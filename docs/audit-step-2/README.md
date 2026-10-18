@@ -1,0 +1,63 @@
+# FlexyGram 1.0 — Auditoría técnica, PASO 2
+
+Fecha: 18 de octubre de 2026. Creador y responsable de FlexyGram: **@Lukhou23**. Repositorio propietario: **Jose22Yt/FlexyGram**. La autoría del código original corresponde a sus autores y se mantienen sus avisos y licencias.
+
+## Resultado y alcance
+
+La base es una aplicación Android de Views con navegación y fragmentos propios, no una aplicación construida alrededor de AndroidX FragmentManager o Compose. Tiene colas y cachés, pero también barreras deliberadas de transición y trabajo síncrono condicionado por la caché. **No se ha demostrado que una parte sea lenta, que exista una fuga de memoria, ni que FlexyGram iguale o empeore la respuesta de Exteraless.** Eso exige ejecutar una base controlada y medirla.
+
+Se inspeccionó el árbol del superproyecto y se leyeron las rutas críticas, configuración, puente de plugins y workflows citados. Se hizo búsqueda estática por símbolos, esperas y puntos de entrada. No es una revisión línea por línea de las dependencias vendorizadas ni una auditoría de seguridad completa de todos los plugins. Los submódulos se inventariaron por URL y SHA, sin inicializarlos ni auditar su contenido interno.
+
+| Evidencia | Estado |
+| --- | --- |
+| Commit funcional original de Exteraless | `1ad6a60a6834ffca722b1a22f4fba27ecb29a061` |
+| Commit de FlexyGram inspeccionado | `db1bea24b7b705de33f8ff8c8e174011c153cac7` |
+| Árbol de ese commit | `66ce2d09ceef8575633f171d6acef29db6ea152c` |
+| `main` y `develop` al comenzar | Ambos en ese commit; sin protección |
+| Código ejecutado de la aplicación | Ninguno |
+| Gradle, compilaciones, pruebas Android, APK o workflows ejecutados | Ninguno |
+| Acceso al Poco X8 Pro / mediciones reales | No disponible en este paso |
+
+Se obtuvo una copia del repositorio para lectura, incluidos los binarios que ya forman parte de su árbol. No se ejecutaron scripts del proyecto, Gradle, pip, CMake ni herramientas de compilación; no se inicializaron submódulos ni se instalaron dependencias. Los comandos de análisis usaron Git, búsqueda de texto y una generación local de documentación propia.
+
+## Lectura del informe
+
+1. [Mapa de arquitectura y responsabilidades](architecture.md).
+2. [Navegación, toques, animaciones y rendimiento](navigation-performance.md).
+3. [Construcción, dependencias y compatibilidad](build-dependencies.md).
+4. [GitHub, workflows y requisitos del Paso 3](github-and-next-step.md).
+5. [Inventario verificable: dependencias y submódulos](inventory.md).
+
+Los enlaces de código usan el SHA completo inspeccionado, para que el desplazamiento futuro de una rama no cambie la evidencia.
+
+## Clasificación
+
+- **H — Hecho:** visible en código o configuración; no equivale a impacto medido.
+- **R — Riesgo:** consecuencia plausible que requiere reproducción o medición.
+- **M — Medir:** no puede resolverse con lectura de código.
+- La prioridad expresa el orden de estudio y control, no una severidad de incidente demostrado. No se declara ningún defecto crítico confirmado.
+
+## Hallazgos priorizados
+
+| ID | Prioridad | Hecho comprobado | Riesgo / validación pendiente |
+| --- | --- | --- | --- |
+| NAV-01 | Alta | La lista de diálogos activa `setInstantClick(true)`; RecyclerListView puede entregar el clic antes de finalizar el estado visual de pulsación | Preservar esa ruta; medir tiempo desde el toque al primer fotograma y distinguir búsquedas/doble toque. Evidencia: [TMessagesProj/src/main/java/org/telegram/ui/DialogsActivity.java:L4322](https://github.com/Jose22Yt/FlexyGram/blob/db1bea24b7b705de33f8ff8c8e174011c153cac7/TMessagesProj/src/main/java/org/telegram/ui/DialogsActivity.java#L4322), [TMessagesProj/src/main/java/org/telegram/ui/Components/RecyclerListView.java:L1135](https://github.com/Jose22Yt/FlexyGram/blob/db1bea24b7b705de33f8ff8c8e174011c153cac7/TMessagesProj/src/main/java/org/telegram/ui/Components/RecyclerListView.java#L1135) |
+| NAV-02 | Alta | `presentFragment` y `closeLastFragment` rechazan navegación durante estados de transición/deslizamiento | No existe evidencia de cancelación universal por cada toque. Medir eventos aceptados, rechazados y estados finales. Evidencia: [TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java:L2446](https://github.com/Jose22Yt/FlexyGram/blob/db1bea24b7b705de33f8ff8c8e174011c153cac7/TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java#L2446), [TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java:L3101](https://github.com/Jose22Yt/FlexyGram/blob/db1bea24b7b705de33f8ff8c8e174011c153cac7/TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java#L3101) |
+| NAV-03 | Alta | `ChatActivity.onFragmentCreate` espera con `CountDownLatch.await()` sin timeout en consultas de entidades ausentes de memoria | Puede bloquear el llamador UI hasta que responda storageQueue; no se ha medido duración ni reproducido ANR. Evidencia: [TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java:L3104](https://github.com/Jose22Yt/FlexyGram/blob/db1bea24b7b705de33f8ff8c8e174011c153cac7/TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java#L3104), [TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java:L3143](https://github.com/Jose22Yt/FlexyGram/blob/db1bea24b7b705de33f8ff8c8e174011c153cac7/TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java#L3143), [TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java:L3180](https://github.com/Jose22Yt/FlexyGram/blob/db1bea24b7b705de33f8ff8c8e174011c153cac7/TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java#L3180) |
+| NAV-04 | Alta | Apertura diferida por `firstLoading`; existen temporizadores de 200/250 ms y una comprobación de recuperación de transición tras 1500 ms | Son ramas condicionales, no latencias universales ni FPS. Medir con/sin caché y teclado. Evidencia: [TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java:L28841](https://github.com/Jose22Yt/FlexyGram/blob/db1bea24b7b705de33f8ff8c8e174011c153cac7/TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java#L28841), [TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java:L2740](https://github.com/Jose22Yt/FlexyGram/blob/db1bea24b7b705de33f8ff8c8e174011c153cac7/TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java#L2740), [TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java:L2126](https://github.com/Jose22Yt/FlexyGram/blob/db1bea24b7b705de33f8ff8c8e174011c153cac7/TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java#L2126) |
+| UI-01 | Alta | La preparación de preview crea un bitmap a 1/9 de resolución por eje, dibuja la vista y aplica stackBlur sin salto explícito de hilo en ese método | Trabajo síncrono potencialmente relevante al mantener pulsado; medir CPU, GC, RenderThread y GPU. Evidencia: [TMessagesProj/src/main/java/org/telegram/ui/DialogsActivity.java:L9266](https://github.com/Jose22Yt/FlexyGram/blob/db1bea24b7b705de33f8ff8c8e174011c153cac7/TMessagesProj/src/main/java/org/telegram/ui/DialogsActivity.java#L9266) |
+| PLG-01 | Alta | Inicialización Python en executor; hooks concretos llaman síncronamente a `loader.callAttr` | El executor de inicio no vuelve asíncronos todos los hooks. Riesgo condicionado al plugin y al hilo llamador. Evidencia: [TMessagesProj/src/main/java/app/exteraless/plugins/PythonPluginsEngine.java:L114](https://github.com/Jose22Yt/FlexyGram/blob/db1bea24b7b705de33f8ff8c8e174011c153cac7/TMessagesProj/src/main/java/app/exteraless/plugins/PythonPluginsEngine.java#L114), [TMessagesProj/src/main/java/app/exteraless/plugins/PythonPluginsEngine.java:L550](https://github.com/Jose22Yt/FlexyGram/blob/db1bea24b7b705de33f8ff8c8e174011c153cac7/TMessagesProj/src/main/java/app/exteraless/plugins/PythonPluginsEngine.java#L550) |
+| BLD-01 | Alta | Chaquopy personalizado, submódulo media y numerosos archivos nativos importados son parte de la construcción | Una clonación incompleta o un prebuilt incompatible puede impedir construcción o carga. Sin compilación ni validación ABI/ELF. Véase informe de construcción |
+| BLD-02 | Alta | Credenciales heredadas con fallback y firma debug si falta keystore propio | Antes de distribuir hay que definir identidad de paquete, credenciales y firma propias; no se han cambiado. Evidencia: [TMessagesProj/build.gradle:L151](https://github.com/Jose22Yt/FlexyGram/blob/db1bea24b7b705de33f8ff8c8e174011c153cac7/TMessagesProj/build.gradle#L151), [TMessagesProj/build.gradle:L223](https://github.com/Jose22Yt/FlexyGram/blob/db1bea24b7b705de33f8ff8c8e174011c153cac7/TMessagesProj/build.gradle#L223) |
+| CI-01 | Alta | Release heredada declara `contents: write`, publicación GitHub, envío a Telegram y borrado de prereleases | Riesgo latente si se habilita. Actions sigue desactivado; ninguna de esas acciones se ejecutó. Evidencia: [.github/workflows/release.yml:L26](https://github.com/Jose22Yt/FlexyGram/blob/db1bea24b7b705de33f8ff8c8e174011c153cac7/.github/workflows/release.yml#L26), [.github/workflows/release.yml:L117](https://github.com/Jose22Yt/FlexyGram/blob/db1bea24b7b705de33f8ff8c8e174011c153cac7/.github/workflows/release.yml#L117) |
+| CFG-01 | Media | Estilo de navegación usa booleanos `static final` derivados de configuración | El valor queda capturado al inicializar la clase; no asumir actualización en vivo. Evidencia: [TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java:L4175](https://github.com/Jose22Yt/FlexyGram/blob/db1bea24b7b705de33f8ff8c8e174011c153cac7/TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java#L4175) |
+| MEM-01 | Media | Existen grupos de observadores, cancelación por GUID y limpieza de vistas; también stacks y referencias globales | Auditar retenciones tras ciclos y process death; ninguna fuga confirmada. Evidencia: [TMessagesProj/src/main/java/org/telegram/ui/ActionBar/BaseFragment.java:L525](https://github.com/Jose22Yt/FlexyGram/blob/db1bea24b7b705de33f8ff8c8e174011c153cac7/TMessagesProj/src/main/java/org/telegram/ui/ActionBar/BaseFragment.java#L525), [TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java:L3748](https://github.com/Jose22Yt/FlexyGram/blob/db1bea24b7b705de33f8ff8c8e174011c153cac7/TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java#L3748) |
+| BLD-03 | Media | Comentarios citan Python 3.12, configuración y CI dicen 3.11; target nativo android-27 frente a minSdk 24 | Inconsistencias/requisitos a resolver con evidencia; no corregidos en este paso. Evidencia: [TMessagesProj/build.gradle:L94](https://github.com/Jose22Yt/FlexyGram/blob/db1bea24b7b705de33f8ff8c8e174011c153cac7/TMessagesProj/build.gradle#L94), [TMessagesProj/build.gradle:L136](https://github.com/Jose22Yt/FlexyGram/blob/db1bea24b7b705de33f8ff8c8e174011c153cac7/TMessagesProj/build.gradle#L136), [TMessagesProj/build.gradle:L191](https://github.com/Jose22Yt/FlexyGram/blob/db1bea24b7b705de33f8ff8c8e174011c153cac7/TMessagesProj/build.gradle#L191), [build.gradle:L47](https://github.com/Jose22Yt/FlexyGram/blob/db1bea24b7b705de33f8ff8c8e174011c153cac7/build.gradle#L47) |
+| REL-01 | Alta antes de distribución | El actualizador apunta a `exteraless/exteraless` y el paquete sigue siendo `com.exteraless.app` | No presentar una futura APK como canal de actualización propio sin revisar firma, paquete y origen. Evidencia: [TMessagesProj/src/main/java/app/exteraless/updater/GitHubUpdater.java:L47](https://github.com/Jose22Yt/FlexyGram/blob/db1bea24b7b705de33f8ff8c8e174011c153cac7/TMessagesProj/src/main/java/app/exteraless/updater/GitHubUpdater.java#L47), [gradle.properties:L20](https://github.com/Jose22Yt/FlexyGram/blob/db1bea24b7b705de33f8ff8c8e174011c153cac7/gradle.properties#L20) |
+| TEST-01 | Media | Pruebas existentes centradas en plugins pueden omitir casos si falta corpus o mapping R8 | Un futuro resultado verde con skips no probaría fluidez ni cobertura completa. Evidencia: [tests/README.md:L10](https://github.com/Jose22Yt/FlexyGram/blob/db1bea24b7b705de33f8ff8c8e174011c153cac7/tests/README.md#L10) |
+
+## Qué conservar y qué ampliar
+
+Conservar inicialmente navegación, contratos de ciclo de vida, colas, transporte, SQLite, reproducción y reciclado. Ampliar mediante controladores de UI y políticas de presentación pequeñas, con configuración versionada y activación por función. No crear otro motor global de navegación, frame clock, reproductor o sistema de preferencias por defecto.
+
+Las prioridades oficiales son: **estabilidad → respuesta táctil → fluidez → eficiencia → funciones propias → personalización y diseño**. Ninguna hipótesis de este informe autoriza una optimización o implementación automática.
