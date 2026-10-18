@@ -23,11 +23,10 @@ public class GcmPushListenerService extends FirebaseMessagingService {
     public void onMessageReceived(RemoteMessage message) {
         if (isGooglePushDisabled()) return;
 
-        String from = message.getFrom();
         Map<String, String> data = message.getData();
         long time = message.getSentTime();
 
-        FileLog.d("FCM received data: " + data + " from: " + from);
+        FileLog.d("FCM message received");
 
         PushListenerController.processRemoteMessage(PushListenerController.PUSH_TYPE_FIREBASE, data.get("p"), time);
     }
@@ -37,7 +36,7 @@ public class GcmPushListenerService extends FirebaseMessagingService {
         if (isGooglePushDisabled()) return;
         AndroidUtilities.runOnUIThread(() -> {
             if (BuildVars.LOGS_ENABLED) {
-                FileLog.d("Refreshed FCM token: " + token);
+                FileLog.d("FCM token refreshed");
             }
             ApplicationLoader.postInitApplication();
             PushListenerController.sendRegistrationToServer(PushListenerController.PUSH_TYPE_FIREBASE, token);
