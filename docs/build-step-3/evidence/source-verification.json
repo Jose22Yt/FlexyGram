@@ -1,0 +1,19 @@
+{
+  "original_code_sha": "1ad6a60a6834ffca722b1a22f4fba27ecb29a061",
+  "step1_sha": "db1bea24b7b705de33f8ff8c8e174011c153cac7",
+  "approved_step2_head": "7b6200b508b6b5aa710ff6eeaac6b67836449040",
+  "step2_merge_sha": "082aff3d0fc57ce90b0154fe76d9d7c796ed45a2",
+  "step2_merge_diff": [
+    "A\tdocs/audit-step-2/README.md",
+    "A\tdocs/audit-step-2/architecture.md",
+    "A\tdocs/audit-step-2/build-dependencies.md",
+    "A\tdocs/audit-step-2/github-and-next-step.md",
+    "A\tdocs/audit-step-2/inventory.md",
+    "A\tdocs/audit-step-2/navigation-performance.md"
+  ],
+  "tracked_worktree_diff": [],
+  "worktree_status": [
+    "?? docs/build-step-3/"
+  ],
+  "local_properties_ignored": true
+}

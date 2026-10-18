@@ -1,0 +1,31 @@
+{
+  "jdk": {
+    "exit_code": 0,
+    "output": "openjdk version \"21.0.11\" 2026-04-21\nOpenJDK Runtime Environment JBR-21.0.11+10-1163.116-nomod (build 21.0.11+10-b1163.116)\nOpenJDK 64-Bit Server VM JBR-21.0.11+10-1163.116-nomod (build 21.0.11+10-b1163.116, mixed mode, sharing)"
+  },
+  "python": {
+    "exit_code": 0,
+    "output": "Python 3.11.17"
+  },
+  "cmake": {
+    "exit_code": 0,
+    "output": "cmake version 3.31.6\n\nCMake suite maintained and supported by Kitware (kitware.com/cmake)."
+  },
+  "ndk_clang": {
+    "exit_code": 0,
+    "output": "Android (12470979, +pgo, +bolt, +lto, +mlgo, based on r522817c) clang version 18.0.3 (https://android.googlesource.com/toolchain/llvm-project d8003a456d14a3deb8054cdaa529ffbf02d9b262)\nTarget: x86_64-unknown-linux-gnu\nThread model: posix\nInstalledDir: /workspace/scratch/1f84b79e43f3/step3-work/toolchains/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin"
+  },
+  "adb": {
+    "exit_code": 0,
+    "output": "Android Debug Bridge version 1.0.41\nVersion 37.0.1-15733141\nInstalled as /workspace/scratch/1f84b79e43f3/step3-work/toolchains/android-sdk/platform-tools/adb\nRunning on Linux 6.18.55 (x86_64)"
+  },
+  "sdk_packages": {
+    "platforms/android-37.0": "Pkg.Desc=Android SDK Platform 17\nPkg.UserSrc=false\nPlatform.Version=17\nPlatform.CodeName=\nPkg.Revision=2\nAndroidVersion.ApiLevel=37.0\nAndroidVersion.CodeName=\nAndroidVersion.ExtensionLevel=22\nAndroidVersion.IsBaseSdk=true\nAndroidVersion.PreviewSdkInt=0\nAndroidVersion.BetaVersion=\nLayoutlib.Api=15\nLayoutlib.Revision=1\nPlatform.MinToolsRev=22\n",
+    "platforms/android-35": "Pkg.Desc=Android SDK Platform 15\nPkg.UserSrc=false\nPlatform.Version=15\nPlatform.CodeName=\nPkg.Revision=2\nAndroidVersion.ApiLevel=35\nAndroidVersion.ExtensionLevel=13\nAndroidVersion.IsBaseSdk=true\nLayoutlib.Api=15\nLayoutlib.Revision=1\nPlatform.MinToolsRev=22\n",
+    "build-tools/36.0.0": "Pkg.UserSrc=false\nPkg.Revision=36.0.0\n#Pkg.Revision=36.0.0 rc5",
+    "ndk/27.2.12479018": "Pkg.Desc = Android NDK\nPkg.Revision = 27.2.12479018\nPkg.BaseRevision = 27.2.12479018\nPkg.ReleaseName = r27c\n",
+    "cmake/3.31.6": "Pkg.Revision = 3.31.6\nPkg.Path = cmake;3.31.6\nPkg.Desc = CMake 3.31.6\n"
+  },
+  "wrapper_jar_sha256": "7a9ce74cff467ca1bf60a4fcd9f05185acceda4d0f382434d393e17864262c5d",
+  "device_check": "List of devices attached"
+}

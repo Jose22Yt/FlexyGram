@@ -1,0 +1,14 @@
+{
+  "aapt": {
+    "exit_code": 0,
+    "output": "Android Asset Packaging Tool, v0.2-13193326"
+  },
+  "aapt2": {
+    "exit_code": 0,
+    "output": "Android Asset Packaging Tool (aapt) 2.20-13193326"
+  },
+  "apksigner": {
+    "exit_code": 0,
+    "output": "0.9"
+  }
+}

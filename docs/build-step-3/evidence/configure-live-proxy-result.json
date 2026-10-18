@@ -1,0 +1,12 @@
+{
+  "command": [
+    "./gradlew",
+    "help",
+    "--info",
+    "--no-daemon",
+    "--console=plain",
+    "--stacktrace",
+    "--max-workers=2"
+  ],
+  "exit_code": 0
+}
