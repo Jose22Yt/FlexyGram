@@ -1,0 +1,3 @@
+{"file": "jbr.tar.gz", "bytes": 241266253, "algorithm": "sha512", "hash": "13d0aab4bcfa9e4f77a696b97d3998f7e82e22f7f1362d8ce97f0d50d69dddd9331a66ada3fe92c04e544795fc247bcbaf586ad0415df4eda5e0e0505753888f", "verified": true}
+{"file": "gradle-9.7.1-bin.zip", "bytes": 151433392, "algorithm": "sha256", "hash": "acd53f1edaf02f1a8ff99879f8a34b302661a057d9b063ae9e35b552f804d20a", "verified": true}
+PROVISION COMPLETE

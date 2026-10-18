@@ -1,0 +1,6 @@
+{"file": "platform-35_r02.zip", "bytes": 64273788, "algorithm": "sha1", "hash": "0bb560a90a7a2cbd0dd8348224d518b638fe7949", "verified": true}
+{"file": "build-tools_r36_linux.zip", "bytes": 63737259, "algorithm": "sha1", "hash": "b0b6376977657e8ad9b969bacf4093601da2c6fb", "verified": true}
+installed platforms;android-35
+installed build-tools;36.0.0
+{"file": "android-ndk-r27c-linux.zip", "bytes": 663987688, "algorithm": "sha1", "hash": "090e8083a715fdb1a3e402d0763c388abb03fb4e", "verified": true}
+installed ndk;27.2.12479018

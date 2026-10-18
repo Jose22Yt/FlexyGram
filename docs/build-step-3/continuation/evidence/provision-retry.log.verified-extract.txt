@@ -1,0 +1,8 @@
+{"file": "platform-tools_r37.0.1-linux.zip", "bytes": 9054187, "algorithm": "sha1", "hash": "477254aa5f903c15cf51001717bdf347fb6b53e0", "verified": true}
+installed platform-tools
+{"file": "cmake-3.31.6-linux.zip", "bytes": 30771638, "algorithm": "sha1", "hash": "a54551dabd5daf8cc99f7f51769fd00ca759be0a", "verified": true}
+installed cmake;3.31.6
+{"file": "platform-37.0_r02.zip", "bytes": 67281901, "algorithm": "sha1", "hash": "ed8ebf7f8822a4de5686d427f237d2fa30ff7410", "verified": true}
+{"file": "jbr.tar.gz", "bytes": 241266253, "algorithm": "sha512", "hash": "13d0aab4bcfa9e4f77a696b97d3998f7e82e22f7f1362d8ce97f0d50d69dddd9331a66ada3fe92c04e544795fc247bcbaf586ad0415df4eda5e0e0505753888f", "verified": true}
+{"file": "gradle-9.7.1-bin.zip", "bytes": 151433392, "algorithm": "sha256", "hash": "acd53f1edaf02f1a8ff99879f8a34b302661a057d9b063ae9e35b552f804d20a", "verified": true}
+PROVISION COMPLETE

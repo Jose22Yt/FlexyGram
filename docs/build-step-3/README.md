@@ -1,5 +1,8 @@
 # FlexyGram 1.0 — Paso 3: preparación y primera construcción de referencia
 
+> **Continuación y nueva entrega:** la APK original de este registro no se recuperó. Se reconstruyó desde el mismo commit de fuente. Consultar [la verificación actual y el nuevo SHA-256](continuation/README.md), los límites de 16 KB y las pruebas Android pendientes. Los hashes históricos siguientes no identifican la APK nueva.
+
+
 Responsable y creador de FlexyGram: **@Lukhou23**. Cuenta propietaria: **Jose22Yt**. Base funcional y autoría original: **Exteraless y sus contribuyentes**, sin atribuir su código a FlexyGram. Se conserva GPL-3.0 y los avisos originales.
 
 Fecha de la sesión: 18 de octubre de 2026. Alcance exclusivo: integrar documentación aprobada, preparar entorno y comprobar una construcción ARM64 Debug. No se autoriza avanzar al Paso 4 desde este informe.

@@ -1,0 +1,46 @@
+GitHub excerpt; complete depurated log is in the downloadable evidence archive. Original line numbers follow.
+26366: C/C++: ndk.dir in local.properties is not set
+26367: C/C++: Not considering ANDROID_NDK_HOME because support was removed after deprecation period.
+26368: C/C++: sdkFolder is <WORKSPACE>/step3-work/toolchains/android-sdk
+26369: Starting process 'command '<WORKSPACE>/step3-work/toolchains/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-strip''. Working directory: <WORKSPACE>/FlexyGram/TMessagesProj Command: <WORKSPACE>/step3-work/toolchains/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-strip --strip-unneeded -o <WORKSPACE>/FlexyGram/TMessagesProj/build/intermediates/stripped_native_libs/debug/stripDebugDebugSymbols/out/lib/x86_64/libvosk.so <WORKSPACE>/FlexyGram/TMessagesProj/build/intermediates/merged_native_libs/debug/mergeDebugNativeLibs/out/lib/x86_64/libvosk.so
+26370: Successfully started process 'command '<WORKSPACE>/step3-work/toolchains/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-strip''
+26371: Successfully started process 'command '<WORKSPACE>/step3-work/toolchains/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-strip''
+26372: Unable to strip the following libraries, packaging them as they are: libjnidispatch.so. Run with --info option to learn more.
+26373: Resolve mutations for :TMessagesProj:packageDebug (Thread[#63,included builds,5,main]) started.
+26374: :TMessagesProj:packageDebug (Thread[#63,included builds,5,main]) started.
+26375: 
+26376: > Task :TMessagesProj:packageDebug
+26377: Custom actions are attached to task ':TMessagesProj:packageDebug'.
+26378: Caching disabled for task ':TMessagesProj:packageDebug' because:
+26379:   Caching has been disabled for the task
+26380: Task ':TMessagesProj:packageDebug' is not up-to-date because:
+26381:   No history is available.
+26382: The input changes require a full rebuild for incremental task ':TMessagesProj:packageDebug'.
+26383: Resolve mutations for :TMessagesProj:createDebugApkListingFileRedirect (Thread[#63,included builds,5,main]) started.
+26384: :TMessagesProj:createDebugApkListingFileRedirect (Thread[#63,included builds,5,main]) started.
+26385: 
+26386: > Task :TMessagesProj:createDebugApkListingFileRedirect
+26387: Caching disabled for task ':TMessagesProj:createDebugApkListingFileRedirect' because:
+26388:   Caching has been disabled for the task
+26389: Task ':TMessagesProj:createDebugApkListingFileRedirect' is not up-to-date because:
+26390:   No history is available.
+26391: Resolve mutations for :TMessagesProj:assembleDebug (Thread[#63,included builds,5,main]) started.
+26392: :TMessagesProj:assembleDebug (Thread[#63,included builds,5,main]) started.
+26393: 
+26394: > Task :TMessagesProj:assembleDebug
+26395: Skipping task ':TMessagesProj:assembleDebug' as it has no actions.
+26396: Build c95b62f7-8750-4618-a6d6-52e7f4aa80e7 is closed
+26397: AAPT2 aapt2-9.3.1-15703166-linux Daemon #1: shutdown
+26398: AAPT2 aapt2-9.3.1-15703166-linux Daemon #2: shutdown
+26399: Build 897b1b8b-040a-460d-b468-fb0e8f1bd1fd is closed
+26400: 
+26401: [Incubating] Problems report is available at: file://<WORKSPACE>/FlexyGram/build/reports/problems/problems-report.html
+26402: 
+26403: Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+26404: 
+26405: You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+26406: 
+26407: For more on this, please refer to https://docs.gradle.org/9.7.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+26408: 
+26409: BUILD SUCCESSFUL in 18m 34s
+26410: 247 actionable tasks: 39 executed, 208 up-to-date

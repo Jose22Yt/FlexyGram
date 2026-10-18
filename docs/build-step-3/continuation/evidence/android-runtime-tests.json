@@ -1,0 +1,1 @@
+{"installation":"not_run","first_launch":"not_run","native_loading":"not_run","python_initialization":"not_run","main_screen":"not_run","logcat":"not_collected_no_android_target","reason":"adb devices -l returned an empty list; no Android emulator installed or running; /dev/kvm unavailable.","host_page_size_bytes":4096,"android_page_size_bytes":null,"poco_page_size_bytes":null}
