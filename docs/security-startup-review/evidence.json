@@ -1,0 +1,1968 @@
+{
+  "review_date_utc": "2026-10-18",
+  "project_owner": "@Lukhou23",
+  "repository": "Jose22Yt/FlexyGram",
+  "source_commit": "082aff3d0fc57ce90b0154fe76d9d7c796ed45a2",
+  "source_tree": "3583f5ca9815640d1b0faf423d5ddbfc3ab19894",
+  "apk": {
+    "filename": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk",
+    "bytes": 111994391,
+    "sha256_recalculated": "1ca683e5e4ef924ca9e7636afcd0c0b2c54de5064a46603ac5ae7b4f811278fe",
+    "package": "com.exteraless.app",
+    "version_name": "13.0.2",
+    "version_code": 1261,
+    "certificate_sha256_from_prior_apksigner": "ba687de28eaaaa20bc77898f5520ba1b544216c6a3b88c333a96e593b3e94456",
+    "runtime_executed_in_this_audit": false
+  },
+  "generated_build_config_checked_now": {
+    "app_id": 6,
+    "app_hash_matches_source_fallback": true,
+    "app_hash_value_omitted": true,
+    "debug_tools": "false",
+    "debug_flag_expression": "Boolean.parseBoolean(\"true\")"
+  },
+  "source_locations": {
+    "reset_all": [
+      {
+        "path": "TMessagesProj/src/main/java/org/telegram/ui/SessionsActivity.java",
+        "line": 357,
+        "url": "https://github.com/Jose22Yt/FlexyGram/blob/082aff3d0fc57ce90b0154fe76d9d7c796ed45a2/TMessagesProj/src/main/java/org/telegram/ui/SessionsActivity.java#L357"
+      },
+      {
+        "path": "TMessagesProj/src/main/java/org/telegram/ui/SessionsActivity.java",
+        "line": 397,
+        "url": "https://github.com/Jose22Yt/FlexyGram/blob/082aff3d0fc57ce90b0154fe76d9d7c796ed45a2/TMessagesProj/src/main/java/org/telegram/ui/SessionsActivity.java#L397"
+      }
+    ],
+    "reset_one": [
+      {
+        "path": "TMessagesProj/src/main/java/org/telegram/messenger/UnconfirmedAuthController.java",
+        "line": 400,
+        "url": "https://github.com/Jose22Yt/FlexyGram/blob/082aff3d0fc57ce90b0154fe76d9d7c796ed45a2/TMessagesProj/src/main/java/org/telegram/messenger/UnconfirmedAuthController.java#L400"
+      },
+      {
+        "path": "TMessagesProj/src/main/java/org/telegram/ui/SessionsActivity.java",
+        "line": 526,
+        "url": "https://github.com/Jose22Yt/FlexyGram/blob/082aff3d0fc57ce90b0154fe76d9d7c796ed45a2/TMessagesProj/src/main/java/org/telegram/ui/SessionsActivity.java#L526"
+      },
+      {
+        "path": "TMessagesProj/src/main/java/org/telegram/ui/SessionsActivity.java",
+        "line": 582,
+        "url": "https://github.com/Jose22Yt/FlexyGram/blob/082aff3d0fc57ce90b0154fe76d9d7c796ed45a2/TMessagesProj/src/main/java/org/telegram/ui/SessionsActivity.java#L582"
+      },
+      {
+        "path": "TMessagesProj/src/main/java/org/telegram/ui/SessionsActivity.java",
+        "line": 614,
+        "url": "https://github.com/Jose22Yt/FlexyGram/blob/082aff3d0fc57ce90b0154fe76d9d7c796ed45a2/TMessagesProj/src/main/java/org/telegram/ui/SessionsActivity.java#L614"
+      }
+    ],
+    "logout_rpc": [
+      {
+        "path": "TMessagesProj/src/main/java/org/telegram/messenger/MessagesController.java",
+        "line": 16449,
+        "url": "https://github.com/Jose22Yt/FlexyGram/blob/082aff3d0fc57ce90b0154fe76d9d7c796ed45a2/TMessagesProj/src/main/java/org/telegram/messenger/MessagesController.java#L16449"
+      }
+    ],
+    "auth_key_duplicated": [
+      {
+        "path": "TMessagesProj/jni/tgnet/ConnectionsManager.cpp",
+        "line": 1539,
+        "url": "https://github.com/Jose22Yt/FlexyGram/blob/082aff3d0fc57ce90b0154fe76d9d7c796ed45a2/TMessagesProj/jni/tgnet/ConnectionsManager.cpp#L1539"
+      }
+    ],
+    "push_session_revoke": [
+      {
+        "path": "TMessagesProj/src/main/java/org/telegram/messenger/PushListenerController.java",
+        "line": 273,
+        "url": "https://github.com/Jose22Yt/FlexyGram/blob/082aff3d0fc57ce90b0154fe76d9d7c796ed45a2/TMessagesProj/src/main/java/org/telegram/messenger/PushListenerController.java#L273"
+      }
+    ],
+    "future_auth_token_log": [
+      {
+        "path": "TMessagesProj/src/main/java/org/telegram/messenger/AuthTokensHelper.java",
+        "line": 85,
+        "url": "https://github.com/Jose22Yt/FlexyGram/blob/082aff3d0fc57ce90b0154fe76d9d7c796ed45a2/TMessagesProj/src/main/java/org/telegram/messenger/AuthTokensHelper.java#L85"
+      }
+    ],
+    "push_auth_key_log": [
+      {
+        "path": "TMessagesProj/src/main/java/org/telegram/messenger/PushListenerController.java",
+        "line": 137,
+        "url": "https://github.com/Jose22Yt/FlexyGram/blob/082aff3d0fc57ce90b0154fe76d9d7c796ed45a2/TMessagesProj/src/main/java/org/telegram/messenger/PushListenerController.java#L137"
+      },
+      {
+        "path": "TMessagesProj/src/main/java/org/telegram/messenger/PushListenerController.java",
+        "line": 152,
+        "url": "https://github.com/Jose22Yt/FlexyGram/blob/082aff3d0fc57ce90b0154fe76d9d7c796ed45a2/TMessagesProj/src/main/java/org/telegram/messenger/PushListenerController.java#L152"
+      }
+    ]
+  },
+  "linked_source_files_verified_against_git": [
+    {
+      "path": "TMessagesProj/build.gradle",
+      "sha256": "56104716940965dd307db1deb98ac37c4a5cc92e7ebba4982c519366ebed60c3"
+    },
+    {
+      "path": "TMessagesProj/jni/CMakeLists.txt",
+      "sha256": "a8286c0aac6e9555969d7ea51ad3f806d22f3b23c03bcb6b53c69c29e1f3f91e"
+    },
+    {
+      "path": "TMessagesProj/jni/tgnet/Config.cpp",
+      "sha256": "c2ab487ac0db14a8b2769efec7b2ed785670ccf01fcee91e2755ea195d26f733"
+    },
+    {
+      "path": "TMessagesProj/jni/tgnet/ConnectionsManager.cpp",
+      "sha256": "2ec98539700348ea3fb39b23ffd8e49d88b6216920e59cf28c90602cd45aef32"
+    },
+    {
+      "path": "TMessagesProj/jni/tgnet/Datacenter.cpp",
+      "sha256": "32442764f1d5318512dc737993b045140d104c5fc48ebbe84990d059401168cb"
+    },
+    {
+      "path": "TMessagesProj/src/main/AndroidManifest.xml",
+      "sha256": "210c55d53b33da09f9db62e31aa6c36c27a68e6346bb900e9043c1770aad587a"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/PluginsController.java",
+      "sha256": "db9e8f14ee548f219d1287dcbd94c063112738e8645dfdd77a90549c61c9e465"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/PythonPluginsEngine.java",
+      "sha256": "b745539e9da48e2981f94a3b51de0ca1331dd2493bbda9cd2cb35407b210dd9d"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/messenger/ApplicationLoader.java",
+      "sha256": "754ff2d517bb349f01b34ba3d16c1c49df442eb2ffbd8d9e9835c0012c0e8260"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/messenger/AuthTokensHelper.java",
+      "sha256": "170d75c4868a03930347955267a52d365cd6a81af301c477780d1dfb12d111b2"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/messenger/BackupAgent.java",
+      "sha256": "043d5a66e95cb805b5a56b6e2246260460b2d541be024a62da126a0a24ab6d5d"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/messenger/BuildVars.java",
+      "sha256": "7039ad52aa7a869ab73996d4fbcddeb3a34b1a7660c5c85beaaa449b37eaf7d0"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/messenger/ContactsController.java",
+      "sha256": "9ca5fa402d9715a96727002c2456fa74c45e5f29bb493bb2660bca8d7e5a3981"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/messenger/FileLog.java",
+      "sha256": "d099b39e54549c0a149a8fa5991719340e04ed54124c0ee52ecb30e2caa5abc6"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/messenger/GcmPushListenerService.java",
+      "sha256": "f4e70698964dd69f999615e86d30a31dcb3a03c3c2ee5086a4574393c1102338"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/messenger/MessagesController.java",
+      "sha256": "cf60286b0d80039e5a0d180de23e9af6cf1326a8f62502adb90a2d1933e1fe5f"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/messenger/MessagesStorage.java",
+      "sha256": "fb9a9746731b65d55e58f9662ca6933ad63fa01dd988d9aeaf502fafbe8637e8"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/messenger/NativeLoader.java",
+      "sha256": "fb2296ec1d5e2f41f8cca48f59a78727b3d07ddeda352e76c82336da2ec1d8d9"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/messenger/PushListenerController.java",
+      "sha256": "1bcff47ba5ecb4663ae0f7ba05dad971c7ca13c4a240cff6c0e10b722d1e2fed"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/messenger/UnconfirmedAuthController.java",
+      "sha256": "9a4f4bfcb409b88802ec7c8eb1d634e7b57c8a938fbb898b02590111a154bffc"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/tgnet/ConnectionsManager.java",
+      "sha256": "44d4ccb492da5ed8b8657bb541016420fd064aa132c0832f3062fa8cc8a39daf"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/Cells/UnconfirmedAuthHintCell.java",
+      "sha256": "65f98e8b9d521643d0ea7e962da18fb6e1e3b44c4ec4c6e4217f0de6db6c3475"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/LaunchActivity.java",
+      "sha256": "7089b57697e640ae70fc432fd3b80e115a3871309a8ee21adf8c05edd23c0f7c"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/LoginActivity.java",
+      "sha256": "a7ef3de66726b79f7d664194b6a6a72f69168c1aac04197ffa9e4a139ff17690"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/SessionBottomSheet.java",
+      "sha256": "2daf97ccaac3c70752ce2220cb5e30c4bc51297e40cc0634ed046a8ee575c415"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/SessionsActivity.java",
+      "sha256": "f5afdadd4f8ca717648713298e9e4831a78f24e75c3614d05dee25ff5c120553"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/NekoXConfig.java",
+      "sha256": "24cf8b9aac5f5410102af754afbcee6d953df99e5c9c2a1febe8b9e7a0c53e64"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/xml/auth.xml",
+      "sha256": "a1cca394b31e4d248e8c83183ffc04a8b99b22e7bb894f222d16907598c5a12c"
+    }
+  ],
+  "prior_native_audit": {
+    "provenance": "Recovered Step 3 readelf/apk-audit.json of exactly the same APK SHA-256; not Android execution",
+    "summary": {
+      "elf_total": 97,
+      "arm64_total": 96,
+      "installed_arm64": 18,
+      "apk_abis": [
+        "arm64-v8a"
+      ],
+      "arm64_load_alignment_failures": [
+        "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!chaquopy/lib/libexslt.so",
+        "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!chaquopy/lib/libfreetype.so",
+        "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!chaquopy/lib/libxml2.so",
+        "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!chaquopy/lib/libxslt.so"
+      ],
+      "non_arm64_elf": [
+        "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!debugpy/_vendored/pydevd/pydevd_attach_to_process/attach_linux_amd64.so"
+      ],
+      "relro_end_unaligned_count": 73,
+      "relro_writable_overlap_count": 3,
+      "unresolved_needed": []
+    },
+    "archives": [
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk",
+        "entries": 13290,
+        "crc_error": null
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/app.imy",
+        "entries": 39,
+        "crc_error": null
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/bootstrap.imy",
+        "entries": 129,
+        "crc_error": null
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-arm64-v8a.imy",
+        "entries": 0,
+        "crc_error": null
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy",
+        "entries": 820,
+        "crc_error": null
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy",
+        "entries": 48,
+        "crc_error": null
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-common.imy",
+        "entries": 630,
+        "crc_error": null
+      }
+    ],
+    "python_distributions": [
+      {
+        "name": "pyelftools",
+        "version": "0.26",
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/bootstrap.imy!java/_vendor/pyelftools-0.26.dist-info/METADATA"
+      },
+      {
+        "name": "setuptools",
+        "version": "68.2.2",
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/bootstrap.imy!setuptools-68.2.2.dist-info/METADATA"
+      },
+      {
+        "name": "beautifulsoup4",
+        "version": "4.15.0",
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!beautifulsoup4-4.15.0.dist-info/METADATA"
+      },
+      {
+        "name": "certifi",
+        "version": "2026.10.18",
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!certifi-2026.10.18.dist-info/METADATA"
+      },
+      {
+        "name": "chaquopy-freetype",
+        "version": "2.9.1",
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!chaquopy_freetype-2.9.1.dist-info/METADATA"
+      },
+      {
+        "name": "chaquopy-libjpeg",
+        "version": "1.5.3",
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!chaquopy_libjpeg-1.5.3.dist-info/METADATA"
+      },
+      {
+        "name": "chaquopy-libxml2",
+        "version": "2.9.8",
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!chaquopy_libxml2-2.9.8.dist-info/METADATA"
+      },
+      {
+        "name": "chaquopy-libxslt",
+        "version": "1.1.32",
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!chaquopy_libxslt-1.1.32.dist-info/METADATA"
+      },
+      {
+        "name": "chaquopy-libyaml",
+        "version": "0.2.5",
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!chaquopy_libyaml-0.2.5.dist-info/METADATA"
+      },
+      {
+        "name": "charset-normalizer",
+        "version": "3.5.2",
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!charset_normalizer-3.5.2.dist-info/METADATA"
+      },
+      {
+        "name": "debugpy",
+        "version": "1.8.22",
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!debugpy-1.8.22.dist-info/METADATA"
+      },
+      {
+        "name": "idna",
+        "version": "3.20",
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!idna-3.20.dist-info/METADATA"
+      },
+      {
+        "name": "lxml",
+        "version": "5.3.0",
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!lxml-5.3.0.dist-info/METADATA"
+      },
+      {
+        "name": "packaging",
+        "version": "26.3",
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!packaging-26.3.dist-info/METADATA"
+      },
+      {
+        "name": "pillow",
+        "version": "11.0.0",
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!pillow-11.0.0.dist-info/METADATA"
+      },
+      {
+        "name": "PyYAML",
+        "version": "6.0.3",
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!pyyaml-6.0.3.dist-info/METADATA"
+      },
+      {
+        "name": "requests",
+        "version": "2.34.2",
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!requests-2.34.2.dist-info/METADATA"
+      },
+      {
+        "name": "soupsieve",
+        "version": "3.0.3",
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!soupsieve-3.0.3.dist-info/METADATA"
+      },
+      {
+        "name": "typing_extensions",
+        "version": "4.16.0",
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!typing_extensions-4.16.0.dist-info/METADATA"
+      },
+      {
+        "name": "urllib3",
+        "version": "2.8.0",
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!urllib3-2.8.0.dist-info/METADATA"
+      }
+    ],
+    "pyc_magic_counts": {
+      "a70d0d0a": 1261
+    },
+    "short_pyc_headers": [],
+    "four_arm64_load_alignment_failures": [
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!chaquopy/lib/libexslt.so",
+        "bytes": 108144,
+        "sha256": "997c4e05f91d1253cbdac10c72ef6079335f1d034a8b86b56c7ce8af89f35414",
+        "readelf_exit": 0,
+        "section_headers_available": true,
+        "elf_class": 64,
+        "machine": 183,
+        "pt_load": [
+          {
+            "type": 1,
+            "flags": 5,
+            "offset": 0,
+            "vaddr": 0,
+            "filesz": 102140,
+            "memsz": 102140,
+            "align": 4096
+          },
+          {
+            "type": 1,
+            "flags": 6,
+            "offset": 104688,
+            "vaddr": 108784,
+            "filesz": 1816,
+            "memsz": 1816,
+            "align": 4096
+          }
+        ],
+        "load_alignment_4k": true,
+        "load_sizes_valid": true,
+        "load_alignment_16k": false,
+        "gnu_relro": [
+          {
+            "vaddr": 108784,
+            "memsz": 1808,
+            "end_mod_16k": 12288,
+            "page_protected_range": [
+              98304,
+              114688
+            ],
+            "writable_sections_outside_relro_in_same_pages": [
+              {
+                "section_index": 17,
+                "section_name": ".data",
+                "type": 1,
+                "vaddr": 110592,
+                "size": 8,
+                "intersection": [
+                  110592,
+                  110600
+                ]
+              }
+            ],
+            "nonpadding_writable_overlap": true
+          }
+        ],
+        "needed": [
+          "libxslt.so",
+          "libm.so",
+          "libxml2.so",
+          "libdl.so",
+          "libc.so"
+        ],
+        "soname": "libexslt.so",
+        "needed_not_found_in_apk_or_common_android_system_allowlist": []
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!chaquopy/lib/libfreetype.so",
+        "bytes": 834864,
+        "sha256": "8301778e995a698b9273cd0a95d4e884fd30be6802b55a246cbf60ae09216172",
+        "readelf_exit": 0,
+        "section_headers_available": true,
+        "elf_class": 64,
+        "machine": 183,
+        "pt_load": [
+          {
+            "type": 1,
+            "flags": 5,
+            "offset": 0,
+            "vaddr": 0,
+            "filesz": 808608,
+            "memsz": 808608,
+            "align": 4096
+          },
+          {
+            "type": 1,
+            "flags": 6,
+            "offset": 808608,
+            "vaddr": 812704,
+            "filesz": 24280,
+            "memsz": 24280,
+            "align": 4096
+          }
+        ],
+        "load_alignment_4k": true,
+        "load_sizes_valid": true,
+        "load_alignment_16k": false,
+        "gnu_relro": [
+          {
+            "vaddr": 812704,
+            "memsz": 26976,
+            "end_mod_16k": 4096,
+            "page_protected_range": [
+              802816,
+              851968
+            ],
+            "writable_sections_outside_relro_in_same_pages": [],
+            "nonpadding_writable_overlap": false
+          }
+        ],
+        "needed": [
+          "libm.so",
+          "libz.so",
+          "libdl.so",
+          "libc.so"
+        ],
+        "soname": "libfreetype.so",
+        "needed_not_found_in_apk_or_common_android_system_allowlist": []
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!chaquopy/lib/libxml2.so",
+        "bytes": 2156856,
+        "sha256": "de6451563a70442ad9b2fa41b67a565cb5c69555625d8145b803fc32eca5fcda",
+        "readelf_exit": 0,
+        "section_headers_available": true,
+        "elf_class": 64,
+        "machine": 183,
+        "pt_load": [
+          {
+            "type": 1,
+            "flags": 5,
+            "offset": 0,
+            "vaddr": 0,
+            "filesz": 2117824,
+            "memsz": 2117824,
+            "align": 4096
+          },
+          {
+            "type": 1,
+            "flags": 6,
+            "offset": 2118880,
+            "vaddr": 2122976,
+            "filesz": 36192,
+            "memsz": 41200,
+            "align": 4096
+          }
+        ],
+        "load_alignment_4k": true,
+        "load_sizes_valid": true,
+        "load_alignment_16k": false,
+        "gnu_relro": [
+          {
+            "vaddr": 2122976,
+            "memsz": 31520,
+            "end_mod_16k": 8192,
+            "page_protected_range": [
+              2113536,
+              2162688
+            ],
+            "writable_sections_outside_relro_in_same_pages": [
+              {
+                "section_index": 18,
+                "section_name": ".data",
+                "type": 1,
+                "vaddr": 2154496,
+                "size": 4672,
+                "intersection": [
+                  2154496,
+                  2159168
+                ]
+              },
+              {
+                "section_index": 19,
+                "section_name": ".bss",
+                "type": 8,
+                "vaddr": 2159168,
+                "size": 5008,
+                "intersection": [
+                  2159168,
+                  2162688
+                ]
+              }
+            ],
+            "nonpadding_writable_overlap": true
+          }
+        ],
+        "needed": [
+          "libz.so",
+          "libm.so",
+          "libdl.so",
+          "libc.so"
+        ],
+        "soname": "libxml2.so",
+        "needed_not_found_in_apk_or_common_android_system_allowlist": []
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!chaquopy/lib/libxslt.so",
+        "bytes": 346224,
+        "sha256": "bf625093e95bee481d4641dcb99e7021d374c578b1bcfb47f11eb80330f5052e",
+        "readelf_exit": 0,
+        "section_headers_available": true,
+        "elf_class": 64,
+        "machine": 183,
+        "pt_load": [
+          {
+            "type": 1,
+            "flags": 5,
+            "offset": 0,
+            "vaddr": 0,
+            "filesz": 337816,
+            "memsz": 337816,
+            "align": 4096
+          },
+          {
+            "type": 1,
+            "flags": 6,
+            "offset": 340392,
+            "vaddr": 344488,
+            "filesz": 4048,
+            "memsz": 5224,
+            "align": 4096
+          }
+        ],
+        "load_alignment_4k": true,
+        "load_sizes_valid": true,
+        "load_alignment_16k": false,
+        "gnu_relro": [
+          {
+            "vaddr": 344488,
+            "memsz": 3672,
+            "end_mod_16k": 4096,
+            "page_protected_range": [
+              344064,
+              360448
+            ],
+            "writable_sections_outside_relro_in_same_pages": [
+              {
+                "section_index": 18,
+                "section_name": ".data",
+                "type": 1,
+                "vaddr": 348160,
+                "size": 376,
+                "intersection": [
+                  348160,
+                  348536
+                ]
+              },
+              {
+                "section_index": 19,
+                "section_name": ".bss",
+                "type": 8,
+                "vaddr": 348536,
+                "size": 1176,
+                "intersection": [
+                  348536,
+                  349712
+                ]
+              }
+            ],
+            "nonpadding_writable_overlap": true
+          }
+        ],
+        "needed": [
+          "libm.so",
+          "libxml2.so",
+          "libdl.so",
+          "libc.so"
+        ],
+        "soname": "libxslt.so",
+        "needed_not_found_in_apk_or_common_android_system_allowlist": []
+      }
+    ],
+    "native_file_inventory": [
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!lib/arm64-v8a/libaliuhook.so",
+        "bytes": 88600,
+        "sha256": "c1a3e4702be737f20d29609e559476350e9d44e20a918be6a27d8cb679d34e85",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "liblog.so",
+          "liblsplant.so",
+          "libm.so",
+          "libc++_shared.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!lib/arm64-v8a/libc++_shared.so",
+        "bytes": 1304848,
+        "sha256": "35e56d209d7f28a79bf1e263cbf1e4bafc5038448dea0a954cba0423a28f0f6b",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libc.so",
+          "libm.so",
+          "libdl.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!lib/arm64-v8a/libchaquopy_java.so",
+        "bytes": 154080,
+        "sha256": "3d2fadf0330a2aeee7cf8d62f2da23aca193213a74bd35add75bc895efee672b",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libpython3.11.so",
+          "liblog.so",
+          "libm.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!lib/arm64-v8a/libcrypto_chaquopy.so",
+        "bytes": 3784,
+        "sha256": "766c1744b32da624ca78d3996806b43631f28222576ba80bb5688e5c3041f0be",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libcrypto_python.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!lib/arm64-v8a/libcrypto_python.so",
+        "bytes": 3721048,
+        "sha256": "c6c31b928c480e77ca85f9e34286ca922d6c56fd79567b34d442bbcc6817d10e",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!lib/arm64-v8a/libdatastore_shared_counter.so",
+        "bytes": 7112,
+        "sha256": "d3e48717c9aa147e0ab21063ba0e8e0211cabf8bf40b222640829519edbf58e1",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!lib/arm64-v8a/libimage_processing_util_jni.so",
+        "bytes": 32528,
+        "sha256": "0292b063fafccf734472cbb59588e756c2dbca907c72021ba6fbf126385508a2",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "liblog.so",
+          "libandroid.so",
+          "libjnigraphics.so",
+          "libm.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!lib/arm64-v8a/libjnidispatch.so",
+        "bytes": 165992,
+        "sha256": "ddfc6c965bbe366615c000ec1f06552ddf0bb2b4f9d921d0bff8c75b3cb2ca4c",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libc.so",
+          "libdl.so",
+          "libm.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!lib/arm64-v8a/liblanguage_id_l2c_jni.so",
+        "bytes": 1019552,
+        "sha256": "b93e65a48200df45dbbfc82e17560ae689b1b462ab4ecdce5fd2c093802e1a94",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libandroid.so",
+          "libdl.so",
+          "libm.so",
+          "liblog.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!lib/arm64-v8a/liblsplant.so",
+        "bytes": 108976,
+        "sha256": "87cd4b71675d1a962d0acbb27ebec9a42010b8497d7e494fca03f4d861b9d1b9",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "liblog.so",
+          "libz.so",
+          "libm.so",
+          "libc++_shared.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!lib/arm64-v8a/libpython3.11.so",
+        "bytes": 5389896,
+        "sha256": "bcbf0b2cedc14925bc820ed606033e04cc369c6698a8169fc07185cf1108975e",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!lib/arm64-v8a/libsqlite3_chaquopy.so",
+        "bytes": 3784,
+        "sha256": "1e348dceef9c46754e6be14f2a58e6d34441afb03974b36fa0710f8ee50ebf2d",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libsqlite3_python.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!lib/arm64-v8a/libsqlite3_python.so",
+        "bytes": 886520,
+        "sha256": "6b0f0012ffff95d2420e88fd420d0d65dc4d63d943c1011567978f6203d118dd",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libz.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!lib/arm64-v8a/libssl_chaquopy.so",
+        "bytes": 3768,
+        "sha256": "024d7a7696e789443642645df35929994aa8a4a3cb4d46b2fe7415d64f9a2282",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libssl_python.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!lib/arm64-v8a/libssl_python.so",
+        "bytes": 623736,
+        "sha256": "60b083de76e184b19bb830e80f9f6b155f6db87e309018d007db6439db45145e",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libcrypto_python.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!lib/arm64-v8a/libsurface_util_jni.so",
+        "bytes": 4896,
+        "sha256": "a5c9d1928ea92ec7a94dff8cf666e7739cd734198b9f0ae1d4e28ea3c86516ba",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libandroid.so",
+          "libm.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!lib/arm64-v8a/libtmessages.49.so",
+        "bytes": 43696472,
+        "sha256": "59be6f26514b7dfc8b5ab92610e67da4b1428a3cc237e4f91c6736c06e6d27ea",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libjnigraphics.so",
+          "liblog.so",
+          "libz.so",
+          "libGLESv2.so",
+          "libEGL.so",
+          "libandroid.so",
+          "libOpenSLES.so",
+          "libdl.so",
+          "libm.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!lib/arm64-v8a/libvosk.so",
+        "bytes": 10042800,
+        "sha256": "06965ebb4e5eb3a9e4a815755e178d9553392e3fe8d3d368ac46952ad3694173",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "liblog.so",
+          "libm.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/bootstrap-native/arm64-v8a/_bz2.cpython-311.so",
+        "bytes": 82632,
+        "sha256": "f8cf0aec85135121536aea2981081f3534c973496f3457e092abe3349155977e",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/bootstrap-native/arm64-v8a/_ctypes.cpython-311.so",
+        "bytes": 218272,
+        "sha256": "673e90b1be6dc1a96a5175662fe007b13463841959a5d2a1dcc891dbad72c2b1",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libdl.so",
+          "libpython3.11.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/bootstrap-native/arm64-v8a/_datetime.cpython-311.so",
+        "bytes": 106712,
+        "sha256": "94739342dc95342b30523f0c3d51c5f3ea719c66b9283d317d6286aafa5e48b6",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/bootstrap-native/arm64-v8a/_lzma.cpython-311.so",
+        "bytes": 242824,
+        "sha256": "662946f372e9ffc578973b8d45d5ef3038c01d04aab7ea90eadcb4cfa691fd33",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/bootstrap-native/arm64-v8a/_random.cpython-311.so",
+        "bytes": 13952,
+        "sha256": "f9ac07ab294a7786001db5ed68dc9b8be575a78712b4fff71468a0cae0346e76",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/bootstrap-native/arm64-v8a/_sha512.cpython-311.so",
+        "bytes": 22896,
+        "sha256": "008f550dec5d96ee4a1d00c041cd7859d95a4d56f39d537cf75a73b89291aee2",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/bootstrap-native/arm64-v8a/_struct.cpython-311.so",
+        "bytes": 46328,
+        "sha256": "82da00584039d88b3c12bb53586efa6c911453a2089880bad3c27b826cc66399",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/bootstrap-native/arm64-v8a/binascii.cpython-311.so",
+        "bytes": 24880,
+        "sha256": "0790c2ae67f90545d99c5054b72914daf98f175f5961c43d7d8eb8f210c77145",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libz.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/bootstrap-native/arm64-v8a/java/chaquopy.so",
+        "bytes": 931320,
+        "sha256": "6a7f0ed643adf729656685e32f6c941981a03af6590c426af66e86c8d84f9877",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libpython3.11.so",
+          "libdl.so",
+          "libandroid.so",
+          "libm.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/bootstrap-native/arm64-v8a/math.cpython-311.so",
+        "bytes": 60184,
+        "sha256": "ee3d59dc72b8ca885940e9f620c332f226b97558098da21a80b0d6088a4b1bc3",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/bootstrap-native/arm64-v8a/mmap.cpython-311.so",
+        "bytes": 25784,
+        "sha256": "7611b0a4709825d809b0756ea2a122e1ee98162b6f8a3c696a1f72a50c099163",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/bootstrap-native/arm64-v8a/zlib.cpython-311.so",
+        "bytes": 37840,
+        "sha256": "db931d00d398a324ff1b84fce981e9b664a05aee91dc80e0167010ecc2b58cf5",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libz.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!PIL/_imaging.so",
+        "bytes": 482952,
+        "sha256": "2e2cc6d52aa6e4ed50818acca2a71d2e2fc3df057d65aa67512a293f8add79d1",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libjpeg_chaquopy.so",
+          "libz.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!PIL/_imagingft.so",
+        "bytes": 30520,
+        "sha256": "245b82d8bd927debcaff6f21cca2786e3cd1f0c5893051e6049248b0fe08f96f",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libfreetype.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!PIL/_imagingmath.so",
+        "bytes": 22736,
+        "sha256": "e1d3e17ede0101602c9767820f76a64f0c0535bf0adc5df1820871a4cc8a45b2",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!PIL/_imagingmorph.so",
+        "bytes": 7800,
+        "sha256": "f131fa4fad9ccd4b4753c85224bca57719f77abedfcf7f67e3489c54180e4b1e",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!PIL/_imagingtk.so",
+        "bytes": 10232,
+        "sha256": "d3d62e825f87fe46e71111658db219e10da82cc9ad114f41b8eb12596b924156",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!chaquopy/lib/libexslt.so",
+        "bytes": 108144,
+        "sha256": "997c4e05f91d1253cbdac10c72ef6079335f1d034a8b86b56c7ce8af89f35414",
+        "machine": 183,
+        "load_alignment_16k": false,
+        "needed": [
+          "libxslt.so",
+          "libm.so",
+          "libxml2.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!chaquopy/lib/libfreetype.so",
+        "bytes": 834864,
+        "sha256": "8301778e995a698b9273cd0a95d4e884fd30be6802b55a246cbf60ae09216172",
+        "machine": 183,
+        "load_alignment_16k": false,
+        "needed": [
+          "libm.so",
+          "libz.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!chaquopy/lib/libjpeg_chaquopy.so",
+        "bytes": 483520,
+        "sha256": "d2f3b50ac7f4a7019de5b0a7394e2f7f1fe7335f56c285f9550e64333597b193",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!chaquopy/lib/libxml2.so",
+        "bytes": 2156856,
+        "sha256": "de6451563a70442ad9b2fa41b67a565cb5c69555625d8145b803fc32eca5fcda",
+        "machine": 183,
+        "load_alignment_16k": false,
+        "needed": [
+          "libz.so",
+          "libm.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!chaquopy/lib/libxslt.so",
+        "bytes": 346224,
+        "sha256": "bf625093e95bee481d4641dcb99e7021d374c578b1bcfb47f11eb80330f5052e",
+        "machine": 183,
+        "load_alignment_16k": false,
+        "needed": [
+          "libm.so",
+          "libxml2.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!chaquopy/lib/libyaml-0.so",
+        "bytes": 193040,
+        "sha256": "408d052e0bbf658ab3f9c45d70c371767e42045e09d379cb02555e07e5860871",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!debugpy/_vendored/pydevd/pydevd_attach_to_process/attach_linux_amd64.so",
+        "bytes": 20584,
+        "sha256": "8fafec366c6a3b38d3429c7a9ad9957fd029f170eac9fd37bdecbbbebb3e9441",
+        "machine": 62,
+        "load_alignment_16k": false,
+        "needed": [
+          "libstdc++.so.6",
+          "libm.so.6",
+          "libgcc_s.so.1",
+          "libc.so.6"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!lxml/_elementpath.so",
+        "bytes": 165592,
+        "sha256": "8bc100c71b6811c1abef234ca9f14426fc1fbfc42e2ef57d7ebd015e72142c7d",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!lxml/builder.so",
+        "bytes": 90512,
+        "sha256": "a081a40b39e1382edcce56481a4cec64d46b88f2da849f1fdad0e592564a9e52",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!lxml/etree.so",
+        "bytes": 1846464,
+        "sha256": "c7a50dfbd152555af2315b4aeb90b0536572e968c5ade31e4e9206ee63db3d84",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libxslt.so",
+          "libexslt.so",
+          "libxml2.so",
+          "libz.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!lxml/objectify.so",
+        "bytes": 348800,
+        "sha256": "495faea379dfa1cd5ff6168e02307ccb05081366233deee635736f4b3f0592cf",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libxslt.so",
+          "libexslt.so",
+          "libxml2.so",
+          "libz.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!lxml/sax.so",
+        "bytes": 142416,
+        "sha256": "4e71d8fa68ac49fd1cfe6c5de71e921714ee1465ccee57e48d17887e18fb2e96",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!lxml/html/diff.so",
+        "bytes": 286648,
+        "sha256": "3c47bd6c6bcf75e9dd1c23b0c22efbd688171127318e3f275998b17925eb972f",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/requirements-common.imy!yaml/_yaml.so",
+        "bytes": 281024,
+        "sha256": "f2dd4390a06a7628665daf28d3e81ffc654a4ba8cce2bf96ed6b808e80532385",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libyaml-0.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_asyncio.cpython-311.so",
+        "bytes": 62584,
+        "sha256": "3c5e321e2a921ec650c6032e5801e82dfb7e3f7a05623074b89e098bfdd60ccc",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_bisect.cpython-311.so",
+        "bytes": 13512,
+        "sha256": "86039f931776875150d0cd056bab52e30b33f54714ad194f694781387aaf9a23",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_blake2.cpython-311.so",
+        "bytes": 38616,
+        "sha256": "29ed2cb9da460c3cb078c2b3225fa236dfb3c1ade4ad07bc4f768e3b8069e2ba",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_codecs_cn.cpython-311.so",
+        "bytes": 146800,
+        "sha256": "56bf76db8023355a2418d48f26cbe106986412d69ad1cf2e6771abdb3343e2c9",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_codecs_hk.cpython-311.so",
+        "bytes": 155024,
+        "sha256": "25e04ca66cee04c005a2bf718fac8538c319f184386181c344a18e25196f05fe",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_codecs_iso2022.cpython-311.so",
+        "bytes": 22328,
+        "sha256": "65799fb72c3de477e896ec530f55ae4cd4501cd79fb430c6991189f3ac580dfe",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_codecs_jp.cpython-311.so",
+        "bytes": 263928,
+        "sha256": "2084f9a313e3bc3dabb3dfbad74c66dd99667346e9b284718aa54e2a056c1cdd",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_codecs_kr.cpython-311.so",
+        "bytes": 133472,
+        "sha256": "3aa419a54af92042ee1f4b91533f736d698e42faa0dd7c76d01e38f26ace507d",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_codecs_tw.cpython-311.so",
+        "bytes": 108544,
+        "sha256": "5442a3795f74b31e0daa0e7fbf5f31c231293e146c955fda073200af2a99291c",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_contextvars.cpython-311.so",
+        "bytes": 5000,
+        "sha256": "179a05aaa0a29232711148b542662d57dd74a5b6db637b44e391599102ca94f8",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_csv.cpython-311.so",
+        "bytes": 35840,
+        "sha256": "52b7dccebc817e2d21d2885f4fd3a6472003e12beff0931016fb9aead93a9c7a",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_decimal.cpython-311.so",
+        "bytes": 339040,
+        "sha256": "ca79a04560e04720d080376d24fbb7819e7c3af1c000673404590154e5e3e119",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_elementtree.cpython-311.so",
+        "bytes": 70280,
+        "sha256": "1e2d10729ee186509cb860056545eee110bc190647d3af276a950fccd097f208",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_hashlib.cpython-311.so",
+        "bytes": 52304,
+        "sha256": "1bca1abf2bad3ce839dab11260620c283409f4fa6d7d23c75dff6fe5ce6413a9",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libcrypto_python.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_heapq.cpython-311.so",
+        "bytes": 18016,
+        "sha256": "86e16c84253e26b3886a5ddafaa7f38b56fc37fb426ca0ef67a0542d11adfbfc",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_json.cpython-311.so",
+        "bytes": 37808,
+        "sha256": "5817e162a6b9032eb0709dfcc7d5dec6ad614db9a27bbfffeed5ae7c481eb57b",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_lsprof.cpython-311.so",
+        "bytes": 18504,
+        "sha256": "1dd157fc17954e94a75da5460df56008acdba97435a901d17662ce2c77182317",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_md5.cpython-311.so",
+        "bytes": 14096,
+        "sha256": "7ecb7407870389508a2e88713fa550525c7f7cc6106fefff23eb82ed51f961e4",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_multibytecodec.cpython-311.so",
+        "bytes": 38688,
+        "sha256": "c503fbed773d3d70eb7c44c944c22292f0ec3fe2abec83f4d21fcb34c051f44c",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_multiprocessing.cpython-311.so",
+        "bytes": 16592,
+        "sha256": "89295c12e59021063e0e13af0f0fe4c491a88224f49fdc4b1c987687672bf4ed",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_opcode.cpython-311.so",
+        "bytes": 6632,
+        "sha256": "2015ef14daabbbdd6fa2a1ea14b8f3461f0a5699950f2c3e02be7cbe4588a290",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_pickle.cpython-311.so",
+        "bytes": 117848,
+        "sha256": "8a1a7df22a12ba2cacc0d52391e459c0169aa05670c849eeadab1107451a5475",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_posixsubprocess.cpython-311.so",
+        "bytes": 17360,
+        "sha256": "bd85ae0bd7e64a3ffa1be63d8b86e7f2a07abf1bd7c54a4f6d27bc2bbc3212d2",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_queue.cpython-311.so",
+        "bytes": 14864,
+        "sha256": "d47034befb53ca076654ed16a7f8c4f1c2d8f589807643a7665e0eb9a975ea09",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_sha1.cpython-311.so",
+        "bytes": 14912,
+        "sha256": "884b442390410434b19f035843a3df6fdf40bd4638b9ca13002823b52ff04c93",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_sha256.cpython-311.so",
+        "bytes": 19696,
+        "sha256": "b87f1d67e4d931b2b3bc5f45c9132d6f7fa3f0374e08c3aa9f1ee79cd35fbb16",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_sha3.cpython-311.so",
+        "bytes": 19648,
+        "sha256": "1a559e1e7947c0f17e6d553e68ed956a5bda19cf2bfeebcef038f37b27c0d033",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_socket.cpython-311.so",
+        "bytes": 94088,
+        "sha256": "597fa5089a3b77a91cc19c241ccd3e3fc6ea7a6589478c40a14000a04bb036ff",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_sqlite3.cpython-311.so",
+        "bytes": 112584,
+        "sha256": "6328f2e5bdd5a6542effb3da42da5380dd97c6550ef7184397cefc41c91db814",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libsqlite3_python.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_ssl.cpython-311.so",
+        "bytes": 217952,
+        "sha256": "b8233d9043297ff4eb9a750ded36da67c5a1cbe4d3abd26b179d0d9c43d5ff22",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libssl_python.so",
+          "libcrypto_python.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_statistics.cpython-311.so",
+        "bytes": 6680,
+        "sha256": "9de6457f606d657bca5e8e75660ce5c0adcee40113f2905f4130b680f6c1edc9",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_typing.cpython-311.so",
+        "bytes": 4384,
+        "sha256": "176863cd53d9ddf6ecf3468e9b64ef7f443b8e465aefdda43a8233ba508b7ac7",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_xxsubinterpreters.cpython-311.so",
+        "bytes": 34200,
+        "sha256": "ba3d516152f1d22240c53d00c95702dd228b1a36734f062e56602750caf23942",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_xxtestfuzz.cpython-311.so",
+        "bytes": 12640,
+        "sha256": "12b9c98d98de80e343b996a838f55a2cbf3a38cfa1d3846b070bda9d84831374",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_zoneinfo.cpython-311.so",
+        "bytes": 29832,
+        "sha256": "026c2bbdaeda60fe3cceb8c1979503b951b197e31a076574ffb900c872e9a671",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!array.cpython-311.so",
+        "bytes": 55656,
+        "sha256": "94df5ea3662421ea0984fd29c97f62ace7b0ba9937f7d573d0d51dbc1afa08fc",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!audioop.cpython-311.so",
+        "bytes": 42056,
+        "sha256": "b5ae5752b294280c03f8fe06e506c2a25ea2a98907c9caf3abd3e8717d4aafc3",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!cmath.cpython-311.so",
+        "bytes": 32080,
+        "sha256": "491d77bb6199e295cdf67f234381c01380da4bc011d69f00e6ea7b58c757e8d6",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!fcntl.cpython-311.so",
+        "bytes": 15656,
+        "sha256": "28e1435fec4c06357cb1f1c851de970d1b3bb070c9c8d86462d6aaf830d3e86a",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!ossaudiodev.cpython-311.so",
+        "bytes": 29616,
+        "sha256": "b68104138c8c82d3e69136cda45c69bee68824bf8fdb77fb11a09c53020f16e5",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!pyexpat.cpython-311.so",
+        "bytes": 228928,
+        "sha256": "a734056b279c87b092f7a26609b613d47a0e01f2d1f47e7366ef2b9fa374bf8a",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!resource.cpython-311.so",
+        "bytes": 13928,
+        "sha256": "2384aefae34831b96d697c255e812c82a8b0e291b77d6403144bff783e02b56d",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!select.cpython-311.so",
+        "bytes": 29200,
+        "sha256": "deda4d07abc543e6042fac860eda69a70dee19cff292b1e1722c25cd287bc40a",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!syslog.cpython-311.so",
+        "bytes": 10016,
+        "sha256": "61cf4dadd53c02fb26ec478200b4e6b74d238e45d9c0ee6886ade5ba1e2f22fd",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!termios.cpython-311.so",
+        "bytes": 27624,
+        "sha256": "6e69e32e0b0cbe29bb2e3e7354a472818d6cc3d5e6015049a2870143eaceeea1",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!unicodedata.cpython-311.so",
+        "bytes": 1127664,
+        "sha256": "bd4236154796626f167a53ed631c72aa12258a7bcc2112b2849a83647fc0d383",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!xxlimited.cpython-311.so",
+        "bytes": 10648,
+        "sha256": "2962fe87d36a096725fd61d1e26a6d5b9d50b02e7b7e8492d39e4ae84708ee16",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      },
+      {
+        "path": "FlexyGram-1.0-Clean-Baseline-arm64-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!xxlimited_35.cpython-311.so",
+        "bytes": 9680,
+        "sha256": "551e041026a4bf2cd2d4d661847e14bb207facbd3c7635a0e04cbfae4fafcdfc",
+        "machine": 183,
+        "load_alignment_16k": true,
+        "needed": [
+          "libm.so",
+          "libpython3.11.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      }
+    ],
+    "limits": [
+      "Static analysis only; no Android execution.",
+      "DT_NEEDED names do not prove symbol/version compatibility or dynamically loaded library closure.",
+      "RELRO writable-tail overlaps are structural risk indicators, not observed crashes."
+    ]
+  },
+  "runtime_evidence_from_prior_step3": {
+    "installation": "not_run",
+    "first_launch": "not_run",
+    "native_loading": "not_run",
+    "python_initialization": "not_run",
+    "main_screen": "not_run",
+    "logcat": "not_collected_no_android_target",
+    "reason": "adb devices -l returned an empty list; no Android emulator installed or running; /dev/kvm unavailable.",
+    "host_page_size_bytes": 4096,
+    "android_page_size_bytes": null,
+    "poco_page_size_bytes": null
+  },
+  "this_audit_limits": [
+    "No personal account or credential access",
+    "No Android execution or startup measurements",
+    "No Telegram RPCs or revocation experiments",
+    "No new APK",
+    "No functional source changes",
+    "Server decision and reported message not independently verified"
+  ]
+}
