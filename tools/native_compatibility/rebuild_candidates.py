@@ -42,11 +42,10 @@ def rebuild(sources,output,ndk,cmake,wheelhouse,manifest):
     for row in manifest['archives']:
         archive=sources/row['file'];verify_archive(archive,row['sha256'])
         with tarfile.open(archive) as tar:tar.extractall(src,filter='data')
-    ft=sources/'freetype-git'
-    actual=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ft,text=True).strip()
-    if actual!=manifest['freetype_commit']:raise ValueError('FreeType source commit mismatch')
-    # Export the immutable committed tree, excluding ignored/untracked files and .git hooks.
-    data=subprocess.check_output(['git','archive','--format=tar',actual],cwd=ft)
+    # Source may be the pinned Git checkout or Work's SHA-verified git-archive TAR.
+    # No Git history is fabricated, and the active native dependencies remain untouched.
+    from pinned_freetype import read_pinned_freetype
+    data=read_pinned_freetype(sources,manifest['freetype_commit'])
     ftout=src/'freetype';ftout.mkdir()
     with tarfile.open(fileobj=io.BytesIO(data)) as tar:tar.extractall(ftout,filter='data')
     commands=[]
