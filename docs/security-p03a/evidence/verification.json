@@ -1,0 +1,25 @@
+{
+  "integration_sha": "d31d0e780fe133337b343379563d65f579acf14d",
+  "base_tree_verified": "5e983aa0f6a53c80f9fb9e296f26e750310c2c7c",
+  "tests": 20,
+  "failed": 0,
+  "skipped": 0,
+  "android_runtime_executed": false,
+  "accounts_or_telegram_requests_used": false,
+  "apk_published": false,
+  "issue_creation": "GitHub API 410: Issues has been disabled in this repository",
+  "main_sha": "db1bea24b7b705de33f8ff8c8e174011c153cac7",
+  "pr2_open": true,
+  "tracked_changes_from_verified_develop_tree": [
+    "TMessagesProj/src/main/java/org/telegram/messenger/BackupAgent.java",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/helpers/CloudSettingsHelper.java",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/helpers/SettingsBackupHelper.java"
+  ],
+  "manifest_build_configuration_and_other_tracked_sources_unchanged": true,
+  "source_sha256": {
+    "TMessagesProj/src/main/java/org/telegram/messenger/BackupAgent.java": "dbaf9f078aa68f5b5802b2dcdb40f43fdca8fdb80e004eacf0747fdd680f77f5",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/helpers/CloudSettingsHelper.java": "90010d369dfaaaf3c50df88c9a84d9dc6b2207727847191a31b7eab3b1a726fd",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/helpers/SettingsBackupHelper.java": "87d31b0bcdf049066f299ed9f38eafed1dbd3ab12a468dad1fc198a0defb75a6",
+    "TMessagesProj/src/main/java/org/telegram/messenger/SettingsBackupPolicy.java": "1f0b8744e5a751ac6a0902805069c0a3ac206bb173f0fb3bd1a3a818dd2dae07"
+  }
+}
