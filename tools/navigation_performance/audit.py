@@ -59,7 +59,7 @@ CHECKS = (
 def _method_body(source: str, anchor: str) -> tuple[int, str] | None:
     """Return the span of one Java method; never inspect a neighboring method.
 
-    Mask comments and Java string/character literals before matching braces.
+    Mask comments and Java string/character literals before matching braces and evidence.
     The mask preserves offsets so evidence lines refer to the real source.
     """
     masked = re.sub(
@@ -80,7 +80,7 @@ def _method_body(source: str, anchor: str) -> tuple[int, str] | None:
         elif masked[index] == "}":
             nesting -= 1
             if nesting == 0:
-                return opening + 1, source[opening + 1:index]
+                return opening + 1, masked[opening + 1:index]
     return None
 
 
