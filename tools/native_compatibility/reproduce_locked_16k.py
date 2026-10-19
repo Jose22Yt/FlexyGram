@@ -142,7 +142,7 @@ def execute(args) -> dict:
     canonical_repo = REPO.resolve()
     input_roots = tuple(p.resolve() for p in (sources, wheelhouse, ndk))
     if (canonical_output == canonical_repo or canonical_repo in canonical_output.parents
-            or any(canonical_output == p or canonical_output in p.parents
+            or any(canonical_output == p or p in canonical_output.parents
                    for p in input_roots)):
         raise ValueError('Output must be isolated from all inputs and repository')
     library_pins, wheel_pins = expected()
