@@ -37,7 +37,7 @@ def validate_manifest(data: object) -> dict:
     if not files or len(files) != len(set(files)):
         raise ValueError('No unique manifest entries')
     for name, row in files.items():
-        if not isinstance(name, str) or not name or '\\x00' in name:
+        if not isinstance(name, str) or not name or chr(0) in name:
             raise ValueError('Unsafe manifest entry')
         path = Path(name)
         if (path.is_absolute() or '..' in path.parts or name in ('.', '..') or
@@ -63,7 +63,7 @@ def inspect_archive(path: Path, manifest: dict, expected_sha: str) -> dict:
         seen = set()
         for member in archive.infolist():
             name = member.filename
-            if not name or '\\x00' in name or any(part in ('', '.') for part in name.rstrip('/').split('/')):
+            if not name or chr(0) in name or any(part in ('', '.') for part in name.rstrip('/').split('/')):
                 raise ValueError('Unsafe ZIP member path')
             if name in seen:
                 raise ValueError('Duplicate ZIP member')
