@@ -246,5 +246,49 @@ class ReproductionGateTests(unittest.TestCase):
         self.assertFalse(out.exists())
 
 
+    def test_dotdot_paths_are_canonical_before_invoking_builders(self):
+        import argparse
+        nested = self.path / 'existing'
+        nested.mkdir()
+        raw = nested / '..' / 'fresh-build'
+        args = argparse.Namespace(sources=str(self.path / 'sources'),
+                                  wheelhouse=str(self.path / 'inputs'),
+                                  ndk=str(self.path / 'ndk'), cmake=str(self.path / 'cmake'),
+                                  output=str(raw))
+        captured = []
+        def stop_at_first_builder(argv, **kwargs):
+            captured.append(argv)
+            raise RuntimeError('SYNTHETIC_STOP_BEFORE_NATIVE_EXECUTION')
+        with patch.object(r, 'expected', return_value=(self.libs, self.rebuilt)), \
+             patch.object(r, 'check_inputs', return_value=18), \
+             patch('wheelhouse.select', return_value=self.approved), \
+             patch.object(r, 'load', side_effect=lambda path: {'rebuilt': self.rows[:3]} if path.name == 'wheel-reproducibility.json' else {}), \
+             patch.object(r.subprocess, 'run', side_effect=stop_at_first_builder):
+            with self.assertRaisesRegex(RuntimeError, 'SYNTHETIC_STOP'):
+                r.execute(args)
+        self.assertEqual(len(captured), 1)
+        self.assertEqual(captured[0][captured[0].index('--output') + 1],
+                         str(self.path / 'fresh-build' / 'gnu'))
+        for option in ['--sources', '--output']:
+            self.assertNotIn('/../', captured[0][captured[0].index(option) + 1])
+
+    def test_input_symlink_validation_precedes_canonical_build_paths(self):
+        import argparse
+        actual = self.path / 'actual-input'
+        actual.mkdir()
+        alias = self.path / 'linked-input'
+        alias.symlink_to(actual, target_is_directory=True)
+        args = argparse.Namespace(sources=str(alias), wheelhouse=str(self.path / 'wheels'),
+                                  ndk=str(self.path / 'ndk'), cmake=str(self.path / 'cmake'),
+                                  output=str(self.path / 'fresh-result'))
+        def reject_raw_root(sources, *unused):
+            self.assertTrue(sources.is_symlink())
+            raise ValueError('UNSAFE_RAW_INPUT_ROOT')
+        with patch.object(r, 'expected', return_value=(self.libs, self.rebuilt)), \
+             patch.object(r, 'check_inputs', side_effect=reject_raw_root):
+            with self.assertRaisesRegex(ValueError, 'UNSAFE_RAW_INPUT_ROOT'):
+                r.execute(args)
+        self.assertFalse((self.path / 'fresh-result').exists())
+
 if __name__ == '__main__':
     unittest.main()

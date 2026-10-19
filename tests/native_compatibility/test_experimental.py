@@ -5,7 +5,7 @@ from unittest.mock import patch
 ROOT=Path(__file__).resolve().parents[2];sys.path.insert(0,str(ROOT/'tools/native_compatibility'))
 from compat_relink import version_map,link_args,BOUNDARIES
 from experimental_wheels import record,repack,verify
-from prepare_experiment import overlay
+from prepare_experiment import overlay,unsigned_diagnostic
 from experiment_recipe import plugin_default
 from abi_report import compare
 class ExperimentalTests(unittest.TestCase):
@@ -56,6 +56,15 @@ class ExperimentalTests(unittest.TestCase):
     p.symlink_to(outside)
     with self.assertRaises(ValueError):verify(m,root)
    finally:outside.unlink()
+ def test_unsigned_overlay_removes_only_diagnostic_assignment(self):
+  text='before\nsigningConfig = signingConfigs.diagnosticLab\nafter'
+  result=unsigned_diagnostic(text)
+  self.assertNotIn('signingConfig =',result)
+  self.assertNotIn('signingConfigs.diagnosticLab',result)
+  self.assertTrue(result.startswith('before\n'));self.assertTrue(result.endswith('\nafter'))
+ def test_unsigned_overlay_rejects_missing_or_duplicate_assignment(self):
+  for text in ['', 'signingConfig = signingConfigs.diagnosticLab\n'*2]:
+   with self.assertRaises(ValueError):unsigned_diagnostic(text)
  def test_overlay_rejects_modifying_source_checkout(self):
   with tempfile.TemporaryDirectory() as d:
    root=Path(d)

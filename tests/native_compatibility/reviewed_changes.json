@@ -60,11 +60,12 @@
     },
     "tools/native_compatibility/rebuild_candidates.py": {
       "before": null,
-      "after": "ee764e2034d36c7d9624685af9ca30586471722dcca6ac3bc5cbacf2033795b5",
+      "after": "dd760439ffba6415e0dd60c296af5f9234766e7b74e94738fe183b52f91a3c1a",
       "previous": [
         "0cd6596bb78071258a8e65092ea8fe65102eec16bfb2e1655f766589c8bd830d",
         "af7c0ee1f653cfa7c5c7cf4c0f6ab8e9ae37da98bf2374a6747a6789a1f0ea69",
-        "42220c572150dc84c1299cee5e38aaebc01acee5407705265a8af04a3718a1ce"
+        "42220c572150dc84c1299cee5e38aaebc01acee5407705265a8af04a3718a1ce",
+        "ee764e2034d36c7d9624685af9ca30586471722dcca6ac3bc5cbacf2033795b5"
       ]
     },
     "tools/native_compatibility/rebuild-sources.json": {
@@ -99,12 +100,36 @@
     },
     "tools/native_compatibility/prepare_experiment.py": {
       "before": null,
-      "after": "c9fa124471b711779a913ee784b72dd3fc8b7bf47d0525a24e4f37647b564a34",
-      "previous": []
+      "after": "85e6718c4be69f5903cb88a7428a7e142de56653a3ae0310964b86c4d8d24af2",
+      "previous": [
+        "c9fa124471b711779a913ee784b72dd3fc8b7bf47d0525a24e4f37647b564a34"
+      ]
     },
     "tools/native_compatibility/build_host_fixture.py": {
       "before": null,
       "after": "51fc4f9e042b9e703a91bd2e455e495ccb8e7cef0bace567077f5fc462dc2db2",
+      "previous": []
+    },
+    "tools/native_compatibility/pinned_freetype.py": {
+      "before": null,
+      "after": "fee35e86e877df6896bbcab02c8160971ca5355da3c43bbfc9a97b144c46d309",
+      "previous": []
+    },
+    "tools/native_compatibility/reproduce_locked_16k.py": {
+      "before": null,
+      "after": "db58f029b42871ee01157054f849815d70d870681b218a9a0ae0750628f8b801",
+      "previous": [
+        "173380121ce0fc625f95ce3376c49c8442bd3406d8f12ba0f8112b1191cc9cf4"
+      ]
+    },
+    "tools/native_compatibility/run_p04c_host_gate.py": {
+      "before": null,
+      "after": "b5489884cb5d53ccacb51a861374be2d4258ac445e37da9828d8747343cc3eea",
+      "previous": []
+    },
+    "tools/native_compatibility/stage_recovered_inputs.py": {
+      "before": null,
+      "after": "9fa1e07cbfab2927ac5276274d96bbf0cb93d5a4a1bccbc93fd7d62451d36a9a",
       "previous": []
     }
   }

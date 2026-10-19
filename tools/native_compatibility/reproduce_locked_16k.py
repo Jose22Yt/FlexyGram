@@ -207,6 +207,12 @@ def execute(args) -> dict:
         raise ValueError('Output must be isolated from all inputs and repository')
     library_pins, wheel_pins = expected()
     check_inputs(sources, wheelhouse, ndk, cmake)
+    # Validate raw roots first (including symlinks), then build with canonical
+    # paths. CMake canonicalizes sources; a prefix-map containing /../ would
+    # otherwise miss __FILE__ paths and break the reviewed FreeType digest.
+    sources, wheelhouse, ndk, cmake = [p.resolve() for p in
+                                       (sources, wheelhouse, ndk, cmake)]
+    output = canonical_output
     approved = __import__('wheelhouse').select(
         load(REPO / 'TMessagesProj/python/wheels.lock.json'), ['arm64-v8a'])
     reviewed = load(EVIDENCE / 'wheel-reproducibility.json')['rebuilt']
