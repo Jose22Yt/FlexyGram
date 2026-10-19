@@ -105,6 +105,66 @@ class ReproductionGateTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'exactly 18 unique wheels'):
             self.validate()
 
+    def test_rebuilt_original_mapping_cannot_be_swapped(self):
+        reviewed = {row['filename']: row['original_filename']
+                    for row in self.rows if row['rebuilt']}
+        a, b = self.rows[0], self.rows[1]
+        a['original_filename'], b['original_filename'] = (
+            b['original_filename'], a['original_filename'])
+        self.save()
+        with self.assertRaisesRegex(ValueError, 'Reviewed rebuilt wheel origin mismatch'):
+            r.check_outputs(self.folder, self.approved, self.libs, self.rebuilt, reviewed)
+
+    def test_copied_wheels_cannot_swap_original_names(self):
+        a, b = self.rows[5], self.rows[6]
+        a['original_filename'], b['original_filename'] = (
+            b['original_filename'], a['original_filename'])
+        self.save()
+        with self.assertRaisesRegex(ValueError, 'Unmodified wheel origin mismatch'):
+            self.validate()
+
+    def test_duplicate_rebuilt_origin_is_rejected(self):
+        self.rows[1]['original_filename'] = self.rows[0]['original_filename']
+        self.save()
+        with self.assertRaisesRegex(ValueError, '18 unique wheels and origins'):
+            self.validate()
+
+    def test_nonboolean_rebuilt_flag_is_rejected(self):
+        self.rows[5]['rebuilt'] = 'false'
+        self.save()
+        with self.assertRaisesRegex(ValueError, 'mapping is incomplete'):
+            self.validate()
+
+    def test_wheel_directory_symlink_is_rejected(self):
+        wheel_dir = self.folder / 'wheels'
+        external = self.path / 'external-wheelhouse'
+        wheel_dir.rename(external)
+        wheel_dir.symlink_to(external, target_is_directory=True)
+        with self.assertRaisesRegex(ValueError, 'Unsafe rebuilt wheel directory'):
+            self.validate()
+
+    def test_symlinked_library_parent_is_rejected(self):
+        native = self.folder / 'prefix/lib'
+        external = self.path / 'external-libs'
+        native.rename(external)
+        native.symlink_to(external, target_is_directory=True)
+        with self.assertRaisesRegex(ValueError, 'Missing source-rebuilt ELF'):
+            self.validate()
+
+    def test_symlinked_manifest_is_rejected(self):
+        manifest = self.folder / 'wheels-manifest.json'
+        external = self.path / 'external-manifest.json'
+        manifest.rename(external)
+        manifest.symlink_to(external)
+        with self.assertRaisesRegex(ValueError, 'Unsafe wheel manifest'):
+            self.validate()
+
+    def test_reviewed_mapping_requires_all_three_substitutes(self):
+        sources = {row['filename']: row['original_filename']
+                   for row in self.rows[:2]}
+        with self.assertRaisesRegex(ValueError, 'Reviewed replacement mapping is incomplete'):
+            r.check_outputs(self.folder, self.approved, self.libs, self.rebuilt, sources)
+
     def test_runtime_certification_in_manifest_is_rejected(self):
         self.manifest['android_runtime_validated'] = True
         self.save()
