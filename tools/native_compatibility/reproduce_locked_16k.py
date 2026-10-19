@@ -85,7 +85,7 @@ def check_outputs(folder: Path, approved: list[dict], library_pins: dict,
                   wheel_pins: dict, replacement_sources: dict | None = None) -> dict:
     # Every approved input must map to precisely one output. A hash match alone
     # is insufficient if the manifest misidentifies which package was replaced.
-    approved_map = {row['filename']: row['sha256'] for row in approved}
+    approved_map = {row['filename']: row for row in approved}
     if len(approved) != 18 or len(approved_map) != 18 or len(wheel_pins) != 3:
         raise ValueError('Invalid original or replacement wheel inventory')
     if replacement_sources is not None and set(replacement_sources) != set(wheel_pins):
@@ -144,6 +144,10 @@ def check_outputs(folder: Path, approved: list[dict], library_pins: dict,
         if (not isinstance(name, str) or '/' in name or '\\' in name or
                 not isinstance(source, str) or source not in approved_map):
             raise ValueError('Unsafe wheel manifest name or origin')
+        original = approved_map[source]
+        if (row.get('original_sha256') != original['sha256'] or
+                row.get('original_url') != original['url']):
+            raise ValueError('Original wheel provenance disagrees with approved lock')
         if row['rebuilt'] is True:
             if name not in wheel_pins or source == name:
                 raise ValueError('Invalid rebuilt wheel origin')
