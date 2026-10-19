@@ -16,49 +16,55 @@ def canonical(name):
     return re.sub(r'[-_.]+', '-', name).lower()
 
 
+def require(condition, message='Invalid lock contract'):
+    """Enforce checks even when Python is run with optimization (-O)."""
+    if not condition:
+        raise AssertionError(message)
+
+
 def check_contract(lock, requirements):
     """Check equality between declared requirement hashes and ABI-specific wheel set."""
-    assert lock['schema'] == 1 and lock['python'] == '3.11'
-    assert sorted(lock['abis']) == ['arm64-v8a', 'x86_64']
+    require(lock['schema'] == 1 and lock['python'] == '3.11')
+    require(sorted(lock['abis']) == ['arm64-v8a', 'x86_64'])
     reqs = {}
     for line in requirements.replace('\\\n', ' ').splitlines():
         line = line.strip()
         if not line or line.startswith('#'):
             continue
         match = re.fullmatch(r'([A-Za-z0-9_.-]+)==([^\s]+)((?:\s+--hash=sha256:[a-f0-9]{64})+)', line)
-        assert match, 'Unexpected pip requirement syntax'
+        require(match, 'Unexpected pip requirement syntax')
         name, version = canonical(match[1]), match[2]
-        assert name not in reqs, 'Duplicate requirement'
+        require(name not in reqs, 'Duplicate requirement')
         reqs[name] = (version, set(re.findall(r'--hash=sha256:([a-f0-9]{64})', match[3])))
     packages, filenames = set(), set()
     abi_counts = {abi: 0 for abi in lock['abis']}
     for package in lock['packages']:
         name = canonical(package['name'])
-        assert name not in packages, 'Duplicate locked package'
+        require(name not in packages, 'Duplicate locked package')
         packages.add(name)
-        assert name in reqs and reqs[name][0] == package['version'], 'Version mismatch'
+        require(name in reqs and reqs[name][0] == package['version'], 'Version mismatch')
         expected_hashes = set()
-        assert package['files'], 'Empty wheel list'
+        require(package['files'], 'Empty wheel list')
         for row in package['files']:
             filename, digest = row['filename'], row['sha256']
-            assert filename == Path(filename).name and filename.endswith('.whl'), 'Unsafe wheel filename'
-            assert filename not in filenames, 'Duplicate wheel file'
+            require(filename == Path(filename).name and filename.endswith('.whl'), 'Unsafe wheel filename')
+            require(filename not in filenames, 'Duplicate wheel file')
             filenames.add(filename)
-            assert re.fullmatch(r'[a-f0-9]{64}', digest), 'Malformed digest'
+            require(re.fullmatch(r'[a-f0-9]{64}', digest), 'Malformed digest')
             expected_hashes.add(digest)
             parsed = urlsplit(row['url'])
-            assert parsed.scheme == 'https' and not parsed.query and not parsed.fragment
-            assert ((parsed.netloc == 'files.pythonhosted.org') or
-                    (parsed.netloc == 'chaquo.com' and parsed.path.startswith('/pypi-13.1/'))), 'Unexpected wheel origin'
-            assert parsed.path.endswith('/' + filename), 'Filename does not match origin'
-        assert reqs[name][1] == expected_hashes, 'Lock/requirements hashes differ'
+            require(parsed.scheme == 'https' and not parsed.query and not parsed.fragment)
+            require((parsed.netloc == 'files.pythonhosted.org') or
+                    (parsed.netloc == 'chaquo.com' and parsed.path.startswith('/pypi-13.1/')), 'Unexpected wheel origin')
+            require(parsed.path.endswith('/' + filename), 'Filename does not match origin')
+        require(reqs[name][1] == expected_hashes, 'Lock/requirements hashes differ')
         for abi in lock['abis']:
             tag = abi.replace('-', '_')
             matched = [f for f in package['files']
                        if f['filename'].endswith('-any.whl') or f['filename'].endswith('_' + tag + '.whl')]
-            assert len(matched) == 1, 'Package has missing or ambiguous wheel for ' + abi
+            require(len(matched) == 1, 'Package has missing or ambiguous wheel for ' + abi)
             abi_counts[abi] += 1
-    assert set(reqs) == packages, 'Unlisted or missing requirement'
+    require(set(reqs) == packages, 'Unlisted or missing requirement')
     return {'packages': len(packages), 'wheel_files': len(filenames), 'abi_counts': abi_counts}
 
 
