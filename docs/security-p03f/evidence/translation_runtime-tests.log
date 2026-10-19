@@ -1,0 +1,9 @@
+test_all_direct_adapters_guard_before_work (test_runtime_policy.RuntimePolicyTests.test_all_direct_adapters_guard_before_work) ... ok
+test_kotlin_production_methods_and_regressions (test_runtime_policy.RuntimePolicyTests.test_kotlin_production_methods_and_regressions) ... ok
+test_private_builders_and_error_surfaces (test_runtime_policy.RuntimePolicyTests.test_private_builders_and_error_surfaces) ... ok
+test_real_java_policy_and_library_wrappers (test_runtime_policy.RuntimePolicyTests.test_real_java_policy_and_library_wrappers) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 18.970s
+
+OK

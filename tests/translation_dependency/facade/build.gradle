@@ -1,0 +1,6 @@
+// Standalone only: deliberately NOT included in the production settings.gradle.
+plugins { id 'java-library' }
+def gsonPath = providers.environmentVariable('GSON_JAR').get()
+dependencies { api files(gsonPath) }
+java { sourceCompatibility = JavaVersion.VERSION_1_8; targetCompatibility = JavaVersion.VERSION_1_8 }
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8'; options.release = 8 }

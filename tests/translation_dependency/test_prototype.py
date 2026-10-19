@@ -46,7 +46,7 @@ class PrototypeTests(unittest.TestCase):
    Path(os.environ['PROTOTYPE_EVIDENCE_DIR'],'prototype-jar-scan.json').write_text(json.dumps(result,indent=2)+'\n')
  def test_production_and_all_previous_security_files_unchanged(self):
   changed=run(['git','diff',BASE,'--name-only']).splitlines()
-  self.assertTrue(all(p.startswith(('docs/security-p03e/','tests/translation_dependency/')) for p in changed),changed)
+  self.assertTrue(all(p.startswith(('docs/security-p03e/','docs/security-p03f/','tests/translation_dependency/')) for p in changed),changed)
   source=(ROOT/'tests/translation_dependency/java/lab/flexygram/translation/PrototypeAdapter.java').read_text()
   for forbidden in ['java.net','okhttp','http://','https://','getInstance','System.getenv']:self.assertNotIn(forbidden,source)
 if __name__=='__main__':unittest.main()

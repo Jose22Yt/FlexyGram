@@ -1,0 +1,10 @@
+{
+  "tests/translation_dependency/facade/src/main/java/lab/flexygram/fixture/FixtureTransport.java": "f3488cfca447f58558f43c699d005f422aceb2d72aefd0fa29870bdb4fb2b135",
+  "tests/translation_dependency/facade/src/main/java/app/nekogram/translator/FacadeFailure.java": "b03e13ae4144af68e780b4c89f024358c62a707849b173db79fa622af997333a",
+  "tests/translation_dependency/facade/src/main/java/app/nekogram/translator/DeepLTranslator.java": "162cfbb46063da0b02a2b310dd7f90b75806e49110d8221c667c74819f700f1e",
+  "tests/translation_dependency/facade/src/main/java/app/nekogram/translator/MicrosoftTranslator.java": "59e132f38f1bc7fb4bdb6058967844af9eaa3252c2ad132937886dc5f7fee075",
+  "tests/translation_dependency/facade/src/main/java/app/nekogram/translator/BaseTranslator.java": "16fd75f8eeb192902f8ffa9c432e1c03c5f8d42e166cd952055b71d84ccfe9b6",
+  "tests/translation_dependency/facade/src/main/java/app/nekogram/translator/Result.java": "eaf2d845b4e91ee3c0ab2bf644c2d9c116389f6c022bb0eaa769bb01a62320eb",
+  "tests/translation_dependency/facade/src/main/java/app/nekogram/translator/FixtureEngine.java": "c0aeef091d000b8e83b3a50bdadc5d0e384535050129b710e1586dee2b35fd20",
+  "tests/translation_dependency/facade/src/main/java/app/nekogram/translator/Http429Exception.java": "28d1b8cdfd6404f83974b3ecd6f57613374b74e4f7277e92cc73a51c96e6cb81"
+}
