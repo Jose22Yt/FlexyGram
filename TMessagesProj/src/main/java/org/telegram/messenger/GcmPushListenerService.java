@@ -21,6 +21,7 @@ public class GcmPushListenerService extends FirebaseMessagingService {
 
     @Override
     public void onMessageReceived(RemoteMessage message) {
+        if (org.telegram.messenger.DiagnosticPolicy.isIsolated()) return;
         if (isGooglePushDisabled()) return;
 
         Map<String, String> data = message.getData();
@@ -33,6 +34,7 @@ public class GcmPushListenerService extends FirebaseMessagingService {
 
     @Override
     public void onNewToken(@NonNull String token) {
+        if (org.telegram.messenger.DiagnosticPolicy.isIsolated()) return;
         if (isGooglePushDisabled()) return;
         AndroidUtilities.runOnUIThread(() -> {
             if (BuildVars.LOGS_ENABLED) {

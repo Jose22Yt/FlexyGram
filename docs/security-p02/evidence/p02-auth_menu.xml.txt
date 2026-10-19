@@ -1,0 +1,12 @@
+N: android=http://schemas.android.com/apk/res/android
+  E: PreferenceScreen (line=3)
+    E: PreferenceCategory (line=4)
+      A: android:title(0x010101e1)=@0x7f11289d
+    E: PreferenceScreen (line=7)
+      A: android:title(0x010101e1)=@0x7f110131
+      A: android:key(0x010101e8)="account_settings" (Raw: "account_settings")
+      A: android:summary(0x010101e9)="" (Raw: "")
+      E: intent (line=10)
+        A: android:targetPackage(0x01010021)="io.github.jose22yt.flexygram.diagnostic" (Raw: "io.github.jose22yt.flexygram.diagnostic")
+        A: android:action(0x0101002d)="org.telegram.messenger.OPEN_ACCOUNT" (Raw: "org.telegram.messenger.OPEN_ACCOUNT")
+        A: android:targetClass(0x0101002f)="org.telegram.ui.LaunchActivity" (Raw: "org.telegram.ui.LaunchActivity")

@@ -53,6 +53,7 @@ if(diagnostics.getDiagnostics().stream().anyMatch(d->d.getKind()==Diagnostic.Kin
 }
 System.out.println("Java production syntax PASS");}}
 """
+    sources['org/telegram/messenger/DiagnosticPolicy.java'] = 'package org.telegram.messenger; public class DiagnosticPolicy {public static boolean isolated=false; public static boolean isIsolated(){return isolated;}}'
     filelog = (java / 'FileLog.java').read_text()
     # Compile and execute these production diagnostic methods verbatim, with
     # synchronous queues/writers so both sink outputs can be asserted offline.

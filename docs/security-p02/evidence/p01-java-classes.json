@@ -1,0 +1,37 @@
+[
+  {
+    "class": "org/telegram/messenger/AuthTokensHelper",
+    "sha256": "9be44c26405e299520f361cf24def1fb39947269afa68bebc53688e06097d0b1",
+    "bytes": 6430
+  },
+  {
+    "class": "org/telegram/messenger/PushListenerController",
+    "sha256": "29595351a4387fd4cbf1c5fba5b10f6c9bd565dcd9927a25fa037ae3e8bfa212",
+    "bytes": 66222
+  },
+  {
+    "class": "org/telegram/messenger/GcmPushListenerService",
+    "sha256": "5f7f06f3cf2dffb4656382498dd5b1aa2e6872855ed3b1ac41bd54d39c9dcb2a",
+    "bytes": 3041
+  },
+  {
+    "class": "org/telegram/messenger/GooglePushListenerServiceProvider",
+    "sha256": "a94dc60ec507271d722102ca06a2bc1343aed1b9dfbf060287d2cf90c504227f",
+    "bytes": 4917
+  },
+  {
+    "class": "org/telegram/messenger/CaptchaController",
+    "sha256": "245b7126942d82de191aeafb20d4b07f2f5e897027e0d2778e536b0c13721998",
+    "bytes": 2178
+  },
+  {
+    "class": "org/telegram/messenger/FileLog",
+    "sha256": "1d4545b72ef80f96c124d3b1574fdf73c433e904bc5af936af8a8bf60ab228a0",
+    "bytes": 20693
+  },
+  {
+    "class": "app/exteraless/plugins/PythonPluginsEngine",
+    "sha256": "c2c9c72ebb0844104ab2fd0d84b74ac696dffb78bfc0a308bf0b5523c791711b",
+    "bytes": 21060
+  }
+]

@@ -1,0 +1,13 @@
+// Resolve a complete pair from one source; never combine sources or log values.
+return { Properties local, Map environment ->
+    def hasLocal = local.containsKey('TELEGRAM_APP_ID') || local.containsKey('TELEGRAM_APP_HASH')
+    def source = hasLocal ? local : environment
+    def id = source.get('TELEGRAM_APP_ID')?.toString()?.trim()
+    def hash = source.get('TELEGRAM_APP_HASH')?.toString()?.trim()
+    if (!source.containsKey('TELEGRAM_APP_ID') && !source.containsKey('TELEGRAM_APP_HASH')) return null
+    if (!id || !hash || !(id ==~ /[1-9][0-9]*/) || id.size() > 10 ||
+            new BigInteger(id) > Integer.MAX_VALUE || id == '6' || !(hash ==~ /[a-fA-F0-9]{32}/)) {
+        throw new IllegalArgumentException('Telegram API configuration requires one complete valid project-owned pair')
+    }
+    return [id: id.toInteger(), hash: hash, source: hasLocal ? 'local.properties' : 'environment']
+}

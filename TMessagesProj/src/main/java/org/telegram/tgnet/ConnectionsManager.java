@@ -230,6 +230,7 @@ public class ConnectionsManager extends BaseController {
 
     public ConnectionsManager(int instance) {
         super(instance);
+        if (org.telegram.messenger.DiagnosticPolicy.isIsolated()) { connectionState = ConnectionStateWaitingForNetwork; return; }
         connectionState = native_getConnectionState(currentAccount);
         String deviceModel;
         String systemLangCode;
@@ -418,6 +419,17 @@ public class ConnectionsManager extends BaseController {
 
     public int sendRequest(final TLObject object, final RequestDelegate onComplete, final RequestDelegateTimestamp onCompleteTimestamp, final QuickAckDelegate onQuickAck, final WriteToSocketDelegate onWriteToSocket, final int flags, final int datacenterId, final int connectionType, final boolean immediate) {
         final int requestToken = lastRequestToken.getAndIncrement();
+        if (org.telegram.messenger.DiagnosticPolicy.isIsolated()) {
+            Utilities.stageQueue.postRunnable(() -> {
+                TLRPC.TL_error error = new TLRPC.TL_error();
+                error.code = 403;
+                error.text = "DIAGNOSTIC_AUTH_DISABLED";
+                if (onComplete != null) onComplete.run(null, error);
+                if (onCompleteTimestamp != null) onCompleteTimestamp.run(null, error, 0);
+            });
+            return requestToken;
+        }
+
         Utilities.stageQueue.postRunnable(() -> {
             sendRequestInternal(object, onComplete, onCompleteTimestamp, onQuickAck, onWriteToSocket, flags, datacenterId, connectionType, immediate, requestToken);
         });
@@ -744,6 +756,7 @@ public class ConnectionsManager extends BaseController {
     }
 
     public void init(int version, int layer, int apiId, String deviceModel, String systemVersion, String appVersion, String langCode, String systemLangCode, String configPath, String logPath, String regId, String cFingerprint, int timezoneOffset, long userId, boolean userPremium, boolean enablePushConnection) {
+        if (org.telegram.messenger.DiagnosticPolicy.isIsolated()) return;
         final SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", Activity.MODE_PRIVATE);
         final ProxySettings proxySettings = ProxySettings.fromSharedPreferences(preferences);
         if (preferences.getBoolean("proxy_enabled", false) && proxySettings.isValid()) {

@@ -1,0 +1,14 @@
+{
+  "apk_name": "exteraless-v13.0.2(1261)-debug.apk",
+  "bytes": 111994675,
+  "sha256": "7df905fac76cf6bae099906ae6e62030dc5ade8a08120fe29b71f8ca299c9f3a",
+  "abis": [
+    "arm64-v8a"
+  ],
+  "arm64_elf_libraries": 18,
+  "production_class_descriptors": 7,
+  "old_sensitive_log_prefixes_absent": true,
+  "zip_crc_ok": true,
+  "signature_verified": true,
+  "python_modules_match_source": true
+}

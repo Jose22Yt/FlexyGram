@@ -10,11 +10,13 @@ public class BackupAgent extends BackupAgentHelper {
 
     @Override
     public void onCreate() {
+        if (org.telegram.messenger.DiagnosticPolicy.isIsolated()) return;
         SharedPreferencesBackupHelper helper = new SharedPreferencesBackupHelper(this, "saved_tokens", "saved_tokens_login");
         addHelper("prefs", helper);
     }
 
     public static void requestBackup() {
+        if (org.telegram.messenger.DiagnosticPolicy.isIsolated()) return;
         if (backupManager == null) {
             backupManager = new BackupManager(ApplicationLoader.applicationContext);
         }

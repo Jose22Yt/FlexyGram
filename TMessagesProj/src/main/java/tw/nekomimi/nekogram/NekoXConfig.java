@@ -47,10 +47,12 @@ public class NekoXConfig {
     public static String customAppHash = preferences.getString("custom_app_hash", "");
 
     public static int currentAppId() {
+        if (org.telegram.messenger.DiagnosticPolicy.isIsolated()) return 0;
         return customApi == API_TYPE_CUSTOM ? customAppId : BuildConfig.APP_ID;
     }
 
     public static String currentAppHash() {
+        if (org.telegram.messenger.DiagnosticPolicy.isIsolated()) return "";
         return customApi == API_TYPE_CUSTOM ? customAppHash : BuildConfig.APP_HASH;
     }
 

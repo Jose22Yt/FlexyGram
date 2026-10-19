@@ -1,3 +1,4 @@
+#include "DiagnosticPolicy.h"
 /*
  * This is the source code of tgnet library v. 1.1
  * It is licensed under GNU GPL v. 2 or later.
@@ -1964,6 +1965,7 @@ int32_t ConnectionsManager::sendRequest(TLObject *object, onCompleteFunc onCompl
 
 #ifdef ANDROID
 void ConnectionsManager::sendRequest(TLObject *object, onCompleteFunc onComplete, onQuickAckFunc onQuickAck, onWriteToSocketFunc onWriteToSocket, onRequestClearFunc onClear, uint32_t flags, uint32_t datacenterId, ConnectionType connectionType, bool immediate, int32_t requestToken) {
+    if (flexygram::isolatedDiagnostic) { delete object; return; }
     scheduleTask([&, requestToken, object, onComplete, onQuickAck, onWriteToSocket, onClear, flags, datacenterId, connectionType, immediate] {
         if (LOGS_ENABLED) DEBUG_D("send request %p - %s", object, typeid(*object).name());
         auto request = new Request(instanceNum, requestToken, connectionType, flags, datacenterId, onComplete, onQuickAck, onWriteToSocket, onClear);
@@ -3695,6 +3697,7 @@ void ConnectionsManager::applyDnsConfig(NativeByteBuffer *buffer, std::string ph
 }
 
 void ConnectionsManager::init(uint32_t version, int32_t layer, int32_t apiId, std::string deviceModel, std::string systemVersion, std::string appVersion, std::string langCode, std::string systemLangCode, std::string configPath, std::string logPath, std::string regId, std::string cFingerpting, std::string installerId, std::string packageId, int32_t timezoneOffset, int64_t userId, bool userPremium, bool isPaused, bool enablePushConnection, bool hasNetwork, int32_t networkType, int32_t performanceClass) {
+    if (flexygram::isolatedDiagnostic) return;
     currentVersion = version;
     currentLayer = layer;
     currentApiId = apiId;

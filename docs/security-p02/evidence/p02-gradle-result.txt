@@ -1,0 +1,25 @@
+> Task :TMessagesProj:mergeDebugNativeLibs UP-TO-DATE
+> Task :TMessagesProj:validateSigningDebug UP-TO-DATE
+> Task :TMessagesProj:writeDebugAppMetadata UP-TO-DATE
+> Task :TMessagesProj:writeDebugSigningConfigVersions UP-TO-DATE
+
+> Task :TMessagesProj:stripDebugDebugSymbols
+<WORKSPACE>/p01-android-validation/android-sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-strip: error: '<WORKSPACE>/FlexyGram-api-review/TMessagesProj/build/intermediates/merged_native_libs/debug/mergeDebugNativeLibs/out/lib/arm64-v8a/.libtmessages.49.so.k0nakk': section header table goes past the end of the file: e_shoff = 0x17492688
+
+Unable to strip the following libraries, packaging them as they are: .libtmessages.49.so.k0nakk. Run with --info option to learn more.
+
+> Task :TMessagesProj:packageDebug
+> Task :TMessagesProj:createDebugApkListingFileRedirect UP-TO-DATE
+> Task :TMessagesProj:assembleDebug
+
+[Incubating] Problems report is available at: file://<WORKSPACE>/FlexyGram-api-review/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.7.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 5m 3s
+244 actionable tasks: 12 executed, 232 up-to-date
+GRADLE_PROCESS_EXIT=0

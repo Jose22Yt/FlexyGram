@@ -142,6 +142,7 @@ public class BillingController implements PurchasesUpdatedListener, BillingClien
     }
 
     public void startConnection() {
+        if (DiagnosticPolicy.isIsolated()) return;
         if (isReady()) {
             return;
         }

@@ -302,6 +302,7 @@ public class UserConfig extends BaseController {
 
     public void
     loadConfig() {
+        if (DiagnosticPolicy.isIsolated()) { configLoaded = true; return; }
         synchronized (sync) {
             if (configLoaded) {
                 return;

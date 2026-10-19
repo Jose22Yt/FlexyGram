@@ -25,7 +25,7 @@
 
     <uses-permission android:name="android.permission.READ_CLIPBOARD"/>
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
-    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.INTERNET" tools:node="remove" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
@@ -39,14 +39,14 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
-    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"/>
-    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO"/>
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-    <uses-permission android:name="android.permission.READ_CONTACTS" />
-    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
-    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" tools:node="remove" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" tools:node="remove" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" tools:node="remove" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" tools:node="remove" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" tools:node="remove" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" tools:node="remove" />
+    <uses-permission android:name="android.permission.WRITE_CONTACTS" tools:node="remove" />
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" tools:node="remove" />
     <uses-permission android:name="android.permission.READ_PROFILE"/>
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS"/>
     <uses-permission android:name="android.permission.READ_SYNC_SETTINGS"/>
@@ -87,7 +87,7 @@
     <uses-permission android:name="me.everything.badger.permission.BADGE_COUNT_READ"/>
     <uses-permission android:name="me.everything.badger.permission.BADGE_COUNT_WRITE"/>
     <uses-permission android:name="com.android.vending.BILLING"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" tools:node="remove" />
 
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -108,12 +108,13 @@
 
     <application
         android:name="org.telegram.messenger.ApplicationLoader"
-        android:allowBackup="true"
-        android:restoreAnyVersion="true"
-        android:backupAgent=".BackupAgent"
+        android:allowBackup="false"
+        android:restoreAnyVersion="false"
+        android:fullBackupContent="false"
+        android:dataExtractionRules="@xml/diagnostic_data_extraction"
         android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher_exteraless"
-        android:label="@string/NagramX"
+        android:label="FlexyGram Diagnostic"
         android:largeHeap="true"
         android:theme="@style/Theme.TMessages.Start"
         android:manageSpaceActivity="org.telegram.ui.ExternalActionActivity"
@@ -459,7 +460,7 @@
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
-                <data android:mimeType="vnd.android.cursor.item/vnd.com.exteraless.app.android.profile"/>
+                <data android:mimeType="vnd.android.cursor.item/vnd.io.github.jose22yt.flexygram.diagnostic.android.profile"/>
             </intent-filter>
             <!-- exteraless plugins: файл плагина, открытый из чата, файлового
                  менеджера или «Поделиться». Без этого фильтра система показывает
@@ -534,13 +535,13 @@
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
-                <data android:mimeType="vnd.android.cursor.item/vnd.com.exteraless.app.android.call"/>
-                <data android:mimeType="vnd.android.cursor.item/vnd.com.exteraless.app.android.call.video"/>
+                <data android:mimeType="vnd.android.cursor.item/vnd.io.github.jose22yt.flexygram.diagnostic.android.call"/>
+                <data android:mimeType="vnd.android.cursor.item/vnd.io.github.jose22yt.flexygram.diagnostic.android.call.video"/>
             </intent-filter>
         </activity-alias>
         <activity
             android:name="app.exteraless.shortcuts.QuickToggleActivity"
-            android:exported="true"
+            android:exported="false"
             android:excludeFromRecents="true"
             android:noHistory="true"
             android:taskAffinity=""
@@ -561,7 +562,7 @@
             android:excludeFromRecents="true"
             android:stateNotNeeded="true"
             android:theme="@style/Theme.TMessages.Transparent"
-            android:exported="true">
+            android:exported="false">
             <intent-filter android:icon="@mipmap/ic_launcher_exteraless" android:roundIcon="@mipmap/ic_launcher_exteraless_round" android:priority="1">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.BROWSABLE" />
@@ -574,7 +575,7 @@
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode"
             android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustPan"
-            android:exported="true">
+            android:exported="false">
             <intent-filter android:icon="@mipmap/ic_launcher_exteraless" android:roundIcon="@mipmap/ic_launcher_exteraless_round">
                 <action android:name="org.telegram.passport.AUTHORIZE"/>
                 <category android:name="android.intent.category.DEFAULT"/>
@@ -585,7 +586,7 @@
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode"
             android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustPan"
-            android:exported="true">
+            android:exported="false">
             <intent-filter android:icon="@mipmap/ic_launcher_exteraless" android:roundIcon="@mipmap/ic_launcher_exteraless_round">
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
             </intent-filter>
@@ -595,7 +596,7 @@
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode"
             android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustPan"
-            android:exported="true">
+            android:exported="false">
             <intent-filter android:icon="@mipmap/ic_launcher_exteraless" android:roundIcon="@mipmap/ic_launcher_exteraless_round">
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
             </intent-filter>
@@ -612,12 +613,12 @@
         <activity
             android:name="org.telegram.messenger.OpenChatReceiver"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode"
-            android:exported="true">
+            android:exported="false">
         </activity>
         <activity
             android:name="org.telegram.messenger.OpenAttachedMenuBotReceiver"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode"
-            android:exported="true">
+            android:exported="false">
         </activity>
         <activity
             android:name="org.telegram.ui.PopupNotificationActivity"
@@ -672,7 +673,7 @@
 
         <!-- <receiver
             android:name=".SmsReceiver"
-            android:exported="true">
+            android:exported="true" android:enabled="false">
             <intent-filter>
                 <action android:name="com.google.android.gms.auth.api.phone.SMS_RETRIEVED"/>
             </intent-filter>
@@ -688,7 +689,7 @@
             android:name=".AuthenticatorService"
             android:exported="true"
             android:foregroundServiceType="dataSync"
-        >
+         android:enabled="false">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator"/>
             </intent-filter>
@@ -700,7 +701,7 @@
             android:name=".ContactsSyncAdapterService"
             android:exported="true"
             android:foregroundServiceType="dataSync"
-        >
+         android:enabled="false">
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
             </intent-filter>
@@ -715,7 +716,7 @@
             android:exported="false"
             android:permission="android.permission.BIND_JOB_SERVICE"
             android:foregroundServiceType="dataSync"
-        />
+         android:enabled="false"/>
         <service
             android:name=".BringAppForegroundService"
             android:enabled="true"
@@ -724,16 +725,16 @@
         />
         <service
             android:name=".NotificationsService"
-            android:enabled="true"
+
             android:exported="true"
             android:stopWithTask="false"
             android:foregroundServiceType="remoteMessaging"
-        />
+         android:enabled="false"/>
         <service
             android:name=".NotificationRepeat"
             android:exported="false"
             android:foregroundServiceType="dataSync"
-        />
+         android:enabled="false"/>
         <service
             android:name=".VideoEncodingService"
             android:enabled="true"
@@ -742,28 +743,28 @@
         />
         <service
             android:name="org.telegram.ui.Stories.recorder.StoryUploadingService"
-            android:enabled="true"
+
             android:exported="true"
             android:foregroundServiceType="dataSync"
-        />
+         android:enabled="false"/>
         <service
             android:name=".ImportingService"
-            android:enabled="true"
+
             android:exported="true"
             android:foregroundServiceType="dataSync"
-        />
+         android:enabled="false"/>
         <service
             android:name=".LocationSharingService"
-            android:enabled="true"
+
             android:exported="true"
             android:foregroundServiceType="location"
-        />
+         android:enabled="false"/>
         <service
             android:name=".voip.VoIPService"
-            android:enabled="true"
+
             android:exported="false"
             android:foregroundServiceType="camera|microphone|mediaPlayback|mediaProjection"
-        />
+         android:enabled="false"/>
         <service
             android:name=".MusicPlayerService"
             android:exported="true"
@@ -784,7 +785,7 @@
             android:permission="android.permission.BIND_TELECOM_CONNECTION_SERVICE"
             android:exported="true"
             android:foregroundServiceType="dataSync"
-        >
+         android:enabled="false">
             <intent-filter>
                 <action android:name="android.telecom.ConnectionService" />
             </intent-filter>
@@ -807,7 +808,7 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".AppStartReceiver" android:enabled="true" android:exported="false">
+        <receiver android:name=".AppStartReceiver"  android:exported="false" android:enabled="false">
             <intent-filter>
                 <action android:name="org.telegram.start" />
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
@@ -898,7 +899,7 @@
             android:foregroundServiceType="dataSync"
         />
 
-<!--        <receiver android:name=".FeedWidgetProvider">-->
+<!--        <receiver android:name=".FeedWidgetProvider" android:enabled="false">-->
 <!--            <meta-data android:name="android.appwidget.provider"-->
 <!--                android:resource="@xml/feed_widget_info" />-->
 <!--            <intent-filter>-->
@@ -913,17 +914,17 @@
             android:name=".FilesMigrationService"
             android:exported="false"
             android:foregroundServiceType="dataSync"
-            tools:targetApi="30" />
+            tools:targetApi="30"  android:enabled="false"/>
 
         <service android:name=".UnifiedPushService"
-            android:exported="false">
+            android:exported="false" android:enabled="false">
             <intent-filter>
                 <action android:name="org.unifiedpush.android.connector.PUSH_EVENT" />
             </intent-filter>
         </service>
 
         <service android:name=".GcmPushListenerService"
-            android:exported="false">
+            android:exported="false" android:enabled="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
@@ -998,6 +999,23 @@
 
         <meta-data android:name="firebase_crashlytics_collection_enabled" android:value="false" />
 
+
+        <!-- P0.2: no Firebase auto-init, WorkManager initializer, push or backup transports. -->
+        <provider android:name="com.google.firebase.provider.FirebaseInitProvider" tools:node="remove" />
+        <provider android:name="androidx.startup.InitializationProvider" tools:node="remove" />
+        <service android:name="com.google.firebase.messaging.FirebaseMessagingService" tools:node="remove" />
+        <service android:name="com.google.android.datatransport.runtime.backends.TransportBackendDiscovery" tools:node="remove" />
+        <service android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.JobInfoSchedulerService" tools:node="remove" />
+        <receiver android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.AlarmManagerSchedulerBroadcastReceiver" tools:node="remove" />
+        <meta-data android:name="firebase_messaging_auto_init_enabled" android:value="false" />
+
+        <provider android:name="com.google.mlkit.common.internal.MlKitInitProvider" tools:node="remove" />
+        <receiver android:name="com.google.firebase.iid.FirebaseInstanceIdReceiver" tools:node="remove" />
+        <receiver android:name="org.unifiedpush.android.connector.internal.MessagingReceiverImpl" tools:node="remove" />
+        <service android:name="org.unifiedpush.android.connector.internal.RaiseToForegroundService" tools:node="remove" />
+        <receiver android:name="com.google.android.gms.cast.framework.media.MediaIntentReceiver" tools:node="remove" />
+        <service android:name="com.google.android.gms.cast.framework.ReconnectionService" tools:node="remove" />
+        <service android:name="com.google.android.gms.auth.api.signin.RevocationBoundService" tools:node="remove" />
     </application>
 
 </manifest>
