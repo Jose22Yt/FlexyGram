@@ -51,6 +51,10 @@ if (properties != null) {
     pwd = properties.getProperty('ALIAS_PASS')
 }
 
+// P0.3b: fixed diagnostic mode; no private service data may enter its artifacts.
+def resolvePush = new GroovyShell().evaluate(rootProject.file('gradle/push-services.gradle'))
+def pushConfig = resolvePush(properties ?: new Properties(), System.getenv(), APP_PACKAGE, true)
+
 def chaquopyBuildPython = properties?.getProperty('CHAQUOPY_BUILD_PYTHON') ?: System.getenv('CHAQUOPY_BUILD_PYTHON')
 
 keystorePwd = keystorePwd ?: System.getenv('KEYSTORE_PASS')
@@ -164,6 +168,16 @@ android {
         def mapsKey = ''
         def glyphKey = ''
         buildConfigField 'boolean', 'ISOLATED_DIAGNOSTIC', 'true'
+        buildConfigField 'boolean', 'FLEXYGRAM_FCM_ENABLED', pushConfig.fcm.toString()
+        buildConfigField 'boolean', 'FLEXYGRAM_UNIFIED_PUSH_ENABLED', pushConfig.unified.toString()
+        buildConfigField 'String', 'FLEXYGRAM_PUSH_ANDROID_ID', groovy.json.JsonOutput.toJson(pushConfig.androidId)
+        buildConfigField 'String', 'FLEXYGRAM_FCM_PROJECT_ID', groovy.json.JsonOutput.toJson(pushConfig.projectId)
+        buildConfigField 'String', 'FLEXYGRAM_FCM_APP_ID', groovy.json.JsonOutput.toJson(pushConfig.appId)
+        buildConfigField 'String', 'FLEXYGRAM_FCM_SENDER_ID', groovy.json.JsonOutput.toJson(pushConfig.senderId)
+        buildConfigField 'String', 'FLEXYGRAM_FCM_API_KEY', groovy.json.JsonOutput.toJson(pushConfig.apiKey)
+        buildConfigField 'String', 'FLEXYGRAM_UNIFIED_GATEWAY', groovy.json.JsonOutput.toJson(pushConfig.gateway)
+        buildConfigField 'String', 'FLEXYGRAM_UNIFIED_DISTRIBUTOR', groovy.json.JsonOutput.toJson(pushConfig.distributor)
+        buildConfigField 'String', 'FLEXYGRAM_PUSH_SCOPE', groovy.json.JsonOutput.toJson(pushConfig.scope)
 
         manifestPlaceholders += [MAPS_API_KEY: mapsKey, GLYPH_API_KEY: glyphKey]
 
@@ -461,3 +475,4 @@ dependencies {
     // Nothing Glyph SDK (Glyph Interface + Glyph Matrix), локальный AAR
     implementation files('libs/glyph-matrix-sdk-2.0.aar')
 }
+

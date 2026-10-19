@@ -307,14 +307,16 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
             app.exteraless.debug.EnergyProfiler.resumeIfEnabled(applicationContext);
         }
         SharedPrefsHelper.init(applicationContext);
-        if (!DiagnosticPolicy.isIsolated()) {
+        if (PushServicesPolicy.crashReportingAllowed()) {
             FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(AndroidUtil.shouldEnableCrashlytics());
         }
         for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) { //TODO improve account
             UserConfig.getInstance(a).loadConfig();
             MessagesController.getInstance(a);
             if (a == 0) {
-                SharedConfig.pushStringStatus = "__FIREBASE_GENERATING_SINCE_" + ConnectionsManager.getInstance(a).getCurrentTime() + "__";
+                SharedConfig.pushStringStatus = PushServicesPolicy.anyAllowed()
+                        ? "__FIREBASE_GENERATING_SINCE_" + ConnectionsManager.getInstance(a).getCurrentTime() + "__"
+                        : "__PUSH_DISABLED__";
             } else {
                 ConnectionsManager.getInstance(a);
             }
@@ -443,10 +445,12 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
 
     public static void startPushService() {
         if (org.telegram.messenger.DiagnosticPolicy.isIsolated()) return;
+        if (!PushServicesPolicy.anyAllowed()) return;
         Utilities.stageQueue.postRunnable(ApplicationLoader::startPushServiceInternal);
     }
 
     private static void startPushServiceInternal() {
+        if (!PushServicesPolicy.anyAllowed()) return;
         SharedPreferences preferences = MessagesController.getNotificationsSettings(UserConfig.selectedAccount);
         final int pushServiceType = NaConfig.INSTANCE.getPushServiceType().Int();
         final boolean remoteFailed = TextUtils.isEmpty(SharedConfig.pushString)
@@ -515,6 +519,7 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
 
     private static void initPushServices() {
         if (org.telegram.messenger.DiagnosticPolicy.isIsolated()) return;
+        if (!PushServicesPolicy.anyAllowed()) return;
         AndroidUtilities.runOnUIThread(() -> {
             if (getPushProvider().hasServices()) {
                 getPushProvider().onRequestPushToken();
@@ -533,6 +538,7 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
     private static final long PUSH_TOKEN_TIMEOUT_MS = 60_000;
 
     private static void checkPushTokenTimeout() {
+        if (!PushServicesPolicy.anyAllowed()) return;
         final String status = SharedConfig.pushStringStatus;
         if (!TextUtils.isEmpty(SharedConfig.pushString) || status == null || !status.contains("_GENERATING_SINCE_")) {
             return;
@@ -920,3 +926,4 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
         });
     }
 }
+

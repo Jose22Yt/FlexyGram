@@ -1,0 +1,13 @@
+{
+  "provenance": "Summary of tool results observed in this session before temporary executor reset. Not reconstructed raw logs.",
+  "original_full_tests": {"passed":26,"failed":0,"skipped":0,"seconds":10.892},
+  "original_build": {"result":"BUILD SUCCESSFUL","arm64":true,"skip_native":false,"seconds_reported":"3m49s","tasks":244,"executed":15,"up_to_date":229},
+  "final_pre_reset_build": {"result":"BUILD SUCCESSFUL","seconds_reported":"1m25s","tasks":244,"executed":7,"up_to_date":237},
+  "original_binary_manifest": {"permissions":2,"internet_present":false,"components":89,"enabled_exported":1,"push_fields_disabled_or_empty":10,"auto_init_collection_flags_false":3},
+  "original_artifact_scan": {"sha256":"acb96b3ac2a58e6e35eb1703ce7978d45de5d5c45bb3867b62ae7860d60bc82f","zip_entries":14847,"nested_archives":7,"forbidden_value_hits":0,"embedded_google_services_json":0,"client_key_shaped_hits":2,"all_client_keys_absent":false,"generic_scan_passed":false},
+  "remaining_key_findings": ["tw.nekomimi.nekogram.translate.source.GoogleTranslator.translate", "app.nekogram.translator.GoogleAppTranslator.translateImpl"],
+  "raw_logs_and_apk_survived_reset":false,
+  "android_execution_performed":false,
+  "apk_distributed":false,
+  "published_recovered_commit_needs_full_suite_and_build_revalidation":true
+}

@@ -1,0 +1,16 @@
+"""Synthetic SDK/IPC doubles. No real service credentials or network."""
+BUILD_CONFIG='''package org.telegram.messenger; public class BuildConfig {
+public static boolean FLEXYGRAM_FCM_ENABLED=true,FLEXYGRAM_UNIFIED_PUSH_ENABLED=true;
+public static String APPLICATION_ID="io.github.jose22yt.flexygram.synthetic",FLEXYGRAM_PUSH_ANDROID_ID=APPLICATION_ID,
+FLEXYGRAM_FCM_PROJECT_ID="flexygram-synthetic",FLEXYGRAM_FCM_APP_ID="1:123456789012:android:0123456789abcdef012345",
+FLEXYGRAM_FCM_SENDER_ID="123456789012",FLEXYGRAM_FCM_API_KEY="SYNTHETIC_TEST_KEY_NOT_REAL",
+FLEXYGRAM_UNIFIED_GATEWAY="https://push.invalid/",FLEXYGRAM_UNIFIED_DISTRIBUTOR="test.synthetic.distributor",
+FLEXYGRAM_PUSH_SCOPE="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+}'''
+SOURCES={
+'org/telegram/messenger/BuildConfig.java':BUILD_CONFIG,
+'org/telegram/messenger/PushServicesPolicy.java':'''package org.telegram.messenger; public class PushServicesPolicy {public static boolean fcmAllowed(){return !DiagnosticPolicy.isIsolated();}public static boolean unifiedAllowed(){return !DiagnosticPolicy.isIsolated();}public static String distributor(){return BuildConfig.FLEXYGRAM_UNIFIED_DISTRIBUTOR;}}''',
+'com/google/firebase/FirebaseOptions.java':'''package com.google.firebase; public class FirebaseOptions {String project,app,sender,key;public String getProjectId(){return project;}public String getApplicationId(){return app;}public String getGcmSenderId(){return sender;}public String getApiKey(){return key;}public static class Builder {FirebaseOptions o=new FirebaseOptions();public Builder setProjectId(String s){o.project=s;return this;}public Builder setApplicationId(String s){o.app=s;return this;}public Builder setGcmSenderId(String s){o.sender=s;return this;}public Builder setApiKey(String s){o.key=s;return this;}public FirebaseOptions build(){return o;}}}''',
+'com/google/firebase/FirebaseApp.java':'''package com.google.firebase; import org.telegram.messenger.BuildConfig; public class FirebaseApp {public static int lookups,initializations;public static FirebaseApp instance=new FirebaseApp();public FirebaseOptions options=new FirebaseOptions.Builder().setProjectId(BuildConfig.FLEXYGRAM_FCM_PROJECT_ID).setApplicationId(BuildConfig.FLEXYGRAM_FCM_APP_ID).setGcmSenderId(BuildConfig.FLEXYGRAM_FCM_SENDER_ID).setApiKey(BuildConfig.FLEXYGRAM_FCM_API_KEY).build();public static FirebaseApp getInstance(){lookups++;if(instance==null)throw new IllegalStateException("not initialized");return instance;}public static FirebaseApp initializeApp(Object context,FirebaseOptions o){initializations++;instance=new FirebaseApp();instance.options=o;return instance;}public FirebaseOptions getOptions(){return options;}}''',
+'org/unifiedpush/android/connector/UnifiedPush.java':'''package org.unifiedpush.android.connector; import java.util.*;public class UnifiedPush {public static List<String> distributors=new ArrayList<>();public static String saved;public static int probes,registrations;public static List<String> getDistributors(Object c){probes++;return distributors;}public static String getAckDistributor(Object c){return saved;}public static void saveDistributor(Object c,String d){saved=d;}public static void register(Object c,String instance,String title,Object vapid){registrations++;}}'''
+}

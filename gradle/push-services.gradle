@@ -1,0 +1,49 @@
+import groovy.json.JsonSlurper
+import java.security.MessageDigest
+
+// Preparation only: all current variants call this with isolated=true.
+// No default project, resource lookup, environment credential pairs or mixed sources.
+return { Properties local, Map environment, String androidId, boolean isolated ->
+    def disabled = [fcm:false, unified:false, androidId:'', projectId:'', appId:'',
+                    senderId:'', apiKey:'', gateway:'', distributor:'', scope:'']
+    def selected = local.containsKey('FLEXYGRAM_PUSH_CONFIG_FILE') ? local : environment
+    def path = selected.get('FLEXYGRAM_PUSH_CONFIG_FILE')?.toString()?.trim()
+    if (!path) return disabled
+    def reject = { -> throw new IllegalArgumentException('Invalid or unauthorized FlexyGram push configuration') }
+    // Do not even open private configuration for a diagnostic build.
+    if (isolated) reject()
+    try {
+        File file = new File(path)
+        if (!file.isFile() || file.length() > 32768) reject()
+        def data = new JsonSlurper().parse(file)
+        if (!(data instanceof Map) || !data.keySet().every { it in ['schema','ownerApproved','androidId','firebase','unifiedPush'] }
+            || data.schema != 1 || data.ownerApproved != true || data.androidId != androidId
+            || !(androidId ==~ /io\.github\.jose22yt\.flexygram\.[a-z][a-z0-9_.]*/)
+            || androidId == 'io.github.jose22yt.flexygram.diagnostic') reject()
+        def result = new LinkedHashMap(disabled)
+        result.androidId = androidId
+        if (data.containsKey('firebase')) {
+            def f = data.firebase
+            if (!(f instanceof Map) || f.keySet() != (['projectId','appId','senderId','apiKey'] as Set)
+                || !(f.projectId instanceof String) || !(f.projectId ==~ /flexygram-[a-z0-9-]{1,20}/)
+                || !(f.senderId instanceof String) || !(f.senderId ==~ /[1-9][0-9]{5,19}/)
+                || !(f.appId instanceof String) || !(f.appId ==~ /1:${f.senderId}:android:[a-f0-9]{20,40}/)
+                || !(f.apiKey instanceof String) || !(f.apiKey ==~ /AIza[A-Za-z0-9_-]{35}/)) reject()
+            result.putAll([fcm:true,projectId:f.projectId,appId:f.appId,senderId:f.senderId,apiKey:f.apiKey])
+        }
+        if (data.containsKey('unifiedPush')) {
+            def u = data.unifiedPush
+            if (!(u instanceof Map) || u.keySet() != (['gateway','distributor'] as Set)
+                || !(u.gateway instanceof String) || !(u.distributor instanceof String)
+                || !(u.distributor ==~ /[a-zA-Z][a-zA-Z0-9_]*(\.[a-zA-Z][a-zA-Z0-9_]*)+/)) reject()
+            def uri = new URI(u.gateway)
+            if (uri.scheme != 'https' || !uri.host || uri.userInfo || uri.query || uri.fragment
+                || uri.host.equalsIgnoreCase('p2p.belloworld.it') || (uri.port != -1 && uri.port != 443)) reject()
+            result.putAll([unified:true,gateway:u.gateway.endsWith('/') ? u.gateway : u.gateway+'/',distributor:u.distributor])
+        }
+        if (!result.fcm && !result.unified) reject()
+        result.scope = MessageDigest.getInstance('SHA-256').digest(
+            groovy.json.JsonOutput.toJson(result).getBytes('UTF-8')).encodeHex().toString()
+        return result
+    } catch (Exception ignored) { reject() }
+}

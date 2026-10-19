@@ -27,3 +27,8 @@ replay_pid*.log
 TMessagesProj/release.keystore
 TMessagesProj/release/
 tests/local/
+
+
+# P0.3b: service configuration is private and explicit, never auto-discovered.
+**/google-services.json
+**/flexygram-push.private.json

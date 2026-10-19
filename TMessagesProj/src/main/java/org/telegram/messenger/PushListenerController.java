@@ -49,6 +49,7 @@ public class PushListenerController {
 
 
     private static void sendRegistrationToServerInternal(@PushType int pushType, String token) {
+        if (!PushServicesPolicy.isTypeAllowed(pushType)) return;
         if (isPushTypeDisabled(pushType)) {
             return;
         }
@@ -97,6 +98,7 @@ public class PushListenerController {
     }
 
     public static void processRemoteMessage(@PushType int pushType, String data, long time) {
+        if (!PushServicesPolicy.isTypeAllowed(pushType)) return;
         String tag = pushType == PUSH_TYPE_FIREBASE ? "FCM" : (pushType == PUSH_TYPE_HUAWEI ? "HCM" : "UP");
         CountDownLatch countDownLatch = new CountDownLatch(1);
         FileLog.d(tag + " PRE START PROCESSING");
@@ -1819,9 +1821,13 @@ public class PushListenerController {
     }
 
     public static IPushListenerServiceProvider getProvider() {
+        if (!PushServicesPolicy.anyAllowed()) return new DummyPushProvider();
         if (instance != null)
             return instance;
-        switch (NaConfig.INSTANCE.getPushServiceType().Int()) {
+        int selectedType = NaConfig.INSTANCE.getPushServiceType().Int();
+        if ((selectedType == 1 || selectedType == 3) && !PushServicesPolicy.fcmAllowed()) return new DummyPushProvider();
+        if (selectedType == 2 && !PushServicesPolicy.unifiedAllowed()) return new DummyPushProvider();
+        switch (selectedType) {
             case 1:
             case 3: {
                 instance = new GooglePushListenerServiceProvider();
@@ -1842,11 +1848,13 @@ public class PushListenerController {
     // UP start
     public static void sendRegistrationToServer(@PushType int pushType, String token) {
         if (DiagnosticPolicy.isIsolated()) return;
+        if (!PushServicesPolicy.isTypeAllowed(pushType)) return;
         Utilities.stageQueue.postRunnable(() -> sendRegistrationToServerInternal(pushType, token));
     }
 
     public static void sendWebPushRegistrationToServer(String token, String simplePushToken) {
         if (DiagnosticPolicy.isIsolated()) return;
+        if (!PushServicesPolicy.unifiedAllowed()) return;
         Utilities.stageQueue.postRunnable(() -> {
             if (isPushTypeDisabled(PUSH_TYPE_WEB)) {
                 return;
@@ -1857,6 +1865,7 @@ public class PushListenerController {
     }
 
     public static void refreshRegistration() {
+        if (!PushServicesPolicy.anyAllowed()) return;
         Utilities.stageQueue.postRunnable(() -> {
             if (!TextUtils.isEmpty(SharedConfig.pushString)) {
                 sendRegistrationToServerInternal(SharedConfig.pushType, SharedConfig.pushString);
@@ -1866,6 +1875,7 @@ public class PushListenerController {
 
     public static void reconcilePushRegistration() {
         if (DiagnosticPolicy.isIsolated()) return;
+        if (!PushServicesPolicy.anyAllowed()) return;
         Utilities.stageQueue.postRunnable(() -> {
             int serviceType = NaConfig.INSTANCE.getPushServiceType().Int();
             boolean googlePush = serviceType == 1 || serviceType == 3;
@@ -1884,12 +1894,14 @@ public class PushListenerController {
     }
 
     public static void unregisterSimplePush() {
+        if (!PushServicesPolicy.unifiedAllowed()) return;
         String token = NaConfig.getPreferences().getString(NaConfig.INSTANCE.getPushServiceTypeUnifiedSimple().getKey(), "");
         NaConfig.INSTANCE.getPushServiceTypeUnifiedSimple().setConfigString("");
         unregisterPush(PUSH_TYPE_SIMPLE, token);
     }
 
     public static void unregisterWebPush() {
+        if (!PushServicesPolicy.unifiedAllowed()) return;
         Utilities.stageQueue.postRunnable(() -> {
             if (SharedConfig.pushType != PUSH_TYPE_WEB) {
                 return;
@@ -1899,6 +1911,7 @@ public class PushListenerController {
     }
 
     private static void unregisterCurrentPushInternal() {
+        if (!PushServicesPolicy.anyAllowed()) return;
         int pushType = SharedConfig.pushType;
         String token = SharedConfig.pushString;
         ConnectionsManager.setRegId(null, pushType, SharedConfig.pushStringStatus);
@@ -1914,6 +1927,7 @@ public class PushListenerController {
     }
 
     private static void unregisterPush(@PushType int pushType, String token) {
+        if (!PushServicesPolicy.isTypeAllowed(pushType)) return;
         if (TextUtils.isEmpty(token)) {
             return;
         }
@@ -1935,6 +1949,7 @@ public class PushListenerController {
     }
 
     private static boolean isPushTypeDisabled(@PushType int pushType) {
+        if (!PushServicesPolicy.isTypeAllowed(pushType)) return true;
         int serviceType = NaConfig.INSTANCE.getPushServiceType().Int();
         if (pushType == PUSH_TYPE_WEB || pushType == PUSH_TYPE_SIMPLE) {
             return serviceType != 2;
@@ -1943,3 +1958,4 @@ public class PushListenerController {
     }
     // UP end
 }
+

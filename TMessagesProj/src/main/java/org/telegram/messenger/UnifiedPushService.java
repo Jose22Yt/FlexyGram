@@ -28,7 +28,7 @@ import xyz.nextalone.nagram.NaConfig;
 @SuppressWarnings("NullableProblems")
 public class UnifiedPushService extends PushService {
 
-    public static final String UP_GATEWAY_DEFAULT = "https://p2p.belloworld.it/"; // https://github.com/Mercurygram/Mercurygram?tab=readme-ov-file#unifiedpush-put-to-post-gateway
+    public static final String UP_GATEWAY_DEFAULT = ""; // No third-party fallback.
 
     private static final String DISTRIBUTOR_NTFY = "io.heckel.ntfy";
     static final String UP_FAILED = "__UNIFIEDPUSH_FAILED__";
@@ -51,21 +51,15 @@ public class UnifiedPushService extends PushService {
 
     @Override
     public void onNewEndpoint(PushEndpoint endpoint, String instance) {
-        if (isUnifiedPushDisabled()) {
-            UnifiedPush.unregister(this, instance);
-            return;
-        }
+        if (isUnifiedPushDisabled()) return;
         AndroidUtilities.runOnUIThread(() -> {
             ApplicationLoader.postInitApplication();
             Utilities.globalQueue.postRunnable(() -> {
                 SharedConfig.pushStringGetTimeEnd = SystemClock.elapsedRealtime();
                 ensureWebPushKeys();
 
-                String gateway = NaConfig.getPreferences().getString(NaConfig.INSTANCE.getPushServiceTypeUnifiedGateway().getKey(), "");
-                if (gateway.isEmpty()) {
-                    gateway = UP_GATEWAY_DEFAULT;
-                }
-                if (!gateway.endsWith("/")) gateway += "/";
+                if (!PushServicesPolicy.unifiedAllowed()) return;
+                String gateway = PushServicesPolicy.unifiedGateway();
 
                 try {
                     String gatewayUrl = gateway + "aesgcm?e=" + URLEncoder.encode(endpoint.getUrl(), StandardCharsets.UTF_8);
@@ -84,7 +78,7 @@ public class UnifiedPushService extends PushService {
                             : gateway + URLEncoder.encode(endpoint.getUrl(), StandardCharsets.UTF_8);
                     PushListenerController.sendWebPushRegistrationToServer(tokenObj.toString(), simplePushUrl);
                 } catch (Exception e) {
-                    FileLog.e(e);
+                    FileLog.e("UnifiedPush operation failed (" + e.getClass().getSimpleName() + ")");
                 }
             });
         });
@@ -117,7 +111,7 @@ public class UnifiedPushService extends PushService {
                 });
                 return;
             } catch (Exception e) {
-                FileLog.e("WP DECRYPT ERROR, falling back to wake-up: " + e.getMessage());
+                FileLog.e("WebPush decryption failed (" + e.getClass().getSimpleName() + ")");
             }
         }
 
@@ -142,7 +136,7 @@ public class UnifiedPushService extends PushService {
     @Override
     public void onRegistrationFailed(FailedReason reason, String instance) {
         if (isUnifiedPushDisabled()) return;
-        FileLog.e("Failed to get endpoint: " + reason);
+        FileLog.e("UnifiedPush registration failed (" + (reason == null ? "unknown" : reason.getClass().getSimpleName()) + ")");
         AndroidUtilities.runOnUIThread(() -> {
             ApplicationLoader.postInitApplication();
             SharedConfig.pushStringStatus = UP_FAILED;
@@ -180,13 +174,17 @@ public class UnifiedPushService extends PushService {
     }
 
     private static boolean isUnifiedPushDisabled() {
-        return NaConfig.getPreferences().getInt(NaConfig.INSTANCE.getPushServiceType().getKey(), 1) != 2;
+        return !PushServicesPolicy.unifiedAllowed()
+                || !PushServicesPolicy.distributor().equals(UnifiedPush.getSavedDistributor(ApplicationLoader.applicationContext))
+                || NaConfig.getPreferences().getInt(NaConfig.INSTANCE.getPushServiceType().getKey(), 1) != 2;
     }
 
     private static synchronized void loadWebPushKeys() {
         if (webPushPrivateKey != null && webPushPublicKey != null && webPushAuthSecret != null) {
             return;
         }
+        if (!PushServicesPolicy.unifiedAllowed()) return;
+        if (!PushServicesPolicy.scope().equals(NaConfig.getPreferences().getString("FlexyGramPushScope", ""))) return;
         String priv = NaConfig.getPreferences().getString(NaConfig.INSTANCE.getPushServiceTypeUnifiedWebPushPrivateKey().getKey(), "");
         String pub = NaConfig.getPreferences().getString(NaConfig.INSTANCE.getPushServiceTypeUnifiedWebPushPublicKey().getKey(), "");
         String auth = NaConfig.getPreferences().getString(NaConfig.INSTANCE.getPushServiceTypeUnifiedWebPushAuthSecret().getKey(), "");
@@ -214,7 +212,7 @@ public class UnifiedPushService extends PushService {
             NaConfig.INSTANCE.getPushServiceTypeUnifiedWebPushPrivateKey().setConfigString("");
             NaConfig.INSTANCE.getPushServiceTypeUnifiedWebPushPublicKey().setConfigString("");
             NaConfig.INSTANCE.getPushServiceTypeUnifiedWebPushAuthSecret().setConfigString("");
-            FileLog.e(e);
+            FileLog.e("UnifiedPush operation failed (" + e.getClass().getSimpleName() + ")");
         }
     }
 
@@ -239,8 +237,10 @@ public class UnifiedPushService extends PushService {
             NaConfig.INSTANCE.getPushServiceTypeUnifiedWebPushPrivateKey().setConfigString(Base64.encodeToString(webPushPrivateKey, Base64.DEFAULT));
             NaConfig.INSTANCE.getPushServiceTypeUnifiedWebPushPublicKey().setConfigString(Base64.encodeToString(webPushPublicKey, Base64.DEFAULT));
             NaConfig.INSTANCE.getPushServiceTypeUnifiedWebPushAuthSecret().setConfigString(Base64.encodeToString(webPushAuthSecret, Base64.DEFAULT));
+            NaConfig.getPreferences().edit().putString("FlexyGramPushScope", PushServicesPolicy.scope()).apply();
         } catch (Exception e) {
-            FileLog.e(e);
+            FileLog.e("UnifiedPush operation failed (" + e.getClass().getSimpleName() + ")");
         }
     }
 }
+
