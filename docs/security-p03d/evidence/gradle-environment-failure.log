@@ -1,0 +1,608 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.7.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build
+> Task :buildSrc:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :buildSrc:compileKotlin
+> Task :buildSrc:pluginDescriptors
+> Task :buildSrc:processResources
+> Task :buildSrc:compileJava NO-SOURCE
+> Task :buildSrc:compileGroovy NO-SOURCE
+> Task :buildSrc:classes
+> Task :buildSrc:jar
+> Task :TMessagesProj_Modules:media3:media-lib-common:preBuild UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-common:preDebugBuild UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-common:processDebugNavigationResources
+> Task :TMessagesProj_Modules:media3:media-lib-container:preBuild UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-container:preDebugBuild UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-container:processDebugNavigationResources FROM-CACHE
+> Task :TMessagesProj_Modules:media3:media-lib-database:preBuild UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-database:preDebugBuild UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-database:processDebugNavigationResources FROM-CACHE
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:preBuild UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:preDebugBuild UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:processDebugNavigationResources FROM-CACHE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:preBuild UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:preDebugBuild UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:processDebugNavigationResources FROM-CACHE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:preBuild UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:preDebugBuild UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:processDebugNavigationResources FROM-CACHE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:preBuild UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:preDebugBuild UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:processDebugNavigationResources
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:preBuild UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:preDebugBuild UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:processDebugNavigationResources FROM-CACHE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:preBuild UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:preDebugBuild UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:processDebugNavigationResources FROM-CACHE
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:preBuild UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:preDebugBuild UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:processDebugNavigationResources FROM-CACHE
+> Task :TMessagesProj_Modules:media3:media-lib-session:preBuild UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-session:preDebugBuild UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-session:processDebugNavigationResources
+> Task :TMessagesProj_Modules:media3:media-lib-common:generateDebugResources
+> Task :TMessagesProj_Modules:media3:media-lib-common:packageDebugResources
+> Task :TMessagesProj_Modules:media3:media-lib-common:parseDebugLocalResources
+> Task :TMessagesProj_Modules:media3:media-lib-common:generateDebugRFile
+> Task :TMessagesProj_Modules:media3:media-lib-common:compileDebugKotlin NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-common:javaPreCompileDebug
+> Task :TMessagesProj:preBuild UP-TO-DATE
+> Task :TMessagesProj:preDebugBuild UP-TO-DATE
+> Task :TMessagesProj:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :TMessagesProj:generateDebugBuildConfig
+
+> Task :TMessagesProj_Modules:media3:media-lib-common:compileDebugJavaWithJavac
+Java compiler version 21 has deprecated support for compiling with source/target version 8.
+Try one of the following options:
+    1. [Recommended] Use Java toolchain with a lower language version
+    2. Set a higher source/target version
+    3. Use a lower version of the JDK running the build (if you're not using Java toolchain)
+For more details on how to configure these settings, see https://developer.android.com/build/jdks.
+To suppress this warning, set android.javaCompile.suppressSourceTargetDeprecationWarning=true in gradle.properties.
+Add android.sync.suppressAgpWarnings=JAVA_COMPILE_DEPRECATED_SOURCE_TARGET to the gradle.properties file to suppress this warning.
+warning: [options] source value 8 is obsolete and will be removed in a future release
+warning: [options] target value 8 is obsolete and will be removed in a future release
+warning: [options] To suppress warnings about obsolete options, use -Xlint:-options.
+
+> Task :TMessagesProj:generateDebugLottieMeta
+> Task :TMessagesProj:extractDebugPythonBuildPackages
+
+> Task :TMessagesProj_Modules:media3:media-lib-common:compileDebugJavaWithJavac
+warning: unknown enum constant Level.FULL
+  reason: class file for com.google.j2objc.annotations.ReflectionSupport$Level not found
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+4 warnings
+
+> Task :TMessagesProj_Modules:media3:media-lib-common:bundleLibCompileToJarDebug
+
+> Task :TMessagesProj:installDebugPythonRequirements
+Chaquopy: Installing for arm64-v8a
+Looking in indexes: https://pypi.org/simple, https://chaquo.com/pypi-13.1
+
+> Task :TMessagesProj_Modules:media3:media-lib-container:generateDebugResources FROM-CACHE
+> Task :TMessagesProj_Modules:media3:media-lib-container:packageDebugResources
+> Task :TMessagesProj_Modules:media3:media-lib-container:parseDebugLocalResources FROM-CACHE
+> Task :TMessagesProj_Modules:media3:media-lib-container:generateDebugRFile
+> Task :TMessagesProj_Modules:media3:media-lib-container:compileDebugKotlin NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-container:javaPreCompileDebug FROM-CACHE
+
+> Task :TMessagesProj_Modules:media3:media-lib-container:compileDebugJavaWithJavac
+Java compiler version 21 has deprecated support for compiling with source/target version 8.
+Try one of the following options:
+    1. [Recommended] Use Java toolchain with a lower language version
+    2. Set a higher source/target version
+    3. Use a lower version of the JDK running the build (if you're not using Java toolchain)
+For more details on how to configure these settings, see https://developer.android.com/build/jdks.
+To suppress this warning, set android.javaCompile.suppressSourceTargetDeprecationWarning=true in gradle.properties.
+Add android.sync.suppressAgpWarnings=JAVA_COMPILE_DEPRECATED_SOURCE_TARGET to the gradle.properties file to suppress this warning.
+warning: [options] source value 8 is obsolete and will be removed in a future release
+warning: [options] target value 8 is obsolete and will be removed in a future release
+warning: [options] To suppress warnings about obsolete options, use -Xlint:-options.
+warning: unknown enum constant MigrationStatus.STRICT
+  reason: class file for kotlin.annotations.jvm.MigrationStatus not found
+4 warnings
+
+> Task :TMessagesProj_Modules:media3:media-lib-container:bundleLibCompileToJarDebug
+> Task :TMessagesProj_Modules:media3:media-lib-database:generateDebugResources FROM-CACHE
+> Task :TMessagesProj_Modules:media3:media-lib-database:packageDebugResources
+> Task :TMessagesProj_Modules:media3:media-lib-database:parseDebugLocalResources FROM-CACHE
+> Task :TMessagesProj_Modules:media3:media-lib-database:generateDebugRFile
+> Task :TMessagesProj_Modules:media3:media-lib-database:compileDebugKotlin NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-database:javaPreCompileDebug FROM-CACHE
+
+> Task :TMessagesProj_Modules:media3:media-lib-database:compileDebugJavaWithJavac
+Java compiler version 21 has deprecated support for compiling with source/target version 8.
+Try one of the following options:
+    1. [Recommended] Use Java toolchain with a lower language version
+    2. Set a higher source/target version
+    3. Use a lower version of the JDK running the build (if you're not using Java toolchain)
+For more details on how to configure these settings, see https://developer.android.com/build/jdks.
+To suppress this warning, set android.javaCompile.suppressSourceTargetDeprecationWarning=true in gradle.properties.
+Add android.sync.suppressAgpWarnings=JAVA_COMPILE_DEPRECATED_SOURCE_TARGET to the gradle.properties file to suppress this warning.
+warning: [options] source value 8 is obsolete and will be removed in a future release
+warning: [options] target value 8 is obsolete and will be removed in a future release
+warning: [options] To suppress warnings about obsolete options, use -Xlint:-options.
+3 warnings
+
+> Task :TMessagesProj_Modules:media3:media-lib-database:bundleLibCompileToJarDebug
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:generateDebugResources FROM-CACHE
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:packageDebugResources
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:parseDebugLocalResources FROM-CACHE
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:generateDebugRFile
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:compileDebugKotlin NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:javaPreCompileDebug FROM-CACHE
+
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:compileDebugJavaWithJavac
+Java compiler version 21 has deprecated support for compiling with source/target version 8.
+Try one of the following options:
+    1. [Recommended] Use Java toolchain with a lower language version
+    2. Set a higher source/target version
+    3. Use a lower version of the JDK running the build (if you're not using Java toolchain)
+For more details on how to configure these settings, see https://developer.android.com/build/jdks.
+To suppress this warning, set android.javaCompile.suppressSourceTargetDeprecationWarning=true in gradle.properties.
+Add android.sync.suppressAgpWarnings=JAVA_COMPILE_DEPRECATED_SOURCE_TARGET to the gradle.properties file to suppress this warning.
+warning: [options] source value 8 is obsolete and will be removed in a future release
+warning: [options] target value 8 is obsolete and will be removed in a future release
+warning: [options] To suppress warnings about obsolete options, use -Xlint:-options.
+3 warnings
+
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:bundleLibCompileToJarDebug
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:generateDebugResources FROM-CACHE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:packageDebugResources
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:parseDebugLocalResources FROM-CACHE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:generateDebugRFile
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:compileDebugKotlin NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:javaPreCompileDebug FROM-CACHE
+
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:compileDebugJavaWithJavac
+Java compiler version 21 has deprecated support for compiling with source/target version 8.
+Try one of the following options:
+    1. [Recommended] Use Java toolchain with a lower language version
+    2. Set a higher source/target version
+    3. Use a lower version of the JDK running the build (if you're not using Java toolchain)
+For more details on how to configure these settings, see https://developer.android.com/build/jdks.
+To suppress this warning, set android.javaCompile.suppressSourceTargetDeprecationWarning=true in gradle.properties.
+Add android.sync.suppressAgpWarnings=JAVA_COMPILE_DEPRECATED_SOURCE_TARGET to the gradle.properties file to suppress this warning.
+warning: [options] source value 8 is obsolete and will be removed in a future release
+warning: [options] target value 8 is obsolete and will be removed in a future release
+warning: [options] To suppress warnings about obsolete options, use -Xlint:-options.
+warning: unknown enum constant MigrationStatus.STRICT
+  reason: class file for kotlin.annotations.jvm.MigrationStatus not found
+4 warnings
+
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:bundleLibCompileToJarDebug
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:generateDebugResources FROM-CACHE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:packageDebugResources
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:parseDebugLocalResources FROM-CACHE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:generateDebugRFile
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:generateDebugResources
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:packageDebugResources
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:parseDebugLocalResources
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:generateDebugRFile
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:generateDebugResources FROM-CACHE
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:packageDebugResources
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:parseDebugLocalResources FROM-CACHE
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:generateDebugRFile
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:compileDebugKotlin NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:javaPreCompileDebug FROM-CACHE
+
+> Task :TMessagesProj:installDebugPythonRequirements
+Collecting beautifulsoup4
+
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:compileDebugJavaWithJavac
+Java compiler version 21 has deprecated support for compiling with source/target version 8.
+Try one of the following options:
+    1. [Recommended] Use Java toolchain with a lower language version
+    2. Set a higher source/target version
+    3. Use a lower version of the JDK running the build (if you're not using Java toolchain)
+For more details on how to configure these settings, see https://developer.android.com/build/jdks.
+To suppress this warning, set android.javaCompile.suppressSourceTargetDeprecationWarning=true in gradle.properties.
+Add android.sync.suppressAgpWarnings=JAVA_COMPILE_DEPRECATED_SOURCE_TARGET to the gradle.properties file to suppress this warning.
+warning: [options] source value 8 is obsolete and will be removed in a future release
+warning: [options] target value 8 is obsolete and will be removed in a future release
+warning: [options] To suppress warnings about obsolete options, use -Xlint:-options.
+warning: unknown enum constant When.MAYBE
+  reason: class file for javax.annotation.meta.When not found
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+4 warnings
+
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:bundleLibCompileToJarDebug
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:compileDebugKotlin NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:javaPreCompileDebug FROM-CACHE
+
+> Task :TMessagesProj:installDebugPythonRequirements
+  Downloading beautifulsoup4-4.15.0-py3-none-any.whl.metadata (3.8 kB)
+Collecting debugpy
+  Downloading debugpy-1.8.22-py2.py3-none-any.whl.metadata (1.4 kB)
+Collecting lxml
+  Downloading https://chaquo.com/pypi-13.1/lxml/lxml-5.3.0-0-cp311-cp311-android_24_arm64_v8a.whl (1.4 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.4/1.4 MB 5.2 MB/s  0:00:00
+Collecting packaging
+  Downloading packaging-26.3-py3-none-any.whl.metadata (3.5 kB)
+Collecting pillow
+  Downloading https://chaquo.com/pypi-13.1/pillow/pillow-11.0.0-0-cp311-cp311-android_24_arm64_v8a.whl (582 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 582.7/582.7 kB 6.4 MB/s  0:00:00
+Collecting requests
+  Downloading requests-2.34.2-py3-none-any.whl.metadata (4.8 kB)
+Collecting PyYAML
+  Downloading https://chaquo.com/pypi-13.1/pyyaml/pyyaml-6.0.3-0-cp311-cp311-android_24_arm64_v8a.whl (136 kB)
+Collecting soupsieve>=1.6.1 (from beautifulsoup4)
+  Downloading soupsieve-3.0.3-py3-none-any.whl.metadata (4.4 kB)
+Collecting typing-extensions>=4.0.0 (from beautifulsoup4)
+  Downloading typing_extensions-4.16.0-py3-none-any.whl.metadata (3.3 kB)
+Collecting chaquopy-libxslt>=1.1.32 (from lxml)
+  Downloading https://chaquo.com/pypi-13.1/chaquopy-libxslt/chaquopy_libxslt-1.1.32-2-py3-none-android_21_arm64_v8a.whl (178 kB)
+Collecting chaquopy-libxml2>=2.9.8 (from lxml)
+  Downloading https://chaquo.com/pypi-13.1/chaquopy-libxml2/chaquopy_libxml2-2.9.8-2-py3-none-android_21_arm64_v8a.whl (773 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 773.4/773.4 kB 9.6 MB/s  0:00:00
+Collecting chaquopy-freetype>=2.9.1 (from pillow)
+  Downloading https://chaquo.com/pypi-13.1/chaquopy-freetype/chaquopy_freetype-2.9.1-2-py3-none-android_21_arm64_v8a.whl (533 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 533.8/533.8 kB 5.5 MB/s  0:00:00
+Collecting chaquopy-libjpeg>=1.5.3 (from pillow)
+  Downloading https://chaquo.com/pypi-13.1/chaquopy-libjpeg/chaquopy_libjpeg-1.5.3-1-py3-none-android_21_arm64_v8a.whl (176 kB)
+Collecting charset_normalizer<4,>=2 (from requests)
+  Downloading charset_normalizer-3.5.2-py3-none-any.whl.metadata (46 kB)
+Collecting idna<4,>=2.5 (from requests)
+  Downloading idna-3.20-py3-none-any.whl.metadata (7.2 kB)
+Collecting urllib3<3,>=1.26 (from requests)
+  Downloading urllib3-2.8.0-py3-none-any.whl.metadata (7.4 kB)
+Collecting certifi>=2023.5.7 (from requests)
+  Downloading certifi-2026.10.18-py3-none-any.whl.metadata (2.5 kB)
+Collecting chaquopy-libyaml>=0.2.5 (from PyYAML)
+  Downloading https://chaquo.com/pypi-13.1/chaquopy-libyaml/chaquopy_libyaml-0.2.5-0-py3-none-android_24_arm64_v8a.whl (58 kB)
+Downloading beautifulsoup4-4.15.0-py3-none-any.whl (109 kB)
+Downloading debugpy-1.8.22-py2.py3-none-any.whl (5.4 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.4/5.4 MB 37.7 MB/s  0:00:00
+Downloading packaging-26.3-py3-none-any.whl (129 kB)
+Downloading requests-2.34.2-py3-none-any.whl (73 kB)
+Downloading charset_normalizer-3.5.2-py3-none-any.whl (68 kB)
+Downloading idna-3.20-py3-none-any.whl (69 kB)
+Downloading urllib3-2.8.0-py3-none-any.whl (135 kB)
+
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:compileDebugJavaWithJavac
+Java compiler version 21 has deprecated support for compiling with source/target version 8.
+Try one of the following options:
+    1. [Recommended] Use Java toolchain with a lower language version
+    2. Set a higher source/target version
+    3. Use a lower version of the JDK running the build (if you're not using Java toolchain)
+For more details on how to configure these settings, see https://developer.android.com/build/jdks.
+To suppress this warning, set android.javaCompile.suppressSourceTargetDeprecationWarning=true in gradle.properties.
+Add android.sync.suppressAgpWarnings=JAVA_COMPILE_DEPRECATED_SOURCE_TARGET to the gradle.properties file to suppress this warning.
+warning: [options] source value 8 is obsolete and will be removed in a future release
+warning: [options] target value 8 is obsolete and will be removed in a future release
+warning: [options] To suppress warnings about obsolete options, use -Xlint:-options.
+warning: unknown enum constant Level.FULL
+  reason: class file for com.google.j2objc.annotations.ReflectionSupport$Level not found
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+4 warnings
+
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:bundleLibCompileToJarDebug
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:compileDebugKotlin NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:javaPreCompileDebug FROM-CACHE
+
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:compileDebugJavaWithJavac
+Java compiler version 21 has deprecated support for compiling with source/target version 8.
+Try one of the following options:
+    1. [Recommended] Use Java toolchain with a lower language version
+    2. Set a higher source/target version
+    3. Use a lower version of the JDK running the build (if you're not using Java toolchain)
+For more details on how to configure these settings, see https://developer.android.com/build/jdks.
+To suppress this warning, set android.javaCompile.suppressSourceTargetDeprecationWarning=true in gradle.properties.
+Add android.sync.suppressAgpWarnings=JAVA_COMPILE_DEPRECATED_SOURCE_TARGET to the gradle.properties file to suppress this warning.
+warning: [options] source value 8 is obsolete and will be removed in a future release
+warning: [options] target value 8 is obsolete and will be removed in a future release
+warning: [options] To suppress warnings about obsolete options, use -Xlint:-options.
+3 warnings
+
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:bundleLibCompileToJarDebug
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:generateDebugResources FROM-CACHE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:packageDebugResources
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:parseDebugLocalResources FROM-CACHE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:generateDebugRFile
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:compileDebugKotlin NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:javaPreCompileDebug FROM-CACHE
+
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:compileDebugJavaWithJavac
+Java compiler version 21 has deprecated support for compiling with source/target version 8.
+Try one of the following options:
+    1. [Recommended] Use Java toolchain with a lower language version
+    2. Set a higher source/target version
+    3. Use a lower version of the JDK running the build (if you're not using Java toolchain)
+For more details on how to configure these settings, see https://developer.android.com/build/jdks.
+To suppress this warning, set android.javaCompile.suppressSourceTargetDeprecationWarning=true in gradle.properties.
+Add android.sync.suppressAgpWarnings=JAVA_COMPILE_DEPRECATED_SOURCE_TARGET to the gradle.properties file to suppress this warning.
+warning: [options] source value 8 is obsolete and will be removed in a future release
+warning: [options] target value 8 is obsolete and will be removed in a future release
+warning: [options] To suppress warnings about obsolete options, use -Xlint:-options.
+warning: unknown enum constant When.MAYBE
+  reason: class file for javax.annotation.meta.When not found
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+4 warnings
+
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:bundleLibCompileToJarDebug
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:generateDebugResources FROM-CACHE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:packageDebugResources
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:parseDebugLocalResources FROM-CACHE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:generateDebugRFile
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:compileDebugKotlin NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:javaPreCompileDebug FROM-CACHE
+
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:compileDebugJavaWithJavac
+Java compiler version 21 has deprecated support for compiling with source/target version 8.
+Try one of the following options:
+    1. [Recommended] Use Java toolchain with a lower language version
+    2. Set a higher source/target version
+    3. Use a lower version of the JDK running the build (if you're not using Java toolchain)
+For more details on how to configure these settings, see https://developer.android.com/build/jdks.
+To suppress this warning, set android.javaCompile.suppressSourceTargetDeprecationWarning=true in gradle.properties.
+Add android.sync.suppressAgpWarnings=JAVA_COMPILE_DEPRECATED_SOURCE_TARGET to the gradle.properties file to suppress this warning.
+warning: [options] source value 8 is obsolete and will be removed in a future release
+warning: [options] target value 8 is obsolete and will be removed in a future release
+warning: [options] To suppress warnings about obsolete options, use -Xlint:-options.
+warning: unknown enum constant When.MAYBE
+  reason: class file for javax.annotation.meta.When not found
+Note: <WORKSPACE>/FlexyGram/TMessagesProj_Modules/media/libraries/exoplayer_hls/src/main/java/androidx/media3/exoplayer/hls/HlsMediaSource.java uses or overrides a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+4 warnings
+
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:bundleLibCompileToJarDebug
+
+> Task :TMessagesProj:installDebugPythonRequirements
+Downloading certifi-2026.10.18-py3-none-any.whl (134 kB)
+Downloading soupsieve-3.0.3-py3-none-any.whl (41 kB)
+Downloading typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+Installing collected packages: chaquopy-libyaml, chaquopy-libxml2, chaquopy-libjpeg, chaquopy-freetype, urllib3, typing-extensions, soupsieve, PyYAML, pillow, packaging, idna, debugpy, charset_normalizer, chaquopy-libxslt, certifi, requests, lxml, beautifulsoup4
+
+Successfully installed PyYAML-6.0.3 beautifulsoup4-4.15.0 certifi-2026.10.18 chaquopy-freetype-2.9.1 chaquopy-libjpeg-1.5.3 chaquopy-libxml2-2.9.8 chaquopy-libxslt-1.1.32 chaquopy-libyaml-0.2.5 charset_normalizer-3.5.2 debugpy-1.8.22 idna-3.20 lxml-5.3.0 packaging-26.3 pillow-11.0.0 requests-2.34.2 soupsieve-3.0.3 typing-extensions-4.16.0 urllib3-2.8.0
+
+> Task :TMessagesProj:mergeDebugPythonSources
+> Task :TMessagesProj:generateDebugPythonProxies
+> Task :TMessagesProj:generateDebugResources
+> Task :TMessagesProj_Modules:media3:media-lib-session:compileDebugAidl
+> Task :TMessagesProj_Modules:media3:media-lib-session:generateDebugResources
+> Task :TMessagesProj_Modules:media3:media-lib-session:packageDebugResources
+> Task :TMessagesProj_Modules:media3:media-lib-session:parseDebugLocalResources
+> Task :TMessagesProj_Modules:media3:media-lib-session:generateDebugRFile
+> Task :TMessagesProj_Modules:media3:media-lib-session:compileDebugKotlin NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-session:javaPreCompileDebug FROM-CACHE
+> Task :TMessagesProj:packageDebugResources
+
+> Task :TMessagesProj_Modules:media3:media-lib-session:compileDebugJavaWithJavac
+Java compiler version 21 has deprecated support for compiling with source/target version 8.
+Try one of the following options:
+    1. [Recommended] Use Java toolchain with a lower language version
+    2. Set a higher source/target version
+    3. Use a lower version of the JDK running the build (if you're not using Java toolchain)
+For more details on how to configure these settings, see https://developer.android.com/build/jdks.
+To suppress this warning, set android.javaCompile.suppressSourceTargetDeprecationWarning=true in gradle.properties.
+Add android.sync.suppressAgpWarnings=JAVA_COMPILE_DEPRECATED_SOURCE_TARGET to the gradle.properties file to suppress this warning.
+warning: [options] source value 8 is obsolete and will be removed in a future release
+warning: [options] target value 8 is obsolete and will be removed in a future release
+warning: [options] To suppress warnings about obsolete options, use -Xlint:-options.
+warning: unknown enum constant Level.FULL
+  reason: class file for com.google.j2objc.annotations.ReflectionSupport$Level not found
+warning: unknown enum constant When.MAYBE
+  reason: class file for javax.annotation.meta.When not found
+warning: unknown enum constant MigrationStatus.STRICT
+  reason: class file for kotlin.annotations.jvm.MigrationStatus not found
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+6 warnings
+
+> Task :TMessagesProj_Modules:media3:media-lib-session:bundleLibCompileToJarDebug
+> Task :TMessagesProj_Modules:media3:media-lib-common:generateDebugAssets UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-common:mergeDebugAssets
+> Task :TMessagesProj_Modules:media3:media-lib-container:generateDebugAssets UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-container:mergeDebugAssets
+> Task :TMessagesProj_Modules:media3:media-lib-database:generateDebugAssets UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-database:mergeDebugAssets
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:generateDebugAssets UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:mergeDebugAssets
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:generateDebugAssets UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:mergeDebugAssets
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:generateDebugAssets UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:mergeDebugAssets
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:generateDebugAssets UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:mergeDebugAssets
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:generateDebugAssets UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:mergeDebugAssets
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:generateDebugAssets UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:mergeDebugAssets
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:generateDebugAssets UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:mergeDebugAssets
+> Task :TMessagesProj_Modules:media3:media-lib-session:generateDebugAssets UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-session:mergeDebugAssets
+> Task :TMessagesProj_Modules:media3:media-lib-common:processDebugJavaRes NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-container:processDebugJavaRes NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-database:processDebugJavaRes NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:processDebugJavaRes NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:processDebugJavaRes NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:processDebugJavaRes NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:processDebugJavaRes NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:processDebugJavaRes NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:processDebugJavaRes NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:processDebugJavaRes NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-session:processDebugJavaRes NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:bundleLibRuntimeToDirDebug
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:bundleLibRuntimeToDirDebug
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:bundleLibRuntimeToDirDebug
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:bundleLibRuntimeToDirDebug
+> Task :TMessagesProj_Modules:media3:media-lib-session:bundleLibRuntimeToDirDebug
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:bundleLibRuntimeToDirDebug
+> Task :TMessagesProj_Modules:media3:media-lib-container:bundleLibRuntimeToDirDebug
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:bundleLibRuntimeToDirDebug
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:bundleLibRuntimeToDirDebug
+> Task :TMessagesProj_Modules:media3:media-lib-database:bundleLibRuntimeToDirDebug
+> Task :TMessagesProj_Modules:media3:media-lib-common:bundleLibRuntimeToDirDebug
+> Task :TMessagesProj_Modules:media3:media-lib-common:writeDebugAarMetadata
+> Task :TMessagesProj_Modules:media3:media-lib-container:writeDebugAarMetadata
+> Task :TMessagesProj_Modules:media3:media-lib-database:writeDebugAarMetadata
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:writeDebugAarMetadata
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:writeDebugAarMetadata
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:writeDebugAarMetadata
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:writeDebugAarMetadata
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:writeDebugAarMetadata
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:writeDebugAarMetadata
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:writeDebugAarMetadata
+> Task :TMessagesProj_Modules:media3:media-lib-session:writeDebugAarMetadata
+> Task :TMessagesProj_Modules:media3:media-lib-common:extractDeepLinksDebug
+
+> Task :TMessagesProj_Modules:media3:media-lib-common:processDebugManifest
+package="androidx.media3.common" found in source AndroidManifest.xml: <WORKSPACE>/FlexyGram/TMessagesProj_Modules/media/libraries/common/src/main/AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="androidx.media3.common" from the source AndroidManifest.xml: <WORKSPACE>/FlexyGram/TMessagesProj_Modules/media/libraries/common/src/main/AndroidManifest.xml.
+
+> Task :TMessagesProj_Modules:media3:media-lib-container:extractDeepLinksDebug FROM-CACHE
+
+> Task :TMessagesProj_Modules:media3:media-lib-container:processDebugManifest
+package="androidx.media3.container" found in source AndroidManifest.xml: <WORKSPACE>/FlexyGram/TMessagesProj_Modules/media/libraries/container/src/main/AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="androidx.media3.container" from the source AndroidManifest.xml: <WORKSPACE>/FlexyGram/TMessagesProj_Modules/media/libraries/container/src/main/AndroidManifest.xml.
+
+> Task :TMessagesProj_Modules:media3:media-lib-database:extractDeepLinksDebug FROM-CACHE
+
+> Task :TMessagesProj_Modules:media3:media-lib-database:processDebugManifest
+package="androidx.media3.database" found in source AndroidManifest.xml: <WORKSPACE>/FlexyGram/TMessagesProj_Modules/media/libraries/database/src/main/AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="androidx.media3.database" from the source AndroidManifest.xml: <WORKSPACE>/FlexyGram/TMessagesProj_Modules/media/libraries/database/src/main/AndroidManifest.xml.
+
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:extractDeepLinksDebug FROM-CACHE
+
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:processDebugManifest
+package="androidx.media3.datasource" found in source AndroidManifest.xml: <WORKSPACE>/FlexyGram/TMessagesProj_Modules/media/libraries/datasource/src/main/AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="androidx.media3.datasource" from the source AndroidManifest.xml: <WORKSPACE>/FlexyGram/TMessagesProj_Modules/media/libraries/datasource/src/main/AndroidManifest.xml.
+
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:extractDeepLinksDebug FROM-CACHE
+
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:processDebugManifest
+package="androidx.media3.decoder" found in source AndroidManifest.xml: <WORKSPACE>/FlexyGram/TMessagesProj_Modules/media/libraries/decoder/src/main/AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="androidx.media3.decoder" from the source AndroidManifest.xml: <WORKSPACE>/FlexyGram/TMessagesProj_Modules/media/libraries/decoder/src/main/AndroidManifest.xml.
+
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:extractDeepLinksDebug FROM-CACHE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:processDebugManifest
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:extractDeepLinksDebug FROM-CACHE
+
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:processDebugManifest
+package="androidx.media3.exoplayer" found in source AndroidManifest.xml: <WORKSPACE>/FlexyGram/TMessagesProj_Modules/media/libraries/exoplayer/src/main/AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="androidx.media3.exoplayer" from the source AndroidManifest.xml: <WORKSPACE>/FlexyGram/TMessagesProj_Modules/media/libraries/exoplayer/src/main/AndroidManifest.xml.
+
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:extractDeepLinksDebug FROM-CACHE
+
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:processDebugManifest
+package="androidx.media3.exoplayer.dash" found in source AndroidManifest.xml: <WORKSPACE>/FlexyGram/TMessagesProj_Modules/media/libraries/exoplayer_dash/src/main/AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="androidx.media3.exoplayer.dash" from the source AndroidManifest.xml: <WORKSPACE>/FlexyGram/TMessagesProj_Modules/media/libraries/exoplayer_dash/src/main/AndroidManifest.xml.
+
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:extractDeepLinksDebug FROM-CACHE
+
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:processDebugManifest
+package="androidx.media3.exoplayer.hls" found in source AndroidManifest.xml: <WORKSPACE>/FlexyGram/TMessagesProj_Modules/media/libraries/exoplayer_hls/src/main/AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="androidx.media3.exoplayer.hls" from the source AndroidManifest.xml: <WORKSPACE>/FlexyGram/TMessagesProj_Modules/media/libraries/exoplayer_hls/src/main/AndroidManifest.xml.
+
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:extractDeepLinksDebug FROM-CACHE
+
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:processDebugManifest
+package="androidx.media3.extractor" found in source AndroidManifest.xml: <WORKSPACE>/FlexyGram/TMessagesProj_Modules/media/libraries/extractor/src/main/AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="androidx.media3.extractor" from the source AndroidManifest.xml: <WORKSPACE>/FlexyGram/TMessagesProj_Modules/media/libraries/extractor/src/main/AndroidManifest.xml.
+
+> Task :TMessagesProj_Modules:media3:media-lib-session:extractDeepLinksDebug FROM-CACHE
+
+> Task :TMessagesProj_Modules:media3:media-lib-session:processDebugManifest
+package="androidx.media3.session" found in source AndroidManifest.xml: <WORKSPACE>/FlexyGram/TMessagesProj_Modules/media/libraries/session/src/main/AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="androidx.media3.session" from the source AndroidManifest.xml: <WORKSPACE>/FlexyGram/TMessagesProj_Modules/media/libraries/session/src/main/AndroidManifest.xml.
+
+> Task :TMessagesProj_Modules:media3:media-lib-common:mapDebugSourceSetPaths
+> Task :TMessagesProj_Modules:media3:media-lib-common:compileDebugLibraryResources
+> Task :TMessagesProj_Modules:media3:media-lib-container:mapDebugSourceSetPaths
+> Task :TMessagesProj_Modules:media3:media-lib-container:compileDebugLibraryResources FROM-CACHE
+> Task :TMessagesProj_Modules:media3:media-lib-database:mapDebugSourceSetPaths
+> Task :TMessagesProj_Modules:media3:media-lib-database:compileDebugLibraryResources FROM-CACHE
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:mapDebugSourceSetPaths
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:compileDebugLibraryResources FROM-CACHE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:mapDebugSourceSetPaths
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:compileDebugLibraryResources FROM-CACHE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:mapDebugSourceSetPaths
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:compileDebugLibraryResources FROM-CACHE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:mapDebugSourceSetPaths
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:compileDebugLibraryResources
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:mapDebugSourceSetPaths
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:compileDebugLibraryResources FROM-CACHE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:mapDebugSourceSetPaths
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:compileDebugLibraryResources FROM-CACHE
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:mapDebugSourceSetPaths
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:compileDebugLibraryResources FROM-CACHE
+> Task :TMessagesProj_Modules:media3:media-lib-session:mapDebugSourceSetPaths
+> Task :TMessagesProj_Modules:media3:media-lib-session:compileDebugLibraryResources
+> Task :TMessagesProj_Modules:media3:media-lib-common:mergeDebugJniLibFolders
+> Task :TMessagesProj_Modules:media3:media-lib-common:mergeDebugNativeLibs NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-common:copyDebugJniLibsProjectOnly
+> Task :TMessagesProj_Modules:media3:media-lib-container:mergeDebugJniLibFolders
+> Task :TMessagesProj_Modules:media3:media-lib-container:mergeDebugNativeLibs NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-container:copyDebugJniLibsProjectOnly
+> Task :TMessagesProj_Modules:media3:media-lib-database:mergeDebugJniLibFolders
+> Task :TMessagesProj_Modules:media3:media-lib-database:mergeDebugNativeLibs NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-database:copyDebugJniLibsProjectOnly
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:mergeDebugJniLibFolders
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:mergeDebugNativeLibs NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:copyDebugJniLibsProjectOnly
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:mergeDebugJniLibFolders
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:mergeDebugNativeLibs NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:copyDebugJniLibsProjectOnly
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:mergeDebugJniLibFolders
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:mergeDebugNativeLibs NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:copyDebugJniLibsProjectOnly
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:mergeDebugJniLibFolders
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:mergeDebugNativeLibs NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:copyDebugJniLibsProjectOnly
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:mergeDebugJniLibFolders
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:mergeDebugNativeLibs NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:copyDebugJniLibsProjectOnly
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:mergeDebugJniLibFolders
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:mergeDebugNativeLibs NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:copyDebugJniLibsProjectOnly
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:mergeDebugJniLibFolders
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:mergeDebugNativeLibs NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:copyDebugJniLibsProjectOnly
+> Task :TMessagesProj_Modules:media3:media-lib-session:mergeDebugJniLibFolders
+> Task :TMessagesProj_Modules:media3:media-lib-session:mergeDebugNativeLibs NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-session:copyDebugJniLibsProjectOnly
+> Task :TMessagesProj:processDebugNavigationResources
+> Task :TMessagesProj:parseDebugLocalResources
+> Task :TMessagesProj:javaPreCompileDebug
+> Task :TMessagesProj:generateDebugAssets UP-TO-DATE
+> Task :TMessagesProj:generateDebugRFile
+> Task :TMessagesProj:buildChaquopyRuntimeArm64V8a FAILED
+
+[Incubating] Problems report is available at: file://<WORKSPACE>/FlexyGram/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':TMessagesProj:buildChaquopyRuntimeArm64V8a' (registered in build file 'TMessagesProj/build.gradle').
+> Process 'command 'bash'' finished with non-zero exit value 2
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+> Get more help at https://help.gradle.org.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.7.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 4m 32s
+205 actionable tasks: 153 executed, 52 from cache

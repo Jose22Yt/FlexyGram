@@ -1,5 +1,6 @@
 package tw.nekomimi.nekogram.translate.source
 
+import tw.nekomimi.nekogram.translate.TranslationServicesPolicy
 import android.text.TextUtils
 import okhttp3.FormBody
 import okhttp3.Request
@@ -17,11 +18,12 @@ import java.io.IOException
 
 object GoogleCloudTranslator : Translator {
 
-    private val httpClient = HttpClient.instance
+    private val httpClient by lazy { HttpClient.instance }
 
     override suspend fun doTranslate(
         from: String, to: String, query: String, entities: ArrayList<TLRPC.MessageEntity>
     ): TLRPC.TL_textWithEntities {
+        TranslationServicesPolicy.requireRoute(TranslationServicesPolicy.Route.GOOGLE_CLOUD)
 
         if (to.lowercase() !in targetLanguages.map { it.lowercase() }) {
             throw UnsupportedOperationException(getString(R.string.TranslateApiUnsupported) + " " + to)
@@ -62,21 +64,23 @@ object GoogleCloudTranslator : Translator {
             responseBodyString = httpClient.newCall(request).await().use { response ->
                 val bodyString = response.body.string()
                 if (!response.isSuccessful) {
-                    error("HTTP ${response.code} : $bodyString")
+                    error("TRANSLATION_HTTP_ERROR")
                 }
                 bodyString
             }
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            throw e
         } catch (e: IOException) {
-            error("Google Cloud Translate API request failed due to network issue: ${e.message}")
+            throw TranslationServicesPolicy.safeFailure(e)
         } catch (e: Exception) {
-            error("An unexpected error occurred during Google Cloud translation: ${e.message}")
+            throw TranslationServicesPolicy.safeFailure(e)
         }
 
         try {
             var respObj = JSONObject(responseBodyString)
 
             if (respObj.isNull("data")) {
-                error(respObj.toString(4))
+                error("TRANSLATION_INVALID_RESPONSE")
             }
 
             respObj = respObj.getJSONObject("data")
@@ -89,7 +93,7 @@ object GoogleCloudTranslator : Translator {
             val translatedText = respArr.getJSONObject(0).getString("translatedText")
             finalString.append(translatedText)
         } catch (e: JSONException) {
-            error("Google Cloud Translate API response parsing failed: ${e.message}")
+            throw TranslationServicesPolicy.safeFailure(e)
         }
 
         var finalText = TLRPC.TL_textWithEntities()

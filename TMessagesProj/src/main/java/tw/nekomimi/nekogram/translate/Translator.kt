@@ -3,6 +3,9 @@ package tw.nekomimi.nekogram.translate
 import android.text.TextUtils
 import android.view.View
 import androidx.core.content.edit
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import okhttp3.Call
@@ -114,18 +117,20 @@ interface Translator {
             translateCallBack: TranslateCallBack
         ) {
 
+            val selectedProvider = NekoConfig.translationProvider.Int()
             AppScope.io.launch {
                 runCatching {
-                    val result: String = translate(to, query, provider.takeIf { it != 0 } ?: NekoConfig.translationProvider.Int())
+                    val result: String = translate(to, query, provider.takeIf { it != 0 } ?: selectedProvider)
 
                     AndroidUtilities.runOnUIThread {
                         translateCallBack.onSuccess(result)
                     }
                 }.onFailure {
+                    if (it is CancellationException) throw it
                     AndroidUtilities.runOnUIThread {
                         translateCallBack.onFailed(
                             it is UnsupportedOperationException,
-                            it.message ?: it.javaClass.simpleName
+                            TranslationServicesPolicy.safeErrorCode(it)
                         )
                     }
                 }
@@ -142,18 +147,20 @@ interface Translator {
             translateCallBack: TranslateCallBack2
         ) {
 
+            val selectedProvider = NekoConfig.translationProvider.Int()
             AppScope.io.launch {
                 runCatching {
                     val result = translateBase(
-                        to, query, entities, NekoConfig.translationProvider.Int()
+                        to, query, entities, selectedProvider
                     )
 
                     AndroidUtilities.runOnUIThread { translateCallBack.onSuccess(result) }
                 }.onFailure {
+                    if (it is CancellationException) throw it
                     AndroidUtilities.runOnUIThread {
                         translateCallBack.onFailed(
                             it is UnsupportedOperationException,
-                            it.message ?: it.javaClass.simpleName
+                            TranslationServicesPolicy.safeErrorCode(it)
                         )
                     }
                 }
@@ -187,18 +194,21 @@ interface Translator {
             provider: Int,
             translateCallBack: TranslateCallBack2
         ) {
+            val selectedProvider = NekoConfig.translationProvider.Int()
             AppScope.io.launch {
                 runCatching {
-                    val effectiveProvider = provider.takeIf { it != 0 } ?: NekoConfig.translationProvider.Int()
+                    val effectiveProvider = provider.takeIf { it != 0 } ?: selectedProvider
+                    TranslationServicesPolicy.requireProvider(effectiveProvider)
                     val result = LLMTranslator.withTranslationContext(context) {
                         translateBase(to, query, entities, effectiveProvider)
                     }
                     AndroidUtilities.runOnUIThread { translateCallBack.onSuccess(result) }
                 }.onFailure {
+                    if (it is CancellationException) throw it
                     AndroidUtilities.runOnUIThread {
                         translateCallBack.onFailed(
                             it is UnsupportedOperationException,
-                            it.message ?: it.javaClass.simpleName
+                            TranslationServicesPolicy.safeErrorCode(it)
                         )
                     }
                 }
@@ -212,9 +222,11 @@ interface Translator {
             query: TranslateController.PollText,
             translateCallBack: TranslateCallBack3
         ) {
+            val selectedProvider = NekoConfig.translationProvider.Int()
             AppScope.io.launch {
                 runCatching {
-                    val effectiveProvider = getBulkTranslateProvider(NekoConfig.translationProvider.Int())
+                    val effectiveProvider = getBulkTranslateProvider(selectedProvider)
+                    TranslationServicesPolicy.requireProvider(effectiveProvider)
                     val translatedPoll = TranslateController.PollText()
                     if (query.question != null) {
                         translatedPoll.question = translateBase(
@@ -237,10 +249,11 @@ interface Translator {
 
                     AndroidUtilities.runOnUIThread { translateCallBack.onSuccess(translatedPoll) }
                 }.onFailure {
+                    if (it is CancellationException) throw it
                     AndroidUtilities.runOnUIThread {
                         translateCallBack.onFailed(
                             it is UnsupportedOperationException,
-                            it.message ?: it.javaClass.simpleName
+                            TranslationServicesPolicy.safeErrorCode(it)
                         )
                     }
                 }
@@ -270,16 +283,15 @@ interface Translator {
         }
 
         private fun getBulkTranslateProvider(provider: Int): Int {
-            return when (provider) {
-                providerDeepL -> providerGoogle
-                else -> provider
-            }
+            return TranslationServicesPolicy.bulkProvider(provider)
         }
 
         @Throws(Exception::class)
         private suspend fun translateBase(
             to: Locale, query: String, entities: ArrayList<TLRPC.MessageEntity>, provider: Int
         ): TLRPC.TL_textWithEntities {
+            currentCoroutineContext().ensureActive()
+            TranslationServicesPolicy.requireProvider(provider)
             var language = to.language
             var country = to.country
 
@@ -336,7 +348,18 @@ interface Translator {
                 else -> throw IllegalArgumentException()
             }
 
-            return translator.doTranslate("auto", language, query, entities)
+            return try {
+                currentCoroutineContext().ensureActive()
+                TranslationServicesPolicy.requireProvider(provider)
+                translator.doTranslate("auto", language, query, entities).also {
+                    currentCoroutineContext().ensureActive()
+                    TranslationServicesPolicy.requireProvider(provider)
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                throw TranslationServicesPolicy.safeFailure(e)
+            }
         }
 
         private val availableLocaleList: Array<Locale> = Locale.getAvailableLocales().also {

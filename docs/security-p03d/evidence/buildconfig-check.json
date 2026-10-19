@@ -1,0 +1,6 @@
+{
+  "compiled_telegram_app_id": 0,
+  "compiled_app_hash_empty": true,
+  "compiled_isolated_diagnostic": true,
+  "check": "javap -constants of actual Android compiled BuildConfig; raw output withheld to avoid secret-bearing configurations"
+}

@@ -1,0 +1,10 @@
+{
+  "host_cmake_on_default_path": false,
+  "legacy_default_cmake_directory_present": false,
+  "configured_cmake_version": "3.31.6",
+  "native_target": "arm64-v8a",
+  "runtime_python": "3.11.17",
+  "cython": "3.0.11",
+  "no_dependency_declaration_changes": true,
+  "bootstrap_note": "Exact Wrapper pre-provisioned after Java download failed; declared JetBrains JDK 21 downloaded from project toolchain URL; authenticated proxy configuration kept outside repository."
+}

@@ -1,5 +1,6 @@
 package tw.nekomimi.nekogram.translate.source
 
+import tw.nekomimi.nekogram.translate.TranslationServicesPolicy
 import android.os.SystemClock
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -18,11 +19,12 @@ import java.io.IOException
 
 object LingoTranslator : Translator {
 
-    private val httpClient = HttpClient.instance
+    private val httpClient by lazy { HttpClient.instance }
 
     override suspend fun doTranslate(
         from: String, to: String, query: String, entities: ArrayList<TLRPC.MessageEntity>
     ): TLRPC.TL_textWithEntities {
+        TranslationServicesPolicy.requireRoute(TranslationServicesPolicy.Route.LINGO)
         FileLog.d("doTranslate: from=$from, to=$to, query=$query")
 
         if (to !in listOf("zh", "en", "es", "fr", "ja", "ru")) {

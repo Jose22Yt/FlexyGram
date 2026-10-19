@@ -1,0 +1,20 @@
+{
+  "gradle": "9.7.1",
+  "gradle_archive_sha256": "acd53f1edaf02f1a8ff99879f8a34b302661a057d9b063ae9e35b552f804d20a",
+  "matches_previous_verified_gradle_archive": true,
+  "java_build": "openjdk version \"21.0.10\" 2026-01-20\nOpenJDK Runtime Environment JBR-21.0.10+7-1163.105-jcef (build 21.0.10+7-b1163.105)\nOpenJDK 64-Bit Server VM JBR-21.0.10+7-1163.105-jcef (build 21.0.10+7-b1163.105, mixed mode, sharing)\n",
+  "android_gradle_plugin": "9.3.1",
+  "chaquopy": "17.0.0",
+  "python_host": "3.11.17",
+  "chaquopy_target": "3.11.14-0",
+  "sdk": {
+    "ndk/27.2.12479018": "Pkg.Desc = Android NDK\nPkg.Revision = 27.2.12479018\nPkg.BaseRevision = 27.2.12479018\nPkg.ReleaseName = r27c\n",
+    "build-tools/36.0.0": "Pkg.UserSrc=false\nPkg.Revision=36.0.0\n#Pkg.Revision=36.0.0 rc5",
+    "cmake/3.31.6": "Pkg.Revision = 3.31.6\nPkg.Path = cmake;3.31.6\nPkg.Desc = CMake 3.31.6\n",
+    "platforms/android-37.0": "Pkg.Desc=Android SDK Platform 17\nPkg.UserSrc=false\nPlatform.Version=17\nPlatform.CodeName=\nPkg.Revision=2\nAndroidVersion.ApiLevel=37.0\nAndroidVersion.CodeName=\nAndroidVersion.ExtensionLevel=22\nAndroidVersion.IsBaseSdk=true\nAndroidVersion.PreviewSdkInt=0\nAndroidVersion.BetaVersion=\nLayoutlib.Api=15\nLayoutlib.Revision=1\nPlatform.MinToolsRev=22\n",
+    "platforms/android-35": "Pkg.Desc=Android SDK Platform 15\nPkg.UserSrc=false\nPlatform.Version=15\nPlatform.CodeName=\nPkg.Revision=2\nAndroidVersion.ApiLevel=35\nAndroidVersion.ExtensionLevel=13\nAndroidVersion.IsBaseSdk=true\nLayoutlib.Api=15\nLayoutlib.Revision=1\nPlatform.MinToolsRev=22\n"
+  },
+  "telegram_credential_environment_present": false,
+  "native_target": "arm64-v8a",
+  "no_skip_native": true
+}

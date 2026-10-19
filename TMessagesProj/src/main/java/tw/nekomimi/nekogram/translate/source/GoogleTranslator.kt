@@ -1,29 +1,29 @@
 package tw.nekomimi.nekogram.translate.source
 
+import tw.nekomimi.nekogram.translate.TranslationServicesPolicy
 import androidx.core.util.component1
 import androidx.core.util.component2
 import okhttp3.HttpUrl
 import okhttp3.Request
 import org.json.JSONException
 import org.json.JSONObject
-import org.telegram.messenger.FileLog
 import org.telegram.messenger.LocaleController.getString
 import org.telegram.messenger.R
 import org.telegram.tgnet.TLRPC
 import org.telegram.ui.Components.TranslateAlert2
 import tw.nekomimi.nekogram.translate.HTMLKeeper
 import tw.nekomimi.nekogram.translate.Translator
-import tw.nekomimi.nekogram.translate.source.fallback.GoogleTranslatorNeko
 import tw.nekomimi.nekogram.utils.HttpClient
 import java.io.IOException
 
 object GoogleTranslator : Translator {
 
-    private val httpClient = HttpClient.instance
+    private val httpClient by lazy { HttpClient.instance }
 
     override suspend fun doTranslate(
         from: String, to: String, query: String, entities: ArrayList<TLRPC.MessageEntity>
     ): TLRPC.TL_textWithEntities {
+        TranslationServicesPolicy.requireRoute(TranslationServicesPolicy.Route.GOOGLE_LEGACY_PA)
         if (to.lowercase() !in targetLanguages.map { it.lowercase() }) {
             throw UnsupportedOperationException(getString(R.string.TranslateApiUnsupported) + " " + to)
         }
@@ -41,13 +41,10 @@ object GoogleTranslator : Translator {
 
         val translated = try {
             translate(textToTranslate, from, to)
-        } catch (e: RuntimeException) {
-            try {
-                FileLog.e("Cloud Translation API request failed, trying to use Nekogram's translation API...", e)
-                GoogleTranslatorNeko.translate(textToTranslate, from, to)
-            } catch (e: Exception) {
-                error("Cloud Translation API request failed: ${e.message}")
-            }
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            throw TranslationServicesPolicy.safeFailure(e)
         }
 
         val finalText: TLRPC.TL_textWithEntities
@@ -68,6 +65,7 @@ object GoogleTranslator : Translator {
     private suspend fun translate(
         text: String, from: String, to: String
     ): String {
+        TranslationServicesPolicy.requireRoute(TranslationServicesPolicy.Route.GOOGLE_LEGACY_PA)
         val urlBuilder = HttpUrl.Builder().scheme("https").host("translate-pa.googleapis.com")
             .addPathSegments("v1/translate").addQueryParameter("params.client", "gtx")
             .addQueryParameter(
@@ -89,14 +87,14 @@ object GoogleTranslator : Translator {
             val responseBodyString = httpClient.newCall(request).await().use { response ->
                 val bodyString = response.body.string()
                 if (!response.isSuccessful) {
-                    throw RuntimeException("HTTP ${response.code} : $bodyString")
+                    throw IllegalStateException("TRANSLATION_HTTP_ERROR")
                 }
                 bodyString
             }
 
             val json = JSONObject(responseBodyString)
             if (json.isNull("translation")) {
-                error("Google API response missing 'translation' field: ${json.toString(2)}")
+                error("TRANSLATION_INVALID_RESPONSE")
             }
             val result = json.getString("translation")
 
@@ -106,9 +104,9 @@ object GoogleTranslator : Translator {
                 result
             }
         } catch (e: IOException) {
-            throw RuntimeException("Google API request failed due to network issue: ${e.message}", e)
+            throw TranslationServicesPolicy.safeFailure(e)
         } catch (e: JSONException) {
-            throw RuntimeException("Google API response parsing failed: ${e.message}", e)
+            throw TranslationServicesPolicy.safeFailure(e)
         }
     }
 

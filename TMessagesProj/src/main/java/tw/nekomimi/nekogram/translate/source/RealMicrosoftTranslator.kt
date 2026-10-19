@@ -1,5 +1,6 @@
 package tw.nekomimi.nekogram.translate.source
 
+import tw.nekomimi.nekogram.translate.TranslationServicesPolicy
 import org.telegram.messenger.LocaleController.getString
 import org.telegram.messenger.R
 import org.telegram.tgnet.TLRPC
@@ -10,7 +11,7 @@ import app.nekogram.translator.MicrosoftTranslator as NekoMicrosoftTranslator
 
 object RealMicrosoftTranslator : Translator {
 
-    private val translator = NekoMicrosoftTranslator.getInstance()
+    private val translator by lazy { NekoMicrosoftTranslator.getInstance() }
 
     override suspend fun doTranslate(
         from: String,
@@ -18,6 +19,7 @@ object RealMicrosoftTranslator : Translator {
         query: String,
         entities: ArrayList<TLRPC.MessageEntity>
     ): TLRPC.TL_textWithEntities {
+        TranslationServicesPolicy.requireRoute(TranslationServicesPolicy.Route.MICROSOFT_LIBRARY)
 
         val fromLang = from.takeUnless { it == "auto" }
         val toLang = when {

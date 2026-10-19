@@ -1,5 +1,6 @@
 package tw.nekomimi.nekogram.translate.source
 
+import tw.nekomimi.nekogram.translate.TranslationServicesPolicy
 import android.text.TextUtils
 import okhttp3.Request
 import org.json.JSONException
@@ -18,11 +19,12 @@ import java.io.IOException
 
 object GoogleAppTranslator : Translator {
 
-    private val httpClient = HttpClient.instance
+    private val httpClient by lazy { HttpClient.instance }
 
     override suspend fun doTranslate(
         from: String, to: String, query: String, entities: ArrayList<TLRPC.MessageEntity>
     ): TLRPC.TL_textWithEntities {
+        TranslationServicesPolicy.requireRoute(TranslationServicesPolicy.Route.GOOGLE_DISPATCH)
 
         if (NaConfig.googleTranslateExp.Bool()) {
             return GoogleTranslator.doTranslate(
@@ -53,6 +55,7 @@ object GoogleAppTranslator : Translator {
             false
         ) else query
 
+        TranslationServicesPolicy.requireRoute(TranslationServicesPolicy.Route.GOOGLE_LEGACY_WEB)
         val url = "https://translate.google.com" + "/translate_a/single?dj=1" +
                 "&q=" + TransUtils.encodeURIComponent(textToTranslate) +
                 "&sl=auto" +
@@ -69,14 +72,16 @@ object GoogleAppTranslator : Translator {
             responseBodyString = httpClient.newCall(request).await().use { response ->
                 val bodyString = response.body.string()
                 if (!response.isSuccessful) {
-                    error("HTTP ${response.code} : $bodyString")
+                    error("TRANSLATION_HTTP_ERROR")
                 }
                 bodyString
             }
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            throw e
         } catch (e: IOException) {
-            error("Google Translate API request failed due to network issue: ${e.message}")
+            throw TranslationServicesPolicy.safeFailure(e)
         } catch (e: Exception) {
-            error("An unexpected error occurred during Google Translate API call: ${e.message}")
+            throw TranslationServicesPolicy.safeFailure(e)
         }
 
         try {
@@ -85,7 +90,7 @@ object GoogleAppTranslator : Translator {
                 finalString.append(array.getJSONObject(index).getString("trans"))
             }
         } catch (e: JSONException) {
-            error("Google Translate API response parsing failed: ${e.message}")
+            throw TranslationServicesPolicy.safeFailure(e)
         }
 
         var finalText = TLRPC.TL_textWithEntities()

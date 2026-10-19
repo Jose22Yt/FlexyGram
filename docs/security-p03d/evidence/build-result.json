@@ -1,0 +1,49 @@
+{
+  "task": ":TMessagesProj:assembleDebug",
+  "final_result": "BUILD SUCCESSFUL",
+  "final_exit_code": 0,
+  "final_duration": "1m 41s",
+  "final_tasks": {
+    "total": 244,
+    "executed": 9,
+    "up_to_date": 235
+  },
+  "full_native_and_chaquopy_run": {
+    "result": "BUILD SUCCESSFUL",
+    "exit_code": 0,
+    "duration": "11m 3s",
+    "total_tasks": 244,
+    "executed": 40,
+    "up_to_date": 204
+  },
+  "final_options": [
+    "--no-daemon",
+    "--max-workers=2",
+    "-Dorg.gradle.jvmargs=-Xmx3g",
+    "-Pkotlin.incremental=false"
+  ],
+  "native_target": "arm64-v8a",
+  "no_native_skip": true,
+  "source_fingerprints_match_after_build": true,
+  "earlier_failures": [
+    {
+      "task": "buildChaquopyRuntimeArm64V8a",
+      "result": "failed; exit 2 from script",
+      "remedy": "Set CMAKE to installed SDK 3.31.6 outside repository; no source change"
+    },
+    {
+      "task": "compileDebugKotlin",
+      "result": "incremental conflicting declarations for existing locale extensions; 35s",
+      "remedy": "Exactly one source declaration found; non-incremental CLI rerun succeeded, without source/dependency/configuration change for those extensions",
+      "limit": "No universal diagnosis of AGP/Kotlin incremental compilation claimed"
+    }
+  ],
+  "warnings": [
+    "Existing deprecated Kotlin Locale constructors and Java APIs",
+    "Existing CMake/NDK and third-party C++ warnings",
+    "Gradle deprecated features; Gradle 10 incompatible",
+    "Multiple Kotlin daemon sessions reported"
+  ],
+  "no_android_execution": true,
+  "no_apk_install_or_distribution": true
+}
