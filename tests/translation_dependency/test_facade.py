@@ -161,7 +161,7 @@ println("real-consumers-linked-and-policy-denied")
   assert_scope(self)
   dependency=(ROOT/'TMessagesProj/build.gradle').read_text()
   self.assertNotIn("implementation 'app.nekogram.translator:translator:1.6.1'",dependency)
-  self.assertIn("implementation project(':translation-compat-diagnostic')",dependency)
+  self.assertIn("diagnosticImplementation project(':translation-compat-diagnostic')",dependency)
   # The laboratory module itself is still not included in Android.
   self.assertNotIn('tests/translation_dependency/facade',(ROOT/'settings.gradle').read_text())
  def test_android24_bootclasspath_and_d8(self):

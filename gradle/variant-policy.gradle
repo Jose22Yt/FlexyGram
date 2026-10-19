@@ -1,0 +1,17 @@
+// Repository-owned architecture, never a runtime or private-credentials switch.
+return { File file ->
+    def data = new groovy.json.JsonSlurper().parse(file)
+    def names = ['diagnostic', 'production'] as Set
+    def capabilities = ['authentication','telegramTransport','push','translation','plugins','sessionRestore'] as Set
+    if (data.keySet() != (['schema','variants'] as Set) || data.schema != 1 || data.variants.keySet() != names)
+        throw new IllegalArgumentException('Invalid build variant policy')
+    data.variants.each { name, row ->
+        def expectedId = 'io.github.jose22yt.flexygram.' + (name == 'diagnostic' ? 'diagnostic' : 'app')
+        if (row.keySet() != (['applicationId','isolated','buildEnabled','capabilities'] as Set) ||
+            row.applicationId != expectedId || row.isolated != (name == 'diagnostic') ||
+            row.buildEnabled != (name == 'diagnostic') || row.capabilities.keySet() != capabilities ||
+            row.capabilities.values().any { it != false })
+            throw new IllegalArgumentException('Unauthorized build capability or identity')
+    }
+    return data.variants
+}

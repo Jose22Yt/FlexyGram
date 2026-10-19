@@ -1,0 +1,4 @@
+// No private file is read at this stage. No property or secret can bypass missing implementations.
+return { ->
+    throw new IllegalStateException('FLEXYGRAM_PRODUCTION_INCOMPLETE: production is disabled; reviewed authentication/transport and translation implementations, production manifest, owner-authorized private Telegram configuration and independent signing are not configured. No APK may be produced.')
+}

@@ -31,35 +31,22 @@ def verCode = 1261
 def officialVer = APP_VERSION_NAME
 def officialCode = APP_VERSION_CODE
 
-def keystorePwd = null
-def alias = null
-def pwd = null
-
-Properties properties
-def base64 = System.getenv('LOCAL_PROPERTIES')
-if (base64 != null && !base64.isBlank()) {
-    properties = new Properties()
-    properties.load(new ByteArrayInputStream(Base64.decoder.decode(base64)))
-} else if (project.rootProject.file('local.properties').exists()) {
-    properties = new Properties()
-    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+// SDK/build-Python settings only. Diagnostic never resolves private service credentials.
+Properties properties = new Properties()
+if (rootProject.file('local.properties').exists()) {
+    rootProject.file('local.properties').withInputStream { properties.load(it) }
 }
-
-if (properties != null) {
-    keystorePwd = properties.getProperty('KEYSTORE_PASS')
-    alias = properties.getProperty('ALIAS_NAME')
-    pwd = properties.getProperty('ALIAS_PASS')
+def variantPolicyFile = rootProject.file('gradle/variant-policy.json')
+def variantPolicy = new GroovyShell().evaluate(rootProject.file('gradle/variant-policy.gradle')).call(variantPolicyFile)
+def policyDigest = java.security.MessageDigest.getInstance('SHA-256').digest(variantPolicyFile.bytes).encodeHex().toString()
+def rejectProduction = new GroovyShell().evaluate(rootProject.file('gradle/production-readiness.gradle'))
+// Early, redacted rejection even for tasks of variants which AGP deliberately disables.
+if (gradle.startParameter.taskNames.any { it.toLowerCase(java.util.Locale.ROOT).contains('production') }) {
+    rejectProduction.call()
 }
-
-// P0.3b: fixed diagnostic mode; no private service data may enter its artifacts.
 def resolvePush = new GroovyShell().evaluate(rootProject.file('gradle/push-services.gradle'))
-def pushConfig = resolvePush(properties ?: new Properties(), System.getenv(), APP_PACKAGE, true)
-
-def chaquopyBuildPython = properties?.getProperty('CHAQUOPY_BUILD_PYTHON') ?: System.getenv('CHAQUOPY_BUILD_PYTHON')
-
-keystorePwd = keystorePwd ?: System.getenv('KEYSTORE_PASS')
-alias = alias ?: System.getenv('ALIAS_NAME')
-pwd = pwd ?: System.getenv('ALIAS_PASS')
+def pushConfig = resolvePush(new Properties(), [:], variantPolicy.diagnostic.applicationId, true)
+def chaquopyBuildPython = properties.getProperty('CHAQUOPY_BUILD_PYTHON') ?: System.getenv('CHAQUOPY_BUILD_PYTHON')
 
 def nativeTarget = System.getenv('NATIVE_TARGET') ?: ''
 
@@ -76,10 +63,9 @@ if (nativeTarget == 'SKIP') {
 }
 
 android {
-    if (APP_PACKAGE != 'io.github.jose22yt.flexygram.diagnostic') {
-        throw new GradleException('Diagnostic application ID is fixed')
-    }
-    defaultConfig.applicationId = APP_PACKAGE
+    // IDs are fixed per flavor, not an overridable project-wide APP_PACKAGE.
+    flavorDimensions += 'environment'
+    buildFeatures { resValues = true }
 
     androidResources {
         localeFilters += [
@@ -160,14 +146,11 @@ android {
             }
         }
 
-        // Diagnostic builds never embed usable Telegram or inherited service keys.
-        def apiPair = new GroovyShell().evaluate(rootProject.file('gradle/telegram-api.gradle'))
-                .call(properties ?: new Properties(), System.getenv())
+        // All service values remain empty/disabled until a separately reviewed implementation.
         def appId = '0'
         def appHash = ''
         def mapsKey = ''
         def glyphKey = ''
-        buildConfigField 'boolean', 'ISOLATED_DIAGNOSTIC', 'true'
         buildConfigField 'boolean', 'FLEXYGRAM_FCM_ENABLED', pushConfig.fcm.toString()
         buildConfigField 'boolean', 'FLEXYGRAM_UNIFIED_PUSH_ENABLED', pushConfig.unified.toString()
         buildConfigField 'String', 'FLEXYGRAM_PUSH_ANDROID_ID', groovy.json.JsonOutput.toJson(pushConfig.androidId)
@@ -224,28 +207,41 @@ android {
         }
     }
 
-    // Ключ подписи в репозиторий не кладётся. Положи свой release.keystore рядом
-    // с этим файлом и пропиши KEYSTORE_PASS / ALIAS_NAME / ALIAS_PASS в
-    // local.properties; без него сборка подписывается отладочным ключом Android.
-    def releaseKeystore = project.file('release.keystore')
-    def hasReleaseKeystore = releaseKeystore.exists() && keystorePwd != null && alias != null
-
     signingConfigs {
-        debug {
+        diagnosticLab {
             storeFile file(System.getenv('FLEXYGRAM_DIAGNOSTIC_KEYSTORE') ?:
                     "${gradle.gradleUserHomeDir}/flexygram-diagnostic/debug.keystore")
             storePassword System.getenv('FLEXYGRAM_DIAGNOSTIC_STORE_PASSWORD')
             keyAlias 'flexygram-diagnostic'
             keyPassword System.getenv('FLEXYGRAM_DIAGNOSTIC_KEY_PASSWORD')
         }
-        release {
-            if (hasReleaseKeystore) {
-                storeFile releaseKeystore
-                storePassword keystorePwd
-                keyAlias alias
-                keyPassword pwd
-            }
+    }
+
+    productFlavors {
+        diagnostic {
+            dimension = 'environment'
+            applicationId = variantPolicy.diagnostic.applicationId
+            isDefault = true
+            signingConfig = signingConfigs.diagnosticLab
         }
+        production {
+            dimension = 'environment'
+            applicationId = variantPolicy.production.applicationId
+            // No signingConfig: no production key and no debug/lab fallback.
+        }
+    }
+    productFlavors.all { flavor ->
+        def policy = variantPolicy[flavor.name]
+        flavor.buildConfigField 'boolean', 'ISOLATED_DIAGNOSTIC', policy.isolated.toString()
+        flavor.buildConfigField 'String', 'FLEXYGRAM_VARIANT', groovy.json.JsonOutput.toJson(flavor.name)
+        flavor.buildConfigField 'String', 'FLEXYGRAM_POLICY_SCOPE', groovy.json.JsonOutput.toJson(policyDigest + ':' + flavor.name)
+        policy.capabilities.each { name, enabled ->
+            flavor.buildConfigField 'boolean', 'FLEXYGRAM_CAP_' + name.toUpperCase(java.util.Locale.ROOT), enabled.toString()
+        }
+        flavor.resValue 'string', 'flexygram_account_type', policy.applicationId
+        flavor.resValue 'string', 'flexygram_storage_namespace', policy.applicationId
+        flavor.externalNativeBuild.cmake.arguments '-DFLEXYGRAM_FLAVOR=' + flavor.name,
+                '-DFLEXYGRAM_POLICY_SCOPE=' + policyDigest + ':' + flavor.name
     }
 
     buildTypes {
@@ -254,7 +250,7 @@ android {
             debuggable = true
             jniDebuggable = true
             multiDexEnabled = true
-            signingConfig = signingConfigs.debug
+            signingConfig = null
         }
 
         staging {
@@ -265,7 +261,7 @@ android {
             multiDexEnabled = true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             matchingFallbacks = ['release', 'staging', 'debug']
-            signingConfig = signingConfigs.debug
+            signingConfig = null
         }
 
         release {
@@ -276,7 +272,7 @@ android {
             multiDexEnabled = true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             matchingFallbacks = ['release', 'staging', 'debug']
-            signingConfig = signingConfigs.debug
+            signingConfig = null
         }
     }
 
@@ -286,9 +282,14 @@ android {
 }
 
 androidComponents {
+    beforeVariants(selector().all()) { builder ->
+        def flavor = builder.productFlavors.find { it.first == 'environment' }?.second
+        // Only two useful laboratory variants. Production never reaches codegen, JNI or packaging.
+        builder.enable = flavor == 'diagnostic' && builder.buildType in ['debug', 'staging']
+    }
     onVariants(selector().all()) { variant ->
         variant.outputs.forEach { output ->
-            String gramName = 'exteraless'
+            String gramName = 'flexygram'
             String first = String.format('%s-v%s(%s)', gramName, verName, verCode)
             output.outputFileName.set(
                 output.outputFileName.get()
@@ -457,7 +458,7 @@ dependencies {
     // add for keep formatting in translations
     implementation 'org.apache.commons:commons-text:1.15.0'
     // translator from nekogram
-    implementation project(':translation-compat-diagnostic')
+    diagnosticImplementation project(':translation-compat-diagnostic')
 
     // plugins engine: Xposed-совместимые хуки (LSPlant), MVEL-фильтры, генерация классов
     implementation 'com.aliucord:Aliuhook:1.1.4'
@@ -477,7 +478,7 @@ dependencies {
 }
 
 
-// P0.3g: no configuration in this fixed Diagnostic project may resolve the legacy AAR.
+// No flavor may resolve the retired AAR, including disabled production configurations.
 configurations.configureEach {
     exclude group: 'app.nekogram.translator', module: 'translator'
 }
@@ -488,7 +489,8 @@ tasks.register('verifyDiagnosticTranslationClasspath') {
     // Recheck the resolved graph rather than accepting a stale report.
     outputs.upToDateWhen { false }
     doLast {
-        def names = ['debugCompileClasspath', 'debugRuntimeClasspath']
+        def names = ['diagnosticDebugCompileClasspath', 'diagnosticDebugRuntimeClasspath',
+                     'diagnosticStagingCompileClasspath', 'diagnosticStagingRuntimeClasspath']
         def graphs = [:]
         names.each { name ->
             def configuration = configurations.getByName(name)
@@ -513,3 +515,11 @@ tasks.register('verifyDiagnosticTranslationClasspath') {
     }
 }
 tasks.named('preBuild').configure { dependsOn 'verifyDiagnosticTranslationClasspath' }
+
+// An explicit failed task, never a silent successful no-op for disabled production builds.
+tasks.register('verifyProductionReadiness') { doLast { rejectProduction.call() } }
+['', 'Debug', 'Staging', 'Release'].each { suffix ->
+    ['assemble', 'bundle'].each { operation ->
+        tasks.register(operation + 'Production' + suffix) { dependsOn 'verifyProductionReadiness' }
+    }
+}

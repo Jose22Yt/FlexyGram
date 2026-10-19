@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 
+include("${CMAKE_CURRENT_LIST_DIR}/variant-policy.cmake")
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -170,6 +172,7 @@ set(NATIVE_LIB "tmessages.49")
 
 #tmessages
 add_library(${NATIVE_LIB} SHARED
+        tgnet/VariantPolicy.cpp
         jni.c
         audio.c
         webm_encoder.c
@@ -308,6 +311,7 @@ target_include_directories(${NATIVE_LIB} PUBLIC
 target_link_options(${NATIVE_LIB} PRIVATE "-Wl,-z,max-page-size=16384")
 target_link_options(${NATIVE_LIB} PRIVATE "-Wl,-z,common-page-size=16384")
 target_link_options(${NATIVE_LIB} PRIVATE "-Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/exports.map")
+set_property(TARGET ${NATIVE_LIB} APPEND PROPERTY LINK_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/exports.map")
 target_link_libraries(${NATIVE_LIB}
         -Wl,--whole-archive rnnoise openh264 voipandroid -Wl,--no-whole-archive
         tgvoip

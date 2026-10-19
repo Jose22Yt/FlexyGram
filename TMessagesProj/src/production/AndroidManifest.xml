@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Architectural placeholder only: no launcher, network or remote components.
+         Disabled by beforeVariants AND the explicit production readiness gate. -->
+    <application android:label="FlexyGram (unavailable)" android:enabled="false" />
+</manifest>

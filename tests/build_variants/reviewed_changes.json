@@ -1,0 +1,175 @@
+{
+  "base": "d9f2b788cf23e830e84ba24e9f6cb2e71e13bd4d",
+  "purpose": "Explicit P0.4b architecture changes only; tests never refresh these hashes",
+  "files": {
+    "TMessagesProj/build.gradle": {
+      "before": "02161a45c44fe6f0b75c80359fd8c924e925302e693c33d9d873ebc6e5f5fba1",
+      "after": "7d83c7b582a4af6a5adeb2f06c363e47f9728e41d328cf25fff80a549bd00b39",
+      "previous": [
+        "02161a45c44fe6f0b75c80359fd8c924e925302e693c33d9d873ebc6e5f5fba1",
+        "f978651af1f32a66c32ffc864a0ea628e1281cd456ad57d5d04934bce8b844b0"
+      ]
+    },
+    "TMessagesProj/jni/CMakeLists.txt": {
+      "before": "a8286c0aac6e9555969d7ea51ad3f806d22f3b23c03bcb6b53c69c29e1f3f91e",
+      "after": "60abfeb00abfc6188b69567d56674b28654814ed0329681ba177e22458ba1519",
+      "previous": [
+        "a8286c0aac6e9555969d7ea51ad3f806d22f3b23c03bcb6b53c69c29e1f3f91e"
+      ]
+    },
+    "TMessagesProj/jni/exports.map": {
+      "before": "bcf9079ba2249251a5930f07854f4269835bbc667a029c5bf17dab45a9b174bf",
+      "after": "c79156a17779751b12e5f0d078493f9e4e0690a5df1bcaccf6b5ad9e33d55024",
+      "previous": [
+        "bcf9079ba2249251a5930f07854f4269835bbc667a029c5bf17dab45a9b174bf"
+      ]
+    },
+    "TMessagesProj/jni/tgnet/DiagnosticPolicy.h": {
+      "before": "1ab431aa0f17ce3a778627c13b385292833e0fa2496ac0b9294e3b61d68ef8e6",
+      "after": "16f12f70587f5723c63a2d6edf1cd352e323226c4899582c16906e3350e55eae",
+      "previous": [
+        "1ab431aa0f17ce3a778627c13b385292833e0fa2496ac0b9294e3b61d68ef8e6"
+      ]
+    },
+    "TMessagesProj/jni/tgnet/VariantPolicy.cpp": {
+      "before": null,
+      "after": "ee3d81bff6525ffaa2f2307d0b6bf1924f0097a6b30aa8f19f05b30ee778b607",
+      "previous": []
+    },
+    "TMessagesProj/jni/tgnet/VariantPolicy.generated.h.in": {
+      "before": null,
+      "after": "e8fdc6c8337b0066062ef8c351ff6936d83603437128b7e932def3d79796a14a",
+      "previous": []
+    },
+    "TMessagesProj/jni/variant-policy.cmake": {
+      "before": null,
+      "after": "96d570c3cdac82a89c4e27c25a7498f06feb0b78e12b8980c5763d0542ebb47a",
+      "previous": []
+    },
+    "TMessagesProj/src/diagnostic/AndroidManifest.xml": {
+      "before": null,
+      "after": "7e1e6f45cb47a842aa07c732e6ebe5a735f4f7840ac60b8f77c7b203c07b5240",
+      "previous": []
+    },
+    "TMessagesProj/src/main/AndroidManifest.xml": {
+      "before": "7e1e6f45cb47a842aa07c732e6ebe5a735f4f7840ac60b8f77c7b203c07b5240",
+      "after": "eabe2924f51e5bb083913b6ac3c6fc2cd64695d73be23b893f6ef13f76b1af20",
+      "previous": [
+        "7e1e6f45cb47a842aa07c732e6ebe5a735f4f7840ac60b8f77c7b203c07b5240"
+      ]
+    },
+    "TMessagesProj/src/main/java/org/telegram/messenger/BuildVariantPolicy.java": {
+      "before": null,
+      "after": "ff8741ee2b61a23ac405caeb5865b115db6f949600af5a74e02ce02cddc47177",
+      "previous": []
+    },
+    "TMessagesProj/src/main/res/xml/auth.xml": {
+      "before": "f901b2f295c1da45d99f8524b2d3d08258943fe732f968bb328d3c4dbe6d550d",
+      "after": "d60ac1b59dd5d0b3410d992b0e894dbebaceb9d2e8ffeea08a16faa5a8bdbe64",
+      "previous": [
+        "f901b2f295c1da45d99f8524b2d3d08258943fe732f968bb328d3c4dbe6d550d"
+      ]
+    },
+    "TMessagesProj/src/main/res/xml/sync_contacts.xml": {
+      "before": "6f53186187b7417cdceac20ac22a65094a55f34a0b3cdd5a8cc1d1b9a39a6477",
+      "after": "1421d47998da314d067712096f9b12bb8f9c6eace6e467b9eabb955a440ea61d",
+      "previous": [
+        "6f53186187b7417cdceac20ac22a65094a55f34a0b3cdd5a8cc1d1b9a39a6477"
+      ]
+    },
+    "TMessagesProj/src/production/AndroidManifest.xml": {
+      "before": null,
+      "after": "ff9a7cebb062a856e305ea9a46fbab70f4905816e89bd3208995c4ae917678e8",
+      "previous": []
+    },
+    "config/flexygram-production.properties.example": {
+      "before": null,
+      "after": "403979b448d53fcb18abcbf90532adeaf844f784b3e9fb60a01549d80516ca21",
+      "previous": []
+    },
+    "gradle.properties": {
+      "before": "62c0d29e367c0ce417f6914d8c7479b276440a9e0831dc71235821d155ad4ee0",
+      "after": "f149ebb862477e3b50e7d129a12c8ec2e903d5cf88e7cf4a711bd2175a1c09b0",
+      "previous": [
+        "62c0d29e367c0ce417f6914d8c7479b276440a9e0831dc71235821d155ad4ee0"
+      ]
+    },
+    "gradle/production-readiness.gradle": {
+      "before": null,
+      "after": "98a657809d1331164fb80892ac25333ca0a11f1919cbf5b65cae23a771c7d02b",
+      "previous": []
+    },
+    "gradle/variant-policy.gradle": {
+      "before": null,
+      "after": "6d7249d9c1036d58a9a5839a4ea7e9424bc865c2eb42a3ddebaee7803256a8ab",
+      "previous": []
+    },
+    "gradle/variant-policy.json": {
+      "before": null,
+      "after": "0f92362819e8a4973909188235d68012a364c974d8e430ce61370e88da8ed181",
+      "previous": []
+    },
+    "tests/build_variants/check_diagnostic.py": {
+      "before": null,
+      "after": "874e2082aba51bf460234812417f01f7b701da21558a729db2795017056665c9",
+      "previous": []
+    },
+    "tests/build_variants/native_fixture.py": {
+      "before": null,
+      "after": "6e5c6ec683e550d9703c8df5f7e2e2f456f1ccf80997b92c6387b0f1e290a156",
+      "previous": []
+    },
+    "tests/build_variants/scope.py": {
+      "before": null,
+      "after": "210598676311402688bc35eb9b7c7edf38cc6b9d405f34803ca2260be051b4c5",
+      "previous": []
+    },
+    "tests/build_variants/test_variants.py": {
+      "before": null,
+      "after": "22e28236d301f462d287c90af11af8e6daae5902c00180694712a14d24f7ff2e",
+      "previous": []
+    },
+    "tests/security/test_p02_isolation.py": {
+      "before": "cf1073b1a4767792cc61f3a15e4db78a5f9e982c94423fdf4fd96000df79f6ab",
+      "after": "2b8193c594f7ea38161cc9aaee327325b37bdc19c9108256880309290f594668",
+      "previous": [
+        "cf1073b1a4767792cc61f3a15e4db78a5f9e982c94423fdf4fd96000df79f6ab"
+      ]
+    },
+    "tests/security/test_p03b_push.py": {
+      "before": "ac3dada0626828509d0b573582808372d1b16d1fe9cef49b2c5ba6dfd0cb0053",
+      "after": "c24eac53c5ba876c7d0574ac8a7e03fa0864a4bbc24797cf5b34710f052885ae",
+      "previous": [
+        "ac3dada0626828509d0b573582808372d1b16d1fe9cef49b2c5ba6dfd0cb0053"
+      ]
+    },
+    "tests/translation_dependency/test_facade.py": {
+      "before": "db7118ef6f3e85360c13c6310ba739904f70b4bc494fc0f851e10e8b01786bfd",
+      "after": "d47454c87bb84ebef91df10ebfa075cca1f4049cb8e7f53b049fa87d29ee948c",
+      "previous": [
+        "db7118ef6f3e85360c13c6310ba739904f70b4bc494fc0f851e10e8b01786bfd"
+      ]
+    },
+    "tests/translation_safety/test_preparation.py": {
+      "before": "1e1c341ce317f63ca98c4b791f24f56483ccb41006d5e2f0ce6affeb53382389",
+      "after": "1fedbdc4ed9576db4c590d902449659caee7eb3985c9caa20a8cf840eb95ecd2",
+      "previous": [
+        "1e1c341ce317f63ca98c4b791f24f56483ccb41006d5e2f0ce6affeb53382389"
+      ]
+    },
+    "tests/translation_staging/review_scope.py": {
+      "before": "de6dcbbd44175343fc634e79720b6b872123ffcb3081ce92ce0dd3f9b63b235c",
+      "after": "cbaf75ddf3c3a63136adf51c2d5b1a7274cdc315402dd7c6639d2ef72b0b3a12",
+      "previous": [
+        "de6dcbbd44175343fc634e79720b6b872123ffcb3081ce92ce0dd3f9b63b235c"
+      ]
+    },
+    "tests/translation_staging/test_staging.py": {
+      "before": "7f330896caf714027663391e2eebf496592ca171b5280748ec4c9a20a8c81f24",
+      "after": "dacad236b5e24d6af826bef0b0193464f7c5ee6df10aefb1429132a0fa40eb1f",
+      "previous": [
+        "7f330896caf714027663391e2eebf496592ca171b5280748ec4c9a20a8c81f24"
+      ]
+    }
+  }
+}

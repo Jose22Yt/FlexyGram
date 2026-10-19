@@ -1,0 +1,6 @@
+# Schema only. Do not fill this file or commit credentials.
+# Future owner-authorized configuration must live outside the repository.
+# P0.4b never loads this file and production cannot be enabled by configuration.
+TELEGRAM_APP_ID=
+TELEGRAM_APP_HASH=
+# Production signing is deliberately NOT configured in P0.4b.
