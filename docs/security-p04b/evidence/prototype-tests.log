@@ -1,0 +1,17 @@
+test_actual_base_pipeline_and_result_contract (test_prototype.PrototypeTests.test_actual_base_pipeline_and_result_contract) ... ok
+test_all_frozen_language_entries (test_prototype.PrototypeTests.test_all_frozen_language_entries) ... ok
+test_errors_no_private_causes_or_provider_switch (test_prototype.PrototypeTests.test_errors_no_private_causes_or_provider_switch) ... ok
+test_explicit_formality_capabilities (test_prototype.PrototypeTests.test_explicit_formality_capabilities) ... ok
+test_frozen_inventory_regenerates_without_dropping_numeric_regions (test_prototype.PrototypeTests.test_frozen_inventory_regenerates_without_dropping_numeric_regions) ... ok
+test_invalid_config_never_invokes_transport (test_prototype.PrototypeTests.test_invalid_config_never_invokes_transport) ... ok
+test_observed_normalization_pipeline (test_prototype.PrototypeTests.test_observed_normalization_pipeline) ... ok
+test_pre_inflight_and_exception_cancellation (test_prototype.PrototypeTests.test_pre_inflight_and_exception_cancellation) ... ok
+test_production_and_all_previous_security_files_unchanged (test_prototype.PrototypeTests.test_production_and_all_previous_security_files_unchanged) ... ok
+test_prototype_jar_scans_clean_without_legacy_dependency (test_prototype.PrototypeTests.test_prototype_jar_scans_clean_without_legacy_dependency) ... ok
+test_text_html_unicode_passthrough_fixture (test_prototype.PrototypeTests.test_text_html_unicode_passthrough_fixture) ... ok
+test_wrapper_chinese_aliases (test_prototype.PrototypeTests.test_wrapper_chinese_aliases) ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 2.898s
+
+OK

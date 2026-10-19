@@ -1,0 +1,33 @@
+{
+  "code_commit": "c55915ce0bf9a820d4744a31f8c6aeddb80a1d02",
+  "abi": "arm64-v8a",
+  "library": "libtmessages.49.so",
+  "linked_unstripped_library": true,
+  "guards": [
+    {
+      "symbol": "_ZN18ConnectionsManager4initEjiiNSt6__ndk112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEES6_S6_S6_S6_S6_S6_S6_S6_S6_S6_ilbbbbii",
+      "instructions": [
+        "ret"
+      ],
+      "transport_or_initialization_body_absent": true
+    },
+    {
+      "symbol": "_ZN16ConnectionSocket14openConnectionENSt6__ndk112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEEtS6_bi",
+      "instructions": [
+        "ret"
+      ],
+      "transport_or_initialization_body_absent": true
+    },
+    {
+      "symbol": "_ZN16ConnectionSocket22openConnectionInternalEb",
+      "instructions": [
+        "ret"
+      ],
+      "transport_or_initialization_body_absent": true
+    }
+  ],
+  "runtime_execution": false,
+  "packaged_text_matches_inspected_linked_library": true,
+  "text_sha256": "f76278c7b470fc64e2d284fc80bdaad71d2087d3a3a0ec2b38a28cef5b1b065f",
+  "text_bytes": 28385356
+}

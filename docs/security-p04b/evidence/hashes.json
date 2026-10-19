@@ -1,0 +1,28 @@
+{
+  "algorithm": "SHA-256",
+  "files": {
+    "artifact-scan.json": "281dd826fc5effe52f997e3216ff472539ddb2df07be4432d880f19cd6caec2d",
+    "code-source-hashes.json": "7d7e565ed04140b4d94a7c06936c1687982b50a8bab36d2195a52266a8b114f0",
+    "compiled-java-policy.json": "ccf27f5eef8ec31e7932a49ed2f81e8ded8a193d2001dae87952aba48fa041fe",
+    "dependency-graph.json": "d4cfedc783bafcfa526f284f75117ab06fb4f4e09048dfcd4d7d88f4e723cbd5",
+    "diagnostic-signature.log": "32fb64a890466a2eac25755e2a6354de5aedbc8ebdbdb278915eadb89ec280e8",
+    "environment.json": "18a7a7b174415867364f7a1d3ab2e9023aef4d2fae09933de29ba10e4cd88109",
+    "facade-tests.log": "fa1fc1af707045f42ab773e6581b2259b506d895405a4ee00ebe1fa1133e5920",
+    "gradle-arm64-final.log": "ec11fb14a646282b9d323e72370b99c02867115c23f78bc4289ceff27d2f60bc",
+    "java-policy-bytecode.log": "6cba2bfa8b29e67f6795dbdc7a01aa4dd8db763f237b8e49ec4c0fbc39376d83",
+    "merged-manifest-audit.json": "56a1fd50505879a6d239955af5ccc27ec2cf807397f044a39d75f3466f0b74be",
+    "merged-manifest.xml": "41dc4ff2474cc692aeba283a4933fb37f90c3f682afd8f6d5245ef40695deca3",
+    "native-linked-guards.json": "0c779ee2ce7d2dbbc5dc735b7113374debc356d8a91522c05b5b9299acb7fe24",
+    "native-linked-guards.log": "c62b125162b3667e98f27405032df4fcfb916d190cfed85e8bb951c0d99e44d1",
+    "production-build-rejection.log": "3c4b1b1a524e1629af043d39c3493249dd397fc47e3a9991e1b230eefee7acad",
+    "prototype-tests.log": "c60cd601d7eedf703d91685d7b6866e31118f4e8a86e1ae4ffde12669af2646d",
+    "runtime-tests.log": "bce830a028e3e87430c527520eb4c8084c8728feafcf5cb04c09c4a4f9b5e69f",
+    "safety-tests.log": "15b474a4a59a3240264596a0cfe617ff6335a9290c09c9188586eef93207fe6a",
+    "security-tests.log": "f2a1d070f6dcfb6c1e88da3d635f2f03c88995ce3b201d82f7b43b4c2bff5c45",
+    "staging-tests.log": "048b323ff8169949efb97fec063f52e5b5522f75ac0b884be335f97bfa08a642",
+    "test-summary.json": "16c3d1303e65e4f41ede3d236a8e759eeb94bb61f04f66b22c29a168e33af037",
+    "validation-summary.json": "56e43e0130a2205c870fc9aab74a580d3c5bcaad4ac340bb5451f7384304484b",
+    "variants-tests.log": "14119cb5aa75594a9fdc9ce806c8adf8e7862ae18b9324752e69adff8960ba31",
+    "verification-tool-hashes.json": "7ef8161c27087cd6cac08f7e0e2b58747593163e333bad346d884cfb6af393be"
+  }
+}

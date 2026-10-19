@@ -25,8 +25,12 @@ def run(command, **kw):
 
 class IsolationTests(unittest.TestCase):
     def test_identity_backup_permissions_components(self):
-        manifest=ET.parse(MAIN/'AndroidManifest.xml').getroot()
-        self.assertIn('APP_PACKAGE='+ID,(ROOT/'gradle.properties').read_text())
+        manifest=ET.parse(ROOT/'TMessagesProj/src/diagnostic/AndroidManifest.xml').getroot()
+        import json
+        policy=json.loads((ROOT/'gradle/variant-policy.json').read_text())['variants']['diagnostic']
+        self.assertEqual(policy['applicationId'],ID)
+        self.assertTrue(policy['isolated'] and policy['buildEnabled'])
+        self.assertTrue(all(value is False for value in policy['capabilities'].values()))
         app=manifest.find('application')
         self.assertEqual(app.get(ANDROID+'label'),'FlexyGram Diagnostic')
         self.assertEqual(app.get(ANDROID+'allowBackup'),'false')
@@ -81,14 +85,15 @@ class IsolationTests(unittest.TestCase):
             if authority:self.assertTrue(authority.startswith('${applicationId}.'),authority)
         for file in ['auth.xml','sync_contacts.xml']:
             node=ET.parse(MAIN/'res/xml'/file).getroot()
-            self.assertEqual(node.get(ANDROID+'accountType'),ID)
+            self.assertEqual(node.get(ANDROID+'accountType'),'@string/flexygram_account_type')
+            self.assertIn("resValue 'string', 'flexygram_account_type', policy.applicationId",(ROOT/'TMessagesProj/build.gradle').read_text())
         extraction=ET.parse(MAIN/'res/xml/diagnostic_data_extraction.xml').getroot()
         for kind in ['cloud-backup','device-transfer']:
             self.assertEqual(len(extraction.find(kind).findall('exclude')),9)
 
     def test_diagnostic_api_and_engine_controls_are_immutable(self):
         gradle=(ROOT/'TMessagesProj/build.gradle').read_text()
-        self.assertIn("'ISOLATED_DIAGNOSTIC', 'true'",gradle)
+        self.assertIn("'ISOLATED_DIAGNOSTIC', policy.isolated.toString()",gradle)
         self.assertIn("def appId = '0'",gradle)
         self.assertIn("def appHash = ''",gradle)
         self.assertNotIn("def appId = '6'",gradle)
@@ -179,7 +184,11 @@ class IsolationTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             p=Path(directory);cpp=p/'test.cpp'
             cpp.write_text('#include "'+str(header)+'"\nint writes=0,loads=0,freed=0;struct Object{~Object(){freed++;}};\nvoid send(Object*object){'+send+'\nwrites++;}\nvoid init(){'+init+'\nloads++;}\nint main(){for(int i=0;i<20;i++){send(new Object);init();}return writes||loads||freed!=20;}')
-            run(['c++','-std=c++17',str(cpp),'-o',str(p/'test')]);run([str(p/'test')])
+            import sys
+            sys.path.insert(0,str(ROOT/'tests/build_variants'))
+            from native_fixture import configure
+            generated=configure(p/'policy')
+            run(['c++','-std=c++17','-I'+str(generated),str(cpp),'-o',str(p/'test')]);run([str(p/'test')])
         socket=(ROOT/'TMessagesProj/jni/tgnet/ConnectionSocket.cpp').read_text()
         for name in ['openConnection(', 'openConnectionInternal(']:
             part=socket[socket.index('void ConnectionSocket::'+name):]

@@ -117,12 +117,14 @@ println("actual complete Kotlin consumers linked; real policy denied")}
   names=['translate/Translator.kt','translate/HTMLKeeper.java','translate/TranslationServicesPolicy.java','translate/source/RealMicrosoftTranslator.kt','translate/source/DeepLTranslator.kt','translate/source/MicrosoftTranslator.kt']
   paths=[str((PROD/'tw/nekomimi/nekogram'/n).relative_to(ROOT)) for n in names]
   paths+=['TMessagesProj/src/main/java/org/telegram/tgnet/TLRPC.java','TMessagesProj/src/main/AndroidManifest.xml','TMessagesProj/src/main/java/org/telegram/messenger/DiagnosticPolicy.java']
-  for path in paths:self.assertEqual((ROOT/path).read_bytes(),subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT),path)
+  for path in paths:
+   current=ROOT/('TMessagesProj/src/diagnostic/AndroidManifest.xml' if path=='TMessagesProj/src/main/AndroidManifest.xml' else path)
+   self.assertEqual(current.read_bytes(),subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT),path)
   assert_scope(self)
  def test_active_aar_removed_and_exclusion_mandatory(self):
   s=(ROOT/'TMessagesProj/build.gradle').read_text()
   self.assertNotIn("implementation 'app.nekogram.translator:translator:1.6.1'",s)
-  self.assertIn("implementation project(':translation-compat-diagnostic')",s)
+  self.assertIn("diagnosticImplementation project(':translation-compat-diagnostic')",s)
   self.assertIn("exclude group: 'app.nekogram.translator', module: 'translator'",s)
   self.assertIn("dependsOn 'verifyDiagnosticTranslationClasspath'",s)
   self.assertNotIn('GoogleAppTranslator',(TRANS/'source/fallback/GoogleTranslatorNeko.java').read_text())

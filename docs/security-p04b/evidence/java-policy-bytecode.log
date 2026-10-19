@@ -1,0 +1,56 @@
+Compiled from "DiagnosticPolicy.java"
+public final class org.telegram.messenger.DiagnosticPolicy {
+  private org.telegram.messenger.DiagnosticPolicy();
+    Code:
+       0: aload_0
+       1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+       4: return
+
+  public static boolean isIsolated();
+    Code:
+       0: iconst_1
+       1: ireturn
+}
+Compiled from "BuildVariantPolicy.java"
+public final class org.telegram.messenger.BuildVariantPolicy {
+  private org.telegram.messenger.BuildVariantPolicy();
+    Code:
+       0: aload_0
+       1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+       4: return
+
+  public static boolean authenticationAllowed();
+    Code:
+       0: iconst_0
+       1: ireturn
+
+  public static boolean telegramTransportAllowed();
+    Code:
+       0: iconst_0
+       1: ireturn
+
+  public static boolean pushAllowed();
+    Code:
+       0: iconst_0
+       1: ireturn
+
+  public static boolean translationAllowed();
+    Code:
+       0: iconst_0
+       1: ireturn
+
+  public static boolean pluginsAllowed();
+    Code:
+       0: iconst_0
+       1: ireturn
+
+  public static boolean sessionRestoreAllowed();
+    Code:
+       0: iconst_0
+       1: ireturn
+
+  public static java.lang.String storageNamespace();
+    Code:
+       0: ldc           #9                  // String io.github.jose22yt.flexygram.diagnostic
+       2: areturn
+}

@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "variants": {
+    "diagnostic": {
+      "applicationId": "io.github.jose22yt.flexygram.diagnostic",
+      "isolated": true,
+      "buildEnabled": true,
+      "capabilities": {
+        "authentication": false,
+        "telegramTransport": false,
+        "push": false,
+        "translation": false,
+        "plugins": false,
+        "sessionRestore": false
+      }
+    },
+    "production": {
+      "applicationId": "io.github.jose22yt.flexygram.app",
+      "isolated": false,
+      "buildEnabled": false,
+      "capabilities": {
+        "authentication": false,
+        "telegramTransport": false,
+        "push": false,
+        "translation": false,
+        "plugins": false,
+        "sessionRestore": false
+      }
+    }
+  }
+}

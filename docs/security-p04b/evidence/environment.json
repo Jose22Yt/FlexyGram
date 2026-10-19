@@ -1,0 +1,22 @@
+{
+  "gradle": "9.7.1",
+  "agp": "9.3.1",
+  "gradle_jdk": "JetBrains21.0.10-b1163.105",
+  "compile_sdk": 37,
+  "installed_platform": "android-37.0",
+  "target_sdk": 36,
+  "min_sdk": 24,
+  "build_tools": "36.0.0",
+  "ndk": "27.2.12479018",
+  "cmake": "3.31.6",
+  "host_python": "3.11.17",
+  "python_minor": "3.11",
+  "chaquopy": "17.0.0",
+  "native_target": "arm64-v8a",
+  "native_skip": false,
+  "kotlin_incremental_argument": false,
+  "laboratory_signing_only": true,
+  "production_signing_configured": false,
+  "android_installation": false,
+  "distributed": false
+}

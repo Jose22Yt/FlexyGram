@@ -3,6 +3,7 @@
     Java_*;        # all JNI functions resolved by name
     JNI_OnLoad;
     JNI_OnUnload;
+    flexygram_variant_policy; # non-secret compiled flavor/capability attestation
   local:
     *;             # hide everything else (FFmpeg, libyuv, webrtc, ...)
 };
