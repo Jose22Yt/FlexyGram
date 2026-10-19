@@ -124,16 +124,16 @@ class ReproductionGateTests(unittest.TestCase):
         reviewed = {row['filename']: row['original_filename']
                     for row in self.rows if row['rebuilt']}
         a, b = self.rows[0], self.rows[1]
-        a['original_filename'], b['original_filename'] = (
-            b['original_filename'], a['original_filename'])
+        for field in ('original_filename', 'original_sha256', 'original_url'):
+            a[field], b[field] = b[field], a[field]
         self.save()
         with self.assertRaisesRegex(ValueError, 'Reviewed rebuilt wheel origin mismatch'):
             r.check_outputs(self.folder, self.approved, self.libs, self.rebuilt, reviewed)
 
     def test_copied_wheels_cannot_swap_original_names(self):
         a, b = self.rows[5], self.rows[6]
-        a['original_filename'], b['original_filename'] = (
-            b['original_filename'], a['original_filename'])
+        for field in ('original_filename', 'original_sha256', 'original_url'):
+            a[field], b[field] = b[field], a[field]
         self.save()
         with self.assertRaisesRegex(ValueError, 'Unmodified wheel origin mismatch'):
             self.validate()
