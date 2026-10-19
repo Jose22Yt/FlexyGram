@@ -156,13 +156,14 @@ println("real-consumers-linked-and-policy-denied")
    e=Path(os.environ['FACADE_EVIDENCE_DIR']);(e/'facade-jar-scan.json').write_text(json.dumps(result,indent=2)+'\n')
    (e/'facade-source-hashes.json').write_text(json.dumps({str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in self.source},indent=2)+'\n')
  def test_production_and_historical_evidence_remain_unchanged(self):
-  base='3cd4177369b35c02963d29cfbc11e3993fcfc268'
-  changed=run(['git','diff',base,'--name-only']).splitlines()
-  self.assertTrue(all(p.startswith(('tests/translation_dependency/','docs/security-p03f/')) for p in changed),changed)
-  settings=(ROOT/'settings.gradle').read_text();self.assertNotIn('facade',settings)
-  dependency=(ROOT/'TMessagesProj/build.gradle').read_text();self.assertIn('translator:1.6.1',dependency)
-  # Historical reports and all production and P0.1-P0.3d files are immutable relative to merged PR11.
-  self.assertEqual(run(['git','diff',base,'--','TMessagesProj','TMessagesProj_App','settings.gradle','build.gradle','tests/security','tests/translation_safety','tests/translation_runtime','docs/security-p03e']),'')
+  sys.path.insert(0,str(ROOT/'tests/translation_staging'))
+  from review_scope import assert_scope
+  assert_scope(self)
+  dependency=(ROOT/'TMessagesProj/build.gradle').read_text()
+  self.assertNotIn("implementation 'app.nekogram.translator:translator:1.6.1'",dependency)
+  self.assertIn("implementation project(':translation-compat-diagnostic')",dependency)
+  # The laboratory module itself is still not included in Android.
+  self.assertNotIn('tests/translation_dependency/facade',(ROOT/'settings.gradle').read_text())
  def test_android24_bootclasspath_and_d8(self):
   sdk=Path(os.environ['ANDROID_SDK_ROOT']);boot=sdk/'platforms/android-24/android.jar'
   self.assertTrue(boot.is_file(),'Install exact Android API24 platform; do not substitute JDK compilation')

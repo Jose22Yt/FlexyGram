@@ -2,7 +2,7 @@
   "audited_base": "333dd8c9beb35a2e3caa985279858df7b5bc2ee7",
   "purpose": "Source identity preservation, not service authorization or runtime testing",
   "sha256": {
-    "TMessagesProj/build.gradle": "f978651af1f32a66c32ffc864a0ea628e1281cd456ad57d5d04934bce8b844b0",
+    "TMessagesProj/build.gradle": "02161a45c44fe6f0b75c80359fd8c924e925302e693c33d9d873ebc6e5f5fba1",
     "TMessagesProj/src/main/AndroidManifest.xml": "7e1e6f45cb47a842aa07c732e6ebe5a735f4f7840ac60b8f77c7b203c07b5240",
     "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/HTMLKeeper.java": "097bb74a3f844dc45aabf0e6f078de1f5d705eb91d5a9e015a5e897ec6ded8c8",
     "TMessagesProj/src/main/java/org/telegram/messenger/ApplicationLoader.java": "91d058fd979b9846f61ab08510817c79233c14b8e45c61bd1de5de52430e2a46",
@@ -14,14 +14,14 @@
     "TMessagesProj/src/main/java/org/telegram/messenger/GcmPushListenerService.java": "c3af95b9c0378a2fb590e465fd8bdd1f1e051fb2ad4b0c2188c25c8cc6522cf0",
     "TMessagesProj/src/main/java/org/telegram/messenger/PushListenerController.java": "8ef7e2cb83cba9bed5bb9c3610a2a8b9aad9ed3500734a269f0164c06ccf9982",
     "TMessagesProj/src/main/java/org/telegram/messenger/SharedConfig.java": "05c2858d415890053c317eae5593981261ec65ddd27ac5c213aeb2c88dd2c9d4",
-    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/GoogleTranslator.kt": "0555a42de6a1efca64362ba8ed6c284bcbdfa0318bd142c738dd2ec9b60cc3eb",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/GoogleTranslator.kt": "3131be46bb51bfd178eeacd33a30c7300be2d27c38006a2ead2e36ddcc4d2c8e",
     "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/GoogleAppTranslator.kt": "af3ea371b13144f1c1afb1a9a5112cbb93c745cbc1f019d6fa0d77429bfb372c",
     "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/GoogleCloudTranslator.kt": "c9c152ae33bcbc444c5c1e035fa9a57446fa7fd42fccfb2b703ad120972f55af",
     "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/RealMicrosoftTranslator.kt": "5ccdd25e81acda444daef42d3c24209449082968b24bd23784b67693953ab843",
     "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/MicrosoftTranslator.kt": "72ecff7433ee2230ebe85356c3660647a04d12fec8ce44e64e5b8d8416a7132a",
     "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/DeepLTranslator.kt": "70d613a49e80236416f7b4622df7c83f63496c8218324e8d825f0527d5b8a77d",
     "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/LLMTranslator.kt": "a99ec21303ed290619b78a7d9ebd683ab65cf106811b4eb198faab724f500c44",
-    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/fallback/GoogleTranslatorNeko.java": "1e0251e13382ba66c479e2af653824058421399b6e4e57158d5793e06e552bc1",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/fallback/GoogleTranslatorNeko.java": "6c4f3c3f411cde492c0bad9d3c40a37d23f8071bea5fd7ae231b3251e5e89401",
     "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/fallback/DeepLTranslatorNeko.java": "d52599b387c76e0ec563e9051b2c74fdb0db8058f3c69b367f3266dff820d83f"
   },
   "prior_audited_base": "2cc41769339d9689498c5f23b446f4cfdf3ad8c0",
@@ -61,6 +61,20 @@
     "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/fallback/DeepLTranslatorNeko.java": {
       "before": "063241eb57de1a9a09c9a4c66e03a2686c3ea905afbe17a919a6d023b30b5eee",
       "after": "d52599b387c76e0ec563e9051b2c74fdb0db8058f3c69b367f3266dff820d83f"
+    }
+  },
+  "p03g_reviewed_changes": {
+    "TMessagesProj/build.gradle": {
+      "before": "f978651af1f32a66c32ffc864a0ea628e1281cd456ad57d5d04934bce8b844b0",
+      "after": "02161a45c44fe6f0b75c80359fd8c924e925302e693c33d9d873ebc6e5f5fba1"
+    },
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/GoogleTranslator.kt": {
+      "before": "0555a42de6a1efca64362ba8ed6c284bcbdfa0318bd142c738dd2ec9b60cc3eb",
+      "after": "3131be46bb51bfd178eeacd33a30c7300be2d27c38006a2ead2e36ddcc4d2c8e"
+    },
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/fallback/GoogleTranslatorNeko.java": {
+      "before": "1e0251e13382ba66c479e2af653824058421399b6e4e57158d5793e06e552bc1",
+      "after": "6c4f3c3f411cde492c0bad9d3c40a37d23f8071bea5fd7ae231b3251e5e89401"
     }
   }
 }

@@ -2,11 +2,13 @@
 KOTLIN_LIB points to the exact Gradle 9.7.1 lib directory. No compiler download here.
 """
 from pathlib import Path
-import os, re, subprocess, tempfile, unittest, json, hashlib
+import os, re, subprocess, tempfile, unittest, json, hashlib, sys
 ROOT=Path(__file__).resolve().parents[2]
 BASE=ROOT/'TMessagesProj/src/main/java/tw/nekomimi/nekogram'
 TRANS=BASE/'translate'
 CANARY='SYNTHETIC_PRIVATE_TEXT_URL_KEY_RESPONSE_NOT_REAL'
+sys.path.insert(0,str(ROOT/'tests/translation_staging'))
+from review_scope import reviewed_change
 
 
 def method(path, signature):
@@ -79,11 +81,13 @@ System.out.println("policy/wrappers denied; 0 singleton/transport calls; safe di
             f=ROOT/name
             self.assertTrue(f.is_file(),name)
             old=subprocess.run(['git','show','333dd8c9beb35a2e3caa985279858df7b5bc2ee7:'+name],cwd=ROOT,capture_output=True,check=True).stdout
-            self.assertEqual(hashlib.sha256(f.read_bytes()).digest(),hashlib.sha256(old).digest())
+            self.assertTrue(hashlib.sha256(f.read_bytes()).digest()==hashlib.sha256(old).digest() or reviewed_change(name,hashlib.sha256(old).hexdigest()),name)
 
     def test_private_builders_and_error_surfaces(self):
         pa=method(TRANS/'source/GoogleTranslator.kt','private suspend fun translate(')
-        self.assertLess(pa.index('requireRoute'),pa.index('val urlBuilder'))
+        self.assertLess(pa.index('requireRoute'),pa.index('throw TranslationServicesPolicy.denied()'))
+        self.assertNotIn('urlBuilder',pa)
+        self.assertNotIn('HttpClient',pa)
         llm=method(TRANS/'source/LLMTranslator.kt','private fun doLLMTranslate(')
         self.assertLess(llm.index('requireRoute'),llm.index('getNextApiKey'))
         for name in ['GoogleTranslator','GoogleAppTranslator','GoogleCloudTranslator','LLMTranslator']:
