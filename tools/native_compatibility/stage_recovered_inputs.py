@@ -126,6 +126,10 @@ def stage(archive: Path, destination: Path, manifest: dict,
     root.parent.mkdir(parents=True, exist_ok=True)
     temporary = Path(tempfile.mkdtemp(prefix='.flexygram-stage-', dir=root.parent))
     try:
+        # The source is opened again after verification. Fail closed if it was
+        # replaced before extraction, and verify it remained pinned afterward.
+        if digest(archive) != expected_sha:
+            raise ValueError('Recovered ZIP changed before extraction')
         with zipfile.ZipFile(archive) as zip_input:
             for name in sorted(manifest['files']):
                 target = temporary / name
@@ -135,6 +139,8 @@ def stage(archive: Path, destination: Path, manifest: dict,
                 os.chmod(target, 0o600)
                 if digest(target) != manifest['files'][name]['sha256']:
                     raise ValueError('Extracted private member changed')
+        if digest(archive) != expected_sha:
+            raise ValueError('Recovered ZIP changed during extraction')
         report['freetype_git_checkout_prepared'] = False
         report['note'] = ('FreeType tar is a verified source export, not a Git checkout. '
                           'The experimental recipe accepts its pinned TAR without '
