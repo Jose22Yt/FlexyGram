@@ -1,0 +1,12 @@
+{
+  "exit_code": 0,
+  "elapsed_seconds": 596.0822002887726,
+  "commit": "03e4e27e3a59b79b05f3b99b6fdee7d48709bc16",
+  "command": [
+    "./gradlew",
+    ":TMessagesProj:assembleDebug",
+    "--no-daemon",
+    "--max-workers=2",
+    "--console=plain"
+  ]
+}

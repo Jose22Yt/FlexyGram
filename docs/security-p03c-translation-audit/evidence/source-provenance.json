@@ -1,0 +1,26 @@
+[
+  {
+    "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/GoogleTranslator.kt",
+    "audited_blob": "91147b27e920c298de8307b19a4ca203e278d6cd",
+    "original_baseline_blob": "91147b27e920c298de8307b19a4ca203e278d6cd",
+    "unchanged_from_original_baseline": true
+  },
+  {
+    "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/GoogleAppTranslator.kt",
+    "audited_blob": "bdc997f676bd8d8548fa13dac5cb3aaec48d5ec7",
+    "original_baseline_blob": "bdc997f676bd8d8548fa13dac5cb3aaec48d5ec7",
+    "unchanged_from_original_baseline": true
+  },
+  {
+    "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/fallback/GoogleTranslatorNeko.java",
+    "audited_blob": "8f4238c529a318c11803c87fc13762062b9c5b54",
+    "original_baseline_blob": "8f4238c529a318c11803c87fc13762062b9c5b54",
+    "unchanged_from_original_baseline": true
+  },
+  {
+    "path": "TMessagesProj/build.gradle",
+    "audited_blob": "794f05a37d571a668c9ff4477b9275106ace674e",
+    "original_baseline_blob": "a1e62005228f213fea2028330c665cd8ef37db4b",
+    "unchanged_from_original_baseline": false
+  }
+]

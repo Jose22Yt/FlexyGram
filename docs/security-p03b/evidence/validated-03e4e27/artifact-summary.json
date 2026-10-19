@@ -1,0 +1,25 @@
+{
+  "commit": "03e4e27e3a59b79b05f3b99b6fdee7d48709bc16",
+  "apk_sha256": "bd4223a37ca463b33fb98c07b16433746e82468cf9743abbba1a0732f965d7f7",
+  "apk_size": 111989811,
+  "abis": [
+    "arm64-v8a"
+  ],
+  "installed_native_library_count": 18,
+  "zip_crc": "passed",
+  "manifest_merged": "passed",
+  "manifest_apk": "passed",
+  "manifest_mutations_rejected": 10,
+  "push_buildconfig": "2 false + 8 empty; isolated true",
+  "auto_init_collection": "3 false",
+  "scan": {
+    "zip_entries": 14847,
+    "nested_archives": 7,
+    "forbidden_value_hits": 0,
+    "client_key_shaped_hits": 2,
+    "embedded_google_services_json": 0,
+    "passed": false,
+    "sha256": "bd4223a37ca463b33fb98c07b16433746e82468cf9743abbba1a0732f965d7f7"
+  },
+  "android_execution": "not performed; laboratory pending"
+}

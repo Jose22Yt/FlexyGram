@@ -1,0 +1,36 @@
+{
+  "audit_base": "5443f15ac61309bc9bfc9a8f81d0d028e9479923",
+  "compiled_code_commit": "03e4e27e3a59b79b05f3b99b6fdee7d48709bc16",
+  "compiled_code_tree": "aab7e88c522c1df18bd3f028b9eb40fd9ec431af",
+  "dependency": "app.nekogram.translator:translator:1.6.1",
+  "aar_sha256": "08cdf350bd21b6cc063a8fb0141eed6cdf06c06772c5080ca38114dce07a8f27",
+  "published_aar_sha1_verified": true,
+  "matches_validated_build_dependency": true,
+  "class_sha256": "dd89f3344b59516ca8f6e29808411a8bcf3222cb8105d7385bbd853aa5b30cae",
+  "pom_sha256": "7251c56f8e00aa9ad1c068810879fbcd5035e91e5d6f166311851e0c7753db4f",
+  "sources_jar_entries": [
+    "META-INF/",
+    "META-INF/MANIFEST.MF"
+  ],
+  "sources_revision_verified": false,
+  "bytecode_inspection": "OpenJDK17 jdk.jdeps/com.sun.tools.javap.Main -c -p; no class execution",
+  "client_keys": {
+    "local_count": 1,
+    "dependency_count": 1,
+    "distinct": true,
+    "values": "withheld",
+    "ownership": "not established",
+    "server_restrictions": "not established",
+    "authorized_for_flexygram": false
+  },
+  "foreign_identity_headers_observed": [
+    "x-android-package",
+    "x-android-cert"
+  ],
+  "declared_package_header": "com.google.android.apps.translate",
+  "private_key_or_telegram_session_found_by_these_two_findings": false,
+  "translator_requests_sent": 0,
+  "new_build_performed": false,
+  "android_runtime_test_performed": false,
+  "documentation_only": true
+}

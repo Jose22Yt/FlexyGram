@@ -1,0 +1,10 @@
+  protected final app.nekogram.translator.Result translateImpl(java.lang.String, java.lang.String, java.lang.String);
+     599: ldc_w         #679                // String https://translate-pa.googleapis.com/v1/translate?
+     622: ldc_w         #691                // String user-agent
+     625: ldc_w         #693                // String GoogleTranslate/10.25.51.941482215.4-release (Linux; U; Android 16; Pixel 10 Pro)
+     635: ldc_w         #701                // String x-goog-api-key
+     638: ldc_w         #703                // String [REDACTED_CLIENT_KEY]
+     648: ldc_w         #705                // String x-android-package
+     651: ldc_w         #707                // String com.google.android.apps.translate
+     661: ldc_w         #709                // String x-android-cert
+Certificate literal present in bytecode; value intentionally omitted. Server-side key restrictions not established.

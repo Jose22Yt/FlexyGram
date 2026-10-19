@@ -1,0 +1,92 @@
+[
+  {
+    "name": "beautifulsoup4",
+    "version": "4.15.0",
+    "metadata_sha256": "b2f888103259f1607c85f3b1163be1bc49fc9941a3243c3b89a21075bfc6d4fb"
+  },
+  {
+    "name": "certifi",
+    "version": "2026.10.18",
+    "metadata_sha256": "5f23b0cfb71be0a44970eb5d3ad49ba3db52616d7a583d594697bd9ee1bf2065"
+  },
+  {
+    "name": "chaquopy-freetype",
+    "version": "2.9.1",
+    "metadata_sha256": "3467e684dc3a62fcb6e494d969170773532e727e409b697c4904ce391686e483"
+  },
+  {
+    "name": "chaquopy-libjpeg",
+    "version": "1.5.3",
+    "metadata_sha256": "437febffe0ec0fed2559b44695e6bc1da280ec988a2476f44f56feafbb4e7a46"
+  },
+  {
+    "name": "chaquopy-libxml2",
+    "version": "2.9.8",
+    "metadata_sha256": "70356abce84e04fc75ddb413f91a88b911630489e241934112e1bfb3f9ebfa5b"
+  },
+  {
+    "name": "chaquopy-libxslt",
+    "version": "1.1.32",
+    "metadata_sha256": "e2ee2c30e4fc18056f06bfd6dc07ddc0eb40c6e899960a8439c2e5b8679240ef"
+  },
+  {
+    "name": "chaquopy-libyaml",
+    "version": "0.2.5",
+    "metadata_sha256": "12ba63515d022b32f38821caeb543eb4108c4114a6ab7aef993982781423fd81"
+  },
+  {
+    "name": "charset-normalizer",
+    "version": "3.5.2",
+    "metadata_sha256": "89ce6362bb7be88558f4be99a98f5d1b4da93d19cd0323e5ee0bac05cf883dfb"
+  },
+  {
+    "name": "debugpy",
+    "version": "1.8.22",
+    "metadata_sha256": "dad0ffa81756bcf79a9ef2961c532e411545c608159378446f087e6a2f2ea41a"
+  },
+  {
+    "name": "idna",
+    "version": "3.20",
+    "metadata_sha256": "dbd8c14c1e4ca1e0c9824a6dbc7cbbf78884f38eb52d91148cd3025f671e4b85"
+  },
+  {
+    "name": "lxml",
+    "version": "5.3.0",
+    "metadata_sha256": "e529a3c38054d8610968d398903d47cb3b47e9fca60c496cd3676cd62b505560"
+  },
+  {
+    "name": "packaging",
+    "version": "26.3",
+    "metadata_sha256": "70fdb89fc4d4a9a043bf7372b8972bcc883fddff34ab55e9cf80d73875384763"
+  },
+  {
+    "name": "pillow",
+    "version": "11.0.0",
+    "metadata_sha256": "ca46866cbdf184e375d8eab01b23c26a80d02741765a0da82d393217a3d32b88"
+  },
+  {
+    "name": "PyYAML",
+    "version": "6.0.3",
+    "metadata_sha256": "072f66b2100e314403bbfd403c3be0d9543241f5a8046b9dc1bbdfb3ddb09bdf"
+  },
+  {
+    "name": "requests",
+    "version": "2.34.2",
+    "metadata_sha256": "8c384ba3e979480faae2859d3c5e6c1276dd2c3616e322e124d52c8cfc556f27"
+  },
+  {
+    "name": "soupsieve",
+    "version": "3.0.3",
+    "metadata_sha256": "f76db712b0fadfee975fb519a46cc7f7b92979dc0ca297004fffc97b0a1f5f7c"
+  },
+  {
+    "name": "typing_extensions",
+    "version": "4.16.0",
+    "metadata_sha256": "b05084ca1d50879865178d9fff9fabeab61bdfb1f361bfbde95421ffc8f9be46"
+  },
+  {
+    "name": "urllib3",
+    "version": "2.8.0",
+    "metadata_sha256": "10898c620e8007c030e07fa5622b68358a43010025dfbd78a1cb797699de2bb4"
+  }
+]

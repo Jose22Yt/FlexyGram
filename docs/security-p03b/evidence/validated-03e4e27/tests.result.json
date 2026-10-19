@@ -1,0 +1,14 @@
+{
+  "exit_code": 0,
+  "elapsed_seconds": 8.94086241722107,
+  "commit": "03e4e27e3a59b79b05f3b99b6fdee7d48709bc16",
+  "command": [
+    "/root/.local/share/uv/python/cpython-3.11-linux-x86_64-gnu/bin/python3.11",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests/security",
+    "-v"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "documentation_files": 24,
+  "no_client_key_values_in_new_docs": true,
+  "original_evidence_hashes_verified": true,
+  "two_distinct_client_keys_confirmed_without_service_use": true,
+  "source_blobs_match_original": true,
+  "merge_tree_matches_compiled_tree": true,
+  "tracked_diff_before_document_commit": "",
+  "limits": "Static audit and documentation checks; no new security-suite run/build or Android execution."
+}
