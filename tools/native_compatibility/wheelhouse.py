@@ -19,8 +19,12 @@ def verified(path,row):
     return True
 
 def prepare(lock,dest,abis,offline=False,cache=None):
+    # Reject redirects of the entire directory, not only individual wheel files.
+    if dest.is_symlink():raise ValueError('Wheelhouse destination cannot be a symlink')
     dest.mkdir(parents=True,exist_ok=True)
-    cache=cache or Path.home()/'.cache/flexygram/wheels';cache.mkdir(parents=True,exist_ok=True)
+    cache=cache or Path.home()/'.cache/flexygram/wheels'
+    if cache.is_symlink():raise ValueError('Wheelhouse cache cannot be a symlink')
+    cache.mkdir(parents=True,exist_ok=True)
     selected=select(lock,abis)
     known={f['filename']:f for p in lock['packages'] for f in p['files']}
     # A previous supported ABI may remain; verify it too. Never admit an unlisted build tag.

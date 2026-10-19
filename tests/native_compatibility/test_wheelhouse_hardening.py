@@ -65,6 +65,25 @@ class WheelhouseHardeningTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'Symlink is not allowed'):
                 prepare(lock, root/'out', ['arm64-v8a'], True, cache)
 
+    def test_symlink_destination_directory_is_rejected(self):
+        with tempfile.TemporaryDirectory() as d:
+            data, filename, lock = fixture(); root = Path(d)
+            target = root/'elsewhere'; target.mkdir()
+            alias = root/'out'; alias.symlink_to(target, target_is_directory=True)
+            cache = root/'cache'; cache.mkdir(); (cache/filename).write_bytes(data)
+            with self.assertRaisesRegex(ValueError, 'destination cannot be a symlink'):
+                prepare(lock, alias, ['arm64-v8a'], True, cache)
+            self.assertEqual(list(target.iterdir()), [])
+
+    def test_symlink_cache_directory_is_rejected(self):
+        with tempfile.TemporaryDirectory() as d:
+            data, filename, lock = fixture(); root = Path(d)
+            target = root/'elsewhere'; target.mkdir()
+            (target/filename).write_bytes(data)
+            alias = root/'cache'; alias.symlink_to(target, target_is_directory=True)
+            with self.assertRaisesRegex(ValueError, 'cache cannot be a symlink'):
+                prepare(lock, root/'out', ['arm64-v8a'], True, alias)
+
     def test_modified_locked_wheel_is_rejected(self):
         with tempfile.TemporaryDirectory() as d:
             _, filename, lock = fixture(); root = Path(d)

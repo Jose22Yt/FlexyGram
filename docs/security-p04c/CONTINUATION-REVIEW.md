@@ -8,15 +8,15 @@ Trabajo de Work recuperado: `03ee4e03a3497f9082e564b257f7313bbef536ca`, rama `se
 
 - Se conserva el cambio original de Work: `ANDROID_PLATFORM=android-24` (frente a minSdk 24), lock Python con versiones y hashes, auditoría estática ELF/API24 y pruebas sintéticas.
 - Se cierra una condición permisiva en `tools/native_compatibility/wheelhouse.py`: anteriormente se filtraban solo `*.whl` en el directorio de salida; otros archivos, directorios o symlinks podían permanecer en una ubicación utilizada después por pip mediante `--find-links`.
-- Se rechazan **todas** las entradas del directorio que no sean archivos regulares de wheel con nombre listado; se rechazan symlinks tanto en salida como en caché. El comportamiento normal de caché offline y las verificaciones SHA-256/CRC se conservan.
-- Se añadieron seis regresiones independientes en `tests/native_compatibility/test_wheelhouse_hardening.py`.
+- Se rechazan directorios raíz de salida/caché que sean enlaces simbólicos, además de sus archivos internos. Se rechazan **todas** las entradas del directorio que no sean archivos regulares de wheel con nombre listado; se rechazan symlinks tanto en salida como en caché. El comportamiento normal de caché offline y las verificaciones SHA-256/CRC se conservan.
+- Se añadieron ocho regresiones independientes en `tests/native_compatibility/test_wheelhouse_hardening.py`.
 - Se actualizó el hash esperado y la trazabilidad explícita de `tests/native_compatibility/reviewed_changes.json` sin tocar los snapshots históricos de P0.3g/P0.4b.
 
 ## Resultados realmente ejecutados
 
 La revisión de esta continuación se hizo con acceso GitHub a la fuente y un entorno Python local aislado, **sin** checkout Android completo ni descarga de artefactos externos.
 
-- `python -m unittest -v test_wheelhouse_hardening` (con la versión exacta de la herramienta copiada del HEAD y los cambios anteriores): **6/6 aprobadas**, 0 fallos (Python 3.13 del host de revisión). Las pruebas no realizan peticiones de red.
+- `python -m unittest -v test_wheelhouse_hardening` (con la versión exacta de la herramienta copiada del HEAD y los cambios anteriores): **8/8 aprobadas**, 0 fallos (Python 3.13 del host de revisión). Las pruebas no realizan peticiones de red.
 - `python -m compileall` de la herramienta y pruebas: **aprobado**.
 - No se han ejecutado las pruebas completas de P0.4c/P0.4b en este entorno: falta pyelftools y un checkout completo para las comprobaciones de alcance de Git.
 - No se ejecutó Gradle ni se compiló una APK en esta continuación. No se contaba con SDK/NDK/CMake Android, wrapper recuperado o emulador, ni acceso al APK interno de Work.
