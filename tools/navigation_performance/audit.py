@@ -56,6 +56,34 @@ CHECKS = (
 )
 
 
+def _method_body(source: str, anchor: str) -> tuple[int, str] | None:
+    """Return the span of one Java method; never inspect a neighboring method.
+
+    Mask comments and Java string/character literals before matching braces.
+    The mask preserves offsets so evidence lines refer to the real source.
+    """
+    masked = re.sub(
+        r'//[^\n]*|/\*[\s\S]*?\*/|"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\'',
+        lambda match: " " * len(match.group(0)),
+        source,
+    )
+    start = masked.find(anchor)
+    if start == -1:
+        return None
+    opening = masked.find("{", start + len(anchor))
+    if opening < 0 or ";" in masked[start + len(anchor):opening]:
+        return None
+    nesting = 0
+    for index in range(opening, len(masked)):
+        if masked[index] == "{":
+            nesting += 1
+        elif masked[index] == "}":
+            nesting -= 1
+            if nesting == 0:
+                return opening + 1, source[opening + 1:index]
+    return None
+
+
 def audit(root: Path) -> dict:
     root = Path(root)
     data: dict[str, str] = {}
@@ -73,11 +101,12 @@ def audit(root: Path) -> dict:
         if source is None:
             missing.append(code)
             continue
-        offset = source.find(anchor)
-        if offset < 0:
+        method = _method_body(source, anchor)
+        if method is None:
             missing.append(code)
             continue
-        match = re.search(pattern, source[offset:offset + width], flags=re.DOTALL)
+        offset, body = method
+        match = re.search(pattern, body[:width], flags=re.DOTALL)
         if match is None:
             missing.append(code)
             continue
@@ -113,7 +142,7 @@ def main(argv=None) -> int:
     args = parser.parse_args(argv)
     report = audit(args.repo)
     print(json.dumps(report, ensure_ascii=False, indent=2))
-    return int(args.strict and (report["missing_checks"] or report["unreadable"]))
+    return int(bool(args.strict and (report["missing_checks"] or report["unreadable"])))
 
 
 if __name__ == "__main__":
