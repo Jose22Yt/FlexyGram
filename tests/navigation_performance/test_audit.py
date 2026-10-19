@@ -6,7 +6,14 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from audit import SOURCES, audit, main
+import importlib.util
+
+# Stable module identity even when other project's audit.py was imported first.
+AUDIT_PATH = Path(__file__).resolve().parents[2] / "tools/navigation_performance/audit.py"
+SPEC = importlib.util.spec_from_file_location("flexygram_navigation_audit", AUDIT_PATH)
+MODULE = importlib.util.module_from_spec(SPEC)
+SPEC.loader.exec_module(MODULE)
+SOURCES, audit, main = MODULE.SOURCES, MODULE.audit, MODULE.main
 
 
 NAV = """
@@ -97,6 +104,34 @@ class NavigationAuditTests(unittest.TestCase):
             "fragment == null || checkTransitionAnimation() || animationInProgress",
             "fragment == null || animationInProgress"))
         self.assertIn("PRESENT_REJECTS_TRANSITION", self.result()["missing_checks"])
+
+    def test_present_guard_does_not_match_neighbor_method(self):
+        # The same guard text elsewhere in ActionBarLayout must not hide a
+        # removed presentFragment guard.
+        altered = NAV.replace(
+            "fragment == null || checkTransitionAnimation() || animationInProgress",
+            "fragment == null || animationInProgress")
+        self.write("navigation", altered + """
+public boolean unrelatedMethod() {
+    if (checkTransitionAnimation() || animationInProgress || startedTracking) {
+        return false;
+    }
+}
+""")
+        self.assertIn("PRESENT_REJECTS_TRANSITION",
+                      self.result()["missing_checks"])
+
+    def test_guard_only_inside_a_java_comment_does_not_count(self):
+        altered = NAV.replace(
+            "fragment == null || checkTransitionAnimation() || animationInProgress",
+            "fragment == null || animationInProgress")
+        altered = altered.replace(
+            "public boolean presentFragment(NavigationParams params) {",
+            "public boolean presentFragment(NavigationParams params) {\n"
+            " // if (checkTransitionAnimation() || animationInProgress || startedTracking) return false;\n")
+        self.write("navigation", altered)
+        self.assertIn("PRESENT_REJECTS_TRANSITION",
+                      self.result()["missing_checks"])
 
     def test_close_gate_mutation_is_detected(self):
         self.write("navigation", NAV.replace(
