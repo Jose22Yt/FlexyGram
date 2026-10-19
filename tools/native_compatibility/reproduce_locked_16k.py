@@ -64,13 +64,10 @@ def check_inputs(sources: Path, wheelhouse: Path, ndk: Path, cmake: Path) -> int
     source_manifest = load(NATIVE / 'rebuild-sources.json')
     for row in source_manifest['archives'] + [BINUTILS]:
         verify_archive(sources / row['file'], row['sha256'])
-    freetype = sources / 'freetype-git'
-    if freetype.is_symlink() or not (freetype / '.git').exists():
-        raise ValueError('Pinned FreeType Git checkout is missing')
-    commit = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=freetype,
-                                     text=True, timeout=10).strip()
-    if commit != source_manifest['freetype_commit']:
-        raise ValueError('Pinned FreeType revision differs')
+    # Work's private recovery bundle contains the SHA-pinned git-archive TAR.
+    # That TAR and the real fixed Git commit are equivalent approved inputs.
+    from pinned_freetype import read_pinned_freetype
+    read_pinned_freetype(sources, source_manifest['freetype_commit'])
     approved = select(load(REPO / 'TMessagesProj/python/wheels.lock.json'), ['arm64-v8a'])
     if len(approved) != 18:
         raise ValueError('Expected 18 locked ARM64 wheels')
