@@ -1,0 +1,65 @@
+{
+  "security": {
+    "tests": 26,
+    "failed": 0,
+    "skipped": 0
+  },
+  "preparation": {
+    "tests": 27,
+    "failed": 0,
+    "skipped": 0
+  },
+  "runtime_policy": {
+    "tests": 4,
+    "failed": 0,
+    "skipped": 0
+  },
+  "total": 57,
+  "python": "3.11.17",
+  "test_compiler": "Temurin JDK 21.0.12.1",
+  "kotlin_compiler": "2.4.0 from Gradle 9.7.1",
+  "callsites_before": 59,
+  "callsites_after": 55,
+  "source_files_before": 24,
+  "source_files_after": 22,
+  "reviewed_preservation_changes": {
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/GoogleTranslator.kt": {
+      "before": "089adfc891f1d6410178415122bd6363ab9a0496f4ad9224a4b9e7642ea4d561",
+      "after": "0555a42de6a1efca64362ba8ed6c284bcbdfa0318bd142c738dd2ec9b60cc3eb"
+    },
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/GoogleAppTranslator.kt": {
+      "before": "9b94b5448bdbc0a33dcdd72ac7223a5760a3bd970879f1ee5d3a7c0fcf6cdbaf",
+      "after": "af3ea371b13144f1c1afb1a9a5112cbb93c745cbc1f019d6fa0d77429bfb372c"
+    },
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/GoogleCloudTranslator.kt": {
+      "before": "aaf3298f355c9f33911365ed7991174bf94746d1c25264fca15660eb90e4a3d4",
+      "after": "c9c152ae33bcbc444c5c1e035fa9a57446fa7fd42fccfb2b703ad120972f55af"
+    },
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/RealMicrosoftTranslator.kt": {
+      "before": "413196aa5763b882c39d7cc65964351bfff28847371a6720d9e0d8eea0a298f1",
+      "after": "5ccdd25e81acda444daef42d3c24209449082968b24bd23784b67693953ab843"
+    },
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/MicrosoftTranslator.kt": {
+      "before": "502cbaf874f37cd686bd3db31d41258ce844ce4a83749573bb9187a686d0eed1",
+      "after": "72ecff7433ee2230ebe85356c3660647a04d12fec8ce44e64e5b8d8416a7132a"
+    },
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/DeepLTranslator.kt": {
+      "before": "564fdd52219c0761d360ad048692860362aa2f665e1d2ebcc16a2b53e5e5bea2",
+      "after": "70d613a49e80236416f7b4622df7c83f63496c8218324e8d825f0527d5b8a77d"
+    },
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/LLMTranslator.kt": {
+      "before": "1d47c37cb78605db51157564343087da7006cfd8f26a7b842fd6e8481909e472",
+      "after": "a99ec21303ed290619b78a7d9ebd683ab65cf106811b4eb198faab724f500c44"
+    },
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/fallback/GoogleTranslatorNeko.java": {
+      "before": "3fc1c292b71c7798a8ef3e4a93b006769e79834e3a5f5b21223a55cd600bcf88",
+      "after": "1e0251e13382ba66c479e2af653824058421399b6e4e57158d5793e06e552bc1"
+    },
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/fallback/DeepLTranslatorNeko.java": {
+      "before": "063241eb57de1a9a09c9a4c66e03a2686c3ea905afbe17a919a6d023b30b5eee",
+      "after": "d52599b387c76e0ec563e9051b2c74fdb0db8058f3c69b367f3266dff820d83f"
+    }
+  },
+  "no_android_runtime": true,
+  "no_real_services": true
+}

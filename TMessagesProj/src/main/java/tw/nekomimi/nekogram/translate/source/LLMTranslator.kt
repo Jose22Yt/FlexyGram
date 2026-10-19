@@ -1,12 +1,13 @@
 package tw.nekomimi.nekogram.translate.source
 
+import tw.nekomimi.nekogram.translate.TranslationServicesPolicy
 import kotlinx.coroutines.ThreadContextElement
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 import org.telegram.messenger.BuildVars
-import org.telegram.messenger.FileLog
 import org.telegram.messenger.LocaleController.getString
 import org.telegram.messenger.R
 import org.telegram.tgnet.TLRPC
@@ -107,6 +108,7 @@ object LLMTranslator : Translator {
         query: String,
         entities: ArrayList<TLRPC.MessageEntity>
     ): TLRPC.TL_textWithEntities {
+        TranslationServicesPolicy.requireRoute(TranslationServicesPolicy.Route.LLM)
         var retryCount = 0
 
         val originalText = TLRPC.TL_textWithEntities()
@@ -120,6 +122,8 @@ object LLMTranslator : Translator {
         ) else query
 
         while (retryCount < MAX_RETRY) {
+            kotlinx.coroutines.currentCoroutineContext().ensureActive()
+            TranslationServicesPolicy.requireRoute(TranslationServicesPolicy.Route.LLM)
             try {
                 val translatedText = doLLMTranslate(to.code2Locale.displayName, textToTranslate)
                 return if (entities.isNotEmpty()) {
@@ -134,6 +138,8 @@ object LLMTranslator : Translator {
                         text = translatedText
                     }
                 }
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
             } catch (_: RateLimitException) {
                 retryCount++
                 val actualWaitTimeMillis = backoffDelayWithJitterMillis(retryCount)
@@ -144,36 +150,24 @@ object LLMTranslator : Translator {
             } catch (e: IOException) {
                 retryCount++
                 if (BuildVars.LOGS_ENABLED) {
-                    AndroidUtil.showErrorDialog(e)
+                    AndroidUtil.showErrorDialog(TranslationServicesPolicy.safeErrorCode(e))
                 }
                 if (retryCount >= MAX_RETRY) {
-                    if (BuildVars.LOGS_ENABLED) {
-                        AndroidUtil.showErrorDialog("Max retry count reached due to network errors, falling back to GoogleAppTranslator")
-                    }
-                    return GoogleAppTranslator.doTranslate(from, to, query, entities)
+                    throw TranslationServicesPolicy.safeFailure(e)
                 }
                 val waitTimeMillis = backoffDelayMillis(retryCount)
                 delay(waitTimeMillis.milliseconds)
-            } catch (e: UnsupportedOperationException) {
-                throw e
             } catch (e: Exception) {
-                if (BuildVars.LOGS_ENABLED) {
-                    AndroidUtil.showErrorDialog("Error during LLM translation, falling back to GoogleAppTranslator.\n$e")
-                }
-                return GoogleAppTranslator.doTranslate(from, to, query, entities)
+                throw TranslationServicesPolicy.safeFailure(e)
             }
         }
-        if (BuildVars.LOGS_ENABLED) {
-            AndroidUtil.showErrorDialog("Max retry count reached, falling back to GoogleAppTranslator")
-        }
-        return GoogleAppTranslator.doTranslate(from, to, query, entities)
+        throw IllegalStateException("TRANSLATION_RETRIES_EXHAUSTED")
     }
 
     @Throws(IOException::class, RateLimitException::class, UnsupportedOperationException::class)
     private fun doLLMTranslate(to: String, query: String): String {
+        TranslationServicesPolicy.requireRoute(TranslationServicesPolicy.Route.LLM)
         val apiKey = getNextApiKey() ?: throw UnsupportedOperationException(getString(R.string.ApiKeyNotSet))
-        val apiKeyForLog = apiKey.takeLast(2)
-        FileLog.d("createPost: Bearer $apiKeyForLog")
 
         val llmProviderPreset = NaConfig.llmProviderPreset.Int()
         val apiUrl = LlmConfig.getEffectiveBaseUrl(llmProviderPreset)
@@ -209,7 +203,6 @@ object LLMTranslator : Translator {
                 put("content", userPrompt)
             })
         }
-        FileLog.d("Requesting LLM API with model: $model, messages: $messages")
 
         val response = if (llmProviderPreset == PresetRegistry.GOOGLE_AGENT_PLATFORM) {
             VertexGeminiClient.generateContent(apiUrl, apiKey, model, messages)
@@ -223,8 +216,8 @@ object LLMTranslator : Translator {
             val apiKeyNotSet = getString(R.string.ApiKeyNotSet)
             when {
                 code == 429 -> throw RateLimitException("LLM API rate limit exceeded")
-                code in 400..499 || (code == 0 && error == apiKeyNotSet) -> throw UnsupportedOperationException(error)
-                else -> throw IOException(error)
+                code in 400..499 || (code == 0 && error == apiKeyNotSet) -> throw UnsupportedOperationException("TRANSLATION_REQUEST_REJECTED")
+                else -> throw IOException("TRANSLATION_REQUEST_FAILED")
             }
         }
 

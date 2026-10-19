@@ -211,12 +211,15 @@ class SourcePreparationChecks(unittest.TestCase):
     def test_source_inventory_matches_explicit_review(self):
         self.assertEqual(collect(), json.loads(SNAPSHOT.read_text()))
 
-    def test_llm_direct_fallback_and_forced_google_rich_content_are_in_inventory(self):
+    def test_removed_llm_fallback_and_explicit_rich_provider_are_reviewed(self):
         rows = collect()['callsites']
         llm = [r for r in rows if r['path'].endswith('/LLMTranslator.kt')
                and r['symbol']=='GoogleAppTranslator.doTranslate']
-        self.assertEqual(len(llm), 3)
-        self.assertTrue(any(r['path'].endswith('/MessageTrans.kt') and r['line']==389 for r in rows))
+        self.assertEqual(len(llm), 0)
+        self.assertTrue(any(r['path'].endswith('/MessageTrans.kt') and r['symbol']=='Translator.translate' for r in rows))
+        rich = (ROOT/'TMessagesProj/src/main/java/tw/nekomimi/nekogram/parts/MessageTrans.kt').read_text()
+        self.assertNotIn('Translator.providerGoogle', rich)
+        self.assertIn('Translator.translate(target, text, provider)', rich)
 
     def test_shared_engines_and_isolation_sources_preserved(self):
         snapshot = json.loads(Path(__file__).with_name('preserved_sources.json').read_text())

@@ -1,0 +1,70 @@
+{
+  "tw.nekomimi.nekogram.translate.source.GoogleTranslator": {
+    "policy_invocations": 2,
+    "class_sha256": "cd07ce331504a4a8f1be611e69832e275a02fab7e84df256e2dabdea7556d3a0"
+  },
+  "tw.nekomimi.nekogram.translate.source.GoogleAppTranslator": {
+    "policy_invocations": 2,
+    "class_sha256": "8278523ea5321c849c10e6270cedddd0d1f4423e11945e2233572026e6d8b563"
+  },
+  "tw.nekomimi.nekogram.translate.source.GoogleCloudTranslator": {
+    "policy_invocations": 1,
+    "class_sha256": "31c9c3cd267280322318a6215226199f56400cbdd9644403233f936194e8e7f4"
+  },
+  "tw.nekomimi.nekogram.translate.source.LLMTranslator": {
+    "policy_invocations": 3,
+    "class_sha256": "9079860fab2bfce4640f41345e4bc9ab6b2a31c26574bd9857f81ec33209b8f2"
+  },
+  "tw.nekomimi.nekogram.translate.source.MicrosoftTranslator": {
+    "policy_invocations": 1,
+    "class_sha256": "15098230fd21546c66fb89fd30f11ab0a32d2fd32cf10e8374b496d6eaff744a"
+  },
+  "tw.nekomimi.nekogram.translate.source.RealMicrosoftTranslator": {
+    "policy_invocations": 1,
+    "class_sha256": "7008c4e4652267fb3415d9c4bc844c72d3b2f84d2d33bbfa19f109b9906a98ff"
+  },
+  "tw.nekomimi.nekogram.translate.source.DeepLTranslator": {
+    "policy_invocations": 1,
+    "class_sha256": "fb7ca6d0933264365126b82d689e509354a7d21ebaff70d25245c0910366719d"
+  },
+  "tw.nekomimi.nekogram.translate.source.YandexTranslator": {
+    "policy_invocations": 1,
+    "class_sha256": "48ab982dc5b8239f153924c1bf4a5aa0fa92e83b0ffa001597e019991ac126e7"
+  },
+  "tw.nekomimi.nekogram.translate.source.LingoTranslator": {
+    "policy_invocations": 1,
+    "class_sha256": "78b99bcbf40e3819f7e82765da4263f669f33c61f7d50f3985f978d77236ee2c"
+  },
+  "tw.nekomimi.nekogram.translate.source.TelegramAPITranslator": {
+    "policy_invocations": 1,
+    "class_sha256": "981faa88141af763f877a76c8448526764c1cb6d238eeded2c4c6668abe7fb3d"
+  },
+  "tw.nekomimi.nekogram.translate.source.TranSmartTranslator": {
+    "policy_invocations": 1,
+    "class_sha256": "068057811c04fa087d383705947c308b565121eda5e16686551a3326cfd26104"
+  },
+  "tw.nekomimi.nekogram.translate.source.fallback.GoogleTranslatorNeko": {
+    "policy_invocations": 1,
+    "class_sha256": "b08a89b1d786eda1ea91a44668782b7af1cb23a0e51f50644167ab334edccd27"
+  },
+  "tw.nekomimi.nekogram.translate.source.fallback.DeepLTranslatorNeko": {
+    "policy_invocations": 1,
+    "class_sha256": "406bad526fff0f71b6feced8a1a2fb61f8df8cae9f5a59565b768e78f7ab5716"
+  },
+  "tw.nekomimi.nekogram.translate.Translator$Companion": {
+    "policy_invocations": 3,
+    "class_sha256": "bcd5f7ec0e5a96919cd6af362dc4e0d32a10b34666a70791fba76a0e8ed1e7e7"
+  },
+  "tw.nekomimi.nekogram.translate.Translator$Companion$translatePoll$1": {
+    "policy_invocations": 1,
+    "class_sha256": "04e86f4395dcb6364725a713202893df2edbb5b297c763a9970b34794d8b4256"
+  },
+  "tw.nekomimi.nekogram.translate.Translator$Companion$translateWithContext$1": {
+    "policy_invocations": 1,
+    "class_sha256": "015e5892b53115c5192d1247fdebbdb1b7e5f9f19ac89ffbc25206393714c71f"
+  },
+  "tw.nekomimi.nekogram.parts.MessageTransKt": {
+    "policy_invocations": 3,
+    "class_sha256": "7a49c7037dba0fc22c0a6212c20ae3114ea0efa389c6f2ba5e6ca803436c7274"
+  }
+}

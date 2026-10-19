@@ -1,6 +1,9 @@
 package tw.nekomimi.nekogram.parts
 
 import android.content.Context
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -22,6 +25,7 @@ import org.telegram.tgnet.tl.TL_iv
 import org.telegram.ui.ChatActivity
 import tw.nekomimi.nekogram.NekoConfig
 import tw.nekomimi.nekogram.helpers.MessageHelper
+import tw.nekomimi.nekogram.translate.TranslationServicesPolicy
 import tw.nekomimi.nekogram.translate.Translator
 import tw.nekomimi.nekogram.translate.code2Locale
 import tw.nekomimi.nekogram.translate.locale2code
@@ -235,6 +239,13 @@ fun ChatActivity.translateMessages(
         ?: selectedObjectGroup?.messages
         ?: emptyList()
 ) {
+    val selectedProvider = provider.takeIf { it != 0 } ?: NekoConfig.translationProvider.Int()
+    if (!TranslationServicesPolicy.isProviderAuthorized(selectedProvider)) {
+        messages.firstOrNull()?.let { msg ->
+            handleTranslationError(parentActivity, TranslationServicesPolicy.denied(), msg, translateController) {}
+        }
+        return
+    }
     if (messages.any { translateController.isTranslating(it) }) return
 
     val targetLanguage = targetLocale.toLanguageTag()
@@ -286,7 +297,7 @@ fun ChatActivity.translateMessages(
                     if (!isActive) return@launch
                     translateSingleMessage(
                         msg,
-                        provider,
+                        selectedProvider,
                         targetLocale,
                         targetLanguage,
                         translatorMode,
@@ -306,6 +317,8 @@ private suspend fun ChatActivity.translateSingleMessage(
     translatorMode: Int,
     canReuseCache: Boolean,
 ) {
+    currentCoroutineContext().ensureActive()
+    TranslationServicesPolicy.requireProvider(provider)
     val needsSummary = msg.needsSummaryTranslation(canReuseCache, targetLanguage)
     val needsOriginal = msg.needsOriginalTranslation(canReuseCache, targetLanguage)
 
@@ -324,7 +337,7 @@ private suspend fun ChatActivity.translateSingleMessage(
     // Translate original content if needed
     if (needsOriginal) {
         val success = when {
-            msg.isRich -> translateRichMessageContent(msg, targetLocale)
+            msg.isRich -> translateRichMessageContent(msg, targetLocale, provider)
             msg.isPoll -> translatePoll(msg, targetLocale, provider) &&
                     (msg.messageOwner.message.isNullOrEmpty() ||
                             translateMessageContent(msg, targetLocale, provider, translatorMode, llmContext))
@@ -373,8 +386,11 @@ private suspend fun ChatActivity.translateSummary(
 
 private suspend fun ChatActivity.translateRichMessageContent(
     msg: MessageObject,
-    target: Locale
+    target: Locale,
+    provider: Int
 ): Boolean {
+    currentCoroutineContext().ensureActive()
+    TranslationServicesPolicy.requireProvider(provider)
     val richMessage = msg.messageOwner.rich_message ?: return false
     val targetLanguage = target.locale2code
     val texts = RichMessageTransHelper.collectPlainTexts(richMessage)
@@ -386,7 +402,7 @@ private suspend fun ChatActivity.translateRichMessageContent(
             texts.map { text ->
                 async(dispatcher) {
                     if (!isActive) return@async
-                    val translated = Translator.translate(target, text, Translator.providerGoogle) // Google Translate is forced here due to rate limits
+                    val translated = Translator.translate(target, text, provider)
                     RichMessageTransHelper.putCachedTranslation(richMessage, targetLanguage, text, translated)
                 }
             }.awaitAll()
@@ -394,7 +410,7 @@ private suspend fun ChatActivity.translateRichMessageContent(
         RichMessageTransHelper.hasFullCache(richMessage, targetLanguage)
     }.getOrElse { e ->
         handleTranslationError(parentActivity, e, msg, translateController) {
-            translateMessages(target, 0, listOf(msg))
+            translateMessages(target, provider, listOf(msg))
         }
         false
     }
@@ -684,6 +700,8 @@ private suspend fun translateText(
     provider: Int,
     llmContext: String?
 ): TLRPC.TL_textWithEntities {
+    currentCoroutineContext().ensureActive()
+    TranslationServicesPolicy.requireProvider(provider)
     val safeEntities = entities ?: ArrayList()
 
     return if (llmContext != null) {
@@ -704,14 +722,15 @@ private fun handleTranslationError(
 ) {
     controller.removeAsTranslatingItem(messageObject)
     controller.removeAsManualTranslate(messageObject)
+    if (throwable is CancellationException) throw throwable
 
     if (parentActivity != null) {
         AlertUtil.showTransFailedDialog(
             parentActivity,
             throwable is UnsupportedOperationException,
-            throwable.message ?: throwable.javaClass.simpleName
+            TranslationServicesPolicy.safeErrorCode(throwable)
         ) {
-            retryAction()
+            if (throwable !is SecurityException) retryAction()
         }
     }
 }

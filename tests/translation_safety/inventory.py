@@ -34,7 +34,7 @@ def collect():
                          'line':clean.count('\n', 0, match.start())+1,
                          'symbol':symbol})
     paths = sorted({row['path'] for row in rows})
-    return {'schema':1, 'audited_source_base':'2cc41769339d9689498c5f23b446f4cfdf3ad8c0',
+    return {'schema':1, 'audited_source_base':'333dd8c9beb35a2e3caa985279858df7b5bc2ee7',
             'callsites':rows,
             'source_sha256':{p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in paths},
             'limits':'Lexical Kotlin/Java snapshot; reflection, generated code, plugins and binary calls need separate review.'}

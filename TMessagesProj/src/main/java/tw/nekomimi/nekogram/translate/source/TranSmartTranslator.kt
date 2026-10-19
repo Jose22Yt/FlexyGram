@@ -1,5 +1,6 @@
 package tw.nekomimi.nekogram.translate.source
 
+import tw.nekomimi.nekogram.translate.TranslationServicesPolicy
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONArray
@@ -18,7 +19,7 @@ import java.util.UUID
 
 object TranSmartTranslator : Translator {
 
-    private val httpClient = HttpClient.instance
+    private val httpClient by lazy { HttpClient.instance }
 
     private fun getRandomBrowserVersion(): String {
         val majorVersion = (Math.random() * 17).toInt() + 100
@@ -36,6 +37,7 @@ object TranSmartTranslator : Translator {
     override suspend fun doTranslate(
         from: String, to: String, query: String, entities: ArrayList<TLRPC.MessageEntity>
     ): TLRPC.TL_textWithEntities {
+        TranslationServicesPolicy.requireRoute(TranslationServicesPolicy.Route.TRANSMART)
 
         if (to.lowercase() !in targetLanguages.map { it.lowercase() }) {
             throw UnsupportedOperationException(getString(R.string.TranslateApiUnsupported) + " " + to)

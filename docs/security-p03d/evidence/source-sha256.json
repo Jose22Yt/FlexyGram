@@ -1,0 +1,28 @@
+{
+  "base_commit": "333dd8c9beb35a2e3caa985279858df7b5bc2ee7",
+  "source_sha256": {
+    "TMessagesProj/build.gradle": "f978651af1f32a66c32ffc864a0ea628e1281cd456ad57d5d04934bce8b844b0",
+    "TMessagesProj/src/main/AndroidManifest.xml": "7e1e6f45cb47a842aa07c732e6ebe5a735f4f7840ac60b8f77c7b203c07b5240",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/parts/MessageTrans.kt": "8e09b26dc66f02d336d04291f6294a365103ef972a84c8d971446ffefe075dba",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/CustomElementHandler.java": "da8bd17d7d6b5256b00c4e43c1da926a480be086bcf6aecb9c65c39fcc6ecdae",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/HTMLKeeper.java": "097bb74a3f844dc45aabf0e6f078de1f5d705eb91d5a9e015a5e897ec6ded8c8",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/HTMLTagAttributesHandler.java": "6bbf088897d18abbe70fbe083396e681cbdf9359e68e7000c1d886e711a2245f",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/TransUtils.java": "436497b88946fb220417926219459fd137c63d3159847a2d48a387d3eee3788b",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/TranslationServicesPolicy.java": "b0725b36eeac813cd4d5043bb9371df8ae2d70697b5b2f631a8782234c1ce667",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/Translator.kt": "f54cfb4519bf906e266d27fcf1499a69d2d3906b0a7e203ae3b8eb0dd7e4234a",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/DeepLTranslator.kt": "70d613a49e80236416f7b4622df7c83f63496c8218324e8d825f0527d5b8a77d",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/GoogleAppTranslator.kt": "af3ea371b13144f1c1afb1a9a5112cbb93c745cbc1f019d6fa0d77429bfb372c",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/GoogleCloudTranslator.kt": "c9c152ae33bcbc444c5c1e035fa9a57446fa7fd42fccfb2b703ad120972f55af",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/GoogleTranslator.kt": "0555a42de6a1efca64362ba8ed6c284bcbdfa0318bd142c738dd2ec9b60cc3eb",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/LLMTranslator.kt": "a99ec21303ed290619b78a7d9ebd683ab65cf106811b4eb198faab724f500c44",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/LingoTranslator.kt": "0688fb81d788b741ab0bce2a809ae996304046c03230fc1c1c0970d2dacb5bf9",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/MicrosoftTranslator.kt": "72ecff7433ee2230ebe85356c3660647a04d12fec8ce44e64e5b8d8416a7132a",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/RealMicrosoftTranslator.kt": "5ccdd25e81acda444daef42d3c24209449082968b24bd23784b67693953ab843",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/TelegramAPITranslator.kt": "242388ec2801a6f179e1e77aaa38feee18d558e367f1d15f8cfc81cddee4bd93",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/TranSmartTranslator.kt": "e359abb048b43f2b13971a3b623d595464f668fc8d83a53c5a4035f1f516e8fc",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/YandexTranslator.kt": "7be6e9ba99a49d273bff6ccb8c0ca251b60ac519878bb68e39ba881e4bf90a28",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/fallback/DeepLTranslatorNeko.java": "d52599b387c76e0ec563e9051b2c74fdb0db8058f3c69b367f3266dff820d83f",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/fallback/GoogleTranslatorNeko.java": "1e0251e13382ba66c479e2af653824058421399b6e4e57158d5793e06e552bc1",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/raw/BingTranslatorRaw.java": "54def68f09c81b467f25604520f6cdb9f91c0a7d199809745b6d1f9ff85bca4b"
+  }
+}

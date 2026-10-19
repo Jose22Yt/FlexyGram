@@ -1,5 +1,6 @@
 package tw.nekomimi.nekogram.translate.source
 
+import tw.nekomimi.nekogram.translate.TranslationServicesPolicy
 import android.text.TextUtils
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.telegram.messenger.FileLog
@@ -22,6 +23,7 @@ object TelegramAPITranslator : Translator {
     override suspend fun doTranslate(
         from: String, to: String, query: String, entities: ArrayList<TLRPC.MessageEntity>
     ): TLRPC.TL_textWithEntities {
+        TranslationServicesPolicy.requireRoute(TranslationServicesPolicy.Route.TELEGRAM)
 
         return suspendCancellableCoroutine { continuation ->
             val originalText = TLRPC.TL_textWithEntities()

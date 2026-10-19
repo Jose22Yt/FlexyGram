@@ -1,5 +1,6 @@
 package tw.nekomimi.nekogram.translate.source
 
+import tw.nekomimi.nekogram.translate.TranslationServicesPolicy
 import org.telegram.messenger.LocaleController.getString
 import org.telegram.messenger.R
 import org.telegram.tgnet.TLRPC
@@ -11,7 +12,7 @@ import java.io.IOException
 
 object MicrosoftTranslator : Translator {
 
-    private val rawTranslator = BingTranslatorRaw()
+    private val rawTranslator by lazy { BingTranslatorRaw() }
 
     override suspend fun doTranslate(
         from: String,
@@ -19,6 +20,7 @@ object MicrosoftTranslator : Translator {
         query: String,
         entities: ArrayList<TLRPC.MessageEntity>
     ): TLRPC.TL_textWithEntities {
+        TranslationServicesPolicy.requireRoute(TranslationServicesPolicy.Route.MICROSOFT)
 
         val fromLang = if (from == "auto") "auto-detect" else from
         val toLang = when {

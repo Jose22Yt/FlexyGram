@@ -1,5 +1,6 @@
 package tw.nekomimi.nekogram.translate.source
 
+import tw.nekomimi.nekogram.translate.TranslationServicesPolicy
 import okhttp3.FormBody
 import okhttp3.Request
 import org.json.JSONException
@@ -22,11 +23,12 @@ object DeepLTranslator : Translator {
     const val FORMALITY_INFORMAL = 1
     const val FORMALITY_FORMAL = 2
 
-    private val httpClient = HttpClient.instance
+    private val httpClient by lazy { HttpClient.instance }
 
     override suspend fun doTranslate(
         from: String, to: String, query: String, entities: ArrayList<TLRPC.MessageEntity>
     ): TLRPC.TL_textWithEntities {
+        TranslationServicesPolicy.requireRoute(TranslationServicesPolicy.Route.DEEPL)
         if (to.isEmpty()) {
             throw UnsupportedOperationException(getString(R.string.TranslateApiUnsupported) + " " + to)
         }
