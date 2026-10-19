@@ -1,0 +1,19 @@
+{
+  "buildconfig-compiled.txt": "552fee0a549a362ce81519f2f6ce0edf023a973b67ee9b65cc2380998d3d097f",
+  "signature.log": "4c1fbd1d8ba3bfae2ef72d7018f5479f2f54f046a61d060c2252e6ccefa641fa",
+  "artifact-summary.json": "4eacf58d862f4bf62bb9ce8dbd97b6fb7b8519573cdfae06eba77881eb2959cb",
+  "tests.result.json": "4e1ee4057a88bb255a41cc1528ca44ad3d08daf2ec310cce83ba1735ef42c1a0",
+  "submodules.txt": "e019a6cdb33738f97fe77cbf3e9da7283c1329397096d0d890c2f9760e9d39c0",
+  "manifest-apk.json": "749aa3715efac520b1d23d8c041e296e69894e378624b5efb6233c9ed932e80d",
+  "provenance.json": "0e7561b4a5aff1138bb4c23f7c46bfb04c96641b89d93d177daf11242e429a92",
+  "translator-findings.json": "f83d7407e809841bed40e1f45a571c9522d19a157beb8f2fb4cfe7a4aa6e05d6",
+  "tests.log": "799018107239d2f008543efa14830cd8a716728fb7e4c44d3925e5ac1424888d",
+  "artifact-scan.json": "95801bcfabefa0da82a2a18e12fbcd6680428314e9a4aa3082c529a40ae96df4",
+  "supplemental-scan.json": "74f99dac7c1b0c8f0f0d51b30570fdd3247e87577a48b78260a401e3a5d4586e",
+  "build.log": "93b34c3ddeb67594b116d6670937110485c93a6f9ead20c3d4457c17e5c061a6",
+  "manifest-merged.json": "749aa3715efac520b1d23d8c041e296e69894e378624b5efb6233c9ed932e80d",
+  "buildconfig.json": "d1a7037c2ca6e5a215ae4021c3d3d19b3bf246f595ea15ecbe5bfd321516a467",
+  "build.result.json": "c0510123353b84a6468a0243d258bf3c185e20a01a292ad7f4d6acd5f7bd23e4",
+  "python-requirements-resolved.json": "6439e51c61b2b4ba5cfa38778450af85e30177bb08f5974bfb63eeed43bb4a95",
+  "manifest-mutations.json": "2d0c31e0773a607b45ab75fe68ee17d080bf3b0064d9ef55cb2580494770dff1"
+}

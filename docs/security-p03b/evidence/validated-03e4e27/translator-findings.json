@@ -1,0 +1,20 @@
+{
+  "apk_sha256": "bd4223a37ca463b33fb98c07b16433746e82468cf9743abbba1a0732f965d7f7",
+  "unique_client_keys": 2,
+  "dex_references": [
+    {
+      "dex": "classes20.dex",
+      "class": "Ltw/nekomimi/nekogram/translate/source/GoogleTranslator;",
+      "method": "translate",
+      "classification": "inherited translator client API key; authorization unresolved; value withheld"
+    },
+    {
+      "dex": "classes35.dex",
+      "class": "Lapp/nekogram/translator/GoogleAppTranslator;",
+      "method": "translateImpl",
+      "classification": "inherited translator client API key; authorization unresolved; value withheld"
+    }
+  ],
+  "server_secret_evidence": "No server credential established by this finding; embedding does not establish ownership or authorization",
+  "beta_gate": "Resolve translator service authorization and client-key restrictions before authenticated beta; no online validity probes performed"
+}

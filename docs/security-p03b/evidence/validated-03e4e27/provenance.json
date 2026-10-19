@@ -1,0 +1,23 @@
+{
+  "commit": "03e4e27e3a59b79b05f3b99b6fdee7d48709bc16",
+  "tree": "aab7e88c522c1df18bd3f028b9eb40fd9ec431af",
+  "gradle": "9.7.1",
+  "gradle_archive_sha256": "acd53f1edaf02f1a8ff99879f8a34b302661a057d9b063ae9e35b552f804d20a",
+  "java": "JetBrains JDK 21.0.11+10-b1163.116",
+  "python_host": "3.11.17",
+  "NATIVE_TARGET": "arm64-v8a",
+  "CMAKE": "SDK 3.31.6",
+  "source_changes": "",
+  "sdk_packages": {
+    "ndk/27.2.12479018": "Pkg.Desc = Android NDK\nPkg.Revision = 27.2.12479018\nPkg.BaseRevision = 27.2.12479018\nPkg.ReleaseName = r27c\n",
+    "build-tools/36.0.0": "Pkg.UserSrc=false\nPkg.Revision=36.0.0\n#Pkg.Revision=36.0.0 rc5",
+    "platforms/android-37.0": "Pkg.Desc=Android SDK Platform 17\nPkg.UserSrc=false\nPlatform.Version=17\nPlatform.CodeName=\nPkg.Revision=2\nAndroidVersion.ApiLevel=37.0\nAndroidVersion.CodeName=\nAndroidVersion.ExtensionLevel=22\nAndroidVersion.IsBaseSdk=true\nAndroidVersion.PreviewSdkInt=0\nAndroidVersion.BetaVersion=\nLayoutlib.Api=15\nLayoutlib.Revision=1\nPlatform.MinToolsRev=22\n",
+    "platforms/android-35": "Pkg.Desc=Android SDK Platform 15\nPkg.UserSrc=false\nPlatform.Version=15\nPlatform.CodeName=\nPkg.Revision=2\nAndroidVersion.ApiLevel=35\nAndroidVersion.ExtensionLevel=13\nAndroidVersion.IsBaseSdk=true\nLayoutlib.Api=15\nLayoutlib.Revision=1\nPlatform.MinToolsRev=22\n",
+    "cmake/3.31.6": "Pkg.Revision = 3.31.6\nPkg.Path = cmake;3.31.6\nPkg.Desc = CMake 3.31.6\n"
+  },
+  "private_configuration": "none; local ephemeral laboratory signing key only",
+  "dependency_note": "Python pip install declarations are unversioned upstream; resolved requirements will be recorded. No dependency declarations modified.",
+  "jdk_archive_sha256": "097bf328b5bf5a236c095b8c8e5204c0eda91e5baa06b37383a7754b10671d8b",
+  "chaquopy_target": "3.11.14-0",
+  "gson_2_14_0_sha1_verified": "efc0e34ede4e3204eaefb84a00e55e8c86634382"
+}

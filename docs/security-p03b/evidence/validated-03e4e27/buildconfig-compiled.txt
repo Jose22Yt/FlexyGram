@@ -1,0 +1,29 @@
+Compiled from "BuildConfig.java"
+public final class org.telegram.messenger.BuildConfig {
+  public static final boolean DEBUG;
+  public static final java.lang.String APPLICATION_ID = "io.github.jose22yt.flexygram.diagnostic";
+  public static final java.lang.String BUILD_TYPE = "debug";
+  public static final int VERSION_CODE = 1261;
+  public static final java.lang.String VERSION_NAME = "13.0.2";
+  public static final java.lang.String APP_HASH = "";
+  public static final int APP_ID = 0;
+  public static final java.lang.String BUILD_COMMIT_ID = "";
+  public static final long BUILD_TIMESTAMP = 0l;
+  public static final java.lang.String BUILD_VERSION_STRING = "13.0.2";
+  public static final boolean DEBUG_TOOLS = false;
+  public static final java.lang.String FLEXYGRAM_FCM_API_KEY = "";
+  public static final java.lang.String FLEXYGRAM_FCM_APP_ID = "";
+  public static final boolean FLEXYGRAM_FCM_ENABLED = false;
+  public static final java.lang.String FLEXYGRAM_FCM_PROJECT_ID = "";
+  public static final java.lang.String FLEXYGRAM_FCM_SENDER_ID = "";
+  public static final java.lang.String FLEXYGRAM_PUSH_ANDROID_ID = "";
+  public static final java.lang.String FLEXYGRAM_PUSH_SCOPE = "";
+  public static final java.lang.String FLEXYGRAM_UNIFIED_DISTRIBUTOR = "";
+  public static final java.lang.String FLEXYGRAM_UNIFIED_GATEWAY = "";
+  public static final boolean FLEXYGRAM_UNIFIED_PUSH_ENABLED = false;
+  public static final boolean ISOLATED_DIAGNOSTIC = true;
+  public static final java.lang.String OFFICIAL_VERSION = "13.0.2";
+  public static final int OFFICIAL_VERSION_CODE = 7175;
+  public org.telegram.messenger.BuildConfig();
+  static {};
+}

@@ -1,0 +1,19 @@
+{
+  "DEBUG": "Boolean.parseBoolean(\"true\")",
+  "APPLICATION_ID": "\"io.github.jose22yt.flexygram.diagnostic\"",
+  "VERSION_CODE": "1261",
+  "VERSION_NAME": "\"13.0.2\"",
+  "APP_HASH": "\"\"",
+  "APP_ID": "0",
+  "FLEXYGRAM_FCM_API_KEY": "\"\"",
+  "FLEXYGRAM_FCM_APP_ID": "\"\"",
+  "FLEXYGRAM_FCM_ENABLED": "false",
+  "FLEXYGRAM_FCM_PROJECT_ID": "\"\"",
+  "FLEXYGRAM_FCM_SENDER_ID": "\"\"",
+  "FLEXYGRAM_PUSH_ANDROID_ID": "\"\"",
+  "FLEXYGRAM_PUSH_SCOPE": "\"\"",
+  "FLEXYGRAM_UNIFIED_DISTRIBUTOR": "\"\"",
+  "FLEXYGRAM_UNIFIED_GATEWAY": "\"\"",
+  "FLEXYGRAM_UNIFIED_PUSH_ENABLED": "false",
+  "ISOLATED_DIAGNOSTIC": "true"
+}

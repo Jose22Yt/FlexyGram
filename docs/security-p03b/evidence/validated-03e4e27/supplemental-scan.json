@@ -1,0 +1,16 @@
+{
+  "supplemental_candidates": [],
+  "logs": [
+    {
+      "file": "tests.log",
+      "known_forbidden_hits": 0,
+      "client_key_shaped_hits": 0
+    },
+    {
+      "file": "build.log",
+      "known_forbidden_hits": 0,
+      "client_key_shaped_hits": 0
+    }
+  ],
+  "limits": "Pattern-based candidates only, not universal absence-of-secrets certification; inherited translator keys reported separately"
+}
