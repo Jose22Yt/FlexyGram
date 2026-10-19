@@ -1,0 +1,35 @@
+Language conversion method only; no provider initialization or network execution
+
+    Code:
+       0: aload_1
+       1: ifnonnull     6
+       4: aconst_null
+       5: areturn
+       6: iload_2
+       7: ifeq          38
+      10: aload_1
+      11: ldc_w         #314                // String zh-Hans
+      14: invokevirtual #318                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+      17: ifeq          24
+      20: ldc_w         #271                // String zh-CN
+      23: areturn
+      24: aload_1
+      25: ldc_w         #320                // String zh-Hant
+      28: invokevirtual #318                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+      31: ifeq          66
+      34: ldc_w         #273                // String zh-TW
+      37: areturn
+      38: aload_1
+      39: ldc_w         #271                // String zh-CN
+      42: invokevirtual #318                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+      45: ifeq          52
+      48: ldc_w         #314                // String zh-Hans
+      51: areturn
+      52: aload_1
+      53: ldc_w         #273                // String zh-TW
+      56: invokevirtual #318                // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+      59: ifeq          66
+      62: ldc_w         #320                // String zh-Hant
+      65: areturn
+      66: aload_1
+      67: areturn

@@ -1,0 +1,16 @@
+{
+  "base": "26f5c9fc03924fafcf3246b78b48946d09fba69d",
+  "approved_pr10": "97b5972c03ced57e17b54ff6af5a8ea516785a7c",
+  "previous_tests_repeated": 57,
+  "new_tests": 12,
+  "total_tests": 69,
+  "failures": 0,
+  "skips": 0,
+  "production_and_previous_security_files_unchanged": true,
+  "android_build_performed": false,
+  "android_install_or_run": false,
+  "prototype_compiler": "JDK21",
+  "python": "3.11.17",
+  "network_provider_calls": 0,
+  "limits": "Only Base/Result execute from original library with fake implementation; no provider implementation or singleton executes; no full ABI/HTML/linguistic/service parity certified"
+}

@@ -1,0 +1,302 @@
+{
+  "classes_jar_sha256": "9e320d75f545614afc882ad21fde6f01bb6f00ee7aa1d0afc014b110fe1db4b4",
+  "internal_class_references": {
+    "app/nekogram/translator/BaiduTranslator$a": [
+      "app/nekogram/translator/BaiduTranslator",
+      "app/nekogram/translator/BaiduTranslator$a"
+    ],
+    "app/nekogram/translator/BaiduTranslator": [
+      "app/nekogram/translator/BaiduTranslator",
+      "app/nekogram/translator/BaiduTranslator$a",
+      "app/nekogram/translator/BaseTranslator",
+      "app/nekogram/translator/Result",
+      "app/nekogram/translator/a",
+      "app/nekogram/translator/b"
+    ],
+    "app/nekogram/translator/BaseTranslator": [
+      "app/nekogram/translator/BaseTranslator",
+      "app/nekogram/translator/Result",
+      "app/nekogram/translator/b"
+    ],
+    "app/nekogram/translator/DeepLTranslator$a": [
+      "app/nekogram/translator/DeepLTranslator",
+      "app/nekogram/translator/DeepLTranslator$a"
+    ],
+    "app/nekogram/translator/DeepLTranslator$b": [
+      "app/nekogram/translator/DeepLTranslator",
+      "app/nekogram/translator/DeepLTranslator$a",
+      "app/nekogram/translator/DeepLTranslator$b"
+    ],
+    "app/nekogram/translator/DeepLTranslator$c": [
+      "app/nekogram/translator/DeepLTranslator",
+      "app/nekogram/translator/DeepLTranslator$c",
+      "app/nekogram/translator/DeepLTranslator$d"
+    ],
+    "app/nekogram/translator/DeepLTranslator$d": [
+      "app/nekogram/translator/DeepLTranslator",
+      "app/nekogram/translator/DeepLTranslator$d"
+    ],
+    "app/nekogram/translator/DeepLTranslator": [
+      "app/nekogram/translator/BaseTranslator",
+      "app/nekogram/translator/DeepLTranslator",
+      "app/nekogram/translator/DeepLTranslator$a",
+      "app/nekogram/translator/DeepLTranslator$b",
+      "app/nekogram/translator/DeepLTranslator$c",
+      "app/nekogram/translator/DeepLTranslator$d",
+      "app/nekogram/translator/Result",
+      "app/nekogram/translator/b",
+      "app/nekogram/translator/c"
+    ],
+    "app/nekogram/translator/GoogleAppTranslator$a": [
+      "app/nekogram/translator/GoogleAppTranslator",
+      "app/nekogram/translator/GoogleAppTranslator$a"
+    ],
+    "app/nekogram/translator/GoogleAppTranslator$b": [
+      "app/nekogram/translator/GoogleAppTranslator",
+      "app/nekogram/translator/GoogleAppTranslator$a",
+      "app/nekogram/translator/GoogleAppTranslator$b"
+    ],
+    "app/nekogram/translator/GoogleAppTranslator": [
+      "app/nekogram/translator/BaseTranslator",
+      "app/nekogram/translator/GoogleAppTranslator",
+      "app/nekogram/translator/GoogleAppTranslator$a",
+      "app/nekogram/translator/GoogleAppTranslator$b",
+      "app/nekogram/translator/Result",
+      "app/nekogram/translator/b",
+      "app/nekogram/translator/d"
+    ],
+    "app/nekogram/translator/Http429Exception": [
+      "app/nekogram/translator/Http429Exception"
+    ],
+    "app/nekogram/translator/LingoTranslator$a": [
+      "app/nekogram/translator/LingoTranslator",
+      "app/nekogram/translator/LingoTranslator$a"
+    ],
+    "app/nekogram/translator/LingoTranslator$b": [
+      "app/nekogram/translator/LingoTranslator",
+      "app/nekogram/translator/LingoTranslator$b"
+    ],
+    "app/nekogram/translator/LingoTranslator$c": [
+      "app/nekogram/translator/LingoTranslator",
+      "app/nekogram/translator/LingoTranslator$a",
+      "app/nekogram/translator/LingoTranslator$b",
+      "app/nekogram/translator/LingoTranslator$c"
+    ],
+    "app/nekogram/translator/LingoTranslator$d": [
+      "app/nekogram/translator/LingoTranslator",
+      "app/nekogram/translator/LingoTranslator$b",
+      "app/nekogram/translator/LingoTranslator$d"
+    ],
+    "app/nekogram/translator/LingoTranslator": [
+      "app/nekogram/translator/BaseTranslator",
+      "app/nekogram/translator/LingoTranslator",
+      "app/nekogram/translator/LingoTranslator$a",
+      "app/nekogram/translator/LingoTranslator$b",
+      "app/nekogram/translator/LingoTranslator$c",
+      "app/nekogram/translator/LingoTranslator$d",
+      "app/nekogram/translator/Result",
+      "app/nekogram/translator/b",
+      "app/nekogram/translator/e"
+    ],
+    "app/nekogram/translator/MicrosoftTranslator$a": [
+      "app/nekogram/translator/MicrosoftTranslator",
+      "app/nekogram/translator/MicrosoftTranslator$a"
+    ],
+    "app/nekogram/translator/MicrosoftTranslator$b": [
+      "app/nekogram/translator/MicrosoftTranslator",
+      "app/nekogram/translator/MicrosoftTranslator$b"
+    ],
+    "app/nekogram/translator/MicrosoftTranslator$c": [
+      "app/nekogram/translator/MicrosoftTranslator",
+      "app/nekogram/translator/MicrosoftTranslator$a",
+      "app/nekogram/translator/MicrosoftTranslator$c",
+      "app/nekogram/translator/MicrosoftTranslator$e"
+    ],
+    "app/nekogram/translator/MicrosoftTranslator$d": [
+      "app/nekogram/translator/MicrosoftTranslator",
+      "app/nekogram/translator/MicrosoftTranslator$d"
+    ],
+    "app/nekogram/translator/MicrosoftTranslator$e": [
+      "app/nekogram/translator/MicrosoftTranslator",
+      "app/nekogram/translator/MicrosoftTranslator$e"
+    ],
+    "app/nekogram/translator/MicrosoftTranslator": [
+      "app/nekogram/translator/BaseTranslator",
+      "app/nekogram/translator/MicrosoftTranslator",
+      "app/nekogram/translator/MicrosoftTranslator$a",
+      "app/nekogram/translator/MicrosoftTranslator$b",
+      "app/nekogram/translator/MicrosoftTranslator$c",
+      "app/nekogram/translator/MicrosoftTranslator$d",
+      "app/nekogram/translator/MicrosoftTranslator$e",
+      "app/nekogram/translator/Result",
+      "app/nekogram/translator/b",
+      "app/nekogram/translator/f"
+    ],
+    "app/nekogram/translator/Result": [
+      "app/nekogram/translator/Result"
+    ],
+    "app/nekogram/translator/SogouTranslator$a": [
+      "app/nekogram/translator/SogouTranslator",
+      "app/nekogram/translator/SogouTranslator$a",
+      "app/nekogram/translator/SogouTranslator$d"
+    ],
+    "app/nekogram/translator/SogouTranslator$b": [
+      "app/nekogram/translator/SogouTranslator",
+      "app/nekogram/translator/SogouTranslator$b"
+    ],
+    "app/nekogram/translator/SogouTranslator$c": [
+      "app/nekogram/translator/SogouTranslator",
+      "app/nekogram/translator/SogouTranslator$a",
+      "app/nekogram/translator/SogouTranslator$c"
+    ],
+    "app/nekogram/translator/SogouTranslator$d": [
+      "app/nekogram/translator/SogouTranslator",
+      "app/nekogram/translator/SogouTranslator$d"
+    ],
+    "app/nekogram/translator/SogouTranslator": [
+      "app/nekogram/translator/BaseTranslator",
+      "app/nekogram/translator/Result",
+      "app/nekogram/translator/SogouTranslator",
+      "app/nekogram/translator/SogouTranslator$a",
+      "app/nekogram/translator/SogouTranslator$b",
+      "app/nekogram/translator/SogouTranslator$c",
+      "app/nekogram/translator/SogouTranslator$d",
+      "app/nekogram/translator/b",
+      "app/nekogram/translator/g"
+    ],
+    "app/nekogram/translator/TranSmartTranslator$a": [
+      "app/nekogram/translator/TranSmartTranslator",
+      "app/nekogram/translator/TranSmartTranslator$a"
+    ],
+    "app/nekogram/translator/TranSmartTranslator$b": [
+      "app/nekogram/translator/TranSmartTranslator",
+      "app/nekogram/translator/TranSmartTranslator$a",
+      "app/nekogram/translator/TranSmartTranslator$b",
+      "app/nekogram/translator/TranSmartTranslator$d",
+      "app/nekogram/translator/TranSmartTranslator$e"
+    ],
+    "app/nekogram/translator/TranSmartTranslator$c": [
+      "app/nekogram/translator/TranSmartTranslator",
+      "app/nekogram/translator/TranSmartTranslator$c"
+    ],
+    "app/nekogram/translator/TranSmartTranslator$d": [
+      "app/nekogram/translator/TranSmartTranslator",
+      "app/nekogram/translator/TranSmartTranslator$d"
+    ],
+    "app/nekogram/translator/TranSmartTranslator$e": [
+      "app/nekogram/translator/TranSmartTranslator",
+      "app/nekogram/translator/TranSmartTranslator$e"
+    ],
+    "app/nekogram/translator/TranSmartTranslator": [
+      "app/nekogram/translator/BaseTranslator",
+      "app/nekogram/translator/Result",
+      "app/nekogram/translator/TranSmartTranslator",
+      "app/nekogram/translator/TranSmartTranslator$a",
+      "app/nekogram/translator/TranSmartTranslator$b",
+      "app/nekogram/translator/TranSmartTranslator$c",
+      "app/nekogram/translator/TranSmartTranslator$d",
+      "app/nekogram/translator/TranSmartTranslator$e",
+      "app/nekogram/translator/b",
+      "app/nekogram/translator/h"
+    ],
+    "app/nekogram/translator/YandexTranslator$a": [
+      "app/nekogram/translator/YandexTranslator",
+      "app/nekogram/translator/YandexTranslator$a"
+    ],
+    "app/nekogram/translator/YandexTranslator": [
+      "app/nekogram/translator/BaseTranslator",
+      "app/nekogram/translator/Result",
+      "app/nekogram/translator/YandexTranslator",
+      "app/nekogram/translator/YandexTranslator$a",
+      "app/nekogram/translator/b",
+      "app/nekogram/translator/i"
+    ],
+    "app/nekogram/translator/YouDaoTranslator$a": [
+      "app/nekogram/translator/YouDaoTranslator",
+      "app/nekogram/translator/YouDaoTranslator$a"
+    ],
+    "app/nekogram/translator/YouDaoTranslator$b": [
+      "app/nekogram/translator/YouDaoTranslator",
+      "app/nekogram/translator/YouDaoTranslator$a",
+      "app/nekogram/translator/YouDaoTranslator$b"
+    ],
+    "app/nekogram/translator/YouDaoTranslator": [
+      "app/nekogram/translator/BaseTranslator",
+      "app/nekogram/translator/Result",
+      "app/nekogram/translator/YouDaoTranslator",
+      "app/nekogram/translator/YouDaoTranslator$a",
+      "app/nekogram/translator/YouDaoTranslator$b",
+      "app/nekogram/translator/b",
+      "app/nekogram/translator/j"
+    ],
+    "app/nekogram/translator/a": [
+      "app/nekogram/translator/BaiduTranslator",
+      "app/nekogram/translator/a"
+    ],
+    "app/nekogram/translator/b": [
+      "app/nekogram/translator/BaseTranslator",
+      "app/nekogram/translator/Http429Exception",
+      "app/nekogram/translator/b"
+    ],
+    "app/nekogram/translator/c": [
+      "app/nekogram/translator/DeepLTranslator",
+      "app/nekogram/translator/c"
+    ],
+    "app/nekogram/translator/d": [
+      "app/nekogram/translator/GoogleAppTranslator",
+      "app/nekogram/translator/d"
+    ],
+    "app/nekogram/translator/e": [
+      "app/nekogram/translator/LingoTranslator",
+      "app/nekogram/translator/e"
+    ],
+    "app/nekogram/translator/f": [
+      "app/nekogram/translator/MicrosoftTranslator",
+      "app/nekogram/translator/f"
+    ],
+    "app/nekogram/translator/g": [
+      "app/nekogram/translator/SogouTranslator",
+      "app/nekogram/translator/g"
+    ],
+    "app/nekogram/translator/h": [
+      "app/nekogram/translator/TranSmartTranslator",
+      "app/nekogram/translator/h"
+    ],
+    "app/nekogram/translator/i": [
+      "app/nekogram/translator/YandexTranslator",
+      "app/nekogram/translator/i"
+    ],
+    "app/nekogram/translator/j": [
+      "app/nekogram/translator/YouDaoTranslator",
+      "app/nekogram/translator/j"
+    ]
+  },
+  "provider_reference_closures": {
+    "app/nekogram/translator/MicrosoftTranslator": [
+      "app/nekogram/translator/BaseTranslator",
+      "app/nekogram/translator/Http429Exception",
+      "app/nekogram/translator/MicrosoftTranslator",
+      "app/nekogram/translator/MicrosoftTranslator$a",
+      "app/nekogram/translator/MicrosoftTranslator$b",
+      "app/nekogram/translator/MicrosoftTranslator$c",
+      "app/nekogram/translator/MicrosoftTranslator$d",
+      "app/nekogram/translator/MicrosoftTranslator$e",
+      "app/nekogram/translator/Result",
+      "app/nekogram/translator/b",
+      "app/nekogram/translator/f"
+    ],
+    "app/nekogram/translator/DeepLTranslator": [
+      "app/nekogram/translator/BaseTranslator",
+      "app/nekogram/translator/DeepLTranslator",
+      "app/nekogram/translator/DeepLTranslator$a",
+      "app/nekogram/translator/DeepLTranslator$b",
+      "app/nekogram/translator/DeepLTranslator$c",
+      "app/nekogram/translator/DeepLTranslator$d",
+      "app/nekogram/translator/Http429Exception",
+      "app/nekogram/translator/Result",
+      "app/nekogram/translator/b",
+      "app/nekogram/translator/c"
+    ]
+  },
+  "limits": "Constant-pool overapproximation, not reachability/initialization proof; reflection and string descriptors need separate review."
+}

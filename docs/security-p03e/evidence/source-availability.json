@@ -1,0 +1,50 @@
+{
+  "checked_date": "2026-10-19",
+  "declared_scm": "https://github.com/Nekogram/translator",
+  "declared_scm_http_status": 404,
+  "scm_error_caveat": "Not found using current public connection; not proof of global absence",
+  "sources_url": "https://repo.maven.apache.org/maven2/app/nekogram/translator/translator/1.6.1/translator-1.6.1-sources.jar",
+  "sources_sha256": "c6deada2fac53b8ea6523dbda77597b128006674616f140f04df23264c6d1aa3",
+  "sources_entries": [
+    "META-INF/",
+    "META-INF/MANIFEST.MF"
+  ],
+  "matching_source_commit_established": false,
+  "aar_sha256": "08cdf350bd21b6cc063a8fb0141eed6cdf06c06772c5080ca38114dce07a8f27",
+  "maven_pom_sha256": "7251c56f8e00aa9ad1c068810879fbcd5035e91e5d6f166311851e0c7753db4f",
+  "maven_module_sha256": "48599f51e711e3ebc36fa566cea522216af4c7cad4241919df7b007e5f86c0d6",
+  "official_alternatives": [
+    {
+      "repository": "DeepL/deepl-java",
+      "license_declared": "MIT",
+      "commit": "8b7ed8c1d0f0f6f921a463b252f04c2ec47cf791",
+      "not_integrated": true
+    },
+    {
+      "repository": "Azure/azure-sdk-for-java",
+      "license_declared": "MIT",
+      "module": "sdk/translation/azure-ai-translation-text",
+      "commit": "9deee9867e66d956dde14cd7b76794dcdb8b4b60",
+      "not_integrated": true
+    }
+  ],
+  "nekogram_client_tree": {
+    "sha": "8c07753a82174314873a655bb7206a919bc0a919",
+    "truncated": false,
+    "matching_aar_source_established": false,
+    "related_paths": [
+      "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translator/TelegramTranslator.java",
+      "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translator/TextWithEntitiesTranslator.java",
+      "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translator/Translator.java",
+      "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translator/TranslatorApps.java",
+      "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translator/TranslatorSettingsPopupWrapper.java",
+      "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translator/deepl",
+      "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translator/deepl/DeepLOAuth.java",
+      "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translator/deepl/DeepLOAuthWebviewActivity.java",
+      "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translator/html",
+      "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translator/html/CustomElementHandler.java",
+      "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translator/html/HTMLKeeper.java",
+      "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translator/html/HTMLTagAttributesHandler.java"
+    ]
+  }
+}
