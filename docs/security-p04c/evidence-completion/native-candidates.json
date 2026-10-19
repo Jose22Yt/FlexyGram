@@ -1,0 +1,26 @@
+{
+  "chaquopy-freetype": {
+    "index": "https://chaquo.com/pypi-13.1/chaquopy-freetype/",
+    "arm64_files": [
+      "chaquopy_freetype-2.9.1-1-py3-none-android_21_arm64_v8a.whl",
+      "chaquopy_freetype-2.9.1-2-py3-none-android_21_arm64_v8a.whl"
+    ],
+    "candidate_inspections": []
+  },
+  "chaquopy-libxml2": {
+    "index": "https://chaquo.com/pypi-13.1/chaquopy-libxml2/",
+    "arm64_files": [
+      "chaquopy_libxml2-2.9.8-1-py3-none-android_21_arm64_v8a.whl",
+      "chaquopy_libxml2-2.9.8-2-py3-none-android_21_arm64_v8a.whl"
+    ],
+    "candidate_inspections": []
+  },
+  "chaquopy-libxslt": {
+    "index": "https://chaquo.com/pypi-13.1/chaquopy-libxslt/",
+    "arm64_files": [
+      "chaquopy_libxslt-1.1.32-1-py3-none-android_21_arm64_v8a.whl",
+      "chaquopy_libxslt-1.1.32-2-py3-none-android_21_arm64_v8a.whl"
+    ],
+    "candidate_inspections": []
+  }
+}

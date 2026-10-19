@@ -1,0 +1,17 @@
+{
+  "tools/native_compatibility/acceptance.py": "27fa11a88694e5953b4846f3b3cbc34f60d96f96f04d97d7d8feaa946b412425",
+  "tools/native_compatibility/rebuild_candidates.py": "0cd6596bb78071258a8e65092ea8fe65102eec16bfb2e1655f766589c8bd830d",
+  "tools/native_compatibility/audit.py": "3159252fc7ae161b49b0381b3b5a378ea4daa61d42d0cf093bca71081d704fe2",
+  "tools/native_compatibility/wheelhouse.py": "cb3366173079fa8b7a2711506579bc29de131124377fdb9e55208651501c6b97",
+  "tools/native_compatibility/requirements.lock": "54bfc17714546a068eeb4caf481e8ba4c384fe1ecc936fcbd79876a7789bde6b",
+  "tools/native_compatibility/rebuild-sources.json": "7ddf343b6025e0481bb32a2b11e5aa3bfaba3c740ede8bf8a0aa004ffb0324bc",
+  "tests/native_compatibility/test_rebuild_recipe.py": "862a1fd91b9dfb84ff369b673ecdfd3ded3d82ff8f7800138306b6f2670f118e",
+  "tests/native_compatibility/reviewed_changes.json": "689cc1bf36dc857d0a55e0c590c176e5e5d0a1806267df1f93d55671fe75e360",
+  "tests/native_compatibility/test_native.py": "df3f15ce8648f658c6d99aa308aa48da83d6b08b6554d4ae826ff7542d71a3d8",
+  "tests/native_compatibility/test_lock_contract.py": "67134f2fcb24fd5a639908abddd31ce1e22f774036bd4030a96dde5dc18efc51",
+  "tests/native_compatibility/test_wheelhouse_hardening.py": "982ddd7d7a3a5f132ca923254606b6659f305d5a584ab575e7d2db352268bca7",
+  "tests/native_compatibility/test_acceptance.py": "a149e2afd0c6e837a55269078e089b3bfda70ee4bff716afc7b8629921a5849d",
+  "tests/native_compatibility/scope_native.py": "faa5502f88a02a49657f95c0cf51a4b561ea29d7e1637598ad095f91596484d3",
+  "tests/native_compatibility/test_gate_runner.py": "489669f951693463e3430ecbbc2d9c113c13d21c3df3b9d345cdf629869f0761",
+  "tests/native_compatibility/run_gate.py": "bc0f04f91ba425ee9c90cf7acdc2b76fb350178bdefafcaae85a54c613f263c0"
+}

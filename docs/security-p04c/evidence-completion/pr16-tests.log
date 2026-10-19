@@ -1,0 +1,13 @@
+test_changed_diagnostic_identity_fails_closed (test_audit.IdentityAuditTests.test_changed_diagnostic_identity_fails_closed) ... ok
+test_launcher_component_identifier_is_not_a_user_visible_brand_failure (test_audit.IdentityAuditTests.test_launcher_component_identifier_is_not_a_user_visible_brand_failure) ... ok
+test_legacy_user_visible_names_flagged_without_failing_safe_baseline (test_audit.IdentityAuditTests.test_legacy_user_visible_names_flagged_without_failing_safe_baseline) ... ok
+test_missing_icon_resource_is_error (test_audit.IdentityAuditTests.test_missing_icon_resource_is_error) ... ok
+test_missing_launcher_is_error (test_audit.IdentityAuditTests.test_missing_launcher_is_error) ... ok
+test_policy_identity_mismatch_is_error (test_audit.IdentityAuditTests.test_policy_identity_mismatch_is_error) ... ok
+test_rebranding_visible_strings_does_not_require_renaming_internal_alias (test_audit.IdentityAuditTests.test_rebranding_visible_strings_does_not_require_renaming_internal_alias) ... ok
+test_strict_only_fails_on_errors_not_review_items (test_audit.IdentityAuditTests.test_strict_only_fails_on_errors_not_review_items) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.021s
+
+OK

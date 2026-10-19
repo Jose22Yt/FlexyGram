@@ -1,0 +1,868 @@
+{
+  "libraries": [
+    {
+      "library": "libfreetype.so",
+      "contract": {
+        "static_contract_pass": true,
+        "blockers": [],
+        "missing_export_pairs": [],
+        "new_needed": [],
+        "before_sha256": "8301778e995a698b9273cd0a95d4e884fd30be6802b55a246cbf60ae09216172",
+        "after_sha256": "97a426c57cb12a25e2f2d460009d13157f967cabd521f414935da94937475786",
+        "runtime_required": true,
+        "replacement_approved": false,
+        "limits": "Necessary static conditions only. Export equality does not prove optional features, behavior, symbol resolution or Android loading."
+      },
+      "candidate": {
+        "sha256": "97a426c57cb12a25e2f2d460009d13157f967cabd521f414935da94937475786",
+        "soname": "libfreetype.so",
+        "needed": [
+          "libz.so",
+          "libm.so",
+          "libdl.so",
+          "libc.so"
+        ],
+        "load_4k": true,
+        "load_16k": true,
+        "android_note_api": 24,
+        "relro": [
+          {
+            "start": 693344,
+            "end": 720896,
+            "end_aligned_16k": true,
+            "writable_sections_in_roundup": []
+          }
+        ]
+      }
+    },
+    {
+      "library": "libxml2.so",
+      "contract": {
+        "static_contract_pass": false,
+        "blockers": [
+          "export_contract_loss"
+        ],
+        "missing_export_pairs": [
+          [
+            "LIBXML2_2.4.30",
+            null
+          ],
+          [
+            "LIBXML2_2.4.30",
+            "LIBXML2_2.4.30"
+          ],
+          [
+            "LIBXML2_2.5.0",
+            null
+          ],
+          [
+            "LIBXML2_2.5.0",
+            "LIBXML2_2.5.0"
+          ],
+          [
+            "LIBXML2_2.5.2",
+            null
+          ],
+          [
+            "LIBXML2_2.5.2",
+            "LIBXML2_2.5.2"
+          ],
+          [
+            "LIBXML2_2.5.4",
+            null
+          ],
+          [
+            "LIBXML2_2.5.4",
+            "LIBXML2_2.5.4"
+          ],
+          [
+            "LIBXML2_2.5.5",
+            null
+          ],
+          [
+            "LIBXML2_2.5.5",
+            "LIBXML2_2.5.5"
+          ],
+          [
+            "LIBXML2_2.5.6",
+            null
+          ],
+          [
+            "LIBXML2_2.5.6",
+            "LIBXML2_2.5.6"
+          ],
+          [
+            "LIBXML2_2.5.7",
+            null
+          ],
+          [
+            "LIBXML2_2.5.7",
+            "LIBXML2_2.5.7"
+          ],
+          [
+            "LIBXML2_2.5.8",
+            null
+          ],
+          [
+            "LIBXML2_2.5.8",
+            "LIBXML2_2.5.8"
+          ],
+          [
+            "LIBXML2_2.5.9",
+            null
+          ],
+          [
+            "LIBXML2_2.5.9",
+            "LIBXML2_2.5.9"
+          ],
+          [
+            "LIBXML2_2.6.0",
+            null
+          ],
+          [
+            "LIBXML2_2.6.0",
+            "LIBXML2_2.6.0"
+          ],
+          [
+            "LIBXML2_2.6.1",
+            null
+          ],
+          [
+            "LIBXML2_2.6.1",
+            "LIBXML2_2.6.1"
+          ],
+          [
+            "LIBXML2_2.6.10",
+            null
+          ],
+          [
+            "LIBXML2_2.6.10",
+            "LIBXML2_2.6.10"
+          ],
+          [
+            "LIBXML2_2.6.11",
+            null
+          ],
+          [
+            "LIBXML2_2.6.11",
+            "LIBXML2_2.6.11"
+          ],
+          [
+            "LIBXML2_2.6.12",
+            null
+          ],
+          [
+            "LIBXML2_2.6.12",
+            "LIBXML2_2.6.12"
+          ],
+          [
+            "LIBXML2_2.6.14",
+            null
+          ],
+          [
+            "LIBXML2_2.6.14",
+            "LIBXML2_2.6.14"
+          ],
+          [
+            "LIBXML2_2.6.15",
+            null
+          ],
+          [
+            "LIBXML2_2.6.15",
+            "LIBXML2_2.6.15"
+          ],
+          [
+            "LIBXML2_2.6.16",
+            null
+          ],
+          [
+            "LIBXML2_2.6.16",
+            "LIBXML2_2.6.16"
+          ],
+          [
+            "LIBXML2_2.6.17",
+            null
+          ],
+          [
+            "LIBXML2_2.6.17",
+            "LIBXML2_2.6.17"
+          ],
+          [
+            "LIBXML2_2.6.18",
+            null
+          ],
+          [
+            "LIBXML2_2.6.18",
+            "LIBXML2_2.6.18"
+          ],
+          [
+            "LIBXML2_2.6.19",
+            null
+          ],
+          [
+            "LIBXML2_2.6.19",
+            "LIBXML2_2.6.19"
+          ],
+          [
+            "LIBXML2_2.6.2",
+            null
+          ],
+          [
+            "LIBXML2_2.6.2",
+            "LIBXML2_2.6.2"
+          ],
+          [
+            "LIBXML2_2.6.20",
+            null
+          ],
+          [
+            "LIBXML2_2.6.20",
+            "LIBXML2_2.6.20"
+          ],
+          [
+            "LIBXML2_2.6.21",
+            null
+          ],
+          [
+            "LIBXML2_2.6.21",
+            "LIBXML2_2.6.21"
+          ],
+          [
+            "LIBXML2_2.6.23",
+            null
+          ],
+          [
+            "LIBXML2_2.6.23",
+            "LIBXML2_2.6.23"
+          ],
+          [
+            "LIBXML2_2.6.24",
+            null
+          ],
+          [
+            "LIBXML2_2.6.24",
+            "LIBXML2_2.6.24"
+          ],
+          [
+            "LIBXML2_2.6.25",
+            null
+          ],
+          [
+            "LIBXML2_2.6.25",
+            "LIBXML2_2.6.25"
+          ],
+          [
+            "LIBXML2_2.6.27",
+            null
+          ],
+          [
+            "LIBXML2_2.6.27",
+            "LIBXML2_2.6.27"
+          ],
+          [
+            "LIBXML2_2.6.28",
+            null
+          ],
+          [
+            "LIBXML2_2.6.28",
+            "LIBXML2_2.6.28"
+          ],
+          [
+            "LIBXML2_2.6.29",
+            null
+          ],
+          [
+            "LIBXML2_2.6.29",
+            "LIBXML2_2.6.29"
+          ],
+          [
+            "LIBXML2_2.6.3",
+            null
+          ],
+          [
+            "LIBXML2_2.6.3",
+            "LIBXML2_2.6.3"
+          ],
+          [
+            "LIBXML2_2.6.32",
+            null
+          ],
+          [
+            "LIBXML2_2.6.32",
+            "LIBXML2_2.6.32"
+          ],
+          [
+            "LIBXML2_2.6.5",
+            null
+          ],
+          [
+            "LIBXML2_2.6.5",
+            "LIBXML2_2.6.5"
+          ],
+          [
+            "LIBXML2_2.6.6",
+            null
+          ],
+          [
+            "LIBXML2_2.6.6",
+            "LIBXML2_2.6.6"
+          ],
+          [
+            "LIBXML2_2.6.7",
+            null
+          ],
+          [
+            "LIBXML2_2.6.7",
+            "LIBXML2_2.6.7"
+          ],
+          [
+            "LIBXML2_2.6.8",
+            null
+          ],
+          [
+            "LIBXML2_2.6.8",
+            "LIBXML2_2.6.8"
+          ],
+          [
+            "LIBXML2_2.7.0",
+            null
+          ],
+          [
+            "LIBXML2_2.7.0",
+            "LIBXML2_2.7.0"
+          ],
+          [
+            "LIBXML2_2.7.3",
+            null
+          ],
+          [
+            "LIBXML2_2.7.3",
+            "LIBXML2_2.7.3"
+          ],
+          [
+            "LIBXML2_2.7.4",
+            null
+          ],
+          [
+            "LIBXML2_2.7.4",
+            "LIBXML2_2.7.4"
+          ],
+          [
+            "LIBXML2_2.8.0",
+            null
+          ],
+          [
+            "LIBXML2_2.8.0",
+            "LIBXML2_2.8.0"
+          ],
+          [
+            "LIBXML2_2.9.0",
+            null
+          ],
+          [
+            "LIBXML2_2.9.0",
+            "LIBXML2_2.9.0"
+          ],
+          [
+            "LIBXML2_2.9.1",
+            null
+          ],
+          [
+            "LIBXML2_2.9.1",
+            "LIBXML2_2.9.1"
+          ],
+          [
+            "__bss_end__",
+            null
+          ],
+          [
+            "__bss_start",
+            null
+          ],
+          [
+            "__bss_start__",
+            null
+          ],
+          [
+            "__end__",
+            null
+          ],
+          [
+            "_bss_end__",
+            null
+          ],
+          [
+            "_edata",
+            null
+          ],
+          [
+            "_end",
+            null
+          ]
+        ],
+        "new_needed": [],
+        "before_sha256": "de6451563a70442ad9b2fa41b67a565cb5c69555625d8145b803fc32eca5fcda",
+        "after_sha256": "253b6906fd9cb5e0e5a83cc0222b300404d0a61a6bcb736b8d40c5f0a3af9652",
+        "runtime_required": true,
+        "replacement_approved": false,
+        "limits": "Necessary static conditions only. Export equality does not prove optional features, behavior, symbol resolution or Android loading."
+      },
+      "candidate": {
+        "sha256": "253b6906fd9cb5e0e5a83cc0222b300404d0a61a6bcb736b8d40c5f0a3af9652",
+        "soname": "libxml2.so",
+        "needed": [
+          "libz.so",
+          "libm.so",
+          "libdl.so",
+          "libc.so"
+        ],
+        "load_4k": true,
+        "load_16k": true,
+        "android_note_api": 24,
+        "relro": [
+          {
+            "start": 1553744,
+            "end": 1589248,
+            "end_aligned_16k": true,
+            "writable_sections_in_roundup": []
+          }
+        ]
+      }
+    },
+    {
+      "library": "libxslt.so",
+      "contract": {
+        "static_contract_pass": false,
+        "blockers": [
+          "export_contract_loss",
+          "new_needed_requires_review"
+        ],
+        "missing_export_pairs": [
+          [
+            "LIBXML2_1.0.11",
+            null
+          ],
+          [
+            "LIBXML2_1.0.11",
+            "LIBXML2_1.0.11"
+          ],
+          [
+            "LIBXML2_1.0.12",
+            null
+          ],
+          [
+            "LIBXML2_1.0.12",
+            "LIBXML2_1.0.12"
+          ],
+          [
+            "LIBXML2_1.0.13",
+            null
+          ],
+          [
+            "LIBXML2_1.0.13",
+            "LIBXML2_1.0.13"
+          ],
+          [
+            "LIBXML2_1.0.16",
+            null
+          ],
+          [
+            "LIBXML2_1.0.16",
+            "LIBXML2_1.0.16"
+          ],
+          [
+            "LIBXML2_1.0.17",
+            null
+          ],
+          [
+            "LIBXML2_1.0.17",
+            "LIBXML2_1.0.17"
+          ],
+          [
+            "LIBXML2_1.0.18",
+            null
+          ],
+          [
+            "LIBXML2_1.0.18",
+            "LIBXML2_1.0.18"
+          ],
+          [
+            "LIBXML2_1.0.22",
+            null
+          ],
+          [
+            "LIBXML2_1.0.22",
+            "LIBXML2_1.0.22"
+          ],
+          [
+            "LIBXML2_1.0.24",
+            null
+          ],
+          [
+            "LIBXML2_1.0.24",
+            "LIBXML2_1.0.24"
+          ],
+          [
+            "LIBXML2_1.0.30",
+            null
+          ],
+          [
+            "LIBXML2_1.0.30",
+            "LIBXML2_1.0.30"
+          ],
+          [
+            "LIBXML2_1.0.32",
+            null
+          ],
+          [
+            "LIBXML2_1.0.32",
+            "LIBXML2_1.0.32"
+          ],
+          [
+            "LIBXML2_1.0.33",
+            null
+          ],
+          [
+            "LIBXML2_1.0.33",
+            "LIBXML2_1.0.33"
+          ],
+          [
+            "LIBXML2_1.1.0",
+            null
+          ],
+          [
+            "LIBXML2_1.1.0",
+            "LIBXML2_1.1.0"
+          ],
+          [
+            "LIBXML2_1.1.1",
+            null
+          ],
+          [
+            "LIBXML2_1.1.1",
+            "LIBXML2_1.1.1"
+          ],
+          [
+            "LIBXML2_1.1.18",
+            null
+          ],
+          [
+            "LIBXML2_1.1.18",
+            "LIBXML2_1.1.18"
+          ],
+          [
+            "LIBXML2_1.1.2",
+            null
+          ],
+          [
+            "LIBXML2_1.1.2",
+            "LIBXML2_1.1.2"
+          ],
+          [
+            "LIBXML2_1.1.20",
+            null
+          ],
+          [
+            "LIBXML2_1.1.20",
+            "LIBXML2_1.1.20"
+          ],
+          [
+            "LIBXML2_1.1.23",
+            null
+          ],
+          [
+            "LIBXML2_1.1.23",
+            "LIBXML2_1.1.23"
+          ],
+          [
+            "LIBXML2_1.1.24",
+            null
+          ],
+          [
+            "LIBXML2_1.1.24",
+            "LIBXML2_1.1.24"
+          ],
+          [
+            "LIBXML2_1.1.25",
+            null
+          ],
+          [
+            "LIBXML2_1.1.25",
+            "LIBXML2_1.1.25"
+          ],
+          [
+            "LIBXML2_1.1.26",
+            null
+          ],
+          [
+            "LIBXML2_1.1.26",
+            "LIBXML2_1.1.26"
+          ],
+          [
+            "LIBXML2_1.1.27",
+            null
+          ],
+          [
+            "LIBXML2_1.1.27",
+            "LIBXML2_1.1.27"
+          ],
+          [
+            "LIBXML2_1.1.3",
+            null
+          ],
+          [
+            "LIBXML2_1.1.3",
+            "LIBXML2_1.1.3"
+          ],
+          [
+            "LIBXML2_1.1.30",
+            null
+          ],
+          [
+            "LIBXML2_1.1.30",
+            "LIBXML2_1.1.30"
+          ],
+          [
+            "LIBXML2_1.1.5",
+            null
+          ],
+          [
+            "LIBXML2_1.1.5",
+            "LIBXML2_1.1.5"
+          ],
+          [
+            "LIBXML2_1.1.7",
+            null
+          ],
+          [
+            "LIBXML2_1.1.7",
+            "LIBXML2_1.1.7"
+          ],
+          [
+            "LIBXML2_1.1.9",
+            null
+          ],
+          [
+            "LIBXML2_1.1.9",
+            "LIBXML2_1.1.9"
+          ]
+        ],
+        "new_needed": [
+          "libz.so"
+        ],
+        "before_sha256": "bf625093e95bee481d4641dcb99e7021d374c578b1bcfb47f11eb80330f5052e",
+        "after_sha256": "eea0faa5cf7057b82da8fe926cb24f9a68faef321b4bb35b94a0837d35cb4252",
+        "runtime_required": true,
+        "replacement_approved": false,
+        "limits": "Necessary static conditions only. Export equality does not prove optional features, behavior, symbol resolution or Android loading."
+      },
+      "candidate": {
+        "sha256": "eea0faa5cf7057b82da8fe926cb24f9a68faef321b4bb35b94a0837d35cb4252",
+        "soname": "libxslt.so",
+        "needed": [
+          "libxml2.so",
+          "libz.so",
+          "libm.so",
+          "libdl.so",
+          "libc.so"
+        ],
+        "load_4k": true,
+        "load_16k": true,
+        "android_note_api": 24,
+        "relro": [
+          {
+            "start": 269392,
+            "end": 278528,
+            "end_aligned_16k": true,
+            "writable_sections_in_roundup": []
+          }
+        ]
+      }
+    },
+    {
+      "library": "libexslt.so",
+      "contract": {
+        "static_contract_pass": false,
+        "blockers": [
+          "export_contract_loss",
+          "new_needed_requires_review"
+        ],
+        "missing_export_pairs": [
+          [
+            "__bss_end__",
+            null
+          ],
+          [
+            "__bss_start",
+            null
+          ],
+          [
+            "__bss_start__",
+            null
+          ],
+          [
+            "__end__",
+            null
+          ],
+          [
+            "_bss_end__",
+            null
+          ],
+          [
+            "_edata",
+            null
+          ],
+          [
+            "_end",
+            null
+          ]
+        ],
+        "new_needed": [
+          "libz.so"
+        ],
+        "before_sha256": "997c4e05f91d1253cbdac10c72ef6079335f1d034a8b86b56c7ce8af89f35414",
+        "after_sha256": "9af934e7440d4d1c7f3b8ac845bba42cb54a9a1773594b1e7127cd0a40296efc",
+        "runtime_required": true,
+        "replacement_approved": false,
+        "limits": "Necessary static conditions only. Export equality does not prove optional features, behavior, symbol resolution or Android loading."
+      },
+      "candidate": {
+        "sha256": "9af934e7440d4d1c7f3b8ac845bba42cb54a9a1773594b1e7127cd0a40296efc",
+        "soname": "libexslt.so",
+        "needed": [
+          "libxslt.so",
+          "libxml2.so",
+          "libz.so",
+          "libm.so",
+          "libdl.so",
+          "libc.so"
+        ],
+        "load_4k": true,
+        "load_16k": true,
+        "android_note_api": 24,
+        "relro": [
+          {
+            "start": 104528,
+            "end": 114688,
+            "end_aligned_16k": true,
+            "writable_sections_in_roundup": []
+          }
+        ]
+      }
+    }
+  ],
+  "commands": [
+    {
+      "args": [
+        "./configure",
+        "--host=aarch64-linux-android",
+        "--prefix=<WORKSPACE>/FlexyGram/../repro-final-candidates/prefix",
+        "--disable-shared",
+        "--with-pic",
+        "--disable-xz",
+        "--disable-xzdec",
+        "--disable-lzmadec",
+        "--disable-lzmainfo",
+        "--disable-scripts",
+        "--disable-doc"
+      ],
+      "cwd": "sources/xz-5.2.4"
+    },
+    {
+      "args": [
+        "make",
+        "-j2"
+      ],
+      "cwd": "sources/xz-5.2.4"
+    },
+    {
+      "args": [
+        "make",
+        "install"
+      ],
+      "cwd": "sources/xz-5.2.4"
+    },
+    {
+      "args": [
+        "./configure",
+        "--host=aarch64-linux-android",
+        "--prefix=<WORKSPACE>/FlexyGram/../repro-final-candidates/prefix",
+        "--without-python",
+        "--with-lzma"
+      ],
+      "cwd": "sources/libxml2-2.9.8"
+    },
+    {
+      "args": [
+        "make",
+        "-j2"
+      ],
+      "cwd": "sources/libxml2-2.9.8"
+    },
+    {
+      "args": [
+        "make",
+        "install"
+      ],
+      "cwd": "sources/libxml2-2.9.8"
+    },
+    {
+      "args": [
+        "./configure",
+        "--host=aarch64-linux-android",
+        "--prefix=<WORKSPACE>/FlexyGram/../repro-final-candidates/prefix",
+        "--without-python",
+        "--without-crypto",
+        "--with-libxml-prefix=<WORKSPACE>/FlexyGram/../repro-final-candidates/prefix"
+      ],
+      "cwd": "sources/libxslt-1.1.32"
+    },
+    {
+      "args": [
+        "make",
+        "-j2"
+      ],
+      "cwd": "sources/libxslt-1.1.32"
+    },
+    {
+      "args": [
+        "make",
+        "install"
+      ],
+      "cwd": "sources/libxslt-1.1.32"
+    },
+    {
+      "args": [
+        "<WORKSPACE>/FlexyGram/../android-tools/sdk/cmake/3.31.6/bin/cmake",
+        "-S",
+        "<WORKSPACE>/FlexyGram/../repro-final-candidates/sources/freetype",
+        "-B",
+        "<WORKSPACE>/FlexyGram/../repro-final-candidates/freetype-build",
+        "-DCMAKE_TOOLCHAIN_FILE=<WORKSPACE>/FlexyGram/../android-tools/sdk/ndk/27.2.12479018/build/cmake/android.toolchain.cmake",
+        "-DANDROID_ABI=arm64-v8a",
+        "-DANDROID_PLATFORM=android-24",
+        "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON",
+        "-DBUILD_SHARED_LIBS=ON",
+        "-DFT_WITH_ZLIB=ON",
+        "-DCMAKE_DISABLE_FIND_PACKAGE_PNG=ON",
+        "-DCMAKE_DISABLE_FIND_PACKAGE_BZip2=ON",
+        "-DCMAKE_DISABLE_FIND_PACKAGE_HarfBuzz=ON",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,-z,max-page-size=16384 -Wl,-z,common-page-size=16384"
+      ],
+      "cwd": "."
+    },
+    {
+      "args": [
+        "<WORKSPACE>/FlexyGram/../android-tools/sdk/cmake/3.31.6/bin/cmake",
+        "--build",
+        "<WORKSPACE>/FlexyGram/../repro-final-candidates/freetype-build",
+        "-j2"
+      ],
+      "cwd": "."
+    }
+  ],
+  "packaged": false,
+  "active_lock_changed": false,
+  "limits": "Independent source experiment, not a replacement. Optional feature/behavior parity and Android loader tests remain required."
+}

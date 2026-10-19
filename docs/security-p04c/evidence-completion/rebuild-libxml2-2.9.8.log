@@ -1,0 +1,531 @@
+checking whether to enable maintainer-specific portions of Makefiles... yes
+checking build system type... x86_64-pc-linux-gnu
+checking host system type... aarch64-unknown-linux-android
+checking for a BSD-compatible install... /usr/bin/install -c
+checking whether build environment is sane... yes
+checking for aarch64-linux-android-strip... <WORKSPACE>/FlexyGram/../android-tools/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-strip
+checking for a thread-safe mkdir -p... /usr/bin/mkdir -p
+checking for gawk... no
+checking for mawk... mawk
+checking whether make sets $(MAKE)... yes
+checking whether make supports nested variables... yes
+checking whether make supports nested variables... (cached) yes
+checking for aarch64-linux-android-gcc... <WORKSPACE>/FlexyGram/../android-tools/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang
+checking whether the C compiler works... yes
+checking for C compiler default output file name... a.out
+checking for suffix of executables...
+checking whether we are cross compiling... yes
+checking for suffix of object files... o
+checking whether we are using the GNU C compiler... yes
+checking whether <WORKSPACE>/FlexyGram/../android-tools/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang accepts -g... yes
+checking for <WORKSPACE>/FlexyGram/../android-tools/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang option to accept ISO C89... none needed
+checking whether <WORKSPACE>/FlexyGram/../android-tools/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang understands -c and -o together... yes
+checking for style of include used by make... GNU
+checking dependency style of <WORKSPACE>/FlexyGram/../android-tools/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang... gcc3
+checking whether ln -s works... yes
+checking how to run the C preprocessor... <WORKSPACE>/FlexyGram/../android-tools/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang -E
+checking for mv... /usr/bin/mv
+checking for tar... /usr/bin/tar
+checking for perl... /usr/bin/perl
+checking for wget... /usr/bin/wget
+checking for xmllint... /usr/bin/xmllint
+checking for xsltproc... /usr/bin/xsltproc
+checking for aarch64-linux-android-pkg-config... no
+checking for pkg-config... no
+checking how to print strings... printf
+checking for a sed that does not truncate output... /usr/bin/sed
+checking for grep that handles long lines and -e... /usr/bin/grep
+checking for egrep... /usr/bin/grep -E
+checking for fgrep... /usr/bin/grep -F
+checking for ld used by <WORKSPACE>/FlexyGram/../android-tools/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang... <WORKSPACE>/android-tools/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/ld
+checking if the linker (<WORKSPACE>/android-tools/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/ld) is GNU ld... yes
+checking for BSD- or MS-compatible name lister (nm)... no
+checking for aarch64-linux-android-dumpbin... no
+checking for aarch64-linux-android-link... no
+checking for dumpbin... no
+checking for link... link -dump
+configure: WARNING: using cross tools not prefixed with host triplet
+checking the name lister (nm) interface... BSD nm
+checking the maximum length of command line arguments... 1572864
+checking how to convert x86_64-pc-linux-gnu file names to aarch64-unknown-linux-android format... func_convert_file_noop
+checking how to convert x86_64-pc-linux-gnu file names to toolchain format... func_convert_file_noop
+checking for <WORKSPACE>/android-tools/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/ld option to reload object files... -r
+checking for aarch64-linux-android-objdump... no
+checking for objdump... objdump
+checking how to recognize dependent libraries... pass_all
+checking for aarch64-linux-android-dlltool... no
+checking for dlltool... no
+checking how to associate runtime and link libraries... printf %s\n
+checking for aarch64-linux-android-ar... <WORKSPACE>/FlexyGram/../android-tools/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar
+checking for archiver @FILE support... @
+checking for aarch64-linux-android-strip... (cached) <WORKSPACE>/FlexyGram/../android-tools/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-strip
+checking for aarch64-linux-android-ranlib... <WORKSPACE>/FlexyGram/../android-tools/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ranlib
+checking command to parse nm output from <WORKSPACE>/FlexyGram/../android-tools/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang object... ok
+checking for sysroot... no
+checking for a working dd... /usr/bin/dd
+checking how to truncate binary pipes... /usr/bin/dd bs=4096 count=1
+checking for aarch64-linux-android-mt... no
+checking for mt... no
+checking if : is a manifest tool... no
+checking for ANSI C header files... yes
+checking for sys/types.h... yes
+checking for sys/stat.h... yes
+checking for stdlib.h... yes
+checking for string.h... yes
+checking for memory.h... yes
+checking for strings.h... yes
+checking for inttypes.h... yes
+checking for stdint.h... yes
+checking for unistd.h... yes
+checking for dlfcn.h... yes
+checking for objdir... .libs
+checking if <WORKSPACE>/FlexyGram/../android-tools/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang supports -fno-rtti -fno-exceptions... yes
+checking for <WORKSPACE>/FlexyGram/../android-tools/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang option to produce PIC... -fPIC -DPIC
+checking if <WORKSPACE>/FlexyGram/../android-tools/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang PIC flag -fPIC -DPIC works... yes
+checking if <WORKSPACE>/FlexyGram/../android-tools/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang static flag -static works... yes
+checking if <WORKSPACE>/FlexyGram/../android-tools/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang supports -c -o file.o... yes
+checking if <WORKSPACE>/FlexyGram/../android-tools/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang supports -c -o file.o... (cached) yes
+checking whether the <WORKSPACE>/FlexyGram/../android-tools/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang linker (<WORKSPACE>/android-tools/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/ld) supports shared libraries... yes
+checking whether -lc should be explicitly linked in... no
+checking dynamic linker characteristics... Android linker
+checking how to hardcode library paths into programs... immediate
+checking whether stripping libraries is possible... yes
+checking if libtool supports shared libraries... yes
+checking whether to build shared libraries... yes
+checking whether to build static libraries... yes
+Checking zlib
+checking for Z... no
+checking zlib.h usability... yes
+checking zlib.h presence... yes
+checking for zlib.h... yes
+checking for gzread in -lz... yes
+Checking lzma
+checking for LZMA... no
+checking lzma.h usability... yes
+checking lzma.h presence... yes
+checking for lzma.h... yes
+checking for lzma_code in -llzma... yes
+Checking headers
+checking for dirent.h that defines DIR... yes
+checking for library containing opendir... none required
+checking for ANSI C header files... (cached) yes
+checking fcntl.h usability... yes
+checking fcntl.h presence... yes
+checking for fcntl.h... yes
+checking for unistd.h... (cached) yes
+checking ctype.h usability... yes
+checking ctype.h presence... yes
+checking for ctype.h... yes
+checking dirent.h usability... yes
+checking dirent.h presence... yes
+checking for dirent.h... yes
+checking errno.h usability... yes
+checking errno.h presence... yes
+checking for errno.h... yes
+checking malloc.h usability... yes
+checking malloc.h presence... yes
+checking for malloc.h... yes
+checking stdarg.h usability... yes
+checking stdarg.h presence... yes
+checking for stdarg.h... yes
+checking for sys/stat.h... (cached) yes
+checking for sys/types.h... (cached) yes
+checking for stdint.h... (cached) yes
+checking for inttypes.h... (cached) yes
+checking time.h usability... yes
+checking time.h presence... yes
+checking for time.h... yes
+checking math.h usability... yes
+checking math.h presence... yes
+checking for math.h... yes
+checking limits.h usability... yes
+checking limits.h presence... yes
+checking for limits.h... yes
+checking float.h usability... yes
+checking float.h presence... yes
+checking for float.h... yes
+checking for stdlib.h... (cached) yes
+checking for sys/socket.h... yes
+checking for netinet/in.h... yes
+checking for arpa/inet.h... yes
+checking netdb.h usability... yes
+checking netdb.h presence... yes
+checking for netdb.h... yes
+checking sys/time.h usability... yes
+checking sys/time.h presence... yes
+checking for sys/time.h... yes
+checking sys/select.h usability... yes
+checking sys/select.h presence... yes
+checking for sys/select.h... yes
+checking poll.h usability... yes
+checking poll.h presence... yes
+checking for poll.h... yes
+checking sys/mman.h usability... yes
+checking sys/mman.h presence... yes
+checking for sys/mman.h... yes
+checking sys/timeb.h usability... no
+checking sys/timeb.h presence... no
+checking for sys/timeb.h... no
+checking signal.h usability... yes
+checking signal.h presence... yes
+checking for signal.h... yes
+checking for arpa/nameser.h... yes
+checking for resolv.h... yes
+checking dl.h usability... no
+checking dl.h presence... no
+checking for dl.h... no
+checking for dlfcn.h... (cached) yes
+Checking types
+checking for uint32_t... yes
+Checking libraries
+checking for strftime... yes
+checking for strftime... (cached) yes
+checking for localtime... yes
+checking for gettimeofday... yes
+checking for ftime... no
+checking for stat... yes
+checking for signal... yes
+checking for rand... yes
+checking for rand_r... yes
+checking for srand... yes
+checking for time... yes
+checking for isascii... yes
+checking for mmap... yes
+checking for munmap... yes
+checking for putenv... yes
+checking for va_copy... yes
+checking whether va_list is an array type... no
+checking for library containing gethostent... none required
+checking for library containing setsockopt... none required
+checking for library containing connect... none required
+checking for type of socket length (socklen_t)... configure: WARNING: could not determine
+checking for const gethostbyname() argument... yes
+checking for const send() second argument... yes
+checking whether to enable IPv6... yes
+checking struct sockaddr::ss_family... yes
+checking for getaddrinfo... yes
+checking for isnan... yes
+checking for isinf... yes
+checking for shl_load... no
+checking for shl_load in -ldld... no
+checking for dlopen... yes
+Checking configuration requirements
+Enabling multithreaded support
+checking pthread.h usability... yes
+checking pthread.h presence... yes
+checking for pthread.h... yes
+checking for pthread_join in -lpthread... no
+Enabled Schematron support
+checking iconv.h usability... yes
+checking iconv.h presence... yes
+checking for iconv.h... yes
+checking for iconv... no
+checking for iconv in -liconv... no
+Disabling ICU support
+Enabled Schemas/Relax-NG support
+checking for printf... yes
+checking for sprintf... yes
+checking for fprintf... yes
+checking for snprintf... yes
+checking for vfprintf... yes
+checking for vsprintf... yes
+checking for vsnprintf... yes
+checking for sscanf... yes
+Disabling code coverage for GCC
+checking that generated files are newer than configure... done
+configure: creating ./config.status
+config.status: creating libxml2.spec
+config.status: creating Makefile
+config.status: creating include/Makefile
+config.status: creating include/libxml/Makefile
+config.status: creating doc/Makefile
+config.status: creating doc/examples/Makefile
+config.status: creating doc/devhelp/Makefile
+config.status: creating example/Makefile
+config.status: creating python/Makefile
+config.status: creating python/tests/Makefile
+config.status: creating xstc/Makefile
+config.status: creating include/libxml/xmlversion.h
+config.status: creating libxml-2.0.pc
+config.status: creating libxml-2.0-uninstalled.pc
+config.status: creating libxml2-config.cmake
+config.status: creating python/setup.py
+config.status: creating xml2-config
+config.status: creating config.h
+config.status: executing depfiles commands
+config.status: executing libtool commands
+Done configuring
+make  all-recursive
+make[1]: Entering directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8'
+Making all in include
+make[2]: Entering directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/include'
+Making all in libxml
+make[3]: Entering directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/include/libxml'
+make[3]: Nothing to be done for 'all'.
+make[3]: Leaving directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/include/libxml'
+make[3]: Entering directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/include'
+make[3]: Nothing to be done for 'all-am'.
+make[3]: Leaving directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/include'
+make[2]: Leaving directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/include'
+Making all in .
+make[2]: Entering directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8'
+  CC       SAX.lo
+  CC       entities.lo
+  CC       encoding.lo
+encoding.c:500:26: warning: cast from 'const unsigned char *' to 'unsigned short *' increases required alignment from 1 to 2 [-Wcast-align]
+  500 |     unsigned short* in = (unsigned short*) inb;
+      |                          ^~~~~~~~~~~~~~~~~~~~~
+encoding.c:582:27: warning: cast from 'unsigned char *' to 'unsigned short *' increases required alignment from 1 to 2 [-Wcast-align]
+  582 |     unsigned short* out = (unsigned short*) outb;
+      |                           ^~~~~~~~~~~~~~~~~~~~~~
+encoding.c:738:26: warning: cast from 'const unsigned char *' to 'unsigned short *' increases required alignment from 1 to 2 [-Wcast-align]
+  738 |     unsigned short* in = (unsigned short*) inb;
+      |                          ^~~~~~~~~~~~~~~~~~~~~
+encoding.c:824:27: warning: cast from 'unsigned char *' to 'unsigned short *' increases required alignment from 1 to 2 [-Wcast-align]
+  824 |     unsigned short* out = (unsigned short*) outb;
+      |                           ^~~~~~~~~~~~~~~~~~~~~~
+encoding.c:2397:12: warning: variable 'writtentot' set but not used [-Wunused-but-set-variable]
+ 2397 |     size_t writtentot = 0;
+      |            ^
+encoding.c:2572:9: warning: variable 'writtentot' set but not used [-Wunused-but-set-variable]
+ 2572 |     int writtentot = 0;
+      |         ^
+encoding.c:2574:9: warning: variable 'output' set but not used [-Wunused-but-set-variable]
+ 2574 |     int output = 0;
+      |         ^
+encoding.c:2725:12: warning: variable 'handler_in_list' set but not used [-Wunused-but-set-variable]
+ 2725 |     int i, handler_in_list = 0;
+      |            ^
+  CC       error.lo
+8 warnings generated.
+  CC       parserInternals.lo
+  CC       parser.lo
+  CC       tree.lo
+  CC       hash.lo
+  CC       list.lo
+  CC       xmlIO.lo
+  CC       xmlmemory.lo
+  CC       uri.lo
+  CC       valid.lo
+  CC       xlink.lo
+  CC       HTMLparser.lo
+  CC       HTMLtree.lo
+  CC       debugXML.lo
+  CC       xpath.lo
+  CC       xpointer.lo
+xpath.c:10553:9: warning: variable 'len' set but not used [-Wunused-but-set-variable]
+ 10553 |     int len = 0, l;
+       |         ^
+xpath.c:14256:9: warning: variable 'nb_nodes' set but not used [-Wunused-but-set-variable]
+ 14256 |     int nb_nodes = 0;
+       |         ^
+  CC       xinclude.lo
+  CC       nanohttp.lo
+nanohttp.c:1009:67: warning: passing 'int *' to parameter of type 'socklen_t * _Nonnull' (aka 'unsigned int *') converts between pointers to integer types with different sign [-Wpointer-sign]
+ 1009 |         if (getsockopt(s, SOL_SOCKET, SO_ERROR, (char *) &status, &len) <
+      |                                                                   ^~~~
+<WORKSPACE>/FlexyGram/../android-tools/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/../sysroot/usr/include/sys/socket.h:292:111: note: passing argument to parameter '__value_length' here
+  292 | __socketcall int getsockopt(int __fd, int __level, int __option, void* _Nullable __value, socklen_t* _Nonnull __value_length);
+      |                                                                                                               ^
+1 warning generated.
+2 warnings generated.
+  CC       nanoftp.lo
+nanoftp.c:1477:66: warning: passing 'int *' to parameter of type 'socklen_t * _Nonnull' (aka 'unsigned int *') converts between pointers to integer types with different sign [-Wpointer-sign]
+ 1477 |         getsockname(ctxt->dataFd, (struct sockaddr *) &dataAddr, &dataAddrLen);
+      |                                                                  ^~~~~~~~~~~~
+<WORKSPACE>/FlexyGram/../android-tools/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/../sysroot/usr/include/sys/socket.h:291:94: note: passing argument to parameter '__addr_length' here
+  291 | __socketcall int getsockname(int __fd, struct sockaddr* _Nonnull __addr, socklen_t* _Nonnull __addr_length);
+      |                                                                                              ^
+nanoftp.c:1490:66: warning: passing 'int *' to parameter of type 'socklen_t * _Nonnull' (aka 'unsigned int *') converts between pointers to integer types with different sign [-Wpointer-sign]
+ 1490 |         getsockname(ctxt->dataFd, (struct sockaddr *) &dataAddr, &dataAddrLen);
+      |                                                                  ^~~~~~~~~~~~
+<WORKSPACE>/FlexyGram/../android-tools/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/../sysroot/usr/include/sys/socket.h:291:94: note: passing argument to parameter '__addr_length' here
+  291 | __socketcall int getsockname(int __fd, struct sockaddr* _Nonnull __addr, socklen_t* _Nonnull __addr_length);
+      |                                                                                              ^
+2 warnings generated.
+  CC       catalog.lo
+catalog.c:2188:9: warning: variable 'count' set but not used [-Wunused-but-set-variable]
+ 2188 |     int count = 0;
+      |         ^
+1 warning generated.
+  CC       globals.lo
+  CC       threads.lo
+  CC       c14n.lo
+  CC       xmlstring.lo
+  CC       buf.lo
+  CC       xmlregexp.lo
+  CC       xmlschemas.lo
+xmlschemas.c:21773:9: warning: variable 'count' set but not used [-Wunused-but-set-variable]
+ 21773 |     int count = 0;
+       |         ^
+  CC       xmlschemastypes.lo
+  CC       xmlunicode.lo
+1 warning generated.
+  CC       xmlreader.lo
+  CC       relaxng.lo
+  CC       dict.lo
+dict.c:999:30: warning: variable 'nbi' set but not used [-Wunused-but-set-variable]
+  999 |     unsigned long key, okey, nbi = 0;
+      |                              ^
+1 warning generated.
+  CC       SAX2.lo
+  CC       xmlwriter.lo
+  CC       legacy.lo
+  CC       chvalid.lo
+  CC       pattern.lo
+  CC       xmlsave.lo
+  CC       xmlmodule.lo
+  CC       schematron.lo
+  CC       xzlib.lo
+  CC       testdso.lo
+  CC       xmllint.o
+  CC       xmlcatalog.o
+sed -e 's?\@XML_LIBDIR\@?-L<WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/lib?g' \
+    -e 's?\@XML_INCLUDEDIR\@?-I<WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/include/libxml2?g' \
+    -e 's?\@VERSION\@?2.9.8?g' \
+    -e 's?\@XML_LIBS\@?-lxml2 -lz -llzma    -lm ?g' \
+       < ./xml2Conf.sh.in > xml2Conf.tmp \
+&& mv xml2Conf.tmp xml2Conf.sh
+  CCLD     libxml2.la
+  CCLD     testdso.la
+  CCLD     xmllint
+  CCLD     xmlcatalog
+make[2]: Leaving directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8'
+Making all in doc
+make[2]: Entering directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/doc'
+Making all in .
+make[3]: Entering directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/doc'
+make[3]: Nothing to be done for 'all-am'.
+make[3]: Leaving directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/doc'
+Making all in devhelp
+make[3]: Entering directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/doc/devhelp'
+make[3]: Nothing to be done for 'all'.
+make[3]: Leaving directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/doc/devhelp'
+Making all in examples
+make[3]: Entering directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/doc/examples'
+make[3]: Nothing to be done for 'all'.
+make[3]: Leaving directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/doc/examples'
+make[2]: Leaving directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/doc'
+Making all in example
+make[2]: Entering directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/example'
+make[2]: Nothing to be done for 'all'.
+make[2]: Leaving directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/example'
+Making all in xstc
+make[2]: Entering directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/xstc'
+make[2]: Nothing to be done for 'all'.
+make[2]: Leaving directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/xstc'
+make[1]: Leaving directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8'
+make  install-recursive
+make[1]: Entering directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8'
+Making install in include
+make[2]: Entering directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/include'
+Making install in libxml
+make[3]: Entering directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/include/libxml'
+make[4]: Entering directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/include/libxml'
+make[4]: Nothing to be done for 'install-exec-am'.
+ /usr/bin/mkdir -p '<WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/include/libxml2/libxml'
+ /usr/bin/install -c -m 644 SAX.h entities.h encoding.h parser.h parserInternals.h xmlerror.h HTMLparser.h HTMLtree.h debugXML.h tree.h list.h hash.h xpath.h xpathInternals.h xpointer.h xinclude.h xmlIO.h xmlmemory.h nanohttp.h nanoftp.h uri.h valid.h xlink.h xmlversion.h DOCBparser.h catalog.h threads.h globals.h c14n.h xmlautomata.h xmlregexp.h xmlmodule.h xmlschemas.h schemasInternals.h xmlschemastypes.h xmlstring.h xmlunicode.h xmlreader.h relaxng.h dict.h '<WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/include/libxml2/libxml'
+ /usr/bin/install -c -m 644 SAX2.h xmlexports.h xmlwriter.h chvalid.h pattern.h xmlsave.h schematron.h '<WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/include/libxml2/libxml'
+make[4]: Leaving directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/include/libxml'
+make[3]: Leaving directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/include/libxml'
+make[3]: Entering directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/include'
+make[4]: Entering directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/include'
+make[4]: Nothing to be done for 'install-exec-am'.
+make[4]: Nothing to be done for 'install-data-am'.
+make[4]: Leaving directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/include'
+make[3]: Leaving directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/include'
+make[2]: Leaving directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/include'
+Making install in .
+make[2]: Entering directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8'
+make[3]: Entering directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8'
+ /usr/bin/mkdir -p '<WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/lib'
+ /bin/bash ./libtool   --mode=install /usr/bin/install -c   libxml2.la '<WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/lib'
+libtool: install: /usr/bin/install -c .libs/libxml2.so <WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/lib/libxml2.so
+libtool: install: /usr/bin/install -c .libs/libxml2.lai <WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/lib/libxml2.la
+libtool: install: /usr/bin/install -c .libs/libxml2.a <WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/lib/libxml2.a
+libtool: install: chmod 644 <WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/lib/libxml2.a
+libtool: install: <WORKSPACE>/FlexyGram/../android-tools/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ranlib <WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/lib/libxml2.a
+ /usr/bin/mkdir -p '<WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/bin'
+  /bin/bash ./libtool   --mode=install /usr/bin/install -c xmllint xmlcatalog '<WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/bin'
+libtool: install: /usr/bin/install -c .libs/xmllint <WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/bin/xmllint
+libtool: install: /usr/bin/install -c .libs/xmlcatalog <WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/bin/xmlcatalog
+ /usr/bin/mkdir -p '<WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/bin'
+ /usr/bin/install -c xml2-config '<WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/bin'
+ /usr/bin/mkdir -p '<WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/lib'
+ /usr/bin/install -c -m 644 xml2Conf.sh '<WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/lib'
+ /usr/bin/mkdir -p '<WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/lib/cmake/libxml2'
+ /usr/bin/install -c -m 644 libxml2-config.cmake '<WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/lib/cmake/libxml2'
+/usr/bin/mkdir -p <WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/share/doc/libxml2-2.9.8
+/usr/bin/install -c -m 0644 ./Copyright <WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/share/doc/libxml2-2.9.8
+/usr/bin/mkdir -p <WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/share/doc/libxml2-2.9.8/examples
+/usr/bin/install -c -m 0644 ./xmllint.c <WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/share/doc/libxml2-2.9.8/examples
+/usr/bin/install -c -m 0644 ./testSAX.c <WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/share/doc/libxml2-2.9.8/examples
+/usr/bin/install -c -m 0644 ./testHTML.c <WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/share/doc/libxml2-2.9.8/examples
+/usr/bin/install -c -m 0644 ./testXPath.c <WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/share/doc/libxml2-2.9.8/examples
+ /usr/bin/mkdir -p '<WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/share/aclocal'
+ /usr/bin/install -c -m 644 libxml.m4 '<WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/share/aclocal'
+ /usr/bin/mkdir -p '<WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/share/man/man1'
+ /usr/bin/install -c -m 644 xml2-config.1 '<WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/share/man/man1'
+ /usr/bin/mkdir -p '<WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/share/man/man3'
+ /usr/bin/install -c -m 644 libxml.3 '<WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/share/man/man3'
+ /usr/bin/mkdir -p '<WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/lib/pkgconfig'
+ /usr/bin/install -c -m 644 libxml-2.0.pc '<WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/lib/pkgconfig'
+make[3]: Leaving directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8'
+make[2]: Leaving directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8'
+Making install in doc
+make[2]: Entering directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/doc'
+Making install in .
+make[3]: Entering directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/doc'
+make[4]: Entering directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/doc'
+make[4]: Nothing to be done for 'install-exec-am'.
+/usr/bin/mkdir -p <WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/share/doc/libxml2-2.9.8/html
+/usr/bin/install -c -m 0644 ./xml.html ./encoding.html ./FAQ.html ./structure.gif ./DOM.gif ./smallfootonly.gif ./redhat.gif ./libxml.gif ./w3c.png ./Libxml2-Logo-180x168.gif ./Libxml2-Logo-90x34.gif <WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/share/doc/libxml2-2.9.8/html
+/usr/bin/mkdir -p <WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/share/doc/libxml2-2.9.8/html/html
+/usr/bin/install -c -m 0644 ./html/*.html <WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/share/doc/libxml2-2.9.8/html/html
+/usr/bin/install -c -m 0644 ./html/*.png <WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/share/doc/libxml2-2.9.8/html/html
+/usr/bin/mkdir -p <WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/share/doc/libxml2-2.9.8/html/tutorial
+/usr/bin/install -c -m 0644 ./tutorial/*.* \
+	<WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/share/doc/libxml2-2.9.8/html/tutorial
+/usr/bin/mkdir -p <WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/share/doc/libxml2-2.9.8/html/tutorial/images
+/usr/bin/install -c -m 0644 ./tutorial/images/*.* \
+	<WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/share/doc/libxml2-2.9.8/html/tutorial/images
+/usr/bin/mkdir -p <WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/share/doc/libxml2-2.9.8/html/tutorial/images/callouts
+/usr/bin/install -c -m 0644 ./tutorial/images/callouts/*.* \
+	<WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/share/doc/libxml2-2.9.8/html/tutorial/images/callouts
+ /usr/bin/mkdir -p '<WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/share/man/man1'
+ /usr/bin/install -c -m 644 xmllint.1 xmlcatalog.1 '<WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/share/man/man1'
+make[4]: Leaving directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/doc'
+make[3]: Leaving directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/doc'
+Making install in devhelp
+make[3]: Entering directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/doc/devhelp'
+make[4]: Entering directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/doc/devhelp'
+make[4]: Nothing to be done for 'install-exec-am'.
+ /usr/bin/mkdir -p '<WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/share/gtk-doc/html/libxml2'
+ /usr/bin/install -c -m 644 libxml2.devhelp general.html index.html libxml2-c14n.html libxml2-catalog.html libxml2-chvalid.html libxml2-debugXML.html libxml2-dict.html libxml2-DOCBparser.html libxml2-encoding.html libxml2-entities.html libxml2-globals.html libxml2-hash.html libxml2-HTMLparser.html libxml2-HTMLtree.html libxml2-list.html libxml2-nanoftp.html libxml2-nanohttp.html libxml2-parser.html libxml2-parserInternals.html libxml2-pattern.html libxml2-relaxng.html libxml2-SAX2.html libxml2-SAX.html libxml2-schemasInternals.html libxml2-schematron.html libxml2-threads.html libxml2-tree.html libxml2-uri.html libxml2-valid.html libxml2-xinclude.html libxml2-xlink.html libxml2-xmlautomata.html libxml2-xmlerror.html libxml2-xmlexports.html libxml2-xmlIO.html libxml2-xmlmemory.html libxml2-xmlmodule.html libxml2-xmlreader.html libxml2-xmlregexp.html '<WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/share/gtk-doc/html/libxml2'
+ /usr/bin/install -c -m 644 libxml2-xmlsave.html libxml2-xmlschemas.html libxml2-xmlschemastypes.html libxml2-xmlstring.html libxml2-xmlunicode.html libxml2-xmlversion.html libxml2-xmlwriter.html libxml2-xpath.html libxml2-xpathInternals.html libxml2-xpointer.html home.png left.png right.png up.png style.css '<WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/share/gtk-doc/html/libxml2'
+make[4]: Leaving directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/doc/devhelp'
+make[3]: Leaving directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/doc/devhelp'
+Making install in examples
+make[3]: Entering directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/doc/examples'
+make[4]: Entering directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/doc/examples'
+make[4]: Nothing to be done for 'install-exec-am'.
+/usr/bin/mkdir -p <WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/share/doc/libxml2-2.9.8/html
+/usr/bin/install -c -m 0644 ./*.html ./*.c ./*.xml ./*.xsl ./*.res <WORKSPACE>/FlexyGram/../repro-final-candidates/prefix/share/doc/libxml2-2.9.8/html
+make[4]: Leaving directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/doc/examples'
+make[3]: Leaving directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/doc/examples'
+make[2]: Leaving directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/doc'
+Making install in example
+make[2]: Entering directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/example'
+make[3]: Entering directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/example'
+make[3]: Nothing to be done for 'install-exec-am'.
+make[3]: Nothing to be done for 'install-data-am'.
+make[3]: Leaving directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/example'
+make[2]: Leaving directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/example'
+Making install in xstc
+make[2]: Entering directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/xstc'
+make[3]: Entering directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/xstc'
+make[3]: Nothing to be done for 'install-exec-am'.
+make[3]: Nothing to be done for 'install-data-am'.
+make[3]: Leaving directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/xstc'
+make[2]: Leaving directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8/xstc'
+make[1]: Leaving directory '<WORKSPACE>/repro-final-candidates/sources/libxml2-2.9.8'

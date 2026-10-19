@@ -52,6 +52,21 @@
       "before": null,
       "previous": [],
       "after": "54bfc17714546a068eeb4caf481e8ba4c384fe1ecc936fcbd79876a7789bde6b"
+    },
+    "tools/native_compatibility/acceptance.py": {
+      "before": null,
+      "after": "27fa11a88694e5953b4846f3b3cbc34f60d96f96f04d97d7d8feaa946b412425",
+      "previous": []
+    },
+    "tools/native_compatibility/rebuild_candidates.py": {
+      "before": null,
+      "after": "0cd6596bb78071258a8e65092ea8fe65102eec16bfb2e1655f766589c8bd830d",
+      "previous": []
+    },
+    "tools/native_compatibility/rebuild-sources.json": {
+      "before": null,
+      "after": "7ddf343b6025e0481bb32a2b11e5aa3bfaba3c740ede8bf8a0aa004ffb0324bc",
+      "previous": []
     }
   }
 }

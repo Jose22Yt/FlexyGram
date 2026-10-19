@@ -1,0 +1,21 @@
+Looking in links: <WORKSPACE>/locked-wheels-all
+Processing ./locked-wheels-all/beautifulsoup4-4.15.0-py3-none-any.whl (from -r <WORKSPACE>/FlexyGram/TMessagesProj/python/requirements.lock (line 3))
+Processing ./locked-wheels-all/certifi-2026.10.18-py3-none-any.whl (from -r <WORKSPACE>/FlexyGram/TMessagesProj/python/requirements.lock (line 5))
+Processing ./locked-wheels-all/chaquopy_freetype-2.9.1-2-py3-none-android_21_x86_64.whl (from -r <WORKSPACE>/FlexyGram/TMessagesProj/python/requirements.lock (line 7))
+Processing ./locked-wheels-all/chaquopy_libjpeg-1.5.3-1-py3-none-android_21_x86_64.whl (from -r <WORKSPACE>/FlexyGram/TMessagesProj/python/requirements.lock (line 10))
+Processing ./locked-wheels-all/chaquopy_libxml2-2.9.8-2-py3-none-android_21_x86_64.whl (from -r <WORKSPACE>/FlexyGram/TMessagesProj/python/requirements.lock (line 13))
+Processing ./locked-wheels-all/chaquopy_libxslt-1.1.32-2-py3-none-android_21_x86_64.whl (from -r <WORKSPACE>/FlexyGram/TMessagesProj/python/requirements.lock (line 16))
+Processing ./locked-wheels-all/chaquopy_libyaml-0.2.5-0-py3-none-android_24_x86_64.whl (from -r <WORKSPACE>/FlexyGram/TMessagesProj/python/requirements.lock (line 19))
+Processing ./locked-wheels-all/charset_normalizer-3.5.2-py3-none-any.whl (from -r <WORKSPACE>/FlexyGram/TMessagesProj/python/requirements.lock (line 22))
+Processing ./locked-wheels-all/debugpy-1.8.22-py2.py3-none-any.whl (from -r <WORKSPACE>/FlexyGram/TMessagesProj/python/requirements.lock (line 24))
+Processing ./locked-wheels-all/idna-3.20-py3-none-any.whl (from -r <WORKSPACE>/FlexyGram/TMessagesProj/python/requirements.lock (line 26))
+Processing ./locked-wheels-all/lxml-5.3.0-0-cp311-cp311-android_24_x86_64.whl (from -r <WORKSPACE>/FlexyGram/TMessagesProj/python/requirements.lock (line 28))
+Processing ./locked-wheels-all/packaging-26.3-py3-none-any.whl (from -r <WORKSPACE>/FlexyGram/TMessagesProj/python/requirements.lock (line 31))
+Processing ./locked-wheels-all/pillow-11.0.0-0-cp311-cp311-android_24_x86_64.whl (from -r <WORKSPACE>/FlexyGram/TMessagesProj/python/requirements.lock (line 33))
+Processing ./locked-wheels-all/pyyaml-6.0.3-0-cp311-cp311-android_24_x86_64.whl (from -r <WORKSPACE>/FlexyGram/TMessagesProj/python/requirements.lock (line 36))
+Processing ./locked-wheels-all/requests-2.34.2-py3-none-any.whl (from -r <WORKSPACE>/FlexyGram/TMessagesProj/python/requirements.lock (line 39))
+Processing ./locked-wheels-all/soupsieve-3.0.3-py3-none-any.whl (from -r <WORKSPACE>/FlexyGram/TMessagesProj/python/requirements.lock (line 41))
+Processing ./locked-wheels-all/typing_extensions-4.16.0-py3-none-any.whl (from -r <WORKSPACE>/FlexyGram/TMessagesProj/python/requirements.lock (line 43))
+Processing ./locked-wheels-all/urllib3-2.8.0-py3-none-any.whl (from -r <WORKSPACE>/FlexyGram/TMessagesProj/python/requirements.lock (line 45))
+Installing collected packages: chaquopy-libyaml, chaquopy-libxml2, chaquopy-libjpeg, chaquopy-freetype, urllib3, typing_extensions, soupsieve, PyYAML, pillow, packaging, idna, debugpy, charset-normalizer, chaquopy-libxslt, certifi, requests, lxml, beautifulsoup4
+Successfully installed PyYAML-6.0.3 beautifulsoup4-4.15.0 certifi-2026.10.18 chaquopy-freetype-2.9.1 chaquopy-libjpeg-1.5.3 chaquopy-libxml2-2.9.8 chaquopy-libxslt-1.1.32 chaquopy-libyaml-0.2.5 charset-normalizer-3.5.2 debugpy-1.8.22 idna-3.20 lxml-5.3.0 packaging-26.3 pillow-11.0.0 requests-2.34.2 soupsieve-3.0.3 typing_extensions-4.16.0 urllib3-2.8.0

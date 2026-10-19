@@ -1,0 +1,38 @@
+{
+  "scope": "Changed names only extracted into resources; candidate icon files compiled separately; not full PR Android build",
+  "results": [
+    {
+      "locale": "values",
+      "exit": 0
+    },
+    {
+      "locale": "values-ar",
+      "exit": 0
+    },
+    {
+      "locale": "values-de",
+      "exit": 0
+    },
+    {
+      "locale": "values-es",
+      "exit": 0
+    },
+    {
+      "locale": "values-it",
+      "exit": 0
+    },
+    {
+      "locale": "values-ko",
+      "exit": 0
+    },
+    {
+      "locale": "values-nl",
+      "exit": 0
+    },
+    {
+      "locale": "values-pt-rBR",
+      "exit": 0
+    }
+  ],
+  "raw_develop_strings_aapt_exit": 1
+}
