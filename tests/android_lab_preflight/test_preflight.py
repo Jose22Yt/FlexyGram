@@ -22,9 +22,12 @@ CERT = '27ef63ae50546c0af28c0ac54ef66a0c00614934cda86c6bea42d9d2759e7b83'
 class SimulatedRunner:
     def __init__(self, sdk='24', page='4096', abis='arm64-v8a,armeabi-v7a',
                  qemu='1', devices='List of devices attached\nemulator-5554 device product:test model:test\n',
-                 installed='', package=module.PACKAGE, internet=False, cert=CERT, v2=True):
+                 installed='', package=module.PACKAGE, internet=False, cert=CERT, v2=True,
+                 kernel='aarch64', primary_abi='arm64-v8a', bridge='0', bridge_exec='0'):
         self.sdk, self.page, self.abis = sdk, page, abis
         self.qemu, self.devices, self.installed = qemu, devices, installed
+        self.kernel, self.primary_abi = kernel, primary_abi
+        self.bridge, self.bridge_exec = bridge, bridge_exec
         self.package, self.internet, self.cert, self.v2 = package, internet, cert, v2
         self.calls = []
 
@@ -37,6 +40,14 @@ class SimulatedRunner:
                 return self.qemu
             if argv[4:6] == ['getprop', 'ro.boot.qemu']:
                 return self.qemu
+            if argv[4:] == ['uname', '-m']:
+                return self.kernel
+            if argv[4:6] == ['getprop', 'ro.product.cpu.abi']:
+                return self.primary_abi
+            if argv[4:6] == ['getprop', 'ro.dalvik.vm.native.bridge']:
+                return self.bridge
+            if argv[4:6] == ['getprop', 'ro.enable.native.bridge.exec']:
+                return self.bridge_exec
             if argv[4:6] == ['getprop', 'ro.build.version.sdk']:
                 return self.sdk
             if argv[4:6] == ['getprop', 'ro.product.cpu.abilist']:
@@ -109,6 +120,33 @@ class AndroidPreflightTests(unittest.TestCase):
 
     def test_unsupported_abi_is_rejected(self):
         self.runner.abis = 'x86_64,x86'
+        self.assertEqual(self.run_cli()[0], 1)
+
+    def test_x86_guest_with_arm64_advertised_is_rejected(self):
+        self.runner.kernel = 'x86_64'
+        self.runner.primary_abi = 'x86_64'
+        self.runner.abis = 'x86_64,arm64-v8a'
+        status, report = self.run_cli()
+        self.assertEqual(status, 1)
+        self.assertEqual(report['status'], 'BLOCKED')
+
+    def test_primary_abi_must_be_arm64(self):
+        self.runner.primary_abi = 'x86_64'
+        self.runner.abis = 'arm64-v8a,x86_64'
+        self.assertEqual(self.run_cli()[0], 1)
+
+    def test_native_bridge_property_is_blocked(self):
+        self.runner.bridge = 'libhoudini.so'
+        status, report = self.run_cli()
+        self.assertEqual(status, 1)
+        self.assertEqual(report['status'], 'BLOCKED')
+
+    def test_native_bridge_exec_property_is_blocked(self):
+        self.runner.bridge_exec = '1'
+        self.assertEqual(self.run_cli()[0], 1)
+
+    def test_non_arm64_kernel_is_blocked_even_if_abi_listed(self):
+        self.runner.kernel = 'x86_64'
         self.assertEqual(self.run_cli()[0], 1)
 
     def test_emulator_identity_must_be_proven(self):
@@ -187,6 +225,25 @@ class AndroidPreflightTests(unittest.TestCase):
         self.assertEqual(result['category_counts']['crash_or_anr'], 1)
         self.assertNotIn('MySecretToken', json.dumps(result))
         self.assertNotIn('private', json.dumps(result))
+
+    def test_critical_local_log_blocks_preflight(self):
+        path = self.root / 'startup.log'
+        path.write_text('FATAL EXCEPTION: main\nModuleNotFoundError: lxml\n',
+                        encoding='utf-8')
+        status, report = self.run_cli(self.flags() + ['--log-file', str(path)])
+        self.assertEqual(status, 1)
+        self.assertEqual(report['status'], 'BLOCKED')
+        self.assertEqual(report['log_indicators']['category_counts']['crash_or_anr'], 1)
+        self.assertEqual(report['log_indicators']['category_counts']['python_import_error'], 1)
+        self.assertNotIn(str(path), json.dumps(report))
+
+    def test_clean_local_log_is_not_runtime_certification(self):
+        path = self.root / 'startup.log'
+        path.write_text('local synthetic diagnostic startup\n', encoding='utf-8')
+        status, report = self.run_cli(self.flags() + ['--log-file', str(path)])
+        self.assertEqual(status, 0)
+        self.assertEqual(report['status'], 'READY_FOR_HUMAN_REVIEW_NOT_RUNTIME_VALIDATED')
+        self.assertEqual(sum(report['log_indicators']['category_counts'].values()), 0)
 
     def test_log_symlink_is_rejected(self):
         path = self.root / 'private.log'
