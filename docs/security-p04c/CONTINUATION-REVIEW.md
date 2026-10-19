@@ -34,3 +34,17 @@ La revisión de esta continuación se hizo con acceso GitHub a la fuente y un en
 8. Revisar los hallazgos y obtener aprobación expresa del propietario antes de cualquier fusión. **No iniciar PASO 4**.
 
 Esta continuación está preparada como **PR en borrador**, no como validación de P0.4c ni como autorización para fusionarlo. No se han activado GitHub Actions ni publicado APK/Releases. `main` y `develop` no deben cambiar.
+
+
+## Verificación adicional del contrato de dependencias (continuación)
+
+Comprobación cruzada directa de los dos archivos de bloqueo desde GitHub y su integración en Gradle:
+
+- Paquetes de `wheels.lock.json`: **18**; paquetes de `requirements.lock`: **18**, mismos nombres normalizados, versiones y conjuntos de SHA-256 por paquete.
+- Wheels registrados: **26**; ninguna duplicación, hash mal formado ni discrepancia de URL/nombre detectada en la inspección del archivo declarado. Tanto ARM64 como x86_64 seleccionan exactamente **18 archivos** (uno por paquete).
+- `TMessagesProj/build.gradle` mantiene `ANDROID_PLATFORM=android-24`, `--require-hashes` y `--no-index`. La comprobación del texto Gradle no es una prueba de que el plugin Chaquopy haya ejecutado esas opciones en una compilación real.
+- Nueva suite `tests/native_compatibility/test_lock_contract.py`: diez casos, incluyendo contrato real del repositorio y mutaciones negativas de hashes, duplicados, URL/host, ABI, rutas y requisitos sin fijar. No descarga wheels ni ejecuta Gradle.
+- Ejecución Python 3.13 local contra el arnés y la herramienta conservada: **18 tests, 17 correctos y 1 omitido** (el test del lock completo se omitió **solo** por no haber checkout Git completo en este entorno). El contrato real se inspeccionó por separado a través del conector de GitHub y no se anuncia como prueba Python ejecutada.
+- Sintaxis Python: `compileall` sin errores.
+
+Estas comprobaciones amplían la cobertura pero no acreditan que los 26 wheels se hayan descargado realmente, que correspondan a su contenido hash, ni que Chaquopy pueda instalar/importar todos ellos. El set completo de 102 pruebas históricas y el build Android siguen pendientes.
