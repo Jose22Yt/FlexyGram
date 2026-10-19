@@ -1,0 +1,54 @@
+{
+  "base": "ab063041804674861e865364206c0ef27ef1e953",
+  "files": {
+    "TMessagesProj/build.gradle": {
+      "before": "7d83c7b582a4af6a5adeb2f06c363e47f9728e41d328cf25fff80a549bd00b39",
+      "after": "45f5e0fac03635e865a60eb16ad296a8422db9184c6cf3b5e0f4b235e02ae618",
+      "previous": [
+        "02161a45c44fe6f0b75c80359fd8c924e925302e693c33d9d873ebc6e5f5fba1",
+        "7d83c7b582a4af6a5adeb2f06c363e47f9728e41d328cf25fff80a549bd00b39",
+        "f978651af1f32a66c32ffc864a0ea628e1281cd456ad57d5d04934bce8b844b0"
+      ]
+    },
+    "TMessagesProj/python/requirements.lock": {
+      "before": null,
+      "after": "3b256cf2e29614bf33d3115a0a84a80f4df4097bb529cdd5d7dc977e579462a6",
+      "previous": []
+    },
+    "TMessagesProj/python/wheels.lock.json": {
+      "before": null,
+      "after": "2473f225e52f03d9de4e52b524f341c9ba1066118528f82425ecda20be9a70c9",
+      "previous": []
+    },
+    "tools/native_compatibility/audit.py": {
+      "before": null,
+      "after": "3159252fc7ae161b49b0381b3b5a378ea4daa61d42d0cf093bca71081d704fe2",
+      "previous": []
+    },
+    "tools/native_compatibility/wheelhouse.py": {
+      "before": null,
+      "after": "3f8c5e0aa75ed4dd13f22497df9f2531420e1c00afc5c68708e1ae2389dcd44f",
+      "previous": []
+    },
+    "tests/build_variants/scope.py": {
+      "before": "210598676311402688bc35eb9b7c7edf38cc6b9d405f34803ca2260be051b4c5",
+      "after": "9c0bb55929eedd2a738ce743e8a87f074e28f603419baf9bd8ca8edd38fb921e",
+      "previous": [
+        "210598676311402688bc35eb9b7c7edf38cc6b9d405f34803ca2260be051b4c5"
+      ]
+    },
+    "tests/translation_staging/review_scope.py": {
+      "before": "cbaf75ddf3c3a63136adf51c2d5b1a7274cdc315402dd7c6639d2ef72b0b3a12",
+      "after": "3db5849fcc10a91ba1e189cda03d4537b975a0ca983de33a881dea0aad754f20",
+      "previous": [
+        "cbaf75ddf3c3a63136adf51c2d5b1a7274cdc315402dd7c6639d2ef72b0b3a12",
+        "de6dcbbd44175343fc634e79720b6b872123ffcb3081ce92ce0dd3f9b63b235c"
+      ]
+    },
+    "tools/native_compatibility/requirements.lock": {
+      "before": null,
+      "previous": [],
+      "after": "54bfc17714546a068eeb4caf481e8ba4c384fe1ecc936fcbd79876a7789bde6b"
+    }
+  }
+}
