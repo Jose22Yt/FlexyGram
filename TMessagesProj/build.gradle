@@ -457,7 +457,7 @@ dependencies {
     // add for keep formatting in translations
     implementation 'org.apache.commons:commons-text:1.15.0'
     // translator from nekogram
-    implementation 'app.nekogram.translator:translator:1.6.1'
+    implementation project(':translation-compat-diagnostic')
 
     // plugins engine: Xposed-совместимые хуки (LSPlant), MVEL-фильтры, генерация классов
     implementation 'com.aliucord:Aliuhook:1.1.4'
@@ -476,3 +476,40 @@ dependencies {
     implementation files('libs/glyph-matrix-sdk-2.0.aar')
 }
 
+
+// P0.3g: no configuration in this fixed Diagnostic project may resolve the legacy AAR.
+configurations.configureEach {
+    exclude group: 'app.nekogram.translator', module: 'translator'
+}
+
+tasks.register('verifyDiagnosticTranslationClasspath') {
+    def report = layout.buildDirectory.file('reports/translation-diagnostic-classpath.json')
+    outputs.file(report)
+    // Recheck the resolved graph rather than accepting a stale report.
+    outputs.upToDateWhen { false }
+    doLast {
+        def names = ['debugCompileClasspath', 'debugRuntimeClasspath']
+        def graphs = [:]
+        names.each { name ->
+            def configuration = configurations.getByName(name)
+            def components = configuration.incoming.resolutionResult.allComponents
+            if (components.any { it.moduleVersion?.group == 'app.nekogram.translator' && it.moduleVersion?.name == 'translator' }) {
+                throw new GradleException('Legacy translation dependency is forbidden in Diagnostic')
+            }
+            // External artifacts only: legacy resolvedArtifacts is ambiguous for AGP project variants.
+            def external = configuration.incoming.artifactView {
+                componentFilter { id -> id instanceof org.gradle.api.artifacts.component.ModuleComponentIdentifier }
+            }.artifacts.artifacts
+            graphs[name] = [
+                components: components.collect { it.id.displayName }.sort(),
+                externalArtifacts: external.collect { artifact ->
+                    [id: artifact.id.componentIdentifier.displayName, file: artifact.file.absolutePath]
+                }.sort { it.id }
+            ]
+        }
+        def target = report.get().asFile
+        target.parentFile.mkdirs()
+        target.text = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(graphs))
+    }
+}
+tasks.named('preBuild').configure { dependsOn 'verifyDiagnosticTranslationClasspath' }

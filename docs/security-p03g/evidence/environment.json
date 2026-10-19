@@ -1,0 +1,20 @@
+{
+  "gradle": "9.7.1",
+  "agp": "9.3.1",
+  "gradle_jdk": "JetBrains21.0.10-b1163.105",
+  "test_jdk": "Temurin21.0.12.1+1",
+  "compile_sdk": 37,
+  "build_tools": "36.0.0",
+  "ndk": "27.2.12479018",
+  "cmake": "3.31.6",
+  "python": "3.11.17",
+  "chaquopy": "17.0.0",
+  "native_target": "arm64-v8a",
+  "kotlin_incremental_argument": false,
+  "repository_gradle_properties_changed": false,
+  "gradle_offline": true,
+  "reference_aar_not_resolved_in_app": true,
+  "production_source_hashes_match_reviewed": true,
+  "sdk_platform_for_facade_check": 24,
+  "jdk_only_is_not_android_runtime_evidence": true
+}

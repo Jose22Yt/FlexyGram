@@ -1,0 +1,19 @@
+test_aar_compiled_base_and_result_binary_linkage (test_facade.FacadeTests.test_aar_compiled_base_and_result_binary_linkage) ... ok
+test_android24_bootclasspath_and_d8 (test_facade.FacadeTests.test_android24_bootclasspath_and_d8) ... ok
+test_base_pipeline_protected_array_and_helper_contract (test_facade.FacadeTests.test_base_pipeline_protected_array_and_helper_contract) ... ok
+test_case_sensitive_chinese_null_auto_and_empty_conversion (test_facade.FacadeTests.test_case_sensitive_chinese_null_auto_and_empty_conversion) ... ok
+test_complete_ordered_language_catalogs (test_facade.FacadeTests.test_complete_ordered_language_catalogs) ... ok
+test_consumed_abi_descriptors_and_modifiers (test_facade.FacadeTests.test_consumed_abi_descriptors_and_modifiers) ... ok
+test_facade_artifact_and_sources_have_no_retired_material (test_facade.FacadeTests.test_facade_artifact_and_sources_have_no_retired_material) ... ok
+test_pre_inflight_exception_thread_cancellation (test_facade.FacadeTests.test_pre_inflight_exception_thread_cancellation) ... ok
+test_production_and_historical_evidence_remain_unchanged (test_facade.FacadeTests.test_production_and_historical_evidence_remain_unchanged) ... ok
+test_public_result_fields_and_safe_value_semantics (test_facade.FacadeTests.test_public_result_fields_and_safe_value_semantics) ... ok
+test_real_java_and_kotlin_consumers_compile_and_link (test_facade.FacadeTests.test_real_java_and_kotlin_consumers_compile_and_link) ... ok
+test_safe_errors_and_no_retry_or_provider_switch (test_facade.FacadeTests.test_safe_errors_and_no_retry_or_provider_switch) ... ok
+test_unconfigured_instances_and_jwt_are_closed (test_facade.FacadeTests.test_unconfigured_instances_and_jwt_are_closed) ... ok
+test_unicode_html_entities_are_opaque_and_lossless (test_facade.FacadeTests.test_unicode_html_entities_are_opaque_and_lossless) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 21.180s
+
+OK

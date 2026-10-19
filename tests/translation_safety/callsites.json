@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "audited_source_base": "333dd8c9beb35a2e3caa985279858df7b5bc2ee7",
+  "audited_source_base": "8ed92d59f8e2c379851e13d3c45f24d8a36f92df",
   "callsites": [
     {
       "path": "TMessagesProj/src/main/java/app/exteraless/utils/text/TranslatorUtils.java",
@@ -258,16 +258,6 @@
       "symbol": "translator.translate"
     },
     {
-      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/fallback/GoogleTranslatorNeko.java",
-      "line": 10,
-      "symbol": "GoogleAppTranslator.getInstance"
-    },
-    {
-      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/fallback/GoogleTranslatorNeko.java",
-      "line": 12,
-      "symbol": "translator.translate"
-    },
-    {
       "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/ui/NekoDelegateFragment.java",
       "line": 622,
       "symbol": "Translator.translatePoll"
@@ -299,7 +289,6 @@
     "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/GoogleAppTranslator.kt": "af3ea371b13144f1c1afb1a9a5112cbb93c745cbc1f019d6fa0d77429bfb372c",
     "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/RealMicrosoftTranslator.kt": "5ccdd25e81acda444daef42d3c24209449082968b24bd23784b67693953ab843",
     "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/fallback/DeepLTranslatorNeko.java": "d52599b387c76e0ec563e9051b2c74fdb0db8058f3c69b367f3266dff820d83f",
-    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/fallback/GoogleTranslatorNeko.java": "1e0251e13382ba66c479e2af653824058421399b6e4e57158d5793e06e552bc1",
     "TMessagesProj/src/main/java/tw/nekomimi/nekogram/ui/NekoDelegateFragment.java": "70ebb5cdde166b8a994dcd005955d8b74a8aa72ac41a41774c5e314818e08f65"
   },
   "limits": "Lexical Kotlin/Java snapshot; reflection, generated code, plugins and binary calls need separate review."

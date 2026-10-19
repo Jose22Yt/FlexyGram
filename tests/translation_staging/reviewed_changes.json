@@ -1,0 +1,50 @@
+{
+  "base": "8ed92d59f8e2c379851e13d3c45f24d8a36f92df",
+  "purpose": "Exact diagnostic-only changes reviewed for P0.3g; no automatic refresh in tests",
+  "files": {
+    "settings.gradle": {
+      "before": "20faab35abb1539e63af98b4f1f5cbcd6017c8ae1ff68c0751a8d67d8020f4d1",
+      "after": "9790077ba1d458e0b4f03369bd582135ed31010fc093350ae0f37e855e413756"
+    },
+    "TMessagesProj/build.gradle": {
+      "before": "f978651af1f32a66c32ffc864a0ea628e1281cd456ad57d5d04934bce8b844b0",
+      "after": "02161a45c44fe6f0b75c80359fd8c924e925302e693c33d9d873ebc6e5f5fba1"
+    },
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/GoogleTranslator.kt": {
+      "before": "0555a42de6a1efca64362ba8ed6c284bcbdfa0318bd142c738dd2ec9b60cc3eb",
+      "after": "3131be46bb51bfd178eeacd33a30c7300be2d27c38006a2ead2e36ddcc4d2c8e"
+    },
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/fallback/GoogleTranslatorNeko.java": {
+      "before": "1e0251e13382ba66c479e2af653824058421399b6e4e57158d5793e06e552bc1",
+      "after": "6c4f3c3f411cde492c0bad9d3c40a37d23f8071bea5fd7ae231b3251e5e89401"
+    },
+    "TMessagesProj_Modules/translation-compat-diagnostic/build.gradle": {
+      "before": null,
+      "after": "aef39708fb6567b4f83c5c5a9d17ea7490d24e0c313e278231661133dae0090e"
+    },
+    "TMessagesProj_Modules/translation-compat-diagnostic/src/main/java/app/nekogram/translator/DeepLTranslator.java": {
+      "before": null,
+      "after": "363747fe3fdcbf7dca5125768a7b084a4bc62b07a2a309a7957411060ad00079"
+    },
+    "TMessagesProj_Modules/translation-compat-diagnostic/src/main/java/app/nekogram/translator/MicrosoftTranslator.java": {
+      "before": null,
+      "after": "1fb929f6301fdc089a5e97b39b862b5a0a837717a84393c00c47da5c11b8430d"
+    },
+    "TMessagesProj_Modules/translation-compat-diagnostic/src/main/java/app/nekogram/translator/BaseTranslator.java": {
+      "before": null,
+      "after": "dacbc8086d968a6edc1d3b275d346778e13a3d8c6ae319ebeb68126dd7dd8629"
+    },
+    "TMessagesProj_Modules/translation-compat-diagnostic/src/main/java/app/nekogram/translator/Result.java": {
+      "before": null,
+      "after": "ecb02601f71eac288f5c8a76f500e1a058ffa518b07e11b0339e9089220ad956"
+    },
+    "TMessagesProj_Modules/translation-compat-diagnostic/src/main/java/app/nekogram/translator/LanguageCodes.java": {
+      "before": null,
+      "after": "7984c504f39401319fb464a8fdb55d7f0fbe42f7e5979e5fcb7dab6deaaa5fd7"
+    },
+    "TMessagesProj_Modules/translation-compat-diagnostic/src/main/java/app/nekogram/translator/Http429Exception.java": {
+      "before": null,
+      "after": "b7db6c244239acf0bfdd5431d316ece6fc72f06f64111da15de04ae0aedc43ea"
+    }
+  }
+}

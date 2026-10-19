@@ -1,0 +1,72 @@
+{
+  "pr12_head": "2e2037225555a51a291545e1c64e513c830fed80",
+  "pr12_merge": "8ed92d59f8e2c379851e13d3c45f24d8a36f92df",
+  "tests": {
+    "previous": 83,
+    "new": 10,
+    "total_passed": 93,
+    "failures": 0,
+    "skipped": 0,
+    "negative_manifest_mutations_rejected": 10
+  },
+  "gradle": {
+    "exit_code": 0,
+    "result": "BUILD SUCCESSFUL",
+    "duration": "8m39s",
+    "tasks": 252,
+    "executed": 39,
+    "from_cache": 14,
+    "up_to_date": 199,
+    "scope": "clean application + diagnostic module then full ARM64 assembleDebug including JNI and Chaquopy; other unchanged projects reuse cache",
+    "offline": true,
+    "incremental_kotlin": false,
+    "first_attempt": "failed in added dependency verifier, fixed without changing Media3 or production contracts"
+  },
+  "apk": {
+    "sha256": "6302ecb37ca15716b5ce56fe1039845841454092b35181ffcd35cb82832cd066",
+    "bytes": 111957647,
+    "application_id": "io.github.jose22yt.flexygram.diagnostic",
+    "version_code": 1261,
+    "version_name": "13.0.2",
+    "label": "FlexyGram Diagnostic",
+    "abi": "arm64-v8a",
+    "debug_signature_v2_verified": true,
+    "min_sdk": "24",
+    "target_sdk": "36",
+    "installed": false,
+    "distributed": false
+  },
+  "scan": {
+    "complete": true,
+    "apk_entries": 14847,
+    "nested_archives": 7,
+    "dependency_artifacts": 201,
+    "known_keys": 0,
+    "client_key_candidates": 0,
+    "foreign_package_markers": 0,
+    "foreign_certificate_markers": 0,
+    "all_dependency_scans_passed": true,
+    "duplicate_dex_definitions": 0,
+    "diagnostic_facade_classes": 6,
+    "fixture_classes": 0,
+    "legacy_extra_classes": 0,
+    "guarded_compiled_classes": 17,
+    "native_aarch64_libraries": 18
+  },
+  "diagnostic": {
+    "internet_permission": false,
+    "api_id_zero": true,
+    "api_hash_empty": true,
+    "authentication_enabled": false,
+    "firebase_push_enabled": false,
+    "translation_providers_enabled": false,
+    "distribution_allowed": false
+  },
+  "limitations": [
+    "No ART/emulator/device/runtime network test",
+    "No real translation or authenticated session",
+    "Original native ANDROID_PLATFORM27 with manifest minSdk24 needs separate review",
+    "Original RealMicrosoft cancellation/error handling needs review before any authorization",
+    "Scanner covers recorded fingerprints and candidate formats, not universal secret absence"
+  ]
+}

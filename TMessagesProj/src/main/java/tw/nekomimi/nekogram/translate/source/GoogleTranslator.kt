@@ -3,22 +3,15 @@ package tw.nekomimi.nekogram.translate.source
 import tw.nekomimi.nekogram.translate.TranslationServicesPolicy
 import androidx.core.util.component1
 import androidx.core.util.component2
-import okhttp3.HttpUrl
-import okhttp3.Request
-import org.json.JSONException
-import org.json.JSONObject
 import org.telegram.messenger.LocaleController.getString
 import org.telegram.messenger.R
 import org.telegram.tgnet.TLRPC
 import org.telegram.ui.Components.TranslateAlert2
 import tw.nekomimi.nekogram.translate.HTMLKeeper
 import tw.nekomimi.nekogram.translate.Translator
-import tw.nekomimi.nekogram.utils.HttpClient
-import java.io.IOException
 
 object GoogleTranslator : Translator {
 
-    private val httpClient by lazy { HttpClient.instance }
 
     override suspend fun doTranslate(
         from: String, to: String, query: String, entities: ArrayList<TLRPC.MessageEntity>
@@ -62,58 +55,15 @@ object GoogleTranslator : Translator {
         return finalText
     }
 
+    // The legacy PA transport and its unauthorized embedded key are retired.
+    // Keep the consumer contract and preferences; recovery requires a reviewed integration.
     private suspend fun translate(
         text: String, from: String, to: String
     ): String {
         TranslationServicesPolicy.requireRoute(TranslationServicesPolicy.Route.GOOGLE_LEGACY_PA)
-        val urlBuilder = HttpUrl.Builder().scheme("https").host("translate-pa.googleapis.com")
-            .addPathSegments("v1/translate").addQueryParameter("params.client", "gtx")
-            .addQueryParameter(
-                "query.source_language", if (from.isEmpty() || from == "auto") "auto" else from
-            ).addQueryParameter("query.target_language", to)
-            .addQueryParameter("query.display_language", "en-US")
-            .addQueryParameter("data_types", "TRANSLATION")
-            .addQueryParameter("key", "AIzaSyDLEeFI5OtFBwYBIoK_jj5m32rZK5CkCXA")
-            .addQueryParameter("query.text", text)
-        val httpUrl = urlBuilder.build()
-
-        val request: Request = Request.Builder().url(httpUrl).get().header("Accept", "*/*")
-            .header("Accept-Language", "en-US,en;q=0.9").header(
-                "User-Agent",
-                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"
-            ).build()
-
-        try {
-            val responseBodyString = httpClient.newCall(request).await().use { response ->
-                val bodyString = response.body.string()
-                if (!response.isSuccessful) {
-                    throw IllegalStateException("TRANSLATION_HTTP_ERROR")
-                }
-                bodyString
-            }
-
-            val json = JSONObject(responseBodyString)
-            if (json.isNull("translation")) {
-                error("TRANSLATION_INVALID_RESPONSE")
-            }
-            val result = json.getString("translation")
-
-            return if (to.lowercase().startsWith("zh")) {
-                fixChineseNewlines(text, result)
-            } else {
-                result
-            }
-        } catch (e: IOException) {
-            throw TranslationServicesPolicy.safeFailure(e)
-        } catch (e: JSONException) {
-            throw TranslationServicesPolicy.safeFailure(e)
-        }
+        throw TranslationServicesPolicy.denied()
     }
 
-    /**
-     * Fix Google Translate API bug for Chinese: single \n becomes \n\n in result.
-     * Strategy: Build newline pattern from original text and apply to translated result.
-     */
     private fun fixChineseNewlines(original: String, translated: String): String {
         // Extract newline patterns from original: count consecutive \n at each break point
         val originalNewlinePattern = mutableListOf<Int>()

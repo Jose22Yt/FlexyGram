@@ -27,6 +27,8 @@ dependencyResolutionManagement {
 
 rootProject.name = "exteraless"
 include ':TMessagesProj'
+include ':translation-compat-diagnostic'
+project(':translation-compat-diagnostic').projectDir = file('TMessagesProj_Modules/translation-compat-diagnostic')
 
 gradle.ext.androidxMediaModulePrefix = 'TMessagesProj_Modules:media3:media-'
 apply from: file("TMessagesProj_Modules/media/core_settings.gradle")
