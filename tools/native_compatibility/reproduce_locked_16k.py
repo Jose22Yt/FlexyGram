@@ -136,8 +136,14 @@ def execute(args) -> dict:
     output = Path(args.output).absolute()
     if output.is_symlink() or output.exists():
         raise ValueError('Use a previously nonexistent private output directory')
-    if output == REPO or REPO in output.parents or any(
-            output == p or output in p.parents for p in (sources, wheelhouse, ndk)):
+    # Canonicalize ancestors too: a parent symlink must not redirect a fresh
+    # output directory into the checkout, sources, wheelhouse or NDK.
+    canonical_output = output.resolve()
+    canonical_repo = REPO.resolve()
+    input_roots = tuple(p.resolve() for p in (sources, wheelhouse, ndk))
+    if (canonical_output == canonical_repo or canonical_repo in canonical_output.parents
+            or any(canonical_output == p or canonical_output in p.parents
+                   for p in input_roots)):
         raise ValueError('Output must be isolated from all inputs and repository')
     library_pins, wheel_pins = expected()
     check_inputs(sources, wheelhouse, ndk, cmake)
