@@ -140,6 +140,40 @@ class StageTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'path collision'):
             self.verify(manifest)
 
+    def test_archive_change_before_extraction_fails_closed(self):
+        dest = self.base / 'no-output-before'
+        original_digest = s.digest
+        calls = {'archive': 0}
+
+        def changing_digest(path):
+            if Path(path) == self.bundle:
+                calls['archive'] += 1
+                if calls['archive'] == 2:
+                    return 'f' * 64
+            return original_digest(path)
+
+        with patch.object(s, 'digest', side_effect=changing_digest):
+            with self.assertRaisesRegex(ValueError, 'changed before extraction'):
+                s.stage(self.bundle, dest, self.manifest, self.pin)
+        self.assertFalse(dest.exists())
+
+    def test_archive_change_during_extraction_fails_closed(self):
+        dest = self.base / 'no-output-after'
+        original_digest = s.digest
+        calls = {'archive': 0}
+
+        def changing_digest(path):
+            if Path(path) == self.bundle:
+                calls['archive'] += 1
+                if calls['archive'] == 3:
+                    return 'f' * 64
+            return original_digest(path)
+
+        with patch.object(s, 'digest', side_effect=changing_digest):
+            with self.assertRaisesRegex(ValueError, 'changed during extraction'):
+                s.stage(self.bundle, dest, self.manifest, self.pin)
+        self.assertFalse(dest.exists())
+
     def test_bad_manifest_digest_rejected(self):
         other = json.loads(json.dumps(self.manifest))
         other['files']['sources/example.tar.xz']['sha256'] = 'a' * 64
