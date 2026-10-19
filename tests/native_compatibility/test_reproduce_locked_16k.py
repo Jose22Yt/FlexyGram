@@ -146,6 +146,21 @@ class ReproductionGateTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'previously nonexistent'):
             r.execute(args)
 
+    def test_symlinked_output_parent_cannot_write_into_inputs(self):
+        sources = self.path / 'protected-sources'
+        sources.mkdir()
+        alias = self.path / 'redirected-output'
+        alias.symlink_to(sources, target_is_directory=True)
+        output = alias / 'new-build'
+        args = type('Args', (), {'sources': str(sources),
+                                 'wheelhouse': str(self.path / 'wheels'),
+                                 'ndk': str(self.path / 'ndk'),
+                                 'cmake': str(self.path / 'cmake'),
+                                 'output': str(output)})()
+        with self.assertRaisesRegex(ValueError, 'Output must be isolated'):
+            r.execute(args)
+        self.assertFalse((sources / 'new-build').exists())
+
     def test_missing_input_preflight_exits_blocked_without_output(self):
         out = self.path / 'result-do-not-create'
         flags = ['--sources', str(self.path / 'not-here'), '--wheelhouse', str(self.path),
