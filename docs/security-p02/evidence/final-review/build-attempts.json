@@ -1,0 +1,110 @@
+[
+  {
+    "command": [
+      "./gradlew",
+      ":TMessagesProj:assembleDebug",
+      "--no-daemon",
+      "--console=plain",
+      "--stacktrace",
+      "--max-workers=2"
+    ],
+    "exit_code": 0,
+    "seconds": 525.3156574479997,
+    "native_target": "arm64-v8a",
+    "skip_native": false,
+    "label": "assemble-arm64-aliasfix"
+  },
+  {
+    "command": [
+      "./gradlew",
+      ":TMessagesProj:assembleDebug",
+      "--no-daemon",
+      "--console=plain",
+      "--stacktrace",
+      "--max-workers=2"
+    ],
+    "exit_code": 1,
+    "seconds": 76.26145830200016,
+    "native_target": "arm64-v8a",
+    "skip_native": false,
+    "label": "assemble-arm64-execfix"
+  },
+  {
+    "command": [
+      "./gradlew",
+      ":TMessagesProj:assembleDebug",
+      "--no-daemon",
+      "--console=plain",
+      "--stacktrace",
+      "--max-workers=2"
+    ],
+    "exit_code": 0,
+    "seconds": 32.8213750609998,
+    "native_target": "arm64-v8a",
+    "skip_native": false,
+    "label": "assemble-arm64-final"
+  },
+  {
+    "command": [
+      "./gradlew",
+      ":TMessagesProj:assembleDebug",
+      "--no-build-cache",
+      "--no-watch-fs",
+      "--no-daemon",
+      "--console=plain",
+      "--stacktrace",
+      "--max-workers=2"
+    ],
+    "exit_code": 0,
+    "seconds": 28.45737516400004,
+    "native_target": "arm64-v8a",
+    "skip_native": false,
+    "label": "assemble-arm64-repackage"
+  },
+  {
+    "command": [
+      "./gradlew",
+      ":TMessagesProj:assembleDebug",
+      "--no-daemon",
+      "--console=plain",
+      "--stacktrace",
+      "--max-workers=2"
+    ],
+    "exit_code": 1,
+    "seconds": 7.397880111000177,
+    "native_target": "arm64-v8a",
+    "skip_native": false,
+    "label": "assemble-arm64"
+  },
+  {
+    "command": [
+      "./gradlew",
+      ":TMessagesProj:assembleDebug",
+      "--info",
+      "--no-daemon",
+      "--console=plain",
+      "--stacktrace",
+      "--max-workers=2"
+    ],
+    "exit_code": 1,
+    "seconds": 174.733571472,
+    "native_target": "arm64-v8a",
+    "skip_native": false,
+    "label": "assemble-arm64-retry"
+  },
+  {
+    "command": [
+      "./gradlew",
+      ":TMessagesProj:assembleDebug",
+      "--no-daemon",
+      "--console=plain",
+      "--stacktrace",
+      "--max-workers=2"
+    ],
+    "exit_code": 1,
+    "seconds": 132.31485450600007,
+    "native_target": "arm64-v8a",
+    "skip_native": false,
+    "label": "assemble-arm64-sdkfix"
+  }
+]

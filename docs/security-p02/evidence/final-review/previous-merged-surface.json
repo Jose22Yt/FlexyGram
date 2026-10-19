@@ -1,0 +1,833 @@
+{
+  "source": "PR #5 e7a1db7, recorded aapt2 binary manifest evidence (not re-executed)",
+  "permissions": [
+    "android.permission.READ_CLIPBOARD",
+    "android.permission.BLUETOOTH_CONNECT",
+    "android.permission.FOREGROUND_SERVICE",
+    "android.permission.FOREGROUND_SERVICE_DATA_SYNC",
+    "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK",
+    "android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION",
+    "android.permission.FOREGROUND_SERVICE_CAMERA",
+    "android.permission.FOREGROUND_SERVICE_LOCATION",
+    "android.permission.FOREGROUND_SERVICE_MICROPHONE",
+    "android.permission.FOREGROUND_SERVICE_REMOTE_MESSAGING",
+    "android.permission.RECORD_AUDIO",
+    "android.permission.MODIFY_AUDIO_SETTINGS",
+    "android.permission.ACCESS_NETWORK_STATE",
+    "android.permission.ACCESS_WIFI_STATE",
+    "android.permission.WAKE_LOCK",
+    "android.permission.READ_PROFILE",
+    "android.permission.WRITE_SYNC_SETTINGS",
+    "android.permission.READ_SYNC_SETTINGS",
+    "android.permission.AUTHENTICATE_ACCOUNTS",
+    "android.permission.VIBRATE",
+    "com.nothing.ketchum.permission.ENABLE",
+    "android.permission.SYSTEM_ALERT_WINDOW",
+    "android.permission.READ_PHONE_STATE",
+    "android.permission.RECEIVE_BOOT_COMPLETED",
+    "android.permission.USE_FINGERPRINT",
+    "android.permission.USE_BIOMETRIC",
+    "android.permission.INSTALL_SHORTCUT",
+    "com.android.launcher.permission.INSTALL_SHORTCUT",
+    "com.android.launcher.permission.UNINSTALL_SHORTCUT",
+    "android.permission.CAMERA",
+    "android.permission.BLUETOOTH",
+    "android.permission.MANAGE_OWN_CALLS",
+    "android.permission.USE_FULL_SCREEN_INTENT",
+    "android.permission.REQUEST_INSTALL_PACKAGES",
+    "android.permission.READ_PHONE_NUMBERS",
+    "android.permission.POST_NOTIFICATIONS",
+    "android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS",
+    "com.sec.android.provider.badge.permission.READ",
+    "com.sec.android.provider.badge.permission.WRITE",
+    "com.htc.launcher.permission.READ_SETTINGS",
+    "com.htc.launcher.permission.UPDATE_SHORTCUT",
+    "com.sonyericsson.home.permission.BROADCAST_BADGE",
+    "com.sonymobile.home.permission.PROVIDER_INSERT_BADGE",
+    "com.anddoes.launcher.permission.UPDATE_COUNT",
+    "com.majeur.launcher.permission.UPDATE_BADGE",
+    "com.huawei.android.launcher.permission.CHANGE_BADGE",
+    "com.huawei.android.launcher.permission.READ_SETTINGS",
+    "com.huawei.android.launcher.permission.WRITE_SETTINGS",
+    "android.permission.READ_APP_BADGE",
+    "com.oppo.launcher.permission.READ_SETTINGS",
+    "com.oppo.launcher.permission.WRITE_SETTINGS",
+    "me.everything.badger.permission.BADGE_COUNT_READ",
+    "me.everything.badger.permission.BADGE_COUNT_WRITE",
+    "com.android.vending.BILLING",
+    "android.permission.ACCESS_BACKGROUND_LOCATION",
+    "android.permission.ACCESS_COARSE_LOCATION",
+    "android.permission.ACCESS_FINE_LOCATION",
+    "android.permission.ACCESS_MEDIA_LOCATION",
+    "android.permission.CREDENTIAL_MANAGER_SET_ORIGIN",
+    "com.google.android.c2dm.permission.RECEIVE",
+    "io.github.jose22yt.flexygram.diagnostic.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+  ],
+  "components": [
+    {
+      "type": "activity",
+      "name": "org.telegram.ui.LaunchActivity",
+      "enabled": true,
+      "exported": true,
+      "permission": null
+    },
+    {
+      "type": "activity-alias",
+      "name": "org.telegram.ui.CallsActivity",
+      "enabled": true,
+      "exported": true,
+      "permission": "android.permission.CALL_PHONE"
+    },
+    {
+      "type": "activity-alias",
+      "name": "org.telegram.messenger.NoxIcon",
+      "enabled": false,
+      "exported": true,
+      "permission": null
+    },
+    {
+      "type": "activity-alias",
+      "name": "org.telegram.messenger.TurboIcon",
+      "enabled": false,
+      "exported": true,
+      "permission": null
+    },
+    {
+      "type": "activity-alias",
+      "name": "org.telegram.messenger.PremiumIcon",
+      "enabled": false,
+      "exported": true,
+      "permission": null
+    },
+    {
+      "type": "activity-alias",
+      "name": "org.telegram.messenger.AquaIcon",
+      "enabled": false,
+      "exported": true,
+      "permission": null
+    },
+    {
+      "type": "activity-alias",
+      "name": "org.telegram.messenger.VintageIcon",
+      "enabled": false,
+      "exported": true,
+      "permission": null
+    },
+    {
+      "type": "activity-alias",
+      "name": "org.telegram.messenger.TelegramIcon",
+      "enabled": false,
+      "exported": true,
+      "permission": null
+    },
+    {
+      "type": "activity-alias",
+      "name": "org.telegram.messenger.PlusIcon",
+      "enabled": false,
+      "exported": true,
+      "permission": null
+    },
+    {
+      "type": "activity-alias",
+      "name": "org.telegram.messenger.NothingIcon",
+      "enabled": false,
+      "exported": true,
+      "permission": null
+    },
+    {
+      "type": "activity-alias",
+      "name": "org.telegram.messenger.MonoIcon",
+      "enabled": false,
+      "exported": true,
+      "permission": null
+    },
+    {
+      "type": "activity-alias",
+      "name": "org.telegram.messenger.HandIcon",
+      "enabled": false,
+      "exported": true,
+      "permission": null
+    },
+    {
+      "type": "activity-alias",
+      "name": "org.telegram.messenger.GoIcon",
+      "enabled": false,
+      "exported": true,
+      "permission": null
+    },
+    {
+      "type": "activity-alias",
+      "name": "org.telegram.messenger.QuackIcon",
+      "enabled": false,
+      "exported": true,
+      "permission": null
+    },
+    {
+      "type": "activity-alias",
+      "name": "org.telegram.messenger.AyuIcon",
+      "enabled": false,
+      "exported": true,
+      "permission": null
+    },
+    {
+      "type": "activity-alias",
+      "name": "org.telegram.messenger.NyaIcon",
+      "enabled": false,
+      "exported": true,
+      "permission": null
+    },
+    {
+      "type": "activity-alias",
+      "name": "org.telegram.messenger.RedIcon",
+      "enabled": false,
+      "exported": true,
+      "permission": null
+    },
+    {
+      "type": "activity-alias",
+      "name": "org.telegram.messenger.BlueprintIcon",
+      "enabled": false,
+      "exported": true,
+      "permission": null
+    },
+    {
+      "type": "activity-alias",
+      "name": "org.telegram.messenger.ExteralessIcon",
+      "enabled": true,
+      "exported": true,
+      "permission": null
+    },
+    {
+      "type": "activity",
+      "name": "app.exteraless.shortcuts.QuickToggleActivity",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "activity",
+      "name": "org.telegram.ui.BubbleActivity",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "activity",
+      "name": "org.telegram.ui.ShareActivity",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "activity",
+      "name": "org.telegram.ui.ExternalActionActivity",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "activity",
+      "name": "org.telegram.ui.ChatsWidgetConfigActivity",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "activity",
+      "name": "org.telegram.ui.ContactsWidgetConfigActivity",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "activity",
+      "name": "org.telegram.messenger.OpenChatReceiver",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "activity",
+      "name": "org.telegram.messenger.OpenAttachedMenuBotReceiver",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "activity",
+      "name": "org.telegram.ui.PopupNotificationActivity",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "activity",
+      "name": "org.telegram.ui.VoIPPermissionActivity",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "activity",
+      "name": "org.telegram.ui.VoIPFeedbackActivity",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "activity",
+      "name": "tw.nekomimi.nekogram.helpers.AppRestartHelper",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "receiver",
+      "name": "org.telegram.messenger.AutoMessageHeardReceiver",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "receiver",
+      "name": "org.telegram.messenger.CopyCodeReceiver",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "receiver",
+      "name": "org.telegram.messenger.NotificationsDisabledReceiver",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "receiver",
+      "name": "org.telegram.messenger.CallReceiver",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "service",
+      "name": "org.telegram.messenger.AuthenticatorService",
+      "enabled": false,
+      "exported": true,
+      "permission": null
+    },
+    {
+      "type": "service",
+      "name": "org.telegram.messenger.ContactsSyncAdapterService",
+      "enabled": false,
+      "exported": true,
+      "permission": null
+    },
+    {
+      "type": "service",
+      "name": "org.telegram.messenger.KeepAliveJob",
+      "enabled": false,
+      "exported": false,
+      "permission": "android.permission.BIND_JOB_SERVICE"
+    },
+    {
+      "type": "service",
+      "name": "org.telegram.messenger.BringAppForegroundService",
+      "enabled": true,
+      "exported": true,
+      "permission": null
+    },
+    {
+      "type": "service",
+      "name": "org.telegram.messenger.NotificationsService",
+      "enabled": false,
+      "exported": true,
+      "permission": null
+    },
+    {
+      "type": "service",
+      "name": "org.telegram.messenger.NotificationRepeat",
+      "enabled": false,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "service",
+      "name": "org.telegram.messenger.VideoEncodingService",
+      "enabled": true,
+      "exported": true,
+      "permission": null
+    },
+    {
+      "type": "service",
+      "name": "org.telegram.ui.Stories.recorder.StoryUploadingService",
+      "enabled": false,
+      "exported": true,
+      "permission": null
+    },
+    {
+      "type": "service",
+      "name": "org.telegram.messenger.ImportingService",
+      "enabled": false,
+      "exported": true,
+      "permission": null
+    },
+    {
+      "type": "service",
+      "name": "org.telegram.messenger.LocationSharingService",
+      "enabled": false,
+      "exported": true,
+      "permission": null
+    },
+    {
+      "type": "service",
+      "name": "org.telegram.messenger.voip.VoIPService",
+      "enabled": false,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "service",
+      "name": "org.telegram.messenger.MusicPlayerService",
+      "enabled": true,
+      "exported": true,
+      "permission": null
+    },
+    {
+      "type": "service",
+      "name": "org.telegram.messenger.MusicBrowserService",
+      "enabled": true,
+      "exported": true,
+      "permission": null
+    },
+    {
+      "type": "service",
+      "name": "org.telegram.messenger.voip.TelegramConnectionService",
+      "enabled": false,
+      "exported": true,
+      "permission": "android.permission.BIND_TELECOM_CONNECTION_SERVICE"
+    },
+    {
+      "type": "receiver",
+      "name": "org.telegram.messenger.MusicPlayerReceiver",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "receiver",
+      "name": "org.telegram.messenger.voip.VoIPMediaButtonReceiver",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "receiver",
+      "name": "org.telegram.messenger.AppStartReceiver",
+      "enabled": false,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "receiver",
+      "name": "org.telegram.messenger.RefererReceiver",
+      "enabled": true,
+      "exported": true,
+      "permission": "android.permission.INSTALL_PACKAGES"
+    },
+    {
+      "type": "receiver",
+      "name": "org.telegram.messenger.WearReplyReceiver",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "service",
+      "name": "org.telegram.messenger.WearAuthListenerService",
+      "enabled": true,
+      "exported": true,
+      "permission": null
+    },
+    {
+      "type": "receiver",
+      "name": "org.telegram.messenger.StopLiveLocationReceiver",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "receiver",
+      "name": "org.telegram.messenger.PopupReplyReceiver",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "receiver",
+      "name": "org.telegram.messenger.NotificationCallbackReceiver",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "receiver",
+      "name": "org.telegram.messenger.ShareBroadcastReceiver",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "receiver",
+      "name": "org.telegram.messenger.CustomTabsCopyReceiver",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "receiver",
+      "name": "org.telegram.messenger.NotificationDismissReceiver",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "receiver",
+      "name": "org.telegram.messenger.voip.VoIPActionsReceiver",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "receiver",
+      "name": "org.telegram.messenger.ShortcutResultReceiver",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "provider",
+      "name": "androidx.core.content.FileProvider",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "provider",
+      "name": "org.telegram.messenger.NotificationImageProvider",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "provider",
+      "name": "org.telegram.messenger.voip.CallNotificationSoundProvider",
+      "enabled": true,
+      "exported": true,
+      "permission": null
+    },
+    {
+      "type": "receiver",
+      "name": "org.telegram.messenger.ChatsWidgetProvider",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "service",
+      "name": "org.telegram.messenger.ChatsWidgetService",
+      "enabled": true,
+      "exported": false,
+      "permission": "android.permission.BIND_REMOTEVIEWS"
+    },
+    {
+      "type": "receiver",
+      "name": "org.telegram.messenger.ContactsWidgetProvider",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "service",
+      "name": "org.telegram.messenger.ContactsWidgetService",
+      "enabled": true,
+      "exported": false,
+      "permission": "android.permission.BIND_REMOTEVIEWS"
+    },
+    {
+      "type": "service",
+      "name": "org.telegram.messenger.FilesMigrationService",
+      "enabled": false,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "service",
+      "name": "org.telegram.messenger.UnifiedPushService",
+      "enabled": false,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "service",
+      "name": "org.telegram.messenger.GcmPushListenerService",
+      "enabled": false,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "provider",
+      "name": "tw.nekomimi.nekogram.streaming.MediaStreamingProvider",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "provider",
+      "name": "app.exteraless.icons.IconPackProvider",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "receiver",
+      "name": "tw.nekomimi.nekogram.SaveToDownloadReceiver",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "service",
+      "name": "org.telegram.messenger.car.TelegramCarAppService",
+      "enabled": true,
+      "exported": true,
+      "permission": null
+    },
+    {
+      "type": "service",
+      "name": "androidx.sharetarget.ChooserTargetServiceCompat",
+      "enabled": true,
+      "exported": true,
+      "permission": "android.permission.BIND_CHOOSER_TARGET_SERVICE"
+    },
+    {
+      "type": "service",
+      "name": "androidx.credentials.playservices.CredentialProviderMetadataHolder",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "activity",
+      "name": "androidx.credentials.playservices.controllers.identityauth.HiddenActivity",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "activity",
+      "name": "androidx.credentials.playservices.controllers.identitycredentials.IdentityCredentialApiHiddenActivity",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "service",
+      "name": "androidx.car.app.CarAppMetadataHolderService",
+      "enabled": false,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "activity",
+      "name": "androidx.car.app.CarAppPermissionActivity",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "receiver",
+      "name": "androidx.car.app.notification.CarAppNotificationBroadcastReceiver",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "service",
+      "name": "androidx.camera.core.impl.MetadataHolderService",
+      "enabled": false,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "activity",
+      "name": "com.android.billingclient.api.ProxyBillingActivity",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "activity",
+      "name": "com.android.billingclient.api.ProxyBillingActivityV2",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "service",
+      "name": "com.google.mlkit.common.internal.MlKitComponentDiscoveryService",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "activity",
+      "name": "com.google.android.gms.auth.api.signin.internal.SignInHubActivity",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "service",
+      "name": "com.google.firebase.components.ComponentDiscoveryService",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "activity",
+      "name": "com.google.android.gms.common.api.GoogleApiActivity",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "service",
+      "name": "com.google.firebase.sessions.SessionLifecycleService",
+      "enabled": false,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "service",
+      "name": "androidx.room.MultiInstanceInvalidationService",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "activity",
+      "name": "org.unifiedpush.android.connector.internal.LinkActivity",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    },
+    {
+      "type": "receiver",
+      "name": "androidx.profileinstaller.ProfileInstallReceiver",
+      "enabled": true,
+      "exported": true,
+      "permission": "android.permission.DUMP"
+    },
+    {
+      "type": "provider",
+      "name": "ru.noties.jlatexmath.JLatexMathInitProvider",
+      "enabled": true,
+      "exported": false,
+      "permission": null
+    }
+  ],
+  "enabled_exported": [
+    {
+      "type": "activity",
+      "name": "org.telegram.ui.LaunchActivity",
+      "enabled": true,
+      "exported": true,
+      "permission": null
+    },
+    {
+      "type": "activity-alias",
+      "name": "org.telegram.ui.CallsActivity",
+      "enabled": true,
+      "exported": true,
+      "permission": "android.permission.CALL_PHONE"
+    },
+    {
+      "type": "activity-alias",
+      "name": "org.telegram.messenger.ExteralessIcon",
+      "enabled": true,
+      "exported": true,
+      "permission": null
+    },
+    {
+      "type": "service",
+      "name": "org.telegram.messenger.BringAppForegroundService",
+      "enabled": true,
+      "exported": true,
+      "permission": null
+    },
+    {
+      "type": "service",
+      "name": "org.telegram.messenger.VideoEncodingService",
+      "enabled": true,
+      "exported": true,
+      "permission": null
+    },
+    {
+      "type": "service",
+      "name": "org.telegram.messenger.MusicPlayerService",
+      "enabled": true,
+      "exported": true,
+      "permission": null
+    },
+    {
+      "type": "service",
+      "name": "org.telegram.messenger.MusicBrowserService",
+      "enabled": true,
+      "exported": true,
+      "permission": null
+    },
+    {
+      "type": "receiver",
+      "name": "org.telegram.messenger.RefererReceiver",
+      "enabled": true,
+      "exported": true,
+      "permission": "android.permission.INSTALL_PACKAGES"
+    },
+    {
+      "type": "service",
+      "name": "org.telegram.messenger.WearAuthListenerService",
+      "enabled": true,
+      "exported": true,
+      "permission": null
+    },
+    {
+      "type": "provider",
+      "name": "org.telegram.messenger.voip.CallNotificationSoundProvider",
+      "enabled": true,
+      "exported": true,
+      "permission": null
+    },
+    {
+      "type": "service",
+      "name": "org.telegram.messenger.car.TelegramCarAppService",
+      "enabled": true,
+      "exported": true,
+      "permission": null
+    },
+    {
+      "type": "service",
+      "name": "androidx.sharetarget.ChooserTargetServiceCompat",
+      "enabled": true,
+      "exported": true,
+      "permission": "android.permission.BIND_CHOOSER_TARGET_SERVICE"
+    },
+    {
+      "type": "receiver",
+      "name": "androidx.profileinstaller.ProfileInstallReceiver",
+      "enabled": true,
+      "exported": true,
+      "permission": "android.permission.DUMP"
+    }
+  ]
+}

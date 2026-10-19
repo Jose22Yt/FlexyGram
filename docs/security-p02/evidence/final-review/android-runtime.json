@@ -1,0 +1,15 @@
+{
+  "adb_exit_code": 0,
+  "connected_targets_count": 0,
+  "device_serials_recorded": false,
+  "emulator_binary_installed": false,
+  "kvm_available": false,
+  "installation": "not_run",
+  "startup": "not_run",
+  "permission_prompts": "not_observed",
+  "traffic_by_android_uid": "not_measured",
+  "restoration_runtime": "not_run",
+  "personal_account_used": false,
+  "poco_used": false,
+  "reason": "No connected Android target or installed emulator in this lab."
+}

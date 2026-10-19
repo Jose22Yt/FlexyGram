@@ -1,5 +1,7 @@
 # P0.2 — Identidad y aislamiento diagnóstico
 
+**Revisión final del PR #5:** ver [endurecimiento de permisos/componentes y límites de validación](FINAL-REVIEW.md). Los resultados que siguen describen la compilación histórica del commit e7a1db7; no sustituyen las evidencias nuevas de esa revisión.
+
 FlexyGram 1.0, responsable @Lukhou23. Se conservan las licencias, copyright y autoría del código original. No se atribuye el incidente anterior a una causa no demostrada.
 
 ## Integración P0.1

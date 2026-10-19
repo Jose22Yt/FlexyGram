@@ -34,6 +34,45 @@ class IsolationTests(unittest.TestCase):
         self.assertEqual(app.get(ANDROID+'restoreAnyVersion'),'false')
         internet=next(e for e in manifest.findall('uses-permission') if e.get(ANDROID+'name')=='android.permission.INTERNET')
         self.assertEqual(internet.get(TOOLS+'node'),'remove')
+        # Keep all 18 existing tests; strengthen this contract against inherited
+        # sensitive permissions and every IPC category, not just six services.
+        requested={e.get(ANDROID+'name') for e in manifest.findall('uses-permission')
+                   if e.get(ANDROID+'name') and e.get(TOOLS+'node')!='remove'}
+        self.assertEqual(requested,{'android.permission.ACCESS_NETWORK_STATE',
+                                  '${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION'})
+        self.assertTrue(any(e.get(TOOLS+'node')=='removeAll' for e in manifest.findall('uses-permission')))
+        for kind in ['service','receiver','provider','activity','activity-alias']:
+            self.assertTrue(any(e.get(TOOLS+'node')=='removeAll' for e in app.findall(kind)),kind)
+            for component in app.findall(kind):
+                if component.get(TOOLS+'node') in ['remove','removeAll']:
+                    continue
+                if kind=='provider' and component.get(ANDROID+'name')=='ru.noties.jlatexmath.JLatexMathInitProvider':
+                    self.assertEqual(component.get(ANDROID+'enabled'),'true')
+                    self.assertEqual(component.get(ANDROID+'exported'),'false')
+                    self.assertEqual(component.get(ANDROID+'authorities'),'${applicationId}.jlatexmathinitprovider')
+                elif kind in ['service','receiver','provider']:
+                    self.assertEqual(component.get(ANDROID+'enabled'),'false',component.attrib)
+                    self.assertEqual(component.get(ANDROID+'exported'),'false',component.attrib)
+                if kind=='activity':
+                    self.assertEqual(component.get(ANDROID+'exported'),'false',component.attrib)
+        active_aliases=[e for e in app.findall('activity-alias')
+                        if e.get(TOOLS+'node') not in ['remove','removeAll']
+                        and e.get(ANDROID+'enabled','true')=='true']
+        self.assertEqual([e.get(ANDROID+'name') for e in active_aliases],['org.telegram.messenger.ExteralessIcon'])
+        launch=next(e for e in app.findall('activity') if e.get(ANDROID+'name')=='org.telegram.ui.LaunchActivity')
+        self.assertFalse(launch.findall('intent-filter'))
+        fcm=next(e for e in manifest.findall('uses-permission') if e.get(ANDROID+'name')=='com.google.android.c2dm.permission.RECEIVE')
+        self.assertEqual(fcm.get(TOOLS+'node'),'remove')
+        for kind,name in [
+            ('service','androidx.sharetarget.ChooserTargetServiceCompat'),
+            ('service','androidx.credentials.playservices.CredentialProviderMetadataHolder'),
+            ('service','com.google.mlkit.common.internal.MlKitComponentDiscoveryService'),
+            ('service','com.google.firebase.components.ComponentDiscoveryService'),
+            ('service','androidx.room.MultiInstanceInvalidationService'),
+            ('receiver','androidx.car.app.notification.CarAppNotificationBroadcastReceiver'),
+            ('receiver','androidx.profileinstaller.ProfileInstallReceiver')]:
+            component=next(e for e in app.findall(kind) if e.get(ANDROID+'name')==name)
+            self.assertEqual(component.get(TOOLS+'node'),'remove',name)
         for name in ['.AuthenticatorService','.ContactsSyncAdapterService','.GcmPushListenerService','.UnifiedPushService','.FilesMigrationService','.ImportingService']:
             component=next(e for e in app.findall('service') if e.get(ANDROID+'name')==name)
             self.assertEqual(component.get(ANDROID+'enabled'),'false',name)

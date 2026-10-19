@@ -1,0 +1,541 @@
+[
+  {
+    "kind": "activity-alias",
+    "name": "org.telegram.messenger.ExteralessIcon",
+    "enabled_before": "true",
+    "exported_before": "true",
+    "intent_filters_before": 1
+  },
+  {
+    "kind": "activity-alias",
+    "name": "org.telegram.messenger.BlueprintIcon",
+    "enabled_before": "false",
+    "exported_before": "true",
+    "intent_filters_before": 1
+  },
+  {
+    "kind": "activity-alias",
+    "name": "org.telegram.messenger.RedIcon",
+    "enabled_before": "false",
+    "exported_before": "true",
+    "intent_filters_before": 1
+  },
+  {
+    "kind": "activity-alias",
+    "name": "org.telegram.messenger.NyaIcon",
+    "enabled_before": "false",
+    "exported_before": "true",
+    "intent_filters_before": 1
+  },
+  {
+    "kind": "activity-alias",
+    "name": "org.telegram.messenger.AyuIcon",
+    "enabled_before": "false",
+    "exported_before": "true",
+    "intent_filters_before": 1
+  },
+  {
+    "kind": "activity-alias",
+    "name": "org.telegram.messenger.QuackIcon",
+    "enabled_before": "false",
+    "exported_before": "true",
+    "intent_filters_before": 1
+  },
+  {
+    "kind": "activity-alias",
+    "name": "org.telegram.messenger.GoIcon",
+    "enabled_before": "false",
+    "exported_before": "true",
+    "intent_filters_before": 1
+  },
+  {
+    "kind": "activity-alias",
+    "name": "org.telegram.messenger.HandIcon",
+    "enabled_before": "false",
+    "exported_before": "true",
+    "intent_filters_before": 1
+  },
+  {
+    "kind": "activity-alias",
+    "name": "org.telegram.messenger.MonoIcon",
+    "enabled_before": "false",
+    "exported_before": "true",
+    "intent_filters_before": 1
+  },
+  {
+    "kind": "activity-alias",
+    "name": "org.telegram.messenger.NothingIcon",
+    "enabled_before": "false",
+    "exported_before": "true",
+    "intent_filters_before": 1
+  },
+  {
+    "kind": "activity-alias",
+    "name": "org.telegram.messenger.PlusIcon",
+    "enabled_before": "false",
+    "exported_before": "true",
+    "intent_filters_before": 1
+  },
+  {
+    "kind": "activity-alias",
+    "name": "org.telegram.messenger.TelegramIcon",
+    "enabled_before": "false",
+    "exported_before": "true",
+    "intent_filters_before": 1
+  },
+  {
+    "kind": "activity-alias",
+    "name": "org.telegram.messenger.VintageIcon",
+    "enabled_before": "false",
+    "exported_before": "true",
+    "intent_filters_before": 1
+  },
+  {
+    "kind": "activity-alias",
+    "name": "org.telegram.messenger.AquaIcon",
+    "enabled_before": "false",
+    "exported_before": "true",
+    "intent_filters_before": 1
+  },
+  {
+    "kind": "activity-alias",
+    "name": "org.telegram.messenger.PremiumIcon",
+    "enabled_before": "false",
+    "exported_before": "true",
+    "intent_filters_before": 1
+  },
+  {
+    "kind": "activity-alias",
+    "name": "org.telegram.messenger.TurboIcon",
+    "enabled_before": "false",
+    "exported_before": "true",
+    "intent_filters_before": 1
+  },
+  {
+    "kind": "activity-alias",
+    "name": "org.telegram.messenger.NoxIcon",
+    "enabled_before": "false",
+    "exported_before": "true",
+    "intent_filters_before": 1
+  },
+  {
+    "kind": "activity",
+    "name": "org.telegram.ui.LaunchActivity",
+    "enabled_before": "true",
+    "exported_before": "true",
+    "intent_filters_before": 15
+  },
+  {
+    "kind": "activity-alias",
+    "name": "org.telegram.ui.CallsActivity",
+    "enabled_before": "true",
+    "exported_before": "true",
+    "intent_filters_before": 1
+  },
+  {
+    "kind": "activity",
+    "name": "app.exteraless.shortcuts.QuickToggleActivity",
+    "enabled_before": "true",
+    "exported_before": "false",
+    "intent_filters_before": 0
+  },
+  {
+    "kind": "activity",
+    "name": "org.telegram.ui.BubbleActivity",
+    "enabled_before": "true",
+    "exported_before": null,
+    "intent_filters_before": 0
+  },
+  {
+    "kind": "activity",
+    "name": "org.telegram.ui.ShareActivity",
+    "enabled_before": "true",
+    "exported_before": "false",
+    "intent_filters_before": 1
+  },
+  {
+    "kind": "activity",
+    "name": "org.telegram.ui.ExternalActionActivity",
+    "enabled_before": "true",
+    "exported_before": "false",
+    "intent_filters_before": 1
+  },
+  {
+    "kind": "activity",
+    "name": "org.telegram.ui.ChatsWidgetConfigActivity",
+    "enabled_before": "true",
+    "exported_before": "false",
+    "intent_filters_before": 1
+  },
+  {
+    "kind": "activity",
+    "name": "org.telegram.ui.ContactsWidgetConfigActivity",
+    "enabled_before": "true",
+    "exported_before": "false",
+    "intent_filters_before": 1
+  },
+  {
+    "kind": "activity",
+    "name": "org.telegram.messenger.OpenChatReceiver",
+    "enabled_before": "true",
+    "exported_before": "false",
+    "intent_filters_before": 0
+  },
+  {
+    "kind": "activity",
+    "name": "org.telegram.messenger.OpenAttachedMenuBotReceiver",
+    "enabled_before": "true",
+    "exported_before": "false",
+    "intent_filters_before": 0
+  },
+  {
+    "kind": "activity",
+    "name": "org.telegram.ui.PopupNotificationActivity",
+    "enabled_before": "true",
+    "exported_before": null,
+    "intent_filters_before": 0
+  },
+  {
+    "kind": "activity",
+    "name": "org.telegram.ui.VoIPPermissionActivity",
+    "enabled_before": "true",
+    "exported_before": null,
+    "intent_filters_before": 0
+  },
+  {
+    "kind": "activity",
+    "name": "org.telegram.ui.VoIPFeedbackActivity",
+    "enabled_before": "true",
+    "exported_before": null,
+    "intent_filters_before": 0
+  },
+  {
+    "kind": "activity",
+    "name": "tw.nekomimi.nekogram.helpers.AppRestartHelper",
+    "enabled_before": "true",
+    "exported_before": "false",
+    "intent_filters_before": 0
+  },
+  {
+    "kind": "receiver",
+    "name": ".AutoMessageHeardReceiver",
+    "enabled_before": "true",
+    "exported_before": "false",
+    "intent_filters_before": 1
+  },
+  {
+    "kind": "receiver",
+    "name": ".CopyCodeReceiver",
+    "enabled_before": "true",
+    "exported_before": "false",
+    "intent_filters_before": 1
+  },
+  {
+    "kind": "receiver",
+    "name": ".NotificationsDisabledReceiver",
+    "enabled_before": "true",
+    "exported_before": "false",
+    "intent_filters_before": 1
+  },
+  {
+    "kind": "receiver",
+    "name": ".CallReceiver",
+    "enabled_before": "true",
+    "exported_before": "false",
+    "intent_filters_before": 1
+  },
+  {
+    "kind": "service",
+    "name": ".AuthenticatorService",
+    "enabled_before": "false",
+    "exported_before": "true",
+    "intent_filters_before": 1
+  },
+  {
+    "kind": "service",
+    "name": ".ContactsSyncAdapterService",
+    "enabled_before": "false",
+    "exported_before": "true",
+    "intent_filters_before": 1
+  },
+  {
+    "kind": "service",
+    "name": ".KeepAliveJob",
+    "enabled_before": "false",
+    "exported_before": "false",
+    "intent_filters_before": 0
+  },
+  {
+    "kind": "service",
+    "name": ".BringAppForegroundService",
+    "enabled_before": "true",
+    "exported_before": "true",
+    "intent_filters_before": 0
+  },
+  {
+    "kind": "service",
+    "name": ".NotificationsService",
+    "enabled_before": "false",
+    "exported_before": "true",
+    "intent_filters_before": 0
+  },
+  {
+    "kind": "service",
+    "name": ".NotificationRepeat",
+    "enabled_before": "false",
+    "exported_before": "false",
+    "intent_filters_before": 0
+  },
+  {
+    "kind": "service",
+    "name": ".VideoEncodingService",
+    "enabled_before": "true",
+    "exported_before": "true",
+    "intent_filters_before": 0
+  },
+  {
+    "kind": "service",
+    "name": "org.telegram.ui.Stories.recorder.StoryUploadingService",
+    "enabled_before": "false",
+    "exported_before": "true",
+    "intent_filters_before": 0
+  },
+  {
+    "kind": "service",
+    "name": ".ImportingService",
+    "enabled_before": "false",
+    "exported_before": "true",
+    "intent_filters_before": 0
+  },
+  {
+    "kind": "service",
+    "name": ".LocationSharingService",
+    "enabled_before": "false",
+    "exported_before": "true",
+    "intent_filters_before": 0
+  },
+  {
+    "kind": "service",
+    "name": ".voip.VoIPService",
+    "enabled_before": "false",
+    "exported_before": "false",
+    "intent_filters_before": 0
+  },
+  {
+    "kind": "service",
+    "name": ".MusicPlayerService",
+    "enabled_before": "true",
+    "exported_before": "true",
+    "intent_filters_before": 0
+  },
+  {
+    "kind": "service",
+    "name": ".MusicBrowserService",
+    "enabled_before": "true",
+    "exported_before": "true",
+    "intent_filters_before": 1
+  },
+  {
+    "kind": "service",
+    "name": ".voip.TelegramConnectionService",
+    "enabled_before": "false",
+    "exported_before": "true",
+    "intent_filters_before": 1
+  },
+  {
+    "kind": "receiver",
+    "name": ".MusicPlayerReceiver",
+    "enabled_before": "true",
+    "exported_before": "false",
+    "intent_filters_before": 1
+  },
+  {
+    "kind": "receiver",
+    "name": ".voip.VoIPMediaButtonReceiver",
+    "enabled_before": "true",
+    "exported_before": "false",
+    "intent_filters_before": 1
+  },
+  {
+    "kind": "receiver",
+    "name": ".AppStartReceiver",
+    "enabled_before": "false",
+    "exported_before": "false",
+    "intent_filters_before": 1
+  },
+  {
+    "kind": "receiver",
+    "name": ".RefererReceiver",
+    "enabled_before": "true",
+    "exported_before": "true",
+    "intent_filters_before": 1
+  },
+  {
+    "kind": "receiver",
+    "name": ".WearReplyReceiver",
+    "enabled_before": "true",
+    "exported_before": "false",
+    "intent_filters_before": 0
+  },
+  {
+    "kind": "service",
+    "name": ".WearAuthListenerService",
+    "enabled_before": "true",
+    "exported_before": "true",
+    "intent_filters_before": 1
+  },
+  {
+    "kind": "receiver",
+    "name": ".StopLiveLocationReceiver",
+    "enabled_before": "true",
+    "exported_before": "false",
+    "intent_filters_before": 0
+  },
+  {
+    "kind": "receiver",
+    "name": ".PopupReplyReceiver",
+    "enabled_before": "true",
+    "exported_before": "false",
+    "intent_filters_before": 0
+  },
+  {
+    "kind": "receiver",
+    "name": ".NotificationCallbackReceiver",
+    "enabled_before": "true",
+    "exported_before": "false",
+    "intent_filters_before": 0
+  },
+  {
+    "kind": "receiver",
+    "name": ".ShareBroadcastReceiver",
+    "enabled_before": "true",
+    "exported_before": "false",
+    "intent_filters_before": 0
+  },
+  {
+    "kind": "receiver",
+    "name": ".CustomTabsCopyReceiver",
+    "enabled_before": "true",
+    "exported_before": "false",
+    "intent_filters_before": 0
+  },
+  {
+    "kind": "receiver",
+    "name": ".NotificationDismissReceiver",
+    "enabled_before": "true",
+    "exported_before": "false",
+    "intent_filters_before": 0
+  },
+  {
+    "kind": "receiver",
+    "name": ".voip.VoIPActionsReceiver",
+    "enabled_before": "true",
+    "exported_before": "false",
+    "intent_filters_before": 0
+  },
+  {
+    "kind": "receiver",
+    "name": ".ShortcutResultReceiver",
+    "enabled_before": "true",
+    "exported_before": "false",
+    "intent_filters_before": 0
+  },
+  {
+    "kind": "provider",
+    "name": "androidx.core.content.FileProvider",
+    "enabled_before": "true",
+    "exported_before": "false",
+    "intent_filters_before": 0
+  },
+  {
+    "kind": "provider",
+    "name": ".NotificationImageProvider",
+    "enabled_before": "true",
+    "exported_before": "false",
+    "intent_filters_before": 0
+  },
+  {
+    "kind": "provider",
+    "name": ".voip.CallNotificationSoundProvider",
+    "enabled_before": "true",
+    "exported_before": "true",
+    "intent_filters_before": 0
+  },
+  {
+    "kind": "receiver",
+    "name": ".ChatsWidgetProvider",
+    "enabled_before": "true",
+    "exported_before": "false",
+    "intent_filters_before": 1
+  },
+  {
+    "kind": "service",
+    "name": ".ChatsWidgetService",
+    "enabled_before": "true",
+    "exported_before": "false",
+    "intent_filters_before": 0
+  },
+  {
+    "kind": "receiver",
+    "name": ".ContactsWidgetProvider",
+    "enabled_before": "true",
+    "exported_before": "false",
+    "intent_filters_before": 1
+  },
+  {
+    "kind": "service",
+    "name": ".ContactsWidgetService",
+    "enabled_before": "true",
+    "exported_before": "false",
+    "intent_filters_before": 0
+  },
+  {
+    "kind": "service",
+    "name": ".FilesMigrationService",
+    "enabled_before": "false",
+    "exported_before": "false",
+    "intent_filters_before": 0
+  },
+  {
+    "kind": "service",
+    "name": ".UnifiedPushService",
+    "enabled_before": "false",
+    "exported_before": "false",
+    "intent_filters_before": 1
+  },
+  {
+    "kind": "service",
+    "name": ".GcmPushListenerService",
+    "enabled_before": "false",
+    "exported_before": "false",
+    "intent_filters_before": 1
+  },
+  {
+    "kind": "provider",
+    "name": "tw.nekomimi.nekogram.streaming.MediaStreamingProvider",
+    "enabled_before": "true",
+    "exported_before": "false",
+    "intent_filters_before": 0
+  },
+  {
+    "kind": "provider",
+    "name": "app.exteraless.icons.IconPackProvider",
+    "enabled_before": "true",
+    "exported_before": "false",
+    "intent_filters_before": 0
+  },
+  {
+    "kind": "receiver",
+    "name": "tw.nekomimi.nekogram.SaveToDownloadReceiver",
+    "enabled_before": "true",
+    "exported_before": "false",
+    "intent_filters_before": 1
+  },
+  {
+    "kind": "service",
+    "name": "org.telegram.messenger.car.TelegramCarAppService",
+    "enabled_before": "true",
+    "exported_before": "true",
+    "intent_filters_before": 1
+  }
+]
