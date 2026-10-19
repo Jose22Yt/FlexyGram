@@ -5,6 +5,9 @@ import tempfile
 import unittest
 import zipfile
 from pathlib import Path
+import sys
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / 'tools/native_compatibility'))
 from wheelhouse import prepare
 
 

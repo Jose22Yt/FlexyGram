@@ -48,3 +48,10 @@ Comprobación cruzada directa de los dos archivos de bloqueo desde GitHub y su i
 - Sintaxis Python: `compileall` sin errores.
 
 Estas comprobaciones amplían la cobertura pero no acreditan que los 26 wheels se hayan descargado realmente, que correspondan a su contenido hash, ni que Chaquopy pueda instalar/importar todos ellos. El set completo de 102 pruebas históricas y el build Android siguen pendientes.
+
+
+## Importación independiente de tests — regresión reproducida y corregida
+
+Al ejecutar directamente `python -m unittest discover -s tests/native_compatibility -p test_wheelhouse_hardening.py -v` desde la raíz simulada del repositorio, **antes de la corrección se obtuvo** `ModuleNotFoundError: No module named 'wheelhouse'`. La suite dependía accidentalmente de que otra prueba importase primero el módulo desde `tools/native_compatibility`.
+
+La corrección incluye la ruta de herramientas a partir de la raíz de Git calculada desde `__file__`, sin añadir dependencias ni cambiar la herramienta de instalación. Con el mismo árbol local simulado, la suite pasa **8/8** ejecutada en solitario. La ejecución conjunta local de ambas suites añadió **18 casos: 17 aprobados y 1 omitido** (el caso que requiere el checkout real completo). En el entorno real queda por ejecutar el conjunto integral, incluida la prueba del lock contra los archivos del checkout y los tests históricos.
