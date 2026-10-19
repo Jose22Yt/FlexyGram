@@ -145,7 +145,8 @@ class IsolationTests(unittest.TestCase):
             directory=Path(directory);h.write_sources(directory,MAIN/'java/org/telegram/messenger',MAIN)
             package=directory/'org/telegram/messenger'
             (package/'DiagnosticPolicy.java').write_text((JAVA/'org/telegram/messenger/DiagnosticPolicy.java').read_text())
-            (package/'BuildConfig.java').write_text('package org.telegram.messenger; public class BuildConfig {public static final boolean ISOLATED_DIAGNOSTIC=true;}')
+            from push_fixtures import BUILD_CONFIG
+            (package/'BuildConfig.java').write_text(BUILD_CONFIG.replace('public class BuildConfig {', 'public class BuildConfig {public static final boolean ISOLATED_DIAGNOSTIC=true;'))
             source=(JAVA/'org/telegram/tgnet/ConnectionsManager.java').read_text()
             signature='public int sendRequest(final TLObject object, final RequestDelegate onComplete, final RequestDelegateTimestamp'
             method=h.method(source,signature)
@@ -186,3 +187,4 @@ class IsolationTests(unittest.TestCase):
 
 
 if __name__=='__main__':unittest.main()
+

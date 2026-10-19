@@ -579,11 +579,14 @@ public class SharedConfig {
                 editor.putBoolean("useFingerprint", useFingerprintLock);
                 editor.putBoolean("walletUseFingerprintLock", walletUseFingerprintLock);
                 editor.putBoolean("allowScreenCapture", allowScreenCapture);
-                editor.putString("pushString2", pushString);
-                editor.putInt("pushType", pushType);
-                editor.putBoolean("pushStatSent", pushStatSent);
-                editor.putLong("pushLastReceivedTime", pushLastReceivedTime);
-                editor.putString("pushAuthKey", pushAuthKey != null ? Base64.encodeToString(pushAuthKey, Base64.DEFAULT) : "");
+                if (PushServicesPolicy.anyAllowed()) {
+                    editor.putString("FlexyGramPushScope", PushServicesPolicy.scope());
+                    editor.putString("pushString2", pushString);
+                    editor.putInt("pushType", pushType);
+                    editor.putBoolean("pushStatSent", pushStatSent);
+                    editor.putLong("pushLastReceivedTime", pushLastReceivedTime);
+                    editor.putString("pushAuthKey", pushAuthKey != null ? Base64.encodeToString(pushAuthKey, Base64.DEFAULT) : "");
+                }
                 editor.putInt("lastLocalId", lastLocalId);
                 editor.putString("passportConfigJson", passportConfigJson);
                 editor.putInt("passportConfigHash", passportConfigHash);
@@ -660,7 +663,9 @@ public class SharedConfig {
             walletUseFingerprintLock = preferences.getBoolean("walletUseFingerprintLock", true);
             allowScreenCapture = preferences.getBoolean("allowScreenCapture", false);
             lastLocalId = preferences.getInt("lastLocalId", -210000);
-            pushString = preferences.getString("pushString2", "");
+            boolean ownPushState = PushServicesPolicy.anyAllowed()
+                    && PushServicesPolicy.scope().equals(preferences.getString("FlexyGramPushScope", ""));
+            pushString = ownPushState ? preferences.getString("pushString2", "") : "";
             pushType = preferences.getInt("pushType", PushListenerController.PUSH_TYPE_FIREBASE);
             pushStatSent = preferences.getBoolean("pushStatSent", false);
             pushLastReceivedTime = preferences.getLong("pushLastReceivedTime", 0);
@@ -669,7 +674,7 @@ public class SharedConfig {
             storageCacheDir = preferences.getString("storageCacheDir", null);
             proxyRotationEnabled = preferences.getBoolean("proxyRotationEnabled", false);
             proxyRotationTimeout = preferences.getInt("proxyRotationTimeout", ProxyRotationController.DEFAULT_TIMEOUT_INDEX);
-            String authKeyString = preferences.getString("pushAuthKey", null);
+            String authKeyString = ownPushState ? preferences.getString("pushAuthKey", null) : null;
             if (!TextUtils.isEmpty(authKeyString)) {
                 pushAuthKey = Base64.decode(authKeyString, Base64.DEFAULT);
             }
@@ -2101,3 +2106,4 @@ public class SharedConfig {
 
 
 }
+

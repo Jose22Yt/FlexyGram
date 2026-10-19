@@ -16426,6 +16426,7 @@ public class MessagesController extends BaseController implements NotificationCe
     }
 
     public void unregistedPush() {
+        if (!PushServicesPolicy.anyAllowed()) return;
         if (getUserConfig().registeredForPush && SharedConfig.pushString.length() == 0) {
             TL_account.unregisterDevice req = new TL_account.unregisterDevice();
             req.token = SharedConfig.pushString;
@@ -16498,6 +16499,7 @@ public class MessagesController extends BaseController implements NotificationCe
     }
 
     public void registerForPush(@PushListenerController.PushType int pushType, String regid) {
+        if (!PushServicesPolicy.isTypeAllowed(pushType)) return;
         if (TextUtils.isEmpty(regid) || getUserConfig().getClientUserId() == 0) {
             return;
         }
@@ -26190,6 +26192,7 @@ public class MessagesController extends BaseController implements NotificationCe
 
     // UP start
     private void registerSimplePush(String token) {
+        if (!PushServicesPolicy.unifiedAllowed()) return;
         if (TextUtils.isEmpty(token) || getUserConfig().getClientUserId() == 0) {
             return;
         }
@@ -26242,6 +26245,7 @@ public class MessagesController extends BaseController implements NotificationCe
     }
 
     public void unregisterPush(@PushListenerController.PushType int pushType, String token) {
+        if (!PushServicesPolicy.isTypeAllowed(pushType)) return;
         if (pushType == PushListenerController.PUSH_TYPE_WEB && TextUtils.isEmpty(SharedConfig.pushString)) {
             registeringForPush = false;
             lastPushRegisterSendTime = 0;

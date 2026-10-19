@@ -12,7 +12,8 @@ public class UnifiedPushListenerServiceProvider implements PushListenerControlle
 
     @Override
     public boolean hasServices() {
-        return !UnifiedPush.getDistributors(ApplicationLoader.applicationContext).isEmpty();
+        if (!PushServicesPolicy.unifiedAllowed()) return false;
+        return UnifiedPush.getDistributors(ApplicationLoader.applicationContext).contains(PushServicesPolicy.distributor());
     }
 
     @Override
@@ -22,9 +23,10 @@ public class UnifiedPushListenerServiceProvider implements PushListenerControlle
 
     @Override
     public void onRequestPushToken() {
+        if (!PushServicesPolicy.unifiedAllowed()) return;
         String currentPushString = SharedConfig.pushString;
         if (!TextUtils.isEmpty(currentPushString)) {
-            FileLog.d("UnifiedPush endpoint = " + currentPushString);
+            FileLog.d("UnifiedPush registration available");
         } else {
             FileLog.d("No UnifiedPush string found");
         }
@@ -32,21 +34,18 @@ public class UnifiedPushListenerServiceProvider implements PushListenerControlle
             try {
                 SharedConfig.pushStringGetTimeStart = SystemClock.elapsedRealtime();
                 SharedConfig.saveConfig();
-                if (UnifiedPush.getAckDistributor(ApplicationLoader.applicationContext) == null) {
-                    List<String> distributors = UnifiedPush.getDistributors(ApplicationLoader.applicationContext);
-                    if (distributors.size() > 0) {
-                        String distributor =  distributors.get(0);
-                        UnifiedPush.saveDistributor(ApplicationLoader.applicationContext, distributor);
-                    }
-                }
+                if (!PushServicesPolicy.unifiedAllowed()) return;
+                if (!UnifiedPush.getDistributors(ApplicationLoader.applicationContext)
+                        .contains(PushServicesPolicy.distributor())) return;
+                UnifiedPush.saveDistributor(ApplicationLoader.applicationContext, PushServicesPolicy.distributor());
                 UnifiedPush.register(
                         ApplicationLoader.applicationContext,
                         "default",
-                        "Telegram Simple Push",
+                        "FlexyGram Push",
                         null
                 );
             } catch (Throwable e) {
-                FileLog.e(e);
+                FileLog.e("UnifiedPush operation failed (" + e.getClass().getSimpleName() + ")");
             }
         });
     }
@@ -56,3 +55,4 @@ public class UnifiedPushListenerServiceProvider implements PushListenerControlle
         return PushListenerController.PUSH_TYPE_WEB;
     }
 }
+

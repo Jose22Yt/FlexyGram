@@ -1,0 +1,8 @@
+test_production_callbacks_and_policy (test_p03b_push.PushTests.test_production_callbacks_and_policy) ... ok
+test_artifact_scanner (test_p03b_push.PushTests.test_artifact_scanner) ... ok
+test_manifest_and_guards (test_p03b_push.PushTests.test_manifest_and_guards) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.965s
+
+OK

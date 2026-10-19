@@ -1,6 +1,7 @@
 """Minimal offline doubles, not a replacement for an Android/Gradle build."""
 from pathlib import Path
 import shutil
+from push_fixtures import SOURCES as PUSH_SOURCES
 
 
 def method(source, signature):
@@ -41,8 +42,9 @@ def write_sources(root, java, main):
 'org/telegram/messenger/Utilities.java': '''package org.telegram.messenger; import java.util.HexFormat; public class Utilities {public static Queue globalQueue=new Queue();public static class Queue {public void postRunnable(Runnable r){r.run();}} public static byte[] hexToBytes(String s){return HexFormat.of().parseHex(s);} public static String bytesToHex(byte[] b){return HexFormat.of().formatHex(b);}}''',
 'org/telegram/messenger/BackupAgent.java': 'package org.telegram.messenger; public class BackupAgent {public static int calls; public static void requestBackup(){calls++;}}',
 'org/telegram/messenger/SharedConfig.java': '''package org.telegram.messenger; public class SharedConfig {public static String pushString,pushStringStatus;public static long pushStringGetTimeStart,pushStringGetTimeEnd;}''',
-'org/telegram/messenger/PushListenerController.java': '''package org.telegram.messenger; public class PushListenerController {public static final int PUSH_TYPE_FIREBASE=2;public static String registered,received;public static int sends; public interface IPushListenerServiceProvider {String getLogTitle();int getPushType();void onRequestPushToken();boolean hasServices();} public static void processRemoteMessage(int t,String d,long time){received=d;if(time!=7)throw new AssertionError();} public static void sendRegistrationToServer(int t,String token){registered=token;sends++;}}''',
+'org/telegram/messenger/PushListenerController.java': '''package org.telegram.messenger; public class PushListenerController {public static final int PUSH_TYPE_FIREBASE=2,PUSH_TYPE_WEB=10;public static String registered,received;public static int sends; public interface IPushListenerServiceProvider {String getLogTitle();int getPushType();void onRequestPushToken();boolean hasServices();} public static void processRemoteMessage(int t,String d,long time){received=d;if(time!=7)throw new AssertionError();} public static void sendRegistrationToServer(int t,String token){registered=token;sends++;}}''',
     }
+    sources.update(PUSH_SOURCES)
     sources['ParseSources.java'] = r"""import javax.tools.*;import com.sun.source.util.JavacTask;import java.util.*;
 public class ParseSources {public static void main(String[] args)throws Exception {
 JavaCompiler compiler=ToolProvider.getSystemJavaCompiler();DiagnosticCollector<JavaFileObject> diagnostics=new DiagnosticCollector<>();
@@ -109,3 +111,4 @@ System.out.println("P0.1 Java harness PASS");
         target.write_text(text)
     for name in ('AuthTokensHelper', 'GcmPushListenerService', 'CaptchaController', 'GooglePushListenerServiceProvider'):
         shutil.copyfile(java / (name + '.java'), root / 'org/telegram/messenger' / (name + '.java'))
+
