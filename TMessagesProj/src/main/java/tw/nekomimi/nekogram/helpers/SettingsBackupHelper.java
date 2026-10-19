@@ -13,8 +13,6 @@ import android.widget.LinearLayout;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.radolyn.ayugram.messages.AyuSavePreferences;
-import com.radolyn.ayugram.utils.AyuGhostPreferences;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,40 +30,24 @@ import org.telegram.ui.LaunchActivity;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
 import kotlin.text.StringsKt;
-import tw.nekomimi.nekogram.DialogConfig;
-import tw.nekomimi.nekogram.NekoConfig;
-import tw.nekomimi.nekogram.config.ConfigItem;
 import tw.nekomimi.nekogram.utils.AlertUtil;
 import tw.nekomimi.nekogram.utils.FileUtil;
 import tw.nekomimi.nekogram.utils.GsonUtil;
 import tw.nekomimi.nekogram.utils.ShareUtil;
 import xyz.nextalone.nagram.NaConfig;
-import xyz.nextalone.nagram.helper.BookmarksHelper;
-import xyz.nextalone.nagram.helper.LocalPeerColorHelper;
-import xyz.nextalone.nagram.helper.LocalPremiumStatusHelper;
 
 public final class SettingsBackupHelper {
     public static String backupSettingsJson(boolean isCloud, int indentSpaces) throws JSONException {
-        return backupSettingsJson(isCloud, indentSpaces, true);
+        return backupSettingsJson(isCloud, indentSpaces, false);
     }
 
     public static String backupSettingsJson(boolean isCloud, int indentSpaces, boolean includeApiKeys) throws JSONException {
 
         JSONObject configJson = new JSONObject();
-
-        ArrayList<String> userconfig = new ArrayList<>();
-        userconfig.add("saveIncomingPhotos");
-        userconfig.add("passcodeHash");
-        userconfig.add("passcodeType");
-        userconfig.add("passcodeHash");
-        userconfig.add("autoLockIn");
-        userconfig.add("useFingerprint");
-        spToJSON("userconfing", configJson, userconfig::contains, isCloud);
 
         ArrayList<String> mainconfig = new ArrayList<>();
         mainconfig.add("saveToGallery");
@@ -130,11 +112,11 @@ public final class SettingsBackupHelper {
         spToJSON("mainconfig", configJson, mainconfig::contains);
         if (!isCloud) spToJSON("themeconfig", configJson, null);
         spToJSON("nkmrcfg", configJson, null, includeApiKeys);
-        if (includeApiKeys) {
-            spToJSON("aiConfig", configJson, key -> !"history".equals(key));
-        }
 
-        return configJson.toString(indentSpaces);
+        // Both local and cloud output pass the same settings-only boundary.
+        // The legacy includeApiKeys argument cannot opt credentials back in.
+        return new JSONObject(org.telegram.messenger.SettingsBackupPolicy.sanitize(
+                GsonUtil.toJsonObject(configJson.toString())).toString()).toString(indentSpaces);
     }
 
     private static void spToJSON(String sp, JSONObject object, Function<String, Boolean> filter) throws JSONException {
@@ -185,76 +167,21 @@ public final class SettingsBackupHelper {
             restart.setPositiveButton(getString(R.string.OK), (__, ___) -> AppRestartHelper.triggerRebirth(context, new Intent(context, LaunchActivity.class)));
             restart.show();
         } catch (Exception e) {
-            AlertUtil.showSimpleAlert(context, e);
+            AlertUtil.showSimpleAlert(context, new IllegalArgumentException("Settings backup could not be processed"));
         }
     }
 
     @SuppressLint("ApplySharedPref")
     public static void importSettings(JsonObject configJson) throws JSONException {
-        Map<String, Integer> configTypes = new HashMap<>();
-        try {
-            configTypes.putAll(NekoConfig.getConfigTypes());
-            configTypes.putAll(NaConfig.INSTANCE.getConfigTypes());
-        } catch (Throwable ignore) {
-        }
-        try {
-            configTypes.putAll(app.exteraless.OpenExteraConfig.getConfigTypes());
-            configTypes.putAll(app.exteraless.chats.ChatsConfig.getConfigTypes());
-            configTypes.putAll(app.exteraless.icons.IconPacksConfig.getConfigTypes());
-            configTypes.putAll(app.exteraless.glyph.GlyphConfig.getConfigTypes());
-            configTypes.putAll(app.exteraless.pillstack.PillStackConfig.getConfigTypes());
-            configTypes.putAll(app.exteraless.utils.UtilsConfig.getConfigTypes());
-            configTypes.putAll(app.exteraless.appearance.AppearanceConfig.getConfigTypes());
-            configTypes.putAll(app.exteraless.general.GeneralConfig.getConfigTypes());
-        } catch (Throwable ignore) {
-        }
-        String[] preservePrefixes = {
-                AyuGhostPreferences.ghostReadExclusionPrefix,
-                AyuGhostPreferences.ghostTypingExclusionPrefix,
-                AyuSavePreferences.saveExclusionPrefix,
-                LocalNameHelper.chatNameOverridePrefix,
-                LocalNameHelper.userNameOverridePrefix,
-                DialogConfig.customForumTabPrefix,
-                LocalPeerColorHelper.KEY_PREFIX,
-                LocalPremiumStatusHelper.KEY_PREFIX,
-                BookmarksHelper.KEY_PREFIX
-        };
-
+        // Filter BEFORE looking up any SharedPreferences namespace from untrusted JSON.
+        configJson = org.telegram.messenger.SettingsBackupPolicy.sanitize(configJson);
         for (Map.Entry<String, JsonElement> element : configJson.entrySet()) {
             String spName = element.getKey();
             SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences(spName, Activity.MODE_PRIVATE);
             SharedPreferences.Editor editor = preferences.edit();
             for (Map.Entry<String, JsonElement> config : ((JsonObject) element.getValue()).entrySet()) {
                 String key = config.getKey();
-                if ("nkmrcfg".equals(spName) && isDeviceSpecificPushKey(key)) {
-                    continue;
-                }
-                if (!config.getValue().isJsonPrimitive()) {
-                    continue;
-                }
                 JsonPrimitive value = config.getValue().getAsJsonPrimitive();
-                if ("nkmrcfg".equals(spName)) {
-                    boolean shouldSkip = true;
-                    for (String prefix : preservePrefixes) {
-                        if (key.startsWith(prefix)) {
-                            shouldSkip = false;
-                            break;
-                        }
-                    }
-                    if (shouldSkip) {
-                        String actualKey = key;
-                        if (key.endsWith("_long")) {
-                            actualKey = StringsKt.substringBeforeLast(key, "_long", key);
-                        } else if (key.endsWith("_float")) {
-                            actualKey = StringsKt.substringBeforeLast(key, "_float", key);
-                        }
-                        Integer type = configTypes.get(actualKey);
-                        shouldSkip = type == null || !isCompatibleConfigValue(key, value, type);
-                    }
-                    if (shouldSkip) {
-                        continue;
-                    }
-                }
                 if (value.isBoolean()) {
                     editor.putBoolean(key, value.getAsBoolean());
                 } else if (value.isNumber()) {
@@ -283,25 +210,6 @@ public final class SettingsBackupHelper {
         PushListenerController.reconcilePushRegistration();
     }
 
-    private static boolean isCompatibleConfigValue(String key, JsonPrimitive value, int type) {
-        if (key.equals(NaConfig.INSTANCE.getPushServiceType().getKey())) {
-            return value.isNumber() && value.getAsInt() >= 0 && value.getAsInt() <= 3;
-        }
-        if (type == ConfigItem.configTypeBool || type == ConfigItem.configTypeBoolLinkInt) {
-            return value.isBoolean();
-        }
-        if (type == ConfigItem.configTypeInt) {
-            return value.isNumber() && !key.endsWith("_long") && !key.endsWith("_float");
-        }
-        if (type == ConfigItem.configTypeLong) {
-            return value.isNumber() && key.endsWith("_long");
-        }
-        if (type == ConfigItem.configTypeFloat) {
-            return value.isNumber() && key.endsWith("_float");
-        }
-        return value.isString();
-    }
-
     public static void backupSettings(Context context, Theme.ResourcesProvider resourceProvider) {
         if (context == null) return;
 
@@ -313,24 +221,22 @@ public final class SettingsBackupHelper {
 
         CheckBoxCell checkBoxCell = new CheckBoxCell(context, CheckBoxCell.TYPE_CHECK_BOX_DEFAULT, resourceProvider);
         checkBoxCell.setBackground(Theme.getSelectorDrawable(false));
-        checkBoxCell.setText(getString(R.string.ExportSettingsIncludeApiKeys), "", true, false);
+        checkBoxCell.setText(getString(R.string.ExportSettingsIncludeApiKeys), "", false, false);
         checkBoxCell.setPadding(LocaleController.isRTL ? dp(16) : dp(8), 0, LocaleController.isRTL ? dp(8) : dp(16), 0);
-        checkBoxCell.setChecked(true, false);
-        checkBoxCell.setOnClickListener(v -> {
-            CheckBoxCell cell = (CheckBoxCell) v;
-            cell.setChecked(!cell.isChecked(), true);
-        });
+        checkBoxCell.setChecked(false, false);
+        checkBoxCell.setEnabled(false);
+        // Credential export is intentionally unavailable for every variant.
         linearLayout.addView(checkBoxCell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 48));
 
         builder.setView(linearLayout);
         builder.setPositiveButton(getString(R.string.ExportTheme), (dialog, which) -> {
-            boolean includeApiKeys = checkBoxCell.isChecked();
+            boolean includeApiKeys = false;
             try {
                 File cacheFile = new File(AndroidUtilities.getCacheDir(), new Date() + ".nekox-settings.json");
                 FileUtil.writeUtf8String(SettingsBackupHelper.backupSettingsJson(false, 4, includeApiKeys), cacheFile);
                 ShareUtil.shareFile(context, cacheFile);
             } catch (Exception e) {
-                AlertUtil.showSimpleAlert(context, e);
+                AlertUtil.showSimpleAlert(context, new IllegalArgumentException("Settings backup could not be processed"));
             }
         });
         builder.setNegativeButton(getString(R.string.Cancel), null);

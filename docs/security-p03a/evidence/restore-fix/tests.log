@@ -1,0 +1,29 @@
+test_authentication_and_dispatch_preserved (test_p01_logs.DevServerTests.test_authentication_and_dispatch_preserved) ... ok
+test_bind_failure_safe_and_start_disabled_after_failure (test_p01_logs.DevServerTests.test_bind_failure_safe_and_start_disabled_after_failure) ... ok
+test_debugger_errors_and_logs_safe (test_p01_logs.DevServerTests.test_debugger_errors_and_logs_safe) ... ok
+test_exception_and_unknown_command_reports_safe (test_p01_logs.DevServerTests.test_exception_and_unknown_command_reports_safe) ... ok
+test_malformed_stream_keeps_processing_without_echoing_input (test_p01_logs.DevServerTests.test_malformed_stream_keeps_processing_without_echoing_input) ... ok
+test_plugin_diagnostic_errors_safe (test_p01_logs.DevServerTests.test_plugin_diagnostic_errors_safe) ... ok
+test_python_loader_start_boundary_safe (test_p01_logs.DevServerTests.test_python_loader_start_boundary_safe) ... ok
+test_socketserver_traceback_does_not_leak (test_p01_logs.DevServerTests.test_socketserver_traceback_does_not_leak) ... ok
+test_token_file_failure_safe_in_android_and_stderr (test_p01_logs.DevServerTests.test_token_file_failure_safe_in_android_and_stderr) ... ok
+test_token_written_unchanged_but_not_logged (test_p01_logs.DevServerTests.test_token_written_unchanged_but_not_logged) ... ok
+test_actual_java_callbacks_with_synthetic_secrets (test_p01_logs.JavaRuntimeTests.test_actual_java_callbacks_with_synthetic_secrets) ... ok
+test_protocol_diagnostics_have_no_body_serializer_or_to_string_fallback (test_p01_logs.JavaSourceContracts.test_protocol_diagnostics_have_no_body_serializer_or_to_string_fallback) ... ok
+test_sensitive_paths_never_forward_raw_throwables_or_payloads (test_p01_logs.JavaSourceContracts.test_sensitive_paths_never_forward_raw_throwables_or_payloads) ... ok
+test_actual_pair_resolver_complete_precedence_and_invalid_inputs (test_p02_isolation.IsolationTests.test_actual_pair_resolver_complete_precedence_and_invalid_inputs) ... ok
+test_diagnostic_api_and_engine_controls_are_immutable (test_p02_isolation.IsolationTests.test_diagnostic_api_and_engine_controls_are_immutable) ... ok
+test_identity_backup_permissions_components (test_p02_isolation.IsolationTests.test_identity_backup_permissions_components) ... ok
+test_native_guards_drop_requests_and_prevent_initialization (test_p02_isolation.IsolationTests.test_native_guards_drop_requests_and_prevent_initialization) ... ok
+test_production_rpc_gate_and_push_callbacks_no_transport (test_p02_isolation.IsolationTests.test_production_rpc_gate_and_push_callbacks_no_transport) ... ok
+test_bounded_restore_descriptor_ownership_and_no_data_mutation (test_p03_backups.BackupTests.test_bounded_restore_descriptor_ownership_and_no_data_mutation) ... ok
+test_no_credential_opt_in_or_automatic_backup_registration (test_p03_backups.BackupTests.test_no_credential_opt_in_or_automatic_backup_registration) ... ok
+test_previous_null_destination_defect_is_detected (test_p03_backups.BackupTests.test_previous_null_destination_defect_is_detected) ... ok
+test_production_export_import_and_agent (test_p03_backups.BackupTests.test_production_export_import_and_agent) ... ok
+
+----------------------------------------------------------------------
+Ran 22 tests in 6.546s
+
+OK
+PASS: bounded entity discard; next entity retained; original descriptors open; duplicates closed; synthetic files/preferences/tokens unchanged; legacy and 36.1+ callbacks
+PASS: production export/import, synthetic credentials unchanged, fail-closed policy, legacy restore discarded

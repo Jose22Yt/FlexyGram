@@ -1,0 +1,17 @@
+{
+  "reviewed_commit": "2112c856ed053eeb3d1ece9fbca46e0c0854884e",
+  "base_tree_verified": "5bd532d3800a6c8edc7c500a1aea1fbf83cd930b",
+  "tests": 22,
+  "failures": 0,
+  "skips": 0,
+  "old_null_destination_mutation": "rejected with NullPointerException by framework-shaped parent validation",
+  "unchanged_approved_policy_sources_sha256": {
+    "TMessagesProj/src/main/java/org/telegram/messenger/SettingsBackupPolicy.java": "1f0b8744e5a751ac6a0902805069c0a3ac206bb173f0fb3bd1a3a818dd2dae07",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/helpers/SettingsBackupHelper.java": "87d31b0bcdf049066f299ed9f38eafed1dbd3ab12a468dad1fc198a0defb75a6",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/helpers/CloudSettingsHelper.java": "90010d369dfaaaf3c50df88c9a84d9dc6b2207727847191a31b7eab3b1a726fd"
+  },
+  "runtime_android_tested": false,
+  "framework_binder_art_and_native_fd_ownership_tested": false,
+  "network_or_personal_accounts_used": false,
+  "apk_distributed": false
+}

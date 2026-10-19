@@ -57,7 +57,7 @@ public class CloudSettingsHelper {
     private final Handler handler = new Handler(Looper.getMainLooper());
     private long localSyncedDate = preferences.getLong("updated_at", -1);
     private boolean autoSync = preferences.getBoolean("auto_sync", false);
-    private boolean includeApiKeys = preferences.getBoolean("include_api_keys", false);
+    private final boolean includeApiKeys = false;
 
     private static final String SETTINGS_CHUNKS_COUNT_KEY = "neko_settings";
     private static final String SETTINGS_CHUNK_KEY_PREFIX = "neko_settings_";
@@ -125,8 +125,7 @@ public class CloudSettingsHelper {
     }
 
     public void setIncludeApiKeys(boolean value) {
-        includeApiKeys = value;
-        preferences.edit().putBoolean("include_api_keys", value).apply();
+        // Legacy API retained; a backup cannot opt into copying credentials.
     }
 
     public static String formatSyncDate(long date) {
@@ -274,11 +273,7 @@ public class CloudSettingsHelper {
 
         MiniCheckBoxCell apiKeysCheck = new MiniCheckBoxCell(context, 8, resourcesProvider);
         apiKeysCheck.setTextAndValueAndCheck(getString(R.string.CloudConfigIncludeApiKeys), getString(R.string.CloudConfigIncludeApiKeysDesc), includeApiKeys);
-        apiKeysCheck.setOnClickListener(view -> {
-            includeApiKeys = !includeApiKeys;
-            preferences.edit().putBoolean("include_api_keys", includeApiKeys).apply();
-            apiKeysCheck.setChecked(includeApiKeys);
-        });
+        apiKeysCheck.setEnabled(false); // Settings backups never carry credentials.
         linearLayout.addView(apiKeysCheck, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 8, 0, 8, 0));
 
         linearLayout.addView(syncedDate, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 16, 8, 16, 0));
