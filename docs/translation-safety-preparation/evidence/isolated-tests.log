@@ -1,0 +1,32 @@
+test_cancellation_is_not_converted_to_failure_or_fallback (test_preparation.PolicyScenarios.test_cancellation_is_not_converted_to_failure_or_fallback) ... ok
+test_diagnostic_denies_every_provider_before_adapter (test_preparation.PolicyScenarios.test_diagnostic_denies_every_provider_before_adapter) ... ok
+test_diagnostic_identity_cannot_be_enabled_by_other_flags (test_preparation.PolicyScenarios.test_diagnostic_identity_cannot_be_enabled_by_other_flags) ... ok
+test_failure_is_terminal_and_exception_message_is_not_propagated (test_preparation.PolicyScenarios.test_failure_is_terminal_and_exception_message_is_not_propagated) ... ok
+test_fake_dispatch_preserves_payload_without_logging_it (test_preparation.PolicyScenarios.test_fake_dispatch_preserves_payload_without_logging_it) ... ok
+test_foreign_insecure_or_changed_endpoints_denied (test_preparation.PolicyScenarios.test_foreign_insecure_or_changed_endpoints_denied) ... ok
+test_legacy_direct_calls_and_forged_grants_never_authorized (test_preparation.PolicyScenarios.test_legacy_direct_calls_and_forged_grants_never_authorized) ... ok
+test_local_model_absence_does_not_download_or_fall_back (test_preparation.PolicyScenarios.test_local_model_absence_does_not_download_or_fall_back) ... ok
+test_missing_unverified_foreign_or_wrong_provider_grants (test_preparation.PolicyScenarios.test_missing_unverified_foreign_or_wrong_provider_grants) ... ok
+test_network_and_telegram_session_are_separate_requirements (test_preparation.PolicyScenarios.test_network_and_telegram_session_are_separate_requirements) ... ok
+test_queue_rechecks_scope_and_isolation_at_execution (test_preparation.PolicyScenarios.test_queue_rechecks_scope_and_isolation_at_execution) ... ok
+test_repeated_invocation_has_no_cached_authorization (test_preparation.PolicyScenarios.test_repeated_invocation_has_no_cached_authorization) ... ok
+test_silent_provider_switch_denied_and_selection_scoped (test_preparation.PolicyScenarios.test_silent_provider_switch_denied_and_selection_scoped) ... ok
+test_stale_scope_and_expiry_denied (test_preparation.PolicyScenarios.test_stale_scope_and_expiry_denied) ... ok
+test_unavailable_capability_is_not_remapped_to_google (test_preparation.PolicyScenarios.test_unavailable_capability_is_not_remapped_to_google) ... ok
+test_apk_structure_is_required_only_when_requested (test_preparation.ScannerScenarios.test_apk_structure_is_required_only_when_requested) ... ok
+test_clean_synthetic_container (test_preparation.ScannerScenarios.test_clean_synthetic_container) ... ok
+test_corrupt_archive_does_not_pass (test_preparation.ScannerScenarios.test_corrupt_archive_does_not_pass) ... ok
+test_embedded_service_configuration_is_reported (test_preparation.ScannerScenarios.test_embedded_service_configuration_is_reported) ... ok
+test_foreign_certificate_case_and_package_separately (test_preparation.ScannerScenarios.test_foreign_certificate_case_and_package_separately) ... ok
+test_known_key_in_nested_jar_fails_without_printing_value (test_preparation.ScannerScenarios.test_known_key_in_nested_jar_fails_without_printing_value) ... ok
+test_nested_depth_and_expansion_limits_fail_closed (test_preparation.ScannerScenarios.test_nested_depth_and_expansion_limits_fail_closed) ... ok
+test_unknown_client_key_is_reported_without_false_clean_claim (test_preparation.ScannerScenarios.test_unknown_client_key_is_reported_without_false_clean_claim) ... ok
+test_utf16_key_and_foreign_identity_are_detected (test_preparation.ScannerScenarios.test_utf16_key_and_foreign_identity_are_detected) ... ok
+test_llm_direct_fallback_and_forced_google_rich_content_are_in_inventory (test_preparation.SourcePreparationChecks.test_llm_direct_fallback_and_forced_google_rich_content_are_in_inventory) ... ok
+test_shared_engines_and_isolation_sources_preserved (test_preparation.SourcePreparationChecks.test_shared_engines_and_isolation_sources_preserved) ... ok
+test_source_inventory_matches_explicit_review (test_preparation.SourcePreparationChecks.test_source_inventory_matches_explicit_review) ... ok
+
+----------------------------------------------------------------------
+Ran 27 tests in 3.523s
+
+OK

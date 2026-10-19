@@ -1,0 +1,328 @@
+{
+  "schema": 1,
+  "audited_source_base": "2cc41769339d9689498c5f23b446f4cfdf3ad8c0",
+  "callsites": [
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/utils/text/TranslatorUtils.java",
+      "line": 68,
+      "symbol": "Translator.translate"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/messenger/TranslateController.java",
+      "line": 1103,
+      "symbol": "Translator.translateWithContext"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/messenger/TranslateController.java",
+      "line": 1434,
+      "symbol": "Translator.translatePoll"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/messenger/TranslateController.java",
+      "line": 2081,
+      "symbol": "Translator.translate"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/messenger/TranslateController.java",
+      "line": 2250,
+      "symbol": "Translator.translate"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/Cells/TextSelectionHelper.java",
+      "line": 1677,
+      "symbol": "Translator.translate"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/Cells/TextSelectionHelper.java",
+      "line": 1689,
+      "symbol": "Translator.translate"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/Components/ChatActivityEnterView.java",
+      "line": 7043,
+      "symbol": "Translator.translateWithContext"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/Components/ChatActivityEnterView.java",
+      "line": 7068,
+      "symbol": "Translator.translateWithContext"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/Components/ChatActivityEnterView.java",
+      "line": 7073,
+      "symbol": "Translator.translate"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/Components/ChatActivityEnterView.java",
+      "line": 7101,
+      "symbol": "Translator.translate"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/Components/ChatAttachAlert.java",
+      "line": 4549,
+      "symbol": "Translator.translate"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/Components/ChatAttachAlert.java",
+      "line": 4573,
+      "symbol": "Translator.translate"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/Components/EditTextCaption.java",
+      "line": 408,
+      "symbol": "Translator.translate"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/Components/EditTextCaption.java",
+      "line": 428,
+      "symbol": "Translator.translate"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/Components/ShareAlert.java",
+      "line": 2434,
+      "symbol": "Translator.translate"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/Components/TranscribeButton.java",
+      "line": 910,
+      "symbol": "Translator.translate"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/DialogsActivity.java",
+      "line": 12383,
+      "symbol": "Translator.translate"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/DocumentSelectActivity.java",
+      "line": 825,
+      "symbol": "Translator.translate"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/DocumentSelectActivity.java",
+      "line": 849,
+      "symbol": "Translator.translate"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/PhotoAlbumPickerActivity.java",
+      "line": 615,
+      "symbol": "Translator.translate"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/PhotoAlbumPickerActivity.java",
+      "line": 639,
+      "symbol": "Translator.translate"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/PhotoPickerActivity.java",
+      "line": 1264,
+      "symbol": "Translator.translate"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/PhotoPickerActivity.java",
+      "line": 1288,
+      "symbol": "Translator.translate"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/PhotoViewer.java",
+      "line": 8347,
+      "symbol": "Translator.translate"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/PhotoViewer.java",
+      "line": 8372,
+      "symbol": "Translator.translate"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/parts/ArticleTrans.kt",
+      "line": 90,
+      "symbol": "Translator.translateArticle"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/parts/DialogTrans.kt",
+      "line": 43,
+      "symbol": "Translator.translate"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/parts/MessageTrans.kt",
+      "line": 389,
+      "symbol": "Translator.translate"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/parts/MessageTrans.kt",
+      "line": 412,
+      "symbol": "Translator.translate"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/parts/MessageTrans.kt",
+      "line": 424,
+      "symbol": "Translator.translate"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/parts/MessageTrans.kt",
+      "line": 691,
+      "symbol": "Translator.translate"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/parts/MessageTrans.kt",
+      "line": 694,
+      "symbol": "Translator.translate"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/Translator.kt",
+      "line": 97,
+      "symbol": "translateBase"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/Translator.kt",
+      "line": 103,
+      "symbol": "translateBase"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/Translator.kt",
+      "line": 147,
+      "symbol": "translateBase"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/Translator.kt",
+      "line": 176,
+      "symbol": "getBulkTranslateProvider"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/Translator.kt",
+      "line": 194,
+      "symbol": "translateBase"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/Translator.kt",
+      "line": 217,
+      "symbol": "getBulkTranslateProvider"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/Translator.kt",
+      "line": 220,
+      "symbol": "translateBase"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/Translator.kt",
+      "line": 226,
+      "symbol": "translateBase"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/Translator.kt",
+      "line": 233,
+      "symbol": "translateBase"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/Translator.kt",
+      "line": 263,
+      "symbol": "translateBase"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/Translator.kt",
+      "line": 267,
+      "symbol": "getBulkTranslateProvider"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/Translator.kt",
+      "line": 339,
+      "symbol": "translator.doTranslate"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/GoogleAppTranslator.kt",
+      "line": 28,
+      "symbol": "GoogleTranslator.doTranslate"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/GoogleAppTranslator.kt",
+      "line": 34,
+      "symbol": "GoogleCloudTranslator.doTranslate"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/GoogleTranslator.kt",
+      "line": 47,
+      "symbol": "GoogleTranslatorNeko.translate"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/LLMTranslator.kt",
+      "line": 153,
+      "symbol": "GoogleAppTranslator.doTranslate"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/LLMTranslator.kt",
+      "line": 163,
+      "symbol": "GoogleAppTranslator.doTranslate"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/LLMTranslator.kt",
+      "line": 169,
+      "symbol": "GoogleAppTranslator.doTranslate"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/RealMicrosoftTranslator.kt",
+      "line": 13,
+      "symbol": "NekoMicrosoftTranslator.getInstance"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/RealMicrosoftTranslator.kt",
+      "line": 50,
+      "symbol": "translator.translate"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/fallback/DeepLTranslatorNeko.java",
+      "line": 8,
+      "symbol": "DeepLTranslator.getInstance"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/fallback/DeepLTranslatorNeko.java",
+      "line": 10,
+      "symbol": "translator.translate"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/fallback/GoogleTranslatorNeko.java",
+      "line": 8,
+      "symbol": "GoogleAppTranslator.getInstance"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/fallback/GoogleTranslatorNeko.java",
+      "line": 10,
+      "symbol": "translator.translate"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/ui/NekoDelegateFragment.java",
+      "line": 622,
+      "symbol": "Translator.translatePoll"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/ui/NekoDelegateFragment.java",
+      "line": 668,
+      "symbol": "Translator.translate"
+    }
+  ],
+  "source_sha256": {
+    "TMessagesProj/src/main/java/app/exteraless/utils/text/TranslatorUtils.java": "bcce38bcf94be99851fe6965634f848a11fc16fe7c8a7abadb5d2f10e1f8947a",
+    "TMessagesProj/src/main/java/org/telegram/messenger/TranslateController.java": "33fc27cfd64116a79563b6138a944e54934b522e48a3d6e3a94140a363f485a8",
+    "TMessagesProj/src/main/java/org/telegram/ui/Cells/TextSelectionHelper.java": "af03b065f0bcba1268700dd711c9ad2c98de2f8043c016585c753a5147bb68d4",
+    "TMessagesProj/src/main/java/org/telegram/ui/Components/ChatActivityEnterView.java": "7f856083eef4c3ff75559023a7e9153ee241c4f2a1ba1083346ced1d9471f1ac",
+    "TMessagesProj/src/main/java/org/telegram/ui/Components/ChatAttachAlert.java": "c95228406451173caf96db1b738e0b51d32cab32e8e37c3018f7f3be0b531c00",
+    "TMessagesProj/src/main/java/org/telegram/ui/Components/EditTextCaption.java": "629dade2aa026fdb5aca23670af0b1ab55d38439f7697cdabeb36428efa9367d",
+    "TMessagesProj/src/main/java/org/telegram/ui/Components/ShareAlert.java": "d7d7d97e6f9b16dc880680fd688bd372d20dcd762f2419a70a63b9be6603b92f",
+    "TMessagesProj/src/main/java/org/telegram/ui/Components/TranscribeButton.java": "8f7b5b47182623108a36e730697744f760c738ef55fd25037d31d2dd015965ff",
+    "TMessagesProj/src/main/java/org/telegram/ui/DialogsActivity.java": "6cb070e30b4ec5c435d9a0fc6da09ac534575694214673b9eba8f9bf251b0768",
+    "TMessagesProj/src/main/java/org/telegram/ui/DocumentSelectActivity.java": "5bfea8d70ae2ba7d44097bfc32316a98f846937545d697ab3ce6f8bb808c726d",
+    "TMessagesProj/src/main/java/org/telegram/ui/PhotoAlbumPickerActivity.java": "fc13bd3a1ff7daeb35ad8445dae3dfa986435a7bec29952c38e2f67b2880b8ba",
+    "TMessagesProj/src/main/java/org/telegram/ui/PhotoPickerActivity.java": "02383641c5e31e238d4ab7e06448277505e5ff872b8fff38e43ec8684f6fa484",
+    "TMessagesProj/src/main/java/org/telegram/ui/PhotoViewer.java": "325dae015cfd355922e52dc557cf9024cdf252a9b4e90858f793cb5b15133fbc",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/parts/ArticleTrans.kt": "d4304179767a67a7647086f72389db245451a70d9980e940d95259fa9089b67d",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/parts/DialogTrans.kt": "87b2689c58f0c277838e22150be7bb3696c40a4e1c8824da05887c73fddcfc08",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/parts/MessageTrans.kt": "95060b8e259f76d35fb0ffcad6a223e47cc4518b19e59c175191efc23d6ea5e7",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/Translator.kt": "21bc6054edfa89bf14fdf2d206f6475110f52b89e7e31200b50fb45d64c0fe51",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/GoogleAppTranslator.kt": "9b94b5448bdbc0a33dcdd72ac7223a5760a3bd970879f1ee5d3a7c0fcf6cdbaf",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/GoogleTranslator.kt": "089adfc891f1d6410178415122bd6363ab9a0496f4ad9224a4b9e7642ea4d561",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/LLMTranslator.kt": "1d47c37cb78605db51157564343087da7006cfd8f26a7b842fd6e8481909e472",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/RealMicrosoftTranslator.kt": "413196aa5763b882c39d7cc65964351bfff28847371a6720d9e0d8eea0a298f1",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/fallback/DeepLTranslatorNeko.java": "063241eb57de1a9a09c9a4c66e03a2686c3ea905afbe17a919a6d023b30b5eee",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/fallback/GoogleTranslatorNeko.java": "3fc1c292b71c7798a8ef3e4a93b006769e79834e3a5f5b21223a55cd600bcf88",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/ui/NekoDelegateFragment.java": "70ebb5cdde166b8a994dcd005955d8b74a8aa72ac41a41774c5e314818e08f65"
+  },
+  "limits": "Lexical Kotlin/Java snapshot; reflection, generated code, plugins and binary calls need separate review."
+}

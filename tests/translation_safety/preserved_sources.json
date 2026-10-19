@@ -1,0 +1,27 @@
+{
+  "audited_base": "2cc41769339d9689498c5f23b446f4cfdf3ad8c0",
+  "purpose": "Source identity preservation, not service authorization or runtime testing",
+  "sha256": {
+    "TMessagesProj/build.gradle": "f978651af1f32a66c32ffc864a0ea628e1281cd456ad57d5d04934bce8b844b0",
+    "TMessagesProj/src/main/AndroidManifest.xml": "7e1e6f45cb47a842aa07c732e6ebe5a735f4f7840ac60b8f77c7b203c07b5240",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/HTMLKeeper.java": "097bb74a3f844dc45aabf0e6f078de1f5d705eb91d5a9e015a5e897ec6ded8c8",
+    "TMessagesProj/src/main/java/org/telegram/messenger/ApplicationLoader.java": "91d058fd979b9846f61ab08510817c79233c14b8e45c61bd1de5de52430e2a46",
+    "TMessagesProj/src/main/java/org/telegram/messenger/DiagnosticPolicy.java": "958264b8a144bd45a6563897d8dfb641cd321ea5fadaded8d9366d0c4f087312",
+    "TMessagesProj/src/main/java/org/telegram/messenger/PushServicesPolicy.java": "d44a6cb29b00fcce02a7df8b7c8b7e6e4fc9a49d3b21b3d0d8966f82c3bc45a5",
+    "TMessagesProj/src/main/java/org/telegram/messenger/SettingsBackupPolicy.java": "1f0b8744e5a751ac6a0902805069c0a3ac206bb173f0fb3bd1a3a818dd2dae07",
+    "TMessagesProj/src/main/java/org/telegram/messenger/BackupAgent.java": "7a01b406b1244a70324722da0aedcabe387805041b94fde4d7aee6425654618d",
+    "TMessagesProj/src/main/java/org/telegram/messenger/AuthTokensHelper.java": "06476514d88e95dd80fde7f427c16a598981cc685a468826c53eb697fedf4c70",
+    "TMessagesProj/src/main/java/org/telegram/messenger/GcmPushListenerService.java": "c3af95b9c0378a2fb590e465fd8bdd1f1e051fb2ad4b0c2188c25c8cc6522cf0",
+    "TMessagesProj/src/main/java/org/telegram/messenger/PushListenerController.java": "8ef7e2cb83cba9bed5bb9c3610a2a8b9aad9ed3500734a269f0164c06ccf9982",
+    "TMessagesProj/src/main/java/org/telegram/messenger/SharedConfig.java": "05c2858d415890053c317eae5593981261ec65ddd27ac5c213aeb2c88dd2c9d4",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/GoogleTranslator.kt": "089adfc891f1d6410178415122bd6363ab9a0496f4ad9224a4b9e7642ea4d561",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/GoogleAppTranslator.kt": "9b94b5448bdbc0a33dcdd72ac7223a5760a3bd970879f1ee5d3a7c0fcf6cdbaf",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/GoogleCloudTranslator.kt": "aaf3298f355c9f33911365ed7991174bf94746d1c25264fca15660eb90e4a3d4",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/RealMicrosoftTranslator.kt": "413196aa5763b882c39d7cc65964351bfff28847371a6720d9e0d8eea0a298f1",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/MicrosoftTranslator.kt": "502cbaf874f37cd686bd3db31d41258ce844ce4a83749573bb9187a686d0eed1",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/DeepLTranslator.kt": "564fdd52219c0761d360ad048692860362aa2f665e1d2ebcc16a2b53e5e5bea2",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/LLMTranslator.kt": "1d47c37cb78605db51157564343087da7006cfd8f26a7b842fd6e8481909e472",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/fallback/GoogleTranslatorNeko.java": "3fc1c292b71c7798a8ef3e4a93b006769e79834e3a5f5b21223a55cd600bcf88",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/fallback/DeepLTranslatorNeko.java": "063241eb57de1a9a09c9a4c66e03a2686c3ea905afbe17a919a6d023b30b5eee"
+  }
+}

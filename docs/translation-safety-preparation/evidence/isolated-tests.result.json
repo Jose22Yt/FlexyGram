@@ -1,0 +1,23 @@
+{
+  "source_base": "2cc41769339d9689498c5f23b446f4cfdf3ad8c0",
+  "command": "python -m unittest discover -s tests/translation_safety -v",
+  "suite": "translation-safety isolated preparation; distinct from original 26 P0 security tests",
+  "tests": 27,
+  "failures": 0,
+  "omissions": 0,
+  "runtime_seconds": 3.523,
+  "test_files_sha256": {
+    "callsites.json": "758a6cbcbee822a42d2af6eb7898cf7aaa8fdd33246a8ae114fd23275106f73f",
+    "policy_model.py": "d109348266d6004a8181c3466ce548e2d0661b9c68761cf0f0f93165ae4f8df9",
+    "preserved_sources.json": "49ed128a65aed588506ed2b2595722d83e326fc12cfdb19f64833a71055801df",
+    "retired_fingerprints.json": "c84a6c07173d6b49b701bfae4ceb40e1cf63ca64a2a4c2b69c662ea4d2fe595e",
+    "test_preparation.py": "84dc2c3f5ed7dee03d7ec9c0bbc6037e5c6b84995865824a07484b0546b9817f",
+    "artifact_gate.py": "a225804b19ce0592229a038cd8b1ab8e763581db45fee5b79b9108d69883e0f5",
+    "inventory.py": "c21438940715f758dcc3e6333008489c2e6de27c0f7ac5aebc10175ed4d70d59"
+  },
+  "production_wiring": false,
+  "android_build_performed": false,
+  "android_execution_performed": false,
+  "translation_network_calls": 0,
+  "old_security_suite_rerun": false
+}
