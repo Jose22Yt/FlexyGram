@@ -1,0 +1,105 @@
+Compiled from "SourceFile"
+public abstract class app.nekogram.translator.BaseTranslator {
+  protected static final com.google.gson.Gson a;
+    descriptor: Lcom/google/gson/Gson;
+  public app.nekogram.translator.BaseTranslator();
+    descriptor: ()V
+
+  static {};
+    descriptor: ()V
+
+  protected static java.lang.String a(java.lang.String);
+    descriptor: (Ljava/lang/String;)Ljava/lang/String;
+
+  public final app.nekogram.translator.Result translate(java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception;
+    descriptor: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lapp/nekogram/translator/Result;
+
+  protected abstract app.nekogram.translator.Result translateImpl(java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception;
+    descriptor: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lapp/nekogram/translator/Result;
+
+  protected app.nekogram.translator.Result[] translateImpl(java.lang.String[], java.lang.String, java.lang.String) throws java.lang.Exception;
+    descriptor: ([Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)[Lapp/nekogram/translator/Result;
+
+  public abstract java.util.List<java.lang.String> getTargetLanguages();
+    descriptor: ()Ljava/util/List;
+
+  protected java.lang.String convertLanguageCode(java.lang.String, boolean);
+    descriptor: (Ljava/lang/String;Z)Ljava/lang/String;
+
+  public final boolean supportLanguage(java.lang.String);
+    descriptor: (Ljava/lang/String;)Z
+}
+Compiled from "SourceFile"
+public final class app.nekogram.translator.Result {
+  public final java.lang.String translation;
+    descriptor: Ljava/lang/String;
+  public final java.lang.String sourceLanguage;
+    descriptor: Ljava/lang/String;
+  app.nekogram.translator.Result(java.lang.String, java.lang.String);
+    descriptor: (Ljava/lang/String;Ljava/lang/String;)V
+
+  public static app.nekogram.translator.Result of(java.lang.String, java.lang.String);
+    descriptor: (Ljava/lang/String;Ljava/lang/String;)Lapp/nekogram/translator/Result;
+
+  public final boolean equals(java.lang.Object);
+    descriptor: (Ljava/lang/Object;)Z
+
+  public final int hashCode();
+    descriptor: ()I
+
+  public final java.lang.String toString();
+    descriptor: ()Ljava/lang/String;
+}
+Compiled from "SourceFile"
+public class app.nekogram.translator.Http429Exception extends java.io.IOException {
+  public app.nekogram.translator.Http429Exception();
+    descriptor: ()V
+}
+Compiled from "SourceFile"
+public class app.nekogram.translator.MicrosoftTranslator extends app.nekogram.translator.BaseTranslator {
+  private final java.util.List b;
+    descriptor: Ljava/util/List;
+  public app.nekogram.translator.MicrosoftTranslator();
+    descriptor: ()V
+
+  public static app.nekogram.translator.MicrosoftTranslator getInstance();
+    descriptor: ()Lapp/nekogram/translator/MicrosoftTranslator;
+
+  public java.util.List<java.lang.String> getTargetLanguages();
+    descriptor: ()Ljava/util/List;
+
+  protected final java.lang.String convertLanguageCode(java.lang.String, boolean);
+    descriptor: (Ljava/lang/String;Z)Ljava/lang/String;
+
+  protected final app.nekogram.translator.Result translateImpl(java.lang.String, java.lang.String, java.lang.String);
+    descriptor: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lapp/nekogram/translator/Result;
+}
+Compiled from "SourceFile"
+public class app.nekogram.translator.DeepLTranslator extends app.nekogram.translator.BaseTranslator {
+  private static final java.lang.String c;
+    descriptor: Ljava/lang/String;
+  private static java.lang.String d;
+    descriptor: Ljava/lang/String;
+  private final java.util.List b;
+    descriptor: Ljava/util/List;
+  public app.nekogram.translator.DeepLTranslator();
+    descriptor: ()V
+
+  public static app.nekogram.translator.DeepLTranslator getInstance();
+    descriptor: ()Lapp/nekogram/translator/DeepLTranslator;
+
+  public static void setJwt(java.lang.String);
+    descriptor: (Ljava/lang/String;)V
+
+  static {};
+    descriptor: ()V
+
+  public java.util.List<java.lang.String> getTargetLanguages();
+    descriptor: ()Ljava/util/List;
+
+  protected final java.lang.String convertLanguageCode(java.lang.String, boolean);
+    descriptor: (Ljava/lang/String;Z)Ljava/lang/String;
+
+  protected final app.nekogram.translator.Result translateImpl(java.lang.String, java.lang.String, java.lang.String);
+    descriptor: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lapp/nekogram/translator/Result;
+}
