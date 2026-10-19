@@ -1,0 +1,22 @@
+[
+  {
+    "pr": 16,
+    "tests": 8,
+    "expected": 8,
+    "exit_code": 0,
+    "strict_exit_code": 0
+  },
+  {
+    "pr": 18,
+    "tests": 6,
+    "expected": 6,
+    "exit_code": 0
+  },
+  {
+    "pr": 19,
+    "tests": 15,
+    "expected": 15,
+    "exit_code": 0,
+    "strict_exit_code": 0
+  }
+]

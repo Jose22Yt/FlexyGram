@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "scope": "visible labels/icons and diagnostic identity, not source packages or credits",
+  "errors": 0,
+  "review_items": 10,
+  "findings": [
+    {
+      "level": "review",
+      "code": "LEGACY_LAUNCHER_ICON",
+      "path": "TMessagesProj/src/diagnostic/AndroidManifest.xml",
+      "detail": "icon: @mipmap/ic_launcher_exteraless"
+    },
+    {
+      "level": "review",
+      "code": "LEGACY_LAUNCHER_ICON",
+      "path": "TMessagesProj/src/diagnostic/AndroidManifest.xml",
+      "detail": "roundIcon: @mipmap/ic_launcher_exteraless_round"
+    },
+    {
+      "level": "review",
+      "code": "LEGACY_PRIMARY_ICON",
+      "path": "TMessagesProj/src/diagnostic/AndroidManifest.xml",
+      "detail": "application icon: @mipmap/ic_launcher_exteraless"
+    },
+    {
+      "level": "review",
+      "code": "LEGACY_PRIMARY_ICON",
+      "path": "TMessagesProj/src/diagnostic/AndroidManifest.xml",
+      "detail": "application roundIcon: @mipmap/ic_launcher_exteraless_round"
+    },
+    {
+      "level": "review",
+      "code": "LEGACY_VISIBLE_STRING",
+      "path": "TMessagesProj/src/main/res/values/strings.xml",
+      "detail": "AppName: exteraless"
+    },
+    {
+      "level": "review",
+      "code": "LEGACY_VISIBLE_STRING",
+      "path": "TMessagesProj/src/main/res/values/strings.xml",
+      "detail": "AppNameBeta: Telegram Beta"
+    },
+    {
+      "level": "review",
+      "code": "LEGACY_ACCOUNT_ICON",
+      "path": "TMessagesProj/src/main/res/xml/auth.xml",
+      "detail": "icon: @mipmap/ic_launcher_exteraless_round"
+    },
+    {
+      "level": "review",
+      "code": "LEGACY_ACCOUNT_ICON",
+      "path": "TMessagesProj/src/main/res/xml/auth.xml",
+      "detail": "smallIcon: @mipmap/ic_launcher_exteraless_round"
+    },
+    {
+      "level": "review",
+      "code": "LEGACY_ACCOUNT_LABEL",
+      "path": "TMessagesProj/src/main/res/xml/auth.xml",
+      "detail": "@string/AppName -> exteraless"
+    },
+    {
+      "level": "review",
+      "code": "LEGACY_BUILD_NAME",
+      "path": "settings.gradle",
+      "detail": "exteraless"
+    }
+  ]
+}

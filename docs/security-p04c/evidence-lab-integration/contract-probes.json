@@ -1,0 +1,34 @@
+{
+  "status": "OFFLINE_REVIEW_REPRODUCED",
+  "pins_and_12_case_ids_match": true,
+  "pr17_rejects_translated_x86": true,
+  "pr21_rejects_direct_pr17_format": "BLOCKED",
+  "pr21_synthetic_positive_status": "CONSISTENT_SELF_REPORTED_EVIDENCE_REQUIRES_HUMAN_REVIEW",
+  "runtime_certified": false,
+  "observations": [
+    {
+      "probe": "mixed_x86_arm64_advertisement",
+      "observed_pr20": "ACCEPTED_ADVERTISED_ABI",
+      "actual_android_execution": false,
+      "missing_reads": [
+        "uname",
+        "ro.product.cpu.abi",
+        "ro.dalvik.vm.native.bridge"
+      ],
+      "fix_required_before_authoritative_preflight": true
+    },
+    {
+      "probe": "critical_log_with_valid_mock_preflight",
+      "exit_code": 0,
+      "status": "READY_FOR_HUMAN_REVIEW_NOT_RUNTIME_VALIDATED",
+      "counts": {
+        "crash_or_anr": 1,
+        "memory_failure": 0,
+        "native_loader_error": 0,
+        "python_import_error": 1
+      },
+      "must_not_be_used_as_final_runtime_gate": true
+    }
+  ],
+  "android_executed": false
+}

@@ -1,0 +1,11 @@
+test_account_labels_resolve_to_updated_brand_without_touching_auth_xml (test_branding.BrandResourcesTests.test_account_labels_resolve_to_updated_brand_without_touching_auth_xml) ... ok
+test_adaptive_round_and_standard_reference_the_same_layers (test_branding.BrandResourcesTests.test_adaptive_round_and_standard_reference_the_same_layers) ... ok
+test_diagnostic_application_and_launcher_are_unchanged (test_branding.BrandResourcesTests.test_diagnostic_application_and_launcher_are_unchanged) ... ok
+test_identity_candidate_assets_exist_and_parse (test_branding.BrandResourcesTests.test_identity_candidate_assets_exist_and_parse) ... ok
+test_localized_product_names_are_consistent (test_branding.BrandResourcesTests.test_localized_product_names_are_consistent) ... ok
+test_monochrome_mark_has_f_cutout_and_vectors_have_consistent_viewport (test_branding.BrandResourcesTests.test_monochrome_mark_has_f_cutout_and_vectors_have_consistent_viewport) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.033s
+
+OK

@@ -1,0 +1,16 @@
+[
+  {
+    "probe": "emulator-headless-version",
+    "exit_code": 0,
+    "log": "emulator-headless-version.log",
+    "android_boot": false
+  },
+  {
+    "probe": "arm64-engine-version",
+    "command_option": "-version",
+    "exit_code": 0,
+    "log": "arm64-engine-version.log",
+    "android_boot": false,
+    "initial_double_dash_version_was_unsupported": true
+  }
+]

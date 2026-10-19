@@ -1,0 +1,27 @@
+test_16k_requires_modern_android_api (test_preflight.AndroidPreflightTests.test_16k_requires_modern_android_api) ... ok
+test_16kb_profile_checks_real_page_size_and_sdk (test_preflight.AndroidPreflightTests.test_16kb_profile_checks_real_page_size_and_sdk) ... ok
+test_android_16k_profile_rejects_only_4k_pages (test_preflight.AndroidPreflightTests.test_android_16k_profile_rejects_only_4k_pages) ... ok
+test_api24_clean_preflight_is_review_only (test_preflight.AndroidPreflightTests.test_api24_clean_preflight_is_review_only) ... ok
+test_api24_rejects_wrong_sdk_even_if_arm64 (test_preflight.AndroidPreflightTests.test_api24_rejects_wrong_sdk_even_if_arm64) ... ok
+test_bad_digest_does_not_run_aapt2_or_apksigner (test_preflight.AndroidPreflightTests.test_bad_digest_does_not_run_aapt2_or_apksigner) ... ok
+test_bad_package_is_rejected (test_preflight.AndroidPreflightTests.test_bad_package_is_rejected) ... ok
+test_corrupt_zip_is_rejected_before_external_tools (test_preflight.AndroidPreflightTests.test_corrupt_zip_is_rejected_before_external_tools) ... ok
+test_emulator_identity_must_be_proven (test_preflight.AndroidPreflightTests.test_emulator_identity_must_be_proven) ... ok
+test_emulator_must_be_online_authorized (test_preflight.AndroidPreflightTests.test_emulator_must_be_online_authorized) ... ok
+test_internet_permission_blocks_preflight (test_preflight.AndroidPreflightTests.test_internet_permission_blocks_preflight) ... ok
+test_log_summarizes_without_including_personal_contents (test_preflight.AndroidPreflightTests.test_log_summarizes_without_including_personal_contents) ... ok
+test_log_symlink_is_rejected (test_preflight.AndroidPreflightTests.test_log_symlink_is_rejected) ... ok
+test_no_apk_does_not_claim_full_readiness (test_preflight.AndroidPreflightTests.test_no_apk_does_not_claim_full_readiness) ... ok
+test_no_dangerous_commands_can_be_issued (test_preflight.AndroidPreflightTests.test_no_dangerous_commands_can_be_issued) ... ok
+test_non_emulator_hardware_serial_rejected_before_adb (test_preflight.AndroidPreflightTests.test_non_emulator_hardware_serial_rejected_before_adb) ... ok
+test_partial_apk_arguments_rejected (test_preflight.AndroidPreflightTests.test_partial_apk_arguments_rejected) ... ok
+test_refuses_to_continue_if_diagnostic_is_preinstalled (test_preflight.AndroidPreflightTests.test_refuses_to_continue_if_diagnostic_is_preinstalled) ... ok
+test_symlinked_apk_not_accepted (test_preflight.AndroidPreflightTests.test_symlinked_apk_not_accepted) ... ok
+test_unsigned_v2_blocks_preflight (test_preflight.AndroidPreflightTests.test_unsigned_v2_blocks_preflight) ... ok
+test_unsupported_abi_is_rejected (test_preflight.AndroidPreflightTests.test_unsupported_abi_is_rejected) ... ok
+test_wrong_certificate_pin_blocks_preflight (test_preflight.AndroidPreflightTests.test_wrong_certificate_pin_blocks_preflight) ... ok
+
+----------------------------------------------------------------------
+Ran 22 tests in 0.015s
+
+OK
