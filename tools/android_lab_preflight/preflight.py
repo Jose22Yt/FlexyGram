@@ -2,7 +2,7 @@
 """Read-only FlexyGram Diagnostic ARM64 emulator and APK preflight.
 
 Never installs/starts an APK, changes settings, connects to a service, or pulls
-logs from a device. Successful checks are NOT Android runtime certification.
+logs from a device. Successful checks are NOT Android runtime certification or final lab acceptance.
 Python standard library only; designed to run offline in an authorized lab.
 """
 from __future__ import annotations
@@ -93,9 +93,21 @@ def emulator_probe(serial: str, profile: str, run=command) -> dict:
     # Emulator-* alone does not prove this is an emulator: inspect its QEMU properties.
     if getprop('ro.kernel.qemu') != '1' and getprop('ro.boot.qemu') != '1':
         raise Blocked('Emulator identity could not be verified')
+    # A reported arm64-v8a *secondary* ABI is not proof of an ARM64 kernel.
+    # Never accept an x86 guest using native bridge or a translated ABI.
+    kernel_arch = run(['adb', '-s', serial, 'shell', 'uname', '-m']).strip()
+    primary_abi = getprop('ro.product.cpu.abi')
+    native_bridge = getprop('ro.dalvik.vm.native.bridge').strip().lower()
+    native_bridge_exec = getprop('ro.enable.native.bridge.exec').strip().lower()
     sdk = getprop('ro.build.version.sdk')
     abilist = getprop('ro.product.cpu.abilist')
     page = run(['adb', '-s', serial, 'shell', 'getconf', 'PAGE_SIZE']).strip()
+    if kernel_arch not in ('aarch64', 'arm64'):
+        raise Blocked('Guest kernel is not ARM64')
+    if primary_abi != 'arm64-v8a' or abilist.split(',')[0] != 'arm64-v8a':
+        raise Blocked('Primary Android ABI is not arm64-v8a')
+    if native_bridge not in ('', '0', 'false') or native_bridge_exec not in ('', '0', 'false'):
+        raise Blocked('Native bridge must be disabled for the ARM64 laboratory')
     if not sdk.isdecimal() or not page.isdecimal():
         raise Blocked('Android API or page-size probe was not numeric')
     api = int(sdk)
@@ -116,6 +128,8 @@ def emulator_probe(serial: str, profile: str, run=command) -> dict:
     return {
         'target_id_sha256_prefix': hashlib.sha256(serial.encode()).hexdigest()[:12],
         'emulator_property_verified': True, 'android_api': api,
+        'kernel_arm64_verified': True, 'primary_arm64_v8a_verified': True,
+        'native_bridge_disabled': True,
         'advertises_arm64_v8a': True, 'page_size_bytes': page_bytes,
         'diagnostic_preinstalled': False, 'profile': profile,
     }
@@ -177,6 +191,8 @@ def main(argv=None, run=command) -> int:
             raise Blocked('APK path and both SHA-256 pins must be provided together')
         if args.log_file is not None:
             report['log_indicators'] = read_log_counts(args.log_file)
+            if any(report['log_indicators']['category_counts'].values()):
+                raise Blocked('Critical indicators detected in the supplied local log')
         report['target'] = emulator_probe(args.serial, args.profile, run)
         if args.apk is not None:
             report['apk'] = apk_probe(args.apk, args.expected_apk_sha256,
