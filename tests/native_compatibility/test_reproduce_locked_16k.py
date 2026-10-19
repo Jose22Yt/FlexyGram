@@ -44,10 +44,13 @@ class ReproductionGateTests(unittest.TestCase):
             with zipfile.ZipFile(path, 'w') as z:
                 z.writestr('payload.txt', str(i).encode())
             digest = r.sha(path)
-            self.approved.append({'filename': original, 'sha256': digest})
+            original_url = 'https://fixture.invalid/' + original
+            self.approved.append({'filename': original, 'sha256': digest,
+                                  'url': original_url})
             if rebuilt:
                 self.rebuilt[current] = digest
             self.rows.append({'filename': current, 'original_filename': original,
+                              'original_sha256': digest, 'original_url': original_url,
                               'sha256': digest, 'rebuilt': rebuilt})
         self.manifest = {'wheels': self.rows, 'android_runtime_validated': False}
         self.save()
@@ -86,7 +89,19 @@ class ReproductionGateTests(unittest.TestCase):
 
     def test_original_wheel_sha_mismatch_is_rejected(self):
         self.approved[4]['sha256'] = '0' * 64
-        with self.assertRaisesRegex(ValueError, 'Original wheel was modified'):
+        with self.assertRaisesRegex(ValueError, 'Original wheel provenance disagrees'):
+            self.validate()
+
+    def test_original_sha256_provenance_cannot_be_forged(self):
+        self.rows[4]['original_sha256'] = 'f' * 64
+        self.save()
+        with self.assertRaisesRegex(ValueError, 'Original wheel provenance disagrees'):
+            self.validate()
+
+    def test_original_url_provenance_cannot_be_forged(self):
+        self.rows[2]['original_url'] = 'https://unapproved.invalid/wheel'
+        self.save()
+        with self.assertRaisesRegex(ValueError, 'Original wheel provenance disagrees'):
             self.validate()
 
     def test_missing_wheel_is_rejected(self):
