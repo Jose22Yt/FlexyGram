@@ -1,0 +1,59 @@
+[
+  {
+    "name": "commandlinetools-linux-16111833_latest.zip",
+    "url": "https://dl.google.com/android/repository/commandlinetools-linux-16111833_latest.zip",
+    "bytes": 181052239,
+    "hash_algorithm": "sha1",
+    "hash": "e025545c62a8e64c7559119566a569fb1dec5f60",
+    "expected_hash": "e025545c62a8e64c7559119566a569fb1dec5f60",
+    "hash_ok": true,
+    "seconds": 8.5
+  },
+  {
+    "name": "gradle-9.7.1-bin.zip",
+    "url": "https://services.gradle.org/distributions/gradle-9.7.1-bin.zip",
+    "bytes": 151433392,
+    "hash_algorithm": "sha256",
+    "hash": "acd53f1edaf02f1a8ff99879f8a34b302661a057d9b063ae9e35b552f804d20a",
+    "expected_hash": "acd53f1edaf02f1a8ff99879f8a34b302661a057d9b063ae9e35b552f804d20a",
+    "hash_ok": true,
+    "seconds": 16.7
+  },
+  {
+    "name": "OpenJDK21U-jdk_x64_linux_hotspot_21.0.12.1_1.tar.gz",
+    "url": "https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.12.1%2B1/OpenJDK21U-jdk_x64_linux_hotspot_21.0.12.1_1.tar.gz",
+    "bytes": 207473347,
+    "hash_algorithm": "sha256",
+    "hash": "ce79869e1307ed8ee1e2baa86a412b1eb5b75d10a01006d788a6f968bcfaee94",
+    "expected_hash": "ce79869e1307ed8ee1e2baa86a412b1eb5b75d10a01006d788a6f968bcfaee94",
+    "hash_ok": true,
+    "seconds": 18.4
+  },
+  {
+    "name": "commandlinetools-linux-13114758_latest.zip",
+    "url": "https://dl.google.com/android/repository/commandlinetools-linux-13114758_latest.zip",
+    "bytes": 164760899,
+    "hash_algorithm": "sha1",
+    "hash": "5fdcc763663eefb86a5b8879697aa6088b041e70",
+    "expected_hash": "5fdcc763663eefb86a5b8879697aa6088b041e70",
+    "hash_ok": true
+  },
+  {
+    "name": "platform-35_r02.zip",
+    "url": "https://dl.google.com/android/repository/platform-35_r02.zip",
+    "bytes": 64273788,
+    "hash_algorithm": "sha1",
+    "hash": "0bb560a90a7a2cbd0dd8348224d518b638fe7949",
+    "expected_hash": "0bb560a90a7a2cbd0dd8348224d518b638fe7949",
+    "hash_ok": true
+  },
+  {
+    "name": "platform-37.0_r02.zip",
+    "url": "https://dl.google.com/android/repository/platform-37.0_r02.zip",
+    "bytes": 67281901,
+    "hash_algorithm": "sha1",
+    "hash": "ed8ebf7f8822a4de5686d427f237d2fa30ff7410",
+    "expected_hash": "ed8ebf7f8822a4de5686d427f237d2fa30ff7410",
+    "hash_ok": true
+  }
+]

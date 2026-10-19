@@ -1,0 +1,1 @@
+{"command":[":TMessagesProj:assembleDebug","--no-daemon","--console=plain","--stacktrace","--info","--max-workers=2"],"exit_code":0,"seconds":1115.0232648849487}

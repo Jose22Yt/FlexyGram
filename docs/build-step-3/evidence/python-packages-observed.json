@@ -1,0 +1,92 @@
+[
+  {
+    "name": "beautifulsoup4",
+    "version": "4.15.0",
+    "metadata_path": "common/beautifulsoup4-4.15.0.dist-info/METADATA"
+  },
+  {
+    "name": "certifi",
+    "version": "2026.10.18",
+    "metadata_path": "common/certifi-2026.10.18.dist-info/METADATA"
+  },
+  {
+    "name": "chaquopy-freetype",
+    "version": "2.9.1",
+    "metadata_path": "common/chaquopy_freetype-2.9.1.dist-info/METADATA"
+  },
+  {
+    "name": "chaquopy-libjpeg",
+    "version": "1.5.3",
+    "metadata_path": "common/chaquopy_libjpeg-1.5.3.dist-info/METADATA"
+  },
+  {
+    "name": "chaquopy-libxml2",
+    "version": "2.9.8",
+    "metadata_path": "common/chaquopy_libxml2-2.9.8.dist-info/METADATA"
+  },
+  {
+    "name": "chaquopy-libxslt",
+    "version": "1.1.32",
+    "metadata_path": "common/chaquopy_libxslt-1.1.32.dist-info/METADATA"
+  },
+  {
+    "name": "chaquopy-libyaml",
+    "version": "0.2.5",
+    "metadata_path": "common/chaquopy_libyaml-0.2.5.dist-info/METADATA"
+  },
+  {
+    "name": "charset-normalizer",
+    "version": "3.5.2",
+    "metadata_path": "common/charset_normalizer-3.5.2.dist-info/METADATA"
+  },
+  {
+    "name": "debugpy",
+    "version": "1.8.22",
+    "metadata_path": "common/debugpy-1.8.22.dist-info/METADATA"
+  },
+  {
+    "name": "idna",
+    "version": "3.20",
+    "metadata_path": "common/idna-3.20.dist-info/METADATA"
+  },
+  {
+    "name": "lxml",
+    "version": "5.3.0",
+    "metadata_path": "common/lxml-5.3.0.dist-info/METADATA"
+  },
+  {
+    "name": "packaging",
+    "version": "26.3",
+    "metadata_path": "common/packaging-26.3.dist-info/METADATA"
+  },
+  {
+    "name": "pillow",
+    "version": "11.0.0",
+    "metadata_path": "common/pillow-11.0.0.dist-info/METADATA"
+  },
+  {
+    "name": "PyYAML",
+    "version": "6.0.3",
+    "metadata_path": "common/pyyaml-6.0.3.dist-info/METADATA"
+  },
+  {
+    "name": "requests",
+    "version": "2.34.2",
+    "metadata_path": "common/requests-2.34.2.dist-info/METADATA"
+  },
+  {
+    "name": "soupsieve",
+    "version": "3.0.3",
+    "metadata_path": "common/soupsieve-3.0.3.dist-info/METADATA"
+  },
+  {
+    "name": "typing_extensions",
+    "version": "4.16.0",
+    "metadata_path": "common/typing_extensions-4.16.0.dist-info/METADATA"
+  },
+  {
+    "name": "urllib3",
+    "version": "2.8.0",
+    "metadata_path": "common/urllib3-2.8.0.dist-info/METADATA"
+  }
+]

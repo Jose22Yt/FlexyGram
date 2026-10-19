@@ -1,0 +1,83 @@
+GitHub excerpt; complete depurated log is in the downloadable evidence archive. Original line numbers follow.
+4250: 
+4251: [notice] A new release of pip is available: 24.0 -> 26.2.1
+4252: [notice] To update, run: <WORKSPACE>/FlexyGram/TMessagesProj/build/chaquopy/work/venv/bin/python3.11 -m pip install --upgrade pip
+4253: <WORKSPACE>/FlexyGram/TMessagesProj/chaquopy/exteraless/build.sh: line 60: <WORKSPACE>/step3-work/toolchains/android-sdk/cmake/3.31.6/bin/cmake: No such file or directory
+4254: 
+4255: > Task :TMessagesProj:buildChaquopyRuntimeArm64V8a FAILED
+4256: 
+4257: > Task :TMessagesProj:compileDebugKotlin
+4258: w: file://<WORKSPACE>/FlexyGram/TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/Translator.kt:37:13 'constructor(p0: String!): Locale' is deprecated. Deprecated in Java.
+4259: w: file://<WORKSPACE>/FlexyGram/TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/Translator.kt:39:13 'constructor(p0: String!, p1: String!): Locale' is deprecated. Deprecated in Java.
+4260: Finished executing kotlin compiler using DAEMON strategy
+4261: Stored cache entry for task ':TMessagesProj:compileDebugKotlin' with cache key d951ed4b16f7083cbce1d82f6f3ecb78
+4262: Build c4baa7c9-6797-49cb-9c9d-6ecf7f7f5265 is closed
+4263: Build a2d21b8a-2b06-433d-813a-e1cb0d09f47f is closed
+4264: 
+4265: [Incubating] Problems report is available at: file://<WORKSPACE>/FlexyGram/build/reports/problems/problems-report.html
+4266: 
+4267: FAILURE: Build failed with an exception.
+4268: 
+4269: * What went wrong:
+4270: Execution failed for task ':TMessagesProj:buildChaquopyRuntimeArm64V8a' (registered in build file 'TMessagesProj/build.gradle').
+4271: > Process 'command 'bash'' finished with non-zero exit value 127
+4272: 
+4273: * Try:
+4274: > Run with --debug option to get more log output.
+4275: > Run with --scan to get full insights from a Build Scan (powered by Develocity).
+4276: > Get more help at https://help.gradle.org.
+4277: 
+4278: * Exception is:
+4279: org.gradle.api.tasks.TaskExecutionException: Execution failed for task ':TMessagesProj:buildChaquopyRuntimeArm64V8a' (registered in build file 'TMessagesProj/build.gradle').
+4280: 	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.lambda$executeIfValid$1(ExecuteActionsTaskExecuter.java:135)
+4281: 	at org.gradle.internal.Try$Failure.ifSuccessfulOrElse(Try.java:288)
+4282: 	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:133)
+4283: 	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.execute(ExecuteActionsTaskExecuter.java:121)
+4284: 	at org.gradle.api.internal.tasks.execution.ProblemsTaskPathTrackingTaskExecuter.execute(ProblemsTaskPathTrackingTaskExecuter.java:41)
+4285: 	at org.gradle.api.internal.tasks.execution.ResolveTaskExecutionModeExecuter.execute(ResolveTaskExecutionModeExecuter.java:51)
+4286: 	at org.gradle.api.internal.tasks.execution.FinalizePropertiesTaskExecuter.execute(FinalizePropertiesTaskExecuter.java:46)
+4383: 	at org.gradle.internal.execution.steps.ValidateStep$Mutable.executeDelegate(ValidateStep.java:79)
+4384: 	at org.gradle.internal.execution.steps.ValidateStep$Mutable.executeDelegate(ValidateStep.java:65)
+4385: 	at org.gradle.internal.execution.steps.ValidateStep.execute(ValidateStep.java:105)
+4386: 	at org.gradle.internal.execution.steps.ValidateStep$Mutable.execute(ValidateStep.java:65)
+4387: 	at org.gradle.internal.execution.steps.CaptureMutableStateBeforeExecutionStep.executeMutable(CaptureMutableStateBeforeExecutionStep.java:86)
+4388: 	at org.gradle.internal.execution.steps.CaptureMutableStateBeforeExecutionStep.execute(CaptureMutableStateBeforeExecutionStep.java:65)
+4389: 	at org.gradle.internal.execution.steps.CaptureMutableStateBeforeExecutionStep.execute(CaptureMutableStateBeforeExecutionStep.java:45)
+4390: 	at org.gradle.internal.execution.steps.SkipEmptyMutableWorkStep.executeWithNonEmptySources(SkipEmptyMutableWorkStep.java:210)
+4391: 	at org.gradle.internal.execution.steps.SkipEmptyMutableWorkStep.executeMutable(SkipEmptyMutableWorkStep.java:85)
+4392: 	at org.gradle.internal.execution.steps.SkipEmptyMutableWorkStep.executeMutable(SkipEmptyMutableWorkStep.java:53)
+4393: 	at org.gradle.internal.execution.steps.MutableStep.execute(MutableStep.java:26)
+4394: 	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsStartedStep.execute(MarkSnapshottingInputsStartedStep.java:38)
+4395: 	at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.executeMutable(LoadPreviousExecutionStateStep.java:36)
+4396: 	at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.executeMutable(LoadPreviousExecutionStateStep.java:23)
+4397: 	at org.gradle.internal.execution.steps.MutableStep.execute(MutableStep.java:26)
+4398: 	at org.gradle.internal.execution.steps.HandleStaleOutputsStep.executeMutable(HandleStaleOutputsStep.java:77)
+4399: 	at org.gradle.internal.execution.steps.HandleStaleOutputsStep.executeMutable(HandleStaleOutputsStep.java:43)
+4400: 	at org.gradle.internal.execution.steps.MutableStep.execute(MutableStep.java:26)
+4401: 	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.lambda$executeMutable$0(AssignMutableWorkspaceStep.java:34)
+4402: 	at org.gradle.api.internal.tasks.execution.TaskExecution$4.withWorkspace(TaskExecution.java:305)
+4403: 	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.executeMutable(AssignMutableWorkspaceStep.java:30)
+4404: 	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.executeMutable(AssignMutableWorkspaceStep.java:21)
+4405: 	at org.gradle.internal.execution.steps.MutableStep.execute(MutableStep.java:26)
+4406: 	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:40)
+4407: 	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:23)
+4408: 	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.lambda$execute$2(ExecuteWorkBuildOperationFiringStep.java:67)
+4409: 	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:67)
+4410: 	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:39)
+4411: 	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:46)
+4412: 	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:34)
+4413: 	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:56)
+4414: 	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:38)
+4415: 	at org.gradle.internal.execution.impl.DefaultExecutionEngine$1.execute(DefaultExecutionEngine.java:68)
+4416: 	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:132)
+4417: 	... 30 more
+4418: 
+4419: 
+4420: Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+4421: 
+4422: You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+4423: 
+4424: For more on this, please refer to https://docs.gradle.org/9.7.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+4425: 
+4426: BUILD FAILED in 2m 31s
+4427: 209 actionable tasks: 93 executed, 19 from cache, 97 up-to-date

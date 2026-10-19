@@ -1,0 +1,16 @@
+[
+  {
+    "path": "TMessagesProj/build/chaquopy/runtime/arm64-v8a/chaquopy.so",
+    "bytes": 931320,
+    "sha256": "6a7f0ed643adf729656685e32f6c941981a03af6590c426af66e86c8d84f9877",
+    "elf_class": 2,
+    "elf_machine": 183
+  },
+  {
+    "path": "TMessagesProj/build/chaquopy/runtime/arm64-v8a/libchaquopy_java.so",
+    "bytes": 154080,
+    "sha256": "b4cad31cbfc87d052e19bd60681fef86b81639f1c5d67854648c5dc8f3de5d45",
+    "elf_class": 2,
+    "elf_machine": 183
+  }
+]

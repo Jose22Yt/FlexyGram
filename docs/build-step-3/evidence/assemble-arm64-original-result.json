@@ -1,0 +1,13 @@
+{
+  "command": [
+    "./gradlew",
+    ":TMessagesProj:assembleDebug",
+    "--warning-mode",
+    "all",
+    "--no-daemon",
+    "--console=plain",
+    "--stacktrace",
+    "--max-workers=2"
+  ],
+  "exit_code": 0
+}

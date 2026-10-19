@@ -1,0 +1,67 @@
+GitHub excerpt; complete depurated log is in the downloadable evidence archive. Original line numbers follow.
+1275: 
+1276: FAILURE: Build failed with an exception.
+1277: 
+1278: * What went wrong:
+1279: Execution failed for task ':TMessagesProj_Modules:media3:media-lib-session:compileDebugAidl' (registered by plugin 'com.android.internal.library').
+1280: > A failure occurred while executing com.android.build.gradle.tasks.AidlCompile$AidlCompileRunnable
+1281:    > A problem occurred starting process 'command '<WORKSPACE>/step3-work/toolchains/android-sdk/build-tools/36.0.0/aidl''
+1282: 
+1283: * Try:
+1284: > Run with --debug option to get more log output.
+1285: > Run with --scan to get full insights from a Build Scan (powered by Develocity).
+1286: > Get more help at https://help.gradle.org.
+1287: 
+1288: * Exception is:
+1289: org.gradle.api.tasks.TaskExecutionException: Execution failed for task ':TMessagesProj_Modules:media3:media-lib-session:compileDebugAidl' (registered by plugin 'com.android.internal.library').
+1290: 	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.lambda$executeIfValid$1(ExecuteActionsTaskExecuter.java:135)
+1291: 	at org.gradle.internal.Try$Failure.ifSuccessfulOrElse(Try.java:288)
+1292: 	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:133)
+1293: 	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.execute(ExecuteActionsTaskExecuter.java:121)
+1294: 	at org.gradle.api.internal.tasks.execution.ProblemsTaskPathTrackingTaskExecuter.execute(ProblemsTaskPathTrackingTaskExecuter.java:41)
+1295: 	at org.gradle.api.internal.tasks.execution.ResolveTaskExecutionModeExecuter.execute(ResolveTaskExecutionModeExecuter.java:51)
+1459: 	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.executeMutable(AssignMutableWorkspaceStep.java:21)
+1460: 	at org.gradle.internal.execution.steps.MutableStep.execute(MutableStep.java:26)
+1461: 	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:40)
+1462: 	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:23)
+1463: 	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.lambda$execute$2(ExecuteWorkBuildOperationFiringStep.java:67)
+1464: 	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:67)
+1465: 	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:39)
+1466: 	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:46)
+1467: 	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:34)
+1468: 	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:56)
+1469: 	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:38)
+1470: 	at org.gradle.internal.execution.impl.DefaultExecutionEngine$1.execute(DefaultExecutionEngine.java:68)
+1471: 	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:132)
+1472: 	... 61 more
+1473: Caused by: org.gradle.process.ProcessExecutionException: A problem occurred starting process 'command '<WORKSPACE>/step3-work/toolchains/android-sdk/build-tools/36.0.0/aidl''
+1474: 	at org.gradle.process.internal.DefaultExecHandle.execExceptionFor(DefaultExecHandle.java:246)
+1475: 	at org.gradle.process.internal.DefaultExecHandle.setEndStateInfo(DefaultExecHandle.java:223)
+1476: 	at org.gradle.process.internal.DefaultExecHandle.failed(DefaultExecHandle.java:413)
+1477: 	at org.gradle.process.internal.ExecHandleRunner.lambda$run$3(ExecHandleRunner.java:182)
+1478: 	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:84)
+1479: 	at org.gradle.process.internal.ExecHandleRunner.run(ExecHandleRunner.java:181)
+1480: 	... 2 more
+1481: Caused by: net.rubygrapefruit.platform.NativeException: Could not start '<WORKSPACE>/step3-work/toolchains/android-sdk/build-tools/36.0.0/aidl'
+1482: 	at net.rubygrapefruit.platform.internal.DefaultProcessLauncher.start(DefaultProcessLauncher.java:27)
+1483: 	at net.rubygrapefruit.platform.internal.WrapperProcessLauncher.start(WrapperProcessLauncher.java:36)
+1484: 	at org.gradle.process.internal.ExecHandleRunner.startProcess(ExecHandleRunner.java:202)
+1485: 	at org.gradle.process.internal.ExecHandleRunner.lambda$run$0(ExecHandleRunner.java:160)
+1486: 	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:84)
+1487: 	at org.gradle.process.internal.ExecHandleRunner.run(ExecHandleRunner.java:159)
+1488: 	... 2 more
+1489: Caused by: java.io.IOException: Cannot run program "<WORKSPACE>/step3-work/toolchains/android-sdk/build-tools/36.0.0/aidl" (in directory "<WORKSPACE>/FlexyGram/TMessagesProj_Modules/media/libraries/session"): Exec failed, error: 13 (Permission denied) 
+1490: 	at net.rubygrapefruit.platform.internal.DefaultProcessLauncher.start(DefaultProcessLauncher.java:25)
+1491: 	... 7 more
+1492: Caused by: java.io.IOException: Exec failed, error: 13 (Permission denied) 
+1493: 	... 8 more
+1494: 
+1495: 
+1496: Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+1497: 
+1498: You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+1499: 
+1500: For more on this, please refer to https://docs.gradle.org/9.7.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+1501: 
+1502: BUILD FAILED in 29s
+1503: 98 actionable tasks: 1 executed, 97 up-to-date
