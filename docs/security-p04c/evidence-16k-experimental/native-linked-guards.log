@@ -1,0 +1,13 @@
+
+<REPO>/TMessagesProj/build/intermediates/cxx/Debug/6u6b4x3x/obj/arm64-v8a/libtmessages.49.so:	file format elf64-littleaarch64
+
+Disassembly of section .text:
+
+00000000020ec268 <_ZN18ConnectionsManager4initEjiiNSt6__ndk112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEES6_S6_S6_S6_S6_S6_S6_S6_S6_S6_ilbbbbii>:
+ 20ec268:      	ret
+
+00000000020fa4a8 <_ZN16ConnectionSocket14openConnectionENSt6__ndk112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEEtS6_bi>:
+ 20fa4a8:      	ret
+
+00000000020fa4ac <_ZN16ConnectionSocket22openConnectionInternalEb>:
+ 20fa4ac:      	ret

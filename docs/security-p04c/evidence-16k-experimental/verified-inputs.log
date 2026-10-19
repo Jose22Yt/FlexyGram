@@ -1,0 +1,53 @@
+{
+  "approved_original_wheels_verified": 26,
+  "approved_packages": 18,
+  "experimental_wheels": 18,
+  "independent_rebuilt_wheels_byte_identical": true,
+  "rebuilt": [
+    {
+      "filename": "chaquopy_freetype-2.9.1-3flexygram16k-py3-none-android_24_arm64_v8a.whl",
+      "sha256": "f4308f6ad71eefca3cd9def87ee8c2673499b6dd10810daa23c1a22e805fc937",
+      "original_filename": "chaquopy_freetype-2.9.1-2-py3-none-android_21_arm64_v8a.whl",
+      "original_sha256": "7a8262dc69d1bbf7209b3b7576744743670bd5a8cba48c7d8f08c151943ccbc7",
+      "original_url": "https://chaquo.com/pypi-13.1/chaquopy-freetype/chaquopy_freetype-2.9.1-2-py3-none-android_21_arm64_v8a.whl",
+      "rebuilt": true,
+      "changed_members": [
+        "chaquopy/lib/libfreetype.so",
+        "chaquopy_freetype-2.9.1.dist-info/WHEEL",
+        "chaquopy_freetype-2.9.1.dist-info/RECORD"
+      ],
+      "licenses_and_other_metadata_unchanged": true
+    },
+    {
+      "filename": "chaquopy_libxml2-2.9.8-3flexygram16k-py3-none-android_24_arm64_v8a.whl",
+      "sha256": "2b47fe307311e932c4502ad9eec108f070eec6f36c03d4d97a2d22222387badb",
+      "original_filename": "chaquopy_libxml2-2.9.8-2-py3-none-android_21_arm64_v8a.whl",
+      "original_sha256": "f8a7adf4f565e4cec6add811a9886be2191e8214913987dce24a3bb522dcb4e3",
+      "original_url": "https://chaquo.com/pypi-13.1/chaquopy-libxml2/chaquopy_libxml2-2.9.8-2-py3-none-android_21_arm64_v8a.whl",
+      "rebuilt": true,
+      "changed_members": [
+        "chaquopy/lib/libxml2.so",
+        "chaquopy_libxml2-2.9.8.dist-info/WHEEL",
+        "chaquopy_libxml2-2.9.8.dist-info/RECORD"
+      ],
+      "licenses_and_other_metadata_unchanged": true
+    },
+    {
+      "filename": "chaquopy_libxslt-1.1.32-3flexygram16k-py3-none-android_24_arm64_v8a.whl",
+      "sha256": "f8d9b05b17dfbc498c9edf22d24b65c37f9c3ad92a10a49e61b267130548d70f",
+      "original_filename": "chaquopy_libxslt-1.1.32-2-py3-none-android_21_arm64_v8a.whl",
+      "original_sha256": "0526c414fc0af6f02b9e922042c79e3aa0e3c28fe093de3a38d834755ffc2a27",
+      "original_url": "https://chaquo.com/pypi-13.1/chaquopy-libxslt/chaquopy_libxslt-1.1.32-2-py3-none-android_21_arm64_v8a.whl",
+      "rebuilt": true,
+      "changed_members": [
+        "chaquopy/lib/libexslt.so",
+        "chaquopy/lib/libxslt.so",
+        "chaquopy_libxslt-1.1.32.dist-info/WHEEL",
+        "chaquopy_libxslt-1.1.32.dist-info/RECORD"
+      ],
+      "licenses_and_other_metadata_unchanged": true
+    }
+  ],
+  "approved_requirements_sha256": "3b256cf2e29614bf33d3115a0a84a80f4df4097bb529cdd5d7dc977e579462a6",
+  "approved_wheel_lock_sha256": "2473f225e52f03d9de4e52b524f341c9ba1066118528f82425ecda20be9a70c9"
+}

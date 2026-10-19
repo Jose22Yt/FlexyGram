@@ -25,7 +25,7 @@ def environment(ndk,prefix):
     tool=ndk/'toolchains/llvm/prebuilt/linux-x86_64/bin'
     env.update(CC=str(tool/'aarch64-linux-android24-clang'),AR=str(tool/'llvm-ar'),
                RANLIB=str(tool/'llvm-ranlib'),STRIP=str(tool/'llvm-strip'),
-               CFLAGS='-O2 -fPIC',CPPFLAGS='-I'+str(prefix/'include'),
+               CFLAGS='-O2 -fPIC -ffile-prefix-map='+str(prefix.parent)+'=/build/flexygram-native',CPPFLAGS='-I'+str(prefix/'include'),
                LDFLAGS='-Wl,-z,max-page-size=16384 -Wl,-z,common-page-size=16384 -Wl,--undefined-version -L'+str(prefix/'lib'),
                PKG_CONFIG_LIBDIR=str(prefix/'lib/pkgconfig'),PKG_CONFIG_PATH=str(prefix/'lib/pkgconfig'),
                PATH=str(prefix/'bin')+':'+env['PATH'],SOURCE_DATE_EPOCH='1524096000')
@@ -62,13 +62,13 @@ def rebuild(sources,output,ndk,cmake,wheelhouse,manifest):
             f=directory/'libxslt/extensions.c';f.write_text(patch_callback(f.read_text()))
         log=output/(name+'.log')
         run(['./configure','--host=aarch64-linux-android','--prefix='+str(prefix),*flags],directory,log)
-        run(['make','-j2'],directory,log);run(['make','install'],directory,log)
+        run(['make','-j2','V=1'],directory,log);run(['make','install'],directory,log)
     ftbuild=output/'freetype-build'
     run([str(cmake),'-S',str(ftout),'-B',str(ftbuild),'-DCMAKE_TOOLCHAIN_FILE='+str(ndk/'build/cmake/android.toolchain.cmake'),
          '-DANDROID_ABI=arm64-v8a','-DANDROID_PLATFORM=android-24','-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON',
-         '-DBUILD_SHARED_LIBS=ON','-DFT_WITH_ZLIB=ON','-DCMAKE_DISABLE_FIND_PACKAGE_PNG=ON',
+         '-DBUILD_SHARED_LIBS=ON','-DCMAKE_C_FLAGS='+env['CFLAGS'],'-DFT_WITH_ZLIB=ON','-DCMAKE_DISABLE_FIND_PACKAGE_PNG=ON',
          '-DCMAKE_DISABLE_FIND_PACKAGE_BZip2=ON','-DCMAKE_DISABLE_FIND_PACKAGE_HarfBuzz=ON','-DCMAKE_BUILD_TYPE=Release',
-         '-DCMAKE_SHARED_LINKER_FLAGS=-Wl,-z,max-page-size=16384 -Wl,-z,common-page-size=16384'],output,output/'freetype.log')
+         '-DCMAKE_SHARED_LINKER_FLAGS=-Wl,-z,max-page-size=16384 -Wl,-z,common-page-size=16384 -Wl,--hash-style=both -lm'],output,output/'freetype.log')
     run([str(cmake),'--build',str(ftbuild),'-j2'],output,output/'freetype.log')
     rows=[]
     for row in manifest['original_wheels']:

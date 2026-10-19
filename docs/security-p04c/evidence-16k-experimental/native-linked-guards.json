@@ -1,0 +1,33 @@
+{
+  "android_source_base": "a25295a9d567a626e008fc55ca97d80112c5f65b",
+  "guards": [
+    {
+      "symbol": "_ZN18ConnectionsManager4initEjiiNSt6__ndk112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEES6_S6_S6_S6_S6_S6_S6_S6_S6_S6_ilbbbbii",
+      "instructions": [
+        "ret"
+      ],
+      "body_absent": true
+    },
+    {
+      "symbol": "_ZN16ConnectionSocket14openConnectionENSt6__ndk112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEEtS6_bi",
+      "instructions": [
+        "ret"
+      ],
+      "body_absent": true
+    },
+    {
+      "symbol": "_ZN16ConnectionSocket22openConnectionInternalEb",
+      "instructions": [
+        "ret"
+      ],
+      "body_absent": true
+    }
+  ],
+  "packaged_text_matches_linked": true,
+  "text_sha256": "4b6865ceffb0475ae6e146c5a4d3a1f5a8989331e1b3785fc0878827057bc0f9",
+  "compile_commands": 1833,
+  "compiler_targets": [
+    "aarch64-none-linux-android24"
+  ],
+  "runtime_execution": false
+}

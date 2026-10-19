@@ -60,12 +60,51 @@
     },
     "tools/native_compatibility/rebuild_candidates.py": {
       "before": null,
-      "after": "0cd6596bb78071258a8e65092ea8fe65102eec16bfb2e1655f766589c8bd830d",
-      "previous": []
+      "after": "ee764e2034d36c7d9624685af9ca30586471722dcca6ac3bc5cbacf2033795b5",
+      "previous": [
+        "0cd6596bb78071258a8e65092ea8fe65102eec16bfb2e1655f766589c8bd830d",
+        "af7c0ee1f653cfa7c5c7cf4c0f6ab8e9ae37da98bf2374a6747a6789a1f0ea69",
+        "42220c572150dc84c1299cee5e38aaebc01acee5407705265a8af04a3718a1ce"
+      ]
     },
     "tools/native_compatibility/rebuild-sources.json": {
       "before": null,
       "after": "7ddf343b6025e0481bb32a2b11e5aa3bfaba3c740ede8bf8a0aa004ffb0324bc",
+      "previous": []
+    },
+    "tools/native_compatibility/abi_report.py": {
+      "before": null,
+      "after": "49f3dfb719f801a561837d9bd37b22c8bd87972df030d9e0f2519b2af5d4d385",
+      "previous": []
+    },
+    "tools/native_compatibility/compat_relink.py": {
+      "before": null,
+      "after": "32b0880a8f0a5bbae885f617b521b76eed1e0f0654419e0efe6eed801a5e3629",
+      "previous": [
+        "4d6561d556b5e289d1c5e087147398e8c5ef2db3adef67e1c7a566f014b42f81",
+        "07f649cc03b587f19f32d8e3bdac21863fa2ff59ee358814502bb5615191df82"
+      ]
+    },
+    "tools/native_compatibility/experiment_recipe.py": {
+      "before": null,
+      "after": "bd41fcf0bb95f1f3be6e332787b8a8d576de9a3f59bc3b9c3844b3211925bf2c",
+      "previous": [
+        "ac3f6e0f887d3354bf9614d77adfab51e03ef9c1b396752018ab109aa0b2e3cf"
+      ]
+    },
+    "tools/native_compatibility/experimental_wheels.py": {
+      "before": null,
+      "after": "f3939fc684fd42c388872bbfddb84cfbfb877e440b3de67bd1ce1dba60a6c2c6",
+      "previous": []
+    },
+    "tools/native_compatibility/prepare_experiment.py": {
+      "before": null,
+      "after": "c9fa124471b711779a913ee784b72dd3fc8b7bf47d0525a24e4f37647b564a34",
+      "previous": []
+    },
+    "tools/native_compatibility/build_host_fixture.py": {
+      "before": null,
+      "after": "51fc4f9e042b9e703a91bd2e455e495ccb8e7cef0bace567077f5fc462dc2db2",
       "previous": []
     }
   }

@@ -1,0 +1,43 @@
+{
+  "base": "a25295a9d567a626e008fc55ca97d80112c5f65b",
+  "python": "3.11.17 (main, Oct  3 2026, 01:05:36) [Clang 22.1.3 ]",
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+  "hashes": {
+    "tools/native_compatibility/abi_report.py": "49f3dfb719f801a561837d9bd37b22c8bd87972df030d9e0f2519b2af5d4d385",
+    "tools/native_compatibility/acceptance.py": "27fa11a88694e5953b4846f3b3cbc34f60d96f96f04d97d7d8feaa946b412425",
+    "tools/native_compatibility/audit.py": "3159252fc7ae161b49b0381b3b5a378ea4daa61d42d0cf093bca71081d704fe2",
+    "tools/native_compatibility/build_host_fixture.py": "51fc4f9e042b9e703a91bd2e455e495ccb8e7cef0bace567077f5fc462dc2db2",
+    "tools/native_compatibility/compat_relink.py": "32b0880a8f0a5bbae885f617b521b76eed1e0f0654419e0efe6eed801a5e3629",
+    "tools/native_compatibility/experiment_recipe.py": "bd41fcf0bb95f1f3be6e332787b8a8d576de9a3f59bc3b9c3844b3211925bf2c",
+    "tools/native_compatibility/experimental_wheels.py": "f3939fc684fd42c388872bbfddb84cfbfb877e440b3de67bd1ce1dba60a6c2c6",
+    "tools/native_compatibility/prepare_experiment.py": "c9fa124471b711779a913ee784b72dd3fc8b7bf47d0525a24e4f37647b564a34",
+    "tools/native_compatibility/rebuild_candidates.py": "ee764e2034d36c7d9624685af9ca30586471722dcca6ac3bc5cbacf2033795b5",
+    "tools/native_compatibility/rebuild-sources.json": "7ddf343b6025e0481bb32a2b11e5aa3bfaba3c740ede8bf8a0aa004ffb0324bc",
+    "tools/native_compatibility/wheelhouse.py": "cb3366173079fa8b7a2711506579bc29de131124377fdb9e55208651501c6b97",
+    "TMessagesProj/build.gradle": "45f5e0fac03635e865a60eb16ad296a8422db9184c6cf3b5e0f4b235e02ae618",
+    "TMessagesProj/python/requirements.lock": "3b256cf2e29614bf33d3115a0a84a80f4df4097bb529cdd5d7dc977e579462a6",
+    "TMessagesProj/python/wheels.lock.json": "2473f225e52f03d9de4e52b524f341c9ba1066118528f82425ecda20be9a70c9",
+    "gradle/variant-policy.json": "0f92362819e8a4973909188235d68012a364c974d8e430ce61370e88da8ed181",
+    "tests/native_compatibility/test_experimental.py": "921fea07ce2417e1f290a66d018723bb2538acced022289fcd29c66880b75175",
+    "tests/native_compatibility/runtime_cases.py": "cabd6335f2711fd7b189a14ad535429481b611ee9b7be72bc526a87b7a012ad6",
+    "tests/native_compatibility/reviewed_changes.json": "2b6e1c7b7fa46547468ee43b20fa81fe78d685ca046945b61f2315ea002088bf"
+  },
+  "submodules": [
+    " d47b4a1e1817b4590b9c56dfd4ee5fcfdd6f0cbd TMessagesProj/chaquopy (remotes/origin/exteraless)",
+    " ccbb57965020768c94f5b205ea08547a7e0fe49d TMessagesProj/jni/tgcalls (ios-release-11.13-59-gccbb579)",
+    " 54fac219c4ef0bc379dfffb0b8098725d77ac81b TMessagesProj/jni/third_party/absl (20240116.3)",
+    " 4cbcd3078e6ae10d05124379623a1bf03fcb9350 TMessagesProj/jni/third_party/boost-regex (boost-1.82.0)",
+    " 54706fc6bc0cdecab7e9593974a4039cc038fca7 TMessagesProj/jni/third_party/dav1d (1.5.4)",
+    " 45f1910444f34b02621f9f0426ea1a538a613c41 TMessagesProj/jni/third_party/ffmpeg (n8.1.2-30-g45f1910444)",
+    " 31a5d6fbbef8136e4a2b3adaf7b95e2ccaa7436d TMessagesProj/jni/third_party/libprisma (31a5d6f)",
+    " 1024874c5919305883187e2953de8fcb4c3d7fa6 TMessagesProj/jni/third_party/libvpx (v1.16.0)",
+    " 25bd7eb63e828e4bd242cc9b38d260b4b31c6605 TMessagesProj/jni/third_party/wamr (WAMR-2.4.5)",
+    " be05b13e98b048f0b5a0f5fa8ce514d56db5f822 TMessagesProj/jni/third_party/xiph/ogg (v1.3.6)",
+    " 22244de5a79bd1d6d623c32e72bf1954b56235be TMessagesProj/jni/third_party/xiph/opus (v1.6.1)",
+    " a55c164e9891a9326188b7d4d216ec9a88373739 TMessagesProj/jni/third_party/xiph/opusfile (v0.12)",
+    " 31f1b542f88e7b4be9a01e749920d857535fc715 TMessagesProj/jni/tlottie (v1.0.6~1^2)",
+    " 5c65e47cb8d68727c20d89382d0bc51292486b9a TMessagesProj/jni/wallet-engine (heads/master)",
+    " f59d6eecfac6fb58d6e3b7d6cff6c8aed9dbd5b4 TMessagesProj/lib/jlatexmath (f59d6ee)",
+    " c430d207677071b1873f9f18266d55ec45722180 TMessagesProj_Modules/media (1.8.1-4-gc430d20767)"
+  ]
+}

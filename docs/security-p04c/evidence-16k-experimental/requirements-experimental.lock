@@ -1,0 +1,19 @@
+# Experimental ARM64 only. Not an active diagnostic lock.
+beautifulsoup4==4.15.0 --hash=sha256:d6f88de62e1d4e38ecb1077eb9724cd0eff29d2a08ca16a401e9b9e93f117cf9
+certifi==2026.10.18 --hash=sha256:73191c47aaa79da394e8fee2dbc2ec827432cab56311122c9e47abf79e390f62
+chaquopy-freetype==2.9.1 --hash=sha256:f4308f6ad71eefca3cd9def87ee8c2673499b6dd10810daa23c1a22e805fc937
+chaquopy-libjpeg==1.5.3 --hash=sha256:5555be57a2633fb5a3c0c810e89c8b705c471e3dabd95aa596fc7fdd48322728
+chaquopy-libxml2==2.9.8 --hash=sha256:2b47fe307311e932c4502ad9eec108f070eec6f36c03d4d97a2d22222387badb
+chaquopy-libxslt==1.1.32 --hash=sha256:f8d9b05b17dfbc498c9edf22d24b65c37f9c3ad92a10a49e61b267130548d70f
+chaquopy-libyaml==0.2.5 --hash=sha256:77f594d82adf2a1baf5f8340324ef06b7f54b1b0725b7d9b4ce8367e270ad5a2
+charset-normalizer==3.5.2 --hash=sha256:b6b751274acb69d77b3323d6b7dbaa3c7fdfc1eb829b7eb61d262f32e1af9685
+debugpy==1.8.22 --hash=sha256:a9e9d3550e15ca479c59333e90845029190531f0cacfedab3b815a57bd913947
+idna==3.20 --hash=sha256:ab7ae7122974553370f0bdb919e1a960b2cd1bc1ef0276416d896db81c14582c
+lxml==5.3.0 --hash=sha256:6ab16eebfd35a4b9519f979f7a6d90f6c3eb32ece39846728f37ec247a4d0e5f
+packaging==26.3 --hash=sha256:d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c
+pillow==11.0.0 --hash=sha256:c40b2d55a04720f60792769717c54442924dfb776d73a4312e9c2e7ae6aee3dc
+PyYAML==6.0.3 --hash=sha256:75013ba172066d8e009cf8c7a2fa7a2b2d9e83fc9913470d7f5f707872c4885d
+requests==2.34.2 --hash=sha256:2a0d60c172f83ac6ab31e4554906c0f3b3588d37b5cb939b1c061f4907e278e0
+soupsieve==3.0.3 --hash=sha256:fa30e3ba4809cb81ce1f3209f2fbe3e779fc445f0439bc147a0d7c4601743f21
+typing_extensions==4.16.0 --hash=sha256:481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8
+urllib3==2.8.0 --hash=sha256:0cf3cae568d36aa9576b28dfb35f11328f1cb974ca7647d9475ebb86c75ac6e3

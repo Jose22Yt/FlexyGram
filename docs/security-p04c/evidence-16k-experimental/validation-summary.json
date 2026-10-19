@@ -1,0 +1,89 @@
+{
+  "base": "a25295a9d567a626e008fc55ca97d80112c5f65b",
+  "project_tests": {
+    "baseline_reexecuted": 155,
+    "new": 20,
+    "passed": 175,
+    "failed": 0,
+    "skipped": 0,
+    "native_gate": 73,
+    "historical_regressions": 102,
+    "optimized_gate_repeat_counted_again": false
+  },
+  "host_functional_tests": {
+    "passed": 12,
+    "failed": 0,
+    "skipped": 0,
+    "android": false
+  },
+  "pr19": {
+    "head": "103e9e6b1fada37254ce788d0cb2c19e65891c36",
+    "passed": 15,
+    "failed": 0,
+    "skipped": 0,
+    "signals": 11,
+    "required": 11,
+    "negative_cases_passed": true
+  },
+  "apk": {
+    "apk_sha256": "17c32ab39e3ac88213241a6bd643637469a4a4d47311a920b357a2e7b3128230",
+    "bytes": 125488383,
+    "libraries": [
+      {
+        "library": "libexslt.so",
+        "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/requirements-common.imy!chaquopy/lib/libexslt.so",
+        "sha256": "f8e9e0fc0fa7507f3391bacb5c08a16dc9fdab73ca23de48f8adb2dfcca7a194",
+        "matches_final_source_build": true
+      },
+      {
+        "library": "libfreetype.so",
+        "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/requirements-common.imy!chaquopy/lib/libfreetype.so",
+        "sha256": "d086a897a1c1cfa517b9e46c28d762f817af41bde96b2eda3bf6e6b12220eb01",
+        "matches_final_source_build": true
+      },
+      {
+        "library": "libxml2.so",
+        "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/requirements-common.imy!chaquopy/lib/libxml2.so",
+        "sha256": "e282a655ebbe07443cd743bb9dd00a152bfed7edb091d862f0a4e74afc1eff04",
+        "matches_final_source_build": true
+      },
+      {
+        "library": "libxslt.so",
+        "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/requirements-common.imy!chaquopy/lib/libxslt.so",
+        "sha256": "827d113f3045205b205b52d0e4fe2e59998bd3b471368314415a2c3e91571660",
+        "matches_final_source_build": true
+      }
+    ],
+    "signature_verified": true,
+    "zipalign_16k_pass": true,
+    "zipalign_log_sha256": "da7c87df182885953e5b3c3f8ab379f28f44b02ed9eee8b3249137a41f984232",
+    "zipalign_final_line": "Verification successful",
+    "installed": false,
+    "distributed": false,
+    "android_runtime_validated": false
+  },
+  "native_summary": {
+    "elf_total": 97,
+    "android_arm64": 96,
+    "arm64_4k_pass": 96,
+    "arm64_16k_pass": 96,
+    "other_machine": 1,
+    "missing_needed": 0,
+    "strong_unresolved": 0,
+    "version_mismatch": 0
+  },
+  "static_acceptance": {
+    "status": "STATIC_CLEAN_PENDING_ANDROID",
+    "arm64_elf": 96,
+    "non_target_payloads": 1,
+    "blockers": [],
+    "runtime_required": true,
+    "distribution_allowed": false,
+    "limits": "Static API24/16KB conditions; no ART/linker/device certification. Non-target ELF payloads remain in the full report."
+  },
+  "diagnostic_protected": true,
+  "production_rejected": true,
+  "android_execution": false,
+  "active_dependency_replaced": false,
+  "merge_authorized": false
+}

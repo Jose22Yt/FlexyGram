@@ -1,0 +1,14 @@
+test_accounts_storage_and_providers_derive_only_from_variant_identity (test_variants.VariantsTests.test_accounts_storage_and_providers_derive_only_from_variant_identity) ... ok
+test_manifest_source_move_preserves_every_previous_restriction (test_variants.VariantsTests.test_manifest_source_move_preserves_every_previous_restriction) ... ok
+test_native_generated_policy_compiles_real_attestation_and_guard (test_variants.VariantsTests.test_native_generated_policy_compiles_real_attestation_and_guard) ... ok
+test_native_missing_unknown_and_production_flavors_rejected (test_variants.VariantsTests.test_native_missing_unknown_and_production_flavors_rejected) ... ok
+test_original_data_and_security_sources_remain_byte_identical (test_variants.VariantsTests.test_original_data_and_security_sources_remain_byte_identical) ... ok
+test_production_gate_cannot_be_bypassed_with_synthetic_configuration (test_variants.VariantsTests.test_production_gate_cannot_be_bypassed_with_synthetic_configuration) ... ok
+test_productive_modules_and_signing_do_not_inherit_diagnostic (test_variants.VariantsTests.test_productive_modules_and_signing_do_not_inherit_diagnostic) ... ok
+test_real_java_capabilities_are_all_disabled_and_storage_is_per_id (test_variants.VariantsTests.test_real_java_capabilities_are_all_disabled_and_storage_is_per_id) ... ok
+test_real_policy_rejects_unknown_ids_missing_fields_and_enabled_capabilities (test_variants.VariantsTests.test_real_policy_rejects_unknown_ids_missing_fields_and_enabled_capabilities) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 4.522s
+
+OK
