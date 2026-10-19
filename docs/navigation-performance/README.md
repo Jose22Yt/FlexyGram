@@ -28,7 +28,7 @@ Los mecanismos encontrados **son coherentes con la sensación de toques ignorado
 
 `tools/navigation_performance/audit.py` es Python estándar, de solo lectura. Produce JSON con el ID del hallazgo, fichero, línea, tipo (gate/conditional_wait/fallback/exception/cleanup/semantics) y retardo literal cuando existe. La opción `--strict` falla si no encuentra las 11 señales esperadas; **no falla por la existencia de esperas válidas**.
 
-`tests/navigation_performance/test_audit.py` contiene **13 pruebas sintéticas** independientes de Android, con casos mutados para detectar la eliminación/cambio de condiciones, retardo modificado, ruta preview, cierre/base fragment y falsos positivos por tokens fuera del método. No usa red ni cuenta Telegram.
+`tests/navigation_performance/test_audit.py` contiene **15 pruebas sintéticas** independientes de Android, con casos mutados para detectar la eliminación/cambio de condiciones, retardo modificado, ruta preview, cierre/base fragment y falsos positivos por tokens fuera del método. No usa red ni cuenta Telegram.
 
 ~~~bash
 python -m unittest discover -s tests/navigation_performance -v
@@ -52,3 +52,23 @@ Inspección directa del código mediante GitHub: **11 de las 11 señales detecta
 - Work continúa P0.4c de Android/16 KB en sus propias ramas; este PR no cambia sus archivos.
 - No activar Actions, cuentas, red, permisos, FCM, push, traducción, plugins ni producción.
 - No declarar que se corrigió lag, que se probó instalación/ART ni que hay APK nueva.
+
+## Corrección tras revisión de P0.4c (2026-10-19)
+
+Work encontró en la primera versión del PR #19 problemas de importación aislada, conversión de lista a código de salida y coincidencias que atravesaban límites entre métodos. La rama auxiliar incluye ahora cambios acotados:
+
+- Importación del auditor por ruta de archivo con un identificador de módulo exclusivo, sin depender del orden de los imports de otras suites.
+- Retorno de estado estricto normalizado mediante `bool` antes de convertir a entero.
+- Localización de un método Java concreto con llaves balanceadas, ignorando comentarios y literales; la búsqueda de patrones no continúa en otros métodos.
+- Dos regresiones sintéticas adicionales: coincidencias presentes solo en comentarios y una guarda análoga en un método vecino.
+
+**Los cambios fueron publicados y el contenido del PR se volvió a consultar en GitHub. No se han ejecutado aquí los 15 tests ni el auditor en un checkout completo, por lo que la corrección sigue pendiente de la validación de Work.**
+
+Requisitos para Work antes de autorizar la integración:
+
+```sh
+python3.11 -m unittest discover -s tests/navigation_performance -v
+python3.11 tools/navigation_performance/audit.py --strict
+```
+
+Ambos comandos deben terminar sin fallos; comprobar que el JSON conserva las once señales de referencia, y demostrar que los casos negativos no capturan una guarda de otro método ni un comentario. No cambiar duraciones ni navegación para pasar pruebas.
