@@ -1,0 +1,52 @@
+{
+  "merge_pr11": "3cd4177369b35c02963d29cfbc11e3993fcfc268",
+  "approved_pr11_head": "8900fc8222f8f6ff3dd3a3c673a7bdd9ad9179d9",
+  "test_suites": {
+    "security": {
+      "passed": 26,
+      "failures": 0,
+      "skips": 0
+    },
+    "translation_safety": {
+      "passed": 27,
+      "failures": 0,
+      "skips": 0
+    },
+    "translation_runtime": {
+      "passed": 4,
+      "failures": 0,
+      "skips": 0
+    },
+    "translation_dependency": {
+      "passed": 12,
+      "failures": 0,
+      "skips": 0
+    },
+    "facade": {
+      "passed": 14,
+      "failures": 0,
+      "skips": 0
+    }
+  },
+  "total_passed": 83,
+  "standalone_gradle": "9.7.1; offline clean jar; exit 0",
+  "standalone_jar_sha256": "78415fd6a23d299a718b937286c04a4819f45c2045a0411c249ddd65ef8d45d7",
+  "android_check": {
+    "platform": 24,
+    "revision": 3,
+    "android_jar_sha256": "4c438bf1b3d4e6104faccc62e1ffe95ef197b88055497b540a871349e93c8685",
+    "build_tools": "36.0.0",
+    "min_api_d8": 24,
+    "scope": "facade main sources only; bootclasspath compile and DEX; no app build or ART"
+  },
+  "production_changed": false,
+  "historical_evidence_changed": false,
+  "full_android_app_build": false,
+  "emulator_or_device": false,
+  "apk_generated": false,
+  "external_provider_requests": 0,
+  "network_transport_implemented": false,
+  "active_dependency_replaced": false,
+  "distribution_blockers_remain": true,
+  "logs": "Whitespace at line ends normalized only; result text retained."
+}

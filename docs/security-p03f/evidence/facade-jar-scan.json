@@ -1,0 +1,15 @@
+{
+  "complete": true,
+  "apk_shaped": false,
+  "entries": 11,
+  "nested_archives": 0,
+  "client_key_candidates": 0,
+  "known_key_occurrences": 0,
+  "foreign_package_occurrences": 0,
+  "foreign_certificate_occurrences": 0,
+  "embedded_service_configurations": 0,
+  "errors": [],
+  "sha256": "222a1ee4f8b3061b46770424506d6d1c8165bbd6fb05c69f407664f3b1538a8e",
+  "passed": true,
+  "limits": "Static candidates only; no proof of execution or universal absence of secrets."
+}
