@@ -1,0 +1,102 @@
+{
+  "schema": 1,
+  "scope": "static navigation evidence; no device latency measurements",
+  "found_count": 11,
+  "required_count": 11,
+  "findings": [
+    {
+      "id": "PRESENT_REJECTS_TRANSITION",
+      "file": "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java",
+      "line": 2446,
+      "category": "gate",
+      "source_line": "if (fragment == null || checkTransitionAnimation() || animationInProgress || startedTracking || delegate != null && check && !delegate.needPresentFragment(this, params) || !fragment.onFragmentCreate()) {",
+      "interpretation": "Present returns false while a transition or tracking state is active."
+    },
+    {
+      "id": "CLOSE_REJECTS_TRANSITION",
+      "file": "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java",
+      "line": 3106,
+      "category": "gate",
+      "source_line": "if (delegate != null && !delegate.needCloseLastFragment(this) || checkTransitionAnimation() || animationInProgress || startedTracking || fragmentsStack.isEmpty()) {",
+      "interpretation": "Close returns without action while a transition or tracking state is active."
+    },
+    {
+      "id": "BACK_REJECTS_TRANSITION",
+      "file": "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java",
+      "line": 2030,
+      "category": "gate",
+      "source_line": "if (transitionAnimationPreviewMode || startedTracking || checkTransitionAnimation() || fragmentsStack.isEmpty()) {",
+      "interpretation": "Back is ignored while a transition/tracking state is active."
+    },
+    {
+      "id": "TRANSITION_WATCHDOG",
+      "file": "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java",
+      "line": 2130,
+      "category": "fallback",
+      "source_line": "if (transitionAnimationInProgress && (transitionAnimationStartTime < System.currentTimeMillis() - 1500 || inPreviewMode)) {",
+      "interpretation": "A stale animation can be terminated by an elapsed-time fallback.",
+      "literal_delay_ms": 1500
+    },
+    {
+      "id": "PREVIEW_SPECIAL_CASE",
+      "file": "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java",
+      "line": 2127,
+      "category": "exception",
+      "source_line": "if (transitionAnimationPreviewMode) {",
+      "interpretation": "Preview-mode handling must be studied separately from normal transitions."
+    },
+    {
+      "id": "OPEN_KEYBOARD_WAIT",
+      "file": "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java",
+      "line": 2780,
+      "category": "conditional_wait",
+      "source_line": "AndroidUtilities.runOnUIThread(waitingForKeyboardCloseRunnable, 250);",
+      "interpretation": "A keyboard-dependent branch schedules opening later.",
+      "literal_delay_ms": 250
+    },
+    {
+      "id": "OPEN_DEFERRED_WAIT",
+      "file": "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java",
+      "line": 2759,
+      "category": "conditional_wait",
+      "source_line": "AndroidUtilities.runOnUIThread(delayedOpenAnimationRunnable, 200);",
+      "interpretation": "A branch using needDelayOpenAnimation schedules opening later.",
+      "literal_delay_ms": 200
+    },
+    {
+      "id": "CLOSE_KEYBOARD_WAIT",
+      "file": "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java",
+      "line": 3237,
+      "category": "conditional_wait",
+      "source_line": "AndroidUtilities.runOnUIThread(waitingForKeyboardCloseRunnable, 200);",
+      "interpretation": "A keyboard-dependent closing branch schedules its transition later.",
+      "literal_delay_ms": 200
+    },
+    {
+      "id": "ANIMATION_END_CLEANUP",
+      "file": "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java",
+      "line": 2066,
+      "category": "cleanup",
+      "source_line": "if (byCheck) {",
+      "interpretation": "Timeout/cancellation already has animation cleanup and lifecycle work."
+    },
+    {
+      "id": "BASE_FINISH_DELEGATES",
+      "file": "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/BaseFragment.java",
+      "line": 493,
+      "category": "semantics",
+      "source_line": "parentLayout.closeLastFragment(animated);",
+      "interpretation": "The wrapper returns true after invoking a void close method; measure actual acceptance."
+    },
+    {
+      "id": "DIALOG_SWIPE_TRANSITION_GATE",
+      "file": "TMessagesProj/src/main/java/org/telegram/ui/DialogsActivity.java",
+      "line": 1404,
+      "category": "gate",
+      "source_line": "!parentLayout.checkTransitionAnimation() && !parentLayout.isInPreviewMode() && !parentLayout.isPreviewOpenAnimationInProgress() &&",
+      "interpretation": "Dialogs swipe navigation is guarded during transitions."
+    }
+  ],
+  "unreadable": [],
+  "missing_checks": []
+}

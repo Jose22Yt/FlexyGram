@@ -1,0 +1,205 @@
+[
+  {
+    "url": "https://dl.google.com/android/repository/repository2-3.xml",
+    "status": "OK",
+    "packages": [
+      {
+        "path": "platforms;android-37.0",
+        "archives": [
+          {
+            "host": null,
+            "url": "platform-37.0_r02.zip",
+            "checksum": "ed8ebf7f8822a4de5686d427f237d2fa30ff7410"
+          }
+        ]
+      },
+      {
+        "path": "build-tools;36.0.0",
+        "archives": [
+          {
+            "host": "linux",
+            "url": "build-tools_r36_linux.zip",
+            "checksum": "b0b6376977657e8ad9b969bacf4093601da2c6fb"
+          },
+          {
+            "host": "windows",
+            "url": "build-tools_r36_windows.zip",
+            "checksum": "f16ccffd34de8790dede813a6c7d8e2c11a27b50"
+          },
+          {
+            "host": "macosx",
+            "url": "build-tools_r36_macosx.zip",
+            "checksum": "199ae0047ee61e842f8ee0c6d3918e44fb9a1f83"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "url": "https://dl.google.com/android/repository/sys-img/android/sys-img2-3.xml",
+    "status": "OK",
+    "packages": [
+      {
+        "path": "system-images;android-24;default;arm64-v8a",
+        "archives": [
+          {
+            "host": null,
+            "url": "arm64-v8a-24_r09.zip",
+            "checksum": "e88ebdf4533efa0370603ee4ab0e7834e0cc364f"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "url": "https://dl.google.com/android/repository/sys-img/google_apis/sys-img2-3.xml",
+    "status": "OK",
+    "packages": [
+      {
+        "path": "system-images;android-canary-20261007;google_apis_ps16k;arm64-v8a",
+        "archives": [
+          {
+            "host": null,
+            "url": "arm64-v8a-ps16k-canary-20261007_r17.zip",
+            "checksum": "b20b3bc705888607dd2a0ba370b66c2cf83d0f60"
+          }
+        ]
+      },
+      {
+        "path": "system-images;android-canary-20260909;google_apis_ps16k;arm64-v8a",
+        "archives": [
+          {
+            "host": null,
+            "url": "arm64-v8a-ps16k-canary-20260909_r16.zip",
+            "checksum": "f791cef217e08d7eb45bdaea102ae4f5ade94165"
+          }
+        ]
+      },
+      {
+        "path": "system-images;android-37.2;google_apis_ps16k;arm64-v8a",
+        "archives": [
+          {
+            "host": null,
+            "url": "arm64-v8a-ps16k-37.2_r06.zip",
+            "checksum": "efeb41ddbfefaf9b482204b4813bd62b9c650fe1"
+          }
+        ]
+      },
+      {
+        "path": "system-images;android-37.2-beta3;google_apis_ps16k;arm64-v8a",
+        "archives": [
+          {
+            "host": null,
+            "url": "arm64-v8a-ps16k-37.2-beta3_r03.zip",
+            "checksum": "7e5dcd068790fc18d5435c8c721cdb17c18901dc"
+          }
+        ]
+      },
+      {
+        "path": "system-images;android-37.2-beta2;google_apis_ps16k;arm64-v8a",
+        "archives": [
+          {
+            "host": null,
+            "url": "arm64-v8a-ps16k-37.2-beta2_r02.zip",
+            "checksum": "9c33ca3a117b1b67e67ee5aa95be433c5432fd71"
+          }
+        ]
+      },
+      {
+        "path": "system-images;android-37.2-beta1;google_apis_ps16k;arm64-v8a",
+        "archives": [
+          {
+            "host": null,
+            "url": "arm64-v8a-ps16k-37.2-beta1_r01.zip",
+            "checksum": "5bc2a62ef9885fefaff8c98b9fa739a97b45f577"
+          }
+        ]
+      },
+      {
+        "path": "system-images;android-37.1;google_apis_ps16k;arm64-v8a",
+        "archives": [
+          {
+            "host": null,
+            "url": "arm64-v8a-ps16k-37.1_r09.zip",
+            "checksum": "244d8b70618d9a56ac8e8f4f5f65a9f72e2b15a5"
+          }
+        ]
+      },
+      {
+        "path": "system-images;android-37.0;google_apis_ps16k;arm64-v8a",
+        "archives": [
+          {
+            "host": null,
+            "url": "arm64-v8a-ps16k-37.0_r07.zip",
+            "checksum": "a661370122e12de2a9d81da44c838511b3c89277"
+          }
+        ]
+      },
+      {
+        "path": "system-images;android-CANARY;google_apis_ps16k;arm64-v8a",
+        "archives": [
+          {
+            "host": null,
+            "url": "arm64-v8a-ps16k-CANARY_r15.zip",
+            "checksum": "b3555cd7ad7ad1d637d03971938f8cde2e5eedea"
+          }
+        ]
+      },
+      {
+        "path": "system-images;android-36.1;google_apis_ps16k;arm64-v8a",
+        "archives": [
+          {
+            "host": null,
+            "url": "arm64-v8a-ps16k-36.1_r04.zip",
+            "checksum": "a48079a4c1c7781d157ff9ff1c0fc9d5ab3ffc58"
+          }
+        ]
+      },
+      {
+        "path": "system-images;android-36;google_apis_ps16k;arm64-v8a",
+        "archives": [
+          {
+            "host": null,
+            "url": "arm64-v8a-ps16k-36_r07.zip",
+            "checksum": "dda632745023567113d9954101709c6526a3c250"
+          }
+        ]
+      },
+      {
+        "path": "system-images;android-35;google_apis_ps16k;arm64-v8a",
+        "archives": [
+          {
+            "host": null,
+            "url": "arm64-v8a-ps16k-35_r05.zip",
+            "checksum": "9d834fe640beff22d25025a8028b98ab4366be4d"
+          }
+        ]
+      },
+      {
+        "path": "system-images;android-24;google_apis;arm64-v8a",
+        "archives": [
+          {
+            "host": null,
+            "url": "arm64-v8a-24_r27.zip",
+            "checksum": "dbb21f5d464a8d5f012bf3cac1c173496c666330"
+          }
+        ]
+      },
+      {
+        "path": "system-images;android-24;google_apis;arm64-v8a",
+        "archives": [
+          {
+            "host": null,
+            "url": "arm64-v8a-24_r29.zip",
+            "checksum": "d264adca13330b5e50665ab44726e4fecc1ddd1f"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "url": "https://dl.google.com/android/repository/sys-img/google_apis_ps16k/sys-img2-3.xml",
+    "status": "HTTPError",
+    "reason": "HTTP Error 404: Not Found"
+  }
+]

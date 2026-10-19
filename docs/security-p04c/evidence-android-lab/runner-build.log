@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "status": "BUILT_UNSIGNED_NOT_INSTALLABLE",
+  "apk_sha256": "66d0a4cf15b96ddb73595a9434ee258dcd68f469e3f028103d0ca74b686cd369",
+  "apk_filename": "flexygram-lab-unsigned.apk",
+  "signed_with_reviewed_lab_key": false,
+  "source_hashes": {
+    "tests/native_compatibility/android_lab/java/io/github/jose22yt/flexygram/lab/LabInstrumentation.java": "1be448d7edd5bdd4f543fa7c9a2cfb110f0e522168fb42d292daa4b4bd6364bb",
+    "tests/native_compatibility/android_lab/AndroidManifest.xml": "34b3d77fa23d1580c81ec23e85ff92a4bcb492bdcb2432a2d1e45607c46d9a54",
+    "tests/native_compatibility/android_lab/assets/probe.py": "48761083b6e0772d436b406ccc2d62075861873dc0eebb1f9bf765418376cf7a",
+    "tests/native_compatibility/android_lab/contract.json": "1a3ecb0160e2babf91c9ef7c1712c3577fadb73c5f647d17d84275af146dbb28",
+    "tests/native_compatibility/runtime_cases.py": "cabd6335f2711fd7b189a14ad535429481b611ee9b7be72bc526a87b7a012ad6"
+  },
+  "assets": {
+    "contract.json": "1a3ecb0160e2babf91c9ef7c1712c3577fadb73c5f647d17d84275af146dbb28",
+    "probe.py": "48761083b6e0772d436b406ccc2d62075861873dc0eebb1f9bf765418376cf7a",
+    "runtime_cases.py": "cabd6335f2711fd7b189a14ad535429481b611ee9b7be72bc526a87b7a012ad6",
+    "font.ttf": "ee251875b26ce80a812dc3b46d39c40b7cddf51c5e00eeb0209150ee4f4d53e4",
+    "font-LICENSE.txt": "0fd731a904b729a4e02eaf5e8ebd06783edd9abe400e8882760160230675b652"
+  },
+  "reviewed_target_sha256": "17c32ab39e3ac88213241a6bd643637469a4a4d47311a920b357a2e7b3128230",
+  "compile_sdk": 37,
+  "min_sdk": 24,
+  "target_sdk": 36,
+  "permissions": [],
+  "contains_client_or_native_code": false,
+  "android_execution": false
+}

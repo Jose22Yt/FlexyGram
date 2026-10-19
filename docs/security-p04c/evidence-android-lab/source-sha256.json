@@ -1,0 +1,11 @@
+{
+  "tests/native_compatibility/android_lab/AndroidManifest.xml": "34b3d77fa23d1580c81ec23e85ff92a4bcb492bdcb2432a2d1e45607c46d9a54",
+  "tests/native_compatibility/android_lab/assets/probe.py": "48761083b6e0772d436b406ccc2d62075861873dc0eebb1f9bf765418376cf7a",
+  "tests/native_compatibility/android_lab/build_runner.py": "9813249c798d3491addcded14b3ea1cfeb474dd8dab585a28957ae700ed5c601",
+  "tests/native_compatibility/android_lab/contract.json": "1a3ecb0160e2babf91c9ef7c1712c3577fadb73c5f647d17d84275af146dbb28",
+  "tests/native_compatibility/android_lab/contract.py": "e46e558f41f832872937b79668602ae11654aa2cf26488cfdc6b93aef13572f0",
+  "tests/native_compatibility/android_lab/java/io/github/jose22yt/flexygram/lab/LabInstrumentation.java": "1be448d7edd5bdd4f543fa7c9a2cfb110f0e522168fb42d292daa4b4bd6364bb",
+  "tests/native_compatibility/android_lab/offline-receipt.template.json": "c77ae6b4135e2e372194b6f7b509a609d370888ba82a3f7ffe10abb491e743d7",
+  "tests/native_compatibility/android_lab/run_lab.py": "dc583afff4c52ff2cc079672e3106932b5a6bcfa816a62c69f2089758823556f",
+  "tests/native_compatibility/test_android_lab.py": "78c3876f4707f46ec7e0ba1392c4343a754182278723fa8b75217ffe1553c728"
+}
