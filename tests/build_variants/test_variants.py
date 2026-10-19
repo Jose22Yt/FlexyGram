@@ -80,6 +80,10 @@ boolean rejected=false;try{deny()}catch(IllegalStateException e){rejected=true;a
    with self.assertRaises(RuntimeError):configure(self.dir/(name or 'empty'),name)
   with self.assertRaises(RuntimeError):configure(self.dir/'scope','diagnostic','invalid:diagnostic')
  def test_native_generated_policy_compiles_real_attestation_and_guard(self):
+  from check_diagnostic import native_policy_entry
+  self.assertEqual(native_policy_entry(['lib/arm64-v8a/libtmessages.49.so']),'lib/arm64-v8a/libtmessages.49.so')
+  for paths in [[],['lib/x86_64/libtmessages.49.so'],['lib/arm64-v8a/libtmessages.49.so','lib/arm64-v8a/libtmessages.50.so']]:
+   with self.assertRaises(AssertionError):native_policy_entry(paths)
   generated=configure(self.dir/'policy')
   scope=hashlib.sha256((ROOT/'gradle/variant-policy.json').read_bytes()).hexdigest()+':diagnostic'
   header=ROOT/'TMessagesProj/jni/tgnet/DiagnosticPolicy.h'

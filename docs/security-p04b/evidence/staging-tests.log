@@ -1,0 +1,15 @@
+test_class_definitions_not_string_pool_mentions (test_dex_inventory.DexInventoryTests.test_class_definitions_not_string_pool_mentions) ... ok
+test_invalid_format_fails (test_dex_inventory.DexInventoryTests.test_invalid_format_fails) ... ok
+test_active_aar_removed_and_exclusion_mandatory (test_staging.StagingTests.test_active_aar_removed_and_exclusion_mandatory) ... ok
+test_android24_compilation_d8_and_no_duplicate_facade_classes (test_staging.StagingTests.test_android24_compilation_d8_and_no_duplicate_facade_classes) ... ok
+test_google_stub_stays_denied_even_with_permissive_test_policy (test_staging.StagingTests.test_google_stub_stays_denied_even_with_permissive_test_policy) ... ok
+test_no_injection_constructors_or_network_and_default_closed (test_staging.StagingTests.test_no_injection_constructors_or_network_and_default_closed) ... ok
+test_ordered_catalogs_and_conversions_are_preserved (test_staging.StagingTests.test_ordered_catalogs_and_conversions_are_preserved) ... ok
+test_production_public_protected_abi_matches_recorded_aar (test_staging.StagingTests.test_production_public_protected_abi_matches_recorded_aar) ... ok
+test_real_kotlin_consumers_compile_against_production_facade (test_staging.StagingTests.test_real_kotlin_consumers_compile_against_production_facade) ... ok
+test_translator_format_entities_preferences_and_isolation_unchanged (test_staging.StagingTests.test_translator_format_entities_preferences_and_isolation_unchanged) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 15.401s
+
+OK

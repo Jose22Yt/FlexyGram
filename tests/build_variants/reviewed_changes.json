@@ -111,7 +111,7 @@
     },
     "tests/build_variants/check_diagnostic.py": {
       "before": null,
-      "after": "874e2082aba51bf460234812417f01f7b701da21558a729db2795017056665c9",
+      "after": "2b9e51b83c91ec945d1888e3b09687912e21daece2f2cc45f0a3e68996c0e9b0",
       "previous": []
     },
     "tests/build_variants/native_fixture.py": {
@@ -126,7 +126,7 @@
     },
     "tests/build_variants/test_variants.py": {
       "before": null,
-      "after": "22e28236d301f462d287c90af11af8e6daae5902c00180694712a14d24f7ff2e",
+      "after": "db4eb87364a048b78a144e0e8a254a33835266075438f96501d5962a56cff653",
       "previous": []
     },
     "tests/security/test_p02_isolation.py": {

@@ -1,0 +1,10 @@
+{
+  "code_commit": "c55915ce0bf9a820d4744a31f8c6aeddb80a1d02",
+  "compiled_java": true,
+  "application_id": "io.github.jose22yt.flexygram.diagnostic",
+  "api_id_zero": true,
+  "api_hash_empty": true,
+  "isolated_diagnostic": true,
+  "all_capabilities_disabled": true,
+  "policy_scope": "0f92362819e8a4973909188235d68012a364c974d8e430ce61370e88da8ed181:diagnostic"
+}

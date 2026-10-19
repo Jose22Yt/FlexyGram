@@ -1,0 +1,52 @@
+{
+  "android_sources_commit": "c55915ce0bf9a820d4744a31f8c6aeddb80a1d02",
+  "verification_sources": "verification-tool-hashes.json",
+  "previous_regressions": 93,
+  "new_variant_tests": 9,
+  "total_passed": 102,
+  "suites": [
+    {
+      "suite": "security",
+      "passed": 26,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "safety",
+      "passed": 27,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "runtime",
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "facade",
+      "passed": 14,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "prototype",
+      "passed": 12,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "staging",
+      "passed": 10,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "variants",
+      "passed": 9,
+      "failed": 0,
+      "skipped": 0
+    }
+  ],
+  "android_runtime": false
+}

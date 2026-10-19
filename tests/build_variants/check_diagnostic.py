@@ -7,6 +7,11 @@ ROOT=Path(__file__).resolve().parents[2]
 sys.path.insert(0,str(ROOT/'tests/translation_staging'))
 from check_integration import inspect
 
+def native_policy_entry(libraries):
+ matches=[name for name in libraries if re.fullmatch(r'lib/arm64-v8a/libtmessages(?:\.\d+)?\.so',name)]
+ assert len(matches)==1,'missing or ambiguous versioned JNI application library'
+ return matches[0]
+
 def validate(apk,aapt2,classes,graph,manifest,readelf):
  report=inspect(apk,aapt2,classes,graph,manifest)
  constants=subprocess.check_output(['javap','-constants','-classpath',str(classes),'org.telegram.messenger.BuildConfig'],text=True)
@@ -21,7 +26,7 @@ def validate(apk,aapt2,classes,graph,manifest,readelf):
  with zipfile.ZipFile(apk) as z:
   libs=[n for n in z.namelist() if n.startswith('lib/') and n.endswith('.so')]
   assert libs and all(n.startswith('lib/arm64-v8a/') for n in libs),'wrong ABI'
-  native=z.read('lib/arm64-v8a/libtmessages.so');assert marker in native,'JNI scope/capabilities disagree with Java'
+  native=z.read(native_policy_entry(libs));assert marker in native,'JNI scope/capabilities disagree with Java'
   with tempfile.TemporaryDirectory() as d:
    f=Path(d)/'libtmessages.so';f.write_bytes(native)
    symbols=subprocess.check_output([str(readelf),'--dyn-syms','--wide',str(f)],text=True)

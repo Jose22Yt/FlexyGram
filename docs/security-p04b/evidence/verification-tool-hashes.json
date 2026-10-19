@@ -1,0 +1,8 @@
+{
+  "purpose": "Post-build inspection supports libtmessages.49.so and rejects ambiguous names; no Android source changes after c55915ce",
+  "sha256": {
+    "tests/build_variants/check_diagnostic.py": "2b9e51b83c91ec945d1888e3b09687912e21daece2f2cc45f0a3e68996c0e9b0",
+    "tests/build_variants/test_variants.py": "db4eb87364a048b78a144e0e8a254a33835266075438f96501d5962a56cff653",
+    "tests/build_variants/reviewed_changes.json": "ae85c9dfe4019775c54d8a79c466778ff465f6ff6caf8611e7abaf03303432f9"
+  }
+}
