@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "retired_key_sha256": [
+    "83f395c814a1d173ddd06db410984fe2dc36f4f393c5e6eddd6db93f69cc1182",
+    "cc297a014efdb72b2f3b753ba8799f57d094ed28ba6a94808020aac122ff8ae6"
+  ],
+  "foreign_package_markers": [
+    "com.google.android.apps.translate"
+  ],
+  "foreign_certificate_sha256": [
+    "167041ef77a80637ced723d9d0c3b0f360e4b021fd2ff3b89e7e8c9d7c9b5a8f"
+  ],
+  "provenance": {
+    "code_base": "2cc41769339d9689498c5f23b446f4cfdf3ad8c0",
+    "dependency": "app.nekogram.translator:translator:1.6.1",
+    "aar_sha256": "08cdf350bd21b6cc063a8fb0141eed6cdf06c06772c5080ca38114dce07a8f27"
+  },
+  "warning": "Detection fingerprints only; no removal/obfuscation of application values. Legacy values still ship until reviewed replacement."
+}

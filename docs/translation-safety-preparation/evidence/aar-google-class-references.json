@@ -1,0 +1,10 @@
+{
+  "dependency": "app.nekogram.translator:translator:1.6.1",
+  "references": [
+    "app/nekogram/translator/GoogleAppTranslator$a.class",
+    "app/nekogram/translator/GoogleAppTranslator$b.class",
+    "app/nekogram/translator/GoogleAppTranslator.class",
+    "app/nekogram/translator/d.class"
+  ],
+  "limits": "Constant-pool references, not proof that every method executes."
+}
