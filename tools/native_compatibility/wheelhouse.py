@@ -11,6 +11,7 @@ def select(lock,abis):
     return [f for p in lock['packages'] for f in p['files']
             if '-any.whl' in f['filename'] or any(f['filename'].endswith('_'+tags[a]+'.whl') for a in abis)]
 def verified(path,row):
+    if path.is_symlink():raise ValueError('Symlink is not allowed in locked wheelhouse: '+path.name)
     if not path.is_file():return False
     if hashlib.sha256(path.read_bytes()).hexdigest()!=row['sha256']:raise ValueError('Wheel digest mismatch: '+row['filename'])
     with zipfile.ZipFile(path) as z:
@@ -23,8 +24,9 @@ def prepare(lock,dest,abis,offline=False,cache=None):
     selected=select(lock,abis)
     known={f['filename']:f for p in lock['packages'] for f in p['files']}
     # A previous supported ABI may remain; verify it too. Never admit an unlisted build tag.
-    for existing in dest.glob('*.whl'):
-        if existing.name not in known:raise ValueError('Wheelhouse contains unlisted wheels; use an empty output directory')
+    for existing in dest.iterdir():
+        if existing.is_symlink() or not existing.is_file() or existing.name not in known:
+            raise ValueError('Wheelhouse contains unlisted or unsafe entry; use an empty output directory')
         verified(existing,known[existing.name])
     for row in selected:
         name=row['filename'];url=row['url'];digest=row['sha256']
