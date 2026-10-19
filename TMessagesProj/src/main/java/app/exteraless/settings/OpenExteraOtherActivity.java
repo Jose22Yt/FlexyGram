@@ -196,8 +196,10 @@ public class OpenExteraOtherActivity extends BaseNekoSettingsActivity {
             if (view instanceof TextCheckCell) {
                 ((TextCheckCell) view).setChecked(enabled);
             }
-            FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(
-                    AndroidUtil.shouldEnableCrashlytics());
+            if (!org.telegram.messenger.DiagnosticPolicy.isIsolated()) {
+                FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(
+                        AndroidUtil.shouldEnableCrashlytics());
+            }
         } else if (position == contentCaptureRow) {
             toggleCheck(view, GeneralConfig.contentCapture);
             GeneralHelper.applyContentCapture(getParentActivity());

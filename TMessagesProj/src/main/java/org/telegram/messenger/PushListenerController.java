@@ -1841,10 +1841,12 @@ public class PushListenerController {
 
     // UP start
     public static void sendRegistrationToServer(@PushType int pushType, String token) {
+        if (DiagnosticPolicy.isIsolated()) return;
         Utilities.stageQueue.postRunnable(() -> sendRegistrationToServerInternal(pushType, token));
     }
 
     public static void sendWebPushRegistrationToServer(String token, String simplePushToken) {
+        if (DiagnosticPolicy.isIsolated()) return;
         Utilities.stageQueue.postRunnable(() -> {
             if (isPushTypeDisabled(PUSH_TYPE_WEB)) {
                 return;
@@ -1863,6 +1865,7 @@ public class PushListenerController {
     }
 
     public static void reconcilePushRegistration() {
+        if (DiagnosticPolicy.isIsolated()) return;
         Utilities.stageQueue.postRunnable(() -> {
             int serviceType = NaConfig.INSTANCE.getPushServiceType().Int();
             boolean googlePush = serviceType == 1 || serviceType == 3;

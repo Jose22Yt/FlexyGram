@@ -390,6 +390,7 @@ public class ContactsController extends BaseController {
     }
 
     public void checkAppAccount() {
+        if (org.telegram.messenger.DiagnosticPolicy.isIsolated()) return;
         systemAccount = null;
         Utilities.globalQueue.postRunnable(() -> {
             AccountManager am = AccountManager.get(ApplicationLoader.applicationContext);
@@ -1022,12 +1023,12 @@ public class ContactsController extends BaseController {
             /*if (schedule) {
                 try {
                     AccountManager am = AccountManager.get(ApplicationLoader.applicationContext);
-                    Account[] accounts = am.getAccountsByType("org.telegram.account");
+                    Account[] accounts = am.getAccountsByType(BuildConfig.APPLICATION_ID);
                     boolean recreateAccount = false;
                     if (getUserConfig().isClientActivated()) {
                         if (accounts.length != 1) {
                             FileLog.e("detected account deletion!");
-                            currentAccount = new Account(getUserConfig().getCurrentUser().phone, "org.telegram.account");
+                            currentAccount = new Account(getUserConfig().getCurrentUser().phone, BuildConfig.APPLICATION_ID);
                             am.addAccountExplicitly(currentAccount, "", null);
                             AndroidUtilities.runOnUIThread(new Runnable() {
                                 @Override

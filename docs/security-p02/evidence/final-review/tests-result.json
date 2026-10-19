@@ -1,0 +1,6 @@
+{
+  "exit_code": 0,
+  "tests": 18,
+  "seconds": 4.448315417000231,
+  "command": "python -m unittest discover -s tests/security -v"
+}

@@ -13,6 +13,7 @@ import java.util.ArrayList;
 public class AuthTokensHelper {
 
     public static ArrayList<TLRPC.TL_auth_loggedOut> getSavedLogOutTokens() {
+        if (DiagnosticPolicy.isIsolated()) return null;
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("saved_tokens", Context.MODE_PRIVATE);
         int count = preferences.getInt("count", 0);
 
@@ -34,6 +35,7 @@ public class AuthTokensHelper {
     }
 
     public static void saveLogOutTokens(ArrayList<TLRPC.TL_auth_loggedOut> tokens) {
+        if (DiagnosticPolicy.isIsolated()) return;
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("saved_tokens", Context.MODE_PRIVATE);
         ArrayList<TLRPC.TL_auth_loggedOut> activeTokens = new ArrayList<>();
         preferences.edit().clear().apply();
@@ -55,6 +57,7 @@ public class AuthTokensHelper {
     }
 
     public static ArrayList<TLRPC.TL_auth_authorization> getSavedLogInTokens() {
+        if (DiagnosticPolicy.isIsolated()) return null;
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("saved_tokens_login", Context.MODE_PRIVATE);
         int count = preferences.getInt("count", 0);
 
@@ -80,6 +83,7 @@ public class AuthTokensHelper {
     }
 
     public static void saveLogInToken(TLRPC.TL_auth_authorization token) {
+        if (DiagnosticPolicy.isIsolated()) return;
         if (BuildVars.DEBUG_VERSION) {
             FileLog.d("AuthTokensHelper: saving login token");
         }
@@ -112,6 +116,7 @@ public class AuthTokensHelper {
     }
 
     public static void addLogOutToken(TLRPC.TL_auth_loggedOut response) {
+        if (DiagnosticPolicy.isIsolated()) return;
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("saved_tokens", Context.MODE_PRIVATE);
         int count = preferences.getInt("count", 0);
         SerializedData data = new SerializedData(response.getObjectSize());

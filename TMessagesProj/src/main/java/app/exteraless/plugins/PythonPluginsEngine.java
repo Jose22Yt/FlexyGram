@@ -112,6 +112,7 @@ public class PythonPluginsEngine extends com.exteragram.messenger.plugins.Python
 
     /** Идемпотентный запуск интерпретатора. Колбэк придёт на потоке executor'а. */
     public void ensureStarted(Context appContext, StartCallback callback) {
+        if (org.telegram.messenger.DiagnosticPolicy.isIsolated()) { if (callback != null) callback.onStarted(false); return; }
         if (started || startFailed) {
             if (callback != null) {
                 callback.onStarted(started);

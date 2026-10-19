@@ -1,0 +1,64 @@
+{
+  "source_base": "e7a1db7a0fc2a0f4c44afa1332555f1d858e02fa",
+  "apk_internal_only": true,
+  "apk_uploaded_or_installed": false,
+  "sha256": "c2769a9a5405574f6b8bb3995262db4a03ce058b8e8d471864237aaaaa01e211",
+  "bytes": 111986563,
+  "package": "io.github.jose22yt.flexygram.diagnostic",
+  "installed_abis": [
+    "arm64-v8a"
+  ],
+  "installed_elf_count": 18,
+  "archives": [
+    {
+      "path": "exteraless-v13.0.2(1261)-debug.apk",
+      "entries": 13291,
+      "crc": "passed"
+    },
+    {
+      "path": "exteraless-v13.0.2(1261)-debug.apk!assets/chaquopy/app.imy",
+      "entries": 40,
+      "crc": "passed"
+    },
+    {
+      "path": "exteraless-v13.0.2(1261)-debug.apk!assets/chaquopy/bootstrap.imy",
+      "entries": 129,
+      "crc": "passed"
+    },
+    {
+      "path": "exteraless-v13.0.2(1261)-debug.apk!assets/chaquopy/requirements-arm64-v8a.imy",
+      "entries": 0,
+      "crc": "passed"
+    },
+    {
+      "path": "exteraless-v13.0.2(1261)-debug.apk!assets/chaquopy/requirements-common.imy",
+      "entries": 820,
+      "crc": "passed"
+    },
+    {
+      "path": "exteraless-v13.0.2(1261)-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy",
+      "entries": 48,
+      "crc": "passed"
+    },
+    {
+      "path": "exteraless-v13.0.2(1261)-debug.apk!assets/chaquopy/stdlib-common.imy",
+      "entries": 630,
+      "crc": "passed"
+    }
+  ],
+  "signature_verification": "passed",
+  "zipalign": "passed",
+  "elf_count": 97,
+  "arm64_load_alignment_failures": [
+    "exteraless-v13.0.2(1261)-debug.apk!assets/chaquopy/requirements-common.imy!chaquopy/lib/libexslt.so",
+    "exteraless-v13.0.2(1261)-debug.apk!assets/chaquopy/requirements-common.imy!chaquopy/lib/libfreetype.so",
+    "exteraless-v13.0.2(1261)-debug.apk!assets/chaquopy/requirements-common.imy!chaquopy/lib/libxml2.so",
+    "exteraless-v13.0.2(1261)-debug.apk!assets/chaquopy/requirements-common.imy!chaquopy/lib/libxslt.so"
+  ],
+  "native_runtime_tested": false,
+  "full_16kb_compatibility_certified": false,
+  "limits": [
+    "No Android execution, permission dialog observation, installation or traffic capture.",
+    "PT_LOAD alignment alone does not certify RELRO, imports or runtime compatibility."
+  ]
+}

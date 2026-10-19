@@ -1,0 +1,4 @@
+N: android=http://schemas.android.com/apk/res/android
+  E: sync-adapter (line=3)
+    A: android:accountType(0x0101028f)="io.github.jose22yt.flexygram.diagnostic" (Raw: "io.github.jose22yt.flexygram.diagnostic")
+    A: android:contentAuthority(0x01010290)="com.android.contacts" (Raw: "com.android.contacts")

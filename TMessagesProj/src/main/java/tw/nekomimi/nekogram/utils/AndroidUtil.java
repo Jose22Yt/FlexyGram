@@ -338,6 +338,7 @@ public class AndroidUtil {
     };
 
     public static boolean shouldReportCrashToCrashlytics(Throwable error) {
+        if (org.telegram.messenger.DiagnosticPolicy.isIsolated()) return false;
         Throwable current = error;
         for (int depth = 0; current != null && depth < 32; depth++) {
             if (current instanceof OutOfMemoryError) {
@@ -374,6 +375,7 @@ public class AndroidUtil {
     }
 
     public static boolean shouldEnableCrashlytics() {
+        if (org.telegram.messenger.DiagnosticPolicy.isIsolated()) return false;
         return !BuildConfig.DEBUG
                 && app.exteraless.general.GeneralConfig.crashReports();
     }

@@ -180,6 +180,7 @@ public class PasskeysController {
 
     @RequiresApi(api = 28)
     public static Runnable login(Context context, int currentAccount, boolean clickedButton, Utilities.Callback3<Long, TLRPC.auth_Authorization, String> done) {
+        if (DiagnosticPolicy.isIsolated()) { done.run(null, null, "DIAGNOSTIC_AUTH_DISABLED"); return () -> {}; }
         if (!BuildVars.SUPPORTS_PASSKEYS) return null;
 
         final CredentialManager credentialManager = CredentialManager.create(context);

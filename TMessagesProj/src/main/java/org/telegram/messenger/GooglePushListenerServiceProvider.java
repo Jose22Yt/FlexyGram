@@ -28,6 +28,7 @@ public class GooglePushListenerServiceProvider implements PushListenerController
 
     @Override
     public void onRequestPushToken() {
+        if (org.telegram.messenger.DiagnosticPolicy.isIsolated()) return;
         String currentPushString = SharedConfig.pushString;
         if (!TextUtils.isEmpty(currentPushString)) {
             if (BuildVars.DEBUG_PRIVATE_VERSION) {

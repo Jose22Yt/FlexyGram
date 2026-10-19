@@ -1,0 +1,22 @@
+{
+  "package": "io.github.jose22yt.flexygram.diagnostic",
+  "name": "FlexyGram Diagnostic",
+  "apk_sha256": "ed7a6c4ded34fb992dae7e90f07eed0988bd109fa911bc4d006eea8586c34c2a",
+  "bytes": 111991011,
+  "debuggable": true,
+  "abis": [
+    "arm64-v8a"
+  ],
+  "native_libraries": 18,
+  "no_internet_permission": true,
+  "no_firebase_or_mlkit_auto_init": true,
+  "account_types_and_authorities_verified": true,
+  "backup_and_transfer_disabled": true,
+  "api_id": 0,
+  "api_hash_empty": true,
+  "auth_tokens_helper_guards_present_in_compiled_class": true,
+  "signature_verified": true,
+  "diagnostic_certificate_sha256": "7184de239dc697f4957e8074300a9e440e3154cad5aac3f2f04a490fc90e78a5",
+  "certificate_differs_from_p01": true,
+  "installed_or_executed": false
+}

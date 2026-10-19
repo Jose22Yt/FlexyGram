@@ -1,0 +1,7 @@
+N: android=http://schemas.android.com/apk/res/android
+  E: account-authenticator (line=8)
+    A: android:label(0x01010001)=@0x7f110316
+    A: android:icon(0x01010002)=@0x7f0e0008
+    A: android:accountType(0x0101028f)="io.github.jose22yt.flexygram.diagnostic" (Raw: "io.github.jose22yt.flexygram.diagnostic")
+    A: android:smallIcon(0x0101029e)=@0x7f0e0008
+    A: android:accountPreferences(0x0101029f)=@0x7f140001

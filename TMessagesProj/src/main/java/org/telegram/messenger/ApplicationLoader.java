@@ -307,7 +307,9 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
             app.exteraless.debug.EnergyProfiler.resumeIfEnabled(applicationContext);
         }
         SharedPrefsHelper.init(applicationContext);
-        FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(AndroidUtil.shouldEnableCrashlytics());
+        if (!DiagnosticPolicy.isIsolated()) {
+            FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(AndroidUtil.shouldEnableCrashlytics());
+        }
         for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) { //TODO improve account
             UserConfig.getInstance(a).loadConfig();
             MessagesController.getInstance(a);
@@ -334,7 +336,7 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
             ContactsController.getInstance(a).checkAppAccount();
             DownloadController.getInstance(a);
         }
-        BillingController.getInstance().startConnection();
+        if (!DiagnosticPolicy.isIsolated()) BillingController.getInstance().startConnection();
     }
 
     public ApplicationLoader() {
@@ -424,8 +426,8 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
         org.osmdroid.config.Configuration.getInstance().setOsmdroidTileCache(new File(osmdroidBasePath, "tiles"));
 
         LauncherIconController.tryFixLauncherIconIfNeeded();
-        ProxyRotationController.init();
-        app.exteraless.proxy.ProxyPingController.init();
+        if (!DiagnosticPolicy.isIsolated()) ProxyRotationController.init();
+        if (!DiagnosticPolicy.isIsolated()) app.exteraless.proxy.ProxyPingController.init();
         app.exteraless.links.LinkCleaner.preloadIfEnabled();
         app.exteraless.appearance.M3CircularProgress.prewarm();
 
@@ -440,6 +442,7 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
     });
 
     public static void startPushService() {
+        if (org.telegram.messenger.DiagnosticPolicy.isIsolated()) return;
         Utilities.stageQueue.postRunnable(ApplicationLoader::startPushServiceInternal);
     }
 
@@ -511,6 +514,7 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
     }
 
     private static void initPushServices() {
+        if (org.telegram.messenger.DiagnosticPolicy.isIsolated()) return;
         AndroidUtilities.runOnUIThread(() -> {
             if (getPushProvider().hasServices()) {
                 getPushProvider().onRequestPushToken();

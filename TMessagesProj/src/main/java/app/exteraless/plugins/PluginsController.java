@@ -168,10 +168,12 @@ public class PluginsController extends com.exteragram.messenger.plugins.PluginsC
     }
 
     public boolean isEngineEnabled() {
+        if (org.telegram.messenger.DiagnosticPolicy.isIsolated()) return false;
         return preferences != null && preferences.getBoolean(PluginsConstants.KEY_ENGINE_ENABLED, false);
     }
 
     public void setEngineEnabled(boolean enabled) {
+        if (org.telegram.messenger.DiagnosticPolicy.isIsolated()) return;
         if (PluginSinkGate.refuseFromPlugin("setEngineEnabled", false)) {
             return;
         }
@@ -233,10 +235,12 @@ public class PluginsController extends com.exteragram.messenger.plugins.PluginsC
     private volatile Boolean unsafeMode;
 
     public boolean isDeveloperMode() {
+        if (org.telegram.messenger.DiagnosticPolicy.isIsolated()) return false;
         return preferences != null && preferences.getBoolean(PluginsConstants.KEY_DEVELOPER_MODE, false);
     }
 
     public void setDeveloperMode(boolean developerMode) {
+        if (org.telegram.messenger.DiagnosticPolicy.isIsolated()) return;
         preferences.edit().putBoolean(PluginsConstants.KEY_DEVELOPER_MODE, developerMode).apply();
     }
 
@@ -783,6 +787,7 @@ public class PluginsController extends com.exteragram.messenger.plugins.PluginsC
     }
 
     public boolean setPluginEnabled(String id, boolean enabled) {
+        if (org.telegram.messenger.DiagnosticPolicy.isIsolated()) return false;
         if (PluginSinkGate.refuseFromPlugin("setPluginEnabled", true)) {
             return false;
         }
@@ -949,6 +954,7 @@ public class PluginsController extends com.exteragram.messenger.plugins.PluginsC
     }
 
     public void installPlugin(File source, boolean enable, boolean keepEnabledState, InstallCallback callback) {
+        if (org.telegram.messenger.DiagnosticPolicy.isIsolated()) { deliver(callback, false, "DIAGNOSTIC_PLUGINS_DISABLED", null); return; }
         final String installer = PluginSinkGate.callingPlugin();
         final boolean installerTrusted = installer != null
                 && PluginPermissions.has(installer, PluginPermissions.HOOKS);

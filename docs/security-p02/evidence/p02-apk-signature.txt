@@ -1,0 +1,17 @@
+Verifies
+Verified using v1 scheme (JAR signing): false
+Verified using v2 scheme (APK Signature Scheme v2): true
+Verified using v3 scheme (APK Signature Scheme v3): false
+Verified using v3.1 scheme (APK Signature Scheme v3.1): false
+Verified using v4 scheme (APK Signature Scheme v4): false
+Verified for SourceStamp: false
+Number of signers: 1
+Signer #1 certificate DN: CN=FlexyGram Diagnostic, OU=Local diagnostics, O=FlexyGram
+Signer #1 certificate SHA-256 digest: 7184de239dc697f4957e8074300a9e440e3154cad5aac3f2f04a490fc90e78a5
+Signer #1 certificate SHA-1 digest: b25a019e026cf4fa72300f394bb9449831b3be10
+Signer #1 certificate MD5 digest: 73cd1e973975015b74435f22a4768628
+Signer #1 key algorithm: RSA
+Signer #1 key size (bits): 2048
+Signer #1 public key SHA-256 digest: d1fc27880224e017d6994c351e6de9b6101528d223f69fcca1f30b45200415d4
+Signer #1 public key SHA-1 digest: 72ef916904c507097da093ff0d0ac8163fa5245b
+Signer #1 public key MD5 digest: 73e98b594edf3b604fd2ead98476f991

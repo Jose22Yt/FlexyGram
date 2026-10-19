@@ -1,0 +1,42 @@
+[
+  {
+    "mutation": "INTERNET reintroduced",
+    "rejected": true
+  },
+  {
+    "mutation": "CAMERA reintroduced",
+    "rejected": true
+  },
+  {
+    "mutation": "Wear authorization service enabled",
+    "rejected": true
+  },
+  {
+    "mutation": "Car service enabled",
+    "rejected": true
+  },
+  {
+    "mutation": "FileProvider exposed",
+    "rejected": true
+  },
+  {
+    "mutation": "Rendering provider exposed",
+    "rejected": true
+  },
+  {
+    "mutation": "Launch target exposed directly",
+    "rejected": true
+  },
+  {
+    "mutation": "Weak custom receiver permission",
+    "rejected": true
+  },
+  {
+    "mutation": "Backup enabled",
+    "rejected": true
+  },
+  {
+    "mutation": "Unexpected library service",
+    "rejected": true
+  }
+]

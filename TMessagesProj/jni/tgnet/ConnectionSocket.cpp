@@ -1,3 +1,4 @@
+#include "DiagnosticPolicy.h"
 /*
  * This is the source code of tgnet library v. 1.1
  * It is licensed under GNU GPL v. 2 or later.
@@ -473,6 +474,7 @@ ConnectionSocket::~ConnectionSocket() {
 }
 
 void ConnectionSocket::openConnection(std::string address, uint16_t port, std::string secret, bool ipv6, int32_t networkType) {
+    if (flexygram::isolatedDiagnostic) return;
     currentNetworkType = networkType;
     isIpv6 = ipv6;
     currentAddress = address;
@@ -620,6 +622,7 @@ void ConnectionSocket::openConnection(std::string address, uint16_t port, std::s
 }
 
 void ConnectionSocket::openConnectionInternal(bool ipv6) {
+    if (flexygram::isolatedDiagnostic) return;
     int epolFd = ConnectionsManager::getInstance(instanceNum).epolFd;
     int yes = 1;
     if (setsockopt(socketFd, IPPROTO_TCP, TCP_NODELAY, &yes, sizeof(int))) {

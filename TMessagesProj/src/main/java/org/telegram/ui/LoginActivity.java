@@ -6116,6 +6116,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
             VerticalPositionAutoAnimator.attach(bottomContainer);
 
             bottomContainer.setOnClickListener(view -> {
+                if (org.telegram.messenger.DiagnosticPolicy.isIsolated()) return;
                 NotificationCenter.getGlobalInstance().addObserver(new NotificationCenter.NotificationCenterDelegate() {
                     @Override
                     public void didReceivedNotification(int id, int account, Object... args) {
@@ -6450,6 +6451,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
             signInWithGoogleView.setText(str);
 
             signInWithGoogleView.setOnClickListener(view -> {
+                if (org.telegram.messenger.DiagnosticPolicy.isIsolated()) return;
                 NotificationCenter.getGlobalInstance().addObserver(new NotificationCenter.NotificationCenterDelegate() {
                     @Override
                     public void didReceivedNotification(int id, int account, Object... args) {

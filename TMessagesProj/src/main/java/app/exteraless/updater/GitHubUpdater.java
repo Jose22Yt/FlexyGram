@@ -104,6 +104,7 @@ public final class GitHubUpdater {
     }
 
     public static void check(boolean force) {
+        if (org.telegram.messenger.DiagnosticPolicy.isIsolated()) return;
         int channel = NaConfig.INSTANCE.getAutoUpdateChannel().Int();
         if (!force) {
             if (channel == UpdateHelper.UPDATE_OFF) {
@@ -131,6 +132,7 @@ public final class GitHubUpdater {
     }
 
     public static void fetch(CheckCallback callback) {
+        if (org.telegram.messenger.DiagnosticPolicy.isIsolated()) { AndroidUtilities.runOnUIThread(() -> callback.onChecked(null, null, true)); return; }
         final boolean prerelease = NaConfig.INSTANCE.getAutoUpdateChannel().Int() == UpdateHelper.UPDATE_CHANNEL_BETA;
         new Thread(() -> {
             Release release = null;
@@ -362,6 +364,7 @@ public final class GitHubUpdater {
     }
 
     public static void download(Activity activity, Release release, DownloadListener listener) {
+        if (org.telegram.messenger.DiagnosticPolicy.isIsolated()) { listener.onFinished(false, false); return; }
         if (download != null) {
             return;
         }
@@ -431,6 +434,7 @@ public final class GitHubUpdater {
     }
 
     private static void install(Activity activity, File file) {
+        if (org.telegram.messenger.DiagnosticPolicy.isIsolated()) return;
         try {
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_ACTIVITY_NEW_TASK);
