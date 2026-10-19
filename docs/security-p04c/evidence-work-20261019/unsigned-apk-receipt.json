@@ -1,0 +1,33 @@
+{
+  "status": "BUILT_UNSIGNED_STATIC_VERIFIED",
+  "source_head": "723580b5cfee51416aa3f87cdebc3f8c911eb7ed",
+  "apk_filename": "flexygram-v13.0.2(1261)-diagnostic-debug-unsigned.apk",
+  "apk_bytes": 113080783,
+  "apk_sha256": "ddb7b017838a2a13991ac09154bbf252a11d62326e9a588349ca03c115e01699",
+  "signature": "absent",
+  "apksigner_exit": 1,
+  "apk_signing_block": false,
+  "jar_signature_entries": false,
+  "zip_crc_valid": true,
+  "zipalign_16k": true,
+  "packaged_elf_sha256": {
+    "libexslt.so": "f8e9e0fc0fa7507f3391bacb5c08a16dc9fdab73ca23de48f8adb2dfcca7a194",
+    "libfreetype.so": "d086a897a1c1cfa517b9e46c28d762f817af41bde96b2eda3bf6e6b12220eb01",
+    "libxml2.so": "e282a655ebbe07443cd743bb9dd00a152bfed7edb091d862f0a4e74afc1eff04",
+    "libxslt.so": "827d113f3045205b205b52d0e4fe2e59998bd3b471368314415a2c3e91571660"
+  },
+  "android_runtime_validated": false,
+  "installed": false,
+  "distributed": false,
+  "signing_key_loaded_or_generated": false,
+  "limits": "Unsigned APK; not installable. Static verification does not certify Android loading.",
+  "tools_checkpoint": "85e20675cbc142e64ad92e726dba5c15cd8efae3",
+  "build_result": "BUILD SUCCESSFUL",
+  "gradle_elapsed": "11m 13s",
+  "gradle_tasks": {
+    "executed": 209,
+    "from_cache": 35,
+    "up_to_date": 4
+  },
+  "jni_and_chaquopy_built": true
+}
