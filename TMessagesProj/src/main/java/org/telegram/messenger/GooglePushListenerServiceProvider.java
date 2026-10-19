@@ -31,7 +31,7 @@ public class GooglePushListenerServiceProvider implements PushListenerController
         String currentPushString = SharedConfig.pushString;
         if (!TextUtils.isEmpty(currentPushString)) {
             if (BuildVars.DEBUG_PRIVATE_VERSION) {
-                FileLog.d("FCM regId = " + currentPushString);
+                FileLog.d("FCM registration available");
             }
         } else {
             FileLog.d("FCM Registration not found.");
@@ -45,7 +45,7 @@ public class GooglePushListenerServiceProvider implements PushListenerController
                             SharedConfig.pushStringGetTimeEnd = SystemClock.elapsedRealtime();
                             if (!task.isSuccessful()) {
                                 Exception error = task.getException();
-                                lastError = error == null ? "unknown" : error.getClass().getSimpleName() + ": " + error.getMessage();
+                                lastError = error == null ? "unknown" : error.getClass().getSimpleName();
                                 FileLog.d("Failed to get regid: " + lastError);
                                 SharedConfig.pushStringStatus = "__FIREBASE_FAILED__";
                                 PushListenerController.sendRegistrationToServer(getPushType(), null);
@@ -59,7 +59,7 @@ public class GooglePushListenerServiceProvider implements PushListenerController
                             }
                         });
             } catch (Throwable e) {
-                FileLog.e(e);
+                FileLog.e("Google push operation failed (" + e.getClass().getSimpleName() + ")");
             }
         });
     }
@@ -71,7 +71,7 @@ public class GooglePushListenerServiceProvider implements PushListenerController
                 int resultCode = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(ApplicationLoader.applicationContext);
                 hasServices = resultCode == ConnectionResult.SUCCESS;
             } catch (Exception e) {
-                FileLog.e(e);
+                FileLog.e("Google push operation failed (" + e.getClass().getSimpleName() + ")");
                 hasServices = false;
             }
         }

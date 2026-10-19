@@ -8,7 +8,6 @@ import android.content.SharedPreferences;
 import org.telegram.tgnet.SerializedData;
 import org.telegram.tgnet.TLRPC;
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 public class AuthTokensHelper {
@@ -73,7 +72,7 @@ public class AuthTokensHelper {
                     tokens.add((TLRPC.TL_auth_authorization) token);
                 }
             } catch (Exception e) {
-                FileLog.e(e);
+                FileLog.e("AuthTokensHelper: load login tokens failed (" + e.getClass().getSimpleName() + ")");
             }
         }
 
@@ -82,7 +81,7 @@ public class AuthTokensHelper {
 
     public static void saveLogInToken(TLRPC.TL_auth_authorization token) {
         if (BuildVars.DEBUG_VERSION) {
-            FileLog.d("saveLogInToken " + new String(token.future_auth_token, StandardCharsets.UTF_8));
+            FileLog.d("AuthTokensHelper: saving login token");
         }
         ArrayList<TLRPC.TL_auth_authorization> tokens = getSavedLogInTokens();
         if (tokens == null) {

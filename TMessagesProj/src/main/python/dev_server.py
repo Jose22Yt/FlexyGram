@@ -30,8 +30,8 @@ _debugger = {"listening": False, "host": None, "port": None, "platform": None}
 
 # Токен сессии. Порт слушается на 127.0.0.1, но на Android это не граница:
 # любое приложение на устройстве может подключиться и через write_plugin
-# поставить свой плагин. Токен пишется в файл внутри каталога приложения и в
-# лог, так что инструмент разработчика достаёт его через adb.
+# поставить свой плагин. Токен хранится только в приватном файле приложения;
+# секреты и содержимое запросов не должны попадать в диагностические логи.
 _token = None
 TOKEN_FILE = ".devserver_token"
 _FREE_COMMANDS = frozenset({"ping"})
@@ -50,10 +50,9 @@ def _publish_token(token: str) -> None:
         path = os.path.join(file_utils.get_plugins_dir(), TOKEN_FILE)
         with open(path, "w", encoding="utf-8") as handle:
             handle.write(token)
-        _log(f"token written to {path}")
+        _log("token file written")
     except Exception as e:
-        _log(f"cannot write token file: {e}")
-    _log(f"token: {token}")
+        _log(f"cannot write token file ({type(e).__name__})")
 
 
 def _log(message):
@@ -95,7 +94,7 @@ def _plugin_json(p):
         "enabled": bool(p.enabled),
         "loaded": bool(p.loaded),
         "has_settings": bool(p.hasSettings),
-        "error": str(p.loadError) if p.loadError is not None else None,
+        "error": "plugin load failed" if p.loadError is not None else None,
     }
 
 
@@ -114,7 +113,7 @@ def _require_plugin_id(request) -> str:
 def _cmd_set_enabled(request, enabled: bool):
     plugin_id = _require_plugin_id(request)
     if not _controller().setPluginEnabled(plugin_id, enabled):
-        return {"ok": False, "error": f"unknown plugin {plugin_id!r}"}
+        return {"ok": False, "error": "unknown plugin"}
     return {}
 
 
@@ -122,12 +121,12 @@ def _cmd_reload_plugin(request):
     plugin_id = _require_plugin_id(request)
     controller = _controller()
     if controller.getPlugin(plugin_id) is None:
-        return {"ok": False, "error": f"unknown plugin {plugin_id!r}"}
+        return {"ok": False, "error": "unknown plugin"}
     controller.reloadPlugin(plugin_id)
     plugin = controller.getPlugin(plugin_id)
     error = plugin.loadError if plugin is not None else None
     if error:
-        return {"ok": False, "error": str(error)}
+        return {"ok": False, "error": "plugin reload failed"}
     return {}
 
 
@@ -139,7 +138,7 @@ def _cmd_write_plugin(request):
     try:
         data = base64.b64decode(content)
     except (binascii.Error, ValueError) as e:
-        raise ValueError(f"content is not valid base64: {e}")
+        raise ValueError("content is not valid base64") from None
 
     filename = request.get("filename") or (plugin_id + ".py")
     filename = os.path.basename(str(filename))
@@ -169,7 +168,7 @@ def _cmd_write_plugin(request):
     if not done.wait(120):
         return {"ok": False, "error": "install timed out"}
     if not outcome.get("ok"):
-        return {"ok": False, "error": outcome.get("error") or "install failed"}
+        return {"ok": False, "error": "plugin install failed"}
     return {}
 
 
@@ -181,9 +180,9 @@ def _cmd_remove_plugin(request):
         from extera_utils import plugin_loader
         plugin_loader.uninstall_plugin(plugin_id)
     except Exception as e:
-        _log(f"python-side uninstall of {plugin_id!r} failed: {e}")
+        _log(f"python-side uninstall failed ({type(e).__name__})")
     if not _controller().uninstallPlugin(plugin_id):
-        return {"ok": False, "error": f"unknown plugin {plugin_id!r}"}
+        return {"ok": False, "error": "unknown plugin"}
     return {}
 
 
@@ -201,10 +200,10 @@ def _cmd_start_debugger(request):
     try:
         debugpy.listen((host, port))
     except Exception as e:
-        return {"ok": False, "error": f"debugpy.listen failed: {e}"}
+        return {"ok": False, "error": f"debugpy.listen failed ({type(e).__name__})"}
     _debugger.update({"listening": True, "host": host, "port": port,
                       "platform": platform})
-    _log(f"debugpy listening on {host}:{port} ({platform})")
+    _log("debugpy listening")
     return {"debugger": dict(_debugger)}
 
 
@@ -221,7 +220,7 @@ def _cmd_stop_debugger(request):
     try:
         stop()
     except Exception as e:
-        return {"ok": False, "error": f"debugpy stop failed: {e}"}
+        return {"ok": False, "error": f"debugpy stop failed ({type(e).__name__})"}
     _debugger.update({"listening": False, "host": None, "port": None,
                       "platform": None})
     return {}
@@ -274,13 +273,13 @@ def dispatch(request: dict) -> dict:
             handler = _COMMANDS.get(command)
             if handler is None:
                 return {**response, "ok": False,
-                        "error": f"unknown command {command!r}"}
+                        "error": "unknown command"}
             payload = handler(request)
         # A payload may override "ok" to False (command-level failure).
         response.update(payload or {})
     except Exception as e:
         return {"#": request_id, "ok": False,
-                "error": f"{type(e).__name__}: {e}"}
+                "error": f"command failed ({type(e).__name__})"}
     return response
 
 
@@ -304,7 +303,7 @@ class _Handler(socketserver.StreamRequestHandler):
                     raise ValueError("request must be a JSON object")
             except Exception as e:
                 self._respond({"#": None, "ok": False,
-                               "error": f"malformed request: {e}"})
+                               "error": f"malformed request ({type(e).__name__})"})
                 continue
             self._respond(dispatch(request))
 
@@ -320,6 +319,12 @@ class _Server(socketserver.ThreadingTCPServer):
     daemon_threads = True
     allow_reuse_address = True
 
+    def handle_error(self, request, client_address):
+        # socketserver otherwise prints the exception and its sensitive message.
+        import sys
+        error_type = sys.exc_info()[0]
+        _log(f"request handler failed ({error_type.__name__ if error_type else 'unknown'})")
+
 
 def start() -> bool:
     """Start the dev server once; False when unavailable (bind failure)."""
@@ -333,7 +338,7 @@ def start() -> bool:
             server = _Server((HOST, PORT), _Handler)
         except Exception as e:
             _failed = True
-            _log(f"cannot bind {HOST}:{PORT} — dev server disabled: {e}")
+            _log(f"cannot bind dev server ({type(e).__name__})")
             return False
         thread = threading.Thread(target=server.serve_forever,
                                   name="extera-dev-server", daemon=True)

@@ -134,7 +134,7 @@ public class PythonPluginsEngine extends com.exteragram.messenger.plugins.Python
                     try {
                         loader.callAttr("start_dev_server");
                     } catch (Throwable t) {
-                        FileLog.e("PluginsEngine: dev server start failed", t);
+                        FileLog.e("PluginsEngine: dev server start failed (" + t.getClass().getSimpleName() + ")");
                     }
                 }
             } catch (Throwable t) {

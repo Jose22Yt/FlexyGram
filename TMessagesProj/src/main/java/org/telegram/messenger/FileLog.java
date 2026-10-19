@@ -110,16 +110,15 @@ public class FileLog {
                 try {
                     dump.run();
                 } catch (Throwable e) {
-                    // Application callbacks may have changed Java fields/collections
-                    // by now. A failed debug dump must not affect request processing.
-                    Log.e(tag, "Unable to serialize asynchronous protocol dump", e);
+                    // A failed diagnostic must not affect request processing.
+                    Log.e(tag, "Unable to write protocol diagnostic (" + e.getClass().getSimpleName() + ")");
                 } finally {
                     pendingProtocolDumps.decrementAndGet();
                 }
             });
         } catch (Throwable e) {
             pendingProtocolDumps.decrementAndGet();
-            Log.e(tag, "Unable to queue protocol dump", e);
+            Log.e(tag, "Unable to queue protocol diagnostic (" + e.getClass().getSimpleName() + ")");
         }
     }
 
@@ -135,13 +134,13 @@ public class FileLog {
         long requestingTime = time - startRequestTimeInMillis;
         boolean hasError = error != null;
         postProtocolDump(() -> {
-            checkGson();
-            String req = "req -> " + requestSimpleName + " : " + gson.toJson(request);
+            // Protocol bodies can contain OTPs, passwords and tokens in arbitrary fields.
+            String req = "req -> " + requestSimpleName;
             String res = "null";
             if (response != null) {
-                res = "res -> " + response.getClass().getSimpleName() + " : " + gson.toJson(response);
+                res = "res -> " + response.getClass().getSimpleName();
             } else if (error != null) {
-                res = "err -> " + error.getClass().getSimpleName() + " : " + gson.toJson(error);
+                res = "err -> " + error.getClass().getSimpleName() + " code=" + error.code;
             }
             try {
                 String metadata = "requestMsgId=" + requestMsgId + " requestingTime=" + requestingTime + " request_token=" + requestToken + " account=" + account;
@@ -160,7 +159,7 @@ public class FileLog {
                 Log.println(priority, mtproto_tag, res);
                 Log.println(priority, mtproto_tag, " ");
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.e(tag, "Unable to write protocol diagnostic (" + e.getClass().getSimpleName() + ")");
             }
         });
     }
@@ -170,10 +169,8 @@ public class FileLog {
             return;
         }
         long time = System.currentTimeMillis();
-        boolean skipGson = gsonDisabled;
         postProtocolDump(() -> {
-            checkGson();
-            String messageStr = "receive message -> " + message.getClass().getSimpleName() + " : " + (skipGson ? message : gson.toJson(message));
+            String messageStr = "receive message -> " + message.getClass().getSimpleName();
             try {
                 FileLog logger = getInstance();
                 String metadata = logger.dateFormat.format(time) + " msgId=" + messageId + " account=" + account;
@@ -187,7 +184,7 @@ public class FileLog {
                 Log.d(mtproto_tag, messageStr);
                 Log.d(mtproto_tag, " ");
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.e(tag, "Unable to write protocol diagnostic (" + e.getClass().getSimpleName() + ")");
             }
         });
     }

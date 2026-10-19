@@ -134,7 +134,7 @@ public class PushListenerController {
                     if (!Arrays.equals(SharedConfig.pushAuthKeyId, inAuthKeyId)) {
                         onDecryptError(countDownLatch);
                         if (BuildVars.LOGS_ENABLED) {
-                            FileLog.d(String.format(Locale.US, tag + " DECRYPT ERROR 2 k1=%s k2=%s, key=%s", Utilities.bytesToHex(SharedConfig.pushAuthKeyId), Utilities.bytesToHex(inAuthKeyId), Utilities.bytesToHex(SharedConfig.pushAuthKey)));
+                            FileLog.d(tag + " DECRYPT ERROR 2: key ID mismatch");
                         }
                         return;
                     }
@@ -149,7 +149,7 @@ public class PushListenerController {
                     if (!Utilities.arraysEquals(messageKey, 0, messageKeyFull, 8)) {
                         onDecryptError(countDownLatch);
                         if (BuildVars.LOGS_ENABLED) {
-                            FileLog.d(String.format(tag + " DECRYPT ERROR 3, key = %s", Utilities.bytesToHex(SharedConfig.pushAuthKey)));
+                            FileLog.d(tag + " DECRYPT ERROR 3: message key mismatch");
                         }
                         return;
                     }
@@ -226,7 +226,7 @@ public class PushListenerController {
                         return;
                     }
                     if (BuildVars.LOGS_ENABLED) {
-                        FileLog.d(tag + " " + loc_key);
+                        FileLog.d(tag + " push notification accepted");
                     }
                     switch (loc_key) {
                         case "MESSAGE_WALLET_TONCONNECT_REQUEST":
@@ -361,7 +361,7 @@ public class PushListenerController {
                     if (custom.has("topic_id")) {
                         topicId = custom.getInt("topic_id");
                     }
-                    FileLog.d( "recived push notification {"+ loc_key+ "} chatId " + chat_id + " custom topicId " + topicId);
+                    FileLog.d(tag + " push notification metadata parsed");
                     if (custom.has("encryption_id")) {
                         dialogId = DialogObject.makeEncryptedDialogId(custom.getInt("encryption_id"));
                     }
@@ -438,7 +438,7 @@ public class PushListenerController {
 
                             MessagesController.getInstance(currentAccount).deleteMessagesByPush(dialogId, ids, channel_id);
                             if (BuildVars.LOGS_ENABLED) {
-                                FileLog.d(tag + " received " + loc_key + " for dialogId = " + dialogId + " mids = " + TextUtils.join(",", ids));
+                                FileLog.d(tag + " push delete notification processed");
                             }
                         } else if ("READ_REACTION".equals(loc_key)) {
                             String messages = custom.getString("messages");
@@ -456,7 +456,7 @@ public class PushListenerController {
 
                             MessagesController.getInstance(currentAccount).checkUnreadReactions(dialogId, topicId, sparseBooleanArray);
                             if (BuildVars.LOGS_ENABLED) {
-                                FileLog.d(tag + " received " + loc_key + " for dialogId = " + dialogId + " mids = " + TextUtils.join(",", ids));
+                                FileLog.d(tag + " push reaction read notification processed");
                             }
                         } else if (!TextUtils.isEmpty(loc_key)) {
                             int msg_id;
@@ -1445,7 +1445,7 @@ public class PushListenerController {
 
                                         default: {
                                             if (BuildVars.LOGS_ENABLED) {
-                                                FileLog.w("unhandled loc_key = " + loc_key);
+                                                FileLog.w(tag + " unhandled push notification type");
                                             }
                                             break;
                                         }
@@ -1453,7 +1453,7 @@ public class PushListenerController {
                                 }
 
                                 if (BuildVars.LOGS_ENABLED) {
-                                    FileLog.d(tag + " received message notification " + loc_key + " for dialogId = " + dialogId + " mid = " + msg_id);
+                                    FileLog.d(tag + " push message prepared");
                                 }
                                 if (messageText != null) {
                                     boolean isStoryReaction = loc_key.equals("REACT_STORY") || loc_key.equals("REACT_STORY_HIDDEN");
@@ -1543,9 +1543,9 @@ public class PushListenerController {
                         onDecryptError(countDownLatch);
                     }
                     if (BuildVars.LOGS_ENABLED) {
-                        FileLog.e("error in loc_key = " + loc_key + " json " + jsonString);
+                        FileLog.e(tag + " push processing failed");
                     }
-                    FileLog.e(e);
+                    FileLog.e("PushListenerController: processing failed (" + e.getClass().getSimpleName() + ")");
                 }
             });
         });

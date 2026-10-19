@@ -3537,7 +3537,7 @@ def start_dev_server() -> None:
         import dev_server
         dev_server.start()
     except Exception as e:
-        print(f"[exteraless:plugin_loader] dev server start failed: {e}",
+        print(f"[exteraless:plugin_loader] dev server start failed ({type(e).__name__})",
               file=sys.stderr)
     return None
 

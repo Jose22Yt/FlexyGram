@@ -74,7 +74,7 @@ public class CaptchaController {
             .addOnSuccessListener(client -> {
                 client.executeTask(getAction(action))
                     .addOnSuccessListener(token -> {
-                        FileLog.d("CaptchaController: got token for {action="+action+", key_id="+key_id+"}: " + token);
+                        FileLog.d("CaptchaController: token received");
                         if (token == null) {
                             finalRequest.done("RECAPTCHA_FAILED_TOKEN_NULL");
                         } else {
@@ -82,12 +82,12 @@ public class CaptchaController {
                         }
                     })
                     .addOnFailureListener(e -> {
-                        FileLog.e("CaptchaController: executeTask failure", e);
+                        FileLog.e("CaptchaController: executeTask failure (" + formatException(e) + ")");
                         finalRequest.done("RECAPTCHA_FAILED_TASK_EXCEPTION_" + formatException(e));
                     });
             })
             .addOnFailureListener(e -> {
-                FileLog.e("CaptchaController: getTasksClient failure", e);
+                FileLog.e("CaptchaController: getTasksClient failure (" + formatException(e) + ")");
                 finalRequest.done("RECAPTCHA_FAILED_GETCLIENT_EXCEPTION_" + formatException(e));
             });*/
     }
@@ -107,8 +107,8 @@ public class CaptchaController {
 
     private static String formatException(Exception e) {
         if (e == null) return "NULL";
-        if (e.getMessage() == null) return "MSG_NULL";
-        return e.getMessage().replaceAll(" ", "_").toUpperCase();
+        // Exception messages may contain provider tokens or request parameters.
+        return e.getClass().getSimpleName();
     }
 
 }
