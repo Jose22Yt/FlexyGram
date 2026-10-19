@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Optional FlexyGram brand candidate. Default launcher stays unchanged. -->
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@drawable/flexygram_brand_background" />
+    <foreground android:drawable="@drawable/flexygram_brand_mark" />
+    <monochrome android:drawable="@drawable/flexygram_brand_monochrome" />
+</adaptive-icon>

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Candidate dark variant. Not connected to the current launcher. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <gradient android:startColor="#172B37" android:endColor="#263E48" android:angle="315" />
+</shape>
