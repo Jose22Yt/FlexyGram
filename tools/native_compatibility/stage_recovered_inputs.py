@@ -37,8 +37,11 @@ def validate_manifest(data: object) -> dict:
     if not files or len(files) != len(set(files)):
         raise ValueError('No unique manifest entries')
     for name, row in files.items():
+        if not isinstance(name, str) or not name or '\\x00' in name:
+            raise ValueError('Unsafe manifest entry')
         path = Path(name)
-        if (not isinstance(name, str) or path.is_absolute() or '..' in path.parts or
+        if (path.is_absolute() or '..' in path.parts or name in ('.', '..') or
+                any(part in ('', '.') for part in name.split('/')) or
                 '\\' in name or len(path.parts) < 1 or path.as_posix() != name or
                 not isinstance(row, dict) or not isinstance(row.get('bytes'), int) or
                 isinstance(row['bytes'], bool) or row['bytes'] < 0 or
@@ -60,6 +63,8 @@ def inspect_archive(path: Path, manifest: dict, expected_sha: str) -> dict:
         seen = set()
         for member in archive.infolist():
             name = member.filename
+            if not name or '\\x00' in name or any(part in ('', '.') for part in name.rstrip('/').split('/')):
+                raise ValueError('Unsafe ZIP member path')
             if name in seen:
                 raise ValueError('Duplicate ZIP member')
             seen.add(name)
@@ -83,6 +88,12 @@ def inspect_archive(path: Path, manifest: dict, expected_sha: str) -> dict:
             file_info[name] = member
         if set(file_info) != set(entries):
             raise ValueError('Recovered ZIP has missing manifest members')
+        # A file cannot also serve as an ancestor directory for another member.
+        # Reject before extraction, even if a separately pinned manifest requested it.
+        for name in file_info:
+            if any('/'.join(Path(name).parts[:n]) in file_info
+                   for n in range(1, len(Path(name).parts))):
+                raise ValueError('ZIP file and directory path collision')
         # Stream the *uncompressed* bytes with an upper bound fixed by the manifest.
         for name, info in sorted(file_info.items()):
             total = 0
