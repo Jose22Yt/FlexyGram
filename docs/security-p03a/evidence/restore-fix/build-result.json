@@ -1,0 +1,16 @@
+{
+  "command": [
+    "./gradlew",
+    ":TMessagesProj:assembleDebug",
+    "--offline",
+    "--no-watch-fs",
+    "--no-daemon",
+    "--console=plain",
+    "--stacktrace",
+    "--max-workers=2"
+  ],
+  "exit_code": 0,
+  "seconds": 42.169269697000345,
+  "native_target": "arm64-v8a",
+  "skip_native": false
+}

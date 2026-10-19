@@ -1,0 +1,66 @@
+{
+  "comparison_base": "develop d31d0e780fe133337b343379563d65f579acf14d, before P0.3a",
+  "mainconfig_no_longer_exported": [
+    "autoNightBrighnessThreshold",
+    "autoNightCityName",
+    "autoNightLastSunCheckDay",
+    "autoNightLocationLatitude3",
+    "autoNightLocationLongitude3",
+    "autoNightScheduleByLocation",
+    "autoNightSunriseTime",
+    "autoNightSunsetTime",
+    "directShareHash",
+    "lastKeepMediaCheckTime",
+    "lockRecordAudioVideoHint",
+    "noSoundHintShowed",
+    "scheduledOrNoSoundHintShows",
+    "searchMessagesAsListHintShows",
+    "searchMessagesAsListUsed",
+    "stickersReorderingHintUsed",
+    "textSelectionHintShows",
+    "web_restricted_domains2"
+  ],
+  "userconfing_no_longer_exported": [
+    "autoLockIn",
+    "passcodeHash",
+    "passcodeType",
+    "saveIncomingPhotos",
+    "useFingerprint"
+  ],
+  "nkmrcfg_kept_bool": [
+    "DisableInstantCamera",
+    "HidePhone",
+    "TypefaceUseDefault",
+    "forceFontWeightFallback",
+    "repeatConfirm",
+    "showAddToSavedMessages",
+    "showAdminActions",
+    "showChangePermissions",
+    "showDeleteDownloadedFile",
+    "showMessageDetails",
+    "showMessageHide",
+    "showRepeat",
+    "showReport",
+    "showSeconds",
+    "showShareMessages",
+    "showTranslate",
+    "showViewHistory",
+    "unreadBadgeOnBackButton",
+    "useCustomEmoji"
+  ],
+  "nkmrcfg_kept_int": [
+    "ActionBarDecoration",
+    "NameOrder",
+    "TabletMode"
+  ],
+  "nkmrcfg_kept_float": [
+    "stickerSize_float"
+  ],
+  "themeconfig_kept": [
+    "lastDayTheme",
+    "lastDarkTheme",
+    "accent_current_[A-Za-z0-9_-]{1,64} (integer)"
+  ],
+  "all_other_nkmrcfg_themeconfig_keys": "No longer portable; includes future/unregistered keys. Previous exporter enumerated all stored preferences, so a finite exhaustive list requires private user data and is deliberately not collected.",
+  "aiConfig": "Entire section no longer exported, including credentials and conversation configuration. Never collect live values."
+}

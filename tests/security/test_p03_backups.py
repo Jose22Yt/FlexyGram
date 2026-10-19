@@ -7,6 +7,7 @@ import subprocess
 import tempfile
 import unittest
 from java_harness import method
+from restore_harness import SOURCES as RESTORE_SOURCES
 
 ROOT = Path(__file__).resolve().parents[2]
 JAVA = ROOT / 'TMessagesProj/src/main/java'
@@ -74,6 +75,14 @@ ok(android.app.backup.BackupAgentHelper.helpers==0);ok(android.app.backup.Backup
 System.out.println("PASS: production export/import, synthetic credentials unchanged, fail-closed policy, legacy restore discarded");
 }}
 '''}
+        # AOSP validates destination before internal discard; the old null super call must fail.
+        for name in ['android/annotation/SuppressLint.java', 'android/os/ParcelFileDescriptor.java',
+                     'android/app/backup/FullRestoreDataInput.java']:
+            sources[name] = RESTORE_SOURCES[name]
+        sources['android/app/backup/BackupAgentHelper.java'] = sources['android/app/backup/BackupAgentHelper.java'].replace(
+            'target=file;', 'file.getCanonicalPath();target=file;')
+        sources['android/app/backup/BackupAgentHelper.java'] = sources['android/app/backup/BackupAgentHelper.java'].replace(
+            'public void onCreate(){}', 'public void onCreate(){} public void onRestoreFile(FullRestoreDataInput input)throws IOException {throw new AssertionError("Framework writer reached");}')
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
             for name, body in sources.items():
@@ -85,6 +94,30 @@ System.out.println("PASS: production export/import, synthetic credentials unchan
             result=subprocess.run(['java','-cp',str(root)+os.pathsep+gson,'Main'],capture_output=True,text=True)
             self.assertEqual(result.returncode,0,result.stdout+result.stderr)
             print(result.stdout.strip())
+
+    def run_restore_harness(self, legacy_mutation=False):
+        source = (JAVA/'org/telegram/messenger/BackupAgent.java').read_text()
+        if legacy_mutation:
+            source = source.replace('discardEntity(data, size);',
+                'super.onRestoreFile(data, size, (java.io.File) null, type, mode, mtime);', 1)
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            for name, body in RESTORE_SOURCES.items():
+                target=root/name; target.parent.mkdir(parents=True, exist_ok=True); target.write_text(body)
+            (root/'org/telegram/messenger/BackupAgent.java').write_text(source)
+            result=subprocess.run(['javac','-d',str(root),*[str(p) for p in root.rglob('*.java')]],capture_output=True,text=True)
+            self.assertEqual(result.returncode,0,result.stderr)
+            return subprocess.run(['java','-cp',str(root),'Main',str(root/'fake-private-data')],capture_output=True,text=True)
+
+    def test_bounded_restore_descriptor_ownership_and_no_data_mutation(self):
+        result=self.run_restore_harness()
+        self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+        print(result.stdout.strip())
+
+    def test_previous_null_destination_defect_is_detected(self):
+        result=self.run_restore_harness(legacy_mutation=True)
+        self.assertNotEqual(result.returncode,0,'Regression must fail with the old implementation')
+        self.assertIn('NullPointerException',result.stderr)
 
     def test_no_credential_opt_in_or_automatic_backup_registration(self):
         helper=(JAVA/'tw/nekomimi/nekogram/helpers/CloudSettingsHelper.java').read_text()

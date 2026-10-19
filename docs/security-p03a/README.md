@@ -1,5 +1,7 @@
 # P0.3a — Respaldos, restauración y datos de sesión
 
+**Corrección posterior del PR #6:** [descarte acotado de entidades, regresión del destino null y revisión de rutas Android](RESTORE-FILE-FIX.md). Los resultados de 20 pruebas de abajo corresponden a la revisión inicial; la corrección final tiene 22 pruebas y evidencias propias. [Inventario de ajustes no portátiles](PORTABLE-SETTINGS-CHANGES.json).
+
 Proyecto FlexyGram 1.0, creado y dirigido por @Lukhou23. Créditos y licencias originales conservados.
 
 ## Estado de integración y bloqueo de beta
