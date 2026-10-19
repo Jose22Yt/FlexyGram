@@ -1,0 +1,65 @@
+{
+  "reviewed_head": "86226a55d59c2bac5a85516a1ab4d97a67801961",
+  "frozen_source_hashes_match": true,
+  "source_entries": 11,
+  "evidence_sha256": {
+    "docs/security-p03g/evidence/android-integration.json": "97d46ef3d4c3e065aa6e917fc5aa384e2f5f3e05f0d5832f50165f2f1de7113e",
+    "docs/security-p03g/evidence/artifact-inspection.log": "34f7e17db9cc984118fe1159425038185e5b7e3066d767b36f4b5ac0667251a6",
+    "docs/security-p03g/evidence/baseline-security-tests.log": "f1476fee87659d296a3abb7c0688b5e3849c3d56b39a625db6d2b11b085e9768",
+    "docs/security-p03g/evidence/baseline-summary.log": "789ed2a0222fd3c6262332c551ff883ccb21a20c49faedc6b581fbb8ff467801",
+    "docs/security-p03g/evidence/baseline-translation_dependency-tests.log": "497a78eaa785982f70e29772e43131d24298ac76804deed0fd9906e36df14379",
+    "docs/security-p03g/evidence/baseline-translation_runtime-tests.log": "bb4f3277181548847ffc1c78db868d9d770ab08ff9965e09b6c063d958c5c0dd",
+    "docs/security-p03g/evidence/baseline-translation_safety-tests.log": "b94b7206a6d3225d7d89bc8d2b07907978f9300c4a7abb244eb22c1209340784",
+    "docs/security-p03g/evidence/debug-signature.log": "68e7ff13cd9b54e07bbdb6ac626a2c4f730349e47fe5a1ba40470eb623e4c7cd",
+    "docs/security-p03g/evidence/environment.json": "6f0181360c10cbd826dba4c15c4f0ff3bc9dc68ef0a7ea69bfbcdb5a4b885bf8",
+    "docs/security-p03g/evidence/frozen-build-source-hashes.json": "583286625a5651862dc286441f62a018e63444b0c53faa952eb8f73ff2061ff7",
+    "docs/security-p03g/evidence/gradle-arm64-final.log": "419bee5d07dc4c3ca9ff983755820e5c2a537bfcbfc54ddc39527002702688e1",
+    "docs/security-p03g/evidence/gradle-attempt1-verifier-failure.log": "84ee3cfa3ee72399054f59f6c567d7126c5cc656fc8ff036f5d28e82bee878d9",
+    "docs/security-p03g/evidence/pinned-submodules.txt": "78ff20389029058e7af41bdbada83ace4fe54d25d46ebc919ea7844c4256854f",
+    "docs/security-p03g/evidence/security-all.log": "6dbe86f84eda6b42e6e476656d4362b9d1284680d723e5e241e506bdf066e53e",
+    "docs/security-p03g/evidence/translation_dependency-test_facade.py.log": "9d02fdc81683593bb1b05dc590db39ac6727e69ba7451a8e1f241534ebc71bce",
+    "docs/security-p03g/evidence/translation_dependency-test_prototype.py.log": "fb8d842ec4fcebc71d939ad4616b3a9be7b9db81581b8178cbf97adbbf475668",
+    "docs/security-p03g/evidence/translation_runtime-all.log": "dcaee70a35e480e926a4949d8dd1c722cc753a3694a95ed0fb8b57318330b039",
+    "docs/security-p03g/evidence/translation_safety-all.log": "085e0ea8f5302ded329093b575efb6cca9360ef476d3227bc0113ad6a86ed8a6",
+    "docs/security-p03g/evidence/translation_staging-all.log": "b09d92f5d46c7995fda1268cc55a1f146e2ffb69d9629e565346a0bf4eac1804",
+    "docs/security-p03g/evidence/validation-summary.json": "036b7a336198e997f9c863fb5839e21792c2317988db06100ccc50197e14bc8c"
+  },
+  "no_tests_rerun": true,
+  "android_execution_validated": false,
+  "integration_sha": "781b18be703809898ac0478c6239d53216ebd736",
+  "merge_tree_matches_reviewed_head": true,
+  "historical_final_suites": [
+    {
+      "log": "security-all.log",
+      "passed": 26,
+      "skipped": 0
+    },
+    {
+      "log": "translation_safety-all.log",
+      "passed": 27,
+      "skipped": 0
+    },
+    {
+      "log": "translation_runtime-all.log",
+      "passed": 4,
+      "skipped": 0
+    },
+    {
+      "log": "translation_dependency-test_facade.py.log",
+      "passed": 14,
+      "skipped": 0
+    },
+    {
+      "log": "translation_dependency-test_prototype.py.log",
+      "passed": 12,
+      "skipped": 0
+    },
+    {
+      "log": "translation_staging-all.log",
+      "passed": 10,
+      "skipped": 0
+    }
+  ],
+  "tests_rerun": false,
+  "build_rerun": false
+}
