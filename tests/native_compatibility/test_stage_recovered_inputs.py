@@ -119,6 +119,27 @@ class StageTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'absent, unsafe'):
             s.inspect_archive(link, self.manifest, self.pin)
 
+    def test_manifest_non_string_name_rejected_cleanly(self):
+        bad = {'files': {42: {'sha256': '0' * 64, 'bytes': 0}}}
+        with self.assertRaisesRegex(ValueError, 'Unsafe manifest'):
+            s.validate_manifest(bad)
+
+    def test_manifest_dot_component_rejected(self):
+        bad = {'files': {'sources/./example.tar.xz': {
+            'sha256': '0' * 64, 'bytes': 0}}}
+        with self.assertRaisesRegex(ValueError, 'Unsafe manifest'):
+            s.validate_manifest(bad)
+
+    def test_nested_member_under_regular_file_rejected(self):
+        parts = {'sources/parent': b'a',
+                 'sources/parent/child.tar': b'b'}
+        self.make_zip(parts)
+        manifest = {'files': {name: {'sha256': hashlib.sha256(data).hexdigest(),
+                                    'bytes': len(data)}
+                              for name, data in parts.items()}}
+        with self.assertRaisesRegex(ValueError, 'path collision'):
+            self.verify(manifest)
+
     def test_bad_manifest_digest_rejected(self):
         other = json.loads(json.dumps(self.manifest))
         other['files']['sources/example.tar.xz']['sha256'] = 'a' * 64
