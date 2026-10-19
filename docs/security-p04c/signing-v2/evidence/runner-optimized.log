@@ -1,0 +1,37 @@
+test_api24_and_real_16k_profiles_pass (test_android_lab.AndroidLabTests.test_api24_and_real_16k_profiles_pass) ... ok
+test_backcompat_is_not_strict_16kb (test_android_lab.AndroidLabTests.test_backcompat_is_not_strict_16kb) ... ok
+test_capability_or_internet_and_jni_failures_rejected (test_android_lab.AndroidLabTests.test_capability_or_internet_and_jni_failures_rejected) ... ok
+test_changed_apk_is_rejected (test_android_lab.AndroidLabTests.test_changed_apk_is_rejected) ... ok
+test_changed_wheel_is_rejected (test_android_lab.AndroidLabTests.test_changed_wheel_is_rejected) ... ok
+test_complete_synthetic_runtime_report_passes (test_android_lab.AndroidLabTests.test_complete_synthetic_runtime_report_passes) ... ok
+test_different_library_or_unmapped_library_rejected (test_android_lab.AndroidLabTests.test_different_library_or_unmapped_library_rejected) ... ok
+test_exact_synthetic_artifacts_pass_readonly_gate (test_android_lab.AndroidLabTests.test_exact_synthetic_artifacts_pass_readonly_gate) ... ok
+test_failures_errors_skips_and_expected_failures_rejected (test_android_lab.AndroidLabTests.test_failures_errors_skips_and_expected_failures_rejected) ... ok
+test_instrumentation_protocol_requires_unique_completion (test_android_lab.AndroidLabTests.test_instrumentation_protocol_requires_unique_completion) ... ok
+test_missing_and_extra_wheels_rejected (test_android_lab.AndroidLabTests.test_missing_and_extra_wheels_rejected) ... ok
+test_missing_case_and_duplicate_case_rejected (test_android_lab.AndroidLabTests.test_missing_case_and_duplicate_case_rejected) ... ok
+test_missing_or_altered_evidence_blocks_matrix (test_android_lab.AndroidLabTests.test_missing_or_altered_evidence_blocks_matrix) ... ok
+test_network_attempt_blocks_matrix_even_if_no_packet_left (test_android_lab.AndroidLabTests.test_network_attempt_blocks_matrix_even_if_no_packet_left) ... ok
+test_network_counter_must_be_present_and_unambiguous (test_android_lab.AndroidLabTests.test_network_counter_must_be_present_and_unambiguous) ... ok
+test_no_implicit_offline_attestation (test_android_lab.AndroidLabTests.test_no_implicit_offline_attestation) ... ok
+test_normal_build_does_not_include_instrumentation (test_android_lab.AndroidLabTests.test_normal_build_does_not_include_instrumentation) ... ok
+test_only_explicit_local_emulators_allowed (test_android_lab.AndroidLabTests.test_only_explicit_local_emulators_allowed) ... ok
+test_python_build_api_is_not_used_as_runtime_api (test_android_lab.AndroidLabTests.test_python_build_api_is_not_used_as_runtime_api) ... ok
+test_real_java_dictionary_lookup_uses_python_item_not_attribute (test_android_lab.AndroidLabTests.test_real_java_dictionary_lookup_uses_python_item_not_attribute) ... ok
+test_replay_and_python_plugin_mismatch_rejected (test_android_lab.AndroidLabTests.test_replay_and_python_plugin_mismatch_rejected) ... ok
+test_reviewed_source_and_12_cases_are_preserved (test_android_lab.AndroidLabTests.test_reviewed_source_and_12_cases_are_preserved) ... ok
+test_runtime_api_has_no_build_api_fallback (test_android_lab.AndroidLabTests.test_runtime_api_has_no_build_api_fallback) ... ok
+test_signature_and_apk_mismatch_rejected (test_android_lab.AndroidLabTests.test_signature_and_apk_mismatch_rejected) ... ok
+test_symlink_wheel_rejected (test_android_lab.AndroidLabTests.test_symlink_wheel_rejected) ... ok
+test_test_count_not_inferred_from_pass_text (test_android_lab.AndroidLabTests.test_test_count_not_inferred_from_pass_text) ... ok
+test_test_manifest_requests_no_permissions_or_app_components (test_android_lab.AndroidLabTests.test_test_manifest_requests_no_permissions_or_app_components) ... ok
+test_two_independent_synthetic_receipts_required (test_android_lab.AndroidLabTests.test_two_independent_synthetic_receipts_required) ... ok
+test_unsigned_runner_is_not_installable (test_android_lab.AndroidLabTests.test_unsigned_runner_is_not_installable) ... ok
+test_wrong_api_or_page_rejected (test_android_lab.AndroidLabTests.test_wrong_api_or_page_rejected) ... ok
+test_wrong_arm64_or_load_alignment_rejected (test_android_lab.AndroidLabTests.test_wrong_arm64_or_load_alignment_rejected) ... ok
+test_x86_native_bridge_and_physical_rejected (test_android_lab.AndroidLabTests.test_x86_native_bridge_and_physical_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 32 tests in 0.590s
+
+OK

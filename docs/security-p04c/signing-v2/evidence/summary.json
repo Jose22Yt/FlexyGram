@@ -1,0 +1,31 @@
+{
+  "base_head": "25919fc3d4115e7d0ea4260af2db006a302f4f7d",
+  "key_status": "BLOCKED_CUSTODY_NOT_CREATED",
+  "private_key_generated": false,
+  "password_generated": false,
+  "certificate_sha256": null,
+  "creation_date": null,
+  "private_key_backup_created": false,
+  "key_generation_owner_authorized": true,
+  "apk_signing_owner_authorized": false,
+  "signed_apk_built": false,
+  "unique_tests_this_turn": 101,
+  "optimized_runs_not_double_counted": 101,
+  "skips": 0,
+  "failures": 0,
+  "new_adapter_tests": 16,
+  "previous_207_tests_preserved_not_all_rerun": true,
+  "android_execution": false,
+  "active_contracts_unchanged": true,
+  "pr20_head": "3aaae0fc3065b631968476195da5adfd13ba95d8",
+  "pr21_head": "88f988ee844248a4513281cfe7818777fbda660e",
+  "custody_checks": {
+    "connected_secret_vault_tool_exposed": false,
+    "secret_tool_executable_available": false,
+    "keyctl_executable_available": false,
+    "gpg_available": true,
+    "owner_encryption_public_recipient_provided": false,
+    "ordinary_file_backup_is_not_assumed_a_secret_vault": true
+  },
+  "required_resource": "Owner-controlled verified public encryption recipient with recovery process, or authorized recoverable secret vault; no private key or password requested in chat"
+}

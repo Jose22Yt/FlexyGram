@@ -1,0 +1,9 @@
+{
+  "exit_code": 1,
+  "output_directory_created": false,
+  "result": {
+    "status": "BLOCKED",
+    "runtime_certified": false,
+    "reason": "Evidence or pinned auxiliary contract rejected"
+  }
+}
