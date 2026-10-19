@@ -39,7 +39,8 @@ def expected() -> tuple[dict, dict]:
     libraries = {row['library']: row['contract']['after_sha256'] for row in abi
                  if row['static_abi_pass'] is True and row['independent_build_identical'] is True}
     replacements = {row['filename']: row['sha256'] for row in wheels if row['rebuilt'] is True}
-    if set(libraries) != set(NAMES) or len(replacements) != 3:
+    if (len(abi) != len(libraries) or len(wheels) != len(replacements) or
+            set(libraries) != set(NAMES) or len(replacements) != 3):
         raise ValueError('Reviewed ELF or wheel evidence is incomplete')
     return libraries, replacements
 
@@ -81,29 +82,87 @@ def check_inputs(sources: Path, wheelhouse: Path, ndk: Path, cmake: Path) -> int
 
 
 def check_outputs(folder: Path, approved: list[dict], library_pins: dict,
-                  wheel_pins: dict) -> dict:
+                  wheel_pins: dict, replacement_sources: dict | None = None) -> dict:
+    # Every approved input must map to precisely one output. A hash match alone
+    # is insufficient if the manifest misidentifies which package was replaced.
+    approved_map = {row['filename']: row['sha256'] for row in approved}
+    if len(approved) != 18 or len(approved_map) != 18 or len(wheel_pins) != 3:
+        raise ValueError('Invalid original or replacement wheel inventory')
+    if replacement_sources is not None and set(replacement_sources) != set(wheel_pins):
+        raise ValueError('Reviewed replacement mapping is incomplete')
+
+    def safe_file(path: Path) -> bool:
+        # Reject symlinks in ancestors too: a regular ELF reached through
+        # prefix/lib -> /external is still outside the requested build.
+        try:
+            relative = path.relative_to(folder)
+        except ValueError:
+            return False
+        current = folder
+        if current.is_symlink():
+            return False
+        for part in relative.parts:
+            current = current / part
+            if current.is_symlink():
+                return False
+        return path.is_file()
+
     libs = {}
     for name in NAMES:
         candidate = folder / ('freetype-build' if name == 'libfreetype.so' else 'prefix/lib') / name
-        if candidate.is_symlink() or not candidate.is_file():
+        if not safe_file(candidate):
             raise ValueError('Missing source-rebuilt ELF ' + name)
         digest = sha(candidate)
         if digest != library_pins[name]:
             raise ValueError('Reviewed ELF SHA-256 mismatch: ' + name)
         libs[name] = digest
+    wheels_dir = folder / 'wheels'
+    if wheels_dir.is_symlink() or not wheels_dir.is_dir():
+        raise ValueError('Unsafe rebuilt wheel directory')
+    if not safe_file(folder / 'wheels-manifest.json'):
+        raise ValueError('Unsafe wheel manifest')
     manifest = load(folder / 'wheels-manifest.json')
     rows = manifest['wheels']
-    names = {row['filename'] for row in rows}
-    if len(rows) != 18 or len(names) != 18:
-        raise ValueError('Wheel manifest must contain exactly 18 unique wheels')
-    expected_names = set(wheel_pins) | {row['filename'] for row in approved if row['filename'] not in
-                    {r['original_filename'] for r in rows if r['rebuilt']}}
+    if not isinstance(rows, list) or any(not isinstance(row, dict) for row in rows):
+        raise ValueError('Malformed wheel manifest')
+    try:
+        names = {row['filename'] for row in rows}
+        original_names = [row['original_filename'] for row in rows]
+        rebuilt = [row for row in rows if row['rebuilt'] is True]
+        copied = [row for row in rows if row['rebuilt'] is False]
+    except (KeyError, TypeError):
+        raise ValueError('Malformed wheel manifest') from None
+    if len(rows) != 18 or len(names) != 18 or len(set(original_names)) != 18:
+        raise ValueError('Wheel manifest must contain exactly 18 unique wheels and origins')
+    if (set(original_names) != set(approved_map) or len(rebuilt) != 3 or
+            {row['filename'] for row in rebuilt} != set(wheel_pins) or
+            len(copied) != 15):
+        raise ValueError('Original-to-rebuilt wheel mapping is incomplete')
+    for row in rows:
+        name = row['filename']
+        source = row['original_filename']
+        if (not isinstance(name, str) or '/' in name or '\\' in name or
+                not isinstance(source, str) or source not in approved_map):
+            raise ValueError('Unsafe wheel manifest name or origin')
+        if row['rebuilt'] is True:
+            if name not in wheel_pins or source == name:
+                raise ValueError('Invalid rebuilt wheel origin')
+            if (replacement_sources is not None and
+                    replacement_sources[name] != source):
+                raise ValueError('Reviewed rebuilt wheel origin mismatch')
+        elif row['rebuilt'] is False:
+            if name != source or name in wheel_pins:
+                raise ValueError('Unmodified wheel origin mismatch')
+        else:
+            raise ValueError('Wheel rebuilt flag must be boolean')
+    expected_names = (set(approved_map) -
+                      {row['original_filename'] for row in rebuilt}) | set(wheel_pins)
     if names != expected_names:
         raise ValueError('Output wheel inventory differs from the pinned overlay')
     observed = {}
     for row in rows:
         path = folder / 'wheels' / row['filename']
-        if path.is_symlink() or not path.is_file():
+        if not safe_file(path):
             raise ValueError('Missing wheel file')
         digest = sha(path)
         if digest != row['sha256']:
@@ -146,6 +205,14 @@ def execute(args) -> dict:
     check_inputs(sources, wheelhouse, ndk, cmake)
     approved = __import__('wheelhouse').select(
         load(REPO / 'TMessagesProj/python/wheels.lock.json'), ['arm64-v8a'])
+    reviewed = load(EVIDENCE / 'wheel-reproducibility.json')['rebuilt']
+    if len(reviewed) != 3 or {row['filename'] for row in reviewed} != set(wheel_pins):
+        raise ValueError('Reviewed replacement wheel origins are incomplete')
+    replacement_sources = {row['filename']: row['original_filename'] for row in reviewed}
+    approved_pins = {row['filename']: row['sha256'] for row in approved}
+    if any(approved_pins.get(row['original_filename']) != row['original_sha256']
+           for row in reviewed):
+        raise ValueError('Reviewed original wheel SHA-256 mismatch')
     output.mkdir(parents=True)
 
     def run(stage: str, argv: list[str]) -> None:
@@ -167,7 +234,8 @@ def execute(args) -> dict:
         run(letter + '-candidates', [cmd, str(NATIVE / 'rebuild_candidates.py'), *common])
         run(letter + '-final', [cmd, str(NATIVE / 'experiment_recipe.py'), *common,
                                 '--linker', str(linker)])
-        reports.append(check_outputs(target, approved, library_pins, wheel_pins))
+        reports.append(check_outputs(target, approved, library_pins, wheel_pins,
+                                     replacement_sources))
     if reports[0] != reports[1]:
         raise ValueError('Independent A/B native outputs differ')
     receipt = {'status': 'REPRODUCIBLE_STATIC_OUTPUTS_ONLY',
