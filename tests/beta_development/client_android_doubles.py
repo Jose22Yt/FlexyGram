@@ -1,6 +1,30 @@
 """Explicit host doubles: compile/execute beta wrappers, never Android certification."""
 from test_frame_endpoint import TREE
 STUBS={
+'android/net/Uri.java':'''package android.net;public final class Uri {
+ private final String value;private Uri(String v){value=v;}public static Uri parse(String v){return new Uri(v);}
+ public String getScheme(){int end=value.indexOf(':');return end<0?null:value.substring(0,end);}
+}''',
+'android/content/Intent.java':'''package android.content;public class Intent {
+ public static final String ACTION_CREATE_DOCUMENT="android.intent.action.CREATE_DOCUMENT",CATEGORY_OPENABLE="android.intent.category.OPENABLE",EXTRA_TITLE="android.intent.extra.TITLE",EXTRA_LOCAL_ONLY="android.intent.extra.LOCAL_ONLY";
+ public String action,type;public final java.util.Set<String> categories=new java.util.HashSet<>();
+ public final java.util.Map<String,Object> extras=new java.util.HashMap<>();private android.net.Uri data;
+ public Intent(){}public Intent(String a){action=a;}public Intent addCategory(String c){categories.add(c);return this;}public Intent setType(String t){type=t;return this;}
+ public Intent putExtra(String k,String v){extras.put(k,v);return this;}public Intent putExtra(String k,boolean v){extras.put(k,v);return this;}
+ public Intent setData(android.net.Uri v){data=v;return this;}public android.net.Uri getData(){return data;}
+}''',
+'android/content/ContentResolver.java':'''package android.content;public class ContentResolver {
+ public static final ContentResolver INSTANCE=new ContentResolver();public static boolean failOpen,failWrite,failClose;
+ public static int opens;public static byte[] saved;public static String mode;
+ public java.io.OutputStream openOutputStream(android.net.Uri uri,String value)throws java.io.IOException {
+  opens++;mode=value;if(failOpen)throw new java.io.IOException("SYNTHETIC_PRIVATE_VALUE");
+  return new java.io.ByteArrayOutputStream(){
+   @Override public void write(byte[] b,int off,int len){if(failWrite)throw new IllegalStateException("SYNTHETIC_PRIVATE_VALUE");super.write(b,off,len);}
+   @Override public void close()throws java.io.IOException{saved=toByteArray();if(failClose)throw new java.io.IOException("SYNTHETIC_PRIVATE_VALUE");super.close();}
+  };
+ }
+}''',
+
 'android/annotation/TargetApi.java':'package android.annotation;public @interface TargetApi {int value();}',
 'android/os/Build.java':'package android.os;public final class Build {public static final class VERSION {public static int SDK_INT=24;}}',
 'android/window/OnBackInvokedCallback.java':'package android.window;public interface OnBackInvokedCallback {void onBackInvoked();}',
@@ -25,13 +49,16 @@ public class OnBackInvokedDispatcher {
  public void putInt(String key,int value){values.put(key,value);}public void putBoolean(String key,boolean value){values.put(key,value);}
  public void putString(String key,String value){values.put(key,value);}public Object get(String key){return values.get(key);}
 }''',
-'android/content/Context.java':'''package android.content; public class Context {public Context getApplicationContext(){return this;}public java.io.File getFilesDir(){return new java.io.File(System.getProperty("java.io.tmpdir"),"synthetic-beta-files");}}''',
+'android/content/Context.java':'''package android.content; public class Context {public Context getApplicationContext(){return this;}public java.io.File getFilesDir(){return new java.io.File(System.getProperty("java.io.tmpdir"),"synthetic-beta-files");}public ContentResolver getContentResolver(){return ContentResolver.INSTANCE;}}''',
 'android/app/Activity.java':'''package android.app;
 public class Activity extends android.content.Context {
  public static final java.util.Queue<Runnable> ui=new java.util.concurrent.ConcurrentLinkedQueue<>();
  public static final java.util.concurrent.CountDownLatch posted=new java.util.concurrent.CountDownLatch(1);
  private boolean finishing,destroyed;public boolean changingConfigurations;public android.view.View content;
  protected void onCreate(android.os.Bundle b){}protected void onResume(){}protected void onPause(){}protected void onDestroy(){destroyed=true;}
+ public static final int RESULT_OK=-1,RESULT_CANCELED=0;public android.content.Intent picker;public int pickerCode;public boolean pickerUnavailable;
+ public void startActivityForResult(android.content.Intent i,int code){if(pickerUnavailable)throw new IllegalStateException("SYNTHETIC_PRIVATE_VALUE");picker=i;pickerCode=code;}
+ protected void onActivityResult(int code,int result,android.content.Intent i){}
  protected void onSaveInstanceState(android.os.Bundle b){}public void saveState(android.os.Bundle b){onSaveInstanceState(b);}
  public boolean isChangingConfigurations(){return changingConfigurations;}
  public final android.window.OnBackInvokedDispatcher dispatcher=new android.window.OnBackInvokedDispatcher(this::finish);
