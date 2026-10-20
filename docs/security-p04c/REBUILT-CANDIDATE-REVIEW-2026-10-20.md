@@ -62,11 +62,11 @@ y no necesita cuentas ni conexión de red.
 
 ### Tests obligatorios añadidos
 
-tests/native_compatibility/test_rebuilt_candidate_review.py aporta **24 tests
+tests/native_compatibility/test_rebuilt_candidate_review.py aporta **27 tests
 sintéticos** (sin APK real), incluyendo cambios de recibos, JNI, historial,
 guardas, alcance prohibido, omisión de tests, ZIP, firma JAR, symlinks,
 ELF 4KB-only, duplicados e inventario físico, más una vía positiva de 97 ELF.
-El gate run_gate.py requiere ahora **255 tests mínimos**, sin omisiones,
+El gate run_gate.py requiere ahora **258 tests mínimos**, sin omisiones,
 fallos, errores o expectedFailure.
 
 Comandos de Work:
@@ -74,11 +74,11 @@ Comandos de Work:
     python3.11 -B -m unittest discover -s tests/native_compatibility -p test_rebuilt_candidate_review.py -v
     python3.11 -B -O -m unittest discover -s tests/native_compatibility -p test_rebuilt_candidate_review.py -v
     # En checkout con JDK21 y recursos externos PR20/21 fijados:
-    python3.11 -B tests/native_compatibility/run_gate.py --output /private/native-255.json
-    python3.11 -B -O tests/native_compatibility/run_gate.py --output /private/native-255-opt.json
+    python3.11 -B tests/native_compatibility/run_gate.py --output /private/native-258.json
+    python3.11 -B -O tests/native_compatibility/run_gate.py --output /private/native-258-opt.json
 
 Las rutas /private son ejemplos. Se necesitan las variables/archivos fijados
-en WORK-CONTINUATION-2026-10-20.md. Las 24 regresiones se han **guardado
+en WORK-CONTINUATION-2026-10-20.md. Las 27 regresiones se han **guardado
 en GitHub, pero no ejecutado oficialmente desde este chat**. No contar como PASS
 antes de la reejecución auténtica en checkout completo.
 
