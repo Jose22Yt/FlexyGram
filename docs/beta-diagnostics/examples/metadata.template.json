@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "client": "FlexyGram",
+  "apk_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "source": "synthetic",
+  "run_id": "SYNTHETIC_EXAMPLE",
+  "repetition": 0,
+  "conditions": {
+    "device_id": null,
+    "android_api": null,
+    "page_bytes": null,
+    "refresh_hz": null,
+    "resolution": null,
+    "build_type": null,
+    "scenario": null,
+    "dataset_id": null,
+    "cache_state": null,
+    "thermal_state": null,
+    "charging": null,
+    "power_save": null,
+    "animation_scales": null,
+    "navigation": null,
+    "theme": null,
+    "event_endpoint": null,
+    "protocol": null,
+    "observer_lost_events": null
+  }
+}

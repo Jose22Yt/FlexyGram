@@ -535,7 +535,7 @@ public class NotificationCenter {
         }
         if (minTime != Long.MAX_VALUE) {
             long time = EXPIRE_NOTIFICATIONS_TIME - (currentTime - minTime);
-            AndroidUtilities.runOnUIThread(() -> checkForExpiredNotifications = this::checkForExpiredNotifications, Math.max(17, time));
+            AndroidUtilities.runOnUIThread(checkForExpiredNotifications = this::checkForExpiredNotifications, Math.max(17, time));
         }
     }
 
