@@ -7,7 +7,7 @@
   "exception_available": false,
   "root_cause_confirmed": false,
   "execution_environment": "unavailable",
-  "host_regressions_prepared": 7,
+  "host_regressions_prepared": 9,
   "host_tests_executed": 0,
   "host_tests_passed": null,
   "host_tests_failed": null,

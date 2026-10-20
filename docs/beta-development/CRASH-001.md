@@ -52,9 +52,10 @@ Su sustituto de ThemePreviewMessagesCell lanza un error si se invoca; UserConfig
 rechaza sesiones y JNI/Python se declaran no disponibles. Esto comprueba el
 aislamiento en el host cuando se ejecute, **no reproduce el fallo Android**.
 
-Siete casos: abrir/volver sin cuenta, contenido sin runtimes opcionales,
+Nueve casos (incluidos dos del commit de insets): abrir/volver sin cuenta, contenido sin runtimes opcionales,
 25 ciclos, toques rápidos/Atrás durante transición, temas claro/oscuro,
-recreación y ausencia de imports de cuenta/runtime en la vista.
+recreación, ausencia de imports de cuenta/runtime en la vista, redispatch de
+insets/IME y cabeceras sin doble margen.
 No se omiten pruebas cuando falta JDK: fallan por requisito ausente.
 
 Pendiente en un host con Python 3.11 y JAVA_HOME=JDK21:
@@ -76,3 +77,17 @@ volver, repetir, Atrás durante apertura, alternar tema y recrear/reabrir Activi
 Confirmar que no termina el proceso y que hay contenido. Capturas/grabación
 permiten reportar el resultado; un cierre persistente requiere evidencia de
 excepción disponible por un mecanismo autorizado, sin exigir ADB al usuario.
+
+## Insets, commit separado
+
+El host de beta ahora envuelve ActionBarLayout en un FrameLayout que aplica
+systemBars/displayCutout mediante AndroidX existente. Devuelve los insets
+restantes para mantener el tratamiento de IME por ActionBarLayout.
+Las tres cabeceras desactivan occupyStatusBar: una sola capa posee el margen.
+El padding es absoluto, se sustituye al redispatch y no se acumula.
+
+No se cambia el manifiesto, flags de ventana, gestos ni motor de navegación.
+Los dobles sólo prueban aritmética y configuración de cabeceras, no el despacho
+real de ventanas ni la apariencia en Android 17. Pendiente comprobar gestos,
+recortes, rotación y ambas paletas en el dispositivo. Este segundo commit puede
+revisarse/aplicarse por separado sin retrasar el parche de la conversación.

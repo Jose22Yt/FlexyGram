@@ -83,7 +83,34 @@ public final class OfflineConversationHarness {
         owner.onCreate(null); owner.onResume();
         try {
             ActionBarLayout nav = navigation(owner);
-            if (args[0].equals("standalone")) {
+            if (args[0].equals("insets")) {
+                need(owner.content instanceof android.widget.FrameLayout, "missing inset root");
+                need(((android.widget.FrameLayout) owner.content).children.get(0) == nav,
+                        "navigation replaced instead of wrapped");
+                androidx.core.view.WindowInsetsCompat incoming =
+                        new androidx.core.view.WindowInsetsCompat(7, 31, 9, 24, 300);
+                androidx.core.view.WindowInsetsCompat remaining =
+                        androidx.core.view.ViewCompat.dispatch(owner.content, incoming);
+                need(java.util.Arrays.equals(owner.content.padding, new int[]{7,31,9,24}),
+                        "system bars/cutout not applied");
+                need(remaining.bars.top == 0 && remaining.bars.bottom == 0 && remaining.ime == 276,
+                        "insets consumed twice or IME discarded");
+                androidx.core.view.ViewCompat.dispatch(owner.content, incoming);
+                need(owner.content.padding[1] == 31, "repeated insets accumulated");
+                androidx.core.view.ViewCompat.dispatch(owner.content,
+                        new androidx.core.view.WindowInsetsCompat(0,0,0,0,0));
+                need(java.util.Arrays.equals(owner.content.padding, new int[]{0,0,0,0}),
+                        "old insets retained");
+            } else if (args[0].equals("headers")) {
+                need(!nav.getLastFragment().getActionBar().occupyStatusBar, "home retained legacy top inset");
+                open(owner, 0); conversation(nav);
+                need(!nav.getLastFragment().getActionBar().occupyStatusBar, "chat retained legacy top inset");
+                back(owner); open(owner, 1);
+                need(!nav.getLastFragment().getActionBar().occupyStatusBar, "settings retained legacy top inset");
+                nav.rebuildAllFragmentViews(true, true);
+                need(!nav.getLastFragment().getActionBar().occupyStatusBar, "recreated header duplicated inset");
+                back(owner);
+            } else if (args[0].equals("standalone")) {
                 need(new OfflineConversationView(new android.content.Context(), false).children.size() == 1,
                         "standalone content missing");
                 need(new OfflineConversationView(new android.content.Context(), true).children.size() == 1,
@@ -195,6 +222,12 @@ class OfflineConversationTests(unittest.TestCase):
 
     def test_recreate_activity_restores_account_free_conversation(self):
         self.run_scenario("recreate")
+
+    def test_system_bars_cutout_and_remaining_ime_insets(self):
+        self.run_scenario("insets")
+
+    def test_all_headers_use_only_root_inset_after_recreation(self):
+        self.run_scenario("headers")
 
     def test_view_has_no_telegram_or_optional_runtime_imports(self):
         source = (SOURCE / "OfflineConversationView.java").read_text(encoding="utf-8")

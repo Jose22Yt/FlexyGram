@@ -7,6 +7,8 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.core.view.ViewCompat;
+
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.BuildConfig;
 import org.telegram.messenger.BuildVariantPolicy;
@@ -71,7 +73,9 @@ public final class BetaPreviewActivity extends Activity {
         ownedTheme = Theme.getCurrentTheme();
         navigation = new ActionBarLayout(this, false);
         navigation.setFragmentStack(new ArrayList<>());
-        setContentView(navigation);
+        View insetRoot = BetaSystemInsets.wrap(this, navigation);
+        setContentView(insetRoot);
+        ViewCompat.requestApplyInsets(insetRoot);
         events = new NavigationEvents(4096, System::nanoTime);
         requests = new BetaNavigation(new LatestNavigation.Scheduler() {
             @Override public void postFrame(Runnable action) { navigation.postOnAnimation(action); }
@@ -174,6 +178,7 @@ public final class BetaPreviewActivity extends Activity {
 
     private final class Routes extends Scene {
         @Override public View createView(Context context) {
+            actionBar.setOccupyStatusBar(false);
             actionBar.setTitle("FlexyGram · Offline Development");
             LinearLayout list = list(context);
             DialogCell dialog = new DialogCell(null, context, false, false);
@@ -298,6 +303,7 @@ public final class BetaPreviewActivity extends Activity {
     }
 
     private void back(BaseFragment fragment, String title) {
+        fragment.getActionBar().setOccupyStatusBar(false);
         fragment.getActionBar().setTitle(title);
         fragment.getActionBar().setBackButtonImage(org.telegram.messenger.R.drawable.ic_ab_back);
         fragment.getActionBar().setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick() {

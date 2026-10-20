@@ -70,7 +70,7 @@ public class View {
 'org/telegram/messenger/NativeLoader.java':'package org.telegram.messenger;public class NativeLoader {public static boolean ready=true;public static boolean loaded(){return ready;}}',
 'org/telegram/messenger/R.java':'package org.telegram.messenger;public class R {public static class drawable {public static final int ic_ab_back=1;}}',
 'org/telegram/ui/ActionBar/ActionBar.java':'''package org.telegram.ui.ActionBar;public class ActionBar {public static class ActionBarMenuOnItemClick {public void onItemClick(int id){}}
- public void setTitle(String s){}public void setBackButtonImage(int i){}public void setActionBarMenuOnItemClick(ActionBarMenuOnItemClick c){}}''',
+ public boolean occupyStatusBar=true;public void setOccupyStatusBar(boolean value){occupyStatusBar=value;}public void setTitle(String s){}public void setBackButtonImage(int i){}public void setActionBarMenuOnItemClick(ActionBarMenuOnItemClick c){}}''',
 'org/telegram/ui/ActionBar/BaseFragment.java':'''package org.telegram.ui.ActionBar;public class BaseFragment {
  protected android.view.View fragmentView;protected ActionBar actionBar=new ActionBar();public ActionBarLayout parent;
  public android.view.View createView(android.content.Context c){return fragmentView=new android.view.View(c);}
@@ -116,4 +116,26 @@ STUBS.update({
  'android/content/res/Resources.java': 'package android.content.res;public class Resources {public android.util.DisplayMetrics getDisplayMetrics(){return new android.util.DisplayMetrics();}}',
  'android/view/Gravity.java': 'package android.view;public class Gravity {public static final int START=8388611,END=8388613;}',
  'android/graphics/drawable/GradientDrawable.java': 'package android.graphics.drawable;public class GradientDrawable {public int color;public float radius;public void setColor(int c){color=c;}public void setCornerRadius(float r){radius=r;}}',
+})
+
+# Insets are explicit host doubles, not a simulation of Android's window manager.
+STUBS.update({
+ 'android/widget/FrameLayout.java': 'package android.widget;public class FrameLayout extends LinearLayout {public FrameLayout(android.content.Context c){super(c);}}',
+ 'androidx/core/graphics/Insets.java': 'package androidx.core.graphics;public class Insets {public final int left,top,right,bottom;public Insets(int l,int t,int r,int b){left=l;top=t;right=r;bottom=b;}}',
+ 'androidx/core/view/WindowInsetsCompat.java': '''package androidx.core.view;
+ public class WindowInsetsCompat {
+  public final androidx.core.graphics.Insets bars;public final int ime;
+  public WindowInsetsCompat(int l,int t,int r,int b,int keyboard){bars=new androidx.core.graphics.Insets(l,t,r,b);ime=keyboard;}
+  public static class Type {public static int systemBars(){return 1;}public static int displayCutout(){return 2;}}
+  public androidx.core.graphics.Insets getInsets(int type){if(type!=3)throw new AssertionError("wrong inset types");return bars;}
+  public WindowInsetsCompat inset(int l,int t,int r,int b){return new WindowInsetsCompat(Math.max(0,bars.left-l),Math.max(0,bars.top-t),Math.max(0,bars.right-r),Math.max(0,bars.bottom-b),Math.max(0,ime-b));}
+ }''',
+ 'androidx/core/view/ViewCompat.java': '''package androidx.core.view;
+ public class ViewCompat {
+  public interface Listener {WindowInsetsCompat apply(android.view.View view,WindowInsetsCompat insets);}
+  private static final java.util.Map<android.view.View,Listener> listeners=new java.util.WeakHashMap<>();
+  public static void setOnApplyWindowInsetsListener(android.view.View view,Listener listener){listeners.put(view,listener);}
+  public static void requestApplyInsets(android.view.View view){}
+  public static WindowInsetsCompat dispatch(android.view.View view,WindowInsetsCompat insets){return listeners.get(view).apply(view,insets);}
+ }''',
 })
