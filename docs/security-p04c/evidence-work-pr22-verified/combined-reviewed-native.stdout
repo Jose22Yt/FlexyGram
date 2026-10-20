@@ -1,0 +1,21 @@
+{"status": "BLOCKED", "error_class": "ValueError", "signed": false, "android_runtime_validated": false}
+{"status": "BLOCKED_UNSIGNED_V2_DRAFT_NOT_LAB_CONTRACT", "signed": false, "android_runtime_validated": false, "output_written": true}
+{"status": "BLOCKED", "error_class": "ValueError", "signed": false, "android_runtime_validated": false}
+{"status": "BLOCKED", "error_class": "ValueError", "blocker": "VERIFICATION_FAILED", "signed": false, "android_runtime_validated": false}
+{"status": "BLOCKED", "blocker": "CANDIDATE_METADATA_OR_BYTES_UNVERIFIED", "error_class": "ValueError", "signed": false, "android_runtime_validated": false, "distribution_allowed": false}
+{"status": "BLOCKED", "error_class": "ValueError", "android_runtime_validated": false}
+{"status": "BLOCKED", "error_class": "ValueError", "signed_apk_sha256": null, "android_runtime_validated": false}
+{
+  "discovery_incomplete": false,
+  "errors": 0,
+  "expected_failures": 0,
+  "failures": 0,
+  "gate": "P0.4c Python offline native-compatibility",
+  "limits": "Python unittest only; not an Android build, runtime, API24, or 16KB certification",
+  "minimum_required": 318,
+  "passed": 318,
+  "skipped": 0,
+  "status": "PASS",
+  "tests_run": 318,
+  "unexpected_successes": 0
+}
