@@ -43,6 +43,15 @@ def main(argv=None):
     args = parser.parse_args(argv)
     suite_dir = Path(__file__).resolve().parent
     summary = run_suite(suite_dir)
+    # Scope includes historical native tests and the 21 new unsigned evidence/
+    # actual-APK regression cases. Never silently pass a partial discovery.
+    minimum_tests = 200
+    summary['minimum_required'] = minimum_tests
+    if summary['tests_run'] < minimum_tests:
+        summary['status'] = 'BLOCKED'
+        summary['discovery_incomplete'] = True
+    else:
+        summary['discovery_incomplete'] = False
     payload = json.dumps(summary, indent=2, sort_keys=True) + '\n'
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)
