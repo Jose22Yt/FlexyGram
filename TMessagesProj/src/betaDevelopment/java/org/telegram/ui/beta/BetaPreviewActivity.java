@@ -56,10 +56,8 @@ public final class BetaPreviewActivity extends Activity {
             if (requests != null) requestClose(); else finish();
         });
         systemBack.register();
-        try {
-            ApplicationLoader.postInitApplication();
-        } catch (RuntimeException | LinkageError initializationFailure) {
-            // Stop here: partially initialized client components must not be constructed.
+        if (!BetaPostInit.ensure(ApplicationLoader::postInitApplication)) {
+            // A failed post-init stays blocked across Activity recreation in this process.
             // Application.onCreate/ART failures before this Activity remain outside this boundary.
             TextView failure = new TextView(this);
             failure.setText("FlexyGram offline startup stopped: POST_INIT_FAILED");
