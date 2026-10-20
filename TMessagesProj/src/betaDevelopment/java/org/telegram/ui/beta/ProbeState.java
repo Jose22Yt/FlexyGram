@@ -1,12 +1,24 @@
 package org.telegram.ui.beta;
 
-/** Activity-owned local runtime result. Recreated views read state, never receive stale cell callbacks. */
+/** Activity-local observations, never serialized as proof of runtime initialization after process death. */
 final class ProbeState {
     enum Value { IDLE, RUNNING, READY, FAILED }
+    enum Outcome { READY, JNI_UNAVAILABLE, PYTHON_START_FAILED, PYTHON_IMPORT_FAILED }
     private Value value = Value.IDLE;
+    private Outcome outcome;
     private boolean closed;
     Value value() { return value; }
-    boolean begin() { if (closed || value == Value.RUNNING) return false; value = Value.RUNNING; return true; }
-    boolean finish(boolean success) { if (closed) return false; value = success ? Value.READY : Value.FAILED; return true; }
+    Outcome outcome() { return outcome; }
+    boolean begin() {
+        if (closed || value == Value.RUNNING) return false;
+        outcome = null; value = Value.RUNNING; return true;
+    }
+    boolean finish(boolean success) { return finish(success ? Outcome.READY : Outcome.PYTHON_IMPORT_FAILED); }
+    boolean finish(Outcome result) {
+        if (closed) return false;
+        outcome = java.util.Objects.requireNonNull(result);
+        value = result == Outcome.READY ? Value.READY : Value.FAILED;
+        return true;
+    }
     void close() { closed = true; }
 }

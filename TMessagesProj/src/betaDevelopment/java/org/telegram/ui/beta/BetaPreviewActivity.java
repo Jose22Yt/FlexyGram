@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.TextView;
 
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.BuildConfig;
@@ -26,7 +27,7 @@ import java.util.concurrent.Executors;
 /** Offline synthetic routes using real client cells/navigation, never an account or session. */
 public final class BetaPreviewActivity extends Activity {
     private ActionBarLayout navigation;
-    private Theme.ThemeInfo initialTheme;
+    private Theme.ThemeInfo initialTheme, ownedTheme;
     private BetaNavigation requests;
     private NavigationEvents events;
     private SceneFrameObserver frameObserver;
@@ -49,8 +50,23 @@ public final class BetaPreviewActivity extends Activity {
             finish();
             return;
         }
-        ApplicationLoader.postInitApplication();
+        try {
+            ApplicationLoader.postInitApplication();
+        } catch (RuntimeException | LinkageError initializationFailure) {
+            // Stop here: partially initialized client components must not be constructed.
+            // Application.onCreate/ART failures before this Activity remain outside this boundary.
+            TextView failure = new TextView(this);
+            failure.setText("FlexyGram offline startup stopped: POST_INIT_FAILED");
+            setContentView(failure);
+            return;
+        }
         initialTheme = Theme.getCurrentTheme();
+        BetaUiState restored = BetaUiState.restore(state, Theme.isCurrentThemeDark());
+        if (restored.dark != Theme.isCurrentThemeDark()) {
+            Theme.ThemeInfo next = Theme.getTheme(restored.dark ? "Dark Blue" : "Blue");
+            if (next != null) Theme.applyTheme(next, false, false);
+        }
+        ownedTheme = Theme.getCurrentTheme();
         navigation = new ActionBarLayout(this, false);
         navigation.setFragmentStack(new ArrayList<>());
         setContentView(navigation);
@@ -80,6 +96,7 @@ public final class BetaPreviewActivity extends Activity {
                         Theme.ThemeInfo next = Theme.getTheme(destination == BetaNavigation.Destination.DARK ? "Dark Blue" : "Blue");
                         if (next == null) return false;
                         Theme.applyTheme(next, false, false);
+                        ownedTheme = Theme.getCurrentTheme();
                         navigation.rebuildAllFragmentViews(true, true);
                         return true;
                     default: return false;
@@ -103,6 +120,8 @@ public final class BetaPreviewActivity extends Activity {
             }
         }, events);
         navigation.addFragmentToStack(new Routes());
+        if (restored.route == BetaUiState.Route.CONVERSATION) navigation.addFragmentToStack(new Conversation());
+        else if (restored.route == BetaUiState.Route.SETTINGS) navigation.addFragmentToStack(new Settings());
         navigation.showLastFragment();
         requests.startup();
     }
@@ -119,13 +138,23 @@ public final class BetaPreviewActivity extends Activity {
     private void requestClose() {
         requests.request(BetaNavigation.Destination.BACK, navigation.getLastFragment() instanceof Conversation);
     }
+    @Override protected void onSaveInstanceState(Bundle state) {
+        super.onSaveInstanceState(state);
+        if (navigation == null) return;
+        BaseFragment visible = navigation.getLastFragment();
+        BetaUiState.Route route = visible instanceof Conversation ? BetaUiState.Route.CONVERSATION
+                : visible instanceof Settings ? BetaUiState.Route.SETTINGS : BetaUiState.Route.HOME;
+        new BetaUiState(route, Theme.isCurrentThemeDark()).save(state);
+    }
     @Override protected void onDestroy() {
         if (requests != null) requests.close();
         probe.close();
         probeCell = null; exportCell = null;
         localRuntime.shutdownNow();
         if (navigation != null) navigation.removeAllFragments();
-        if (initialTheme != null) Theme.applyTheme(initialTheme, false, false);
+        // A config restart keeps its theme; an unrelated owner must not be overwritten on destruction.
+        if (!isChangingConfigurations() && initialTheme != null && ownedTheme == Theme.getCurrentTheme())
+            Theme.applyTheme(initialTheme, false, false);
         super.onDestroy();
     }
 
@@ -202,8 +231,14 @@ public final class BetaPreviewActivity extends Activity {
         String value;
         switch (probe.value()) {
             case RUNNING: value = "Initializing locally"; break;
-            case READY: value = "JNI and Python initialized; plugins disabled"; break;
-            case FAILED: value = "Initialization blocked"; break;
+            case READY: value = "Python initialized; JNI loaded; sys imported; plugins disabled"; break;
+            case FAILED:
+                switch (probe.outcome()) {
+                    case JNI_UNAVAILABLE: value = "JNI not loaded"; break;
+                    case PYTHON_START_FAILED: value = "Python start failed"; break;
+                    default: value = "Python import failed";
+                }
+                break;
             default: value = "Tap to initialize without plugins";
         }
         probeCell.setEnabled(probe.value() != ProbeState.Value.RUNNING);
@@ -215,17 +250,17 @@ public final class BetaPreviewActivity extends Activity {
         final Context application = getApplicationContext();
         final WeakReference<BetaPreviewActivity> owner = new WeakReference<>(this);
         localRuntime.execute(() -> {
-            final boolean success = LocalPythonProbe.run(application);
-            postProbeResult(owner, success);
+            final ProbeState.Outcome result = LocalPythonProbe.inspect(application);
+            postProbeResult(owner, result);
         });
     }
-    private static void postProbeResult(WeakReference<BetaPreviewActivity> owner, boolean success) {
+    private static void postProbeResult(WeakReference<BetaPreviewActivity> owner, ProbeState.Outcome result) {
         BetaPreviewActivity activity = owner.get();
         if (activity == null) return;
         activity.runOnUiThread(() -> {
             BetaPreviewActivity current = owner.get();
             if (current == null || current.isFinishing() || current.isDestroyed()) return;
-            if (current.probe.finish(success)) current.renderProbe();
+            if (current.probe.finish(result)) current.renderProbe();
         });
     }
     private void renderExport() {

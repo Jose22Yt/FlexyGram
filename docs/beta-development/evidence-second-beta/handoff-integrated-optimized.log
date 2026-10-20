@@ -1,0 +1,26 @@
+test_beta_package_is_independent (test_diagnostics.DiagnosticsAdapterTests.test_beta_package_is_independent) ... ok
+test_modified_or_missing_pr24_source_is_not_executed (test_diagnostics.DiagnosticsAdapterTests.test_modified_or_missing_pr24_source_is_not_executed) ... ok
+test_archive_inventory_cannot_smuggle_private_members (test_handoff.HandoffTests.test_archive_inventory_cannot_smuggle_private_members) ... ok
+test_corrupt_restored_bytes_fail (test_handoff.HandoffTests.test_corrupt_restored_bytes_fail) ... ok
+test_digest_and_inventory_precheck_only (test_handoff.HandoffTests.test_digest_and_inventory_precheck_only) ... ok
+test_existing_archive_wrong_payload_or_unsafe_path_blocks (test_handoff.HandoffTests.test_existing_archive_wrong_payload_or_unsafe_path_blocks) ... ok
+test_existing_work_archive_inventory_without_extracting (test_handoff.HandoffTests.test_existing_work_archive_inventory_without_extracting) ... ok
+test_gate_delegates_full_review_and_checks_version (test_handoff.HandoffTests.test_gate_delegates_full_review_and_checks_version) ... ok
+test_missing_file_is_never_a_success (test_handoff.HandoffTests.test_missing_file_is_never_a_success) ... ok
+test_missing_or_empty_required_resources (test_handoff.HandoffTests.test_missing_or_empty_required_resources) ... ok
+test_path_traversal_and_duplicate_members_blocked (test_handoff.HandoffTests.test_path_traversal_and_duplicate_members_blocked) ... ok
+test_receipt_cannot_substitute_other_apk (test_handoff.HandoffTests.test_receipt_cannot_substitute_other_apk) ... ok
+test_roundtrip_bundle_after_independent_copy (test_handoff.HandoffTests.test_roundtrip_bundle_after_independent_copy) ... ok
+test_signed_jar_is_not_accepted_for_unsigned_handoff (test_handoff.HandoffTests.test_signed_jar_is_not_accepted_for_unsigned_handoff) ... ok
+test_subprocess_failure_cannot_leave_old_pass_or_print_private_output (test_handoff.HandoffTests.test_subprocess_failure_cannot_leave_old_pass_or_print_private_output) ... ok
+test_wrong_hash_blocks_before_importing_review_tools (test_handoff.HandoffTests.test_wrong_hash_blocks_before_importing_review_tools) ... ok
+test_arbitrary_launcher_category_is_rejected (test_manifest.ManifestRegressionTests.test_arbitrary_launcher_category_is_rejected) ... ok
+test_current_optional_multiwindow_category_remains_compatible (test_manifest.ManifestRegressionTests.test_current_optional_multiwindow_category_remains_compatible) ... ok
+test_missing_launcher_category_must_fail (test_manifest.ManifestRegressionTests.test_missing_launcher_category_must_fail) ... ok
+test_valid_beta_launcher_contract (test_manifest.ManifestRegressionTests.test_valid_beta_launcher_contract) ... ok
+test_wrong_application_initializer_must_fail (test_manifest.ManifestRegressionTests.test_wrong_application_initializer_must_fail) ... ok
+
+----------------------------------------------------------------------
+Ran 21 tests in 0.023s
+
+OK

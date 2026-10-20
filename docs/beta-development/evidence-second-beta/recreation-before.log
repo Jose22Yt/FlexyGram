@@ -1,0 +1,81 @@
+test_conversation_and_settings_survive_activity_recreation (test_recreation_startup.RecreationStartupTests.test_conversation_and_settings_survive_activity_recreation) ...
+  test_conversation_and_settings_survive_activity_recreation (test_recreation_startup.RecreationStartupTests.test_conversation_and_settings_survive_activity_recreation) (route='conversation') ... FAIL
+  test_conversation_and_settings_survive_activity_recreation (test_recreation_startup.RecreationStartupTests.test_conversation_and_settings_survive_activity_recreation) (route='settings') ... FAIL
+test_dark_theme_survives_configuration_and_external_theme_is_preserved (test_recreation_startup.RecreationStartupTests.test_dark_theme_survives_configuration_and_external_theme_is_preserved) ...
+  test_dark_theme_survives_configuration_and_external_theme_is_preserved (test_recreation_startup.RecreationStartupTests.test_dark_theme_survives_configuration_and_external_theme_is_preserved) (scenario='dark') ... FAIL
+  test_dark_theme_survives_configuration_and_external_theme_is_preserved (test_recreation_startup.RecreationStartupTests.test_dark_theme_survives_configuration_and_external_theme_is_preserved) (scenario='foreign') ... FAIL
+test_failed_post_init_is_reported_without_building_client_views (test_recreation_startup.RecreationStartupTests.test_failed_post_init_is_reported_without_building_client_views) ... FAIL
+
+======================================================================
+FAIL: test_conversation_and_settings_survive_activity_recreation (test_recreation_startup.RecreationStartupTests.test_conversation_and_settings_survive_activity_recreation) (route='conversation')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/6fe2cd15bb66/client/tests/beta_development/test_recreation_startup.py", line 61, in test_conversation_and_settings_survive_activity_recreation
+    with self.subTest(route=name):self.run_scenario(name)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/6fe2cd15bb66/client/tests/beta_development/test_recreation_startup.py", line 58, in run_scenario
+    self.assertEqual(p.returncode,0,p.stderr)
+AssertionError: 1 != 0 : Exception in thread "main" java.lang.AssertionError: UI_STATE_NOT_RESTORED
+	at org.telegram.ui.beta.RestartHarness.need(RestartHarness.java:4)
+	at org.telegram.ui.beta.RestartHarness.main(RestartHarness.java:27)
+
+
+======================================================================
+FAIL: test_conversation_and_settings_survive_activity_recreation (test_recreation_startup.RecreationStartupTests.test_conversation_and_settings_survive_activity_recreation) (route='settings')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/6fe2cd15bb66/client/tests/beta_development/test_recreation_startup.py", line 61, in test_conversation_and_settings_survive_activity_recreation
+    with self.subTest(route=name):self.run_scenario(name)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/6fe2cd15bb66/client/tests/beta_development/test_recreation_startup.py", line 58, in run_scenario
+    self.assertEqual(p.returncode,0,p.stderr)
+AssertionError: 1 != 0 : Exception in thread "main" java.lang.AssertionError: UI_STATE_NOT_RESTORED
+	at org.telegram.ui.beta.RestartHarness.need(RestartHarness.java:4)
+	at org.telegram.ui.beta.RestartHarness.main(RestartHarness.java:27)
+
+
+======================================================================
+FAIL: test_dark_theme_survives_configuration_and_external_theme_is_preserved (test_recreation_startup.RecreationStartupTests.test_dark_theme_survives_configuration_and_external_theme_is_preserved) (scenario='dark')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/6fe2cd15bb66/client/tests/beta_development/test_recreation_startup.py", line 64, in test_dark_theme_survives_configuration_and_external_theme_is_preserved
+    with self.subTest(scenario=name):self.run_scenario(name)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/6fe2cd15bb66/client/tests/beta_development/test_recreation_startup.py", line 58, in run_scenario
+    self.assertEqual(p.returncode,0,p.stderr)
+AssertionError: 1 != 0 : Exception in thread "main" java.lang.AssertionError: CONFIG_RESTART_LOST_DARK_THEME
+	at org.telegram.ui.beta.RestartHarness.need(RestartHarness.java:4)
+	at org.telegram.ui.beta.RestartHarness.main(RestartHarness.java:26)
+
+
+======================================================================
+FAIL: test_dark_theme_survives_configuration_and_external_theme_is_preserved (test_recreation_startup.RecreationStartupTests.test_dark_theme_survives_configuration_and_external_theme_is_preserved) (scenario='foreign')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/6fe2cd15bb66/client/tests/beta_development/test_recreation_startup.py", line 64, in test_dark_theme_survives_configuration_and_external_theme_is_preserved
+    with self.subTest(scenario=name):self.run_scenario(name)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/6fe2cd15bb66/client/tests/beta_development/test_recreation_startup.py", line 58, in run_scenario
+    self.assertEqual(p.returncode,0,p.stderr)
+AssertionError: 1 != 0 : Exception in thread "main" java.lang.AssertionError: DESTROY_OVERWROTE_FOREIGN_THEME
+	at org.telegram.ui.beta.RestartHarness.need(RestartHarness.java:4)
+	at org.telegram.ui.beta.RestartHarness.main(RestartHarness.java:18)
+
+
+======================================================================
+FAIL: test_failed_post_init_is_reported_without_building_client_views (test_recreation_startup.RecreationStartupTests.test_failed_post_init_is_reported_without_building_client_views)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/6fe2cd15bb66/client/tests/beta_development/test_recreation_startup.py", line 65, in test_failed_post_init_is_reported_without_building_client_views
+    def test_failed_post_init_is_reported_without_building_client_views(self):self.run_scenario('startup')
+                                                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/6fe2cd15bb66/client/tests/beta_development/test_recreation_startup.py", line 58, in run_scenario
+    self.assertEqual(p.returncode,0,p.stderr)
+AssertionError: 1 != 0 : Exception in thread "main" java.lang.AssertionError: POST_INIT_CRASHED
+	at org.telegram.ui.beta.RestartHarness.main(RestartHarness.java:10)
+
+
+----------------------------------------------------------------------
+Ran 3 tests in 5.669s
+
+FAILED (failures=5)

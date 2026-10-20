@@ -1,0 +1,135 @@
+{
+  "base_pr23": "e50fa88e80358893d08e9901e81e3b0a74a0a54d",
+  "pr25_reviewed": "2363f38ccab1618a75fec790c04b78b6067e91bc",
+  "integration_commit": "03bd1ce719c28dc73869f01717f46e9ba013b9e2",
+  "python": "3.11.17",
+  "suites": {
+    "client": {
+      "ids": [
+        "test_activity_lifecycle.ActivityLifecycle.test_old_probe_loses_recreated_cell_new_activity_updates_current_view.test_old_probe_loses_recreated_cell_new_activity_updates_current_view",
+        "test_back_regression.BackRegression.test_back_during_transition_original_fails_corrected_queues.test_back_during_transition_original_fails_corrected_queues",
+        "test_build_profile.BuildProfileTests.test_actual_cmake_beta_scope_is_bound_to_profile.test_actual_cmake_beta_scope_is_bound_to_profile",
+        "test_build_profile.BuildProfileTests.test_actual_groovy_validator_accepts_only_closed_identity.test_actual_groovy_validator_accepts_only_closed_identity",
+        "test_build_profile.BuildProfileTests.test_protected_policies_and_historical_contract_are_unchanged.test_protected_policies_and_historical_contract_are_unchanged",
+        "test_client_events.ClientEventsTests.test_blocked_writer_does_not_block_ui_and_second_consumer_rejected.test_blocked_writer_does_not_block_ui_and_second_consumer_rejected",
+        "test_client_events.ClientEventsTests.test_clock_regression_and_thread_ownership.test_clock_regression_and_thread_ownership",
+        "test_client_events.ClientEventsTests.test_close_after_open_waits_and_completes.test_close_after_open_waits_and_completes",
+        "test_client_events.ClientEventsTests.test_export_is_background_private_and_never_overwrites.test_export_is_background_private_and_never_overwrites",
+        "test_client_events.ClientEventsTests.test_interoperability_with_pinned_work1_analyzer.test_interoperability_with_pinned_work1_analyzer",
+        "test_client_events.ClientEventsTests.test_overflow_cannot_change_navigation.test_overflow_cannot_change_navigation",
+        "test_client_events.ClientEventsTests.test_probe_state_recreated_view_and_destroy.test_probe_state_recreated_view_and_destroy",
+        "test_client_events.ClientEventsTests.test_replace_pause_reentry_and_closed_owner.test_replace_pause_reentry_and_closed_owner",
+        "test_client_events.ClientEventsTests.test_theme_replacement_uses_only_latest_explicit_target.test_theme_replacement_uses_only_latest_explicit_target",
+        "test_client_events.ClientEventsTests.test_writer_failure_is_not_loss_free.test_writer_failure_is_not_loss_free",
+        "test_frame_endpoint.FrameEndpointTests.test_predraw_frame_cancel_and_timeout_real_observer.test_predraw_frame_cancel_and_timeout_real_observer",
+        "test_navigation_queue.NavigationQueueTests.test_bounded_latest_request_reentrancy_and_lifecycle.test_bounded_latest_request_reentrancy_and_lifecycle",
+        "test_notification_expiry.NotificationExpiry.test_original_callback_bug_and_actual_corrected_method.test_original_callback_bug_and_actual_corrected_method",
+        "test_recreation_startup.RecreationStartupTests.test_conversation_and_settings_survive_activity_recreation.test_conversation_and_settings_survive_activity_recreation",
+        "test_recreation_startup.RecreationStartupTests.test_dark_theme_survives_configuration_and_external_theme_is_preserved.test_dark_theme_survives_configuration_and_external_theme_is_preserved",
+        "test_recreation_startup.RecreationStartupTests.test_failed_post_init_is_reported_without_building_client_views.test_failed_post_init_is_reported_without_building_client_views",
+        "test_transition_ownership.TransitionOwnershipTests.test_historical_method_reproduces_lost_callback.test_historical_method_reproduces_lost_callback",
+        "test_transition_ownership.TransitionOwnershipTests.test_real_method_preserves_reentrant_work.test_real_method_preserves_reentrant_work",
+        "test_ui_state_probe.UiStateProbeTests.test_jni_start_import_and_success_stages_without_private_error_output.test_jni_start_import_and_success_stages_without_private_error_output",
+        "test_ui_state_probe.UiStateProbeTests.test_saved_state_is_primitive_allowlist_and_never_runtime_or_credentials.test_saved_state_is_primitive_allowlist_and_never_runtime_or_credentials"
+      ],
+      "modes": {
+        "normal": {
+          "passed": 25,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "sha256": "7a586bf8de89c00b775fbb19a15c40fc5ad0819726d9e9acfc48a191c657a6bf"
+        },
+        "optimized": {
+          "passed": 25,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "sha256": "506359ff9df1e28d8959ea34065f54a71b9781e026d656472acb338c660aef9a"
+        }
+      }
+    },
+    "handoff": {
+      "ids": [
+        "test_diagnostics.DiagnosticsAdapterTests.test_beta_package_is_independent.test_beta_package_is_independent",
+        "test_diagnostics.DiagnosticsAdapterTests.test_modified_or_missing_pr24_source_is_not_executed.test_modified_or_missing_pr24_source_is_not_executed",
+        "test_handoff.HandoffTests.test_archive_inventory_cannot_smuggle_private_members.test_archive_inventory_cannot_smuggle_private_members",
+        "test_handoff.HandoffTests.test_corrupt_restored_bytes_fail.test_corrupt_restored_bytes_fail",
+        "test_handoff.HandoffTests.test_digest_and_inventory_precheck_only.test_digest_and_inventory_precheck_only",
+        "test_handoff.HandoffTests.test_existing_archive_wrong_payload_or_unsafe_path_blocks.test_existing_archive_wrong_payload_or_unsafe_path_blocks",
+        "test_handoff.HandoffTests.test_existing_work_archive_inventory_without_extracting.test_existing_work_archive_inventory_without_extracting",
+        "test_handoff.HandoffTests.test_gate_delegates_full_review_and_checks_version.test_gate_delegates_full_review_and_checks_version",
+        "test_handoff.HandoffTests.test_missing_file_is_never_a_success.test_missing_file_is_never_a_success",
+        "test_handoff.HandoffTests.test_missing_or_empty_required_resources.test_missing_or_empty_required_resources",
+        "test_handoff.HandoffTests.test_path_traversal_and_duplicate_members_blocked.test_path_traversal_and_duplicate_members_blocked",
+        "test_handoff.HandoffTests.test_receipt_cannot_substitute_other_apk.test_receipt_cannot_substitute_other_apk",
+        "test_handoff.HandoffTests.test_roundtrip_bundle_after_independent_copy.test_roundtrip_bundle_after_independent_copy",
+        "test_handoff.HandoffTests.test_signed_jar_is_not_accepted_for_unsigned_handoff.test_signed_jar_is_not_accepted_for_unsigned_handoff",
+        "test_handoff.HandoffTests.test_subprocess_failure_cannot_leave_old_pass_or_print_private_output.test_subprocess_failure_cannot_leave_old_pass_or_print_private_output",
+        "test_handoff.HandoffTests.test_wrong_hash_blocks_before_importing_review_tools.test_wrong_hash_blocks_before_importing_review_tools",
+        "test_manifest.ManifestRegressionTests.test_arbitrary_launcher_category_is_rejected.test_arbitrary_launcher_category_is_rejected",
+        "test_manifest.ManifestRegressionTests.test_current_optional_multiwindow_category_remains_compatible.test_current_optional_multiwindow_category_remains_compatible",
+        "test_manifest.ManifestRegressionTests.test_missing_launcher_category_must_fail.test_missing_launcher_category_must_fail",
+        "test_manifest.ManifestRegressionTests.test_valid_beta_launcher_contract.test_valid_beta_launcher_contract",
+        "test_manifest.ManifestRegressionTests.test_wrong_application_initializer_must_fail.test_wrong_application_initializer_must_fail"
+      ],
+      "modes": {
+        "normal": {
+          "passed": 21,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "sha256": "baf987eeda8959695edd3cf9d505394ca4a6b55937b2b3dd4dfc1735d0281c89"
+        },
+        "optimized": {
+          "passed": 21,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "sha256": "013653fb2242475ceab00bbdc62af8e281fb8b71203a4a2196a835e99e1c36e9"
+        }
+      }
+    }
+  },
+  "distinct_methods": 46,
+  "counting": "25 client +21 handoff; optimized repetitions not additional distinct tests; CLI compatibility fixture not a test method.",
+  "android_executed": false,
+  "apk_built": false,
+  "new_apk_sha256": null,
+  "storage": {
+    "private_persistence_confirmed": false,
+    "remote_recovery_verified": false,
+    "new_upload_attempted": false,
+    "basis": "Reviewed PR25 validation receipt records HTTP403 before transfer and original artifacts unavailable; PR25 discussion has no new recovery acknowledgement. No duplicate storage resolution attempted."
+  },
+  "source_sha256": {
+    "TMessagesProj/src/betaDevelopment/AndroidManifest.xml": "f369615379cd79d6d0de1c2bfe5c7d5fd34f41102048659145242b66ed312319",
+    "TMessagesProj/src/betaDevelopment/java/org/telegram/ui/beta/BetaEventExport.java": "527cbfb84b248eba4650c63d52a68ea83cf939c0241d2ef881a4e937801771e5",
+    "TMessagesProj/src/betaDevelopment/java/org/telegram/ui/beta/BetaNavigation.java": "1a02f5e31abbdd53cbd9d0f43d05764efaa0a9864972e8617f650b8770621409",
+    "TMessagesProj/src/betaDevelopment/java/org/telegram/ui/beta/BetaPreviewActivity.java": "5464a5b7ae23675f64467ce5147b5c2a8e0e7aa992b7bede4ca6a8f86b6caab0",
+    "TMessagesProj/src/betaDevelopment/java/org/telegram/ui/beta/BetaUiState.java": "b22e77c9b9dd8e05196c63cc803af630fa99183f351da638a93ef3311c82f62f",
+    "TMessagesProj/src/betaDevelopment/java/org/telegram/ui/beta/LatestNavigation.java": "e93341e3c6a1a8b2df87967f5d9e5f112347d1ab6ed98551f7054670fbb8cc8a",
+    "TMessagesProj/src/betaDevelopment/java/org/telegram/ui/beta/LocalPythonProbe.java": "3446731703980a254fae6660d4d598f65ce6a26ab9dfea229c9c8e230b177497",
+    "TMessagesProj/src/betaDevelopment/java/org/telegram/ui/beta/NavigationEvents.java": "822972ac30b9537427070123faf44aea4e058cd5786e73ec5ced373ebaf5bb96",
+    "TMessagesProj/src/betaDevelopment/java/org/telegram/ui/beta/ProbeState.java": "262a45c4f961823487747b46837070c5214d7959f9fe10c1fde6c26d9175de1d",
+    "TMessagesProj/src/betaDevelopment/java/org/telegram/ui/beta/SceneFrameObserver.java": "d55331faeda7ed76b980c6503fff2a667de697c871699f5e548abfe1d3504025",
+    "TMessagesProj/src/main/java/org/telegram/messenger/NotificationCenter.java": "0099c8f192ebf9feb0997f9375ce38fb9f59159e8ce733a9eb25beb1158a4b7f",
+    "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java": "dc28d57fa4b9567bcc088e07daa3d71197868d3c78b4d3d0a27559cef32f7c1c",
+    "gradle/beta-development.json": "67536a3d559318947afcefbaaeb5a0669b5dbe627956a1c12f4e360999368827",
+    "gradle/production-readiness.gradle": "98a657809d1331164fb80892ac25333ca0a11f1919cbf5b65cae23a771c7d02b",
+    "gradle/variant-policy.json": "0f92362819e8a4973909188235d68012a364c974d8e430ce61370e88da8ed181",
+    "tests/beta_development/client_android_doubles.py": "ddb2c41024356a958aa841cf463ee0d52fc0cffe3766c800481e3b3bf86d5e2d",
+    "tests/beta_development/test_activity_lifecycle.py": "b48bfa47820de7d34163608ada8e0688a39f834d47afd8efcb9e4b69727413f8",
+    "tests/beta_development/test_back_regression.py": "c7b03d62e6ce562b9379910922155accd914c234ee34b39df02c62af09367798",
+    "tests/beta_development/test_build_profile.py": "0890e9057ade9f31532ea6ae8e21d27acbea8207ae68529cadc4d3bbbbd81339",
+    "tests/beta_development/test_client_events.py": "60a2a1bcdd63097eaadd4b5f39ca214d4ddf551e1a98610537f2d96165927c7b",
+    "tests/beta_development/test_frame_endpoint.py": "9ce92a7d6aabf68eebe61175ad6756650aac460a82ae6f3ca9e788649d32e264",
+    "tests/beta_development/test_navigation_queue.py": "14a3f8b9ae6d33c2774641a1d97258e94e913a4b0febb1fb746c92755d91bcd8",
+    "tests/beta_development/test_notification_expiry.py": "7e219257ae576560402b7506a0516f59ef5396eb41c491cdbdf4c5d5af6917f9",
+    "tests/beta_development/test_recreation_startup.py": "1773b340ddf03dd45d7effd8d2c2560ab37c1b9b800611691917f1cb99aa8173",
+    "tests/beta_development/test_transition_ownership.py": "cae64906626698fbcdf9990886081315c3ee11fd8928ce15df4198c3fd063147",
+    "tests/beta_development/test_ui_state_probe.py": "845764eb5ccdeb3c69b13d61cb70d1348237d8cec335b28617d6f4f7a6e28b13"
+  },
+  "pr24_cli_compatibility": "PASS normal and optimized; reports byte-identical, pinned Work1 sources consumed read-only.",
+  "missing_apk_cli": "Expected BLOCKED/exit1 on an intentionally unavailable path and synthetic digest, not a real APK verification."
+}

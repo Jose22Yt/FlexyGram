@@ -1,0 +1,8 @@
+test_conversation_and_settings_survive_activity_recreation (test_recreation_startup.RecreationStartupTests.test_conversation_and_settings_survive_activity_recreation) ... ok
+test_dark_theme_survives_configuration_and_external_theme_is_preserved (test_recreation_startup.RecreationStartupTests.test_dark_theme_survives_configuration_and_external_theme_is_preserved) ... ok
+test_failed_post_init_is_reported_without_building_client_views (test_recreation_startup.RecreationStartupTests.test_failed_post_init_is_reported_without_building_client_views) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 5.846s
+
+OK

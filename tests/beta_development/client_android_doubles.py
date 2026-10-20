@@ -1,17 +1,23 @@
 """Explicit host doubles: compile/execute beta wrappers, never Android certification."""
 from test_frame_endpoint import TREE
 STUBS={
-'android/os/Bundle.java':'package android.os; public class Bundle {}',
+'android/os/Bundle.java':'''package android.os; public class Bundle {
+ public final java.util.Map<String,Object> values=new java.util.HashMap<>();
+ public void putInt(String key,int value){values.put(key,value);}public void putBoolean(String key,boolean value){values.put(key,value);}
+ public void putString(String key,String value){values.put(key,value);}public Object get(String key){return values.get(key);}
+}''',
 'android/content/Context.java':'''package android.content; public class Context {public Context getApplicationContext(){return this;}public java.io.File getFilesDir(){return new java.io.File(System.getProperty("java.io.tmpdir"),"synthetic-beta-files");}}''',
 'android/app/Activity.java':'''package android.app;
 public class Activity extends android.content.Context {
  public static final java.util.Queue<Runnable> ui=new java.util.concurrent.ConcurrentLinkedQueue<>();
  public static final java.util.concurrent.CountDownLatch posted=new java.util.concurrent.CountDownLatch(1);
- private boolean finishing,destroyed;
+ private boolean finishing,destroyed;public boolean changingConfigurations;public android.view.View content;
  protected void onCreate(android.os.Bundle b){}protected void onResume(){}protected void onPause(){}protected void onDestroy(){destroyed=true;}
+ protected void onSaveInstanceState(android.os.Bundle b){}public void saveState(android.os.Bundle b){onSaveInstanceState(b);}
+ public boolean isChangingConfigurations(){return changingConfigurations;}
  public void onBackPressed(){finish();}public void finish(){finishing=true;}
  public boolean isFinishing(){return finishing;}public boolean isDestroyed(){return destroyed;}
- public void setContentView(android.view.View v){}public void runOnUiThread(Runnable r){ui.add(r);posted.countDown();}
+ public void setContentView(android.view.View v){content=v;}public void runOnUiThread(Runnable r){ui.add(r);posted.countDown();}
 }''',
 'android/view/ViewTreeObserver.java':TREE,
 'android/view/View.java':'''package android.view;
@@ -33,13 +39,14 @@ public class View {
  public static final int VERTICAL=1;public final java.util.List<android.view.View> children=new java.util.ArrayList<>();
  public LinearLayout(android.content.Context c){super(c);}public void setOrientation(int i){}public void addView(android.view.View v){children.add(v);}
 }''',
+'android/widget/TextView.java':'package android.widget;public class TextView extends android.view.View {public String text;public TextView(android.content.Context c){super(c);}public void setText(CharSequence value){text=value.toString();}}',
 'android/widget/ScrollView.java':'''package android.widget;public class ScrollView extends LinearLayout {public ScrollView(android.content.Context c){super(c);}public void setFillViewport(boolean b){}}''',
-'org/telegram/messenger/ApplicationLoader.java':'package org.telegram.messenger;public class ApplicationLoader {public static void postInitApplication(){}}',
+'org/telegram/messenger/ApplicationLoader.java':'package org.telegram.messenger;public class ApplicationLoader {public static boolean fail;public static void postInitApplication(){if(fail)throw new IllegalStateException("SYNTHETIC_PRIVATE_VALUE");}}',
 'org/telegram/messenger/BuildConfig.java':'''package org.telegram.messenger;public class BuildConfig {public static final String APPLICATION_ID="io.github.jose22yt.flexygram.beta.development",APP_HASH="";public static final int APP_ID=0;public static final boolean ISOLATED_DIAGNOSTIC=true;}''',
 'org/telegram/messenger/BuildVariantPolicy.java':'''package org.telegram.messenger;public class BuildVariantPolicy {
  public static boolean authenticationAllowed(){return false;}public static boolean telegramTransportAllowed(){return false;}public static boolean pushAllowed(){return false;}
  public static boolean pluginsAllowed(){return false;}public static boolean translationAllowed(){return false;}public static boolean sessionRestoreAllowed(){return false;}}''',
-'org/telegram/messenger/NativeLoader.java':'package org.telegram.messenger;public class NativeLoader {public static boolean loaded(){return true;}}',
+'org/telegram/messenger/NativeLoader.java':'package org.telegram.messenger;public class NativeLoader {public static boolean ready=true;public static boolean loaded(){return ready;}}',
 'org/telegram/messenger/R.java':'package org.telegram.messenger;public class R {public static class drawable {public static final int ic_ab_back=1;}}',
 'org/telegram/ui/ActionBar/ActionBar.java':'''package org.telegram.ui.ActionBar;public class ActionBar {public static class ActionBarMenuOnItemClick {public void onItemClick(int id){}}
  public void setTitle(String s){}public void setBackButtonImage(int i){}public void setActionBarMenuOnItemClick(ActionBarMenuOnItemClick c){}}''',
@@ -76,7 +83,7 @@ public class View {
 'com/chaquo/python/android/AndroidPlatform.java':'package com.chaquo.python.android;public class AndroidPlatform {public AndroidPlatform(android.content.Context c){}}',
 'com/chaquo/python/Python.java':'''package com.chaquo.python;public class Python {
  public static final java.util.concurrent.CountDownLatch entered=new java.util.concurrent.CountDownLatch(1),release=new java.util.concurrent.CountDownLatch(1);
- static boolean started;public static boolean isStarted(){return started;}public static void start(com.chaquo.python.android.AndroidPlatform p){started=true;}
- public static Python getInstance(){return new Python();}public Object getModule(String name){entered.countDown();try{if(!release.await(5,java.util.concurrent.TimeUnit.SECONDS))throw new RuntimeException();}catch(InterruptedException e){throw new RuntimeException();}return new Object();}}
+ public static boolean failStart,failImport;static boolean started;public static boolean isStarted(){return started;}public static void start(com.chaquo.python.android.AndroidPlatform p){if(failStart)throw new IllegalStateException("SYNTHETIC_PRIVATE_VALUE");started=true;}
+ public static Python getInstance(){return new Python();}public Object getModule(String name){if(failImport)throw new IllegalStateException("SYNTHETIC_PRIVATE_VALUE");entered.countDown();try{if(!release.await(5,java.util.concurrent.TimeUnit.SECONDS))throw new RuntimeException();}catch(InterruptedException e){throw new RuntimeException();}return new Object();}}
 '''
 }
