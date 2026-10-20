@@ -1,0 +1,14 @@
+{
+  "candidate_native_sha256": "756e53d23f29ecca32d7c9706375494cdf2217d0db8d314a4195d0174400912b",
+  "build_path_strings_found": 447,
+  "examples": [
+    "/workspace/scratch/6fe2cd15bb66/experiment/TMessagesProj/jni/voip/webrtc/sdk/android/src/jni/pc/peer_connection.cc",
+    "/workspace/scratch/6fe2cd15bb66/experiment/TMessagesProj/jni/voip/webrtc/sdk/android/src/jni/video_decoder_wrapper.cc",
+    "/workspace/scratch/6fe2cd15bb66/experiment/TMessagesProj/jni/voip/webrtc/rtc_base/ssl_adapter.h",
+    "/workspace/scratch/6fe2cd15bb66/experiment/TMessagesProj/jni/voip/webrtc/rtc_base/system/warn_current_thread_is_deadlocked.cc",
+    "/workspace/scratch/6fe2cd15bb66/experiment/TMessagesProj/jni/voip/webrtc/media/base/codec.cc",
+    "/workspace/scratch/6fe2cd15bb66/experiment/TMessagesProj/jni/voip/webrtc/modules/video_coding/codecs/vp8/temporal_layers_checker.cc"
+  ],
+  "historical_binary_available": false,
+  "interpretation": "Embedded build paths and linker layout can change the ELF digest. Only the application JNI ELF differs among 97 historical hashes. This observation does not establish a complete byte-level cause or whole-APK reproducibility."
+}

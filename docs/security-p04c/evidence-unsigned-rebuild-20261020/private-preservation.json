@@ -1,0 +1,16 @@
+{
+  "filename": "FlexyGram-P04c-Unsigned-Candidate-1177ceb8-Private.zip",
+  "bytes": 302608432,
+  "sha256": "c1c5caea6b949ea97ce4e912e17639c7d372aeb6def42a5c17909ebdfa963812",
+  "members": 58,
+  "contains_unsigned_apk": true,
+  "contains_native_inputs_outputs": true,
+  "contains_unstripped_jni": true,
+  "contains_private_key": false,
+  "saved_privately": true,
+  "recovered_copy_verified": true,
+  "verified_members": 58,
+  "archive_crc_valid": true,
+  "apk_sha256": "291881863ea81418fa6cb12104b6eaea4aee2403822894da2143a51f3030bdd5",
+  "private_identity_retained": true
+}

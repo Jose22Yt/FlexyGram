@@ -1,0 +1,21 @@
+{
+  "source_head": "1177ceb8f4351b1626dd65e3dbd657f3b0ff159f",
+  "apk_name": "flexygram-v13.0.2(1261)-diagnostic-debug-unsigned.apk",
+  "bytes": 113080183,
+  "sha256": "291881863ea81418fa6cb12104b6eaea4aee2403822894da2143a51f3030bdd5",
+  "historical_unsigned_sha256": "ddb7b017838a2a13991ac09154bbf252a11d62326e9a588349ca03c115e01699",
+  "matches_historical_unsigned": false,
+  "signed": false,
+  "crc_valid": true,
+  "zipalign_16k_pass": true,
+  "internet_absent": true,
+  "packaged_rebuilt_elf": {
+    "libexslt.so": "f8e9e0fc0fa7507f3391bacb5c08a16dc9fdab73ca23de48f8adb2dfcca7a194",
+    "libfreetype.so": "d086a897a1c1cfa517b9e46c28d762f817af41bde96b2eda3bf6e6b12220eb01",
+    "libxml2.so": "e282a655ebbe07443cd743bb9dd00a152bfed7edb091d862f0a4e74afc1eff04",
+    "libxslt.so": "827d113f3045205b205b52d0e4fe2e59998bd3b471368314415a2c3e91571660"
+  },
+  "installed": false,
+  "android_executed": false,
+  "historical_contract_modified": false
+}

@@ -1,0 +1,6 @@
+{
+  "source_head": "1177ceb8f4351b1626dd65e3dbd657f3b0ff159f",
+  "historical_android_code_head": "723580b5cfee51416aa3f87cdebc3f8c911eb7ed",
+  "android_gradle_jni_module_diff_empty": true,
+  "note": "git diff --name-only historical..current -- TMessagesProj TMessagesProj_Modules gradle build.gradle settings.gradle returned no paths; only evidence/tools changed."
+}

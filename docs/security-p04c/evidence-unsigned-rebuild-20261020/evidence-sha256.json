@@ -1,0 +1,178 @@
+{
+  "android-code-continuity.json": {
+    "sha256": "e1bf99e2ca58d902568acbab4c62acdc44839829614f5d267e5a7325ad674d0e",
+    "bytes": 366
+  },
+  "apk-badging.txt": {
+    "sha256": "145f27b606f69e4e054d0b91595a26a08231354c94db14a9e9650c6e4dac3a30",
+    "bytes": 4015
+  },
+  "apk-diagnostic-check.json": {
+    "sha256": "8a4a0c91a3ff4d5d3a2f8e3ceec64149976c5b02942aae152153eff49cc4f62c",
+    "bytes": 221012
+  },
+  "apk-diagnostic-check.log": {
+    "sha256": "cb1b01098ce6c288a289ad4dd15201b066ef02b8d47b5c7ce383bd1caa08143a",
+    "bytes": 360
+  },
+  "apk-native-acceptance.json": {
+    "sha256": "7712d70f6f59dbcdf15ced2dbf45f329cd09196fcc038795e086ad7e48856199",
+    "bytes": 305
+  },
+  "apk-native-audit.json": {
+    "sha256": "e9eb75b8168b7a711ea22879a31b66231f26666b5f66257a830e83727c997d2e",
+    "bytes": 139293
+  },
+  "apk-native-audit.log": {
+    "sha256": "57c11359ceb1b1d3ae6eb9bf0b79c8fb5c3b4179529e61e54427a346c6b61a60",
+    "bytes": 170
+  },
+  "apk-permissions.txt": {
+    "sha256": "b004f0b5cc7d7506659a5dd2e2f1371c0b12985c55f45269de55e88b6b625245",
+    "bytes": 311
+  },
+  "apksigner-unsigned.log": {
+    "sha256": "1413af210d1627fde4f14e31934eb5d9d031684e4f7a5c3371a74b3bdeb8764c",
+    "bytes": 52
+  },
+  "arm64-engine-version.log": {
+    "sha256": "ea36a35958c14ba5f003d0e68087a01947b2b1e7d3c26286417430ced3f2b811",
+    "bytes": 655
+  },
+  "build-attempt-1.json": {
+    "sha256": "cdb6b012a52e621ba613a2ef5ef51517b23587805da56ad9bddb756f2ad88c3c",
+    "bytes": 321
+  },
+  "build-attempt-2.json": {
+    "sha256": "573633885532251f901cd5dc9a03b2e4fac516abd3cbb060ff405bebd9bac05e",
+    "bytes": 321
+  },
+  "build-result.json": {
+    "sha256": "385b98c2ad7dbba4d901bc547329f2f01d02ac1ec87cebf9583e198281a3db2f",
+    "bytes": 321
+  },
+  "emulator-acceleration-help.log": {
+    "sha256": "a24e9ad52aa5673fb7be5718a27cabc3700c5790f87ed01cc8dd1486ded5d453",
+    "bytes": 747
+  },
+  "emulator-headless-version.log": {
+    "sha256": "ea36a35958c14ba5f003d0e68087a01947b2b1e7d3c26286417430ced3f2b811",
+    "bytes": 655
+  },
+  "gradle-attempt-1-sdk-metadata.log": {
+    "sha256": "94917b360b4cbca417cedd33d0172f5f0768f59efa498316482eb33cef6b7af6",
+    "bytes": 4618
+  },
+  "gradle-attempt-2-cmake-path.log": {
+    "sha256": "1ce2e2cb516c809f97d846996e2371c647099ccd8c4f7cf044a67276b926b159",
+    "bytes": 49981
+  },
+  "gradle-unsigned.log": {
+    "sha256": "2eda4fd2dcfdcf6899a97de20a585843dcc7a7d3509ae956dac247e641cbc293",
+    "bytes": 234671
+  },
+  "graph-attempt-1-buildsrc.log": {
+    "sha256": "a3d1ac3909f74eaac71a855fc0ad93553bf574fa514cd0380e5f4a2883108aea",
+    "bytes": 1381
+  },
+  "graph-attempt-2-artifact-view.log": {
+    "sha256": "93bb9390c094542bbcef3a4b3d0bc7ae683633ce5f8fc9974e57c9e59f34a114",
+    "bytes": 107396
+  },
+  "graph-export.log": {
+    "sha256": "dfdddb33a0aa0da3e9c4d34f33c583b8e335302c39573d3e68e0d34cc1062d5f",
+    "bytes": 1345
+  },
+  "graph-result.json": {
+    "sha256": "b0bfcb33c13c64db7201c94eab3e720f68da95ddf297383786d4f8e839ca643e",
+    "bytes": 387
+  },
+  "historical-comparison.json": {
+    "sha256": "ddf0e2c502bc07dbc34f52fdad5b8dd3d28fae8f95ffc0107d62f08e8a6ac5b1",
+    "bytes": 1407
+  },
+  "host-gate-opt.log": {
+    "sha256": "832f325a67e8d17a7bfa6848979928352fc408f3e2a387d19dafbde367ce0d3e",
+    "bytes": 8596
+  },
+  "host-gate.log": {
+    "sha256": "79570ceab216038e24dcec01995162066ee6e507a4b730d22e881b3db2fe0ea1",
+    "bytes": 8593
+  },
+  "image-availability.json": {
+    "sha256": "5d3b2a1acdb2488c9823e858dcb732d0ec7841accd98467c190580faebf57010",
+    "bytes": 769
+  },
+  "jni-inspection.log": {
+    "sha256": "2b05d3f9855461b6e9d97949aa12c712fe255b3d6ab195dae307f78856d3bbb3",
+    "bytes": 912
+  },
+  "lab-probe.json": {
+    "sha256": "4aeebcaee64ff61b5c44a59d5513dc311e4563cfcbfe482101059847927bad13",
+    "bytes": 3331
+  },
+  "native-231-opt.json": {
+    "sha256": "45d3061812adff57b31ec87f4734d870015cbdb6ecafee220c0221772cb66bd3",
+    "bytes": 375
+  },
+  "native-231-opt.log": {
+    "sha256": "87097ac7f7ed7b445b779afb6dde17d8a6b48cfce14e3cc03a632dbe4cb1628b",
+    "bytes": 33284
+  },
+  "native-231.json": {
+    "sha256": "45d3061812adff57b31ec87f4734d870015cbdb6ecafee220c0221772cb66bd3",
+    "bytes": 375
+  },
+  "native-231.log": {
+    "sha256": "f3c61a8a93fc8ec41e7a3a9f9d1265517a95a1b97f3e7b45f63ae53da0163196",
+    "bytes": 33284
+  },
+  "native-build-path-observation.json": {
+    "sha256": "640171f16e3d961cea45ef297c4bad51b68080ac4e6cbc0ea4bec7b5df93c675",
+    "bytes": 1164
+  },
+  "native-linked-guards.json": {
+    "sha256": "107a87442bb4e8a5e85fa908b9eb34a8d2da78a5f64e79319e0ce98a1ebb22fe",
+    "bytes": 911
+  },
+  "overlay.json": {
+    "sha256": "8e1b8b2d6b2782c0b519326829dce50220988ed66d1c1d3c560d156a10536c58",
+    "bytes": 429
+  },
+  "private-preservation.json": {
+    "sha256": "a012aaad1d838a07711a94bb6d5de71bda464fac09e79db34a0e47f95a470ac2",
+    "bytes": 574
+  },
+  "recovered-abi.json": {
+    "sha256": "ea7d1a7f70a5c4d0ba1bd982b944a801980d2103195c44e1ce5c4414030d3741",
+    "bytes": 3775
+  },
+  "recovery-verification.json": {
+    "sha256": "b5f8e3b06e53bbc96f9b1138ec6f4f5135e513eed6f2b91a0f265cbbdeae1bd2",
+    "bytes": 8308
+  },
+  "source-input-receipt.json": {
+    "sha256": "7d21c95622a1186e758ffd0637825171e408b74ba615c8d429476029e6a728e6",
+    "bytes": 2560
+  },
+  "toolchain-receipt.json": {
+    "sha256": "93a8096d6c0b11f6b43e7a23d8d50eca93d0793288224669e964984ffaa2c933",
+    "bytes": 3386
+  },
+  "unchanged-source-contracts.json": {
+    "sha256": "80b7646377371b3882b24b4eb3547cdcc8dcd227e9c184f2e1aff9b352e20ec0",
+    "bytes": 682
+  },
+  "unsigned-apk-receipt.json": {
+    "sha256": "34b7297b704094b38d1ecc47803c4d2485e3e227e60223ce9158ec57c58245b3",
+    "bytes": 945
+  },
+  "wheels-verify.log": {
+    "sha256": "105f5790f0645159bcf9d3e97ebfc61ed5a3c43f435fed06dbcb58b2ea6ffb80",
+    "bytes": 33
+  },
+  "zipalign.log": {
+    "sha256": "0c498bf9aef36f478df36a15b17db318f66b0a36362340093a28844db9b0fb96",
+    "bytes": 886
+  }
+}

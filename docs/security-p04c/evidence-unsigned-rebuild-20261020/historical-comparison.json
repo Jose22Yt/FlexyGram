@@ -1,0 +1,39 @@
+{
+  "historical_apk_available": false,
+  "historical_unsigned_apk_sha256": "ddb7b017838a2a13991ac09154bbf252a11d62326e9a588349ca03c115e01699",
+  "candidate_apk_sha256": "291881863ea81418fa6cb12104b6eaea4aee2403822894da2143a51f3030bdd5",
+  "matches_historical_apk_sha256": false,
+  "elf_inventory_matches": true,
+  "unchanged_elf": 96,
+  "elf_differences": [
+    {
+      "member": "lib/arm64-v8a/libtmessages.49.so",
+      "historical_sha256": "b52a40892f7b69162be55cdcced8d3c143cbf85c10243aea0abfbe5f05f89cff",
+      "candidate_sha256": "756e53d23f29ecca32d7c9706375494cdf2217d0db8d314a4195d0174400912b"
+    }
+  ],
+  "dependency_graph_comparison": {
+    "diagnosticDebugCompileClasspath": {
+      "same_components": true,
+      "added": [],
+      "removed": []
+    },
+    "diagnosticDebugRuntimeClasspath": {
+      "same_components": true,
+      "added": [],
+      "removed": []
+    },
+    "diagnosticStagingCompileClasspath": {
+      "same_components": true,
+      "added": [],
+      "removed": []
+    },
+    "diagnosticStagingRuntimeClasspath": {
+      "same_components": true,
+      "added": [],
+      "removed": []
+    }
+  },
+  "historical_contract_modified": false,
+  "limits": "Comparison against historical recorded ELF/dependency evidence, not binary-to-binary comparison with the missing historical APK. Native reproducibility A/B records are historical and recovered, not newly executed builds."
+}

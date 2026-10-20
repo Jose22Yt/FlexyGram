@@ -1,0 +1,234 @@
+{
+  "source_head": "1177ceb8f4351b1626dd65e3dbd657f3b0ff159f",
+  "archive_sha256": "979c5c5f61519949dd677a6d4892fbd13e202af803b291b0b7003b4c5bd2ecb2",
+  "members_verified": 44,
+  "overlay_wheels_verified": 18,
+  "recovered_original_wheels": 18,
+  "elf_verified": 4,
+  "abi_pass": true,
+  "historical_ab_wheel_rows_match": true,
+  "new_native_rebuild_executed": false,
+  "historical_unsigned_apk_recovered": false,
+  "members": [
+    {
+      "member": "elf/libexslt.so",
+      "sha256": "f8e9e0fc0fa7507f3391bacb5c08a16dc9fdab73ca23de48f8adb2dfcca7a194",
+      "bytes": 100384
+    },
+    {
+      "member": "elf/libfreetype.so",
+      "sha256": "d086a897a1c1cfa517b9e46c28d762f817af41bde96b2eda3bf6e6b12220eb01",
+      "bytes": 3687592
+    },
+    {
+      "member": "elf/libxml2.so",
+      "sha256": "e282a655ebbe07443cd743bb9dd00a152bfed7edb091d862f0a4e74afc1eff04",
+      "bytes": 1825744
+    },
+    {
+      "member": "elf/libxslt.so",
+      "sha256": "827d113f3045205b205b52d0e4fe2e59998bd3b471368314415a2c3e91571660",
+      "bytes": 299216
+    },
+    {
+      "member": "overlay-arm64/beautifulsoup4-4.15.0-py3-none-any.whl",
+      "sha256": "d6f88de62e1d4e38ecb1077eb9724cd0eff29d2a08ca16a401e9b9e93f117cf9",
+      "bytes": 109924
+    },
+    {
+      "member": "overlay-arm64/certifi-2026.10.18-py3-none-any.whl",
+      "sha256": "73191c47aaa79da394e8fee2dbc2ec827432cab56311122c9e47abf79e390f62",
+      "bytes": 134093
+    },
+    {
+      "member": "overlay-arm64/chaquopy_freetype-2.9.1-3flexygram16k-py3-none-android_24_arm64_v8a.whl",
+      "sha256": "f4308f6ad71eefca3cd9def87ee8c2673499b6dd10810daa23c1a22e805fc937",
+      "bytes": 1568079
+    },
+    {
+      "member": "overlay-arm64/chaquopy_libjpeg-1.5.3-1-py3-none-android_21_arm64_v8a.whl",
+      "sha256": "5555be57a2633fb5a3c0c810e89c8b705c471e3dabd95aa596fc7fdd48322728",
+      "bytes": 176242
+    },
+    {
+      "member": "overlay-arm64/chaquopy_libxml2-2.9.8-3flexygram16k-py3-none-android_24_arm64_v8a.whl",
+      "sha256": "2b47fe307311e932c4502ad9eec108f070eec6f36c03d4d97a2d22222387badb",
+      "bytes": 832391
+    },
+    {
+      "member": "overlay-arm64/chaquopy_libxslt-1.1.32-3flexygram16k-py3-none-android_24_arm64_v8a.whl",
+      "sha256": "f8d9b05b17dfbc498c9edf22d24b65c37f9c3ad92a10a49e61b267130548d70f",
+      "bytes": 186718
+    },
+    {
+      "member": "overlay-arm64/chaquopy_libyaml-0.2.5-0-py3-none-android_24_arm64_v8a.whl",
+      "sha256": "77f594d82adf2a1baf5f8340324ef06b7f54b1b0725b7d9b4ce8367e270ad5a2",
+      "bytes": 58012
+    },
+    {
+      "member": "overlay-arm64/charset_normalizer-3.5.2-py3-none-any.whl",
+      "sha256": "b6b751274acb69d77b3323d6b7dbaa3c7fdfc1eb829b7eb61d262f32e1af9685",
+      "bytes": 68872
+    },
+    {
+      "member": "overlay-arm64/debugpy-1.8.22-py2.py3-none-any.whl",
+      "sha256": "a9e9d3550e15ca479c59333e90845029190531f0cacfedab3b815a57bd913947",
+      "bytes": 5374857
+    },
+    {
+      "member": "overlay-arm64/idna-3.20-py3-none-any.whl",
+      "sha256": "ab7ae7122974553370f0bdb919e1a960b2cd1bc1ef0276416d896db81c14582c",
+      "bytes": 69583
+    },
+    {
+      "member": "overlay-arm64/lxml-5.3.0-0-cp311-cp311-android_24_arm64_v8a.whl",
+      "sha256": "6ab16eebfd35a4b9519f979f7a6d90f6c3eb32ece39846728f37ec247a4d0e5f",
+      "bytes": 1420163
+    },
+    {
+      "member": "overlay-arm64/packaging-26.3-py3-none-any.whl",
+      "sha256": "d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c",
+      "bytes": 129956
+    },
+    {
+      "member": "overlay-arm64/pillow-11.0.0-0-cp311-cp311-android_24_arm64_v8a.whl",
+      "sha256": "c40b2d55a04720f60792769717c54442924dfb776d73a4312e9c2e7ae6aee3dc",
+      "bytes": 582690
+    },
+    {
+      "member": "overlay-arm64/pyyaml-6.0.3-0-cp311-cp311-android_24_arm64_v8a.whl",
+      "sha256": "75013ba172066d8e009cf8c7a2fa7a2b2d9e83fc9913470d7f5f707872c4885d",
+      "bytes": 136080
+    },
+    {
+      "member": "overlay-arm64/requests-2.34.2-py3-none-any.whl",
+      "sha256": "2a0d60c172f83ac6ab31e4554906c0f3b3588d37b5cb939b1c061f4907e278e0",
+      "bytes": 73075
+    },
+    {
+      "member": "overlay-arm64/soupsieve-3.0.3-py3-none-any.whl",
+      "sha256": "fa30e3ba4809cb81ce1f3209f2fbe3e779fc445f0439bc147a0d7c4601743f21",
+      "bytes": 41705
+    },
+    {
+      "member": "overlay-arm64/typing_extensions-4.16.0-py3-none-any.whl",
+      "sha256": "481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8",
+      "bytes": 45571
+    },
+    {
+      "member": "overlay-arm64/urllib3-2.8.0-py3-none-any.whl",
+      "sha256": "0cf3cae568d36aa9576b28dfb35f11328f1cb974ca7647d9475ebb86c75ac6e3",
+      "bytes": 135717
+    },
+    {
+      "member": "sources-originals/FlexyGram-P04c-Recovered-Original-Inputs.zip",
+      "sha256": "17325285036532db37a4ed09600f5a62a61056de6a2c59bec1d17da550ea0d82",
+      "bytes": 45434269
+    },
+    {
+      "member": "sources-originals/freetype-source.bundle",
+      "sha256": "0c4e4e096a0853a0e47a8cdbf61dffb7e39bb06867349d6d2315974cfb1454a7",
+      "bytes": 2382713
+    },
+    {
+      "member": "rebuild/freetype-path-rebuild.py",
+      "sha256": "2defd7d118ae1175e776021b17a70083709f0881db6b63048ff94978d5a62b63",
+      "bytes": 1128
+    },
+    {
+      "member": "rebuild/freetype-path-reproducibility.json",
+      "sha256": "b9ef0a5c0cd5b433938a2ff52001ce27b2fbfdde1cc30bc396e80c372360f8f2",
+      "bytes": 667
+    },
+    {
+      "member": "rebuild/overlay.json",
+      "sha256": "49ae5650f807cd5bbfd44e62be54cf5b5fa63c42a12af369f67e354ef187728e",
+      "bytes": 398
+    },
+    {
+      "member": "rebuild/unsigned.init.gradle",
+      "sha256": "653913c8f25f36e7f66d333c8ecdbc85732246370b4071f3ce73126e9b5e8285",
+      "bytes": 763
+    },
+    {
+      "member": "rebuild/sdk-tools.json",
+      "sha256": "b94b4a07e81cab7bd2d24d507cc4559032308732681d12e0b6cbfb87ed44aaa5",
+      "bytes": 1426
+    },
+    {
+      "member": "reproducibility/a/compat-report.json",
+      "sha256": "ed73bf5b2a1e41e0364f8ee71b4f3c7f7743f6a3e55fce5a1fd3e8251a28299a",
+      "bytes": 13256
+    },
+    {
+      "member": "reproducibility/a/wheels-manifest.json",
+      "sha256": "c6495ee9895da29a2c4bdc9c45647721c33070190eeb8c9b8054096cb2bf2f97",
+      "bytes": 9272
+    },
+    {
+      "member": "reproducibility/b/compat-report.json",
+      "sha256": "22d8d4097574aa72ee5ec9fb583e7d8f54083ff77c3304af8a2c98f4ea18dfc9",
+      "bytes": 13256
+    },
+    {
+      "member": "reproducibility/b/wheels-manifest.json",
+      "sha256": "c6495ee9895da29a2c4bdc9c45647721c33070190eeb8c9b8054096cb2bf2f97",
+      "bytes": 9272
+    },
+    {
+      "member": "recipes/rebuild_candidates.py",
+      "sha256": "ee764e2034d36c7d9624685af9ca30586471722dcca6ac3bc5cbacf2033795b5",
+      "bytes": 6381
+    },
+    {
+      "member": "recipes/experiment_recipe.py",
+      "sha256": "bd41fcf0bb95f1f3be6e332787b8a8d576de9a3f59bc3b9c3844b3211925bf2c",
+      "bytes": 6434
+    },
+    {
+      "member": "recipes/compat_relink.py",
+      "sha256": "32b0880a8f0a5bbae885f617b521b76eed1e0f0654419e0efe6eed801a5e3629",
+      "bytes": 4558
+    },
+    {
+      "member": "recipes/experimental_wheels.py",
+      "sha256": "f3939fc684fd42c388872bbfddb84cfbfb877e440b3de67bd1ce1dba60a6c2c6",
+      "bytes": 4704
+    },
+    {
+      "member": "recipes/prepare_experiment.py",
+      "sha256": "c9fa124471b711779a913ee784b72dd3fc8b7bf47d0525a24e4f37647b564a34",
+      "bytes": 3161
+    },
+    {
+      "member": "recipes/audit.py",
+      "sha256": "3159252fc7ae161b49b0381b3b5a378ea4daa61d42d0cf093bca71081d704fe2",
+      "bytes": 8481
+    },
+    {
+      "member": "recipes/acceptance.py",
+      "sha256": "27fa11a88694e5953b4846f3b3cbc34f60d96f96f04d97d7d8feaa946b412425",
+      "bytes": 3729
+    },
+    {
+      "member": "recipes/abi_report.py",
+      "sha256": "49f3dfb719f801a561837d9bd37b22c8bd87972df030d9e0f2519b2af5d4d385",
+      "bytes": 2002
+    },
+    {
+      "member": "recipes/wheelhouse.py",
+      "sha256": "cb3366173079fa8b7a2711506579bc29de131124377fdb9e55208651501c6b97",
+      "bytes": 3724
+    },
+    {
+      "member": "recipes/rebuild-sources.json",
+      "sha256": "7ddf343b6025e0481bb32a2b11e5aa3bfaba3c740ede8bf8a0aa004ffb0324bc",
+      "bytes": 2000
+    },
+    {
+      "member": "recipes/requirements.lock",
+      "sha256": "54bfc17714546a068eeb4caf481e8ba4c384fe1ecc936fcbd79876a7789bde6b",
+      "bytes": 96
+    }
+  ]
+}

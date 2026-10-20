@@ -1,0 +1,38 @@
+{
+  "host_arch": "x86_64",
+  "host_page_size": 4096,
+  "kvm_present": false,
+  "tun_present": false,
+  "android_executed": false,
+  "apk_installed": false,
+  "network_namespace": {
+    "exit_code": 1,
+    "stderr": "unshare: write failed /proc/self/uid_map: Operation not permitted"
+  },
+  "emulator_version": {
+    "exit_code": 127,
+    "stdout": "",
+    "stderr": "/workspace/scratch/6fe2cd15bb66/toolchains/sdk/emulator/qemu/linux-x86_64/qemu-system-x86_64: error while loading shared libraries: libxkbfile.so.1: cannot open shared object file: No such file or directory\n"
+  },
+  "acceleration": {
+    "exit_code": 3,
+    "stdout": "accel:\n3\nKVM requires a CPU that supports vmx or svm\naccel\n",
+    "stderr": ""
+  },
+  "arm64_engine_present": true,
+  "tcg_note": "ARM64 engine presence is not a successful boot; KVM absence alone does not prove TCG impossible. Offline isolation and signed authorized artifact required.",
+  "headless_version": {
+    "exit_code": 0,
+    "output": "Android emulator version 37.2.12.0 (build_id 16428233) (CL:N/A)\nCopyright (C) 2006-2024 The Android Open Source Project and many others.\nThis program is a derivative of the QEMU CPU emulator (www.qemu.org).\n\n  This software is licensed under the terms of the GNU General Public\n  License version 2, as published by the Free Software Foundation, and\n  may be copied, distributed, and modified under those terms.\n\n  This program is distributed in the hope that it will be useful,\n  but WITHOUT ANY WARRANTY; without even the implied warranty of\n  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n  GNU General Public License for more details.\n\n"
+  },
+  "acceleration_help": {
+    "exit_code": 0,
+    "output": "\n  Use '-accel <mode>' to control how CPU emulation can be accelerated\n  when launching the Android emulator. Accelerated emulation only works\n  for x86 and x86_64 system images. On Linux, it relies on KVM being\n  installed. On Windows, it relies on WHPX or AEHD. On MacOS, it relies\n  on HVF.\n  Valid values for <mode> are:\n\n     auto   The default, determines automatically if acceleration\n            is supported, and uses it when possible.\n\n     off    Disables acceleration entirely. Mostly useful for debugging.\n\n     on     Force acceleration. If KVM/WHPX/AEHD is not installed or usable,\n            the emulator will refuse to start and print an error message.\n\n  Note that this flag is ignored if you're not emulating an x86 or x86_64\n\n"
+  },
+  "arm64_headless_engine_version": {
+    "exit_code": 0,
+    "output": "Android emulator version 37.2.12.0 (build_id 16428233) (CL:N/A)\nCopyright (C) 2006-2024 The Android Open Source Project and many others.\nThis program is a derivative of the QEMU CPU emulator (www.qemu.org).\n\n  This software is licensed under the terms of the GNU General Public\n  License version 2, as published by the Free Software Foundation, and\n  may be copied, distributed, and modified under those terms.\n\n  This program is distributed in the hope that it will be useful,\n  but WITHOUT ANY WARRANTY; without even the implied warranty of\n  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n  GNU General Public License for more details.\n\n"
+  },
+  "offline_boot_validated": false,
+  "gui_version_probe_is_not_headless_blocker": true
+}

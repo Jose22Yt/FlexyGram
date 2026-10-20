@@ -1,0 +1,4 @@
+package: io.github.jose22yt.flexygram.diagnostic
+uses-permission: name='android.permission.ACCESS_NETWORK_STATE'
+permission: io.github.jose22yt.flexygram.diagnostic.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+uses-permission: name='io.github.jose22yt.flexygram.diagnostic.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION'
