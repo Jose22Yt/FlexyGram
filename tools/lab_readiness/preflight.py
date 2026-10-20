@@ -12,6 +12,9 @@ PROFILES = {
     'arm64-16k': (35, 'google_apis_ps16k', 'flexygram-api35-offline-v2'),
 }
 GIB = 1024 ** 3
+HOST_OVERRIDES = ['ADB_SERVER_SOCKET', 'ANDROID_ADB_SERVER_ADDRESS',
+                  'ANDROID_ADB_SERVER_PORT', 'ANDROID_SERIAL', 'LD_PRELOAD',
+                  'LD_AUDIT', 'JAVA_TOOL_OPTIONS', 'JDK_JAVA_OPTIONS', '_JAVA_OPTIONS']
 
 
 def properties(path):
@@ -65,9 +68,8 @@ def inspect(sdk, avd_home, java_home, env=None, runner=subprocess.run, usage=shu
         check('free_space_volume_' + str(index), lambda v=volume: require(usage(v['path']).free >= v['budget']))
 
     # A subsequent authorized offline session must explicitly clear inherited routing defaults.
-    for key in ['ADB_SERVER_SOCKET', 'ANDROID_ADB_SERVER_ADDRESS', 'ANDROID_ADB_SERVER_PORT',
-                'ANDROID_SERIAL', 'HTTP_PROXY', 'HTTPS_PROXY', 'ALL_PROXY',
-                'http_proxy', 'https_proxy', 'all_proxy']:
+    for key in HOST_OVERRIDES + ['HTTP_PROXY', 'HTTPS_PROXY', 'ALL_PROXY',
+                                'http_proxy', 'https_proxy', 'all_proxy']:
         check('environment_' + key, lambda key=key: require(not env.get(key)))
 
     for label, relative, expected in [
@@ -86,8 +88,10 @@ def inspect(sdk, avd_home, java_home, env=None, runner=subprocess.run, usage=shu
         def version(command=command, expected=expected):
             require(Path(command[0]).is_file())
             # No personal SDK/ADB defaults and no proxy values passed to child tools.
-            child = {k: v for k, v in env.items() if k not in ['ANDROID_SERIAL', 'ADB_SERVER_SOCKET'] and 'proxy' not in k.lower()}
+            child = {k: v for k, v in env.items() if k not in HOST_OVERRIDES and 'proxy' not in k.lower()}
             child['ANDROID_AVD_HOME'] = str(avd_home)
+            child['ANDROID_USER_HOME'] = str(avd_home)
+            child['ANDROID_HOME'] = str(sdk)
             child['ANDROID_SDK_ROOT'] = str(sdk)
             child['LD_LIBRARY_PATH'] = str(sdk / 'emulator/lib64') + ':' + str(sdk / 'emulator/lib64/qt/lib')
             result = runner(command, capture_output=True, text=True, timeout=20, env=child)

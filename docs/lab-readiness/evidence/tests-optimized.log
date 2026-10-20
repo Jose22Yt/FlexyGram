@@ -34,6 +34,6 @@ test_wrong_target_rejected (test_preflight.Readiness.test_wrong_target_rejected)
 test_wrong_versions_are_rejected (test_preflight.Readiness.test_wrong_versions_are_rejected) ... ok
 
 ----------------------------------------------------------------------
-Ran 34 tests in 0.055s
+Ran 34 tests in 0.059s
 
 OK

@@ -41,7 +41,9 @@ Comprobaciones agregadas (continúan después de un fallo):
   particiones de datos externas y Play Store habilitado. Los config.ini de
   ejemplo con rutas temporales deben regenerarse para el hogar privado real.
 - Se señalan valores heredados de proxies, selección de dispositivo o servidor
-  ADB remoto sin publicar sus contenidos. En este host existen proxies;
+  ADB remoto, precargas LD_PRELOAD/LD_AUDIT y opciones de agentes JVM sin
+  publicar sus contenidos. Estas opciones se excluyen de los subprocesos de
+  versión, incluso si la inspección sigue para recopilar otros bloqueos. En este host existen proxies;
   no deben borrarse globalmente, sino preparar un entorno offline separado
   autorizado cuando corresponda.
 

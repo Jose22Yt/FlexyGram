@@ -25,7 +25,12 @@
     "environment_ADB_SERVER_SOCKET",
     "environment_ANDROID_ADB_SERVER_ADDRESS",
     "environment_ANDROID_ADB_SERVER_PORT",
-    "environment_ANDROID_SERIAL"
+    "environment_ANDROID_SERIAL",
+    "environment_LD_PRELOAD",
+    "environment_LD_AUDIT",
+    "environment_JAVA_TOOL_OPTIONS",
+    "environment_JDK_JAVA_OPTIONS",
+    "environment__JAVA_OPTIONS"
   ],
   "required_next": [
     "reviewed image/archive gate",

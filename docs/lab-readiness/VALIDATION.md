@@ -56,3 +56,49 @@ El siguiente paso es incorporar por revisión estas mejoras al trabajo principal
 proveer laboratorio ARM64 aislado con herramientas/imágenes revisadas, ejecutar
 ambos gates de preparación y obtener autorización de firma/instalación antes
 de los 12 casos reales por perfil. Production sigue fuera del alcance.
+
+## Comprobación concurrente posterior a publicación
+
+Al publicar PR #22, el Work principal había avanzado PR #17 a
+`c7302da16082a30f39d8ef41886427cbf1edbe6c`. Se recuperaron ambos refs sin
+modificarlos. `git merge-tree --write-tree` (cálculo sin actualizar ninguna
+rama) produjo `d9b0a21a6c7d1ac475fb331065faa606b76de628`, exit 0:
+**sin conflictos textuales** entre ese HEAD y los primeros dos commits de esta
+rama. El controlador compartido no cambió en el intervalo a5459cf..c7302da.
+Esto no equivale a haber fusionado ramas o ejecutado el gate completo combinado.
+
+El nuevo launcher `empty_avd_boot.py` del HEAD concurrente reutiliza precisamente
+`Adb` y `preflight`. Por ese cambio nuevo de consumidor se ejecutaron sus
+**14 pruebas sintéticas** contra el controlador corregido de esta rama. Fuentes
+launcher/test obtenidas mediante `git show c7302da…:ruta`, en directorio temporal
+separado; dependencias Python resueltas desde esta rama. Comando:
+
+```sh
+PYTHONPATH=tests/native_compatibility:tests/native_compatibility/android_lab \
+  ../python311/bin/python -B -m unittest discover \
+  -s ../concurrency-check -p test_empty_avd_boot.py -v
+```
+
+Resultado: **14/14 PASS**, 0 fallos/errores/omisiones, registro
+`evidence/concurrent-launcher.log`. Ninguna ejecuta Android, ADB o unshare.
+Son comprobaciones nuevas de esta sesión sobre ese consumidor, no una
+reutilización del resultado publicado por el otro Work.
+
+Conteo final ampliado de esta tarea: **80 pruebas distintas aprobadas** =
+34 del suplemento + 32 del controlador histórico + 14 del consumidor concurrente.
+El conteo de 66 anterior describe el punto previo a esta comprobación adicional.
+Las 34 repeticiones con `-O` y los intentos iniciales no se vuelven a sumar.
+No se ejecutaron aquí las 304/318 del gate principal.
+
+La base de esta rama se conserva en a5459cf para no reescribir historia ni
+mezclar el trabajo concurrente. PR #22 puede revisarse contra la rama de #17;
+volver a comprobar conflictos si esa rama avanza antes de incorporar.
+
+El cierre endurece también los subprocesos de versión: elimina opciones de
+precarga/agentes y selección ADB heredadas, bloquea su presencia en el informe
+y fija ANDROID_USER_HOME/ANDROID_HOME además de AVD_HOME/SDK_ROOT.
+La regresión de entorno utiliza sólo marcadores sintéticos y prueba su ausencia
+en los argumentos de entorno entregados a cada doble de subprocess. Tras ese
+cambio se repitieron las 34 normales y las mismas 34 con `-O`: PASS/0 omisiones.
+`host-jdk21-preflight.json` ejecuta únicamente la sonda real de JDK21 disponible,
+con las raíces SDK/AVD ausentes: JDK PASS, preparación global BLOCKED.

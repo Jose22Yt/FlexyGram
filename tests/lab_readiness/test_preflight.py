@@ -69,6 +69,8 @@ class Readiness(unittest.TestCase):
         for _, kwargs in self.commands:
             self.assertEqual(kwargs['timeout'], 20)
             self.assertEqual(kwargs['env']['ANDROID_AVD_HOME'], str(self.avd))
+            self.assertEqual(kwargs['env']['ANDROID_USER_HOME'], str(self.avd))
+            self.assertEqual(kwargs['env']['ANDROID_HOME'], str(self.sdk))
             self.assertNotIn('shell', kwargs)
 
     def test_inspection_does_not_write_fixture(self):
@@ -108,9 +110,10 @@ class Readiness(unittest.TestCase):
 
     def test_environment_values_never_leak(self):
         secret = 'SYNTHETIC_PRIVATE_PROXY'
-        report = p.inspect(self.sdk, self.avd, self.java, env={'HTTP_PROXY': secret, 'ADB_SERVER_SOCKET': secret}, runner=self.runner)
+        report = p.inspect(self.sdk, self.avd, self.java, env={key: secret for key in p.HOST_OVERRIDES + ['HTTP_PROXY']}, runner=self.runner)
         self.assertIn('environment_HTTP_PROXY', report['blocking_checks'])
-        self.assertIn('environment_ADB_SERVER_SOCKET', report['blocking_checks'])
+        for key in p.HOST_OVERRIDES:
+            self.assertIn('environment_' + key, report['blocking_checks'])
         self.assertNotIn(secret, str(report))
         for _, kwargs in self.commands: self.assertNotIn(secret, str(kwargs['env']))
 
