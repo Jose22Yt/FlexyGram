@@ -1,0 +1,43 @@
+{
+  "android_executed": false,
+  "apk_installed": false,
+  "apk_signed": false,
+  "blocking_checks": [
+    "storage_sdk",
+    "storage_avd",
+    "environment_HTTP_PROXY",
+    "environment_HTTPS_PROXY",
+    "environment_ALL_PROXY",
+    "environment_http_proxy",
+    "environment_https_proxy",
+    "environment_all_proxy",
+    "sdk_cli_metadata",
+    "build_tools_metadata",
+    "adb_version",
+    "emulator_version",
+    "java_version",
+    "avd_api24-4k",
+    "avd_arm64-16k"
+  ],
+  "image_bytes_verified": false,
+  "network_isolation_verified": false,
+  "passed_checks": [
+    "environment_ADB_SERVER_SOCKET",
+    "environment_ANDROID_ADB_SERVER_ADDRESS",
+    "environment_ANDROID_ADB_SERVER_PORT",
+    "environment_ANDROID_SERIAL",
+    "environment_LD_PRELOAD",
+    "environment_LD_AUDIT",
+    "environment_JAVA_TOOL_OPTIONS",
+    "environment_JDK_JAVA_OPTIONS",
+    "environment__JAVA_OPTIONS"
+  ],
+  "required_next": [
+    "reviewed image/archive gate",
+    "authorized offline namespace verification",
+    "explicit -no-snapshot boot plan",
+    "authorized Android runtime validation"
+  ],
+  "schema": "flexygram-readiness-supplement-v1",
+  "status": "PREBOOT_BLOCKED"
+}

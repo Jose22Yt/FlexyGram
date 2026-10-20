@@ -1,0 +1,15 @@
+{
+  "base_pr17": "c7302da16082a30f39d8ef41886427cbf1edbe6c",
+  "source_pr22": "0ffcf81bd1aaba2512ff1b0ef09472e612c45d1c",
+  "temporary_integration_tree": "7a510644fb2045aeb4502545f1adbfbb2c0c7721",
+  "python": "3.11.17",
+  "pyelftools": "0.33",
+  "jdk": "Temurin 21.0.12.1+1",
+  "jdk_archive_sha256": "ce79869e1307ed8ee1e2baa86a412b1eb5b75d10a01006d788a6f968bcfaee94",
+  "pr20_source_sha256": "f840911ae0adc5cb5fcfb3351e986d1024151838eca3af7434e86fecd65bf146",
+  "pr21_source_sha256": "5e0a1be9fbe1fbcb4e1ac1f283c3faf23b29a328a03138dd93448606583f45ca",
+  "android_executed": false,
+  "apk_rebuilt": false,
+  "apk_signed": false,
+  "apk_installed": false
+}

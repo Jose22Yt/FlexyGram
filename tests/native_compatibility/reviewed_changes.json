@@ -131,6 +131,90 @@
       "before": null,
       "after": "9fa1e07cbfab2927ac5276274d96bbf0cb93d5a4a1bccbc93fd7d62451d36a9a",
       "previous": []
+    },
+    "docs/lab-readiness/README.md": {
+      "before": null,
+      "after": "9f8b5b0ba379b04880deaf96ed4d3eac66874c954004365f9e46f5dce0452086",
+      "previous": []
+    },
+    "docs/lab-readiness/VALIDATION.md": {
+      "before": null,
+      "after": "a26994ab2defe4b719405f1a966a0e632518de25b10a5f2f430fe126932c9591",
+      "previous": []
+    },
+    "docs/lab-readiness/evidence/concurrent-launcher.log": {
+      "before": null,
+      "after": "0d6e07092c3d46b481bc0da3358c9f06a8df92239348f4f9fe08284802e514dd",
+      "previous": []
+    },
+    "docs/lab-readiness/evidence/controller-before.log": {
+      "before": null,
+      "after": "85885ea8a50e6bb9c7bf9be74f7328bbec8c9ade4efcc5f579ea8f5f0e2de29f",
+      "previous": []
+    },
+    "docs/lab-readiness/evidence/controller-initial-missing-javac.log": {
+      "before": null,
+      "after": "eedf1e9e74364d221cb712c58c01b0c8756d63880585fded82ef4cf150d4b184",
+      "previous": []
+    },
+    "docs/lab-readiness/evidence/controller-jdk21.log": {
+      "before": null,
+      "after": "714c47c5ecd4223afcb8dea37c2f50200728b93d0a70f8d7b28c7f48686f7bf5",
+      "previous": []
+    },
+    "docs/lab-readiness/evidence/host-inventory.json": {
+      "before": null,
+      "after": "039da7b1f283ddc159ac6809021b0a1fba414747674653786c58362e2094cc18",
+      "previous": []
+    },
+    "docs/lab-readiness/evidence/host-jdk21-preflight.json": {
+      "before": null,
+      "after": "baca3c2bea985b17206a438bcdea981e3a5688b60fc898e0886932454a361010",
+      "previous": []
+    },
+    "docs/lab-readiness/evidence/missing-roots-preflight.json": {
+      "before": null,
+      "after": "2149c4bd2659b2ea1464f0eac5505b2e26173a6493b232a86bdccd23c6c1e9bb",
+      "previous": []
+    },
+    "docs/lab-readiness/evidence/tests-normal.log": {
+      "before": null,
+      "after": "374614764f05dac4e629b1c5a12b6d0cc58a0d6c5d6be275a84e7d9d90e919e0",
+      "previous": []
+    },
+    "docs/lab-readiness/evidence/tests-optimized.log": {
+      "before": null,
+      "after": "175344b4a6849951ba0c8ee0d50a1c26daebfe849109af09432b032793e60ad6",
+      "previous": []
+    },
+    "tests/lab_readiness/test_controller_regressions.py": {
+      "before": null,
+      "after": "7b638f9e0a0b988c74f90beae44fa65f869ea7b2617e38c4c8cfdb7356a1f4dd",
+      "previous": []
+    },
+    "tests/lab_readiness/test_preflight.py": {
+      "before": null,
+      "after": "07cc2e92a4facc1eae39fddfc05bc5fc6bd4723d35e4f1ad8c56f80621c71634",
+      "previous": [
+        "a9c40bc6613371746edd65c8548aa271f48060986f5de39f5a077d2f74bb0595"
+      ]
+    },
+    "tools/lab_readiness/preflight.py": {
+      "before": null,
+      "after": "1a0a4d137f9fe4436cc96c0bb5cfa8840fdb5470518c4fa7055346c935ad5a79",
+      "previous": [
+        "a8abb5fbe6c9b5d32884dc7233acbb081948a6fcc32cc97336afbc1ac24e15c4"
+      ]
+    },
+    "tools/lab_readiness/run_combined_gate.py": {
+      "before": null,
+      "after": "4a77530c75fbf6f7a038380e1967997e06e98e110f22e9a25754600c053a0529",
+      "previous": []
+    },
+    "tests/lab_readiness/test_combined_gate.py": {
+      "before": null,
+      "after": "486e52d8e6708786cfc1ed839025d927a7ca29b300b121de4f254a972ce15e71",
+      "previous": []
     }
   }
 }
