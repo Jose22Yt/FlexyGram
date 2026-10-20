@@ -1,0 +1,173 @@
+{
+  "schema": 1,
+  "project": "FlexyGram1.0",
+  "responsible": "@Lukhou23",
+  "reviewed_pr29": "be75bdb65ddb5ae5a68024a985295eae7f612dd8",
+  "integration_commits": [
+    "ef1ce2d22506f4258b48f11c3e644ef5000214ce",
+    "97dfb08e58159b31d322dd8435080fb039abdeb9"
+  ],
+  "new_regressions": 8,
+  "distinct_test_methods": 68,
+  "python": "3.11.17",
+  "suites": [
+    {
+      "suite": "beta_development",
+      "distinct_methods": 36,
+      "normal": "PASS",
+      "optimized": "PASS",
+      "skipped": 0,
+      "ids": [
+        "test_activity_lifecycle.ActivityLifecycle.test_old_probe_loses_recreated_cell_new_activity_updates_current_view.test_old_probe_loses_recreated_cell_new_activity_updates_current_view",
+        "test_back_regression.BackRegression.test_back_during_transition_original_fails_corrected_queues.test_back_during_transition_original_fails_corrected_queues",
+        "test_build_profile.BuildProfileTests.test_actual_cmake_beta_scope_is_bound_to_profile.test_actual_cmake_beta_scope_is_bound_to_profile",
+        "test_build_profile.BuildProfileTests.test_actual_groovy_validator_accepts_only_closed_identity.test_actual_groovy_validator_accepts_only_closed_identity",
+        "test_build_profile.BuildProfileTests.test_protected_policies_and_historical_contract_are_unchanged.test_protected_policies_and_historical_contract_are_unchanged",
+        "test_client_events.ClientEventsTests.test_blocked_writer_does_not_block_ui_and_second_consumer_rejected.test_blocked_writer_does_not_block_ui_and_second_consumer_rejected",
+        "test_client_events.ClientEventsTests.test_clock_regression_and_thread_ownership.test_clock_regression_and_thread_ownership",
+        "test_client_events.ClientEventsTests.test_close_after_open_waits_and_completes.test_close_after_open_waits_and_completes",
+        "test_client_events.ClientEventsTests.test_export_is_background_private_and_never_overwrites.test_export_is_background_private_and_never_overwrites",
+        "test_client_events.ClientEventsTests.test_interoperability_with_pinned_work1_analyzer.test_interoperability_with_pinned_work1_analyzer",
+        "test_client_events.ClientEventsTests.test_interrupt_reports_logical_cancellation_not_presentation.test_interrupt_reports_logical_cancellation_not_presentation",
+        "test_client_events.ClientEventsTests.test_overflow_cannot_change_navigation.test_overflow_cannot_change_navigation",
+        "test_client_events.ClientEventsTests.test_probe_state_recreated_view_and_destroy.test_probe_state_recreated_view_and_destroy",
+        "test_client_events.ClientEventsTests.test_rapid_tap_observes_navigation_frame_instead_of_instant_success.test_rapid_tap_observes_navigation_frame_instead_of_instant_success",
+        "test_client_events.ClientEventsTests.test_replace_pause_reentry_and_closed_owner.test_replace_pause_reentry_and_closed_owner",
+        "test_client_events.ClientEventsTests.test_theme_replacement_uses_only_latest_explicit_target.test_theme_replacement_uses_only_latest_explicit_target",
+        "test_client_events.ClientEventsTests.test_writer_failure_is_not_loss_free.test_writer_failure_is_not_loss_free",
+        "test_frame_endpoint.FrameEndpointTests.test_predraw_frame_cancel_and_timeout_real_observer.test_predraw_frame_cancel_and_timeout_real_observer",
+        "test_navigation_queue.NavigationQueueTests.test_bounded_latest_request_reentrancy_and_lifecycle.test_bounded_latest_request_reentrancy_and_lifecycle",
+        "test_notification_expiry.NotificationExpiry.test_original_callback_bug_and_actual_corrected_method.test_original_callback_bug_and_actual_corrected_method",
+        "test_personal_import_bridge.PersonalImporterBridge.test_actual_java_two_batch_export_imports_and_keeps_rapid_tap_endpoint.test_actual_java_two_batch_export_imports_and_keeps_rapid_tap_endpoint",
+        "test_platform_back.PlatformBackTests.test_api24_32_keep_legacy_back_without_platform_registration.test_api24_32_keep_legacy_back_without_platform_registration",
+        "test_platform_back.PlatformBackTests.test_api33_36_37_original_lacks_bridge_new_activity_preserves_queue.test_api33_36_37_original_lacks_bridge_new_activity_preserves_queue",
+        "test_platform_back.PlatformBackTests.test_platform_registration_and_destruction_are_idempotent.test_platform_registration_and_destruction_are_idempotent",
+        "test_postinit_reentry.PostInitReentryTests.test_linkage_failure_blocks_second_activity_in_same_process.test_linkage_failure_blocks_second_activity_in_same_process",
+        "test_postinit_reentry.PostInitReentryTests.test_recursive_entry_cannot_build_on_partial_initialization.test_recursive_entry_cannot_build_on_partial_initialization",
+        "test_postinit_reentry.PostInitReentryTests.test_runtime_failure_blocks_second_activity_in_same_process.test_runtime_failure_blocks_second_activity_in_same_process",
+        "test_postinit_reentry.PostInitReentryTests.test_success_is_reused_without_repeating_global_initialization.test_success_is_reused_without_repeating_global_initialization",
+        "test_postinit_reentry.PostInitReentryTests.test_unhandled_fatal_propagates_but_remains_fail_closed.test_unhandled_fatal_propagates_but_remains_fail_closed",
+        "test_recreation_startup.RecreationStartupTests.test_conversation_and_settings_survive_activity_recreation.test_conversation_and_settings_survive_activity_recreation",
+        "test_recreation_startup.RecreationStartupTests.test_dark_theme_survives_configuration_and_external_theme_is_preserved.test_dark_theme_survives_configuration_and_external_theme_is_preserved",
+        "test_recreation_startup.RecreationStartupTests.test_failed_post_init_is_reported_without_building_client_views.test_failed_post_init_is_reported_without_building_client_views",
+        "test_transition_ownership.TransitionOwnershipTests.test_historical_method_reproduces_lost_callback.test_historical_method_reproduces_lost_callback",
+        "test_transition_ownership.TransitionOwnershipTests.test_real_method_preserves_reentrant_work.test_real_method_preserves_reentrant_work",
+        "test_ui_state_probe.UiStateProbeTests.test_jni_start_import_and_success_stages_without_private_error_output.test_jni_start_import_and_success_stages_without_private_error_output",
+        "test_ui_state_probe.UiStateProbeTests.test_saved_state_is_primitive_allowlist_and_never_runtime_or_credentials.test_saved_state_is_primitive_allowlist_and_never_runtime_or_credentials"
+      ]
+    },
+    {
+      "suite": "personal_beta",
+      "distinct_methods": 11,
+      "normal": "PASS",
+      "optimized": "PASS",
+      "skipped": 0,
+      "ids": [
+        "test_import_events.PersonalImportTests.test_cross_batch_operation_and_numeric_order.test_cross_batch_operation_and_numeric_order",
+        "test_import_events.PersonalImportTests.test_early_crash_without_events_reuses_real_log_parser.test_early_crash_without_events_reuses_real_log_parser",
+        "test_import_events.PersonalImportTests.test_false_counter_and_event_session_spoof_rejected.test_false_counter_and_event_session_spoof_rejected",
+        "test_import_events.PersonalImportTests.test_framestats_requires_real_refresh_input_and_keeps_fps_unknown.test_framestats_requires_real_refresh_input_and_keeps_fps_unknown",
+        "test_import_events.PersonalImportTests.test_loss_abandonment_or_pending_never_certifies_performance.test_loss_abandonment_or_pending_never_certifies_performance",
+        "test_import_events.PersonalImportTests.test_loss_counters_cannot_regress.test_loss_counters_cannot_regress",
+        "test_import_events.PersonalImportTests.test_missing_first_batch_rejected_before_orphan_acceptance.test_missing_first_batch_rejected_before_orphan_acceptance",
+        "test_import_events.PersonalImportTests.test_mixed_sessions_and_duplicate_batch_rejected.test_mixed_sessions_and_duplicate_batch_rejected",
+        "test_import_events.PersonalImportTests.test_partial_export_and_wrong_record_count_rejected.test_partial_export_and_wrong_record_count_rejected",
+        "test_import_events.PersonalImportTests.test_profile_is_declared_not_device_or_strict_16k_attestation.test_profile_is_declared_not_device_or_strict_16k_attestation",
+        "test_import_events.PersonalImportTests.test_user_text_cannot_add_private_observer_fields.test_user_text_cannot_add_private_observer_fields"
+      ]
+    },
+    {
+      "suite": "beta_handoff",
+      "distinct_methods": 21,
+      "normal": "PASS",
+      "optimized": "PASS",
+      "skipped": 0,
+      "ids": [
+        "test_diagnostics.DiagnosticsAdapterTests.test_beta_package_is_independent.test_beta_package_is_independent",
+        "test_diagnostics.DiagnosticsAdapterTests.test_modified_or_missing_pr24_source_is_not_executed.test_modified_or_missing_pr24_source_is_not_executed",
+        "test_handoff.HandoffTests.test_archive_inventory_cannot_smuggle_private_members.test_archive_inventory_cannot_smuggle_private_members",
+        "test_handoff.HandoffTests.test_corrupt_restored_bytes_fail.test_corrupt_restored_bytes_fail",
+        "test_handoff.HandoffTests.test_digest_and_inventory_precheck_only.test_digest_and_inventory_precheck_only",
+        "test_handoff.HandoffTests.test_existing_archive_wrong_payload_or_unsafe_path_blocks.test_existing_archive_wrong_payload_or_unsafe_path_blocks",
+        "test_handoff.HandoffTests.test_existing_work_archive_inventory_without_extracting.test_existing_work_archive_inventory_without_extracting",
+        "test_handoff.HandoffTests.test_gate_delegates_full_review_and_checks_version.test_gate_delegates_full_review_and_checks_version",
+        "test_handoff.HandoffTests.test_missing_file_is_never_a_success.test_missing_file_is_never_a_success",
+        "test_handoff.HandoffTests.test_missing_or_empty_required_resources.test_missing_or_empty_required_resources",
+        "test_handoff.HandoffTests.test_path_traversal_and_duplicate_members_blocked.test_path_traversal_and_duplicate_members_blocked",
+        "test_handoff.HandoffTests.test_receipt_cannot_substitute_other_apk.test_receipt_cannot_substitute_other_apk",
+        "test_handoff.HandoffTests.test_roundtrip_bundle_after_independent_copy.test_roundtrip_bundle_after_independent_copy",
+        "test_handoff.HandoffTests.test_signed_jar_is_not_accepted_for_unsigned_handoff.test_signed_jar_is_not_accepted_for_unsigned_handoff",
+        "test_handoff.HandoffTests.test_subprocess_failure_cannot_leave_old_pass_or_print_private_output.test_subprocess_failure_cannot_leave_old_pass_or_print_private_output",
+        "test_handoff.HandoffTests.test_wrong_hash_blocks_before_importing_review_tools.test_wrong_hash_blocks_before_importing_review_tools",
+        "test_manifest.ManifestRegressionTests.test_arbitrary_launcher_category_is_rejected.test_arbitrary_launcher_category_is_rejected",
+        "test_manifest.ManifestRegressionTests.test_current_optional_multiwindow_category_remains_compatible.test_current_optional_multiwindow_category_remains_compatible",
+        "test_manifest.ManifestRegressionTests.test_missing_launcher_category_must_fail.test_missing_launcher_category_must_fail",
+        "test_manifest.ManifestRegressionTests.test_valid_beta_launcher_contract.test_valid_beta_launcher_contract",
+        "test_manifest.ManifestRegressionTests.test_wrong_application_initializer_must_fail.test_wrong_application_initializer_must_fail"
+      ]
+    }
+  ],
+  "reviewed_files": [
+    {
+      "path": "TMessagesProj/src/betaDevelopment/java/org/telegram/ui/beta/BetaPostInit.java",
+      "sha256": "3987abb4a691f6a273e287098435eeb7bfa370cf096af74446c7557aa9041cb8",
+      "reviewed_bytes_preserved": true
+    },
+    {
+      "path": "TMessagesProj/src/betaDevelopment/java/org/telegram/ui/beta/BetaPreviewActivity.java",
+      "sha256": "313e78fb5ba9126b7d7c14537efa47a962feaae95b833008002d9e4f81e9b0f3",
+      "reviewed_bytes_preserved": true
+    },
+    {
+      "path": "TMessagesProj/src/betaDevelopment/java/org/telegram/ui/beta/BetaSystemBack.java",
+      "sha256": "74f05dfb48ab481dab5349347ea47c1be78a2c1de8d5e4a523cf9b5f552d9768",
+      "reviewed_bytes_preserved": true
+    },
+    {
+      "path": "docs/beta-development/WORK1-COMPILE-HANDOVER.md",
+      "sha256": "f89152f3d56490fe7cb6ebf60b8705e06d9db2e2ca602d3739c2531fa302feb9",
+      "reviewed_bytes_preserved": true
+    },
+    {
+      "path": "docs/beta-development/evidence-work1-handover.json",
+      "sha256": "99b2e11eb3dea3b1249c7e4ef5a80e2903103595473ca8a179d56de5ab3c5b61",
+      "reviewed_bytes_preserved": true
+    },
+    {
+      "path": "tests/beta_development/client_android_doubles.py",
+      "sha256": "380bcebd5fa1b6e5383e09559dad01bbe13c49004693cdbfe7f52f8e40889488",
+      "reviewed_bytes_preserved": true
+    },
+    {
+      "path": "tests/beta_development/test_platform_back.py",
+      "sha256": "24db416396a6741c04a4ace57cfd662d2c015c5fc386e97480f3c8040a0818dd",
+      "reviewed_bytes_preserved": true
+    },
+    {
+      "path": "tests/beta_development/test_postinit_reentry.py",
+      "sha256": "6a903e1de43de96eb15f7f83afa3de11fe22cee28636c6cec74020501ec40de5",
+      "reviewed_bytes_preserved": true
+    }
+  ],
+  "cache_survived_maintenance": false,
+  "four_elf_rebuilt": false,
+  "experimental_wheels_rebuilt": false,
+  "original_wheels_verified": 18,
+  "overlay_wheels_verified": 18,
+  "apk_status": "BUILD_RUNNING_NO_RESULT_YET",
+  "apk_sha256": null,
+  "android_executed": false,
+  "signed": false,
+  "installed": false,
+  "distributed": false,
+  "dropbox_probe": {
+    "sha256": "2094cb8985a1cf26d909f83272d20a977c1c541706ce218b3104cbecd8769c6d",
+    "bytes": 57671850,
+    "upload_and_recovery_previously_verified": true,
+    "probe_still_listed_in_current_session": true,
+    "apk_uploaded": false,
+    "folder_members_or_invitations_enumerated": false,
+    "private_access_approval_pending": true
+  },
+  "build_source_commit": "97dfb08e58159b31d322dd8435080fb039abdeb9"
+}
