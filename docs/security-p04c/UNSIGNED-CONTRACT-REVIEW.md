@@ -65,9 +65,10 @@ python3.11 -B -O tests/native_compatibility/run_gate.py \
   --output /private/native-with-apk-check-optimized.json
 ```
 
-El total orientativo de la suite nativa pasa de **177 a 198**
-(12 pruebas nuevas del revisor de evidencias y 9 pruebas sintéticas nuevas
-del APK físico). **No está ejecutada esa nueva suite**; el total debe
+El total esperado de la suite nativa pasa de **177 a 200**
+(12 pruebas nuevas del revisor de evidencias, 9 pruebas sintéticas nuevas
+del APK físico y 2 regresiones del gate). El ejecutor general bloquea
+explícitamente si descubre menos de **200** casos. **No está ejecutada esa nueva suite**; el total debe
 confirmarse con las salidas reales. No copiar binarios a GitHub ni
 declarar instalado/certificado el APK si la lectura de sus bytes tiene éxito.
 
