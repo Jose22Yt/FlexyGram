@@ -9,7 +9,9 @@ def inventory():
     caps=Path('/proc/self/status').read_text() if Path('/proc/self/status').exists() else ''
     cap=re.search(r'^CapEff:\s*([0-9a-f]+)',caps,re.M);bits=int(cap[1],16) if cap else 0
     return {'host_arch':platform.machine(),'host_pages':os.sysconf('SC_PAGE_SIZE'),'kvm':Path('/dev/kvm').exists(),'tun':Path('/dev/net/tun').exists(),'cap_net_admin':bool(bits&(1<<12)),'cap_sys_admin':bool(bits&(1<<21)),'adb':bool(shutil.which('adb')),'emulator':bool(shutil.which('emulator')),'qemu_arm64':bool(shutil.which('qemu-system-aarch64')),'launch_cvd':bool(shutil.which('launch_cvd')),'android_executed':False,'status':'INVENTORY_ONLY'}
-def serial_ok(serial):return bool(re.fullmatch(r'emulator-[0-9]+|127\.0\.0\.1:[0-9]+|localhost:[0-9]+',serial))
+def serial_ok(serial):
+    match=re.fullmatch(r'(emulator-|127\.0\.0\.1:|localhost:)([0-9]{1,5})',serial)
+    return bool(match and 1<=int(match[2])<=(65534 if match[1]=='emulator-' else 65535))
 def counters(text):
     rows=[line.split() for line in text.splitlines() if re.match(r'^\s*\d+\s+\d+\s+DROP\b',line)]
     require(len(rows)==1,'Missing/ambiguous firewall DROP counter')
@@ -26,7 +28,10 @@ class Adb:
     def run(self,*args,timeout=45,check=True):
         p=subprocess.run([self.binary,'-s',self.serial,*map(str,args)],capture_output=True,text=True,timeout=timeout)
         if check:require(p.returncode==0,'ADB command failed: '+str(args[0])+'\n'+p.stderr[:500])
-        return p.stdout+p.stderr
+        # ADB host startup notices are not guest output. Preserve all other diagnostics.
+        stderr=''.join(line for line in p.stderr.splitlines(keepends=True)
+                       if not re.fullmatch(r'\* daemon (?:not running; starting now at tcp:[0-9]{1,5}|started successfully)\r?\n?',line))
+        return p.stdout+stderr
     def shell(self,*args,**kw):return self.run('shell',*args,**kw).replace('\r','').strip()
     def prop(self,name):return self.shell('getprop',name)
 

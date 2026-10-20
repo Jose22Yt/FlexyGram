@@ -1,0 +1,75 @@
+test_invalid_tcp_port_is_not_a_local_emulator (test_controller_regressions.ControllerRegressions.test_invalid_tcp_port_is_not_a_local_emulator) ... 
+  test_invalid_tcp_port_is_not_a_local_emulator (test_controller_regressions.ControllerRegressions.test_invalid_tcp_port_is_not_a_local_emulator) (serial='localhost:0') ... FAIL
+  test_invalid_tcp_port_is_not_a_local_emulator (test_controller_regressions.ControllerRegressions.test_invalid_tcp_port_is_not_a_local_emulator) (serial='127.0.0.1:65536') ... FAIL
+  test_invalid_tcp_port_is_not_a_local_emulator (test_controller_regressions.ControllerRegressions.test_invalid_tcp_port_is_not_a_local_emulator) (serial='emulator-0') ... FAIL
+  test_invalid_tcp_port_is_not_a_local_emulator (test_controller_regressions.ControllerRegressions.test_invalid_tcp_port_is_not_a_local_emulator) (serial='emulator-65535') ... FAIL
+  test_invalid_tcp_port_is_not_a_local_emulator (test_controller_regressions.ControllerRegressions.test_invalid_tcp_port_is_not_a_local_emulator) (serial='emulator-99999999') ... FAIL
+test_nonzero_exit_still_blocks (test_controller_regressions.ControllerRegressions.test_nonzero_exit_still_blocks) ... ok
+test_partial_banner_or_similar_error_is_preserved (test_controller_regressions.ControllerRegressions.test_partial_banner_or_similar_error_is_preserved) ... ok
+test_startup_banner_does_not_corrupt_get_state (test_controller_regressions.ControllerRegressions.test_startup_banner_does_not_corrupt_get_state) ... FAIL
+test_stdout_is_never_filtered_as_host_banner (test_controller_regressions.ControllerRegressions.test_stdout_is_never_filtered_as_host_banner) ... ok
+test_supported_serials_preserved (test_controller_regressions.ControllerRegressions.test_supported_serials_preserved) ... ok
+test_timeout_propagates_without_retry_or_side_effect (test_controller_regressions.ControllerRegressions.test_timeout_propagates_without_retry_or_side_effect) ... ok
+test_unknown_stderr_is_preserved (test_controller_regressions.ControllerRegressions.test_unknown_stderr_is_preserved) ... ok
+
+======================================================================
+FAIL: test_invalid_tcp_port_is_not_a_local_emulator (test_controller_regressions.ControllerRegressions.test_invalid_tcp_port_is_not_a_local_emulator) (serial='localhost:0')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram/tests/lab_readiness/test_controller_regressions.py", line 29, in test_invalid_tcp_port_is_not_a_local_emulator
+    with self.subTest(serial=serial):self.assertFalse(run_lab.serial_ok(serial))
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_invalid_tcp_port_is_not_a_local_emulator (test_controller_regressions.ControllerRegressions.test_invalid_tcp_port_is_not_a_local_emulator) (serial='127.0.0.1:65536')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram/tests/lab_readiness/test_controller_regressions.py", line 29, in test_invalid_tcp_port_is_not_a_local_emulator
+    with self.subTest(serial=serial):self.assertFalse(run_lab.serial_ok(serial))
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_invalid_tcp_port_is_not_a_local_emulator (test_controller_regressions.ControllerRegressions.test_invalid_tcp_port_is_not_a_local_emulator) (serial='emulator-0')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram/tests/lab_readiness/test_controller_regressions.py", line 29, in test_invalid_tcp_port_is_not_a_local_emulator
+    with self.subTest(serial=serial):self.assertFalse(run_lab.serial_ok(serial))
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_invalid_tcp_port_is_not_a_local_emulator (test_controller_regressions.ControllerRegressions.test_invalid_tcp_port_is_not_a_local_emulator) (serial='emulator-65535')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram/tests/lab_readiness/test_controller_regressions.py", line 29, in test_invalid_tcp_port_is_not_a_local_emulator
+    with self.subTest(serial=serial):self.assertFalse(run_lab.serial_ok(serial))
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_invalid_tcp_port_is_not_a_local_emulator (test_controller_regressions.ControllerRegressions.test_invalid_tcp_port_is_not_a_local_emulator) (serial='emulator-99999999')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram/tests/lab_readiness/test_controller_regressions.py", line 29, in test_invalid_tcp_port_is_not_a_local_emulator
+    with self.subTest(serial=serial):self.assertFalse(run_lab.serial_ok(serial))
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_startup_banner_does_not_corrupt_get_state (test_controller_regressions.ControllerRegressions.test_startup_banner_does_not_corrupt_get_state)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram/tests/lab_readiness/test_controller_regressions.py", line 17, in test_startup_banner_does_not_corrupt_get_state
+    self.assertEqual(self.response(stderr='* daemon not running; starting now at tcp:5037\n* daemon started successfully\n'),'device\n')
+AssertionError: 'device\n* daemon not running; starting now at tcp[34 chars]ly\n' != 'device\n'
+  device
+- * daemon not running; starting now at tcp:5037
+- * daemon started successfully
+
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.003s
+
+FAILED (failures=6)
