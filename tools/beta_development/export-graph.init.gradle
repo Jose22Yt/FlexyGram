@@ -1,6 +1,8 @@
 // Read-only graph inspection for the offline beta; no build, signing or app execution.
 gradle.projectsEvaluated {
-    def app = rootProject.project(':TMessagesProj')
+    // Init scripts also run for buildSrc; that auxiliary build has no app project.
+    def app = rootProject.findProject(':TMessagesProj')
+    if (app == null) return
     app.tasks.register('writeBetaDevelopmentGraph') {
         doLast {
             def output = app.findProperty('betaGraphOutput')

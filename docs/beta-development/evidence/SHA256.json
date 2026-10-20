@@ -1,0 +1,98 @@
+{
+  "beta-apk-review.json": {
+    "bytes": 19391,
+    "sha256": "a6e9b2881442c4acfebaec6ec47c163ae3ac8b80614a88796cf33b20d73b648f"
+  },
+  "beta-classpath.json": {
+    "bytes": 25862,
+    "sha256": "c77a025191364b2ed1a4d9bdd2740287314044cc238b9231c5f1092c3b3cdb88"
+  },
+  "beta-first-build.json": {
+    "bytes": 282,
+    "sha256": "e354db471dc70b378089746410254d519d96949ee2bd50ce14bb44a55cf43492"
+  },
+  "beta-gradle-first-success-01.log": {
+    "bytes": 64895,
+    "sha256": "8a39a7386561076a4bc271c15f4295a930bb1d5c7d39800e7b8104c2f21c41f2"
+  },
+  "beta-gradle-first-success-02.log": {
+    "bytes": 64942,
+    "sha256": "a1093ec4461198130daf0a1fc106d96c37cc2cfa8427eb5187f0ef266ebb1956"
+  },
+  "beta-gradle-first-success-03.log": {
+    "bytes": 64941,
+    "sha256": "06cef48368d7d1fbcf4c16b91c4de79cd50f2bd72648c6bb0db29b4203451141"
+  },
+  "beta-gradle-first-success-04.log": {
+    "bytes": 466,
+    "sha256": "7c7bd1b2ab09a42b2f25cfc9774e4a6d6d3e354ff17a040259c846e3dc3c050f"
+  },
+  "beta-gradle-first-success-result.json": {
+    "bytes": 327,
+    "sha256": "83306db5e86a0a72c7917b5705d2e4b4034859703f64217df79070d24d2c12ad"
+  },
+  "beta-gradle-graph.log": {
+    "bytes": 1343,
+    "sha256": "6384ef5b20f336890de6d5a5db227b5054b8b2cb31cbf4b16f29187fcb2212ed"
+  },
+  "beta-gradle-production-check.log": {
+    "bytes": 2011,
+    "sha256": "837667b96e67d5ef43ca816cdc88abe3f86de3470fc9ea7f6fa3c22795db26a2"
+  },
+  "beta-gradle-result-graph.json": {
+    "bytes": 515,
+    "sha256": "e8f617e484a77beb9ae6e1eaea90ed7518b5ac922231f64d911ea2f95e81cce3"
+  },
+  "beta-gradle-result-production-check.json": {
+    "bytes": 321,
+    "sha256": "7ccdecf5ed114c67e6bf0fd2b5e90569d45561d89e4c1b660525236a0a58642f"
+  },
+  "beta-gradle-result.json": {
+    "bytes": 326,
+    "sha256": "6b75e1bcf5edd928eb83c94b56bba21831492db025457c28e41eb9bc05623e3c"
+  },
+  "beta-gradle.log": {
+    "bytes": 29880,
+    "sha256": "039796621357f009f74ef895d4a4d0b7a071f918798d8d82e7f0f694d49478ff"
+  },
+  "beta-host-tests-final-opt.log": {
+    "bytes": 1032,
+    "sha256": "b17ea5b3b1647fbb2d396cca277c016c3910dfd8923f512c5715dde83cd88b72"
+  },
+  "beta-host-tests-final.log": {
+    "bytes": 1032,
+    "sha256": "8a85fc7fd5648a7eaedb3d92297e084fb89030f4be96e5f69535ff19e723dd4c"
+  },
+  "beta-host-tests-opt.log": {
+    "bytes": 1032,
+    "sha256": "ff42123299c04ed7951fcd213d888b4ce4517a268536a7599d471659c9a92c4a"
+  },
+  "beta-host-tests.log": {
+    "bytes": 1032,
+    "sha256": "6f7dfdf262f0a5268c33b304e8f98980a432f7206fc393b1b30b8b3f1963d511"
+  },
+  "beta-native-guards.json": {
+    "bytes": 912,
+    "sha256": "b76759fe0808c61f5f5f4834ce5c9e03c70e760a2e1804390c81807696b36ec0"
+  },
+  "beta-private-backup.json": {
+    "bytes": 694,
+    "sha256": "5a733f416bf7be48f9175a06ebbc568197828aec464925f51025f776c41d4fba"
+  },
+  "beta-queue-busy-cancel-before.log": {
+    "bytes": 1192,
+    "sha256": "a5638650f6c0ac8fc8e7161df2e10699811970bb71dba6a327ed43888c795fda"
+  },
+  "beta-queue-compiled.json": {
+    "bytes": 198,
+    "sha256": "713c60a9e74b9aed02401eaa68342d44aa54496d03fa77ecc34aaf5654d6bb82"
+  },
+  "beta-queue-compiled.txt": {
+    "bytes": 4575,
+    "sha256": "beb9410f613e270fe574787fc4f45d16e1777769fa1fe1b61696cbf7634e812e"
+  },
+  "beta-source-inputs.json": {
+    "bytes": 2794,
+    "sha256": "e3d2ad23ffaa7d7404269ce3a33a73143091709b4009ee469c0070f00791796f"
+  }
+}

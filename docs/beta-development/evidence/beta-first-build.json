@@ -1,0 +1,8 @@
+{
+  "source_code_commit": "643566b46b8aaf41033e1e059805379dde737cf7",
+  "apk_sha256": "e087816459e2ff1aad23e3ea45cd1fc6f6ffbde580f74572567262cce95e125a",
+  "bytes": 113086551,
+  "status": "SUPERSEDED_BY_BUSY_PROBE_CANCELLATION_FIX",
+  "signed": false,
+  "android_executed": false
+}

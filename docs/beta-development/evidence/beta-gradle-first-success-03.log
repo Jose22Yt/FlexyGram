@@ -1,0 +1,616 @@
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/third_party/openh264/src/codec/encoder/core/inc/wels_task_encoder.h:45:
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/third_party/openh264/src/codec/encoder/core/inc/encoder_context.h:45:
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/third_party/openh264/src/codec/encoder/core/inc/param_svc.h:493:26: warning: variable 'pSpatialLayer' set but not used [-Wunused-but-set-variable]
+C/C++:   493 |     SSpatialLayerConfig* pSpatialLayer = &sSpatialLayers[0];
+C/C++:       |                          ^
+C/C++: 1 warning generated.
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/third_party/openh264/src/codec/encoder/core/src/wels_preprocess.cpp:33:
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/third_party/openh264/src/codec/encoder/core/inc/wels_preprocess.h:51:
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/third_party/openh264/src/codec/encoder/core/inc/param_svc.h:493:26: warning: variable 'pSpatialLayer' set but not used [-Wunused-but-set-variable]
+C/C++:   493 |     SSpatialLayerConfig* pSpatialLayer = &sSpatialLayers[0];
+C/C++:       |                          ^
+C/C++: 1 warning generated.
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/third_party/openh264/src/codec/encoder/core/src/wels_task_management.cpp:49:
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/third_party/openh264/src/codec/encoder/core/inc/encoder_context.h:45:
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/third_party/openh264/src/codec/encoder/core/inc/param_svc.h:493:26: warning: variable 'pSpatialLayer' set but not used [-Wunused-but-set-variable]
+C/C++:   493 |     SSpatialLayerConfig* pSpatialLayer = &sSpatialLayers[0];
+C/C++:       |                          ^
+C/C++: 1 warning generated.
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/third_party/openh264/src/codec/encoder/plus/src/welsEncoderExt.cpp:34:
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/third_party/openh264/src/codec/encoder/plus/inc/welsEncoderExt.h:48:
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/third_party/openh264/src/codec/encoder/core/inc/encoder_context.h:45:
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/third_party/openh264/src/codec/encoder/core/inc/param_svc.h:493:26: warning: variable 'pSpatialLayer' set but not used [-Wunused-but-set-variable]
+C/C++:   493 |     SSpatialLayerConfig* pSpatialLayer = &sSpatialLayers[0];
+C/C++:       |                          ^
+C/C++: 1 warning generated.
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/third_party/openh264/src/codec/encoder/core/src/encoder_ext.cpp:41:
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/third_party/openh264/src/codec/encoder/core/inc/encoder.h:43:
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/third_party/openh264/src/codec/encoder/core/inc/encoder_context.h:45:
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/third_party/openh264/src/codec/encoder/core/inc/param_svc.h:493:26: warning: variable 'pSpatialLayer' set but not used [-Wunused-but-set-variable]
+C/C++:   493 |     SSpatialLayerConfig* pSpatialLayer = &sSpatialLayers[0];
+C/C++:       |                          ^
+C/C++: 1 warning generated.
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/third_party/openh264/src/codec/encoder/core/src/svc_set_mb_syn_cabac.cpp:40:
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/third_party/openh264/src/codec/encoder/core/inc/svc_set_mb_syn.h:46:
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/third_party/openh264/src/codec/encoder/core/inc/encoder_context.h:45:
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/third_party/openh264/src/codec/encoder/core/inc/param_svc.h:493:26: warning: variable 'pSpatialLayer' set but not used [-Wunused-but-set-variable]
+C/C++:   493 |     SSpatialLayerConfig* pSpatialLayer = &sSpatialLayers[0];
+C/C++:       |                          ^
+C/C++: 1 warning generated.
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/VoIPController.cpp:422:15: warning: unqualified call to 'std::move' [-Wunqualified-std-cast-call]
+C/C++:   422 |                         Buffer buf(move(s));
+C/C++:       |                                    ^
+C/C++:       |                                    std::
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/VoIPController.cpp:974:13: warning: unqualified call to 'std::move' [-Wunqualified-std-cast-call]
+C/C++:   974 |         Buffer buf(move(s));
+C/C++:       |                    ^
+C/C++:       |                    std::
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/VoIPController.cpp:1053:28: warning: unqualified call to 'std::move' [-Wunqualified-std-cast-call]
+C/C++:  1053 |                 ecAudioPackets.push_back(move(ecBuf));
+C/C++:       |                                          ^
+C/C++:       |                                          std::
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/VoIPController.cpp:1069:21: warning: unqualified call to 'std::move' [-Wunqualified-std-cast-call]
+C/C++:  1069 |                         /*.data=*/Buffer(move(pkt)),
+C/C++:       |                                          ^
+C/C++:       |                                          std::
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/VoIPController.cpp:1075:22: warning: unqualified call to 'std::move' [-Wunqualified-std-cast-call]
+C/C++:  1075 |         SendOrEnqueuePacket(move(p));
+C/C++:       |                             ^
+C/C++:       |                             std::
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/VoIPController.cpp:1079:28: warning: unqualified call to 'std::move' [-Wunqualified-std-cast-call]
+C/C++:  1079 |                 ecAudioPackets.push_back(move(ecBuf));
+C/C++:       |                                          ^
+C/C++:       |                                          std::
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/VoIPController.cpp:1096:12: warning: unqualified call to 'std::move' [-Wunqualified-std-cast-call]
+C/C++:  1096 |                                 Buffer(move(pkt)),
+C/C++:       |                                        ^
+C/C++:       |                                        std::
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/VoIPController.cpp:1099:23: warning: unqualified call to 'std::move' [-Wunqualified-std-cast-call]
+C/C++:  1099 |                 SendOrEnqueuePacket(move(p));
+C/C++:       |                                     ^
+C/C++:       |                                     std::
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/VoIPController.cpp:1448:23: warning: unqualified call to 'std::move' [-Wunqualified-std-cast-call]
+C/C++:  1448 |                                         /*.data=*/Buffer(move(out)),
+C/C++:       |                                                          ^
+C/C++:       |                                                          std::
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/VoIPController.cpp:1691:25: warning: unqualified call to 'std::move' [-Wunqualified-std-cast-call]
+C/C++:  1691 |                                 SendOrEnqueuePacket(move(*opkt), false);
+C/C++:       |                                                     ^
+C/C++:       |                                                     std::
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/VoIPController.cpp:1756:17: warning: unqualified call to 'std::move' [-Wunqualified-std-cast-call]
+C/C++:  1756 |                                                         Buffer b(move(o));
+C/C++:       |                                                                  ^
+C/C++:       |                                                                  std::
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/VoIPController.cpp:1796:19: warning: unqualified call to 'std::move' [-Wunqualified-std-cast-call]
+C/C++:  1796 |                                                         Buffer buf(move(pkt));
+C/C++:       |                                                                    ^
+C/C++:       |                                                                    std::
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/VoIPController.cpp:1823:24: warning: variable length arrays in C++ are a Clang extension [-Wvla-cxx-extension]
+C/C++:  1823 |                 unsigned char aesOut[MSC_STACK_FALLBACK(in.Remaining(), 1500)];
+C/C++:       |                                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/PrivateDefines.h:119:34: note: expanded from macro 'MSC_STACK_FALLBACK'
+C/C++:   119 | #define MSC_STACK_FALLBACK(a, b) (a)
+C/C++:       |                                  ^~~
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/VoIPController.cpp:1823:46: note: non-constexpr function 'Remaining' cannot be used in a constant expression
+C/C++:  1823 |                 unsigned char aesOut[MSC_STACK_FALLBACK(in.Remaining(), 1500)];
+C/C++:       |                                                            ^
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/video/../Buffers.h:34:10: note: declared here
+C/C++:    34 |                 size_t Remaining();
+C/C++:       |                        ^
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/VoIPController.cpp:2120:81: warning: format specifies type 'unsigned int' but the argument has type 'size_type' (aka 'unsigned long') [-Wformat]
+C/C++:  2120 |                                                 LOGE("!!!!!!!!!!!!!!11 VIDEO FRAME LOSS DETECTED [1] %u of %u fragments", sentVideoFrames[0].unacknowledgedPackets.size(), sentVideoFrames[0].fragmentCount);
+C/C++:       |                                                                                                      ~~                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C/C++:       |                                                                                                      %zu
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/logging.h:32:74: note: expanded from macro 'LOGE'
+C/C++:    32 | #define LOGE(...) {__android_log_print(ANDROID_LOG_ERROR, TAG, _LOG_WRAP(__VA_ARGS__)); tgvoip_log_file_printf('E', __VA_ARGS__);}
+C/C++:       |                                                                          ^~~~~~~~~~~
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/logging.h:26:24: note: expanded from macro '_LOG_WRAP'
+C/C++:    26 | #define _LOG_WRAP(...) __VA_ARGS__
+C/C++:       |                        ^~~~~~~~~~~
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/VoIPController.cpp:2129:80: warning: format specifies type 'unsigned int' but the argument has type 'size_type' (aka 'unsigned long') [-Wformat]
+C/C++:  2129 |                                         LOGE("!!!!!!!!!!!!!!11 VIDEO FRAME LOSS DETECTED [2] %u of %u fragments", f->unacknowledgedPackets.size(), f->fragmentCount);
+C/C++:       |                                                                                              ~~                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C/C++:       |                                                                                              %zu
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/logging.h:32:74: note: expanded from macro 'LOGE'
+C/C++:    32 | #define LOGE(...) {__android_log_print(ANDROID_LOG_ERROR, TAG, _LOG_WRAP(__VA_ARGS__)); tgvoip_log_file_printf('E', __VA_ARGS__);}
+C/C++:       |                                                                          ^~~~~~~~~~~
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/logging.h:26:24: note: expanded from macro '_LOG_WRAP'
+C/C++:    26 | #define _LOG_WRAP(...) __VA_ARGS__
+C/C++:       |                        ^~~~~~~~~~~
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/VoIPController.cpp:2273:22: warning: unqualified call to 'std::move' [-Wunqualified-std-cast-call]
+C/C++:  2273 |                                 /*.data=*/Buffer(move(out)),
+C/C++:       |                                                  ^
+C/C++:       |                                                  std::
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/VoIPController.cpp:2505:22: warning: unqualified call to 'std::move' [-Wunqualified-std-cast-call]
+C/C++:  2505 |                                 /*.data=*/Buffer(move(pkt)),
+C/C++:       |                                                  ^
+C/C++:       |                                                  std::
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/VoIPController.cpp:2646:39: warning: unqualified call to 'std::move' [-Wunqualified-std-cast-call]
+C/C++:  2646 |                                         stm->codecSpecificData.push_back(move(csd));
+C/C++:       |                                                                          ^
+C/C++:       |                                                                          std::
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/VoIPController.cpp:2784:27: warning: unqualified call to 'std::move' [-Wunqualified-std-cast-call]
+C/C++:  2784 |                 sendQueue.push_back(move(pkt));
+C/C++:       |                                     ^
+C/C++:       |                                     std::
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/VoIPController.cpp:2845:25: warning: variable length arrays in C++ are a Clang extension [-Wvla-cxx-extension]
+C/C++:  2845 |                         unsigned char aesOut[MSC_STACK_FALLBACK(inner.GetLength(), 1500)];
+C/C++:       |                                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/PrivateDefines.h:119:34: note: expanded from macro 'MSC_STACK_FALLBACK'
+C/C++:   119 | #define MSC_STACK_FALLBACK(a, b) (a)
+C/C++:       |                                  ^~~
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/VoIPController.cpp:2845:50: note: non-constexpr function 'GetLength' cannot be used in a constant expression
+C/C++:  2845 |                         unsigned char aesOut[MSC_STACK_FALLBACK(inner.GetLength(), 1500)];
+C/C++:       |                                                                       ^
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/video/../Buffers.h:66:10: note: declared here
+C/C++:    66 |                 size_t GetLength();
+C/C++:       |                        ^
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/VoIPController.cpp:2864:25: warning: variable length arrays in C++ are a Clang extension [-Wvla-cxx-extension]
+C/C++:  2864 |                         unsigned char aesOut[MSC_STACK_FALLBACK(inner.GetLength(), 1500)];
+C/C++:       |                                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/PrivateDefines.h:119:34: note: expanded from macro 'MSC_STACK_FALLBACK'
+C/C++:   119 | #define MSC_STACK_FALLBACK(a, b) (a)
+C/C++:       |                                  ^~~
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/VoIPController.cpp:2864:50: note: non-constexpr function 'GetLength' cannot be used in a constant expression
+C/C++:  2864 |                         unsigned char aesOut[MSC_STACK_FALLBACK(inner.GetLength(), 1500)];
+C/C++:       |                                                                       ^
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/video/../Buffers.h:66:10: note: declared here
+C/C++:    66 |                 size_t GetLength();
+C/C++:       |                        ^
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/VoIPController.cpp:3147:12: warning: unqualified call to 'std::move' [-Wunqualified-std-cast-call]
+C/C++:  3147 |                 pkt.data=move(b);
+C/C++:       |                          ^
+C/C++:       |                          std::
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/VoIPController.cpp:3156:27: warning: unqualified call to 'std::move' [-Wunqualified-std-cast-call]
+C/C++:  3156 |                 queuedPackets.push_back(move(pkt));
+C/C++:       |                                         ^
+C/C++:       |                                         std::
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/VoIPController.cpp:3170:12: warning: unqualified call to 'std::move' [-Wunqualified-std-cast-call]
+C/C++:  3170 |                         x->data=move(data);
+C/C++:       |                                 ^
+C/C++:       |                                 std::
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/VoIPController.cpp:3174:36: warning: unqualified call to 'std::move' [-Wunqualified-std-cast-call]
+C/C++:  3174 |         UnacknowledgedExtraData xd={type, move(data), 0};
+C/C++:       |                                           ^
+C/C++:       |                                           std::
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/VoIPController.cpp:3175:26: warning: unqualified call to 'std::move' [-Wunqualified-std-cast-call]
+C/C++:  3175 |         currentExtras.push_back(move(xd));
+C/C++:       |                                 ^
+C/C++:       |                                 std::
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/VoIPController.cpp:3444:23: warning: unqualified call to 'std::move' [-Wunqualified-std-cast-call]
+C/C++:  3444 |                                         /*.data=*/Buffer(move(pkt)),
+C/C++:       |                                                          ^
+C/C++:       |                                                          std::
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/VoIPController.cpp:3448:24: warning: unqualified call to 'std::move' [-Wunqualified-std-cast-call]
+C/C++:  3448 |                         SendOrEnqueuePacket(move(p));
+C/C++:       |                                             ^
+C/C++:       |                                             std::
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/VoIPController.cpp:3470:13: warning: unqualified call to 'std::move' [-Wunqualified-std-cast-call]
+C/C++:  3470 |         Buffer buf(move(os));
+C/C++:       |                    ^
+C/C++:       |                    std::
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/VoIPController.cpp:3492:36: warning: unqualified call to 'std::move' [-Wunqualified-std-cast-call]
+C/C++:  3492 |                         videoRenderer->DecodeAndDisplay(move(frame), pts);
+C/C++:       |                                                         ^
+C/C++:       |                                                         std::
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/VoIPController.cpp:3796:18: warning: unqualified call to 'std::move' [-Wunqualified-std-cast-call]
+C/C++:  3796 |                                                 Buffer buf(move(s));
+C/C++:       |                                                            ^
+C/C++:       |                                                            std::
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/VoIPController.cpp:3875:17: warning: unqualified call to 'std::move' [-Wunqualified-std-cast-call]
+C/C++:  3875 |                                                 /*.data=*/move(buf),
+C/C++:       |                                                           ^
+C/C++:       |                                                           std::
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/VoIPController.cpp:3883:23: warning: unqualified call to 'std::move' [-Wunqualified-std-cast-call]
+C/C++:  3883 |                 SendOrEnqueuePacket(move(pkt));
+C/C++:       |                                     ^
+C/C++:       |                                     std::
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/VoIPController.cpp:14:
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/VoIPController.h:24:
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/video/VideoSource.h:12:
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/video/../Buffers.h:19:
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/video/../threading.h:110:8: warning: private field 'maxPriority' is not used [-Wunused-private-field]
+C/C++:   110 |                 bool maxPriority=false;
+C/C++:       |                      ^
+C/C++: 34 warnings generated.
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/tgcalls/tgcalls/desktop_capturer/DesktopCaptureSourceHelper.cpp:258:35: warning: explicit capture of 'this' with a capture default of '=' is a C++20 extension [-Wc++20-extensions]
+C/C++:   258 |     _callback.setOnFatalError([=, this] {
+C/C++:       |                                   ^
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/tgcalls/tgcalls/desktop_capturer/DesktopCaptureSourceHelper.cpp:264:30: warning: explicit capture of 'this' with a capture default of '=' is a C++20 extension [-Wc++20-extensions]
+C/C++:   264 |     _callback.setOnPause([=, this] (bool pause) {
+C/C++:       |                              ^
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/tgcalls/tgcalls/desktop_capturer/DesktopCaptureSourceHelper.cpp:338:41: warning: explicit capture of 'this' with a capture default of '=' is a C++20 extension [-Wc++20-extensions]
+C/C++:   338 |     _scheduler.runDelayed(_delayMs, [=, this] {
+C/C++:       |                                         ^
+C/C++: 3 warnings generated.
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/tgcalls/legacy/InstanceImplLegacy.cpp:1:
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/tgcalls/legacy/InstanceImplLegacy.h:6:
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/VoIPController.h:24:
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/video/VideoSource.h:12:
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/video/../Buffers.h:19:
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/video/../threading.h:110:8: warning: private field 'maxPriority' is not used [-Wunused-private-field]
+C/C++:   110 |                 bool maxPriority=false;
+C/C++:       |                      ^
+C/C++: 1 warning generated.
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/tgcalls/tgcalls/group/GroupInstanceReferenceImpl.cpp:595:11: warning: field '_e2eEncryptDecrypt' will be initialized after field '_userIds' [-Wreorder-ctor]
+C/C++:   595 |         , _e2eEncryptDecrypt(std::move(descriptor.e2eEncryptDecrypt))
+C/C++:       |           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C/C++:       |           _userIds(std::make_shared<GRUserIdRegistry>())
+C/C++:   596 |         , _userIds(std::make_shared<GRUserIdRegistry>())
+C/C++:       |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C/C++:       |           _e2eEncryptDecrypt(std::move(descriptor.e2eEncryptDecrypt))
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/tgcalls/tgcalls/group/GroupInstanceReferenceImpl.cpp:1:
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/tgcalls/tgcalls/group/GroupInstanceReferenceImpl.h:5:
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/toolchains/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/functional:526:
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/toolchains/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/__functional/boyer_moore_searcher.h:22:
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/toolchains/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/__memory/shared_ptr.h:33:
+C/C++: /workspace/scratch/6fe2cd15bb66/toolchains/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/__memory/unique_ptr.h:601:30: warning: 'RtcEventLogFactory' is deprecated: Use default constructor [-Wdeprecated-declarations]
+C/C++:   601 |   return unique_ptr<_Tp>(new _Tp(std::forward<_Args>(__args)...));
+C/C++:       |                              ^
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/tgcalls/tgcalls/group/GroupInstanceReferenceImpl.cpp:731:39: note: in instantiation of function template specialization 'std::make_unique<webrtc::RtcEventLogFactory, webrtc::TaskQueueFactory *>' requested here
+C/C++:   731 |         deps.event_log_factory = std::make_unique<webrtc::RtcEventLogFactory>(deps.task_queue_factory.get());
+C/C++:       |                                       ^
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/api/rtc_event_log/rtc_event_log_factory.h:29:5: note: 'RtcEventLogFactory' has been explicitly marked deprecated here
+C/C++:    29 |   [[deprecated("Use default constructor")]]  //
+C/C++:       |     ^
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/tgcalls/tgcalls/group/GroupInstanceReferenceImpl.cpp:2331:10: warning: private field '_disableAudioInput' is not used [-Wunused-private-field]
+C/C++:  2331 |     bool _disableAudioInput = false;
+C/C++:       |          ^
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/tgcalls/tgcalls/group/GroupInstanceReferenceImpl.cpp:2332:10: warning: private field '_enableSystemMute' is not used [-Wunused-private-field]
+C/C++:  2332 |     bool _enableSystemMute = false;
+C/C++:       |          ^
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/tgcalls/tgcalls/group/GroupInstanceReferenceImpl.cpp:2339:9: warning: private field '_minOutgoingVideoBitrateKbit' is not used [-Wunused-private-field]
+C/C++:  2339 |     int _minOutgoingVideoBitrateKbit = 100;
+C/C++:       |         ^
+C/C++: 5 warnings generated.
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/tgcalls/tgcalls/v2/SignalingTranslator.cpp:14:13: warning: unused function 'contentIdBySsrc' [-Wunused-function]
+C/C++:    14 | std::string contentIdBySsrc(uint32_t ssrc) {
+C/C++:       |             ^~~~~~~~~~~~~~~
+C/C++: 1 warning generated.
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/tgcalls/tgcalls/v2/InstanceV2CompatImpl.cpp:352:5: warning: field '_videoCapture' will be initialized after field '_signalingTranslator' [-Wreorder-ctor]
+C/C++:   350 |     _eventLog(std::make_unique<webrtc::RtcEventLogNull>()),
+C/C++:       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C/C++:       |     _signalingTranslator(_encryptionKey.isOutgoing)
+C/C++:   351 |     _taskQueueFactory(webrtc::CreateDefaultTaskQueueFactory()),
+C/C++:       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C/C++:       |     _eventLog(std::make_unique<webrtc::RtcEventLogNull>())
+C/C++:   352 |     _videoCapture(descriptor.videoCapture),
+C/C++:       |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C/C++:       |     _taskQueueFactory(webrtc::CreateDefaultTaskQueueFactory())
+C/C++:   353 |     _signalingTranslator(_encryptionKey.isOutgoing) {
+C/C++:       |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C/C++:       |     _videoCapture(descriptor.videoCapture)
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/tgcalls/tgcalls/v2/InstanceV2CompatImpl.cpp:1:
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/tgcalls/tgcalls/v2/InstanceV2CompatImpl.h:5:
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/tgcalls/tgcalls/Instance.h:5:
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/toolchains/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/functional:526:
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/toolchains/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/__functional/boyer_moore_searcher.h:22:
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/toolchains/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/__memory/shared_ptr.h:33:
+C/C++: /workspace/scratch/6fe2cd15bb66/toolchains/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/__memory/unique_ptr.h:601:30: warning: 'RtcEventLogFactory' is deprecated: Use default constructor [-Wdeprecated-declarations]
+C/C++:   601 |   return unique_ptr<_Tp>(new _Tp(std::forward<_Args>(__args)...));
+C/C++:       |                              ^
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/tgcalls/tgcalls/v2/InstanceV2CompatImpl.cpp:439:68: note: in instantiation of function template specialization 'std::make_unique<webrtc::RtcEventLogFactory, webrtc::TaskQueueFactory *>' requested here
+C/C++:   439 |         peerConnectionFactoryDependencies.event_log_factory = std::make_unique<webrtc::RtcEventLogFactory>(peerConnectionFactoryDependencies.task_queue_factory.get());
+C/C++:       |                                                                    ^
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/api/rtc_event_log/rtc_event_log_factory.h:29:5: note: 'RtcEventLogFactory' has been explicitly marked deprecated here
+C/C++:    29 |   [[deprecated("Use default constructor")]]  //
+C/C++:       |     ^
+C/C++: 2 warnings generated.
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/tgcalls/tgcalls/v2wasm/wasm_module_entry.cpp:16:16: warning: unknown attribute 'import_module' ignored [-Wunknown-attributes]
+C/C++:    16 | __attribute__((import_module("env"), import_name("host_emit")))
+C/C++:       |                ^~~~~~~~~~~~~~~~~~~~
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/tgcalls/tgcalls/v2wasm/wasm_module_entry.cpp:16:38: warning: unknown attribute 'import_name' ignored [-Wunknown-attributes]
+C/C++:    16 | __attribute__((import_module("env"), import_name("host_emit")))
+C/C++:       |                                      ^~~~~~~~~~~~~~~~~~~~~~~~
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/tgcalls/tgcalls/v2wasm/wasm_module_entry.cpp:28:16: warning: unknown attribute 'export_name' ignored [-Wunknown-attributes]
+C/C++:    28 | __attribute__((export_name("rt_alloc")))
+C/C++:       |                ^~~~~~~~~~~~~~~~~~~~~~~
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/tgcalls/tgcalls/v2wasm/wasm_module_entry.cpp:33:16: warning: unknown attribute 'export_name' ignored [-Wunknown-attributes]
+C/C++:    33 | __attribute__((export_name("rt_free")))
+C/C++:       |                ^~~~~~~~~~~~~~~~~~~~~~
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/tgcalls/tgcalls/v2wasm/wasm_module_entry.cpp:38:16: warning: unknown attribute 'export_name' ignored [-Wunknown-attributes]
+C/C++:    38 | __attribute__((export_name("core_init")))
+C/C++:       |                ^~~~~~~~~~~~~~~~~~~~~~~~
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/tgcalls/tgcalls/v2wasm/wasm_module_entry.cpp:48:16: warning: unknown attribute 'export_name' ignored [-Wunknown-attributes]
+C/C++:    48 | __attribute__((export_name("core_on_event")))
+C/C++:       |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C/C++: 6 warnings generated.
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/tgcalls/tgcalls/v2wasm/CallCoreHost.cpp:1:
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/tgcalls/tgcalls/v2wasm/CallCoreHost.h:4:
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/toolchains/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/deque:205:
+C/C++: /workspace/scratch/6fe2cd15bb66/toolchains/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/__memory/unique_ptr.h:601:30: warning: 'RtcEventLogFactory' is deprecated: Use default constructor [-Wdeprecated-declarations]
+C/C++:   601 |   return unique_ptr<_Tp>(new _Tp(std::forward<_Args>(__args)...));
+C/C++:       |                              ^
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/tgcalls/tgcalls/v2wasm/CallCoreHost.cpp:600:64: note: in instantiation of function template specialization 'std::make_unique<webrtc::RtcEventLogFactory, webrtc::TaskQueueFactory *>' requested here
+C/C++:   600 |     peerConnectionFactoryDependencies.event_log_factory = std::make_unique<webrtc::RtcEventLogFactory>(peerConnectionFactoryDependencies.task_queue_factory.get());
+C/C++:       |                                                                ^
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/api/rtc_event_log/rtc_event_log_factory.h:29:5: note: 'RtcEventLogFactory' has been explicitly marked deprecated here
+C/C++:    29 |   [[deprecated("Use default constructor")]]  //
+C/C++:       |     ^
+C/C++: 1 warning generated.
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/tgcalls/tgcalls/v2/InstanceV2ReferenceImpl.cpp:1:
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/tgcalls/tgcalls/v2/InstanceV2ReferenceImpl.h:5:
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/tgcalls/tgcalls/Instance.h:5:
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/toolchains/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/functional:526:
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/toolchains/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/__functional/boyer_moore_searcher.h:22:
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/toolchains/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/__memory/shared_ptr.h:33:
+C/C++: /workspace/scratch/6fe2cd15bb66/toolchains/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/c++/v1/__memory/unique_ptr.h:601:30: warning: 'RtcEventLogFactory' is deprecated: Use default constructor [-Wdeprecated-declarations]
+C/C++:   601 |   return unique_ptr<_Tp>(new _Tp(std::forward<_Args>(__args)...));
+C/C++:       |                              ^
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/tgcalls/tgcalls/v2/InstanceV2ReferenceImpl.cpp:490:68: note: in instantiation of function template specialization 'std::make_unique<webrtc::RtcEventLogFactory, webrtc::TaskQueueFactory *>' requested here
+C/C++:   490 |         peerConnectionFactoryDependencies.event_log_factory = std::make_unique<webrtc::RtcEventLogFactory>(peerConnectionFactoryDependencies.task_queue_factory.get());
+C/C++:       |                                                                    ^
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/api/rtc_event_log/rtc_event_log_factory.h:29:5: note: 'RtcEventLogFactory' has been explicitly marked deprecated here
+C/C++:    29 |   [[deprecated("Use default constructor")]]  //
+C/C++:       |     ^
+C/C++: 1 warning generated.
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/modules/utility/source/jvm_android.cc:82:10: warning: unused variable 'ret' [-Wunused-variable]
+C/C++:    82 |     jint ret = jvm->AttachCurrentThread(&env, nullptr);
+C/C++:       |          ^~~
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/modules/utility/source/jvm_android.cc:78:11: warning: unused variable 'jni' [-Wunused-variable]
+C/C++:    78 |   JNIEnv* jni = GetEnv(jvm);
+C/C++:       |           ^~~
+C/C++: 2 warnings generated.
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/call/call.cc:72:
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/video/video_receive_stream2.h:38:
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/video/rtp_video_stream_receiver2.h:393:7: warning: declaration does not declare anything [-Wmissing-declarations]
+C/C++:   393 |       RTC_GUARDED_BY(packet_sequence_checker_);
+C/C++:       |       ^
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/rtc_base/thread_annotations.h:31:27: note: expanded from macro 'RTC_GUARDED_BY'
+C/C++:    31 | #define RTC_GUARDED_BY(x) RTC_THREAD_ANNOTATION_ATTRIBUTE__(guarded_by(x))
+C/C++:       |                           ^
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/rtc_base/thread_annotations.h:23:46: note: expanded from macro 'RTC_THREAD_ANNOTATION_ATTRIBUTE__'
+C/C++:    23 | #define RTC_THREAD_ANNOTATION_ATTRIBUTE__(x) __attribute__((x))
+C/C++:       |                                              ^
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/call/call.cc:72:
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/video/video_receive_stream2.h:38:
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/video/rtp_video_stream_receiver2.h:393:7: warning: attribute guarded_by ignored, because it is not attached to a declaration [-Wignored-attributes]
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/rtc_base/thread_annotations.h:31:71: note: expanded from macro 'RTC_GUARDED_BY'
+C/C++:    31 | #define RTC_GUARDED_BY(x) RTC_THREAD_ANNOTATION_ATTRIBUTE__(guarded_by(x))
+C/C++:       |                                                                       ^
+C/C++: 2 warnings generated.
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/video/video_source_sink_controller.cc:40:55: warning: format specifies type 'long' but the argument has type 'rtc::VideoSourceInterface<VideoFrame> *' [-Wformat]
+C/C++:    40 |     DEBUG_D("$%d: SetSource(): new source as %ld", a, source_);
+C/C++:       |                                              ~~~      ^~~~~~~
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/video/video_source_sink_controller.cc:67:60: warning: format specifies type 'long' but the argument has type 'rtc::VideoSourceInterface<VideoFrame> *' [-Wformat]
+C/C++:    67 |     DEBUG_D("$%d: PushSourceSinkSettings(): 2 src=%ld", a, source_);
+C/C++:       |                                                   ~~~      ^~~~~~~
+C/C++: 2 warnings generated.
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/video/video_quality_observer2.cc:21:
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/video/video_receive_stream2.h:38:
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/video/rtp_video_stream_receiver2.h:393:7: warning: declaration does not declare anything [-Wmissing-declarations]
+C/C++:   393 |       RTC_GUARDED_BY(packet_sequence_checker_);
+C/C++:       |       ^
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/rtc_base/thread_annotations.h:31:27: note: expanded from macro 'RTC_GUARDED_BY'
+C/C++:    31 | #define RTC_GUARDED_BY(x) RTC_THREAD_ANNOTATION_ATTRIBUTE__(guarded_by(x))
+C/C++:       |                           ^
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/rtc_base/thread_annotations.h:23:46: note: expanded from macro 'RTC_THREAD_ANNOTATION_ATTRIBUTE__'
+C/C++:    23 | #define RTC_THREAD_ANNOTATION_ATTRIBUTE__(x) __attribute__((x))
+C/C++:       |                                              ^
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/video/video_quality_observer2.cc:21:
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/video/video_receive_stream2.h:38:
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/video/rtp_video_stream_receiver2.h:393:7: warning: attribute guarded_by ignored, because it is not attached to a declaration [-Wignored-attributes]
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/rtc_base/thread_annotations.h:31:71: note: expanded from macro 'RTC_GUARDED_BY'
+C/C++:    31 | #define RTC_GUARDED_BY(x) RTC_THREAD_ANNOTATION_ATTRIBUTE__(guarded_by(x))
+C/C++:       |                                                                       ^
+C/C++: 2 warnings generated.
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/video/receive_statistics_proxy.cc:25:
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/video/video_receive_stream2.h:38:
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/video/rtp_video_stream_receiver2.h:393:7: warning: declaration does not declare anything [-Wmissing-declarations]
+C/C++:   393 |       RTC_GUARDED_BY(packet_sequence_checker_);
+C/C++:       |       ^
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/rtc_base/thread_annotations.h:31:27: note: expanded from macro 'RTC_GUARDED_BY'
+C/C++:    31 | #define RTC_GUARDED_BY(x) RTC_THREAD_ANNOTATION_ATTRIBUTE__(guarded_by(x))
+C/C++:       |                           ^
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/rtc_base/thread_annotations.h:23:46: note: expanded from macro 'RTC_THREAD_ANNOTATION_ATTRIBUTE__'
+C/C++:    23 | #define RTC_THREAD_ANNOTATION_ATTRIBUTE__(x) __attribute__((x))
+C/C++:       |                                              ^
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/video/receive_statistics_proxy.cc:25:
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/video/video_receive_stream2.h:38:
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/video/rtp_video_stream_receiver2.h:393:7: warning: attribute guarded_by ignored, because it is not attached to a declaration [-Wignored-attributes]
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/rtc_base/thread_annotations.h:31:71: note: expanded from macro 'RTC_GUARDED_BY'
+C/C++:    31 | #define RTC_GUARDED_BY(x) RTC_THREAD_ANNOTATION_ATTRIBUTE__(guarded_by(x))
+C/C++:       |                                                                       ^
+C/C++: 2 warnings generated.
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/video/video_receive_stream2.cc:11:
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/video/video_receive_stream2.h:38:
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/video/rtp_video_stream_receiver2.h:393:7: warning: declaration does not declare anything [-Wmissing-declarations]
+C/C++:   393 |       RTC_GUARDED_BY(packet_sequence_checker_);
+C/C++:       |       ^
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/rtc_base/thread_annotations.h:31:27: note: expanded from macro 'RTC_GUARDED_BY'
+C/C++:    31 | #define RTC_GUARDED_BY(x) RTC_THREAD_ANNOTATION_ATTRIBUTE__(guarded_by(x))
+C/C++:       |                           ^
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/rtc_base/thread_annotations.h:23:46: note: expanded from macro 'RTC_THREAD_ANNOTATION_ATTRIBUTE__'
+C/C++:    23 | #define RTC_THREAD_ANNOTATION_ATTRIBUTE__(x) __attribute__((x))
+C/C++:       |                                              ^
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/video/video_receive_stream2.cc:11:
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/video/video_receive_stream2.h:38:
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/video/rtp_video_stream_receiver2.h:393:7: warning: attribute guarded_by ignored, because it is not attached to a declaration [-Wignored-attributes]
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/rtc_base/thread_annotations.h:31:71: note: expanded from macro 'RTC_GUARDED_BY'
+C/C++:    31 | #define RTC_GUARDED_BY(x) RTC_THREAD_ANNOTATION_ATTRIBUTE__(guarded_by(x))
+C/C++:       |                                                                       ^
+C/C++: 2 warnings generated.
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/video/rtp_video_stream_receiver2.cc:11:
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/video/rtp_video_stream_receiver2.h:393:7: warning: declaration does not declare anything [-Wmissing-declarations]
+C/C++:   393 |       RTC_GUARDED_BY(packet_sequence_checker_);
+C/C++:       |       ^
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/rtc_base/thread_annotations.h:31:27: note: expanded from macro 'RTC_GUARDED_BY'
+C/C++:    31 | #define RTC_GUARDED_BY(x) RTC_THREAD_ANNOTATION_ATTRIBUTE__(guarded_by(x))
+C/C++:       |                           ^
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/rtc_base/thread_annotations.h:23:46: note: expanded from macro 'RTC_THREAD_ANNOTATION_ATTRIBUTE__'
+C/C++:    23 | #define RTC_THREAD_ANNOTATION_ATTRIBUTE__(x) __attribute__((x))
+C/C++:       |                                              ^
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/video/rtp_video_stream_receiver2.cc:11:
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/video/rtp_video_stream_receiver2.h:393:7: warning: attribute guarded_by ignored, because it is not attached to a declaration [-Wignored-attributes]
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/webrtc/rtc_base/thread_annotations.h:31:71: note: expanded from macro 'RTC_GUARDED_BY'
+C/C++:    31 | #define RTC_GUARDED_BY(x) RTC_THREAD_ANNOTATION_ATTRIBUTE__(guarded_by(x))
+C/C++:       |                                                                       ^
+C/C++: 2 warnings generated.
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/exoplayer/ffmpeg_jni.cc:31:9: warning: '__STDC_CONSTANT_MACROS' macro redefined [-Wmacro-redefined]
+C/C++:    31 | #define __STDC_CONSTANT_MACROS
+C/C++:       |         ^
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/.cxx/Debug/1a4u5e4j/arm64-v8a/<command line>:51:9: note: previous definition is here
+C/C++:    51 | #define __STDC_CONSTANT_MACROS 1
+C/C++:       |         ^
+C/C++: 1 warning generated.
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/gifvideo.cpp:50:1: warning: typedef requires a name [-Wmissing-declarations]
+C/C++:    50 | typedef struct VideoInfo {
+C/C++:       | ^~~~~~~
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/gifvideo.cpp:143:10: warning: format string is not a string literal (potentially insecure) [-Wformat-security]
+C/C++:   143 |     LOGE(line);
+C/C++:       |          ^~~~
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/c_utils.h:11:67: note: expanded from macro 'LOGE'
+C/C++:    11 | #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
+C/C++:       |                                                                   ^~~~~~~~~~~
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/gifvideo.cpp:143:10: note: treat the string as an argument to avoid this
+C/C++:   143 |     LOGE(line);
+C/C++:       |          ^
+C/C++:       |          "%s", 
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/c_utils.h:11:67: note: expanded from macro 'LOGE'
+C/C++:    11 | #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
+C/C++:       |                                                                   ^
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/gifvideo.cpp:152:37: warning: format specifies type 'int' but the argument has type 'const enum AVPixelFormat *' [-Wformat]
+C/C++:   152 |         LOGE("available format %d", p);
+C/C++:       |                                ~~   ^
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/c_utils.h:11:67: note: expanded from macro 'LOGE'
+C/C++:    11 | #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
+C/C++:       |                                                                   ^~~~~~~~~~~
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/gifvideo.cpp:416:86: warning: format specifies type 'long long' but the argument has type 'jlong' (aka 'long') [-Wformat]
+C/C++:   416 |             LOGE("can't open source file at offset %s (offset=%lld), %s", info->src, fileOffset, av_err2str(ret));
+C/C++:       |                                                               ~~~~                   ^~~~~~~~~~
+C/C++:       |                                                               %ld
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/c_utils.h:11:67: note: expanded from macro 'LOGE'
+C/C++:    11 | #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
+C/C++:       |                                                                   ^~~~~~~~~~~
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/gifvideo.cpp:643:13: warning: comparison between NULL and non-pointer ('jlong' (aka 'long') and NULL) [-Wnull-arithmetic]
+C/C++:   643 |     if (ptr == NULL) {
+C/C++:       |         ~~~ ^  ~~~~
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/gifvideo.cpp:668:13: warning: comparison between NULL and non-pointer ('jlong' (aka 'long') and NULL) [-Wnull-arithmetic]
+C/C++:   668 |     if (ptr == NULL) {
+C/C++:       |         ~~~ ^  ~~~~
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/gifvideo.cpp:676:13: warning: comparison between NULL and non-pointer ('jlong' (aka 'long') and NULL) [-Wnull-arithmetic]
+C/C++:   676 |     if (ptr == NULL) {
+C/C++:       |         ~~~ ^  ~~~~
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/gifvideo.cpp:768:39: warning: '&&' within '||' [-Wlogical-op-parentheses]
+C/C++:   768 |     if (!(wantedWidth == frame->width && wantedHeight == frame->height || wantedWidth == frame->height && wantedHeight == frame->width)) {
+C/C++:       |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ~~
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/gifvideo.cpp:768:39: note: place parentheses around the '&&' expression to silence this warning
+C/C++:   768 |     if (!(wantedWidth == frame->width && wantedHeight == frame->height || wantedWidth == frame->height && wantedHeight == frame->width)) {
+C/C++:       |                                       ^
+C/C++:       |           (                                                           )
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/gifvideo.cpp:768:104: warning: '&&' within '||' [-Wlogical-op-parentheses]
+C/C++:   768 |     if (!(wantedWidth == frame->width && wantedHeight == frame->height || wantedWidth == frame->height && wantedHeight == frame->width)) {
+C/C++:       |                                                                        ~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/gifvideo.cpp:768:104: note: place parentheses around the '&&' expression to silence this warning
+C/C++:   768 |     if (!(wantedWidth == frame->width && wantedHeight == frame->height || wantedWidth == frame->height && wantedHeight == frame->width)) {
+C/C++:       |                                                                                                        ^                              
+C/C++:       |                                                                           (                                                           )
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/gifvideo.cpp:146:27: warning: unused function 'get_format' [-Wunused-function]
+C/C++:   146 | static enum AVPixelFormat get_format(AVCodecContext *ctx,
+C/C++:       |                           ^~~~~~~~~~
+C/C++: 10 warnings generated.
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/image.cpp:652:15: warning: variable length arrays in C++ are a Clang extension [-Wvla-cxx-extension]
+C/C++:   652 |     int stack[div * 4];
+C/C++:       |               ^~~~~~~
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/image.cpp:652:15: note: initializer of 'div' is not a constant expression
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/image.cpp:647:15: note: declared here
+C/C++:   647 |     const int div = radius + radius + 1;
+C/C++:       |               ^
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/image.cpp:655:14: warning: variable length arrays in C++ are a Clang extension [-Wvla-cxx-extension]
+C/C++:   655 |     int vmin[MAX(w, h)];
+C/C++:       |              ^~~~~~~~~
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/c_utils.h:21:19: note: expanded from macro 'MAX'
+C/C++:    21 | #define MAX(x, y) ((x) > (y)) ? (x) : (y)
+C/C++:       |                   ^~~~~~~~~~~~~~~~~~~~~~~
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/image.cpp:655:14: note: read of non-const variable 'w' is not allowed in a constant expression
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/c_utils.h:21:20: note: expanded from macro 'MAX'
+C/C++:    21 | #define MAX(x, y) ((x) > (y)) ? (x) : (y)
+C/C++:       |                    ^
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/image.cpp:633:9: note: declared here
+C/C++:   633 |     int w = info.width;
+C/C++:       |         ^
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/image.cpp:685:9: warning: variable 'yw' set but not used [-Wunused-but-set-variable]
+C/C++:   685 |     int yw = 0, yi = 0;
+C/C++:       |         ^
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/image.cpp:923:49: warning: implicit conversion from 'int' to 'float' changes value from 2147483647 to 2147483648 [-Wimplicit-const-int-float-conversion]
+C/C++:   923 |             noise = (rand() - rand()) / 255.F / RAND_MAX;
+C/C++:       |                                               ~ ^~~~~~~~
+C/C++: /workspace/scratch/6fe2cd15bb66/toolchains/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include/stdlib.h:132:18: note: expanded from macro 'RAND_MAX'
+C/C++:   132 | #define RAND_MAX 0x7fffffff
+C/C++:       |                  ^~~~~~~~~~
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/image.cpp:1075:38: warning: 'gatherPositions' has C-linkage specified, but returns incomplete type 'std::vector<std::pair<float, float>>' which could be incompatible with C [-Wreturn-type-c-linkage]
+C/C++:  1075 | std::vector<std::pair<float, float>> gatherPositions(std::vector<std::pair<float, float>> list, int phase) {
+C/C++:       |                                      ^
+C/C++: 5 warnings generated.
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:368:88: warning: adding 'jint' (aka 'int') to a string does not append to the string [-Wstring-plus-int]
+C/C++:   368 |             throwNewJavaIllegalArgumentException(env, "Unknown data saving constant: " + dataSaving);
+C/C++:       |                                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:368:88: note: use array indexing to silence this warning
+C/C++:   368 |             throwNewJavaIllegalArgumentException(env, "Unknown data saving constant: " + dataSaving);
+C/C++:       |                                                                                        ^           
+C/C++:       |                                                       &                                [           ]
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:518:34: warning: variable length arrays in C++ are a Clang extension [-Wvla-cxx-extension]
+C/C++:   518 |                     jint intFill[size];
+C/C++:       |                                  ^~~~
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:518:34: note: read of non-const variable 'size' is not allowed in a constant expression
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:513:34: note: declared here
+C/C++:   513 |                     unsigned int size = update.updates.size();
+C/C++:       |                                  ^
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:519:38: warning: variable length arrays in C++ are a Clang extension [-Wvla-cxx-extension]
+C/C++:   519 |                     jfloat floatFill[size];
+C/C++:       |                                      ^~~~
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:519:38: note: read of non-const variable 'size' is not allowed in a constant expression
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:513:34: note: declared here
+C/C++:   513 |                     unsigned int size = update.updates.size();
+C/C++:       |                                  ^
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:520:39: warning: variable length arrays in C++ are a Clang extension [-Wvla-cxx-extension]
+C/C++:   520 |                     jboolean boolFill[size];
+C/C++:       |                                       ^~~~
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:520:39: note: read of non-const variable 'size' is not allowed in a constant expression
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:513:34: note: declared here
+C/C++:   513 |                     unsigned int size = update.updates.size();
+C/C++:       |                                  ^
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:542:41: warning: ISO C++ requires field designators to be specified in declaration order; field 'isConference' will be initialized after field 'outgoingAudioBitrateKbit' [-Wreorder-init-list]
+C/C++:   542 |             .outgoingAudioBitrateKbit = customBitrate,
+C/C++:       |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:541:29: note: previous initialization for field 'isConference' is here
+C/C++:   541 |             .isConference = (bool) conference,
+C/C++:       |                             ^~~~~~~~~~~~~~~~~
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:570:30: warning: variable length arrays in C++ are a Clang extension [-Wvla-cxx-extension]
+C/C++:   570 |                 jint intFill[size];
+C/C++:       |                              ^~~~
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:570:30: note: read of non-const variable 'size' is not allowed in a constant expression
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:567:30: note: declared here
+C/C++:   567 |                 unsigned int size = ssrcs.size();
+C/C++:       |                              ^
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:1339:39: warning: format specifies type 'int' but the argument has type 'jlong' (aka 'long') [-Wformat]
+C/C++:  1339 |     DEBUG_D("setConferenceCallId %d", call_id);
+C/C++:       |                                  ~~   ^~~~~~~
+C/C++:       |                                  %ld
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/org_telegram_messenger_voip_Instance.cpp:21:
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/tgcalls/legacy/InstanceImplLegacy.h:6:
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/VoIPController.h:24:
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/video/VideoSource.h:12:
+C/C++: In file included from /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/video/../Buffers.h:19:
+C/C++: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/jni/voip/libtgvoip/video/../threading.h:110:8: warning: private field 'maxPriority' is not used [-Wunused-private-field]
+C/C++:   110 |                 bool maxPriority=false;
+C/C++:       |                      ^
+C/C++: 8 warnings generated.
+
+> Task :TMessagesProj:dexBuilderBetaDevelopmentDebug
+> Task :TMessagesProj:mergeProjectDexBetaDevelopmentDebug
+> Task :TMessagesProj:generateBetaDevelopmentDebugPythonJniLibs
+> Task :TMessagesProj:mergeBetaDevelopmentDebugJniLibFolders
+> Task :TMessagesProj:writeBetaDevelopmentDebugAppMetadata
+> Task :TMessagesProj:writeBetaDevelopmentDebugSigningConfigVersions
+> Task :TMessagesProj:mergeBetaDevelopmentDebugNativeLibs
+
+> Task :TMessagesProj:stripBetaDevelopmentDebugDebugSymbols
+Unable to strip the following libraries, packaging them as they are: libjnidispatch.so. Run with --info option to learn more.
+
+> Task :TMessagesProj:packageBetaDevelopmentDebug
+> Task :TMessagesProj:createBetaDevelopmentDebugApkListingFileRedirect
+> Task :TMessagesProj:assembleBetaDevelopmentDebug
+
+[Incubating] Problems report is available at: file:///workspace/scratch/6fe2cd15bb66/beta-build/build/reports/problems/problems-report.html
+

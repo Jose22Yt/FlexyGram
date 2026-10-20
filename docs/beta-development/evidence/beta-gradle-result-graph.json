@@ -1,0 +1,18 @@
+{
+  "exit_code": 0,
+  "seconds": 17,
+  "command": [
+    "--no-daemon",
+    "--console=plain",
+    "--max-workers=2",
+    "-Pkotlin.incremental=false",
+    "-PflexygramBetaDevelopment=true",
+    ":TMessagesProj:writeBetaDevelopmentGraph",
+    "-I",
+    "/workspace/scratch/6fe2cd15bb66/reviewed/tools/beta_development/export-graph.init.gradle",
+    "-PbetaGraphOutput=/workspace/scratch/6fe2cd15bb66/evidence/beta-classpath.json"
+  ],
+  "native_target": "arm64-v8a",
+  "signed": false,
+  "android_executed": false
+}

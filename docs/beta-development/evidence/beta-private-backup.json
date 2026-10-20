@@ -1,0 +1,14 @@
+{
+  "name": "FlexyGram-Beta-Offline-525b6999-Private.zip",
+  "bytes": 288410254,
+  "sha256": "9cad4dc2accdeb0fc6260ad889882b159fee11710f2c39213cae2c50a6ae8634",
+  "members": 44,
+  "apk_sha256": "98de352740b07c3e6f00a2399246c9c60bc744ed44a976324c79e4132b086afd",
+  "code_commit": "525b699982610b0d3721f85123734ae6b73154e8",
+  "android_signing_key_included": false,
+  "local_archive_members_verified": true,
+  "private_persistence_confirmed": false,
+  "remote_recovery_verified": false,
+  "persistence_blocker": "Authorized upload helper rejected at tool discovery with HTTP 403; no alternate write attempted; archive remains in transient workspace.",
+  "old_diagnostic_backup_unchanged": true
+}

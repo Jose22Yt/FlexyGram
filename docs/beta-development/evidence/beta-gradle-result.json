@@ -1,0 +1,15 @@
+{
+  "exit_code": 0,
+  "seconds": 74,
+  "command": [
+    "--no-daemon",
+    "--console=plain",
+    "--max-workers=2",
+    "-Pkotlin.incremental=false",
+    "-PflexygramBetaDevelopment=true",
+    ":TMessagesProj:assembleBetaDevelopmentDebug"
+  ],
+  "native_target": "arm64-v8a",
+  "signed": false,
+  "android_executed": false
+}

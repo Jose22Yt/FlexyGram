@@ -84,3 +84,5 @@ firmar o instalar. La APK Diagnostic29188186… y sus contratos permanecen intac
 Una APK beta nueva necesitará su propio expediente/contrato, no repinar v1/v2 históricos.
 Autenticación, servicios propios, firma de distribución y pruebas de cuenta vendrán
 solamente con otra aprobación. No se habilitan Production ni GitHub Actions.
+
+Resultados reales de compilación y bloqueos: [BUILD-RESULTS.md](BUILD-RESULTS.md).
