@@ -169,9 +169,27 @@ class ClientEventsTests(unittest.TestCase):
   self.assertFalse(combined['android_execution_verified_by_analyzer'])
   self.assertEqual(combined['interactions']['operations']['chat_close']['presented'],1)
   rows=self.run_case('replace');report=module.interactions('\n'.join(json.dumps(r)for r in rows))
-  self.assertGreater(report['operations']['transition_interrupt']['presented'],0)
+  self.assertGreater(report['operations']['transition_interrupt']['cancelled'],0)
+  self.assertEqual(report['operations']['transition_interrupt']['presented'],0)
   self.assertGreater(report['operations']['chat_open']['incomplete'],0)
   self.assertEqual(report['operations']['chat_open']['timeout'],0)
+ def test_rapid_tap_observes_navigation_frame_instead_of_instant_success(self):
+  rows=self.run_case('close')
+  phases=[row['phase'] for row in rows if row['op']=='rapid_tap']
+  self.assertEqual(phases,['request','accepted','presented'])
+  chat_close_frame=next(row['timestamp_ns'] for row in rows
+                         if row['op']=='chat_close' and row['phase']=='presented')
+  tap_frame=next(row['timestamp_ns'] for row in rows
+                 if row['op']=='rapid_tap' and row['phase']=='presented')
+  self.assertGreater(tap_frame,chat_close_frame,
+                     'rapid tap must not complete before navigation endpoint')
+ def test_interrupt_reports_logical_cancellation_not_presentation(self):
+  rows=self.run_case('replace')
+  by_id={}
+  for row in rows:
+   if row['op']=='transition_interrupt':by_id.setdefault(row['id'],[]).append(row['phase'])
+  self.assertTrue(by_id)
+  for phases in by_id.values():self.assertEqual(phases,['request','accepted','cancelled'])
  def test_clock_regression_and_thread_ownership(self):self.run_case('clock')
  def test_writer_failure_is_not_loss_free(self):self.run_case('io')
  def test_probe_state_recreated_view_and_destroy(self):self.run_case('probe')
