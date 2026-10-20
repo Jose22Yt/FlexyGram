@@ -1,9 +1,12 @@
 """Fail-closed contract tests for run_gate.py; no Android or network dependencies."""
 import io
+import json
+from contextlib import redirect_stdout
+from unittest.mock import patch
 from pathlib import Path
 import tempfile
 import unittest
-from run_gate import run_suite
+from run_gate import run_suite, main
 
 
 class OfflineGateTests(unittest.TestCase):
@@ -46,6 +49,25 @@ class TestFixture(unittest.TestCase):
     def test_known_problem(self): self.fail('still failing')
 ''')
         self.assertEqual((summary['status'], summary['expected_failures']), ('BLOCKED', 1))
+
+    def test_main_blocks_incomplete_test_discovery(self):
+        fake = {'status': 'PASS', 'passed': 199, 'tests_run': 199,
+                'errors': 0, 'failures': 0, 'skipped': 0}
+        with patch('run_gate.run_suite', return_value=fake), redirect_stdout(io.StringIO()) as output:
+            self.assertEqual(main([]), 1)
+        report = json.loads(output.getvalue())
+        self.assertEqual(report['status'], 'BLOCKED')
+        self.assertTrue(report['discovery_incomplete'])
+        self.assertEqual(report['minimum_required'], 200)
+
+    def test_main_accepts_complete_reviewed_discovery(self):
+        fake = {'status': 'PASS', 'passed': 200, 'tests_run': 200,
+                'errors': 0, 'failures': 0, 'skipped': 0}
+        with patch('run_gate.run_suite', return_value=fake), redirect_stdout(io.StringIO()) as output:
+            self.assertEqual(main([]), 0)
+        report = json.loads(output.getvalue())
+        self.assertEqual(report['status'], 'PASS')
+        self.assertFalse(report['discovery_incomplete'])
 
     def test_zero_tests_blocks_gate(self):
         summary = self.run_fixture('empty', '"""No tests."""\n')
