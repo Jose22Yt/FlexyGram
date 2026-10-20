@@ -1,0 +1,26 @@
+{
+  "code_commit": "525b699982610b0d3721f85123734ae6b73154e8",
+  "source_files": {
+    "TMessagesProj/jni/CMakeLists.txt": "decab4a0c5f32b000e903aa0325566170c20fcdd431568420e231d72a1216673",
+    "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java": "dc28d57fa4b9567bcc088e07daa3d71197868d3c78b4d3d0a27559cef32f7c1c",
+    "settings.gradle": "c912a77408a083da3c131743cf034a9c4ddc32a7bf4d19a3d13280429650c651",
+    "TMessagesProj/jni/beta-development-policy.cmake": "f66d32030dedad68aba600400361c536aa8fdcbb13a83aa1e2ee951eacbe4f1b",
+    "TMessagesProj/src/betaDevelopment/AndroidManifest.xml": "f369615379cd79d6d0de1c2bfe5c7d5fd34f41102048659145242b66ed312319",
+    "TMessagesProj/src/betaDevelopment/java/org/telegram/ui/beta/BetaPreviewActivity.java": "a16f184fa140bba6a1dabef56fa92745f772145b72daa5155493e72001611bfc",
+    "TMessagesProj/src/betaDevelopment/java/org/telegram/ui/beta/LatestNavigation.java": "e93341e3c6a1a8b2df87967f5d9e5f112347d1ab6ed98551f7054670fbb8cc8a",
+    "TMessagesProj_Modules/translation-compat-beta-offline/build.gradle": "59748bf9e8b159857f62f4292a82e9179c5c4868f44d5d0e62a87a9ec4cef552",
+    "TMessagesProj_Modules/translation-compat-beta-offline/src/main/java/app/nekogram/translator/BaseTranslator.java": "8be8575b8c14e6aa3631355672b20e062bfaeee086cf3407e65754b7cfdf6845",
+    "TMessagesProj_Modules/translation-compat-beta-offline/src/main/java/app/nekogram/translator/DeepLTranslator.java": "89a369e0d440454120b55a6206adf95ef23fbfb90211dfc496cea4ee6c0ab8e0",
+    "TMessagesProj_Modules/translation-compat-beta-offline/src/main/java/app/nekogram/translator/Http429Exception.java": "ce33232a443c9668c617acf15fa1d31d05b9c30a5656f97fb9245ecce638a7f1",
+    "TMessagesProj_Modules/translation-compat-beta-offline/src/main/java/app/nekogram/translator/LanguageCodes.java": "7984c504f39401319fb464a8fdb55d7f0fbe42f7e5979e5fcb7dab6deaaa5fd7",
+    "TMessagesProj_Modules/translation-compat-beta-offline/src/main/java/app/nekogram/translator/MicrosoftTranslator.java": "ce8ce660780601b3b1075dd89bdff0a168f99314ecc33affcf880f8cafa3953d",
+    "TMessagesProj_Modules/translation-compat-beta-offline/src/main/java/app/nekogram/translator/Result.java": "e49fc89b7db01822db02a23c0806aa3366223a396033ad86e1f02ebcdf832dfd",
+    "gradle/beta-development.gradle": "ed91cb48cc1e40772810c3d9d9b1ae32676ef74f9a1e43048c34864204982989",
+    "gradle/beta-development.json": "67536a3d559318947afcefbaaeb5a0669b5dbe627956a1c12f4e360999368827",
+    "TMessagesProj/build.gradle": "ffc62ea9711aef2a1cef8b37150ed1a51800ea41e546d3b4ce5df33ce08b433c"
+  },
+  "overlay_build_sha256": "8585d5a2d03953ea0e8bfd0119fe34c3de97834eb223263b3d8a9486fc517a5f",
+  "overlay_reproduced_exactly": true,
+  "source_and_native_files_byte_equal": true,
+  "apk_signing_authorized": false
+}

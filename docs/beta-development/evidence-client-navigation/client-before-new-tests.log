@@ -1,0 +1,45 @@
+test_actual_cmake_beta_scope_is_bound_to_profile (test_build_profile.BuildProfileTests.test_actual_cmake_beta_scope_is_bound_to_profile) ...
+  test_actual_cmake_beta_scope_is_bound_to_profile (test_build_profile.BuildProfileTests.test_actual_cmake_beta_scope_is_bound_to_profile) (case='valid') ... FAIL
+test_actual_cmake_beta_scope_is_bound_to_profile (test_build_profile.BuildProfileTests.test_actual_cmake_beta_scope_is_bound_to_profile) ... ERROR
+test_actual_groovy_validator_accepts_only_closed_identity (test_build_profile.BuildProfileTests.test_actual_groovy_validator_accepts_only_closed_identity) ... ok
+test_protected_policies_and_historical_contract_are_unchanged (test_build_profile.BuildProfileTests.test_protected_policies_and_historical_contract_are_unchanged) ... ok
+test_bounded_latest_request_reentrancy_and_lifecycle (test_navigation_queue.NavigationQueueTests.test_bounded_latest_request_reentrancy_and_lifecycle) ... ok
+test_original_callback_bug_and_actual_corrected_method (test_notification_expiry.NotificationExpiry.test_original_callback_bug_and_actual_corrected_method) ... ok
+test_historical_method_reproduces_lost_callback (test_transition_ownership.TransitionOwnershipTests.test_historical_method_reproduces_lost_callback) ... ok
+test_real_method_preserves_reentrant_work (test_transition_ownership.TransitionOwnershipTests.test_real_method_preserves_reentrant_work) ... ok
+
+======================================================================
+ERROR: test_actual_cmake_beta_scope_is_bound_to_profile (test_build_profile.BuildProfileTests.test_actual_cmake_beta_scope_is_bound_to_profile)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/6fe2cd15bb66/client/tests/beta_development/test_build_profile.py", line 36, in test_actual_cmake_beta_scope_is_bound_to_profile
+    header=(folder/'valid/flexygram-policy/VariantPolicy.generated.h').read_text()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/.local/share/uv/python/cpython-3.11.17-linux-x86_64-gnu/lib/python3.11/pathlib.py", line 1058, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/.local/share/uv/python/cpython-3.11.17-linux-x86_64-gnu/lib/python3.11/pathlib.py", line 1044, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/tmp/tmphl1wd985/valid/flexygram-policy/VariantPolicy.generated.h'
+
+======================================================================
+FAIL: test_actual_cmake_beta_scope_is_bound_to_profile (test_build_profile.BuildProfileTests.test_actual_cmake_beta_scope_is_bound_to_profile) (case='valid')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/6fe2cd15bb66/client/tests/beta_development/test_build_profile.py", line 35, in test_actual_cmake_beta_scope_is_bound_to_profile
+    with self.subTest(case=name):self.assertEqual(p.returncode==0,accepted,p.stderr)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False != True : CMake Error: File /workspace/scratch/6fe2cd15bb66/client/TMessagesProj/jni/tgnet/VariantPolicy.generated.h.in does not exist.
+CMake Error at /workspace/scratch/6fe2cd15bb66/client/TMessagesProj/jni/beta-development-policy.cmake:12 (configure_file):
+  configure_file Problem configuring file
+Call Stack (most recent call first):
+  CMakeLists.txt:3 (include)
+
+
+
+
+----------------------------------------------------------------------
+Ran 7 tests in 13.308s
+
+FAILED (failures=1, errors=1)

@@ -1,0 +1,325 @@
+{
+  "status": "SYNTHETIC_BETA_COMPATIBILITY_PASS",
+  "pr24_commit": "db5b9a113d54f552a925ea233c5b199ab95bfcdb",
+  "package": "io.github.jose22yt.flexygram.beta.development",
+  "report": {
+    "schema": 1,
+    "metadata": {
+      "schema": 1,
+      "client": "FlexyGram",
+      "apk_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "source": "synthetic",
+      "run_id": "beta_handoff_fixture",
+      "repetition": 0,
+      "conditions": {
+        "build_type": "betaDevelopmentDebug",
+        "protocol": "pr24_v1"
+      }
+    },
+    "input_sha256": {
+      "logcat": "7c233cc11b31186e19f7c5d000cde27208945bd9d6c12d65e25d0cd15559e200",
+      "events": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logcat": {
+      "status": "OBSERVED_LOG_SIGNALS",
+      "parsed_lines": 5,
+      "unparsed_lines": 0,
+      "attributed_lines": 4,
+      "outside_window_or_undated": 0,
+      "epoch_window_scoped": false,
+      "signal_counts": {
+        "java_fatal": 1,
+        "anr": 1,
+        "native_crash": 0,
+        "native_load": 1,
+        "jni": 0,
+        "python": 1,
+        "animation": 0
+      },
+      "choreographer_reported_skipped_frames": 0,
+      "limits": "Signals, not unique crash/ANR counts; absence is not proof of stability. No raw messages emitted."
+    },
+    "frames": null,
+    "interactions": {
+      "status": "NO_EVENT_DATA",
+      "operations": {
+        "startup": {
+          "requested": 0,
+          "accepted": 0,
+          "presented": 0,
+          "cancelled": 0,
+          "timeout": 0,
+          "incomplete": 0,
+          "request_to_accept": {
+            "n": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "max_ms": null
+          },
+          "request_to_present": {
+            "n": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "max_ms": null
+          },
+          "request_to_cancel": {
+            "n": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "max_ms": null
+          }
+        },
+        "chat_open": {
+          "requested": 0,
+          "accepted": 0,
+          "presented": 0,
+          "cancelled": 0,
+          "timeout": 0,
+          "incomplete": 0,
+          "request_to_accept": {
+            "n": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "max_ms": null
+          },
+          "request_to_present": {
+            "n": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "max_ms": null
+          },
+          "request_to_cancel": {
+            "n": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "max_ms": null
+          }
+        },
+        "chat_close": {
+          "requested": 0,
+          "accepted": 0,
+          "presented": 0,
+          "cancelled": 0,
+          "timeout": 0,
+          "incomplete": 0,
+          "request_to_accept": {
+            "n": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "max_ms": null
+          },
+          "request_to_present": {
+            "n": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "max_ms": null
+          },
+          "request_to_cancel": {
+            "n": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "max_ms": null
+          }
+        },
+        "rapid_tap": {
+          "requested": 0,
+          "accepted": 0,
+          "presented": 0,
+          "cancelled": 0,
+          "timeout": 0,
+          "incomplete": 0,
+          "request_to_accept": {
+            "n": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "max_ms": null
+          },
+          "request_to_present": {
+            "n": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "max_ms": null
+          },
+          "request_to_cancel": {
+            "n": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "max_ms": null
+          }
+        },
+        "transition_interrupt": {
+          "requested": 0,
+          "accepted": 0,
+          "presented": 0,
+          "cancelled": 0,
+          "timeout": 0,
+          "incomplete": 0,
+          "request_to_accept": {
+            "n": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "max_ms": null
+          },
+          "request_to_present": {
+            "n": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "max_ms": null
+          },
+          "request_to_cancel": {
+            "n": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "max_ms": null
+          }
+        },
+        "theme_light": {
+          "requested": 0,
+          "accepted": 0,
+          "presented": 0,
+          "cancelled": 0,
+          "timeout": 0,
+          "incomplete": 0,
+          "request_to_accept": {
+            "n": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "max_ms": null
+          },
+          "request_to_present": {
+            "n": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "max_ms": null
+          },
+          "request_to_cancel": {
+            "n": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "max_ms": null
+          }
+        },
+        "theme_dark": {
+          "requested": 0,
+          "accepted": 0,
+          "presented": 0,
+          "cancelled": 0,
+          "timeout": 0,
+          "incomplete": 0,
+          "request_to_accept": {
+            "n": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "max_ms": null
+          },
+          "request_to_present": {
+            "n": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "max_ms": null
+          },
+          "request_to_cancel": {
+            "n": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "max_ms": null
+          }
+        }
+      },
+      "limits": "Requires real instrumentation or reviewed external observer. Incomplete/timeout is not proof of ANR or ignored physical touch."
+    },
+    "android_execution_verified_by_analyzer": false
+  },
+  "capture_plan": [
+    [
+      "/not-executed/adb",
+      "-s",
+      "emulator-5554",
+      "get-state"
+    ],
+    [
+      "/not-executed/adb",
+      "-s",
+      "emulator-5554",
+      "shell",
+      "getprop",
+      "ro.kernel.qemu"
+    ],
+    [
+      "/not-executed/adb",
+      "-s",
+      "emulator-5554",
+      "shell",
+      "dumpsys",
+      "account"
+    ],
+    [
+      "/not-executed/adb",
+      "-s",
+      "emulator-5554",
+      "shell",
+      "pidof",
+      "io.github.jose22yt.flexygram.beta.development"
+    ],
+    [
+      "/not-executed/adb",
+      "-s",
+      "emulator-5554",
+      "logcat",
+      "-b",
+      "main",
+      "-b",
+      "system",
+      "-b",
+      "crash",
+      "-d",
+      "-v",
+      "epoch",
+      "-t",
+      "5000"
+    ],
+    [
+      "/not-executed/adb",
+      "-s",
+      "emulator-5554",
+      "shell",
+      "dumpsys",
+      "gfxinfo",
+      "io.github.jose22yt.flexygram.beta.development",
+      "framestats"
+    ],
+    [
+      "/not-executed/adb",
+      "-s",
+      "emulator-5554",
+      "shell",
+      "pm",
+      "path",
+      "io.github.jose22yt.flexygram.beta.development"
+    ]
+  ],
+  "adb_executed": false,
+  "android_executed": false,
+  "real_apk_accessed": false
+}

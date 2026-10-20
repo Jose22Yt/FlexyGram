@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "status": "DRAFT_NOT_AUTHORIZED",
+  "approval_scope": "FlexyGram_Beta_disposable_single_trial_v1",
+  "trial_id": "flexygram-personal-offline-9513d497-v1",
+  "package": "io.github.jose22yt.flexygram.beta.development",
+  "source_commit": "97dfb08e58159b31d322dd8435080fb039abdeb9",
+  "approved_unsigned_apk_sha256": "9513d49706a714d496b45aab1992c0cc250e8c2e4df8bb1a1be00d8451e60ede",
+  "build_receipt_sha256": null,
+  "certificate_sha256": null,
+  "approval_reference": null,
+  "ephemeral_key_generation_approval_reference": null,
+  "protected_input_review_reference": null,
+  "apk_signing_authorized": false,
+  "production_use_allowed": false,
+  "permanent_identity": false,
+  "discard_key_after_trial": true,
+  "future_updates_guaranteed": false,
+  "installation_authorized": false,
+  "distribution_allowed": false
+}

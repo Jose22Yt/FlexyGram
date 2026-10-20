@@ -1,0 +1,8 @@
+test_api24_32_keep_legacy_back_without_platform_registration (test_platform_back.PlatformBackTests.test_api24_32_keep_legacy_back_without_platform_registration) ... ok
+test_api33_36_37_original_lacks_bridge_new_activity_preserves_queue (test_platform_back.PlatformBackTests.test_api33_36_37_original_lacks_bridge_new_activity_preserves_queue) ... ok
+test_platform_registration_and_destruction_are_idempotent (test_platform_back.PlatformBackTests.test_platform_registration_and_destruction_are_idempotent) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 5.033s
+
+OK

@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "provider": "Dropbox",
+  "path": "/FlexyGram-Work2-Private/FlexyGram-BetaDevelopment-PR29-97dfb08-Unsigned-Private.zip",
+  "file_id": "id:7uKZZ5yXrxEAAAAAAAAABw",
+  "revision": "0165e4a928401c700000003314317a1",
+  "bundle_bytes": 337741135,
+  "bundle_sha256": "812ef5f9132edb75d0f061d8db9058489309194ea183bba5cef6dfbd6765029d",
+  "members": 40,
+  "zip_crc_verified": true,
+  "all_member_sizes_and_sha256_verified": true,
+  "same_build_classes_provenance_verified": true,
+  "jni_inputs_and_evidence_receipt_verified": true,
+  "apk_bytes": 113101251,
+  "apk_sha256": "9513d49706a714d496b45aab1992c0cc250e8c2e4df8bb1a1be00d8451e60ede",
+  "build_source_commit": "97dfb08e58159b31d322dd8435080fb039abdeb9",
+  "original_unchanged": true,
+  "remote_recovery_verified": true,
+  "privacy_evidence": "User-supplied folder sharing screenshots: no invited persons, no edit links, no view links; folder shown at personal root. Connector previously identified personal account/root and no direct shared links.",
+  "apk_signed": false,
+  "android_executed": false,
+  "historical_archive_receipt": "Unchanged pre-upload receipt retains remote_recovery_verified=false; this independent download supersedes that storage status only."
+}

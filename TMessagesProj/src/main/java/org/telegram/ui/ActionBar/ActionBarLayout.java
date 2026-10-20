@@ -2416,9 +2416,14 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         if (delayedOpenAnimationRunnable == null || waitingForKeyboardCloseRunnable != null) {
             return;
         }
-        AndroidUtilities.cancelRunOnUIThread(delayedOpenAnimationRunnable);
-        delayedOpenAnimationRunnable.run();
-        delayedOpenAnimationRunnable = null;
+        final Runnable pending = delayedOpenAnimationRunnable;
+        AndroidUtilities.cancelRunOnUIThread(pending);
+        pending.run();
+        // A fragment callback can schedule a NEW transition synchronously.
+        // Do not orphan that callback by clearing its replacement's ownership.
+        if (delayedOpenAnimationRunnable == pending) {
+            delayedOpenAnimationRunnable = null;
+        }
     }
 
     public boolean isInPreviewMode() {

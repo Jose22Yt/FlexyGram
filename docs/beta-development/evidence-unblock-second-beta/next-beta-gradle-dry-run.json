@@ -1,0 +1,17 @@
+{
+  "source_head": "5f5cadc38978552577113a6dad0f52e286fe3e06",
+  "command": [
+    "--no-daemon",
+    "--console=plain",
+    "--max-workers=2",
+    "-PflexygramBetaDevelopment=true",
+    ":TMessagesProj:assembleBetaDevelopmentDebug",
+    "--dry-run",
+    "--info"
+  ],
+  "exit_code": 1,
+  "seconds": 6.9,
+  "apk_generated": false,
+  "android_executed": false,
+  "dry_run_only": true
+}

@@ -1,0 +1,53 @@
+{
+  "permanent_approval_ast_unchanged": true,
+  "pr30_source_commit": "2ab7546b0fddf52890d3ae45eaef599358b861cd",
+  "base_pr23_commit": "eef5c7e42f4b4cd3c85ea1c921888f7295c36f18",
+  "distinct_methods": 50,
+  "runs": {
+    "temporary-policy-normal.log": {
+      "tests": 29,
+      "skipped": 0,
+      "result": "PASS",
+      "sha256": "0ae4ad3055a30d501d10d2c3b9748ef23c776333e6c7a70acdd981b1eca32fc5"
+    },
+    "temporary-policy-optimized.log": {
+      "tests": 29,
+      "skipped": 0,
+      "result": "PASS",
+      "sha256": "7e73b4f2fe55dcee089016a2175410c43785510081d354acaba9d39e384d6ef8"
+    },
+    "temporary-handoff-normal.log": {
+      "tests": 21,
+      "skipped": 0,
+      "result": "PASS",
+      "sha256": "baf987eeda8959695edd3cf9d505394ca4a6b55937b2b3dd4dfc1735d0281c89"
+    },
+    "temporary-handoff-optimized.log": {
+      "tests": 21,
+      "skipped": 0,
+      "result": "PASS",
+      "sha256": "bf6725a4fe30a61c3252a9d004f4f92926e4f6893370f1aa25632444a8d22a74"
+    }
+  },
+  "android_executed": false,
+  "secret_generated": false,
+  "apk_signed": false,
+  "apk_recompiled": false,
+  "input_probe": {
+    "core_dumps_disabled": true,
+    "fixture_not_in_argv_or_environment": true,
+    "keytool_keystore_operation_executed": false,
+    "keytool_missing_password_file_negative_control_verified": true,
+    "keytool_password_reader_via_stdin_verified": true,
+    "keytool_read_only_list_of_nonexistent_store_executed": true,
+    "limits": "Tests Java stdin and read-only keytool password input only; not protection against host administrator, memory inspection or JVM crash artifacts.",
+    "persistent_custody_verified": false,
+    "secret_generated": false,
+    "signing_executed": false,
+    "status": "NONSECRET_JAVA_KEYTOOL_INPUT_VERIFIED"
+  },
+  "input_probe_modes": [
+    "normal",
+    "-O"
+  ]
+}

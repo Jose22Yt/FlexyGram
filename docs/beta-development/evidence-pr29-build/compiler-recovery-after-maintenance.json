@@ -1,0 +1,37 @@
+[
+  {
+    "package": "ndk;27.2.12479018",
+    "sha256": "59c2f6dc96743b5daf5d1626684640b20a6bd2b1d85b13156b90333741bad5cc",
+    "target": "sdk/ndk/27.2.12479018"
+  },
+  {
+    "package": "build-tools;36.0.0",
+    "sha256": "5d9ac77fb6ff43d9da518a337b4fcf8f9097113df531d99ccefe80ef7ce8250b",
+    "target": "sdk/build-tools/36.0.0"
+  },
+  {
+    "package": "platforms;android-37.0",
+    "sha256": "840b23e827f96e64aea4c89a1194aac3dc5f6bad37edb231c5c795d890330e8d",
+    "target": "sdk/platforms/android-37"
+  },
+  {
+    "package": "platforms;android-35",
+    "sha256": "0988cacad01b38a18a47bac14a0695f246bc76c1b06c0eeb8eb0dc825ab0c8e0",
+    "target": "sdk/platforms/android-35"
+  },
+  {
+    "package": "gradle",
+    "sha256": "acd53f1edaf02f1a8ff99879f8a34b302661a057d9b063ae9e35b552f804d20a",
+    "target": "gradle-9.7.1"
+  },
+  {
+    "package": "jdk",
+    "sha512": "9444ad955a24171f6c5c10e6405f40fd3da931d9810b421b71767f74c94e021666d79390646f4809f988dc4bea8535669827d47c915f83397b36b20e6b828a7d",
+    "target": "jbrsdk-21.0.10-linux-x64-b1163.105"
+  },
+  {
+    "package": "ninja",
+    "sha256": "6f98805688d19672bd699fbbfa2c2cf0fc054ac3df1f0e6a47664d963d530255",
+    "target": "ninja-1.12.1"
+  }
+]

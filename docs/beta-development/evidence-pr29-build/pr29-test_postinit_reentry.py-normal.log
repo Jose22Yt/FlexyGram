@@ -1,0 +1,10 @@
+test_linkage_failure_blocks_second_activity_in_same_process (test_postinit_reentry.PostInitReentryTests.test_linkage_failure_blocks_second_activity_in_same_process) ... ok
+test_recursive_entry_cannot_build_on_partial_initialization (test_postinit_reentry.PostInitReentryTests.test_recursive_entry_cannot_build_on_partial_initialization) ... ok
+test_runtime_failure_blocks_second_activity_in_same_process (test_postinit_reentry.PostInitReentryTests.test_runtime_failure_blocks_second_activity_in_same_process) ... ok
+test_success_is_reused_without_repeating_global_initialization (test_postinit_reentry.PostInitReentryTests.test_success_is_reused_without_repeating_global_initialization) ... ok
+test_unhandled_fatal_propagates_but_remains_fail_closed (test_postinit_reentry.PostInitReentryTests.test_unhandled_fatal_propagates_but_remains_fail_closed) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 9.034s
+
+OK

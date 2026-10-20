@@ -1,0 +1,28 @@
+{
+  "source_commit": "97dfb08e58159b31d322dd8435080fb039abdeb9",
+  "java_source_tree_matches_committed_code": true,
+  "only_tracked_overlay": "TMessagesProj/build.gradle",
+  "new_helpers_in_apk_dex": true,
+  "compiled_activity_invokes_new_helpers": true,
+  "classes_from_same_build": [
+    {
+      "class": "BetaSystemBack",
+      "sha256": "d2023246b1a7a40b675a731766ae2b60edea81143a77a40fb6b137e3f270c2a7"
+    },
+    {
+      "class": "BetaSystemBack$Api33",
+      "sha256": "8bad2211919fd1fc320ecc7e6d9b49262caabe1922978df4668ed9c32759c451"
+    },
+    {
+      "class": "BetaPostInit",
+      "sha256": "943a2b7e278f0447eed76dd87b2534db05e7ad2039ffdcbb355b077b53edc2d5"
+    },
+    {
+      "class": "BetaPreviewActivity",
+      "sha256": "b8b8ddacc5a13a9d0229dfdb964ae474189cf9f11fe8d80e4ce6e0043f467cf6"
+    }
+  ],
+  "build_commit_id_field": "",
+  "build_commit_id_limit": "Project default empty; provenance is committed checkout, source hashes and same-build receipts, not an embedded commit stamp.",
+  "android_execution": false
+}

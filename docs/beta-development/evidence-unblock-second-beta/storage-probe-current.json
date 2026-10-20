@@ -1,0 +1,12 @@
+{
+  "synthetic_only": true,
+  "bytes": 57671850,
+  "sha256": "2094cb8985a1cf26d909f83272d20a977c1c541706ce218b3104cbecd8769c6d",
+  "apk_generated": false,
+  "private_persistence_confirmed": false,
+  "remote_recovery_verified": false,
+  "upload_attempted": true,
+  "error": "HTTP403 at authenticated hosted tool discovery, before upload preparation or byte transfer",
+  "transfer_started": false,
+  "new_apk_generated": false
+}

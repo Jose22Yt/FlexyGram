@@ -1,0 +1,354 @@
+Picked up JAVA_TOOL_OPTIONS: [local proxy/TLS settings redacted]
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.7.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :buildSrc:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :buildSrc:compileKotlin UP-TO-DATE
+> Task :buildSrc:compileJava NO-SOURCE
+> Task :buildSrc:compileGroovy NO-SOURCE
+> Task :buildSrc:pluginDescriptors UP-TO-DATE
+> Task :buildSrc:processResources UP-TO-DATE
+> Task :buildSrc:classes UP-TO-DATE
+> Task :buildSrc:jar UP-TO-DATE
+> Task :translation-compat-beta-offline:compileJava UP-TO-DATE
+> Task :translation-compat-beta-offline:processResources NO-SOURCE
+> Task :translation-compat-beta-offline:classes UP-TO-DATE
+> Task :translation-compat-beta-offline:jar UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-common:preBuild UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-common:preDebugBuild UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-common:processDebugNavigationResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-container:preBuild UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-container:preDebugBuild UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-container:processDebugNavigationResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-database:preBuild UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-database:preDebugBuild UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-database:processDebugNavigationResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:preBuild UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:preDebugBuild UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:processDebugNavigationResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:preBuild UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:preDebugBuild UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:processDebugNavigationResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:preBuild UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:preDebugBuild UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:processDebugNavigationResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:preBuild UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:preDebugBuild UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:processDebugNavigationResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:preBuild UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:preDebugBuild UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:processDebugNavigationResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:preBuild UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:preDebugBuild UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:processDebugNavigationResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:preBuild UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:preDebugBuild UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:processDebugNavigationResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-session:preBuild UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-session:preDebugBuild UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-session:processDebugNavigationResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-common:generateDebugResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-common:packageDebugResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-common:parseDebugLocalResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-common:generateDebugRFile UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-common:compileDebugKotlin NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-common:javaPreCompileDebug UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-common:compileDebugJavaWithJavac UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-common:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-container:generateDebugResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-container:packageDebugResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-container:parseDebugLocalResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-container:generateDebugRFile UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-container:compileDebugKotlin NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-container:javaPreCompileDebug UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-container:compileDebugJavaWithJavac UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-container:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-database:generateDebugResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-database:packageDebugResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-database:parseDebugLocalResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-database:generateDebugRFile UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-database:compileDebugKotlin NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-database:javaPreCompileDebug UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-database:compileDebugJavaWithJavac UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-database:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:generateDebugResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:packageDebugResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:parseDebugLocalResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:generateDebugRFile UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:compileDebugKotlin NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:javaPreCompileDebug UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:compileDebugJavaWithJavac UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:generateDebugResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:packageDebugResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:parseDebugLocalResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:generateDebugRFile UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:compileDebugKotlin NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:javaPreCompileDebug UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:compileDebugJavaWithJavac UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:generateDebugResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:packageDebugResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:parseDebugLocalResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:generateDebugRFile UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:generateDebugResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:packageDebugResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:parseDebugLocalResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:generateDebugRFile UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:generateDebugResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:packageDebugResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:parseDebugLocalResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:generateDebugRFile UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:compileDebugKotlin NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:javaPreCompileDebug UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:compileDebugJavaWithJavac UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:compileDebugKotlin NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:javaPreCompileDebug UP-TO-DATE
+> Task :TMessagesProj:verifyDiagnosticTranslationClasspath
+> Task :TMessagesProj:preBuild
+> Task :TMessagesProj:preBetaDevelopmentDebugBuild
+> Task :TMessagesProj:mergeBetaDevelopmentDebugNativeDebugMetadata NO-SOURCE
+> Task :TMessagesProj:generateBetaDevelopmentDebugBuildConfig UP-TO-DATE
+> Task :TMessagesProj:generateBetaDevelopmentDebugResValues UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:compileDebugJavaWithJavac UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:compileDebugKotlin NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:javaPreCompileDebug UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:compileDebugJavaWithJavac UP-TO-DATE
+> Task :TMessagesProj:generateBetaDevelopmentDebugLottieMeta UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:generateDebugResources UP-TO-DATE
+> Task :TMessagesProj:extractBetaDevelopmentDebugPythonBuildPackages UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:packageDebugResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:parseDebugLocalResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:generateDebugRFile UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:compileDebugKotlin NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:javaPreCompileDebug UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:compileDebugJavaWithJavac UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:generateDebugResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:packageDebugResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:parseDebugLocalResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:generateDebugRFile UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:compileDebugKotlin NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:javaPreCompileDebug UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:compileDebugJavaWithJavac UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-session:compileDebugAidl UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-session:generateDebugResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-session:packageDebugResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-session:parseDebugLocalResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-session:generateDebugRFile UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-session:compileDebugKotlin NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-session:javaPreCompileDebug UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-session:compileDebugJavaWithJavac UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-session:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-common:generateDebugAssets UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-common:mergeDebugAssets UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-container:generateDebugAssets UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-container:mergeDebugAssets UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-database:generateDebugAssets UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-database:mergeDebugAssets UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:generateDebugAssets UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:mergeDebugAssets UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:generateDebugAssets UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:mergeDebugAssets UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:generateDebugAssets UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:mergeDebugAssets UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:generateDebugAssets UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:mergeDebugAssets UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:generateDebugAssets UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:mergeDebugAssets UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:generateDebugAssets UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:mergeDebugAssets UP-TO-DATE
+
+> Task :TMessagesProj:prepareLockedPython
+Verified experimental wheels: 18
+
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:generateDebugAssets UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:mergeDebugAssets UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-session:generateDebugAssets UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-session:mergeDebugAssets UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-common:processDebugJavaRes NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-container:processDebugJavaRes NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-database:processDebugJavaRes NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:processDebugJavaRes NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:processDebugJavaRes NO-SOURCE
+> Task :TMessagesProj:installBetaDevelopmentDebugPythonRequirements UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:processDebugJavaRes NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:processDebugJavaRes NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:processDebugJavaRes NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:processDebugJavaRes NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:processDebugJavaRes NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-session:processDebugJavaRes NO-SOURCE
+> Task :TMessagesProj:mergeBetaDevelopmentDebugPythonSources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :TMessagesProj:generateBetaDevelopmentDebugPythonProxies UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-session:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :TMessagesProj:generateBetaDevelopmentDebugResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-container:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :TMessagesProj:packageBetaDevelopmentDebugResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-database:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-common:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-common:writeDebugAarMetadata UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-container:writeDebugAarMetadata UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-database:writeDebugAarMetadata UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:writeDebugAarMetadata UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:writeDebugAarMetadata UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:writeDebugAarMetadata UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:writeDebugAarMetadata UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:writeDebugAarMetadata UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:writeDebugAarMetadata UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:writeDebugAarMetadata UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-session:writeDebugAarMetadata UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-common:extractDeepLinksDebug UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-common:processDebugManifest UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-container:extractDeepLinksDebug UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-container:processDebugManifest UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-database:extractDeepLinksDebug UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-database:processDebugManifest UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:extractDeepLinksDebug UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:processDebugManifest UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:extractDeepLinksDebug UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:processDebugManifest UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:extractDeepLinksDebug UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:processDebugManifest UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:extractDeepLinksDebug UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:processDebugManifest UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:extractDeepLinksDebug UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:processDebugManifest UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:extractDeepLinksDebug UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:processDebugManifest UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:extractDeepLinksDebug UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:processDebugManifest UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-session:extractDeepLinksDebug UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-session:processDebugManifest UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-common:mapDebugSourceSetPaths UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-common:compileDebugLibraryResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-container:mapDebugSourceSetPaths UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-container:compileDebugLibraryResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-database:mapDebugSourceSetPaths UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-database:compileDebugLibraryResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:mapDebugSourceSetPaths UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:compileDebugLibraryResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:mapDebugSourceSetPaths UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:compileDebugLibraryResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:mapDebugSourceSetPaths UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:compileDebugLibraryResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:mapDebugSourceSetPaths UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:compileDebugLibraryResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:mapDebugSourceSetPaths UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:compileDebugLibraryResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:mapDebugSourceSetPaths UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:compileDebugLibraryResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:mapDebugSourceSetPaths UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:compileDebugLibraryResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-session:mapDebugSourceSetPaths UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-session:compileDebugLibraryResources UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-common:mergeDebugJniLibFolders UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-common:mergeDebugNativeLibs NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-common:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-container:mergeDebugJniLibFolders UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-container:mergeDebugNativeLibs NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-container:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-database:mergeDebugJniLibFolders UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-database:mergeDebugNativeLibs NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-database:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:mergeDebugJniLibFolders UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:mergeDebugNativeLibs NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-datasource:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:mergeDebugJniLibFolders UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:mergeDebugNativeLibs NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:mergeDebugJniLibFolders UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:mergeDebugNativeLibs NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:mergeDebugJniLibFolders UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:mergeDebugNativeLibs NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:mergeDebugJniLibFolders UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:mergeDebugNativeLibs NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-dash:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:mergeDebugJniLibFolders UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:mergeDebugNativeLibs NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-exoplayer-hls:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:mergeDebugJniLibFolders UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:mergeDebugNativeLibs NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-extractor:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-session:mergeDebugJniLibFolders UP-TO-DATE
+> Task :TMessagesProj_Modules:media3:media-lib-session:mergeDebugNativeLibs NO-SOURCE
+> Task :TMessagesProj_Modules:media3:media-lib-session:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :TMessagesProj:processBetaDevelopmentDebugNavigationResources UP-TO-DATE
+> Task :TMessagesProj:parseBetaDevelopmentDebugLocalResources UP-TO-DATE
+> Task :TMessagesProj:generateBetaDevelopmentDebugRFile UP-TO-DATE
+> Task :TMessagesProj:javaPreCompileBetaDevelopmentDebug UP-TO-DATE
+> Task :TMessagesProj:generateBetaDevelopmentDebugAssets UP-TO-DATE
+> Task :TMessagesProj:buildChaquopyRuntimeArm64V8a UP-TO-DATE
+> Task :TMessagesProj:generateBetaDevelopmentDebugPythonMiscAssets UP-TO-DATE
+> Task :TMessagesProj:generateBetaDevelopmentDebugPythonRequirementsAssets UP-TO-DATE
+> Task :TMessagesProj:generateBetaDevelopmentDebugPythonSourceAssets UP-TO-DATE
+> Task :TMessagesProj:generateBetaDevelopmentDebugPythonBuildAssets UP-TO-DATE
+> Task :TMessagesProj:mergeBetaDevelopmentDebugAssets UP-TO-DATE
+> Task :TMessagesProj:compressBetaDevelopmentDebugAssets UP-TO-DATE
+> Task :TMessagesProj:generateBetaDevelopmentDebugGlobalSynthetics UP-TO-DATE
+> Task :TMessagesProj:l8DexDesugarLibBetaDevelopmentDebug UP-TO-DATE
+> Task :TMessagesProj:checkBetaDevelopmentDebugDuplicateClasses UP-TO-DATE
+> Task :TMessagesProj:desugarBetaDevelopmentDebugFileDependencies UP-TO-DATE
+> Task :TMessagesProj:mergeExtDexBetaDevelopmentDebug UP-TO-DATE
+> Task :TMessagesProj:mergeLibDexBetaDevelopmentDebug UP-TO-DATE
+> Task :TMessagesProj:checkBetaDevelopmentDebugAarMetadata UP-TO-DATE
+> Task :TMessagesProj:mapBetaDevelopmentDebugSourceSetPaths UP-TO-DATE
+> Task :TMessagesProj:compileBetaDevelopmentDebugNavigationResources UP-TO-DATE
+> Task :TMessagesProj:mergeBetaDevelopmentDebugResources UP-TO-DATE
+> Task :TMessagesProj:createBetaDevelopmentDebugCompatibleScreenManifests UP-TO-DATE
+> Task :TMessagesProj:extractDeepLinksBetaDevelopmentDebug UP-TO-DATE
+> Task :TMessagesProj:processBetaDevelopmentDebugMainManifest UP-TO-DATE
+> Task :TMessagesProj:processBetaDevelopmentDebugManifest UP-TO-DATE
+> Task :TMessagesProj:processBetaDevelopmentDebugManifestForPackage UP-TO-DATE
+> Task :TMessagesProj:processBetaDevelopmentDebugResources UP-TO-DATE
+> Task :TMessagesProj:configureCMakeDebug[arm64-v8a]-2
+> Task :TMessagesProj:buildCMakeDebug[arm64-v8a]-2
+> Task :TMessagesProj:generateBetaDevelopmentDebugPythonJniLibs UP-TO-DATE
+> Task :TMessagesProj:mergeBetaDevelopmentDebugJniLibFolders UP-TO-DATE
+> Task :TMessagesProj:mergeBetaDevelopmentDebugNativeLibs UP-TO-DATE
+
+> Task :TMessagesProj:stripBetaDevelopmentDebugDebugSymbols
+/workspace/scratch/6fe2cd15bb66/toolchains/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-strip: error: '/workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/build/intermediates/merged_native_libs/betaDevelopmentDebug/mergeBetaDevelopmentDebugNativeLibs/out/lib/arm64-v8a/.libtmessages.49.so.Wtw9ul': section header table goes past the end of the file: e_shoff = 0x1726c6a0
+
+Unable to strip the following libraries, packaging them as they are: .libtmessages.49.so.Wtw9ul. Run with --info option to learn more.
+
+> Task :TMessagesProj:writeBetaDevelopmentDebugAppMetadata UP-TO-DATE
+> Task :TMessagesProj:writeBetaDevelopmentDebugSigningConfigVersions UP-TO-DATE
+> Task :TMessagesProj:compileBetaDevelopmentDebugKotlin
+w: file:///workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/Translator.kt:40:13 'constructor(p0: String!): Locale' is deprecated. Deprecated in Java.
+w: file:///workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/Translator.kt:42:13 'constructor(p0: String!, p1: String!): Locale' is deprecated. Deprecated in Java.
+
+> Task :TMessagesProj:compileBetaDevelopmentDebugJavaWithJavac
+Note: /workspace/scratch/6fe2cd15bb66/beta-build/TMessagesProj/src/betaDevelopment/java/org/telegram/ui/beta/BetaPreviewActivity.java uses or overrides a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+
+> Task :TMessagesProj:processBetaDevelopmentDebugJavaRes UP-TO-DATE
+> Task :TMessagesProj:mergeBetaDevelopmentDebugJavaResource UP-TO-DATE
+> Task :TMessagesProj:dexBuilderBetaDevelopmentDebug
+> Task :TMessagesProj:mergeProjectDexBetaDevelopmentDebug
+> Task :TMessagesProj:packageBetaDevelopmentDebug
+> Task :TMessagesProj:createBetaDevelopmentDebugApkListingFileRedirect UP-TO-DATE
+> Task :TMessagesProj:assembleBetaDevelopmentDebug
+w: Detected multiple Kotlin daemon sessions at 
+
+[Incubating] Problems report is available at: file:///workspace/scratch/6fe2cd15bb66/beta-build/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.7.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 1m 13s
+248 actionable tasks: 10 executed, 238 up-to-date

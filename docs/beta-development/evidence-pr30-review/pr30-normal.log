@@ -1,0 +1,22 @@
+test_alignment_failure_blocks (test_post_sign.BetaPostSignTests.test_alignment_failure_blocks) ... ok
+test_cli_blocks_without_exposing_tool_output_or_overwriting_report (test_post_sign.BetaPostSignTests.test_cli_blocks_without_exposing_tool_output_or_overwriting_report) ... ok
+test_commit_version_classes_and_review_binding_block (test_post_sign.BetaPostSignTests.test_commit_version_classes_and_review_binding_block) ... ok
+test_duplicate_approval_json_is_rejected (test_post_sign.BetaPostSignTests.test_duplicate_approval_json_is_rejected) ... ok
+test_gate_blocker_or_changed_manifest_blocks (test_post_sign.BetaPostSignTests.test_gate_blocker_or_changed_manifest_blocks) ... ok
+test_hash_mismatches_block (test_post_sign.BetaPostSignTests.test_hash_mismatches_block) ... ok
+test_invalid_v2_and_multiple_signers_block (test_post_sign.BetaPostSignTests.test_invalid_v2_and_multiple_signers_block) ... ok
+test_missing_and_diagnostic_authorization_block_before_tools (test_post_sign.BetaPostSignTests.test_missing_and_diagnostic_authorization_block_before_tools) ... ok
+test_payload_changes_and_added_removed_entries_block (test_post_sign.BetaPostSignTests.test_payload_changes_and_added_removed_entries_block) ... ok
+test_post_sign_tamper_blocks_even_with_updated_expected_hash (test_post_sign.BetaPostSignTests.test_post_sign_tamper_blocks_even_with_updated_expected_hash) ... ok
+test_recovered_copy_and_input_mutation_block (test_post_sign.BetaPostSignTests.test_recovered_copy_and_input_mutation_block) ... ok
+test_synthetic_success_requires_real_primitive_calls_and_gate (test_post_sign.BetaPostSignTests.test_synthetic_success_requires_real_primitive_calls_and_gate) ... ok
+test_tool_errors_and_timeouts_block (test_post_sign.BetaPostSignTests.test_tool_errors_and_timeouts_block) ... ok
+test_wrong_certificate_blocks (test_post_sign.BetaPostSignTests.test_wrong_certificate_blocks) ... ok
+test_zip_path_and_duplicate_member_rejected (test_post_sign.BetaPostSignTests.test_zip_path_and_duplicate_member_rejected) ... /workspace/scratch/6fe2cd15bb66/toolchains/python/cpython-3.11.17-linux-x86_64-gnu/lib/python3.11/zipfile.py:1606: UserWarning: Duplicate name: 'classes.dex'
+  return self._open_to_write(zinfo, force_zip64=force_zip64)
+ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 0.092s
+
+OK

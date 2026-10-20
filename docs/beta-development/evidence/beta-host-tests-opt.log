@@ -1,0 +1,11 @@
+test_actual_cmake_beta_scope_is_bound_to_profile (test_build_profile.BuildProfileTests.test_actual_cmake_beta_scope_is_bound_to_profile) ... ok
+test_actual_groovy_validator_accepts_only_closed_identity (test_build_profile.BuildProfileTests.test_actual_groovy_validator_accepts_only_closed_identity) ... ok
+test_protected_policies_and_historical_contract_are_unchanged (test_build_profile.BuildProfileTests.test_protected_policies_and_historical_contract_are_unchanged) ... ok
+test_bounded_latest_request_reentrancy_and_lifecycle (test_navigation_queue.NavigationQueueTests.test_bounded_latest_request_reentrancy_and_lifecycle) ... ok
+test_historical_method_reproduces_lost_callback (test_transition_ownership.TransitionOwnershipTests.test_historical_method_reproduces_lost_callback) ... ok
+test_real_method_preserves_reentrant_work (test_transition_ownership.TransitionOwnershipTests.test_real_method_preserves_reentrant_work) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 7.701s
+
+OK
