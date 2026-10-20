@@ -25,7 +25,7 @@ public class OnBackInvokedDispatcher {
  public void putInt(String key,int value){values.put(key,value);}public void putBoolean(String key,boolean value){values.put(key,value);}
  public void putString(String key,String value){values.put(key,value);}public Object get(String key){return values.get(key);}
 }''',
-'android/content/Context.java':'''package android.content; public class Context {public Context getApplicationContext(){return this;}public java.io.File getFilesDir(){return new java.io.File(System.getProperty("java.io.tmpdir"),"synthetic-beta-files");}}''',
+'android/content/Context.java':'''package android.content; public class Context {public Context getApplicationContext(){return this;}public android.content.res.Resources getResources(){return new android.content.res.Resources();}public java.io.File getFilesDir(){return new java.io.File(System.getProperty("java.io.tmpdir"),"synthetic-beta-files");}}''',
 'android/app/Activity.java':'''package android.app;
 public class Activity extends android.content.Context {
  public static final java.util.Queue<Runnable> ui=new java.util.concurrent.ConcurrentLinkedQueue<>();
@@ -46,10 +46,10 @@ public class View {
  public interface OnClickListener {void onClick(View v);}
  public static final java.util.List<Runnable> frames=new java.util.ArrayList<>();
  public final ViewTreeObserver tree=new ViewTreeObserver();public final java.util.List<Runnable> timers=new java.util.ArrayList<>();
- public boolean enabled=true;OnClickListener click;
+ public boolean enabled=true;public int backgroundColor;public Object background;public int[] padding=new int[4];OnClickListener click;
  public View(android.content.Context c){}public ViewTreeObserver getViewTreeObserver(){return tree;}
  public void setOnClickListener(OnClickListener l){click=l;}public void performClick(){if(enabled&&click!=null)click.onClick(this);}
- public void setEnabled(boolean b){enabled=b;}public void setBackgroundColor(int c){}
+ public void setEnabled(boolean b){enabled=b;}public void setBackgroundColor(int c){backgroundColor=c;}public void setBackground(Object b){background=b;}public void setPadding(int l,int t,int r,int b){padding=new int[]{l,t,r,b};}
  public boolean isAttachedToWindow(){return true;}public boolean isShown(){return true;}public boolean hasWindowFocus(){return true;}
  public int getWidth(){return 100;}public int getHeight(){return 100;}
  public boolean postDelayed(Runnable r,long t){timers.add(r);return true;}
@@ -57,10 +57,10 @@ public class View {
  public void invalidate(){}public static void frame(){if(!frames.isEmpty())frames.remove(0).run();}
 }''',
 'android/widget/LinearLayout.java':'''package android.widget;public class LinearLayout extends android.view.View {
- public static final int VERTICAL=1;public final java.util.List<android.view.View> children=new java.util.ArrayList<>();
- public LinearLayout(android.content.Context c){super(c);}public void setOrientation(int i){}public void addView(android.view.View v){children.add(v);}
+ public static final int VERTICAL=1,HORIZONTAL=0;public int gravity;public final java.util.List<android.view.View> children=new java.util.ArrayList<>();
+ public LinearLayout(android.content.Context c){super(c);}public void setOrientation(int i){}public void setGravity(int i){gravity=i;}public void addView(android.view.View v){children.add(v);}public void addView(android.view.View v,LayoutParams p){children.add(v);}public static class LayoutParams {public static final int MATCH_PARENT=-1,WRAP_CONTENT=-2;public LayoutParams(int w,int h){}}
 }''',
-'android/widget/TextView.java':'package android.widget;public class TextView extends android.view.View {public String text;public TextView(android.content.Context c){super(c);}public void setText(CharSequence value){text=value.toString();}}',
+'android/widget/TextView.java':'package android.widget;public class TextView extends android.view.View {public String text;public TextView(android.content.Context c){super(c);}public void setText(CharSequence value){text=value.toString();}public void setTextSize(int u,float s){}public void setTextColor(int c){}public void setMaxWidth(int w){}public void setGravity(int g){}}',
 'android/widget/ScrollView.java':'''package android.widget;public class ScrollView extends LinearLayout {public ScrollView(android.content.Context c){super(c);}public void setFillViewport(boolean b){}}''',
 'org/telegram/messenger/ApplicationLoader.java':'package org.telegram.messenger;public class ApplicationLoader {public static boolean fail;public static void postInitApplication(){if(fail)throw new IllegalStateException("SYNTHETIC_PRIVATE_VALUE");}}',
 'org/telegram/messenger/BuildConfig.java':'''package org.telegram.messenger;public class BuildConfig {public static final String APPLICATION_ID="io.github.jose22yt.flexygram.beta.development",APP_HASH="";public static final int APP_ID=0;public static final boolean ISOLATED_DIAGNOSTIC=true;}''',
@@ -108,3 +108,12 @@ public class View {
  public static Python getInstance(){return new Python();}public Object getModule(String name){if(failImport)throw new IllegalStateException("SYNTHETIC_PRIVATE_VALUE");entered.countDown();try{if(!release.await(5,java.util.concurrent.TimeUnit.SECONDS))throw new RuntimeException();}catch(InterruptedException e){throw new RuntimeException();}return new Object();}}
 '''
 }
+
+# Framework-only widgets used by the account-free conversation fixture.
+STUBS.update({
+ 'android/util/DisplayMetrics.java': 'package android.util;public class DisplayMetrics {public float density=1;public int widthPixels=360;}',
+ 'android/util/TypedValue.java': 'package android.util;public class TypedValue {public static final int COMPLEX_UNIT_SP=2;}',
+ 'android/content/res/Resources.java': 'package android.content.res;public class Resources {public android.util.DisplayMetrics getDisplayMetrics(){return new android.util.DisplayMetrics();}}',
+ 'android/view/Gravity.java': 'package android.view;public class Gravity {public static final int START=8388611,END=8388613;}',
+ 'android/graphics/drawable/GradientDrawable.java': 'package android.graphics.drawable;public class GradientDrawable {public int color;public float radius;public void setColor(int c){color=c;}public void setCornerRadius(float r){radius=r;}}',
+})

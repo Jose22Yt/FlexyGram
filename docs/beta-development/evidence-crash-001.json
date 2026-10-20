@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "issue": "CRASH-001",
+  "source_base": "090b907cfd305614130fe35340bd148bc247dcff",
+  "installed_source": "97dfb08e58159b31d322dd8435080fb039abdeb9",
+  "android_crash_reported_by_owner": true,
+  "exception_available": false,
+  "root_cause_confirmed": false,
+  "execution_environment": "unavailable",
+  "host_regressions_prepared": 7,
+  "host_tests_executed": 0,
+  "host_tests_passed": null,
+  "host_tests_failed": null,
+  "android_tests_executed": 0,
+  "gradle_build": "NOT_RUN",
+  "apk_changed": false
+}

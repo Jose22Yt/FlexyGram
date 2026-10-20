@@ -5,7 +5,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import org.telegram.messenger.ApplicationLoader;
@@ -17,7 +16,6 @@ import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Cells.DialogCell;
 import org.telegram.ui.Cells.TextSettingsCell;
-import org.telegram.ui.Cells.ThemePreviewMessagesCell;
 
 import java.util.ArrayList;
 import java.lang.ref.WeakReference;
@@ -198,12 +196,7 @@ public final class BetaPreviewActivity extends Activity {
     private final class Conversation extends Scene {
         @Override public View createView(Context context) {
             back(this, "Synthetic conversation");
-            ScrollView scroll = new ScrollView(context);
-            scroll.setFillViewport(true);
-            ThemePreviewMessagesCell messages = new ThemePreviewMessagesCell(context, navigation, 0);
-            messages.fragment = this;
-            scroll.addView(messages);
-            return fragmentView = scroll;
+            return fragmentView = new OfflineConversationView(context, Theme.isCurrentThemeDark());
         }
     }
 
