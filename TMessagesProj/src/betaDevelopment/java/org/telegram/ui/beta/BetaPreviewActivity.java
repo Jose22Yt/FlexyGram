@@ -29,6 +29,7 @@ public final class BetaPreviewActivity extends Activity {
     private ActionBarLayout navigation;
     private Theme.ThemeInfo initialTheme, ownedTheme;
     private BetaNavigation requests;
+    private BetaSystemBack systemBack;
     private NavigationEvents events;
     private SceneFrameObserver frameObserver;
     private final ProbeState probe = new ProbeState();
@@ -50,10 +51,13 @@ public final class BetaPreviewActivity extends Activity {
             finish();
             return;
         }
-        try {
-            ApplicationLoader.postInitApplication();
-        } catch (RuntimeException | LinkageError initializationFailure) {
-            // Stop here: partially initialized client components must not be constructed.
+        systemBack = new BetaSystemBack(this, () -> {
+            if (isFinishing() || isDestroyed()) return;
+            if (requests != null) requestClose(); else finish();
+        });
+        systemBack.register();
+        if (!BetaPostInit.ensure(ApplicationLoader::postInitApplication)) {
+            // A failed post-init stays blocked across Activity recreation in this process.
             // Application.onCreate/ART failures before this Activity remain outside this boundary.
             TextView failure = new TextView(this);
             failure.setText("FlexyGram offline startup stopped: POST_INIT_FAILED");
@@ -147,6 +151,7 @@ public final class BetaPreviewActivity extends Activity {
         new BetaUiState(route, Theme.isCurrentThemeDark()).save(state);
     }
     @Override protected void onDestroy() {
+        if (systemBack != null) systemBack.close();
         if (requests != null) requests.close();
         probe.close();
         probeCell = null; exportCell = null;

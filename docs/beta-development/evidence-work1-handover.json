@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "base_pr23": "78151d9e8083290dca2617279cab3afb53540de6",
+  "execution_environment_available": false,
+  "work2_workspace_accessed": false,
+  "work2_gradle_process_accessed": false,
+  "proxy_state_observed": null,
+  "gradle_dependency_cache_inspected": false,
+  "foojay_resolution_retested": false,
+  "later_work2_progress_source": "user handover; not independently re-executed",
+  "prepared_regression_methods": {
+    "platform_back": 3,
+    "postinit_reentry": 5
+  },
+  "new_tests_executed": 0,
+  "new_tests_passed": null,
+  "new_tests_failed": null,
+  "java_compilation_executed": false,
+  "android_gradle_build_executed": false,
+  "apk_generated": false,
+  "apk_gate_executed": false,
+  "private_backup_created": false,
+  "private_recovery_verified": false,
+  "keys_generated": false,
+  "apk_signed": false,
+  "apk_installed": false,
+  "changes_scope": "betaDevelopment Activity, two beta helpers, host doubles, two regression files, short handover",
+  "historical_contracts_modified": false,
+  "gradle_versions_modified": false,
+  "main_develop_or_work2_branch_modified": false,
+  "review_limit": "Prepared patches and unexecuted regressions only. No build or Android runtime claim."
+}

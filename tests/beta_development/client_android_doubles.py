@@ -1,6 +1,25 @@
 """Explicit host doubles: compile/execute beta wrappers, never Android certification."""
 from test_frame_endpoint import TREE
 STUBS={
+'android/annotation/TargetApi.java':'package android.annotation;public @interface TargetApi {int value();}',
+'android/os/Build.java':'package android.os;public final class Build {public static final class VERSION {public static int SDK_INT=24;}}',
+'android/window/OnBackInvokedCallback.java':'package android.window;public interface OnBackInvokedCallback {void onBackInvoked();}',
+'android/window/OnBackInvokedDispatcher.java':'''package android.window;
+public class OnBackInvokedDispatcher {
+ public static final int PRIORITY_DEFAULT=0;
+ public final java.util.List<OnBackInvokedCallback> callbacks=new java.util.ArrayList<>();
+ public int registrations,unregistrations;
+ private final Runnable fallback;
+ public OnBackInvokedDispatcher(Runnable fallback){this.fallback=fallback;}
+ public void registerOnBackInvokedCallback(int priority,OnBackInvokedCallback callback){
+  if(priority!=PRIORITY_DEFAULT||callbacks.contains(callback))throw new AssertionError("bad registration");
+  callbacks.add(callback);registrations++;
+ }
+ public void unregisterOnBackInvokedCallback(OnBackInvokedCallback callback){
+  if(!callbacks.remove(callback))throw new AssertionError("unknown callback");unregistrations++;
+ }
+ public void dispatch(){if(callbacks.isEmpty())fallback.run();else for(OnBackInvokedCallback cb:new java.util.ArrayList<>(callbacks))cb.onBackInvoked();}
+}''',
 'android/os/Bundle.java':'''package android.os; public class Bundle {
  public final java.util.Map<String,Object> values=new java.util.HashMap<>();
  public void putInt(String key,int value){values.put(key,value);}public void putBoolean(String key,boolean value){values.put(key,value);}
@@ -15,6 +34,8 @@ public class Activity extends android.content.Context {
  protected void onCreate(android.os.Bundle b){}protected void onResume(){}protected void onPause(){}protected void onDestroy(){destroyed=true;}
  protected void onSaveInstanceState(android.os.Bundle b){}public void saveState(android.os.Bundle b){onSaveInstanceState(b);}
  public boolean isChangingConfigurations(){return changingConfigurations;}
+ public final android.window.OnBackInvokedDispatcher dispatcher=new android.window.OnBackInvokedDispatcher(this::finish);
+ public android.window.OnBackInvokedDispatcher getOnBackInvokedDispatcher(){return dispatcher;}
  public void onBackPressed(){finish();}public void finish(){finishing=true;}
  public boolean isFinishing(){return finishing;}public boolean isDestroyed(){return destroyed;}
  public void setContentView(android.view.View v){content=v;}public void runOnUiThread(Runnable r){ui.add(r);posted.countDown();}
