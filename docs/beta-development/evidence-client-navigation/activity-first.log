@@ -1,0 +1,6 @@
+test_old_probe_loses_recreated_cell_new_activity_updates_current_view (test_activity_lifecycle.ActivityLifecycle.test_old_probe_loses_recreated_cell_new_activity_updates_current_view) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 2.038s
+
+OK

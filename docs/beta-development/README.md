@@ -86,3 +86,5 @@ Autenticación, servicios propios, firma de distribución y pruebas de cuenta ve
 solamente con otra aprobación. No se habilitan Production ni GitHub Actions.
 
 Resultados reales de compilación y bloqueos: [BUILD-RESULTS.md](BUILD-RESULTS.md).
+
+Continuación Work2: [navegación, lifecycle y productor de eventos](CLIENT-NAVIGATION.md).

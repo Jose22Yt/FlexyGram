@@ -1,0 +1,18 @@
+test_predraw_frame_cancel_and_timeout_real_observer (test_frame_endpoint.FrameEndpointTests.test_predraw_frame_cancel_and_timeout_real_observer) ... FAIL
+
+======================================================================
+FAIL: test_predraw_frame_cancel_and_timeout_real_observer (test_frame_endpoint.FrameEndpointTests.test_predraw_frame_cancel_and_timeout_real_observer)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/6fe2cd15bb66/client/tests/beta_development/test_frame_endpoint.py", line 56, in test_predraw_frame_cancel_and_timeout_real_observer
+    self.assertEqual(p.returncode,0,p.stderr)
+AssertionError: 1 != 0 : /workspace/scratch/6fe2cd15bb66/client/TMessagesProj/src/betaDevelopment/java/org/telegram/ui/beta/SceneFrameObserver.java:16: error: variable currentAndIdle might not have been initialized
+    private final Runnable frame = () -> complete(currentAndIdle.getAsBoolean() && visible());
+                                                  ^
+1 error
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.635s
+
+FAILED (failures=1)
