@@ -1,0 +1,82 @@
+{
+  "reviewed_head": "9b38f4390311adbf337815828b0e5f720904d576",
+  "android_code_commit": "9b38f4390311adbf337815828b0e5f720904d576",
+  "android_runtime_source_unchanged_from_reviewed_head": true,
+  "tests": {
+    "historical_new_execution": 102,
+    "p04c": 53,
+    "passed": 155,
+    "failed": 0,
+    "skipped": 0,
+    "optimized_p04c_repeat": 53
+  },
+  "build": {
+    "task": ":TMessagesProj:assembleDiagnosticDebug",
+    "native_target": "arm64-v8a",
+    "jni": true,
+    "chaquopy": true,
+    "skip": false,
+    "exit": 0,
+    "duration": "17m13s",
+    "tasks": 249,
+    "executed": 213,
+    "from_cache": 36
+  },
+  "apk": {
+    "sha256": "40cac89aeb2087e9a467b04fc6a6fad2d7b1651482f8ed65fa053665e9d491d1",
+    "bytes": 111959935,
+    "package": "io.github.jose22yt.flexygram.diagnostic",
+    "debug_signature_v2_valid": true,
+    "own_lab_certificate_sha256": "27ef63ae50546c0af28c0ac54ef66a0c00614934cda86c6bea42d9d2759e7b83",
+    "internet": false,
+    "java_jni_scope": "0f92362819e8a4973909188235d68012a364c974d8e430ce61370e88da8ed181:diagnostic",
+    "all_capabilities_disabled": true,
+    "zip_alignment_16k_check": true,
+    "installed": false,
+    "distributed": false
+  },
+  "production": {
+    "gradle_exit": 1,
+    "blocked_by": "FLEXYGRAM_PRODUCTION_INCOMPLETE",
+    "apk_created": false
+  },
+  "native_static": {
+    "elf_total": 97,
+    "android_arm64": 96,
+    "arm64_4k_pass": 96,
+    "arm64_16k_pass": 92,
+    "other_machine": 1,
+    "missing_needed": 0,
+    "strong_unresolved": 0,
+    "version_mismatch": 0
+  },
+  "compile_targets": [
+    "aarch64-none-linux-android24"
+  ],
+  "native_compile_commands": 1833,
+  "native_ret_guards": 3,
+  "native_packaged_text_matches_linked": true,
+  "source_candidates": {
+    "built": 4,
+    "all_pt_load_16k": true,
+    "static_contract_pass": [
+      "libfreetype.so"
+    ],
+    "strict_rejections": [
+      "libxml2.so",
+      "libxslt.so",
+      "libexslt.so"
+    ],
+    "packaged": false
+  },
+  "beta_ready": false,
+  "merge_recommended": false,
+  "android_runtime_test": false,
+  "limits": [
+    "Four vendor ELF remain 4KB/RELRO blockers in the actual APK",
+    "Candidates are not active dependencies and have not been loaded on Android",
+    "XML family strict symbol/NEEDED differences need resolution before substitution",
+    "No ARM64 Android emulator/device/KVM available",
+    "Scanner and API24 symbol resolution are static evidence, not runtime certification"
+  ]
+}

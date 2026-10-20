@@ -1,0 +1,127 @@
+[
+  {
+    "pr": 16,
+    "head": "fe3b8973b44a74fcbba3aedc92a514f3b1462e80",
+    "base": "ab063041804674861e865364206c0ef27ef1e953",
+    "pr17": "ee73f72c44734772fb3f9a67cd0ddd2a4b00f220",
+    "merge_tree_exit_code": 0,
+    "result_tree": "1668d4cdf7178316780f12912d9eb52c4ce3864e",
+    "files": [
+      "docs/identity-resources/README.md",
+      "tests/identity_resources/audit.py",
+      "tests/identity_resources/test_audit.py"
+    ],
+    "scope_frozen_requires_explicit_review": true,
+    "file_sha256": {
+      "docs/identity-resources/README.md": "b36070c2b8d031e2f2d3d3bd0689ffda93fdaf1b27e1a453b7967eb8309372aa",
+      "tests/identity_resources/audit.py": "43ec5e98d11d52ca57dcd5303c440d10e51235245cf48e1b98552ea02beca741",
+      "tests/identity_resources/test_audit.py": "6d0635cf33e9db6343edc113337aabf0d2b63d540d86c6b7361eeceb24694b03"
+    }
+  },
+  {
+    "pr": 18,
+    "head": "44f9826e2d5d74634a85374962da07b068f39efa",
+    "base": "ab063041804674861e865364206c0ef27ef1e953",
+    "pr17": "ee73f72c44734772fb3f9a67cd0ddd2a4b00f220",
+    "merge_tree_exit_code": 0,
+    "result_tree": "bff5baec5532c9d713a5e0765c4dd352578098e7",
+    "files": [
+      "TMessagesProj/src/main/res/drawable-night/flexygram_brand_background.xml",
+      "TMessagesProj/src/main/res/drawable-night/flexygram_brand_mark.xml",
+      "TMessagesProj/src/main/res/drawable/flexygram_brand_background.xml",
+      "TMessagesProj/src/main/res/drawable/flexygram_brand_mark.xml",
+      "TMessagesProj/src/main/res/drawable/flexygram_brand_monochrome.xml",
+      "TMessagesProj/src/main/res/mipmap-anydpi-v26/ic_launcher_flexygram_candidate.xml",
+      "TMessagesProj/src/main/res/mipmap-anydpi-v26/ic_launcher_flexygram_candidate_round.xml",
+      "TMessagesProj/src/main/res/values-ar/strings.xml",
+      "TMessagesProj/src/main/res/values-de/strings.xml",
+      "TMessagesProj/src/main/res/values-es/strings.xml",
+      "TMessagesProj/src/main/res/values-it/strings.xml",
+      "TMessagesProj/src/main/res/values-ko/strings.xml",
+      "TMessagesProj/src/main/res/values-nl/strings.xml",
+      "TMessagesProj/src/main/res/values-pt-rBR/strings.xml",
+      "TMessagesProj/src/main/res/values/strings.xml",
+      "docs/brand-resources/README.md",
+      "docs/brand-resources/identity-preview.svg",
+      "tests/brand_resources/test_branding.py"
+    ],
+    "scope_frozen_requires_explicit_review": true,
+    "file_sha256": {
+      "TMessagesProj/src/main/res/drawable-night/flexygram_brand_background.xml": "7ee48be9975a239fc6bcfbc2b9ed29684b880ba91187b2577569024df2967260",
+      "TMessagesProj/src/main/res/drawable-night/flexygram_brand_mark.xml": "97aab614a4afecfd5e3cda1ebeac55268a3b7ece7b62901a022b91492e69de8d",
+      "TMessagesProj/src/main/res/drawable/flexygram_brand_background.xml": "3ee2bced9c422d2d87339ecd2630e0aaecce1bec08f4a71bc93c6e9a414e6878",
+      "TMessagesProj/src/main/res/drawable/flexygram_brand_mark.xml": "2cd97d90280277a1b2c40cf3b46b8764dd21c45ca66775ad71d13b38088fc014",
+      "TMessagesProj/src/main/res/drawable/flexygram_brand_monochrome.xml": "fec29ae2b7e12791841441074751a75bbee60e8cc24779393c8145ec0f6c803b",
+      "TMessagesProj/src/main/res/mipmap-anydpi-v26/ic_launcher_flexygram_candidate.xml": "ec7fa47836d0bbc55dfd492ded76197b4b7ccc68de75f74aee97c773f98c4f93",
+      "TMessagesProj/src/main/res/mipmap-anydpi-v26/ic_launcher_flexygram_candidate_round.xml": "ec7fa47836d0bbc55dfd492ded76197b4b7ccc68de75f74aee97c773f98c4f93",
+      "TMessagesProj/src/main/res/values-ar/strings.xml": "b1ecdf3b10f13af3e5500e8a992f0227a948d2c455e55114fd4feb202b03ab38",
+      "TMessagesProj/src/main/res/values-de/strings.xml": "c76d104eac2fd7bb5cf460ce5d7151bea823c5ec9423dba1a15a1557f22741e9",
+      "TMessagesProj/src/main/res/values-es/strings.xml": "9db10918ba2e3410b72ed4af480525bbfaccc40ad8807e198e390320f1317b23",
+      "TMessagesProj/src/main/res/values-it/strings.xml": "18e05cc6425f6b260c132ce392ae91b5f34aab1d7e3414826def2feedf185085",
+      "TMessagesProj/src/main/res/values-ko/strings.xml": "63d9f7bf0107afe1d1f32df966a78b7f1e87c1b936e1a566b86aafe4c5289630",
+      "TMessagesProj/src/main/res/values-nl/strings.xml": "f3a13a8619036fe4035c5d880653413a9ad924a51e317726d3ce5c722e992bec",
+      "TMessagesProj/src/main/res/values-pt-rBR/strings.xml": "8d79c9b0627252faf1898b0271b654ee6873f4ad2e024c227aa1637c7782f477",
+      "TMessagesProj/src/main/res/values/strings.xml": "dd5e7bcb1b57b4a0626fcc5b77c4bd75dee48f0d761f3dc3e37d396dacbcfd4e",
+      "docs/brand-resources/README.md": "3c6d65e7501de5d4f30ef5ecbe36f16f8b3e6d0e080e728bf78adb2eba4eb3b7",
+      "docs/brand-resources/identity-preview.svg": "843b340cb5bbda99e98d6e33d89fa7589a5b179c8b14dd6156eaf7f5ec47bcc6",
+      "tests/brand_resources/test_branding.py": "07a729a26d040a8f19fb33c02e02133ad1d2a50820fb57022e4dd09ef29da2f4"
+    }
+  },
+  {
+    "pr": 19,
+    "head": "103e9e6b1fada37254ce788d0cb2c19e65891c36",
+    "base": "ab063041804674861e865364206c0ef27ef1e953",
+    "pr17": "ee73f72c44734772fb3f9a67cd0ddd2a4b00f220",
+    "merge_tree_exit_code": 0,
+    "result_tree": "7436d3aabca81c76eb9e21a6c989d6439cdfb80d",
+    "files": [
+      "docs/navigation-performance/README.md",
+      "tests/navigation_performance/test_audit.py",
+      "tools/navigation_performance/audit.py"
+    ],
+    "scope_frozen_requires_explicit_review": true,
+    "file_sha256": {
+      "docs/navigation-performance/README.md": "e12ff71ba13979c6234385b877bb1efd389798e68a959d111e3295187d44f95d",
+      "tests/navigation_performance/test_audit.py": "1dd8a2fe007c658d2d21513f4c9fc57208aab6550f9f3de1f707362690f58afa",
+      "tools/navigation_performance/audit.py": "71328136cd1b528df74d1d105af8d8f7074d220d3eb820505fbbd992dc1818cf"
+    }
+  },
+  {
+    "pr": 20,
+    "head": "9efbcbb710a31280b2c20e7d1733ff21ec083cb4",
+    "base": "ab063041804674861e865364206c0ef27ef1e953",
+    "pr17": "ee73f72c44734772fb3f9a67cd0ddd2a4b00f220",
+    "merge_tree_exit_code": 0,
+    "result_tree": "2fc173bb45220b054c384d136a7aac0dc97c39a9",
+    "files": [
+      "docs/android-lab-preflight/README.md",
+      "tests/android_lab_preflight/test_preflight.py",
+      "tools/android_lab_preflight/preflight.py"
+    ],
+    "scope_frozen_requires_explicit_review": true,
+    "file_sha256": {
+      "docs/android-lab-preflight/README.md": "8b4a61d479c90670c7341ee5ad4b48ee107a0c80225ec98255bf7c94338f01b5",
+      "tests/android_lab_preflight/test_preflight.py": "da731579a96b60f7962a558e4b7e64923e155a153653ec3917e9864e09459519",
+      "tools/android_lab_preflight/preflight.py": "14293e4ad5099e2176eff5243036963bf85a837b895b05896c27181e3d3a92f3"
+    }
+  },
+  {
+    "pr": 21,
+    "head": "88f988ee844248a4513281cfe7818777fbda660e",
+    "base": "ab063041804674861e865364206c0ef27ef1e953",
+    "pr17": "ee73f72c44734772fb3f9a67cd0ddd2a4b00f220",
+    "merge_tree_exit_code": 0,
+    "result_tree": "3b41efbcde5dd4abf0bf44699efd51f224bd9a80",
+    "files": [
+      "docs/android-lab-evidence/README.md",
+      "tests/android_lab_evidence/test_check.py",
+      "tools/android_lab_evidence/check.py"
+    ],
+    "scope_frozen_requires_explicit_review": true,
+    "file_sha256": {
+      "docs/android-lab-evidence/README.md": "c60059ef53d65e4ae6faa434a6838c751a0e1a16829130dd83649f03a612bfd9",
+      "tests/android_lab_evidence/test_check.py": "a922aac1c619a660672d33d9388db68727ca0d2f8ba3ce8ccbb34b503071156c",
+      "tools/android_lab_evidence/check.py": "5e0a1be9fbe1fbcb4e1ac1f283c3faf23b29a328a03138dd93448606583f45ca"
+    }
+  }
+]

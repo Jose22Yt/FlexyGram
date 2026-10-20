@@ -1,0 +1,266 @@
+[
+  {
+    "url": "https://dl.google.com/android/repository/repository2-3.xml",
+    "catalog_sha256": "237eefe28e55619d3e63d730f8994cc1ae6d9c171096f07a6c147297145787e6",
+    "status": "CATALOG_VERIFIED_ONLY_NOT_INSTALLED_OR_BOOTED",
+    "packages": [
+      {
+        "package": "platforms;android-37.0",
+        "revision": "2",
+        "archives": [
+          {
+            "host_os": null,
+            "url": "platform-37.0_r02.zip",
+            "bytes": "67281901",
+            "checksum": "ed8ebf7f8822a4de5686d427f237d2fa30ff7410",
+            "checksum_type": {
+              "type": "sha1"
+            }
+          }
+        ]
+      },
+      {
+        "package": "ndk;27.2.12479018",
+        "revision": "27.2.12479018",
+        "archives": [
+          {
+            "host_os": "linux",
+            "url": "android-ndk-r27c-linux.zip",
+            "bytes": "663987688",
+            "checksum": "090e8083a715fdb1a3e402d0763c388abb03fb4e",
+            "checksum_type": {
+              "type": "sha1"
+            }
+          },
+          {
+            "host_os": "macosx",
+            "url": "android-ndk-r27c-darwin.zip",
+            "bytes": "836128272",
+            "checksum": "0217c10ffbec496bb9fbfbb3c6fc2477c6b77297",
+            "checksum_type": {
+              "type": "sha1"
+            }
+          },
+          {
+            "host_os": "windows",
+            "url": "android-ndk-r27c-windows.zip",
+            "bytes": "781511249",
+            "checksum": "ac5f7762764b1f15341094e148ad4f847d050c38",
+            "checksum_type": {
+              "type": "sha1"
+            }
+          }
+        ]
+      },
+      {
+        "package": "build-tools;36.0.0",
+        "revision": "36.0.0",
+        "archives": [
+          {
+            "host_os": "linux",
+            "url": "build-tools_r36_linux.zip",
+            "bytes": "63737259",
+            "checksum": "b0b6376977657e8ad9b969bacf4093601da2c6fb",
+            "checksum_type": {
+              "type": "sha1"
+            }
+          },
+          {
+            "host_os": "windows",
+            "url": "build-tools_r36_windows.zip",
+            "bytes": "58699878",
+            "checksum": "f16ccffd34de8790dede813a6c7d8e2c11a27b50",
+            "checksum_type": {
+              "type": "sha1"
+            }
+          },
+          {
+            "host_os": "macosx",
+            "url": "build-tools_r36_macosx.zip",
+            "bytes": "79121749",
+            "checksum": "199ae0047ee61e842f8ee0c6d3918e44fb9a1f83",
+            "checksum_type": {
+              "type": "sha1"
+            }
+          }
+        ]
+      },
+      {
+        "package": "platform-tools",
+        "revision": "37.0.1",
+        "archives": [
+          {
+            "host_os": "linux",
+            "url": "platform-tools_r37.0.1-linux.zip",
+            "bytes": "9054187",
+            "checksum": "477254aa5f903c15cf51001717bdf347fb6b53e0",
+            "checksum_type": {
+              "type": "sha1"
+            }
+          },
+          {
+            "host_os": "macosx",
+            "url": "platform-tools_r37.0.1-darwin.zip",
+            "bytes": "16110554",
+            "checksum": "6ae73f4de6452dc57e62ec02b68eed92a4c21661",
+            "checksum_type": {
+              "type": "sha1"
+            }
+          },
+          {
+            "host_os": "windows",
+            "url": "platform-tools_r37.0.1-win.zip",
+            "bytes": "8044989",
+            "checksum": "e03e78b1d80b396f1c3358e31251cb31740e1110",
+            "checksum_type": {
+              "type": "sha1"
+            }
+          }
+        ]
+      },
+      {
+        "package": "emulator",
+        "revision": "37.3.4",
+        "archives": [
+          {
+            "host_os": "linux",
+            "url": "emulator-linux_x64-16555280.zip",
+            "bytes": "353505482",
+            "checksum": "3256d0dd7ac10a8ad8c64b1c5f3ce227036d6b5e",
+            "checksum_type": {
+              "type": "sha1"
+            }
+          },
+          {
+            "host_os": "macosx",
+            "url": "emulator-darwin_x64-16555280.zip",
+            "bytes": "493505602",
+            "checksum": "155220398c3537b5a5fed77d7678619840293cb4",
+            "checksum_type": {
+              "type": "sha1"
+            }
+          },
+          {
+            "host_os": "macosx",
+            "url": "emulator-darwin_aarch64-16555280.zip",
+            "bytes": "420504752",
+            "checksum": "4cd3b6f14336a0085b8992eeffe637864839b4ce",
+            "checksum_type": {
+              "type": "sha1"
+            }
+          },
+          {
+            "host_os": "windows",
+            "url": "emulator-windows_x64-16555280.zip",
+            "bytes": "459979551",
+            "checksum": "f6dad179df6127fe8d1b6def347b190507fdbbe3",
+            "checksum_type": {
+              "type": "sha1"
+            }
+          }
+        ]
+      },
+      {
+        "package": "emulator",
+        "revision": "37.2.12",
+        "archives": [
+          {
+            "host_os": "linux",
+            "url": "emulator-linux_x64-16428233.zip",
+            "bytes": "349654171",
+            "checksum": "cd7362ea55dfb86a418958138dc396e74165dd01",
+            "checksum_type": {
+              "type": "sha1"
+            }
+          },
+          {
+            "host_os": "macosx",
+            "url": "emulator-darwin_x64-16428233.zip",
+            "bytes": "488731099",
+            "checksum": "0c08fc22f41f2e63976f5503d593f821ff11e30b",
+            "checksum_type": {
+              "type": "sha1"
+            }
+          },
+          {
+            "host_os": "macosx",
+            "url": "emulator-darwin_aarch64-16428233.zip",
+            "bytes": "416112708",
+            "checksum": "3af4fe44ce82b3d88ae5678a53735f27ad729c15",
+            "checksum_type": {
+              "type": "sha1"
+            }
+          },
+          {
+            "host_os": "windows",
+            "url": "emulator-windows_x64-16428233.zip",
+            "bytes": "455342868",
+            "checksum": "488ed747e82de7e9bb5247becd1ac043c7e5e85d",
+            "checksum_type": {
+              "type": "sha1"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "url": "https://dl.google.com/android/repository/sys-img/android/sys-img2-3.xml",
+    "catalog_sha256": "ab70efed53b5c289035fb6b3b552b22ad6e04eeab2d58e0e6edcc9ce3640bfad",
+    "status": "CATALOG_VERIFIED_ONLY_NOT_INSTALLED_OR_BOOTED",
+    "packages": [
+      {
+        "package": "system-images;android-24;default;arm64-v8a",
+        "revision": "9",
+        "archives": [
+          {
+            "host_os": null,
+            "url": "arm64-v8a-24_r09.zip",
+            "bytes": "305854153",
+            "checksum": "e88ebdf4533efa0370603ee4ab0e7834e0cc364f",
+            "checksum_type": {
+              "type": "sha1"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "url": "https://dl.google.com/android/repository/sys-img/google_apis/sys-img2-3.xml",
+    "catalog_sha256": "ad71946ba2d002f86d9ece1121b74aec494b420aa6b8fdac83fa5ce52b51dcb4",
+    "status": "CATALOG_VERIFIED_ONLY_NOT_INSTALLED_OR_BOOTED",
+    "packages": [
+      {
+        "package": "system-images;android-36;google_apis_ps16k;arm64-v8a",
+        "revision": "7",
+        "archives": [
+          {
+            "host_os": null,
+            "url": "arm64-v8a-ps16k-36_r07.zip",
+            "bytes": "1875087037",
+            "checksum": "dda632745023567113d9954101709c6526a3c250",
+            "checksum_type": {
+              "type": "sha1"
+            }
+          }
+        ]
+      },
+      {
+        "package": "system-images;android-35;google_apis_ps16k;arm64-v8a",
+        "revision": "5",
+        "archives": [
+          {
+            "host_os": null,
+            "url": "arm64-v8a-ps16k-35_r05.zip",
+            "bytes": "1778788352",
+            "checksum": "9d834fe640beff22d25025a8028b98ab4366be4d",
+            "checksum_type": {
+              "type": "sha1"
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,13 @@
+{
+  "source_head": "1177ceb8f4351b1626dd65e3dbd657f3b0ff159f",
+  "active_inputs_unchanged": true,
+  "only_experimental_overlay_modified": "TMessagesProj/build.gradle",
+  "historical_contract_and_runner_sha256": {
+    "tests/native_compatibility/android_lab/contract.json": "1a3ecb0160e2babf91c9ef7c1712c3577fadb73c5f647d17d84275af146dbb28",
+    "tests/native_compatibility/android_lab/assets/probe.py": "48761083b6e0772d436b406ccc2d62075861873dc0eebb1f9bf765418376cf7a",
+    "tests/native_compatibility/runtime_cases.py": "cabd6335f2711fd7b189a14ad535429481b611ee9b7be72bc526a87b7a012ad6"
+  },
+  "keys_generated": false,
+  "apk_signed": false,
+  "android_runtime_validated": false
+}

@@ -1,0 +1,18 @@
+{
+  "schema": 2,
+  "status": "BLOCKED_CUSTODY_NOT_CREATED",
+  "proposed_key_id": "flexygram-diagnostic-lab-v2",
+  "proposed_alias": "flexygram-diagnostic",
+  "proposed_algorithm": "RSA-3072 / SHA256withRSA certificate / PKCS12",
+  "certificate_sha256": null,
+  "creation_date": null,
+  "procedure_version": "FG-LAB-SIGNING-2.0-PROPOSED",
+  "generation_authorized_by_owner": true,
+  "apk_signing_authorized": false,
+  "production_use_allowed": false,
+  "private_key_generated": false,
+  "private_key_backed_up": false,
+  "password_created": false,
+  "historical_certificate_sha256": "27ef63ae50546c0af28c0ac54ef66a0c00614934cda86c6bea42d9d2759e7b83",
+  "historical_apk_sha256": "17c32ab39e3ac88213241a6bd643637469a4a4d47311a920b357a2e7b3128230"
+}

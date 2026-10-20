@@ -1,0 +1,29 @@
+test_16k_profile_wrong_pages_is_blocked (test_check.EvidenceContractTests.test_16k_profile_wrong_pages_is_blocked) ... ok
+test_16k_requires_modern_api (test_check.EvidenceContractTests.test_16k_requires_modern_api) ... ok
+test_api24_requires_exact_api (test_check.EvidenceContractTests.test_api24_requires_exact_api) ... ok
+test_bool_cannot_pass_as_numeric_zero (test_check.EvidenceContractTests.test_bool_cannot_pass_as_numeric_zero) ... ok
+test_changed_library_hash_is_blocked (test_check.EvidenceContractTests.test_changed_library_hash_is_blocked) ... ok
+test_chaquopy_failure_is_blocked (test_check.EvidenceContractTests.test_chaquopy_failure_is_blocked) ... ok
+test_cli_missing_evidence_is_blocked (test_check.EvidenceContractTests.test_cli_missing_evidence_is_blocked) ... ok
+test_cli_synthetic_evidence_emits_no_private_data (test_check.EvidenceContractTests.test_cli_synthetic_evidence_emits_no_private_data) ... ok
+test_duplicate_json_key_fails_closed (test_check.EvidenceContractTests.test_duplicate_json_key_fails_closed) ... ok
+test_extra_profile_is_blocked (test_check.EvidenceContractTests.test_extra_profile_is_blocked) ... ok
+test_extra_unknown_case_is_blocked (test_check.EvidenceContractTests.test_extra_unknown_case_is_blocked) ... ok
+test_internet_permission_is_blocked (test_check.EvidenceContractTests.test_internet_permission_is_blocked) ... ok
+test_jni_failure_is_blocked (test_check.EvidenceContractTests.test_jni_failure_is_blocked) ... ok
+test_missing_native_library_is_blocked (test_check.EvidenceContractTests.test_missing_native_library_is_blocked) ... ok
+test_missing_profile_is_blocked (test_check.EvidenceContractTests.test_missing_profile_is_blocked) ... ok
+test_missing_runtime_case_is_blocked (test_check.EvidenceContractTests.test_missing_runtime_case_is_blocked) ... ok
+test_skipped_runtime_case_is_blocked (test_check.EvidenceContractTests.test_skipped_runtime_case_is_blocked) ... ok
+test_symlink_file_is_rejected (test_check.EvidenceContractTests.test_symlink_file_is_rejected) ... ok
+test_unexpected_network_activity_is_blocked (test_check.EvidenceContractTests.test_unexpected_network_activity_is_blocked) ... ok
+test_unexpected_private_fields_are_blocked (test_check.EvidenceContractTests.test_unexpected_private_fields_are_blocked) ... ok
+test_valid_fixture_is_never_claimed_as_android_certification (test_check.EvidenceContractTests.test_valid_fixture_is_never_claimed_as_android_certification) ... ok
+test_wrong_apk_hash_is_blocked (test_check.EvidenceContractTests.test_wrong_apk_hash_is_blocked) ... ok
+test_wrong_arm_abi_is_blocked (test_check.EvidenceContractTests.test_wrong_arm_abi_is_blocked) ... ok
+test_wrong_cert_is_blocked (test_check.EvidenceContractTests.test_wrong_cert_is_blocked) ... ok
+
+----------------------------------------------------------------------
+Ran 24 tests in 0.004s
+
+OK

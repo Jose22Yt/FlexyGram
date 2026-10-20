@@ -1,0 +1,42 @@
+{
+  "branches/main": {
+    "sha": "db1bea24b7b705de33f8ff8c8e174011c153cac7",
+    "protected": true
+  },
+  "branches/develop": {
+    "sha": "ab063041804674861e865364206c0ef27ef1e953",
+    "protected": false
+  },
+  "pulls/2": {
+    "sha": "61035fe977c251aef81b13324c46926ed2a61e3b",
+    "state": "open",
+    "draft": false,
+    "base": "develop"
+  },
+  "pulls/16": {
+    "sha": "fe3b8973b44a74fcbba3aedc92a514f3b1462e80",
+    "state": "open",
+    "draft": true,
+    "base": "develop"
+  },
+  "pulls/18": {
+    "sha": "44f9826e2d5d74634a85374962da07b068f39efa",
+    "state": "open",
+    "draft": true,
+    "base": "develop"
+  },
+  "actions/runs": {
+    "runs": 0
+  },
+  "pulls/17": {
+    "sha": "a25295a9d567a626e008fc55ca97d80112c5f65b",
+    "state": "open",
+    "draft": true,
+    "base": "develop"
+  },
+  "pr19": {
+    "head": "103e9e6b1fada37254ce788d0cb2c19e65891c36",
+    "tests_passed": 15,
+    "static_signals": 11
+  }
+}

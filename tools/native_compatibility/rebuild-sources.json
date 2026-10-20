@@ -1,0 +1,49 @@
+{
+  "scope": "Offline experiment; does not replace runtime wheels",
+  "archives": [
+    {
+      "file": "libxml2-2.9.8.tar.xz",
+      "url": "https://download.gnome.org/sources/libxml2/2.9/libxml2-2.9.8.tar.xz",
+      "sha256": "dcca21d624bbbe094fcc104e1f15f2eacfb65aecd0e38ed220aeca56b62c81e2"
+    },
+    {
+      "file": "libxslt-1.1.32.tar.xz",
+      "url": "https://download.gnome.org/sources/libxslt/1.1/libxslt-1.1.32.tar.xz",
+      "sha256": "b7da90eaa6b0dae9e9a3769e29a757342eef0edb9a7b431424814375414422af"
+    },
+    {
+      "file": "xz-5.2.4-complete.tar.xz",
+      "url": "https://archive.debian.org/debian/pool/main/x/xz-utils/xz-utils_5.2.4.orig.tar.xz",
+      "sha256": "9717ae363760dedf573dad241420c5fea86256b65bc21d2cf71b2b12f0544f4b"
+    }
+  ],
+  "freetype_repository": "https://github.com/freetype/freetype.git",
+  "freetype_commit": "86bc8a95056c97a810986434a3f268cbe67f2902",
+  "original_wheels": [
+    {
+      "filename": "chaquopy_freetype-2.9.1-2-py3-none-android_21_arm64_v8a.whl",
+      "url": "https://chaquo.com/pypi-13.1/chaquopy-freetype/chaquopy_freetype-2.9.1-2-py3-none-android_21_arm64_v8a.whl",
+      "sha256": "7a8262dc69d1bbf7209b3b7576744743670bd5a8cba48c7d8f08c151943ccbc7",
+      "libraries": [
+        "libfreetype.so"
+      ]
+    },
+    {
+      "filename": "chaquopy_libxml2-2.9.8-2-py3-none-android_21_arm64_v8a.whl",
+      "url": "https://chaquo.com/pypi-13.1/chaquopy-libxml2/chaquopy_libxml2-2.9.8-2-py3-none-android_21_arm64_v8a.whl",
+      "sha256": "f8a7adf4f565e4cec6add811a9886be2191e8214913987dce24a3bb522dcb4e3",
+      "libraries": [
+        "libxml2.so"
+      ]
+    },
+    {
+      "filename": "chaquopy_libxslt-1.1.32-2-py3-none-android_21_arm64_v8a.whl",
+      "url": "https://chaquo.com/pypi-13.1/chaquopy-libxslt/chaquopy_libxslt-1.1.32-2-py3-none-android_21_arm64_v8a.whl",
+      "sha256": "0526c414fc0af6f02b9e922042c79e3aa0e3c28fe093de3a38d834755ffc2a27",
+      "libraries": [
+        "libxslt.so",
+        "libexslt.so"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+[
+  {
+    "file": "libxml2-2.9.8.tar.xz",
+    "url": "https://download.gnome.org/sources/libxml2/2.9/libxml2-2.9.8.tar.xz",
+    "sha256": "dcca21d624bbbe094fcc104e1f15f2eacfb65aecd0e38ed220aeca56b62c81e2",
+    "bytes": 3101996,
+    "status": "RECOVERED_PINNED_SOURCE"
+  },
+  {
+    "file": "libxslt-1.1.32.tar.xz",
+    "url": "https://download.gnome.org/sources/libxslt/1.1/libxslt-1.1.32.tar.xz",
+    "sha256": "b7da90eaa6b0dae9e9a3769e29a757342eef0edb9a7b431424814375414422af",
+    "bytes": 1717076,
+    "status": "RECOVERED_PINNED_SOURCE"
+  },
+  {
+    "file": "xz-5.2.4-complete.tar.xz",
+    "url": "https://archive.debian.org/debian/pool/main/x/xz-utils/xz-utils_5.2.4.orig.tar.xz",
+    "sha256": "9717ae363760dedf573dad241420c5fea86256b65bc21d2cf71b2b12f0544f4b",
+    "bytes": 1053868,
+    "status": "RECOVERED_PINNED_SOURCE"
+  },
+  {
+    "file": "binutils-2.42.tar.xz",
+    "url": "https://ftp.gnu.org/gnu/binutils/binutils-2.42.tar.xz",
+    "sha256": "f6e4d41fd5fc778b06b7891457b3620da5ecea1006c6a4a41ae998109f85a800",
+    "bytes": 27567160,
+    "status": "RECOVERED_PINNED_SOURCE"
+  }
+]

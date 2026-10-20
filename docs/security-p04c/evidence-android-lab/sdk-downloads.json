@@ -1,0 +1,16 @@
+[
+  {
+    "package": "platforms;android-37.0",
+    "url": "https://dl.google.com/android/repository/platform-37.0_r02.zip",
+    "catalog_sha1": "ed8ebf7f8822a4de5686d427f237d2fa30ff7410",
+    "sha256": "840b23e827f96e64aea4c89a1194aac3dc5f6bad37edb231c5c795d890330e8d",
+    "bytes": 67281901
+  },
+  {
+    "package": "build-tools;36.0.0",
+    "url": "https://dl.google.com/android/repository/build-tools_r36_linux.zip",
+    "catalog_sha1": "b0b6376977657e8ad9b969bacf4093601da2c6fb",
+    "sha256": "5d9ac77fb6ff43d9da518a337b4fcf8f9097113df531d99ccefe80ef7ce8250b",
+    "bytes": 63737259
+  }
+]

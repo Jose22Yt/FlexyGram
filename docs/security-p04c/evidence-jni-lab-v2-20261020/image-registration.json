@@ -1,0 +1,12 @@
+[
+  {
+    "package": "system-images;android-24;default;arm64-v8a",
+    "catalog": "https://dl.google.com/android/repository/sys-img/android/sys-img2-3.xml",
+    "local_metadata_from_official_catalog": true
+  },
+  {
+    "package": "system-images;android-35;google_apis_ps16k;arm64-v8a",
+    "catalog": "https://dl.google.com/android/repository/sys-img/google_apis/sys-img2-3.xml",
+    "local_metadata_from_official_catalog": true
+  }
+]

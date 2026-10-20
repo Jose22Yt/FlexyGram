@@ -1,0 +1,3104 @@
+{
+  "symbols": [
+    {
+      "name": "JNI_OnLoad",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 42242976,
+      "size": 176
+    },
+    {
+      "name": "JNI_OnUnload",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 42243152,
+      "size": 4
+    },
+    {
+      "name": "Java_androidx_media3_decoder_ffmpeg_ExperimentalFfmpegVideoDecoder_ffmpegInitialize",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14835968,
+      "size": 140
+    },
+    {
+      "name": "Java_androidx_media3_decoder_ffmpeg_ExperimentalFfmpegVideoDecoder_ffmpegReceiveFrame",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14836712,
+      "size": 1096
+    },
+    {
+      "name": "Java_androidx_media3_decoder_ffmpeg_ExperimentalFfmpegVideoDecoder_ffmpegRelease",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14836188,
+      "size": 112
+    },
+    {
+      "name": "Java_androidx_media3_decoder_ffmpeg_ExperimentalFfmpegVideoDecoder_ffmpegRenderFrame",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14837956,
+      "size": 1600
+    },
+    {
+      "name": "Java_androidx_media3_decoder_ffmpeg_ExperimentalFfmpegVideoDecoder_ffmpegReset",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14836108,
+      "size": 80
+    },
+    {
+      "name": "Java_androidx_media3_decoder_ffmpeg_ExperimentalFfmpegVideoDecoder_ffmpegSendPacket",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14836300,
+      "size": 412
+    },
+    {
+      "name": "Java_org_telegram_SQLite_SQLiteCursor_columnByteArrayValue",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14803812,
+      "size": 152
+    },
+    {
+      "name": "Java_org_telegram_SQLite_SQLiteCursor_columnByteBufferValue",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14803964,
+      "size": 132
+    },
+    {
+      "name": "Java_org_telegram_SQLite_SQLiteCursor_columnCount",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14803456,
+      "size": 8
+    },
+    {
+      "name": "Java_org_telegram_SQLite_SQLiteCursor_columnDoubleValue",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14803664,
+      "size": 76
+    },
+    {
+      "name": "Java_org_telegram_SQLite_SQLiteCursor_columnIntValue",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14803512,
+      "size": 76
+    },
+    {
+      "name": "Java_org_telegram_SQLite_SQLiteCursor_columnIsNull",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14803476,
+      "size": 36
+    },
+    {
+      "name": "Java_org_telegram_SQLite_SQLiteCursor_columnLongValue",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14803588,
+      "size": 76
+    },
+    {
+      "name": "Java_org_telegram_SQLite_SQLiteCursor_columnStringValue",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14803740,
+      "size": 72
+    },
+    {
+      "name": "Java_org_telegram_SQLite_SQLiteCursor_columnType",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14803464,
+      "size": 12
+    },
+    {
+      "name": "Java_org_telegram_SQLite_SQLiteDatabase_beginTransaction",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14803080,
+      "size": 28
+    },
+    {
+      "name": "Java_org_telegram_SQLite_SQLiteDatabase_closedb",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14802968,
+      "size": 112
+    },
+    {
+      "name": "Java_org_telegram_SQLite_SQLiteDatabase_commitTransaction",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14803108,
+      "size": 28
+    },
+    {
+      "name": "Java_org_telegram_SQLite_SQLiteDatabase_opendb",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14803136,
+      "size": 320
+    },
+    {
+      "name": "Java_org_telegram_SQLite_SQLitePreparedStatement_bindByteBuffer",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14802096,
+      "size": 168
+    },
+    {
+      "name": "Java_org_telegram_SQLite_SQLitePreparedStatement_bindDouble",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14802728,
+      "size": 120
+    },
+    {
+      "name": "Java_org_telegram_SQLite_SQLitePreparedStatement_bindInt",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14802480,
+      "size": 124
+    },
+    {
+      "name": "Java_org_telegram_SQLite_SQLitePreparedStatement_bindLong",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14802604,
+      "size": 124
+    },
+    {
+      "name": "Java_org_telegram_SQLite_SQLitePreparedStatement_bindNull",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14802848,
+      "size": 120
+    },
+    {
+      "name": "Java_org_telegram_SQLite_SQLitePreparedStatement_bindString",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14802264,
+      "size": 216
+    },
+    {
+      "name": "Java_org_telegram_SQLite_SQLitePreparedStatement_finalize",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14802088,
+      "size": 8
+    },
+    {
+      "name": "Java_org_telegram_SQLite_SQLitePreparedStatement_prepare",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14801776,
+      "size": 196
+    },
+    {
+      "name": "Java_org_telegram_SQLite_SQLitePreparedStatement_reset",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14801972,
+      "size": 116
+    },
+    {
+      "name": "Java_org_telegram_SQLite_SQLitePreparedStatement_step",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14801628,
+      "size": 148
+    },
+    {
+      "name": "Java_org_telegram_messenger_Intro_onDrawFrame",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 42271564,
+      "size": 17596
+    },
+    {
+      "name": "Java_org_telegram_messenger_Intro_onSurfaceChanged",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 42299688,
+      "size": 320
+    },
+    {
+      "name": "Java_org_telegram_messenger_Intro_onSurfaceCreated",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 42295080,
+      "size": 4608
+    },
+    {
+      "name": "Java_org_telegram_messenger_Intro_setBackgroundColor",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 42271300,
+      "size": 264
+    },
+    {
+      "name": "Java_org_telegram_messenger_Intro_setDate",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 42294840,
+      "size": 12
+    },
+    {
+      "name": "Java_org_telegram_messenger_Intro_setFastTextures",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 42294968,
+      "size": 36
+    },
+    {
+      "name": "Java_org_telegram_messenger_Intro_setFreeTextures",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 42295004,
+      "size": 20
+    },
+    {
+      "name": "Java_org_telegram_messenger_Intro_setIcTextures",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 42294852,
+      "size": 88
+    },
+    {
+      "name": "Java_org_telegram_messenger_Intro_setPage",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 42294768,
+      "size": 72
+    },
+    {
+      "name": "Java_org_telegram_messenger_Intro_setPowerfulTextures",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 42295024,
+      "size": 36
+    },
+    {
+      "name": "Java_org_telegram_messenger_Intro_setPrivateTextures",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 42295060,
+      "size": 20
+    },
+    {
+      "name": "Java_org_telegram_messenger_Intro_setScrollOffset",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 42294756,
+      "size": 12
+    },
+    {
+      "name": "Java_org_telegram_messenger_Intro_setTelegramTextures",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 42294940,
+      "size": 28
+    },
+    {
+      "name": "Java_org_telegram_messenger_MediaController_cropOpusFile",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 42253036,
+      "size": 4224
+    },
+    {
+      "name": "Java_org_telegram_messenger_MediaController_getWaveform",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 42250800,
+      "size": 656
+    },
+    {
+      "name": "Java_org_telegram_messenger_MediaController_getWaveform2",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 42250312,
+      "size": 488
+    },
+    {
+      "name": "Java_org_telegram_messenger_MediaController_isOpusFile",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 42250044,
+      "size": 268
+    },
+    {
+      "name": "Java_org_telegram_messenger_MediaController_joinOpusFiles",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 42257260,
+      "size": 740
+    },
+    {
+      "name": "Java_org_telegram_messenger_MediaController_startRecord",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 42249872,
+      "size": 112
+    },
+    {
+      "name": "Java_org_telegram_messenger_MediaController_stopRecord",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 42250040,
+      "size": 4
+    },
+    {
+      "name": "Java_org_telegram_messenger_MediaController_writeFrame",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 42249984,
+      "size": 56
+    },
+    {
+      "name": "Java_org_telegram_messenger_MrzRecognizer_binarizeAndFindCharacters",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14847824,
+      "size": 2896
+    },
+    {
+      "name": "Java_org_telegram_messenger_MrzRecognizer_findCornerPoints",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14845528,
+      "size": 2296
+    },
+    {
+      "name": "Java_org_telegram_messenger_MrzRecognizer_performRecognition",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14850720,
+      "size": 656
+    },
+    {
+      "name": "Java_org_telegram_messenger_MrzRecognizer_setYuvBitmapPixels",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14851376,
+      "size": 204
+    },
+    {
+      "name": "Java_org_telegram_messenger_Utilities_aesCbcEncryption",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 42245120,
+      "size": 280
+    },
+    {
+      "name": "Java_org_telegram_messenger_Utilities_aesCbcEncryptionByteArray",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 42244780,
+      "size": 340
+    },
+    {
+      "name": "Java_org_telegram_messenger_Utilities_aesCtrDecryption",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 42244116,
+      "size": 264
+    },
+    {
+      "name": "Java_org_telegram_messenger_Utilities_aesCtrDecryptionByteArray",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 42244380,
+      "size": 400
+    },
+    {
+      "name": "Java_org_telegram_messenger_Utilities_aesIgeEncryption",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 42243156,
+      "size": 280
+    },
+    {
+      "name": "Java_org_telegram_messenger_Utilities_aesIgeEncryptionByteArray",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 42243436,
+      "size": 312
+    },
+    {
+      "name": "Java_org_telegram_messenger_Utilities_applyAlphaInvert",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14797544,
+      "size": 808
+    },
+    {
+      "name": "Java_org_telegram_messenger_Utilities_applySoftLight",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14796244,
+      "size": 888
+    },
+    {
+      "name": "Java_org_telegram_messenger_Utilities_averageBitmapColor",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14798788,
+      "size": 432
+    },
+    {
+      "name": "Java_org_telegram_messenger_Utilities_blurBitmap",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14784376,
+      "size": 6432
+    },
+    {
+      "name": "Java_org_telegram_messenger_Utilities_calcCDT",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14790808,
+      "size": 824
+    },
+    {
+      "name": "Java_org_telegram_messenger_Utilities_clearDir",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 42246640,
+      "size": 124
+    },
+    {
+      "name": "Java_org_telegram_messenger_Utilities_copyBitmaps",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14795720,
+      "size": 524
+    },
+    {
+      "name": "Java_org_telegram_messenger_Utilities_drawDitheredGradient",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14793308,
+      "size": 868
+    },
+    {
+      "name": "Java_org_telegram_messenger_Utilities_drawReplyLinePattern",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14800104,
+      "size": 1056
+    },
+    {
+      "name": "Java_org_telegram_messenger_Utilities_expandAlphaToBlack",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14799220,
+      "size": 416
+    },
+    {
+      "name": "Java_org_telegram_messenger_Utilities_extractAlpha",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14799636,
+      "size": 468
+    },
+    {
+      "name": "Java_org_telegram_messenger_Utilities_generateGradient",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14794336,
+      "size": 1384
+    },
+    {
+      "name": "Java_org_telegram_messenger_Utilities_getDirSize",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 42246376,
+      "size": 132
+    },
+    {
+      "name": "Java_org_telegram_messenger_Utilities_getLastUsageFileTime",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 42246508,
+      "size": 132
+    },
+    {
+      "name": "Java_org_telegram_messenger_Utilities_nLibyuvARGBSaleBitmap",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14798352,
+      "size": 436
+    },
+    {
+      "name": "Java_org_telegram_messenger_Utilities_needInvert",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14783900,
+      "size": 476
+    },
+    {
+      "name": "Java_org_telegram_messenger_Utilities_pbkdf2",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 42243748,
+      "size": 368
+    },
+    {
+      "name": "Java_org_telegram_messenger_Utilities_readlink",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14804096,
+      "size": 168
+    },
+    {
+      "name": "Java_org_telegram_messenger_Utilities_readlinkFd",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14804264,
+      "size": 228
+    },
+    {
+      "name": "Java_org_telegram_messenger_Utilities_stackBlurBitmap",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14791632,
+      "size": 1676
+    },
+    {
+      "name": "Java_org_telegram_messenger_video_WebmEncoder_createEncoder",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 42258000,
+      "size": 1036
+    },
+    {
+      "name": "Java_org_telegram_messenger_video_WebmEncoder_stop",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 42259480,
+      "size": 416
+    },
+    {
+      "name": "Java_org_telegram_messenger_video_WebmEncoder_writeFrame",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 42259036,
+      "size": 444
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_ConferenceCall_call_1apply_1block",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14859340,
+      "size": 424
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_ConferenceCall_call_1create",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14858488,
+      "size": 336
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_ConferenceCall_call_1create_1change_1state_1block",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14858824,
+      "size": 296
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_ConferenceCall_call_1create_1self_1add_1block",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14858120,
+      "size": 368
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_ConferenceCall_call_1create_1zero_1block",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14857824,
+      "size": 296
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_ConferenceCall_call_1describe",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14863052,
+      "size": 232
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_ConferenceCall_call_1describe_1block",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14863284,
+      "size": 320
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_ConferenceCall_call_1describe_1message",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14863604,
+      "size": 320
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_ConferenceCall_call_1destroy",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14862304,
+      "size": 204
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_ConferenceCall_call_1destroy_1all",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14862508,
+      "size": 200
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_ConferenceCall_call_1get_1height",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14859120,
+      "size": 220
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_ConferenceCall_call_1get_1state",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14859764,
+      "size": 324
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_ConferenceCall_call_1get_1verification_1state",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14860472,
+      "size": 320
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_ConferenceCall_call_1get_1verification_1words",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14861984,
+      "size": 320
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_ConferenceCall_call_1pull_1outbound_1messages",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14861212,
+      "size": 232
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_ConferenceCall_call_1receive_1inbound_1message",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14860792,
+      "size": 420
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_ConferenceCall_decrypt_1message_1for_1one",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14855172,
+      "size": 332
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_ConferenceCall_encrypt_1message_1for_1one",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14855504,
+      "size": 332
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_ConferenceCall_key_1destroy",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14855836,
+      "size": 204
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_ConferenceCall_key_1from_1ecdh",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14854948,
+      "size": 224
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_ConferenceCall_key_1from_1public_1key",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14854640,
+      "size": 308
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_ConferenceCall_key_1generate_1temporary_1private_1key",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14854192,
+      "size": 216
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_ConferenceCall_key_1to_1public_1key",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14854408,
+      "size": 232
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_GroupCallMessagesController_groupCallMessageDecryptImpl",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16391680,
+      "size": 696
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_GroupCallMessagesController_groupCallMessageEncryptImpl",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16392376,
+      "size": 684
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_NativeInstance_activateVideoCapturer",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16406560,
+      "size": 356
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_NativeInstance_addIncomingVideoOutput",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16394428,
+      "size": 1012
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_NativeInstance_clearVideoCapturer",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16406916,
+      "size": 404
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_NativeInstance_createVideoCapturer",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16405372,
+      "size": 1020
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_NativeInstance_destroyVideoCapturer",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16407320,
+      "size": 124
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_NativeInstance_getAllVersions",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16410852,
+      "size": 400
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_NativeInstance_getDebugInfo",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16403176,
+      "size": 208
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_NativeInstance_getLastError",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16402968,
+      "size": 208
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_NativeInstance_getPersistentState",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16403652,
+      "size": 200
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_NativeInstance_getPreferredRelayId",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16403384,
+      "size": 120
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_NativeInstance_getTrafficStats",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16403504,
+      "size": 148
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_NativeInstance_getVersion",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16402208,
+      "size": 56
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_NativeInstance_hasVideoCapturer",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16408144,
+      "size": 96
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_NativeInstance_makeGroupNativeInstance",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16388212,
+      "size": 2144
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_NativeInstance_makeNativeInstance",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16395988,
+      "size": 5712
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_NativeInstance_onMediaDescriptionAvailable",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16405096,
+      "size": 276
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_NativeInstance_onRequestTimeComplete",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16410464,
+      "size": 240
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_NativeInstance_onSignalingDataReceive",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16410196,
+      "size": 268
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_NativeInstance_onStreamPartAvailable",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16404304,
+      "size": 792
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_NativeInstance_prepareForStream",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16393268,
+      "size": 124
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_NativeInstance_removeIncomingVideoOutput",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16395440,
+      "size": 268
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_NativeInstance_resetGroupInstance",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16393564,
+      "size": 320
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_NativeInstance_setAudioOutputGainControlEnabled",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16402728,
+      "size": 124
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_NativeInstance_setBufferSize",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16402264,
+      "size": 56
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_NativeInstance_setConferenceCallId",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16410704,
+      "size": 148
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_NativeInstance_setEchoCancellationStrength",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16402852,
+      "size": 116
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_NativeInstance_setGlobalServerConfig",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16402100,
+      "size": 108
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_NativeInstance_setJoinResponsePayload",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16393060,
+      "size": 208
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_NativeInstance_setMuteMicrophone",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16402452,
+      "size": 168
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_NativeInstance_setNetworkType",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16402320,
+      "size": 132
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_NativeInstance_setNoiseSuppressionEnabled",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16394316,
+      "size": 112
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_NativeInstance_setVideoEndpointQuality",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16395708,
+      "size": 280
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_NativeInstance_setVideoState",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16408240,
+      "size": 224
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_NativeInstance_setVideoStateCapturer",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16407792,
+      "size": 132
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_NativeInstance_setVolume",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16402620,
+      "size": 108
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_NativeInstance_setupOutgoingVideo",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16408464,
+      "size": 1280
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_NativeInstance_setupOutgoingVideoCreated",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16409744,
+      "size": 452
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_NativeInstance_stopGroupNative",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16404088,
+      "size": 216
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_NativeInstance_stopNative",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16403852,
+      "size": 188
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_NativeInstance_switchCamera",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16407924,
+      "size": 220
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_NativeInstance_switchCameraCapturer",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16407568,
+      "size": 224
+    },
+    {
+      "name": "Java_org_telegram_messenger_voip_VideoCapturerDevice_nativeGetJavaVideoCapturerObserver",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15530672,
+      "size": 124
+    },
+    {
+      "name": "Java_org_telegram_tgnet_ConnectionsManager_native_1test_1AuthAuthorization",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14826840,
+      "size": 72
+    },
+    {
+      "name": "Java_org_telegram_ui_Components_AnimatedFileNative_nCreateDecoder",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14807672,
+      "size": 1420
+    },
+    {
+      "name": "Java_org_telegram_ui_Components_AnimatedFileNative_nDestroyDecoder",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14809092,
+      "size": 216
+    },
+    {
+      "name": "Java_org_telegram_ui_Components_AnimatedFileNative_nGetFrameAtTime",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14809884,
+      "size": 372
+    },
+    {
+      "name": "Java_org_telegram_ui_Components_AnimatedFileNative_nGetVideoFrame",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14811344,
+      "size": 464
+    },
+    {
+      "name": "Java_org_telegram_ui_Components_AnimatedFileNative_nGetVideoInfo",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14806156,
+      "size": 1452
+    },
+    {
+      "name": "Java_org_telegram_ui_Components_AnimatedFileNative_nPrepareToSeek",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14809324,
+      "size": 16
+    },
+    {
+      "name": "Java_org_telegram_ui_Components_AnimatedFileNative_nSeekToMs",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14809564,
+      "size": 320
+    },
+    {
+      "name": "Java_org_telegram_ui_Components_AnimatedFileNative_nStopDecoder",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14809308,
+      "size": 16
+    },
+    {
+      "name": "Java_org_telegram_ui_Components_RLottieNative_nCreate",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14814448,
+      "size": 532
+    },
+    {
+      "name": "Java_org_telegram_ui_Components_RLottieNative_nCreateWithJson",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14817056,
+      "size": 224
+    },
+    {
+      "name": "Java_org_telegram_ui_Components_RLottieNative_nDestroy",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14817280,
+      "size": 8
+    },
+    {
+      "name": "Java_org_telegram_ui_Components_RLottieNative_nGetFrame",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14817288,
+      "size": 752
+    },
+    {
+      "name": "Java_org_telegram_ui_Stories_recorder_FfmpegAudioWaveformLoader_init",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 42251456,
+      "size": 1364
+    },
+    {
+      "name": "Java_org_telegram_ui_Wallet_WalletEngine2_isValidCellBoc",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14596364,
+      "size": 268
+    },
+    {
+      "name": "Java_org_telegram_ui_Wallet_WalletEngine2_mnemonicWordlist",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14592552,
+      "size": 688
+    },
+    {
+      "name": "Java_org_telegram_ui_Wallet_WalletEngine2_nativeBalance",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14604772,
+      "size": 1300
+    },
+    {
+      "name": "Java_org_telegram_ui_Wallet_WalletEngine2_nativeClose",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14633184,
+      "size": 560
+    },
+    {
+      "name": "Java_org_telegram_ui_Wallet_WalletEngine2_nativeCreate",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14601848,
+      "size": 2328
+    },
+    {
+      "name": "Java_org_telegram_ui_Wallet_WalletEngine2_nativeCreateImportProof",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14598220,
+      "size": 2652
+    },
+    {
+      "name": "Java_org_telegram_ui_Wallet_WalletEngine2_nativeDecryptComment",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14614896,
+      "size": 1136
+    },
+    {
+      "name": "Java_org_telegram_ui_Wallet_WalletEngine2_nativeDecryptRawComment",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14612952,
+      "size": 1760
+    },
+    {
+      "name": "Java_org_telegram_ui_Wallet_WalletEngine2_nativeEmulateRotateKey",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14609564,
+      "size": 560
+    },
+    {
+      "name": "Java_org_telegram_ui_Wallet_WalletEngine2_nativeEmulateSend",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14606284,
+      "size": 1396
+    },
+    {
+      "name": "Java_org_telegram_ui_Wallet_WalletEngine2_nativeEmulateSendNFT",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14633832,
+      "size": 828
+    },
+    {
+      "name": "Java_org_telegram_ui_Wallet_WalletEngine2_nativeIsValidAddress",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14600952,
+      "size": 480
+    },
+    {
+      "name": "Java_org_telegram_ui_Wallet_WalletEngine2_nativeMessageBodyHash",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14624388,
+      "size": 380
+    },
+    {
+      "name": "Java_org_telegram_ui_Wallet_WalletEngine2_nativePrepareRotateKey",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14610124,
+      "size": 2640
+    },
+    {
+      "name": "Java_org_telegram_ui_Wallet_WalletEngine2_nativePrepareSend",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14621044,
+      "size": 3344
+    },
+    {
+      "name": "Java_org_telegram_ui_Wallet_WalletEngine2_nativePrepareSendNFT",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14636060,
+      "size": 1424
+    },
+    {
+      "name": "Java_org_telegram_ui_Wallet_WalletEngine2_nativePrepareTonConnectTransfer",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14619880,
+      "size": 1164
+    },
+    {
+      "name": "Java_org_telegram_ui_Wallet_WalletEngine2_nativePreviewSignMessage",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14618456,
+      "size": 452
+    },
+    {
+      "name": "Java_org_telegram_ui_Wallet_WalletEngine2_nativePreviewTonConnect",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14616032,
+      "size": 604
+    },
+    {
+      "name": "Java_org_telegram_ui_Wallet_WalletEngine2_nativeResolvePending",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14629568,
+      "size": 1192
+    },
+    {
+      "name": "Java_org_telegram_ui_Wallet_WalletEngine2_nativeRotateKey",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14630760,
+      "size": 2424
+    },
+    {
+      "name": "Java_org_telegram_ui_Wallet_WalletEngine2_nativeSecretPhraseToAddress",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14595264,
+      "size": 880
+    },
+    {
+      "name": "Java_org_telegram_ui_Wallet_WalletEngine2_nativeSecretPhraseToPublicKey",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14593360,
+      "size": 1148
+    },
+    {
+      "name": "Java_org_telegram_ui_Wallet_WalletEngine2_nativeSend",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14624768,
+      "size": 2548
+    },
+    {
+      "name": "Java_org_telegram_ui_Wallet_WalletEngine2_nativeSignMessage",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14618908,
+      "size": 972
+    },
+    {
+      "name": "Java_org_telegram_ui_Wallet_WalletEngine2_nativeTonConnectCrypto",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14597044,
+      "size": 1176
+    },
+    {
+      "name": "Java_org_telegram_ui_Wallet_WalletEngine2_nativeTransactionAddress",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14601432,
+      "size": 416
+    },
+    {
+      "name": "Java_org_telegram_utils_code_highlight_PrismaHighlighter_nativeCreate",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14879332,
+      "size": 380
+    },
+    {
+      "name": "Java_org_telegram_utils_code_highlight_PrismaHighlighter_nativeDestroy",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14881508,
+      "size": 48
+    },
+    {
+      "name": "Java_org_telegram_utils_code_highlight_PrismaHighlighter_nativeGetLanguages",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14881016,
+      "size": 492
+    },
+    {
+      "name": "Java_org_telegram_utils_code_highlight_PrismaHighlighter_nativeGetTokenNames",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14881556,
+      "size": 428
+    },
+    {
+      "name": "Java_org_telegram_utils_code_highlight_PrismaHighlighter_nativeHighlight",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14880112,
+      "size": 592
+    },
+    {
+      "name": "Java_org_webrtc_AudioTrack_nativeSetVolume",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15796112,
+      "size": 56
+    },
+    {
+      "name": "Java_org_webrtc_BuiltinAudioDecoderFactoryFactory_nativeCreateBuiltinAudioDecoderFactory",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16306328,
+      "size": 40
+    },
+    {
+      "name": "Java_org_webrtc_BuiltinAudioEncoderFactoryFactory_nativeCreateBuiltinAudioEncoderFactory",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16222932,
+      "size": 40
+    },
+    {
+      "name": "Java_org_webrtc_CallSessionFileRotatingLogSink_nativeAddSink",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15899656,
+      "size": 92
+    },
+    {
+      "name": "Java_org_webrtc_CallSessionFileRotatingLogSink_nativeDeleteSink",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15900724,
+      "size": 48
+    },
+    {
+      "name": "Java_org_webrtc_CallSessionFileRotatingLogSink_nativeGetLogData",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15900856,
+      "size": 144
+    },
+    {
+      "name": "Java_org_webrtc_DataChannel_nativeBufferedAmount",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15859956,
+      "size": 72
+    },
+    {
+      "name": "Java_org_webrtc_DataChannel_nativeClose",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15860784,
+      "size": 72
+    },
+    {
+      "name": "Java_org_webrtc_DataChannel_nativeId",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15860912,
+      "size": 72
+    },
+    {
+      "name": "Java_org_webrtc_DataChannel_nativeLabel",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15861736,
+      "size": 140
+    },
+    {
+      "name": "Java_org_webrtc_DataChannel_nativeRegisterObserver",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15862016,
+      "size": 100
+    },
+    {
+      "name": "Java_org_webrtc_DataChannel_nativeSend",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15862288,
+      "size": 108
+    },
+    {
+      "name": "Java_org_webrtc_DataChannel_nativeState",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15862720,
+      "size": 140
+    },
+    {
+      "name": "Java_org_webrtc_DataChannel_nativeUnregisterObserver",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15862948,
+      "size": 80
+    },
+    {
+      "name": "Java_org_webrtc_DtmfSender_nativeCanInsertDtmf",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15731864,
+      "size": 48
+    },
+    {
+      "name": "Java_org_webrtc_DtmfSender_nativeDuration",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15731964,
+      "size": 48
+    },
+    {
+      "name": "Java_org_webrtc_DtmfSender_nativeInsertDtmf",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15732060,
+      "size": 108
+    },
+    {
+      "name": "Java_org_webrtc_DtmfSender_nativeInterToneGap",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15732324,
+      "size": 48
+    },
+    {
+      "name": "Java_org_webrtc_DtmfSender_nativeTones",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15732420,
+      "size": 116
+    },
+    {
+      "name": "Java_org_webrtc_EglBase10Impl_nativeGetCurrentNativeEGLContext",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16126148,
+      "size": 40
+    },
+    {
+      "name": "Java_org_webrtc_H264Utils_nativeIsSameH264Profile",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16122776,
+      "size": 104
+    },
+    {
+      "name": "Java_org_webrtc_Histogram_nativeAddSample",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16310000,
+      "size": 56
+    },
+    {
+      "name": "Java_org_webrtc_Histogram_nativeCreateCounts",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16310120,
+      "size": 100
+    },
+    {
+      "name": "Java_org_webrtc_Histogram_nativeCreateEnumeration",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16310392,
+      "size": 84
+    },
+    {
+      "name": "Java_org_webrtc_JavaI420Buffer_nativeCropAndScaleI420",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16310632,
+      "size": 488
+    },
+    {
+      "name": "Java_org_webrtc_JniCommon_nativeAddRef",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16069128,
+      "size": 48
+    },
+    {
+      "name": "Java_org_webrtc_JniCommon_nativeAllocateByteBuffer",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16069224,
+      "size": 116
+    },
+    {
+      "name": "Java_org_webrtc_JniCommon_nativeFreeByteBuffer",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16069412,
+      "size": 76
+    },
+    {
+      "name": "Java_org_webrtc_JniCommon_nativeReleaseRef",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16069560,
+      "size": 48
+    },
+    {
+      "name": "Java_org_webrtc_LibvpxVp8Decoder_nativeCreateDecoder",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16069656,
+      "size": 48
+    },
+    {
+      "name": "Java_org_webrtc_LibvpxVp8Encoder_nativeCreateEncoder",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16069816,
+      "size": 40
+    },
+    {
+      "name": "Java_org_webrtc_LibvpxVp9Decoder_nativeCreateDecoder",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16070760,
+      "size": 40
+    },
+    {
+      "name": "Java_org_webrtc_LibvpxVp9Decoder_nativeIsSupported",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16070904,
+      "size": 40
+    },
+    {
+      "name": "Java_org_webrtc_LibvpxVp9Encoder_nativeCreateEncoder",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16071028,
+      "size": 40
+    },
+    {
+      "name": "Java_org_webrtc_LibvpxVp9Encoder_nativeIsSupported",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16071172,
+      "size": 40
+    },
+    {
+      "name": "Java_org_webrtc_Logging_nativeEnableLogThreads",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15951784,
+      "size": 44
+    },
+    {
+      "name": "Java_org_webrtc_Logging_nativeEnableLogTimeStamps",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15951828,
+      "size": 44
+    },
+    {
+      "name": "Java_org_webrtc_Logging_nativeEnableLogToDebugOutput",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15951708,
+      "size": 76
+    },
+    {
+      "name": "Java_org_webrtc_Logging_nativeLog",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15951872,
+      "size": 616
+    },
+    {
+      "name": "Java_org_webrtc_MediaSource_nativeGetState",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16053972,
+      "size": 116
+    },
+    {
+      "name": "Java_org_webrtc_MediaStreamTrack_nativeGetEnabled",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15952580,
+      "size": 48
+    },
+    {
+      "name": "Java_org_webrtc_MediaStreamTrack_nativeGetId",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15952680,
+      "size": 116
+    },
+    {
+      "name": "Java_org_webrtc_MediaStreamTrack_nativeGetKind",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15952928,
+      "size": 116
+    },
+    {
+      "name": "Java_org_webrtc_MediaStreamTrack_nativeGetState",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15953176,
+      "size": 116
+    },
+    {
+      "name": "Java_org_webrtc_MediaStreamTrack_nativeSetEnabled",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15953372,
+      "size": 56
+    },
+    {
+      "name": "Java_org_webrtc_MediaStream_nativeAddAudioTrackToNativeStream",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15735128,
+      "size": 56
+    },
+    {
+      "name": "Java_org_webrtc_MediaStream_nativeAddVideoTrackToNativeStream",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15735320,
+      "size": 56
+    },
+    {
+      "name": "Java_org_webrtc_MediaStream_nativeGetId",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15735512,
+      "size": 116
+    },
+    {
+      "name": "Java_org_webrtc_MediaStream_nativeRemoveAudioTrack",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15735760,
+      "size": 56
+    },
+    {
+      "name": "Java_org_webrtc_MediaStream_nativeRemoveVideoTrack",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15735952,
+      "size": 56
+    },
+    {
+      "name": "Java_org_webrtc_Metrics_nativeEnable",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16080232,
+      "size": 40
+    },
+    {
+      "name": "Java_org_webrtc_Metrics_nativeGetAndReset",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16080304,
+      "size": 108
+    },
+    {
+      "name": "Java_org_webrtc_NV12Buffer_nativeCropAndScale",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16384256,
+      "size": 452
+    },
+    {
+      "name": "Java_org_webrtc_NV21Buffer_nativeCropAndScale",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16306484,
+      "size": 408
+    },
+    {
+      "name": "Java_org_webrtc_NativeAndroidVideoTrackSource_nativeAdaptFrame",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16288124,
+      "size": 156
+    },
+    {
+      "name": "Java_org_webrtc_NativeAndroidVideoTrackSource_nativeAdaptOutputFormat",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16288724,
+      "size": 236
+    },
+    {
+      "name": "Java_org_webrtc_NativeAndroidVideoTrackSource_nativeOnFrameCaptured",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16289220,
+      "size": 132
+    },
+    {
+      "name": "Java_org_webrtc_NativeAndroidVideoTrackSource_nativeSetIsScreencast",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16289784,
+      "size": 64
+    },
+    {
+      "name": "Java_org_webrtc_NativeAndroidVideoTrackSource_nativeSetState",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16289912,
+      "size": 64
+    },
+    {
+      "name": "Java_org_webrtc_NetworkMonitor_nativeNotifyConnectionTypeChanged",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16126220,
+      "size": 96
+    },
+    {
+      "name": "Java_org_webrtc_NetworkMonitor_nativeNotifyOfActiveNetworkList",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16126564,
+      "size": 124
+    },
+    {
+      "name": "Java_org_webrtc_NetworkMonitor_nativeNotifyOfNetworkConnect",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16126820,
+      "size": 124
+    },
+    {
+      "name": "Java_org_webrtc_NetworkMonitor_nativeNotifyOfNetworkDisconnect",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16127324,
+      "size": 104
+    },
+    {
+      "name": "Java_org_webrtc_NetworkMonitor_nativeNotifyOfNetworkPreference",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16127692,
+      "size": 132
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnectionFactory_nativeCreateAudioSource",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15902892,
+      "size": 92
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnectionFactory_nativeCreateAudioTrack",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15903260,
+      "size": 100
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnectionFactory_nativeCreateLocalMediaStream",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15903572,
+      "size": 92
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnectionFactory_nativeCreatePeerConnection",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15903868,
+      "size": 164
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnectionFactory_nativeCreatePeerConnectionFactory",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15905904,
+      "size": 392
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnectionFactory_nativeCreateVideoSource",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15907220,
+      "size": 64
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnectionFactory_nativeCreateVideoTrack",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15907388,
+      "size": 100
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnectionFactory_nativeDeleteLoggable",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15907772,
+      "size": 40
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnectionFactory_nativeFindFieldTrialsFullName",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15907896,
+      "size": 144
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnectionFactory_nativeFreeFactory",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15908240,
+      "size": 48
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnectionFactory_nativeGetNativePeerConnectionFactory",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15908384,
+      "size": 48
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnectionFactory_nativeGetRtpReceiverCapabilities",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15908476,
+      "size": 160
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnectionFactory_nativeGetRtpSenderCapabilities",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15908808,
+      "size": 160
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnectionFactory_nativeInitializeAndroidGlobals",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15909140,
+      "size": 40
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnectionFactory_nativeInitializeFieldTrials",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15909248,
+      "size": 76
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnectionFactory_nativeInitializeInternalTracer",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15910032,
+      "size": 40
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnectionFactory_nativeInjectLoggable",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15910112,
+      "size": 84
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnectionFactory_nativePrintStackTrace",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15910340,
+      "size": 48
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnectionFactory_nativeShutdownInternalTracer",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15911076,
+      "size": 40
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnectionFactory_nativeStartAecDump",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15911148,
+      "size": 64
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnectionFactory_nativeStartInternalTracingCapture",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15911344,
+      "size": 76
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnectionFactory_nativeStopAecDump",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15912096,
+      "size": 48
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnectionFactory_nativeStopInternalTracingCapture",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15912196,
+      "size": 40
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnection_nativeAddIceCandidate",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15954384,
+      "size": 144
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnection_nativeAddIceCandidateWithObserver",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15954824,
+      "size": 172
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnection_nativeAddLocalStream",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15955548,
+      "size": 80
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnection_nativeAddTrack",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15955696,
+      "size": 184
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnection_nativeAddTransceiverOfType",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15956888,
+      "size": 196
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnection_nativeAddTransceiverWithTrack",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15958028,
+      "size": 184
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnection_nativeClose",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15959212,
+      "size": 72
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnection_nativeConnectionState",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15959340,
+      "size": 140
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnection_nativeCreateAnswer",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15959568,
+      "size": 128
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnection_nativeCreateDataChannel",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15959956,
+      "size": 196
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnection_nativeCreateOffer",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15960612,
+      "size": 128
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnection_nativeCreatePeerConnectionObserver",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15961028,
+      "size": 76
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnection_nativeCreateSender",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15961208,
+      "size": 196
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnection_nativeFreeOwnedPeerConnection",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15961732,
+      "size": 48
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnection_nativeGetCertificate",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15961852,
+      "size": 140
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnection_nativeGetLocalDescription",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15962276,
+      "size": 140
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnection_nativeGetNativePeerConnection",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15962704,
+      "size": 72
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnection_nativeGetReceivers",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15962824,
+      "size": 140
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnection_nativeGetRemoteDescription",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15963112,
+      "size": 140
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnection_nativeGetSenders",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15963536,
+      "size": 140
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnection_nativeGetTransceivers",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15963824,
+      "size": 140
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnection_nativeIceConnectionState",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15964112,
+      "size": 140
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnection_nativeIceGatheringState",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15964340,
+      "size": 140
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnection_nativeNewGetStats",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15964568,
+      "size": 100
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnection_nativeNewGetStatsReceiver",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15964824,
+      "size": 116
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnection_nativeNewGetStatsSender",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15965232,
+      "size": 116
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnection_nativeOldGetStats",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15965640,
+      "size": 108
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnection_nativeRemoveIceCandidates",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15965928,
+      "size": 100
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnection_nativeRemoveLocalStream",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15966184,
+      "size": 80
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnection_nativeRemoveTrack",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15966328,
+      "size": 80
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnection_nativeRestartIce",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15966580,
+      "size": 72
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnection_nativeSetAudioPlayout",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15966708,
+      "size": 80
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnection_nativeSetAudioRecording",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15966860,
+      "size": 80
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnection_nativeSetBitrate",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15967012,
+      "size": 156
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnection_nativeSetConfiguration",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15967476,
+      "size": 100
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnection_nativeSetLocalDescription",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15967856,
+      "size": 128
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnection_nativeSetLocalDescriptionAutomatically",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15968240,
+      "size": 100
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnection_nativeSetRemoteDescription",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15968532,
+      "size": 128
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnection_nativeSignalingState",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15968916,
+      "size": 140
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnection_nativeStartRtcEventLog",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15969144,
+      "size": 88
+    },
+    {
+      "name": "Java_org_webrtc_PeerConnection_nativeStopRtcEventLog",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15969524,
+      "size": 72
+    },
+    {
+      "name": "Java_org_webrtc_RtcCertificatePem_nativeGenerateCertificate",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15857548,
+      "size": 152
+    },
+    {
+      "name": "Java_org_webrtc_RtpReceiver_nativeGetId",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15711468,
+      "size": 116
+    },
+    {
+      "name": "Java_org_webrtc_RtpReceiver_nativeGetParameters",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15711716,
+      "size": 116
+    },
+    {
+      "name": "Java_org_webrtc_RtpReceiver_nativeGetTrack",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15711976,
+      "size": 48
+    },
+    {
+      "name": "Java_org_webrtc_RtpReceiver_nativeSetFrameDecryptor",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15712156,
+      "size": 56
+    },
+    {
+      "name": "Java_org_webrtc_RtpReceiver_nativeSetObserver",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15712336,
+      "size": 92
+    },
+    {
+      "name": "Java_org_webrtc_RtpReceiver_nativeUnsetObserver",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15712564,
+      "size": 56
+    },
+    {
+      "name": "Java_org_webrtc_RtpSender_nativeGetDtmfSender",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15896420,
+      "size": 48
+    },
+    {
+      "name": "Java_org_webrtc_RtpSender_nativeGetId",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15896600,
+      "size": 116
+    },
+    {
+      "name": "Java_org_webrtc_RtpSender_nativeGetMediaType",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15896848,
+      "size": 116
+    },
+    {
+      "name": "Java_org_webrtc_RtpSender_nativeGetParameters",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15897084,
+      "size": 116
+    },
+    {
+      "name": "Java_org_webrtc_RtpSender_nativeGetStreams",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15897344,
+      "size": 116
+    },
+    {
+      "name": "Java_org_webrtc_RtpSender_nativeGetTrack",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15897608,
+      "size": 48
+    },
+    {
+      "name": "Java_org_webrtc_RtpSender_nativeSetFrameEncryptor",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15897788,
+      "size": 56
+    },
+    {
+      "name": "Java_org_webrtc_RtpSender_nativeSetParameters",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15897968,
+      "size": 92
+    },
+    {
+      "name": "Java_org_webrtc_RtpSender_nativeSetStreams",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15898308,
+      "size": 92
+    },
+    {
+      "name": "Java_org_webrtc_RtpSender_nativeSetTrack",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15898536,
+      "size": 56
+    },
+    {
+      "name": "Java_org_webrtc_RtpTransceiver_nativeCurrentDirection",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15836556,
+      "size": 116
+    },
+    {
+      "name": "Java_org_webrtc_RtpTransceiver_nativeDirection",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15836808,
+      "size": 116
+    },
+    {
+      "name": "Java_org_webrtc_RtpTransceiver_nativeGetMediaType",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15837004,
+      "size": 116
+    },
+    {
+      "name": "Java_org_webrtc_RtpTransceiver_nativeGetMid",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15837200,
+      "size": 116
+    },
+    {
+      "name": "Java_org_webrtc_RtpTransceiver_nativeGetReceiver",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15837440,
+      "size": 116
+    },
+    {
+      "name": "Java_org_webrtc_RtpTransceiver_nativeGetSender",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15837688,
+      "size": 116
+    },
+    {
+      "name": "Java_org_webrtc_RtpTransceiver_nativeSetCodecPreferences",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15837936,
+      "size": 92
+    },
+    {
+      "name": "Java_org_webrtc_RtpTransceiver_nativeSetDirection",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15838196,
+      "size": 92
+    },
+    {
+      "name": "Java_org_webrtc_RtpTransceiver_nativeStopInternal",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15839520,
+      "size": 48
+    },
+    {
+      "name": "Java_org_webrtc_RtpTransceiver_nativeStopStandard",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15839616,
+      "size": 48
+    },
+    {
+      "name": "Java_org_webrtc_RtpTransceiver_nativeStopped",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15839728,
+      "size": 48
+    },
+    {
+      "name": "Java_org_webrtc_SoftwareVideoDecoderFactory_nativeCreate",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16217556,
+      "size": 108
+    },
+    {
+      "name": "Java_org_webrtc_SoftwareVideoDecoderFactory_nativeCreateFactory",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16217876,
+      "size": 40
+    },
+    {
+      "name": "Java_org_webrtc_SoftwareVideoDecoderFactory_nativeGetSupportedCodecs",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16218020,
+      "size": 116
+    },
+    {
+      "name": "Java_org_webrtc_SoftwareVideoDecoderFactory_nativeIsSupported",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16218284,
+      "size": 92
+    },
+    {
+      "name": "Java_org_webrtc_SoftwareVideoEncoderFactory_nativeCreateEncoder",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16295908,
+      "size": 92
+    },
+    {
+      "name": "Java_org_webrtc_SoftwareVideoEncoderFactory_nativeCreateFactory",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16296248,
+      "size": 40
+    },
+    {
+      "name": "Java_org_webrtc_SoftwareVideoEncoderFactory_nativeGetSupportedCodecs",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16296392,
+      "size": 116
+    },
+    {
+      "name": "Java_org_webrtc_TimestampAligner_nativeCreateTimestampAligner",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16383784,
+      "size": 40
+    },
+    {
+      "name": "Java_org_webrtc_TimestampAligner_nativeReleaseTimestampAligner",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16383916,
+      "size": 48
+    },
+    {
+      "name": "Java_org_webrtc_TimestampAligner_nativeRtcTimeNanos",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16384036,
+      "size": 40
+    },
+    {
+      "name": "Java_org_webrtc_TimestampAligner_nativeTranslateTimestamp",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16384108,
+      "size": 56
+    },
+    {
+      "name": "Java_org_webrtc_TurnCustomizer_nativeFreeTurnCustomizer",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 15833472,
+      "size": 48
+    },
+    {
+      "name": "Java_org_webrtc_VideoDecoderFallback_nativeCreate",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16287424,
+      "size": 120
+    },
+    {
+      "name": "Java_org_webrtc_VideoDecoderWrapper_nativeOnDecodedFrame",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16085856,
+      "size": 156
+    },
+    {
+      "name": "Java_org_webrtc_VideoEncoderFallback_nativeCreateEncoder",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16219236,
+      "size": 104
+    },
+    {
+      "name": "Java_org_webrtc_VideoEncoderWrapper_nativeOnEncodedFrame",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16314068,
+      "size": 100
+    },
+    {
+      "name": "Java_org_webrtc_VideoTrack_nativeAddSink",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16072132,
+      "size": 56
+    },
+    {
+      "name": "Java_org_webrtc_VideoTrack_nativeFreeSink",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16072320,
+      "size": 48
+    },
+    {
+      "name": "Java_org_webrtc_VideoTrack_nativeRemoveSink",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16072436,
+      "size": 56
+    },
+    {
+      "name": "Java_org_webrtc_VideoTrack_nativeWrapSink",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16072548,
+      "size": 76
+    },
+    {
+      "name": "Java_org_webrtc_YuvHelper_nativeABGRToI420",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16123056,
+      "size": 264
+    },
+    {
+      "name": "Java_org_webrtc_YuvHelper_nativeCopyPlane",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16123584,
+      "size": 144
+    },
+    {
+      "name": "Java_org_webrtc_YuvHelper_nativeI420Copy",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16123872,
+      "size": 392
+    },
+    {
+      "name": "Java_org_webrtc_YuvHelper_nativeI420Rotate",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16124664,
+      "size": 408
+    },
+    {
+      "name": "Java_org_webrtc_YuvHelper_nativeI420ToNV12",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16125488,
+      "size": 332
+    },
+    {
+      "name": "Java_org_webrtc_audio_JavaAudioDeviceModule_nativeCreateAudioDeviceModule",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16286200,
+      "size": 208
+    },
+    {
+      "name": "Java_org_webrtc_audio_WebRtcAudioRecord_nativeCacheDirectBufferAddress",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16254116,
+      "size": 124
+    },
+    {
+      "name": "Java_org_webrtc_audio_WebRtcAudioRecord_nativeDataIsRecorded",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16255204,
+      "size": 112
+    },
+    {
+      "name": "Java_org_webrtc_audio_WebRtcAudioTrack_nativeCacheDirectBufferAddress",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16271484,
+      "size": 100
+    },
+    {
+      "name": "Java_org_webrtc_audio_WebRtcAudioTrack_nativeGetPlayoutData",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 16273084,
+      "size": 64
+    },
+    {
+      "name": "flexygram_variant_policy",
+      "type": "STT_FUNC",
+      "binding": "STB_GLOBAL",
+      "visibility": "STV_DEFAULT",
+      "address": 14783888,
+      "size": 12
+    }
+  ],
+  "abi": {
+    "flags": 0,
+    "osabi": "ELFOSABI_SYSV",
+    "abi_version": 0
+  },
+  "needed": [
+    "libjnigraphics.so",
+    "liblog.so",
+    "libz.so",
+    "libGLESv2.so",
+    "libEGL.so",
+    "libandroid.so",
+    "libOpenSLES.so",
+    "libdl.so",
+    "libm.so",
+    "libc.so"
+  ],
+  "soname": [
+    "libtmessages.49.so"
+  ]
+}

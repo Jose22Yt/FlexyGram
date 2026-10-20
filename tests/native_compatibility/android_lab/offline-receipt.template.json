@@ -1,0 +1,10 @@
+{
+  "disposable_emulator": false,
+  "no_accounts": false,
+  "no_personal_data": false,
+  "host_egress_and_lan_blocked": false,
+  "local_adb_only": false,
+  "image_origin": "REPLACE_WITH_OFFICIAL_SOURCE_AND_LOCAL_PROVISIONING_RECORD",
+  "image_revision": "REPLACE_WITH_PINNED_IMAGE_AND_EMULATOR_OR_CUTTLEFISH_REVISION",
+  "image_sha256": "REPLACE_WITH_ACTUAL_IMAGE_ARCHIVE_SHA256"
+}

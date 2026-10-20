@@ -1,0 +1,22 @@
+[
+  {
+    "probe": "adb-version",
+    "exit_code": 0,
+    "android_boot": false
+  },
+  {
+    "probe": "emulator-version",
+    "exit_code": 0,
+    "android_boot": false
+  },
+  {
+    "probe": "arm64-engine-version",
+    "exit_code": 0,
+    "android_boot": false
+  },
+  {
+    "probe": "accel-check",
+    "exit_code": 3,
+    "android_boot": false
+  }
+]

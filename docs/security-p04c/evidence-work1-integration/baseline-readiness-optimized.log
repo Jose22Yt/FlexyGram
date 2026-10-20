@@ -1,0 +1,39 @@
+test_invalid_tcp_port_is_not_a_local_emulator (test_controller_regressions.ControllerRegressions.test_invalid_tcp_port_is_not_a_local_emulator) ... ok
+test_nonzero_exit_still_blocks (test_controller_regressions.ControllerRegressions.test_nonzero_exit_still_blocks) ... ok
+test_partial_banner_or_similar_error_is_preserved (test_controller_regressions.ControllerRegressions.test_partial_banner_or_similar_error_is_preserved) ... ok
+test_startup_banner_does_not_corrupt_get_state (test_controller_regressions.ControllerRegressions.test_startup_banner_does_not_corrupt_get_state) ... ok
+test_stdout_is_never_filtered_as_host_banner (test_controller_regressions.ControllerRegressions.test_stdout_is_never_filtered_as_host_banner) ... ok
+test_supported_serials_preserved (test_controller_regressions.ControllerRegressions.test_supported_serials_preserved) ... ok
+test_timeout_propagates_without_retry_or_side_effect (test_controller_regressions.ControllerRegressions.test_timeout_propagates_without_retry_or_side_effect) ... ok
+test_unknown_stderr_is_preserved (test_controller_regressions.ControllerRegressions.test_unknown_stderr_is_preserved) ... ok
+test_16k_tag_is_required (test_preflight.Readiness.test_16k_tag_is_required) ... ok
+test_avd_directory_escape (test_preflight.Readiness.test_avd_directory_escape) ... ok
+test_complete_synthetic_fixture_is_preboot_only (test_preflight.Readiness.test_complete_synthetic_fixture_is_preboot_only) ... ok
+test_duplicate_properties_with_whitespace_rejected (test_preflight.Readiness.test_duplicate_properties_with_whitespace_rejected) ... ok
+test_empty_system_image (test_preflight.Readiness.test_empty_system_image) ... ok
+test_environment_values_never_leak (test_preflight.Readiness.test_environment_values_never_leak) ... ok
+test_external_data_partition_rejected (test_preflight.Readiness.test_external_data_partition_rejected) ... ok
+test_image_path_escape (test_preflight.Readiness.test_image_path_escape) ... ok
+test_inspection_does_not_write_fixture (test_preflight.Readiness.test_inspection_does_not_write_fixture) ... ok
+test_mismatched_build_tools_metadata (test_preflight.Readiness.test_mismatched_build_tools_metadata) ... ok
+test_missing_cli_metadata (test_preflight.Readiness.test_missing_cli_metadata) ... ok
+test_missing_kernel (test_preflight.Readiness.test_missing_kernel) ... ok
+test_missing_roots_report_all_failures (test_preflight.Readiness.test_missing_roots_report_all_failures) ... ok
+test_nonzero_version_is_rejected (test_preflight.Readiness.test_nonzero_version_is_rejected) ... ok
+test_noop_tool_is_not_version_proof (test_preflight.Readiness.test_noop_tool_is_not_version_proof) ... ok
+test_only_version_commands_and_explicit_roots (test_preflight.Readiness.test_only_version_commands_and_explicit_roots) ... ok
+test_play_store_rejected (test_preflight.Readiness.test_play_store_rejected) ... ok
+test_shared_volume_budget_is_aggregated (test_preflight.Readiness.test_shared_volume_budget_is_aggregated) ... ok
+test_symlink_config_escape (test_preflight.Readiness.test_symlink_config_escape) ... ok
+test_tool_timeout_is_aggregated (test_preflight.Readiness.test_tool_timeout_is_aggregated) ... ok
+test_unreviewed_revision_rejected (test_preflight.Readiness.test_unreviewed_revision_rejected) ... ok
+test_whitespace_properties_supported (test_preflight.Readiness.test_whitespace_properties_supported) ... ok
+test_wrong_abi (test_preflight.Readiness.test_wrong_abi) ... ok
+test_wrong_image_path (test_preflight.Readiness.test_wrong_image_path) ... ok
+test_wrong_target_rejected (test_preflight.Readiness.test_wrong_target_rejected) ... ok
+test_wrong_versions_are_rejected (test_preflight.Readiness.test_wrong_versions_are_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 34 tests in 0.064s
+
+OK

@@ -1,0 +1,18 @@
+[
+  {
+    "function": "FT_Stream_OpenBzip2",
+    "both_have_original_unimplemented_error7": true,
+    "first_return_disassembly": {
+      "original": "\n   b2b9c:      \tsub\tsp, sp, #0x10\n   b2ba0:      \tstr\tx0, [sp, #0x8]\n   b2ba4:      \tstr\tx1, [sp]\n   b2ba8:      \tldr\tx8, [sp, #0x8]\n   b2bac:      \tstr\tx8, [sp, #0x8]\n   b2bb0:      \tldr\tx8, [sp]\n   b2bb4:      \tstr\tx8, [sp]\n   b2bb8:      \tmov\tw0, #0x7                // =7\n   b2bbc:      \tadd\tsp, sp, #0x10\n   b2bc0:      \tret",
+      "rebuilt": "\n   54830:      \tmov\tw0, #0x7                // =7\n   54834:      \tret"
+    }
+  },
+  {
+    "function": "FT_Library_SetLcdFilter",
+    "both_have_original_unimplemented_error7": true,
+    "first_return_disassembly": {
+      "original": "\n   24c6c:      \tsub\tsp, sp, #0x10\n   24c70:      \tstr\tx0, [sp, #0x8]\n   24c74:      \tstr\tw1, [sp, #0x4]\n   24c78:      \tldr\tx8, [sp, #0x8]\n   24c7c:      \tstr\tx8, [sp, #0x8]\n   24c80:      \tldr\tw8, [sp, #0x4]\n   24c84:      \tstr\tw8, [sp, #0x4]\n   24c88:      \tmov\tw0, #0x7                // =7\n   24c8c:      \tadd\tsp, sp, #0x10\n   24c90:      \tret",
+      "rebuilt": "\n   3cd54:      \tmov\tw0, #0x7                // =7\n   3cd58:      \tret"
+    }
+  }
+]

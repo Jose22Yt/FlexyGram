@@ -1,0 +1,6 @@
+Command: zipalign -c -P 16 -v 4 APK_INTERNA
+Exit: 0
+Original verbose log SHA256: 16785df37fea34406304c752e07d23138e42c70058e0a45840fdf461f30fbf88
+14858 archive entries inspected; verbose per-entry lines omitted.
+Verification successful
+ZIP alignment does not certify ELF PT_LOAD or runtime loading.

@@ -1,0 +1,11 @@
+{
+  "filename": "FlexyGram-P04c-Recovered-Original-Inputs.zip",
+  "bytes": 45434269,
+  "sha256": "17325285036532db37a4ed09600f5a62a61056de6a2c59bec1d17da550ea0d82",
+  "contains_apk": false,
+  "contains_experimental_wheels": false,
+  "contains_signing_key": false,
+  "original_wheels": 18,
+  "overlay_matching_wheels": 15,
+  "source_archives": 5
+}

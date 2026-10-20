@@ -1,0 +1,56 @@
+[
+  {
+    "suite": "pr17-runner",
+    "optimized": false,
+    "tests": 32,
+    "expected_tests": 32,
+    "passed": true,
+    "exit_code": 0,
+    "log": "pr17-runner.log"
+  },
+  {
+    "suite": "pr17-runner",
+    "optimized": true,
+    "tests": 32,
+    "expected_tests": 32,
+    "passed": true,
+    "exit_code": 0,
+    "log": "pr17-runner-optimized.log"
+  },
+  {
+    "suite": "pr20",
+    "optimized": false,
+    "tests": 22,
+    "expected_tests": 22,
+    "passed": true,
+    "exit_code": 0,
+    "log": "pr20.log"
+  },
+  {
+    "suite": "pr20",
+    "optimized": true,
+    "tests": 22,
+    "expected_tests": 22,
+    "passed": true,
+    "exit_code": 0,
+    "log": "pr20-optimized.log"
+  },
+  {
+    "suite": "pr21",
+    "optimized": false,
+    "tests": 24,
+    "expected_tests": 24,
+    "passed": true,
+    "exit_code": 0,
+    "log": "pr21.log"
+  },
+  {
+    "suite": "pr21",
+    "optimized": true,
+    "tests": 24,
+    "expected_tests": 24,
+    "passed": true,
+    "exit_code": 0,
+    "log": "pr21-optimized.log"
+  }
+]

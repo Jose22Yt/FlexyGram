@@ -1,0 +1,79 @@
+test_archive_change_before_extraction_fails_closed (test_stage_recovered_inputs.StageTests.test_archive_change_before_extraction_fails_closed) ... ok
+test_archive_change_during_extraction_fails_closed (test_stage_recovered_inputs.StageTests.test_archive_change_during_extraction_fails_closed) ... ok
+test_archive_symlink_rejected (test_stage_recovered_inputs.StageTests.test_archive_symlink_rejected) ... ok
+test_bad_manifest_digest_rejected (test_stage_recovered_inputs.StageTests.test_bad_manifest_digest_rejected) ... ok
+test_corrupted_member_rejected_even_if_bundle_pin_updated (test_stage_recovered_inputs.StageTests.test_corrupted_member_rejected_even_if_bundle_pin_updated) ... ok
+test_destination_already_exists_rejected (test_stage_recovered_inputs.StageTests.test_destination_already_exists_rejected) ... ok
+test_duplicate_member_rejected (test_stage_recovered_inputs.StageTests.test_duplicate_member_rejected) ... /root/.local/share/uv/python/cpython-3.11.17-linux-x86_64-gnu/lib/python3.11/zipfile.py:1606: UserWarning: Duplicate name: 'original-wheels/example.whl'
+  return self._open_to_write(zinfo, force_zip64=force_zip64)
+ok
+test_extra_file_rejected (test_stage_recovered_inputs.StageTests.test_extra_file_rejected) ... ok
+test_manifest_dot_component_rejected (test_stage_recovered_inputs.StageTests.test_manifest_dot_component_rejected) ... ok
+test_manifest_non_string_name_rejected_cleanly (test_stage_recovered_inputs.StageTests.test_manifest_non_string_name_rejected_cleanly) ... ok
+test_manifest_with_parent_traversal_rejected (test_stage_recovered_inputs.StageTests.test_manifest_with_parent_traversal_rejected) ... ok
+test_missing_file_rejected (test_stage_recovered_inputs.StageTests.test_missing_file_rejected) ... ok
+test_nested_member_under_regular_file_rejected (test_stage_recovered_inputs.StageTests.test_nested_member_under_regular_file_rejected) ... ok
+test_path_traversal_rejected (test_stage_recovered_inputs.StageTests.test_path_traversal_rejected) ... ok
+test_private_staging_verified_and_receipted (test_stage_recovered_inputs.StageTests.test_private_staging_verified_and_receipted) ... ok
+test_source_checkout_as_stage_directory_rejected (test_stage_recovered_inputs.StageTests.test_source_checkout_as_stage_directory_rejected) ... ok
+test_symlink_member_rejected (test_stage_recovered_inputs.StageTests.test_symlink_member_rejected) ... ok
+test_valid_archives_verified_without_staging (test_stage_recovered_inputs.StageTests.test_valid_archives_verified_without_staging) ... ok
+test_wrong_bundle_sha_rejected_without_writing (test_stage_recovered_inputs.StageTests.test_wrong_bundle_sha_rejected_without_writing) ... ok
+test_exact_pinned_source_tar_is_accepted (test_pinned_freetype.PinnedFreetypeTests.test_exact_pinned_source_tar_is_accepted) ... ok
+test_export_contents_changed_is_rejected (test_pinned_freetype.PinnedFreetypeTests.test_export_contents_changed_is_rejected) ... ok
+test_export_symlink_is_rejected (test_pinned_freetype.PinnedFreetypeTests.test_export_symlink_is_rejected) ... ok
+test_invalid_checkout_does_not_silently_fallback_to_export (test_pinned_freetype.PinnedFreetypeTests.test_invalid_checkout_does_not_silently_fallback_to_export) ... ok
+test_missing_export_is_rejected (test_pinned_freetype.PinnedFreetypeTests.test_missing_export_is_rejected) ... ok
+test_pinned_checkout_uses_git_archive_not_untracked_files (test_pinned_freetype.PinnedFreetypeTests.test_pinned_checkout_uses_git_archive_not_untracked_files) ... ok
+test_symlinked_checkout_is_rejected (test_pinned_freetype.PinnedFreetypeTests.test_symlinked_checkout_is_rejected) ... ok
+test_unrecognized_commit_is_rejected (test_pinned_freetype.PinnedFreetypeTests.test_unrecognized_commit_is_rejected) ... ok
+test_changed_native_elf_is_rejected (test_reproduce_locked_16k.ReproductionGateTests.test_changed_native_elf_is_rejected) ... ok
+test_changed_rebuilt_wheel_is_rejected (test_reproduce_locked_16k.ReproductionGateTests.test_changed_rebuilt_wheel_is_rejected) ... ok
+test_copied_wheels_cannot_swap_original_names (test_reproduce_locked_16k.ReproductionGateTests.test_copied_wheels_cannot_swap_original_names) ... ok
+test_dotdot_paths_are_canonical_before_invoking_builders (test_reproduce_locked_16k.ReproductionGateTests.test_dotdot_paths_are_canonical_before_invoking_builders) ... ok
+test_duplicate_rebuilt_origin_is_rejected (test_reproduce_locked_16k.ReproductionGateTests.test_duplicate_rebuilt_origin_is_rejected) ... ok
+test_duplicate_wheel_manifest_is_rejected (test_reproduce_locked_16k.ReproductionGateTests.test_duplicate_wheel_manifest_is_rejected) ... ok
+test_exact_rebuilt_and_original_inputs_are_accepted (test_reproduce_locked_16k.ReproductionGateTests.test_exact_rebuilt_and_original_inputs_are_accepted) ... ok
+test_existing_output_directory_is_not_overwritten (test_reproduce_locked_16k.ReproductionGateTests.test_existing_output_directory_is_not_overwritten) ... ok
+test_extra_unpinned_wheel_is_rejected (test_reproduce_locked_16k.ReproductionGateTests.test_extra_unpinned_wheel_is_rejected) ... ok
+test_input_symlink_validation_precedes_canonical_build_paths (test_reproduce_locked_16k.ReproductionGateTests.test_input_symlink_validation_precedes_canonical_build_paths) ... ok
+test_missing_input_preflight_exits_blocked_without_output (test_reproduce_locked_16k.ReproductionGateTests.test_missing_input_preflight_exits_blocked_without_output) ... ok
+test_missing_native_elf_is_rejected (test_reproduce_locked_16k.ReproductionGateTests.test_missing_native_elf_is_rejected) ... ok
+test_missing_wheel_is_rejected (test_reproduce_locked_16k.ReproductionGateTests.test_missing_wheel_is_rejected) ... ok
+test_nonboolean_rebuilt_flag_is_rejected (test_reproduce_locked_16k.ReproductionGateTests.test_nonboolean_rebuilt_flag_is_rejected) ... ok
+test_original_sha256_provenance_cannot_be_forged (test_reproduce_locked_16k.ReproductionGateTests.test_original_sha256_provenance_cannot_be_forged) ... ok
+test_original_url_provenance_cannot_be_forged (test_reproduce_locked_16k.ReproductionGateTests.test_original_url_provenance_cannot_be_forged) ... ok
+test_original_wheel_sha_mismatch_is_rejected (test_reproduce_locked_16k.ReproductionGateTests.test_original_wheel_sha_mismatch_is_rejected) ... ok
+test_rebuilt_original_mapping_cannot_be_swapped (test_reproduce_locked_16k.ReproductionGateTests.test_rebuilt_original_mapping_cannot_be_swapped) ... ok
+test_rebuilt_wheel_with_wrong_approved_pin_is_rejected (test_reproduce_locked_16k.ReproductionGateTests.test_rebuilt_wheel_with_wrong_approved_pin_is_rejected) ... ok
+test_reviewed_evidence_must_contain_all_libraries_and_three_wheels (test_reproduce_locked_16k.ReproductionGateTests.test_reviewed_evidence_must_contain_all_libraries_and_three_wheels) ... ok
+test_reviewed_mapping_requires_all_three_substitutes (test_reproduce_locked_16k.ReproductionGateTests.test_reviewed_mapping_requires_all_three_substitutes) ... ok
+test_runtime_certification_in_manifest_is_rejected (test_reproduce_locked_16k.ReproductionGateTests.test_runtime_certification_in_manifest_is_rejected) ... ok
+test_symlinked_library_parent_is_rejected (test_reproduce_locked_16k.ReproductionGateTests.test_symlinked_library_parent_is_rejected) ... ok
+test_symlinked_manifest_is_rejected (test_reproduce_locked_16k.ReproductionGateTests.test_symlinked_manifest_is_rejected) ... ok
+test_symlinked_native_library_is_rejected (test_reproduce_locked_16k.ReproductionGateTests.test_symlinked_native_library_is_rejected) ... ok
+test_symlinked_output_parent_cannot_write_into_inputs (test_reproduce_locked_16k.ReproductionGateTests.test_symlinked_output_parent_cannot_write_into_inputs) ... ok
+test_wheel_directory_symlink_is_rejected (test_reproduce_locked_16k.ReproductionGateTests.test_wheel_directory_symlink_is_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 54 tests in 0.124s
+
+OK
+{"status": "BLOCKED", "error_class": "ValueError", "android_runtime_validated": false}
+{
+  "android_runtime_validated": false,
+  "apk_built": false,
+  "apk_signed": false,
+  "errors": 0,
+  "failures": 0,
+  "file_sha256": {
+    "tools/native_compatibility/pinned_freetype.py": "fee35e86e877df6896bbcab02c8160971ca5355da3c43bbfc9a97b144c46d309",
+    "tools/native_compatibility/reproduce_locked_16k.py": "db58f029b42871ee01157054f849815d70d870681b218a9a0ae0750628f8b801",
+    "tools/native_compatibility/stage_recovered_inputs.py": "9fa1e07cbfab2927ac5276274d96bbf0cb93d5a4a1bccbc93fd7d62451d36a9a"
+  },
+  "mode": "normal",
+  "python": "3.11.17",
+  "skipped": 0,
+  "status": "P04C_HOST_PASS",
+  "tests": 54
+}

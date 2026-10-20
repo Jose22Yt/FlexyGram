@@ -29,7 +29,7 @@ def assert_scope(test):
   # Documentary history from approved P0.4a must remain identical to its merged base.
   if path.startswith('docs/security-p04a/'):
    test.assertEqual((ROOT/path).read_bytes(),subprocess.check_output(['git','show','d9f2b788cf23e830e84ba24e9f6cb2e71e13bd4d:'+path],cwd=ROOT));continue
-  if path.startswith(('docs/security-p04b/','tests/build_variants/')):continue
+  if path.startswith(('docs/security-p04b/','tests/build_variants/','docs/security-p04c/','tests/native_compatibility/')):continue
   test.assertIn(path,rows,'Unexpected production or historical evidence change')
   test.assertTrue(reviewed_change(path,rows[path]['before']),path)
  # Freeze every integrated source, including newly added module files not yet in the index.

@@ -1,0 +1,74 @@
+[
+  {
+    "name": "platform-tools",
+    "url": "https://dl.google.com/android/repository/platform-tools_r37.0.1-linux.zip",
+    "expected": "d230f13842f60f782a8645f9c813f8f845bf36089ea7289f28c48f17979313f1",
+    "algorithm": "sha256",
+    "dest": "/workspace/scratch/1f84b79e43f3/lab-tools/sdk",
+    "sha256": "d230f13842f60f782a8645f9c813f8f845bf36089ea7289f28c48f17979313f1",
+    "bytes": 9054187,
+    "checksum_verified": true,
+    "extracted": true,
+    "booted": false
+  },
+  {
+    "name": "emulator",
+    "url": "https://dl.google.com/android/repository/emulator-linux_x64-16428233.zip",
+    "expected": "b08fc43d8608d2955f607f1b287beb525041e730086bdca3af152accac3af9c1",
+    "algorithm": "sha256",
+    "dest": "/workspace/scratch/1f84b79e43f3/lab-tools/sdk",
+    "sha256": "b08fc43d8608d2955f607f1b287beb525041e730086bdca3af152accac3af9c1",
+    "bytes": 349654171,
+    "checksum_verified": true,
+    "extracted": true,
+    "booted": false
+  },
+  {
+    "name": "platforms;android-37.0",
+    "url": "https://dl.google.com/android/repository/platform-37.0_r02.zip",
+    "expected": "ed8ebf7f8822a4de5686d427f237d2fa30ff7410",
+    "algorithm": "sha1",
+    "dest": "/workspace/scratch/1f84b79e43f3/lab-tools/platforms-android-37.0",
+    "sha256": "840b23e827f96e64aea4c89a1194aac3dc5f6bad37edb231c5c795d890330e8d",
+    "bytes": 67281901,
+    "checksum_verified": true,
+    "extracted": true,
+    "booted": false
+  },
+  {
+    "name": "build-tools;36.0.0",
+    "url": "https://dl.google.com/android/repository/build-tools_r36_linux.zip",
+    "expected": "b0b6376977657e8ad9b969bacf4093601da2c6fb",
+    "algorithm": "sha1",
+    "dest": "/workspace/scratch/1f84b79e43f3/lab-tools/build-tools-36.0.0",
+    "sha256": "5d9ac77fb6ff43d9da518a337b4fcf8f9097113df531d99ccefe80ef7ce8250b",
+    "bytes": 63737259,
+    "checksum_verified": true,
+    "extracted": true,
+    "booted": false
+  },
+  {
+    "name": "system-images;android-24;default;arm64-v8a",
+    "url": "https://dl.google.com/android/repository/sys-img/android/arm64-v8a-24_r09.zip",
+    "expected": "e88ebdf4533efa0370603ee4ab0e7834e0cc364f",
+    "algorithm": "sha1",
+    "dest": "/workspace/scratch/1f84b79e43f3/lab-tools/system-images-android-24-default-arm64-v8a",
+    "sha256": "3c3a70dcffe8c162984ec190fc3388bf237b241b3ba80bf7aa5c86e130d8f59b",
+    "bytes": 305854153,
+    "checksum_verified": true,
+    "extracted": true,
+    "booted": false
+  },
+  {
+    "name": "system-images;android-35;google_apis_ps16k;arm64-v8a",
+    "url": "https://dl.google.com/android/repository/sys-img/google_apis/arm64-v8a-ps16k-35_r05.zip",
+    "expected": "9d834fe640beff22d25025a8028b98ab4366be4d",
+    "algorithm": "sha1",
+    "dest": "/workspace/scratch/1f84b79e43f3/lab-tools/system-images-android-35-google_apis_ps16k-arm64-v8a",
+    "sha256": "991c7c08258a0a32d7851ae8f9fb7dcd62f5b3907f1a91a2514cd94e75005cb3",
+    "bytes": 1778788352,
+    "checksum_verified": true,
+    "extracted": true,
+    "booted": false
+  }
+]

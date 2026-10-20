@@ -1,0 +1,33 @@
+{
+  "guards": [
+    {
+      "symbol": "_ZN18ConnectionsManager4initEjiiNSt6__ndk112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEES6_S6_S6_S6_S6_S6_S6_S6_S6_S6_ilbbbbii",
+      "instructions": [
+        "ret"
+      ],
+      "body_absent": true
+    },
+    {
+      "symbol": "_ZN16ConnectionSocket14openConnectionENSt6__ndk112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEEtS6_bi",
+      "instructions": [
+        "ret"
+      ],
+      "body_absent": true
+    },
+    {
+      "symbol": "_ZN16ConnectionSocket22openConnectionInternalEb",
+      "instructions": [
+        "ret"
+      ],
+      "body_absent": true
+    }
+  ],
+  "packaged_text_matches_linked": true,
+  "text_sha256": "aa570dbb8589d03ddda14f2358c560a96a06b5f98ced2ea80bf7a70bf738654a",
+  "compile_commands": 1833,
+  "unique_source_files": 1832,
+  "compiler_targets": [
+    "aarch64-none-linux-android24"
+  ],
+  "runtime_execution": false
+}

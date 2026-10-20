@@ -1,0 +1,9 @@
+{
+  "base": "a25295a9d567a626e008fc55ca97d80112c5f65b",
+  "compared_source_files": 27874,
+  "differing_files": [
+    "TMessagesProj/build.gradle"
+  ],
+  "approved_build_unchanged": true,
+  "experimental_build_overlay_only": true
+}

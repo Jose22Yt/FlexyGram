@@ -1,0 +1,5408 @@
+{
+  "apk_sha256": "17c32ab39e3ac88213241a6bd643637469a4a4d47311a920b357a2e7b3128230",
+  "libraries": [
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!lib/arm64-v8a/libaliuhook.so",
+      "sha256": "c1a3e4702be737f20d29609e559476350e9d44e20a918be6a27d8cb679d34e85",
+      "machine": "EM_AARCH64",
+      "android_note_api": 21,
+      "soname": "libaliuhook.so",
+      "needed": [
+        "liblog.so",
+        "liblsplant.so",
+        "libm.so",
+        "libc++_shared.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 83056,
+          "memsz": 83056,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 83056,
+          "vaddr": 99440,
+          "filesz": 3104,
+          "memsz": 7056,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 86160,
+          "vaddr": 118928,
+          "filesz": 48,
+          "memsz": 5752,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 99440,
+          "end": 106496,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!lib/arm64-v8a/libc++_shared.so",
+      "sha256": "35e56d209d7f28a79bf1e263cbf1e4bafc5038448dea0a954cba0423a28f0f6b",
+      "machine": "EM_AARCH64",
+      "android_note_api": 21,
+      "soname": "libc++_shared.so",
+      "needed": [
+        "libc.so",
+        "libm.so",
+        "libdl.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 623424,
+          "memsz": 623424,
+          "align": 16384,
+          "flags": 4
+        },
+        {
+          "offset": 623424,
+          "vaddr": 639808,
+          "filesz": 638736,
+          "memsz": 638736,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 1262160,
+          "vaddr": 1294928,
+          "filesz": 39384,
+          "memsz": 40368,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 1301544,
+          "vaddr": 1350696,
+          "filesz": 568,
+          "memsz": 32024,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 1294928,
+          "end": 1335296,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [
+        {
+          "name": "__cxa_thread_atexit_impl",
+          "weak": true,
+          "provider": null,
+          "version": null
+        }
+      ],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!lib/arm64-v8a/libchaquopy_java.so",
+      "sha256": "3d2fadf0330a2aeee7cf8d62f2da23aca193213a74bd35add75bc895efee672b",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": "libchaquopy_java.so",
+      "needed": [
+        "libpython3.11.so",
+        "liblog.so",
+        "libm.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 147984,
+          "memsz": 147984,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 147984,
+          "vaddr": 164368,
+          "filesz": 1896,
+          "memsz": 3568,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 149880,
+          "vaddr": 182648,
+          "filesz": 2144,
+          "memsz": 3864,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 164368,
+          "end": 167936,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!lib/arm64-v8a/libcrypto_chaquopy.so",
+      "sha256": "766c1744b32da624ca78d3996806b43631f28222576ba80bb5688e5c3041f0be",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": "libcrypto_chaquopy.so",
+      "needed": [
+        "libm.so",
+        "libcrypto_python.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 1704,
+          "memsz": 1704,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 1704,
+          "vaddr": 18088,
+          "filesz": 504,
+          "memsz": 2392,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 18088,
+          "end": 20480,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!lib/arm64-v8a/libcrypto_python.so",
+      "sha256": "c6c31b928c480e77ca85f9e34286ca922d6c56fd79567b34d442bbcc6817d10e",
+      "machine": "EM_AARCH64",
+      "android_note_api": 21,
+      "soname": "libcrypto_python.so",
+      "needed": [
+        "libm.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 3361712,
+          "memsz": 3361712,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 3361712,
+          "vaddr": 3378096,
+          "filesz": 349528,
+          "memsz": 353360,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 3711240,
+          "vaddr": 3744008,
+          "filesz": 7816,
+          "memsz": 16088,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 3378096,
+          "end": 3731456,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [
+        {
+          "name": "getentropy",
+          "weak": true,
+          "provider": null,
+          "version": null
+        },
+        {
+          "name": "memfd_create",
+          "weak": true,
+          "provider": null,
+          "version": null
+        }
+      ],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!lib/arm64-v8a/libdatastore_shared_counter.so",
+      "sha256": "d3e48717c9aa147e0ab21063ba0e8e0211cabf8bf40b222640829519edbf58e1",
+      "machine": "EM_AARCH64",
+      "android_note_api": 21,
+      "soname": "libdatastore_shared_counter.so",
+      "needed": [
+        "libm.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 4544,
+          "memsz": 4544,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 4544,
+          "vaddr": 20928,
+          "filesz": 616,
+          "memsz": 616,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 5160,
+          "vaddr": 37928,
+          "filesz": 0,
+          "memsz": 1,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 20928,
+          "end": 24576,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!lib/arm64-v8a/libimage_processing_util_jni.so",
+      "sha256": "0292b063fafccf734472cbb59588e756c2dbca907c72021ba6fbf126385508a2",
+      "machine": "EM_AARCH64",
+      "android_note_api": 23,
+      "soname": "libimage_processing_util_jni.so",
+      "needed": [
+        "liblog.so",
+        "libandroid.so",
+        "libjnigraphics.so",
+        "libm.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 29472,
+          "memsz": 29472,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 29472,
+          "vaddr": 45856,
+          "filesz": 992,
+          "memsz": 3296,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 30464,
+          "vaddr": 63232,
+          "filesz": 0,
+          "memsz": 4,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 45856,
+          "end": 49152,
+          "end_aligned_16k": true,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!lib/arm64-v8a/libjnidispatch.so",
+      "sha256": "ddfc6c965bbe366615c000ec1f06552ddf0bb2b4f9d921d0bff8c75b3cb2ca4c",
+      "machine": "EM_AARCH64",
+      "android_note_api": null,
+      "soname": null,
+      "needed": [
+        "libc.so",
+        "libdl.so",
+        "libm.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 152376,
+          "memsz": 152376,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 162712,
+          "vaddr": 179096,
+          "filesz": 1708,
+          "memsz": 3816,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 179096,
+          "end": 180224,
+          "end_aligned_16k": true,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!lib/arm64-v8a/liblanguage_id_l2c_jni.so",
+      "sha256": "b93e65a48200df45dbbfc82e17560ae689b1b462ab4ecdce5fd2c093802e1a94",
+      "machine": "EM_AARCH64",
+      "android_note_api": 21,
+      "soname": "liblanguage_id_l2c_jni.so",
+      "needed": [
+        "libandroid.so",
+        "libdl.so",
+        "libm.so",
+        "liblog.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 980160,
+          "memsz": 980160,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 983040,
+          "vaddr": 983040,
+          "filesz": 19824,
+          "memsz": 20480,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 1002864,
+          "vaddr": 1019248,
+          "filesz": 14080,
+          "memsz": 107200,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 983040,
+          "end": 1003520,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [
+        {
+          "name": "_ZN4absl19leak_check_internal12DoIgnoreLeakEPKv",
+          "weak": true,
+          "provider": null,
+          "version": null
+        },
+        {
+          "name": "__gcov_dump",
+          "weak": true,
+          "provider": null,
+          "version": null
+        },
+        {
+          "name": "__gcov_flush",
+          "weak": true,
+          "provider": null,
+          "version": null
+        },
+        {
+          "name": "MallocExtension_Internal_MarkThreadIdle",
+          "weak": true,
+          "provider": null,
+          "version": null
+        },
+        {
+          "name": "MallocExtension_Internal_MarkThreadBusy",
+          "weak": true,
+          "provider": null,
+          "version": null
+        }
+      ],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!lib/arm64-v8a/liblsplant.so",
+      "sha256": "87cd4b71675d1a962d0acbb27ebec9a42010b8497d7e494fca03f4d861b9d1b9",
+      "machine": "EM_AARCH64",
+      "android_note_api": 21,
+      "soname": "liblsplant.so",
+      "needed": [
+        "liblog.so",
+        "libz.so",
+        "libm.so",
+        "libc++_shared.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 105488,
+          "memsz": 105488,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 105488,
+          "vaddr": 121872,
+          "filesz": 1536,
+          "memsz": 5104,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 107024,
+          "vaddr": 139792,
+          "filesz": 40,
+          "memsz": 15012,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 121872,
+          "end": 126976,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!lib/arm64-v8a/libpython3.11.so",
+      "sha256": "bcbf0b2cedc14925bc820ed606033e04cc369c6698a8169fc07185cf1108975e",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 4014096,
+          "memsz": 4014096,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 4014096,
+          "vaddr": 4030480,
+          "filesz": 193704,
+          "memsz": 196592,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 4207800,
+          "vaddr": 4240568,
+          "filesz": 1180248,
+          "memsz": 1452360,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 4030480,
+          "end": 4227072,
+          "end_aligned_16k": true,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!lib/arm64-v8a/libsqlite3_chaquopy.so",
+      "sha256": "1e348dceef9c46754e6be14f2a58e6d34441afb03974b36fa0710f8ee50ebf2d",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": "libsqlite3_chaquopy.so",
+      "needed": [
+        "libm.so",
+        "libsqlite3_python.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 1704,
+          "memsz": 1704,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 1704,
+          "vaddr": 18088,
+          "filesz": 504,
+          "memsz": 2392,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 18088,
+          "end": 20480,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!lib/arm64-v8a/libsqlite3_python.so",
+      "sha256": "6b0f0012ffff95d2420e88fd420d0d65dc4d63d943c1011567978f6203d118dd",
+      "machine": "EM_AARCH64",
+      "android_note_api": 21,
+      "soname": "libsqlite3_python.so",
+      "needed": [
+        "libm.so",
+        "libz.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 861232,
+          "memsz": 861232,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 861232,
+          "vaddr": 877616,
+          "filesz": 8840,
+          "memsz": 11216,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 870072,
+          "vaddr": 902840,
+          "filesz": 14608,
+          "memsz": 16064,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 877616,
+          "end": 888832,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!lib/arm64-v8a/libssl_chaquopy.so",
+      "sha256": "024d7a7696e789443642645df35929994aa8a4a3cb4d46b2fe7415d64f9a2282",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": "libssl_chaquopy.so",
+      "needed": [
+        "libm.so",
+        "libssl_python.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 1688,
+          "memsz": 1688,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 1688,
+          "vaddr": 18072,
+          "filesz": 504,
+          "memsz": 2408,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 18072,
+          "end": 20480,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!lib/arm64-v8a/libssl_python.so",
+      "sha256": "60b083de76e184b19bb830e80f9f6b155f6db87e309018d007db6439db45145e",
+      "machine": "EM_AARCH64",
+      "android_note_api": 21,
+      "soname": "libssl_python.so",
+      "needed": [
+        "libm.so",
+        "libcrypto_python.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 569552,
+          "memsz": 569552,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 569552,
+          "vaddr": 585936,
+          "filesz": 37896,
+          "memsz": 40752,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 607448,
+          "vaddr": 640216,
+          "filesz": 14296,
+          "memsz": 14360,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 585936,
+          "end": 626688,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [
+        {
+          "name": "memfd_create",
+          "weak": true,
+          "provider": null,
+          "version": null
+        }
+      ],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!lib/arm64-v8a/libsurface_util_jni.so",
+      "sha256": "a5c9d1928ea92ec7a94dff8cf666e7739cd734198b9f0ae1d4e28ea3c86516ba",
+      "machine": "EM_AARCH64",
+      "android_note_api": 23,
+      "soname": "libsurface_util_jni.so",
+      "needed": [
+        "libandroid.so",
+        "libm.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 2480,
+          "memsz": 2480,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 2480,
+          "vaddr": 18864,
+          "filesz": 568,
+          "memsz": 1616,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 18864,
+          "end": 20480,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!lib/arm64-v8a/libtmessages.49.so",
+      "sha256": "8561f0a930b8e3ca541f7355acd800671cc51728ac870bd65fbe1cad1c25540e",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": "libtmessages.49.so",
+      "needed": [
+        "libjnigraphics.so",
+        "liblog.so",
+        "libz.so",
+        "libGLESv2.so",
+        "libEGL.so",
+        "libandroid.so",
+        "libOpenSLES.so",
+        "libdl.so",
+        "libm.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 42984160,
+          "memsz": 42984160,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 42984160,
+          "vaddr": 43000544,
+          "filesz": 673648,
+          "memsz": 679200,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 43657808,
+          "vaddr": 43690576,
+          "filesz": 31256,
+          "memsz": 3104350,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 43000544,
+          "end": 43679744,
+          "end_aligned_16k": true,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [
+        {
+          "name": "OPENSSL_memory_alloc",
+          "weak": true,
+          "provider": null,
+          "version": null
+        },
+        {
+          "name": "OPENSSL_memory_free",
+          "weak": true,
+          "provider": null,
+          "version": null
+        },
+        {
+          "name": "OPENSSL_memory_get_size",
+          "weak": true,
+          "provider": null,
+          "version": null
+        },
+        {
+          "name": "getrandom",
+          "weak": true,
+          "provider": null,
+          "version": null
+        },
+        {
+          "name": "__cxa_thread_atexit_impl",
+          "weak": true,
+          "provider": "libc.so",
+          "version": "LIBC"
+        }
+      ],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!lib/arm64-v8a/libvosk.so",
+      "sha256": "06965ebb4e5eb3a9e4a815755e178d9553392e3fe8d3d368ac46952ad3694173",
+      "machine": "EM_AARCH64",
+      "android_note_api": 21,
+      "soname": "libvosk.so",
+      "needed": [
+        "liblog.so",
+        "libm.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 4223292,
+          "memsz": 4223292,
+          "align": 16384,
+          "flags": 4
+        },
+        {
+          "offset": 4223296,
+          "vaddr": 4239680,
+          "filesz": 5657744,
+          "memsz": 5657744,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 9881040,
+          "vaddr": 9913808,
+          "filesz": 156312,
+          "memsz": 158256,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 10037352,
+          "vaddr": 10086504,
+          "filesz": 3176,
+          "memsz": 33896,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 9913808,
+          "end": 10072064,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [
+        {
+          "name": "memfd_create",
+          "weak": true,
+          "provider": null,
+          "version": null
+        }
+      ],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/bootstrap-native/arm64-v8a/_bz2.cpython-311.so",
+      "sha256": "f8cf0aec85135121536aea2981081f3534c973496f3457e092abe3349155977e",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 75904,
+          "memsz": 75904,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 75904,
+          "vaddr": 92288,
+          "filesz": 1128,
+          "memsz": 1920,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 77032,
+          "vaddr": 109800,
+          "filesz": 3896,
+          "memsz": 3896,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 92288,
+          "end": 94208,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/bootstrap-native/arm64-v8a/_ctypes.cpython-311.so",
+      "sha256": "673e90b1be6dc1a96a5175662fe007b13463841959a5d2a1dcc891dbad72c2b1",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libdl.so",
+        "libpython3.11.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 200688,
+          "memsz": 200688,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 200688,
+          "vaddr": 217072,
+          "filesz": 2464,
+          "memsz": 4112,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 203152,
+          "vaddr": 235920,
+          "filesz": 13348,
+          "memsz": 14616,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 217072,
+          "end": 221184,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/bootstrap-native/arm64-v8a/_datetime.cpython-311.so",
+      "sha256": "94739342dc95342b30523f0c3d51c5f3ea719c66b9283d317d6286aafa5e48b6",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 95520,
+          "memsz": 95520,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 95520,
+          "vaddr": 111904,
+          "filesz": 1624,
+          "memsz": 2784,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 97144,
+          "vaddr": 129912,
+          "filesz": 7792,
+          "memsz": 7904,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 111904,
+          "end": 114688,
+          "end_aligned_16k": true,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/bootstrap-native/arm64-v8a/_lzma.cpython-311.so",
+      "sha256": "662946f372e9ffc578973b8d45d5ef3038c01d04aab7ea90eadcb4cfa691fd33",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 237312,
+          "memsz": 237312,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 237312,
+          "vaddr": 253696,
+          "filesz": 2576,
+          "memsz": 4352,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 239888,
+          "vaddr": 272656,
+          "filesz": 1232,
+          "memsz": 1232,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 253696,
+          "end": 258048,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/bootstrap-native/arm64-v8a/_random.cpython-311.so",
+      "sha256": "f9ac07ab294a7786001db5ed68dc9b8be575a78712b4fff71468a0cae0346e76",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 11008,
+          "memsz": 11008,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 11008,
+          "vaddr": 27392,
+          "filesz": 784,
+          "memsz": 1280,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 11792,
+          "vaddr": 44560,
+          "filesz": 456,
+          "memsz": 456,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 27392,
+          "end": 28672,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/bootstrap-native/arm64-v8a/_sha512.cpython-311.so",
+      "sha256": "008f550dec5d96ee4a1d00c041cd7859d95a4d56f39d537cf75a73b89291aee2",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 19488,
+          "memsz": 19488,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 19488,
+          "vaddr": 35872,
+          "filesz": 728,
+          "memsz": 992,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 20216,
+          "vaddr": 52984,
+          "filesz": 976,
+          "memsz": 976,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 35872,
+          "end": 36864,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/bootstrap-native/arm64-v8a/_struct.cpython-311.so",
+      "sha256": "82da00584039d88b3c12bb53586efa6c911453a2089880bad3c27b826cc66399",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 39536,
+          "memsz": 39536,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 39536,
+          "vaddr": 55920,
+          "filesz": 2080,
+          "memsz": 5520,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 41616,
+          "vaddr": 74384,
+          "filesz": 3008,
+          "memsz": 3008,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 55920,
+          "end": 61440,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/bootstrap-native/arm64-v8a/binascii.cpython-311.so",
+      "sha256": "0790c2ae67f90545d99c5054b72914daf98f175f5961c43d7d8eb8f210c77145",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libz.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 21216,
+          "memsz": 21216,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 21216,
+          "vaddr": 37600,
+          "filesz": 960,
+          "memsz": 3360,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 22176,
+          "vaddr": 54944,
+          "filesz": 1000,
+          "memsz": 1000,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 37600,
+          "end": 40960,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/bootstrap-native/arm64-v8a/java/chaquopy.so",
+      "sha256": "6a7f0ed643adf729656685e32f6c941981a03af6590c426af66e86c8d84f9877",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": "chaquopy.so",
+      "needed": [
+        "libpython3.11.so",
+        "libdl.so",
+        "libandroid.so",
+        "libm.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 908544,
+          "memsz": 908544,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 908544,
+          "vaddr": 924928,
+          "filesz": 2368,
+          "memsz": 4864,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 910912,
+          "vaddr": 943680,
+          "filesz": 18352,
+          "memsz": 35336,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 924928,
+          "end": 929792,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/bootstrap-native/arm64-v8a/math.cpython-311.so",
+      "sha256": "ee3d59dc72b8ca885940e9f620c332f226b97558098da21a80b0d6088a4b1bc3",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 55056,
+          "memsz": 55056,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 55056,
+          "vaddr": 71440,
+          "filesz": 1320,
+          "memsz": 2288,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 56376,
+          "vaddr": 89144,
+          "filesz": 2104,
+          "memsz": 2104,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 71440,
+          "end": 73728,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/bootstrap-native/arm64-v8a/mmap.cpython-311.so",
+      "sha256": "7611b0a4709825d809b0756ea2a122e1ee98162b6f8a3c696a1f72a50c099163",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 21856,
+          "memsz": 21856,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 21856,
+          "vaddr": 38240,
+          "filesz": 976,
+          "memsz": 2720,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 22832,
+          "vaddr": 55600,
+          "filesz": 1248,
+          "memsz": 1248,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 38240,
+          "end": 40960,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/bootstrap-native/arm64-v8a/zlib.cpython-311.so",
+      "sha256": "db931d00d398a324ff1b84fce981e9b664a05aee91dc80e0167010ecc2b58cf5",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libz.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 33216,
+          "memsz": 33216,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 33216,
+          "vaddr": 49600,
+          "filesz": 1200,
+          "memsz": 3648,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 34416,
+          "vaddr": 67184,
+          "filesz": 1720,
+          "memsz": 1720,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 49600,
+          "end": 53248,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_asyncio.cpython-311.so",
+      "sha256": "3c5e321e2a921ec650c6032e5801e82dfb7e3f7a05623074b89e098bfdd60ccc",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 53408,
+          "memsz": 53408,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 53408,
+          "vaddr": 69792,
+          "filesz": 1496,
+          "memsz": 3936,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 54904,
+          "vaddr": 87672,
+          "filesz": 5904,
+          "memsz": 6064,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 69792,
+          "end": 73728,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_bisect.cpython-311.so",
+      "sha256": "86039f931776875150d0cd056bab52e30b33f54714ad194f694781387aaf9a23",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 10432,
+          "memsz": 10432,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 10432,
+          "vaddr": 26816,
+          "filesz": 824,
+          "memsz": 1856,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 11256,
+          "vaddr": 44024,
+          "filesz": 552,
+          "memsz": 552,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 26816,
+          "end": 28672,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_blake2.cpython-311.so",
+      "sha256": "29ed2cb9da460c3cb078c2b3225fa236dfb3c1ade4ad07bc4f768e3b8069e2ba",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 34656,
+          "memsz": 34656,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 34656,
+          "vaddr": 51040,
+          "filesz": 1024,
+          "memsz": 2208,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 35680,
+          "vaddr": 68448,
+          "filesz": 1160,
+          "memsz": 1192,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 51040,
+          "end": 53248,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_codecs_cn.cpython-311.so",
+      "sha256": "56bf76db8023355a2418d48f26cbe106986412d69ad1cf2e6771abdb3343e2c9",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 123360,
+          "memsz": 123360,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 123360,
+          "vaddr": 139744,
+          "filesz": 21536,
+          "memsz": 24096,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 144896,
+          "vaddr": 177664,
+          "filesz": 200,
+          "memsz": 200,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 139744,
+          "end": 163840,
+          "end_aligned_16k": true,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_codecs_hk.cpython-311.so",
+      "sha256": "25e04ca66cee04c005a2bf718fac8538c319f184386181c344a18e25196f05fe",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 139904,
+          "memsz": 139904,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 139904,
+          "vaddr": 156288,
+          "filesz": 13144,
+          "memsz": 15744,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 153048,
+          "vaddr": 185816,
+          "filesz": 200,
+          "memsz": 224,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 156288,
+          "end": 172032,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_codecs_iso2022.cpython-311.so",
+      "sha256": "65799fb72c3de477e896ec530f55ae4cd4501cd79fb430c6991189f3ac580dfe",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 17904,
+          "memsz": 17904,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 17904,
+          "vaddr": 34288,
+          "filesz": 2448,
+          "memsz": 2576,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 20352,
+          "vaddr": 53120,
+          "filesz": 200,
+          "memsz": 344,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 34288,
+          "end": 36864,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_codecs_jp.cpython-311.so",
+      "sha256": "2084f9a313e3bc3dabb3dfbad74c66dd99667346e9b284718aa54e2a056c1cdd",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 211424,
+          "memsz": 211424,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 211424,
+          "vaddr": 227808,
+          "filesz": 50600,
+          "memsz": 50720,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 262024,
+          "vaddr": 294792,
+          "filesz": 200,
+          "memsz": 200,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 227808,
+          "end": 278528,
+          "end_aligned_16k": true,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_codecs_kr.cpython-311.so",
+      "sha256": "3aa419a54af92042ee1f4b91533f736d698e42faa0dd7c76d01e38f26ace507d",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 118320,
+          "memsz": 118320,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 118320,
+          "vaddr": 134704,
+          "filesz": 13248,
+          "memsz": 16848,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 131568,
+          "vaddr": 164336,
+          "filesz": 200,
+          "memsz": 200,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 134704,
+          "end": 151552,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_codecs_tw.cpython-311.so",
+      "sha256": "5442a3795f74b31e0daa0e7fbf5f31c231293e146c955fda073200af2a99291c",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 89392,
+          "memsz": 89392,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 89392,
+          "vaddr": 105776,
+          "filesz": 17248,
+          "memsz": 21200,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 106640,
+          "vaddr": 139408,
+          "filesz": 200,
+          "memsz": 200,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 105776,
+          "end": 126976,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_contextvars.cpython-311.so",
+      "sha256": "179a05aaa0a29232711148b542662d57dd74a5b6db637b44e391599102ca94f8",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 2576,
+          "memsz": 2576,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 2576,
+          "vaddr": 18960,
+          "filesz": 520,
+          "memsz": 1520,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 3096,
+          "vaddr": 35864,
+          "filesz": 200,
+          "memsz": 200,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 18960,
+          "end": 20480,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_csv.cpython-311.so",
+      "sha256": "52b7dccebc817e2d21d2885f4fd3a6472003e12beff0931016fb9aead93a9c7a",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 31072,
+          "memsz": 31072,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 31072,
+          "vaddr": 47456,
+          "filesz": 1008,
+          "memsz": 1696,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 32080,
+          "vaddr": 64848,
+          "filesz": 1984,
+          "memsz": 2032,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 47456,
+          "end": 49152,
+          "end_aligned_16k": true,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_decimal.cpython-311.so",
+      "sha256": "ca79a04560e04720d080376d24fbb7819e7c3af1c000673404590154e5e3e119",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 326528,
+          "memsz": 326528,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 326528,
+          "vaddr": 342912,
+          "filesz": 1976,
+          "memsz": 5248,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 328504,
+          "vaddr": 361272,
+          "filesz": 8760,
+          "memsz": 8968,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 342912,
+          "end": 348160,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_elementtree.cpython-311.so",
+      "sha256": "1e2d10729ee186509cb860056545eee110bc190647d3af276a950fccd097f208",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 62688,
+          "memsz": 62688,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 62688,
+          "vaddr": 79072,
+          "filesz": 1648,
+          "memsz": 2848,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 64336,
+          "vaddr": 97104,
+          "filesz": 4168,
+          "memsz": 4176,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 79072,
+          "end": 81920,
+          "end_aligned_16k": true,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_hashlib.cpython-311.so",
+      "sha256": "1bca1abf2bad3ce839dab11260620c283409f4fa6d7d23c75dff6fe5ce6413a9",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libcrypto_python.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 44608,
+          "memsz": 44608,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 44608,
+          "vaddr": 60992,
+          "filesz": 2672,
+          "memsz": 4544,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 47280,
+          "vaddr": 80048,
+          "filesz": 3320,
+          "memsz": 3320,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 60992,
+          "end": 65536,
+          "end_aligned_16k": true,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_heapq.cpython-311.so",
+      "sha256": "86e16c84253e26b3886a5ddafaa7f38b56fc37fb426ca0ef67a0542d11adfbfc",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 15312,
+          "memsz": 15312,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 15312,
+          "vaddr": 31696,
+          "filesz": 576,
+          "memsz": 1072,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 15888,
+          "vaddr": 48656,
+          "filesz": 424,
+          "memsz": 424,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 31696,
+          "end": 32768,
+          "end_aligned_16k": true,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_json.cpython-311.so",
+      "sha256": "5817e162a6b9032eb0709dfcc7d5dec6ad614db9a27bbfffeed5ae7c481eb57b",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 33536,
+          "memsz": 33536,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 33536,
+          "vaddr": 49920,
+          "filesz": 1024,
+          "memsz": 3328,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 34560,
+          "vaddr": 67328,
+          "filesz": 1544,
+          "memsz": 1544,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 49920,
+          "end": 53248,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_lsprof.cpython-311.so",
+      "sha256": "1dd157fc17954e94a75da5460df56008acdba97435a901d17662ce2c77182317",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 15168,
+          "memsz": 15168,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 15168,
+          "vaddr": 31552,
+          "filesz": 800,
+          "memsz": 1216,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 15968,
+          "vaddr": 48736,
+          "filesz": 764,
+          "memsz": 804,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 31552,
+          "end": 32768,
+          "end_aligned_16k": true,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_md5.cpython-311.so",
+      "sha256": "7ecb7407870389508a2e88713fa550525c7f7cc6106fefff23eb82ed51f961e4",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 10992,
+          "memsz": 10992,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 10992,
+          "vaddr": 27376,
+          "filesz": 704,
+          "memsz": 1296,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 11696,
+          "vaddr": 44464,
+          "filesz": 696,
+          "memsz": 696,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 27376,
+          "end": 28672,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_multibytecodec.cpython-311.so",
+      "sha256": "c503fbed773d3d70eb7c44c944c22292f0ec3fe2abec83f4d21fcb34c051f44c",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 33360,
+          "memsz": 33360,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 33360,
+          "vaddr": 49744,
+          "filesz": 1272,
+          "memsz": 3504,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 34632,
+          "vaddr": 67400,
+          "filesz": 2352,
+          "memsz": 2352,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 49744,
+          "end": 53248,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_multiprocessing.cpython-311.so",
+      "sha256": "89295c12e59021063e0e13af0f0fe4c491a88224f49fdc4b1c987687672bf4ed",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 12672,
+          "memsz": 12672,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 12672,
+          "vaddr": 29056,
+          "filesz": 920,
+          "memsz": 3712,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 13592,
+          "vaddr": 46360,
+          "filesz": 1224,
+          "memsz": 1256,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 29056,
+          "end": 32768,
+          "end_aligned_16k": true,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_opcode.cpython-311.so",
+      "sha256": "2015ef14daabbbdd6fa2a1ea14b8f3461f0a5699950f2c3e02be7cbe4588a290",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 4064,
+          "memsz": 4064,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 4064,
+          "vaddr": 20448,
+          "filesz": 600,
+          "memsz": 4128,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 4664,
+          "vaddr": 37432,
+          "filesz": 264,
+          "memsz": 264,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 20448,
+          "end": 24576,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_pickle.cpython-311.so",
+      "sha256": "8a1a7df22a12ba2cacc0d52391e459c0169aa05670c849eeadab1107451a5475",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 110448,
+          "memsz": 110448,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 110448,
+          "vaddr": 126832,
+          "filesz": 2096,
+          "memsz": 4240,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 112544,
+          "vaddr": 145312,
+          "filesz": 3600,
+          "memsz": 3600,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 126832,
+          "end": 131072,
+          "end_aligned_16k": true,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_posixsubprocess.cpython-311.so",
+      "sha256": "bd85ae0bd7e64a3ffa1be63d8b86e7f2a07abf1bd7c54a4f6d27bc2bbc3212d2",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 14400,
+          "memsz": 14400,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 14400,
+          "vaddr": 30784,
+          "filesz": 1016,
+          "memsz": 1984,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 15416,
+          "vaddr": 48184,
+          "filesz": 168,
+          "memsz": 184,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 30784,
+          "end": 32768,
+          "end_aligned_16k": true,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_queue.cpython-311.so",
+      "sha256": "d47034befb53ca076654ed16a7f8c4f1c2d8f589807643a7665e0eb9a975ea09",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 11488,
+          "memsz": 11488,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 11488,
+          "vaddr": 27872,
+          "filesz": 848,
+          "memsz": 4896,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 12336,
+          "vaddr": 45104,
+          "filesz": 824,
+          "memsz": 824,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 27872,
+          "end": 32768,
+          "end_aligned_16k": true,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_sha1.cpython-311.so",
+      "sha256": "884b442390410434b19f035843a3df6fdf40bd4638b9ca13002823b52ff04c93",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 11808,
+          "memsz": 11808,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 11808,
+          "vaddr": 28192,
+          "filesz": 704,
+          "memsz": 4576,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 12512,
+          "vaddr": 45280,
+          "filesz": 696,
+          "memsz": 696,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 28192,
+          "end": 32768,
+          "end_aligned_16k": true,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_sha256.cpython-311.so",
+      "sha256": "b87f1d67e4d931b2b3bc5f45c9132d6f7fa3f0374e08c3aa9f1ee79cd35fbb16",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 16384,
+          "memsz": 16384,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 16384,
+          "vaddr": 16384,
+          "filesz": 728,
+          "memsz": 4096,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 17112,
+          "vaddr": 33496,
+          "filesz": 880,
+          "memsz": 880,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 16384,
+          "end": 20480,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_sha3.cpython-311.so",
+      "sha256": "1a559e1e7947c0f17e6d553e68ed956a5bda19cf2bfeebcef038f37b27c0d033",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 15312,
+          "memsz": 15312,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 15312,
+          "vaddr": 31696,
+          "filesz": 784,
+          "memsz": 1072,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 16096,
+          "vaddr": 48864,
+          "filesz": 1848,
+          "memsz": 1848,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 31696,
+          "end": 32768,
+          "end_aligned_16k": true,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_socket.cpython-311.so",
+      "sha256": "597fa5089a3b77a91cc19c241ccd3e3fc6ea7a6589478c40a14000a04bb036ff",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 87824,
+          "memsz": 87824,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 87824,
+          "vaddr": 104208,
+          "filesz": 1624,
+          "memsz": 2288,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 89448,
+          "vaddr": 122216,
+          "filesz": 2864,
+          "memsz": 2880,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 104208,
+          "end": 106496,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_sqlite3.cpython-311.so",
+      "sha256": "6328f2e5bdd5a6542effb3da42da5380dd97c6550ef7184397cefc41c91db814",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libsqlite3_python.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 101504,
+          "memsz": 101504,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 101504,
+          "vaddr": 117888,
+          "filesz": 4448,
+          "memsz": 4992,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 105952,
+          "vaddr": 138720,
+          "filesz": 4928,
+          "memsz": 4928,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 117888,
+          "end": 122880,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_ssl.cpython-311.so",
+      "sha256": "b8233d9043297ff4eb9a750ded36da67c5a1cbe4d3abd26b179d0d9c43d5ff22",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libssl_python.so",
+        "libcrypto_python.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 180784,
+          "memsz": 180784,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 180784,
+          "vaddr": 197168,
+          "filesz": 31200,
+          "memsz": 32208,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 211984,
+          "vaddr": 244752,
+          "filesz": 4192,
+          "memsz": 4200,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 197168,
+          "end": 229376,
+          "end_aligned_16k": true,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_statistics.cpython-311.so",
+      "sha256": "9de6457f606d657bca5e8e75660ce5c0adcee40113f2905f4130b680f6c1edc9",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 4192,
+          "memsz": 4192,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 4192,
+          "vaddr": 20576,
+          "filesz": 544,
+          "memsz": 4000,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 4736,
+          "vaddr": 37504,
+          "filesz": 168,
+          "memsz": 184,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 20576,
+          "end": 24576,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_typing.cpython-311.so",
+      "sha256": "176863cd53d9ddf6ecf3468e9b64ef7f443b8e465aefdda43a8233ba508b7ac7",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 2032,
+          "memsz": 2032,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 2032,
+          "vaddr": 18416,
+          "filesz": 480,
+          "memsz": 2064,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 2512,
+          "vaddr": 35280,
+          "filesz": 168,
+          "memsz": 184,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 18416,
+          "end": 20480,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_xxsubinterpreters.cpython-311.so",
+      "sha256": "ba3d516152f1d22240c53d00c95702dd228b1a36734f062e56602750caf23942",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 29456,
+          "memsz": 29456,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 29456,
+          "vaddr": 45840,
+          "filesz": 1112,
+          "memsz": 3312,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 30568,
+          "vaddr": 63336,
+          "filesz": 1856,
+          "memsz": 1936,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 45840,
+          "end": 49152,
+          "end_aligned_16k": true,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_xxtestfuzz.cpython-311.so",
+      "sha256": "12b9c98d98de80e343b996a838f55a2cbf3a38cfa1d3846b070bda9d84831374",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 9872,
+          "memsz": 9872,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 9872,
+          "vaddr": 26256,
+          "filesz": 824,
+          "memsz": 2416,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 10696,
+          "vaddr": 43464,
+          "filesz": 168,
+          "memsz": 269,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 26256,
+          "end": 28672,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!_zoneinfo.cpython-311.so",
+      "sha256": "026c2bbdaeda60fe3cceb8c1979503b951b197e31a076574ffb900c872e9a671",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 26112,
+          "memsz": 26112,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 26112,
+          "vaddr": 42496,
+          "filesz": 896,
+          "memsz": 2560,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 27008,
+          "vaddr": 59776,
+          "filesz": 1048,
+          "memsz": 1168,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 42496,
+          "end": 45056,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!array.cpython-311.so",
+      "sha256": "94df5ea3662421ea0984fd29c97f62ace7b0ba9937f7d573d0d51dbc1afa08fc",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 49792,
+          "memsz": 49792,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 49792,
+          "vaddr": 66176,
+          "filesz": 2008,
+          "memsz": 3456,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 51800,
+          "vaddr": 84568,
+          "filesz": 2080,
+          "memsz": 2088,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 66176,
+          "end": 69632,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!audioop.cpython-311.so",
+      "sha256": "b5ae5752b294280c03f8fe06e506c2a25ea2a98907c9caf3abd3e8717d4aafc3",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 38560,
+          "memsz": 38560,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 38560,
+          "vaddr": 54944,
+          "filesz": 792,
+          "memsz": 2400,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 39352,
+          "vaddr": 72120,
+          "filesz": 1000,
+          "memsz": 1000,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 54944,
+          "end": 57344,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!cmath.cpython-311.so",
+      "sha256": "491d77bb6199e295cdf67f234381c01380da4bc011d69f00e6ea7b58c757e8d6",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 28528,
+          "memsz": 28528,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 28528,
+          "vaddr": 44912,
+          "filesz": 808,
+          "memsz": 4240,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 29336,
+          "vaddr": 62104,
+          "filesz": 968,
+          "memsz": 9592,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 44912,
+          "end": 49152,
+          "end_aligned_16k": true,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!fcntl.cpython-311.so",
+      "sha256": "28e1435fec4c06357cb1f1c851de970d1b3bb070c9c8d86462d6aaf830d3e86a",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 12960,
+          "memsz": 12960,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 12960,
+          "vaddr": 29344,
+          "filesz": 696,
+          "memsz": 3424,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 13656,
+          "vaddr": 46424,
+          "filesz": 296,
+          "memsz": 296,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 29344,
+          "end": 32768,
+          "end_aligned_16k": true,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!ossaudiodev.cpython-311.so",
+      "sha256": "b68104138c8c82d3e69136cda45c69bee68824bf8fdb77fb11a09c53020f16e5",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 24704,
+          "memsz": 24704,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 24704,
+          "vaddr": 41088,
+          "filesz": 816,
+          "memsz": 3968,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 25520,
+          "vaddr": 58288,
+          "filesz": 2320,
+          "memsz": 2328,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 41088,
+          "end": 45056,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!pyexpat.cpython-311.so",
+      "sha256": "a734056b279c87b092f7a26609b613d47a0e01f2d1f47e7366ef2b9fa374bf8a",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 212288,
+          "memsz": 212288,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 212288,
+          "vaddr": 228672,
+          "filesz": 9040,
+          "memsz": 12992,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 221328,
+          "vaddr": 254096,
+          "filesz": 5824,
+          "memsz": 6264,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 228672,
+          "end": 241664,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!resource.cpython-311.so",
+      "sha256": "2384aefae34831b96d697c255e812c82a8b0e291b77d6403144bff783e02b56d",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 10880,
+          "memsz": 10880,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 10880,
+          "vaddr": 27264,
+          "filesz": 712,
+          "memsz": 1408,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 11592,
+          "vaddr": 44360,
+          "filesz": 632,
+          "memsz": 632,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 27264,
+          "end": 28672,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!select.cpython-311.so",
+      "sha256": "deda4d07abc543e6042fac860eda69a70dee19cff292b1e1722c25cd287bc40a",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 25024,
+          "memsz": 25024,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 25024,
+          "vaddr": 41408,
+          "filesz": 1136,
+          "memsz": 3648,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 26160,
+          "vaddr": 58928,
+          "filesz": 1336,
+          "memsz": 1336,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 41408,
+          "end": 45056,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!syslog.cpython-311.so",
+      "sha256": "61cf4dadd53c02fb26ec478200b4e6b74d238e45d9c0ee6886ade5ba1e2f22fd",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 7200,
+          "memsz": 7200,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 7200,
+          "vaddr": 23584,
+          "filesz": 648,
+          "memsz": 992,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 7848,
+          "vaddr": 40616,
+          "filesz": 392,
+          "memsz": 408,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 23584,
+          "end": 24576,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!termios.cpython-311.so",
+      "sha256": "6e69e32e0b0cbe29bb2e3e7354a472818d6cc3d5e6015049a2870143eaceeea1",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 21072,
+          "memsz": 21072,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 21072,
+          "vaddr": 37456,
+          "filesz": 4424,
+          "memsz": 7600,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 25496,
+          "vaddr": 58264,
+          "filesz": 424,
+          "memsz": 424,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 37456,
+          "end": 45056,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!unicodedata.cpython-311.so",
+      "sha256": "bd4236154796626f167a53ed631c72aa12258a7bcc2112b2849a83647fc0d383",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 1122992,
+          "memsz": 1122992,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 1122992,
+          "vaddr": 1139376,
+          "filesz": 1664,
+          "memsz": 3408,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 1124656,
+          "vaddr": 1157424,
+          "filesz": 1304,
+          "memsz": 1304,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 1139376,
+          "end": 1142784,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!xxlimited.cpython-311.so",
+      "sha256": "2962fe87d36a096725fd61d1e26a6d5b9d50b02e7b7e8492d39e4ae84708ee16",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 7536,
+          "memsz": 7536,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 7536,
+          "vaddr": 23920,
+          "filesz": 704,
+          "memsz": 4752,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 8240,
+          "vaddr": 41008,
+          "filesz": 632,
+          "memsz": 648,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 23920,
+          "end": 28672,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/stdlib-arm64-v8a.imy!xxlimited_35.cpython-311.so",
+      "sha256": "551e041026a4bf2cd2d4d661847e14bb207facbd3c7635a0e04cbfae4fafcdfc",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 6592,
+          "memsz": 6592,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 6592,
+          "vaddr": 22976,
+          "filesz": 664,
+          "memsz": 1600,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 7256,
+          "vaddr": 40024,
+          "filesz": 648,
+          "memsz": 664,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 22976,
+          "end": 24576,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/requirements-common.imy!PIL/_imaging.so",
+      "sha256": "2e2cc6d52aa6e4ed50818acca2a71d2e2fc3df057d65aa67512a293f8add79d1",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libjpeg_chaquopy.so",
+        "libz.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 454336,
+          "memsz": 454336,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 454336,
+          "vaddr": 470720,
+          "filesz": 16016,
+          "memsz": 16704,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 470352,
+          "vaddr": 503120,
+          "filesz": 10544,
+          "memsz": 11604,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 470720,
+          "end": 487424,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/requirements-common.imy!PIL/_imagingft.so",
+      "sha256": "245b82d8bd927debcaff6f21cca2786e3cd1f0c5893051e6049248b0fe08f96f",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libfreetype.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 24624,
+          "memsz": 24624,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 24624,
+          "vaddr": 41008,
+          "filesz": 1088,
+          "memsz": 4048,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 25712,
+          "vaddr": 58480,
+          "filesz": 2752,
+          "memsz": 2760,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 41008,
+          "end": 45056,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/requirements-common.imy!PIL/_imagingmath.so",
+      "sha256": "e1d3e17ede0101602c9767820f76a64f0c0535bf0adc5df1820871a4cc8a45b2",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 19632,
+          "memsz": 19632,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 19632,
+          "vaddr": 36016,
+          "filesz": 920,
+          "memsz": 4944,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 20552,
+          "vaddr": 53320,
+          "filesz": 200,
+          "memsz": 200,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 36016,
+          "end": 40960,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/requirements-common.imy!PIL/_imagingmorph.so",
+      "sha256": "f131fa4fad9ccd4b4753c85224bca57719f77abedfcf7f67e3489c54180e4b1e",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 5008,
+          "memsz": 5008,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 5008,
+          "vaddr": 21392,
+          "filesz": 576,
+          "memsz": 3184,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 5584,
+          "vaddr": 38352,
+          "filesz": 232,
+          "memsz": 232,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 21392,
+          "end": 24576,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/requirements-common.imy!PIL/_imagingtk.so",
+      "sha256": "d3d62e825f87fe46e71111658db219e10da82cc9ad114f41b8eb12596b924156",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 7328,
+          "memsz": 7328,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 7328,
+          "vaddr": 23712,
+          "filesz": 680,
+          "memsz": 864,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 8008,
+          "vaddr": 40776,
+          "filesz": 168,
+          "memsz": 208,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 23712,
+          "end": 24576,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/requirements-common.imy!chaquopy/lib/libexslt.so",
+      "sha256": "f8e9e0fc0fa7507f3391bacb5c08a16dc9fdab73ca23de48f8adb2dfcca7a194",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": "libexslt.so",
+      "needed": [
+        "libxslt.so",
+        "libm.so",
+        "libxml2.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 77208,
+          "memsz": 77208,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 80112,
+          "vaddr": 96496,
+          "filesz": 1816,
+          "memsz": 1816,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 96496,
+          "end": 98304,
+          "end_aligned_16k": true,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/requirements-common.imy!chaquopy/lib/libfreetype.so",
+      "sha256": "d086a897a1c1cfa517b9e46c28d762f817af41bde96b2eda3bf6e6b12220eb01",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": "libfreetype.so",
+      "needed": [
+        "libm.so",
+        "libz.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 678864,
+          "memsz": 678864,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 678864,
+          "vaddr": 695248,
+          "filesz": 24224,
+          "memsz": 25648,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 695248,
+          "end": 720896,
+          "end_aligned_16k": true,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/requirements-common.imy!chaquopy/lib/libjpeg_chaquopy.so",
+      "sha256": "d2f3b50ac7f4a7019de5b0a7394e2f7f1fe7335f56c285f9550e64333597b193",
+      "machine": "EM_AARCH64",
+      "android_note_api": 21,
+      "soname": "libjpeg_chaquopy.so",
+      "needed": [
+        "libm.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 478144,
+          "memsz": 478144,
+          "align": 65536,
+          "flags": 5
+        },
+        {
+          "offset": 479232,
+          "vaddr": 544768,
+          "filesz": 2488,
+          "memsz": 2488,
+          "align": 65536,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/requirements-common.imy!chaquopy/lib/libxml2.so",
+      "sha256": "e282a655ebbe07443cd743bb9dd00a152bfed7edb091d862f0a4e74afc1eff04",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": "libxml2.so",
+      "needed": [
+        "libz.so",
+        "libm.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 1530624,
+          "memsz": 1530624,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 1539960,
+          "vaddr": 1556344,
+          "filesz": 35236,
+          "memsz": 40176,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 1556344,
+          "end": 1589248,
+          "end_aligned_16k": true,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/requirements-common.imy!chaquopy/lib/libxslt.so",
+      "sha256": "827d113f3045205b205b52d0e4fe2e59998bd3b471368314415a2c3e91571660",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": "libxslt.so",
+      "needed": [
+        "libm.so",
+        "libxml2.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 244896,
+          "memsz": 244896,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 258048,
+          "vaddr": 258048,
+          "filesz": 4168,
+          "memsz": 5344,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 258048,
+          "end": 262144,
+          "end_aligned_16k": true,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/requirements-common.imy!chaquopy/lib/libyaml-0.so",
+      "sha256": "408d052e0bbf658ab3f9c45d70c371767e42045e09d379cb02555e07e5860871",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": "libyaml-0.so",
+      "needed": [
+        "libm.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 190352,
+          "memsz": 190352,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 190352,
+          "vaddr": 206736,
+          "filesz": 840,
+          "memsz": 2160,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 206736,
+          "end": 208896,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/requirements-common.imy!debugpy/_vendored/pydevd/pydevd_attach_to_process/attach_linux_amd64.so",
+      "sha256": "8fafec366c6a3b38d3429c7a9ad9957fd029f170eac9fd37bdecbbbebb3e9441",
+      "machine": "EM_X86_64",
+      "android_note_api": null,
+      "soname": null,
+      "needed": [
+        "libstdc++.so.6",
+        "libm.so.6",
+        "libgcc_s.so.1",
+        "libc.so.6"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 2520,
+          "memsz": 2520,
+          "align": 4096,
+          "flags": 4
+        },
+        {
+          "offset": 4096,
+          "vaddr": 4096,
+          "filesz": 5610,
+          "memsz": 5610,
+          "align": 4096,
+          "flags": 5
+        },
+        {
+          "offset": 12288,
+          "vaddr": 12288,
+          "filesz": 2596,
+          "memsz": 2596,
+          "align": 4096,
+          "flags": 4
+        },
+        {
+          "offset": 15872,
+          "vaddr": 19968,
+          "filesz": 624,
+          "memsz": 712,
+          "align": 4096,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": false,
+      "relro": [
+        {
+          "start": 19968,
+          "end": 20480,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": [
+            ".got.plt",
+            ".data",
+            ".bss"
+          ]
+        }
+      ],
+      "api24_audit": "not_android_arm64"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/requirements-common.imy!lxml/_elementpath.so",
+      "sha256": "8bc100c71b6811c1abef234ca9f14426fc1fbfc42e2ef57d7ebd015e72142c7d",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 152624,
+          "memsz": 152624,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 152624,
+          "vaddr": 169008,
+          "filesz": 1688,
+          "memsz": 3024,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 154312,
+          "vaddr": 187080,
+          "filesz": 9224,
+          "memsz": 12392,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 169008,
+          "end": 172032,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/requirements-common.imy!lxml/builder.so",
+      "sha256": "a081a40b39e1382edcce56481a4cec64d46b88f2da849f1fdad0e592564a9e52",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 84048,
+          "memsz": 84048,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 84048,
+          "vaddr": 100432,
+          "filesz": 1600,
+          "memsz": 1968,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 85648,
+          "vaddr": 118416,
+          "filesz": 2808,
+          "memsz": 4088,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 100432,
+          "end": 102400,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/requirements-common.imy!lxml/etree.so",
+      "sha256": "c7a50dfbd152555af2315b4aeb90b0536572e968c5ade31e4e9206ee63db3d84",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libxslt.so",
+        "libexslt.so",
+        "libxml2.so",
+        "libz.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 1741392,
+          "memsz": 1741392,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 1741392,
+          "vaddr": 1757776,
+          "filesz": 5248,
+          "memsz": 7600,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 1746640,
+          "vaddr": 1779408,
+          "filesz": 97768,
+          "memsz": 128088,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 1757776,
+          "end": 1765376,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/requirements-common.imy!lxml/objectify.so",
+      "sha256": "495faea379dfa1cd5ff6168e02307ccb05081366233deee635736f4b3f0592cf",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libxslt.so",
+        "libexslt.so",
+        "libxml2.so",
+        "libz.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 331152,
+          "memsz": 331152,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 331152,
+          "vaddr": 347536,
+          "filesz": 2304,
+          "memsz": 4720,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 333456,
+          "vaddr": 366224,
+          "filesz": 13288,
+          "memsz": 18960,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 347536,
+          "end": 352256,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/requirements-common.imy!lxml/sax.so",
+      "sha256": "4e71d8fa68ac49fd1cfe6c5de71e921714ee1465ccee57e48d17887e18fb2e96",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 136064,
+          "memsz": 136064,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 136064,
+          "vaddr": 152448,
+          "filesz": 1648,
+          "memsz": 3200,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 137712,
+          "vaddr": 170480,
+          "filesz": 2648,
+          "memsz": 4912,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 152448,
+          "end": 155648,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/requirements-common.imy!lxml/html/diff.so",
+      "sha256": "3c47bd6c6bcf75e9dd1c23b0c22efbd688171127318e3f275998b17925eb972f",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 277712,
+          "memsz": 277712,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 277712,
+          "vaddr": 294096,
+          "filesz": 1848,
+          "memsz": 4912,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 279560,
+          "vaddr": 312328,
+          "filesz": 5032,
+          "memsz": 10928,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 294096,
+          "end": 299008,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    },
+    {
+      "path": "flexygram-v13.0.2(1261)-diagnostic-debug.apk!assets/chaquopy/requirements-common.imy!yaml/_yaml.so",
+      "sha256": "f2dd4390a06a7628665daf28d3e81ffc654a4ba8cce2bf96ed6b808e80532385",
+      "machine": "EM_AARCH64",
+      "android_note_api": 24,
+      "soname": null,
+      "needed": [
+        "libm.so",
+        "libpython3.11.so",
+        "libyaml-0.so",
+        "libdl.so",
+        "libc.so"
+      ],
+      "load_segments": [
+        {
+          "offset": 0,
+          "vaddr": 0,
+          "filesz": 271936,
+          "memsz": 271936,
+          "align": 16384,
+          "flags": 5
+        },
+        {
+          "offset": 271936,
+          "vaddr": 288320,
+          "filesz": 2280,
+          "memsz": 2496,
+          "align": 16384,
+          "flags": 6
+        },
+        {
+          "offset": 274216,
+          "vaddr": 306984,
+          "filesz": 4752,
+          "memsz": 9424,
+          "align": 16384,
+          "flags": 6
+        }
+      ],
+      "load_4k": true,
+      "load_16k": true,
+      "relro": [
+        {
+          "start": 288320,
+          "end": 290816,
+          "end_aligned_16k": false,
+          "writable_sections_in_roundup": []
+        }
+      ],
+      "missing_needed_api24": [],
+      "strong_outside_needed_closure": [],
+      "strong_unresolved_api24": [],
+      "version_provider_mismatches_api24": [],
+      "weak_imports": [],
+      "api24_audit": "static_only"
+    }
+  ],
+  "summary": {
+    "elf_total": 97,
+    "android_arm64": 96,
+    "arm64_4k_pass": 96,
+    "arm64_16k_pass": 96,
+    "other_machine": 1,
+    "missing_needed": 0,
+    "strong_unresolved": 0,
+    "version_mismatch": 0
+  },
+  "limits": [
+    "Read-only ELF/version/provider audit, not a linker or Android execution.",
+    "Resolution outside DT_NEEDED closure is reported, never assumed safe; Chaquopy global Python symbols require runtime validation.",
+    "Weak symbols, dlopen/dlsym, namespaces, Java/JNI registration and execution paths require lab tests.",
+    "RELRO end misalignment alone is an advisory; writable overlap and PT_LOAD are reported separately.",
+    "AArch64 objects inside this Android APK are the target set; other-machine payloads remain visible, not silently dropped."
+  ]
+}

@@ -1,0 +1,1 @@
+{"apk_sha256": "17c32ab39e3ac88213241a6bd643637469a4a4d47311a920b357a2e7b3128230", "variant_policy": {"java_jni_scope": "0f92362819e8a4973909188235d68012a364c974d8e430ce61370e88da8ed181:diagnostic", "all_capabilities_disabled": true, "native_policy_export_verified": true, "compiled_data_resources_diagnostic": true}, "installed": false, "distributed": false}

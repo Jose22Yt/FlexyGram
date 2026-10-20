@@ -1,0 +1,11 @@
+{
+  "host": "x86_64",
+  "kvm": false,
+  "emulator_binary": false,
+  "system_images": null,
+  "qemu_aarch64": null,
+  "adb_exit": 0,
+  "adb_output": "List of devices attached\n\n",
+  "android_tests_executed": false,
+  "apk_installed": false
+}

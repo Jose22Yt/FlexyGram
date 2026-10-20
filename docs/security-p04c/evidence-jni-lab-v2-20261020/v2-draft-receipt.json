@@ -1,0 +1,15 @@
+{
+  "filename": "FlexyGram-Lab-v2-29188186-Draft.json",
+  "sha256": "a4158e5e665deaaf91d8cad2e05d28715f2ef8465c3c2d635103c3220d280efe",
+  "bytes": 5516,
+  "mode": "0o600",
+  "saved_privately": true,
+  "source_unsigned_apk_sha256": "291881863ea81418fa6cb12104b6eaea4aee2403822894da2143a51f3030bdd5",
+  "status": "BLOCKED_UNSIGNED_V2_DRAFT_NOT_LAB_CONTRACT",
+  "runtime_contract_activated": false,
+  "certificate_sha256": null,
+  "signed_apk_sha256": null,
+  "signed_runner_sha256": null,
+  "apk_signing_authorized": false,
+  "signing_custody_verified": false
+}

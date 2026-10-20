@@ -1,0 +1,62 @@
+[
+  {
+    "pr": 17,
+    "head": "ee73f72c44734772fb3f9a67cd0ddd2a4b00f220",
+    "base": "develop",
+    "base_sha": "ab063041804674861e865364206c0ef27ef1e953",
+    "state": "open",
+    "draft": true,
+    "merged": false,
+    "branch": "security/paso-3-p04c-completion-review"
+  },
+  {
+    "pr": 16,
+    "head": "fe3b8973b44a74fcbba3aedc92a514f3b1462e80",
+    "base": "develop",
+    "base_sha": "ab063041804674861e865364206c0ef27ef1e953",
+    "state": "open",
+    "draft": true,
+    "merged": false,
+    "branch": "feature/flexygram-identity-resources"
+  },
+  {
+    "pr": 18,
+    "head": "44f9826e2d5d74634a85374962da07b068f39efa",
+    "base": "develop",
+    "base_sha": "ab063041804674861e865364206c0ef27ef1e953",
+    "state": "open",
+    "draft": true,
+    "merged": false,
+    "branch": "feature/flexygram-brand-resources"
+  },
+  {
+    "pr": 19,
+    "head": "103e9e6b1fada37254ce788d0cb2c19e65891c36",
+    "base": "develop",
+    "base_sha": "ab063041804674861e865364206c0ef27ef1e953",
+    "state": "open",
+    "draft": true,
+    "merged": false,
+    "branch": "audit/flexygram-chat-navigation-performance"
+  },
+  {
+    "pr": 20,
+    "head": "9efbcbb710a31280b2c20e7d1733ff21ec083cb4",
+    "base": "develop",
+    "base_sha": "ab063041804674861e865364206c0ef27ef1e953",
+    "state": "open",
+    "draft": true,
+    "merged": false,
+    "branch": "test/flexygram-android-lab-preflight"
+  },
+  {
+    "pr": 21,
+    "head": "88f988ee844248a4513281cfe7818777fbda660e",
+    "base": "develop",
+    "base_sha": "ab063041804674861e865364206c0ef27ef1e953",
+    "state": "open",
+    "draft": true,
+    "merged": false,
+    "branch": "test/flexygram-android-lab-evidence"
+  }
+]

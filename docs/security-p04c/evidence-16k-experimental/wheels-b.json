@@ -1,0 +1,153 @@
+{
+  "schema": 1,
+  "experimental_only": true,
+  "abi": "arm64-v8a",
+  "wheels": [
+    {
+      "filename": "beautifulsoup4-4.15.0-py3-none-any.whl",
+      "sha256": "d6f88de62e1d4e38ecb1077eb9724cd0eff29d2a08ca16a401e9b9e93f117cf9",
+      "original_filename": "beautifulsoup4-4.15.0-py3-none-any.whl",
+      "original_sha256": "d6f88de62e1d4e38ecb1077eb9724cd0eff29d2a08ca16a401e9b9e93f117cf9",
+      "original_url": "https://files.pythonhosted.org/packages/88/c6/92fcd42f1ba33e1184263f25bfabf3d27c383410470f169e4b8163bf9c17/beautifulsoup4-4.15.0-py3-none-any.whl",
+      "rebuilt": false
+    },
+    {
+      "filename": "certifi-2026.10.18-py3-none-any.whl",
+      "sha256": "73191c47aaa79da394e8fee2dbc2ec827432cab56311122c9e47abf79e390f62",
+      "original_filename": "certifi-2026.10.18-py3-none-any.whl",
+      "original_sha256": "73191c47aaa79da394e8fee2dbc2ec827432cab56311122c9e47abf79e390f62",
+      "original_url": "https://files.pythonhosted.org/packages/08/ba/95dd616042484f7c83a06974388b37b837732740ee70bc5dc715b5fcd55a/certifi-2026.10.18-py3-none-any.whl",
+      "rebuilt": false
+    },
+    {
+      "filename": "chaquopy_freetype-2.9.1-3flexygram16k-py3-none-android_24_arm64_v8a.whl",
+      "sha256": "f4308f6ad71eefca3cd9def87ee8c2673499b6dd10810daa23c1a22e805fc937",
+      "original_filename": "chaquopy_freetype-2.9.1-2-py3-none-android_21_arm64_v8a.whl",
+      "original_sha256": "7a8262dc69d1bbf7209b3b7576744743670bd5a8cba48c7d8f08c151943ccbc7",
+      "original_url": "https://chaquo.com/pypi-13.1/chaquopy-freetype/chaquopy_freetype-2.9.1-2-py3-none-android_21_arm64_v8a.whl",
+      "rebuilt": true
+    },
+    {
+      "filename": "chaquopy_libjpeg-1.5.3-1-py3-none-android_21_arm64_v8a.whl",
+      "sha256": "5555be57a2633fb5a3c0c810e89c8b705c471e3dabd95aa596fc7fdd48322728",
+      "original_filename": "chaquopy_libjpeg-1.5.3-1-py3-none-android_21_arm64_v8a.whl",
+      "original_sha256": "5555be57a2633fb5a3c0c810e89c8b705c471e3dabd95aa596fc7fdd48322728",
+      "original_url": "https://chaquo.com/pypi-13.1/chaquopy-libjpeg/chaquopy_libjpeg-1.5.3-1-py3-none-android_21_arm64_v8a.whl",
+      "rebuilt": false
+    },
+    {
+      "filename": "chaquopy_libxml2-2.9.8-3flexygram16k-py3-none-android_24_arm64_v8a.whl",
+      "sha256": "2b47fe307311e932c4502ad9eec108f070eec6f36c03d4d97a2d22222387badb",
+      "original_filename": "chaquopy_libxml2-2.9.8-2-py3-none-android_21_arm64_v8a.whl",
+      "original_sha256": "f8a7adf4f565e4cec6add811a9886be2191e8214913987dce24a3bb522dcb4e3",
+      "original_url": "https://chaquo.com/pypi-13.1/chaquopy-libxml2/chaquopy_libxml2-2.9.8-2-py3-none-android_21_arm64_v8a.whl",
+      "rebuilt": true
+    },
+    {
+      "filename": "chaquopy_libxslt-1.1.32-3flexygram16k-py3-none-android_24_arm64_v8a.whl",
+      "sha256": "f8d9b05b17dfbc498c9edf22d24b65c37f9c3ad92a10a49e61b267130548d70f",
+      "original_filename": "chaquopy_libxslt-1.1.32-2-py3-none-android_21_arm64_v8a.whl",
+      "original_sha256": "0526c414fc0af6f02b9e922042c79e3aa0e3c28fe093de3a38d834755ffc2a27",
+      "original_url": "https://chaquo.com/pypi-13.1/chaquopy-libxslt/chaquopy_libxslt-1.1.32-2-py3-none-android_21_arm64_v8a.whl",
+      "rebuilt": true
+    },
+    {
+      "filename": "chaquopy_libyaml-0.2.5-0-py3-none-android_24_arm64_v8a.whl",
+      "sha256": "77f594d82adf2a1baf5f8340324ef06b7f54b1b0725b7d9b4ce8367e270ad5a2",
+      "original_filename": "chaquopy_libyaml-0.2.5-0-py3-none-android_24_arm64_v8a.whl",
+      "original_sha256": "77f594d82adf2a1baf5f8340324ef06b7f54b1b0725b7d9b4ce8367e270ad5a2",
+      "original_url": "https://chaquo.com/pypi-13.1/chaquopy-libyaml/chaquopy_libyaml-0.2.5-0-py3-none-android_24_arm64_v8a.whl",
+      "rebuilt": false
+    },
+    {
+      "filename": "charset_normalizer-3.5.2-py3-none-any.whl",
+      "sha256": "b6b751274acb69d77b3323d6b7dbaa3c7fdfc1eb829b7eb61d262f32e1af9685",
+      "original_filename": "charset_normalizer-3.5.2-py3-none-any.whl",
+      "original_sha256": "b6b751274acb69d77b3323d6b7dbaa3c7fdfc1eb829b7eb61d262f32e1af9685",
+      "original_url": "https://files.pythonhosted.org/packages/fc/ad/d07d7862a62ffa6d79d68074d14823243dd235a77c45262acbf6adeb28bf/charset_normalizer-3.5.2-py3-none-any.whl",
+      "rebuilt": false
+    },
+    {
+      "filename": "debugpy-1.8.22-py2.py3-none-any.whl",
+      "sha256": "a9e9d3550e15ca479c59333e90845029190531f0cacfedab3b815a57bd913947",
+      "original_filename": "debugpy-1.8.22-py2.py3-none-any.whl",
+      "original_sha256": "a9e9d3550e15ca479c59333e90845029190531f0cacfedab3b815a57bd913947",
+      "original_url": "https://files.pythonhosted.org/packages/56/3d/c7dc9f35bc9e22cdb53679f844bee40fd5cff871862f60595869a433400d/debugpy-1.8.22-py2.py3-none-any.whl",
+      "rebuilt": false
+    },
+    {
+      "filename": "idna-3.20-py3-none-any.whl",
+      "sha256": "ab7ae7122974553370f0bdb919e1a960b2cd1bc1ef0276416d896db81c14582c",
+      "original_filename": "idna-3.20-py3-none-any.whl",
+      "original_sha256": "ab7ae7122974553370f0bdb919e1a960b2cd1bc1ef0276416d896db81c14582c",
+      "original_url": "https://files.pythonhosted.org/packages/58/a2/bb081bab032533a855d44de1d56f8e8426114ff1ba5d1f07a438a0a654f8/idna-3.20-py3-none-any.whl",
+      "rebuilt": false
+    },
+    {
+      "filename": "lxml-5.3.0-0-cp311-cp311-android_24_arm64_v8a.whl",
+      "sha256": "6ab16eebfd35a4b9519f979f7a6d90f6c3eb32ece39846728f37ec247a4d0e5f",
+      "original_filename": "lxml-5.3.0-0-cp311-cp311-android_24_arm64_v8a.whl",
+      "original_sha256": "6ab16eebfd35a4b9519f979f7a6d90f6c3eb32ece39846728f37ec247a4d0e5f",
+      "original_url": "https://chaquo.com/pypi-13.1/lxml/lxml-5.3.0-0-cp311-cp311-android_24_arm64_v8a.whl",
+      "rebuilt": false
+    },
+    {
+      "filename": "packaging-26.3-py3-none-any.whl",
+      "sha256": "d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c",
+      "original_filename": "packaging-26.3-py3-none-any.whl",
+      "original_sha256": "d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c",
+      "original_url": "https://files.pythonhosted.org/packages/63/34/ba1c580383c9eada3711951fef0795c80b829a078d72188184bcab9dd527/packaging-26.3-py3-none-any.whl",
+      "rebuilt": false
+    },
+    {
+      "filename": "pillow-11.0.0-0-cp311-cp311-android_24_arm64_v8a.whl",
+      "sha256": "c40b2d55a04720f60792769717c54442924dfb776d73a4312e9c2e7ae6aee3dc",
+      "original_filename": "pillow-11.0.0-0-cp311-cp311-android_24_arm64_v8a.whl",
+      "original_sha256": "c40b2d55a04720f60792769717c54442924dfb776d73a4312e9c2e7ae6aee3dc",
+      "original_url": "https://chaquo.com/pypi-13.1/pillow/pillow-11.0.0-0-cp311-cp311-android_24_arm64_v8a.whl",
+      "rebuilt": false
+    },
+    {
+      "filename": "pyyaml-6.0.3-0-cp311-cp311-android_24_arm64_v8a.whl",
+      "sha256": "75013ba172066d8e009cf8c7a2fa7a2b2d9e83fc9913470d7f5f707872c4885d",
+      "original_filename": "pyyaml-6.0.3-0-cp311-cp311-android_24_arm64_v8a.whl",
+      "original_sha256": "75013ba172066d8e009cf8c7a2fa7a2b2d9e83fc9913470d7f5f707872c4885d",
+      "original_url": "https://chaquo.com/pypi-13.1/pyyaml/pyyaml-6.0.3-0-cp311-cp311-android_24_arm64_v8a.whl",
+      "rebuilt": false
+    },
+    {
+      "filename": "requests-2.34.2-py3-none-any.whl",
+      "sha256": "2a0d60c172f83ac6ab31e4554906c0f3b3588d37b5cb939b1c061f4907e278e0",
+      "original_filename": "requests-2.34.2-py3-none-any.whl",
+      "original_sha256": "2a0d60c172f83ac6ab31e4554906c0f3b3588d37b5cb939b1c061f4907e278e0",
+      "original_url": "https://files.pythonhosted.org/packages/a0/f4/c67b0b3f1b9245e8d266f0f112c500d50e5b4e83cb6f3b71b6528104182a/requests-2.34.2-py3-none-any.whl",
+      "rebuilt": false
+    },
+    {
+      "filename": "soupsieve-3.0.3-py3-none-any.whl",
+      "sha256": "fa30e3ba4809cb81ce1f3209f2fbe3e779fc445f0439bc147a0d7c4601743f21",
+      "original_filename": "soupsieve-3.0.3-py3-none-any.whl",
+      "original_sha256": "fa30e3ba4809cb81ce1f3209f2fbe3e779fc445f0439bc147a0d7c4601743f21",
+      "original_url": "https://files.pythonhosted.org/packages/49/ca/f639c80449997b88aba7bc9705d25dd76cc0844f45f187862fd8f8bb18fa/soupsieve-3.0.3-py3-none-any.whl",
+      "rebuilt": false
+    },
+    {
+      "filename": "typing_extensions-4.16.0-py3-none-any.whl",
+      "sha256": "481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8",
+      "original_filename": "typing_extensions-4.16.0-py3-none-any.whl",
+      "original_sha256": "481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8",
+      "original_url": "https://files.pythonhosted.org/packages/49/d3/b8441a820a491ddfc024b0b0cf0393375b75ea13866d9c66727e54c2fc80/typing_extensions-4.16.0-py3-none-any.whl",
+      "rebuilt": false
+    },
+    {
+      "filename": "urllib3-2.8.0-py3-none-any.whl",
+      "sha256": "0cf3cae568d36aa9576b28dfb35f11328f1cb974ca7647d9475ebb86c75ac6e3",
+      "original_filename": "urllib3-2.8.0-py3-none-any.whl",
+      "original_sha256": "0cf3cae568d36aa9576b28dfb35f11328f1cb974ca7647d9475ebb86c75ac6e3",
+      "original_url": "https://files.pythonhosted.org/packages/92/9d/c4e665119135114480843e7ab388fa94d8480650450e6f8e26b70d323a4c/urllib3-2.8.0-py3-none-any.whl",
+      "rebuilt": false
+    }
+  ],
+  "source_manifest_sha256": "52ce5f4abb1ddadeec886cd5faba18e27ac6f59bddce3ffb12f393cb201df21b",
+  "android_runtime_validated": false
+}

@@ -1,0 +1,287 @@
+[
+  {
+    "pr": 16,
+    "head": "fe3b8973b44a74fcbba3aedc92a514f3b1462e80",
+    "commands": [
+      {
+        "command": [
+          "<WORKSPACE>/FlexyGram/.venv-p04c/bin/python",
+          "-m",
+          "unittest",
+          "discover",
+          "-s",
+          "tests/identity_resources",
+          "-v"
+        ],
+        "exit": 0,
+        "log": "pr16-tests.log"
+      },
+      {
+        "command": [
+          "<WORKSPACE>/FlexyGram/.venv-p04c/bin/python",
+          "tests/identity_resources/audit.py",
+          "--strict"
+        ],
+        "exit": 0,
+        "log": "pr16-audit.json"
+      }
+    ],
+    "merge_tree_exit": 0,
+    "merge_tree_output": "7de0780f8786774cc8ec9fa0178515864e49630c\n",
+    "limits": "Detached review worktree; no merge. Resource compilation only, no icon activation or APK build.",
+    "merge_against_p04c_exit": 0,
+    "future_p04c_scope_review_needed": [
+      "docs/identity-resources/README.md",
+      "tests/identity_resources/audit.py",
+      "tests/identity_resources/test_audit.py"
+    ],
+    "merged": false
+  },
+  {
+    "pr": 18,
+    "head": "44f9826e2d5d74634a85374962da07b068f39efa",
+    "commands": [
+      {
+        "command": [
+          "<WORKSPACE>/FlexyGram/.venv-p04c/bin/python",
+          "-m",
+          "unittest",
+          "discover",
+          "-s",
+          "tests/brand_resources",
+          "-v"
+        ],
+        "exit": 0,
+        "log": "pr18-tests.log"
+      },
+      {
+        "command": [
+          "<WORKSPACE>/android-tools/sdk/build-tools/36.0.0/aapt2",
+          "compile",
+          "<WORKSPACE>/review-pr18/TMessagesProj/src/main/res/drawable-night/flexygram_brand_background.xml",
+          "-o",
+          "<WORKSPACE>/pr18-flat-resources"
+        ],
+        "exit": 0,
+        "log": "pr18-aapt-drawable-night-flexygram_brand_background.xml.log"
+      },
+      {
+        "command": [
+          "<WORKSPACE>/android-tools/sdk/build-tools/36.0.0/aapt2",
+          "compile",
+          "<WORKSPACE>/review-pr18/TMessagesProj/src/main/res/drawable-night/flexygram_brand_mark.xml",
+          "-o",
+          "<WORKSPACE>/pr18-flat-resources"
+        ],
+        "exit": 0,
+        "log": "pr18-aapt-drawable-night-flexygram_brand_mark.xml.log"
+      },
+      {
+        "command": [
+          "<WORKSPACE>/android-tools/sdk/build-tools/36.0.0/aapt2",
+          "compile",
+          "<WORKSPACE>/review-pr18/TMessagesProj/src/main/res/drawable/flexygram_brand_background.xml",
+          "-o",
+          "<WORKSPACE>/pr18-flat-resources"
+        ],
+        "exit": 0,
+        "log": "pr18-aapt-drawable-flexygram_brand_background.xml.log"
+      },
+      {
+        "command": [
+          "<WORKSPACE>/android-tools/sdk/build-tools/36.0.0/aapt2",
+          "compile",
+          "<WORKSPACE>/review-pr18/TMessagesProj/src/main/res/drawable/flexygram_brand_mark.xml",
+          "-o",
+          "<WORKSPACE>/pr18-flat-resources"
+        ],
+        "exit": 0,
+        "log": "pr18-aapt-drawable-flexygram_brand_mark.xml.log"
+      },
+      {
+        "command": [
+          "<WORKSPACE>/android-tools/sdk/build-tools/36.0.0/aapt2",
+          "compile",
+          "<WORKSPACE>/review-pr18/TMessagesProj/src/main/res/drawable/flexygram_brand_monochrome.xml",
+          "-o",
+          "<WORKSPACE>/pr18-flat-resources"
+        ],
+        "exit": 0,
+        "log": "pr18-aapt-drawable-flexygram_brand_monochrome.xml.log"
+      },
+      {
+        "command": [
+          "<WORKSPACE>/android-tools/sdk/build-tools/36.0.0/aapt2",
+          "compile",
+          "<WORKSPACE>/review-pr18/TMessagesProj/src/main/res/mipmap-anydpi-v26/ic_launcher_flexygram_candidate.xml",
+          "-o",
+          "<WORKSPACE>/pr18-flat-resources"
+        ],
+        "exit": 0,
+        "log": "pr18-aapt-mipmap-anydpi-v26-ic_launcher_flexygram_candidate.xml.log"
+      },
+      {
+        "command": [
+          "<WORKSPACE>/android-tools/sdk/build-tools/36.0.0/aapt2",
+          "compile",
+          "<WORKSPACE>/review-pr18/TMessagesProj/src/main/res/mipmap-anydpi-v26/ic_launcher_flexygram_candidate_round.xml",
+          "-o",
+          "<WORKSPACE>/pr18-flat-resources"
+        ],
+        "exit": 0,
+        "log": "pr18-aapt-mipmap-anydpi-v26-ic_launcher_flexygram_candidate_round.xml.log"
+      },
+      {
+        "command": [
+          "<WORKSPACE>/android-tools/sdk/build-tools/36.0.0/aapt2",
+          "compile",
+          "<WORKSPACE>/review-pr18/TMessagesProj/src/main/res/values-ar/strings.xml",
+          "-o",
+          "<WORKSPACE>/pr18-flat-resources"
+        ],
+        "exit": 0,
+        "log": "pr18-aapt-values-ar-strings.xml.log"
+      },
+      {
+        "command": [
+          "<WORKSPACE>/android-tools/sdk/build-tools/36.0.0/aapt2",
+          "compile",
+          "<WORKSPACE>/review-pr18/TMessagesProj/src/main/res/values-de/strings.xml",
+          "-o",
+          "<WORKSPACE>/pr18-flat-resources"
+        ],
+        "exit": 0,
+        "log": "pr18-aapt-values-de-strings.xml.log"
+      },
+      {
+        "command": [
+          "<WORKSPACE>/android-tools/sdk/build-tools/36.0.0/aapt2",
+          "compile",
+          "<WORKSPACE>/review-pr18/TMessagesProj/src/main/res/values-es/strings.xml",
+          "-o",
+          "<WORKSPACE>/pr18-flat-resources"
+        ],
+        "exit": 0,
+        "log": "pr18-aapt-values-es-strings.xml.log"
+      },
+      {
+        "command": [
+          "<WORKSPACE>/android-tools/sdk/build-tools/36.0.0/aapt2",
+          "compile",
+          "<WORKSPACE>/review-pr18/TMessagesProj/src/main/res/values-it/strings.xml",
+          "-o",
+          "<WORKSPACE>/pr18-flat-resources"
+        ],
+        "exit": 0,
+        "log": "pr18-aapt-values-it-strings.xml.log"
+      },
+      {
+        "command": [
+          "<WORKSPACE>/android-tools/sdk/build-tools/36.0.0/aapt2",
+          "compile",
+          "<WORKSPACE>/review-pr18/TMessagesProj/src/main/res/values-ko/strings.xml",
+          "-o",
+          "<WORKSPACE>/pr18-flat-resources"
+        ],
+        "exit": 0,
+        "log": "pr18-aapt-values-ko-strings.xml.log"
+      },
+      {
+        "command": [
+          "<WORKSPACE>/android-tools/sdk/build-tools/36.0.0/aapt2",
+          "compile",
+          "<WORKSPACE>/review-pr18/TMessagesProj/src/main/res/values-nl/strings.xml",
+          "-o",
+          "<WORKSPACE>/pr18-flat-resources"
+        ],
+        "exit": 0,
+        "log": "pr18-aapt-values-nl-strings.xml.log"
+      },
+      {
+        "command": [
+          "<WORKSPACE>/android-tools/sdk/build-tools/36.0.0/aapt2",
+          "compile",
+          "<WORKSPACE>/review-pr18/TMessagesProj/src/main/res/values-pt-rBR/strings.xml",
+          "-o",
+          "<WORKSPACE>/pr18-flat-resources"
+        ],
+        "exit": 0,
+        "log": "pr18-aapt-values-pt-rBR-strings.xml.log"
+      },
+      {
+        "command": [
+          "<WORKSPACE>/android-tools/sdk/build-tools/36.0.0/aapt2",
+          "compile",
+          "<WORKSPACE>/review-pr18/TMessagesProj/src/main/res/values/strings.xml",
+          "-o",
+          "<WORKSPACE>/pr18-flat-resources"
+        ],
+        "exit": 1,
+        "log": "pr18-aapt-values-strings.xml.log"
+      }
+    ],
+    "merge_tree_exit": 0,
+    "merge_tree_output": "73d8f0a80ab176ca0722b54f58fff0af1bcf4850\n",
+    "limits": "Detached review worktree; no merge. Resource compilation only, no icon activation or APK build.",
+    "merge_against_p04c_exit": 0,
+    "future_p04c_scope_review_needed": [
+      "TMessagesProj/src/main/res/drawable-night/flexygram_brand_background.xml",
+      "TMessagesProj/src/main/res/drawable-night/flexygram_brand_mark.xml",
+      "TMessagesProj/src/main/res/drawable/flexygram_brand_background.xml",
+      "TMessagesProj/src/main/res/drawable/flexygram_brand_mark.xml",
+      "TMessagesProj/src/main/res/drawable/flexygram_brand_monochrome.xml",
+      "TMessagesProj/src/main/res/mipmap-anydpi-v26/ic_launcher_flexygram_candidate.xml",
+      "TMessagesProj/src/main/res/mipmap-anydpi-v26/ic_launcher_flexygram_candidate_round.xml",
+      "TMessagesProj/src/main/res/values-ar/strings.xml",
+      "TMessagesProj/src/main/res/values-de/strings.xml",
+      "TMessagesProj/src/main/res/values-es/strings.xml",
+      "TMessagesProj/src/main/res/values-it/strings.xml",
+      "TMessagesProj/src/main/res/values-ko/strings.xml",
+      "TMessagesProj/src/main/res/values-nl/strings.xml",
+      "TMessagesProj/src/main/res/values-pt-rBR/strings.xml",
+      "TMessagesProj/src/main/res/values/strings.xml",
+      "docs/brand-resources/README.md",
+      "docs/brand-resources/identity-preview.svg",
+      "tests/brand_resources/test_branding.py"
+    ],
+    "merged": false
+  },
+  {
+    "pr": 19,
+    "head": "4d128c682fe4cacb89ec3571e5e59fc05f6fa457",
+    "commands": [
+      {
+        "command": [
+          "<WORKSPACE>/FlexyGram/.venv-p04c/bin/python",
+          "-m",
+          "unittest",
+          "discover",
+          "-s",
+          "tests/navigation_performance",
+          "-v"
+        ],
+        "exit": 1,
+        "log": "pr19-tests.log"
+      },
+      {
+        "command": [
+          "<WORKSPACE>/FlexyGram/.venv-p04c/bin/python",
+          "tools/navigation_performance/audit.py",
+          "--strict"
+        ],
+        "exit": 1,
+        "log": "pr19-audit.json"
+      }
+    ],
+    "merge_tree_exit": 0,
+    "merge_tree_output": "2089140a80ae7f5401f9b16e82447712ac914678\n",
+    "limits": "Detached review worktree; no merge. Resource compilation only, no icon activation or APK build.",
+    "merge_against_p04c_exit": 0,
+    "future_p04c_scope_review_needed": [
+      "docs/navigation-performance/README.md",
+      "tests/navigation_performance/test_audit.py",
+      "tools/navigation_performance/audit.py"
+    ],
+    "merged": false
+  }
+]

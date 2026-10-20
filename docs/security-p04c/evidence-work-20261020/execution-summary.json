@@ -1,0 +1,19 @@
+{
+  "source_head": "c8b5f63f34ea06c9fcdc40a9f37c55661f189190",
+  "python": "3.11.17",
+  "unique_tests": 231,
+  "normal_passed": 231,
+  "optimized_passed": 231,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "initial_environment_errors": 17,
+  "original_apk_recovered": false,
+  "rebuilt_candidate_pending": true,
+  "v2_draft_sha256": "6c5328f615b142ed266dd916ef4b1a0e2b7e422e8a71c8cfeb58a94632bf916d",
+  "v2_draft_permissions": "0600",
+  "historical_v1_unchanged": true,
+  "signing_key_generated": false,
+  "apk_signed": false,
+  "android_executed": false
+}

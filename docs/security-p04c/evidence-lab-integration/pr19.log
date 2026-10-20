@@ -1,0 +1,20 @@
+test_back_gate_mutation_is_detected (test_audit.NavigationAuditTests.test_back_gate_mutation_is_detected) ... ok
+test_base_finish_delegate_change_is_detected (test_audit.NavigationAuditTests.test_base_finish_delegate_change_is_detected) ... ok
+test_close_gate_mutation_is_detected (test_audit.NavigationAuditTests.test_close_gate_mutation_is_detected) ... ok
+test_conditional_waits_and_watchdog_are_not_confused (test_audit.NavigationAuditTests.test_conditional_waits_and_watchdog_are_not_confused) ... ok
+test_dialog_swipe_gate_mutation_is_detected (test_audit.NavigationAuditTests.test_dialog_swipe_gate_mutation_is_detected) ... ok
+test_expected_navigation_evidence_is_identified (test_audit.NavigationAuditTests.test_expected_navigation_evidence_is_identified) ... ok
+test_guard_only_inside_a_java_comment_does_not_count (test_audit.NavigationAuditTests.test_guard_only_inside_a_java_comment_does_not_count) ... ok
+test_missing_file_is_exposed_not_silently_skipped (test_audit.NavigationAuditTests.test_missing_file_is_exposed_not_silently_skipped) ... ok
+test_open_gate_mutation_is_detected (test_audit.NavigationAuditTests.test_open_gate_mutation_is_detected) ... ok
+test_present_guard_does_not_match_neighbor_method (test_audit.NavigationAuditTests.test_present_guard_does_not_match_neighbor_method) ... ok
+test_preview_special_case_mutation_is_detected (test_audit.NavigationAuditTests.test_preview_special_case_mutation_is_detected) ... ok
+test_source_is_not_modified_by_audit (test_audit.NavigationAuditTests.test_source_is_not_modified_by_audit) ... ok
+test_strict_checks_source_integrity_not_timing_preferences (test_audit.NavigationAuditTests.test_strict_checks_source_integrity_not_timing_preferences) ... ok
+test_timeout_change_is_reported_without_claiming_improvement (test_audit.NavigationAuditTests.test_timeout_change_is_reported_without_claiming_improvement) ... ok
+test_unrelated_wait_outside_present_does_not_replace_missing_branch (test_audit.NavigationAuditTests.test_unrelated_wait_outside_present_does_not_replace_missing_branch) ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 0.019s
+
+OK

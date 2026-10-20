@@ -1,0 +1,10 @@
+{
+  "host_architecture": "x86_64",
+  "kvm_available": false,
+  "emulator_binary_available": false,
+  "adb_devices": "List of devices attached\n\n",
+  "android_execution": false,
+  "api24_runtime_test": false,
+  "pages16k_runtime_test": false,
+  "installed": false
+}

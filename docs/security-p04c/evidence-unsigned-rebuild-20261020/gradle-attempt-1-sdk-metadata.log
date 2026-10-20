@@ -1,0 +1,46 @@
+Picked up JAVA_TOOL_OPTIONS: [local proxy and TLS settings redacted]
+
+Welcome to Gradle 9.7.1!
+
+Here are the highlights of this release:
+ - Isolated Projects graduates to incubating
+ - Broader Configuration Cache compatibility
+ - Resilient Sync helps you fix broken builds
+ - More source locations in problem reports
+
+For more details see https://docs.gradle.org/9.7.1/release-notes.html
+
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.7.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :buildSrc:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :buildSrc:compileKotlin
+> Task :buildSrc:pluginDescriptors
+> Task :buildSrc:processResources
+> Task :buildSrc:compileJava NO-SOURCE
+> Task :buildSrc:compileGroovy NO-SOURCE
+> Task :buildSrc:classes
+> Task :buildSrc:jar
+Warning: SDK processing. package.xml parsing problem. unexpected element (uri:"", local:"repository"). Expected elements are <{http://schemas.android.com/repository/android/common/01}repository>,<{http://schemas.android.com/repository/android/common/02}repository>,<{http://schemas.android.com/repository/android/generic/01}repository>,<{http://schemas.android.com/repository/android/generic/02}repository>,<{http://schemas.android.com/sdk/android/repo/addon2/01}sdk-addon>,<{http://schemas.android.com/sdk/android/repo/addon2/02}sdk-addon>,<{http://schemas.android.com/sdk/android/repo/addon2/03}sdk-addon>,<{http://schemas.android.com/sdk/android/repo/addon2/04}sdk-addon>,<{http://schemas.android.com/sdk/android/repo/repository2/01}sdk-repository>,<{http://schemas.android.com/sdk/android/repo/repository2/02}sdk-repository>,<{http://schemas.android.com/sdk/android/repo/repository2/03}sdk-repository>,<{http://schemas.android.com/sdk/android/repo/repository2/04}sdk-repository>,<{http://schemas.android.com/sdk/android/repo/sys-img2/01}sdk-sys-img>,<{http://schemas.android.com/sdk/android/repo/sys-img2/02}sdk-sys-img>,<{http://schemas.android.com/sdk/android/repo/sys-img2/03}sdk-sys-img>,<{http://schemas.android.com/sdk/android/repo/sys-img2/04}sdk-sys-img>,<{http://schemas.android.com/sdk/android/repo/sys-img2/05}sdk-sys-img>
+
+[Incubating] Problems report is available at: file:///workspace/scratch/6fe2cd15bb66/experiment/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Could not determine the dependencies of task ':TMessagesProj:compileDiagnosticDebugJavaWithJavac'.
+> javax.xml.bind.UnmarshalException: unexpected element (uri:"", local:"repository"). Expected elements are <{http://schemas.android.com/repository/android/common/01}repository>,<{http://schemas.android.com/repository/android/common/02}repository>,<{http://schemas.android.com/repository/android/generic/01}repository>,<{http://schemas.android.com/repository/android/generic/02}repository>,<{http://schemas.android.com/sdk/android/repo/addon2/01}sdk-addon>,<{http://schemas.android.com/sdk/android/repo/addon2/02}sdk-addon>,<{http://schemas.android.com/sdk/android/repo/addon2/03}sdk-addon>,<{http://schemas.android.com/sdk/android/repo/addon2/04}sdk-addon>,<{http://schemas.android.com/sdk/android/repo/repository2/01}sdk-repository>,<{http://schemas.android.com/sdk/android/repo/repository2/02}sdk-repository>,<{http://schemas.android.com/sdk/android/repo/repository2/03}sdk-repository>,<{http://schemas.android.com/sdk/android/repo/repository2/04}sdk-repository>,<{http://schemas.android.com/sdk/android/repo/sys-img2/01}sdk-sys-img>,<{http://schemas.android.com/sdk/android/repo/sys-img2/02}sdk-sys-img>,<{http://schemas.android.com/sdk/android/repo/sys-img2/03}sdk-sys-img>,<{http://schemas.android.com/sdk/android/repo/sys-img2/04}sdk-sys-img>,<{http://schemas.android.com/sdk/android/repo/sys-img2/05}sdk-sys-img>
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+> Get more help at https://help.gradle.org.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.7.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 2m 51s
+4 actionable tasks: 4 executed

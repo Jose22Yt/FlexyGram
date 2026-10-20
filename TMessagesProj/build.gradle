@@ -136,13 +136,8 @@ android {
                 buildPython chaquopyBuildPython
             }
             pip {
-                install 'beautifulsoup4'
-                install 'debugpy'
-                install 'lxml'
-                install 'packaging'
-                install 'pillow'
-                install 'requests'
-                install 'PyYAML'
+                options '--require-hashes', '--only-binary', ':all:', '--no-index', '--find-links', file('build/locked-wheelhouse').absolutePath
+                install '-r', file('python/requirements.lock').absolutePath
             }
         }
 
@@ -175,7 +170,7 @@ android {
 
         externalNativeBuild {
             cmake {
-                arguments '-DANDROID_STL=c++_static', '-DANDROID_PLATFORM=android-27', '-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON'
+                arguments '-DANDROID_STL=c++_static', '-DANDROID_PLATFORM=android-24', '-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON'
                 System.getenv('PATH').split(File.pathSeparator).any { path ->
                     var file = Paths.get("${path}${File.separator}ccache${if (OperatingSystem.current().windows) ".exe" else ""}").toFile()
                     if (file.exists()) {
@@ -521,5 +516,24 @@ tasks.register('verifyProductionReadiness') { doLast { rejectProduction.call() }
 ['', 'Debug', 'Staging', 'Release'].each { suffix ->
     ['assemble', 'bundle'].each { operation ->
         tasks.register(operation + 'Production' + suffix) { dependsOn 'verifyProductionReadiness' }
+    }
+}
+
+// P0.4c: pip resolves exclusively the verified local wheelhouse, including transitives.
+def prepareLockedPython = tasks.register('prepareLockedPython', Exec) {
+    inputs.files(file('python/wheels.lock.json'), rootProject.file('tools/native_compatibility/wheelhouse.py'))
+    def requested = System.getenv('NATIVE_TARGET') ?: ''
+    def lockedAbis = requested in ['', 'universal'] ? ['arm64-v8a', 'x86_64'] : [requested == 'SKIP' ? 'arm64-v8a' : requested]
+    inputs.property('targetAbis', lockedAbis)
+    outputs.dir(file('build/locked-wheelhouse'))
+    commandLine(([chaquopyBuildPython ?: 'python3', rootProject.file('tools/native_compatibility/wheelhouse.py').absolutePath,
+        '--lock', file('python/wheels.lock.json').absolutePath,
+        '--output', file('build/locked-wheelhouse').absolutePath] +
+        lockedAbis.collectMany { ['--abi', it] } +
+        (gradle.startParameter.offline ? ['--offline'] : [])))
+}
+tasks.configureEach { task ->
+    if (task.name.startsWith('install') && task.name.endsWith('PythonRequirements')) {
+        task.dependsOn(prepareLockedPython)
     }
 }

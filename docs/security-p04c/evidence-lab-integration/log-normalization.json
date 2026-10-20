@@ -1,0 +1,12 @@
+{
+  "arm64-engine-version.log": {
+    "raw_sha256": "ea36a35958c14ba5f003d0e68087a01947b2b1e7d3c26286417430ced3f2b811",
+    "published_sha256": "6dcda41ae20ba51d34ab8b46daa292e2fc3a5ff3c92a9f21fbc485c50279b41c",
+    "normalization": "Remove trailing empty EOF lines only"
+  },
+  "emulator-headless-version.log": {
+    "raw_sha256": "ea36a35958c14ba5f003d0e68087a01947b2b1e7d3c26286417430ced3f2b811",
+    "published_sha256": "6dcda41ae20ba51d34ab8b46daa292e2fc3a5ff3c92a9f21fbc485c50279b41c",
+    "normalization": "Remove trailing empty EOF lines only"
+  }
+}

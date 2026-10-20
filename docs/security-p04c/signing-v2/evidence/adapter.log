@@ -1,0 +1,21 @@
+test_changed_contract_does_not_silently_repin_secondary (test_pr21_adapter.AdapterTests.test_changed_contract_does_not_silently_repin_secondary) ... ok
+test_cli_missing_inputs_fails_without_creating_outputs (test_pr21_adapter.AdapterTests.test_cli_missing_inputs_fails_without_creating_outputs) ... ok
+test_counter_boolean_not_accepted_as_numeric_zero (test_pr21_adapter.AdapterTests.test_counter_boolean_not_accepted_as_numeric_zero) ... ok
+test_counter_log_disagreement_rejected_even_with_updated_digest (test_pr21_adapter.AdapterTests.test_counter_log_disagreement_rejected_even_with_updated_digest) ... ok
+test_critical_python_and_memory_indicators_rejected (test_pr21_adapter.AdapterTests.test_critical_python_and_memory_indicators_rejected) ... ok
+test_duplicate_and_nonfinite_json_rejected (test_pr21_adapter.AdapterTests.test_duplicate_and_nonfinite_json_rejected) ... ok
+test_environment_and_instrumentation_must_agree (test_pr21_adapter.AdapterTests.test_environment_and_instrumentation_must_agree) ... ok
+test_missing_case_not_promoted_to_pass (test_pr21_adapter.AdapterTests.test_missing_case_not_promoted_to_pass) ... ok
+test_missing_historical_provenance_not_filled_with_defaults (test_pr21_adapter.AdapterTests.test_missing_historical_provenance_not_filled_with_defaults) ... ok
+test_missing_installation_evidence_rejected (test_pr21_adapter.AdapterTests.test_missing_installation_evidence_rejected) ... ok
+test_missing_profile_or_repeated_nonce_rejected (test_pr21_adapter.AdapterTests.test_missing_profile_or_repeated_nonce_rejected) ... ok
+test_partial_cold_start_not_promoted_to_pass (test_pr21_adapter.AdapterTests.test_partial_cold_start_not_promoted_to_pass) ... ok
+test_positive_synthetic_mapping_preserves_false_certification (test_pr21_adapter.AdapterTests.test_positive_synthetic_mapping_preserves_false_certification) ... ok
+test_primary_reports_cannot_be_passed_directly_to_secondary (test_pr21_adapter.AdapterTests.test_primary_reports_cannot_be_passed_directly_to_secondary) ... ok
+test_runner_source_receipt_mismatch_rejected (test_pr21_adapter.AdapterTests.test_runner_source_receipt_mismatch_rejected) ... ok
+test_wrong_auxiliary_code_rejected_before_import (test_pr21_adapter.AdapterTests.test_wrong_auxiliary_code_rejected_before_import) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 0.068s
+
+OK

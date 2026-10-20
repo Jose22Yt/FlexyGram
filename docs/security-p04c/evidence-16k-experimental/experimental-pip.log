@@ -1,0 +1,21 @@
+Looking in links: ../compat-rebuild-a/wheelhouse-final-ordered
+Processing /workspace/scratch/1f84b79e43f3/compat-rebuild-a/wheelhouse-final-ordered/beautifulsoup4-4.15.0-py3-none-any.whl (from -r ../compat-rebuild-a/requirements-experimental.lock (line 2))
+Processing /workspace/scratch/1f84b79e43f3/compat-rebuild-a/wheelhouse-final-ordered/certifi-2026.10.18-py3-none-any.whl (from -r ../compat-rebuild-a/requirements-experimental.lock (line 3))
+Processing /workspace/scratch/1f84b79e43f3/compat-rebuild-a/wheelhouse-final-ordered/chaquopy_freetype-2.9.1-3flexygram16k-py3-none-android_24_arm64_v8a.whl (from -r ../compat-rebuild-a/requirements-experimental.lock (line 4))
+Processing /workspace/scratch/1f84b79e43f3/compat-rebuild-a/wheelhouse-final-ordered/chaquopy_libjpeg-1.5.3-1-py3-none-android_21_arm64_v8a.whl (from -r ../compat-rebuild-a/requirements-experimental.lock (line 5))
+Processing /workspace/scratch/1f84b79e43f3/compat-rebuild-a/wheelhouse-final-ordered/chaquopy_libxml2-2.9.8-3flexygram16k-py3-none-android_24_arm64_v8a.whl (from -r ../compat-rebuild-a/requirements-experimental.lock (line 6))
+Processing /workspace/scratch/1f84b79e43f3/compat-rebuild-a/wheelhouse-final-ordered/chaquopy_libxslt-1.1.32-3flexygram16k-py3-none-android_24_arm64_v8a.whl (from -r ../compat-rebuild-a/requirements-experimental.lock (line 7))
+Processing /workspace/scratch/1f84b79e43f3/compat-rebuild-a/wheelhouse-final-ordered/chaquopy_libyaml-0.2.5-0-py3-none-android_24_arm64_v8a.whl (from -r ../compat-rebuild-a/requirements-experimental.lock (line 8))
+Processing /workspace/scratch/1f84b79e43f3/compat-rebuild-a/wheelhouse-final-ordered/charset_normalizer-3.5.2-py3-none-any.whl (from -r ../compat-rebuild-a/requirements-experimental.lock (line 9))
+Processing /workspace/scratch/1f84b79e43f3/compat-rebuild-a/wheelhouse-final-ordered/debugpy-1.8.22-py2.py3-none-any.whl (from -r ../compat-rebuild-a/requirements-experimental.lock (line 10))
+Processing /workspace/scratch/1f84b79e43f3/compat-rebuild-a/wheelhouse-final-ordered/idna-3.20-py3-none-any.whl (from -r ../compat-rebuild-a/requirements-experimental.lock (line 11))
+Processing /workspace/scratch/1f84b79e43f3/compat-rebuild-a/wheelhouse-final-ordered/lxml-5.3.0-0-cp311-cp311-android_24_arm64_v8a.whl (from -r ../compat-rebuild-a/requirements-experimental.lock (line 12))
+Processing /workspace/scratch/1f84b79e43f3/compat-rebuild-a/wheelhouse-final-ordered/packaging-26.3-py3-none-any.whl (from -r ../compat-rebuild-a/requirements-experimental.lock (line 13))
+Processing /workspace/scratch/1f84b79e43f3/compat-rebuild-a/wheelhouse-final-ordered/pillow-11.0.0-0-cp311-cp311-android_24_arm64_v8a.whl (from -r ../compat-rebuild-a/requirements-experimental.lock (line 14))
+Processing /workspace/scratch/1f84b79e43f3/compat-rebuild-a/wheelhouse-final-ordered/pyyaml-6.0.3-0-cp311-cp311-android_24_arm64_v8a.whl (from -r ../compat-rebuild-a/requirements-experimental.lock (line 15))
+Processing /workspace/scratch/1f84b79e43f3/compat-rebuild-a/wheelhouse-final-ordered/requests-2.34.2-py3-none-any.whl (from -r ../compat-rebuild-a/requirements-experimental.lock (line 16))
+Processing /workspace/scratch/1f84b79e43f3/compat-rebuild-a/wheelhouse-final-ordered/soupsieve-3.0.3-py3-none-any.whl (from -r ../compat-rebuild-a/requirements-experimental.lock (line 17))
+Processing /workspace/scratch/1f84b79e43f3/compat-rebuild-a/wheelhouse-final-ordered/typing_extensions-4.16.0-py3-none-any.whl (from -r ../compat-rebuild-a/requirements-experimental.lock (line 18))
+Processing /workspace/scratch/1f84b79e43f3/compat-rebuild-a/wheelhouse-final-ordered/urllib3-2.8.0-py3-none-any.whl (from -r ../compat-rebuild-a/requirements-experimental.lock (line 19))
+Installing collected packages: chaquopy-libyaml, chaquopy-libxml2, chaquopy-libjpeg, chaquopy-freetype, urllib3, typing_extensions, soupsieve, PyYAML, pillow, packaging, idna, debugpy, charset-normalizer, chaquopy-libxslt, certifi, requests, lxml, beautifulsoup4
+Successfully installed PyYAML-6.0.3 beautifulsoup4-4.15.0 certifi-2026.10.18 chaquopy-freetype-2.9.1 chaquopy-libjpeg-1.5.3 chaquopy-libxml2-2.9.8 chaquopy-libxslt-1.1.32 chaquopy-libyaml-0.2.5 charset-normalizer-3.5.2 debugpy-1.8.22 idna-3.20 lxml-5.3.0 packaging-26.3 pillow-11.0.0 requests-2.34.2 soupsieve-3.0.3 typing_extensions-4.16.0 urllib3-2.8.0

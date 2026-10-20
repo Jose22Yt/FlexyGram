@@ -1,0 +1,14 @@
+{
+  "discovery_incomplete": false,
+  "errors": 0,
+  "expected_failures": 0,
+  "failures": 1,
+  "gate": "P0.4c Python offline native-compatibility",
+  "limits": "Python unittest only; not an Android build, runtime, API24, or 16KB certification",
+  "minimum_required": 318,
+  "passed": 317,
+  "skipped": 0,
+  "status": "BLOCKED",
+  "tests_run": 318,
+  "unexpected_successes": 0
+}

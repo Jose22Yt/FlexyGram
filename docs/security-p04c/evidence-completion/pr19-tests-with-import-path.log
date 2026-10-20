@@ -1,0 +1,38 @@
+test_back_gate_mutation_is_detected (test_audit.NavigationAuditTests.test_back_gate_mutation_is_detected) ... ok
+test_base_finish_delegate_change_is_detected (test_audit.NavigationAuditTests.test_base_finish_delegate_change_is_detected) ... ok
+test_close_gate_mutation_is_detected (test_audit.NavigationAuditTests.test_close_gate_mutation_is_detected) ... ok
+test_conditional_waits_and_watchdog_are_not_confused (test_audit.NavigationAuditTests.test_conditional_waits_and_watchdog_are_not_confused) ... ok
+test_dialog_swipe_gate_mutation_is_detected (test_audit.NavigationAuditTests.test_dialog_swipe_gate_mutation_is_detected) ... ok
+test_expected_navigation_evidence_is_identified (test_audit.NavigationAuditTests.test_expected_navigation_evidence_is_identified) ... ok
+test_missing_file_is_exposed_not_silently_skipped (test_audit.NavigationAuditTests.test_missing_file_is_exposed_not_silently_skipped) ... ok
+test_open_gate_mutation_is_detected (test_audit.NavigationAuditTests.test_open_gate_mutation_is_detected) ... FAIL
+test_preview_special_case_mutation_is_detected (test_audit.NavigationAuditTests.test_preview_special_case_mutation_is_detected) ... ok
+test_source_is_not_modified_by_audit (test_audit.NavigationAuditTests.test_source_is_not_modified_by_audit) ... ok
+test_strict_checks_source_integrity_not_timing_preferences (test_audit.NavigationAuditTests.test_strict_checks_source_integrity_not_timing_preferences) ... ERROR
+test_timeout_change_is_reported_without_claiming_improvement (test_audit.NavigationAuditTests.test_timeout_change_is_reported_without_claiming_improvement) ... ok
+test_unrelated_wait_outside_present_does_not_replace_missing_branch (test_audit.NavigationAuditTests.test_unrelated_wait_outside_present_does_not_replace_missing_branch) ... ok
+
+======================================================================
+ERROR: test_strict_checks_source_integrity_not_timing_preferences (test_audit.NavigationAuditTests.test_strict_checks_source_integrity_not_timing_preferences)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKSPACE>/review-pr19/tests/navigation_performance/test_audit.py", line 149, in test_strict_checks_source_integrity_not_timing_preferences
+    self.assertEqual(main(["--repo", str(self.root), "--strict"]), 0)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<WORKSPACE>/review-pr19/tools/navigation_performance/audit.py", line 116, in main
+    return int(args.strict and (report["missing_checks"] or report["unreadable"]))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: int() argument must be a string, a bytes-like object or a real number, not 'list'
+
+======================================================================
+FAIL: test_open_gate_mutation_is_detected (test_audit.NavigationAuditTests.test_open_gate_mutation_is_detected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<WORKSPACE>/review-pr19/tests/navigation_performance/test_audit.py", line 99, in test_open_gate_mutation_is_detected
+    self.assertIn("PRESENT_REJECTS_TRANSITION", self.result()["missing_checks"])
+AssertionError: 'PRESENT_REJECTS_TRANSITION' not found in []
+
+----------------------------------------------------------------------
+Ran 13 tests in 0.054s
+
+FAILED (failures=1, errors=1)

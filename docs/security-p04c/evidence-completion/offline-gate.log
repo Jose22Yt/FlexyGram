@@ -1,0 +1,70 @@
+test_4k_library_blocks_even_without_symbol_failures (test_acceptance.AcceptanceTests.test_4k_library_blocks_even_without_symbol_failures) ... ok
+test_aligning_does_not_excuse_loss_of_exports_or_versions (test_acceptance.AcceptanceTests.test_aligning_does_not_excuse_loss_of_exports_or_versions) ... ok
+test_api_soname_machine_and_new_dependencies_are_fail_closed (test_acceptance.AcceptanceTests.test_api_soname_machine_and_new_dependencies_are_fail_closed) ... ok
+test_clean_contract_is_not_permission_to_replace_or_distribute (test_acceptance.AcceptanceTests.test_clean_contract_is_not_permission_to_replace_or_distribute) ... ok
+test_empty_target_is_not_clean_and_other_architecture_is_not_hidden (test_acceptance.AcceptanceTests.test_empty_target_is_not_clean_and_other_architecture_is_not_hidden) ... ok
+test_global_symbols_and_writable_relro_overlap_require_review (test_acceptance.AcceptanceTests.test_global_symbols_and_writable_relro_overlap_require_review) ... ok
+test_expected_failure_blocks_gate (test_gate_runner.OfflineGateTests.test_expected_failure_blocks_gate) ... ok
+test_failure_blocks_gate (test_gate_runner.OfflineGateTests.test_failure_blocks_gate) ... ok
+test_import_error_blocks_gate (test_gate_runner.OfflineGateTests.test_import_error_blocks_gate) ... ok
+test_skip_blocks_gate (test_gate_runner.OfflineGateTests.test_skip_blocks_gate) ... ok
+test_success_reports_pass (test_gate_runner.OfflineGateTests.test_success_reports_pass) ... ok
+test_zero_tests_blocks_gate (test_gate_runner.OfflineGateTests.test_zero_tests_blocks_gate) ... ok
+test_duplicate_filename_fails (test_lock_contract.LockContractTests.test_duplicate_filename_fails) ... ok
+test_duplicate_package_fails (test_lock_contract.LockContractTests.test_duplicate_package_fails) ... ok
+test_mismatched_digest_fails (test_lock_contract.LockContractTests.test_mismatched_digest_fails) ... ok
+test_path_traversal_fails (test_lock_contract.LockContractTests.test_path_traversal_fails) ... ok
+test_real_repository_lock (test_lock_contract.LockContractTests.test_real_repository_lock) ... ok
+test_synthetic_valid (test_lock_contract.LockContractTests.test_synthetic_valid) ... ok
+test_unapproved_origin_fails (test_lock_contract.LockContractTests.test_unapproved_origin_fails) ... ok
+test_undeclared_package_fails (test_lock_contract.LockContractTests.test_undeclared_package_fails) ... ok
+test_unpinned_syntax_fails (test_lock_contract.LockContractTests.test_unpinned_syntax_fails) ... ok
+test_unsupported_abi_fails (test_lock_contract.LockContractTests.test_unsupported_abi_fails) ... ok
+test_16k_and_64k_are_supported_alignment (test_native.NativeCompatibilityTests.test_16k_and_64k_are_supported_alignment) ... ok
+test_4k_is_not_16k (test_native.NativeCompatibilityTests.test_4k_is_not_16k) ... ok
+test_every_runtime_wheel_is_pinned_and_hashed (test_native.NativeCompatibilityTests.test_every_runtime_wheel_is_pinned_and_hashed) ... ok
+test_foreign_machine_stays_visible (test_native.NativeCompatibilityTests.test_foreign_machine_stays_visible) ... ok
+test_load_segment_cannot_exceed_file (test_native.NativeCompatibilityTests.test_load_segment_cannot_exceed_file) ... ok
+test_missing_needed_is_reported (test_native.NativeCompatibilityTests.test_missing_needed_is_reported) ... ok
+test_needed_closure_is_transitive_and_weak_symbols_are_not_hard_failures (test_native.NativeCompatibilityTests.test_needed_closure_is_transitive_and_weak_symbols_are_not_hard_failures) ... ok
+test_nested_imy_payload_is_scanned (test_native.NativeCompatibilityTests.test_nested_imy_payload_is_scanned) ... ok
+test_non_power_of_two_and_incongruent_declared_alignment_fail (test_native.NativeCompatibilityTests.test_non_power_of_two_and_incongruent_declared_alignment_fail) ... ok
+test_offset_virtual_address_congruence_is_required (test_native.NativeCompatibilityTests.test_offset_virtual_address_congruence_is_required) ... ok
+test_platform_matches_minimum_and_external_capabilities_remain_closed (test_native.NativeCompatibilityTests.test_platform_matches_minimum_and_external_capabilities_remain_closed) ... ok
+test_relro_advisory_is_not_a_load_alignment_failure (test_native.NativeCompatibilityTests.test_relro_advisory_is_not_a_load_alignment_failure) ... ok
+test_reviewed_native_scope (test_native.NativeCompatibilityTests.test_reviewed_native_scope) ... ok
+test_switching_supported_abis_preserves_hash_checks (test_native.NativeCompatibilityTests.test_switching_supported_abis_preserves_hash_checks) ... ok
+test_symbol_versions_are_checked_against_named_provider (test_native.NativeCompatibilityTests.test_symbol_versions_are_checked_against_named_provider) ... ok
+test_symbols_outside_dependency_closure_are_not_silently_approved (test_native.NativeCompatibilityTests.test_symbols_outside_dependency_closure_are_not_silently_approved) ... ok
+test_wheelhouse_rejects_tampering_and_foreign_files_without_network (test_native.NativeCompatibilityTests.test_wheelhouse_rejects_tampering_and_foreign_files_without_network) ... ok
+test_writable_relro_overlap_is_distinct (test_native.NativeCompatibilityTests.test_writable_relro_overlap_is_distinct) ... ok
+test_callback_patch_is_exact_and_does_not_suppress_compiler_errors (test_rebuild_recipe.RebuildRecipeTests.test_callback_patch_is_exact_and_does_not_suppress_compiler_errors) ... ok
+test_cross_environment_excludes_host_include_and_library_leaks (test_rebuild_recipe.RebuildRecipeTests.test_cross_environment_excludes_host_include_and_library_leaks) ... ok
+test_original_wheel_hashes_are_preserved_not_relabelled_as_rebuilt (test_rebuild_recipe.RebuildRecipeTests.test_original_wheel_hashes_are_preserved_not_relabelled_as_rebuilt) ... ok
+test_source_hash_and_symlink_are_verified_before_build (test_rebuild_recipe.RebuildRecipeTests.test_source_hash_and_symlink_are_verified_before_build) ... ok
+test_symlink_root_is_rejected_before_build_or_ndk_access (test_rebuild_recipe.RebuildRecipeTests.test_symlink_root_is_rejected_before_build_or_ndk_access) ... ok
+test_modified_locked_wheel_is_rejected (test_wheelhouse_hardening.WheelhouseHardeningTests.test_modified_locked_wheel_is_rejected) ... ok
+test_symlink_cache_directory_is_rejected (test_wheelhouse_hardening.WheelhouseHardeningTests.test_symlink_cache_directory_is_rejected) ... ok
+test_symlink_destination_directory_is_rejected (test_wheelhouse_hardening.WheelhouseHardeningTests.test_symlink_destination_directory_is_rejected) ... ok
+test_symlink_in_cache_is_rejected (test_wheelhouse_hardening.WheelhouseHardeningTests.test_symlink_in_cache_is_rejected) ... ok
+test_symlink_to_approved_filename_in_output_is_rejected (test_wheelhouse_hardening.WheelhouseHardeningTests.test_symlink_to_approved_filename_in_output_is_rejected) ... ok
+test_unlisted_directory_is_rejected (test_wheelhouse_hardening.WheelhouseHardeningTests.test_unlisted_directory_is_rejected) ... ok
+test_unlisted_non_wheel_file_is_rejected (test_wheelhouse_hardening.WheelhouseHardeningTests.test_unlisted_non_wheel_file_is_rejected) ... ok
+test_verified_offline_cache_remains_usable (test_wheelhouse_hardening.WheelhouseHardeningTests.test_verified_offline_cache_remains_usable) ... ok
+
+----------------------------------------------------------------------
+Ran 53 tests in 0.071s
+
+OK
+{
+  "errors": 0,
+  "expected_failures": 0,
+  "failures": 0,
+  "gate": "P0.4c Python offline native-compatibility",
+  "limits": "Python unittest only; not an Android build, runtime, API24, or 16KB certification",
+  "passed": 53,
+  "skipped": 0,
+  "status": "PASS",
+  "tests_run": 53,
+  "unexpected_successes": 0
+}

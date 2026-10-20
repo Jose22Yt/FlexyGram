@@ -1,0 +1,20 @@
+test_16k_tag_required_but_not_runtime_proof (test_lab_host_preflight.HostPreflightTests.test_16k_tag_required_but_not_runtime_proof) ... ok
+test_arm64_api24_properties (test_lab_host_preflight.HostPreflightTests.test_arm64_api24_properties) ... ok
+test_avd_storage_above_margin_allows_preflight (test_lab_host_preflight.HostPreflightTests.test_avd_storage_above_margin_allows_preflight) ... ok
+test_avd_storage_below_margin_blocks_before_android (test_lab_host_preflight.HostPreflightTests.test_avd_storage_below_margin_blocks_before_android) ... ok
+test_duplicate_properties_rejected (test_lab_host_preflight.HostPreflightTests.test_duplicate_properties_rejected) ... ok
+test_exact_api35_required (test_lab_host_preflight.HostPreflightTests.test_exact_api35_required) ... ok
+test_gzip_kernel_architecture_checked_after_decompression (test_lab_host_preflight.HostPreflightTests.test_gzip_kernel_architecture_checked_after_decompression) ... ok
+test_namespace_denial_blocks_before_boot (test_lab_host_preflight.HostPreflightTests.test_namespace_denial_blocks_before_boot) ... ok
+test_probe_blocks_even_when_tools_and_images_ready_if_disk_full (test_lab_host_preflight.HostPreflightTests.test_probe_blocks_even_when_tools_and_images_ready_if_disk_full) ... ok
+test_ready_preflight_never_authorizes_or_executes_android (test_lab_host_preflight.HostPreflightTests.test_ready_preflight_never_authorizes_or_executes_android) ... ok
+test_timeout_blocks (test_lab_host_preflight.HostPreflightTests.test_timeout_blocks) ... ok
+test_unavailable_avd_storage_fails_closed (test_lab_host_preflight.HostPreflightTests.test_unavailable_avd_storage_fails_closed) ... ok
+test_unknown_archive_hash_rejected (test_lab_host_preflight.HostPreflightTests.test_unknown_archive_hash_rejected) ... ok
+test_wrong_kernel_cannot_pass_valid_archive (test_lab_host_preflight.HostPreflightTests.test_wrong_kernel_cannot_pass_valid_archive) ... ok
+test_x86_cannot_validate_arm64 (test_lab_host_preflight.HostPreflightTests.test_x86_cannot_validate_arm64) ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 0.008s
+
+OK

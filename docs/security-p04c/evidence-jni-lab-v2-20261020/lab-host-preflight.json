@@ -1,0 +1,78 @@
+{
+  "status": "HOST_BLOCKED_BEFORE_ANDROID_BOOT",
+  "blockers": [
+    "isolated network namespace unavailable"
+  ],
+  "images": [
+    {
+      "profile": "api24-4k",
+      "sha256": "3c3a70dcffe8c162984ec190fc3388bf237b241b3ba80bf7aa5c86e130d8f59b",
+      "bytes": 305854153,
+      "crc_valid": true,
+      "properties": {
+        "Pkg.Desc": "Android SDK Platform 7.0",
+        "Pkg.UserSrc": "false",
+        "Pkg.Revision": "9",
+        "AndroidVersion.ApiLevel": "24",
+        "SystemImage.Abi": "arm64-v8a",
+        "SystemImage.GpuSupport": "true",
+        "SystemImage.TagId": "default"
+      },
+      "kernel_gzip": false,
+      "arm64_kernel_header_verified": true,
+      "actual_guest_api": null,
+      "actual_guest_page_size": null,
+      "strict_16k_runtime_verified": false,
+      "booted": false
+    },
+    {
+      "profile": "arm64-16k",
+      "sha256": "991c7c08258a0a32d7851ae8f9fb7dcd62f5b3907f1a91a2514cd94e75005cb3",
+      "bytes": 1778788352,
+      "crc_valid": true,
+      "properties": {
+        "Pkg.Desc": "System Image Page Size 16k arm64-v8a with Google APIs.",
+        "Pkg.Revision": "5",
+        "Pkg.Dependencies": "emulator#33.1.24",
+        "AndroidVersion.ApiLevel": "35",
+        "AndroidVersion.ExtensionLevel": "13",
+        "AndroidVersion.IsBaseSdk": "true",
+        "SystemImage.Abi": "arm64-v8a",
+        "SystemImage.TagId": "google_apis,page_size_16kb",
+        "SystemImage.TagDisplay": "Google APIs,16 KB Page Size",
+        "SystemImage.GpuSupport": "true",
+        "Addon.VendorId": "google",
+        "Addon.VendorDisplay": "Google Inc."
+      },
+      "kernel_gzip": true,
+      "arm64_kernel_header_verified": true,
+      "actual_guest_api": null,
+      "actual_guest_page_size": null,
+      "strict_16k_runtime_verified": false,
+      "booted": false
+    }
+  ],
+  "emulator": {
+    "exit_code": 0,
+    "output": "Android emulator version 37.2.12.0 (build_id 16428233) (CL:N/A)\nCopyright (C) 2006-2024 The Android Open Source Project and many others.\nThis program is a derivative of the QEMU CPU emulator (www.qemu.org).\n\n  This software is licensed under the terms of the GNU General Public\n  License version 2, as published by the Free Software Foundation, and\n  may be copied, distributed, and modified under those terms.\n\n  This program is distributed in the hope that it will be useful,\n  but WITHOUT ANY WARRANTY; without even the implied warranty of\n  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n  GNU General Public License for more details.\n\n"
+  },
+  "arm64_engine": {
+    "exit_code": 0,
+    "output": "Android emulator version 37.2.12.0 (build_id 16428233) (CL:N/A)\nCopyright (C) 2006-2024 The Android Open Source Project and many others.\nThis program is a derivative of the QEMU CPU emulator (www.qemu.org).\n\n  This software is licensed under the terms of the GNU General Public\n  License version 2, as published by the Free Software Foundation, and\n  may be copied, distributed, and modified under those terms.\n\n  This program is distributed in the hope that it will be useful,\n  but WITHOUT ANY WARRANTY; without even the implied warranty of\n  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n  GNU General Public License for more details.\n\n"
+  },
+  "adb_version_only": {
+    "exit_code": 0,
+    "output": "Android Debug Bridge version 1.0.41\nVersion 37.0.1-15733141\nInstalled as /workspace/scratch/6fe2cd15bb66/toolchains/sdk/platform-tools/adb\nRunning on Linux 6.18.55 (x86_64)\n"
+  },
+  "network_namespace": {
+    "exit_code": 1,
+    "output": "unshare: write failed /proc/self/uid_map: Operation not permitted\n"
+  },
+  "kvm_present": false,
+  "host_arch": "x86_64",
+  "host_page_size": 4096,
+  "android_executed": false,
+  "installation_authorized": false,
+  "runtime_validated": false,
+  "limits": "Tool versions, image bytes and namespace availability only. A READY result is not an ARM64 boot, actual page-size observation or a runtime/signing authorization."
+}

@@ -1,0 +1,13 @@
+{
+  "source_head_before_changes": "a5459cf85c2c23e452bb09f38dfe0a28745ecda1",
+  "python": "Python 3.11.17",
+  "jdk_archive_sha512": "9444ad955a24171f6c5c10e6405f40fd3da931d9810b421b71767f74c94e021666d79390646f4809f988dc4bea8535669827d47c915f83397b36b20e6b828a7d",
+  "jdk_version": "openjdk version \"21.0.10\" 2026-01-20\nOpenJDK Runtime Environment JBR-21.0.10+7-1163.105-nomod (build 21.0.10+7-b1163.105)\nOpenJDK 64-Bit Server VM JBR-21.0.10+7-1163.105-nomod (build 21.0.10+7-b1163.105, mixed mode, sharing)",
+  "pr20_sha256": "f840911ae0adc5cb5fcfb3351e986d1024151838eca3af7434e86fecd65bf146",
+  "pr21_sha256": "5e0a1be9fbe1fbcb4e1ac1f283c3faf23b29a328a03138dd93448606583f45ca",
+  "pyelftools": "0.33",
+  "android_boot_attempted": false,
+  "app_installed": false,
+  "key_generated": false,
+  "apk_signed": false
+}

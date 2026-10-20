@@ -1,0 +1,807 @@
+Picked up JAVA_TOOL_OPTIONS: [local proxy and TLS settings redacted]
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.7.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :buildSrc:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :buildSrc:compileKotlin UP-TO-DATE
+> Task :buildSrc:compileJava NO-SOURCE
+> Task :buildSrc:compileGroovy NO-SOURCE
+> Task :buildSrc:pluginDescriptors UP-TO-DATE
+> Task :buildSrc:processResources UP-TO-DATE
+> Task :buildSrc:classes UP-TO-DATE
+> Task :buildSrc:jar UP-TO-DATE
+> Task :TMessagesProj:exportExperimentalGraph FAILED
+
+[Incubating] Problems report is available at: file:///workspace/scratch/6fe2cd15bb66/experiment/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* Where:
+Initialization script '/workspace/scratch/6fe2cd15bb66/graph.init.gradle' line: 11
+
+* What went wrong:
+Execution failed for task ':TMessagesProj:exportExperimentalGraph' (registered in initialization script '../graph.init.gradle').
+> Could not resolve all artifacts for configuration ':TMessagesProj:diagnosticDebugCompileClasspath'.
+   > The consumer was configured to find a library for use during compile-time, preferably optimized for Android, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug', attribute 'com.android.build.api.attributes.ProductFlavor:environment' with value 'diagnostic', attribute 'org.jetbrains.kotlin.platform.type' with value 'androidJvm'. However we cannot choose between the following variants of project ':TMessagesProj_Modules:media3:media-lib-exoplayer-dash':
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-exoplayer-dash:debugApiElements' variant 'android-classes-jar' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-classes-jar' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+               - Provides its elements packaged as a jar but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-exoplayer-dash:debugApiElements' variant 'android-lint' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-lint' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+               - Provides its elements packaged as a jar but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-exoplayer-dash:debugApiElements' variant 'android-lint-local-aar' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-lint-local-aar' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-exoplayer-dash:debugApiElements' variant 'android-manifest' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-manifest' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-exoplayer-dash:debugApiElements' variant 'android-renderscript' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-renderscript' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-exoplayer-dash:debugApiElements' variant 'android-symbol-with-package-name' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-symbol-with-package-name' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-exoplayer-dash:debugApiElements' variant 'jar' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'jar' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+               - Provides its elements packaged as a jar but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-exoplayer-dash:debugApiElements' variant 'r-class-jar' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'r-class-jar' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+               - Provides its elements packaged as a jar but the consumer didn't ask for it
+   > The consumer was configured to find a library for use during compile-time, preferably optimized for Android, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug', attribute 'com.android.build.api.attributes.ProductFlavor:environment' with value 'diagnostic', attribute 'org.jetbrains.kotlin.platform.type' with value 'androidJvm'. However we cannot choose between the following variants of project ':TMessagesProj_Modules:media3:media-lib-exoplayer-hls':
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-exoplayer-hls:debugApiElements' variant 'android-classes-jar' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-classes-jar' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+               - Provides its elements packaged as a jar but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-exoplayer-hls:debugApiElements' variant 'android-lint' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-lint' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+               - Provides its elements packaged as a jar but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-exoplayer-hls:debugApiElements' variant 'android-lint-local-aar' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-lint-local-aar' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-exoplayer-hls:debugApiElements' variant 'android-manifest' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-manifest' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-exoplayer-hls:debugApiElements' variant 'android-renderscript' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-renderscript' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-exoplayer-hls:debugApiElements' variant 'android-symbol-with-package-name' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-symbol-with-package-name' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-exoplayer-hls:debugApiElements' variant 'jar' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'jar' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+               - Provides its elements packaged as a jar but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-exoplayer-hls:debugApiElements' variant 'r-class-jar' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'r-class-jar' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+               - Provides its elements packaged as a jar but the consumer didn't ask for it
+   > The consumer was configured to find a library for use during compile-time, preferably optimized for Android, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug', attribute 'com.android.build.api.attributes.ProductFlavor:environment' with value 'diagnostic', attribute 'org.jetbrains.kotlin.platform.type' with value 'androidJvm'. However we cannot choose between the following variants of project ':TMessagesProj_Modules:media3:media-lib-exoplayer':
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-exoplayer:debugApiElements' variant 'android-classes-jar' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-classes-jar' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+               - Provides its elements packaged as a jar but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-exoplayer:debugApiElements' variant 'android-lint' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-lint' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+               - Provides its elements packaged as a jar but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-exoplayer:debugApiElements' variant 'android-lint-local-aar' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-lint-local-aar' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-exoplayer:debugApiElements' variant 'android-manifest' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-manifest' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-exoplayer:debugApiElements' variant 'android-renderscript' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-renderscript' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-exoplayer:debugApiElements' variant 'android-symbol-with-package-name' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-symbol-with-package-name' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-exoplayer:debugApiElements' variant 'jar' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'jar' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+               - Provides its elements packaged as a jar but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-exoplayer:debugApiElements' variant 'r-class-jar' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'r-class-jar' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+               - Provides its elements packaged as a jar but the consumer didn't ask for it
+   > The consumer was configured to find a library for use during compile-time, preferably optimized for Android, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug', attribute 'com.android.build.api.attributes.ProductFlavor:environment' with value 'diagnostic', attribute 'org.jetbrains.kotlin.platform.type' with value 'androidJvm'. However we cannot choose between the following variants of project ':TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg':
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:debugApiElements' variant 'android-classes-jar' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-classes-jar' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+               - Provides its elements packaged as a jar but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:debugApiElements' variant 'android-lint' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-lint' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+               - Provides its elements packaged as a jar but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:debugApiElements' variant 'android-lint-local-aar' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-lint-local-aar' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:debugApiElements' variant 'android-manifest' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-manifest' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:debugApiElements' variant 'android-renderscript' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-renderscript' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:debugApiElements' variant 'android-symbol-with-package-name' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-symbol-with-package-name' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:debugApiElements' variant 'jar' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'jar' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+               - Provides its elements packaged as a jar but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg:debugApiElements' variant 'r-class-jar' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'r-class-jar' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+               - Provides its elements packaged as a jar but the consumer didn't ask for it
+   > The consumer was configured to find a library for use during compile-time, preferably optimized for Android, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug', attribute 'com.android.build.api.attributes.ProductFlavor:environment' with value 'diagnostic', attribute 'org.jetbrains.kotlin.platform.type' with value 'androidJvm'. However we cannot choose between the following variants of project ':TMessagesProj_Modules:media3:media-lib-session':
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-session:debugApiElements' variant 'android-aidl' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-aidl' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-session:debugApiElements' variant 'android-classes-jar' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-classes-jar' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+               - Provides its elements packaged as a jar but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-session:debugApiElements' variant 'android-lint' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-lint' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+               - Provides its elements packaged as a jar but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-session:debugApiElements' variant 'android-lint-local-aar' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-lint-local-aar' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-session:debugApiElements' variant 'android-manifest' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-manifest' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-session:debugApiElements' variant 'android-renderscript' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-renderscript' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-session:debugApiElements' variant 'android-symbol-with-package-name' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-symbol-with-package-name' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-session:debugApiElements' variant 'jar' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'jar' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+               - Provides its elements packaged as a jar but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-session:debugApiElements' variant 'r-class-jar' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'r-class-jar' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+               - Provides its elements packaged as a jar but the consumer didn't ask for it
+   > The consumer was configured to find a library for use during compile-time, preferably optimized for Android, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug', attribute 'com.android.build.api.attributes.ProductFlavor:environment' with value 'diagnostic', attribute 'org.jetbrains.kotlin.platform.type' with value 'androidJvm'. However we cannot choose between the following variants of project ':TMessagesProj_Modules:media3:media-lib-extractor':
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-extractor:debugApiElements' variant 'android-classes-jar' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-classes-jar' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+               - Provides its elements packaged as a jar but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-extractor:debugApiElements' variant 'android-lint' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-lint' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+               - Provides its elements packaged as a jar but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-extractor:debugApiElements' variant 'android-lint-local-aar' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-lint-local-aar' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-extractor:debugApiElements' variant 'android-manifest' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-manifest' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-extractor:debugApiElements' variant 'android-renderscript' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-renderscript' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-extractor:debugApiElements' variant 'android-symbol-with-package-name' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-symbol-with-package-name' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-extractor:debugApiElements' variant 'jar' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'jar' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+               - Provides its elements packaged as a jar but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-extractor:debugApiElements' variant 'r-class-jar' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'r-class-jar' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+               - Provides its elements packaged as a jar but the consumer didn't ask for it
+   > The consumer was configured to find a library for use during compile-time, preferably optimized for Android, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug', attribute 'com.android.build.api.attributes.ProductFlavor:environment' with value 'diagnostic', attribute 'org.jetbrains.kotlin.platform.type' with value 'androidJvm'. However we cannot choose between the following variants of project ':TMessagesProj_Modules:media3:media-lib-container':
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-container:debugApiElements' variant 'android-classes-jar' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-classes-jar' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+               - Provides its elements packaged as a jar but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-container:debugApiElements' variant 'android-lint' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-lint' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+               - Provides its elements packaged as a jar but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-container:debugApiElements' variant 'android-lint-local-aar' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-lint-local-aar' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-container:debugApiElements' variant 'android-manifest' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-manifest' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-container:debugApiElements' variant 'android-renderscript' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-renderscript' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-container:debugApiElements' variant 'android-symbol-with-package-name' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-symbol-with-package-name' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-container:debugApiElements' variant 'jar' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'jar' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+               - Provides its elements packaged as a jar but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-container:debugApiElements' variant 'r-class-jar' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'r-class-jar' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+               - Provides its elements packaged as a jar but the consumer didn't ask for it
+   > The consumer was configured to find a library for use during compile-time, preferably optimized for Android, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug', attribute 'com.android.build.api.attributes.ProductFlavor:environment' with value 'diagnostic', attribute 'org.jetbrains.kotlin.platform.type' with value 'androidJvm'. However we cannot choose between the following variants of project ':TMessagesProj_Modules:media3:media-lib-datasource':
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-datasource:debugApiElements' variant 'android-classes-jar' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-classes-jar' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+               - Provides its elements packaged as a jar but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-datasource:debugApiElements' variant 'android-lint' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-lint' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+               - Provides its elements packaged as a jar but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-datasource:debugApiElements' variant 'android-lint-local-aar' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-lint-local-aar' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-datasource:debugApiElements' variant 'android-manifest' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-manifest' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-datasource:debugApiElements' variant 'android-renderscript' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-renderscript' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-datasource:debugApiElements' variant 'android-symbol-with-package-name' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-symbol-with-package-name' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-datasource:debugApiElements' variant 'jar' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'jar' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+               - Provides its elements packaged as a jar but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-datasource:debugApiElements' variant 'r-class-jar' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'r-class-jar' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+               - Provides its elements packaged as a jar but the consumer didn't ask for it
+   > The consumer was configured to find a library for use during compile-time, preferably optimized for Android, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug', attribute 'com.android.build.api.attributes.ProductFlavor:environment' with value 'diagnostic', attribute 'org.jetbrains.kotlin.platform.type' with value 'androidJvm'. However we cannot choose between the following variants of project ':TMessagesProj_Modules:media3:media-lib-decoder':
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-decoder:debugApiElements' variant 'android-classes-jar' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-classes-jar' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+               - Provides its elements packaged as a jar but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-decoder:debugApiElements' variant 'android-lint' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-lint' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+               - Provides its elements packaged as a jar but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-decoder:debugApiElements' variant 'android-lint-local-aar' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-lint-local-aar' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-decoder:debugApiElements' variant 'android-manifest' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-manifest' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-decoder:debugApiElements' variant 'android-renderscript' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-renderscript' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-decoder:debugApiElements' variant 'android-symbol-with-package-name' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-symbol-with-package-name' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-decoder:debugApiElements' variant 'jar' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'jar' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+               - Provides its elements packaged as a jar but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-decoder:debugApiElements' variant 'r-class-jar' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'r-class-jar' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+               - Provides its elements packaged as a jar but the consumer didn't ask for it
+   > The consumer was configured to find a library for use during compile-time, preferably optimized for Android, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug', attribute 'com.android.build.api.attributes.ProductFlavor:environment' with value 'diagnostic', attribute 'org.jetbrains.kotlin.platform.type' with value 'androidJvm'. However we cannot choose between the following variants of project ':TMessagesProj_Modules:media3:media-lib-database':
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-database:debugApiElements' variant 'android-classes-jar' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-classes-jar' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+               - Provides its elements packaged as a jar but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-database:debugApiElements' variant 'android-lint' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-lint' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+               - Provides its elements packaged as a jar but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-database:debugApiElements' variant 'android-lint-local-aar' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-lint-local-aar' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-database:debugApiElements' variant 'android-manifest' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-manifest' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-database:debugApiElements' variant 'android-renderscript' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-renderscript' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-database:debugApiElements' variant 'android-symbol-with-package-name' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-symbol-with-package-name' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-database:debugApiElements' variant 'jar' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'jar' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+               - Provides its elements packaged as a jar but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-database:debugApiElements' variant 'r-class-jar' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'r-class-jar' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+               - Provides its elements packaged as a jar but the consumer didn't ask for it
+   > The consumer was configured to find a library for use during compile-time, preferably optimized for Android, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug', attribute 'com.android.build.api.attributes.ProductFlavor:environment' with value 'diagnostic', attribute 'org.jetbrains.kotlin.platform.type' with value 'androidJvm'. However we cannot choose between the following variants of project ':TMessagesProj_Modules:media3:media-lib-common':
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-common:debugApiElements' variant 'android-classes-jar' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-classes-jar' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+               - Provides its elements packaged as a jar but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-common:debugApiElements' variant 'android-lint' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-lint' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+               - Provides its elements packaged as a jar but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-common:debugApiElements' variant 'android-lint-local-aar' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-lint-local-aar' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-common:debugApiElements' variant 'android-manifest' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-manifest' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-common:debugApiElements' variant 'android-renderscript' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-renderscript' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-common:debugApiElements' variant 'android-symbol-with-package-name' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'android-symbol-with-package-name' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-common:debugApiElements' variant 'jar' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'jar' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+               - Provides its elements packaged as a jar but the consumer didn't ask for it
+       - Configuration ':TMessagesProj_Modules:media3:media-lib-common:debugApiElements' variant 'r-class-jar' declares a component for use during compile-time, as well as attribute 'com.android.build.api.attributes.AgpVersionAttr' with value '9.3.1', attribute 'com.android.build.api.attributes.BuildTypeAttr' with value 'debug':
+           - Unmatched attributes:
+               - Doesn't say anything about com.android.build.api.attributes.ProductFlavor:environment (required 'diagnostic')
+               - Doesn't say anything about its component category (required a library)
+               - Doesn't say anything about its target Java environment (preferred optimized for Android)
+               - Doesn't say anything about org.jetbrains.kotlin.platform.type (required 'androidJvm')
+               - Provides attribute 'artifactType' with value 'r-class-jar' but the consumer didn't ask for it
+               - Provides attribute 'com.android.build.gradle.internal.attributes.VariantAttr' with value 'debug' but the consumer didn't ask for it
+               - Provides its elements packaged as a jar but the consumer didn't ask for it
+
+* Try:
+> Ambiguity errors are explained in more detail at https://docs.gradle.org/9.7.1/userguide/variant_model.html#sub:variant-ambiguity.
+> Review the variant matching algorithm at https://docs.gradle.org/9.7.1/userguide/variant_attributes.html#sec:abm_algorithm.
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+> Get more help at https://help.gradle.org.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.7.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 15s
+5 actionable tasks: 1 executed, 4 up-to-date

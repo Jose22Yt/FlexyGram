@@ -1,0 +1,55 @@
+{
+  "jdk_version": "openjdk version \"21.0.10\" 2026-01-20\nOpenJDK Runtime Environment JBR-21.0.10+7-1163.105-nomod (build 21.0.10+7-b1163.105)\nOpenJDK 64-Bit Server VM JBR-21.0.10+7-1163.105-nomod (build 21.0.10+7-b1163.105, mixed mode, sharing)\n",
+  "jdk_archive_sha512": "9444ad955a24171f6c5c10e6405f40fd3da931d9810b421b71767f74c94e021666d79390646f4809f988dc4bea8535669827d47c915f83397b36b20e6b828a7d",
+  "python_version": "Python 3.11.17",
+  "cmake_version": "cmake version 3.31.6",
+  "ninja_version": "1.12.1",
+  "ndk_properties": "Pkg.Desc = Android NDK\nPkg.Revision = 27.2.12479018\nPkg.BaseRevision = 27.2.12479018\nPkg.ReleaseName = r27c\n",
+  "clang_version": "Android (12470979, +pgo, +bolt, +lto, +mlgo, based on r522817c) clang version 18.0.3 (https://android.googlesource.com/toolchain/llvm-project d8003a456d14a3deb8054cdaa529ffbf02d9b262)\nTarget: x86_64-unknown-linux-gnu\nThread model: posix\nInstalledDir: /workspace/scratch/6fe2cd15bb66/toolchains/sdk/ndk/27.2.12479018/toolchains/llvm/prebuilt/linux-x86_64/bin\n",
+  "downloads": [
+    {
+      "package": "ndk;27.2.12479018",
+      "url": "https://dl.google.com/android/repository/android-ndk-r27c-linux.zip",
+      "sha256": "59c2f6dc96743b5daf5d1626684640b20a6bd2b1d85b13156b90333741bad5cc",
+      "catalog_sha1": "090e8083a715fdb1a3e402d0763c388abb03fb4e",
+      "location": "/workspace/scratch/6fe2cd15bb66/build-lab/sdk/ndk/27.2.12479018"
+    },
+    {
+      "package": "build-tools;36.0.0",
+      "url": "https://dl.google.com/android/repository/build-tools_r36_linux.zip",
+      "sha256": "5d9ac77fb6ff43d9da518a337b4fcf8f9097113df531d99ccefe80ef7ce8250b",
+      "catalog_sha1": "b0b6376977657e8ad9b969bacf4093601da2c6fb",
+      "location": "/workspace/scratch/6fe2cd15bb66/build-lab/sdk/build-tools/36.0.0"
+    },
+    {
+      "package": "platforms;android-37.0",
+      "url": "https://dl.google.com/android/repository/platform-37.0_r02.zip",
+      "sha256": "840b23e827f96e64aea4c89a1194aac3dc5f6bad37edb231c5c795d890330e8d",
+      "catalog_sha1": "ed8ebf7f8822a4de5686d427f237d2fa30ff7410",
+      "location": "/workspace/scratch/6fe2cd15bb66/build-lab/sdk/platforms/android-37"
+    },
+    {
+      "package": "platforms;android-24",
+      "url": "https://dl.google.com/android/repository/platform-24_r02.zip",
+      "sha256": "f268f5945c6ece7ea95c1c252067280854d2a20da924e22ae4720287df8bdbc9",
+      "catalog_sha1": "8912da3d4bfe7a9f28f0e5ce92d3a8dc96342aee",
+      "location": "/workspace/scratch/6fe2cd15bb66/build-lab/sdk/platforms/android-24"
+    },
+    {
+      "package": "platforms;android-35",
+      "url": "https://dl.google.com/android/repository/platform-35_r02.zip",
+      "catalog_sha1": "0bb560a90a7a2cbd0dd8348224d518b638fe7949",
+      "sha256": "0988cacad01b38a18a47bac14a0695f246bc76c1b06c0eeb8eb0dc825ab0c8e0"
+    },
+    {
+      "package": "gradle",
+      "url": "https://services.gradle.org/distributions/gradle-9.7.1-bin.zip",
+      "sha256": "acd53f1edaf02f1a8ff99879f8a34b302661a057d9b063ae9e35b552f804d20a"
+    }
+  ],
+  "api24_android_jar_sha256": "4c438bf1b3d4e6104faccc62e1ffe95ef197b88055497b540a871349e93c8685",
+  "api37_android_jar_sha256": "bf1b4387cc7ca94fc6ef684f040d9d16fbf16248e181819f020736ea2053f177",
+  "sdk_cmake_archive_sha256": "ce136bb4b02580b36e53d9ccfe5275069655e6ef7d46d6fe2fcf88cfdf8fb761",
+  "ndk_official_symlinks_restored": 35,
+  "app_code_modified": false
+}

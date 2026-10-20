@@ -1,0 +1,181 @@
+[
+  {
+    "path": "chaquopy/lib/libexslt.so",
+    "soname": "libexslt.so",
+    "needed": [
+      "libxslt.so",
+      "libm.so",
+      "libxml2.so",
+      "libdl.so",
+      "libc.so"
+    ],
+    "android_note_api": 21,
+    "load_16k": false,
+    "load_segments": [
+      {
+        "offset": 0,
+        "vaddr": 0,
+        "filesz": 102140,
+        "memsz": 102140,
+        "align": 4096,
+        "flags": 5
+      },
+      {
+        "offset": 104688,
+        "vaddr": 108784,
+        "filesz": 1816,
+        "memsz": 1816,
+        "align": 4096,
+        "flags": 6
+      }
+    ]
+  },
+  {
+    "path": "chaquopy/lib/libxslt.so",
+    "soname": "libxslt.so",
+    "needed": [
+      "libm.so",
+      "libxml2.so",
+      "libdl.so",
+      "libc.so"
+    ],
+    "android_note_api": 21,
+    "load_16k": false,
+    "load_segments": [
+      {
+        "offset": 0,
+        "vaddr": 0,
+        "filesz": 337816,
+        "memsz": 337816,
+        "align": 4096,
+        "flags": 5
+      },
+      {
+        "offset": 340392,
+        "vaddr": 344488,
+        "filesz": 4048,
+        "memsz": 5224,
+        "align": 4096,
+        "flags": 6
+      }
+    ]
+  },
+  {
+    "path": "chaquopy/lib/libxml2.so",
+    "soname": "libxml2.so",
+    "needed": [
+      "libz.so",
+      "libm.so",
+      "libdl.so",
+      "libc.so"
+    ],
+    "android_note_api": 21,
+    "load_16k": false,
+    "load_segments": [
+      {
+        "offset": 0,
+        "vaddr": 0,
+        "filesz": 2117824,
+        "memsz": 2117824,
+        "align": 4096,
+        "flags": 5
+      },
+      {
+        "offset": 2118880,
+        "vaddr": 2122976,
+        "filesz": 36192,
+        "memsz": 41200,
+        "align": 4096,
+        "flags": 6
+      }
+    ]
+  },
+  {
+    "path": "chaquopy/lib/libyaml-0.so",
+    "soname": "libyaml-0.so",
+    "needed": [
+      "libm.so",
+      "libdl.so",
+      "libc.so"
+    ],
+    "android_note_api": 24,
+    "load_16k": true,
+    "load_segments": [
+      {
+        "offset": 0,
+        "vaddr": 0,
+        "filesz": 190352,
+        "memsz": 190352,
+        "align": 16384,
+        "flags": 5
+      },
+      {
+        "offset": 190352,
+        "vaddr": 206736,
+        "filesz": 840,
+        "memsz": 2160,
+        "align": 16384,
+        "flags": 6
+      }
+    ]
+  },
+  {
+    "path": "chaquopy/lib/libfreetype.so",
+    "soname": "libfreetype.so",
+    "needed": [
+      "libm.so",
+      "libz.so",
+      "libdl.so",
+      "libc.so"
+    ],
+    "android_note_api": 21,
+    "load_16k": false,
+    "load_segments": [
+      {
+        "offset": 0,
+        "vaddr": 0,
+        "filesz": 808608,
+        "memsz": 808608,
+        "align": 4096,
+        "flags": 5
+      },
+      {
+        "offset": 808608,
+        "vaddr": 812704,
+        "filesz": 24280,
+        "memsz": 24280,
+        "align": 4096,
+        "flags": 6
+      }
+    ]
+  },
+  {
+    "path": "chaquopy/lib/libjpeg_chaquopy.so",
+    "soname": "libjpeg_chaquopy.so",
+    "needed": [
+      "libm.so",
+      "libdl.so",
+      "libc.so"
+    ],
+    "android_note_api": 21,
+    "load_16k": true,
+    "load_segments": [
+      {
+        "offset": 0,
+        "vaddr": 0,
+        "filesz": 478144,
+        "memsz": 478144,
+        "align": 65536,
+        "flags": 5
+      },
+      {
+        "offset": 479232,
+        "vaddr": 544768,
+        "filesz": 2488,
+        "memsz": 2488,
+        "align": 65536,
+        "flags": 6
+      }
+    ]
+  }
+]

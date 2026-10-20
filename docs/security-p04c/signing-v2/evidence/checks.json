@@ -1,0 +1,50 @@
+[
+  {
+    "suite": "runner",
+    "python": "3.11.17",
+    "optimized": false,
+    "tests": 32,
+    "passed": true,
+    "exit_code": 0
+  },
+  {
+    "suite": "runner",
+    "python": "3.11.17",
+    "optimized": true,
+    "tests": 32,
+    "passed": true,
+    "exit_code": 0
+  },
+  {
+    "suite": "adapter",
+    "python": "3.11.17",
+    "optimized": false,
+    "tests": 16,
+    "passed": true,
+    "exit_code": 0
+  },
+  {
+    "suite": "adapter",
+    "python": "3.11.17",
+    "optimized": true,
+    "tests": 16,
+    "passed": true,
+    "exit_code": 0
+  },
+  {
+    "suite": "pr21",
+    "python": "3.11.17",
+    "optimized": false,
+    "tests": 24,
+    "passed": true,
+    "exit_code": 0
+  },
+  {
+    "suite": "pr21",
+    "python": "3.11.17",
+    "optimized": true,
+    "tests": 24,
+    "passed": true,
+    "exit_code": 0
+  }
+]

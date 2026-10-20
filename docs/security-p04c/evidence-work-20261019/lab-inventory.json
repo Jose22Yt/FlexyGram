@@ -1,0 +1,14 @@
+{
+  "host_arch": "x86_64",
+  "host_pages": 4096,
+  "kvm": false,
+  "tun": false,
+  "cap_net_admin": false,
+  "cap_sys_admin": false,
+  "adb": true,
+  "emulator": false,
+  "qemu_arm64": false,
+  "launch_cvd": false,
+  "android_executed": false,
+  "status": "INVENTORY_ONLY"
+}

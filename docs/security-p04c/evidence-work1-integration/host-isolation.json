@@ -1,0 +1,75 @@
+{
+  "host_arch": "x86_64",
+  "host_pages": 4096,
+  "free_bytes": 26458017792,
+  "tools": {
+    "adb": false,
+    "emulator": false,
+    "qemu-system-aarch64": false,
+    "ip": true,
+    "unshare": true,
+    "docker": false,
+    "podman": false,
+    "bwrap": true
+  },
+  "devices": {
+    "/dev/kvm": false,
+    "/dev/net/tun": false,
+    "/dev/bus/usb": false
+  },
+  "namespace_attempts": {
+    "mapped_user_net": {
+      "command": [
+        "unshare",
+        "--user",
+        "--map-root-user",
+        "--net",
+        "true"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "unshare: write failed /proc/self/uid_map: Operation not permitted\n"
+    },
+    "net_only": {
+      "command": [
+        "unshare",
+        "--net",
+        "true"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "unshare: unshare failed: Operation not permitted\n"
+    },
+    "unmapped_user_net": {
+      "command": [
+        "unshare",
+        "--user",
+        "--net",
+        "true"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "unmapped_set_loopback": {
+      "command": [
+        "unshare",
+        "--user",
+        "--net",
+        "ip",
+        "link",
+        "set",
+        "lo",
+        "up"
+      ],
+      "exit": 1,
+      "stdout": "",
+      "stderr": "Cannot open netlink socket: Operation not permitted\n"
+    },
+    "bubblewrap": {
+      "error_type": "TimeoutExpired"
+    }
+  },
+  "android_boot_attempted": false,
+  "apk_installed": false
+}

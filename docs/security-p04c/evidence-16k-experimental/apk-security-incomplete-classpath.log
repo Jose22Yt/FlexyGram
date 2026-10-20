@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram/tests/build_variants/check_diagnostic.py", line 44, in <module>
+    a=p.parse_args();r=validate(a.apk,a.aapt2,a.classes,a.graph,a.manifest,a.readelf)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram/tests/build_variants/check_diagnostic.py", line 16, in validate
+    report=inspect(apk,aapt2,classes,graph,manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram/tests/translation_staging/check_integration.py", line 39, in inspect
+    result=check(apk,aapt2,classes)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram/tests/translation_runtime/check_artifact.py", line 58, in check
+    text=subprocess.run(['javap','-c','-p','-classpath',classes,cls],check=True,capture_output=True,text=True).stdout
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/.local/share/uv/python/cpython-3.11.17-linux-x86_64-gnu/lib/python3.11/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['javap', '-c', '-p', '-classpath', PosixPath('../experiment-16k/TMessagesProj/build/intermediates/javac/diagnosticDebug/compileDiagnosticDebugJavaWithJavac/classes'), 'tw.nekomimi.nekogram.translate.source.GoogleTranslator']' returned non-zero exit status 1.

@@ -1,0 +1,12 @@
+{
+  "android_runtime_validated": false,
+  "apk_bytes": 113080183,
+  "apk_sha256": "291881863ea81418fa6cb12104b6eaea4aee2403822894da2143a51f3030bdd5",
+  "arm64": 96,
+  "distribution_allowed": false,
+  "elf_total": 97,
+  "historical_contract_modified": false,
+  "installed": false,
+  "signed": false,
+  "status": "CANDIDATE_BYTES_STATICALLY_VERIFIED_PENDING_ANDROID"
+}

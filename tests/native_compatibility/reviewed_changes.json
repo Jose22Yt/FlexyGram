@@ -1,0 +1,220 @@
+{
+  "base": "ab063041804674861e865364206c0ef27ef1e953",
+  "files": {
+    "TMessagesProj/build.gradle": {
+      "before": "7d83c7b582a4af6a5adeb2f06c363e47f9728e41d328cf25fff80a549bd00b39",
+      "after": "45f5e0fac03635e865a60eb16ad296a8422db9184c6cf3b5e0f4b235e02ae618",
+      "previous": [
+        "02161a45c44fe6f0b75c80359fd8c924e925302e693c33d9d873ebc6e5f5fba1",
+        "7d83c7b582a4af6a5adeb2f06c363e47f9728e41d328cf25fff80a549bd00b39",
+        "f978651af1f32a66c32ffc864a0ea628e1281cd456ad57d5d04934bce8b844b0"
+      ]
+    },
+    "TMessagesProj/python/requirements.lock": {
+      "before": null,
+      "after": "3b256cf2e29614bf33d3115a0a84a80f4df4097bb529cdd5d7dc977e579462a6",
+      "previous": []
+    },
+    "TMessagesProj/python/wheels.lock.json": {
+      "before": null,
+      "after": "2473f225e52f03d9de4e52b524f341c9ba1066118528f82425ecda20be9a70c9",
+      "previous": []
+    },
+    "tools/native_compatibility/audit.py": {
+      "before": null,
+      "after": "3159252fc7ae161b49b0381b3b5a378ea4daa61d42d0cf093bca71081d704fe2",
+      "previous": []
+    },
+    "tools/native_compatibility/wheelhouse.py": {
+      "before": null,
+      "after": "cb3366173079fa8b7a2711506579bc29de131124377fdb9e55208651501c6b97",
+      "previous": [
+        "3f8c5e0aa75ed4dd13f22497df9f2531420e1c00afc5c68708e1ae2389dcd44f",
+        "3c715888f2edfa62dcb8702c69ed7699c32e76871bbde47ce2bb995d1e5a67eb"
+      ]
+    },
+    "tests/build_variants/scope.py": {
+      "before": "210598676311402688bc35eb9b7c7edf38cc6b9d405f34803ca2260be051b4c5",
+      "after": "9c0bb55929eedd2a738ce743e8a87f074e28f603419baf9bd8ca8edd38fb921e",
+      "previous": [
+        "210598676311402688bc35eb9b7c7edf38cc6b9d405f34803ca2260be051b4c5"
+      ]
+    },
+    "tests/translation_staging/review_scope.py": {
+      "before": "cbaf75ddf3c3a63136adf51c2d5b1a7274cdc315402dd7c6639d2ef72b0b3a12",
+      "after": "3db5849fcc10a91ba1e189cda03d4537b975a0ca983de33a881dea0aad754f20",
+      "previous": [
+        "cbaf75ddf3c3a63136adf51c2d5b1a7274cdc315402dd7c6639d2ef72b0b3a12",
+        "de6dcbbd44175343fc634e79720b6b872123ffcb3081ce92ce0dd3f9b63b235c"
+      ]
+    },
+    "tools/native_compatibility/requirements.lock": {
+      "before": null,
+      "previous": [],
+      "after": "54bfc17714546a068eeb4caf481e8ba4c384fe1ecc936fcbd79876a7789bde6b"
+    },
+    "tools/native_compatibility/acceptance.py": {
+      "before": null,
+      "after": "27fa11a88694e5953b4846f3b3cbc34f60d96f96f04d97d7d8feaa946b412425",
+      "previous": []
+    },
+    "tools/native_compatibility/rebuild_candidates.py": {
+      "before": null,
+      "after": "dd760439ffba6415e0dd60c296af5f9234766e7b74e94738fe183b52f91a3c1a",
+      "previous": [
+        "0cd6596bb78071258a8e65092ea8fe65102eec16bfb2e1655f766589c8bd830d",
+        "af7c0ee1f653cfa7c5c7cf4c0f6ab8e9ae37da98bf2374a6747a6789a1f0ea69",
+        "42220c572150dc84c1299cee5e38aaebc01acee5407705265a8af04a3718a1ce",
+        "ee764e2034d36c7d9624685af9ca30586471722dcca6ac3bc5cbacf2033795b5"
+      ]
+    },
+    "tools/native_compatibility/rebuild-sources.json": {
+      "before": null,
+      "after": "7ddf343b6025e0481bb32a2b11e5aa3bfaba3c740ede8bf8a0aa004ffb0324bc",
+      "previous": []
+    },
+    "tools/native_compatibility/abi_report.py": {
+      "before": null,
+      "after": "49f3dfb719f801a561837d9bd37b22c8bd87972df030d9e0f2519b2af5d4d385",
+      "previous": []
+    },
+    "tools/native_compatibility/compat_relink.py": {
+      "before": null,
+      "after": "32b0880a8f0a5bbae885f617b521b76eed1e0f0654419e0efe6eed801a5e3629",
+      "previous": [
+        "4d6561d556b5e289d1c5e087147398e8c5ef2db3adef67e1c7a566f014b42f81",
+        "07f649cc03b587f19f32d8e3bdac21863fa2ff59ee358814502bb5615191df82"
+      ]
+    },
+    "tools/native_compatibility/experiment_recipe.py": {
+      "before": null,
+      "after": "bd41fcf0bb95f1f3be6e332787b8a8d576de9a3f59bc3b9c3844b3211925bf2c",
+      "previous": [
+        "ac3f6e0f887d3354bf9614d77adfab51e03ef9c1b396752018ab109aa0b2e3cf"
+      ]
+    },
+    "tools/native_compatibility/experimental_wheels.py": {
+      "before": null,
+      "after": "f3939fc684fd42c388872bbfddb84cfbfb877e440b3de67bd1ce1dba60a6c2c6",
+      "previous": []
+    },
+    "tools/native_compatibility/prepare_experiment.py": {
+      "before": null,
+      "after": "85e6718c4be69f5903cb88a7428a7e142de56653a3ae0310964b86c4d8d24af2",
+      "previous": [
+        "c9fa124471b711779a913ee784b72dd3fc8b7bf47d0525a24e4f37647b564a34"
+      ]
+    },
+    "tools/native_compatibility/build_host_fixture.py": {
+      "before": null,
+      "after": "51fc4f9e042b9e703a91bd2e455e495ccb8e7cef0bace567077f5fc462dc2db2",
+      "previous": []
+    },
+    "tools/native_compatibility/pinned_freetype.py": {
+      "before": null,
+      "after": "fee35e86e877df6896bbcab02c8160971ca5355da3c43bbfc9a97b144c46d309",
+      "previous": []
+    },
+    "tools/native_compatibility/reproduce_locked_16k.py": {
+      "before": null,
+      "after": "db58f029b42871ee01157054f849815d70d870681b218a9a0ae0750628f8b801",
+      "previous": [
+        "173380121ce0fc625f95ce3376c49c8442bd3406d8f12ba0f8112b1191cc9cf4"
+      ]
+    },
+    "tools/native_compatibility/run_p04c_host_gate.py": {
+      "before": null,
+      "after": "b5489884cb5d53ccacb51a861374be2d4258ac445e37da9828d8747343cc3eea",
+      "previous": []
+    },
+    "tools/native_compatibility/stage_recovered_inputs.py": {
+      "before": null,
+      "after": "9fa1e07cbfab2927ac5276274d96bbf0cb93d5a4a1bccbc93fd7d62451d36a9a",
+      "previous": []
+    },
+    "docs/lab-readiness/README.md": {
+      "before": null,
+      "after": "9f8b5b0ba379b04880deaf96ed4d3eac66874c954004365f9e46f5dce0452086",
+      "previous": []
+    },
+    "docs/lab-readiness/VALIDATION.md": {
+      "before": null,
+      "after": "a26994ab2defe4b719405f1a966a0e632518de25b10a5f2f430fe126932c9591",
+      "previous": []
+    },
+    "docs/lab-readiness/evidence/concurrent-launcher.log": {
+      "before": null,
+      "after": "0d6e07092c3d46b481bc0da3358c9f06a8df92239348f4f9fe08284802e514dd",
+      "previous": []
+    },
+    "docs/lab-readiness/evidence/controller-before.log": {
+      "before": null,
+      "after": "85885ea8a50e6bb9c7bf9be74f7328bbec8c9ade4efcc5f579ea8f5f0e2de29f",
+      "previous": []
+    },
+    "docs/lab-readiness/evidence/controller-initial-missing-javac.log": {
+      "before": null,
+      "after": "eedf1e9e74364d221cb712c58c01b0c8756d63880585fded82ef4cf150d4b184",
+      "previous": []
+    },
+    "docs/lab-readiness/evidence/controller-jdk21.log": {
+      "before": null,
+      "after": "714c47c5ecd4223afcb8dea37c2f50200728b93d0a70f8d7b28c7f48686f7bf5",
+      "previous": []
+    },
+    "docs/lab-readiness/evidence/host-inventory.json": {
+      "before": null,
+      "after": "039da7b1f283ddc159ac6809021b0a1fba414747674653786c58362e2094cc18",
+      "previous": []
+    },
+    "docs/lab-readiness/evidence/host-jdk21-preflight.json": {
+      "before": null,
+      "after": "baca3c2bea985b17206a438bcdea981e3a5688b60fc898e0886932454a361010",
+      "previous": []
+    },
+    "docs/lab-readiness/evidence/missing-roots-preflight.json": {
+      "before": null,
+      "after": "2149c4bd2659b2ea1464f0eac5505b2e26173a6493b232a86bdccd23c6c1e9bb",
+      "previous": []
+    },
+    "docs/lab-readiness/evidence/tests-normal.log": {
+      "before": null,
+      "after": "374614764f05dac4e629b1c5a12b6d0cc58a0d6c5d6be275a84e7d9d90e919e0",
+      "previous": []
+    },
+    "docs/lab-readiness/evidence/tests-optimized.log": {
+      "before": null,
+      "after": "175344b4a6849951ba0c8ee0d50a1c26daebfe849109af09432b032793e60ad6",
+      "previous": []
+    },
+    "tests/lab_readiness/test_controller_regressions.py": {
+      "before": null,
+      "after": "7b638f9e0a0b988c74f90beae44fa65f869ea7b2617e38c4c8cfdb7356a1f4dd",
+      "previous": []
+    },
+    "tests/lab_readiness/test_preflight.py": {
+      "before": null,
+      "after": "07cc2e92a4facc1eae39fddfc05bc5fc6bd4723d35e4f1ad8c56f80621c71634",
+      "previous": [
+        "a9c40bc6613371746edd65c8548aa271f48060986f5de39f5a077d2f74bb0595"
+      ]
+    },
+    "tools/lab_readiness/preflight.py": {
+      "before": null,
+      "after": "1a0a4d137f9fe4436cc96c0bb5cfa8840fdb5470518c4fa7055346c935ad5a79",
+      "previous": [
+        "a8abb5fbe6c9b5d32884dc7233acbb081948a6fcc32cc97336afbc1ac24e15c4"
+      ]
+    },
+    "tools/lab_readiness/run_combined_gate.py": {
+      "before": null,
+      "after": "4a77530c75fbf6f7a038380e1967997e06e98e110f22e9a25754600c053a0529",
+      "previous": []
+    },
+    "tests/lab_readiness/test_combined_gate.py": {
+      "before": null,
+      "after": "486e52d8e6708786cfc1ed839025d927a7ca29b300b121de4f254a972ce15e71",
+      "previous": []
+    }
+  }
+}

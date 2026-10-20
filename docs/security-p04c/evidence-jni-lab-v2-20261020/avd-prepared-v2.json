@@ -1,0 +1,30 @@
+[
+  {
+    "profile": "api24-4k",
+    "api": 24,
+    "abi": "arm64-v8a",
+    "avd_name": "flexygram-api24-offline-v2",
+    "exit_code": 0,
+    "configured": true,
+    "booted": false,
+    "actual_page_size": null,
+    "config_sha256": "da619c1f470a24553ce21f70603a06c6ddb8bd87e40fee425bdf5f67173cd792",
+    "cpu_arch": "arm64",
+    "image_sysdir": "system-images/android-24/default/arm64-v8a/",
+    "duplicate_config_keys": false
+  },
+  {
+    "profile": "arm64-16k",
+    "api": 35,
+    "abi": "arm64-v8a",
+    "avd_name": "flexygram-api35-offline-v2",
+    "exit_code": 0,
+    "configured": true,
+    "booted": false,
+    "actual_page_size": null,
+    "config_sha256": "0ef7dbcf54308862ec80ec98ba809f1aaacfd22f438b5c40f57cfae8d9b76e5a",
+    "cpu_arch": "arm64",
+    "image_sysdir": "system-images/android-35/google_apis_ps16k/arm64-v8a/",
+    "duplicate_config_keys": false
+  }
+]

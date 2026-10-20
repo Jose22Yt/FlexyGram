@@ -1,0 +1,14 @@
+{
+  "code_head": "1177ceb8f4351b1626dd65e3dbd657f3b0ff159f",
+  "exit_code": 1,
+  "seconds": 172,
+  "command": [
+    "--no-daemon",
+    "--console=plain",
+    "--max-workers=2",
+    "-Pkotlin.incremental=false",
+    ":TMessagesProj:assembleDiagnosticDebug"
+  ],
+  "native_target": "arm64-v8a",
+  "unsigned_overlay": true
+}

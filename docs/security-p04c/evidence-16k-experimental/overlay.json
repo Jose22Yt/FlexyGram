@@ -1,0 +1,7 @@
+{
+  "source_head": "a25295a9d567a626e008fc55ca97d80112c5f65b",
+  "approved_build_sha256": "45f5e0fac03635e865a60eb16ad296a8422db9184c6cf3b5e0f4b235e02ae618",
+  "overlay_build_sha256": "ac02eb128aedc74d6df17e331ddee0d8c8b09f5fe05215ad96ee6d963ea548df",
+  "experimental_manifest_sha256": "c6495ee9895da29a2c4bdc9c45647721c33070190eeb8c9b8054096cb2bf2f97",
+  "production_and_policy_unchanged": true
+}

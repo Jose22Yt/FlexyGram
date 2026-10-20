@@ -1,0 +1,41 @@
+{
+  "status": "HOST_BLOCKED_BEFORE_ANDROID_BOOT",
+  "blockers": [
+    "api24-4k: Regular image archive required",
+    "arm64-16k: Regular image archive required",
+    "emulator unavailable",
+    "ARM64 engine unavailable",
+    "adb executable unavailable",
+    "isolated network namespace unavailable"
+  ],
+  "storage": {
+    "status": "PASS",
+    "target": "ANDROID_AVD_HOME",
+    "free_bytes": 28263157760,
+    "required_free_bytes": 10737418240
+  },
+  "images": [],
+  "emulator": {
+    "exit_code": null,
+    "error": "FileNotFoundError"
+  },
+  "arm64_engine": {
+    "exit_code": null,
+    "error": "FileNotFoundError"
+  },
+  "adb_version_only": {
+    "exit_code": null,
+    "error": "FileNotFoundError"
+  },
+  "network_namespace": {
+    "exit_code": 1,
+    "output": "unshare: write failed /proc/self/uid_map: Operation not permitted\n"
+  },
+  "kvm_present": false,
+  "host_arch": "x86_64",
+  "host_page_size": 4096,
+  "android_executed": false,
+  "installation_authorized": false,
+  "runtime_validated": false,
+  "limits": "Tool versions, image bytes and namespace availability only. A READY result is not an ARM64 boot, actual page-size observation or a runtime/signing authorization."
+}

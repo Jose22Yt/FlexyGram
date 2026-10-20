@@ -1,0 +1,27 @@
+{
+  "android_runtime_validated": false,
+  "certificate_sha256": null,
+  "distribution_allowed": false,
+  "evidence_files_verified": 44,
+  "historical_lab_contract_preserved": true,
+  "kind": "proposal_only_not_android_lab_contract",
+  "lab_profiles_completed": 0,
+  "native_elf_sha256": {
+    "libexslt.so": "f8e9e0fc0fa7507f3391bacb5c08a16dc9fdab73ca23de48f8adb2dfcca7a194",
+    "libfreetype.so": "d086a897a1c1cfa517b9e46c28d762f817af41bde96b2eda3bf6e6b12220eb01",
+    "libxml2.so": "e282a655ebbe07443cd743bb9dd00a152bfed7edb091d862f0a4e74afc1eff04",
+    "libxslt.so": "827d113f3045205b205b52d0e4fe2e59998bd3b471368314415a2c3e91571660"
+  },
+  "reviewed_arm64_elf": 96,
+  "reviewed_original_wheels": 18,
+  "reviewed_rebuilt_wheels": 3,
+  "schema": 1,
+  "signed_apk_bytes": null,
+  "signed_apk_sha256": null,
+  "signed_runner_sha256": null,
+  "signing_authorized": false,
+  "source_head": "723580b5cfee51416aa3f87cdebc3f8c911eb7ed",
+  "status": "UNSIGNED_EVIDENCE_REVIEWED_SIGNING_BLOCKED",
+  "unsigned_apk_bytes": 113080783,
+  "unsigned_apk_sha256": "ddb7b017838a2a13991ac09154bbf252a11d62326e9a588349ca03c115e01699"
+}

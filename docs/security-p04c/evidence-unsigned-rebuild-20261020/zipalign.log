@@ -1,0 +1,16 @@
+Full verbose zipalign output is retained in the private verified backup.
+Original bytes: 727877
+Original SHA-256: d1688ecbcb8b5422e8b028e561452e7c252a97f392018edd323a54a138e6c81b
+Excerpt (last lines):
+111990745 play-services-mlkit-image-labeling.properties (OK - compressed)
+111990892 play-services-mlkit-subject-segmentation.properties (OK - compressed)
+111991031 play-services-phenotype.properties (OK - compressed)
+111991146 play-services-stats.properties (OK - compressed)
+111991257 play-services-tasks.properties (OK - compressed)
+111991376 play-services-vision-common.properties (OK - compressed)
+111991494 play-services-vision.properties (OK - compressed)
+111991607 play-services-wearable.properties (OK - compressed)
+111991704 version.txt (OK)
+111991773 vision-common.properties (OK - compressed)
+111991873 vision-interfaces.properties (OK - compressed)
+Verification successful

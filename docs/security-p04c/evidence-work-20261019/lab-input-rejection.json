@@ -1,0 +1,10 @@
+{
+  "exit": 1,
+  "expected_block": true,
+  "result": {
+    "status": "BLOCKED",
+    "error_class": "ValueError",
+    "error": "Reviewed APK digest/size mismatch",
+    "android_executed": false
+  }
+}

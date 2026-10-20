@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram/../finalize_order.py", line 10, in <module>
+    finalize(r/'rebuild-sources',out,ndk,cmake,r/'locked-wheels-all',r/'binutils-build/ld/ld-new',m)
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram/tools/native_compatibility/experiment_recipe.py", line 84, in finalize
+    result=prepare(wheelhouse,output,output/'wheels',json.loads(Path(__file__).resolve().parents[2].joinpath('TMessagesProj/python/wheels.lock.json').read_text()),manifest)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram/tools/native_compatibility/experimental_wheels.py", line 70, in prepare
+    verify(manifest,dest);return manifest
+    ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram/tools/native_compatibility/experimental_wheels.py", line 48, in verify
+    if not verified(dest/row['filename'],row):raise ValueError('Missing/non-file experimental wheel')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram/tools/native_compatibility/wheelhouse.py", line 16, in verified
+    if hashlib.sha256(path.read_bytes()).hexdigest()!=row['sha256']:raise ValueError('Wheel digest mismatch: '+row['filename'])
+                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: Wheel digest mismatch: chaquopy_freetype-2.9.1-3flexygram16k-py3-none-android_24_arm64_v8a.whl

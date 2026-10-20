@@ -1,0 +1,44 @@
+[
+  {
+    "suite": "security",
+    "exit_code": 0,
+    "count": 26,
+    "skipped": false
+  },
+  {
+    "suite": "translation-safety",
+    "exit_code": 0,
+    "count": 27,
+    "skipped": false
+  },
+  {
+    "suite": "translation-runtime",
+    "exit_code": 0,
+    "count": 4,
+    "skipped": false
+  },
+  {
+    "suite": "translation-facade",
+    "exit_code": 0,
+    "count": 14,
+    "skipped": false
+  },
+  {
+    "suite": "translation-prototype",
+    "exit_code": 0,
+    "count": 12,
+    "skipped": false
+  },
+  {
+    "suite": "translation-staging",
+    "exit_code": 0,
+    "count": 10,
+    "skipped": false
+  },
+  {
+    "suite": "build-variants",
+    "exit_code": 0,
+    "count": 9,
+    "skipped": false
+  }
+]

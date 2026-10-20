@@ -1,0 +1,183 @@
+{
+  "profile": "arm64-16k",
+  "archive_sha256": "991c7c08258a0a32d7851ae8f9fb7dcd62f5b3907f1a91a2514cd94e75005cb3",
+  "files": {
+    "NOTICE.txt": {
+      "bytes": 5787163,
+      "allocated_bytes": 5787648,
+      "sha256": "19f766f13d9c3a5e56a2c4438ddba91d8b652bbe2c5046a9c11c96e55a082343",
+      "readback_verified": true
+    },
+    "VerifiedBootParams.textproto": {
+      "bytes": 356,
+      "allocated_bytes": 4096,
+      "sha256": "15ddd02d7bef9b255263e76d1513df668278244df8d309ff3d10bee1dadcd799",
+      "readback_verified": true
+    },
+    "advancedFeatures.ini": {
+      "bytes": 758,
+      "allocated_bytes": 4096,
+      "sha256": "b293a499caf9a3a2b0ba8e95fbc3d9113c8d3c33da27af59c6284e5f81119e5e",
+      "readback_verified": true
+    },
+    "build.prop": {
+      "bytes": 4771,
+      "allocated_bytes": 8192,
+      "sha256": "ace08312e534e01c14b533c3e3702d378ff90a9fd5e6518e45510ae03c220721",
+      "readback_verified": true
+    },
+    "encryptionkey.img": {
+      "bytes": 18874368,
+      "allocated_bytes": 262144,
+      "sha256": "522bd0b6a2c92e37de465059bb9487bb9597a9aae032b469a8ebe0b38146d8c3",
+      "readback_verified": true
+    },
+    "kernel-ranchu": {
+      "bytes": 14727219,
+      "allocated_bytes": 14729216,
+      "sha256": "e8ac73e75665e94ae692c782cdde9a5f98f905d47eee4d9fde48892510232a58",
+      "readback_verified": true
+    },
+    "kernel_cmdline.txt": {
+      "bytes": 16,
+      "allocated_bytes": 4096,
+      "sha256": "5bd6571f46a3e593053a7c6c37f4eed840c0da2278506fa53d1ff021e9d4d8e4",
+      "readback_verified": true
+    },
+    "ramdisk.img": {
+      "bytes": 2083875,
+      "allocated_bytes": 2084864,
+      "sha256": "5c5bd7b9577fe26df5f8b531dd8e0c7cbd432b7943e85a2cb84663fdb53a2e24",
+      "readback_verified": true
+    },
+    "source.properties": {
+      "bytes": 407,
+      "allocated_bytes": 4096,
+      "sha256": "4630570821d0a6a3d60a2d496fa45b1ef5f132ebe0b9eb64ab57dfec5e476bea",
+      "readback_verified": true
+    },
+    "system.img": {
+      "bytes": 3891265536,
+      "allocated_bytes": 3432714240,
+      "sha256": "f540461938c431f81bc00d07d3e8f7154811133193282615984424cca1ed77a5",
+      "readback_verified": true
+    },
+    "vendor.img": {
+      "bytes": 109051904,
+      "allocated_bytes": 106364928,
+      "sha256": "966beabfa21a6ac8a3d3d45c78c062f055a433f6d4222dd05c888ec86f14e90e",
+      "readback_verified": true
+    },
+    "data/empty_data_disk": {
+      "bytes": 107,
+      "allocated_bytes": 4096,
+      "sha256": "e4dc7c33a83013f3d9eb9b5a5693c912e83a9c7f978933b5c7600039dbfde903",
+      "readback_verified": true
+    },
+    "data/local.prop": {
+      "bytes": 46,
+      "allocated_bytes": 4096,
+      "sha256": "49b05d093a46d35d85df01fb99133f077fcc725cc49efe1a1bedae884d24e20b",
+      "readback_verified": true
+    },
+    "data/misc/GoldfishSkinConfig": {
+      "bytes": 783,
+      "allocated_bytes": 4096,
+      "sha256": "763b66cad27dc57354f456bb763e27acf8859059890e6515daba90e77c906b75",
+      "readback_verified": true
+    },
+    "data/misc/apns/apns-conf.xml": {
+      "bytes": 6575,
+      "allocated_bytes": 8192,
+      "sha256": "c35b899f2b6296aee4a9742302651cce9eb64622669d4d8fe8d276ca11060eb6",
+      "readback_verified": true
+    },
+    "data/misc/emulator/version.txt": {
+      "bytes": 112,
+      "allocated_bytes": 4096,
+      "sha256": "2f4ecb211f6b497d6011a75390fb0469ceaec4b816c10209198e43bafa57c695",
+      "readback_verified": true
+    },
+    "data/misc/emulator/config/radioconfig.xml": {
+      "bytes": 1433,
+      "allocated_bytes": 4096,
+      "sha256": "534a81b662ad62fc70ec0ea22715670524a05a066afc9fdac8e7c0f5a7789cd7",
+      "readback_verified": true
+    },
+    "data/misc/modem_simulator/iccprofile_for_carrierapitests.xml": {
+      "bytes": 16537,
+      "allocated_bytes": 20480,
+      "sha256": "dc4b5f5344f084fc44f89250bbcf2b12e452eb98c104e4ef3ec115366eb6ce32",
+      "readback_verified": true
+    },
+    "data/misc/modem_simulator/iccprofile_for_sim0.xml": {
+      "bytes": 14647,
+      "allocated_bytes": 16384,
+      "sha256": "a2744726a306b18d7547251026201aa5c6a9e120aa1555992eeb8b0a3b4aa6d9",
+      "readback_verified": true
+    },
+    "data/misc/modem_simulator/iccprofile_for_sim_tel_alaska.xml": {
+      "bytes": 14474,
+      "allocated_bytes": 16384,
+      "sha256": "462cc26ddaa9d6c470a2d9415771c80e323b526b1863f099accb298955b14db3",
+      "readback_verified": true
+    },
+    "data/misc/modem_simulator/etc/modem_simulator/files/numeric_operator.xml": {
+      "bytes": 297,
+      "allocated_bytes": 4096,
+      "sha256": "c2557e604beea20b67642cdbb14ae7b792f804e4476b3f6cf47035690234f436",
+      "readback_verified": true
+    },
+    "data/misc/pixel_9_pro_fold/display_settings.xml": {
+      "bytes": 303,
+      "allocated_bytes": 4096,
+      "sha256": "2adca8f98a2c8ee0f780e10ca16587ac92641df5e93ab4437c3c47ad41b0041d",
+      "readback_verified": true
+    },
+    "data/misc/pixel_9_pro_fold/extra_feature.xml": {
+      "bytes": 829,
+      "allocated_bytes": 4096,
+      "sha256": "ba27b7a61457027e2a77917f8b07d716d3e918097901a14833749252b15aa38f",
+      "readback_verified": true
+    },
+    "data/misc/pixel_9_pro_fold/devicestate/device_state_configuration.xml": {
+      "bytes": 1644,
+      "allocated_bytes": 4096,
+      "sha256": "8bebf4943ed3fc50973ac428ab8c8c0d71700af81419f44fc95a59f52f873838",
+      "readback_verified": true
+    },
+    "data/misc/pixel_9_pro_fold/displayconfig/display_layout_configuration.xml": {
+      "bytes": 1311,
+      "allocated_bytes": 4096,
+      "sha256": "a64e2eca65bc2f9196215fb72a88c9035a584319f8b3da3606fff161be642be8",
+      "readback_verified": true
+    },
+    "data/misc/pixel_fold/display_settings.xml": {
+      "bytes": 303,
+      "allocated_bytes": 4096,
+      "sha256": "2adca8f98a2c8ee0f780e10ca16587ac92641df5e93ab4437c3c47ad41b0041d",
+      "readback_verified": true
+    },
+    "data/misc/pixel_fold/extra_feature.xml": {
+      "bytes": 829,
+      "allocated_bytes": 4096,
+      "sha256": "ba27b7a61457027e2a77917f8b07d716d3e918097901a14833749252b15aa38f",
+      "readback_verified": true
+    },
+    "data/misc/pixel_fold/devicestate/device_state_configuration.xml": {
+      "bytes": 1644,
+      "allocated_bytes": 4096,
+      "sha256": "8bebf4943ed3fc50973ac428ab8c8c0d71700af81419f44fc95a59f52f873838",
+      "readback_verified": true
+    },
+    "data/misc/pixel_fold/displayconfig/display_layout_configuration.xml": {
+      "bytes": 1311,
+      "allocated_bytes": 4096,
+      "sha256": "a64e2eca65bc2f9196215fb72a88c9035a584319f8b3da3606fff161be642be8",
+      "readback_verified": true
+    }
+  },
+  "booted": false,
+  "apk_installed": false,
+  "status": "IMAGE_BYTES_MATERIALIZED_NOT_ANDROID_VALIDATED"
+}

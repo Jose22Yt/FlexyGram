@@ -1,0 +1,21 @@
+{
+  "head": "c369e4ea13862430c147e39ce3f5913a44e05d85",
+  "observed_count": 85,
+  "expected_count": 97,
+  "missing": [
+    "assets/chaquopy/bootstrap-native/arm64-v8a/_bz2.cpython-311.so",
+    "assets/chaquopy/bootstrap-native/arm64-v8a/_ctypes.cpython-311.so",
+    "assets/chaquopy/bootstrap-native/arm64-v8a/_datetime.cpython-311.so",
+    "assets/chaquopy/bootstrap-native/arm64-v8a/_lzma.cpython-311.so",
+    "assets/chaquopy/bootstrap-native/arm64-v8a/_random.cpython-311.so",
+    "assets/chaquopy/bootstrap-native/arm64-v8a/_sha512.cpython-311.so",
+    "assets/chaquopy/bootstrap-native/arm64-v8a/_struct.cpython-311.so",
+    "assets/chaquopy/bootstrap-native/arm64-v8a/binascii.cpython-311.so",
+    "assets/chaquopy/bootstrap-native/arm64-v8a/java/chaquopy.so",
+    "assets/chaquopy/bootstrap-native/arm64-v8a/math.cpython-311.so",
+    "assets/chaquopy/bootstrap-native/arm64-v8a/mmap.cpython-311.so",
+    "assets/chaquopy/bootstrap-native/arm64-v8a/zlib.cpython-311.so"
+  ],
+  "extra": [],
+  "apk_changed": false
+}

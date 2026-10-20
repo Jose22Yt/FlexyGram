@@ -1,0 +1,13 @@
+{
+  "source": {
+    "url": "https://ftp.gnu.org/gnu/binutils/binutils-2.42.tar.xz",
+    "sha256": "f6e4d41fd5fc778b06b7891457b3620da5ecea1006c6a4a41ae998109f85a800",
+    "bytes": 27567160
+  },
+  "linker_version": "GNU ld (GNU Binutils) 2.42",
+  "linker_sha256": "85c40fee48a1c09a92172353f802aa96dff4d21ca2d0ae6fad668b0357ea22d1",
+  "host_compiler": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0",
+  "ndk": "27.2.12479018",
+  "compiler": "Android (12470979, +pgo, +bolt, +lto, +mlgo, based on r522817c) clang version 18.0.3 (https://android.googlesource.com/toolchain/llvm-project d8003a456d14a3deb8054cdaa529ffbf02d9b262)",
+  "gnu_replaces_app_linker": false
+}

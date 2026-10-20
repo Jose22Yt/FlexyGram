@@ -1,0 +1,30 @@
+[
+  {
+    "package": "ndk;27.2.12479018",
+    "url": "https://dl.google.com/android/repository/android-ndk-r27c-linux.zip",
+    "hash": "090e8083a715fdb1a3e402d0763c388abb03fb4e",
+    "alg": "sha1",
+    "sha256": "59c2f6dc96743b5daf5d1626684640b20a6bd2b1d85b13156b90333741bad5cc"
+  },
+  {
+    "package": "cmdline-tools;19.0",
+    "url": "https://dl.google.com/android/repository/commandlinetools-linux-13114758_latest.zip",
+    "hash": "5fdcc763663eefb86a5b8879697aa6088b041e70",
+    "alg": "sha1",
+    "sha256": "7ec965280a073311c339e571cd5de778b9975026cfcbe79f2b1cdcb1e15317ee"
+  },
+  {
+    "package": "cmake;3.31.6",
+    "url": "https://dl.google.com/android/repository/cmake-3.31.6-linux.zip",
+    "hash": "a54551dabd5daf8cc99f7f51769fd00ca759be0a",
+    "alg": "sha1",
+    "sha256": "ce136bb4b02580b36e53d9ccfe5275069655e6ef7d46d6fe2fcf88cfdf8fb761"
+  },
+  {
+    "package": "gradle",
+    "url": "https://services.gradle.org/distributions/gradle-9.7.1-bin.zip",
+    "hash": "acd53f1edaf02f1a8ff99879f8a34b302661a057d9b063ae9e35b552f804d20a",
+    "alg": "sha256",
+    "sha256": "acd53f1edaf02f1a8ff99879f8a34b302661a057d9b063ae9e35b552f804d20a"
+  }
+]

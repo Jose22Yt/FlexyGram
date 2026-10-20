@@ -1,0 +1,32 @@
+[
+  {
+    "package": "system-images;android-24;default;arm64-v8a",
+    "url": "https://dl.google.com/android/repository/sys-img/android/arm64-v8a-24_r09.zip",
+    "http_status": 200,
+    "content_length": "305854153",
+    "catalog_bytes": "305854153",
+    "catalog_checksum": "e88ebdf4533efa0370603ee4ab0e7834e0cc364f",
+    "downloaded": false,
+    "booted": false
+  },
+  {
+    "package": "system-images;android-36;google_apis_ps16k;arm64-v8a",
+    "url": "https://dl.google.com/android/repository/sys-img/google_apis/arm64-v8a-ps16k-36_r07.zip",
+    "http_status": 200,
+    "content_length": "1875087037",
+    "catalog_bytes": "1875087037",
+    "catalog_checksum": "dda632745023567113d9954101709c6526a3c250",
+    "downloaded": false,
+    "booted": false
+  },
+  {
+    "package": "system-images;android-35;google_apis_ps16k;arm64-v8a",
+    "url": "https://dl.google.com/android/repository/sys-img/google_apis/arm64-v8a-ps16k-35_r05.zip",
+    "http_status": 200,
+    "content_length": "1778788352",
+    "catalog_bytes": "1778788352",
+    "catalog_checksum": "9d834fe640beff22d25025a8028b98ab4366be4d",
+    "downloaded": false,
+    "booted": false
+  }
+]
