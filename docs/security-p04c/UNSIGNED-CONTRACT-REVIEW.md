@@ -34,3 +34,45 @@ Cada comprobación debe salir 0 y las suites no pueden tener fallos, omisiones n
 4. Solo con aprobación separada para firmar, avanzar a ensayo en dos emuladores aislados ARM64 (API24/4096 y API35+/16384 real y estricto), sin cuentas personales ni conexión externa. Ejecutar los 12 casos reales por perfil y guardar hashes, logs y counters para revisión.
 
 **No** fusionar PR17, activar Actions, modificar Production, iniciar Paso 4, permitir autenticación, ni publicar APK/keystore. Las pruebas en dispositivos son una autorización y una puerta separadas.
+
+## Auditoría de bytes reales del APK — avance adicional
+
+Se añadió `tests/native_compatibility/verify_private_unsigned_apk.py` junto con
+`test_private_unsigned_apk.py` (**9 casos sintéticos nuevos**). Este paso
+no se limita a comparar recibos: exige el archivo original de la APK
+en un almacenamiento privado, el nombre/tamaño exacto y SHA256
+`ddb7b017838a2a13991ac09154bbf252a11d62326e9a588349ca03c115e01699`.
+Verifica CRC, rutas duplicadas y firmas JAR/APK Sig Block, y abre los dos
+archivos Chaquopy nativos incluidos en el APK. Extrae y compara **97
+bibliotecas ELF** contra las 97 entradas de `apk-native-audit.json`,
+comprueba la arquitectura e inspecciona de nuevo los segmentos PT_LOAD
+ARM64 con alineación de 16 KB. Solo puede devolver
+`PRIVATE_UNSIGNED_APK_BYTES_VERIFIED_ONLY`, nunca un PASS Android.
+
+Comandos precisos, sin instalación ni firma:
+
+```sh
+python3.11 -B -m unittest discover -s tests/native_compatibility -p test_private_unsigned_apk.py -v
+python3.11 -B -O -m unittest discover -s tests/native_compatibility -p test_private_unsigned_apk.py -v
+
+# La variable apunta al APK REAL privado recuperable, no a un ZIP sustituto.
+python3.11 -B tests/native_compatibility/verify_private_unsigned_apk.py \
+  --apk "/private/apks/flexygram-v13.0.2(1261)-diagnostic-debug-unsigned.apk"
+
+python3.11 -B tests/native_compatibility/run_gate.py \
+  --output /private/native-with-apk-check.json
+python3.11 -B -O tests/native_compatibility/run_gate.py \
+  --output /private/native-with-apk-check-optimized.json
+```
+
+El total orientativo de la suite nativa pasa de **177 a 198**
+(12 pruebas nuevas del revisor de evidencias y 9 pruebas sintéticas nuevas
+del APK físico). **No está ejecutada esa nueva suite**; el total debe
+confirmarse con las salidas reales. No copiar binarios a GitHub ni
+declarar instalado/certificado el APK si la lectura de sus bytes tiene éxito.
+
+El archivo privado no está disponible en esta sesión de ChatGPT.
+Si falta en el host de Work, responder `BLOCKED_MISSING_PRIVATE_APK`,
+sin inventar hashes ni reconstruir a escondidas un artefacto diferente.
+Los permisos de firma del propietario y la custodia recuperable siguen
+siendo requisitos independientes posteriores.
