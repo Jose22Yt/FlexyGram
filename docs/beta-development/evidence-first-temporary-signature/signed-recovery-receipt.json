@@ -1,0 +1,17 @@
+{
+  "bytes": 113163015,
+  "distribution_allowed": false,
+  "file_id": "id:7uKZZ5yXrxEAAAAAAAAACQ",
+  "independently_downloaded": true,
+  "installation_authorized": false,
+  "path": "/FlexyGram-Work2-Private/FlexyGram-BetaDevelopment-97dfb08-OfflineTrial-Temporary-Signed.apk",
+  "provider": "Dropbox",
+  "revision": "0165e4b8d72b4f300000003314317a1",
+  "schema": 1,
+  "signed_apk_sha256": "2a8d7a603cd49855534b41e31bf8296e9309ea8cc7e31e978215311a252ff825",
+  "status": "PRIVATE_SIGNED_APK_RECOVERY_VERIFIED",
+  "trial_id": "flexygram-personal-offline-9513d497-v1",
+  "verification_reference": "Work2 independent Dropbox download with full SHA256 and ZIP CRC verification, 2026-10-20",
+  "zip_crc_verified": true,
+  "zip_members": 13291
+}
