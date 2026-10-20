@@ -1,6 +1,20 @@
 # P0.4c — continuación verificable y puerta de contrato de laboratorio v2
 
-**Estado: pre-laboratorio.** No se ha firmado una APK nueva, generado una clave, utilizado ADB, activado Production, fusionado PR17 ni iniciado Paso 4. Todos los cambios se limitan a `tests/native_compatibility/` y documentación.
+**Estado: pre-laboratorio.**
+
+**Actualización de Work (2026-10-20):** el gate íntegro del checkout registró
+**231/231 PASS** en Python 3.11 normal y `-O`, cero fallos/errores/omisiones,
+según `evidence-work-20261020/native-final*.json`. Se añadieron tres casos
+negativos de recuperación de APK y el mínimo obligatorio se elevó de 228 a
+**231** para evitar una pérdida silenciosa de cobertura. La APK unsigned
+histórica con SHA256 `ddb7b017838a2a13991ac09154bbf252a11d62326e9a588349ca03c115e01699`
+**no se recuperó**. El siguiente paso pendiente es finalizar la reconstrucción
+**únicamente unsigned** en worktree aislado; comparar contra el hash histórico
+sin sustituirlo, auditar por completo cualquier candidato y registrar su SHA
+real. Los dos AVD están configurados, pero **no arrancados**: el host carece
+de KVM y no pudo verificar aislamiento de red. No hay firma autorizada ni
+custodia recuperable. Véase `WORK-CONTINUATION-2026-10-20.md`.
+ No se ha firmado una APK nueva, generado una clave, utilizado ADB, activado Production, fusionado PR17 ni iniciado Paso 4. Todos los cambios se limitan a `tests/native_compatibility/` y documentación.
 
 ## Lo que quedó implementado desde ChatGPT
 
@@ -21,8 +35,8 @@ python3.11 -B -m unittest discover -s tests/native_compatibility -p test_unsigne
 python3.11 -B -m unittest discover -s tests/native_compatibility -p test_private_unsigned_apk.py -v
 python3.11 -B -m unittest discover -s tests/native_compatibility -p test_post_sign_diagnostic.py -v
 python3.11 -B -m unittest discover -s tests/native_compatibility -p test_lab_v2_draft.py -v
-python3.11 -B tests/native_compatibility/run_gate.py --output /private/p04c-host-228.json
-python3.11 -B -O tests/native_compatibility/run_gate.py --output /private/p04c-host-228-optimized.json
+python3.11 -B tests/native_compatibility/run_gate.py --output /private/p04c-host-231.json
+python3.11 -B -O tests/native_compatibility/run_gate.py --output /private/p04c-host-231-optimized.json
 
 python3.11 -B tests/native_compatibility/review_unsigned_contract.py
 python3.11 -B tests/native_compatibility/create_lab_v2_draft.py --output /private/p04c-lab-v2-draft-new.json
@@ -30,7 +44,7 @@ python3.11 -B tests/native_compatibility/verify_private_unsigned_apk.py \
   --apk '/private/apks/flexygram-v13.0.2(1261)-diagnostic-debug-unsigned.apk'
 ```
 
-`/private` es un ejemplo: Work debe usar rutas privadas reales existentes, con su APK original intacta. Exigir **228 o más casos**, cero fallos/omisiones y ambas modalidades. El gate host falla si descubre menos de 228 casos. Registrar hashes privados y logs sin publicarlos si contienen binarios/secretos.
+`/private` es un ejemplo: Work debe usar rutas privadas reales existentes, con su APK original intacta. Exigir **231 o más casos**, cero fallos/omisiones y ambas modalidades. El gate host falla si descubre menos de 231 casos. Registrar hashes privados y logs sin publicarlos si contienen binarios/secretos.
 
 ### Después, únicamente si el propietario verifica custodia y **autoriza expresamente la firma**
 
