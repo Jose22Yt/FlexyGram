@@ -102,8 +102,18 @@ def check_signature(signed, apksigner, expected_cert, runner=subprocess.run):
     return cert
 
 
-def verify(unsigned_apk, signed_apk, identity, apksigner,
-           evidence=unsigned.review.EVIDENCE, signature_runner=subprocess.run):
+def check_alignment(signed, zipalign, runner=subprocess.run):
+    regular(signed)
+    regular(zipalign)
+    completed = runner([str(zipalign), '-c', '-P', '16', '-v', '4', str(signed)],
+                       capture_output=True, text=True, timeout=120, check=False)
+    require(completed.returncode == 0, 'Signed APK 16 KB ZIP alignment failed')
+    return True
+
+
+def verify(unsigned_apk, signed_apk, identity, apksigner, zipalign,
+           evidence=unsigned.review.EVIDENCE, signature_runner=subprocess.run,
+           alignment_runner=subprocess.run):
     unsigned_receipt = unsigned.verify(unsigned_apk, evidence)
     source_sha = unsigned_receipt['sha256']
     cert = approved_identity(identity, source_sha)
@@ -114,6 +124,7 @@ def verify(unsigned_apk, signed_apk, identity, apksigner,
     signed_sha = unsigned.review.sha256(signed_apk)
     require(signed_sha != source_sha, 'Signed APK identical to unsigned baseline')
     check_signature(signed_apk, apksigner, cert, runner=signature_runner)
+    check_alignment(signed_apk, zipalign, runner=alignment_runner)
     return {
         'status': 'SIGNED_STATIC_REVIEW_ONLY_PENDING_ANDROID',
         'signed_apk_sha256': signed_sha,
@@ -121,6 +132,7 @@ def verify(unsigned_apk, signed_apk, identity, apksigner,
         'source_unsigned_apk_sha256': source_sha,
         'certificate_sha256': cert,
         'apk_v2_verified': True,
+        'zipalign_16k_verified': True,
         'apk_payload_identical_to_reviewed_unsigned': True,
         'installable': None,
         'android_runtime_validated': False,
@@ -132,12 +144,12 @@ def verify(unsigned_apk, signed_apk, identity, apksigner,
 
 def main(argv=None):
     p = argparse.ArgumentParser(description=__doc__)
-    for name in ('unsigned-apk', 'signed-apk', 'identity', 'apksigner'):
+    for name in ('unsigned-apk', 'signed-apk', 'identity', 'apksigner', 'zipalign'):
         p.add_argument('--'+name, type=Path, required=True)
     p.add_argument('--evidence', type=Path, default=unsigned.review.EVIDENCE)
     a = p.parse_args(argv)
     try:
-        result = verify(a.unsigned_apk, a.signed_apk, a.identity, a.apksigner, a.evidence)
+        result = verify(a.unsigned_apk, a.signed_apk, a.identity, a.apksigner, a.zipalign, a.evidence)
         print(json.dumps(result, indent=2, sort_keys=True))
         return 0
     except (OSError, ValueError, TypeError, KeyError, zipfile.BadZipFile,
