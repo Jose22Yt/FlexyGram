@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "date": "2026-10-20",
+  "base_pr25": "2363f38ccab1618a75fec790c04b78b6067e91bc",
+  "reviewed_pr23": "e50fa88e80358893d08e9901e81e3b0a74a0a54d",
+  "reviewed_pr24": "db5b9a113d54f552a925ea233c5b199ab95bfcdb",
+  "python": "3.11.17",
+  "new_distinct_tests": 11,
+  "normal": {
+    "passed": 11,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "optimized": {
+    "passed": 11,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "counting": "11 distinct tests, 22 method executions across normal/-O; no historical suites rerun.",
+  "commands": [
+    "FLEXYGRAM_DIAGNOSTICS_SOURCE=<pinned-PR24>/tools/beta_diagnostics python3.11 -m unittest discover -s tests/personal_beta -v",
+    "FLEXYGRAM_DIAGNOSTICS_SOURCE=<pinned-PR24>/tools/beta_diagnostics python3.11 -O -m unittest discover -s tests/personal_beta -v",
+    "python3.11 tools/personal_beta/import_events.py --source-dir <pinned-PR24>/tools/beta_diagnostics --exports <synthetic-session-batch> --profile <synthetic-profile.json> --environment synthetic --apk-sha256 <64-zero-fixture> --output <new-report.json>"
+  ],
+  "apk_available": false,
+  "apk_built": false,
+  "keys_generated": false,
+  "apk_signed": false,
+  "apk_installed": false,
+  "adb_executed": false,
+  "android_executed": false,
+  "private_transfer_attempted": false,
+  "client_files_modified": false,
+  "historical_contracts_modified": false,
+  "source_sha256": {
+    "tools/personal_beta/import_events.py": "49ebc59308caece427c95a03ddcff82ec2f1a4ce61b2c9d97e70dc35b5b50fe7",
+    "tests/personal_beta/test_import_events.py": "68a9dbbfe68f489694782b9f01c9884b24840418a2d407d77fe90d337e390ee4"
+  }
+}

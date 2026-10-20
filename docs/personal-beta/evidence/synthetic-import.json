@@ -1,0 +1,239 @@
+{
+  "schema": 1,
+  "capture_environment": "synthetic",
+  "package": "io.github.jose22yt.flexygram.beta.development",
+  "declared_apk_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "apk_bytes_verified_by_importer": false,
+  "android_execution_verified_by_importer": false,
+  "comparable_with_isolated_lab": false,
+  "profile": {
+    "android_api": 37,
+    "abi": "arm64-v8a",
+    "page_bytes": 4096,
+    "compat_mode_disabled": null,
+    "observed_by_tool": false,
+    "strict_16k_runtime_proven": false,
+    "limits": "Operator-supplied facts only. A 4KB run does not test 16KB; a 16KB run needs separate compatibility-mode and native-loading evidence."
+  },
+  "events": {
+    "events_sha256": "59ae8eb47733c14be9a0564e95ee1bc992d70deb0e26bc04dd9c0f86097aae34",
+    "batches": 1,
+    "records": 3,
+    "endpoint": "beta_idle_predraw_frame_v1",
+    "observer_lost_events": 0,
+    "observer_abandoned_operations": 0,
+    "quality": "COMPLETE_EVENT_SAMPLE_ONLY",
+    "interactions": {
+      "status": "EVENT_SAMPLE",
+      "operations": {
+        "startup": {
+          "requested": 0,
+          "accepted": 0,
+          "presented": 0,
+          "cancelled": 0,
+          "timeout": 0,
+          "incomplete": 0,
+          "request_to_accept": {
+            "n": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "max_ms": null
+          },
+          "request_to_present": {
+            "n": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "max_ms": null
+          },
+          "request_to_cancel": {
+            "n": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "max_ms": null
+          }
+        },
+        "chat_open": {
+          "requested": 1,
+          "accepted": 1,
+          "presented": 1,
+          "cancelled": 0,
+          "timeout": 0,
+          "incomplete": 0,
+          "request_to_accept": {
+            "n": 1,
+            "p50_ms": 0.0001,
+            "p95_ms": 0.0001,
+            "p99_ms": 0.0001,
+            "max_ms": 0.0001
+          },
+          "request_to_present": {
+            "n": 1,
+            "p50_ms": 0.0002,
+            "p95_ms": 0.0002,
+            "p99_ms": 0.0002,
+            "max_ms": 0.0002
+          },
+          "request_to_cancel": {
+            "n": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "max_ms": null
+          }
+        },
+        "chat_close": {
+          "requested": 0,
+          "accepted": 0,
+          "presented": 0,
+          "cancelled": 0,
+          "timeout": 0,
+          "incomplete": 0,
+          "request_to_accept": {
+            "n": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "max_ms": null
+          },
+          "request_to_present": {
+            "n": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "max_ms": null
+          },
+          "request_to_cancel": {
+            "n": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "max_ms": null
+          }
+        },
+        "rapid_tap": {
+          "requested": 0,
+          "accepted": 0,
+          "presented": 0,
+          "cancelled": 0,
+          "timeout": 0,
+          "incomplete": 0,
+          "request_to_accept": {
+            "n": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "max_ms": null
+          },
+          "request_to_present": {
+            "n": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "max_ms": null
+          },
+          "request_to_cancel": {
+            "n": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "max_ms": null
+          }
+        },
+        "transition_interrupt": {
+          "requested": 0,
+          "accepted": 0,
+          "presented": 0,
+          "cancelled": 0,
+          "timeout": 0,
+          "incomplete": 0,
+          "request_to_accept": {
+            "n": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "max_ms": null
+          },
+          "request_to_present": {
+            "n": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "max_ms": null
+          },
+          "request_to_cancel": {
+            "n": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "max_ms": null
+          }
+        },
+        "theme_light": {
+          "requested": 0,
+          "accepted": 0,
+          "presented": 0,
+          "cancelled": 0,
+          "timeout": 0,
+          "incomplete": 0,
+          "request_to_accept": {
+            "n": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "max_ms": null
+          },
+          "request_to_present": {
+            "n": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "max_ms": null
+          },
+          "request_to_cancel": {
+            "n": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "max_ms": null
+          }
+        },
+        "theme_dark": {
+          "requested": 0,
+          "accepted": 0,
+          "presented": 0,
+          "cancelled": 0,
+          "timeout": 0,
+          "incomplete": 0,
+          "request_to_accept": {
+            "n": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "max_ms": null
+          },
+          "request_to_present": {
+            "n": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "max_ms": null
+          },
+          "request_to_cancel": {
+            "n": 0,
+            "p50_ms": null,
+            "p95_ms": null,
+            "p99_ms": null,
+            "max_ms": null
+          }
+        }
+      },
+      "limits": "Requires real instrumentation or reviewed external observer. Incomplete/timeout is not proof of ANR or ignored physical touch."
+    }
+  },
+  "logcat": null,
+  "frames": null,
+  "limits": "Reads supplied files only; no capture/sign/install/launch, no authorization receipt, no physical touch-to-photon or authenticated chat measurements."
+}
