@@ -22,6 +22,29 @@ IMAGES = {
                   'url': 'https://dl.google.com/android/repository/sys-img/google_apis/arm64-v8a-ps16k-35_r05.zip'}}
 
 
+
+# Conservative *free* disk margin after images are already materialized.
+# Two 2 GB AVD userdata files plus snapshots/logs/growth need headroom.
+MIN_AVD_FREE_BYTES = 10 * 1024**3
+
+
+def check_storage(sdk):
+    """Check the actual writable AVD filesystem; never creates files."""
+    raw = os.environ.get('ANDROID_AVD_HOME')
+    target = Path(raw) if raw else sdk
+    label = 'ANDROID_AVD_HOME' if raw else 'SDK_fallback'
+    try:
+        require(target.is_dir(), 'Storage target directory unavailable')
+        usage = shutil.disk_usage(target)
+        free = usage.free
+        require(type(free) is int and free >= 0, 'Invalid filesystem space reading')
+        return {'status': 'PASS' if free >= MIN_AVD_FREE_BYTES else 'BLOCKED',
+                'target': label, 'free_bytes': free, 'required_free_bytes': MIN_AVD_FREE_BYTES}
+    except (OSError, ValueError) as exc:
+        return {'status': 'BLOCKED', 'target': label, 'free_bytes': None,
+                'required_free_bytes': MIN_AVD_FREE_BYTES, 'error_class': type(exc).__name__}
+
+
 def require(value, message):
     if not value:
         raise ValueError(message)
@@ -94,8 +117,11 @@ def probe(sdk, archives):
         if row['exit_code'] != 0: blockers.append(name+' unavailable')
     if not shutil.which('ip'): blockers.append('iproute2 missing for isolated loopback setup')
     if platform.system() != 'Linux': blockers.append('This preflight recipe requires Linux')
+    storage = check_storage(sdk)
+    if storage['status'] != 'PASS':
+        blockers.append('insufficient or unverified AVD filesystem space (10 GiB free required)')
     return {'status': 'HOST_BLOCKED_BEFORE_ANDROID_BOOT' if blockers else 'HOST_READY_FOR_MANUAL_OFFLINE_BOOT_CHECK_ONLY',
-            'blockers': blockers, 'images': images, 'emulator': version, 'arm64_engine': engine,
+            'blockers': blockers, 'storage': storage, 'images': images, 'emulator': version, 'arm64_engine': engine,
             'adb_version_only': adb, 'network_namespace': network,
             'kvm_present': Path('/dev/kvm').exists(), 'host_arch': platform.machine(),
             'host_page_size': os.sysconf('SC_PAGE_SIZE'), 'android_executed': False,
