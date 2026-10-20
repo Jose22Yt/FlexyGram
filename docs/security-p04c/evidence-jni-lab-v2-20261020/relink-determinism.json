@@ -1,0 +1,13 @@
+{
+  "operation": "link_only_existing_objects_no_compilation",
+  "exit_code": 0,
+  "seconds": 15.16,
+  "linked_original_sha256": "b8dd9024e067a3b81ddab61ecbbf25db4539f7e6dd42d17850dd27f2846cd2df",
+  "linked_repeated_sha256": "b8dd9024e067a3b81ddab61ecbbf25db4539f7e6dd42d17850dd27f2846cd2df",
+  "linked_identical": true,
+  "apk_rebuilt": false,
+  "original_outputs_modified": false,
+  "stripped_repeated_sha256": "756e53d23f29ecca32d7c9706375494cdf2217d0db8d314a4195d0174400912b",
+  "packaged_sha256": "756e53d23f29ecca32d7c9706375494cdf2217d0db8d314a4195d0174400912b",
+  "strip_matches_packaged": true
+}

@@ -260,7 +260,10 @@ def inspect_private_apk(path: Path, expected: dict):
                     (upper.endswith((".RSA", ".DSA", ".EC", ".SF")) or
                      upper == "META-INF/MANIFEST.MF")),
                     "JAR-signed APK cannot be reviewed as unsigned")
-            if name.startswith("lib/") and name.endswith(".so"):
+            # Chaquopy also places 12 reviewed ELF directly in bootstrap-native assets.
+            # Scan every flat native member; the exact pinned inventory below
+            # rejects anything unreviewed rather than broadening an allowlist.
+            if name.endswith(".so"):
                 found[name] = outer.read(name)
         with path.open("rb") as stream:
             stream.seek(max(0, outer.start_dir - 16))

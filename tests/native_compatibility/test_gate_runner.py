@@ -51,17 +51,17 @@ class TestFixture(unittest.TestCase):
         self.assertEqual((summary['status'], summary['expected_failures']), ('BLOCKED', 1))
 
     def test_main_blocks_incomplete_test_discovery(self):
-        fake = {'status': 'PASS', 'passed': 257, 'tests_run': 257,
+        fake = {'status': 'PASS', 'passed': 299, 'tests_run': 299,
                 'errors': 0, 'failures': 0, 'skipped': 0}
         with patch('run_gate.run_suite', return_value=fake), redirect_stdout(io.StringIO()) as output:
             self.assertEqual(main([]), 1)
         report = json.loads(output.getvalue())
         self.assertEqual(report['status'], 'BLOCKED')
         self.assertTrue(report['discovery_incomplete'])
-        self.assertEqual(report['minimum_required'], 258)
+        self.assertEqual(report['minimum_required'], 300)
 
     def test_main_accepts_complete_reviewed_discovery(self):
-        fake = {'status': 'PASS', 'passed': 258, 'tests_run': 258,
+        fake = {'status': 'PASS', 'passed': 300, 'tests_run': 300,
                 'errors': 0, 'failures': 0, 'skipped': 0}
         with patch('run_gate.run_suite', return_value=fake), redirect_stdout(io.StringIO()) as output:
             self.assertEqual(main([]), 0)

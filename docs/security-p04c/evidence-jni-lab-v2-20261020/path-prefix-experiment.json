@@ -1,0 +1,89 @@
+{
+  "raw_prefix": {
+    "allocated_section_differences": [
+      ".data.rel.ro",
+      ".dynamic",
+      ".dynsym",
+      ".eh_frame",
+      ".eh_frame_hdr",
+      ".fini_array",
+      ".got.plt",
+      ".plt",
+      ".rela.dyn",
+      ".rela.plt",
+      ".relro_padding",
+      ".rodata",
+      ".text"
+    ],
+    "allocated_byte_differences": [
+      ".dynamic",
+      ".dynsym",
+      ".eh_frame_hdr",
+      ".got.plt",
+      ".plt",
+      ".rela.dyn",
+      ".rela.plt",
+      ".rodata",
+      ".text"
+    ],
+    "section_layout_differences": [
+      ".data.rel.ro",
+      ".dynamic",
+      ".eh_frame",
+      ".eh_frame_hdr",
+      ".fini_array",
+      ".got.plt",
+      ".plt",
+      ".relro_padding",
+      ".rodata",
+      ".text"
+    ],
+    "executable_section_differences": [
+      ".plt",
+      ".text"
+    ],
+    "executable_byte_differences": [
+      ".plt",
+      ".text"
+    ],
+    "exports_equal": false,
+    "export_abi_equal": true,
+    "elf_abi_equal": true,
+    "needed_equal": true,
+    "sonames_equal": true,
+    "search_paths_equal": true,
+    "relocations_equal": false,
+    "program_headers_equal": false,
+    "entry_equal": true,
+    "only_nonallocated_sections_removed": false,
+    "removed_sections": [],
+    "left_sha256": "44ca1fc965495dcc35c1f4f3ccb20a8886ad1c9c23bed5ae1463ee22436729cb",
+    "right_sha256": "cf5b4d39fc82572d9b3d2a5c111bfb4b368a89df09e6c3fbe8ca6c2c8de92d85"
+  },
+  "canonical_prefix": {
+    "allocated_section_differences": [],
+    "allocated_byte_differences": [],
+    "section_layout_differences": [],
+    "executable_section_differences": [],
+    "executable_byte_differences": [],
+    "exports_equal": true,
+    "export_abi_equal": true,
+    "elf_abi_equal": true,
+    "needed_equal": true,
+    "sonames_equal": true,
+    "search_paths_equal": true,
+    "relocations_equal": true,
+    "program_headers_equal": true,
+    "entry_equal": true,
+    "only_nonallocated_sections_removed": true,
+    "removed_sections": [],
+    "left_sha256": "b753fa207d7a54a99a7c15c986b0e178d6a156f6866ef475fafd5336c9d28b46",
+    "right_sha256": "b753fa207d7a54a99a7c15c986b0e178d6a156f6866ef475fafd5336c9d28b46"
+  },
+  "abi": "aarch64-linux-android24",
+  "same_source_sha256": "a778a100666b4257e8d364639d7959176236a814f0f8ea9f9e9a6e453e0b5138",
+  "fixture_only": true,
+  "apk_modified": false,
+  "historical_cause_proven": false,
+  "limits": "Three/four tiny host-cross-compiled fixtures, never loaded. Causal path experiment does not explain every byte of missing historical JNI."
+}

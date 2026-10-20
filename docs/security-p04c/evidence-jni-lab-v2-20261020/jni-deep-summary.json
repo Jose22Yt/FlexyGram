@@ -1,0 +1,63 @@
+{
+  "candidate_apk_sha256": "291881863ea81418fa6cb12104b6eaea4aee2403822894da2143a51f3030bdd5",
+  "candidate_jni_sha256": "756e53d23f29ecca32d7c9706375494cdf2217d0db8d314a4195d0174400912b",
+  "historical_jni_sha256": "b52a40892f7b69162be55cdcced8d3c143cbf85c10243aea0abfbe5f05f89cff",
+  "historical_binary_available": false,
+  "historical_text_sha256": "44a7127ecacd421cec0d9aac758fc439a13c0aab070f82e517b39b2793350ed7",
+  "candidate_text_sha256": "aa570dbb8589d03ddda14f2358c560a96a06b5f98ced2ea80bf7a70bf738654a",
+  "text_hash_matches_historical": false,
+  "historical_dependencies_equal": true,
+  "historical_soname_equal": true,
+  "historical_exports_relocations_sections_available": false,
+  "dynamic_defined_global_weak_symbols": 385,
+  "symbol_visibility_counts": {
+    "STV_DEFAULT": 385
+  },
+  "decoded_relocations": 58076,
+  "relocation_types": {
+    "1027": 57624,
+    "257": 21,
+    "1025": 32,
+    "1026": 399
+  },
+  "rpath_runpath": [],
+  "paths": {
+    "count": 447,
+    "sections": {
+      ".rodata": 447
+    },
+    "all_allocated": true,
+    "any_executable_path_string": false
+  },
+  "current_linked_packaged_comparison": {
+    "allocated_section_differences": [],
+    "allocated_byte_differences": [],
+    "section_layout_differences": [],
+    "executable_section_differences": [],
+    "executable_byte_differences": [],
+    "exports_equal": true,
+    "export_abi_equal": true,
+    "elf_abi_equal": true,
+    "needed_equal": true,
+    "sonames_equal": true,
+    "search_paths_equal": true,
+    "relocations_equal": true,
+    "program_headers_equal": true,
+    "entry_equal": true,
+    "only_nonallocated_sections_removed": true,
+    "removed_sections": [
+      ".debug_abbrev",
+      ".debug_aranges",
+      ".debug_info",
+      ".debug_line",
+      ".debug_loc",
+      ".debug_ranges",
+      ".debug_str",
+      ".strtab",
+      ".symtab"
+    ]
+  },
+  "v1_contract_sha256": "1a3ecb0160e2babf91c9ef7c1712c3577fadb73c5f647d17d84275af146dbb28",
+  "v1_unchanged": true,
+  "android_executed": false
+}

@@ -1,0 +1,63 @@
+{
+  "profile": "api24-4k",
+  "archive_sha256": "3c3a70dcffe8c162984ec190fc3388bf237b241b3ba80bf7aa5c86e130d8f59b",
+  "files": {
+    "advancedFeatures.ini": {
+      "bytes": 121,
+      "allocated_bytes": 4096,
+      "sha256": "3779b3848d3946f3c689ab64f5d09092537a2c71593d1edae55fedec41ab30c0",
+      "readback_verified": true
+    },
+    "kernel-ranchu": {
+      "bytes": 7748096,
+      "allocated_bytes": 7749632,
+      "sha256": "3112e2210d65c276b067e6cfdd1c26caa95e45061cb08893cccd03f82f76407b",
+      "readback_verified": true
+    },
+    "NOTICE.txt": {
+      "bytes": 1686439,
+      "allocated_bytes": 1687552,
+      "sha256": "b9adb76fb4a0014647a9e89dbf00786b26c9af3565e1d42a17bb2e3a727722ea",
+      "readback_verified": true
+    },
+    "kernel-qemu": {
+      "bytes": 7748096,
+      "allocated_bytes": 7749632,
+      "sha256": "3112e2210d65c276b067e6cfdd1c26caa95e45061cb08893cccd03f82f76407b",
+      "readback_verified": true
+    },
+    "build.prop": {
+      "bytes": 2232,
+      "allocated_bytes": 4096,
+      "sha256": "efdafc61b6e3eeb29ed9ddabed8c4ce7848dd80589180ff5f33a88e073822303",
+      "readback_verified": true
+    },
+    "userdata.img": {
+      "bytes": 576716800,
+      "allocated_bytes": 21561344,
+      "sha256": "150f13ebe77a34c71668f3db5a80def569f28ab3d4be744221ddddaf69aa9215",
+      "readback_verified": true
+    },
+    "source.properties": {
+      "bytes": 175,
+      "allocated_bytes": 4096,
+      "sha256": "7265a95ee28c5188e06a71f9c3fc1be49ce5b29995bef264868017e5db0ed280",
+      "readback_verified": true
+    },
+    "ramdisk.img": {
+      "bytes": 1455579,
+      "allocated_bytes": 1458176,
+      "sha256": "2ff5ba043bf1ff25cc7c9beddf280997757e980c6936ec5f54d6ed4013154080",
+      "readback_verified": true
+    },
+    "system.img": {
+      "bytes": 2684354560,
+      "allocated_bytes": 664014848,
+      "sha256": "12f1505bd473dd9dc62ec9e71f6cf97fc2555e523e693c8fab58eefcaefb6af3",
+      "readback_verified": true
+    }
+  },
+  "booted": false,
+  "apk_installed": false,
+  "status": "IMAGE_BYTES_MATERIALIZED_NOT_ANDROID_VALIDATED"
+}

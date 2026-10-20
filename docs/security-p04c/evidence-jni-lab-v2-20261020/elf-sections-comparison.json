@@ -1,0 +1,795 @@
+{
+  "linked": {
+    "sha256": "b8dd9024e067a3b81ddab61ecbbf25db4539f7e6dd42d17850dd27f2846cd2df",
+    "machine": "EM_AARCH64",
+    "entry": 0,
+    "abi": {
+      "flags": 0,
+      "osabi": "ELFOSABI_SYSV",
+      "abi_version": 0
+    },
+    "sections": {
+      "": {
+        "type": "SHT_NULL",
+        "flags": 0,
+        "address": 0,
+        "size": 0,
+        "alignment": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      ".note.android.ident": {
+        "type": "SHT_NOTE",
+        "flags": 2,
+        "address": 568,
+        "size": 152,
+        "alignment": 4,
+        "sha256": "f76c30d135d83bbf9636db7b1cd690a8130d6232d2f5a092a41b22bd4e50e8a6"
+      },
+      ".note.gnu.build-id": {
+        "type": "SHT_NOTE",
+        "flags": 2,
+        "address": 720,
+        "size": 36,
+        "alignment": 4,
+        "sha256": "a437c3d60c6ebb2de7d7ddadfd14613a0158cc1629aa1bcb46d9d8a94d055325"
+      },
+      ".dynsym": {
+        "type": "SHT_DYNSYM",
+        "flags": 2,
+        "address": 760,
+        "size": 19368,
+        "alignment": 8,
+        "sha256": "17c2ac02e5f87f6f27200e25fc8e054c29720cf5b3f1d0527f80b115b39157df"
+      },
+      ".gnu.version": {
+        "type": "SHT_GNU_versym",
+        "flags": 2,
+        "address": 20128,
+        "size": 1614,
+        "alignment": 2,
+        "sha256": "db77e0aea1e75e552601550913068ab822bb66e433b6bb1588c07bb5d30438ca"
+      },
+      ".gnu.version_r": {
+        "type": "SHT_GNU_verneed",
+        "flags": 2,
+        "address": 21744,
+        "size": 112,
+        "alignment": 4,
+        "sha256": "83673359816180c49ace557147c748ba09984faa3a794c7f19fdd143fe64f68f"
+      },
+      ".gnu.hash": {
+        "type": "SHT_GNU_HASH",
+        "flags": 2,
+        "address": 21856,
+        "size": 2964,
+        "alignment": 8,
+        "sha256": "d6cc38c8859abfbf091a9e15184c6c28dc0838952b3a7d1890a95e347182b74e"
+      },
+      ".dynstr": {
+        "type": "SHT_STRTAB",
+        "flags": 2,
+        "address": 24820,
+        "size": 27294,
+        "alignment": 1,
+        "sha256": "f25ff12a491ba002d14b5e204ef475639236df4a963532e11fd02a1d7a459e07"
+      },
+      ".rela.dyn": {
+        "type": "SHT_RELA",
+        "flags": 2,
+        "address": 52120,
+        "size": 1384248,
+        "alignment": 8,
+        "sha256": "1087e87308a8c36fe14599b7a3c99c9d0316d063d02445286240b3143271a155"
+      },
+      ".rela.plt": {
+        "type": "SHT_RELA",
+        "flags": 66,
+        "address": 1436368,
+        "size": 9576,
+        "alignment": 8,
+        "sha256": "b4ee328ce5fa63b33ae9bbbf92988eac0cba6f9e038321098987f59749d1faa7"
+      },
+      ".gcc_except_table": {
+        "type": "SHT_PROGBITS",
+        "flags": 2,
+        "address": 1445944,
+        "size": 595756,
+        "alignment": 4,
+        "sha256": "69149f31d0901481a9a18d15c2f293a8a98261d28021f61b409445a4c3fcd390"
+      },
+      ".rodata": {
+        "type": "SHT_PROGBITS",
+        "flags": 50,
+        "address": 2043904,
+        "size": 2138128,
+        "alignment": 4096,
+        "sha256": "842364025f4dcba7a2926754fc9fd1e8fa08d3643fa2903d2c4b682b1e902702"
+      },
+      ".eh_frame_hdr": {
+        "type": "SHT_PROGBITS",
+        "flags": 2,
+        "address": 4182032,
+        "size": 1884252,
+        "alignment": 4,
+        "sha256": "ba0a677368ff1174e495f77b83154304f35b9b417a435c7ce723057113949027"
+      },
+      ".eh_frame": {
+        "type": "SHT_PROGBITS",
+        "flags": 2,
+        "address": 6066288,
+        "size": 8526036,
+        "alignment": 8,
+        "sha256": "63918a4d35be6cc189e7360fe5f0bd3c8ce20a2f16b21c11fe6174df3105e14d"
+      },
+      ".text": {
+        "type": "SHT_PROGBITS",
+        "flags": 6,
+        "address": 14592384,
+        "size": 28385356,
+        "alignment": 64,
+        "sha256": "aa570dbb8589d03ddda14f2358c560a96a06b5f98ced2ea80bf7a70bf738654a"
+      },
+      ".plt": {
+        "type": "SHT_PROGBITS",
+        "flags": 6,
+        "address": 42977744,
+        "size": 6416,
+        "alignment": 16,
+        "sha256": "6cf531756561bc9052fe93dd4fb4ad317d73ee1d72de02df30b49854aa07570b"
+      },
+      ".data.rel.ro": {
+        "type": "SHT_PROGBITS",
+        "flags": 3,
+        "address": 43000544,
+        "size": 614872,
+        "alignment": 16,
+        "sha256": "daf09e8447a002e6c414eed5a253503d646105aa90b0841c5785b9dc4f4aec56"
+      },
+      ".fini_array": {
+        "type": "SHT_FINI_ARRAY",
+        "flags": 3,
+        "address": 43615416,
+        "size": 16,
+        "alignment": 8,
+        "sha256": "374708fff7719dd5979ec875d56cd2286f6d3cf7ec317a3b25632aab28ec37bb"
+      },
+      ".init_array": {
+        "type": "SHT_INIT_ARRAY",
+        "flags": 3,
+        "address": 43615432,
+        "size": 112,
+        "alignment": 8,
+        "sha256": "b5fdab78d8947eacc864bfeecb4d2100780e5afe1cd8efafb124887913ac49fa"
+      },
+      ".dynamic": {
+        "type": "SHT_DYNAMIC",
+        "flags": 3,
+        "address": 43615544,
+        "size": 544,
+        "alignment": 8,
+        "sha256": "661e0ae76afa19dbbd255f283a1d0c78c8875cf4f1ee04948c8ebad46764fc4b"
+      },
+      ".got": {
+        "type": "SHT_PROGBITS",
+        "flags": 3,
+        "address": 43616088,
+        "size": 54888,
+        "alignment": 8,
+        "sha256": "b73c776f19e358d2e8506675ab078b03596f95127e9016994bfff0d71caee240"
+      },
+      ".got.plt": {
+        "type": "SHT_PROGBITS",
+        "flags": 3,
+        "address": 43670976,
+        "size": 3216,
+        "alignment": 8,
+        "sha256": "ad0a21923779a280d05c32c66a2f00ae980e26ebc84e7997770ceeca45d90f6f"
+      },
+      ".relro_padding": {
+        "type": "SHT_NOBITS",
+        "flags": 3,
+        "address": 43674192,
+        "size": 5552,
+        "alignment": 1,
+        "sha256": null
+      },
+      ".data": {
+        "type": "SHT_PROGBITS",
+        "flags": 3,
+        "address": 43690576,
+        "size": 31256,
+        "alignment": 16,
+        "sha256": "774d8c55038bebc0ff3f8a2779c38f585e190a11a864eda2e33c52a6ed1cb68c"
+      },
+      ".bss": {
+        "type": "SHT_NOBITS",
+        "flags": 2097155,
+        "address": 43721856,
+        "size": 3073070,
+        "alignment": 64,
+        "sha256": null
+      },
+      ".comment": {
+        "type": "SHT_PROGBITS",
+        "flags": 48,
+        "address": 0,
+        "size": 362,
+        "alignment": 1,
+        "sha256": "764029efcce191e349a3ea2f9c88db8d43ccc3833ec80397a1052d0c9a946614"
+      },
+      ".debug_abbrev": {
+        "type": "SHT_PROGBITS",
+        "flags": 0,
+        "address": 0,
+        "size": 3050016,
+        "alignment": 1,
+        "sha256": "1317925ff09847b57d2231d4afce85809e463cc90330ae94dd9e8214f6439a33"
+      },
+      ".debug_info": {
+        "type": "SHT_PROGBITS",
+        "flags": 0,
+        "address": 0,
+        "size": 159330610,
+        "alignment": 1,
+        "sha256": "cee01611cc781ebc8d82ccec846a7172870baeaddf2f3b7b968fe56ef78fcd8c"
+      },
+      ".debug_ranges": {
+        "type": "SHT_PROGBITS",
+        "flags": 0,
+        "address": 0,
+        "size": 7555216,
+        "alignment": 1,
+        "sha256": "bffd458c93340d65cf25e92414e5828aa16446e96b9023a9d9928a0305921aaa"
+      },
+      ".debug_str": {
+        "type": "SHT_PROGBITS",
+        "flags": 48,
+        "address": 0,
+        "size": 85004309,
+        "alignment": 1,
+        "sha256": "8d362863773254649f256c13371577d1c39e9b2a89ead35400452b4e26feabd6"
+      },
+      ".debug_line": {
+        "type": "SHT_PROGBITS",
+        "flags": 0,
+        "address": 0,
+        "size": 35875703,
+        "alignment": 1,
+        "sha256": "8357d5ceaf90bca80b1cb449a8480c5980250f29a3c777aedeca8d09fc461505"
+      },
+      ".debug_loc": {
+        "type": "SHT_PROGBITS",
+        "flags": 0,
+        "address": 0,
+        "size": 5824946,
+        "alignment": 1,
+        "sha256": "cc5dab900133f2f1999883b284fb9be29e19ae4f8aec8452c2a20d8ef5bcabf0"
+      },
+      ".debug_aranges": {
+        "type": "SHT_PROGBITS",
+        "flags": 0,
+        "address": 0,
+        "size": 672,
+        "alignment": 1,
+        "sha256": "9f4fafe69073f1860ab1fd36b45bd75850017cdb9d46bcad625b81cebb4b5afd"
+      },
+      ".symtab": {
+        "type": "SHT_SYMTAB",
+        "flags": 0,
+        "address": 0,
+        "size": 12549960,
+        "alignment": 8,
+        "sha256": "fc800f89616694662d39184e021b7d2748c97f520a07997424912c635e2d9f53"
+      },
+      ".shstrtab": {
+        "type": "SHT_STRTAB",
+        "flags": 0,
+        "address": 0,
+        "size": 385,
+        "alignment": 1,
+        "sha256": "8450d8e5a3cb0f558a514b8e7ae78d170828c4ef2782f7beddc3680c6eb06d16"
+      },
+      ".strtab": {
+        "type": "SHT_STRTAB",
+        "flags": 0,
+        "address": 0,
+        "size": 35535928,
+        "alignment": 1,
+        "sha256": "b7f1f19d866a2ef429b7ee3c1cb74c39a091fa44922f7632b8c330e84895d827"
+      }
+    },
+    "program_headers": [
+      {
+        "p_type": "PT_PHDR",
+        "p_flags": 4,
+        "p_offset": 64,
+        "p_vaddr": 64,
+        "p_paddr": 64,
+        "p_filesz": 504,
+        "p_memsz": 504,
+        "p_align": 8
+      },
+      {
+        "p_type": "PT_LOAD",
+        "p_flags": 5,
+        "p_offset": 0,
+        "p_vaddr": 0,
+        "p_paddr": 0,
+        "p_filesz": 42984160,
+        "p_memsz": 42984160,
+        "p_align": 16384
+      },
+      {
+        "p_type": "PT_LOAD",
+        "p_flags": 6,
+        "p_offset": 42984160,
+        "p_vaddr": 43000544,
+        "p_paddr": 43000544,
+        "p_filesz": 673648,
+        "p_memsz": 679200,
+        "p_align": 16384
+      },
+      {
+        "p_type": "PT_LOAD",
+        "p_flags": 6,
+        "p_offset": 43657808,
+        "p_vaddr": 43690576,
+        "p_paddr": 43690576,
+        "p_filesz": 31256,
+        "p_memsz": 3104350,
+        "p_align": 16384
+      },
+      {
+        "p_type": "PT_DYNAMIC",
+        "p_flags": 6,
+        "p_offset": 43599160,
+        "p_vaddr": 43615544,
+        "p_paddr": 43615544,
+        "p_filesz": 544,
+        "p_memsz": 544,
+        "p_align": 8
+      },
+      {
+        "p_type": "PT_GNU_RELRO",
+        "p_flags": 4,
+        "p_offset": 42984160,
+        "p_vaddr": 43000544,
+        "p_paddr": 43000544,
+        "p_filesz": 673648,
+        "p_memsz": 679200,
+        "p_align": 1
+      },
+      {
+        "p_type": "PT_GNU_EH_FRAME",
+        "p_flags": 4,
+        "p_offset": 4182032,
+        "p_vaddr": 4182032,
+        "p_paddr": 4182032,
+        "p_filesz": 1884252,
+        "p_memsz": 1884252,
+        "p_align": 4
+      },
+      {
+        "p_type": "PT_GNU_STACK",
+        "p_flags": 6,
+        "p_offset": 0,
+        "p_vaddr": 0,
+        "p_paddr": 0,
+        "p_filesz": 0,
+        "p_memsz": 0,
+        "p_align": 0
+      },
+      {
+        "p_type": "PT_NOTE",
+        "p_flags": 4,
+        "p_offset": 568,
+        "p_vaddr": 568,
+        "p_paddr": 568,
+        "p_filesz": 188,
+        "p_memsz": 188,
+        "p_align": 4
+      }
+    ],
+    "needed": [
+      "libjnigraphics.so",
+      "liblog.so",
+      "libz.so",
+      "libGLESv2.so",
+      "libEGL.so",
+      "libandroid.so",
+      "libOpenSLES.so",
+      "libdl.so",
+      "libm.so",
+      "libc.so"
+    ],
+    "sonames": [
+      "libtmessages.49.so"
+    ],
+    "search_paths": [],
+    "build_paths": {
+      "count": 34008,
+      "canonical_json_sha256": "2e1a1eb6552f1ce2c65318fb87323e32879c72ca8dc3023b4608414ca117843e",
+      "detail": "Compared in full by elf_candidate_review.py against the preserved ELF; canonical digest retained here."
+    },
+    "export_count": 385,
+    "exports_sha256": "25feea97885c4b7895a8d75fb33a3a6d6c0464710ccaec5030733104aacf924e",
+    "relocation_count": 58076,
+    "relocations_sha256": "a066e6611219a7fdca9f29e4a69cd25a6709ddc79b406313ec69d79d80d683c6"
+  },
+  "packaged": {
+    "sha256": "756e53d23f29ecca32d7c9706375494cdf2217d0db8d314a4195d0174400912b",
+    "machine": "EM_AARCH64",
+    "entry": 0,
+    "abi": {
+      "flags": 0,
+      "osabi": "ELFOSABI_SYSV",
+      "abi_version": 0
+    },
+    "sections": {
+      "": {
+        "type": "SHT_NULL",
+        "flags": 0,
+        "address": 0,
+        "size": 0,
+        "alignment": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      ".note.android.ident": {
+        "type": "SHT_NOTE",
+        "flags": 2,
+        "address": 568,
+        "size": 152,
+        "alignment": 4,
+        "sha256": "f76c30d135d83bbf9636db7b1cd690a8130d6232d2f5a092a41b22bd4e50e8a6"
+      },
+      ".note.gnu.build-id": {
+        "type": "SHT_NOTE",
+        "flags": 2,
+        "address": 720,
+        "size": 36,
+        "alignment": 4,
+        "sha256": "a437c3d60c6ebb2de7d7ddadfd14613a0158cc1629aa1bcb46d9d8a94d055325"
+      },
+      ".dynsym": {
+        "type": "SHT_DYNSYM",
+        "flags": 2,
+        "address": 760,
+        "size": 19368,
+        "alignment": 8,
+        "sha256": "17c2ac02e5f87f6f27200e25fc8e054c29720cf5b3f1d0527f80b115b39157df"
+      },
+      ".gnu.version": {
+        "type": "SHT_GNU_versym",
+        "flags": 2,
+        "address": 20128,
+        "size": 1614,
+        "alignment": 2,
+        "sha256": "db77e0aea1e75e552601550913068ab822bb66e433b6bb1588c07bb5d30438ca"
+      },
+      ".gnu.version_r": {
+        "type": "SHT_GNU_verneed",
+        "flags": 2,
+        "address": 21744,
+        "size": 112,
+        "alignment": 4,
+        "sha256": "83673359816180c49ace557147c748ba09984faa3a794c7f19fdd143fe64f68f"
+      },
+      ".gnu.hash": {
+        "type": "SHT_GNU_HASH",
+        "flags": 2,
+        "address": 21856,
+        "size": 2964,
+        "alignment": 8,
+        "sha256": "d6cc38c8859abfbf091a9e15184c6c28dc0838952b3a7d1890a95e347182b74e"
+      },
+      ".dynstr": {
+        "type": "SHT_STRTAB",
+        "flags": 2,
+        "address": 24820,
+        "size": 27294,
+        "alignment": 1,
+        "sha256": "f25ff12a491ba002d14b5e204ef475639236df4a963532e11fd02a1d7a459e07"
+      },
+      ".rela.dyn": {
+        "type": "SHT_RELA",
+        "flags": 2,
+        "address": 52120,
+        "size": 1384248,
+        "alignment": 8,
+        "sha256": "1087e87308a8c36fe14599b7a3c99c9d0316d063d02445286240b3143271a155"
+      },
+      ".rela.plt": {
+        "type": "SHT_RELA",
+        "flags": 66,
+        "address": 1436368,
+        "size": 9576,
+        "alignment": 8,
+        "sha256": "b4ee328ce5fa63b33ae9bbbf92988eac0cba6f9e038321098987f59749d1faa7"
+      },
+      ".gcc_except_table": {
+        "type": "SHT_PROGBITS",
+        "flags": 2,
+        "address": 1445944,
+        "size": 595756,
+        "alignment": 4,
+        "sha256": "69149f31d0901481a9a18d15c2f293a8a98261d28021f61b409445a4c3fcd390"
+      },
+      ".rodata": {
+        "type": "SHT_PROGBITS",
+        "flags": 50,
+        "address": 2043904,
+        "size": 2138128,
+        "alignment": 4096,
+        "sha256": "842364025f4dcba7a2926754fc9fd1e8fa08d3643fa2903d2c4b682b1e902702"
+      },
+      ".eh_frame_hdr": {
+        "type": "SHT_PROGBITS",
+        "flags": 2,
+        "address": 4182032,
+        "size": 1884252,
+        "alignment": 4,
+        "sha256": "ba0a677368ff1174e495f77b83154304f35b9b417a435c7ce723057113949027"
+      },
+      ".eh_frame": {
+        "type": "SHT_PROGBITS",
+        "flags": 2,
+        "address": 6066288,
+        "size": 8526036,
+        "alignment": 8,
+        "sha256": "63918a4d35be6cc189e7360fe5f0bd3c8ce20a2f16b21c11fe6174df3105e14d"
+      },
+      ".text": {
+        "type": "SHT_PROGBITS",
+        "flags": 6,
+        "address": 14592384,
+        "size": 28385356,
+        "alignment": 64,
+        "sha256": "aa570dbb8589d03ddda14f2358c560a96a06b5f98ced2ea80bf7a70bf738654a"
+      },
+      ".plt": {
+        "type": "SHT_PROGBITS",
+        "flags": 6,
+        "address": 42977744,
+        "size": 6416,
+        "alignment": 16,
+        "sha256": "6cf531756561bc9052fe93dd4fb4ad317d73ee1d72de02df30b49854aa07570b"
+      },
+      ".data.rel.ro": {
+        "type": "SHT_PROGBITS",
+        "flags": 3,
+        "address": 43000544,
+        "size": 614872,
+        "alignment": 16,
+        "sha256": "daf09e8447a002e6c414eed5a253503d646105aa90b0841c5785b9dc4f4aec56"
+      },
+      ".fini_array": {
+        "type": "SHT_FINI_ARRAY",
+        "flags": 3,
+        "address": 43615416,
+        "size": 16,
+        "alignment": 8,
+        "sha256": "374708fff7719dd5979ec875d56cd2286f6d3cf7ec317a3b25632aab28ec37bb"
+      },
+      ".init_array": {
+        "type": "SHT_INIT_ARRAY",
+        "flags": 3,
+        "address": 43615432,
+        "size": 112,
+        "alignment": 8,
+        "sha256": "b5fdab78d8947eacc864bfeecb4d2100780e5afe1cd8efafb124887913ac49fa"
+      },
+      ".dynamic": {
+        "type": "SHT_DYNAMIC",
+        "flags": 3,
+        "address": 43615544,
+        "size": 544,
+        "alignment": 8,
+        "sha256": "661e0ae76afa19dbbd255f283a1d0c78c8875cf4f1ee04948c8ebad46764fc4b"
+      },
+      ".got": {
+        "type": "SHT_PROGBITS",
+        "flags": 3,
+        "address": 43616088,
+        "size": 54888,
+        "alignment": 8,
+        "sha256": "b73c776f19e358d2e8506675ab078b03596f95127e9016994bfff0d71caee240"
+      },
+      ".got.plt": {
+        "type": "SHT_PROGBITS",
+        "flags": 3,
+        "address": 43670976,
+        "size": 3216,
+        "alignment": 8,
+        "sha256": "ad0a21923779a280d05c32c66a2f00ae980e26ebc84e7997770ceeca45d90f6f"
+      },
+      ".relro_padding": {
+        "type": "SHT_NOBITS",
+        "flags": 3,
+        "address": 43674192,
+        "size": 5552,
+        "alignment": 1,
+        "sha256": null
+      },
+      ".data": {
+        "type": "SHT_PROGBITS",
+        "flags": 3,
+        "address": 43690576,
+        "size": 31256,
+        "alignment": 16,
+        "sha256": "774d8c55038bebc0ff3f8a2779c38f585e190a11a864eda2e33c52a6ed1cb68c"
+      },
+      ".bss": {
+        "type": "SHT_NOBITS",
+        "flags": 2097155,
+        "address": 43721856,
+        "size": 3073070,
+        "alignment": 64,
+        "sha256": null
+      },
+      ".comment": {
+        "type": "SHT_PROGBITS",
+        "flags": 48,
+        "address": 0,
+        "size": 362,
+        "alignment": 1,
+        "sha256": "764029efcce191e349a3ea2f9c88db8d43ccc3833ec80397a1052d0c9a946614"
+      },
+      ".shstrtab": {
+        "type": "SHT_STRTAB",
+        "flags": 0,
+        "address": 0,
+        "size": 275,
+        "alignment": 1,
+        "sha256": "5dbaa0504c7af40eb21dd2aa191bacc2bd7929c01116e1054fcd3ea49a64b35c"
+      }
+    },
+    "program_headers": [
+      {
+        "p_type": "PT_PHDR",
+        "p_flags": 4,
+        "p_offset": 64,
+        "p_vaddr": 64,
+        "p_paddr": 64,
+        "p_filesz": 504,
+        "p_memsz": 504,
+        "p_align": 8
+      },
+      {
+        "p_type": "PT_LOAD",
+        "p_flags": 5,
+        "p_offset": 0,
+        "p_vaddr": 0,
+        "p_paddr": 0,
+        "p_filesz": 42984160,
+        "p_memsz": 42984160,
+        "p_align": 16384
+      },
+      {
+        "p_type": "PT_LOAD",
+        "p_flags": 6,
+        "p_offset": 42984160,
+        "p_vaddr": 43000544,
+        "p_paddr": 43000544,
+        "p_filesz": 673648,
+        "p_memsz": 679200,
+        "p_align": 16384
+      },
+      {
+        "p_type": "PT_LOAD",
+        "p_flags": 6,
+        "p_offset": 43657808,
+        "p_vaddr": 43690576,
+        "p_paddr": 43690576,
+        "p_filesz": 31256,
+        "p_memsz": 3104350,
+        "p_align": 16384
+      },
+      {
+        "p_type": "PT_DYNAMIC",
+        "p_flags": 6,
+        "p_offset": 43599160,
+        "p_vaddr": 43615544,
+        "p_paddr": 43615544,
+        "p_filesz": 544,
+        "p_memsz": 544,
+        "p_align": 8
+      },
+      {
+        "p_type": "PT_GNU_RELRO",
+        "p_flags": 4,
+        "p_offset": 42984160,
+        "p_vaddr": 43000544,
+        "p_paddr": 43000544,
+        "p_filesz": 673648,
+        "p_memsz": 679200,
+        "p_align": 1
+      },
+      {
+        "p_type": "PT_GNU_EH_FRAME",
+        "p_flags": 4,
+        "p_offset": 4182032,
+        "p_vaddr": 4182032,
+        "p_paddr": 4182032,
+        "p_filesz": 1884252,
+        "p_memsz": 1884252,
+        "p_align": 4
+      },
+      {
+        "p_type": "PT_GNU_STACK",
+        "p_flags": 6,
+        "p_offset": 0,
+        "p_vaddr": 0,
+        "p_paddr": 0,
+        "p_filesz": 0,
+        "p_memsz": 0,
+        "p_align": 0
+      },
+      {
+        "p_type": "PT_NOTE",
+        "p_flags": 4,
+        "p_offset": 568,
+        "p_vaddr": 568,
+        "p_paddr": 568,
+        "p_filesz": 188,
+        "p_memsz": 188,
+        "p_align": 4
+      }
+    ],
+    "needed": [
+      "libjnigraphics.so",
+      "liblog.so",
+      "libz.so",
+      "libGLESv2.so",
+      "libEGL.so",
+      "libandroid.so",
+      "libOpenSLES.so",
+      "libdl.so",
+      "libm.so",
+      "libc.so"
+    ],
+    "sonames": [
+      "libtmessages.49.so"
+    ],
+    "search_paths": [],
+    "build_paths": {
+      "count": 447,
+      "canonical_json_sha256": "24171276296cb443684abe375e13597c80684835b2de891addbfe914a6881425",
+      "detail": "Compared in full by elf_candidate_review.py against the preserved ELF; canonical digest retained here."
+    },
+    "export_count": 385,
+    "exports_sha256": "25feea97885c4b7895a8d75fb33a3a6d6c0464710ccaec5030733104aacf924e",
+    "relocation_count": 58076,
+    "relocations_sha256": "a066e6611219a7fdca9f29e4a69cd25a6709ddc79b406313ec69d79d80d683c6"
+  },
+  "comparison": {
+    "allocated_section_differences": [],
+    "allocated_byte_differences": [],
+    "section_layout_differences": [],
+    "executable_section_differences": [],
+    "executable_byte_differences": [],
+    "exports_equal": true,
+    "export_abi_equal": true,
+    "elf_abi_equal": true,
+    "needed_equal": true,
+    "sonames_equal": true,
+    "search_paths_equal": true,
+    "relocations_equal": true,
+    "program_headers_equal": true,
+    "entry_equal": true,
+    "only_nonallocated_sections_removed": true,
+    "removed_sections": [
+      ".debug_abbrev",
+      ".debug_aranges",
+      ".debug_info",
+      ".debug_line",
+      ".debug_loc",
+      ".debug_ranges",
+      ".debug_str",
+      ".strtab",
+      ".symtab"
+    ]
+  },
+  "historical_binary_available": false,
+  "android_executed": false,
+  "limits": "Only these two supplied binaries were compared. Historical hashes do not supply historical section, export or relocation bytes."
+}

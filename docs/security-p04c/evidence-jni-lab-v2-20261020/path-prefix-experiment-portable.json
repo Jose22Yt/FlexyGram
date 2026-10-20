@@ -1,0 +1,91 @@
+{
+  "raw_prefix": {
+    "allocated_section_differences": [
+      ".data.rel.ro",
+      ".dynamic",
+      ".dynsym",
+      ".eh_frame",
+      ".eh_frame_hdr",
+      ".fini_array",
+      ".got.plt",
+      ".plt",
+      ".rela.dyn",
+      ".rela.plt",
+      ".relro_padding",
+      ".rodata",
+      ".text"
+    ],
+    "allocated_byte_differences": [
+      ".dynamic",
+      ".dynsym",
+      ".eh_frame_hdr",
+      ".got.plt",
+      ".plt",
+      ".rela.dyn",
+      ".rela.plt",
+      ".rodata",
+      ".text"
+    ],
+    "section_layout_differences": [
+      ".data.rel.ro",
+      ".dynamic",
+      ".eh_frame",
+      ".eh_frame_hdr",
+      ".fini_array",
+      ".got.plt",
+      ".plt",
+      ".relro_padding",
+      ".rodata",
+      ".text"
+    ],
+    "executable_section_differences": [
+      ".plt",
+      ".text"
+    ],
+    "executable_byte_differences": [
+      ".plt",
+      ".text"
+    ],
+    "exports_equal": false,
+    "export_abi_equal": true,
+    "elf_abi_equal": true,
+    "needed_equal": true,
+    "sonames_equal": true,
+    "search_paths_equal": true,
+    "relocations_equal": false,
+    "program_headers_equal": false,
+    "entry_equal": true,
+    "only_nonallocated_sections_removed": false,
+    "removed_sections": [],
+    "left_sha256": "c4a47140d5fd169331383256404fb932f44d0a82078769cdb739ecdd5a129e48",
+    "right_sha256": "8f8c5b785620a4844165d7bca12de3f687ff0d4c2d7e9a6aad4f1c73621e6f64"
+  },
+  "canonical_prefix": {
+    "allocated_section_differences": [],
+    "allocated_byte_differences": [],
+    "section_layout_differences": [],
+    "executable_section_differences": [],
+    "executable_byte_differences": [],
+    "exports_equal": true,
+    "export_abi_equal": true,
+    "elf_abi_equal": true,
+    "needed_equal": true,
+    "sonames_equal": true,
+    "search_paths_equal": true,
+    "relocations_equal": true,
+    "program_headers_equal": true,
+    "entry_equal": true,
+    "only_nonallocated_sections_removed": true,
+    "removed_sections": [],
+    "left_sha256": "b753fa207d7a54a99a7c15c986b0e178d6a156f6866ef475fafd5336c9d28b46",
+    "right_sha256": "b753fa207d7a54a99a7c15c986b0e178d6a156f6866ef475fafd5336c9d28b46"
+  },
+  "abi": "aarch64-linux-android24",
+  "same_source_sha256": "a778a100666b4257e8d364639d7959176236a814f0f8ea9f9e9a6e453e0b5138",
+  "fixture_only": true,
+  "fixture_count": 4,
+  "apk_modified": false,
+  "historical_cause_proven": false,
+  "android_executed": false,
+  "limits": "Synthetic sizeof(__FILE__) makes path changes observable. This causal example does not attribute every historical JNI difference to paths."
+}

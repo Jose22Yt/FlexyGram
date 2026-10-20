@@ -253,7 +253,8 @@ class CandidateReviewTests(unittest.TestCase):
         with zipfile.ZipFile(apk, "w") as outer:
             outer.writestr("AndroidManifest.xml", b"synthetic manifest, not installable")
             for i in range(30):
-                name = "lib/arm64-v8a/libsynthetic" + str(i) + ".so"
+                prefix = "lib/arm64-v8a/" if i < 18 else "assets/chaquopy/bootstrap-native/arm64-v8a/"
+                name = prefix + "libsynthetic" + str(i) + ".so"
                 if name == omit:
                     continue
                 data = fake_elf(alignment=4096 if name == change else 16384)
@@ -318,6 +319,25 @@ class CandidateReviewTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Unsafe APK ZIP member type"):
             self.physically_checked(apk, expected)
 
+
+    def test_bootstrap_elf_inventory_is_verified(self):
+        apk, expected = self.synthetic_physical_apk()
+        self.assertEqual(sum(n.startswith('assets/chaquopy/bootstrap-native/') for n in expected), 12)
+        self.assertEqual(self.physically_checked(apk, expected)['elf_total'], 97)
+
+    def test_bootstrap_elf_hash_mismatch_is_rejected(self):
+        apk, expected = self.synthetic_physical_apk()
+        name = next(n for n in expected if n.startswith('assets/chaquopy/bootstrap-native/'))
+        expected[name] = ('f'*64, 'EM_AARCH64')
+        with self.assertRaisesRegex(ValueError, 'Physical ELF digest'):
+            self.physically_checked(apk, expected)
+
+    def test_unreviewed_flat_elf_is_rejected(self):
+        apk, expected = self.synthetic_physical_apk()
+        with zipfile.ZipFile(apk, 'a') as archive:
+            archive.writestr('assets/unreviewed.so', fake_elf())
+        with self.assertRaisesRegex(ValueError, 'ELF inventory mismatch'):
+            self.physically_checked(apk, expected)
 
     def indexed_synthetic_evidence(self):
         names = sorted(candidate.NEEDED)
