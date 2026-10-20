@@ -246,5 +246,78 @@ class CandidateReviewTests(unittest.TestCase):
                     candidate.inspect_private_apk(apk, {})
 
 
+    def synthetic_physical_apk(self, change=None, omit=None, nested_duplicate=False):
+        """Create an isolated 97-ELF test APK with no Android app or identity."""
+        apk = self.root / candidate.APK_NAME
+        expected = {}
+        with zipfile.ZipFile(apk, "w") as outer:
+            outer.writestr("AndroidManifest.xml", b"synthetic manifest, not installable")
+            for i in range(30):
+                name = "lib/arm64-v8a/libsynthetic" + str(i) + ".so"
+                if name == omit:
+                    continue
+                data = fake_elf(alignment=4096 if name == change else 16384)
+                outer.writestr(name, data)
+                expected[name] = (hashlib.sha256(data).hexdigest(), "EM_AARCH64")
+            for n, count in zip(candidate.NESTED, (19, 48)):
+                memory = BytesIO()
+                with zipfile.ZipFile(memory, "w") as inner:
+                    for i in range(count):
+                        name = "lib/test" + str(i) + ".so"
+                        machine = "EM_X86_64" if n == candidate.NESTED[1] and i == 47 else "EM_AARCH64"
+                        data = fake_elf(arch=62 if machine == "EM_X86_64" else 183)
+                        inner.writestr(name, data)
+                        expected[n + "!" + name] = (hashlib.sha256(data).hexdigest(), machine)
+                    if nested_duplicate and n == candidate.NESTED[0]:
+                        inner.writestr("lib/test0.so", fake_elf())
+                outer.writestr(n, memory.getvalue())
+        return apk, expected
+
+    def physically_checked(self, apk, expected):
+        with patch.object(candidate, "APK_SHA256", candidate.file_sha(apk)):
+            with patch.object(candidate, "APK_BYTES", apk.stat().st_size):
+                return candidate.inspect_private_apk(apk, expected)
+
+    def test_synthetic_97_elf_physical_apk_passes_static_only(self):
+        apk, expected = self.synthetic_physical_apk()
+        result = self.physically_checked(apk, expected)
+        self.assertEqual(result["elf_total"], 97)
+        self.assertEqual(result["arm64"], 96)
+        self.assertFalse(result["android_runtime_validated"])
+
+    def test_physical_elf_digest_mismatch_is_blocked(self):
+        apk, expected = self.synthetic_physical_apk()
+        expected["lib/arm64-v8a/libsynthetic0.so"] = ("f" * 64, "EM_AARCH64")
+        with self.assertRaisesRegex(ValueError, "Physical ELF digest"):
+            self.physically_checked(apk, expected)
+
+    def test_physical_4k_only_elf_is_blocked(self):
+        apk, expected = self.synthetic_physical_apk(
+            change="lib/arm64-v8a/libsynthetic0.so")
+        with self.assertRaisesRegex(ValueError, "16 KB PT_LOAD"):
+            self.physically_checked(apk, expected)
+
+    def test_physical_missing_elf_is_blocked(self):
+        apk, expected = self.synthetic_physical_apk()
+        expected["lib/arm64-v8a/never-packaged.so"] = ("0" * 64, "EM_AARCH64")
+        with self.assertRaisesRegex(ValueError, "ELF inventory mismatch"):
+            self.physically_checked(apk, expected)
+
+    def test_physical_nested_duplicate_is_blocked(self):
+        apk, expected = self.synthetic_physical_apk(nested_duplicate=True)
+        with self.assertRaisesRegex(ValueError, "Nested ZIP duplicates"):
+            self.physically_checked(apk, expected)
+
+    def test_physical_symlink_entry_is_blocked(self):
+        apk, expected = self.synthetic_physical_apk()
+        with zipfile.ZipFile(apk, "a") as outer:
+            link = zipfile.ZipInfo("assets/unsafe-link")
+            link.create_system = 3
+            link.external_attr = (0o120777 << 16)
+            outer.writestr(link, "outside")
+        with self.assertRaisesRegex(ValueError, "Unsafe APK ZIP member type"):
+            self.physically_checked(apk, expected)
+
+
 if __name__ == "__main__":
     unittest.main()
