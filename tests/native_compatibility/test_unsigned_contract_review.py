@@ -47,6 +47,14 @@ class UnsignedContractReviewTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Evidence digest mismatch"):
             review.verify(self.folder)
 
+    def test_rewritten_evidence_index_is_rejected(self):
+        self.prepare_copy()
+        self.mutate("evidence-sha256.json",
+                    lambda d: d["evidence_files"].update(
+                        {"unsigned-apk-receipt.json": "0" * 64}))
+        with self.assertRaisesRegex(ValueError, "Reviewed evidence index SHA-256 changed"):
+            review.verify(self.folder)
+
     def test_missing_evidence_is_rejected(self):
         self.prepare_copy()
         (self.folder / "native-linked-guards.json").unlink()
