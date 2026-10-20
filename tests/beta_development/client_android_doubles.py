@@ -87,7 +87,9 @@ public class View {
  public boolean checkTransitionAnimation(){return busy;}public boolean isTransitionAnimationInProgress(){return busy;}
  public boolean isSwipeInProgress(){return false;}public boolean isPreviewOpenAnimationInProgress(){return false;}
  public boolean presentFragment(BaseFragment f){if(busy)return false;addFragmentToStack(f);f.createView(context);busy=true;return true;}
- public void closeLastFragment(boolean b){if(busy||stack.size()<2)return;BaseFragment f=getLastFragment();f.onTransitionAnimationStart(false,true);stack.remove(f);f.onFragmentDestroy();busy=true;}
+ // Real ActionBarLayout.closeLastFragment creates the previous view if it was
+ // never visible (e.g. home underneath a restored conversation).
+ public void closeLastFragment(boolean b){if(busy||stack.size()<2)return;BaseFragment f=getLastFragment();f.onTransitionAnimationStart(false,true);stack.remove(f);f.onFragmentDestroy();if(getLastFragment().getFragmentView()==null)showLastFragment();busy=true;}
  public void onBackPressed(){closeLastFragment(true);}public void onResume(){}public void onPause(){}
  public void removeAllFragments(){for(BaseFragment f:stack)f.onFragmentDestroy();stack.clear();}
  public void rebuildAllFragmentViews(boolean a,boolean b){getLastFragment().createView(context);}
