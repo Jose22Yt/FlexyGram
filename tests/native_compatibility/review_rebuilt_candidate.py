@@ -22,6 +22,7 @@ from verify_private_unsigned_apk import elf_alignment, NESTED
 ROOT = Path(__file__).resolve().parents[2]
 EVIDENCE = ROOT / "docs/security-p04c/evidence-unsigned-rebuild-20261020"
 INDEX_BLOB_SHA = "d668ab49458669e0ca5fc63102d8b19653e373e8"
+INDEX_SHA256 = "fff31dd27ffc69b1aed2da19428bf0e5d0eabdf51c06d2ca4828db95b74a05b7"
 SOURCE_HEAD = "1177ceb8f4351b1626dd65e3dbd657f3b0ff159f"
 APK_NAME = "flexygram-v13.0.2(1261)-diagnostic-debug-unsigned.apk"
 APK_SHA256 = "291881863ea81418fa6cb12104b6eaea4aee2403822894da2143a51f3030bdd5"
@@ -92,7 +93,9 @@ def check_index(folder: Path):
     contents = index.read_bytes()
     git_blob = hashlib.sha1(b"blob " + str(len(contents)).encode("ascii") +
                             b"\0" + contents).hexdigest()
-    require(git_blob == INDEX_BLOB_SHA, "Candidate evidence index pin mismatch")
+    require(git_blob == INDEX_BLOB_SHA and
+            hashlib.sha256(contents).hexdigest() == INDEX_SHA256,
+            "Candidate evidence index pin mismatch")
     inventory = strict_json(contents)
     require(isinstance(inventory, dict) and len(inventory) == 44 and
             NEEDED <= inventory.keys(), "Incomplete candidate evidence inventory")
