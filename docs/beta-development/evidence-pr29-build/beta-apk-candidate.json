@@ -1,0 +1,10 @@
+{
+  "source_commit": "97dfb08e58159b31d322dd8435080fb039abdeb9",
+  "apk_sha256": "9513d49706a714d496b45aab1992c0cc250e8c2e4df8bb1a1be00d8451e60ede",
+  "bytes": 113101251,
+  "historical_beta_sha256": "98de352740b07c3e6f00a2399246c9c60bc744ed44a976324c79e4132b086afd",
+  "historical_artifact_replaced": false,
+  "signed": false,
+  "installed": false,
+  "android_execution": false
+}

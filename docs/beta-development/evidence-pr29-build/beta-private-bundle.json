@@ -1,0 +1,13 @@
+{
+  "bundle_sha256": "812ef5f9132edb75d0f061d8db9058489309194ea183bba5cef6dfbd6765029d",
+  "bytes": 337741135,
+  "members": 40,
+  "all_members_hash_and_crc_verified": true,
+  "apk_sha256": "9513d49706a714d496b45aab1992c0cc250e8c2e4df8bb1a1be00d8451e60ede",
+  "apk_inside_exact": true,
+  "local_only": true,
+  "private_persistence_confirmed": false,
+  "remote_recovery_verified": false,
+  "intended_destination": "/FlexyGram-Work2-Private/FlexyGram-BetaDevelopment-PR29-97dfb08-Unsigned-Private.zip",
+  "approval_pending": "Folder members/invitations and upload of this exact new private archive"
+}

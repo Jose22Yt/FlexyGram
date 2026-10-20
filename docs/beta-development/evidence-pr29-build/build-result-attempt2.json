@@ -1,0 +1,19 @@
+{
+  "code_head": "97dfb08e58159b31d322dd8435080fb039abdeb9",
+  "exit_code": 0,
+  "seconds": 693.55,
+  "command": [
+    "--no-daemon",
+    "--console=plain",
+    "--max-workers=2",
+    "-Pkotlin.incremental=false",
+    "-PflexygramBetaDevelopment=true",
+    ":TMessagesProj:assembleBetaDevelopmentDebug"
+  ],
+  "attempt": 2,
+  "unsigned_overlay": true,
+  "native_target": "arm64-v8a",
+  "skip_native": false,
+  "android_execution": false,
+  "log": "gradle-beta-unsigned-attempt2.log"
+}

@@ -1,0 +1,11 @@
+{
+  "package": "platforms;android-37.0",
+  "revision": 2,
+  "official_catalog_sha256": "237eefe28e55619d3e63d730f8994cc1ae6d9c171096f07a6c147297145787e6",
+  "package_xml_sha256": "51b7031ce0c005ca145d2c65be3b444316e3a5a61c743b06cbc089384aec91aa",
+  "android_jar_sha256": "bf1b4387cc7ca94fc6ef684f040d9d16fbf16248e181819f020736ea2053f177",
+  "catalog_archive_sha1_exact": true,
+  "platform_redownloaded": false,
+  "project_configuration_modified": false,
+  "installed_path": "platforms/android-37.0"
+}

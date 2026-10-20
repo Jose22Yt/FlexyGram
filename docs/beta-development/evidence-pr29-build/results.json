@@ -154,8 +154,8 @@
   "experimental_wheels_rebuilt": false,
   "original_wheels_verified": 18,
   "overlay_wheels_verified": 18,
-  "apk_status": "BUILD_RUNNING_NO_RESULT_YET",
-  "apk_sha256": null,
+  "apk_status": "BUILD_SUCCESSFUL_STATIC_PASS_PENDING_ANDROID_AND_PRIVATE_BACKUP_APPROVAL",
+  "apk_sha256": "9513d49706a714d496b45aab1992c0cc250e8c2e4df8bb1a1be00d8451e60ede",
   "android_executed": false,
   "signed": false,
   "installed": false,
@@ -169,5 +169,53 @@
     "folder_members_or_invitations_enumerated": false,
     "private_access_approval_pending": true
   },
-  "build_source_commit": "97dfb08e58159b31d322dd8435080fb039abdeb9"
+  "build_source_commit": "97dfb08e58159b31d322dd8435080fb039abdeb9",
+  "apk_bytes": 113101251,
+  "build_result": {
+    "code_head": "97dfb08e58159b31d322dd8435080fb039abdeb9",
+    "exit_code": 0,
+    "seconds": 693.55,
+    "command": [
+      "--no-daemon",
+      "--console=plain",
+      "--max-workers=2",
+      "-Pkotlin.incremental=false",
+      "-PflexygramBetaDevelopment=true",
+      ":TMessagesProj:assembleBetaDevelopmentDebug"
+    ],
+    "attempt": 2,
+    "unsigned_overlay": true,
+    "native_target": "arm64-v8a",
+    "skip_native": false,
+    "android_execution": false,
+    "log": "gradle-beta-unsigned-attempt2.log"
+  },
+  "static_gate_status": "BETA_UNSIGNED_STATIC_REVIEW_ONLY_PENDING_ANDROID",
+  "native_summary": {
+    "elf_total": 97,
+    "android_arm64": 96,
+    "arm64_4k_pass": 96,
+    "arm64_16k_pass": 96,
+    "other_machine": 1,
+    "missing_needed": 0,
+    "strong_unresolved": 0,
+    "version_mismatch": 0
+  },
+  "signature": "absent",
+  "apk_package": "io.github.jose22yt.flexygram.beta.development",
+  "jni_guards_ret": 3,
+  "packaged_text_matches_linked": true,
+  "private_bundle": {
+    "bundle_sha256": "812ef5f9132edb75d0f061d8db9058489309194ea183bba5cef6dfbd6765029d",
+    "bytes": 337741135,
+    "members": 40,
+    "all_members_hash_and_crc_verified": true,
+    "apk_sha256": "9513d49706a714d496b45aab1992c0cc250e8c2e4df8bb1a1be00d8451e60ede",
+    "apk_inside_exact": true,
+    "local_only": true,
+    "private_persistence_confirmed": false,
+    "remote_recovery_verified": false,
+    "intended_destination": "/FlexyGram-Work2-Private/FlexyGram-BetaDevelopment-PR29-97dfb08-Unsigned-Private.zip",
+    "approval_pending": "Folder members/invitations and upload of this exact new private archive"
+  }
 }
