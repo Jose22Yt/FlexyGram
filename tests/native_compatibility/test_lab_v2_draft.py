@@ -16,11 +16,12 @@ class V2DraftTests(unittest.TestCase):
             'signing_authorized': False, 'android_runtime_validated': False,
             'distribution_allowed': False, 'unsigned_apk_sha256': 'a'*64,
             'unsigned_apk_bytes': 113080783, 'source_head': 'b'*40,
-            'native_elf_sha256': {'libxml2.so': 'c'*64},
+            'native_elf_sha256': {'libxml2.so': 'c'*64, 'libexslt.so': 'e'*64,
+                                   'libxslt.so': 'f'*64, 'libfreetype.so': 'd'*64},
         }
         self.previous = {
             'schema': 1, 'reviewed_head': 'e'*40,
-            'case_ids': ['test' + str(i) for i in range(12)],
+            'case_ids': ['test_case' + str(i) for i in range(12)],
             'target_package': 'io.github.jose22yt.flexygram.diagnostic',
             'runner_package': 'runner', 'runner_class': 'LabInstrumentation',
             'jni_library': 'libtmessages.49.so', 'runtime_cases_sha256': 'f'*64,
@@ -33,10 +34,10 @@ class V2DraftTests(unittest.TestCase):
             'sha256': 'd'*64,
         }]}
         self.wheels = {'wheels': [
-            {'filename': 'wheel'+str(i), 'sha256': str(i%10)*64, 'rebuilt': i<3}
+            {'filename': 'wheel'+str(i)+'.whl', 'sha256': str(i%10)*64, 'rebuilt': i<3}
             for i in range(18)
         ]}
-        self.apk = {'apk_sha256': 'a'*64, 'signature': 'absent'}
+        self.apk = {'apk_sha256': 'a'*64, 'apk_bytes': 113080783, 'signature': 'absent'}
 
     def build(self):
         return lab.make_draft(self.summary, self.previous,
@@ -71,6 +72,41 @@ class V2DraftTests(unittest.TestCase):
     def test_forged_runtime_success_blocks(self):
         self.summary['android_runtime_validated'] = True
         with self.assertRaisesRegex(ValueError, 'reviewed unsigned'):
+            self.build()
+
+    def test_missing_native_elf_pin_blocks(self):
+        self.summary['native_elf_sha256'].pop('libxml2.so')
+        with self.assertRaisesRegex(ValueError, 'Four pinned ELF'):
+            self.build()
+
+    def test_duplicate_wheel_name_blocks(self):
+        self.wheels['wheels'][1]['filename'] = self.wheels['wheels'][0]['filename']
+        with self.assertRaisesRegex(ValueError, 'wheel overlay incomplete'):
+            self.build()
+
+    def test_invalid_wheel_digest_blocks(self):
+        self.wheels['wheels'][0]['sha256'] = 'INVALID'
+        with self.assertRaisesRegex(ValueError, 'wheel overlay incomplete'):
+            self.build()
+
+    def test_incorrect_apk_size_blocks(self):
+        self.apk['apk_bytes'] += 1
+        with self.assertRaisesRegex(ValueError, 'Unsigned source receipt'):
+            self.build()
+
+    def test_nonboolean_rebuilt_flag_blocks(self):
+        self.wheels['wheels'][0]['rebuilt'] = 1
+        with self.assertRaisesRegex(ValueError, 'wheel overlay incomplete'):
+            self.build()
+
+    def test_invalid_case_id_blocks(self):
+        self.previous['case_ids'][0] = '../../test_case0'
+        with self.assertRaisesRegex(ValueError, 'Historical lab v1 invalid'):
+            self.build()
+
+    def test_invalid_jni_digest_blocks(self):
+        self.audit['libraries'][0]['sha256'] = 'not-a-real-hash'
+        with self.assertRaisesRegex(ValueError, 'Exactly one verified'):
             self.build()
 
     def test_no_output_inside_checkout(self):
