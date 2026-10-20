@@ -76,6 +76,21 @@ python3.11 "$REPO/tests/native_compatibility/lab_host_preflight.py" \
   --sdk "$SDK" --archives "$LAB/archives" --output "$LAB/preflight.json"
 ```
 
+**Comprobación de espacio añadida tras el informe Work (2026-10-20):**
+`lab_host_preflight.py` exige ahora **10 GiB libres como mínimo** en el
+filesystem de `ANDROID_AVD_HOME` (si está definido; en caso contrario
+comprueba el filesystem del SDK). Incluye `storage.target`,
+`storage.free_bytes`, `storage.required_free_bytes` y `storage.status`
+en el recibo, sin publicar rutas privadas. Un directorio AVD inexistente,
+una lectura de filesystem fallida o espacio insuficiente devuelven BLOCKED.
+Esto es un **margen operativo conservador** para los 2 AVD y sus datos/logs,
+no una certificación de arranque ni una sustitución de aislamiento de red.
+El host anterior quedó con solo **265818112 bytes** libres tras materializar
+ambas imágenes. Se añadieron cuatro regresiones sintéticas y el nuevo gate
+espera **304 pruebas mínimas**; esta cifra todavía debe reejecutarse desde
+un checkout real. Las **300/300** del informe anterior son evidencia de Work
+para el HEAD previo.
+
 Exit1/BLOCKED significa **no arrancar**. Un READY solo permite comprobar después un boot
 offline; no certifica que el emulador acepte ARM64/TCG. KVM ausente no implica por sí solo
 que TCG sea imposible; la opción `-accel off` tampoco demuestra que funcione.
