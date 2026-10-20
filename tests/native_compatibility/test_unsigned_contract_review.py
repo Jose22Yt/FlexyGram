@@ -7,7 +7,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-SCRIPT = Path(__file__).resolve().parents[2] / "tools/native_compatibility/review_unsigned_contract.py"
+SCRIPT = Path(__file__).resolve().parents[2] / "tests/native_compatibility/review_unsigned_contract.py"
 spec = importlib.util.spec_from_file_location("p04c_unsigned_contract_review", SCRIPT)
 review = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(review)
