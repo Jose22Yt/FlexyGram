@@ -29,6 +29,7 @@ public final class BetaPreviewActivity extends Activity {
     private ActionBarLayout navigation;
     private Theme.ThemeInfo initialTheme, ownedTheme;
     private BetaNavigation requests;
+    private BetaSystemBack systemBack;
     private NavigationEvents events;
     private SceneFrameObserver frameObserver;
     private final ProbeState probe = new ProbeState();
@@ -50,6 +51,11 @@ public final class BetaPreviewActivity extends Activity {
             finish();
             return;
         }
+        systemBack = new BetaSystemBack(this, () -> {
+            if (isFinishing() || isDestroyed()) return;
+            if (requests != null) requestClose(); else finish();
+        });
+        systemBack.register();
         try {
             ApplicationLoader.postInitApplication();
         } catch (RuntimeException | LinkageError initializationFailure) {
@@ -147,6 +153,7 @@ public final class BetaPreviewActivity extends Activity {
         new BetaUiState(route, Theme.isCurrentThemeDark()).save(state);
     }
     @Override protected void onDestroy() {
+        if (systemBack != null) systemBack.close();
         if (requests != null) requests.close();
         probe.close();
         probeCell = null; exportCell = null;
