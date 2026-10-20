@@ -2,6 +2,8 @@ package org.telegram.ui.beta;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -33,7 +35,12 @@ public final class BetaPreviewActivity extends Activity {
     private NavigationEvents events;
     private SceneFrameObserver frameObserver;
     private final ProbeState probe = new ProbeState();
-    private TextSettingsCell probeCell, exportCell;
+    private TextSettingsCell probeCell, exportCell, documentCell;
+    private static final int CREATE_DIAGNOSTICS = 0xF103;
+    private static final String PENDING_DOCUMENT = "beta_pending_diagnostic_document";
+    private String pendingDocument;
+    private boolean documentBusy;
+    private String documentStatus = "Guardar ZIP local; sin envío automático";
     private boolean exportPending, closeAccepted;
     private String exportStatus = "Save app-private events";
     private long exportId;
@@ -42,6 +49,15 @@ public final class BetaPreviewActivity extends Activity {
     @Override
     protected void onCreate(Bundle state) {
         super.onCreate(state);
+        if (state != null) {
+            try {
+                Object pending = state.get(PENDING_DOCUMENT);
+                if (pending instanceof String && BetaDiagnosticsDocument.validName((String) pending))
+                    pendingDocument = (String) pending;
+            } catch (RuntimeException invalidBundle) {
+                pendingDocument = null;
+            }
+        }
         if (!"io.github.jose22yt.flexygram.beta.development".equals(BuildConfig.APPLICATION_ID)
                 || !BuildConfig.ISOLATED_DIAGNOSTIC || BuildConfig.APP_ID != 0
                 || !BuildConfig.APP_HASH.isEmpty() || BuildVariantPolicy.authenticationAllowed()
@@ -144,6 +160,7 @@ public final class BetaPreviewActivity extends Activity {
     }
     @Override protected void onSaveInstanceState(Bundle state) {
         super.onSaveInstanceState(state);
+        if (BetaDiagnosticsDocument.validName(pendingDocument)) state.putString(PENDING_DOCUMENT, pendingDocument);
         if (navigation == null) return;
         BaseFragment visible = navigation.getLastFragment();
         BetaUiState.Route route = visible instanceof Conversation ? BetaUiState.Route.CONVERSATION
@@ -154,7 +171,7 @@ public final class BetaPreviewActivity extends Activity {
         if (systemBack != null) systemBack.close();
         if (requests != null) requests.close();
         probe.close();
-        probeCell = null; exportCell = null;
+        probeCell = null; exportCell = null; documentCell = null;
         localRuntime.shutdownNow();
         if (navigation != null) navigation.removeAllFragments();
         // A config restart keeps its theme; an unrelated owner must not be overwritten on destruction.
@@ -169,7 +186,7 @@ public final class BetaPreviewActivity extends Activity {
             if (!isOpen && backward) closeAccepted = true;
         }
         @Override public void onFragmentDestroy() {
-            if (this instanceof Settings) { probeCell = null; exportCell = null; }
+            if (this instanceof Settings) { probeCell = null; exportCell = null; documentCell = null; }
             super.onFragmentDestroy();
         }
     }
@@ -227,6 +244,10 @@ public final class BetaPreviewActivity extends Activity {
             renderExport();
             exportCell.setOnClickListener(v -> saveObservations());
             list.addView(exportCell);
+            documentCell = new TextSettingsCell(context);
+            renderDocument();
+            documentCell.setOnClickListener(v -> exportDiagnostics());
+            list.addView(documentCell);
             return fragmentView = list;
         }
     }
@@ -270,12 +291,12 @@ public final class BetaPreviewActivity extends Activity {
     }
     private void renderExport() {
         if (exportCell == null) return;
-        exportCell.setEnabled(!exportPending);
+        exportCell.setEnabled(!exportPending && !documentBusy);
         exportCell.setTextAndValue("Local observations", exportPending ? "Saving" : exportStatus, false);
     }
     private void saveObservations() {
-        if (isFinishing() || isDestroyed() || !(navigation.getLastFragment() instanceof Settings) || exportPending) return;
-        exportPending = true; renderExport();
+        if (isFinishing() || isDestroyed() || !(navigation.getLastFragment() instanceof Settings) || exportPending || documentBusy) return;
+        exportPending = true; renderExport(); renderDocument();
         final Context application = getApplicationContext();
         final NavigationEvents capture = events;
         final long id = ++exportId;
@@ -294,6 +315,119 @@ public final class BetaPreviewActivity extends Activity {
             current.exportPending = false;
             current.exportStatus = success ? "Saved privately; observations only" : "Export incomplete";
             current.renderExport();
+            current.renderDocument();
+        });
+    }
+
+
+    private void renderDocument() {
+        if (documentCell == null) return;
+        documentCell.setEnabled(!documentBusy && !exportPending);
+        documentCell.setTextAndValue("Exportar diagnósticos", documentBusy ? "Preparando / guardando" : documentStatus, false);
+    }
+    private void exportDiagnostics() {
+        if (isFinishing() || isDestroyed() || !(navigation.getLastFragment() instanceof Settings)
+                || documentBusy || exportPending) return;
+        if (BetaDiagnosticsDocument.validName(pendingDocument)) {
+            openDiagnosticPicker(); // retry the retained snapshot; never drain again after cancellation
+            return;
+        }
+        documentBusy = true; renderDocument(); renderExport();
+        final Context application = getApplicationContext();
+        final NavigationEvents capture = events;
+        final long id = ++exportId;
+        final ProbeState.Value value = probe.value();
+        final ProbeState.Outcome outcome = probe.outcome();
+        final WeakReference<BetaPreviewActivity> owner = new WeakReference<>(this);
+        localRuntime.execute(() -> {
+            String name = null;
+            try {
+                name = BetaDiagnosticsDocument.prepare(application.getFilesDir(), capture, id, value, outcome).getName();
+            } catch (Exception unavailable) {
+                // No exception, URI, account, token or private payload goes to logs.
+            }
+            postDiagnosticPrepared(owner, name);
+        });
+    }
+    private static void postDiagnosticPrepared(WeakReference<BetaPreviewActivity> owner, String name) {
+        BetaPreviewActivity activity = owner.get();
+        if (activity == null) return;
+        activity.runOnUiThread(() -> {
+            BetaPreviewActivity current = owner.get();
+            if (current == null || current.isFinishing() || current.isDestroyed()) return;
+            current.documentBusy = false;
+            if (!BetaDiagnosticsDocument.validName(name)) {
+                current.documentStatus = "No se pudo preparar; observaciones privadas conservadas";
+                current.renderDocument(); current.renderExport();
+                return;
+            }
+            current.pendingDocument = name;
+            current.openDiagnosticPicker();
+        });
+    }
+    private void openDiagnosticPicker() {
+        if (isFinishing() || isDestroyed() || documentBusy || !BetaDiagnosticsDocument.validName(pendingDocument)) return;
+        if (navigation == null || !(navigation.getLastFragment() instanceof Settings)) {
+            documentStatus = "Copia privada lista; vuelve a Settings para exportar";
+            renderDocument(); renderExport();
+            return;
+        }
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("application/zip");
+        intent.putExtra(Intent.EXTRA_TITLE, "FlexyGram-diagnostics.zip");
+        intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+        documentBusy = true; renderDocument(); renderExport();
+        try {
+            startActivityForResult(intent, CREATE_DIAGNOSTICS);
+        } catch (RuntimeException unavailable) {
+            documentBusy = false;
+            documentStatus = "Selector no disponible; copia privada conservada";
+            renderDocument(); renderExport();
+        }
+    }
+    @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode != CREATE_DIAGNOSTICS || isFinishing() || isDestroyed()) return;
+        documentBusy = false;
+        if (resultCode != RESULT_OK || data == null || data.getData() == null) {
+            documentStatus = "Cancelado; copia privada conservada para reintentar";
+            renderDocument(); renderExport();
+            return;
+        }
+        final Uri uri = data.getData();
+        if (!"content".equals(uri.getScheme()) || !BetaDiagnosticsDocument.validName(pendingDocument)) {
+            documentStatus = "Destino no válido; copia privada conservada";
+            renderDocument(); renderExport();
+            return;
+        }
+        final String name = pendingDocument;
+        final Context application = getApplicationContext();
+        final WeakReference<BetaPreviewActivity> owner = new WeakReference<>(this);
+        documentBusy = true; renderDocument(); renderExport();
+        localRuntime.execute(() -> {
+            boolean success = false;
+            try (java.io.OutputStream destination = application.getContentResolver().openOutputStream(uri, "wt")) {
+                BetaDiagnosticsDocument.copy(application.getFilesDir(), name, destination);
+                success = true;
+            } catch (Exception unavailable) {
+                success = false;
+                // Provider failures can leave a partial user document; private source is never deleted.
+            }
+            postDiagnosticSaved(owner, name, success);
+        });
+    }
+    private static void postDiagnosticSaved(WeakReference<BetaPreviewActivity> owner, String name, boolean success) {
+        BetaPreviewActivity activity = owner.get();
+        if (activity == null) return;
+        activity.runOnUiThread(() -> {
+            BetaPreviewActivity current = owner.get();
+            if (current == null || current.isFinishing() || current.isDestroyed()) return;
+            current.documentBusy = false;
+            if (success && name.equals(current.pendingDocument)) current.pendingDocument = null;
+            current.documentStatus = success ? "Guardado; compartir sólo si tú lo decides"
+                    : "Error: archivo externo puede estar incompleto; copia privada conservada";
+            current.renderDocument(); current.renderExport();
         });
     }
 

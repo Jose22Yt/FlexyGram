@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "base_pr23": "958d28ba7ded7e0fa868a71788d8c0679d53bda4",
+  "pr31": "93af93d45fb918a8d6ae79dac3ef2ec6cdac7219",
+  "execution_environment_available": false,
+  "prepared_test_methods": 15,
+  "tests_executed": 0,
+  "tests_passed": null,
+  "tests_failed": null,
+  "tests_omitted": null,
+  "host_java_compilation_executed": false,
+  "android_compilation_executed": false,
+  "android_phone_executed": false,
+  "apk_accessed": false,
+  "apk_modified": false,
+  "apk_signed": false,
+  "adb_used": false,
+  "existing_importer_modified": false,
+  "navigation_engine_modified": false,
+  "work2_branch_modified": false,
+  "verification_limit": "Source review and publication only. Tests and Android17 behavior pending execution.",
+  "later_pr23_observed": "090b907cfd305614130fe35340bd148bc247dcff",
+  "concurrent_changed_paths": [
+    "docs/beta-development/evidence-first-temporary-signature/PRIVATE-RECOVERY.md",
+    "docs/beta-development/evidence-first-temporary-signature/signed-recovery-receipt.json",
+    "docs/beta-development/evidence-first-temporary-signature/temporary-full-policy-after-recovery.json"
+  ]
+}
