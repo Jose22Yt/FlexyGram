@@ -239,8 +239,6 @@ class CandidateReviewTests(unittest.TestCase):
         apk = self.root / candidate.APK_NAME
         with zipfile.ZipFile(apk, "w") as z:
             z.writestr("AndroidManifest.xml", "fixture")
-            with unittest.mock.patch("zipfile.ZipFile.writestr", wraps=z.writestr):
-                pass
             z.writestr("AndroidManifest.xml", "fixture2")
         with patch.object(candidate, "APK_SHA256", candidate.file_sha(apk)):
             with patch.object(candidate, "APK_BYTES", apk.stat().st_size):
