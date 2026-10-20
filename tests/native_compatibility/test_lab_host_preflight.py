@@ -1,5 +1,6 @@
 """Synthetic preflight regressions; no Android, ADB devices or network services."""
 from pathlib import Path
+from types import SimpleNamespace
 import gzip
 import hashlib
 import subprocess
@@ -66,7 +67,8 @@ class HostPreflightTests(unittest.TestCase):
         def command(args, env=None):
             return {'exit_code': 1 if args[0] == 'unshare' else 0, 'output': 'SYNTHETIC'}
         with patch.object(lab, 'verify_image', return_value={'fixture': True}), \
-             patch.object(lab, 'command', side_effect=command), patch.object(lab.shutil, 'which', return_value='/sbin/ip'):
+             patch.object(lab, 'command', side_effect=command), patch.object(lab.shutil, 'which', return_value='/sbin/ip'), \
+             patch.object(lab, 'check_storage', return_value={'status': 'PASS', 'free_bytes': 12*1024**3}):
             r = lab.probe(Path('/synthetic/sdk'), Path('/synthetic/images'))
         self.assertEqual(r['status'], 'HOST_BLOCKED_BEFORE_ANDROID_BOOT')
         self.assertIn('isolated network namespace unavailable', r['blockers'])
@@ -77,7 +79,8 @@ class HostPreflightTests(unittest.TestCase):
         def command(args, env=None):
             calls.append(args);return {'exit_code': 0, 'output': 'SYNTHETIC_VERSION'}
         with patch.object(lab, 'verify_image', return_value={'fixture': True}), \
-             patch.object(lab, 'command', side_effect=command), patch.object(lab.shutil, 'which', return_value='/sbin/ip'):
+             patch.object(lab, 'command', side_effect=command), patch.object(lab.shutil, 'which', return_value='/sbin/ip'), \
+             patch.object(lab, 'check_storage', return_value={'status': 'PASS', 'free_bytes': 12*1024**3}):
             r = lab.probe(Path('/synthetic/sdk'), Path('/synthetic/images'))
         self.assertEqual(r['status'], 'HOST_READY_FOR_MANUAL_OFFLINE_BOOT_CHECK_ONLY')
         self.assertFalse(r['installation_authorized'])
@@ -85,3 +88,45 @@ class HostPreflightTests(unittest.TestCase):
         self.assertFalse(r['android_executed'])
         self.assertEqual(len(calls), 4)
         self.assertFalse(any(token in ('install', 'shell', '-avd', 'start-server') for args in calls for token in args))
+
+
+    def test_avd_storage_above_margin_allows_preflight(self):
+        with tempfile.TemporaryDirectory() as d, \
+             patch.dict(lab.os.environ, {'ANDROID_AVD_HOME': d}), \
+             patch.object(lab.shutil, 'disk_usage',
+                          return_value=SimpleNamespace(free=11*1024**3)):
+            status = lab.check_storage(Path('/synthetic/sdk'))
+        self.assertEqual(status['status'], 'PASS')
+        self.assertEqual(status['target'], 'ANDROID_AVD_HOME')
+        self.assertEqual(status['required_free_bytes'], 10*1024**3)
+
+    def test_avd_storage_below_margin_blocks_before_android(self):
+        with tempfile.TemporaryDirectory() as d, \
+             patch.dict(lab.os.environ, {'ANDROID_AVD_HOME': d}), \
+             patch.object(lab.shutil, 'disk_usage',
+                          return_value=SimpleNamespace(free=256*1024**2)):
+            status = lab.check_storage(Path('/synthetic/sdk'))
+        self.assertEqual(status['status'], 'BLOCKED')
+        self.assertEqual(status['free_bytes'], 256*1024**2)
+
+    def test_unavailable_avd_storage_fails_closed(self):
+        with tempfile.TemporaryDirectory() as d:
+            missing = str(Path(d)/'not-created')
+            with patch.dict(lab.os.environ, {'ANDROID_AVD_HOME': missing}):
+                status = lab.check_storage(Path(d))
+        self.assertEqual(status['status'], 'BLOCKED')
+        self.assertIsNone(status['free_bytes'])
+
+    def test_probe_blocks_even_when_tools_and_images_ready_if_disk_full(self):
+        def command(args, env=None):
+            return {'exit_code': 0, 'output': 'SYNTHETIC'}
+        with patch.object(lab, 'verify_image', return_value={'fixture': True}), \
+             patch.object(lab, 'command', side_effect=command), \
+             patch.object(lab.shutil, 'which', return_value='/sbin/ip'), \
+             patch.object(lab, 'check_storage',
+                          return_value={'status': 'BLOCKED', 'free_bytes': 265818112}):
+            result = lab.probe(Path('/synthetic/sdk'), Path('/synthetic/images'))
+        self.assertEqual(result['status'], 'HOST_BLOCKED_BEFORE_ANDROID_BOOT')
+        self.assertTrue(any('filesystem space' in item for item in result['blockers']))
+        self.assertEqual(result['storage']['free_bytes'], 265818112)
+        self.assertFalse(result['android_executed'])
