@@ -7,6 +7,7 @@ import argparse
 import json
 from pathlib import Path
 import os
+import re
 import review_unsigned_contract as review
 
 SCHEMA = 2
@@ -24,21 +25,42 @@ def make_draft(evidence, previous, audit, wheel_manifest, apk):
             evidence['android_runtime_validated'] is False and
             evidence['distribution_allowed'] is False,
             'Only reviewed unsigned, blocked evidence can seed the lab v2 draft')
-    require(previous['schema'] == 1 and
-            len(previous['case_ids']) == 12 and
-            len(set(previous['case_ids'])) == 12, 'Historical lab v1 invalid')
-    require(len(wheel_manifest['wheels']) == 18 and
-            sum(x['rebuilt'] is True for x in wheel_manifest['wheels']) == 3,
+    case_ids = previous['case_ids']
+    require(previous['schema'] == 1 and len(case_ids) == 12 and
+            len(set(case_ids)) == 12 and
+            all(isinstance(c, str) and re.fullmatch(r'test_[a-z0-9_]+', c)
+                for c in case_ids), 'Historical lab v1 invalid')
+    expected_libs = {'libfreetype.so', 'libxml2.so', 'libexslt.so', 'libxslt.so'}
+    native = evidence['native_elf_sha256']
+    require(set(native) == expected_libs and
+            all(isinstance(value, str) and
+                re.fullmatch('[a-f0-9]{64}', value) for value in native.values()),
+            'Four pinned ELF hashes required')
+    rows = wheel_manifest['wheels']
+    require(len(rows) == 18 and
+            sum(type(row['rebuilt']) is bool and row['rebuilt'] for row in rows) == 3 and
+            all(type(row['rebuilt']) is bool and
+                isinstance(row['filename'], str) and
+                re.fullmatch(r'[a-zA-Z0-9_.-]+\.whl', row['filename']) and
+                isinstance(row['sha256'], str) and
+                re.fullmatch('[a-f0-9]{64}', row['sha256']) for row in rows) and
+            len({row['filename'] for row in rows}) == 18,
             'Reviewed wheel overlay incomplete')
     expected_apk = evidence['unsigned_apk_sha256']
-    require(apk['apk_sha256'] == expected_apk and
+    require(isinstance(expected_apk, str) and
+            re.fullmatch('[a-f0-9]{64}', expected_apk) and
+            evidence['unsigned_apk_bytes'] > 0 and
+            apk['apk_sha256'] == expected_apk and
+            apk['apk_bytes'] == evidence['unsigned_apk_bytes'] and
             apk['signature'] == 'absent', 'Unsigned source receipt disagreement')
     name = previous['jni_library']
     matches = [x for x in audit['libraries']
                if x['path'].endswith('!lib/arm64-v8a/' + name) and
                   x['machine'] == 'EM_AARCH64']
     require(len(matches) == 1 and matches[0]['load_4k'] is True and
-            matches[0]['load_16k'] is True,
+            matches[0]['load_16k'] is True and
+            isinstance(matches[0]['sha256'], str) and
+            re.fullmatch('[a-f0-9]{64}', matches[0]['sha256']),
             'Exactly one verified packaged JNI library required')
     require(previous['target_package'] == 'io.github.jose22yt.flexygram.diagnostic',
             'Diagnostic package changed')
