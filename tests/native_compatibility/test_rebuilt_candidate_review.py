@@ -334,7 +334,9 @@ class CandidateReviewTests(unittest.TestCase):
 
     def test_synthetic_evidence_chain_44_files_valid(self):
         names, pin = self.indexed_synthetic_evidence()
-        with patch.object(candidate, "INDEX_BLOB_SHA", pin):
+        with patch.object(candidate, "INDEX_BLOB_SHA", pin), patch.object(
+                candidate, "INDEX_SHA256", hashlib.sha256(
+                    (self.root / "evidence-sha256.json").read_bytes()).hexdigest()):
             records = candidate.check_index(self.root)
         self.assertEqual(len(names), 44)
         self.assertIn("build-result.json", records)
@@ -343,7 +345,9 @@ class CandidateReviewTests(unittest.TestCase):
     def test_mutated_evidence_file_rejected_against_index(self):
         names, pin = self.indexed_synthetic_evidence()
         (self.root / "build-result.json").write_bytes(b'{"modified":true}')
-        with patch.object(candidate, "INDEX_BLOB_SHA", pin):
+        with patch.object(candidate, "INDEX_BLOB_SHA", pin), patch.object(
+                candidate, "INDEX_SHA256", hashlib.sha256(
+                    (self.root / "evidence-sha256.json").read_bytes()).hexdigest()):
             with self.assertRaisesRegex(ValueError, "Candidate evidence changed"):
                 candidate.check_index(self.root)
 
@@ -353,7 +357,9 @@ class CandidateReviewTests(unittest.TestCase):
         real = self.root / "original"
         child.rename(real)
         child.symlink_to(real)
-        with patch.object(candidate, "INDEX_BLOB_SHA", pin):
+        with patch.object(candidate, "INDEX_BLOB_SHA", pin), patch.object(
+                candidate, "INDEX_SHA256", hashlib.sha256(
+                    (self.root / "evidence-sha256.json").read_bytes()).hexdigest()):
             with self.assertRaisesRegex(ValueError, "Missing or unsafe"):
                 candidate.check_index(self.root)
 
