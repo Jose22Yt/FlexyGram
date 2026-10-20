@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "test_environment": "host_synthetic_only",
+  "python": "3.12.14",
+  "interpreter": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+  "base_pr26": "51f60082d81269a9010baa92415cfb9f3001f4a0",
+  "pr23_observed": "a0e3c23f5f070eaa0fa3c0ecf14f235658d878f4",
+  "compiled_apk_commit_declared": "97dfb08e58159b31d322dd8435080fb039abdeb9",
+  "tests": {
+    "unique": 22,
+    "normal": {
+      "executed": 22,
+      "passed": 22,
+      "failed": 0,
+      "skipped": 0
+    },
+    "optimized": {
+      "executed": 22,
+      "passed": 22,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "commands": [
+    "PR24_SOURCE_DIR=<pinned-tools> python3 -B -m unittest discover -s tests/personal_beta -p test_first_start.py -v",
+    "PR24_SOURCE_DIR=<pinned-tools> python3 -O -B -m unittest discover -s tests/personal_beta -p test_first_start.py -v",
+    "python3 -B tools/personal_beta/first_start.py"
+  ],
+  "adb_executed": false,
+  "android_executed": false,
+  "apksigner_executed": false,
+  "apk_accessed": false,
+  "apk_built": false,
+  "apk_signed": false,
+  "installed": false,
+  "pr26_importer_modified": false,
+  "pr24_analyzers_modified": false,
+  "client_modified": false,
+  "python311_verified": false,
+  "python311_limitation": "Prior venv points to an absent interpreter; Python3.12.14 used instead.",
+  "tested_file_sha256": {
+    "tools/personal_beta/first_start.py": "27e4b86655f883acd84bde3888c8e1aaea52f6e8113698ccef057f79edc620fc",
+    "tests/personal_beta/test_first_start.py": "d0cd8f5ad6dbdea44dc26ce25af840bdac0f600a966673ee9a677e602e79a449",
+    "docs/personal-beta/FIRST-START.md": "518c023c8444de128017ba4910f7e6ec9b88adc8b2d64030cddb18f754426319",
+    "docs/personal-beta/evidence/first-start/tests-normal.log": "1bcc91516b78dae8a4da9c9e9a9a33be2655fa04a1419a440dfdc0b3766e577f",
+    "docs/personal-beta/evidence/first-start/tests-optimized.log": "c64bd99ac4f61aa685b0cf11b6fb7408653c10317e556b23a06eb4e344195b49"
+  }
+}

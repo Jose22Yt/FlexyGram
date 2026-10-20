@@ -1,0 +1,27 @@
+test_adb_transport_env_is_local_and_failures_do_not_expose_stderr (test_first_start.FirstStartTests.test_adb_transport_env_is_local_and_failures_do_not_expose_stderr) ... ok
+test_authorization_requires_exact_scope_hash_certificate_and_device (test_first_start.FirstStartTests.test_authorization_requires_exact_scope_hash_certificate_and_device) ... ok
+test_cli_missing_authorization_never_contacts_adb (test_first_start.FirstStartTests.test_cli_missing_authorization_never_contacts_adb) ... ok
+test_cli_private_report_and_existing_output_not_overwritten (test_first_start.FirstStartTests.test_cli_private_report_and_existing_output_not_overwritten) ... ok
+test_command_allowlist_rejects_all_mutating_or_broad_commands (test_first_start.FirstStartTests.test_command_allowlist_rejects_all_mutating_or_broad_commands) ... ok
+test_exit_self_and_user_requested_not_falsely_called_crashes (test_first_start.FirstStartTests.test_exit_self_and_user_requested_not_falsely_called_crashes) ... ok
+test_exports_reuse_pr26_and_discard_invalid_private_input (test_first_start.FirstStartTests.test_exports_reuse_pr26_and_discard_invalid_private_input) ... ok
+test_foreign_process_and_package_prefix_ignored (test_first_start.FirstStartTests.test_foreign_process_and_package_prefix_ignored) ... ok
+test_history_indices_can_shift_without_new_crash (test_first_start.FirstStartTests.test_history_indices_can_shift_without_new_crash) ... ok
+test_installed_apk_mismatch_blocks_before_logs (test_first_start.FirstStartTests.test_installed_apk_mismatch_blocks_before_logs) ... ok
+test_installed_version_and_similar_package_fail_closed (test_first_start.FirstStartTests.test_installed_version_and_similar_package_fail_closed) ... ok
+test_jni_python_and_fatal_signals_are_sanitized (test_first_start.FirstStartTests.test_jni_python_and_fatal_signals_are_sanitized) ... ok
+test_log_window_begins_before_operator_actions (test_first_start.FirstStartTests.test_log_window_begins_before_operator_actions) ... ok
+test_no_live_process_does_not_assert_success_or_call_global_logcat (test_first_start.FirstStartTests.test_no_live_process_does_not_assert_success_or_call_global_logcat) ... ok
+test_os_crash_native_anr_and_initialization_are_not_normal_exit (test_first_start.FirstStartTests.test_os_crash_native_anr_and_initialization_are_not_normal_exit) ... ok
+test_other_pid_and_quoted_app_messages_not_classified (test_first_start.FirstStartTests.test_other_pid_and_quoted_app_messages_not_classified) ... ok
+test_pid_reuse_discards_messages (test_first_start.FirstStartTests.test_pid_reuse_discards_messages) ... ok
+test_plan_has_no_subprocess_and_no_authorization (test_first_start.FirstStartTests.test_plan_has_no_subprocess_and_no_authorization) ... ok
+test_real_pinned_framestats_parser_not_invented_fps (test_first_start.FirstStartTests.test_real_pinned_framestats_parser_not_invented_fps) ... ok
+test_truncated_or_denied_history_is_unknown (test_first_start.FirstStartTests.test_truncated_or_denied_history_is_unknown) ... ok
+test_unavailable_or_malformed_logs_tolerated (test_first_start.FirstStartTests.test_unavailable_or_malformed_logs_tolerated) ... ok
+test_valid_exports_go_through_existing_importer (test_first_start.FirstStartTests.test_valid_exports_go_through_existing_importer) ... ok
+
+----------------------------------------------------------------------
+Ran 22 tests in 0.049s
+
+OK
