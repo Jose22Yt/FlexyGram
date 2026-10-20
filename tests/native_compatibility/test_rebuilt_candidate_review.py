@@ -319,5 +319,44 @@ class CandidateReviewTests(unittest.TestCase):
             self.physically_checked(apk, expected)
 
 
+    def indexed_synthetic_evidence(self):
+        names = sorted(candidate.NEEDED)
+        names += ["fixture%02d.txt" % i for i in range(44 - len(names))]
+        index = {}
+        for name in names:
+            data = b"{}" if name.endswith(".json") else b"synthetic log"
+            (self.root / name).write_bytes(data)
+            index[name] = {"bytes": len(data), "sha256": hashlib.sha256(data).hexdigest()}
+        raw = (json.dumps(index, sort_keys=True, indent=2) + "\n").encode()
+        (self.root / "evidence-sha256.json").write_bytes(raw)
+        pin = hashlib.sha1(b"blob " + str(len(raw)).encode() + b"\0" + raw).hexdigest()
+        return names, pin
+
+    def test_synthetic_evidence_chain_44_files_valid(self):
+        names, pin = self.indexed_synthetic_evidence()
+        with patch.object(candidate, "INDEX_BLOB_SHA", pin):
+            records = candidate.check_index(self.root)
+        self.assertEqual(len(names), 44)
+        self.assertIn("build-result.json", records)
+        self.assertEqual(records["build-result.json"], {})
+
+    def test_mutated_evidence_file_rejected_against_index(self):
+        names, pin = self.indexed_synthetic_evidence()
+        (self.root / "build-result.json").write_bytes(b'{"modified":true}')
+        with patch.object(candidate, "INDEX_BLOB_SHA", pin):
+            with self.assertRaisesRegex(ValueError, "Candidate evidence changed"):
+                candidate.check_index(self.root)
+
+    def test_index_rejects_symlinked_child(self):
+        names, pin = self.indexed_synthetic_evidence()
+        child = self.root / "build-result.json"
+        real = self.root / "original"
+        child.rename(real)
+        child.symlink_to(real)
+        with patch.object(candidate, "INDEX_BLOB_SHA", pin):
+            with self.assertRaisesRegex(ValueError, "Missing or unsafe"):
+                candidate.check_index(self.root)
+
+
 if __name__ == "__main__":
     unittest.main()
