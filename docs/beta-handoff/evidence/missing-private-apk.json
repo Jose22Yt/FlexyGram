@@ -1,0 +1,7 @@
+{
+  "status": "BLOCKED",
+  "error_type": "ValueError",
+  "code": "APK_UNAVAILABLE_OR_UNSAFE",
+  "android_executed": false,
+  "distribution_allowed": false
+}

@@ -1,0 +1,24 @@
+test_missing_launcher_category_must_fail (test_manifest.ManifestRegressionTests.test_missing_launcher_category_must_fail) ... FAIL
+test_valid_beta_launcher_contract (test_manifest.ManifestRegressionTests.test_valid_beta_launcher_contract) ... ok
+test_wrong_application_initializer_must_fail (test_manifest.ManifestRegressionTests.test_wrong_application_initializer_must_fail) ... FAIL
+
+======================================================================
+FAIL: test_missing_launcher_category_must_fail (test_manifest.ManifestRegressionTests.test_missing_launcher_category_must_fail)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram/tests/beta_handoff/test_manifest.py", line 57, in test_missing_launcher_category_must_fail
+    with self.assertRaisesRegex(ValueError, 'launcher intent'):
+AssertionError: ValueError not raised
+
+======================================================================
+FAIL: test_wrong_application_initializer_must_fail (test_manifest.ManifestRegressionTests.test_wrong_application_initializer_must_fail)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram/tests/beta_handoff/test_manifest.py", line 61, in test_wrong_application_initializer_must_fail
+    with self.assertRaisesRegex(ValueError, 'initializer'):
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.002s
+
+FAILED (failures=2)

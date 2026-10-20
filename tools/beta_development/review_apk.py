@@ -65,6 +65,7 @@ def binary_manifest(apk,aapt2):
     require(len(custom)==1 and custom[0].get(A+'name')==PACKAGE+'.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION'and custom[0].get(A+'protectionLevel')=='signature','Invalid receiver signature permission')
     require(not root.findall('uses-permission-sdk-23'),'Unexpected SDK-specific permission')
     app=root.find('application');require(app is not None,'Application missing')
+    require(app.get(A+'name')=='org.telegram.messenger.ApplicationLoader','Wrong beta application initializer')
     require(app.get(A+'debuggable')=='true','Development APK must be Debug')
     require(app.get(A+'allowBackup')=='false'and not app.get(A+'backupAgent'),'Backup/session restoration enabled')
     require(app.get(A+'usesCleartextTraffic')=='false','Cleartext capability unexpectedly enabled')
@@ -85,7 +86,11 @@ def binary_manifest(apk,aapt2):
     require(len(public)==1 and public[0]['name']==LAUNCHER,'Unexpected exported entry point')
     alias=next(n for n in app.findall('activity-alias')if n.get(A+'name')==LAUNCHER)
     require(alias.get(A+'targetActivity')==ENTRY,'Wrong beta launcher target')
-    require({n.get(A+'name')for n in alias.findall('.//action')}=={'android.intent.action.MAIN'}and not alias.findall('.//data'),'Unexpected launcher intent')
+    filters=alias.findall('intent-filter')
+    require(len(filters)==1 and {n.get(A+'name')for n in filters[0].findall('action')}=={'android.intent.action.MAIN'} and
+            'android.intent.category.LAUNCHER' in {n.get(A+'name')for n in filters[0].findall('category')} and
+            {n.get(A+'name')for n in filters[0].findall('category')} <= {'android.intent.category.LAUNCHER','android.intent.category.MULTIWINDOW_LAUNCHER'} and
+            not filters[0].findall('data'),'Unexpected launcher intent')
     target=next(n for n in app.findall('activity')if n.get(A+'name')==ENTRY)
     require(target.get(A+'enabled','true')=='true','Beta target disabled')
     return dict(package=PACKAGE,permissions=permissions,components=rows,enabled_exported=public)
