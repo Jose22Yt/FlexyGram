@@ -66,7 +66,11 @@ ausente/mal vinculado/modificado, informe exclusivo y tipos booleanos estrictos.
 `probe_password_channel.py` se ejecutó realmente contra Java21.0.10: fixture
 PUBLICO por pipe stdin, sin incluirlo en argv/environment, sin console/PTY y con
 core dumps desactivados en el hijo. Sólo crea un fuente Java público temporal.
-No ejecuta keytool contra un keystore, no genera contraseñas/claves/certificados,
+También prueba el lector real de keytool con -storepass:file /proc/self/fd/0,
+exclusivamente -list sobre un keystore inexistente; el control negativo con
+archivo de contraseña inexistente falla durante lectura. Ambos exit1 son
+esperados y diferenciados: no son verificaciones de firma. No abre ni crea un
+keystore real, no genera contraseñas/claves/certificados,
 no firma y no certifica custodia ni protección contra administrador/inspección de
 memoria/artefactos de crash JVM. Logs y resultado adyacentes.
 
@@ -80,7 +84,9 @@ memoria/artefactos de crash JVM. Logs y resultado adyacentes.
    protegido sin secretos en código de herramientas, argv, environment o archivos
    de texto. Descartar stdout/stderr no públicos, sin trazas de secretos; reportar
    sólo errores saneados y certificado/huella pública. Nada de contraseñas por chat.
-   Comprobar con fixture público el puente exacto antes de usar material real.
+   El lector exacto de contraseña de keytool ya fue comprobado con fixture
+   público y control negativo, sin keystore; repetir ese preflight al iniciar
+   el worker antes de usar material real.
 3. Keystore cifrado temporal fuera de Git en directorio0700/archivo0600; contraseña
    retenida únicamente en memoria del proceso privado mientras se espera la
    siguiente autorización. Esto NO es custodia permanente ni recuperable.

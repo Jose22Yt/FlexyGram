@@ -37,10 +37,17 @@
     "core_dumps_disabled": true,
     "fixture_not_in_argv_or_environment": true,
     "keytool_keystore_operation_executed": false,
-    "limits": "Tests stdin transport to Java only; not protection against host administrator, memory inspection or JVM crash artifacts.",
+    "keytool_missing_password_file_negative_control_verified": true,
+    "keytool_password_reader_via_stdin_verified": true,
+    "keytool_read_only_list_of_nonexistent_store_executed": true,
+    "limits": "Tests Java stdin and read-only keytool password input only; not protection against host administrator, memory inspection or JVM crash artifacts.",
     "persistent_custody_verified": false,
     "secret_generated": false,
     "signing_executed": false,
-    "status": "NONSECRET_JAVA_STDIN_PIPE_VERIFIED"
-  }
+    "status": "NONSECRET_JAVA_KEYTOOL_INPUT_VERIFIED"
+  },
+  "input_probe_modes": [
+    "normal",
+    "-O"
+  ]
 }
