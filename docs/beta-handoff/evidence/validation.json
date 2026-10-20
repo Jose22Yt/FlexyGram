@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "date_utc": "2026-10-20",
+  "base_pr23": "40c80878b18cdc50f49d44eb4fb26a31b9b0cf6a",
+  "pr17": "b637c290c4514f158196ae7e5db3ba7daf7ed4c2",
+  "pr24": "db5b9a113d54f552a925ea233c5b199ab95bfcdb",
+  "python": "3.11.17",
+  "pyelftools": "0.32",
+  "distinct_unit_tests": 21,
+  "normal": {
+    "passed": 21,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "optimized": {
+    "passed": 21,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "counting": "21 distinct tests; 42 method executions across normal/-O. Compatibility scenario separate, not added to unit count. No historical suites rerun.",
+  "commands": [
+    "python3.11 -m unittest discover -s tests/beta_handoff -v",
+    "python3.11 -O -m unittest discover -s tests/beta_handoff -v",
+    "python3.11 tools/beta_handoff/diagnostics.py --source-dir <pinned-PR24>/tools/beta_diagnostics --output <synthetic-report>",
+    "python3.11 -O tools/beta_handoff/diagnostics.py --source-dir <pinned-PR24>/tools/beta_diagnostics --output <synthetic-report>"
+  ],
+  "pr24_synthetic_compatibility_normal_and_optimized": "PASS; byte-equal JSON",
+  "storage_probe": {
+    "synthetic_only": true,
+    "bytes": 54526255,
+    "sha256": "c92bd6553e5a196d0d79db5d5a25930e7c082719f0a1a43e157ecb106e878185",
+    "local_zip_crc_pass": true,
+    "upload_attempted": true,
+    "error": "hosted apps tools/list request failed with HTTP status 403",
+    "transfer_started": false,
+    "private_persistence_confirmed": false,
+    "remote_recovery_verified": false
+  },
+  "original_beta_apk_available": false,
+  "original_backup_available": false,
+  "apk_rebuilt": false,
+  "android_executed": false,
+  "adb_executed": false,
+  "keys_generated": false,
+  "apk_signed": false,
+  "source_sha256": {
+    "tools/beta_handoff/archive.py": "2b26d92d476462ff9b8d52aeb524f12efd2cd4cbb40a0b8752483dba0210533c",
+    "tools/beta_handoff/diagnostics.py": "4b065874443442e03876a3688c280fba1cf6b9a4509bdbe729c318e801846905",
+    "tools/beta_handoff/gate.py": "98e0d46922ca24f86d4e198289a5b0a1790b29500f4076906ea009757459a431",
+    "tests/beta_handoff/test_diagnostics.py": "d1f3a5ac2d2cc376b2eb9a04fa42a451528eca788829d1f9523012de80eb6b53",
+    "tests/beta_handoff/test_handoff.py": "a06b964f03be53b88dc7b4f30cf2faff976429daf36973ff56a5630206e9c5da",
+    "tests/beta_handoff/test_manifest.py": "00e79cfeff5239cc19e0d86f9d7932d18f5e8b8b5e4f12e597bf2fea4e248e6e",
+    "tools/beta_development/review_apk.py": "577f465d9a01acfd2d4373976a8387d6a5ccb66d64dbb10aef81f9997aebb8aa"
+  }
+}
