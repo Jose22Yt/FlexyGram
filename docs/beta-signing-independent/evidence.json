@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "date_utc": "2026-10-20",
+  "reviewed_head": "78151d9e8083290dca2617279cab3afb53540de6",
+  "snapshot_only": true,
+  "execution_environment": "unavailable",
+  "dropbox_metadata_verified": true,
+  "probe_bytes": 57671850,
+  "probe_revision": "0165e48298ab1bd00000003314317a1",
+  "probe_file_id": "id:7uKZZ5yXrxEAAAAAAAAABg",
+  "folder_links": {
+    "count": 0,
+    "has_more": false
+  },
+  "file_links": {
+    "count": 0,
+    "has_more": false
+  },
+  "full_member_roster_verified": false,
+  "private_access_approved": false,
+  "download_link_issued": true,
+  "download_get_performed": false,
+  "sha256_independently_computed": false,
+  "crc_independently_checked": false,
+  "expected_probe_sha256_source": "docs/beta-development/evidence-unblock-second-beta/storage-probe-current.json at 78151d9e8083290dca2617279cab3afb53540de6",
+  "expected_probe_sha256": "2094cb8985a1cf26d909f83272d20a977c1c541706ce218b3104cbecd8769c6d",
+  "dropbox_content_hash": "4761b071f7a5edee928d7553ec8f464c010133b1a6758c845a0d7c86d03c5f62",
+  "not_equivalent_hash_algorithms": true,
+  "new_tests_executed": 0,
+  "signing_wrapper_implemented": false,
+  "apk_signed": false,
+  "android_executed": false,
+  "source_findings": [
+    {
+      "id": "BETA-BACK-36",
+      "priority": "high",
+      "classification": "documented platform contract and inspected integration mismatch; Android reproduction pending"
+    },
+    {
+      "id": "BETA-POSTINIT-REENTRY",
+      "priority": "high",
+      "classification": "conditional failure-path risk from source; injected reproduction not run"
+    },
+    {
+      "id": "JNI_BEFORE_ACTIVITY",
+      "priority": "medium",
+      "classification": "runtime limitation; not a newly demonstrated defect"
+    }
+  ]
+}

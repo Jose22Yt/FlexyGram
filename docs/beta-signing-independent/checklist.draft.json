@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "status": "DRAFT_NOT_AUTHORIZED",
+  "scope": "FlexyGram_Beta_personal_offline_only",
+  "reviewed_client_commit": "78151d9e8083290dca2617279cab3afb53540de6",
+  "package": "io.github.jose22yt.flexygram.beta.development",
+  "min_sdk": 24,
+  "expected_target_sdk": 36,
+  "expected_abi": "arm64-v8a",
+  "authorization": {
+    "key_generation": false,
+    "signing": false,
+    "private_delivery": false,
+    "installation": false,
+    "personal_offline_execution": false
+  },
+  "identity": {
+    "certificate_sha256": null,
+    "custody_recovery_evidence": null,
+    "approval_reference": null
+  },
+  "artifacts": {
+    "unsigned_apk_sha256": null,
+    "signed_apk_sha256": null,
+    "unsigned_review": null,
+    "signed_review": null,
+    "recovered_bundle_sha256": null
+  },
+  "required_checks": [
+    "current_build_commit_and_version_pinned",
+    "unsigned_gate_pr25_pass_on_actual_bytes",
+    "one_beta_signer_matching_independently_approved_certificate",
+    "valid_apk_v2_signature_min_api24",
+    "all_non_signing_zip_payloads_equal",
+    "manifest_and_permissions_equal",
+    "dex_resources_python_native_payloads_equal",
+    "native_api24_4k_16k_static_acceptance_preserved",
+    "signed_zipalign_16k_pass",
+    "api0_empty_hash_and_six_capabilities_false",
+    "private_folder_membership_reviewed",
+    "no_unapproved_shared_links",
+    "original_and_signed_artifacts_preserved_separately",
+    "independent_download_sha256_and_zip_crc_match",
+    "owner_delivery_scope_approved",
+    "platform_back_api36_reviewed_before_navigation_claims"
+  ],
+  "dropbox": {
+    "folder": "/FlexyGram-Work2-Private",
+    "probe": "/FlexyGram-Work2-Private/FlexyGram-Storage-Probe-No-APK.zip",
+    "probe_file_id": "id:7uKZZ5yXrxEAAAAAAAAABg",
+    "probe_revision": "0165e48298ab1bd00000003314317a1",
+    "observed_probe_bytes": 57671850,
+    "expected_probe_sha256_from_work2": "2094cb8985a1cf26d909f83272d20a977c1c541706ce218b3104cbecd8769c6d",
+    "reported_dropbox_content_hash": "4761b071f7a5edee928d7553ec8f464c010133b1a6758c845a0d7c86d03c5f62",
+    "content_hash_is_not_file_sha256": true,
+    "folder_direct_links": 0,
+    "file_direct_links": 0,
+    "shared_link_pagination_complete": true,
+    "full_membership_enumeration_available": false,
+    "private_access_approved": false,
+    "temporary_download_link_issued": true,
+    "downloaded_bytes_independently_verified": false,
+    "crc_independently_verified": false
+  },
+  "execution": {
+    "host_runtime_available": false,
+    "new_python_tests_executed": 0,
+    "apk_signed": false,
+    "android_executed": false
+  },
+  "installable": null,
+  "android_runtime_validated": false,
+  "production_allowed": false
+}
