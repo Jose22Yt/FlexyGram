@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "serial": "emulator-5554",
+  "package": "io.github.jose22yt.flexygram.diagnostic",
+  "metadata_sha256": null,
+  "network_namespace": null,
+  "known_pids": [],
+  "frame_stream": null,
+  "log_epoch_window": null,
+  "frame_window_ns": null,
+  "disposable_emulator": false,
+  "offline_isolation_verified": false,
+  "no_accounts": false,
+  "no_personal_data": false,
+  "authorized_read_only_capture": false
+}

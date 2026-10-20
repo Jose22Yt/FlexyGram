@@ -1,0 +1,3 @@
+{"id": "synthetic1", "op": "chat_open", "phase": "request", "timestamp_ns": 1000000000, "clock": "android_monotonic_ns"}
+{"id": "synthetic1", "op": "chat_open", "phase": "accepted", "timestamp_ns": 1002000000, "clock": "android_monotonic_ns"}
+{"id": "synthetic1", "op": "chat_open", "phase": "presented", "timestamp_ns": 1020000000, "clock": "android_monotonic_ns"}
