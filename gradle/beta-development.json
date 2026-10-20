@@ -1,0 +1,12 @@
+{
+  "applicationId": "io.github.jose22yt.flexygram.beta.development",
+  "isolated": true,
+  "capabilities": {
+    "authentication": false,
+    "telegramTransport": false,
+    "push": false,
+    "translation": false,
+    "plugins": false,
+    "sessionRestore": false
+  }
+}

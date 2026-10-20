@@ -39,6 +39,14 @@ if (rootProject.file('local.properties').exists()) {
 def variantPolicyFile = rootProject.file('gradle/variant-policy.json')
 def variantPolicy = new GroovyShell().evaluate(rootProject.file('gradle/variant-policy.gradle')).call(variantPolicyFile)
 def policyDigest = java.security.MessageDigest.getInstance('SHA-256').digest(variantPolicyFile.bytes).encodeHex().toString()
+// Separate offline development profile; never rewrites the protected two-variant policy.
+def betaDevelopmentEnabled = providers.gradleProperty('flexygramBetaDevelopment').orNull == 'true'
+def betaPolicyFile = rootProject.file('gradle/beta-development.json')
+def betaPolicy = betaDevelopmentEnabled ? new GroovyShell().evaluate(rootProject.file('gradle/beta-development.gradle')).call(betaPolicyFile) : null
+def betaScope = betaDevelopmentEnabled ? java.security.MessageDigest.getInstance('SHA-256').digest(betaPolicyFile.bytes).encodeHex().toString() + ':betaDevelopment' : null
+if (betaDevelopmentEnabled && System.getenv('NATIVE_TARGET') != 'arm64-v8a') {
+    throw new GradleException('FLEXYGRAM_BETA_REQUIRES_REAL_ARM64_JNI')
+}
 def rejectProduction = new GroovyShell().evaluate(rootProject.file('gradle/production-readiness.gradle'))
 // Early, redacted rejection even for tasks of variants which AGP deliberately disables.
 if (gradle.startParameter.taskNames.any { it.toLowerCase(java.util.Locale.ROOT).contains('production') }) {
@@ -224,19 +232,27 @@ android {
             applicationId = variantPolicy.production.applicationId
             // No signingConfig: no production key and no debug/lab fallback.
         }
+        if (betaDevelopmentEnabled) {
+            betaDevelopment {
+                dimension = 'environment'
+                applicationId = betaPolicy.applicationId
+                // No flavor signing assignment; Debug also has no signing config.
+            }
+        }
     }
     productFlavors.all { flavor ->
-        def policy = variantPolicy[flavor.name]
+        def isBeta = flavor.name == 'betaDevelopment'
+        def policy = isBeta ? betaPolicy : variantPolicy[flavor.name]
         flavor.buildConfigField 'boolean', 'ISOLATED_DIAGNOSTIC', policy.isolated.toString()
         flavor.buildConfigField 'String', 'FLEXYGRAM_VARIANT', groovy.json.JsonOutput.toJson(flavor.name)
-        flavor.buildConfigField 'String', 'FLEXYGRAM_POLICY_SCOPE', groovy.json.JsonOutput.toJson(policyDigest + ':' + flavor.name)
+        flavor.buildConfigField 'String', 'FLEXYGRAM_POLICY_SCOPE', groovy.json.JsonOutput.toJson(isBeta ? betaScope : policyDigest + ':' + flavor.name)
         policy.capabilities.each { name, enabled ->
             flavor.buildConfigField 'boolean', 'FLEXYGRAM_CAP_' + name.toUpperCase(java.util.Locale.ROOT), enabled.toString()
         }
         flavor.resValue 'string', 'flexygram_account_type', policy.applicationId
         flavor.resValue 'string', 'flexygram_storage_namespace', policy.applicationId
         flavor.externalNativeBuild.cmake.arguments '-DFLEXYGRAM_FLAVOR=' + flavor.name,
-                '-DFLEXYGRAM_POLICY_SCOPE=' + policyDigest + ':' + flavor.name
+                '-DFLEXYGRAM_POLICY_SCOPE=' + (isBeta ? betaScope : policyDigest + ':' + flavor.name)
     }
 
     buildTypes {
@@ -280,7 +296,8 @@ androidComponents {
     beforeVariants(selector().all()) { builder ->
         def flavor = builder.productFlavors.find { it.first == 'environment' }?.second
         // Only two useful laboratory variants. Production never reaches codegen, JNI or packaging.
-        builder.enable = flavor == 'diagnostic' && builder.buildType in ['debug', 'staging']
+        builder.enable = (flavor == 'diagnostic' && builder.buildType in ['debug', 'staging']) ||
+                (betaDevelopmentEnabled && flavor == 'betaDevelopment' && builder.buildType == 'debug')
     }
     onVariants(selector().all()) { variant ->
         variant.outputs.forEach { output ->
@@ -454,6 +471,9 @@ dependencies {
     implementation 'org.apache.commons:commons-text:1.15.0'
     // translator from nekogram
     diagnosticImplementation project(':translation-compat-diagnostic')
+    if (betaDevelopmentEnabled) {
+        betaDevelopmentImplementation project(':translation-compat-beta-offline')
+    }
 
     // plugins engine: Xposed-совместимые хуки (LSPlant), MVEL-фильтры, генерация классов
     implementation 'com.aliucord:Aliuhook:1.1.4'

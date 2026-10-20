@@ -1,0 +1,12 @@
+// No credentials or switches can enable external capabilities in this development profile.
+return { File file ->
+    def row = new groovy.json.JsonSlurper().parse(file)
+    def caps = ['authentication', 'telegramTransport', 'push', 'translation', 'plugins', 'sessionRestore'] as Set
+    if (row.keySet() != (['applicationId', 'isolated', 'capabilities'] as Set) ||
+            row.applicationId != 'io.github.jose22yt.flexygram.beta.development' ||
+            row.isolated != true || row.capabilities.keySet() != caps ||
+            row.capabilities.values().any { it != false }) {
+        throw new IllegalArgumentException('FLEXYGRAM_BETA_EXTERNAL_CAPABILITIES_FORBIDDEN')
+    }
+    return row
+}

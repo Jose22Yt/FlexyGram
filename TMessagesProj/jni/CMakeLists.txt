@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.16)
 
-include("${CMAKE_CURRENT_LIST_DIR}/variant-policy.cmake")
+if(FLEXYGRAM_FLAVOR STREQUAL "betaDevelopment")
+    include("${CMAKE_CURRENT_LIST_DIR}/beta-development-policy.cmake")
+else()
+    include("${CMAKE_CURRENT_LIST_DIR}/variant-policy.cmake")
+endif()
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
