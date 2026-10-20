@@ -43,6 +43,11 @@ coalesce pulsaciones mientras termina una transición y cancela lo pendiente en 
 pausa y destrucción. Una simulación Java real de1000 interacciones valida ownership,
 última petición, reentrada y cierre. **No es una medición de FPS/lag en Android**.
 
+Una regresión adicional del mismo harness reproduce cancelación síncrona durante la
+consulta de transición ocupada: se comprueban de nuevo ownership/cierre tras esa consulta,
+evitando ejecutar null o trabajo cancelado. Se conserva el registro rojo y las seis
+pruebas finales pasan en ambos modos; no se cuentan subcasos como métodos adicionales.
+
 ## Construcción y comprobaciones
 
 Perfil opt-in: `NATIVE_TARGET=arm64-v8a`,

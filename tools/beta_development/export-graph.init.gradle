@@ -1,0 +1,30 @@
+// Read-only graph inspection for the offline beta; no build, signing or app execution.
+gradle.projectsEvaluated {
+    def app = rootProject.project(':TMessagesProj')
+    app.tasks.register('writeBetaDevelopmentGraph') {
+        doLast {
+            def output = app.findProperty('betaGraphOutput')
+            if (!output) throw new GradleException('Private betaGraphOutput path required')
+            def target = new File(output.toString()).canonicalFile
+            if (target.exists() || target.toPath().startsWith(rootProject.projectDir.canonicalFile.toPath())) {
+                throw new GradleException('New private graph destination outside checkout required')
+            }
+            def graphs = [:]
+            ['betaDevelopmentDebugCompileClasspath', 'betaDevelopmentDebugRuntimeClasspath'].each { name ->
+                def config = app.configurations.getByName(name)
+                def components = config.incoming.resolutionResult.allComponents
+                def projects = components.findAll {
+                    it.id instanceof org.gradle.api.artifacts.component.ProjectComponentIdentifier
+                }.collect { it.id.projectPath }.sort()
+                if (!projects.contains(':translation-compat-beta-offline') ||
+                        projects.contains(':translation-compat-diagnostic') ||
+                        components.any { it.moduleVersion?.group == 'app.nekogram.translator' && it.moduleVersion?.name == 'translator' }) {
+                    throw new GradleException('Unexpected beta translation graph')
+                }
+                graphs[name] = [projects: projects, components: components.collect { it.id.displayName }.sort()]
+            }
+            target.parentFile.mkdirs()
+            target.text = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(graphs))
+        }
+    }
+}

@@ -33,6 +33,10 @@ public class QueueHarness {
   q.submit(()->result[0]=3);q.cancel();require(f.frames.isEmpty()&&result[0]==2,"pause/back must cancel pending navigation");
   q.submit(()->result[0]=4);q.close();q.submit(()->result[0]=5);
   require(f.frames.isEmpty()&&result[0]==2,"closed screen retained pending work");
+  LatestNavigation[] owner={null};
+  owner[0]=new LatestNavigation(f,()->{owner[0].cancel();return false;});
+  owner[0].submit(()->result[0]=6);f.step();
+  require(result[0]==2&&f.frames.isEmpty(),"reentrant busy-probe cancellation ran stale work");
   System.out.println("PASS: 1000 interactions, one frame, latest wins, reentry, cancel, close");
  }
 }'''

@@ -36,7 +36,10 @@ final class LatestNavigation implements AutoCloseable {
     private void drain() {
         posted = false;
         if (closed || pending == null) return;
-        if (busy.getAsBoolean()) {
+        boolean waiting = busy.getAsBoolean();
+        // Finishing a transition can synchronously pause/close the owner.
+        if (closed || pending == null) return;
+        if (waiting) {
             schedule();
             return;
         }

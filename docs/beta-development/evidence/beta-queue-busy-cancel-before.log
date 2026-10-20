@@ -1,0 +1,18 @@
+test_bounded_latest_request_reentrancy_and_lifecycle (test_navigation_queue.NavigationQueueTests.test_bounded_latest_request_reentrancy_and_lifecycle) ... FAIL
+
+======================================================================
+FAIL: test_bounded_latest_request_reentrancy_and_lifecycle (test_navigation_queue.NavigationQueueTests.test_bounded_latest_request_reentrancy_and_lifecycle)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/6fe2cd15bb66/reviewed/tests/beta_development/test_navigation_queue.py", line 50, in test_bounded_latest_request_reentrancy_and_lifecycle
+    self.assertEqual(result.returncode,0,result.stderr)
+AssertionError: 1 != 0 : Exception in thread "main" java.lang.NullPointerException: Cannot invoke "java.lang.Runnable.run()" because "<local1>" is null
+	at org.telegram.ui.beta.LatestNavigation.drain(LatestNavigation.java:45)
+	at org.telegram.ui.beta.QueueHarness$Frames.step(QueueHarness.java:9)
+	at org.telegram.ui.beta.QueueHarness.main(QueueHarness.java:26)
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.935s
+
+FAILED (failures=1)
