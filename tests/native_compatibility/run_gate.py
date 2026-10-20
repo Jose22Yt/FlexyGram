@@ -43,9 +43,9 @@ def main(argv=None):
     args = parser.parse_args(argv)
     suite_dir = Path(__file__).resolve().parent
     summary = run_suite(suite_dir)
-    # Scope includes historical native tests and the 21 new unsigned evidence/
-    # actual-APK regression cases. Never silently pass a partial discovery.
-    minimum_tests = 200
+    # Includes 12 unsigned-evidence, 9 raw-APK and 11 post-signature
+    # regressions alongside the historically reviewed native tests.
+    minimum_tests = 211
     summary['minimum_required'] = minimum_tests
     if summary['tests_run'] < minimum_tests:
         summary['status'] = 'BLOCKED'
