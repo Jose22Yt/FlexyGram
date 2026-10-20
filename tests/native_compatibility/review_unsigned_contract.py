@@ -18,6 +18,7 @@ LAB_V1 = ROOT / "tests/native_compatibility/android_lab/contract.json"
 PENDING_IDENTITY = ROOT / "docs/security-p04c/signing-v2/identity.pending.json"
 APK_SHA256 = "ddb7b017838a2a13991ac09154bbf252a11d62326e9a588349ca03c115e01699"
 APK_BYTES = 113080783
+EVIDENCE_INDEX_SHA256 = "fc57830ec457a0eb43d7250d853f267437c4fd8bda0c894e575e6d48c80405bc"
 LIBRARIES = frozenset(("libexslt.so", "libfreetype.so", "libxml2.so", "libxslt.so"))
 NEEDED = frozenset((
     "unsigned-apk-receipt.json", "apk-native-audit.json", "apk-native-acceptance.json",
@@ -48,7 +49,11 @@ def sha256(path: Path) -> str:
 
 def check_evidence_files(folder: Path) -> int:
     require(folder.is_dir() and not folder.is_symlink(), "Evidence directory missing or unsafe")
-    inventory = read_json(folder / "evidence-sha256.json")
+    index_path = folder / "evidence-sha256.json"
+    require(not index_path.is_symlink() and index_path.is_file() and
+            sha256(index_path) == EVIDENCE_INDEX_SHA256,
+            "Reviewed evidence index SHA-256 changed")
+    inventory = read_json(index_path)
     files = inventory["evidence_files"]
     require(isinstance(files, dict) and NEEDED <= files.keys(), "Evidence inventory incomplete")
     require(len(files) >= len(NEEDED), "Evidence inventory too small")
