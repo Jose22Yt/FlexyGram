@@ -1,0 +1,30 @@
+[
+  {
+    "name": "libexslt.so",
+    "sha256": "f8e9e0fc0fa7507f3391bacb5c08a16dc9fdab73ca23de48f8adb2dfcca7a194",
+    "load_4k_16k": true,
+    "historical_hash_exact": true,
+    "android_executed": false
+  },
+  {
+    "name": "libfreetype.so",
+    "sha256": "d086a897a1c1cfa517b9e46c28d762f817af41bde96b2eda3bf6e6b12220eb01",
+    "load_4k_16k": true,
+    "historical_hash_exact": true,
+    "android_executed": false
+  },
+  {
+    "name": "libxml2.so",
+    "sha256": "e282a655ebbe07443cd743bb9dd00a152bfed7edb091d862f0a4e74afc1eff04",
+    "load_4k_16k": true,
+    "historical_hash_exact": true,
+    "android_executed": false
+  },
+  {
+    "name": "libxslt.so",
+    "sha256": "827d113f3045205b205b52d0e4fe2e59998bd3b471368314415a2c3e91571660",
+    "load_4k_16k": true,
+    "historical_hash_exact": true,
+    "android_executed": false
+  }
+]

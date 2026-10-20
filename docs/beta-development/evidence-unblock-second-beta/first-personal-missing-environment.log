@@ -1,0 +1,16 @@
+setUpClass (test_import_events.PersonalImportTests) ... ERROR
+
+======================================================================
+ERROR: setUpClass (test_import_events.PersonalImportTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/6fe2cd15bb66/client/tests/personal_beta/test_import_events.py", line 21, in setUpClass
+    source = Path(os.environ['FLEXYGRAM_DIAGNOSTICS_SOURCE'])
+                  ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen os>", line 679, in __getitem__
+KeyError: 'FLEXYGRAM_DIAGNOSTICS_SOURCE'
+
+----------------------------------------------------------------------
+Ran 0 tests in 0.000s
+
+FAILED (errors=1)

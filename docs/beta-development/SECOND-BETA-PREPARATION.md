@@ -1,5 +1,9 @@
 # Work2 — integración25 y cliente preparado para la siguiente APK
 
+> Informe histórico de44a607. Estado posterior e insumos recuperados:
+> [integración27/26 y desbloqueo](SECOND-BETA-UNBLOCK.md). No se espera ya que Work1
+> certifique la APK antigua no recuperada.
+
 FlexyGram1.0, creado y dirigido por @Lukhou23. Base PR23
 `e50fa88e80358893d08e9901e81e3b0a74a0a54d`.
 

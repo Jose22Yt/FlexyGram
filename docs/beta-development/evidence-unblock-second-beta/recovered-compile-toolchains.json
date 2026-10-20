@@ -1,0 +1,26 @@
+[
+  {
+    "package": "ndk;27.2.12479018",
+    "sha256": "59c2f6dc96743b5daf5d1626684640b20a6bd2b1d85b13156b90333741bad5cc",
+    "path": "/workspace/scratch/6fe2cd15bb66/toolchains/sdk/ndk/27.2.12479018",
+    "source_properties": "Pkg.Desc = Android NDK\nPkg.Revision = 27.2.12479018\nPkg.BaseRevision = 27.2.12479018\nPkg.ReleaseName = r27c\n"
+  },
+  {
+    "package": "build-tools;36.0.0",
+    "sha256": "5d9ac77fb6ff43d9da518a337b4fcf8f9097113df531d99ccefe80ef7ce8250b",
+    "path": "/workspace/scratch/6fe2cd15bb66/toolchains/sdk/build-tools/36.0.0",
+    "source_properties": "Pkg.UserSrc=false\nPkg.Revision=36.0.0\n#Pkg.Revision=36.0.0 rc5"
+  },
+  {
+    "package": "platforms;android-37.0",
+    "sha256": "840b23e827f96e64aea4c89a1194aac3dc5f6bad37edb231c5c795d890330e8d",
+    "path": "/workspace/scratch/6fe2cd15bb66/toolchains/sdk/platforms/android-37",
+    "source_properties": "Pkg.Desc=Android SDK Platform 17\nPkg.UserSrc=false\nPlatform.Version=17\nPlatform.CodeName=\nPkg.Revision=2\nAndroidVersion.ApiLevel=37.0\nAndroidVersion.CodeName=\nAndroidVersion.ExtensionLevel=22\nAndroidVersion.IsBaseSdk=true\nAndroidVersion.PreviewSdkInt=0\nAndroidVersion.BetaVersion=\nLayoutlib.Api=15\nLayoutlib.Revision=1\nPlatform.MinToolsRev=22\n"
+  },
+  {
+    "package": "platforms;android-35",
+    "sha256": "0988cacad01b38a18a47bac14a0695f246bc76c1b06c0eeb8eb0dc825ab0c8e0",
+    "path": "/workspace/scratch/6fe2cd15bb66/toolchains/sdk/platforms/android-35",
+    "source_properties": "Pkg.Desc=Android SDK Platform 15\nPkg.UserSrc=false\nPlatform.Version=15\nPlatform.CodeName=\nPkg.Revision=2\nAndroidVersion.ApiLevel=35\nAndroidVersion.ExtensionLevel=13\nAndroidVersion.IsBaseSdk=true\nLayoutlib.Api=15\nLayoutlib.Revision=1\nPlatform.MinToolsRev=22\n"
+  }
+]
