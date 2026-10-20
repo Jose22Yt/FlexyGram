@@ -176,9 +176,11 @@
     "library_read_recovery_verified": true,
     "library_write_probe": "HTTP403 before transfer",
     "dropbox_connection": "INSTALLED_ENABLED_VERIFIED",
-    "dropbox_upload_download_tools_exposed": false,
+    "dropbox_upload_download_tools_exposed": true,
     "dropbox_upload_or_recovery_test_executed": false,
-    "new_artifact_recoverable_storage_verified": false
+    "new_artifact_recoverable_storage_verified": false,
+    "dropbox_destination_confirmed": false,
+    "dropbox_status": "Operations appeared after publication; source ZIP ready; exact folder/file mutation confirmation pending under Dropbox tool policy"
   },
   "build_preparation": {
     "isolated_checkout_prepared": true,

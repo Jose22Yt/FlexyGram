@@ -109,17 +109,24 @@ La lectura/recuperación del respaldo privado sí funcionó. La prueba nueva de 
 usó57671850bytes sintéticos sin APK/secretos y falló HTTP403 **antes de transferencia**;
 no se cambió de endpoint ni se eludió ese error.
 
-El responsable conectó Dropbox: se verificó instalado/habilitado. Sin embargo, esta
-sesión no expone ninguna operación Dropbox de subida/descarga, ni un recurso de skill
-que la proporcione. **No se ha ejecutado una prueba de escritura o recuperación en
-Dropbox.** Conexión habilitada no demuestra permiso de escritura ni custodia recuperable.
-Hace falta disponer de esas operaciones en la sesión, no volver a solicitar conectar una
-cuenta ya conectada ni compartir contraseñas/tokens. No se sube nada mediante APIs no
-anunciadas y no se genera una APK mientras falte la prueba privada de recuperación.
+El responsable conectó Dropbox; instalado/habilitado verificado. **Actualización posterior**:
+las operaciones de subida, descarga y carpetas ya aparecieron. Se comprobó la conexión
+y se buscó FlexyGram:sin resultados, sin modificar archivos. No se ha ejecutado una
+prueba de escritura o recuperación en Dropbox. Conexión habilitada no acredita custodia.
+
+La herramienta de crear carpeta exige confirmar antes la mutación exacta; upload_file
+exige origen y destino completos inequívocos. La petición original autoriza conservación
+privada, pero no especifica un destino Dropbox. Se presenta al responsable crear
+`/FlexyGram-Work2-Private` y subir allí `FlexyGram-Storage-Probe-No-APK.zip`
+(57671850bytes sintéticos, SHA256`2094cb8985a1cf26d909f83272d20a977c1c541706ce218b3104cbecd8769c6d`).
+Tras la confirmación:recuperar con enlace temporal de un uso, comprobar hash/CRC y
+metadatos privados; no crear enlaces compartidos. No se ha creado aún la carpeta ni
+se ha subido ese ZIP. El archivo está listo localmente y no contiene APK ni secretos.
+La confirmación se limita a almacenamiento:no es firma, entrega o instalación.
 
 No existe ya dependencia de Work1 para certificar el archivo antiguo. Orden pendiente:
 
-1. Exponer operaciones del Dropbox conectado; guardar y recuperar un ZIP sintético
+1. Confirmar el destino exacto del Dropbox conectado; guardar y recuperar un ZIP sintético
    privado con SHA exacto, sin enlace público ni sobrescritura. Verificar capacidad para
    un respaldo de APK/clases/JNI/logs, no sólo metadatos.
 2. Resolver el transporte de dependencias Gradle fijadas y pasar configuración; no
