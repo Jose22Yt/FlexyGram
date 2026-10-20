@@ -1,0 +1,12 @@
+{
+  "source_apk_sha256": "291881863ea81418fa6cb12104b6eaea4aee2403822894da2143a51f3030bdd5",
+  "preserved_draft_sha256": "a4158e5e665deaaf91d8cad2e05d28715f2ef8465c3c2d635103c3220d280efe",
+  "regenerated_draft_identical": true,
+  "historical_v1_sha256": "1a3ecb0160e2babf91c9ef7c1712c3577fadb73c5f647d17d84275af146dbb28",
+  "certificate": null,
+  "signed_apk": null,
+  "activated": false,
+  "custody_verified": false,
+  "keys_generated": false,
+  "signing_performed": false
+}

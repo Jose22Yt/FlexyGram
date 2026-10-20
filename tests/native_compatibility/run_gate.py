@@ -45,7 +45,7 @@ def main(argv=None):
     summary = run_suite(suite_dir)
     # Includes unsigned evidence, raw APK, post-signing and v2 draft tests.
     # No partial discovery may pass.
-    minimum_tests = 304
+    minimum_tests = 318
     summary['minimum_required'] = minimum_tests
     if summary['tests_run'] < minimum_tests:
         summary['status'] = 'BLOCKED'

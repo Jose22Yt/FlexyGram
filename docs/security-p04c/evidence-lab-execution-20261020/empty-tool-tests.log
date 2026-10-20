@@ -1,0 +1,17 @@
+test_accounts_and_preinstalled_clients_rejected (test_empty_avd_boot.EmptyBootTests.test_accounts_and_preinstalled_clients_rejected) ... ok
+test_blocked_host_never_invokes_namespace_or_android (test_empty_avd_boot.EmptyBootTests.test_blocked_host_never_invokes_namespace_or_android) ... ok
+test_default_gateway_rejected_even_on_loopback (test_empty_avd_boot.EmptyBootTests.test_default_gateway_rejected_even_on_loopback) ... ok
+test_down_loopback_rejected (test_empty_avd_boot.EmptyBootTests.test_down_loopback_rejected) ... ok
+test_exact_api35_and_no_bridge_required (test_empty_avd_boot.EmptyBootTests.test_exact_api35_and_no_bridge_required) ... ok
+test_existing_namespace_rejected (test_empty_avd_boot.EmptyBootTests.test_existing_namespace_rejected) ... ok
+test_external_interface_rejected (test_empty_avd_boot.EmptyBootTests.test_external_interface_rejected) ... ok
+test_forged_parent_rejected (test_empty_avd_boot.EmptyBootTests.test_forged_parent_rejected) ... ok
+test_fresh_loopback_namespace_allowed (test_empty_avd_boot.EmptyBootTests.test_fresh_loopback_namespace_allowed) ... ok
+test_guest_validation_reuses_existing_runner (test_empty_avd_boot.EmptyBootTests.test_guest_validation_reuses_existing_runner) ... ok
+test_previously_booted_avd_rejected (test_empty_avd_boot.EmptyBootTests.test_previously_booted_avd_rejected) ... ok
+test_proxy_preload_and_adb_environment_not_inherited (test_empty_avd_boot.EmptyBootTests.test_proxy_preload_and_adb_environment_not_inherited) ... ok
+
+----------------------------------------------------------------------
+Ran 12 tests in 0.006s
+
+OK

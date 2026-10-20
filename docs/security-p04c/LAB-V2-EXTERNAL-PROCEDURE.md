@@ -1,5 +1,11 @@
 # Laboratorio v2 en Linux — procedimiento externo
 
+**Continuación del 20 de octubre:** disponible un lanzador de infraestructura vacío
+`tests/native_compatibility/empty_avd_boot.py`. Reutiliza la inspección del runner existente;
+no instala APK. Los304 tests del HEAD aprobado y318 tras añadir14 regresiones pasaron
+normal y `-O`. Véase `LAB-EXECUTION-2026-10-20.md`; las instancias SDK/AVD del scratch
+anterior fueron retiradas por mantenimiento, no confundir las recetas con instancias vivas.
+
 Preparación de infraestructura; no habilita instalación, firma, autenticación ni distribución.
 El ejecutor funcional continúa siendo `tests/native_compatibility/android_lab/run_lab.py`.
 Su contrato v1 sigue congelado: **no ejecutarlo con el candidato nuevo hasta revisar y activar v2**.
@@ -142,6 +148,38 @@ Una imagen etiquetada ps16k no sustituye la medición real ni verifica el modo e
 Conservar fingerprint, kernel, página real, propiedades y logs, sin cuentas ni datos de usuario.
 
 ## Puerta posterior, todavía no autorizada
+
+### Lanzador automatizado de infraestructura (sin aplicación)
+
+Después de materializar/verificar las imágenes fijadas y crear AVD nuevos con las recetas
+anteriores, ejecutar **uno por vez**, en VM dedicada sin USB passthrough:
+
+```bash
+python3.11 "$REPO/tests/native_compatibility/empty_avd_boot.py" \
+  --profile api24-4k --sdk "$SDK" --archives "$LAB/archives" \
+  --avd-home "$ANDROID_AVD_HOME" --user-home "$ANDROID_USER_HOME" \
+  --output "$LAB/empty-api24-new" --timeout 600
+python3.11 "$REPO/tests/native_compatibility/empty_avd_boot.py" \
+  --profile arm64-16k --sdk "$SDK" --archives "$LAB/archives" \
+  --avd-home "$ANDROID_AVD_HOME" --user-home "$ANDROID_USER_HOME" \
+  --output "$LAB/empty-api35-new" --timeout 600
+```
+
+El lanzador crea y valida su propio namespace: no pasarlo por un túnel, proxy ni contenedor
+con red compartida. No usar el argumento interno `--inside` manualmente. Exige salida nueva,
+bytes materializados iguales al ZIP fijado, configuración INI sin rutas de datos externas,
+namespace distinto del padre, solo loopback activo y rutas locales antes de boot. Rechaza
+AVD ya arrancados; no borra datos ni fuerza perfiles existentes. Usa datos privados nuevos.
+`disk.dataPartition.path=<temp>` es el marcador normal admitido; temporales se confinan
+a la salida privada. Cámaras/audio y mDNS de ADB quedan desactivados.
+
+Guardar `preflight.json`, `namespace.log`, `emulator.log` y `empty-boot.json` cuando existan.
+Un bloqueo inicial no genera logs de procesos que nunca se crearon. El único éxito posible
+es `EMPTY_ANDROID_BOOT_VERIFIED_NO_APP_TEST`, que **no** acredita pruebas de FlexyGram.
+Si falla TCG/frontend, conservar el mensaje exacto en emulator.log y revisar otro host;
+no repetir indefinidamente ni sustituir ARM64. Si falta margen/islamiento, no hay boot.
+
+### Firma e instalación siguen fuera de esta autorización
 
 Antes de instalar: revisión del candidato29188186…, custodia recuperable de clave exclusiva
 Diagnostic, autorización independiente de generación/firma/instalación, certificado medido,

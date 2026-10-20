@@ -1,0 +1,8 @@
+{
+  "tests/native_compatibility/empty_avd_boot.py": "783ba82babf2264dec0ba05f8fad92ff821ccdb1b05ecd51ed0df7c498252717",
+  "tests/native_compatibility/test_empty_avd_boot.py": "b75b4bd1e0da25b010ad438ce185531cdc712757f263fbcfe6b074e3e02a5474",
+  "tests/native_compatibility/run_gate.py": "6b174505292277c85bf32770ff0535f294ff76e68f543d69a0de38937f43827a",
+  "tests/native_compatibility/test_gate_runner.py": "99f4002dc9e93b426901338c53c10e9d17fedde03309f3a948128a022ae54b3d",
+  "tests/native_compatibility/lab_host_preflight.py": "e3d8fe30705c346afefb0d943fae9b0327041c248d56c8a4903a320afda1536b",
+  "tests/native_compatibility/test_lab_host_preflight.py": "1d60fcdbb6a37df751eb22ab617bbc544debf5ab0f029bac2085f446d84eea61"
+}

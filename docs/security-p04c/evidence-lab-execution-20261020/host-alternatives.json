@@ -1,0 +1,76 @@
+{
+  "namespace_probes": {
+    "user_net_mapped": {
+      "argv": [
+        "unshare",
+        "--user",
+        "--map-root-user",
+        "--net",
+        "true"
+      ],
+      "exit_code": 1,
+      "output": "unshare: write failed /proc/self/uid_map: Operation not permitted"
+    },
+    "user_net_without_uid_mapping": {
+      "argv": [
+        "unshare",
+        "--user",
+        "--net",
+        "true"
+      ],
+      "exit_code": 0,
+      "output": ""
+    },
+    "network_only": {
+      "argv": [
+        "unshare",
+        "--net",
+        "true"
+      ],
+      "exit_code": 1,
+      "output": "unshare: unshare failed: Operation not permitted"
+    },
+    "user_only": {
+      "argv": [
+        "unshare",
+        "--user",
+        "true"
+      ],
+      "exit_code": 0,
+      "output": ""
+    }
+  },
+  "host_process_limits": {
+    "CapInh": "0000000000000000",
+    "CapPrm": "0000000000000000",
+    "CapEff": "0000000000000000",
+    "CapBnd": "0000000000000000",
+    "CapAmb": "0000000000000000",
+    "NoNewPrivs": "1",
+    "Seccomp": "2",
+    "Seccomp_filters": "1"
+  },
+  "devices": {
+    "/dev/kvm": false,
+    "/dev/net/tun": false,
+    "/var/run/docker.sock": false,
+    "/run/podman/podman.sock": false
+  },
+  "tools": {
+    "docker": false,
+    "podman": false,
+    "qemu-system-aarch64": false,
+    "launch_cvd": false,
+    "bwrap": true,
+    "ip": true
+  },
+  "storage": {
+    "free_bytes": 28263026688,
+    "required_free_bytes": 10737418240
+  },
+  "android_executed": false,
+  "remote_host_available": false,
+  "remote_host_note": "No authorized Android/Linux provisioning connector or host supplied; media/site sandbox is not an Android laboratory.",
+  "unmapped_namespace_usable_for_lab": false,
+  "unmapped_namespace_limitation": "Creation succeeds, but required ip/netlink configuration and inspection fail: Cannot open netlink socket: Operation not permitted. No Android boot attempted."
+}
