@@ -19,7 +19,8 @@ Referencia fija del candidato:
 ### Fase A: recibos públicos (sin APK privada)
 
 El verificador enlaza el inventario de 44 archivos con el objeto Git exacto
-d668ab49458669e0ca5fc63102d8b19653e373e8 de
+d668ab49458669e0ca5fc63102d8b19653e373e8 **y SHA-256**
+fff31dd27ffc69b1aed2da19428bf0e5d0eabdf51c06d2ca4828db95b74a05b7 de
 evidence-unsigned-rebuild-20261020/evidence-sha256.json.
 Para cada archivo comprueba tamaño y SHA256. Compara de manera independiente:
 HEAD de fuentes, ejecución Gradle, APK y políticas Diagnostic, 97 entradas ELF,
