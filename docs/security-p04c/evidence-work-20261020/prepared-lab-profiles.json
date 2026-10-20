@@ -1,0 +1,24 @@
+[
+  {
+    "name": "flexygram-api24-offline",
+    "api": 24,
+    "abi": "arm64-v8a",
+    "image_revision": "9",
+    "required_page_size": 4096,
+    "actual_page_size": null,
+    "compatibility_disabled_verified": false,
+    "booted": false,
+    "configured": true
+  },
+  {
+    "name": "flexygram-api35-16k-offline",
+    "api": 35,
+    "abi": "arm64-v8a",
+    "image_revision": "5",
+    "required_page_size": 16384,
+    "actual_page_size": null,
+    "compatibility_disabled_verified": false,
+    "booted": false,
+    "configured": true
+  }
+]

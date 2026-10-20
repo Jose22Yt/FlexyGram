@@ -1,6 +1,8 @@
 """Synthetic private APK byte checks, never Android execution or signing."""
 import hashlib
 from io import BytesIO
+from io import StringIO
+from contextlib import redirect_stdout
 import json
 from pathlib import Path
 import struct
@@ -137,6 +139,32 @@ class PrivateUnsignedAPKTests(unittest.TestCase):
     def test_no_real_apk_available_is_blocked(self):
         self.assertEqual(inspect_apk.main([
             "--apk", str(self.apk), "--evidence", str(self.evidence)]), 1)
+
+    def test_missing_bytes_emit_specific_blocker_without_private_path(self):
+        output = StringIO()
+        with patch.object(inspect_apk.review, "verify", return_value={}), redirect_stdout(output):
+            code = inspect_apk.main(["--apk", str(self.apk), "--evidence", str(self.evidence)])
+        result = json.loads(output.getvalue())
+        self.assertEqual(code, 1)
+        self.assertEqual(result["blocker"], "BLOCKED_MISSING_PRIVATE_APK")
+        self.assertFalse(result["android_runtime_validated"])
+        self.assertNotIn(str(self.apk), output.getvalue())
+
+    def test_dangling_symlink_is_unsafe_not_missing_bytes(self):
+        self.apk.symlink_to(self.apk.parent / "absent-target")
+        with patch.object(inspect_apk.review, "verify", return_value={}):
+            with self.assertRaises(ValueError) as error:
+                inspect_apk.verify(self.apk, self.evidence)
+        self.assertIs(type(error.exception), ValueError)
+
+    def test_corrupt_existing_apk_is_not_a_missing_artifact(self):
+        self.materialize()
+        self.apk.write_bytes(b"SYNTHETIC_CORRUPT")
+        output = StringIO()
+        with patch.object(inspect_apk.review, "verify", return_value={}), redirect_stdout(output):
+            code = inspect_apk.main(["--apk", str(self.apk), "--evidence", str(self.evidence)])
+        self.assertEqual(code, 1)
+        self.assertEqual(json.loads(output.getvalue())["blocker"], "VERIFICATION_FAILED")
 
 
 if __name__ == "__main__":

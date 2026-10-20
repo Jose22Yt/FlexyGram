@@ -1,0 +1,118 @@
+[
+  {
+    "library": "chaquopy/lib/libfreetype.so",
+    "contract": {
+      "static_contract_pass": true,
+      "blockers": [],
+      "missing_export_pairs": [],
+      "new_needed": [],
+      "before_sha256": "8301778e995a698b9273cd0a95d4e884fd30be6802b55a246cbf60ae09216172",
+      "after_sha256": "d086a897a1c1cfa517b9e46c28d762f817af41bde96b2eda3bf6e6b12220eb01",
+      "runtime_required": true,
+      "replacement_approved": false,
+      "limits": "Necessary static conditions only. Export equality does not prove optional features, behavior, symbol resolution or Android loading."
+    },
+    "typed_export_differences": [],
+    "version_definition_differences": [],
+    "new_export_names": [],
+    "old_export_names": 199,
+    "new_export_count": 199,
+    "before_hash_sections": [
+      ".hash",
+      ".gnu.hash"
+    ],
+    "after_hash_sections": [
+      ".hash",
+      ".gnu.hash"
+    ],
+    "static_abi_pass": true,
+    "runtime_validated": false
+  },
+  {
+    "library": "chaquopy/lib/libxml2.so",
+    "contract": {
+      "static_contract_pass": true,
+      "blockers": [],
+      "missing_export_pairs": [],
+      "new_needed": [],
+      "before_sha256": "de6451563a70442ad9b2fa41b67a565cb5c69555625d8145b803fc32eca5fcda",
+      "after_sha256": "e282a655ebbe07443cd743bb9dd00a152bfed7edb091d862f0a4e74afc1eff04",
+      "runtime_required": true,
+      "replacement_approved": false,
+      "limits": "Necessary static conditions only. Export equality does not prove optional features, behavior, symbol resolution or Android loading."
+    },
+    "typed_export_differences": [],
+    "version_definition_differences": [],
+    "new_export_names": [],
+    "old_export_names": 1846,
+    "new_export_count": 1846,
+    "before_hash_sections": [
+      ".hash",
+      ".gnu.hash"
+    ],
+    "after_hash_sections": [
+      ".hash",
+      ".gnu.hash"
+    ],
+    "static_abi_pass": true,
+    "runtime_validated": false
+  },
+  {
+    "library": "chaquopy/lib/libexslt.so",
+    "contract": {
+      "static_contract_pass": true,
+      "blockers": [],
+      "missing_export_pairs": [],
+      "new_needed": [],
+      "before_sha256": "997c4e05f91d1253cbdac10c72ef6079335f1d034a8b86b56c7ce8af89f35414",
+      "after_sha256": "f8e9e0fc0fa7507f3391bacb5c08a16dc9fdab73ca23de48f8adb2dfcca7a194",
+      "runtime_required": true,
+      "replacement_approved": false,
+      "limits": "Necessary static conditions only. Export equality does not prove optional features, behavior, symbol resolution or Android loading."
+    },
+    "typed_export_differences": [],
+    "version_definition_differences": [],
+    "new_export_names": [],
+    "old_export_names": 24,
+    "new_export_count": 24,
+    "before_hash_sections": [
+      ".hash",
+      ".gnu.hash"
+    ],
+    "after_hash_sections": [
+      ".hash",
+      ".gnu.hash"
+    ],
+    "static_abi_pass": true,
+    "runtime_validated": false
+  },
+  {
+    "library": "chaquopy/lib/libxslt.so",
+    "contract": {
+      "static_contract_pass": true,
+      "blockers": [],
+      "missing_export_pairs": [],
+      "new_needed": [],
+      "before_sha256": "bf625093e95bee481d4641dcb99e7021d374c578b1bcfb47f11eb80330f5052e",
+      "after_sha256": "827d113f3045205b205b52d0e4fe2e59998bd3b471368314415a2c3e91571660",
+      "runtime_required": true,
+      "replacement_approved": false,
+      "limits": "Necessary static conditions only. Export equality does not prove optional features, behavior, symbol resolution or Android loading."
+    },
+    "typed_export_differences": [],
+    "version_definition_differences": [],
+    "new_export_names": [],
+    "old_export_names": 273,
+    "new_export_count": 273,
+    "before_hash_sections": [
+      ".hash",
+      ".gnu.hash"
+    ],
+    "after_hash_sections": [
+      ".hash",
+      ".gnu.hash"
+    ],
+    "static_abi_pass": true,
+    "runtime_validated": false
+  }
+]

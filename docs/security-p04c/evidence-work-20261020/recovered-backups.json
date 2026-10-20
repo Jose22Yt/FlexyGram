@@ -1,0 +1,16 @@
+{
+  "backups": [
+    {
+      "name": "FlexyGram-P04c-Native-Reproduced-723580b5.zip",
+      "sha256": "1231c834ba67cb33f4ef4105de1748acd478b2061886b60c845e64d3cd40ba54",
+      "verified": true
+    },
+    {
+      "name": "FlexyGram-P04c-Inputs-Reacquired-723580b5.zip",
+      "sha256": "069f02369676c96db4507f14b70abb95c29f75c9f28d3c80712b716a485b420b",
+      "verified": true
+    }
+  ],
+  "original_members_verified": 25,
+  "apk_present": false
+}

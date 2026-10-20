@@ -17,6 +17,10 @@ NESTED = ("assets/chaquopy/requirements-common.imy",
           "assets/chaquopy/stdlib-arm64-v8a.imy")
 
 
+class MissingPrivateApkError(ValueError):
+    """Missing bytes are a recovery blocker, never a successful evidence review."""
+
+
 def elf_alignment(data: bytes, machine: str) -> None:
     review.require(data[:6] == b"\x7fELF\x02\x01" and len(data) >= 64, "Bad ELF64")
     m = struct.unpack_from("<H", data, 18)[0]
@@ -42,6 +46,9 @@ def elf_alignment(data: bytes, machine: str) -> None:
 
 def verify(apk: Path, evidence: Path = review.EVIDENCE) -> dict:
     review.verify(evidence)
+    # Keep unsafe/symlink inputs distinct from an absent private build output.
+    if not apk.exists() and not apk.is_symlink() and not any(p.is_symlink() for p in apk.parents):
+        raise MissingPrivateApkError('Private unsigned APK unavailable')
     review.require(apk.is_file() and not apk.is_symlink() and
                    not any(p.is_symlink() for p in apk.parents), "Missing or unsafe APK")
     receipt = review.read_json(evidence / "unsigned-apk-receipt.json")
@@ -119,6 +126,7 @@ def main(argv=None):
         return 0
     except (OSError, ValueError, KeyError, TypeError, zipfile.BadZipFile) as exc:
         print(json.dumps({"status": "BLOCKED", "error_class": type(exc).__name__,
+                          "blocker": "BLOCKED_MISSING_PRIVATE_APK" if isinstance(exc, MissingPrivateApkError) else "VERIFICATION_FAILED",
                           "signed": False, "android_runtime_validated": False}))
         return 1
 

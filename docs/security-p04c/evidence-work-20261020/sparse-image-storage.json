@@ -1,0 +1,38 @@
+[
+  {
+    "name": "system-images-android-24-default-arm64-v8a/arm64-v8a/system.img",
+    "sha256": "12f1505bd473dd9dc62ec9e71f6cf97fc2555e523e693c8fab58eefcaefb6af3",
+    "bytes": 2684354560,
+    "allocated_before": 2684358656,
+    "allocated_after": 654856192,
+    "exit": 0,
+    "bytes_unchanged": true
+  },
+  {
+    "name": "system-images-android-24-default-arm64-v8a/arm64-v8a/userdata.img",
+    "sha256": "150f13ebe77a34c71668f3db5a80def569f28ab3d4be744221ddddaf69aa9215",
+    "bytes": 576716800,
+    "allocated_before": 576720896,
+    "allocated_after": 20930560,
+    "exit": 0,
+    "bytes_unchanged": true
+  },
+  {
+    "name": "system-images-android-35-google_apis_ps16k-arm64-v8a/arm64-v8a/system.img",
+    "sha256": "f540461938c431f81bc00d07d3e8f7154811133193282615984424cca1ed77a5",
+    "bytes": 3891265536,
+    "allocated_before": 3891269632,
+    "allocated_after": 3431530496,
+    "exit": 0,
+    "bytes_unchanged": true
+  },
+  {
+    "name": "system-images-android-35-google_apis_ps16k-arm64-v8a/arm64-v8a/vendor.img",
+    "sha256": "966beabfa21a6ac8a3d3d45c78c062f055a433f6d4222dd05c888ec86f14e90e",
+    "bytes": 109051904,
+    "allocated_before": 109051904,
+    "allocated_after": 106147840,
+    "exit": 0,
+    "bytes_unchanged": true
+  }
+]
