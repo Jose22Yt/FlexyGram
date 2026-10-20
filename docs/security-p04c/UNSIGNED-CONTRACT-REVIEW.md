@@ -4,12 +4,12 @@ Estado: **solo propuesta de datos sin firmar**. Este paso no firma, no instala, 
 
 ## Qué se ha preparado aquí
 
-- `tests/native_compatibility/review_unsigned_contract.py` lee **en modo solo lectura** las 44 evidencias publicadas por Work el 19 de octubre, recalcula su SHA-256 y rechaza cualquier falta o alteración; revisa además inventarios, procedencia de las 18 wheels, 3 reconstruidas, 4 ELF, hashes idénticos A/B y empaquetado, 96 ELF ARM64, controles estáticos 4/16 KB, guardas JNI, Diagnostic sin INTERNET, bloqueo de Production y falta de ejecución Android.
+- `tests/native_compatibility/review_unsigned_contract.py` lee **en modo solo lectura** las 44 evidencias publicadas por Work el 19 de octubre, fija previamente el SHA-256 del inventario (`fc57830ec457a0eb43d7250d853f267437c4fd8bda0c894e575e6d48c80405bc`) y recalcula los SHA-256 individuales y rechaza cualquier falta o alteración; revisa además inventarios, procedencia de las 18 wheels, 3 reconstruidas, 4 ELF, hashes idénticos A/B y empaquetado, 96 ELF ARM64, controles estáticos 4/16 KB, guardas JNI, Diagnostic sin INTERNET, bloqueo de Production y falta de ejecución Android.
 - Protege el contrato original `tests/native_compatibility/android_lab/contract.json` comprobando que todavía identifica la APK **histórica firmada**, distinta de la APK nueva sin firma; comprueba también `signing-v2/identity.pending.json`, que debe continuar bloqueado y sin certificado real.
 - Su salida JSON es `UNSIGNED_EVIDENCE_REVIEWED_SIGNING_BLOCKED` con valores de `signed_apk_sha256`, `certificate_sha256` y `signed_runner_sha256` **null**. **No** se permite usar esa salida como `contract.json` del runner ni como prueba de firma, carga JNI o compatibilidad Android.
-- `tests/native_compatibility/test_unsigned_contract_review.py` añade **11 pruebas host**, incluidas mutaciones negativas para evidencias, certificados/firmas, permiso INTERNET, ABI y falsos PASS. El nuevo código está dentro de `tests/native_compatibility/` para conservar intacta la protección `scope_native`. No se amplió `reviewed_changes.json` ni se modificaron archivos activos.
+- `tests/native_compatibility/test_unsigned_contract_review.py` añade **12 pruebas host**, incluidas mutaciones negativas para evidencias, certificados/firmas, permiso INTERNET, ABI y falsos PASS. El nuevo código está dentro de `tests/native_compatibility/` para conservar intacta la protección `scope_native`. No se amplió `reviewed_changes.json` ni se modificaron archivos activos.
 
-**Límite de verificación:** en este entorno no se ejecutó todavía la nueva suite completa de pruebas Python del checkout. Las 279 pruebas de Work corresponden al commit anterior; **no** atribuirles estas 11 nuevas pruebas hasta reejecutarlas.
+**Límite de verificación:** en este entorno no se ejecutó todavía la nueva suite completa de pruebas Python del checkout. Las 279 pruebas de Work corresponden al commit anterior; **no** atribuirles estas 12 nuevas pruebas hasta reejecutarlas.
 
 ## Comandos para Work — primero estos, antes de preparar un contrato firmado
 
