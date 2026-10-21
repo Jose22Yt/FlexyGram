@@ -1,0 +1,1101 @@
+--- a/TMessagesProj/src/main/java/org/telegram/ui/LoginActivity.java
++++ b/TMessagesProj/src/main/java/org/telegram/ui/LoginActivity.java
+@@ -490,6 +490,8 @@
+     }
+ 
+     public LoginActivity changeEmail(Runnable onFinishCallback) {
++        if (localLoginClosed()) throw new IllegalStateException("LOCAL_MODE_NOT_SUPPORTED");
++
+         activityMode = MODE_CHANGE_LOGIN_EMAIL;
+         currentViewNum = VIEW_ADD_EMAIL;
+         emailChangeFinishCallback = onFinishCallback;
+@@ -497,6 +499,8 @@
+     }
+ 
+     public LoginActivity changeEmail(Runnable onFinishCallback, Runnable onSkipCallback, boolean isNonSkippable) {
++        if (localLoginClosed()) throw new IllegalStateException("LOCAL_MODE_NOT_SUPPORTED");
++
+         activityMode = MODE_CHANGE_LOGIN_EMAIL;
+         currentViewNum = VIEW_ADD_EMAIL;
+         emailChangeFinishCallback = onFinishCallback;
+@@ -507,6 +511,8 @@
+     }
+ 
+     public LoginActivity cancelAccountDeletion(String phone, Bundle params, TLRPC.TL_auth_sentCode sentCode) {
++        if (localLoginClosed()) throw new IllegalStateException("LOCAL_MODE_NOT_SUPPORTED");
++
+         cancelDeletionPhone = phone;
+         cancelDeletionParams = params;
+         cancelDeletionCode = sentCode;
+@@ -515,6 +521,8 @@
+     }
+ 
+     public LoginActivity changePhoneNumber() {
++        if (localLoginClosed()) throw new IllegalStateException("LOCAL_MODE_NOT_SUPPORTED");
++
+         activityMode = MODE_CHANGE_PHONE_NUMBER;
+         return this;
+     }
+@@ -525,6 +533,8 @@
+ 
+     @Override
+     public void onFragmentDestroy() {
++        if (localLoginClosed()) { preparedLocalFragmentDestroyed = true; detachClosedLocalView(); cachedFragmentView = null; }
++
+         detachPreparedLocalLogin();
+         super.onFragmentDestroy();
+         for (int a = 0; a < views.length; a++) {
+@@ -541,12 +551,14 @@
+                 AndroidUtilities.cancelRunOnUIThread(callback);
+             }
+         }
+-        getNotificationCenter().removeObserver(this, NotificationCenter.didUpdateConnectionState);
+-        getNotificationCenter().removeObserver(this, NotificationCenter.newSuggestionsAvailable);
++        if (!localLoginClosed()) getNotificationCenter().removeObserver(this, NotificationCenter.didUpdateConnectionState);
++        if (!localLoginClosed()) getNotificationCenter().removeObserver(this, NotificationCenter.newSuggestionsAvailable);
+     }
+ 
+     @Override
+     public boolean onFragmentCreate() {
++        if (localLoginClosed()) return preparedLocalSession != null && !preparedLocalFragmentDestroyed && super.onFragmentCreate();
++
+         getNotificationCenter().addObserver(this, NotificationCenter.didUpdateConnectionState);
+         getNotificationCenter().addObserver(this, NotificationCenter.newSuggestionsAvailable);
+         return super.onFragmentCreate();
+@@ -557,6 +569,8 @@
+     private io.github.jose22yt.flexygram.login.NativePagePlan preparedLocalLoginPlan;
+ 
+     public void bindPreparedLocalLogin(io.github.jose22yt.flexygram.login.LoginNativeBinding binding) {
++        if (localLoginClosed()) throw new IllegalStateException("USE_CLOSED_LOCAL_PAGES_BINDING");
++
+         if (!"realAlpha".equals(org.telegram.messenger.BuildConfig.FLEXYGRAM_VARIANT)
+                 || !org.telegram.messenger.DiagnosticPolicy.isIsolated()
+                 || activityMode != MODE_LOGIN || binding == null || preparedLocalLoginBinding != null
+@@ -606,12 +620,146 @@
+     }
+     // END FLEXYGRAM PREPARED LOCAL BINDING
+ 
++    // BEGIN CLOSED LOCAL PAGES — original views, no original auth or session mutation.
++    private boolean preparedLocalMode;
++    private io.github.jose22yt.flexygram.login.local.LocalLoginSession preparedLocalSession;
++    private io.github.jose22yt.flexygram.login.local.EphemeralPages.View preparedLocalView;
++    private io.github.jose22yt.flexygram.login.local.LocalTransitionFence preparedTransition;
++    private AnimatorSet preparedPagesAnimation;
++    private boolean preparedLocalViewAlive;
++    private boolean preparedLocalFragmentDestroyed;
++    private io.github.jose22yt.flexygram.login.local.EphemeralPages.Status preparedLastLocalStatus;
++    private static boolean localLoginClosed() {
++        return "realAlpha".equals(org.telegram.messenger.BuildConfig.FLEXYGRAM_VARIANT)
++                && org.telegram.messenger.DiagnosticPolicy.isIsolated();
++    }
++    public void bindClosedLocalPages(io.github.jose22yt.flexygram.login.local.LocalLoginSession session) {
++        if (!localLoginClosed() || session == null || session.scope().account != currentAccount
++                || preparedLocalSession != null || cachedFragmentView != null || activityMode != MODE_LOGIN)
++            throw new IllegalStateException("LOCAL_PAGE_BINDING_REJECTED");
++        preparedLocalMode = true;
++        preparedLocalSession = session;
++    }
++    private boolean localViewActive() {
++        return preparedLocalMode && !preparedLocalFragmentDestroyed && preparedLocalViewAlive && activityMode == MODE_LOGIN
++                && preparedLocalSession != null && preparedLocalSession.valid(preparedLocalView, currentAccount);
++    }
++    private void attachClosedLocalView() {
++        if (preparedLocalFragmentDestroyed || localViewActive()) return;
++        if (preparedLocalSession == null || preparedLocalSession.scope().account != currentAccount) return;
++        preparedLocalViewAlive = true;
++        preparedTransition = new io.github.jose22yt.flexygram.login.local.LocalTransitionFence();
++        preparedLocalView = preparedLocalSession.attach(currentAccount,
++                io.github.jose22yt.flexygram.session.android.LoginActivityAdapter.mainExecutor(), state -> {
++                    if (!localViewActive()) return;
++                    if (state.status == io.github.jose22yt.flexygram.login.local.EphemeralPages.Status.STORAGE_REVIEW
++                            || state.status == io.github.jose22yt.flexygram.login.local.EphemeralPages.Status.STOPPED
++                            || state.status == io.github.jose22yt.flexygram.login.local.EphemeralPages.Status.UNSUPPORTED
++                            || state.status == io.github.jose22yt.flexygram.login.local.EphemeralPages.Status.COMPLETE) {
++                        clearClosedLocalInputs();
++                        if (preparedLastLocalStatus != state.status) needShowAlert("Local login simulation", state.status.name());
++                        preparedLastLocalStatus = state.status;
++                        return;
++                    }
++                    preparedLastLocalStatus = state.status;
++                    if (state.page < 0) return; // unsupported/storage review never falls through to native auth.
++                    if (!io.github.jose22yt.flexygram.login.local.EphemeralPages.allowedPage(state.page)) return;
++                    if (state.page != currentViewNum) setPage(state.page, true, null, false);
++                    else localApplyPage(state.page);
++                });
++    }
++    private long prepareLocalTransition() {
++        if (preparedPagesAnimation != null) {
++            preparedPagesAnimation.removeAllListeners();
++            preparedPagesAnimation.cancel();
++            preparedPagesAnimation = null;
++        }
++        for (int a = 0; a < views.length; a++) if (views[a] != null && a != currentViewNum) {
++            views[a].setVisibility(View.GONE);
++            views[a].setX(0);
++            localClearPage(a);
++        }
++        return preparedTransition.next();
++    }
++    private void detachClosedLocalView() {
++        preparedLocalViewAlive = false;
++        if (preparedTransition != null) preparedTransition.destroy();
++        if (preparedPagesAnimation != null) { preparedPagesAnimation.removeAllListeners(); preparedPagesAnimation.cancel(); preparedPagesAnimation = null; }
++        if (doneItemAnimation != null) { doneItemAnimation.removeAllListeners(); doneItemAnimation.cancel(); }
++        for (AnimatorSet animation : showDoneAnimation) if (animation != null) { animation.removeAllListeners(); animation.cancel(); }
++        if (keyboardAnimator != null) { keyboardAnimator.removeAllListeners(); keyboardAnimator.cancel(); }
++        if (preparedLocalSession != null) preparedLocalSession.detach(preparedLocalView);
++        preparedLocalView = null;
++        clearClosedLocalInputs();
++    }
++    private void localPhoneNext(CharSequence country, CharSequence number) {
++        if (!localViewActive()) return;
++        char[] copy = io.github.jose22yt.flexygram.login.local.NativeUiInput.bounded(country, number);
++        try { preparedLocalSession.phone(preparedLocalView, copy); }
++        finally { io.github.jose22yt.flexygram.login.local.NativeUiInput.wipe(copy); }
++    }
++    private void localCodeNext(CharSequence code) {
++        if (!localViewActive()) return;
++        char[] copy = io.github.jose22yt.flexygram.login.local.NativeUiInput.bounded(code);
++        try { preparedLocalSession.code(preparedLocalView, copy); }
++        finally { io.github.jose22yt.flexygram.login.local.NativeUiInput.wipe(copy); }
++    }
++    private void localPasswordNext(CharSequence password) {
++        if (!localViewActive()) return;
++        char[] copy = io.github.jose22yt.flexygram.login.local.NativeUiInput.bounded(password);
++        try { if (preparedLocalSession.parameters(preparedLocalView).status == io.github.jose22yt.flexygram.login.local.EphemeralPages.Status.PARAMETERS_PENDING) preparedLocalSession.loadPassword(preparedLocalView); else preparedLocalSession.password(preparedLocalView, copy); }
++        finally { io.github.jose22yt.flexygram.login.local.NativeUiInput.wipe(copy); }
++    }
++    private void localRegisterNext(CharSequence first, CharSequence last) {
++        if (!localViewActive()) return;
++        char[] f = io.github.jose22yt.flexygram.login.local.NativeUiInput.bounded(first);
++        char[] l = io.github.jose22yt.flexygram.login.local.NativeUiInput.bounded(last);
++        try { preparedLocalSession.register(preparedLocalView, f, l); }
++        finally { io.github.jose22yt.flexygram.login.local.NativeUiInput.wipe(f); io.github.jose22yt.flexygram.login.local.NativeUiInput.wipe(l); }
++    }
++    private void localCancelPages() {
++        if (localViewActive()) preparedLocalSession.cancel(preparedLocalView);
++        clearClosedLocalInputs();
++    }
++    private void clearClosedLocalInputs() { for (int page : new int[]{0,1,2,5,6}) localClearPage(page); }
++    private void localClearPage(int page) {
++        if (views[page] == null) return;
++        if (page == VIEW_PHONE_INPUT) { PhoneView p = (PhoneView) views[page]; p.codeField.setText(""); p.phoneField.setText(""); }
++        else if (page == VIEW_CODE_MESSAGE || page == VIEW_CODE_SMS) { LoginActivitySmsView p = (LoginActivitySmsView) views[page]; if (p.codeFieldContainer != null && p.codeFieldContainer.codeField != null) {
++            boolean previous = p.codeFieldContainer.ignoreOnTextChange;
++            p.codeFieldContainer.ignoreOnTextChange = true;
++            try { for (android.widget.EditText f : p.codeFieldContainer.codeField) if (f != null) f.setText(""); }
++            finally { p.codeFieldContainer.ignoreOnTextChange = previous; }
++        } p.currentParams = null; p.phone = p.phoneHash = p.requestPhone = p.emailPhone = null; }
++        else if (page == VIEW_PASSWORD) { LoginActivityPasswordView p = (LoginActivityPasswordView) views[page]; p.codeField.setText(""); p.currentParams = null; p.currentPassword = null; p.passwordString = p.requestPhone = p.phoneHash = p.phoneCode = null; }
++        else if (page == VIEW_REGISTER) { LoginActivityRegisterView p = (LoginActivityRegisterView) views[page]; p.firstNameField.setText(""); p.lastNameField.setText(""); p.currentParams = null; p.requestPhone = p.phoneHash = null; }
++    }
++    private void localApplyPage(int page) {
++        if (!localViewActive()) return;
++        io.github.jose22yt.flexygram.login.local.EphemeralPages.Parameters state = preparedLocalSession.parameters(preparedLocalView);
++        if (state.page != page) return;
++        if (page == VIEW_CODE_MESSAGE || page == VIEW_CODE_SMS) {
++            LoginActivitySmsView p = (LoginActivitySmsView) views[page];
++            p.currentParams = null; p.nextType = 0; p.waitingForEvent = false;
++            if (state.codeLength < 1 || state.codeLength > 12) return;
++            p.codeFieldContainer.setNumbersCount(state.codeLength, p.currentType);
++            if (p.codeFieldContainer.codeField != null) for (android.widget.EditText f : p.codeFieldContainer.codeField) { f.setSaveEnabled(false); f.setSaveFromParentEnabled(false); }
++        }
++        if (page == VIEW_PASSWORD) { LoginActivityPasswordView p = (LoginActivityPasswordView) views[page]; p.codeField.setSaveEnabled(false); p.codeField.setSaveFromParentEnabled(false); }
++        if (page == VIEW_PHONE_INPUT) { PhoneView p = (PhoneView) views[page]; p.codeField.setSaveEnabled(false); p.phoneField.setSaveEnabled(false); }
++        if (page == VIEW_REGISTER) { LoginActivityRegisterView p = (LoginActivityRegisterView) views[page]; p.firstNameField.setSaveEnabled(false); p.lastNameField.setSaveEnabled(false); }
++    }
++    // END CLOSED LOCAL PAGES
++
+     private View cachedFragmentView;
+     @Override
+     public View createView(Context context) {
++        if (localLoginClosed() && preparedLocalSession == null) throw new IllegalStateException("LOCAL_LOGIN_BINDING_REQUIRED");
++
+         if (cachedFragmentView != null) {
+             fragmentView = cachedFragmentView;
+             cachedFragmentView = null;
++            if (localLoginClosed()) { fragmentView.setSaveEnabled(false); fragmentView.setSaveFromParentEnabled(false); if (android.os.Build.VERSION.SDK_INT >= 26) fragmentView.setImportantForAutofill(android.view.View.IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS); attachClosedLocalView(); }
+             return fragmentView;
+         }
+ 
+@@ -635,6 +783,17 @@
+ 
+         sizeNotifierFrameLayout = new SizeNotifierFrameLayout(context) {
+             @Override
++            protected void onAttachedToWindow() {
++                super.onAttachedToWindow();
++                if (localLoginClosed() && !preparedLocalFragmentDestroyed) attachClosedLocalView();
++            }
++            @Override
++            protected void onDetachedFromWindow() {
++                if (localLoginClosed()) detachClosedLocalView();
++                super.onDetachedFromWindow();
++            }
++
++            @Override
+             protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+                 MarginLayoutParams marginLayoutParams = (MarginLayoutParams) floatingButton.getLayoutParams();
+                 int keyboardOffset = isCustomKeyboardVisible() ? AndroidUtilities.dp(CustomPhoneKeyboardView.KEYBOARD_HEIGHT_DP - 4) : 0;
+@@ -708,6 +867,7 @@
+             protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+                 super.onLayout(changed, left, top, right, bottom);
+                 for (SlideView slideView : views) {
++                    if (slideView == null) continue;
+                     MarginLayoutParams params = (MarginLayoutParams) slideView.getLayoutParams();
+                     int childBottom = getHeight() + AndroidUtilities.dp(16);
+                     if (!slideView.hasCustomKeyboard() && keyboardView.getVisibility() == VISIBLE) {
+@@ -723,6 +883,7 @@
+                 int width = getMeasuredWidth(), height = getMeasuredHeight();
+ 
+                 for (SlideView slideView : views) {
++                    if (slideView == null) continue;
+                     MarginLayoutParams params = (MarginLayoutParams) slideView.getLayoutParams();
+                     int childHeight = height - params.topMargin + AndroidUtilities.dp(16);
+                     if (!slideView.hasCustomKeyboard() && keyboardView.getVisibility() == VISIBLE) {
+@@ -737,34 +898,35 @@
+         keyboardView.setViewToFindFocus(slideViewsContainer);
+         keyboardLinearLayout.addView(keyboardView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, CustomPhoneKeyboardView.KEYBOARD_HEIGHT_DP));
+ 
+-        views[VIEW_PHONE_INPUT] = new PhoneView(context);
+-        views[VIEW_CODE_MESSAGE] = new LoginActivitySmsView(context, AUTH_TYPE_MESSAGE);
+-        views[VIEW_CODE_SMS] = new LoginActivitySmsView(context, AUTH_TYPE_SMS);
+-        views[VIEW_CODE_FLASH_CALL] = new LoginActivitySmsView(context, AUTH_TYPE_FLASH_CALL);
+-        views[VIEW_CODE_CALL] = new LoginActivitySmsView(context, AUTH_TYPE_CALL);
+-        views[VIEW_REGISTER] = new LoginActivityRegisterView(context);
+-        views[VIEW_PASSWORD] = new LoginActivityPasswordView(context);
+-        views[VIEW_RECOVER] = new LoginActivityRecoverView(context);
+-        views[VIEW_RESET_WAIT] = new LoginActivityResetWaitView(context);
+-        views[VIEW_NEW_PASSWORD_STAGE_1] = new LoginActivityNewPasswordView(context, 0);
+-        views[VIEW_NEW_PASSWORD_STAGE_2] = new LoginActivityNewPasswordView(context, 1);
+-        views[VIEW_CODE_MISSED_CALL] = new LoginActivitySmsView(context, AUTH_TYPE_MISSED_CALL);
+-        views[VIEW_ADD_EMAIL] = new LoginActivitySetupEmail(context);
+-        views[VIEW_CODE_EMAIL_SETUP] = new LoginActivityEmailCodeView(context, true);
+-        views[VIEW_CODE_EMAIL] = new LoginActivityEmailCodeView(context, false);
+-        views[VIEW_CODE_FRAGMENT_SMS] = new LoginActivitySmsView(context, AUTH_TYPE_FRAGMENT_SMS);
+-        views[VIEW_CODE_WORD] = new LoginActivityPhraseView(context, AUTH_TYPE_WORD);
+-        views[VIEW_CODE_PHRASE] = new LoginActivityPhraseView(context, AUTH_TYPE_PHRASE);
+-        views[VIEW_QR_LOGIN] = new LoginActivityQrView(context);
+-        views[VIEW_PAY] = new LoginPayView(context);
++        if (!localLoginClosed() || io.github.jose22yt.flexygram.login.local.EphemeralPages.allowedPage(VIEW_PHONE_INPUT)) views[VIEW_PHONE_INPUT] = new PhoneView(context);
++        if (!localLoginClosed() || io.github.jose22yt.flexygram.login.local.EphemeralPages.allowedPage(VIEW_CODE_MESSAGE)) views[VIEW_CODE_MESSAGE] = new LoginActivitySmsView(context, AUTH_TYPE_MESSAGE);
++        if (!localLoginClosed() || io.github.jose22yt.flexygram.login.local.EphemeralPages.allowedPage(VIEW_CODE_SMS)) views[VIEW_CODE_SMS] = new LoginActivitySmsView(context, AUTH_TYPE_SMS);
++        if (!localLoginClosed() || io.github.jose22yt.flexygram.login.local.EphemeralPages.allowedPage(VIEW_CODE_FLASH_CALL)) views[VIEW_CODE_FLASH_CALL] = new LoginActivitySmsView(context, AUTH_TYPE_FLASH_CALL);
++        if (!localLoginClosed() || io.github.jose22yt.flexygram.login.local.EphemeralPages.allowedPage(VIEW_CODE_CALL)) views[VIEW_CODE_CALL] = new LoginActivitySmsView(context, AUTH_TYPE_CALL);
++        if (!localLoginClosed() || io.github.jose22yt.flexygram.login.local.EphemeralPages.allowedPage(VIEW_REGISTER)) views[VIEW_REGISTER] = new LoginActivityRegisterView(context);
++        if (!localLoginClosed() || io.github.jose22yt.flexygram.login.local.EphemeralPages.allowedPage(VIEW_PASSWORD)) views[VIEW_PASSWORD] = new LoginActivityPasswordView(context);
++        if (!localLoginClosed() || io.github.jose22yt.flexygram.login.local.EphemeralPages.allowedPage(VIEW_RECOVER)) views[VIEW_RECOVER] = new LoginActivityRecoverView(context);
++        if (!localLoginClosed() || io.github.jose22yt.flexygram.login.local.EphemeralPages.allowedPage(VIEW_RESET_WAIT)) views[VIEW_RESET_WAIT] = new LoginActivityResetWaitView(context);
++        if (!localLoginClosed() || io.github.jose22yt.flexygram.login.local.EphemeralPages.allowedPage(VIEW_NEW_PASSWORD_STAGE_1)) views[VIEW_NEW_PASSWORD_STAGE_1] = new LoginActivityNewPasswordView(context, 0);
++        if (!localLoginClosed() || io.github.jose22yt.flexygram.login.local.EphemeralPages.allowedPage(VIEW_NEW_PASSWORD_STAGE_2)) views[VIEW_NEW_PASSWORD_STAGE_2] = new LoginActivityNewPasswordView(context, 1);
++        if (!localLoginClosed() || io.github.jose22yt.flexygram.login.local.EphemeralPages.allowedPage(VIEW_CODE_MISSED_CALL)) views[VIEW_CODE_MISSED_CALL] = new LoginActivitySmsView(context, AUTH_TYPE_MISSED_CALL);
++        if (!localLoginClosed() || io.github.jose22yt.flexygram.login.local.EphemeralPages.allowedPage(VIEW_ADD_EMAIL)) views[VIEW_ADD_EMAIL] = new LoginActivitySetupEmail(context);
++        if (!localLoginClosed() || io.github.jose22yt.flexygram.login.local.EphemeralPages.allowedPage(VIEW_CODE_EMAIL_SETUP)) views[VIEW_CODE_EMAIL_SETUP] = new LoginActivityEmailCodeView(context, true);
++        if (!localLoginClosed() || io.github.jose22yt.flexygram.login.local.EphemeralPages.allowedPage(VIEW_CODE_EMAIL)) views[VIEW_CODE_EMAIL] = new LoginActivityEmailCodeView(context, false);
++        if (!localLoginClosed() || io.github.jose22yt.flexygram.login.local.EphemeralPages.allowedPage(VIEW_CODE_FRAGMENT_SMS)) views[VIEW_CODE_FRAGMENT_SMS] = new LoginActivitySmsView(context, AUTH_TYPE_FRAGMENT_SMS);
++        if (!localLoginClosed() || io.github.jose22yt.flexygram.login.local.EphemeralPages.allowedPage(VIEW_CODE_WORD)) views[VIEW_CODE_WORD] = new LoginActivityPhraseView(context, AUTH_TYPE_WORD);
++        if (!localLoginClosed() || io.github.jose22yt.flexygram.login.local.EphemeralPages.allowedPage(VIEW_CODE_PHRASE)) views[VIEW_CODE_PHRASE] = new LoginActivityPhraseView(context, AUTH_TYPE_PHRASE);
++        if (!localLoginClosed() || io.github.jose22yt.flexygram.login.local.EphemeralPages.allowedPage(VIEW_QR_LOGIN)) views[VIEW_QR_LOGIN] = new LoginActivityQrView(context);
++        if (!localLoginClosed() || io.github.jose22yt.flexygram.login.local.EphemeralPages.allowedPage(VIEW_PAY)) views[VIEW_PAY] = new LoginPayView(context);
+ 
+         for (int a = 0; a < views.length; a++) {
++            if (views[a] == null) continue;
+             views[a].setVisibility(a == 0 ? View.VISIBLE : View.GONE);
+             final boolean needsTopMargin = a != VIEW_PAY;
+             slideViewsContainer.addView(views[a], LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.CENTER, AndroidUtilities.isTablet() ? 26 : 18, needsTopMargin ? 30 : 0, AndroidUtilities.isTablet() ? 26 : 18, 0));
+         }
+ 
+-        Bundle savedInstanceState = activityMode == MODE_LOGIN && preparedLocalLoginBinding == null ? loadCurrentState(newAccount, currentAccount) : null;
++        Bundle savedInstanceState = activityMode == MODE_LOGIN && !localLoginClosed() && preparedLocalLoginBinding == null ? loadCurrentState(newAccount, currentAccount) : null;
+         if (savedInstanceState != null) {
+             int viewNum = savedInstanceState.getInt("currentViewNum", 0);
+             if (viewNum < 0 || viewNum >= views.length)
+@@ -856,6 +1018,7 @@
+         moreButtonView.addSubItem(2, R.drawable.msg_permissions_solar, getString(R.string.CustomApi)).setContentDescription(getString(R.string.CustomApi));
+         moreButtonView.addSubItem(3, R.drawable.msg_retry_solar, getString(R.string.TestBackend));
+         moreButtonView.setDelegate(id -> {
++            if (localLoginClosed()) return;
+             if (id == 0) {
+                 presentFragment(new ProxyListActivity());
+             } else if (id == 1) {
+@@ -943,7 +1106,8 @@
+             fillNextCodeParams(cancelDeletionParams, cancelDeletionCode, false);
+         }
+ 
+-        return fragmentView;
++        if (localLoginClosed()) { fragmentView.setSaveEnabled(false); fragmentView.setSaveFromParentEnabled(false); if (android.os.Build.VERSION.SDK_INT >= 26) fragmentView.setImportantForAutofill(android.view.View.IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS); attachClosedLocalView(); }
++            return fragmentView;
+     }
+ 
+     private boolean isCustomKeyboardForceDisabled() {
+@@ -1019,8 +1183,10 @@
+ 
+     @Override
+     public void onPause() {
++        if (localLoginClosed() && !localViewActive()) return;
++
+         super.onPause();
+-        if (newAccount) {
++        if (newAccount && !localLoginClosed()) {
+             ConnectionsManager.getInstance(currentAccount).setAppPaused(true, false);
+         }
+         AndroidUtilities.removeAltFocusable(getParentActivity(), classGuid);
+@@ -1028,8 +1194,10 @@
+ 
+     @Override
+     public void onResume() {
++        if (localLoginClosed() && !localViewActive()) return;
++
+         super.onResume();
+-        if (newAccount) {
++        if (newAccount && !localLoginClosed()) {
+             ConnectionsManager.getInstance(currentAccount).setAppPaused(false, false);
+         }
+         AndroidUtilities.requestAdjustResize(getParentActivity(), classGuid);
+@@ -1066,6 +1234,8 @@
+ 
+     @Override
+     public void onConfigurationChanged(Configuration newConfig) {
++        if (localLoginClosed() && !localViewActive()) return;
++
+         setCustomKeyboardVisible(views[currentViewNum].hasCustomKeyboard(), false);
+         if (phoneNumberConfirmView != null) {
+             phoneNumberConfirmView.dismiss();
+@@ -1074,6 +1244,8 @@
+ 
+     @Override
+     public void onRequestPermissionsResultFragment(int requestCode, String[] permissions, int[] grantResults) {
++        if (localLoginClosed()) return;
++
+         if (permissions.length == 0 || grantResults.length == 0) return;
+ 
+         boolean granted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+@@ -1102,6 +1274,8 @@
+     }
+ 
+     public static Bundle loadCurrentState(boolean newAccount, int currentAccount) {
++        if (localLoginClosed()) return null;
++
+         try {
+             Bundle bundle = new Bundle();
+             SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("logininfo2" + (newAccount ? "_" + currentAccount : ""), Context.MODE_PRIVATE);
+@@ -1141,6 +1315,8 @@
+     }
+ 
+     private void clearCurrentState() {
++        if (localLoginClosed()) return;
++
+         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("logininfo2" + (newAccount ? "_" + currentAccount : ""), Context.MODE_PRIVATE);
+         SharedPreferences.Editor editor = preferences.edit();
+         editor.clear();
+@@ -1177,6 +1353,8 @@
+ 
+     @Override
+     protected void onDialogDismiss(Dialog dialog) {
++        if (localLoginClosed()) return;
++
+         if (Build.VERSION.SDK_INT >= 23) {
+             if (dialog == permissionsDialog && !permissionsItems.isEmpty() && getParentActivity() != null) {
+                 try {
+@@ -1202,6 +1380,8 @@
+ 
+     @Override
+     public boolean onBackPressed(boolean invoked) {
++        if (localLoginClosed()) { if (!invoked) return currentViewNum == VIEW_PHONE_INPUT; if (currentViewNum == VIEW_PHONE_INPUT) { localCancelPages(); return true; } localCancelPages(); setPage(VIEW_PHONE_INPUT, true, null, true); return false; }
++
+         if (emailChangeIsSuggestion && currentViewNum == VIEW_ADD_EMAIL) {
+             return false;
+         }
+@@ -1259,6 +1439,8 @@
+ 
+     @Override
+     public void onActivityResultFragment(int requestCode, int resultCode, Intent data) {
++        if (localLoginClosed()) return;
++
+         LoginActivityRegisterView registerView = (LoginActivityRegisterView) views[VIEW_REGISTER];
+         if (registerView != null) {
+             registerView.imageUpdater.onActivityResult(requestCode, resultCode, data);
+@@ -1571,10 +1753,16 @@
+     }
+ 
+     private void needShowProgress(int requestId) {
++        if (localLoginClosed()) return;
++
++        if (localLoginClosed()) return;
++
+         needShowProgress(requestId, true);
+     }
+ 
+     private void needShowProgress(int requestId, boolean animated) {
++        if (localLoginClosed()) return;
++
+         if (isInCancelAccountDeletionMode() && requestId == 0) {
+             if (cancelDeleteProgressDialog != null || getParentActivity() == null || getParentActivity().isFinishing()) {
+                 return;
+@@ -1611,6 +1799,10 @@
+     }
+ 
+     public void setPage(@ViewNumber int page, boolean animated, Bundle params, boolean back) {
++        if (localLoginClosed() && (!localViewActive() || params != null || !io.github.jose22yt.flexygram.login.local.EphemeralPages.allowedPage(page))) return;
++        final io.github.jose22yt.flexygram.login.local.LocalTransitionFence localFence = preparedTransition;
++        final long localTransition = localLoginClosed() ? prepareLocalTransition() : 0;
++
+         boolean needFloatingButton = page == VIEW_PHONE_INPUT || page == VIEW_REGISTER || page == VIEW_PASSWORD ||
+                 page == VIEW_NEW_PASSWORD_STAGE_1 || page == VIEW_NEW_PASSWORD_STAGE_2 || page == VIEW_ADD_EMAIL || page == VIEW_CODE_PHRASE || page == VIEW_CODE_WORD;
+         if (page == currentViewNum) {
+@@ -1653,9 +1845,11 @@
+             newView.setVisibility(View.VISIBLE);
+ 
+             AnimatorSet pagesAnimation = new AnimatorSet();
++            if (localLoginClosed()) preparedPagesAnimation = pagesAnimation;
+             pagesAnimation.addListener(new AnimatorListenerAdapter() {
+                 @Override
+                 public void onAnimationEnd(Animator animation) {
++                    if (localLoginClosed() && (!localViewActive() || localFence != preparedTransition || !localFence.current(localTransition))) return;
+                     if (currentDoneType == DONE_TYPE_FLOATING && needFloatingButton) {
+                         showDoneButton(true, true);
+                     }
+@@ -1689,6 +1883,8 @@
+ 
+     @Override
+     public void saveSelfArgs(Bundle outState) {
++        if (localLoginClosed()) { if (preparedLocalSession != null) { outState.putBoolean("flexygram_local_auth_restart", true); outState.putInt("flexygram_local_auth_slot", currentAccount); } return; }
++
+         if (preparedLocalLoginBinding != null) {
+             preparedLocalLoginBinding.saveRestartMarker(outState);
+             return;
+@@ -1767,6 +1963,8 @@
+     private boolean pendingSwitchingAccount;
+ 
+     private void onAuthSuccess(TLRPC.TL_auth_authorization res, boolean afterSignup) {
++        if (localLoginClosed()) return;
++
+         BackButtonMenuRecent.clearRecentDialogs(currentAccount);
+         PasscodeHelper.removePasscodeForAccount(currentAccount);
+         MessagesController.getInstance(currentAccount).cleanup();
+@@ -1803,12 +2001,16 @@
+     }
+ 
+     private void fillNextCodeParams(Bundle params, TL_account.sentEmailCode res) {
++        if (localLoginClosed()) return;
++
+         params.putString("emailPattern", res.email_pattern);
+         params.putInt("length", res.length);
+         setPage(VIEW_CODE_EMAIL_SETUP, true, params, false);
+     }
+ 
+     private void fillNextCodeParams(Bundle params, TLRPC.auth_SentCode res) {
++        if (localLoginClosed()) return;
++
+         fillNextCodeParams(params, res, true);
+     }
+ /*
+@@ -1874,6 +2076,8 @@
+ 
+     private boolean isRequestingFirebaseSms;
+     private void fillNextCodeParams(Bundle params, TLRPC.auth_SentCode res, boolean animate) {
++        if (localLoginClosed()) return;
++
+         if (res instanceof TLRPC.TL_auth_sentCodePaymentRequired) {
+             final TLRPC.TL_auth_sentCodePaymentRequired auth = (TLRPC.TL_auth_sentCodePaymentRequired) res;
+             params.putString("product", auth.store_product);
+@@ -2106,6 +2310,8 @@
+         private long lastTitleClick = 0;
+         private Toast lastTitleToast;
+         private void showDebugMenu() {
++            if (localLoginClosed()) { return; }
++
+             new AlertDialog.Builder(getContext())
+                 .setTitle(LocaleController.getString(R.string.SettingsDebug))
+                 .setItems(new String[] {
+@@ -2145,6 +2351,7 @@
+             titleView.setLineSpacing(dp(2), 1.0f);
+             addView(titleView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL, 32, 0, 32, 0));
+             titleView.setOnClickListener(v -> {
++                if (localLoginClosed()) return;
+                 if (lastTitleToast != null) {
+                     lastTitleToast.cancel();
+                     lastTitleToast = null;
+@@ -2209,6 +2416,7 @@
+             countryOutlineView.setOnFocusChangeListener((v, hasFocus) -> countryOutlineView.animateSelection(hasFocus ? 1 : 0));
+             addView(countryOutlineView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 58, 16, 24, 16, 14));
+             countryOutlineView.setOnClickListener(view -> {
++                if (localLoginClosed()) return;
+                 CountrySelectActivity fragment = new CountrySelectActivity(true, countriesArray);
+                 fragment.setCountrySelectActivityDelegate((country) -> {
+                     selectCountry(country);
+@@ -2270,6 +2478,7 @@
+ 
+                 @Override
+                 public void afterTextChanged(Editable editable) {
++                        if (localLoginClosed()) return;
+                     if (ignoreOnTextChange) {
+                         return;
+                     }
+@@ -2514,6 +2723,7 @@
+ 
+                 @Override
+                 public void afterTextChanged(Editable s) {
++                        if (localLoginClosed()) return;
+                     if (ignoreOnPhoneChange) {
+                         return;
+                     }
+@@ -2580,6 +2790,7 @@
+                 addView(syncContactsBox, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.MATCH_PARENT, Gravity.LEFT | Gravity.TOP, 16, 0, 16 + (LocaleController.isRTL && AndroidUtilities.isSmallScreen() ? 56 : 0), 0));
+                 bottomMargin -= 24;
+                 syncContactsBox.setOnClickListener(v -> {
++                if (localLoginClosed()) return;
+                     if (getParentActivity() == null) {
+                         return;
+                     }
+@@ -2594,13 +2805,14 @@
+                 });
+             }
+ 
+-            final boolean allowTestBackend = true;
++            final boolean allowTestBackend = !localLoginClosed();
+             if (allowTestBackend && activityMode == MODE_LOGIN) {
+                 testBackendCheckBox = new CheckBoxCell(context, 2);
+                 testBackendCheckBox.setText(getString(R.string.TestBackend), "", testBackend = getConnectionsManager().isTestBackend(), false);
+                 addView(testBackendCheckBox, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.MATCH_PARENT, Gravity.LEFT | Gravity.TOP, 16, 0, 16 + (LocaleController.isRTL && AndroidUtilities.isSmallScreen() ? 56 : 0), 0));
+                 bottomMargin -= 24;
+                 testBackendCheckBox.setOnClickListener(v -> {
++                if (localLoginClosed()) return;
+                     if (getParentActivity() == null) {
+                         return;
+                     }
+@@ -2669,6 +2881,7 @@
+ 
+             Collections.sort(countriesArray, Comparator.comparing(o -> o.name));
+ 
++            if (!localLoginClosed()) {
+             String country = null;
+ 
+             try {
+@@ -2694,6 +2907,7 @@
+                     }
+                 }), ConnectionsManager.RequestFlagWithoutLogin | ConnectionsManager.RequestFlagFailOnServerErrors);
+             }
++            }
+             if (codeField.length() == 0) {
+                 setCountryButtonText(null);
+                 phoneField.setHintText(null);
+@@ -2711,6 +2925,8 @@
+         }
+ 
+         private void loadCountries() {
++            if (localLoginClosed()) { return; }
++
+             TLRPC.TL_help_getCountriesList req = new TLRPC.TL_help_getCountriesList();
+             req.lang_code = LocaleController.getInstance().getCurrentLocaleInfo() != null ? LocaleController.getInstance().getCurrentLocaleInfo().getLangCode() : Locale.getDefault().getCountry();
+             getConnectionsManager().sendRequest(req, (response, error) -> {
+@@ -2855,12 +3071,14 @@
+         @Override
+         protected void onAttachedToWindow() {
+             super.onAttachedToWindow();
++            if (localLoginClosed()) return;
+             NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.emojiLoaded);
+         }
+ 
+         @Override
+         protected void onDetachedFromWindow() {
+             super.onDetachedFromWindow();
++            if (localLoginClosed()) return;
+             NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.emojiLoaded);
+         }
+ 
+@@ -2976,6 +3194,8 @@
+ 
+         @Override
+         public void onCancelPressed() {
++            if (localLoginClosed()) { return; }
++
+             nextPressed = false;
+         }
+ 
+@@ -2998,6 +3218,8 @@
+ 
+         @Override
+         public void onNextPressed(String code) {
++            if (localLoginClosed()) { localPhoneNext(codeField.getText(), phoneField.getText()); return; }
++
+             if (getParentActivity() == null || nextPressed || isRequestingFirebaseSms) {
+                 return;
+             }
+@@ -3399,6 +3621,8 @@
+ 
+         private boolean numberFilled;
+         public void fillNumber() {
++            if (localLoginClosed()) { return; }
++
+             if (numberFilled || activityMode != MODE_LOGIN) {
+                 return;
+             }
+@@ -3519,6 +3743,8 @@
+ 
+         @Override
+         public void onShow() {
++            if (localLoginClosed()) { return; }
++
+             super.onShow();
+             fillNumber();
+             if (syncContactsBox != null) {
+@@ -3550,6 +3776,8 @@
+ 
+         @Override
+         public void onDestroyActivity() {
++            if (localLoginClosed()) { localClearPage(VIEW_PHONE_INPUT); return; }
++
+             super.onDestroyActivity();
+             if (cancelRequestingPasskey != null) {
+                 cancelRequestingPasskey.run();
+@@ -3561,6 +3789,8 @@
+         private boolean requestingPasskey = false;
+         private Runnable cancelRequestingPasskey;
+         private void requestPasskey(boolean clickedButton, boolean force) {
++            if (localLoginClosed()) { return; }
++
+             if (activityMode != MODE_LOGIN) return;
+             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P || !BuildVars.SUPPORTS_PASSKEYS) return;
+             if (force) {
+@@ -3643,6 +3873,8 @@
+ 
+         @Override
+         public void saveStateParams(Bundle bundle) {
++            if (localLoginClosed()) { return; }
++
+             String code = codeField.getText().toString();
+             if (code.length() != 0) {
+                 bundle.putString("phoneview_code", code);
+@@ -3655,6 +3887,8 @@
+ 
+         @Override
+         public void restoreStateParams(Bundle bundle) {
++            if (localLoginClosed()) { return; }
++
+             String code = bundle.getString("phoneview_code");
+             if (code != null) {
+                 codeField.setText(code);
+@@ -3667,6 +3901,10 @@
+ 
+         @Override
+         public void didReceivedNotification(int id, int account, Object... args) {
++            if (localLoginClosed()) { return; }
++
++        if (localLoginClosed()) return;
++
+             if (id == NotificationCenter.emojiLoaded) {
+                 countryButton.getCurrentView().invalidate();
+             }
+@@ -3964,6 +4202,7 @@
+             timeText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
+             timeText.setGravity(Gravity.TOP | Gravity.LEFT);
+             timeText.setOnClickListener(v -> {
++                if (localLoginClosed()) return;
+ //                if (isRequestingFirebaseSms || isResendingCode) {
+ //                    return;
+ //                }
+@@ -4065,6 +4304,7 @@
+                 openFragmentButton.setPadding(AndroidUtilities.dp(34), 0, AndroidUtilities.dp(34), 0);
+                 openFragmentButton.setBackground(Theme.createSimpleSelectorRoundRectDrawable(AndroidUtilities.dp(6), Theme.getColor(Theme.key_changephoneinfo_image2), Theme.getColor(Theme.key_chats_actionPressedBackground)));
+                 openFragmentButton.setOnClickListener(v -> {
++                if (localLoginClosed()) return;
+                     try {
+                         getContext().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+                     } catch (Exception e) {
+@@ -4105,6 +4345,7 @@
+ 
+             if (currentType != AUTH_TYPE_FRAGMENT_SMS) {
+                 problemText.setOnClickListener(v -> {
++                if (localLoginClosed()) return;
+                     if (nextCodeParams != null && nextCodeAuth != null) {
+                         fillNextCodeParams(nextCodeParams, nextCodeAuth);
+                         return;
+@@ -4325,10 +4566,14 @@
+ 
+         @Override
+         public void onCancelPressed() {
++            if (localLoginClosed()) { return; }
++
+             nextPressed = false;
+         }
+ 
+         private void resendCode() {
++            if (localLoginClosed()) { return; }
++
+             if (nextPressed || isResendingCode || isRequestingFirebaseSms) {
+                 return;
+             }
+@@ -4479,6 +4724,8 @@
+ 
+         @Override
+         public void setParams(Bundle params, boolean restore) {
++            if (localLoginClosed()) { localApplyPage(currentViewNum); return; }
++
+             if (params == null) {
+                 if (nextCodeParams != null && nextCodeAuth != null) {
+                     setProblemTextVisible(true);
+@@ -4755,6 +5002,8 @@
+         }
+ 
+         private void createCodeTimer() {
++            if (localLoginClosed()) { return; }
++
+             if (codeTimer != null) {
+                 return;
+             }
+@@ -4799,6 +5048,8 @@
+         }
+ 
+         private void createTimer() {
++            if (localLoginClosed()) { return; }
++
+             if (timeTimer != null) {
+                 return;
+             }
+@@ -4869,6 +5120,8 @@
+ 
+         @Override
+         public void onNextPressed(String code) {
++            if (localLoginClosed()) { localCodeNext(codeFieldContainer.getCode()); return; }
++
+             if (currentViewNum == AUTH_TYPE_MISSED_CALL) {
+                 if (nextPressed) {
+                     return;
+@@ -5233,6 +5486,8 @@
+ 
+         @Override
+         public boolean onBackPressed(boolean force) {
++            if (localLoginClosed()) { localCancelPages(); return true; }
++
+             if (activityMode != MODE_LOGIN) {
+                 finishFragment();
+                 return false;
+@@ -5282,6 +5537,8 @@
+ 
+         @Override
+         public void onDestroyActivity() {
++            if (localLoginClosed()) { localClearPage((currentType == AUTH_TYPE_MESSAGE ? VIEW_CODE_MESSAGE : VIEW_CODE_SMS)); return; }
++
+             super.onDestroyActivity();
+             if (currentType == AUTH_TYPE_FRAGMENT_SMS) {
+                 NotificationCenter.getGlobalInstance().removeObserver(LoginActivitySmsView.this, NotificationCenter.didReceiveSmsCode);
+@@ -5299,6 +5556,8 @@
+ 
+         @Override
+         public void onShow() {
++            if (localLoginClosed()) { return; }
++
+             super.onShow();
+             if (hintDrawable != null) {
+                 hintDrawable.setCurrentFrame(0);
+@@ -5326,6 +5585,8 @@
+ 
+         @Override
+         public void didReceivedNotification(int id, int account, Object... args) {
++            if (localLoginClosed()) { return; }
++
+             if (!waitingForEvent || codeFieldContainer.codeField == null) {
+                 return;
+             }
+@@ -5348,6 +5609,8 @@
+ 
+         @Override
+         public void onHide() {
++            if (localLoginClosed()) { localClearPage((currentType == AUTH_TYPE_MESSAGE ? VIEW_CODE_MESSAGE : VIEW_CODE_SMS)); return; }
++
+             super.onHide();
+             isResendingCode = false;
+             nextPressed = false;
+@@ -5358,6 +5621,8 @@
+ 
+         @Override
+         public void saveStateParams(Bundle bundle) {
++            if (localLoginClosed()) { return; }
++
+             String code = codeFieldContainer.getCode();
+             if (code.length() != 0) {
+                 bundle.putString("smsview_code_" + currentType, code);
+@@ -5378,6 +5643,8 @@
+ 
+         @Override
+         public void restoreStateParams(Bundle bundle) {
++            if (localLoginClosed()) { return; }
++
+             currentParams = bundle.getBundle("smsview_params_" + currentType);
+             if (currentParams != null) {
+                 setParams(currentParams, true);
+@@ -5589,6 +5856,7 @@
+             VerticalPositionAutoAnimator.attach(cancelButton);
+ 
+             cancelButton.setOnClickListener(view -> {
++                if (localLoginClosed()) return;
+                 if (radialProgressView.getTag() != null) {
+                     return;
+                 }
+@@ -5675,11 +5943,15 @@
+ 
+         @Override
+         public void onCancelPressed() {
++            if (localLoginClosed()) { return; }
++
+             nextPressed = false;
+         }
+ 
+         @Override
+         public void setParams(Bundle params, boolean restore) {
++            if (localLoginClosed()) { localApplyPage(currentViewNum); return; }
++
+             if (params == null) {
+                 return;
+             }
+@@ -5718,6 +5990,8 @@
+ 
+         @Override
+         public void onNextPressed(String code) {
++            if (localLoginClosed()) { localPasswordNext(codeField.getText()); return; }
++
+             if (nextPressed) {
+                 return;
+             }
+@@ -5808,6 +6082,8 @@
+ 
+         @Override
+         public boolean onBackPressed(boolean force) {
++            if (localLoginClosed()) { localCancelPages(); return true; }
++
+             nextPressed = false;
+             needHideProgress(true);
+             currentParams = null;
+@@ -5816,6 +6092,8 @@
+ 
+         @Override
+         public void onShow() {
++            if (localLoginClosed()) { if (preparedLocalSession != null && localViewActive()) preparedLocalSession.loadPassword(preparedLocalView); return; }
++
+             super.onShow();
+             AndroidUtilities.runOnUIThread(() -> {
+                 if (codeField != null) {
+@@ -5830,6 +6108,8 @@
+ 
+         @Override
+         public void saveStateParams(Bundle bundle) {
++            if (localLoginClosed()) { return; }
++
+             String code = codeField.getText().toString();
+             if (code.length() != 0) {
+                 bundle.putString("passview_code", code);
+@@ -5841,6 +6121,8 @@
+ 
+         @Override
+         public void restoreStateParams(Bundle bundle) {
++            if (localLoginClosed()) { return; }
++
+             currentParams = bundle.getBundle("passview_params");
+             if (currentParams != null) {
+                 setParams(currentParams, true);
+@@ -6179,6 +6461,8 @@
+                 NotificationCenter.getGlobalInstance().addObserver(new NotificationCenter.NotificationCenterDelegate() {
+                     @Override
+                     public void didReceivedNotification(int id, int account, Object... args) {
++        if (localLoginClosed()) return;
++
+                         int request = (int) args[0];
+                         int result = (int) args[1];
+                         Intent data = (Intent) args[2];
+@@ -6514,6 +6798,8 @@
+                 NotificationCenter.getGlobalInstance().addObserver(new NotificationCenter.NotificationCenterDelegate() {
+                     @Override
+                     public void didReceivedNotification(int id, int account, Object... args) {
++        if (localLoginClosed()) return;
++
+                         int request = (int) args[0];
+                         int result = (int) args[1];
+                         Intent data = (Intent) args[2];
+@@ -7936,11 +8222,14 @@
+ 
+             @Override
+             public void onClick(View widget) {
++                if (localLoginClosed()) return;
+                 showTermsOfService(false);
+             }
+         }
+ 
+         private void showTermsOfService(boolean needAccept) {
++            if (localLoginClosed()) { return; }
++
+             if (currentTermsOfService == null) {
+                 return;
+             }
+@@ -7982,12 +8271,14 @@
+ 
+             setOrientation(VERTICAL);
+ 
++            if (!localLoginClosed()) {
+             imageUpdater = new ImageUpdater(false, ImageUpdater.FOR_TYPE_USER, false);
+             imageUpdater.setOpenWithFrontfaceCamera(true);
+             imageUpdater.setSearchAvailable(false);
+             imageUpdater.setUploadAfterSelect(false);
+             imageUpdater.parentFragment = LoginActivity.this;
+             imageUpdater.setDelegate(this);
++            }
+ 
+             FrameLayout avatarContainer = new FrameLayout(context);
+             addView(avatarContainer, LayoutHelper.createLinear(78, 78, Gravity.CENTER_HORIZONTAL));
+@@ -8031,6 +8322,7 @@
+             };
+             avatarContainer.addView(avatarOverlay, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
+             avatarOverlay.setOnClickListener(view -> {
++                if (localLoginClosed()) return;
+                 imageUpdater.openMenu(avatar != null, () -> {
+                     avatar = null;
+                     avatarBig = null;
+@@ -8204,6 +8496,7 @@
+             wrongNumber.setVisibility(GONE);
+             addView(wrongNumber, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.TOP | (LocaleController.isRTL ? Gravity.RIGHT : Gravity.LEFT), 0, 20, 0, 0));
+             wrongNumber.setOnClickListener(view -> {
++                if (localLoginClosed()) return;
+                 if (radialProgressView.getTag() != null) {
+                     return;
+                 }
+@@ -8284,6 +8577,8 @@
+ 
+         @Override
+         public void didUploadPhoto(final TLRPC.InputFile photo, final TLRPC.InputFile video, double videoStartTimestamp, String videoPath, final TLRPC.PhotoSize bigSize, final TLRPC.PhotoSize smallSize, boolean isVideo, TLRPC.VideoSize emojiMarkup) {
++            if (localLoginClosed()) { return; }
++
+             AndroidUtilities.runOnUIThread(() -> {
+                 avatar = smallSize.location;
+                 avatarBig = bigSize.location;
+@@ -8350,6 +8645,8 @@
+ 
+         @Override
+         public boolean onBackPressed(boolean force) {
++            if (localLoginClosed()) { localCancelPages(); return true; }
++
+             if (!force) {
+                 AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
+                 builder.setTitle(getString(R.string.Warning));
+@@ -8376,6 +8673,8 @@
+ 
+         @Override
+         public void onCancelPressed() {
++            if (localLoginClosed()) { return; }
++
+             nextPressed = false;
+         }
+ 
+@@ -8386,6 +8685,8 @@
+ 
+         @Override
+         public void onShow() {
++            if (localLoginClosed()) { return; }
++
+             super.onShow();
+             if (privacyView != null) {
+                 if (restoringState) {
+@@ -8411,6 +8712,8 @@
+ 
+         @Override
+         public void setParams(Bundle params, boolean restore) {
++            if (localLoginClosed()) { localApplyPage(currentViewNum); return; }
++
+             if (params == null) {
+                 return;
+             }
+@@ -8423,6 +8726,8 @@
+ 
+         @Override
+         public void onNextPressed(String code) {
++            if (localLoginClosed()) { localRegisterNext(firstNameField.getText(), lastNameField.getText()); return; }
++
+             if (nextPressed) {
+                 return;
+             }
+@@ -8478,6 +8783,8 @@
+ 
+         @Override
+         public void saveStateParams(Bundle bundle) {
++            if (localLoginClosed()) { return; }
++
+             String first = firstNameField.getText().toString();
+             if (first.length() != 0) {
+                 bundle.putString("registerview_first", first);
+@@ -8500,6 +8807,8 @@
+ 
+         @Override
+         public void restoreStateParams(Bundle bundle) {
++            if (localLoginClosed()) { return; }
++
+             currentParams = bundle.getBundle("registerview_params");
+             if (currentParams != null) {
+                 setParams(currentParams, true);
+@@ -8587,12 +8896,16 @@
+ 
+         @Override
+         public void onDestroyActivity() {
++            if (localLoginClosed()) {  return; }
++
+             removeObserver();
+             super.onDestroyActivity();
+         }
+ 
+         @Override
+         public void onShow() {
++            if (localLoginClosed()) { return; }
++
+             super.onShow();
+             waitingForEvent = true;
+             exportLoginToken(true);
+@@ -8600,6 +8913,8 @@
+ 
+         @Override
+         public void onHide() {
++            if (localLoginClosed()) {  return; }
++
+             removeObserver();
+             super.onHide();
+             qrView.clear();
+@@ -8611,6 +8926,8 @@
+         }
+ 
+         public void exportLoginToken(boolean show) {
++            if (localLoginClosed()) { return; }
++
+             if (!waitingForEvent) {
+                 return;
+             }
+@@ -8711,6 +9028,8 @@
+ 
+         @Override
+         public void didReceivedNotification(int id, int account, Object... args) {
++            if (localLoginClosed()) { return; }
++
+             if (id == NotificationCenter.updateLoginToken) {
+                 exportLoginToken(false);
+             }
+@@ -8848,6 +9167,7 @@
+         floatingButtonIcon.setBackgroundColor(Theme.getColor(Theme.key_chats_actionBackground));
+ 
+         for (SlideView slideView : views) {
++                    if (slideView == null) continue;
+             slideView.updateColors();
+         }
+ 
+@@ -9136,6 +9456,8 @@
+     private int currentConnectionState;
+ 
+     private void updateProxyButton(boolean animated, boolean force) {
++        if (localLoginClosed()) return;
++
+         if (proxyDrawable == null) {
+             return;
+         }
+@@ -9201,6 +9523,8 @@
+ 
+     @Override
+     public void didReceivedNotification(int id, int account, Object... args) {
++        if (localLoginClosed()) return;
++
+         if (id == NotificationCenter.didUpdateConnectionState) {
+             //updateProxyButton(true, false);
+         } else if (id == NotificationCenter.newSuggestionsAvailable) {

@@ -1,0 +1,44 @@
+--- a/TMessagesProj/build.gradle
++++ b/TMessagesProj/build.gradle
+@@ -49,6 +49,11 @@
+ }
+ // Native-interface integration has a separate closed profile; no credentials are resolved.
+ def realAlphaEnabled = providers.gradleProperty('flexygramRealAlpha').orNull == 'true'
++def localLoginPagesEnabled = providers.gradleProperty('flexygramLocalLoginPages').orNull == 'true'
++if (localLoginPagesEnabled && !realAlphaEnabled) throw new GradleException('FLEXYGRAM_LOCAL_PAGES_REQUIRES_REALALPHA')
++if (localLoginPagesEnabled && !rootProject.file('build/generated/flexygram-local-login/java/org/telegram/ui/LoginActivity.java').isFile()) throw new GradleException('FLEXYGRAM_LOCAL_PAGES_OVERLAY_REQUIRED')
++if (localLoginPagesEnabled) { def expected = new groovy.json.JsonSlurper().parse(rootProject.file('patches/native-login-pages/inventory.json')).overlay_sha256; def actual = java.security.MessageDigest.getInstance('SHA-256').digest(rootProject.file('build/generated/flexygram-local-login/java/org/telegram/ui/LoginActivity.java').bytes).encodeHex().toString(); if (actual != expected) throw new GradleException('FLEXYGRAM_LOCAL_PAGES_OVERLAY_MISMATCH') }
++
+ def realAlphaPolicyFile = rootProject.file('gradle/real-alpha.json')
+ def realAlphaPolicy = realAlphaEnabled ? new GroovyShell().evaluate(rootProject.file('gradle/real-alpha.gradle')).call(realAlphaPolicyFile) : null
+ def realAlphaScope = realAlphaEnabled ? java.security.MessageDigest.getInstance('SHA-256').digest(realAlphaPolicyFile.bytes).encodeHex().toString() + ':realAlpha' : null
+@@ -305,6 +310,21 @@
+     }
+ 
+     sourceSets.main.jniLibs.srcDirs = ['./jni/']
++    if (localLoginPagesEnabled) {
++        sourceSets.main.java.exclude('org/telegram/ui/LoginActivity.java')
++        sourceSets.realAlpha.java.srcDirs += [
++            rootProject.file('TMessagesProj_Modules/telegram-session-core/src/main/java'),
++            rootProject.file('TMessagesProj_Modules/telegram-session-android/src/main/java'),
++            rootProject.file('TMessagesProj_Modules/telegram-session-android/src/android/java'),
++            rootProject.file('TMessagesProj_Modules/telegram-native-login/src/main/java'),
++            rootProject.file('TMessagesProj_Modules/telegram-native-login/src/telegram/java'),
++            rootProject.file('TMessagesProj_Modules/telegram-login-wiring/src/telegram/java'),
++            rootProject.file('TMessagesProj_Modules/telegram-login-wiring/src/android/java'),
++            rootProject.file('TMessagesProj_Modules/telegram-login-local-ui/src/main/java'),
++            rootProject.file('build/generated/flexygram-local-login/java')
++        ]
++    }
++
+ 
+     namespace = 'org.telegram.messenger'
+ }
+@@ -312,6 +332,7 @@
+ androidComponents {
+     beforeVariants(selector().all()) { builder ->
+         def flavor = builder.productFlavors.find { it.first == 'environment' }?.second
++        if (localLoginPagesEnabled && !(flavor == 'realAlpha' && builder.buildType == 'debug')) { builder.enable = false; return }
+         // Reviewed isolated variants only. Production never reaches codegen, JNI or packaging.
+         builder.enable = (flavor == 'diagnostic' && builder.buildType in ['debug', 'staging']) ||
+                 (betaDevelopmentEnabled && flavor == 'betaDevelopment' && builder.buildType == 'debug') ||

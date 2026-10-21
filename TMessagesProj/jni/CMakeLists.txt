@@ -360,3 +360,11 @@ target_link_libraries(${NATIVE_LIB}
 
 #include(AndroidNdkModules)
 #android_ndk_import_module_cpufeatures()
+
+# Opt-in local visual laboratory: read-only identity/policy JNI seam, no tgnet operation.
+if(FLEXYGRAM_LOCAL_LOGIN_PAGES)
+    if(NOT FLEXYGRAM_FLAVOR STREQUAL "realAlpha")
+        message(FATAL_ERROR "LOCAL_LOGIN_BRIDGE_REQUIRES_REALALPHA")
+    endif()
+    include("${CMAKE_CURRENT_LIST_DIR}/../../TMessagesProj_Modules/telegram-session-android/integration/read-only-jni.cmake")
+endif()
