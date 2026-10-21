@@ -6,7 +6,7 @@ import io.github.jose22yt.flexygram.session.android.OperationJournal.*;
 import io.github.jose22yt.flexygram.session.android.OperationJournal.Record;
 
 /** Bridge to LOCAL controller contract, not a real MTProto persistence adapter. */
-public final class JournaledLocalSessionStore implements SessionStore,AutoCloseable {
+public final class JournaledLocalSessionStore implements LocalSessionStore {
     public enum Outcome { COMPLETED, FAILED_WITHOUT_WRITE, UNCERTAIN }
     public interface LocalSink {
         /** Synthetic rehearsal only. Never store MTProto keys or activate UserConfig. */

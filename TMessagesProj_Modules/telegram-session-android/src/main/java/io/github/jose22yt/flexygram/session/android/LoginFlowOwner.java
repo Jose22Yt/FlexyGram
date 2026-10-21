@@ -9,7 +9,7 @@ import io.github.jose22yt.flexygram.session.RequestCoordinator.*;
 public final class LoginFlowOwner implements AutoCloseable {
     public enum Failure { NONE, LOCAL_OPERATION, WORKER_UNAVAILABLE }
     private final AuthenticationController controller;
-    private final JournaledLocalSessionStore store;
+    private final LocalSessionStore store;
     private final Executor worker;
     private final ArrayDeque<Task> tasks=new ArrayDeque<>();
     private boolean draining,closed,initialized;
@@ -21,6 +21,9 @@ public final class LoginFlowOwner implements AutoCloseable {
         void wipe(){if(input!=null)Arrays.fill(input,'\0');}
     }
     public LoginFlowOwner(ClosedRuntime runtime,TransportPort localTransport,JournaledLocalSessionStore store,Executor worker) {
+        this(runtime,localTransport,(LocalSessionStore)store,worker);
+    }
+    public LoginFlowOwner(ClosedRuntime runtime,TransportPort localTransport,LocalSessionStore store,Executor worker) {
         if(runtime==null||localTransport==null||store==null||worker==null
                 ||runtime.scope.variant!=SessionScope.Variant.REAL_ALPHA
                 ||localTransport.domain()!=Domain.LOCAL_SIMULATION||!runtime.scope.equals(localTransport.scope()))
@@ -28,6 +31,8 @@ public final class LoginFlowOwner implements AutoCloseable {
         controller=new AuthenticationController(runtime,localTransport,store);this.store=store;this.worker=worker;
     }
     public AuthenticationController.UiSnapshot snapshot(){return controller.snapshot();}
+    /** Adapter phase changed; reuse the existing revisioned UI relay, without polling or requests. */
+    public void signalLocalAdapterState(){controller.refreshLocalAdapterUi();}
     public synchronized Failure failure(){return failure;}
     public AuthUiRelay.Binding attachView(Executor mainExecutor,AuthUiRelay.Observer observer) {
         synchronized(this){if(closed)throw new IllegalStateException("LOGIN_OWNER_CLOSED");}

@@ -64,6 +64,11 @@ public final class AuthenticationController implements AutoCloseable {
     public int uiExecutorFailures() { return ui.executorFailures(); }
     public int adapterFailures() { return broker.adapterFailures(); }
     public synchronized UiSnapshot snapshot() { return new UiSnapshot(scope,state,fault,revision); }
+    /** UI invalidation only for a local adapter's substate (2FA/QR). Never changes request generation. */
+    public void refreshLocalAdapterUi() {
+        synchronized(this) { if(state==State.CLOSED)return; revision++; }
+        ui.publish(snapshot());
+    }
     public boolean initialize() {
         long epoch;
         synchronized(this) {

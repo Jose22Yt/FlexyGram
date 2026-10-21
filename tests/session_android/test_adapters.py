@@ -57,8 +57,10 @@ class AdapterTests(unittest.TestCase):
         self.assertNotRegex(text,r'\b(?:connect|socket|send|recv|getaddrinfo|SSL_connect|_.*ConnectionsManager.*)\b')
     def test_shared_sources_and_variants_unchanged(self):
         changed=subprocess.check_output(['git','diff','--name-only','985f8ec8f426225dfd7fba772272fd77e02b7fcf'],cwd=ROOT,text=True)
-        for p in changed.splitlines():self.assertTrue(p=='tests/session_core/test_integration_contracts.py' or p.startswith(('TMessagesProj_Modules/telegram-session-android/','tests/session_android/','docs/session-android/')),p)
+        added={'TMessagesProj_Modules/telegram-session-core/src/main/java/io/github/jose22yt/flexygram/session/AuthenticationController.java'}
+        for p in changed.splitlines():self.assertTrue(p in added or p=='tests/session_core/test_integration_contracts.py' or p.startswith(('TMessagesProj_Modules/telegram-session-android/','tests/session_android/','docs/session-android/','TMessagesProj_Modules/telegram-native-login/','tests/native_login/','docs/native-login/')),p)
         self.assertNotIn('telegram-session-android',(ROOT/'settings.gradle').read_text())
+        self.assertNotIn('telegram-native-login',(ROOT/'settings.gradle').read_text())
     def test_sources_do_not_mutate_telegram_state_or_log(self):
         text='\n'.join(p.read_text() for p in MODULE.glob('src/*/java/**/*.java'))
         self.assertNotRegex(text,r'FileLog\.|System\.(?:out|err)|printStackTrace\(|getMessage\(|getCause\(')

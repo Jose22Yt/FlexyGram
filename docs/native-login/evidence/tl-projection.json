@@ -1,0 +1,166 @@
+{
+  "source_sha256": {
+    "TLRPC.java": "413c0d09f15ad5175cd3bdab24bebc464d235af195bdfd2f803a328884a50dae",
+    "TL_account.java": "44e00cd1251d7332bbc378d2a5da71145c84906c5021715c34d7125d7707fc91"
+  },
+  "declarations": {
+    "TL_error": {
+      "header": "public static class TL_error extends TLObject",
+      "fields": [
+        "public int code;",
+        "public String text;"
+      ]
+    },
+    "auth_Authorization": {
+      "header": "public static abstract class auth_Authorization extends TLObject",
+      "fields": []
+    },
+    "TL_auth_authorization": {
+      "header": "public static class TL_auth_authorization extends auth_Authorization",
+      "fields": [
+        "public boolean setup_password_required;",
+        "public byte[] future_auth_token;",
+        "public User user;"
+      ]
+    },
+    "TL_auth_authorizationSignUpRequired": {
+      "header": "public static class TL_auth_authorizationSignUpRequired extends auth_Authorization",
+      "fields": [
+        "public TL_help_termsOfService terms_of_service;"
+      ]
+    },
+    "TL_help_termsOfService": {
+      "header": "public static class TL_help_termsOfService extends TLObject",
+      "fields": []
+    },
+    "User": {
+      "header": "public static abstract class User extends TLObject",
+      "fields": [
+        "public long id;",
+        "public String phone;"
+      ]
+    },
+    "TL_user": {
+      "header": "public static class TL_user extends User",
+      "fields": []
+    },
+    "auth_SentCode": {
+      "header": "public static abstract class auth_SentCode extends TLObject",
+      "fields": [
+        "public auth_SentCodeType type;",
+        "public String phone_code_hash;",
+        "public auth_Authorization authorization;"
+      ]
+    },
+    "TL_auth_sentCode": {
+      "header": "public static class TL_auth_sentCode extends auth_SentCode",
+      "fields": []
+    },
+    "TL_auth_sentCodeSuccess": {
+      "header": "public static class TL_auth_sentCodeSuccess extends auth_SentCode",
+      "fields": []
+    },
+    "TL_auth_sentCodePaymentRequired": {
+      "header": "public static class TL_auth_sentCodePaymentRequired extends auth_SentCode",
+      "fields": []
+    },
+    "auth_SentCodeType": {
+      "header": "public static abstract class auth_SentCodeType extends TLObject",
+      "fields": []
+    },
+    "auth_LoginToken": {
+      "header": "public static abstract class auth_LoginToken extends TLObject",
+      "fields": []
+    },
+    "TL_auth_loginToken": {
+      "header": "public static class TL_auth_loginToken extends auth_LoginToken",
+      "fields": [
+        "public int expires;",
+        "public byte[] token;"
+      ]
+    },
+    "TL_auth_loginTokenMigrateTo": {
+      "header": "public static class TL_auth_loginTokenMigrateTo extends auth_LoginToken",
+      "fields": [
+        "public int dc_id;",
+        "public byte[] token;"
+      ]
+    },
+    "TL_auth_loginTokenSuccess": {
+      "header": "public static class TL_auth_loginTokenSuccess extends auth_LoginToken",
+      "fields": [
+        "public auth_Authorization authorization;"
+      ]
+    },
+    "PasswordKdfAlgo": {
+      "header": "public static abstract class PasswordKdfAlgo extends TLObject",
+      "fields": []
+    },
+    "TL_passwordKdfAlgoUnknown": {
+      "header": "public static class TL_passwordKdfAlgoUnknown extends PasswordKdfAlgo",
+      "fields": []
+    },
+    "TL_passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow": {
+      "header": "public static class TL_passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow extends PasswordKdfAlgo",
+      "fields": []
+    },
+    "TL_auth_sentCodeTypeApp": {
+      "header": "public static class TL_auth_sentCodeTypeApp extends auth_SentCodeType",
+      "fields": []
+    },
+    "TL_auth_sentCodeTypeSms": {
+      "header": "public static class TL_auth_sentCodeTypeSms extends auth_SentCodeType",
+      "fields": []
+    },
+    "TL_auth_sentCodeTypeCall": {
+      "header": "public static class TL_auth_sentCodeTypeCall extends auth_SentCodeType",
+      "fields": []
+    },
+    "TL_auth_sentCodeTypeFlashCall": {
+      "header": "public static class TL_auth_sentCodeTypeFlashCall extends auth_SentCodeType",
+      "fields": []
+    },
+    "TL_auth_sentCodeTypeMissedCall": {
+      "header": "public static class TL_auth_sentCodeTypeMissedCall extends auth_SentCodeType",
+      "fields": []
+    },
+    "TL_auth_sentCodeTypeSmsWord": {
+      "header": "public static class TL_auth_sentCodeTypeSmsWord extends auth_SentCodeType",
+      "fields": []
+    },
+    "TL_auth_sentCodeTypeSmsPhrase": {
+      "header": "public static class TL_auth_sentCodeTypeSmsPhrase extends auth_SentCodeType",
+      "fields": []
+    },
+    "TL_auth_sentCodeTypeFragmentSms": {
+      "header": "public static class TL_auth_sentCodeTypeFragmentSms extends auth_SentCodeType",
+      "fields": []
+    },
+    "TL_auth_sentCodeTypeEmailCode": {
+      "header": "public static class TL_auth_sentCodeTypeEmailCode extends auth_SentCodeType",
+      "fields": []
+    },
+    "TL_auth_sentCodeTypeSetUpEmailRequired": {
+      "header": "public static class TL_auth_sentCodeTypeSetUpEmailRequired extends auth_SentCodeType",
+      "fields": []
+    },
+    "TL_auth_sentCodeTypeFirebaseSms": {
+      "header": "public static class TL_auth_sentCodeTypeFirebaseSms extends auth_SentCodeType",
+      "fields": []
+    },
+    "Password": {
+      "header": "public static class Password extends TLObject",
+      "fields": [
+        "public boolean has_password;",
+        "public TLRPC.PasswordKdfAlgo current_algo;",
+        "public byte[] srp_B;",
+        "public long srp_id;"
+      ]
+    },
+    "TL_password": {
+      "header": "public static class TL_password extends Password",
+      "fields": []
+    }
+  },
+  "wire_serializers_compiled": false
+}

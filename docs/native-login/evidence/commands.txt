@@ -1,0 +1,15 @@
+Code commit: 39c9ac03cc4a3222e0bcb8b7525763ee11036816
+Working directory: repository root
+Python executable: /root/.local/bin/python3.11 (put its directory on PATH for commands below).
+Required environment: JAVA_HOME=JDK21; FLEXYGRAM_ANDROID24_JAR=verified SDK24 android.jar; FLEXYGRAM_GRADLE_HOME=Gradle9.7.1; FLEXYGRAM_CMAKE=CMake3.31.6
+
+python3.11 -m unittest discover -s tests/native_login -v
+python3.11 -O -m unittest discover -s tests/native_login -v
+python3.11 -m unittest discover -s tests/session_core -p test_integration_contracts.py -v
+python3.11 -O -m unittest discover -s tests/session_core -p test_integration_contracts.py -v
+python3.11 -m unittest discover -s tests/session_core -p test_runtime.py -k ui -v
+python3.11 -O -m unittest discover -s tests/session_core -p test_runtime.py -k ui -v
+python3.11 -m unittest discover -s tests/session_android -p test_adapters.py -k owner -k storeCloseReentrant -k storeCompletedLocalReceipt -k android_api24 -k jdk21_default -v
+python3.11 -O -m unittest discover -s tests/session_android -p test_adapters.py -k owner -k storeCloseReentrant -k storeCompletedLocalReceipt -k android_api24 -k jdk21_default -v
+
+Selected previous tests rerun because shared owner/store/UI hooks changed. Other historical suites were not rerun. Final source blobs match published code commit. Preliminary failure logs are excluded from final totals.

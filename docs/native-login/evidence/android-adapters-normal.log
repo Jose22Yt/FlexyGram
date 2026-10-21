@@ -1,0 +1,16 @@
+test_android_api24_symbols_compile_real_sdk (test_adapters.AdapterTests.test_android_api24_symbols_compile_real_sdk) ... ok
+test_jdk21_default_source_compilation (test_adapters.AdapterTests.test_jdk21_default_source_compilation) ... ok
+test_ownerCancelDropsLateCallback (test_adapters.AdapterTests.test_ownerCancelDropsLateCallback) ... ok
+test_ownerExplicitRetry (test_adapters.AdapterTests.test_ownerExplicitRetry) ... ok
+test_ownerLocalFlow (test_adapters.AdapterTests.test_ownerLocalFlow) ... ok
+test_ownerQueuedInputsWipedOnClose (test_adapters.AdapterTests.test_ownerQueuedInputsWipedOnClose) ... ok
+test_ownerRecreationDetachesView (test_adapters.AdapterTests.test_ownerRecreationDetachesView) ... ok
+test_ownerRejectsTelegram (test_adapters.AdapterTests.test_ownerRejectsTelegram) ... ok
+test_ownerWorkerRejectsSafely (test_adapters.AdapterTests.test_ownerWorkerRejectsSafely) ... ok
+test_storeCloseReentrant (test_adapters.AdapterTests.test_storeCloseReentrant) ... ok
+test_storeCompletedLocalReceipt (test_adapters.AdapterTests.test_storeCompletedLocalReceipt) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 5.251s
+
+OK
