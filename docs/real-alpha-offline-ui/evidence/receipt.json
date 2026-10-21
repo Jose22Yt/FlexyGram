@@ -1,0 +1,48 @@
+{
+  "code_commit": "cba121088a4d3c2f611b704e0bf33d069c07a769",
+  "code_tree": "2f1116e08812924b781589d2ea47a31c4cd6eeb8",
+  "base_commit": "57e3d958d161d77f3c468dcd9dc45644ccbc2fe7",
+  "pr43_reviewed_head": "4cc8fd1cb87d646c8f196cecc2e86472923c590f",
+  "merge_tree_with_pr43": "cad86c6acbcdd7694865f73e9845574ad33ed6b9",
+  "merge_tree_exit_code": 0,
+  "environment": {
+    "python": "3.11.17",
+    "jdk": "JBR 21.0.10+7-1163.105",
+    "groovy": "4.0.32 from Gradle 9.7.1",
+    "sdk_stubs_api": 24
+  },
+  "commands": [
+    "python3.11 tools/real_alpha_offline_ui/materialize.py",
+    "python3.11 tools/real_alpha_offline_ui/materialize.py --check",
+    "python3.11 -m unittest discover -s tests/real_alpha_offline_ui -v",
+    "python3.11 -O -m unittest discover -s tests/real_alpha_offline_ui -v",
+    "git merge-tree --write-tree cba121088a4d3c2f611b704e0bf33d069c07a769 4cc8fd1cb87d646c8f196cecc2e86472923c590f"
+  ],
+  "final_results": {
+    "distinct_tests": 24,
+    "normal": {
+      "passed": 24,
+      "failed": 0,
+      "skipped": 0
+    },
+    "optimized_python": {
+      "passed": 24,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "development_failure": "The newly added message-placeholder regression initially failed: the original condition occurs four times. All four count/type/bind paths were guarded consistently and both final runs passed.",
+  "android_build": {
+    "attempted": false,
+    "reason": "SDK37, BuildTools36, NDK27.2 and CMake3.31.6 unavailable; previous blocked builds not repeated"
+  },
+  "android_execution": false,
+  "apk_created": false,
+  "files": {
+    "host-optimized.log": "231cffc1d3f83dcf90cc315a3ae5f501cf657b861f2f3d3aec20546bc20ebe4c",
+    "host-normal.log": "82bb9481a0fb8b88bc11a327aa8f302cc2274ace296c13bd3034f3fe63c16a03"
+  },
+  "source_lock_sha256": "89be0732b5ed2f1903b6df1bf18f4659a368f2b4872c9fc47f4a6eddc112c8ab",
+  "sdk24_jar_sha256": "4c438bf1b3d4e6104faccc62e1ffe95ef197b88055497b540a871349e93c8685",
+  "generated_at_utc": "2026-10-21T22:23:48.588694+00:00"
+}
