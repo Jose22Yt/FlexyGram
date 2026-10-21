@@ -1,0 +1,47 @@
+{
+  "complete_original_request_classes": [
+    "TL_auth_sendCode",
+    "TL_auth_signIn",
+    "TL_auth_signUp",
+    "TL_auth_checkPassword",
+    "TL_auth_exportLoginToken",
+    "TL_auth_importLoginToken",
+    "TL_codeSettings",
+    "InputCheckPasswordSRP",
+    "TL_inputCheckPasswordSRP",
+    "TL_inputCheckPasswordEmpty",
+    "PasswordKdfAlgo",
+    "TL_passwordKdfAlgoUnknown",
+    "TL_passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow",
+    "TL_account.getPassword"
+  ],
+  "complete_original_files": [
+    "TLMethod.java",
+    "InputSerializedData.java",
+    "OutputSerializedData.java",
+    "SRPHelper.java"
+  ],
+  "projected_reply_declarations": 32,
+  "full_TLRPC_compiled": false,
+  "full_LoginActivity_compiled": false,
+  "wire_parser_executed": false,
+  "source_sha256": {
+    "TLRPC.java": "413c0d09f15ad5175cd3bdab24bebc464d235af195bdfd2f803a328884a50dae",
+    "TL_account.java": "44e00cd1251d7332bbc378d2a5da71145c84906c5021715c34d7125d7707fc91"
+  },
+  "request_body_sha256": {
+    "TL_auth_sendCode": "116c802aef7673b6d66cf2014ecd2e326616bf9cfcac50621aab2276040adf9a",
+    "TL_auth_signIn": "1f05101276d75234fbb23dd6500a304c15f382b5aa6f935339740369790ae9c6",
+    "TL_auth_signUp": "b54659dcb6a1d3e6e35b0b28dacf4742b73661da945d4b9481245db000b5bdb2",
+    "TL_auth_checkPassword": "bf69fb34cfbf8cc4418da64cdb7cec181c864146a41c7552d2b4102e07a09cb8",
+    "TL_auth_exportLoginToken": "c8ae0d5a979ba847f2a2219b1e3d0228d79ae5d7395491bbfd61e3cb02e454cf",
+    "TL_auth_importLoginToken": "e6669d6609266f2828ea881e5f6c9ab48cb64bffd40c9921dfce76d77456cd52",
+    "TL_codeSettings": "0a0d1e79978749c7cec3dbadadc6b148032bf111e8bbf8591503aa429b4b3d25",
+    "InputCheckPasswordSRP": "d338e1f0bf3fe72dfdd3ac10afed29f7cf96954f2efe647cf3959bf5d4dfffb8",
+    "TL_inputCheckPasswordSRP": "f937c6f06649775cc4383268b5c3696f44ceaed225cd5ce73ecce638a0f81bfe",
+    "TL_inputCheckPasswordEmpty": "1c95e11b25830fb24e3ad2908c72d00b511ecf1f0f850de4885078dc44513eab",
+    "PasswordKdfAlgo": "8f3401f8f123d20a34e2fc384e41330564e4b476c4e999f69ee2f017e49011c9",
+    "TL_passwordKdfAlgoUnknown": "fbbaadbbebc648f6c0b61e031a2aedd8c2aead8336ac6128a0ead3822c1dfc57",
+    "TL_passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow": "e6daa4076416534494d26dcaee8c7c92b0a98725b65f9bff8fb3ed39777df09a"
+  }
+}

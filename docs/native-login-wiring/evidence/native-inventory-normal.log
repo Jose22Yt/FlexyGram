@@ -1,0 +1,6 @@
+test_no_shared_client_or_capability_files_changed (test_native_login.NativeLoginTests.test_no_shared_client_or_capability_files_changed) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 2.325s
+
+OK
