@@ -95,8 +95,8 @@ public final class SessionHarness {
         case "uiRecreation":{List<Runnable> queue=new ArrayList<>();int[] oldCalls={0},newCalls={0};a.observe(queue::add,snap->oldCalls[0]++);need(a.initialize());a.start(secret());a.observe(queue::add,snap->newCalls[0]++);for(Runnable task:new ArrayList<>(queue))task.run();need(oldCalls[0]==0&&newCalls[0]==1&&t.submits==1);break;}
         case "uiOutOfOrder":{List<Runnable> queue=new ArrayList<>();List<UiSnapshot> observed=new ArrayList<>();a.observe(queue::add,observed::add);need(a.initialize());a.start(secret());Collections.reverse(queue);for(Runnable task:queue)task.run();need(observed.size()==1&&observed.get(0).state==State.STARTING);break;}
         case "uiCloseDropsQueued":{List<Runnable> queue=new ArrayList<>();int[] count={0};a.observe(queue::add,snap->count[0]++);a.close();for(Runnable task:queue)task.run();need(count[0]==0);denied(()->a.observe(Runnable::run,snap->{}));break;}
-        case "uiObserverFailure":{AuthUiRelay relay=new AuthUiRelay(a.snapshot());relay.attach(Runnable::run,snap->{throw new IllegalStateException(CANARY);});need(relay.observerFailures()==1&&a.snapshot().state==State.NEW&&t.submits==0);break;}
-        case "uiExecutorFailure":{AuthUiRelay relay=new AuthUiRelay(a.snapshot());relay.attach(task->{throw new IllegalStateException(CANARY);},snap->{throw new AssertionError();});need(relay.executorFailures()==1&&t.submits==0);break;}
+        case "uiObserverFailure":{a.observe(Runnable::run,snap->{throw new IllegalStateException(CANARY);});need(a.uiObserverFailures()==1&&a.snapshot().state==State.NEW&&t.submits==0);break;}
+        case "uiExecutorFailure":{a.observe(task->{throw new IllegalStateException(CANARY);},snap->{throw new AssertionError();});need(a.uiExecutorFailures()==1&&t.submits==0);break;}
         case "uiScopeRejected":{AuthUiRelay relay=new AuthUiRelay(a.snapshot());AuthenticationController other=new AuthenticationController(closed(scope(1)),new Transport(scope(1)),s);denied(()->relay.publish(other.snapshot()));break;}
         case "uiOldBindingCannotCloseNew":{AuthUiRelay.Binding old=a.observe(Runnable::run,snap->{});int[] calls={0};a.observe(Runnable::run,snap->calls[0]++);old.close();need(a.initialize());need(calls[0]>=2);break;}
         case "uiBindingReleasesObserver":{AuthUiRelay.Binding binding=a.observe(task->{},snap->{});binding.close();Field observer=binding.getClass().getDeclaredField("observer");observer.setAccessible(true);need(observer.get(binding)==null);break;}
@@ -152,7 +152,7 @@ public final class SessionHarness {
         case "authForeignStore":s.reported=scope(1);need(!a.initialize());need(a.snapshot().fault==Fault.INVALID_SCOPE&&t.init==0&&s.writes==0);break;
         case "authNullStore":s.nullSnapshot=true;need(!a.initialize());need(a.snapshot().fault==Fault.INVALID_SCOPE&&t.init==0);break;
         case "authReadFailure":s.failRead=true;need(!a.initialize());need(!a.initialize());need(a.snapshot().fault==Fault.STORAGE&&t.init==0);break;
-        case "authInitFailure":t.failInit=true;need(!a.initialize());need(!a.initialize());need(a.snapshot().fault==Fault.INITIALIZATION&&t.init==1&&t.closes==1);break;
+        case "authInitFailure":t.failInit=true;need(!a.initialize());need(!a.initialize());need(a.snapshot().fault==Fault.INITIALIZATION&&t.init==1&&t.closes==1&&a.adapterFailures()==1);break;
         case "authStartReentry":need(a.initialize());need(a.start(secret()));need(!a.start(secret()));need(t.submits==1&&a.snapshot().state==State.STARTING);break;
         case "authCodeBeforeStart":need(a.initialize());need(!a.submitCode(secret()));need(t.submits==0);break;
         case "authCodeReentry":code(a,t);need(a.submitCode(secret()));need(!a.submitCode(secret()));need(t.submits==2&&a.snapshot().state==State.VERIFYING);break;

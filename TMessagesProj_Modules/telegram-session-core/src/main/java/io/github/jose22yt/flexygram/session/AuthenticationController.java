@@ -58,6 +58,9 @@ public final class AuthenticationController implements AutoCloseable {
     public AuthUiRelay.Binding observe(java.util.concurrent.Executor executor, AuthUiRelay.Observer observer) {
         return ui.attach(executor,observer);
     }
+    public int uiObserverFailures() { return ui.observerFailures(); }
+    public int uiExecutorFailures() { return ui.executorFailures(); }
+    public int adapterFailures() { return broker.adapterFailures(); }
     public synchronized UiSnapshot snapshot() { return new UiSnapshot(scope,state,fault,revision); }
     public boolean initialize() {
         long epoch;
