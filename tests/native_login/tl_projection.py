@@ -34,7 +34,7 @@ def write_projection(folder):
         'TL_auth_authorizationSignUpRequired':['terms_of_service'], 'TL_help_termsOfService':[],
         'User':['id','phone'], 'TL_user':[],
         'auth_SentCode':['type','phone_code_hash','authorization'], 'TL_auth_sentCode':[],
-        'TL_auth_sentCodeSuccess':[], 'TL_auth_sentCodePaymentRequired':[], 'auth_SentCodeType':[],
+        'TL_auth_sentCodeSuccess':[], 'TL_auth_sentCodePaymentRequired':[], 'auth_SentCodeType':['length'],
         'auth_LoginToken':[], 'TL_auth_loginToken':['expires','token'],
         'TL_auth_loginTokenMigrateTo':['dc_id','token'], 'TL_auth_loginTokenSuccess':['authorization'],
         'PasswordKdfAlgo':[], 'TL_passwordKdfAlgoUnknown':[],

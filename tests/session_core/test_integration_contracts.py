@@ -78,7 +78,7 @@ class IntegrationContracts(unittest.TestCase):
         allowed=['TMessagesProj_Modules/telegram-session-core/','tests/session_core/','patches/session-core/','docs/session-core/']
         # Child-stage inventory only: original shared/build files must still be byte-identical.
         allowed+=['TMessagesProj_Modules/telegram-session-android/','tests/session_android/','docs/session-android/']
-        allowed+=['TMessagesProj_Modules/telegram-native-login/','tests/native_login/','docs/native-login/','TMessagesProj_Modules/telegram-login-wiring/','tests/native_login_wiring/','docs/native-login-wiring/','tools/native_login_wiring/','patches/native-login-wiring/']
+        allowed+=['TMessagesProj_Modules/telegram-native-login/','tests/native_login/','docs/native-login/','TMessagesProj_Modules/telegram-login-wiring/','tests/native_login_wiring/','docs/native-login-wiring/','tools/native_login_wiring/','patches/native-login-wiring/','TMessagesProj_Modules/telegram-login-local-ui/','tests/native_login_pages/','tools/native_login_pages/','patches/native-login-pages/','docs/native-login-pages/']
         for path in changed:self.assertTrue(any(path.startswith(prefix) for prefix in allowed),path)
         for path in self.paths:
             before=subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT)

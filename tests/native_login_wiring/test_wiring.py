@@ -58,8 +58,8 @@ class WiringTests(unittest.TestCase):
         for path in protected:self.assertEqual(subprocess.check_output(['git','diff','--name-only','19b515e0ce63bdecae235b434ca265dbaf4d48ca','--',path],cwd=ROOT,text=True),'')
         self.assertNotIn('telegram-login-wiring',(ROOT/'settings.gradle').read_text())
         changed=subprocess.check_output(['git','diff','--name-only','19b515e0ce63bdecae235b434ca265dbaf4d48ca'],cwd=ROOT,text=True).splitlines()
-        exact={'tests/native_login/test_native_login.py','tests/session_android/test_adapters.py','tests/session_core/test_integration_contracts.py'}
-        for path in changed:self.assertTrue(path in exact or path.startswith(('TMessagesProj_Modules/telegram-login-wiring/','tests/native_login_wiring/','docs/native-login-wiring/','patches/native-login-wiring/','tools/native_login_wiring/')),path)
+        exact={'TMessagesProj_Modules/telegram-native-login/src/main/java/io/github/jose22yt/flexygram/login/NativeLoginProtocol.java','TMessagesProj_Modules/telegram-native-login/src/main/java/io/github/jose22yt/flexygram/login/NativeLoginTransport.java','TMessagesProj_Modules/telegram-native-login/src/telegram/java/io/github/jose22yt/flexygram/login/TlAuthResponses.java','tests/native_login/tl_projection.py','tests/native_login/test_native_login.py','tests/session_android/test_adapters.py','tests/session_core/test_integration_contracts.py'}
+        for path in changed:self.assertTrue(path in exact or path.startswith(('TMessagesProj_Modules/telegram-login-wiring/','tests/native_login_wiring/','docs/native-login-wiring/','patches/native-login-wiring/','tools/native_login_wiring/','TMessagesProj_Modules/telegram-login-local-ui/','tests/native_login_pages/','tools/native_login_pages/','patches/native-login-pages/','docs/native-login-pages/')),path)
     def test_patches_apply_only_to_temporary_copies(self):
         original=(ROOT/'TMessagesProj/src/main/java/org/telegram/ui/LoginActivity.java').read_text()
         self.assertNotIn('bindPreparedLocalLogin',original)

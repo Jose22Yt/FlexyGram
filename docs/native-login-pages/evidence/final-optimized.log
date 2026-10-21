@@ -1,0 +1,42 @@
+test_accountChangeInvalidatesOldQueuedView (test_pages.PagesTests.test_accountChangeInvalidatesOldQueuedView) ... ok
+test_actual_gradle_overlay_branch_with_synthetic_providers (test_pages.PagesTests.test_actual_gradle_overlay_branch_with_synthetic_providers) ... ok
+test_appDeliveryUsesOriginalMessagePage (test_pages.PagesTests.test_appDeliveryUsesOriginalMessagePage) ... ok
+test_boundedInputMissingDependencyFailsClosed (test_pages.PagesTests.test_boundedInputMissingDependencyFailsClosed) ... ok
+test_callDeliveryNotEnabled (test_pages.PagesTests.test_callDeliveryNotEnabled) ... ok
+test_cancelBeforeWorkerDispatch (test_pages.PagesTests.test_cancelBeforeWorkerDispatch) ... ok
+test_channelMetadataContainsNoSecretsOrSerialization (test_pages.PagesTests.test_channelMetadataContainsNoSecretsOrSerialization) ... ok
+test_channel_has_no_persistence_network_or_raw_parameters (test_pages.PagesTests.test_channel_has_no_persistence_network_or_raw_parameters) ... ok
+test_consecutiveCodeTapsOneLocalRequest (test_pages.PagesTests.test_consecutiveCodeTapsOneLocalRequest) ... ok
+test_consecutivePhoneTapsOneLocalRequest (test_pages.PagesTests.test_consecutivePhoneTapsOneLocalRequest) ... ok
+test_constructor_requests_and_outer_notification_are_guarded (test_pages.PagesTests.test_constructor_requests_and_outer_notification_are_guarded) ... ok
+test_exact_source_scope_and_no_active_client_patch (test_pages.PagesTests.test_exact_source_scope_and_no_active_client_patch) ... ok
+test_guard_inventory_complete_for_declared_methods (test_pages.PagesTests.test_guard_inventory_complete_for_declared_methods) ... ok
+test_hostThemeRebindPreservesParameters (test_pages.PagesTests.test_hostThemeRebindPreservesParameters) ... ok
+test_inactiveVariantGuardPreservesLegacyPath (test_pages.PagesTests.test_inactiveVariantGuardPreservesLegacyPath) ... ok
+test_invalidCodeLengthFailsClosed (test_pages.PagesTests.test_invalidCodeLengthFailsClosed) ... ok
+test_lateResponseAfterCancelNoCallback (test_pages.PagesTests.test_lateResponseAfterCancelNoCallback) ... ok
+test_materialized_overlay_is_pinned_and_recovers_identically (test_pages.PagesTests.test_materialized_overlay_is_pinned_and_recovers_identically) ... ok
+test_nativeBackCancelsOnlyLocalRequest (test_pages.PagesTests.test_nativeBackCancelsOnlyLocalRequest) ... ok
+test_nativePasswordGuardFlow (test_pages.PagesTests.test_nativePasswordGuardFlow) ... ok
+test_nativePhoneSmsGuardFlow (test_pages.PagesTests.test_nativePhoneSmsGuardFlow) ... ok
+test_nativeRegisterGuardFlow (test_pages.PagesTests.test_nativeRegisterGuardFlow) ... ok
+test_native_page_factory_and_loops_reject_unsupported_slots (test_pages.PagesTests.test_native_page_factory_and_loops_reject_unsupported_slots) ... ok
+test_original_java_parser_syntax_only (test_pages.PagesTests.test_original_java_parser_syntax_only) ... ok
+test_patches_apply_to_pinned_copies_only (test_pages.PagesTests.test_patches_apply_to_pinned_copies_only) ... ok
+test_qrLifecycleAlwaysBlocked (test_pages.PagesTests.test_qrLifecycleAlwaysBlocked) ... ok
+test_queuedSecretWipedOnViewDetach (test_pages.PagesTests.test_queuedSecretWipedOnViewDetach) ... ok
+test_requiredTermsNotSilentlyAccepted (test_pages.PagesTests.test_requiredTermsNotSilentlyAccepted) ... ok
+test_sdk24_symbols_and_jdk21_source (test_pages.PagesTests.test_sdk24_symbols_and_jdk21_source) ... ok
+test_source_sets_patch_realalpha_only (test_pages.PagesTests.test_source_sets_patch_realalpha_only) ... ok
+test_storageFailureDoesNotDeleteOrRetry (test_pages.PagesTests.test_storageFailureDoesNotDeleteOrRetry) ... ok
+test_transitionTicketsRejectOldAndDestroyedCallbacks (test_pages.PagesTests.test_transitionTicketsRejectOldAndDestroyedCallbacks) ... ok
+test_unavailablePasswordParametersNoNativeFallback (test_pages.PagesTests.test_unavailablePasswordParametersNoNativeFallback) ... ok
+test_uncertainStorageBlocksFurtherActions (test_pages.PagesTests.test_uncertainStorageBlocksFurtherActions) ... ok
+test_unknownLengthNotEnabled (test_pages.PagesTests.test_unknownLengthNotEnabled) ... ok
+test_viewRecreationNoReplayAndOldRendererDetached (test_pages.PagesTests.test_viewRecreationNoReplayAndOldRendererDetached) ... ok
+test_workerFailureNoFallback (test_pages.PagesTests.test_workerFailureNoFallback) ... ok
+
+----------------------------------------------------------------------
+Ran 37 tests in 10.940s
+
+OK

@@ -1,0 +1,66 @@
+test_absent_editor_array (test_cleanup.OriginalEditorCleanupTests.test_absent_editor_array) ... ok
+test_existing_suppression_restored (test_cleanup.OriginalEditorCleanupTests.test_existing_suppression_restored) ... FAIL
+test_original_editor_digits_cleared (test_cleanup.OriginalEditorCleanupTests.test_original_editor_digits_cleared) ... FAIL
+test_partial_editor_array (test_cleanup.OriginalEditorCleanupTests.test_partial_editor_array) ... FAIL
+test_unavailable_container_still_clears_metadata (test_cleanup.OriginalEditorCleanupTests.test_unavailable_container_still_clears_metadata) ... FAIL
+
+======================================================================
+FAIL: test_existing_suppression_restored (test_cleanup.OriginalEditorCleanupTests.test_existing_suppression_restored)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram-local-pages/tests/native_login_pages/test_cleanup.py", line 85, in test_existing_suppression_restored
+    def test_existing_suppression_restored(self):self.check('suppressed')
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram-local-pages/tests/native_login_pages/test_cleanup.py", line 81, in check
+    self.assertEqual(result.returncode, 0, result.stderr)
+AssertionError: 1 != 0 : Exception in thread "main" java.lang.IllegalStateException: HOST_CLEANUP_CONTRACT_FAILED
+	at CleanupHarness.require(CleanupHarness.java:40)
+	at CleanupHarness.main(CleanupHarness.java:49)
+
+
+======================================================================
+FAIL: test_original_editor_digits_cleared (test_cleanup.OriginalEditorCleanupTests.test_original_editor_digits_cleared)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram-local-pages/tests/native_login_pages/test_cleanup.py", line 84, in test_original_editor_digits_cleared
+    def test_original_editor_digits_cleared(self):self.check('clear')
+                                                  ^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram-local-pages/tests/native_login_pages/test_cleanup.py", line 81, in check
+    self.assertEqual(result.returncode, 0, result.stderr)
+AssertionError: 1 != 0 : Exception in thread "main" java.lang.IllegalStateException: HOST_CLEANUP_CONTRACT_FAILED
+	at CleanupHarness.require(CleanupHarness.java:40)
+	at CleanupHarness.main(CleanupHarness.java:48)
+
+
+======================================================================
+FAIL: test_partial_editor_array (test_cleanup.OriginalEditorCleanupTests.test_partial_editor_array)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram-local-pages/tests/native_login_pages/test_cleanup.py", line 87, in test_partial_editor_array
+    def test_partial_editor_array(self):self.check('partial')
+                                        ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram-local-pages/tests/native_login_pages/test_cleanup.py", line 81, in check
+    self.assertEqual(result.returncode, 0, result.stderr)
+AssertionError: 1 != 0 : Exception in thread "main" java.lang.IllegalStateException: HOST_CLEANUP_CONTRACT_FAILED
+	at CleanupHarness.require(CleanupHarness.java:40)
+	at CleanupHarness.main(CleanupHarness.java:51)
+
+
+======================================================================
+FAIL: test_unavailable_container_still_clears_metadata (test_cleanup.OriginalEditorCleanupTests.test_unavailable_container_still_clears_metadata)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram-local-pages/tests/native_login_pages/test_cleanup.py", line 86, in test_unavailable_container_still_clears_metadata
+    def test_unavailable_container_still_clears_metadata(self):self.check('unavailable')
+                                                               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram-local-pages/tests/native_login_pages/test_cleanup.py", line 81, in check
+    self.assertEqual(result.returncode, 0, result.stderr)
+AssertionError: 1 != 0 : Exception in thread "main" java.lang.NullPointerException: Cannot invoke "CleanupHarness$CodeFieldContainer.setText(String)" because "<local2>.codeFieldContainer" is null
+	at CleanupHarness.localClearPage(CleanupHarness.java:36)
+	at CleanupHarness.main(CleanupHarness.java:50)
+
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.743s
+
+FAILED (failures=4)

@@ -14,10 +14,11 @@ public final class NativeLoginTransport implements TransportPort {
         public final Stage stage;
         public final Error error;
         public final Route route;
+        public final int codeLength;
         public final boolean termsRequired;
         public final long revision;
-        private Snapshot(SessionScope scope,Stage stage,Error error,Route route,boolean terms,long revision) {
-            this.scope=scope;this.stage=stage;this.error=error;this.route=route;termsRequired=terms;this.revision=revision;
+        private Snapshot(SessionScope scope,Stage stage,Error error,Route route,int codeLength,boolean terms,long revision) {
+            this.scope=scope;this.stage=stage;this.error=error;this.route=route;this.codeLength=codeLength;termsRequired=terms;this.revision=revision;
         }
         @Override public String toString(){return "NativeLogin["+stage+","+error+"]";}
     }
@@ -39,7 +40,7 @@ public final class NativeLoginTransport implements TransportPort {
     private Parent parent;
     private Call call;
     private boolean initialized,closed,qr,termsRequired,migrated;
-    private int targetDc,discarded,adapterFailures;
+    private int targetDc,discarded,adapterFailures,codeLength;
     private long revision,deadline;
     private Action retryAction;
     private Runnable stateSignal=()->{};
@@ -75,7 +76,7 @@ public final class NativeLoginTransport implements TransportPort {
         if(signal==null||initialized||closed)throw new IllegalStateException("STATE_SIGNAL_BINDING_REJECTED");
         stateSignal=signal;
     }
-    public synchronized Snapshot snapshot(){return new Snapshot(scope,stage,error,route,termsRequired,revision);}
+    public synchronized Snapshot snapshot(){return new Snapshot(scope,stage,error,route,codeLength,termsRequired,revision);}
     public synchronized int discardedReplies(){return discarded;}
     public synchronized int adapterFailures(){return adapterFailures;}
     public synchronized boolean selectQrLocal(boolean explicitChoice) {
@@ -216,7 +217,7 @@ public final class NativeLoginTransport implements TransportPort {
             return finish(true);
         }
         if(response.kind==Kind.CODE&&action==Action.SEND_CODE) {
-            route=response.route;
+            route=response.route;codeLength=response.value;
             if(route==Route.EMAIL||route==Route.SETUP_EMAIL||route==Route.FIREBASE||route==Route.PAYMENT||route==Route.FRAGMENT_SMS) {
                 change(Stage.FAILED,Error.PROTOCOL);return finish(false);
             }

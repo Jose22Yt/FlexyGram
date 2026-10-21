@@ -1,0 +1,37 @@
+test_storageFailureDoesNotDeleteOrRetry (test_pages.PagesTests.test_storageFailureDoesNotDeleteOrRetry) ... FAIL
+test_uncertainStorageBlocksFurtherActions (test_pages.PagesTests.test_uncertainStorageBlocksFurtherActions) ... FAIL
+
+======================================================================
+FAIL: test_storageFailureDoesNotDeleteOrRetry (test_pages.PagesTests.test_storageFailureDoesNotDeleteOrRetry)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram-local-pages/tests/native_login_pages/test_pages.py", line 52, in <lambda>
+    for case in CASES:setattr(PagesTests,'test_'+case,lambda self,c=case:self.run_case(c))
+                                                                         ^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram-local-pages/tests/native_login_pages/test_pages.py", line 18, in run_case
+    self.assertNotIn('SYNTHETIC_LOCAL_UI_SECRET_77121',p.stdout+p.stderr);self.assertEqual(p.returncode,0,p.stdout+p.stderr);self.assertIn('HOST_NATIVE_GUARDS_LOCAL_ONLY',p.stdout)
+                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : Exception in thread "main" java.lang.AssertionError: LOCAL_PAGES_CONTRACT
+	at io.github.jose22yt.flexygram.login.PagesHarness.yes(PagesHarness.java:11)
+	at io.github.jose22yt.flexygram.login.PagesHarness.main(PagesHarness.java:85)
+
+
+======================================================================
+FAIL: test_uncertainStorageBlocksFurtherActions (test_pages.PagesTests.test_uncertainStorageBlocksFurtherActions)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram-local-pages/tests/native_login_pages/test_pages.py", line 52, in <lambda>
+    for case in CASES:setattr(PagesTests,'test_'+case,lambda self,c=case:self.run_case(c))
+                                                                         ^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram-local-pages/tests/native_login_pages/test_pages.py", line 18, in run_case
+    self.assertNotIn('SYNTHETIC_LOCAL_UI_SECRET_77121',p.stdout+p.stderr);self.assertEqual(p.returncode,0,p.stdout+p.stderr);self.assertIn('HOST_NATIVE_GUARDS_LOCAL_ONLY',p.stdout)
+                                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : Exception in thread "main" java.lang.AssertionError: LOCAL_PAGES_CONTRACT
+	at io.github.jose22yt.flexygram.login.PagesHarness.yes(PagesHarness.java:11)
+	at io.github.jose22yt.flexygram.login.PagesHarness.main(PagesHarness.java:82)
+
+
+----------------------------------------------------------------------
+Ran 2 tests in 2.737s
+
+FAILED (failures=2)

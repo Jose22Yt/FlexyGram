@@ -30,9 +30,11 @@ public final class NativeLoginProtocol {
             if(kind==null || kind==Kind.ERROR || kind==Kind.CODE || kind==Kind.QR_MIGRATION)throw new IllegalArgumentException("RESPONSE_METADATA_REQUIRED");
             return new Response(kind,Route.NONE,Error.NONE,0,false);
         }
-        public static Response code(Route route) {
+        public static Response code(Route route) {return code(route,0);}
+        public static Response code(Route route,int length) {
             if(route==null||route==Route.NONE)throw new IllegalArgumentException("CODE_ROUTE_REQUIRED");
-            return new Response(Kind.CODE,route,Error.NONE,0,false);
+            if(length<0||length>12)return failure(Error.PROTOCOL);
+            return new Response(Kind.CODE,route,Error.NONE,length,false);
         }
         public static Response signup(boolean terms) {return new Response(Kind.SIGNUP,Route.NONE,Error.NONE,0,terms);}
         public static Response migration(int dc) {

@@ -1,0 +1,85 @@
+{
+  "code_commit": "3a7ef7e6105eec1286e63c05fe1c7f858b92968c",
+  "selections": [
+    [
+      "final",
+      [
+        "discover",
+        "-s",
+        "tests/native_login_pages",
+        "-v"
+      ]
+    ],
+    [
+      "previous-wiring",
+      [
+        "discover",
+        "-s",
+        "tests/native_login_wiring",
+        "-v",
+        "-k",
+        "originalSendSignInSerializers",
+        "-k",
+        "passwordOriginalRequestAndProofWipe",
+        "-k",
+        "signupOriginalFieldsAndOrigin",
+        "-k",
+        "qrOriginalMigrationTokenOwnedCopy",
+        "-k",
+        "invalidCodeRetryPreservesContext",
+        "-k",
+        "srpRefreshRequiresNewParameters",
+        "-k",
+        "cancelLateReplyAndNoNativeMutation",
+        "-k",
+        "no_live_transport_or_policy_changes"
+      ]
+    ],
+    [
+      "native-inventory",
+      [
+        "discover",
+        "-s",
+        "tests/native_login",
+        "-p",
+        "test_native_login.py",
+        "-k",
+        "no_shared_client",
+        "-v"
+      ]
+    ],
+    [
+      "android-inventory",
+      [
+        "discover",
+        "-s",
+        "tests/session_android",
+        "-p",
+        "test_adapters.py",
+        "-k",
+        "shared_sources_and_variants",
+        "-v"
+      ]
+    ],
+    [
+      "core-inventory",
+      [
+        "discover",
+        "-s",
+        "tests/session_core",
+        "-p",
+        "test_integration_contracts.py",
+        "-k",
+        "no_existing_shared_or_build",
+        "-v"
+      ]
+    ]
+  ],
+  "modes": {
+    "normal": [],
+    "optimized": [
+      "-O"
+    ]
+  },
+  "python": "/root/.local/bin/python3.11"
+}

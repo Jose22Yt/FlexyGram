@@ -1,0 +1,29 @@
+setUpClass (test_pages.PagesTests) ... ERROR
+
+======================================================================
+ERROR: setUpClass (test_pages.PagesTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram-local-pages/tests/native_login_pages/test_pages.py", line 13, in setUpClass
+    if p.returncode:raise RuntimeError(p.stderr)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: warning: [options] source value 8 is obsolete and will be removed in a future release
+warning: [options] target value 8 is obsolete and will be removed in a future release
+warning: [options] To suppress warnings about obsolete options, use -Xlint:-options.
+/tmp/tmp_vft44uw/fixtures/OriginalGuardHost.java:16: error: incompatible types: unexpected return value
+public void setParams(Bundle params, boolean restore){if (localLoginClosed()) { localApplyPage(currentViewNum); return; }legacy++;return false;}
+                                                                                                                                         ^
+/tmp/tmp_vft44uw/fixtures/OriginalGuardHost.java:29: error: incompatible types: unexpected return value
+public void exportLoginToken(boolean show){if (localLoginClosed()) { return; }legacy++;return false;}
+                                                                                              ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-local-pages/tests/native_login_pages/PagesHarness.java:100: error: incompatible types: Parameters cannot be converted to Serializable
+   f.code();for(Field field:Parameters.class.getDeclaredFields())yes(field.getType().isPrimitive()||field.getType().isEnum());yes(!(f.local.parameters(f.view) instanceof java.io.Serializable));yes(!f.local.parameters(f.view).toString().contains(CANARY));break;
+                                                                                                                                                      ^
+3 errors
+3 warnings
+
+
+----------------------------------------------------------------------
+Ran 0 tests in 2.697s
+
+FAILED (errors=1)
