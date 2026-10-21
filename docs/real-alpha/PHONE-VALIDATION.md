@@ -12,8 +12,8 @@ Completar este recibo antes de probar; un campo pendiente bloquea la instalació
 
 | Campo | Valor que debe completarse |
 |---|---|
-| Commit de corrección | Según informe final/PR separado |
-| SHA-256 unsigned corregida | Según gate de la compilación nueva |
+| Commit de código corregido | `50d82ba07adfe4acd251fb5761f1334050fb3ff9` — PR #37; Atrás independiente `acee30b2237e7a776c9053cd4c8f94b371708e9e` |
+| SHA-256 unsigned corregida | `93d80550614480728c3b65bc7c52217a79711fe6395c697662788e85c04b06b6` — 113076087 bytes |
 | Certificado SHA-256 autorizado | Pendiente de autorización; no existe firma realAlpha en esta entrega |
 | SHA-256 y tamaño de la copia firmada | Pendientes; serán distintos del unsigned |
 | Autorización de entrega e instalación | Pendiente, vinculada a la copia firmada y certificado anteriores |
