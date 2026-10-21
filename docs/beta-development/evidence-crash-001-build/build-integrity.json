@@ -1,0 +1,16 @@
+{
+  "native_and_python_tasks": [
+    ":TMessagesProj:buildChaquopyRuntimeArm64V8a",
+    ":TMessagesProj:configureCMakeDebug[arm64-v8a]-2",
+    ":TMessagesProj:buildCMakeDebug[arm64-v8a]-2",
+    ":TMessagesProj:generateBetaDevelopmentDebugPythonJniLibs"
+  ],
+  "build_successful": true,
+  "task_summary": "248 actionable tasks:196 executed,52 from cache",
+  "native_skip": false,
+  "first_signed_remote_id": "id:7uKZZ5yXrxEAAAAAAAAACQ",
+  "first_signed_remote_revision": "0165e4b8d72b4f300000003314317a1",
+  "first_signed_remote_bytes": 113163015,
+  "gradle_overlay_sha256": "c91a190ee5c2fb72ad02ae9d8566a8ce87b0b5c98e82ae701499245f52d11d9c",
+  "android_executed": false
+}

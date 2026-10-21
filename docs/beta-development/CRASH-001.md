@@ -5,8 +5,9 @@
 El responsable reprodujo en su Android el cierre del proceso al pulsar
 Synthetic conversation en la APK del commit
 `97dfb08e58159b31d322dd8435080fb039abdeb9`.
-No se recibió una excepción/stack trace y esta sesión no dispone de ejecución:
-`No usable execution environment is available`.
+No se recibió una excepción/stack trace. Work1 no pudo ejecutar en su sesión;
+Work2 ya completó las regresiones host y el build unsigned del código
+`2d532562f68946a83f5cdd2fc1059e3024beb525`. Véase [resultado real](CRASH-001-BUILD.md).
 No se reprodujo el cierre desde esta sesión ni se inspeccionó el vídeo.
 
 Hechos de fuente en ese commit:
@@ -50,7 +51,7 @@ la exportación futura de #32, aplicar este diff, no copiar una Activity complet
 `test_offline_conversation.py` compila wrappers Java reales con dobles framework.
 Su sustituto de ThemePreviewMessagesCell lanza un error si se invoca; UserConfig
 rechaza sesiones y JNI/Python se declaran no disponibles. Esto comprueba el
-aislamiento en el host cuando se ejecute, **no reproduce el fallo Android**.
+aislamiento en el host ya ejecutado, **no reproduce el fallo Android**.
 
 Nueve casos (incluidos dos del commit de insets): abrir/volver sin cuenta, contenido sin runtimes opcionales,
 25 ciclos, toques rápidos/Atrás durante transición, temas claro/oscuro,
@@ -58,17 +59,17 @@ recreación, ausencia de imports de cuenta/runtime en la vista, redispatch de
 insets/IME y cabeceras sin doble margen.
 No se omiten pruebas cuando falta JDK: fallan por requisito ausente.
 
-Pendiente en un host con Python 3.11 y JAVA_HOME=JDK21:
+Ejecutado en Python 3.11.17 y JDK21.0.10 (9/9 en ambos modos, cero omisiones):
 
 ```sh
 python3.11 -m unittest discover -s tests/beta_development -p test_offline_conversation.py -v
 python3.11 -O -m unittest discover -s tests/beta_development -p test_offline_conversation.py -v
 ```
 
-Después ejecutar la suite beta existente con sus requisitos Gradle/CMake
-originales y compilar `:TMessagesProj:assembleBetaDevelopmentDebug` ARM64,
-JNI/Chaquopy completos y sin firma; aplicar los verificadores existentes.
-No se ha hecho en esta sesión: **0 pruebas ejecutadas; compilación pendiente**.
+También se ejecutaron 45 pruebas beta (incluyen las nueve),11 de importador y21
+de handoff:77 métodos distintos PASS normal/-O. Build ARM64 JNI/Chaquopy completo
+**BUILD SUCCESSFUL en14m37s** y gate estático aprobado. No ejecución Android.
+El informe y los logs están en [CRASH-001-BUILD.md](CRASH-001-BUILD.md).
 
 Para aceptar el arreglo hace falta una nueva APK identificada por su hash,
 verificación offline y las autorizaciones separadas de firma/entrega/instalación.

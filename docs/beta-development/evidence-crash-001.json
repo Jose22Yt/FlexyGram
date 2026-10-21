@@ -6,12 +6,25 @@
   "android_crash_reported_by_owner": true,
   "exception_available": false,
   "root_cause_confirmed": false,
-  "execution_environment": "unavailable",
+  "execution_environment": "host_available_no_android_runtime",
   "host_regressions_prepared": 9,
-  "host_tests_executed": 0,
-  "host_tests_passed": null,
-  "host_tests_failed": null,
+  "host_tests_executed": 9,
+  "host_tests_passed": 9,
+  "host_tests_failed": 0,
   "android_tests_executed": 0,
-  "gradle_build": "NOT_RUN",
-  "apk_changed": false
+  "gradle_build": "BUILD_SUCCESSFUL",
+  "apk_changed": true,
+  "source_commit": "2d532562f68946a83f5cdd2fc1059e3024beb525",
+  "host_modes": [
+    "normal",
+    "-O"
+  ],
+  "host_distinct_suite_methods": 77,
+  "gradle_elapsed": "14m37s",
+  "original_apk_modified": false,
+  "new_unsigned_apk_sha256": "2ca59f8f4575850d42b6fad56e231dbbbe2cff077fa93bf33aa3b638a3ae0d00",
+  "new_unsigned_apk_bytes": 113102119,
+  "private_backup": "LOCAL_VERIFIED_PENDING_UPLOAD_AUTHORIZATION",
+  "new_identity_generated": false,
+  "second_apk_signed": false
 }

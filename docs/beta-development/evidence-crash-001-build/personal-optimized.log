@@ -1,0 +1,16 @@
+test_cross_batch_operation_and_numeric_order (test_import_events.PersonalImportTests.test_cross_batch_operation_and_numeric_order) ... ok
+test_early_crash_without_events_reuses_real_log_parser (test_import_events.PersonalImportTests.test_early_crash_without_events_reuses_real_log_parser) ... ok
+test_false_counter_and_event_session_spoof_rejected (test_import_events.PersonalImportTests.test_false_counter_and_event_session_spoof_rejected) ... ok
+test_framestats_requires_real_refresh_input_and_keeps_fps_unknown (test_import_events.PersonalImportTests.test_framestats_requires_real_refresh_input_and_keeps_fps_unknown) ... ok
+test_loss_abandonment_or_pending_never_certifies_performance (test_import_events.PersonalImportTests.test_loss_abandonment_or_pending_never_certifies_performance) ... ok
+test_loss_counters_cannot_regress (test_import_events.PersonalImportTests.test_loss_counters_cannot_regress) ... ok
+test_missing_first_batch_rejected_before_orphan_acceptance (test_import_events.PersonalImportTests.test_missing_first_batch_rejected_before_orphan_acceptance) ... ok
+test_mixed_sessions_and_duplicate_batch_rejected (test_import_events.PersonalImportTests.test_mixed_sessions_and_duplicate_batch_rejected) ... ok
+test_partial_export_and_wrong_record_count_rejected (test_import_events.PersonalImportTests.test_partial_export_and_wrong_record_count_rejected) ... ok
+test_profile_is_declared_not_device_or_strict_16k_attestation (test_import_events.PersonalImportTests.test_profile_is_declared_not_device_or_strict_16k_attestation) ... ok
+test_user_text_cannot_add_private_observer_fields (test_import_events.PersonalImportTests.test_user_text_cannot_add_private_observer_fields) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 0.068s
+
+OK
