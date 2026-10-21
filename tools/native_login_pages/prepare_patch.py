@@ -33,6 +33,9 @@ def replace_once(source,old,new):
     if source.count(old)!=1:raise RuntimeError('AMBIGUOUS_ANCHOR:'+old[:80])
     return source.replace(old,new,1)
 def main():
+    for path in [TARGET,'TMessagesProj/build.gradle','patches/native-login-wiring/0001-realalpha-source-integration.patch','patches/native-login-wiring/0002-native-fragment-local-binding.patch']:
+        pinned=subprocess.check_output(['git','show','40faca6b04563bcacd02d0947addd4c18ff81e81:'+path],cwd=ROOT)
+        if (ROOT/path).read_bytes()!=pinned:raise RuntimeError('PINNED_INTEGRATION_CONTEXT_CHANGED:'+path)
     out=ROOT/'patches/native-login-pages';out.mkdir(parents=True,exist_ok=True)
     with tempfile.TemporaryDirectory() as d:
         temp=Path(d)
@@ -46,13 +49,13 @@ def main():
         s=replace_once(s,'    private View cachedFragmentView;',helpers+'\n    private View cachedFragmentView;')
         # Existing #39 binding is not an activation path for these pages.
         s=prefix(s,'public void bindPreparedLocalLogin(', '        if (localLoginClosed()) throw new IllegalStateException("USE_CLOSED_LOCAL_PAGES_BINDING");')
-        s=prefix(s,'public boolean onFragmentCreate()', '        if (localLoginClosed()) return preparedLocalSession != null && super.onFragmentCreate();')
+        s=prefix(s,'public boolean onFragmentCreate()', '        if (localLoginClosed()) return preparedLocalSession != null && !preparedLocalFragmentDestroyed && super.onFragmentCreate();')
         s=prefix(s,'public View createView(Context context)', '        if (localLoginClosed() && preparedLocalSession == null) throw new IllegalStateException("LOCAL_LOGIN_BINDING_REQUIRED");')
         s=s.replace('if (newAccount) {\n            ConnectionsManager.getInstance(currentAccount).setAppPaused','if (newAccount && !localLoginClosed()) {\n            ConnectionsManager.getInstance(currentAccount).setAppPaused')
-        s=prefix(s,'public void onFragmentDestroy()', '        if (localLoginClosed()) detachClosedLocalView();')
+        s=prefix(s,'public void onFragmentDestroy()', '        if (localLoginClosed()) { preparedLocalFragmentDestroyed = true; detachClosedLocalView(); cachedFragmentView = null; }')
         s=s.replace('        getNotificationCenter().removeObserver(this, NotificationCenter.didUpdateConnectionState);','        if (!localLoginClosed()) getNotificationCenter().removeObserver(this, NotificationCenter.didUpdateConnectionState);')
         s=s.replace('        getNotificationCenter().removeObserver(this, NotificationCenter.newSuggestionsAvailable);','        if (!localLoginClosed()) getNotificationCenter().removeObserver(this, NotificationCenter.newSuggestionsAvailable);')
-        s=prefix(s,'public void saveSelfArgs(Bundle outState)', '        if (localLoginClosed()) { if (preparedLocalSession != null) { outState.putBoolean("flexygram_local_auth_restart", true); outState.putInt("flexygram_local_auth_account", currentAccount); } return; }')
+        s=prefix(s,'public void saveSelfArgs(Bundle outState)', '        if (localLoginClosed()) { if (preparedLocalSession != null) { outState.putBoolean("flexygram_local_auth_restart", true); outState.putInt("flexygram_local_auth_slot", currentAccount); } return; }')
         s=s.replace('activityMode == MODE_LOGIN && preparedLocalLoginBinding == null ? loadCurrentState','activityMode == MODE_LOGIN && !localLoginClosed() && preparedLocalLoginBinding == null ? loadCurrentState')
         s=prefix(s,'public boolean onBackPressed(boolean invoked)', '        if (localLoginClosed()) { if (!invoked) return currentViewNum == VIEW_PHONE_INPUT; if (currentViewNum == VIEW_PHONE_INPUT) { localCancelPages(); return true; } localCancelPages(); setPage(VIEW_PHONE_INPUT, true, null, true); return false; }')
         for signature in ['public void onRequestPermissionsResultFragment(', 'public void onActivityResultFragment(', 'private void clearCurrentState()', 'private void needShowProgress(', 'private void resendCodeFromSafetyNet(', 'private void onAuthSuccess(TLRPC.TL_auth_authorization res, boolean afterSignup)', 'private void fillNextCodeParams(Bundle params, TLRPC.auth_SentCode res, boolean animated)', 'public void didReceivedNotification(int id, int account, Object... args)']:
@@ -73,6 +76,19 @@ def main():
         s=re.sub(r'^(        views\[(VIEW_\w+)\] = new .+;)$',lambda m:('        if (!localLoginClosed() || io.github.jose22yt.flexygram.login.local.EphemeralPages.allowedPage('+m[2]+')) '+m[1].strip()),s,flags=re.M)
         s=s.replace('for (SlideView slideView : views) {','for (SlideView slideView : views) {\n                    if (slideView == null) continue;')
         s=replace_once(s,'            views[a].setVisibility(a == 0 ? View.VISIBLE : View.GONE);','            if (views[a] == null) continue;\n            views[a].setVisibility(a == 0 ? View.VISIBLE : View.GONE);')
+        window_hooks="""
+            @Override
+            protected void onAttachedToWindow() {
+                super.onAttachedToWindow();
+                if (localLoginClosed() && !preparedLocalFragmentDestroyed) attachClosedLocalView();
+            }
+            @Override
+            protected void onDetachedFromWindow() {
+                if (localLoginClosed()) detachClosedLocalView();
+                super.onDetachedFromWindow();
+            }
+"""
+        s=replace_once(s,'        sizeNotifierFrameLayout = new SizeNotifierFrameLayout(context) {','        sizeNotifierFrameLayout = new SizeNotifierFrameLayout(context) {'+window_hooks)
         # createView has a cache return and a normal return. Attach only after original views exist.
         a,b,c=span(s,'public View createView(Context context)');chunk=s[a:c]
         chunk=chunk.replace('return fragmentView;','if (localLoginClosed()) attachClosedLocalView();\n            return fragmentView;')

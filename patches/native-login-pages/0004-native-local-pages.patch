@@ -40,7 +40,7 @@
  
      @Override
      public void onFragmentDestroy() {
-+        if (localLoginClosed()) detachClosedLocalView();
++        if (localLoginClosed()) { preparedLocalFragmentDestroyed = true; detachClosedLocalView(); cachedFragmentView = null; }
 +
          detachPreparedLocalLogin();
          super.onFragmentDestroy();
@@ -57,7 +57,7 @@
  
      @Override
      public boolean onFragmentCreate() {
-+        if (localLoginClosed()) return preparedLocalSession != null && super.onFragmentCreate();
++        if (localLoginClosed()) return preparedLocalSession != null && !preparedLocalFragmentDestroyed && super.onFragmentCreate();
 +
          getNotificationCenter().addObserver(this, NotificationCenter.didUpdateConnectionState);
          getNotificationCenter().addObserver(this, NotificationCenter.newSuggestionsAvailable);
@@ -71,7 +71,7 @@
          if (!"realAlpha".equals(org.telegram.messenger.BuildConfig.FLEXYGRAM_VARIANT)
                  || !org.telegram.messenger.DiagnosticPolicy.isIsolated()
                  || activityMode != MODE_LOGIN || binding == null || preparedLocalLoginBinding != null
-@@ -606,12 +620,140 @@
+@@ -606,12 +620,141 @@
      }
      // END FLEXYGRAM PREPARED LOCAL BINDING
  
@@ -82,6 +82,7 @@
 +    private io.github.jose22yt.flexygram.login.local.LocalTransitionFence preparedTransition;
 +    private AnimatorSet preparedPagesAnimation;
 +    private boolean preparedLocalViewAlive;
++    private boolean preparedLocalFragmentDestroyed;
 +    private io.github.jose22yt.flexygram.login.local.EphemeralPages.Status preparedLastLocalStatus;
 +    private static boolean localLoginClosed() {
 +        return "realAlpha".equals(org.telegram.messenger.BuildConfig.FLEXYGRAM_VARIANT)
@@ -95,11 +96,11 @@
 +        preparedLocalSession = session;
 +    }
 +    private boolean localViewActive() {
-+        return preparedLocalMode && preparedLocalViewAlive && activityMode == MODE_LOGIN
++        return preparedLocalMode && !preparedLocalFragmentDestroyed && preparedLocalViewAlive && activityMode == MODE_LOGIN
 +                && preparedLocalSession != null && preparedLocalSession.valid(preparedLocalView, currentAccount);
 +    }
 +    private void attachClosedLocalView() {
-+        if (localViewActive()) return;
++        if (preparedLocalFragmentDestroyed || localViewActive()) return;
 +        if (preparedLocalSession == null || preparedLocalSession.scope().account != currentAccount) return;
 +        preparedLocalViewAlive = true;
 +        preparedTransition = new io.github.jose22yt.flexygram.login.local.LocalTransitionFence();
@@ -212,7 +213,25 @@
              return fragmentView;
          }
  
-@@ -708,6 +850,7 @@
+@@ -635,6 +778,17 @@
+ 
+         sizeNotifierFrameLayout = new SizeNotifierFrameLayout(context) {
+             @Override
++            protected void onAttachedToWindow() {
++                super.onAttachedToWindow();
++                if (localLoginClosed() && !preparedLocalFragmentDestroyed) attachClosedLocalView();
++            }
++            @Override
++            protected void onDetachedFromWindow() {
++                if (localLoginClosed()) detachClosedLocalView();
++                super.onDetachedFromWindow();
++            }
++
++            @Override
+             protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+                 MarginLayoutParams marginLayoutParams = (MarginLayoutParams) floatingButton.getLayoutParams();
+                 int keyboardOffset = isCustomKeyboardVisible() ? AndroidUtilities.dp(CustomPhoneKeyboardView.KEYBOARD_HEIGHT_DP - 4) : 0;
+@@ -708,6 +862,7 @@
              protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
                  super.onLayout(changed, left, top, right, bottom);
                  for (SlideView slideView : views) {
@@ -220,7 +239,7 @@
                      MarginLayoutParams params = (MarginLayoutParams) slideView.getLayoutParams();
                      int childBottom = getHeight() + AndroidUtilities.dp(16);
                      if (!slideView.hasCustomKeyboard() && keyboardView.getVisibility() == VISIBLE) {
-@@ -723,6 +866,7 @@
+@@ -723,6 +878,7 @@
                  int width = getMeasuredWidth(), height = getMeasuredHeight();
  
                  for (SlideView slideView : views) {
@@ -228,7 +247,7 @@
                      MarginLayoutParams params = (MarginLayoutParams) slideView.getLayoutParams();
                      int childHeight = height - params.topMargin + AndroidUtilities.dp(16);
                      if (!slideView.hasCustomKeyboard() && keyboardView.getVisibility() == VISIBLE) {
-@@ -737,34 +881,35 @@
+@@ -737,34 +893,35 @@
          keyboardView.setViewToFindFocus(slideViewsContainer);
          keyboardLinearLayout.addView(keyboardView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, CustomPhoneKeyboardView.KEYBOARD_HEIGHT_DP));
  
@@ -285,7 +304,7 @@
          if (savedInstanceState != null) {
              int viewNum = savedInstanceState.getInt("currentViewNum", 0);
              if (viewNum < 0 || viewNum >= views.length)
-@@ -856,6 +1001,7 @@
+@@ -856,6 +1013,7 @@
          moreButtonView.addSubItem(2, R.drawable.msg_permissions_solar, getString(R.string.CustomApi)).setContentDescription(getString(R.string.CustomApi));
          moreButtonView.addSubItem(3, R.drawable.msg_retry_solar, getString(R.string.TestBackend));
          moreButtonView.setDelegate(id -> {
@@ -293,7 +312,7 @@
              if (id == 0) {
                  presentFragment(new ProxyListActivity());
              } else if (id == 1) {
-@@ -943,7 +1089,8 @@
+@@ -943,7 +1101,8 @@
              fillNextCodeParams(cancelDeletionParams, cancelDeletionCode, false);
          }
  
@@ -303,7 +322,7 @@
      }
  
      private boolean isCustomKeyboardForceDisabled() {
-@@ -1019,8 +1166,10 @@
+@@ -1019,8 +1178,10 @@
  
      @Override
      public void onPause() {
@@ -315,7 +334,7 @@
              ConnectionsManager.getInstance(currentAccount).setAppPaused(true, false);
          }
          AndroidUtilities.removeAltFocusable(getParentActivity(), classGuid);
-@@ -1028,8 +1177,10 @@
+@@ -1028,8 +1189,10 @@
  
      @Override
      public void onResume() {
@@ -327,7 +346,7 @@
              ConnectionsManager.getInstance(currentAccount).setAppPaused(false, false);
          }
          AndroidUtilities.requestAdjustResize(getParentActivity(), classGuid);
-@@ -1066,6 +1217,8 @@
+@@ -1066,6 +1229,8 @@
  
      @Override
      public void onConfigurationChanged(Configuration newConfig) {
@@ -336,7 +355,7 @@
          setCustomKeyboardVisible(views[currentViewNum].hasCustomKeyboard(), false);
          if (phoneNumberConfirmView != null) {
              phoneNumberConfirmView.dismiss();
-@@ -1074,6 +1227,8 @@
+@@ -1074,6 +1239,8 @@
  
      @Override
      public void onRequestPermissionsResultFragment(int requestCode, String[] permissions, int[] grantResults) {
@@ -345,7 +364,7 @@
          if (permissions.length == 0 || grantResults.length == 0) return;
  
          boolean granted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
-@@ -1102,6 +1257,8 @@
+@@ -1102,6 +1269,8 @@
      }
  
      public static Bundle loadCurrentState(boolean newAccount, int currentAccount) {
@@ -354,7 +373,7 @@
          try {
              Bundle bundle = new Bundle();
              SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("logininfo2" + (newAccount ? "_" + currentAccount : ""), Context.MODE_PRIVATE);
-@@ -1141,6 +1298,8 @@
+@@ -1141,6 +1310,8 @@
      }
  
      private void clearCurrentState() {
@@ -363,7 +382,7 @@
          SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("logininfo2" + (newAccount ? "_" + currentAccount : ""), Context.MODE_PRIVATE);
          SharedPreferences.Editor editor = preferences.edit();
          editor.clear();
-@@ -1177,6 +1336,8 @@
+@@ -1177,6 +1348,8 @@
  
      @Override
      protected void onDialogDismiss(Dialog dialog) {
@@ -372,7 +391,7 @@
          if (Build.VERSION.SDK_INT >= 23) {
              if (dialog == permissionsDialog && !permissionsItems.isEmpty() && getParentActivity() != null) {
                  try {
-@@ -1202,6 +1363,8 @@
+@@ -1202,6 +1375,8 @@
  
      @Override
      public boolean onBackPressed(boolean invoked) {
@@ -381,7 +400,7 @@
          if (emailChangeIsSuggestion && currentViewNum == VIEW_ADD_EMAIL) {
              return false;
          }
-@@ -1259,6 +1422,8 @@
+@@ -1259,6 +1434,8 @@
  
      @Override
      public void onActivityResultFragment(int requestCode, int resultCode, Intent data) {
@@ -390,7 +409,7 @@
          LoginActivityRegisterView registerView = (LoginActivityRegisterView) views[VIEW_REGISTER];
          if (registerView != null) {
              registerView.imageUpdater.onActivityResult(requestCode, resultCode, data);
-@@ -1571,10 +1736,16 @@
+@@ -1571,10 +1748,16 @@
      }
  
      private void needShowProgress(int requestId) {
@@ -407,7 +426,7 @@
          if (isInCancelAccountDeletionMode() && requestId == 0) {
              if (cancelDeleteProgressDialog != null || getParentActivity() == null || getParentActivity().isFinishing()) {
                  return;
-@@ -1611,6 +1782,10 @@
+@@ -1611,6 +1794,10 @@
      }
  
      public void setPage(@ViewNumber int page, boolean animated, Bundle params, boolean back) {
@@ -418,7 +437,7 @@
          boolean needFloatingButton = page == VIEW_PHONE_INPUT || page == VIEW_REGISTER || page == VIEW_PASSWORD ||
                  page == VIEW_NEW_PASSWORD_STAGE_1 || page == VIEW_NEW_PASSWORD_STAGE_2 || page == VIEW_ADD_EMAIL || page == VIEW_CODE_PHRASE || page == VIEW_CODE_WORD;
          if (page == currentViewNum) {
-@@ -1653,9 +1828,11 @@
+@@ -1653,9 +1840,11 @@
              newView.setVisibility(View.VISIBLE);
  
              AnimatorSet pagesAnimation = new AnimatorSet();
@@ -430,16 +449,16 @@
                      if (currentDoneType == DONE_TYPE_FLOATING && needFloatingButton) {
                          showDoneButton(true, true);
                      }
-@@ -1689,6 +1866,8 @@
+@@ -1689,6 +1878,8 @@
  
      @Override
      public void saveSelfArgs(Bundle outState) {
-+        if (localLoginClosed()) { if (preparedLocalSession != null) { outState.putBoolean("flexygram_local_auth_restart", true); outState.putInt("flexygram_local_auth_account", currentAccount); } return; }
++        if (localLoginClosed()) { if (preparedLocalSession != null) { outState.putBoolean("flexygram_local_auth_restart", true); outState.putInt("flexygram_local_auth_slot", currentAccount); } return; }
 +
          if (preparedLocalLoginBinding != null) {
              preparedLocalLoginBinding.saveRestartMarker(outState);
              return;
-@@ -1767,6 +1946,8 @@
+@@ -1767,6 +1958,8 @@
      private boolean pendingSwitchingAccount;
  
      private void onAuthSuccess(TLRPC.TL_auth_authorization res, boolean afterSignup) {
@@ -448,7 +467,7 @@
          BackButtonMenuRecent.clearRecentDialogs(currentAccount);
          PasscodeHelper.removePasscodeForAccount(currentAccount);
          MessagesController.getInstance(currentAccount).cleanup();
-@@ -1803,12 +1984,16 @@
+@@ -1803,12 +1996,16 @@
      }
  
      private void fillNextCodeParams(Bundle params, TL_account.sentEmailCode res) {
@@ -465,7 +484,7 @@
          fillNextCodeParams(params, res, true);
      }
  /*
-@@ -1874,6 +2059,8 @@
+@@ -1874,6 +2071,8 @@
  
      private boolean isRequestingFirebaseSms;
      private void fillNextCodeParams(Bundle params, TLRPC.auth_SentCode res, boolean animate) {
@@ -474,7 +493,7 @@
          if (res instanceof TLRPC.TL_auth_sentCodePaymentRequired) {
              final TLRPC.TL_auth_sentCodePaymentRequired auth = (TLRPC.TL_auth_sentCodePaymentRequired) res;
              params.putString("product", auth.store_product);
-@@ -2106,6 +2293,8 @@
+@@ -2106,6 +2305,8 @@
          private long lastTitleClick = 0;
          private Toast lastTitleToast;
          private void showDebugMenu() {
@@ -483,7 +502,7 @@
              new AlertDialog.Builder(getContext())
                  .setTitle(LocaleController.getString(R.string.SettingsDebug))
                  .setItems(new String[] {
-@@ -2145,6 +2334,7 @@
+@@ -2145,6 +2346,7 @@
              titleView.setLineSpacing(dp(2), 1.0f);
              addView(titleView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL, 32, 0, 32, 0));
              titleView.setOnClickListener(v -> {
@@ -491,7 +510,7 @@
                  if (lastTitleToast != null) {
                      lastTitleToast.cancel();
                      lastTitleToast = null;
-@@ -2209,6 +2399,7 @@
+@@ -2209,6 +2411,7 @@
              countryOutlineView.setOnFocusChangeListener((v, hasFocus) -> countryOutlineView.animateSelection(hasFocus ? 1 : 0));
              addView(countryOutlineView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 58, 16, 24, 16, 14));
              countryOutlineView.setOnClickListener(view -> {
@@ -499,7 +518,7 @@
                  CountrySelectActivity fragment = new CountrySelectActivity(true, countriesArray);
                  fragment.setCountrySelectActivityDelegate((country) -> {
                      selectCountry(country);
-@@ -2270,6 +2461,7 @@
+@@ -2270,6 +2473,7 @@
  
                  @Override
                  public void afterTextChanged(Editable editable) {
@@ -507,7 +526,7 @@
                      if (ignoreOnTextChange) {
                          return;
                      }
-@@ -2514,6 +2706,7 @@
+@@ -2514,6 +2718,7 @@
  
                  @Override
                  public void afterTextChanged(Editable s) {
@@ -515,7 +534,7 @@
                      if (ignoreOnPhoneChange) {
                          return;
                      }
-@@ -2580,6 +2773,7 @@
+@@ -2580,6 +2785,7 @@
                  addView(syncContactsBox, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.MATCH_PARENT, Gravity.LEFT | Gravity.TOP, 16, 0, 16 + (LocaleController.isRTL && AndroidUtilities.isSmallScreen() ? 56 : 0), 0));
                  bottomMargin -= 24;
                  syncContactsBox.setOnClickListener(v -> {
@@ -523,7 +542,7 @@
                      if (getParentActivity() == null) {
                          return;
                      }
-@@ -2594,13 +2788,14 @@
+@@ -2594,13 +2800,14 @@
                  });
              }
  
@@ -539,7 +558,7 @@
                      if (getParentActivity() == null) {
                          return;
                      }
-@@ -2669,6 +2864,7 @@
+@@ -2669,6 +2876,7 @@
  
              Collections.sort(countriesArray, Comparator.comparing(o -> o.name));
  
@@ -547,7 +566,7 @@
              String country = null;
  
              try {
-@@ -2694,6 +2890,7 @@
+@@ -2694,6 +2902,7 @@
                      }
                  }), ConnectionsManager.RequestFlagWithoutLogin | ConnectionsManager.RequestFlagFailOnServerErrors);
              }
@@ -555,7 +574,7 @@
              if (codeField.length() == 0) {
                  setCountryButtonText(null);
                  phoneField.setHintText(null);
-@@ -2711,6 +2908,8 @@
+@@ -2711,6 +2920,8 @@
          }
  
          private void loadCountries() {
@@ -564,7 +583,7 @@
              TLRPC.TL_help_getCountriesList req = new TLRPC.TL_help_getCountriesList();
              req.lang_code = LocaleController.getInstance().getCurrentLocaleInfo() != null ? LocaleController.getInstance().getCurrentLocaleInfo().getLangCode() : Locale.getDefault().getCountry();
              getConnectionsManager().sendRequest(req, (response, error) -> {
-@@ -2855,12 +3054,14 @@
+@@ -2855,12 +3066,14 @@
          @Override
          protected void onAttachedToWindow() {
              super.onAttachedToWindow();
@@ -579,7 +598,7 @@
              NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.emojiLoaded);
          }
  
-@@ -2976,6 +3177,8 @@
+@@ -2976,6 +3189,8 @@
  
          @Override
          public void onCancelPressed() {
@@ -588,7 +607,7 @@
              nextPressed = false;
          }
  
-@@ -2998,6 +3201,8 @@
+@@ -2998,6 +3213,8 @@
  
          @Override
          public void onNextPressed(String code) {
@@ -597,7 +616,7 @@
              if (getParentActivity() == null || nextPressed || isRequestingFirebaseSms) {
                  return;
              }
-@@ -3399,6 +3604,8 @@
+@@ -3399,6 +3616,8 @@
  
          private boolean numberFilled;
          public void fillNumber() {
@@ -606,7 +625,7 @@
              if (numberFilled || activityMode != MODE_LOGIN) {
                  return;
              }
-@@ -3519,6 +3726,8 @@
+@@ -3519,6 +3738,8 @@
  
          @Override
          public void onShow() {
@@ -615,7 +634,7 @@
              super.onShow();
              fillNumber();
              if (syncContactsBox != null) {
-@@ -3550,6 +3759,8 @@
+@@ -3550,6 +3771,8 @@
  
          @Override
          public void onDestroyActivity() {
@@ -624,7 +643,7 @@
              super.onDestroyActivity();
              if (cancelRequestingPasskey != null) {
                  cancelRequestingPasskey.run();
-@@ -3561,6 +3772,8 @@
+@@ -3561,6 +3784,8 @@
          private boolean requestingPasskey = false;
          private Runnable cancelRequestingPasskey;
          private void requestPasskey(boolean clickedButton, boolean force) {
@@ -633,7 +652,7 @@
              if (activityMode != MODE_LOGIN) return;
              if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P || !BuildVars.SUPPORTS_PASSKEYS) return;
              if (force) {
-@@ -3643,6 +3856,8 @@
+@@ -3643,6 +3868,8 @@
  
          @Override
          public void saveStateParams(Bundle bundle) {
@@ -642,7 +661,7 @@
              String code = codeField.getText().toString();
              if (code.length() != 0) {
                  bundle.putString("phoneview_code", code);
-@@ -3655,6 +3870,8 @@
+@@ -3655,6 +3882,8 @@
  
          @Override
          public void restoreStateParams(Bundle bundle) {
@@ -651,7 +670,7 @@
              String code = bundle.getString("phoneview_code");
              if (code != null) {
                  codeField.setText(code);
-@@ -3667,6 +3884,10 @@
+@@ -3667,6 +3896,10 @@
  
          @Override
          public void didReceivedNotification(int id, int account, Object... args) {
@@ -662,7 +681,7 @@
              if (id == NotificationCenter.emojiLoaded) {
                  countryButton.getCurrentView().invalidate();
              }
-@@ -3964,6 +4185,7 @@
+@@ -3964,6 +4197,7 @@
              timeText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
              timeText.setGravity(Gravity.TOP | Gravity.LEFT);
              timeText.setOnClickListener(v -> {
@@ -670,7 +689,7 @@
  //                if (isRequestingFirebaseSms || isResendingCode) {
  //                    return;
  //                }
-@@ -4065,6 +4287,7 @@
+@@ -4065,6 +4299,7 @@
                  openFragmentButton.setPadding(AndroidUtilities.dp(34), 0, AndroidUtilities.dp(34), 0);
                  openFragmentButton.setBackground(Theme.createSimpleSelectorRoundRectDrawable(AndroidUtilities.dp(6), Theme.getColor(Theme.key_changephoneinfo_image2), Theme.getColor(Theme.key_chats_actionPressedBackground)));
                  openFragmentButton.setOnClickListener(v -> {
@@ -678,7 +697,7 @@
                      try {
                          getContext().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
                      } catch (Exception e) {
-@@ -4105,6 +4328,7 @@
+@@ -4105,6 +4340,7 @@
  
              if (currentType != AUTH_TYPE_FRAGMENT_SMS) {
                  problemText.setOnClickListener(v -> {
@@ -686,7 +705,7 @@
                      if (nextCodeParams != null && nextCodeAuth != null) {
                          fillNextCodeParams(nextCodeParams, nextCodeAuth);
                          return;
-@@ -4325,10 +4549,14 @@
+@@ -4325,10 +4561,14 @@
  
          @Override
          public void onCancelPressed() {
@@ -701,7 +720,7 @@
              if (nextPressed || isResendingCode || isRequestingFirebaseSms) {
                  return;
              }
-@@ -4479,6 +4707,8 @@
+@@ -4479,6 +4719,8 @@
  
          @Override
          public void setParams(Bundle params, boolean restore) {
@@ -710,7 +729,7 @@
              if (params == null) {
                  if (nextCodeParams != null && nextCodeAuth != null) {
                      setProblemTextVisible(true);
-@@ -4755,6 +4985,8 @@
+@@ -4755,6 +4997,8 @@
          }
  
          private void createCodeTimer() {
@@ -719,7 +738,7 @@
              if (codeTimer != null) {
                  return;
              }
-@@ -4799,6 +5031,8 @@
+@@ -4799,6 +5043,8 @@
          }
  
          private void createTimer() {
@@ -728,7 +747,7 @@
              if (timeTimer != null) {
                  return;
              }
-@@ -4869,6 +5103,8 @@
+@@ -4869,6 +5115,8 @@
  
          @Override
          public void onNextPressed(String code) {
@@ -737,7 +756,7 @@
              if (currentViewNum == AUTH_TYPE_MISSED_CALL) {
                  if (nextPressed) {
                      return;
-@@ -5233,6 +5469,8 @@
+@@ -5233,6 +5481,8 @@
  
          @Override
          public boolean onBackPressed(boolean force) {
@@ -746,7 +765,7 @@
              if (activityMode != MODE_LOGIN) {
                  finishFragment();
                  return false;
-@@ -5282,6 +5520,8 @@
+@@ -5282,6 +5532,8 @@
  
          @Override
          public void onDestroyActivity() {
@@ -755,7 +774,7 @@
              super.onDestroyActivity();
              if (currentType == AUTH_TYPE_FRAGMENT_SMS) {
                  NotificationCenter.getGlobalInstance().removeObserver(LoginActivitySmsView.this, NotificationCenter.didReceiveSmsCode);
-@@ -5299,6 +5539,8 @@
+@@ -5299,6 +5551,8 @@
  
          @Override
          public void onShow() {
@@ -764,7 +783,7 @@
              super.onShow();
              if (hintDrawable != null) {
                  hintDrawable.setCurrentFrame(0);
-@@ -5326,6 +5568,8 @@
+@@ -5326,6 +5580,8 @@
  
          @Override
          public void didReceivedNotification(int id, int account, Object... args) {
@@ -773,7 +792,7 @@
              if (!waitingForEvent || codeFieldContainer.codeField == null) {
                  return;
              }
-@@ -5348,6 +5592,8 @@
+@@ -5348,6 +5604,8 @@
  
          @Override
          public void onHide() {
@@ -782,7 +801,7 @@
              super.onHide();
              isResendingCode = false;
              nextPressed = false;
-@@ -5358,6 +5604,8 @@
+@@ -5358,6 +5616,8 @@
  
          @Override
          public void saveStateParams(Bundle bundle) {
@@ -791,7 +810,7 @@
              String code = codeFieldContainer.getCode();
              if (code.length() != 0) {
                  bundle.putString("smsview_code_" + currentType, code);
-@@ -5378,6 +5626,8 @@
+@@ -5378,6 +5638,8 @@
  
          @Override
          public void restoreStateParams(Bundle bundle) {
@@ -800,7 +819,7 @@
              currentParams = bundle.getBundle("smsview_params_" + currentType);
              if (currentParams != null) {
                  setParams(currentParams, true);
-@@ -5589,6 +5839,7 @@
+@@ -5589,6 +5851,7 @@
              VerticalPositionAutoAnimator.attach(cancelButton);
  
              cancelButton.setOnClickListener(view -> {
@@ -808,7 +827,7 @@
                  if (radialProgressView.getTag() != null) {
                      return;
                  }
-@@ -5675,11 +5926,15 @@
+@@ -5675,11 +5938,15 @@
  
          @Override
          public void onCancelPressed() {
@@ -824,7 +843,7 @@
              if (params == null) {
                  return;
              }
-@@ -5718,6 +5973,8 @@
+@@ -5718,6 +5985,8 @@
  
          @Override
          public void onNextPressed(String code) {
@@ -833,7 +852,7 @@
              if (nextPressed) {
                  return;
              }
-@@ -5808,6 +6065,8 @@
+@@ -5808,6 +6077,8 @@
  
          @Override
          public boolean onBackPressed(boolean force) {
@@ -842,7 +861,7 @@
              nextPressed = false;
              needHideProgress(true);
              currentParams = null;
-@@ -5816,6 +6075,8 @@
+@@ -5816,6 +6087,8 @@
  
          @Override
          public void onShow() {
@@ -851,7 +870,7 @@
              super.onShow();
              AndroidUtilities.runOnUIThread(() -> {
                  if (codeField != null) {
-@@ -5830,6 +6091,8 @@
+@@ -5830,6 +6103,8 @@
  
          @Override
          public void saveStateParams(Bundle bundle) {
@@ -860,7 +879,7 @@
              String code = codeField.getText().toString();
              if (code.length() != 0) {
                  bundle.putString("passview_code", code);
-@@ -5841,6 +6104,8 @@
+@@ -5841,6 +6116,8 @@
  
          @Override
          public void restoreStateParams(Bundle bundle) {
@@ -869,7 +888,7 @@
              currentParams = bundle.getBundle("passview_params");
              if (currentParams != null) {
                  setParams(currentParams, true);
-@@ -6179,6 +6444,8 @@
+@@ -6179,6 +6456,8 @@
                  NotificationCenter.getGlobalInstance().addObserver(new NotificationCenter.NotificationCenterDelegate() {
                      @Override
                      public void didReceivedNotification(int id, int account, Object... args) {
@@ -878,7 +897,7 @@
                          int request = (int) args[0];
                          int result = (int) args[1];
                          Intent data = (Intent) args[2];
-@@ -6514,6 +6781,8 @@
+@@ -6514,6 +6793,8 @@
                  NotificationCenter.getGlobalInstance().addObserver(new NotificationCenter.NotificationCenterDelegate() {
                      @Override
                      public void didReceivedNotification(int id, int account, Object... args) {
@@ -887,7 +906,7 @@
                          int request = (int) args[0];
                          int result = (int) args[1];
                          Intent data = (Intent) args[2];
-@@ -7936,11 +8205,14 @@
+@@ -7936,11 +8217,14 @@
  
              @Override
              public void onClick(View widget) {
@@ -902,7 +921,7 @@
              if (currentTermsOfService == null) {
                  return;
              }
-@@ -7982,12 +8254,14 @@
+@@ -7982,12 +8266,14 @@
  
              setOrientation(VERTICAL);
  
@@ -917,7 +936,7 @@
  
              FrameLayout avatarContainer = new FrameLayout(context);
              addView(avatarContainer, LayoutHelper.createLinear(78, 78, Gravity.CENTER_HORIZONTAL));
-@@ -8031,6 +8305,7 @@
+@@ -8031,6 +8317,7 @@
              };
              avatarContainer.addView(avatarOverlay, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
              avatarOverlay.setOnClickListener(view -> {
@@ -925,7 +944,7 @@
                  imageUpdater.openMenu(avatar != null, () -> {
                      avatar = null;
                      avatarBig = null;
-@@ -8204,6 +8479,7 @@
+@@ -8204,6 +8491,7 @@
              wrongNumber.setVisibility(GONE);
              addView(wrongNumber, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.TOP | (LocaleController.isRTL ? Gravity.RIGHT : Gravity.LEFT), 0, 20, 0, 0));
              wrongNumber.setOnClickListener(view -> {
@@ -933,7 +952,7 @@
                  if (radialProgressView.getTag() != null) {
                      return;
                  }
-@@ -8284,6 +8560,8 @@
+@@ -8284,6 +8572,8 @@
  
          @Override
          public void didUploadPhoto(final TLRPC.InputFile photo, final TLRPC.InputFile video, double videoStartTimestamp, String videoPath, final TLRPC.PhotoSize bigSize, final TLRPC.PhotoSize smallSize, boolean isVideo, TLRPC.VideoSize emojiMarkup) {
@@ -942,7 +961,7 @@
              AndroidUtilities.runOnUIThread(() -> {
                  avatar = smallSize.location;
                  avatarBig = bigSize.location;
-@@ -8350,6 +8628,8 @@
+@@ -8350,6 +8640,8 @@
  
          @Override
          public boolean onBackPressed(boolean force) {
@@ -951,7 +970,7 @@
              if (!force) {
                  AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
                  builder.setTitle(getString(R.string.Warning));
-@@ -8376,6 +8656,8 @@
+@@ -8376,6 +8668,8 @@
  
          @Override
          public void onCancelPressed() {
@@ -960,7 +979,7 @@
              nextPressed = false;
          }
  
-@@ -8386,6 +8668,8 @@
+@@ -8386,6 +8680,8 @@
  
          @Override
          public void onShow() {
@@ -969,7 +988,7 @@
              super.onShow();
              if (privacyView != null) {
                  if (restoringState) {
-@@ -8411,6 +8695,8 @@
+@@ -8411,6 +8707,8 @@
  
          @Override
          public void setParams(Bundle params, boolean restore) {
@@ -978,7 +997,7 @@
              if (params == null) {
                  return;
              }
-@@ -8423,6 +8709,8 @@
+@@ -8423,6 +8721,8 @@
  
          @Override
          public void onNextPressed(String code) {
@@ -987,7 +1006,7 @@
              if (nextPressed) {
                  return;
              }
-@@ -8478,6 +8766,8 @@
+@@ -8478,6 +8778,8 @@
  
          @Override
          public void saveStateParams(Bundle bundle) {
@@ -996,7 +1015,7 @@
              String first = firstNameField.getText().toString();
              if (first.length() != 0) {
                  bundle.putString("registerview_first", first);
-@@ -8500,6 +8790,8 @@
+@@ -8500,6 +8802,8 @@
  
          @Override
          public void restoreStateParams(Bundle bundle) {
@@ -1005,7 +1024,7 @@
              currentParams = bundle.getBundle("registerview_params");
              if (currentParams != null) {
                  setParams(currentParams, true);
-@@ -8587,12 +8879,16 @@
+@@ -8587,12 +8891,16 @@
  
          @Override
          public void onDestroyActivity() {
@@ -1022,7 +1041,7 @@
              super.onShow();
              waitingForEvent = true;
              exportLoginToken(true);
-@@ -8600,6 +8896,8 @@
+@@ -8600,6 +8908,8 @@
  
          @Override
          public void onHide() {
@@ -1031,7 +1050,7 @@
              removeObserver();
              super.onHide();
              qrView.clear();
-@@ -8611,6 +8909,8 @@
+@@ -8611,6 +8921,8 @@
          }
  
          public void exportLoginToken(boolean show) {
@@ -1040,7 +1059,7 @@
              if (!waitingForEvent) {
                  return;
              }
-@@ -8711,6 +9011,8 @@
+@@ -8711,6 +9023,8 @@
  
          @Override
          public void didReceivedNotification(int id, int account, Object... args) {
@@ -1049,7 +1068,7 @@
              if (id == NotificationCenter.updateLoginToken) {
                  exportLoginToken(false);
              }
-@@ -8848,6 +9150,7 @@
+@@ -8848,6 +9162,7 @@
          floatingButtonIcon.setBackgroundColor(Theme.getColor(Theme.key_chats_actionBackground));
  
          for (SlideView slideView : views) {
@@ -1057,7 +1076,7 @@
              slideView.updateColors();
          }
  
-@@ -9136,6 +9439,8 @@
+@@ -9136,6 +9451,8 @@
      private int currentConnectionState;
  
      private void updateProxyButton(boolean animated, boolean force) {
@@ -1066,7 +1085,7 @@
          if (proxyDrawable == null) {
              return;
          }
-@@ -9201,6 +9506,8 @@
+@@ -9201,6 +9518,8 @@
  
      @Override
      public void didReceivedNotification(int id, int account, Object... args) {

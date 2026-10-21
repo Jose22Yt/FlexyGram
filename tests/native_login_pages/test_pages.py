@@ -23,6 +23,10 @@ class PagesTests(unittest.TestCase):
   self.assertIn('if (!localLoginClosed() || io.github.jose22yt.flexygram.login.local.EphemeralPages.allowedPage(VIEW_QR_LOGIN))',self.patched)
   self.assertIn('setImportantForAutofill(android.view.View.IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS)',self.patched)
   self.assertIn('localFence != preparedTransition',self.patched)
+  self.assertIn('if (localLoginClosed()) detachClosedLocalView();',self.patched)
+  self.assertIn('!preparedLocalFragmentDestroyed) attachClosedLocalView();',self.patched)
+  self.assertIn('outState.putInt("flexygram_local_auth_slot", currentAccount)',self.patched)
+  self.assertNotIn('flexygram_local_auth_account',self.patched)
  def test_guard_inventory_complete_for_declared_methods(self):
   from prepare_patch import span
   data=json.loads((ROOT/'patches/native-login-pages/inventory.json').read_text());self.assertGreaterEqual(len(data['guarded_methods']),45)

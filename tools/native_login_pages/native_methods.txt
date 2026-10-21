@@ -5,6 +5,7 @@
     private io.github.jose22yt.flexygram.login.local.LocalTransitionFence preparedTransition;
     private AnimatorSet preparedPagesAnimation;
     private boolean preparedLocalViewAlive;
+    private boolean preparedLocalFragmentDestroyed;
     private io.github.jose22yt.flexygram.login.local.EphemeralPages.Status preparedLastLocalStatus;
     private static boolean localLoginClosed() {
         return "realAlpha".equals(org.telegram.messenger.BuildConfig.FLEXYGRAM_VARIANT)
@@ -18,11 +19,11 @@
         preparedLocalSession = session;
     }
     private boolean localViewActive() {
-        return preparedLocalMode && preparedLocalViewAlive && activityMode == MODE_LOGIN
+        return preparedLocalMode && !preparedLocalFragmentDestroyed && preparedLocalViewAlive && activityMode == MODE_LOGIN
                 && preparedLocalSession != null && preparedLocalSession.valid(preparedLocalView, currentAccount);
     }
     private void attachClosedLocalView() {
-        if (localViewActive()) return;
+        if (preparedLocalFragmentDestroyed || localViewActive()) return;
         if (preparedLocalSession == null || preparedLocalSession.scope().account != currentAccount) return;
         preparedLocalViewAlive = true;
         preparedTransition = new io.github.jose22yt.flexygram.login.local.LocalTransitionFence();
