@@ -1,0 +1,39 @@
+warning: [options] source value 8 is obsolete and will be removed in a future release
+warning: [options] target value 8 is obsolete and will be removed in a future release
+warning: [options] To suppress warnings about obsolete options, use -Xlint:-options.
+TMessagesProj_Modules/telegram-native-login/src/main/java/io/github/jose22yt/flexygram/login/NativeLoginTransport.java:185: error: reference to Kind is ambiguous
+        if(response.kind==Kind.ERROR) {
+                          ^
+  both enum io.github.jose22yt.flexygram.login.NativeLoginProtocol.Kind in NativeLoginProtocol and enum io.github.jose22yt.flexygram.session.RequestCoordinator.Kind in RequestCoordinator match
+TMessagesProj_Modules/telegram-native-login/src/main/java/io/github/jose22yt/flexygram/login/NativeLoginTransport.java:197: error: reference to Kind is ambiguous
+        if(response.kind==Kind.PASSWORD_NEEDED&&(action==Action.SEND_CODE||action==Action.SIGN_IN||action==Action.EXPORT_QR||action==Action.IMPORT_QR)) {
+                          ^
+  both enum io.github.jose22yt.flexygram.login.NativeLoginProtocol.Kind in NativeLoginProtocol and enum io.github.jose22yt.flexygram.session.RequestCoordinator.Kind in RequestCoordinator match
+TMessagesProj_Modules/telegram-native-login/src/main/java/io/github/jose22yt/flexygram/login/NativeLoginTransport.java:200: error: reference to Kind is ambiguous
+        if(response.kind==Kind.PASSWORD_PARAMETERS&&action==Action.GET_PASSWORD){change(Stage.PASSWORD_PARAMETERS,Error.NONE);return null;}
+                          ^
+  both enum io.github.jose22yt.flexygram.login.NativeLoginProtocol.Kind in NativeLoginProtocol and enum io.github.jose22yt.flexygram.session.RequestCoordinator.Kind in RequestCoordinator match
+TMessagesProj_Modules/telegram-native-login/src/main/java/io/github/jose22yt/flexygram/login/NativeLoginTransport.java:201: error: reference to Kind is ambiguous
+        if(response.kind==Kind.SIGNUP&&(action==Action.SEND_CODE||action==Action.SIGN_IN)) {
+                          ^
+  both enum io.github.jose22yt.flexygram.login.NativeLoginProtocol.Kind in NativeLoginProtocol and enum io.github.jose22yt.flexygram.session.RequestCoordinator.Kind in RequestCoordinator match
+TMessagesProj_Modules/telegram-native-login/src/main/java/io/github/jose22yt/flexygram/login/NativeLoginTransport.java:204: error: reference to Kind is ambiguous
+        if(response.kind==Kind.AUTHORIZED&&(action==Action.SEND_CODE||action==Action.SIGN_IN||action==Action.CHECK_PASSWORD||action==Action.SIGN_UP||action==Action.EXPORT_QR||action==Action.IMPORT_QR)) {
+                          ^
+  both enum io.github.jose22yt.flexygram.login.NativeLoginProtocol.Kind in NativeLoginProtocol and enum io.github.jose22yt.flexygram.session.RequestCoordinator.Kind in RequestCoordinator match
+TMessagesProj_Modules/telegram-native-login/src/main/java/io/github/jose22yt/flexygram/login/NativeLoginTransport.java:208: error: reference to Kind is ambiguous
+        if(response.kind==Kind.CODE&&action==Action.SEND_CODE) {
+                          ^
+  both enum io.github.jose22yt.flexygram.login.NativeLoginProtocol.Kind in NativeLoginProtocol and enum io.github.jose22yt.flexygram.session.RequestCoordinator.Kind in RequestCoordinator match
+TMessagesProj_Modules/telegram-native-login/src/main/java/io/github/jose22yt/flexygram/login/NativeLoginTransport.java:215: error: reference to Kind is ambiguous
+        if(response.kind==Kind.QR_TOKEN&&action==Action.EXPORT_QR) {
+                          ^
+  both enum io.github.jose22yt.flexygram.login.NativeLoginProtocol.Kind in NativeLoginProtocol and enum io.github.jose22yt.flexygram.session.RequestCoordinator.Kind in RequestCoordinator match
+TMessagesProj_Modules/telegram-native-login/src/main/java/io/github/jose22yt/flexygram/login/NativeLoginTransport.java:219: error: reference to Kind is ambiguous
+        if(response.kind==Kind.QR_MIGRATION&&action==Action.EXPORT_QR&&!migrated) {
+                          ^
+  both enum io.github.jose22yt.flexygram.login.NativeLoginProtocol.Kind in NativeLoginProtocol and enum io.github.jose22yt.flexygram.session.RequestCoordinator.Kind in RequestCoordinator match
+8 errors
+3 warnings
+
+JAVAC_EXIT=1

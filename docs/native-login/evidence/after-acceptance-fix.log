@@ -1,0 +1,48 @@
+test_accountSeparation (test_native_login.NativeLoginTests.test_accountSeparation) ... ok
+test_androidViewRecreationNoRequestReplay (test_native_login.NativeLoginTests.test_androidViewRecreationNoRequestReplay) ... ok
+test_android_sdk24_symbols (test_native_login.NativeLoginTests.test_android_sdk24_symbols) ... ok
+test_authorizationRevalidatedBeforeWrite (test_native_login.NativeLoginTests.test_authorizationRevalidatedBeforeWrite) ... ok
+test_bytecode_and_projection_scope (test_native_login.NativeLoginTests.test_bytecode_and_projection_scope) ... ok
+test_callbackThenThrowCannotCommit (test_native_login.NativeLoginTests.test_callbackThenThrowCannotCommit) ... ok
+test_cancelAndLateAuthorization (test_native_login.NativeLoginTests.test_cancelAndLateAuthorization) ... ok
+test_clockAndAdapterExceptionsAreSafe (test_native_login.NativeLoginTests.test_clockAndAdapterExceptionsAreSafe) ... ok
+test_codeInvalidRetryAndExpiryTerminal (test_native_login.NativeLoginTests.test_codeInvalidRetryAndExpiryTerminal) ... ok
+test_concurrentFirstResponseWins (test_native_login.NativeLoginTests.test_concurrentFirstResponseWins) ... ok
+test_domainChangeCannotDispatch (test_native_login.NativeLoginTests.test_domainChangeCannotDispatch) ... ok
+test_duplicateRawAuthorizationCannotPoisonNextStep (test_native_login.NativeLoginTests.test_duplicateRawAuthorizationCannotPoisonNextStep) ... ok
+test_duplicateResponseNotReused (test_native_login.NativeLoginTests.test_duplicateResponseNotReused) ... ok
+test_existingDatabaseOriginPreserved (test_native_login.NativeLoginTests.test_existingDatabaseOriginPreserved) ... ok
+test_failedWriteIsNotRetried (test_native_login.NativeLoginTests.test_failedWriteIsNotRetried) ... ok
+test_floodWaitUsesClockAndConsent (test_native_login.NativeLoginTests.test_floodWaitUsesClockAndConsent) ... ok
+test_foreignReceiptRejected (test_native_login.NativeLoginTests.test_foreignReceiptRejected) ... ok
+test_foreignRequestCannotStageAuthorization (test_native_login.NativeLoginTests.test_foreignRequestCannotStageAuthorization) ... ok
+test_jdk21_default_source (test_native_login.NativeLoginTests.test_jdk21_default_source) ... ok
+test_journalFailureAfterOriginalWrite (test_native_login.NativeLoginTests.test_journalFailureAfterOriginalWrite) ... ok
+test_lyingFailureCannotBeKnownFailed (test_native_login.NativeLoginTests.test_lyingFailureCannotBeKnownFailed) ... ok
+test_malformedRepliesAndUnknownAlgorithm (test_native_login.NativeLoginTests.test_malformedRepliesAndUnknownAlgorithm) ... ok
+test_missingWriteReceiptsStayUncertain (test_native_login.NativeLoginTests.test_missingWriteReceiptsStayUncertain) ... ok
+test_nativeCodeAndCommit (test_native_login.NativeLoginTests.test_nativeCodeAndCommit) ... ok
+test_no_network_or_destructive_telegram_calls (test_native_login.NativeLoginTests.test_no_network_or_destructive_telegram_calls) ... ok
+test_no_shared_client_or_capability_files_changed (test_native_login.NativeLoginTests.test_no_shared_client_or_capability_files_changed) ... ok
+test_nullHandleCannotCommit (test_native_login.NativeLoginTests.test_nullHandleCannotCommit) ... ok
+test_ownedHandshakeContinuesSameFormat (test_native_login.NativeLoginTests.test_ownedHandshakeContinuesSameFormat) ... ok
+test_passwordAndExplicitRetry (test_native_login.NativeLoginTests.test_passwordAndExplicitRetry) ... ok
+test_preexistingNativeFilesNeedReview (test_native_login.NativeLoginTests.test_preexistingNativeFilesNeedReview) ... ok
+test_preexistingSessionNeverMutated (test_native_login.NativeLoginTests.test_preexistingSessionNeverMutated) ... ok
+test_processRecreationOnlyRestartsMarker (test_native_login.NativeLoginTests.test_processRecreationOnlyRestartsMarker) ... ok
+test_qrMigrationExplicitAndScoped (test_native_login.NativeLoginTests.test_qrMigrationExplicitAndScoped) ... ok
+test_qrRefreshHasNoTimer (test_native_login.NativeLoginTests.test_qrRefreshHasNoTimer) ... ok
+test_reentrantCloseKeepsWriteOutcome (test_native_login.NativeLoginTests.test_reentrantCloseKeepsWriteOutcome) ... ok
+test_sameResponseObjectAcceptedOnce (test_native_login.NativeLoginTests.test_sameResponseObjectAcceptedOnce) ... ok
+test_sendCodeEarlyAuthorization (test_native_login.NativeLoginTests.test_sendCodeEarlyAuthorization) ... ok
+test_signupRequiresConsentAndKeepsOrigin (test_native_login.NativeLoginTests.test_signupRequiresConsentAndKeepsOrigin) ... ok
+test_srpRefreshNeverAutomatic (test_native_login.NativeLoginTests.test_srpRefreshNeverAutomatic) ... ok
+test_typedMappingAndPrivacyMatrix (test_native_login.NativeLoginTests.test_typedMappingAndPrivacyMatrix) ... ok
+test_unprovenHandshakeIsNotOwned (test_native_login.NativeLoginTests.test_unprovenHandshakeIsNotOwned) ... ok
+test_unsupportedRouteHasNoFallback (test_native_login.NativeLoginTests.test_unsupportedRouteHasNoFallback) ... ok
+test_writeThenThrowIsNeverRolledBack (test_native_login.NativeLoginTests.test_writeThenThrowIsNeverRolledBack) ... ok
+
+----------------------------------------------------------------------
+Ran 43 tests in 8.431s
+
+OK

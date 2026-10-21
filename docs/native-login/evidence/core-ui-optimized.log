@@ -1,0 +1,18 @@
+test_badBuildFacts (test_runtime.RuntimeTests.test_badBuildFacts) ... ok
+test_uiBindingReleasesObserver (test_runtime.RuntimeTests.test_uiBindingReleasesObserver) ... ok
+test_uiCloseDropsQueued (test_runtime.RuntimeTests.test_uiCloseDropsQueued) ... ok
+test_uiDetachQueued (test_runtime.RuntimeTests.test_uiDetachQueued) ... ok
+test_uiExecutorFailure (test_runtime.RuntimeTests.test_uiExecutorFailure) ... ok
+test_uiFlowEvents (test_runtime.RuntimeTests.test_uiFlowEvents) ... ok
+test_uiObserverFailure (test_runtime.RuntimeTests.test_uiObserverFailure) ... ok
+test_uiOldBindingCannotCloseNew (test_runtime.RuntimeTests.test_uiOldBindingCannotCloseNew) ... ok
+test_uiOutOfOrder (test_runtime.RuntimeTests.test_uiOutOfOrder) ... ok
+test_uiRecreation (test_runtime.RuntimeTests.test_uiRecreation) ... ok
+test_uiReplay (test_runtime.RuntimeTests.test_uiReplay) ... ok
+test_uiScopeRejected (test_runtime.RuntimeTests.test_uiScopeRejected) ... ok
+test_uiStalePublication (test_runtime.RuntimeTests.test_uiStalePublication) ... ok
+
+----------------------------------------------------------------------
+Ran 13 tests in 2.281s
+
+OK

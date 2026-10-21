@@ -1,0 +1,21 @@
+test_duplicateRawAuthorizationCannotPoisonNextStep (test_native_login.NativeLoginTests.test_duplicateRawAuthorizationCannotPoisonNextStep) ... FAIL
+
+======================================================================
+FAIL: test_duplicateRawAuthorizationCannotPoisonNextStep (test_native_login.NativeLoginTests.test_duplicateRawAuthorizationCannotPoisonNextStep)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram-native-login/tests/native_login/test_native_login.py", line 62, in <lambda>
+    setattr(NativeLoginTests,'test_'+case,lambda self,c=case:self.run_case(c))
+                                                             ^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram-native-login/tests/native_login/test_native_login.py", line 35, in run_case
+    self.assertNotIn(CANARY,p.stdout+p.stderr);self.assertEqual(p.returncode,0,p.stdout+p.stderr);self.assertIn('LOCAL_SYNTHETIC_ONLY',p.stdout)
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : Exception in thread "main" java.lang.AssertionError: NATIVE_LOGIN_CONTRACT_FAILED
+	at io.github.jose22yt.flexygram.login.NativeLoginHarness.need(NativeLoginHarness.java:22)
+	at io.github.jose22yt.flexygram.login.NativeLoginHarness.main(NativeLoginHarness.java:154)
+
+
+----------------------------------------------------------------------
+Ran 1 test in 2.090s
+
+FAILED (failures=1)
