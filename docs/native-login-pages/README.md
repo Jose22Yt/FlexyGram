@@ -1,9 +1,36 @@
 # Pantallas nativas: flujo local preparado
 
 Base fija: PR #39 `40faca6b04563bcacd02d0947addd4c18ff81e81`.
-Código validado: `3a7ef7e6105eec1286e63c05fe1c7f858b92968c`.
+Código de la entrega inicial: `3a7ef7e6105eec1286e63c05fe1c7f858b92968c`.
+Corrección posterior validada: `379131f15dba3a90ad0b48cb8c0af7b99938affc`.
 Rama independiente `preparation/native-login-local-pages`, PR #40 en borrador.
 FlexyGram: @Lukhou23; se mantienen código, créditos y licencias Telegram/Exteraless.
+
+## Continuación: limpieza de campos originales
+
+Se reprodujo un defecto del overlay preparado, no un fallo Android observado:
+`CodeFieldContainer.setText("")` original recorre cero caracteres y deja los dígitos
+existentes. `localClearPage` ahora borra cada editor y restaura en `finally` el valor
+anterior de `ignoreOnTextChange`, evitando el watcher de autocompletado durante esa
+limpieza. Tolera contenedor/array/campos ausentes y libera los metadatos locales.
+No se modifica CodeFieldContainer ni LoginActivity originales.
+
+Cinco regresiones usan los cuerpos originales sin modificar de ambos overloads
+setText y el método exacto de limpieza del overlay; sólo los widgets son dobles.
+Antes del fix: 4 fallos y 1 PASS; después: cinco PASS. Se repitió la suite afectada:
+**42 distintas (37 anteriores +5 nuevas), normal y -O:84 ejecuciones PASS, cero
+fallos/omisiones finales**. No se repitieron las otras 11 regresiones de la entrega
+inicial ni se suman sus resultados como una nueva ejecución.
+[IDs, comandos, hashes y logs](evidence/continuation/results.json).
+
+Se actualizó el SHA del overlay en el inventario. Si existe una copia generada anterior,
+el materializador la rechazará: conservarla fuera del destino generado antes de crear
+la nueva; no sobrescribir el archivo compartido. El parche 0003 de Gradle no cambió.
+Se comprobó además que mainExecutor usa Handler.post: la sospecha de un callback
+inmediato antes de devolver el ticket no aplica a este adaptador y no se alteró esa ruta.
+
+Siguen pendientes el typecheck completo con SDK37/dependencias/fuentes generadas,
+AGP/Kotlin y ejecución Android. Esta continuación no ejecuta Gradle ni genera APK.
 
 ## Implementación
 
