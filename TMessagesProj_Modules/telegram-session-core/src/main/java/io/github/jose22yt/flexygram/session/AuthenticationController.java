@@ -50,6 +50,8 @@ public final class AuthenticationController implements AutoCloseable {
     private Fault fault=Fault.NONE;
     private long generation, storeVersion, revision;
     private char[] challenge, stagedSession;
+    // Independent of UI state: observers may reenter close() while a result is published.
+    private boolean committing, closeRequested;
     public AuthenticationController(ClosedRuntime runtime, TransportPort transport, SessionStore store) {
         if (runtime == null || store == null) throw new IllegalArgumentException("AUTH_DEPENDENCIES_REQUIRED");
         this.runtime=runtime; this.scope=runtime.scope; this.store=store; this.broker=new RequestCoordinator(runtime,transport);
@@ -129,6 +131,7 @@ public final class AuthenticationController implements AutoCloseable {
     /** Explicit local commit, not onAuthSuccess and not UserConfig.setCurrentUser. Never logs out. */
     public synchronized boolean commitLocal() {
         if (state != State.LOCAL_AUTHORIZED) return false;
+        committing=true;
         transition(State.COMMITTING,Fault.NONE);
         ui.publish(snapshot());
         char[] copy=stagedSession.clone();
@@ -139,7 +142,12 @@ public final class AuthenticationController implements AutoCloseable {
             transition(State.STORAGE_UNCERTAIN,Fault.STORAGE_UNCERTAIN); ui.publish(snapshot()); return false;
         } catch (RuntimeException | LinkageError unavailable) {
             transition(State.STORAGE_UNCERTAIN,Fault.STORAGE_UNCERTAIN); ui.publish(snapshot()); return false;
-        } finally { wipe(copy); clearMaterial(); }
+        } finally {
+            wipe(copy); clearMaterial(); committing=false;
+            // Closing releases only this flow and its UI. It must not undo or retry a write,
+            // including an uncertain write which may already have reached the store.
+            if (closeRequested) close();
+        }
     }
     public boolean cancel() {
         synchronized(this) {
@@ -165,8 +173,9 @@ public final class AuthenticationController implements AutoCloseable {
     public void close() {
         synchronized(this) {
             if (state == State.CLOSED) return;
-            // A same-thread reentrant close from a storage adapter is deferred to the caller.
-            if (state == State.COMMITTING) return;
+            // Remember reentrant lifecycle disposal until the atomic store call has returned.
+            if (committing) { closeRequested=true; return; }
+            closeRequested=false;
             ++generation; transition(State.CLOSED,fault); clearMaterial();
         }
         broker.close(); ui.close();
