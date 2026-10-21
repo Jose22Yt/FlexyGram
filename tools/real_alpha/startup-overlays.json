@@ -1,0 +1,354 @@
+{
+  "base_commit": "8f8c25234a973c5dfaf411978b2d4f5c2173ff93",
+  "files": [
+    {
+      "source": "TMessagesProj/src/main/java/org/telegram/messenger/ApplicationLoader.java",
+      "source_sha256": "91d058fd979b9846f61ab08510817c79233c14b8e45c61bd1de5de52430e2a46",
+      "output_sha256": "75282db0341a345d37ec83b1853007e13d74a7640c7b2faed91eae1a0ece5f59",
+      "hunks": [
+        {
+          "start": 285,
+          "end": 285,
+          "replacement": [
+            "        org.telegram.messenger.StartupTrace.stage(org.telegram.messenger.StartupTrace.Stage.LOCALE_RETURN);\n",
+            "        org.telegram.messenger.StartupTrace.stage(org.telegram.messenger.StartupTrace.Stage.CONFIG_BEGIN);\n"
+          ]
+        },
+        {
+          "start": 296,
+          "end": 296,
+          "replacement": [
+            "        org.telegram.messenger.StartupTrace.stage(org.telegram.messenger.StartupTrace.Stage.GLYPH_BEGIN);\n"
+          ]
+        },
+        {
+          "start": 297,
+          "end": 297,
+          "replacement": [
+            "        org.telegram.messenger.StartupTrace.stage(org.telegram.messenger.StartupTrace.Stage.GLYPH_RETURN);\n"
+          ]
+        },
+        {
+          "start": 304,
+          "end": 304,
+          "replacement": [
+            "        org.telegram.messenger.StartupTrace.stage(org.telegram.messenger.StartupTrace.Stage.PLUGINS_BEGIN);\n"
+          ]
+        },
+        {
+          "start": 312,
+          "end": 312,
+          "replacement": [
+            "        org.telegram.messenger.StartupTrace.stage(org.telegram.messenger.StartupTrace.Stage.CONTROLLERS_BEGIN);\n"
+          ]
+        },
+        {
+          "start": 329,
+          "end": 329,
+          "replacement": [
+            "        org.telegram.messenger.StartupTrace.stage(org.telegram.messenger.StartupTrace.Stage.CONTROLLERS_RETURN);\n"
+          ]
+        },
+        {
+          "start": 335,
+          "end": 335,
+          "replacement": [
+            "        org.telegram.messenger.StartupTrace.stage(org.telegram.messenger.StartupTrace.Stage.MEDIA_BEGIN);\n"
+          ]
+        },
+        {
+          "start": 341,
+          "end": 341,
+          "replacement": [
+            "        org.telegram.messenger.StartupTrace.stage(org.telegram.messenger.StartupTrace.Stage.POST_INIT_RETURN);\n"
+          ]
+        },
+        {
+          "start": 397,
+          "end": 397,
+          "replacement": [
+            "        org.telegram.messenger.StartupTrace.stage(org.telegram.messenger.StartupTrace.Stage.APP_NATIVE_BEGIN);\n"
+          ]
+        },
+        {
+          "start": 398,
+          "end": 398,
+          "replacement": [
+            "        org.telegram.messenger.StartupTrace.stage(org.telegram.messenger.StartupTrace.Stage.APP_NATIVE_RETURN);\n"
+          ]
+        },
+        {
+          "start": 401,
+          "end": 401,
+          "replacement": [
+            "            org.telegram.messenger.StartupTrace.stage(org.telegram.messenger.StartupTrace.Stage.APP_NATIVE_JAVA_RETURN);\n"
+          ]
+        },
+        {
+          "start": 913,
+          "end": 913,
+          "replacement": [
+            "            if (StartupTrace.enabled()) {\n",
+            "                StartupTrace.failure(error);\n",
+            "                // Do not persist raw messages/stacks in the diagnostic report or CrashLog.\n",
+            "                Throwable safe = new IllegalStateException(\"FLEXYGRAM_STARTUP_DIAGNOSTIC_FAILED\");\n",
+            "                if (systemUncaughtExceptionHandler != null) {\n",
+            "                    systemUncaughtExceptionHandler.uncaughtException(thread, safe);\n",
+            "                }\n",
+            "                Process.killProcess(Process.myPid());\n",
+            "                System.exit(10);\n",
+            "                return;\n",
+            "            }\n"
+          ]
+        }
+      ]
+    },
+    {
+      "source": "TMessagesProj/src/main/java/org/telegram/ui/LaunchActivity.java",
+      "source_sha256": "b8e51ee5be52ed44f891b62ae21a9321fb0e8da0fd5a5de1fcf6e7680e29b660",
+      "output_sha256": "224bddab1f7d8592edc7251713ba6d09c42b3130982638b6f6d921e6eb9118ef",
+      "hunks": [
+        {
+          "start": 432,
+          "end": 432,
+          "replacement": [
+            "        org.telegram.messenger.StartupTrace.stage(org.telegram.messenger.StartupTrace.Stage.LAUNCH_ENTER);\n"
+          ]
+        },
+        {
+          "start": 482,
+          "end": 482,
+          "replacement": [
+            "        org.telegram.messenger.StartupTrace.stage(org.telegram.messenger.StartupTrace.Stage.LAUNCH_FRAMEWORK_RETURN);\n"
+          ]
+        }
+      ]
+    },
+    {
+      "source": "TMessagesProj/src/main/java/org/telegram/ui/DialogsActivity.java",
+      "source_sha256": "6cb070e30b4ec5c435d9a0fc6da09ac534575694214673b9eba8f9bf251b0768",
+      "output_sha256": "2bcc598c765aa2002148350189ef950e8cfb9ce248fc4e6d3ea3d326f1c7a26b",
+      "hunks": [
+        {
+          "start": 2909,
+          "end": 2909,
+          "replacement": [
+            "        org.telegram.messenger.StartupTrace.stage(org.telegram.messenger.StartupTrace.Stage.DIALOGS_FRAGMENT_BEGIN);\n"
+          ]
+        },
+        {
+          "start": 3336,
+          "end": 3336,
+          "replacement": [
+            "        org.telegram.messenger.StartupTrace.stage(org.telegram.messenger.StartupTrace.Stage.DIALOGS_VIEW_BEGIN);\n"
+          ]
+        },
+        {
+          "start": 5887,
+          "end": 5887,
+          "replacement": [
+            "        org.telegram.messenger.StartupTrace.stage(org.telegram.messenger.StartupTrace.Stage.DIALOGS_VIEW_RETURN);\n"
+          ]
+        }
+      ]
+    },
+    {
+      "source": "TMessagesProj/src/realAlpha/java/org/telegram/ui/realalpha/RealAlphaActivity.java",
+      "source_sha256": "bfe8c14a6c46c68a33c597563a1abeee79680e07e3dbf47eafde31d11ed97ff6",
+      "output_sha256": "dfb018b4c41fecca33a2b1f1875f942d9ff972ff84081ce730001b674e2d21cb",
+      "hunks": [
+        {
+          "start": 40,
+          "end": 40,
+          "replacement": [
+            "        org.telegram.messenger.StartupTrace.stage(org.telegram.messenger.StartupTrace.Stage.REAL_ALPHA_ENTER);\n"
+          ]
+        },
+        {
+          "start": 43,
+          "end": 43,
+          "replacement": [
+            "        org.telegram.messenger.StartupTrace.stage(org.telegram.messenger.StartupTrace.Stage.LAUNCH_BEGIN);\n"
+          ]
+        },
+        {
+          "start": 44,
+          "end": 44,
+          "replacement": [
+            "        org.telegram.messenger.StartupTrace.stage(org.telegram.messenger.StartupTrace.Stage.LAUNCH_RETURN);\n"
+          ]
+        },
+        {
+          "start": 47,
+          "end": 47,
+          "replacement": [
+            "        org.telegram.messenger.StartupTrace.stage(org.telegram.messenger.StartupTrace.Stage.DIALOGS_FACTORY);\n"
+          ]
+        }
+      ]
+    },
+    {
+      "source": "TMessagesProj/src/realAlpha/java/org/telegram/ui/realalpha/RealAlphaBootstrap.java",
+      "source_sha256": "bf5199d498c395e8473e93606045c78593afa331ef2b3ad0f2692e408d50b234",
+      "output_sha256": "b5d11953f0dc9722a0a32c63503e1e30a2fb23097d8c48a10ed73ae5eda0185e",
+      "hunks": [
+        {
+          "start": 15,
+          "end": 15,
+          "replacement": [
+            "        org.telegram.messenger.StartupTrace.stage(org.telegram.messenger.StartupTrace.Stage.POLICY_BEGIN);\n"
+          ]
+        },
+        {
+          "start": 16,
+          "end": 16,
+          "replacement": [
+            "        org.telegram.messenger.StartupTrace.stage(org.telegram.messenger.StartupTrace.Stage.POLICY_RETURN);\n"
+          ]
+        },
+        {
+          "start": 25,
+          "end": 25,
+          "replacement": [
+            "            org.telegram.messenger.StartupTrace.stage(org.telegram.messenger.StartupTrace.Stage.ACCOUNTS_BEFORE);\n"
+          ]
+        },
+        {
+          "start": 26,
+          "end": 26,
+          "replacement": [
+            "            org.telegram.messenger.StartupTrace.stage(org.telegram.messenger.StartupTrace.Stage.POST_INIT_BEGIN);\n"
+          ]
+        },
+        {
+          "start": 27,
+          "end": 27,
+          "replacement": [
+            "            org.telegram.messenger.StartupTrace.stage(org.telegram.messenger.StartupTrace.Stage.ACCOUNTS_AFTER);\n"
+          ]
+        },
+        {
+          "start": 29,
+          "end": 29,
+          "replacement": [
+            "            org.telegram.messenger.StartupTrace.stage(org.telegram.messenger.StartupTrace.Stage.BOOTSTRAP_READY);\n"
+          ]
+        },
+        {
+          "start": 31,
+          "end": 31,
+          "replacement": [
+            "            org.telegram.messenger.StartupTrace.failure(failure);\n"
+          ]
+        }
+      ]
+    },
+    {
+      "source": "TMessagesProj/src/realAlpha/java/org/telegram/ui/realalpha/RealAlphaPolicy.java",
+      "source_sha256": "b84990546f9056024fa31926d51013bdc195bb2c67700dd02c41cc8bbf8ff7cd",
+      "output_sha256": "ae9808f1843fef45437270a604727cbeef9b236fc219147071896686bac37fd5",
+      "hunks": [
+        {
+          "start": 13,
+          "end": 14,
+          "replacement": [
+            "        boolean startupProbe = \"startupDiagnostic\".equals(BuildConfig.BUILD_TYPE)\n",
+            "                && (APPLICATION_ID + \".startupdiagnostic\").equals(BuildConfig.APPLICATION_ID);\n",
+            "        if ((!APPLICATION_ID.equals(BuildConfig.APPLICATION_ID) && !startupProbe)\n"
+          ]
+        }
+      ]
+    },
+    {
+      "source": "TMessagesProj/src/main/java/org/telegram/messenger/NativeLoader.java",
+      "source_sha256": "fb2296ec1d5e2f41f8cca48f59a78727b3d07ddeda352e76c82336da2ec1d8d9",
+      "output_sha256": "3f8242dff8dd099d63d4688a14dfd52102c0921f939a2eff46bbe5d4dced554b",
+      "hunks": [
+        {
+          "start": 38,
+          "end": 38,
+          "replacement": [
+            "                org.telegram.messenger.StartupTrace.observed(th);\n"
+          ]
+        },
+        {
+          "start": 57,
+          "end": 57,
+          "replacement": [
+            "                org.telegram.messenger.StartupTrace.observed(e);\n"
+          ]
+        },
+        {
+          "start": 87,
+          "end": 87,
+          "replacement": [
+            "                org.telegram.messenger.StartupTrace.observed(e);\n"
+          ]
+        },
+        {
+          "start": 91,
+          "end": 91,
+          "replacement": [
+            "                org.telegram.messenger.StartupTrace.observed(e);\n"
+          ]
+        },
+        {
+          "start": 97,
+          "end": 97,
+          "replacement": [
+            "                org.telegram.messenger.StartupTrace.observed(e);\n"
+          ]
+        },
+        {
+          "start": 104,
+          "end": 104,
+          "replacement": [
+            "                org.telegram.messenger.StartupTrace.observed(e);\n"
+          ]
+        },
+        {
+          "start": 126,
+          "end": 126,
+          "replacement": [
+            "                org.telegram.messenger.StartupTrace.observed(e);\n"
+          ]
+        },
+        {
+          "start": 141,
+          "end": 141,
+          "replacement": [
+            "                org.telegram.messenger.StartupTrace.observed(e);\n"
+          ]
+        },
+        {
+          "start": 159,
+          "end": 159,
+          "replacement": [
+            "                org.telegram.messenger.StartupTrace.observed(e);\n"
+          ]
+        },
+        {
+          "start": 174,
+          "end": 174,
+          "replacement": [
+            "                org.telegram.messenger.StartupTrace.observed(e);\n"
+          ]
+        },
+        {
+          "start": 182,
+          "end": 182,
+          "replacement": [
+            "                org.telegram.messenger.StartupTrace.observed(e);\n"
+          ]
+        },
+        {
+          "start": 210,
+          "end": 210,
+          "replacement": [
+            "                org.telegram.messenger.StartupTrace.observed(e);\n"
+          ]
+        }
+      ]
+    }
+  ]
+}
