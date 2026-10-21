@@ -1,0 +1,20 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
+    <application android:name="org.telegram.ui.realalpha.diagnostics.StartupDiagnosticApplication"
+        android:label="FlexyGram Startup Probe" android:theme="@android:style/Theme.Material.Light.NoActionBar"
+        tools:replace="android:name,android:label,android:theme">
+        <activity android:name="org.telegram.ui.realalpha.RealAlphaActivity"
+            android:exported="false" android:process=":startup_probe" tools:node="replace"
+            android:theme="@style/Theme.TMessages.Start" android:launchMode="singleTask"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode|smallestScreenSize|screenLayout"
+            android:windowSoftInputMode="adjustResize" />
+        <activity android:name="org.telegram.ui.realalpha.diagnostics.StartupReportActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <provider android:name="ru.noties.jlatexmath.JLatexMathInitProvider"
+            android:process=":startup_probe" />
+    </application>
+</manifest>

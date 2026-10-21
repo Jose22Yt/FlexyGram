@@ -55,6 +55,10 @@ def realAlphaScope = realAlphaEnabled ? java.security.MessageDigest.getInstance(
 if (realAlphaEnabled && System.getenv('NATIVE_TARGET') != 'arm64-v8a') {
     throw new GradleException('FLEXYGRAM_REAL_ALPHA_REQUIRES_REAL_ARM64_JNI')
 }
+def startupDiagnosticsEnabled = providers.gradleProperty('flexygramRealAlphaStartupDiagnostics').orNull == 'true'
+if (startupDiagnosticsEnabled && !realAlphaEnabled) {
+    throw new GradleException('FLEXYGRAM_STARTUP_DIAGNOSTICS_REQUIRES_REAL_ALPHA')
+}
 def rejectProduction = new GroovyShell().evaluate(rootProject.file('gradle/production-readiness.gradle'))
 // Early, redacted rejection even for tasks of variants which AGP deliberately disables.
 if (gradle.startParameter.taskNames.any { it.toLowerCase(java.util.Locale.ROOT).contains('production') }) {
@@ -281,6 +285,15 @@ android {
             signingConfig = null
         }
 
+        if (startupDiagnosticsEnabled) {
+            startupDiagnostic {
+                initWith debug
+                applicationIdSuffix = '.startupdiagnostic'
+                matchingFallbacks = ['debug']
+                signingConfig = null
+            }
+        }
+
         staging {
             debuggable = false
             jniDebuggable = false
@@ -315,7 +328,8 @@ androidComponents {
         // Reviewed isolated variants only. Production never reaches codegen, JNI or packaging.
         builder.enable = (flavor == 'diagnostic' && builder.buildType in ['debug', 'staging']) ||
                 (betaDevelopmentEnabled && flavor == 'betaDevelopment' && builder.buildType == 'debug') ||
-                (realAlphaEnabled && flavor == 'realAlpha' && builder.buildType == 'debug')
+                (realAlphaEnabled && flavor == 'realAlpha' && builder.buildType == 'debug') ||
+                (startupDiagnosticsEnabled && flavor == 'realAlpha' && builder.buildType == 'startupDiagnostic')
     }
     onVariants(selector().all()) { variant ->
         variant.outputs.forEach { output ->
@@ -558,6 +572,39 @@ tasks.register('verifyProductionReadiness') { doLast { rejectProduction.call() }
 ['', 'Debug', 'Staging', 'Release'].each { suffix ->
     ['assemble', 'bundle'].each { operation ->
         tasks.register(operation + 'Production' + suffix) { dependsOn 'verifyProductionReadiness' }
+    }
+}
+
+// Exact, generated Java overlay is selected ONLY for the explicit startup diagnostic task.
+// Debug realAlpha and every existing variant still compile their original source bytes.
+if (startupDiagnosticsEnabled) {
+    def startupSources = layout.buildDirectory.dir('generated/flexygramStartup/java')
+    def prepareStartupSources = tasks.register('prepareRealAlphaStartupSources', Exec) {
+        inputs.files(rootProject.file('tools/real_alpha/startup-overlays.json'),
+                rootProject.file('tools/real_alpha/prepare_startup_sources.py'))
+        def rows = new groovy.json.JsonSlurper().parse(rootProject.file('tools/real_alpha/startup-overlays.json')).files
+        inputs.files(rows.collect { rootProject.file(it.source) })
+        outputs.dir(startupSources)
+        commandLine chaquopyBuildPython ?: 'python3', rootProject.file('tools/real_alpha/prepare_startup_sources.py'),
+                '--output', startupSources.get().asFile.absolutePath
+    }
+    androidComponents.onVariants(androidComponents.selector().withBuildType('startupDiagnostic')) { variant ->
+        if (variant.name == 'realAlphaStartupDiagnostic') {
+            variant.sources.java.addStaticSourceDirectory(startupSources.get().asFile.absolutePath)
+        }
+    }
+    tasks.configureEach { task ->
+        if (task.name == 'compileRealAlphaStartupDiagnosticKotlin') {
+            task.dependsOn(prepareStartupSources)
+        }
+    }
+    tasks.withType(JavaCompile).configureEach { task ->
+        if (task.name == 'compileRealAlphaStartupDiagnosticJavaWithJavac') {
+            def rows = new groovy.json.JsonSlurper().parse(rootProject.file('tools/real_alpha/startup-overlays.json')).files
+            def originals = rows.collect { rootProject.file(it.source).canonicalPath } as Set
+            task.dependsOn(prepareStartupSources)
+            task.exclude { element -> originals.contains(element.file.canonicalPath) }
+        }
     }
 }
 

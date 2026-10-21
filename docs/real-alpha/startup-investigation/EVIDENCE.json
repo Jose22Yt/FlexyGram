@@ -1,0 +1,150 @@
+{
+  "status": "PHYSICAL_STARTUP_FAILED_CAUSE_UNCONFIRMED_DIAGNOSTIC_PREPARED",
+  "base_pr": 37,
+  "base_head": "8f8c25234a973c5dfaf411978b2d4f5c2173ff93",
+  "branch": "fix/real-alpha-startup-diagnostics",
+  "root_cause_confirmed": false,
+  "physical_original_startup_passed": false,
+  "diagnostic_android_executed": false,
+  "host_tests": {
+    "distinct": 78,
+    "normal": "passed",
+    "optimized": "passed",
+    "existing": 56,
+    "new": 22,
+    "normal_log_sha256": "95dfdc410a2d8af29c6579c8665fc41aac1f1fc8e7505381192fe32a780497b4",
+    "optimized_log_sha256": "503a522051ee0593a7d9f373783e9dafa4c6030393c2eb8264714aca7e0fc251"
+  },
+  "build": {
+    "status": "BUILD SUCCESSFUL",
+    "variant": "realAlphaStartupDiagnostic",
+    "offline": true,
+    "native_target": "arm64-v8a",
+    "jdk": "21.0.10",
+    "gradle": "9.7.1",
+    "sdk": 37,
+    "target_sdk": 36,
+    "ndk": "27.2.12479018",
+    "cmake": "3.31.6",
+    "python": "3.11.17",
+    "jni_real": true,
+    "chaquopy_real": true,
+    "command": "NATIVE_TARGET=arm64-v8a gradle -PflexygramRealAlpha=true -PflexygramRealAlphaStartupDiagnostics=true :TMessagesProj:assembleRealAlphaStartupDiagnostic",
+    "approved_wheels_manifest_sha256": "c6495ee9895da29a2c4bdc9c45647721c33070190eeb8c9b8054096cb2bf2f97"
+  },
+  "unsigned_diagnostic": {
+    "apk_bytes": 116699043,
+    "apk_sha256": "c52933e38c286fe83814399936018eeea00c9166c741bd424af4988de4ccaaf6",
+    "backup_bytes": 105101730,
+    "backup_sha256": "985cf8e170fc89a12bbc7cab68f31d8a6b2482d15f7df19e16305c101dcde02a",
+    "local_backup_crc_verified": true,
+    "backup_internal_apk_equal": true,
+    "signed": false,
+    "new_key_generated": false,
+    "distributed": false,
+    "installed": false
+  },
+  "apk_gates": {
+    "status": "STARTUP_DIAGNOSTIC_UNSIGNED_ONLY_PENDING_ANDROID",
+    "apk_sha256": "c52933e38c286fe83814399936018eeea00c9166c741bd424af4988de4ccaaf6",
+    "bytes": 116699043,
+    "manifest": {
+      "package": "io.github.jose22yt.flexygram.realalpha.startupdiagnostic",
+      "launcher": "org.telegram.ui.realalpha.diagnostics.StartupReportActivity",
+      "probe": "org.telegram.ui.realalpha.RealAlphaActivity",
+      "application": "org.telegram.ui.realalpha.diagnostics.StartupDiagnosticApplication",
+      "probe_process": ":startup_probe",
+      "permissions": [
+        "android.permission.ACCESS_NETWORK_STATE",
+        "io.github.jose22yt.flexygram.realalpha.startupdiagnostic.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+      ],
+      "no_internet": true,
+      "restore_disabled": true
+    },
+    "native_summary": {
+      "elf_total": 97,
+      "android_arm64": 96,
+      "arm64_4k_pass": 96,
+      "arm64_16k_pass": 96,
+      "other_machine": 1,
+      "missing_needed": 0,
+      "strong_unresolved": 0,
+      "version_mismatch": 0
+    },
+    "native_acceptance": {
+      "status": "STATIC_CLEAN_PENDING_ANDROID",
+      "arm64_elf": 96,
+      "non_target_payloads": 1,
+      "blockers": [],
+      "runtime_required": true,
+      "distribution_allowed": false,
+      "limits": "Static API24/16KB conditions; no ART/linker/device certification. Non-target ELF payloads remain in the full report."
+    },
+    "signature": "absent",
+    "zipalign_4k_16k": true,
+    "native_ui_dex_linkage": true,
+    "generated_hooks_compiled": true,
+    "retired_scan": {
+      "complete": true,
+      "apk_shaped": true,
+      "entries": 14858,
+      "nested_archives": 7,
+      "client_key_candidates": 0,
+      "known_key_occurrences": 0,
+      "foreign_package_occurrences": 0,
+      "foreign_certificate_occurrences": 0,
+      "embedded_service_configurations": 0,
+      "errors": [],
+      "sha256": "c52933e38c286fe83814399936018eeea00c9166c741bd424af4988de4ccaaf6",
+      "passed": true,
+      "limits": "Static candidates only; no proof of execution or universal absence of secrets."
+    },
+    "android_executed": false,
+    "root_cause_confirmed": false,
+    "distribution_allowed": false
+  },
+  "failed_artifact_preservation": {
+    "failed_apk_sha256": "c4f89fbe374f39d57fb98f73ef92ac9d493ee2061343669b59a8eab179cb9fb9",
+    "failed_apk_bytes": 113081095,
+    "backup_sha256": "7ababd3649679397e224cd0d8d8e2cb8f31c1c6b16487712ec535aa37315a830",
+    "backup_bytes": 105081156,
+    "old_key_reused": false,
+    "new_keys_generated": false
+  },
+  "original_sources_unchanged": [
+    {
+      "source": "TMessagesProj/src/main/java/org/telegram/messenger/ApplicationLoader.java",
+      "source_sha256": "91d058fd979b9846f61ab08510817c79233c14b8e45c61bd1de5de52430e2a46"
+    },
+    {
+      "source": "TMessagesProj/src/main/java/org/telegram/ui/LaunchActivity.java",
+      "source_sha256": "b8e51ee5be52ed44f891b62ae21a9321fb0e8da0fd5a5de1fcf6e7680e29b660"
+    },
+    {
+      "source": "TMessagesProj/src/main/java/org/telegram/ui/DialogsActivity.java",
+      "source_sha256": "6cb070e30b4ec5c435d9a0fc6da09ac534575694214673b9eba8f9bf251b0768"
+    },
+    {
+      "source": "TMessagesProj/src/realAlpha/java/org/telegram/ui/realalpha/RealAlphaActivity.java",
+      "source_sha256": "bfe8c14a6c46c68a33c597563a1abeee79680e07e3dbf47eafde31d11ed97ff6"
+    },
+    {
+      "source": "TMessagesProj/src/realAlpha/java/org/telegram/ui/realalpha/RealAlphaBootstrap.java",
+      "source_sha256": "bf5199d498c395e8473e93606045c78593afa331ef2b3ad0f2692e408d50b234"
+    },
+    {
+      "source": "TMessagesProj/src/realAlpha/java/org/telegram/ui/realalpha/RealAlphaPolicy.java",
+      "source_sha256": "b84990546f9056024fa31926d51013bdc195bb2c67700dd02c41cc8bbf8ff7cd"
+    },
+    {
+      "source": "TMessagesProj/src/main/java/org/telegram/messenger/NativeLoader.java",
+      "source_sha256": "fb2296ec1d5e2f41f8cca48f59a78727b3d07ddeda352e76c82336da2ec1d8d9"
+    }
+  ],
+  "original_verifiers_unchanged": true,
+  "pr37_modified": false,
+  "keys_generated": false,
+  "signed": false,
+  "distributed": false,
+  "installed": false
+}
