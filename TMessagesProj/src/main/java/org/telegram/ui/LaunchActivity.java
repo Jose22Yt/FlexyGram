@@ -731,7 +731,12 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         MediaController.getInstance().setBaseActivity(this, true);
         // ApplicationLoader.startAppCenter(this);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        // Offline realAlpha has no biometric permission or app-lock identity to prepare.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                && !("realAlpha".equals(BuildConfig.FLEXYGRAM_VARIANT)
+                && BuildConfig.ISOLATED_DIAGNOSTIC
+                && !BuildConfig.FLEXYGRAM_CAP_AUTHENTICATION
+                && !BuildConfig.FLEXYGRAM_CAP_TELEGRAMTRANSPORT)) {
             FingerprintController.checkKeyReady();
         }
 

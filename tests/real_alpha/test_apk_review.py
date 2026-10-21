@@ -82,6 +82,17 @@ Class #2
             with zipfile.ZipFile(apk,'w') as z:z.writestr('classes.dex',b'synthetic fixture')
             with patch.object(r,'command',return_value=listing):r.verify_dex_linkage(apk,Path('synthetic-dexdump'))
             mutations=[listing.replace('Lorg/telegram/ui/LaunchActivity;','Lorg/telegram/ui/beta/BetaPreviewActivity;'),listing.replace("'getClientNotActivatedFragment'","'unrelatedFactory'"),listing.replace('      new-instance',"    #1\n      name : 'unrelatedFactory'\n      new-instance"),listing+listing,listing.replace("Class descriptor : 'Lorg/telegram/ui/DialogsActivity;'","Class descriptor : 'Lsynthetic/Missing;'"),listing+"\nClass #3\n  Class descriptor : 'Lorg/telegram/ui/realalpha/RealAlphaBack;'",listing.replace("name : 'otherMethod'","name : 'onBackPressed'"),listing.replace("name : 'otherMethod'","name : 'onDestroy'"),listing.replace('unregisterOnBackInvokedCallback','removedUnregister'),listing.replace('check-cast OnBackAnimationCallback','removedPredictiveCallback')]
+            mutations.append(listing.replace("      name : 'onBackPressed'", "      name : 'onBackPressed'\n      invoke-static Lorg/telegram/messenger/FingerprintController;.checkKeyReady:()V"))
             for m in mutations:
                 with self.subTest(mutation=m),patch.object(r,'command',return_value=m),self.assertRaises(ValueError):r.verify_dex_linkage(apk,Path('synthetic-dexdump'))
+    def test_biometric_dex_guard_requires_constant_identity_and_forward_skip(self):
+        block='''|0100: const-string v0, "realAlpha"
+|0102: invoke-virtual {v0, v0}, Ljava/lang/String;.equals:(Ljava/lang/Object;)Z
+|0105: move-result v0
+|0106: if-nez v0, 010b // +0005
+|0108: invoke-static {}, Lorg/telegram/messenger/FingerprintController;.checkKeyReady:()V
+'''
+        r.verify_offline_biometric_guard(block)
+        for bad in [block.replace('realAlpha','diagnostic'),block.replace('if-nez','if-eqz'),block.replace('010b','0100'),block.replace('move-result v0','move-result v1'),block.replace('|0102:', '|0101: move-object v0, v1\n|0102:')]:
+            with self.subTest(bad=bad),self.assertRaises(ValueError):r.verify_offline_biometric_guard(bad)
 if __name__=='__main__':unittest.main()

@@ -1,5 +1,5 @@
 {
-  "base_commit": "8f8c25234a973c5dfaf411978b2d4f5c2173ff93",
+  "base_commit": "cce67ce7023e8231cd1c244c60f0305c455c160c",
   "files": [
     {
       "source": "TMessagesProj/src/main/java/org/telegram/messenger/ApplicationLoader.java",
@@ -105,8 +105,8 @@
     },
     {
       "source": "TMessagesProj/src/main/java/org/telegram/ui/LaunchActivity.java",
-      "source_sha256": "b8e51ee5be52ed44f891b62ae21a9321fb0e8da0fd5a5de1fcf6e7680e29b660",
-      "output_sha256": "224bddab1f7d8592edc7251713ba6d09c42b3130982638b6f6d921e6eb9118ef",
+      "source_sha256": "3fcd3102ade6d5091b18e5c002e9ee68b3125ac909f3ecc2126c55ffc4a678c1",
+      "output_sha256": "d7ff2562a6db83adb3a2c0f05db4720854b0beb8bb3dc77161094cfab75d5510",
       "hunks": [
         {
           "start": 432,
