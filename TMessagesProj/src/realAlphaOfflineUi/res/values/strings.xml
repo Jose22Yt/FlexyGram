@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyGramOfflineDialogsTitle">FlexyGram · Offline trial</string>
+    <string name="FlexyGramOfflineDialogsEmpty">Offline test version\nTelegram connection is intentionally disabled.\nNo chats are loaded from the network.</string>
+</resources>

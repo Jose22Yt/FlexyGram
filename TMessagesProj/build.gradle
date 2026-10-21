@@ -578,7 +578,10 @@ tasks.register('verifyDiagnosticTranslationClasspath') {
     // Recheck the resolved graph rather than accepting a stale report.
     outputs.upToDateWhen { false }
     doLast {
-        def names = ['diagnosticDebugCompileClasspath', 'diagnosticDebugRuntimeClasspath',
+        // Opt-in native labs disable Diagnostic variants; audit the graph actually built.
+        def nativeLabOnly = localLoginPagesEnabled || providers.gradleProperty('flexygramOfflineDialogsUi').orNull == 'true'
+        def names = nativeLabOnly ? ['realAlphaDebugCompileClasspath', 'realAlphaDebugRuntimeClasspath'] :
+                    ['diagnosticDebugCompileClasspath', 'diagnosticDebugRuntimeClasspath',
                      'diagnosticStagingCompileClasspath', 'diagnosticStagingRuntimeClasspath']
         def graphs = [:]
         names.each { name ->
@@ -664,3 +667,6 @@ tasks.configureEach { task ->
         task.dependsOn(prepareLockedPython)
     }
 }
+
+// Independent, opt-in source overlay; does not participate in the default build.
+apply from: rootProject.file("gradle/real-alpha-offline-ui.gradle")
