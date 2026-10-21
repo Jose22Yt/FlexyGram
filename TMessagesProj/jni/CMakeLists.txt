@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.16)
 
 if(FLEXYGRAM_FLAVOR STREQUAL "betaDevelopment")
     include("${CMAKE_CURRENT_LIST_DIR}/beta-development-policy.cmake")
+elseif(FLEXYGRAM_FLAVOR STREQUAL "realAlpha")
+    include("${CMAKE_CURRENT_LIST_DIR}/real-alpha-policy.cmake")
 else()
     include("${CMAKE_CURRENT_LIST_DIR}/variant-policy.cmake")
 endif()
