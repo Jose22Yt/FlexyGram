@@ -1,0 +1,14 @@
+test_existing_private_api_pair_resolver_with_synthetic_values (test_integration_contracts.IntegrationContracts.test_existing_private_api_pair_resolver_with_synthetic_values) ... ok
+test_no_existing_shared_or_build_files_modified (test_integration_contracts.IntegrationContracts.test_no_existing_shared_or_build_files_modified) ... ok
+test_no_network_logging_or_android_backend_in_new_module (test_integration_contracts.IntegrationContracts.test_no_network_logging_or_android_backend_in_new_module) ... ok
+test_original_debug_reset_and_unapplied_no_reset_patch (test_integration_contracts.IntegrationContracts.test_original_debug_reset_and_unapplied_no_reset_patch) ... ok
+test_original_java_login_sinks_and_unapplied_redaction (test_integration_contracts.IntegrationContracts.test_original_java_login_sinks_and_unapplied_redaction) ... ok
+test_original_native_integrity_sink_and_unapplied_redaction (test_integration_contracts.IntegrationContracts.test_original_native_integrity_sink_and_unapplied_redaction) ... ok
+test_original_null_user_partial_mutation_and_unapplied_fix (test_integration_contracts.IntegrationContracts.test_original_null_user_partial_mutation_and_unapplied_fix) ... ok
+test_scope_matches_fixed_userconfig_and_variant_identities (test_integration_contracts.IntegrationContracts.test_scope_matches_fixed_userconfig_and_variant_identities) ... ok
+test_unapplied_api_patch_keeps_closed_mode_and_rejects_legacy_overrides (test_integration_contracts.IntegrationContracts.test_unapplied_api_patch_keeps_closed_mode_and_rejects_legacy_overrides) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 4.894s
+
+OK

@@ -1,0 +1,15 @@
+{
+  "python": "Python 3.11.17",
+  "jdk": "JBR SDK 21.0.10+7-b1163.105",
+  "java_target": "--release 8 (classfile 52)",
+  "cpp": "c++ (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0",
+  "cmake": "3.31.6 (pinned cmake package)",
+  "gradle": "9.7.1 Groovy resolver only, no Gradle task executed",
+  "android_sdk": "Google platform-24_r02.zip, API24; package source.properties revision3",
+  "download_sha256": {
+    "jbr.tar.gz": "87d145c5877b71236c34f075f923824a4bf9f24724c5a1ad68ade36e4a947a95",
+    "gradle.zip": "acd53f1edaf02f1a8ff99879f8a34b302661a057d9b063ae9e35b552f804d20a",
+    "platform-24_r02.zip": "f268f5945c6ece7ea95c1c252067280854d2a20da924e22ae4720287df8bdbc9",
+    "sdk24/android-7.0/android.jar": "4c438bf1b3d4e6104faccc62e1ffe95ef197b88055497b540a871349e93c8685"
+  }
+}
