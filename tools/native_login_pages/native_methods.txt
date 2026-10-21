@@ -1,0 +1,124 @@
+    // BEGIN CLOSED LOCAL PAGES — original views, no original auth or session mutation.
+    private boolean preparedLocalMode;
+    private io.github.jose22yt.flexygram.login.local.LocalLoginSession preparedLocalSession;
+    private io.github.jose22yt.flexygram.login.local.EphemeralPages.View preparedLocalView;
+    private io.github.jose22yt.flexygram.login.local.LocalTransitionFence preparedTransition;
+    private AnimatorSet preparedPagesAnimation;
+    private boolean preparedLocalViewAlive;
+    private io.github.jose22yt.flexygram.login.local.EphemeralPages.Status preparedLastLocalStatus;
+    private static boolean localLoginClosed() {
+        return "realAlpha".equals(org.telegram.messenger.BuildConfig.FLEXYGRAM_VARIANT)
+                && org.telegram.messenger.DiagnosticPolicy.isIsolated();
+    }
+    public void bindClosedLocalPages(io.github.jose22yt.flexygram.login.local.LocalLoginSession session) {
+        if (!localLoginClosed() || session == null || session.scope().account != currentAccount
+                || preparedLocalSession != null || cachedFragmentView != null || activityMode != MODE_LOGIN)
+            throw new IllegalStateException("LOCAL_PAGE_BINDING_REJECTED");
+        preparedLocalMode = true;
+        preparedLocalSession = session;
+    }
+    private boolean localViewActive() {
+        return preparedLocalMode && preparedLocalViewAlive && activityMode == MODE_LOGIN
+                && preparedLocalSession != null && preparedLocalSession.valid(preparedLocalView, currentAccount);
+    }
+    private void attachClosedLocalView() {
+        if (localViewActive()) return;
+        if (preparedLocalSession == null || preparedLocalSession.scope().account != currentAccount) return;
+        preparedLocalViewAlive = true;
+        preparedTransition = new io.github.jose22yt.flexygram.login.local.LocalTransitionFence();
+        preparedLocalView = preparedLocalSession.attach(currentAccount,
+                io.github.jose22yt.flexygram.session.android.LoginActivityAdapter.mainExecutor(), state -> {
+                    if (!localViewActive()) return;
+                    if (state.status == io.github.jose22yt.flexygram.login.local.EphemeralPages.Status.STORAGE_REVIEW
+                            || state.status == io.github.jose22yt.flexygram.login.local.EphemeralPages.Status.STOPPED
+                            || state.status == io.github.jose22yt.flexygram.login.local.EphemeralPages.Status.UNSUPPORTED
+                            || state.status == io.github.jose22yt.flexygram.login.local.EphemeralPages.Status.COMPLETE) {
+                        clearClosedLocalInputs();
+                        if (preparedLastLocalStatus != state.status) needShowAlert("Local login simulation", state.status.name());
+                        preparedLastLocalStatus = state.status;
+                        return;
+                    }
+                    preparedLastLocalStatus = state.status;
+                    if (state.page < 0) return; // unsupported/storage review never falls through to native auth.
+                    if (!io.github.jose22yt.flexygram.login.local.EphemeralPages.allowedPage(state.page)) return;
+                    if (state.page != currentViewNum) setPage(state.page, true, null, false);
+                    else localApplyPage(state.page);
+                });
+    }
+    private long prepareLocalTransition() {
+        if (preparedPagesAnimation != null) {
+            preparedPagesAnimation.removeAllListeners();
+            preparedPagesAnimation.cancel();
+            preparedPagesAnimation = null;
+        }
+        for (int a = 0; a < views.length; a++) if (views[a] != null && a != currentViewNum) {
+            views[a].setVisibility(View.GONE);
+            views[a].setX(0);
+            localClearPage(a);
+        }
+        return preparedTransition.next();
+    }
+    private void detachClosedLocalView() {
+        preparedLocalViewAlive = false;
+        if (preparedTransition != null) preparedTransition.destroy();
+        if (preparedPagesAnimation != null) { preparedPagesAnimation.removeAllListeners(); preparedPagesAnimation.cancel(); preparedPagesAnimation = null; }
+        if (doneItemAnimation != null) { doneItemAnimation.removeAllListeners(); doneItemAnimation.cancel(); }
+        for (AnimatorSet animation : showDoneAnimation) if (animation != null) { animation.removeAllListeners(); animation.cancel(); }
+        if (keyboardAnimator != null) { keyboardAnimator.removeAllListeners(); keyboardAnimator.cancel(); }
+        if (preparedLocalSession != null) preparedLocalSession.detach(preparedLocalView);
+        preparedLocalView = null;
+        clearClosedLocalInputs();
+    }
+    private void localPhoneNext(CharSequence country, CharSequence number) {
+        if (!localViewActive()) return;
+        char[] copy = io.github.jose22yt.flexygram.login.local.NativeUiInput.bounded(country, number);
+        try { preparedLocalSession.phone(preparedLocalView, copy); }
+        finally { io.github.jose22yt.flexygram.login.local.NativeUiInput.wipe(copy); }
+    }
+    private void localCodeNext(CharSequence code) {
+        if (!localViewActive()) return;
+        char[] copy = io.github.jose22yt.flexygram.login.local.NativeUiInput.bounded(code);
+        try { preparedLocalSession.code(preparedLocalView, copy); }
+        finally { io.github.jose22yt.flexygram.login.local.NativeUiInput.wipe(copy); }
+    }
+    private void localPasswordNext(CharSequence password) {
+        if (!localViewActive()) return;
+        char[] copy = io.github.jose22yt.flexygram.login.local.NativeUiInput.bounded(password);
+        try { if (preparedLocalSession.parameters(preparedLocalView).status == io.github.jose22yt.flexygram.login.local.EphemeralPages.Status.PARAMETERS_PENDING) preparedLocalSession.loadPassword(preparedLocalView); else preparedLocalSession.password(preparedLocalView, copy); }
+        finally { io.github.jose22yt.flexygram.login.local.NativeUiInput.wipe(copy); }
+    }
+    private void localRegisterNext(CharSequence first, CharSequence last) {
+        if (!localViewActive()) return;
+        char[] f = io.github.jose22yt.flexygram.login.local.NativeUiInput.bounded(first);
+        char[] l = io.github.jose22yt.flexygram.login.local.NativeUiInput.bounded(last);
+        try { preparedLocalSession.register(preparedLocalView, f, l); }
+        finally { io.github.jose22yt.flexygram.login.local.NativeUiInput.wipe(f); io.github.jose22yt.flexygram.login.local.NativeUiInput.wipe(l); }
+    }
+    private void localCancelPages() {
+        if (localViewActive()) preparedLocalSession.cancel(preparedLocalView);
+        clearClosedLocalInputs();
+    }
+    private void clearClosedLocalInputs() { for (int page : new int[]{0,1,2,5,6}) localClearPage(page); }
+    private void localClearPage(int page) {
+        if (views[page] == null) return;
+        if (page == VIEW_PHONE_INPUT) { PhoneView p = (PhoneView) views[page]; p.codeField.setText(""); p.phoneField.setText(""); }
+        else if (page == VIEW_CODE_MESSAGE || page == VIEW_CODE_SMS) { LoginActivitySmsView p = (LoginActivitySmsView) views[page]; p.codeFieldContainer.setText(""); p.currentParams = null; p.phone = p.phoneHash = p.requestPhone = p.emailPhone = null; }
+        else if (page == VIEW_PASSWORD) { LoginActivityPasswordView p = (LoginActivityPasswordView) views[page]; p.codeField.setText(""); p.currentParams = null; p.currentPassword = null; p.passwordString = p.requestPhone = p.phoneHash = p.phoneCode = null; }
+        else if (page == VIEW_REGISTER) { LoginActivityRegisterView p = (LoginActivityRegisterView) views[page]; p.firstNameField.setText(""); p.lastNameField.setText(""); p.currentParams = null; p.requestPhone = p.phoneHash = null; }
+    }
+    private void localApplyPage(int page) {
+        if (!localViewActive()) return;
+        io.github.jose22yt.flexygram.login.local.EphemeralPages.Parameters state = preparedLocalSession.parameters(preparedLocalView);
+        if (state.page != page) return;
+        if (page == VIEW_CODE_MESSAGE || page == VIEW_CODE_SMS) {
+            LoginActivitySmsView p = (LoginActivitySmsView) views[page];
+            p.currentParams = null; p.nextType = 0; p.waitingForEvent = false;
+            if (state.codeLength < 1 || state.codeLength > 12) return;
+            p.codeFieldContainer.setNumbersCount(state.codeLength, p.currentType);
+            if (p.codeFieldContainer.codeField != null) for (android.widget.EditText f : p.codeFieldContainer.codeField) { f.setSaveEnabled(false); f.setSaveFromParentEnabled(false); }
+        }
+        if (page == VIEW_PASSWORD) { LoginActivityPasswordView p = (LoginActivityPasswordView) views[page]; p.codeField.setSaveEnabled(false); p.codeField.setSaveFromParentEnabled(false); }
+        if (page == VIEW_PHONE_INPUT) { PhoneView p = (PhoneView) views[page]; p.codeField.setSaveEnabled(false); p.phoneField.setSaveEnabled(false); }
+        if (page == VIEW_REGISTER) { LoginActivityRegisterView p = (LoginActivityRegisterView) views[page]; p.firstNameField.setSaveEnabled(false); p.lastNameField.setSaveEnabled(false); }
+    }
+    // END CLOSED LOCAL PAGES

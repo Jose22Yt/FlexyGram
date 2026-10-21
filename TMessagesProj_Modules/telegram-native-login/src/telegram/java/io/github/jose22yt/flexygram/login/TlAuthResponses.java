@@ -40,7 +40,7 @@ public final class TlAuthResponses {
             if(response instanceof TLRPC.TL_auth_sentCode) {
                 TLRPC.TL_auth_sentCode code=(TLRPC.TL_auth_sentCode)response;
                 if(code.phone_code_hash==null||code.phone_code_hash.isEmpty())return Response.failure(Error.PROTOCOL);
-                Route route=route(code.type);return route==Route.NONE?Response.of(Kind.UNSUPPORTED):Response.code(route);
+                Route route=route(code.type);return route==Route.NONE?Response.of(Kind.UNSUPPORTED):Response.code(route,code.type.length);
             }
         } else if(action==Action.GET_PASSWORD && response instanceof TL_account.Password) {
             TL_account.Password password=(TL_account.Password)response;

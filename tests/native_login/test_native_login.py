@@ -47,7 +47,7 @@ class NativeLoginTests(unittest.TestCase):
         self.assertEqual(self.metadata['declarations']['TL_auth_authorization']['fields'],['public boolean setup_password_required;','public byte[] future_auth_token;','public User user;'])
     def test_no_shared_client_or_capability_files_changed(self):
         changed=subprocess.check_output(['git','diff','--name-only','b09b79301db93e19471bd0c21aecba0bb9e64063'],cwd=ROOT,text=True).splitlines()
-        for path in changed:self.assertTrue(path in CHANGED_SHARED or path.startswith(('TMessagesProj_Modules/telegram-native-login/','tests/native_login/','docs/native-login/','TMessagesProj_Modules/telegram-login-wiring/','tests/native_login_wiring/','docs/native-login-wiring/','tools/native_login_wiring/','patches/native-login-wiring/')),path)
+        for path in changed:self.assertTrue(path in CHANGED_SHARED or path.startswith(('TMessagesProj_Modules/telegram-native-login/','tests/native_login/','docs/native-login/','TMessagesProj_Modules/telegram-login-wiring/','tests/native_login_wiring/','docs/native-login-wiring/','tools/native_login_wiring/','patches/native-login-wiring/','TMessagesProj_Modules/telegram-login-local-ui/','tests/native_login_pages/','tools/native_login_pages/','patches/native-login-pages/','docs/native-login-pages/')),path)
         settings=(ROOT/'settings.gradle').read_text();self.assertNotIn('telegram-native-login',settings)
         for path in ['gradle/real-alpha.json','gradle/variant-policy.json','gradle/beta-development.json','TMessagesProj/jni/tgnet/DiagnosticPolicy.h']:
             self.assertEqual((ROOT/path).read_bytes(),subprocess.check_output(['git','show','b09b79301db93e19471bd0c21aecba0bb9e64063:'+path],cwd=ROOT))
