@@ -1,0 +1,29 @@
+[
+  {
+    "mode": "normal",
+    "command": [
+      "python3.11",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests/session_core",
+      "-v"
+    ],
+    "exit_code": 0
+  },
+  {
+    "mode": "optimized",
+    "command": [
+      "python3.11",
+      "-O",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests/session_core",
+      "-v"
+    ],
+    "exit_code": 0
+  }
+]
