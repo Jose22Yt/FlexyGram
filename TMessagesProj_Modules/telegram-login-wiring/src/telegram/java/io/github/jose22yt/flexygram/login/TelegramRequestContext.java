@@ -41,7 +41,8 @@ public final class TelegramRequestContext implements LocalRpc {
     private char[] phone,first,last;
     private String phoneHash;
     private TL_account.Password password;
-    private byte[] migrationToken;
+    private byte[] migrationToken,qrToken;
+    private int qrExpires;
     private int migrationDc,failures,discarded;
     private long epoch;
     private boolean closed;
@@ -57,6 +58,12 @@ public final class TelegramRequestContext implements LocalRpc {
     @Override public SessionScope scope(){return scope;}
     public synchronized int adapterFailures(){return failures;}
     public synchronized int discardedReplies(){return discarded;}
+    /** Synthetic display bytes for a future original QR renderer; explicit local wall time, no timer/RPC. */
+    public synchronized byte[] copyQrTokenLocal(long nowEpochSeconds) {
+        if(closed||nowEpochSeconds<=0||qrToken==null)return null;
+        if(nowEpochSeconds>=qrExpires){Arrays.fill(qrToken,(byte)0);qrToken=null;qrExpires=0;return null;}
+        return qrToken.clone();
+    }
     /** Explicit synthetic names; consent/terms are checked by NativeLoginTransport before SIGN_UP. */
     public synchronized void namesLocal(char[] first,char[] last) {
         if(closed||flight!=null||first==null||first.length==0||last==null||first.length>128||last.length>128)
@@ -135,8 +142,13 @@ public final class TelegramRequestContext implements LocalRpc {
             try {
                 result=TlAuthResponses.mapAndStageLocal(current.request,store,raw.response,raw.error);
                 if(result.kind==Kind.CODE&&raw.response instanceof TLRPC.TL_auth_sentCode)phoneHash=((TLRPC.TL_auth_sentCode)raw.response).phone_code_hash;
-                if(result.kind==Kind.PASSWORD_PARAMETERS&&raw.response instanceof TL_account.Password)password=(TL_account.Password)raw.response;
-                if(result.error==Error.SRP_REFRESH)password=null;
+                if(result.kind==Kind.PASSWORD_PARAMETERS&&raw.response instanceof TL_account.Password){clearPassword();password=copyPassword((TL_account.Password)raw.response);}
+                if(result.error==Error.SRP_REFRESH)clearPassword();
+                if(result.kind==Kind.QR_TOKEN&&current.request.action==Action.EXPORT_QR&&raw.response instanceof TLRPC.TL_auth_loginToken) {
+                    TLRPC.TL_auth_loginToken token=(TLRPC.TL_auth_loginToken)raw.response;
+                    if(qrToken!=null)Arrays.fill(qrToken,(byte)0);
+                    qrToken=token.token.clone();qrExpires=token.expires;
+                }
                 if(result.kind==Kind.QR_MIGRATION&&raw.response instanceof TLRPC.TL_auth_loginTokenMigrateTo) {
                     TLRPC.TL_auth_loginTokenMigrateTo migration=(TLRPC.TL_auth_loginTokenMigrateTo)raw.response;
                     if(migrationToken!=null)Arrays.fill(migrationToken,(byte)0);
@@ -167,7 +179,16 @@ public final class TelegramRequestContext implements LocalRpc {
         try{port.close();}catch(RuntimeException|LinkageError unavailable){synchronized(this){failures++;}}
     }
     private void cancel(Cancellation handle){if(handle!=null)try{handle.cancel();}catch(RuntimeException|LinkageError unavailable){synchronized(this){failures++;}}}
-    private void clearState(){wipe(phone);wipe(first);wipe(last);phone=first=last=null;phoneHash=null;password=null;if(migrationToken!=null)Arrays.fill(migrationToken,(byte)0);migrationToken=null;migrationDc=0;}
+    private static byte[] copy(byte[] value){return value==null?null:value.clone();}
+    private static void wipeBytes(byte[] value){if(value!=null)Arrays.fill(value,(byte)0);}
+    private static TL_account.Password copyPassword(TL_account.Password source) {
+        TLRPC.TL_passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow from=(TLRPC.TL_passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow)source.current_algo;
+        TLRPC.TL_passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow to=new TLRPC.TL_passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow();
+        to.g=from.g;to.p=copy(from.p);to.salt1=copy(from.salt1);to.salt2=copy(from.salt2);
+        TL_account.TL_password password=new TL_account.TL_password();password.has_password=source.has_password;password.srp_id=source.srp_id;password.srp_B=copy(source.srp_B);password.current_algo=to;return password;
+    }
+    private void clearPassword(){if(password!=null){wipeBytes(password.srp_B);if(password.current_algo instanceof TLRPC.TL_passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow){TLRPC.TL_passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow a=(TLRPC.TL_passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow)password.current_algo;wipeBytes(a.p);wipeBytes(a.salt1);wipeBytes(a.salt2);}password=null;}}
+    private void clearState(){wipe(phone);wipe(first);wipe(last);phone=first=last=null;phoneHash=null;clearPassword();wipeBytes(migrationToken);migrationToken=null;migrationDc=0;wipeBytes(qrToken);qrToken=null;qrExpires=0;}
     private static void wipe(char[] a){if(a!=null)Arrays.fill(a,'\0');}
     private static void clearOriginal(TLObject value) {
         if(value instanceof TLRPC.TL_auth_sendCode){TLRPC.TL_auth_sendCode r=(TLRPC.TL_auth_sendCode)value;r.phone_number=null;r.api_hash="";r.settings=null;}

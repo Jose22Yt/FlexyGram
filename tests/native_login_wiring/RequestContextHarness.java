@@ -65,7 +65,7 @@ public class RequestContextHarness {
     }
     static Request request(F f,Action action){return new Request(scope(0),action,data(),0,f.store.operation());}
     static Object field(Object o,String name)throws Exception{Field f=o.getClass().getDeclaredField(name);f.setAccessible(true);return f.get(o);}
-    static void cleared(F f)throws Exception{for(String key:new String[]{"phone","phoneHash","password","migrationToken","first","last"})yes(field(f.context,key)==null);}
+    static void cleared(F f)throws Exception{for(String key:new String[]{"phone","phoneHash","password","migrationToken","qrToken","first","last"})yes(field(f.context,key)==null);}
     static void rejected(Runnable r){boolean failed=false;try{r.run();}catch(IllegalArgumentException|IllegalStateException expected){yes(!expected.toString().contains(PRIVATE));failed=true;}yes(failed);}
     public static void main(String[] args)throws Exception{
         F f=new F();
@@ -80,6 +80,10 @@ public class RequestContextHarness {
             f.code();f.port.fail(TLRPC.TL_auth_signIn.class,"SESSION_PASSWORD_NEEDED");f.owner.verifyLocal(data());f.port.add(TL_account.getPassword.class,password());yes(f.transport.loadPasswordParametersLocal(true));
             f.port.add(TLRPC.TL_auth_checkPassword.class,authorized());yes(f.transport.checkPasswordProofLocal(data(),true));yes(f.proof.calls==1&&((TLRPC.TL_auth_checkPassword)f.port.originals.get(3)).password==null);cleared(f);break;
         }
+        case "passwordParametersNotBorrowedFromCallback":{
+            f.code();f.port.fail(TLRPC.TL_auth_signIn.class,"SESSION_PASSWORD_NEEDED");f.owner.verifyLocal(data());TL_account.TL_password received=password();received.srp_B=new byte[]{9};f.port.add(TL_account.getPassword.class,received);f.transport.loadPasswordParametersLocal(true);
+            received.srp_id=55;received.srp_B[0]=7;TL_account.Password owned=(TL_account.Password)field(f.context,"password");yes(owned.srp_id==1&&owned.srp_B[0]==9);f.owner.cancelLocal();yes(received.srp_B[0]==7);break;
+        }
         case "signupOriginalFieldsAndOrigin":{
             f.code();TLRPC.TL_auth_authorizationSignUpRequired signup=new TLRPC.TL_auth_authorizationSignUpRequired();signup.terms_of_service=new TLRPC.TL_help_termsOfService();f.port.add(TLRPC.TL_auth_signIn.class,signup);f.owner.verifyLocal(data());
             f.context.namesLocal("SYNTHETIC_FIRST".toCharArray(),"SYNTHETIC_LAST".toCharArray());f.port.add(TLRPC.TL_auth_signUp.class,authorized());yes(!f.transport.signUpLocal(data(),true,false));yes(f.transport.signUpLocal(data(),true,true));
@@ -90,6 +94,9 @@ public class RequestContextHarness {
             f.port.add(TLRPC.TL_auth_exportLoginToken.class,m);f.initialize();f.transport.selectQrLocal(true);f.owner.startLocal(data());
             original[0]=7;f.port.add(TLRPC.TL_auth_importLoginToken.class,qrSuccess(authorized()));yes(f.transport.approveMigrationLocal(true));yes(f.port.dcs.get(1)==3);
             byte[] encoded=(byte[])f.port.encoded.get(1).values.get(1);yes(encoded[0]==9&&((TLRPC.TL_auth_importLoginToken)f.port.originals.get(1)).token==null);cleared(f);break;
+        }
+        case "qrDisplayExpiryHasNoAutomaticRequest":{
+            f.port.add(TLRPC.TL_auth_exportLoginToken.class,qr());f.initialize();f.transport.selectQrLocal(true);f.owner.startLocal(data());byte[] one=f.context.copyQrTokenLocal(59);yes(one!=null);byte first=one[0];one[0]=0;yes(f.context.copyQrTokenLocal(59)[0]==first);yes(f.context.copyQrTokenLocal(60)==null&&field(f.context,"qrToken")==null&&f.port.calls==1);break;
         }
         case "cancelLateReplyAndNoNativeMutation":{
             f.port.async=true;f.port.add(TLRPC.TL_auth_sendCode.class,sent());f.initialize();f.owner.startLocal(data());f.owner.cancelLocal();f.port.reply(f.port.pending.get(0));cleared(f);yes(f.port.cancels==1&&f.disk.commits==0&&f.owner.snapshot().state==State.CANCELLED);break;
