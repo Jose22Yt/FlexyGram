@@ -1,0 +1,93 @@
+{
+  "status": "UNSIGNED_STATIC_PASS_PENDING_ANDROID",
+  "pr": 37,
+  "code_commit": "50d82ba07adfe4acd251fb5761f1334050fb3ff9",
+  "independent_back_commit": "acee30b2237e7a776c9053cd4c8f94b371708e9e",
+  "local_build_commit": "0f146dfe428af74b713726e4b2a4d68251fb5010",
+  "identical_code_tree": "65e8431861974f22778946eab9c811667d7d6fca",
+  "base_pr34_head": "36e27309bee4e6c27e3850321fa0c6c44e2acf42",
+  "apk_filename": "FlexyGram-1.0-realAlpha-corrected-arm64-debug-unsigned.apk",
+  "apk_sha256": "93d80550614480728c3b65bc7c52217a79711fe6395c697662788e85c04b06b6",
+  "apk_bytes": 113076087,
+  "signature": "absent",
+  "certificate_sha256": null,
+  "gradle_build_success": true,
+  "gradle_seconds": 993,
+  "merged_and_binary_manifest_verified": true,
+  "manifest": {
+    "package": "io.github.jose22yt.flexygram.realalpha",
+    "permissions": [
+      "android.permission.ACCESS_NETWORK_STATE",
+      "io.github.jose22yt.flexygram.realalpha.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+    ],
+    "components": [
+      {
+        "type": "activity",
+        "name": "org.telegram.ui.realalpha.RealAlphaActivity",
+        "enabled": true,
+        "exported": true,
+        "authority": null
+      },
+      {
+        "type": "provider",
+        "name": "ru.noties.jlatexmath.JLatexMathInitProvider",
+        "enabled": true,
+        "exported": false,
+        "authority": "io.github.jose22yt.flexygram.realalpha.jlatexmathinitprovider"
+      }
+    ],
+    "enabled_exported": [
+      {
+        "type": "activity",
+        "name": "org.telegram.ui.realalpha.RealAlphaActivity",
+        "enabled": true,
+        "exported": true,
+        "authority": null
+      }
+    ]
+  },
+  "dex_back_owner": "LaunchActivity",
+  "obsolete_back_bridge_absent": true,
+  "native_dialogs_factory_verified": true,
+  "native_summary": {
+    "elf_total": 97,
+    "android_arm64": 96,
+    "arm64_4k_pass": 96,
+    "arm64_16k_pass": 96,
+    "other_machine": 1,
+    "missing_needed": 0,
+    "strong_unresolved": 0,
+    "version_mismatch": 0
+  },
+  "native_acceptance": {
+    "status": "STATIC_CLEAN_PENDING_ANDROID",
+    "arm64_elf": 96,
+    "non_target_payloads": 1,
+    "blockers": [],
+    "runtime_required": true,
+    "distribution_allowed": false,
+    "limits": "Static API24/16KB conditions; no ART/linker/device certification. Non-target ELF payloads remain in the full report."
+  },
+  "jni_sha256": "b0fe29a89a16e898e01c25f9a441ea98a10168937a5424c252d6b596edda71a7",
+  "native_policy_scope": "2a7084f29e0504ed08441b1eeacad5c2e433298281af0252aaeace02722c8ff1:realAlpha",
+  "rebuilt_four_elf_hashes_exact": true,
+  "zipalign_4k_16k_verified": true,
+  "compiled_capabilities_closed": true,
+  "host_tests_distinct": 58,
+  "realalpha_tests_normal_and_optimized": 56,
+  "additional_critical_tests_normal": 2,
+  "baseline_regression_rejection_expected": 2,
+  "glyph_aar_sha256": "be00ee9cd7115f6b11984c6e31fe98e298fb726940d1555063610685ef3bbf29",
+  "glyph_declared_min_sdk": 33,
+  "glyph_api24_runtime_compatibility_proven": false,
+  "previous_unsigned_sha256": "b5f072c882a71d62c915f9a6a2fade3fbdcfc23ec4ae5b44e1d63e292d12ead2",
+  "previous_unsigned_bytes": 113076811,
+  "previous_apk_and_backup_recovered_and_hash_verified": true,
+  "previous_apk_rejected_by_corrected_verifier": true,
+  "android_executed": false,
+  "installed": false,
+  "signed": false,
+  "distribution_allowed": false,
+  "pr34_modified": false,
+  "main_develop_modified": false
+}

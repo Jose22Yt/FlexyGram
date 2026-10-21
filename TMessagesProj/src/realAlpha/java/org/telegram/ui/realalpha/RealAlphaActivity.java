@@ -14,7 +14,6 @@ import org.telegram.ui.ActionBar.INavigationLayout;
 /** Real LaunchActivity + DialogsActivity. No preview cells, fake account or replacement chat UI. */
 public final class RealAlphaActivity extends LaunchActivity {
     private static final RealAlphaBootstrap BOOTSTRAP = new RealAlphaBootstrap();
-    private final RealAlphaBack back = new RealAlphaBack(this, this::onBackPressed);
 
     private static final RealAlphaBootstrap.Accounts ACCOUNTS = new RealAlphaBootstrap.Accounts() {
         @Override public void initialize() {
@@ -43,7 +42,6 @@ public final class RealAlphaActivity extends LaunchActivity {
         // No deep links, share/login extras, or restoration of an unreviewed account-bound screen.
         setIntent(new Intent(this, RealAlphaActivity.class).setAction(Intent.ACTION_MAIN));
         super.onCreate(null);
-        back.register();
     }
 
     @Override protected BaseFragment getClientNotActivatedFragment() {
@@ -78,8 +76,4 @@ public final class RealAlphaActivity extends LaunchActivity {
         // No external activity capabilities have been reviewed for P1/P2.
     }
 
-    @Override protected void onDestroy() {
-        back.close();
-        super.onDestroy();
-    }
 }
