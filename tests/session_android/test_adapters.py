@@ -47,6 +47,10 @@ class AdapterTests(unittest.TestCase):
     def test_bytecode_java8(self):
         files=list((self.classes/'io/github/jose22yt/flexygram').rglob('*.class'));self.assertGreater(len(files),20)
         for p in files:self.assertEqual(struct.unpack('>H',p.read_bytes()[6:8])[0],52)
+    def test_jdk21_default_source_compilation(self):
+        # Catch java.lang.Record name collisions which --release 8 cannot expose.
+        p=subprocess.run([str(self.java/'javac'),'-d',str(self.folder/'jdk21-classes'),*map(str,self.sources),*map(str,self.fixtures.rglob('*.java')),str(HARNESS)],capture_output=True,text=True)
+        self.assertEqual(p.returncode,0,p.stderr)
     def test_jni_library_has_no_transport_symbols(self):
         text=subprocess.check_output(['nm','-D',str(self.library)],text=True)
         self.assertIn('AndroidNativeBridge_nativeIdentity',text);self.assertIn('AndroidNativeBridge_nativePolicy',text)

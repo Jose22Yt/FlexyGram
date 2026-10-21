@@ -6,6 +6,7 @@ import java.io.*;
 import java.nio.channels.*;
 import io.github.jose22yt.flexygram.session.*;
 import io.github.jose22yt.flexygram.session.android.OperationJournal.*;
+import io.github.jose22yt.flexygram.session.android.OperationJournal.Record;
 
 /** No-backup metadata only. AtomicFile does not lock: readers and CAS writers take FileLock. */
 public final class AndroidJournalBackend implements Backend {

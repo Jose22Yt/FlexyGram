@@ -3,6 +3,7 @@ import java.util.Arrays;
 import io.github.jose22yt.flexygram.session.SessionScope;
 import io.github.jose22yt.flexygram.session.AuthenticationController.*;
 import io.github.jose22yt.flexygram.session.android.OperationJournal.*;
+import io.github.jose22yt.flexygram.session.android.OperationJournal.Record;
 
 /** Bridge to LOCAL controller contract, not a real MTProto persistence adapter. */
 public final class JournaledLocalSessionStore implements SessionStore,AutoCloseable {

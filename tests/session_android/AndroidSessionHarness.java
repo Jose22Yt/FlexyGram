@@ -13,6 +13,7 @@ import io.github.jose22yt.flexygram.session.*;
 import io.github.jose22yt.flexygram.session.RequestCoordinator.*;
 import io.github.jose22yt.flexygram.session.AuthenticationController.*;
 import io.github.jose22yt.flexygram.session.android.OperationJournal.*;
+import io.github.jose22yt.flexygram.session.android.OperationJournal.Record;
 
 /** HOST: Android/controller doubles; real new Java, real AccountInstance and real new JNI on Linux. */
 public final class AndroidSessionHarness {
