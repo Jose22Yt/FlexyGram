@@ -5,6 +5,7 @@ import io.github.jose22yt.flexygram.session.*;
 import io.github.jose22yt.flexygram.session.RequestCoordinator.*;
 import io.github.jose22yt.flexygram.login.NativeLoginProtocol.*;
 import io.github.jose22yt.flexygram.login.NativeLoginProtocol.Error;
+import io.github.jose22yt.flexygram.login.NativeLoginProtocol.Kind;
 
 /** Adapts typed LOCAL replies to the existing AuthenticationController, without a second auth UI. */
 public final class NativeLoginTransport implements TransportPort {
@@ -26,7 +27,7 @@ public final class NativeLoginTransport implements TransportPort {
     }
     private static final class Call {
         final Parent parent;final Request request;
-        boolean returned,done;Response buffered;Cancellation cancellation;
+        boolean returned,done;Response buffered,selected;Cancellation cancellation;
         Call(Parent parent,Request request){this.parent=parent;this.request=request;}
     }
     private final SessionScope scope;
@@ -43,14 +44,15 @@ public final class NativeLoginTransport implements TransportPort {
     private Action retryAction;
     private Runnable stateSignal=()->{};
     private final java.util.function.Supplier<?> operationOwnerProvider;
+    private final Runnable discardUncommitted;
     private Object operationOwner;
     public NativeLoginTransport(ClosedRuntime runtime,LocalRpc rpc,Clock clock) {
-        this(runtime,rpc,clock,()->new Object());
+        this(runtime,rpc,clock,()->new Object(),()->{});
     }
-    public NativeLoginTransport(ClosedRuntime runtime,LocalRpc rpc,Clock clock,java.util.function.Supplier<?> operationOwnerProvider) {
-        if(runtime==null||rpc==null||clock==null||operationOwnerProvider==null||runtime.scope.variant!=SessionScope.Variant.REAL_ALPHA)
+    public NativeLoginTransport(ClosedRuntime runtime,LocalRpc rpc,Clock clock,java.util.function.Supplier<?> operationOwnerProvider,Runnable discardUncommitted) {
+        if(runtime==null||rpc==null||clock==null||operationOwnerProvider==null||discardUncommitted==null||runtime.scope.variant!=SessionScope.Variant.REAL_ALPHA)
             throw new IllegalArgumentException("LOCAL_NATIVE_LOGIN_REQUIRED");
-        scope=runtime.scope;this.rpc=rpc;this.clock=clock;this.operationOwnerProvider=operationOwnerProvider;
+        scope=runtime.scope;this.rpc=rpc;this.clock=clock;this.operationOwnerProvider=operationOwnerProvider;this.discardUncommitted=discardUncommitted;
         if(!local())throw new IllegalArgumentException("LOCAL_NATIVE_LOGIN_REQUIRED");
     }
     private boolean local(){
@@ -150,36 +152,45 @@ public final class NativeLoginTransport implements TransportPort {
         Cancellation handle=null;boolean failed=false;
         try {if(!local())throw new IllegalStateException();handle=rpc.submit(current.request,response->accept(current,response));}
         catch(RuntimeException|LinkageError unavailable){failed=true;synchronized(this){adapterFailures++;}}
-        Response response;boolean cancel;Runnable completion=null;
+        Response response;boolean cancel,selected=false;
         synchronized(this) {
             current.returned=true;current.cancellation=handle;cancel=current.done;
-            response=failed||handle==null?Response.failure(Error.ADAPTER):current.buffered;
+            if(failed||handle==null){dispose(current.buffered);response=Response.failure(Error.ADAPTER);}
+            else response=current.buffered;
             current.buffered=null;
             if(!current.done&&call==current&&!closed&&response!=null) {
                 // Reserve the first synchronous result before a later asynchronous callback can win.
-                current.done=true;call=null;current.request.close();completion=apply(current.request.action,response);
+                current.done=true;current.selected=response;selected=true;
             }
         }
         if(cancel)cancel(handle);
-        deliver(completion);notifyUi();
+        if(selected)completeSelected(current,response);else if(response!=null)dispose(response);
+        notifyUi();
     }
     private void accept(Call current,Response response) {
         if(response==null)response=Response.failure(Error.PROTOCOL);
         synchronized(this) {
-            if(current.done||call!=current||closed){discarded++;return;}
-            if(!current.returned){if(current.buffered==null)current.buffered=response;else discarded++;return;}
+            if(current.done||call!=current||closed){discarded++;if(current.selected!=response&&current.buffered!=response)dispose(response);return;}
+            if(!current.returned){if(current.buffered==null)current.buffered=response;else{discarded++;if(current.buffered!=response)dispose(response);}return;}
+            current.done=true;current.selected=response;
         }
-        complete(current,response);
+        completeSelected(current,response);
     }
-    private void complete(Call current,Response response) {
-        Runnable completion;
+    private void completeSelected(Call current,Response response) {
+        Response accepted=response;Runnable completion=null;
+        // Stage only the winning, handle-validated response, outside transport locks.
+        try{if(!response.acceptOriginal(current.request))accepted=Response.failure(Error.PROTOCOL);}
+        catch(RuntimeException|LinkageError unavailable){accepted=Response.failure(Error.PROTOCOL);}
         synchronized(this) {
-            if(current.done||call!=current||closed){discarded++;return;}
-            current.done=true;call=null;current.request.close();
-            completion=apply(current.request.action,response);
+            if(call==current&&parent==current.parent&&!closed) {
+                call=null;current.request.close();completion=apply(current.request.action,accepted);
+            } else discarded++;
+            current.selected=null;
         }
+        dispose(response);if(accepted!=response)dispose(accepted);
         deliver(completion);notifyUi();
     }
+    private static void dispose(Response response){if(response!=null)response.close();}
     private Runnable apply(Action action,Response response) {
         if(response.kind==Kind.ERROR) {
             retryAction=action;
@@ -231,7 +242,7 @@ public final class NativeLoginTransport implements TransportPort {
         Cancellation handle=null;
         synchronized(this) {
             if(parent!=owner)return;parent=null;
-            if(call!=null){call.done=true;call.request.close();handle=call.cancellation;call=null;}
+            if(call!=null){call.done=true;call.request.close();dispose(call.buffered);call.buffered=null;handle=call.cancellation;call=null;}
             change(Stage.FAILED,Error.NONE);
         }
         cancel(handle);
@@ -249,13 +260,14 @@ public final class NativeLoginTransport implements TransportPort {
         try{signal.run();}catch(RuntimeException|LinkageError failure){synchronized(this){adapterFailures++;}}
     }
     @Override public void close() {
-        Cancellation handle=null;boolean release;
+        Cancellation handle=null;boolean release,discard;
         synchronized(this) {
-            if(closed)return;closed=true;parent=null;release=initialized;stateSignal=()->{};
-            if(call!=null){call.done=true;call.request.close();handle=call.cancellation;call=null;}
+            if(closed)return;discard=stage!=Stage.AUTHORIZED;closed=true;parent=null;release=initialized;stateSignal=()->{};
+            if(call!=null){call.done=true;call.request.close();dispose(call.buffered);call.buffered=null;handle=call.cancellation;call=null;}
             change(Stage.CLOSED,error);
         }
         cancel(handle);
+        if(discard)try{discardUncommitted.run();}catch(RuntimeException|LinkageError failure){synchronized(this){adapterFailures++;}}
         if(release)try{if(local())rpc.close();}catch(RuntimeException|LinkageError failure){synchronized(this){adapterFailures++;}}
     }
 }

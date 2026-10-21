@@ -78,12 +78,14 @@ class IntegrationContracts(unittest.TestCase):
         allowed=['TMessagesProj_Modules/telegram-session-core/','tests/session_core/','patches/session-core/','docs/session-core/']
         # Child-stage inventory only: original shared/build files must still be byte-identical.
         allowed+=['TMessagesProj_Modules/telegram-session-android/','tests/session_android/','docs/session-android/']
+        allowed+=['TMessagesProj_Modules/telegram-native-login/','tests/native_login/','docs/native-login/']
         for path in changed:self.assertTrue(any(path.startswith(prefix) for prefix in allowed),path)
         for path in self.paths:
             before=subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT)
             self.assertEqual((ROOT/path).read_bytes(),before)
         self.assertNotIn('telegram-session-core',(ROOT/'settings.gradle').read_text())
         self.assertNotIn('telegram-session-android',(ROOT/'settings.gradle').read_text())
+        self.assertNotIn('telegram-native-login',(ROOT/'settings.gradle').read_text())
 
     def test_scope_matches_fixed_userconfig_and_variant_identities(self):
         source=(ROOT/self.paths[0]).read_text()

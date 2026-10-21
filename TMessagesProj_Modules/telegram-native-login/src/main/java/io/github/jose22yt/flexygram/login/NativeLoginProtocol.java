@@ -14,12 +14,15 @@ public final class NativeLoginProtocol {
     public enum Error { NONE, INVALID_CODE, EXPIRED_CODE, INVALID_PASSWORD, SRP_REFRESH, WAIT, PHONE_INVALID, PHONE_BANNED, SESSION_REVOKED, REMOTE, PROTOCOL, ADAPTER }
     public enum Stage { NEW, READY, BUSY, CODE_REQUIRED, CODE_RETRY, PASSWORD_REQUIRED, PASSWORD_PARAMETERS,
         SIGNUP_REQUIRED, QR_TOKEN, QR_MIGRATION, WAITING, EARLY_AUTHORIZED, AUTHORIZED, FAILED, CLOSED }
-    public static final class Response {
+    interface Acceptance extends AutoCloseable {boolean stage(Request request);@Override void close();}
+    public static final class Response implements AutoCloseable {
         public final Kind kind;
         public final Route route;
         public final Error error;
         public final int value;
         public final boolean termsRequired;
+        private Acceptance acceptance;
+        private boolean closed;
         private Response(Kind kind,Route route,Error error,int value,boolean terms) {
             this.kind=kind;this.route=route;this.error=error;this.value=value;termsRequired=terms;
         }
@@ -44,6 +47,13 @@ public final class NativeLoginProtocol {
             if(error==null||error==Error.NONE||error==Error.WAIT)throw new IllegalArgumentException("ERROR_METADATA_REQUIRED");
             return new Response(Kind.ERROR,Route.NONE,error,0,false);
         }
+        static Response withAcceptance(Response metadata,Acceptance acceptance) {
+            if(metadata.kind!=Kind.AUTHORIZED||acceptance==null)throw new IllegalArgumentException("AUTHORIZATION_ACCEPTANCE_REQUIRED");
+            Response response=new Response(metadata.kind,metadata.route,metadata.error,metadata.value,metadata.termsRequired);
+            response.acceptance=acceptance;return response;
+        }
+        synchronized boolean acceptOriginal(Request request){return !closed&&(acceptance==null||acceptance.stage(request));}
+        @Override public synchronized void close(){closed=true;if(acceptance!=null){acceptance.close();acceptance=null;}}
         @Override public String toString(){return "AuthResponse["+kind+","+error+"]";}
     }
     /** Owned copy. Synthetic inputs only until a separately reviewed native adapter exists. */

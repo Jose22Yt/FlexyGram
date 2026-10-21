@@ -144,10 +144,15 @@ public final class NativePersistenceFence implements AutoCloseable {
     public synchronized Commit commitLocal(Lease requested,long expected,LocalOriginalWrite writer) {
         requireLease(requested);
         if(writer==null||committing||expected!=revision)return Commit.CONFLICT;
-        Inventory before=capture();validateChanges(before);
-        if(before.authorizedAccount)throw new IllegalStateException("ACCOUNT_APPEARED_BEFORE_COMMIT");
         committing=true;
         try {
+            Inventory before;
+            try {
+                before=capture();validateChanges(before);
+                if(before.authorizedAccount)throw new IllegalStateException();
+            } catch(RuntimeException|LinkageError changed) {
+                journal.move(Phase.WRITING);return uncertain();
+            }
             journal.move(Phase.WRITING);
             Report report;
             try{report=port.domain()==Domain.LOCAL_SIMULATION?writer.commit(lease):null;}

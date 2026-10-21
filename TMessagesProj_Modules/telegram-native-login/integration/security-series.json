@@ -1,0 +1,53 @@
+{
+  "original_source_commit": "36e27309bee4e6c27e3850321fa0c6c44e2acf42",
+  "branch_base": "b09b79301db93e19471bd0c21aecba0bb9e64063",
+  "mode": "REVIEW_ONLY_NO_APPLY",
+  "patches": [
+    {
+      "path": "patches/session-core/0001-userconfig-reject-null-before-mutation.patch",
+      "sha256": "2201bfc1ee91b846b402e6a19cc7f772583fc6b6dc792a24708bb8d7135d26ce",
+      "targets": [
+        "TMessagesProj/src/main/java/org/telegram/messenger/UserConfig.java"
+      ],
+      "applied_to_client": false
+    },
+    {
+      "path": "patches/session-core/0002-no-implicit-auth-key-reset-retry.patch",
+      "sha256": "61130bd61ceb85df149a3721f3d586438139978e74a283cef70f0a22fd5853a7",
+      "targets": [
+        "TMessagesProj/src/main/java/org/telegram/tgnet/ConnectionsManager.java"
+      ],
+      "applied_to_client": false
+    },
+    {
+      "path": "patches/session-core/0003-realalpha-ignore-legacy-api-preferences.patch",
+      "sha256": "2f7420bf275370acb930037360d18692d96792683efc13d19c37fbe9e7757d67",
+      "targets": [
+        "TMessagesProj/src/main/java/tw/nekomimi/nekogram/NekoXConfig.java"
+      ],
+      "applied_to_client": false
+    },
+    {
+      "path": "patches/session-core/0004-redact-native-and-login-sensitive-diagnostics.patch",
+      "sha256": "e38a213cf7ed1b22a2d70ba79f1975db33ced046408d51b9d6ded0d65f8a2a16",
+      "targets": [
+        "TMessagesProj/src/main/java/org/telegram/ui/LoginActivity.java",
+        "TMessagesProj/jni/tgnet/ConnectionsManager.cpp"
+      ],
+      "applied_to_client": false
+    }
+  ],
+  "target_git_blobs": {
+    "TMessagesProj/jni/tgnet/ConnectionsManager.cpp": "d370d3901eb81a749e1b2fb357c9d2191f38c370",
+    "TMessagesProj/src/main/java/org/telegram/messenger/UserConfig.java": "051743c7d7722a9e6f2c5dee38b77fd478fe99b8",
+    "TMessagesProj/src/main/java/org/telegram/tgnet/ConnectionsManager.java": "0c238e7706916d6ea9a16443aa0d97550db68883",
+    "TMessagesProj/src/main/java/org/telegram/ui/LoginActivity.java": "a7a8e6b49c27d83798b8a81638a1b21c7936964b",
+    "TMessagesProj/src/main/java/tw/nekomimi/nekogram/NekoXConfig.java": "e04ee3441aef74923f26ea788853382e25310410"
+  },
+  "checks": "tests/session_core/test_integration_contracts.py, applies only to temporary copies",
+  "remaining_log_review": [
+    "error.text outside mapped enum boundary",
+    "FileLog.e(Throwable) in SDK and original login paths",
+    "original native logs not covered by the three redacted sinks"
+  ]
+}

@@ -23,6 +23,11 @@ public final class TelegramAuthorizationStore implements LocalSessionStore {
         if(runtime==null||port==null)throw new IllegalArgumentException("ORIGINAL_STORAGE_REQUIRED");
         scope=runtime.scope;this.port=port;fence=new NativePersistenceFence(runtime,journal,port);
     }
+    /** Binds operation ownership and failure cleanup together; no network adapter is supplied. */
+    public NativeLoginTransport localTransport(ClosedRuntime runtime,NativeLoginProtocol.LocalRpc rpc,NativeLoginProtocol.Clock clock) {
+        if(runtime==null||!scope.equals(runtime.scope))throw new IllegalArgumentException("TRANSPORT_SCOPE_MISMATCH");
+        return new NativeLoginTransport(runtime,rpc,clock,this::operation,this::close);
+    }
     @Override public synchronized void beginExplicit(boolean retryApproved) {
         if(closed||lease!=null)throw new IllegalStateException("AUTHORIZATION_STORE_NOT_NEW");
         lease=fence.beginExplicit(retryApproved);
@@ -42,6 +47,7 @@ public final class TelegramAuthorizationStore implements LocalSessionStore {
     @Override public synchronized Commit commitLocalIfEmpty(SessionScope requested,long version,char[] localReceipt) {
         if(!scope.equals(requested))throw new IllegalArgumentException("ACCOUNT_SCOPE_MISMATCH");
         if(closed||committing||staged==null||localReceipt==null||localReceipt.length==0)return Commit.CONFLICT;
+        if(staged.user==null||staged.setup_password_required){staged=null;source=null;return Commit.CONFLICT;}
         committing=true;TLRPC.TL_auth_authorization original=staged;
         try{return fence.commitLocal(lease,version,operation->port.commitOriginal(operation,original,source));}
         finally{staged=null;source=null;committing=false;if(closeRequested)close();}

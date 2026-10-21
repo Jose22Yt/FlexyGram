@@ -18,8 +18,15 @@ public final class TlAuthResponses {
             if(response instanceof TLRPC.TL_auth_authorization)authorization=(TLRPC.TL_auth_authorization)response;
             else if(response instanceof TLRPC.TL_auth_sentCodeSuccess)authorization=((TLRPC.TL_auth_sentCodeSuccess)response).authorization;
             else if(response instanceof TLRPC.TL_auth_loginTokenSuccess)authorization=((TLRPC.TL_auth_loginTokenSuccess)response).authorization;
-            try{store.stageLocal(store.operation(),request,authorization);}
-            catch(RuntimeException|LinkageError unavailable){return Response.failure(Error.PROTOCOL);}
+            final TLRPC.auth_Authorization candidate=authorization;
+            return Response.withAcceptance(result,new Acceptance() {
+                private TLRPC.auth_Authorization original=candidate;
+                public boolean stage(Request accepted) {
+                    try{store.stageLocal(store.operation(),accepted,original);return true;}
+                    catch(RuntimeException|LinkageError unavailable){return false;}
+                }
+                public void close(){original=null;}
+            });
         }
         return result;
     }
