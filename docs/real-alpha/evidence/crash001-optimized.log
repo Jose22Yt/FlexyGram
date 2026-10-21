@@ -1,0 +1,14 @@
+test_all_headers_use_only_root_inset_after_recreation (test_offline_conversation.OfflineConversationTests.test_all_headers_use_only_root_inset_after_recreation) ... ok
+test_dark_light_and_reenter_rebuild_message_palette (test_offline_conversation.OfflineConversationTests.test_dark_light_and_reenter_rebuild_message_palette) ... ok
+test_fixed_messages_construct_without_optional_local_runtimes (test_offline_conversation.OfflineConversationTests.test_fixed_messages_construct_without_optional_local_runtimes) ... ok
+test_open_without_account_and_return_home (test_offline_conversation.OfflineConversationTests.test_open_without_account_and_return_home) ... ok
+test_rapid_taps_and_back_during_transition_preserve_queue (test_offline_conversation.OfflineConversationTests.test_rapid_taps_and_back_during_transition_preserve_queue) ... ok
+test_recreate_activity_restores_account_free_conversation (test_offline_conversation.OfflineConversationTests.test_recreate_activity_restores_account_free_conversation) ... ok
+test_repeated_open_close_has_no_duplicate_routes (test_offline_conversation.OfflineConversationTests.test_repeated_open_close_has_no_duplicate_routes) ... ok
+test_system_bars_cutout_and_remaining_ime_insets (test_offline_conversation.OfflineConversationTests.test_system_bars_cutout_and_remaining_ime_insets) ... ok
+test_view_has_no_telegram_or_optional_runtime_imports (test_offline_conversation.OfflineConversationTests.test_view_has_no_telegram_or_optional_runtime_imports) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 1.865s
+
+OK

@@ -1,0 +1,40 @@
+test_actual_groovy_closed_profile_and_mutations (test_profile.ProfileTests.test_actual_groovy_closed_profile_and_mutations) ... ok
+test_actual_native_profile_binding_and_denial_constants (test_profile.ProfileTests.test_actual_native_profile_binding_and_denial_constants) ... ok
+test_gradle_is_opt_in_unsigned_debug_arm64 (test_profile.ProfileTests.test_gradle_is_opt_in_unsigned_debug_arm64) ... ok
+test_minimal_native_launch_hook_only (test_profile.ProfileTests.test_minimal_native_launch_hook_only) ... ok
+test_no_synthetic_ui_or_account_fabrication (test_profile.ProfileTests.test_no_synthetic_ui_or_account_fabrication) ... ok
+test_offline_sources_and_security_contracts_byte_identical (test_profile.ProfileTests.test_offline_sources_and_security_contracts_byte_identical) ... ok
+test_production_remains_rejected_with_synthetic_overrides (test_profile.ProfileTests.test_production_remains_rejected_with_synthetic_overrides) ... ok
+test_source_manifest_is_closed_and_namespaced (test_profile.ProfileTests.test_source_manifest_is_closed_and_namespaced) ... ok
+test_apiHash (test_runtime.RuntimeTests.test_apiHash) ... ok
+test_apiId (test_runtime.RuntimeTests.test_apiId) ... ok
+test_back (test_runtime.RuntimeTests.test_back) ... ok
+test_capabilities (test_runtime.RuntimeTests.test_capabilities) ... ok
+test_closed (test_runtime.RuntimeTests.test_closed) ... ok
+test_emptySlots (test_runtime.RuntimeTests.test_emptySlots) ... ok
+test_externalIntents (test_runtime.RuntimeTests.test_externalIntents) ... ok
+test_failure (test_runtime.RuntimeTests.test_failure) ... ok
+test_identity (test_runtime.RuntimeTests.test_identity) ... ok
+test_identityAfterInit (test_runtime.RuntimeTests.test_identityAfterInit) ... ok
+test_initializeOnce (test_runtime.RuntimeTests.test_initializeOnce) ... ok
+test_intents (test_runtime.RuntimeTests.test_intents) ... ok
+test_invalidSlot (test_runtime.RuntimeTests.test_invalidSlot) ... ok
+test_isolation (test_runtime.RuntimeTests.test_isolation) ... ok
+test_legacyBack (test_runtime.RuntimeTests.test_legacyBack) ... ok
+test_linkage (test_runtime.RuntimeTests.test_linkage) ... ok
+test_missingControllers (test_runtime.RuntimeTests.test_missingControllers) ... ok
+test_missingJNI (test_runtime.RuntimeTests.test_missingJNI) ... ok
+test_nativeRoot (test_runtime.RuntimeTests.test_nativeRoot) ... ok
+test_priorIdentity (test_runtime.RuntimeTests.test_priorIdentity) ... ok
+test_readyContamination (test_runtime.RuntimeTests.test_readyContamination) ... ok
+test_recreation (test_runtime.RuntimeTests.test_recreation) ... ok
+test_reentry (test_runtime.RuntimeTests.test_reentry) ... ok
+test_routeDeny (test_runtime.RuntimeTests.test_routeDeny) ... ok
+test_scope (test_runtime.RuntimeTests.test_scope) ... ok
+test_staleIdentity (test_runtime.RuntimeTests.test_staleIdentity) ... ok
+test_variant (test_runtime.RuntimeTests.test_variant) ... ok
+
+----------------------------------------------------------------------
+Ran 35 tests in 19.297s
+
+OK

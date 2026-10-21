@@ -47,6 +47,14 @@ def betaScope = betaDevelopmentEnabled ? java.security.MessageDigest.getInstance
 if (betaDevelopmentEnabled && System.getenv('NATIVE_TARGET') != 'arm64-v8a') {
     throw new GradleException('FLEXYGRAM_BETA_REQUIRES_REAL_ARM64_JNI')
 }
+// Native-interface integration has a separate closed profile; no credentials are resolved.
+def realAlphaEnabled = providers.gradleProperty('flexygramRealAlpha').orNull == 'true'
+def realAlphaPolicyFile = rootProject.file('gradle/real-alpha.json')
+def realAlphaPolicy = realAlphaEnabled ? new GroovyShell().evaluate(rootProject.file('gradle/real-alpha.gradle')).call(realAlphaPolicyFile) : null
+def realAlphaScope = realAlphaEnabled ? java.security.MessageDigest.getInstance('SHA-256').digest(realAlphaPolicyFile.bytes).encodeHex().toString() + ':realAlpha' : null
+if (realAlphaEnabled && System.getenv('NATIVE_TARGET') != 'arm64-v8a') {
+    throw new GradleException('FLEXYGRAM_REAL_ALPHA_REQUIRES_REAL_ARM64_JNI')
+}
 def rejectProduction = new GroovyShell().evaluate(rootProject.file('gradle/production-readiness.gradle'))
 // Early, redacted rejection even for tasks of variants which AGP deliberately disables.
 if (gradle.startParameter.taskNames.any { it.toLowerCase(java.util.Locale.ROOT).contains('production') }) {
@@ -239,20 +247,29 @@ android {
                 // No flavor signing assignment; Debug also has no signing config.
             }
         }
+        if (realAlphaEnabled) {
+            realAlpha {
+                dimension = 'environment'
+                applicationId = realAlphaPolicy.applicationId
+                // Unsigned only. No Diagnostic or Android debug key fallback.
+            }
+        }
     }
     productFlavors.all { flavor ->
         def isBeta = flavor.name == 'betaDevelopment'
-        def policy = isBeta ? betaPolicy : variantPolicy[flavor.name]
+        def isRealAlpha = flavor.name == 'realAlpha'
+        def policy = isRealAlpha ? realAlphaPolicy : (isBeta ? betaPolicy : variantPolicy[flavor.name])
+        def scope = isRealAlpha ? realAlphaScope : (isBeta ? betaScope : policyDigest + ':' + flavor.name)
         flavor.buildConfigField 'boolean', 'ISOLATED_DIAGNOSTIC', policy.isolated.toString()
         flavor.buildConfigField 'String', 'FLEXYGRAM_VARIANT', groovy.json.JsonOutput.toJson(flavor.name)
-        flavor.buildConfigField 'String', 'FLEXYGRAM_POLICY_SCOPE', groovy.json.JsonOutput.toJson(isBeta ? betaScope : policyDigest + ':' + flavor.name)
+        flavor.buildConfigField 'String', 'FLEXYGRAM_POLICY_SCOPE', groovy.json.JsonOutput.toJson(scope)
         policy.capabilities.each { name, enabled ->
             flavor.buildConfigField 'boolean', 'FLEXYGRAM_CAP_' + name.toUpperCase(java.util.Locale.ROOT), enabled.toString()
         }
         flavor.resValue 'string', 'flexygram_account_type', policy.applicationId
         flavor.resValue 'string', 'flexygram_storage_namespace', policy.applicationId
         flavor.externalNativeBuild.cmake.arguments '-DFLEXYGRAM_FLAVOR=' + flavor.name,
-                '-DFLEXYGRAM_POLICY_SCOPE=' + (isBeta ? betaScope : policyDigest + ':' + flavor.name)
+                '-DFLEXYGRAM_POLICY_SCOPE=' + scope
     }
 
     buildTypes {
@@ -295,9 +312,10 @@ android {
 androidComponents {
     beforeVariants(selector().all()) { builder ->
         def flavor = builder.productFlavors.find { it.first == 'environment' }?.second
-        // Only two useful laboratory variants. Production never reaches codegen, JNI or packaging.
+        // Reviewed isolated variants only. Production never reaches codegen, JNI or packaging.
         builder.enable = (flavor == 'diagnostic' && builder.buildType in ['debug', 'staging']) ||
-                (betaDevelopmentEnabled && flavor == 'betaDevelopment' && builder.buildType == 'debug')
+                (betaDevelopmentEnabled && flavor == 'betaDevelopment' && builder.buildType == 'debug') ||
+                (realAlphaEnabled && flavor == 'realAlpha' && builder.buildType == 'debug')
     }
     onVariants(selector().all()) { variant ->
         variant.outputs.forEach { output ->
@@ -473,6 +491,10 @@ dependencies {
     diagnosticImplementation project(':translation-compat-diagnostic')
     if (betaDevelopmentEnabled) {
         betaDevelopmentImplementation project(':translation-compat-beta-offline')
+    }
+
+    if (realAlphaEnabled) {
+        realAlphaImplementation project(':translation-compat-beta-offline')
     }
 
     // plugins engine: Xposed-совместимые хуки (LSPlant), MVEL-фильтры, генерация классов

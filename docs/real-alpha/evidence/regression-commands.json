@@ -1,0 +1,157 @@
+[
+  {
+    "suite": "logging",
+    "mode": "normal",
+    "command": [
+      "/root/.local/bin/python3.11",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests/security",
+      "-p",
+      "test_p01_logs.py",
+      "-v"
+    ],
+    "exit_code": 0
+  },
+  {
+    "suite": "crash001",
+    "mode": "normal",
+    "command": [
+      "/root/.local/bin/python3.11",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests/beta_development",
+      "-p",
+      "test_offline_conversation.py",
+      "-v"
+    ],
+    "exit_code": 0
+  },
+  {
+    "suite": "beta-profile",
+    "mode": "normal",
+    "command": [
+      "/root/.local/bin/python3.11",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests/beta_development",
+      "-p",
+      "test_build_profile.py",
+      "-v"
+    ],
+    "exit_code": 0
+  },
+  {
+    "suite": "rpc-and-native",
+    "mode": "normal",
+    "command": [
+      "/root/.local/bin/python3.11",
+      "-m",
+      "unittest",
+      "test_p02_isolation.IsolationTests.test_production_rpc_gate_and_push_callbacks_no_transport",
+      "test_p02_isolation.IsolationTests.test_native_guards_drop_requests_and_prevent_initialization",
+      "-v"
+    ],
+    "exit_code": 0
+  },
+  {
+    "suite": "logging",
+    "mode": "optimized",
+    "command": [
+      "/root/.local/bin/python3.11",
+      "-O",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests/security",
+      "-p",
+      "test_p01_logs.py",
+      "-v"
+    ],
+    "exit_code": 0
+  },
+  {
+    "suite": "crash001",
+    "mode": "optimized",
+    "command": [
+      "/root/.local/bin/python3.11",
+      "-O",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests/beta_development",
+      "-p",
+      "test_offline_conversation.py",
+      "-v"
+    ],
+    "exit_code": 0
+  },
+  {
+    "suite": "beta-profile",
+    "mode": "optimized",
+    "command": [
+      "/root/.local/bin/python3.11",
+      "-O",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests/beta_development",
+      "-p",
+      "test_build_profile.py",
+      "-v"
+    ],
+    "exit_code": 0
+  },
+  {
+    "suite": "rpc-and-native",
+    "mode": "optimized",
+    "command": [
+      "/root/.local/bin/python3.11",
+      "-O",
+      "-m",
+      "unittest",
+      "test_p02_isolation.IsolationTests.test_production_rpc_gate_and_push_callbacks_no_transport",
+      "test_p02_isolation.IsolationTests.test_native_guards_drop_requests_and_prevent_initialization",
+      "-v"
+    ],
+    "exit_code": 0
+  },
+  {
+    "suite": "real_alpha",
+    "mode": "normal",
+    "command": [
+      "python3.11",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests/real_alpha",
+      "-v"
+    ],
+    "exit_code": 0
+  },
+  {
+    "suite": "real_alpha",
+    "mode": "optimized",
+    "command": [
+      "python3.11",
+      "-O",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests/real_alpha",
+      "-v"
+    ],
+    "exit_code": 0
+  }
+]

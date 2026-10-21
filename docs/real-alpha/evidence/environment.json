@@ -1,0 +1,27 @@
+{
+  "python": "Python 3.11.17",
+  "java": "openjdk version \"21.0.10\" 2026-01-20",
+  "cmake": "cmake version 3.31.6",
+  "cxx": "c++ (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0",
+  "gradle": "9.7.1",
+  "restored_submodules": {
+    "media": "c430d207677071b1873f9f18266d55ec45722180",
+    "jlatexmath": "f59d6eecfac6fb58d6e3b7d6cff6c8aed9dbd5b4"
+  },
+  "android_sdk_configured": false,
+  "apk_generated": false,
+  "verified_archives": {
+    "jbr.tar.gz": {
+      "sha256": "87d145c5877b71236c34f075f923824a4bf9f24724c5a1ad68ade36e4a947a95",
+      "sha512": "9444ad955a24171f6c5c10e6405f40fd3da931d9810b421b71767f74c94e021666d79390646f4809f988dc4bea8535669827d47c915f83397b36b20e6b828a7d"
+    },
+    "cmake.zip": {
+      "sha256": "ce136bb4b02580b36e53d9ccfe5275069655e6ef7d46d6fe2fcf88cfdf8fb761",
+      "sha512": "bce4c690e6f06df711f3829880f7e0f6c207d8e729e4fcbb35395b407c510cdb9e600d54aab77d8c3e4eb3514b7f04a43d7f1c4f9548b1e8f21b2bd2070c44d9"
+    },
+    "gradle.zip": {
+      "sha256": "acd53f1edaf02f1a8ff99879f8a34b302661a057d9b063ae9e35b552f804d20a",
+      "sha512": "ca3f3e76d022cec8338e3e1b30f25d95aa90c8bd1b3e8ac665492139b3307f4f5f29bfbb0d3be663b99ed6c8a3e3d6a09345df0ee5179d6f9f2eb086453ad997"
+    }
+  }
+}

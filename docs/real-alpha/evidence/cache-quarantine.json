@@ -1,0 +1,9 @@
+{
+  "gradle_stop_exit": 0,
+  "gradle_stop_output": "No Gradle daemons are running.\n",
+  "quarantined_task_owned_transform_directories": [
+    "dcf3f4a3583c8e4983e707bb8e827741"
+  ],
+  "dependency_versions_changed": false,
+  "fresh_android_build_verified": false
+}
