@@ -1,0 +1,158 @@
+{
+  "code_commit": "8b3787071f41374ed8b22c3a5d03c2b036ed5646",
+  "base": "2d532562f68946a83f5cdd2fc1059e3024beb525",
+  "distinct_tests": 62,
+  "new_tests": 35,
+  "previous_regressions": 27,
+  "final_executions": 124,
+  "failed": 0,
+  "skipped": 0,
+  "android_runtime_executed": false,
+  "full_android_compilation_succeeded": false,
+  "modes": {
+    "normal": {
+      "distinct_tests": 62,
+      "logs": [
+        {
+          "log": "host-normal.log",
+          "passed": 35,
+          "failed": 0,
+          "skipped": 0,
+          "sha256": "47301c9abba3a4f631809ee82a579af33606846f8afe5d473b162b307020e53f"
+        },
+        {
+          "log": "logging-normal.log",
+          "passed": 13,
+          "failed": 0,
+          "skipped": 0,
+          "sha256": "1f635022ccb58f3cea68e13a301e714af9ef327e0f681c7c13959459b007ff79"
+        },
+        {
+          "log": "crash001-normal.log",
+          "passed": 9,
+          "failed": 0,
+          "skipped": 0,
+          "sha256": "1da7cd2d81ad435552af385d0e91e956e4fa6b98b8d3ec0c2d0f60f54019e26c"
+        },
+        {
+          "log": "beta-profile-normal.log",
+          "passed": 3,
+          "failed": 0,
+          "skipped": 0,
+          "sha256": "2dda2c075a05d105098611e7e3bc2208afd8153e6340796a10123a329a7b83ec"
+        },
+        {
+          "log": "rpc-and-native-normal.log",
+          "passed": 2,
+          "failed": 0,
+          "skipped": 0,
+          "sha256": "a070b90e6e7038895a382b062586cb77f2cfb3a5da50fa9ef6c1b89a6ea4ce00"
+        }
+      ]
+    },
+    "optimized": {
+      "distinct_tests": 62,
+      "logs": [
+        {
+          "log": "host-optimized.log",
+          "passed": 35,
+          "failed": 0,
+          "skipped": 0,
+          "sha256": "ed2125ed9d2b14bec97459cdeeab122e91c1af84c4c600c19f111500a4fb8f9e"
+        },
+        {
+          "log": "logging-optimized.log",
+          "passed": 13,
+          "failed": 0,
+          "skipped": 0,
+          "sha256": "83d7f7a4655e6b73eb1eb44a64134d78980b85fc5c3185be75268cc4362424ad"
+        },
+        {
+          "log": "crash001-optimized.log",
+          "passed": 9,
+          "failed": 0,
+          "skipped": 0,
+          "sha256": "7be7a65f45f142530b947c8eda2a3845b71a177b44377aee502dd5e75a20dca4"
+        },
+        {
+          "log": "beta-profile-optimized.log",
+          "passed": 3,
+          "failed": 0,
+          "skipped": 0,
+          "sha256": "c60008fc31ddf39c421ece3c6474cffc90aee983ba2fe0ada96440f923df5835"
+        },
+        {
+          "log": "rpc-and-native-optimized.log",
+          "passed": 2,
+          "failed": 0,
+          "skipped": 0,
+          "sha256": "976627db0e463fc74931eae7ac65987729e834f7a563f880fe72b505339fce7d"
+        }
+      ]
+    }
+  },
+  "method_ids": [
+    "test_build_profile.BuildProfileTests.test_actual_cmake_beta_scope_is_bound_to_profile",
+    "test_build_profile.BuildProfileTests.test_actual_groovy_validator_accepts_only_closed_identity",
+    "test_build_profile.BuildProfileTests.test_protected_policies_and_historical_contract_are_unchanged",
+    "test_offline_conversation.OfflineConversationTests.test_all_headers_use_only_root_inset_after_recreation",
+    "test_offline_conversation.OfflineConversationTests.test_dark_light_and_reenter_rebuild_message_palette",
+    "test_offline_conversation.OfflineConversationTests.test_fixed_messages_construct_without_optional_local_runtimes",
+    "test_offline_conversation.OfflineConversationTests.test_open_without_account_and_return_home",
+    "test_offline_conversation.OfflineConversationTests.test_rapid_taps_and_back_during_transition_preserve_queue",
+    "test_offline_conversation.OfflineConversationTests.test_recreate_activity_restores_account_free_conversation",
+    "test_offline_conversation.OfflineConversationTests.test_repeated_open_close_has_no_duplicate_routes",
+    "test_offline_conversation.OfflineConversationTests.test_system_bars_cutout_and_remaining_ime_insets",
+    "test_offline_conversation.OfflineConversationTests.test_view_has_no_telegram_or_optional_runtime_imports",
+    "test_p01_logs.DevServerTests.test_authentication_and_dispatch_preserved",
+    "test_p01_logs.DevServerTests.test_bind_failure_safe_and_start_disabled_after_failure",
+    "test_p01_logs.DevServerTests.test_debugger_errors_and_logs_safe",
+    "test_p01_logs.DevServerTests.test_exception_and_unknown_command_reports_safe",
+    "test_p01_logs.DevServerTests.test_malformed_stream_keeps_processing_without_echoing_input",
+    "test_p01_logs.DevServerTests.test_plugin_diagnostic_errors_safe",
+    "test_p01_logs.DevServerTests.test_python_loader_start_boundary_safe",
+    "test_p01_logs.DevServerTests.test_socketserver_traceback_does_not_leak",
+    "test_p01_logs.DevServerTests.test_token_file_failure_safe_in_android_and_stderr",
+    "test_p01_logs.DevServerTests.test_token_written_unchanged_but_not_logged",
+    "test_p01_logs.JavaRuntimeTests.test_actual_java_callbacks_with_synthetic_secrets",
+    "test_p01_logs.JavaSourceContracts.test_protocol_diagnostics_have_no_body_serializer_or_to_string_fallback",
+    "test_p01_logs.JavaSourceContracts.test_sensitive_paths_never_forward_raw_throwables_or_payloads",
+    "test_p02_isolation.IsolationTests.test_native_guards_drop_requests_and_prevent_initialization",
+    "test_p02_isolation.IsolationTests.test_production_rpc_gate_and_push_callbacks_no_transport",
+    "test_profile.ProfileTests.test_actual_groovy_closed_profile_and_mutations",
+    "test_profile.ProfileTests.test_actual_native_profile_binding_and_denial_constants",
+    "test_profile.ProfileTests.test_gradle_is_opt_in_unsigned_debug_arm64",
+    "test_profile.ProfileTests.test_minimal_native_launch_hook_only",
+    "test_profile.ProfileTests.test_no_synthetic_ui_or_account_fabrication",
+    "test_profile.ProfileTests.test_offline_sources_and_security_contracts_byte_identical",
+    "test_profile.ProfileTests.test_production_remains_rejected_with_synthetic_overrides",
+    "test_profile.ProfileTests.test_source_manifest_is_closed_and_namespaced",
+    "test_runtime.RuntimeTests.test_apiHash",
+    "test_runtime.RuntimeTests.test_apiId",
+    "test_runtime.RuntimeTests.test_back",
+    "test_runtime.RuntimeTests.test_capabilities",
+    "test_runtime.RuntimeTests.test_closed",
+    "test_runtime.RuntimeTests.test_emptySlots",
+    "test_runtime.RuntimeTests.test_externalIntents",
+    "test_runtime.RuntimeTests.test_failure",
+    "test_runtime.RuntimeTests.test_identity",
+    "test_runtime.RuntimeTests.test_identityAfterInit",
+    "test_runtime.RuntimeTests.test_initializeOnce",
+    "test_runtime.RuntimeTests.test_intents",
+    "test_runtime.RuntimeTests.test_invalidSlot",
+    "test_runtime.RuntimeTests.test_isolation",
+    "test_runtime.RuntimeTests.test_legacyBack",
+    "test_runtime.RuntimeTests.test_linkage",
+    "test_runtime.RuntimeTests.test_missingControllers",
+    "test_runtime.RuntimeTests.test_missingJNI",
+    "test_runtime.RuntimeTests.test_nativeRoot",
+    "test_runtime.RuntimeTests.test_priorIdentity",
+    "test_runtime.RuntimeTests.test_readyContamination",
+    "test_runtime.RuntimeTests.test_recreation",
+    "test_runtime.RuntimeTests.test_reentry",
+    "test_runtime.RuntimeTests.test_routeDeny",
+    "test_runtime.RuntimeTests.test_scope",
+    "test_runtime.RuntimeTests.test_staleIdentity",
+    "test_runtime.RuntimeTests.test_variant"
+  ]
+}

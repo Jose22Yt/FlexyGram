@@ -1,0 +1,91 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.7.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :buildSrc:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :buildSrc:compileKotlin UP-TO-DATE
+> Task :buildSrc:compileJava NO-SOURCE
+> Task :buildSrc:compileGroovy NO-SOURCE
+> Task :buildSrc:pluginDescriptors UP-TO-DATE
+> Task :buildSrc:processResources UP-TO-DATE
+> Task :buildSrc:classes UP-TO-DATE
+> Task :buildSrc:jar UP-TO-DATE
+The contents of the immutable workspace '/workspace/scratch/1f84b79e43f3/alpha-toolchain/gradle-cache/caches/9.7.1/transforms/dcf3f4a3583c8e4983e707bb8e827741' have been modified. These workspace directories are not supposed to be modified once they are created. The modification might have been caused by an external process, or could be the result of disk corruption.
+outputDirectory:
+ - transformed (Directory, 3e7975cff72d370cd3a6a94577ac50a9)
+   - .gradle-agent-instrumented-external.marker (RegularFile, f571933bb948577b1f9f3076fb8fc7c6)
+   - .gradle-instrumented-classpath.marker (RegularFile, f571933bb948577b1f9f3076fb8fc7c6)
+   - instrumented (Directory, 37b667a45c56144403dfc4bd9535162b)
+     - .instrumented-kotlin-gradle-plugin-2.2.10-gradle813.jar.SGbxJm (RegularFile, 43ac86244c748cb4e41aac3565aba149)
+     - .instrumented-kotlin-gradle-plugin-2.2.10-gradle813.jar.SGbxJm.YeREo0 (RegularFile, de9950bc4378b0d17ec1a383f1976d48)
+     - instrumented-kotlin-gradle-plugin-2.2.10-gradle813.jar (RegularFile, 8178cfca8508433b614ee3776a98386d)
+
+resultsFile:
+ - results.bin (RegularFile, 6f0daa7033540ed3bb560466da65682e)
+
+The contents of the immutable workspace '/workspace/scratch/1f84b79e43f3/alpha-toolchain/gradle-cache/caches/9.7.1/transforms/dcf3f4a3583c8e4983e707bb8e827741' have been modified. These workspace directories are not supposed to be modified once they are created. The modification might have been caused by an external process, or could be the result of disk corruption.
+outputDirectory:
+ - transformed (Directory, 3e7975cff72d370cd3a6a94577ac50a9)
+   - .gradle-agent-instrumented-external.marker (RegularFile, f571933bb948577b1f9f3076fb8fc7c6)
+   - .gradle-instrumented-classpath.marker (RegularFile, f571933bb948577b1f9f3076fb8fc7c6)
+   - instrumented (Directory, 37b667a45c56144403dfc4bd9535162b)
+     - .instrumented-kotlin-gradle-plugin-2.2.10-gradle813.jar.SGbxJm (RegularFile, 43ac86244c748cb4e41aac3565aba149)
+     - .instrumented-kotlin-gradle-plugin-2.2.10-gradle813.jar.SGbxJm.YeREo0 (RegularFile, de9950bc4378b0d17ec1a383f1976d48)
+     - instrumented-kotlin-gradle-plugin-2.2.10-gradle813.jar (RegularFile, 8178cfca8508433b614ee3776a98386d)
+
+resultsFile:
+ - results.bin (RegularFile, 6f0daa7033540ed3bb560466da65682e)
+
+
+[Incubating] Problems report is available at: file:///workspace/scratch/1f84b79e43f3/FlexyGram-real-alpha/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+A problem occurred configuring root project 'exteraless'.
+> Could not resolve all artifacts for configuration 'classpath'.
+   > Could not resolve com.google.gms:google-services:4.5.0.
+     Required by:
+         buildscript of root project 'exteraless' > com.google.gms.google-services:com.google.gms.google-services.gradle.plugin:4.5.0
+      > No cached version of com.google.gms:google-services:4.5.0 available for offline mode.
+      > No cached version of com.google.gms:google-services:4.5.0 available for offline mode.
+      > No cached version of com.google.gms:google-services:4.5.0 available for offline mode.
+      > No cached version of com.google.gms:google-services:4.5.0 available for offline mode.
+      > No cached version of com.google.gms:google-services:4.5.0 available for offline mode.
+   > Could not resolve com.google.firebase:firebase-crashlytics-gradle:3.0.8.
+     Required by:
+         buildscript of root project 'exteraless' > com.google.firebase.crashlytics:com.google.firebase.crashlytics.gradle.plugin:3.0.8
+      > No cached version of com.google.firebase:firebase-crashlytics-gradle:3.0.8 available for offline mode.
+      > No cached version of com.google.firebase:firebase-crashlytics-gradle:3.0.8 available for offline mode.
+      > No cached version of com.google.firebase:firebase-crashlytics-gradle:3.0.8 available for offline mode.
+      > No cached version of com.google.firebase:firebase-crashlytics-gradle:3.0.8 available for offline mode.
+      > No cached version of com.google.firebase:firebase-crashlytics-gradle:3.0.8 available for offline mode.
+   > Could not resolve com.chaquo.python:gradle:17.0.0.
+     Required by:
+         buildscript of root project 'exteraless' > com.chaquo.python:com.chaquo.python.gradle.plugin:17.0.0
+      > No cached version of com.chaquo.python:gradle:17.0.0 available for offline mode.
+      > No cached version of com.chaquo.python:gradle:17.0.0 available for offline mode.
+      > No cached version of com.chaquo.python:gradle:17.0.0 available for offline mode.
+      > No cached version of com.chaquo.python:gradle:17.0.0 available for offline mode.
+   > Could not resolve com.google.errorprone:error_prone_annotations:2.36.0.
+     Required by:
+         buildscript of root project 'exteraless' > com.android.tools.build:gradle:9.3.1 > com.android.tools.build:bundletool:1.18.3
+      > No cached version of com.google.errorprone:error_prone_annotations:2.36.0 available for offline mode.
+      > No cached version of com.google.errorprone:error_prone_annotations:2.36.0 available for offline mode.
+      > No cached version of com.google.errorprone:error_prone_annotations:2.36.0 available for offline mode.
+      > No cached version of com.google.errorprone:error_prone_annotations:2.36.0 available for offline mode.
+      > No cached version of com.google.errorprone:error_prone_annotations:2.36.0 available for offline mode.
+> There are 15 more failures with identical causes.
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+> Get more help at https://help.gradle.org.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.7.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 9s
+4 actionable tasks: 4 up-to-date

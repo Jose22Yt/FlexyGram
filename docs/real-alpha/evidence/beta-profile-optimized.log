@@ -1,0 +1,8 @@
+test_actual_cmake_beta_scope_is_bound_to_profile (test_build_profile.BuildProfileTests.test_actual_cmake_beta_scope_is_bound_to_profile) ... ok
+test_actual_groovy_validator_accepts_only_closed_identity (test_build_profile.BuildProfileTests.test_actual_groovy_validator_accepts_only_closed_identity) ... ok
+test_protected_policies_and_historical_contract_are_unchanged (test_build_profile.BuildProfileTests.test_protected_policies_and_historical_contract_are_unchanged) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 6.097s
+
+OK
