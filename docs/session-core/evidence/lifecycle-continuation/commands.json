@@ -1,0 +1,52 @@
+{
+  "environment": {
+    "JAVA_HOME": "/workspace/scratch/1f84b79e43f3/alpha-toolchain/jbrsdk-21.0.10-linux-x64-b1163.105",
+    "PATH": "$JAVA_HOME/bin:$PATH",
+    "FLEXYGRAM_GRADLE_HOME": "/workspace/scratch/1f84b79e43f3/alpha-toolchain/gradle/gradle-9.7.1",
+    "FLEXYGRAM_CMAKE": "/workspace/scratch/1f84b79e43f3/alpha-toolchain/tools/bin/cmake"
+  },
+  "python": "/root/.local/bin/python3.11",
+  "final": [
+    {
+      "args": [
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/session_core",
+        "-v"
+      ],
+      "exit_code": 0,
+      "log": "host-normal.log"
+    },
+    {
+      "args": [
+        "-O",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/session_core",
+        "-v"
+      ],
+      "exit_code": 0,
+      "log": "host-optimized.log"
+    }
+  ],
+  "pre_fix": {
+    "args": [
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests/session_core",
+      "-p",
+      "test_runtime.py",
+      "-k",
+      "CloseDuring",
+      "-v"
+    ],
+    "unittest_exit_code": 1,
+    "note": "Shell printed saved log afterward; unittest outcome is six failures, not PASS."
+  }
+}

@@ -1,0 +1,26 @@
+--- a/TMessagesProj/src/main/java/tw/nekomimi/nekogram/NekoXConfig.java
++++ b/TMessagesProj/src/main/java/tw/nekomimi/nekogram/NekoXConfig.java
+@@ -48,12 +48,23 @@
+ 
+     public static int currentAppId() {
+         if (org.telegram.messenger.DiagnosticPolicy.isIsolated()) return 0;
++        if (realAlphaProjectApi()) return BuildConfig.APP_ID;
+         return customApi == API_TYPE_CUSTOM ? customAppId : BuildConfig.APP_ID;
+     }
+ 
+     public static String currentAppHash() {
+         if (org.telegram.messenger.DiagnosticPolicy.isIsolated()) return "";
++        if (realAlphaProjectApi()) return BuildConfig.APP_HASH;
+         return customApi == API_TYPE_CUSTOM ? customAppHash : BuildConfig.APP_HASH;
++    }
++
++    private static boolean realAlphaProjectApi() {
++        if (!"realAlpha".equals(BuildConfig.FLEXYGRAM_VARIANT)) return false;
++        if (BuildConfig.APP_ID <= 0 || BuildConfig.APP_ID == 6 || BuildConfig.APP_HASH == null ||
++                !BuildConfig.APP_HASH.matches("[a-fA-F0-9]{32}")) {
++            throw new IllegalStateException("PROJECT_API_CONFIGURATION_REQUIRED");
++        }
++        return true;
+     }
+ 
+     public static void saveCustomApi() {

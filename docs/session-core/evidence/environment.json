@@ -1,0 +1,11 @@
+{
+  "python": "Python 3.11.17",
+  "jdk": "openjdk version \"21.0.10\" 2026-01-20",
+  "javac": "javac 21.0.10",
+  "cxx": "c++ (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0",
+  "cmake": "cmake version 3.31.6",
+  "java_release": 8,
+  "gradle_groovy_distribution": "9.7.1",
+  "android_build_attempted": false,
+  "shared_sources_modified": false
+}

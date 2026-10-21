@@ -1,0 +1,12 @@
+{
+  "python": "Python 3.11.17",
+  "jdk": "JBR SDK 21.0.10+7-b1163.105",
+  "java_bytecode_release": 8,
+  "cmake": "3.31.6 (PyPI cmake pinned wheel)",
+  "cpp": "GCC 13.3.0 (Ubuntu 13.3.0-6ubuntu2~24.04)",
+  "gradle_groovy": "9.7.1 (resolver only, no Gradle build)",
+  "gradle_zip_sha256": "acd53f1edaf02f1a8ff99879f8a34b302661a057d9b063ae9e35b552f804d20a",
+  "jdk_archive_sha256": "87d145c5877b71236c34f075f923824a4bf9f24724c5a1ad68ade36e4a947a95",
+  "archive_checksums": "Gradle SHA256 and JBR SHA512 compared with publisher checksum files; equal",
+  "isolated_simulations_only": true
+}
