@@ -103,7 +103,12 @@
     private void localClearPage(int page) {
         if (views[page] == null) return;
         if (page == VIEW_PHONE_INPUT) { PhoneView p = (PhoneView) views[page]; p.codeField.setText(""); p.phoneField.setText(""); }
-        else if (page == VIEW_CODE_MESSAGE || page == VIEW_CODE_SMS) { LoginActivitySmsView p = (LoginActivitySmsView) views[page]; p.codeFieldContainer.setText(""); p.currentParams = null; p.phone = p.phoneHash = p.requestPhone = p.emailPhone = null; }
+        else if (page == VIEW_CODE_MESSAGE || page == VIEW_CODE_SMS) { LoginActivitySmsView p = (LoginActivitySmsView) views[page]; if (p.codeFieldContainer != null && p.codeFieldContainer.codeField != null) {
+            boolean previous = p.codeFieldContainer.ignoreOnTextChange;
+            p.codeFieldContainer.ignoreOnTextChange = true;
+            try { for (android.widget.EditText f : p.codeFieldContainer.codeField) if (f != null) f.setText(""); }
+            finally { p.codeFieldContainer.ignoreOnTextChange = previous; }
+        } p.currentParams = null; p.phone = p.phoneHash = p.requestPhone = p.emailPhone = null; }
         else if (page == VIEW_PASSWORD) { LoginActivityPasswordView p = (LoginActivityPasswordView) views[page]; p.codeField.setText(""); p.currentParams = null; p.currentPassword = null; p.passwordString = p.requestPhone = p.phoneHash = p.phoneCode = null; }
         else if (page == VIEW_REGISTER) { LoginActivityRegisterView p = (LoginActivityRegisterView) views[page]; p.firstNameField.setText(""); p.lastNameField.setText(""); p.currentParams = null; p.requestPhone = p.phoneHash = null; }
     }
