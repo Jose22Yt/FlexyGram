@@ -72,7 +72,9 @@ println('PRODUCTION_BLOCKED')
     def test_minimal_native_launch_hook_only(self):
         path='TMessagesProj/src/main/java/org/telegram/ui/LaunchActivity.java'
         original=subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT).decode()
-        self.assertEqual((ROOT/path).read_text(),original.replace('private BaseFragment getClientNotActivatedFragment()','protected BaseFragment getClientNotActivatedFragment()'))
+        expected=original.replace('private BaseFragment getClientNotActivatedFragment()','protected BaseFragment getClientNotActivatedFragment()')
+        expected=expected.replace('        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {\n            FingerprintController.checkKeyReady();', '        // Offline realAlpha has no biometric permission or app-lock identity to prepare.\n        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M\n                && !("realAlpha".equals(BuildConfig.FLEXYGRAM_VARIANT)\n                && BuildConfig.ISOLATED_DIAGNOSTIC\n                && !BuildConfig.FLEXYGRAM_CAP_AUTHENTICATION\n                && !BuildConfig.FLEXYGRAM_CAP_TELEGRAMTRANSPORT)) {\n            FingerprintController.checkKeyReady();')
+        self.assertEqual((ROOT/path).read_text(),expected)
         # Catch signature drift hidden by the Android doubles.
         self.assertIn('public void onNewIntent(Intent intent)',original)
         self.assertIn('public boolean needPresentFragment(INavigationLayout layout, INavigationLayout.NavigationParams params)',original)
