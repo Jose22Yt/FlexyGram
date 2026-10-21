@@ -11,8 +11,17 @@
     <permission android:name="${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
         android:protectionLevel="signature" />
     <uses-permission android:name="${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+    <!-- Named removals cover SDK entries retained by the actual library merge. -->
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" tools:node="remove" />
+    <uses-permission android:name="android.permission.USE_FINGERPRINT" tools:node="remove" />
+    <uses-permission android:name="com.android.vending.BILLING" tools:node="remove" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" tools:node="remove" />
+    <uses-permission-sdk-23 tools:node="removeAll" />
     <uses-permission tools:node="removeAll" />
     <uses-feature android:glEsVersion="0x00020000" android:required="false" />
+    <!-- Match the existing offline variants' Glyph merger exception only.
+         This does not prove API24 runtime support or enable its service/permission. -->
+    <uses-sdk tools:overrideLibrary="com.nothing.thirdparty" />
     <application android:name="org.telegram.messenger.ApplicationLoader"
         android:label="FlexyGram Real Alpha — Offline Integration"
         android:theme="@style/Theme.TMessages.Start"
@@ -38,7 +47,19 @@
             android:authorities="${applicationId}.jlatexmathinitprovider"
             android:enabled="true" android:exported="false"
             tools:replace="android:authorities" />
-        <!-- Explicit declarations above survive; lower-priority library entry points do not. -->
+        <!-- Remove observed transitive auth/billing/SDK initializers by exact name. -->
+        <activity android:name="androidx.credentials.playservices.controllers.identityauth.HiddenActivity" tools:node="remove" />
+        <activity android:name="androidx.credentials.playservices.controllers.identitycredentials.IdentityCredentialApiHiddenActivity" tools:node="remove" />
+        <activity android:name="androidx.car.app.CarAppPermissionActivity" tools:node="remove" />
+        <activity android:name="com.android.billingclient.api.ProxyBillingActivity" tools:node="remove" />
+        <activity android:name="com.android.billingclient.api.ProxyBillingActivityV2" tools:node="remove" />
+        <provider android:name="com.google.mlkit.common.internal.MlKitInitProvider" tools:node="remove" />
+        <activity android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity" tools:node="remove" />
+        <activity android:name="com.google.android.gms.common.api.GoogleApiActivity" tools:node="remove" />
+        <provider android:name="com.google.firebase.provider.FirebaseInitProvider" tools:node="remove" />
+        <provider android:name="androidx.startup.InitializationProvider" tools:node="remove" />
+        <activity android:name="org.unifiedpush.android.connector.internal.LinkActivity" tools:node="remove" />
+        <!-- Generic markers and named removals are checked against the real merged output. -->
         <activity tools:node="removeAll" />
         <activity-alias tools:node="removeAll" />
         <service tools:node="removeAll" />
