@@ -1,0 +1,11 @@
+--- a/TMessagesProj/jni/CMakeLists.txt
++++ b/TMessagesProj/jni/CMakeLists.txt
+@@ -360,3 +360,8 @@
+ 
+ #include(AndroidNdkModules)
+ #android_ndk_import_module_cpufeatures()
++
++# Read-only seam; Java registration requires separate reviewed integration.
++if(FLEXYGRAM_FLAVOR STREQUAL "realAlpha")
++    include("${CMAKE_CURRENT_LIST_DIR}/../../TMessagesProj_Modules/telegram-session-android/integration/read-only-jni.cmake")
++endif()

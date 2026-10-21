@@ -1,0 +1,223 @@
+{
+  "code_commit": "29248617be6a20f4748f12d281eef2cae2292f6b",
+  "base_pr35": "985f8ec8f426225dfd7fba772272fd77e02b7fcf",
+  "pr34_reviewed": "36e27309bee4e6c27e3850321fa0c6c44e2acf42",
+  "new_distinct_tests": 77,
+  "existing_selective_tests_reexecuted": 9,
+  "distinct_tested_this_stage": 86,
+  "final_executions": 172,
+  "failures": 0,
+  "errors": 0,
+  "skips": 0,
+  "test_ids": {
+    "host": [
+      "test_adapters.AdapterTests.test_androidBackendWrongPackage",
+      "test_adapters.AdapterTests.test_androidJournalCasConflict",
+      "test_adapters.AdapterTests.test_androidJournalLockContention",
+      "test_adapters.AdapterTests.test_androidJournalNoCredentials",
+      "test_adapters.AdapterTests.test_androidJournalRejectsCorruption",
+      "test_adapters.AdapterTests.test_androidJournalRejectsMainThread",
+      "test_adapters.AdapterTests.test_androidJournalRejectsOversize",
+      "test_adapters.AdapterTests.test_androidJournalRoundtrip",
+      "test_adapters.AdapterTests.test_androidJournalSeparateAccounts",
+      "test_adapters.AdapterTests.test_androidLoginDetachedNoCallbacks",
+      "test_adapters.AdapterTests.test_androidLoginForeignRecreation",
+      "test_adapters.AdapterTests.test_androidLoginHandlerRejected",
+      "test_adapters.AdapterTests.test_androidLoginMarkerNoInput",
+      "test_adapters.AdapterTests.test_androidLoginNativeCallbackSeam",
+      "test_adapters.AdapterTests.test_androidLoginWrongAccount",
+      "test_adapters.AdapterTests.test_androidProbeBeforeStorageExisting",
+      "test_adapters.AdapterTests.test_androidProbeBeforeStorageNative",
+      "test_adapters.AdapterTests.test_androidProbeControllerFailure",
+      "test_adapters.AdapterTests.test_androidProbeFixedSlot",
+      "test_adapters.AdapterTests.test_androidProbeForeignFilesRejected",
+      "test_adapters.AdapterTests.test_androidProbeNativeArtifacts",
+      "test_adapters.AdapterTests.test_androidProbePersistedUser",
+      "test_adapters.AdapterTests.test_androidProbeTmpPasswordBlocked",
+      "test_adapters.AdapterTests.test_androidProcessDeathNoAutomaticRestart",
+      "test_adapters.AdapterTests.test_android_api24_symbols_compile_real_sdk",
+      "test_adapters.AdapterTests.test_bytecode_java8",
+      "test_adapters.AdapterTests.test_cmake_fragment_build_and_existing_export_policy",
+      "test_adapters.AdapterTests.test_deniedNativeTransport",
+      "test_adapters.AdapterTests.test_jdk21_default_source_compilation",
+      "test_adapters.AdapterTests.test_jniActualReadOnlyBridge",
+      "test_adapters.AdapterTests.test_jniApiCredentialsRejected",
+      "test_adapters.AdapterTests.test_jniCapabilityMismatch",
+      "test_adapters.AdapterTests.test_jniDirectInvalidAccount",
+      "test_adapters.AdapterTests.test_jniInvalidAccount",
+      "test_adapters.AdapterTests.test_jniMissingFailsClosed",
+      "test_adapters.AdapterTests.test_jniPidMismatch",
+      "test_adapters.AdapterTests.test_jniPolicyScopeMismatch",
+      "test_adapters.AdapterTests.test_jniUidMismatch",
+      "test_adapters.AdapterTests.test_jniWrongPackage",
+      "test_adapters.AdapterTests.test_jni_library_has_no_transport_symbols",
+      "test_adapters.AdapterTests.test_journalBeginAndRecovery",
+      "test_adapters.AdapterTests.test_journalNoAutoResume",
+      "test_adapters.AdapterTests.test_journalRaceOwnership",
+      "test_adapters.AdapterTests.test_journalReadFailureSafe",
+      "test_adapters.AdapterTests.test_journalRetryExplicitOnly",
+      "test_adapters.AdapterTests.test_journalTransitions",
+      "test_adapters.AdapterTests.test_journalUncertainBlocksRetry",
+      "test_adapters.AdapterTests.test_journalWriteThenThrow",
+      "test_adapters.AdapterTests.test_journalWrongScope",
+      "test_adapters.AdapterTests.test_native_open_policy_compile_rejected",
+      "test_adapters.AdapterTests.test_ownerCancelDropsLateCallback",
+      "test_adapters.AdapterTests.test_ownerExplicitRetry",
+      "test_adapters.AdapterTests.test_ownerLocalFlow",
+      "test_adapters.AdapterTests.test_ownerQueuedInputsWipedOnClose",
+      "test_adapters.AdapterTests.test_ownerRecreationDetachesView",
+      "test_adapters.AdapterTests.test_ownerRejectsTelegram",
+      "test_adapters.AdapterTests.test_ownerWorkerRejectsSafely",
+      "test_adapters.AdapterTests.test_recordValidation",
+      "test_adapters.AdapterTests.test_shared_sources_and_variants_unchanged",
+      "test_adapters.AdapterTests.test_sources_do_not_mutate_telegram_state_or_log",
+      "test_adapters.AdapterTests.test_storeAccountAppearsBeforeCommit",
+      "test_adapters.AdapterTests.test_storeBeginWriteEvidenceFailure",
+      "test_adapters.AdapterTests.test_storeCancelNoSessionMutation",
+      "test_adapters.AdapterTests.test_storeCloseDuringJournalWrite",
+      "test_adapters.AdapterTests.test_storeCloseReentrant",
+      "test_adapters.AdapterTests.test_storeCompletedLocalReceipt",
+      "test_adapters.AdapterTests.test_storeCompletionEvidenceFailure",
+      "test_adapters.AdapterTests.test_storeExistingPreserved",
+      "test_adapters.AdapterTests.test_storeForeignAccountBlocked",
+      "test_adapters.AdapterTests.test_storeKnownFailure",
+      "test_adapters.AdapterTests.test_storeNativeFilesRequireReview",
+      "test_adapters.AdapterTests.test_storeSinkException",
+      "test_adapters.AdapterTests.test_storeUnknownBlocked",
+      "test_adapters.AdapterTests.test_storeUnknownWrite",
+      "test_adapters.AdapterTests.test_storeWrongScope",
+      "test_adapters.AdapterTests.test_unapplied_jni_patch_applies_to_original_cmake",
+      "test_adapters.AdapterTests.test_unique_inventory_and_slot_contract"
+    ],
+    "security-patches": [
+      "test_integration_contracts.IntegrationContracts.test_existing_private_api_pair_resolver_with_synthetic_values",
+      "test_integration_contracts.IntegrationContracts.test_no_existing_shared_or_build_files_modified",
+      "test_integration_contracts.IntegrationContracts.test_no_network_logging_or_android_backend_in_new_module",
+      "test_integration_contracts.IntegrationContracts.test_original_debug_reset_and_unapplied_no_reset_patch",
+      "test_integration_contracts.IntegrationContracts.test_original_java_login_sinks_and_unapplied_redaction",
+      "test_integration_contracts.IntegrationContracts.test_original_native_integrity_sink_and_unapplied_redaction",
+      "test_integration_contracts.IntegrationContracts.test_original_null_user_partial_mutation_and_unapplied_fix",
+      "test_integration_contracts.IntegrationContracts.test_scope_matches_fixed_userconfig_and_variant_identities",
+      "test_integration_contracts.IntegrationContracts.test_unapplied_api_patch_keeps_closed_mode_and_rejects_legacy_overrides"
+    ]
+  },
+  "logs_sha256": {
+    "host-normal.log": "49a885b4e8333f9cffab95b49cbc8af97944bbc1511bf1dd6d785b425f1b49e8",
+    "host-optimized.log": "1a753292431d386b46feb02257a99e462322f5cc6722632271606fbe278b72eb",
+    "security-patches-normal.log": "e5245435fb1bca72c280fd5274e46be416b9b23579229631fe07909fb8a7e37e",
+    "security-patches-optimized.log": "b0c3fda4e2e62b0492b47e9715101529e8ab1bb295c0681482173a0614122d5f",
+    "jdk21-before-fix.log": "0ec756d8453c7a59a6c22f74d5a84866979878b52798b6b49827fa55d4dbf78e"
+  },
+  "code_and_test_files": {
+    "TMessagesProj_Modules/telegram-session-android/integration/.gitattributes": {
+      "sha256": "fb25a78a6381f5646d71aacea4486f6aeeeb03c4d71740227011024be0d20a8f",
+      "git_blob": "24e115f5b2170dd3eaeaf95de74a012c0e856171"
+    },
+    "TMessagesProj_Modules/telegram-session-android/integration/0001-realalpha-read-only-jni.patch": {
+      "sha256": "f24cf32486218f9417a7cdd360cb607932e781376343c6bc3513c0ecc596df85",
+      "git_blob": "bbab66a555ae1a7c356219d36e4ac122155d100a"
+    },
+    "TMessagesProj_Modules/telegram-session-android/integration/read-only-jni.cmake": {
+      "sha256": "047c1f143cec133e88a34d7007bfbe4d122bb157680443f2b74e97e38d98c644",
+      "git_blob": "380ddd16fe3d3bc8875d890962a3259a22e7b082"
+    },
+    "TMessagesProj_Modules/telegram-session-android/src/android/java/io/github/jose22yt/flexygram/session/android/AndroidJournalBackend.java": {
+      "sha256": "755f4eeb29d249969b6b76629884a1516aee7affe397cff0a01ef0a2bd834f18",
+      "git_blob": "4ad69e65e08ca95691b20ad13d7ae2b64613ed28"
+    },
+    "TMessagesProj_Modules/telegram-session-android/src/android/java/io/github/jose22yt/flexygram/session/android/AndroidNativeBridge.java": {
+      "sha256": "6e550f4ee5359ee654fcb3198dafe9edb8ba440f8a18a9298664fb623c8cd2f6",
+      "git_blob": "07206e3357767d4ee6c0e1bf9ef4dbcd5e9f98ae"
+    },
+    "TMessagesProj_Modules/telegram-session-android/src/android/java/io/github/jose22yt/flexygram/session/android/LoginActivityAdapter.java": {
+      "sha256": "ffb1b13477e1bc3e81304979bbafc3dd13c6ce545a405abdefe84d43730a89c5",
+      "git_blob": "31e14b1a5a3a46aebd5bc2abc4058cacdab221b3"
+    },
+    "TMessagesProj_Modules/telegram-session-android/src/android/java/io/github/jose22yt/flexygram/session/android/TelegramAccountAdapter.java": {
+      "sha256": "7282a9560496b4efd7a45adb01587c4f93aa05215fca72fdcd60962ace593a61",
+      "git_blob": "d47596689649002f868f944fe80dd1915cc09fb5"
+    },
+    "TMessagesProj_Modules/telegram-session-android/src/main/cpp/SessionReadOnlyBridge.cpp": {
+      "sha256": "f7f735738d7269c7d9a5e20b7322b84e81fa56fa9e203b48613f3a2e74209785",
+      "git_blob": "571654f95b3d7f7022b29ced307d9a4adfb81f46"
+    },
+    "TMessagesProj_Modules/telegram-session-android/src/main/java/io/github/jose22yt/flexygram/session/android/AccountProbe.java": {
+      "sha256": "1e93f709d7e03ae0d55b0a3567919529f70529d59468ddbffbcb278e5dc43e00",
+      "git_blob": "c2c11b4d30db775291e51cd7cf646560466a537a"
+    },
+    "TMessagesProj_Modules/telegram-session-android/src/main/java/io/github/jose22yt/flexygram/session/android/DeniedTelegramTransport.java": {
+      "sha256": "bb26be09c14ef3592edfc162c7c7713e564bceb58acde18dd1e5d16dd1122865",
+      "git_blob": "287f992c4aaa2c6d37553d108fad8f6269a4090f"
+    },
+    "TMessagesProj_Modules/telegram-session-android/src/main/java/io/github/jose22yt/flexygram/session/android/JournaledLocalSessionStore.java": {
+      "sha256": "a642662dd4189937493571e2000b3b6626e5c24fa3197c242ef9fb177e725fe5",
+      "git_blob": "8430c97426b80f902f4acf41016454f1d63c5c2a"
+    },
+    "TMessagesProj_Modules/telegram-session-android/src/main/java/io/github/jose22yt/flexygram/session/android/LoginFlowOwner.java": {
+      "sha256": "76800e3702b3277666b1b1aab623d448c41861a8cbef1f64501a92bf78c9bbc3",
+      "git_blob": "a6bfacbd35d65d7d9b1db2488c4b0d979d351e19"
+    },
+    "TMessagesProj_Modules/telegram-session-android/src/main/java/io/github/jose22yt/flexygram/session/android/OperationJournal.java": {
+      "sha256": "e694c285e1ad7c355eed4a02759ead65766e2dc7f7901047caaf1ce454391638",
+      "git_blob": "322f41cf39058b5825c6e1cab09e676e794acfc1"
+    },
+    "TMessagesProj_Modules/telegram-session-android/src/main/java/io/github/jose22yt/flexygram/session/android/ReadOnlyAttestation.java": {
+      "sha256": "691fe96375598f870adbb8903087df67017a791a3c8c4213ac6414441dbd0987",
+      "git_blob": "b6dc34b9cc67732b5f4fb2a566ef37d9090793a8"
+    },
+    "tests/session_android/AndroidSessionHarness.java": {
+      "sha256": "6c6fa79fdd9611afdd89afc17bd8dd3964bf5772d04037cf5ed770287cb4dea9",
+      "git_blob": "e8c9a5ac370043d354d644c10f911e815935efe2"
+    },
+    "tests/session_android/fixtures.py": {
+      "sha256": "79f1e1dc13df2c0503642c29fc7dcb4c4f87d30a985403e96dfb6967173066f0",
+      "git_blob": "3e6649a0493c6848ecfc919e32b1cd6d652118d7"
+    },
+    "tests/session_android/test_adapters.py": {
+      "sha256": "b1faa25781ab9453603eb4a415d839a866a6df51146b3908475bf99bfc1b007d",
+      "git_blob": "1bba3e790755ee3711734b19d24d91e21c299e96"
+    },
+    "tests/session_core/test_integration_contracts.py": {
+      "sha256": "26289762e5091611141441b4a3d33119d714e423ccff79cb770da8a0c183d3d2",
+      "git_blob": "7e3b99104ba3c3982a40850fd795c5fbfa2b785b"
+    }
+  },
+  "unapplied_security_patches": {
+    "patches/session-core/0001-userconfig-reject-null-before-mutation.patch": {
+      "sha256": "2201bfc1ee91b846b402e6a19cc7f772583fc6b6dc792a24708bb8d7135d26ce",
+      "git_blob": "3f4d6c47c7b7de1b42d9a08d4d7d5a398c3f9627"
+    },
+    "patches/session-core/0002-no-implicit-auth-key-reset-retry.patch": {
+      "sha256": "61130bd61ceb85df149a3721f3d586438139978e74a283cef70f0a22fd5853a7",
+      "git_blob": "b10145bc7b10d9127fcef072793ebf6cf18d1330"
+    },
+    "patches/session-core/0003-realalpha-ignore-legacy-api-preferences.patch": {
+      "sha256": "2f7420bf275370acb930037360d18692d96792683efc13d19c37fbe9e7757d67",
+      "git_blob": "8e0ad11bc5cef6a34d89d011f0a69071a59c3453"
+    },
+    "patches/session-core/0004-redact-native-and-login-sensitive-diagnostics.patch": {
+      "sha256": "e38a213cf7ed1b22a2d70ba79f1975db33ced046408d51b9d6ded0d65f8a2a16",
+      "git_blob": "5dc9e1ba3860f5a250d4f7947c19bb067dc032c3"
+    }
+  },
+  "host_jni_executed": true,
+  "android_api_symbols_sdk": 24,
+  "android_runtime_executed": false,
+  "android_java_libraries_or_desugaring_certified": false,
+  "android_build_executed": false,
+  "native_engine_initialization": "UNKNOWN",
+  "telegram_connected": false,
+  "real_credentials_used": false,
+  "main_develop_pr34_modified": false,
+  "module_registered_or_packaged": false,
+  "pre_reset_results_counted": false,
+  "workspace_recovery": "Files recovered from this session after runtime reverted. Final tests rerun on recovered published source; earlier logs not available and not substituted.",
+  "pre_fix_jdk21_regression": {
+    "test": "test_jdk21_default_source_compilation",
+    "executed": 1,
+    "failures": 1,
+    "compiler_errors": 20,
+    "cause": "OperationJournal.Record vs java.lang.Record wildcard import ambiguity",
+    "log": "jdk21-before-fix.log"
+  }
+}

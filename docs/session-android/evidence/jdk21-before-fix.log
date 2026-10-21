@@ -1,0 +1,95 @@
+test_jdk21_default_source_compilation (test_adapters.AdapterTests.test_jdk21_default_source_compilation) ... FAIL
+
+======================================================================
+FAIL: test_jdk21_default_source_compilation (test_adapters.AdapterTests.test_jdk21_default_source_compilation)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram-session-android/tests/session_android/test_adapters.py", line 53, in test_jdk21_default_source_compilation
+    self.assertEqual(p.returncode,0,p.stderr)
+AssertionError: 1 != 0 : /workspace/scratch/1f84b79e43f3/FlexyGram-session-android/TMessagesProj_Modules/telegram-session-android/src/main/java/io/github/jose22yt/flexygram/session/android/JournaledLocalSessionStore.java:18: error: reference to Record is ambiguous
+    private Record started;
+            ^
+  both class io.github.jose22yt.flexygram.session.android.OperationJournal.Record in OperationJournal and class java.lang.Record in java.lang match
+/workspace/scratch/1f84b79e43f3/FlexyGram-session-android/TMessagesProj_Modules/telegram-session-android/src/android/java/io/github/jose22yt/flexygram/session/android/AndroidJournalBackend.java:27: error: reference to Record is ambiguous
+    @Override public Record read(SessionScope requested) {
+                     ^
+  both class io.github.jose22yt.flexygram.session.android.OperationJournal.Record in OperationJournal and class java.lang.Record in java.lang match
+/workspace/scratch/1f84b79e43f3/FlexyGram-session-android/TMessagesProj_Modules/telegram-session-android/src/android/java/io/github/jose22yt/flexygram/session/android/AndroidJournalBackend.java:33: error: reference to Record is ambiguous
+    private Record readLocked()throws IOException {
+            ^
+  both class io.github.jose22yt.flexygram.session.android.OperationJournal.Record in OperationJournal and class java.lang.Record in java.lang match
+/workspace/scratch/1f84b79e43f3/FlexyGram-session-android/TMessagesProj_Modules/telegram-session-android/src/android/java/io/github/jose22yt/flexygram/session/android/AndroidJournalBackend.java:46: error: reference to Record is ambiguous
+    @Override public boolean compareAndSet(Record expected,Record next) {
+                                           ^
+  both class io.github.jose22yt.flexygram.session.android.OperationJournal.Record in OperationJournal and class java.lang.Record in java.lang match
+/workspace/scratch/1f84b79e43f3/FlexyGram-session-android/TMessagesProj_Modules/telegram-session-android/src/android/java/io/github/jose22yt/flexygram/session/android/AndroidJournalBackend.java:46: error: reference to Record is ambiguous
+    @Override public boolean compareAndSet(Record expected,Record next) {
+                                                           ^
+  both class io.github.jose22yt.flexygram.session.android.OperationJournal.Record in OperationJournal and class java.lang.Record in java.lang match
+/workspace/scratch/1f84b79e43f3/FlexyGram-session-android/tests/session_android/AndroidSessionHarness.java:28: error: reference to Record is ambiguous
+        Record row=Record.empty(scope(0));int writes,failAt;boolean failRead,after;Runnable beforeWriting=()->{};
+        ^
+  both class io.github.jose22yt.flexygram.session.android.OperationJournal.Record in OperationJournal and class java.lang.Record in java.lang match
+/workspace/scratch/1f84b79e43f3/FlexyGram-session-android/tests/session_android/AndroidSessionHarness.java:29: error: reference to Record is ambiguous
+        public synchronized Record read(SessionScope s){if(failRead)throw new IllegalStateException(CANARY);return row;}
+                            ^
+  both class io.github.jose22yt.flexygram.session.android.OperationJournal.Record in OperationJournal and class java.lang.Record in java.lang match
+/workspace/scratch/1f84b79e43f3/FlexyGram-session-android/tests/session_android/AndroidSessionHarness.java:30: error: reference to Record is ambiguous
+        public synchronized boolean compareAndSet(Record old,Record next){writes++;if(writes==2)beforeWriting.run();if(failAt==writes&&!after)throw new IllegalStateException(CANARY);if(!row.equals(old))return false;row=next;if(failAt==writes&&after)throw new IllegalStateException(CANARY);return true;}
+                                                  ^
+  both class io.github.jose22yt.flexygram.session.android.OperationJournal.Record in OperationJournal and class java.lang.Record in java.lang match
+/workspace/scratch/1f84b79e43f3/FlexyGram-session-android/tests/session_android/AndroidSessionHarness.java:30: error: reference to Record is ambiguous
+        public synchronized boolean compareAndSet(Record old,Record next){writes++;if(writes==2)beforeWriting.run();if(failAt==writes&&!after)throw new IllegalStateException(CANARY);if(!row.equals(old))return false;row=next;if(failAt==writes&&after)throw new IllegalStateException(CANARY);return true;}
+                                                             ^
+  both class io.github.jose22yt.flexygram.session.android.OperationJournal.Record in OperationJournal and class java.lang.Record in java.lang match
+/workspace/scratch/1f84b79e43f3/FlexyGram-session-android/TMessagesProj_Modules/telegram-session-android/src/android/java/io/github/jose22yt/flexygram/session/android/AndroidJournalBackend.java:39: error: reference to Record is ambiguous
+            Record r=new Record(SessionScope.of(variant,appId,account),revision,operation,Phase.valueOf(phase));
+            ^
+  both class io.github.jose22yt.flexygram.session.android.OperationJournal.Record in OperationJournal and class java.lang.Record in java.lang match
+/workspace/scratch/1f84b79e43f3/FlexyGram-session-android/TMessagesProj_Modules/telegram-session-android/src/android/java/io/github/jose22yt/flexygram/session/android/AndroidJournalBackend.java:39: error: reference to Record is ambiguous
+            Record r=new Record(SessionScope.of(variant,appId,account),revision,operation,Phase.valueOf(phase));
+                         ^
+  both class io.github.jose22yt.flexygram.session.android.OperationJournal.Record in OperationJournal and class java.lang.Record in java.lang match
+/workspace/scratch/1f84b79e43f3/FlexyGram-session-android/TMessagesProj_Modules/telegram-session-android/src/android/java/io/github/jose22yt/flexygram/session/android/AndroidJournalBackend.java:43: error: reference to Record is ambiguous
+            return Record.empty(scope);
+                   ^
+  both class io.github.jose22yt.flexygram.session.android.OperationJournal.Record in OperationJournal and class java.lang.Record in java.lang match
+/workspace/scratch/1f84b79e43f3/FlexyGram-session-android/tests/session_android/AndroidSessionHarness.java:28: error: reference to Record is ambiguous
+        Record row=Record.empty(scope(0));int writes,failAt;boolean failRead,after;Runnable beforeWriting=()->{};
+                   ^
+  both class io.github.jose22yt.flexygram.session.android.OperationJournal.Record in OperationJournal and class java.lang.Record in java.lang match
+/workspace/scratch/1f84b79e43f3/FlexyGram-session-android/tests/session_android/AndroidSessionHarness.java:55: error: reference to Record is ambiguous
+        case "recordValidation":denied(()->new Record(scope(0),-1,"",Phase.NONE));denied(()->new Record(scope(0),1,CANARY,Phase.STARTED));denied(()->new Record(scope(0),0,"",Phase.WRITING));break;
+                                               ^
+  both class io.github.jose22yt.flexygram.session.android.OperationJournal.Record in OperationJournal and class java.lang.Record in java.lang match
+/workspace/scratch/1f84b79e43f3/FlexyGram-session-android/tests/session_android/AndroidSessionHarness.java:55: error: reference to Record is ambiguous
+        case "recordValidation":denied(()->new Record(scope(0),-1,"",Phase.NONE));denied(()->new Record(scope(0),1,CANARY,Phase.STARTED));denied(()->new Record(scope(0),0,"",Phase.WRITING));break;
+                                                                                                 ^
+  both class io.github.jose22yt.flexygram.session.android.OperationJournal.Record in OperationJournal and class java.lang.Record in java.lang match
+/workspace/scratch/1f84b79e43f3/FlexyGram-session-android/tests/session_android/AndroidSessionHarness.java:55: error: reference to Record is ambiguous
+        case "recordValidation":denied(()->new Record(scope(0),-1,"",Phase.NONE));denied(()->new Record(scope(0),1,CANARY,Phase.STARTED));denied(()->new Record(scope(0),0,"",Phase.WRITING));break;
+                                                                                                                                                         ^
+  both class io.github.jose22yt.flexygram.session.android.OperationJournal.Record in OperationJournal and class java.lang.Record in java.lang match
+/workspace/scratch/1f84b79e43f3/FlexyGram-session-android/tests/session_android/AndroidSessionHarness.java:56: error: reference to Record is ambiguous
+        case "journalBeginAndRecovery":{need(journal.inspect().recovery()==Recovery.EMPTY);Record first=journal.begin(false);need(first.phase==Phase.STARTED&&first.recovery()==Recovery.ACTIVE_OR_INTERRUPTED);denied(()->journal.begin(false));break;}
+                                                                                           ^
+  both class io.github.jose22yt.flexygram.session.android.OperationJournal.Record in OperationJournal and class java.lang.Record in java.lang match
+/workspace/scratch/1f84b79e43f3/FlexyGram-session-android/tests/session_android/AndroidSessionHarness.java:60: error: reference to Record is ambiguous
+        case "journalRetryExplicitOnly":{String old=journal.begin(false).operation;journal.move(Phase.FAILED);denied(()->new OperationJournal(memory,scope(0)).begin(false));Record fresh=new OperationJournal(memory,scope(0)).begin(true);need(!old.equals(fresh.operation)&&fresh.revision==3);break;}
+                                                                                                                                                                             ^
+  both class io.github.jose22yt.flexygram.session.android.OperationJournal.Record in OperationJournal and class java.lang.Record in java.lang match
+/workspace/scratch/1f84b79e43f3/FlexyGram-session-android/tests/session_android/AndroidSessionHarness.java:94: error: reference to Record is ambiguous
+        case "androidJournalCasConflict":{AndroidJournalBackend b=new AndroidJournalBackend(context,attestation(0).runtime);Record empty=b.read(scope(0)),one=new Record(scope(0),1,"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",Phase.STARTED);need(b.compareAndSet(empty,one));need(!new AndroidJournalBackend(context,attestation(0).runtime).compareAndSet(empty,one));need(b.read(scope(0)).equals(one));break;}
+                                                                                                                            ^
+  both class io.github.jose22yt.flexygram.session.android.OperationJournal.Record in OperationJournal and class java.lang.Record in java.lang match
+/workspace/scratch/1f84b79e43f3/FlexyGram-session-android/tests/session_android/AndroidSessionHarness.java:94: error: reference to Record is ambiguous
+        case "androidJournalCasConflict":{AndroidJournalBackend b=new AndroidJournalBackend(context,attestation(0).runtime);Record empty=b.read(scope(0)),one=new Record(scope(0),1,"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",Phase.STARTED);need(b.compareAndSet(empty,one));need(!new AndroidJournalBackend(context,attestation(0).runtime).compareAndSet(empty,one));need(b.read(scope(0)).equals(one));break;}
+                                                                                                                                                                  ^
+  both class io.github.jose22yt.flexygram.session.android.OperationJournal.Record in OperationJournal and class java.lang.Record in java.lang match
+20 errors
+
+
+----------------------------------------------------------------------
+Ran 1 test in 2.749s
+
+FAILED (failures=1)

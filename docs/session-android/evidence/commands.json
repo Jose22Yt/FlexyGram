@@ -1,0 +1,72 @@
+{
+  "environment": {
+    "JAVA_HOME": "/workspace/scratch/1f84b79e43f3/alpha-toolchain/jbrsdk-21.0.10-linux-x64-b1163.105",
+    "PATH": "$JAVA_HOME/bin:$PATH",
+    "FLEXYGRAM_CMAKE": "/workspace/scratch/1f84b79e43f3/alpha-toolchain/tools/bin/cmake",
+    "FLEXYGRAM_ANDROID24_JAR": "/workspace/scratch/1f84b79e43f3/alpha-toolchain/sdk24/android-7.0/android.jar",
+    "FLEXYGRAM_GRADLE_HOME": "/workspace/scratch/1f84b79e43f3/alpha-toolchain/gradle/gradle-9.7.1"
+  },
+  "working_directory": "/workspace/scratch/1f84b79e43f3/FlexyGram-session-android",
+  "commands": [
+    {
+      "python": "/root/.local/bin/python3.11",
+      "args": [
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/session_android",
+        "-v"
+      ],
+      "exit_code": 0,
+      "log": "host-normal.log"
+    },
+    {
+      "python": "/root/.local/bin/python3.11",
+      "args": [
+        "-O",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/session_android",
+        "-v"
+      ],
+      "exit_code": 0,
+      "log": "host-optimized.log"
+    },
+    {
+      "python": "/root/.local/bin/python3.11",
+      "args": [
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/session_core",
+        "-p",
+        "test_integration_contracts.py",
+        "-v"
+      ],
+      "exit_code": 0,
+      "log": "security-patches-normal.log"
+    },
+    {
+      "python": "/root/.local/bin/python3.11",
+      "args": [
+        "-O",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/session_core",
+        "-p",
+        "test_integration_contracts.py",
+        "-v"
+      ],
+      "exit_code": 0,
+      "log": "security-patches-optimized.log"
+    }
+  ],
+  "sdk_symbols_compilation": "javac --release 8 -classpath <real API24 android.jar>; not an Android build or bootclasspath/runtime compatibility proof",
+  "host_jni_compilation": "c++ -std=c++17 -fPIC -fvisibility=hidden -shared -Wall -Wextra -Werror; real original VariantPolicy.cpp + new bridge; see executable test for complete arguments"
+}
