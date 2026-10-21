@@ -51,11 +51,16 @@ public final class NativeLoginProtocol {
         public final SessionScope scope;
         public final Action action;
         public final int datacenter;
+        private final Object operationOwner;
         private char[] input;
         public Request(SessionScope scope,Action action,char[] synthetic,int dc) {
-            if(scope==null||action==null||synthetic==null||synthetic.length>4096)throw new IllegalArgumentException("LOCAL_REQUEST_REQUIRED");
-            this.scope=scope;this.action=action;datacenter=dc;input=synthetic.clone();
+            this(scope,action,synthetic,dc,new Object());
         }
+        Request(SessionScope scope,Action action,char[] synthetic,int dc,Object owner) {
+            if(scope==null||action==null||synthetic==null||synthetic.length>4096||owner==null)throw new IllegalArgumentException("LOCAL_REQUEST_REQUIRED");
+            this.scope=scope;this.action=action;datacenter=dc;input=synthetic.clone();operationOwner=owner;
+        }
+        public boolean belongsTo(Object owner){return owner!=null&&operationOwner==owner;}
         public synchronized char[] copyInput(){if(input==null)throw new IllegalStateException("REQUEST_CLOSED");return input.clone();}
         public synchronized boolean isClosed(){return input==null;}
         @Override public synchronized void close(){if(input!=null){Arrays.fill(input,'\0');input=null;}}
@@ -70,6 +75,9 @@ public final class NativeLoginProtocol {
         void close();
     }
     public interface Clock {long elapsedMillis();}
+    public static boolean needsInput(Action action) {
+        return action==Action.SEND_CODE||action==Action.SIGN_IN||action==Action.CHECK_PASSWORD||action==Action.SIGN_UP;
+    }
     public static Response error(String text) {
         if("SESSION_PASSWORD_NEEDED".equals(text))return Response.of(Kind.PASSWORD_NEEDED);
         if("PHONE_CODE_INVALID".equals(text)||"PHONE_CODE_EMPTY".equals(text))return Response.failure(Error.INVALID_CODE);

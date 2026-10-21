@@ -9,6 +9,20 @@ import io.github.jose22yt.flexygram.login.NativeLoginProtocol.Error;
 /** Typed boundary for original TL classes. Retains no response/error or private values. */
 public final class TlAuthResponses {
     private TlAuthResponses() {}
+    /** Common LOCAL callback boundary. Reject stale/foreign ownership BEFORE retaining authorization. */
+    public static Response mapAndStageLocal(Request request,TelegramAuthorizationStore store,TLObject response,TLRPC.TL_error error) {
+        if(request==null||request.isClosed())return Response.failure(Error.PROTOCOL);
+        Response result=map(request.action,response,error);
+        if(result.kind==Kind.AUTHORIZED) {
+            TLRPC.auth_Authorization authorization=null;
+            if(response instanceof TLRPC.TL_auth_authorization)authorization=(TLRPC.TL_auth_authorization)response;
+            else if(response instanceof TLRPC.TL_auth_sentCodeSuccess)authorization=((TLRPC.TL_auth_sentCodeSuccess)response).authorization;
+            else if(response instanceof TLRPC.TL_auth_loginTokenSuccess)authorization=((TLRPC.TL_auth_loginTokenSuccess)response).authorization;
+            try{store.stageLocal(store.operation(),request,authorization);}
+            catch(RuntimeException|LinkageError unavailable){return Response.failure(Error.PROTOCOL);}
+        }
+        return result;
+    }
     public static Response map(Action action,TLObject response,TLRPC.TL_error error) {
         if(action==null || response!=null&&error!=null)return Response.failure(Error.PROTOCOL);
         if(error!=null)return NativeLoginProtocol.error(error.text);

@@ -42,18 +42,29 @@ public final class NativeLoginTransport implements TransportPort {
     private long revision,deadline;
     private Action retryAction;
     private Runnable stateSignal=()->{};
+    private final java.util.function.Supplier<?> operationOwnerProvider;
+    private Object operationOwner;
     public NativeLoginTransport(ClosedRuntime runtime,LocalRpc rpc,Clock clock) {
-        if(runtime==null||rpc==null||clock==null||runtime.scope.variant!=SessionScope.Variant.REAL_ALPHA)
+        this(runtime,rpc,clock,()->new Object());
+    }
+    public NativeLoginTransport(ClosedRuntime runtime,LocalRpc rpc,Clock clock,java.util.function.Supplier<?> operationOwnerProvider) {
+        if(runtime==null||rpc==null||clock==null||operationOwnerProvider==null||runtime.scope.variant!=SessionScope.Variant.REAL_ALPHA)
             throw new IllegalArgumentException("LOCAL_NATIVE_LOGIN_REQUIRED");
-        scope=runtime.scope;this.rpc=rpc;this.clock=clock;
+        scope=runtime.scope;this.rpc=rpc;this.clock=clock;this.operationOwnerProvider=operationOwnerProvider;
         if(!local())throw new IllegalArgumentException("LOCAL_NATIVE_LOGIN_REQUIRED");
     }
-    private boolean local(){return rpc.domain()==Domain.LOCAL_SIMULATION&&scope.equals(rpc.scope());}
+    private boolean local(){
+        try{return rpc.domain()==Domain.LOCAL_SIMULATION&&scope.equals(rpc.scope());}
+        catch(RuntimeException|LinkageError unavailable){return false;}
+    }
+    private long elapsed(){try{return clock.elapsedMillis();}catch(RuntimeException|LinkageError unavailable){return -1;}}
     @Override public Domain domain(){return Domain.LOCAL_SIMULATION;}
     @Override public SessionScope scope(){return scope;}
     @Override public void initialize() {
         synchronized(this) {
             if(closed||initialized||!local())throw new IllegalStateException("LOCAL_INITIALIZATION_REJECTED");
+            try{operationOwner=operationOwnerProvider.get();if(operationOwner==null)throw new IllegalStateException();}
+            catch(RuntimeException|LinkageError unavailable){throw new IllegalStateException("OPERATION_OWNER_UNAVAILABLE");}
             initialized=true;change(Stage.READY,Error.NONE);
         }
         notifyUi();
@@ -110,10 +121,10 @@ public final class NativeLoginTransport implements TransportPort {
         synchronized(this) {
             if(!explicitChoice||closed||parent==null||call!=null||retryAction==null
                     ||error!=Error.INVALID_CODE&&error!=Error.INVALID_PASSWORD&&error!=Error.WAIT)return false;
-            if(stage==Stage.WAITING) {long now=clock.elapsedMillis();if(now<0||now<deadline)return false;}
+            if(stage==Stage.WAITING) {long now=elapsed();if(now<0||now<deadline)return false;}
             else if(stage!=Stage.CODE_RETRY&&stage!=Stage.PASSWORD_PARAMETERS)return false;
             action=retryAction;
-            if(freshSyntheticInput==null||freshSyntheticInput.length>4096)return false;
+            if(freshSyntheticInput==null||freshSyntheticInput.length>4096||NativeLoginProtocol.needsInput(action)&&freshSyntheticInput.length==0)return false;
             change(Stage.BUSY,Error.NONE);
         }
         dispatch(action,freshSyntheticInput,0);return true;
@@ -121,7 +132,8 @@ public final class NativeLoginTransport implements TransportPort {
     private boolean auxiliary(Action action,char[] input,boolean explicitChoice,Stage required) {
         int dc;
         synchronized(this) {
-            if(!explicitChoice||closed||parent==null||call!=null||stage!=required||input==null||input.length>4096)return false;
+            if(!explicitChoice||closed||parent==null||call!=null||stage!=required||input==null||input.length>4096
+                    ||NativeLoginProtocol.needsInput(action)&&input.length==0)return false;
             if(action==Action.IMPORT_QR&&migrated)return false;
             dc=action==Action.IMPORT_QR?targetDc:0;
             if(action==Action.IMPORT_QR)migrated=true;
@@ -133,7 +145,7 @@ public final class NativeLoginTransport implements TransportPort {
         final Call current;
         synchronized(this) {
             if(closed||parent==null||call!=null)return;
-            current=new Call(parent,new Request(scope,action,input,dc));call=current;change(Stage.BUSY,Error.NONE);
+            current=new Call(parent,new Request(scope,action,input,dc,operationOwner));call=current;change(Stage.BUSY,Error.NONE);
         }
         Cancellation handle=null;boolean failed=false;
         try {if(!local())throw new IllegalStateException();handle=rpc.submit(current.request,response->accept(current,response));}
@@ -175,7 +187,7 @@ public final class NativeLoginTransport implements TransportPort {
             if(response.error==Error.INVALID_PASSWORD&&action==Action.CHECK_PASSWORD){change(Stage.PASSWORD_PARAMETERS,response.error);return null;}
             if(response.error==Error.SRP_REFRESH&&action==Action.CHECK_PASSWORD){change(Stage.PASSWORD_REQUIRED,response.error);return null;}
             if(response.error==Error.WAIT) {
-                long now=clock.elapsedMillis(),delay=response.value*1000L;
+                long now=elapsed(),delay=response.value*1000L;
                 if(now>=0&&Long.MAX_VALUE-now>=delay){deadline=now+delay;change(Stage.WAITING,response.error);return null;}
             }
             change(Stage.FAILED,response.error);return finish(false);
