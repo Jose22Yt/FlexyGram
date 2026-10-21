@@ -25,7 +25,7 @@ public class OnBackInvokedDispatcher {
  public void putInt(String key,int value){values.put(key,value);}public void putBoolean(String key,boolean value){values.put(key,value);}
  public void putString(String key,String value){values.put(key,value);}public Object get(String key){return values.get(key);}
 }''',
-'android/content/Context.java':'''package android.content; public class Context {public Context getApplicationContext(){return this;}public java.io.File getFilesDir(){return new java.io.File(System.getProperty("java.io.tmpdir"),"synthetic-beta-files");}}''',
+'android/content/Context.java':'''package android.content; public class Context {public Context getApplicationContext(){return this;}public android.content.res.Resources getResources(){return new android.content.res.Resources();}public java.io.File getFilesDir(){return new java.io.File(System.getProperty("java.io.tmpdir"),"synthetic-beta-files");}}''',
 'android/app/Activity.java':'''package android.app;
 public class Activity extends android.content.Context {
  public static final java.util.Queue<Runnable> ui=new java.util.concurrent.ConcurrentLinkedQueue<>();
@@ -46,10 +46,10 @@ public class View {
  public interface OnClickListener {void onClick(View v);}
  public static final java.util.List<Runnable> frames=new java.util.ArrayList<>();
  public final ViewTreeObserver tree=new ViewTreeObserver();public final java.util.List<Runnable> timers=new java.util.ArrayList<>();
- public boolean enabled=true;OnClickListener click;
+ public boolean enabled=true;public int backgroundColor;public Object background;public int[] padding=new int[4];OnClickListener click;
  public View(android.content.Context c){}public ViewTreeObserver getViewTreeObserver(){return tree;}
  public void setOnClickListener(OnClickListener l){click=l;}public void performClick(){if(enabled&&click!=null)click.onClick(this);}
- public void setEnabled(boolean b){enabled=b;}public void setBackgroundColor(int c){}
+ public void setEnabled(boolean b){enabled=b;}public void setBackgroundColor(int c){backgroundColor=c;}public void setBackground(Object b){background=b;}public void setPadding(int l,int t,int r,int b){padding=new int[]{l,t,r,b};}
  public boolean isAttachedToWindow(){return true;}public boolean isShown(){return true;}public boolean hasWindowFocus(){return true;}
  public int getWidth(){return 100;}public int getHeight(){return 100;}
  public boolean postDelayed(Runnable r,long t){timers.add(r);return true;}
@@ -57,10 +57,10 @@ public class View {
  public void invalidate(){}public static void frame(){if(!frames.isEmpty())frames.remove(0).run();}
 }''',
 'android/widget/LinearLayout.java':'''package android.widget;public class LinearLayout extends android.view.View {
- public static final int VERTICAL=1;public final java.util.List<android.view.View> children=new java.util.ArrayList<>();
- public LinearLayout(android.content.Context c){super(c);}public void setOrientation(int i){}public void addView(android.view.View v){children.add(v);}
+ public static final int VERTICAL=1,HORIZONTAL=0;public int gravity;public final java.util.List<android.view.View> children=new java.util.ArrayList<>();
+ public LinearLayout(android.content.Context c){super(c);}public void setOrientation(int i){}public void setGravity(int i){gravity=i;}public void addView(android.view.View v){children.add(v);}public void addView(android.view.View v,LayoutParams p){children.add(v);}public static class LayoutParams {public static final int MATCH_PARENT=-1,WRAP_CONTENT=-2;public LayoutParams(int w,int h){}}
 }''',
-'android/widget/TextView.java':'package android.widget;public class TextView extends android.view.View {public String text;public TextView(android.content.Context c){super(c);}public void setText(CharSequence value){text=value.toString();}}',
+'android/widget/TextView.java':'package android.widget;public class TextView extends android.view.View {public String text;public TextView(android.content.Context c){super(c);}public void setText(CharSequence value){text=value.toString();}public void setTextSize(int u,float s){}public void setTextColor(int c){}public void setMaxWidth(int w){}public void setGravity(int g){}}',
 'android/widget/ScrollView.java':'''package android.widget;public class ScrollView extends LinearLayout {public ScrollView(android.content.Context c){super(c);}public void setFillViewport(boolean b){}}''',
 'org/telegram/messenger/ApplicationLoader.java':'package org.telegram.messenger;public class ApplicationLoader {public static boolean fail;public static void postInitApplication(){if(fail)throw new IllegalStateException("SYNTHETIC_PRIVATE_VALUE");}}',
 'org/telegram/messenger/BuildConfig.java':'''package org.telegram.messenger;public class BuildConfig {public static final String APPLICATION_ID="io.github.jose22yt.flexygram.beta.development",APP_HASH="";public static final int APP_ID=0;public static final boolean ISOLATED_DIAGNOSTIC=true;}''',
@@ -70,7 +70,7 @@ public class View {
 'org/telegram/messenger/NativeLoader.java':'package org.telegram.messenger;public class NativeLoader {public static boolean ready=true;public static boolean loaded(){return ready;}}',
 'org/telegram/messenger/R.java':'package org.telegram.messenger;public class R {public static class drawable {public static final int ic_ab_back=1;}}',
 'org/telegram/ui/ActionBar/ActionBar.java':'''package org.telegram.ui.ActionBar;public class ActionBar {public static class ActionBarMenuOnItemClick {public void onItemClick(int id){}}
- public void setTitle(String s){}public void setBackButtonImage(int i){}public void setActionBarMenuOnItemClick(ActionBarMenuOnItemClick c){}}''',
+ public boolean occupyStatusBar=true;public void setOccupyStatusBar(boolean value){occupyStatusBar=value;}public void setTitle(String s){}public void setBackButtonImage(int i){}public void setActionBarMenuOnItemClick(ActionBarMenuOnItemClick c){}}''',
 'org/telegram/ui/ActionBar/BaseFragment.java':'''package org.telegram.ui.ActionBar;public class BaseFragment {
  protected android.view.View fragmentView;protected ActionBar actionBar=new ActionBar();public ActionBarLayout parent;
  public android.view.View createView(android.content.Context c){return fragmentView=new android.view.View(c);}
@@ -87,7 +87,9 @@ public class View {
  public boolean checkTransitionAnimation(){return busy;}public boolean isTransitionAnimationInProgress(){return busy;}
  public boolean isSwipeInProgress(){return false;}public boolean isPreviewOpenAnimationInProgress(){return false;}
  public boolean presentFragment(BaseFragment f){if(busy)return false;addFragmentToStack(f);f.createView(context);busy=true;return true;}
- public void closeLastFragment(boolean b){if(busy||stack.size()<2)return;BaseFragment f=getLastFragment();f.onTransitionAnimationStart(false,true);stack.remove(f);f.onFragmentDestroy();busy=true;}
+ // Real ActionBarLayout.closeLastFragment creates the previous view if it was
+ // never visible (e.g. home underneath a restored conversation).
+ public void closeLastFragment(boolean b){if(busy||stack.size()<2)return;BaseFragment f=getLastFragment();f.onTransitionAnimationStart(false,true);stack.remove(f);f.onFragmentDestroy();if(getLastFragment().getFragmentView()==null)showLastFragment();busy=true;}
  public void onBackPressed(){closeLastFragment(true);}public void onResume(){}public void onPause(){}
  public void removeAllFragments(){for(BaseFragment f:stack)f.onFragmentDestroy();stack.clear();}
  public void rebuildAllFragmentViews(boolean a,boolean b){getLastFragment().createView(context);}
@@ -108,3 +110,34 @@ public class View {
  public static Python getInstance(){return new Python();}public Object getModule(String name){if(failImport)throw new IllegalStateException("SYNTHETIC_PRIVATE_VALUE");entered.countDown();try{if(!release.await(5,java.util.concurrent.TimeUnit.SECONDS))throw new RuntimeException();}catch(InterruptedException e){throw new RuntimeException();}return new Object();}}
 '''
 }
+
+# Framework-only widgets used by the account-free conversation fixture.
+STUBS.update({
+ 'android/util/DisplayMetrics.java': 'package android.util;public class DisplayMetrics {public float density=1;public int widthPixels=360;}',
+ 'android/util/TypedValue.java': 'package android.util;public class TypedValue {public static final int COMPLEX_UNIT_SP=2;}',
+ 'android/content/res/Resources.java': 'package android.content.res;public class Resources {public android.util.DisplayMetrics getDisplayMetrics(){return new android.util.DisplayMetrics();}}',
+ 'android/view/Gravity.java': 'package android.view;public class Gravity {public static final int START=8388611,END=8388613;}',
+ 'android/graphics/drawable/GradientDrawable.java': 'package android.graphics.drawable;public class GradientDrawable {public int color;public float radius;public void setColor(int c){color=c;}public void setCornerRadius(float r){radius=r;}}',
+})
+
+# Insets are explicit host doubles, not a simulation of Android's window manager.
+STUBS.update({
+ 'android/widget/FrameLayout.java': 'package android.widget;public class FrameLayout extends LinearLayout {public FrameLayout(android.content.Context c){super(c);}}',
+ 'androidx/core/graphics/Insets.java': 'package androidx.core.graphics;public class Insets {public final int left,top,right,bottom;public Insets(int l,int t,int r,int b){left=l;top=t;right=r;bottom=b;}}',
+ 'androidx/core/view/WindowInsetsCompat.java': '''package androidx.core.view;
+ public class WindowInsetsCompat {
+  public final androidx.core.graphics.Insets bars;public final int ime;
+  public WindowInsetsCompat(int l,int t,int r,int b,int keyboard){bars=new androidx.core.graphics.Insets(l,t,r,b);ime=keyboard;}
+  public static class Type {public static int systemBars(){return 1;}public static int displayCutout(){return 2;}}
+  public androidx.core.graphics.Insets getInsets(int type){if(type!=3)throw new AssertionError("wrong inset types");return bars;}
+  public WindowInsetsCompat inset(int l,int t,int r,int b){return new WindowInsetsCompat(Math.max(0,bars.left-l),Math.max(0,bars.top-t),Math.max(0,bars.right-r),Math.max(0,bars.bottom-b),Math.max(0,ime-b));}
+ }''',
+ 'androidx/core/view/ViewCompat.java': '''package androidx.core.view;
+ public class ViewCompat {
+  public interface Listener {WindowInsetsCompat apply(android.view.View view,WindowInsetsCompat insets);}
+  private static final java.util.Map<android.view.View,Listener> listeners=new java.util.WeakHashMap<>();
+  public static void setOnApplyWindowInsetsListener(android.view.View view,Listener listener){listeners.put(view,listener);}
+  public static void requestApplyInsets(android.view.View view){}
+  public static WindowInsetsCompat dispatch(android.view.View view,WindowInsetsCompat insets){return listeners.get(view).apply(view,insets);}
+ }''',
+})

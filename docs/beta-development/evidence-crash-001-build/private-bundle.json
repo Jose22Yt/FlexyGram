@@ -1,0 +1,14 @@
+{
+  "bundle_name": "FlexyGram-BetaDevelopment-CRASH001-2d532562-Unsigned-Private.zip",
+  "bytes": 337758546,
+  "sha256": "9678e4d92b5b27e8018429be326a5345ce9c163b8b99cdb61424720f77fa5811",
+  "members": 41,
+  "all_member_sha256_and_crc_verified": true,
+  "apk_sha256": "2ca59f8f4575850d42b6fad56e231dbbbe2cff077fa93bf33aa3b638a3ae0d00",
+  "apk_bytes": 113102119,
+  "source_commit": "2d532562f68946a83f5cdd2fc1059e3024beb525",
+  "local_only": true,
+  "upload_authorized": false,
+  "remote_recovery_verified": false,
+  "proposed_destination": "/FlexyGram-Work2-Private/FlexyGram-BetaDevelopment-CRASH001-2d532562-Unsigned-Private.zip"
+}

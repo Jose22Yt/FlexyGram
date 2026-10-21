@@ -1,0 +1,10 @@
+{
+  "previous_certificate_sha256": "e68685abf684405159d6d6edf93984f07f2043053c024f252888b9f55aee5e05",
+  "previous_process_available": false,
+  "process_probe_error": "Unknown process id 16262",
+  "local_keystore_recovered": false,
+  "workspace_maintenance_observed": true,
+  "new_identity_generated": false,
+  "second_apk_signing_authorized": false,
+  "note": "Lost ephemeral process/password cannot be recovered from the public certificate or signed APK; no regeneration attempted."
+}

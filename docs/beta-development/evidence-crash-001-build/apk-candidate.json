@@ -1,0 +1,80 @@
+{
+  "source_commit": "2d532562f68946a83f5cdd2fc1059e3024beb525",
+  "apk_sha256": "2ca59f8f4575850d42b6fad56e231dbbbe2cff077fa93bf33aa3b638a3ae0d00",
+  "bytes": 113102119,
+  "apk_path": "/workspace/scratch/6fe2cd15bb66/private-artifacts/FlexyGram-BetaDevelopment-CRASH001-2d532562-arm64-unsigned.apk",
+  "signed": false,
+  "gate_status": "BETA_UNSIGNED_STATIC_REVIEW_ONLY_PENDING_ANDROID",
+  "source_files": [
+    {
+      "path": "TMessagesProj/src/betaDevelopment/java/org/telegram/ui/beta/BetaEventExport.java",
+      "sha256": "527cbfb84b248eba4650c63d52a68ea83cf939c0241d2ef881a4e937801771e5"
+    },
+    {
+      "path": "TMessagesProj/src/betaDevelopment/java/org/telegram/ui/beta/BetaNavigation.java",
+      "sha256": "94e6b2883fa2685e04837bb21e54edb315fbeeee35d5de1dc8513e87cb36f5d8"
+    },
+    {
+      "path": "TMessagesProj/src/betaDevelopment/java/org/telegram/ui/beta/BetaPostInit.java",
+      "sha256": "3987abb4a691f6a273e287098435eeb7bfa370cf096af74446c7557aa9041cb8"
+    },
+    {
+      "path": "TMessagesProj/src/betaDevelopment/java/org/telegram/ui/beta/BetaPreviewActivity.java",
+      "sha256": "2a96cb28ed606f7295706abd4d64ecf5600294009eca48fba75ec51654849651"
+    },
+    {
+      "path": "TMessagesProj/src/betaDevelopment/java/org/telegram/ui/beta/BetaSystemBack.java",
+      "sha256": "74f05dfb48ab481dab5349347ea47c1be78a2c1de8d5e4a523cf9b5f552d9768"
+    },
+    {
+      "path": "TMessagesProj/src/betaDevelopment/java/org/telegram/ui/beta/BetaSystemInsets.java",
+      "sha256": "7a53bce13fd631c2863206e2fab60a7ded08f61cd293277b2e5e2ecff2c6dea4"
+    },
+    {
+      "path": "TMessagesProj/src/betaDevelopment/java/org/telegram/ui/beta/BetaUiState.java",
+      "sha256": "b22e77c9b9dd8e05196c63cc803af630fa99183f351da638a93ef3311c82f62f"
+    },
+    {
+      "path": "TMessagesProj/src/betaDevelopment/java/org/telegram/ui/beta/LatestNavigation.java",
+      "sha256": "e93341e3c6a1a8b2df87967f5d9e5f112347d1ab6ed98551f7054670fbb8cc8a"
+    },
+    {
+      "path": "TMessagesProj/src/betaDevelopment/java/org/telegram/ui/beta/LocalPythonProbe.java",
+      "sha256": "3446731703980a254fae6660d4d598f65ce6a26ab9dfea229c9c8e230b177497"
+    },
+    {
+      "path": "TMessagesProj/src/betaDevelopment/java/org/telegram/ui/beta/NavigationEvents.java",
+      "sha256": "822972ac30b9537427070123faf44aea4e058cd5786e73ec5ced373ebaf5bb96"
+    },
+    {
+      "path": "TMessagesProj/src/betaDevelopment/java/org/telegram/ui/beta/OfflineConversationView.java",
+      "sha256": "9ac17711aa911cc102586a64af482ae0dc6e0fea3b87b46b0c75c342fb90311b"
+    },
+    {
+      "path": "TMessagesProj/src/betaDevelopment/java/org/telegram/ui/beta/ProbeState.java",
+      "sha256": "262a45c4f961823487747b46837070c5214d7959f9fe10c1fde6c26d9175de1d"
+    },
+    {
+      "path": "TMessagesProj/src/betaDevelopment/java/org/telegram/ui/beta/SceneFrameObserver.java",
+      "sha256": "d55331faeda7ed76b980c6503fff2a667de697c871699f5e548abfe1d3504025"
+    }
+  ],
+  "same_build_classes": {
+    "BetaPreviewActivity": {
+      "sha256": "c8fe3fc315b81ae1f20fc0a28b13493bd02f03c5faad652462abe6b48506fff8"
+    },
+    "BetaPreviewActivity$Conversation": {
+      "sha256": "db8a1436ce73983456fc2ebd6a32cbdebd96557f0c4ab83877033347a8ab2b2b"
+    },
+    "OfflineConversationView": {
+      "sha256": "68344a16197a79bb9287f491c866e8c2e03688eb3499b05c5a8dd9daae7ebe9e"
+    },
+    "BetaSystemInsets": {
+      "sha256": "ba24a271e723745ca48e7b9879b2c4196d3e36f5b308fd2297c27a404ada24a7"
+    }
+  },
+  "compiled_conversation_uses_offline_view": true,
+  "compiled_activity_uses_insets_wrapper": true,
+  "classes_present_in_dex": true,
+  "android_executed": false
+}

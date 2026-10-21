@@ -5,8 +5,9 @@ import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
+
+import androidx.core.view.ViewCompat;
 
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.BuildConfig;
@@ -17,7 +18,6 @@ import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Cells.DialogCell;
 import org.telegram.ui.Cells.TextSettingsCell;
-import org.telegram.ui.Cells.ThemePreviewMessagesCell;
 
 import java.util.ArrayList;
 import java.lang.ref.WeakReference;
@@ -73,7 +73,9 @@ public final class BetaPreviewActivity extends Activity {
         ownedTheme = Theme.getCurrentTheme();
         navigation = new ActionBarLayout(this, false);
         navigation.setFragmentStack(new ArrayList<>());
-        setContentView(navigation);
+        View insetRoot = BetaSystemInsets.wrap(this, navigation);
+        setContentView(insetRoot);
+        ViewCompat.requestApplyInsets(insetRoot);
         events = new NavigationEvents(4096, System::nanoTime);
         requests = new BetaNavigation(new LatestNavigation.Scheduler() {
             @Override public void postFrame(Runnable action) { navigation.postOnAnimation(action); }
@@ -176,6 +178,7 @@ public final class BetaPreviewActivity extends Activity {
 
     private final class Routes extends Scene {
         @Override public View createView(Context context) {
+            actionBar.setOccupyStatusBar(false);
             actionBar.setTitle("FlexyGram · Offline Development");
             LinearLayout list = list(context);
             DialogCell dialog = new DialogCell(null, context, false, false);
@@ -198,12 +201,7 @@ public final class BetaPreviewActivity extends Activity {
     private final class Conversation extends Scene {
         @Override public View createView(Context context) {
             back(this, "Synthetic conversation");
-            ScrollView scroll = new ScrollView(context);
-            scroll.setFillViewport(true);
-            ThemePreviewMessagesCell messages = new ThemePreviewMessagesCell(context, navigation, 0);
-            messages.fragment = this;
-            scroll.addView(messages);
-            return fragmentView = scroll;
+            return fragmentView = new OfflineConversationView(context, Theme.isCurrentThemeDark());
         }
     }
 
@@ -305,6 +303,7 @@ public final class BetaPreviewActivity extends Activity {
     }
 
     private void back(BaseFragment fragment, String title) {
+        fragment.getActionBar().setOccupyStatusBar(false);
         fragment.getActionBar().setTitle(title);
         fragment.getActionBar().setBackButtonImage(org.telegram.messenger.R.drawable.ic_ab_back);
         fragment.getActionBar().setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick() {

@@ -1,0 +1,44 @@
+[
+  {
+    "target": "sdk/ndk/27.2.12479018",
+    "checksum": "59c2f6dc96743b5daf5d1626684640b20a6bd2b1d85b13156b90333741bad5cc",
+    "algorithm": "sha256",
+    "url": "https://dl.google.com/android/repository/android-ndk-r27c-linux.zip",
+    "bytes": 663987688
+  },
+  {
+    "target": "gradle-9.7.1",
+    "checksum": "acd53f1edaf02f1a8ff99879f8a34b302661a057d9b063ae9e35b552f804d20a",
+    "algorithm": "sha256",
+    "url": "https://services.gradle.org/distributions/gradle-9.7.1-bin.zip",
+    "bytes": 151433392
+  },
+  {
+    "target": "sdk/platforms/android-37.0",
+    "checksum": "840b23e827f96e64aea4c89a1194aac3dc5f6bad37edb231c5c795d890330e8d",
+    "algorithm": "sha256",
+    "url": "https://dl.google.com/android/repository/platform-37.0_r02.zip",
+    "bytes": 67281901
+  },
+  {
+    "target": "sdk/build-tools/36.0.0",
+    "checksum": "5d9ac77fb6ff43d9da518a337b4fcf8f9097113df531d99ccefe80ef7ce8250b",
+    "algorithm": "sha256",
+    "url": "https://dl.google.com/android/repository/build-tools_r36_linux.zip",
+    "bytes": 63737259
+  },
+  {
+    "target": "sdk/platforms/android-35",
+    "checksum": "0988cacad01b38a18a47bac14a0695f246bc76c1b06c0eeb8eb0dc825ab0c8e0",
+    "algorithm": "sha256",
+    "url": "https://dl.google.com/android/repository/platform-35_r02.zip",
+    "bytes": 64273788
+  },
+  {
+    "target": "jbrsdk-21.0.10-linux-x64-b1163.105",
+    "checksum": "9444ad955a24171f6c5c10e6405f40fd3da931d9810b421b71767f74c94e021666d79390646f4809f988dc4bea8535669827d47c915f83397b36b20e6b828a7d",
+    "algorithm": "sha512",
+    "url": "https://cache-redirector.jetbrains.com/intellij-jbr/jbrsdk-21.0.10-linux-x64-b1163.105.tar.gz",
+    "bytes": 240951772
+  }
+]

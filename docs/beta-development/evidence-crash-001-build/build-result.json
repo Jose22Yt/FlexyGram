@@ -1,0 +1,19 @@
+{
+  "source_commit": "2d532562f68946a83f5cdd2fc1059e3024beb525",
+  "exit_code": 0,
+  "seconds": 877.56,
+  "attempt": 1,
+  "native_target": "arm64-v8a",
+  "skip_native": false,
+  "unsigned_overlay": true,
+  "android_executed": false,
+  "log": "pr33-gradle-attempt1.log",
+  "command": [
+    "--no-daemon",
+    "--console=plain",
+    "--max-workers=2",
+    "-Pkotlin.incremental=false",
+    "-PflexygramBetaDevelopment=true",
+    ":TMessagesProj:assembleBetaDevelopmentDebug"
+  ]
+}
