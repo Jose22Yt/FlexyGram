@@ -1,0 +1,238 @@
+{
+  "base": "40faca6b04563bcacd02d0947addd4c18ff81e81",
+  "target_sha256": "7e306a2569e25e4580f6ad5500be7bb976a874be211c1ae85dacc951652d2764",
+  "overlay_sha256": "4643722678483b1efdcdeee639e06f6e783789a7583e0e046dd2e43507cedffc",
+  "guarded_methods": [
+    {
+      "class": "PhoneView",
+      "method": "showDebugMenu",
+      "guard": "localLoginClosed"
+    },
+    {
+      "class": "PhoneView",
+      "method": "loadCountries",
+      "guard": "localLoginClosed"
+    },
+    {
+      "class": "PhoneView",
+      "method": "onCancelPressed",
+      "guard": "localLoginClosed"
+    },
+    {
+      "class": "PhoneView",
+      "method": "onNextPressed",
+      "guard": "localLoginClosed"
+    },
+    {
+      "class": "PhoneView",
+      "method": "fillNumber",
+      "guard": "localLoginClosed"
+    },
+    {
+      "class": "PhoneView",
+      "method": "onShow",
+      "guard": "localLoginClosed"
+    },
+    {
+      "class": "PhoneView",
+      "method": "onDestroyActivity",
+      "guard": "localLoginClosed"
+    },
+    {
+      "class": "PhoneView",
+      "method": "requestPasskey",
+      "guard": "localLoginClosed"
+    },
+    {
+      "class": "PhoneView",
+      "method": "saveStateParams",
+      "guard": "localLoginClosed"
+    },
+    {
+      "class": "PhoneView",
+      "method": "restoreStateParams",
+      "guard": "localLoginClosed"
+    },
+    {
+      "class": "PhoneView",
+      "method": "didReceivedNotification",
+      "guard": "localLoginClosed"
+    },
+    {
+      "class": "LoginActivitySmsView",
+      "method": "onCancelPressed",
+      "guard": "localLoginClosed"
+    },
+    {
+      "class": "LoginActivitySmsView",
+      "method": "resendCode",
+      "guard": "localLoginClosed"
+    },
+    {
+      "class": "LoginActivitySmsView",
+      "method": "setParams",
+      "guard": "localLoginClosed"
+    },
+    {
+      "class": "LoginActivitySmsView",
+      "method": "createCodeTimer",
+      "guard": "localLoginClosed"
+    },
+    {
+      "class": "LoginActivitySmsView",
+      "method": "createTimer",
+      "guard": "localLoginClosed"
+    },
+    {
+      "class": "LoginActivitySmsView",
+      "method": "onNextPressed",
+      "guard": "localLoginClosed"
+    },
+    {
+      "class": "LoginActivitySmsView",
+      "method": "onBackPressed",
+      "guard": "localLoginClosed"
+    },
+    {
+      "class": "LoginActivitySmsView",
+      "method": "onDestroyActivity",
+      "guard": "localLoginClosed"
+    },
+    {
+      "class": "LoginActivitySmsView",
+      "method": "onShow",
+      "guard": "localLoginClosed"
+    },
+    {
+      "class": "LoginActivitySmsView",
+      "method": "didReceivedNotification",
+      "guard": "localLoginClosed"
+    },
+    {
+      "class": "LoginActivitySmsView",
+      "method": "onHide",
+      "guard": "localLoginClosed"
+    },
+    {
+      "class": "LoginActivitySmsView",
+      "method": "saveStateParams",
+      "guard": "localLoginClosed"
+    },
+    {
+      "class": "LoginActivitySmsView",
+      "method": "restoreStateParams",
+      "guard": "localLoginClosed"
+    },
+    {
+      "class": "LoginActivityPasswordView",
+      "method": "onCancelPressed",
+      "guard": "localLoginClosed"
+    },
+    {
+      "class": "LoginActivityPasswordView",
+      "method": "setParams",
+      "guard": "localLoginClosed"
+    },
+    {
+      "class": "LoginActivityPasswordView",
+      "method": "onNextPressed",
+      "guard": "localLoginClosed"
+    },
+    {
+      "class": "LoginActivityPasswordView",
+      "method": "onBackPressed",
+      "guard": "localLoginClosed"
+    },
+    {
+      "class": "LoginActivityPasswordView",
+      "method": "onShow",
+      "guard": "localLoginClosed"
+    },
+    {
+      "class": "LoginActivityPasswordView",
+      "method": "saveStateParams",
+      "guard": "localLoginClosed"
+    },
+    {
+      "class": "LoginActivityPasswordView",
+      "method": "restoreStateParams",
+      "guard": "localLoginClosed"
+    },
+    {
+      "class": "LoginActivityRegisterView",
+      "method": "showTermsOfService",
+      "guard": "localLoginClosed"
+    },
+    {
+      "class": "LoginActivityRegisterView",
+      "method": "didUploadPhoto",
+      "guard": "localLoginClosed"
+    },
+    {
+      "class": "LoginActivityRegisterView",
+      "method": "onBackPressed",
+      "guard": "localLoginClosed"
+    },
+    {
+      "class": "LoginActivityRegisterView",
+      "method": "onCancelPressed",
+      "guard": "localLoginClosed"
+    },
+    {
+      "class": "LoginActivityRegisterView",
+      "method": "onShow",
+      "guard": "localLoginClosed"
+    },
+    {
+      "class": "LoginActivityRegisterView",
+      "method": "setParams",
+      "guard": "localLoginClosed"
+    },
+    {
+      "class": "LoginActivityRegisterView",
+      "method": "onNextPressed",
+      "guard": "localLoginClosed"
+    },
+    {
+      "class": "LoginActivityRegisterView",
+      "method": "saveStateParams",
+      "guard": "localLoginClosed"
+    },
+    {
+      "class": "LoginActivityRegisterView",
+      "method": "restoreStateParams",
+      "guard": "localLoginClosed"
+    },
+    {
+      "class": "LoginActivityQrView",
+      "method": "onDestroyActivity",
+      "guard": "localLoginClosed"
+    },
+    {
+      "class": "LoginActivityQrView",
+      "method": "onShow",
+      "guard": "localLoginClosed"
+    },
+    {
+      "class": "LoginActivityQrView",
+      "method": "onHide",
+      "guard": "localLoginClosed"
+    },
+    {
+      "class": "LoginActivityQrView",
+      "method": "exportLoginToken",
+      "guard": "localLoginClosed"
+    },
+    {
+      "class": "LoginActivityQrView",
+      "method": "didReceivedNotification",
+      "guard": "localLoginClosed"
+    }
+  ],
+  "qr_enabled": false,
+  "review_only": true,
+  "prerequisites": {
+    "patches/native-login-wiring/0001-realalpha-source-integration.patch": "702ceac91abbca32ac87080fc00609dab3fa17a09117d6298d815e98ab858ab7",
+    "patches/native-login-wiring/0002-native-fragment-local-binding.patch": "17afd022bb13e63913bf845facb8cdf3406e958597401f4f796c00c7ce40338b"
+  }
+}

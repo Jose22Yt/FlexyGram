@@ -1,0 +1,22 @@
+test_hostRetainedRootMenuRebound (test_integration.IntegrationTests.test_hostRetainedRootMenuRebound) ... FAIL
+
+======================================================================
+FAIL: test_hostRetainedRootMenuRebound (test_integration.IntegrationTests.test_hostRetainedRootMenuRebound)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram-native-integration/tests/real_alpha_local_login/test_integration.py", line 82, in <lambda>
+    for name in CASES:setattr(IntegrationTests,'test_'+name,lambda self,n=name:self.case(n))
+                                                                               ^^^^^^^^^^^^
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram-native-integration/tests/real_alpha_local_login/test_integration.py", line 32, in case
+    self.assertNotIn('FAKE_LOCAL_ONLY',r.stdout+r.stderr);self.assertEqual(r.returncode,0,r.stdout+r.stderr);self.assertIn('HOST_LOCAL_INTEGRATION_NOT_ANDROID',r.stdout)
+                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 0 : Exception in thread "main" java.lang.IllegalStateException: LOCAL_INTEGRATION_CONTRACT
+	at org.telegram.ui.realalpha.local.IntegrationHarness.yes(IntegrationHarness.java:14)
+	at org.telegram.ui.realalpha.local.IntegrationHarness.choose(IntegrationHarness.java:26)
+	at org.telegram.ui.realalpha.local.IntegrationHarness.main(IntegrationHarness.java:52)
+
+
+----------------------------------------------------------------------
+Ran 1 test in 2.252s
+
+FAILED (failures=1)

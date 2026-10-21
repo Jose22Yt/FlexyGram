@@ -1,0 +1,44 @@
+{
+  "java": "openjdk version \"21.0.10\" 2026-01-20\nOpenJDK Runtime Environment JBR-21.0.10+7-1163.105-nomod (build 21.0.10+7-b1163.105)\nOpenJDK 64-Bit Server VM JBR-21.0.10+7-1163.105-nomod (build 21.0.10+7-b1163.105, mixed mode, sharing)",
+  "python": "Python 3.11.17",
+  "gradle": "9.7.1, launched actual assembleRealAlphaDebug; did not complete settings",
+  "android_sdk24_sha256": "4c438bf1b3d4e6104faccc62e1ffe95ef197b88055497b540a871349e93c8685",
+  "available_fixed_android_tools": {
+    "sdk37": [],
+    "build_tools36": [],
+    "ndk27": [],
+    "cmake331": []
+  },
+  "uninitialized_submodules": 16,
+  "chaquopy_pinned_not_initialized": true,
+  "build_attempts": [
+    {
+      "command": "NATIVE_TARGET=arm64-v8a gradle :TMessagesProj:assembleRealAlphaDebug -PflexygramRealAlpha=true -PflexygramLocalLoginPages=true --offline --no-daemon --console=plain",
+      "log": "gradle-offline.log",
+      "returncode": 1
+    },
+    {
+      "command": "same assemble task, online, inherited proxy host/port forwarded to JVM, TLS unchanged",
+      "log": "gradle-online.log",
+      "returncode": 1
+    },
+    {
+      "command": "same assemble task, explicit JVM proxy host/port, --info --refresh-dependencies",
+      "log": "gradle-resolution-info.log",
+      "returncode": 1
+    }
+  ],
+  "build_blocker": "settings.gradle:15 cannot resolve org.gradle.toolchains.foojay-resolver-convention:1.0.0 in this session; no project Java/JNI/Chaquopy tasks reached",
+  "new_unsigned_apk": null,
+  "signing_or_installation": false,
+  "shared_sources_unchanged": [
+    "LaunchActivity",
+    "DialogsActivity",
+    "LoginActivity",
+    "RealAlphaActivity",
+    "manifests",
+    "variant policy",
+    "production gate"
+  ],
+  "APK_private_backup": null
+}
