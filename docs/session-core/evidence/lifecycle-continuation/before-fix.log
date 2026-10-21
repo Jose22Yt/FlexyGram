@@ -1,0 +1,95 @@
+test_authCloseDuringCommit (test_runtime.RuntimeTests.test_authCloseDuringCommit) ... FAIL
+test_authCloseDuringCommitConflict (test_runtime.RuntimeTests.test_authCloseDuringCommitConflict) ... FAIL
+test_authCloseDuringCommitDropsQueuedUi (test_runtime.RuntimeTests.test_authCloseDuringCommitDropsQueuedUi) ... FAIL
+test_authCloseDuringCommitFailure (test_runtime.RuntimeTests.test_authCloseDuringCommitFailure) ... FAIL
+test_authCloseDuringCommitUnknown (test_runtime.RuntimeTests.test_authCloseDuringCommitUnknown) ... FAIL
+test_authCloseDuringNullCommit (test_runtime.RuntimeTests.test_authCloseDuringNullCommit) ... FAIL
+
+======================================================================
+FAIL: test_authCloseDuringCommit (test_runtime.RuntimeTests.test_authCloseDuringCommit)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram-session-core/tests/session_core/test_runtime.py", line 40, in <lambda>
+    setattr(RuntimeTests,'test_'+case,lambda self,c=case:self.run_case(c))
+                                                         ^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram-session-core/tests/session_core/test_runtime.py", line 30, in run_case
+    self.assertEqual(p.returncode,0,p.stdout+p.stderr)
+AssertionError: 1 != 0 : Exception in thread "main" java.lang.AssertionError: CONTRACT_FAILED
+	at io.github.jose22yt.flexygram.session.SessionHarness.need(SessionHarness.java:14)
+	at io.github.jose22yt.flexygram.session.SessionHarness.main(SessionHarness.java:174)
+
+
+======================================================================
+FAIL: test_authCloseDuringCommitConflict (test_runtime.RuntimeTests.test_authCloseDuringCommitConflict)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram-session-core/tests/session_core/test_runtime.py", line 40, in <lambda>
+    setattr(RuntimeTests,'test_'+case,lambda self,c=case:self.run_case(c))
+                                                         ^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram-session-core/tests/session_core/test_runtime.py", line 30, in run_case
+    self.assertEqual(p.returncode,0,p.stdout+p.stderr)
+AssertionError: 1 != 0 : Exception in thread "main" java.lang.AssertionError: CONTRACT_FAILED
+	at io.github.jose22yt.flexygram.session.SessionHarness.need(SessionHarness.java:14)
+	at io.github.jose22yt.flexygram.session.SessionHarness.main(SessionHarness.java:175)
+
+
+======================================================================
+FAIL: test_authCloseDuringCommitDropsQueuedUi (test_runtime.RuntimeTests.test_authCloseDuringCommitDropsQueuedUi)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram-session-core/tests/session_core/test_runtime.py", line 40, in <lambda>
+    setattr(RuntimeTests,'test_'+case,lambda self,c=case:self.run_case(c))
+                                                         ^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram-session-core/tests/session_core/test_runtime.py", line 30, in run_case
+    self.assertEqual(p.returncode,0,p.stdout+p.stderr)
+AssertionError: 1 != 0 : Exception in thread "main" java.lang.AssertionError: CONTRACT_FAILED
+	at io.github.jose22yt.flexygram.session.SessionHarness.need(SessionHarness.java:14)
+	at io.github.jose22yt.flexygram.session.SessionHarness.main(SessionHarness.java:181)
+
+
+======================================================================
+FAIL: test_authCloseDuringCommitFailure (test_runtime.RuntimeTests.test_authCloseDuringCommitFailure)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram-session-core/tests/session_core/test_runtime.py", line 40, in <lambda>
+    setattr(RuntimeTests,'test_'+case,lambda self,c=case:self.run_case(c))
+                                                         ^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram-session-core/tests/session_core/test_runtime.py", line 30, in run_case
+    self.assertEqual(p.returncode,0,p.stdout+p.stderr)
+AssertionError: 1 != 0 : Exception in thread "main" java.lang.AssertionError: CONTRACT_FAILED
+	at io.github.jose22yt.flexygram.session.SessionHarness.need(SessionHarness.java:14)
+	at io.github.jose22yt.flexygram.session.SessionHarness.main(SessionHarness.java:176)
+
+
+======================================================================
+FAIL: test_authCloseDuringCommitUnknown (test_runtime.RuntimeTests.test_authCloseDuringCommitUnknown)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram-session-core/tests/session_core/test_runtime.py", line 40, in <lambda>
+    setattr(RuntimeTests,'test_'+case,lambda self,c=case:self.run_case(c))
+                                                         ^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram-session-core/tests/session_core/test_runtime.py", line 30, in run_case
+    self.assertEqual(p.returncode,0,p.stdout+p.stderr)
+AssertionError: 1 != 0 : Exception in thread "main" java.lang.AssertionError: CONTRACT_FAILED
+	at io.github.jose22yt.flexygram.session.SessionHarness.need(SessionHarness.java:14)
+	at io.github.jose22yt.flexygram.session.SessionHarness.main(SessionHarness.java:177)
+
+
+======================================================================
+FAIL: test_authCloseDuringNullCommit (test_runtime.RuntimeTests.test_authCloseDuringNullCommit)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram-session-core/tests/session_core/test_runtime.py", line 40, in <lambda>
+    setattr(RuntimeTests,'test_'+case,lambda self,c=case:self.run_case(c))
+                                                         ^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/1f84b79e43f3/FlexyGram-session-core/tests/session_core/test_runtime.py", line 30, in run_case
+    self.assertEqual(p.returncode,0,p.stdout+p.stderr)
+AssertionError: 1 != 0 : Exception in thread "main" java.lang.AssertionError: CONTRACT_FAILED
+	at io.github.jose22yt.flexygram.session.SessionHarness.need(SessionHarness.java:14)
+	at io.github.jose22yt.flexygram.session.SessionHarness.main(SessionHarness.java:178)
+
+
+----------------------------------------------------------------------
+Ran 6 tests in 1.666s
+
+FAILED (failures=6)

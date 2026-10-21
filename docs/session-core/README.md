@@ -53,7 +53,7 @@ Los cuatro parches se aplicaron **solo a copias temporales** en las pruebas, con
 
 Pendientes de seguridad: revisar logs de errorText y excepciones SDK (FileLog.e(Throwable) puede incluir mensajes/causas), mapeo completo de errores 2FA/signup/QR/recuperación, recuperación transaccional entre archivos nativos/DB/prefs, carga JNI y bridge de atestación de solo lectura en Android. Los tests P0.1 anteriores no certificaban todos estos sinks. No se atribuye el incidente de sesiones/bots a ningún hallazgo sin evidencia de ejecución.
 
-## Resultados finales
+## Validación inicial conservada
 
 Código verificado: `bf4468cccc6eba8d1efb2a14f911e96559d09d28`. **101 pruebas distintas aprobadas** en Python3.11 normal y `-O`: 202 ejecuciones finales, cero fallos y cero omisiones. Son 90 pruebas del coordinador/controlador/UI y bytecode, nueve de integración/parches/resolución API y dos de C++/política nativa. No se suman los bucles, subcasos o repeticiones preliminares como tests distintos.
 
@@ -74,3 +74,7 @@ El adaptador de persistencia deberá distinguir una sesión preexistente del mat
 5. Solo después: nueva política revisada y explícita, pareja API propia desde fuente privada, construcción unsigned/verificación, firma/instalación autorizadas por hash y aprobación independiente para una prueba de conexión/cuenta. No hace falta ni se solicita un API Hash, teléfono o código para revisar este PR.
 
 No hay un cliente conectado nuevo, APK, clave ni firma en esta entrega. Production y las variantes existentes permanecen bloqueadas/intactas. No se fusiona ningún PR ni se habilita Actions.
+
+## Continuación: cierre durante commit local
+
+Código actualizado: `6d0f97154e4cc151af19744d44fd411d3e2fd33d`. Se corrigió una petición close() reentrante descartada durante commitLocal(): ahora se difiere hasta finalizar el guardado y se liberan los observadores. No se borra ni se reintenta la escritura, tampoco si su resultado es incierto. Nueve regresiones nuevas; suite completa **110/110 normal y 110/110 con -O**, cero fallos/errores/omisiones finales (110 distintas, 220 ejecuciones). Seis casos reprodujeron el defecto antes de corregirlo. Evidencias, comandos y un intento intermedio incompleto por checkout parcial en [evidence/lifecycle-continuation](evidence/lifecycle-continuation/README.md). Esta corrección sigue fuera del cliente Android y no se aplica al PR #34.
