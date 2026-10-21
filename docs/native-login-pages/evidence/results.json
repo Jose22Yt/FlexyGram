@@ -1,0 +1,356 @@
+{
+  "code_commit": "3a7ef7e6105eec1286e63c05fe1c7f858b92968c",
+  "base_commit": "40faca6b04563bcacd02d0947addd4c18ff81e81",
+  "scope": "HOST_LOCAL_PORTS_AND_EXTRACTED_NATIVE_GUARDS_NOT_ANDROID",
+  "groups": {
+    "final": {
+      "modes": {
+        "normal": {
+          "passed": 37,
+          "failed": 0,
+          "skipped": 0,
+          "command": [
+            "python3.11",
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "tests/native_login_pages",
+            "-v"
+          ],
+          "log": "final-normal.log",
+          "sha256": "d7117115b01b698adc9cf830d353ce9934885c60c8f8f7de95243012a3d1ebaf"
+        },
+        "optimized": {
+          "passed": 37,
+          "failed": 0,
+          "skipped": 0,
+          "command": [
+            "python3.11",
+            "-O",
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "tests/native_login_pages",
+            "-v"
+          ],
+          "log": "final-optimized.log",
+          "sha256": "2b64ed9cd57baf9450fb7f1c9ec836a7e6a01df9c8926071d5629b1dc58f71d7"
+        }
+      },
+      "test_ids": [
+        "test_pages.PagesTests.test_accountChangeInvalidatesOldQueuedView",
+        "test_pages.PagesTests.test_actual_gradle_overlay_branch_with_synthetic_providers",
+        "test_pages.PagesTests.test_appDeliveryUsesOriginalMessagePage",
+        "test_pages.PagesTests.test_boundedInputMissingDependencyFailsClosed",
+        "test_pages.PagesTests.test_callDeliveryNotEnabled",
+        "test_pages.PagesTests.test_cancelBeforeWorkerDispatch",
+        "test_pages.PagesTests.test_channelMetadataContainsNoSecretsOrSerialization",
+        "test_pages.PagesTests.test_channel_has_no_persistence_network_or_raw_parameters",
+        "test_pages.PagesTests.test_consecutiveCodeTapsOneLocalRequest",
+        "test_pages.PagesTests.test_consecutivePhoneTapsOneLocalRequest",
+        "test_pages.PagesTests.test_constructor_requests_and_outer_notification_are_guarded",
+        "test_pages.PagesTests.test_exact_source_scope_and_no_active_client_patch",
+        "test_pages.PagesTests.test_guard_inventory_complete_for_declared_methods",
+        "test_pages.PagesTests.test_hostThemeRebindPreservesParameters",
+        "test_pages.PagesTests.test_inactiveVariantGuardPreservesLegacyPath",
+        "test_pages.PagesTests.test_invalidCodeLengthFailsClosed",
+        "test_pages.PagesTests.test_lateResponseAfterCancelNoCallback",
+        "test_pages.PagesTests.test_materialized_overlay_is_pinned_and_recovers_identically",
+        "test_pages.PagesTests.test_nativeBackCancelsOnlyLocalRequest",
+        "test_pages.PagesTests.test_nativePasswordGuardFlow",
+        "test_pages.PagesTests.test_nativePhoneSmsGuardFlow",
+        "test_pages.PagesTests.test_nativeRegisterGuardFlow",
+        "test_pages.PagesTests.test_native_page_factory_and_loops_reject_unsupported_slots",
+        "test_pages.PagesTests.test_original_java_parser_syntax_only",
+        "test_pages.PagesTests.test_patches_apply_to_pinned_copies_only",
+        "test_pages.PagesTests.test_qrLifecycleAlwaysBlocked",
+        "test_pages.PagesTests.test_queuedSecretWipedOnViewDetach",
+        "test_pages.PagesTests.test_requiredTermsNotSilentlyAccepted",
+        "test_pages.PagesTests.test_sdk24_symbols_and_jdk21_source",
+        "test_pages.PagesTests.test_source_sets_patch_realalpha_only",
+        "test_pages.PagesTests.test_storageFailureDoesNotDeleteOrRetry",
+        "test_pages.PagesTests.test_transitionTicketsRejectOldAndDestroyedCallbacks",
+        "test_pages.PagesTests.test_unavailablePasswordParametersNoNativeFallback",
+        "test_pages.PagesTests.test_uncertainStorageBlocksFurtherActions",
+        "test_pages.PagesTests.test_unknownLengthNotEnabled",
+        "test_pages.PagesTests.test_viewRecreationNoReplayAndOldRendererDetached",
+        "test_pages.PagesTests.test_workerFailureNoFallback"
+      ]
+    },
+    "previous-wiring": {
+      "modes": {
+        "normal": {
+          "passed": 8,
+          "failed": 0,
+          "skipped": 0,
+          "command": [
+            "python3.11",
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "tests/native_login_wiring",
+            "-v",
+            "-k",
+            "originalSendSignInSerializers",
+            "-k",
+            "passwordOriginalRequestAndProofWipe",
+            "-k",
+            "signupOriginalFieldsAndOrigin",
+            "-k",
+            "qrOriginalMigrationTokenOwnedCopy",
+            "-k",
+            "invalidCodeRetryPreservesContext",
+            "-k",
+            "srpRefreshRequiresNewParameters",
+            "-k",
+            "cancelLateReplyAndNoNativeMutation",
+            "-k",
+            "no_live_transport_or_policy_changes"
+          ],
+          "log": "previous-wiring-normal.log",
+          "sha256": "9c60f9be27600ca9f0b4eec5b9456dedb6006721b3a2633e114922cb709d5e95"
+        },
+        "optimized": {
+          "passed": 8,
+          "failed": 0,
+          "skipped": 0,
+          "command": [
+            "python3.11",
+            "-O",
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "tests/native_login_wiring",
+            "-v",
+            "-k",
+            "originalSendSignInSerializers",
+            "-k",
+            "passwordOriginalRequestAndProofWipe",
+            "-k",
+            "signupOriginalFieldsAndOrigin",
+            "-k",
+            "qrOriginalMigrationTokenOwnedCopy",
+            "-k",
+            "invalidCodeRetryPreservesContext",
+            "-k",
+            "srpRefreshRequiresNewParameters",
+            "-k",
+            "cancelLateReplyAndNoNativeMutation",
+            "-k",
+            "no_live_transport_or_policy_changes"
+          ],
+          "log": "previous-wiring-optimized.log",
+          "sha256": "5ce0740a0d6ffe5e8a81926a5bc6a38ea1d191e7b489cd79f18dbf8756fa61e1"
+        }
+      },
+      "test_ids": [
+        "test_wiring.WiringTests.test_cancelLateReplyAndNoNativeMutation",
+        "test_wiring.WiringTests.test_invalidCodeRetryPreservesContext",
+        "test_wiring.WiringTests.test_no_live_transport_or_policy_changes",
+        "test_wiring.WiringTests.test_originalSendSignInSerializers",
+        "test_wiring.WiringTests.test_passwordOriginalRequestAndProofWipe",
+        "test_wiring.WiringTests.test_qrOriginalMigrationTokenOwnedCopy",
+        "test_wiring.WiringTests.test_signupOriginalFieldsAndOrigin",
+        "test_wiring.WiringTests.test_srpRefreshRequiresNewParameters"
+      ]
+    },
+    "native-inventory": {
+      "modes": {
+        "normal": {
+          "passed": 1,
+          "failed": 0,
+          "skipped": 0,
+          "command": [
+            "python3.11",
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "tests/native_login",
+            "-p",
+            "test_native_login.py",
+            "-k",
+            "no_shared_client",
+            "-v"
+          ],
+          "log": "native-inventory-normal.log",
+          "sha256": "bd9101f05457417f02494dfa0e79af46b120971a8515eb2904e374b4d560de86"
+        },
+        "optimized": {
+          "passed": 1,
+          "failed": 0,
+          "skipped": 0,
+          "command": [
+            "python3.11",
+            "-O",
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "tests/native_login",
+            "-p",
+            "test_native_login.py",
+            "-k",
+            "no_shared_client",
+            "-v"
+          ],
+          "log": "native-inventory-optimized.log",
+          "sha256": "cfd0131c58d33f101570df279f1da50d5202271806c34c03f97572887fbc64d8"
+        }
+      },
+      "test_ids": [
+        "test_native_login.NativeLoginTests.test_no_shared_client_or_capability_files_changed"
+      ]
+    },
+    "android-inventory": {
+      "modes": {
+        "normal": {
+          "passed": 1,
+          "failed": 0,
+          "skipped": 0,
+          "command": [
+            "python3.11",
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "tests/session_android",
+            "-p",
+            "test_adapters.py",
+            "-k",
+            "shared_sources_and_variants",
+            "-v"
+          ],
+          "log": "android-inventory-normal.log",
+          "sha256": "5a06d5bcbabf4bef5dfcfcadfec83b80c97680586665b65c2bacb92d2b2e9251"
+        },
+        "optimized": {
+          "passed": 1,
+          "failed": 0,
+          "skipped": 0,
+          "command": [
+            "python3.11",
+            "-O",
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "tests/session_android",
+            "-p",
+            "test_adapters.py",
+            "-k",
+            "shared_sources_and_variants",
+            "-v"
+          ],
+          "log": "android-inventory-optimized.log",
+          "sha256": "ec4593e502ef2854eb04f2e5829b093d93413eac90e9a39767464e1e8a531a91"
+        }
+      },
+      "test_ids": [
+        "test_adapters.AdapterTests.test_shared_sources_and_variants_unchanged"
+      ]
+    },
+    "core-inventory": {
+      "modes": {
+        "normal": {
+          "passed": 1,
+          "failed": 0,
+          "skipped": 0,
+          "command": [
+            "python3.11",
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "tests/session_core",
+            "-p",
+            "test_integration_contracts.py",
+            "-k",
+            "no_existing_shared_or_build",
+            "-v"
+          ],
+          "log": "core-inventory-normal.log",
+          "sha256": "0c55054a18c9bf35293d18053d9d9efeff5650d2e947b7ccc3ed5322da5033a2"
+        },
+        "optimized": {
+          "passed": 1,
+          "failed": 0,
+          "skipped": 0,
+          "command": [
+            "python3.11",
+            "-O",
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "tests/session_core",
+            "-p",
+            "test_integration_contracts.py",
+            "-k",
+            "no_existing_shared_or_build",
+            "-v"
+          ],
+          "log": "core-inventory-optimized.log",
+          "sha256": "bf239ee5692d0af8d5f6c7d417432ecd438093f09ce31be47818b55d7a5a87e3"
+        }
+      },
+      "test_ids": [
+        "test_integration_contracts.IntegrationContracts.test_no_existing_shared_or_build_files_modified"
+      ]
+    }
+  },
+  "preliminary_logs_excluded": [
+    "pre-storage-fix.log",
+    "after-storage-fix.log",
+    "prepublish-checked.log",
+    "prepublish-pages.log",
+    "prepublish-final.log",
+    "second-tests.log",
+    "window-lifecycle-checked.log",
+    "groovy-checked.log",
+    "expanded-pages.log",
+    "initial-tests.log"
+  ],
+  "new_tests": 37,
+  "selected_previous_tests": 11,
+  "distinct_tests": 48,
+  "passing_executions": 96,
+  "failed": 0,
+  "skipped": 0,
+  "source_sha256": {
+    "TMessagesProj_Modules/telegram-login-local-ui/src/main/java/io/github/jose22yt/flexygram/login/local/EphemeralPages.java": "e84ab892f632300ffb8ccc38b5f17fbc4a06ca9fb0bfaf3e4e7217f8c87f8081",
+    "TMessagesProj_Modules/telegram-login-local-ui/src/main/java/io/github/jose22yt/flexygram/login/local/LocalLoginSession.java": "d9e94ca50f9fc9f5231e21de67429c0ec5960abd3005c8335ffe6dede013ae52",
+    "TMessagesProj_Modules/telegram-login-local-ui/src/main/java/io/github/jose22yt/flexygram/login/local/LocalTransitionFence.java": "71a0d7bc1ff94c9ae4ffe860b0f1d1ece8d1e70470fd5418e08d08fc144a680a",
+    "TMessagesProj_Modules/telegram-login-local-ui/src/main/java/io/github/jose22yt/flexygram/login/local/NativeUiInput.java": "5f3a6e00e8f2d1053e0f755fb4566ab13e926491472d1f4a437ef3ccb8e504ed",
+    "TMessagesProj_Modules/telegram-native-login/src/main/java/io/github/jose22yt/flexygram/login/NativeLoginProtocol.java": "73cb09cbfdbccaac793ac9708058cc6048408b01d7e7ff8b0289543d299b1e9e",
+    "TMessagesProj_Modules/telegram-native-login/src/main/java/io/github/jose22yt/flexygram/login/NativeLoginTransport.java": "0015a29bbeb20d1fd1e1809a73e6fb7720ce18fff4e1a57625820ac75839248f",
+    "TMessagesProj_Modules/telegram-native-login/src/telegram/java/io/github/jose22yt/flexygram/login/TlAuthResponses.java": "00bcfd4bfc0451ddfd996c44490a68c193da35a51fd371aef380e40a00c45928",
+    "patches/native-login-pages/0003-realalpha-local-pages-sources.patch": "73c2ec202f493980487928a5671736eb115cd33ffcad74a9cb46e60deb201825",
+    "patches/native-login-pages/0004-native-local-pages.patch": "48beae36c2eb9eac9da7ffd120cf8b71f34bcbb03b2ba7f3edbd91e7d4b45a31",
+    "patches/native-login-pages/inventory.json": "5643d48c8fbf788ba5b1dadf7f285490b43a599963c29dc16dad47855470b8df",
+    "tests/native_login/test_native_login.py": "c9f887304eafc945629e754ed0fd9507852c2ee8d12749dcd1fc6da638e9ff00",
+    "tests/native_login/tl_projection.py": "015f09293504d2be747b7cb21c4a0384050093c31dd2ad447f768ad8ca09fd20",
+    "tests/native_login_pages/PagesHarness.java": "4ec14d5f9d6d78a92795118d55b464b3d65276e6b9fc52dc1a5bee803e3fd126",
+    "tests/native_login_pages/fixtures_pages.py": "27c1f8d7e704818ee77c6c60bc3d950c53185b2a6cd5ddde096e3a67d1be4c56",
+    "tests/native_login_pages/test_pages.py": "b5617f4833fac8aafe18f1615ed7459911c286d0c538278d0c05e0ee82227c9b",
+    "tests/native_login_wiring/test_wiring.py": "d6d1436c15e9b3625aa09b56864183e43554dffff69e8e1b70a05863c3f9ef13",
+    "tests/session_android/test_adapters.py": "f0354c495dd930ed7cda32d8c9c9f7be928d9a845b5b74c61c8ec27ed6a051a6",
+    "tests/session_core/test_integration_contracts.py": "080b85c081338a473218658ad462e79acdb4912deed754c5e7d3c08df842b0bb",
+    "tools/native_login_pages/materialize_overlay.py": "9343b3967700afb2fd9490faea25d3d2537be473ad7fc13b2d04c6960d30df4d",
+    "tools/native_login_pages/native_methods.txt": "bfc47c97d15203ad85f8ac0f603d184938f768524a5e13bf8a317d26bee74a9d",
+    "tools/native_login_pages/prepare_patch.py": "3ac901efafe626fc3784e065acd4d17174245d17f5dcc8d65ed8dcc9d360adb0"
+  },
+  "android_compilation": false,
+  "android_execution": false,
+  "full_LoginActivity_typecheck": false,
+  "java_parse_only": true,
+  "overlay": {
+    "original_sha256": "7e306a2569e25e4580f6ad5500be7bb976a874be211c1ae85dacc951652d2764",
+    "overlay_sha256": "f2afc5e4bc36b6c4e3163d99d1c343acd1306dce5f2368b39301d5a4391cce8c",
+    "generation_only_not_compilation": true
+  }
+}

@@ -1,0 +1,13 @@
+test_cancelLateReplyAndNoNativeMutation (test_wiring.WiringTests.test_cancelLateReplyAndNoNativeMutation) ... ok
+test_invalidCodeRetryPreservesContext (test_wiring.WiringTests.test_invalidCodeRetryPreservesContext) ... ok
+test_no_live_transport_or_policy_changes (test_wiring.WiringTests.test_no_live_transport_or_policy_changes) ... ok
+test_originalSendSignInSerializers (test_wiring.WiringTests.test_originalSendSignInSerializers) ... ok
+test_passwordOriginalRequestAndProofWipe (test_wiring.WiringTests.test_passwordOriginalRequestAndProofWipe) ... ok
+test_qrOriginalMigrationTokenOwnedCopy (test_wiring.WiringTests.test_qrOriginalMigrationTokenOwnedCopy) ... ok
+test_signupOriginalFieldsAndOrigin (test_wiring.WiringTests.test_signupOriginalFieldsAndOrigin) ... ok
+test_srpRefreshRequiresNewParameters (test_wiring.WiringTests.test_srpRefreshRequiresNewParameters) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 3.582s
+
+OK
