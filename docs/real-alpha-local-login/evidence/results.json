@@ -1,0 +1,211 @@
+{
+  "code_commit": "9acdc1d0811ce4772fe9487f8dad4b16fc0576f6",
+  "new_integration_tests": 33,
+  "selected_existing_cleanup_tests": 5,
+  "distinct_final_tests": 38,
+  "passing_final_suite_executions": 76,
+  "failed_final": 0,
+  "skipped_final": 0,
+  "runs": [
+    {
+      "command": [
+        "/root/.local/bin/python3.11",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/real_alpha_local_login",
+        "-v"
+      ],
+      "environment": {
+        "JAVA_HOME": "/workspace/scratch/1f84b79e43f3/alpha-toolchain/jbrsdk-21.0.10-linux-x64-b1163.105",
+        "FLEXYGRAM_GRADLE_HOME": "/workspace/scratch/1f84b79e43f3/alpha-toolchain/gradle/gradle-9.7.1",
+        "FLEXYGRAM_ANDROID24_JAR": "/workspace/scratch/1f84b79e43f3/alpha-toolchain/sdk24/android-7.0/android.jar"
+      },
+      "log": "docs/real-alpha-local-login/evidence/final-normal.log",
+      "log_sha256": "c88f6c30a6e28ed2d715798c3635b4c89dcf682dba8ae7680ebcfd5f730f201c",
+      "passed": 33,
+      "failed": 0,
+      "skipped": 0,
+      "test_ids": [
+        "test_integration.IntegrationTests.test_app.test_app",
+        "test_integration.IntegrationTests.test_biometric_fix_and_original_views_are_byte_identical.test_biometric_fix_and_original_views_are_byte_identical",
+        "test_integration.IntegrationTests.test_cancelPending.test_cancelPending",
+        "test_integration.IntegrationTests.test_complete_overlays_parse_only.test_complete_overlays_parse_only",
+        "test_integration.IntegrationTests.test_consecutivePresses.test_consecutivePresses",
+        "test_integration.IntegrationTests.test_gradle_selection_runs_real_groovy_not_agp.test_gradle_selection_runs_real_groovy_not_agp",
+        "test_integration.IntegrationTests.test_hostAccountChanged.test_hostAccountChanged",
+        "test_integration.IntegrationTests.test_hostBoundBeforeAdmission.test_hostBoundBeforeAdmission",
+        "test_integration.IntegrationTests.test_hostDestroyedWhileOpening.test_hostDestroyedWhileOpening",
+        "test_integration.IntegrationTests.test_hostDoubleOpen.test_hostDoubleOpen",
+        "test_integration.IntegrationTests.test_hostExistingAccountRejected.test_hostExistingAccountRejected",
+        "test_integration.IntegrationTests.test_hostForeignLoginRejected.test_hostForeignLoginRejected",
+        "test_integration.IntegrationTests.test_hostJniUnavailable.test_hostJniUnavailable",
+        "test_integration.IntegrationTests.test_hostNativePolicyMismatch.test_hostNativePolicyMismatch",
+        "test_integration.IntegrationTests.test_hostNavigationBeforeReady.test_hostNavigationBeforeReady",
+        "test_integration.IntegrationTests.test_hostPresentationFailureCloses.test_hostPresentationFailureCloses",
+        "test_integration.IntegrationTests.test_hostRecreationBeforeReady.test_hostRecreationBeforeReady",
+        "test_integration.IntegrationTests.test_hostReopenAfterDestroy.test_hostReopenAfterDestroy",
+        "test_integration.IntegrationTests.test_hostRetainedRootMenuRebound.test_hostRetainedRootMenuRebound",
+        "test_integration.IntegrationTests.test_hostScreenNoStrongOuterOwner.test_hostScreenNoStrongOuterOwner",
+        "test_integration.IntegrationTests.test_hostWorkerRejected.test_hostWorkerRejected",
+        "test_integration.IntegrationTests.test_host_android_api_calls_compile_against_sdk24.test_host_android_api_calls_compile_against_sdk24",
+        "test_integration.IntegrationTests.test_invalidCodeRetry.test_invalidCodeRetry",
+        "test_integration.IntegrationTests.test_jdk21_default_source_compile.test_jdk21_default_source_compile",
+        "test_integration.IntegrationTests.test_jni_is_read_only_and_has_expected_exports.test_jni_is_read_only_and_has_expected_exports",
+        "test_integration.IntegrationTests.test_noPersistence.test_noPersistence",
+        "test_integration.IntegrationTests.test_no_remote_or_account_writer_in_fixture_or_host.test_no_remote_or_account_writer_in_fixture_or_host",
+        "test_integration.IntegrationTests.test_original_production_gate_still_rejects.test_original_production_gate_still_rejects",
+        "test_integration.IntegrationTests.test_overlay_source_selection_and_qr_block.test_overlay_source_selection_and_qr_block",
+        "test_integration.IntegrationTests.test_recreateView.test_recreateView",
+        "test_integration.IntegrationTests.test_registration.test_registration",
+        "test_integration.IntegrationTests.test_sms.test_sms",
+        "test_integration.IntegrationTests.test_twoFactor.test_twoFactor"
+      ]
+    },
+    {
+      "command": [
+        "/root/.local/bin/python3.11",
+        "-O",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/real_alpha_local_login",
+        "-v"
+      ],
+      "environment": {
+        "JAVA_HOME": "/workspace/scratch/1f84b79e43f3/alpha-toolchain/jbrsdk-21.0.10-linux-x64-b1163.105",
+        "FLEXYGRAM_GRADLE_HOME": "/workspace/scratch/1f84b79e43f3/alpha-toolchain/gradle/gradle-9.7.1",
+        "FLEXYGRAM_ANDROID24_JAR": "/workspace/scratch/1f84b79e43f3/alpha-toolchain/sdk24/android-7.0/android.jar"
+      },
+      "log": "docs/real-alpha-local-login/evidence/final-optimized.log",
+      "log_sha256": "d5bfa5f7a6c21ef4a394c619428896fc453a410e462f04a08d699450e7bb240c",
+      "passed": 33,
+      "failed": 0,
+      "skipped": 0,
+      "test_ids": [
+        "test_integration.IntegrationTests.test_app.test_app",
+        "test_integration.IntegrationTests.test_biometric_fix_and_original_views_are_byte_identical.test_biometric_fix_and_original_views_are_byte_identical",
+        "test_integration.IntegrationTests.test_cancelPending.test_cancelPending",
+        "test_integration.IntegrationTests.test_complete_overlays_parse_only.test_complete_overlays_parse_only",
+        "test_integration.IntegrationTests.test_consecutivePresses.test_consecutivePresses",
+        "test_integration.IntegrationTests.test_gradle_selection_runs_real_groovy_not_agp.test_gradle_selection_runs_real_groovy_not_agp",
+        "test_integration.IntegrationTests.test_hostAccountChanged.test_hostAccountChanged",
+        "test_integration.IntegrationTests.test_hostBoundBeforeAdmission.test_hostBoundBeforeAdmission",
+        "test_integration.IntegrationTests.test_hostDestroyedWhileOpening.test_hostDestroyedWhileOpening",
+        "test_integration.IntegrationTests.test_hostDoubleOpen.test_hostDoubleOpen",
+        "test_integration.IntegrationTests.test_hostExistingAccountRejected.test_hostExistingAccountRejected",
+        "test_integration.IntegrationTests.test_hostForeignLoginRejected.test_hostForeignLoginRejected",
+        "test_integration.IntegrationTests.test_hostJniUnavailable.test_hostJniUnavailable",
+        "test_integration.IntegrationTests.test_hostNativePolicyMismatch.test_hostNativePolicyMismatch",
+        "test_integration.IntegrationTests.test_hostNavigationBeforeReady.test_hostNavigationBeforeReady",
+        "test_integration.IntegrationTests.test_hostPresentationFailureCloses.test_hostPresentationFailureCloses",
+        "test_integration.IntegrationTests.test_hostRecreationBeforeReady.test_hostRecreationBeforeReady",
+        "test_integration.IntegrationTests.test_hostReopenAfterDestroy.test_hostReopenAfterDestroy",
+        "test_integration.IntegrationTests.test_hostRetainedRootMenuRebound.test_hostRetainedRootMenuRebound",
+        "test_integration.IntegrationTests.test_hostScreenNoStrongOuterOwner.test_hostScreenNoStrongOuterOwner",
+        "test_integration.IntegrationTests.test_hostWorkerRejected.test_hostWorkerRejected",
+        "test_integration.IntegrationTests.test_host_android_api_calls_compile_against_sdk24.test_host_android_api_calls_compile_against_sdk24",
+        "test_integration.IntegrationTests.test_invalidCodeRetry.test_invalidCodeRetry",
+        "test_integration.IntegrationTests.test_jdk21_default_source_compile.test_jdk21_default_source_compile",
+        "test_integration.IntegrationTests.test_jni_is_read_only_and_has_expected_exports.test_jni_is_read_only_and_has_expected_exports",
+        "test_integration.IntegrationTests.test_noPersistence.test_noPersistence",
+        "test_integration.IntegrationTests.test_no_remote_or_account_writer_in_fixture_or_host.test_no_remote_or_account_writer_in_fixture_or_host",
+        "test_integration.IntegrationTests.test_original_production_gate_still_rejects.test_original_production_gate_still_rejects",
+        "test_integration.IntegrationTests.test_overlay_source_selection_and_qr_block.test_overlay_source_selection_and_qr_block",
+        "test_integration.IntegrationTests.test_recreateView.test_recreateView",
+        "test_integration.IntegrationTests.test_registration.test_registration",
+        "test_integration.IntegrationTests.test_sms.test_sms",
+        "test_integration.IntegrationTests.test_twoFactor.test_twoFactor"
+      ]
+    },
+    {
+      "command": [
+        "/root/.local/bin/python3.11",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/native_login_pages",
+        "-v",
+        "-p",
+        "test_cleanup.py"
+      ],
+      "environment": {
+        "JAVA_HOME": "/workspace/scratch/1f84b79e43f3/alpha-toolchain/jbrsdk-21.0.10-linux-x64-b1163.105",
+        "FLEXYGRAM_GRADLE_HOME": "/workspace/scratch/1f84b79e43f3/alpha-toolchain/gradle/gradle-9.7.1",
+        "FLEXYGRAM_ANDROID24_JAR": "/workspace/scratch/1f84b79e43f3/alpha-toolchain/sdk24/android-7.0/android.jar"
+      },
+      "log": "docs/real-alpha-local-login/evidence/cleanup-normal.log",
+      "log_sha256": "581edd9f654e4774461d34c543b6a54814115de1bce51655f6c1d964cf058e53",
+      "passed": 5,
+      "failed": 0,
+      "skipped": 0,
+      "test_ids": [
+        "test_cleanup.OriginalEditorCleanupTests.test_absent_editor_array.test_absent_editor_array",
+        "test_cleanup.OriginalEditorCleanupTests.test_existing_suppression_restored.test_existing_suppression_restored",
+        "test_cleanup.OriginalEditorCleanupTests.test_original_editor_digits_cleared.test_original_editor_digits_cleared",
+        "test_cleanup.OriginalEditorCleanupTests.test_partial_editor_array.test_partial_editor_array",
+        "test_cleanup.OriginalEditorCleanupTests.test_unavailable_container_still_clears_metadata.test_unavailable_container_still_clears_metadata"
+      ]
+    },
+    {
+      "command": [
+        "/root/.local/bin/python3.11",
+        "-O",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests/native_login_pages",
+        "-v",
+        "-p",
+        "test_cleanup.py"
+      ],
+      "environment": {
+        "JAVA_HOME": "/workspace/scratch/1f84b79e43f3/alpha-toolchain/jbrsdk-21.0.10-linux-x64-b1163.105",
+        "FLEXYGRAM_GRADLE_HOME": "/workspace/scratch/1f84b79e43f3/alpha-toolchain/gradle/gradle-9.7.1",
+        "FLEXYGRAM_ANDROID24_JAR": "/workspace/scratch/1f84b79e43f3/alpha-toolchain/sdk24/android-7.0/android.jar"
+      },
+      "log": "docs/real-alpha-local-login/evidence/cleanup-optimized.log",
+      "log_sha256": "9cc6847adee1d480b8d91caa78c5f2e3b6bd152ae05f103fe3d644f756874fb4",
+      "passed": 5,
+      "failed": 0,
+      "skipped": 0,
+      "test_ids": [
+        "test_cleanup.OriginalEditorCleanupTests.test_absent_editor_array.test_absent_editor_array",
+        "test_cleanup.OriginalEditorCleanupTests.test_existing_suppression_restored.test_existing_suppression_restored",
+        "test_cleanup.OriginalEditorCleanupTests.test_original_editor_digits_cleared.test_original_editor_digits_cleared",
+        "test_cleanup.OriginalEditorCleanupTests.test_partial_editor_array.test_partial_editor_array",
+        "test_cleanup.OriginalEditorCleanupTests.test_unavailable_container_still_clears_metadata.test_unavailable_container_still_clears_metadata"
+      ]
+    }
+  ],
+  "development_logs_excluded_from_final_count": {
+    "logs": [
+      "first-normal.log",
+      "fourth-normal.log",
+      "gradle-offline.log",
+      "gradle-online.log",
+      "gradle-resolution-info.log",
+      "retained-menu-before.log",
+      "second-normal.log",
+      "source-selection-fixture-before.log",
+      "strong-owner-before.log",
+      "third-normal.log"
+    ],
+    "note": "Includes fixture compile/parser errors, earlier exploratory PASS runs, and reproduced retained-menu/strong-owner failures; no Android runs."
+  },
+  "verification_scope": {
+    "host_java_modules": true,
+    "native_read_only_bridge_compiled_and_loaded_in_linux_jvm": true,
+    "android_sdk24_symbols_with_telegram_ui_doubles": true,
+    "complete_overlays_java_syntax_only": true,
+    "gradle_source_snippets_with_model_doubles": true,
+    "full_Android_typecheck": false,
+    "Android_build_completed": false,
+    "Android_executed": false,
+    "APK_generated": false
+  }
+}

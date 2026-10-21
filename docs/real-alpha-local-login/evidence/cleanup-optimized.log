@@ -1,0 +1,10 @@
+test_absent_editor_array (test_cleanup.OriginalEditorCleanupTests.test_absent_editor_array) ... ok
+test_existing_suppression_restored (test_cleanup.OriginalEditorCleanupTests.test_existing_suppression_restored) ... ok
+test_original_editor_digits_cleared (test_cleanup.OriginalEditorCleanupTests.test_original_editor_digits_cleared) ... ok
+test_partial_editor_array (test_cleanup.OriginalEditorCleanupTests.test_partial_editor_array) ... ok
+test_unavailable_container_still_clears_metadata (test_cleanup.OriginalEditorCleanupTests.test_unavailable_container_still_clears_metadata) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.745s
+
+OK

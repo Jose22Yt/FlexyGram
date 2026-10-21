@@ -1,0 +1,38 @@
+test_app (test_integration.IntegrationTests.test_app) ... ok
+test_biometric_fix_and_original_views_are_byte_identical (test_integration.IntegrationTests.test_biometric_fix_and_original_views_are_byte_identical) ... ok
+test_cancelPending (test_integration.IntegrationTests.test_cancelPending) ... ok
+test_complete_overlays_parse_only (test_integration.IntegrationTests.test_complete_overlays_parse_only) ... ok
+test_consecutivePresses (test_integration.IntegrationTests.test_consecutivePresses) ... ok
+test_gradle_selection_runs_real_groovy_not_agp (test_integration.IntegrationTests.test_gradle_selection_runs_real_groovy_not_agp) ... ok
+test_hostAccountChanged (test_integration.IntegrationTests.test_hostAccountChanged) ... ok
+test_hostBoundBeforeAdmission (test_integration.IntegrationTests.test_hostBoundBeforeAdmission) ... ok
+test_hostDestroyedWhileOpening (test_integration.IntegrationTests.test_hostDestroyedWhileOpening) ... ok
+test_hostDoubleOpen (test_integration.IntegrationTests.test_hostDoubleOpen) ... ok
+test_hostExistingAccountRejected (test_integration.IntegrationTests.test_hostExistingAccountRejected) ... ok
+test_hostForeignLoginRejected (test_integration.IntegrationTests.test_hostForeignLoginRejected) ... ok
+test_hostJniUnavailable (test_integration.IntegrationTests.test_hostJniUnavailable) ... ok
+test_hostNativePolicyMismatch (test_integration.IntegrationTests.test_hostNativePolicyMismatch) ... ok
+test_hostNavigationBeforeReady (test_integration.IntegrationTests.test_hostNavigationBeforeReady) ... ok
+test_hostPresentationFailureCloses (test_integration.IntegrationTests.test_hostPresentationFailureCloses) ... ok
+test_hostRecreationBeforeReady (test_integration.IntegrationTests.test_hostRecreationBeforeReady) ... ok
+test_hostReopenAfterDestroy (test_integration.IntegrationTests.test_hostReopenAfterDestroy) ... ok
+test_hostRetainedRootMenuRebound (test_integration.IntegrationTests.test_hostRetainedRootMenuRebound) ... ok
+test_hostScreenNoStrongOuterOwner (test_integration.IntegrationTests.test_hostScreenNoStrongOuterOwner) ... ok
+test_hostWorkerRejected (test_integration.IntegrationTests.test_hostWorkerRejected) ... ok
+test_host_android_api_calls_compile_against_sdk24 (test_integration.IntegrationTests.test_host_android_api_calls_compile_against_sdk24) ... ok
+test_invalidCodeRetry (test_integration.IntegrationTests.test_invalidCodeRetry) ... ok
+test_jdk21_default_source_compile (test_integration.IntegrationTests.test_jdk21_default_source_compile) ... ok
+test_jni_is_read_only_and_has_expected_exports (test_integration.IntegrationTests.test_jni_is_read_only_and_has_expected_exports) ... ok
+test_noPersistence (test_integration.IntegrationTests.test_noPersistence) ... ok
+test_no_remote_or_account_writer_in_fixture_or_host (test_integration.IntegrationTests.test_no_remote_or_account_writer_in_fixture_or_host) ... ok
+test_original_production_gate_still_rejects (test_integration.IntegrationTests.test_original_production_gate_still_rejects) ... ok
+test_overlay_source_selection_and_qr_block (test_integration.IntegrationTests.test_overlay_source_selection_and_qr_block) ... ok
+test_recreateView (test_integration.IntegrationTests.test_recreateView) ... ok
+test_registration (test_integration.IntegrationTests.test_registration) ... ok
+test_sms (test_integration.IntegrationTests.test_sms) ... ok
+test_twoFactor (test_integration.IntegrationTests.test_twoFactor) ... ok
+
+----------------------------------------------------------------------
+Ran 33 tests in 10.609s
+
+OK

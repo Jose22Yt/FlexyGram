@@ -1,0 +1,337 @@
+{
+  "base_pr": 42,
+  "base_commit": "57e3d958d161d77f3c468dcd9dc45644ccbc2fe7",
+  "selected_source_pr": 40,
+  "selected_source_commit": "97e0c70945b3f8e8968468e828ee1853b8a4c751",
+  "integration_code_commit": "9acdc1d0811ce4772fe9487f8dad4b16fc0576f6",
+  "reused_exact_git_blobs": [
+    {
+      "path": "TMessagesProj_Modules/telegram-login-local-ui/src/main/java/io/github/jose22yt/flexygram/login/local/EphemeralPages.java",
+      "sha": "a26db1752d1ebcb2c43957b1ec8efddd8ade999f"
+    },
+    {
+      "path": "TMessagesProj_Modules/telegram-login-local-ui/src/main/java/io/github/jose22yt/flexygram/login/local/LocalLoginSession.java",
+      "sha": "a0409761ab7dee5c3353f3a9d9ee5e992785035c"
+    },
+    {
+      "path": "TMessagesProj_Modules/telegram-login-local-ui/src/main/java/io/github/jose22yt/flexygram/login/local/LocalTransitionFence.java",
+      "sha": "47181164e98fa874f8acebfed6efe8edac07c08f"
+    },
+    {
+      "path": "TMessagesProj_Modules/telegram-login-local-ui/src/main/java/io/github/jose22yt/flexygram/login/local/NativeUiInput.java",
+      "sha": "210f773f7890c12feb6bb532a844531a463f2fcd"
+    },
+    {
+      "path": "TMessagesProj_Modules/telegram-login-wiring/src/android/java/io/github/jose22yt/flexygram/login/LoginNativeBinding.java",
+      "sha": "107ad49a3f8b858dbd10fac02c56fafcfd502674"
+    },
+    {
+      "path": "TMessagesProj_Modules/telegram-login-wiring/src/telegram/java/io/github/jose22yt/flexygram/login/NativePagePlan.java",
+      "sha": "d7a9589ea1c8f17218d78ecb2c49507b7fa413fe"
+    },
+    {
+      "path": "TMessagesProj_Modules/telegram-login-wiring/src/telegram/java/io/github/jose22yt/flexygram/login/OriginalSrpLocalProof.java",
+      "sha": "da2e4ba12bf06c2ebdb8e879ecc7ab39ee8d1daa"
+    },
+    {
+      "path": "TMessagesProj_Modules/telegram-login-wiring/src/telegram/java/io/github/jose22yt/flexygram/login/TelegramRequestContext.java",
+      "sha": "30c2136172069d7477f2f84b5c465fe9491cc4ea"
+    },
+    {
+      "path": "TMessagesProj_Modules/telegram-native-login/README.md",
+      "sha": "7fed8595a956638a751008ad15e54bc666c7f194"
+    },
+    {
+      "path": "TMessagesProj_Modules/telegram-native-login/integration/security-series.json",
+      "sha": "774fb972d7d804def9bdee01450fba487aaca7cd"
+    },
+    {
+      "path": "TMessagesProj_Modules/telegram-native-login/src/main/java/io/github/jose22yt/flexygram/login/NativeLoginProtocol.java",
+      "sha": "5a4e560ec1889e45cfaa1f879e331d8e2e678958"
+    },
+    {
+      "path": "TMessagesProj_Modules/telegram-native-login/src/main/java/io/github/jose22yt/flexygram/login/NativeLoginTransport.java",
+      "sha": "4f0c64b36da16f27e20c9a9e6051e32cbbec71ad"
+    },
+    {
+      "path": "TMessagesProj_Modules/telegram-native-login/src/main/java/io/github/jose22yt/flexygram/login/NativePersistenceFence.java",
+      "sha": "42afd7e6016e74340d10f63f103289c486d210e9"
+    },
+    {
+      "path": "TMessagesProj_Modules/telegram-native-login/src/telegram/java/io/github/jose22yt/flexygram/login/TelegramAuthorizationStore.java",
+      "sha": "03c89a414a8f65d20517a53174f9d749cdf8f477"
+    },
+    {
+      "path": "TMessagesProj_Modules/telegram-native-login/src/telegram/java/io/github/jose22yt/flexygram/login/TlAuthResponses.java",
+      "sha": "617856b8899a48e9cc320940c43a6d3d148291d1"
+    },
+    {
+      "path": "TMessagesProj_Modules/telegram-session-android/README.md",
+      "sha": "6a252348c81b55cf04366813b71c35ef28c316c1"
+    },
+    {
+      "path": "TMessagesProj_Modules/telegram-session-android/integration/.gitattributes",
+      "sha": "24e115f5b2170dd3eaeaf95de74a012c0e856171"
+    },
+    {
+      "path": "TMessagesProj_Modules/telegram-session-android/integration/0001-realalpha-read-only-jni.patch",
+      "sha": "bbab66a555ae1a7c356219d36e4ac122155d100a"
+    },
+    {
+      "path": "TMessagesProj_Modules/telegram-session-android/integration/read-only-jni.cmake",
+      "sha": "380ddd16fe3d3bc8875d890962a3259a22e7b082"
+    },
+    {
+      "path": "TMessagesProj_Modules/telegram-session-android/src/android/java/io/github/jose22yt/flexygram/session/android/AndroidJournalBackend.java",
+      "sha": "4ad69e65e08ca95691b20ad13d7ae2b64613ed28"
+    },
+    {
+      "path": "TMessagesProj_Modules/telegram-session-android/src/android/java/io/github/jose22yt/flexygram/session/android/AndroidNativeBridge.java",
+      "sha": "07206e3357767d4ee6c0e1bf9ef4dbcd5e9f98ae"
+    },
+    {
+      "path": "TMessagesProj_Modules/telegram-session-android/src/android/java/io/github/jose22yt/flexygram/session/android/LoginActivityAdapter.java",
+      "sha": "31e14b1a5a3a46aebd5bc2abc4058cacdab221b3"
+    },
+    {
+      "path": "TMessagesProj_Modules/telegram-session-android/src/android/java/io/github/jose22yt/flexygram/session/android/TelegramAccountAdapter.java",
+      "sha": "d47596689649002f868f944fe80dd1915cc09fb5"
+    },
+    {
+      "path": "TMessagesProj_Modules/telegram-session-android/src/main/cpp/SessionReadOnlyBridge.cpp",
+      "sha": "571654f95b3d7f7022b29ced307d9a4adfb81f46"
+    },
+    {
+      "path": "TMessagesProj_Modules/telegram-session-android/src/main/java/io/github/jose22yt/flexygram/session/android/AccountProbe.java",
+      "sha": "c2c11b4d30db775291e51cd7cf646560466a537a"
+    },
+    {
+      "path": "TMessagesProj_Modules/telegram-session-android/src/main/java/io/github/jose22yt/flexygram/session/android/DeniedTelegramTransport.java",
+      "sha": "287f992c4aaa2c6d37553d108fad8f6269a4090f"
+    },
+    {
+      "path": "TMessagesProj_Modules/telegram-session-android/src/main/java/io/github/jose22yt/flexygram/session/android/JournaledLocalSessionStore.java",
+      "sha": "83c7123d12c4b78228940711e4bcfe9bec29b332"
+    },
+    {
+      "path": "TMessagesProj_Modules/telegram-session-android/src/main/java/io/github/jose22yt/flexygram/session/android/LocalSessionStore.java",
+      "sha": "73e9f2807a358a1f9ee1c29ce7a3d4fc36456f04"
+    },
+    {
+      "path": "TMessagesProj_Modules/telegram-session-android/src/main/java/io/github/jose22yt/flexygram/session/android/LoginFlowOwner.java",
+      "sha": "932fbd9de448ad257ea11989f9d7f35690df6c08"
+    },
+    {
+      "path": "TMessagesProj_Modules/telegram-session-android/src/main/java/io/github/jose22yt/flexygram/session/android/OperationJournal.java",
+      "sha": "322f41cf39058b5825c6e1cab09e676e794acfc1"
+    },
+    {
+      "path": "TMessagesProj_Modules/telegram-session-android/src/main/java/io/github/jose22yt/flexygram/session/android/ReadOnlyAttestation.java",
+      "sha": "b6dc34b9cc67732b5f4fb2a566ef37d9090793a8"
+    },
+    {
+      "path": "TMessagesProj_Modules/telegram-session-core/README.md",
+      "sha": "5c7d1ee40a3de2daa6383decea71f71f8eb6d0dc"
+    },
+    {
+      "path": "TMessagesProj_Modules/telegram-session-core/src/main/java/io/github/jose22yt/flexygram/session/AuthUiRelay.java",
+      "sha": "3c49b5f72434f71423c6a0e0cabeae74bcd1a319"
+    },
+    {
+      "path": "TMessagesProj_Modules/telegram-session-core/src/main/java/io/github/jose22yt/flexygram/session/AuthenticationController.java",
+      "sha": "221a621f2f7802fc5c665d6c5d17c241dea66194"
+    },
+    {
+      "path": "TMessagesProj_Modules/telegram-session-core/src/main/java/io/github/jose22yt/flexygram/session/ClosedRuntime.java",
+      "sha": "837e4357ac726d6349133834fca4a57913dc4420"
+    },
+    {
+      "path": "TMessagesProj_Modules/telegram-session-core/src/main/java/io/github/jose22yt/flexygram/session/RequestCoordinator.java",
+      "sha": "467052cc019fe30b07fffcc46d5ef0aca4d3fd51"
+    },
+    {
+      "path": "TMessagesProj_Modules/telegram-session-core/src/main/java/io/github/jose22yt/flexygram/session/SessionScope.java",
+      "sha": "a8c5892f30cc11db8625d35ae8b52dff07890d33"
+    },
+    {
+      "path": "patches/native-login-pages/0003-realalpha-local-pages-sources.patch",
+      "sha": "a4f688cc66b0e28fb40736e908f94b03db340656"
+    },
+    {
+      "path": "patches/native-login-pages/0004-native-local-pages.patch",
+      "sha": "691ff2bef1d94e1c23a13bc1c1e9cdbb992f805e"
+    },
+    {
+      "path": "patches/native-login-pages/inventory.json",
+      "sha": "7d1800c02b8ac7b67b6b4578cac6e4c995ba3d8c"
+    },
+    {
+      "path": "patches/native-login-wiring/0001-realalpha-source-integration.patch",
+      "sha": "2f263954b626cf97b82cce7e44d606010fc4f881"
+    },
+    {
+      "path": "patches/native-login-wiring/0002-native-fragment-local-binding.patch",
+      "sha": "7ee0cf3afe05a01bcaeee908b1f4270cfe17759f"
+    },
+    {
+      "path": "tests/native_login/NativeLoginHarness.java",
+      "sha": "31ecc71483e55d614eaa9997fcef5a9db56bef89"
+    },
+    {
+      "path": "tests/native_login/test_native_login.py",
+      "sha": "71e03f449611c908eb1c51fb21771fe636fa5122"
+    },
+    {
+      "path": "tests/native_login/tl_projection.py",
+      "sha": "610679c5f2f51ce2bbdb5ff6a359a97abd1c87f1"
+    },
+    {
+      "path": "tests/native_login_pages/PagesHarness.java",
+      "sha": "4f8f2205471789e79ee9a2c2237fe58474d66edd"
+    },
+    {
+      "path": "tests/native_login_pages/fixtures_pages.py",
+      "sha": "3ca5acac6996960e3e6d7e2cbca24e15f19f9650"
+    },
+    {
+      "path": "tests/native_login_pages/test_cleanup.py",
+      "sha": "f9d824d31da1c978470d76cb24d51123affdd35f"
+    },
+    {
+      "path": "tests/native_login_pages/test_pages.py",
+      "sha": "78e1925f64e91e0cb115286d61888ec203206dab"
+    },
+    {
+      "path": "tests/native_login_wiring/RequestContextHarness.java",
+      "sha": "df363137080fa0f61fd4e1423638ccbec3744d3a"
+    },
+    {
+      "path": "tests/native_login_wiring/fixtures.py",
+      "sha": "9cbb9ad826a74e16d2b8566aac64bf8326b7d9f7"
+    },
+    {
+      "path": "tests/native_login_wiring/test_wiring.py",
+      "sha": "aacaf5f92a387d969afd55036835f26f88a6d4cd"
+    },
+    {
+      "path": "tests/session_android/AndroidSessionHarness.java",
+      "sha": "e8c9a5ac370043d354d644c10f911e815935efe2"
+    },
+    {
+      "path": "tests/session_android/fixtures.py",
+      "sha": "3e6649a0493c6848ecfc919e32b1cd6d652118d7"
+    },
+    {
+      "path": "tests/session_android/test_adapters.py",
+      "sha": "4c8aff4a9edc2d23e865c056f59618dcfdfef63d"
+    },
+    {
+      "path": "tests/session_core/SessionHarness.java",
+      "sha": "1da66c477ee83066fdb48abd8e1ed0d2247d3225"
+    },
+    {
+      "path": "tests/session_core/test_integration_contracts.py",
+      "sha": "a1d5a7ef6f2b4a6db413b1cc121be4629dc51995"
+    },
+    {
+      "path": "tests/session_core/test_native_contracts.py",
+      "sha": "a47e2e6a37e5390d40bc61d8e1fd07ee318f7050"
+    },
+    {
+      "path": "tests/session_core/test_runtime.py",
+      "sha": "4240de0e0a94820759f0185959e96ef2ec41692a"
+    },
+    {
+      "path": "tools/native_login_pages/materialize_overlay.py",
+      "sha": "09b8e3e8a4406440f42cb6fe361af673a3da3cb8"
+    },
+    {
+      "path": "tools/native_login_pages/native_methods.txt",
+      "sha": "cda76219348f7fea031c090532013cbecfbe2139"
+    },
+    {
+      "path": "tools/native_login_pages/prepare_patch.py",
+      "sha": "e6067666bc425f929fe8073bf463b80cce458e37"
+    },
+    {
+      "path": "tools/native_login_wiring/compile_originals.py",
+      "sha": "cb812770ff6498e88615555fa0af2ed979fca339"
+    }
+  ],
+  "code_input_sha256": {
+    "TMessagesProj/build.gradle": "1ff489c2b11024e864a4efb7ea5f69840aaf5bf25eb9ab9c5934eac76b6723e2",
+    "TMessagesProj/jni/CMakeLists.txt": "6d03f59d0229a195235b6fa87b92724bfe1df6bd4fb2b8cbd7d1aa29a11a7bff",
+    "TMessagesProj/src/realAlphaLocalLogin/java/org/telegram/ui/realalpha/local/LocalLoginRehearsal.java": "204a54536392c592684fa4f134ab1b4c76d83a2b767fec2a0f49cabd9455fc3b",
+    "TMessagesProj/src/realAlphaLocalLogin/java/org/telegram/ui/realalpha/local/RealAlphaLocalLoginHost.java": "1a8a84117f7ddf68597a17151a75546fb23e4155714c9ffda51fd1106b6c455b",
+    "TMessagesProj_Modules/telegram-login-local-ui/src/main/java/io/github/jose22yt/flexygram/login/local/EphemeralPages.java": "e84ab892f632300ffb8ccc38b5f17fbc4a06ca9fb0bfaf3e4e7217f8c87f8081",
+    "TMessagesProj_Modules/telegram-login-local-ui/src/main/java/io/github/jose22yt/flexygram/login/local/LocalLoginSession.java": "d9e94ca50f9fc9f5231e21de67429c0ec5960abd3005c8335ffe6dede013ae52",
+    "TMessagesProj_Modules/telegram-login-local-ui/src/main/java/io/github/jose22yt/flexygram/login/local/LocalTransitionFence.java": "71a0d7bc1ff94c9ae4ffe860b0f1d1ece8d1e70470fd5418e08d08fc144a680a",
+    "TMessagesProj_Modules/telegram-login-local-ui/src/main/java/io/github/jose22yt/flexygram/login/local/NativeUiInput.java": "5f3a6e00e8f2d1053e0f755fb4566ab13e926491472d1f4a437ef3ccb8e504ed",
+    "TMessagesProj_Modules/telegram-login-wiring/src/android/java/io/github/jose22yt/flexygram/login/LoginNativeBinding.java": "bc70a28cc9ec8ea5e10741973710ebc7132eb666b28644169e5eda184d7a2c66",
+    "TMessagesProj_Modules/telegram-login-wiring/src/telegram/java/io/github/jose22yt/flexygram/login/NativePagePlan.java": "1beb03e1fb4ce72218a74fe8e8c4a70f2008fea799d3f66021cbc496cffed5c0",
+    "TMessagesProj_Modules/telegram-login-wiring/src/telegram/java/io/github/jose22yt/flexygram/login/OriginalSrpLocalProof.java": "fc5fa3e1c305efb41a3407404d6c9122ddbfd46914e47e92f0a9dfd625dab728",
+    "TMessagesProj_Modules/telegram-login-wiring/src/telegram/java/io/github/jose22yt/flexygram/login/TelegramRequestContext.java": "fec0e9db8837bfc36095169f4264c95c927b7c2c4635ae50ce5fcfc01f9dd90c",
+    "TMessagesProj_Modules/telegram-native-login/README.md": "e07662310760296d685392c22b0c6f48c0b7922979a210f379aff13b067f87b6",
+    "TMessagesProj_Modules/telegram-native-login/integration/security-series.json": "8fb7c5a909354eee480adcba81af8ca8d3a5ee4e49aa62c86eb2e183c3e3bbc2",
+    "TMessagesProj_Modules/telegram-native-login/src/main/java/io/github/jose22yt/flexygram/login/NativeLoginProtocol.java": "73cb09cbfdbccaac793ac9708058cc6048408b01d7e7ff8b0289543d299b1e9e",
+    "TMessagesProj_Modules/telegram-native-login/src/main/java/io/github/jose22yt/flexygram/login/NativeLoginTransport.java": "0015a29bbeb20d1fd1e1809a73e6fb7720ce18fff4e1a57625820ac75839248f",
+    "TMessagesProj_Modules/telegram-native-login/src/main/java/io/github/jose22yt/flexygram/login/NativePersistenceFence.java": "3f1d0fac2b745ca7a0bbbb8d5eb9a4789c9cf59c1b4d4b3deb5d8247b6dc24da",
+    "TMessagesProj_Modules/telegram-native-login/src/telegram/java/io/github/jose22yt/flexygram/login/TelegramAuthorizationStore.java": "ad2bd13f32144e49628bde2add788bed94a01b581149f2a622c078a74b161372",
+    "TMessagesProj_Modules/telegram-native-login/src/telegram/java/io/github/jose22yt/flexygram/login/TlAuthResponses.java": "00bcfd4bfc0451ddfd996c44490a68c193da35a51fd371aef380e40a00c45928",
+    "TMessagesProj_Modules/telegram-session-android/README.md": "e09594ffbb5adc9f47547587888ec2f2fda6879a15133789d75096f2b9d21dac",
+    "TMessagesProj_Modules/telegram-session-android/integration/.gitattributes": "fb25a78a6381f5646d71aacea4486f6aeeeb03c4d71740227011024be0d20a8f",
+    "TMessagesProj_Modules/telegram-session-android/integration/0001-realalpha-read-only-jni.patch": "f24cf32486218f9417a7cdd360cb607932e781376343c6bc3513c0ecc596df85",
+    "TMessagesProj_Modules/telegram-session-android/integration/read-only-jni.cmake": "047c1f143cec133e88a34d7007bfbe4d122bb157680443f2b74e97e38d98c644",
+    "TMessagesProj_Modules/telegram-session-android/src/android/java/io/github/jose22yt/flexygram/session/android/AndroidJournalBackend.java": "755f4eeb29d249969b6b76629884a1516aee7affe397cff0a01ef0a2bd834f18",
+    "TMessagesProj_Modules/telegram-session-android/src/android/java/io/github/jose22yt/flexygram/session/android/AndroidNativeBridge.java": "6e550f4ee5359ee654fcb3198dafe9edb8ba440f8a18a9298664fb623c8cd2f6",
+    "TMessagesProj_Modules/telegram-session-android/src/android/java/io/github/jose22yt/flexygram/session/android/LoginActivityAdapter.java": "ffb1b13477e1bc3e81304979bbafc3dd13c6ce545a405abdefe84d43730a89c5",
+    "TMessagesProj_Modules/telegram-session-android/src/android/java/io/github/jose22yt/flexygram/session/android/TelegramAccountAdapter.java": "7282a9560496b4efd7a45adb01587c4f93aa05215fca72fdcd60962ace593a61",
+    "TMessagesProj_Modules/telegram-session-android/src/main/cpp/SessionReadOnlyBridge.cpp": "f7f735738d7269c7d9a5e20b7322b84e81fa56fa9e203b48613f3a2e74209785",
+    "TMessagesProj_Modules/telegram-session-android/src/main/java/io/github/jose22yt/flexygram/session/android/AccountProbe.java": "1e93f709d7e03ae0d55b0a3567919529f70529d59468ddbffbcb278e5dc43e00",
+    "TMessagesProj_Modules/telegram-session-android/src/main/java/io/github/jose22yt/flexygram/session/android/DeniedTelegramTransport.java": "bb26be09c14ef3592edfc162c7c7713e564bceb58acde18dd1e5d16dd1122865",
+    "TMessagesProj_Modules/telegram-session-android/src/main/java/io/github/jose22yt/flexygram/session/android/JournaledLocalSessionStore.java": "7d75f38ca70ebf63a81389ec93337848beceee054e3bc002147c7c3dac64c615",
+    "TMessagesProj_Modules/telegram-session-android/src/main/java/io/github/jose22yt/flexygram/session/android/LocalSessionStore.java": "0b31df6ff9648743f5a5226c2e421cd401ca84820aed3afa1d74e6d927ee0c29",
+    "TMessagesProj_Modules/telegram-session-android/src/main/java/io/github/jose22yt/flexygram/session/android/LoginFlowOwner.java": "d67dbd2ec93d27f26bb2b81e928dab2d102f7ea8f49d586e404264cf46d586bb",
+    "TMessagesProj_Modules/telegram-session-android/src/main/java/io/github/jose22yt/flexygram/session/android/OperationJournal.java": "e694c285e1ad7c355eed4a02759ead65766e2dc7f7901047caaf1ce454391638",
+    "TMessagesProj_Modules/telegram-session-android/src/main/java/io/github/jose22yt/flexygram/session/android/ReadOnlyAttestation.java": "691fe96375598f870adbb8903087df67017a791a3c8c4213ac6414441dbd0987",
+    "TMessagesProj_Modules/telegram-session-core/README.md": "5769ffc1ce983c9a787e4dfca73505cc2c9270187509735942940e1123fb648f",
+    "TMessagesProj_Modules/telegram-session-core/src/main/java/io/github/jose22yt/flexygram/session/AuthUiRelay.java": "375b31b93833b98551a1778ad239d0029b089e32dd562ee9429531ab89ad3bd5",
+    "TMessagesProj_Modules/telegram-session-core/src/main/java/io/github/jose22yt/flexygram/session/AuthenticationController.java": "22275a4db7485c0a51957ea6f7d7ec3bf6f2582161ff6d30d7a89d76b95e1977",
+    "TMessagesProj_Modules/telegram-session-core/src/main/java/io/github/jose22yt/flexygram/session/ClosedRuntime.java": "3e6c8a174fe5d0a32153d88e8173942f484a13defac965e11ac4d27a7766932c",
+    "TMessagesProj_Modules/telegram-session-core/src/main/java/io/github/jose22yt/flexygram/session/RequestCoordinator.java": "4733035ee9ec8b5d42e4092ba7c671c4731e8a779a14d58867d7a937d1668c67",
+    "TMessagesProj_Modules/telegram-session-core/src/main/java/io/github/jose22yt/flexygram/session/SessionScope.java": "09834b41bc8567e22935fafef3a9956ba5d25ee757c31958e04994ca73f984fa",
+    "patches/native-login-pages/0003-realalpha-local-pages-sources.patch": "73c2ec202f493980487928a5671736eb115cd33ffcad74a9cb46e60deb201825",
+    "patches/native-login-pages/0004-native-local-pages.patch": "b7eda145ecebf4b1240673e1c076ab8b797aad59de9d2e346f445ecc241d6901",
+    "patches/native-login-pages/inventory.json": "a4a5eeda9a8d58e5666c7225a9210acce20b254a8bb27105f32914f30eead5dd",
+    "patches/native-login-wiring/0001-realalpha-source-integration.patch": "702ceac91abbca32ac87080fc00609dab3fa17a09117d6298d815e98ab858ab7",
+    "patches/native-login-wiring/0002-native-fragment-local-binding.patch": "17afd022bb13e63913bf845facb8cdf3406e958597401f4f796c00c7ce40338b",
+    "tests/native_login/NativeLoginHarness.java": "04fd27d34bad682ad628fbc1c0a0c68c5205d62c3ca538d11249fea6bfa527e9",
+    "tests/native_login/test_native_login.py": "c9f887304eafc945629e754ed0fd9507852c2ee8d12749dcd1fc6da638e9ff00",
+    "tests/native_login/tl_projection.py": "015f09293504d2be747b7cb21c4a0384050093c31dd2ad447f768ad8ca09fd20",
+    "tests/native_login_pages/PagesHarness.java": "4ec14d5f9d6d78a92795118d55b464b3d65276e6b9fc52dc1a5bee803e3fd126",
+    "tests/native_login_pages/fixtures_pages.py": "27c1f8d7e704818ee77c6c60bc3d950c53185b2a6cd5ddde096e3a67d1be4c56",
+    "tests/native_login_pages/test_cleanup.py": "cc7c73f503fea5d237adae5e5ee16573e5c6349dae6c68d8a8b7f5e37f7b6821",
+    "tests/native_login_pages/test_pages.py": "b5617f4833fac8aafe18f1615ed7459911c286d0c538278d0c05e0ee82227c9b",
+    "tests/native_login_wiring/RequestContextHarness.java": "4855583223a99dcd069db7e905a628d9b1fc73a095b23ae7987807eb6419ecf6",
+    "tests/native_login_wiring/fixtures.py": "c45b8c2eb8748c0feef65578e2d6eecab05c8eeda97344420725306d26bb9515",
+    "tests/native_login_wiring/test_wiring.py": "d6d1436c15e9b3625aa09b56864183e43554dffff69e8e1b70a05863c3f9ef13",
+    "tests/real_alpha_local_login/IntegrationHarness.java": "fdb2b179d9430265200bcdda899d5991c00796a60b1032254f5a6437af4149f2",
+    "tests/real_alpha_local_login/fixtures.py": "8ffd0df9b1be77fccc4a1e304ee90698ebdd756622aaa8106c2778e99d6a5398",
+    "tests/real_alpha_local_login/test_integration.py": "cb69b782eaee2474fee50f02948d968ca0aad8f42f4c5887302d38d808efa4a1",
+    "tests/session_android/AndroidSessionHarness.java": "6c6fa79fdd9611afdd89afc17bd8dd3964bf5772d04037cf5ed770287cb4dea9",
+    "tests/session_android/fixtures.py": "79f1e1dc13df2c0503642c29fc7dcb4c4f87d30a985403e96dfb6967173066f0",
+    "tests/session_android/test_adapters.py": "f0354c495dd930ed7cda32d8c9c9f7be928d9a845b5b74c61c8ec27ed6a051a6",
+    "tests/session_core/SessionHarness.java": "bad867c92fb71c999c95d84f611e7961b99a9f8832ae7bb71153b06b6262adee",
+    "tests/session_core/test_integration_contracts.py": "080b85c081338a473218658ad462e79acdb4912deed754c5e7d3c08df842b0bb",
+    "tests/session_core/test_native_contracts.py": "87a88a779a85227cc9f1de7a9be6cba13c88f2640e35666570bab41d9f0eaabd",
+    "tests/session_core/test_runtime.py": "728471f6f331b67bbc333c1ad64683917208eb9279678bf33d06505fdd15592b",
+    "tools/native_login_pages/materialize_overlay.py": "9343b3967700afb2fd9490faea25d3d2537be473ad7fc13b2d04c6960d30df4d",
+    "tools/native_login_pages/native_methods.txt": "d820a4552db48da30f41515ba31370174281868e55e4982afebd6479f889d9f0",
+    "tools/native_login_pages/prepare_patch.py": "3ac901efafe626fc3784e065acd4d17174245d17f5dcc8d65ed8dcc9d360adb0",
+    "tools/native_login_wiring/compile_originals.py": "1d7001a0096b5fd79ae176376b3847d55a0f1c4c07c9e5725b0785ee186795ea",
+    "tools/real_alpha_local_login/generated.json": "3d163ef423c3b30ba73d8a8c615fb72066816191dd0c9cf5f12edffc5d60aa37",
+    "tools/real_alpha_local_login/materialize.py": "c87420defe5a0700d600f4ce387e0c1b0457a5a37d3443e618096417d4a2c243",
+    "tools/real_alpha_local_login/originals.json": "d325155a8a69caf2505797ccdfef18406b8ac864335563e7bb53f8dc4ffc3b8d"
+  },
+  "branch_merge_performed": false
+}
