@@ -1,0 +1,15 @@
+Source commit: f8abf084fa4a6ae68541dc04d199417a1df0ebc2
+Run from repository root. Python executable here: /root/.local/bin/python3.11
+JAVA_HOME: JDK21.0.10; FLEXYGRAM_ANDROID24_JAR: verified SDK24 android.jar; FLEXYGRAM_GRADLE_HOME: Gradle9.7.1; FLEXYGRAM_CMAKE: CMake3.31.6
+
+python3.11 -m unittest discover -s tests/native_login_wiring -v
+python3.11 -O -m unittest discover -s tests/native_login_wiring -v
+python3.11 -m unittest discover -s tests/native_login -p test_native_login.py -k no_shared_client -v
+python3.11 -O -m unittest discover -s tests/native_login -p test_native_login.py -k no_shared_client -v
+python3.11 -m unittest discover -s tests/session_android -p test_adapters.py -k shared_sources_and_variants -v
+python3.11 -O -m unittest discover -s tests/session_android -p test_adapters.py -k shared_sources_and_variants -v
+python3.11 -m unittest discover -s tests/session_core -p test_integration_contracts.py -k no_existing_shared_or_build -v
+python3.11 -O -m unittest discover -s tests/session_core -p test_integration_contracts.py -k no_existing_shared_or_build -v
+
+Complete originals: python3.11 tools/native_login_wiring/compile_originals.py --output docs/native-login-wiring/evidence/full-original-attempt --classpath <SDK24 android.jar>
+This separate command returned 1 (BLOCKED), not PASS. See its exact command/source hashes. No full app/Android run was performed.

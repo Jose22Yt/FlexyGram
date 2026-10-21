@@ -1,0 +1,31 @@
+test_accountAndLeaseSeparation (test_wiring.WiringTests.test_accountAndLeaseSeparation) ... ok
+test_android_sdk24_symbols (test_wiring.WiringTests.test_android_sdk24_symbols) ... ok
+test_callbackThenThrowDoesNotRetainHash (test_wiring.WiringTests.test_callbackThenThrowDoesNotRetainHash) ... ok
+test_cancelLateReplyAndNoNativeMutation (test_wiring.WiringTests.test_cancelLateReplyAndNoNativeMutation) ... ok
+test_cancellationErrorsDoNotLeak (test_wiring.WiringTests.test_cancellationErrorsDoNotLeak) ... ok
+test_domainChangeRejectedBeforePort (test_wiring.WiringTests.test_domainChangeRejectedBeforePort) ... ok
+test_duplicateRawReplyDiscarded (test_wiring.WiringTests.test_duplicateRawReplyDiscarded) ... ok
+test_emptySessionNoImplicitRestore (test_wiring.WiringTests.test_emptySessionNoImplicitRestore) ... ok
+test_invalidCodeRetryPreservesContext (test_wiring.WiringTests.test_invalidCodeRetryPreservesContext) ... ok
+test_jdk21_default_compile (test_wiring.WiringTests.test_jdk21_default_compile) ... ok
+test_missingHandleDoesNotAdvance (test_wiring.WiringTests.test_missingHandleDoesNotAdvance) ... ok
+test_native_page_numbers_match_original (test_wiring.WiringTests.test_native_page_numbers_match_original) ... ok
+test_no_live_transport_or_policy_changes (test_wiring.WiringTests.test_no_live_transport_or_policy_changes) ... ok
+test_originalSendSignInSerializers (test_wiring.WiringTests.test_originalSendSignInSerializers) ... ok
+test_originalSrpWrapperFailsWithoutCryptoClaim (test_wiring.WiringTests.test_originalSrpWrapperFailsWithoutCryptoClaim) ... ok
+test_original_request_class_bodies_retained (test_wiring.WiringTests.test_original_request_class_bodies_retained) ... ok
+test_pagePlanBlocksOriginalSideEffects (test_wiring.WiringTests.test_pagePlanBlocksOriginalSideEffects) ... ok
+test_passwordOriginalRequestAndProofWipe (test_wiring.WiringTests.test_passwordOriginalRequestAndProofWipe) ... ok
+test_processDeathOnlyRestartMarker (test_wiring.WiringTests.test_processDeathOnlyRestartMarker) ... ok
+test_proofFailureSanitizedAndNoRequest (test_wiring.WiringTests.test_proofFailureSanitizedAndNoRequest) ... ok
+test_qrOriginalMigrationTokenOwnedCopy (test_wiring.WiringTests.test_qrOriginalMigrationTokenOwnedCopy) ... ok
+test_recreationReattachesWithoutRequests (test_wiring.WiringTests.test_recreationReattachesWithoutRequests) ... ok
+test_sendCodeFloodWaitExplicitRetry (test_wiring.WiringTests.test_sendCodeFloodWaitExplicitRetry) ... ok
+test_signupOriginalFieldsAndOrigin (test_wiring.WiringTests.test_signupOriginalFieldsAndOrigin) ... ok
+test_srpRefreshRequiresNewParameters (test_wiring.WiringTests.test_srpRefreshRequiresNewParameters) ... ok
+test_terminalFailureAndUnsupportedRouteClear (test_wiring.WiringTests.test_terminalFailureAndUnsupportedRouteClear) ... ok
+
+----------------------------------------------------------------------
+Ran 26 tests in 8.178s
+
+OK

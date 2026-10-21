@@ -1,0 +1,176 @@
+{
+  "code_commit": "f8abf084fa4a6ae68541dc04d199417a1df0ebc2",
+  "base_commit": "19b515e0ce63bdecae235b434ca265dbaf4d48ca",
+  "scope": "HOST_LOCAL_ONLY_NOT_ANDROID",
+  "groups": {
+    "final": {
+      "modes": {
+        "normal": {
+          "passed": 42,
+          "failed": 0,
+          "skipped": 0,
+          "command": "python3.11 -m unittest discover -s tests/native_login_wiring -v",
+          "log": "final-normal.log",
+          "sha256": "a10cbc77560cbf052a4de717773d1e60cb610ba3acff0bdd71df98777c19430a"
+        },
+        "optimized": {
+          "passed": 42,
+          "failed": 0,
+          "skipped": 0,
+          "command": "python3.11 -O -m unittest discover -s tests/native_login_wiring -v",
+          "log": "final-optimized.log",
+          "sha256": "54e13a59e4da758ef9f0fb00874086c36128cd13b52569cb8047176a7779366a"
+        }
+      },
+      "canonical_distinct_ids": [
+        "test_native_login.NativeLoginTests.test_androidViewRecreationNoRequestReplay",
+        "test_native_login.NativeLoginTests.test_callbackThenThrowCannotCommit",
+        "test_native_login.NativeLoginTests.test_concurrentFirstResponseWins",
+        "test_native_login.NativeLoginTests.test_foreignRequestCannotStageAuthorization",
+        "test_native_login.NativeLoginTests.test_journalFailureAfterOriginalWrite",
+        "test_native_login.NativeLoginTests.test_missingWriteReceiptsStayUncertain",
+        "test_native_login.NativeLoginTests.test_nativeCodeAndCommit",
+        "test_native_login.NativeLoginTests.test_writeThenThrowIsNeverRolledBack",
+        "test_wiring.WiringTests.test_accountAndLeaseSeparation",
+        "test_wiring.WiringTests.test_android_sdk24_symbols",
+        "test_wiring.WiringTests.test_callbackThenThrowDoesNotRetainHash",
+        "test_wiring.WiringTests.test_cancelLateReplyAndNoNativeMutation",
+        "test_wiring.WiringTests.test_cancellationErrorsDoNotLeak",
+        "test_wiring.WiringTests.test_domainChangeRejectedBeforePort",
+        "test_wiring.WiringTests.test_duplicateRawReplyDiscarded",
+        "test_wiring.WiringTests.test_emptySessionNoImplicitRestore",
+        "test_wiring.WiringTests.test_gradle_patch_scopes_sources_to_realalpha",
+        "test_wiring.WiringTests.test_invalidCodeRetryPreservesContext",
+        "test_wiring.WiringTests.test_jdk21_default_compile",
+        "test_wiring.WiringTests.test_missingHandleDoesNotAdvance",
+        "test_wiring.WiringTests.test_native_page_numbers_match_original",
+        "test_wiring.WiringTests.test_native_page_side_effects_are_not_assumed_safe",
+        "test_wiring.WiringTests.test_no_live_transport_or_policy_changes",
+        "test_wiring.WiringTests.test_oldOperationCannotAffectNewContext",
+        "test_wiring.WiringTests.test_originalSendSignInSerializers",
+        "test_wiring.WiringTests.test_originalSrpWrapperFailsWithoutCryptoClaim",
+        "test_wiring.WiringTests.test_original_request_class_bodies_retained",
+        "test_wiring.WiringTests.test_pagePlanBlocksOriginalSideEffects",
+        "test_wiring.WiringTests.test_passwordOriginalRequestAndProofWipe",
+        "test_wiring.WiringTests.test_passwordParametersNotBorrowedFromCallback",
+        "test_wiring.WiringTests.test_patchBindingRefusesParameterizedPage",
+        "test_wiring.WiringTests.test_patches_apply_only_to_temporary_copies",
+        "test_wiring.WiringTests.test_processDeathOnlyRestartMarker",
+        "test_wiring.WiringTests.test_proofFailureSanitizedAndNoRequest",
+        "test_wiring.WiringTests.test_qrDisplayExpiryHasNoAutomaticRequest",
+        "test_wiring.WiringTests.test_qrOriginalMigrationTokenOwnedCopy",
+        "test_wiring.WiringTests.test_recreationReattachesWithoutRequests",
+        "test_wiring.WiringTests.test_reentryRejectedWhileLocalRequestPending",
+        "test_wiring.WiringTests.test_sendCodeFloodWaitExplicitRetry",
+        "test_wiring.WiringTests.test_signupOriginalFieldsAndOrigin",
+        "test_wiring.WiringTests.test_srpRefreshRequiresNewParameters",
+        "test_wiring.WiringTests.test_terminalFailureAndUnsupportedRouteClear"
+      ]
+    },
+    "native-inventory": {
+      "modes": {
+        "normal": {
+          "passed": 1,
+          "failed": 0,
+          "skipped": 0,
+          "command": "python3.11 -m unittest discover -s tests/native_login -p test_native_login.py -k no_shared_client -v",
+          "log": "native-inventory-normal.log",
+          "sha256": "46692f1c62172a555692f4580c7718ea3d5904e1c392b99fb4d740f381f98263"
+        },
+        "optimized": {
+          "passed": 1,
+          "failed": 0,
+          "skipped": 0,
+          "command": "python3.11 -O -m unittest discover -s tests/native_login -p test_native_login.py -k no_shared_client -v",
+          "log": "native-inventory-optimized.log",
+          "sha256": "cfd0131c58d33f101570df279f1da50d5202271806c34c03f97572887fbc64d8"
+        }
+      },
+      "canonical_distinct_ids": [
+        "test_native_login.NativeLoginTests.test_no_shared_client_or_capability_files_changed"
+      ]
+    },
+    "android-inventory": {
+      "modes": {
+        "normal": {
+          "passed": 1,
+          "failed": 0,
+          "skipped": 0,
+          "command": "python3.11 -m unittest discover -s tests/session_android -p test_adapters.py -k shared_sources_and_variants -v",
+          "log": "android-inventory-normal.log",
+          "sha256": "6aab0ba3ec8f5ff86154ad183846be905c2ae5247333ae889e25764f38a4deb7"
+        },
+        "optimized": {
+          "passed": 1,
+          "failed": 0,
+          "skipped": 0,
+          "command": "python3.11 -O -m unittest discover -s tests/session_android -p test_adapters.py -k shared_sources_and_variants -v",
+          "log": "android-inventory-optimized.log",
+          "sha256": "3666f6025cc48b2e979adde2551f19dee079afce320913c25a5039d1f5149a56"
+        }
+      },
+      "canonical_distinct_ids": [
+        "test_adapters.AdapterTests.test_shared_sources_and_variants_unchanged"
+      ]
+    },
+    "core-inventory": {
+      "modes": {
+        "normal": {
+          "passed": 1,
+          "failed": 0,
+          "skipped": 0,
+          "command": "python3.11 -m unittest discover -s tests/session_core -p test_integration_contracts.py -k no_existing_shared_or_build -v",
+          "log": "core-inventory-normal.log",
+          "sha256": "31736f5beb7f5a0977cdce55911ee935d808e68f706630d0ace93d9ee2e3ede9"
+        },
+        "optimized": {
+          "passed": 1,
+          "failed": 0,
+          "skipped": 0,
+          "command": "python3.11 -O -m unittest discover -s tests/session_core -p test_integration_contracts.py -k no_existing_shared_or_build -v",
+          "log": "core-inventory-optimized.log",
+          "sha256": "89105effbfd1b9bd346976bd6024f7289e5064238192c34ae3bcaf6af3012496"
+        }
+      },
+      "canonical_distinct_ids": [
+        "test_integration_contracts.IntegrationContracts.test_no_existing_shared_or_build_files_modified"
+      ]
+    }
+  },
+  "excluded_preliminary_logs": [
+    "initial-context-tests.log",
+    "context-tests-second.log",
+    "integration-patch-tests.log",
+    "prepublish-tests.log",
+    "pre-password-ownership-fix.log",
+    "after-password-fix.log"
+  ],
+  "new_tests": 34,
+  "selected_existing_tests": 11,
+  "distinct_tests": 45,
+  "passing_executions": 90,
+  "failed": 0,
+  "skipped": 0,
+  "source_sha256": {
+    "TMessagesProj_Modules/telegram-login-wiring/src/android/java/io/github/jose22yt/flexygram/login/LoginNativeBinding.java": "bc70a28cc9ec8ea5e10741973710ebc7132eb666b28644169e5eda184d7a2c66",
+    "TMessagesProj_Modules/telegram-login-wiring/src/telegram/java/io/github/jose22yt/flexygram/login/NativePagePlan.java": "1beb03e1fb4ce72218a74fe8e8c4a70f2008fea799d3f66021cbc496cffed5c0",
+    "TMessagesProj_Modules/telegram-login-wiring/src/telegram/java/io/github/jose22yt/flexygram/login/OriginalSrpLocalProof.java": "fc5fa3e1c305efb41a3407404d6c9122ddbfd46914e47e92f0a9dfd625dab728",
+    "TMessagesProj_Modules/telegram-login-wiring/src/telegram/java/io/github/jose22yt/flexygram/login/TelegramRequestContext.java": "fec0e9db8837bfc36095169f4264c95c927b7c2c4635ae50ce5fcfc01f9dd90c",
+    "patches/native-login-wiring/0001-realalpha-source-integration.patch": "702ceac91abbca32ac87080fc00609dab3fa17a09117d6298d815e98ab858ab7",
+    "patches/native-login-wiring/0002-native-fragment-local-binding.patch": "17afd022bb13e63913bf845facb8cdf3406e958597401f4f796c00c7ce40338b",
+    "tests/native_login/test_native_login.py": "c3340493a4698fa76de10d9139c353fe22f0604917541470d304cbb15a5eba4f",
+    "tests/native_login_wiring/RequestContextHarness.java": "4855583223a99dcd069db7e905a628d9b1fc73a095b23ae7987807eb6419ecf6",
+    "tests/native_login_wiring/fixtures.py": "c45b8c2eb8748c0feef65578e2d6eecab05c8eeda97344420725306d26bb9515",
+    "tests/native_login_wiring/test_wiring.py": "70424a4d0654392278f17dca231e99c81ad6e1cb051fa1c706e1aef320ffbe97",
+    "tests/session_android/test_adapters.py": "12de73e23953e7f35905956ca9712ff773e3b4925b2b1eadcd5dc3e7ee8767c9",
+    "tests/session_core/test_integration_contracts.py": "662e84e495128c81716ba322294f7fe19c0031b4f54ac92ae071c0ef983b78ee",
+    "tools/native_login_wiring/compile_originals.py": "1d7001a0096b5fd79ae176376b3847d55a0f1c4c07c9e5725b0785ee186795ea"
+  },
+  "full_original_compilation": {
+    "status": "BLOCKED",
+    "receipt": "full-original-attempt/receipt.json",
+    "log": "full-original-attempt/javac.log",
+    "log_sha256": "e26d6931793e677fd04d7b1ff8c52eb4ea6a997a00bb0a7294ee14b9a3724999",
+    "not_a_passing_test": true
+  }
+}

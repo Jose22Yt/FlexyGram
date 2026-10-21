@@ -1,0 +1,91 @@
+--- a/TMessagesProj/src/main/java/org/telegram/ui/LoginActivity.java
++++ b/TMessagesProj/src/main/java/org/telegram/ui/LoginActivity.java
+@@ -525,6 +525,7 @@
+ 
+     @Override
+     public void onFragmentDestroy() {
++        detachPreparedLocalLogin();
+         super.onFragmentDestroy();
+         for (int a = 0; a < views.length; a++) {
+             if (views[a] != null) {
+@@ -550,6 +551,60 @@
+         getNotificationCenter().addObserver(this, NotificationCenter.newSuggestionsAvailable);
+         return super.onFragmentCreate();
+     }
++
++    // BEGIN FLEXYGRAM PREPARED LOCAL BINDING — no real requests or native persistence.
++    private io.github.jose22yt.flexygram.login.LoginNativeBinding preparedLocalLoginBinding;
++    private io.github.jose22yt.flexygram.login.NativePagePlan preparedLocalLoginPlan;
++
++    public void bindPreparedLocalLogin(io.github.jose22yt.flexygram.login.LoginNativeBinding binding) {
++        if (!"realAlpha".equals(org.telegram.messenger.BuildConfig.FLEXYGRAM_VARIANT)
++                || !org.telegram.messenger.DiagnosticPolicy.isIsolated()
++                || activityMode != MODE_LOGIN || binding == null || preparedLocalLoginBinding != null
++                || cachedFragmentView != null) {
++            throw new IllegalStateException("PREPARED_LOGIN_BINDING_REJECTED");
++        }
++        preparedLocalLoginBinding = binding;
++        try {
++            binding.attach(this, state -> {
++                preparedLocalLoginPlan = state;
++                // Native code/SRP/signup parameters and QR/SMS lifecycle still require review.
++                // Never call fillNextCodeParams, onAuthSuccess or a parameterized page here.
++                if (!state.mayEnterOriginalPage()) return false;
++                if (state.page == io.github.jose22yt.flexygram.login.NativePagePlan.Page.KEEP) return true;
++                if (state.page != io.github.jose22yt.flexygram.login.NativePagePlan.Page.PHONE
++                        || cachedFragmentView == null || views[VIEW_PHONE_INPUT] == null) return false;
++                if (currentViewNum != VIEW_PHONE_INPUT) setPage(VIEW_PHONE_INPUT, true, null, true);
++                return true;
++            });
++        } catch (RuntimeException | LinkageError unavailable) {
++            preparedLocalLoginBinding = null;
++            preparedLocalLoginPlan = null;
++            throw new IllegalStateException("PREPARED_LOGIN_ATTACH_FAILED");
++        }
++    }
++
++    public io.github.jose22yt.flexygram.login.NativePagePlan preparedLocalLoginPlan() {
++        return preparedLocalLoginPlan;
++    }
++
++    public boolean preparedLocalLoginStart(char[] synthetic) {
++        return preparedLocalLoginBinding != null && preparedLocalLoginBinding.startLocal(synthetic);
++    }
++
++    public boolean preparedLocalLoginVerify(char[] synthetic) {
++        return preparedLocalLoginBinding != null && preparedLocalLoginBinding.verifyLocal(synthetic);
++    }
++
++    public boolean preparedLocalLoginCancel() {
++        return preparedLocalLoginBinding != null && preparedLocalLoginBinding.cancelLocal();
++    }
++
++    public void detachPreparedLocalLogin() {
++        if (preparedLocalLoginBinding != null) preparedLocalLoginBinding.detach();
++        preparedLocalLoginBinding = null;
++        preparedLocalLoginPlan = null;
++    }
++    // END FLEXYGRAM PREPARED LOCAL BINDING
+ 
+     private View cachedFragmentView;
+     @Override
+@@ -709,7 +764,7 @@
+             slideViewsContainer.addView(views[a], LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.CENTER, AndroidUtilities.isTablet() ? 26 : 18, needsTopMargin ? 30 : 0, AndroidUtilities.isTablet() ? 26 : 18, 0));
+         }
+ 
+-        Bundle savedInstanceState = activityMode == MODE_LOGIN ? loadCurrentState(newAccount, currentAccount) : null;
++        Bundle savedInstanceState = activityMode == MODE_LOGIN && preparedLocalLoginBinding == null ? loadCurrentState(newAccount, currentAccount) : null;
+         if (savedInstanceState != null) {
+             int viewNum = savedInstanceState.getInt("currentViewNum", 0);
+             if (viewNum < 0 || viewNum >= views.length)
+@@ -1634,6 +1689,10 @@
+ 
+     @Override
+     public void saveSelfArgs(Bundle outState) {
++        if (preparedLocalLoginBinding != null) {
++            preparedLocalLoginBinding.saveRestartMarker(outState);
++            return;
++        }
+         try {
+             Bundle bundle = new Bundle();
+             bundle.putInt("currentViewNum", currentViewNum);

@@ -1,0 +1,6 @@
+test_no_existing_shared_or_build_files_modified (test_integration_contracts.IntegrationContracts.test_no_existing_shared_or_build_files_modified) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.057s
+
+OK

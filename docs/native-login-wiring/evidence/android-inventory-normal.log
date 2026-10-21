@@ -1,0 +1,6 @@
+test_shared_sources_and_variants_unchanged (test_adapters.AdapterTests.test_shared_sources_and_variants_unchanged) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 1.656s
+
+OK

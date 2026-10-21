@@ -1,0 +1,260 @@
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/LocaleController.java:11: error: package app.exteraless does not exist
+import app.exteraless.OpenExteraConfig;
+                     ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/LocaleController.java:36: error: package androidx.annotation does not exist
+import androidx.annotation.RequiresApi;
+                          ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/LocaleController.java:37: error: package androidx.annotation does not exist
+import androidx.annotation.StringRes;
+                          ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/AndroidUtilities.java:23: error: cannot find symbol
+import android.app.PictureInPictureParams;
+                  ^
+  symbol:   class PictureInPictureParams
+  location: package android.app
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/AndroidUtilities.java:117: error: package android.view.inspector does not exist
+import android.view.inspector.WindowInspector;
+                             ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/AndroidUtilities.java:127: error: package androidx.annotation does not exist
+import androidx.annotation.DrawableRes;
+                          ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/AndroidUtilities.java:128: error: package androidx.annotation does not exist
+import androidx.annotation.NonNull;
+                          ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/AndroidUtilities.java:129: error: package androidx.annotation does not exist
+import androidx.annotation.Nullable;
+                          ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/AndroidUtilities.java:130: error: package androidx.annotation does not exist
+import androidx.annotation.RawRes;
+                          ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/AndroidUtilities.java:131: error: package androidx.annotation does not exist
+import androidx.annotation.RequiresApi;
+                          ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/AndroidUtilities.java:132: error: package androidx.core.content does not exist
+import androidx.core.content.ContextCompat;
+                            ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/AndroidUtilities.java:133: error: package androidx.core.content does not exist
+import androidx.core.content.FileProvider;
+                            ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/AndroidUtilities.java:134: error: package androidx.core.graphics does not exist
+import androidx.core.graphics.ColorUtils;
+                             ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/AndroidUtilities.java:135: error: package androidx.core.graphics does not exist
+import androidx.core.graphics.Insets;
+                             ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/AndroidUtilities.java:136: error: package androidx.core.math does not exist
+import androidx.core.math.MathUtils;
+                         ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/AndroidUtilities.java:137: error: package androidx.core.view does not exist
+import androidx.core.view.WindowCompat;
+                         ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/AndroidUtilities.java:138: error: package androidx.core.view does not exist
+import androidx.core.view.WindowInsetsCompat;
+                         ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/AndroidUtilities.java:139: error: package androidx.core.widget does not exist
+import androidx.core.widget.NestedScrollView;
+                           ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/AndroidUtilities.java:140: error: package androidx.dynamicanimation.animation does not exist
+import androidx.dynamicanimation.animation.DynamicAnimation;
+                                          ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/AndroidUtilities.java:141: error: package androidx.dynamicanimation.animation does not exist
+import androidx.dynamicanimation.animation.SpringAnimation;
+                                          ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/AndroidUtilities.java:142: error: package androidx.dynamicanimation.animation does not exist
+import androidx.dynamicanimation.animation.SpringForce;
+                                          ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/AndroidUtilities.java:143: error: package androidx.exifinterface.media does not exist
+import androidx.exifinterface.media.ExifInterface;
+                                   ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/AndroidUtilities.java:146: error: package androidx.viewpager.widget does not exist
+import androidx.viewpager.widget.ViewPager;
+                                ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/AndroidUtilities.java:149: error: package com.google.android.gms.auth.api.phone does not exist
+import com.google.android.gms.auth.api.phone.SmsRetriever;
+                                            ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/AndroidUtilities.java:150: error: package com.google.android.gms.auth.api.phone does not exist
+import com.google.android.gms.auth.api.phone.SmsRetrieverClient;
+                                            ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/AndroidUtilities.java:151: error: package com.google.android.gms.tasks does not exist
+import com.google.android.gms.tasks.Task;
+                                   ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/AndroidUtilities.java:248: error: package xyz.nextalone.nagram does not exist
+import xyz.nextalone.nagram.NaConfig;
+                           ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/NotificationsController.java:11: error: package app.exteraless.notifications does not exist
+import app.exteraless.notifications.NotificationsHelper;
+                                   ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/NotificationsController.java:19: error: cannot find symbol
+import android.app.NotificationChannel;
+                  ^
+  symbol:   class NotificationChannel
+  location: package android.app
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/NotificationsController.java:20: error: cannot find symbol
+import android.app.NotificationChannelGroup;
+                  ^
+  symbol:   class NotificationChannelGroup
+  location: package android.app
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/NotificationsController.java:31: error: cannot find symbol
+import android.graphics.ImageDecoder;
+                       ^
+  symbol:   class ImageDecoder
+  location: package android.graphics
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/NotificationsController.java:57: error: package androidx.collection does not exist
+import androidx.collection.LongSparseArray;
+                          ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/NotificationsController.java:58: error: package androidx.core.app does not exist
+import androidx.core.app.NotificationCompat;
+                        ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/NotificationsController.java:59: error: package androidx.core.app does not exist
+import androidx.core.app.NotificationManagerCompat;
+                        ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/NotificationsController.java:60: error: package androidx.core.app does not exist
+import androidx.core.app.Person;
+                        ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/NotificationsController.java:61: error: package androidx.core.app does not exist
+import androidx.core.app.RemoteInput;
+                        ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/NotificationsController.java:62: error: package androidx.core.content does not exist
+import androidx.core.content.FileProvider;
+                            ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/NotificationsController.java:63: error: package androidx.core.content does not exist
+import androidx.core.content.LocusIdCompat;
+                            ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/NotificationsController.java:64: error: package androidx.core.content.pm does not exist
+import androidx.core.content.pm.ShortcutInfoCompat;
+                               ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/NotificationsController.java:65: error: package androidx.core.content.pm does not exist
+import androidx.core.content.pm.ShortcutManagerCompat;
+                               ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/NotificationsController.java:66: error: package androidx.core.graphics does not exist
+import androidx.core.graphics.ColorUtils;
+                             ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/NotificationsController.java:67: error: package androidx.core.graphics.drawable does not exist
+import androidx.core.graphics.drawable.IconCompat;
+                                      ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/NotificationsController.java:69: error: package com.google.common.collect does not exist
+import com.google.common.collect.Lists;
+                                ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/NotificationsController.java:109: error: package xyz.nextalone.nagram does not exist
+import xyz.nextalone.nagram.NaConfig;
+                           ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/MediaDataController.java:16: error: cannot find symbol
+import android.content.pm.ShortcutManager;
+                         ^
+  symbol:   class ShortcutManager
+  location: package android.content.pm
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/MediaDataController.java:42: error: package androidx.annotation does not exist
+import androidx.annotation.NonNull;
+                          ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/MediaDataController.java:43: error: package androidx.annotation does not exist
+import androidx.annotation.Nullable;
+                          ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/MediaDataController.java:44: error: package androidx.collection does not exist
+import androidx.collection.LongSparseArray;
+                          ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/MediaDataController.java:45: error: package androidx.core.content.pm does not exist
+import androidx.core.content.pm.ShortcutInfoCompat;
+                               ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/MediaDataController.java:46: error: package androidx.core.content.pm does not exist
+import androidx.core.content.pm.ShortcutManagerCompat;
+                               ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/MediaDataController.java:47: error: package androidx.core.graphics.drawable does not exist
+import androidx.core.graphics.drawable.IconCompat;
+                                      ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/MediaDataController.java:49: error: package com.android.billingclient.api does not exist
+import com.android.billingclient.api.ProductDetails;
+                                    ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/MediaDataController.java:117: error: package xyz.nextalone.nagram does not exist
+import xyz.nextalone.nagram.NaConfig;
+                           ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/ui/Stars/StarsController.java:19: error: package androidx.annotation does not exist
+import androidx.annotation.NonNull;
+                          ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/ui/Stars/StarsController.java:20: error: package androidx.annotation does not exist
+import androidx.annotation.Nullable;
+                          ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/ui/Stars/StarsController.java:22: error: package com.android.billingclient.api does not exist
+import com.android.billingclient.api.BillingClient;
+                                    ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/ui/Stars/StarsController.java:23: error: package com.android.billingclient.api does not exist
+import com.android.billingclient.api.BillingFlowParams;
+                                    ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/ui/Stars/StarsController.java:24: error: package com.android.billingclient.api does not exist
+import com.android.billingclient.api.ProductDetails;
+                                    ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/ui/Stars/StarsController.java:25: error: package com.android.billingclient.api does not exist
+import com.android.billingclient.api.QueryProductDetailsParams;
+                                    ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/ui/Stars/StarsController.java:48: error: cannot find symbol
+import org.telegram.messenger.R;
+                             ^
+  symbol:   class R
+  location: package org.telegram.messenger
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/ui/ActionBar/MessageDrawable.java:517: warning: [removal] finalize() in Object has been deprecated and marked for removal
+    protected void finalize() throws Throwable {
+                   ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/ui/ActionBar/MessageDrawable.java:518: warning: [removal] finalize() in Object has been deprecated and marked for removal
+        super.finalize();
+             ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/ui/Components/BackgroundGradientDrawable.java:198: warning: [removal] finalize() in Object has been deprecated and marked for removal
+    protected void finalize() throws Throwable {
+                   ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/ui/Components/BackgroundGradientDrawable.java:202: warning: [removal] finalize() in Object has been deprecated and marked for removal
+            super.finalize();
+                 ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/ui/Components/RLottieDrawable.java:831: warning: [removal] finalize() in Object has been deprecated and marked for removal
+    protected void finalize() throws Throwable {
+                   ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/ui/Components/RLottieDrawable.java:835: warning: [removal] finalize() in Object has been deprecated and marked for removal
+            super.finalize();
+                 ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/ui/Components/RLottieNative.java:183: warning: [removal] finalize() in Object has been deprecated and marked for removal
+    protected void finalize() throws Throwable {
+                   ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/ui/Components/RLottieNative.java:189: warning: [removal] finalize() in Object has been deprecated and marked for removal
+            super.finalize();
+                 ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/ui/Components/AnimatedFileDrawable.java:766: warning: [removal] finalize() in Object has been deprecated and marked for removal
+    protected void finalize() throws Throwable {
+                   ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/ui/Components/AnimatedFileDrawable.java:771: warning: [removal] finalize() in Object has been deprecated and marked for removal
+            super.finalize();
+                 ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/ui/Components/AnimatedFileNative.java:104: warning: [removal] finalize() in Object has been deprecated and marked for removal
+    protected void finalize() throws Throwable {
+                   ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/ui/Components/AnimatedFileNative.java:110: warning: [removal] finalize() in Object has been deprecated and marked for removal
+            super.finalize();
+                 ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/tgnet/NativeByteBuffer.java:669: warning: [removal] finalize() in Object has been deprecated and marked for removal
+    protected void finalize() throws Throwable {
+                   ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/tgnet/NativeByteBuffer.java:674: warning: [removal] finalize() in Object has been deprecated and marked for removal
+        super.finalize();
+             ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/SQLite/SQLiteDatabase.java:93: warning: [removal] finalize() in Object has been deprecated and marked for removal
+	public void finalize() throws Throwable {
+	            ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/SQLite/SQLiteDatabase.java:94: warning: [removal] finalize() in Object has been deprecated and marked for removal
+        super.finalize();
+             ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/ui/Components/InstantCameraView.java:3971: warning: [removal] finalize() in Object has been deprecated and marked for removal
+        protected void finalize() throws Throwable {
+                       ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/ui/Components/InstantCameraView.java:3991: warning: [removal] finalize() in Object has been deprecated and marked for removal
+                super.finalize();
+                     ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/camera/CameraView.java:3314: warning: [removal] finalize() in Object has been deprecated and marked for removal
+        protected void finalize() throws Throwable {
+                       ^
+/workspace/scratch/1f84b79e43f3/FlexyGram-login-wiring/TMessagesProj/src/main/java/org/telegram/messenger/camera/CameraView.java:3330: warning: [removal] finalize() in Object has been deprecated and marked for removal
+                super.finalize();
+                     ^
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+Note: Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+60 errors
+20 warnings
+only showing the first 60 errors, of 55360 total; use -Xmaxerrs if you would like to see more
