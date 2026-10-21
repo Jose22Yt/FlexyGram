@@ -95,4 +95,16 @@ Class #2
         r.verify_offline_biometric_guard(block)
         for bad in [block.replace('realAlpha','diagnostic'),block.replace('if-nez','if-eqz'),block.replace('010b','0100'),block.replace('move-result v0','move-result v1'),block.replace('|0102:', '|0101: move-object v0, v1\n|0102:')]:
             with self.subTest(bad=bad),self.assertRaises(ValueError):r.verify_offline_biometric_guard(bad)
+        # Exact D8 layout observed in the corrected ARM64 debug APK.
+        trampoline='''|048a: const-string v0, "realAlpha" // string@ec44
+|048c: invoke-virtual {v0, v0}, Ljava/lang/String;.equals:(Ljava/lang/Object;)Z // method@0ebc
+|048f: move-result v0
+|0490: if-eqz v0, 0493 // +0003
+|0492: goto 0496 // +0004
+|0493: invoke-static {}, Lorg/telegram/messenger/FingerprintController;.checkKeyReady:()V // method@133e
+|0496: sget v0, Landroid/os/Build$VERSION;.SDK_INT:I
+'''
+        r.verify_offline_biometric_guard(trampoline)
+        for bad in [trampoline.replace('realAlpha','diagnostic'),trampoline.replace('if-eqz','if-nez'),trampoline.replace('goto 0496','goto 0493'),trampoline.replace('goto 0496','goto 0497'),trampoline.replace('v0, 0493','v0, 0496'),trampoline.replace('move-result v0','move-result v1'),trampoline.replace('|048c:', '|048b: move-object v0, v1\n|048c:')]:
+            with self.subTest(bad=bad),self.assertRaises(ValueError):r.verify_offline_biometric_guard(bad)
 if __name__=='__main__':unittest.main()

@@ -119,14 +119,23 @@ def verify_offline_biometric_guard(block):
     if 'FingerprintController;.checkKeyReady' not in block:return
     require(len(calls)==1,'Unexpected offline biometric call inventory')
     i=calls[0];require(i>=3,'Unprotected offline biometric call')
-    _,equals=instructions[i-3];_,move=instructions[i-2];_,branch=instructions[i-1]
+    end=instructions[i][0]+3
+    # D8 can emit either if-nez over the call or if-eqz to the call followed
+    # by an unconditional goto over it. Both must land immediately after it.
+    trampoline=instructions[i-1][1].startswith('goto ')
+    width=4 if trampoline else 3
+    require(i>=width,'Incomplete offline biometric branch')
+    _,equals=instructions[i-width];_,move=instructions[i-width+1];_,branch=instructions[i-width+2]
     args=re.search(r'invoke-virtual \{(v\d+), (v\d+)\}, Ljava/lang/String;.equals:',equals)
-    value=re.fullmatch(r'move-result (v\d+)',move)
-    jump=re.match(r'if-nez (v\d+), ([0-9a-f]+)',branch)
-    require(args and value and jump and value[1]==jump[1] and int(jump[2],16)>instructions[i][0],
+    value=re.match(r'move-result (v\d+)(?:\s*//.*)?$',move)
+    jump=re.match(r'if-eqz (v\d+), ([0-9a-f]+)' if trampoline else r'if-nez (v\d+), ([0-9a-f]+)',branch)
+    target=instructions[i][0] if trampoline else end
+    skip=re.match(r'goto ([0-9a-f]+)',instructions[i-1][1]) if trampoline else None
+    require(args and value and jump and value[1]==jump[1] and int(jump[2],16)==target
+            and (not trampoline or (skip and int(skip[1],16)==end)),
             'Offline biometric call lacks a forward skip branch')
     constants={}
-    for _,text in instructions[max(0,i-10):i-3]:
+    for _,text in instructions[max(0,i-width-7):i-width]:
         match=re.match(r'const-string(?:/jumbo)? (v\d+), "([^"]+)"',text)
         if match:
             constants[match[1]]=match[2]
