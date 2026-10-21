@@ -1,0 +1,10 @@
+--- a/TMessagesProj/src/main/java/org/telegram/messenger/UserConfig.java
++++ b/TMessagesProj/src/main/java/org/telegram/messenger/UserConfig.java
+@@ -272,6 +272,7 @@
+     }
+ 
+     public void setCurrentUser(TLRPC.User user) {
++        if (user == null) throw new IllegalArgumentException("USER_REQUIRED");
+         synchronized (sync) {
+             TLRPC.User oldUser = currentUser;
+             currentUser = user;

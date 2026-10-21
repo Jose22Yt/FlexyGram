@@ -1,0 +1,31 @@
+--- a/TMessagesProj/src/main/java/org/telegram/ui/LoginActivity.java
++++ b/TMessagesProj/src/main/java/org/telegram/ui/LoginActivity.java
+@@ -3185,7 +3185,7 @@
+                         settings.logout_tokens = new ArrayList<>();
+                     }
+                     if (BuildVars.DEBUG_VERSION) {
+-                        FileLog.d("login token to check " + new String(loginTokens.get(i).future_auth_token, StandardCharsets.UTF_8));
++                        FileLog.d("login token candidate available");
+                     }
+                     settings.logout_tokens.add(loginTokens.get(i).future_auth_token);
+                     if (settings.logout_tokens.size() >= 20) {
+@@ -10434,7 +10434,7 @@
+                             purpose.phone_number = phone;
+                             purpose.premium_days = premium_days;
+ 
+-                            FileLog.d("LoginBilling found \"" + product + "\" product, with currency=" + purpose.currency + " amount=" + purpose.amount + "; phone=" + phone + ", phone_code_hash=" + phoneHash);
++                            FileLog.d("LoginBilling product metadata received");
+ 
+                             final TLRPC.TL_payments_canPurchaseStore req = new TLRPC.TL_payments_canPurchaseStore();
+                             req.purpose = purpose;
+--- a/TMessagesProj/jni/tgnet/ConnectionsManager.cpp
++++ b/TMessagesProj/jni/tgnet/ConnectionsManager.cpp
+@@ -2243,7 +2243,7 @@
+                 request->awaitingIntegrityCheck = false;
+                 request->requestFlags &=~ RequestFlagFailOnServerErrors;
+ 
+-                if (LOGS_ENABLED) DEBUG_D("account%d: received integrity token, wrapping %s", instanceNum, token.c_str());
++                if (LOGS_ENABLED) DEBUG_D("account%d: received integrity result", instanceNum);
+ 
+                 processRequestQueue(request->connectionType, request->datacenterId);
+ 

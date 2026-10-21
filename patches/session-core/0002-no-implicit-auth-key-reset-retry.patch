@@ -1,0 +1,19 @@
+--- a/TMessagesProj/src/main/java/org/telegram/tgnet/ConnectionsManager.java
++++ b/TMessagesProj/src/main/java/org/telegram/tgnet/ConnectionsManager.java
+@@ -514,14 +514,8 @@
+                         final long delta = Math.max(0, (System.currentTimeMillis() - finalStartRequestTime) - ping_time);
+                         DefaultBandwidthMeter.getSingletonInstance(ApplicationLoader.applicationContext).onTransfer(size, delta);
+                     }
+-                    if (BuildVars.DEBUG_PRIVATE_VERSION && !getUserConfig().isClientActivated() && error != null && error.code == 400 && Objects.equals(error.text, "CONNECTION_NOT_INITED")) {
+-                        if (BuildVars.LOGS_ENABLED) {
+-                            FileLog.d("Cleanup keys for " + currentAccount + " because of CONNECTION_NOT_INITED");
+-                        }
+-                        cleanup(true);
+-                        sendRequest(normalizedObject, onComplete, onCompleteTimestamp, onQuickAck, onWriteToSocket, flags, datacenterId, connectionType, immediate);
+-                        return;
+-                    }
++                    // FlexyGram: do not reset auth keys or recursively retry without reviewed authorization.
++                    // Preserve the original error delivery below.
+                     if (resp != null) {
+                         resp.networkType = networkType;
+                     }
