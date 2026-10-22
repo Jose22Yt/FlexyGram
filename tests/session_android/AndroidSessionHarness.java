@@ -95,6 +95,23 @@ public final class AndroidSessionHarness {
         case "androidJournalCasConflict":{AndroidJournalBackend b=new AndroidJournalBackend(context,attestation(0).runtime);Record empty=b.read(scope(0)),one=new Record(scope(0),1,"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",Phase.STARTED);need(b.compareAndSet(empty,one));need(!new AndroidJournalBackend(context,attestation(0).runtime).compareAndSet(empty,one));need(b.read(scope(0)).equals(one));break;}
         case "androidJournalSeparateAccounts":{OperationJournal a0=new OperationJournal(new AndroidJournalBackend(context,attestation(0).runtime),scope(0)),a1=new OperationJournal(new AndroidJournalBackend(context,attestation(1).runtime),scope(1));a0.begin(false);need(a1.inspect().phase==Phase.NONE);a1.begin(false);need(!a0.inspect().operation.equals(a1.inspect().operation));break;}
         case "androidBackendWrongPackage":context.pkg="com.example.unapproved";denied(()->new AndroidJournalBackend(context,attestation(0).runtime));break;
+        case "androidProbeTrustedRootAlias":{
+            File alias=new File(args[1],"private-alias");Files.createSymbolicLink(alias.toPath(),context.getFilesDir().toPath());
+            ApplicationLoader.overrideFiles=alias;
+            need(new TelegramAccountAdapter(context,attestation(0)).inspect().evidence==AccountProbe.Evidence.EMPTY);
+            need(new TelegramAccountAdapter(context,attestation(1)).inspect().evidence==AccountProbe.Evidence.EMPTY);break;}
+        case "androidProbeAliasStillRejectsAuth":{
+            File alias=new File(args[1],"private-alias");Files.createSymbolicLink(alias.toPath(),context.getFilesDir().toPath());
+            ApplicationLoader.overrideFiles=alias;File f=new File(context.getFilesDir(),"tgnet.dat");Files.write(f.toPath(),new byte[]{1});
+            AccountProbe.Snapshot p=new TelegramAccountAdapter(context,attestation(0)).inspect();
+            need(p.evidence==AccountProbe.Evidence.NATIVE_FILES_PRESENT&&p.diagnostic==AccountProbe.Diagnostic.AUTH_FILES_PRESENT&&f.length()==1);break;}
+        case "androidProbeAccountRedirectRejected":{
+            Files.createSymbolicLink(new File(context.getFilesDir(),"account1").toPath(),context.getNoBackupFilesDir().toPath());
+            AccountProbe.Snapshot p=new TelegramAccountAdapter(context,attestation(1)).inspect();
+            need(p.evidence==AccountProbe.Evidence.UNAVAILABLE&&p.step==AccountProbe.Step.ACCOUNT_DIRECTORY);break;}
+        case "androidProbeSafeControllerDiagnostic":{
+            MessagesStorage.fail=true;AccountProbe.Snapshot p=new TelegramAccountAdapter(context,attestation(0)).inspect();
+            need(p.diagnostic==AccountProbe.Diagnostic.INITIALIZATION_FAILED&&p.step==AccountProbe.Step.STORAGE_HANDLE&&!p.toString().contains(CANARY));break;}
         case "androidProbeFixedSlot":{TelegramAccountAdapter p=new TelegramAccountAdapter(context,attestation(1));need(p.inspect().evidence==AccountProbe.Evidence.EMPTY&&UserConfig.selectedAccount==9);UserConfig.getInstance(0).active=true;need(p.inspect().evidence==AccountProbe.Evidence.EMPTY);UserConfig.getInstance(1).active=true;need(p.inspect().evidence==AccountProbe.Evidence.EXISTING_ACCOUNT);break;}
         case "androidProbePersistedUser":UserConfig.getInstance(0).keys.add("user");need(new TelegramAccountAdapter(context,attestation(0)).inspect().evidence==AccountProbe.Evidence.EXISTING_ACCOUNT);break;
         case "androidProbeBeforeStorageExisting":UserConfig.getInstance(0).keys.add("user");MessagesStorage.fail=true;need(new TelegramAccountAdapter(context,attestation(0)).inspect().evidence==AccountProbe.Evidence.EXISTING_ACCOUNT);break;

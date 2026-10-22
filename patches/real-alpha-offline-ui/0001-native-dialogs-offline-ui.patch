@@ -11,7 +11,7 @@
 @@ -3030,9 +3031,11 @@
              observersGroup.add(NotificationCenter.dialogTranslate);
          }
- 
+
 +        if (!closedOfflineProfile()) {
          loadDialogs(getAccountInstance());
          getMessagesController().getStoriesController().loadAllStories();
@@ -30,20 +30,20 @@
          } else {
 @@ -3057,15 +3061,21 @@
          }
- 
+
          BirthdayController.getInstance(currentAccount).check();
 +        }
          additionNavigationBarHeight = hasMainTabs && MainTabsLayout.isBottomNavigationVisible() && !MainTabsLayout.isBottomNavigationFloating() ? dp(app.exteraless.appearance.MainTabsUiHelper.getTabsViewHeightDp()) : 0;
          additionFloatingButtonOffset = hasMainTabs && MainTabsLayout.isBottomNavigationVisible() ? dp(app.exteraless.appearance.MainTabsUiHelper.getTabsFabOffsetDp()) : 0;
- 
+
 -        LastSeenHelper.preload();
 +        if (!closedOfflineProfile()) {
 +            LastSeenHelper.preload();
 +        }
- 
+
          return true;
      }
- 
+
      public static void loadDialogs(AccountInstance accountInstance) {
 +        if (closedOfflineProfile()) {
 +            return;
@@ -52,7 +52,7 @@
          if (!dialogsLoaded[currentAccount]) {
              MessagesController messagesController = accountInstance.getMessagesController();
 @@ -3202,6 +3212,9 @@
- 
+
      @Override
      public void onFragmentDestroy() {
 +        if (closedOfflineProfile() && searchViewPager != null && searchViewPager.dialogsSearchAdapter != null) {
@@ -62,7 +62,7 @@
          if (observersGroup != null) {
              observersGroup.removeAllObservers();
 @@ -3320,6 +3333,11 @@
- 
+
      @Override
      public void setTitleOverlayText(String title, int titleId, Runnable action) {
 +        if (isOfflineLabRoot()) {
@@ -120,7 +120,7 @@
 +            }
          }
      }
- 
+
 @@ -3523,7 +3582,7 @@
                  searching = false;
                  searchWas = false;
@@ -133,7 +133,7 @@
 @@ -4920,7 +4979,7 @@
              viewPage.dialogsAdapter.setArchivedPullDrawable(viewPage.pullForegroundDrawable);
              viewPage.listView.setAdapter(viewPage.dialogsAdapter);
- 
+
 -            viewPage.listView.setEmptyView(folderId == 0 && communityId == 0 ? viewPage.progressView : null);
 +            viewPage.listView.setEmptyView(offlineAwareEmptyView(viewPage, folderId == 0 && communityId == 0));
              viewPage.scrollHelper = new RecyclerAnimationScrollHelper(viewPage.listView, viewPage.layoutManager);
@@ -168,7 +168,7 @@
              for (int a = 0; a < viewPages.length; a++) {
 @@ -8090,6 +8155,9 @@
      }
- 
+
      private void checkListLoad(ViewPage viewPage, int firstVisibleItem, int lastVisibleItem, boolean loadAll) {
 +        if (isOfflineLabRoot()) {
 +            return;
@@ -177,7 +177,7 @@
              return;
          }
 @@ -10674,6 +10742,9 @@
- 
+
      @TargetApi(Build.VERSION_CODES.M)
      private void askForPermissons(boolean alert) {
 +        if (closedOfflineProfile()) {
@@ -187,7 +187,7 @@
          if (activity == null) {
              return;
 @@ -10756,6 +10827,9 @@
- 
+
      @Override
      public void onRequestPermissionsResultFragment(int requestCode, String[] permissions, int[] grantResults) {
 +        if (closedOfflineProfile()) {
@@ -226,7 +226,7 @@
 +++ b/TMessagesProj/src/main/java/org/telegram/ui/Adapters/DialogsAdapter.java
 @@ -1605,6 +1605,15 @@
      }
- 
+
      private void updateItemList() {
 +        if (parentFragment != null && parentFragment.isOfflineLabRoot()) {
 +            itemInternals.clear();
@@ -244,7 +244,7 @@
 +++ b/TMessagesProj/src/main/java/org/telegram/ui/Adapters/DialogsSearchAdapter.java
 @@ -380,6 +380,9 @@
      }
- 
+
      public void loadMoreSearchMessages() {
 +        if (org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha()) {
 +            return;
@@ -253,9 +253,9 @@
              return;
          }
 @@ -1101,11 +1104,105 @@
- 
+
      int waitingResponseCount;
- 
+
 +    private int offlineSearchGeneration;
 +    private boolean offlineSearchDestroyed;
 +
@@ -349,7 +349,7 @@
      private boolean globalResultsAllowed() {
          return allowGlobalSearch && !NaConfig.INSTANCE.getDisableGlobalSearch().Bool();
      }
- 
+
      public void searchDialogs(String text, int folderId, boolean allowPublicPosts) {
 +        if (org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha()) {
 +            searchOfflineDialogs(text, folderId);
@@ -394,3 +394,316 @@
              messagesCount = forceLoadingMessages ? 4 : 2;
          }
          if (!searchForumResultMessages.isEmpty() && !localMessagesSearchEndReached) {
+--- a/TMessagesProj/src/main/java/org/telegram/ui/Components/DialogsBotsAdapter.java
++++ b/TMessagesProj/src/main/java/org/telegram/ui/Components/DialogsBotsAdapter.java
+@@ -99,11 +99,12 @@
+                 .show();
+         }), true);
+         update(false);
+-        MediaDataController.getInstance(currentAccount).loadHints(true);
++        if (!org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha()) MediaDataController.getInstance(currentAccount).loadHints(true);
+     }
+
+     private int topPeersStart, topPeersEnd;
+     public void fillItems(ArrayList<UItem> items, UniversalAdapter adapter) {
++        if (org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha()) return;
+         HashSet<Long> uids = new HashSet<>();
+
+         if (!TextUtils.isEmpty(query)) {
+@@ -225,6 +226,7 @@
+     private int searchBotsId;
+     public String query;
+     private void searchMessages(boolean next) {
++        if (org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha()) return;
+         loadingMessages = true;
+         final int searchId = ++searchBotsId;
+         TLRPC.TL_messages_searchGlobal req = new TLRPC.TL_messages_searchGlobal();
+@@ -359,6 +361,7 @@
+
+     private Runnable searchMessagesRunnable = () -> searchMessages(false);
+     public void search(String query) {
++        if (org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha()) { this.query=query; update(false); return; }
+         if (TextUtils.equals(query, this.query)) return;
+         this.query = query;
+         AndroidUtilities.cancelRunOnUIThread(searchMessagesRunnable);
+@@ -390,6 +393,7 @@
+     }
+
+     public void searchMore() {
++        if (org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha()) return;
+         if (!hasMore || loadingMessages || TextUtils.isEmpty(this.query)) {
+             return;
+         }
+@@ -398,6 +402,7 @@
+
+     private boolean first = true;
+     public void checkBottom() {
++        if (org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha()) return;
+         if (!TextUtils.isEmpty(this.query)) {
+             if (hasMore && !loadingMessages && seesLoading()) {
+                 searchMore();
+--- a/TMessagesProj/src/main/java/org/telegram/ui/Components/DialogsChannelsAdapter.java
++++ b/TMessagesProj/src/main/java/org/telegram/ui/Components/DialogsChannelsAdapter.java
+@@ -75,6 +75,7 @@
+     }
+
+     public void fillItems(ArrayList<UItem> items, UniversalAdapter adapter) {
++        if (org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha()) return;
+         if (TextUtils.isEmpty(query)) {
+             if (myChannels != null && !myChannels.isEmpty()) {
+                 if (myChannels.size() > 5) {
+@@ -194,6 +195,7 @@
+     private int searchChannelsId;
+     public String query;
+     private void searchMessages(boolean next) {
++        if (org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha()) return;
+         loadingMessages = true;
+         final int searchId = ++searchChannelsId;
+         TLRPC.TL_messages_searchGlobal req = new TLRPC.TL_messages_searchGlobal();
+@@ -330,6 +332,7 @@
+
+     private final Runnable searchMessagesRunnable = () -> searchMessages(false);
+     public void search(String query) {
++        if (org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha()) { this.query=query; update(false); return; }
+         updateMyChannels();
+         if (TextUtils.equals(query, this.query)) return;
+         this.query = query;
+@@ -368,6 +371,7 @@
+     }
+
+     public void searchMore() {
++        if (org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha()) return;
+         if (!hasMore || loadingMessages || TextUtils.isEmpty(this.query)) {
+             return;
+         }
+@@ -385,6 +389,7 @@
+     }
+
+     public void checkBottom() {
++        if (org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha()) return;
+         if (!hasMore || loadingMessages || TextUtils.isEmpty(this.query) || listView == null)
+             return;
+         if (seesLoading()) {
+--- a/TMessagesProj/src/main/java/org/telegram/ui/Components/SearchViewPager.java
++++ b/TMessagesProj/src/main/java/org/telegram/ui/Components/SearchViewPager.java
+@@ -190,7 +190,7 @@
+                     lastSearchScrolledToTop = true;
+                 }
+                 if (getItemCount() == 0 && itemCount != 0 && !isSearching()) {
+-                    emptyView.showProgress(false, false);
++                    emptyView.showProgress(!org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha() && (false), false);
+                 }
+             }
+
+@@ -373,7 +373,7 @@
+         emptyView.subtitle.setVisibility(View.GONE);
+         emptyView.setVisibility(View.GONE);
+         emptyView.addView(loadingView, 0);
+-        emptyView.showProgress(true, false);
++        emptyView.showProgress(!org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha() && (true), false);
+
+         searchContainer = new FrameLayout(context);
+         searchContainer.addView(emptyView);
+@@ -421,7 +421,7 @@
+         channelsEmptyView.subtitle.setVisibility(View.GONE);
+         channelsEmptyView.setVisibility(View.GONE);
+         channelsEmptyView.addView(loadingView, 0);
+-        channelsEmptyView.showProgress(true, false);
++        channelsEmptyView.showProgress(!org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha() && (true), false);
+         channelsSearchContainer.addView(channelsEmptyView);
+         channelsSearchContainer.addView(channelsSearchListView);
+         channelsSearchListView.setEmptyView(channelsEmptyView);
+@@ -429,7 +429,7 @@
+             @Override
+             public void update(boolean animated) {
+                 super.update(animated);
+-                channelsEmptyView.showProgress(loadingMessages || loadingChannels || messages == null || !messages.isEmpty() || searchMyChannels == null || !searchMyChannels.isEmpty() || searchChannels == null || !searchChannels.isEmpty() || searchRecommendedChannels == null || !searchRecommendedChannels.isEmpty(), animated);
++                channelsEmptyView.showProgress(!org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha() && (loadingMessages || loadingChannels || messages == null || !messages.isEmpty() || searchMyChannels == null || !searchMyChannels.isEmpty() || searchChannels == null || !searchChannels.isEmpty() || searchRecommendedChannels == null || !searchRecommendedChannels.isEmpty()), animated);
+                 if (TextUtils.isEmpty(query)) {
+                     channelsEmptyView.title.setText(getString(R.string.NoChannelsTitle));
+                     channelsEmptyView.subtitle.setVisibility(View.VISIBLE);
+@@ -501,7 +501,7 @@
+         botsEmptyView.subtitle.setVisibility(View.GONE);
+         botsEmptyView.setVisibility(View.GONE);
+         botsEmptyView.addView(loadingView, 0);
+-        botsEmptyView.showProgress(true, false);
++        botsEmptyView.showProgress(!org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha() && (true), false);
+         botsSearchContainer.addView(botsEmptyView);
+         botsSearchContainer.addView(botsSearchListView);
+         botsSearchListView.setEmptyView(botsEmptyView);
+@@ -509,7 +509,7 @@
+             @Override
+             public void update(boolean animated) {
+                 super.update(animated);
+-                botsEmptyView.showProgress(loadingMessages || loadingBots || searchMessages == null || !searchMessages.isEmpty(), animated);
++                botsEmptyView.showProgress(!org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha() && (loadingMessages || loadingBots || searchMessages == null || !searchMessages.isEmpty()), animated);
+                 botsEmptyView.title.setText(getString(R.string.NoResult));
+                 botsEmptyView.subtitle.setVisibility(View.GONE);
+             }
+@@ -574,7 +574,7 @@
+         hashtagEmptyView.subtitle.setVisibility(View.GONE);
+         hashtagEmptyView.setVisibility(View.GONE);
+         hashtagEmptyView.addView(loadingView, 0);
+-        hashtagEmptyView.showProgress(true, false);
++        hashtagEmptyView.showProgress(!org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha() && (true), false);
+         hashtagSearchContainer.addView(hashtagEmptyView);
+         hashtagSearchContainer.addView(hashtagSearchListView);
+         hashtagSearchListView.setEmptyView(hashtagEmptyView);
+@@ -582,7 +582,7 @@
+             @Override
+             public void update(boolean animated) {
+                 super.update(animated);
+-                hashtagEmptyView.showProgress(false, animated);
++                hashtagEmptyView.showProgress(!org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha() && (false), animated);
+                 hashtagEmptyView.title.setText(getString(R.string.NoResult));
+                 hashtagEmptyView.subtitle.setVisibility(View.GONE);
+             }
+@@ -717,7 +717,7 @@
+         }
+
+         if (view == channelsSearchContainer) {
+-            MessagesController.getInstance(currentAccount).getChannelRecommendations(0);
++            if (!org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha()) MessagesController.getInstance(currentAccount).getChannelRecommendations(0);
+             channelsSearchAdapter.search(query);
+             channelsEmptyView.setKeyboardHeight(keyboardSize, false);
+         } else if (view == botsSearchContainer) {
+@@ -727,7 +727,7 @@
+                 botsSearchAdapter.checkBottom();
+             }
+         } else if (view == postsSearchContainer) {
+-            postsSearchContainer.search(query);
++            if (!org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha()) postsSearchContainer.search(query);
+         } else if (view == hashtagSearchContainer) {
+             if (hashtagSearchAdapter.getHashtag(query) == null) {
+                 return;
+@@ -735,7 +735,7 @@
+             if (reset) {
+                 hashtagSearchLayoutManager.scrollToPositionWithOffset(0, 0);
+             }
+-            hashtagSearchAdapter.search(query);
++            if (!org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha()) hashtagSearchAdapter.search(query);
+             hashtagEmptyView.setKeyboardHeight(keyboardSize, false);
+         } else if (view == searchContainer) {
+             if (dialogId == 0 && communityId == 0 && minDate == 0 && maxDate == 0 || forumDialogId != 0) {
+@@ -745,11 +745,11 @@
+                 noMediaFiltersSearchView.animate().setListener(null).cancel();
+                 noMediaFiltersSearchView.setDelegate(null, false);
+                 if (reset) {
+-                    emptyView.showProgress(!dialogsSearchAdapter.isSearching(), false);
+-                    emptyView.showProgress(dialogsSearchAdapter.isSearching(), false);
++                    emptyView.showProgress(!org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha() && (!dialogsSearchAdapter.isSearching()), false);
++                    emptyView.showProgress(!org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha() && (dialogsSearchAdapter.isSearching()), false);
+                 } else {
+                     if (!dialogsSearchAdapter.hasRecentSearch()) {
+-                        emptyView.showProgress(dialogsSearchAdapter.isSearching(), true);
++                        emptyView.showProgress(!org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha() && (dialogsSearchAdapter.isSearching()), true);
+                     }
+                 }
+                 if (reset) {
+@@ -1457,7 +1457,7 @@
+     @Override
+     public void didReceivedNotification(int id, int account, Object... args) {
+         if (id == NotificationCenter.channelRecommendationsLoaded) {
+-            channelsEmptyView.showProgress(MessagesController.getInstance(currentAccount).getChannelRecommendations(0) != null, true);
++            channelsEmptyView.showProgress(!org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha() && (MessagesController.getInstance(currentAccount).getChannelRecommendations(0) != null), true);
+             channelsSearchAdapter.updateMyChannels();
+             channelsSearchAdapter.update(true);
+         } else if (id == NotificationCenter.dialogDeleted || id == NotificationCenter.dialogsNeedReload) {
+--- a/TMessagesProj/src/main/java/org/telegram/ui/FilteredSearchView.java
++++ b/TMessagesProj/src/main/java/org/telegram/ui/FilteredSearchView.java
+@@ -589,6 +589,20 @@
+             AndroidUtilities.cancelRunOnUIThread(searchRunnable);
+         }
+         AndroidUtilities.cancelRunOnUIThread(clearCurrentResultsRunnable);
++        if (org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha()) {
++            requestIndex++; // Invalidate any delayed completion without scheduling a request.
++            messages.clear(); messagesById.clear(); sections.clear(); sectionArrays.clear();
++            localTipChats.clear(); localTipDates.clear();
++            isLoading=false; firstLoading=false; endReached=true; totalCount=0;
++            lastSearchFilterQueryString=currentSearchFilterQueryString;
++            emptyView.title.setText(LocaleController.getString(R.string.NoResult));
++            emptyView.subtitle.setVisibility(View.GONE);
++            emptyView.showProgress(false, false);
++            loadingView.setVisibility(View.GONE);
++            if (adapter != null) adapter.notifyDataSetChanged();
++            emptyView.setVisibility(View.VISIBLE);
++            return;
++        }
+         if (filterAndQueryIsSame && clearOldResults) {
+             return;
+         }
+--- a/TMessagesProj/src/main/java/org/telegram/ui/Components/HashtagsSearchAdapter.java
++++ b/TMessagesProj/src/main/java/org/telegram/ui/Components/HashtagsSearchAdapter.java
+@@ -30,6 +30,7 @@
+
+     private boolean hadStories;
+     public void fillItems(ArrayList<UItem> items, UniversalAdapter adapter) {
++        if (org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha()) return;
+         boolean hasStories = hasList && list != null && list.getLoadedCount() > 0;
+         if (hasStories) {
+             items.add(MessagesSearchAdapter.StoriesView.Factory.asStoriesList(list));
+@@ -75,6 +76,7 @@
+     private final boolean[] cashtag = new boolean[1];
+
+     public void search(String query) {
++        if (org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha()) return;
+         lastQuery = query;
+         final String hashtag = getHashtag(query, cashtag);
+         if (!TextUtils.equals(this.hashtagQuery, hashtag)) {
+@@ -179,6 +181,7 @@
+
+
+     public void checkBottom() {
++        if (org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha()) return;
+         if (!TextUtils.isEmpty(lastQuery)) {
+             if (!endReached && !loading && seesLoading()) {
+                 search(lastQuery);
+--- a/TMessagesProj/src/main/java/org/telegram/ui/Components/PostsSearchContainer.java
++++ b/TMessagesProj/src/main/java/org/telegram/ui/Components/PostsSearchContainer.java
+@@ -201,6 +201,7 @@
+     }
+
+     private void load(final boolean pay) {
++        if (org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha()) return;
+         if (loading) return;
+
+         final boolean news = TextUtils.isEmpty(lastQuery);
+@@ -365,6 +366,7 @@
+
+     private int queryid = 0;
+     public void search(String q) {
++        if (org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha()) { lastQuery=q; updateEmptyView(); listView.adapter.update(false); return; }
+         if (TextUtils.equals(lastQuery, q))
+             return;
+
+@@ -395,6 +397,7 @@
+     private int floodLoadingRequestId = -1;
+
+     private void loadFlood(String query) {
++        if (org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha()) return;
+         if (floodLoadingRequestId >= 0) {
+             ConnectionsManager.getInstance(currentAccount).cancelRequest(floodLoadingRequestId, true);
+             floodLoadingRequestId = -1;
+@@ -441,6 +444,7 @@
+
+     private boolean isEmpty;
+     private void fillItems(ArrayList<UItem> items, UniversalAdapter adapter) {
++        if (org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha()) { isEmpty=true; return; }
+         if (flood == null) {
+             items.add(UItem.asFlicker(-1, FlickerLoadingView.DIALOG_CELL_TYPE));
+             items.add(UItem.asFlicker(-2, FlickerLoadingView.DIALOG_CELL_TYPE));
+@@ -498,6 +502,14 @@
+     private final Runnable updateEmptyViewRunnable = this::updateEmptyView;
+     private void updateEmptyView() {
+         AndroidUtilities.cancelRunOnUIThread(updateEmptyViewRunnable);
++        if (org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha()) {
++            emptyImageView.setVisibility(View.GONE);
++            emptyTitleView.setText(getString(R.string.NoResult));
++            emptyTextView.setVisibility(View.GONE);
++            emptyButton.setVisibility(View.GONE);
++            emptyUnderButtonTextView.setVisibility(View.GONE);
++            return;
++        }
+         final int now = ConnectionsManager.getInstance(currentAccount).getCurrentTime();
+         if (!UserConfig.getInstance(currentAccount).isPremium()) {
+             emptyImageView.setVisibility(View.GONE);

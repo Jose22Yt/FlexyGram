@@ -12,7 +12,31 @@
     "org/telegram/ui/Adapters/DialogsSearchAdapter.java": {
       "original_sha256": "4f2ee4f745f25fd668d24ef1343f37ee2a850fee7577748c2e891804b3a6a0cd",
       "overlay_sha256": "99f93146488dbe6bde33a816ccb351002502f49f4087144c6601c6575cccd0a5"
+    },
+    "org/telegram/ui/Components/DialogsBotsAdapter.java": {
+      "original_sha256": "eabb8537ce3bc6f7d824b1ec6ebdcb050bc31cb40f47c5d77e2097217554bb2b",
+      "overlay_sha256": "003565b73a645183ac60bde9be6ea2ddb3fc9718c23aca8bf2041232eee34845"
+    },
+    "org/telegram/ui/Components/DialogsChannelsAdapter.java": {
+      "original_sha256": "94a2748f62a044e972b1cb609507c08884b8ca2af61b0b4443bfb72f1e534d42",
+      "overlay_sha256": "45b9c4ea72450e3cc04a4f0c7398169f739723c54d0cde5705287d8114550743"
+    },
+    "org/telegram/ui/Components/SearchViewPager.java": {
+      "original_sha256": "486f0c3bd29f3424396e0145c59aaecc07d0930303b51e1c2a769895ea154753",
+      "overlay_sha256": "135d1f6205f51fccb31233e1171a1e5994a949aec518c1b6f3037c9e37e79295"
+    },
+    "org/telegram/ui/FilteredSearchView.java": {
+      "original_sha256": "62b48789b00dbe38cd751b6e08413bffcf346574a90f37ba32838b36608852a5",
+      "overlay_sha256": "15d26e982716f280514e275bd9d2ef4f3562bb335ce7bccc24c053f9f6e65d72"
+    },
+    "org/telegram/ui/Components/HashtagsSearchAdapter.java": {
+      "original_sha256": "1063ce24fc801f145fdab49c67b7c0f3e50e311b04ff4784b7eaf7177723a344",
+      "overlay_sha256": "213573a046ee089f332364913dcb39aa7389b200a508ccccf6eaafd9155bcee9"
+    },
+    "org/telegram/ui/Components/PostsSearchContainer.java": {
+      "original_sha256": "110230a44d0f09f195869fdfddfd0b2c553d980db53af90520627b6b7346ac54",
+      "overlay_sha256": "21670d601a5724c46523111f01de0f00e547a6bf55038ffcc14a25d263407a0b"
     }
   },
-  "patch_sha256": "5e6446c073817f605b641f200cc5f81e6fe2a4c258bb2e41aabcc19d42062f52"
+  "patch_sha256": "24d146b9951b52485f2117169b6f2bfea684229c200e05e06a95af2f4f681ed6"
 }

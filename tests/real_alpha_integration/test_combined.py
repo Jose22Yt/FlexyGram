@@ -88,7 +88,7 @@ if (flavor != 'realAlpha' || builder.buildType != 'debug')"""
     def test_full_handoff_passes_with_explicit_non_android_receipt(self):
         receipt = gate.inspect(self.root)
         self.assertEqual(receipt['result'], 'PASS')
-        self.assertEqual(receipt['checked_generated_java'], 7)
+        self.assertEqual(receipt['checked_generated_java'], 13)
         self.assertFalse(receipt['android_compiled'])
         self.assertFalse(receipt['signed'])
 

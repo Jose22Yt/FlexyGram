@@ -10,8 +10,7 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[2]
 OUTPUT = Path('TMessagesProj/build/generated/flexygram-offline-dialogs-ui/java')
 PATCH = Path('patches/real-alpha-offline-ui/0001-native-dialogs-offline-ui.patch')
-SOURCES = ('org/telegram/ui/DialogsActivity.java', 'org/telegram/ui/Adapters/DialogsAdapter.java',
-           'org/telegram/ui/Adapters/DialogsSearchAdapter.java')
+SOURCES = ('org/telegram/ui/DialogsActivity.java', 'org/telegram/ui/Adapters/DialogsAdapter.java', 'org/telegram/ui/Adapters/DialogsSearchAdapter.java', 'org/telegram/ui/Components/DialogsBotsAdapter.java', 'org/telegram/ui/Components/DialogsChannelsAdapter.java', 'org/telegram/ui/Components/SearchViewPager.java', 'org/telegram/ui/FilteredSearchView.java', 'org/telegram/ui/Components/HashtagsSearchAdapter.java', 'org/telegram/ui/Components/PostsSearchContainer.java')
 
 def digest(data):
     return hashlib.sha256(data).hexdigest()

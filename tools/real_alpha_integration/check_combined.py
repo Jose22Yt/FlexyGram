@@ -18,9 +18,7 @@ OFFLINE_ROOT = Path('TMessagesProj/build/generated/flexygram-offline-dialogs-ui/
 MAIN_ROOT = Path('TMessagesProj/src/main/java')
 ALPHA_ROOT = Path('TMessagesProj/src/realAlpha/java')
 OFFLINE_PATCH = Path('patches/real-alpha-offline-ui/0001-native-dialogs-offline-ui.patch')
-EXPECTED_OFFLINE = frozenset(('org/telegram/ui/DialogsActivity.java',
-    'org/telegram/ui/Adapters/DialogsAdapter.java',
-    'org/telegram/ui/Adapters/DialogsSearchAdapter.java'))
+EXPECTED_OFFLINE = frozenset(('org/telegram/ui/DialogsActivity.java', 'org/telegram/ui/Adapters/DialogsAdapter.java', 'org/telegram/ui/Adapters/DialogsSearchAdapter.java', 'org/telegram/ui/Components/DialogsBotsAdapter.java', 'org/telegram/ui/Components/DialogsChannelsAdapter.java', 'org/telegram/ui/Components/SearchViewPager.java', 'org/telegram/ui/FilteredSearchView.java', 'org/telegram/ui/Components/HashtagsSearchAdapter.java', 'org/telegram/ui/Components/PostsSearchContainer.java'))
 EXPECTED_ALPHA = frozenset(('org/telegram/ui/realalpha/RealAlphaActivity.java',
     'org/telegram/ui/realalpha/RealAlphaBootstrap.java',
     'org/telegram/ui/realalpha/RealAlphaPolicy.java'))
@@ -150,7 +148,7 @@ def inspect(root, generated=True):
             if seen != expected_paths:
                 fail('GENERATED_SOURCE_INVENTORY_CHANGED:' + location.as_posix())
     return {'result': 'PASS', 'scope': 'realAlphaDebug + local login + offline UI',
-            'checked_original_java': 7, 'checked_generated_java': 7 if generated else 0,
+            'checked_original_java': len(EXPECTED_OFFLINE)+4, 'checked_generated_java': len(EXPECTED_OFFLINE)+4 if generated else 0,
             'materialized_sources_checked': generated, 'android_compiled': False,
             'signed': False, 'network_required': False}
 
