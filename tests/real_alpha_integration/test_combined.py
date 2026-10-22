@@ -53,7 +53,10 @@ file('src/realAlphaLocalLogin/java')
 sourceSets.realAlpha.java.setSrcDirs(
 if (localLoginPagesEnabled && startupDiagnosticsEnabled)
 if (localLoginPagesEnabled && !(flavor == 'realAlpha' && builder.buildType == 'debug'))
-apply from: rootProject.file("gradle/real-alpha-offline-ui.gradle")"""
+apply from: rootProject.file("gradle/real-alpha-offline-ui.gradle")
+if (localLoginPagesEnabled && providers.gradleProperty('flexygramOfflineDialogsUi').orNull == 'true')
+tasks.register('verifyCombinedRealAlphaSources', Exec)
+tasks.named('preBuild').configure { dependsOn verifyCombinedRealAlphaSources }"""
         overlay_gradle = """providers.gradleProperty('flexygramOfflineDialogsUi').orNull == 'true'
 providers.gradleProperty('flexygramRealAlpha').orNull != 'true'
 providers.gradleProperty('flexygramRealAlphaStartupDiagnostics').orNull == 'true'
@@ -115,6 +118,12 @@ if (flavor != 'realAlpha' || builder.buildType != 'debug')"""
         path = self.root / 'gradle/real-alpha-offline-ui.gradle'
         path.write_text(path.read_text().replace("if (flavor != 'realAlpha' || builder.buildType != 'debug')", ''))
         with self.assertRaisesRegex(gate.PreflightError, 'MISSING_OFFLINE_GRADLE_GUARD'):
+            gate.inspect(self.root)
+
+    def test_rejects_removed_automatic_combined_gate(self):
+        path = self.root / 'TMessagesProj/build.gradle'
+        path.write_text(path.read_text().replace("tasks.register('verifyCombinedRealAlphaSources', Exec)", ''))
+        with self.assertRaisesRegex(gate.PreflightError, 'MISSING_LOCAL_LOGIN_GRADLE_GUARD'):
             gate.inspect(self.root)
 
     def test_rejects_malicious_inventory_expansion(self):
