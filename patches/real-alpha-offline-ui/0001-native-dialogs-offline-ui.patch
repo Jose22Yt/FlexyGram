@@ -1,0 +1,396 @@
+--- a/TMessagesProj/src/main/java/org/telegram/ui/DialogsActivity.java
++++ b/TMessagesProj/src/main/java/org/telegram/ui/DialogsActivity.java
+@@ -396,6 +396,7 @@
+         private int dialogsType;
+         private int archivePullViewState;
+         private FlickerLoadingView progressView;
++        private TextView offlineEmptyView;
+         private int lastItemsCount;
+         private DialogsItemAnimator dialogsItemAnimator;
+         private RecyclerItemsEnterAnimator recyclerItemsEnterAnimator;
+@@ -3030,9 +3031,11 @@
+             observersGroup.add(NotificationCenter.dialogTranslate);
+         }
+ 
++        if (!closedOfflineProfile()) {
+         loadDialogs(getAccountInstance());
+         getMessagesController().getStoriesController().loadAllStories();
+         getMessagesController().loadPinnedDialogs(folderId, 0, null);
++        }
+         if (databaseMigrationHint != null && !getMessagesStorage().isDatabaseMigrationInProgress()) {
+             View localView = databaseMigrationHint;
+             if (localView.getParent() != null) {
+@@ -3040,6 +3043,7 @@
+             }
+             databaseMigrationHint = null;
+         }
++        if (!closedOfflineProfile()) {
+         if (isArchive()) {
+             getMessagesController().getStoriesController().loadHiddenStories();
+         } else {
+@@ -3057,15 +3061,21 @@
+         }
+ 
+         BirthdayController.getInstance(currentAccount).check();
++        }
+         additionNavigationBarHeight = hasMainTabs && MainTabsLayout.isBottomNavigationVisible() && !MainTabsLayout.isBottomNavigationFloating() ? dp(app.exteraless.appearance.MainTabsUiHelper.getTabsViewHeightDp()) : 0;
+         additionFloatingButtonOffset = hasMainTabs && MainTabsLayout.isBottomNavigationVisible() ? dp(app.exteraless.appearance.MainTabsUiHelper.getTabsFabOffsetDp()) : 0;
+ 
+-        LastSeenHelper.preload();
++        if (!closedOfflineProfile()) {
++            LastSeenHelper.preload();
++        }
+ 
+         return true;
+     }
+ 
+     public static void loadDialogs(AccountInstance accountInstance) {
++        if (closedOfflineProfile()) {
++            return;
++        }
+         int currentAccount = accountInstance.getCurrentAccount();
+         if (!dialogsLoaded[currentAccount]) {
+             MessagesController messagesController = accountInstance.getMessagesController();
+@@ -3202,6 +3212,9 @@
+ 
+     @Override
+     public void onFragmentDestroy() {
++        if (closedOfflineProfile() && searchViewPager != null && searchViewPager.dialogsSearchAdapter != null) {
++            searchViewPager.dialogsSearchAdapter.cancelOfflineSearch();
++        }
+         super.onFragmentDestroy();
+         if (observersGroup != null) {
+             observersGroup.removeAllObservers();
+@@ -3320,6 +3333,11 @@
+ 
+     @Override
+     public void setTitleOverlayText(String title, int titleId, Runnable action) {
++        if (isOfflineLabRoot()) {
++            title = "FlexyGramOfflineDialogsTitle";
++            titleId = R.string.FlexyGramOfflineDialogsTitle;
++            action = null;
++        }
+         super.setTitleOverlayText(title, titleId, action);
+         if (actionBar != null && selectAnimatedEmojiDialog != null && selectAnimatedEmojiDialog.getContentView() instanceof SelectAnimatedEmojiDialog) {
+             SimpleTextView textView = actionBar.getTitleTextView();
+@@ -3327,6 +3345,47 @@
+         }
+         if (dialogStoriesCell != null) {
+             dialogStoriesCell.setTitleOverlayText(title, titleId);
++        }
++    }
++
++    // This UI overlay is compiled only by an explicit, closed realAlpha build.
++    private static boolean closedOfflineProfile() {
++        return org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha();
++    }
++
++    public boolean isOfflineLabRoot() {
++        return closedOfflineProfile() && !onlySelect && folderId == 0 && communityId == 0
++                && initialDialogsType == DIALOGS_TYPE_DEFAULT && delegate == null && searchString == null;
++    }
++
++    private View offlineAwareEmptyView(ViewPage page, boolean eligible) {
++        if (!isOfflineLabRoot()) {
++            return eligible ? page.progressView : null;
++        }
++        if (page.offlineEmptyView == null) {
++            TextView label = new TextView(page.getContext());
++            label.setGravity(Gravity.CENTER);
++            label.setTextSize(16);
++            label.setPadding(dp(24), dp(24), dp(24), dp(24));
++            label.setVisibility(View.GONE);
++            label.setClickable(false);
++            label.setFocusable(false);
++            page.offlineEmptyView = label;
++            page.addView(label, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
++        }
++        page.offlineEmptyView.setText(LocaleController.getString(R.string.FlexyGramOfflineDialogsEmpty));
++        page.offlineEmptyView.setTextColor(getThemedColor(Theme.key_emptyListPlaceholder));
++        page.progressView.setVisibility(View.GONE);
++        return page.offlineEmptyView;
++    }
++
++    private void refreshOfflineEmptyViews() {
++        if (isOfflineLabRoot() && viewPages != null) {
++            for (ViewPage page : viewPages) {
++                if (page != null && page.listView != null) {
++                    page.listView.setEmptyView(offlineAwareEmptyView(page, true));
++                }
++            }
+         }
+     }
+ 
+@@ -3523,7 +3582,7 @@
+                 searching = false;
+                 searchWas = false;
+                 if (viewPages[0] != null) {
+-                    viewPages[0].listView.setEmptyView(folderId == 0 ? viewPages[0].progressView : null);
++                    viewPages[0].listView.setEmptyView(offlineAwareEmptyView(viewPages[0], folderId == 0));
+                     showSearch(false, false, true);
+                 }
+                 updateFilterTabs(false, true);
+@@ -4920,7 +4979,7 @@
+             viewPage.dialogsAdapter.setArchivedPullDrawable(viewPage.pullForegroundDrawable);
+             viewPage.listView.setAdapter(viewPage.dialogsAdapter);
+ 
+-            viewPage.listView.setEmptyView(folderId == 0 && communityId == 0 ? viewPage.progressView : null);
++            viewPage.listView.setEmptyView(offlineAwareEmptyView(viewPage, folderId == 0 && communityId == 0));
+             viewPage.scrollHelper = new RecyclerAnimationScrollHelper(viewPage.listView, viewPage.layoutManager);
+             viewPage.scrollHelper.forceUseStableId = true;
+             viewPage.scrollHelper.isDialogs = true;
+@@ -7310,12 +7369,13 @@
+         if (commentView != null) {
+             commentView.onResume();
+         }
+-        if (!onlySelect && folderId == 0 && communityId == 0) {
++        if (!closedOfflineProfile() && !onlySelect && folderId == 0 && communityId == 0) {
+             getMediaDataController().checkStickers(MediaDataController.TYPE_EMOJI);
+         }
+         if (searchViewPager != null) {
+             searchViewPager.onResume();
+         }
++        if (!closedOfflineProfile()) {
+         final boolean tosAccepted;
+         if (!afterSignup) {
+             tosAccepted = getUserConfig().unacceptedTermsOfService == null;
+@@ -7418,6 +7478,11 @@
+                     .create());
+             }
+         }
++        }
++        refreshOfflineEmptyViews();
++        if (isOfflineLabRoot()) {
++            setTitleOverlayText(null, 0, null);
++        }
+         showFiltersHint();
+         if (viewPages != null) {
+             for (int a = 0; a < viewPages.length; a++) {
+@@ -8090,6 +8155,9 @@
+     }
+ 
+     private void checkListLoad(ViewPage viewPage, int firstVisibleItem, int lastVisibleItem, boolean loadAll) {
++        if (isOfflineLabRoot()) {
++            return;
++        }
+         if (tabsAnimationInProgress || startedTracking || filterTabsView != null && filterTabsView.getVisibility() == View.VISIBLE && filterTabsView.isAnimatingIndicator()) {
+             return;
+         }
+@@ -10674,6 +10742,9 @@
+ 
+     @TargetApi(Build.VERSION_CODES.M)
+     private void askForPermissons(boolean alert) {
++        if (closedOfflineProfile()) {
++            return;
++        }
+         Activity activity = getParentActivity();
+         if (activity == null) {
+             return;
+@@ -10756,6 +10827,9 @@
+ 
+     @Override
+     public void onRequestPermissionsResultFragment(int requestCode, String[] permissions, int[] grantResults) {
++        if (closedOfflineProfile()) {
++            return;
++        }
+         if (requestCode == 1) {
+             for (int a = 0; a < permissions.length; a++) {
+                 if (grantResults.length <= a) {
+@@ -10833,7 +10907,7 @@
+             }
+         }
+         try {
+-            viewPage.listView.setEmptyView(folderId == 0 && communityId == 0 ? viewPage.progressView : null);
++            viewPage.listView.setEmptyView(offlineAwareEmptyView(viewPage, folderId == 0 && communityId == 0));
+         } catch (Exception e) {
+             FileLog.e(e);
+         }
+@@ -11080,7 +11154,7 @@
+             showNextSupportedSuggestion();
+             updateDialogsHint();
+             checkEmailConfig();
+-        } else if (id == NotificationCenter.forceImportContactsStart) {
++        } else if (id == NotificationCenter.forceImportContactsStart && !closedOfflineProfile()) {
+             if (floatingButton3 != null) {
+                 floatingButton3.setProgressVisible(true, true);
+             }
+@@ -12410,6 +12484,7 @@
+     @Override
+     public ArrayList<ThemeDescription> getThemeDescriptions() {
+         ThemeDescription.ThemeDescriptionDelegate cellDelegate = () -> {
++            refreshOfflineEmptyViews();
+             for (int b = 0; b < 3; b++) {
+                 RecyclerListView list;
+                 if (b == 2) {
+--- a/TMessagesProj/src/main/java/org/telegram/ui/Adapters/DialogsAdapter.java
++++ b/TMessagesProj/src/main/java/org/telegram/ui/Adapters/DialogsAdapter.java
+@@ -1605,6 +1605,15 @@
+     }
+ 
+     private void updateItemList() {
++        if (parentFragment != null && parentFragment.isOfflineLabRoot()) {
++            itemInternals.clear();
++            dialogsCount = 0;
++            isEmpty = true;
++            hasHints = false;
++            onlineContacts = null;
++            forceUpdatingContacts = false;
++            return;
++        }
+         if (communityId != 0) {
+             updateItemListForCommunity();
+             return;
+--- a/TMessagesProj/src/main/java/org/telegram/ui/Adapters/DialogsSearchAdapter.java
++++ b/TMessagesProj/src/main/java/org/telegram/ui/Adapters/DialogsSearchAdapter.java
+@@ -380,6 +380,9 @@
+     }
+ 
+     public void loadMoreSearchMessages() {
++        if (org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha()) {
++            return;
++        }
+         if (reqForumId != 0 && reqId != 0) {
+             return;
+         }
+@@ -1101,11 +1104,105 @@
+ 
+     int waitingResponseCount;
+ 
++    private int offlineSearchGeneration;
++    private boolean offlineSearchDestroyed;
++
++    public void cancelOfflineSearch() {
++        if (!org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha()) {
++            return;
++        }
++        offlineSearchDestroyed = true;
++        offlineSearchGeneration++;
++        waitingResponseCount = 0;
++        if (searchRunnable != null) {
++            Utilities.searchQueue.cancelRunnable(searchRunnable);
++            searchRunnable = null;
++        }
++        delegate = null;
++        filtersDelegate = null;
++    }
++
++    // Use the existing local database and native result views, without waiting for
++    // the remote search/message/public-post callbacks disabled by this profile.
++    private void searchOfflineDialogs(String text, int folderId) {
++        if (offlineSearchDestroyed) {
++            return;
++        }
++        final int generation = ++offlineSearchGeneration;
++        if (searchRunnable != null) {
++            Utilities.searchQueue.cancelRunnable(searchRunnable);
++            searchRunnable = null;
++        }
++        lastSearchText = text;
++        this.folderId = folderId;
++        final String query = text == null ? "" : text.trim().toLowerCase(java.util.Locale.ROOT);
++        filterRecent(query);
++        searchAdapterHelper.clear();
++        searchResult.clear();
++        searchResultNames.clear();
++        searchResultMessages.clear();
++        searchForumResultMessages.clear();
++        searchResultHashtags.clear();
++        searchTopics.clear();
++        publicPosts.clear();
++        publicPostsTotalCount = 0;
++        publicPostsLastRate = 0;
++        publicPostsHashtag = null;
++        forceLoadingMessages = false;
++        messagesSearchEndReached = true;
++        localMessagesSearchEndReached = true;
++        searchWas = !query.isEmpty();
++        waitingResponseCount = searchWas && needMessagesSearch != 2 ? 1 : 0;
++        notifyDataSetChanged();
++        if (delegate != null) {
++            delegate.searchStateChanged(waitingResponseCount != 0, false);
++        }
++        if (waitingResponseCount == 0) {
++            return;
++        }
++        searchRunnable = () -> {
++            searchRunnable = null;
++            MessagesStorage.getInstance(currentAccount).getStorageQueue().postRunnable(() -> {
++                ArrayList<Object> results = new ArrayList<>();
++                ArrayList<CharSequence> names = new ArrayList<>();
++                ArrayList<TLRPC.User> users = new ArrayList<>();
++                try {
++                    MessagesStorage.getInstance(currentAccount).localSearch(dialogsType, query, results, names, users, filterDialogIds, -1);
++                } catch (RuntimeException error) {
++                    results.clear();
++                    names.clear();
++                    FileLog.e("Offline dialogs local search failed: " + error.getClass().getSimpleName());
++                }
++                AndroidUtilities.runOnUIThread(() -> {
++                    if (offlineSearchDestroyed || generation != offlineSearchGeneration) {
++                        return;
++                    }
++                    waitingResponseCount = 0;
++                    for (int i = 0; i < results.size(); i++) {
++                        if (filter(results.get(i))) {
++                            searchResult.add(results.get(i));
++                            searchResultNames.add(names.get(i));
++                        }
++                    }
++                    notifyDataSetChanged();
++                    if (delegate != null) {
++                        delegate.searchStateChanged(false, false);
++                    }
++                });
++            });
++        };
++        Utilities.searchQueue.postRunnable(searchRunnable, 300);
++    }
++
+     private boolean globalResultsAllowed() {
+         return allowGlobalSearch && !NaConfig.INSTANCE.getDisableGlobalSearch().Bool();
+     }
+ 
+     public void searchDialogs(String text, int folderId, boolean allowPublicPosts) {
++        if (org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha()) {
++            searchOfflineDialogs(text, folderId);
++            return;
++        }
+         searchAdapterHelper.setAllowGlobalResults(globalResultsAllowed());
+         if (text != null && text.equals(lastSearchText) && (folderId == this.folderId || TextUtils.isEmpty(text))) {
+             return;
+@@ -1423,7 +1520,7 @@
+             localMessagesLoadingRow = count;
+         }
+         int messagesCount = searchResultMessages.size();
+-        if ((currentMessagesFilter != Filter.All || forceLoadingMessages) && searchResultMessages.isEmpty()) {
++        if (!org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha() && (currentMessagesFilter != Filter.All || forceLoadingMessages) && searchResultMessages.isEmpty()) {
+             messagesCount = forceLoadingMessages ? 3 : 1;
+         }
+         if (!searchForumResultMessages.isEmpty() && !localMessagesSearchEndReached) {
+@@ -1609,7 +1706,7 @@
+         }
+         i -= localMessagesCount;
+         int messagesCount = searchResultMessages.isEmpty() ? 0 : searchResultMessages.size() + 1;
+-        if ((currentMessagesFilter != Filter.All || forceLoadingMessages) && searchResultMessages.isEmpty()) {
++        if (!org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha() && (currentMessagesFilter != Filter.All || forceLoadingMessages) && searchResultMessages.isEmpty()) {
+             messagesCount = forceLoadingMessages ? 4 : 2;
+         }
+         if (i > 0 && i < messagesCount) {
+@@ -2015,7 +2112,7 @@
+                     int globalCount = globalSearch.isEmpty() && sponsoredPeers.isEmpty() ? 0 : globalSearchCount + sponsoredPeers.size() + 1;
+                     int localMessagesCount = searchForumResultMessages.isEmpty() ? 0 : searchForumResultMessages.size() + 1;
+                     int messagesCount = searchResultMessages.isEmpty() ? 0 : searchResultMessages.size() + 1;
+-                    if ((currentMessagesFilter != Filter.All || forceLoadingMessages) && searchResultMessages.isEmpty()) {
++                    if (!org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha() && (currentMessagesFilter != Filter.All || forceLoadingMessages) && searchResultMessages.isEmpty()) {
+                         messagesCount = forceLoadingMessages ? 4 : 2;
+                     }
+                     String title = null;
+@@ -2285,7 +2382,7 @@
+         }
+         int globalCount = sponsoredPeers.isEmpty() && globalSearch.isEmpty() ? 0 : globalSearchCount + sponsoredPeers.size() + 1;
+         int messagesCount = searchResultMessages.isEmpty() ? 0 : searchResultMessages.size() + 1;
+-        if ((currentMessagesFilter != Filter.All || forceLoadingMessages) && searchResultMessages.isEmpty()) {
++        if (!org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha() && (currentMessagesFilter != Filter.All || forceLoadingMessages) && searchResultMessages.isEmpty()) {
+             messagesCount = forceLoadingMessages ? 4 : 2;
+         }
+         if (!searchForumResultMessages.isEmpty() && !localMessagesSearchEndReached) {
