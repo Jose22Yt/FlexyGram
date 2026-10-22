@@ -1,0 +1,29 @@
+test_actual_gradle_overlay_dsl_with_explicit_model (test_offline_ui.OfflineUiTests.test_actual_gradle_overlay_dsl_with_explicit_model) ... ok
+test_complete_overlay_java_parses (test_offline_ui.OfflineUiTests.test_complete_overlay_java_parses) ... ok
+test_destroy_cancels_only_local_work_before_original_cleanup (test_offline_ui.OfflineUiTests.test_destroy_cancels_only_local_work_before_original_cleanup) ... ok
+test_direct_permission_callbacks_are_guarded (test_offline_ui.OfflineUiTests.test_direct_permission_callbacks_are_guarded) ... ok
+test_empty_adapter_guard_executes_without_controller_flags (test_offline_ui.OfflineUiTests.test_empty_adapter_guard_executes_without_controller_flags) ... ok
+test_legacy_loading_source_guard_preserves_original_body (test_offline_ui.OfflineUiTests.test_legacy_loading_source_guard_preserves_original_body) ... ok
+test_materializer_idempotent_and_shared_sources_unchanged (test_offline_ui.OfflineUiTests.test_materializer_idempotent_and_shared_sources_unchanged) ... ok
+test_new_empty_view_api_compiles_against_android24_stubs (test_offline_ui.OfflineUiTests.test_new_empty_view_api_compiles_against_android24_stubs) ... ok
+test_no_controller_completion_or_connection_state_fabrication (test_offline_ui.OfflineUiTests.test_no_controller_completion_or_connection_state_fabrication) ... ok
+test_permission_block_unchanged_and_enclosed_without_skipping_lifecycle (test_offline_ui.OfflineUiTests.test_permission_block_unchanged_and_enclosed_without_skipping_lifecycle) ... ok
+test_policy_closed_profile_and_each_independent_capability (test_offline_ui.OfflineUiTests.test_policy_closed_profile_and_each_independent_capability) ... ok
+test_real_inserted_search_methods_execute_with_local_doubles (test_offline_ui.OfflineUiTests.test_real_inserted_search_methods_execute_with_local_doubles) ... ok
+test_reject_inventory_expansion (test_offline_ui.OfflineUiTests.test_reject_inventory_expansion) ... ok
+test_reject_missing_materialization (test_offline_ui.OfflineUiTests.test_reject_missing_materialization) ... ok
+test_reject_modified_original (test_offline_ui.OfflineUiTests.test_reject_modified_original) ... ok
+test_reject_modified_overlay (test_offline_ui.OfflineUiTests.test_reject_modified_overlay) ... ok
+test_reject_modified_patch (test_offline_ui.OfflineUiTests.test_reject_modified_patch) ... ok
+test_reject_symlinked_output (test_offline_ui.OfflineUiTests.test_reject_symlinked_output) ... ok
+test_reject_unexpected_generated_class (test_offline_ui.OfflineUiTests.test_reject_unexpected_generated_class) ... ok
+test_remote_message_filter_does_not_create_loading_placeholder (test_offline_ui.OfflineUiTests.test_remote_message_filter_does_not_create_loading_placeholder) ... ok
+test_resources_are_localized_and_minimal (test_offline_ui.OfflineUiTests.test_resources_are_localized_and_minimal) ... ok
+test_root_scope_does_not_apply_to_selection_archive_community (test_offline_ui.OfflineUiTests.test_root_scope_does_not_apply_to_selection_archive_community) ... ok
+test_search_entry_and_paging_guard_leave_original_other_profile_body (test_offline_ui.OfflineUiTests.test_search_entry_and_paging_guard_leave_original_other_profile_body) ... ok
+test_static_empty_label_and_native_recycler_contract (test_offline_ui.OfflineUiTests.test_static_empty_label_and_native_recycler_contract) ... ok
+
+----------------------------------------------------------------------
+Ran 24 tests in 5.999s
+
+OK
