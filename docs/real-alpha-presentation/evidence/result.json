@@ -1,0 +1,39 @@
+{
+  "code_commit": "a53dad2d236b8c6562befd6a98a1a66af3437a92",
+  "base_commit": "bac868145ed5eadba13ca3ffd3456c635ffb5c38",
+  "build": "BUILD SUCCESSFUL",
+  "build_duration": "15m 35s",
+  "gradle_tasks": 249,
+  "native_compile_workers": 2,
+  "regressions": {
+    "presentation": 9,
+    "local_login": 35,
+    "combined_gate": 13
+  },
+  "baseline_expected_failure": "REPRODUCED_CREATE_VIEW_NULL_PAGE",
+  "artifacts": {
+    "apk": {
+      "bytes": 113168827,
+      "sha256": "157d7c583779ab0eccc82e76a69a6169eec53a073757a6be5d3d35999c4fcf24",
+      "filename": "FlexyGram-realAlpha-PR53-ARM64-unsigned.apk"
+    },
+    "backup": {
+      "bytes": 268417781,
+      "sha256": "39d90155bd2c66b69baa91c843674de2a38a9dad88d30623aed1cfb0e2ac315b",
+      "filename": "FlexyGram-realAlpha-PR53-recovery.zip"
+    },
+    "manifest_members": 46,
+    "crc_verified": true
+  },
+  "recovery": {
+    "apk_recovered_identically": true,
+    "backup_recovered_identically": true,
+    "all_backup_members_verified": 46,
+    "crc_verified": true
+  },
+  "android_runtime_tested": false,
+  "signed": false,
+  "installed": false,
+  "search_empty_overlay_followup": "pending physical reproduction; not changed",
+  "title": "compact native Login local icon with accessibility description"
+}

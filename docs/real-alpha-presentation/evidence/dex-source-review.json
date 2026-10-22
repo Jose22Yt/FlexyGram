@@ -1,0 +1,24 @@
+{
+  "code_commit": "a53dad2d236b8c6562befd6a98a1a66af3437a92",
+  "compiled_build_commit": "a53dad2",
+  "host_source_sha256": "3f47ed62d56c9a109dfd5cae78b3a61e4df8190ab7dd47c9816bca62a39e6c4e",
+  "generated_login_sha256": "9b17859c0504c065b73b2747bf372d43ed2fbf9ff4be745d5b76479bd3e8d509",
+  "generated_activity_sha256": "169b1835eb22fce179b4a25058514e364894d0c0144d6ddb555da363f285a5b2",
+  "original_phoneview_class_unchanged": true,
+  "phoneview_source_sha256": "8e29f691ecae314c3d7f199b4adaf1b725fd74a72d787cffbcd72882f19bbe65",
+  "pr52_signed_apk_sha256_unchanged": "7557c2e1157a34f4b0103fa06ff4972542f97e6e4f8ea1d508830bc14d6f231d",
+  "android_executed": false,
+  "apk_sha256": "157d7c583779ab0eccc82e76a69a6169eec53a073757a6be5d3d35999c4fcf24",
+  "packaged_dex_symbols": {
+    "Lorg/telegram/ui/LoginActivity$PhoneView;": true,
+    "Lorg/telegram/ui/realalpha/local/RealAlphaLocalLoginHost$LocalScreen;": true,
+    "Lorg/telegram/ui/realalpha/local/RealAlphaLocalLoginHost$PresentationStep;": true,
+    "LOCAL_SCREEN_CONSTRUCTION": true,
+    "LOCAL_PAGE_BINDING": true,
+    "NAVIGATION_ADMISSION": true,
+    "FRAGMENT_CREATION": true,
+    "VIEW_CREATION": true,
+    "FRAGMENT_RESUME": true
+  },
+  "android_phoneview_rendering_verified": false
+}
