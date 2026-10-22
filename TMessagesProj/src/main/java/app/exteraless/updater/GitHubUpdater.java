@@ -104,6 +104,7 @@ public final class GitHubUpdater {
     }
 
     public static void check(boolean force) {
+        if (BuildConfig.CONNECTED_ALPHA) return;
         int channel = NaConfig.INSTANCE.getAutoUpdateChannel().Int();
         if (!force) {
             if (channel == UpdateHelper.UPDATE_OFF) {

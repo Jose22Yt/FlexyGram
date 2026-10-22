@@ -154,13 +154,13 @@ android {
         }
 
         // obtain your own keys at https://core.telegram.org/api/obtaining_api_id
-        def appId = '6'
-        def appHash = 'eb06d4abfb49dc3eeb1aeb98ae0f581e'
+        def appId = properties?.getProperty('TELEGRAM_APP_ID') ?: System.getenv('TELEGRAM_APP_ID') ?: '0'
+        def appHash = properties?.getProperty('TELEGRAM_APP_HASH') ?: System.getenv('TELEGRAM_APP_HASH') ?: ''
 
         // obtain your own key at https://developers.google.com/maps/documentation/android-sdk/get-api-key
         // Android keys are restricted by package name and signing certificate,
         // so a key taken from another build shows an empty map.
-        def mapsKey = 'AIzaSyDE_x6GRKJCSfCY33soBYUQ2piYsgjVpVE'
+        def mapsKey = ''
 
         // Nothing Glyph SDK. «test» — отладочный ключ из Glyph Developer Kit, боевой
         // запрашивается у Nothing под package name приложения.
@@ -178,6 +178,8 @@ android {
 
         manifestPlaceholders += [MAPS_API_KEY: mapsKey, GLYPH_API_KEY: glyphKey]
 
+        buildConfigField 'boolean', 'CONNECTED_ALPHA', 'true'
+        buildConfigField 'String', 'ALPHA_GOOGLE_AUTH_CLIENT_ID', '"' + (properties?.getProperty('ALPHA_GOOGLE_AUTH_CLIENT_ID') ?: System.getenv('ALPHA_GOOGLE_AUTH_CLIENT_ID') ?: '') + '"'
         buildConfigField 'String', 'BUILD_VERSION_STRING', '"' + APP_VERSION_NAME + '"'
         buildConfigField 'String', 'BUILD_COMMIT_ID', '"' + shortCommit + '"'
         buildConfigField 'String', 'OFFICIAL_VERSION', '"' + officialVer + '"'
@@ -238,6 +240,18 @@ android {
         }
     }
 
+    signingConfigs {
+        connectedAlpha {
+            // Deliberately never fall back to an inherited release/debug key.
+            storeFile rootProject.file('config/connected-alpha-test.keystore')
+            storePassword properties?.getProperty('ALPHA_STORE_PASSWORD') ?: System.getenv('ALPHA_STORE_PASSWORD')
+            keyAlias properties?.getProperty('ALPHA_KEY_ALIAS') ?: System.getenv('ALPHA_KEY_ALIAS')
+            keyPassword properties?.getProperty('ALPHA_KEY_PASSWORD') ?: System.getenv('ALPHA_KEY_PASSWORD')
+            enableV1Signing true
+            enableV2Signing true
+        }
+    }
+
     buildTypes {
         debug {
             isDefault = true
@@ -270,15 +284,30 @@ android {
         }
     }
 
+    buildTypes.create('connectedAlpha') {
+        initWith buildTypes.debug
+        // Keep native logging disabled for credentials/account traffic.
+        debuggable = false
+        jniDebuggable = false
+        signingConfig = signingConfigs.connectedAlpha
+        matchingFallbacks = ['debug']
+        versionNameSuffix = '-alpha'
+    }
+
     sourceSets.main.jniLibs.srcDirs = ['./jni/']
 
     namespace = 'org.telegram.messenger'
 }
 
+apply from: rootProject.file('gradle/connected-alpha.gradle')
+
 androidComponents {
+    beforeVariants(selector().all()) { builder ->
+        builder.enable = builder.buildType == 'connectedAlpha'
+    }
     onVariants(selector().all()) { variant ->
         variant.outputs.forEach { output ->
-            String gramName = 'exteraless'
+            String gramName = 'FlexyGram-Alpha'
             String first = String.format('%s-v%s(%s)', gramName, verName, verCode)
             output.outputFileName.set(
                 output.outputFileName.get()

@@ -108,9 +108,10 @@
 
     <application
         android:name="org.telegram.messenger.ApplicationLoader"
-        android:allowBackup="true"
-        android:restoreAnyVersion="true"
-        android:backupAgent=".BackupAgent"
+        android:allowBackup="false"
+        android:restoreAnyVersion="false"
+        android:fullBackupContent="false"
+        android:dataExtractionRules="@xml/connected_alpha_extraction_rules"
         android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher_exteraless"
         android:label="@string/NagramX"
@@ -128,6 +129,7 @@
         android:usesCleartextTraffic="true"
         android:enableOnBackInvokedCallback="true"
     >
+        <meta-data android:name="firebase_crashlytics_collection_enabled" android:value="false" />
         <!-- usesCleartextTraffic for browser supporting opening http:// links -->
 
         <!-- Единственный включённый alias: именно он даёт запись в лаунчере.
@@ -459,7 +461,7 @@
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
-                <data android:mimeType="vnd.android.cursor.item/vnd.com.exteraless.app.android.profile"/>
+                <data android:mimeType="vnd.android.cursor.item/vnd.io.github.jose22yt.flexygram.alpha.android.profile"/>
             </intent-filter>
             <!-- exteraless plugins: файл плагина, открытый из чата, файлового
                  менеджера или «Поделиться». Без этого фильтра система показывает
@@ -534,8 +536,8 @@
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
-                <data android:mimeType="vnd.android.cursor.item/vnd.com.exteraless.app.android.call"/>
-                <data android:mimeType="vnd.android.cursor.item/vnd.com.exteraless.app.android.call.video"/>
+                <data android:mimeType="vnd.android.cursor.item/vnd.io.github.jose22yt.flexygram.alpha.android.call"/>
+                <data android:mimeType="vnd.android.cursor.item/vnd.io.github.jose22yt.flexygram.alpha.android.call.video"/>
             </intent-filter>
         </activity-alias>
         <activity

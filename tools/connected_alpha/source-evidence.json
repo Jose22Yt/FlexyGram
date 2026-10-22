@@ -1,0 +1,22 @@
+{
+  "status": "PASS_STATIC_ONLY",
+  "upstream_components_identical": 15,
+  "sha256": {
+    "TMessagesProj/src/main/java/org/telegram/ui/LoginActivity.java": "a7ef3de66726b79f7d664194b6a6a72f69168c1aac04197ffa9e4a139ff17690",
+    "TMessagesProj/src/main/java/org/telegram/ui/LaunchActivity.java": "7089b57697e640ae70fc432fd3b80e115a3871309a8ee21adf8c05edd23c0f7c",
+    "TMessagesProj/src/main/java/org/telegram/ui/DialogsActivity.java": "6cb070e30b4ec5c435d9a0fc6da09ac534575694214673b9eba8f9bf251b0768",
+    "TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java": "3f6e6a27e821fb719cbdc79946a276ba1b52aa4aa552b31d81700d230822426f",
+    "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java": "aa8289100a8d240ae1a3cf1f3a38c1ad15db5fdd38ee41decd3ccf5858ef9c5f",
+    "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/Theme.java": "4f7aec85fdb8703372dbbbea6c2884b131e25478abe1726cfa5684ad28448659",
+    "TMessagesProj/src/main/java/org/telegram/tgnet/ConnectionsManager.java": "44d4ccb492da5ed8b8657bb541016420fd064aa132c0832f3062fa8cc8a39daf",
+    "TMessagesProj/src/main/java/org/telegram/messenger/MessagesController.java": "cf60286b0d80039e5a0d180de23e9af6cf1326a8f62502adb90a2d1933e1fe5f",
+    "TMessagesProj/src/main/java/org/telegram/messenger/SendMessagesHelper.java": "d29d1ed44721c6bf2248c49e3dbef0e150598f8b9d39882ef8e4024b30e585ff",
+    "TMessagesProj/src/main/java/org/telegram/messenger/MediaController.java": "300af747768069e56eff5f2b2d23a70a7969fbdca3d90087a6b8aede670e6541",
+    "TMessagesProj/src/main/java/org/telegram/messenger/NotificationsController.java": "3b46b5ceadadd34517117c3880c24648023193787b1eae1dd69bf09a5f8b7e5e",
+    "TMessagesProj/src/main/java/app/exteraless/plugins/PluginsController.java": "db9e8f14ee548f219d1287dcbd94c063112738e8645dfdd77a90549c61c9e465",
+    "TMessagesProj/src/main/java/app/exteraless/plugins/PythonPluginsEngine.java": "b745539e9da48e2981f94a3b51de0ca1331dd2493bbda9cd2cb35407b210dd9d",
+    "TMessagesProj/src/main/java/org/telegram/messenger/ContactsController.java": "9ca5fa402d9715a96727002c2456fa74c45e5f29bb493bb2660bca8d7e5a3981",
+    "TMessagesProj/jni/tgnet/ConnectionsManager.cpp": "2ec98539700348ea3fb39b23ffd8e49d88b6216920e59cf28c90602cd45aef32"
+  },
+  "android_runtime": "NOT_TESTED"
+}

@@ -38,7 +38,9 @@ import tw.nekomimi.nekogram.utils.FileUtil;
 
 public class AyuMessagesController {
     public static final String attachmentsSubfolder = "Saved Attachments";
-    public static final File attachmentsPath = new File(new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), AyuConstants.APP_NAME), attachmentsSubfolder);
+    public static final File attachmentsPath = org.telegram.messenger.BuildConfig.CONNECTED_ALPHA
+            ? new File(org.telegram.messenger.ApplicationLoader.getFilesDirFixed(), attachmentsSubfolder)
+            : new File(new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), AyuConstants.APP_NAME), attachmentsSubfolder);
     private static AyuMessagesController instance;
     private EditedMessageDao editedMessageDao;
     private DeletedMessageDao deletedMessageDao;

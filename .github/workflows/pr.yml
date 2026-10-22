@@ -11,8 +11,25 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
+  connected-alpha-static:
+    if: github.head_ref == 'alpha/connected-exteraless-baseline'
+    name: Connected Alpha source checks (no APK)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python3 tools/connected_alpha/check_source.py
+      - run: python3 -m unittest discover -s tools/connected_alpha -p 'test_*.py' -v
   build:
+    if: github.head_ref != 'alpha/connected-exteraless-baseline'
     name: Gradle Build
     runs-on: ubuntu-latest
     env:

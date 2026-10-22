@@ -1,0 +1,93 @@
+#!/usr/bin/env python3
+"""Fail closed on an actual APK. Requires Android build-tools and readelf-free ELF parsing."""
+import argparse
+import hashlib
+import io
+import json
+import re
+import struct
+import subprocess
+import zipfile
+from pathlib import Path
+
+APP = 'io.github.jose22yt.flexygram.alpha'
+
+def require(condition, message):
+    if not condition:
+        raise ValueError(message)
+
+def command(*args):
+    return subprocess.check_output(args, text=True, stderr=subprocess.STDOUT)
+
+def inspect_elf(data, name):
+    require(len(data) >= 64, f'{name}: truncated ELF header')
+    require(data[:6] == b'\x7fELF\x02\x01', f'{name}: expected ELF64 little endian')
+    require(struct.unpack_from('<H', data, 18)[0] == 183, f'{name}: not AArch64')
+    offset = struct.unpack_from('<Q', data, 32)[0]
+    size, count = struct.unpack_from('<HH', data, 54)
+    require(size >= 56 and offset+size*count <= len(data), f'{name}: truncated program headers')
+    loads = 0
+    for i in range(count):
+        kind, flags, file_offset, address, _, file_size, memory_size, alignment = struct.unpack_from('<IIQQQQQQ', data, offset+i*size)
+        if kind == 1:
+            loads += 1
+            require(alignment >= 16384 and (address-file_offset) % 16384 == 0, f'{name}: PT_LOAD incompatible with 16 KB pages')
+            require(file_offset+file_size <= len(data), f'{name}: truncated PT_LOAD')
+    require(loads > 0, f'{name}: missing PT_LOAD')
+    return {'name': name, 'sha256': hashlib.sha256(data).hexdigest()}
+
+def inspect_archive(z, prefix=''):
+    found = []
+    require(z.testzip() is None, f'{prefix}: invalid ZIP CRC')
+    for entry in z.infolist():
+        if entry.filename.endswith('.so'):
+            found.append(inspect_elf(z.read(entry), prefix+entry.filename))
+        # Chaquopy bootstrap/runtime libraries can be inside nested ZIP assets.
+        elif entry.filename.endswith(('.zip','.imy')) and 'chaquopy' in entry.filename:
+            data = z.read(entry)
+            if zipfile.is_zipfile(io.BytesIO(data)):
+                with zipfile.ZipFile(io.BytesIO(data)) as nested:
+                    found += inspect_archive(nested, prefix+entry.filename+'!/')
+    return found
+
+def main():
+    p = argparse.ArgumentParser()
+    p.add_argument('apk', type=Path)
+    p.add_argument('--build-tools', type=Path, required=True)
+    p.add_argument('--certificate-sha256', required=True, help='Expected authorized Alpha-only signing certificate fingerprint')
+    args = p.parse_args()
+    expected = re.sub('[^0-9a-f]', '', args.certificate_sha256.lower())
+    require(len(expected) == 64, 'Expected certificate fingerprint must have 64 hex digits')
+    bt = args.build_tools
+    signature = command(str(bt/'apksigner'), 'verify', '--verbose', '--print-certs', str(args.apk))
+    require('Verified using v2 scheme (APK Signature Scheme v2): true' in signature, 'Missing APK Signature Scheme v2')
+    certs = re.findall(r'Signer #\d+ certificate SHA-256 digest: ([0-9a-fA-F]+)', signature)
+    require([c.lower() for c in certs] == [expected], 'Unexpected signing certificate or multiple signers')
+    command(str(bt/'zipalign'), '-c', '-P', '16', '4', str(args.apk))
+    badging = command(str(bt/'aapt2'), 'dump', 'badging', str(args.apk))
+    require(f"package: name='{APP}'" in badging, 'Wrong application ID')
+    require("application-label:'FlexyGram Alpha'" in badging, 'Wrong label')
+    require("launchable-activity:" in badging, 'Missing launcher')
+    require("uses-permission: name='android.permission.INTERNET'" in badging, 'Missing INTERNET')
+    require('application-debuggable' not in badging, 'Unexpected debuggable APK')
+    require("native-code: 'arm64-v8a'" in badging and "'x86_64'" not in badging, 'Unexpected native ABI')
+    manifest = command(str(bt/'aapt2'), 'dump', 'xmltree', str(args.apk), '--file', 'AndroidManifest.xml')
+    require('sharedUserId' not in manifest and 'backupAgent' not in manifest, 'Shared UID or backup agent present')
+    require(re.search(r'allowBackup[^\n]*0x0\b', manifest), 'Backup must be disabled in merged manifest')
+    require(re.search(r'restoreAnyVersion[^\n]*0x0\b', manifest), 'Restore must be disabled')
+    authorities = re.findall(r'android:authorities[^\n]*?="([^"]+)"', manifest)
+    require(authorities and all(a.startswith(APP+'.') for a in authorities), 'Provider identity collision')
+    with zipfile.ZipFile(args.apk) as z:
+        names = z.namelist()
+        require(len(names) == len(set(names)), 'Duplicate ZIP entries')
+        require('classes.dex' in names and 'lib/arm64-v8a/libtmessages.so' in names, 'Missing Java or native Telegram code')
+        require(not any(n.startswith('lib/') and not n.startswith('lib/arm64-v8a/') for n in names if not n.endswith('/')), 'Non-ARM64 JNI payload')
+        elfs = inspect_archive(z)
+        require(elfs, 'No ELF payloads inspected')
+    print(json.dumps({'apk':args.apk.name,'bytes':args.apk.stat().st_size,
+        'sha256':hashlib.sha256(args.apk.read_bytes()).hexdigest(),
+        'certificate_sha256':expected,'elf_count':len(elfs),'elfs':elfs,
+        'status':'PASS_ARTIFACT_ONLY','android_runtime':'NOT_TESTED'}, indent=2))
+
+if __name__ == '__main__':
+    main()
