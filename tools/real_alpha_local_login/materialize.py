@@ -21,6 +21,10 @@ def prepare():
                 '    private static final RealAlphaBootstrap BOOTSTRAP = new RealAlphaBootstrap();\n    private final org.telegram.ui.realalpha.local.RealAlphaLocalLoginHost localLab = new org.telegram.ui.realalpha.local.RealAlphaLocalLoginHost(this);')
             text=text.replace('        return fragment != null && fragment.getClass() == DialogsActivity.class;',
                 '        return fragment != null && (fragment.getClass() == DialogsActivity.class || localLab.owns(fragment));')
+            for expression,fragment in [('permitted(params.fragment) && super.needPresentFragment(layout, params)', 'params.fragment'), ('permitted(fragment) && super.needAddFragmentToStack(fragment, layout)', 'fragment')]:
+                target='        return '+expression+';'
+                if text.count(target)!=1:raise ValueError('REALALPHA_ADMISSION_CONTEXT_CHANGED')
+                text=text.replace(target,'        boolean allowed=permitted('+fragment+');\n        localLab.recordNavigationAdmission('+fragment+',allowed);\n        return allowed && '+expression.split(' && ',1)[1]+';')
             marker='    @Override public void onNewIntent(Intent ignored) {'
             if text.count(marker)!=1:raise ValueError('REALALPHA_LIFECYCLE_CONTEXT_CHANGED')
             text=text.replace(marker,'''    @Override protected void onResume() {

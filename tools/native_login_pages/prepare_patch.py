@@ -76,6 +76,7 @@ def main():
         s=re.sub(r'^(        views\[(VIEW_\w+)\] = new .+;)$',lambda m:('        if (!localLoginClosed() || io.github.jose22yt.flexygram.login.local.EphemeralPages.allowedPage('+m[2]+')) '+m[1].strip()),s,flags=re.M)
         s=s.replace('for (SlideView slideView : views) {','for (SlideView slideView : views) {\n                    if (slideView == null) continue;')
         s=replace_once(s,'            views[a].setVisibility(a == 0 ? View.VISIBLE : View.GONE);','            if (views[a] == null) continue;\n            views[a].setVisibility(a == 0 ? View.VISIBLE : View.GONE);')
+        s=replace_once(s,'            SlideView v = views[a];\n            if (savedInstanceState != null)', '            SlideView v = views[a];\n            if (v == null) continue;\n            if (savedInstanceState != null)')
         window_hooks="""
             @Override
             protected void onAttachedToWindow() {

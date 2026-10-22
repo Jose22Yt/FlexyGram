@@ -25,6 +25,9 @@ import io.github.jose22yt.flexygram.session.android.*;
 public final class RealAlphaLocalLoginHost implements AutoCloseable {
     private static final int MENU_ID = 904301;
     private enum Phase { NATIVE_ATTESTATION, ACCOUNT_INSPECTION, LOCAL_INITIALIZATION, PRESENTATION }
+    private enum PresentationStep { LOCAL_SCREEN_CONSTRUCTION, LOCAL_PAGE_BINDING,
+        NAVIGATION_TRANSITION, NAVIGATION_ADMISSION, NAVIGATION_ADMISSION_REJECTED,
+        FRAGMENT_CREATION, VIEW_CREATION, FRAGMENT_RESUME, PRESENTED }
     private final RealAlphaActivity activity;
     private final Handler main = new Handler(Looper.getMainLooper());
     private Ticket current;
@@ -36,6 +39,7 @@ public final class RealAlphaLocalLoginHost implements AutoCloseable {
         final Handler worker;
         volatile LocalLoginRehearsal flow;
         volatile Phase phase=Phase.NATIVE_ATTESTATION;
+        volatile PresentationStep presentationStep=PresentationStep.LOCAL_SCREEN_CONSTRUCTION;
         volatile AccountProbe.Diagnostic diagnostic=AccountProbe.Diagnostic.INTERNAL_EXCEPTION;
         volatile AccountProbe.Step inspectionStep=AccountProbe.Step.CONTEXT;
         Ticket() { thread.start(); worker=new Handler(thread.getLooper()); }
@@ -60,7 +64,8 @@ public final class RealAlphaLocalLoginHost implements AutoCloseable {
         ActionBar bar=root.getActionBar(); if (bar==null) return;
         ActionBarMenu menu=bar.createMenu();
         org.telegram.ui.ActionBar.ActionBarMenuItem item=menu.getItem(MENU_ID);
-        if (item==null) item=menu.addItem(MENU_ID,"Login local");
+        if (item==null) item=menu.addItem(MENU_ID,org.telegram.messenger.R.drawable.msg_permissions_solar);
+        item.setContentDescription("Login local");
         // A native DialogsActivity/menu may survive Activity recreation. Always rebind it.
         WeakReference<RealAlphaLocalLoginHost> host=new WeakReference<>(this);
         WeakReference<BaseFragment> origin=new WeakReference<>(root);
@@ -119,10 +124,19 @@ public final class RealAlphaLocalLoginHost implements AutoCloseable {
         if (ticket.flow==null || ticket.flow.owner.snapshot().state!=AuthenticationController.State.READY) { failed(root,ticket); return; }
         try {
             ticket.phase=Phase.PRESENTATION;
+            ticket.presentationStep=PresentationStep.LOCAL_SCREEN_CONSTRUCTION;
             LocalScreen candidate=new LocalScreen(account,ticket,this);
             screen=candidate; // Admission identity is installed before native presentation delegates run.
+            ticket.presentationStep=PresentationStep.NAVIGATION_TRANSITION;
             if (!root.presentFragment(candidate) && candidate.getParentLayout()==null) failed(root,ticket);
+            else ticket.presentationStep=PresentationStep.PRESENTED;
         } catch (RuntimeException|LinkageError failure) { failed(root,ticket); }
+    }
+    // Called only from the realAlpha delegate; observation never changes admission.
+    public void recordNavigationAdmission(BaseFragment fragment,boolean allowed) {
+        requireMain();
+        if (owns(fragment) && current.phase==Phase.PRESENTATION)
+            current.presentationStep=allowed?PresentationStep.NAVIGATION_ADMISSION:PresentationStep.NAVIGATION_ADMISSION_REJECTED;
     }
     public boolean owns(BaseFragment fragment) {
         return !closed && current!=null && !current.cancelled.get() && fragment!=null && fragment==screen;
@@ -132,6 +146,7 @@ public final class RealAlphaLocalLoginHost implements AutoCloseable {
         if (current!=ticket) return;
         current=null; screen=null;
         if (!closed && !activity.isFinishing() && LaunchActivity.getLastFragment()==root) status(root,"LOCAL_LOGIN_UNAVAILABLE:"+ticket.phase.name()
+            +(ticket.phase==Phase.PRESENTATION?":"+ticket.presentationStep.name():"")
             +(ticket.phase==Phase.ACCOUNT_INSPECTION?":"+ticket.diagnostic.name()+":"+ticket.inspectionStep.name():""));
     }
     private void status(BaseFragment root,String code) {
@@ -142,7 +157,24 @@ public final class RealAlphaLocalLoginHost implements AutoCloseable {
     private static final class LocalScreen extends LoginActivity {
         private final WeakReference<RealAlphaLocalLoginHost> host;
         private final Ticket ticket;
-        LocalScreen(int account,Ticket ticket,RealAlphaLocalLoginHost host) { super(account); this.ticket=ticket; this.host=new WeakReference<>(host); bindClosedLocalPages(ticket.flow.pages); }
+        LocalScreen(int account,Ticket ticket,RealAlphaLocalLoginHost host) { super(account); this.ticket=ticket; this.host=new WeakReference<>(host); ticket.presentationStep=PresentationStep.LOCAL_PAGE_BINDING; bindClosedLocalPages(ticket.flow.pages); }
+        @Override public boolean onFragmentCreate() {
+            ticket.presentationStep=PresentationStep.FRAGMENT_CREATION;
+            boolean created=super.onFragmentCreate();
+            if (created) ticket.presentationStep=PresentationStep.NAVIGATION_TRANSITION;
+            return created;
+        }
+        @Override public android.view.View createView(Context context) {
+            ticket.presentationStep=PresentationStep.VIEW_CREATION;
+            android.view.View view=super.createView(context);
+            ticket.presentationStep=PresentationStep.NAVIGATION_TRANSITION;
+            return view;
+        }
+        @Override public void onResume() {
+            ticket.presentationStep=PresentationStep.FRAGMENT_RESUME;
+            super.onResume();
+            ticket.presentationStep=PresentationStep.NAVIGATION_TRANSITION;
+        }
         @Override public void onFragmentDestroy() {
             try { super.onFragmentDestroy(); }
             finally { ticket.close(); RealAlphaLocalLoginHost active=host.get(); if (active!=null && active.current==ticket) { active.current=null; active.screen=null; } host.clear(); }

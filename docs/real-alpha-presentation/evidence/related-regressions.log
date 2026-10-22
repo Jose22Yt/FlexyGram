@@ -1,0 +1,41 @@
+=== present-baseline-reproduction.log ===
+F
+======================================================================
+FAIL: test_sms (test_presentation.PresentationTests.test_sms)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "$WORKSPACE/FlexyGram/tests/real_alpha_local_login/test_presentation.py", line 23, in <lambda>
+    setattr(PresentationTests,'test_'+case,lambda self,c=case:self.case(c))
+                                                              ^^^^^^^^^^^^
+  File "$WORKSPACE/FlexyGram/tests/real_alpha_local_login/test_presentation.py", line 20, in case
+    self.assertEqual(p.returncode,0,p.stdout+p.stderr)
+AssertionError: 1 != 0 : Exception in thread "main" java.lang.AssertionError: REPRODUCED_CREATE_VIEW_NULL_PAGE
+	at org.telegram.ui.realalpha.local.PresentationHarness.main(PresentationHarness.java:17)
+
+
+----------------------------------------------------------------------
+Ran 1 test in 2.372s
+
+FAILED (failures=1)
+
+=== present-regressions.log ===
+.........
+----------------------------------------------------------------------
+Ran 9 tests in 3.305s
+
+OK
+
+=== present-login-regressions.log ===
+...................................
+----------------------------------------------------------------------
+Ran 35 tests in 13.247s
+
+OK
+
+=== present-combined-regressions.log ===
+.............
+----------------------------------------------------------------------
+Ran 13 tests in 0.084s
+
+OK
+
