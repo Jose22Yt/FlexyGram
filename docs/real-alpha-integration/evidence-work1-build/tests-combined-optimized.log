@@ -1,0 +1,23 @@
+test_full_handoff_passes_with_explicit_non_android_receipt (test_combined.CombinedGateTests.test_full_handoff_passes_with_explicit_non_android_receipt) ... ok
+test_rejects_malicious_inventory_expansion (test_combined.CombinedGateTests.test_rejects_malicious_inventory_expansion) ... ok
+test_rejects_missing_variant_guard (test_combined.CombinedGateTests.test_rejects_missing_variant_guard) ... ok
+test_rejects_mutated_offline_patch (test_combined.CombinedGateTests.test_rejects_mutated_offline_patch) ... ok
+test_rejects_network_permission_reintroduction (test_combined.CombinedGateTests.test_rejects_network_permission_reintroduction) ... ok
+test_rejects_online_capability_reintroduction (test_combined.CombinedGateTests.test_rejects_online_capability_reintroduction) ... ok
+test_rejects_removed_automatic_combined_gate (test_combined.CombinedGateTests.test_rejects_removed_automatic_combined_gate) ... ok
+test_rejects_stale_generated_overlay (test_combined.CombinedGateTests.test_rejects_stale_generated_overlay) ... ok
+test_rejects_stale_original_even_when_outputs_are_valid (test_combined.CombinedGateTests.test_rejects_stale_original_even_when_outputs_are_valid) ... ok
+test_rejects_symlink_generated_source (test_combined.CombinedGateTests.test_rejects_symlink_generated_source) ... ok
+test_rejects_unexpected_generated_java (test_combined.CombinedGateTests.test_rejects_unexpected_generated_java) ... ok
+test_rejects_untrusted_login_patch_path (test_combined.CombinedGateTests.test_rejects_untrusted_login_patch_path) ... ok
+test_static_mode_does_not_require_materialized_outputs (test_combined.CombinedGateTests.test_static_mode_does_not_require_materialized_outputs) ... ok
+test_cleanup_order_back_override_and_missing_combined_classes_rejected (test_combined_apk.CombinedApkTests.test_cleanup_order_back_override_and_missing_combined_classes_rejected) ... ok
+test_combined_cleanup_is_accepted_only_with_explicit_profile (test_combined_apk.CombinedApkTests.test_combined_cleanup_is_accepted_only_with_explicit_profile) ... ok
+test_missing_cleanup_super_delegation_or_extra_call_is_rejected (test_combined_apk.CombinedApkTests.test_missing_cleanup_super_delegation_or_extra_call_is_rejected) ... ok
+test_changed_or_ambiguous_task_wiring_fails_closed (test_experiment_preservation.ExperimentPreservationTests.test_changed_or_ambiguous_task_wiring_fails_closed) ... ok
+test_real_build_retains_all_following_safety_controls (test_experiment_preservation.ExperimentPreservationTests.test_real_build_retains_all_following_safety_controls) ... ok
+
+----------------------------------------------------------------------
+Ran 18 tests in 0.110s
+
+OK

@@ -1,0 +1,92 @@
+[
+  {
+    "path": "apk-static-review.json",
+    "original_sha256": "b24907d06ecf45a245117ef2f09b4dcae5234b910600bbcb292d405a368233f7",
+    "published_sha256": "b24907d06ecf45a245117ef2f09b4dcae5234b910600bbcb292d405a368233f7",
+    "workspace_path_normalized": false
+  },
+  {
+    "path": "build-receipt.json",
+    "original_sha256": "f5576dd02c70468903554032e03c0780df37c2973bb5f68a3513ca5e53b6eb9b",
+    "published_sha256": "f5576dd02c70468903554032e03c0780df37c2973bb5f68a3513ca5e53b6eb9b",
+    "workspace_path_normalized": false
+  },
+  {
+    "path": "native-reproduction.json",
+    "original_sha256": "bd9f3714ee2b9ad64e004a41a6cbb80741f0a3a50b2905843932a9995c4e9a7a",
+    "published_sha256": "bd9f3714ee2b9ad64e004a41a6cbb80741f0a3a50b2905843932a9995c4e9a7a",
+    "workspace_path_normalized": false
+  },
+  {
+    "path": "jni-readonly-exports.json",
+    "original_sha256": "a1e05ad314c83b0ad52fdc8c3464f54f9b5dfe3603aed43ee847f5498b92a326",
+    "published_sha256": "a1e05ad314c83b0ad52fdc8c3464f54f9b5dfe3603aed43ee847f5498b92a326",
+    "workspace_path_normalized": false
+  },
+  {
+    "path": "final-overlay-receipt.json",
+    "original_sha256": "4a8da1edd370b08b632591939113294ad69d0e9416d643dc0b5f4fa2e2ac4a20",
+    "published_sha256": "4a8da1edd370b08b632591939113294ad69d0e9416d643dc0b5f4fa2e2ac4a20",
+    "workspace_path_normalized": false
+  },
+  {
+    "path": "recovery-receipt.json",
+    "original_sha256": "10cf001f9fbcf07a76943515a20cd6688437a81177623f27e96a93be13e6b976",
+    "published_sha256": "10cf001f9fbcf07a76943515a20cd6688437a81177623f27e96a93be13e6b976",
+    "workspace_path_normalized": false
+  },
+  {
+    "path": "tests-real_alpha_integration.log",
+    "original_sha256": "e1cda6acec8f212ddc6bd0daaf308d99fb733ba38b1f90960b15d5e8e7650a14",
+    "published_sha256": "e1cda6acec8f212ddc6bd0daaf308d99fb733ba38b1f90960b15d5e8e7650a14",
+    "workspace_path_normalized": false
+  },
+  {
+    "path": "tests-real_alpha_local_login.log",
+    "original_sha256": "ab1f7224966d7ae4a415aeb8b0fe6374f767f81e90604ea34c8ec70f0bc27158",
+    "published_sha256": "ab1f7224966d7ae4a415aeb8b0fe6374f767f81e90604ea34c8ec70f0bc27158",
+    "workspace_path_normalized": false
+  },
+  {
+    "path": "tests-real_alpha_offline_ui.log",
+    "original_sha256": "25ad286387d286414035514def326445ffdbf299929b04a93b45e5dc7ee1aa27",
+    "published_sha256": "25ad286387d286414035514def326445ffdbf299929b04a93b45e5dc7ee1aa27",
+    "workspace_path_normalized": false
+  },
+  {
+    "path": "tests-native-experimental.log",
+    "original_sha256": "54bf68c2727b47d4f43955dff03010bd89f859fc96f9651777b01a397076f4f8",
+    "published_sha256": "54bf68c2727b47d4f43955dff03010bd89f859fc96f9651777b01a397076f4f8",
+    "workspace_path_normalized": false
+  },
+  {
+    "path": "tests-apk-review.log",
+    "original_sha256": "43432a07ce710f958ee09350daaf6c6a0b22c268bd6acab0b35720314995ef63",
+    "published_sha256": "43432a07ce710f958ee09350daaf6c6a0b22c268bd6acab0b35720314995ef63",
+    "workspace_path_normalized": false
+  },
+  {
+    "path": "tests-combined-optimized.log",
+    "original_sha256": "6739876efef75cbb908ef141b41aebb541fbf977fc1386b97e26cfc8a7d22fb8",
+    "published_sha256": "6739876efef75cbb908ef141b41aebb541fbf977fc1386b97e26cfc8a7d22fb8",
+    "workspace_path_normalized": false
+  },
+  {
+    "path": "gate-static.json",
+    "original_sha256": "8468e6214eb9cfc49ae21b7c665fbc244dcf44b099c13df4927ea3c2adad30e4",
+    "published_sha256": "8468e6214eb9cfc49ae21b7c665fbc244dcf44b099c13df4927ea3c2adad30e4",
+    "workspace_path_normalized": false
+  },
+  {
+    "path": "gate-generated.json",
+    "original_sha256": "f87815c560f9b24e7cf205b18fe1b2af3ad68f52eb83c0ce3ad534ed25e8470e",
+    "published_sha256": "f87815c560f9b24e7cf205b18fe1b2af3ad68f52eb83c0ce3ad534ed25e8470e",
+    "workspace_path_normalized": false
+  },
+  {
+    "path": "build-final-16k-retry.log",
+    "original_sha256": "3df73b96b6f9a6fa6925177ba33e76d20c248d6de29f5ad315defa6b180e8ae2",
+    "published_sha256": "10522aa48d54930e277a91861d7fa245f62a68f6230ff7449ac0ab2fa9e46b66",
+    "workspace_path_normalized": true
+  }
+]

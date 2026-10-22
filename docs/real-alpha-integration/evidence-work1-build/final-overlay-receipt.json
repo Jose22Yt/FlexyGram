@@ -1,0 +1,8 @@
+{
+  "source_head": "38e9052242988cdcb0771df816a4769990cac547",
+  "approved_build_sha256": "ee86b1111f300e8454f86992d68692ae23ae210bee64f6d1bb86ec43f9875461",
+  "overlay_build_sha256": "74478e82c8f052ed1b91974de6fedc0392043cc80c3ea331e4adfd5ad9a02a54",
+  "experimental_manifest_sha256": "c6495ee9895da29a2c4bdc9c45647721c33070190eeb8c9b8054096cb2bf2f97",
+  "production_and_policy_unchanged": true,
+  "unsigned_diagnostic": false
+}

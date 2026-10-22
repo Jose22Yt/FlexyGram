@@ -1,0 +1,15 @@
+test_biometric_dex_guard_requires_constant_identity_and_forward_skip (test_apk_review.ReviewTests.test_biometric_dex_guard_requires_constant_identity_and_forward_skip) ... ok
+test_dex_native_factory_must_be_in_exact_class_and_method (test_apk_review.ReviewTests.test_dex_native_factory_must_be_in_exact_class_and_method) ... ok
+test_exact_closed_fixture (test_apk_review.ReviewTests.test_exact_closed_fixture) ... ok
+test_external_tool_modified_utf8_preserves_ascii_structure (test_apk_review.ReviewTests.test_external_tool_modified_utf8_preserves_ascii_structure) ... ok
+test_extra_components_rejected (test_apk_review.ReviewTests.test_extra_components_rejected) ... ok
+test_host_debugpy_asset_is_separate_and_pinned_not_arm64 (test_apk_review.ReviewTests.test_host_debugpy_asset_is_separate_and_pinned_not_arm64) ... ok
+test_internet_and_duplicate_permissions_rejected (test_apk_review.ReviewTests.test_internet_and_duplicate_permissions_rejected) ... ok
+test_other_identities_rejected (test_apk_review.ReviewTests.test_other_identities_rejected) ... ok
+test_restore_exposure_and_external_collection_rejected (test_apk_review.ReviewTests.test_restore_exposure_and_external_collection_rejected) ... ok
+test_source_compatibility_exception_is_glyph_only_and_legacy_gates_unchanged (test_apk_review.ReviewTests.test_source_compatibility_exception_is_glyph_only_and_legacy_gates_unchanged) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.036s
+
+OK

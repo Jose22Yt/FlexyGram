@@ -1,0 +1,8 @@
+{
+  "exports_present": [
+    "Java_io_github_jose22yt_flexygram_session_android_AndroidNativeBridge_nativePolicy",
+    "Java_io_github_jose22yt_flexygram_session_android_AndroidNativeBridge_nativeIdentity"
+  ],
+  "jni_sha256": "3296b81680fe4324f52510fce7c80ba89463844c1bd94033880dee3935fbb1d5",
+  "android_executed": false
+}
