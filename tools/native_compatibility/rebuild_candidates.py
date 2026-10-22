@@ -8,6 +8,11 @@ from audit import elf
 from acceptance import candidate_contract
 from wheelhouse import verified
 
+# The reviewed FreeType ELF includes NDK header paths in DWARF. Preserve those
+# bytes when rebuilding under another SDK root; do not change the historical
+# ELF/wheel pins or edit the linked binary to accept a different result.
+REVIEWED_NDK_PREFIX = '/workspace/scratch/1f84b79e43f3/android-tools/sdk/ndk/27.2.12479018'
+
 def digest(path):return hashlib.sha256(path.read_bytes()).hexdigest()
 def verify_archive(path,expected):
     if path.is_symlink() or not path.is_file() or digest(path)!=expected:
@@ -25,7 +30,8 @@ def environment(ndk,prefix):
     tool=ndk/'toolchains/llvm/prebuilt/linux-x86_64/bin'
     env.update(CC=str(tool/'aarch64-linux-android24-clang'),AR=str(tool/'llvm-ar'),
                RANLIB=str(tool/'llvm-ranlib'),STRIP=str(tool/'llvm-strip'),
-               CFLAGS='-O2 -fPIC -ffile-prefix-map='+str(prefix.parent)+'=/build/flexygram-native',CPPFLAGS='-I'+str(prefix/'include'),
+               CFLAGS='-O2 -fPIC -ffile-prefix-map='+str(prefix.parent)+'=/build/flexygram-native'
+                      +' -ffile-prefix-map='+str(ndk)+'='+REVIEWED_NDK_PREFIX,CPPFLAGS='-I'+str(prefix/'include'),
                LDFLAGS='-Wl,-z,max-page-size=16384 -Wl,-z,common-page-size=16384 -Wl,--undefined-version -L'+str(prefix/'lib'),
                PKG_CONFIG_LIBDIR=str(prefix/'lib/pkgconfig'),PKG_CONFIG_PATH=str(prefix/'lib/pkgconfig'),
                PATH=str(prefix/'bin')+':'+env['PATH'],SOURCE_DATE_EPOCH='1524096000')
