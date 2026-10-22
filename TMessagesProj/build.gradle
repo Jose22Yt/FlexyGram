@@ -667,3 +667,16 @@ tasks.configureEach { task ->
 
 // Independent, opt-in source overlay; does not participate in the default build.
 apply from: rootProject.file("gradle/real-alpha-offline-ui.gradle")
+ 
+// Combined lab inputs are verified before Java/D8 whenever both opt-ins are set.
+// This never runs for the stable APK, another flavor, or a one-feature build.
+if (localLoginPagesEnabled && providers.gradleProperty('flexygramOfflineDialogsUi').orNull == 'true') {
+    def verifyCombinedRealAlphaSources = tasks.register('verifyCombinedRealAlphaSources', Exec) {
+        workingDir rootProject.projectDir
+        commandLine chaquopyBuildPython ?: 'python3',
+                rootProject.file('tools/real_alpha_integration/check_combined.py').absolutePath, '--check'
+        outputs.upToDateWhen { false }
+    }
+    tasks.named('preBuild').configure { dependsOn verifyCombinedRealAlphaSources }
+}
+
