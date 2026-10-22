@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyGramOfflineDialogsTitle">FlexyGram · Prueba sin conexión</string>
+    <string name="FlexyGramOfflineDialogsEmpty">Versión de prueba sin conexión\nLa conexión a Telegram está deshabilitada deliberadamente.\nNo se cargan chats desde la red.</string>
+</resources>

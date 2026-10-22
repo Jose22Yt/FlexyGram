@@ -664,3 +664,6 @@ tasks.configureEach { task ->
         task.dependsOn(prepareLockedPython)
     }
 }
+
+// Independent, opt-in source overlay; does not participate in the default build.
+apply from: rootProject.file("gradle/real-alpha-offline-ui.gradle")
