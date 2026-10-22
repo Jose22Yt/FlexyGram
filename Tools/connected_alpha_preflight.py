@@ -137,7 +137,7 @@ def preflight(
     # A source-level sanity check. The final merged manifest and the APK need
     # separate verification: Firebase and dependency manifests can add providers.
     authorities = re.findall(r'android:authorities="([^"]+)"', manifest)
-    fixed = [s for s in authorities if "\${applicationId}" not in s]
+    fixed = [s for s in authorities if "${applicationId}" not in s]
     if fixed:
         result("authorities", "WARN", "Hay autoridades fijas en el manifiesto: revisar colisiones con apps instaladas.")
     else:
