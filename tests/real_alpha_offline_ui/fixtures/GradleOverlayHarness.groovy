@@ -40,7 +40,7 @@ for (props in [[flexygramOfflineDialogsUi: 'true'],
     catch (GradleException expected) { assert expected.message.contains('REQUIRES_CLOSED_REAL_ALPHA_DEBUG') }
 }
 def enabled = evaluate([flexygramOfflineDialogsUi: 'true', flexygramRealAlpha: 'true'])
-assert enabled.main.java.excludes.size() == 3
+assert enabled.main.java.excludes.toSet() == new groovy.json.JsonSlurper().parse(new File(root, 'tools/real_alpha_offline_ui/sources.json')).sources.keySet()
 assert enabled.alpha.java.dirs.size() == 2 && enabled.alpha.res.dirs.size() == 1
 for (flavor in ['diagnostic', 'betaDevelopment', 'production', 'realAlpha']) {
     for (build in ['debug', 'release', 'startupDiagnostic']) {

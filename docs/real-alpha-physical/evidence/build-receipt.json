@@ -1,0 +1,227 @@
+{
+  "source_commit": "b6678c2e4b3823956122a7ebc274fdd8df111853",
+  "base_commit": "a91d006ec945c9d775d52db180f35884d77533e9",
+  "pr": 52,
+  "unsigned": true,
+  "android_runtime_tested": false,
+  "signing_key_accessed": false,
+  "apk_sha256": "1b2aa70df396e53937b42fa542adb0d68f72626f4f99df136b0a7619cfcdfdd6",
+  "apk_bytes": 113167667,
+  "old_apk_unchanged_sha256": "cc2053f96119dca5319d9a02bb2ece9a49b7cc342747e975103c4bfba5e8520b",
+  "regressions": {
+    "account_probe": 12,
+    "local_login_original_suite": 33,
+    "local_host_targeted": 3,
+    "offline_ui": 25,
+    "combined_gate": 13
+  },
+  "physical_cause_confirmed": false,
+  "source_defect_reproduced": "trusted private-root alias falsely rejected by a91d006 adapter",
+  "startup_dark_intervals": "cause and duration pending physical measurement",
+  "members": {
+    "AndroidManifest-merged.xml": {
+      "sha256": "f73ab086206ce58ecdde136beb521f1929f675640960beb91a6e9f950eef5009",
+      "bytes": 4894
+    },
+    "FlexyGram-realAlpha-PR52-ARM64-unsigned.apk": {
+      "sha256": "1b2aa70df396e53937b42fa542adb0d68f72626f4f99df136b0a7619cfcdfdd6",
+      "bytes": 113167667
+    },
+    "apk-static-review.json": {
+      "sha256": "87f790e3753430921e62aa62c5b62a875fd2a9c5e1ccfa4dd1006301d6837f13",
+      "bytes": 2588
+    },
+    "approved-native-inputs/build-final-overlay.gradle": {
+      "sha256": "74478e82c8f052ed1b91974de6fedc0392043cc80c3ea331e4adfd5ad9a02a54",
+      "bytes": 34591
+    },
+    "approved-native-inputs/native-reproduction.json": {
+      "sha256": "bd9f3714ee2b9ad64e004a41a6cbb80741f0a3a50b2905843932a9995c4e9a7a",
+      "bytes": 9606
+    },
+    "approved-native-inputs/requirements-experimental.lock": {
+      "sha256": "1a82b59a2566881dcf714cb4366a96284ee4fae291bbf0b623bba7068f5cd42a",
+      "bytes": 1830
+    },
+    "approved-native-inputs/wheels-manifest.json": {
+      "sha256": "c6495ee9895da29a2c4bdc9c45647721c33070190eeb8c9b8054096cb2bf2f97",
+      "bytes": 9272
+    },
+    "approved-native-inputs/wheels/beautifulsoup4-4.15.0-py3-none-any.whl": {
+      "sha256": "d6f88de62e1d4e38ecb1077eb9724cd0eff29d2a08ca16a401e9b9e93f117cf9",
+      "bytes": 109924
+    },
+    "approved-native-inputs/wheels/certifi-2026.10.18-py3-none-any.whl": {
+      "sha256": "73191c47aaa79da394e8fee2dbc2ec827432cab56311122c9e47abf79e390f62",
+      "bytes": 134093
+    },
+    "approved-native-inputs/wheels/chaquopy_freetype-2.9.1-3flexygram16k-py3-none-android_24_arm64_v8a.whl": {
+      "sha256": "f4308f6ad71eefca3cd9def87ee8c2673499b6dd10810daa23c1a22e805fc937",
+      "bytes": 1568079
+    },
+    "approved-native-inputs/wheels/chaquopy_libjpeg-1.5.3-1-py3-none-android_21_arm64_v8a.whl": {
+      "sha256": "5555be57a2633fb5a3c0c810e89c8b705c471e3dabd95aa596fc7fdd48322728",
+      "bytes": 176242
+    },
+    "approved-native-inputs/wheels/chaquopy_libxml2-2.9.8-3flexygram16k-py3-none-android_24_arm64_v8a.whl": {
+      "sha256": "2b47fe307311e932c4502ad9eec108f070eec6f36c03d4d97a2d22222387badb",
+      "bytes": 832391
+    },
+    "approved-native-inputs/wheels/chaquopy_libxslt-1.1.32-3flexygram16k-py3-none-android_24_arm64_v8a.whl": {
+      "sha256": "f8d9b05b17dfbc498c9edf22d24b65c37f9c3ad92a10a49e61b267130548d70f",
+      "bytes": 186718
+    },
+    "approved-native-inputs/wheels/chaquopy_libyaml-0.2.5-0-py3-none-android_24_arm64_v8a.whl": {
+      "sha256": "77f594d82adf2a1baf5f8340324ef06b7f54b1b0725b7d9b4ce8367e270ad5a2",
+      "bytes": 58012
+    },
+    "approved-native-inputs/wheels/charset_normalizer-3.5.2-py3-none-any.whl": {
+      "sha256": "b6b751274acb69d77b3323d6b7dbaa3c7fdfc1eb829b7eb61d262f32e1af9685",
+      "bytes": 68872
+    },
+    "approved-native-inputs/wheels/debugpy-1.8.22-py2.py3-none-any.whl": {
+      "sha256": "a9e9d3550e15ca479c59333e90845029190531f0cacfedab3b815a57bd913947",
+      "bytes": 5374857
+    },
+    "approved-native-inputs/wheels/idna-3.20-py3-none-any.whl": {
+      "sha256": "ab7ae7122974553370f0bdb919e1a960b2cd1bc1ef0276416d896db81c14582c",
+      "bytes": 69583
+    },
+    "approved-native-inputs/wheels/lxml-5.3.0-0-cp311-cp311-android_24_arm64_v8a.whl": {
+      "sha256": "6ab16eebfd35a4b9519f979f7a6d90f6c3eb32ece39846728f37ec247a4d0e5f",
+      "bytes": 1420163
+    },
+    "approved-native-inputs/wheels/packaging-26.3-py3-none-any.whl": {
+      "sha256": "d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c",
+      "bytes": 129956
+    },
+    "approved-native-inputs/wheels/pillow-11.0.0-0-cp311-cp311-android_24_arm64_v8a.whl": {
+      "sha256": "c40b2d55a04720f60792769717c54442924dfb776d73a4312e9c2e7ae6aee3dc",
+      "bytes": 582690
+    },
+    "approved-native-inputs/wheels/pyyaml-6.0.3-0-cp311-cp311-android_24_arm64_v8a.whl": {
+      "sha256": "75013ba172066d8e009cf8c7a2fa7a2b2d9e83fc9913470d7f5f707872c4885d",
+      "bytes": 136080
+    },
+    "approved-native-inputs/wheels/requests-2.34.2-py3-none-any.whl": {
+      "sha256": "2a0d60c172f83ac6ab31e4554906c0f3b3588d37b5cb939b1c061f4907e278e0",
+      "bytes": 73075
+    },
+    "approved-native-inputs/wheels/soupsieve-3.0.3-py3-none-any.whl": {
+      "sha256": "fa30e3ba4809cb81ce1f3209f2fbe3e779fc445f0439bc147a0d7c4601743f21",
+      "bytes": 41705
+    },
+    "approved-native-inputs/wheels/typing_extensions-4.16.0-py3-none-any.whl": {
+      "sha256": "481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8",
+      "bytes": 45571
+    },
+    "approved-native-inputs/wheels/urllib3-2.8.0-py3-none-any.whl": {
+      "sha256": "0cf3cae568d36aa9576b28dfb35f11328f1cb974ca7647d9475ebb86c75ac6e3",
+      "bytes": 135717
+    },
+    "build-final-overlay.gradle": {
+      "sha256": "9d1dc028d33fcaa3dde3078d5a92313162a4d1b63b7cb47cfa32754b3e014e41",
+      "bytes": 34686
+    },
+    "compiled-classes.jar": {
+      "sha256": "17123ef538d016f8b04ff7ff80047b402b468aaa38d76b8d7ad97eb297719d59",
+      "bytes": 40225130
+    },
+    "jni-unstripped/libtmessages.49.so": {
+      "sha256": "11d2cb30b650d76d36ae64dc562febb6c6f33fef354dd98d9b85bdaf375f1abc",
+      "bytes": 388979112
+    },
+    "logs/physical-android-build-2.log": {
+      "sha256": "a17fe855950a816f0293b8d16bc5d9c621a4a7096335faf634592de9a484a24b",
+      "bytes": 1855
+    },
+    "logs/physical-android-build-3.log": {
+      "sha256": "20eaf5ac9d7d873d7933a6eea8924264cdedfef7796f0b29edfb27f5f1939bea",
+      "bytes": 242245
+    },
+    "logs/physical-android-build.log": {
+      "sha256": "c0edf8c67140dac8d7a5605ed256a9f2e75bbf564155902578888c5cacc09702",
+      "bytes": 2120
+    },
+    "logs/physical-apk-review.log": {
+      "sha256": "56edcb3c6aba71746cdeccec530b1fb8b8e4d6967853709823d87085da7ee1e4",
+      "bytes": 382
+    },
+    "logs/physical-baseline-reproduction.log": {
+      "sha256": "63fb2297232fbade36ccf65a9a571f3fa7ac3cf0aa2fdf40c23b8f277d137e9e",
+      "bytes": 438
+    },
+    "logs/physical-combined-tests.log": {
+      "sha256": "782bcb65aa42395d5cefce1cf5bc7a5a82e1fbc7388ed92583cae499dfc5c62e",
+      "bytes": 112
+    },
+    "logs/physical-fetch.log": {
+      "sha256": "52a43fa6c59d34f5c37ba27f4f767021c3e5035fc323c74dcf2cce16f39cda64",
+      "bytes": 119
+    },
+    "logs/physical-host-alias-test.log": {
+      "sha256": "7928814aedf498e5aa121cba473e181c212f6f421a47b7658e369002bacc562b",
+      "bytes": 98
+    },
+    "logs/physical-host-diagnostic-test.log": {
+      "sha256": "5edee93926baaf2d652c81594a39241d47b26049d82234a944c94aca7c9aec2e",
+      "bytes": 98
+    },
+    "logs/physical-host-existing-test.log": {
+      "sha256": "b0d8864e05ffc7a3b7ad37661f9e52ba9a78f1e477cd780a2303958776f0fa0c",
+      "bytes": 98
+    },
+    "logs/physical-login-tests.log": {
+      "sha256": "3578362e44a3ff25432a44e54645672bf32930103bf66e4ee176c1a7be39597f",
+      "bytes": 133
+    },
+    "logs/physical-offline-tests.log": {
+      "sha256": "068d6cb34912abf877e6c1b3f8033b616b858813d9b6fdddae3db990aae3b7bf",
+      "bytes": 124
+    },
+    "logs/physical-preflight-initial.log": {
+      "sha256": "f87815c560f9b24e7cf205b18fe1b2af3ad68f52eb83c0ce3ad534ed25e8470e",
+      "bytes": 239
+    },
+    "logs/physical-preflight.log": {
+      "sha256": "536a46d42d0dab4d8c3c35b7255b2c92699dbcd16334ae74bc1594a37a7be564",
+      "bytes": 241
+    },
+    "logs/physical-probe-tests.log": {
+      "sha256": "4ce4b159ff7679481a0468f481ab9e558b9a46d43b31b03c542ec76edc04e964",
+      "bytes": 111
+    },
+    "logs/physical-submodules.log": {
+      "sha256": "f5d77d430fcc24a8e34e8148133a8add33773f58120b47b7441f915674817f6f",
+      "bytes": 5578
+    },
+    "receipts/physical-build-overlay.json": {
+      "sha256": "46589e11e224d86ae258ed562f937d5984769e732afeec6f03b1be0f03732d73",
+      "bytes": 429
+    },
+    "receipts/physical-build-preflight.json": {
+      "sha256": "42687fffeaa4d0fc5ae26baf3b93edc99bcb35a6cc0b49c62f2d4a102963ad00",
+      "bytes": 227
+    },
+    "receipts/physical-dex-source-review.json": {
+      "sha256": "5bd223d62cff4656d0f8d881d5b162d82bb6342baba4a7087219a19c2ad076bb",
+      "bytes": 1550
+    },
+    "receipts/physical-preflight-check.json": {
+      "sha256": "536a46d42d0dab4d8c3c35b7255b2c92699dbcd16334ae74bc1594a37a7be564",
+      "bytes": 241
+    },
+    "receipts/physical-preflight-static.json": {
+      "sha256": "91144139dcc397d44ce40ae150af039285db4b552bc70b01e5f797f5ca122c71",
+      "bytes": 241
+    },
+    "source-corrections.patch": {
+      "sha256": "0c8c69c430c170a69a6e7133efde8eec5edddd40110180ccd7adcc3b6fcbfc3a",
+      "bytes": 50930
+    },
+    "source-regression-tests.patch": {
+      "sha256": "3a2c47357b49124f272eb3e97f458e4f4a9917dbda710bd46e0cb13719433aad",
+      "bytes": 2395
+    }
+  }
+}

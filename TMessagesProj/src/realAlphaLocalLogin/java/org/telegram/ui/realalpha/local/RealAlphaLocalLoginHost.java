@@ -36,6 +36,8 @@ public final class RealAlphaLocalLoginHost implements AutoCloseable {
         final Handler worker;
         volatile LocalLoginRehearsal flow;
         volatile Phase phase=Phase.NATIVE_ATTESTATION;
+        volatile AccountProbe.Diagnostic diagnostic=AccountProbe.Diagnostic.INTERNAL_EXCEPTION;
+        volatile AccountProbe.Step inspectionStep=AccountProbe.Step.CONTEXT;
         Ticket() { thread.start(); worker=new Handler(thread.getLooper()); }
         Executor executor() { return task -> { if (!worker.post(task)) throw new IllegalStateException("LOCAL_WORKER_UNAVAILABLE"); }; }
         void close() {
@@ -94,6 +96,7 @@ public final class RealAlphaLocalLoginHost implements AutoCloseable {
                 ReadOnlyAttestation attestation=AndroidNativeBridge.read(application,account);
                 ticket.phase=Phase.ACCOUNT_INSPECTION;
                 AccountProbe.Snapshot probe=new TelegramAccountAdapter(application,attestation).inspect();
+                ticket.diagnostic=probe.diagnostic; ticket.inspectionStep=probe.step;
                 if (probe.evidence!=AccountProbe.Evidence.EMPTY || !probe.controllerHandlesAvailable)
                     throw new IllegalStateException("LOCAL_ACCOUNT_NOT_EMPTY");
                 ticket.phase=Phase.LOCAL_INITIALIZATION;
@@ -128,7 +131,8 @@ public final class RealAlphaLocalLoginHost implements AutoCloseable {
         requireMain(); ticket.close();
         if (current!=ticket) return;
         current=null; screen=null;
-        if (!closed && !activity.isFinishing() && LaunchActivity.getLastFragment()==root) status(root,"LOCAL_LOGIN_UNAVAILABLE:"+ticket.phase.name());
+        if (!closed && !activity.isFinishing() && LaunchActivity.getLastFragment()==root) status(root,"LOCAL_LOGIN_UNAVAILABLE:"+ticket.phase.name()
+            +(ticket.phase==Phase.ACCOUNT_INSPECTION?":"+ticket.diagnostic.name()+":"+ticket.inspectionStep.name():""));
     }
     private void status(BaseFragment root,String code) {
         root.showDialog(new AlertDialog.Builder(activity).setTitle("Laboratorio local")

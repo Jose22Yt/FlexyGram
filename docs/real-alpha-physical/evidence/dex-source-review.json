@@ -1,0 +1,29 @@
+{
+  "dex_required_symbols_present": [
+    "Lio/github/jose22yt/flexygram/session/android/AccountProbe$Diagnostic;",
+    "Lio/github/jose22yt/flexygram/session/android/AccountProbe$Step;",
+    "INITIALIZATION_FAILED",
+    "ACCOUNT_DIRECTORY",
+    "STORAGE_HANDLE",
+    "Lorg/telegram/ui/FilteredSearchView;",
+    "Lorg/telegram/ui/Components/PostsSearchContainer;"
+  ],
+  "compiled_changed_java_matches_commit": "b6678c2e4b3823956122a7ebc274fdd8df111853",
+  "sha256": {
+    "TMessagesProj/src/realAlphaLocalLogin/java/org/telegram/ui/realalpha/local/RealAlphaLocalLoginHost.java": "ba19ed82d3663b3dc7cd66198d4f8f84ad91bc237ac717945e417066b55e269a",
+    "TMessagesProj_Modules/telegram-session-android/src/android/java/io/github/jose22yt/flexygram/session/android/TelegramAccountAdapter.java": "271538795eeb25e54a74a4fab586eb224e02eb8aaed32704f23babe45b634daa",
+    "TMessagesProj_Modules/telegram-session-android/src/main/java/io/github/jose22yt/flexygram/session/android/AccountProbe.java": "03f4bb3179a09eccacae8238e43856b65293ce334429046f2d144079c5f84250"
+  },
+  "baseline_comparison": {
+    "same_member_inventory": true,
+    "members": 13291,
+    "baseline_bytes": 124452770,
+    "current_bytes": 113167667,
+    "baseline_compressed_payload": 111187854,
+    "current_compressed_payload": 111189315,
+    "baseline_local_extra_bytes": 0,
+    "current_local_extra_bytes": 0,
+    "note": "Clean APK has the same member inventory; file size difference is predominantly ZIP layout/free space, not removed functions."
+  },
+  "android_executed": false
+}

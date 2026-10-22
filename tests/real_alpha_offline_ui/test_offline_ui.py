@@ -42,7 +42,7 @@ class OfflineUiTests(unittest.TestCase):
         cls.lock = json.loads((ROOT / 'tools/real_alpha_offline_ui/sources.json').read_text())
         cls.original = {p: (ROOT / 'TMessagesProj/src/main/java' / p).read_text() for p in m.SOURCES}
         cls.overlay = {p: (ROOT / m.OUTPUT / p).read_text() for p in m.SOURCES}
-        cls.activity, cls.adapter, cls.search = [cls.overlay[p] for p in m.SOURCES]
+        cls.activity, cls.adapter, cls.search = [cls.overlay[p] for p in m.SOURCES[:3]]
         cls.scratch = tempfile.TemporaryDirectory()
         cls.tmp = Path(cls.scratch.name)
         pkg = cls.tmp / 'org/telegram/messenger'; pkg.mkdir(parents=True)
@@ -176,6 +176,23 @@ h.closed=false;h.update();if(!h.itemInternals.equals(List.of(2)))throw new Asser
         output = run([JDK / 'bin/java', '-cp', os.pathsep.join(map(str, jars)), 'groovy.ui.GroovyMain',
                       Path(__file__).parent / 'fixtures/GradleOverlayHarness.groovy', ROOT])
         self.assertIn('GradleOverlayHarness PASS', output)
+
+    def test_closed_search_tabs_stop_before_remote_scheduling(self):
+        policy='org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha()'
+        for name in ('DialogsBotsAdapter', 'DialogsChannelsAdapter'):
+            text=self.overlay['org/telegram/ui/Components/'+name+'.java']
+            for signature in ('public void fillItems(', 'public void search(String query)', 'public void checkBottom()', 'private void searchMessages(boolean next)'):
+                body=method(text,signature)
+                self.assertIn(policy,body)
+                self.assertLess(body.index(policy),body.index('return;'))
+        text=self.overlay['org/telegram/ui/FilteredSearchView.java']
+        body=method(text,'public void search(long dialogId,')
+        self.assertLess(body.index(policy),body.index('sendRequestTyped('))
+        self.assertIn('endReached=true; totalCount=0;',body)
+        self.assertIn('emptyView.showProgress(false, false);',body)
+        pager=self.overlay['org/telegram/ui/Components/SearchViewPager.java']
+        self.assertIn('botsEmptyView.showProgress(!'+policy,pager)
+        self.assertIn('channelsEmptyView.showProgress(!'+policy,pager)
 
     def test_remote_message_filter_does_not_create_loading_placeholder(self):
         self.assertEqual(self.search.count('if (!org.telegram.ui.realalpha.offline.OfflineDialogsUi.isClosedRealAlpha() && (currentMessagesFilter != Filter.All || forceLoadingMessages) && searchResultMessages.isEmpty())'), 4)
