@@ -1,0 +1,35 @@
+// Opt-in overlay. With the property absent, all existing source sets and variants are untouched.
+if (providers.gradleProperty('flexygramOfflineDialogsUi').orNull == 'true') {
+    if (providers.gradleProperty('flexygramRealAlpha').orNull != 'true' ||
+            providers.gradleProperty('flexygramRealAlphaStartupDiagnostics').orNull == 'true') {
+        throw new GradleException('FLEXYGRAM_OFFLINE_DIALOGS_REQUIRES_CLOSED_REAL_ALPHA_DEBUG')
+    }
+    def inventory = new groovy.json.JsonSlurper().parse(rootProject.file('tools/real_alpha_offline_ui/sources.json'))
+    def hash = { File file -> java.security.MessageDigest.getInstance('SHA-256').digest(file.bytes).encodeHex().toString() }
+    def sourceRoot = file('src/main/java')
+    def overlayRoot = file('build/generated/flexygram-offline-dialogs-ui/java')
+    if (hash(rootProject.file('patches/real-alpha-offline-ui/0001-native-dialogs-offline-ui.patch')) != inventory.patch_sha256) {
+        throw new GradleException('FLEXYGRAM_OFFLINE_DIALOGS_PATCH_HASH')
+    }
+    def actual = overlayRoot.exists() ? fileTree(overlayRoot).files.collect { overlayRoot.toPath().relativize(it.toPath()).toString().replace('\\', '/') }.toSet() : [] as Set
+    if (actual != inventory.sources.keySet()) {
+        throw new GradleException('FLEXYGRAM_OFFLINE_DIALOGS_MATERIALIZE_FIRST')
+    }
+    inventory.sources.each { path, hashes ->
+        def original = new File(sourceRoot, path)
+        def generated = new File(overlayRoot, path)
+        if (!original.isFile() || !generated.isFile() || hash(original) != hashes.original_sha256 || hash(generated) != hashes.overlay_sha256) {
+            throw new GradleException('FLEXYGRAM_OFFLINE_DIALOGS_SOURCE_HASH')
+        }
+        android.sourceSets.main.java.exclude(path)
+    }
+    android.sourceSets.realAlpha.java.srcDir(overlayRoot)
+    android.sourceSets.realAlpha.java.srcDir(file('src/realAlphaOfflineUi/java'))
+    android.sourceSets.realAlpha.res.srcDir(file('src/realAlphaOfflineUi/res'))
+    androidComponents.beforeVariants(androidComponents.selector().all()) { builder ->
+        def flavor = builder.productFlavors.find { it.first == 'environment' }?.second
+        if (flavor != 'realAlpha' || builder.buildType != 'debug') {
+            builder.enable = false
+        }
+    }
+}
