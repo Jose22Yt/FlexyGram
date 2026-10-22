@@ -21,6 +21,9 @@ python3.11 tools/real_alpha_integration/check_combined.py --prepare
 python3.11 tools/real_alpha_integration/check_combined.py --check
 ```
 
+Gradle ejecuta automáticamente el mismo \`--check\` durante \`preBuild\` cuando
+ambos opt-ins están activos. Esto no reemplaza el materializador previo.
+
 Solo con los SDK, submódulos y dependencias verificadas disponibles:
 
 ```sh
@@ -31,7 +34,8 @@ NATIVE_TARGET=arm64-v8a ./gradlew :TMessagesProj:assembleRealAlphaDebug \
 ```
 
 La comprobación cubre **7 fuentes originales + 7 copias Java generadas**,
-hashes de los parches, selección Gradle, ausencia de clases duplicadas entre
+hashes de los parches, selección Gradle, política aislada, retirada de INTERNET,
+única Activity exportada y ausencia de clases duplicadas entre
 ambos overlays y negación de variantes distintas de realAlphaDebug.
 No intenta sustituir una compilación Gradle/AGP ni prueba JNI, Chaquopy,
 recursos Android, rendimiento o navegación real. El indicador
