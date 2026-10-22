@@ -1,0 +1,18 @@
+{
+  "base_commit": "57e3d958d161d77f3c468dcd9dc45644ccbc2fe7",
+  "sources": {
+    "org/telegram/ui/DialogsActivity.java": {
+      "original_sha256": "6cb070e30b4ec5c435d9a0fc6da09ac534575694214673b9eba8f9bf251b0768",
+      "overlay_sha256": "85252d758f12f161badfc870f06f1cfcac08748b87d1f5bf4cd4271c2e4cc0df"
+    },
+    "org/telegram/ui/Adapters/DialogsAdapter.java": {
+      "original_sha256": "419c207cb61d700e250d9a3c33077a719d5979464b85cfde20424d9e4015b72f",
+      "overlay_sha256": "92c6a72c600285bc9a4e46a99b8240d7a99b28683f526076094ed4fef104ed0d"
+    },
+    "org/telegram/ui/Adapters/DialogsSearchAdapter.java": {
+      "original_sha256": "4f2ee4f745f25fd668d24ef1343f37ee2a850fee7577748c2e891804b3a6a0cd",
+      "overlay_sha256": "99f93146488dbe6bde33a816ccb351002502f49f4087144c6601c6575cccd0a5"
+    }
+  },
+  "patch_sha256": "5e6446c073817f605b641f200cc5f81e6fe2a4c258bb2e41aabcc19d42062f52"
+}
