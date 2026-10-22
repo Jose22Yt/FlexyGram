@@ -10,6 +10,7 @@ import json
 from pathlib import Path
 import subprocess
 import sys
+import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[2]
 LOCAL_ROOT = Path('build/generated/flexygram-local-login')
@@ -78,6 +79,28 @@ def inspect(root, generated=True):
         if rel.is_absolute() or '..' in rel.parts or not rel.as_posix().startswith('patches/'):
             fail('UNSAFE_PATCH_REFERENCE')
         check_sha(root, rel, sha)
+    policy = inventory(root, Path('gradle/real-alpha.json'))
+    expected_caps = {'authentication', 'telegramTransport', 'push',
+                     'translation', 'plugins', 'sessionRestore'}
+    if (set(policy) != {'applicationId', 'isolated', 'capabilities'}
+            or policy['applicationId'] != 'io.github.jose22yt.flexygram.realalpha'
+            or policy['isolated'] is not True
+            or set(policy['capabilities']) != expected_caps
+            or any(value is not False for value in policy['capabilities'].values())):
+        fail('REALALPHA_ISOLATION_POLICY_CHANGED')
+    android = '{http://schemas.android.com/apk/res/android}'
+    tools = '{http://schemas.android.com/tools}'
+    manifest = ET.fromstring(read_file(root, Path('TMessagesProj/src/realAlpha/AndroidManifest.xml')))
+    internet = [p for p in manifest.findall('uses-permission')
+                if p.attrib.get(android + 'name') == 'android.permission.INTERNET']
+    if len(internet) != 1 or internet[0].attrib.get(tools + 'node') != 'remove':
+        fail('REALALPHA_INTERNET_PERMISSION_NOT_REMOVED')
+    app = manifest.find('application')
+    if app is None or app.attrib.get(android + 'usesCleartextTraffic') != 'false':
+        fail('REALALPHA_CLEARTEXT_POLICY_CHANGED')
+    exported = [a for a in app.findall('activity') if a.attrib.get(android + 'exported') == 'true']
+    if len(exported) != 1 or exported[0].attrib.get(android + 'name') != 'org.telegram.ui.realalpha.RealAlphaActivity':
+        fail('REALALPHA_EXPORTED_ACTIVITY_CHANGED')
     # No generated source can silently shadow another generated class.
     local_login = 'org/telegram/ui/LoginActivity.java'
     if set(EXPECTED_OFFLINE).intersection(set(EXPECTED_ALPHA) | {local_login}):
