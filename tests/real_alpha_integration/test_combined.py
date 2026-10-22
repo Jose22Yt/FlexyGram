@@ -64,6 +64,19 @@ android.sourceSets.main.java.exclude(path)
 android.sourceSets.realAlpha.java.srcDir(overlayRoot)
 android.sourceSets.realAlpha.res.srcDir(
 if (flavor != 'realAlpha' || builder.buildType != 'debug')"""
+        put(Path('gradle/real-alpha.json'), json.dumps({
+            'applicationId': 'io.github.jose22yt.flexygram.realalpha', 'isolated': True,
+            'capabilities': {c: False for c in ('authentication','telegramTransport','push',
+                'translation','plugins','sessionRestore')}
+        }).encode())
+        put(Path('TMessagesProj/src/realAlpha/AndroidManifest.xml'), b'''<manifest
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools">
+            <uses-permission android:name="android.permission.INTERNET" tools:node="remove" />
+            <application android:usesCleartextTraffic="false">
+                <activity android:name="org.telegram.ui.realalpha.RealAlphaActivity" android:exported="true" />
+            </application>
+        </manifest>''')
         put(Path('TMessagesProj/build.gradle'), main_gradle.encode())
         put(Path('gradle/real-alpha-offline-ui.gradle'), overlay_gradle.encode())
 
@@ -124,6 +137,20 @@ if (flavor != 'realAlpha' || builder.buildType != 'debug')"""
         path = self.root / 'TMessagesProj/build.gradle'
         path.write_text(path.read_text().replace("tasks.register('verifyCombinedRealAlphaSources', Exec)", ''))
         with self.assertRaisesRegex(gate.PreflightError, 'MISSING_LOCAL_LOGIN_GRADLE_GUARD'):
+            gate.inspect(self.root)
+
+    def test_rejects_network_permission_reintroduction(self):
+        path = self.root / 'TMessagesProj/src/realAlpha/AndroidManifest.xml'
+        path.write_text(path.read_text().replace('tools:node="remove"', 'tools:node="merge"'))
+        with self.assertRaisesRegex(gate.PreflightError, 'REALALPHA_INTERNET_PERMISSION_NOT_REMOVED'):
+            gate.inspect(self.root)
+
+    def test_rejects_online_capability_reintroduction(self):
+        path = self.root / 'gradle/real-alpha.json'
+        policy = json.loads(path.read_text())
+        policy['capabilities']['authentication'] = True
+        path.write_text(json.dumps(policy))
+        with self.assertRaisesRegex(gate.PreflightError, 'REALALPHA_ISOLATION_POLICY_CHANGED'):
             gate.inspect(self.root)
 
     def test_rejects_malicious_inventory_expansion(self):
