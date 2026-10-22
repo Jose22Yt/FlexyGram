@@ -1,0 +1,39 @@
+{
+  "result": "UNSIGNED_APK_STATIC_VERIFIED_PENDING_ANDROID",
+  "apk": "FlexyGram-realAlpha-ARM64-unsigned.apk",
+  "apk_sha256": "cc2053f96119dca5319d9a02bb2ece9a49b7cc342747e975103c4bfba5e8520b",
+  "bytes": 124452770,
+  "source_base": "b5575029dde6bf787bf0781dcfd032256789ee26",
+  "application_code_commit": "38e9052242988cdcb0771df816a4769990cac547",
+  "verification_tools_commit": "e21f1fdbab73005bbca680af63613b23a605b227",
+  "host_tests": {
+    "tests-real_alpha_integration.log": 18,
+    "tests-real_alpha_local_login.log": 33,
+    "tests-real_alpha_offline_ui.log": 24,
+    "tests-native-experimental.log": 22,
+    "tests-apk-review.log": 10
+  },
+  "host_tests_total": 107,
+  "combined_optimized_tests": 18,
+  "native_summary": {
+    "elf_total": 97,
+    "android_arm64": 96,
+    "arm64_4k_pass": 96,
+    "arm64_16k_pass": 96,
+    "other_machine": 1,
+    "missing_needed": 0,
+    "strong_unresolved": 0,
+    "version_mismatch": 0
+  },
+  "unsigned": true,
+  "android_executed": false,
+  "installed": false,
+  "main_develop_modified": false,
+  "temporary_sync_files_in_apk": false,
+  "external_capabilities_enabled": false,
+  "warnings": [
+    "Inherited C/C++/resource/Gradle deprecations remain.",
+    "Final strip step reported a temporary intermediate file; verified APK has no temporary paths and all 96 ARM64 ELF pass."
+  ],
+  "build_overlay_receipt": "final-overlay-receipt.json"
+}

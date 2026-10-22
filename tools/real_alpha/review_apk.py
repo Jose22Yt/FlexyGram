@@ -149,10 +149,30 @@ def verify_offline_biometric_guard(block):
             'Biometric skip must compare the compiled realAlpha identity with itself')
 
 
-def verify_dex_linkage(apk,dexdump):
+def dex_method(block, name):
+    match=re.search(r"(?ms)name\s*:\s*'"+re.escape(name)+r"'.*?(?=^\s*#\d|^\s*(?:Virtual|Direct) methods|^\s*source_file_idx|\Z)",block)
+    require(match is not None,'DEX method missing: '+name)
+    return match.group(0)
+
+def verify_local_lifecycle(block):
+    # Local pages add teardown of their own host, while LaunchActivity still
+    # owns Back and receives both lifecycle callbacks. Default review stays strict.
+    for name, first, second in (
+        ('onResume','Lorg/telegram/ui/LaunchActivity;.onResume:',
+         'Lorg/telegram/ui/realalpha/local/RealAlphaLocalLoginHost;.attachEntry:'),
+        ('onDestroy','Lorg/telegram/ui/realalpha/local/RealAlphaLocalLoginHost;.close:',
+         'Lorg/telegram/ui/LaunchActivity;.onDestroy:')):
+        body=dex_method(block,name)
+        require(body.count(first)==1 and body.count(second)==1 and
+                body.index(first)<body.index(second),'Local lifecycle delegation missing or reordered: '+name)
+        calls=re.findall(r'(?m)^.*?invoke-[^\n]+',body)
+        require(len(calls)==2,'Unexpected local lifecycle call: '+name)
+
+def verify_dex_linkage(apk,dexdump,combined_local_login=False):
     found=False
     back_owner=False
     definitions=set()
+    overlay_methods=set()
     with tempfile.TemporaryDirectory() as folder,zipfile.ZipFile(apk) as z:
         for name in z.namelist():
             if not re.fullmatch(r'classes(?:\d+)?\.dex',name):continue
@@ -161,6 +181,14 @@ def verify_dex_linkage(apk,dexdump):
                 descriptor=re.search(r"Class descriptor\s*:\s*'([^']+)'",block)
                 if descriptor:
                     definitions.add(descriptor.group(1))
+                    if combined_local_login:
+                        expected_methods={
+                            'Lorg/telegram/ui/LoginActivity;': ('bindClosedLocalPages',),
+                            'Lorg/telegram/ui/DialogsActivity;': ('offlineAwareEmptyView',),
+                            'Lorg/telegram/ui/Adapters/DialogsSearchAdapter;': ('cancelOfflineSearch','searchOfflineDialogs')}
+                        for name in expected_methods.get(descriptor.group(1),()):
+                            dex_method(block,name)
+                            overlay_methods.add((descriptor.group(1),name))
                     require(not descriptor.group(1).startswith('Lorg/telegram/ui/realalpha/RealAlphaBack'),'Obsolete Back bridge in DEX')
                     if descriptor.group(1)=='Lorg/telegram/ui/LaunchActivity;':
                         verify_offline_biometric_guard(block)
@@ -169,7 +197,9 @@ def verify_dex_linkage(apk,dexdump):
                 if not re.search(r"Class descriptor\s*:\s*'Lorg/telegram/ui/realalpha/RealAlphaActivity;'",block):continue
                 require(not found,'Duplicate realAlpha DEX class');found=True
                 require(re.search(r"Superclass\s*:\s*'Lorg/telegram/ui/LaunchActivity;'",block),'Wrong DEX superclass')
-                require(not re.search(r"name\s*:\s*'(?:onBackPressed|onDestroy)'",block) and 'Landroid/window/' not in block and 'RealAlphaBack' not in block,'Subclass overrides original Back lifecycle')
+                forbidden='onBackPressed' if combined_local_login else '(?:onBackPressed|onDestroy)'
+                require(not re.search(r"name\s*:\s*'"+forbidden+"'",block) and 'Landroid/window/' not in block and 'RealAlphaBack' not in block,'Subclass overrides original Back lifecycle')
+                if combined_local_login:verify_local_lifecycle(block)
                 factory=re.search(r"(?ms)name\s*:\s*'getClientNotActivatedFragment'.*?(?=^\s*#\d|^\s*(?:Virtual|Direct) methods|^\s*source_file_idx|\Z)",block)
                 require(factory is not None,'DEX factory missing')
                 body=factory.group(0)
@@ -177,6 +207,13 @@ def verify_dex_linkage(apk,dexdump):
     require(found,'DEX entry definition missing')
     require(back_owner,'DEX original Back owner missing')
     require({'Lorg/telegram/ui/LaunchActivity;','Lorg/telegram/ui/DialogsActivity;'} <= definitions,'Original native UI class definitions missing')
+    if combined_local_login:
+        require(len(overlay_methods)==4,'Combined Java overlays missing from DEX')
+        require({'Lorg/telegram/ui/realalpha/local/RealAlphaLocalLoginHost;',
+                 'Lorg/telegram/ui/realalpha/local/LocalLoginRehearsal;',
+                 'Lorg/telegram/ui/realalpha/offline/OfflineDialogsUi;',
+                 'Lio/github/jose22yt/flexygram/login/local/LocalLoginSession;'} <= definitions,
+                'Combined local-login/offline DEX definitions missing')
 
 
 def check_native_inventory(report):
@@ -229,7 +266,7 @@ def review(args):
     manifest=binary_manifest(args.apk,args.build_tools/'aapt2')
     merged=validate_manifest(ET.parse(args.merged_manifest).getroot())
     require(manifest==merged,'Merged/packaged manifests differ')
-    verify_dex_linkage(args.apk,args.build_tools/'dexdump')
+    verify_dex_linkage(args.apk,args.build_tools/'dexdump',getattr(args,'combined_local_login',False))
     elf=audit(args.apk,args.ndk);acceptance=artifact_acceptance(elf)
     check_native_inventory(elf)
     linkage=command([args.javap,'-c','-p','-classpath',args.classes,ENTRY])
@@ -252,5 +289,6 @@ def review(args):
 
 if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__)
+    p.add_argument('--combined-local-login',action='store_true',help='Require the reviewed local host lifecycle and offline UI DEX classes')
     for name in ('apk','build-tools','ndk','classes','javap','merged-manifest','output'):p.add_argument('--'+name,type=Path,required=True)
     args=p.parse_args();result=review(args);args.output.write_text(json.dumps(result,indent=2)+'\n');print(json.dumps({k:result[k]for k in ('status','apk_sha256','bytes','native_summary','signature')}))

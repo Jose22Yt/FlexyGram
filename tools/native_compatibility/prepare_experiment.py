@@ -4,6 +4,20 @@ The approved diagnostic requirements/lock/build file are not changed.
 from pathlib import Path
 import argparse,hashlib,json,subprocess
 
+def replace_python_preparation(text, replacement):
+ # Replace only the reviewed task/wiring, retaining later overlays and gates.
+ start_marker='// P0.4c: pip resolves exclusively'
+ end_marker="""tasks.configureEach { task ->
+    if (task.name.startsWith('install') && task.name.endsWith('PythonRequirements')) {
+        task.dependsOn(prepareLockedPython)
+    }
+}"""
+ if text.count(start_marker)!=1 or text.count(end_marker)!=1:
+  raise ValueError('Reviewed Python preparation block no longer matches')
+ start=text.index(start_marker);end=text.index(end_marker)+len(end_marker)
+ if end<=start:raise ValueError('Reviewed Python preparation block is out of order')
+ return text[:start]+replacement+text[end:]
+
 def unsigned_diagnostic(text):
  old='signingConfig = signingConfigs.diagnosticLab'
  if text.count(old)!=1:raise ValueError('Reviewed diagnostic signing assignment no longer matches')
@@ -31,15 +45,14 @@ def overlay(source,checkout,wheelhouse,manifest,python,unsigned=False):
   ("file('python/requirements.lock').absolutePath",repr(str(requirements)))]:
   if text.count(old)!=(2 if 'wheelhouse' in old else 1):raise ValueError('Reviewed build overlay no longer matches')
   text=text.replace(old,new)
- start=text.index('// P0.4c: pip resolves exclusively')
- text=text[:start]+'''// Isolated 16 KB experiment: validate exact local wheels before pip.
+ text=replace_python_preparation(text,'''// Isolated 16 KB experiment: validate exact local wheels before pip.
  def prepareLockedPython = tasks.register('prepareLockedPython', Exec) {
      commandLine '''+repr(str(python))+', '+repr(str(source/'tools/native_compatibility/experimental_wheels.py'))+", 'verify', '--manifest', "+repr(str(manifest))+", '--wheelhouse', "+repr(str(wheelhouse))+'''
  }
  tasks.configureEach { task ->
      if (task.name.startsWith('install') && task.name.endsWith('PythonRequirements')) task.dependsOn(prepareLockedPython)
  }
-'''
+''')
  dst.write_text(text)
  return {'source_head':subprocess.check_output(['git','rev-parse','HEAD'],cwd=source,text=True).strip(),
   'approved_build_sha256':hashlib.sha256(src.read_bytes()).hexdigest(),'overlay_build_sha256':hashlib.sha256(dst.read_bytes()).hexdigest(),

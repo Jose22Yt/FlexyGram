@@ -359,6 +359,10 @@ android {
     namespace = 'org.telegram.messenger'
 }
 
+// AGP creates classpath configurations only for enabled variants. The local-login
+// profile disables Diagnostic, so collect the actual variants instead of probing
+// nonexistent Diagnostic configurations (and verify realAlpha itself as well).
+def reviewedTranslationClasspaths = []
 androidComponents {
     beforeVariants(selector().all()) { builder ->
         def flavor = builder.productFlavors.find { it.first == 'environment' }?.second
@@ -370,6 +374,8 @@ androidComponents {
                 (startupDiagnosticsEnabled && flavor == 'realAlpha' && builder.buildType == 'startupDiagnostic')
     }
     onVariants(selector().all()) { variant ->
+        reviewedTranslationClasspaths.addAll([
+                variant.name + 'CompileClasspath', variant.name + 'RuntimeClasspath'])
         variant.outputs.forEach { output ->
             String gramName = 'flexygram'
             String first = String.format('%s-v%s(%s)', gramName, verName, verCode)
@@ -578,8 +584,8 @@ tasks.register('verifyDiagnosticTranslationClasspath') {
     // Recheck the resolved graph rather than accepting a stale report.
     outputs.upToDateWhen { false }
     doLast {
-        def names = ['diagnosticDebugCompileClasspath', 'diagnosticDebugRuntimeClasspath',
-                     'diagnosticStagingCompileClasspath', 'diagnosticStagingRuntimeClasspath']
+        def names = reviewedTranslationClasspaths.sort(false)
+        if (names.isEmpty()) throw new GradleException('No enabled isolated translation classpaths to verify')
         def graphs = [:]
         names.each { name ->
             def configuration = configurations.getByName(name)

@@ -1,0 +1,10 @@
+{
+  "bundle_sha256": "31702d7c98d8d5042e9022ffa3325d0b5b42dc6bd41d5f920d7a65a84ac56cb8",
+  "bytes": 268711319,
+  "members_verified": 45,
+  "zip_crc_pass": true,
+  "all_member_sha256_pass": true,
+  "apk_sha256": "cc2053f96119dca5319d9a02bb2ece9a49b7cc342747e975103c4bfba5e8520b",
+  "remote_recovery_verified": true,
+  "recovered_member_hashes_pass": 45
+}
