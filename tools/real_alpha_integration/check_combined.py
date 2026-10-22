@@ -92,6 +92,9 @@ def inspect(root, generated=True):
         'if (localLoginPagesEnabled && startupDiagnosticsEnabled)',
         "if (localLoginPagesEnabled && !(flavor == 'realAlpha' && builder.buildType == 'debug'))",
         'apply from: rootProject.file("gradle/real-alpha-offline-ui.gradle")',
+        "if (localLoginPagesEnabled && providers.gradleProperty('flexygramOfflineDialogsUi').orNull == 'true')",
+        "tasks.register('verifyCombinedRealAlphaSources', Exec)",
+        "tasks.named('preBuild').configure { dependsOn verifyCombinedRealAlphaSources }",
     )
     for token in required_main:
         if token not in gradle:
