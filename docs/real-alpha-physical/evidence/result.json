@@ -1,0 +1,22 @@
+{
+  "apk": {
+    "bytes": 113167667,
+    "sha256": "1b2aa70df396e53937b42fa542adb0d68f72626f4f99df136b0a7619cfcdfdd6",
+    "filename": "FlexyGram-realAlpha-PR52-ARM64-unsigned.apk"
+  },
+  "backup": {
+    "bytes": 268406085,
+    "sha256": "d2baa895b9b6c6206dac73ff22c081b84cfd4ec8e2ba07c7c07a300335be0d89",
+    "filename": "FlexyGram-realAlpha-PR52-recovery.zip"
+  },
+  "manifest_members": 52,
+  "crc_verified": true,
+  "build": "SUCCESSFUL",
+  "tasks": 249,
+  "elapsed": "11m 53s",
+  "code_commit": "b6678c2e4b3823956122a7ebc274fdd8df111853",
+  "signed": false,
+  "android_executed": false,
+  "private_backup_retrieval_verified": true,
+  "recovered_members_verified": 52
+}

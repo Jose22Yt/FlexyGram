@@ -1,0 +1,56 @@
+physical-probe-tests.log
+............
+----------------------------------------------------------------------
+Ran 12 tests in 2.494s
+
+OK
+
+physical-login-tests.log
+.................................
+----------------------------------------------------------------------
+Ran 33 tests in 13.075s
+
+OK
+
+physical-offline-tests.log
+.........................
+----------------------------------------------------------------------
+Ran 25 tests in 6.648s
+
+OK
+
+physical-combined-tests.log
+.............
+----------------------------------------------------------------------
+Ran 13 tests in 0.082s
+
+OK
+
+physical-host-alias-test.log
+.
+----------------------------------------------------------------------
+Ran 1 test in 2.760s
+
+OK
+
+physical-host-diagnostic-test.log
+.
+----------------------------------------------------------------------
+Ran 1 test in 2.831s
+
+OK
+
+physical-host-existing-test.log
+.
+----------------------------------------------------------------------
+Ran 1 test in 2.544s
+
+OK
+
+physical-baseline-reproduction.log
+warning: [options] source value 8 is obsolete and will be removed in a future release
+warning: [options] target value 8 is obsolete and will be removed in a future release
+warning: [options] To suppress warnings about obsolete options, use -Xlint:-options.
+3 warnings
+BASELINE a91d006: trusted private-root alias rejects EMPTY slot (regression reproduced).
+Corrected adapter: same fixture passes; see physical-probe-tests.log (12 cases).

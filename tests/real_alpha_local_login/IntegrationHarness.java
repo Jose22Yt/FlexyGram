@@ -40,7 +40,9 @@ public class IntegrationHarness {
    case "hostDestroyedWhileOpening":{setup(args[1]);choose(0);host.close();pump();yes(LaunchActivity.last==root);break;}
    case "hostAccountChanged":{setup(args[1]);choose(0);root.account=1;pump();yes(LaunchActivity.last==root);break;}
    case "hostForeignLoginRejected":{setup(args[1]);yes(!host.owns(new LoginActivity(0)));host.close();break;}
-   case "hostExistingAccountRejected":{setup(args[1]);org.telegram.messenger.UserConfig.getInstance(0).active=true;choose(0);pump();yes(LaunchActivity.last==root&&AlertDialog.lastMessage.contains("ACCOUNT_INSPECTION"));host.close();break;}
+   case "hostTrustedRootAliasOpens":{setup(args[1]);java.io.File alias=new java.io.File(args[1],"private-alias");java.nio.file.Files.createSymbolicLink(alias.toPath(),activity.getFilesDir().toPath());org.telegram.messenger.ApplicationLoader.overrideFiles=alias;choose(0);pump();yes(host.owns(LaunchActivity.last));host.close();break;}
+   case "hostControllerDiagnostic":{setup(args[1]);org.telegram.messenger.MessagesStorage.fail=true;choose(0);pump();yes(LaunchActivity.last==root&&AlertDialog.lastMessage.contains("ACCOUNT_INSPECTION:INITIALIZATION_FAILED:STORAGE_HANDLE"));host.close();break;}
+   case "hostExistingAccountRejected":{setup(args[1]);org.telegram.messenger.UserConfig.getInstance(0).active=true;choose(0);pump();yes(LaunchActivity.last==root&&AlertDialog.lastMessage.contains("ACCOUNT_INSPECTION:EXISTING_ACCOUNT:USER_CONFIG"));host.close();break;}
    case "hostPresentationFailureCloses":{setup(args[1]);root.present=false;choose(0);pump();yes(LaunchActivity.last==root);host.close();break;}
    case "hostReopenAfterDestroy":{setup(args[1]);choose(0);pump();LoginActivity s=(LoginActivity)LaunchActivity.last;s.onFragmentDestroy();pump();LaunchActivity.last=root;choose(1);pump();yes(LaunchActivity.last instanceof LoginActivity&&LaunchActivity.last!=s&&host.owns(LaunchActivity.last));host.close();break;}
    case "hostWorkerRejected":{setup(args[1]);Handler.reject=true;choose(0);yes(LaunchActivity.last==root);Handler.reject=false;host.close();break;}
