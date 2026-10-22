@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   connected-alpha-static:
-    if: github.head_ref == 'alpha/connected-exteraless-baseline'
+    if: github.head_ref == 'alpha/connected-exteraless-baseline' || startsWith(github.head_ref, 'support/connected-alpha-ci-')
     name: Connected Alpha source checks (no APK)
     runs-on: ubuntu-latest
     steps:
@@ -26,10 +26,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - run: python3 -m pip install -r tools/connected_alpha/requirements-ci.txt
       - run: python3 tools/connected_alpha/check_source.py
       - run: python3 -m unittest discover -s tools/connected_alpha -p 'test_*.py' -v
   build:
-    if: github.head_ref != 'alpha/connected-exteraless-baseline'
+    if: github.head_ref != 'alpha/connected-exteraless-baseline' && !startsWith(github.head_ref, 'support/connected-alpha-ci-')
     name: Gradle Build
     runs-on: ubuntu-latest
     env:

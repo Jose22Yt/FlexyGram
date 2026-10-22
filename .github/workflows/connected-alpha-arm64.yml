@@ -7,13 +7,19 @@ on:
       - support/connected-alpha-ci-20261022
     paths:
       - '.github/workflows/connected-alpha-arm64.yml'
+      - '.github/workflows/pr.yml'
+      - '.gitmodules'
+      - 'buildSrc/**'
       - 'TMessagesProj/**'
       - 'TMessagesProj_Modules/**'
       - 'gradle/**'
+      - 'gradlew'
+      - 'gradlew.bat'
       - 'gradle.properties'
       - 'build.gradle'
       - 'settings.gradle'
       - 'tools/connected_alpha/**'
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -23,8 +29,25 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  source-checks:
+    name: Source checks (not an APK build)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python3 -m pip install -r tools/connected_alpha/requirements-ci.txt
+      - name: Check upstream parity, build contract and verifier regressions
+        run: |
+          python3 tools/connected_alpha/check_source.py
+          python3 -m unittest discover -s tools/connected_alpha -p 'test_*.py' -v
+
   credentials-present:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       ready: ${{ steps.check.outputs.ready }}
     steps:
@@ -39,38 +62,37 @@ jobs:
           ALPHA_KEY_PASSWORD: ${{ secrets.ALPHA_KEY_PASSWORD }}
           ALPHA_FIREBASE_JSON_B64: ${{ secrets.ALPHA_FIREBASE_JSON_B64 }}
           ALPHA_KEYSTORE_B64: ${{ secrets.ALPHA_KEYSTORE_B64 }}
+          ALPHA_CERTIFICATE_SHA256: ${{ secrets.ALPHA_CERTIFICATE_SHA256 }}
         run: |
           set -euo pipefail
           ready=true
-          for name in TELEGRAM_APP_ID TELEGRAM_APP_HASH ALPHA_STORE_PASSWORD ALPHA_KEY_ALIAS ALPHA_KEY_PASSWORD ALPHA_FIREBASE_JSON_B64 ALPHA_KEYSTORE_B64; do
-            if [[ -z "${!name}" ]]; then ready=false; fi
+          for name in TELEGRAM_APP_ID TELEGRAM_APP_HASH ALPHA_STORE_PASSWORD ALPHA_KEY_ALIAS ALPHA_KEY_PASSWORD ALPHA_FIREBASE_JSON_B64 ALPHA_KEYSTORE_B64 ALPHA_CERTIFICATE_SHA256; do
+            if [[ -z "${!name}" ]]; then
+              echo "::error::Missing private input: $name"
+              ready=false
+            fi
           done
           echo "ready=$ready" >> "$GITHUB_OUTPUT"
-          if [[ "$ready" == true ]]; then
-            echo "Private inputs present; no values logged."
-          else
-            echo "Private inputs incomplete; skipping native build."
+          if [[ "$ready" != true ]]; then
+            echo 'BLOCKED: private inputs incomplete; no APK built.' >> "$GITHUB_STEP_SUMMARY"
+            exit 1
           fi
+          echo 'Private inputs present; native build still pending.' >> "$GITHUB_STEP_SUMMARY"
 
   build-arm64:
-    needs: credentials-present
+    needs: [source-checks, credentials-present]
     if: needs.credentials-present.outputs.ready == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 120
     env:
       NATIVE_TARGET: arm64-v8a
-      TELEGRAM_APP_ID: ${{ secrets.TELEGRAM_APP_ID }}
-      TELEGRAM_APP_HASH: ${{ secrets.TELEGRAM_APP_HASH }}
-      ALPHA_STORE_PASSWORD: ${{ secrets.ALPHA_STORE_PASSWORD }}
-      ALPHA_KEY_ALIAS: ${{ secrets.ALPHA_KEY_ALIAS }}
-      ALPHA_KEY_PASSWORD: ${{ secrets.ALPHA_KEY_PASSWORD }}
-      ALPHA_FIREBASE_JSON_B64: ${{ secrets.ALPHA_FIREBASE_JSON_B64 }}
-      ALPHA_KEYSTORE_B64: ${{ secrets.ALPHA_KEYSTORE_B64 }}
+      COMMIT_ID: ${{ github.sha }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           submodules: recursive
+          persist-credentials: false
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -79,6 +101,8 @@ jobs:
         with:
           python-version: '3.11'
       - uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-disabled: true
       - uses: android-actions/setup-android@v3
         with:
           packages: >-
@@ -87,85 +111,109 @@ jobs:
             platforms;android-37.0
             ndk;27.2.12479018
             cmake;3.31.6
-      - name: Install native build tools
+      - name: Install native tools and optional encrypted-delivery tool
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends nasm
-      - name: Check workspace disk before JNI build
+          sudo apt-get install -y --no-install-recommends nasm ninja-build age
+      - name: Select installed JDK and exact CMake for Chaquopy
         shell: bash
         run: |
           set -euo pipefail
+          # Upstream daemon criteria require JetBrains even when JAVA_HOME is Temurin.
+          # Adapt only the ephemeral CI checkout, keeping the Java language target 21.
+          printf 'toolchainVersion=21\ntoolchainVendor=ADOPTIUM\n' > gradle/gradle-daemon-jvm.properties
+          printf 'sdk.dir=%s\n' "$ANDROID_HOME" > local.properties
+          echo "CHAQUOPY_BUILD_PYTHON=$(command -v python3.11)" >> "$GITHUB_ENV"
+          echo "CMAKE=$ANDROID_HOME/cmake/3.31.6/bin/cmake" >> "$GITHUB_ENV"
+          test -x "$ANDROID_HOME/cmake/3.31.6/bin/cmake"
+          "$ANDROID_HOME/cmake/3.31.6/bin/cmake" --version
+          java -version
+          python3.11 --version
+          ./gradlew --version --no-daemon
+      - name: Check pinned submodules and disk before JNI build
+        shell: bash
+        run: |
+          set -euo pipefail
+          git submodule status --recursive > "$RUNNER_TEMP/alpha-submodules.txt"
+          if grep -Eq '^[+-U]' "$RUNNER_TEMP/alpha-submodules.txt"; then
+            echo '::error::Missing or mismatched pinned native submodule.'
+            exit 1
+          fi
           df -h .
           free_kb=$(df -Pk . | awk 'NR==2 {print $4}')
           if (( free_kb < 8 * 1024 * 1024 )); then
-            echo "::error::Less than 8 GiB free; JNI build not attempted."
+            echo '::error::Less than 8 GiB free; JNI build not attempted.'
             exit 1
           fi
-      - name: Restore private inputs in ignored locations
-        shell: bash
-        run: |
-          set -euo pipefail
-          printf 'sdk.dir=%s\n' "$ANDROID_HOME" > local.properties
-          echo "CHAQUOPY_BUILD_PYTHON=$(command -v python3.11)" >> "$GITHUB_ENV"
-          python3 - <<'PY'
-          import base64, json, os
-          from pathlib import Path
-          for name, target in (
-              ('ALPHA_FIREBASE_JSON_B64', 'TMessagesProj/src/connectedAlpha/google-services.json'),
-              ('ALPHA_KEYSTORE_B64', 'config/connected-alpha-test.keystore'),
-          ):
-              data = base64.b64decode(os.environ[name], validate=True)
-              if not data:
-                  raise ValueError(f'{name}: empty input')
-              if name == 'ALPHA_FIREBASE_JSON_B64':
-                  clients = json.loads(data).get('client', [])
-                  if not any(c.get('client_info', {}).get('android_client_info', {}).get('package_name') == 'io.github.jose22yt.flexygram.alpha' for c in clients):
-                      raise ValueError('Firebase Android package does not match Connected Alpha')
-              path = Path(target)
-              path.parent.mkdir(parents=True, exist_ok=True)
-              path.write_bytes(data)
-              path.chmod(0o600)
-          print('Private input files staged. No contents logged.')
-          PY
-      - name: Run source and ELF verifier tests
-        run: |
-          python3 tools/connected_alpha/check_source.py >/dev/null
-          python3 -m unittest discover -s tools/connected_alpha -p 'test_*.py' -v
+      - name: Validate and restore private inputs (no values logged)
+        env:
+          TELEGRAM_APP_ID: ${{ secrets.TELEGRAM_APP_ID }}
+          TELEGRAM_APP_HASH: ${{ secrets.TELEGRAM_APP_HASH }}
+          ALPHA_STORE_PASSWORD: ${{ secrets.ALPHA_STORE_PASSWORD }}
+          ALPHA_KEY_ALIAS: ${{ secrets.ALPHA_KEY_ALIAS }}
+          ALPHA_KEY_PASSWORD: ${{ secrets.ALPHA_KEY_PASSWORD }}
+          ALPHA_FIREBASE_JSON_B64: ${{ secrets.ALPHA_FIREBASE_JSON_B64 }}
+          ALPHA_KEYSTORE_B64: ${{ secrets.ALPHA_KEYSTORE_B64 }}
+          ALPHA_CERTIFICATE_SHA256: ${{ secrets.ALPHA_CERTIFICATE_SHA256 }}
+        run: python3 tools/connected_alpha/ci_inputs.py
       - name: Build Connected Alpha with original native code
-        run: ./gradlew :TMessagesProj:assembleConnectedAlpha --no-daemon --console=plain
-      - name: Verify APK with authorized certificate
+        env:
+          TELEGRAM_APP_ID: ${{ secrets.TELEGRAM_APP_ID }}
+          TELEGRAM_APP_HASH: ${{ secrets.TELEGRAM_APP_HASH }}
+          ALPHA_STORE_PASSWORD: ${{ secrets.ALPHA_STORE_PASSWORD }}
+          ALPHA_KEY_ALIAS: ${{ secrets.ALPHA_KEY_ALIAS }}
+          ALPHA_KEY_PASSWORD: ${{ secrets.ALPHA_KEY_PASSWORD }}
+        run: ./gradlew :TMessagesProj:assembleConnectedAlpha --no-daemon --console=plain --max-workers=2
+      - name: Verify APK against independently authorized certificate
         shell: bash
+        env:
+          ALPHA_CERTIFICATE_SHA256: ${{ secrets.ALPHA_CERTIFICATE_SHA256 }}
         run: |
           set -euo pipefail
           mapfile -t packages < <(find TMessagesProj/build/outputs/apk/connectedAlpha -type f -name '*.apk')
           if [[ "${#packages[@]}" -ne 1 ]]; then
-            echo "::error::Expected exactly one Connected Alpha APK."
+            echo '::error::Expected exactly one Connected Alpha APK.'
             exit 1
           fi
-          fingerprint=$(keytool -list -v -keystore config/connected-alpha-test.keystore -alias "$ALPHA_KEY_ALIAS" -storepass:env ALPHA_STORE_PASSWORD | sed -n 's/^[[:space:]]*SHA256: //p' | head -n1)
-          test -n "$fingerprint"
-          python3 tools/connected_alpha/verify_apk.py "${packages[0]}" --build-tools "$ANDROID_HOME/build-tools/36.0.0" --certificate-sha256 "$fingerprint" > connected-alpha-verification.json
+          python3 tools/connected_alpha/verify_apk.py "${packages[0]}" --build-tools "$ANDROID_HOME/build-tools/36.0.0" --certificate-sha256 "$ALPHA_CERTIFICATE_SHA256" > connected-alpha-verification.json
           python3 - <<'PY'
-          import json
-          data = json.load(open('connected-alpha-verification.json', encoding='utf-8'))
-          print('APK SHA-256:', data['sha256'])
-          print('ELF verified:', data['elf_count'])
-          print('Android launch and login remain NOT TESTED.')
+          import json, os
+          from pathlib import Path
+          report = Path('connected-alpha-verification.json')
+          data = json.loads(report.read_text())
+          data['commit'] = os.environ['COMMIT_ID']
+          report.write_text(json.dumps(data, indent=2) + '\n')
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as f:
+              f.write('Artifact verification passed. Android launch/login: NOT TESTED.\n\n')
+              f.write('APK SHA-256: ' + data['sha256'] + '\n')
+              f.write('ELF payloads verified: ' + str(data['elf_count']) + '\n')
           PY
-      # In a public repo, action artifacts can be accessed by other users.
-      # Upload requires a SEPARATE explicit repository variable opt-in.
-      - name: Public APK artifact — explicit opt-in only
-        if: vars.ALPHA_PUBLIC_APK_ARTIFACT == 'enabled'
+      - name: Encrypt verified APK for owner's private recipient (optional)
+        if: vars.ALPHA_AGE_RECIPIENT != ''
+        shell: bash
+        env:
+          ALPHA_AGE_RECIPIENT: ${{ vars.ALPHA_AGE_RECIPIENT }}
+        run: |
+          set -euo pipefail
+          mapfile -t packages < <(find TMessagesProj/build/outputs/apk/connectedAlpha -type f -name '*.apk')
+          test "${#packages[@]}" -eq 1
+          mkdir -p "$RUNNER_TEMP/alpha-delivery"
+          cp -- "${packages[0]}" "$RUNNER_TEMP/alpha-delivery/FlexyGram-Alpha-arm64.apk"
+          cp connected-alpha-verification.json "$RUNNER_TEMP/alpha-delivery/verification.json"
+          # Only these two verified deliverables enter the encrypted archive.
+          tar -C "$RUNNER_TEMP/alpha-delivery" -cf - FlexyGram-Alpha-arm64.apk verification.json |
+            age --encrypt -r "$ALPHA_AGE_RECIPIENT" -o "$RUNNER_TEMP/FlexyGram-Alpha-arm64.tar.age"
+      - name: Upload encrypted delivery only (never plaintext APK)
+        if: vars.ALPHA_AGE_RECIPIENT != ''
         uses: actions/upload-artifact@v4
         with:
-          name: FlexyGram-ConnectedAlpha-ARM64
-          path: |
-            TMessagesProj/build/outputs/apk/connectedAlpha/*.apk
-            connected-alpha-verification.json
+          name: FlexyGram-ConnectedAlpha-ARM64-encrypted
+          path: ${{ runner.temp }}/FlexyGram-Alpha-arm64.tar.age
           retention-days: 1
           if-no-files-found: error
-      - name: Wipe private build inputs
+      - name: Wipe private inputs and generated plaintext, including caches
         if: always()
         shell: bash
         run: |
-          rm -f TMessagesProj/src/connectedAlpha/google-services.json config/connected-alpha-test.keystore
+          rm -f local.properties TMessagesProj/src/connectedAlpha/google-services.json config/connected-alpha-test.keystore connected-alpha-verification.json
+          rm -rf TMessagesProj/build TMessagesProj/.cxx .gradle "$RUNNER_TEMP/alpha-delivery"

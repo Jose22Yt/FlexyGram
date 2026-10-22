@@ -9,8 +9,13 @@ import struct
 import subprocess
 import zipfile
 from pathlib import Path
+from ci_inputs import fingerprint
 
 APP = 'io.github.jose22yt.flexygram.alpha'
+NATIVE_LIBRARY = 'lib/arm64-v8a/libtmessages.49.so'
+
+def require_telegram_payload(names):
+    require('classes.dex' in names and NATIVE_LIBRARY in names, 'Missing Java or native Telegram code (libtmessages.49.so required)')
 
 def require(condition, message):
     if not condition:
@@ -56,8 +61,7 @@ def main():
     p.add_argument('--build-tools', type=Path, required=True)
     p.add_argument('--certificate-sha256', required=True, help='Expected authorized Alpha-only signing certificate fingerprint')
     args = p.parse_args()
-    expected = re.sub('[^0-9a-f]', '', args.certificate_sha256.lower())
-    require(len(expected) == 64, 'Expected certificate fingerprint must have 64 hex digits')
+    expected = fingerprint(args.certificate_sha256)
     bt = args.build_tools
     signature = command(str(bt/'apksigner'), 'verify', '--verbose', '--print-certs', str(args.apk))
     require('Verified using v2 scheme (APK Signature Scheme v2): true' in signature, 'Missing APK Signature Scheme v2')
@@ -80,7 +84,7 @@ def main():
     with zipfile.ZipFile(args.apk) as z:
         names = z.namelist()
         require(len(names) == len(set(names)), 'Duplicate ZIP entries')
-        require('classes.dex' in names and 'lib/arm64-v8a/libtmessages.so' in names, 'Missing Java or native Telegram code')
+        require_telegram_payload(names)
         require(not any(n.startswith('lib/') and not n.startswith('lib/arm64-v8a/') for n in names if not n.endswith('/')), 'Non-ARM64 JNI payload')
         elfs = inspect_archive(z)
         require(elfs, 'No ELF payloads inspected')
