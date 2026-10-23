@@ -33,14 +33,23 @@ class PackagedLauncherVerification(unittest.TestCase):
                 line = f'A: {prefix}allowBackup(0x01010280)=(type 0x12)0x00000000'
                 self.assertTrue(binary_boolean_is_false(line, 'allowBackup'))
                 self.assertTrue(binary_boolean_is_false(line.replace('0x00000000', '0x0'), 'allowBackup'))
+                self.assertTrue(binary_boolean_is_false(line.replace('(type 0x12)0x00000000', 'false'), 'allowBackup'))
                 self.assertFalse(binary_boolean_is_false(line.replace('0x00000000', '0xffffffff'), 'allowBackup'))
+                self.assertFalse(binary_boolean_is_false(line.replace('(type 0x12)0x00000000', 'true'), 'allowBackup'))
                 self.assertFalse(binary_boolean_is_false(line + '\n' + line, 'allowBackup'))
                 self.assertFalse(binary_boolean_is_false('', 'allowBackup'))
 
     def test_packaged_provider_authorities_accepts_both_namespace_spellings(self):
         self.assertEqual(provider_authorities('''
-            A: http://schemas.android.com/apk/res/android:authorities(0x01010018)="io.github.jose22yt.flexygram.alpha.provider" (Raw: "io.github.jose22yt.flexygram.alpha.provider")
-            A: android:authorities(0x01010018)="io.github.jose22yt.flexygram.alpha.streaming"
+          E: manifest (line=2)
+            E: queries (line=10)
+              E: provider (line=11)
+                A: http://schemas.android.com/apk/res/android:authorities(0x01010018)="androidx.car.app.connection"
+            E: application (line=20)
+              E: provider (line=22)
+                A: http://schemas.android.com/apk/res/android:authorities(0x01010018)="io.github.jose22yt.flexygram.alpha.provider" (Raw: "io.github.jose22yt.flexygram.alpha.provider")
+              E: provider (line=26)
+                A: android:authorities(0x01010018)="io.github.jose22yt.flexygram.alpha.streaming"
         '''), ['io.github.jose22yt.flexygram.alpha.provider',
                'io.github.jose22yt.flexygram.alpha.streaming'])
 

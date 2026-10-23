@@ -26,8 +26,7 @@ def require(condition, message):
 def command(*args):
     return subprocess.check_output(args, text=True, stderr=subprocess.STDOUT)
 
-def has_launcher_alias(xmltree):
-    """Inspect the packaged manifest: AAPT2 badging omits launcher aliases."""
+def parse_xmltree(xmltree):
     root = {'children': [], 'attrs': {}}
     stack = [(-1, root)]
     for line in xmltree.splitlines():
@@ -45,34 +44,41 @@ def has_launcher_alias(xmltree):
             value = attr[2]
             quoted = re.search(r'"([^"]*)"', value)
             stack[-1][1]['attrs'][attr[1]] = quoted[1] if quoted else value.strip()
+    return root
+
+def application_nodes(xmltree):
+    root = parse_xmltree(xmltree)
+    for manifest in root['children']:
+        if manifest['tag'] == 'manifest':
+            yield from (child for child in manifest['children'] if child['tag'] == 'application')
+
+def has_launcher_alias(xmltree):
+    """Inspect the packaged manifest: AAPT2 badging omits launcher aliases."""
 
     def enabled(node):
         return node['attrs'].get('enabled', 'true') not in ('false', '(type 0x12)0x0', '0x0')
 
-    for app in root['children']:
-        if app['tag'] != 'manifest':
+    for application in application_nodes(xmltree):
+        if not enabled(application):
             continue
-        for application in app['children']:
-            if application['tag'] != 'application' or not enabled(application):
+        activities = set()
+        for component in application['children']:
+            if component['tag'] == 'activity':
+                activities.add(component['attrs'].get('name'))
+            if component['tag'] != 'activity-alias' or not enabled(component):
                 continue
-            activities = set()
-            for component in application['children']:
-                if component['tag'] == 'activity':
-                    activities.add(component['attrs'].get('name'))
-                if component['tag'] != 'activity-alias' or not enabled(component):
+            attrs = component['attrs']
+            if attrs.get('targetActivity') not in activities or attrs.get('name') != 'org.telegram.messenger.ExteralessIcon':
+                continue
+            if attrs.get('exported') not in ('true', '(type 0x12)0xffffffff'):
+                continue
+            for intent in component['children']:
+                if intent['tag'] != 'intent-filter':
                     continue
-                attrs = component['attrs']
-                if attrs.get('targetActivity') not in activities or attrs.get('name') != 'org.telegram.messenger.ExteralessIcon':
-                    continue
-                if attrs.get('exported') not in ('true', '(type 0x12)0xffffffff'):
-                    continue
-                for intent in component['children']:
-                    if intent['tag'] != 'intent-filter':
-                        continue
-                    actions = {child['attrs'].get('name') for child in intent['children'] if child['tag'] == 'action'}
-                    categories = {child['attrs'].get('name') for child in intent['children'] if child['tag'] == 'category'}
-                    if 'android.intent.action.MAIN' in actions and 'android.intent.category.LAUNCHER' in categories:
-                        return True
+                actions = {child['attrs'].get('name') for child in intent['children'] if child['tag'] == 'action'}
+                categories = {child['attrs'].get('name') for child in intent['children'] if child['tag'] == 'category'}
+                if 'android.intent.action.MAIN' in actions and 'android.intent.category.LAUNCHER' in categories:
+                    return True
     return False
 
 def launcher_diagnostic(xmltree):
@@ -86,12 +92,16 @@ def launcher_diagnostic(xmltree):
 
 def binary_boolean_is_false(xmltree, name):
     values = re.findall(r'^\s*A: ' + ANDROID_ATTR + re.escape(name) +
-                        r'\([^)]*\)=\(type 0x12\)0x([0-9a-fA-F]+)\b', xmltree, re.M)
-    return len(values) == 1 and int(values[0], 16) == 0
+                        r'\([^)]*\)=(?:\(type 0x12\)0x([0-9a-fA-F]+)\b|(false|true)\b)',
+                        xmltree, re.M)
+    return len(values) == 1 and (values[0][1] == 'false' or
+                                 bool(values[0][0]) and int(values[0][0], 16) == 0)
 
 def provider_authorities(xmltree):
-    return re.findall(r'^\s*A: ' + ANDROID_ATTR +
-                      r'authorities\([^)]*\)="([^"]+)"', xmltree, re.M)
+    return [provider['attrs']['authorities']
+            for application in application_nodes(xmltree)
+            for provider in application['children']
+            if provider['tag'] == 'provider' and 'authorities' in provider['attrs']]
 
 def security_attribute_diagnostic(xmltree):
     return [line for line in xmltree.splitlines()
