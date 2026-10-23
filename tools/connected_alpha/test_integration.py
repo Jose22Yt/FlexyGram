@@ -12,6 +12,30 @@ from check_resources import A, APP, ROOT, check_resource_text, probe_manifest
 
 
 class UnifiedIntegration(unittest.TestCase):
+    def test_launcher_alias_follows_target_and_is_the_only_enabled_launcher(self):
+        root = ET.parse(ROOT/'TMessagesProj/src/main/AndroidManifest.xml').getroot()
+        components = list(root.find('application'))
+        target = 'org.telegram.ui.LaunchActivity'
+        activity_position = next(i for i, child in enumerate(components)
+                                 if child.tag == 'activity' and child.get(A+'name') == target)
+        launchers = []
+        for position, alias in enumerate(components):
+            if alias.tag != 'activity-alias' or alias.get(A+'targetActivity') != target:
+                continue
+            with self.subTest(alias=alias.get(A+'name')):
+                self.assertGreater(position, activity_position,
+                                   'Android requires the target activity before its alias')
+            if alias.get(A+'enabled', 'true') != 'true':
+                continue
+            for intent in alias.findall('intent-filter'):
+                actions = {item.get(A+'name') for item in intent.findall('action')}
+                categories = {item.get(A+'name') for item in intent.findall('category')}
+                if {'android.intent.action.MAIN'} <= actions and {'android.intent.category.LAUNCHER'} <= categories:
+                    launchers.append(alias)
+        self.assertEqual([alias.get(A+'name') for alias in launchers],
+                         ['org.telegram.messenger.ExteralessIcon'])
+        self.assertEqual(launchers[0].get(A+'exported'), 'true')
+
     def test_baseline_stray_text_rejected_and_current_values_clean(self):
         path = 'TMessagesProj/src/main/res/values/strings.xml'
         original = subprocess.check_output(['git', 'show', 'e5869928c812271f87489c7012978563716ebfc0:'+path], cwd=ROOT)
@@ -64,13 +88,19 @@ class UnifiedIntegration(unittest.TestCase):
             expression = re.sub(r'!(?!=)', 'not ', expression)
             github = SimpleNamespace(event_name=event, head_ref=head, ref='refs/heads/'+head)
             return eval(expression, {'__builtins__': {}, 'startsWith': str.startswith}, {'github': github})
-        for branch in ('integration/connected-alpha-unified', 'integration/connected-alpha-next'):
+        for branch in ('integration/connected-alpha-unified', 'integration/connected-alpha-next',
+                       'integration/connected-alpha-javac-fix'):
             with self.subTest(branch=branch):
                 self.assertTrue(enabled('connected-alpha-static', 'pull_request', branch))
                 self.assertFalse(enabled('build', 'pull_request', branch))
                 self.assertFalse(enabled('connected-alpha-native', 'pull_request', branch))
         self.assertTrue(enabled('build', 'pull_request', 'unrelated/feature'))
         self.assertTrue(enabled('connected-alpha-native', 'push', 'support/connected-alpha-ci-20261022'))
+        self.assertTrue(enabled('connected-alpha-native', 'push', 'integration/connected-alpha-javac-fix'))
+        self.assertFalse(enabled('connected-alpha-native', 'push', 'integration/connected-alpha-next'))
+        self.assertFalse(enabled('connected-alpha-native', 'push', 'unrelated/feature'))
+        events = workflow.get('on', workflow.get(True))
+        self.assertIn('integration/connected-alpha-javac-fix', events['push']['branches'])
 
     def test_both_source_jobs_run_complete_suite_and_real_resource_gate(self):
         for path, job in (('pr.yml', 'connected-alpha-static'), ('connected-alpha-arm64.yml', 'source-checks')):
