@@ -39,7 +39,7 @@ def has_launcher_alias(xmltree):
             stack[-1][1]['children'].append(node)
             stack.append((indent, node))
             continue
-        attr = re.match(r'\s*A: android:([\w]+)(?:\([^)]*\))?=(.*)', line)
+        attr = re.match(r'\s*A: (?:android:|http://schemas\.android\.com/apk/res/android:)([\w]+)(?:\([^)]*\))?=(.*)', line)
         if attr and len(stack) > 1:
             value = attr[2]
             quoted = re.search(r'"([^"]*)"', value)

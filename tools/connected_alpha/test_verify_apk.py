@@ -35,6 +35,12 @@ class PackagedLauncherVerification(unittest.TestCase):
     def test_accepts_launcher_alias_even_without_badging_launchable_activity(self):
         self.assertTrue(has_launcher_alias(PACKAGED_MANIFEST))
 
+    def test_accepts_actual_aapt2_namespace_and_indentation(self):
+        real_shape = PACKAGED_MANIFEST.replace('android:',
+            'http://schemas.android.com/apk/res/android:')
+        real_shape = '\n'.join('  ' + line for line in real_shape.splitlines())
+        self.assertTrue(has_launcher_alias(real_shape))
+
     def test_rejects_disabled_or_unexported_alias(self):
         for attribute in ('enabled', 'exported'):
             with self.subTest(attribute=attribute):
