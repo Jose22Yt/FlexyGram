@@ -16563,7 +16563,7 @@ public class ChatActivityEnterView extends FrameLayout implements
 
     /** Native recording/previews keep their full background; their layout is untouched. */
     public boolean isFlexyCompactPresentation() {
-        return flexyCompactLayout && getVisibility() == VISIBLE && !recordingAudioVideo
+        return flexyCompactLayout && getVisibility() == VISIBLE && getAlpha() == 1f && !recordingAudioVideo
             && recordInterfaceState == 0 && (recordedAudioPanel == null || recordedAudioPanel.getVisibility() != VISIBLE)
             && (topView == null || topView.getVisibility() != VISIBLE)
             && !richDraftActive;

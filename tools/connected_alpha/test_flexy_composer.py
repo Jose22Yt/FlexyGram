@@ -75,6 +75,14 @@ class ComposerRegression(unittest.TestCase):
             self.assertNotIn(forbidden,presentation)
         self.assertIn('unregisterOnSharedPreferenceChangeListener(flexyComposerListener)',self.current)
 
+    def test_native_search_and_action_overlays_keep_their_original_background(self):
+        chat = (ROOT/'TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java').read_text()
+        # Native priorities fade the composer without changing its visibility.
+        self.assertIn('checkBottomViewVisibility(chatActivityEnterView, MESSAGE_INPUT_CONTAINER, false)', chat)
+        gate = method_bodies(self.current, 'isFlexyCompactPresentation')[0]
+        self.assertIn('getAlpha() == 1f', gate)
+        self.assertIn('getVisibility() == VISIBLE', gate)
+
     def test_geometry_actual_java_preserves_native_reservations_and_touch_slots(self):
         production = ROOT/'TMessagesProj/src/main/java/app/flexygram/composer/ComposerGeometry.java'
         test = '''
