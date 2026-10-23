@@ -26,7 +26,7 @@ public final class MainActivity extends Activity {
     private Button cipherButton, keyButton, decryptButton, installButton, reportButton, clearButton;
     private TextView status;
     private boolean verified, nativeReady;
-    private static final int PICK_CIPHER = 1, PICK_IDENTITY = 2;
+    private static final int PICK_CIPHER = 1, PICK_IDENTITY = 2, SAVE_REPORT = 3;
 
     @Override public void onCreate(Bundle saved) {
         super.onCreate(saved);
@@ -78,6 +78,7 @@ public final class MainActivity extends Activity {
     @Override protected void onActivityResult(int request, int result, Intent data) {
         super.onActivityResult(request, result, data);
         if (result != RESULT_OK || data == null || data.getData() == null || RUNNING.get()) return;
+        if (request == SAVE_REPORT) { saveReport(data.getData()); return; }
         if (request == PICK_CIPHER) { encrypted = data.getData(); cipherButton.setText("1. Archivo cifrado seleccionado"); }
         if (request == PICK_IDENTITY) { identity = data.getData(); keyButton.setText("2. Identidad seleccionada (solo esta operación)"); }
         verified = false; refresh();
@@ -152,7 +153,29 @@ public final class MainActivity extends Activity {
             // This view shows only the public, fixed verification summary. No identity content.
             new AlertDialog.Builder(this).setTitle("Informe de la entrega")
                 .setMessage("Paquete: " + Contract.APP + "\nCommit: " + Contract.COMMIT + "\nSHA-256: " + Contract.HASH + "\nBibliotecas ELF: 96\nFirma: coincide con el informe cifrado\nPrueba física: PENDIENTE\n\nverification.json se ha extraído en el almacenamiento privado del auxiliar.")
+                .setNeutralButton("Guardar informe", (dialog, which) -> {
+                    Intent save = new Intent(Intent.ACTION_CREATE_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("application/json");
+                    save.putExtra(Intent.EXTRA_TITLE, "verification.json"); save.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+                    startActivityForResult(save, SAVE_REPORT);
+                })
                 .setPositiveButton("Cerrar", null).show();
         } catch (Exception ignored) { }
+    }
+    private void saveReport(Uri destination) {
+        if (!verified || !RUNNING.compareAndSet(false, true)) return;
+        refresh();
+        new Thread(() -> {
+            String message;
+            try {
+                Contract.requireVerified(this);
+                byte[] report = java.nio.file.Files.readAllBytes(new File(Contract.directory(this), "verification.json").toPath());
+                try (java.io.OutputStream out = getContentResolver().openOutputStream(destination, "wt")) {
+                    if (out == null) throw new java.io.IOException(); out.write(report);
+                }
+                message = "Informe guardado en la ubicación local que elegiste. Ya puedes instalar FlexyGram Alpha.";
+            } catch (Exception e) { message = "No se pudo guardar el informe. Puedes seguir instalando la APK verificada o volver a intentarlo."; }
+            final String result = message; RUNNING.set(false);
+            runOnUiThread(() -> { status.setText(result); refresh(); });
+        }, "save-local-report").start();
     }
 }
