@@ -8,6 +8,9 @@ import org.telegram.messenger.ApplicationLoader;
 public final class FlexyComposerConfig {
     public static final String STYLE = "style";
     public static final String GLASS = "pearlGlass";
+    public static final String POSITION = "verticalPosition";
+    public static final String LEVEL = "compactLevel";
+    public static final String GAP = "componentGap";
     public static final int CLASSIC = 0;
     public static final int COMPACT_IOS = 1;
 
@@ -18,6 +21,16 @@ public final class FlexyComposerConfig {
     }
     public static boolean compact() { return preferences().getInt(STYLE, CLASSIC) == COMPACT_IOS; }
     public static boolean glass() { return preferences().getBoolean(GLASS, false); }
+    public static int position() { return ComposerStyle.position(preferences().getInt(POSITION, 0)); }
+    public static int level() { return ComposerStyle.level(preferences().getInt(LEVEL, 0)); }
+    public static int gap() { return ComposerStyle.gap(level(), preferences().getInt(GAP, 0)); }
+    public static void setPosition(int value) { if (position() == ComposerStyle.position(value)) return; preferences().edit().putInt(POSITION, ComposerStyle.position(value)).apply(); }
+    public static void setLevel(int value) { preferences().edit().putInt(LEVEL, ComposerStyle.level(value)).apply(); }
+    public static void setGap(int value) { preferences().edit().putInt(GAP, ComposerStyle.clamp(value, ComposerStyle.MIN_GAP, ComposerStyle.MAX_GAP)).apply(); }
+    public static void reset() {
+        preferences().edit().putInt(STYLE, COMPACT_IOS).putBoolean(GLASS, false)
+            .remove(POSITION).remove(LEVEL).remove(GAP).apply();
+    }
     public static void setStyle(int value) {
         if (value != CLASSIC && value != COMPACT_IOS) throw new IllegalArgumentException("Unknown composer style");
         preferences().edit().putInt(STYLE, value).apply();

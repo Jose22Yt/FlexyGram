@@ -356,7 +356,7 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
         actionBar.setBackButtonImage(R.drawable.ic_ab_back);
         actionBar.setAllowOverlayTitle(true);
         actionBar.setUseContainerForTitles();
-        actionBar.setTitle(getString(R.string.Settings));
+        actionBar.setTitle(getString(R.string.FlexySettingsTitle));
         actionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick() {
             @Override
             public void onItemClick(int id) {
@@ -785,7 +785,7 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
         }
         // Как в exteraGram 12.9.0 (SettingsActivity.java:899): знак приложения вместо
         // шестерёнки, акцент фирменного цвета на обе точки градиента.
-        items.add(SettingCell.Factory.of(-1, 0xFF993C38, 0xFF993C38, R.drawable.exteraless_icon_tile, getString(R.string.OpenExteraPreferences), getString(R.string.OpenExteraInfo)));
+        items.add(SettingCell.Factory.of(-1, 0xFF0753BC, 0xFF0753BC, R.drawable.flexygram_brand_tile, getString(R.string.FlexyPreferences), getString(R.string.OpenExteraInfo)));
         items.add(UItem.asShadow(null));
         final boolean walletAbove = getConnectionsManager().getCurrentTime() - 1791538462 < 4 * 7 * 24 * 60 * 60;
         if (walletAbove && getMessagesController().config.walletAvailable.get()) {

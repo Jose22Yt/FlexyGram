@@ -1,5 +1,5 @@
 <resources>
-    <string name="AppName">FlexyGram Alpha</string>
-    <string name="AppNameBeta">FlexyGram Alpha</string>
-    <string name="OpenExtera">FlexyGram Alpha</string>
+  <string name="AppName">FlexyGram Alpha</string>
+  <string name="AppNameBeta">FlexyGram Alpha</string>
+  <string name="OpenExtera">FlexyGram</string>
 </resources>

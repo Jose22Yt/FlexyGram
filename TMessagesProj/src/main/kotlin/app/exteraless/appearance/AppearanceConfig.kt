@@ -681,7 +681,8 @@ object AppearanceConfig {
     private const val LEGACY_DEFAULT_TITLE = "Nagram X"
 
     private fun migrateLegacyTitleName() {
-        if (NaConfig.customTitle.String() != LEGACY_DEFAULT_TITLE) return
+        val previous = NaConfig.customTitle.String()
+        if (previous != LEGACY_DEFAULT_TITLE && previous != "exteraless") return
         NaConfig.customTitle.setConfigString(NaConfig.customTitle.defaultValue as String)
         if (titleText.Int() == TITLE_TEXT_CUSTOM) {
             titleText.setConfigInt(0)

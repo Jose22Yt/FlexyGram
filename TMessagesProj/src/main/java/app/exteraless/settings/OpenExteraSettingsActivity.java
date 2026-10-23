@@ -147,7 +147,7 @@ public class OpenExteraSettingsActivity extends BaseNekoSettingsActivity {
 
     @Override
     protected String getActionBarTitle() {
-        return getString(R.string.OpenExtera);
+        return getString(R.string.FlexyBrandName);
     }
 
     @Override
