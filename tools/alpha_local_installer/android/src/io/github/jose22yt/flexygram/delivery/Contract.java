@@ -15,8 +15,8 @@ import java.security.MessageDigest;
 final class Contract {
     static final String APP = "io.github.jose22yt.flexygram.alpha";
     static final String APK = "FlexyGram-Alpha-arm64.apk";
-    static final String HASH = "PENDING_VERIFIED_SIGNATURE_APK";
-    static final String CIPHER_HASH = "PENDING_VERIFIED_SIGNATURE_CIPHERTEXT";
+    static final String HASH = "b40c37adaaa30ae211f6d24fa4cf55cfdd58bc5cf18866949e23e6a594d627d8";
+    static final String CIPHER_HASH = "6af14ccc9511fa97f84f18d5db308d447433023f4b7b0de8ff39e14c79d71945";
     static final String CERTIFICATE = "c8f04cad685ca5757d35b25ea4b0b4613c7399909948d821e6ada61f9fb12b2c";
     static final String COMMIT = "52c52014111b982c5c2260f0a470f3d284e52c8b";
     static File directory(Context c) throws IOException {
