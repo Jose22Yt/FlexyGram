@@ -156,8 +156,15 @@ def test_verdict_cache_reuses_classification(loader, monkeypatch):
 
 def test_install_reflection_gate_installs_policy(loader, monkeypatch):
     installed = []
+    sealed = []
+    policy = [None]
     chaquopy = types.ModuleType('java.chaquopy')
-    chaquopy.set_reflection_policy = installed.append
+    chaquopy.get_reflection_policy = lambda: policy[0]
+    def set_policy(value):
+        policy[0] = value
+        installed.append(value)
+    chaquopy.set_reflection_policy = set_policy
+    chaquopy.seal_reflection_policy = lambda: sealed.append(policy[0])
     java = types.ModuleType('java')
     java.chaquopy = chaquopy
     monkeypatch.setitem(sys.modules, 'java', java)
@@ -165,7 +172,8 @@ def test_install_reflection_gate_installs_policy(loader, monkeypatch):
     loader._install_reflection_gate()
     assert installed == [loader._reflection_gate]
     loader._install_reflection_gate()
-    assert installed == [loader._reflection_gate, loader._reflection_gate]
+    assert installed == [loader._reflection_gate]
+    assert sealed == [loader._reflection_gate, loader._reflection_gate]
 
 
 def test_install_reflection_gate_tolerates_missing_api(loader, monkeypatch, capsys):
@@ -177,6 +185,7 @@ def test_install_reflection_gate_tolerates_missing_api(loader, monkeypatch, caps
 
 def test_install_reflection_gate_reports_set_failure(loader, monkeypatch, capsys):
     chaquopy = types.ModuleType('java.chaquopy')
+    chaquopy.get_reflection_policy = lambda: None
     def set_reflection_policy(policy):
         raise RuntimeError("bridge rejected the policy")
     chaquopy.set_reflection_policy = set_reflection_policy
@@ -185,4 +194,29 @@ def test_install_reflection_gate_reports_set_failure(loader, monkeypatch, capsys
     monkeypatch.setitem(sys.modules, 'java', java)
     monkeypatch.setitem(sys.modules, 'java.chaquopy', chaquopy)
     loader._install_reflection_gate()
+    assert 'reflection gate install failed' in capsys.readouterr().err
+
+
+def test_install_reflection_gate_replaces_different_policy(loader, monkeypatch):
+    installed = []
+    chaquopy = types.ModuleType('java.chaquopy')
+    chaquopy.get_reflection_policy = lambda: object()
+    chaquopy.set_reflection_policy = installed.append
+    monkeypatch.setitem(sys.modules, 'java', types.ModuleType('java'))
+    monkeypatch.setitem(sys.modules, 'java.chaquopy', chaquopy)
+    loader._install_reflection_gate()
+    assert installed == [loader._reflection_gate]
+
+
+def test_install_reflection_gate_reports_get_failure(loader, monkeypatch, capsys):
+    installed = []
+    chaquopy = types.ModuleType('java.chaquopy')
+    def get_policy():
+        raise RuntimeError('bridge lookup failed')
+    chaquopy.get_reflection_policy = get_policy
+    chaquopy.set_reflection_policy = installed.append
+    monkeypatch.setitem(sys.modules, 'java', types.ModuleType('java'))
+    monkeypatch.setitem(sys.modules, 'java.chaquopy', chaquopy)
+    loader._install_reflection_gate()
+    assert installed == []
     assert 'reflection gate install failed' in capsys.readouterr().err

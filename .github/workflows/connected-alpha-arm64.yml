@@ -59,10 +59,13 @@ jobs:
         with:
           python-version: '3.11'
       - run: python3 -m pip install -r tools/connected_alpha/requirements-ci.txt
-      - name: Check upstream parity, build contract and verifier regressions
-        run: |
-          python3 tools/connected_alpha/check_source.py
-          python3 -m unittest discover -s tools/connected_alpha -p 'test_*.py' -v
+      - name: Check upstream parity, build contract and all verifier/stability regressions
+        run: python3 tools/connected_alpha/run_checks.py
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: 'build-tools;36.0.0 platforms;android-37.0'
+      - name: Compile resources and link isolated provider probe against API 37
+        run: python3 tools/connected_alpha/check_resources.py --sdk-root "$ANDROID_HOME"
 
   credentials-present:
     runs-on: ubuntu-24.04

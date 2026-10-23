@@ -1,5 +1,7 @@
 # Connected Alpha — estabilidad y primera prueba física
 
+> Evidencia histórica del PR #57. Para la integración con #56, consultar `../integration-result.json` y ejecutar `python3 tools/connected_alpha/run_checks.py`.
+
 Base de esta revisión: PR #55, `4b0bf291284ff64c3cac89ccdf2b76bb00041e39`.
 Origen: Exteraless `1ad6a60a6834ffca722b1a22f4fba27ecb29a061`.
 Rama independiente: `stability/connected-alpha-review`. Destino del borrador: la rama del PR #55; no main/develop.

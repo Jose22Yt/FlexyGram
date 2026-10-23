@@ -4,7 +4,10 @@ import unittest
 from pathlib import Path
 from xml.etree import ElementTree as ET
 
-from physical_preflight import APP, SCENARIOS, collect
+try:
+    from .physical_preflight import APP, SCENARIOS, collect
+except ImportError:  # Direct discovery with -s .../stability remains supported.
+    from physical_preflight import APP, SCENARIOS, collect
 
 ROOT = Path(__file__).resolve().parents[3]
 BASE = '4b0bf291284ff64c3cac89ccdf2b76bb00041e39'

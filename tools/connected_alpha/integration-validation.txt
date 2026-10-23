@@ -1,0 +1,173 @@
+{
+  "status": "PASS_STATIC_ONLY",
+  "upstream_components_identical": 15,
+  "sha256": {
+    "TMessagesProj/src/main/java/org/telegram/ui/LoginActivity.java": "a7ef3de66726b79f7d664194b6a6a72f69168c1aac04197ffa9e4a139ff17690",
+    "TMessagesProj/src/main/java/org/telegram/ui/LaunchActivity.java": "7089b57697e640ae70fc432fd3b80e115a3871309a8ee21adf8c05edd23c0f7c",
+    "TMessagesProj/src/main/java/org/telegram/ui/DialogsActivity.java": "6cb070e30b4ec5c435d9a0fc6da09ac534575694214673b9eba8f9bf251b0768",
+    "TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java": "3f6e6a27e821fb719cbdc79946a276ba1b52aa4aa552b31d81700d230822426f",
+    "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java": "aa8289100a8d240ae1a3cf1f3a38c1ad15db5fdd38ee41decd3ccf5858ef9c5f",
+    "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/Theme.java": "4f7aec85fdb8703372dbbbea6c2884b131e25478abe1726cfa5684ad28448659",
+    "TMessagesProj/src/main/java/org/telegram/tgnet/ConnectionsManager.java": "44d4ccb492da5ed8b8657bb541016420fd064aa132c0832f3062fa8cc8a39daf",
+    "TMessagesProj/src/main/java/org/telegram/messenger/MessagesController.java": "cf60286b0d80039e5a0d180de23e9af6cf1326a8f62502adb90a2d1933e1fe5f",
+    "TMessagesProj/src/main/java/org/telegram/messenger/SendMessagesHelper.java": "d29d1ed44721c6bf2248c49e3dbef0e150598f8b9d39882ef8e4024b30e585ff",
+    "TMessagesProj/src/main/java/org/telegram/messenger/MediaController.java": "300af747768069e56eff5f2b2d23a70a7969fbdca3d90087a6b8aede670e6541",
+    "TMessagesProj/src/main/java/org/telegram/messenger/NotificationsController.java": "3b46b5ceadadd34517117c3880c24648023193787b1eae1dd69bf09a5f8b7e5e",
+    "TMessagesProj/src/main/java/app/exteraless/plugins/PluginsController.java": "db9e8f14ee548f219d1287dcbd94c063112738e8645dfdd77a90549c61c9e465",
+    "TMessagesProj/src/main/java/app/exteraless/plugins/PythonPluginsEngine.java": "b745539e9da48e2981f94a3b51de0ca1331dd2493bbda9cd2cb35407b210dd9d",
+    "TMessagesProj/src/main/java/org/telegram/messenger/ContactsController.java": "9ca5fa402d9715a96727002c2456fa74c45e5f29bb493bb2660bca8d7e5a3981",
+    "TMessagesProj/jni/tgnet/ConnectionsManager.cpp": "2ec98539700348ea3fb39b23ffd8e49d88b6216920e59cf28c90602cd45aef32"
+  },
+  "android_runtime": "NOT_TESTED"
+}
+{
+  "status": "PASS_SOURCE_PARITY_ONLY",
+  "upstream": "1ad6a60a6834ffca722b1a22f4fba27ecb29a061",
+  "additional_components_identical": 11,
+  "sha256": {
+    "TMessagesProj/src/main/java/org/telegram/messenger/NativeLoader.java": "fb2296ec1d5e2f41f8cca48f59a78727b3d07ddeda352e76c82336da2ec1d8d9",
+    "TMessagesProj/src/main/java/org/telegram/messenger/FileLoader.java": "c86fd593fc79ed3d2e566f549d578f0edff9b90e9e960669318b6e08a8583c72",
+    "TMessagesProj/src/main/java/org/telegram/messenger/DispatchQueue.java": "f5090969254bc80dc3b30a6b5a1d78c1b79aa2a61814f8801d9e438afc2c7335",
+    "TMessagesProj/src/main/java/org/telegram/messenger/DispatchQueuePoolBackground.java": "4f20b12b0d6101820e94dee7c583ce950d5507fbb13511d202574a74c4838b91",
+    "TMessagesProj/src/main/java/org/telegram/messenger/MusicPlayerService.java": "e5860af3e27c59edb000ed9c8b984300e75bb9fc90b226fc1e0b4bbe98570507",
+    "TMessagesProj/src/main/java/org/telegram/messenger/NotificationsService.java": "b48c0d19db05b3bc9158beac68b2f371a01bf8d707a812d65cbd2e7696c171ec",
+    "TMessagesProj/src/main/java/org/telegram/messenger/PushListenerController.java": "1bcff47ba5ecb4663ae0f7ba05dad971c7ca13c4a240cff6c0e10b722d1e2fed",
+    "TMessagesProj/src/main/java/org/telegram/messenger/GooglePushListenerServiceProvider.java": "c75e58a9da5c0e4822cf1d9b03325badcb55290e6ceb0f1cd8d13d20626040e9",
+    "TMessagesProj/src/main/java/org/telegram/messenger/UserConfig.java": "dc6ab416e7cba0d9cfb4d6a784de4affbbc0a3a4663ee7f3408138c3a3e7804c",
+    "TMessagesProj/src/main/java/org/telegram/messenger/SharedConfig.java": "3f04f13b6c713732db49e298a7673e264a296754af0bba15ecfd5775a95b782a",
+    "TMessagesProj/src/main/java/org/telegram/messenger/AndroidUtilities.java": "72b9688891af95daf3ff6b55a31ff16f03eb84db730593de41dfd8b2de81acd5"
+  },
+  "committed_jni_tree": "5a436ec69d8ae7547ea3713398e39ab031d5485c",
+  "android_runtime": "NOT_TESTED"
+}
+test_all_original_paths_preserved_with_only_narrow_addition (stability.test_stability.AttachmentConfiguration.test_all_original_paths_preserved_with_only_narrow_addition) ... ok
+test_baseline_cannot_expose_relocated_attachment (stability.test_stability.AttachmentConfiguration.test_baseline_cannot_expose_relocated_attachment) ... ok
+test_other_private_files_remain_outside_roots (stability.test_stability.AttachmentConfiguration.test_other_private_files_remain_outside_roots) ... ok
+test_overlay_exposes_saved_attachment_and_nested_media (stability.test_stability.AttachmentConfiguration.test_overlay_exposes_saved_attachment_and_nested_media) ... ok
+test_provider_requires_explicit_grant_and_is_not_exported (stability.test_stability.AttachmentConfiguration.test_provider_requires_explicit_grant_and_is_not_exported) ... ok
+test_both_page_sizes_leave_every_acceptance_pending (stability.test_stability.DeviceCollector.test_both_page_sizes_leave_every_acceptance_pending) ... ok
+test_package_manager_error_cannot_be_treated_as_not_installed (stability.test_stability.DeviceCollector.test_package_manager_error_cannot_be_treated_as_not_installed) ... ok
+test_reject_wrong_api_abi_emulator_or_unknown_pages (stability.test_stability.DeviceCollector.test_reject_wrong_api_abi_emulator_or_unknown_pages) ... ok
+test_substring_package_does_not_count_as_alpha (stability.test_stability.DeviceCollector.test_substring_package_does_not_count_as_alpha) ... ok
+test_accept_actual_versioned_telegram_library (test_cloud_build.CloudBuildRegression.test_accept_actual_versioned_telegram_library) ... ok
+test_base64_errors_hide_values (test_cloud_build.CloudBuildRegression.test_base64_errors_hide_values) ... ok
+test_base64_wrapping_supported (test_cloud_build.CloudBuildRegression.test_base64_wrapping_supported) ... ok
+test_certificate_colons_supported (test_cloud_build.CloudBuildRegression.test_certificate_colons_supported) ... ok
+test_certificate_junk_not_silently_discarded (test_cloud_build.CloudBuildRegression.test_certificate_junk_not_silently_discarded) ... ok
+test_firebase_other_client_rejected (test_cloud_build.CloudBuildRegression.test_firebase_other_client_rejected) ... ok
+test_firebase_truncated_configuration_rejected (test_cloud_build.CloudBuildRegression.test_firebase_truncated_configuration_rejected) ... ok
+test_legacy_debug_build_never_runs_for_push (test_cloud_build.CloudBuildRegression.test_legacy_debug_build_never_runs_for_push) ... ok
+test_native_support_route_is_not_duplicated (test_cloud_build.CloudBuildRegression.test_native_support_route_is_not_duplicated) ... ok
+test_no_plaintext_apk_upload (test_cloud_build.CloudBuildRegression.test_no_plaintext_apk_upload) ... ok
+test_reject_inherited_api_identifiers (test_cloud_build.CloudBuildRegression.test_reject_inherited_api_identifiers) ... ok
+test_reject_malformed_api_hash (test_cloud_build.CloudBuildRegression.test_reject_malformed_api_hash) ... ok
+test_reject_missing_dex (test_cloud_build.CloudBuildRegression.test_reject_missing_dex) ... ok
+test_reject_unversioned_substitute (test_cloud_build.CloudBuildRegression.test_reject_unversioned_substitute) ... ok
+test_support_push_enters_registered_workflow (test_cloud_build.CloudBuildRegression.test_support_push_enters_registered_workflow) ... ok
+test_verifier_matches_both_native_producers (test_cloud_build.CloudBuildRegression.test_verifier_matches_both_native_producers) ... ok
+test_workflow_contract (test_cloud_build.CloudBuildRegression.test_workflow_contract) ... ok
+test_baseline_stray_text_rejected_and_current_values_clean (test_integration.UnifiedIntegration.test_baseline_stray_text_rejected_and_current_values_clean) ... ok
+test_both_source_jobs_run_complete_suite_and_real_resource_gate (test_integration.UnifiedIntegration.test_both_source_jobs_run_complete_suite_and_real_resource_gate) ... ok
+test_resource_fix_does_not_change_any_displayed_string (test_integration.UnifiedIntegration.test_resource_fix_does_not_change_any_displayed_string) ... ok
+test_resource_probe_preserves_actual_provider_and_backup_contract (test_integration.UnifiedIntegration.test_resource_probe_preserves_actual_provider_and_backup_contract) ... ok
+test_root_discovery_includes_stability_cases (test_integration.UnifiedIntegration.test_root_discovery_includes_stability_cases) ... ok
+test_unified_pr_routes_to_checks_without_legacy_debug_or_private_build (test_integration.UnifiedIntegration.test_unified_pr_routes_to_checks_without_legacy_debug_or_private_build) ... ok
+test_ambiguous_installation_never_overwritten (test_sdk_layout.SdkLayoutRegression.test_ambiguous_installation_never_overwritten) ... ok
+test_complete_platform_is_not_modified (test_sdk_layout.SdkLayoutRegression.test_complete_platform_is_not_modified) ... ok
+test_lifts_original_payload_without_rewriting_metadata (test_sdk_layout.SdkLayoutRegression.test_lifts_original_payload_without_rewriting_metadata) ... ok
+test_missing_payload_is_not_synthesized (test_sdk_layout.SdkLayoutRegression.test_missing_payload_is_not_synthesized) ... ok
+test_wrong_api_rejected_before_any_moves (test_sdk_layout.SdkLayoutRegression.test_wrong_api_rejected_before_any_moves) ... ok
+test_arm64_16k (test_verify_apk.ElfVerification.test_arm64_16k) ... ok
+test_arm64_64k (test_verify_apk.ElfVerification.test_arm64_64k) ... ok
+test_inspect_nested_chaquopy (test_verify_apk.ElfVerification.test_inspect_nested_chaquopy) ... ok
+test_reject_4k_only (test_verify_apk.ElfVerification.test_reject_4k_only) ... ok
+test_reject_bad_segment_congruence (test_verify_apk.ElfVerification.test_reject_bad_segment_congruence) ... ok
+test_reject_no_loads (test_verify_apk.ElfVerification.test_reject_no_loads) ... ok
+test_reject_truncated_segment (test_verify_apk.ElfVerification.test_reject_truncated_segment) ... ok
+test_reject_x86 (test_verify_apk.ElfVerification.test_reject_x86) ... ok
+
+----------------------------------------------------------------------
+Ran 45 tests in 0.371s
+
+OK
+..............sssss...ssssssss.ssss.s.sssss............................. [ 41%]
+s............................................................s.......... [ 82%]
+.............sssss............                                           [100%]
+=========================== short test summary info ============================
+SKIPPED [1] tests/test_reference_parity.py:383: нет корпуса плагинов
+SKIPPED [1] tests/test_dynamic_proxy_shape.py:312: plugin corpus not found at /home/coral/openExtera/plugin-corpus/all
+SKIPPED [1] tests/test_dynamic_proxy_shape.py:330: plugin corpus not found at /home/coral/openExtera/plugin-corpus/all
+SKIPPED [1] tests/test_dynamic_proxy_shape.py:348: plugin corpus not found at /home/coral/openExtera/plugin-corpus/all
+SKIPPED [1] tests/test_dynamic_proxy_shape.py:375: plugin corpus not found at /home/coral/openExtera/plugin-corpus/all
+SKIPPED [1] tests/test_elyx_archive.py:44: no archive with native libraries in /home/coral/openExtera/plugin-corpus/archives
+SKIPPED [1] tests/test_java_call_shape.py:454: plugin corpus not found at /home/coral/openExtera/plugin-corpus/all
+SKIPPED [1] tests/test_java_call_shape.py:471: plugin corpus not found at /home/coral/openExtera/plugin-corpus/all
+SKIPPED [1] tests/test_java_call_shape.py:489: plugin corpus not found at /home/coral/openExtera/plugin-corpus/all
+SKIPPED [1] tests/test_java_call_shape.py:506: plugin corpus not found at /home/coral/openExtera/plugin-corpus/all
+SKIPPED [1] tests/test_java_call_shape.py:527: plugin corpus not found at /home/coral/openExtera/plugin-corpus/all
+SKIPPED [3] tests/test_java_refs.py:198: plugin corpus not found at /home/coral/openExtera/plugin-corpus/all
+SKIPPED [1] tests/test_plugin_parse.py:92: no plugin corpus at /home/coral/openExtera/plugin-corpus/all
+SKIPPED [1] tests/test_plugin_parse.py:105: no plugin corpus at /home/coral/openExtera/plugin-corpus/all
+SKIPPED [1] tests/test_plugin_parse.py:124: no plugin corpus at /home/coral/openExtera/plugin-corpus/all
+SKIPPED [1] tests/test_plugin_parse.py:162: no plugin corpus at /home/coral/openExtera/plugin-corpus/all
+SKIPPED [1] tests/test_python_runtime.py:67: no plugin archives in /home/coral/openExtera/plugin-corpus/archives
+SKIPPED [1] tests/test_python_sdk_signatures.py:675: plugin corpus not found at /home/coral/openExtera/plugin-corpus/all
+SKIPPED [1] tests/test_python_sdk_signatures.py:691: plugin corpus not found at /home/coral/openExtera/plugin-corpus/all
+SKIPPED [1] tests/test_python_sdk_signatures.py:700: plugin corpus not found at /home/coral/openExtera/plugin-corpus/all
+SKIPPED [1] tests/test_python_sdk_signatures.py:709: plugin corpus not found at /home/coral/openExtera/plugin-corpus/all
+SKIPPED [1] tests/test_python_sdk_signatures.py:718: plugin corpus not found at /home/coral/openExtera/plugin-corpus/all
+SKIPPED [1] tests/test_regressions.py:268: no R8 usage report at <checkout>/TMessagesProj/build/outputs/mapping/release/usage.txt
+SKIPPED [1] tests/test_sdk_nx_port.py:939: admin_tools corpus file is unavailable
+SKIPPED [1] tests/test_sdk_surface.py:211: plugin corpus not found at /home/coral/openExtera/plugin-corpus/all
+SKIPPED [1] tests/test_sdk_surface.py:218: plugin corpus not found at /home/coral/openExtera/plugin-corpus/all
+SKIPPED [1] tests/test_sdk_surface.py:227: plugin corpus not found at /home/coral/openExtera/plugin-corpus/all
+SKIPPED [1] tests/test_sdk_surface.py:236: plugin corpus not found at /home/coral/openExtera/plugin-corpus/all
+SKIPPED [1] tests/test_sdk_surface.py:246: plugin corpus not found at /home/coral/openExtera/plugin-corpus/all
+144 passed, 31 skipped in 7.61s
+PASS: source and host checks only; Android runtime NOT_TESTED.
+
+$ python3 tools/connected_alpha/check_resources.py --sdk-root <SDK>
+{
+  "status": "PASS_RESOURCES_AND_ISOLATED_LINK_ONLY",
+  "main_compile": "PASS_LEGACY_FORMAT_WARNINGS",
+  "alpha_compile": "PASS_STRICT",
+  "api": 37,
+  "aapt2": "Android Asset Packaging Tool (aapt) 2.20-13193326",
+  "android_jar_sha256": "bf1b4387cc7ca94fc6ef684f040d9d16fbf16248e181819f020736ea2053f177",
+  "provider_overlay_selected_in_binary": true,
+  "full_app_merged_manifest": "NOT_VALIDATED_BY_THIS_PROBE",
+  "apk_build": "NOT_RUN",
+  "android_runtime": "NOT_TESTED",
+  "main_compiled_entries": 7163,
+  "alpha_compiled_entries": 9
+}
+
+Baseline AAPT2 --legacy failed with: values/strings.xml:6348: error: plain text not allowed here.
+Only the stray backslash outside StoragePathFreeExternal was removed; actual string elements unchanged.
+
+$ gradle :TMessagesProj:processConnectedAlphaMainManifest --no-daemon --console=plain
+FAILURE: Build failed with an exception.
+
+* Where:
+Script '<checkout>/gradle/connected-alpha.gradle' line: 17
+
+* What went wrong:
+Execution failed for task ':TMessagesProj:validateConnectedAlphaConfiguration' (registered in script 'gradle/connected-alpha.gradle').
+> Configure your authorized TELEGRAM_APP_ID and TELEGRAM_APP_HASH privately in local.properties or environment; inherited/sample IDs are rejected.
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+> Get more help at https://help.gradle.org.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.7.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 18s
+20 actionable tasks: 16 executed, 4 up-to-date
+
+actionlint 1.7.12 (both modified workflows): PASS
