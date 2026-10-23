@@ -6,6 +6,7 @@ import csv
 import hashlib
 import io
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -101,6 +102,8 @@ def main():
         raise ValueError('Pinned Chaquopy recipes or 16 KB linker policy changed')
     output.mkdir(parents=True, exist_ok=False)
     pypi = root/'server/pypi'
+    build_env = dict(os.environ)
+    build_env['PATH'] = str(Path(sys.executable).parent) + os.pathsep + build_env.get('PATH', '')
     evidence = {}
     # The original compiler wrapper deliberately rejects include/library paths
     # outside its checkout. Keep temporary recipes inside that trusted tree.
@@ -128,7 +131,7 @@ def main():
             metadata.setdefault('build', {})['number'] = 100
             (recipe/'meta.yaml').write_text(yaml.safe_dump(metadata, sort_keys=False))
             subprocess.run([sys.executable, str(pypi/'build-wheel.py'), '--abi', 'arm64-v8a',
-                            '--api-level', '24', str(recipe)], cwd=pypi, check=True)
+                            '--api-level', '24', str(recipe)], cwd=pypi, env=build_env, check=True)
             candidates = list((pypi/'dist'/name).glob('*-100-py3-none-android_24_arm64_v8a.whl'))
             if len(candidates) != 1:
                 raise ValueError('Expected exactly one rebuilt ARM64 wheel')
