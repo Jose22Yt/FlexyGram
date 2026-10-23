@@ -50,7 +50,16 @@ public class Policy {
             self.assertEqual(method_bodies(old,n),method_bodies(now,n))
         enter=(ROOT/ENTER).read_text()
         reserve=method_bodies(enter,'calculateIslandTotalHeight')[0]
-        self.assertIn('+ Math.max(0, getFlexyVerticalOffset())',reserve)
+        self.assertIn('+ getFlexyVerticalReservation()',reserve)
+        offset=method_bodies(enter,'getFlexyVerticalOffset')[0]
+        self.assertIn('getVisibility() == VISIBLE',offset)
+        self.assertIn('getAlpha() == 1f',offset)
+        self.assertIn('Math.max(0, dp(flexyPositionDp))',method_bodies(enter,'getFlexyVerticalReservation')[0])
+        for position in range(-4,17):
+            for alpha in [0,0.1,0.5,0.99,1]:
+                actual=position if alpha==1 else 0
+                reserved=max(0,position)*alpha
+                self.assertGreaterEqual(reserved,actual)
         self.assertIn('onChangedIslandTotalHeight(newIslandTotalHeight)',enter)
         for token in ('setScaleX(', 'setScaleY(', 'setTranslationY('):
             self.assertNotIn(token,method_bodies(enter,'applyFlexyComposerPresentation')[0])

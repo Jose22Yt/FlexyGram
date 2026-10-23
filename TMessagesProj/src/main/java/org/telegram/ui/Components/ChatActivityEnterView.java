@@ -694,7 +694,11 @@ public class ChatActivityEnterView extends FrameLayout implements
         flexyTextPaddingDp = app.flexygram.composer.ComposerStyle.padding(level);
         flexyPositionDp = app.flexygram.composer.FlexyComposerConfig.position();
     }
-    public int getFlexyVerticalOffset() { return flexyCompactLayout ? dp(flexyPositionDp) : 0; }
+    public int getFlexyVerticalOffset() {
+        // Search, message actions and channel overlays share the parent island.
+        return flexyCompactLayout && getVisibility() == VISIBLE && getAlpha() == 1f ? dp(flexyPositionDp) : 0;
+    }
+    private int getFlexyVerticalReservation() { return flexyCompactLayout ? Math.max(0, dp(flexyPositionDp)) : 0; }
     public int getFlexyVisualInset() { return dp(flexyInsetDp); }
 
     private int flexyNativeFieldRight = -1;
@@ -17500,7 +17504,7 @@ public class ChatActivityEnterView extends FrameLayout implements
         // Reserve raised islands through the existing chat-list padding callback.
         // Negative positions retain the native reservation, leaving extra clearance.
         return fieldHeight + (topView != null ? topView.getMeasuredHeight() : 0) * topViewVisibility
-            + Math.max(0, getFlexyVerticalOffset());
+            + getFlexyVerticalReservation();
     }
 
 
