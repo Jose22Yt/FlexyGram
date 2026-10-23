@@ -3360,7 +3360,15 @@ public class ChatActivityEnterView extends FrameLayout implements
                     }
 
                     final float r = dpf2(19);
-                    paint.setColor(getThemedColor(Theme.key_chat_messagePanelSend));
+                    // Signature compositor: the native mic/record circle stays functional,
+                    // but uses the same restrained surface as the detached attach/text islands.
+                    // In classic mode the exact upstream accent is preserved.
+                    if (flexyCompactLayout && !app.flexygram.composer.FlexyComposerConfig.glass()) {
+                        final int panel = getThemedColor(Theme.key_chat_messagePanelBackground);
+                        paint.setColor(ColorUtils.calculateLuminance(panel) < 0.4 ? Color.BLACK : Color.WHITE);
+                    } else {
+                        paint.setColor(getThemedColor(Theme.key_chat_messagePanelSend));
+                    }
                     final float margin = dpf2(3);
                     final float height = dpf2(38);
                     final float width = dpf2(38);
@@ -11805,7 +11813,10 @@ public class ChatActivityEnterView extends FrameLayout implements
         boolean isMenuState = isAudioVideoSendButtonInMenuState();
         int color = audioVideoButtonContainerForbidden || isMenuState
                 ? getThemedColor(Theme.key_glass_defaultIcon)
-                : Color.WHITE;
+                : flexyCompactLayout && !app.flexygram.composer.FlexyComposerConfig.glass()
+                    ? (ColorUtils.calculateLuminance(getThemedColor(Theme.key_chat_messagePanelBackground)) < 0.4
+                        ? Color.WHITE : Color.BLACK)
+                    : Color.WHITE;
         setIconColorFilter(audioVideoSendButton, new PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN));
         audioVideoButtonContainer.setBackground(isMenuState
                 ? Theme.createSelectorDrawable(getThemedColor(Theme.key_listSelector))
@@ -16558,6 +16569,13 @@ public class ChatActivityEnterView extends FrameLayout implements
             text.rightMargin = app.flexygram.composer.ComposerGeometry.textEnd(flexyNativeFieldRight,
                 flexyCompactTextEnd(), compact);
             flexyAppliedFieldRight = text.rightMargin;
+        }
+        if (compact != wasCompact) {
+            // The original FlexyGram uses a plus on the independent attach island.
+            // Keep Exteraless' attachment click/gesture handler unchanged.
+            attachButton.setImageResource(compact ? R.drawable.msg_add : R.drawable.msg_input_attach2);
+            updateAudioVideoSendButtonColor();
+            audioVideoButtonContainer.invalidate();
         }
         if (wasCompact && !compact) emojiButton.setTranslationX(0);
         updateAttachButtonTranslationX();
