@@ -80,6 +80,7 @@ def main():
                 file = Path(directory) / license
                 if file.is_file(): z.write(file, f'assets/licenses/module-{i}-{license}')
         z.write(ROOT.parent.parent / 'LICENSE', 'assets/licenses/FlexyGram-LICENSE')
+        z.write(Path(run('go', 'env', 'GOROOT', capture=True).strip()) / 'LICENSE', 'assets/licenses/Go-LICENSE')
     aligned = OUT / 'aligned.apk'
     run(bt / 'zipalign', '-P', '16', '4', unsigned, aligned)
     # A throwaway, public-password build key for THIS HELPER ONLY. No Alpha
@@ -110,7 +111,11 @@ def main():
             '--ks-pass', 'pass:android', '--key-pass', 'pass:android', '--out', OUT / 'smoke.apk', test_apk)
     finally: key.unlink(missing_ok=True)
     signature = run(bt / 'apksigner', 'verify', '--verbose', '--print-certs', apk, capture=True)
-    assert 'Verified using v2 scheme (APK Signature Scheme v2): true' in signature
+    print(signature)
+    # With minSdk 30, apksigner may select v3 rather than v2. Both are modern
+    # whole-APK schemes. Verification itself must succeed, and v1 alone fails.
+    assert any(f'Verified using {v} scheme (APK Signature Scheme {v}): true' in signature
+               for v in ('v2', 'v3', 'v3.1'))
     run(bt / 'zipalign', '-c', '-P', '16', '4', apk)
     badging = run(bt / 'aapt2', 'dump', 'badging', apk, capture=True)
     assert f"package: name='{PACKAGE}'" in badging
