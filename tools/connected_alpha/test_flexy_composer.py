@@ -74,6 +74,8 @@ class ComposerRegression(unittest.TestCase):
         for forbidden in ('new ', 'removeView(', 'addView(', 'setText(', 'setLayoutParams(', 'requestLayout('):
             self.assertNotIn(forbidden,presentation)
         self.assertIn('unregisterOnSharedPreferenceChangeListener(flexyComposerListener)',self.current)
+        listener = self.current.split('flexyComposerListener =',1)[1].split('};',1)[0]
+        self.assertIn('messageEditTextContainer.requestLayout()', listener)
 
     def test_native_search_and_action_overlays_keep_their_original_background(self):
         chat = (ROOT/'TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java').read_text()

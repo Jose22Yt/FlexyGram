@@ -691,7 +691,9 @@ public class ChatActivityEnterView extends FrameLayout implements
     private final SharedPreferences.OnSharedPreferenceChangeListener flexyComposerListener = (prefs, key) -> {
         if (app.flexygram.composer.FlexyComposerConfig.STYLE.equals(key)) {
             flexyCompactRequested = app.flexygram.composer.FlexyComposerConfig.compact();
-            requestLayout();
+            // Force the view containing the measure hook even with unchanged specs.
+            if (messageEditTextContainer != null) messageEditTextContainer.requestLayout();
+            else requestLayout();
             invalidate();
         }
     };
