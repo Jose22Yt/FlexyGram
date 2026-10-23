@@ -45,7 +45,7 @@ jobs:
       ALPHA_KEYSTORE_B64: ${{ secrets.ALPHA_KEYSTORE_B64 }}
       ALPHA_CERTIFICATE_SHA256: ${{ secrets.ALPHA_CERTIFICATE_SHA256 }}
   connected-alpha-static:
-    if: github.event_name == 'pull_request' && (github.head_ref == 'alpha/connected-exteraless-baseline' || startsWith(github.head_ref, 'support/connected-alpha-ci-') || startsWith(github.head_ref, 'integration/connected-alpha-'))
+    if: github.event_name == 'pull_request' && (github.head_ref == 'alpha/connected-exteraless-baseline' || startsWith(github.head_ref, 'support/connected-alpha-ci-') || startsWith(github.head_ref, 'integration/connected-alpha-') || github.head_ref == 'tools/alpha-local-installer')
     name: Connected Alpha source checks (no APK)
     runs-on: ubuntu-latest
     steps:
@@ -64,7 +64,7 @@ jobs:
           packages: 'build-tools;36.0.0 platforms;android-37.0'
       - run: python3 tools/connected_alpha/check_resources.py --sdk-root "$ANDROID_HOME"
   build:
-    if: github.event_name == 'pull_request' && github.head_ref != 'alpha/connected-exteraless-baseline' && !startsWith(github.head_ref, 'support/connected-alpha-ci-') && !startsWith(github.head_ref, 'integration/connected-alpha-')
+    if: github.event_name == 'pull_request' && github.head_ref != 'alpha/connected-exteraless-baseline' && !startsWith(github.head_ref, 'support/connected-alpha-ci-') && !startsWith(github.head_ref, 'integration/connected-alpha-') && github.head_ref != 'tools/alpha-local-installer'
     name: Gradle Build
     runs-on: ubuntu-latest
     env:
