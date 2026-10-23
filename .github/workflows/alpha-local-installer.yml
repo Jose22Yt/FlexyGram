@@ -1,8 +1,8 @@
-name: Offline Alpha 2 Signature Fix installer
+name: Offline Signature Personalized installer
 
 on:
   push:
-    branches: [fix/alpha2-signature-installer]
+    branches: [fix/alpha2-signature-personalized-installer]
     paths:
       - 'tools/alpha_local_installer/**'
       - '.github/workflows/alpha-local-installer.yml'
@@ -57,8 +57,17 @@ jobs:
         if: steps.profile.outputs.ready == 'true'
         with:
           packages: 'build-tools;36.0.0 platforms;android-37.0 ndk;27.2.12479018'
+      - uses: actions/checkout@v4
+        if: steps.profile.outputs.ready == 'true'
+        with:
+          ref: 6ea4c7d5a90796dae81b1aa4ee170f04366005e7
+          path: signature-source
+          persist-credentials: false
+          sparse-checkout: TMessagesProj/src/main/java/app/flexygram/composer
       - name: Build and verify independent offline helper (no repository secrets)
         if: steps.profile.outputs.ready == 'true'
+        env:
+          SIGNATURE_SOURCE_ROOT: ${{ github.workspace }}/signature-source
         run: python3 tools/alpha_local_installer/build.py
       - name: Test helper UI, JNI rejection and provider isolation in Android emulator
         if: steps.profile.outputs.ready == 'true'
@@ -67,9 +76,9 @@ jobs:
         if: steps.profile.outputs.ready == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: FlexyGram-Alpha2-Signature-Fix-installer
+          name: FlexyGram-Signature-Personalized-installer
           path: |
-            tools/alpha_local_installer/build/FlexyGram-Alpha2-Signature-Fix-Instalador.apk
+            tools/alpha_local_installer/build/FlexyGram-Signature-Personalized-Instalador.apk
             tools/alpha_local_installer/build/helper-verification.json
             tools/alpha_local_installer/build/android-smoke.txt
           if-no-files-found: error

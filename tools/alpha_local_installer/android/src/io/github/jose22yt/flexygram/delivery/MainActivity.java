@@ -1,4 +1,4 @@
-package io.github.jose22yt.flexygram.delivery.alpha2.signature;
+package io.github.jose22yt.flexygram.delivery.alpha2.signature1264;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -41,15 +41,15 @@ public final class MainActivity extends Activity {
             Insets bars = insets.getInsets(WindowInsets.Type.systemBars() | WindowInsets.Type.displayCutout());
             v.setPadding(bars.left, bars.top, bars.right, bars.bottom); return insets;
         });
-        TextView title = text(root, "Actualizar FlexyGram Alpha 2 Signature Fix"); title.setTextSize(25);
+        TextView title = text(root, "Actualizar FlexyGram Signature Personalized"); title.setTextSize(25);
         text(root, "Todo el descifrado ocurre en este teléfono. La identidad privada no se guarda ni se transmite.");
         text(root, "Abre tu ZIP de recuperación en el teléfono. Selecciona únicamente el archivo de identidad age original que contiene la clave privada. El archivo delivery-public-recipient.txt no sirve para descifrar.");
         cipherButton = button(root, "1. Seleccionar archivo cifrado", () -> pick(PICK_CIPHER));
         keyButton = button(root, "2. Seleccionar identidad original", () -> pick(PICK_IDENTITY));
         decryptButton = button(root, "3. Descifrar y comprobar", this::startDecrypt);
-        status = text(root, nativeReady ? "Selecciona FlexyGram-Alpha2-Signature-Fix-arm64.tar.age y tu identidad original." : "No se pudo cargar el componente local. No se ha leído tu identidad.");
+        status = text(root, nativeReady ? "Selecciona FlexyGram-Signature-Personalized-arm64.tar.age y tu identidad original." : "No se pudo cargar el componente local. No se ha leído tu identidad.");
         status.setTextIsSelectable(true);
-        installButton = button(root, "4. Actualizar FlexyGram Alpha 2 Signature Fix", this::startInstall);
+        installButton = button(root, "4. Actualizar FlexyGram Signature Personalized", this::startInstall);
         reportButton = button(root, "Ver informe de verificación", this::showReport);
         clearButton = button(root, "Borrar archivos temporales", () -> {
             Contract.clean(this); verified = false; encrypted = identity = null;
@@ -155,7 +155,7 @@ public final class MainActivity extends Activity {
                 .setMessage("Paquete: " + Contract.APP + "\nCommit: " + Contract.COMMIT + "\nSHA-256: " + Contract.HASH + "\nBibliotecas ELF: 96\nFirma: coincide con el informe cifrado\nPrueba física: PENDIENTE\n\nverification.json se ha extraído en el almacenamiento privado del auxiliar.")
                 .setNeutralButton("Guardar informe", (dialog, which) -> {
                     Intent save = new Intent(Intent.ACTION_CREATE_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("application/json");
-                    save.putExtra(Intent.EXTRA_TITLE, "FlexyGram-Alpha2-Signature-Fix-verification.json"); save.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+                    save.putExtra(Intent.EXTRA_TITLE, "FlexyGram-Signature-Personalized-verification.json"); save.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
                     startActivityForResult(save, SAVE_REPORT);
                 })
                 .setPositiveButton("Cerrar", null).show();

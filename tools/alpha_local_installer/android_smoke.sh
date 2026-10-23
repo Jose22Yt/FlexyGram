@@ -38,16 +38,18 @@ for attempt in $(seq 1 120); do
 done
 [[ "$booted" == true ]]
 adb shell input keyevent 82
-adb install -r build/FlexyGram-Alpha2-Signature-Fix-Instalador.apk
+adb install -r build/FlexyGram-Signature-Personalized-Instalador.apk
 adb install -r -t build/smoke.apk
-adb shell am instrument -w -r io.github.jose22yt.flexygram.delivery.alpha2.signature.tests/io.github.jose22yt.flexygram.delivery.alpha2.signature.SmokeInstrumentation | tee build/android-smoke.txt
+adb shell am instrument -w -r io.github.jose22yt.flexygram.delivery.alpha2.signature1264.tests/io.github.jose22yt.flexygram.delivery.alpha2.signature1264.SmokeInstrumentation | tee build/android-smoke.txt
 grep -q 'helper_smoke=PASS' build/android-smoke.txt
+grep -q 'signature_android_preferences_policy=PASS' build/android-smoke.txt
 python3 - <<'PY'
 import json
 from pathlib import Path
 p=Path('build/helper-verification.json')
 r=json.loads(p.read_text())
 r['android_helper_emulator_smoke']='PASS (API 35 x86_64 helper only)'
+r['signature_android_preferences_policy']='PASS (isolated production classes, API 35)'
 r['physical_android_test']='NOT_TESTED'
 p.write_text(json.dumps(r,indent=2)+'\n')
 PY
