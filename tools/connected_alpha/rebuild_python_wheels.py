@@ -81,7 +81,9 @@ def main():
     output.mkdir(parents=True, exist_ok=False)
     pypi = root/'server/pypi'
     evidence = {}
-    with tempfile.TemporaryDirectory(prefix='alpha-wheel-sources-') as tmp:
+    # The original compiler wrapper deliberately rejects include/library paths
+    # outside its checkout. Keep temporary recipes inside that trusted tree.
+    with tempfile.TemporaryDirectory(prefix='alpha-wheel-sources-', dir=root) as tmp:
         work = Path(tmp)
         # libxml2 must be built before libxslt, whose recipe consumes its wheel.
         for name, (version, url, digest) in SOURCES.items():
