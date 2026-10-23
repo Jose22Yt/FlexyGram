@@ -2,7 +2,7 @@ import io
 import struct
 import unittest
 import zipfile
-from verify_apk import has_launcher_alias, inspect_archive, inspect_elf
+from verify_apk import has_launcher_alias, inspect_archive, inspect_elf, launcher_diagnostic
 
 
 PACKAGED_MANIFEST = '''
@@ -25,6 +25,13 @@ E: manifest (line=2)
 
 
 class PackagedLauncherVerification(unittest.TestCase):
+    def test_failure_diagnostic_limits_output_to_public_launcher_structure(self):
+        diagnostic = launcher_diagnostic(PACKAGED_MANIFEST +
+            '    A: android:value="sensitive-other-metadata"\n')
+        self.assertIn('activity-alias', str(diagnostic))
+        self.assertIn('ExteralessIcon', str(diagnostic))
+        self.assertNotIn('sensitive-other-metadata', str(diagnostic))
+
     def test_accepts_launcher_alias_even_without_badging_launchable_activity(self):
         self.assertTrue(has_launcher_alias(PACKAGED_MANIFEST))
 

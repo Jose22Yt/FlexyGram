@@ -7,6 +7,7 @@ import json
 import re
 import struct
 import subprocess
+import sys
 import zipfile
 from pathlib import Path
 from ci_inputs import fingerprint
@@ -73,6 +74,15 @@ def has_launcher_alias(xmltree):
                         return True
     return False
 
+def launcher_diagnostic(xmltree):
+    """Only public component structure; never print arbitrary manifest metadata."""
+    lines = xmltree.splitlines()
+    structural = [line for line in lines if re.search(r'\bE: (manifest|application|activity-alias)\b', line)]
+    named = [line for line in lines if any(value in line for value in (
+        'ExteralessIcon', 'LaunchActivity', 'android.intent.action.MAIN',
+        'android.intent.category.LAUNCHER'))]
+    return {'lines': len(lines), 'structure': structural[:20], 'launcher_references': named[:24]}
+
 def inspect_elf(data, name):
     require(len(data) >= 64, f'{name}: truncated ELF header')
     require(data[:6] == b'\x7fELF\x02\x01', f'{name}: expected ELF64 little endian')
@@ -124,7 +134,10 @@ def main():
     require('application-debuggable' not in badging, 'Unexpected debuggable APK')
     require("native-code: 'arm64-v8a'" in badging and "'x86_64'" not in badging, 'Unexpected native ABI')
     manifest = command(str(bt/'aapt2'), 'dump', 'xmltree', str(args.apk), '--file', 'AndroidManifest.xml')
-    require(has_launcher_alias(manifest), 'Missing enabled, exported launcher alias in packaged manifest')
+    if not has_launcher_alias(manifest):
+        print('Launcher diagnostic (public component structure only): ' +
+              json.dumps(launcher_diagnostic(manifest)), file=sys.stderr)
+        raise ValueError('Missing enabled, exported launcher alias in packaged manifest')
     require('sharedUserId' not in manifest and 'backupAgent' not in manifest, 'Shared UID or backup agent present')
     require(re.search(r'allowBackup[^\n]*0x0\b', manifest), 'Backup must be disabled in merged manifest')
     require(re.search(r'restoreAnyVersion[^\n]*0x0\b', manifest), 'Restore must be disabled')
