@@ -14,4 +14,7 @@
   <string name="FlexyComposerPositionReset">Reset bar position</string>
   <string name="FlexyComposerReset">Reset default layout</string>
   <string name="FlexyComposerPreview">Conversation bar preview</string>
+  <string name="FlexyComposerIcons">Icon appearance</string>
+  <string name="FlexyComposerReferenceIcons">Reference · clip and folded circle</string>
+  <string name="FlexyComposerSmileIcons">Plus and smile</string>
 </resources>

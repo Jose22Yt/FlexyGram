@@ -13,6 +13,14 @@ import java.util.Map;
 
 public class ChatActivityEnterViewAnimatedIconView extends RLottieImageView {
     private State currentState;
+    private boolean compactIcons, referenceIcons;
+    public void setCompactIcons(boolean compact, boolean reference) {
+        if (compactIcons == compact && referenceIcons == reference) return;
+        compactIcons = compact;
+        referenceIcons = reference;
+        if (currentState != null) setState(currentState, false);
+    }
+
     private TransitState animatingState;
     private final int sizeDp;
 
@@ -76,11 +84,13 @@ public class ChatActivityEnterViewAnimatedIconView extends RLottieImageView {
         if (animate && state == currentState) {
             return;
         }
-        if (useStaticIcons()) {
+        if (compactIcons || useStaticIcons()) {
             currentState = state;
             animatingState = null;
             stopAnimation();
-            setImageResource(staticResourceFor(state));
+            setImageResource(compactIcons ? app.flexygram.composer.ComposerIcons.resource(state.name(), staticResourceFor(state), referenceIcons) : staticResourceFor(state));
+            if (state == State.VOICE) setContentDescription(LocaleController.getString(R.string.AccDescrVoiceMessage));
+            else if (state == State.VIDEO) setContentDescription(LocaleController.getString(R.string.AccDescrVideoMessage));
             return;
         }
         State fromState = currentState;

@@ -10,4 +10,7 @@
   <string name="FlexyComposerPositionReset">Сбросить положение панели</string>
   <string name="FlexyComposerReset">Сбросить оформление</string>
   <string name="FlexyComposerPreview">Предпросмотр панели</string>
+  <string name="FlexyComposerIcons">Вид значков</string>
+  <string name="FlexyComposerReferenceIcons">Образец · скрепка и круг</string>
+  <string name="FlexyComposerSmileIcons">Плюс и улыбка</string>
 </resources>

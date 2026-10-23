@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.drawable.Drawable;
+import androidx.core.graphics.ColorUtils;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +27,7 @@ import tw.nekomimi.nekogram.settings.BaseNekoSettingsActivity;
 
 public final class FlexyComposerSettingsActivity extends BaseNekoSettingsActivity {
     private static final int POSITION = 100, GAP = 101, PREVIEW = 102;
-    private int styleRow, previewRow, positionRow, positionResetRow, levelRow, gapRow, glassRow, resetRow, infoRow;
+    private int styleRow, previewRow, positionRow, positionResetRow, levelRow, gapRow, iconsRow, glassRow, resetRow, infoRow;
     private Preview preview;
     @Override protected void updateRows() {
         super.updateRows();
@@ -35,6 +37,7 @@ public final class FlexyComposerSettingsActivity extends BaseNekoSettingsActivit
         positionResetRow = addRow();
         levelRow = addRow("flexyComposerLevel");
         gapRow = addRow("flexyComposerGap");
+        iconsRow = addRow("flexyComposerIcons");
         glassRow = addRow("flexyComposerGlass");
         resetRow = addRow("flexyComposerReset");
         infoRow = addRow();
@@ -53,6 +56,11 @@ public final class FlexyComposerSettingsActivity extends BaseNekoSettingsActivit
             showDialog(new AlertDialog.Builder(getParentActivity(), getResourceProvider())
                 .setTitle(getString(R.string.FlexyComposerLevel))
                 .setItems(levels(), (dialog, which) -> { FlexyComposerConfig.setLevel(which); refresh(); }).create());
+        } else if (position == iconsRow && FlexyComposerConfig.compact()) {
+            showDialog(new AlertDialog.Builder(getParentActivity(), getResourceProvider())
+                .setTitle(getString(R.string.FlexyComposerIcons))
+                .setItems(new CharSequence[]{getString(R.string.FlexyComposerReferenceIcons), getString(R.string.FlexyComposerSmileIcons)},
+                    (dialog, which) -> { FlexyComposerConfig.setReferenceIcons(which == 0); refresh(); }).create());
         } else if (position == glassRow && FlexyComposerConfig.compact()) {
             FlexyComposerConfig.setGlass(!FlexyComposerConfig.glass()); refresh();
         } else if (position == positionResetRow && FlexyComposerConfig.compact()) {
@@ -104,7 +112,21 @@ public final class FlexyComposerSettingsActivity extends BaseNekoSettingsActivit
     /** Lightweight settings preview, never substitutes the real native composer. */
     private final class Preview extends View {
         final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        Preview(Context c) { super(c); setContentDescription(getString(R.string.FlexyComposerPreview)); }
+        final Drawable plus, clip, smile, folded, voice;
+        Preview(Context c) {
+            super(c); setContentDescription(getString(R.string.FlexyComposerPreview));
+            clip = c.getResources().getDrawable(R.drawable.flexy_composer_clip).mutate();
+            folded = c.getResources().getDrawable(R.drawable.flexy_composer_folded).mutate();
+            plus = c.getResources().getDrawable(R.drawable.flexy_composer_add).mutate();
+            smile = c.getResources().getDrawable(R.drawable.flexy_composer_smile).mutate();
+            voice = c.getResources().getDrawable(R.drawable.flexy_composer_voice).mutate();
+        }
+        private void icon(Canvas canvas, Drawable icon, float x, float y, int color) {
+            int half = dp(12);
+            icon.setTint(color);
+            icon.setBounds(Math.round(x)-half, Math.round(y)-half, Math.round(x)+half, Math.round(y)+half);
+            icon.draw(canvas);
+        }
         @Override protected void onMeasure(int w, int h) { setMeasuredDimension(MeasureSpec.getSize(w), dp(96)); }
         @Override protected void onDraw(Canvas c) {
             if (!FlexyComposerConfig.compact()) {
@@ -115,16 +137,16 @@ public final class FlexyComposerSettingsActivity extends BaseNekoSettingsActivit
             }
             int level = FlexyComposerConfig.level(); float radius = dp(ComposerStyle.diameter(level)) / 2f;
             float y = dp(54 - FlexyComposerConfig.position()), gap = dp(FlexyComposerConfig.gap());
-            int surface = getThemedColor(Theme.key_chat_messagePanelBackground), ink = getThemedColor(Theme.key_windowBackgroundWhiteBlackText);
+            boolean dark = ColorUtils.calculateLuminance(getThemedColor(Theme.key_chat_messagePanelBackground)) < 0.4;
+            int surface = ComposerStyle.surface(dark, FlexyComposerConfig.glass()), ink = ComposerStyle.icon(dark);
             c.drawColor(getThemedColor(Theme.key_windowBackgroundGray)); paint.setColor(surface);
             float left = dp(30), right = getWidth() - dp(30);
             c.drawCircle(left,y,radius,paint); c.drawCircle(right,y,radius,paint);
             c.drawRoundRect(left+radius+gap,y-radius,right-radius-gap,y+radius,radius,radius,paint);
-            paint.setColor(ink); paint.setTextAlign(Paint.Align.CENTER); paint.setTextSize(dp(23));
-            float baseline = y - (paint.ascent()+paint.descent())/2;
-            c.drawText("+",left,baseline,paint); c.drawText("↑",right,baseline,paint);
-            c.drawText("☺",right-radius-gap-dp(20),baseline,paint);
-            paint.setTextAlign(Paint.Align.LEFT); paint.setTextSize(dp(16));
+            icon(c, FlexyComposerConfig.referenceIcons() ? clip : plus, left, y, ink); icon(c, voice, right, y, ink);
+            icon(c, FlexyComposerConfig.referenceIcons() ? folded : smile, right-radius-gap-dp(20), y, ink);
+            paint.setColor(ink);
+            paint.setTextAlign(Paint.Align.LEFT); paint.setTextSize(dp(18));
             c.drawText(getString(R.string.TypeMessage),left+radius+gap+dp(ComposerStyle.padding(level)),y-(paint.ascent()+paint.descent())/2,paint);
         }
     }
@@ -151,6 +173,7 @@ public final class FlexyComposerSettingsActivity extends BaseNekoSettingsActivit
             } else {
                 TextSettingsCell cell = (TextSettingsCell)h.itemView;
                 if (p == styleRow) cell.setTextAndValue(getString(R.string.FlexyComposerStyle), getString(FlexyComposerConfig.compact() ? R.string.FlexyComposerCompact : R.string.FlexyComposerClassic), true);
+                else if (p == iconsRow) cell.setTextAndValue(getString(R.string.FlexyComposerIcons), getString(FlexyComposerConfig.referenceIcons() ? R.string.FlexyComposerReferenceIcons : R.string.FlexyComposerSmileIcons), true);
                 else if (p == levelRow) cell.setTextAndValue(getString(R.string.FlexyComposerLevel), levels()[FlexyComposerConfig.level()].toString(), true);
                 else cell.setText(getString(p == resetRow ? R.string.FlexyComposerReset : R.string.FlexyComposerPositionReset), true);
                 cell.setEnabled(p == styleRow || p == resetRow || FlexyComposerConfig.compact(), null);

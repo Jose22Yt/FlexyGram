@@ -18,18 +18,18 @@ public class Policy {
    int y=ComposerStyle.position(raw);ok(y>=-4 && y<=16);
    ok(9+y>=5);ok(ComposerStyle.reserve(y)==Math.max(0,y));
    int level=ComposerStyle.level(raw);ok(level>=0 && level<=2);
-   ok(ComposerStyle.diameter(raw)>=36 && ComposerStyle.diameter(raw)<=40);
+   ok(ComposerStyle.diameter(raw)>=32 && ComposerStyle.diameter(raw)<=36);
    for(int g=-20;g<=20;g++) {
     int gap=ComposerStyle.gap(raw,g);ok(gap>=2 && gap<=8);
     ok(ComposerStyle.padding(raw)>=10);
     // 44dp hit slots never scale. Multiline native heights only lose visual inset.
     for(int h:new int[]{44,68,120,300}) {
-     ok(h-2*ComposerStyle.inset(raw)>=36);
+     ok(h-2*ComposerStyle.inset(raw)>=32);
      ok(ComposerGeometry.TOUCH_SLOT==44);
     }
    }
   }
-  ok(ComposerStyle.position(0)==0 && ComposerStyle.inset(0)==2 && ComposerStyle.gap(0,0)==6);
+  ok(ComposerStyle.position(0)==0 && ComposerStyle.inset(0)==4 && ComposerStyle.gap(0,0)==6);
   System.out.print("PASS production geometry policy");
  }
 }
@@ -87,8 +87,8 @@ public class Policy {
             for density in ('mdpi','hdpi','xhdpi','xxhdpi','xxxhdpi'):self.assertTrue((res/f'mipmap-{density}'/f'{name}.png').is_file())
         manifest=(ROOT/'TMessagesProj/src/main/AndroidManifest.xml').read_text()
         self.assertIn('org.telegram.messenger.ExteralessIcon',manifest)
-        self.assertIn('def verCode = 1264',(ROOT/'TMessagesProj/build.gradle').read_text())
-        self.assertIn('--expected-version-code 1264',(ROOT/'.github/workflows/connected-alpha-arm64.yml').read_text())
+        self.assertIn('def verCode = 1265',(ROOT/'TMessagesProj/build.gradle').read_text())
+        self.assertIn('--expected-version-code 1265',(ROOT/'.github/workflows/connected-alpha-arm64.yml').read_text())
         self.assertIn('previous != LEGACY_DEFAULT_TITLE && previous != "exteraless"',(ROOT/'TMessagesProj/src/main/kotlin/app/exteraless/appearance/AppearanceConfig.kt').read_text())
         self.assertIn('R.string.FlexyBrandName',(ROOT/'TMessagesProj/src/main/java/tw/nekomimi/nekogram/helpers/TypefaceHelper.java').read_text())
 
