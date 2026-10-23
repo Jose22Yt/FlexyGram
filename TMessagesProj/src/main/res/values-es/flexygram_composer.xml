@@ -1,0 +1,8 @@
+<resources>
+    <string name="FlexyComposerSettings">FlexyGram · Barra de conversación</string>
+    <string name="FlexyComposerStyle">Estilo de barra de conversación</string>
+    <string name="FlexyComposerClassic">Clásica</string>
+    <string name="FlexyComposerCompact">Compacta iOS</string>
+    <string name="FlexyComposerGlass">Cristal perlado discreto</string>
+    <string name="FlexyComposerInfo">Los cambios se aplican sin reiniciar. Clásica conserva la barra original de Exteraless. Compacta mantiene los controles nativos, el tamaño del texto y las zonas táctiles; los controles especiales y las ventanas muy estrechas conservan su distribución original. El cristal solo cambia el acabado, nunca la altura del teclado. La grabación y las vistas previas conservan su fondo nativo.</string>
+</resources>

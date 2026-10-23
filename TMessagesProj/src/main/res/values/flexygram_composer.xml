@@ -1,0 +1,8 @@
+<resources>
+    <string name="FlexyComposerSettings">FlexyGram · Conversation bar</string>
+    <string name="FlexyComposerStyle">Conversation bar style</string>
+    <string name="FlexyComposerClassic">Classic</string>
+    <string name="FlexyComposerCompact">Compact iOS</string>
+    <string name="FlexyComposerGlass">Subtle pearl glass</string>
+    <string name="FlexyComposerInfo">Changes apply without restarting. Classic keeps the original Exteraless bar. Compact keeps native controls, text size and touch areas; specialized controls and very narrow windows retain their original layout. Glass changes only the surface, never keyboard height. Recording and previews retain their native background.</string>
+</resources>

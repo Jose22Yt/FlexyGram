@@ -26,6 +26,13 @@ def require(condition, message):
 def command(*args):
     return subprocess.check_output(args, text=True, stderr=subprocess.STDOUT)
 
+def package_version_code(badging):
+    lines = [line for line in badging.splitlines() if line.startswith('package: ')]
+    require(len(lines) == 1, 'Expected exactly one packaged application')
+    versions = re.findall(r"\bversionCode='([0-9]+)'", lines[0])
+    require(len(versions) == 1 and int(versions[0]) > 0, 'Missing or invalid APK version code')
+    return int(versions[0])
+
 def parse_xmltree(xmltree):
     root = {'children': [], 'attrs': {}}
     stack = [(-1, root)]
@@ -152,6 +159,7 @@ def main():
     p.add_argument('apk', type=Path)
     p.add_argument('--build-tools', type=Path, required=True)
     p.add_argument('--certificate-sha256', required=True, help='Expected authorized Alpha-only signing certificate fingerprint')
+    p.add_argument('--expected-version-code', type=int, help='Required update version, when building a delivery profile')
     args = p.parse_args()
     expected = fingerprint(args.certificate_sha256)
     bt = args.build_tools
@@ -162,6 +170,9 @@ def main():
     command(str(bt/'zipalign'), '-c', '-P', '16', '4', str(args.apk))
     badging = command(str(bt/'aapt2'), 'dump', 'badging', str(args.apk))
     require(f"package: name='{APP}'" in badging, 'Wrong application ID')
+    version_code = package_version_code(badging)
+    if args.expected_version_code is not None:
+        require(version_code == args.expected_version_code, 'Unexpected update version code')
     require("application-label:'FlexyGram Alpha'" in badging, 'Wrong label')
     require("uses-permission: name='android.permission.INTERNET'" in badging, 'Missing INTERNET')
     require('application-debuggable' not in badging, 'Unexpected debuggable APK')
@@ -187,6 +198,7 @@ def main():
         elfs = inspect_archive(z)
         require(elfs, 'No ELF payloads inspected')
     print(json.dumps({'apk':args.apk.name,'bytes':args.apk.stat().st_size,
+        'application_id':APP,'version_code':version_code,
         'sha256':hashlib.sha256(args.apk.read_bytes()).hexdigest(),
         'certificate_sha256':expected,'elf_count':len(elfs),'elfs':elfs,
         'status':'PASS_ARTIFACT_ONLY','android_runtime':'NOT_TESTED'}, indent=2))

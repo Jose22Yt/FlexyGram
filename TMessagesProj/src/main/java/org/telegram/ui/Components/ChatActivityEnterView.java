@@ -684,6 +684,19 @@ public class ChatActivityEnterView extends FrameLayout implements
     @Nullable
     private ImageView reactionsButton;
     public FrameLayout messageEditTextContainer;
+    private boolean flexyCompactRequested;
+    private boolean flexyCompactLayout;
+    private int flexyNativeFieldRight = -1;
+    private int flexyAppliedFieldRight = -1;
+    private final SharedPreferences.OnSharedPreferenceChangeListener flexyComposerListener = (prefs, key) -> {
+        if (app.flexygram.composer.FlexyComposerConfig.STYLE.equals(key)) {
+            flexyCompactRequested = app.flexygram.composer.FlexyComposerConfig.compact();
+            // Force the view containing the measure hook even with unchanged specs.
+            if (messageEditTextContainer != null) messageEditTextContainer.requestLayout();
+            else requestLayout();
+            invalidate();
+        }
+    };
     public FrameLayout textFieldContainer;
     public FrameLayout sendButtonContainer;
     private ImageView sendOutlineView;
@@ -2757,6 +2770,7 @@ public class ChatActivityEnterView extends FrameLayout implements
         FrameLayout frameLayout = messageEditTextContainer = new FrameLayout(context) {
             @Override
             protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+                applyFlexyComposerPresentation(MeasureSpec.getSize(widthMeasureSpec));
                 super.onMeasure(widthMeasureSpec, heightMeasureSpec);
                 final int height = Math.max(dp(44), getMeasuredHeight());
                 if (animatorInputFieldHeight.getFactor() > 0) {
@@ -3726,6 +3740,8 @@ public class ChatActivityEnterView extends FrameLayout implements
         checkChannelRights();
 
         createMessageEditText();
+        flexyCompactRequested = app.flexygram.composer.FlexyComposerConfig.compact();
+        app.flexygram.composer.FlexyComposerConfig.preferences().registerOnSharedPreferenceChangeListener(flexyComposerListener);
     }
 
     public void setViewParentForEmoji(ViewGroup viewParent) {
@@ -7539,6 +7555,7 @@ public class ChatActivityEnterView extends FrameLayout implements
     }
 
     public void onDestroy() {
+        app.flexygram.composer.FlexyComposerConfig.preferences().unregisterOnSharedPreferenceChangeListener(flexyComposerListener);
         if (audioTimelineView != null) {
             audioTimelineView.destroy();
         }
@@ -10118,6 +10135,10 @@ public class ChatActivityEnterView extends FrameLayout implements
         if (doneButton != null && doneButton.getVisibility() == VISIBLE) {
             layoutParams.rightMargin = Math.max(layoutParams.rightMargin, Math.max(0, doneButton.width() - dp(DEFAULT_HEIGHT)));
         }
+        flexyNativeFieldRight = layoutParams.rightMargin;
+        if (flexyCompactLayout) layoutParams.rightMargin = app.flexygram.composer.ComposerGeometry.textEnd(
+            layoutParams.rightMargin, flexyCompactTextEnd(), true);
+        flexyAppliedFieldRight = layoutParams.rightMargin;
         if (oldRightMargin != layoutParams.rightMargin) {
             messageEditText.setLayoutParams(layoutParams);
         }
@@ -16486,9 +16507,76 @@ public class ChatActivityEnterView extends FrameLayout implements
 
     private void updateAttachButtonTranslationX() {
         if (attachButton == null) return;
-        attachButton.setTranslationX(attachLayoutPaddingTranslationX + attachLayoutTranslationX + (sendButton != null ? (
+        final float nativeTranslation = nativeAttachTranslationX();
+        attachButton.setTranslationX(flexyCompactLayout ? 0 : nativeTranslation);
+        if (flexyCompactLayout) emojiButton.setTranslationX(nativeTranslation);
+    }
+
+    private float nativeAttachTranslationX() {
+        return attachLayoutPaddingTranslationX + attachLayoutTranslationX + (sendButton != null ? (
             -Math.max(0, sendButton.width() - dp(DEFAULT_HEIGHT + 12)) * sendButton.getAlpha()
-        ) : 0));
+        ) : 0);
+    }
+
+    private int flexyCompactTextEnd() {
+        return dp(app.flexygram.composer.ComposerGeometry.TEXT_END_SLOT) + Math.round(Math.max(0, -nativeAttachTranslationX()));
+    }
+
+    /** Mutates only existing presentation params during the native measure pass. */
+    private void applyFlexyComposerPresentation(int width) {
+        if (!flexyCompactRequested && !flexyCompactLayout) return;
+        final boolean specialControls = !isChat || parentFragment == null || isStories
+            || senderSelectView != null && senderSelectView.getVisibility() == VISIBLE
+            || botCommandsMenuButton != null && (botCommandsMenuButton.getTag() != null || botCommandsMenuButton.getVisibility() == VISIBLE)
+            || botWebViewButton != null && botWebViewButton.getVisibility() == VISIBLE
+            || aiButton != null && aiButton.getVisibility() == VISIBLE
+            || ((MarginLayoutParams) emojiButton.getLayoutParams()).leftMargin > dp(3);
+        final boolean compact = flexyCompactRequested && app.flexygram.composer.ComposerGeometry.supportsCompact(
+            width / AndroidUtilities.density, specialControls);
+        if (!compact && !flexyCompactLayout) return;
+        final boolean wasCompact = flexyCompactLayout;
+        flexyCompactLayout = compact;
+        FrameLayout.LayoutParams attach = (FrameLayout.LayoutParams) attachButton.getLayoutParams();
+        attach.gravity = Gravity.BOTTOM | (compact ? Gravity.LEFT : Gravity.RIGHT);
+        FrameLayout.LayoutParams emoji = (FrameLayout.LayoutParams) emojiButton.getLayoutParams();
+        emoji.gravity = Gravity.BOTTOM | (compact ? Gravity.RIGHT : Gravity.LEFT);
+        // The outer native onMeasure has already reserved sender/bot controls.
+        // Preserve that value when falling back, rather than restoring a constant.
+        if (compact) emoji.leftMargin = 0;
+        emoji.rightMargin = compact ? dp(3) : 0;
+        if (deleteRichDraftButton != null) {
+            FrameLayout.LayoutParams delete = (FrameLayout.LayoutParams) deleteRichDraftButton.getLayoutParams();
+            delete.gravity = emoji.gravity;
+            if (compact) delete.leftMargin = 0;
+            delete.rightMargin = emoji.rightMargin;
+        }
+        if (messageEditText != null) {
+            FrameLayout.LayoutParams text = (FrameLayout.LayoutParams) messageEditText.getLayoutParams();
+            if (compact) text.leftMargin = dp(54);
+            // Editing can directly change this margin without updateFieldRight.
+            if (flexyNativeFieldRight < 0 || text.rightMargin != flexyAppliedFieldRight) flexyNativeFieldRight = text.rightMargin;
+            text.rightMargin = app.flexygram.composer.ComposerGeometry.textEnd(flexyNativeFieldRight,
+                flexyCompactTextEnd(), compact);
+            flexyAppliedFieldRight = text.rightMargin;
+        }
+        if (wasCompact && !compact) emojiButton.setTranslationX(0);
+        updateAttachButtonTranslationX();
+    }
+
+    /** Native recording/previews keep their full background; their layout is untouched. */
+    public boolean isFlexyCompactPresentation() {
+        return flexyCompactLayout && getVisibility() == VISIBLE && getAlpha() == 1f && !recordingAudioVideo
+            && recordInterfaceState == 0 && (recordedAudioPanel == null || recordedAudioPanel.getVisibility() != VISIBLE)
+            && (topView == null || topView.getVisibility() != VISIBLE)
+            && !richDraftActive;
+    }
+
+    public boolean getFlexyAttachmentBounds(RectF out) {
+        if (attachButton == null || attachButton.getVisibility() != VISIBLE || attachButton.getAlpha() <= 0) return false;
+        final float x = textFieldContainer.getX() + messageEditTextContainer.getX() + attachButton.getX();
+        final float y = textFieldContainer.getY() + messageEditTextContainer.getY() + attachButton.getY();
+        out.set(x + dp(2), y + dp(2), x + attachButton.getWidth() - dp(2), y + attachButton.getHeight() - dp(2));
+        return true;
     }
 
     private void updateEmojiButtonParams() {
