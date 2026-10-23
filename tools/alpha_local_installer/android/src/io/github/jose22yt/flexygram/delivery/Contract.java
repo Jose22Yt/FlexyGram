@@ -15,8 +15,8 @@ import java.security.MessageDigest;
 final class Contract {
     static final String APP = "io.github.jose22yt.flexygram.alpha";
     static final String APK = "FlexyGram-Alpha-arm64.apk";
-    static final String HASH = "PENDING_VERIFIED_ALPHA2_APK_HASH";
-    static final String CIPHER_HASH = "PENDING_VERIFIED_ALPHA2_CIPHER_HASH";
+    static final String HASH = "515b5145ee4413450f10a130f8753fdd2eda405aaf106fe968f598a19e716552";
+    static final String CIPHER_HASH = "7eabe59c2fe2cf0863fb98221687b4f371c64ab698e26bf6f6a1de8d1dcbb48a";
     static final String COMMIT = "feb17ef642f7d06582f5cf6387cc4bc11a062573";
     static File directory(Context c) throws IOException {
         File d = new File(c.getNoBackupFilesDir(), "verified");

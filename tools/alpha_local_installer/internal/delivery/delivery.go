@@ -18,8 +18,8 @@ import (
 )
 
 const APKName = "FlexyGram-Alpha-arm64.apk"
-const APKHash = "PENDING_VERIFIED_ALPHA2_APK_HASH"
-const CipherHash = "PENDING_VERIFIED_ALPHA2_CIPHER_HASH"
+const APKHash = "515b5145ee4413450f10a130f8753fdd2eda405aaf106fe968f598a19e716552"
+const CipherHash = "7eabe59c2fe2cf0863fb98221687b4f371c64ab698e26bf6f6a1de8d1dcbb48a"
 const Recipient = "age1dc36uuvdg4ut52crhgux297zfjc5u0p0rucgnjss8svmgdl2eylseanqqe"
 const Commit = "feb17ef642f7d06582f5cf6387cc4bc11a062573"
 const MaxAPK = 256 << 20

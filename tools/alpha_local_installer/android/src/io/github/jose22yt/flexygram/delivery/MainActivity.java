@@ -155,7 +155,7 @@ public final class MainActivity extends Activity {
                 .setMessage("Paquete: " + Contract.APP + "\nCommit: " + Contract.COMMIT + "\nSHA-256: " + Contract.HASH + "\nBibliotecas ELF: 96\nFirma: coincide con el informe cifrado\nPrueba física: PENDIENTE\n\nverification.json se ha extraído en el almacenamiento privado del auxiliar.")
                 .setNeutralButton("Guardar informe", (dialog, which) -> {
                     Intent save = new Intent(Intent.ACTION_CREATE_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("application/json");
-                    save.putExtra(Intent.EXTRA_TITLE, "verification.json"); save.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+                    save.putExtra(Intent.EXTRA_TITLE, "FlexyGram-Alpha2-verification.json"); save.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
                     startActivityForResult(save, SAVE_REPORT);
                 })
                 .setPositiveButton("Cerrar", null).show();
@@ -172,7 +172,7 @@ public final class MainActivity extends Activity {
                 try (java.io.OutputStream out = getContentResolver().openOutputStream(destination, "wt")) {
                     if (out == null) throw new java.io.IOException(); out.write(report);
                 }
-                message = "Informe guardado en la ubicación local que elegiste. Ya puedes instalar FlexyGram Alpha.";
+                message = "Informe guardado en la ubicación local que elegiste. Ya puedes actualizar FlexyGram Alpha 2.";
             } catch (Exception e) { message = "No se pudo guardar el informe. Puedes seguir instalando la APK verificada o volver a intentarlo."; }
             final String result = message; RUNNING.set(false);
             runOnUiThread(() -> { status.setText(result); refresh(); });
