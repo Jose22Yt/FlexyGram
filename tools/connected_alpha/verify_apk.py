@@ -24,6 +24,55 @@ def require(condition, message):
 def command(*args):
     return subprocess.check_output(args, text=True, stderr=subprocess.STDOUT)
 
+def has_launcher_alias(xmltree):
+    """Inspect the packaged manifest: AAPT2 badging omits launcher aliases."""
+    root = {'children': [], 'attrs': {}}
+    stack = [(-1, root)]
+    for line in xmltree.splitlines():
+        indent = len(line) - len(line.lstrip())
+        element = re.match(r'\s*E: ([\w-]+)\b', line)
+        if element:
+            while stack[-1][0] >= indent:
+                stack.pop()
+            node = {'tag': element[1], 'children': [], 'attrs': {}}
+            stack[-1][1]['children'].append(node)
+            stack.append((indent, node))
+            continue
+        attr = re.match(r'\s*A: android:([\w]+)(?:\([^)]*\))?=(.*)', line)
+        if attr and len(stack) > 1:
+            value = attr[2]
+            quoted = re.search(r'"([^"]*)"', value)
+            stack[-1][1]['attrs'][attr[1]] = quoted[1] if quoted else value.strip()
+
+    def enabled(node):
+        return node['attrs'].get('enabled', 'true') not in ('false', '(type 0x12)0x0', '0x0')
+
+    for app in root['children']:
+        if app['tag'] != 'manifest':
+            continue
+        for application in app['children']:
+            if application['tag'] != 'application' or not enabled(application):
+                continue
+            activities = set()
+            for component in application['children']:
+                if component['tag'] == 'activity':
+                    activities.add(component['attrs'].get('name'))
+                if component['tag'] != 'activity-alias' or not enabled(component):
+                    continue
+                attrs = component['attrs']
+                if attrs.get('targetActivity') not in activities or attrs.get('name') != 'org.telegram.messenger.ExteralessIcon':
+                    continue
+                if attrs.get('exported') not in ('true', '(type 0x12)0xffffffff'):
+                    continue
+                for intent in component['children']:
+                    if intent['tag'] != 'intent-filter':
+                        continue
+                    actions = {child['attrs'].get('name') for child in intent['children'] if child['tag'] == 'action'}
+                    categories = {child['attrs'].get('name') for child in intent['children'] if child['tag'] == 'category'}
+                    if 'android.intent.action.MAIN' in actions and 'android.intent.category.LAUNCHER' in categories:
+                        return True
+    return False
+
 def inspect_elf(data, name):
     require(len(data) >= 64, f'{name}: truncated ELF header')
     require(data[:6] == b'\x7fELF\x02\x01', f'{name}: expected ELF64 little endian')
@@ -71,11 +120,11 @@ def main():
     badging = command(str(bt/'aapt2'), 'dump', 'badging', str(args.apk))
     require(f"package: name='{APP}'" in badging, 'Wrong application ID')
     require("application-label:'FlexyGram Alpha'" in badging, 'Wrong label')
-    require("launchable-activity:" in badging, 'Missing launcher')
     require("uses-permission: name='android.permission.INTERNET'" in badging, 'Missing INTERNET')
     require('application-debuggable' not in badging, 'Unexpected debuggable APK')
     require("native-code: 'arm64-v8a'" in badging and "'x86_64'" not in badging, 'Unexpected native ABI')
     manifest = command(str(bt/'aapt2'), 'dump', 'xmltree', str(args.apk), '--file', 'AndroidManifest.xml')
+    require(has_launcher_alias(manifest), 'Missing enabled, exported launcher alias in packaged manifest')
     require('sharedUserId' not in manifest and 'backupAgent' not in manifest, 'Shared UID or backup agent present')
     require(re.search(r'allowBackup[^\n]*0x0\b', manifest), 'Backup must be disabled in merged manifest')
     require(re.search(r'restoreAnyVersion[^\n]*0x0\b', manifest), 'Restore must be disabled')
