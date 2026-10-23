@@ -119,6 +119,37 @@ public class GeometryRegression {
             output = subprocess.check_output(['java','-cp',tmp,'GeometryRegression'],text=True)
             self.assertIn('PASS:',output)
 
+    def test_compact_pill_preserves_separate_native_action_slot(self):
+        source = (ROOT/CONTAINER).read_text()
+        draw = method_bodies(source, 'drawFlexyCompactBackground')[0]
+        self.assertIn('ComposerGeometry.pillRight(', draw)
+        self.assertIn('ComposerGeometry.TRAILING_ACTION_SLOT', draw)
+        # Test actual production geometry in px across multiple screen densities.
+        production = ROOT/'TMessagesProj/src/main/java/app/flexygram/composer/ComposerGeometry.java'
+        test = '''
+import app.flexygram.composer.ComposerGeometry;
+public class ActionSlotRegression {
+ public static void main(String[] args) {
+  if (ComposerGeometry.TRAILING_ACTION_SLOT != 50) throw new AssertionError("native action hit area was reduced");
+  for (int density=1;density<=4;density++) for (int dpWidth=280;dpWidth<=500;dpWidth+=20) {
+   float width=dpWidth*density, rightInset=7*density, edgeInset=7*density;
+   float action=ComposerGeometry.TRAILING_ACTION_SLOT*density;
+   float pillRight=ComposerGeometry.pillRight(width,rightInset,edgeInset,action);
+   if (pillRight > width-rightInset-edgeInset-action+0.01f)
+    throw new AssertionError("pill covers audio/send action");
+   if (pillRight <= (7+44+6)*density)
+    throw new AssertionError("pill collapses at supported widths");
+  }
+  System.out.println("PASS: compact pill ends before native audio/send touch slot");
+ }
+}'''
+        with tempfile.TemporaryDirectory() as tmp:
+            runner = Path(tmp)/'ActionSlotRegression.java'; runner.write_text(test)
+            subprocess.run(['java','-m','jdk.compiler/com.sun.tools.javac.Main','-d',tmp,
+                            str(production),str(runner)],check=True)
+            self.assertIn('PASS:',subprocess.check_output(
+                ['java','-cp',tmp,'ActionSlotRegression'],text=True))
+
     def test_update_version_parser_rejects_missing_duplicate_and_malformed_versions(self):
         self.assertEqual(package_version_code("package: name='io.github.jose22yt.flexygram.alpha' versionCode='1262' versionName='alpha2'"),1262)
         for text in ("", "package: versionCode='0'", "package: versionCode='x'", "package: versionCode='1262' versionCode='1261'", "package: versionCode='1262'\npackage: versionCode='1261'"):
