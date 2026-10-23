@@ -9,10 +9,20 @@ from pathlib import Path
 from unittest.mock import patch
 
 from rebuild_python_wheels import (HOST_HELPERS, UNBUILT_XML2_EXPORTS,
-                                   android_debugpy, android_xml2_exports, checked_bytes)
+                                   android_debugpy, android_xml2_exports,
+                                   android_xslt_callback, checked_bytes)
 
 
 class PythonWheelRegression(unittest.TestCase):
+    def test_xslt_unused_callback_argument_matches_libxml_const_contract(self):
+        source = ('static void\nxsltHashScannerModuleFree(void *payload ATTRIBUTE_UNUSED,\n'
+                  '                          void *data ATTRIBUTE_UNUSED,\n'
+                  '                          xmlChar * name ATTRIBUTE_UNUSED)\n{}\n')
+        self.assertEqual(android_xslt_callback(source),
+                         source.replace('xmlChar * name', 'const xmlChar * name'))
+        with self.assertRaisesRegex(ValueError, 'Unexpected libxslt'):
+            android_xslt_callback(source + source)
+
     def test_only_unbuilt_optional_xml2_exports_removed(self):
         original = 'LIBXML2_2.4.30 {\nglobal:\n    xmlReadMemory;\n' + ''.join(
             '    '+name+';\n' for name in sorted(UNBUILT_XML2_EXPORTS)) + '};\n'

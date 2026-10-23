@@ -66,6 +66,15 @@ def android_xml2_exports(text):
     return ''.join(result)
 
 
+def android_xslt_callback(text):
+    pattern = (r'(xsltHashScannerModuleFree\(void \*payload ATTRIBUTE_UNUSED,\s*'
+               r'void \*data ATTRIBUTE_UNUSED,\s*)xmlChar \* name ATTRIBUTE_UNUSED\)')
+    result, count = re.subn(pattern, r'\1const xmlChar * name ATTRIBUTE_UNUSED)', text)
+    if count != 1:
+        raise ValueError('Unexpected libxslt callback signature')
+    return result
+
+
 def android_debugpy(source, destination):
     """Keep Python network debugging; remove only fixed desktop PID-attach binaries."""
     checked_bytes(source.read_bytes(), DEBUGPY_SHA256)
@@ -127,6 +136,9 @@ def main():
             if name == 'chaquopy-libxml2':
                 export_map = directories[0]/'libxml2.syms'
                 export_map.write_text(android_xml2_exports(export_map.read_text()))
+            elif name == 'chaquopy-libxslt':
+                callback = directories[0]/'libxslt/extensions.c'
+                callback.write_text(android_xslt_callback(callback.read_text()))
             metadata['source'] = {'path': str(directories[0])}
             metadata.setdefault('build', {})['number'] = 100
             (recipe/'meta.yaml').write_text(yaml.safe_dump(metadata, sort_keys=False))
