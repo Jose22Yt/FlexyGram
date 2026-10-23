@@ -89,6 +89,7 @@ public class Policy {
         self.assertIn('org.telegram.messenger.ExteralessIcon',manifest)
         self.assertIn('def verCode = 1264',(ROOT/'TMessagesProj/build.gradle').read_text())
         self.assertIn('--expected-version-code 1264',(ROOT/'.github/workflows/connected-alpha-arm64.yml').read_text())
+        self.assertIn('previous != LEGACY_DEFAULT_TITLE && previous != "exteraless"',(ROOT/'TMessagesProj/src/main/kotlin/app/exteraless/appearance/AppearanceConfig.kt').read_text())
         self.assertIn('R.string.FlexyBrandName',(ROOT/'TMessagesProj/src/main/java/tw/nekomimi/nekogram/helpers/TypefaceHelper.java').read_text())
 
 if __name__=='__main__':unittest.main()

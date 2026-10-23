@@ -3,4 +3,5 @@
   <string name="AppNameBeta">FlexyGram Alpha</string>
   <string name="NagramX">FlexyGram Alpha</string>
   <string name="OpenExtera">FlexyGram</string>
+  <string name="AppIconExteraless" translatable="false">FlexyGram</string>
 </resources>
