@@ -63,6 +63,26 @@ class CloudBuildRegression(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'complete Firebase'):
             validate_firebase(json.dumps({'client':[{'client_info':{'android_client_info':{'package_name':APP}}}]}))
 
+    def test_support_push_enters_registered_workflow(self):
+        workflow = yaml.safe_load((ROOT/'.github/workflows/pr.yml').read_text())
+        events = workflow.get('on', workflow.get(True))
+        self.assertIn('support/connected-alpha-ci-20261022', events['push']['branches'])
+        native = workflow['jobs']['connected-alpha-native']
+        self.assertEqual(native['uses'], './.github/workflows/connected-alpha-arm64.yml')
+        self.assertIn("github.event_name == 'push'", native['if'])
+        self.assertIn('ALPHA_CERTIFICATE_SHA256', native['secrets'])
+
+    def test_native_support_route_is_not_duplicated(self):
+        workflow = yaml.safe_load((ROOT/'.github/workflows/connected-alpha-arm64.yml').read_text())
+        events = workflow.get('on', workflow.get(True))
+        self.assertNotIn('support/connected-alpha-ci-20261022', events['push']['branches'])
+        self.assertIn('workflow_call', events)
+        self.assertEqual(len(events['workflow_call']['secrets']), 8)
+
+    def test_legacy_debug_build_never_runs_for_push(self):
+        workflow = yaml.safe_load((ROOT/'.github/workflows/pr.yml').read_text())
+        self.assertIn("github.event_name == 'pull_request'", workflow['jobs']['build']['if'])
+
     def test_workflow_contract(self):
         workflow = yaml.safe_load((ROOT/'.github/workflows/connected-alpha-arm64.yml').read_text())
         jobs = workflow['jobs']

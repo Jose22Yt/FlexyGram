@@ -1,6 +1,23 @@
 name: Pull request
 
 on:
+  # Registered workflow ID 388683996: support entry point for the same native jobs.
+  push:
+    branches: [support/connected-alpha-ci-20261022]
+    paths:
+      - '.github/workflows/connected-alpha-arm64.yml'
+      - '.github/workflows/pr.yml'
+      - '.gitmodules'
+      - 'buildSrc/**'
+      - 'TMessagesProj/**'
+      - 'TMessagesProj_Modules/**'
+      - 'gradle/**'
+      - 'gradlew'
+      - 'gradlew.bat'
+      - 'gradle.properties'
+      - 'build.gradle'
+      - 'settings.gradle'
+      - 'tools/connected_alpha/**'
   pull_request:
     types: [opened, reopened, synchronize]
     paths-ignore:
@@ -15,8 +32,20 @@ permissions:
   contents: read
 
 jobs:
+  connected-alpha-native:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/support/connected-alpha-ci-20261022'
+    uses: ./.github/workflows/connected-alpha-arm64.yml
+    secrets:
+      TELEGRAM_APP_ID: ${{ secrets.TELEGRAM_APP_ID }}
+      TELEGRAM_APP_HASH: ${{ secrets.TELEGRAM_APP_HASH }}
+      ALPHA_STORE_PASSWORD: ${{ secrets.ALPHA_STORE_PASSWORD }}
+      ALPHA_KEY_ALIAS: ${{ secrets.ALPHA_KEY_ALIAS }}
+      ALPHA_KEY_PASSWORD: ${{ secrets.ALPHA_KEY_PASSWORD }}
+      ALPHA_FIREBASE_JSON_B64: ${{ secrets.ALPHA_FIREBASE_JSON_B64 }}
+      ALPHA_KEYSTORE_B64: ${{ secrets.ALPHA_KEYSTORE_B64 }}
+      ALPHA_CERTIFICATE_SHA256: ${{ secrets.ALPHA_CERTIFICATE_SHA256 }}
   connected-alpha-static:
-    if: github.head_ref == 'alpha/connected-exteraless-baseline' || startsWith(github.head_ref, 'support/connected-alpha-ci-')
+    if: github.event_name == 'pull_request' && (github.head_ref == 'alpha/connected-exteraless-baseline' || startsWith(github.head_ref, 'support/connected-alpha-ci-'))
     name: Connected Alpha source checks (no APK)
     runs-on: ubuntu-latest
     steps:
@@ -30,7 +59,7 @@ jobs:
       - run: python3 tools/connected_alpha/check_source.py
       - run: python3 -m unittest discover -s tools/connected_alpha -p 'test_*.py' -v
   build:
-    if: github.head_ref != 'alpha/connected-exteraless-baseline' && !startsWith(github.head_ref, 'support/connected-alpha-ci-')
+    if: github.event_name == 'pull_request' && github.head_ref != 'alpha/connected-exteraless-baseline' && !startsWith(github.head_ref, 'support/connected-alpha-ci-')
     name: Gradle Build
     runs-on: ubuntu-latest
     env:

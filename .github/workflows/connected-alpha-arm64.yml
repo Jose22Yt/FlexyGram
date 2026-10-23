@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - alpha/connected-exteraless-baseline
-      - support/connected-alpha-ci-20261022
     paths:
       - '.github/workflows/connected-alpha-arm64.yml'
       - '.github/workflows/pr.yml'
@@ -20,6 +19,25 @@ on:
       - 'settings.gradle'
       - 'tools/connected_alpha/**'
   workflow_dispatch:
+  # The support branch enters through the already registered pr.yml workflow.
+  workflow_call:
+    secrets:
+      TELEGRAM_APP_ID:
+        required: false
+      TELEGRAM_APP_HASH:
+        required: false
+      ALPHA_STORE_PASSWORD:
+        required: false
+      ALPHA_KEY_ALIAS:
+        required: false
+      ALPHA_KEY_PASSWORD:
+        required: false
+      ALPHA_FIREBASE_JSON_B64:
+        required: false
+      ALPHA_KEYSTORE_B64:
+        required: false
+      ALPHA_CERTIFICATE_SHA256:
+        required: false
 
 permissions:
   contents: read
