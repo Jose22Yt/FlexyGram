@@ -64,13 +64,19 @@ class UnifiedIntegration(unittest.TestCase):
             expression = re.sub(r'!(?!=)', 'not ', expression)
             github = SimpleNamespace(event_name=event, head_ref=head, ref='refs/heads/'+head)
             return eval(expression, {'__builtins__': {}, 'startsWith': str.startswith}, {'github': github})
-        for branch in ('integration/connected-alpha-unified', 'integration/connected-alpha-next'):
+        for branch in ('integration/connected-alpha-unified', 'integration/connected-alpha-next',
+                       'integration/connected-alpha-javac-fix'):
             with self.subTest(branch=branch):
                 self.assertTrue(enabled('connected-alpha-static', 'pull_request', branch))
                 self.assertFalse(enabled('build', 'pull_request', branch))
                 self.assertFalse(enabled('connected-alpha-native', 'pull_request', branch))
         self.assertTrue(enabled('build', 'pull_request', 'unrelated/feature'))
         self.assertTrue(enabled('connected-alpha-native', 'push', 'support/connected-alpha-ci-20261022'))
+        self.assertTrue(enabled('connected-alpha-native', 'push', 'integration/connected-alpha-javac-fix'))
+        self.assertFalse(enabled('connected-alpha-native', 'push', 'integration/connected-alpha-next'))
+        self.assertFalse(enabled('connected-alpha-native', 'push', 'unrelated/feature'))
+        events = workflow.get('on', workflow.get(True))
+        self.assertIn('integration/connected-alpha-javac-fix', events['push']['branches'])
 
     def test_both_source_jobs_run_complete_suite_and_real_resource_gate(self):
         for path, job in (('pr.yml', 'connected-alpha-static'), ('connected-alpha-arm64.yml', 'source-checks')):
