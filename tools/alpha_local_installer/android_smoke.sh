@@ -1,9 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 cd "$(dirname "$0")"
+export ANDROID_USER_HOME="$RUNNER_TEMP/alpha-helper-android"
+export ANDROID_EMULATOR_HOME="$ANDROID_USER_HOME"
+export ANDROID_AVD_HOME="$ANDROID_USER_HOME/avd"
+mkdir -p "$ANDROID_AVD_HOME"
 sdkmanager 'platform-tools' 'emulator' 'system-images;android-35;google_apis;x86_64' > build/emulator-setup.txt
 sudo chown "$(id -un)" /dev/kvm
-printf 'no\n' | avdmanager create avd --force -n alpha-helper-test -k 'system-images;android-35;google_apis;x86_64' > build/avd-setup.txt
+printf 'no\n' | avdmanager create avd --force -n alpha-helper-test -p "$ANDROID_AVD_HOME/alpha-helper-test.avd" -k 'system-images;android-35;google_apis;x86_64' > build/avd-setup.txt
+test -s "$ANDROID_AVD_HOME/alpha-helper-test.ini"
+"$ANDROID_HOME/emulator/emulator" -list-avds
 "$ANDROID_HOME/emulator/emulator" -avd alpha-helper-test -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect > build/emulator.txt 2>&1 &
 emulator_pid=$!
 cleanup() {
