@@ -211,7 +211,7 @@ jobs:
             echo '::error::Expected exactly one Connected Alpha APK.'
             exit 1
           fi
-          python3 tools/connected_alpha/verify_apk.py "${packages[0]}" --build-tools "$ANDROID_HOME/build-tools/36.0.0" --certificate-sha256 "$ALPHA_CERTIFICATE_SHA256" --expected-version-code 1263 > connected-alpha-verification.json
+          python3 tools/connected_alpha/verify_apk.py "${packages[0]}" --build-tools "$ANDROID_HOME/build-tools/36.0.0" --certificate-sha256 "$ALPHA_CERTIFICATE_SHA256" --expected-version-code 1264 > connected-alpha-verification.json
           python3 - <<'PY'
           import json, os
           from pathlib import Path
@@ -243,7 +243,7 @@ jobs:
         if: vars.ALPHA_AGE_RECIPIENT != ''
         uses: actions/upload-artifact@v4
         with:
-          name: FlexyGram-ConnectedAlpha2-compact-ARM64-encrypted
+          name: FlexyGram-Signature-Personalized-ARM64-encrypted
           path: ${{ runner.temp }}/FlexyGram-Alpha-arm64.tar.age
           retention-days: 1
           if-no-files-found: error

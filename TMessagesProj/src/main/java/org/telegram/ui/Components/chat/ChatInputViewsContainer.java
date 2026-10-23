@@ -217,7 +217,8 @@ public class ChatInputViewsContainer extends FrameLayout {
     }
 
     private void checkViewsPositions() {
-        inputIslandBubbleContainer.setTranslationY(-maxBottomInset - dp(INPUT_BUBBLE_BOTTOM));
+        inputIslandBubbleContainer.setTranslationY(-maxBottomInset - dp(INPUT_BUBBLE_BOTTOM)
+            - (flexyComposer == null ? 0 : flexyComposer.getFlexyVerticalOffset()));
         inAppKeyboardBubbleContainer.setTranslationY(inAppKeyboardBubbleContainer.getMeasuredHeight() - imeBottomInset);
     }
 
@@ -335,7 +336,7 @@ public class ChatInputViewsContainer extends FrameLayout {
         flexyPill.offset(offsetX, offsetY);
         final boolean attach = flexyComposer.getFlexyAttachmentBounds(flexyAttach);
         if (attach) flexyAttach.offset(offsetX, offsetY);
-        final float radius = dp(20);
+        final float radius = (dp(44) - 2 * flexyComposer.getFlexyVisualInset()) / 2f;
         if (flexyPearlGlass) {
             // One existing native backdrop pass, clipped to the two surfaces.
             // No second blur engine, drawable factory or animation controller.

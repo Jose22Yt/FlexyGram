@@ -316,7 +316,7 @@ public class TypefaceHelper {
     }
 
     public static SpannableStringBuilder getTitleText(int currentAccount) {
-        String title = (String) NaConfig.INSTANCE.getCustomTitle().defaultValue;
+        String title = LocaleController.getString(R.string.FlexyBrandName);
         // openExtera: заголовок списка чатов (AppearanceConfig.titleText).
         // Перенесено из exteraGram 12.9.0, LocaleUtils.getActionBarTitle(int).
         // 0 — имя приложения (NagramX customTitle), 1 — username, 2 — имя, 3 — «Чаты».

@@ -55,7 +55,7 @@
     <string name="AppIconInfoPremium"><!-- сюда подпись --></string>
     <string name="AppIconInfoTurbo"><!-- сюда подпись --></string>
     <string name="AppIconInfoNox"><!-- сюда подпись --></string>
-    <string name="OpenExteraPreferences">exteraless Preferences</string>
+    <string name="OpenExteraPreferences">FlexyGram Preferences</string>
     <string name="OpenExteraDesignSection">Design</string>
     <string name="OpenExteraDesigner">Icons and design</string>
     <string name="OpenExteraDesignStudio">Design studio</string>

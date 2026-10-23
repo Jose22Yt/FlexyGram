@@ -52,7 +52,7 @@ class ComposerRegression(unittest.TestCase):
     def test_native_insets_and_keyboard_container_remain_unchanged(self):
         old = subprocess.check_output(['git','show',BASE+':'+CONTAINER], cwd=ROOT, text=True)
         now = (ROOT/CONTAINER).read_text()
-        for name in ('checkInsets','checkViewsPositions','checkInAppKeyboardChild','checkInAppKeyboardViewHeight','setInputBubbleHeight'):
+        for name in ('checkInsets','checkInAppKeyboardChild','checkInAppKeyboardViewHeight','setInputBubbleHeight'):
             self.assertEqual(method_bodies(old,name),method_bodies(now,name),name)
 
     def test_glass_is_paint_only_and_uses_one_existing_backdrop(self):
@@ -173,6 +173,7 @@ public class PillBoundsRegression {
   float getX(){return x;} float getY(){return y;}
   int getWidth(){return width;} int getHeight(){return height;}
  }
+ int flexyInsetDp=2,flexyGapDp=6;
  View textFieldContainer=new View(),messageEditTextContainer=new View();
  float actionShift;
  float nativeAttachTranslationX(){return actionShift;}
@@ -182,7 +183,8 @@ public class PillBoundsRegression {
   PillBoundsRegression p=new PillBoundsRegression();RectF r=new RectF();
   for(float d:new float[]{1,1.25f,1.5f,2,2.75f,3,4}) {
    density=d;
-   for(int screen:new int[]{280,335,400,500,800}) for(int h:new int[]{44,68,120}) for(int paid:new int[]{0,56}){
+   for(int level=0;level<3;level++) for(int gap=2;gap<=8;gap++) for(int screen:new int[]{280,335,400,500,800}) for(int h:new int[]{44,68,120}) for(int paid:new int[]{0,56}){
+    p.flexyInsetDp=2+level;p.flexyGapDp=gap;
     p.textFieldContainer.x=dp(7);p.textFieldContainer.y=dp(3);
     p.messageEditTextContainer.x=dp(11);p.messageEditTextContainer.y=dp(9);
     p.messageEditTextContainer.width=dp(screen)-dp(44);
@@ -191,12 +193,12 @@ public class PillBoundsRegression {
     float x=p.textFieldContainer.x+p.messageEditTextContainer.x;
     float y=p.textFieldContainer.y+p.messageEditTextContainer.y;
     float end=x+p.messageEditTextContainer.width+p.actionShift;
-    require(r.left-(x+dp(42))>=dp(6),"attachment merged into pill");
-    require(end+dp(2)-r.right>=dp(6),"send merged into pill");
+    require(r.left-(x+dp(44)-dp(p.flexyInsetDp))>=dp(gap),"attachment merged into pill");
+    require(end+dp(p.flexyInsetDp)-r.right>=dp(gap),"send merged into pill");
     float emojiCenter=end-dp(3)-dp(22);
     require(emojiCenter+dp(12)<=r.right && emojiCenter-dp(12)>=r.left,"emoji outside pill");
-    require(x+dp(62)-r.left>=dp(11),"message text touches pill edge");
-    require(r.top==y+dp(2) && r.bottom==y+dp(h)-dp(2),"multiline or native vertical position changed");
+    require(x+dp(44+gap+12-level)-r.left>=dp(12-level)-1,"message text touches pill edge");
+    require(r.top==y+dp(p.flexyInsetDp) && r.bottom==y+dp(h)-dp(p.flexyInsetDp),"multiline or native vertical position changed");
    }
   }
   p.messageEditTextContainer.width=0;
@@ -249,6 +251,7 @@ public class PresentationRegression {
   void setTranslationX(float x){translation=x;}
   void setImageResource(int icon){imageResource=icon;}
   void invalidate() {}
+  void setCompactVisualInset(int inset) {}
   int width(){return width;}
   float getAlpha(){return alpha;}
  }
@@ -259,6 +262,7 @@ public class PresentationRegression {
  void updateAudioVideoSendButtonColor() {}
  float attachLayoutPaddingTranslationX,attachLayoutTranslationX;
  int flexyNativeFieldRight=-1,flexyAppliedFieldRight=-1;
+ int flexyInsetDp=2,flexyGapDp=6,flexyTextPaddingDp=12;
  static final int DEFAULT_HEIGHT=44;
  final String draft="unchanged draft with emoji and multiple lines";
  void nativeMeasure(){emojiButton.p.leftMargin=3;deleteRichDraftButton.p.leftMargin=3;messageEditText.p.leftMargin=50;}
@@ -293,7 +297,9 @@ public class PresentationRegression {
   p.botCommandsMenuButton.tag=new Object();p.emojiButton.p.leftMargin=80;p.messageEditText.p.leftMargin=120;
   p.applyFlexyComposerPresentation(335);
   p.require(!p.flexyCompactLayout && p.emojiButton.p.leftMargin==80 && p.messageEditText.p.leftMargin==120);
-  p.botCommandsMenuButton.tag=null;p.nativeMeasure();p.applyFlexyComposerPresentation(200);
+  p.botCommandsMenuButton.tag=null;p.nativeMeasure();p.sendButton.width=240;p.applyFlexyComposerPresentation(335);
+  p.require(!p.flexyCompactLayout); // paid action leaves insufficient width
+  p.sendButton.width=44;p.nativeMeasure();p.applyFlexyComposerPresentation(200);
   p.require(!p.flexyCompactLayout);
   System.out.print("PASS: actual production presentation method; native margin, paid widths, draft identity, special controls and 10000 recoveries");
  }

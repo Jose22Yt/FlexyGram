@@ -1,0 +1,13 @@
+<resources>
+  <string name="FlexyComposerCompact">Signature Compact</string>
+  <string name="FlexyComposerPosition">Положение панели по вертикали</string>
+  <string name="FlexyComposerLevel">Компактность</string>
+  <string name="FlexyComposerDefault">По умолчанию</string>
+  <string name="FlexyComposerSmall">Компактный</string>
+  <string name="FlexyComposerExtraSmall">Сверхкомпактный</string>
+  <string name="FlexyComposerGap">Расстояние между элементами</string>
+  <string name="FlexyComposerGlass">Перламутровое стекло</string>
+  <string name="FlexyComposerPositionReset">Сбросить положение панели</string>
+  <string name="FlexyComposerReset">Сбросить оформление</string>
+  <string name="FlexyComposerPreview">Предпросмотр панели</string>
+</resources>
