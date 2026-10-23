@@ -150,6 +150,19 @@ public class ActionSlotRegression {
             self.assertIn('PASS:',subprocess.check_output(
                 ['java','-cp',tmp,'ActionSlotRegression'],text=True))
 
+    def test_signature_three_islands_and_native_mic_paint(self):
+        enter = self.current
+        container = (ROOT/CONTAINER).read_text()
+        presentation = method_bodies(enter, 'applyFlexyComposerPresentation')[0]
+        self.assertIn('R.drawable.msg_add', presentation)
+        self.assertIn('R.drawable.msg_input_attach2', presentation)
+        self.assertIn('audioVideoButtonContainer.invalidate()', presentation)
+        self.assertIn('if (flexyCompactLayout)', enter)
+        self.assertIn('ColorUtils.blendARGB(panel, Color.WHITE', enter)
+        self.assertIn('ColorUtils.calculateLuminance(panel) < 0.4 ? Color.BLACK : Color.WHITE', container)
+        self.assertIn('canvas.drawRoundRect(flexyPill', container)
+        self.assertIn('canvas.drawRoundRect(flexyAttach', container)
+
     def test_update_version_parser_rejects_missing_duplicate_and_malformed_versions(self):
         self.assertEqual(package_version_code("package: name='io.github.jose22yt.flexygram.alpha' versionCode='1262' versionName='alpha2'"),1262)
         for text in ("", "package: versionCode='0'", "package: versionCode='x'", "package: versionCode='1262' versionCode='1261'", "package: versionCode='1262'\npackage: versionCode='1261'"):
@@ -162,24 +175,28 @@ public class ActionSlotRegression {
 public class PresentationRegression {
  static final int VISIBLE=0;
  static class Gravity { static final int LEFT=3, RIGHT=5, BOTTOM=80; }
+ static class R { static class drawable { static final int msg_add=1, msg_input_attach2=2; } }
  static class AndroidUtilities { static float density=1; }
  static int dp(float n){return Math.round(n);}
  static class MarginLayoutParams { int leftMargin=3,rightMargin=0,gravity; }
  static class FrameLayout { static class LayoutParams extends MarginLayoutParams {} }
  static class V {
   FrameLayout.LayoutParams p=new FrameLayout.LayoutParams(); int visibility=8; Object tag;
-  float translation,alpha=1; int width=44;
+  float translation,alpha=1; int width=44, imageResource;
   FrameLayout.LayoutParams getLayoutParams(){return p;}
   int getVisibility(){return visibility;}
   Object getTag(){return tag;}
   void setTranslationX(float x){translation=x;}
+  void setImageResource(int icon){imageResource=icon;}
+  void invalidate() {}
   int width(){return width;}
   float getAlpha(){return alpha;}
  }
  boolean isChat=true,isStories=false,flexyCompactRequested,flexyCompactLayout;
  Object parentFragment=new Object();
  V senderSelectView=new V(),botCommandsMenuButton=new V(),botWebViewButton=new V(),aiButton=new V();
- V attachButton=new V(),emojiButton=new V(),deleteRichDraftButton=new V(),messageEditText=new V(),sendButton=new V();
+ V attachButton=new V(),emojiButton=new V(),deleteRichDraftButton=new V(),messageEditText=new V(),sendButton=new V(),audioVideoButtonContainer=new V();
+ void updateAudioVideoSendButtonColor() {}
  float attachLayoutPaddingTranslationX,attachLayoutTranslationX;
  int flexyNativeFieldRight=-1,flexyAppliedFieldRight=-1;
  static final int DEFAULT_HEIGHT=44;
@@ -201,6 +218,7 @@ public class PresentationRegression {
    p.applyFlexyComposerPresentation(335);
    p.require(p.flexyCompactLayout);
    p.require(p.attachButton.p.gravity==(Gravity.BOTTOM|Gravity.LEFT));
+   p.require(p.attachButton.imageResource==R.drawable.msg_add);
    p.require(p.emojiButton.p.gravity==(Gravity.BOTTOM|Gravity.RIGHT));
    p.require(p.messageEditText.p.leftMargin==54);
    p.require(p.messageEditText.p.rightMargin>=50+Math.max(0,-p.nativeAttachTranslationX()));
@@ -209,6 +227,7 @@ public class PresentationRegression {
    p.require(!p.flexyCompactLayout && p.messageEditText.p.rightMargin==end);
    p.require(p.messageEditText.p.leftMargin==50 && p.emojiButton.p.leftMargin==3 && p.emojiButton.p.rightMargin==0);
    p.require(p.attachButton.p.gravity==(Gravity.BOTTOM|Gravity.RIGHT));
+   p.require(p.attachButton.imageResource==R.drawable.msg_input_attach2);
   }
   p.nativeMeasure();p.flexyCompactRequested=true;p.applyFlexyComposerPresentation(335);
   p.botCommandsMenuButton.tag=new Object();p.emojiButton.p.leftMargin=80;p.messageEditText.p.leftMargin=120;
