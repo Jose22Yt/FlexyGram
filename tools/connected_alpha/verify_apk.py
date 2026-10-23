@@ -14,6 +14,7 @@ from ci_inputs import fingerprint
 
 APP = 'io.github.jose22yt.flexygram.alpha'
 NATIVE_LIBRARY = 'lib/arm64-v8a/libtmessages.49.so'
+ANDROID_ATTR = r'(?:android:|http://schemas\.android\.com/apk/res/android:)'
 
 def require_telegram_payload(names):
     require('classes.dex' in names and NATIVE_LIBRARY in names, 'Missing Java or native Telegram code (libtmessages.49.so required)')
@@ -83,6 +84,20 @@ def launcher_diagnostic(xmltree):
         'android.intent.category.LAUNCHER'))]
     return {'lines': len(lines), 'structure': structural[:20], 'launcher_references': named[:24]}
 
+def binary_boolean_is_false(xmltree, name):
+    values = re.findall(r'^\s*A: ' + ANDROID_ATTR + re.escape(name) +
+                        r'\([^)]*\)=\(type 0x12\)0x([0-9a-fA-F]+)\b', xmltree, re.M)
+    return len(values) == 1 and int(values[0], 16) == 0
+
+def provider_authorities(xmltree):
+    return re.findall(r'^\s*A: ' + ANDROID_ATTR +
+                      r'authorities\([^)]*\)="([^"]+)"', xmltree, re.M)
+
+def security_attribute_diagnostic(xmltree):
+    return [line for line in xmltree.splitlines()
+            if re.search(r'^\s*A: ' + ANDROID_ATTR +
+                         r'(?:allowBackup|restoreAnyVersion|authorities)\(', line)][:24]
+
 def inspect_elf(data, name):
     require(len(data) >= 64, f'{name}: truncated ELF header')
     require(data[:6] == b'\x7fELF\x02\x01', f'{name}: expected ELF64 little endian')
@@ -139,9 +154,12 @@ def main():
               json.dumps(launcher_diagnostic(manifest)), file=sys.stderr)
         raise ValueError('Missing enabled, exported launcher alias in packaged manifest')
     require('sharedUserId' not in manifest and 'backupAgent' not in manifest, 'Shared UID or backup agent present')
-    require(re.search(r'allowBackup[^\n]*0x0\b', manifest), 'Backup must be disabled in merged manifest')
-    require(re.search(r'restoreAnyVersion[^\n]*0x0\b', manifest), 'Restore must be disabled')
-    authorities = re.findall(r'android:authorities[^\n]*?="([^"]+)"', manifest)
+    if not (binary_boolean_is_false(manifest, 'allowBackup') and
+            binary_boolean_is_false(manifest, 'restoreAnyVersion')):
+        print('Packaged backup flags: ' + json.dumps(security_attribute_diagnostic(manifest)),
+              file=sys.stderr)
+        raise ValueError('Backup and restore must be disabled in merged manifest')
+    authorities = provider_authorities(manifest)
     require(authorities and all(a.startswith(APP+'.') for a in authorities), 'Provider identity collision')
     with zipfile.ZipFile(args.apk) as z:
         names = z.namelist()

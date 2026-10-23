@@ -2,7 +2,9 @@ import io
 import struct
 import unittest
 import zipfile
-from verify_apk import has_launcher_alias, inspect_archive, inspect_elf, launcher_diagnostic
+from verify_apk import (binary_boolean_is_false, has_launcher_alias, inspect_archive,
+                        inspect_elf, launcher_diagnostic, provider_authorities,
+                        security_attribute_diagnostic)
 
 
 PACKAGED_MANIFEST = '''
@@ -25,6 +27,29 @@ E: manifest (line=2)
 
 
 class PackagedLauncherVerification(unittest.TestCase):
+    def test_binary_backup_flags_reject_true_missing_or_duplicates(self):
+        for prefix in ('android:', 'http://schemas.android.com/apk/res/android:'):
+            with self.subTest(prefix=prefix):
+                line = f'A: {prefix}allowBackup(0x01010280)=(type 0x12)0x00000000'
+                self.assertTrue(binary_boolean_is_false(line, 'allowBackup'))
+                self.assertTrue(binary_boolean_is_false(line.replace('0x00000000', '0x0'), 'allowBackup'))
+                self.assertFalse(binary_boolean_is_false(line.replace('0x00000000', '0xffffffff'), 'allowBackup'))
+                self.assertFalse(binary_boolean_is_false(line + '\n' + line, 'allowBackup'))
+                self.assertFalse(binary_boolean_is_false('', 'allowBackup'))
+
+    def test_packaged_provider_authorities_accepts_both_namespace_spellings(self):
+        self.assertEqual(provider_authorities('''
+            A: http://schemas.android.com/apk/res/android:authorities(0x01010018)="io.github.jose22yt.flexygram.alpha.provider" (Raw: "io.github.jose22yt.flexygram.alpha.provider")
+            A: android:authorities(0x01010018)="io.github.jose22yt.flexygram.alpha.streaming"
+        '''), ['io.github.jose22yt.flexygram.alpha.provider',
+               'io.github.jose22yt.flexygram.alpha.streaming'])
+
+    def test_security_diagnostic_excludes_other_metadata(self):
+        manifest = ('A: http://schemas.android.com/apk/res/android:allowBackup(0x01010280)=(type 0x12)0x0\n'
+                    'A: android:value="sensitive-other-metadata"\n')
+        self.assertEqual(len(security_attribute_diagnostic(manifest)), 1)
+        self.assertNotIn('sensitive-other-metadata', str(security_attribute_diagnostic(manifest)))
+
     def test_failure_diagnostic_limits_output_to_public_launcher_structure(self):
         diagnostic = launcher_diagnostic(PACKAGED_MANIFEST +
             '    A: android:value="sensitive-other-metadata"\n')
