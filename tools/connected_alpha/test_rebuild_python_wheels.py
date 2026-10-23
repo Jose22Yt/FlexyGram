@@ -8,10 +8,19 @@ import zipfile
 from pathlib import Path
 from unittest.mock import patch
 
-from rebuild_python_wheels import HOST_HELPERS, android_debugpy, checked_bytes
+from rebuild_python_wheels import (HOST_HELPERS, UNBUILT_XML2_EXPORTS,
+                                   android_debugpy, android_xml2_exports, checked_bytes)
 
 
 class PythonWheelRegression(unittest.TestCase):
+    def test_only_unbuilt_optional_xml2_exports_removed(self):
+        original = 'LIBXML2_2.4.30 {\nglobal:\n    xmlReadMemory;\n' + ''.join(
+            '    '+name+';\n' for name in sorted(UNBUILT_XML2_EXPORTS)) + '};\n'
+        self.assertEqual(android_xml2_exports(original),
+                         'LIBXML2_2.4.30 {\nglobal:\n    xmlReadMemory;\n};\n')
+        with self.assertRaisesRegex(ValueError, 'Unexpected libxml2'):
+            android_xml2_exports(original.replace('    xmlDllMain;\n', ''))
+
     def test_source_checksum_mismatch_rejected(self):
         with self.assertRaisesRegex(ValueError, 'SHA-256 mismatch'):
             checked_bytes(b'changed archive', hashlib.sha256(b'authorized archive').hexdigest())

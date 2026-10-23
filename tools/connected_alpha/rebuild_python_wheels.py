@@ -6,6 +6,7 @@ import csv
 import hashlib
 import io
 import json
+import re
 import shutil
 import subprocess
 import sys
@@ -36,12 +37,32 @@ HOST_HELPERS = {ATTACH + name for name in (
     'attach.dylib', 'attach_amd64.dll', 'attach_linux_amd64.so', 'attach_x86.dll',
     'inject_dll_amd64.exe', 'inject_dll_x86.exe',
     'run_code_on_dllmain_amd64.dll', 'run_code_on_dllmain_x86.dll')}
+UNBUILT_XML2_EXPORTS = {
+    'docbCreateFileParserCtxt', 'docbCreatePushParserCtxt', 'docbEncodeEntities',
+    'docbFreeParserCtxt', 'docbParseChunk', 'docbParseDoc', 'docbParseDocument',
+    'docbParseFile', 'docbSAXParseDoc', 'docbSAXParseFile', 'xmlDllMain',
+}
 
 
 def checked_bytes(data, expected):
     if hashlib.sha256(data).hexdigest() != expected:
         raise ValueError('Source SHA-256 mismatch')
     return data
+
+
+def android_xml2_exports(text):
+    """The upstream Android recipe disables DocBook and never builds Windows code."""
+    removed = set()
+    result = []
+    for line in text.splitlines(keepends=True):
+        symbol = re.fullmatch(r'\s*(\w+)\s*;\s*', line)
+        if symbol and symbol[1] in UNBUILT_XML2_EXPORTS:
+            removed.add(symbol[1])
+        else:
+            result.append(line)
+    if removed != UNBUILT_XML2_EXPORTS:
+        raise ValueError('Unexpected libxml2 optional export map')
+    return ''.join(result)
 
 
 def android_debugpy(source, destination):
@@ -100,6 +121,9 @@ def main():
             directories = list(source.iterdir())
             if len(directories) != 1 or not directories[0].is_dir():
                 raise ValueError('Unexpected source archive layout')
+            if name == 'chaquopy-libxml2':
+                export_map = directories[0]/'libxml2.syms'
+                export_map.write_text(android_xml2_exports(export_map.read_text()))
             metadata['source'] = {'path': str(directories[0])}
             metadata.setdefault('build', {})['number'] = 100
             (recipe/'meta.yaml').write_text(yaml.safe_dump(metadata, sort_keys=False))
