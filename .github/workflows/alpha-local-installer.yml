@@ -1,8 +1,8 @@
-name: Offline Alpha 2 installer profile
+name: Offline Alpha 2 Signature Fix installer
 
 on:
   push:
-    branches: [integration/connected-alpha-2-installer]
+    branches: [fix/alpha2-signature-installer]
     paths:
       - 'tools/alpha_local_installer/**'
       - '.github/workflows/alpha-local-installer.yml'
@@ -67,9 +67,9 @@ jobs:
         if: steps.profile.outputs.ready == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: FlexyGram-Alpha2-offline-installer-helper
+          name: FlexyGram-Alpha2-Signature-Fix-installer
           path: |
-            tools/alpha_local_installer/build/FlexyGram-Alpha2-Instalador-local.apk
+            tools/alpha_local_installer/build/FlexyGram-Alpha2-Signature-Fix-Instalador.apk
             tools/alpha_local_installer/build/helper-verification.json
             tools/alpha_local_installer/build/android-smoke.txt
           if-no-files-found: error

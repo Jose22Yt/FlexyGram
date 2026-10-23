@@ -31,8 +31,8 @@ func fixture(t *testing.T, change func(*[]entry, map[string]any)) ([]byte, []byt
 	}
 	apk := []byte("test APK bytes, not an Android release")
 	h := sha256.Sum256(apk)
-	c := contract{id.Recipient().String(), hex.EncodeToString(h[:]), "", "test-commit", 2}
-	r := map[string]any{"application_id": "io.github.jose22yt.flexygram.alpha", "version_code": 1262, "sha256": c.apk, "bytes": len(apk), "commit": c.commit, "status": "PASS_ARTIFACT_ONLY", "android_runtime": "NOT_TESTED", "certificate_sha256": strings.Repeat("a", 64), "elf_count": 2,
+	c := contract{id.Recipient().String(), hex.EncodeToString(h[:]), "", "test-commit", strings.Repeat("a", 64), 2}
+	r := map[string]any{"application_id": "io.github.jose22yt.flexygram.alpha", "version_code": 1263, "sha256": c.apk, "bytes": len(apk), "commit": c.commit, "status": "PASS_ARTIFACT_ONLY", "android_runtime": "NOT_TESTED", "certificate_sha256": strings.Repeat("a", 64), "elf_count": 2,
 		"elfs": []map[string]string{{"name": "lib/one.so", "sha256": strings.Repeat("b", 64)}, {"name": "assets/chaquopy.zip!/two.so", "sha256": strings.Repeat("c", 64)}}}
 	entries := []entry{{APKName, apk, tar.TypeReg, 0}}
 	if change != nil {
@@ -100,13 +100,15 @@ func TestAuthenticatedDelivery(t *testing.T) {
 
 func TestRejectInvalidDelivery(t *testing.T) {
 	tests := map[string]func(*[]entry, map[string]any){
-		"wrong package":       func(es *[]entry, r map[string]any) { r["application_id"] = "other" },
-		"wrong version":       func(es *[]entry, r map[string]any) { r["version_code"] = 1261 },
-		"wrong APK":           func(es *[]entry, r map[string]any) { (*es)[0].data = []byte("altered") },
-		"wrong report hash":   func(es *[]entry, r map[string]any) { r["sha256"] = strings.Repeat("d", 64) },
-		"wrong source commit": func(es *[]entry, r map[string]any) { r["commit"] = "other" },
-		"wrong ELF count":     func(es *[]entry, r map[string]any) { r["elf_count"] = 96 },
-		"wrong ELF inventory": func(es *[]entry, r map[string]any) { r["elfs"] = []any{} },
+		"wrong package":             func(es *[]entry, r map[string]any) { r["application_id"] = "other" },
+		"previous Alpha 2 version":  func(es *[]entry, r map[string]any) { r["version_code"] = 1262 },
+		"wrong signing certificate": func(es *[]entry, r map[string]any) { r["certificate_sha256"] = strings.Repeat("b", 64) },
+		"wrong version":             func(es *[]entry, r map[string]any) { r["version_code"] = 1261 },
+		"wrong APK":                 func(es *[]entry, r map[string]any) { (*es)[0].data = []byte("altered") },
+		"wrong report hash":         func(es *[]entry, r map[string]any) { r["sha256"] = strings.Repeat("d", 64) },
+		"wrong source commit":       func(es *[]entry, r map[string]any) { r["commit"] = "other" },
+		"wrong ELF count":           func(es *[]entry, r map[string]any) { r["elf_count"] = 96 },
+		"wrong ELF inventory":       func(es *[]entry, r map[string]any) { r["elfs"] = []any{} },
 		"duplicate ELF": func(es *[]entry, r map[string]any) {
 			r["elfs"] = []map[string]string{{"name": "same", "sha256": strings.Repeat("a", 64)}, {"name": "same", "sha256": strings.Repeat("b", 64)}}
 		},
@@ -153,7 +155,7 @@ func TestIdentityAndAuthenticationFailures(t *testing.T) {
 		"identity too large":                   {b, bytes.Repeat([]byte("x"), 65537), c},
 		"multiple identities":                  {b, append(append([]byte{}, key...), []byte(other.String())...), c},
 		"truncated final authentication chunk": {b[:len(b)-1], key, c},
-		"wrong ciphertext hash":                {b, key, contract{c.recipient, c.apk, strings.Repeat("0", 64), c.commit, c.elfCount}},
+		"wrong ciphertext hash":                {b, key, contract{c.recipient, c.apk, strings.Repeat("0", 64), c.commit, c.certificate, c.elfCount}},
 	}
 	corrupt := append([]byte{}, b...)
 	corrupt[len(corrupt)-1] ^= 1

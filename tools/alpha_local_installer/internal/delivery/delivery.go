@@ -18,10 +18,11 @@ import (
 )
 
 const APKName = "FlexyGram-Alpha-arm64.apk"
-const APKHash = "515b5145ee4413450f10a130f8753fdd2eda405aaf106fe968f598a19e716552"
-const CipherHash = "7eabe59c2fe2cf0863fb98221687b4f371c64ab698e26bf6f6a1de8d1dcbb48a"
+const APKHash = "b40c37adaaa30ae211f6d24fa4cf55cfdd58bc5cf18866949e23e6a594d627d8"
+const CipherHash = "6af14ccc9511fa97f84f18d5db308d447433023f4b7b0de8ff39e14c79d71945"
 const Recipient = "age1dc36uuvdg4ut52crhgux297zfjc5u0p0rucgnjss8svmgdl2eylseanqqe"
-const Commit = "feb17ef642f7d06582f5cf6387cc4bc11a062573"
+const Commit = "52c52014111b982c5c2260f0a470f3d284e52c8b"
+const CertificateSHA256 = "c8f04cad685ca5757d35b25ea4b0b4613c7399909948d821e6ada61f9fb12b2c"
 const MaxAPK = 256 << 20
 const maxReport = 256 << 10
 
@@ -29,8 +30,8 @@ var ErrIdentity = errors.New("identity rejected")
 var ErrIntegrity = errors.New("delivery integrity rejected")
 
 type contract struct {
-	recipient, apk, cipher, commit string
-	elfCount                       int
+	recipient, apk, cipher, commit, certificate string
+	elfCount                                    int
 }
 type report struct {
 	ApplicationID string `json:"application_id"`
@@ -51,7 +52,7 @@ type report struct {
 // Decrypt never accepts an alternate production hash, recipient or source commit.
 // The identity reader is consumed in memory only, and is never written to disk.
 func Decrypt(cipher, identity io.Reader, output string) error {
-	return decrypt(cipher, identity, output, contract{Recipient, APKHash, CipherHash, Commit, 96})
+	return decrypt(cipher, identity, output, contract{Recipient, APKHash, CipherHash, Commit, CertificateSHA256, 96})
 }
 
 func validHash(s string) bool {
@@ -142,8 +143,8 @@ func decrypt(cipher, identity io.Reader, output string, c contract) (err error) 
 	}
 	var r report
 	if json.Unmarshal(reportData, &r) != nil || r.SHA256 != c.apk || r.Bytes != apkBytes || r.Commit != c.commit ||
-		r.ApplicationID != "io.github.jose22yt.flexygram.alpha" || r.VersionCode != 1262 || r.Status != "PASS_ARTIFACT_ONLY" || r.Runtime != "NOT_TESTED" || r.ELFCount != c.elfCount ||
-		len(r.ELFs) != c.elfCount || !validHash(r.Certificate) {
+		r.ApplicationID != "io.github.jose22yt.flexygram.alpha" || r.VersionCode != 1263 || r.Status != "PASS_ARTIFACT_ONLY" || r.Runtime != "NOT_TESTED" || r.ELFCount != c.elfCount ||
+		len(r.ELFs) != c.elfCount || r.Certificate != c.certificate || !validHash(r.Certificate) {
 		return ErrIntegrity
 	}
 	names := map[string]bool{}

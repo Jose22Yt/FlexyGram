@@ -38,9 +38,9 @@ for attempt in $(seq 1 120); do
 done
 [[ "$booted" == true ]]
 adb shell input keyevent 82
-adb install -r build/FlexyGram-Alpha2-Instalador-local.apk
+adb install -r build/FlexyGram-Alpha2-Signature-Fix-Instalador.apk
 adb install -r -t build/smoke.apk
-adb shell am instrument -w -r io.github.jose22yt.flexygram.delivery.alpha2.tests/io.github.jose22yt.flexygram.delivery.alpha2.SmokeInstrumentation | tee build/android-smoke.txt
+adb shell am instrument -w -r io.github.jose22yt.flexygram.delivery.alpha2.signature.tests/io.github.jose22yt.flexygram.delivery.alpha2.signature.SmokeInstrumentation | tee build/android-smoke.txt
 grep -q 'helper_smoke=PASS' build/android-smoke.txt
 python3 - <<'PY'
 import json

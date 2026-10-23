@@ -1,4 +1,4 @@
-package io.github.jose22yt.flexygram.delivery.alpha2;
+package io.github.jose22yt.flexygram.delivery.alpha2.signature;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;
@@ -15,9 +15,10 @@ import java.security.MessageDigest;
 final class Contract {
     static final String APP = "io.github.jose22yt.flexygram.alpha";
     static final String APK = "FlexyGram-Alpha-arm64.apk";
-    static final String HASH = "515b5145ee4413450f10a130f8753fdd2eda405aaf106fe968f598a19e716552";
-    static final String CIPHER_HASH = "7eabe59c2fe2cf0863fb98221687b4f371c64ab698e26bf6f6a1de8d1dcbb48a";
-    static final String COMMIT = "feb17ef642f7d06582f5cf6387cc4bc11a062573";
+    static final String HASH = "b40c37adaaa30ae211f6d24fa4cf55cfdd58bc5cf18866949e23e6a594d627d8";
+    static final String CIPHER_HASH = "6af14ccc9511fa97f84f18d5db308d447433023f4b7b0de8ff39e14c79d71945";
+    static final String CERTIFICATE = "c8f04cad685ca5757d35b25ea4b0b4613c7399909948d821e6ada61f9fb12b2c";
+    static final String COMMIT = "52c52014111b982c5c2260f0a470f3d284e52c8b";
     static File directory(Context c) throws IOException {
         File d = new File(c.getNoBackupFilesDir(), "verified");
         if (!d.isDirectory() && !d.mkdir()) throw new IOException("private output unavailable");
@@ -41,12 +42,12 @@ final class Contract {
         File dir = directory(c), apk = new File(dir, APK), report = new File(dir, "verification.json");
         if (!apk.isFile() || !report.isFile() || report.length() > 262144 || !HASH.equals(hash(apk))) throw new IOException("integrity rejected");
         JSONObject r = new JSONObject(new String(Files.readAllBytes(report.toPath()), StandardCharsets.UTF_8));
-        if (!HASH.equals(r.getString("sha256")) || !COMMIT.equals(r.getString("commit")) ||
+        if (!CERTIFICATE.equals(r.getString("certificate_sha256")) || !HASH.equals(r.getString("sha256")) || !COMMIT.equals(r.getString("commit")) ||
                 !"PASS_ARTIFACT_ONLY".equals(r.getString("status")) || !"NOT_TESTED".equals(r.getString("android_runtime")) ||
-                !APP.equals(r.getString("application_id")) || r.getLong("version_code") != 1262 || r.getLong("bytes") != apk.length() || r.getInt("elf_count") != 96 || r.getJSONArray("elfs").length() != 96)
+                !APP.equals(r.getString("application_id")) || r.getLong("version_code") != 1263 || r.getLong("bytes") != apk.length() || r.getInt("elf_count") != 96 || r.getJSONArray("elfs").length() != 96)
             throw new IOException("report rejected");
         PackageInfo p = c.getPackageManager().getPackageArchiveInfo(apk.getPath(), PackageManager.GET_SIGNING_CERTIFICATES);
-        if (p == null || !APP.equals(p.packageName) || p.signingInfo == null || p.getLongVersionCode() != 1262) throw new IOException("APK identity rejected");
+        if (p == null || !APP.equals(p.packageName) || p.signingInfo == null || p.getLongVersionCode() != 1263) throw new IOException("APK identity rejected");
         Signature[] signers = p.signingInfo.getApkContentsSigners();
         if (signers.length != 1 || !r.getString("certificate_sha256").equals(hex(MessageDigest.getInstance("SHA-256").digest(signers[0].toByteArray()))))
             throw new IOException("certificate rejected");
