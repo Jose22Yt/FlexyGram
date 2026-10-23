@@ -362,8 +362,10 @@ public class ChatInputViewsContainer extends FrameLayout {
             canvas.drawRoundRect(flexyPill, radius, radius, flexyPearl);
             if (attach) canvas.drawRoundRect(flexyAttach, radius, radius, flexyPearl);
         } else {
-            flexySurface.setColor(ColorUtils.setAlphaComponent(flexyComposer.getThemedColor(Theme.key_chat_messagePanelBackground),
-                blurredBackgroundDrawable.getAlpha()));
+            // The original Signature contract: glass OFF means solid white or black
+            // islands, never a faded full-width blur or neon-tinted surfaces.
+            final int panel = flexyComposer.getThemedColor(Theme.key_chat_messagePanelBackground);
+            flexySurface.setColor(ColorUtils.calculateLuminance(panel) < 0.4 ? Color.BLACK : Color.WHITE);
             canvas.drawRoundRect(flexyPill, radius, radius, flexySurface);
             if (attach) canvas.drawRoundRect(flexyAttach, radius, radius, flexySurface);
         }
