@@ -32,7 +32,7 @@ func fixture(t *testing.T, change func(*[]entry, map[string]any)) ([]byte, []byt
 	apk := []byte("test APK bytes, not an Android release")
 	h := sha256.Sum256(apk)
 	c := contract{id.Recipient().String(), hex.EncodeToString(h[:]), "", "test-commit", strings.Repeat("a", 64), 2}
-	r := map[string]any{"application_id": "io.github.jose22yt.flexygram.alpha", "version_code": 1263, "sha256": c.apk, "bytes": len(apk), "commit": c.commit, "status": "PASS_ARTIFACT_ONLY", "android_runtime": "NOT_TESTED", "certificate_sha256": strings.Repeat("a", 64), "elf_count": 2,
+	r := map[string]any{"application_id": "io.github.jose22yt.flexygram.alpha", "version_code": 1264, "sha256": c.apk, "bytes": len(apk), "commit": c.commit, "status": "PASS_ARTIFACT_ONLY", "android_runtime": "NOT_TESTED", "certificate_sha256": strings.Repeat("a", 64), "elf_count": 2,
 		"elfs": []map[string]string{{"name": "lib/one.so", "sha256": strings.Repeat("b", 64)}, {"name": "assets/chaquopy.zip!/two.so", "sha256": strings.Repeat("c", 64)}}}
 	entries := []entry{{APKName, apk, tar.TypeReg, 0}}
 	if change != nil {
@@ -102,6 +102,7 @@ func TestRejectInvalidDelivery(t *testing.T) {
 	tests := map[string]func(*[]entry, map[string]any){
 		"wrong package":             func(es *[]entry, r map[string]any) { r["application_id"] = "other" },
 		"previous Alpha 2 version":  func(es *[]entry, r map[string]any) { r["version_code"] = 1262 },
+		"previous Signature Fix":    func(es *[]entry, r map[string]any) { r["version_code"] = 1263 },
 		"wrong signing certificate": func(es *[]entry, r map[string]any) { r["certificate_sha256"] = strings.Repeat("b", 64) },
 		"wrong version":             func(es *[]entry, r map[string]any) { r["version_code"] = 1261 },
 		"wrong APK":                 func(es *[]entry, r map[string]any) { (*es)[0].data = []byte("altered") },

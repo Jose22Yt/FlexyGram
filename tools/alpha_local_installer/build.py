@@ -12,7 +12,7 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parent
 OUT = ROOT / 'build'
-PACKAGE = 'io.github.jose22yt.flexygram.delivery.alpha2.signature'
+PACKAGE = 'io.github.jose22yt.flexygram.delivery.alpha2.signature1264'
 
 def run(*args, env=None, capture=False):
     return subprocess.run([str(a) for a in args], cwd=ROOT, env=env, check=True,
@@ -97,7 +97,7 @@ def main():
     run(java / 'bin/keytool', '-genkeypair', '-keystore', key, '-storepass', 'android',
         '-keypass', 'android', '-alias', 'helper', '-dname', 'CN=FlexyGram Offline Helper',
         '-keyalg', 'RSA', '-keysize', '3072', '-validity', '3650', '-noprompt')
-    apk = OUT / 'FlexyGram-Alpha2-Signature-Fix-Instalador.apk'
+    apk = OUT / 'FlexyGram-Signature-Personalized-Instalador.apk'
     try:
         run(bt / 'apksigner', 'sign', '--ks', key, '--ks-key-alias', 'helper',
             '--ks-pass', 'pass:android', '--key-pass', 'pass:android', '--out', apk, aligned)
@@ -105,9 +105,12 @@ def main():
         # used exclusively in CI. It is NOT included in the delivery artifact.
         (OUT / 'testclasses').mkdir()
         (OUT / 'testdex').mkdir()
+        policy = Path(os.environ['SIGNATURE_SOURCE_ROOT']) / 'TMessagesProj/src/main/java/app/flexygram/composer'
+        production_policy = [policy / name for name in ('ComposerGeometry.java', 'ComposerStyle.java', 'FlexyComposerConfig.java')]
+        assert all(p.is_file() for p in production_policy)
         run(java / 'bin/javac', '-encoding', 'UTF-8', '-source', '17', '-target', '17',
             '-classpath', str(jar)+os.pathsep+str(OUT / 'classes.jar'), '-d', OUT / 'testclasses',
-            *sorted((ROOT / 'android/test').rglob('*.java')))
+            *sorted((ROOT / 'android/test').rglob('*.java')), *production_policy)
         run(java / 'bin/jar', '--create', '--file', OUT / 'testclasses.jar', '-C', OUT / 'testclasses', '.')
         run(bt / 'd8', '--lib', jar, '--lib', OUT / 'classes.jar', '--min-api', '30',
             '--output', OUT / 'testdex', OUT / 'testclasses.jar')
@@ -137,7 +140,7 @@ def main():
               'helper_native_16kb': True, 'physical_android_test': 'NOT_TESTED',
               'target_apk_sha256': pins['APKHash'],
               'target_cipher_sha256': pins['CipherHash'],
-              'target_version_code': 1263,
+              'target_version_code': 1264,
               'target_source_commit': pins['Commit']}
     (OUT / 'helper-verification.json').write_text(json.dumps(report, indent=2)+'\n')
     print(json.dumps(report, indent=2))

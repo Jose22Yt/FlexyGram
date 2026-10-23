@@ -1,4 +1,4 @@
-package io.github.jose22yt.flexygram.delivery.alpha2.signature;
+package io.github.jose22yt.flexygram.delivery.alpha2.signature1264;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
@@ -11,7 +11,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 
 public final class VerifiedApkProvider extends ContentProvider {
-    static final Uri URI = Uri.parse("content://io.github.jose22yt.flexygram.delivery.alpha2.signature.files/verified/FlexyGram-Alpha-arm64.apk");
+    static final Uri URI = Uri.parse("content://io.github.jose22yt.flexygram.delivery.alpha2.signature1264.files/verified/FlexyGram-Alpha-arm64.apk");
     private void requireUri(Uri uri) {
         if (!URI.equals(uri)) throw new SecurityException("Unsupported file");
     }
