@@ -1,11 +1,11 @@
-# Instalador local independiente de Connected Alpha 2
+# Instalador privado — Alpha 2 Signature Fix
 
-Perfil separado del instalador de Alpha 1 (PR #60). Paquete auxiliar `io.github.jose22yt.flexygram.delivery.alpha2`. No sustituye la app auxiliar anterior ni modifica o vuelve a firmar FlexyGram.
+Perfil independiente del instalador anterior del PR #62. El auxiliar usa `io.github.jose22yt.flexygram.delivery.alpha2.signature`; puede coexistir con el auxiliar antiguo aunque su firma de pruebas sea distinta. La aplicación destino conserva `io.github.jose22yt.flexygram.alpha`, certificado original y versión 1263.
 
-Selecciona el archivo cifrado de Alpha 2 y el archivo de identidad age original mediante el selector Android. El descifrado ocurre localmente, sin permiso de Internet, sin guardar ni registrar la identidad. El ZIP de recuperación permanece en el teléfono; extrae allí únicamente su archivo de identidad. Nunca envíes el ZIP o la clave privada por chat.
+La entrega queda bloqueada mientras APKHash o CipherHash no contengan hashes reales verificados. Solo se aceptan el APK, cifrado y commit fijados en el perfil. Se exige EOF autenticado de age, tar con exactamente APK e informe, inventario de 96 ELF y certificado SHA-256 original explícito. La versión 1262 y certificados distintos se rechazan. Se conserva la política de firmante instalado y prohibición de degradación antes del instalador Android.
 
-El perfil fija SHA-256 del cifrado y APK, destinatario público original y commit de origen. Exige EOF autenticado de age, tar con exactamente APK e informe, 96 ELF y versión 1262. Antes de cada acceso o instalación vuelve a comprobar APK, identidad y certificado; si ya existe FlexyGram comprueba el mismo firmante y evita degradaciones. El sistema Android hace su propia verificación al actualizar.
+El auxiliar no tiene permiso INTERNET ni acceso general al almacenamiento. La identidad age se selecciona mediante Android SAF y solo se procesa en memoria; no se guarda ni se transmite. No incluye la identidad ni la clave de firma de Alpha. La compilación del auxiliar utiliza su propia firma temporal de pruebas.
 
-Tras verificar, pulsa instalar y acepta **Actualizar**. No desinstales FlexyGram Alpha existente: así la actualización compatible conserva sus datos y sesión. El informe puede guardarse desde la interfaz. “Borrar archivos locales” elimina los resultados privados del auxiliar. No tiene acceso a datos de Telegram.
+Archivos de prueba: `FlexyGram-Alpha2-Signature-Fix-Instalador.apk` y `FlexyGram-Alpha2-Signature-Fix-arm64.tar.age`. Seleccionar también la identidad age original de la recuperación privada. El destinatario público no permite descifrar. El auxiliar comprueba los archivos antes de ofrecer la actualización; Android vuelve a verificar la firma.
 
-Las pruebas Go usan identidades desechables solo como fixtures. La instrumentación prueba únicamente el auxiliar en API 35 x86_64; no acredita la barra compacta ni el rendimiento de Alpha 2 en el Poco. El APK auxiliar se firma con una clave efímera propia de CI; nunca consume credenciales de firma de Alpha.
+Las pruebas del auxiliar en emulador no certifican el compositor real. Instalación y diseño en Poco X8 Pro / Android 17 siguen pendientes de prueba del propietario.
