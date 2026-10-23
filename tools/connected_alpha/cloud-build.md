@@ -114,3 +114,7 @@ Physical installation, original phone/code/2FA login, real dialogs/messages/medi
 ## Connected Alpha Actions trigger probe
 
 A source-free push to this support branch is used to determine whether GitHub schedules the already-defined `.github/workflows/pr.yml` push entrypoint. The repository owner still needs to allow Actions in repository Settings if no workflow runs are created. This probe does not change source, credentials, signing, or artifact publication policy. If the run appears, inspect the source-checks and credentials-present jobs separately before interpreting build-arm64.
+
+## Post-enablement workflow trigger (2026-10-22)
+
+The repository owner confirmed that the GitHub Actions settings were saved and the Actions page is now visible. This non-secret documentation commit intentionally matches the `tools/connected_alpha/**` path filter in the existing registered `.github/workflows/pr.yml` workflow on the support branch. It requests normal source-check and credentials-presence jobs only; a real APK build still requires private credentials. Any missing-input failure must be reported as BLOCKED, not a successful Alpha build. No code, credentials, or artifact delivery policy has changed.
