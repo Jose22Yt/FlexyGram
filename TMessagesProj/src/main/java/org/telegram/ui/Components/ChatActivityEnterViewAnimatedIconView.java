@@ -14,8 +14,17 @@ import java.util.Map;
 public class ChatActivityEnterViewAnimatedIconView extends RLottieImageView {
     private State currentState;
     private boolean compactIcons, referenceIcons;
+    private ScaleType nativeScaleType;
     public void setCompactIcons(boolean compact, boolean reference) {
         if (compactIcons == compact && referenceIcons == reference) return;
+        if (compactIcons != compact) {
+            if (compact) {
+                nativeScaleType = getScaleType();
+                setScaleType(ScaleType.CENTER_INSIDE);
+            } else if (nativeScaleType != null) {
+                setScaleType(nativeScaleType);
+            }
+        }
         compactIcons = compact;
         referenceIcons = reference;
         if (currentState != null) setState(currentState, false);

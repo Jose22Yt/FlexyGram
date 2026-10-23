@@ -1,0 +1,72 @@
+/* Android native-graphics resource/presentation probe, not a logged-in chat UI test.
+ * SPDX-License-Identifier: GPL-3.0-or-later */
+import android.app.Application;
+import android.content.res.*;
+import android.graphics.*;
+import android.graphics.drawable.Drawable;
+import android.util.DisplayMetrics;
+import app.flexygram.composer.ComposerStyle;
+import java.io.*;
+import java.lang.reflect.Method;
+import org.junit.*;
+import org.junit.runner.RunWith;
+import org.robolectric.*;
+import org.robolectric.annotation.*;
+import static org.junit.Assert.*;
+
+@RunWith(RobolectricTestRunner.class)
+@Config(manifest=Config.NONE, sdk=35)
+@GraphicsMode(GraphicsMode.Mode.NATIVE)
+public class ComposerVisualTest {
+ private Resources resources;
+ @Before public void setup() throws Exception {
+  AssetManager assets=AssetManager.class.getDeclaredConstructor().newInstance();
+  Method add=AssetManager.class.getMethod("addAssetPath",String.class);
+  assertTrue((Integer)add.invoke(assets,System.getProperty("probe.root")+"/resources.ap_")>0);
+  DisplayMetrics metrics=new DisplayMetrics(); metrics.density=3;metrics.densityDpi=480;metrics.scaledDensity=3;
+  resources=new Resources(assets,metrics,new Configuration());
+ }
+ private void icon(Canvas canvas,String name,float x,float y,int color) {
+  int id=resources.getIdentifier("flexy_composer_"+name,"drawable","app.flexygram.visualprobe");
+  assertTrue(id!=0);Drawable d=resources.getDrawable(id,null).mutate();d.setTint(color);
+  d.setBounds((int)x-36,(int)y-36,(int)x+36,(int)y+36);d.draw(canvas);
+ }
+ @Test public void renderBothThemesAllDensitiesAndActions() throws Exception {
+  int width=1170,height=3*220;Bitmap bitmap=Bitmap.createBitmap(width,height,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(bitmap);
+  Paint paint=new Paint(Paint.ANTI_ALIAS_FLAG);paint.setTypeface(Typeface.create("sans-serif",Typeface.NORMAL));
+  for(int row=0;row<6;row++) {
+   boolean dark=row>=3;int level=row%3;float y=row*110+55;float radius=ComposerStyle.diameter(level)*1.5f;
+   paint.setColor(dark?0xFF121418:0xFFDCE8DC);c.drawRect(0,row*110,width,(row+1)*110,paint);
+   paint.setColor(ComposerStyle.surface(dark,false));c.drawCircle(90,y,radius,paint);c.drawCircle(1080,y,radius,paint);
+   float gap=ComposerStyle.gap(level,0)*3;float left=90+radius+gap,right=1080-radius-gap;
+   c.drawRoundRect(left,y-radius,right,y+radius,radius,radius,paint);
+   int ink=ComposerStyle.icon(dark);icon(c,"clip",90,y,ink);icon(c,"folded",right-60,y,ink);icon(c,row%3==0?"voice":row%3==1?"video":"send",1080,y,ink);
+   paint.setColor(ink);paint.setTextSize(54);c.drawText("Mensaje",left+ComposerStyle.padding(level)*3,y-(paint.ascent()+paint.descent())/2,paint);
+   assertEquals(44,app.flexygram.composer.ComposerGeometry.TOUCH_SLOT);
+  }
+  File out=new File(System.getProperty("probe.root"),"android-native-vectors.png");
+  try(FileOutputStream stream=new FileOutputStream(out)){assertTrue(bitmap.compress(Bitmap.CompressFormat.PNG,100,stream));}
+  assertTrue(out.length()>1000);
+ }
+
+ private static class Skin extends android.widget.ImageView {
+  boolean compactIcons,referenceIcons;ScaleType nativeScaleType;Object currentState;
+  Skin(android.content.Context context){super(context);}
+  void setState(Object state,boolean animate){}
+  __PRODUCTION_ICON_SETTER__
+ }
+ @Test public void productionSkinKeepsVectorSizeAndRestoresNativeScaleType() {
+  Skin view=new Skin(RuntimeEnvironment.getApplication());
+  view.setImageDrawable(resources.getDrawable(resources.getIdentifier("flexy_composer_folded","drawable","app.flexygram.visualprobe"),null));
+  view.setPadding(23,23,23,23);view.measure(android.view.View.MeasureSpec.makeMeasureSpec(132,1073741824),android.view.View.MeasureSpec.makeMeasureSpec(132,1073741824));view.layout(0,0,132,132);
+  float[] values=new float[9];view.getImageMatrix().getValues(values);
+  assertEquals(android.widget.ImageView.ScaleType.FIT_CENTER,view.getScaleType());
+  assertTrue("native padding upscaled compact vectors",values[0]>1);
+  view.setCompactIcons(true,true);view.measure(android.view.View.MeasureSpec.makeMeasureSpec(132,1073741824),android.view.View.MeasureSpec.makeMeasureSpec(132,1073741824));view.layout(0,0,132,132);view.getImageMatrix().getValues(values);
+  assertEquals("compact glyph must retain its intrinsic 24dp size",1,values[0],0.001);
+  for(int i=0;i<1000;i++) {view.setCompactIcons(true,i%2==0);assertEquals(android.widget.ImageView.ScaleType.CENTER_INSIDE,view.getScaleType());}
+  view.setCompactIcons(false,true);view.measure(android.view.View.MeasureSpec.makeMeasureSpec(132,1073741824),android.view.View.MeasureSpec.makeMeasureSpec(132,1073741824));view.layout(0,0,132,132);view.getImageMatrix().getValues(values);
+  assertEquals(android.widget.ImageView.ScaleType.FIT_CENTER,view.getScaleType());
+  assertTrue(values[0]>1);
+ }
+}

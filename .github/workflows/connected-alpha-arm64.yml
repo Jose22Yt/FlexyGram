@@ -68,6 +68,18 @@ jobs:
           packages: 'build-tools;36.0.0 platforms;android-37.0'
       - name: Compile resources and link isolated provider probe against API 37
         run: python3 tools/connected_alpha/check_resources.py --sdk-root "$ANDROID_HOME"
+      - name: Render production vectors and verify production icon sizing with Android graphics
+        run: python3 tools/connected_alpha/composer_visual/run.py --sdk-root "$ANDROID_HOME"
+      - name: Retain isolated Android graphic probe evidence (not app/device screenshots)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: composer-android-graphics
+          path: |
+            build/connected-alpha-composer-visual/android-native-vectors.png
+            build/connected-alpha-composer-visual/target/surefire-reports/*.xml
+          retention-days: 7
+          if-no-files-found: warn
 
   credentials-present:
     runs-on: ubuntu-24.04

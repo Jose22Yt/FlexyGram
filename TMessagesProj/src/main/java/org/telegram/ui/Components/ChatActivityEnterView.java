@@ -16834,7 +16834,13 @@ public class ChatActivityEnterView extends FrameLayout implements
         public void setResourceId(int resId) {
             if (this.resId != resId) {
                 this.resId = resId;
-                reloadCompactSendIcon();
+                if (compactVisualInset >= 0) {
+                    reloadCompactSendIcon();
+                } else {
+                    drawable = getContext().getResources().getDrawable(resId).mutate();
+                    inactiveDrawable = getContext().getResources().getDrawable(resId).mutate();
+                    drawableInverse = getContext().getResources().getDrawable(resId).mutate();
+                }
                 invalidate();
             }
         }
