@@ -52,6 +52,7 @@ if (properties != null) {
 }
 
 def chaquopyBuildPython = properties?.getProperty('CHAQUOPY_BUILD_PYTHON') ?: System.getenv('CHAQUOPY_BUILD_PYTHON')
+def alphaWheelhouse = System.getenv('ALPHA_WHEELHOUSE')
 
 keystorePwd = keystorePwd ?: System.getenv('KEYSTORE_PASS')
 alias = alias ?: System.getenv('ALIAS_NAME')
@@ -143,6 +144,13 @@ android {
                 buildPython chaquopyBuildPython
             }
             pip {
+                if (alphaWheelhouse) {
+                    def verifiedWheels = fileTree(alphaWheelhouse).matching { include '*.whl' }.files.sort()
+                    if (targetAbis != ['arm64-v8a'] || verifiedWheels.size() != 4) {
+                        throw new GradleException('Alpha wheelhouse requires four verified ARM64 dependency wheels')
+                    }
+                    verifiedWheels.each { install it.absolutePath }
+                }
                 install 'beautifulsoup4'
                 install 'debugpy'
                 install 'lxml'
