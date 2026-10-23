@@ -3,7 +3,10 @@ package org.telegram.ui.Components.chat;
 import static org.telegram.messenger.AndroidUtilities.dp;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -18,6 +21,11 @@ import android.widget.FrameLayout;
 import androidx.annotation.NonNull;
 
 import org.telegram.ui.Components.LayoutHelper;
+import org.telegram.ui.Components.ChatActivityEnterView;
+import org.telegram.ui.ActionBar.Theme;
+import androidx.core.graphics.ColorUtils;
+import app.flexygram.composer.ComposerGeometry;
+import app.flexygram.composer.FlexyComposerConfig;
 import org.telegram.ui.Components.blur3.BlurredBackgroundWithFadeDrawable;
 import org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawable;
 import org.telegram.ui.Components.inset.InAppKeyboardInsetView;
@@ -34,11 +42,27 @@ public class ChatInputViewsContainer extends FrameLayout {
     private final View fadeView;
     private final FrameLayout inputIslandBubbleContainer;
     private final FrameLayout inAppKeyboardBubbleContainer;
+    private ChatActivityEnterView flexyComposer;
+    private boolean flexyPearlGlass;
+    private final SharedPreferences.OnSharedPreferenceChangeListener flexyListener = (prefs, key) -> {
+        flexyPearlGlass = FlexyComposerConfig.glass();
+        // Surface changes never request layout or change insets.
+        invalidate();
+    };
 
     public ChatInputViewsContainer(@NonNull Context context) {
         super(context);
 
-        inputIslandBubbleContainer = new FrameLayout(context);
+        inputIslandBubbleContainer = new FrameLayout(context) {
+            @Override public void onViewAdded(View child) {
+                super.onViewAdded(child);
+                if (child instanceof ChatActivityEnterView) flexyComposer = (ChatActivityEnterView) child;
+            }
+            @Override public void onViewRemoved(View child) {
+                super.onViewRemoved(child);
+                if (child == flexyComposer) flexyComposer = null;
+            }
+        };
         addView(inputIslandBubbleContainer,
             LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.BOTTOM));
 
@@ -65,6 +89,17 @@ public class ChatInputViewsContainer extends FrameLayout {
 
     public View getFadeView() {
         return fadeView;
+    }
+
+    @Override protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        flexyPearlGlass = FlexyComposerConfig.glass();
+        FlexyComposerConfig.preferences().registerOnSharedPreferenceChangeListener(flexyListener);
+    }
+
+    @Override protected void onDetachedFromWindow() {
+        FlexyComposerConfig.preferences().unregisterOnSharedPreferenceChangeListener(flexyListener);
+        super.onDetachedFromWindow();
     }
 
     public void setWindowInsetsProvider(WindowInsetsProvider windowInsetsProvider) {
@@ -269,14 +304,68 @@ public class ChatInputViewsContainer extends FrameLayout {
         tmpRect.offset(0, blurTop + (int) bubbleInputTranlationY);
 
         blurredBackgroundDrawable.setBounds(tmpRect);
-        if (drawInputBackground)
-            blurredBackgroundDrawable.draw(canvas);
+        if (drawInputBackground) {
+            if (flexyComposer != null && flexyComposer.isFlexyCompactPresentation()) {
+                drawFlexyCompactBackground(canvas, blurTop);
+            } else {
+                blurredBackgroundDrawable.draw(canvas);
+            }
+        }
 
         if (needDrawInAppKeyboard) {
             underKeyboardBackgroundDrawable.draw(canvas);
         }
 
         super.dispatchDraw(canvas);
+    }
+
+    private final RectF flexyPill = new RectF();
+    private final RectF flexyAttach = new RectF();
+    private final Path flexyMask = new Path();
+    private final RectF flexyLastPill = new RectF();
+    private final RectF flexyLastAttach = new RectF();
+    private boolean flexyLastHasAttach;
+    private final Paint flexySurface = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint flexyPearl = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+    private void drawFlexyCompactBackground(Canvas canvas, int top) {
+        final float inset = dp(ComposerGeometry.VISUAL_INSET);
+        flexyPill.set(inputBubbleOffsetLeft + dp(7 + ComposerGeometry.TOUCH_SLOT + ComposerGeometry.PILL_GAP - 2),
+            top + inset, getMeasuredWidth() - inputBubbleOffsetRight - dp(7),
+            top + inset + ComposerGeometry.visualHeight(inputBubbleHeightRound, inset));
+        final boolean attach = flexyComposer.getFlexyAttachmentBounds(flexyAttach);
+        if (attach) flexyAttach.offset(inputIslandBubbleContainer.getX() + flexyComposer.getX(),
+            inputIslandBubbleContainer.getY() + flexyComposer.getY());
+        final float radius = dp(20);
+        if (flexyPearlGlass) {
+            // One existing native backdrop pass, clipped to the two surfaces.
+            // No second blur engine, drawable factory or animation controller.
+            if (!flexyPill.equals(flexyLastPill) || attach != flexyLastHasAttach || attach && !flexyAttach.equals(flexyLastAttach)) {
+                flexyMask.rewind();
+                flexyMask.addRoundRect(flexyPill, radius, radius, Path.Direction.CW);
+                if (attach) flexyMask.addRoundRect(flexyAttach, radius, radius, Path.Direction.CW);
+                flexyLastPill.set(flexyPill);
+                flexyLastAttach.set(flexyAttach);
+                flexyLastHasAttach = attach;
+            }
+            canvas.save();
+            canvas.clipPath(flexyMask);
+            blurredBackgroundDrawable.draw(canvas);
+            canvas.restore();
+            final int color = flexyComposer.getThemedColor(Theme.key_chat_messagePanelBackground);
+            final boolean dark = ColorUtils.calculateLuminance(color) < 0.4;
+            flexyPearl.setColor(ColorUtils.setAlphaComponent(Color.WHITE,
+                (dark ? 28 : 76) * blurredBackgroundDrawable.getAlpha() / 255));
+            flexyPearl.setStyle(Paint.Style.STROKE);
+            flexyPearl.setStrokeWidth(1);
+            canvas.drawRoundRect(flexyPill, radius, radius, flexyPearl);
+            if (attach) canvas.drawRoundRect(flexyAttach, radius, radius, flexyPearl);
+        } else {
+            flexySurface.setColor(ColorUtils.setAlphaComponent(flexyComposer.getThemedColor(Theme.key_chat_messagePanelBackground),
+                blurredBackgroundDrawable.getAlpha()));
+            canvas.drawRoundRect(flexyPill, radius, radius, flexySurface);
+            if (attach) canvas.drawRoundRect(flexyAttach, radius, radius, flexySurface);
+        }
     }
 
     @Override
