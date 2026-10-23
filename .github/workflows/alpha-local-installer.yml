@@ -1,0 +1,76 @@
+name: Offline Alpha 2 installer profile
+
+on:
+  push:
+    branches: [integration/connected-alpha-2-installer]
+    paths:
+      - 'tools/alpha_local_installer/**'
+      - '.github/workflows/alpha-local-installer.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  helper:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            tools/alpha_local_installer
+            LICENSE
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26.10'
+          cache: false
+      - name: Test authenticated decryption and all failure paths with test-only identities
+        working-directory: tools/alpha_local_installer
+        run: |
+          go mod verify
+          go test -race -count=1 -v ./internal/delivery
+          go vet ./internal/delivery
+          python3 -m unittest discover -p test_update_policy.py -v
+      - name: Gate APK delivery until verified Alpha 2 hashes exist
+        id: profile
+        shell: bash
+        run: |
+          python3 - <<'PYPROFILE'
+          import os, re
+          from pathlib import Path
+          source = Path('tools/alpha_local_installer/internal/delivery/delivery.go').read_text()
+          pins = dict(re.findall(r'const (APKHash|CipherHash|Commit) = "([^"]+)"', source))
+          ready = all(re.fullmatch(r'[0-9a-f]{64}', pins.get(k, '')) for k in ('APKHash', 'CipherHash')) and bool(re.fullmatch(r'[0-9a-f]{40}', pins.get('Commit', '')))
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+              f.write('ready=' + str(ready).lower() + '\n')
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as f:
+              f.write('Delivery profile ready; build and Android tests follow.\n' if ready else 'HOST CHECKS ONLY. Delivery blocked pending verified Alpha 2 hashes. No APK built or uploaded.\n')
+          PYPROFILE
+      - uses: android-actions/setup-android@v3
+        if: steps.profile.outputs.ready == 'true'
+        with:
+          packages: 'build-tools;36.0.0 platforms;android-37.0 ndk;27.2.12479018'
+      - name: Build and verify independent offline helper (no repository secrets)
+        if: steps.profile.outputs.ready == 'true'
+        run: python3 tools/alpha_local_installer/build.py
+      - name: Test helper UI, JNI rejection and provider isolation in Android emulator
+        if: steps.profile.outputs.ready == 'true'
+        run: bash tools/alpha_local_installer/android_smoke.sh
+      - name: Upload helper and public build verification only
+        if: steps.profile.outputs.ready == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: FlexyGram-Alpha2-offline-installer-helper
+          path: |
+            tools/alpha_local_installer/build/FlexyGram-Alpha2-Instalador-local.apk
+            tools/alpha_local_installer/build/helper-verification.json
+            tools/alpha_local_installer/build/android-smoke.txt
+          if-no-files-found: error
+          retention-days: 7
