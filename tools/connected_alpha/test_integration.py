@@ -79,6 +79,14 @@ class UnifiedIntegration(unittest.TestCase):
             self.assertIn('python3 tools/connected_alpha/run_checks.py', runs)
             self.assertIn('python3 tools/connected_alpha/check_resources.py', runs)
 
+    def test_source_jobs_fetch_pinned_media_before_plugin_alias_tests(self):
+        for path, job in (('pr.yml', 'connected-alpha-static'), ('connected-alpha-arm64.yml', 'source-checks')):
+            workflow = yaml.safe_load((ROOT/'.github/workflows'/path).read_text())
+            runs = [step.get('run', '') for step in workflow['jobs'][job]['steps']]
+            checkout = runs.index('git submodule update --init --depth 1 TMessagesProj_Modules/media')
+            checks = runs.index('python3 tools/connected_alpha/run_checks.py')
+            self.assertLess(checkout, checks)
+
 
 if __name__ == '__main__':
     unittest.main()

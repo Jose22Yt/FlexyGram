@@ -59,6 +59,8 @@ jobs:
         with:
           python-version: '3.11'
       - run: python3 -m pip install -r tools/connected_alpha/requirements-ci.txt
+      - name: Checkout pinned media sources for plugin alias tests
+        run: git submodule update --init --depth 1 TMessagesProj_Modules/media
       - name: Check upstream parity, build contract and all verifier/stability regressions
         run: python3 tools/connected_alpha/run_checks.py
       - uses: android-actions/setup-android@v3

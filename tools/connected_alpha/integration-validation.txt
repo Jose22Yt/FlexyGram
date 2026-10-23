@@ -71,6 +71,7 @@ test_both_source_jobs_run_complete_suite_and_real_resource_gate (test_integratio
 test_resource_fix_does_not_change_any_displayed_string (test_integration.UnifiedIntegration.test_resource_fix_does_not_change_any_displayed_string) ... ok
 test_resource_probe_preserves_actual_provider_and_backup_contract (test_integration.UnifiedIntegration.test_resource_probe_preserves_actual_provider_and_backup_contract) ... ok
 test_root_discovery_includes_stability_cases (test_integration.UnifiedIntegration.test_root_discovery_includes_stability_cases) ... ok
+test_source_jobs_fetch_pinned_media_before_plugin_alias_tests (test_integration.UnifiedIntegration.test_source_jobs_fetch_pinned_media_before_plugin_alias_tests) ... ok
 test_unified_pr_routes_to_checks_without_legacy_debug_or_private_build (test_integration.UnifiedIntegration.test_unified_pr_routes_to_checks_without_legacy_debug_or_private_build) ... ok
 test_ambiguous_installation_never_overwritten (test_sdk_layout.SdkLayoutRegression.test_ambiguous_installation_never_overwritten) ... ok
 test_complete_platform_is_not_modified (test_sdk_layout.SdkLayoutRegression.test_complete_platform_is_not_modified) ... ok
@@ -87,7 +88,7 @@ test_reject_truncated_segment (test_verify_apk.ElfVerification.test_reject_trunc
 test_reject_x86 (test_verify_apk.ElfVerification.test_reject_x86) ... ok
 
 ----------------------------------------------------------------------
-Ran 45 tests in 0.371s
+Ran 46 tests in 0.326s
 
 OK
 ..............sssss...ssssssss.ssss.s.sssss............................. [ 41%]
@@ -123,7 +124,7 @@ SKIPPED [1] tests/test_sdk_surface.py:218: plugin corpus not found at /home/cora
 SKIPPED [1] tests/test_sdk_surface.py:227: plugin corpus not found at /home/coral/openExtera/plugin-corpus/all
 SKIPPED [1] tests/test_sdk_surface.py:236: plugin corpus not found at /home/coral/openExtera/plugin-corpus/all
 SKIPPED [1] tests/test_sdk_surface.py:246: plugin corpus not found at /home/coral/openExtera/plugin-corpus/all
-144 passed, 31 skipped in 7.61s
+144 passed, 31 skipped in 6.97s
 PASS: source and host checks only; Android runtime NOT_TESTED.
 
 $ python3 tools/connected_alpha/check_resources.py --sdk-root <SDK>
@@ -171,3 +172,5 @@ BUILD FAILED in 18s
 20 actionable tasks: 16 executed, 4 up-to-date
 
 actionlint 1.7.12 (both modified workflows): PASS
+
+CI 39883084553 found missing media sources for alias tests; fixed source-job prerequisite without skipping test.

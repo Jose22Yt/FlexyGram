@@ -4,7 +4,7 @@
   "integration": "No overlapping source paths between PR56 and PR57; full parent history restored before applying PR57",
   "host_tests": {
     "connected_alpha_unittest": {
-      "passed": 45,
+      "passed": 46,
       "failed": 0
     },
     "upstream_pytest": {
@@ -52,7 +52,8 @@
     "actionlint": "1.7.12 PASS for both changed workflows",
     "upstream_components_identical": 26,
     "java_kotlin_python_jni_production_changes": false,
-    "security_gates_removed": false
+    "security_gates_removed": false,
+    "ci_prerequisite_fix": "Run 39883084553: unittest45 PASS; alias test failed because media submodule absent in CI. Both source jobs now initialize only the pinned media submodule before complete suite; no test suppressed."
   },
   "pending": [
     "Full application merged/binary manifest with authorized private configuration",
