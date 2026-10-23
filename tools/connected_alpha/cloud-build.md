@@ -80,6 +80,10 @@ sha256sum FlexyGram-Alpha-arm64.apk
 
 Compare with verification.json and the Actions summary. Encryption delivery is opt-in through the public-recipient variable; no private decryption key is sent to the runner. No release publishing is performed.
 
+## If a push produces zero workflow runs
+
+A workflow definition passing actionlint does **not** prove that GitHub Actions is active for the repository. First check **Settings → Actions → General** for repository or organization restrictions. Also inspect **Actions → All workflows** on GitHub itself: an empty run list indicates that GitHub has not registered a run, rather than a build failure or a missing secret. A push to this support branch with a changed file under `tools/connected_alpha/**` matches the current workflow's branch/path filters. If no run appears, investigate Actions enablement/registration before doing any more Gradle, Firebase, or credential work. Do not commit dummy secrets or merge into `main` solely to trigger this test.
+
 ## Trigger without merging into main/develop
 
 The push event includes this support branch and alpha/connected-exteraless-baseline, and watches the workflow, Gradle, buildSrc, native/Android and connected-alpha tooling paths.
