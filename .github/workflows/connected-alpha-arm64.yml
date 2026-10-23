@@ -129,6 +129,8 @@ jobs:
             platforms;android-37.0
             ndk;27.2.12479018
             cmake;3.31.6
+      - name: Verify SDK payload and normalize nested API 37 layout
+        run: python3 tools/connected_alpha/preflight_sdk.py --sdk-root "$ANDROID_HOME"
       - name: Install native tools and optional encrypted-delivery tool
         run: |
           sudo apt-get update -qq
