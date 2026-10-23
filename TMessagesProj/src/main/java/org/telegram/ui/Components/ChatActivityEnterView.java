@@ -695,6 +695,9 @@ public class ChatActivityEnterView extends FrameLayout implements
             if (messageEditTextContainer != null) messageEditTextContainer.requestLayout();
             else requestLayout();
             invalidate();
+        } else if (app.flexygram.composer.FlexyComposerConfig.GLASS.equals(key)
+                && audioVideoButtonContainer != null) {
+            audioVideoButtonContainer.invalidate();
         }
     };
     public FrameLayout textFieldContainer;
@@ -3360,12 +3363,17 @@ public class ChatActivityEnterView extends FrameLayout implements
                     }
 
                     final float r = dpf2(19);
-                    // Signature compositor: the native mic/record circle stays functional,
-                    // but uses the same restrained surface as the detached attach/text islands.
-                    // In classic mode the exact upstream accent is preserved.
-                    if (flexyCompactLayout && !app.flexygram.composer.FlexyComposerConfig.glass()) {
+                    // Signature compositor: use one restrained, separate native action circle.
+                    // Preserve upstream accent and all native microphone gestures in Classic.
+                    if (flexyCompactLayout) {
                         final int panel = getThemedColor(Theme.key_chat_messagePanelBackground);
-                        paint.setColor(ColorUtils.calculateLuminance(panel) < 0.4 ? Color.BLACK : Color.WHITE);
+                        final boolean dark = ColorUtils.calculateLuminance(panel) < 0.4;
+                        if (app.flexygram.composer.FlexyComposerConfig.glass()) {
+                            final int pearl = ColorUtils.blendARGB(panel, Color.WHITE, dark ? 0.12f : 0.72f);
+                            paint.setColor(ColorUtils.setAlphaComponent(pearl, dark ? 226 : 238));
+                        } else {
+                            paint.setColor(dark ? Color.BLACK : Color.WHITE);
+                        }
                     } else {
                         paint.setColor(getThemedColor(Theme.key_chat_messagePanelSend));
                     }
@@ -11813,7 +11821,7 @@ public class ChatActivityEnterView extends FrameLayout implements
         boolean isMenuState = isAudioVideoSendButtonInMenuState();
         int color = audioVideoButtonContainerForbidden || isMenuState
                 ? getThemedColor(Theme.key_glass_defaultIcon)
-                : flexyCompactLayout && !app.flexygram.composer.FlexyComposerConfig.glass()
+                : flexyCompactLayout
                     ? (ColorUtils.calculateLuminance(getThemedColor(Theme.key_chat_messagePanelBackground)) < 0.4
                         ? Color.WHITE : Color.BLACK)
                     : Color.WHITE;
