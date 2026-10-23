@@ -110,3 +110,7 @@ The connected GitHub tools can read runs and rerun existing jobs; they cannot en
 After a real build, the artifact verifier checks the compiled package/name/launcher/INTERNET, v2 signature against the authorized fingerprint, zipalign, ZIP integrity, actual versioned Telegram JNI, and all packaged ELF PT_LOAD segments including nested Chaquopy archives for 4/16 KiB compatibility. Existing upstream Python/native dependencies may still reveal errors in that real run; such failures must be fixed, not waived.
 
 Physical installation, original phone/code/2FA login, real dialogs/messages/media, notifications/lifecycle, Android 17 predictive back and same-device navigation speed on the Poco X8 Pro remain pending. The owner performs login manually. A signed, verified artifact alone does not prove those ten acceptance scenarios.
+
+## Connected Alpha Actions trigger probe
+
+A source-free push to this support branch is used to determine whether GitHub schedules the already-defined `.github/workflows/pr.yml` push entrypoint. The repository owner still needs to allow Actions in repository Settings if no workflow runs are created. This probe does not change source, credentials, signing, or artifact publication policy. If the run appears, inspect the source-checks and credentials-present jobs separately before interpreting build-arm64.
