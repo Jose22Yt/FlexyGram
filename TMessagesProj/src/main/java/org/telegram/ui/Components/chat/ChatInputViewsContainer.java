@@ -24,7 +24,7 @@ import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.ChatActivityEnterView;
 import org.telegram.ui.ActionBar.Theme;
 import androidx.core.graphics.ColorUtils;
-import app.flexygram.composer.ComposerGeometry;
+import org.telegram.messenger.AndroidUtilities;
 import app.flexygram.composer.FlexyComposerConfig;
 import org.telegram.ui.Components.blur3.BlurredBackgroundWithFadeDrawable;
 import org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawable;
@@ -306,7 +306,7 @@ public class ChatInputViewsContainer extends FrameLayout {
         blurredBackgroundDrawable.setBounds(tmpRect);
         if (drawInputBackground) {
             if (flexyComposer != null && flexyComposer.isFlexyCompactPresentation()) {
-                drawFlexyCompactBackground(canvas, blurTop + (int) bubbleInputTranlationY);
+                drawFlexyCompactBackground(canvas);
             } else {
                 blurredBackgroundDrawable.draw(canvas);
             }
@@ -328,14 +328,13 @@ public class ChatInputViewsContainer extends FrameLayout {
     private final Paint flexySurface = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint flexyPearl = new Paint(Paint.ANTI_ALIAS_FLAG);
 
-    private void drawFlexyCompactBackground(Canvas canvas, int top) {
-        final float inset = dp(ComposerGeometry.VISUAL_INSET);
-        flexyPill.set(inputBubbleOffsetLeft + dp(7 + ComposerGeometry.TOUCH_SLOT + ComposerGeometry.PILL_GAP - 2),
-            top + inset, getMeasuredWidth() - inputBubbleOffsetRight - dp(7),
-            top + inset + ComposerGeometry.visualHeight(inputBubbleHeightRound, inset));
+    private void drawFlexyCompactBackground(Canvas canvas) {
+        if (!flexyComposer.getFlexyTextPillBounds(flexyPill)) return;
+        final float offsetX = inputIslandBubbleContainer.getX() + flexyComposer.getX();
+        final float offsetY = inputIslandBubbleContainer.getY() + flexyComposer.getY();
+        flexyPill.offset(offsetX, offsetY);
         final boolean attach = flexyComposer.getFlexyAttachmentBounds(flexyAttach);
-        if (attach) flexyAttach.offset(inputIslandBubbleContainer.getX() + flexyComposer.getX(),
-            inputIslandBubbleContainer.getY() + flexyComposer.getY());
+        if (attach) flexyAttach.offset(offsetX, offsetY);
         final float radius = dp(20);
         if (flexyPearlGlass) {
             // One existing native backdrop pass, clipped to the two surfaces.
@@ -357,12 +356,14 @@ public class ChatInputViewsContainer extends FrameLayout {
             flexyPearl.setColor(ColorUtils.setAlphaComponent(Color.WHITE,
                 (dark ? 28 : 76) * blurredBackgroundDrawable.getAlpha() / 255));
             flexyPearl.setStyle(Paint.Style.STROKE);
-            flexyPearl.setStrokeWidth(1);
+            flexyPearl.setStrokeWidth(0.65f * AndroidUtilities.density);
             canvas.drawRoundRect(flexyPill, radius, radius, flexyPearl);
             if (attach) canvas.drawRoundRect(flexyAttach, radius, radius, flexyPearl);
         } else {
-            flexySurface.setColor(ColorUtils.setAlphaComponent(flexyComposer.getThemedColor(Theme.key_chat_messagePanelBackground),
-                blurredBackgroundDrawable.getAlpha()));
+            // The original Signature contract: glass OFF means solid white or black
+            // islands, never a faded full-width blur or neon-tinted surfaces.
+            final int panel = flexyComposer.getThemedColor(Theme.key_chat_messagePanelBackground);
+            flexySurface.setColor(ColorUtils.calculateLuminance(panel) < 0.4 ? Color.BLACK : Color.WHITE);
             canvas.drawRoundRect(flexyPill, radius, radius, flexySurface);
             if (attach) canvas.drawRoundRect(flexyAttach, radius, radius, flexySurface);
         }

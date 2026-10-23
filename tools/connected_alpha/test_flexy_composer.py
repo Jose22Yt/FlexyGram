@@ -57,7 +57,7 @@ class ComposerRegression(unittest.TestCase):
 
     def test_glass_is_paint_only_and_uses_one_existing_backdrop(self):
         source = (ROOT/CONTAINER).read_text()
-        self.assertIn('drawFlexyCompactBackground(canvas, blurTop + (int) bubbleInputTranlationY)', source)
+        self.assertIn('drawFlexyCompactBackground(canvas)', source)
         draw = method_bodies(source,'drawFlexyCompactBackground')[0]
         self.assertEqual(draw.count('blurredBackgroundDrawable.draw(canvas)'),1)
         for forbidden in ('new ', 'requestLayout(', 'setLayoutParams(', 'setTranslation', 'ValueAnimator', 'ObjectAnimator'):
@@ -119,6 +119,110 @@ public class GeometryRegression {
             output = subprocess.check_output(['java','-cp',tmp,'GeometryRegression'],text=True)
             self.assertIn('PASS:',output)
 
+    def test_compact_pill_preserves_separate_native_action_slot(self):
+        source = (ROOT/CONTAINER).read_text()
+        draw = method_bodies(source, 'drawFlexyCompactBackground')[0]
+        self.assertIn('getFlexyTextPillBounds(flexyPill)', draw)
+        self.assertIn('flexyPill.offset(offsetX, offsetY)', draw)
+        bounds = method_bodies(self.current, 'getFlexyTextPillBounds')[0]
+        self.assertIn('messageEditTextContainer.getWidth()', bounds)
+        self.assertIn('nativeAttachTranslationX()', bounds)
+        # Test actual production geometry in px across multiple screen densities.
+        production = ROOT/'TMessagesProj/src/main/java/app/flexygram/composer/ComposerGeometry.java'
+        test = '''
+import app.flexygram.composer.ComposerGeometry;
+public class ActionSlotRegression {
+ public static void main(String[] args) {
+  if (ComposerGeometry.TRAILING_ACTION_SLOT != 50) throw new AssertionError("native action hit area was reduced");
+  for (int density=1;density<=4;density++) for (int dpWidth=280;dpWidth<=500;dpWidth+=20) {
+   float width=dpWidth*density, rightInset=7*density, edgeInset=7*density;
+   float nativeFieldRight=width-rightInset-edgeInset-44*density;
+   float pillRight=ComposerGeometry.pillRight(nativeFieldRight,6*density,0);
+   if (pillRight > nativeFieldRight-6*density+0.01f)
+    throw new AssertionError("pill covers audio/send action");
+   // Native emoji slot is 44dp, right margin 3dp; its 24dp glyph must fit.
+   float emojiCenter=nativeFieldRight-25*density;
+   if (emojiCenter+12*density > pillRight)
+    throw new AssertionError("emoji is outside the text pill");
+   if (pillRight <= (7+44+6)*density)
+    throw new AssertionError("pill collapses at supported widths");
+  }
+  System.out.println("PASS: compact pill ends before native audio/send touch slot");
+ }
+}'''
+        with tempfile.TemporaryDirectory() as tmp:
+            runner = Path(tmp)/'ActionSlotRegression.java'; runner.write_text(test)
+            subprocess.run(['java','-m','jdk.compiler/com.sun.tools.javac.Main','-d',tmp,
+                            str(production),str(runner)],check=True)
+            self.assertIn('PASS:',subprocess.check_output(
+                ['java','-cp',tmp,'ActionSlotRegression'],text=True))
+
+    def test_actual_pill_bounds_keep_emoji_inside_and_both_islands_separate(self):
+        method = method_bodies(self.current, 'getFlexyTextPillBounds')[0]
+        fixture = '''
+public class PillBoundsRegression {
+ static float density;
+ static int dp(float n){ return (int)Math.ceil(n*density); }
+ static class RectF {
+  float left,top,right,bottom;
+  void set(float a,float b,float c,float d){left=a;top=b;right=c;bottom=d;}
+  float width(){return right-left;} float height(){return bottom-top;}
+ }
+ static class View {
+  float x,y; int width,height;
+  float getX(){return x;} float getY(){return y;}
+  int getWidth(){return width;} int getHeight(){return height;}
+ }
+ View textFieldContainer=new View(),messageEditTextContainer=new View();
+ float actionShift;
+ float nativeAttachTranslationX(){return actionShift;}
+ static void require(boolean b,String why){if(!b)throw new AssertionError(why);}
+ __METHOD__
+ public static void main(String[] args){
+  PillBoundsRegression p=new PillBoundsRegression();RectF r=new RectF();
+  for(float d:new float[]{1,1.25f,1.5f,2,2.75f,3,4}) {
+   density=d;
+   for(int screen:new int[]{280,335,400,500,800}) for(int h:new int[]{44,68,120}) for(int paid:new int[]{0,56}){
+    p.textFieldContainer.x=dp(7);p.textFieldContainer.y=dp(3);
+    p.messageEditTextContainer.x=dp(11);p.messageEditTextContainer.y=dp(9);
+    p.messageEditTextContainer.width=dp(screen)-dp(44);
+    p.messageEditTextContainer.height=dp(h);p.actionShift=-dp(paid);
+    require(p.getFlexyTextPillBounds(r),"missing valid surface");
+    float x=p.textFieldContainer.x+p.messageEditTextContainer.x;
+    float y=p.textFieldContainer.y+p.messageEditTextContainer.y;
+    float end=x+p.messageEditTextContainer.width+p.actionShift;
+    require(r.left-(x+dp(42))>=dp(6),"attachment merged into pill");
+    require(end+dp(2)-r.right>=dp(6),"send merged into pill");
+    float emojiCenter=end-dp(3)-dp(22);
+    require(emojiCenter+dp(12)<=r.right && emojiCenter-dp(12)>=r.left,"emoji outside pill");
+    require(x+dp(62)-r.left>=dp(11),"message text touches pill edge");
+    require(r.top==y+dp(2) && r.bottom==y+dp(h)-dp(2),"multiline or native vertical position changed");
+   }
+  }
+  p.messageEditTextContainer.width=0;
+  require(!p.getFlexyTextPillBounds(r),"unmeasured field accepted");
+  System.out.print("PASS: actual view-coordinate method, translated native field, emoji, paid send and multiline");
+ }
+}'''.replace('__METHOD__', method)
+        with tempfile.TemporaryDirectory() as tmp:
+            runner=Path(tmp)/'PillBoundsRegression.java';runner.write_text(fixture)
+            production=ROOT/'TMessagesProj/src/main/java/app/flexygram/composer/ComposerGeometry.java'
+            subprocess.run(['java','-m','jdk.compiler/com.sun.tools.javac.Main','-d',tmp,str(production),str(runner)],check=True)
+            self.assertIn('PASS:',subprocess.check_output(['java','-cp',tmp,'PillBoundsRegression'],text=True))
+
+    def test_signature_three_islands_and_native_mic_paint(self):
+        enter = self.current
+        container = (ROOT/CONTAINER).read_text()
+        presentation = method_bodies(enter, 'applyFlexyComposerPresentation')[0]
+        self.assertIn('R.drawable.msg_add', presentation)
+        self.assertIn('R.drawable.msg_input_attach2', presentation)
+        self.assertIn('audioVideoButtonContainer.invalidate()', presentation)
+        self.assertIn('if (flexyCompactLayout)', enter)
+        self.assertIn('ColorUtils.blendARGB(panel, Color.WHITE', enter)
+        self.assertIn('ColorUtils.calculateLuminance(panel) < 0.4 ? Color.BLACK : Color.WHITE', container)
+        self.assertIn('canvas.drawRoundRect(flexyPill', container)
+        self.assertIn('canvas.drawRoundRect(flexyAttach', container)
+
     def test_update_version_parser_rejects_missing_duplicate_and_malformed_versions(self):
         self.assertEqual(package_version_code("package: name='io.github.jose22yt.flexygram.alpha' versionCode='1262' versionName='alpha2'"),1262)
         for text in ("", "package: versionCode='0'", "package: versionCode='x'", "package: versionCode='1262' versionCode='1261'", "package: versionCode='1262'\npackage: versionCode='1261'"):
@@ -131,24 +235,28 @@ public class GeometryRegression {
 public class PresentationRegression {
  static final int VISIBLE=0;
  static class Gravity { static final int LEFT=3, RIGHT=5, BOTTOM=80; }
+ static class R { static class drawable { static final int msg_add=1, msg_input_attach2=2; } }
  static class AndroidUtilities { static float density=1; }
  static int dp(float n){return Math.round(n);}
  static class MarginLayoutParams { int leftMargin=3,rightMargin=0,gravity; }
  static class FrameLayout { static class LayoutParams extends MarginLayoutParams {} }
  static class V {
   FrameLayout.LayoutParams p=new FrameLayout.LayoutParams(); int visibility=8; Object tag;
-  float translation,alpha=1; int width=44;
+  float translation,alpha=1; int width=44, imageResource;
   FrameLayout.LayoutParams getLayoutParams(){return p;}
   int getVisibility(){return visibility;}
   Object getTag(){return tag;}
   void setTranslationX(float x){translation=x;}
+  void setImageResource(int icon){imageResource=icon;}
+  void invalidate() {}
   int width(){return width;}
   float getAlpha(){return alpha;}
  }
  boolean isChat=true,isStories=false,flexyCompactRequested,flexyCompactLayout;
  Object parentFragment=new Object();
  V senderSelectView=new V(),botCommandsMenuButton=new V(),botWebViewButton=new V(),aiButton=new V();
- V attachButton=new V(),emojiButton=new V(),deleteRichDraftButton=new V(),messageEditText=new V(),sendButton=new V();
+ V attachButton=new V(),emojiButton=new V(),deleteRichDraftButton=new V(),messageEditText=new V(),sendButton=new V(),audioVideoButtonContainer=new V();
+ void updateAudioVideoSendButtonColor() {}
  float attachLayoutPaddingTranslationX,attachLayoutTranslationX;
  int flexyNativeFieldRight=-1,flexyAppliedFieldRight=-1;
  static final int DEFAULT_HEIGHT=44;
@@ -170,14 +278,16 @@ public class PresentationRegression {
    p.applyFlexyComposerPresentation(335);
    p.require(p.flexyCompactLayout);
    p.require(p.attachButton.p.gravity==(Gravity.BOTTOM|Gravity.LEFT));
+   p.require(p.attachButton.imageResource==R.drawable.msg_add);
    p.require(p.emojiButton.p.gravity==(Gravity.BOTTOM|Gravity.RIGHT));
-   p.require(p.messageEditText.p.leftMargin==54);
+   p.require(p.messageEditText.p.leftMargin==62);
    p.require(p.messageEditText.p.rightMargin>=50+Math.max(0,-p.nativeAttachTranslationX()));
    p.require(p.messageEditText==originalText && p.draft==originalDraft);
    p.nativeMeasure();p.flexyCompactRequested=false;p.applyFlexyComposerPresentation(335);
    p.require(!p.flexyCompactLayout && p.messageEditText.p.rightMargin==end);
    p.require(p.messageEditText.p.leftMargin==50 && p.emojiButton.p.leftMargin==3 && p.emojiButton.p.rightMargin==0);
    p.require(p.attachButton.p.gravity==(Gravity.BOTTOM|Gravity.RIGHT));
+   p.require(p.attachButton.imageResource==R.drawable.msg_input_attach2);
   }
   p.nativeMeasure();p.flexyCompactRequested=true;p.applyFlexyComposerPresentation(335);
   p.botCommandsMenuButton.tag=new Object();p.emojiButton.p.leftMargin=80;p.messageEditText.p.leftMargin=120;
