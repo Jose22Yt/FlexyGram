@@ -15,10 +15,10 @@ import java.security.MessageDigest;
 final class Contract {
     static final String APP = "io.github.jose22yt.flexygram.alpha";
     static final String APK = "FlexyGram-Alpha-arm64.apk";
-    static final String HASH = "PENDING_VERIFIED_PERSONALIZED_APK";
-    static final String CIPHER_HASH = "PENDING_VERIFIED_PERSONALIZED_CIPHERTEXT";
+    static final String HASH = "09ba96a34a28c5e1c9e55466f604fd2fe9504b9bb7dffba65555457d9e4476b1";
+    static final String CIPHER_HASH = "75eec9943c3b9b2edc74c35bb1150b9134735c9c742bb1bd7f36718ebe57f5b8";
     static final String CERTIFICATE = "c8f04cad685ca5757d35b25ea4b0b4613c7399909948d821e6ada61f9fb12b2c";
-    static final String COMMIT = "6ea4c7d5a90796dae81b1aa4ee170f04366005e7";
+    static final String COMMIT = "f27a10cb894f5f44c0eb0059a94e4205c58e7157";
     static File directory(Context c) throws IOException {
         File d = new File(c.getNoBackupFilesDir(), "verified");
         if (!d.isDirectory() && !d.mkdir()) throw new IOException("private output unavailable");
