@@ -331,7 +331,8 @@ public class ChatInputViewsContainer extends FrameLayout {
     private void drawFlexyCompactBackground(Canvas canvas, int top) {
         final float inset = dp(ComposerGeometry.VISUAL_INSET);
         flexyPill.set(inputBubbleOffsetLeft + dp(7 + ComposerGeometry.TOUCH_SLOT + ComposerGeometry.PILL_GAP - 2),
-            top + inset, getMeasuredWidth() - inputBubbleOffsetRight - dp(7),
+            top + inset, ComposerGeometry.pillRight(getMeasuredWidth(), inputBubbleOffsetRight,
+                dp(7), dp(ComposerGeometry.TRAILING_ACTION_SLOT)),
             top + inset + ComposerGeometry.visualHeight(inputBubbleHeightRound, inset));
         final boolean attach = flexyComposer.getFlexyAttachmentBounds(flexyAttach);
         if (attach) flexyAttach.offset(inputIslandBubbleContainer.getX() + flexyComposer.getX(),
