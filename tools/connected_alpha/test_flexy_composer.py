@@ -57,7 +57,7 @@ class ComposerRegression(unittest.TestCase):
 
     def test_glass_is_paint_only_and_uses_one_existing_backdrop(self):
         source = (ROOT/CONTAINER).read_text()
-        self.assertIn('drawFlexyCompactBackground(canvas, blurTop + (int) bubbleInputTranlationY)', source)
+        self.assertIn('drawFlexyCompactBackground(canvas)', source)
         draw = method_bodies(source,'drawFlexyCompactBackground')[0]
         self.assertEqual(draw.count('blurredBackgroundDrawable.draw(canvas)'),1)
         for forbidden in ('new ', 'requestLayout(', 'setLayoutParams(', 'setTranslation', 'ValueAnimator', 'ObjectAnimator'):
@@ -122,8 +122,11 @@ public class GeometryRegression {
     def test_compact_pill_preserves_separate_native_action_slot(self):
         source = (ROOT/CONTAINER).read_text()
         draw = method_bodies(source, 'drawFlexyCompactBackground')[0]
-        self.assertIn('ComposerGeometry.pillRight(', draw)
-        self.assertIn('ComposerGeometry.TRAILING_ACTION_SLOT', draw)
+        self.assertIn('getFlexyTextPillBounds(flexyPill)', draw)
+        self.assertIn('flexyPill.offset(offsetX, offsetY)', draw)
+        bounds = method_bodies(self.current, 'getFlexyTextPillBounds')[0]
+        self.assertIn('messageEditTextContainer.getWidth()', bounds)
+        self.assertIn('nativeAttachTranslationX()', bounds)
         # Test actual production geometry in px across multiple screen densities.
         production = ROOT/'TMessagesProj/src/main/java/app/flexygram/composer/ComposerGeometry.java'
         test = '''
@@ -133,10 +136,14 @@ public class ActionSlotRegression {
   if (ComposerGeometry.TRAILING_ACTION_SLOT != 50) throw new AssertionError("native action hit area was reduced");
   for (int density=1;density<=4;density++) for (int dpWidth=280;dpWidth<=500;dpWidth+=20) {
    float width=dpWidth*density, rightInset=7*density, edgeInset=7*density;
-   float action=ComposerGeometry.TRAILING_ACTION_SLOT*density;
-   float pillRight=ComposerGeometry.pillRight(width,rightInset,edgeInset,action);
-   if (pillRight > width-rightInset-edgeInset-action+0.01f)
+   float nativeFieldRight=width-rightInset-edgeInset-44*density;
+   float pillRight=ComposerGeometry.pillRight(nativeFieldRight,6*density,0);
+   if (pillRight > nativeFieldRight-6*density+0.01f)
     throw new AssertionError("pill covers audio/send action");
+   // Native emoji slot is 44dp, right margin 3dp; its 24dp glyph must fit.
+   float emojiCenter=nativeFieldRight-25*density;
+   if (emojiCenter+12*density > pillRight)
+    throw new AssertionError("emoji is outside the text pill");
    if (pillRight <= (7+44+6)*density)
     throw new AssertionError("pill collapses at supported widths");
   }
@@ -149,6 +156,59 @@ public class ActionSlotRegression {
                             str(production),str(runner)],check=True)
             self.assertIn('PASS:',subprocess.check_output(
                 ['java','-cp',tmp,'ActionSlotRegression'],text=True))
+
+    def test_actual_pill_bounds_keep_emoji_inside_and_both_islands_separate(self):
+        method = method_bodies(self.current, 'getFlexyTextPillBounds')[0]
+        fixture = '''
+public class PillBoundsRegression {
+ static float density;
+ static int dp(float n){ return (int)Math.ceil(n*density); }
+ static class RectF {
+  float left,top,right,bottom;
+  void set(float a,float b,float c,float d){left=a;top=b;right=c;bottom=d;}
+  float width(){return right-left;} float height(){return bottom-top;}
+ }
+ static class View {
+  float x,y; int width,height;
+  float getX(){return x;} float getY(){return y;}
+  int getWidth(){return width;} int getHeight(){return height;}
+ }
+ View textFieldContainer=new View(),messageEditTextContainer=new View();
+ float actionShift;
+ float nativeAttachTranslationX(){return actionShift;}
+ static void require(boolean b,String why){if(!b)throw new AssertionError(why);}
+ __METHOD__
+ public static void main(String[] args){
+  PillBoundsRegression p=new PillBoundsRegression();RectF r=new RectF();
+  for(float d:new float[]{1,1.25f,1.5f,2,2.75f,3,4}) {
+   density=d;
+   for(int screen:new int[]{280,335,400,500,800}) for(int h:new int[]{44,68,120}) for(int paid:new int[]{0,56}){
+    p.textFieldContainer.x=dp(7);p.textFieldContainer.y=dp(3);
+    p.messageEditTextContainer.x=dp(11);p.messageEditTextContainer.y=dp(9);
+    p.messageEditTextContainer.width=dp(screen)-dp(44);
+    p.messageEditTextContainer.height=dp(h);p.actionShift=-dp(paid);
+    require(p.getFlexyTextPillBounds(r),"missing valid surface");
+    float x=p.textFieldContainer.x+p.messageEditTextContainer.x;
+    float y=p.textFieldContainer.y+p.messageEditTextContainer.y;
+    float end=x+p.messageEditTextContainer.width+p.actionShift;
+    require(r.left-(x+dp(42))>=dp(6),"attachment merged into pill");
+    require(end+dp(2)-r.right>=dp(6),"send merged into pill");
+    float emojiCenter=end-dp(3)-dp(22);
+    require(emojiCenter+dp(12)<=r.right && emojiCenter-dp(12)>=r.left,"emoji outside pill");
+    require(x+dp(62)-r.left>=dp(11),"message text touches pill edge");
+    require(r.top==y+dp(2) && r.bottom==y+dp(h)-dp(2),"multiline or native vertical position changed");
+   }
+  }
+  p.messageEditTextContainer.width=0;
+  require(!p.getFlexyTextPillBounds(r),"unmeasured field accepted");
+  System.out.print("PASS: actual view-coordinate method, translated native field, emoji, paid send and multiline");
+ }
+}'''.replace('__METHOD__', method)
+        with tempfile.TemporaryDirectory() as tmp:
+            runner=Path(tmp)/'PillBoundsRegression.java';runner.write_text(fixture)
+            production=ROOT/'TMessagesProj/src/main/java/app/flexygram/composer/ComposerGeometry.java'
+            subprocess.run(['java','-m','jdk.compiler/com.sun.tools.javac.Main','-d',tmp,str(production),str(runner)],check=True)
+            self.assertIn('PASS:',subprocess.check_output(['java','-cp',tmp,'PillBoundsRegression'],text=True))
 
     def test_signature_three_islands_and_native_mic_paint(self):
         enter = self.current
@@ -220,7 +280,7 @@ public class PresentationRegression {
    p.require(p.attachButton.p.gravity==(Gravity.BOTTOM|Gravity.LEFT));
    p.require(p.attachButton.imageResource==R.drawable.msg_add);
    p.require(p.emojiButton.p.gravity==(Gravity.BOTTOM|Gravity.RIGHT));
-   p.require(p.messageEditText.p.leftMargin==54);
+   p.require(p.messageEditText.p.leftMargin==62);
    p.require(p.messageEditText.p.rightMargin>=50+Math.max(0,-p.nativeAttachTranslationX()));
    p.require(p.messageEditText==originalText && p.draft==originalDraft);
    p.nativeMeasure();p.flexyCompactRequested=false;p.applyFlexyComposerPresentation(335);

@@ -5,12 +5,18 @@ public final class ComposerGeometry {
     public static final int TOUCH_SLOT = 44;
     public static final int VISUAL_INSET = 2;
     public static final int PILL_GAP = 6;
+    public static final int TEXT_PADDING = 12;
     public static final int TEXT_END_SLOT = 50;
     // Keep the original native 44dp recording/send hit area outside the text pill.
     public static final int TRAILING_ACTION_SLOT = TOUCH_SLOT + PILL_GAP;
 
-    public static float pillRight(float width, float nativeRightInset, float visualInsetPx, float actionSlotPx) {
-        return width - nativeRightInset - visualInsetPx - actionSlotPx;
+    public static float pillLeft(float fieldLeft, float touchSlotPx, float gapPx) {
+        return fieldLeft + touchSlotPx + gapPx;
+    }
+
+    /** The native field already excludes the send slot; never reserve it twice. */
+    public static float pillRight(float fieldRight, float gapPx, float nativeActionTranslation) {
+        return fieldRight - gapPx + Math.min(0, nativeActionTranslation);
     }
 
     private ComposerGeometry() { }

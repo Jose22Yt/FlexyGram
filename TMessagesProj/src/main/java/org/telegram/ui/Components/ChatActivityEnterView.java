@@ -3362,7 +3362,7 @@ public class ChatActivityEnterView extends FrameLayout implements
                         }
                     }
 
-                    final float r = dpf2(19);
+                    final float r = dpf2(flexyCompactLayout ? 20 : 19);
                     // Signature compositor: use one restrained, separate native action circle.
                     // Preserve upstream accent and all native microphone gestures in Classic.
                     if (flexyCompactLayout) {
@@ -3377,9 +3377,9 @@ public class ChatActivityEnterView extends FrameLayout implements
                     } else {
                         paint.setColor(getThemedColor(Theme.key_chat_messagePanelSend));
                     }
-                    final float margin = dpf2(3);
-                    final float height = dpf2(38);
-                    final float width = dpf2(38);
+                    final float margin = dpf2(flexyCompactLayout ? 2 : 3);
+                    final float height = dpf2(flexyCompactLayout ? 40 : 38);
+                    final float width = height;
                     backgroundRect.set(
                             getMeasuredWidth() - width - margin,
                             getMeasuredHeight() - height - margin,
@@ -16571,7 +16571,8 @@ public class ChatActivityEnterView extends FrameLayout implements
         }
         if (messageEditText != null) {
             FrameLayout.LayoutParams text = (FrameLayout.LayoutParams) messageEditText.getLayoutParams();
-            if (compact) text.leftMargin = dp(54);
+            if (compact) text.leftMargin = dp(app.flexygram.composer.ComposerGeometry.TOUCH_SLOT
+                + app.flexygram.composer.ComposerGeometry.PILL_GAP + app.flexygram.composer.ComposerGeometry.TEXT_PADDING);
             // Editing can directly change this margin without updateFieldRight.
             if (flexyNativeFieldRight < 0 || text.rightMargin != flexyAppliedFieldRight) flexyNativeFieldRight = text.rightMargin;
             text.rightMargin = app.flexygram.composer.ComposerGeometry.textEnd(flexyNativeFieldRight,
@@ -16603,6 +16604,19 @@ public class ChatActivityEnterView extends FrameLayout implements
         final float y = textFieldContainer.getY() + messageEditTextContainer.getY() + attachButton.getY();
         out.set(x + dp(2), y + dp(2), x + attachButton.getWidth() - dp(2), y + attachButton.getHeight() - dp(2));
         return true;
+    }
+
+    /** Bounds in this view's coordinates, after native layout/IME translations. */
+    public boolean getFlexyTextPillBounds(RectF out) {
+        if (messageEditTextContainer == null || messageEditTextContainer.getWidth() <= 0) return false;
+        final float x = textFieldContainer.getX() + messageEditTextContainer.getX();
+        final float y = textFieldContainer.getY() + messageEditTextContainer.getY();
+        out.set(app.flexygram.composer.ComposerGeometry.pillLeft(x,
+                dp(app.flexygram.composer.ComposerGeometry.TOUCH_SLOT), dp(app.flexygram.composer.ComposerGeometry.PILL_GAP)),
+            y + dp(app.flexygram.composer.ComposerGeometry.VISUAL_INSET), app.flexygram.composer.ComposerGeometry.pillRight(
+                x + messageEditTextContainer.getWidth(), dp(app.flexygram.composer.ComposerGeometry.PILL_GAP), nativeAttachTranslationX()),
+            y + messageEditTextContainer.getHeight() - dp(app.flexygram.composer.ComposerGeometry.VISUAL_INSET));
+        return out.width() > 0 && out.height() > 0;
     }
 
     private void updateEmojiButtonParams() {
