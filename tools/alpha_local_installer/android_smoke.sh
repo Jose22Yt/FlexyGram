@@ -6,9 +6,25 @@ sudo chown "$(id -un)" /dev/kvm
 printf 'no\n' | avdmanager create avd --force -n alpha-helper-test -k 'system-images;android-35;google_apis;x86_64' > build/avd-setup.txt
 "$ANDROID_HOME/emulator/emulator" -avd alpha-helper-test -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect > build/emulator.txt 2>&1 &
 emulator_pid=$!
-trap 'kill "$emulator_pid" 2>/dev/null || true' EXIT
+cleanup() {
+  result=$?
+  if [[ "$result" != 0 ]]; then
+    tail -n 100 build/emulator.txt || true
+    adb devices -l || true
+  fi
+  kill "$emulator_pid" 2>/dev/null || true
+  exit "$result"
+}
+trap cleanup EXIT
 export PATH="$ANDROID_HOME/platform-tools:$PATH"
-timeout 180 adb wait-for-device
+adb start-server
+connected=false
+for attempt in $(seq 1 90); do
+  if ! kill -0 "$emulator_pid" 2>/dev/null; then echo 'Emulator exited before connecting'; exit 1; fi
+  if adb devices | grep -Eq '^emulator-[0-9]+[[:space:]]+device$'; then connected=true; break; fi
+  sleep 2
+done
+[[ "$connected" == true ]]
 booted=false
 for attempt in $(seq 1 120); do
   if [[ "$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" == '1' ]]; then booted=true; break; fi
