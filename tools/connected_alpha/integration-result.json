@@ -1,0 +1,64 @@
+{
+  "base_pr_56": "e5869928c812271f87489c7012978563716ebfc0",
+  "incorporated_pr_57": "885c929a42e5764dc62154c1806ba61902d6c13b",
+  "integration": "No overlapping source paths between PR56 and PR57; full parent history restored before applying PR57",
+  "host_tests": {
+    "connected_alpha_unittest": {
+      "passed": 46,
+      "failed": 0
+    },
+    "upstream_pytest": {
+      "passed": 144,
+      "failed": 0,
+      "skipped": 31,
+      "skip_reason": "External plugin corpus/archives or R8 report absent"
+    },
+    "baseline_pytest_failures_reproduced": 2,
+    "baseline_failure_cause": "Chaquopy mocks lacked existing get_reflection_policy API; tests updated, production loader unchanged"
+  },
+  "resources": {
+    "status": "PASS_RESOURCES_AND_ISOLATED_LINK_ONLY",
+    "main_compile": "PASS_LEGACY_FORMAT_WARNINGS",
+    "alpha_compile": "PASS_STRICT",
+    "api": 37,
+    "aapt2": "Android Asset Packaging Tool (aapt) 2.20-13193326",
+    "android_jar_sha256": "bf1b4387cc7ca94fc6ef684f040d9d16fbf16248e181819f020736ea2053f177",
+    "provider_overlay_selected_in_binary": true,
+    "full_app_merged_manifest": "NOT_VALIDATED_BY_THIS_PROBE",
+    "apk_build": "NOT_RUN",
+    "android_runtime": "NOT_TESTED",
+    "main_compiled_entries": 7163,
+    "alpha_compiled_entries": 9
+  },
+  "manifest_attempt": {
+    "task": ":TMessagesProj:processConnectedAlphaMainManifest",
+    "status": "BLOCKED",
+    "failed_task": ":TMessagesProj:validateConnectedAlphaConfiguration",
+    "reason": "Authorized Telegram API inputs absent; no fake values or exclusions used",
+    "gradle_result": "BUILD FAILED in 18s; 20 tasks: 16 executed, 4 up-to-date",
+    "library_manifests": "Media module manifest tasks executed; full app merge not completed"
+  },
+  "local_tools": {
+    "jdk": "Temurin 21.0.13+9",
+    "gradle": "9.7.1",
+    "sdk": "API37 revision2",
+    "build_tools": "36.0.0",
+    "ndk": "27.2.12479018",
+    "cmake": "3.31.6",
+    "download_checksums": "Verified against official publishers; original payloads only",
+    "temporary_daemon_vendor_override": "Restored; not committed"
+  },
+  "validation": {
+    "actionlint": "1.7.12 PASS for both changed workflows",
+    "upstream_components_identical": 26,
+    "java_kotlin_python_jni_production_changes": false,
+    "security_gates_removed": false,
+    "ci_prerequisite_fix": "Run 39883084553: unittest45 PASS; alias test failed because media submodule absent in CI. Both source jobs now initialize only the pinned media submodule before complete suite; no test suppressed."
+  },
+  "pending": [
+    "Full application merged/binary manifest with authorized private configuration",
+    "Complete ARM64 app/JNI/Chaquopy build and final APK verification",
+    "Install, native login, real dialogs, messages, multimedia, background notifications",
+    "Physical Android17 and same-device performance comparison"
+  ]
+}

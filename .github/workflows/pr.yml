@@ -3,7 +3,7 @@ name: Pull request
 on:
   # Registered workflow ID 388683996: support entry point for the same native jobs.
   push:
-    branches: [support/connected-alpha-ci-20261022]
+    branches: [support/connected-alpha-ci-20261022, integration/connected-alpha-unified]
     paths:
       - '.github/workflows/connected-alpha-arm64.yml'
       - '.github/workflows/pr.yml'
@@ -33,7 +33,7 @@ permissions:
 
 jobs:
   connected-alpha-native:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/support/connected-alpha-ci-20261022'
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/support/connected-alpha-ci-20261022' || github.ref == 'refs/heads/integration/connected-alpha-unified')
     uses: ./.github/workflows/connected-alpha-arm64.yml
     secrets:
       TELEGRAM_APP_ID: ${{ secrets.TELEGRAM_APP_ID }}
@@ -45,7 +45,7 @@ jobs:
       ALPHA_KEYSTORE_B64: ${{ secrets.ALPHA_KEYSTORE_B64 }}
       ALPHA_CERTIFICATE_SHA256: ${{ secrets.ALPHA_CERTIFICATE_SHA256 }}
   connected-alpha-static:
-    if: github.event_name == 'pull_request' && (github.head_ref == 'alpha/connected-exteraless-baseline' || startsWith(github.head_ref, 'support/connected-alpha-ci-'))
+    if: github.event_name == 'pull_request' && (github.head_ref == 'alpha/connected-exteraless-baseline' || startsWith(github.head_ref, 'support/connected-alpha-ci-') || startsWith(github.head_ref, 'integration/connected-alpha-'))
     name: Connected Alpha source checks (no APK)
     runs-on: ubuntu-latest
     steps:
@@ -56,10 +56,15 @@ jobs:
         with:
           python-version: '3.11'
       - run: python3 -m pip install -r tools/connected_alpha/requirements-ci.txt
-      - run: python3 tools/connected_alpha/check_source.py
-      - run: python3 -m unittest discover -s tools/connected_alpha -p 'test_*.py' -v
+      - name: Checkout pinned media sources for plugin alias tests
+        run: git submodule update --init --depth 1 TMessagesProj_Modules/media
+      - run: python3 tools/connected_alpha/run_checks.py
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: 'build-tools;36.0.0 platforms;android-37.0'
+      - run: python3 tools/connected_alpha/check_resources.py --sdk-root "$ANDROID_HOME"
   build:
-    if: github.event_name == 'pull_request' && github.head_ref != 'alpha/connected-exteraless-baseline' && !startsWith(github.head_ref, 'support/connected-alpha-ci-')
+    if: github.event_name == 'pull_request' && github.head_ref != 'alpha/connected-exteraless-baseline' && !startsWith(github.head_ref, 'support/connected-alpha-ci-') && !startsWith(github.head_ref, 'integration/connected-alpha-')
     name: Gradle Build
     runs-on: ubuntu-latest
     env:
