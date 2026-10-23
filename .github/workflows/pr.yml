@@ -3,7 +3,7 @@ name: Pull request
 on:
   # Registered workflow ID 388683996: support entry point for the same native jobs.
   push:
-    branches: [support/connected-alpha-ci-20261022]
+    branches: [support/connected-alpha-ci-20261022, integration/connected-alpha-unified]
     paths:
       - '.github/workflows/connected-alpha-arm64.yml'
       - '.github/workflows/pr.yml'
@@ -33,7 +33,7 @@ permissions:
 
 jobs:
   connected-alpha-native:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/support/connected-alpha-ci-20261022'
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/support/connected-alpha-ci-20261022' || github.ref == 'refs/heads/integration/connected-alpha-unified')
     uses: ./.github/workflows/connected-alpha-arm64.yml
     secrets:
       TELEGRAM_APP_ID: ${{ secrets.TELEGRAM_APP_ID }}
