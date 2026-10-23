@@ -154,6 +154,8 @@ def main():
             evidence[name] = {'source_sha256': digest, 'version': version}
         subprocess.run([sys.executable, '-m', 'pip', 'download', '--index-url',
                         'https://pypi.org/simple', '--no-deps', '--only-binary=:all:',
+                        '--platform', 'android_24_arm64_v8a', '--abi', 'cp311',
+                        '--implementation', 'cp', '--python-version', '3.11',
                         '--dest', str(work), 'debugpy==1.8.22'], check=True)
         android_debugpy(work/'debugpy-1.8.22-py2.py3-none-any.whl',
                         output/'debugpy-1.8.22-100-py2.py3-none-any.whl')
