@@ -1,0 +1,38 @@
+Connected Alpha stability: host validation only; Android runtime NOT_TESTED.
+
+$ python3 -m unittest discover -s tools/connected_alpha -p test_*.py -v
+
+test_arm64_16k (test_verify_apk.ElfVerification.test_arm64_16k) ... ok
+test_arm64_64k (test_verify_apk.ElfVerification.test_arm64_64k) ... ok
+test_inspect_nested_chaquopy (test_verify_apk.ElfVerification.test_inspect_nested_chaquopy) ... ok
+test_reject_4k_only (test_verify_apk.ElfVerification.test_reject_4k_only) ... ok
+test_reject_bad_segment_congruence (test_verify_apk.ElfVerification.test_reject_bad_segment_congruence) ... ok
+test_reject_no_loads (test_verify_apk.ElfVerification.test_reject_no_loads) ... ok
+test_reject_truncated_segment (test_verify_apk.ElfVerification.test_reject_truncated_segment) ... ok
+test_reject_x86 (test_verify_apk.ElfVerification.test_reject_x86) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.001s
+
+OK
+
+exit=0
+
+$ python3 -m unittest discover -s tools/connected_alpha/stability -p test_*.py -v
+
+test_all_original_paths_preserved_with_only_narrow_addition (test_stability.AttachmentConfiguration.test_all_original_paths_preserved_with_only_narrow_addition) ... ok
+test_baseline_cannot_expose_relocated_attachment (test_stability.AttachmentConfiguration.test_baseline_cannot_expose_relocated_attachment) ... ok
+test_other_private_files_remain_outside_roots (test_stability.AttachmentConfiguration.test_other_private_files_remain_outside_roots) ... ok
+test_overlay_exposes_saved_attachment_and_nested_media (test_stability.AttachmentConfiguration.test_overlay_exposes_saved_attachment_and_nested_media) ... ok
+test_provider_requires_explicit_grant_and_is_not_exported (test_stability.AttachmentConfiguration.test_provider_requires_explicit_grant_and_is_not_exported) ... ok
+test_both_page_sizes_leave_every_acceptance_pending (test_stability.DeviceCollector.test_both_page_sizes_leave_every_acceptance_pending) ... ok
+test_package_manager_error_cannot_be_treated_as_not_installed (test_stability.DeviceCollector.test_package_manager_error_cannot_be_treated_as_not_installed) ... ok
+test_reject_wrong_api_abi_emulator_or_unknown_pages (test_stability.DeviceCollector.test_reject_wrong_api_abi_emulator_or_unknown_pages) ... ok
+test_substring_package_does_not_count_as_alpha (test_stability.DeviceCollector.test_substring_package_does_not_count_as_alpha) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.009s
+
+OK
+
+exit=0
