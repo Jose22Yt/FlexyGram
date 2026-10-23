@@ -30,7 +30,7 @@ public final class SmokeInstrumentation extends Instrumentation {
             runOnMainSync(() -> {
                 // Exact production preference/policy classes checked out from the
                 // pinned app commit. This isolated test APK has no Telegram state.
-                org.telegram.messenger.ApplicationLoader.applicationContext = getContext();
+                org.telegram.messenger.ApplicationLoader.applicationContext = c;
                 android.content.SharedPreferences prefs = app.flexygram.composer.FlexyComposerConfig.preferences();
                 prefs.edit().clear().commit();
                 final int[] notifications = {0};
@@ -53,6 +53,10 @@ public final class SmokeInstrumentation extends Instrumentation {
                     app.flexygram.composer.FlexyComposerConfig.setStyle(0);
                     check(!app.flexygram.composer.FlexyComposerConfig.compact());
                 }
+                // Require a successful real disk commit in this test app's own
+                // sandbox, not only in-memory preference notifications.
+                check(prefs.edit().putInt(app.flexygram.composer.FlexyComposerConfig.GAP, 5).commit());
+                check(app.flexygram.composer.FlexyComposerConfig.gap() == 5);
                 app.flexygram.composer.FlexyComposerConfig.reset();
                 check(app.flexygram.composer.FlexyComposerConfig.compact());
                 check(app.flexygram.composer.FlexyComposerConfig.position() == 0);
