@@ -306,7 +306,7 @@ public class ChatInputViewsContainer extends FrameLayout {
         blurredBackgroundDrawable.setBounds(tmpRect);
         if (drawInputBackground) {
             if (flexyComposer != null && flexyComposer.isFlexyCompactPresentation()) {
-                drawFlexyCompactBackground(canvas, blurTop);
+                drawFlexyCompactBackground(canvas, blurTop + (int) bubbleInputTranlationY);
             } else {
                 blurredBackgroundDrawable.draw(canvas);
             }

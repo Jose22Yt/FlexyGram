@@ -57,6 +57,7 @@ class ComposerRegression(unittest.TestCase):
 
     def test_glass_is_paint_only_and_uses_one_existing_backdrop(self):
         source = (ROOT/CONTAINER).read_text()
+        self.assertIn('drawFlexyCompactBackground(canvas, blurTop + (int) bubbleInputTranlationY)', source)
         draw = method_bodies(source,'drawFlexyCompactBackground')[0]
         self.assertEqual(draw.count('blurredBackgroundDrawable.draw(canvas)'),1)
         for forbidden in ('new ', 'requestLayout(', 'setLayoutParams(', 'setTranslation', 'ValueAnimator', 'ObjectAnimator'):
