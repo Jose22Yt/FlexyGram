@@ -40,5 +40,6 @@ def main():
     a=a.resize((1536,1536),Image.Resampling.LANCZOS).resize((768,768),Image.Resampling.LANCZOS)
     out=Image.new('RGBA',(768,768),(255,255,255,0));out.putalpha(a)
     out.save(alpha/'drawable-nodpi/flexygram_launcher_mono.png')
+    out.save(ROOT/'TMessagesProj/src/main/res/drawable-nodpi/flexygram_brand_monochrome.png')
     print('Original artwork SHA-256:',hashlib.sha256(SOURCE.read_bytes()).hexdigest())
 if __name__=='__main__':main()
