@@ -1,0 +1,6 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="io.github.jose22yt.flexygram.delivery.tests">
+    <uses-sdk android:minSdkVersion="30" android:targetSdkVersion="37" />
+    <application android:label="Helper smoke tests" />
+    <instrumentation android:name="io.github.jose22yt.flexygram.delivery.SmokeInstrumentation"
+        android:targetPackage="io.github.jose22yt.flexygram.delivery" android:functionalTest="true" />
+</manifest>
