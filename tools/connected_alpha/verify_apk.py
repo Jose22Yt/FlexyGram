@@ -125,18 +125,26 @@ def inspect_elf(data, name):
     require(loads > 0, f'{name}: missing PT_LOAD')
     return {'name': name, 'sha256': hashlib.sha256(data).hexdigest()}
 
-def inspect_archive(z, prefix=''):
+def inspect_archive(z, prefix='', failures=None):
     found = []
+    top_level = failures is None
+    if failures is None:
+        failures = []
     require(z.testzip() is None, f'{prefix}: invalid ZIP CRC')
     for entry in z.infolist():
         if entry.filename.endswith('.so'):
-            found.append(inspect_elf(z.read(entry), prefix+entry.filename))
+            try:
+                found.append(inspect_elf(z.read(entry), prefix+entry.filename))
+            except ValueError as exc:
+                failures.append(str(exc))
         # Chaquopy bootstrap/runtime libraries can be inside nested ZIP assets.
         elif entry.filename.endswith(('.zip','.imy')) and 'chaquopy' in entry.filename:
             data = z.read(entry)
             if zipfile.is_zipfile(io.BytesIO(data)):
                 with zipfile.ZipFile(io.BytesIO(data)) as nested:
-                    found += inspect_archive(nested, prefix+entry.filename+'!/')
+                    found += inspect_archive(nested, prefix+entry.filename+'!/', failures)
+    if top_level and failures:
+        raise ValueError('Incompatible ELF payloads: ' + '; '.join(failures))
     return found
 
 def main():

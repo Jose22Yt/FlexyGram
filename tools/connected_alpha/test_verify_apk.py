@@ -140,6 +140,19 @@ class ElfVerification(unittest.TestCase):
         self.assertEqual(len(result), 1)
         self.assertIn('imy!/java/chaquopy.so', result[0]['name'])
 
+    def test_reports_every_incompatible_nested_elf_and_still_fails(self):
+        nested = io.BytesIO()
+        with zipfile.ZipFile(nested, 'w') as z:
+            z.writestr('lib/libexslt.so', elf(alignment=4096))
+            z.writestr('lib/libxml2.so', elf(machine=62))
+            z.writestr('lib/valid.so', elf())
+        outer = io.BytesIO()
+        with zipfile.ZipFile(outer, 'w') as z:
+            z.writestr('assets/chaquopy/requirements-common.imy', nested.getvalue())
+        with zipfile.ZipFile(outer) as z:
+            with self.assertRaisesRegex(ValueError, 'libexslt.so.*libxml2.so'):
+                inspect_archive(z)
+
 
 if __name__ == '__main__':
     unittest.main()
