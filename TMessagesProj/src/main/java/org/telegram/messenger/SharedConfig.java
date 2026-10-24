@@ -741,7 +741,8 @@ public class SharedConfig {
             repeatMode = preferences.getInt("repeatMode", 0);
             fontSize = preferences.getInt("fons_size", AndroidUtilities.isTablet() && !AndroidUtilities.isFold() ? 18 : 16);
             fontSizeIsDefault = !preferences.contains("fons_size");
-            bubbleRadius = preferences.getInt("bubbleRadius", 17);
+            bubbleRadius = preferences.getInt("bubbleRadius",
+                    app.flexygram.bubbles.BubbleStyle.defaultRadius("io.github.jose22yt.flexygram.alpha".equals(ApplicationLoader.applicationContext.getPackageName())));
             ivFontSize = preferences.getInt("iv_font_size", fontSize);
             allowBigEmoji = preferences.getBoolean("allowBigEmoji", true);
             useSystemEmoji = preferences.getBoolean("useSystemEmoji", false);

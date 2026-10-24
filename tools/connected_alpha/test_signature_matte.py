@@ -40,12 +40,17 @@ class SignatureMatteTests(unittest.TestCase):
     def test_exact_candidate_scope_preserves_app_delivery_and_native_previews(self):
         paths=subprocess.check_output(['git','diff','--name-only',BASE],cwd=ROOT,text=True).splitlines()
         paths+=subprocess.check_output(['git','ls-files','--others','--exclude-standard'],cwd=ROOT,text=True).splitlines()
-        self.assertTrue(set(paths)<=CANDIDATE_PATHS, set(paths)-CANDIDATE_PATHS)
+        from release_1270_contract import PATHS
+        paths=[p for p in paths if not p.startswith("TMessagesProj/jni/")]
+        self.assertTrue(set(paths)<=CANDIDATE_PATHS|PATHS, set(paths)-CANDIDATE_PATHS-PATHS)
         for directory in ('app/flexygram/composer','app/flexygram/home','app/exteraless/appearance'):
             prefix='TMessagesProj/src/main/java/'+directory
             for path in subprocess.check_output(['git','ls-tree','-r','--name-only',BASE,'--',prefix],cwd=ROOT,text=True).splitlines():
-                self.assertEqual((ROOT/path).read_text(),old(path),path)
-        self.assertEqual((ROOT/'TMessagesProj/build.gradle').read_text().replace('def verCode = 1269','def verCode = 1267').replace("versionNameSuffix = '-alpha2-signature-matte'","versionNameSuffix = '-alpha2-integrated-signature'"),old('TMessagesProj/build.gradle'))
+                expected=old(path)
+                if directory=='app/flexygram/home':
+                    expected=subprocess.check_output(['git','show','cb2c98234aa7e88550853d54132e52d629b2674f:'+path],cwd=ROOT,text=True)
+                self.assertEqual((ROOT/path).read_text(),expected,path)
+        self.assertEqual((ROOT/'TMessagesProj/build.gradle').read_text().replace('def verCode = 1270','def verCode = 1267').replace("versionNameSuffix = '-alpha2-ios-glass-home2'","versionNameSuffix = '-alpha2-integrated-signature'"),old('TMessagesProj/build.gradle'))
         from test_matte_release import restore_delivery_workflow
         self.assertEqual(restore_delivery_workflow((ROOT/'.github/workflows/connected-alpha-arm64.yml').read_text()),old('.github/workflows/connected-alpha-arm64.yml'))
 

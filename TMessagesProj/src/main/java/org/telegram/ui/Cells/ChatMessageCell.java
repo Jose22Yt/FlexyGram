@@ -284,6 +284,15 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     private final static float EPHEMERAL_HINT_HEIGHT = 25f;
 
     public boolean clipToGroupBounds;
+    private final MessageDrawable.GlassSource flexyBubbleSource = (canvas, path) ->
+        delegate != null && !drawForBlur && delegate.drawFlexyBubbleWallpaper(this, canvas, path);
+    private void drawFlexyBubble(Canvas canvas, MessageDrawable drawable, Paint customPaint) {
+        // Drawables are shared by native themes: never retain a cell/activity between draws.
+        drawable.setFlexyGlassSource(flexyBubbleSource);
+        try { drawable.drawCached(canvas, backgroundCacheParams, customPaint); }
+        finally { drawable.setFlexyGlassSource(null); }
+    }
+
     public boolean drawForBlur;
     private boolean flipImage;
     private boolean visibleOnScreen = true;
@@ -843,6 +852,10 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         }
 
         default boolean isLandscape() {
+            return false;
+        }
+
+        default boolean drawFlexyBubbleWallpaper(ChatMessageCell cell, Canvas canvas, android.graphics.Path path) {
             return false;
         }
 
@@ -20915,7 +20928,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                 canvas.save();
                 canvas.clipRect(0, 0, getMeasuredWidth(), getMeasuredHeight());
                 if (currentBackgroundDrawable != null)
-                    currentBackgroundDrawable.drawCached(canvas, backgroundCacheParams, selectionOverlayPaint);
+                    drawFlexyBubble(canvas, currentBackgroundDrawable, selectionOverlayPaint);
                 canvas.restore();
             }
             selectionOverlayPaint.setAlpha(wasAlpha);
@@ -21305,11 +21318,11 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
 //                if ((isPressed() && isCheckPressed || !isCheckPressed && isPressed) && !textIsSelectionMode()) {
 //                    currentSelectedBackgroundAlpha = 1f;
 //                    currentBackgroundSelectedDrawable.setAlpha((int) (255 * alphaInternal));
-//                    currentBackgroundSelectedDrawable.drawCached(canvas, backgroundCacheParams);
+//                    drawFlexyBubble(canvas, currentBackgroundSelectedDrawable, null);
 //                } else {
                 currentSelectedBackgroundAlpha = 0;
                 currentBackgroundDrawable.setAlpha((int) (255 * alphaInternal));
-                currentBackgroundDrawable.drawCached(canvas, backgroundCacheParams);
+                drawFlexyBubble(canvas, currentBackgroundDrawable, null);
 //                }
                 if (currentBackgroundShadowDrawable != null && currentPosition == null) {
                     currentBackgroundShadowDrawable.setAlpha((int) (255 * alphaInternal));
@@ -21318,18 +21331,18 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             } else {
                 if (isHighlightedAnimated) {
                     currentBackgroundDrawable.setAlpha((int) (255 * alphaInternal));
-                    currentBackgroundDrawable.drawCached(canvas, backgroundCacheParams);
+                    drawFlexyBubble(canvas, currentBackgroundDrawable, null);
                     currentSelectedBackgroundAlpha = getHighlightAlpha();
                     if (currentPosition == null) {
                         currentBackgroundSelectedDrawable.setAlpha((int) (alphaInternal * currentSelectedBackgroundAlpha * 255));
-                        currentBackgroundSelectedDrawable.drawCached(canvas, backgroundCacheParams);
+                        drawFlexyBubble(canvas, currentBackgroundSelectedDrawable, null);
                     }
                 } else if (selectedBackgroundProgress != 0 && (currentMessageObject == null || !currentMessageObject.preview) && !(currentMessagesGroup != null && currentMessagesGroup.isDocuments)) {
                     currentBackgroundDrawable.setAlpha((int) (255 * alphaInternal));
-                    currentBackgroundDrawable.drawCached(canvas, backgroundCacheParams);
+                    drawFlexyBubble(canvas, currentBackgroundDrawable, null);
                     currentSelectedBackgroundAlpha = selectedBackgroundProgress;
                     currentBackgroundSelectedDrawable.setAlpha((int) (currentSelectedBackgroundAlpha * alphaInternal * 255));
-                    currentBackgroundSelectedDrawable.drawCached(canvas, backgroundCacheParams);
+                    drawFlexyBubble(canvas, currentBackgroundSelectedDrawable, null);
                     if (currentBackgroundDrawable.getGradientShader() == null) {
                         currentBackgroundShadowDrawable = null;
                     }
@@ -21341,7 +21354,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                         }
                         currentSelectedBackgroundAlpha = 1f;
                         currentBackgroundSelectedDrawable.setAlpha((int) (255 * alphaInternal));
-                        currentBackgroundSelectedDrawable.drawCached(canvas, backgroundCacheParams);
+                        drawFlexyBubble(canvas, currentBackgroundSelectedDrawable, null);
                         if (currentPosition != null) {
                             canvas.restore();
                         }
@@ -21351,7 +21364,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                         if (NaConfig.INSTANCE.getTranslucentDeletedMessages().Bool() && ayuDeleted && currentMessageObject.isOutOwner()) {
                             currentBackgroundDrawable.setAlpha((int) (255 * 0.75f));
                         }
-                        currentBackgroundDrawable.drawCached(canvas, backgroundCacheParams);
+                        drawFlexyBubble(canvas, currentBackgroundDrawable, null);
                     }
                 }
                 if (currentBackgroundShadowDrawable != null && currentPosition == null) {
@@ -22674,7 +22687,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             }
             currentBackgroundDrawable.setAlpha((int) (getAlpha() * (shouldTranslucentDeleted() && ayuDeleted ? 255 * 0.75f : 255)));
             currentBackgroundDrawable.setBounds(left, top, right, bottom);
-            currentBackgroundDrawable.drawCached(canvas, backgroundCacheParams);
+            drawFlexyBubble(canvas, currentBackgroundDrawable, null);
             currentBackgroundDrawable.setAlpha(255);
         }
 

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyBubblesTitle">Пузыри сообщений</string>
+    <string name="FlexyBubblesGlass">Стеклянные пузыри</string>
+    <string name="FlexyBubblesTransparency">Прозрачность</string>
+    <string name="FlexyBubblesBorder">Выделять края</string>
+    <string name="FlexyBubblesEdges">Размытие краёв чата</string>
+    <string name="FlexyBubblesInfo">Использует общий кэш размытого фона. Однотонный фон остаётся однотонным; для анимированного или неподдерживаемого фона применяется лёгкое оформление темы. При 100 % сохраняется минимальный оттенок для читаемости. Во время переходов и программного рисования используются непрозрачные пузыри. Размытие краёв учитывает ограничения устройства и энергосбережение.</string>
+</resources>

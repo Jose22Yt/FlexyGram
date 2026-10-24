@@ -214,6 +214,7 @@ public class FilterTabsView extends FrameLayout {
         public ValueAnimator changeAnimator;
         private Tab currentTab;
         private int textHeight;
+        private final app.flexygram.home.SignatureHomeTint signatureHomeTint = new app.flexygram.home.SignatureHomeTint();
         private int tabWidth;
         private float tabCounterVisible;
         private int currentPosition;
@@ -383,21 +384,23 @@ public class FilterTabsView extends FrameLayout {
                 unreadKey = Theme.key_chats_tabUnreadUnactiveBackground;
                 unreadOtherKey = Theme.key_chats_tabUnreadActiveBackground;
             }
-            if (animateToKey < 0) {
-                if ((animatingIndicator || manualScrollingToId != -1) && (currentTab.id == id1 || currentTab.id == id2)) {
-                    textPaint.setColor(ColorUtils.blendARGB(Theme.getColor(otherKey, resourcesProvider), Theme.getColor(key, resourcesProvider), animatingIndicatorProgress));
+            if (!signatureHome) {
+                if (animateToKey < 0) {
+                    if ((animatingIndicator || manualScrollingToId != -1) && (currentTab.id == id1 || currentTab.id == id2)) {
+                        textPaint.setColor(ColorUtils.blendARGB(Theme.getColor(otherKey, resourcesProvider), Theme.getColor(key, resourcesProvider), animatingIndicatorProgress));
+                    } else {
+                        textPaint.setColor(Theme.getColor(key, resourcesProvider));
+                    }
                 } else {
-                    textPaint.setColor(Theme.getColor(key, resourcesProvider));
-                }
-            } else {
-                int color1 = Theme.getColor(key, resourcesProvider);
-                int color2 = Theme.getColor(animateToKey, resourcesProvider);
-                if ((animatingIndicator || manualScrollingToPosition != -1) && (currentTab.id == id1 || currentTab.id == id2)) {
-                    int color3 = Theme.getColor(otherKey, resourcesProvider);
-                    int color4 = Theme.getColor(animateToOtherKey, resourcesProvider);
-                    textPaint.setColor(ColorUtils.blendARGB(ColorUtils.blendARGB(color3, color4, animationValue), ColorUtils.blendARGB(color1, color2, animationValue), animatingIndicatorProgress));
-                } else {
-                    textPaint.setColor(ColorUtils.blendARGB(color1, color2, animationValue));
+                    int color1 = Theme.getColor(key, resourcesProvider);
+                    int color2 = Theme.getColor(animateToKey, resourcesProvider);
+                    if ((animatingIndicator || manualScrollingToPosition != -1) && (currentTab.id == id1 || currentTab.id == id2)) {
+                        int color3 = Theme.getColor(otherKey, resourcesProvider);
+                        int color4 = Theme.getColor(animateToOtherKey, resourcesProvider);
+                        textPaint.setColor(ColorUtils.blendARGB(ColorUtils.blendARGB(color3, color4, animationValue), ColorUtils.blendARGB(color1, color2, animationValue), animatingIndicatorProgress));
+                    } else {
+                        textPaint.setColor(ColorUtils.blendARGB(color1, color2, animationValue));
+                    }
                 }
             }
             if (signatureHome) {
@@ -410,7 +413,9 @@ public class FilterTabsView extends FrameLayout {
                         app.flexygram.home.SignatureHomeStyle.text(dark, false),
                         app.flexygram.home.SignatureHomeStyle.text(dark, true), selected));
             }
-            emojiColorFilter = new PorterDuffColorFilter(textPaint.getColor(), PorterDuff.Mode.SRC_IN);
+            ColorFilter emojiColorFilter = signatureHome
+                    ? signatureHomeTint.get(textPaint.getColor())
+                    : new PorterDuffColorFilter(textPaint.getColor(), PorterDuff.Mode.SRC_IN);
 
             float counterWidth;
             int countWidth;
@@ -923,7 +928,6 @@ public class FilterTabsView extends FrameLayout {
     private final TextPaint textCounterPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
     private final Paint deletePaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
     private final Paint counterPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private ColorFilter emojiColorFilter = new PorterDuffColorFilter(0, PorterDuff.Mode.SRC_IN);
 
     private final ArrayList<Tab> tabs = new ArrayList<>();
 

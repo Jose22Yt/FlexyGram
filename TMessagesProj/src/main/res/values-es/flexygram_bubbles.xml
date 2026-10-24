@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyBubblesTitle">Burbujas de chat</string>
+    <string name="FlexyBubblesGlass">Burbujas de cristal</string>
+    <string name="FlexyBubblesTransparency">Transparencia</string>
+    <string name="FlexyBubblesBorder">Resaltar bordes</string>
+    <string name="FlexyBubblesEdges">Desenfocar bordes del chat</string>
+    <string name="FlexyBubblesInfo">Utiliza el desenfoque del fondo compartido y en caché. Los colores sólidos se mantienen sólidos; los fondos animados o no compatibles usan un tratamiento ligero del tema. Al 100 %, se conserva un tinte mínimo para facilitar la lectura. Durante transiciones y renderizado por software, se utilizan burbujas nativas opacas. El desenfoque de los extremos respeta los límites de desenfoque y ahorro de energía del dispositivo.</string>
+</resources>

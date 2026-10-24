@@ -31737,6 +31737,11 @@ public class ChatActivity extends BaseFragment implements
     @Override
     public void onResume() {
         super.onResume();
+        app.flexygram.bubbles.BubbleConfig.load();
+        if (chatActivityFadeView != null) {
+            chatActivityFadeView.setFlexyEdgeBlur(app.flexygram.bubbles.BubbleConfig.edges(), glassBackgroundDrawableFactoryFrosted);
+        }
+        if (chatListView != null) chatListView.invalidateViews();
         cachedIsGestureNavigation = AndroidUtil.isGestureNavigation(getContext());
         checkShowBlur(false);
         activityResumeTime = System.currentTimeMillis();
@@ -42182,6 +42187,23 @@ public class ChatActivity extends BaseFragment implements
     }
 
     private class ChatMessageCellDelegate implements ChatMessageCell.ChatMessageCellDelegate {
+        @Override
+        public boolean drawFlexyBubbleWallpaper(ChatMessageCell cell, Canvas canvas, android.graphics.Path path) {
+            if (contentView == null || chatListView == null || navbarContentSourceWallpaper.getSource() == null
+                    || !canvas.isHardwareAccelerated() || cell.getAlpha() < 1f || cell.getTranslationX() != 0) return false;
+            if (navbarContentSourceWallpaper.getSource() instanceof BlurredBackgroundSourceBitmap) {
+                Bitmap bitmap = ((BlurredBackgroundSourceBitmap) navbarContentSourceWallpaper.getSource()).getBitmap();
+                if (bitmap == null || bitmap.isRecycled()) return false;
+            }
+            // WallpaperBitmapProvider memoizes a 90x120 image blur. No bitmap or blur work in this draw.
+            int save = canvas.save();
+            canvas.clipPath(path);
+            canvas.translate(-cell.getX() - chatListView.getX(), -cell.getY() - chatListView.getY());
+            navbarContentSourceWallpaper.draw(canvas, 0, 0, contentView.getWidth(), contentView.getHeight());
+            canvas.restoreToCount(save);
+            return true;
+        }
+
         @Override
         public boolean isReplyOrSelf() {
             return UserObject.isReplyUser(currentUser) || UserObject.isUserSelf(currentUser);

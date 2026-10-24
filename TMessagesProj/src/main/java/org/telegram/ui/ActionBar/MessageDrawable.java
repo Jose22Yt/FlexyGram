@@ -31,6 +31,15 @@ import java.util.Arrays;
 
 public class MessageDrawable extends Drawable {
 
+    public interface GlassSource { boolean draw(Canvas canvas, Path path); }
+    private GlassSource flexyGlassSource;
+    private final Paint flexyBorderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    public void setFlexyGlassSource(GlassSource source) { flexyGlassSource = source; }
+    private boolean flexySurface() {
+        return currentType != TYPE_PREVIEW && !isSelected && flexyGlassSource != null
+            && (app.flexygram.bubbles.BubbleConfig.glass() || app.flexygram.bubbles.BubbleConfig.border());
+    }
+
     private Shader gradientShader;
     private int currentBackgroundHeight;
     public Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -561,7 +570,7 @@ public class MessageDrawable extends Drawable {
 
     public void draw(Canvas canvas, Paint paintToUse) {
         Rect bounds = getBounds();
-        if (!oeRemoveMessageTail() && paintToUse == null && paint.getStyle() == Paint.Style.FILL && gradientShader == null && overrideRoundRadius == 0 && overrideRounding <= 0) {
+        if (!flexySurface() && !oeRemoveMessageTail() && paintToUse == null && paint.getStyle() == Paint.Style.FILL && gradientShader == null && overrideRoundRadius == 0 && overrideRounding <= 0) {
             Drawable background = getBackgroundDrawable();
             if (background != null) {
                 background.setBounds(bounds);
@@ -610,7 +619,8 @@ public class MessageDrawable extends Drawable {
         boolean invalidatePath;
         if (pathDrawCacheParams != null) {
             path = pathDrawCacheParams.path;
-            invalidatePath = pathDrawCacheParams.invalidatePath(bounds, drawFullBottom, drawFullTop);
+            invalidatePath = pathDrawCacheParams.invalidatePath(bounds, drawFullBottom, drawFullTop)
+                | pathDrawCacheParams.invalidateShape(rad, nearRad, smallRad, padding, currentType, isTopNear, isBottomNear, botButtonsBottom, drawFullBubble, isOut, paintToUse != null);
         } else {
             path = this.path;
             invalidatePath = true;
@@ -619,7 +629,22 @@ public class MessageDrawable extends Drawable {
             generatePath(path, bounds, padding, rad, smallRad, nearRad, top, drawFullBottom, drawFullTop, paintToUse != null);
         }
 
+        // Only the fill changes. Selection overlays, spoilers and all text/media remain native.
+        final int originalAlpha = p.getAlpha();
+        if (paintToUse == null && flexySurface() && app.flexygram.bubbles.BubbleConfig.glass()
+                && alpha == 255 && flexyGlassSource.draw(canvas, path)) {
+            p.setAlpha(Math.round(originalAlpha * app.flexygram.bubbles.BubbleStyle.tintAlpha(
+                app.flexygram.bubbles.BubbleConfig.transparency()) / 255f));
+        }
         canvas.drawPath(path, p);
+        p.setAlpha(originalAlpha);
+        if (paintToUse == null && flexySurface() && app.flexygram.bubbles.BubbleConfig.border()) {
+            flexyBorderPaint.setStyle(Paint.Style.STROKE);
+            flexyBorderPaint.setStrokeWidth(Math.max(1f, dp(.5f)));
+            flexyBorderPaint.setColor(ColorUtils.setAlphaComponent(getColor(
+                isOut ? Theme.key_chat_outBubbleSelected : Theme.key_chat_inBubbleSelected), Math.round(66 * alpha / 255f)));
+            canvas.drawPath(path, flexyBorderPaint);
+        }
         if (gradientShader != null && isSelected && paintToUse == null) {
             int color = getColor(Theme.key_chat_outBubbleGradientSelectedOverlay);
             selectedPaint.setColor(ColorUtils.setAlphaComponent(color, (int) (Color.alpha(color) * alpha / 255f)));
@@ -663,7 +688,8 @@ public class MessageDrawable extends Drawable {
         boolean invalidatePath;
         if (pathDrawCacheParams != null) {
             path = pathDrawCacheParams.path;
-            invalidatePath = pathDrawCacheParams.invalidatePath(bounds, drawFullBottom, drawFullTop);
+            invalidatePath = pathDrawCacheParams.invalidatePath(bounds, drawFullBottom, drawFullTop)
+                | pathDrawCacheParams.invalidateShape(rad, nearRad, smallRad, padding, currentType, isTopNear, isBottomNear, botButtonsBottom, drawFullBubble, isOut, true);
         } else {
             path = this.path;
             invalidatePath = true;
@@ -901,6 +927,19 @@ public class MessageDrawable extends Drawable {
             lastDrawFullBottom = drawFullBottom;
             lastRect.set(bounds);
             return invalidate;
+        }
+
+        private int lastRad = -1, lastNearRad, lastSmallRad, lastPadding, lastType;
+        private boolean lastTopNear, lastBottomNear, lastBotButtons, lastFull, lastOut, lastCustom;
+        boolean invalidateShape(int rad, int nearRad, int smallRad, int padding, int type,
+                boolean topNear, boolean bottomNear, boolean botButtons, boolean full, boolean out, boolean custom) {
+            boolean changed = lastRad != rad || lastNearRad != nearRad || lastSmallRad != smallRad
+                || lastPadding != padding || lastType != type || lastTopNear != topNear
+                || lastBottomNear != bottomNear || lastBotButtons != botButtons || lastFull != full || lastOut != out || lastCustom != custom;
+            lastRad = rad; lastNearRad = nearRad; lastSmallRad = smallRad; lastPadding = padding;
+            lastType = type; lastTopNear = topNear; lastBottomNear = bottomNear;
+            lastBotButtons = botButtons; lastFull = full; lastOut = out; lastCustom = custom;
+            return changed;
         }
 
         public Path getPath() {

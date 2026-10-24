@@ -59,7 +59,8 @@ public class SettingsRoute {
   for(boolean enabled:new boolean[]{false,true}){
    ChatsConfig.inlineMathResult.flag=enabled;rootClick();check(opened instanceof OpenExteraChatsActivity);
    OpenExteraChatsActivity chats=(OpenExteraChatsActivity)opened;chats.rows();
-   check(chats.inputHeaderRow==chats.linksDividerRow+1);
+   check(chats.flexyBubblesRow==chats.linksDividerRow+1);
+   check(chats.inputHeaderRow==chats.flexyBubblesRow+1);
    check(chats.composerSettingsRow==chats.inputHeaderRow+1);
    check(chats.addCommaRow==chats.composerSettingsRow+1);
    chats.click(chats.composerSettingsRow);

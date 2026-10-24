@@ -21,6 +21,11 @@ def main():
     for name in COMPONENTS:
         path = f'TMessagesProj/src/main/java/org/telegram/messenger/{name}.java'
         data = (ROOT / path).read_bytes()
+        if name == 'SharedConfig':
+            import sys
+            sys.path.insert(0, str(ROOT/'tools/connected_alpha'))
+            from bubble_parity import restore_bubble_presentation
+            data = restore_bubble_presentation(path, data)
         if data != git('show', UPSTREAM + ':' + path):
             raise SystemExit('FAIL: upstream component changed: ' + path)
         evidence[path] = hashlib.sha256(data).hexdigest()

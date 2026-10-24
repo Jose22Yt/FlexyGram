@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyBubblesTitle">Chat bubbles</string>
+    <string name="FlexyBubblesGlass">Glass bubbles</string>
+    <string name="FlexyBubblesTransparency">Transparency</string>
+    <string name="FlexyBubblesBorder">Highlight borders</string>
+    <string name="FlexyBubblesEdges">Blur chat edges</string>
+    <string name="FlexyBubblesInfo">Uses the shared cached wallpaper blur. Solid colours remain solid; animated or unsupported backgrounds use a lightweight theme treatment. At 100%, a minimum theme tint preserves readability. During transitions and software rendering, opaque native bubbles are used. Edge blur follows the existing device blur and power-saving limits.</string>
+</resources>

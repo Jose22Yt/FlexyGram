@@ -192,6 +192,7 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
 
     private int inputHeaderRow = -1;
     private int composerSettingsRow = -1;
+    private int flexyBubblesRow = -1;
     private int inputDividerRow = -1;
     private int searchHeaderRow = -1;
     private int searchDividerRow = -1;
@@ -459,6 +460,7 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
 
         // The conversation composer lives with the existing text-input controls.
         // Keep this near the top, immediately after the native Sections card.
+        flexyBubblesRow = addRow("flexyBubbles");
         inputHeaderRow = addRow("inputHeader");
         composerSettingsRow = addRow("flexyComposerSettings");
         addCommaRow = addRow("addCommaAfterMention");
@@ -1826,6 +1828,9 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
         } else if (position == adminShortcutsRow) {
             toggleQuickAdminShortcuts(view);
             return;
+        } else if (position == flexyBubblesRow) {
+            presentFragment(new app.flexygram.bubbles.BubbleSettingsActivity());
+            return;
         } else if (position == composerSettingsRow) {
             // Navigation only: retain the original composer preferences and implementation.
             presentFragment(new app.flexygram.composer.FlexyComposerSettingsActivity());
@@ -2918,7 +2923,9 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
         }
 
         private void bindText(TextCell cell, int position) {
-            if (position == composerSettingsRow) {
+            if (position == flexyBubblesRow) {
+                cell.setTextAndIcon(getString(R.string.FlexyBubblesTitle), R.drawable.msg_discussion, false);
+            } else if (position == composerSettingsRow) {
                 cell.setTextAndIcon(getString(R.string.FlexySettingsComposerRow), R.drawable.msg_discussion, false);
                 cell.setSubtitle(getString(R.string.FlexySettingsComposerDescription));
             } else if (position == menusRow) {
@@ -3044,7 +3051,7 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
             if (position == doubleTapReactionRow) return TYPE_SET_REACTION;
             if (isHeader(position)) return TYPE_HEADER;
             if (isDivider(position)) return TYPE_INFO_PRIVACY;
-            if (position == composerSettingsRow || position == aiChatRow || position == chatSettingsRow
+            if (position == flexyBubblesRow || position == composerSettingsRow || position == aiChatRow || position == chatSettingsRow
                     || position == menusRow || position == mediaRow) {
                 return TYPE_TEXT;
             }

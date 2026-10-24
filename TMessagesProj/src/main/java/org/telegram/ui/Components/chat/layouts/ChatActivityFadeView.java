@@ -18,6 +18,18 @@ public class ChatActivityFadeView extends View implements Theme.Colorable {
     private BlurredBackgroundWithFadeDrawable fadeDrawableTop;
     private BlurredBackgroundWithFadeDrawable fadeDrawableBottom;
     private int fadeZoneTop, fadeZoneBottom;
+    private BlurredBackgroundWithFadeDrawable flexyEdgeTop, flexyEdgeBottom;
+    private boolean flexyEdges;
+    public void setFlexyEdgeBlur(boolean enabled, BlurredBackgroundDrawableViewFactory source) {
+        if (enabled && flexyEdgeTop == null) {
+            flexyEdgeTop = new BlurredBackgroundWithFadeDrawable(source.create(this));
+            flexyEdgeBottom = new BlurredBackgroundWithFadeDrawable(source.create(this));
+            flexyEdgeTop.setFadeHeight(-dp(28), true);
+            flexyEdgeBottom.setFadeHeight(dp(28), true);
+        }
+        if (flexyEdges != enabled) { flexyEdges = enabled; invalidate(); }
+        checkBounds();
+    }
 
     public ChatActivityFadeView(Context context) {
         super(context);
@@ -93,6 +105,10 @@ public class ChatActivityFadeView extends View implements Theme.Colorable {
     }
     
     private void checkBounds() {
+        if (flexyEdgeTop != null) {
+            flexyEdgeTop.setBounds(0, 0, getMeasuredWidth(), fadeZoneTop);
+            flexyEdgeBottom.setBounds(0, getMeasuredHeight() - fadeZoneBottom, getMeasuredWidth(), getMeasuredHeight());
+        }
         fadeDrawableTop.setBounds(0, 0, getMeasuredWidth(), fadeZoneTop);
         fadeDrawableBottom.setBounds(0, getMeasuredHeight() - fadeZoneBottom, getMeasuredWidth(), getMeasuredHeight());
     }
@@ -110,6 +126,11 @@ public class ChatActivityFadeView extends View implements Theme.Colorable {
     @Override
     protected void onDraw(@NonNull Canvas canvas) {
         super.onDraw(canvas);
+        if (flexyEdges && flexyEdgeTop != null) {
+            flexyEdgeTop.setAlpha(fadeDrawableTop.getAlpha());
+            flexyEdgeTop.draw(canvas);
+            flexyEdgeBottom.draw(canvas);
+        }
         fadeDrawableTop.draw(canvas);
         fadeDrawableBottom.draw(canvas);
     }
