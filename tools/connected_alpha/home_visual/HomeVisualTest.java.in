@@ -67,10 +67,12 @@ public class HomeVisualTest {
   SignatureHomePainter painter=new SignatureHomePainter();
   for(boolean dark:new boolean[]{false,true}) for(boolean glass:new boolean[]{false,true}) {
    Bitmap b=Bitmap.createBitmap(150,50,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(b);
+   painter.category(c,150,50,1,dark,glass,1);int reference=b.getPixel(75,25);
    for(float progress:new float[]{0,.2f,.5f,1}) {
     b.eraseColor(Color.TRANSPARENT);
     painter.category(c,150,50,1,dark,glass,SignatureHomeStyle.selection(3,3,3,true,progress));
-    assertEquals(SignatureHomeStyle.selectedSurface(dark,glass),b.getPixel(75,25));
+    assertEquals(1,SignatureHomeStyle.selection(3,3,3,true,progress),0);
+    assertEquals(reference,b.getPixel(75,25));
    }
   }
  }
