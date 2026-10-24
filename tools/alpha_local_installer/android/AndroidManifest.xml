@@ -1,9 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="io.github.jose22yt.flexygram.delivery.alpha2.ios1265" android:versionCode="1" android:versionName="1.0">
+    package="io.github.jose22yt.flexygram.delivery.home1266" android:versionCode="1" android:versionName="1.0">
     <uses-sdk android:minSdkVersion="30" android:targetSdkVersion="37" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <queries><package android:name="io.github.jose22yt.flexygram.alpha" /></queries>
-    <application android:label="Instalador FlexyGram iOS Compact" android:theme="@android:style/Theme.Material.Light.NoActionBar"
+    <application android:label="Instalador FlexyGram Signature Home" android:theme="@android:style/Theme.Material.Light.NoActionBar"
         android:allowBackup="false" android:fullBackupContent="false" android:extractNativeLibs="true"
         android:debuggable="false" android:usesCleartextTraffic="false">
         <activity android:name=".MainActivity" android:exported="true" android:configChanges="orientation|screenSize|keyboardHidden">
@@ -12,7 +12,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <provider android:name=".VerifiedApkProvider" android:authorities="io.github.jose22yt.flexygram.delivery.alpha2.ios1265.files"
+        <provider android:name=".VerifiedApkProvider" android:authorities="io.github.jose22yt.flexygram.delivery.home1266.files"
             android:exported="false" android:grantUriPermissions="true" />
     </application>
 </manifest>
