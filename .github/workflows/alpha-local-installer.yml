@@ -21,6 +21,7 @@ jobs:
           persist-credentials: false
           sparse-checkout: |
             tools/alpha_local_installer
+            .github/workflows/alpha-local-installer.yml
             LICENSE
           sparse-checkout-cone-mode: false
       - uses: actions/setup-java@v4
