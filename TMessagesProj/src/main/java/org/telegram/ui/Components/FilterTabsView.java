@@ -78,6 +78,24 @@ import tw.nekomimi.nekogram.folder.FolderIconHelper;
 
 @SuppressLint("ViewConstructor")
 public class FilterTabsView extends FrameLayout {
+    private boolean signatureHome;
+    private boolean signatureHomeOpaquePreview;
+
+    /** Settings-only solid sample; never changes the global Liquid Glass preference. */
+    public void setSignatureHomeOpaquePreview(boolean opaque) {
+        if (signatureHomeOpaquePreview == opaque) return;
+        signatureHomeOpaquePreview = opaque;
+        invalidate();
+    }
+    private final app.flexygram.home.SignatureHomePainter signatureHomePainter = new app.flexygram.home.SignatureHomePainter();
+
+    public void setSignatureHome(boolean enabled) {
+        if (signatureHome == enabled) return;
+        signatureHome = enabled;
+        requestLayout();
+        invalidate();
+    }
+
 
     private final Theme.ResourcesProvider resourcesProvider;
 
@@ -315,7 +333,7 @@ public class FilterTabsView extends FrameLayout {
 
         @Override
         protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-            int w = currentTab.getWidth(false) + dp(FolderIconHelper.getTabPadding()) + additionalTabWidth;
+            int w = currentTab.getWidth(false) + dp(getTabPadding()) + additionalTabWidth;
             setMeasuredDimension(w, MeasureSpec.getSize(heightMeasureSpec));
         }
 
@@ -381,6 +399,16 @@ public class FilterTabsView extends FrameLayout {
                 } else {
                     textPaint.setColor(ColorUtils.blendARGB(color1, color2, animationValue));
                 }
+            }
+            if (signatureHome) {
+                boolean dark = resourcesProvider != null ? resourcesProvider.isDark() : Theme.isCurrentThemeDark();
+                float selected = app.flexygram.home.SignatureHomeStyle.selection(currentTab.id, id1, id2,
+                        animatingIndicator || manualScrollingToId != -1, animatingIndicatorProgress);
+                signatureHomePainter.category(canvas, getMeasuredWidth(), getMeasuredHeight(), AndroidUtilities.density,
+                        dark, !signatureHomeOpaquePreview && org.telegram.messenger.LiteMode.isEnabled(org.telegram.messenger.LiteMode.FLAG_LIQUID_GLASS), selected);
+                textPaint.setColor(app.flexygram.home.SignatureHomePainter.blend(
+                        app.flexygram.home.SignatureHomeStyle.text(dark, false),
+                        app.flexygram.home.SignatureHomeStyle.text(dark, true), selected));
             }
             emojiColorFilter = new PorterDuffColorFilter(textPaint.getColor(), PorterDuff.Mode.SRC_IN);
 
@@ -1412,7 +1440,7 @@ public class FilterTabsView extends FrameLayout {
         Tab tab = new Tab(id, text(text, entities), emoticon, noanimate);
         tab.isDefault = isDefault;
         tab.isLocked = isLocked;
-        allTabsWidth += tab.getWidth(true) + dp(FolderIconHelper.getTabPadding());
+        allTabsWidth += tab.getWidth(true) + dp(getTabPadding());
         tabs.add(tab);
     }
 
@@ -1431,7 +1459,7 @@ public class FilterTabsView extends FrameLayout {
         Tab tab = new Tab(id, text, emoticon, noanimate);
         tab.isDefault = isDefault;
         tab.isLocked = isLocked;
-        allTabsWidth += tab.getWidth(true) + dp(FolderIconHelper.getTabPadding());
+        allTabsWidth += tab.getWidth(true) + dp(getTabPadding());
         tabs.add(tab);
     }
 
@@ -1515,6 +1543,11 @@ public class FilterTabsView extends FrameLayout {
         return selectorColorKey;
     }
 
+    private float getTabPadding() {
+        // 12 dp inner breathing room per side plus a 6 dp visible separation.
+        return signatureHome ? Math.max(30f, FolderIconHelper.getTabPadding()) : FolderIconHelper.getTabPadding();
+    }
+
     private void updateTabsWidths() {
         positionToX.clear();
         positionToWidth.clear();
@@ -1525,7 +1558,7 @@ public class FilterTabsView extends FrameLayout {
             positionToWidth.put(a, tabWidth);
             positionToCount.put(a, tabs.get(a).counter);
             positionToX.put(a, xOffset + additionalTabWidth / 2);
-            xOffset += tabWidth + dp(FolderIconHelper.getTabPadding()) + additionalTabWidth;
+            xOffset += tabWidth + dp(getTabPadding()) + additionalTabWidth;
         }
     }
 
@@ -1589,6 +1622,7 @@ public class FilterTabsView extends FrameLayout {
     }
 
     private void drawSelector(Canvas canvas) {
+        if (signatureHome) return;
         final int height = getMeasuredHeight();
         selectorDrawable.setAlpha((int) (255 * listView.getAlpha()));
         float indicatorX = 0;
@@ -1614,7 +1648,7 @@ public class FilterTabsView extends FrameLayout {
                     int newW = positionToWidth.get(idx2);
                     float prevH = positionToCount.get(idx1) != 0 ? 1 : 0;
                     float newH = positionToCount.get(idx2) != 0 ? 1 : 0;
-                    float padding = FolderIconHelper.getTabPadding();
+                    float padding = getTabPadding();
                     if (additionalTabWidth != 0) {
                         indicatorX = lerp(prevX, newX, animatingIndicatorProgress) + dp(padding / 2f);
                     } else {
@@ -1673,6 +1707,10 @@ public class FilterTabsView extends FrameLayout {
 
     @Override
     protected void dispatchDraw(@NonNull Canvas canvas) {
+        if (signatureHome) {
+            super.dispatchDraw(canvas);
+            return;
+        }
         canvas.save();
         canvas.clipPath(clipPath);
         super.dispatchDraw(canvas);
@@ -1702,7 +1740,7 @@ public class FilterTabsView extends FrameLayout {
                 trueTabsWidth = allTabsWidth;
             }
             int prevWidth = additionalTabWidth;
-            additionalTabWidth = trueTabsWidth < width ? (width - trueTabsWidth) / tabs.size() : 0;
+            additionalTabWidth = !signatureHome && trueTabsWidth < width ? (width - trueTabsWidth) / tabs.size() : 0;
             if (prevWidth != additionalTabWidth) {
                 ignoreLayout = true;
                 RecyclerView.ItemAnimator animator = listView.getItemAnimator();
@@ -1882,7 +1920,7 @@ public class FilterTabsView extends FrameLayout {
                     defaultTab.setTitle(LocaleController.getString(R.string.FilterAllChats), null, false);
                 }
                 for (int b = 0; b < N; b++) {
-                    allTabsWidth += tabs.get(b).getWidth(true) + dp(FolderIconHelper.getTabPadding());
+                    allTabsWidth += tabs.get(b).getWidth(true) + dp(getTabPadding());
                 }
                 break;
             }
@@ -1918,7 +1956,7 @@ public class FilterTabsView extends FrameLayout {
                 defaultTab.setTitle(LocaleController.getString(R.string.FilterAllChats), null, false);
             }
             for (int b = 0, N = tabs.size(); b < N; b++) {
-                allTabsWidth += tabs.get(b).getWidth(true) + dp(FolderIconHelper.getTabPadding());
+                allTabsWidth += tabs.get(b).getWidth(true) + dp(getTabPadding());
             }
         }
     }
