@@ -1,15 +1,9 @@
-# Instalador privado — Alpha 2 integrada
+# Instalador offline — Signature Home 2
 
-Perfil independiente del instalador anterior del PR #75. El auxiliar usa `io.github.jose22yt.flexygram.delivery.alpha2.integrated1267`; puede coexistir con el auxiliar antiguo aunque su firma de pruebas sea distinta. La aplicación destino conserva `io.github.jose22yt.flexygram.alpha`, certificado original y versión 1267.
+Perfil independiente basado en PR77, compatible únicamente con la entrega1268 del HEAD cb2c98234aa7e88550853d54132e52d629b2674f. Mantiene el paquete y certificado originales de Alpha para actualizar sin borrar su sesión. El auxiliar tiene paquete propio para coexistir con los anteriores.
 
-La entrega queda bloqueada mientras APKHash o CipherHash no contengan hashes reales verificados. Solo se aceptan el APK, cifrado y commit fijados en el perfil. Se exige EOF autenticado de age, tar con exactamente APK e informe, inventario de 96 ELF y certificado SHA-256 original explícito. Se rechazan los informes de versiones anteriores y los certificados distintos. Se conserva la política de firmante instalado y prohibición de degradación antes del instalador Android.
+Instala FlexyGram-SignatureHome2-Instalador.apk; selecciona FlexyGram-SignatureHome2-ARM64.tar.age y la identidad age original local, pulsa Descifrar y comprobar y después Actualizar. No se solicita el ZIP privado por red. No tiene permiso INTERNET ni acceso general al almacenamiento.
 
-El auxiliar no tiene permiso INTERNET ni acceso general al almacenamiento. La identidad age se selecciona mediante Android SAF y solo se procesa en memoria; no se guarda ni se transmite. No incluye la identidad ni la clave de firma de Alpha. La compilación del auxiliar utiliza su propia firma temporal de pruebas.
+Se conservan los controles originales: hash del cifrado, destinatario original, autenticación age hasta EOF, tar estricto, hash de APK, informe,96 ELF, paquete, versión y certificado. Rechaza firmas incompatibles y versiones posteriores instaladas. Los pins se fijan después de verificar la compilación real; el gate bloquea la construcción si faltan. Los ensayos utilizan identidades desechables exclusivas de pruebas.
 
-Archivos de prueba: `FlexyGram-Alpha2-Integrada-Instalador.apk` y `FlexyGram-Alpha2-Integrada-1267-arm64.tar.age`. Seleccionar también la identidad age original de la recuperación privada. El destinatario público no permite descifrar. El auxiliar comprueba los archivos antes de ofrecer la actualización; Android vuelve a verificar la firma.
-
-Las pruebas del auxiliar en emulador no certifican el compositor real. Instalación y diseño en Poco X8 Pro / Android 17 siguen pendientes de prueba del propietario.
-
-Entrega1267 compilada y verificada en Actions40060346675. La barra aprobada del PR74 permanece idéntica.
-
-SHA256 APK `48abf0f8a32fb36b28de87f17955df922ba3ca643c4a2d35dbb0c86c543ac67c`; cifrado `ae9b7bbbc22757096cd33e78bf0d726d4865581f1fdae12fd915935bf1585828`.
+La prueba física de actualización y fluidez en Poco Android17 sigue pendiente; un emulador del auxiliar no la sustituye. No publiques la APK Alpha descifrada ni la identidad privada.
