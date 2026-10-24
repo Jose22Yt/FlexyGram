@@ -7,6 +7,7 @@ import shutil
 import subprocess
 import tempfile
 import unittest
+from check_source import restore_home_presentation
 from xml.etree import ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -25,6 +26,21 @@ def body(source, anchor):
     return source[start:pos+1]
 
 class SignatureHomeTests(unittest.TestCase):
+    def test_visual_patch_restores_exact_original_and_rejects_native_mutation(self):
+        path=ROOT/'TMessagesProj/src/main/java/org/telegram/ui/DialogsActivity.java'
+        data=path.read_bytes()
+        restored=restore_home_presentation(data)
+        expected='6cb070e30b4ec5c435d9a0fc6da09ac534575694214673b9eba8f9bf251b0768'
+        self.assertEqual(hashlib.sha256(restored).hexdigest(),expected)
+        # An unrelated change must either fail patch application or fail parity.
+        mutated=data.replace(b'public boolean onBackPressed(boolean invoked)',
+                             b'public boolean onBackPressed(boolean unrelated)',1)
+        try:
+            result=restore_home_presentation(mutated)
+        except ValueError:
+            return
+        self.assertNotEqual(hashlib.sha256(result).hexdigest(),expected)
+
     def test_original_search_menu_back_and_filter_actions_unchanged(self):
         for path, anchor, expected in BEHAVIOR_PINS:
             with self.subTest(anchor=anchor):
@@ -123,6 +139,8 @@ public class HomePolicyProbe {
             '.github/workflows/connected-alpha-arm64.yml',
             'tools/connected_alpha/test_signature_home.py',
             'tools/connected_alpha/test_signature_custom.py',
+            'tools/connected_alpha/check_source.py',
+            'tools/connected_alpha/signature_home_dialogs.patch',
             'tools/connected_alpha/home_visual/run.py',
             'tools/connected_alpha/home_visual/pom.xml',
             'tools/connected_alpha/home_visual/HomeVisualTest.java.in',

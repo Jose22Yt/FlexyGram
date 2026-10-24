@@ -1,0 +1,122 @@
+--- a/TMessagesProj/src/main/java/org/telegram/ui/DialogsActivity.java
++++ b/TMessagesProj/src/main/java/org/telegram/ui/DialogsActivity.java
+@@ -11,6 +11,8 @@
+ import app.exteraless.appearance.AppearanceConfig;
+ import app.exteraless.components.TranslateBeforeSendWrapper;
+ import app.exteraless.drawer.DrawerContainer;
++import app.flexygram.home.SignatureHomePainter;
++import app.flexygram.home.SignatureHomeStyle;
+ import app.exteraless.drawer.MainMenuHelper;
+ import app.exteraless.drawer.MainMenuItem;
+ import app.exteraless.drawer.MainMenuLayout;
+@@ -3234,6 +3236,42 @@
+     @Override
+     public ActionBar createActionBar(Context context) {
+         ActionBar actionBar = new ActionBar(context, resourceProvider) {
++            private final SignatureHomePainter signatureHomePainter = new SignatureHomePainter();
++            private final PorterDuffColorFilter signatureHomeLightInk = new PorterDuffColorFilter(
++                    SignatureHomeStyle.text(false, false), PorterDuff.Mode.SRC_IN);
++            private final PorterDuffColorFilter signatureHomeDarkInk = new PorterDuffColorFilter(
++                    SignatureHomeStyle.text(true, false), PorterDuff.Mode.SRC_IN);
++
++            @Override
++            protected void dispatchDraw(Canvas canvas) {
++                // Only the main screen owns this presentation. Native search,
++                // selection and right-hand chat preview keep their original glass.
++                boolean home = isSignatureHome() && !inPreviewMode
++                        && progressToActionMode == 0 && !isActionModeShowed()
++                        && searchAnimationProgress == 0 && getRightSlidingProgress() == 0;
++                setDrawGlassTitle(!home);
++                doNotDrawGlassMenu = home;
++                super.dispatchDraw(canvas);
++            }
++
++            private void drawSignatureHomeControl(Canvas canvas, View item) {
++                if (item == null || item.getVisibility() != View.VISIBLE || menu == null) return;
++                boolean dark = resourceProvider != null ? resourceProvider.isDark() : Theme.isCurrentThemeDark();
++                // Native themes may use white action-bar icons on a light Home.
++                // Cache the two filters and reapply only when a theme update replaces one.
++                if (item instanceof ActionBarMenuItem) {
++                    android.widget.ImageView icon = ((ActionBarMenuItem) item).getIconView();
++                    PorterDuffColorFilter ink = dark ? signatureHomeDarkInk : signatureHomeLightInk;
++                    if (icon != null && icon.getColorFilter() != ink) icon.setColorFilter(ink);
++                }
++                float diameter = SignatureHomeStyle.controlDiameter(item.getWidth(), item.getHeight(), AndroidUtilities.density);
++                signatureHomePainter.control(canvas,
++                        menu.getX() + item.getX() + item.getWidth() / 2f,
++                        menu.getY() + item.getY() + item.getHeight() / 2f,
++                        diameter * Math.min(item.getScaleX(), item.getScaleY()), AndroidUtilities.density,
++                        dark, LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS), item.getAlpha() * menu.getAlpha());
++            }
++
+ 
+             @Override
+             public void setTranslationY(float translationY) {
+@@ -3252,6 +3290,11 @@
+             protected boolean drawChild(Canvas canvas, View child, long drawingTime) {
+                 if (inPreviewMode && avatarContainer != null && child != avatarContainer) {
+                     return false;
++                }
++                if (isSignatureHome() && child == menu && progressToActionMode == 0
++                        && !isActionModeShowed() && getRightSlidingProgress() == 0) {
++                    drawSignatureHomeControl(canvas, searchItem);
++                    drawSignatureHomeControl(canvas, optionsItem);
+                 }
+                 return super.drawChild(canvas, child, drawingTime);
+             }
+@@ -3356,7 +3399,7 @@
+ 
+         ActionBarMenu menu = actionBar.createMenu();
+         menu.setTranslationX(-dp(5));
+-        searchItem = menu.addItem(0, R.drawable.outline_header_search).setIsSearchField(true, false);
++        searchItem = menu.addItem(0, isSignatureHome() ? R.drawable.flexy_home_search : R.drawable.outline_header_search).setIsSearchField(true, false);
+         searchItem.setOnClickListener(v -> {
+             showSearch(true, false, true);
+             fragmentSearchFieldWatcher.toggleSearch(true);
+@@ -3579,7 +3622,7 @@
+         fragmentSearchFieldWatcher.setDoNotCloseAfterFieldEmpty();
+ 
+         if (initialDialogsType == DIALOGS_TYPE_DEFAULT) {
+-            optionsItem = menu.addItem(4, R.drawable.ic_ab_other);
++            optionsItem = menu.addItem(4, isSignatureHome() ? R.drawable.flexy_home_more : R.drawable.ic_ab_other);
+             optionsItem.setContentDescription(LocaleController.getString(R.string.AccDescrMoreOptions));
+             optionsItem.setOnClickListener(v -> {
+                 getContactsController().loadGlobalPrivacySetting();
+@@ -3736,6 +3779,7 @@
+                     }
+                 }
+             };
++            filterTabsView.setSignatureHome(isSignatureHome());
+             filterTabsView.setVisibility(View.GONE);
+             canShowFilterTabsView = false;
+             animatorFilterTabsVisible.setValue(false, false);
+@@ -5379,8 +5423,10 @@
+             BlurredBackgroundDrawable filterTabsViewBackground = iBlur3FactoryLiquidGlass.create(filterTabsView, BlurredBackgroundProviderImpl.topPanel(resourceProvider));
+             filterTabsViewBackground.setRadius(dp(18));
+             filterTabsViewBackground.setPadding(dp(6.666f));
+-            filterTabsView.setPadding(0, dp(7), 0, dp(7));
+-            filterTabsView.setBlurredBackground(filterTabsViewBackground);
++            filterTabsView.setPadding(0, isSignatureHome() ? 0 : dp(7), 0, isSignatureHome() ? 0 : dp(7));
++            // Individual category surfaces are painted in each existing tab.
++            // The shared rectangle remains only for other uses of FilterTabsView.
++            if (!isSignatureHome()) filterTabsView.setBlurredBackground(filterTabsViewBackground);
+             contentView.addView(filterTabsView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 36 + 7 + 7, Gravity.TOP, 4, 0, 4, 0));
+         }
+ 
+@@ -15057,8 +15103,15 @@
+         }
+     }
+ 
++    public boolean isSignatureHome() {
++        return !onlySelect && initialDialogsType == DIALOGS_TYPE_DEFAULT
++                && folderId == 0 && communityId == 0 && searchString == null;
++    }
++
+     private boolean shouldShowIdleSearchField() {
+-        return !NaConfig.INSTANCE.getHideDialogsSearchField().Bool();
++        // Use the existing search button and search field transition; reserve no
++        // second, idle search row in Signature Home.
++        return !isSignatureHome() && !NaConfig.INSTANCE.getHideDialogsSearchField().Bool();
+     }
+ 
+     private int getIdleSearchFieldHeight() {

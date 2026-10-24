@@ -3237,6 +3237,10 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     public ActionBar createActionBar(Context context) {
         ActionBar actionBar = new ActionBar(context, resourceProvider) {
             private final SignatureHomePainter signatureHomePainter = new SignatureHomePainter();
+            private final PorterDuffColorFilter signatureHomeLightInk = new PorterDuffColorFilter(
+                    SignatureHomeStyle.text(false, false), PorterDuff.Mode.SRC_IN);
+            private final PorterDuffColorFilter signatureHomeDarkInk = new PorterDuffColorFilter(
+                    SignatureHomeStyle.text(true, false), PorterDuff.Mode.SRC_IN);
 
             @Override
             protected void dispatchDraw(Canvas canvas) {
@@ -3253,6 +3257,13 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             private void drawSignatureHomeControl(Canvas canvas, View item) {
                 if (item == null || item.getVisibility() != View.VISIBLE || menu == null) return;
                 boolean dark = resourceProvider != null ? resourceProvider.isDark() : Theme.isCurrentThemeDark();
+                // Native themes may use white action-bar icons on a light Home.
+                // Cache the two filters and reapply only when a theme update replaces one.
+                if (item instanceof ActionBarMenuItem) {
+                    android.widget.ImageView icon = ((ActionBarMenuItem) item).getIconView();
+                    PorterDuffColorFilter ink = dark ? signatureHomeDarkInk : signatureHomeLightInk;
+                    if (icon != null && icon.getColorFilter() != ink) icon.setColorFilter(ink);
+                }
                 float diameter = SignatureHomeStyle.controlDiameter(item.getWidth(), item.getHeight(), AndroidUtilities.density);
                 signatureHomePainter.control(canvas,
                         menu.getX() + item.getX() + item.getWidth() / 2f,
