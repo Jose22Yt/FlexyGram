@@ -347,14 +347,19 @@ index bf02baf94..ba4f9920e 100644
          seekBarView.setDelegate(new SeekBarView.SeekBarViewDelegate() {
              @Override
 diff --git a/TMessagesProj/src/main/java/app/exteraless/appicons/AppIconCell.java b/TMessagesProj/src/main/java/app/exteraless/appicons/AppIconCell.java
-index b0b6e1ad4..2299ff60e 100644
+index b0b6e1ad4..ad8534c67 100644
 --- a/TMessagesProj/src/main/java/app/exteraless/appicons/AppIconCell.java
 +++ b/TMessagesProj/src/main/java/app/exteraless/appicons/AppIconCell.java
-@@ -62,7 +62,7 @@ public class AppIconCell extends LinearLayout {
-         title.setMaxLines(2);
+@@ -59,10 +59,10 @@ public class AppIconCell extends LinearLayout {
+         addView(previewContainer, LayoutHelper.createLinear(68, 68, Gravity.CENTER_HORIZONTAL));
+ 
+         title = new TextView(context);
+-        title.setMaxLines(2);
++        title.setMaxLines(Integer.MAX_VALUE);
          title.setGravity(Gravity.CENTER);
-         title.setEllipsize(TextUtils.TruncateAt.END);
+-        title.setEllipsize(TextUtils.TruncateAt.END);
 -        title.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 13);
++        title.setEllipsize(null);
 +        title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
          title.setLineSpacing(0, 0.95f);
          title.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText, resourcesProvider));
@@ -569,7 +574,7 @@ index de5f93398..a241aca0f 100644
          canvas.save();
          canvas.translate((getWidth() - size) / 2f, (getHeight() - size) / 2f);
 diff --git a/TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraChatsActivity.java b/TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraChatsActivity.java
-index c55273493..0b6f8344b 100644
+index c55273493..8d86978a6 100644
 --- a/TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraChatsActivity.java
 +++ b/TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraChatsActivity.java
 @@ -80,15 +80,18 @@ import xyz.nextalone.nagram.helper.DoubleTap;
@@ -679,7 +684,29 @@ index c55273493..0b6f8344b 100644
              case SCREEN_HIDING:
                  return getString(R.string.OEAppearanceHiding);
              default:
-@@ -877,7 +901,7 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
+@@ -809,6 +833,10 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
+     @Override
+     public int getSearchGuid() {
+         switch (screen) {
++            case SCREEN_SIGNATURE_MESSAGES:
++                return 29400;
++            case SCREEN_SIGNATURE_STICKERS:
++                return 29500;
+             case SCREEN_MENUS:
+                 return 29100;
+             case SCREEN_MEDIA:
+@@ -842,6 +870,10 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
+     @Override
+     protected String getKey() {
+         switch (screen) {
++            case SCREEN_SIGNATURE_MESSAGES:
++                return "flexy_signature_messages";
++            case SCREEN_SIGNATURE_STICKERS:
++                return "flexy_signature_stickers";
+             case SCREEN_MENUS:
+                 return "exteraless_menus";
+             case SCREEN_MEDIA:
+@@ -877,7 +909,7 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
          View view = super.createView(context);
          // Кнопка сброса размера стикеров в шапке: появляется, как только
          // размер отличается от стандартного.
@@ -688,7 +715,7 @@ index c55273493..0b6f8344b 100644
              resetItem = actionBar.createMenu().addItem(0, R.drawable.msg_reset);
              resetItem.setContentDescription(getString(R.string.Reset));
              // Только через updateViewVisibilityAnimated: она проставляет и видимость,
-@@ -1828,6 +1852,12 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
+@@ -1828,6 +1860,12 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
          } else if (position == adminShortcutsRow) {
              toggleQuickAdminShortcuts(view);
              return;
@@ -697,11 +724,11 @@ index c55273493..0b6f8344b 100644
 +        } else if (position == signatureStickersRow) {
 +            presentFragment(new OpenExteraChatsActivity(SCREEN_SIGNATURE_STICKERS)); return;
 +        } else if (position == signatureThemeRow) {
-+            presentFragment(new ThemeActivity(ThemeActivity.THEME_TYPE_THEMES_BROWSER)); return;
++            presentFragment(new app.flexygram.settings.SignatureChatThemeActivity()); return;
          } else if (position == flexyBubblesRow) {
              presentFragment(new app.flexygram.bubbles.BubbleSettingsActivity());
              return;
-@@ -2280,7 +2310,7 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
+@@ -2280,7 +2318,7 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
              addView(edges, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT,
                      LayoutHelper.WRAP_CONTENT, Gravity.LEFT | Gravity.TOP, 21, 52, 21, 0));
  
@@ -710,7 +737,7 @@ index c55273493..0b6f8344b 100644
              sizeBar.setReportChanges(true);
              sizeBar.setSeparatorsCount(endStickerSize - startStickerSize + 1);
              sizeBar.setDelegate((stop, progress) -> {
-@@ -2327,7 +2357,7 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
+@@ -2327,7 +2365,7 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
          }
      }
  
@@ -719,7 +746,7 @@ index c55273493..0b6f8344b 100644
  
          public ListAdapter(Context context) {
              super(context);
-@@ -2338,6 +2368,9 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
+@@ -2338,6 +2376,9 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
          public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
              View view;
              switch (viewType) {
@@ -729,7 +756,7 @@ index c55273493..0b6f8344b 100644
                  case TYPE_STICKER_SIZE:
                      stickerSizeCell = new StickerSizeCell(mContext);
                      stickerSizeCell.setBackgroundColor(getThemedColor(Theme.key_windowBackgroundWhite));
-@@ -2395,6 +2428,7 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
+@@ -2395,6 +2436,7 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
          @Override
          public boolean isEnabled(RecyclerView.ViewHolder holder) {
              int type = holder.getItemViewType();
@@ -737,7 +764,7 @@ index c55273493..0b6f8344b 100644
              if (type == TYPE_STICKER_SIZE || type == TYPE_STICKER_SHAPE || type == TYPE_DOUBLE_TAP
                      || type == TYPE_WIDE_CHANNEL_PREVIEW) {
                  return false;
-@@ -2421,6 +2455,14 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
+@@ -2421,6 +2463,14 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
          @Override
          public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, boolean partial) {
              switch (holder.getItemViewType()) {
@@ -752,7 +779,7 @@ index c55273493..0b6f8344b 100644
                  case TYPE_SET_REACTION:
                      ((DoubleTapCell.SetReactionCell) holder.itemView).update(false);
                      break;
-@@ -2923,23 +2965,29 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
+@@ -2923,23 +2973,29 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
          }
  
          private void bindText(TextCell cell, int position) {
@@ -787,7 +814,7 @@ index c55273493..0b6f8344b 100644
              }
              // Обе строки двухстрочные: подпись под заголовком, высота 64,
              // отступ текста от иконки 60. Ставится после setTextAndIcon —
-@@ -3044,6 +3092,7 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
+@@ -3044,6 +3100,7 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
  
          @Override
          public int getItemViewType(int position) {
@@ -795,7 +822,7 @@ index c55273493..0b6f8344b 100644
              if (position == stickerSizeRow) return TYPE_STICKER_SIZE;
              if (position == stickerShapeRow) return TYPE_STICKER_SHAPE;
              if (position == doubleTapRow) return TYPE_DOUBLE_TAP;
-@@ -3051,7 +3100,7 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
+@@ -3051,7 +3108,7 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
              if (position == doubleTapReactionRow) return TYPE_SET_REACTION;
              if (isHeader(position)) return TYPE_HEADER;
              if (isDivider(position)) return TYPE_INFO_PRIVACY;

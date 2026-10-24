@@ -59,9 +59,9 @@ public class AppIconCell extends LinearLayout {
         addView(previewContainer, LayoutHelper.createLinear(68, 68, Gravity.CENTER_HORIZONTAL));
 
         title = new TextView(context);
-        title.setMaxLines(2);
+        title.setMaxLines(Integer.MAX_VALUE);
         title.setGravity(Gravity.CENTER);
-        title.setEllipsize(TextUtils.TruncateAt.END);
+        title.setEllipsize(null);
         title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         title.setLineSpacing(0, 0.95f);
         title.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText, resourcesProvider));

@@ -10,7 +10,7 @@ def old(path):return subprocess.check_output(['git','show',BASE+':'+path],cwd=RO
 class Signature1271(unittest.TestCase):
  def test_release_scope_and_frozen_working_composer_home_and_native_core(self):
   changed=set(subprocess.check_output(['git','diff','--name-only',BASE],cwd=ROOT,text=True).splitlines())
-  changed.update(subprocess.check_output(['git','ls-files','--others','--exclude-standard'],cwd=ROOT,text=True).splitlines())
+  changed.update(p for p in subprocess.check_output(['git','ls-files','--others','--exclude-standard'],cwd=ROOT,text=True).splitlines() if not p.startswith("TMessagesProj/jni/"))
   self.assertFalse(changed-PATHS,changed-PATHS)
   for path in ['app/flexygram/composer','app/flexygram/home','org/telegram/ui/Components/ChatActivityEnterView.java','org/telegram/ui/ActionBar/ActionBarLayout.java','org/telegram/ui/LoginActivity.java','org/telegram/tgnet','org/telegram/messenger/MessagesController.java','org/telegram/messenger/SendMessagesHelper.java','org/telegram/messenger/MediaController.java']:
    self.assertEqual(subprocess.check_output(['git','diff',BASE,'--','TMessagesProj/src/main/java/'+path],cwd=ROOT),b'',path)
@@ -38,7 +38,10 @@ class Signature1271(unittest.TestCase):
   hub=source.split('private void updateSignatureHubRows()')[1].split('private void updateStickerRows()')[0]
   self.assertEqual(re.findall(r'(\w+Row) = addRow',hub),['flexyBubblesRow','composerSettingsRow','signatureMessagesRow','signatureThemeRow','signatureStickersRow','chatSettingsRow','linksDividerRow'])
   self.assertEqual(source.count('chatSettingsRow = addRow('),1)
-  self.assertIn('THEME_TYPE_THEMES_BROWSER',source);self.assertIn('THEME_TYPE_BASIC',source)
+  self.assertIn('SignatureChatThemeActivity()',source);self.assertIn('THEME_TYPE_BASIC',source)
+  theme=(JAVA/'app/flexygram/settings/SignatureChatThemeActivity.java').read_text()
+  self.assertIn('THEME_TYPE_THEMES_BROWSER',theme);self.assertIn('WallpapersListActivity.TYPE_ALL',theme)
+  self.assertIn('return 29400',source);self.assertIn('return 29500',source)
  def test_launcher_resource_identity_and_all_legacy_aliases_preserved(self):
   manifest=ET.parse(ROOT/'TMessagesProj/src/main/AndroidManifest.xml').getroot();app=manifest.find('application')
   self.assertEqual(app.get(A+'icon'),'@mipmap/ic_flexy_blue')

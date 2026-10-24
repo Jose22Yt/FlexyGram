@@ -833,6 +833,10 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
     @Override
     public int getSearchGuid() {
         switch (screen) {
+            case SCREEN_SIGNATURE_MESSAGES:
+                return 29400;
+            case SCREEN_SIGNATURE_STICKERS:
+                return 29500;
             case SCREEN_MENUS:
                 return 29100;
             case SCREEN_MEDIA:
@@ -866,6 +870,10 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
     @Override
     protected String getKey() {
         switch (screen) {
+            case SCREEN_SIGNATURE_MESSAGES:
+                return "flexy_signature_messages";
+            case SCREEN_SIGNATURE_STICKERS:
+                return "flexy_signature_stickers";
             case SCREEN_MENUS:
                 return "exteraless_menus";
             case SCREEN_MEDIA:
@@ -1857,7 +1865,7 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
         } else if (position == signatureStickersRow) {
             presentFragment(new OpenExteraChatsActivity(SCREEN_SIGNATURE_STICKERS)); return;
         } else if (position == signatureThemeRow) {
-            presentFragment(new ThemeActivity(ThemeActivity.THEME_TYPE_THEMES_BROWSER)); return;
+            presentFragment(new app.flexygram.settings.SignatureChatThemeActivity()); return;
         } else if (position == flexyBubblesRow) {
             presentFragment(new app.flexygram.bubbles.BubbleSettingsActivity());
             return;
