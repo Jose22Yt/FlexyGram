@@ -35,7 +35,9 @@ class FlexySettingsIdentity(unittest.TestCase):
         self.assertIn('channelRow = addRow("flexyOfficialChannel")', self.java)
         self.assertIn("holder.getAdapterPosition() != channelRow", self.java)
         self.assertIn("R.string.FlexySettingsComingSoon", self.java)
-        self.assertNotIn("else if (position == channelRow)", self.java)
+        click_handler = self.java.split("protected void onItemClick(View view, int position, float x, float y) {", 1)[1].split("private void showFlexyAbout()", 1)[0]
+        self.assertNotIn("else if (position == channelRow)", click_handler)
+        self.assertIn("else if (position == channelRow)", self.java)  # display row exists
 
     def test_information_and_composer_are_independent_from_native_composer(self):
         for expected in (
