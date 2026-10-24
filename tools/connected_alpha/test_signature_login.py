@@ -87,7 +87,7 @@ class SignatureLoginTests(unittest.TestCase):
     else:self.assertEqual(reviewed_work1(path),subprocess.check_output(['git','show',WORK1+':'+path],cwd=ROOT),path)
  def test_variant_identity_override_preserves_internal_keys_and_legal_resources(self):
   root=ET.parse(ROOT/'TMessagesProj/src/connectedAlpha/res/values/flexygram_identity.xml').getroot()
-  self.assertEqual({x.get('name'):x.text for x in root},{'NagramX':'FlexyGram'})
+  self.assertEqual({x.get('name'):x.text for x in root},{'NagramX':'FlexyGram Alpha'})
   for locale in ('values','values-es','values-ru'):
    path=f'TMessagesProj/src/main/res/{locale}/flexygram_settings_info.xml'
    self.assertEqual((ROOT/path).read_bytes(),subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT))

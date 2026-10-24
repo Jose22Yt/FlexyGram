@@ -41,8 +41,11 @@ class IntegratedRelease(unittest.TestCase):
    for node in ET.parse(path).getroot():
     if node.tag!='string':continue
     name=node.get('name');self.assertNotIn(name,values,str(path)+': duplicate string '+str(name));values[name]=node.text
-  self.assertEqual(values['NagramX'],'FlexyGram')
+  self.assertEqual(values['NagramX'],'FlexyGram Alpha')
   self.assertEqual(values['AppName'],'FlexyGram Alpha')
   self.assertEqual(values['AppNameBeta'],'FlexyGram Alpha')
   path='TMessagesProj/src/connectedAlpha/res/values/alpha_name.xml'
   self.assertEqual(restore_delivery(path,(ROOT/path).read_bytes()),subprocess.check_output(['git','show',WORK1+':'+path],cwd=ROOT))
+  for locale in ['values','values-es','values-ru']:
+   labels={x.get('name'):x.text for x in ET.parse(ROOT/f'TMessagesProj/src/main/res/{locale}/flexygram_login.xml').getroot() if x.tag=='string'}
+   self.assertEqual(labels['FlexySignatureName'],'FlexyGram')

@@ -109,3 +109,12 @@ index bae27215f..7436f1f4c 100644
    <string name="OpenExtera">FlexyGram</string>
    <string name="AppIconExteraless" translatable="false">FlexyGram</string>
  </resources>
+diff --git a/TMessagesProj/src/connectedAlpha/res/values/flexygram_identity.xml b/TMessagesProj/src/connectedAlpha/res/values/flexygram_identity.xml
+index 827dcb44c..1f511420a 100644
+--- a/TMessagesProj/src/connectedAlpha/res/values/flexygram_identity.xml
++++ b/TMessagesProj/src/connectedAlpha/res/values/flexygram_identity.xml
+@@ -1,3 +1,3 @@
+ <?xml version="1.0" encoding="utf-8"?>
+ <!-- UI label only; preserve the inherited key and all attribution resources. -->
+-<resources><string name="NagramX" translatable="false">FlexyGram</string></resources>
++<resources><string name="NagramX" translatable="false">FlexyGram Alpha</string></resources>
