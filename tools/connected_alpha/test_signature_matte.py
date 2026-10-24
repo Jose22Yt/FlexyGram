@@ -19,7 +19,7 @@ CANDIDATE_PATHS = {
     'tools/connected_alpha/test_signature_home.py', 'tools/connected_alpha/test_signature_matte.py',
     *['TMessagesProj/src/main/java/app/flexygram/settings/'+p+'.java' for p in (
         'SignatureMatteSettingsActivity', 'MatteTextSettingsCell', 'MatteDetailSettingsCell',
-        'MatteExpandableSwitchCell', 'MatteSettingsLayout', 'FreshInstallSavePath')],
+        'MatteExpandableSwitchCell', 'MatteTextCheckCell', 'MatteSettingsLayout', 'FreshInstallSavePath')],
     *['TMessagesProj/src/main/res/'+locale+'/flexygram_matte_settings.xml' for locale in ('values','values-es','values-ru')],
     *['tools/connected_alpha/matte_visual/'+p for p in ('run.py','pom.xml','MatteVisualTest.java.in','stubs.py')],
 }
@@ -72,7 +72,7 @@ class SignatureMatteTests(unittest.TestCase):
         self.assertNotIn('FlexyComposerSettingsActivity',s)
         for locale in ('values','values-es','values-ru'):
             values={n.attrib['name']:n.text for n in ET.parse(ROOT/f'TMessagesProj/src/main/res/{locale}/flexygram_matte_settings.xml').getroot()}
-            self.assertEqual(len(values),5)
+            self.assertEqual(len(values),7)
             self.assertIn('Material Design 3',values['FlexyMatteMd3Info'])
             self.assertIn('iOS Design',values['FlexyMatteIosInfo'])
 

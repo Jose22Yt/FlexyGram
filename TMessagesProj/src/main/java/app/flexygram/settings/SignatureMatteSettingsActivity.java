@@ -38,6 +38,8 @@ public abstract class SignatureMatteSettingsActivity extends BaseNekoSettingsAct
             View view;
             if (type == TYPE_SETTINGS) {
                 view = new MatteTextSettingsCell(mContext, resourcesProvider);
+            } else if (type == TYPE_CHECK) {
+                view = new MatteTextCheckCell(mContext, resourcesProvider);
             } else if (type == TYPE_DETAIL_SETTINGS) {
                 view = new MatteDetailSettingsCell(mContext);
             } else {
@@ -68,15 +70,7 @@ public abstract class SignatureMatteSettingsActivity extends BaseNekoSettingsAct
                 cell.setMultiline(true);
                 if (cell.getTextView() != null) cell.getTextView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
             }
-            // A bind-time operation, never a frame callback or a list rebuild.
-            if (holder.itemView instanceof org.telegram.ui.Cells.TextCheckCell) {
-                ViewGroup cell = (ViewGroup) holder.itemView;
-                for (int i = 0; i < cell.getChildCount(); i++) {
-                    if (cell.getChildAt(i) instanceof TextView) {
-                        ((TextView) cell.getChildAt(i)).setTextSize(TypedValue.COMPLEX_UNIT_SP, i == 0 ? 16 : 13);
-                    }
-                }
-            }
+
         }
     }
 

@@ -887,7 +887,7 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
                     } else if (position == iosHeaderRow) {
                         cell.setText(getString(R.string.OEAppearanceIosDesign));
                     } else if (position == appearanceHeaderRow) {
-                        cell.setText(getString(R.string.OEAppearanceGeneral));
+                        cell.setText(getString(R.string.FlexyMatteInterface));
                     } else if (position == sectionsHeaderRow) {
                         cell.setText(getString(R.string.OEAppearanceSections));
                     } else if (position == blurHeaderRow) {
@@ -897,7 +897,7 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
                     } else if (position == foldersHeaderRow) {
                         cell.setText(getString(R.string.OEAppearanceFolders));
                     } else if (position == linksHeaderRow) {
-                        cell.setText(getString(R.string.OEAppearanceInterface));
+                        cell.setText(getString(R.string.FlexyMatteNavigation));
                     }
                     break;
                 }

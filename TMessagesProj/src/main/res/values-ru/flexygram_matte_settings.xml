@@ -5,4 +5,6 @@
     <string name="FlexyMatteEffects">Дополнительные визуальные эффекты</string>
     <string name="FlexyMatteMd3Info">Material Design 3 меняет индикаторы загрузки, ползунки, переключатели, заголовки, навигацию и элементы плеера. Каждый стиль независим.</string>
     <string name="FlexyMatteIosInfo">iOS Design меняет поверхности навигации и заголовка чата, но не заменяет панель ввода, настроенную в разделе «Чаты».</string>
+    <string name="FlexyMatteInterface">Общий интерфейс</string>
+    <string name="FlexyMatteNavigation">Навигация и видимость</string>
 </resources>

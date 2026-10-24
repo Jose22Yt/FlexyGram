@@ -27,12 +27,12 @@ def main():
     shutil.rmtree(out/'src',ignore_errors=True);shutil.rmtree(out/'target/test-classes',ignore_errors=True)
     src=out/'src/test/java';src.mkdir(parents=True)
     native=''
-    for name in ('TextSettingsCell','TextDetailSettingsCell','TextCheckCell2'):
+    for name in ('TextSettingsCell','TextDetailSettingsCell','TextCheckCell2','TextCheckCell'):
         path='org/telegram/ui/Cells/'+name+'.java';text=(ROOT/'TMessagesProj/src/main/java'/path).read_text();native+=text
         dest=src/path;dest.parent.mkdir(parents=True,exist_ok=True);dest.write_text(text)
     for path,text in sources(native).items():
         dest=src/path;dest.parent.mkdir(parents=True,exist_ok=True);dest.write_text(text)
-    for name in ('MatteSettingsLayout','MatteTextSettingsCell','MatteDetailSettingsCell','MatteExpandableSwitchCell','FreshInstallSavePath'):
+    for name in ('MatteSettingsLayout','MatteTextSettingsCell','MatteDetailSettingsCell','MatteExpandableSwitchCell','MatteTextCheckCell','FreshInstallSavePath'):
         path='app/flexygram/settings/'+name+'.java';dest=src/path;dest.parent.mkdir(parents=True,exist_ok=True)
         shutil.copyfile(ROOT/'TMessagesProj/src/main/java'/path,dest)
     shutil.copyfile(HERE/'MatteVisualTest.java.in',src/'MatteVisualTest.java')

@@ -1,6 +1,6 @@
 """Explicit test doubles for out-of-scope Telegram services/animations, never shipped.
 
-Real Android TextViews, FrameLayouts, measurements, RTL, accessibility and the three
+Real Android TextViews, FrameLayouts, measurements, RTL, accessibility and the four
 upstream native cell sources are exercised. Animated values/switch artwork are not
 certified by this isolated probe; the APK keeps their untouched production engines.
 """
@@ -9,6 +9,12 @@ import re
 def sources(native_sources):
     keys=sorted(set(re.findall(r'Theme\.(key_\w+)',native_sources)))
     return {
+'org/telegram/messenger/FileLog.java':'package org.telegram.messenger; public class FileLog {}',
+'org/telegram/ui/Components/ViewHelper.java':'package org.telegram.ui.Components; public class ViewHelper {}',
+'org/telegram/ui/AvatarSpan.java':'package org.telegram.ui; public class AvatarSpan {public static void checkSpansParent(CharSequence t,android.view.View v){} }',
+'app/exteraless/components/VerticalImageSpan.java':'package app.exteraless.components; public class VerticalImageSpan {public static CharSequence createSpan(android.content.Context c,int r,CharSequence v,String p,int k,org.telegram.ui.ActionBar.Theme.ResourcesProvider x){return v;}}',
+'org/telegram/ui/Components/CheckBoxSquare.java':'package org.telegram.ui.Components; public class CheckBoxSquare extends Switch {public CheckBoxSquare(android.content.Context c){super(c);}}',
+'org/telegram/ui/Components/AnimationProperties.java':'package org.telegram.ui.Components; public class AnimationProperties {public static abstract class FloatProperty<T> extends android.util.Property<T,Float> {public FloatProperty(String n){super(Float.class,n);} public abstract void setValue(T object,float v);public final void set(T object,Float v){setValue(object,v);}}}',
 'org/telegram/messenger/AndroidUtilities.java':'''package org.telegram.messenger; import android.graphics.*; public class AndroidUtilities {
  public static float density=1; public static RectF rectTmp=new RectF();
  public static int dp(float v){return (int)Math.ceil(v*density);} public static float dpf2(float v){return v*density;}
@@ -18,9 +24,9 @@ def sources(native_sources):
 'org/telegram/messenger/BuildVars.java':'package org.telegram.messenger; public class BuildVars {public static boolean DEBUG_PRIVATE_VERSION=false;}',
 'org/telegram/messenger/BuildConfig.java':'package org.telegram.messenger; public class BuildConfig {public static boolean CONNECTED_ALPHA=true;}',
 'org/telegram/messenger/ApplicationLoader.java':'package org.telegram.messenger; public class ApplicationLoader {public static android.content.Context applicationContext;}',
-'org/telegram/messenger/R.java':'package org.telegram.messenger; public class R { public static class drawable {public static int arrow_more=android.R.drawable.arrow_down_float;}}',
+'org/telegram/messenger/R.java':'package org.telegram.messenger; public class R { public static class drawable {public static int arrow_more=android.R.drawable.arrow_down_float,search_arrow=android.R.drawable.arrow_down_float;}}',
 'org/telegram/ui/ActionBar/Theme.java':'''package org.telegram.ui.ActionBar; import android.graphics.*; import android.graphics.drawable.*; public class Theme {
- public interface ResourcesProvider{} public static boolean dark; public static Paint dividerPaint=new Paint();
+ public interface ResourcesProvider{default Paint getPaint(int key){return dividerPaint;}} public static boolean dark; public static Paint dividerPaint=new Paint();
  _KEYS_
  public static int getColor(int k){return getColor(k,null);} public static int getColor(int k,ResourcesProvider p){
  if(k==key_windowBackgroundWhiteBlackText)return dark?0xffeeeeee:0xff16181c;
@@ -41,9 +47,9 @@ public class AnimatedTextView extends TextView {
 'org/telegram/ui/Components/BackupImageView.java':'''package org.telegram.ui.Components; import android.content.*; import android.widget.*; public class BackupImageView extends ImageView { public BackupImageView(Context c){super(c);} public Receiver getImageReceiver(){return new Receiver();} public static class Receiver {public android.graphics.drawable.Drawable getDrawable(){return null;}} }''',
 'org/telegram/ui/Components/RLottieImageView.java':'package org.telegram.ui.Components; public class RLottieImageView extends android.widget.ImageView {public RLottieImageView(android.content.Context c){super(c);}}',
 'org/telegram/ui/Components/EmojiTextView.java':'package org.telegram.ui.Components; public class EmojiTextView extends android.widget.TextView {public EmojiTextView(android.content.Context c){super(c);}}',
-'org/telegram/ui/Components/CubicBezierInterpolator.java':'package org.telegram.ui.Components; public class CubicBezierInterpolator implements android.animation.TimeInterpolator {public static CubicBezierInterpolator EASE_OUT_QUINT=new CubicBezierInterpolator(); public float getInterpolation(float v){return v;}}',
+'org/telegram/ui/Components/CubicBezierInterpolator.java':'package org.telegram.ui.Components; public class CubicBezierInterpolator implements android.animation.TimeInterpolator {public static CubicBezierInterpolator EASE_OUT_QUINT=new CubicBezierInterpolator(),EASE_OUT=new CubicBezierInterpolator(); public float getInterpolation(float v){return v;}}',
 'org/telegram/ui/Components/Switch.java':'''package org.telegram.ui.Components; public class Switch extends android.view.View {
- boolean checked; public Switch(android.content.Context c){super(c);} public void setDrawIconType(int v){} public void setColors(int...v){}
+ boolean checked; public Switch(android.content.Context c){super(c);}public Switch(android.content.Context c,org.telegram.ui.ActionBar.Theme.ResourcesProvider p){super(c);} public void setDrawIconType(int v){} public void setDrawRipple(boolean v){} public void setOverrideColor(int v){}public void setOverrideColorProgress(float a,float b,float c){} public void setColors(int...v){}
  public void setChecked(boolean v,boolean a){checked=v;}public boolean isChecked(){return checked;} public void setIcon(int v){}public boolean hasIcon(){return false;}
 }''',
 'app/exteraless/appearance/M3ListItems.java':'package app.exteraless.appearance; public class M3ListItems {public static boolean enabled(){return false;}public static int rowHeight(int b){return b;} public static int detailRowHeight(int b){return b;}}',

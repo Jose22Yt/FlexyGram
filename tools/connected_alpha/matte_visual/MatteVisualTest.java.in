@@ -58,6 +58,21 @@ public class MatteVisualTest {
     assertTrue(cell.getValueTextView().getVisibility()!=View.VISIBLE);
    }
  }
+ @Test public void nativeSwitchDescriptionsGrowAtLargeFontsAndRetainState() {
+  for(boolean rtl:new boolean[]{false,true})for(float scale:new float[]{1,1.5f,2,3})for(int width:new int[]{240,320,600}){
+   LocaleController.isRTL=rtl;MatteTextCheckCell cell=new MatteTextCheckCell(context(scale),null);
+   cell.setTextAndValueAndCheck("Última conexión relativa y configuración de notificaciones", "Visto por última vez hace cinco minutos",true,false,true);
+   layout(cell,width);TextView title=(TextView)cell.getChildAt(0),detail=(TextView)cell.getChildAt(1);
+   assertTrue(title.getBottom()<=detail.getTop());assertTrue(detail.getBottom()<=cell.getHeight());
+   assertEquals(0,title.getLayout().getEllipsisCount(title.getLineCount()-1));
+   assertEquals(0,detail.getLayout().getEllipsisCount(detail.getLineCount()-1));
+   assertTrue(cell.isChecked());cell.setChecked(false);assertFalse(cell.isChecked());
+   cell.setValueText("Actualizado inmediatamente sin recrear la fila");layout(cell,width);
+   assertFalse(cell.isChecked());assertTrue(detail.getBottom()<=cell.getHeight());
+   AccessibilityNodeInfo info=AccessibilityNodeInfo.obtain();cell.onInitializeAccessibilityNodeInfo(info);
+   assertTrue(info.getContentDescription().toString().contains("Actualizado"));
+  }
+ }
  @Test public void detailSubtitleNeverOverlapsTitleOrIcon() {
   for(boolean rtl:new boolean[]{false,true})for(float scale:new float[]{1,1.5f,2,3})for(int width:new int[]{240,320,600}){
    LocaleController.isRTL=rtl;MatteDetailSettingsCell cell=new MatteDetailSettingsCell(context(scale));

@@ -5,4 +5,6 @@
     <string name="FlexyMatteEffects">Efectos visuales opcionales</string>
     <string name="FlexyMatteMd3Info">Material Design 3 modifica indicadores de carga, deslizadores, interruptores, cabeceras, navegación y controles multimedia. Cada estilo es independiente.</string>
     <string name="FlexyMatteIosInfo">iOS Design modifica las superficies de navegación y cabecera del chat. No sustituye la barra de escritura configurada en Chats.</string>
+    <string name="FlexyMatteInterface">Interfaz general</string>
+    <string name="FlexyMatteNavigation">Navegación y visibilidad</string>
 </resources>
