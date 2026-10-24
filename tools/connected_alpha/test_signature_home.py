@@ -60,6 +60,9 @@ class SignatureHomeTests(unittest.TestCase):
         self.assertIn('doNotDrawGlassMenu = home',dispatch)
         self.assertIn('super.dispatchDraw(canvas)',dispatch)
         self.assertIn('!isSignatureHome() && !NaConfig',body(s,'private boolean shouldShowIdleSearchField()'))
+        shared = body(s, '// Home paints cheap individual pills;')
+        self.assertIn('if (!isSignatureHome())', shared)
+        self.assertIn('iBlur3FactoryLiquidGlass.create(filterTabsView', shared)
 
     def test_native_category_row_and_separators(self):
         s=(ROOT/'TMessagesProj/src/main/java/org/telegram/ui/Components/FilterTabsView.java').read_text()

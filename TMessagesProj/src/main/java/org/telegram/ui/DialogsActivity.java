@@ -5420,13 +5420,15 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
 
         if (filterTabsView != null) {
-            BlurredBackgroundDrawable filterTabsViewBackground = iBlur3FactoryLiquidGlass.create(filterTabsView, BlurredBackgroundProviderImpl.topPanel(resourceProvider));
-            filterTabsViewBackground.setRadius(dp(18));
-            filterTabsViewBackground.setPadding(dp(6.666f));
+            // Home paints cheap individual pills; do not even allocate/register
+            // a shared blur drawable that this row will never draw.
+            if (!isSignatureHome()) {
+                BlurredBackgroundDrawable filterTabsViewBackground = iBlur3FactoryLiquidGlass.create(filterTabsView, BlurredBackgroundProviderImpl.topPanel(resourceProvider));
+                filterTabsViewBackground.setRadius(dp(18));
+                filterTabsViewBackground.setPadding(dp(6.666f));
+                filterTabsView.setBlurredBackground(filterTabsViewBackground);
+            }
             filterTabsView.setPadding(0, isSignatureHome() ? 0 : dp(7), 0, isSignatureHome() ? 0 : dp(7));
-            // Individual category surfaces are painted in each existing tab.
-            // The shared rectangle remains only for other uses of FilterTabsView.
-            if (!isSignatureHome()) filterTabsView.setBlurredBackground(filterTabsViewBackground);
             contentView.addView(filterTabsView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 36 + 7 + 7, Gravity.TOP, 4, 0, 4, 0));
         }
 
