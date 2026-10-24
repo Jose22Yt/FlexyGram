@@ -191,6 +191,7 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
     private int chatsDividerRow = -1;
 
     private int inputHeaderRow = -1;
+    private int composerSettingsRow = -1;
     private int inputDividerRow = -1;
     private int searchHeaderRow = -1;
     private int searchDividerRow = -1;
@@ -456,6 +457,17 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
         chatSettingsRow = addRow("chatSettings");
         linksDividerRow = addRow();
 
+        // The conversation composer lives with the existing text-input controls.
+        // Keep this near the top, immediately after the native Sections card.
+        inputHeaderRow = addRow("inputHeader");
+        composerSettingsRow = addRow("flexyComposerSettings");
+        addCommaRow = addRow("addCommaAfterMention");
+        inlineMathRow = addRow("inlineMathResult");
+        inlineMathCurrencyRow = ChatsConfig.inlineMathResult.Bool() ? addRow("inlineMathCurrency") : -1;
+        tapToSwitchRecordRow = addRow("tapToSwitchRecord", "UseChatAttachEnterMenu");
+        keepAttachButtonRow = addRow("keepAttachButton");
+        inputDividerRow = addRow();
+
         doubleTapHeaderRow = addRow("doubleTapHeader");
         doubleTapRow = addRow("doubleTapPreview");
         doubleTapIncomingRow = addRow("doubleTapIncoming");
@@ -479,14 +491,6 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
         deleteChatForBothSidesRow = addRow("deleteChatForBothSides", "DeleteChatForBothSides");
         hideKeyboardOnScrollRow = addRow("hideKeyboardOnScroll");
         chatsDividerRow = addRow();
-
-        inputHeaderRow = addRow("inputHeader");
-        addCommaRow = addRow("addCommaAfterMention");
-        inlineMathRow = addRow("inlineMathResult");
-        inlineMathCurrencyRow = ChatsConfig.inlineMathResult.Bool() ? addRow("inlineMathCurrency") : -1;
-        tapToSwitchRecordRow = addRow("tapToSwitchRecord", "UseChatAttachEnterMenu");
-        keepAttachButtonRow = addRow("keepAttachButton");
-        inputDividerRow = addRow();
 
         searchHeaderRow = addRow("searchHeader");
         disableGlobalSearchRow = addRow("disableGlobalSearch");
@@ -1822,6 +1826,10 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
         } else if (position == adminShortcutsRow) {
             toggleQuickAdminShortcuts(view);
             return;
+        } else if (position == composerSettingsRow) {
+            // Navigation only: retain the original composer preferences and implementation.
+            presentFragment(new app.flexygram.composer.FlexyComposerSettingsActivity());
+            return;
         } else if (position == menusRow) {
             presentFragment(new OpenExteraChatsActivity(SCREEN_MENUS));
             return;
@@ -2910,7 +2918,10 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
         }
 
         private void bindText(TextCell cell, int position) {
-            if (position == menusRow) {
+            if (position == composerSettingsRow) {
+                cell.setTextAndIcon(getString(R.string.FlexySettingsComposerRow), R.drawable.msg_discussion, false);
+                cell.setSubtitle(getString(R.string.FlexySettingsComposerDescription));
+            } else if (position == menusRow) {
                 cell.setTextAndIcon(getString(R.string.OEChatsMenus), R.drawable.msg_list, true);
                 cell.setSubtitle(getString(R.string.OEChatsMenusInfo));
             } else if (position == mediaRow) {
@@ -3033,7 +3044,8 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
             if (position == doubleTapReactionRow) return TYPE_SET_REACTION;
             if (isHeader(position)) return TYPE_HEADER;
             if (isDivider(position)) return TYPE_INFO_PRIVACY;
-            if (position == aiChatRow || position == chatSettingsRow || position == menusRow || position == mediaRow) {
+            if (position == composerSettingsRow || position == aiChatRow || position == chatSettingsRow
+                    || position == menusRow || position == mediaRow) {
                 return TYPE_TEXT;
             }
             if (isGroupHeader(position)) return TYPE_EXPANDABLE_SWITCH;
