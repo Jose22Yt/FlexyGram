@@ -62,9 +62,9 @@ public class BubbleVisualTest {
   Bitmap b=Bitmap.createBitmap(640,480,Bitmap.Config.ARGB_8888);Canvas canvas=new Canvas(b);
   for(int row=0;row<3;row++) for(boolean glass:new boolean[]{false,true}) for(boolean out:new boolean[]{false,true}) {
    boolean dark=row==1;int color=row==2?(out?0xffcbd6f7:0xfffae9db):(out?(dark?0xff2a4255:0xffc8e7fb):(dark?0xff272a30:0xffeeeeee));
-   int x=(glass?320:0)+(out?140:0),y=row*160+12;
+   int x=(glass?320:0)+(out?160:0),y=row*160+12;
    int save=canvas.save();canvas.translate(x,y);
-   Paint wallpaper=new Paint();wallpaper.setColor(dark?0xff16191e:0xffe6e2dc);canvas.drawRect(0,0,180,140,wallpaper);
+   Paint wallpaper=new Paint();wallpaper.setColor(dark?0xff16191e:0xffe6e2dc);canvas.drawRect(0,0,160,140,wallpaper);
    BubbleConfig.setGlass(glass);BubbleConfig.setBorder(glass);BubbleConfig.setTransparency(35);
    MessageDrawable m=new MessageDrawable(MessageDrawable.TYPE_TEXT,out,false,k->k==Theme.key_chat_outBubble||k==Theme.key_chat_inBubble?color:0);
    m.setBounds(10,10,150,68);m.setTop(0,160,140,false,false);
