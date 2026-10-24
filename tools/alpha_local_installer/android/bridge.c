@@ -3,7 +3,7 @@
 #include "libdelivery.h"
 
 JNIEXPORT jint JNICALL
-Java_io_github_jose22yt_flexygram_delivery_alpha2_ios1265_MainActivity_decryptNative(
+Java_io_github_jose22yt_flexygram_delivery_home1266_MainActivity_decryptNative(
     JNIEnv *env, jclass clazz, jint cipher, jint identity, jstring directory) {
     (void)clazz;
     const char *path = (*env)->GetStringUTFChars(env, directory, NULL);
