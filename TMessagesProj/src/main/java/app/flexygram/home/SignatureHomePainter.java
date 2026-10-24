@@ -43,7 +43,8 @@ public final class SignatureHomePainter {
         // Keep the stroke inside the allocated surface.
         float inset = paint.getStrokeWidth() / 2;
         bounds.inset(inset, inset);
-        canvas.drawRoundRect(bounds, radius, radius, paint);
+        float innerRadius = Math.max(0, radius - inset);
+        canvas.drawRoundRect(bounds, innerRadius, innerRadius, paint);
     }
 
     public static int blend(int from, int to, float progress) {

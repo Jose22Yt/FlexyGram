@@ -49,6 +49,29 @@ public class HomeVisualTest {
   File f=new File(System.getProperty("probe.root"),"android-home-surfaces.png");
   try(FileOutputStream out=new FileOutputStream(f)){assertTrue(bitmap.compress(Bitmap.CompressFormat.PNG,100,out));}
  }
+ @Test public void tintCacheSurvivesAlternatingTabsAndThemeChanges() {
+  SignatureHomeTint selected=new SignatureHomeTint(), idle=new SignatureHomeTint();
+  for(boolean dark:new boolean[]{false,true,false}) {
+   int a=SignatureHomeStyle.text(dark,true),b=SignatureHomeStyle.text(dark,false);
+   Object first=selected.get(a),second=idle.get(b);
+   for(int frame=0;frame<10000;frame++) {
+    assertSame(first,selected.get(a));assertSame(second,idle.get(b));
+   }
+   int other=a^0x00010101;assertNotSame(first,selected.get(other));
+   assertEquals(other,selected.get(other).getColor());
+  }
+ }
+ @Test public void interruptedSelectionKeepsCurrentPillOpaque() {
+  SignatureHomePainter painter=new SignatureHomePainter();
+  for(boolean dark:new boolean[]{false,true}) for(boolean glass:new boolean[]{false,true}) {
+   Bitmap b=Bitmap.createBitmap(150,50,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(b);
+   for(float progress:new float[]{0,.2f,.5f,1}) {
+    b.eraseColor(Color.TRANSPARENT);
+    painter.category(c,150,50,1,dark,glass,SignatureHomeStyle.selection(3,3,3,true,progress));
+    assertEquals(SignatureHomeStyle.selectedSurface(dark,glass),b.getPixel(75,25));
+   }
+  }
+ }
  @Test public void nativeRasterKeepsSeparateCirclesAndPillGaps() {
   for(float density:new float[]{.75f,1,1.5f,2,3,4}) for(boolean dark:new boolean[]{false,true}) for(boolean glass:new boolean[]{false,true}) {
    Bitmap b=Bitmap.createBitmap(300,120,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(b);SignatureHomePainter painter=new SignatureHomePainter();

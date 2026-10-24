@@ -235,7 +235,7 @@ jobs:
             echo '::error::Expected exactly one Connected Alpha APK.'
             exit 1
           fi
-          python3 tools/connected_alpha/verify_apk.py "${packages[0]}" --build-tools "$ANDROID_HOME/build-tools/36.0.0" --certificate-sha256 "$ALPHA_CERTIFICATE_SHA256" --expected-version-code 1267 > connected-alpha-verification.json
+          python3 tools/connected_alpha/verify_apk.py "${packages[0]}" --build-tools "$ANDROID_HOME/build-tools/36.0.0" --certificate-sha256 "$ALPHA_CERTIFICATE_SHA256" --expected-version-code 1268 > connected-alpha-verification.json
           python3 - <<'PY'
           import json, os
           from pathlib import Path
@@ -262,14 +262,31 @@ jobs:
           cp connected-alpha-verification.json "$RUNNER_TEMP/alpha-delivery/verification.json"
           # Only these two verified deliverables enter the encrypted archive.
           tar -C "$RUNNER_TEMP/alpha-delivery" -cf - FlexyGram-Alpha-arm64.apk verification.json |
-            age --encrypt -r "$ALPHA_AGE_RECIPIENT" -o "$RUNNER_TEMP/FlexyGram-Alpha-arm64.tar.age"
+            age --encrypt -r "$ALPHA_AGE_RECIPIENT" -o "$RUNNER_TEMP/FlexyGram-SignatureHome2-ARM64.tar.age"
+      - name: Record public delivery hashes (no private inputs or plaintext upload)
+        if: vars.ALPHA_AGE_RECIPIENT != ''
+        shell: bash
+        run: |
+          python3 - <<'PYREPORT'
+          import hashlib, json, os
+          from pathlib import Path
+          report = json.loads(Path('connected-alpha-verification.json').read_text())
+          cipher = Path(os.environ['RUNNER_TEMP'])/'FlexyGram-SignatureHome2-ARM64.tar.age'
+          public = {key: report[key] for key in ('commit', 'sha256', 'certificate_sha256', 'elf_count')}
+          public['version_code'] = 1268
+          public['cipher_sha256'] = hashlib.sha256(cipher.read_bytes()).hexdigest()
+          Path(os.environ['RUNNER_TEMP'], 'delivery-verification.json').write_text(json.dumps(public, indent=2)+'\n')
+          print(json.dumps(public, sort_keys=True))
+          PYREPORT
       - name: Upload encrypted delivery only (never plaintext APK)
         if: vars.ALPHA_AGE_RECIPIENT != ''
         uses: actions/upload-artifact@v4
         with:
-          name: FlexyGram-Integrated-Signature-1267-ARM64-encrypted
-          path: ${{ runner.temp }}/FlexyGram-Alpha-arm64.tar.age
-          retention-days: 1
+          name: FlexyGram-SignatureHome2-Encrypted
+          path: |
+            ${{ runner.temp }}/FlexyGram-SignatureHome2-ARM64.tar.age
+            ${{ runner.temp }}/delivery-verification.json
+          retention-days: 7
           if-no-files-found: error
       - name: Wipe private inputs and generated plaintext, including caches
         if: always()

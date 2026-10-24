@@ -47,7 +47,7 @@ def main():
     package = source/'app/flexygram/home'
     package.mkdir(parents=True, exist_ok=True)
     production = ROOT/'TMessagesProj/src/main/java/app/flexygram/home'
-    for name in ('SignatureHomeStyle.java', 'SignatureHomePainter.java'):
+    for name in ('SignatureHomeStyle.java', 'SignatureHomePainter.java', 'SignatureHomeTint.java'):
         shutil.copyfile(production/name, package/name)
     shutil.copyfile(HERE/'HomeVisualTest.java.in', source/'HomeVisualTest.java')
     shutil.copyfile(HERE/'pom.xml', output/'pom.xml')
