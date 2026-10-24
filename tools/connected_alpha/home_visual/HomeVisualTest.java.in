@@ -1,0 +1,62 @@
+/* Production surfaces/resources in isolated Android graphics. Not a logged-in Home screenshot.
+ * SPDX-License-Identifier: GPL-3.0-or-later */
+import android.content.res.*;
+import android.graphics.*;
+import android.graphics.drawable.Drawable;
+import android.util.DisplayMetrics;
+import app.flexygram.home.*;
+import java.io.*;
+import java.lang.reflect.Method;
+import org.junit.*;
+import org.junit.runner.RunWith;
+import org.robolectric.*;
+import org.robolectric.annotation.*;
+import static org.junit.Assert.*;
+
+@RunWith(RobolectricTestRunner.class)
+@Config(manifest=Config.NONE, sdk=35)
+@GraphicsMode(GraphicsMode.Mode.NATIVE)
+public class HomeVisualTest {
+ private Resources resources;
+ @Before public void setup() throws Exception {
+  AssetManager assets=AssetManager.class.getDeclaredConstructor().newInstance();
+  Method add=AssetManager.class.getMethod("addAssetPath",String.class);
+  assertTrue((Integer)add.invoke(assets,System.getProperty("probe.root")+"/resources.ap_")>0);
+  DisplayMetrics metrics=new DisplayMetrics();metrics.density=3;metrics.densityDpi=480;metrics.scaledDensity=3;
+  resources=new Resources(assets,metrics,new Configuration());
+ }
+ private void icon(Canvas c,String name,int x,int y,int color) {
+  int id=resources.getIdentifier("flexy_home_"+name,"drawable","app.flexygram.visualprobe");
+  assertTrue(id!=0);Drawable d=resources.getDrawable(id,null).mutate();d.setTint(color);
+  d.setBounds(x-36,y-36,x+36,y+36);d.draw(c);
+ }
+ @Test public void renderProductionSurfacesLightDarkGlassOnOff() throws Exception {
+  Bitmap bitmap=Bitmap.createBitmap(1170,720,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(bitmap);
+  Paint p=new Paint(Paint.ANTI_ALIAS_FLAG);SignatureHomePainter painter=new SignatureHomePainter();
+  for(int panel=0;panel<4;panel++) {
+   boolean dark=panel>=2,glass=panel%2==1;int top=panel*180,ink=SignatureHomeStyle.text(dark,false);
+   p.setColor(dark?0xFF1D1F23:0xFFFAFAFC);c.drawRect(0,top,1170,top+180,p);
+   p.setColor(ink);p.setTypeface(Typeface.create("sans-serif",Typeface.BOLD));p.setTextSize(60);c.drawText("FlexyGram",42,top+76,p);
+   painter.control(c,954,top+56,108,3,dark,glass,1);painter.control(c,1098,top+56,108,3,dark,glass,1);
+   icon(c,"search",954,top+56,ink);icon(c,"more",1098,top+56,ink);
+   String[] labels={"Todos","Personales","Trabajo"};float x=34;
+   for(int i=0;i<labels.length;i++) {
+    p.setTextSize(42);float width=p.measureText(labels[i])+90;c.save();c.translate(x,top+104);
+    painter.category(c,width,76,3,dark,glass,i==0?1:0);p.setColor(SignatureHomeStyle.text(dark,i==0));
+    c.drawText(labels[i],(width-p.measureText(labels[i]))/2,38-(p.ascent()+p.descent())/2,p);c.restore();x+=width;
+   }
+  }
+  File f=new File(System.getProperty("probe.root"),"android-home-surfaces.png");
+  try(FileOutputStream out=new FileOutputStream(f)){assertTrue(bitmap.compress(Bitmap.CompressFormat.PNG,100,out));}
+ }
+ @Test public void nativeRasterKeepsSeparateCirclesAndPillGaps() {
+  for(float density:new float[]{.75f,1,1.5f,2,3,4}) for(boolean dark:new boolean[]{false,true}) for(boolean glass:new boolean[]{false,true}) {
+   Bitmap b=Bitmap.createBitmap(300,120,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(b);SignatureHomePainter painter=new SignatureHomePainter();
+   float d=SignatureHomeStyle.controlDiameter(48*density,50*density,density);
+   painter.control(c,60,60,d,density,dark,glass,1);
+   assertEquals(0,b.getPixel((int)(60+d/2+2),60));assertTrue((b.getPixel(60,60)>>>24)>0);
+   b.eraseColor(Color.TRANSPARENT);painter.category(c,150,50,density,dark,glass,.5f);
+   assertEquals(0,b.getPixel(0,25));assertEquals(0,b.getPixel(149,25));assertTrue((b.getPixel(75,25)>>>24)>0);
+  }
+ }
+}

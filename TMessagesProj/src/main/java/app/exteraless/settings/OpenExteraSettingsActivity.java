@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.telegram.messenger.R;
+import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Cells.TextCell;
 import org.telegram.ui.Cells.TextInfoPrivacyCell;
@@ -35,20 +36,19 @@ public class OpenExteraSettingsActivity extends BaseNekoSettingsActivity {
     private int generalRow;
     private int appearanceRow;
     private int chatsRow;
-    private int flexyComposerRow;
     private int pluginsRow;
     private int otherRow;
     private int categoriesDividerRow;
 
-    private int linksHeaderRow;
+    private int officialHeaderRow;
     private int channelRow;
     private int sourceRow;
-    private int linksDividerRow;
+    private int officialDividerRow;
 
-    private int designHeaderRow;
-    private int designerRow;
-    private int designStudioRow;
-    private int designDividerRow;
+    private int informationHeaderRow;
+    private int aboutFlexyGramRow;
+    private int creditsRow;
+    private int informationDividerRow;
 
     @Override
     protected void updateRows() {
@@ -60,20 +60,19 @@ public class OpenExteraSettingsActivity extends BaseNekoSettingsActivity {
         generalRow = addRow("general");
         appearanceRow = addRow("appearance");
         chatsRow = addRow("chats");
-        flexyComposerRow = addRow("flexyComposer");
         pluginsRow = addRow("plugins");
         otherRow = addRow("other");
         categoriesDividerRow = addRow();
 
-        linksHeaderRow = addRow("linksHeader");
-        channelRow = addRow("channel");
-        sourceRow = addRow("source");
-        linksDividerRow = addRow();
+        officialHeaderRow = addRow("flexyOfficialHeader");
+        channelRow = addRow("flexyOfficialChannel");
+        sourceRow = addRow("flexyOfficialSource");
+        officialDividerRow = addRow();
 
-        designHeaderRow = addRow("designHeader");
-        designerRow = addRow("designer");
-        designStudioRow = addRow("designStudio");
-        designDividerRow = addRow();
+        informationHeaderRow = addRow("flexyInformationHeader");
+        aboutFlexyGramRow = addRow("flexyAbout");
+        creditsRow = addRow("flexyCredits");
+        informationDividerRow = addRow();
     }
 
     /**
@@ -183,22 +182,49 @@ public class OpenExteraSettingsActivity extends BaseNekoSettingsActivity {
             presentFragment(new OpenExteraAppearanceActivity());
         } else if (position == chatsRow) {
             presentFragment(new OpenExteraChatsActivity());
-        } else if (position == flexyComposerRow) {
-            presentFragment(new app.flexygram.composer.FlexyComposerSettingsActivity());
         } else if (position == pluginsRow) {
             presentFragment(new app.exteraless.plugins.ui.PluginsActivity());
         } else if (position == otherRow) {
             presentFragment(new OpenExteraOtherActivity());
-        } else if (position == channelRow) {
-            getMessagesController().openByUserName("exteraless", this, 1);
         } else if (position == sourceRow) {
             org.telegram.messenger.browser.Browser.openUrl(getParentActivity(),
-                    "https://github.com/exteraless/exteraless");
-        } else if (position == designerRow) {
-            getMessagesController().openByUserName("the8055u", this, 1);
-        } else if (position == designStudioRow) {
-            getMessagesController().openByUserName("BlueprintDsgn", this, 1);
+                    "https://github.com/Jose22Yt/FlexyGram");
+        } else if (position == aboutFlexyGramRow) {
+            showFlexyAbout();
+        } else if (position == creditsRow) {
+            showFlexyCredits();
         }
+    }
+
+    private void showFlexyAbout() {
+        if (getParentActivity() == null) {
+            return;
+        }
+        AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
+        builder.setTitle(getString(R.string.FlexySettingsAbout));
+        builder.setMessage(getString(R.string.FlexySettingsAboutBody));
+        builder.setPositiveButton(getString(R.string.OpenExteraSource), (dialog, which) ->
+                org.telegram.messenger.browser.Browser.openUrl(getParentActivity(),
+                        "https://github.com/Jose22Yt/FlexyGram"));
+        builder.setNegativeButton(getString(R.string.OK), null);
+        showDialog(builder.create());
+    }
+
+    private void showFlexyCredits() {
+        if (getParentActivity() == null) {
+            return;
+        }
+        AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity(), getResourceProvider());
+        builder.setTitle(getString(R.string.FlexySettingsCredits));
+        builder.setMessage(getString(R.string.FlexySettingsCreditsBody));
+        builder.setPositiveButton(getString(R.string.FlexySettingsLicenseAction), (dialog, which) ->
+                org.telegram.messenger.browser.Browser.openUrl(getParentActivity(),
+                        "https://github.com/Jose22Yt/FlexyGram/blob/main/LICENSE"));
+        builder.setNeutralButton(getString(R.string.FlexySettingsUpstreamAction), (dialog, which) ->
+                org.telegram.messenger.browser.Browser.openUrl(getParentActivity(),
+                        "https://github.com/exteraless/exteraless"));
+        builder.setNegativeButton(getString(R.string.OK), null);
+        showDialog(builder.create());
     }
 
     private class ListAdapter extends BaseListAdapter {
@@ -226,12 +252,12 @@ public class OpenExteraSettingsActivity extends BaseNekoSettingsActivity {
             switch (holder.getItemViewType()) {
                 case TYPE_HEADER: {
                     HeaderCell cell = (HeaderCell) holder.itemView;
-                    if (position == designHeaderRow) {
-                        cell.setText(getString(R.string.OpenExteraDesignSection));
+                    if (position == informationHeaderRow) {
+                        cell.setText(getString(R.string.FlexySettingsInformation));
                     } else if (position == categoriesHeaderRow) {
                         cell.setText(getString(R.string.OpenExteraCategories));
-                    } else if (position == linksHeaderRow) {
-                        cell.setText(getString(R.string.OpenExteraLinks));
+                    } else if (position == officialHeaderRow) {
+                        cell.setText(getString(R.string.FlexySettingsOfficial));
                     }
                     break;
                 }
@@ -243,24 +269,23 @@ public class OpenExteraSettingsActivity extends BaseNekoSettingsActivity {
                         cell.setTextAndIcon(getString(R.string.OpenExteraAppearance), R.drawable.msg_theme, true);
                     } else if (position == chatsRow) {
                         cell.setTextAndIcon(getString(R.string.OpenExteraChats), R.drawable.msg_discussion, true);
-                    } else if (position == flexyComposerRow) {
-                        cell.setTextAndIcon(getString(R.string.FlexyComposerSettings), R.drawable.msg_discussion, true);
                     } else if (position == pluginsRow) {
                         cell.setTextAndIcon(getString(R.string.OpenExteraPlugins), R.drawable.msg_plugins, true);
                     } else if (position == otherRow) {
                         cell.setTextAndIcon(getString(R.string.OpenExteraOther), R.drawable.msg_fave, false);
                     } else if (position == channelRow) {
-                        cell.setTextAndValueAndIcon(getString(R.string.ProfileChannel),
-                                "@exteraless", R.drawable.msg_channel, true);
+                        // No official channel address has been announced; never forward to upstream.
+                        cell.setTextAndValueAndIcon(getString(R.string.FlexySettingsOfficialChannel),
+                                getString(R.string.FlexySettingsComingSoon), R.drawable.msg_channel, true);
                     } else if (position == sourceRow) {
                         cell.setTextAndValueAndIcon(getString(R.string.OpenExteraSource),
-                                "GitHub", R.drawable.msg_language, false);
-                    } else if (position == designerRow) {
-                        cell.setTextAndValueAndIcon(getString(R.string.OpenExteraDesigner),
-                                "@the8055u", R.drawable.msg_theme, true);
-                    } else if (position == designStudioRow) {
-                        cell.setTextAndValueAndIcon(getString(R.string.OpenExteraDesignStudio),
-                                "@BlueprintDsgn", R.drawable.msg_groups, false);
+                                getString(R.string.FlexyBrandName), R.drawable.msg_language, false);
+                    } else if (position == aboutFlexyGramRow) {
+                        cell.setTextAndIcon(getString(R.string.FlexySettingsAbout),
+                                R.drawable.msg_language, true);
+                    } else if (position == creditsRow) {
+                        cell.setTextAndIcon(getString(R.string.FlexySettingsCredits),
+                                R.drawable.msg_fave, false);
                     }
                     // ВАЖНО: только после setTextAndIcon* — они сбрасывают imageLeft в 16dp.
                     // Метрики сняты с 12.9.0 (420 dpi): иконка 88px от края экрана, текст 219px,
@@ -271,7 +296,7 @@ public class OpenExteraSettingsActivity extends BaseNekoSettingsActivity {
                 }
                 case TYPE_INFO_PRIVACY: {
                     TextInfoPrivacyCell cell = (TextInfoPrivacyCell) holder.itemView;
-                    if (position == designDividerRow) {
+                    if (position == informationDividerRow) {
                         cell.setText(null);
                         cell.setBackground(Theme.getThemedDrawable(mContext,
                                 R.drawable.greydivider_bottom, Theme.key_windowBackgroundGrayShadow));
@@ -283,21 +308,22 @@ public class OpenExteraSettingsActivity extends BaseNekoSettingsActivity {
 
         @Override
         public boolean isEnabled(RecyclerView.ViewHolder holder) {
-            return holder.getItemViewType() == TYPE_TEXT;
+            return holder.getItemViewType() == TYPE_TEXT
+                    && holder.getAdapterPosition() != channelRow;
         }
 
         @Override
         public int getItemViewType(int position) {
             if (position == aboutRow) {
                 return TYPE_ABOUT;
-            } else if (position == categoriesHeaderRow || position == linksHeaderRow
-                    || position == designHeaderRow) {
+            } else if (position == categoriesHeaderRow || position == officialHeaderRow
+                    || position == informationHeaderRow) {
                 return TYPE_HEADER;
-            } else if (position == categoriesDividerRow || position == linksDividerRow) {
+            } else if (position == categoriesDividerRow || position == officialDividerRow) {
                 // Промежуток между секциями — тень фиксированной высоты. TextInfoPrivacyCell
                 // здесь держал высоту под подпись, которой нет, и оставлял пустое поле.
                 return TYPE_SHADOW;
-            } else if (position == designDividerRow) {
+            } else if (position == informationDividerRow) {
                 return TYPE_INFO_PRIVACY;
             }
             return TYPE_TEXT;

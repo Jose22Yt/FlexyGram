@@ -3,106 +3,132 @@ package app.exteraless.appearance;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Path;
-import android.graphics.Region;
 import android.view.Gravity;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.util.TypedValue;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.Theme;
+import org.telegram.ui.Components.AvatarDrawable;
 import org.telegram.ui.Components.LayoutHelper;
 
 /**
- * Превью закругления аватарок со слайдером «Квадрат ↔ Круг».
- * Порт AvatarCornersPreviewCell из exteraGram.
+ * Avatar corner preview using the same AvatarDrawable as the real dialog rows.
+ * No bitmap snapshots, dummy gray bars, account photos, blur or per-frame animation.
  */
 @SuppressLint("ViewConstructor")
 public class AvatarCornersPreviewCell extends FrameLayout {
-
     public interface OnChanged {
         void run();
     }
 
     private final FrameLayout preview;
     private final AvatarCornersSeekBar seekBar;
-
+    private final AvatarDrawable avatarDrawable;
+    private final ImageView avatarView;
+    private final TextView titleView;
+    private final TextView messageView;
     private boolean needDivider;
+    private int lastBackgroundColor = Integer.MIN_VALUE;
 
     public AvatarCornersPreviewCell(Context context, OnChanged onChanged) {
         super(context);
         setWillNotDraw(false);
         setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
 
-        int start = 0, end = AppearanceConfig.AVATAR_CORNERS_MAX;
         seekBar = new AvatarCornersSeekBar(context, value -> {
             AppearanceConfig.avatarCorners.setConfigInt(value);
-            invalidate();
+            updateAvatarCorners();
             if (onChanged != null) {
                 onChanged.run();
             }
-        }, start, end,
+        }, 0, AppearanceConfig.AVATAR_CORNERS_MAX,
                 LocaleController.getString(R.string.OEAppearanceAvatarCorners),
                 LocaleController.getString(R.string.OEAppearanceAvatarCornersLeft),
                 LocaleController.getString(R.string.OEAppearanceAvatarCornersRight));
         seekBar.setValue(AppearanceConfig.avatarCorners());
         addView(seekBar, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
 
-        preview = new FrameLayout(context) {
-            private final Path onlinePath = new Path();
-
-            @Override
-            protected void onDraw(Canvas canvas) {
-                float w = getMeasuredWidth();
-                float h = getMeasuredHeight();
-
-                Theme.dialogs_onlineCirclePaint.setColor(Theme.getColor(Theme.key_chats_onlineCircle));
-                canvas.drawCircle(AndroidUtilities.dp(68), h / 2.0f + AndroidUtilities.dpf2(20.5f), AndroidUtilities.dp(7), Theme.dialogs_onlineCirclePaint);
-
-                Theme.dialogs_onlineCirclePaint.setColor(PreviewColors.getMockColor(true));
-                canvas.drawRoundRect(AndroidUtilities.dp(92), h / 2.0f - AndroidUtilities.dpf2(15.5f),
-                        w - AndroidUtilities.dp(90), h / 2.0f - AndroidUtilities.dpf2(7.5f),
-                        w / 2.0f, w / 2.0f, Theme.dialogs_onlineCirclePaint);
-
-                onlinePath.rewind();
-                onlinePath.addCircle(AndroidUtilities.dp(68), h / 2.0f + AndroidUtilities.dpf2(20.5f), AndroidUtilities.dp(12), Path.Direction.CCW);
-                canvas.save();
-                canvas.clipPath(onlinePath, Region.Op.DIFFERENCE);
-
-                Theme.dialogs_onlineCirclePaint.setColor(PreviewColors.getMockColor(false));
-                canvas.drawRoundRect(AndroidUtilities.dp(92), h / 2.0f + AndroidUtilities.dpf2(7.5f),
-                        w - AndroidUtilities.dp(50), h / 2.0f + AndroidUtilities.dp(15.5f),
-                        w / 2.0f, w / 2.0f, Theme.dialogs_onlineCirclePaint);
-
-                // Аватарка у exteraGram рисуется ярким мок-цветом, а не тем же, что вторая строка
-                // (AvatarCornersPreviewCell.java:188 — brightMockPaint).
-                Theme.dialogs_onlineCirclePaint.setColor(PreviewColors.getMockColor(true));
-                float corners = AppearanceConfig.getAvatarCorners(AndroidUtilities.dp(56));
-                canvas.drawRoundRect(AndroidUtilities.dp(20), h / 2.0f - AndroidUtilities.dp(28),
-                        AndroidUtilities.dp(76), h / 2.0f + AndroidUtilities.dp(28),
-                        corners, corners, Theme.dialogs_onlineCirclePaint);
-                canvas.restore();
-            }
-        };
-        preview.setWillNotDraw(false);
-        // Подложка превью общая для всех экранов настроек.
+        preview = new FrameLayout(context);
         preview.setBackground(new PreviewBackgroundDrawable());
-        addView(preview, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.TOP | Gravity.CENTER, 21, 112, 21, 21));
+        addView(preview, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT,
+                Gravity.TOP | Gravity.CENTER, 21, 112, 21, 21));
+
+        avatarDrawable = new AvatarDrawable();
+        // Deterministic local sample: real Telegram avatar renderer, no account data.
+        avatarDrawable.setInfo(1L, "FlexyGram", "");
+        avatarView = new ImageView(context);
+        avatarView.setImageDrawable(avatarDrawable);
+        preview.addView(avatarView, LayoutHelper.createFrame(56, 56,
+                Gravity.START | Gravity.CENTER_VERTICAL, 16, 0, 0, 0));
+
+        LinearLayout labels = new LinearLayout(context);
+        labels.setOrientation(LinearLayout.VERTICAL);
+        labels.setGravity(Gravity.CENTER_VERTICAL);
+        titleView = new TextView(context);
+        titleView.setText(LocaleController.getString(R.string.FlexyBrandName));
+        titleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+        titleView.setTypeface(AndroidUtilities.bold());
+        titleView.setSingleLine(true);
+        titleView.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        labels.addView(titleView, new LinearLayout.LayoutParams(
+                LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+
+        messageView = new TextView(context);
+        messageView.setText(LocaleController.getString(R.string.FlexyAppearancePreviewMessage));
+        messageView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+        messageView.setSingleLine(true);
+        messageView.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        labels.addView(messageView, new LinearLayout.LayoutParams(
+                LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+
+        preview.addView(labels, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT,
+                LayoutHelper.MATCH_PARENT, Gravity.START | Gravity.CENTER_VERTICAL,
+                86, 0, 16, 0));
+        updateAvatarCorners();
+        updatePalette();
+    }
+
+    private void updateAvatarCorners() {
+        if (avatarDrawable == null) {
+            return;
+        }
+        // A positive radius represents a nearly square avatar at the slider minimum;
+        // the same AvatarDrawable renders the current setting in production.
+        avatarDrawable.setRoundRadius(Math.max(1,
+                AppearanceConfig.getAvatarCorners(AndroidUtilities.dp(56))));
+        avatarView.invalidate();
+        preview.invalidate();
+    }
+
+    private void updatePalette() {
+        if (titleView == null) return;
+        int color = Theme.getColor(Theme.key_windowBackgroundWhite);
+        if (lastBackgroundColor != color) {
+            lastBackgroundColor = color;
+            setBackgroundColor(color);
+        }
+        titleView.setTextColor(Theme.getColor(Theme.key_chats_name));
+        messageView.setTextColor(Theme.getColor(Theme.key_chats_message));
     }
 
     public void setNeedDivider(boolean needDivider) {
         this.needDivider = needDivider;
+        invalidate();
     }
 
     @Override
     public void invalidate() {
         super.invalidate();
-        if (preview != null) {
-            preview.invalidate();
-        }
-        if (seekBar != null) {
-            seekBar.invalidate();
+        if (seekBar != null) seekBar.invalidate();
+        if (avatarDrawable != null) {
+            updateAvatarCorners();
+            updatePalette();
         }
     }
 
@@ -110,9 +136,10 @@ public class AvatarCornersPreviewCell extends FrameLayout {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         if (needDivider) {
-            canvas.drawLine(LocaleController.isRTL ? 0 : AndroidUtilities.dp(21), getMeasuredHeight() - 1,
-                    getMeasuredWidth() - (LocaleController.isRTL ? AndroidUtilities.dp(21) : 0), getMeasuredHeight() - 1,
-                    Theme.dividerPaint);
+            canvas.drawLine(LocaleController.isRTL ? 0 : AndroidUtilities.dp(21),
+                    getMeasuredHeight() - 1,
+                    getMeasuredWidth() - (LocaleController.isRTL ? AndroidUtilities.dp(21) : 0),
+                    getMeasuredHeight() - 1, Theme.dividerPaint);
         }
     }
 
@@ -120,7 +147,6 @@ public class AvatarCornersPreviewCell extends FrameLayout {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(
                 MeasureSpec.makeMeasureSpec(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.EXACTLY),
-                MeasureSpec.makeMeasureSpec(AndroidUtilities.dp(112 + 89 + 21), MeasureSpec.EXACTLY)
-        );
+                MeasureSpec.makeMeasureSpec(AndroidUtilities.dp(112 + 89 + 21), MeasureSpec.EXACTLY));
     }
 }
