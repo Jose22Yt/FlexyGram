@@ -4,6 +4,7 @@ import static org.telegram.messenger.AndroidUtilities.dp;
 import static org.telegram.messenger.LocaleController.getString;
 
 import android.animation.ValueAnimator;
+import org.telegram.messenger.BuildConfig;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -39,6 +40,7 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
 
     public static final int HEIGHT_DP = 64;
 
+    private SignatureMusicHost signatureHost;
     private final BaseFragment fragment;
     private final Theme.ResourcesProvider resourcesProvider;
     private boolean dark;
@@ -52,7 +54,7 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
     private final ImageView nextButton;
     private final ImageView closeButton;
     private final PlayerIcon nextIcon = PlayerIcon.fill(PlayerIcon.NEXT, 24);
-    private final PlayerIcon closeIcon = PlayerIcon.stroke(PlayerIcon.CLOSE, 22);
+    private final PlayerIcon closeIcon = PlayerIcon.stroke(BuildConfig.CONNECTED_ALPHA ? PlayerIcon.CHEVRON_DOWN : PlayerIcon.CLOSE, 22);
     private PlayerColors colors;
     private ValueAnimator showAnimator;
     private MessageObject current;
@@ -85,7 +87,7 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
             }
         });
         card.setClipToOutline(true);
-        card.setElevation(dp(6));
+        card.setElevation(dp(1));
         card.setOnClickListener(v -> Md3Player.open(fragment, this));
         card.setContentDescription(getString(R.string.OEPlayerOpen));
         addView(card, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, HEIGHT_DP, Gravity.BOTTOM, 12, 0, 12, 12));
@@ -97,13 +99,13 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
         LinearLayout texts = new LinearLayout(context);
         texts.setOrientation(LinearLayout.VERTICAL);
         titleView = new TextView(context);
-        titleView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
+        titleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
         titleView.setTypeface(AndroidUtilities.bold());
         titleView.setSingleLine(true);
         titleView.setEllipsize(TextUtils.TruncateAt.END);
         texts.addView(titleView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
         artistView = new TextView(context);
-        artistView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 13);
+        artistView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         artistView.setSingleLine(true);
         artistView.setEllipsize(TextUtils.TruncateAt.END);
         artistView.setAlpha(0.8f);
@@ -130,17 +132,26 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
         nextButton.setImageDrawable(nextIcon);
         nextButton.setContentDescription(getString(R.string.Next));
         nextButton.setOnClickListener(v -> MediaController.getInstance().playNextMessage());
-        card.addView(nextButton, LayoutHelper.createLinear(44, 48));
+        card.addView(nextButton, LayoutHelper.createLinear(48, 48));
 
         closeButton = new ImageView(context);
         closeButton.setScaleType(ImageView.ScaleType.CENTER);
         closeButton.setImageDrawable(closeIcon);
-        closeButton.setContentDescription(getString(R.string.AccDescrClosePlayer));
-        closeButton.setOnClickListener(v -> MediaController.getInstance().cleanupPlayer(true, true));
-        card.addView(closeButton, LayoutHelper.createLinear(44, 48));
+        closeButton.setContentDescription(getString(BuildConfig.CONNECTED_ALPHA ? R.string.FlexyMusicCompact : R.string.AccDescrClosePlayer));
+        closeButton.setOnClickListener(v -> {
+            if (BuildConfig.CONNECTED_ALPHA && signatureHost != null && signatureHost.canCompact()) SignatureMusicPresentation.setCompact(true);
+            else if (!BuildConfig.CONNECTED_ALPHA) MediaController.getInstance().cleanupPlayer(true, true);
+        });
+        closeButton.setOnLongClickListener(v -> { MediaController.getInstance().cleanupPlayer(true, true); return true; });
+        card.addView(closeButton, LayoutHelper.createLinear(48, 48));
 
         applyColors(colors);
         setVisibility(GONE);
+    }
+
+    @Override protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        nextButton.setVisibility(MeasureSpec.getSize(widthMeasureSpec) >= dp(320) ? VISIBLE : GONE);
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
     public boolean canTransition() {
@@ -241,6 +252,7 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
+        NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.didSetNewTheme);
         for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
             NotificationCenter nc = NotificationCenter.getInstance(a);
             nc.addObserver(this, NotificationCenter.messagePlayingDidStart);
@@ -250,12 +262,19 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
             nc.addObserver(this, NotificationCenter.fileLoaded);
             nc.addObserver(this, NotificationCenter.audioInfoLoaded);
         }
+        if (BuildConfig.CONNECTED_ALPHA) {
+            signatureHost = new SignatureMusicHost(fragment, resourcesProvider, () -> update(false));
+            signatureHost.attach();
+        }
         update(false);
     }
 
     @Override
     protected void onDetachedFromWindow() {
+        if (signatureHost != null) { signatureHost.detach(); signatureHost = null; }
         super.onDetachedFromWindow();
+        NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.didSetNewTheme);
+        if (showAnimator != null) { showAnimator.cancel(); showAnimator = null; }
         for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
             NotificationCenter nc = NotificationCenter.getInstance(a);
             nc.removeObserver(this, NotificationCenter.messagePlayingDidStart);
@@ -269,6 +288,7 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
 
     @Override
     public void didReceivedNotification(int id, int account, Object... args) {
+        if (signatureHost != null) signatureHost.update(Md3Player.miniEnabled());
         if (id == NotificationCenter.messagePlayingProgressDidChanged) {
             playButton.progressChanged();
         } else if (id == NotificationCenter.audioInfoLoaded) {
@@ -300,6 +320,11 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
         checkThemeColors();
         MessageObject mo = MediaController.getInstance().getPlayingMessageObject();
         boolean want = Md3Player.miniEnabled() && mo != null && mo.isMusic() && mo.getId() != 0;
+        if (signatureHost != null) {
+            signatureHost.update(want);
+            closeButton.setEnabled(signatureHost.canCompact());
+            if (signatureHost.canCompact() && SignatureMusicPresentation.isCompact()) want = false;
+        }
         if (want) {
             bind(mo);
         }
@@ -308,10 +333,14 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
     }
 
     private void bind(MessageObject mo) {
+        if (current != mo) {
+            titleView.setText(mo.getMusicTitle());
+            artistView.setText(mo.getMusicAuthor());
+            cover.setMessage(mo);
+        }
         current = mo;
-        titleView.setText(mo.getMusicTitle());
-        artistView.setText(mo.getMusicAuthor());
-        cover.setMessage(mo);
+        artistView.setVisibility(getResources().getConfiguration().fontScale > 1.5f ? GONE : VISIBLE);
+        card.setContentDescription(mo.getMusicTitle() + ", " + mo.getMusicAuthor());
         playButton.setMessage(mo);
         playButton.setContentDescription(getString(MediaController.getInstance().isMessagePaused() ? R.string.AccActionPlay : R.string.AccActionPause));
     }
@@ -338,7 +367,7 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
             applyTransform();
             notifyOffset();
         });
-        showAnimator.setDuration(value ? 450 : 300);
+        showAnimator.setDuration(180);
         showAnimator.setInterpolator(value ? new CubicBezierInterpolator(0.05, 0.7, 0.1, 1) : new CubicBezierInterpolator(0.3, 0, 0.8, 0.15));
         showAnimator.start();
     }
@@ -346,6 +375,7 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
     private void applyColors(PlayerColors c) {
         colors = c;
         cardBg.setColor(c.primaryContainer);
+        cardBg.setStroke(dp(1), c.outlineVariant);
         if (Build.VERSION.SDK_INT >= 28) {
             card.setOutlineSpotShadowColor(c.shadow());
             card.setOutlineAmbientShadowColor(c.shadow());

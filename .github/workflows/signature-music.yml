@@ -1,0 +1,42 @@
+name: Signature Music isolated validation
+on:
+  push:
+    branches: [feat/signature-music2]
+  pull_request:
+    types: [opened, reopened, synchronize]
+permissions:
+  contents: read
+concurrency:
+  group: signature-music-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  native-components:
+    if: github.event_name == 'push' || github.head_ref == 'feat/signature-music2'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python3 -m pip install -r tools/connected_alpha/requirements-ci.txt
+      - run: git submodule update --init --depth 1 TMessagesProj_Modules/media
+      - run: python3 tools/connected_alpha/run_checks.py
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: 'build-tools;36.0.0 platforms;android-37.0'
+      - run: python3 tools/connected_alpha/check_resources.py --sdk-root "$ANDROID_HOME"
+      - run: python3 tools/connected_alpha/music_visual/run.py --sdk-root "$ANDROID_HOME"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: signature-music-isolated-components
+          path: |
+            build/connected-alpha-music-visual/android-music-isolated.png
+            build/connected-alpha-music-visual/target/surefire-reports/TEST-*.xml
+          retention-days: 7
+          if-no-files-found: error
