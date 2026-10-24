@@ -45,7 +45,7 @@ class SignatureMatteTests(unittest.TestCase):
             prefix='TMessagesProj/src/main/java/'+directory
             for path in subprocess.check_output(['git','ls-tree','-r','--name-only',BASE,'--',prefix],cwd=ROOT,text=True).splitlines():
                 self.assertEqual((ROOT/path).read_text(),old(path),path)
-        self.assertEqual((ROOT/'TMessagesProj/build.gradle').read_text().replace('def verCode = 1268','def verCode = 1267').replace("versionNameSuffix = '-alpha2-signature-matte'","versionNameSuffix = '-alpha2-integrated-signature'"),old('TMessagesProj/build.gradle'))
+        self.assertEqual((ROOT/'TMessagesProj/build.gradle').read_text().replace('def verCode = 1269','def verCode = 1267').replace("versionNameSuffix = '-alpha2-signature-matte'","versionNameSuffix = '-alpha2-integrated-signature'"),old('TMessagesProj/build.gradle'))
         from test_matte_release import restore_delivery_workflow
         self.assertEqual(restore_delivery_workflow((ROOT/'.github/workflows/connected-alpha-arm64.yml').read_text()),old('.github/workflows/connected-alpha-arm64.yml'))
 
