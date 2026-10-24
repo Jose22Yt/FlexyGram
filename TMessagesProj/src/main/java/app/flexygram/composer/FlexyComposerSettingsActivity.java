@@ -144,8 +144,8 @@ public final class FlexyComposerSettingsActivity extends BaseNekoSettingsActivit
             c.drawCircle(left,y,radius,paint); c.drawCircle(right,y,radius,paint);
             c.drawRoundRect(left+radius+gap,y-radius,right-radius-gap,y+radius,radius,radius,paint);
             icon(c, FlexyComposerConfig.referenceIcons() ? clip : plus, left, y, ink); icon(c, voice, right, y, ink);
-            icon(c, FlexyComposerConfig.referenceIcons() ? folded : smile, right-radius-gap-dp(20), y, ink);
-            paint.setColor(ink);
+            icon(c, FlexyComposerConfig.referenceIcons() ? folded : smile, right-radius-gap-dp(20), y, ComposerStyle.innerIcon(dark));
+            paint.setColor(ComposerStyle.innerIcon(dark));
             paint.setTextAlign(Paint.Align.LEFT); paint.setTextSize(dp(18));
             c.drawText(getString(R.string.TypeMessage),left+radius+gap+dp(ComposerStyle.padding(level)),y-(paint.ascent()+paint.descent())/2,paint);
         }

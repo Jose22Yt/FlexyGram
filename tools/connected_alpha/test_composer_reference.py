@@ -23,6 +23,10 @@ import app.flexygram.composer.*;
 import org.telegram.messenger.R;
 public class Reference {
  static void ok(boolean b) {if(!b) throw new AssertionError("artwork changed action/geometry");}
+ // Opaque surfaces must retain WCAG contrast for hint/selector and external controls.
+ static double linear(int c) {double s=c/255.;return s<=0.04045?s/12.92:Math.pow((s+0.055)/1.055,2.4);}
+ static double lum(int c) {return .2126*linear((c>>16)&255)+.7152*linear((c>>8)&255)+.0722*linear(c&255);}
+ static double contrast(int a,int b) {return (Math.max(lum(a),lum(b))+.05)/(Math.min(lum(a),lum(b))+.05);}
  public static void main(String[] args) {
   for(int i=0;i<10000;i++) {
    boolean reference=(i%2)==0;
@@ -38,6 +42,10 @@ public class Reference {
     // 24dp vector fits even the smallest surface, with four dp breathing room.
     ok((ComposerStyle.diameter(level)-24)/2>=4);
     ok(ComposerGeometry.TOUCH_SLOT==44);
+   }
+   for(boolean dark:new boolean[]{false,true}) {
+    ok(contrast(ComposerStyle.innerIcon(dark),ComposerStyle.surface(dark,false))>=4.5);
+    ok(contrast(ComposerStyle.icon(dark),ComposerStyle.surface(dark,false))>=7);
    }
    ok(ComposerStyle.surface(true,false)!=0xFF000000);
    ok((ComposerStyle.surface(true,true)>>>24)>=232);

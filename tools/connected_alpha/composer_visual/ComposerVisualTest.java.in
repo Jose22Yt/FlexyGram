@@ -40,8 +40,8 @@ public class ComposerVisualTest {
    paint.setColor(ComposerStyle.surface(dark,false));c.drawCircle(90,y,radius,paint);c.drawCircle(1080,y,radius,paint);
    float gap=ComposerStyle.gap(level,0)*3;float left=90+radius+gap,right=1080-radius-gap;
    c.drawRoundRect(left,y-radius,right,y+radius,radius,radius,paint);
-   int ink=ComposerStyle.icon(dark);icon(c,"clip",90,y,ink);icon(c,"folded",right-60,y,ink);icon(c,row%3==0?"voice":row%3==1?"video":"send",1080,y,ink);
-   paint.setColor(ink);paint.setTextSize(54);c.drawText("Mensaje",left+ComposerStyle.padding(level)*3,y-(paint.ascent()+paint.descent())/2,paint);
+   int ink=ComposerStyle.icon(dark);icon(c,"clip",90,y,ink);icon(c,"folded",right-60,y,ComposerStyle.innerIcon(dark));icon(c,row%3==0?"voice":row%3==1?"video":"send",1080,y,ink);
+   paint.setColor(ComposerStyle.innerIcon(dark));paint.setTextSize(54);c.drawText("Mensaje",left+ComposerStyle.padding(level)*3,y-(paint.ascent()+paint.descent())/2,paint);
    assertEquals(44,app.flexygram.composer.ComposerGeometry.TOUCH_SLOT);
   }
   File out=new File(System.getProperty("probe.root"),"android-native-vectors.png");

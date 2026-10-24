@@ -40,6 +40,8 @@ def main():
     subprocess.run([str(aapt), 'compile', '--dir', str(res.parent), '-o', str(output/'resources.zip')], check=True)
     subprocess.run([str(aapt), 'link', '-I', str(android), '--manifest', str(manifest),
                     '-o', str(output/'resources.ap_'), str(output/'resources.zip')], check=True)
+    # Remove stale bytecode before repeated visual comparisons after policy edits.
+    shutil.rmtree(output/'target/test-classes', ignore_errors=True)
     source = output/'src/test/java'
     source.mkdir(parents=True, exist_ok=True)
     package = source/'app/flexygram/composer'

@@ -16638,7 +16638,12 @@ public class ChatActivityEnterView extends FrameLayout implements
             ColorUtils.calculateLuminance(getThemedColor(Theme.key_chat_messagePanelBackground)) < 0.4)
             : getThemedColor(Theme.key_glass_defaultIcon);
         if (attachButton != null) attachButton.setColorFilter(color, flexyCompactLayout ? PorterDuff.Mode.SRC_IN : PorterDuff.Mode.MULTIPLY);
-        if (emojiButton != null) setIconColorFilter(emojiButton, new PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN));
+        int innerColor = flexyCompactLayout ? app.flexygram.composer.ComposerStyle.innerIcon(
+            ColorUtils.calculateLuminance(getThemedColor(Theme.key_chat_messagePanelBackground)) < 0.4)
+            : getThemedColor(Theme.key_glass_defaultIcon);
+        if (emojiButton != null) setIconColorFilter(emojiButton, new PorterDuffColorFilter(innerColor, PorterDuff.Mode.SRC_IN));
+        if (messageEditText != null) messageEditText.setHintColor(flexyCompactLayout ? innerColor
+            : getThemedColor(Theme.key_chat_messagePanelHint));
     }
 
     /** Native recording/previews keep their full background; their layout is untouched. */

@@ -11,7 +11,8 @@ public final class ComposerStyle {
     public static int diameter(int level) { return ComposerGeometry.TOUCH_SLOT - 2 * inset(level); }
     // Native 18sp text and 44dp touch targets remain intact at every density.
     public static int surface(boolean dark, boolean glass) { return dark ? (glass ? 0xE8303236 : 0xFF303236) : (glass ? 0xF5FAFAFC : 0xFFFAFAFC); }
-    public static int icon(boolean dark) { return dark ? 0xFFE1E2E6 : 0xFF62666D; }
+    public static int icon(boolean dark) { return dark ? 0xFFF0F1F4 : 0xFF202329; }
+    public static int innerIcon(boolean dark) { return dark ? 0xFFA6A8AE : 0xFF687078; }
     public static int padding(int level) { return 12 - level(level); }
     public static int gap(int level, int custom) { return custom == 0 ? 6 - level(level) : clamp(custom, MIN_GAP, MAX_GAP); }
     // Lowering consumes at most 4dp of the existing 9dp native bottom gap.
