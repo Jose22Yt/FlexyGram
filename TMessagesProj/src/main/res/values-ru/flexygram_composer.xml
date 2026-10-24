@@ -8,7 +8,7 @@
   <string name="FlexyComposerGap">Расстояние между элементами</string>
   <string name="FlexyComposerGlass">Перламутровое стекло</string>
   <string name="FlexyComposerPositionReset">Сбросить положение панели</string>
-  <string name="FlexyComposerReset">Сбросить оформление</string>
+  <string name="FlexyComposerReset">Применить макет по образцу iPhone</string>
   <string name="FlexyComposerPreview">Предпросмотр панели</string>
   <string name="FlexyComposerIcons">Вид значков</string>
   <string name="FlexyComposerReferenceIcons">Образец · скрепка и круг</string>

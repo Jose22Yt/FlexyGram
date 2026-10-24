@@ -47,8 +47,11 @@ def main():
     package = source/'app/flexygram/composer'
     package.mkdir(parents=True, exist_ok=True)
     production = ROOT/'TMessagesProj/src/main/java/app/flexygram/composer'
-    for name in ('ComposerStyle.java', 'ComposerGeometry.java'):
+    for name in ('ComposerStyle.java', 'ComposerGeometry.java', 'ComposerSliderTrack.java'):
         shutil.copyfile(production/name, package/name)
+    utility = source/'org/telegram/messenger/AndroidUtilities.java'
+    utility.parent.mkdir(parents=True, exist_ok=True)
+    utility.write_text('package org.telegram.messenger; public final class AndroidUtilities { public static int dp(float value) { return Math.round(value*3); } }')
     icon = (ROOT/'TMessagesProj/src/main/java/org/telegram/ui/Components/ChatActivityEnterViewAnimatedIconView.java').read_text()
     start = icon.index('public void setCompactIcons(')
     pos, depth = icon.index('{', start) + 1, 1
@@ -56,7 +59,16 @@ def main():
         if icon[pos] == '{': depth += 1
         elif icon[pos] == '}': depth -= 1
         pos += 1
-    (source/'ComposerVisualTest.java').write_text((HERE/'ComposerVisualTest.java.in').read_text().replace('__PRODUCTION_ICON_SETTER__', icon[start:pos]))
+    hint = (ROOT/'TMessagesProj/src/main/java/org/telegram/ui/Components/EditTextBoldCursor.java').read_text()
+    hint_start = hint.index('public void setStaticHintTypeface(')
+    hint_pos, depth = hint.index('{', hint_start) + 1, 1
+    while depth:
+        if hint[hint_pos] == '{': depth += 1
+        elif hint[hint_pos] == '}': depth -= 1
+        hint_pos += 1
+    (source/'ComposerVisualTest.java').write_text((HERE/'ComposerVisualTest.java.in').read_text()
+        .replace('__PRODUCTION_ICON_SETTER__', icon[start:pos])
+        .replace('__PRODUCTION_HINT_SETTER__', hint[hint_start:hint_pos]))
     shutil.copyfile(HERE/'pom.xml', output/'pom.xml')
     repository = Path.home()/'.m2/repository'
     command = [args.maven, '-B', '-f', str(output/'pom.xml'), '-Dandroid.sdk.jar='+str(android)]

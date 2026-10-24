@@ -31,7 +31,7 @@ public final class FlexyComposerConfig {
     public static void setLevel(int value) { preferences().edit().putInt(LEVEL, ComposerStyle.level(value)).apply(); }
     public static void setGap(int value) { preferences().edit().putInt(GAP, ComposerStyle.clamp(value, ComposerStyle.MIN_GAP, ComposerStyle.MAX_GAP)).apply(); }
     public static void reset() {
-        preferences().edit().putInt(STYLE, COMPACT_IOS).putBoolean(GLASS, false)
+        preferences().edit().putInt(STYLE, COMPACT_IOS).putBoolean(GLASS, true)
             .remove(ICONS).remove(POSITION).remove(LEVEL).remove(GAP).apply();
     }
     public static void setStyle(int value) {

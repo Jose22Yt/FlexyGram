@@ -12,7 +12,7 @@
   <string name="FlexyComposerExtraSmall">Extra compact</string>
   <string name="FlexyComposerGap">Component spacing</string>
   <string name="FlexyComposerPositionReset">Reset bar position</string>
-  <string name="FlexyComposerReset">Reset default layout</string>
+  <string name="FlexyComposerReset">Apply iPhone reference layout</string>
   <string name="FlexyComposerPreview">Conversation bar preview</string>
   <string name="FlexyComposerIcons">Icon appearance</string>
   <string name="FlexyComposerReferenceIcons">Reference · clip and folded circle</string>

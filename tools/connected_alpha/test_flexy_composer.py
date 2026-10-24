@@ -234,10 +234,11 @@ public class PillBoundsRegression {
 
     def test_actual_presentation_method_handles_native_three_dp_margin_and_live_recovery(self):
         methods = '\n'.join(method_bodies(self.current,n)[0] for n in (
-            'applyFlexyComposerPresentation','updateAttachButtonTranslationX','nativeAttachTranslationX','flexyCompactTextEnd'))
+            'hasFlexySpecialControls','applyFlexyComposerPresentation','updateAttachButtonTranslationX','nativeAttachTranslationX','flexyCompactTextEnd'))
         fixture = '''
 public class PresentationRegression {
  static final int VISIBLE=0;
+ static class android { static class graphics { static class Typeface {static Object DEFAULT=new Object();} } }
  static class Gravity { static final int LEFT=3, RIGHT=5, BOTTOM=80; }
  static class R { static class drawable { static final int msg_add=1, msg_input_attach2=2; } }
  static class AndroidUtilities { static float density=1; }
@@ -254,6 +255,7 @@ public class PresentationRegression {
   void setImageResource(int icon){imageResource=icon;}
   void invalidate() {}
   void setCompactVisualInset(int inset) {}
+  void setStaticHintTypeface(Object face) {}
   int width(){return width;}
   float getAlpha(){return alpha;}
  }
@@ -266,7 +268,7 @@ public class PresentationRegression {
  void updateAudioVideoSendButtonColor() {}
  float attachLayoutPaddingTranslationX,attachLayoutTranslationX;
  int flexyNativeFieldRight=-1,flexyAppliedFieldRight=-1;
- int flexyInsetDp=4,flexyGapDp=6,flexyTextPaddingDp=12;
+ int flexyInsetDp=0,flexyGapDp=6,flexyTextPaddingDp=14;
  static final int DEFAULT_HEIGHT=44;
  final String draft="unchanged draft with emoji and multiple lines";
  void nativeMeasure(){emojiButton.p.leftMargin=3;deleteRichDraftButton.p.leftMargin=3;messageEditText.p.leftMargin=50;}
@@ -288,8 +290,8 @@ public class PresentationRegression {
    p.require(p.attachButton.p.gravity==(Gravity.BOTTOM|Gravity.LEFT));
    p.require(p.attachButton.imageResource==R.drawable.msg_add);
    p.require(p.emojiButton.p.gravity==(Gravity.BOTTOM|Gravity.RIGHT));
-   p.require(p.messageEditText.p.leftMargin==58);
-   p.require(p.messageEditText.p.rightMargin>=50+Math.max(0,-p.nativeAttachTranslationX()));
+   p.require(p.messageEditText.p.leftMargin==64);
+   p.require(p.messageEditText.p.rightMargin>=56+Math.max(0,-p.nativeAttachTranslationX()));
    p.require(p.messageEditText==originalText && p.draft==originalDraft);
    p.nativeMeasure();p.flexyCompactRequested=false;p.applyFlexyComposerPresentation(335);
    p.require(!p.flexyCompactLayout && p.messageEditText.p.rightMargin==end);

@@ -57,10 +57,19 @@ public class ChatActivityEnterViewStaticIconView extends FrameLayout {
     private AnimatorSet buttonsAnimation;
     private State currentState;
     private boolean compactIcons, referenceIcons;
+    private int nativeIconSize;
     public void setCompactIcons(boolean compact, boolean reference) {
         if (compactIcons == compact && referenceIcons == reference) return;
         compactIcons = compact;
         referenceIcons = reference;
+        for (ImageView view : buttonViews) {
+            FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) view.getLayoutParams();
+            int size = compact ? org.telegram.messenger.AndroidUtilities.dp(28) : nativeIconSize;
+            if (lp.width != size || lp.height != size) {
+                lp.width = lp.height = size;
+                view.setLayoutParams(lp);
+            }
+        }
         if (currentState != null) setState(currentState, false);
     }
     private int iconResource(State state) {
@@ -75,6 +84,7 @@ public class ChatActivityEnterViewStaticIconView extends FrameLayout {
     public ChatActivityEnterViewStaticIconView(Context context, ChatActivityEnterView enterView, int sizeDp) {
         super(context);
         setWillNotDraw(false);
+        nativeIconSize = org.telegram.messenger.AndroidUtilities.dp(sizeDp);
         for (int i = 0; i < buttonViews.length; i++) {
             buttonViews[i] = new ImageView(context);
             buttonViews[i].setColorFilter(new PorterDuffColorFilter(enterView.getThemedColor(Theme.key_chat_messagePanelIcons), PorterDuff.Mode.MULTIPLY));

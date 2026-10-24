@@ -12,7 +12,7 @@
   <string name="FlexyComposerExtraSmall">Extracompacto</string>
   <string name="FlexyComposerGap">Separación entre componentes</string>
   <string name="FlexyComposerPositionReset">Restablecer posición original</string>
-  <string name="FlexyComposerReset">Restablecer diseño predeterminado</string>
+  <string name="FlexyComposerReset">Aplicar diseño de referencia iPhone</string>
   <string name="FlexyComposerPreview">Vista previa de la barra</string>
   <string name="FlexyComposerIcons">Apariencia de los iconos</string>
   <string name="FlexyComposerReferenceIcons">Referencia · clip y círculo plegado</string>

@@ -5,6 +5,7 @@ import android.content.res.*;
 import android.graphics.*;
 import android.graphics.drawable.Drawable;
 import android.util.DisplayMetrics;
+import android.text.TextPaint;
 import app.flexygram.composer.ComposerStyle;
 import java.io.*;
 import java.lang.reflect.Method;
@@ -29,24 +30,104 @@ public class ComposerVisualTest {
  private void icon(Canvas canvas,String name,float x,float y,int color) {
   int id=resources.getIdentifier("flexy_composer_"+name,"drawable","app.flexygram.visualprobe");
   assertTrue(id!=0);Drawable d=resources.getDrawable(id,null).mutate();d.setTint(color);
-  d.setBounds((int)x-36,(int)y-36,(int)x+36,(int)y+36);d.draw(canvas);
+  int half=d.getIntrinsicWidth()/2; d.setBounds((int)x-half,(int)y-half,(int)x+half,(int)y+half);d.draw(canvas);
  }
  @Test public void renderBothThemesAllDensitiesAndActions() throws Exception {
-  int width=1170,height=3*220;Bitmap bitmap=Bitmap.createBitmap(width,height,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(bitmap);
+  int width=1170,height=6*156;Bitmap bitmap=Bitmap.createBitmap(width,height,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(bitmap);
   Paint paint=new Paint(Paint.ANTI_ALIAS_FLAG);paint.setTypeface(Typeface.create("sans-serif",Typeface.NORMAL));
   for(int row=0;row<6;row++) {
-   boolean dark=row>=3;int level=row%3;float y=row*110+55;float radius=ComposerStyle.diameter(level)*1.5f;
-   paint.setColor(dark?0xFF121418:0xFFDCE8DC);c.drawRect(0,row*110,width,(row+1)*110,paint);
-   paint.setColor(ComposerStyle.surface(dark,false));c.drawCircle(90,y,radius,paint);c.drawCircle(1080,y,radius,paint);
-   float gap=ComposerStyle.gap(level,0)*3;float left=90+radius+gap,right=1080-radius-gap;
+   boolean dark=row>=3;int level=row%3;float y=row*156+78;float radius=ComposerStyle.diameter(level)*1.5f;
+   paint.setColor(dark?0xFF121418:0xFFDCE8DC);c.drawRect(0,row*156,width,(row+1)*156,paint);
+   float side=ComposerStyle.sideMargin(width,3,21), first=side+66,last=width-side-66;
+   paint.setColor(ComposerStyle.surface(dark,false));c.drawCircle(first,y,radius,paint);c.drawCircle(last,y,radius,paint);
+   float gap=ComposerStyle.gap(level,0)*3;float left=first+66-ComposerStyle.inset(level)*3+gap,right=last-66+ComposerStyle.inset(level)*3-gap;
    c.drawRoundRect(left,y-radius,right,y+radius,radius,radius,paint);
-   int ink=ComposerStyle.icon(dark);icon(c,"clip",90,y,ink);icon(c,"folded",right-60,y,ComposerStyle.innerIcon(dark));icon(c,row%3==0?"voice":row%3==1?"video":"send",1080,y,ink);
+   int ink=ComposerStyle.icon(dark);icon(c,"clip",first,y,ink);icon(c,"folded",right-69,y,ComposerStyle.innerIcon(dark));icon(c,row%3==0?"voice":row%3==1?"video":"send",last,y,ink);
    paint.setColor(ComposerStyle.innerIcon(dark));paint.setTextSize(54);c.drawText("Mensaje",left+ComposerStyle.padding(level)*3,y-(paint.ascent()+paint.descent())/2,paint);
    assertEquals(44,app.flexygram.composer.ComposerGeometry.TOUCH_SLOT);
   }
   File out=new File(System.getProperty("probe.root"),"android-native-vectors.png");
   try(FileOutputStream stream=new FileOutputStream(out)){assertTrue(bitmap.compress(Bitmap.CompressFormat.PNG,100,stream));}
   assertTrue(out.length()>1000);
+ }
+
+ @Test public void referenceProportionsAreProducedAtPhoneAndWindowDensities() throws Exception {
+  for(float density:new float[]{1,1.5f,2,2.625f,3,4}) {
+   for(int widthDp:new int[]{280,320,360,390,440,600}) {
+    int width=Math.round(widthDp*density), nativeMargin=Math.round(7*density);
+    int margin=ComposerStyle.sideMargin(width,density,nativeMargin);
+    assertTrue(margin>=nativeMargin);
+    if(widthDp>=360) assertTrue(width-2*margin>=Math.round(324*density)-1);
+    for(int level=0;level<3;level++) {
+     assertTrue(ComposerStyle.diameter(level)>=36);
+     for(int gap=2;gap<=8;gap++) {
+      // Visible gaps may tighten; native 44dp touch slots remain disjoint.
+      float pillLeft=margin+44*density-ComposerStyle.inset(level)*density+gap*density;
+      float inputRight=width-margin-44*density;
+      if(widthDp>=360) assertTrue(inputRight-pillLeft>180*density);
+     }
+    }
+   }
+  }
+  // Canonical normalized reference is 1268px wide, with 128px circles.
+  float density=128f/44;int margin=ComposerStyle.sideMargin(1268,density,Math.round(7*density));
+  assertEquals(82,margin);assertEquals(128,ComposerStyle.diameter(0)*density,.01);
+  Bitmap bitmap=Bitmap.createBitmap(1268,180,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(bitmap);
+  Paint paint=new Paint(Paint.ANTI_ALIAS_FLAG);c.drawColor(0xFFE0EBDD);
+  float radius=64,y=90,left=margin+128+6*density,right=1268-margin-128-6*density;
+  paint.setColor(ComposerStyle.surface(false,false));c.drawCircle(margin+64,y,radius,paint);c.drawCircle(1268-margin-64,y,radius,paint);c.drawRoundRect(left,y-radius,right,y+radius,64,64,paint);
+  // Load binary production vector resources at the exact reference scale.
+  DisplayMetrics metrics=resources.getDisplayMetrics();metrics.density=density;metrics.densityDpi=Math.round(160*density);metrics.scaledDensity=density;
+  resources.updateConfiguration(resources.getConfiguration(),metrics);
+  icon(c,"clip",margin+64,y,ComposerStyle.icon(false));icon(c,"voice",1268-margin-64,y,ComposerStyle.icon(false));icon(c,"folded",right-23*density,y,ComposerStyle.innerIcon(false));
+  paint.setTypeface(Typeface.DEFAULT);paint.setColor(ComposerStyle.innerIcon(false));paint.setTextSize(18*density);
+  c.drawText("Message",left+ComposerStyle.padding(0)*density,y-(paint.ascent()+paint.descent())/2,paint);
+  assertEquals(227.45,left,.1);assertEquals(1040.55,right,.1);
+  try(FileOutputStream stream=new FileOutputStream(new File(System.getProperty("probe.root"),"iphone-reference-geometry.png"))){assertTrue(bitmap.compress(Bitmap.CompressFormat.PNG,100,stream));}
+ }
+ private static class Hint extends android.widget.TextView {
+  android.graphics.Typeface staticHintTypeface;android.text.TextPaint staticHintPaint;
+  android.text.StaticLayout hintLayout;CharSequence hint;Object hintAnimatedDrawable;
+  Hint(android.content.Context c){super(c);}
+  void setHintText(CharSequence text,boolean animated,android.text.TextPaint paint) {
+   if(staticHintTypeface!=null){staticHintPaint.set(paint);staticHintPaint.setTypeface(staticHintTypeface);staticHintPaint.setFakeBoldText(false);paint=staticHintPaint;}
+   hint=text;hintLayout=new android.text.StaticLayout(text,paint,1000,android.text.Layout.Alignment.ALIGN_NORMAL,1,0,false);
+  }
+  __PRODUCTION_HINT_SETTER__
+ }
+ @Test public void hintFontIsNormalWithoutMutatingTypedTextAndClassicRestores() {
+  Hint view=new Hint(RuntimeEnvironment.getApplication());view.hint="Message";view.setTypeface(Typeface.DEFAULT_BOLD);view.setText("Draft");
+  view.setStaticHintTypeface(Typeface.DEFAULT);
+  assertFalse(view.hintLayout.getPaint().getTypeface().isBold());
+  assertTrue(view.getPaint().getTypeface().isBold());assertEquals("Draft",view.getText().toString());
+  android.text.StaticLayout layout=view.hintLayout;
+  for(int i=0;i<10000;i++)view.setStaticHintTypeface(Typeface.DEFAULT);
+  assertSame(layout,view.hintLayout);
+  view.setStaticHintTypeface(null);assertTrue(view.hintLayout.getPaint().getTypeface().isBold());
+ }
+
+ @Test public void nativeSeekBarKeepsThumbAndTrackAlignedInBothDirections() throws Exception {
+  Bitmap bitmap=Bitmap.createBitmap(1000,240,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(bitmap);c.drawColor(0xFF181818);
+  RuntimeEnvironment.getApplication().getApplicationInfo().flags |= android.content.pm.ApplicationInfo.FLAG_SUPPORTS_RTL;
+  for(int direction=0;direction<2;direction++) {
+   android.widget.SeekBar bar=new android.widget.SeekBar(RuntimeEnvironment.getApplication());
+   app.flexygram.composer.ComposerSliderTrack track=new app.flexygram.composer.ComposerSliderTrack();
+   track.configure(0xFF60B3E9,0xFF3A3A3A);bar.setProgressDrawable(track);bar.setSplitTrack(false);
+   android.graphics.drawable.GradientDrawable thumb=new android.graphics.drawable.GradientDrawable();thumb.setColor(0xFF60B3E9);thumb.setCornerRadius(6);thumb.setSize(12,78);bar.setThumb(thumb);bar.setThumbOffset(6);bar.setPadding(6,0,6,0);
+   bar.setLayoutDirection(direction==0?android.view.View.LAYOUT_DIRECTION_LTR:android.view.View.LAYOUT_DIRECTION_RTL);
+   bar.setMax(100);bar.setProgress(60);track.setFraction(60,100);
+   bar.measure(android.view.View.MeasureSpec.makeMeasureSpec(940,1073741824),android.view.View.MeasureSpec.makeMeasureSpec(120,1073741824));bar.layout(0,0,940,120);
+   int save=c.save();c.translate(30,direction*120);bar.draw(c);c.restoreToCount(save);
+   assertEquals(direction,bar.getLayoutDirection());
+   int x=30+bar.getThumb().getBounds().centerX(), y=direction*120+60;
+   assertEquals(0xFF60B3E9,bitmap.getPixel(x,y));
+   assertEquals(0xFF181818,bitmap.getPixel(x-18,y));
+   assertEquals(0xFF181818,bitmap.getPixel(x+18,y));
+   assertEquals(direction==0?0xFF60B3E9:0xFF3A3A3A,bitmap.getPixel(x-40,y));
+   assertEquals(direction==0?0xFF3A3A3A:0xFF60B3E9,bitmap.getPixel(x+40,y));
+   assertEquals(12,bar.getThumb().getIntrinsicWidth());assertEquals(78,bar.getThumb().getIntrinsicHeight());
+  }
+  try(FileOutputStream stream=new FileOutputStream(new File(System.getProperty("probe.root"),"native-dimension-sliders.png"))){assertTrue(bitmap.compress(Bitmap.CompressFormat.PNG,100,stream));}
  }
 
  private static class Skin extends android.widget.ImageView {
@@ -63,7 +144,7 @@ public class ComposerVisualTest {
   assertEquals(android.widget.ImageView.ScaleType.FIT_CENTER,view.getScaleType());
   assertTrue("native padding upscaled compact vectors",values[0]>1);
   view.setCompactIcons(true,true);view.measure(android.view.View.MeasureSpec.makeMeasureSpec(132,1073741824),android.view.View.MeasureSpec.makeMeasureSpec(132,1073741824));view.layout(0,0,132,132);view.getImageMatrix().getValues(values);
-  assertEquals("compact glyph must retain its intrinsic 24dp size",1,values[0],0.001);
+  assertEquals("compact glyph must retain its intrinsic 28dp size",1,values[0],0.001);
   for(int i=0;i<1000;i++) {view.setCompactIcons(true,i%2==0);assertEquals(android.widget.ImageView.ScaleType.CENTER_INSIDE,view.getScaleType());}
   view.setCompactIcons(false,true);view.measure(android.view.View.MeasureSpec.makeMeasureSpec(132,1073741824),android.view.View.MeasureSpec.makeMeasureSpec(132,1073741824));view.layout(0,0,132,132);view.getImageMatrix().getValues(values);
   assertEquals(android.widget.ImageView.ScaleType.FIT_CENTER,view.getScaleType());

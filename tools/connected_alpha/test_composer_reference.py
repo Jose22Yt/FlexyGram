@@ -38,9 +38,9 @@ public class Reference {
    ok(ComposerIcons.resource("MENU",-20,reference)==-20);
    ok(ComposerIcons.resource("SMILE",-1,reference)==(reference?R.drawable.flexy_composer_folded:R.drawable.flexy_composer_smile));
    for(int level=0;level<3;level++) {
-    ok(ComposerStyle.diameter(level)==36-2*level);
-    // 24dp vector fits even the smallest surface, with four dp breathing room.
-    ok((ComposerStyle.diameter(level)-24)/2>=4);
+    ok(ComposerStyle.diameter(level)==44-4*level);
+    // 28dp vector fits even the smallest surface, with four dp breathing room.
+    ok((ComposerStyle.diameter(level)-28)/2>=4);
     ok(ComposerGeometry.TOUCH_SLOT==44);
    }
    for(boolean dark:new boolean[]{false,true}) {
@@ -61,14 +61,21 @@ public class Reference {
             with self.subTest(icon=p.name):
                 s=p.read_text(); x=ET.fromstring(s)
                 self.assertIn('SPDX-License-Identifier: GPL-3.0-or-later',s)
-                self.assertEqual(x.get(A+'width'),'24dp')
-                self.assertEqual(x.get(A+'height'),'24dp')
+                traced = p.stem in ('flexy_composer_clip', 'flexy_composer_voice', 'flexy_composer_folded')
+                size = '28dp' if traced else '24dp'
+                self.assertEqual(x.get(A+'width'),size)
+                self.assertEqual(x.get(A+'height'),size)
                 self.assertGreater(len(x.findall('path')),0)
                 for path in x.findall('path'):
-                    self.assertEqual(path.get(A+'strokeWidth'),'1.6')
-                    self.assertEqual(path.get(A+'strokeLineCap'),'round')
-                    self.assertEqual(path.get(A+'strokeLineJoin'),'round')
-                    self.assertEqual(path.get(A+'fillColor'),'@android:color/transparent')
+                    if traced:
+                        self.assertEqual(path.get(A+'fillType'),'evenOdd')
+                        self.assertEqual(path.get(A+'fillColor'),'#FFFFFFFF')
+                        self.assertLess(len(path.get(A+'pathData')),1500)
+                    else:
+                        self.assertEqual(path.get(A+'strokeWidth'),'1.6')
+                        self.assertEqual(path.get(A+'strokeLineCap'),'round')
+                        self.assertEqual(path.get(A+'strokeLineJoin'),'round')
+                        self.assertEqual(path.get(A+'fillColor'),'@android:color/transparent')
 
     def test_style_switch_preserves_semantics_and_special_send_resources(self):
         enter=(ROOT/ENTER).read_text()
@@ -95,7 +102,7 @@ public class Reference {
         self.assertIn('+ flexyGapDp - flexyInsetDp + flexyTextPaddingDp',enter)
         for scale in (1,1.5,2,2.625,3,4):
             dp=lambda n:int(n*scale+0.5)
-            for inset in (4,5,6):
+            for inset in (0,2,4):
                 for gap in range(2,9):
                     attach_right=dp(44)-dp(inset)
                     pill_left=dp(44)-dp(inset)+dp(gap)
