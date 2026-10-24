@@ -25,7 +25,7 @@ public final class SignatureChatThemeActivity extends SignatureMatteSettingsActi
         Adapter(Context context) { super(context); }
         @Override public int getItemViewType(int position) { return TYPE_SETTINGS; }
         @Override public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, boolean partial) {
-            ((TextSettingsCell)holder.itemView).setText(getString(position == themeRow ? R.string.Themes : R.string.ChangeChatBackground), position == themeRow);
+            ((TextSettingsCell)holder.itemView).setText(getString(position == themeRow ? R.string.BrowseThemes : R.string.ChangeChatBackground), position == themeRow);
         }
     }
 }

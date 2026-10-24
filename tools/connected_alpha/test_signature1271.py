@@ -57,6 +57,13 @@ class Signature1271(unittest.TestCase):
      self.assertEqual(icon.tag,'adaptive-icon')
      if version==33:self.assertIsNotNone(icon.find('monochrome'))
   self.assertEqual('io.github.jose22yt.flexygram.alpha',re.search(r'^APP_PACKAGE=(.+)$',(ROOT/'gradle.properties').read_text(),re.M)[1])
+ def test_new_settings_resource_identifiers_exist(self):
+  resources=set()
+  for file in (ROOT/'TMessagesProj/src/main/res/values').glob('*.xml'):
+   for element in ET.parse(file).getroot():
+    if element.tag=='string':resources.add(element.get('name'))
+  for name in ['app/flexygram/settings/SignatureChatThemeActivity.java','org/telegram/ui/LauncherIconController.java','app/exteraless/appicons/AppIconsActivity.java']:
+   for key in re.findall(r'R\.string\.(\w+)',(JAVA/name).read_text()):self.assertIn(key,resources,name+': '+key)
  def test_actual_launcher_batch_and_legacy_update_persistence(self):
   source=(JAVA/'org/telegram/ui/LauncherIconController.java').read_text()
   resources={kind:set(re.findall(r'R\.'+kind+r'\.(\w+)',source)) for kind in ['drawable','mipmap','string']}
