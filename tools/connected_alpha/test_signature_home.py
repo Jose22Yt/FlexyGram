@@ -155,6 +155,14 @@ public class HomePolicyProbe {
             'TMessagesProj/src/main/res/values-es/flexygram_appearance_preview.xml',
             'TMessagesProj/src/main/res/values-ru/flexygram_appearance_preview.xml',
             'tools/connected_alpha/test_native_appearance_previews.py',
+            # User-approved official branding links, secondary legal attribution,
+            # and relocating the existing composer shortcut under Chats > Text input.
+            'TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraSettingsActivity.java',
+            'TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraChatsActivity.java',
+            'TMessagesProj/src/main/res/values/flexygram_settings_info.xml',
+            'TMessagesProj/src/main/res/values-es/flexygram_settings_info.xml',
+            'TMessagesProj/src/main/res/values-ru/flexygram_settings_info.xml',
+            'tools/connected_alpha/test_flexy_settings_identity.py',
         }
         changed=subprocess.check_output(['git','diff','--name-only',BASE,'HEAD'],cwd=ROOT,text=True).splitlines()
         self.assertTrue(changed)
