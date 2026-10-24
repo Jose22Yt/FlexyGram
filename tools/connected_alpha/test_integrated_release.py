@@ -33,3 +33,14 @@ class IntegratedRelease(unittest.TestCase):
    p.chmod(0o600);self.assertEqual(load_private_inputs(p)['ALPHA_CERTIFICATE_SHA256'],CERT)
    p.write_text(json.dumps({'ALPHA_CERTIFICATE_SHA256':'0'*64}))
    with self.assertRaises(ValueError):load_private_inputs(p)
+
+ def test_integrated_variant_strings_have_one_authoritative_brand_key(self):
+  import xml.etree.ElementTree as ET
+  values={}
+  for path in (ROOT/'TMessagesProj/src/connectedAlpha/res/values').glob('*.xml'):
+   for node in ET.parse(path).getroot():
+    if node.tag!='string':continue
+    name=node.get('name');self.assertNotIn(name,values,str(path)+': duplicate string '+str(name));values[name]=node.text
+  self.assertEqual(values['NagramX'],'FlexyGram')
+  self.assertEqual(values['AppName'],'FlexyGram Alpha')
+  self.assertEqual(values['AppNameBeta'],'FlexyGram Alpha')

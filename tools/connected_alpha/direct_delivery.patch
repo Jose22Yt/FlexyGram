@@ -97,3 +97,15 @@ index e639689ef..ee8650242 100644
 -    <string name="FlexyAlphaDeliveryInfo">Alpha updates use the original encrypted delivery and matching offline installer. Upstream client packages cannot update FlexyGram.</string>
 +    <string name="FlexyAlphaDeliveryInfo">Test updates are distributed privately as a signed Android APK. Install the new APK over your current FlexyGram Alpha to keep your data. No decryption or auxiliary installer is needed.</string>
  </resources>
+diff --git a/TMessagesProj/src/connectedAlpha/res/values/alpha_name.xml b/TMessagesProj/src/connectedAlpha/res/values/alpha_name.xml
+index bae27215f..7436f1f4c 100644
+--- a/TMessagesProj/src/connectedAlpha/res/values/alpha_name.xml
++++ b/TMessagesProj/src/connectedAlpha/res/values/alpha_name.xml
+@@ -1,7 +1,6 @@
+ <resources>
+   <string name="AppName">FlexyGram Alpha</string>
+   <string name="AppNameBeta">FlexyGram Alpha</string>
+-  <string name="NagramX">FlexyGram Alpha</string>
+   <string name="OpenExtera">FlexyGram</string>
+   <string name="AppIconExteraless" translatable="false">FlexyGram</string>
+ </resources>
