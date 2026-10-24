@@ -147,6 +147,14 @@ public class HomePolicyProbe {
             'tools/connected_alpha/home_visual/run.py',
             'tools/connected_alpha/home_visual/pom.xml',
             'tools/connected_alpha/home_visual/HomeVisualTest.java.in',
+            # Follow-up preview-only PR #72, no native Home or composer modifications.
+            'TMessagesProj/src/main/java/app/exteraless/appearance/AvatarCornersPreviewCell.java',
+            'TMessagesProj/src/main/java/app/exteraless/appearance/ChatListPreviewCell.java',
+            'TMessagesProj/src/main/java/app/exteraless/appearance/FoldersPreviewCell.java',
+            'TMessagesProj/src/main/res/values/flexygram_appearance_preview.xml',
+            'TMessagesProj/src/main/res/values-es/flexygram_appearance_preview.xml',
+            'TMessagesProj/src/main/res/values-ru/flexygram_appearance_preview.xml',
+            'tools/connected_alpha/test_native_appearance_previews.py',
         }
         changed=subprocess.check_output(['git','diff','--name-only',BASE,'HEAD'],cwd=ROOT,text=True).splitlines()
         self.assertTrue(changed)
