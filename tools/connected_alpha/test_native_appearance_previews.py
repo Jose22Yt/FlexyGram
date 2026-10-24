@@ -48,6 +48,12 @@ class NativeAppearancePreviews(unittest.TestCase):
         self.assertIn("R.drawable.flexy_home_search", code)
         self.assertIn("R.drawable.flexy_home_more", code)
         self.assertNotIn("R.drawable.ic_ab_other", code)
+        self.assertIn("new SignatureHomePainter()", code)
+        self.assertIn("SignatureHomeStyle.controlDiameter(", code)
+        self.assertIn("painter.control(canvas,", code)
+        self.assertIn("dark, false, item.getAlpha()", code)
+        self.assertIn("setDrawGlassTitle(false)", code)
+        self.assertIn("doNotDrawGlassMenu = true", code)
         for icon in ("flexy_home_search.xml", "flexy_home_more.xml"):
             self.assertTrue((RES / "drawable" / icon).exists())
 
