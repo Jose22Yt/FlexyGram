@@ -38,7 +38,7 @@ public class Policy {
     if(widthDp>=360) ok((width-2*margin)/density>=324-1/density);
    }
   }
-  ok(ComposerStyle.sideMargin(1268,128f/44,20)==82);
+  ok(ComposerStyle.sideMargin(1269,128f/44,20)==82);
   System.out.print("PASS production geometry policy");
  }
 }
@@ -96,8 +96,8 @@ public class Policy {
             for density in ('mdpi','hdpi','xhdpi','xxhdpi','xxxhdpi'):self.assertTrue((res/f'mipmap-{density}'/f'{name}.png').is_file())
         manifest=(ROOT/'TMessagesProj/src/main/AndroidManifest.xml').read_text()
         self.assertIn('org.telegram.messenger.ExteralessIcon',manifest)
-        self.assertIn('def verCode = 1267',(ROOT/'TMessagesProj/build.gradle').read_text())
-        self.assertIn('--expected-version-code 1267',(ROOT/'.github/workflows/connected-alpha-arm64.yml').read_text())
+        self.assertIn('def verCode = 1269',(ROOT/'TMessagesProj/build.gradle').read_text())
+        self.assertIn('--expected-version-code 1269',(ROOT/'.github/workflows/connected-alpha-arm64.yml').read_text())
         self.assertIn('previous != LEGACY_DEFAULT_TITLE && previous != "exteraless"',(ROOT/'TMessagesProj/src/main/kotlin/app/exteraless/appearance/AppearanceConfig.kt').read_text())
         self.assertIn('R.string.FlexyBrandName',(ROOT/'TMessagesProj/src/main/java/tw/nekomimi/nekogram/helpers/TypefaceHelper.java').read_text())
 

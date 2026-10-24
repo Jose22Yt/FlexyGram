@@ -172,6 +172,6 @@ public class HomePolicyProbe {
         self.assertEqual(set(changed)-allowed,set())
         gradle=subprocess.check_output(['git','diff',BASE,'--','TMessagesProj/build.gradle'],cwd=ROOT,text=True)
         additions=[l for l in gradle.splitlines() if l.startswith('+') and not l.startswith('+++')]
-        self.assertEqual(additions,['+def verCode = 1267',"+        versionNameSuffix = '-alpha2-integrated-signature'"])
+        self.assertEqual(additions,['+def verCode = 1269',"+        versionNameSuffix = '-alpha2-signature-matte'"])
 
 if __name__=='__main__':unittest.main()
