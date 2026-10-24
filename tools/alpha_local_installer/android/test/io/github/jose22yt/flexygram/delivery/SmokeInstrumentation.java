@@ -1,4 +1,4 @@
-package io.github.jose22yt.flexygram.delivery.alpha2.signature1264;
+package io.github.jose22yt.flexygram.delivery.alpha2.ios1265;
 
 import android.app.Activity;
 import android.app.Instrumentation;
@@ -44,12 +44,14 @@ public final class SmokeInstrumentation extends Instrumentation {
                     app.flexygram.composer.FlexyComposerConfig.setPosition(n - 7);
                     app.flexygram.composer.FlexyComposerConfig.setGap(n - 5);
                     app.flexygram.composer.FlexyComposerConfig.setGlass(n % 2 == 0);
+                    app.flexygram.composer.FlexyComposerConfig.setReferenceIcons(n % 2 == 0);
+                    check(app.flexygram.composer.FlexyComposerConfig.referenceIcons() == (n % 2 == 0));
                     check(app.flexygram.composer.FlexyComposerConfig.compact());
                     int position = app.flexygram.composer.FlexyComposerConfig.position();
                     int gap = app.flexygram.composer.FlexyComposerConfig.gap();
                     check(position >= -4 && position <= 16 && gap >= 2 && gap <= 8);
                     check(app.flexygram.composer.ComposerGeometry.TOUCH_SLOT == 44);
-                    check(app.flexygram.composer.ComposerStyle.diameter(n % 3) >= 36);
+                    check(app.flexygram.composer.ComposerStyle.diameter(n % 3) >= 32);
                     app.flexygram.composer.FlexyComposerConfig.setStyle(0);
                     check(!app.flexygram.composer.FlexyComposerConfig.compact());
                 }
@@ -62,6 +64,8 @@ public final class SmokeInstrumentation extends Instrumentation {
                 check(app.flexygram.composer.FlexyComposerConfig.position() == 0);
                 check(app.flexygram.composer.FlexyComposerConfig.level() == 0);
                 check(app.flexygram.composer.FlexyComposerConfig.gap() == 6);
+                check(app.flexygram.composer.FlexyComposerConfig.referenceIcons());
+                check(!prefs.contains(app.flexygram.composer.FlexyComposerConfig.ICONS));
                 check(!app.flexygram.composer.FlexyComposerConfig.glass());
                 check(notifications[0] > 0);
                 prefs.unregisterOnSharedPreferenceChangeListener(listener);
@@ -92,7 +96,7 @@ public final class SmokeInstrumentation extends Instrumentation {
                 View root = activity.getWindow().getDecorView();
                 check(button(root, "1. Seleccionar archivo cifrado").isEnabled());
                 check(!button(root, "3. Descifrar y comprobar").isEnabled());
-                check(!button(root, "4. Actualizar FlexyGram Signature Personalized").isEnabled());
+                check(!button(root, "4. Actualizar FlexyGram iOS Compact").isEnabled());
             });
             File cipher = new File(c.getCacheDir(), "test-cipher"), identity = new File(c.getCacheDir(), "test-identity");
             Files.write(cipher.toPath(), "invalid encrypted test bytes".getBytes(StandardCharsets.UTF_8));
@@ -106,7 +110,7 @@ public final class SmokeInstrumentation extends Instrumentation {
             try { c.getContentResolver().openFileDescriptor(VerifiedApkProvider.URI, "rw"); } catch (Exception e) { rejected = true; }
             check(rejected);
             rejected = false;
-            try { c.getContentResolver().openFileDescriptor(Uri.parse("content://io.github.jose22yt.flexygram.delivery.alpha2.signature1264.files/../identity"), "r"); } catch (Exception e) { rejected = true; }
+            try { c.getContentResolver().openFileDescriptor(Uri.parse("content://io.github.jose22yt.flexygram.delivery.alpha2.ios1265.files/../identity"), "r"); } catch (Exception e) { rejected = true; }
             check(rejected);
             File fake = new File(Contract.directory(c), Contract.APK);
             Files.write(fake.toPath(), new byte[]{1,2,3});
