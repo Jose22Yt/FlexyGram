@@ -274,7 +274,7 @@ public class OpenExteraSettingsActivity extends BaseNekoSettingsActivity {
                     } else if (position == chatsRow) {
                         cell.setTextAndIcon(getString(R.string.OpenExteraChats), R.drawable.msg_discussion, true);
                     } else if (position == flexyComposerRow) {
-                        cell.setTextAndIcon(getString(R.string.FlexyComposerSettings), R.drawable.msg_discussion, true);
+                        cell.setTextAndIcon(getString(R.string.FlexySettingsComposerRow), R.drawable.msg_discussion, true);
                     } else if (position == pluginsRow) {
                         cell.setTextAndIcon(getString(R.string.OpenExteraPlugins), R.drawable.msg_plugins, true);
                     } else if (position == otherRow) {
