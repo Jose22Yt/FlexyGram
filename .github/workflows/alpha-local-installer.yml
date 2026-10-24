@@ -60,7 +60,7 @@ jobs:
       - uses: actions/checkout@v4
         if: steps.profile.outputs.ready == 'true'
         with:
-          ref: 1ff3053331656f7a32f3a093fb735abb61018770
+          ref: b478f02ad8a3cee5a17f58d3909c4961a3555651
           path: signature-source
           persist-credentials: false
           sparse-checkout: TMessagesProj/src/main/java/app/flexygram/composer
