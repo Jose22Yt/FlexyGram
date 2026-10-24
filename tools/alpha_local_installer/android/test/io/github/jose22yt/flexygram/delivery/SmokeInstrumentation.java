@@ -1,4 +1,4 @@
-package io.github.jose22yt.flexygram.delivery.alpha2.integrated1267;
+package io.github.jose22yt.flexygram.delivery.alpha2.home2v1268;
 
 import android.app.Activity;
 import android.app.Instrumentation;
@@ -96,7 +96,7 @@ public final class SmokeInstrumentation extends Instrumentation {
                 View root = activity.getWindow().getDecorView();
                 check(button(root, "1. Seleccionar archivo cifrado").isEnabled());
                 check(!button(root, "3. Descifrar y comprobar").isEnabled());
-                check(!button(root, "4. Actualizar FlexyGram Alpha 2 integrada").isEnabled());
+                check(!button(root, "4. Actualizar FlexyGram Signature Home 2").isEnabled());
             });
             File cipher = new File(c.getCacheDir(), "test-cipher"), identity = new File(c.getCacheDir(), "test-identity");
             Files.write(cipher.toPath(), "invalid encrypted test bytes".getBytes(StandardCharsets.UTF_8));
@@ -110,7 +110,7 @@ public final class SmokeInstrumentation extends Instrumentation {
             try { c.getContentResolver().openFileDescriptor(VerifiedApkProvider.URI, "rw"); } catch (Exception e) { rejected = true; }
             check(rejected);
             rejected = false;
-            try { c.getContentResolver().openFileDescriptor(Uri.parse("content://io.github.jose22yt.flexygram.delivery.alpha2.integrated1267.files/../identity"), "r"); } catch (Exception e) { rejected = true; }
+            try { c.getContentResolver().openFileDescriptor(Uri.parse("content://io.github.jose22yt.flexygram.delivery.alpha2.home2v1268.files/../identity"), "r"); } catch (Exception e) { rejected = true; }
             check(rejected);
             File fake = new File(Contract.directory(c), Contract.APK);
             Files.write(fake.toPath(), new byte[]{1,2,3});
