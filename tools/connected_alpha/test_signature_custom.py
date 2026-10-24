@@ -16,9 +16,9 @@ public class Policy {
  public static void main(String[] a){
   for(int raw=-1000;raw<=1000;raw++) {
    int y=ComposerStyle.position(raw);ok(y>=-4 && y<=16);
-   ok(9+y>=5);ok(ComposerStyle.reserve(y)==Math.max(0,y));
+   ok(9+y>=5);ok(ComposerStyle.reserve(y)==10+y);
    int level=ComposerStyle.level(raw);ok(level>=0 && level<=2);
-   ok(ComposerStyle.diameter(raw)>=32 && ComposerStyle.diameter(raw)<=36);
+   ok(ComposerStyle.diameter(raw)>=36 && ComposerStyle.diameter(raw)<=44);
    for(int g=-20;g<=20;g++) {
     int gap=ComposerStyle.gap(raw,g);ok(gap>=2 && gap<=8);
     ok(ComposerStyle.padding(raw)>=10);
@@ -29,7 +29,16 @@ public class Policy {
     }
    }
   }
-  ok(ComposerStyle.position(0)==0 && ComposerStyle.inset(0)==4 && ComposerStyle.gap(0,0)==6);
+  ok(ComposerStyle.position(0)==0 && ComposerStyle.inset(0)==0 && ComposerStyle.gap(0,0)==6);
+  for(float density:new float[]{1,1.5f,2,2.625f,3,4}) {
+   for(int widthDp:new int[]{280,320,360,390,440,600,900}) {
+    int width=Math.round(widthDp*density), nativeMargin=Math.round(7*density);
+    int margin=ComposerStyle.sideMargin(width,density,nativeMargin);
+    ok(margin>=nativeMargin && margin<=Math.max(nativeMargin,Math.round(32*density)));
+    if(widthDp>=360) ok((width-2*margin)/density>=324-1/density);
+   }
+  }
+  ok(ComposerStyle.sideMargin(1268,128f/44,20)==82);
   System.out.print("PASS production geometry policy");
  }
 }
@@ -54,11 +63,11 @@ public class Policy {
         offset=method_bodies(enter,'getFlexyVerticalOffset')[0]
         self.assertIn('getVisibility() == VISIBLE',offset)
         self.assertIn('getAlpha() == 1f',offset)
-        self.assertIn('Math.max(0, dp(flexyPositionDp))',method_bodies(enter,'getFlexyVerticalReservation')[0])
+        self.assertIn('dp(app.flexygram.composer.ComposerStyle.reserve(flexyPositionDp))',method_bodies(enter,'getFlexyVerticalReservation')[0])
         for position in range(-4,17):
             for alpha in [0,0.1,0.5,0.99,1]:
-                actual=position if alpha==1 else 0
-                reserved=max(0,position)*alpha
+                actual=10+position if alpha==1 else 0
+                reserved=(10+position)*alpha
                 self.assertGreaterEqual(reserved,actual)
         self.assertIn('onChangedIslandTotalHeight(newIslandTotalHeight)',enter)
         for token in ('setScaleX(', 'setScaleY(', 'setTranslationY('):
@@ -87,8 +96,8 @@ public class Policy {
             for density in ('mdpi','hdpi','xhdpi','xxhdpi','xxxhdpi'):self.assertTrue((res/f'mipmap-{density}'/f'{name}.png').is_file())
         manifest=(ROOT/'TMessagesProj/src/main/AndroidManifest.xml').read_text()
         self.assertIn('org.telegram.messenger.ExteralessIcon',manifest)
-        self.assertIn('def verCode = 1265',(ROOT/'TMessagesProj/build.gradle').read_text())
-        self.assertIn('--expected-version-code 1265',(ROOT/'.github/workflows/connected-alpha-arm64.yml').read_text())
+        self.assertIn('def verCode = 1266',(ROOT/'TMessagesProj/build.gradle').read_text())
+        self.assertIn('--expected-version-code 1266',(ROOT/'.github/workflows/connected-alpha-arm64.yml').read_text())
         self.assertIn('previous != LEGACY_DEFAULT_TITLE && previous != "exteraless"',(ROOT/'TMessagesProj/src/main/kotlin/app/exteraless/appearance/AppearanceConfig.kt').read_text())
         self.assertIn('R.string.FlexyBrandName',(ROOT/'TMessagesProj/src/main/java/tw/nekomimi/nekogram/helpers/TypefaceHelper.java').read_text())
 

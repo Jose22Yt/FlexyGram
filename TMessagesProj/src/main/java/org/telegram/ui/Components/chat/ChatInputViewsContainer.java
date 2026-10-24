@@ -43,6 +43,7 @@ public class ChatInputViewsContainer extends FrameLayout {
     private final FrameLayout inputIslandBubbleContainer;
     private final FrameLayout inAppKeyboardBubbleContainer;
     private ChatActivityEnterView flexyComposer;
+    private int flexyNativeLeftMargin, flexyNativeRightMargin;
     private boolean flexyPearlGlass;
     private final SharedPreferences.OnSharedPreferenceChangeListener flexyListener = (prefs, key) -> {
         flexyPearlGlass = FlexyComposerConfig.glass();
@@ -54,9 +55,23 @@ public class ChatInputViewsContainer extends FrameLayout {
         super(context);
 
         inputIslandBubbleContainer = new FrameLayout(context) {
+            @Override protected void onMeasure(int widthSpec, int heightSpec) {
+                if (flexyComposer != null) {
+                    LayoutParams lp = (LayoutParams) flexyComposer.getLayoutParams();
+                    int width = MeasureSpec.getSize(widthSpec);
+                    lp.leftMargin = flexyComposer.getFlexyHorizontalMargin(width, flexyNativeLeftMargin);
+                    lp.rightMargin = flexyComposer.getFlexyHorizontalMargin(width, flexyNativeRightMargin);
+                }
+                super.onMeasure(widthSpec, heightSpec);
+            }
             @Override public void onViewAdded(View child) {
                 super.onViewAdded(child);
-                if (child instanceof ChatActivityEnterView) flexyComposer = (ChatActivityEnterView) child;
+                if (child instanceof ChatActivityEnterView) {
+                    flexyComposer = (ChatActivityEnterView) child;
+                    LayoutParams lp = (LayoutParams) child.getLayoutParams();
+                    flexyNativeLeftMargin = lp.leftMargin;
+                    flexyNativeRightMargin = lp.rightMargin;
+                }
             }
             @Override public void onViewRemoved(View child) {
                 super.onViewRemoved(child);

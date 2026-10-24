@@ -687,7 +687,7 @@ public class ChatActivityEnterView extends FrameLayout implements
     private boolean flexyCompactRequested;
     private boolean flexyCompactLayout;
     private boolean flexyMenuState;
-    private int flexyInsetDp = 4, flexyGapDp = 6, flexyTextPaddingDp = 12, flexyPositionDp;
+    private int flexyInsetDp, flexyGapDp = 6, flexyTextPaddingDp = 14, flexyPositionDp;
     private void readFlexyGeometry() {
         final int level = app.flexygram.composer.FlexyComposerConfig.level();
         flexyInsetDp = app.flexygram.composer.ComposerStyle.inset(level);
@@ -697,9 +697,9 @@ public class ChatActivityEnterView extends FrameLayout implements
     }
     public int getFlexyVerticalOffset() {
         // Search, message actions and channel overlays share the parent island.
-        return flexyCompactLayout && getVisibility() == VISIBLE && getAlpha() == 1f ? dp(flexyPositionDp) : 0;
+        return flexyCompactLayout && getVisibility() == VISIBLE && getAlpha() == 1f ? dp(app.flexygram.composer.ComposerStyle.offset(flexyPositionDp)) : 0;
     }
-    private int getFlexyVerticalReservation() { return flexyCompactLayout ? Math.max(0, dp(flexyPositionDp)) : 0; }
+    private int getFlexyVerticalReservation() { return flexyCompactLayout ? dp(app.flexygram.composer.ComposerStyle.reserve(flexyPositionDp)) : 0; }
     public int getFlexyVisualInset() { return dp(flexyInsetDp); }
 
     private int flexyNativeFieldRight = -1;
@@ -16566,15 +16566,24 @@ public class ChatActivityEnterView extends FrameLayout implements
         return dp(app.flexygram.composer.ComposerGeometry.TEXT_END_SLOT) + Math.round(Math.max(0, -nativeAttachTranslationX()));
     }
 
-    /** Mutates only existing presentation params during the native measure pass. */
-    private void applyFlexyComposerPresentation(int width) {
-        if (!flexyCompactRequested && !flexyCompactLayout) return;
-        final boolean specialControls = !isChat || parentFragment == null || isStories
+    private boolean hasFlexySpecialControls() {
+        return !isChat || parentFragment == null || isStories
             || senderSelectView != null && senderSelectView.getVisibility() == VISIBLE
             || botCommandsMenuButton != null && (botCommandsMenuButton.getTag() != null || botCommandsMenuButton.getVisibility() == VISIBLE)
             || botWebViewButton != null && botWebViewButton.getVisibility() == VISIBLE
             || aiButton != null && aiButton.getVisibility() == VISIBLE
             || ((MarginLayoutParams) emojiButton.getLayoutParams()).leftMargin > dp(3);
+    }
+
+    public int getFlexyHorizontalMargin(int width, int nativeMargin) {
+        if (!flexyCompactRequested || emojiButton == null || hasFlexySpecialControls()) return nativeMargin;
+        return app.flexygram.composer.ComposerStyle.sideMargin(width, AndroidUtilities.density, nativeMargin);
+    }
+
+    /** Mutates only existing presentation params during the native measure pass. */
+    private void applyFlexyComposerPresentation(int width) {
+        if (!flexyCompactRequested && !flexyCompactLayout) return;
+        final boolean specialControls = hasFlexySpecialControls();
         final boolean compact = flexyCompactRequested && app.flexygram.composer.ComposerGeometry.supportsCompact(
             (width + Math.min(0, nativeAttachTranslationX())) / AndroidUtilities.density, specialControls);
         if (!compact && !flexyCompactLayout) return;
@@ -16587,7 +16596,7 @@ public class ChatActivityEnterView extends FrameLayout implements
         // The outer native onMeasure has already reserved sender/bot controls.
         // Preserve that value when falling back, rather than restoring a constant.
         if (compact) emoji.leftMargin = 0;
-        emoji.rightMargin = compact ? dp(3) : 0;
+        emoji.rightMargin = compact ? dp(7) : 0;
         if (deleteRichDraftButton != null) {
             FrameLayout.LayoutParams delete = (FrameLayout.LayoutParams) deleteRichDraftButton.getLayoutParams();
             delete.gravity = emoji.gravity;
@@ -16595,6 +16604,7 @@ public class ChatActivityEnterView extends FrameLayout implements
             delete.rightMargin = emoji.rightMargin;
         }
         if (messageEditText != null) {
+            messageEditText.setStaticHintTypeface(compact ? android.graphics.Typeface.DEFAULT : null);
             FrameLayout.LayoutParams text = (FrameLayout.LayoutParams) messageEditText.getLayoutParams();
             if (compact) text.leftMargin = dp(app.flexygram.composer.ComposerGeometry.TOUCH_SLOT
                 + flexyGapDp - flexyInsetDp + flexyTextPaddingDp);

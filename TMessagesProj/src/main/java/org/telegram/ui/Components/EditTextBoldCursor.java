@@ -107,6 +107,17 @@ public class EditTextBoldCursor extends EditTextEffects {
     private float lineSpacingExtra;
     private Rect rect = new Rect();
     private StaticLayout hintLayout;
+    private android.graphics.Typeface staticHintTypeface;
+    private TextPaint staticHintPaint;
+
+    /** Optional static placeholder font, independent of the editable text paint. */
+    public void setStaticHintTypeface(android.graphics.Typeface typeface) {
+        if (staticHintTypeface == typeface) return;
+        staticHintTypeface = typeface;
+        if (typeface != null && staticHintPaint == null) staticHintPaint = new TextPaint();
+        hintLayout = null;
+        setHintText(hint, false, getPaint());
+    }
     public float hintLayoutX, hintLayoutY;
     public boolean hintLayoutYFix;
     public boolean lineYFix;
@@ -631,6 +642,12 @@ public class EditTextBoldCursor extends EditTextEffects {
     }
 
     public void setHintText(CharSequence text, boolean animated, TextPaint paint) {
+        if (staticHintTypeface != null && hintAnimatedDrawable == null) {
+            staticHintPaint.set(paint);
+            staticHintPaint.setTypeface(staticHintTypeface);
+            staticHintPaint.setFakeBoldText(false);
+            paint = staticHintPaint;
+        }
         if (hintAnimatedDrawable != null) {
             hintAnimatedDrawable.setText(text, !LocaleController.isRTL);
         } else {

@@ -6,7 +6,7 @@ public final class ComposerGeometry {
     public static final int VISUAL_INSET = 2;
     public static final int PILL_GAP = 6;
     public static final int TEXT_PADDING = 12;
-    public static final int TEXT_END_SLOT = 50;
+    public static final int TEXT_END_SLOT = 56;
     // Keep the original native 44dp recording/send hit area outside the text pill.
     public static final int TRAILING_ACTION_SLOT = TOUCH_SLOT + PILL_GAP;
 
