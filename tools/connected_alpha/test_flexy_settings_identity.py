@@ -9,6 +9,7 @@ from xml.etree import ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[2]
 JAVA = ROOT / "TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraSettingsActivity.java"
+CHATS_JAVA = ROOT / "TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraChatsActivity.java"
 RES = ROOT / "TMessagesProj/src/main/res"
 SOURCE_URL = "https://github.com/Jose22Yt/FlexyGram"
 UPSTREAM_URL = "https://github.com/exteraless/exteraless"
@@ -17,6 +18,7 @@ UPSTREAM_URL = "https://github.com/exteraless/exteraless"
 class FlexySettingsIdentity(unittest.TestCase):
     def setUp(self):
         self.java = JAVA.read_text(encoding="utf-8")
+        self.chats_java = CHATS_JAVA.read_text(encoding="utf-8")
 
     def test_official_links_replace_upstream_promotional_links(self):
         self.assertIn(SOURCE_URL, self.java)
@@ -42,9 +44,23 @@ class FlexySettingsIdentity(unittest.TestCase):
             'creditsRow = addRow("flexyCredits")',
             "showFlexyAbout();",
             "showFlexyCredits();",
-            "R.string.FlexySettingsComposerRow",
         ):
             self.assertIn(expected, self.java)
+        self.assertNotIn("flexyComposerRow", self.java)
+        self.assertNotIn("FlexyComposerSettingsActivity", self.java)
+        self.assertIn('composerSettingsRow = addRow("flexyComposerSettings")', self.chats_java)
+        self.assertIn("R.string.FlexySettingsComposerRow", self.chats_java)
+        self.assertIn("R.string.FlexySettingsComposerDescription", self.chats_java)
+        self.assertIn("presentFragment(new app.flexygram.composer.FlexyComposerSettingsActivity())", self.chats_java)
+        order = [self.chats_java.index(x) for x in (
+            'linksDividerRow = addRow();',
+            'inputHeaderRow = addRow("inputHeader");',
+            'composerSettingsRow = addRow("flexyComposerSettings");',
+            'addCommaRow = addRow("addCommaAfterMention");',
+            'doubleTapHeaderRow = addRow("doubleTapHeader");',
+        )]
+        self.assertEqual(order, sorted(order))
+        self.assertIn("position == composerSettingsRow || position == aiChatRow", self.chats_java)
         self.assertNotIn("R.string.FlexyComposerSettings), R.drawable.msg_discussion", self.java)
         self.assertTrue((RES / "values/flexygram_composer.xml").is_file())
 
@@ -61,6 +77,7 @@ class FlexySettingsIdentity(unittest.TestCase):
             "FlexySettingsLicenseAction",
             "FlexySettingsUpstreamAction",
             "FlexySettingsComposerRow",
+            "FlexySettingsComposerDescription",
         }
         for directory in ("values", "values-es", "values-ru"):
             path = RES / directory / "flexygram_settings_info.xml"
@@ -74,8 +91,10 @@ class FlexySettingsIdentity(unittest.TestCase):
                 self.assertIn("BlueprintDsgn", entries["FlexySettingsCreditsBody"])
                 self.assertIn("GPL-3.0", entries["FlexySettingsCreditsBody"])
                 self.assertTrue(entries["FlexySettingsComposerRow"].strip())
+                self.assertTrue(entries["FlexySettingsComposerDescription"].strip())
                 for key in keys:
-                    self.assertIn(f"R.string.{key}", self.java)
+                    target = self.chats_java if key in ("FlexySettingsComposerRow", "FlexySettingsComposerDescription") else self.java
+                    self.assertIn(f"R.string.{key}", target)
 
 
 if __name__ == "__main__":
