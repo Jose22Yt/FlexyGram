@@ -67,6 +67,12 @@ def main():
             if restored != expected: raise SystemExit('FAIL: native chat changed outside bubble presentation')
             presentation[path] = {'actual_sha256': hashlib.sha256(actual).hexdigest(), 'restored_upstream_sha256': hashlib.sha256(restored).hexdigest()}
             continue
+        if path.endswith('/ui/LoginActivity.java') and actual != expected:
+            from login_parity import restore_login_presentation
+            restored = restore_login_presentation(path, actual)
+            if restored != expected: raise SystemExit('FAIL: authentication changed outside login presentation')
+            presentation[path] = {'actual_sha256': hashlib.sha256(actual).hexdigest(), 'restored_upstream_sha256': hashlib.sha256(restored).hexdigest()}
+            continue
         if actual != expected:
             raise SystemExit(f'FAIL: upstream component changed: {path}')
         evidence[path] = hashlib.sha256(actual).hexdigest()

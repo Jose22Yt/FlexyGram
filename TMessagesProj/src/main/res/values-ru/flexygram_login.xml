@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexySignatureName" translatable="false">FlexyGram</string>
+    <string name="FlexySignatureTagline">Твой Telegram — по-твоему</string>
+    <string name="FlexySignatureStart">Начать общение</string>
+    <string name="FlexySignatureLanguage">Язык</string>
+    <string name="FlexyAlphaDeliveries">Проверенные сборки Alpha</string>
+    <string name="FlexyAlphaDeliveryInfo">Обновления Alpha используют зашифрованную доставку и совместимый офлайн-установщик. Пакеты исходного клиента не обновляют FlexyGram.</string>
+</resources>
