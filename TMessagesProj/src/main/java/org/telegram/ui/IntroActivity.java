@@ -148,7 +148,11 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
                 startPressed = false;
                 signatureWelcome.startButton.setEnabled(true);
             }
-        }, () -> presentFragment(new LanguageSelectActivity()));
+        }, () -> {
+            if (startPressed) return;
+            startPressed = true;
+            if (!presentFragment(new LanguageSelectActivity())) startPressed = false;
+        });
         fragmentView = signatureWelcome;
         ConnectionsManager.getInstance(currentAccount).updateDcSettings();
         LocaleController.getInstance().loadRemoteLanguages(currentAccount);

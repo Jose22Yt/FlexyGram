@@ -41,6 +41,31 @@ class SignatureLoginTests(unittest.TestCase):
   self.assertIn('new LoginActivity(), true',source)
   self.assertIn('ConnectionsManager.getInstance(currentAccount).updateDcSettings();',source)
   self.assertIn('new LanguageSelectActivity()',source)
+ def test_actual_welcome_callbacks_block_repeated_and_cross_action_taps(self):
+  source=(JAVA/'org/telegram/ui/IntroActivity.java').read_text()
+  begin=source.index('        signatureWelcome = new app.flexygram.login.SignatureWelcomeView(')
+  statement=source[begin:source.index('        fragmentView = signatureWelcome;',begin)]
+  statement=statement.replace('app.flexygram.login.SignatureWelcomeView','FakeWelcome')
+  fixture="""public class WelcomeGateProbe {
+   static class Button {boolean enabled=true;void setEnabled(boolean v){enabled=v;}}
+   static class LoginActivity {} static class LanguageSelectActivity {}
+   static class FakeWelcome {Button startButton=new Button();Runnable start,language;FakeWelcome(int context,Runnable a,Runnable b){start=a;language=b;}}
+   boolean startPressed,accept=true;int calls;FakeWelcome signatureWelcome;
+   boolean presentFragment(Object value,boolean remove){calls++;return accept;}
+   boolean presentFragment(Object value){return presentFragment(value,false);}
+   void create(int context){_STATEMENT_}
+   static void check(boolean value){if(!value)throw new AssertionError();}
+   public static void main(String[] args){
+    WelcomeGateProbe first=new WelcomeGateProbe();first.create(0);first.signatureWelcome.start.run();first.signatureWelcome.start.run();first.signatureWelcome.language.run();check(first.calls==1);check(!first.signatureWelcome.startButton.enabled);
+    WelcomeGateProbe lang=new WelcomeGateProbe();lang.create(0);lang.signatureWelcome.language.run();lang.signatureWelcome.language.run();lang.signatureWelcome.start.run();check(lang.calls==1);
+    WelcomeGateProbe failure=new WelcomeGateProbe();failure.accept=false;failure.create(0);failure.signatureWelcome.start.run();check(!failure.startPressed&&failure.signatureWelcome.startButton.enabled);failure.signatureWelcome.language.run();check(!failure.startPressed&&failure.calls==2);
+   }
+  }""".replace('_STATEMENT_',statement)
+  import tempfile
+  with tempfile.TemporaryDirectory() as temp:
+   runner=Path(temp)/'WelcomeGateProbe.java';runner.write_text(fixture)
+   subprocess.run(['java','-m','jdk.compiler/com.sun.tools.javac.Main','-d',temp,str(runner)],check=True,capture_output=True)
+   subprocess.run(['java','-cp',temp,'WelcomeGateProbe'],check=True,capture_output=True)
  def test_shared_icon_is_resolved_without_replacing_work1_artwork(self):
   identity=(JAVA/'app/flexygram/login/SignatureIdentity.java').read_text()
   self.assertIn('getIdentifier("ic_flexy_blue", "mipmap"',identity)
