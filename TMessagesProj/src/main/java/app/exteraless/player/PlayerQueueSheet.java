@@ -41,11 +41,14 @@ import java.util.Locale;
 
 public class PlayerQueueSheet extends BottomSheet implements NotificationCenter.NotificationCenterDelegate {
 
-    private final PlayerColors colors;
+    private PlayerColors colors;
+    private final GradientDrawable sheetBg = new GradientDrawable();
     private final int account;
     private final FrameLayout root;
     private final RecyclerListView list;
     private final LinearLayoutManager layoutManager;
+    private final LinearLayout header;
+    private final TextView title;
     private final TextView subtitle;
     private final TextView chip;
     private final GradientDrawable chipBg = new GradientDrawable();
@@ -64,13 +67,20 @@ public class PlayerQueueSheet extends BottomSheet implements NotificationCenter.
         account = playing != null ? playing.currentAccount : currentAccount;
         currentAccount = account;
 
-        GradientDrawable bg = new GradientDrawable();
+        GradientDrawable bg = sheetBg;
         bg.setColor(colors.surfaceLow);
         bg.setCornerRadii(new float[]{dp(28), dp(28), dp(28), dp(28), 0, 0, 0, 0});
         root = new FrameLayout(context) {
             @Override
             protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
                 int h = (int) (MeasureSpec.getSize(heightMeasureSpec) * 0.78f);
+                if (header != null && list != null) {
+                    header.measure(MeasureSpec.makeMeasureSpec(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.EXACTLY),
+                            MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+                    int headerHeight = Math.max(dp(72), header.getMeasuredHeight());
+                    header.getLayoutParams().height = headerHeight;
+                    ((FrameLayout.LayoutParams) list.getLayoutParams()).topMargin = dp(42) + headerHeight;
+                }
                 super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(h, MeasureSpec.EXACTLY));
             }
 
@@ -98,27 +108,29 @@ public class PlayerQueueSheet extends BottomSheet implements NotificationCenter.
         handle.setBackground(handleBg);
         root.addView(handle, LayoutHelper.createFrame(32, 4, Gravity.CENTER_HORIZONTAL | Gravity.TOP, 0, 18, 0, 0));
 
-        LinearLayout header = new LinearLayout(context);
-        header.setOrientation(LinearLayout.HORIZONTAL);
+        header = new LinearLayout(context);
+        header.setOrientation(context.getResources().getConfiguration().fontScale > 1.5f ? LinearLayout.VERTICAL : LinearLayout.HORIZONTAL);
         header.setGravity(Gravity.CENTER_VERTICAL);
         header.setPadding(dp(24), 0, dp(24), 0);
         LinearLayout titles = new LinearLayout(context);
         titles.setOrientation(LinearLayout.VERTICAL);
-        TextView title = new TextView(context);
-        title.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 22);
+        title = new TextView(context);
+        title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
         title.setTypeface(AndroidUtilities.bold());
         title.setTextColor(colors.onSurface);
         title.setText(getString(R.string.OEPlayerQueue));
         titles.addView(title, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT));
         subtitle = new TextView(context);
-        subtitle.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
+        subtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         subtitle.setTextColor(colors.onSurfaceVariant);
         subtitle.setSingleLine(true);
         subtitle.setEllipsize(TextUtils.TruncateAt.END);
         titles.addView(subtitle, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, 0, 2, 0, 0));
-        header.addView(titles, LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1f));
+        header.addView(titles, context.getResources().getConfiguration().fontScale > 1.5f
+                ? LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT)
+                : LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1f));
         chip = new TextView(context);
-        chip.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
+        chip.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         chip.setTypeface(AndroidUtilities.bold());
         chip.setGravity(Gravity.CENTER_VERTICAL);
         chip.setPadding(dp(12), 0, dp(16), 0);
@@ -178,6 +190,7 @@ public class PlayerQueueSheet extends BottomSheet implements NotificationCenter.
         super.show();
         NotificationCenter nc = NotificationCenter.getInstance(account);
         nc.addObserver(this, NotificationCenter.messagePlayingDidStart);
+        NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.didSetNewTheme);
         nc.addObserver(this, NotificationCenter.messagePlayingPlayStateChanged);
         nc.addObserver(this, NotificationCenter.messagePlayingDidReset);
         nc.addObserver(this, NotificationCenter.moreMusicDidLoad);
@@ -190,6 +203,7 @@ public class PlayerQueueSheet extends BottomSheet implements NotificationCenter.
         super.dismiss();
         NotificationCenter nc = NotificationCenter.getInstance(account);
         nc.removeObserver(this, NotificationCenter.messagePlayingDidStart);
+        NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.didSetNewTheme);
         nc.removeObserver(this, NotificationCenter.messagePlayingPlayStateChanged);
         nc.removeObserver(this, NotificationCenter.messagePlayingDidReset);
         nc.removeObserver(this, NotificationCenter.moreMusicDidLoad);
@@ -198,6 +212,15 @@ public class PlayerQueueSheet extends BottomSheet implements NotificationCenter.
 
     @Override
     public void didReceivedNotification(int id, int account, Object... args) {
+        if (id == NotificationCenter.didSetNewTheme && org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) {
+            colors = PlayerColors.fromSeed(0, PlayerColors.isDark(resourcesProvider));
+            sheetBg.setColor(colors.surfaceLow);
+            title.setTextColor(colors.onSurface);
+            subtitle.setTextColor(colors.onSurfaceVariant);
+            updateChip();
+            adapter.notifyDataSetChanged();
+            return;
+        }
         if (id == NotificationCenter.messagePlayingDidReset) {
             MessageObject mo = MediaController.getInstance().getPlayingMessageObject();
             if (mo == null || !mo.isMusic()) {
@@ -312,7 +335,7 @@ public class PlayerQueueSheet extends BottomSheet implements NotificationCenter.
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             Row row = new Row(parent.getContext());
-            row.setLayoutParams(new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(72)));
+            row.setLayoutParams(new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, Math.max(dp(72), (int) Math.ceil(42 * getContext().getResources().getDisplayMetrics().scaledDensity + dp(20)))));
             return new RecyclerListView.Holder(row);
         }
 
@@ -349,19 +372,19 @@ public class PlayerQueueSheet extends BottomSheet implements NotificationCenter.
             LinearLayout texts = new LinearLayout(context);
             texts.setOrientation(LinearLayout.VERTICAL);
             title = new TextView(context);
-            title.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
+            title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
             title.setTypeface(AndroidUtilities.bold());
             title.setSingleLine(true);
             title.setEllipsize(TextUtils.TruncateAt.END);
             texts.addView(title, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
             artist = new TextView(context);
-            artist.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
+            artist.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
             artist.setSingleLine(true);
             artist.setEllipsize(TextUtils.TruncateAt.END);
             texts.addView(artist, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 2, 0, 0));
             addView(texts, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT | Gravity.CENTER_VERTICAL, 66, 0, 52, 0));
             duration = new TextView(context);
-            duration.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 13);
+            duration.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
             duration.setFontFeatureSettings("tnum");
             duration.setTextColor(colors.onSurfaceVariant);
             addView(duration, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.RIGHT | Gravity.CENTER_VERTICAL));
@@ -385,6 +408,7 @@ public class PlayerQueueSheet extends BottomSheet implements NotificationCenter.
         void updateState() {
             boolean current = message != null && message == currentItem();
             bg.setColor(current ? colors.secondaryContainer : 0);
+            bg.setStroke(current ? dp(1) : 0, colors.outlineVariant);
             title.setTextColor(current ? colors.onSecondaryContainer : colors.onSurface);
             artist.setTextColor(current ? colors.onSecondaryContainer : colors.onSurfaceVariant);
             duration.setVisibility(current ? GONE : VISIBLE);
@@ -396,6 +420,8 @@ public class PlayerQueueSheet extends BottomSheet implements NotificationCenter.
     private class Equalizer extends View {
 
         private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final float[] still = {6, 11, 8};
+        private final Runnable frame = this::invalidate;
         private final RectF rect = new RectF();
         private boolean playing;
         private float phase;
@@ -414,15 +440,22 @@ public class PlayerQueueSheet extends BottomSheet implements NotificationCenter.
             }
         }
 
+        @Override protected void onDetachedFromWindow() {
+            removeCallbacks(frame);
+            lastFrame = 0;
+            super.onDetachedFromWindow();
+        }
+
         @Override
         protected void onDraw(@NonNull Canvas canvas) {
+            paint.setColor(colors.primary);
             long now = SystemClock.elapsedRealtime();
             float dt = lastFrame == 0 ? 0.016f : Math.min(0.05f, (now - lastFrame) / 1000f);
             lastFrame = now;
             if (playing) {
                 phase += 6f * dt;
             }
-            float[] still = {6, 11, 8};
+
             float barW = dp(4);
             float gap = dp(3);
             float total = barW * 3 + gap * 2;
@@ -434,8 +467,9 @@ public class PlayerQueueSheet extends BottomSheet implements NotificationCenter.
                 canvas.drawRoundRect(rect, dp(2), dp(2), paint);
                 x += barW + gap;
             }
-            if (playing) {
-                postInvalidateOnAnimation();
+            removeCallbacks(frame);
+            if (playing && isShown() && getWindowVisibility() == VISIBLE && !org.telegram.messenger.LiteMode.isPowerSaverApplied()) {
+                postDelayed(frame, 33);
             } else {
                 lastFrame = 0;
             }

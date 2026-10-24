@@ -5,3 +5,9 @@ PATHS=frozenset(['.github/workflows/connected-alpha-arm64.yml', '.github/workflo
 # User explicitly approved the new Signature UI release on top of1270.
 from release_1271_contract import PATHS as SIGNATURE1271_PATHS
 PATHS = PATHS | SIGNATURE1271_PATHS
+
+# Integrated release explicitly includes both approved Work2 inventories and the reviewed P0/delivery delta.
+from integration_contract import INTEGRATION_PATHS
+from login_contract import PATHS as LOGIN_PATHS
+from music_contract import PATHS as MUSIC_PATHS
+PATHS = PATHS | LOGIN_PATHS | MUSIC_PATHS | INTEGRATION_PATHS

@@ -47,6 +47,9 @@ public class OutlineTextContainerView extends FrameLayout {
                 obj.updateColor();
             }).setMultiplier(SPRING_MULTIPLIER);
 
+    private float cornerRadius = -1;
+    public void setCornerRadius(float radius) { cornerRadius = Math.max(0, radius); invalidate(); }
+
     private final RectF rect = new RectF();
     private String mText = "";
     private final Paint outlinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -209,7 +212,8 @@ public class OutlineTextContainerView extends FrameLayout {
         rect.set(getPaddingLeft() + AndroidUtilities.dp(PADDING_LEFT - PADDING_TEXT), getPaddingTop(), getWidth() - AndroidUtilities.dp(PADDING_LEFT + PADDING_TEXT) - getPaddingRight(), getPaddingTop() + stroke * 2);
         canvas.clipRect(rect, Region.Op.DIFFERENCE);
         rect.set(getPaddingLeft() + stroke, getPaddingTop() + stroke, getWidth() - stroke - getPaddingRight(), getHeight() - stroke - getPaddingBottom());
-        canvas.drawRoundRect(rect, AndroidUtilities.dp(8), AndroidUtilities.dp(8), outlinePaint);
+        float radius = cornerRadius >= 0 ? cornerRadius : AndroidUtilities.dp(8);
+        canvas.drawRoundRect(rect, radius, radius, outlinePaint);
         canvas.restore();
 
         float left = getPaddingLeft() + AndroidUtilities.dp(PADDING_LEFT - PADDING_TEXT), lineY = getPaddingTop() + stroke,

@@ -1,0 +1,27 @@
+package app.exteraless.player;
+import static org.telegram.messenger.AndroidUtilities.dp;
+import android.content.*;import android.view.*;import android.widget.*;import android.graphics.*;
+import org.telegram.messenger.BuildConfig;import org.telegram.ui.Components.LayoutHelper;
+/** Production inner layout in an isolated UI fixture; NOT the complete PlayerSheet. */
+public class LayoutFixture extends FrameLayout {
+ private final FrameLayout header; private final View cover;private final LinearLayout titleRow,lyricsPanel,timeRow,group;
+ private final WavySeekBar seekBar;private final TextView bubble;private final ControlsRow controls;private boolean seeking;
+ private int getStatusBarHeight(){return dp(24);}private int getBottomInset(){return dp(24);}private void layoutBubble(){}
+ public ViewGroup content;public View[] ordered;
+ private TextView text(Context c,String value,int size,int color){TextView t=new TextView(c);t.setText(value);t.setTextSize(size);t.setTextColor(color);t.setSingleLine();t.setEllipsize(android.text.TextUtils.TruncateAt.END);return t;}
+ public LayoutFixture(Context c,boolean dark){super(c);PlayerColors colors=PlayerColors.fromSeed(0,dark);setBackgroundColor(colors.surface);
+ content=new PlayerLayout(c);ScrollView scroll=new ScrollView(c);scroll.setFillViewport(true);scroll.addView(content,new ScrollView.LayoutParams(-1,-2));addView(scroll,new FrameLayout.LayoutParams(-1,-1));
+ header=new FrameLayout(c);TextView from=text(c,"Reproduciendo desde\nMi música",14,colors.onSurface);from.setSingleLine(false);from.setGravity(Gravity.CENTER);header.addView(from,new FrameLayout.LayoutParams(-1,-1));content.addView(header);
+ cover=new CoverImage(c,80);((CoverImage)cover).setColors(colors.primaryContainer,colors.primary);((CoverImage)cover).setRadius(dp(24));content.addView(cover);
+ titleRow=new LinearLayout(c);titleRow.setOrientation(1);titleRow.addView(text(c,"Alone",24,colors.onSurface));titleRow.addView(text(c,"Marshmello",16,colors.onSurfaceVariant));content.addView(titleRow);
+ lyricsPanel=new LinearLayout(c);lyricsPanel.setVisibility(GONE);content.addView(lyricsPanel);
+ seekBar=new WavySeekBar(c);seekBar.setColors(colors.primary,colors.secondaryContainer);seekBar.setProgress(.55f);seekBar.setPlaying(true);content.addView(seekBar);
+ timeRow=new LinearLayout(c);timeRow.addView(text(c,"2:19",13,colors.onSurfaceVariant),new LinearLayout.LayoutParams(0,-2,1));timeRow.addView(text(c,"−2:29",13,colors.onSurfaceVariant));content.addView(timeRow);
+ controls=new ControlsRow(c);for(MorphButton b:new MorphButton[]{controls.shuffle,controls.prev,controls.play,controls.next,controls.repeat})b.setColors(colors.primaryContainer,colors.primary,colors.primaryContainer,colors.primary);
+ controls.play.setColors(colors.primary,colors.onPrimary,colors.primary,colors.onPrimary);content.addView(controls);
+ group=new LinearLayout(c);String[] names={"1×","Letra","Cola","Más"};String[] icons={PlayerIcon.SPEED,PlayerIcon.LYRICS,PlayerIcon.QUEUE,PlayerIcon.MORE};
+ for(int i=0;i<4;i++){MorphButton b=new MorphButton(c,PlayerIcon.stroke(icons[i],20));b.setText(names[i]);b.setStackedLabel(true);b.setRadius(dp(18),false);b.setColors(colors.surfaceHigh,colors.onSurface,colors.surfaceHigh,colors.onSurface);group.addView(b,LayoutHelper.createLinear(0,52,1f,2,0,2,0));}content.addView(group);
+ bubble=new TextView(c);bubble.setVisibility(GONE);content.addView(bubble);ordered=new View[]{header,cover,titleRow,seekBar,timeRow,controls,group};
+ }
+_LAYOUT_
+}

@@ -41,6 +41,10 @@ public class MorphButton extends android.view.View {
     private PlayerIcon icon;
     private PlayerIcon altIcon;
     private String text;
+    private boolean stackedLabel;
+    private String displayText;
+
+    public void setStackedLabel(boolean value) { stackedLabel = value; requestLayout(); invalidate(); }
     private String badgeText;
     private int bgColor;
     private int fgColor;
@@ -83,6 +87,8 @@ public class MorphButton extends android.view.View {
     public void setText(String value) {
         if (!TextUtils.equals(text, value)) {
             text = value;
+            setContentDescription(value);
+            updateDisplayText();
             invalidate();
         }
     }
@@ -146,6 +152,25 @@ public class MorphButton extends android.view.View {
         invalidate();
     }
 
+    private void updateDisplayText() {
+        textPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,
+                stackedLabel ? 12 : 15, getResources().getDisplayMetrics()));
+        displayText = text == null ? null : TextUtils.ellipsize(text, textPaint,
+                Math.max(0, getWidth() - dp(stackedLabel ? 12 : 40)), TextUtils.TruncateAt.END).toString();
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        updateDisplayText();
+    }
+
+    @Override
+    public void onInitializeAccessibilityNodeInfo(android.view.accessibility.AccessibilityNodeInfo info) {
+        super.onInitializeAccessibilityNodeInfo(info);
+        info.setClassName("android.widget.Button");
+    }
+
     @Override
     public void setPressed(boolean pressed) {
         boolean changed = pressed != isPressed();
@@ -193,11 +218,11 @@ public class MorphButton extends android.view.View {
 
         float contentWidth = 0;
         int iconSize = icon != null ? icon.getIntrinsicWidth() : 0;
-        if (text != null) {
-            contentWidth = iconSize + dp(8) + textPaint.measureText(text);
+        if (displayText != null && !stackedLabel) {
+            contentWidth = iconSize + dp(8) + textPaint.measureText(displayText);
         }
-        float iconCx = text != null ? (w - contentWidth) / 2f + iconSize / 2f : w / 2f;
-        float cy = h / 2f;
+        float iconCx = displayText != null && !stackedLabel ? (w - contentWidth) / 2f + iconSize / 2f : w / 2f;
+        float cy = stackedLabel && displayText != null ? dp(20) : h / 2f;
         if (altIcon == null) {
             drawIcon(canvas, icon, iconCx, cy, fg, 1f, 1f);
         } else {
@@ -205,11 +230,11 @@ public class MorphButton extends android.view.View {
             drawIcon(canvas, icon, iconCx, cy, fg, 1f - t, 1f - 0.4f * t);
             drawIcon(canvas, altIcon, iconCx, cy, fg, t, 0.6f + 0.4f * t);
         }
-        if (text != null) {
+        if (displayText != null) {
             textPaint.setColor(fg);
-            float tx = iconCx + iconSize / 2f + dp(8);
-            float ty = cy - (textPaint.descent() + textPaint.ascent()) / 2f;
-            canvas.drawText(text, tx, ty, textPaint);
+            float tx = stackedLabel ? (w - textPaint.measureText(displayText)) / 2f : iconCx + iconSize / 2f + dp(8);
+            float ty = stackedLabel ? h - dp(10) - textPaint.descent() : cy - (textPaint.descent() + textPaint.ascent()) / 2f;
+            canvas.drawText(displayText, tx, ty, textPaint);
         }
         float b = Math.max(0f, Math.min(1f, badge.value));
         if (b > 0f && badgeText != null) {

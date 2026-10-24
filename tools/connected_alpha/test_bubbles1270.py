@@ -4,13 +4,16 @@ import subprocess
 import unittest
 from pathlib import Path
 from release_1270_contract import BASE,PATHS
+from music_contract import PATHS as MUSIC_PATHS
+PATHS = PATHS | MUSIC_PATHS
 from bubble_parity import restore_bubble_presentation
 ROOT=Path(__file__).resolve().parents[2]
 JAVA=ROOT/'TMessagesProj/src/main/java'
 class BubbleReleaseTests(unittest.TestCase):
  def test_exact_release_scope_and_approved_composer_matte_previews_are_frozen(self):
   changed=set(subprocess.check_output(['git','diff','--name-only',BASE],cwd=ROOT,text=True).splitlines())
-  self.assertFalse(changed-PATHS,changed-PATHS)
+  from login_contract import PATHS as LOGIN_PATHS
+  self.assertFalse(changed-PATHS-LOGIN_PATHS,changed-PATHS-LOGIN_PATHS)
   for prefix in ('TMessagesProj/src/main/java/app/flexygram/composer','TMessagesProj/jni','TMessagesProj/chaquopy'):
    self.assertEqual(subprocess.check_output(['git','diff',BASE,'--',prefix],cwd=ROOT),b'',prefix)
  def test_reviewed_native_patch_restores_exact_approved_base(self):

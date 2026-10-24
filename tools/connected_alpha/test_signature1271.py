@@ -2,7 +2,9 @@
 import re,subprocess,tempfile,unittest
 from pathlib import Path
 from xml.etree import ElementTree as ET
-from release_1271_contract import BASE,PATHS
+from release_1271_contract import BASE
+from integration_contract import WORK1,combined_paths,reviewed_work1
+PATHS=combined_paths()
 ROOT=Path(__file__).resolve().parents[2]
 JAVA=ROOT/'TMessagesProj/src/main/java'
 A='{http://schemas.android.com/apk/res/android}'
@@ -13,11 +15,14 @@ class Signature1271(unittest.TestCase):
   changed.update(p for p in subprocess.check_output(['git','ls-files','--others','--exclude-standard'],cwd=ROOT,text=True).splitlines() if not p.startswith("TMessagesProj/jni/"))
   self.assertFalse(changed-PATHS,changed-PATHS)
   for path in ['app/flexygram/composer','app/flexygram/home','org/telegram/ui/Components/ChatActivityEnterView.java','org/telegram/ui/ActionBar/ActionBarLayout.java','org/telegram/ui/LoginActivity.java','org/telegram/tgnet','org/telegram/messenger/MessagesController.java','org/telegram/messenger/SendMessagesHelper.java','org/telegram/messenger/MediaController.java']:
-   self.assertEqual(subprocess.check_output(['git','diff',BASE,'--','TMessagesProj/src/main/java/'+path],cwd=ROOT),b'',path)
+
+   prefix='TMessagesProj/src/main/java/'+path
+   files=subprocess.check_output(['git','ls-tree','-r','--name-only',WORK1,'--',prefix],cwd=ROOT,text=True).splitlines()
+   for file in files:self.assertEqual(reviewed_work1(file),subprocess.check_output(['git','show',WORK1+':'+file],cwd=ROOT),file)
   self.assertEqual(subprocess.check_output(['git','diff',BASE,'--','TMessagesProj/jni','TMessagesProj/chaquopy'],cwd=ROOT),b'')
   self.assertIn('def verCode = 1271',(ROOT/'TMessagesProj/build.gradle').read_text())
   workflow=(ROOT/'.github/workflows/connected-alpha-arm64.yml').read_text()
-  for s in ['--expected-version-code 1271','FlexyGram-Alpha1271-ARM64.tar.age','FlexyGram-Alpha1271-Encrypted',':TMessagesProj:assembleConnectedAlpha']:self.assertIn(s,workflow)
+  for s in ['--expected-version-code 1271','Keep direct APK delivery private',':TMessagesProj:assembleConnectedAlpha']:self.assertIn(s,workflow)
  def test_one_fill_control_no_wallpaper_callback_or_graphics_allocations_in_drawing(self):
   settings=(JAVA/'app/flexygram/bubbles/BubbleSettingsActivity.java').read_text()
   self.assertEqual(re.findall(r'= addRow\("(flexyBubble\w+)"',settings),['flexyBubbleTransparency'])

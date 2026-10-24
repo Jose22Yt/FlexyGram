@@ -174,10 +174,10 @@ jobs:
             cmake;3.31.6
       - name: Verify SDK payload and normalize nested API 37 layout
         run: python3 tools/connected_alpha/preflight_sdk.py --sdk-root "$ANDROID_HOME"
-      - name: Install native tools and optional encrypted-delivery tool
+      - name: Install pinned native build tools
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends nasm ninja-build age patchelf autoconf automake libtool pkg-config
+          sudo apt-get install -y --no-install-recommends nasm ninja-build patchelf autoconf automake libtool pkg-config
       - name: Select installed JDK and exact CMake for Chaquopy
         shell: bash
         run: |
@@ -262,29 +262,8 @@ jobs:
               f.write('APK SHA-256: ' + data['sha256'] + '\n')
               f.write('ELF payloads verified: ' + str(data['elf_count']) + '\n')
           PY
-      - name: Encrypt verified APK for owner's private recipient (optional)
-        if: vars.ALPHA_AGE_RECIPIENT != ''
-        shell: bash
-        env:
-          ALPHA_AGE_RECIPIENT: ${{ vars.ALPHA_AGE_RECIPIENT }}
-        run: |
-          set -euo pipefail
-          mapfile -t packages < <(find TMessagesProj/build/outputs/apk/connectedAlpha -type f -name '*.apk')
-          test "${#packages[@]}" -eq 1
-          mkdir -p "$RUNNER_TEMP/alpha-delivery"
-          cp -- "${packages[0]}" "$RUNNER_TEMP/alpha-delivery/FlexyGram-Alpha-arm64.apk"
-          cp connected-alpha-verification.json "$RUNNER_TEMP/alpha-delivery/verification.json"
-          # Only these two verified deliverables enter the encrypted archive.
-          tar -C "$RUNNER_TEMP/alpha-delivery" -cf - FlexyGram-Alpha-arm64.apk verification.json |
-            age --encrypt -r "$ALPHA_AGE_RECIPIENT" -o "$RUNNER_TEMP/FlexyGram-Alpha1271-ARM64.tar.age"
-      - name: Upload encrypted delivery only (never plaintext APK)
-        if: vars.ALPHA_AGE_RECIPIENT != ''
-        uses: actions/upload-artifact@v4
-        with:
-          name: FlexyGram-Alpha1271-Encrypted
-          path: ${{ runner.temp }}/FlexyGram-Alpha1271-ARM64.tar.age
-          retention-days: 7
-          if-no-files-found: error
+      - name: Keep direct APK delivery private
+        run: echo 'Signed APK verified. Private direct delivery is produced locally; no APK is uploaded to this public repository.' >> "$GITHUB_STEP_SUMMARY"
       - name: Wipe private inputs and generated plaintext, including caches
         if: always()
         shell: bash
