@@ -16676,6 +16676,8 @@ public class ChatActivityEnterView extends FrameLayout implements
         if (!isFlexyCompactPresentation() || audioVideoButtonContainer == null
                 || audioVideoButtonContainer.getVisibility() != VISIBLE || audioVideoButtonContainer.getAlpha() != 1f
                 || audioVideoButtonContainer.getScaleX() != 1f || audioVideoButtonContainer.getScaleY() != 1f
+                || sendButtonContainer.getScaleX() != 1f || sendButtonContainer.getScaleY() != 1f
+                || sendButtonContainer.getAlpha() != 1f
                 || expandStickersButton != null && expandStickersButton.getAlpha() > 0) return false;
         final float x = textFieldContainer.getX() + sendButtonContainer.getX() + audioVideoButtonContainer.getX();
         final float y = textFieldContainer.getY() + sendButtonContainer.getY() + audioVideoButtonContainer.getY();

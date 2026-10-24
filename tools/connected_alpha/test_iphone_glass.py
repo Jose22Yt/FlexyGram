@@ -42,6 +42,8 @@ public class VoiceSurface {
   s.presentation=false;ok(!s.getFlexyVoiceBounds(out));s.presentation=true;
   s.audioVideoButtonContainer.alpha=.5f;ok(!s.getFlexyVoiceBounds(out));s.audioVideoButtonContainer.alpha=1;
   s.audioVideoButtonContainer.scale=.8f;ok(!s.getFlexyVoiceBounds(out));s.audioVideoButtonContainer.scale=1;
+  s.sendButtonContainer.scale=.79f;ok(!s.getFlexyVoiceBounds(out));s.sendButtonContainer.scale=1;
+  s.sendButtonContainer.alpha=.5f;ok(!s.getFlexyVoiceBounds(out));s.sendButtonContainer.alpha=1;
   s.expandStickersButton.alpha=.5f;ok(!s.getFlexyVoiceBounds(out));s.expandStickersButton.alpha=0;
   s.audioVideoButtonContainer.visibility=8;ok(!s.getFlexyVoiceBounds(out));
   System.out.println("PASS");
