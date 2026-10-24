@@ -10,4 +10,6 @@ Archivos de prueba: `FlexyGram-Alpha2-Integrada-Instalador.apk` y `FlexyGram-Alp
 
 Las pruebas del auxiliar en emulador no certifican el compositor real. Instalación y diseño en Poco X8 Pro / Android 17 siguen pendientes de prueba del propietario.
 
-Perfil1267 preparado; la entrega permanece bloqueada hasta fijar hashes de la nueva APK realmente compilada y verificada. La barra aprobada del PR74 permanece idéntica.
+Entrega1267 compilada y verificada en Actions40060346675. La barra aprobada del PR74 permanece idéntica.
+
+SHA256 APK `48abf0f8a32fb36b28de87f17955df922ba3ca643c4a2d35dbb0c86c543ac67c`; cifrado `ae9b7bbbc22757096cd33e78bf0d726d4865581f1fdae12fd915935bf1585828`.
