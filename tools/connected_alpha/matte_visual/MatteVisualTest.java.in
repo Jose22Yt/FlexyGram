@@ -1,0 +1,124 @@
+/* Isolated production-cell geometry, not a full app screen or animation capture. */
+import android.content.*;
+import android.content.pm.PackageInfo;
+import android.content.res.*;
+import android.graphics.*;
+import android.view.*;
+import android.view.accessibility.AccessibilityNodeInfo;
+import android.widget.*;
+import app.flexygram.settings.*;
+import org.telegram.messenger.*;
+import org.telegram.ui.ActionBar.Theme;
+import org.telegram.ui.Components.AnimatedTextView;
+import java.io.*;
+import org.junit.*;
+import org.junit.runner.RunWith;
+import org.robolectric.*;
+import org.robolectric.annotation.*;
+import static org.junit.Assert.*;
+
+@RunWith(RobolectricTestRunner.class)
+@Config(manifest=Config.NONE,sdk=35)
+@GraphicsMode(GraphicsMode.Mode.NATIVE)
+public class MatteVisualTest {
+ Context context(float scale) {
+  Context app=RuntimeEnvironment.getApplication();
+  Configuration cfg=new Configuration(app.getResources().getConfiguration());cfg.fontScale=scale;
+  Context c=app.createConfigurationContext(cfg);AndroidUtilities.density=c.getResources().getDisplayMetrics().density;
+  return c;
+ }
+ int dp(float v){return AndroidUtilities.dp(v);}
+ void layout(View v,int width){v.measure(View.MeasureSpec.makeMeasureSpec(dp(width),View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(0,View.MeasureSpec.UNSPECIFIED));v.layout(0,0,v.getMeasuredWidth(),v.getMeasuredHeight());}
+ String[][] samples={
+  {"Optimización de batería","Restringida"},
+  {"Contador de notificaciones en las carpetas","Solo sin silenciar"},
+  {"Battery optimization","Unrestricted"},
+  {"Счётчик уведомлений в папках","Без отключённого звука"}
+ };
+ @Test public void selectorsFitNarrowWidthsFontScaleRtlAndRecycle() {
+  for(boolean dark:new boolean[]{false,true})for(boolean rtl:new boolean[]{false,true})
+   for(float scale:new float[]{1,1.3f,2,3})for(int width:new int[]{240,280,320,400,600}){
+    Theme.dark=dark;LocaleController.isRTL=rtl;Context c=context(scale);
+    MatteTextSettingsCell cell=new MatteTextSettingsCell(c,null);
+    for(String[] pair:samples){
+     cell.setTextAndValue(pair[0],pair[1],true);layout(cell,width);
+     TextView title=cell.getTextView();AnimatedTextView value=cell.getValueTextView();
+     assertTrue(title.getTop()>=0);assertTrue(title.getBottom()<=cell.getHeight());
+     assertTrue(title.getLayout().getEllipsisCount(title.getLineCount()-1)==0);
+     assertTrue(title.getLeft()>=0 && title.getRight()<=cell.getWidth());
+     boolean separate=title.getBottom()<=value.getTop() || title.getRight()<=value.getLeft() || value.getRight()<=title.getLeft();
+     assertTrue("title/value bounds must never overlap",separate);
+     assertTrue(value.getBottom()<=cell.getHeight());
+     AccessibilityNodeInfo info=AccessibilityNodeInfo.obtain();cell.onInitializeAccessibilityNodeInfo(info);
+     assertTrue(info.getText().toString().contains(pair[0]));assertTrue(info.getText().toString().contains(pair[1]));
+    }
+    cell.setTextAndValue("Idioma","ES",false);layout(cell,width);
+    cell.setText("Una etiqueta larga sin valor que debe quedar completa",false);layout(cell,width);
+    assertTrue(cell.getTextView().getBottom()<=cell.getHeight());
+    assertTrue(cell.getValueTextView().getVisibility()!=View.VISIBLE);
+   }
+ }
+ @Test public void nativeSwitchDescriptionsGrowAtLargeFontsAndRetainState() {
+  for(boolean rtl:new boolean[]{false,true})for(float scale:new float[]{1,1.5f,2,3})for(int width:new int[]{240,320,600}){
+   LocaleController.isRTL=rtl;MatteTextCheckCell cell=new MatteTextCheckCell(context(scale),null);
+   cell.setTextAndValueAndCheck("Última conexión relativa y configuración de notificaciones", "Visto por última vez hace cinco minutos",true,false,true);
+   layout(cell,width);TextView title=(TextView)cell.getChildAt(0),detail=(TextView)cell.getChildAt(1);
+   assertTrue(title.getBottom()<=detail.getTop());assertTrue(detail.getBottom()<=cell.getHeight());
+   assertEquals(0,title.getLayout().getEllipsisCount(title.getLineCount()-1));
+   assertEquals(0,detail.getLayout().getEllipsisCount(detail.getLineCount()-1));
+   assertTrue(cell.isChecked());cell.setChecked(false);assertFalse(cell.isChecked());
+   cell.setValueText("Actualizado inmediatamente sin recrear la fila");layout(cell,width);
+   assertFalse(cell.isChecked());assertTrue(detail.getBottom()<=cell.getHeight());
+   AccessibilityNodeInfo info=AccessibilityNodeInfo.obtain();cell.onInitializeAccessibilityNodeInfo(info);
+   assertTrue(info.getContentDescription().toString().contains("Actualizado"));
+  }
+ }
+ @Test public void detailSubtitleNeverOverlapsTitleOrIcon() {
+  for(boolean rtl:new boolean[]{false,true})for(float scale:new float[]{1,1.5f,2,3})for(int width:new int[]{240,320,600}){
+   LocaleController.isRTL=rtl;MatteDetailSettingsCell cell=new MatteDetailSettingsCell(context(scale));
+   cell.setTextAndValueAndIcon("Paquetes de iconos y personalización de la interfaz","Utiliza los recursos originales y conserva los ajustes actuales.",android.R.drawable.ic_menu_edit,true);
+   layout(cell,width);
+   TextView title=cell.getTextView(),detail=cell.getValueTextView();
+   assertTrue(title.getBottom()<=detail.getTop());assertTrue(detail.getBottom()<=cell.getHeight());
+   assertEquals(0,title.getLayout().getEllipsisCount(title.getLineCount()-1));
+  }
+ }
+ @Test public void expandableGroupTitleKeepsCounterAndOriginalToggleHitArea() {
+  for(boolean rtl:new boolean[]{false,true})for(float scale:new float[]{1,1.5f,2,3})for(int width:new int[]{240,320,600}){
+   LocaleController.isRTL=rtl;MatteExpandableSwitchCell cell=new MatteExpandableSwitchCell(context(scale));
+   cell.setTextAndCheck("Material Design 3",true,true);int[] clicks={0};
+   cell.setCollapseArrow("8/8",true,false,()->clicks[0]++);layout(cell,width);
+   TextView title=(TextView)cell.getChildAt(0);View counter=cell.getChildAt(3);View toggle=cell.getChildAt(4);
+   assertTrue(title.getTop()>=0 && title.getBottom()<=cell.getHeight());
+   assertEquals(0,title.getLayout().getEllipsisCount(title.getLineCount()-1));
+   float x=counter.getX();assertTrue(x>=0 && x+counter.getWidth()<=cell.getWidth());
+   assertTrue(rtl?x>=toggle.getRight():x+counter.getWidth()<=toggle.getLeft());
+   assertTrue(toggle.getWidth()>=dp(48));assertTrue(toggle.getHeight()>=dp(48));
+   toggle.performClick();assertEquals(1,clicks[0]);assertTrue(cell.isChecked());
+   cell.setChecked(false);assertFalse(cell.isChecked());
+  }
+ }
+ @Test public void storagePinUsesRealPreferencesAndPreservesOldPaths() throws Exception {
+  Context app=RuntimeEnvironment.getApplication();ApplicationLoader.applicationContext=app;
+  PackageInfo pkg=app.getPackageManager().getPackageInfo(app.getPackageName(),0);
+  pkg.firstInstallTime=10;pkg.lastUpdateTime=10;Shadows.shadowOf(app.getPackageManager()).installPackage(pkg);
+  SharedPreferences prefs=app.getSharedPreferences("storage-probe",0);prefs.edit().clear().commit();
+  FreshInstallSavePath.pin(prefs);assertEquals("FlexyGram",prefs.getString("customSavePath",null));
+  for(String path:new String[]{"exteraless","My folder",""}){
+   prefs.edit().clear().putString("customSavePath",path).commit();FreshInstallSavePath.pin(prefs);assertEquals(path,prefs.getString("customSavePath",null));
+  }
+  prefs.edit().clear().putBoolean("OELegacyDefaultsPinned",true).commit();FreshInstallSavePath.pin(prefs);assertFalse(prefs.contains("customSavePath"));
+  prefs.edit().clear().commit();pkg.lastUpdateTime=20;Shadows.shadowOf(app.getPackageManager()).installPackage(pkg);
+  FreshInstallSavePath.pin(prefs);assertFalse(prefs.contains("customSavePath"));
+ }
+ @Test public void renderRepresentativeProductionRowsInBothThemes() throws Exception {
+  LocaleController.isRTL=false;
+  for(boolean dark:new boolean[]{false,true}){
+   Theme.dark=dark;Context c=context(1);Bitmap b=Bitmap.createBitmap(dp(360),dp(440),Bitmap.Config.ARGB_8888);Canvas canvas=new Canvas(b);canvas.drawColor(dark?0xff141416:0xfff2f3f7);
+   int y=dp(16);
+   for(String[] pair:samples){MatteTextSettingsCell cell=new MatteTextSettingsCell(c,null);cell.setBackgroundColor(dark?0xff242426:0xffffffff);cell.setTextAndValue(pair[0],pair[1],true);layout(cell,336);
+    canvas.save();canvas.translate(dp(12),y);cell.draw(canvas);canvas.restore();y+=cell.getHeight();}
+   File out=new File(System.getProperty("probe.root"),"matte-native-cells-"+(dark?"dark":"light")+".png");try(FileOutputStream f=new FileOutputStream(out)){b.compress(Bitmap.CompressFormat.PNG,100,f);}
+  }
+ }
+}
