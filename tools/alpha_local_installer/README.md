@@ -1,15 +1,11 @@
-# Instalador privado — Alpha 2 integrada
+# Instalador privado de FlexyGram Signature Matte 1269
 
-Perfil independiente del instalador anterior del PR #75. El auxiliar usa `io.github.jose22yt.flexygram.delivery.alpha2.integrated1267`; puede coexistir con el auxiliar antiguo aunque su firma de pruebas sea distinta. La aplicación destino conserva `io.github.jose22yt.flexygram.alpha`, certificado original y versión 1267.
+Perfil independiente del auxiliar del PR77. Destino `io.github.jose22yt.flexygram.alpha`, versión1269 y certificado Alpha original. El auxiliar usa `io.github.jose22yt.flexygram.delivery.alpha2.matte1269` y puede coexistir con auxiliares anteriores.
 
-La entrega queda bloqueada mientras APKHash o CipherHash no contengan hashes reales verificados. Solo se aceptan el APK, cifrado y commit fijados en el perfil. Se exige EOF autenticado de age, tar con exactamente APK e informe, inventario de 96 ELF y certificado SHA-256 original explícito. Se rechazan los informes de versiones anteriores y los certificados distintos. Se conserva la política de firmante instalado y prohibición de degradación antes del instalador Android.
+La APK1269 real se compiló y verificó en Actions40094295846; solo se fijan sus hashes auténticos y el commit compilado. El flujo no usa secretos del repositorio ni la clave de firma de Alpha; firma exclusivamente este auxiliar independiente con una clave efímera.
 
-El auxiliar no tiene permiso INTERNET ni acceso general al almacenamiento. La identidad age se selecciona mediante Android SAF y solo se procesa en memoria; no se guarda ni se transmite. No incluye la identidad ni la clave de firma de Alpha. La compilación del auxiliar utiliza su propia firma temporal de pruebas.
+En Android: descargar y extraer por separado los dos artefactos de Actions; instalar `FlexyGram-Signature-Matte-1269-Instalador.apk`; seleccionar `FlexyGram-Signature-Matte-1269-arm64.tar.age` y la identidad age original guardada en la recuperación privada. Verificar y pulsar instalar/actualizar. No desinstalar Alpha1267. No seleccionar ni compartir el ZIP completo de recuperación.
 
-Archivos de prueba: `FlexyGram-Alpha2-Integrada-Instalador.apk` y `FlexyGram-Alpha2-Integrada-1267-arm64.tar.age`. Seleccionar también la identidad age original de la recuperación privada. El destinatario público no permite descifrar. El auxiliar comprueba los archivos antes de ofrecer la actualización; Android vuelve a verificar la firma.
+El auxiliar no tiene INTERNET ni acceso general al almacenamiento. Utiliza el selector de documentos; consume la identidad en memoria. Exige descifrado age autenticado hasta EOF, destinatario original, dos entradas tar exactas sin rutas arbitrarias, hashes/commit/informe, versión1269,96 ELF y certificado original. Android vuelve a comprobar la firma de la actualización. Rechaza versiones instaladas superiores o firmas distintas.
 
-Las pruebas del auxiliar en emulador no certifican el compositor real. Instalación y diseño en Poco X8 Pro / Android 17 siguen pendientes de prueba del propietario.
-
-Entrega1267 compilada y verificada en Actions40060346675. La barra aprobada del PR74 permanece idéntica.
-
-SHA256 APK `48abf0f8a32fb36b28de87f17955df922ba3ca643c4a2d35dbb0c86c543ac67c`; cifrado `ae9b7bbbc22757096cd33e78bf0d726d4865581f1fdae12fd915935bf1585828`.
+APK SHA-256 `1e0306a1c649c6c0560a954beb38a3cd46ea0a68ebef13ade4f2f224d107e1ad`; cifrado SHA-256 `6097253190a3b0ba2bf07257ce046351b5aa6ff588db60f33d2b5bad1f7cc71e`; fuente `6cc05b60a4f45dfe93934b6dc5b535d38e0e0062`. Firma v2 original, paquete Alpha y96 ELF ARM64 con alineación4/16KB verificados. La barra iPhone, Signature Home y todo el código UI de PR79 permanecen idénticos. El auxiliar Android se compila y prueba por separado antes de su entrega. La prueba del auxiliar y sus comprobaciones no constituyen una prueba física de FlexyGram en Poco Android17.
