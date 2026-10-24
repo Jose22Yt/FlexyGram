@@ -81,6 +81,7 @@ class SignatureMatteTests(unittest.TestCase):
         for forbidden in ('setShadowLayer','RenderEffect','Bitmap','ValueAnimator','postDelayed','setConfig','LiteMode.set'):
             self.assertNotIn(forbidden,s)
         self.assertNotIn('new ',body(s,'public void drawBackgroundRect('))
+        self.assertIn('Theme.multAlpha(',body(s,'public void drawBackgroundRect('))
         self.assertIn('setDrawGlassTitle(false)',s)
         self.assertIn('doNotDrawGlassMenu = true',s)
         base=(JAVA/'tw/nekomimi/nekogram/settings/BaseNekoSettingsActivity.java').read_text()

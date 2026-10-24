@@ -84,8 +84,9 @@ public abstract class SignatureMatteSettingsActivity extends BaseNekoSettingsAct
 
         @Override
         public void drawBackgroundRect(Canvas canvas, RectF rect, float topRadius, float bottomRadius, float alpha) {
-            // Opaque native theme surface, including dark/carbon themes. No shadow/blur layer.
-            fill.setColor(Theme.getColor(Theme.key_windowBackgroundWhite, SignatureMatteSettingsActivity.this.resourcesProvider) | 0xFF000000);
+            // Solid theme surface; preserve only the existing native section transition alpha.
+            fill.setColor(Theme.multAlpha(Theme.getColor(Theme.key_windowBackgroundWhite,
+                    SignatureMatteSettingsActivity.this.resourcesProvider) | 0xFF000000, alpha));
             if (topRadius == bottomRadius) {
                 canvas.drawRoundRect(rect, topRadius, topRadius, fill);
             } else {
