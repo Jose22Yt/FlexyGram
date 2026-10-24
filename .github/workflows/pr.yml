@@ -3,7 +3,7 @@ name: Pull request
 on:
   # Registered workflow ID 388683996: support entry point for the same native jobs.
   push:
-    branches: [support/connected-alpha-ci-20261022, integration/connected-alpha-unified, integration/connected-alpha-javac-fix, integration/connected-alpha-2-compact, fix/alpha2-compact-trailing-action, fix/alpha2-signature-personalization, fix/alpha2-ios-composer-refinement]
+    branches: [support/connected-alpha-ci-20261022, integration/connected-alpha-unified, integration/connected-alpha-javac-fix, integration/connected-alpha-2-compact, fix/alpha2-compact-trailing-action, fix/alpha2-signature-personalization, fix/alpha2-ios-composer-refinement, fix/alpha2-signature-home, fix/alpha2-integrated-ui-settings-previews]
     paths:
       - '.github/workflows/connected-alpha-arm64.yml'
       - '.github/workflows/pr.yml'
@@ -33,7 +33,7 @@ permissions:
 
 jobs:
   connected-alpha-native:
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/support/connected-alpha-ci-20261022' || github.ref == 'refs/heads/integration/connected-alpha-unified' || github.ref == 'refs/heads/integration/connected-alpha-javac-fix' || github.ref == 'refs/heads/integration/connected-alpha-2-compact' || github.ref == 'refs/heads/fix/alpha2-compact-trailing-action' || github.ref == 'refs/heads/fix/alpha2-signature-personalization' || github.ref == 'refs/heads/fix/alpha2-ios-composer-refinement')
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/support/connected-alpha-ci-20261022' || github.ref == 'refs/heads/integration/connected-alpha-unified' || github.ref == 'refs/heads/integration/connected-alpha-javac-fix' || github.ref == 'refs/heads/integration/connected-alpha-2-compact' || github.ref == 'refs/heads/fix/alpha2-compact-trailing-action' || github.ref == 'refs/heads/fix/alpha2-signature-personalization' || github.ref == 'refs/heads/fix/alpha2-ios-composer-refinement' || github.ref == 'refs/heads/fix/alpha2-signature-home' || github.ref == 'refs/heads/fix/alpha2-integrated-ui-settings-previews')
     uses: ./.github/workflows/connected-alpha-arm64.yml
     secrets:
       TELEGRAM_APP_ID: ${{ secrets.TELEGRAM_APP_ID }}
@@ -45,7 +45,7 @@ jobs:
       ALPHA_KEYSTORE_B64: ${{ secrets.ALPHA_KEYSTORE_B64 }}
       ALPHA_CERTIFICATE_SHA256: ${{ secrets.ALPHA_CERTIFICATE_SHA256 }}
   connected-alpha-static:
-    if: github.event_name == 'pull_request' && (github.head_ref == 'alpha/connected-exteraless-baseline' || startsWith(github.head_ref, 'support/connected-alpha-ci-') || startsWith(github.head_ref, 'integration/connected-alpha-') || startsWith(github.head_ref, 'fix/alpha2-'))
+    if: github.event_name == 'pull_request' && (github.head_ref == 'alpha/connected-exteraless-baseline' || startsWith(github.head_ref, 'support/connected-alpha-ci-') || startsWith(github.head_ref, 'integration/connected-alpha-') || startsWith(github.head_ref, 'fix/alpha2-') || startsWith(github.head_ref, 'ui/alpha2-'))
     name: Connected Alpha source checks (no APK)
     runs-on: ubuntu-latest
     steps:
@@ -64,7 +64,7 @@ jobs:
           packages: 'build-tools;36.0.0 platforms;android-37.0'
       - run: python3 tools/connected_alpha/check_resources.py --sdk-root "$ANDROID_HOME"
   build:
-    if: github.event_name == 'pull_request' && github.head_ref != 'alpha/connected-exteraless-baseline' && !startsWith(github.head_ref, 'support/connected-alpha-ci-') && !startsWith(github.head_ref, 'integration/connected-alpha-') && !startsWith(github.head_ref, 'fix/alpha2-')
+    if: github.event_name == 'pull_request' && github.head_ref != 'alpha/connected-exteraless-baseline' && !startsWith(github.head_ref, 'support/connected-alpha-ci-') && !startsWith(github.head_ref, 'integration/connected-alpha-') && !startsWith(github.head_ref, 'fix/alpha2-') && !startsWith(github.head_ref, 'ui/alpha2-')
     name: Gradle Build
     runs-on: ubuntu-latest
     env:
