@@ -32,7 +32,7 @@ func fixture(t *testing.T, change func(*[]entry, map[string]any)) ([]byte, []byt
 	apk := []byte("test APK bytes, not an Android release")
 	h := sha256.Sum256(apk)
 	c := contract{id.Recipient().String(), hex.EncodeToString(h[:]), "", "test-commit", strings.Repeat("a", 64), 2}
-	r := map[string]any{"application_id": "io.github.jose22yt.flexygram.alpha", "version_code": 1266, "sha256": c.apk, "bytes": len(apk), "commit": c.commit, "status": "PASS_ARTIFACT_ONLY", "android_runtime": "NOT_TESTED", "certificate_sha256": strings.Repeat("a", 64), "elf_count": 2,
+	r := map[string]any{"application_id": "io.github.jose22yt.flexygram.alpha", "version_code": 1267, "sha256": c.apk, "bytes": len(apk), "commit": c.commit, "status": "PASS_ARTIFACT_ONLY", "android_runtime": "NOT_TESTED", "certificate_sha256": strings.Repeat("a", 64), "elf_count": 2,
 		"elfs": []map[string]string{{"name": "lib/one.so", "sha256": strings.Repeat("b", 64)}, {"name": "assets/chaquopy.zip!/two.so", "sha256": strings.Repeat("c", 64)}}}
 	entries := []entry{{APKName, apk, tar.TypeReg, 0}}
 	if change != nil {
