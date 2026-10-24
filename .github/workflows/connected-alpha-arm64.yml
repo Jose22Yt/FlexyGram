@@ -70,6 +70,18 @@ jobs:
         run: python3 tools/connected_alpha/check_resources.py --sdk-root "$ANDROID_HOME"
       - name: Render production vectors and verify production icon sizing with Android graphics
         run: python3 tools/connected_alpha/composer_visual/run.py --sdk-root "$ANDROID_HOME"
+      - name: Render Signature Home production surfaces and check compact geometry
+        run: python3 tools/connected_alpha/home_visual/run.py --sdk-root "$ANDROID_HOME"
+      - name: Retain isolated Signature Home Android graphics (not full app screenshots)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: signature-home-android-graphics
+          path: |
+            build/connected-alpha-home-visual/android-home-surfaces.png
+            build/connected-alpha-home-visual/target/surefire-reports/*.xml
+          retention-days: 7
+          if-no-files-found: warn
       - name: Retain isolated Android graphic probe evidence (not app/device screenshots)
         if: always()
         uses: actions/upload-artifact@v4
@@ -223,7 +235,7 @@ jobs:
             echo '::error::Expected exactly one Connected Alpha APK.'
             exit 1
           fi
-          python3 tools/connected_alpha/verify_apk.py "${packages[0]}" --build-tools "$ANDROID_HOME/build-tools/36.0.0" --certificate-sha256 "$ALPHA_CERTIFICATE_SHA256" --expected-version-code 1265 > connected-alpha-verification.json
+          python3 tools/connected_alpha/verify_apk.py "${packages[0]}" --build-tools "$ANDROID_HOME/build-tools/36.0.0" --certificate-sha256 "$ALPHA_CERTIFICATE_SHA256" --expected-version-code 1266 > connected-alpha-verification.json
           python3 - <<'PY'
           import json, os
           from pathlib import Path
@@ -255,7 +267,7 @@ jobs:
         if: vars.ALPHA_AGE_RECIPIENT != ''
         uses: actions/upload-artifact@v4
         with:
-          name: FlexyGram-iOS-Compact-ARM64-encrypted
+          name: FlexyGram-Signature-Home-ARM64-encrypted
           path: ${{ runner.temp }}/FlexyGram-Alpha-arm64.tar.age
           retention-days: 1
           if-no-files-found: error
