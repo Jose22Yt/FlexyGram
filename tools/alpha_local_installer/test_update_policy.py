@@ -48,15 +48,17 @@ public class UpdatePolicyRegression {
  }
  public static void main(String[] args) throws Exception {
   Signature original = new Signature(1), other = new Signature(2);
-  PackageInfo candidate = new PackageInfo(1267,original);
+  PackageInfo candidate = new PackageInfo(1269,original);
   requireCompatibleUpdate(new PackageInfo(1261,original),candidate);
   requireCompatibleUpdate(new PackageInfo(1262,original),candidate);
   requireCompatibleUpdate(new PackageInfo(1263,original),candidate);
   requireCompatibleUpdate(new PackageInfo(1264,original),candidate);
   requireCompatibleUpdate(new PackageInfo(1265,original),candidate);
   requireCompatibleUpdate(new PackageInfo(1266,original),candidate);
+  requireCompatibleUpdate(new PackageInfo(1269,original),candidate);
   requireCompatibleUpdate(new PackageInfo(1267,original),candidate);
-  reject(new PackageInfo(1268,original),candidate);
+  requireCompatibleUpdate(new PackageInfo(1268,original),candidate);
+  reject(new PackageInfo(1270,original),candidate);
   reject(new PackageInfo(1261,other),candidate);
   reject(new PackageInfo(1261,original,other),candidate);
   reject(new PackageInfo(1261),candidate);

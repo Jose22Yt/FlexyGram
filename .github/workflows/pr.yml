@@ -64,7 +64,7 @@ jobs:
           packages: 'build-tools;36.0.0 platforms;android-37.0'
       - run: python3 tools/connected_alpha/check_resources.py --sdk-root "$ANDROID_HOME"
   build:
-    if: github.event_name == 'pull_request' && github.head_ref != 'alpha/connected-exteraless-baseline' && github.head_ref != 'fix/alpha2-signature-installer' && github.head_ref != 'fix/alpha2-signature-personalized-installer' && github.head_ref != 'fix/alpha2-iphone-reference-installer' && github.head_ref != 'fix/alpha2-integrated-signature-installer' && !startsWith(github.head_ref, 'support/connected-alpha-ci-') && !startsWith(github.head_ref, 'integration/connected-alpha-')
+    if: github.event_name == 'pull_request' && github.head_ref != 'alpha/connected-exteraless-baseline' && github.head_ref != 'fix/alpha2-signature-installer' && github.head_ref != 'fix/alpha2-signature-personalized-installer' && github.head_ref != 'fix/alpha2-iphone-reference-installer' && github.head_ref != 'fix/alpha2-integrated-signature-installer' && github.head_ref != 'fix/alpha2-signature-matte-installer' && !startsWith(github.head_ref, 'support/connected-alpha-ci-') && !startsWith(github.head_ref, 'integration/connected-alpha-')
     name: Gradle Build
     runs-on: ubuntu-latest
     env:
