@@ -14,7 +14,7 @@ public final class SignatureHomeStyle {
     }
 
     public static float selection(int id, int selected, int previous, boolean moving, float progress) {
-        if (!moving) return id == selected ? 1 : 0;
+        if (!moving || selected == previous) return id == selected ? 1 : 0;
         float p = Math.max(0, Math.min(1, progress));
         return id == selected ? p : id == previous ? 1 - p : 0;
     }

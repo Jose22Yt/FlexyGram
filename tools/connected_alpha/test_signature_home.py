@@ -167,11 +167,13 @@ public class HomePolicyProbe {
         # Independent General/Appearance candidate; exact delta guarded against Alpha1267.
         from test_signature_matte import CANDIDATE_PATHS
         allowed.update(CANDIDATE_PATHS)
+        from release_1270_contract import PATHS
+        allowed.update(PATHS)
         changed=subprocess.check_output(['git','diff','--name-only',BASE],cwd=ROOT,text=True).splitlines()
         self.assertTrue(changed)
         self.assertEqual(set(changed)-allowed,set())
         gradle=subprocess.check_output(['git','diff',BASE,'--','TMessagesProj/build.gradle'],cwd=ROOT,text=True)
         additions=[l for l in gradle.splitlines() if l.startswith('+') and not l.startswith('+++')]
-        self.assertEqual(additions,['+def verCode = 1269',"+        versionNameSuffix = '-alpha2-signature-matte'"])
+        self.assertEqual(additions,['+def verCode = 1270',"+        versionNameSuffix = '-alpha2-ios-glass-home2'"])
 
 if __name__=='__main__':unittest.main()

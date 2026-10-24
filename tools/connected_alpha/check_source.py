@@ -61,6 +61,12 @@ def main():
             presentation[path] = {'actual_sha256': hashlib.sha256(actual).hexdigest(),
                                   'restored_upstream_sha256': hashlib.sha256(restored).hexdigest()}
             continue
+        if path.endswith('/ui/ChatActivity.java') and actual != expected:
+            from bubble_parity import restore_bubble_presentation
+            restored = restore_bubble_presentation(path, actual)
+            if restored != expected: raise SystemExit('FAIL: native chat changed outside bubble presentation')
+            presentation[path] = {'actual_sha256': hashlib.sha256(actual).hexdigest(), 'restored_upstream_sha256': hashlib.sha256(restored).hexdigest()}
+            continue
         if actual != expected:
             raise SystemExit(f'FAIL: upstream component changed: {path}')
         evidence[path] = hashlib.sha256(actual).hexdigest()
