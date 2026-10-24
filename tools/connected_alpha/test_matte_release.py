@@ -17,6 +17,8 @@ class MatteReleaseTests(unittest.TestCase):
         allowed={'TMessagesProj/build.gradle','.github/workflows/pr.yml','.github/workflows/connected-alpha-arm64.yml','tools/connected_alpha/test_signature_home.py','tools/connected_alpha/test_signature_matte.py','tools/connected_alpha/test_matte_release.py','tools/connected_alpha/test_signature_custom.py'}
         from release_1270_contract import PATHS
         allowed.update(PATHS)
+        from login_contract import PATHS as LOGIN_PATHS
+        allowed.update(LOGIN_PATHS)
         changes=subprocess.check_output(['git','diff','--name-only',BASE],cwd=ROOT,text=True).splitlines()
         self.assertTrue(set(changes)<=allowed,set(changes)-allowed)
         previous=subprocess.check_output(['git','show',BASE+':.github/workflows/connected-alpha-arm64.yml'],cwd=ROOT,text=True)

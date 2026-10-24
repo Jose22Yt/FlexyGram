@@ -1,0 +1,86 @@
+/* Isolated production components, not logged-in app screenshots. GPL-3.0-or-later. */
+import android.content.*;
+import android.content.res.*;
+import android.graphics.*;
+import android.graphics.drawable.*;
+import android.util.DisplayMetrics;
+import android.view.*;
+import android.widget.*;
+import app.flexygram.login.*;
+import org.telegram.messenger.*;
+import org.telegram.ui.ActionBar.Theme;
+import java.io.*;
+import java.lang.reflect.*;
+import java.util.*;
+import org.junit.*;
+import org.junit.runner.RunWith;
+import org.robolectric.*;
+import org.robolectric.annotation.*;
+import static org.junit.Assert.*;
+
+@RunWith(RobolectricTestRunner.class)
+@Config(manifest=Config.NONE,sdk=35)
+@GraphicsMode(GraphicsMode.Mode.NATIVE)
+public class LoginVisualTest {
+ private Context context;
+ private void setup(String language, float density, float font) throws Exception {
+  AssetManager assets=AssetManager.class.getDeclaredConstructor().newInstance();
+  Method add=AssetManager.class.getMethod("addAssetPath",String.class);
+  assertTrue((Integer)add.invoke(assets,System.getProperty("probe.root")+"/resources.ap_")>0);
+  DisplayMetrics metrics=new DisplayMetrics();metrics.density=density;metrics.densityDpi=(int)(160*density);metrics.scaledDensity=density*font;
+  Configuration config=new Configuration();config.fontScale=font;config.setLocale(new Locale(language));
+  Resources resources=new Resources(assets,metrics,config);LocaleController.resources=resources;AndroidUtilities.density=density;
+  context=new android.view.ContextThemeWrapper(RuntimeEnvironment.getApplication(),android.R.style.Theme_Material_Light_NoActionBar){
+   @Override public Resources getResources(){return resources;}
+   @Override public String getPackageName(){return "app.flexygram.visualprobe";}
+  };
+ }
+ private void layout(View v,int width,int height) {v.measure(View.MeasureSpec.makeMeasureSpec(width,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(height,View.MeasureSpec.EXACTLY));v.layout(0,0,width,height);}
+ @Test public void welcomeFitsScrollsAndRespondsAtAllSizes() throws Exception {
+  for(String language:new String[]{"es","en","ru"}) for(float font:new float[]{1,1.5f,2,3}) for(int width:new int[]{240,320,600}) {
+   setup(language,1,font);int[] calls={0,0};SignatureWelcomeView welcome=new SignatureWelcomeView(context,()->calls[0]++,()->calls[1]++);
+   layout(welcome,width,320);ViewGroup content=(ViewGroup)welcome.getChildAt(0);
+   assertTrue(content.getMeasuredHeight()>=320);
+   for(int i=0;i<content.getChildCount();i++) {
+    View child=content.getChildAt(i);assertTrue(child.getLeft()>=0);assertTrue(child.getRight()<=width);
+    assertTrue(child.getBottom()<=content.getMeasuredHeight());
+    if(child instanceof TextView){TextView t=(TextView)child;assertTrue(t.getLayout()!=null);assertTrue(t.getLayout().getHeight()<=t.getHeight()-t.getCompoundPaddingTop()-t.getCompoundPaddingBottom());}
+   }
+   assertEquals("android.widget.Button",welcome.startButton.getAccessibilityClassName());
+   assertTrue(welcome.startButton.getHeight()>=52);assertTrue(welcome.languageButton.getHeight()>=48);
+   welcome.startButton.performClick();welcome.languageButton.performClick();assertArrayEquals(new int[]{1,1},calls);
+   assertTrue(SignatureIdentity.applyPlane(new ImageView(context)));
+  }
+ }
+ @Test public void rotationThemeAndLocaleKeepSameViewAndCallbacks() throws Exception {
+  setup("es",2,1);int[] calls={0};SignatureWelcomeView welcome=new SignatureWelcomeView(context,()->calls[0]++,()->{});
+  TextView button=welcome.startButton;
+  for(boolean dark:new boolean[]{false,true,false}) {Theme.dark=dark;welcome.refresh();layout(welcome,640,360);layout(welcome,360,640);assertSame(button,welcome.startButton);button.performClick();}
+  assertEquals(3,calls[0]);assertEquals("Empezar a chatear",button.getText().toString());
+ }
+ @Test public void nativeOutlineFocusErrorAndAttachmentRemainNative() throws Exception {
+  setup("en",2,1);for(boolean dark:new boolean[]{false,true}) {
+   Theme.dark=dark;SignatureLoginOutline outline=new SignatureLoginOutline(context);EditText edit=new EditText(context);
+   outline.setText("Phone number");outline.addView(edit);outline.attachEditText(edit);assertSame(edit,outline.getAttachedEditText());
+   outline.animateSelection(1,1,false);layout(outline,600,116);
+   Field field=org.telegram.ui.Components.OutlineTextContainerView.class.getDeclaredField("outlinePaint");field.setAccessible(true);
+   Paint paint=(Paint)field.get(outline);assertEquals(SignatureLoginPalette.accent(dark),paint.getColor());
+   outline.animateSelection(0,0,false);assertEquals(SignatureLoginPalette.edge(dark),paint.getColor());
+   Field error=org.telegram.ui.Components.OutlineTextContainerView.class.getDeclaredField("errorProgress");error.setAccessible(true);error.setFloat(outline,1);outline.updateColor();assertEquals(Theme.getColor(Theme.key_text_RedBold),paint.getColor());
+   outline.removeView(edit);assertSame(edit,outline.getAttachedEditText());
+  }
+ }
+ @Test public void paletteDoesNotOverrideErrorSemanticsOrLegacyVariant() throws Exception {
+  setup("en",1,1);assertEquals(Theme.getColor(Theme.key_text_RedBold),SignatureLoginPalette.color(Theme.key_text_RedBold));
+  BuildConfig.CONNECTED_ALPHA=false;try {assertEquals(Theme.getColor(Theme.key_windowBackgroundWhite),SignatureLoginPalette.color(Theme.key_windowBackgroundWhite));}finally{BuildConfig.CONNECTED_ALPHA=true;}
+ }
+ @Test public void renderProductionWelcomeAndNativeFields() throws Exception {
+  setup("es",2,1);Bitmap bitmap=Bitmap.createBitmap(1440,1440,Bitmap.Config.ARGB_8888);Canvas canvas=new Canvas(bitmap);
+  for(int panel=0;panel<2;panel++) {
+   Theme.dark=panel==1;Paint backdrop=new Paint();backdrop.setColor(SignatureLoginPalette.background(Theme.dark));canvas.drawRect(panel*720,0,(panel+1)*720,1440,backdrop);SignatureWelcomeView welcome=new SignatureWelcomeView(context,()->{},()->{});layout(welcome,720,1100);
+   canvas.save();canvas.translate(panel*720,0);welcome.draw(canvas);
+   SignatureLoginOutline field=new SignatureLoginOutline(context);field.setText("Tu número de teléfono");EditText number=new EditText(context);number.setHint("Número");number.setHintTextColor(SignatureLoginPalette.secondary(Theme.dark));number.setTextColor(SignatureLoginPalette.ink(Theme.dark));number.setBackground(null);number.setPadding(32,16,32,0);field.addView(number);field.attachEditText(number);field.animateSelection(1,1,false);layout(field,624,120);canvas.translate(48,1150);field.draw(canvas);canvas.restore();
+  }
+  try(FileOutputStream out=new FileOutputStream(new File(System.getProperty("probe.root"),"signature-login-components.png"))){assertTrue(bitmap.compress(Bitmap.CompressFormat.PNG,100,out));}
+ }
+}

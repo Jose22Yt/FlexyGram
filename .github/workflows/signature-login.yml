@@ -1,0 +1,41 @@
+name: Signature Login source and native view checks
+on:
+  push:
+    branches: [feat/signature-native-login]
+  pull_request:
+    types: [opened, reopened, synchronize]
+permissions:
+  contents: read
+jobs:
+  login:
+    if: github.event_name == 'push' || github.head_ref == 'feat/signature-native-login'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python3 -m pip install -r tools/connected_alpha/requirements-ci.txt
+      - run: git submodule update --init --depth 1 TMessagesProj_Modules/media
+      - run: python3 tools/connected_alpha/run_checks.py
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: 'build-tools;36.0.0 platforms;android-37.0'
+      - run: python3 tools/connected_alpha/check_resources.py --sdk-root "$ANDROID_HOME"
+      - run: python3 tools/connected_alpha/login_visual/run.py --sdk-root "$ANDROID_HOME"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: signature-login-isolated-android-evidence
+          path: |
+            build/connected-alpha-login-visual/*.png
+            build/connected-alpha-login-visual/target/surefire-reports/*.xml
+          retention-days: 7
+          if-no-files-found: warn

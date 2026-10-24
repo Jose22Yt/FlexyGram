@@ -88,7 +88,7 @@ public class UpdaterSheet extends BottomSheet {
     private GitHubUpdater.Release release;
 
     public UpdaterSheet(BaseFragment fragment) {
-        super(fragment.getParentActivity(), false, fragment.getResourceProvider());
+        super(fragment.getParentActivity(), false, org.telegram.messenger.BuildConfig.CONNECTED_ALPHA ? app.flexygram.login.SignatureLoginPalette.INSTANCE : fragment.getResourceProvider());
         this.fragment = fragment;
         fixNavigationBar();
         Context context = getContext();
@@ -109,7 +109,7 @@ public class UpdaterSheet extends BottomSheet {
         title.setTypeface(AndroidUtilities.bold());
         title.setTextColor(getThemedColor(Theme.key_dialogTextBlack));
         title.setGravity(Gravity.CENTER);
-        title.setText(getString(R.string.OpenExtera));
+        title.setText(getString(org.telegram.messenger.BuildConfig.CONNECTED_ALPHA ? R.string.FlexySignatureName : R.string.OpenExtera));
         content.addView(title, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 12, 0, 0));
 
         TextView version = new TextView(context);
@@ -219,10 +219,22 @@ public class UpdaterSheet extends BottomSheet {
         channelInfo.setTextColor(getThemedColor(Theme.key_dialogTextGray2));
         content.addView(channelInfo, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 4, 8, 4, 0));
 
-        content.addView(createLink(context, R.drawable.msg_link, getString(R.string.OEUpdaterAllReleases), () ->
-                Browser.openUrl(getContext(), GitHubUpdater.RELEASES_URL)), LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 40, 0, 20, 0, 0));
+        content.addView(createLink(context, R.drawable.msg_link, getString(org.telegram.messenger.BuildConfig.CONNECTED_ALPHA ? R.string.FlexyAlphaDeliveries : R.string.OEUpdaterAllReleases), () ->
+                Browser.openUrl(getContext(), org.telegram.messenger.BuildConfig.CONNECTED_ALPHA ? "https://github.com/Jose22Yt/FlexyGram/actions" : GitHubUpdater.RELEASES_URL)), LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 40, 0, 20, 0, 0));
 
         setCustomView(content);
+        if (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) {
+            statusTitle.setText(getString(R.string.FlexySignatureName));
+            statusSubtitle.setText(getString(R.string.FlexyAlphaDeliveryInfo));
+            statusProgress.setVisibility(View.GONE);
+            statusImage.setImageResource(R.drawable.msg_info);
+            notesScroll.setVisibility(View.GONE);
+            progressView.setVisibility(View.GONE);
+            actionButton.setVisibility(View.GONE);
+            segments.setVisibility(View.GONE);
+            channelInfo.setVisibility(View.GONE);
+            return;
+        }
         updateChannel();
         check();
     }
@@ -243,7 +255,10 @@ public class UpdaterSheet extends BottomSheet {
         };
         logo.setScaleType(ImageView.ScaleType.CENTER_CROP);
         logo.setBackgroundColor(AboutHeaderCell.LOGO_BACKGROUND);
-        logo.setImageResource(R.drawable.exteraless_icon);
+        if (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) {
+            logo.setBackgroundColor(app.flexygram.login.SignatureLoginPalette.surface(Theme.isCurrentThemeDark()));
+            app.flexygram.login.SignatureIdentity.applyPlane(logo);
+        } else logo.setImageResource(R.drawable.exteraless_icon);
         return logo;
     }
 

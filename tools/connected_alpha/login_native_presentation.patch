@@ -1,0 +1,1018 @@
+diff --git a/TMessagesProj/src/main/java/app/exteraless/updater/GitHubUpdater.java b/TMessagesProj/src/main/java/app/exteraless/updater/GitHubUpdater.java
+index 8dbd9c8b61813847e5720afb346a294494c789b8..b85b87eb6bfec177d4ed535dd8125724b73e6bd3 100644
+--- a/TMessagesProj/src/main/java/app/exteraless/updater/GitHubUpdater.java
++++ b/TMessagesProj/src/main/java/app/exteraless/updater/GitHubUpdater.java
+@@ -132,6 +132,10 @@ public final class GitHubUpdater {
+     }
+ 
+     public static void fetch(CheckCallback callback) {
++        if (BuildConfig.CONNECTED_ALPHA) {
++            AndroidUtilities.runOnUIThread(() -> callback.onChecked(null, null, true));
++            return;
++        }
+         final boolean prerelease = NaConfig.INSTANCE.getAutoUpdateChannel().Int() == UpdateHelper.UPDATE_CHANNEL_BETA;
+         new Thread(() -> {
+             Release release = null;
+@@ -363,6 +367,7 @@ public final class GitHubUpdater {
+     }
+ 
+     public static void download(Activity activity, Release release, DownloadListener listener) {
++        if (BuildConfig.CONNECTED_ALPHA) { listener.onFinished(false, false); return; }
+         if (download != null) {
+             return;
+         }
+diff --git a/TMessagesProj/src/main/java/app/exteraless/updater/UpdaterSheet.java b/TMessagesProj/src/main/java/app/exteraless/updater/UpdaterSheet.java
+index 2694e93bd680f84905943ede45d47131cf9204c0..0384668715362ea5d7a50fa5c9cfbbd84a6f2954 100644
+--- a/TMessagesProj/src/main/java/app/exteraless/updater/UpdaterSheet.java
++++ b/TMessagesProj/src/main/java/app/exteraless/updater/UpdaterSheet.java
+@@ -88,7 +88,7 @@ public class UpdaterSheet extends BottomSheet {
+     private GitHubUpdater.Release release;
+ 
+     public UpdaterSheet(BaseFragment fragment) {
+-        super(fragment.getParentActivity(), false, fragment.getResourceProvider());
++        super(fragment.getParentActivity(), false, org.telegram.messenger.BuildConfig.CONNECTED_ALPHA ? app.flexygram.login.SignatureLoginPalette.INSTANCE : fragment.getResourceProvider());
+         this.fragment = fragment;
+         fixNavigationBar();
+         Context context = getContext();
+@@ -109,7 +109,7 @@ public class UpdaterSheet extends BottomSheet {
+         title.setTypeface(AndroidUtilities.bold());
+         title.setTextColor(getThemedColor(Theme.key_dialogTextBlack));
+         title.setGravity(Gravity.CENTER);
+-        title.setText(getString(R.string.OpenExtera));
++        title.setText(getString(org.telegram.messenger.BuildConfig.CONNECTED_ALPHA ? R.string.FlexySignatureName : R.string.OpenExtera));
+         content.addView(title, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 12, 0, 0));
+ 
+         TextView version = new TextView(context);
+@@ -219,10 +219,22 @@ public class UpdaterSheet extends BottomSheet {
+         channelInfo.setTextColor(getThemedColor(Theme.key_dialogTextGray2));
+         content.addView(channelInfo, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 4, 8, 4, 0));
+ 
+-        content.addView(createLink(context, R.drawable.msg_link, getString(R.string.OEUpdaterAllReleases), () ->
+-                Browser.openUrl(getContext(), GitHubUpdater.RELEASES_URL)), LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 40, 0, 20, 0, 0));
++        content.addView(createLink(context, R.drawable.msg_link, getString(org.telegram.messenger.BuildConfig.CONNECTED_ALPHA ? R.string.FlexyAlphaDeliveries : R.string.OEUpdaterAllReleases), () ->
++                Browser.openUrl(getContext(), org.telegram.messenger.BuildConfig.CONNECTED_ALPHA ? "https://github.com/Jose22Yt/FlexyGram/actions" : GitHubUpdater.RELEASES_URL)), LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 40, 0, 20, 0, 0));
+ 
+         setCustomView(content);
++        if (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) {
++            statusTitle.setText(getString(R.string.FlexySignatureName));
++            statusSubtitle.setText(getString(R.string.FlexyAlphaDeliveryInfo));
++            statusProgress.setVisibility(View.GONE);
++            statusImage.setImageResource(R.drawable.msg_info);
++            notesScroll.setVisibility(View.GONE);
++            progressView.setVisibility(View.GONE);
++            actionButton.setVisibility(View.GONE);
++            segments.setVisibility(View.GONE);
++            channelInfo.setVisibility(View.GONE);
++            return;
++        }
+         updateChannel();
+         check();
+     }
+@@ -243,7 +255,10 @@ public class UpdaterSheet extends BottomSheet {
+         };
+         logo.setScaleType(ImageView.ScaleType.CENTER_CROP);
+         logo.setBackgroundColor(AboutHeaderCell.LOGO_BACKGROUND);
+-        logo.setImageResource(R.drawable.exteraless_icon);
++        if (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) {
++            logo.setBackgroundColor(app.flexygram.login.SignatureLoginPalette.surface(Theme.isCurrentThemeDark()));
++            app.flexygram.login.SignatureIdentity.applyPlane(logo);
++        } else logo.setImageResource(R.drawable.exteraless_icon);
+         return logo;
+     }
+ 
+diff --git a/TMessagesProj/src/main/java/org/telegram/ui/Components/OutlineTextContainerView.java b/TMessagesProj/src/main/java/org/telegram/ui/Components/OutlineTextContainerView.java
+index 455db0aea1997326374675f226679ecb49c6dd0a..08fc4a2c6aa25002b48eca165d1f6b23a89b877a 100644
+--- a/TMessagesProj/src/main/java/org/telegram/ui/Components/OutlineTextContainerView.java
++++ b/TMessagesProj/src/main/java/org/telegram/ui/Components/OutlineTextContainerView.java
+@@ -47,6 +47,9 @@ public class OutlineTextContainerView extends FrameLayout {
+                 obj.updateColor();
+             }).setMultiplier(SPRING_MULTIPLIER);
+ 
++    private float cornerRadius = -1;
++    public void setCornerRadius(float radius) { cornerRadius = Math.max(0, radius); invalidate(); }
++
+     private final RectF rect = new RectF();
+     private String mText = "";
+     private final Paint outlinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+@@ -209,7 +212,8 @@ public class OutlineTextContainerView extends FrameLayout {
+         rect.set(getPaddingLeft() + AndroidUtilities.dp(PADDING_LEFT - PADDING_TEXT), getPaddingTop(), getWidth() - AndroidUtilities.dp(PADDING_LEFT + PADDING_TEXT) - getPaddingRight(), getPaddingTop() + stroke * 2);
+         canvas.clipRect(rect, Region.Op.DIFFERENCE);
+         rect.set(getPaddingLeft() + stroke, getPaddingTop() + stroke, getWidth() - stroke - getPaddingRight(), getHeight() - stroke - getPaddingBottom());
+-        canvas.drawRoundRect(rect, AndroidUtilities.dp(8), AndroidUtilities.dp(8), outlinePaint);
++        float radius = cornerRadius >= 0 ? cornerRadius : AndroidUtilities.dp(8);
++        canvas.drawRoundRect(rect, radius, radius, outlinePaint);
+         canvas.restore();
+ 
+         float left = getPaddingLeft() + AndroidUtilities.dp(PADDING_LEFT - PADDING_TEXT), lineY = getPaddingTop() + stroke,
+diff --git a/TMessagesProj/src/main/java/org/telegram/ui/IntroActivity.java b/TMessagesProj/src/main/java/org/telegram/ui/IntroActivity.java
+index e0299359bd0b84c4ba14635253da35641b86dab1..0c93b02bde53414c7a4a1337afd9d4b8d4f66f0e 100644
+--- a/TMessagesProj/src/main/java/org/telegram/ui/IntroActivity.java
++++ b/TMessagesProj/src/main/java/org/telegram/ui/IntroActivity.java
+@@ -135,11 +135,32 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
+     private NotificationCenter.NotificationCenterDelegate switchLanguageDelegate;
+ 
+     private boolean isOnLogout;
++    private app.flexygram.login.SignatureWelcomeView signatureWelcome;
++    private boolean isSignatureWelcome() { return org.telegram.messenger.BuildConfig.CONNECTED_ALPHA; }
++
++    private View createSignatureWelcome(Context context) {
++        actionBar.setAddToContainer(false);
++        signatureWelcome = new app.flexygram.login.SignatureWelcomeView(context, () -> {
++            if (startPressed) return;
++            startPressed = true;
++            signatureWelcome.startButton.setEnabled(false);
++            if (!presentFragment(new LoginActivity(), true)) {
++                startPressed = false;
++                signatureWelcome.startButton.setEnabled(true);
++            }
++        }, () -> presentFragment(new LanguageSelectActivity()));
++        fragmentView = signatureWelcome;
++        ConnectionsManager.getInstance(currentAccount).updateDcSettings();
++        LocaleController.getInstance().loadRemoteLanguages(currentAccount);
++        return fragmentView;
++    }
++
+ 
+     @Override
+     public boolean onFragmentCreate() {
+         MessagesController.getGlobalMainSettings().edit().putLong("intro_crashed_time", System.currentTimeMillis()).apply();
+ 
++        if (isSignatureWelcome()) return true;
+         titles = new CharSequence[]{
+                 null,
+                 LocaleController.getString(R.string.Page2Title),
+@@ -161,6 +182,7 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
+ 
+     @Override
+     public View createView(Context context) {
++        if (isSignatureWelcome()) return createSignatureWelcome(context);
+         logoDrawable = context.getResources().getDrawable(R.drawable.telegram_logo).mutate();
+         logoDrawable.setBounds(0, dp(8.666f), dp(115), dp(35));
+         titles[0] = LocaleController.getAppName();
+@@ -438,6 +460,11 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
+     @Override
+     public void onResume() {
+         super.onResume();
++        if (isSignatureWelcome()) {
++            startPressed = false;
++            if (signatureWelcome != null) { signatureWelcome.startButton.setEnabled(true); signatureWelcome.refresh(); }
++            return;
++        }
+         if (justCreated) {
+             if (LocaleController.isRTL) {
+                 viewPager.setCurrentItem(6);
+@@ -454,12 +481,12 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
+     @Override
+     public void onPause() {
+         super.onPause();
+-        AndroidUtilities.unlockOrientation(getParentActivity());
++        if (!isSignatureWelcome()) AndroidUtilities.unlockOrientation(getParentActivity());
+     }
+ 
+     @Override
+     public boolean hasForceLightStatusBar() {
+-        return true;
++        return !isSignatureWelcome() || !Theme.isCurrentThemeDark();
+     }
+ 
+     @Override
+@@ -605,6 +632,7 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
+ 
+     @Override
+     public AnimatorSet onCustomTransitionAnimation(boolean isOpen, Runnable callback) {
++        if (isSignatureWelcome()) return null;
+         if (isOnLogout) {
+             AnimatorSet set = new AnimatorSet().setDuration(50);
+             set.playTogether(ValueAnimator.ofFloat());
+@@ -1041,6 +1069,7 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
+     }
+ 
+     private void updateColors(boolean fromTheme) {
++        if (isSignatureWelcome()) { if (signatureWelcome != null) signatureWelcome.refresh(); return; }
+         startMessagingButtonBackground.setColors(new int[]{getThemedColor(Theme.key_featuredStickers_addButton), getThemedColor(Theme.key_featuredStickers_addButton2)});
+         logoDrawable.setColorFilter(Theme.multAlpha(getThemedColor(Theme.key_actionBarDefaultTitle), 0.9f), PorterDuff.Mode.MULTIPLY);
+         fragmentView.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
+diff --git a/TMessagesProj/src/main/java/org/telegram/ui/LoginActivity.java b/TMessagesProj/src/main/java/org/telegram/ui/LoginActivity.java
+index 263b14436c66cd62a7f5ddad7abc3a685a47062e..5994d201585b3db50215bbc13f9a1649e2f75157 100644
+--- a/TMessagesProj/src/main/java/org/telegram/ui/LoginActivity.java
++++ b/TMessagesProj/src/main/java/org/telegram/ui/LoginActivity.java
+@@ -428,8 +428,8 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+ 
+         public ProgressView(Context context) {
+             super(context);
+-            paint.setColor(Theme.getColor(Theme.key_login_progressInner));
+-            paint2.setColor(Theme.getColor(Theme.key_login_progressOuter));
++            paint.setColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_login_progressInner));
++            paint2.setColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_login_progressOuter));
+         }
+ 
+         public void startProgressAnimation(long duration) {
+@@ -479,6 +479,11 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+         }
+     }
+ 
++    private static OutlineTextContainerView createSignatureOutline(Context context) {
++        return app.flexygram.login.SignatureLoginPalette.enabled()
++                ? new app.flexygram.login.SignatureLoginOutline(context) : new OutlineTextContainerView(context);
++    }
++
+     public LoginActivity() {
+         super();
+     }
+@@ -560,6 +565,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+             return fragmentView;
+         }
+ 
++        if (app.flexygram.login.SignatureLoginPalette.enabled()) setResourceProvider(app.flexygram.login.SignatureLoginPalette.INSTANCE);
+         actionBar.setAddToContainer(false);
+         actionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick() {
+             @Override
+@@ -746,7 +752,8 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+             }
+         }
+ 
+-        floatingButton = new FragmentFloatingButton(context, resourceProvider);
++        floatingButton = app.flexygram.login.SignatureLoginPalette.enabled()
++                ? new app.flexygram.login.SignatureLoginButton(context) : new FragmentFloatingButton(context, resourceProvider);
+         floatingButton.setButtonVisible(doneButtonVisible[DONE_TYPE_FLOATING], false);
+         floatingAutoAnimator = VerticalPositionAutoAnimator.attach(floatingButton);
+         sizeNotifierFrameLayout.addView(floatingButton, FragmentFloatingButton.createDefaultLayoutParamsBig());
+@@ -776,7 +783,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+             emailChangeSkipButton.setLineSpacing(AndroidUtilities.dp(2), 1.0f);
+             emailChangeSkipButton.setPadding(AndroidUtilities.dp(16), 0, AndroidUtilities.dp(16), 0);
+             emailChangeSkipButton.setText(getString(R.string.YourEmailSkip));
+-            emailChangeSkipButton.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText4));
++            emailChangeSkipButton.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlueText4));
+             sizeNotifierFrameLayout.addView(emailChangeSkipButton, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, 30, Gravity.TOP | Gravity.RIGHT, 0, 16, 16, 0));
+             emailChangeSkipButton.setOnClickListener(v -> {
+                 if (emailChangeSkipCallback != null) {
+@@ -793,7 +800,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+         proxyButtonView.setVisibility(View.GONE);
+         sizeNotifierFrameLayout.addView(proxyButtonView, LayoutHelper.createFrame(32, 32, Gravity.RIGHT | Gravity.TOP, 16, 16, 16, 16));
+         updateProxyButton(false, true);*/
+-        moreButtonView = new ActionBarMenuItem(context, null, 0, Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
++        moreButtonView = new ActionBarMenuItem(context, null, 0, app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlackText));
+         moreButtonView.setIcon(R.drawable.ic_ab_other);
+         moreButtonView.addSubItem(0, R.drawable.msg_policy_solar, getString(R.string.Proxy));
+         moreButtonView.addSubItem(1, R.drawable.msg_qrcode_solar, getString(R.string.ImportLogin));
+@@ -2076,10 +2083,11 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+             super(context);
+ 
+             setOrientation(VERTICAL);
+-            setGravity(Gravity.CENTER);
++            setGravity(app.flexygram.login.SignatureLoginPalette.enabled() ? Gravity.TOP | Gravity.CENTER_HORIZONTAL : Gravity.CENTER);
++            if (app.flexygram.login.SignatureLoginPalette.enabled()) setPadding(0, dp(48), 0, 0);
+ 
+             titleView = new TextView(context);
+-            titleView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
++            titleView.setTextSize(app.flexygram.login.SignatureLoginPalette.enabled() ? TypedValue.COMPLEX_UNIT_SP : TypedValue.COMPLEX_UNIT_DIP, app.flexygram.login.SignatureLoginPalette.enabled() ? 24 : 18);
+             titleView.setTypeface(AndroidUtilities.bold());
+             titleView.setText(getString(activityMode == MODE_CHANGE_PHONE_NUMBER ? R.string.ChangePhoneNewNumber : R.string.YourNumber));
+             titleView.setGravity(Gravity.CENTER);
+@@ -2119,8 +2127,8 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+                 TextView tv = new TextView(context);
+                 tv.setPadding(dp(16), dp(12), dp(16), dp(12));
+                 tv.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
+-                tv.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+-                tv.setHintTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteHintText));
++                tv.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlackText));
++                tv.setHintTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteHintText));
+                 tv.setMaxLines(1);
+                 tv.setSingleLine(true);
+                 tv.setEllipsize(TextUtils.TruncateAt.END);
+@@ -2141,7 +2149,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+             countryButtonLinearLayout.addView(countryButton, LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1f, 0, 0, 0, 0));
+             countryButtonLinearLayout.addView(chevronRight, LayoutHelper.createLinearRelatively(24, 24, 0, 0, 0, 14, 0));
+ 
+-            countryOutlineView = new OutlineTextContainerView(context);
++            countryOutlineView = createSignatureOutline(context);
+             countryOutlineView.setText(getString(R.string.Country));
+             countryOutlineView.addView(countryButtonLinearLayout, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.TOP, 0, 0, 0, 0));
+             countryOutlineView.setForceUseCenter(true);
+@@ -2151,6 +2159,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+             addView(countryOutlineView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 58, 16, 24, 16, 14));
+             countryOutlineView.setOnClickListener(view -> {
+                 CountrySelectActivity fragment = new CountrySelectActivity(true, countriesArray);
++                if (app.flexygram.login.SignatureLoginPalette.enabled()) fragment.setResourceProvider(app.flexygram.login.SignatureLoginPalette.INSTANCE);
+                 fragment.setCountrySelectActivityDelegate((country) -> {
+                     selectCountry(country);
+                     AndroidUtilities.runOnUIThread(() -> showKeyboard(phoneField), 300);
+@@ -2163,7 +2172,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+             LinearLayout linearLayout = new LinearLayout(context);
+             linearLayout.setOrientation(HORIZONTAL);
+ 
+-            phoneOutlineView = new OutlineTextContainerView(context);
++            phoneOutlineView = createSignatureOutline(context);
+             phoneOutlineView.addView(linearLayout, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_VERTICAL, 16, 8, 16, 8));
+             phoneOutlineView.setText(getString(R.string.PhoneNumber));
+             addView(phoneOutlineView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 58, 16, 8, 16, 8));
+@@ -2516,7 +2525,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+ 
+             int bottomMargin = 72;
+             if (activityMode == MODE_LOGIN) {
+-                syncContactsBox = new CheckBoxCell(context, 2);
++                syncContactsBox = new CheckBoxCell(context, 2, app.flexygram.login.SignatureLoginPalette.enabled() ? app.flexygram.login.SignatureLoginPalette.INSTANCE : null);
+                 syncContactsBox.setText(getString("SyncContacts", R.string.SyncContacts), "", syncContacts, false);
+                 addView(syncContactsBox, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.MATCH_PARENT, Gravity.LEFT | Gravity.TOP, 16, 0, 16 + (LocaleController.isRTL && AndroidUtilities.isSmallScreen() ? 56 : 0), 0));
+                 bottomMargin -= 24;
+@@ -2537,7 +2546,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+ 
+             final boolean allowTestBackend = true;
+             if (allowTestBackend && activityMode == MODE_LOGIN) {
+-                testBackendCheckBox = new CheckBoxCell(context, 2);
++                testBackendCheckBox = new CheckBoxCell(context, 2, app.flexygram.login.SignatureLoginPalette.enabled() ? app.flexygram.login.SignatureLoginPalette.INSTANCE : null);
+                 testBackendCheckBox.setText(getString(R.string.TestBackend), "", testBackend = getConnectionsManager().isTestBackend(), false);
+                 addView(testBackendCheckBox, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.MATCH_PARENT, Gravity.LEFT | Gravity.TOP, 16, 0, 16 + (LocaleController.isRTL && AndroidUtilities.isSmallScreen() ? 56 : 0), 0));
+                 bottomMargin -= 24;
+@@ -2752,28 +2761,28 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+ 
+         @Override
+         public void updateColors() {
+-            titleView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+-            subtitleView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText6));
+-            subtitleView.setLinkTextColor(Theme.getColor(Theme.key_chat_messageLinkIn));
++            titleView.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlackText));
++            subtitleView.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteGrayText6));
++            subtitleView.setLinkTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_chat_messageLinkIn));
+             for (int i = 0; i < countryButton.getChildCount(); i++) {
+                 TextView textView = (TextView) countryButton.getChildAt(i);
+-                textView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+-                textView.setHintTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteHintText));
++                textView.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlackText));
++                textView.setHintTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteHintText));
+             }
+ 
+-            chevronRight.setColorFilter(Theme.getColor(Theme.key_windowBackgroundWhiteHintText));
++            chevronRight.setColorFilter(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteHintText));
+             chevronRight.setBackground(Theme.createSelectorDrawable(getThemedColor(Theme.key_listSelector), 1));
+ 
+-            plusTextView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
++            plusTextView.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlackText));
+ 
+-            codeField.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+-            codeField.setCursorColor(Theme.getColor(Theme.key_windowBackgroundWhiteInputFieldActivated));
++            codeField.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlackText));
++            codeField.setCursorColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteInputFieldActivated));
+ 
+-            codeDividerView.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhiteInputField));
++            codeDividerView.setBackgroundColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteInputField));
+ 
+-            phoneField.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+-            phoneField.setHintTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteHintText));
+-            phoneField.setCursorColor(Theme.getColor(Theme.key_windowBackgroundWhiteInputFieldActivated));
++            phoneField.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlackText));
++            phoneField.setHintTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteHintText));
++            phoneField.setCursorColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteInputFieldActivated));
+ 
+             if (syncContactsBox != null) {
+                 syncContactsBox.setSquareCheckBoxColor(Theme.key_checkboxSquareUnchecked, Theme.key_checkboxSquareBackground, Theme.key_checkboxSquareCheck);
+@@ -3028,7 +3037,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+                                             builder.setMessage(getString("AllowReadCall", R.string.AllowReadCall));
+                                             resId = R.raw.incoming_calls;
+                                         }
+-                                        builder.setTopAnimation(resId, 46, false, Theme.getColor(Theme.key_dialogTopBackground));
++                                        builder.setTopAnimation(resId, 46, false, app.flexygram.login.SignatureLoginPalette.color(Theme.key_dialogTopBackground));
+                                         permissionsDialog = showDialog(builder.create());
+                                         confirmedNumber = true;
+                                     } else {
+@@ -3105,7 +3114,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+                                 builder.setMessage(getString("AllowReadCall", R.string.AllowReadCall));
+                                 resId = R.raw.incoming_calls;
+                             }
+-                            builder.setTopAnimation(resId, 46, false, Theme.getColor(Theme.key_dialogTopBackground));
++                            builder.setTopAnimation(resId, 46, false, app.flexygram.login.SignatureLoginPalette.color(Theme.key_dialogTopBackground));
+                             permissionsDialog = showDialog(builder.create());
+                             confirmedNumber = true;
+                         } else {
+@@ -3150,7 +3159,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+                         if (PhoneNumberUtils.compare(phone, userPhone) && ConnectionsManager.getInstance(a).isTestBackend() == testBackend) {
+                             final int num = a;
+                             AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
+-                            builder.setTitle(getString(R.string.NagramX));
++                            builder.setTitle(getString(org.telegram.messenger.BuildConfig.CONNECTED_ALPHA ? R.string.FlexySignatureName : R.string.NagramX));
+                             builder.setMessage(getString("AccountAlreadyLoggedIn", R.string.AccountAlreadyLoggedIn));
+                             builder.setPositiveButton(getString("AccountSwitch", R.string.AccountSwitch), (dialog, which) -> {
+                                 if (UserConfig.selectedAccount != num) {
+@@ -3369,7 +3378,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+                                         preferences.edit().putBoolean("firstloginshow", false).commit();
+                                         AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
+ 
+-                                        builder.setTopAnimation(R.raw.incoming_calls, 46, false, Theme.getColor(Theme.key_dialogTopBackground));
++                                        builder.setTopAnimation(R.raw.incoming_calls, 46, false, app.flexygram.login.SignatureLoginPalette.color(Theme.key_dialogTopBackground));
+                                         builder.setPositiveButton(getString("Continue", R.string.Continue), null);
+                                         builder.setMessage(getString("AllowFillNumber", R.string.AllowFillNumber));
+                                         permissionsShowDialog = showDialog(builder.create(), true, null);
+@@ -3878,7 +3887,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+             }
+ 
+             prevTypeTextView = new LoadingTextView(context);
+-            prevTypeTextView.setLinkTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteValueText));
++            prevTypeTextView.setLinkTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteValueText));
+             prevTypeTextView.setTextColor(getThemedColor(Theme.key_windowBackgroundWhiteValueText));
+             prevTypeTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
+             prevTypeTextView.setLineSpacing(AndroidUtilities.dp(2), 1.0f);
+@@ -3899,7 +3908,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+                     return getVisibility() == View.VISIBLE && !(time > 0 && timeTimer != null);
+                 }
+             };
+-            timeText.setLinkTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteValueText));
++            timeText.setLinkTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteValueText));
+             timeText.setLineSpacing(AndroidUtilities.dp(2), 1.0f);
+             timeText.setPadding(AndroidUtilities.dp(14), AndroidUtilities.dp(8), AndroidUtilities.dp(14), AndroidUtilities.dp(16));
+             timeText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
+@@ -3913,10 +3922,10 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+                 }
+                 isResendingCode = true;
+                 timeText.invalidate();
+-                timeText.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteValueText));
++                timeText.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteValueText));
+ 
+                 if (nextType == AUTH_TYPE_CALL || nextType == AUTH_TYPE_SMS || nextType == AUTH_TYPE_PHRASE || nextType == AUTH_TYPE_WORD || nextType == AUTH_TYPE_MISSED_CALL || nextType == AUTH_TYPE_FRAGMENT_SMS) {
+-//                    timeText.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText6));
++//                    timeText.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteGrayText6));
+                     if (nextType == AUTH_TYPE_CALL || nextType == AUTH_TYPE_MISSED_CALL) {
+                         timeText.setText(getString(R.string.Calling));
+                     } else {
+@@ -4004,7 +4013,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+                 openFragmentButton.setOrientation(HORIZONTAL);
+                 openFragmentButton.setGravity(Gravity.CENTER);
+                 openFragmentButton.setPadding(AndroidUtilities.dp(34), 0, AndroidUtilities.dp(34), 0);
+-                openFragmentButton.setBackground(Theme.createSimpleSelectorRoundRectDrawable(AndroidUtilities.dp(6), Theme.getColor(Theme.key_changephoneinfo_image2), Theme.getColor(Theme.key_chats_actionPressedBackground)));
++                openFragmentButton.setBackground(Theme.createSimpleSelectorRoundRectDrawable(AndroidUtilities.dp(6), app.flexygram.login.SignatureLoginPalette.color(Theme.key_changephoneinfo_image2), app.flexygram.login.SignatureLoginPalette.color(Theme.key_chats_actionPressedBackground)));
+                 openFragmentButton.setOnClickListener(v -> {
+                     try {
+                         getContext().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+@@ -4205,7 +4214,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+                                         mailer.putExtra(Intent.EXTRA_TEXT, body.toString());
+                                         getContext().startActivity(Intent.createChooser(mailer, "Send email..."));
+                                     } catch (Exception e) {
+-                                        needShowAlert(getString(R.string.NagramX), getString("NoMailInstalled", R.string.NoMailInstalled));
++                                        needShowAlert(getString(org.telegram.messenger.BuildConfig.CONNECTED_ALPHA ? R.string.FlexySignatureName : R.string.NagramX), getString("NoMailInstalled", R.string.NoMailInstalled));
+                                     }
+                                 })
+                                 .setPositiveButton(getString(R.string.Close), null)
+@@ -4218,16 +4227,16 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+ 
+         @Override
+         public void updateColors() {
+-            confirmTextView.setTextColor(Theme.getColor(isInCancelAccountDeletionMode() ? Theme.key_windowBackgroundWhiteBlackText : Theme.key_windowBackgroundWhiteGrayText6));
+-            confirmTextView.setLinkTextColor(Theme.getColor(Theme.key_chats_actionBackground));
+-            titleTextView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
++            confirmTextView.setTextColor(app.flexygram.login.SignatureLoginPalette.color(isInCancelAccountDeletionMode() ? Theme.key_windowBackgroundWhiteBlackText : Theme.key_windowBackgroundWhiteGrayText6));
++            confirmTextView.setLinkTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_chats_actionBackground));
++            titleTextView.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlackText));
+ 
+             if (currentType == AUTH_TYPE_MISSED_CALL) {
+-                missedCallDescriptionSubtitle.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText));
+-                missedCallDescriptionSubtitle2.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText));
+-                missedCallArrowIcon.setColorFilter(new PorterDuffColorFilter(Theme.getColor(Theme.key_windowBackgroundWhiteInputFieldActivated), PorterDuff.Mode.SRC_IN));
+-                missedCallPhoneIcon.setColorFilter(new PorterDuffColorFilter(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText), PorterDuff.Mode.SRC_IN));
+-                prefixTextView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
++                missedCallDescriptionSubtitle.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteGrayText));
++                missedCallDescriptionSubtitle2.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteGrayText));
++                missedCallArrowIcon.setColorFilter(new PorterDuffColorFilter(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteInputFieldActivated), PorterDuff.Mode.SRC_IN));
++                missedCallPhoneIcon.setColorFilter(new PorterDuffColorFilter(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlackText), PorterDuff.Mode.SRC_IN));
++                prefixTextView.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlackText));
+             }
+ 
+             applyLottieColors(hintDrawable);
+@@ -4243,19 +4252,19 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+             if (timeTextColorTag == null) {
+                 timeTextColorTag = Theme.key_windowBackgroundWhiteGrayText6;
+             }
+-            timeText.setTextColor(Theme.getColor(timeTextColorTag));
++            timeText.setTextColor(app.flexygram.login.SignatureLoginPalette.color(timeTextColorTag));
+ 
+             if (currentType != AUTH_TYPE_FRAGMENT_SMS) {
+-                problemText.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText4));
++                problemText.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlueText4));
+             }
+-            wrongCode.setTextColor(Theme.getColor(Theme.key_text_RedBold));
++            wrongCode.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_text_RedBold));
+         }
+ 
+         private void applyLottieColors(RLottieDrawable drawable) {
+             if (drawable != null) {
+-                drawable.setLayerColor("Bubble", Theme.getColor(Theme.key_chats_actionBackground));
+-                drawable.setLayerColor("Phone", Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+-                drawable.setLayerColor("Note", Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
++                drawable.setLayerColor("Bubble", app.flexygram.login.SignatureLoginPalette.color(Theme.key_chats_actionBackground));
++                drawable.setLayerColor("Phone", app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlackText));
++                drawable.setLayerColor("Note", app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlackText));
+             }
+         }
+ 
+@@ -4426,7 +4435,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+                     timeText.setVisibility(GONE);
+                     if (problemText != null) {
+                         problemText.setVisibility(VISIBLE);
+-                        problemText.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteValueText));
++                        problemText.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteValueText));
+                         int resId;
+                         if (nextType == AUTH_TYPE_PHRASE) {
+                             resId = R.string.ReturnEnteringPhrase;
+@@ -4743,7 +4752,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+             if (timeTimer != null) {
+                 return;
+             }
+-            timeText.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText6));
++            timeText.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteGrayText6));
+             timeText.setTag(R.id.color_key_tag, Theme.key_windowBackgroundWhiteGrayText6);
+             if (progressView != null) {
+                 progressView.resetProgressAnimation();
+@@ -4783,7 +4792,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+                                 } else {
+                                     timeText.setText(getString("RequestSmsButton", R.string.RequestSmsButton));
+                                 }
+-                                timeText.setTextColor(Theme.getColor(Theme.key_chats_actionBackground));
++                                timeText.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_chats_actionBackground));
+                                 timeText.setTag(R.id.color_key_tag, Theme.key_chats_actionBackground);
+                             }
+                         }
+@@ -4793,7 +4802,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+         }
+ 
+         private void destroyTimer() {
+-            timeText.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText6));
++            timeText.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteGrayText6));
+             timeText.setTag(R.id.color_key_tag, Theme.key_windowBackgroundWhiteGrayText6);
+             try {
+                 synchronized (timerSync) {
+@@ -5345,7 +5354,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+ 
+     public class LoadingTextView extends TextView {
+ 
+-        private final Drawable rippleDrawable = Theme.createSelectorDrawable(Theme.multAlpha(Theme.getColor(Theme.key_windowBackgroundWhiteValueText), .10f), Theme.RIPPLE_MASK_ROUNDRECT_6DP);
++        private final Drawable rippleDrawable = Theme.createSelectorDrawable(Theme.multAlpha(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteValueText), .10f), Theme.RIPPLE_MASK_ROUNDRECT_6DP);
+         public final LoadingDrawable loadingDrawable = new LoadingDrawable();
+ 
+         public LoadingTextView(Context context) {
+@@ -5490,7 +5499,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+             confirmTextView.setText(getString(R.string.LoginPasswordTextShort));
+             addView(confirmTextView, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL, 12, 8, 12, 0));
+ 
+-            outlineCodeField = new OutlineTextContainerView(context);
++            outlineCodeField = createSignatureOutline(context);
+             outlineCodeField.setText(getString(R.string.EnterPassword));
+             codeField = new EditTextAutoFill(context);
+             codeField.setCursorSize(AndroidUtilities.dp(20));
+@@ -5600,12 +5609,12 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+ 
+         @Override
+         public void updateColors() {
+-            titleView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+-            confirmTextView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText6));
+-            codeField.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+-            codeField.setCursorColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+-            codeField.setHintTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteHintText));
+-            cancelButton.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText4));
++            titleView.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlackText));
++            confirmTextView.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteGrayText6));
++            codeField.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlackText));
++            codeField.setCursorColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlackText));
++            codeField.setHintTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteHintText));
++            cancelButton.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlueText4));
+             outlineCodeField.updateColor();
+         }
+ 
+@@ -5907,11 +5916,11 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+ 
+         @Override
+         public void updateColors() {
+-            titleView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+-            confirmTextView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+-            resetAccountText.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+-            resetAccountTime.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+-            resetAccountButton.setBackground(Theme.createSimpleSelectorRoundRectDrawable(AndroidUtilities.dp(6), Theme.getColor(Theme.key_changephoneinfo_image2), Theme.getColor(Theme.key_chats_actionPressedBackground)));
++            titleView.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlackText));
++            confirmTextView.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlackText));
++            resetAccountText.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlackText));
++            resetAccountTime.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlackText));
++            resetAccountButton.setBackground(Theme.createSimpleSelectorRoundRectDrawable(AndroidUtilities.dp(6), app.flexygram.login.SignatureLoginPalette.color(Theme.key_changephoneinfo_image2), app.flexygram.login.SignatureLoginPalette.color(Theme.key_chats_actionPressedBackground)));
+         }
+ 
+         @Override
+@@ -6053,7 +6062,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+             subtitleView.setText(getString(R.string.AddEmailSubtitle));
+             addView(subtitleView, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL, 32, 8, 32, 0));
+ 
+-            emailOutlineView = new OutlineTextContainerView(context);
++            emailOutlineView = createSignatureOutline(context);
+             emailOutlineView.setText(getString(activityMode == MODE_CHANGE_LOGIN_EMAIL ? R.string.YourNewEmail : R.string.YourEmail));
+ 
+             emailField = new EditTextBoldCursor(context);
+@@ -6150,11 +6159,11 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+ 
+         @Override
+         public void updateColors() {
+-            titleView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+-            subtitleView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText6));
+-            subtitleView.setLinkTextColor(Theme.getColor(Theme.key_chat_messageLinkIn));
+-            emailField.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+-            signInWithGoogleView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText4));
++            titleView.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlackText));
++            subtitleView.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteGrayText6));
++            subtitleView.setLinkTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_chat_messageLinkIn));
++            emailField.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlackText));
++            signInWithGoogleView.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlueText4));
+             loginOrView.updateColors();
+ 
+             emailOutlineView.invalidate();
+@@ -6678,14 +6687,14 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+ 
+         @Override
+         public void updateColors() {
+-            titleView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+-            confirmTextView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText6));
+-            signInWithGoogleView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText4));
++            titleView.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlackText));
++            confirmTextView.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteGrayText6));
++            signInWithGoogleView.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlueText4));
+             loginOrView.updateColors();
+-            resendCodeView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText4));
+-            cantAccessEmailView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText4));
+-            emailResetInView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText6));
+-            wrongCodeView.setTextColor(Theme.getColor(Theme.key_text_RedBold));
++            resendCodeView.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlueText4));
++            cantAccessEmailView.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlueText4));
++            emailResetInView.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteGrayText6));
++            wrongCodeView.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_text_RedBold));
+ 
+             codeFieldContainer.invalidate();
+         }
+@@ -7282,9 +7291,9 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+ 
+         @Override
+         public void updateColors() {
+-            titleView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+-            confirmTextView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText6));
+-            troubleButton.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText4));
++            titleView.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlackText));
++            confirmTextView.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteGrayText6));
++            troubleButton.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlueText4));
+ 
+             codeFieldContainer.invalidate();
+         }
+@@ -7509,7 +7518,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+             addView(confirmTextView, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL, 8, 6, 8, 16));
+ 
+             for (int a = 0; a < codeField.length; a++) {
+-                OutlineTextContainerView outlineField = new OutlineTextContainerView(context);
++                OutlineTextContainerView outlineField = createSignatureOutline(context);
+                 outlineFields[a] = outlineField;
+                 outlineField.setText(getString(stage == 0 ? a == 0 ? R.string.PleaseEnterNewFirstPasswordHint : R.string.PleaseEnterNewSecondPasswordHint : R.string.PasswordHintPlaceholder));
+ 
+@@ -7574,7 +7583,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+                         }
+ 
+                         passwordButton.setTag(isPasswordVisible);
+-                        passwordButton.setColorFilter(Theme.getColor(isPasswordVisible ? Theme.key_windowBackgroundWhiteInputFieldActivated : Theme.key_windowBackgroundWhiteHintText));
++                        passwordButton.setColorFilter(app.flexygram.login.SignatureLoginPalette.color(isPasswordVisible ? Theme.key_windowBackgroundWhiteInputFieldActivated : Theme.key_windowBackgroundWhiteHintText));
+                     });
+                     linearLayout.addView(passwordButton, LayoutHelper.createLinearRelatively(24, 24, 0, 0, 0, 14, 0));
+ 
+@@ -7626,18 +7635,18 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+ 
+         @Override
+         public void updateColors() {
+-            titleTextView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+-            confirmTextView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText6));
++            titleTextView.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlackText));
++            confirmTextView.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteGrayText6));
+             for (EditTextBoldCursor editText : codeField) {
+-                editText.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+-                editText.setCursorColor(Theme.getColor(Theme.key_windowBackgroundWhiteInputFieldActivated));
++                editText.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlackText));
++                editText.setCursorColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteInputFieldActivated));
+             }
+             for (OutlineTextContainerView outlineField : outlineFields) {
+                 outlineField.updateColor();
+             }
+-            cancelButton.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText4));
++            cancelButton.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlueText4));
+             if (passwordButton != null) {
+-                passwordButton.setColorFilter(Theme.getColor(isPasswordVisible ? Theme.key_windowBackgroundWhiteInputFieldActivated : Theme.key_windowBackgroundWhiteHintText));
++                passwordButton.setColorFilter(app.flexygram.login.SignatureLoginPalette.color(isPasswordVisible ? Theme.key_windowBackgroundWhiteInputFieldActivated : Theme.key_windowBackgroundWhiteHintText));
+                 passwordButton.setBackground(Theme.createSelectorDrawable(getThemedColor(Theme.key_listSelector), 1));
+             }
+         }
+@@ -8083,7 +8092,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+             editTextContainer = new FrameLayout(context);
+             addView(editTextContainer, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 8, 21, 8, 0));
+ 
+-            firstNameOutlineView = new OutlineTextContainerView(context);
++            firstNameOutlineView = createSignatureOutline(context);
+             firstNameOutlineView.setText(getString(R.string.FirstName));
+ 
+             firstNameField = new EditTextBoldCursor(context);
+@@ -8108,7 +8117,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+                 return false;
+             });
+ 
+-            lastNameOutlineView = new OutlineTextContainerView(context);
++            lastNameOutlineView = createSignatureOutline(context);
+             lastNameOutlineView.setText(getString(R.string.LastName));
+ 
+             lastNameField = new EditTextBoldCursor(context);
+@@ -8175,15 +8184,15 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+         @Override
+         public void updateColors() {
+             avatarDrawable.invalidateSelf();
+-            titleTextView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+-            descriptionTextView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText6));
+-            firstNameField.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+-            firstNameField.setCursorColor(Theme.getColor(Theme.key_windowBackgroundWhiteInputFieldActivated));
+-            lastNameField.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+-            lastNameField.setCursorColor(Theme.getColor(Theme.key_windowBackgroundWhiteInputFieldActivated));
+-            wrongNumber.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText4));
+-            privacyView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText6));
+-            privacyView.setLinkTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteLinkText));
++            titleTextView.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlackText));
++            descriptionTextView.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteGrayText6));
++            firstNameField.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlackText));
++            firstNameField.setCursorColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteInputFieldActivated));
++            lastNameField.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlackText));
++            lastNameField.setCursorColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteInputFieldActivated));
++            wrongNumber.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlueText4));
++            privacyView.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteGrayText6));
++            privacyView.setLinkTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteLinkText));
+ 
+             firstNameOutlineView.updateColor();
+             lastNameOutlineView.updateColor();
+@@ -8509,9 +8518,9 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+ 
+         @Override
+         public void updateColors() {
+-            titleView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+-            confirmTextView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText6));
+-            confirmTextView.setLinkTextColor(Theme.getColor(Theme.key_chats_actionBackground));
++            titleView.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlackText));
++            confirmTextView.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteGrayText6));
++            confirmTextView.setLinkTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_chats_actionBackground));
+         }
+ 
+         @Override
+@@ -8638,13 +8647,13 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+                         bundle.putString("password", Utilities.bytesToHex(data.toByteArray()));
+                         setPage(VIEW_PASSWORD, true, bundle, false);
+                     } else {
+-                        needShowAlert(LocaleController.getString(R.string.NagramX), error.text);
++                        needShowAlert(LocaleController.getString(org.telegram.messenger.BuildConfig.CONNECTED_ALPHA ? R.string.FlexySignatureName : R.string.NagramX), error.text);
+                     }
+                 }), ConnectionsManager.RequestFlagFailOnServerErrors | ConnectionsManager.RequestFlagWithoutLogin);
+             } else if (errorText.startsWith("FLOOD_WAIT")) {
+-                needShowAlert(LocaleController.getString(R.string.NagramX), getString(R.string.FloodWait) + "\n" + errorText);
++                needShowAlert(LocaleController.getString(org.telegram.messenger.BuildConfig.CONNECTED_ALPHA ? R.string.FlexySignatureName : R.string.NagramX), getString(R.string.FloodWait) + "\n" + errorText);
+             } else {
+-                needShowAlert(LocaleController.getString(R.string.NagramX), errorText);
++                needShowAlert(LocaleController.getString(org.telegram.messenger.BuildConfig.CONNECTED_ALPHA ? R.string.FlexySignatureName : R.string.NagramX), errorText);
+             }
+         }
+ 
+@@ -8715,7 +8724,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+                 public void onAnimationEnd(Animator animation) {
+                     keyboardLinearLayout.setAlpha(1);
+                     startMessagingButton.setVisibility(View.VISIBLE);
+-                    fragmentView.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
++                    fragmentView.setBackgroundColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhite));
+                     floatingButton.setButtonVisible(true, false);
+ 
+                     FrameLayout frameLayout = (FrameLayout) fragmentView;
+@@ -8730,7 +8739,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+                     callback.run();
+                 }
+             });
+-            int bgColor = Theme.getColor(Theme.key_windowBackgroundWhite);
++            int bgColor = app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhite);
+             int initialAlpha = Color.alpha(bgColor);
+             animator.addUpdateListener(animation -> {
+                 float val = (float) animation.getAnimatedValue();
+@@ -8769,22 +8778,22 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+     }
+ 
+     private void updateColors() {
+-        fragmentView.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
++        fragmentView.setBackgroundColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhite));
+ 
+-        backButtonView.setColorFilter(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+-        backButtonView.setBackground(Theme.createSelectorDrawable(Theme.getColor(Theme.key_listSelector)));
++        backButtonView.setColorFilter(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlackText));
++        backButtonView.setBackground(Theme.createSelectorDrawable(app.flexygram.login.SignatureLoginPalette.color(Theme.key_listSelector)));
+ 
+-        // proxyDrawable.setColorFilter(new PorterDuffColorFilter(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText), PorterDuff.Mode.SRC_IN));
+-        // proxyButtonView.setBackground(Theme.createSelectorDrawable(Theme.getColor(Theme.key_listSelector)));
++        // proxyDrawable.setColorFilter(new PorterDuffColorFilter(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlackText), PorterDuff.Mode.SRC_IN));
++        // proxyButtonView.setBackground(Theme.createSelectorDrawable(app.flexygram.login.SignatureLoginPalette.color(Theme.key_listSelector)));
+ 
+-        moreButtonView.setIconColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+-        moreButtonView.setBackground(Theme.createSelectorDrawable(Theme.getColor(Theme.key_listSelector)));
++        moreButtonView.setIconColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlackText));
++        moreButtonView.setBackground(Theme.createSelectorDrawable(app.flexygram.login.SignatureLoginPalette.color(Theme.key_listSelector)));
+ 
+-        radialProgressView.setProgressColor(Theme.getColor(Theme.key_chats_actionBackground));
++        radialProgressView.setProgressColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_chats_actionBackground));
+ 
+         floatingButton.updateColors();
+-        floatingButtonIcon.setColor(Theme.getColor(Theme.key_chats_actionIcon));
+-        floatingButtonIcon.setBackgroundColor(Theme.getColor(Theme.key_chats_actionBackground));
++        floatingButtonIcon.setColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_chats_actionIcon));
++        floatingButtonIcon.setBackgroundColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_chats_actionBackground));
+ 
+         for (SlideView slideView : views) {
+             slideView.updateColors();
+@@ -8922,7 +8931,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+             editTextView.setText(getString(R.string.Edit));
+             editTextView.setSingleLine();
+             editTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
+-            editTextView.setBackground(Theme.getRoundRectSelectorDrawable(AndroidUtilities.dp(6), Theme.getColor(Theme.key_changephoneinfo_image2)));
++            editTextView.setBackground(Theme.getRoundRectSelectorDrawable(AndroidUtilities.dp(6), app.flexygram.login.SignatureLoginPalette.color(Theme.key_changephoneinfo_image2)));
+             editTextView.setOnClickListener(v -> callback.onEditPressed(this, editTextView));
+             editTextView.setTypeface(Typeface.DEFAULT_BOLD);
+             editTextView.setPadding(buttonPadding, buttonPadding / 2, buttonPadding, buttonPadding / 2);
+@@ -8932,7 +8941,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+             confirmTextView.setText(getString(R.string.CheckPhoneNumberYes));
+             confirmTextView.setSingleLine();
+             confirmTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
+-            confirmTextView.setBackground(Theme.getRoundRectSelectorDrawable(AndroidUtilities.dp(6), Theme.getColor(Theme.key_changephoneinfo_image2)));
++            confirmTextView.setBackground(Theme.getRoundRectSelectorDrawable(AndroidUtilities.dp(6), app.flexygram.login.SignatureLoginPalette.color(Theme.key_changephoneinfo_image2)));
+             confirmTextView.setOnClickListener(v -> callback.onConfirmPressed(this, confirmTextView));
+             confirmTextView.setTypeface(Typeface.DEFAULT_BOLD);
+             confirmTextView.setPadding(buttonPadding, buttonPadding / 2, buttonPadding, buttonPadding / 2);
+@@ -8951,13 +8960,13 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+         }
+ 
+         private void updateColors() {
+-            fabTransform.setColor(Theme.getColor(Theme.key_chats_actionIcon));
+-            fabTransform.setBackgroundColor(Theme.getColor(Theme.key_chats_actionBackground));
+-            popupLayout.setBackground(Theme.createRoundRectDrawable(AndroidUtilities.dp(12), Theme.getColor(Theme.key_dialogBackground)));
+-            confirmMessageView.setTextColor(Theme.getColor(Theme.key_dialogTextGray2));
+-            numberView.setTextColor(Theme.getColor(Theme.key_dialogTextBlack));
+-            editTextView.setTextColor(Theme.getColor(Theme.key_changephoneinfo_image2));
+-            confirmTextView.setTextColor(Theme.getColor(Theme.key_changephoneinfo_image2));
++            fabTransform.setColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_chats_actionIcon));
++            fabTransform.setBackgroundColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_chats_actionBackground));
++            popupLayout.setBackground(Theme.createRoundRectDrawable(AndroidUtilities.dp(12), app.flexygram.login.SignatureLoginPalette.color(Theme.key_dialogBackground)));
++            confirmMessageView.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_dialogTextGray2));
++            numberView.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_dialogTextBlack));
++            editTextView.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_changephoneinfo_image2));
++            confirmTextView.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_changephoneinfo_image2));
+             fabButton.updateColors();
+         }
+ 
+@@ -8984,7 +8993,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+                     Bitmap bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+                     Canvas canvas = new Canvas(bitmap);
+                     canvas.scale(1.0f / scaleFactor, 1.0f / scaleFactor);
+-                    canvas.drawColor(Theme.getColor(Theme.key_windowBackgroundWhite));
++                    canvas.drawColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhite));
+                     fragmentView.draw(canvas);
+                     Utilities.stackBlurBitmap(bitmap, Math.max(8, Math.max(w, h) / 150));
+                     blurredView.setBackground(new BitmapDrawable(getContext().getResources(), bitmap));
+@@ -9068,7 +9077,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+ 
+     @Override
+     public boolean isLightStatusBar() {
+-        int color = Theme.getColor(Theme.key_windowBackgroundWhite, null, true);
++        int color = app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhite, null, true);
+         return ColorUtils.calculateLuminance(color) > 0.7f;
+     }
+ 
+@@ -9226,7 +9235,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+             confirmTextView.setLineSpacing(AndroidUtilities.dp(2), 1.0f);
+             addView(confirmTextView, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL, 8, 5, 8, 16));
+ 
+-            outlineField = new OutlineTextContainerView(context);
++            outlineField = createSignatureOutline(context);
+             outlineField.setText(getString(a == 0 ? R.string.SMSWord : R.string.SMSPhrase));
+ 
+             codeField = new EditTextBoldCursor(context) {
+@@ -9301,7 +9310,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+             pasteTextView.setText(getString(R.string.Paste));
+             pasteTextView.setPadding(dp(10), 0, dp(10), 0);
+             pasteTextView.setGravity(Gravity.CENTER);
+-            int textColor = Theme.getColor(Theme.key_windowBackgroundWhiteBlueText2, resourceProvider);
++            int textColor = app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlueText2, resourceProvider);
+             pasteTextView.setTextColor(textColor);
+             pasteTextView.setBackground(Theme.createSimpleSelectorRoundRectDrawable(dp(6), Theme.multAlpha(textColor, .12f), Theme.multAlpha(textColor, .15f)));
+             ScaleStateListAnimator.apply(pasteTextView, .1f, 1.5f);
+@@ -9347,7 +9356,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+             fieldContainer.addView(infoContainer, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+ 
+             prevTypeTextView = new LoadingTextView(context);
+-            prevTypeTextView.setLinkTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteValueText));
++            prevTypeTextView.setLinkTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteValueText));
+             prevTypeTextView.setTextColor(getThemedColor(Theme.key_windowBackgroundWhiteValueText));
+             prevTypeTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
+             prevTypeTextView.setLineSpacing(AndroidUtilities.dp(2), 1.0f);
+@@ -9386,7 +9395,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+                     return getVisibility() == View.VISIBLE && !(time > 0 && timeTimer != null);
+                 }
+             };
+-            timeText.setLinkTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteValueText));
++            timeText.setLinkTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteValueText));
+             timeText.setLineSpacing(AndroidUtilities.dp(2), 1.0f);
+             timeText.setPadding(AndroidUtilities.dp(14), AndroidUtilities.dp(8), AndroidUtilities.dp(14), AndroidUtilities.dp(16));
+             timeText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
+@@ -9406,8 +9415,8 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+                 if (nextType == AUTH_TYPE_CALL || nextType == AUTH_TYPE_SMS || nextType == AUTH_TYPE_MISSED_CALL || nextType == AUTH_TYPE_FRAGMENT_SMS) {
+                     isResendingCode = true;
+                     timeText.invalidate();
+-                    timeText.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteValueText));
+-//                    timeText.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText6));
++                    timeText.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteValueText));
++//                    timeText.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteGrayText6));
+                     timeText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
+                     if (nextType == AUTH_TYPE_CALL || nextType == AUTH_TYPE_MISSED_CALL) {
+                         timeText.setText(getString(R.string.Calling));
+@@ -9525,7 +9534,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+             codeField.setCursorColor(getThemedColor(Theme.key_windowBackgroundWhiteInputFieldActivated));
+             codeField.setHintTextColor(getThemedColor(Theme.key_windowBackgroundWhiteHintText));
+             outlineField.updateColor();
+-//            cancelButton.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText4));
++//            cancelButton.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlueText4));
+         }
+ 
+         @Override
+@@ -9547,7 +9556,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+         public void setParams(Bundle params, boolean restore) {
+             if (params == null) {
+                 if (nextCodeParams != null && nextCodeAuth != null) {
+-                    timeText.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteValueText));
++                    timeText.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteValueText));
+                     int resId;
+                     if (nextType == AUTH_TYPE_PHRASE) {
+                         resId = R.string.ReturnEnteringPhrase;
+@@ -9616,7 +9625,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+             animateError(false);
+ 
+             lastCurrentTime = System.currentTimeMillis();
+-            timeText.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText));
++            timeText.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteGrayText));
+             if (nextType == AUTH_TYPE_SMS || nextType == AUTH_TYPE_CALL || nextType == AUTH_TYPE_FLASH_CALL) {
+                 createTimer();
+             } else {
+@@ -9802,7 +9811,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+ 
+             isResendingCode = true;
+             timeText.invalidate();
+-            timeText.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteValueText));
++            timeText.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteValueText));
+ //            problemText.invalidate();
+ 
+             final Bundle params = new Bundle();
+@@ -9952,7 +9961,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+             if (timeTimer != null) {
+                 return;
+             }
+-            timeText.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText));
++            timeText.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteGrayText));
+             timeText.setTag(R.id.color_key_tag, Theme.key_windowBackgroundWhiteGrayText);
+ //            if (progressView != null) {
+ //                progressView.resetProgressAnimation();
+@@ -9994,7 +10003,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+                                 } else {
+                                     timeText.setText(replaceArrows(getString(R.string.RequestAnotherSMS), true, 0, 0));
+                                 }
+-                                timeText.setTextColor(Theme.getColor(Theme.key_chats_actionBackground));
++                                timeText.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_chats_actionBackground));
+                                 timeText.setTag(R.id.color_key_tag, Theme.key_chats_actionBackground);
+                             }
+                         }
+@@ -10004,7 +10013,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+         }
+ 
+         private void destroyTimer() {
+-            timeText.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText));
++            timeText.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteGrayText));
+             timeText.setTag(R.id.color_key_tag, Theme.key_windowBackgroundWhiteGrayText);
+             try {
+                 synchronized (timerSync) {
+@@ -10101,8 +10110,8 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+             optionsButton = new ImageView(context);
+             optionsButton.setImageResource(R.drawable.ic_ab_other);
+             optionsButton.setScaleType(ImageView.ScaleType.CENTER);
+-            optionsButton.setColorFilter(new PorterDuffColorFilter(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText, resourceProvider), PorterDuff.Mode.SRC_IN));
+-            optionsButton.setBackground(Theme.createSelectorDrawable(Theme.getColor(Theme.key_listSelector)));
++            optionsButton.setColorFilter(new PorterDuffColorFilter(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlackText, resourceProvider), PorterDuff.Mode.SRC_IN));
++            optionsButton.setBackground(Theme.createSelectorDrawable(app.flexygram.login.SignatureLoginPalette.color(Theme.key_listSelector)));
+             topView.addView(optionsButton, LayoutHelper.createFrame(32, 32, Gravity.RIGHT | Gravity.TOP, 0, 16, -2, 0));
+ 
+             GLIconTextureView iconTextureView = new GLIconTextureView(context, GLIconRenderer.DIALOG_STYLE, Icon3D.TYPE_COIN) {
+@@ -10121,7 +10130,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+             iconTextureView.setStarParticlesView(starParticlesView);
+             Bitmap bitmap = Bitmap.createBitmap(50, 50, Bitmap.Config.ARGB_8888);
+             Canvas canvas = new Canvas(bitmap);
+-            canvas.drawColor(ColorUtils.blendARGB(Theme.getColor(Theme.key_premiumGradient2), Theme.getColor(Theme.key_dialogBackground), 0.5f));
++            canvas.drawColor(ColorUtils.blendARGB(app.flexygram.login.SignatureLoginPalette.color(Theme.key_premiumGradient2), app.flexygram.login.SignatureLoginPalette.color(Theme.key_dialogBackground), 0.5f));
+             iconTextureView.setBackgroundBitmap(bitmap);
+ //                iconTextureView.mRenderer.forceNight = true;
+             iconTextureView.mRenderer.colorKey1 = Theme.key_premiumGradient2;
+@@ -10131,7 +10140,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
+ 
+             TextView textView = new TextView(context);
+             textView.setText(getString(R.string.SMSFeeTitle));
+-            textView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
++            textView.setTextColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhiteBlackText));
+             textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
+             textView.setTypeface(AndroidUtilities.bold());
+             textView.setGravity(Gravity.CENTER);

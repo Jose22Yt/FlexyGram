@@ -132,6 +132,10 @@ public final class GitHubUpdater {
     }
 
     public static void fetch(CheckCallback callback) {
+        if (BuildConfig.CONNECTED_ALPHA) {
+            AndroidUtilities.runOnUIThread(() -> callback.onChecked(null, null, true));
+            return;
+        }
         final boolean prerelease = NaConfig.INSTANCE.getAutoUpdateChannel().Int() == UpdateHelper.UPDATE_CHANNEL_BETA;
         new Thread(() -> {
             Release release = null;
@@ -363,6 +367,7 @@ public final class GitHubUpdater {
     }
 
     public static void download(Activity activity, Release release, DownloadListener listener) {
+        if (BuildConfig.CONNECTED_ALPHA) { listener.onFinished(false, false); return; }
         if (download != null) {
             return;
         }

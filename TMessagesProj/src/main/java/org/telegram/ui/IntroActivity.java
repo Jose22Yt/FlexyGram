@@ -135,11 +135,32 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
     private NotificationCenter.NotificationCenterDelegate switchLanguageDelegate;
 
     private boolean isOnLogout;
+    private app.flexygram.login.SignatureWelcomeView signatureWelcome;
+    private boolean isSignatureWelcome() { return org.telegram.messenger.BuildConfig.CONNECTED_ALPHA; }
+
+    private View createSignatureWelcome(Context context) {
+        actionBar.setAddToContainer(false);
+        signatureWelcome = new app.flexygram.login.SignatureWelcomeView(context, () -> {
+            if (startPressed) return;
+            startPressed = true;
+            signatureWelcome.startButton.setEnabled(false);
+            if (!presentFragment(new LoginActivity(), true)) {
+                startPressed = false;
+                signatureWelcome.startButton.setEnabled(true);
+            }
+        }, () -> presentFragment(new LanguageSelectActivity()));
+        fragmentView = signatureWelcome;
+        ConnectionsManager.getInstance(currentAccount).updateDcSettings();
+        LocaleController.getInstance().loadRemoteLanguages(currentAccount);
+        return fragmentView;
+    }
+
 
     @Override
     public boolean onFragmentCreate() {
         MessagesController.getGlobalMainSettings().edit().putLong("intro_crashed_time", System.currentTimeMillis()).apply();
 
+        if (isSignatureWelcome()) return true;
         titles = new CharSequence[]{
                 null,
                 LocaleController.getString(R.string.Page2Title),
@@ -161,6 +182,7 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
 
     @Override
     public View createView(Context context) {
+        if (isSignatureWelcome()) return createSignatureWelcome(context);
         logoDrawable = context.getResources().getDrawable(R.drawable.telegram_logo).mutate();
         logoDrawable.setBounds(0, dp(8.666f), dp(115), dp(35));
         titles[0] = LocaleController.getAppName();
@@ -438,6 +460,11 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
     @Override
     public void onResume() {
         super.onResume();
+        if (isSignatureWelcome()) {
+            startPressed = false;
+            if (signatureWelcome != null) { signatureWelcome.startButton.setEnabled(true); signatureWelcome.refresh(); }
+            return;
+        }
         if (justCreated) {
             if (LocaleController.isRTL) {
                 viewPager.setCurrentItem(6);
@@ -454,12 +481,12 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
     @Override
     public void onPause() {
         super.onPause();
-        AndroidUtilities.unlockOrientation(getParentActivity());
+        if (!isSignatureWelcome()) AndroidUtilities.unlockOrientation(getParentActivity());
     }
 
     @Override
     public boolean hasForceLightStatusBar() {
-        return true;
+        return !isSignatureWelcome() || !Theme.isCurrentThemeDark();
     }
 
     @Override
@@ -605,6 +632,7 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
 
     @Override
     public AnimatorSet onCustomTransitionAnimation(boolean isOpen, Runnable callback) {
+        if (isSignatureWelcome()) return null;
         if (isOnLogout) {
             AnimatorSet set = new AnimatorSet().setDuration(50);
             set.playTogether(ValueAnimator.ofFloat());
@@ -1041,6 +1069,7 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
     }
 
     private void updateColors(boolean fromTheme) {
+        if (isSignatureWelcome()) { if (signatureWelcome != null) signatureWelcome.refresh(); return; }
         startMessagingButtonBackground.setColors(new int[]{getThemedColor(Theme.key_featuredStickers_addButton), getThemedColor(Theme.key_featuredStickers_addButton2)});
         logoDrawable.setColorFilter(Theme.multAlpha(getThemedColor(Theme.key_actionBarDefaultTitle), 0.9f), PorterDuff.Mode.MULTIPLY);
         fragmentView.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
