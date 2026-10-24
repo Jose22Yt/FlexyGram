@@ -33,7 +33,7 @@ def main():
         raise SystemExit('Original build-tools36/API37 required; no resource validation skipped.')
     res = output/'res/drawable'
     res.mkdir(parents=True, exist_ok=True)
-    for path in (ROOT/'TMessagesProj/src/main/res/drawable').glob('flexy_home_*.xml'):
+    for path in (ROOT/'TMessagesProj/src/main/res/drawable').glob('flexy_*.xml'):
         shutil.copyfile(path, res/path.name)
     manifest = output/'AndroidManifest.xml'
     manifest.write_text('<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="app.flexygram.visualprobe"><uses-sdk android:minSdkVersion="24"/><application/></manifest>')
@@ -47,6 +47,7 @@ def main():
     from stubs import write_stubs
     write_stubs(source, ROOT)
     shutil.copyfile(HERE/'BubbleVisualTest.java.in', source/'BubbleVisualTest.java')
+    shutil.copyfile(HERE/'SignatureControlsVisualTest.java.in', source/'SignatureControlsVisualTest.java')
     shutil.copyfile(HERE/'pom.xml', output/'pom.xml')
     repository = Path.home()/'.m2/repository'
     command = [args.maven, '-B', '-f', str(output/'pom.xml'), '-Dandroid.sdk.jar='+str(android)]
@@ -71,7 +72,7 @@ def main():
             with zipfile.ZipFile(path) as archive:
                 (aar_dir/(artifact+'.jar')).write_bytes(archive.read('classes.jar'))
         subprocess.run(command + ['test'], check=True)
-    print('PASS: Android API35 native production MessageDrawable path/cache/glass/preferences probes; full app/device NOT_TESTED.')
+    print('PASS: Android API35 native production MessageDrawable path/cache/Signature/preferences/icon/slider probes; full app/device NOT_TESTED.')
     return 0
 
 

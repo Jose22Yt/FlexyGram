@@ -712,9 +712,11 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
             themeListRow2 = rowCount++;
             themeInfoRow = rowCount++;
 
-            bubbleRadiusHeaderRow = rowCount++;
-            bubbleRadiusRow = rowCount++;
-            bubbleRadiusInfoRow = rowCount++;
+            if (!org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) {
+                bubbleRadiusHeaderRow = rowCount++;
+                bubbleRadiusRow = rowCount++;
+                bubbleRadiusInfoRow = rowCount++;
+            }
 
             chatListHeaderRow = rowCount++;
             chatListRow = rowCount++;

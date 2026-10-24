@@ -1,3 +1,4 @@
+from release_1271_contract import read1270, restore1270
 """Guard the official FlexyGram settings menu, upstream credits and localizations.
 
 These are source/resource checks, not proof of a successful Android launch.
@@ -18,7 +19,7 @@ UPSTREAM_URL = "https://github.com/exteraless/exteraless"
 class FlexySettingsIdentity(unittest.TestCase):
     def setUp(self):
         self.java = JAVA.read_text(encoding="utf-8")
-        self.chats_java = CHATS_JAVA.read_text(encoding="utf-8")
+        self.chats_java = read1270('TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraChatsActivity.java')
 
     def test_official_links_replace_upstream_promotional_links(self):
         self.assertIn(SOURCE_URL, self.java)

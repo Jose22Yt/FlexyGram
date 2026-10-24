@@ -73,7 +73,7 @@ jobs:
       - name: Retain isolated native bubble graphics (not full app screenshots)
         uses: actions/upload-artifact@v4
         with:
-          name: FlexyGram-Alpha1270-native-bubble-probe
+          name: FlexyGram-Alpha1271-native-bubble-probe
           path: build/connected-alpha-bubble-visual/android-native-bubbles.png
           retention-days: 7
           if-no-files-found: error
@@ -246,7 +246,7 @@ jobs:
             echo '::error::Expected exactly one Connected Alpha APK.'
             exit 1
           fi
-          python3 tools/connected_alpha/verify_apk.py "${packages[0]}" --build-tools "$ANDROID_HOME/build-tools/36.0.0" --certificate-sha256 "$ALPHA_CERTIFICATE_SHA256" --expected-version-code 1270 > connected-alpha-verification.json
+          python3 tools/connected_alpha/verify_apk.py "${packages[0]}" --build-tools "$ANDROID_HOME/build-tools/36.0.0" --certificate-sha256 "$ALPHA_CERTIFICATE_SHA256" --expected-version-code 1271 > connected-alpha-verification.json
           python3 - <<'PY'
           import json, os
           from pathlib import Path
@@ -273,13 +273,13 @@ jobs:
           cp connected-alpha-verification.json "$RUNNER_TEMP/alpha-delivery/verification.json"
           # Only these two verified deliverables enter the encrypted archive.
           tar -C "$RUNNER_TEMP/alpha-delivery" -cf - FlexyGram-Alpha-arm64.apk verification.json |
-            age --encrypt -r "$ALPHA_AGE_RECIPIENT" -o "$RUNNER_TEMP/FlexyGram-Alpha1270-ARM64.tar.age"
+            age --encrypt -r "$ALPHA_AGE_RECIPIENT" -o "$RUNNER_TEMP/FlexyGram-Alpha1271-ARM64.tar.age"
       - name: Upload encrypted delivery only (never plaintext APK)
         if: vars.ALPHA_AGE_RECIPIENT != ''
         uses: actions/upload-artifact@v4
         with:
-          name: FlexyGram-Alpha1270-Encrypted
-          path: ${{ runner.temp }}/FlexyGram-Alpha1270-ARM64.tar.age
+          name: FlexyGram-Alpha1271-Encrypted
+          path: ${{ runner.temp }}/FlexyGram-Alpha1271-ARM64.tar.age
           retention-days: 7
           if-no-files-found: error
       - name: Wipe private inputs and generated plaintext, including caches

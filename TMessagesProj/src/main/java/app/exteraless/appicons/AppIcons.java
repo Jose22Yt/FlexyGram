@@ -99,13 +99,16 @@ public final class AppIcons {
         return LauncherIcon.EXTERALESS;
     }
 
-    public static void apply(LauncherIcon icon) {
+    public static void apply(LauncherIcon icon) { apply(icon, () -> { }, () -> { }); }
+    public static void apply(LauncherIcon icon, Runnable success, Runnable failure) {
         pending = icon;
         Utilities.globalQueue.postRunnable(() -> {
-            LauncherIconController.setIcon(icon);
-            if (pending == icon) {
-                pending = null;
-            }
+            boolean changed;
+            try { LauncherIconController.setIcon(icon); changed = LauncherIconController.isEnabled(icon); }
+            catch (RuntimeException e) { changed = false; }
+            if (pending == icon) pending = null;
+            final boolean ok = changed;
+            org.telegram.messenger.AndroidUtilities.runOnUIThread(ok ? success : failure);
         });
     }
 

@@ -1,0 +1,1 @@
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android"><background android:drawable="@drawable/flexy_go_background"/><foreground android:drawable="@drawable/flexy_go_foreground"/><monochrome android:drawable="@drawable/flexy_icon_monochrome"/></adaptive-icon>

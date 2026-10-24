@@ -95,7 +95,8 @@ public class IconPreviewView extends View {
         if (shapeSize != size) {
             shapeSize = size;
             float dp = size / AndroidUtilities.density;
-            shape.set(IconShapeHelper.getFinalIconShapePath(dp, dp, dp * 0.28f));
+            shape.rewind();
+            shape.addRoundRect(0, 0, size, size, size * .24f, size * .24f, Path.Direction.CW);
         }
         canvas.save();
         canvas.translate((getWidth() - size) / 2f, (getHeight() - size) / 2f);

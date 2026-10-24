@@ -1,0 +1,43 @@
+/* Actual Android vector/SeekBar graphics; no launcher/device/runtime performance claim. */
+import android.content.res.*;import android.graphics.*;import android.graphics.drawable.*;
+import android.view.*;import android.view.accessibility.*;import android.os.Bundle;import android.util.DisplayMetrics;
+import org.junit.*;import org.junit.runner.RunWith;import org.robolectric.*;import org.robolectric.annotation.*;
+import app.flexygram.settings.FlexySignatureSlider;import static org.junit.Assert.*;
+@RunWith(RobolectricTestRunner.class) @Config(manifest=Config.NONE,sdk=35) @GraphicsMode(GraphicsMode.Mode.NATIVE)
+public class SignatureControlsVisualTest {
+ @Test public void actualSignatureSliderNativeRangeKeyboardAccessibilityAndRtl() {
+  for(int direction:new int[]{View.LAYOUT_DIRECTION_LTR,View.LAYOUT_DIRECTION_RTL}) {
+   FlexySignatureSlider slider=new FlexySignatureSlider(RuntimeEnvironment.getApplication());
+   slider.setLayoutDirection(direction);slider.setMax(100);slider.setProgress(35);
+   slider.measure(View.MeasureSpec.makeMeasureSpec(320,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(64,View.MeasureSpec.EXACTLY));slider.layout(0,0,320,64);
+   Bitmap image=Bitmap.createBitmap(320,64,Bitmap.Config.ARGB_8888);slider.draw(new Canvas(image));
+   assertEquals(35,slider.getProgress());assertEquals(100,slider.getMax());assertTrue(slider.getThumb().getIntrinsicWidth()<slider.getThumb().getIntrinsicHeight());
+   AccessibilityNodeInfo info=slider.createAccessibilityNodeInfo();assertNotNull(info.getRangeInfo());assertEquals(100,info.getRangeInfo().getMax(),0);
+   Bundle value=new Bundle();value.putFloat(AccessibilityNodeInfo.ACTION_ARGUMENT_PROGRESS_VALUE,71);
+   assertTrue(slider.performAccessibilityAction(AccessibilityNodeInfo.AccessibilityAction.ACTION_SET_PROGRESS.getId(),value));assertEquals(71,slider.getProgress());
+   slider.setProgress(-100);assertEquals(0,slider.getProgress());slider.setProgress(900);assertEquals(100,slider.getProgress());
+  }
+ }
+ @Test public void productionPlaneVectorsSmallSizesSafeAreaAndBothMatteBackgrounds() throws Exception {
+  AssetManager assets=AssetManager.class.getDeclaredConstructor().newInstance();
+  assertTrue((Integer)AssetManager.class.getMethod("addAssetPath",String.class).invoke(assets,System.getProperty("probe.root")+"/resources.ap_")>0);
+  DisplayMetrics metrics=new DisplayMetrics();metrics.density=1;metrics.densityDpi=160;metrics.scaledDensity=1;
+  Resources resources=new Resources(assets,metrics,new Configuration());
+  Bitmap sheet=Bitmap.createBitmap(768,384,Bitmap.Config.ARGB_8888);Canvas canvas=new Canvas(sheet);
+  String[] names={"blue","green","coral","mono","blueprint","nya","quack","go"};
+  for(int i=0;i<names.length;i++) {
+   int x=i%4*192,y=i/4*192;int save=canvas.save();canvas.clipRect(x,y,x+192,y+192);canvas.drawColor(i/4==0?0xffeef0f3:0xff16191e);
+   for(String layer:new String[]{"background","foreground"}) {
+    int id=resources.getIdentifier("flexy_"+names[i]+"_"+layer,"drawable","app.flexygram.visualprobe");assertTrue(id!=0);
+    Drawable d=resources.getDrawable(id,null).mutate();d.setBounds(x+32,y+32,x+160,y+160);d.draw(canvas);
+    if(layer.equals("foreground")) for(int size:new int[]{24,48,108}) {
+     Bitmap b=Bitmap.createBitmap(size,size,Bitmap.Config.ARGB_8888);d.setBounds(0,0,size,size);d.draw(new Canvas(b));int n=0;
+     for(int py=0;py<size;py++)for(int px=0;px<size;px++)if(Color.alpha(b.getPixel(px,py))>80){n++;if(size==108)assertTrue(Math.hypot(px-54,py-54)<34.5);}
+     assertTrue(n>10);
+    }
+   }
+   canvas.restoreToCount(save);
+  }
+  try(java.io.FileOutputStream f=new java.io.FileOutputStream(System.getProperty("probe.root")+"/android-signature-icons.png")){assertTrue(sheet.compress(Bitmap.CompressFormat.PNG,100,f));}
+ }
+}

@@ -1,3 +1,4 @@
+from release_1271_contract import read1270, restore1270
 """Alpha1267 preservation, actual row/handler continuity and executable layout/storage policy."""
 import re
 import subprocess
@@ -49,10 +50,10 @@ class SignatureMatteTests(unittest.TestCase):
                 expected=old(path)
                 if directory=='app/flexygram/home':
                     expected=subprocess.check_output(['git','show','cb2c98234aa7e88550853d54132e52d629b2674f:'+path],cwd=ROOT,text=True)
-                self.assertEqual((ROOT/path).read_text(),expected,path)
-        self.assertEqual((ROOT/'TMessagesProj/build.gradle').read_text().replace('def verCode = 1270','def verCode = 1267').replace("versionNameSuffix = '-alpha2-ios-glass-home2'","versionNameSuffix = '-alpha2-integrated-signature'"),old('TMessagesProj/build.gradle'))
+                self.assertEqual(read1270(path),expected,path)
+        self.assertEqual(read1270('TMessagesProj/build.gradle').replace('def verCode = 1270','def verCode = 1267').replace("versionNameSuffix = '-alpha2-ios-glass-home2'","versionNameSuffix = '-alpha2-integrated-signature'"),old('TMessagesProj/build.gradle'))
         from test_matte_release import restore_delivery_workflow
-        self.assertEqual(restore_delivery_workflow((ROOT/'.github/workflows/connected-alpha-arm64.yml').read_text()),old('.github/workflows/connected-alpha-arm64.yml'))
+        self.assertEqual(restore_delivery_workflow(read1270('.github/workflows/connected-alpha-arm64.yml')),old('.github/workflows/connected-alpha-arm64.yml'))
 
     def test_every_existing_row_and_click_handler_is_preserved(self):
         for name in ('General','Appearance'):

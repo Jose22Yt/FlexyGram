@@ -1,0 +1,12 @@
+<resources>
+    <string name="FlexyIconBlue">Основной синий</string>
+    <string name="FlexyIconGreen">Зелёный</string>
+    <string name="FlexyIconCoral">Coral</string>
+    <string name="FlexyIconMono">Mono</string>
+    <string name="FlexyIconBlueprint">Blueprint</string>
+    <string name="FlexyIconNya">Nya</string>
+    <string name="FlexyIconQuack">Quack</string>
+    <string name="FlexyIconGo">Go</string>
+    <string name="FlexyIconLegacy">Exteraless классический</string>
+    <string name="FlexyIconApplyError">Не удалось изменить значок. Текущий значок сохранён.</string>
+</resources>

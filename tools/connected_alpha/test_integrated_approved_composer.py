@@ -1,3 +1,4 @@
+from release_1271_contract import read1270, restore1270
 """Integration contract: approved1266 composer bytes and executable settings routes.
 
 Host fixtures exercise actual production route/row fragments, not a device screen.
@@ -34,7 +35,7 @@ class ApprovedComposerIntegration(unittest.TestCase):
         self.assertEqual(actual,expected)
 
     def test_actual_sections_text_input_rows_and_route_open_existing_activity(self):
-        chats=(JAVA/'app/exteraless/settings/OpenExteraChatsActivity.java').read_text()
+        chats=read1270('TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraChatsActivity.java')
         root=(JAVA/'app/exteraless/settings/OpenExteraSettingsActivity.java').read_text()
         rows=chats[chats.index('        linksHeaderRow = addRow("linksHeader");'):chats.index('        doubleTapHeaderRow = addRow("doubleTapHeader");')]
         fields=sorted(set(re.findall(r'\b(\w+Row)\s*=',rows)))
