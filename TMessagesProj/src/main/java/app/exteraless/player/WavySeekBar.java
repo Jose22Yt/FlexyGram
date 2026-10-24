@@ -10,6 +10,8 @@ import android.graphics.Path;
 import android.graphics.RectF;
 import android.os.Bundle;
 import android.os.SystemClock;
+import org.telegram.messenger.BuildConfig;
+import org.telegram.messenger.LiteMode;
 import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
 import android.view.View;
@@ -42,7 +44,8 @@ public class WavySeekBar extends View {
     private float amplitude;
     private float phase;
     private long lastFrame;
-    private float maxAmplitude = dp(4);
+    private float maxAmplitude = dp(BuildConfig.CONNECTED_ALPHA ? 3 : 4);
+    private final Runnable waveFrame = this::invalidate;
 
     public WavySeekBar(Context context) {
         super(context);
@@ -167,7 +170,8 @@ public class WavySeekBar extends View {
         long now = SystemClock.elapsedRealtime();
         float dt = lastFrame == 0 ? 0.016f : Math.min(0.05f, (now - lastFrame) / 1000f);
         lastFrame = now;
-        float targetAmp = playing ? maxAmplitude : 0f;
+        boolean visible = isShown() && getWindowVisibility() == VISIBLE;
+        float targetAmp = playing && visible && !LiteMode.isPowerSaverApplied() ? maxAmplitude : 0f;
         amplitude += (targetAmp - amplitude) * (1f - (float) Math.pow(0.85, dt / 0.04f));
         if (Math.abs(amplitude - targetAmp) < dpf2(0.05f)) {
             amplitude = targetAmp;
@@ -212,13 +216,30 @@ public class WavySeekBar extends View {
         }
         canvas.drawCircle(stopX, cy, dp(2), fillPaint);
         rect.set(x - thumbW / 2f, cy - dp(14), x + thumbW / 2f, cy + dp(14));
-        canvas.drawRoundRect(rect, dpf2(1.5f), dpf2(1.5f), fillPaint);
+        if (BuildConfig.CONNECTED_ALPHA) canvas.drawCircle(x, cy, dp(dragging ? 9 : 7), fillPaint);
+        else canvas.drawRoundRect(rect, dpf2(1.5f), dpf2(1.5f), fillPaint);
 
-        if (amplitude > 0f || targetAmp != amplitude) {
-            postInvalidateOnAnimation();
+        removeCallbacks(waveFrame);
+        if (visible && (amplitude > 0f || targetAmp != amplitude)) {
+            postDelayed(waveFrame, 33);
         } else {
             lastFrame = 0;
         }
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        removeCallbacks(waveFrame);
+        lastFrame = 0;
+        super.onDetachedFromWindow();
+    }
+
+    @Override
+    protected void onVisibilityChanged(View changedView, int visibility) {
+        super.onVisibilityChanged(changedView, visibility);
+        removeCallbacks(waveFrame);
+        lastFrame = 0;
+        if (isShown()) invalidate();
     }
 
     @Override
@@ -226,12 +247,20 @@ public class WavySeekBar extends View {
         super.onInitializeAccessibilityNodeInfo(info);
         info.setClassName("android.widget.SeekBar");
         info.setRangeInfo(AccessibilityNodeInfo.RangeInfo.obtain(AccessibilityNodeInfo.RangeInfo.RANGE_TYPE_PERCENT, 0, 100, getProgress() * 100f));
+        info.addAction(AccessibilityNodeInfo.AccessibilityAction.ACTION_SET_PROGRESS);
         info.addAction(AccessibilityNodeInfo.AccessibilityAction.ACTION_SCROLL_FORWARD);
         info.addAction(AccessibilityNodeInfo.AccessibilityAction.ACTION_SCROLL_BACKWARD);
     }
 
     @Override
     public boolean performAccessibilityAction(int action, Bundle arguments) {
+        if (!isEnabled()) return false;
+        if (action == android.R.id.accessibilityActionSetProgress && arguments != null) {
+            progress = Math.max(0f, Math.min(1f, arguments.getFloat(AccessibilityNodeInfo.ACTION_ARGUMENT_PROGRESS_VALUE) / 100f));
+            if (delegate != null) delegate.onSeekEnd(progress, true);
+            invalidate();
+            return true;
+        }
         if (action == AccessibilityNodeInfo.ACTION_SCROLL_FORWARD || action == AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD) {
             float value = Math.max(0f, Math.min(1f, progress + (action == AccessibilityNodeInfo.ACTION_SCROLL_FORWARD ? 0.05f : -0.05f)));
             progress = value;

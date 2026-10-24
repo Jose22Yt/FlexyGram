@@ -1,6 +1,7 @@
 package app.exteraless.player;
 
 import android.graphics.Bitmap;
+import org.telegram.messenger.BuildConfig;
 import android.graphics.Color;
 import android.os.Build;
 
@@ -58,7 +59,21 @@ public final class PlayerColors {
                 primary, onPrimary, primaryContainer, onPrimaryContainer, secondaryContainer, onSecondaryContainer};
     }
 
+    private static final PlayerColors PEARL = signature(false);
+    private static final PlayerColors MIDNIGHT = signature(true);
+
+    private static PlayerColors signature(boolean dark) {
+        int surface = SignatureMusicStyle.surface(dark);
+        int raised = SignatureMusicStyle.raised(dark);
+        int text = SignatureMusicStyle.text(dark);
+        return new PlayerColors(dark, new int[]{surface, surface, raised, raised,
+                text, SignatureMusicStyle.secondary(dark), SignatureMusicStyle.border(dark),
+                SignatureMusicStyle.accent(dark), dark ? 0xff072432 : 0xffffffff,
+                raised, text, raised, text});
+    }
+
     public static PlayerColors fromSeed(int seed, boolean dark) {
+        if (BuildConfig.CONNECTED_ALPHA) return dark ? MIDNIGHT : PEARL;
         DynamicScheme s = new SchemeTonalSpot(Hct.fromInt(seed), dark, 0.0);
         return new PlayerColors(dark, new int[]{
                 s.getSurface(), s.getSurfaceContainerLow(), s.getSurfaceContainer(), s.getSurfaceContainerHigh(),

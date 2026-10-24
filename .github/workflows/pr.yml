@@ -64,7 +64,7 @@ jobs:
           packages: 'build-tools;36.0.0 platforms;android-37.0'
       - run: python3 tools/connected_alpha/check_resources.py --sdk-root "$ANDROID_HOME"
   build:
-    if: github.event_name == 'pull_request' && github.head_ref != 'fix/alpha-ios-bubbles-glass-home2' && github.head_ref != 'fix/signature-matte-general-appearance' && github.head_ref != 'alpha/connected-exteraless-baseline' && !startsWith(github.head_ref, 'support/connected-alpha-ci-') && !startsWith(github.head_ref, 'integration/connected-alpha-') && !startsWith(github.head_ref, 'fix/alpha2-')
+    if: github.event_name == 'pull_request' && github.head_ref != 'feat/signature-music2' && github.head_ref != 'fix/alpha-ios-bubbles-glass-home2' && github.head_ref != 'fix/signature-matte-general-appearance' && github.head_ref != 'alpha/connected-exteraless-baseline' && !startsWith(github.head_ref, 'support/connected-alpha-ci-') && !startsWith(github.head_ref, 'integration/connected-alpha-') && !startsWith(github.head_ref, 'fix/alpha2-')
     name: Gradle Build
     runs-on: ubuntu-latest
     env:
