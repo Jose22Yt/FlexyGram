@@ -12,7 +12,7 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parent
 OUT = ROOT / 'build'
-PACKAGE = 'io.github.jose22yt.flexygram.delivery.alpha2.ios1265'
+PACKAGE = 'io.github.jose22yt.flexygram.delivery.alpha2.iphone1266'
 
 def run(*args, env=None, capture=False):
     return subprocess.run([str(a) for a in args], cwd=ROOT, env=env, check=True,
@@ -97,7 +97,7 @@ def main():
     run(java / 'bin/keytool', '-genkeypair', '-keystore', key, '-storepass', 'android',
         '-keypass', 'android', '-alias', 'helper', '-dname', 'CN=FlexyGram Offline Helper',
         '-keyalg', 'RSA', '-keysize', '3072', '-validity', '3650', '-noprompt')
-    apk = OUT / 'FlexyGram-iOS-Compact-Instalador.apk'
+    apk = OUT / 'FlexyGram-iPhone-Reference-Instalador.apk'
     try:
         run(bt / 'apksigner', 'sign', '--ks', key, '--ks-key-alias', 'helper',
             '--ks-pass', 'pass:android', '--key-pass', 'pass:android', '--out', apk, aligned)
@@ -140,7 +140,7 @@ def main():
               'helper_native_16kb': True, 'physical_android_test': 'NOT_TESTED',
               'target_apk_sha256': pins['APKHash'],
               'target_cipher_sha256': pins['CipherHash'],
-              'target_version_code': 1265,
+              'target_version_code': 1266,
               'target_source_commit': pins['Commit']}
     (OUT / 'helper-verification.json').write_text(json.dumps(report, indent=2)+'\n')
     print(json.dumps(report, indent=2))
