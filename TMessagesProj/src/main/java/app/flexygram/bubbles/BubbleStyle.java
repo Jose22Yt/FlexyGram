@@ -13,5 +13,6 @@ public final class BubbleStyle {
         r += (target-r)*28/100; g += (target-g)*28/100; b += (target-b)*28/100;
         return 0xff000000 | (r << 16) | (g << 8) | b;
     }
+    public static int effectiveRadius(boolean signature, int stored) { return signature ? 20 : stored; }
     public static int defaultRadius(boolean alpha) { return alpha ? 20 : 17; }
 }

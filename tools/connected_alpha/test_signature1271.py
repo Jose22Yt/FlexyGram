@@ -26,6 +26,9 @@ class Signature1271(unittest.TestCase):
   drawable=(JAVA/'org/telegram/ui/ActionBar/MessageDrawable.java').read_text()
   draw=drawable[drawable.index('public void draw(Canvas canvas, Paint paintToUse)'):drawable.index('public Path makePath()')]
   for s in ['flexyGlassSource.draw','new Bitmap','new Paint','new Path','new Shader','saveLayer']:self.assertNotIn(s,draw)
+  shared=(JAVA/'org/telegram/messenger/SharedConfig.java').read_text()
+  self.assertIn('BubbleStyle.effectiveRadius(BuildConfig.CONNECTED_ALPHA, bubbleRadius)',shared)
+  self.assertNotIn('putInt("bubbleRadius", 20)',shared)
   config=(JAVA/'app/flexygram/bubbles/BubbleConfig.java').read_text()
   self.assertEqual(config,old('TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleConfig.java'))
  def test_setting_slider_changes_are_skin_only_and_leave_native_media_sliders_untouched(self):

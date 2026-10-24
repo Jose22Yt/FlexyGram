@@ -909,10 +909,10 @@ index 98937e013..83b130d69 100644
      }
  }
 diff --git a/TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleStyle.java b/TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleStyle.java
-index 9138f9cc0..6e1e2af8a 100644
+index 9138f9cc0..7057a0189 100644
 --- a/TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleStyle.java
 +++ b/TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleStyle.java
-@@ -2,9 +2,16 @@ package app.flexygram.bubbles;
+@@ -2,9 +2,17 @@ package app.flexygram.bubbles;
  
  /** Pure bounded presentation policy. Native message layout/selection/media are unchanged. */
  public final class BubbleStyle {
@@ -929,8 +929,22 @@ index 9138f9cc0..6e1e2af8a 100644
 +        r += (target-r)*28/100; g += (target-g)*28/100; b += (target-b)*28/100;
 +        return 0xff000000 | (r << 16) | (g << 8) | b;
 +    }
++    public static int effectiveRadius(boolean signature, int stored) { return signature ? 20 : stored; }
      public static int defaultRadius(boolean alpha) { return alpha ? 20 : 17; }
  }
+diff --git a/TMessagesProj/src/main/java/org/telegram/messenger/SharedConfig.java b/TMessagesProj/src/main/java/org/telegram/messenger/SharedConfig.java
+index 3a9af87ec..d46a14c55 100644
+--- a/TMessagesProj/src/main/java/org/telegram/messenger/SharedConfig.java
++++ b/TMessagesProj/src/main/java/org/telegram/messenger/SharedConfig.java
+@@ -743,6 +743,8 @@ public class SharedConfig {
+             fontSizeIsDefault = !preferences.contains("fons_size");
+             bubbleRadius = preferences.getInt("bubbleRadius",
+                     app.flexygram.bubbles.BubbleStyle.defaultRadius("io.github.jose22yt.flexygram.alpha".equals(ApplicationLoader.applicationContext.getPackageName())));
++            // Match native media clipping/layout to Signature without rewriting the saved radius.
++            bubbleRadius = app.flexygram.bubbles.BubbleStyle.effectiveRadius(BuildConfig.CONNECTED_ALPHA, bubbleRadius);
+             ivFontSize = preferences.getInt("iv_font_size", fontSize);
+             allowBigEmoji = preferences.getBoolean("allowBigEmoji", true);
+             useSystemEmoji = preferences.getBoolean("useSystemEmoji", false);
 diff --git a/TMessagesProj/src/main/java/org/telegram/ui/ActionBar/MessageDrawable.java b/TMessagesProj/src/main/java/org/telegram/ui/ActionBar/MessageDrawable.java
 index df4c1e941..c336b0ec0 100644
 --- a/TMessagesProj/src/main/java/org/telegram/ui/ActionBar/MessageDrawable.java

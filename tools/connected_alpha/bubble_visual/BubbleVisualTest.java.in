@@ -92,6 +92,7 @@ public class BubbleVisualTest {
   BubbleConfig.setGlass(false);BubbleConfig.load();assertTrue(BubbleConfig.edges());assertTrue(BubbleConfig.border());
   BubbleConfig.setTransparency(-10);assertEquals(0,BubbleConfig.transparency());
   for(int x=-100;x<200;x++){int a=BubbleStyle.tintAlpha(x);assertTrue(a>=0&&a<=255);}
+  for(int stored=-20;stored<100;stored++){assertEquals(20,BubbleStyle.effectiveRadius(true,stored));assertEquals(stored,BubbleStyle.effectiveRadius(false,stored));}
   assertEquals(20,BubbleStyle.defaultRadius(true));assertEquals(17,BubbleStyle.defaultRadius(false));
  }
 }
