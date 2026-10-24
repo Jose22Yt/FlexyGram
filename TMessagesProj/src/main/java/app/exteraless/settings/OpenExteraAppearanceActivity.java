@@ -62,7 +62,7 @@ import java.util.List;
  * (NaConfig / NekoConfig). Чисто визуальные настройки, которых в NagramX нет,
  * хранятся в {@link AppearanceConfig} и помечены в отчёте как «только UI».
  */
-public class OpenExteraAppearanceActivity extends BaseNekoSettingsActivity {
+public class OpenExteraAppearanceActivity extends app.flexygram.settings.SignatureMatteSettingsActivity {
 
     private static final int TYPE_AVATAR_CORNERS = 100;
     private static final int TYPE_CHAT_LIST = 101;
@@ -74,6 +74,9 @@ public class OpenExteraAppearanceActivity extends BaseNekoSettingsActivity {
     private static final int TYPE_ROUND_CHECK = 105;
     /** Две карточки-превью формы плавающей кнопки. */
     private static final int TYPE_FAB_SHAPE = 106;
+
+    private int avatarsHeaderRow, iconsHeaderRow, iconsDividerRow;
+    private int md3HeaderRow, md3DividerRow, iosHeaderRow, iosDividerRow;
 
     // Appearance
     private int appearanceHeaderRow;
@@ -172,6 +175,7 @@ public class OpenExteraAppearanceActivity extends BaseNekoSettingsActivity {
     protected void updateRows() {
         super.updateRows();
 
+        avatarsHeaderRow = addRow("matteAvatarsHeader");
         avatarCornersPreviewRow = addRow("avatarCorners");
         singleCornerRadiusRow = addRow("singleCornerRadius");
         avatarsDividerRow = addRow();
@@ -190,12 +194,13 @@ public class OpenExteraAppearanceActivity extends BaseNekoSettingsActivity {
         tabCounterRow = addRow("tabCounter");
         foldersDividerRow = addRow();
 
-        // Порядок как в 12.9.0: строки-переходы идут сразу после «Chat Folders»,
-        // до секции общего вида.
-        linksHeaderRow = addRow("linksHeader");
-        appNavigationRow = addRow("appNavigation");
+        iconsHeaderRow = addRow("matteIconsHeader");
         iconPacksRow = addRow("iconPacks");
         emojiSetsRow = addRow("emojiSets", "EmojiSets");
+        iconsDividerRow = addRow();
+
+        linksHeaderRow = addRow("linksHeader");
+        appNavigationRow = addRow("appNavigation");
         pillStackRow = addRow("pillStack");
         hidingRow = addRow("hiding");
         linksDividerRow = addRow();
@@ -203,10 +208,10 @@ public class OpenExteraAppearanceActivity extends BaseNekoSettingsActivity {
         appearanceHeaderRow = addRow("appearanceHeader");
         fabShapeRow = addRow("fabShape");
         useSystemFontsRow = addRow("useSystemFonts");
-        // Material Design 3 — сворачиваемая группа, как у exteraGram
-        // (AppearancePreferencesActivity: asExteraExpandableSwitch + пять asRoundCheckbox).
-        // Прежние отдельные селекторы «стиль переключателей» и «стиль слайдеров»
-        // стали двумя галочками внутри неё.
+        customThemesRow = addRow("customThemes");
+        appearanceDividerRow = addRow();
+
+        md3HeaderRow = addRow("matteMd3Header");
         md3GroupRow = addRow("md3Styles");
         if (md3Expanded) {
             md3LoadingRow = addRow("md3Loading");
@@ -221,6 +226,8 @@ public class OpenExteraAppearanceActivity extends BaseNekoSettingsActivity {
             md3LoadingRow = md3SliderRow = md3SwitchRow = md3ChatHeaderRow = md3NavBarRow = md3ListItemsRow = -1;
             md3PlayerRow = md3MiniPlayerRow = -1;
         }
+        md3DividerRow = addRow();
+        iosHeaderRow = addRow("matteIosHeader");
         iosGroupRow = addRow("iosStyles");
         if (iosExpanded) {
             iosNavBarRow = addRow("iosNavBar");
@@ -228,9 +235,7 @@ public class OpenExteraAppearanceActivity extends BaseNekoSettingsActivity {
         } else {
             iosNavBarRow = iosChatHeaderRow = -1;
         }
-        gooeyAvatarRow = addRow("gooeyAvatar");
-        customThemesRow = addRow("customThemes");
-        appearanceDividerRow = addRow();
+        iosDividerRow = addRow();
 
         sectionsHeaderRow = addRow("sectionsHeader");
         sectionRadiusRow = addRow("sectionRadius");
@@ -239,6 +244,7 @@ public class OpenExteraAppearanceActivity extends BaseNekoSettingsActivity {
         sectionsDividerRow = addRow();
 
         blurHeaderRow = addRow("blurHeader");
+        gooeyAvatarRow = addRow("gooeyAvatar");
         glassOutlineRow = addRow("glassOutline");
         glassMessageMenuRow = addRow("glassMessageMenu");
         forceBlurRow = addRow("forceBlur");
@@ -801,7 +807,7 @@ public class OpenExteraAppearanceActivity extends BaseNekoSettingsActivity {
         }
     }
 
-    private class ListAdapter extends BaseListAdapter {
+    private class ListAdapter extends MatteListAdapter {
 
         public ListAdapter(Context context) {
             super(context);
@@ -813,7 +819,7 @@ public class OpenExteraAppearanceActivity extends BaseNekoSettingsActivity {
             View view;
             switch (viewType) {
                 case TYPE_EXPANDABLE_SWITCH:
-                    view = new org.telegram.ui.Cells.TextCheckCell2(mContext);
+                    view = new app.flexygram.settings.MatteExpandableSwitchCell(mContext);
                     view.setBackgroundColor(getThemedColor(Theme.key_windowBackgroundWhite));
                     break;
                 case TYPE_ROUND_CHECK: {
@@ -847,15 +853,6 @@ public class OpenExteraAppearanceActivity extends BaseNekoSettingsActivity {
                     fabShapeCell.setNeedDivider(true);
                     view = fabShapeCell;
                     break;
-                case TYPE_DETAIL_SETTINGS: {
-                    // Базовый класс делает такую же ячейку, но многострочной; exteraGram
-                    // (asButtonWithSubtext(..., 64, 60) :456-458) держит ровно 64 dp.
-                    TextDetailSettingsCell detailCell = new TextDetailSettingsCell(mContext);
-                    detailCell.setBackgroundColor(getThemedColor(Theme.key_windowBackgroundWhite));
-                    detailCell.setMultilineDetail(false);
-                    view = detailCell;
-                    break;
-                }
                 case TYPE_SECTION_SLIDER:
                     AvatarCornersSeekBar slider = new AvatarCornersSeekBar(mContext,
                             OpenExteraAppearanceActivity.this::onSectionRadiusChanged,
@@ -881,12 +878,20 @@ public class OpenExteraAppearanceActivity extends BaseNekoSettingsActivity {
             switch (holder.getItemViewType()) {
                 case TYPE_HEADER: {
                     HeaderCell cell = (HeaderCell) holder.itemView;
-                    if (position == appearanceHeaderRow) {
+                    if (position == avatarsHeaderRow) {
+                        cell.setText(getString(R.string.FlexyMatteAvatars));
+                    } else if (position == iconsHeaderRow) {
+                        cell.setText(getString(R.string.FlexyMatteIcons));
+                    } else if (position == md3HeaderRow) {
+                        cell.setText(getString(R.string.OEAppearanceMaterialDesign3));
+                    } else if (position == iosHeaderRow) {
+                        cell.setText(getString(R.string.OEAppearanceIosDesign));
+                    } else if (position == appearanceHeaderRow) {
                         cell.setText(getString(R.string.OEAppearanceGeneral));
                     } else if (position == sectionsHeaderRow) {
                         cell.setText(getString(R.string.OEAppearanceSections));
                     } else if (position == blurHeaderRow) {
-                        cell.setText(getString(R.string.OEAppearanceBlur));
+                        cell.setText(getString(R.string.FlexyMatteEffects));
                     } else if (position == chatListHeaderRow) {
                         cell.setText(getString(R.string.OEAppearanceChatList));
                     } else if (position == foldersHeaderRow) {
@@ -1022,7 +1027,7 @@ public class OpenExteraAppearanceActivity extends BaseNekoSettingsActivity {
                         cell.setTextAndValueAndIcon(getString(R.string.OEAppearanceIconPacks), getString(R.string.OEAppearanceIconPacksInfo), R.drawable.msg_sticker, true);
                     } else if (position == emojiSetsRow) {
                         cell.setTextAndValueAndIcon(getString(R.string.EmojiSets), getString(NekoConfig.useSystemEmoji.Bool()
-                                ? R.string.OEAppearanceUseSystemEmoji : R.string.OEAppearanceEmojiSetsInfo), R.drawable.msg_emoji_smiles, true);
+                                ? R.string.OEAppearanceUseSystemEmoji : R.string.OEAppearanceEmojiSetsInfo), R.drawable.msg_emoji_smiles, false);
                     } else if (position == pillStackRow) {
                         cell.setTextAndValueAndIcon(getString(R.string.OEAppearancePillStack), getString(R.string.OEAppearancePillStackInfo), R.drawable.outline_header_search, true);
                     } else if (position == hidingRow) {
@@ -1035,7 +1040,11 @@ public class OpenExteraAppearanceActivity extends BaseNekoSettingsActivity {
                     // Скруглённый «хвост» списка положен последней тени, а она у нас после блока
                     // Blur, а не после строк-переходов.
                     boolean bottom = position == blurDividerRow;
-                    if (position == appearanceDividerRow) {
+                    if (position == md3DividerRow) {
+                        cell.setText(getString(R.string.FlexyMatteMd3Info));
+                    } else if (position == iosDividerRow) {
+                        cell.setText(getString(R.string.FlexyMatteIosInfo));
+                    } else if (position == appearanceDividerRow) {
                         cell.setText(getString(R.string.OEAppearanceCustomThemesInfo));
                     } else if (position == blurDividerRow) {
                         cell.setText(getString(R.string.OEAppearanceBlurInfo));
@@ -1085,12 +1094,15 @@ public class OpenExteraAppearanceActivity extends BaseNekoSettingsActivity {
                 return TYPE_SECTION_SLIDER;
             } else if (position == appearanceHeaderRow || position == sectionsHeaderRow
                     || position == blurHeaderRow || position == chatListHeaderRow
-                    || position == foldersHeaderRow || position == linksHeaderRow) {
+                    || position == foldersHeaderRow || position == linksHeaderRow
+                    || position == avatarsHeaderRow || position == iconsHeaderRow
+                    || position == md3HeaderRow || position == iosHeaderRow) {
                 return TYPE_HEADER;
             } else if (position == appearanceDividerRow || position == sectionsDividerRow
                     || position == blurDividerRow || position == avatarsDividerRow
                     || position == chatListDividerRow || position == foldersDividerRow
-                    || position == linksDividerRow) {
+                    || position == linksDividerRow || position == iconsDividerRow
+                    || position == md3DividerRow || position == iosDividerRow) {
                 return TYPE_INFO_PRIVACY;
             } else if (position == fabShapeRow) {
                 return TYPE_FAB_SHAPE;

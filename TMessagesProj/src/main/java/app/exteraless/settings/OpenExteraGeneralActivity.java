@@ -73,7 +73,7 @@ import xyz.nextalone.nagram.NaConfig;
  * Настройки по возможности привязаны к уже существующим ConfigItem NagramX; новые заводятся
  * только там, где в NagramX нет аналога, и помечены «UI-only» (без бэкенда, как в exteraGram 12.9.0).
  */
-public class OpenExteraGeneralActivity extends BaseNekoSettingsActivity {
+public class OpenExteraGeneralActivity extends app.flexygram.settings.SignatureMatteSettingsActivity {
 
     private static final int TYPE_SLIDE = 100;
     private static final int PUSH_SERVICE_IN_APP = 0;
@@ -1108,7 +1108,7 @@ public class OpenExteraGeneralActivity extends BaseNekoSettingsActivity {
         }
     }
 
-    private class ListAdapter extends BaseListAdapter {
+    private class ListAdapter extends MatteListAdapter {
 
         public ListAdapter(Context context) {
             super(context);

@@ -164,6 +164,9 @@ public class HomePolicyProbe {
             'TMessagesProj/src/main/res/values-ru/flexygram_settings_info.xml',
             'tools/connected_alpha/test_flexy_settings_identity.py',
         }
+        # Independent General/Appearance candidate; exact delta guarded against Alpha1267.
+        from test_signature_matte import CANDIDATE_PATHS
+        allowed.update(CANDIDATE_PATHS)
         changed=subprocess.check_output(['git','diff','--name-only',BASE],cwd=ROOT,text=True).splitlines()
         self.assertTrue(changed)
         self.assertEqual(set(changed)-allowed,set())

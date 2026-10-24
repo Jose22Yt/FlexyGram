@@ -100,7 +100,7 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment {
 
     @Override
     public View createView(Context context) {
-        fragmentView = new BlurContentView(context);
+        fragmentView = usesSolidSettingsSurfaces() ? new SizeNotifierFrameLayout(context) : new BlurContentView(context);
         fragmentView.setBackgroundColor(getThemedColor(Theme.key_windowBackgroundGray));
         SizeNotifierFrameLayout frameLayout = (SizeNotifierFrameLayout) fragmentView;
 
@@ -108,8 +108,8 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment {
             actionBar.setDrawBlurBackground(frameLayout);
         }
 
-        listView = new app.exteraless.appearance.SectionCardRecyclerView(context);
-        listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        listView = createSettingsList(context);
+        if (!usesSolidSettingsSurfaces()) listView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 frameLayout.invalidateBlur();
@@ -197,6 +197,15 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment {
      * (корневой экран exteraless) её отключают: подложка закрывает контент под шапкой.
      * Снять её после вызова нельзя — {@code setDrawBlurBackground(null)} падает.
      */
+    /** Opt-in presentation only; existing settings screens retain their original pipeline. */
+    protected boolean usesSolidSettingsSurfaces() {
+        return false;
+    }
+
+    protected app.exteraless.appearance.SectionCardRecyclerView createSettingsList(Context context) {
+        return new app.exteraless.appearance.SectionCardRecyclerView(context);
+    }
+
     protected boolean needActionBarBlur() {
         return true;
     }

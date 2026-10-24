@@ -1,0 +1,43 @@
+name: Signature Matte settings candidate checks
+on:
+  push:
+    branches: [fix/signature-matte-general-appearance]
+  pull_request:
+    branches: [fix/alpha2-approved-composer-integrated-ui]
+permissions:
+  contents: read
+concurrency:
+  group: matte-settings-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  settings-validation:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python3 -m pip install -r tools/connected_alpha/requirements-ci.txt
+      - run: git submodule update --init --depth 1 TMessagesProj_Modules/media
+      - run: python3 tools/connected_alpha/run_checks.py
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: 'build-tools;36.0.0 platforms;android-37.0'
+      - run: python3 tools/connected_alpha/check_resources.py --sdk-root "$ANDROID_HOME"
+      - run: python3 tools/connected_alpha/matte_visual/run.py --sdk-root "$ANDROID_HOME"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: signature-matte-native-cell-probe
+          path: |
+            build/connected-alpha-matte-visual/*.png
+            build/connected-alpha-matte-visual/target/surefire-reports/*.xml
+          if-no-files-found: warn
+          retention-days: 7

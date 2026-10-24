@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyMatteAvatars">Аватары</string>
+    <string name="FlexyMatteIcons">Значки и эмодзи</string>
+    <string name="FlexyMatteEffects">Дополнительные визуальные эффекты</string>
+    <string name="FlexyMatteMd3Info">Material Design 3 меняет индикаторы загрузки, ползунки, переключатели, заголовки, навигацию и элементы плеера. Каждый стиль независим.</string>
+    <string name="FlexyMatteIosInfo">iOS Design меняет поверхности навигации и заголовка чата, но не заменяет панель ввода, настроенную в разделе «Чаты».</string>
+</resources>
