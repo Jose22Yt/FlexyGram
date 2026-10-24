@@ -10,5 +10,6 @@
     <string name="FlexySettingsCreditsBody">FlexyGram se distribuye bajo GNU GPL-3.0. Está basado en Exteraless y sus proyectos de código abierto anteriores. Reconocimientos del diseño original: @the8055u (iconos y diseño), @BlueprintDsgn (estudio de diseño). Se conservan los avisos de autoría y las licencias aplicables al código y los recursos originales.</string>
     <string name="FlexySettingsLicenseAction">Licencia GPL-3.0</string>
     <string name="FlexySettingsUpstreamAction">Código original</string>
-    <string name="FlexySettingsComposerRow">Barra de conversación</string>
+    <string name="FlexySettingsComposerRow">Personalizar barra de escritura</string>
+    <string name="FlexySettingsComposerDescription">Estilo iOS, tamaño, posición y Liquid Glass</string>
 </resources>
