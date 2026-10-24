@@ -44,3 +44,5 @@ class IntegratedRelease(unittest.TestCase):
   self.assertEqual(values['NagramX'],'FlexyGram')
   self.assertEqual(values['AppName'],'FlexyGram Alpha')
   self.assertEqual(values['AppNameBeta'],'FlexyGram Alpha')
+  path='TMessagesProj/src/connectedAlpha/res/values/alpha_name.xml'
+  self.assertEqual(restore_delivery(path,(ROOT/path).read_bytes()),subprocess.check_output(['git','show',WORK1+':'+path],cwd=ROOT))
