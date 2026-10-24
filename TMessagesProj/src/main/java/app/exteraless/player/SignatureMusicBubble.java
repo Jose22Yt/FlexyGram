@@ -131,13 +131,13 @@ public final class SignatureMusicBubble extends FrameLayout {
                 MotionEvent cancel = MotionEvent.obtain(event.getDownTime(), event.getEventTime(), MotionEvent.ACTION_CANCEL, 0, 0, 0);
                 super.onTouchEvent(cancel);
                 cancel.recycle();
-                getParent().requestDisallowInterceptTouchEvent(true);
+                if (getParent() != null) getParent().requestDisallowInterceptTouchEvent(true);
             }
             if (dragging) { setX(startX + dx); setY(startY + dy); confine(); return true; }
         } else if (event.getActionMasked() == MotionEvent.ACTION_UP || event.getActionMasked() == MotionEvent.ACTION_CANCEL) {
             if (dragging) {
                 dragging = false; setPressed(false);
-                getParent().requestDisallowInterceptTouchEvent(false);
+                if (getParent() != null) getParent().requestDisallowInterceptTouchEvent(false);
                 return true;
             }
         }
