@@ -74,7 +74,7 @@ public class AppIconsActivity extends BaseFragment {
         icons.clear();
         icons.addAll(AppIcons.available(currentAccount));
         appliedIcon = previewIcon = AppIcons.current();
-        tint = AppIcons.tint(AppIcons.accent(context, previewIcon));
+        tint = 0;
 
         actionBar.setBackButtonImage(R.drawable.ic_ab_back);
         actionBar.setAllowOverlayTitle(false);
@@ -93,11 +93,9 @@ public class AppIconsActivity extends BaseFragment {
 
         contentView = new ContentView(context);
 
-        glassSource = new BlurredBackgroundSourceColor();
-        glassSource.setColor(topColor());
-        actionBar.setupGlass(new BlurredBackgroundDrawableViewFactory(glassSource),
-                BlurredBackgroundProviderImpl.topPanelChatActivity(getResourceProvider()));
-        actionBar.setGlassOnlyBack();
+        actionBar.setDrawGlassTitle(false);
+        actionBar.doNotDrawGlassMenu = true;
+        actionBar.setBackgroundColor(getThemedColor(Theme.key_windowBackgroundGray));
 
         heroView = new AppIconHeroView(context, getResourceProvider());
         heroView.set(previewIcon);
@@ -173,7 +171,7 @@ public class AppIconsActivity extends BaseFragment {
         }
         previewIcon = icon;
         heroView.set(icon);
-        animateTint(AppIcons.tint(AppIcons.accent(getContext(), icon)));
+        tint = 0; invalidateTop();
         updateButton(true);
         for (int i = 0; i < listView.getChildCount(); i++) {
             View child = listView.getChildAt(i);
@@ -196,15 +194,24 @@ public class AppIconsActivity extends BaseFragment {
             showDialog(new PremiumFeatureBottomSheet(this, PremiumPreviewFragment.PREMIUM_FEATURE_APPLICATION_ICONS, true));
             return;
         }
-        AppIcons.apply(previewIcon);
-        appliedIcon = previewIcon;
-        updateButton(true);
-        Bulletin.make(this, new AppIconBulletinLayout(getContext(), appliedIcon, getResourceProvider()), Bulletin.DURATION_SHORT).show();
+        LauncherIcon chosen = previewIcon;
+        button.setEnabled(false);
+        AppIcons.apply(chosen, () -> {
+            if (isFinished) return;
+            appliedIcon = chosen;
+            button.setEnabled(true); updateButton(false);
+            Bulletin.make(this, new AppIconBulletinLayout(getContext(), appliedIcon, getResourceProvider()), Bulletin.DURATION_SHORT).show();
+        }, () -> {
+            if (isFinished) return;
+            button.setEnabled(true);
+            new org.telegram.ui.ActionBar.AlertDialog.Builder(getParentActivity(), getResourceProvider())
+                .setMessage(getString(R.string.FlexyIconApplyError)).setPositiveButton(getString(R.string.OK), null).show();
+        });
     }
 
     private void updateButton(boolean animated) {
         if (button != null) {
-            button.setText(getString(previewIcon == appliedIcon ? R.string.AppIconsKeep : R.string.AppIconsSelect), animated);
+            button.setText(getString(R.string.AppIconsKeep), animated);
         }
     }
 
@@ -215,34 +222,6 @@ public class AppIconsActivity extends BaseFragment {
 
     private int topColor() {
         return tint == 0 ? baseColor() : ColorUtils.blendARGB(baseColor(), tint, 0.7f);
-    }
-
-    private void animateTint(int to) {
-        cancelTintAnimation();
-        if (tint == to) {
-            return;
-        }
-        int from = tint;
-        if (from == 0 || to == 0) {
-            tint = to;
-            invalidateTop();
-            updateStatusBar();
-            return;
-        }
-        tintAnimator = ValueAnimator.ofFloat(0f, 1f).setDuration(280);
-        tintAnimator.setInterpolator(CubicBezierInterpolator.EASE_OUT_QUINT);
-        tintAnimator.addUpdateListener(a -> {
-            tint = ColorUtils.blendARGB(from, to, (float) a.getAnimatedValue());
-            invalidateTop();
-        });
-        tintAnimator.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                tint = to;
-                updateStatusBar();
-            }
-        });
-        tintAnimator.start();
     }
 
     private void invalidateTop() {
@@ -309,7 +288,7 @@ public class AppIconsActivity extends BaseFragment {
 
     private int spanCount(int width) {
         float available = width - AndroidUtilities.dp(8) * 2;
-        int count = Math.max(3, Math.min(8, Math.round(available / AndroidUtilities.dp(100))));
+        int count = Math.max(3, Math.min(8, Math.round(available / (AndroidUtilities.dp(96) * Math.max(1f, getContext().getResources().getConfiguration().fontScale)))));
         return count < 8 && available / count > AndroidUtilities.dp(112) ? count + 1 : count;
     }
 
@@ -358,21 +337,7 @@ public class AppIconsActivity extends BaseFragment {
         @Override
         protected void onDraw(Canvas canvas) {
             canvas.drawColor(baseColor());
-            if (tint == 0 || collapse >= 1f || heroHeight <= 0) {
-                return;
-            }
-            float cy = heroView.previewCenterY();
-            if (glowColor != tint || glowWidth != getWidth() || glowCy != cy) {
-                glowColor = tint;
-                glowWidth = getWidth();
-                glowCy = cy;
-                float radius = Math.max(getWidth(), heroHeight) * 0.9f;
-                glowPaint.setShader(new RadialGradient(getWidth() / 2f, cy, radius,
-                        new int[]{ColorUtils.setAlphaComponent(tint, 200), ColorUtils.setAlphaComponent(tint, 0)},
-                        new float[]{0f, 1f}, Shader.TileMode.CLAMP));
-            }
-            glowPaint.setAlpha((int) ((1f - collapse) * 255));
-            canvas.drawRect(0, 0, getWidth(), getHeight(), glowPaint);
+
         }
 
         @Override

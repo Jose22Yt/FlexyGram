@@ -113,13 +113,13 @@
         android:fullBackupContent="false"
         android:dataExtractionRules="@xml/connected_alpha_extraction_rules"
         android:hardwareAccelerated="true"
-        android:icon="@mipmap/ic_launcher_exteraless"
+        android:icon="@mipmap/ic_flexy_blue"
         android:label="@string/NagramX"
         android:largeHeap="true"
         android:theme="@style/Theme.TMessages.Start"
         android:manageSpaceActivity="org.telegram.ui.ExternalActionActivity"
         android:networkSecurityConfig="@xml/network_security_config"
-        android:roundIcon="@mipmap/ic_launcher_exteraless_round"
+        android:roundIcon="@mipmap/ic_flexy_blue_round"
         android:supportsRtl="false"
         android:requestLegacyExternalStorage="true"
         android:hasFragileUserData="true"
@@ -209,13 +209,13 @@
                 <data android:host="www.keepassdx.com" android:scheme="http" />
                 <data android:host="www.keepassdx.com" android:scheme="https" />
             </intent-filter>
-            <intent-filter android:icon="@mipmap/ic_launcher_exteraless" android:roundIcon="@mipmap/ic_launcher_exteraless_round" android:priority="1">
+            <intent-filter android:icon="@mipmap/ic_flexy_blue" android:roundIcon="@mipmap/ic_flexy_blue_round" android:priority="1">
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="tonsite" />
             </intent-filter>
-            <intent-filter android:icon="@mipmap/ic_launcher_exteraless" android:roundIcon="@mipmap/ic_launcher_exteraless_round" android:priority="1">
+            <intent-filter android:icon="@mipmap/ic_flexy_blue" android:roundIcon="@mipmap/ic_flexy_blue_round" android:priority="1">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -250,6 +250,134 @@
         <activity-alias
             android:enabled="true"
             android:name="org.telegram.messenger.ExteralessIcon"
+            android:targetActivity="org.telegram.ui.LaunchActivity"
+            android:icon="@mipmap/ic_flexy_blue"
+            android:roundIcon="@mipmap/ic_flexy_blue_round"
+            android:exported="true">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.MULTIWINDOW_LAUNCHER" />
+            </intent-filter>
+            <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
+        </activity-alias>
+
+        <activity-alias
+            android:enabled="false"
+            android:name="org.telegram.messenger.FlexyGreenIcon"
+            android:targetActivity="org.telegram.ui.LaunchActivity"
+            android:icon="@mipmap/ic_flexy_green"
+            android:roundIcon="@mipmap/ic_flexy_green_round"
+            android:exported="true">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.MULTIWINDOW_LAUNCHER" />
+            </intent-filter>
+            <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
+        </activity-alias>
+
+        <activity-alias
+            android:enabled="false"
+            android:name="org.telegram.messenger.FlexyCoralIcon"
+            android:targetActivity="org.telegram.ui.LaunchActivity"
+            android:icon="@mipmap/ic_flexy_coral"
+            android:roundIcon="@mipmap/ic_flexy_coral_round"
+            android:exported="true">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.MULTIWINDOW_LAUNCHER" />
+            </intent-filter>
+            <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
+        </activity-alias>
+
+        <activity-alias
+            android:enabled="false"
+            android:name="org.telegram.messenger.FlexyMonoIcon"
+            android:targetActivity="org.telegram.ui.LaunchActivity"
+            android:icon="@mipmap/ic_flexy_mono"
+            android:roundIcon="@mipmap/ic_flexy_mono_round"
+            android:exported="true">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.MULTIWINDOW_LAUNCHER" />
+            </intent-filter>
+            <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
+        </activity-alias>
+
+        <activity-alias
+            android:enabled="false"
+            android:name="org.telegram.messenger.FlexyBlueprintIcon"
+            android:targetActivity="org.telegram.ui.LaunchActivity"
+            android:icon="@mipmap/ic_flexy_blueprint"
+            android:roundIcon="@mipmap/ic_flexy_blueprint_round"
+            android:exported="true">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.MULTIWINDOW_LAUNCHER" />
+            </intent-filter>
+            <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
+        </activity-alias>
+
+        <activity-alias
+            android:enabled="false"
+            android:name="org.telegram.messenger.FlexyNyaIcon"
+            android:targetActivity="org.telegram.ui.LaunchActivity"
+            android:icon="@mipmap/ic_flexy_nya"
+            android:roundIcon="@mipmap/ic_flexy_nya_round"
+            android:exported="true">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.MULTIWINDOW_LAUNCHER" />
+            </intent-filter>
+            <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
+        </activity-alias>
+
+        <activity-alias
+            android:enabled="false"
+            android:name="org.telegram.messenger.FlexyQuackIcon"
+            android:targetActivity="org.telegram.ui.LaunchActivity"
+            android:icon="@mipmap/ic_flexy_quack"
+            android:roundIcon="@mipmap/ic_flexy_quack_round"
+            android:exported="true">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.MULTIWINDOW_LAUNCHER" />
+            </intent-filter>
+            <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
+        </activity-alias>
+
+        <activity-alias
+            android:enabled="false"
+            android:name="org.telegram.messenger.FlexyGoIcon"
+            android:targetActivity="org.telegram.ui.LaunchActivity"
+            android:icon="@mipmap/ic_flexy_go"
+            android:roundIcon="@mipmap/ic_flexy_go_round"
+            android:exported="true">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.MULTIWINDOW_LAUNCHER" />
+            </intent-filter>
+            <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
+        </activity-alias>
+
+        <activity-alias
+            android:enabled="false"
+            android:name="org.telegram.messenger.FlexyLegacyExteralessIcon"
             android:targetActivity="org.telegram.ui.LaunchActivity"
             android:icon="@mipmap/ic_launcher_exteraless"
             android:roundIcon="@mipmap/ic_launcher_exteraless_round"
@@ -564,7 +692,7 @@
             android:stateNotNeeded="true"
             android:theme="@style/Theme.TMessages.Transparent"
             android:exported="true">
-            <intent-filter android:icon="@mipmap/ic_launcher_exteraless" android:roundIcon="@mipmap/ic_launcher_exteraless_round" android:priority="1">
+            <intent-filter android:icon="@mipmap/ic_flexy_blue" android:roundIcon="@mipmap/ic_flexy_blue_round" android:priority="1">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -577,7 +705,7 @@
             android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustPan"
             android:exported="true">
-            <intent-filter android:icon="@mipmap/ic_launcher_exteraless" android:roundIcon="@mipmap/ic_launcher_exteraless_round">
+            <intent-filter android:icon="@mipmap/ic_flexy_blue" android:roundIcon="@mipmap/ic_flexy_blue_round">
                 <action android:name="org.telegram.passport.AUTHORIZE"/>
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
@@ -588,7 +716,7 @@
             android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustPan"
             android:exported="true">
-            <intent-filter android:icon="@mipmap/ic_launcher_exteraless" android:roundIcon="@mipmap/ic_launcher_exteraless_round">
+            <intent-filter android:icon="@mipmap/ic_flexy_blue" android:roundIcon="@mipmap/ic_flexy_blue_round">
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
             </intent-filter>
         </activity>
@@ -598,7 +726,7 @@
             android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustPan"
             android:exported="true">
-            <intent-filter android:icon="@mipmap/ic_launcher_exteraless" android:roundIcon="@mipmap/ic_launcher_exteraless_round">
+            <intent-filter android:icon="@mipmap/ic_flexy_blue" android:roundIcon="@mipmap/ic_flexy_blue_round">
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
             </intent-filter>
         </activity>
@@ -607,7 +735,7 @@
 <!--            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode"-->
 <!--            android:hardwareAccelerated="true"-->
 <!--            android:windowSoftInputMode="adjustPan">-->
-<!--            <intent-filter android:icon="@mipmap/ic_launcher_exteraless" android:roundIcon="@mipmap/ic_launcher_exteraless_round">-->
+<!--            <intent-filter android:icon="@mipmap/ic_flexy_blue" android:roundIcon="@mipmap/ic_flexy_blue_round">-->
 <!--                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>-->
 <!--            </intent-filter>-->
 <!--        </activity>-->

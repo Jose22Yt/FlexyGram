@@ -579,7 +579,7 @@ public class NekoChatSettingsActivity extends BaseNekoXSettingsActivity implemen
             textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
             textPaint.setTextSize(AndroidUtilities.dp(16));
 
-            sizeBar = new SeekBarView(context);
+            sizeBar = new app.flexygram.settings.FlexySignatureSeekBarView(context);
             sizeBar.setReportChanges(true);
             sizeBar.setSeparatorsCount(endStickerSize - startStickerSize + 1);
             sizeBar.setDelegate((stop, progress) -> {

@@ -18,9 +18,11 @@ public class BubbleVisualTest {
  @Before public void setup(){
   ApplicationLoader.applicationContext=RuntimeEnvironment.getApplication();
   ApplicationLoader.applicationContext.getSharedPreferences(BubbleConfig.FILE,0).edit().clear().commit();
+  BuildConfig.CONNECTED_ALPHA=true;Theme.dark=false;
   BubbleConfig.load(); SharedConfig.bubbleRadius=20; AndroidUtilities.density=1; ChatsConfig.removeMessageTail.value=false;
  }
  @Test public void nativePathsAndNinePatchLightDarkBothDirections() {
+  BuildConfig.CONNECTED_ALPHA=false;
   Bitmap image=Bitmap.createBitmap(640,1000,Bitmap.Config.ARGB_8888);Canvas canvas=new Canvas(image);
   for(boolean dark:new boolean[]{false,true}) for(float d:new float[]{.75f,1,2,3,4}) for(boolean out:new boolean[]{false,true})
    for(int type:new int[]{MessageDrawable.TYPE_TEXT,MessageDrawable.TYPE_MEDIA})
@@ -36,6 +38,7 @@ public class BubbleVisualTest {
      }
  }
  @Test public void neighborRadiusAndTailChangesInvalidateTheSameNativeCache() {
+  BuildConfig.CONNECTED_ALPHA=false;
   MessageDrawable m=new MessageDrawable(MessageDrawable.TYPE_TEXT,true,false);
   m.setBounds(0,0,180,70);m.setTop(0,200,800,false,false);
   MessageDrawable.PathDrawParams cache=new MessageDrawable.PathDrawParams();
@@ -47,16 +50,23 @@ public class BubbleVisualTest {
   ChatsConfig.removeMessageTail.value=false;assertFalse(java.util.Arrays.equals(noTail,m.makePath(cache).approximate(.1f)));
   Path same=m.makePath(cache);for(int i=0;i<10000;i++)assertSame(same,m.makePath(cache));
  }
- @Test public void realGlassFillRestoresPaintAndNeverChangesSelectedOrCustomPaint() {
-  BubbleConfig.setGlass(true);BubbleConfig.setTransparency(100);BubbleConfig.setBorder(true);
+ @Test public void signatureFillIsStableAcrossWallpaperFailuresAndTransparencyOnlyChangesFill() {
   Bitmap b=Bitmap.createBitmap(220,100,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(b);
   MessageDrawable m=new MessageDrawable(MessageDrawable.TYPE_TEXT,true,false);m.setBounds(0,0,180,70);m.setTop(0,220,100,false,false);
-  int[] calls={0};m.setFlexyGlassSource((canvas,path)->{calls[0]++;int save=canvas.save();canvas.clipPath(path);canvas.drawColor(Color.BLUE);canvas.restoreToCount(save);return true;});
-  m.drawCached(c,new MessageDrawable.PathDrawParams());assertEquals(1,calls[0]);assertEquals(255,m.paint.getAlpha());
-  assertNotEquals(Theme.getColor(Theme.key_chat_outBubble),b.getPixel(80,35));
-  Paint overlay=new Paint();overlay.setColor(Color.RED);m.drawCached(c,new MessageDrawable.PathDrawParams(),overlay);assertEquals(1,calls[0]);
-  m.isSelected=true;m.drawCached(c,new MessageDrawable.PathDrawParams());assertEquals(1,calls[0]);
-  m.setFlexyGlassSource(null);assertEquals(255,m.paint.getAlpha());
+  MessageDrawable.PathDrawParams cache=new MessageDrawable.PathDrawParams();
+  int[] calls={0};m.setFlexyGlassSource((canvas,path)->{calls[0]++;return false;});
+  BubbleConfig.setTransparency(0);m.drawCached(c,cache);int color=b.getPixel(80,35);assertEquals(0xffb8daff,color);
+  float[] shape=m.makePath(cache).approximate(.1f);
+  SharedConfig.bubbleRadius=0;ChatsConfig.removeMessageTail.value=true;
+  assertArrayEquals(shape,m.makePath(cache).approximate(.1f),0f);
+  for(int x=0;x<100;x++){b.eraseColor(Color.TRANSPARENT);m.drawCached(c,cache);assertEquals(color,b.getPixel(80,35));}
+  assertEquals(0,calls[0]);assertEquals(255,m.paint.getAlpha());
+  BubbleConfig.setTransparency(100);b.eraseColor(Color.TRANSPARENT);m.drawCached(c,cache);assertEquals(0,b.getPixel(80,35));
+  RectF bounds=new RectF();m.makePath(cache).computeBounds(bounds,true);boolean contour=false;
+  for(int y=0;y<75;y++)for(int x=0;x<185;x++)if(Color.alpha(b.getPixel(x,y))>0)contour=true;
+  assertTrue(contour);
+  Paint overlay=new Paint();overlay.setColor(Color.RED);m.drawCached(c,cache,overlay);assertEquals(Color.RED,b.getPixel(80,35));
+  Theme.dark=true;m.setTop(0,220,100,false,false);BubbleConfig.setTransparency(0);b.eraseColor(Color.TRANSPARENT);m.drawCached(c,cache);assertEquals(0xff245a94,b.getPixel(80,35));
  }
  @Test public void renderNativeBubblesInLightDarkAndCustomThemes() throws Exception {
   Bitmap b=Bitmap.createBitmap(640,480,Bitmap.Config.ARGB_8888);Canvas canvas=new Canvas(b);
@@ -65,7 +75,7 @@ public class BubbleVisualTest {
    int x=(glass?320:0)+(out?160:0),y=row*160+12;
    int save=canvas.save();canvas.translate(x,y);
    Paint wallpaper=new Paint();wallpaper.setColor(dark?0xff16191e:0xffe6e2dc);canvas.drawRect(0,0,160,140,wallpaper);
-   BubbleConfig.setGlass(glass);BubbleConfig.setBorder(glass);BubbleConfig.setTransparency(35);
+   BubbleConfig.setGlass(glass);BubbleConfig.setBorder(glass);BubbleConfig.setTransparency(glass?65:0);
    MessageDrawable m=new MessageDrawable(MessageDrawable.TYPE_TEXT,out,false,k->k==Theme.key_chat_outBubble||k==Theme.key_chat_inBubble?color:0);
    m.setBounds(10,10,150,68);m.setTop(0,160,140,false,false);
    m.setFlexyGlassSource((c,path)->{int a=c.save();c.clipPath(path);c.drawColor(dark?0xff202e39:0xffdcddd4);c.restoreToCount(a);return true;});
@@ -81,7 +91,8 @@ public class BubbleVisualTest {
   assertTrue(BubbleConfig.glass());assertTrue(BubbleConfig.edges());assertTrue(BubbleConfig.border());assertEquals(100,BubbleConfig.transparency());
   BubbleConfig.setGlass(false);BubbleConfig.load();assertTrue(BubbleConfig.edges());assertTrue(BubbleConfig.border());
   BubbleConfig.setTransparency(-10);assertEquals(0,BubbleConfig.transparency());
-  for(int x=-100;x<200;x++){int a=BubbleStyle.tintAlpha(x);assertTrue(a>=46&&a<=255);}
+  for(int x=-100;x<200;x++){int a=BubbleStyle.tintAlpha(x);assertTrue(a>=0&&a<=255);}
+  for(int stored=-20;stored<100;stored++){assertEquals(20,BubbleStyle.effectiveRadius(true,stored));assertEquals(stored,BubbleStyle.effectiveRadius(false,stored));}
   assertEquals(20,BubbleStyle.defaultRadius(true));assertEquals(17,BubbleStyle.defaultRadius(false));
  }
 }

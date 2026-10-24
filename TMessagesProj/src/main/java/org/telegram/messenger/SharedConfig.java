@@ -743,6 +743,8 @@ public class SharedConfig {
             fontSizeIsDefault = !preferences.contains("fons_size");
             bubbleRadius = preferences.getInt("bubbleRadius",
                     app.flexygram.bubbles.BubbleStyle.defaultRadius("io.github.jose22yt.flexygram.alpha".equals(ApplicationLoader.applicationContext.getPackageName())));
+            // Match native media clipping/layout to Signature without rewriting the saved radius.
+            bubbleRadius = app.flexygram.bubbles.BubbleStyle.effectiveRadius(BuildConfig.CONNECTED_ALPHA, bubbleRadius);
             ivFontSize = preferences.getInt("iv_font_size", fontSize);
             allowBigEmoji = preferences.getBoolean("allowBigEmoji", true);
             useSystemEmoji = preferences.getBoolean("useSystemEmoji", false);

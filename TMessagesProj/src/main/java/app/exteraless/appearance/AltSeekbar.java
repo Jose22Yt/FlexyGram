@@ -126,7 +126,7 @@ public class AltSeekbar extends FrameLayout {
         addView(valuesView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
                 Gravity.TOP | Gravity.FILL_HORIZONTAL, 21, 52, 21, 0));
 
-        seekBarView = new SeekBarView(context, true, null);
+        seekBarView = new app.flexygram.settings.FlexySignatureSeekBarView(context, true, null);
         seekBarView.setReportChanges(true);
         seekBarView.setDelegate((stop, progress) -> {
             float value = this.min + (this.max - this.min) * progress;

@@ -84,7 +84,7 @@ public class AvatarCornersSeekBar extends FrameLayout {
 
         addView(headerLayout, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.TOP | Gravity.FILL_HORIZONTAL, 21, 17, 21, 0));
 
-        seekBarView = new SeekBarView(context, true, null);
+        seekBarView = new app.flexygram.settings.FlexySignatureSeekBarView(context, true, null);
         seekBarView.setReportChanges(true);
         seekBarView.setDelegate(new SeekBarView.SeekBarViewDelegate() {
             @Override

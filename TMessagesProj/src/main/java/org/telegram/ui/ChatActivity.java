@@ -31739,7 +31739,7 @@ public class ChatActivity extends BaseFragment implements
         super.onResume();
         app.flexygram.bubbles.BubbleConfig.load();
         if (chatActivityFadeView != null) {
-            chatActivityFadeView.setFlexyEdgeBlur(app.flexygram.bubbles.BubbleConfig.edges(), glassBackgroundDrawableFactoryFrosted);
+            chatActivityFadeView.setFlexyEdgeBlur(false, glassBackgroundDrawableFactoryFrosted);
         }
         if (chatListView != null) chatListView.invalidateViews();
         cachedIsGestureNavigation = AndroidUtil.isGestureNavigation(getContext());
