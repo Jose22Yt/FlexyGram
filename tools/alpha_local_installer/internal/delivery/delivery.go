@@ -18,10 +18,10 @@ import (
 )
 
 const APKName = "FlexyGram-Alpha-arm64.apk"
-const APKHash = "1096160aa312814162f8294ceb30c7476683cc167e8ac6188f4e0c791cafdb93"
-const CipherHash = "f45d2a4f5c4d1270a7f63c80c94bdce030106728f415033ec0a62f5a482d11c9"
+const APKHash = "48abf0f8a32fb36b28de87f17955df922ba3ca643c4a2d35dbb0c86c543ac67c"
+const CipherHash = "ae9b7bbbc22757096cd33e78bf0d726d4865581f1fdae12fd915935bf1585828"
 const Recipient = "age1dc36uuvdg4ut52crhgux297zfjc5u0p0rucgnjss8svmgdl2eylseanqqe"
-const Commit = "b478f02ad8a3cee5a17f58d3909c4961a3555651"
+const Commit = "c85cfa5cc201b25987d101e47f8ee2f252e6b961"
 const CertificateSHA256 = "c8f04cad685ca5757d35b25ea4b0b4613c7399909948d821e6ada61f9fb12b2c"
 const MaxAPK = 256 << 20
 const maxReport = 256 << 10
@@ -143,7 +143,7 @@ func decrypt(cipher, identity io.Reader, output string, c contract) (err error) 
 	}
 	var r report
 	if json.Unmarshal(reportData, &r) != nil || r.SHA256 != c.apk || r.Bytes != apkBytes || r.Commit != c.commit ||
-		r.ApplicationID != "io.github.jose22yt.flexygram.alpha" || r.VersionCode != 1266 || r.Status != "PASS_ARTIFACT_ONLY" || r.Runtime != "NOT_TESTED" || r.ELFCount != c.elfCount ||
+		r.ApplicationID != "io.github.jose22yt.flexygram.alpha" || r.VersionCode != 1267 || r.Status != "PASS_ARTIFACT_ONLY" || r.Runtime != "NOT_TESTED" || r.ELFCount != c.elfCount ||
 		len(r.ELFs) != c.elfCount || r.Certificate != c.certificate || !validHash(r.Certificate) {
 		return ErrIntegrity
 	}

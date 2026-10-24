@@ -1,8 +1,8 @@
-name: Offline iPhone Reference installer
+name: Offline Alpha 2 integrada installer
 
 on:
   push:
-    branches: [fix/alpha2-iphone-reference-installer]
+    branches: [fix/alpha2-integrated-signature-installer]
     paths:
       - 'tools/alpha_local_installer/**'
       - '.github/workflows/alpha-local-installer.yml'
@@ -60,7 +60,7 @@ jobs:
       - uses: actions/checkout@v4
         if: steps.profile.outputs.ready == 'true'
         with:
-          ref: b478f02ad8a3cee5a17f58d3909c4961a3555651
+          ref: c85cfa5cc201b25987d101e47f8ee2f252e6b961
           path: signature-source
           persist-credentials: false
           sparse-checkout: TMessagesProj/src/main/java/app/flexygram/composer
@@ -76,9 +76,9 @@ jobs:
         if: steps.profile.outputs.ready == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: FlexyGram-iPhone-Reference-installer
+          name: FlexyGram-Alpha2-Integrada-installer
           path: |
-            tools/alpha_local_installer/build/FlexyGram-iPhone-Reference-Instalador.apk
+            tools/alpha_local_installer/build/FlexyGram-Alpha2-Integrada-Instalador.apk
             tools/alpha_local_installer/build/helper-verification.json
             tools/alpha_local_installer/build/android-smoke.txt
           if-no-files-found: error
