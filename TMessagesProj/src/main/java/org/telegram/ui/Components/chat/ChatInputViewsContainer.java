@@ -308,6 +308,7 @@ public class ChatInputViewsContainer extends FrameLayout {
             Math.max(getMeasuredHeight(), getMeasuredHeight() - (int) imeBottomInset + dp(INPUT_KEYBOARD_RADIUS * 2))
         );
 
+        flexyVoiceDrawn = false;
         final int blurTop = getMeasuredHeight() - currentBlurredHeight;
 
         tmpRect.set(
@@ -328,6 +329,7 @@ public class ChatInputViewsContainer extends FrameLayout {
             }
         }
 
+        if (flexyComposer != null) flexyComposer.setFlexyVoiceBackdropDrawn(flexyVoiceDrawn);
         if (needDrawInAppKeyboard) {
             underKeyboardBackgroundDrawable.draw(canvas);
         }
@@ -337,6 +339,10 @@ public class ChatInputViewsContainer extends FrameLayout {
 
     private final RectF flexyPill = new RectF();
     private final RectF flexyAttach = new RectF();
+    private final RectF flexyVoice = new RectF();
+    private final RectF flexyLastVoice = new RectF();
+    private boolean flexyLastHasVoice;
+    private boolean flexyVoiceDrawn;
     private final Path flexyMask = new Path();
     private final RectF flexyLastPill = new RectF();
     private final RectF flexyLastAttach = new RectF();
@@ -353,12 +359,18 @@ public class ChatInputViewsContainer extends FrameLayout {
         if (attach) flexyAttach.offset(offsetX, offsetY);
         final float radius = (dp(44) - 2 * flexyComposer.getFlexyVisualInset()) / 2f;
         if (flexyPearlGlass) {
-            // One existing native backdrop pass, clipped to the two surfaces.
+            final boolean voice = flexyComposer.getFlexyVoiceBounds(flexyVoice);
+            if (voice) flexyVoice.offset(offsetX, offsetY);
+            // One native backdrop pass for the pill, attachment and settled microphone.
             // No second blur engine, drawable factory or animation controller.
-            if (!flexyPill.equals(flexyLastPill) || attach != flexyLastHasAttach || attach && !flexyAttach.equals(flexyLastAttach)) {
+            if (!flexyPill.equals(flexyLastPill) || attach != flexyLastHasAttach || attach && !flexyAttach.equals(flexyLastAttach)
+                    || voice != flexyLastHasVoice || voice && !flexyVoice.equals(flexyLastVoice)) {
                 flexyMask.rewind();
                 flexyMask.addRoundRect(flexyPill, radius, radius, Path.Direction.CW);
                 if (attach) flexyMask.addRoundRect(flexyAttach, radius, radius, Path.Direction.CW);
+                if (voice) flexyMask.addRoundRect(flexyVoice, radius, radius, Path.Direction.CW);
+                flexyLastVoice.set(flexyVoice);
+                flexyLastHasVoice = voice;
                 flexyLastPill.set(flexyPill);
                 flexyLastAttach.set(flexyAttach);
                 flexyLastHasAttach = attach;
@@ -375,12 +387,15 @@ public class ChatInputViewsContainer extends FrameLayout {
                 (dark ? 80 : 60) * blurredBackgroundDrawable.getAlpha() / 255));
             canvas.drawRoundRect(flexyPill, radius, radius, flexySurface);
             if (attach) canvas.drawRoundRect(flexyAttach, radius, radius, flexySurface);
+            if (voice) canvas.drawRoundRect(flexyVoice, radius, radius, flexySurface);
             flexyPearl.setColor(ColorUtils.setAlphaComponent(Color.WHITE,
                 (dark ? 28 : 76) * blurredBackgroundDrawable.getAlpha() / 255));
             flexyPearl.setStyle(Paint.Style.STROKE);
             flexyPearl.setStrokeWidth(0.65f * AndroidUtilities.density);
             canvas.drawRoundRect(flexyPill, radius, radius, flexyPearl);
             if (attach) canvas.drawRoundRect(flexyAttach, radius, radius, flexyPearl);
+            if (voice) canvas.drawRoundRect(flexyVoice, radius, radius, flexyPearl);
+            flexyVoiceDrawn = voice;
         } else {
             // Opaque, legible off-white/charcoal surfaces without a full-width backing.
             final int panel = flexyComposer.getThemedColor(Theme.key_chat_messagePanelBackground);

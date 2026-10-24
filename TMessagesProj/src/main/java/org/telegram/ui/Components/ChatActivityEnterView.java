@@ -687,6 +687,13 @@ public class ChatActivityEnterView extends FrameLayout implements
     private boolean flexyCompactRequested;
     private boolean flexyCompactLayout;
     private boolean flexyMenuState;
+    private boolean flexyVoiceBackdropDrawn;
+    public void setFlexyVoiceBackdropDrawn(boolean drawn) {
+        if (flexyVoiceBackdropDrawn == drawn) return;
+        flexyVoiceBackdropDrawn = drawn;
+        // Refresh the child's cached display list only when surface ownership changes.
+        if (audioVideoButtonContainer != null) audioVideoButtonContainer.invalidate();
+    }
     private int flexyInsetDp, flexyGapDp = 6, flexyTextPaddingDp = 14, flexyPositionDp;
     private void readFlexyGeometry() {
         final int level = app.flexygram.composer.FlexyComposerConfig.level();
@@ -3412,7 +3419,7 @@ public class ChatActivityEnterView extends FrameLayout implements
 
                     canvas.save();
                     canvas.scale(s, s, backgroundRect.centerX(), backgroundRect.centerY());
-                    canvas.drawRoundRect(backgroundRect, r, r, paint);
+                    if (!flexyVoiceBackdropDrawn) canvas.drawRoundRect(backgroundRect, r, r, paint);
                     canvas.restore();
                 }
                 super.dispatchDraw(canvas);
@@ -16662,6 +16669,20 @@ public class ChatActivityEnterView extends FrameLayout implements
             && recordInterfaceState == 0 && (recordedAudioPanel == null || recordedAudioPanel.getVisibility() != VISIBLE)
             && (topView == null || topView.getVisibility() != VISIBLE)
             && !richDraftActive;
+    }
+
+    /** Shared glass only for the settled native microphone; transitions keep native paint. */
+    public boolean getFlexyVoiceBounds(RectF out) {
+        if (!isFlexyCompactPresentation() || audioVideoButtonContainer == null
+                || audioVideoButtonContainer.getVisibility() != VISIBLE || audioVideoButtonContainer.getAlpha() != 1f
+                || audioVideoButtonContainer.getScaleX() != 1f || audioVideoButtonContainer.getScaleY() != 1f
+                || expandStickersButton != null && expandStickersButton.getAlpha() > 0) return false;
+        final float x = textFieldContainer.getX() + sendButtonContainer.getX() + audioVideoButtonContainer.getX();
+        final float y = textFieldContainer.getY() + sendButtonContainer.getY() + audioVideoButtonContainer.getY();
+        final int inset = dp(flexyInsetDp);
+        out.set(x + inset, y + inset, x + audioVideoButtonContainer.getWidth() - inset,
+            y + audioVideoButtonContainer.getHeight() - inset);
+        return true;
     }
 
     public boolean getFlexyAttachmentBounds(RectF out) {
