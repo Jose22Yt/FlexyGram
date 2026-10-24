@@ -118,6 +118,10 @@ public class HomePolicyProbe {
    check(SignatureHomeStyle.selection(9,4,3,true,p)==0);
    check(SignatureHomeStyle.selection(4,4,3,false,p)==1);
   }
+  for(float p:new float[]{-1,0,.25f,.5f,1,2}) {
+   check(SignatureHomeStyle.selection(4,4,4,true,p)==1);
+   check(SignatureHomeStyle.selection(3,4,4,true,p)==0);
+  }
   check(SignatureHomeStyle.selection(4,4,3,true,2)==1);
   check(SignatureHomeStyle.selection(4,4,3,true,-1)==0);
  }
@@ -133,6 +137,7 @@ public class HomePolicyProbe {
             'TMessagesProj/src/main/java/org/telegram/ui/DialogsActivity.java',
             'TMessagesProj/src/main/java/org/telegram/ui/Components/FilterTabsView.java',
             'TMessagesProj/src/main/java/org/telegram/ui/Adapters/DialogsAdapter.java',
+            'TMessagesProj/src/main/java/app/flexygram/home/SignatureHomeTint.java',
             'TMessagesProj/src/main/java/app/flexygram/home/SignatureHomeStyle.java',
             'TMessagesProj/src/main/java/app/flexygram/home/SignatureHomePainter.java',
             'TMessagesProj/src/main/res/drawable/flexy_home_search.xml',
@@ -169,6 +174,6 @@ public class HomePolicyProbe {
         self.assertEqual(set(changed)-allowed,set())
         gradle=subprocess.check_output(['git','diff',BASE,'--','TMessagesProj/build.gradle'],cwd=ROOT,text=True)
         additions=[l for l in gradle.splitlines() if l.startswith('+') and not l.startswith('+++')]
-        self.assertEqual(additions,['+def verCode = 1267',"+        versionNameSuffix = '-alpha2-integrated-signature'"])
+        self.assertEqual(additions,['+def verCode = 1268',"+        versionNameSuffix = '-alpha2-signature-home2'"])
 
 if __name__=='__main__':unittest.main()
