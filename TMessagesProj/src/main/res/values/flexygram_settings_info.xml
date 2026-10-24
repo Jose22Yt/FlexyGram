@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexySettingsOfficial">FlexyGram official</string>
+    <string name="FlexySettingsOfficialChannel">Official channel</string>
+    <string name="FlexySettingsComingSoon">Coming soon</string>
+    <string name="FlexySettingsInformation">Information</string>
+    <string name="FlexySettingsAbout">About FlexyGram</string>
+    <string name="FlexySettingsCredits">Licenses and acknowledgements</string>
+    <string name="FlexySettingsAboutBody">FlexyGram is an independent Telegram client based on the open-source Exteraless project. Source code and project changes are available on GitHub.</string>
+    <string name="FlexySettingsCreditsBody">FlexyGram is distributed under GNU GPL-3.0. It builds upon Exteraless and its open-source predecessors. Original design acknowledgements: @the8055u (icons and design), @BlueprintDsgn (design studio). Applicable upstream copyright, asset and license notices remain in force.</string>
+    <string name="FlexySettingsLicenseAction">GPL-3.0 license</string>
+    <string name="FlexySettingsUpstreamAction">Original source</string>
+</resources>
