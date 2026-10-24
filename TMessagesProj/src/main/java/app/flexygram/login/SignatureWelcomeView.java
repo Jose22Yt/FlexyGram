@@ -62,6 +62,7 @@ public final class SignatureWelcomeView extends ScrollView {
     private TextView action(Context context, int sp) {
         android.widget.Button button = new android.widget.Button(context, null, 0);
         button.setAllCaps(false);
+        button.setGravity(Gravity.CENTER);
         button.setTextSize(TypedValue.COMPLEX_UNIT_SP, sp);
         button.setTypeface(Typeface.DEFAULT);
         button.setStateListAnimator(null);

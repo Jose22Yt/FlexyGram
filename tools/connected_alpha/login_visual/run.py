@@ -31,12 +31,14 @@ def main():
     android = sdk/'platforms/android-37.0/android.jar'
     if not aapt.is_file() or not android.is_file():
         raise SystemExit('Original build-tools36/API37 required; no resource validation skipped.')
+    shutil.rmtree(output/'res', ignore_errors=True)
+    shutil.rmtree(output/'src/test/java', ignore_errors=True)
+    for name in ('resources.zip','resources.ap_'): (output/name).unlink(missing_ok=True)
     res = output/'res/drawable'
     res.mkdir(parents=True, exist_ok=True)
     for name in ('foreground','background'):
         shutil.copyfile(HERE/('work1_plane_'+name+'.xml'),res/('flexy_blue_'+name+'.xml'))
     (res/'msg_send.xml').write_text('<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24"><path android:fillColor="#FF1767C4" android:pathData="M2,2L22,12L2,22L6,12Z"/></vector>')
-    (res/'shared_plane.xml').write_text('<layer-list xmlns:android="http://schemas.android.com/apk/res/android"><item android:drawable="@drawable/work1_plane_background"/><item android:drawable="@drawable/work1_plane_foreground"/></layer-list>')
     values=output/'res/values';values.mkdir(parents=True,exist_ok=True)
     shutil.copyfile(ROOT/'TMessagesProj/src/main/res/values/flexygram_login.xml',values/'login.xml')
     (values/'shared.xml').unlink(missing_ok=True)

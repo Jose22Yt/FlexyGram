@@ -47,6 +47,7 @@ public class LoginVisualTest {
     if(child instanceof TextView){TextView t=(TextView)child;assertTrue(t.getLayout()!=null);assertTrue(t.getLayout().getHeight()<=t.getHeight()-t.getCompoundPaddingTop()-t.getCompoundPaddingBottom());}
    }
    assertEquals("android.widget.Button",welcome.startButton.getAccessibilityClassName());
+   assertEquals(Gravity.CENTER,welcome.languageButton.getGravity());
    assertTrue(welcome.startButton.getHeight()>=52);assertTrue(welcome.languageButton.getHeight()>=48);
    welcome.startButton.performClick();welcome.languageButton.performClick();assertArrayEquals(new int[]{1,1},calls);
    assertTrue(SignatureIdentity.applyPlane(new ImageView(context)));
@@ -68,6 +69,18 @@ public class LoginVisualTest {
    outline.animateSelection(0,0,false);assertEquals(SignatureLoginPalette.edge(dark),paint.getColor());
    Field error=org.telegram.ui.Components.OutlineTextContainerView.class.getDeclaredField("errorProgress");error.setAccessible(true);error.setFloat(outline,1);outline.updateColor();assertEquals(Theme.getColor(Theme.key_text_RedBold),paint.getColor());
    outline.removeView(edit);assertSame(edit,outline.getAttachedEditText());
+  }
+ }
+ @Test public void continuePresentationHasNormalPressedAndDisabledStates() throws Exception {
+  setup("en",2,1);
+  for(boolean dark:new boolean[]{false,true}) {
+   Theme.dark=dark;SignatureLoginButton button=new SignatureLoginButton(context);button.updateColors();
+   GradientDrawable normal=(GradientDrawable)((StateListDrawable)button.getBackground()).getCurrent();
+   assertEquals(SignatureLoginPalette.accent(dark),normal.getColor().getDefaultColor());
+   button.setPressed(true);GradientDrawable pressed=(GradientDrawable)((StateListDrawable)button.getBackground()).getCurrent();
+   assertEquals(SignatureLoginPalette.color(Theme.key_chats_actionPressedBackground),pressed.getColor().getDefaultColor());
+   button.setEnabled(false);GradientDrawable disabled=(GradientDrawable)((StateListDrawable)button.getBackground()).getCurrent();
+   assertEquals(SignatureLoginPalette.edge(dark),disabled.getColor().getDefaultColor());
   }
  }
  @Test public void paletteDoesNotOverrideErrorSemanticsOrLegacyVariant() throws Exception {
