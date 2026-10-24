@@ -1,17 +1,22 @@
 diff --git a/.github/workflows/connected-alpha-arm64.yml b/.github/workflows/connected-alpha-arm64.yml
-index c7deca7d8..35b00a6a4 100644
+index c7deca7d8..27424f3e0 100644
 --- a/.github/workflows/connected-alpha-arm64.yml
 +++ b/.github/workflows/connected-alpha-arm64.yml
-@@ -73,7 +73,7 @@ jobs:
+@@ -73,8 +73,11 @@ jobs:
        - name: Retain isolated native bubble graphics (not full app screenshots)
          uses: actions/upload-artifact@v4
          with:
 -          name: FlexyGram-Alpha1270-native-bubble-probe
+-          path: build/connected-alpha-bubble-visual/android-native-bubbles.png
 +          name: FlexyGram-Alpha1271-native-bubble-probe
-           path: build/connected-alpha-bubble-visual/android-native-bubbles.png
++          path: |
++            build/connected-alpha-bubble-visual/android-native-bubbles.png
++            build/connected-alpha-bubble-visual/android-signature-icons.png
++            build/connected-alpha-bubble-visual/target/surefire-reports/*.xml
            retention-days: 7
            if-no-files-found: error
-@@ -246,7 +246,7 @@ jobs:
+       - name: Verify native Signature Matte cell geometry and accessibility
+@@ -246,7 +249,7 @@ jobs:
              echo '::error::Expected exactly one Connected Alpha APK.'
              exit 1
            fi
@@ -20,7 +25,7 @@ index c7deca7d8..35b00a6a4 100644
            python3 - <<'PY'
            import json, os
            from pathlib import Path
-@@ -273,13 +273,13 @@ jobs:
+@@ -273,13 +276,13 @@ jobs:
            cp connected-alpha-verification.json "$RUNNER_TEMP/alpha-delivery/verification.json"
            # Only these two verified deliverables enter the encrypted archive.
            tar -C "$RUNNER_TEMP/alpha-delivery" -cf - FlexyGram-Alpha-arm64.apk verification.json |
