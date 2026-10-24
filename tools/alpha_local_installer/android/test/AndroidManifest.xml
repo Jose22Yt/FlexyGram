@@ -1,6 +1,6 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="io.github.jose22yt.flexygram.delivery.alpha2.signature1264.tests">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="io.github.jose22yt.flexygram.delivery.alpha2.ios1265.tests">
     <uses-sdk android:minSdkVersion="30" android:targetSdkVersion="37" />
     <application android:label="Helper smoke tests" />
-    <instrumentation android:name="io.github.jose22yt.flexygram.delivery.alpha2.signature1264.SmokeInstrumentation"
-        android:targetPackage="io.github.jose22yt.flexygram.delivery.alpha2.signature1264" android:functionalTest="true" />
+    <instrumentation android:name="io.github.jose22yt.flexygram.delivery.alpha2.ios1265.SmokeInstrumentation"
+        android:targetPackage="io.github.jose22yt.flexygram.delivery.alpha2.ios1265" android:functionalTest="true" />
 </manifest>
