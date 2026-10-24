@@ -204,7 +204,8 @@ public class PlayerBarView extends FrameLayout implements NotificationCenter.Not
         if (mo == null || !mo.isMusic()) {
             return;
         }
-        if (current != mo) {
+        if (current != mo || !TextUtils.equals(titleView.getText(), mo.getMusicTitle())
+                || !TextUtils.equals(artistView.getText(), mo.getMusicAuthor())) {
             titleView.setText(mo.getMusicTitle());
             artistView.setText(mo.getMusicAuthor());
             cover.setMessage(mo);

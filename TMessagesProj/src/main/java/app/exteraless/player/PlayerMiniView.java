@@ -333,7 +333,8 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
     }
 
     private void bind(MessageObject mo) {
-        if (current != mo) {
+        if (current != mo || !TextUtils.equals(titleView.getText(), mo.getMusicTitle())
+                || !TextUtils.equals(artistView.getText(), mo.getMusicAuthor())) {
             titleView.setText(mo.getMusicTitle());
             artistView.setText(mo.getMusicAuthor());
             cover.setMessage(mo);

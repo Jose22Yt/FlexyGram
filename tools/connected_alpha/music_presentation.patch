@@ -173,7 +173,7 @@ index b1f60ec49..6d22d06d6 100644
          float b = Math.max(0f, Math.min(1f, badge.value));
          if (b > 0f && badgeText != null) {
 diff --git a/TMessagesProj/src/main/java/app/exteraless/player/PlayerBarView.java b/TMessagesProj/src/main/java/app/exteraless/player/PlayerBarView.java
-index f3f314296..79d3951af 100644
+index f3f314296..86e8f29b5 100644
 --- a/TMessagesProj/src/main/java/app/exteraless/player/PlayerBarView.java
 +++ b/TMessagesProj/src/main/java/app/exteraless/player/PlayerBarView.java
 @@ -4,6 +4,8 @@ import static org.telegram.messenger.AndroidUtilities.dp;
@@ -346,11 +346,12 @@ index f3f314296..79d3951af 100644
          if (id == NotificationCenter.messagePlayingProgressDidChanged) {
              playButton.progressChanged();
          } else if (id == NotificationCenter.audioInfoLoaded) {
-@@ -162,10 +204,14 @@ public class PlayerBarView extends FrameLayout implements NotificationCenter.Not
+@@ -162,10 +204,15 @@ public class PlayerBarView extends FrameLayout implements NotificationCenter.Not
          if (mo == null || !mo.isMusic()) {
              return;
          }
-+        if (current != mo) {
++        if (current != mo || !TextUtils.equals(titleView.getText(), mo.getMusicTitle())
++                || !TextUtils.equals(artistView.getText(), mo.getMusicAuthor())) {
 +            titleView.setText(mo.getMusicTitle());
 +            artistView.setText(mo.getMusicAuthor());
 +            cover.setMessage(mo);
@@ -399,7 +400,7 @@ index 695af01fd..a988ad341 100644
          return new PlayerColors(dark, new int[]{
                  s.getSurface(), s.getSurfaceContainerLow(), s.getSurfaceContainer(), s.getSurfaceContainerHigh(),
 diff --git a/TMessagesProj/src/main/java/app/exteraless/player/PlayerMiniView.java b/TMessagesProj/src/main/java/app/exteraless/player/PlayerMiniView.java
-index 50193bc23..24120d3c5 100644
+index 50193bc23..c9caeca9f 100644
 --- a/TMessagesProj/src/main/java/app/exteraless/player/PlayerMiniView.java
 +++ b/TMessagesProj/src/main/java/app/exteraless/player/PlayerMiniView.java
 @@ -4,6 +4,7 @@ import static org.telegram.messenger.AndroidUtilities.dp;
@@ -533,11 +534,12 @@ index 50193bc23..24120d3c5 100644
          if (want) {
              bind(mo);
          }
-@@ -308,10 +333,14 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
+@@ -308,10 +333,15 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
      }
  
      private void bind(MessageObject mo) {
-+        if (current != mo) {
++        if (current != mo || !TextUtils.equals(titleView.getText(), mo.getMusicTitle())
++                || !TextUtils.equals(artistView.getText(), mo.getMusicAuthor())) {
 +            titleView.setText(mo.getMusicTitle());
 +            artistView.setText(mo.getMusicAuthor());
 +            cover.setMessage(mo);
@@ -551,7 +553,7 @@ index 50193bc23..24120d3c5 100644
          playButton.setMessage(mo);
          playButton.setContentDescription(getString(MediaController.getInstance().isMessagePaused() ? R.string.AccActionPlay : R.string.AccActionPause));
      }
-@@ -338,7 +367,7 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
+@@ -338,7 +368,7 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
              applyTransform();
              notifyOffset();
          });
@@ -560,7 +562,7 @@ index 50193bc23..24120d3c5 100644
          showAnimator.setInterpolator(value ? new CubicBezierInterpolator(0.05, 0.7, 0.1, 1) : new CubicBezierInterpolator(0.3, 0, 0.8, 0.15));
          showAnimator.start();
      }
-@@ -346,6 +375,7 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
+@@ -346,6 +376,7 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
      private void applyColors(PlayerColors c) {
          colors = c;
          cardBg.setColor(c.primaryContainer);
