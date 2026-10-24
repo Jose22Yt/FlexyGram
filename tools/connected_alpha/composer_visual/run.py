@@ -47,8 +47,11 @@ def main():
     package = source/'app/flexygram/composer'
     package.mkdir(parents=True, exist_ok=True)
     production = ROOT/'TMessagesProj/src/main/java/app/flexygram/composer'
-    for name in ('ComposerStyle.java', 'ComposerGeometry.java'):
+    for name in ('ComposerStyle.java', 'ComposerGeometry.java', 'ComposerSliderTrack.java'):
         shutil.copyfile(production/name, package/name)
+    utility = source/'org/telegram/messenger/AndroidUtilities.java'
+    utility.parent.mkdir(parents=True, exist_ok=True)
+    utility.write_text('package org.telegram.messenger; public final class AndroidUtilities { public static int dp(float value) { return Math.round(value*3); } }')
     icon = (ROOT/'TMessagesProj/src/main/java/org/telegram/ui/Components/ChatActivityEnterViewAnimatedIconView.java').read_text()
     start = icon.index('public void setCompactIcons(')
     pos, depth = icon.index('{', start) + 1, 1

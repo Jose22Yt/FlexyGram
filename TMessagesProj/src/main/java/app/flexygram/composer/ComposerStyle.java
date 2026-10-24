@@ -15,7 +15,7 @@ public final class ComposerStyle {
     public static int innerIcon(boolean dark) { return dark ? 0xFFA6A8AE : 0xFF687078; }
     public static int padding(int level) { return 14 - level(level); }
     public static int gap(int level, int custom) { return custom == 0 ? 6 - level(level) : clamp(custom, MIN_GAP, MAX_GAP); }
-    // Lowering consumes at most 4dp of the existing 9dp native bottom gap.
+    // User adjustment is relative to the reference lift, never to Android system insets.
     public static int position(int value) { return clamp(value, MIN_POSITION, MAX_POSITION); }
     public static int offset(int position) { return 10 + position(position); }
     public static int reserve(int position) { return offset(position); }

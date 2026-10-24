@@ -4,12 +4,10 @@ import static org.telegram.messenger.LocaleController.getString;
 import static org.telegram.messenger.AndroidUtilities.dp;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
-import org.telegram.messenger.LocaleController;
 import androidx.core.graphics.ColorUtils;
 import android.view.Gravity;
 import android.view.View;
@@ -118,7 +116,7 @@ public final class FlexyComposerSettingsActivity extends BaseNekoSettingsActivit
             int accent = getThemedColor(Theme.key_windowBackgroundWhiteBlueText);
             valueLabel.setTextColor(accent);
             track.configure(accent, ColorUtils.blendARGB(getThemedColor(Theme.key_windowBackgroundWhite),
-                getThemedColor(Theme.key_windowBackgroundWhiteBlackText), 0.16f), LocaleController.isRTL);
+                getThemedColor(Theme.key_windowBackgroundWhiteBlackText), 0.16f));
             GradientDrawable thumb = new GradientDrawable(); thumb.setColor(accent);
             thumb.setCornerRadius(dp(2)); thumb.setSize(dp(4), dp(26));
             bar.setThumb(thumb);
