@@ -33,11 +33,22 @@ public class MessageDrawable extends Drawable {
 
     public interface GlassSource { boolean draw(Canvas canvas, Path path); }
     private GlassSource flexyGlassSource;
+    private final Paint flexyFillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint flexyBorderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     public void setFlexyGlassSource(GlassSource source) { flexyGlassSource = source; }
     private boolean flexySurface() {
-        return currentType != TYPE_PREVIEW && !isSelected && flexyGlassSource != null
-            && (app.flexygram.bubbles.BubbleConfig.glass() || app.flexygram.bubbles.BubbleConfig.border());
+        return currentType != TYPE_PREVIEW && app.flexygram.bubbles.BubbleStyle.signature();
+    }
+    private int bubbleRadius() {
+        return app.flexygram.bubbles.BubbleStyle.signature() ? 20 : SharedConfig.bubbleRadius;
+    }
+    private int signatureColor() {
+        if (overrideColor != null) return overrideColor;
+        // Explicit chat themes retain their colors; default themes get the Signature palette.
+        int key = isOut ? Theme.key_chat_outBubble : Theme.key_chat_inBubble;
+        if (resourcesProvider != null && getColor(key) != Theme.getColor(key)) return getColor(key);
+        boolean dark = Theme.isCurrentThemeDark();
+        return isOut ? (dark ? 0xff245a94 : 0xffb8daff) : (dark ? 0xff282c33 : 0xffedf0f4);
     }
 
     private Shader gradientShader;
@@ -206,6 +217,10 @@ public class MessageDrawable extends Drawable {
             gradientColor2 = 0;
             gradientColor3 = 0;
             animatedGradient = false;
+        } else if (flexySurface()) {
+            color = signatureColor();
+            gradientColor1 = gradientColor2 = gradientColor3 = 0;
+            animatedGradient = false;
         } else if (isOut) {
             color = getColor(isSelected ? Theme.key_chat_outBubbleSelected : Theme.key_chat_outBubble);
             gradientColor1 = getCurrentColor(Theme.key_chat_outBubbleGradient1);
@@ -341,7 +356,7 @@ public class MessageDrawable extends Drawable {
         } else if (overrideRounding > 0) {
             newRad = 0;
         } else {
-            newRad = dp(SharedConfig.bubbleRadius);
+            newRad = dp(bubbleRadius());
         }
         int idx;
         if (isTopNear && isBottomNear) {
@@ -462,7 +477,7 @@ public class MessageDrawable extends Drawable {
         if (gradientShader == null && !isSelected && crossfadeFromDrawable == null) {
             return null;
         }
-        int newRad = dp(SharedConfig.bubbleRadius);
+        int newRad = dp(bubbleRadius());
         int idx;
         if (isTopNear && isBottomNear) {
             idx = 3;
@@ -586,14 +601,14 @@ public class MessageDrawable extends Drawable {
             rad = overrideRoundRadius;
             nearRad = overrideRoundRadius;
         } else if (overrideRounding > 0) {
-            rad = AndroidUtilities.lerp(dp(SharedConfig.bubbleRadius), Math.min(bounds.width(), bounds.height()) / 2, overrideRounding);
-            nearRad = AndroidUtilities.lerp(dp(Math.min(6, SharedConfig.bubbleRadius)), Math.min(bounds.width(), bounds.height()) / 2, overrideRounding);
+            rad = AndroidUtilities.lerp(dp(bubbleRadius()), Math.min(bounds.width(), bounds.height()) / 2, overrideRounding);
+            nearRad = AndroidUtilities.lerp(dp(Math.min(6, bubbleRadius())), Math.min(bounds.width(), bounds.height()) / 2, overrideRounding);
         } else if (currentType == TYPE_PREVIEW) {
             rad = dp(6);
             nearRad = dp(6);
         } else {
-            rad = dp(SharedConfig.bubbleRadius);
-            nearRad = dp(Math.min(6, SharedConfig.bubbleRadius));
+            rad = dp(bubbleRadius());
+            nearRad = dp(Math.min(6, bubbleRadius()));
         }
         int smallRad = dp(6);
 
@@ -629,21 +644,26 @@ public class MessageDrawable extends Drawable {
             generatePath(path, bounds, padding, rad, smallRad, nearRad, top, drawFullBottom, drawFullTop, paintToUse != null);
         }
 
-        // Only the fill changes. Selection overlays, spoilers and all text/media remain native.
-        final int originalAlpha = p.getAlpha();
-        if (paintToUse == null && flexySurface() && app.flexygram.bubbles.BubbleConfig.glass()
-                && alpha == 255 && flexyGlassSource.draw(canvas, path)) {
-            p.setAlpha(Math.round(originalAlpha * app.flexygram.bubbles.BubbleStyle.tintAlpha(
+        if (paintToUse == null && flexySurface()) {
+            // Stable theme color, independent of wallpaper/blur availability and animation phase.
+            // Instance paints and the native geometry cache are reused for every draw.
+            int color = signatureColor();
+            flexyFillPaint.setColor(color);
+            flexyFillPaint.setAlpha(Math.round(alpha * app.flexygram.bubbles.BubbleStyle.tintAlpha(
                 app.flexygram.bubbles.BubbleConfig.transparency()) / 255f));
-        }
-        canvas.drawPath(path, p);
-        p.setAlpha(originalAlpha);
-        if (paintToUse == null && flexySurface() && app.flexygram.bubbles.BubbleConfig.border()) {
+            canvas.drawPath(path, flexyFillPaint);
+            if (isSelected) {
+                selectedPaint.setColor(getColor(isOut ? Theme.key_chat_outBubbleSelected : Theme.key_chat_inBubbleSelected));
+                selectedPaint.setAlpha(Math.round(90 * alpha / 255f));
+                canvas.drawPath(path, selectedPaint);
+            }
             flexyBorderPaint.setStyle(Paint.Style.STROKE);
-            flexyBorderPaint.setStrokeWidth(Math.max(1f, dp(.5f)));
-            flexyBorderPaint.setColor(ColorUtils.setAlphaComponent(getColor(
-                isOut ? Theme.key_chat_outBubbleSelected : Theme.key_chat_inBubbleSelected), Math.round(66 * alpha / 255f)));
+            flexyBorderPaint.setStrokeWidth(Math.max(1f, AndroidUtilities.density * .65f));
+            flexyBorderPaint.setColor(ColorUtils.setAlphaComponent(
+                app.flexygram.bubbles.BubbleStyle.outline(color, Theme.isCurrentThemeDark()), Math.round(200 * alpha / 255f)));
             canvas.drawPath(path, flexyBorderPaint);
+        } else {
+            canvas.drawPath(path, p);
         }
         if (gradientShader != null && isSelected && paintToUse == null) {
             int color = getColor(Theme.key_chat_outBubbleGradientSelectedOverlay);
@@ -665,14 +685,14 @@ public class MessageDrawable extends Drawable {
             rad = overrideRoundRadius;
             nearRad = overrideRoundRadius;
         } else if (overrideRounding > 0) {
-            rad = AndroidUtilities.lerp(dp(SharedConfig.bubbleRadius), Math.min(bounds.width(), bounds.height()) / 2, overrideRounding);
-            nearRad = AndroidUtilities.lerp(dp(Math.min(6, SharedConfig.bubbleRadius)), Math.min(bounds.width(), bounds.height()) / 2, overrideRounding);
+            rad = AndroidUtilities.lerp(dp(bubbleRadius()), Math.min(bounds.width(), bounds.height()) / 2, overrideRounding);
+            nearRad = AndroidUtilities.lerp(dp(Math.min(6, bubbleRadius())), Math.min(bounds.width(), bounds.height()) / 2, overrideRounding);
         } else if (currentType == TYPE_PREVIEW) {
             rad = dp(6);
             nearRad = dp(6);
         } else {
-            rad = dp(SharedConfig.bubbleRadius);
-            nearRad = dp(Math.min(6, SharedConfig.bubbleRadius));
+            rad = dp(bubbleRadius());
+            nearRad = dp(Math.min(6, bubbleRadius()));
         }
         int smallRad = dp(6);
         int top = Math.max(bounds.top, 0);
@@ -903,6 +923,7 @@ public class MessageDrawable extends Drawable {
 
     /** openExtera: убрать «хвостик» пузыря сообщения (ChatsConfig.removeMessageTail). */
     private static boolean oeRemoveMessageTail() {
+        if (app.flexygram.bubbles.BubbleStyle.signature()) return false;
         try {
             app.exteraless.chats.ChatsConfig.ensureLoaded();
             return app.exteraless.chats.ChatsConfig.removeMessageTail.Bool();

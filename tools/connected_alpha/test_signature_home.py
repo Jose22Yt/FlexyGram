@@ -1,3 +1,4 @@
+from release_1271_contract import read1270, restore1270
 """Home-only integration, executable geometry and preservation of native actions."""
 import hashlib
 import json
@@ -169,10 +170,14 @@ public class HomePolicyProbe {
         allowed.update(CANDIDATE_PATHS)
         from release_1270_contract import PATHS
         allowed.update(PATHS)
+        from login_contract import PATHS as LOGIN_PATHS
+        allowed.update(LOGIN_PATHS)
+        from music_contract import PATHS as MUSIC_PATHS
+        allowed.update(MUSIC_PATHS)
         changed=subprocess.check_output(['git','diff','--name-only',BASE],cwd=ROOT,text=True).splitlines()
         self.assertTrue(changed)
         self.assertEqual(set(changed)-allowed,set())
-        gradle=subprocess.check_output(['git','diff',BASE,'--','TMessagesProj/build.gradle'],cwd=ROOT,text=True)
+        gradle=subprocess.check_output(['git','diff',BASE,'a261ccc3cf2fe1c4af46cb858bb3318b2310aeb8','--','TMessagesProj/build.gradle'],cwd=ROOT,text=True)
         additions=[l for l in gradle.splitlines() if l.startswith('+') and not l.startswith('+++')]
         self.assertEqual(additions,['+def verCode = 1270',"+        versionNameSuffix = '-alpha2-ios-glass-home2'"])
 

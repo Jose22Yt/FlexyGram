@@ -9,13 +9,15 @@ import org.telegram.messenger.R;
 
 public class LauncherIconController {
     public static void tryFixLauncherIconIfNeeded() {
-        for (LauncherIcon icon : LauncherIcon.values()) {
-            if (isEnabled(icon)) {
-                return;
-            }
-        }
-
-        setIcon(LauncherIcon.EXTERALESS);
+        // Preserve existing PackageManager overrides, including all legacy aliases.
+        LauncherIcon active = null;
+        int count = 0;
+        for (LauncherIcon icon : LauncherIcon.values()) if (isEnabled(icon)) { active = icon; count++; }
+        if (count == 1) return;
+        String saved = ApplicationLoader.applicationContext.getSharedPreferences("flexy_launcher", Context.MODE_PRIVATE).getString("selected", "");
+        try { LauncherIcon remembered = LauncherIcon.valueOf(saved); if (count == 0 || isEnabled(remembered)) active = remembered; }
+        catch (IllegalArgumentException ignored) { }
+        setIcon(active == null ? LauncherIcon.EXTERALESS : active);
     }
 
     public static boolean isEnabled(LauncherIcon icon) {
@@ -31,15 +33,35 @@ public class LauncherIconController {
     public static void setIcon(LauncherIcon icon) {
         Context ctx = ApplicationLoader.applicationContext;
         PackageManager pm = ctx.getPackageManager();
-        for (LauncherIcon i : LauncherIcon.values()) {
-            pm.setComponentEnabledSetting(i.getComponentName(ctx), i == icon ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED :
-                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+        if (android.os.Build.VERSION.SDK_INT >= 33) {
+            java.util.ArrayList<PackageManager.ComponentEnabledSetting> changes = new java.util.ArrayList<>();
+            for (LauncherIcon i : LauncherIcon.values()) {
+                changes.add(new PackageManager.ComponentEnabledSetting(i.getComponentName(ctx), i == icon
+                    ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED : PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                    PackageManager.DONT_KILL_APP));
+            }
+            pm.setComponentEnabledSettings(changes);
+        } else {
+            // Enable the destination first: a failed switch must never remove the only launcher entry.
+            pm.setComponentEnabledSetting(icon.getComponentName(ctx), PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+            for (LauncherIcon i : LauncherIcon.values()) if (i != icon) {
+                pm.setComponentEnabledSetting(i.getComponentName(ctx), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+            }
         }
+        ctx.getSharedPreferences("flexy_launcher", Context.MODE_PRIVATE).edit().putString("selected", icon.name()).apply();
     }
 
     public enum LauncherIcon {
-        EXTERALESS("ExteralessIcon", R.drawable.exteraless_icon_background,
-                R.drawable.exteraless_icon_foreground, R.string.AppIconExteraless),
+        EXTERALESS("ExteralessIcon", R.drawable.flexy_blue_background,
+                R.drawable.flexy_blue_foreground, R.string.FlexyIconBlue),
+        FLEX_GREEN("FlexyGreenIcon", R.drawable.flexy_green_background, R.drawable.flexy_green_foreground, R.string.FlexyIconGreen),
+        FLEX_CORAL("FlexyCoralIcon", R.drawable.flexy_coral_background, R.drawable.flexy_coral_foreground, R.string.FlexyIconCoral),
+        FLEX_MONO("FlexyMonoIcon", R.drawable.flexy_mono_background, R.drawable.flexy_mono_foreground, R.string.FlexyIconMono),
+        FLEX_BLUEPRINT("FlexyBlueprintIcon", R.drawable.flexy_blueprint_background, R.drawable.flexy_blueprint_foreground, R.string.FlexyIconBlueprint),
+        FLEX_NYA("FlexyNyaIcon", R.drawable.flexy_nya_background, R.drawable.flexy_nya_foreground, R.string.FlexyIconNya),
+        FLEX_QUACK("FlexyQuackIcon", R.drawable.flexy_quack_background, R.drawable.flexy_quack_foreground, R.string.FlexyIconQuack),
+        FLEX_GO("FlexyGoIcon", R.drawable.flexy_go_background, R.drawable.flexy_go_foreground, R.string.FlexyIconGo),
+        LEGACY_EXTERALESS("FlexyLegacyExteralessIcon", R.drawable.exteraless_icon_background, R.drawable.exteraless_icon_foreground, R.string.FlexyIconLegacy),
         BLUEPRINT("BlueprintIcon", R.drawable.blueprint_icon_background,
                 R.drawable.blueprint_icon_foreground, R.string.AppIconBlueprint),
         RED("RedIcon", R.drawable.red_icon_background,

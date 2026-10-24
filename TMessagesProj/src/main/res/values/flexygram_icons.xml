@@ -1,0 +1,12 @@
+<resources>
+    <string name="FlexyIconBlue">Principal Blue</string>
+    <string name="FlexyIconGreen">Green</string>
+    <string name="FlexyIconCoral">Coral</string>
+    <string name="FlexyIconMono">Mono</string>
+    <string name="FlexyIconBlueprint">Blueprint</string>
+    <string name="FlexyIconNya">Nya</string>
+    <string name="FlexyIconQuack">Quack</string>
+    <string name="FlexyIconGo">Go</string>
+    <string name="FlexyIconLegacy">Exteraless Classic</string>
+    <string name="FlexyIconApplyError">Could not change the icon. Your current launcher icon is preserved.</string>
+</resources>

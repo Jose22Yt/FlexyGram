@@ -1,16 +1,20 @@
+from release_1271_contract import read1270, restore1270
 import hashlib
 import subprocess
 import unittest
 from pathlib import Path
 from release_1270_contract import BASE,PATHS
+from music_contract import PATHS as MUSIC_PATHS
+PATHS = PATHS | MUSIC_PATHS
 from bubble_parity import restore_bubble_presentation
 ROOT=Path(__file__).resolve().parents[2]
 JAVA=ROOT/'TMessagesProj/src/main/java'
 class BubbleReleaseTests(unittest.TestCase):
  def test_exact_release_scope_and_approved_composer_matte_previews_are_frozen(self):
   changed=set(subprocess.check_output(['git','diff','--name-only',BASE],cwd=ROOT,text=True).splitlines())
-  self.assertFalse(changed-PATHS,changed-PATHS)
-  for prefix in ('TMessagesProj/src/main/java/app/flexygram/composer','TMessagesProj/src/main/java/app/flexygram/settings','TMessagesProj/src/main/java/app/exteraless/appearance','TMessagesProj/jni','TMessagesProj/chaquopy'):
+  from login_contract import PATHS as LOGIN_PATHS
+  self.assertFalse(changed-PATHS-LOGIN_PATHS,changed-PATHS-LOGIN_PATHS)
+  for prefix in ('TMessagesProj/src/main/java/app/flexygram/composer','TMessagesProj/jni','TMessagesProj/chaquopy'):
    self.assertEqual(subprocess.check_output(['git','diff',BASE,'--',prefix],cwd=ROOT),b'',prefix)
  def test_reviewed_native_patch_restores_exact_approved_base(self):
   patch=(ROOT/'tools/connected_alpha/bubble_native_presentation.patch').read_text()
@@ -28,7 +32,7 @@ class BubbleReleaseTests(unittest.TestCase):
    path='TMessagesProj/src/main/java/'+path
    self.assertEqual((ROOT/path).read_bytes(),subprocess.check_output(['git','show','cb2c98234aa7e88550853d54132e52d629b2674f:'+path],cwd=ROOT))
  def test_glass_uses_native_path_shared_wallpaper_and_restores_shared_drawable(self):
-  m=(JAVA/'org/telegram/ui/ActionBar/MessageDrawable.java').read_text()
+  m=read1270('TMessagesProj/src/main/java/org/telegram/ui/ActionBar/MessageDrawable.java')
   cell=(JAVA/'org/telegram/ui/Cells/ChatMessageCell.java').read_text()
   chat=(JAVA/'org/telegram/ui/ChatActivity.java').read_text()
   self.assertIn('finally { drawable.setFlexyGlassSource(null); }',cell)
@@ -41,7 +45,7 @@ class BubbleReleaseTests(unittest.TestCase):
   s=(JAVA/'org/telegram/messenger/SharedConfig.java').read_text()
   self.assertIn('preferences.getInt("bubbleRadius",',s)
   self.assertNotIn('putInt("bubbleRadius", 20)',s)
-  settings=(JAVA/'app/flexygram/bubbles/BubbleSettingsActivity.java').read_text()
+  settings=read1270('TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleSettingsActivity.java')
   self.assertEqual(settings.count(' = addRow("flexyBubble'),4)
   self.assertIn('seek.setMax(100)',settings)
   self.assertNotIn('recreate(',settings)

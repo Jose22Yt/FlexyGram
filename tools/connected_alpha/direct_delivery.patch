@@ -1,0 +1,120 @@
+diff --git a/.github/workflows/connected-alpha-arm64.yml b/.github/workflows/connected-alpha-arm64.yml
+index 27424f3e0..f386eeffd 100644
+--- a/.github/workflows/connected-alpha-arm64.yml
++++ b/.github/workflows/connected-alpha-arm64.yml
+@@ -174,10 +174,10 @@ jobs:
+             cmake;3.31.6
+       - name: Verify SDK payload and normalize nested API 37 layout
+         run: python3 tools/connected_alpha/preflight_sdk.py --sdk-root "$ANDROID_HOME"
+-      - name: Install native tools and optional encrypted-delivery tool
++      - name: Install pinned native build tools
+         run: |
+           sudo apt-get update -qq
+-          sudo apt-get install -y --no-install-recommends nasm ninja-build age patchelf autoconf automake libtool pkg-config
++          sudo apt-get install -y --no-install-recommends nasm ninja-build patchelf autoconf automake libtool pkg-config
+       - name: Select installed JDK and exact CMake for Chaquopy
+         shell: bash
+         run: |
+@@ -262,29 +262,8 @@ jobs:
+               f.write('APK SHA-256: ' + data['sha256'] + '\n')
+               f.write('ELF payloads verified: ' + str(data['elf_count']) + '\n')
+           PY
+-      - name: Encrypt verified APK for owner's private recipient (optional)
+-        if: vars.ALPHA_AGE_RECIPIENT != ''
+-        shell: bash
+-        env:
+-          ALPHA_AGE_RECIPIENT: ${{ vars.ALPHA_AGE_RECIPIENT }}
+-        run: |
+-          set -euo pipefail
+-          mapfile -t packages < <(find TMessagesProj/build/outputs/apk/connectedAlpha -type f -name '*.apk')
+-          test "${#packages[@]}" -eq 1
+-          mkdir -p "$RUNNER_TEMP/alpha-delivery"
+-          cp -- "${packages[0]}" "$RUNNER_TEMP/alpha-delivery/FlexyGram-Alpha-arm64.apk"
+-          cp connected-alpha-verification.json "$RUNNER_TEMP/alpha-delivery/verification.json"
+-          # Only these two verified deliverables enter the encrypted archive.
+-          tar -C "$RUNNER_TEMP/alpha-delivery" -cf - FlexyGram-Alpha-arm64.apk verification.json |
+-            age --encrypt -r "$ALPHA_AGE_RECIPIENT" -o "$RUNNER_TEMP/FlexyGram-Alpha1271-ARM64.tar.age"
+-      - name: Upload encrypted delivery only (never plaintext APK)
+-        if: vars.ALPHA_AGE_RECIPIENT != ''
+-        uses: actions/upload-artifact@v4
+-        with:
+-          name: FlexyGram-Alpha1271-Encrypted
+-          path: ${{ runner.temp }}/FlexyGram-Alpha1271-ARM64.tar.age
+-          retention-days: 7
+-          if-no-files-found: error
++      - name: Keep direct APK delivery private
++        run: echo 'Signed APK verified. Private direct delivery is produced locally; no APK is uploaded to this public repository.' >> "$GITHUB_STEP_SUMMARY"
+       - name: Wipe private inputs and generated plaintext, including caches
+         if: always()
+         shell: bash
+diff --git a/TMessagesProj/src/main/java/app/exteraless/updater/UpdaterSheet.java b/TMessagesProj/src/main/java/app/exteraless/updater/UpdaterSheet.java
+index 038466871..a1edf5b09 100644
+--- a/TMessagesProj/src/main/java/app/exteraless/updater/UpdaterSheet.java
++++ b/TMessagesProj/src/main/java/app/exteraless/updater/UpdaterSheet.java
+@@ -219,8 +219,10 @@ public class UpdaterSheet extends BottomSheet {
+         channelInfo.setTextColor(getThemedColor(Theme.key_dialogTextGray2));
+         content.addView(channelInfo, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 4, 8, 4, 0));
+ 
+-        content.addView(createLink(context, R.drawable.msg_link, getString(org.telegram.messenger.BuildConfig.CONNECTED_ALPHA ? R.string.FlexyAlphaDeliveries : R.string.OEUpdaterAllReleases), () ->
+-                Browser.openUrl(getContext(), org.telegram.messenger.BuildConfig.CONNECTED_ALPHA ? "https://github.com/Jose22Yt/FlexyGram/actions" : GitHubUpdater.RELEASES_URL)), LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 40, 0, 20, 0, 0));
++        if (!org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) {
++            content.addView(createLink(context, R.drawable.msg_link, getString(R.string.OEUpdaterAllReleases), () ->
++                Browser.openUrl(getContext(), GitHubUpdater.RELEASES_URL)), LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 40, 0, 20, 0, 0));
++        }
+ 
+         setCustomView(content);
+         if (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) {
+diff --git a/TMessagesProj/src/main/res/values-es/flexygram_login.xml b/TMessagesProj/src/main/res/values-es/flexygram_login.xml
+index 12dd3d53b..513bc5c5f 100644
+--- a/TMessagesProj/src/main/res/values-es/flexygram_login.xml
++++ b/TMessagesProj/src/main/res/values-es/flexygram_login.xml
+@@ -5,5 +5,5 @@
+     <string name="FlexySignatureStart">Empezar a chatear</string>
+     <string name="FlexySignatureLanguage">Idioma</string>
+     <string name="FlexyAlphaDeliveries">Entregas Alpha verificadas</string>
+-    <string name="FlexyAlphaDeliveryInfo">Las actualizaciones Alpha utilizan la entrega cifrada original y su instalador offline compatible. Los paquetes del cliente base no actualizan FlexyGram.</string>
++    <string name="FlexyAlphaDeliveryInfo">Las actualizaciones de prueba se entregan de forma privada como una APK Android firmada. Instala la nueva APK sobre tu FlexyGram Alpha para conservar tus datos. No necesitas descifrar archivos ni un instalador auxiliar.</string>
+ </resources>
+diff --git a/TMessagesProj/src/main/res/values-ru/flexygram_login.xml b/TMessagesProj/src/main/res/values-ru/flexygram_login.xml
+index 51d567515..8d2226bf8 100644
+--- a/TMessagesProj/src/main/res/values-ru/flexygram_login.xml
++++ b/TMessagesProj/src/main/res/values-ru/flexygram_login.xml
+@@ -5,5 +5,5 @@
+     <string name="FlexySignatureStart">Начать общение</string>
+     <string name="FlexySignatureLanguage">Язык</string>
+     <string name="FlexyAlphaDeliveries">Проверенные сборки Alpha</string>
+-    <string name="FlexyAlphaDeliveryInfo">Обновления Alpha используют зашифрованную доставку и совместимый офлайн-установщик. Пакеты исходного клиента не обновляют FlexyGram.</string>
++    <string name="FlexyAlphaDeliveryInfo">Тестовые обновления распространяются приватно в виде подписанного APK Android. Установите новый APK поверх FlexyGram Alpha, чтобы сохранить данные. Расшифровка и дополнительный установщик не нужны.</string>
+ </resources>
+diff --git a/TMessagesProj/src/main/res/values/flexygram_login.xml b/TMessagesProj/src/main/res/values/flexygram_login.xml
+index e639689ef..ee8650242 100644
+--- a/TMessagesProj/src/main/res/values/flexygram_login.xml
++++ b/TMessagesProj/src/main/res/values/flexygram_login.xml
+@@ -5,5 +5,5 @@
+     <string name="FlexySignatureStart">Start chatting</string>
+     <string name="FlexySignatureLanguage">Language</string>
+     <string name="FlexyAlphaDeliveries">Verified Alpha deliveries</string>
+-    <string name="FlexyAlphaDeliveryInfo">Alpha updates use the original encrypted delivery and matching offline installer. Upstream client packages cannot update FlexyGram.</string>
++    <string name="FlexyAlphaDeliveryInfo">Test updates are distributed privately as a signed Android APK. Install the new APK over your current FlexyGram Alpha to keep your data. No decryption or auxiliary installer is needed.</string>
+ </resources>
+diff --git a/TMessagesProj/src/connectedAlpha/res/values/alpha_name.xml b/TMessagesProj/src/connectedAlpha/res/values/alpha_name.xml
+index bae27215f..7436f1f4c 100644
+--- a/TMessagesProj/src/connectedAlpha/res/values/alpha_name.xml
++++ b/TMessagesProj/src/connectedAlpha/res/values/alpha_name.xml
+@@ -1,7 +1,6 @@
+ <resources>
+   <string name="AppName">FlexyGram Alpha</string>
+   <string name="AppNameBeta">FlexyGram Alpha</string>
+-  <string name="NagramX">FlexyGram Alpha</string>
+   <string name="OpenExtera">FlexyGram</string>
+   <string name="AppIconExteraless" translatable="false">FlexyGram</string>
+ </resources>
+diff --git a/TMessagesProj/src/connectedAlpha/res/values/flexygram_identity.xml b/TMessagesProj/src/connectedAlpha/res/values/flexygram_identity.xml
+index 827dcb44c..1f511420a 100644
+--- a/TMessagesProj/src/connectedAlpha/res/values/flexygram_identity.xml
++++ b/TMessagesProj/src/connectedAlpha/res/values/flexygram_identity.xml
+@@ -1,3 +1,3 @@
+ <?xml version="1.0" encoding="utf-8"?>
+ <!-- UI label only; preserve the inherited key and all attribution resources. -->
+-<resources><string name="NagramX" translatable="false">FlexyGram</string></resources>
++<resources><string name="NagramX" translatable="false">FlexyGram Alpha</string></resources>

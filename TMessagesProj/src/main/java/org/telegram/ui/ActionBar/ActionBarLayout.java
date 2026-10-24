@@ -2027,6 +2027,11 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
 
     @Override
     public void onBackPressed() {
+        if (finishClosingPreview()) return;
+        if (transitionAnimationPreviewMode) {
+            finishPreviewFragment();
+            return;
+        }
         if (transitionAnimationPreviewMode || startedTracking || checkTransitionAnimation() || fragmentsStack.isEmpty()) {
             return;
         }
@@ -3098,7 +3103,17 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         closeLastFragment(animated, false);
     }
 
+    /** A second close consumes the same preview transition, never the fragment underneath. */
+    private boolean finishClosingPreview() {
+        if (inPreviewMode && transitionAnimationInProgress && onCloseAnimationEndRunnable != null) {
+            onAnimationEndCheck(true);
+            return true;
+        }
+        return false;
+    }
+
     public void closeLastFragment(boolean animated, boolean forceNoAnimation) {
+        if (finishClosingPreview()) return;
         BaseFragment fragment = getLastFragment();
         if (fragment != null && fragment.closeLastFragment()) {
             return;

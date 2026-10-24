@@ -102,10 +102,8 @@ class CloudBuildRegression(unittest.TestCase):
     def test_no_plaintext_apk_upload(self):
         workflow = yaml.safe_load((ROOT/'.github/workflows/connected-alpha-arm64.yml').read_text())
         upload = [s for s in workflow['jobs']['build-arm64']['steps'] if s.get('uses','').startswith('actions/upload-artifact')]
-        self.assertEqual(len(upload), 1)
-        self.assertTrue(upload[0]['with']['path'].endswith('.tar.age'))
-        self.assertIn('ALPHA_AGE_RECIPIENT', upload[0]['if'])
-        self.assertNotIn('*.apk', upload[0]['with']['path'])
+        self.assertEqual(upload, [], 'A public repository cannot publish the private signed APK')
+        self.assertNotIn('age --encrypt', (ROOT/'.github/workflows/connected-alpha-arm64.yml').read_text())
 
 
 if __name__ == '__main__':

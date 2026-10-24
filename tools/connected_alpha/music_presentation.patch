@@ -1,0 +1,1286 @@
+diff --git a/TMessagesProj/src/main/java/app/exteraless/player/ControlsRow.java b/TMessagesProj/src/main/java/app/exteraless/player/ControlsRow.java
+index 52089c895..99bd0cc8a 100644
+--- a/TMessagesProj/src/main/java/app/exteraless/player/ControlsRow.java
++++ b/TMessagesProj/src/main/java/app/exteraless/player/ControlsRow.java
+@@ -3,6 +3,7 @@ package app.exteraless.player;
+ import static org.telegram.messenger.AndroidUtilities.dp;
+ 
+ import android.content.Context;
++import org.telegram.messenger.BuildConfig;
+ import android.os.SystemClock;
+ import android.view.ViewGroup;
+ 
+@@ -79,6 +80,14 @@ public class ControlsRow extends ViewGroup implements MorphButton.PressListener
+     }
+ 
+     private void updateTargets(boolean animated) {
++        if (BuildConfig.CONNECTED_ALPHA) {
++            prev.setRadius(dp(32), false);
++            next.setRadius(dp(32), false);
++            play.setRadius(dp(44), false);
++            shuffle.setRadius(dp(24), false);
++            repeat.setRadius(dp(24), false);
++            return;
++        }
+         float prevW = pressed == prev ? 76 : pressed == play ? 58 : 64;
+         float nextW = pressed == next ? 76 : pressed == play ? 58 : 64;
+         float playW = pressed == play ? 100 : (pressed == prev || pressed == next) ? 80 : 88;
+@@ -149,7 +158,7 @@ public class ControlsRow extends ViewGroup implements MorphButton.PressListener
+     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+         int width = MeasureSpec.getSize(widthMeasureSpec);
+         scale = Math.min(1f, (width - dp(16)) / (float) dp(312));
+-        int height = Math.round(dp(88) * scale);
++        int height = BuildConfig.CONNECTED_ALPHA ? Math.max(dp(64), Math.round(dp(88) * scale)) + dp(60) : Math.round(dp(88) * scale);
+         measureButtons();
+         setMeasuredDimension(width, height);
+     }
+@@ -157,8 +166,9 @@ public class ControlsRow extends ViewGroup implements MorphButton.PressListener
+     private void measureButtons() {
+         for (MorphButton b : buttons) {
+             b.scale = scale;
+-            int w = Math.max(1, Math.round(b.width.value * scale));
+-            int h = Math.max(1, Math.round(b.baseHeight * scale));
++            int minimum = BuildConfig.CONNECTED_ALPHA ? dp(b == play ? 64 : 48) : 1;
++            int w = Math.max(minimum, Math.round(b.width.value * scale));
++            int h = Math.max(minimum, Math.round(b.baseHeight * scale));
+             b.measure(MeasureSpec.makeMeasureSpec(w, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(h, MeasureSpec.EXACTLY));
+         }
+     }
+@@ -168,7 +178,22 @@ public class ControlsRow extends ViewGroup implements MorphButton.PressListener
+         layoutButtons(r - l, b - t);
+     }
+ 
++    private void place(MorphButton button, int center, int top) {
++        int left = center - button.getMeasuredWidth() / 2;
++        button.layout(left, top, left + button.getMeasuredWidth(), top + button.getMeasuredHeight());
++    }
++
+     private void layoutButtons(int width, int height) {
++        if (BuildConfig.CONNECTED_ALPHA) {
++            int center = width / 2;
++            place(play, center, 0);
++            place(prev, center - Math.round(dp(100) * scale), Math.round(dp(12) * scale));
++            place(next, center + Math.round(dp(100) * scale), Math.round(dp(12) * scale));
++            int y = height - shuffle.getMeasuredHeight();
++            place(shuffle, center - Math.round(dp(52) * scale), y);
++            place(repeat, center + Math.round(dp(52) * scale), y);
++            return;
++        }
+         float total = 0;
+         for (MorphButton button : buttons) {
+             total += button.getMeasuredWidth();
+diff --git a/TMessagesProj/src/main/java/app/exteraless/player/Md3Player.java b/TMessagesProj/src/main/java/app/exteraless/player/Md3Player.java
+index 42260b9ef..52f699bda 100644
+--- a/TMessagesProj/src/main/java/app/exteraless/player/Md3Player.java
++++ b/TMessagesProj/src/main/java/app/exteraless/player/Md3Player.java
+@@ -1,6 +1,7 @@
+ package app.exteraless.player;
+ 
+ import android.content.Context;
++import org.telegram.messenger.BuildConfig;
+ import android.os.Bundle;
+ 
+ import org.telegram.messenger.MediaController;
+@@ -48,7 +49,7 @@ public final class Md3Player {
+             return;
+         }
+         BottomSheet sheet = create(fragment.getParentActivity(), fragment.getResourceProvider());
+-        if (sheet instanceof PlayerSheet && source != null && source.canTransition()) {
++        if (!BuildConfig.CONNECTED_ALPHA && sheet instanceof PlayerSheet && source != null && source.canTransition()) {
+             ((PlayerSheet) sheet).setTransitionSource(source);
+         }
+         fragment.showDialog(sheet);
+diff --git a/TMessagesProj/src/main/java/app/exteraless/player/MorphButton.java b/TMessagesProj/src/main/java/app/exteraless/player/MorphButton.java
+index b1f60ec49..6d22d06d6 100644
+--- a/TMessagesProj/src/main/java/app/exteraless/player/MorphButton.java
++++ b/TMessagesProj/src/main/java/app/exteraless/player/MorphButton.java
+@@ -41,6 +41,10 @@ public class MorphButton extends android.view.View {
+     private PlayerIcon icon;
+     private PlayerIcon altIcon;
+     private String text;
++    private boolean stackedLabel;
++    private String displayText;
++
++    public void setStackedLabel(boolean value) { stackedLabel = value; requestLayout(); invalidate(); }
+     private String badgeText;
+     private int bgColor;
+     private int fgColor;
+@@ -83,6 +87,8 @@ public class MorphButton extends android.view.View {
+     public void setText(String value) {
+         if (!TextUtils.equals(text, value)) {
+             text = value;
++            setContentDescription(value);
++            updateDisplayText();
+             invalidate();
+         }
+     }
+@@ -146,6 +152,25 @@ public class MorphButton extends android.view.View {
+         invalidate();
+     }
+ 
++    private void updateDisplayText() {
++        textPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,
++                stackedLabel ? 12 : 15, getResources().getDisplayMetrics()));
++        displayText = text == null ? null : TextUtils.ellipsize(text, textPaint,
++                Math.max(0, getWidth() - dp(stackedLabel ? 12 : 40)), TextUtils.TruncateAt.END).toString();
++    }
++
++    @Override
++    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
++        super.onSizeChanged(w, h, oldw, oldh);
++        updateDisplayText();
++    }
++
++    @Override
++    public void onInitializeAccessibilityNodeInfo(android.view.accessibility.AccessibilityNodeInfo info) {
++        super.onInitializeAccessibilityNodeInfo(info);
++        info.setClassName("android.widget.Button");
++    }
++
+     @Override
+     public void setPressed(boolean pressed) {
+         boolean changed = pressed != isPressed();
+@@ -193,11 +218,11 @@ public class MorphButton extends android.view.View {
+ 
+         float contentWidth = 0;
+         int iconSize = icon != null ? icon.getIntrinsicWidth() : 0;
+-        if (text != null) {
+-            contentWidth = iconSize + dp(8) + textPaint.measureText(text);
++        if (displayText != null && !stackedLabel) {
++            contentWidth = iconSize + dp(8) + textPaint.measureText(displayText);
+         }
+-        float iconCx = text != null ? (w - contentWidth) / 2f + iconSize / 2f : w / 2f;
+-        float cy = h / 2f;
++        float iconCx = displayText != null && !stackedLabel ? (w - contentWidth) / 2f + iconSize / 2f : w / 2f;
++        float cy = stackedLabel && displayText != null ? dp(20) : h / 2f;
+         if (altIcon == null) {
+             drawIcon(canvas, icon, iconCx, cy, fg, 1f, 1f);
+         } else {
+@@ -205,11 +230,11 @@ public class MorphButton extends android.view.View {
+             drawIcon(canvas, icon, iconCx, cy, fg, 1f - t, 1f - 0.4f * t);
+             drawIcon(canvas, altIcon, iconCx, cy, fg, t, 0.6f + 0.4f * t);
+         }
+-        if (text != null) {
++        if (displayText != null) {
+             textPaint.setColor(fg);
+-            float tx = iconCx + iconSize / 2f + dp(8);
+-            float ty = cy - (textPaint.descent() + textPaint.ascent()) / 2f;
+-            canvas.drawText(text, tx, ty, textPaint);
++            float tx = stackedLabel ? (w - textPaint.measureText(displayText)) / 2f : iconCx + iconSize / 2f + dp(8);
++            float ty = stackedLabel ? h - dp(10) - textPaint.descent() : cy - (textPaint.descent() + textPaint.ascent()) / 2f;
++            canvas.drawText(displayText, tx, ty, textPaint);
+         }
+         float b = Math.max(0f, Math.min(1f, badge.value));
+         if (b > 0f && badgeText != null) {
+diff --git a/TMessagesProj/src/main/java/app/exteraless/player/PlayerBarView.java b/TMessagesProj/src/main/java/app/exteraless/player/PlayerBarView.java
+index f3f314296..86e8f29b5 100644
+--- a/TMessagesProj/src/main/java/app/exteraless/player/PlayerBarView.java
++++ b/TMessagesProj/src/main/java/app/exteraless/player/PlayerBarView.java
+@@ -4,6 +4,8 @@ import static org.telegram.messenger.AndroidUtilities.dp;
+ import static org.telegram.messenger.LocaleController.getString;
+ 
+ import android.content.Context;
++import org.telegram.messenger.BuildConfig;
++import android.graphics.drawable.GradientDrawable;
+ import android.text.TextUtils;
+ import android.util.TypedValue;
+ import android.view.Gravity;
+@@ -27,22 +29,37 @@ import org.telegram.ui.Components.LayoutHelper;
+ public class PlayerBarView extends FrameLayout implements NotificationCenter.NotificationCenterDelegate {
+ 
+     public static final int HEIGHT_DP = 52;
++    public static int heightDp(Context context) {
++        return BuildConfig.CONNECTED_ALPHA ? Math.max(HEIGHT_DP,
++                (int) Math.ceil(18 * context.getResources().getConfiguration().fontScale + 16)) : HEIGHT_DP;
++    }
+ 
+     private final CoverImage cover;
++    private final LinearLayout texts;
+     private final TextView titleView;
+     private final TextView artistView;
+     private final RingPlayButton playButton;
+     private final ImageView nextButton;
+     private final ImageView closeButton;
+     private final PlayerIcon nextIcon = PlayerIcon.fill(PlayerIcon.NEXT, 22);
+-    private final PlayerIcon closeIcon = PlayerIcon.stroke(PlayerIcon.CLOSE, 20);
++    private final PlayerIcon closeIcon = PlayerIcon.stroke(BuildConfig.CONNECTED_ALPHA ? PlayerIcon.CHEVRON_DOWN : PlayerIcon.CLOSE, 20);
++    private final Theme.ResourcesProvider resourcesProvider;
+     private MessageObject current;
++    private Runnable onCompact;
++    public void setOnCompact(Runnable action) { onCompact = action; }
+ 
+     public PlayerBarView(Context context, Theme.ResourcesProvider resourcesProvider, Runnable onOpen, Runnable onClose) {
+         super(context);
++        this.resourcesProvider = resourcesProvider;
+         PlayerColors theme = PlayerColors.fromSeed(PlayerColors.fallbackSeed(resourcesProvider), PlayerColors.isDark(resourcesProvider));
+ 
+-        setBackground(Theme.getSelectorDrawable(false));
++        if (BuildConfig.CONNECTED_ALPHA) {
++            GradientDrawable surface = new GradientDrawable();
++            surface.setCornerRadius(dp(20));
++            surface.setColor(theme.surface);
++            surface.setStroke(dp(1), theme.outlineVariant);
++            setBackground(surface);
++        } else setBackground(Theme.getSelectorDrawable(false));
+         setOnClickListener(v -> onOpen.run());
+         setContentDescription(getString(R.string.OEPlayerOpen));
+ 
+@@ -50,20 +67,20 @@ public class PlayerBarView extends FrameLayout implements NotificationCenter.Not
+         cover.setRadius(dp(10));
+         addView(cover, LayoutHelper.createFrame(36, 36, Gravity.LEFT | Gravity.CENTER_VERTICAL, 12, 0, 0, 0));
+ 
+-        LinearLayout texts = new LinearLayout(context);
++        texts = new LinearLayout(context);
+         texts.setOrientation(LinearLayout.VERTICAL);
+         titleView = new TextView(context);
+-        titleView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
++        titleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+         titleView.setTypeface(AndroidUtilities.bold());
+         titleView.setSingleLine(true);
+         titleView.setEllipsize(TextUtils.TruncateAt.END);
+         texts.addView(titleView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+         artistView = new TextView(context);
+-        artistView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 13);
++        artistView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+         artistView.setSingleLine(true);
+         artistView.setEllipsize(TextUtils.TruncateAt.END);
+         texts.addView(artistView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 1, 0, 0));
+-        addView(texts, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT | Gravity.CENTER_VERTICAL, 60, 0, 6 + 40 * 3 + 4, 0));
++        addView(texts, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT | Gravity.CENTER_VERTICAL, 60, 0, 6 + 48 * 3 + 4, 0));
+ 
+         LinearLayout buttons = new LinearLayout(context);
+         buttons.setOrientation(LinearLayout.HORIZONTAL);
+@@ -80,24 +97,40 @@ public class PlayerBarView extends FrameLayout implements NotificationCenter.Not
+                 mc.pauseMessage(mo);
+             }
+         });
+-        buttons.addView(playButton, LayoutHelper.createLinear(40, 40));
++        buttons.addView(playButton, LayoutHelper.createLinear(48, 48));
+         nextButton = new ImageView(context);
+         nextButton.setScaleType(ImageView.ScaleType.CENTER);
+         nextButton.setImageDrawable(nextIcon);
+         nextButton.setContentDescription(getString(R.string.Next));
+         nextButton.setOnClickListener(v -> MediaController.getInstance().playNextMessage());
+-        buttons.addView(nextButton, LayoutHelper.createLinear(40, 40));
++        buttons.addView(nextButton, LayoutHelper.createLinear(48, 48));
+         closeButton = new ImageView(context);
+         closeButton.setScaleType(ImageView.ScaleType.CENTER);
+         closeButton.setImageDrawable(closeIcon);
+-        closeButton.setContentDescription(getString(R.string.AccDescrClosePlayer));
+-        closeButton.setOnClickListener(v -> onClose.run());
+-        buttons.addView(closeButton, LayoutHelper.createLinear(40, 40));
+-        addView(buttons, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, 40, Gravity.RIGHT | Gravity.CENTER_VERTICAL, 0, 0, 6, 0));
+-
+-        int text = Theme.getColor(Theme.key_inappPlayerPerformer, resourcesProvider);
+-        int secondary = Theme.getColor(Theme.key_inappPlayerTitle, resourcesProvider);
+-        int icons = Theme.getColor(Theme.key_inappPlayerClose, resourcesProvider);
++        closeButton.setContentDescription(getString(BuildConfig.CONNECTED_ALPHA ? R.string.FlexyMusicCompact : R.string.AccDescrClosePlayer));
++        closeButton.setOnClickListener(v -> {
++            if (BuildConfig.CONNECTED_ALPHA && onCompact != null) onCompact.run();
++            else onClose.run();
++        });
++        closeButton.setOnLongClickListener(v -> { onClose.run(); return true; });
++        buttons.addView(closeButton, LayoutHelper.createLinear(48, 48));
++        addView(buttons, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, 48, Gravity.RIGHT | Gravity.CENTER_VERTICAL, 0, 0, 6, 0));
++
++        applyTheme();
++    }
++
++    @Override protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
++        boolean showNext = MeasureSpec.getSize(widthMeasureSpec) >= dp(320);
++        nextButton.setVisibility(showNext ? VISIBLE : GONE);
++        ((FrameLayout.LayoutParams) texts.getLayoutParams()).rightMargin = dp(10 + 48 * (showNext ? 3 : 2));
++        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
++    }
++
++    private void applyTheme() {
++        PlayerColors theme = PlayerColors.fromSeed(PlayerColors.fallbackSeed(resourcesProvider), PlayerColors.isDark(resourcesProvider));
++        int text = BuildConfig.CONNECTED_ALPHA ? theme.onSurface : Theme.getColor(Theme.key_inappPlayerPerformer, resourcesProvider);
++        int secondary = BuildConfig.CONNECTED_ALPHA ? theme.onSurfaceVariant : Theme.getColor(Theme.key_inappPlayerTitle, resourcesProvider);
++        int icons = BuildConfig.CONNECTED_ALPHA ? theme.onSurface : Theme.getColor(Theme.key_inappPlayerClose, resourcesProvider);
+         titleView.setTextColor(text);
+         artistView.setTextColor(ColorUtils.setAlphaComponent(secondary, 0xbf));
+         nextIcon.setColor(icons);
+@@ -106,17 +139,23 @@ public class PlayerBarView extends FrameLayout implements NotificationCenter.Not
+         nextButton.setBackground(Theme.createSelectorDrawable(ripple, Theme.RIPPLE_MASK_CIRCLE_20DP));
+         closeButton.setBackground(Theme.createSelectorDrawable(ripple, Theme.RIPPLE_MASK_CIRCLE_20DP));
+         playButton.setBackground(Theme.createSelectorDrawable(ripple, Theme.RIPPLE_MASK_CIRCLE_20DP));
+-        int accent = Theme.getColor(Theme.key_inappPlayerPlayPause, resourcesProvider);
++        int accent = BuildConfig.CONNECTED_ALPHA ? theme.primary : Theme.getColor(Theme.key_inappPlayerPlayPause, resourcesProvider);
+         playButton.setColors(accent, ColorUtils.setAlphaComponent(accent, 51), accent);
+         cover.setColors(theme.primaryContainer, theme.onPrimaryContainer);
++        if (BuildConfig.CONNECTED_ALPHA && getBackground() instanceof GradientDrawable) {
++            GradientDrawable bg = (GradientDrawable) getBackground();
++            bg.setColor(theme.surface); bg.setStroke(dp(1), theme.outlineVariant);
++        }
+     }
+ 
+     @Override
+     protected void onAttachedToWindow() {
+         super.onAttachedToWindow();
++        NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.didSetNewTheme);
+         for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
+             NotificationCenter nc = NotificationCenter.getInstance(a);
+             nc.addObserver(this, NotificationCenter.messagePlayingDidStart);
++            nc.addObserver(this, NotificationCenter.messagePlayingDidReset);
+             nc.addObserver(this, NotificationCenter.messagePlayingPlayStateChanged);
+             nc.addObserver(this, NotificationCenter.messagePlayingProgressDidChanged);
+             nc.addObserver(this, NotificationCenter.fileLoaded);
+@@ -128,9 +167,11 @@ public class PlayerBarView extends FrameLayout implements NotificationCenter.Not
+     @Override
+     protected void onDetachedFromWindow() {
+         super.onDetachedFromWindow();
++        NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.didSetNewTheme);
+         for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
+             NotificationCenter nc = NotificationCenter.getInstance(a);
+             nc.removeObserver(this, NotificationCenter.messagePlayingDidStart);
++            nc.removeObserver(this, NotificationCenter.messagePlayingDidReset);
+             nc.removeObserver(this, NotificationCenter.messagePlayingPlayStateChanged);
+             nc.removeObserver(this, NotificationCenter.messagePlayingProgressDidChanged);
+             nc.removeObserver(this, NotificationCenter.fileLoaded);
+@@ -140,6 +181,7 @@ public class PlayerBarView extends FrameLayout implements NotificationCenter.Not
+ 
+     @Override
+     public void didReceivedNotification(int id, int account, Object... args) {
++        if (id == NotificationCenter.didSetNewTheme) applyTheme();
+         if (id == NotificationCenter.messagePlayingProgressDidChanged) {
+             playButton.progressChanged();
+         } else if (id == NotificationCenter.audioInfoLoaded) {
+@@ -162,10 +204,15 @@ public class PlayerBarView extends FrameLayout implements NotificationCenter.Not
+         if (mo == null || !mo.isMusic()) {
+             return;
+         }
++        if (current != mo || !TextUtils.equals(titleView.getText(), mo.getMusicTitle())
++                || !TextUtils.equals(artistView.getText(), mo.getMusicAuthor())) {
++            titleView.setText(mo.getMusicTitle());
++            artistView.setText(mo.getMusicAuthor());
++            cover.setMessage(mo);
++        }
+         current = mo;
+-        titleView.setText(mo.getMusicTitle());
+-        artistView.setText(mo.getMusicAuthor());
+-        cover.setMessage(mo);
++        artistView.setVisibility(getResources().getConfiguration().fontScale > 1.5f ? GONE : VISIBLE);
++        setContentDescription(mo.getMusicTitle() + ", " + mo.getMusicAuthor());
+         playButton.setMessage(mo);
+         boolean paused = MediaController.getInstance().isMessagePaused();
+         playButton.setPlaying(!paused, isAttachedToWindow());
+diff --git a/TMessagesProj/src/main/java/app/exteraless/player/PlayerColors.java b/TMessagesProj/src/main/java/app/exteraless/player/PlayerColors.java
+index 695af01fd..a988ad341 100644
+--- a/TMessagesProj/src/main/java/app/exteraless/player/PlayerColors.java
++++ b/TMessagesProj/src/main/java/app/exteraless/player/PlayerColors.java
+@@ -1,6 +1,7 @@
+ package app.exteraless.player;
+ 
+ import android.graphics.Bitmap;
++import org.telegram.messenger.BuildConfig;
+ import android.graphics.Color;
+ import android.os.Build;
+ 
+@@ -58,7 +59,21 @@ public final class PlayerColors {
+                 primary, onPrimary, primaryContainer, onPrimaryContainer, secondaryContainer, onSecondaryContainer};
+     }
+ 
++    private static final PlayerColors PEARL = signature(false);
++    private static final PlayerColors MIDNIGHT = signature(true);
++
++    private static PlayerColors signature(boolean dark) {
++        int surface = SignatureMusicStyle.surface(dark);
++        int raised = SignatureMusicStyle.raised(dark);
++        int text = SignatureMusicStyle.text(dark);
++        return new PlayerColors(dark, new int[]{surface, surface, raised, raised,
++                text, SignatureMusicStyle.secondary(dark), SignatureMusicStyle.border(dark),
++                SignatureMusicStyle.accent(dark), dark ? 0xff072432 : 0xffffffff,
++                raised, text, raised, text});
++    }
++
+     public static PlayerColors fromSeed(int seed, boolean dark) {
++        if (BuildConfig.CONNECTED_ALPHA) return dark ? MIDNIGHT : PEARL;
+         DynamicScheme s = new SchemeTonalSpot(Hct.fromInt(seed), dark, 0.0);
+         return new PlayerColors(dark, new int[]{
+                 s.getSurface(), s.getSurfaceContainerLow(), s.getSurfaceContainer(), s.getSurfaceContainerHigh(),
+diff --git a/TMessagesProj/src/main/java/app/exteraless/player/PlayerMiniView.java b/TMessagesProj/src/main/java/app/exteraless/player/PlayerMiniView.java
+index 50193bc23..c9caeca9f 100644
+--- a/TMessagesProj/src/main/java/app/exteraless/player/PlayerMiniView.java
++++ b/TMessagesProj/src/main/java/app/exteraless/player/PlayerMiniView.java
+@@ -4,6 +4,7 @@ import static org.telegram.messenger.AndroidUtilities.dp;
+ import static org.telegram.messenger.LocaleController.getString;
+ 
+ import android.animation.ValueAnimator;
++import org.telegram.messenger.BuildConfig;
+ import android.content.Context;
+ import android.graphics.Bitmap;
+ import android.graphics.Canvas;
+@@ -39,6 +40,7 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
+ 
+     public static final int HEIGHT_DP = 64;
+ 
++    private SignatureMusicHost signatureHost;
+     private final BaseFragment fragment;
+     private final Theme.ResourcesProvider resourcesProvider;
+     private boolean dark;
+@@ -52,7 +54,7 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
+     private final ImageView nextButton;
+     private final ImageView closeButton;
+     private final PlayerIcon nextIcon = PlayerIcon.fill(PlayerIcon.NEXT, 24);
+-    private final PlayerIcon closeIcon = PlayerIcon.stroke(PlayerIcon.CLOSE, 22);
++    private final PlayerIcon closeIcon = PlayerIcon.stroke(BuildConfig.CONNECTED_ALPHA ? PlayerIcon.CHEVRON_DOWN : PlayerIcon.CLOSE, 22);
+     private PlayerColors colors;
+     private ValueAnimator showAnimator;
+     private MessageObject current;
+@@ -85,7 +87,7 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
+             }
+         });
+         card.setClipToOutline(true);
+-        card.setElevation(dp(6));
++        card.setElevation(dp(1));
+         card.setOnClickListener(v -> Md3Player.open(fragment, this));
+         card.setContentDescription(getString(R.string.OEPlayerOpen));
+         addView(card, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, HEIGHT_DP, Gravity.BOTTOM, 12, 0, 12, 12));
+@@ -97,13 +99,13 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
+         LinearLayout texts = new LinearLayout(context);
+         texts.setOrientation(LinearLayout.VERTICAL);
+         titleView = new TextView(context);
+-        titleView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
++        titleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+         titleView.setTypeface(AndroidUtilities.bold());
+         titleView.setSingleLine(true);
+         titleView.setEllipsize(TextUtils.TruncateAt.END);
+         texts.addView(titleView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+         artistView = new TextView(context);
+-        artistView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 13);
++        artistView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+         artistView.setSingleLine(true);
+         artistView.setEllipsize(TextUtils.TruncateAt.END);
+         artistView.setAlpha(0.8f);
+@@ -130,19 +132,28 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
+         nextButton.setImageDrawable(nextIcon);
+         nextButton.setContentDescription(getString(R.string.Next));
+         nextButton.setOnClickListener(v -> MediaController.getInstance().playNextMessage());
+-        card.addView(nextButton, LayoutHelper.createLinear(44, 48));
++        card.addView(nextButton, LayoutHelper.createLinear(48, 48));
+ 
+         closeButton = new ImageView(context);
+         closeButton.setScaleType(ImageView.ScaleType.CENTER);
+         closeButton.setImageDrawable(closeIcon);
+-        closeButton.setContentDescription(getString(R.string.AccDescrClosePlayer));
+-        closeButton.setOnClickListener(v -> MediaController.getInstance().cleanupPlayer(true, true));
+-        card.addView(closeButton, LayoutHelper.createLinear(44, 48));
++        closeButton.setContentDescription(getString(BuildConfig.CONNECTED_ALPHA ? R.string.FlexyMusicCompact : R.string.AccDescrClosePlayer));
++        closeButton.setOnClickListener(v -> {
++            if (BuildConfig.CONNECTED_ALPHA && signatureHost != null && signatureHost.canCompact()) SignatureMusicPresentation.setCompact(true);
++            else if (!BuildConfig.CONNECTED_ALPHA) MediaController.getInstance().cleanupPlayer(true, true);
++        });
++        closeButton.setOnLongClickListener(v -> { MediaController.getInstance().cleanupPlayer(true, true); return true; });
++        card.addView(closeButton, LayoutHelper.createLinear(48, 48));
+ 
+         applyColors(colors);
+         setVisibility(GONE);
+     }
+ 
++    @Override protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
++        nextButton.setVisibility(MeasureSpec.getSize(widthMeasureSpec) >= dp(320) ? VISIBLE : GONE);
++        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
++    }
++
+     public boolean canTransition() {
+         return isAttachedToWindow() && getVisibility() == VISIBLE && shown && showProgress >= 1f && hostFactor >= 0.99f && card.getWidth() > 0;
+     }
+@@ -241,6 +252,7 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
+     @Override
+     protected void onAttachedToWindow() {
+         super.onAttachedToWindow();
++        NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.didSetNewTheme);
+         for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
+             NotificationCenter nc = NotificationCenter.getInstance(a);
+             nc.addObserver(this, NotificationCenter.messagePlayingDidStart);
+@@ -250,12 +262,19 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
+             nc.addObserver(this, NotificationCenter.fileLoaded);
+             nc.addObserver(this, NotificationCenter.audioInfoLoaded);
+         }
++        if (BuildConfig.CONNECTED_ALPHA) {
++            signatureHost = new SignatureMusicHost(fragment, resourcesProvider, () -> update(false));
++            signatureHost.attach();
++        }
+         update(false);
+     }
+ 
+     @Override
+     protected void onDetachedFromWindow() {
++        if (signatureHost != null) { signatureHost.detach(); signatureHost = null; }
+         super.onDetachedFromWindow();
++        NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.didSetNewTheme);
++        if (showAnimator != null) { showAnimator.cancel(); showAnimator = null; }
+         for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
+             NotificationCenter nc = NotificationCenter.getInstance(a);
+             nc.removeObserver(this, NotificationCenter.messagePlayingDidStart);
+@@ -269,6 +288,7 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
+ 
+     @Override
+     public void didReceivedNotification(int id, int account, Object... args) {
++        if (signatureHost != null) signatureHost.update(Md3Player.miniEnabled());
+         if (id == NotificationCenter.messagePlayingProgressDidChanged) {
+             playButton.progressChanged();
+         } else if (id == NotificationCenter.audioInfoLoaded) {
+@@ -300,6 +320,11 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
+         checkThemeColors();
+         MessageObject mo = MediaController.getInstance().getPlayingMessageObject();
+         boolean want = Md3Player.miniEnabled() && mo != null && mo.isMusic() && mo.getId() != 0;
++        if (signatureHost != null) {
++            signatureHost.update(want);
++            closeButton.setEnabled(signatureHost.canCompact());
++            if (signatureHost.canCompact() && SignatureMusicPresentation.isCompact()) want = false;
++        }
+         if (want) {
+             bind(mo);
+         }
+@@ -308,10 +333,15 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
+     }
+ 
+     private void bind(MessageObject mo) {
++        if (current != mo || !TextUtils.equals(titleView.getText(), mo.getMusicTitle())
++                || !TextUtils.equals(artistView.getText(), mo.getMusicAuthor())) {
++            titleView.setText(mo.getMusicTitle());
++            artistView.setText(mo.getMusicAuthor());
++            cover.setMessage(mo);
++        }
+         current = mo;
+-        titleView.setText(mo.getMusicTitle());
+-        artistView.setText(mo.getMusicAuthor());
+-        cover.setMessage(mo);
++        artistView.setVisibility(getResources().getConfiguration().fontScale > 1.5f ? GONE : VISIBLE);
++        card.setContentDescription(mo.getMusicTitle() + ", " + mo.getMusicAuthor());
+         playButton.setMessage(mo);
+         playButton.setContentDescription(getString(MediaController.getInstance().isMessagePaused() ? R.string.AccActionPlay : R.string.AccActionPause));
+     }
+@@ -338,7 +368,7 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
+             applyTransform();
+             notifyOffset();
+         });
+-        showAnimator.setDuration(value ? 450 : 300);
++        showAnimator.setDuration(180);
+         showAnimator.setInterpolator(value ? new CubicBezierInterpolator(0.05, 0.7, 0.1, 1) : new CubicBezierInterpolator(0.3, 0, 0.8, 0.15));
+         showAnimator.start();
+     }
+@@ -346,6 +376,7 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
+     private void applyColors(PlayerColors c) {
+         colors = c;
+         cardBg.setColor(c.primaryContainer);
++        cardBg.setStroke(dp(1), c.outlineVariant);
+         if (Build.VERSION.SDK_INT >= 28) {
+             card.setOutlineSpotShadowColor(c.shadow());
+             card.setOutlineAmbientShadowColor(c.shadow());
+diff --git a/TMessagesProj/src/main/java/app/exteraless/player/PlayerQueueSheet.java b/TMessagesProj/src/main/java/app/exteraless/player/PlayerQueueSheet.java
+index a57a70048..3067778b7 100644
+--- a/TMessagesProj/src/main/java/app/exteraless/player/PlayerQueueSheet.java
++++ b/TMessagesProj/src/main/java/app/exteraless/player/PlayerQueueSheet.java
+@@ -41,11 +41,14 @@ import java.util.Locale;
+ 
+ public class PlayerQueueSheet extends BottomSheet implements NotificationCenter.NotificationCenterDelegate {
+ 
+-    private final PlayerColors colors;
++    private PlayerColors colors;
++    private final GradientDrawable sheetBg = new GradientDrawable();
+     private final int account;
+     private final FrameLayout root;
+     private final RecyclerListView list;
+     private final LinearLayoutManager layoutManager;
++    private final LinearLayout header;
++    private final TextView title;
+     private final TextView subtitle;
+     private final TextView chip;
+     private final GradientDrawable chipBg = new GradientDrawable();
+@@ -64,13 +67,20 @@ public class PlayerQueueSheet extends BottomSheet implements NotificationCenter.
+         account = playing != null ? playing.currentAccount : currentAccount;
+         currentAccount = account;
+ 
+-        GradientDrawable bg = new GradientDrawable();
++        GradientDrawable bg = sheetBg;
+         bg.setColor(colors.surfaceLow);
+         bg.setCornerRadii(new float[]{dp(28), dp(28), dp(28), dp(28), 0, 0, 0, 0});
+         root = new FrameLayout(context) {
+             @Override
+             protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+                 int h = (int) (MeasureSpec.getSize(heightMeasureSpec) * 0.78f);
++                if (header != null && list != null) {
++                    header.measure(MeasureSpec.makeMeasureSpec(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.EXACTLY),
++                            MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
++                    int headerHeight = Math.max(dp(72), header.getMeasuredHeight());
++                    header.getLayoutParams().height = headerHeight;
++                    ((FrameLayout.LayoutParams) list.getLayoutParams()).topMargin = dp(42) + headerHeight;
++                }
+                 super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(h, MeasureSpec.EXACTLY));
+             }
+ 
+@@ -98,27 +108,29 @@ public class PlayerQueueSheet extends BottomSheet implements NotificationCenter.
+         handle.setBackground(handleBg);
+         root.addView(handle, LayoutHelper.createFrame(32, 4, Gravity.CENTER_HORIZONTAL | Gravity.TOP, 0, 18, 0, 0));
+ 
+-        LinearLayout header = new LinearLayout(context);
+-        header.setOrientation(LinearLayout.HORIZONTAL);
++        header = new LinearLayout(context);
++        header.setOrientation(context.getResources().getConfiguration().fontScale > 1.5f ? LinearLayout.VERTICAL : LinearLayout.HORIZONTAL);
+         header.setGravity(Gravity.CENTER_VERTICAL);
+         header.setPadding(dp(24), 0, dp(24), 0);
+         LinearLayout titles = new LinearLayout(context);
+         titles.setOrientation(LinearLayout.VERTICAL);
+-        TextView title = new TextView(context);
+-        title.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 22);
++        title = new TextView(context);
++        title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
+         title.setTypeface(AndroidUtilities.bold());
+         title.setTextColor(colors.onSurface);
+         title.setText(getString(R.string.OEPlayerQueue));
+         titles.addView(title, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT));
+         subtitle = new TextView(context);
+-        subtitle.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
++        subtitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+         subtitle.setTextColor(colors.onSurfaceVariant);
+         subtitle.setSingleLine(true);
+         subtitle.setEllipsize(TextUtils.TruncateAt.END);
+         titles.addView(subtitle, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, 0, 2, 0, 0));
+-        header.addView(titles, LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1f));
++        header.addView(titles, context.getResources().getConfiguration().fontScale > 1.5f
++                ? LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT)
++                : LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1f));
+         chip = new TextView(context);
+-        chip.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
++        chip.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+         chip.setTypeface(AndroidUtilities.bold());
+         chip.setGravity(Gravity.CENTER_VERTICAL);
+         chip.setPadding(dp(12), 0, dp(16), 0);
+@@ -178,6 +190,7 @@ public class PlayerQueueSheet extends BottomSheet implements NotificationCenter.
+         super.show();
+         NotificationCenter nc = NotificationCenter.getInstance(account);
+         nc.addObserver(this, NotificationCenter.messagePlayingDidStart);
++        NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.didSetNewTheme);
+         nc.addObserver(this, NotificationCenter.messagePlayingPlayStateChanged);
+         nc.addObserver(this, NotificationCenter.messagePlayingDidReset);
+         nc.addObserver(this, NotificationCenter.moreMusicDidLoad);
+@@ -190,6 +203,7 @@ public class PlayerQueueSheet extends BottomSheet implements NotificationCenter.
+         super.dismiss();
+         NotificationCenter nc = NotificationCenter.getInstance(account);
+         nc.removeObserver(this, NotificationCenter.messagePlayingDidStart);
++        NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.didSetNewTheme);
+         nc.removeObserver(this, NotificationCenter.messagePlayingPlayStateChanged);
+         nc.removeObserver(this, NotificationCenter.messagePlayingDidReset);
+         nc.removeObserver(this, NotificationCenter.moreMusicDidLoad);
+@@ -198,6 +212,15 @@ public class PlayerQueueSheet extends BottomSheet implements NotificationCenter.
+ 
+     @Override
+     public void didReceivedNotification(int id, int account, Object... args) {
++        if (id == NotificationCenter.didSetNewTheme && org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) {
++            colors = PlayerColors.fromSeed(0, PlayerColors.isDark(resourcesProvider));
++            sheetBg.setColor(colors.surfaceLow);
++            title.setTextColor(colors.onSurface);
++            subtitle.setTextColor(colors.onSurfaceVariant);
++            updateChip();
++            adapter.notifyDataSetChanged();
++            return;
++        }
+         if (id == NotificationCenter.messagePlayingDidReset) {
+             MessageObject mo = MediaController.getInstance().getPlayingMessageObject();
+             if (mo == null || !mo.isMusic()) {
+@@ -312,7 +335,7 @@ public class PlayerQueueSheet extends BottomSheet implements NotificationCenter.
+         @Override
+         public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+             Row row = new Row(parent.getContext());
+-            row.setLayoutParams(new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(72)));
++            row.setLayoutParams(new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, Math.max(dp(72), (int) Math.ceil(42 * getContext().getResources().getDisplayMetrics().scaledDensity + dp(20)))));
+             return new RecyclerListView.Holder(row);
+         }
+ 
+@@ -349,19 +372,19 @@ public class PlayerQueueSheet extends BottomSheet implements NotificationCenter.
+             LinearLayout texts = new LinearLayout(context);
+             texts.setOrientation(LinearLayout.VERTICAL);
+             title = new TextView(context);
+-            title.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
++            title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+             title.setTypeface(AndroidUtilities.bold());
+             title.setSingleLine(true);
+             title.setEllipsize(TextUtils.TruncateAt.END);
+             texts.addView(title, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+             artist = new TextView(context);
+-            artist.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
++            artist.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+             artist.setSingleLine(true);
+             artist.setEllipsize(TextUtils.TruncateAt.END);
+             texts.addView(artist, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 2, 0, 0));
+             addView(texts, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT | Gravity.CENTER_VERTICAL, 66, 0, 52, 0));
+             duration = new TextView(context);
+-            duration.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 13);
++            duration.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+             duration.setFontFeatureSettings("tnum");
+             duration.setTextColor(colors.onSurfaceVariant);
+             addView(duration, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.RIGHT | Gravity.CENTER_VERTICAL));
+@@ -385,6 +408,7 @@ public class PlayerQueueSheet extends BottomSheet implements NotificationCenter.
+         void updateState() {
+             boolean current = message != null && message == currentItem();
+             bg.setColor(current ? colors.secondaryContainer : 0);
++            bg.setStroke(current ? dp(1) : 0, colors.outlineVariant);
+             title.setTextColor(current ? colors.onSecondaryContainer : colors.onSurface);
+             artist.setTextColor(current ? colors.onSecondaryContainer : colors.onSurfaceVariant);
+             duration.setVisibility(current ? GONE : VISIBLE);
+@@ -396,6 +420,8 @@ public class PlayerQueueSheet extends BottomSheet implements NotificationCenter.
+     private class Equalizer extends View {
+ 
+         private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
++        private final float[] still = {6, 11, 8};
++        private final Runnable frame = this::invalidate;
+         private final RectF rect = new RectF();
+         private boolean playing;
+         private float phase;
+@@ -414,15 +440,22 @@ public class PlayerQueueSheet extends BottomSheet implements NotificationCenter.
+             }
+         }
+ 
++        @Override protected void onDetachedFromWindow() {
++            removeCallbacks(frame);
++            lastFrame = 0;
++            super.onDetachedFromWindow();
++        }
++
+         @Override
+         protected void onDraw(@NonNull Canvas canvas) {
++            paint.setColor(colors.primary);
+             long now = SystemClock.elapsedRealtime();
+             float dt = lastFrame == 0 ? 0.016f : Math.min(0.05f, (now - lastFrame) / 1000f);
+             lastFrame = now;
+             if (playing) {
+                 phase += 6f * dt;
+             }
+-            float[] still = {6, 11, 8};
++
+             float barW = dp(4);
+             float gap = dp(3);
+             float total = barW * 3 + gap * 2;
+@@ -434,8 +467,9 @@ public class PlayerQueueSheet extends BottomSheet implements NotificationCenter.
+                 canvas.drawRoundRect(rect, dp(2), dp(2), paint);
+                 x += barW + gap;
+             }
+-            if (playing) {
+-                postInvalidateOnAnimation();
++            removeCallbacks(frame);
++            if (playing && isShown() && getWindowVisibility() == VISIBLE && !org.telegram.messenger.LiteMode.isPowerSaverApplied()) {
++                postDelayed(frame, 33);
+             } else {
+                 lastFrame = 0;
+             }
+diff --git a/TMessagesProj/src/main/java/app/exteraless/player/PlayerSheet.java b/TMessagesProj/src/main/java/app/exteraless/player/PlayerSheet.java
+index 4aefefd95..01e521446 100644
+--- a/TMessagesProj/src/main/java/app/exteraless/player/PlayerSheet.java
++++ b/TMessagesProj/src/main/java/app/exteraless/player/PlayerSheet.java
+@@ -30,6 +30,8 @@ import android.widget.FrameLayout;
+ import android.widget.ImageView;
+ import android.widget.LinearLayout;
+ import android.widget.TextView;
++import android.widget.ScrollView;
++import org.telegram.messenger.BuildConfig;
+ 
+ import androidx.annotation.NonNull;
+ import androidx.core.graphics.ColorUtils;
+@@ -73,10 +75,11 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
+ 
+     private final LaunchActivity activity;
+     private final int account;
+-    private final boolean dark;
++    private boolean dark;
+     private final int fallbackSeed;
+     private final FrameLayout root;
+     private final PlayerLayout layout;
++    private ScrollView signatureScroll;
+     private final FrameLayout header;
+     private final ImageView collapseButton;
+     private final ImageView moreButton;
+@@ -252,7 +255,16 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
+         containerView = root;
+ 
+         layout = new PlayerLayout(context);
+-        root.addView(layout, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
++        if (BuildConfig.CONNECTED_ALPHA) {
++            ScrollView scroll = signatureScroll = new ScrollView(context);
++            scroll.setFillViewport(true);
++            scroll.setClipToPadding(false);
++            scroll.setVerticalScrollBarEnabled(false);
++            scroll.addView(layout, new ScrollView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
++            root.addView(scroll, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
++        } else {
++            root.addView(layout, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
++        }
+ 
+         header = new FrameLayout(context);
+         collapseButton = new ImageView(context);
+@@ -271,14 +283,14 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
+         headerCenter.setOrientation(LinearLayout.VERTICAL);
+         headerCenter.setGravity(Gravity.CENTER_HORIZONTAL);
+         headerLabel = new TextView(context);
+-        headerLabel.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12);
++        headerLabel.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+         headerLabel.setLetterSpacing(0.08f);
+-        headerLabel.setAllCaps(true);
++        headerLabel.setAllCaps(!BuildConfig.CONNECTED_ALPHA);
+         headerLabel.setSingleLine(true);
+         headerLabel.setEllipsize(TextUtils.TruncateAt.END);
+         headerCenter.addView(headerLabel, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL));
+         headerTitle = new TextView(context);
+-        headerTitle.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
++        headerTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+         headerTitle.setTypeface(AndroidUtilities.bold());
+         headerTitle.setSingleLine(true);
+         headerTitle.setEllipsize(TextUtils.TruncateAt.END);
+@@ -288,14 +300,14 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
+ 
+         cover = new CoverImage(context, 120);
+         cover.setRadius(dp(28));
+-        cover.setListener(fallbackSeed, this::onSeed);
++        if (!BuildConfig.CONNECTED_ALPHA) cover.setListener(fallbackSeed, this::onSeed);
+         cover.setOutlineProvider(new ViewOutlineProvider() {
+             @Override
+             public void getOutline(View view, Outline outline) {
+                 outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), dp(28));
+             }
+         });
+-        cover.setElevation(dp(14));
++        cover.setElevation(dp(BuildConfig.CONNECTED_ALPHA ? 2 : 14));
+         cover.setOnTouchListener(this::onCoverTouch);
+         layout.addView(cover);
+ 
+@@ -305,13 +317,13 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
+         LinearLayout titles = new LinearLayout(context);
+         titles.setOrientation(LinearLayout.VERTICAL);
+         titleView = new TextView(context);
+-        titleView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 26);
++        titleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, BuildConfig.CONNECTED_ALPHA ? 24 : 26);
+         titleView.setTypeface(AndroidUtilities.bold());
+         titleView.setSingleLine(true);
+         titleView.setEllipsize(TextUtils.TruncateAt.END);
+         titles.addView(titleView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+         artistView = new TextView(context);
+-        artistView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
++        artistView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+         artistView.setSingleLine(true);
+         artistView.setEllipsize(TextUtils.TruncateAt.END);
+         titles.addView(artistView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 4, 0, 0));
+@@ -334,13 +346,13 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
+         LinearLayout smallTitles = new LinearLayout(context);
+         smallTitles.setOrientation(LinearLayout.VERTICAL);
+         smallTitle = new TextView(context);
+-        smallTitle.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
++        smallTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+         smallTitle.setTypeface(AndroidUtilities.bold());
+         smallTitle.setSingleLine(true);
+         smallTitle.setEllipsize(TextUtils.TruncateAt.END);
+         smallTitles.addView(smallTitle, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+         smallArtist = new TextView(context);
+-        smallArtist.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
++        smallArtist.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+         smallArtist.setSingleLine(true);
+         smallArtist.setEllipsize(TextUtils.TruncateAt.END);
+         smallTitles.addView(smallArtist, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 2, 0, 0));
+@@ -366,7 +378,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
+         });
+         lyricsPanel.addView(lyricsView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 0, 1f, 0, 16, 0, 0));
+         sourceView = new TextView(context);
+-        sourceView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12);
++        sourceView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+         sourceView.setSingleLine(true);
+         lyricsPanel.addView(sourceView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 16, 0, 8, 0, 0));
+         layout.addView(lyricsPanel);
+@@ -408,11 +420,11 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
+         timeRow = new LinearLayout(context);
+         timeRow.setOrientation(LinearLayout.HORIZONTAL);
+         timeNow = new TextView(context);
+-        timeNow.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 13);
++        timeNow.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+         timeNow.setFontFeatureSettings("tnum");
+         timeRow.addView(timeNow, LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1f));
+         timeLeft = new TextView(context);
+-        timeLeft.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 13);
++        timeLeft.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+         timeLeft.setFontFeatureSettings("tnum");
+         timeLeft.setGravity(Gravity.RIGHT);
+         timeRow.addView(timeLeft, LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1f));
+@@ -452,10 +464,23 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
+         queueButton.setRadius(dp(8), dp(26), false);
+         queueButton.setOnClickListener(v -> openQueue());
+         group.addView(queueButton, LayoutHelper.createLinear(0, 52, 1f));
++        if (BuildConfig.CONNECTED_ALPHA) {
++            for (int i = 0; i < group.getChildCount(); i++) {
++                ((MorphButton) group.getChildAt(i)).setStackedLabel(true);
++                ((MorphButton) group.getChildAt(i)).setRadius(dp(18), false);
++            }
++            MorphButton options = new MorphButton(context, PlayerIcon.fill(PlayerIcon.MORE, 20));
++            options.setText(getString(R.string.AccDescrMoreOptions));
++            options.setStackedLabel(true);
++            options.setRadius(dp(18), false);
++            options.setColors(colors.surfaceHigh, colors.onSurface, colors.surfaceHigh, colors.onSurface);
++            options.setOnClickListener(this::showMenu);
++            group.addView(options, LayoutHelper.createLinear(0, 52, 1f, 4, 0, 0, 0));
++        }
+         layout.addView(group);
+ 
+         bubble = new TextView(context);
+-        bubble.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
++        bubble.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+         bubble.setTypeface(AndroidUtilities.bold());
+         bubble.setFontFeatureSettings("tnum");
+         bubble.setPadding(dp(12), dp(6), dp(12), dp(6));
+@@ -489,7 +514,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
+         if (morphProgress >= 0f || closing) {
+             return false;
+         }
+-        return !touchInLyrics || !lyricsView.canScrollUp();
++        return (signatureScroll == null || signatureScroll.getScrollY() == 0) && (!touchInLyrics || !lyricsView.canScrollUp());
+     }
+ 
+     @Override
+@@ -505,6 +530,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
+         nc.addObserver(this, NotificationCenter.audioInfoLoaded);
+         nc.addObserver(this, NotificationCenter.musicIdsLoaded);
+         NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.messagePlayingSpeedChanged);
++        NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.didSetNewTheme);
+         applySystemBars(true);
+     }
+ 
+@@ -916,9 +942,13 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
+         nc.removeObserver(this, NotificationCenter.audioInfoLoaded);
+         nc.removeObserver(this, NotificationCenter.musicIdsLoaded);
+         NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.messagePlayingSpeedChanged);
+-        if (colorAnimator != null) {
+-            colorAnimator.cancel();
+-        }
++        NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.didSetNewTheme);
++        if (colorAnimator != null) colorAnimator.cancel();
++        if (lyricsAnimator != null) { lyricsAnimator.removeAllListeners(); lyricsAnimator.cancel(); }
++        cover.animate().cancel();
++        bubble.animate().cancel();
++        cover.setListener(fallbackSeed, null);
++        seekBar.setPlaying(false);
+     }
+ 
+     public static void onModesChanged() {
+@@ -929,6 +959,11 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
+ 
+     @Override
+     public void didReceivedNotification(int id, int account, Object... args) {
++        if (id == NotificationCenter.didSetNewTheme && BuildConfig.CONNECTED_ALPHA) {
++            dark = PlayerColors.isDark(resourcesProvider);
++            animateColors(PlayerColors.fromSeed(0, dark), false);
++            return;
++        }
+         if (id == NotificationCenter.messagePlayingDidStart) {
+             MessageObject mo = MediaController.getInstance().getPlayingMessageObject();
+             if (mo == null || !mo.isMusic()) {
+@@ -990,11 +1025,13 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
+         cover.setMessage(mo);
+         smallCover.setMessage(mo);
+         if (changed) {
+-            Integer seed = PlayerArt.cachedSeed(mo);
+-            if (seed != null) {
+-                animateColors(PlayerColors.fromSeed(seed, dark), animated);
+-            } else if (PlayerArt.fileCover(mo) == null && PlayerArt.fullLocation(mo) == null && PlayerArt.thumbLocation(mo) == null) {
+-                animateColors(PlayerColors.fromSeed(fallbackSeed, dark), animated);
++            if (!BuildConfig.CONNECTED_ALPHA) {
++                Integer seed = PlayerArt.cachedSeed(mo);
++                if (seed != null) {
++                    animateColors(PlayerColors.fromSeed(seed, dark), animated);
++                } else if (PlayerArt.fileCover(mo) == null && PlayerArt.fullLocation(mo) == null && PlayerArt.thumbLocation(mo) == null) {
++                    animateColors(PlayerColors.fromSeed(fallbackSeed, dark), animated);
++                }
+             }
+             lyricsKey = null;
+             if (lyricsMode) {
+@@ -1214,7 +1251,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
+         }
+         lyricsMode = value;
+         lyricsButton.setActive(value, animated);
+-        lyricsButton.setRadius(dp(value ? 26 : 8), animated);
++        lyricsButton.setRadius(dp(BuildConfig.CONNECTED_ALPHA ? 18 : value ? 26 : 8), animated);
+         if (value) {
+             loadLyrics();
+             MessageObject mo = current;
+@@ -1241,7 +1278,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
+                 setLyricsFraction(target);
+             }
+         });
+-        lyricsAnimator.setDuration(360);
++        lyricsAnimator.setDuration(BuildConfig.CONNECTED_ALPHA ? 180 : 360);
+         lyricsAnimator.setInterpolator(EMPHASIZED);
+         lyricsAnimator.start();
+     }
+@@ -1309,7 +1346,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
+         lyricsView.showState(LyricsView.STATE_LOADING);
+         sourceView.setText(null);
+         OnlineLyrics.loadCached(q, (lyrics, status) -> {
+-            if (!TextUtils.equals(key, currentKey)) {
++            if (detached || !TextUtils.equals(key, currentKey)) {
+                 return;
+             }
+             if (lyrics != null) {
+@@ -1340,7 +1377,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
+         lyricsView.showState(LyricsView.STATE_LOADING);
+         sourceView.setText(null);
+         OnlineLyrics.fetch(q, (lyrics, status) -> {
+-            if (!TextUtils.equals(key, currentKey)) {
++            if (detached || !TextUtils.equals(key, currentKey)) {
+                 return;
+             }
+             if (lyrics != null) {
+@@ -1427,6 +1464,11 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
+             PlayerActions.showInChat(activity, mo);
+         });
+         o.addGap();
++        if (BuildConfig.CONNECTED_ALPHA) o.add(R.drawable.msg_close, getString(R.string.AccDescrClosePlayer), () -> {
++            o.dismiss();
++            MediaController.getInstance().cleanupPlayer(true, true);
++            dismissImmediately();
++        });
+         o.add(R.drawable.msg_filled_data_music, getString(R.string.OEPlayerClassic), () -> {
+             o.dismiss();
+             openClassic();
+@@ -1524,6 +1566,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
+             applyColors(target);
+             return;
+         }
++        if (colors == target) return;
+         PlayerColors from = colors;
+         colorAnimator = ValueAnimator.ofFloat(0f, 1f);
+         colorAnimator.addUpdateListener(a -> applyColors(PlayerColors.lerp(from, target, (float) a.getAnimatedValue())));
+@@ -1568,6 +1611,8 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
+         speedButton.setColors(c.surfaceHigh, c.onSurface, c.surfaceHigh, c.onSurface);
+         lyricsButton.setColors(c.surfaceHigh, c.onSurface, c.primary, c.onPrimary);
+         queueButton.setColors(c.surfaceHigh, c.onSurface, c.surfaceHigh, c.onSurface);
++        if (BuildConfig.CONNECTED_ALPHA && group.getChildCount() > 3)
++            ((MorphButton) group.getChildAt(3)).setColors(c.surfaceHigh, c.onSurface, c.surfaceHigh, c.onSurface);
+         applySystemBars(false);
+     }
+ 
+@@ -1618,18 +1663,25 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
+             seekBar.measure(exactW, MeasureSpec.makeMeasureSpec(dp(40), MeasureSpec.EXACTLY));
+             timeRow.measure(exactW, MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+             controls.measure(exactW, MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+-            group.measure(exactW, MeasureSpec.makeMeasureSpec(dp(52), MeasureSpec.EXACTLY));
++            int groupHeight = BuildConfig.CONNECTED_ALPHA ? Math.max(dp(72), (int) Math.ceil(dp(38) + 16 * getResources().getDisplayMetrics().scaledDensity)) : dp(52);
++            if (BuildConfig.CONNECTED_ALPHA) {
++                for (int i = 0; i < group.getChildCount(); i++) group.getChildAt(i).getLayoutParams().height = groupHeight;
++            }
++            group.measure(exactW, MeasureSpec.makeMeasureSpec(groupHeight, MeasureSpec.EXACTLY));
+             titleRow.measure(exactW, MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+             bubble.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+-            int fixed = dp(56) + dp(6) + dp(40) + timeRow.getMeasuredHeight() + dp(12) + controls.getMeasuredHeight() + dp(52) + dp(28) + dp(16);
++            int fixed = dp(56) + dp(6) + dp(40) + timeRow.getMeasuredHeight() + dp(12) + controls.getMeasuredHeight() + group.getMeasuredHeight() + dp(28) + dp(16);
+             int available = height - top - bottom - fixed;
+             int titleH = titleRow.getMeasuredHeight();
+-            coverSize = Math.max(dp(96), Math.min(contentW, available - dp(16) - dp(26) - titleH));
++            coverSize = BuildConfig.CONNECTED_ALPHA
++                    ? SignatureMusicStyle.cover(contentW, available - dp(42) - titleH, dp(96))
++                    : Math.max(dp(96), Math.min(contentW, available - dp(16) - dp(26) - titleH));
+             stageHeight = dp(16) + coverSize + dp(26) + titleH;
+             int coverSpec = MeasureSpec.makeMeasureSpec(coverSize, MeasureSpec.EXACTLY);
+             cover.measure(coverSpec, coverSpec);
+             lyricsPanel.measure(exactW, MeasureSpec.makeMeasureSpec(stageHeight, MeasureSpec.EXACTLY));
+-            setMeasuredDimension(width, height);
++            int minimumHeight = top + bottom + fixed + dp(42) + titleH + coverSize;
++            setMeasuredDimension(width, BuildConfig.CONNECTED_ALPHA ? Math.max(height, minimumHeight) : height);
+         }
+ 
+         @Override
+@@ -1657,8 +1709,8 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
+             timeRow.layout(side, y, side + contentW, y + timeRow.getMeasuredHeight());
+             y += timeRow.getMeasuredHeight() + dp(12);
+             controls.layout(side, y, side + contentW, y + controls.getMeasuredHeight());
+-            int groupTop = height - bottom - dp(28) - dp(52);
+-            group.layout(side, groupTop, side + contentW, groupTop + dp(52));
++            int groupTop = height - bottom - dp(28) - group.getMeasuredHeight();
++            group.layout(side, groupTop, side + contentW, groupTop + group.getMeasuredHeight());
+             if (seeking) {
+                 layoutBubble();
+             }
+diff --git a/TMessagesProj/src/main/java/app/exteraless/player/WavySeekBar.java b/TMessagesProj/src/main/java/app/exteraless/player/WavySeekBar.java
+index f5c585c4a..7dc236a88 100644
+--- a/TMessagesProj/src/main/java/app/exteraless/player/WavySeekBar.java
++++ b/TMessagesProj/src/main/java/app/exteraless/player/WavySeekBar.java
+@@ -10,6 +10,8 @@ import android.graphics.Path;
+ import android.graphics.RectF;
+ import android.os.Bundle;
+ import android.os.SystemClock;
++import org.telegram.messenger.BuildConfig;
++import org.telegram.messenger.LiteMode;
+ import android.view.HapticFeedbackConstants;
+ import android.view.MotionEvent;
+ import android.view.View;
+@@ -42,7 +44,8 @@ public class WavySeekBar extends View {
+     private float amplitude;
+     private float phase;
+     private long lastFrame;
+-    private float maxAmplitude = dp(4);
++    private float maxAmplitude = dp(BuildConfig.CONNECTED_ALPHA ? 3 : 4);
++    private final Runnable waveFrame = this::invalidate;
+ 
+     public WavySeekBar(Context context) {
+         super(context);
+@@ -167,7 +170,8 @@ public class WavySeekBar extends View {
+         long now = SystemClock.elapsedRealtime();
+         float dt = lastFrame == 0 ? 0.016f : Math.min(0.05f, (now - lastFrame) / 1000f);
+         lastFrame = now;
+-        float targetAmp = playing ? maxAmplitude : 0f;
++        boolean visible = isShown() && getWindowVisibility() == VISIBLE;
++        float targetAmp = playing && visible && !LiteMode.isPowerSaverApplied() ? maxAmplitude : 0f;
+         amplitude += (targetAmp - amplitude) * (1f - (float) Math.pow(0.85, dt / 0.04f));
+         if (Math.abs(amplitude - targetAmp) < dpf2(0.05f)) {
+             amplitude = targetAmp;
+@@ -212,26 +216,51 @@ public class WavySeekBar extends View {
+         }
+         canvas.drawCircle(stopX, cy, dp(2), fillPaint);
+         rect.set(x - thumbW / 2f, cy - dp(14), x + thumbW / 2f, cy + dp(14));
+-        canvas.drawRoundRect(rect, dpf2(1.5f), dpf2(1.5f), fillPaint);
++        if (BuildConfig.CONNECTED_ALPHA) canvas.drawCircle(x, cy, dp(dragging ? 9 : 7), fillPaint);
++        else canvas.drawRoundRect(rect, dpf2(1.5f), dpf2(1.5f), fillPaint);
+ 
+-        if (amplitude > 0f || targetAmp != amplitude) {
+-            postInvalidateOnAnimation();
++        removeCallbacks(waveFrame);
++        if (visible && (amplitude > 0f || targetAmp != amplitude)) {
++            postDelayed(waveFrame, 33);
+         } else {
+             lastFrame = 0;
+         }
+     }
+ 
++    @Override
++    protected void onDetachedFromWindow() {
++        removeCallbacks(waveFrame);
++        lastFrame = 0;
++        super.onDetachedFromWindow();
++    }
++
++    @Override
++    protected void onVisibilityChanged(View changedView, int visibility) {
++        super.onVisibilityChanged(changedView, visibility);
++        removeCallbacks(waveFrame);
++        lastFrame = 0;
++        if (isShown()) invalidate();
++    }
++
+     @Override
+     public void onInitializeAccessibilityNodeInfo(AccessibilityNodeInfo info) {
+         super.onInitializeAccessibilityNodeInfo(info);
+         info.setClassName("android.widget.SeekBar");
+         info.setRangeInfo(AccessibilityNodeInfo.RangeInfo.obtain(AccessibilityNodeInfo.RangeInfo.RANGE_TYPE_PERCENT, 0, 100, getProgress() * 100f));
++        info.addAction(AccessibilityNodeInfo.AccessibilityAction.ACTION_SET_PROGRESS);
+         info.addAction(AccessibilityNodeInfo.AccessibilityAction.ACTION_SCROLL_FORWARD);
+         info.addAction(AccessibilityNodeInfo.AccessibilityAction.ACTION_SCROLL_BACKWARD);
+     }
+ 
+     @Override
+     public boolean performAccessibilityAction(int action, Bundle arguments) {
++        if (!isEnabled()) return false;
++        if (action == android.R.id.accessibilityActionSetProgress && arguments != null) {
++            progress = Math.max(0f, Math.min(1f, arguments.getFloat(AccessibilityNodeInfo.ACTION_ARGUMENT_PROGRESS_VALUE) / 100f));
++            if (delegate != null) delegate.onSeekEnd(progress, true);
++            invalidate();
++            return true;
++        }
+         if (action == AccessibilityNodeInfo.ACTION_SCROLL_FORWARD || action == AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD) {
+             float value = Math.max(0f, Math.min(1f, progress + (action == AccessibilityNodeInfo.ACTION_SCROLL_FORWARD ? 0.05f : -0.05f)));
+             progress = value;
+diff --git a/TMessagesProj/src/main/java/org/telegram/ui/Components/FragmentContextView.java b/TMessagesProj/src/main/java/org/telegram/ui/Components/FragmentContextView.java
+index c08bff8a9..b5e7ff629 100644
+--- a/TMessagesProj/src/main/java/org/telegram/ui/Components/FragmentContextView.java
++++ b/TMessagesProj/src/main/java/org/telegram/ui/Components/FragmentContextView.java
+@@ -1196,6 +1196,7 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
+             }
+         }
+         currentStyle = style;
++        if (signatureMusicHost != null) signatureMusicHost.update(style == STYLE_AUDIO_PLAYER && app.exteraless.player.Md3Player.miniEnabled());
+         md3Music = computeMd3Music();
+         if (!md3Music) {
+             if (md3Bar != null) {
+@@ -1414,6 +1415,7 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
+ 
+     @Override
+     protected void onDetachedFromWindow() {
++        if (signatureMusicHost != null) { signatureMusicHost.detach(); signatureMusicHost = null; }
+         super.onDetachedFromWindow();
+         if (animatorSet != null) {
+             animatorSet.cancel();
+@@ -1465,6 +1467,11 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
+     protected void onAttachedToWindow() {
+         super.onAttachedToWindow();
+         removeObservers();
++        if (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA && !isLocation
++                && (fragment.getArguments() == null || !fragment.getArguments().getBoolean("hasMainTabs", false))) {
++            signatureMusicHost = new app.exteraless.player.SignatureMusicHost(fragment, resourcesProvider, () -> checkPlayer(false));
++            signatureMusicHost.attach();
++        }
+ 
+         if (isLocation) {
+             globalObserversGroup = NotificationCenter.getGlobalInstance()
+@@ -1490,6 +1497,7 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
+             globalObserversGroup = NotificationCenter.getGlobalInstance()
+                 .createObserversGroup(this)
+                 .add(NotificationCenter.messagePlayingSpeedChanged)
++                .add(NotificationCenter.didSetNewTheme)
+                 .add(NotificationCenter.didStartedCall)
+                 .add(NotificationCenter.didEndCall)
+                 .add(NotificationCenter.webRtcSpeakerAmplitudeEvent)
+@@ -1546,6 +1554,10 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
+ 
+     @Override
+     public void didReceivedNotification(int id, int account, Object... args) {
++        if (id == NotificationCenter.didSetNewTheme) {
++            if (signatureMusicHost != null) signatureMusicHost.update(currentStyle == STYLE_AUDIO_PLAYER && app.exteraless.player.Md3Player.miniEnabled());
++            return;
++        }
+         if (id == NotificationCenter.liveLocationsChanged) {
+             checkLiveLocation(false);
+         } else if (id == NotificationCenter.liveStoryUpdated) {
+@@ -1639,9 +1651,10 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
+     float micAmplitude;
+ 
+     public int getStyleHeight() {
+-        return currentStyle == STYLE_INACTIVE_GROUP_CALL ? 48 : md3Music ? app.exteraless.player.PlayerBarView.HEIGHT_DP : 36;
++        return currentStyle == STYLE_INACTIVE_GROUP_CALL ? 48 : md3Music ? app.exteraless.player.PlayerBarView.heightDp(getContext()) : 36;
+     }
+ 
++    private app.exteraless.player.SignatureMusicHost signatureMusicHost;
+     private app.exteraless.player.PlayerBarView md3Bar;
+     private boolean md3Music;
+ 
+@@ -1656,7 +1669,11 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
+         md3Music = value;
+         if (value && md3Bar == null) {
+             md3Bar = new app.exteraless.player.PlayerBarView(getContext(), resourcesProvider, this::performClick, () -> closeButton.performClick());
+-            addView(md3Bar, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, app.exteraless.player.PlayerBarView.HEIGHT_DP, Gravity.TOP | Gravity.LEFT));
++            md3Bar.setOnCompact(() -> {
++                if (signatureMusicHost != null && signatureMusicHost.canCompact())
++                    app.exteraless.player.SignatureMusicPresentation.setCompact(true);
++            });
++            addView(md3Bar, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, app.exteraless.player.PlayerBarView.heightDp(getContext()), Gravity.TOP | Gravity.LEFT));
+         }
+         if (md3Bar != null) {
+             md3Bar.setVisibility(value ? VISIBLE : GONE);
+@@ -1890,6 +1907,11 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
+     }
+ 
+     private void checkPlayer(boolean create) {
++        if (signatureMusicHost != null) signatureMusicHost.update(
++                app.exteraless.player.Md3Player.miniEnabled()
++                && currentStyle != STYLE_ACTIVE_GROUP_CALL && currentStyle != STYLE_CONNECTING_GROUP_CALL
++                && currentStyle != STYLE_INACTIVE_GROUP_CALL && currentStyle != STYLE_IMPORTING_MESSAGES);
++
+         if (visible && (currentStyle == STYLE_CONNECTING_GROUP_CALL || currentStyle == STYLE_ACTIVE_GROUP_CALL || (currentStyle == STYLE_INACTIVE_GROUP_CALL || currentStyle == STYLE_IMPORTING_MESSAGES) && !isPlayingVoice())) {
+             return;
+         }
+@@ -1901,7 +1923,10 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
+             }
+         }
+         boolean wasVisible = visible;
+-        if (messageObject == null || messageObject.getId() == 0 || messageObject.isVideo() || app.exteraless.player.Md3Player.hidesContextPlayer(fragment, messageObject)) {
++        if (messageObject == null || messageObject.getId() == 0 || messageObject.isVideo() || (signatureMusicHost != null && signatureMusicHost.canCompact()
++                && app.exteraless.player.SignatureMusicPresentation.isCompact() && messageObject.isMusic()
++                && app.exteraless.player.Md3Player.miniEnabled())
++                || app.exteraless.player.Md3Player.hidesContextPlayer(fragment, messageObject)) {
+             lastMessageObject = null;
+             boolean callAvailable = supportsCalls && VoIPService.getSharedInstance() != null && !VoIPService.getSharedInstance().isHangingUp() && VoIPService.getSharedInstance().getCallState() != VoIPService.STATE_WAITING_INCOMING && !GroupCallPip.isShowing();
+             if (!isPlayingVoice() && !callAvailable && chatActivity != null && !GroupCallPip.isShowing()) {

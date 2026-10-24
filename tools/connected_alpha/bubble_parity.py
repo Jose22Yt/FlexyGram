@@ -4,6 +4,8 @@ import tempfile
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 def restore_bubble_presentation(path, actual):
+    from release_1271_contract import restore1270
+    actual = restore1270(path, actual)
     patch = (ROOT/'tools/connected_alpha/bubble_native_presentation.patch').read_bytes()
     prefix = ('diff --git a/' + path + ' b/' + path + '\n').encode()
     sections = [b'diff --git ' + p for p in patch.split(b'diff --git ')[1:]]

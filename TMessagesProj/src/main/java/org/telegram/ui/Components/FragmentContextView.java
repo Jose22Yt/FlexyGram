@@ -1196,6 +1196,7 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
             }
         }
         currentStyle = style;
+        if (signatureMusicHost != null) signatureMusicHost.update(style == STYLE_AUDIO_PLAYER && app.exteraless.player.Md3Player.miniEnabled());
         md3Music = computeMd3Music();
         if (!md3Music) {
             if (md3Bar != null) {
@@ -1414,6 +1415,7 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
 
     @Override
     protected void onDetachedFromWindow() {
+        if (signatureMusicHost != null) { signatureMusicHost.detach(); signatureMusicHost = null; }
         super.onDetachedFromWindow();
         if (animatorSet != null) {
             animatorSet.cancel();
@@ -1465,6 +1467,11 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         removeObservers();
+        if (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA && !isLocation
+                && (fragment.getArguments() == null || !fragment.getArguments().getBoolean("hasMainTabs", false))) {
+            signatureMusicHost = new app.exteraless.player.SignatureMusicHost(fragment, resourcesProvider, () -> checkPlayer(false));
+            signatureMusicHost.attach();
+        }
 
         if (isLocation) {
             globalObserversGroup = NotificationCenter.getGlobalInstance()
@@ -1490,6 +1497,7 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
             globalObserversGroup = NotificationCenter.getGlobalInstance()
                 .createObserversGroup(this)
                 .add(NotificationCenter.messagePlayingSpeedChanged)
+                .add(NotificationCenter.didSetNewTheme)
                 .add(NotificationCenter.didStartedCall)
                 .add(NotificationCenter.didEndCall)
                 .add(NotificationCenter.webRtcSpeakerAmplitudeEvent)
@@ -1546,6 +1554,10 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
 
     @Override
     public void didReceivedNotification(int id, int account, Object... args) {
+        if (id == NotificationCenter.didSetNewTheme) {
+            if (signatureMusicHost != null) signatureMusicHost.update(currentStyle == STYLE_AUDIO_PLAYER && app.exteraless.player.Md3Player.miniEnabled());
+            return;
+        }
         if (id == NotificationCenter.liveLocationsChanged) {
             checkLiveLocation(false);
         } else if (id == NotificationCenter.liveStoryUpdated) {
@@ -1639,9 +1651,10 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
     float micAmplitude;
 
     public int getStyleHeight() {
-        return currentStyle == STYLE_INACTIVE_GROUP_CALL ? 48 : md3Music ? app.exteraless.player.PlayerBarView.HEIGHT_DP : 36;
+        return currentStyle == STYLE_INACTIVE_GROUP_CALL ? 48 : md3Music ? app.exteraless.player.PlayerBarView.heightDp(getContext()) : 36;
     }
 
+    private app.exteraless.player.SignatureMusicHost signatureMusicHost;
     private app.exteraless.player.PlayerBarView md3Bar;
     private boolean md3Music;
 
@@ -1656,7 +1669,11 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
         md3Music = value;
         if (value && md3Bar == null) {
             md3Bar = new app.exteraless.player.PlayerBarView(getContext(), resourcesProvider, this::performClick, () -> closeButton.performClick());
-            addView(md3Bar, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, app.exteraless.player.PlayerBarView.HEIGHT_DP, Gravity.TOP | Gravity.LEFT));
+            md3Bar.setOnCompact(() -> {
+                if (signatureMusicHost != null && signatureMusicHost.canCompact())
+                    app.exteraless.player.SignatureMusicPresentation.setCompact(true);
+            });
+            addView(md3Bar, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, app.exteraless.player.PlayerBarView.heightDp(getContext()), Gravity.TOP | Gravity.LEFT));
         }
         if (md3Bar != null) {
             md3Bar.setVisibility(value ? VISIBLE : GONE);
@@ -1890,6 +1907,11 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
     }
 
     private void checkPlayer(boolean create) {
+        if (signatureMusicHost != null) signatureMusicHost.update(
+                app.exteraless.player.Md3Player.miniEnabled()
+                && currentStyle != STYLE_ACTIVE_GROUP_CALL && currentStyle != STYLE_CONNECTING_GROUP_CALL
+                && currentStyle != STYLE_INACTIVE_GROUP_CALL && currentStyle != STYLE_IMPORTING_MESSAGES);
+
         if (visible && (currentStyle == STYLE_CONNECTING_GROUP_CALL || currentStyle == STYLE_ACTIVE_GROUP_CALL || (currentStyle == STYLE_INACTIVE_GROUP_CALL || currentStyle == STYLE_IMPORTING_MESSAGES) && !isPlayingVoice())) {
             return;
         }
@@ -1901,7 +1923,10 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
             }
         }
         boolean wasVisible = visible;
-        if (messageObject == null || messageObject.getId() == 0 || messageObject.isVideo() || app.exteraless.player.Md3Player.hidesContextPlayer(fragment, messageObject)) {
+        if (messageObject == null || messageObject.getId() == 0 || messageObject.isVideo() || (signatureMusicHost != null && signatureMusicHost.canCompact()
+                && app.exteraless.player.SignatureMusicPresentation.isCompact() && messageObject.isMusic()
+                && app.exteraless.player.Md3Player.miniEnabled())
+                || app.exteraless.player.Md3Player.hidesContextPlayer(fragment, messageObject)) {
             lastMessageObject = null;
             boolean callAvailable = supportsCalls && VoIPService.getSharedInstance() != null && !VoIPService.getSharedInstance().isHangingUp() && VoIPService.getSharedInstance().getCallState() != VoIPService.STATE_WAITING_INCOMING && !GroupCallPip.isShowing();
             if (!isPlayingVoice() && !callAvailable && chatActivity != null && !GroupCallPip.isShowing()) {

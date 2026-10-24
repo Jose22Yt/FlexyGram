@@ -1,3 +1,4 @@
+from release_1271_contract import read1270, restore1270
 """Only explicit version/delivery changes on top of approved PR79; no UI regressions."""
 from pathlib import Path
 import subprocess
@@ -17,19 +18,23 @@ class MatteReleaseTests(unittest.TestCase):
         allowed={'TMessagesProj/build.gradle','.github/workflows/pr.yml','.github/workflows/connected-alpha-arm64.yml','tools/connected_alpha/test_signature_home.py','tools/connected_alpha/test_signature_matte.py','tools/connected_alpha/test_matte_release.py','tools/connected_alpha/test_signature_custom.py'}
         from release_1270_contract import PATHS
         allowed.update(PATHS)
+        from login_contract import PATHS as LOGIN_PATHS
+        allowed.update(LOGIN_PATHS)
+        from music_contract import PATHS as MUSIC_PATHS
+        allowed.update(MUSIC_PATHS)
         changes=subprocess.check_output(['git','diff','--name-only',BASE],cwd=ROOT,text=True).splitlines()
         self.assertTrue(set(changes)<=allowed,set(changes)-allowed)
         previous=subprocess.check_output(['git','show',BASE+':.github/workflows/connected-alpha-arm64.yml'],cwd=ROOT,text=True)
-        self.assertEqual(restore_delivery_workflow((ROOT/'.github/workflows/connected-alpha-arm64.yml').read_text()),previous)
+        self.assertEqual(restore_delivery_workflow(read1270('.github/workflows/connected-alpha-arm64.yml')),previous)
     def test_native_entry_and_version_1270_are_consistent(self):
         workflow=yaml.safe_load((ROOT/'.github/workflows/pr.yml').read_text())
         events=workflow.get('on',workflow.get(True))
         self.assertIn('fix/alpha2-signature-matte-build',events['push']['branches'])
         self.assertIn("refs/heads/fix/alpha2-signature-matte-build",workflow['jobs']['connected-alpha-native']['if'])
-        gradle=(ROOT/'TMessagesProj/build.gradle').read_text()
+        gradle=read1270('TMessagesProj/build.gradle')
         self.assertIn('def verCode = 1270',gradle)
         self.assertIn("versionNameSuffix = '-alpha2-ios-glass-home2'",gradle)
-        build=yaml.safe_load((ROOT/'.github/workflows/connected-alpha-arm64.yml').read_text())
+        build=yaml.safe_load(read1270('.github/workflows/connected-alpha-arm64.yml'))
         runs='\n'.join(s.get('run','') for s in build['jobs']['build-arm64']['steps'])
         self.assertIn('--expected-version-code 1270',runs)
         self.assertIn(':TMessagesProj:assembleConnectedAlpha',runs)

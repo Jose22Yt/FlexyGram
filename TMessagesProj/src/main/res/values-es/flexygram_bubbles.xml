@@ -5,5 +5,11 @@
     <string name="FlexyBubblesTransparency">Transparencia</string>
     <string name="FlexyBubblesBorder">Resaltar bordes</string>
     <string name="FlexyBubblesEdges">Desenfocar bordes del chat</string>
-    <string name="FlexyBubblesInfo">Utiliza el desenfoque del fondo compartido y en caché. Los colores sólidos se mantienen sólidos; los fondos animados o no compatibles usan un tratamiento ligero del tema. Al 100 %, se conserva un tinte mínimo para facilitar la lectura. Durante transiciones y renderizado por software, se utilizan burbujas nativas opacas. El desenfoque de los extremos respeta los límites de desenfoque y ahorro de energía del dispositivo.</string>
+    <string name="FlexyBubblesInfo">El contorno Signature y el piquito curvado mantienen su definición. La transparencia solo modifica el relleno; el texto y la multimedia conservan su opacidad. Las preferencias anteriores se conservan sin aplicar el antiguo Glass.</string>
+
+    <string name="FlexyClassicOptions">Opciones clásicas de Telegram</string>
+    <string name="FlexyClassicOptionsInfo">Ajustes originales de Telegram, temas y fondo del chat</string>
+    <string name="FlexyMessagesGestures">Mensajes y gestos</string>
+    <string name="FlexyStickersMedia">Stickers y multimedia</string>
+    <string name="FlexyThemeWallpaper">Tema y fondo de chat</string>
 </resources>

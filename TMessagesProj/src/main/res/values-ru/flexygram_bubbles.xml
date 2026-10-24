@@ -5,5 +5,11 @@
     <string name="FlexyBubblesTransparency">Прозрачность</string>
     <string name="FlexyBubblesBorder">Выделять края</string>
     <string name="FlexyBubblesEdges">Размытие краёв чата</string>
-    <string name="FlexyBubblesInfo">Использует общий кэш размытого фона. Однотонный фон остаётся однотонным; для анимированного или неподдерживаемого фона применяется лёгкое оформление темы. При 100 % сохраняется минимальный оттенок для читаемости. Во время переходов и программного рисования используются непрозрачные пузыри. Размытие краёв учитывает ограничения устройства и энергосбережение.</string>
+    <string name="FlexyBubblesInfo">Контур Signature и изогнутый хвостик остаются чёткими. Прозрачность меняет только заливку. Текст и медиа остаются непрозрачными. Старые настройки сохранены без применения прежнего Glass.</string>
+
+    <string name="FlexyClassicOptions">Классические настройки Telegram</string>
+    <string name="FlexyClassicOptionsInfo">Настройки Telegram, темы и фон чата</string>
+    <string name="FlexyMessagesGestures">Сообщения и жесты</string>
+    <string name="FlexyStickersMedia">Стикеры и медиа</string>
+    <string name="FlexyThemeWallpaper">Тема и фон чата</string>
 </resources>
