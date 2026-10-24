@@ -283,9 +283,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: FlexyGram-SignatureHome2-Encrypted
-          path: |
-            ${{ runner.temp }}/FlexyGram-SignatureHome2-ARM64.tar.age
-            ${{ runner.temp }}/delivery-verification.json
+          path: ${{ runner.temp }}/FlexyGram-SignatureHome2-ARM64.tar.age
           retention-days: 7
           if-no-files-found: error
       - name: Wipe private inputs and generated plaintext, including caches

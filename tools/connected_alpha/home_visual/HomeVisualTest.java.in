@@ -58,7 +58,9 @@ public class HomeVisualTest {
     assertSame(first,selected.get(a));assertSame(second,idle.get(b));
    }
    int other=a^0x00010101;assertNotSame(first,selected.get(other));
-   assertEquals(other,selected.get(other).getColor());
+   Bitmap pixel=Bitmap.createBitmap(2,2,Bitmap.Config.ARGB_8888);
+   Paint paint=new Paint();paint.setColor(Color.WHITE);paint.setColorFilter(selected.get(other));
+   new Canvas(pixel).drawRect(0,0,2,2,paint);assertEquals(other,pixel.getPixel(1,1));
   }
  }
  @Test public void interruptedSelectionKeepsCurrentPillOpaque() {
