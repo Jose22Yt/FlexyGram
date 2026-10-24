@@ -285,7 +285,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
 
     public boolean clipToGroupBounds;
     private final MessageDrawable.GlassSource flexyBubbleSource = (canvas, path) ->
-        delegate != null && !drawForBlur && delegate.drawFlexyBubbleWallpaper(this, canvas, path);
+        this.delegate != null && !this.drawForBlur && this.delegate.drawFlexyBubbleWallpaper(this, canvas, path);
     private void drawFlexyBubble(Canvas canvas, MessageDrawable drawable, Paint customPaint) {
         // Drawables are shared by native themes: never retain a cell/activity between draws.
         drawable.setFlexyGlassSource(flexyBubbleSource);

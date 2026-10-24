@@ -10,6 +10,7 @@ STEP='''      - name: Verify native Signature Matte cell geometry and accessibil
 '''
 def restore_delivery_workflow(s):
     s = s.replace('--expected-version-code 1270','--expected-version-code 1269').replace('FlexyGram-Alpha1270-Encrypted','FlexyGram-Signature-Matte-1269-ARM64-encrypted').replace('FlexyGram-Alpha1270-ARM64.tar.age','FlexyGram-Signature-Matte-1269-arm64.tar.age').replace('      - name: Verify native iOS bubble paths, glass and saved preference policy\n        run: python3 tools/connected_alpha/bubble_visual/run.py --sdk-root "$ANDROID_HOME"\n','')
+    s = s.replace('      - name: Retain isolated native bubble graphics (not full app screenshots)\n        uses: actions/upload-artifact@v4\n        with:\n          name: FlexyGram-Alpha1270-native-bubble-probe\n          path: build/connected-alpha-bubble-visual/android-native-bubbles.png\n          retention-days: 7\n          if-no-files-found: error\n','')
     return s.replace('--expected-version-code 1269','--expected-version-code 1267').replace('FlexyGram-Signature-Matte-1269-ARM64-encrypted','FlexyGram-Integrated-Signature-1267-ARM64-encrypted').replace('FlexyGram-Signature-Matte-1269-arm64.tar.age','FlexyGram-Alpha-arm64.tar.age').replace(STEP,'').replace('          retention-days: 7\n          if-no-files-found: error','          retention-days: 1\n          if-no-files-found: error')
 class MatteReleaseTests(unittest.TestCase):
     def test_only_reviewed_build_metadata_changes_from_pr79(self):

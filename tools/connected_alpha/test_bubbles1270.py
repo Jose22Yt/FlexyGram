@@ -45,3 +45,20 @@ class BubbleReleaseTests(unittest.TestCase):
   self.assertEqual(settings.count(' = addRow("flexyBubble'),4)
   self.assertIn('seek.setMax(100)',settings)
   self.assertNotIn('recreate(',settings)
+
+ def test_actual_cell_glass_callback_compiles_before_late_declared_delegate(self):
+  source=(JAVA/'org/telegram/ui/Cells/ChatMessageCell.java').read_text()
+  start=source.index('    private final MessageDrawable.GlassSource flexyBubbleSource =')
+  field=source[start:source.index(';',start)+1]
+  runner="""class MessageDrawable {interface GlassSource {boolean draw(Object canvas,Object path);}}
+class CallbackProbe {
+_FIELD_
+ interface Delegate {boolean drawFlexyBubbleWallpaper(Object cell,Object canvas,Object path);}
+ Delegate delegate=(a,b,c)->true;boolean drawForBlur;
+ public static void main(String[] args){CallbackProbe p=new CallbackProbe();if(!p.flexyBubbleSource.draw(null,null))throw new AssertionError();p.drawForBlur=true;if(p.flexyBubbleSource.draw(null,null))throw new AssertionError();}
+}""".replace('_FIELD_',field)
+  import tempfile
+  with tempfile.TemporaryDirectory() as temp:
+   p=Path(temp)/'CallbackProbe.java';p.write_text(runner)
+   subprocess.run(['java','-m','jdk.compiler/com.sun.tools.javac.Main','-d',temp,str(p)],check=True)
+   subprocess.run(['java','-cp',temp,'CallbackProbe'],check=True)

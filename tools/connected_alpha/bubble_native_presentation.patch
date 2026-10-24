@@ -155,7 +155,7 @@ index 1cc966836..df4c1e941 100644
              return path;
          }
 diff --git a/TMessagesProj/src/main/java/org/telegram/ui/Cells/ChatMessageCell.java b/TMessagesProj/src/main/java/org/telegram/ui/Cells/ChatMessageCell.java
-index 777d5d5e2..6f375a132 100644
+index 777d5d5e2..1c69eed0e 100644
 --- a/TMessagesProj/src/main/java/org/telegram/ui/Cells/ChatMessageCell.java
 +++ b/TMessagesProj/src/main/java/org/telegram/ui/Cells/ChatMessageCell.java
 @@ -284,6 +284,15 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
@@ -163,7 +163,7 @@ index 777d5d5e2..6f375a132 100644
  
      public boolean clipToGroupBounds;
 +    private final MessageDrawable.GlassSource flexyBubbleSource = (canvas, path) ->
-+        delegate != null && !drawForBlur && delegate.drawFlexyBubbleWallpaper(this, canvas, path);
++        this.delegate != null && !this.drawForBlur && this.delegate.drawFlexyBubbleWallpaper(this, canvas, path);
 +    private void drawFlexyBubble(Canvas canvas, MessageDrawable drawable, Paint customPaint) {
 +        // Drawables are shared by native themes: never retain a cell/activity between draws.
 +        drawable.setFlexyGlassSource(flexyBubbleSource);
