@@ -65,7 +65,10 @@ public class ChatListPreviewCell extends FrameLayout {
         actionBar = new ActionBar(context);
         actionBar.setOccupyStatusBar(false);
         actionBar.setItemsColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText), false);
-        actionBar.createMenu().addItem(0, R.drawable.ic_ab_other);
+        // Preview the real Signature Home icon artwork, not the inherited
+        // exteraless three-dot asset. This is the native ActionBar component.
+        actionBar.createMenu().addItem(0, R.drawable.flexy_home_search);
+        actionBar.createMenu().addItem(1, R.drawable.flexy_home_more);
         actionBar.setBackground(new PreviewBackgroundDrawable());
         actionBar.setSupportsHolidayImage(true);
         addView(actionBar, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,
