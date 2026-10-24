@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexySettingsOfficial">FlexyGram oficial</string>
+    <string name="FlexySettingsOfficialChannel">Canal oficial</string>
+    <string name="FlexySettingsComingSoon">Próximamente</string>
+    <string name="FlexySettingsInformation">Información</string>
+    <string name="FlexySettingsAbout">Acerca de FlexyGram</string>
+    <string name="FlexySettingsCredits">Licencias y agradecimientos</string>
+    <string name="FlexySettingsAboutBody">FlexyGram es un cliente independiente de Telegram basado en el proyecto de código abierto Exteraless. Su código fuente y cambios están disponibles en GitHub.</string>
+    <string name="FlexySettingsCreditsBody">FlexyGram se distribuye bajo GNU GPL-3.0. Está basado en Exteraless y sus proyectos de código abierto anteriores. Reconocimientos del diseño original: @the8055u (iconos y diseño), @BlueprintDsgn (estudio de diseño). Se conservan los avisos de autoría y las licencias aplicables al código y los recursos originales.</string>
+    <string name="FlexySettingsLicenseAction">Licencia GPL-3.0</string>
+    <string name="FlexySettingsUpstreamAction">Código original</string>
+    <string name="FlexySettingsComposerRow">Personalizar barra de escritura</string>
+    <string name="FlexySettingsComposerDescription">Estilo iOS, tamaño, posición y Liquid Glass</string>
+</resources>
