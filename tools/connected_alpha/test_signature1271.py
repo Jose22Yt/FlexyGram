@@ -37,6 +37,7 @@ class Signature1271(unittest.TestCase):
    self.assertEqual(current,old('TMessagesProj/src/main/java/'+path),path)
   path='TMessagesProj/src/main/java/org/telegram/ui/Components/SeekBarView.java'
   self.assertEqual((ROOT/path).read_text(),old(path))
+  self.assertEqual((JAVA/'org/telegram/ui/ThemeActivity.java').read_text().count('? new app.flexygram.settings.FlexySignatureSeekBarView(context) : new SeekBarView(context)'),2)
   source=(JAVA/'app/exteraless/settings/OpenExteraChatsActivity.java').read_text()
   hub=source.split('private void updateSignatureHubRows()')[1].split('private void updateStickerRows()')[0]
   self.assertEqual(re.findall(r'(\w+Row) = addRow',hub),['flexyBubblesRow','composerSettingsRow','signatureMessagesRow','signatureThemeRow','signatureStickersRow','chatSettingsRow','linksDividerRow'])

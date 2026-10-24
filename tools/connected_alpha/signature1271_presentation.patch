@@ -1182,10 +1182,30 @@ index 7c84e3c22..e1fbae962 100644
                  R.drawable.blueprint_icon_foreground, R.string.AppIconBlueprint),
          RED("RedIcon", R.drawable.red_icon_background,
 diff --git a/TMessagesProj/src/main/java/org/telegram/ui/ThemeActivity.java b/TMessagesProj/src/main/java/org/telegram/ui/ThemeActivity.java
-index fb6560919..b77655168 100644
+index fb6560919..73a4a5425 100644
 --- a/TMessagesProj/src/main/java/org/telegram/ui/ThemeActivity.java
 +++ b/TMessagesProj/src/main/java/org/telegram/ui/ThemeActivity.java
-@@ -712,9 +712,11 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
+@@ -354,7 +354,8 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
+             textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+             textPaint.setTextSize(dp(16));
+ 
+-            sizeBar = new SeekBarView(context);
++            sizeBar = org.telegram.messenger.BuildConfig.CONNECTED_ALPHA
++                    ? new app.flexygram.settings.FlexySignatureSeekBarView(context) : new SeekBarView(context);
+             sizeBar.setReportChanges(true);
+             sizeBar.setSeparatorsCount(endFontSize - startFontSize + 1);
+             sizeBar.setDelegate(new SeekBarView.SeekBarViewDelegate() {
+@@ -438,7 +439,8 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
+             textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+             textPaint.setTextSize(dp(16));
+ 
+-            sizeBar = new SeekBarView(context);
++            sizeBar = org.telegram.messenger.BuildConfig.CONNECTED_ALPHA
++                    ? new app.flexygram.settings.FlexySignatureSeekBarView(context) : new SeekBarView(context);
+             sizeBar.setReportChanges(true);
+             sizeBar.setSeparatorsCount(endRadius - startRadius + 1);
+             sizeBar.setDelegate(new SeekBarView.SeekBarViewDelegate() {
+@@ -712,9 +714,11 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
              themeListRow2 = rowCount++;
              themeInfoRow = rowCount++;
  

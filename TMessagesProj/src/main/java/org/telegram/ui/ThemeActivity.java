@@ -354,7 +354,8 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
             textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
             textPaint.setTextSize(dp(16));
 
-            sizeBar = new SeekBarView(context);
+            sizeBar = org.telegram.messenger.BuildConfig.CONNECTED_ALPHA
+                    ? new app.flexygram.settings.FlexySignatureSeekBarView(context) : new SeekBarView(context);
             sizeBar.setReportChanges(true);
             sizeBar.setSeparatorsCount(endFontSize - startFontSize + 1);
             sizeBar.setDelegate(new SeekBarView.SeekBarViewDelegate() {
@@ -438,7 +439,8 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
             textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
             textPaint.setTextSize(dp(16));
 
-            sizeBar = new SeekBarView(context);
+            sizeBar = org.telegram.messenger.BuildConfig.CONNECTED_ALPHA
+                    ? new app.flexygram.settings.FlexySignatureSeekBarView(context) : new SeekBarView(context);
             sizeBar.setReportChanges(true);
             sizeBar.setSeparatorsCount(endRadius - startRadius + 1);
             sizeBar.setDelegate(new SeekBarView.SeekBarViewDelegate() {
