@@ -12,6 +12,8 @@ JAVA = ROOT/'TMessagesProj/src/main/java'
 SETTINGS = JAVA/'app/flexygram/settings'
 CANDIDATE_PATHS = {
     '.github/workflows/signature-matte-settings.yml', '.github/workflows/pr.yml',
+    '.github/workflows/connected-alpha-arm64.yml', 'TMessagesProj/build.gradle',
+    'tools/connected_alpha/test_matte_release.py', 'tools/connected_alpha/test_signature_custom.py',
     'TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraGeneralActivity.java',
     'TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraAppearanceActivity.java',
     'TMessagesProj/src/main/java/tw/nekomimi/nekogram/settings/BaseNekoSettingsActivity.java',
@@ -43,8 +45,9 @@ class SignatureMatteTests(unittest.TestCase):
             prefix='TMessagesProj/src/main/java/'+directory
             for path in subprocess.check_output(['git','ls-tree','-r','--name-only',BASE,'--',prefix],cwd=ROOT,text=True).splitlines():
                 self.assertEqual((ROOT/path).read_text(),old(path),path)
-        self.assertEqual((ROOT/'TMessagesProj/build.gradle').read_text(),old('TMessagesProj/build.gradle'))
-        self.assertEqual((ROOT/'.github/workflows/connected-alpha-arm64.yml').read_text(),old('.github/workflows/connected-alpha-arm64.yml'))
+        self.assertEqual((ROOT/'TMessagesProj/build.gradle').read_text().replace('def verCode = 1268','def verCode = 1267').replace("versionNameSuffix = '-alpha2-signature-matte'","versionNameSuffix = '-alpha2-integrated-signature'"),old('TMessagesProj/build.gradle'))
+        from test_matte_release import restore_delivery_workflow
+        self.assertEqual(restore_delivery_workflow((ROOT/'.github/workflows/connected-alpha-arm64.yml').read_text()),old('.github/workflows/connected-alpha-arm64.yml'))
 
     def test_every_existing_row_and_click_handler_is_preserved(self):
         for name in ('General','Appearance'):
