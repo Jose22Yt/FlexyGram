@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexySettingsOfficial">Официальный FlexyGram</string>
+    <string name="FlexySettingsOfficialChannel">Официальный канал</string>
+    <string name="FlexySettingsComingSoon">Скоро</string>
+    <string name="FlexySettingsInformation">Информация</string>
+    <string name="FlexySettingsAbout">О FlexyGram</string>
+    <string name="FlexySettingsCredits">Лицензии и благодарности</string>
+    <string name="FlexySettingsAboutBody">FlexyGram — независимый клиент Telegram на основе открытого проекта Exteraless. Исходный код и изменения доступны на GitHub.</string>
+    <string name="FlexySettingsCreditsBody">FlexyGram распространяется на условиях GNU GPL-3.0 и основан на Exteraless и других открытых проектах. Благодарности за оригинальное оформление: @the8055u (иконки и дизайн), @BlueprintDsgn (дизайн-студия). Сохраняются все применимые уведомления об авторстве и лицензиях исходного кода и ресурсов.</string>
+    <string name="FlexySettingsLicenseAction">Лицензия GPL-3.0</string>
+    <string name="FlexySettingsUpstreamAction">Исходный проект</string>
+</resources>
