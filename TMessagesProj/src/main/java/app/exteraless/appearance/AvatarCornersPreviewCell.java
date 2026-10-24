@@ -34,6 +34,7 @@ public class AvatarCornersPreviewCell extends FrameLayout {
     private final TextView titleView;
     private final TextView messageView;
     private boolean needDivider;
+    private int lastBackgroundColor = Integer.MIN_VALUE;
 
     public AvatarCornersPreviewCell(Context context, OnChanged onChanged) {
         super(context);
@@ -107,7 +108,11 @@ public class AvatarCornersPreviewCell extends FrameLayout {
 
     private void updatePalette() {
         if (titleView == null) return;
-        setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
+        int color = Theme.getColor(Theme.key_windowBackgroundWhite);
+        if (lastBackgroundColor != color) {
+            lastBackgroundColor = color;
+            setBackgroundColor(color);
+        }
         titleView.setTextColor(Theme.getColor(Theme.key_chats_name));
         messageView.setTextColor(Theme.getColor(Theme.key_chats_message));
     }
