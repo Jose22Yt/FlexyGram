@@ -173,7 +173,7 @@ public class PillBoundsRegression {
   float getX(){return x;} float getY(){return y;}
   int getWidth(){return width;} int getHeight(){return height;}
  }
- int flexyInsetDp=2,flexyGapDp=6;
+ int flexyInsetDp=4,flexyGapDp=6;
  View textFieldContainer=new View(),messageEditTextContainer=new View();
  float actionShift;
  float nativeAttachTranslationX(){return actionShift;}
@@ -216,12 +216,14 @@ public class PillBoundsRegression {
         enter = self.current
         container = (ROOT/CONTAINER).read_text()
         presentation = method_bodies(enter, 'applyFlexyComposerPresentation')[0]
-        self.assertIn('R.drawable.msg_add', presentation)
-        self.assertIn('R.drawable.msg_input_attach2', presentation)
+        self.assertIn('updateFlexyIconStyle()', presentation)
+        self.assertIn('R.drawable.flexy_composer_clip', enter)
+        self.assertIn('R.drawable.flexy_composer_add', enter)
+        self.assertIn('R.drawable.msg_input_attach2', enter)
         self.assertIn('audioVideoButtonContainer.invalidate()', presentation)
         self.assertIn('if (flexyCompactLayout)', enter)
-        self.assertIn('ColorUtils.blendARGB(panel, Color.WHITE', enter)
-        self.assertIn('ColorUtils.calculateLuminance(panel) < 0.4 ? Color.BLACK : Color.WHITE', container)
+        self.assertIn('ComposerStyle.surface(dark,', enter)
+        self.assertIn('ComposerStyle.surface(ColorUtils.calculateLuminance(panel) < 0.4, false)', container)
         self.assertIn('canvas.drawRoundRect(flexyPill', container)
         self.assertIn('canvas.drawRoundRect(flexyAttach', container)
 
@@ -255,14 +257,16 @@ public class PresentationRegression {
   int width(){return width;}
   float getAlpha(){return alpha;}
  }
- boolean isChat=true,isStories=false,flexyCompactRequested,flexyCompactLayout;
+ boolean isChat=true,isStories=false,flexyCompactRequested,flexyCompactLayout,flexyMenuState,isInInput;
  Object parentFragment=new Object();
  V senderSelectView=new V(),botCommandsMenuButton=new V(),botWebViewButton=new V(),aiButton=new V();
  V attachButton=new V(),emojiButton=new V(),deleteRichDraftButton=new V(),messageEditText=new V(),sendButton=new V(),audioVideoButtonContainer=new V();
+ void updateFlexyIconStyle(){attachButton.setImageResource(flexyCompactLayout ? R.drawable.msg_add : R.drawable.msg_input_attach2);}
+ void updateFlexyIconColors() {}
  void updateAudioVideoSendButtonColor() {}
  float attachLayoutPaddingTranslationX,attachLayoutTranslationX;
  int flexyNativeFieldRight=-1,flexyAppliedFieldRight=-1;
- int flexyInsetDp=2,flexyGapDp=6,flexyTextPaddingDp=12;
+ int flexyInsetDp=4,flexyGapDp=6,flexyTextPaddingDp=12;
  static final int DEFAULT_HEIGHT=44;
  final String draft="unchanged draft with emoji and multiple lines";
  void nativeMeasure(){emojiButton.p.leftMargin=3;deleteRichDraftButton.p.leftMargin=3;messageEditText.p.leftMargin=50;}
@@ -284,7 +288,7 @@ public class PresentationRegression {
    p.require(p.attachButton.p.gravity==(Gravity.BOTTOM|Gravity.LEFT));
    p.require(p.attachButton.imageResource==R.drawable.msg_add);
    p.require(p.emojiButton.p.gravity==(Gravity.BOTTOM|Gravity.RIGHT));
-   p.require(p.messageEditText.p.leftMargin==62);
+   p.require(p.messageEditText.p.leftMargin==58);
    p.require(p.messageEditText.p.rightMargin>=50+Math.max(0,-p.nativeAttachTranslationX()));
    p.require(p.messageEditText==originalText && p.draft==originalDraft);
    p.nativeMeasure();p.flexyCompactRequested=false;p.applyFlexyComposerPresentation(335);

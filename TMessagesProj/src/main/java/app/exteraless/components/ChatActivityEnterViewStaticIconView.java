@@ -56,6 +56,17 @@ public class ChatActivityEnterViewStaticIconView extends FrameLayout {
     private final ImageView[] buttonViews = new ImageView[2];
     private AnimatorSet buttonsAnimation;
     private State currentState;
+    private boolean compactIcons, referenceIcons;
+    public void setCompactIcons(boolean compact, boolean reference) {
+        if (compactIcons == compact && referenceIcons == reference) return;
+        compactIcons = compact;
+        referenceIcons = reference;
+        if (currentState != null) setState(currentState, false);
+    }
+    private int iconResource(State state) {
+        return compactIcons ? app.flexygram.composer.ComposerIcons.resource(state.name(), state.resource, referenceIcons) : state.resource;
+    }
+
 
     public ChatActivityEnterViewStaticIconView(Context context, ChatActivityEnterView enterView) {
         this(context, enterView, 32);
@@ -139,7 +150,7 @@ public class ChatActivityEnterViewStaticIconView extends FrameLayout {
                 buttonsAnimation.cancel();
                 buttonsAnimation = null;
             }
-            buttonViews[0].setImageResource(currentState.resource);
+            buttonViews[0].setImageResource(iconResource(currentState));
             buttonViews[0].setAlpha(1f);
             buttonViews[0].setScaleX(1f);
             buttonViews[0].setScaleY(1f);
@@ -150,7 +161,7 @@ public class ChatActivityEnterViewStaticIconView extends FrameLayout {
                 buttonsAnimation.cancel();
             }
             buttonViews[1].setVisibility(VISIBLE);
-            buttonViews[1].setImageResource(currentState.resource);
+            buttonViews[1].setImageResource(iconResource(currentState));
             buttonViews[0].setAlpha(1f);
             buttonViews[0].setScaleX(1f);
             buttonViews[0].setScaleY(1f);

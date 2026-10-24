@@ -686,7 +686,8 @@ public class ChatActivityEnterView extends FrameLayout implements
     public FrameLayout messageEditTextContainer;
     private boolean flexyCompactRequested;
     private boolean flexyCompactLayout;
-    private int flexyInsetDp = 2, flexyGapDp = 6, flexyTextPaddingDp = 12, flexyPositionDp;
+    private boolean flexyMenuState;
+    private int flexyInsetDp = 4, flexyGapDp = 6, flexyTextPaddingDp = 12, flexyPositionDp;
     private void readFlexyGeometry() {
         final int level = app.flexygram.composer.FlexyComposerConfig.level();
         flexyInsetDp = app.flexygram.composer.ComposerStyle.inset(level);
@@ -716,6 +717,11 @@ public class ChatActivityEnterView extends FrameLayout implements
             if (messageEditTextContainer != null) messageEditTextContainer.requestLayout();
             else requestLayout();
             invalidate();
+        } else if (app.flexygram.composer.FlexyComposerConfig.ICONS.equals(key)) {
+            if (flexyCompactLayout) {
+                updateFlexyIconStyle();
+                updateFlexyIconColors();
+            }
         } else if (app.flexygram.composer.FlexyComposerConfig.GLASS.equals(key)
                 && audioVideoButtonContainer != null) {
             audioVideoButtonContainer.invalidate();
@@ -3389,12 +3395,8 @@ public class ChatActivityEnterView extends FrameLayout implements
                     if (flexyCompactLayout) {
                         final int panel = getThemedColor(Theme.key_chat_messagePanelBackground);
                         final boolean dark = ColorUtils.calculateLuminance(panel) < 0.4;
-                        if (app.flexygram.composer.FlexyComposerConfig.glass()) {
-                            final int pearl = ColorUtils.blendARGB(panel, Color.WHITE, dark ? 0.12f : 0.72f);
-                            paint.setColor(ColorUtils.setAlphaComponent(pearl, dark ? 226 : 238));
-                        } else {
-                            paint.setColor(dark ? Color.BLACK : Color.WHITE);
-                        }
+                        paint.setColor(app.flexygram.composer.ComposerStyle.surface(dark,
+                            app.flexygram.composer.FlexyComposerConfig.glass()));
                     } else {
                         paint.setColor(getThemedColor(Theme.key_chat_messagePanelSend));
                     }
@@ -11834,6 +11836,7 @@ public class ChatActivityEnterView extends FrameLayout implements
         deleteRichDraftButton.setColorFilter(new PorterDuffColorFilter(getThemedColor(Theme.key_glass_defaultIcon), PorterDuff.Mode.SRC_IN));
         deleteRichDraftButton.setBackground(Theme.createInsetRoundRectDrawable(getThemedColor(Theme.key_listSelector), dp(19), dp(1), dp(3)));
         sendOutlineView.setColorFilter(getThemedColor(Theme.key_telegram_color), PorterDuff.Mode.SRC_IN);
+        if (flexyCompactLayout) updateFlexyIconColors();
     }
 
     private void updateAudioVideoSendButtonColor() {
@@ -11844,8 +11847,8 @@ public class ChatActivityEnterView extends FrameLayout implements
         int color = audioVideoButtonContainerForbidden || isMenuState
                 ? getThemedColor(Theme.key_glass_defaultIcon)
                 : flexyCompactLayout
-                    ? (ColorUtils.calculateLuminance(getThemedColor(Theme.key_chat_messagePanelBackground)) < 0.4
-                        ? Color.WHITE : Color.BLACK)
+                    ? app.flexygram.composer.ComposerStyle.icon(ColorUtils.calculateLuminance(
+                        getThemedColor(Theme.key_chat_messagePanelBackground)) < 0.4)
                     : Color.WHITE;
         setIconColorFilter(audioVideoSendButton, new PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN));
         audioVideoButtonContainer.setBackground(isMenuState
@@ -16594,7 +16597,7 @@ public class ChatActivityEnterView extends FrameLayout implements
         if (messageEditText != null) {
             FrameLayout.LayoutParams text = (FrameLayout.LayoutParams) messageEditText.getLayoutParams();
             if (compact) text.leftMargin = dp(app.flexygram.composer.ComposerGeometry.TOUCH_SLOT
-                + flexyGapDp + flexyTextPaddingDp);
+                + flexyGapDp - flexyInsetDp + flexyTextPaddingDp);
             // Editing can directly change this margin without updateFieldRight.
             if (flexyNativeFieldRight < 0 || text.rightMargin != flexyAppliedFieldRight) flexyNativeFieldRight = text.rightMargin;
             text.rightMargin = app.flexygram.composer.ComposerGeometry.textEnd(flexyNativeFieldRight,
@@ -16602,15 +16605,45 @@ public class ChatActivityEnterView extends FrameLayout implements
             flexyAppliedFieldRight = text.rightMargin;
         }
         if (sendButton != null) sendButton.setCompactVisualInset(compact ? dp(flexyInsetDp) : -1);
-        if (compact != wasCompact) {
-            // The original FlexyGram uses a plus on the independent attach island.
+        if (compact != wasCompact || compact && flexyMenuState != isInInput) {
+            flexyMenuState = isInInput;
+            // Change artwork only; reference/plus variants never change the action.
             // Keep Exteraless' attachment click/gesture handler unchanged.
-            attachButton.setImageResource(compact ? R.drawable.msg_add : R.drawable.msg_input_attach2);
+            updateFlexyIconStyle();
+            updateFlexyIconColors();
             updateAudioVideoSendButtonColor();
             audioVideoButtonContainer.invalidate();
         }
         if (wasCompact && !compact) emojiButton.setTranslationX(0);
         updateAttachButtonTranslationX();
+    }
+
+    private void updateFlexyIconStyle() {
+        boolean reference = app.flexygram.composer.FlexyComposerConfig.referenceIcons();
+        attachButton.setImageResource(isInInput ? R.drawable.ic_ab_other : flexyCompactLayout
+            ? (reference ? R.drawable.flexy_composer_clip : R.drawable.flexy_composer_add) : R.drawable.msg_input_attach2);
+        setFlexyIconStyle(emojiButton, flexyCompactLayout, reference);
+        setFlexyIconStyle(audioVideoSendButton, flexyCompactLayout, reference);
+    }
+
+    private static void setFlexyIconStyle(View view, boolean compact, boolean reference) {
+        if (view instanceof ChatActivityEnterViewAnimatedIconView)
+            ((ChatActivityEnterViewAnimatedIconView) view).setCompactIcons(compact, reference);
+        else if (view instanceof ChatActivityEnterViewStaticIconView)
+            ((ChatActivityEnterViewStaticIconView) view).setCompactIcons(compact, reference);
+    }
+
+    private void updateFlexyIconColors() {
+        int color = flexyCompactLayout ? app.flexygram.composer.ComposerStyle.icon(
+            ColorUtils.calculateLuminance(getThemedColor(Theme.key_chat_messagePanelBackground)) < 0.4)
+            : getThemedColor(Theme.key_glass_defaultIcon);
+        if (attachButton != null) attachButton.setColorFilter(color, flexyCompactLayout ? PorterDuff.Mode.SRC_IN : PorterDuff.Mode.MULTIPLY);
+        int innerColor = flexyCompactLayout ? app.flexygram.composer.ComposerStyle.innerIcon(
+            ColorUtils.calculateLuminance(getThemedColor(Theme.key_chat_messagePanelBackground)) < 0.4)
+            : getThemedColor(Theme.key_glass_defaultIcon);
+        if (emojiButton != null) setIconColorFilter(emojiButton, new PorterDuffColorFilter(innerColor, PorterDuff.Mode.SRC_IN));
+        if (messageEditText != null) messageEditText.setHintColor(flexyCompactLayout ? innerColor
+            : getThemedColor(Theme.key_chat_messagePanelHint));
     }
 
     /** Native recording/previews keep their full background; their layout is untouched. */
@@ -16636,9 +16669,9 @@ public class ChatActivityEnterView extends FrameLayout implements
         final float x = textFieldContainer.getX() + messageEditTextContainer.getX();
         final float y = textFieldContainer.getY() + messageEditTextContainer.getY();
         out.set(app.flexygram.composer.ComposerGeometry.pillLeft(x,
-                dp(app.flexygram.composer.ComposerGeometry.TOUCH_SLOT), dp(flexyGapDp)),
+                dp(app.flexygram.composer.ComposerGeometry.TOUCH_SLOT) - dp(flexyInsetDp), dp(flexyGapDp)),
             y + dp(flexyInsetDp), app.flexygram.composer.ComposerGeometry.pillRight(
-                x + messageEditTextContainer.getWidth(), dp(flexyGapDp), nativeAttachTranslationX()),
+                x + messageEditTextContainer.getWidth(), dp(flexyGapDp) - dp(flexyInsetDp), nativeAttachTranslationX()),
             y + messageEditTextContainer.getHeight() - dp(flexyInsetDp));
         return out.width() > 0 && out.height() > 0;
     }
@@ -16806,9 +16839,13 @@ public class ChatActivityEnterView extends FrameLayout implements
         public void setResourceId(int resId) {
             if (this.resId != resId) {
                 this.resId = resId;
-                drawable = getContext().getResources().getDrawable(resId).mutate();
-                inactiveDrawable = getContext().getResources().getDrawable(resId).mutate();
-                drawableInverse = getContext().getResources().getDrawable(resId).mutate();
+                if (compactVisualInset >= 0) {
+                    reloadCompactSendIcon();
+                } else {
+                    drawable = getContext().getResources().getDrawable(resId).mutate();
+                    inactiveDrawable = getContext().getResources().getDrawable(resId).mutate();
+                    drawableInverse = getContext().getResources().getDrawable(resId).mutate();
+                }
                 invalidate();
             }
         }
@@ -17341,7 +17378,21 @@ public class ChatActivityEnterView extends FrameLayout implements
 
         private int compactVisualInset = -1;
         public void setCompactVisualInset(int inset) {
-            if (compactVisualInset != inset) { compactVisualInset = inset; invalidate(); }
+            if (compactVisualInset == inset) return;
+            boolean changedStyle = (compactVisualInset >= 0) != (inset >= 0);
+            compactVisualInset = inset;
+            if (changedStyle) reloadCompactSendIcon();
+            invalidate();
+        }
+        private void reloadCompactSendIcon() {
+            int resource = compactVisualInset >= 0 && resId == R.drawable.send_plane_24
+                ? R.drawable.flexy_composer_send : resId;
+            drawable = getContext().getResources().getDrawable(resource).mutate();
+            inactiveDrawable = getContext().getResources().getDrawable(resource).mutate();
+            drawableInverse = getContext().getResources().getDrawable(resource).mutate();
+            // updateColors caches by color, so invalidate the cache after replacing artwork.
+            drawableColor = 0;
+            updateColors();
         }
         private void checkBackgroundRect() {
             final float margin = compactVisualInset >= 0 ? compactVisualInset : dpf2(3);

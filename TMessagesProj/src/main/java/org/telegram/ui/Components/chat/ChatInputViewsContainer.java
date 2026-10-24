@@ -354,6 +354,12 @@ public class ChatInputViewsContainer extends FrameLayout {
             canvas.restore();
             final int color = flexyComposer.getThemedColor(Theme.key_chat_messagePanelBackground);
             final boolean dark = ColorUtils.calculateLuminance(color) < 0.4;
+            // A cheap tonal wash preserves the native backdrop and chat legibility.
+            flexySurface.setColor(ColorUtils.setAlphaComponent(
+                app.flexygram.composer.ComposerStyle.surface(dark, false),
+                (dark ? 80 : 60) * blurredBackgroundDrawable.getAlpha() / 255));
+            canvas.drawRoundRect(flexyPill, radius, radius, flexySurface);
+            if (attach) canvas.drawRoundRect(flexyAttach, radius, radius, flexySurface);
             flexyPearl.setColor(ColorUtils.setAlphaComponent(Color.WHITE,
                 (dark ? 28 : 76) * blurredBackgroundDrawable.getAlpha() / 255));
             flexyPearl.setStyle(Paint.Style.STROKE);
@@ -361,10 +367,9 @@ public class ChatInputViewsContainer extends FrameLayout {
             canvas.drawRoundRect(flexyPill, radius, radius, flexyPearl);
             if (attach) canvas.drawRoundRect(flexyAttach, radius, radius, flexyPearl);
         } else {
-            // The original Signature contract: glass OFF means solid white or black
-            // islands, never a faded full-width blur or neon-tinted surfaces.
+            // Opaque, legible off-white/charcoal surfaces without a full-width backing.
             final int panel = flexyComposer.getThemedColor(Theme.key_chat_messagePanelBackground);
-            flexySurface.setColor(ColorUtils.calculateLuminance(panel) < 0.4 ? Color.BLACK : Color.WHITE);
+            flexySurface.setColor(app.flexygram.composer.ComposerStyle.surface(ColorUtils.calculateLuminance(panel) < 0.4, false));
             canvas.drawRoundRect(flexyPill, radius, radius, flexySurface);
             if (attach) canvas.drawRoundRect(flexyAttach, radius, radius, flexySurface);
         }
