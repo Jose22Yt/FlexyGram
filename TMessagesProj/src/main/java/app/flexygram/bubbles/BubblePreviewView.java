@@ -39,6 +39,14 @@ public final class BubblePreviewView extends View implements NotificationCenter.
     private final Rect wallpaperBounds = new Rect();
     private final Drawable check, halfCheck;
     private Drawable wallpaper;
+    private boolean wallpaperMotion;
+    private SignatureWallpaperBlur.Owner blurOwner;
+    private final MessageDrawable.GlassSource cachedWallpaper = (canvas, shape) ->
+            blurOwner != null && blurOwner.draw(canvas, shape, 0, 0);
+    public void settingsChanged() {
+        if (blurOwner != null) blurOwner.prepare(wallpaper, wallpaperMotion, Theme.getColor(Theme.key_windowBackgroundGray));
+        invalidate();
+    }
     private int checkColor;
     private static final String TIME = "09:41";
 
@@ -67,6 +75,7 @@ public final class BubblePreviewView extends View implements NotificationCenter.
         checkColor = Theme.getColor(Theme.key_chat_outSentCheckRead);
         check.setTint(checkColor); halfCheck.setTint(checkColor);
         Drawable source = Theme.getCachedWallpaperNonBlocking();
+        wallpaperMotion = Theme.isWallpaperMotion() || source instanceof MotionBackgroundDrawable || source instanceof AnimatedFileDrawable;
         if (source instanceof ChatBackgroundDrawable) source = ((ChatBackgroundDrawable) source).getDrawable(false);
         // Borrow only a still bitmap from animated gradients. Never attach/start their renderer.
         if (source instanceof MotionBackgroundDrawable) {
@@ -79,12 +88,15 @@ public final class BubblePreviewView extends View implements NotificationCenter.
         } else wallpaper = null;
         if (wallpaper instanceof BitmapDrawable) ((BitmapDrawable) wallpaper).setFilterBitmap(true);
         updateWallpaperBounds(getWidth(), getHeight());
+        settingsChanged();
         requestLayout();
         invalidate();
     }
 
     @Override protected void onAttachedToWindow() {
         super.onAttachedToWindow();
+        blurOwner = new SignatureWallpaperBlur.Owner(this);
+        for (MessageDrawable bubble : bubbles) bubble.setFlexyGlassSource(cachedWallpaper);
         NotificationCenter center = NotificationCenter.getGlobalInstance();
         center.addObserver(this, NotificationCenter.didSetNewTheme);
         center.addObserver(this, NotificationCenter.didApplyNewTheme);
@@ -96,6 +108,8 @@ public final class BubblePreviewView extends View implements NotificationCenter.
         center.removeObserver(this, NotificationCenter.didSetNewTheme);
         center.removeObserver(this, NotificationCenter.didApplyNewTheme);
         center.removeObserver(this, NotificationCenter.didSetNewWallpapper);
+        if (blurOwner != null) { blurOwner.close(); blurOwner = null; }
+        for (MessageDrawable bubble : bubbles) bubble.setFlexyGlassSource(null);
         wallpaper = null; // Never recycle the theme owner's original bitmap.
         super.onDetachedFromWindow();
     }

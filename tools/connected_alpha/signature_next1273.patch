@@ -1,8 +1,8 @@
 diff --git a/.github/workflows/pr.yml b/.github/workflows/pr.yml
-index e24190450..8aea4a988 100644
+index e24190450..420fcf990 100644
 --- a/.github/workflows/pr.yml
 +++ b/.github/workflows/pr.yml
-@@ -74,6 +74,17 @@ jobs:
+@@ -74,6 +74,16 @@ jobs:
            done
            python3 tools/connected_alpha/music_visual/reproduce_detach.py --sdk-root "$ANDROID_HOME"
            python3 tools/connected_alpha/preview_visual/run.py --sdk-root "$ANDROID_HOME"
@@ -11,8 +11,7 @@ index e24190450..8aea4a988 100644
 +        with:
 +          name: isolated-signature-renderers
 +          path: |
-+            build/connected-alpha-bubble-visual/signature-preview-light.png
-+            build/connected-alpha-bubble-visual/signature-preview-dark.png
++            build/connected-alpha-bubble-visual/signature-preview-*.png
 +            build/connected-alpha-bubble-visual/target/surefire-reports/*.xml
 +            build/connected-alpha-matte-visual/target/surefire-reports/*.xml
 +          retention-days: 7
@@ -33,11 +32,46 @@ index 25d865b63..78691450c 100644
              return;
          } else if (position == aiChatRow) {
              presentFragment(new app.exteraless.ai.ui.AiSettingsActivity());
+diff --git a/TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleConfig.java b/TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleConfig.java
+index 9ed5bf5b0..bb9ff88d8 100644
+--- a/TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleConfig.java
++++ b/TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleConfig.java
+@@ -8,7 +8,7 @@ import org.telegram.messenger.ApplicationLoader;
+ public final class BubbleConfig {
+     public static final String FILE = "flexygram_bubbles";
+     public static final String GLASS = "glass", TRANSPARENCY = "transparency", BORDER = "border", EDGES = "edges";
+-    private static boolean loaded, glass, border, edges;
++    private static boolean loaded, glass, border, edges, cachedBlur;
+     private static int transparency = 35, borderTenths = 11;
+     private BubbleConfig() { }
+     private static SharedPreferences preferences() {
+@@ -16,6 +16,7 @@ public final class BubbleConfig {
+     }
+     public static void load() {
+         SharedPreferences p = preferences();
++        cachedBlur = p.getBoolean("signature_cached_blur", false);
+         borderTenths = Math.max(5, Math.min(20, p.getInt("signature_border_tenths", 11)));
+         glass = p.getBoolean(GLASS, false); border = p.getBoolean(BORDER, false);
+         edges = p.getBoolean(EDGES, false); transparency = BubbleStyle.transparency(p.getInt(TRANSPARENCY, 35)); loaded = true;
+@@ -23,6 +24,13 @@ public final class BubbleConfig {
+     public static boolean glass() { return loaded && glass; }
+     public static boolean border() { return loaded && border; }
+     public static boolean edges() { return loaded && edges; }
++    public static boolean backgroundBlur() { return cachedBlur; }
++    public static void setBackgroundBlur(boolean value) {
++        if (!loaded) load();
++        if (cachedBlur == value) return;
++        cachedBlur = value;
++        preferences().edit().putBoolean("signature_cached_blur", value).apply();
++    }
+     public static int transparency() { return transparency; }
+     public static int borderTenths() { return borderTenths; }
+     public static float borderDp() { return borderTenths / 10f; }
 diff --git a/TMessagesProj/src/main/java/app/flexygram/bubbles/BubblePreviewView.java b/TMessagesProj/src/main/java/app/flexygram/bubbles/BubblePreviewView.java
-index ba533b774..9e308a741 100644
+index ba533b774..bec8e4560 100644
 --- a/TMessagesProj/src/main/java/app/flexygram/bubbles/BubblePreviewView.java
 +++ b/TMessagesProj/src/main/java/app/flexygram/bubbles/BubblePreviewView.java
-@@ -1,44 +1,168 @@
+@@ -1,44 +1,182 @@
  package app.flexygram.bubbles;
 +
  import android.content.Context;
@@ -109,6 +143,14 @@ index ba533b774..9e308a741 100644
 +    private final Rect wallpaperBounds = new Rect();
 +    private final Drawable check, halfCheck;
 +    private Drawable wallpaper;
++    private boolean wallpaperMotion;
++    private SignatureWallpaperBlur.Owner blurOwner;
++    private final MessageDrawable.GlassSource cachedWallpaper = (canvas, shape) ->
++            blurOwner != null && blurOwner.draw(canvas, shape, 0, 0);
++    public void settingsChanged() {
++        if (blurOwner != null) blurOwner.prepare(wallpaper, wallpaperMotion, Theme.getColor(Theme.key_windowBackgroundGray));
++        invalidate();
++    }
 +    private int checkColor;
 +    private static final String TIME = "09:41";
 +
@@ -137,6 +179,7 @@ index ba533b774..9e308a741 100644
 +        checkColor = Theme.getColor(Theme.key_chat_outSentCheckRead);
 +        check.setTint(checkColor); halfCheck.setTint(checkColor);
 +        Drawable source = Theme.getCachedWallpaperNonBlocking();
++        wallpaperMotion = Theme.isWallpaperMotion() || source instanceof MotionBackgroundDrawable || source instanceof AnimatedFileDrawable;
 +        if (source instanceof ChatBackgroundDrawable) source = ((ChatBackgroundDrawable) source).getDrawable(false);
 +        // Borrow only a still bitmap from animated gradients. Never attach/start their renderer.
 +        if (source instanceof MotionBackgroundDrawable) {
@@ -149,12 +192,15 @@ index ba533b774..9e308a741 100644
 +        } else wallpaper = null;
 +        if (wallpaper instanceof BitmapDrawable) ((BitmapDrawable) wallpaper).setFilterBitmap(true);
 +        updateWallpaperBounds(getWidth(), getHeight());
++        settingsChanged();
 +        requestLayout();
 +        invalidate();
 +    }
 +
 +    @Override protected void onAttachedToWindow() {
 +        super.onAttachedToWindow();
++        blurOwner = new SignatureWallpaperBlur.Owner(this);
++        for (MessageDrawable bubble : bubbles) bubble.setFlexyGlassSource(cachedWallpaper);
 +        NotificationCenter center = NotificationCenter.getGlobalInstance();
 +        center.addObserver(this, NotificationCenter.didSetNewTheme);
 +        center.addObserver(this, NotificationCenter.didApplyNewTheme);
@@ -166,6 +212,8 @@ index ba533b774..9e308a741 100644
 +        center.removeObserver(this, NotificationCenter.didSetNewTheme);
 +        center.removeObserver(this, NotificationCenter.didApplyNewTheme);
 +        center.removeObserver(this, NotificationCenter.didSetNewWallpapper);
++        if (blurOwner != null) { blurOwner.close(); blurOwner = null; }
++        for (MessageDrawable bubble : bubbles) bubble.setFlexyGlassSource(null);
 +        wallpaper = null; // Never recycle the theme owner's original bitmap.
 +        super.onDetachedFromWindow();
 +    }
@@ -236,6 +284,321 @@ index ba533b774..9e308a741 100644
 +        canvas.restoreToCount(save);
      }
  }
+diff --git a/TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleSettingsActivity.java b/TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleSettingsActivity.java
+index 091a06069..74b88e690 100644
+--- a/TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleSettingsActivity.java
++++ b/TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleSettingsActivity.java
+@@ -17,18 +17,24 @@ import org.telegram.ui.Cells.TextInfoPrivacyCell;
+ import org.telegram.ui.Components.RecyclerListView;
+ import app.flexygram.settings.SignatureMatteSettingsActivity;
+ 
+-/** One fill-opacity control; all values belong to this installation, never to a Telegram account. */
++/** Local native preview, fill opacity, border width and optional cached wallpaper blur. */
+ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity {
+     private static final int SLIDER = 110;
+-    private int transparencyRow, borderRow, previewRow, infoRow;
++    private int transparencyRow, borderRow, previewRow, blurRow, infoRow;
+     private BubblePreviewView preview;
+     @Override protected void updateRows() {
+         super.updateRows(); BubbleConfig.load();
+-        previewRow = addRow(); transparencyRow = addRow("flexyBubbleTransparency"); borderRow = addRow("flexyBubbleBorderWidth"); infoRow = addRow();
++        previewRow = addRow(); transparencyRow = addRow("flexyBubbleTransparency"); borderRow = addRow("flexyBubbleBorderWidth"); blurRow = addRow("flexyBubbleBackgroundBlur"); infoRow = addRow();
+     }
+     @Override protected String getActionBarTitle() { return getString(R.string.FlexyBubblesTitle); }
+     @Override protected BaseListAdapter createAdapter(Context context) { return new Adapter(context); }
+-    @Override protected void onItemClick(View view, int position, float x, float y) { }
++    @Override protected void onItemClick(View view, int position, float x, float y) {
++        if (position == blurRow) {
++            BubbleConfig.setBackgroundBlur(!BubbleConfig.backgroundBlur());
++            if (view instanceof TextCheckCell) ((TextCheckCell) view).setChecked(BubbleConfig.backgroundBlur());
++            if (preview != null) preview.settingsChanged();
++        }
++    }
+     private final class TransparencyCell extends LinearLayout {
+         boolean border;
+         final TextView title;
+@@ -45,7 +51,7 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
+                 public void onStartTrackingTouch(SeekBar bar) { bar.getParent().requestDisallowInterceptTouchEvent(true); }
+                 public void onStopTrackingTouch(SeekBar bar) { bar.getParent().requestDisallowInterceptTouchEvent(false); }
+                 public void onProgressChanged(SeekBar bar, int value, boolean user) {
+-                    if (user && !binding) { if (border) BubbleConfig.setBorderTenths(value+5); else BubbleConfig.setTransparency(value); if (preview != null) preview.invalidate(); }
++                    if (user && !binding) { if (border) BubbleConfig.setBorderTenths(value+5); else BubbleConfig.setTransparency(value); if (preview != null) preview.settingsChanged(); }
+                     label(value);
+                 }
+             });
+@@ -63,7 +69,7 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
+     private final class Adapter extends MatteListAdapter {
+         Adapter(Context context) { super(context); }
+         @Override public int getItemViewType(int position) {
+-            return position == previewRow ? 111 : position == transparencyRow || position == borderRow ? SLIDER : TYPE_INFO_PRIVACY;
++            return position == previewRow ? 111 : position == blurRow ? TYPE_CHECK : position == transparencyRow || position == borderRow ? SLIDER : TYPE_INFO_PRIVACY;
+         }
+         @Override public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int type) {
+             if (type == 111) { preview = new BubblePreviewView(parent.getContext()); return new RecyclerListView.Holder(preview); }
+@@ -73,9 +79,10 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
+         @Override public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, boolean partial) {
+             if (position == previewRow) { holder.itemView.invalidate(); return; }
+             if (position == transparencyRow || position == borderRow) { ((TransparencyCell)holder.itemView).bind(position == borderRow); return; }
+-            if (position == infoRow) { ((TextInfoPrivacyCell)holder.itemView).setText(getString(R.string.FlexyBubblesInfo) + "\n\n" + getString(R.string.FlexyBubbleBlurUnavailable)); return; }
++            if (position == blurRow) { ((TextCheckCell)holder.itemView).setTextAndCheck(getString(R.string.FlexyBubbleBackgroundBlur), BubbleConfig.backgroundBlur(), false); return; }
++            if (position == infoRow) { ((TextInfoPrivacyCell)holder.itemView).setText(getString(R.string.FlexyBubblesInfo) + "\n\n" + getString(R.string.FlexyBubbleBlurCompatibility)); return; }
+ 
+         }
+-        @Override public boolean isEnabled(RecyclerView.ViewHolder holder) { return false; }
++        @Override public boolean isEnabled(RecyclerView.ViewHolder holder) { return holder.getAdapterPosition() == blurRow; }
+     }
+ }
+diff --git a/TMessagesProj/src/main/java/app/flexygram/bubbles/SignatureWallpaperBlur.java b/TMessagesProj/src/main/java/app/flexygram/bubbles/SignatureWallpaperBlur.java
+new file mode 100644
+index 000000000..432cf58bf
+--- /dev/null
++++ b/TMessagesProj/src/main/java/app/flexygram/bubbles/SignatureWallpaperBlur.java
+@@ -0,0 +1,245 @@
++package app.flexygram.bubbles;
++
++import android.graphics.Bitmap;
++import android.graphics.BitmapShader;
++import android.graphics.Canvas;
++import android.graphics.Color;
++import android.graphics.Matrix;
++import android.graphics.Paint;
++import android.graphics.Path;
++import android.graphics.PorterDuff;
++import android.graphics.PorterDuffColorFilter;
++import android.graphics.RectF;
++import android.graphics.Shader;
++import android.graphics.drawable.BitmapDrawable;
++import android.graphics.drawable.Drawable;
++import android.os.Build;
++import android.view.View;
++import java.lang.ref.WeakReference;
++import java.util.ArrayList;
++import java.util.Iterator;
++import java.util.LinkedHashMap;
++import org.telegram.messenger.AndroidUtilities;
++import org.telegram.messenger.Utilities;
++import org.telegram.ui.ChatBackgroundDrawable;
++import org.telegram.ui.Components.AnimatedFileDrawable;
++
++/** Shared source-image blur, never a screen capture. Cache bookkeeping/publication is UI-owned;
++ * scaling and the bounded CPU kernel run on Telegram's existing background queue. */
++public final class SignatureWallpaperBlur {
++    private static final int MAX_ENTRIES = 2, MAX_EDGE = 384, RADIUS = 8;
++    private static final LinkedHashMap<Key, Entry> entries = new LinkedHashMap<>(4, .75f, true);
++    private static final ArrayList<WeakReference<Owner>> waiting = new ArrayList<>();
++    private SignatureWallpaperBlur() { }
++
++    private static final class Key {
++        final WeakReference<Bitmap> source;
++        final int identity, generation, background, dim;
++        Key(Bitmap bitmap, int background, int dim) {
++            source = new WeakReference<>(bitmap); identity = System.identityHashCode(bitmap);
++            generation = bitmap.getGenerationId(); this.background = background; this.dim = dim;
++        }
++        @Override public int hashCode() { return ((identity * 31 + generation) * 31 + background) * 31 + dim; }
++        @Override public boolean equals(Object value) {
++            if (this == value) return true;
++            if (!(value instanceof Key)) return false;
++            Key other = (Key) value; Bitmap bitmap = source.get();
++            return bitmap != null && bitmap == other.source.get() && generation == other.generation
++                    && background == other.background && dim == other.dim;
++        }
++    }
++    private static final class Entry {
++        final Key key;
++        final ArrayList<WeakReference<Owner>> owners = new ArrayList<>();
++        volatile boolean canceled;
++        Bitmap bitmap;
++        Runnable task;
++        Entry(Key key) { this.key = key; }
++    }
++    private static void dispose(Entry entry) {
++        entry.canceled = true;
++        if (entry.task != null) Utilities.globalQueue.cancelRunnable(entry.task);
++        entry.task = null;
++        if (entry.bitmap != null) { entry.bitmap.recycle(); entry.bitmap = null; }
++    }
++    private static void sweep() {
++        Iterator<Entry> iterator = entries.values().iterator();
++        while (iterator.hasNext()) {
++            Entry entry = iterator.next();
++            entry.owners.removeIf(reference -> reference.get() == null);
++            if (entry.owners.isEmpty()) { iterator.remove(); dispose(entry); }
++        }
++    }
++    private static Entry acquire(Owner owner, Bitmap source, int background, int dim) {
++        sweep();
++        Key key = new Key(source, background, dim);
++        Entry entry = entries.get(key);
++        boolean created = entry == null;
++        if (created) {
++            if (entries.size() >= MAX_ENTRIES) {
++                if (!owner.waitingForSlot) { waiting.add(new WeakReference<>(owner)); owner.waitingForSlot = true; }
++                return null; // Matte until an attached owner releases a slot; no retry timer.
++            }
++            entry = new Entry(key); entries.put(key, entry);
++        }
++        entry.owners.add(new WeakReference<>(owner));
++        if (created) {
++            Entry pending = entry;
++            entry.task = () -> {
++                Bitmap result = null;
++                try {
++                    if (!pending.canceled && !source.isRecycled() && source.getGenerationId() == key.generation)
++                        result = render(source, background, dim, pending);
++                } catch (IllegalArgumentException | IllegalStateException | OutOfMemoryError unavailable) {
++                    // Optional resource boundary only. No navigation/auth exceptions are intercepted.
++                }
++                Bitmap prepared = result;
++                AndroidUtilities.runOnUIThread(() -> {
++                    pending.task = null;
++                    if (pending.canceled || entries.get(key) != pending || source.isRecycled() || source.getGenerationId() != key.generation) {
++                        if (prepared != null) prepared.recycle();
++                        return;
++                    }
++                    pending.bitmap = prepared;
++                    for (WeakReference<Owner> reference : pending.owners) {
++                        Owner current = reference.get();
++                        if (current != null && !current.closed && current.entry == pending) current.ready();
++                    }
++                });
++            };
++            Utilities.globalQueue.postRunnable(entry.task);
++        }
++        return entry;
++    }
++
++    private static void resumeWaiting() {
++        if (waiting.isEmpty()) return;
++        ArrayList<WeakReference<Owner>> pending = new ArrayList<>(waiting); waiting.clear();
++        for (WeakReference<Owner> reference : pending) {
++            Owner owner = reference.get();
++            if (owner == null) continue;
++            owner.waitingForSlot = false;
++            if (!owner.closed && owner.sourceBitmap != null && !owner.sourceBitmap.isRecycled()) {
++                owner.entry = acquire(owner, owner.sourceBitmap, owner.background, owner.dim);
++                owner.ready();
++            }
++        }
++    }
++
++    private static Bitmap render(Bitmap source, int background, int dim, Entry entry) {
++        float scale = Math.min(1f, MAX_EDGE / (float) Math.max(source.getWidth(), source.getHeight()));
++        int width = Math.max(1, Math.round(source.getWidth() * scale));
++        int height = Math.max(1, Math.round(source.getHeight() * scale));
++        Bitmap result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
++        boolean handedOff = false;
++        try {
++            if (entry.canceled) return null;
++            Canvas canvas = new Canvas(result); canvas.drawColor(background | 0xff000000);
++            Paint paint = new Paint(Paint.FILTER_BITMAP_FLAG);
++            if (dim != 0) paint.setColorFilter(new PorterDuffColorFilter(Color.argb(dim, 0, 0, 0), PorterDuff.Mode.DARKEN));
++            canvas.drawBitmap(source, null, new RectF(0, 0, width, height), paint);
++            if (entry.canceled) return null;
++            int[] pixels = new int[width * height], scratch = new int[pixels.length];
++            result.getPixels(pixels, 0, width, 0, 0, width, height);
++            if (!box(pixels, scratch, width, height, true, entry)
++                    || !box(scratch, pixels, width, height, false, entry)) return null;
++            result.setPixels(pixels, 0, width, 0, 0, width, height);
++            handedOff = true; return result;
++        } finally { if (!handedOff) result.recycle(); }
++    }
++    private static boolean box(int[] source, int[] target, int width, int height, boolean horizontal, Entry entry) {
++        int lines = horizontal ? height : width, length = horizontal ? width : height, divisor = RADIUS * 2 + 1;
++        for (int line = 0; line < lines; line++) {
++            if (entry.canceled) return false;
++            int red = 0, green = 0, blue = 0;
++            for (int j = -RADIUS; j <= RADIUS; j++) {
++                int position = Math.max(0, Math.min(length - 1, j));
++                int color = source[horizontal ? line * width + position : position * width + line];
++                red += Color.red(color); green += Color.green(color); blue += Color.blue(color);
++            }
++            for (int position = 0; position < length; position++) {
++                target[horizontal ? line * width + position : position * width + line] = Color.rgb(red / divisor, green / divisor, blue / divisor);
++                int remove = Math.max(0, position - RADIUS), add = Math.min(length - 1, position + RADIUS + 1);
++                int old = source[horizontal ? line * width + remove : remove * width + line];
++                int next = source[horizontal ? line * width + add : add * width + line];
++                red += Color.red(next) - Color.red(old); green += Color.green(next) - Color.green(old); blue += Color.blue(next) - Color.blue(old);
++            }
++        }
++        return true;
++    }
++
++    /** One per attached conversation/preview. No message retains a bitmap, shader or owner. */
++    public static final class Owner {
++        private final WeakReference<View> target;
++        private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
++        private final Matrix matrix = new Matrix();
++        private final RectF mapping = new RectF();
++        private Drawable source;
++        private Bitmap sourceBitmap;
++        private int generation, background, dim;
++        private Entry entry;
++        private boolean closed, supported, waitingForSlot;
++        private BitmapShader shader;
++        public Owner(View target) { this.target = new WeakReference<>(target); }
++
++        private Bitmap bitmap(Drawable drawable) {
++            if (drawable instanceof AnimatedFileDrawable) return null;
++            if (drawable instanceof BitmapDrawable) {
++                BitmapDrawable image = (BitmapDrawable) drawable;
++                if (image.getTileModeX() != null || image.getTileModeY() != null
++                        || image.getAlpha() != 255 || image.getColorFilter() != null) return null;
++                mapping.set(image.getBounds());
++                return image.getBitmap();
++            }
++            if (drawable instanceof ChatBackgroundDrawable)
++                return ((ChatBackgroundDrawable) drawable).getSignatureStaticBitmap(mapping);
++            return null;
++        }
++        public void prepare(Drawable drawable, boolean motion, int backgroundColor) {
++            if (closed) return;
++            if (!BubbleConfig.backgroundBlur() && entry == null && source == null) return;
++            Bitmap bitmap = !motion && BubbleConfig.backgroundBlur() ? bitmap(drawable) : null;
++            if (bitmap == null || bitmap.isRecycled() || (Build.VERSION.SDK_INT >= 26 && bitmap.getConfig() == Bitmap.Config.HARDWARE)) {
++                clear(); supported = false; return;
++            }
++            int dimAlpha = drawable instanceof ChatBackgroundDrawable
++                    ? Math.max(0, Math.min(255, Math.round(((ChatBackgroundDrawable) drawable).getDimAmount() * 255))) : 0;
++            source = drawable; supported = true;
++            if (sourceBitmap == bitmap && generation == bitmap.getGenerationId() && background == backgroundColor && dim == dimAlpha) return;
++            release(); source = drawable; sourceBitmap = bitmap; generation = bitmap.getGenerationId(); background = backgroundColor; dim = dimAlpha;
++            entry = acquire(this, bitmap, backgroundColor, dimAlpha);
++            ready();
++        }
++        private void ready() {
++            paint.setShader(null); shader = null;
++            if (entry != null && entry.bitmap != null && !entry.bitmap.isRecycled()) {
++                shader = new BitmapShader(entry.bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
++                paint.setShader(shader);
++            }
++            View view = target.get(); if (!closed && view != null) view.invalidate();
++        }
++        public boolean isReady() { return !closed && shader != null && entry != null && entry.bitmap != null && !entry.bitmap.isRecycled(); }
++        public boolean isSupported() { return supported; }
++        public boolean draw(Canvas canvas, Path shape, float rootOffsetX, float rootOffsetY) {
++            if (!BubbleConfig.backgroundBlur() || !isReady() || bitmap(source) != sourceBitmap
++                    || sourceBitmap.isRecycled() || sourceBitmap.getGenerationId() != generation || mapping.isEmpty()) return false;
++            matrix.setScale(mapping.width() / entry.bitmap.getWidth(), mapping.height() / entry.bitmap.getHeight());
++            matrix.postTranslate(mapping.left - rootOffsetX, mapping.top - rootOffsetY); shader.setLocalMatrix(matrix);
++            canvas.drawPath(shape, paint); return true;
++        }
++        private void release() {
++            boolean freed = false;
++            if (waitingForSlot) { waiting.removeIf(reference -> reference.get() == null || reference.get() == this); waitingForSlot = false; }
++            if (shader != null) { paint.setShader(null); shader = null; }
++            if (entry != null) {
++                Entry previous = entry; entry = null;
++                previous.owners.removeIf(reference -> reference.get() == null || reference.get() == this);
++                if (previous.owners.isEmpty()) { entries.remove(previous.key); dispose(previous); freed = true; }
++            }
++            sourceBitmap = null;
++            if (freed) resumeWaiting();
++        }
++        private void clear() { release(); source = null; supported = false; }
++        public void close() { if (closed) return; closed = true; clear(); target.clear(); }
++    }
++}
 diff --git a/TMessagesProj/src/main/java/app/flexygram/settings/SignatureChatThemeActivity.java b/TMessagesProj/src/main/java/app/flexygram/settings/SignatureChatThemeActivity.java
 index 74c8b2a0e..f7de04796 100644
 --- a/TMessagesProj/src/main/java/app/flexygram/settings/SignatureChatThemeActivity.java
@@ -330,7 +693,7 @@ index 000000000..c3348c049
 +    @Override public int getOpacity() { return PixelFormat.TRANSLUCENT; }
 +}
 diff --git a/TMessagesProj/src/main/java/org/telegram/ui/ActionBar/MessageDrawable.java b/TMessagesProj/src/main/java/org/telegram/ui/ActionBar/MessageDrawable.java
-index b3f0c1d59..140bad16f 100644
+index b3f0c1d59..0bb32e1d9 100644
 --- a/TMessagesProj/src/main/java/org/telegram/ui/ActionBar/MessageDrawable.java
 +++ b/TMessagesProj/src/main/java/org/telegram/ui/ActionBar/MessageDrawable.java
 @@ -44,11 +44,10 @@ public class MessageDrawable extends Drawable {
@@ -360,9 +723,14 @@ index b3f0c1d59..140bad16f 100644
          } else if (isOut) {
              color = getColor(isSelected ? Theme.key_chat_outBubbleSelected : Theme.key_chat_outBubble);
              gradientColor1 = getCurrentColor(Theme.key_chat_outBubbleGradient1);
-@@ -649,19 +644,17 @@ public class MessageDrawable extends Drawable {
+@@ -648,20 +643,22 @@ public class MessageDrawable extends Drawable {
+             // Stable theme color, independent of wallpaper/blur availability and animation phase.
              // Instance paints and the native geometry cache are reused for every draw.
              int color = signatureColor();
++            if (app.flexygram.bubbles.BubbleConfig.backgroundBlur() && flexyGlassSource != null) {
++                // Legacy-named coordinate callback, new bounded static cache; legacy Glass flags are ignored.
++                flexyGlassSource.draw(canvas, path);
++            }
              flexyFillPaint.setColor(color);
 +            // Reuse Telegram's cached gradient and matrix; no new shader per frame.
 +            flexyFillPaint.setShader(p.getShader());
@@ -384,7 +752,7 @@ index b3f0c1d59..140bad16f 100644
              canvas.save();
              canvas.clipPath(path);
              canvas.drawPath(path, flexyBorderPaint);
-@@ -738,7 +731,7 @@ public class MessageDrawable extends Drawable {
+@@ -738,7 +735,7 @@ public class MessageDrawable extends Drawable {
                  if (currentType == TYPE_MEDIA || oeNoTail) {
                      path.moveTo(bounds.right - dp(8) - radToUse, bounds.bottom - padding);
                  } else {
@@ -393,7 +761,7 @@ index b3f0c1d59..140bad16f 100644
                  }
                  path.lineTo(bounds.left + padding + radToUse, bounds.bottom - padding);
                  rect.set(bounds.left + padding, bounds.bottom - padding - radToUse * 2, bounds.left + padding + radToUse * 2, bounds.bottom - padding);
-@@ -793,9 +786,22 @@ public class MessageDrawable extends Drawable {
+@@ -793,9 +790,22 @@ public class MessageDrawable extends Drawable {
                          rect.set(bounds.right - dp(8) - radToUse * 2, bounds.bottom - padding - radToUse * 2, bounds.right - dp(8), bounds.bottom - padding);
                          path.arcTo(rect, 0, 90, false);
                      } else {
@@ -416,7 +784,7 @@ index b3f0c1d59..140bad16f 100644
                      }
                  } else {
                      path.lineTo(bounds.right - dp(8), top - topY + currentBackgroundHeight);
-@@ -808,7 +814,7 @@ public class MessageDrawable extends Drawable {
+@@ -808,7 +818,7 @@ public class MessageDrawable extends Drawable {
                  if (currentType == TYPE_MEDIA || oeNoTail) {
                      path.moveTo(bounds.left + dp(8) + radToUse, bounds.bottom - padding);
                  } else {
@@ -425,7 +793,7 @@ index b3f0c1d59..140bad16f 100644
                  }
                  path.lineTo(bounds.right - padding - radToUse, bounds.bottom - padding);
                  rect.set(bounds.right - padding - radToUse * 2, bounds.bottom - padding - radToUse * 2, bounds.right - padding, bounds.bottom - padding);
-@@ -857,9 +863,22 @@ public class MessageDrawable extends Drawable {
+@@ -857,9 +867,22 @@ public class MessageDrawable extends Drawable {
                          rect.set(bounds.left + dp(8), bounds.bottom - padding - radToUse * 2, bounds.left + dp(8) + radToUse * 2, bounds.bottom - padding);
                          path.arcTo(rect, 180, -90, false);
                      } else {
@@ -448,6 +816,102 @@ index b3f0c1d59..140bad16f 100644
                      }
                  } else {
                      path.lineTo(bounds.left + dp(8), top - topY + currentBackgroundHeight);
+diff --git a/TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java b/TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java
+index 0c46dac8e..88f89fdfe 100644
+--- a/TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java
++++ b/TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java
+@@ -18424,6 +18424,16 @@ public class ChatActivity extends BaseFragment implements
+     }
+ 
+     public class ChatActivityFragmentView extends SizeNotifierFrameLayout {
++        private app.flexygram.bubbles.SignatureWallpaperBlur.Owner signatureWallpaperBlur;
++        private void refreshSignatureWallpaperBlur() {
++            if (signatureWallpaperBlur != null) signatureWallpaperBlur.prepare(getBackgroundImage(),
++                    getNewDrawableMotion(), getThemedColor(Theme.key_windowBackgroundGray));
++        }
++        @Override protected void onBackgroundViewInvalidate() {
++            super.onBackgroundViewInvalidate();
++            refreshSignatureWallpaperBlur();
++        }
++
+ 
+         @Override
+         public int measureKeyboardHeight() {
+@@ -18567,6 +18577,7 @@ public class ChatActivity extends BaseFragment implements
+         @Override
+         public void onUpdateBackgroundDrawable(Drawable drawable) {
+             super.onUpdateBackgroundDrawable(drawable);
++            refreshSignatureWallpaperBlur();
+             if (drawable instanceof MotionBackgroundDrawable) {
+                 ((MotionBackgroundDrawable) drawable).setFastRenderAllowed();
+             }
+@@ -18720,6 +18731,8 @@ public class ChatActivity extends BaseFragment implements
+         @Override
+         protected void onAttachedToWindow() {
+             super.onAttachedToWindow();
++            signatureWallpaperBlur = new app.flexygram.bubbles.SignatureWallpaperBlur.Owner(chatListView != null ? chatListView : this);
++            refreshSignatureWallpaperBlur();
+             if (isInsideContainer) {
+                 adjustPanLayoutHelper.setResizableView(contentView);
+             } else if (parentLayout != null && parentLayout.isSheet()) {
+@@ -18739,6 +18752,7 @@ public class ChatActivity extends BaseFragment implements
+ 
+         @Override
+         protected void onDetachedFromWindow() {
++            if (signatureWallpaperBlur != null) { signatureWallpaperBlur.close(); signatureWallpaperBlur = null; }
+             super.onDetachedFromWindow();
+             adjustPanLayoutHelper.onDetach();
+             if (pullingDownDrawable != null) {
+@@ -42189,19 +42203,11 @@ public class ChatActivity extends BaseFragment implements
+     private class ChatMessageCellDelegate implements ChatMessageCell.ChatMessageCellDelegate {
+         @Override
+         public boolean drawFlexyBubbleWallpaper(ChatMessageCell cell, Canvas canvas, android.graphics.Path path) {
+-            if (contentView == null || chatListView == null || navbarContentSourceWallpaper.getSource() == null
+-                    || !canvas.isHardwareAccelerated() || cell.getAlpha() < 1f || cell.getTranslationX() != 0) return false;
+-            if (navbarContentSourceWallpaper.getSource() instanceof BlurredBackgroundSourceBitmap) {
+-                Bitmap bitmap = ((BlurredBackgroundSourceBitmap) navbarContentSourceWallpaper.getSource()).getBitmap();
+-                if (bitmap == null || bitmap.isRecycled()) return false;
+-            }
+-            // WallpaperBitmapProvider memoizes a 90x120 image blur. No bitmap or blur work in this draw.
+-            int save = canvas.save();
+-            canvas.clipPath(path);
+-            canvas.translate(-cell.getX() - chatListView.getX(), -cell.getY() - chatListView.getY());
+-            navbarContentSourceWallpaper.draw(canvas, 0, 0, contentView.getWidth(), contentView.getHeight());
+-            canvas.restoreToCount(save);
+-            return true;
++            if (contentView == null || chatListView == null || contentView.signatureWallpaperBlur == null
++                    || cell.getAlpha() < 1f || cell.getTranslationX() != 0 || Theme.isAnimatingColor()) return false;
++            // Existing cell/root coordinate bridge; only the new static asynchronous cache is sampled.
++            return contentView.signatureWallpaperBlur.draw(canvas, path,
++                    cell.getX() + chatListView.getX(), cell.getY() + chatListView.getY());
+         }
+ 
+         @Override
+diff --git a/TMessagesProj/src/main/java/org/telegram/ui/ChatBackgroundDrawable.java b/TMessagesProj/src/main/java/org/telegram/ui/ChatBackgroundDrawable.java
+index bb94cee38..28c3bb180 100644
+--- a/TMessagesProj/src/main/java/org/telegram/ui/ChatBackgroundDrawable.java
++++ b/TMessagesProj/src/main/java/org/telegram/ui/ChatBackgroundDrawable.java
+@@ -208,6 +208,20 @@ public class ChatBackgroundDrawable extends Drawable {
+         }
+     }
+ 
++    /** Read-only static source/mapping after the native receiver has drawn it.
++     * Animated, rotated, mirrored, patterned and crossfading sources keep Matte. */
++    public Bitmap getSignatureStaticBitmap(android.graphics.RectF region) {
++        if (motionBackgroundDrawable != null || isPattern || alpha != 255
++                || wallpaper != null && wallpaper.settings != null && wallpaper.settings.motion
++                || !imageReceiver.hasImageLoaded() || imageReceiver.getCurrentAlpha() != 1f
++                || imageReceiver.getOrientation() != 0 || imageReceiver.getInvert() != 0) return null;
++        Drawable drawable = imageReceiver.getDrawable();
++        if (!(drawable instanceof BitmapDrawable) || drawable instanceof org.telegram.ui.Components.AnimatedFileDrawable) return null;
++        region.set(imageReceiver.getDrawRegion());
++        Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
++        return bitmap != null && !bitmap.isRecycled() ? bitmap : null;
++    }
++
+     public float getDimAmount() {
+         if (motionBackgroundDrawable == null) {
+             return dimAmount;
 diff --git a/TMessagesProj/src/main/java/org/telegram/ui/ThemeActivity.java b/TMessagesProj/src/main/java/org/telegram/ui/ThemeActivity.java
 index 73a4a5425..4f26cc2ba 100644
 --- a/TMessagesProj/src/main/java/org/telegram/ui/ThemeActivity.java
@@ -608,35 +1072,41 @@ index 73a4a5425..4f26cc2ba 100644
  
          @Override
 diff --git a/TMessagesProj/src/main/res/values-es/flexygram_bubbles.xml b/TMessagesProj/src/main/res/values-es/flexygram_bubbles.xml
-index 03a06e33e..49fd34e07 100644
+index 03a06e33e..4d9d62b5e 100644
 --- a/TMessagesProj/src/main/res/values-es/flexygram_bubbles.xml
 +++ b/TMessagesProj/src/main/res/values-es/flexygram_bubbles.xml
-@@ -20,4 +20,6 @@
+@@ -20,4 +20,8 @@
      <string name="FlexyBubblePreviewIncoming">Hola</string>
      <string name="FlexyBubblePreviewOutgoing">¡Hola!</string>
      <string name="FlexyBubbleBlurUnavailable">El desenfoque de fondo no está disponible en esta compilación de prueba. Matte conserva nítidos el texto y el contorno.</string>
 +    <string name="FlexyBubblePreviewGroupIncoming">Esta conversación es una vista previa local.</string>
 +    <string name="FlexyBubblePreviewGroupOutgoing">Tus cambios se muestran al instante.</string>
++    <string name="FlexyBubbleBackgroundBlur">Desenfoque de fondo</string>
++    <string name="FlexyBubbleBlurCompatibility">El desenfoque está disponible para fondos de imagen estáticos compatibles. Los fondos animados o no compatibles mantienen Matte.</string>
  </resources>
 diff --git a/TMessagesProj/src/main/res/values-ru/flexygram_bubbles.xml b/TMessagesProj/src/main/res/values-ru/flexygram_bubbles.xml
-index 16073b0fd..b4eab7332 100644
+index 16073b0fd..f89abe870 100644
 --- a/TMessagesProj/src/main/res/values-ru/flexygram_bubbles.xml
 +++ b/TMessagesProj/src/main/res/values-ru/flexygram_bubbles.xml
-@@ -20,4 +20,6 @@
+@@ -20,4 +20,8 @@
      <string name="FlexyBubblePreviewIncoming">Привет</string>
      <string name="FlexyBubblePreviewOutgoing">Да!</string>
      <string name="FlexyBubbleBlurUnavailable">Размытие фона недоступно в этой тестовой сборке. Matte сохраняет чёткость текста и контура.</string>
 +    <string name="FlexyBubblePreviewGroupIncoming">Это локальный пример переписки.</string>
 +    <string name="FlexyBubblePreviewGroupOutgoing">Изменения видны сразу.</string>
++    <string name="FlexyBubbleBackgroundBlur">Размытие фона</string>
++    <string name="FlexyBubbleBlurCompatibility">Размытие доступно для совместимых статичных изображений. Анимированные и неподдерживаемые фоны сохраняют Matte.</string>
  </resources>
 diff --git a/TMessagesProj/src/main/res/values/flexygram_bubbles.xml b/TMessagesProj/src/main/res/values/flexygram_bubbles.xml
-index fd56638f3..3a62bc07b 100644
+index fd56638f3..510e7bb92 100644
 --- a/TMessagesProj/src/main/res/values/flexygram_bubbles.xml
 +++ b/TMessagesProj/src/main/res/values/flexygram_bubbles.xml
-@@ -20,4 +20,6 @@
+@@ -20,4 +20,8 @@
      <string name="FlexyBubblePreviewIncoming">Hello</string>
      <string name="FlexyBubblePreviewOutgoing">Hello!</string>
      <string name="FlexyBubbleBlurUnavailable">Background blur is unavailable in this test build. Matte keeps text and outlines sharp.</string>
 +    <string name="FlexyBubblePreviewGroupIncoming">This conversation is a local preview.</string>
 +    <string name="FlexyBubblePreviewGroupOutgoing">Your changes appear immediately.</string>
++    <string name="FlexyBubbleBackgroundBlur">Background blur</string>
++    <string name="FlexyBubbleBlurCompatibility">Blur is available for compatible static image wallpapers. Animated or unsupported backgrounds keep Matte.</string>
  </resources>

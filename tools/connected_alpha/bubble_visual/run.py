@@ -53,6 +53,7 @@ def main():
     shutil.copyfile(HERE/'BubbleVisualTest.java.in', source/'BubbleVisualTest.java')
     shutil.copyfile(HERE/'SignatureControlsVisualTest.java.in', source/'SignatureControlsVisualTest.java')
     shutil.copyfile(HERE/'BubblePreviewVisualTest.java.in', source/'BubblePreviewVisualTest.java')
+    shutil.copyfile(HERE/'CachedBlurVisualTest.java.in', source/'CachedBlurVisualTest.java')
     shutil.copyfile(HERE/'pom.xml', output/'pom.xml')
     repository = Path.home()/'.m2/repository'
     command = [args.maven, '-B', '-f', str(output/'pom.xml'), '-Dandroid.sdk.jar='+str(android)]

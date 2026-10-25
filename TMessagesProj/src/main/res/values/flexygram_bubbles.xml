@@ -22,4 +22,6 @@
     <string name="FlexyBubbleBlurUnavailable">Background blur is unavailable in this test build. Matte keeps text and outlines sharp.</string>
     <string name="FlexyBubblePreviewGroupIncoming">This conversation is a local preview.</string>
     <string name="FlexyBubblePreviewGroupOutgoing">Your changes appear immediately.</string>
+    <string name="FlexyBubbleBackgroundBlur">Background blur</string>
+    <string name="FlexyBubbleBlurCompatibility">Blur is available for compatible static image wallpapers. Animated or unsupported backgrounds keep Matte.</string>
 </resources>

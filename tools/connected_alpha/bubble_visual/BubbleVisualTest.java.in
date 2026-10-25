@@ -16,7 +16,7 @@ import static org.junit.Assert.*;
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 public class BubbleVisualTest {
  @Before public void setup(){
-  ApplicationLoader.applicationContext=RuntimeEnvironment.getApplication();
+  ApplicationLoader.applicationContext=RuntimeEnvironment.getApplication();BubbleConfig.load();BubbleConfig.setBackgroundBlur(false);
   ApplicationLoader.applicationContext.getSharedPreferences(BubbleConfig.FILE,0).edit().clear().commit();
   BuildConfig.CONNECTED_ALPHA=true;Theme.dark=false;
   BubbleConfig.load(); SharedConfig.bubbleRadius=20; AndroidUtilities.density=1; ChatsConfig.removeMessageTail.value=false;

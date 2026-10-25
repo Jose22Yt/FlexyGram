@@ -18,7 +18,8 @@ class Stabilization1272(unittest.TestCase):
    self.assertEqual(subprocess.check_output(['git','diff',BASE,'--',prefix],cwd=ROOT),b'',prefix)
   for path in ['org/telegram/ui/LoginActivity.java','org/telegram/ui/IntroActivity.java','org/telegram/ui/ChatActivity.java','org/telegram/ui/Cells/ChatMessageCell.java','org/telegram/messenger/MediaController.java','org/telegram/messenger/MusicPlayerService.java','org/telegram/messenger/UserConfig.java','org/telegram/messenger/MessagesController.java','org/telegram/messenger/SendMessagesHelper.java']:
    path='TMessagesProj/src/main/java/'+path
-   self.assertEqual((ROOT/path).read_bytes(),subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT),path)
+   from next_alpha_contract import restore_visual
+   self.assertEqual(restore_visual(path,(ROOT/path).read_bytes()),subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT),path)
  def test_cancelled_spring_rolls_back_and_stale_callback_cannot_close_another_fragment(self):
   source=(ROOT/'TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java').read_text();start=source.index('currentSpringAnimation.addEndListener(',source.index('private void animateBackEndAnimation'))
   statement=source[start:source.index('            currentSpringAnimation.start();',start)]

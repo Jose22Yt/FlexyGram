@@ -18424,6 +18424,16 @@ public class ChatActivity extends BaseFragment implements
     }
 
     public class ChatActivityFragmentView extends SizeNotifierFrameLayout {
+        private app.flexygram.bubbles.SignatureWallpaperBlur.Owner signatureWallpaperBlur;
+        private void refreshSignatureWallpaperBlur() {
+            if (signatureWallpaperBlur != null) signatureWallpaperBlur.prepare(getBackgroundImage(),
+                    getNewDrawableMotion(), getThemedColor(Theme.key_windowBackgroundGray));
+        }
+        @Override protected void onBackgroundViewInvalidate() {
+            super.onBackgroundViewInvalidate();
+            refreshSignatureWallpaperBlur();
+        }
+
 
         @Override
         public int measureKeyboardHeight() {
@@ -18567,6 +18577,7 @@ public class ChatActivity extends BaseFragment implements
         @Override
         public void onUpdateBackgroundDrawable(Drawable drawable) {
             super.onUpdateBackgroundDrawable(drawable);
+            refreshSignatureWallpaperBlur();
             if (drawable instanceof MotionBackgroundDrawable) {
                 ((MotionBackgroundDrawable) drawable).setFastRenderAllowed();
             }
@@ -18720,6 +18731,8 @@ public class ChatActivity extends BaseFragment implements
         @Override
         protected void onAttachedToWindow() {
             super.onAttachedToWindow();
+            signatureWallpaperBlur = new app.flexygram.bubbles.SignatureWallpaperBlur.Owner(chatListView != null ? chatListView : this);
+            refreshSignatureWallpaperBlur();
             if (isInsideContainer) {
                 adjustPanLayoutHelper.setResizableView(contentView);
             } else if (parentLayout != null && parentLayout.isSheet()) {
@@ -18739,6 +18752,7 @@ public class ChatActivity extends BaseFragment implements
 
         @Override
         protected void onDetachedFromWindow() {
+            if (signatureWallpaperBlur != null) { signatureWallpaperBlur.close(); signatureWallpaperBlur = null; }
             super.onDetachedFromWindow();
             adjustPanLayoutHelper.onDetach();
             if (pullingDownDrawable != null) {
@@ -42189,19 +42203,11 @@ public class ChatActivity extends BaseFragment implements
     private class ChatMessageCellDelegate implements ChatMessageCell.ChatMessageCellDelegate {
         @Override
         public boolean drawFlexyBubbleWallpaper(ChatMessageCell cell, Canvas canvas, android.graphics.Path path) {
-            if (contentView == null || chatListView == null || navbarContentSourceWallpaper.getSource() == null
-                    || !canvas.isHardwareAccelerated() || cell.getAlpha() < 1f || cell.getTranslationX() != 0) return false;
-            if (navbarContentSourceWallpaper.getSource() instanceof BlurredBackgroundSourceBitmap) {
-                Bitmap bitmap = ((BlurredBackgroundSourceBitmap) navbarContentSourceWallpaper.getSource()).getBitmap();
-                if (bitmap == null || bitmap.isRecycled()) return false;
-            }
-            // WallpaperBitmapProvider memoizes a 90x120 image blur. No bitmap or blur work in this draw.
-            int save = canvas.save();
-            canvas.clipPath(path);
-            canvas.translate(-cell.getX() - chatListView.getX(), -cell.getY() - chatListView.getY());
-            navbarContentSourceWallpaper.draw(canvas, 0, 0, contentView.getWidth(), contentView.getHeight());
-            canvas.restoreToCount(save);
-            return true;
+            if (contentView == null || chatListView == null || contentView.signatureWallpaperBlur == null
+                    || cell.getAlpha() < 1f || cell.getTranslationX() != 0 || Theme.isAnimatingColor()) return false;
+            // Existing cell/root coordinate bridge; only the new static asynchronous cache is sampled.
+            return contentView.signatureWallpaperBlur.draw(canvas, path,
+                    cell.getX() + chatListView.getX(), cell.getY() + chatListView.getY());
         }
 
         @Override

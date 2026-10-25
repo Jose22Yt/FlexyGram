@@ -208,6 +208,20 @@ public class ChatBackgroundDrawable extends Drawable {
         }
     }
 
+    /** Read-only static source/mapping after the native receiver has drawn it.
+     * Animated, rotated, mirrored, patterned and crossfading sources keep Matte. */
+    public Bitmap getSignatureStaticBitmap(android.graphics.RectF region) {
+        if (motionBackgroundDrawable != null || isPattern || alpha != 255
+                || wallpaper != null && wallpaper.settings != null && wallpaper.settings.motion
+                || !imageReceiver.hasImageLoaded() || imageReceiver.getCurrentAlpha() != 1f
+                || imageReceiver.getOrientation() != 0 || imageReceiver.getInvert() != 0) return null;
+        Drawable drawable = imageReceiver.getDrawable();
+        if (!(drawable instanceof BitmapDrawable) || drawable instanceof org.telegram.ui.Components.AnimatedFileDrawable) return null;
+        region.set(imageReceiver.getDrawRegion());
+        Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
+        return bitmap != null && !bitmap.isRecycled() ? bitmap : null;
+    }
+
     public float getDimAmount() {
         if (motionBackgroundDrawable == null) {
             return dimAmount;

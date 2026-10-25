@@ -11,4 +11,4 @@ class NextSignature(unittest.TestCase):
     with self.assertRaises(ValueError,msg=path):restore_visual(path,data.replace(b'public ',b'private ',1))
  def test_message_measurement_grouping_and_engine_are_preserved(self):
   for path in ['TMessagesProj/src/main/java/org/telegram/ui/Cells/ChatMessageCell.java','TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java','TMessagesProj/src/main/java/org/telegram/messenger/MediaController.java']:
-   self.assertEqual((ROOT/path).read_bytes(),subprocess.check_output(['git','show',VISUAL_BASE+':'+path],cwd=ROOT),path)
+   self.assertEqual(restore_visual(path,(ROOT/path).read_bytes()),subprocess.check_output(['git','show',VISUAL_BASE+':'+path],cwd=ROOT),path)

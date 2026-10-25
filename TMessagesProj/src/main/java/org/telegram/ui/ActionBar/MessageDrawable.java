@@ -643,6 +643,10 @@ public class MessageDrawable extends Drawable {
             // Stable theme color, independent of wallpaper/blur availability and animation phase.
             // Instance paints and the native geometry cache are reused for every draw.
             int color = signatureColor();
+            if (app.flexygram.bubbles.BubbleConfig.backgroundBlur() && flexyGlassSource != null) {
+                // Legacy-named coordinate callback, new bounded static cache; legacy Glass flags are ignored.
+                flexyGlassSource.draw(canvas, path);
+            }
             flexyFillPaint.setColor(color);
             // Reuse Telegram's cached gradient and matrix; no new shader per frame.
             flexyFillPaint.setShader(p.getShader());

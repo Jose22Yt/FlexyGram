@@ -22,4 +22,6 @@
     <string name="FlexyBubbleBlurUnavailable">El desenfoque de fondo no está disponible en esta compilación de prueba. Matte conserva nítidos el texto y el contorno.</string>
     <string name="FlexyBubblePreviewGroupIncoming">Esta conversación es una vista previa local.</string>
     <string name="FlexyBubblePreviewGroupOutgoing">Tus cambios se muestran al instante.</string>
+    <string name="FlexyBubbleBackgroundBlur">Desenfoque de fondo</string>
+    <string name="FlexyBubbleBlurCompatibility">El desenfoque está disponible para fondos de imagen estáticos compatibles. Los fondos animados o no compatibles mantienen Matte.</string>
 </resources>

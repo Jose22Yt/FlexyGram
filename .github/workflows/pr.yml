@@ -79,8 +79,7 @@ jobs:
         with:
           name: isolated-signature-renderers
           path: |
-            build/connected-alpha-bubble-visual/signature-preview-light.png
-            build/connected-alpha-bubble-visual/signature-preview-dark.png
+            build/connected-alpha-bubble-visual/signature-preview-*.png
             build/connected-alpha-bubble-visual/target/surefire-reports/*.xml
             build/connected-alpha-matte-visual/target/surefire-reports/*.xml
           retention-days: 7

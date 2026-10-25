@@ -21,7 +21,7 @@ import static org.junit.Assert.*;
 public class BubblePreviewVisualTest {
  private Resources resources;
  @Before public void resources() throws Exception {
-  ApplicationLoader.applicationContext=RuntimeEnvironment.getApplication();
+  ApplicationLoader.applicationContext=RuntimeEnvironment.getApplication();BubbleConfig.load();BubbleConfig.setBackgroundBlur(false);
   AssetManager assets=AssetManager.class.getDeclaredConstructor().newInstance();
   assertTrue((Integer)AssetManager.class.getMethod("addAssetPath",String.class).invoke(assets,System.getProperty("probe.root")+"/resources.ap_")>0);
   DisplayMetrics metrics=new DisplayMetrics();metrics.density=1;metrics.densityDpi=160;metrics.scaledDensity=1;
@@ -62,4 +62,21 @@ public class BubblePreviewVisualTest {
    assertEquals(0,NotificationCenter.getGlobalInstance().registrations.size());assertFalse(original.isRecycled());
   }
  }
+ @Test public void cachedBlurPreviewUsesSyntheticStaticWallpaperAndKeepsContentNative() throws Exception {
+  try(var controller=Robolectric.buildActivity(Activity.class).setup()){
+   Activity a=controller.get();FrameLayout root=new FrameLayout(a);a.setContentView(root);
+   Bitmap wallpaper=Bitmap.createBitmap(512,512,Bitmap.Config.ARGB_8888);
+   int[] pixels=new int[512*512];for(int y=0;y<512;y++)for(int x=0;x<512;x++)pixels[y*512+x]=((x/3+y/3)%2==0)?0xffd7a694:0xff709fa8;
+   wallpaper.setPixels(pixels,0,512,0,0,512,512);Theme.dark=false;Theme.wallpaper=new BitmapDrawable(resources,wallpaper);Theme.chat_msgTextPaint.setTextSize(16);Theme.chat_timePaint.setTextSize(11);
+   BubblePreviewView preview=new BubblePreviewView(context(a));root.addView(preview);measure(preview);BubbleConfig.setTransparency(80);BubbleConfig.setBorderTenths(11);
+   Bitmap before=Bitmap.createBitmap(360,preview.getHeight(),Bitmap.Config.ARGB_8888);preview.draw(new Canvas(before));
+   BubbleConfig.setBackgroundBlur(true);preview.settingsChanged();assertEquals(1,Utilities.globalQueue.pending());Utilities.globalQueue.runAllOnWorker();org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();measure(preview);
+   Bitmap after=Bitmap.createBitmap(360,preview.getHeight(),Bitmap.Config.ARGB_8888);preview.draw(new Canvas(after));assertEquals(before.getHeight(),after.getHeight());
+   int changed=0;for(int y=0;y<after.getHeight();y++)for(int x=0;x<360;x++)if(before.getPixel(x,y)!=after.getPixel(x,y))changed++;
+   assertTrue(changed>500);assertEquals(before.getPixel(12,12),after.getPixel(12,12));
+   for(boolean enabled:new boolean[]{false,true})try(java.io.FileOutputStream f=new java.io.FileOutputStream(System.getProperty("probe.root")+"/signature-preview-blur-"+(enabled?"on":"off")+".png")){assertTrue((enabled?after:before).compress(Bitmap.CompressFormat.PNG,100,f));}
+   root.removeView(preview);assertFalse(wallpaper.isRecycled());assertEquals(0,Utilities.globalQueue.pending());BubbleConfig.setBackgroundBlur(false);
+  }
+ }
+
 }
