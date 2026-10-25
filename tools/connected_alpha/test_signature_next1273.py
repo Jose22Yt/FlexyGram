@@ -5,7 +5,8 @@ class NextSignature(unittest.TestCase):
  def test_visual_delta_restores_exact_checkpoint_and_rejects_unreviewed_edits(self):
   for path in VISUAL_PATHS:
    data=(ROOT/path).read_bytes()
-   self.assertEqual(restore_visual(path,data),subprocess.check_output(['git','show',VISUAL_BASE+':'+path],cwd=ROOT),path)
+   before=subprocess.run(['git','show',VISUAL_BASE+':'+path],cwd=ROOT,capture_output=True)
+   self.assertEqual(restore_visual(path,data),before.stdout if before.returncode==0 else b'',path)
    if path.endswith('.java'):
     with self.assertRaises(ValueError,msg=path):restore_visual(path,data.replace(b'public ',b'private ',1))
  def test_message_measurement_grouping_and_engine_are_preserved(self):

@@ -1,3 +1,38 @@
+diff --git a/.github/workflows/pr.yml b/.github/workflows/pr.yml
+index e24190450..8aea4a988 100644
+--- a/.github/workflows/pr.yml
++++ b/.github/workflows/pr.yml
+@@ -74,6 +74,17 @@ jobs:
+           done
+           python3 tools/connected_alpha/music_visual/reproduce_detach.py --sdk-root "$ANDROID_HOME"
+           python3 tools/connected_alpha/preview_visual/run.py --sdk-root "$ANDROID_HOME"
++      - name: Retain synthetic renderer evidence (no owner screenshots or APK)
++        uses: actions/upload-artifact@v4
++        with:
++          name: isolated-signature-renderers
++          path: |
++            build/connected-alpha-bubble-visual/signature-preview-light.png
++            build/connected-alpha-bubble-visual/signature-preview-dark.png
++            build/connected-alpha-bubble-visual/target/surefire-reports/*.xml
++            build/connected-alpha-matte-visual/target/surefire-reports/*.xml
++          retention-days: 7
++          if-no-files-found: error
+   build:
+     if: github.event_name == 'pull_request' && github.head_ref != 'feat/alpha1271-signature-ui' && github.head_ref != 'feat/signature-native-login' && github.head_ref != 'feat/signature-music2' && github.head_ref != 'fix/alpha-ios-bubbles-glass-home2' && github.head_ref != 'fix/signature-matte-general-appearance' && github.head_ref != 'alpha/connected-exteraless-baseline' && !startsWith(github.head_ref, 'support/connected-alpha-ci-') && !startsWith(github.head_ref, 'integration/connected-alpha-') && !startsWith(github.head_ref, 'fix/alpha2-')
+     name: Gradle Build
+diff --git a/TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraChatsActivity.java b/TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraChatsActivity.java
+index 25d865b63..78691450c 100644
+--- a/TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraChatsActivity.java
++++ b/TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraChatsActivity.java
+@@ -1888,7 +1888,7 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
+             showStoriesOptions(view, position);
+             return;
+         } else if (position == chatSettingsRow) {
+-            presentFragment(new ThemeActivity(ThemeActivity.THEME_TYPE_BASIC));
++            presentFragment(ThemeActivity.signatureClassicOptions());
+             return;
+         } else if (position == aiChatRow) {
+             presentFragment(new app.exteraless.ai.ui.AiSettingsActivity());
 diff --git a/TMessagesProj/src/main/java/app/flexygram/bubbles/BubblePreviewView.java b/TMessagesProj/src/main/java/app/flexygram/bubbles/BubblePreviewView.java
 index ba533b774..9e308a741 100644
 --- a/TMessagesProj/src/main/java/app/flexygram/bubbles/BubblePreviewView.java
@@ -201,6 +236,99 @@ index ba533b774..9e308a741 100644
 +        canvas.restoreToCount(save);
      }
  }
+diff --git a/TMessagesProj/src/main/java/app/flexygram/settings/SignatureChatThemeActivity.java b/TMessagesProj/src/main/java/app/flexygram/settings/SignatureChatThemeActivity.java
+index 74c8b2a0e..f7de04796 100644
+--- a/TMessagesProj/src/main/java/app/flexygram/settings/SignatureChatThemeActivity.java
++++ b/TMessagesProj/src/main/java/app/flexygram/settings/SignatureChatThemeActivity.java
+@@ -1,31 +1,10 @@
+ package app.flexygram.settings;
+ 
+-import static org.telegram.messenger.LocaleController.getString;
+-import android.content.Context;
+-import android.view.View;
+-import androidx.recyclerview.widget.RecyclerView;
+-import org.telegram.messenger.R;
+-import org.telegram.ui.Cells.TextSettingsCell;
+ import org.telegram.ui.ThemeActivity;
+-import org.telegram.ui.WallpapersListActivity;
+ 
+-/** Routes to Telegram's existing theme and wallpaper editors without duplicating their state. */
+-public final class SignatureChatThemeActivity extends SignatureMatteSettingsActivity {
+-    private int themeRow, wallpaperRow;
+-    @Override protected void updateRows() {
+-        super.updateRows(); themeRow = addRow("signatureChatTheme"); wallpaperRow = addRow("signatureChatWallpaper");
+-    }
+-    @Override protected String getActionBarTitle() { return getString(R.string.FlexyThemeWallpaper); }
+-    @Override protected BaseListAdapter createAdapter(Context context) { return new Adapter(context); }
+-    @Override protected void onItemClick(View view, int position, float x, float y) {
+-        if (position == themeRow) presentFragment(new ThemeActivity(ThemeActivity.THEME_TYPE_THEMES_BROWSER));
+-        else if (position == wallpaperRow) presentFragment(new WallpapersListActivity(WallpapersListActivity.TYPE_ALL));
+-    }
+-    private final class Adapter extends MatteListAdapter {
+-        Adapter(Context context) { super(context); }
+-        @Override public int getItemViewType(int position) { return TYPE_SETTINGS; }
+-        @Override public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, boolean partial) {
+-            ((TextSettingsCell)holder.itemView).setText(getString(position == themeRow ? R.string.BrowseThemes : R.string.ChangeChatBackground), position == themeRow);
+-        }
++/** The existing native theme/wallpaper/editor screen, focused and grouped for FlexyGram. */
++public final class SignatureChatThemeActivity extends ThemeActivity {
++    public SignatureChatThemeActivity() {
++        super(ThemeActivity.THEME_TYPE_BASIC, 2);
+     }
+ }
+diff --git a/TMessagesProj/src/main/java/app/flexygram/settings/SignatureNativeRowSurface.java b/TMessagesProj/src/main/java/app/flexygram/settings/SignatureNativeRowSurface.java
+new file mode 100644
+index 000000000..c3348c049
+--- /dev/null
++++ b/TMessagesProj/src/main/java/app/flexygram/settings/SignatureNativeRowSurface.java
+@@ -0,0 +1,47 @@
++package app.flexygram.settings;
++
++import android.graphics.Canvas;
++import android.graphics.ColorFilter;
++import android.graphics.Outline;
++import android.graphics.Paint;
++import android.graphics.Path;
++import android.graphics.PixelFormat;
++import android.graphics.Rect;
++import android.graphics.RectF;
++import android.graphics.drawable.Drawable;
++import android.view.View;
++import android.view.ViewOutlineProvider;
++import org.telegram.messenger.AndroidUtilities;
++
++/** Static grouped native row surface; geometry is rebuilt only on bind/bounds changes. */
++public final class SignatureNativeRowSurface extends Drawable {
++    private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
++    private final Path path = new Path();
++    private final RectF rect = new RectF();
++    private final float[] radii = new float[8];
++    private boolean top, bottom;
++    private int color;
++    public static void bind(View view, int color, boolean top, boolean bottom) {
++        SignatureNativeRowSurface surface;
++        if (view.getBackground() instanceof SignatureNativeRowSurface) surface = (SignatureNativeRowSurface) view.getBackground();
++        else { surface = new SignatureNativeRowSurface(); view.setBackground(surface); }
++        if (surface.top != top || surface.bottom != bottom || surface.color != color) {
++            surface.top = top; surface.bottom = bottom; surface.color = color;
++            surface.paint.setColor(color); surface.geometry(); surface.invalidateSelf();
++        }
++        view.setOutlineProvider(ViewOutlineProvider.BACKGROUND);
++        view.setClipToOutline(true);
++    }
++    private void geometry() {
++        rect.set(getBounds());
++        for (int i = 0; i < 4; i++) radii[i] = top ? AndroidUtilities.dp(18) : 0;
++        for (int i = 4; i < 8; i++) radii[i] = bottom ? AndroidUtilities.dp(18) : 0;
++        path.rewind(); path.addRoundRect(rect, radii, Path.Direction.CW);
++    }
++    @Override protected void onBoundsChange(Rect bounds) { geometry(); }
++    @Override public void draw(Canvas canvas) { canvas.drawPath(path, paint); }
++    @Override public void getOutline(Outline outline) { if (!path.isEmpty()) outline.setConvexPath(path); }
++    @Override public void setAlpha(int alpha) { paint.setAlpha(alpha); invalidateSelf(); }
++    @Override public void setColorFilter(ColorFilter filter) { paint.setColorFilter(filter); invalidateSelf(); }
++    @Override public int getOpacity() { return PixelFormat.TRANSLUCENT; }
++}
 diff --git a/TMessagesProj/src/main/java/org/telegram/ui/ActionBar/MessageDrawable.java b/TMessagesProj/src/main/java/org/telegram/ui/ActionBar/MessageDrawable.java
 index b3f0c1d59..140bad16f 100644
 --- a/TMessagesProj/src/main/java/org/telegram/ui/ActionBar/MessageDrawable.java
@@ -320,6 +448,165 @@ index b3f0c1d59..140bad16f 100644
                      }
                  } else {
                      path.lineTo(bounds.left + dp(8), top - topY + currentBackgroundHeight);
+diff --git a/TMessagesProj/src/main/java/org/telegram/ui/ThemeActivity.java b/TMessagesProj/src/main/java/org/telegram/ui/ThemeActivity.java
+index 73a4a5425..4f26cc2ba 100644
+--- a/TMessagesProj/src/main/java/org/telegram/ui/ThemeActivity.java
++++ b/TMessagesProj/src/main/java/org/telegram/ui/ThemeActivity.java
+@@ -497,11 +497,20 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
+         }
+     }
+ 
+-    public ThemeActivity(int type) {
++    // Presentation only. All original routes, editor logic and preference keys remain native.
++    private int signatureChatSection; // 0 legacy, 1 classic options, 2 theme/wallpaper
++    public ThemeActivity(int type) { this(type, 0); }
++    protected ThemeActivity(int type, int signatureSection) {
+         super();
+         currentType = type;
++        signatureChatSection = org.telegram.messenger.BuildConfig.CONNECTED_ALPHA
++                && type == THEME_TYPE_BASIC ? signatureSection : 0;
+         updateRows(true);
+     }
++    public static ThemeActivity signatureClassicOptions() {
++        return new ThemeActivity(THEME_TYPE_BASIC, 1);
++    }
++
+ 
+     private boolean setBubbleRadius(int size, boolean layout) {
+         if (size != SharedConfig.bubbleRadius) {
+@@ -704,15 +713,33 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
+             createNewThemeRow = rowCount++;
+             lastShadowRow = rowCount++;
+         } else if (currentType == THEME_TYPE_BASIC) {
+-            textSizeHeaderRow = rowCount++;
+-            textSizeRow = rowCount++;
+-            backgroundRow = rowCount++;
+-            changeUserColor = rowCount++;
+-            newThemeInfoRow = rowCount++;
+-            themeHeaderRow = rowCount++;
+-
+-            themeListRow2 = rowCount++;
+-            themeInfoRow = rowCount++;
++            if (signatureChatSection != 2) {
++                textSizeHeaderRow = rowCount++;
++                textSizeRow = rowCount++;
++            }
++            if (signatureChatSection != 1) {
++                backgroundRow = rowCount++;
++                changeUserColor = rowCount++;
++                newThemeInfoRow = rowCount++;
++                themeHeaderRow = rowCount++;
++                themeListRow2 = rowCount++;
++                themeInfoRow = rowCount++;
++            }
++            if (signatureChatSection == 2) {
++                themePreviewRow = rowCount++;
++                selectThemeHeaderRow = rowCount++;
++                themeListRow = rowCount++;
++                hasThemeAccents = Theme.getCurrentTheme().hasAccentColors();
++                if (themesHorizontalListCell != null) themesHorizontalListCell.setDrawDivider(hasThemeAccents);
++                if (hasThemeAccents) themeAccentListRow = rowCount++;
++                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) monetStyleRow = rowCount++;
++                Theme.ThemeInfo info = Theme.getCurrentTheme();
++                Theme.ThemeAccent accent = info.getAccent(false);
++                if (info.themeAccents != null && !info.themeAccents.isEmpty() && accent != null && accent.id >= 100) editThemeRow = rowCount++;
++                createNewThemeRow = rowCount++;
++                nightThemeRow = rowCount++;
++                lastShadowRow = rowCount++;
++            } else {
+ 
+             if (!org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) {
+                 bubbleRadiusHeaderRow = rowCount++;
+@@ -732,7 +759,7 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
+             swipeGestureRow = rowCount++;
+             swipeGestureInfoRow = rowCount++;
+ 
+-            nightThemeRow = rowCount++;
++            if (signatureChatSection == 0) nightThemeRow = rowCount++;
+             browserRow = rowCount++;
+             liteModeRow = rowCount++;
+             stickersRow = rowCount++;
+@@ -758,6 +785,7 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
+             sendByEnterRow = rowCount++;
+             distanceRow = rowCount++;
+             otherSectionRow = rowCount++;
++            }
+         } else {
+             nightDisabledRow = rowCount++;  // TYPE_THEME_TYPE
+             nightScheduledRow = rowCount++; // TYPE_THEME_TYPE
+@@ -1008,16 +1036,24 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
+             sunDrawable.setPlayInDirectionOfCustomEndFrame(true);
+             menuItem = menu.addItem(day_night_switch, sunDrawable);
+         } else if (currentType == THEME_TYPE_BASIC) {
+-            actionBar.setTitle(getString("ChatSettings", R.string.ChatSettings));
++            actionBar.setTitle(getString(signatureChatSection == 2 ? R.string.FlexyThemeWallpaper
++                    : signatureChatSection == 1 ? R.string.FlexyClassicOptions : R.string.ChatSettings));
++            if (signatureChatSection != 0) {
++                actionBar.setDrawGlassTitle(false);
++                actionBar.doNotDrawGlassMenu = true;
++            }
+             ActionBarMenu menu = actionBar.createMenu();
+             menuItem = menu.addItem(0, R.drawable.ic_ab_other);
+             menuItem.setContentDescription(getString("AccDescrMoreOptions", R.string.AccDescrMoreOptions));
+             menuItem.addSubItem(share_theme, R.drawable.msg_share, getString("ShareTheme", R.string.ShareTheme));
+-            menuItem.addSubItem(edit_theme, R.drawable.msg_edit, getString("EditThemeColors", R.string.EditThemeColors));
+-            menuItem.addSubItem(create_theme, R.drawable.msg_palette, getString("CreateNewThemeMenu", R.string.CreateNewThemeMenu));
++            if (signatureChatSection != 2 || editThemeRow < 0)
++                menuItem.addSubItem(edit_theme, R.drawable.msg_edit, getString("EditThemeColors", R.string.EditThemeColors));
++            if (signatureChatSection != 2)
++                menuItem.addSubItem(create_theme, R.drawable.msg_palette, getString("CreateNewThemeMenu", R.string.CreateNewThemeMenu));
++            if (signatureChatSection == 1) menuItem.setVisibility(View.GONE);
+             menuItem.addSubItem(reset_settings, R.drawable.msg_reset, getString("ThemeResetToDefaults", R.string.ThemeResetToDefaults));
+ 
+-            if (getMessagesController().getContentSettings() == null) {
++            if (signatureChatSection != 2 && getMessagesController().getContentSettings() == null) {
+                 getMessagesController().getContentSettings(settings -> {
+                     if (listView != null && listView.isAttachedToWindow() && listAdapter != null) {
+                         if ((sensitiveContentRow >= 0) == (settings != null && settings.sensitive_can_change)) {
+@@ -1578,7 +1614,8 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
+ 
+     @Override
+     public void onInsets(int left, int top, int right, int bottom) {
+-        listView.setPadding(0, 0, 0, bottom);
++        if (signatureChatSection != 0) listView.setPadding(left + dp(14), 0, right + dp(14), bottom);
++        else listView.setPadding(0, 0, 0, bottom);
+         listView.setClipToPadding(false);
+     }
+ 
+@@ -2783,6 +2820,33 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
+                     cell.set(getUserConfig().getCurrentUser());
+                 }
+             }
++            bindSignatureSurface(holder, position);
++        }
++
++        private boolean signatureBoundary(int position) {
++            if (position < 0 || position >= rowCount) return true;
++            int type = getItemViewType(position);
++            return type == TYPE_HEADER || type == TYPE_SHADOW || type == TYPE_TEXT_INFO_PRIVACY;
++        }
++        private void bindSignatureSurface(RecyclerView.ViewHolder holder, int position) {
++            if (signatureChatSection == 0) return;
++            View view = holder.itemView;
++            if (signatureBoundary(position)) {
++                view.setClipToOutline(false);
++                view.setBackground(null);
++                if (view instanceof HeaderCell) {
++                    HeaderCell header = (HeaderCell) view;
++                    header.setTextColor(getThemedColor(Theme.key_windowBackgroundWhiteBlueHeader));
++                    if (header.getTextView() != null) {
++                        header.getTextView().setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 13);
++                        header.getTextView().setSingleLine(false);
++                    }
++                }
++            } else {
++                app.flexygram.settings.SignatureNativeRowSurface.bind(view,
++                        getThemedColor(Theme.key_windowBackgroundWhite) | 0xff000000,
++                        signatureBoundary(position - 1), signatureBoundary(position + 1));
++            }
+         }
+ 
+         @Override
 diff --git a/TMessagesProj/src/main/res/values-es/flexygram_bubbles.xml b/TMessagesProj/src/main/res/values-es/flexygram_bubbles.xml
 index 03a06e33e..49fd34e07 100644
 --- a/TMessagesProj/src/main/res/values-es/flexygram_bubbles.xml

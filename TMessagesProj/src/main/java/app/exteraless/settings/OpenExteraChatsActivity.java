@@ -1888,7 +1888,7 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
             showStoriesOptions(view, position);
             return;
         } else if (position == chatSettingsRow) {
-            presentFragment(new ThemeActivity(ThemeActivity.THEME_TYPE_BASIC));
+            presentFragment(ThemeActivity.signatureClassicOptions());
             return;
         } else if (position == aiChatRow) {
             presentFragment(new app.exteraless.ai.ui.AiSettingsActivity());

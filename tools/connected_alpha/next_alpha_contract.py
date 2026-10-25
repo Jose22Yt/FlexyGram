@@ -20,11 +20,12 @@ def restore1272(path,data):
  return original
 
 VISUAL_BASE='43e14d876601d16890b8c6f24c515103e6ece54f'
-VISUAL_PATHS=frozenset(['TMessagesProj/src/main/java/org/telegram/ui/ActionBar/MessageDrawable.java', 'TMessagesProj/src/main/java/app/flexygram/bubbles/BubblePreviewView.java', 'TMessagesProj/src/main/res/values/flexygram_bubbles.xml', 'TMessagesProj/src/main/res/values-es/flexygram_bubbles.xml', 'TMessagesProj/src/main/res/values-ru/flexygram_bubbles.xml'])
+VISUAL_PATHS=frozenset(['TMessagesProj/src/main/java/org/telegram/ui/ActionBar/MessageDrawable.java', 'TMessagesProj/src/main/java/app/flexygram/bubbles/BubblePreviewView.java', 'TMessagesProj/src/main/res/values/flexygram_bubbles.xml', 'TMessagesProj/src/main/res/values-es/flexygram_bubbles.xml', 'TMessagesProj/src/main/res/values-ru/flexygram_bubbles.xml', 'TMessagesProj/src/main/java/org/telegram/ui/ThemeActivity.java', 'TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraChatsActivity.java', 'TMessagesProj/src/main/java/app/flexygram/settings/SignatureChatThemeActivity.java', 'TMessagesProj/src/main/java/app/flexygram/settings/SignatureNativeRowSurface.java', '.github/workflows/pr.yml'])
 PATHS = PATHS | VISUAL_PATHS | frozenset(['tools/connected_alpha/test_signature_next1273.py','tools/connected_alpha/signature_next1273.patch','tools/connected_alpha/bubble_visual/BubbleVisualTest.java.in','tools/connected_alpha/bubble_visual/BubblePreviewVisualTest.java.in','tools/connected_alpha/bubble_visual/stubs.py','tools/connected_alpha/bubble_visual/run.py'])
 def restore_visual(path,data):
  if path not in VISUAL_PATHS:return data
- original=subprocess.check_output(['git','show',VISUAL_BASE+':'+path],cwd=ROOT)
+ probe=subprocess.run(['git','show',VISUAL_BASE+':'+path],cwd=ROOT,capture_output=True)
+ original=probe.stdout if probe.returncode==0 else None
  if data==original:return data
  patch=(ROOT/'tools/connected_alpha/signature_next1273.patch').read_bytes()
  sections={x.split(b'\n',1)[0]:b'diff --git '+x for x in patch.split(b'diff --git ')[1:]}
@@ -33,5 +34,7 @@ def restore_visual(path,data):
  with tempfile.TemporaryDirectory()as tmp:
   target=Path(tmp)/path;target.parent.mkdir(parents=True);target.write_bytes(data)
   result=subprocess.run(['git','apply','--reverse','-'],input=section,cwd=tmp,capture_output=True)
-  if result.returncode or target.read_bytes()!=original:raise ValueError('Unreviewed next-alpha visual delta: '+path)
- return original
+  if result.returncode or (target.read_bytes() if target.exists() else None)!=original:raise ValueError('Unreviewed next-alpha visual delta: '+path)
+ return original or b''
+
+PATHS = PATHS | frozenset(["tools/connected_alpha/test_theme_sections1273.py","tools/connected_alpha/matte_visual/run.py","tools/connected_alpha/matte_visual/MatteVisualTest.java.in"])
