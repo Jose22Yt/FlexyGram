@@ -100,7 +100,8 @@ class Navigation2(unittest.TestCase):
         changed=set(subprocess.check_output(['git','diff','--name-only',BASE],cwd=ROOT,text=True).splitlines())
         changed.update(subprocess.check_output(['git','ls-files','-o','--exclude-standard'],cwd=ROOT,text=True).splitlines())
         self.assertFalse(changed-(PATHS|combined_paths()),changed-(PATHS|combined_paths()))
-        self.assertEqual({p for p in changed if p.startswith('TMessagesProj/') and p not in work1},set(PRODUCTION))
+        from studio_contract import PATHS as STUDIO_PATHS
+        self.assertEqual({p for p in changed if p.startswith('TMessagesProj/') and p not in work1 and p not in STUDIO_PATHS},set(PRODUCTION))
 
     def test_window_and_package_validation_rejects_injection_and_invalid_clocks(self):
         for window in ((0,0),(20,10),(-1,10),(False,10),(0,60_000_000_001)):

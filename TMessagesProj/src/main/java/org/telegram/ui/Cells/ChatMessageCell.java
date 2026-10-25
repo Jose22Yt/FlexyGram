@@ -580,6 +580,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     }
 
     public interface ChatMessageCellDelegate {
+        default boolean didPressFlexyStudioDocument(ChatMessageCell cell) { return false; }
         default boolean isReplyOrSelf() {
             return false;
         }
@@ -18289,6 +18290,8 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             delegate.didPressRevealSensitiveContent(this);
             return;
         }
+        if (currentMessageObject != null && app.flexygram.studio.FlexyStyleInstallHelper.recognized(currentMessageObject.getDocumentName())
+                && delegate != null && delegate.didPressFlexyStudioDocument(this)) return;
         if (currentMessageObject != null && !currentMessageObject.isAnyKindOfSticker()) {
             currentMessageObject.putInDownloadsStore = true;
         }

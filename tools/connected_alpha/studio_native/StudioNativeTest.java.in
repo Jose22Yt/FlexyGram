@@ -1,0 +1,106 @@
+import android.app.*;import android.content.*;import android.graphics.*;import android.os.*;import android.view.*;import android.widget.*;
+import org.junit.*;import org.junit.runner.RunWith;import org.robolectric.*;import org.robolectric.annotation.*;
+import org.telegram.messenger.*;import org.telegram.ui.ActionBar.*;import app.flexygram.studio.*;import app.flexygram.studio.core.*;
+import java.io.*;import java.lang.reflect.*;import java.util.*;import java.util.concurrent.*;import java.util.concurrent.atomic.*;import static org.junit.Assert.*;
+/** Actual new Studio classes; native Android widgets/preferences with explicit Telegram/theme/navigation doubles. */
+@RunWith(RobolectricTestRunner.class) @Config(manifest=Config.NONE,sdk=35) @GraphicsMode(GraphicsMode.Mode.NATIVE)
+public class StudioNativeTest {
+ Activity activity;FrameLayout root;BaseFragment fragment;
+ @Before public void setup(){activity=Robolectric.buildActivity(Activity.class).setup().get();root=new FrameLayout(activity);activity.setContentView(root);fragment=new BaseFragment(activity,root);org.telegram.ui.LaunchActivity.current=fragment;ApplicationLoader.applicationContext=activity.getApplicationContext();AndroidUtilities.displaySize.set(400,840);AndroidUtilities.density=1;for(StudioSchema.Key k:StudioSchema.keys())ApplicationLoader.applicationContext.getSharedPreferences(k.file,0).edit().clear().commit();new File(ApplicationLoader.applicationContext.getFilesDir(),"flexystudio-rollback.dat").delete();FileLoader.file=new File(activity.getCacheDir(),"missing-fixture");FileLoader.loads=FileLoader.cancels=DownloadController.adds=DownloadController.removes=0;DownloadController.listener=null;DownloadController.observedAccount=-1;org.telegram.ui.LauncherIconController.selected=org.telegram.ui.LauncherIconController.LauncherIcon.EXTERALESS;org.telegram.ui.LauncherIconController.writes=0;}
+ StudioCodec.Preset preset(int sections){Map<String,Map<String,Object>> map=new LinkedHashMap<>();map.put("bubbles",Map.of("transparency",72));if(sections>1)map.put("header",Map.of("compact",true));if(sections>2)map.put("composer",Map.of("style",1,"density",2));if(sections>3)map.put("icon",Map.of("selected","FLEX_BLUEPRINT"));return StudioCodec.create("Configuración-de-prueba-con-nombre-extenso.flexyGram",map);}
+ List<TextView> texts(View view){List<TextView> result=new ArrayList<>();if(view instanceof TextView)result.add((TextView)view);if(view instanceof ViewGroup)for(int i=0;i<((ViewGroup)view).getChildCount();i++)result.addAll(texts(((ViewGroup)view).getChildAt(i)));return result;}
+ void waitFor(AtomicBoolean done)throws Exception{for(int i=0;i<200&&!done.get();i++){Thread.sleep(5);Shadows.shadowOf(Looper.getMainLooper()).idle();}assertTrue("background operation completed",done.get());}
+ @Test public void cardListsExactlyPresentSectionsBeforeAnyPreferencesChange(){
+  for(int count=1;count<=4;count++){FlexyStudioSheet sheet=new FlexyStudioSheet(fragment,preset(count),"SoloBurbujas.flexyGram",834);sheet.show();List<TextView> all=texts(sheet.content);for(String id:StudioSchema.sections()){String label=LocaleController.getString(FlexyStudioText.section(id));long found=all.stream().filter(t->label.contentEquals(t.getText())).count();assertEquals(preset(count).sections.containsKey(id)?1:0,found);}assertFalse(activity.getSharedPreferences("flexygram_bubbles",0).contains("transparency"));sheet.dismiss();}
+ }
+ @Test public void actualApplyAndUndoUseRealPreferencesAndRefreshOnlyIncludedSections()throws Exception{
+  AtomicBoolean applied=new AtomicBoolean();AtomicReference<StudioTransaction.Receipt> receipt=new AtomicReference<>();
+  assertTrue(FlexyStudioStore.apply(preset(1),(ok,pending,r)->{assertTrue(ok);assertFalse(pending);receipt.set(r);applied.set(true);}));waitFor(applied);
+  assertEquals(72,activity.getSharedPreferences("flexygram_bubbles",0).getInt("transparency",-1));assertFalse(activity.getSharedPreferences("flexygram_header",0).contains("compact"));assertEquals(0,org.telegram.ui.LauncherIconController.writes);
+  AtomicBoolean undone=new AtomicBoolean();assertTrue(FlexyStudioStore.undo(receipt.get(),(ok,pending,r)->{assertTrue(ok);undone.set(true);}));waitFor(undone);assertFalse(activity.getSharedPreferences("flexygram_bubbles",0).contains("transparency"));assertFalse(new File(activity.getFilesDir(),"flexystudio-rollback.dat").exists());
+ }
+ @Test public void realPreferencesBatchComposerCallbacksIntoOneDeferredRefresh()throws Exception{
+  AtomicInteger refreshes=new AtomicInteger();Runnable refresh=refreshes::incrementAndGet;
+  SharedPreferences preferences=activity.getSharedPreferences("flexygram_composer",0);
+  SharedPreferences.OnSharedPreferenceChangeListener observer=(p,k)->{if(!FlexyStudioStore.deferComposer(refresh))refresh.run();};preferences.registerOnSharedPreferenceChangeListener(observer);
+  AtomicBoolean done=new AtomicBoolean();FlexyStudioStore.apply(preset(3),(ok,pending,r)->{assertTrue(ok);done.set(true);});waitFor(done);preferences.unregisterOnSharedPreferenceChangeListener(observer);
+  assertEquals(1,refreshes.get());assertEquals(2,preferences.getInt("compactLevel",0));
+ }
+ @Test public void downloadedDocumentNeverStartsNativeDownloadAndCancelCleansLifecycle()throws Exception{
+  File file=new File(activity.getCacheDir(),"downloaded-fixture.flexyGram");try(FileOutputStream out=new FileOutputStream(file)){out.write(StudioCodec.encode(preset(1)));}FileLoader.file=file;
+  MessageObject message=new MessageObject();View source=new View(activity);root.addView(source);assertTrue(FlexyStyleInstallHelper.handleMessageTap(fragment,message,source));
+  assertEquals(0,FileLoader.loads);FlexyStyleInstallHelper.cancel(fragment);root.removeView(source);Shadows.shadowOf(Looper.getMainLooper()).idle();assertNull(DownloadController.listener);
+ }
+ @Test public void missingDocumentUsesMessageAccountOneObserverRepeatTapCancels(){
+  MessageObject message=new MessageObject();View source=new View(activity);root.addView(source);
+  assertTrue(FlexyStyleInstallHelper.handleMessageTap(fragment,message,source));assertEquals(1,FileLoader.loads);assertEquals(2,FileLoader.account);assertEquals(2,DownloadController.observedAccount);assertEquals(1,DownloadController.adds);
+  assertTrue(FlexyStyleInstallHelper.handleMessageTap(fragment,message,source));assertEquals(1,FileLoader.cancels);assertNull(DownloadController.listener);assertEquals(1,DownloadController.removes);
+ }
+ @Test public void unrelatedExtensionsAndOversizedDocumentAreNeverProcessed(){
+  MessageObject message=new MessageObject();for(String name:new String[]{"x.plugin","x.elyx","x.eaf","x.pdf","x.zip","x.flexyGram.zip","x.flexygram"}){message.name=name;assertFalse(FlexyStyleInstallHelper.handleMessageTap(fragment,message,root));}
+  message.name="x.flexyGram";message.document.size=65537;assertTrue(FlexyStyleInstallHelper.handleMessageTap(fragment,message,root));assertEquals(0,FileLoader.loads);
+ }
+ @Test public void sensitiveDocumentKeepsNativeRevealGate(){
+  MessageObject message=new MessageObject();message.sensitive=true;assertFalse(FlexyStyleInstallHelper.handleMessageTap(fragment,message,root));assertEquals(0,FileLoader.loads);assertNull(DownloadController.listener);assertNull(fragment.dialog);
+ }
+ @Test public void externalRoutingAcceptsOnlyContentAndOwnMimeOrExactExtension(){
+  assertTrue(FlexyStyleInstallHelper.isStudioIntent(new Intent(Intent.ACTION_VIEW,android.net.Uri.parse("content://fixture/preset.flexyGram"))));
+  assertTrue(FlexyStyleInstallHelper.isStudioIntent(new Intent(Intent.ACTION_VIEW).setDataAndType(android.net.Uri.parse("content://fixture/opaque/8"),StudioSchema.MIME)));
+  for(String uri:new String[]{"file:///private/preset.flexyGram","https://example.org/preset.flexyGram","content://fixture/file.pdf"})assertFalse(FlexyStyleInstallHelper.isStudioIntent(new Intent(Intent.ACTION_VIEW,android.net.Uri.parse(uri))));
+ }
+ @Test public void detachedSourceRemovesPendingObserverAndRestoresScale(){
+  View source=new View(activity);root.addView(source);FlexyStyleInstallHelper.handleMessageTap(fragment,new MessageObject(),source);root.removeView(source);assertNull(DownloadController.listener);assertEquals(1f,source.getScaleX(),0);assertEquals(1f,source.getScaleY(),0);
+ }
+ @Test public void nativeDownloadCompletionOpensValidatedSheetWithoutSecondTap()throws Exception{
+  File target=new File(activity.getCacheDir(),"auto-open.flexyGram");target.delete();FileLoader.file=target;
+  View source=new View(activity);root.addView(source);assertTrue(FlexyStyleInstallHelper.handleMessageTap(fragment,new MessageObject(),source));
+  DownloadController.FileDownloadProgressListener observer=DownloadController.listener;
+  try(FileOutputStream out=new FileOutputStream(target)){out.write(StudioCodec.encode(preset(1)));}
+  observer.onSuccessDownload("auto-open");
+  AtomicBoolean completed=new AtomicBoolean();for(int i=0;i<200;i++){Thread.sleep(5);Shadows.shadowOf(Looper.getMainLooper()).idle();if(fragment.dialog instanceof FlexyStudioSheet){completed.set(true);break;}}
+  assertTrue(completed.get());assertFalse(activity.getSharedPreferences("flexygram_bubbles",0).contains("transparency"));
+  FlexyStyleInstallHelper.cancel(fragment);
+ }
+ @Test public void iconOnlyTransactionPreservesOtherCategories()throws Exception{
+  AtomicBoolean done=new AtomicBoolean();assertTrue(FlexyStudioStore.apply(StudioCodec.create("Icon.flexyGram",Map.of("icon",Map.of("selected","FLEX_BLUEPRINT"))),(ok,pending,r)->{assertTrue(ok);done.set(true);}));waitFor(done);
+  assertEquals(1,org.telegram.ui.LauncherIconController.writes);assertFalse(activity.getSharedPreferences("flexygram_composer",0).contains("style"));
+ }
+ @Test public void interruptedJournalRestoresActualPreferencesOnStartup()throws Exception{
+  StudioSchema.Key key=StudioSchema.key("bubbles","transparency");
+  activity.getSharedPreferences(key.file,0).edit().putInt(key.preference,99).commit();
+  File journal=new File(activity.getFilesDir(),"flexystudio-rollback.dat");
+  try(DataOutputStream out=new DataOutputStream(new FileOutputStream(journal))){out.writeInt(0x46534731);out.writeInt(1);out.writeUTF("bubbles");out.writeUTF("transparency");out.writeBoolean(true);out.writeInt(41);}
+  FlexyStudioStore.recoverIfNeeded();AtomicBoolean done=new AtomicBoolean();for(int i=0;i<200;i++){Thread.sleep(5);Shadows.shadowOf(Looper.getMainLooper()).idle();if(!journal.exists()){done.set(true);break;}}
+  assertTrue(done.get());assertEquals(41,activity.getSharedPreferences(key.file,0).getInt(key.preference,0));
+ }
+ public static class FixtureProvider extends android.content.ContentProvider {
+  static File file;static String displayName;static long declaredSize;static int opens;
+  public boolean onCreate(){return true;}public String getType(android.net.Uri uri){return StudioSchema.MIME;}
+  public android.database.Cursor query(android.net.Uri uri,String[] projection,String selection,String[] args,String order){android.database.MatrixCursor c=new android.database.MatrixCursor(projection);Object[] row=new Object[projection.length];for(int i=0;i<projection.length;i++)row[i]=projection[i].equals(android.provider.OpenableColumns.DISPLAY_NAME)?displayName:declaredSize;c.addRow(row);return c;}
+  public android.os.ParcelFileDescriptor openFile(android.net.Uri uri,String mode)throws FileNotFoundException{opens++;return android.os.ParcelFileDescriptor.open(file,android.os.ParcelFileDescriptor.MODE_READ_ONLY);}
+  public android.net.Uri insert(android.net.Uri uri,android.content.ContentValues values){throw new UnsupportedOperationException();}public int update(android.net.Uri uri,android.content.ContentValues v,String s,String[]a){throw new UnsupportedOperationException();}public int delete(android.net.Uri u,String s,String[]a){throw new UnsupportedOperationException();}
+ }
+ void provider(byte[] bytes,String name,long declared)throws Exception{
+  FixtureProvider.file=new File(activity.getCacheDir(),"provider-fixture");try(FileOutputStream out=new FileOutputStream(FixtureProvider.file)){out.write(bytes);}FixtureProvider.displayName=name;FixtureProvider.declaredSize=declared;FixtureProvider.opens=0;
+  FixtureProvider provider=new FixtureProvider();android.content.pm.ProviderInfo info=new android.content.pm.ProviderInfo();info.authority="studio.fixture";provider.attachInfo(activity,info);org.robolectric.shadows.ShadowContentResolver.registerProviderInternal(info.authority,provider);
+ }
+ @Test public void actualContentResolverOpensOpaqueUriAndUsesRealMetadata()throws Exception{
+  byte[] bytes=StudioCodec.encode(preset(1));provider(bytes,"Renamed.flexyGram",bytes.length);
+  FlexyStyleInstallHelper.openUri(fragment,android.net.Uri.parse("content://studio.fixture/8"));AtomicBoolean ready=new AtomicBoolean();for(int i=0;i<200;i++){Thread.sleep(5);Shadows.shadowOf(Looper.getMainLooper()).idle();if(fragment.dialog instanceof FlexyStudioSheet){ready.set(true);break;}}
+  assertTrue(ready.get());assertEquals(1,FixtureProvider.opens);assertTrue(texts(((FlexyStudioSheet)fragment.dialog).content).stream().anyMatch(t->"Renamed.flexyGram".contentEquals(t.getText())));assertEquals(-1,DownloadController.observedAccount);fragment.dialog.dismiss();
+ }
+ @Test public void oversizedProviderMetadataNeverOpensStreamOrChangesPreferences()throws Exception{
+  provider(StudioCodec.encode(preset(1)),"Oversized.flexyGram",65537);FlexyStyleInstallHelper.openUri(fragment,android.net.Uri.parse("content://studio.fixture/8"));Thread.sleep(40);Shadows.shadowOf(Looper.getMainLooper()).idle();assertEquals(0,FixtureProvider.opens);assertNull(fragment.dialog);assertFalse(activity.getSharedPreferences("flexygram_bubbles",0).contains("transparency"));FlexyStyleInstallHelper.cancel(fragment);
+ }
+ @Test public void corruptProviderNeverDisplaysCompatibleCard()throws Exception{
+  provider("not a preset".getBytes(java.nio.charset.StandardCharsets.UTF_8),"Corrupt.flexyGram",12);FlexyStyleInstallHelper.openUri(fragment,android.net.Uri.parse("content://studio.fixture/8"));for(int i=0;i<30;i++){Thread.sleep(5);Shadows.shadowOf(Looper.getMainLooper()).idle();}assertNull(fragment.dialog);assertFalse(activity.getSharedPreferences("flexygram_bubbles",0).contains("transparency"));FlexyStyleInstallHelper.cancel(fragment);
+ }
+ @Test public void renderIsolatedPearlMidnightSingleAndMultipleWithLargeFonts()throws Exception{
+  for(boolean dark:new boolean[]{false,true})for(int count:new int[]{1,4}){
+   Theme.dark=dark;FlexyStudioSheet sheet=new FlexyStudioSheet(fragment,preset(count),"SoloBurbujas.flexyGram",834);
+   for(TextView t:texts(sheet.content))t.setTextSize(t.getTextSize()/activity.getResources().getDisplayMetrics().scaledDensity*1.25f);
+   View content=sheet.content;content.measure(View.MeasureSpec.makeMeasureSpec(400,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(840,View.MeasureSpec.AT_MOST));content.layout(0,0,400,content.getMeasuredHeight());assertTrue(content.getMeasuredHeight()<=840);assertTrue(content.getMeasuredHeight()>200);
+   Bitmap image=Bitmap.createBitmap(400,content.getMeasuredHeight(),Bitmap.Config.ARGB_8888);content.draw(new Canvas(image));try(FileOutputStream out=new FileOutputStream(new File(System.getProperty("probe.root"),"studio-"+(dark?"midnight":"pearl")+"-"+count+"-isolated.png"))){image.compress(Bitmap.CompressFormat.PNG,100,out);}sheet.dismiss();
+  }
+ }
+}

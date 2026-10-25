@@ -51,6 +51,8 @@ def work1_paths():
     patch=(ROOT/'tools/connected_alpha/performance/work1_after340.patch').read_bytes()
     return frozenset(line[6:].decode() for line in patch.splitlines() if line.startswith(b'+++ b/'))
 def restore_reserved(path,data):
+    from studio_contract import restore as restore_studio
+    data=restore_studio(path,data) if any(marker in data for marker in (b"FlexyStudio",b"FlexyStyleInstallHelper",b"flexystudio")) else data
     patch=(ROOT/'tools/connected_alpha/performance/work1_after340.patch').read_bytes()
     sections={part.split(b'\n',1)[0]:b'diff --git '+part for part in patch.split(b'diff --git ')[1:]}
     section=sections.get(('a/'+path+' b/'+path).encode())

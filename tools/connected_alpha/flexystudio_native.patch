@@ -1,0 +1,301 @@
+diff --git a/.github/workflows/pr.yml b/.github/workflows/pr.yml
+index b2a63b900..ad5bcf1b2 100644
+--- a/.github/workflows/pr.yml
++++ b/.github/workflows/pr.yml
+@@ -91,7 +91,7 @@ jobs:
+           retention-days: 7
+           if-no-files-found: error
+   build:
+-    if: github.event_name == 'pull_request' && github.head_ref != 'perf/alpha1273-engineering2' && github.head_ref != 'feat/alpha1271-signature-ui' && github.head_ref != 'feat/signature-native-login' && github.head_ref != 'feat/signature-music2' && github.head_ref != 'fix/alpha-ios-bubbles-glass-home2' && github.head_ref != 'fix/signature-matte-general-appearance' && github.head_ref != 'alpha/connected-exteraless-baseline' && !startsWith(github.head_ref, 'support/connected-alpha-ci-') && !startsWith(github.head_ref, 'integration/connected-alpha-') && !startsWith(github.head_ref, 'fix/alpha2-')
++    if: github.event_name == 'pull_request' && github.head_ref != 'feat/flexystudio-native-presets' && github.head_ref != 'perf/alpha1273-engineering2' && github.head_ref != 'feat/alpha1271-signature-ui' && github.head_ref != 'feat/signature-native-login' && github.head_ref != 'feat/signature-music2' && github.head_ref != 'fix/alpha-ios-bubbles-glass-home2' && github.head_ref != 'fix/signature-matte-general-appearance' && github.head_ref != 'alpha/connected-exteraless-baseline' && !startsWith(github.head_ref, 'support/connected-alpha-ci-') && !startsWith(github.head_ref, 'integration/connected-alpha-') && !startsWith(github.head_ref, 'fix/alpha2-')
+     name: Gradle Build
+     runs-on: ubuntu-latest
+     env:
+diff --git a/TMessagesProj/src/main/AndroidManifest.xml b/TMessagesProj/src/main/AndroidManifest.xml
+index 0c9814329..ae2be629c 100644
+--- a/TMessagesProj/src/main/AndroidManifest.xml
++++ b/TMessagesProj/src/main/AndroidManifest.xml
+@@ -179,6 +179,19 @@
+                 <category android:name="android.intent.category.DEFAULT"/>
+                 <data android:mimeType="vnd.android.cursor.item/vnd.io.github.jose22yt.flexygram.alpha.android.profile"/>
+             </intent-filter>
++            <!-- FlexyStudio: own MIME, or an exact extension on a content URI. No catch-all association. -->
++            <intent-filter>
++                <action android:name="android.intent.action.VIEW" />
++                <category android:name="android.intent.category.DEFAULT" />
++                <data android:scheme="content" android:mimeType="application/vnd.flexygram.configuration+json" />
++            </intent-filter>
++            <intent-filter>
++                <action android:name="android.intent.action.VIEW" />
++                <category android:name="android.intent.category.DEFAULT" />
++                <data android:scheme="content" android:host="*" android:pathPattern=".*\\.flexyGram" />
++                <data android:mimeType="application/octet-stream" />
++                <data android:mimeType="application/json" />
++            </intent-filter>
+             <!-- exteraless plugins: файл плагина, открытый из чата, файлового
+                  менеджера или «Поделиться». Без этого фильтра система показывает
+                  обычный выбор приложения, а установить плагин негде. -->
+@@ -1144,6 +1157,11 @@
+ 
+         <meta-data android:name="firebase_crashlytics_collection_enabled" android:value="false" />
+ 
++        <provider android:name="app.flexygram.studio.FlexyStudioProvider"
++            android:authorities="${applicationId}.flexystudio" android:exported="false" android:grantUriPermissions="true">
++            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/flexystudio_paths" />
++        </provider>
++        <service android:name="app.flexygram.studio.FlexyStudioCleanup" android:exported="true" android:permission="android.permission.BIND_JOB_SERVICE" />
+     </application>
+ 
+ </manifest>
+diff --git a/TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraSettingsActivity.java b/TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraSettingsActivity.java
+index 970169b91..c46db356d 100644
+--- a/TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraSettingsActivity.java
++++ b/TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraSettingsActivity.java
+@@ -37,6 +37,7 @@ public class OpenExteraSettingsActivity extends BaseNekoSettingsActivity {
+     private int appearanceRow;
+     private int chatsRow;
+     private int pluginsRow;
++    private int flexyStudioRow = -1;
+     private int otherRow;
+     private int categoriesDividerRow;
+ 
+@@ -60,6 +61,7 @@ public class OpenExteraSettingsActivity extends BaseNekoSettingsActivity {
+         generalRow = addRow("general");
+         appearanceRow = addRow("appearance");
+         chatsRow = addRow("chats");
++        flexyStudioRow = org.telegram.messenger.BuildConfig.CONNECTED_ALPHA ? addRow("flexystudio") : -1;
+         pluginsRow = addRow("plugins");
+         otherRow = addRow("other");
+         categoriesDividerRow = addRow();
+@@ -182,6 +184,8 @@ public class OpenExteraSettingsActivity extends BaseNekoSettingsActivity {
+             presentFragment(new OpenExteraAppearanceActivity());
+         } else if (position == chatsRow) {
+             presentFragment(new OpenExteraChatsActivity());
++        } else if (position == flexyStudioRow && flexyStudioRow >= 0) {
++            presentFragment(new app.flexygram.studio.FlexyStudioActivity());
+         } else if (position == pluginsRow) {
+             presentFragment(new app.exteraless.plugins.ui.PluginsActivity());
+         } else if (position == otherRow) {
+@@ -269,6 +273,8 @@ public class OpenExteraSettingsActivity extends BaseNekoSettingsActivity {
+                         cell.setTextAndIcon(getString(R.string.OpenExteraAppearance), R.drawable.msg_theme, true);
+                     } else if (position == chatsRow) {
+                         cell.setTextAndIcon(getString(R.string.OpenExteraChats), R.drawable.msg_discussion, true);
++                    } else if (position == flexyStudioRow && flexyStudioRow >= 0) {
++                        cell.setTextAndIcon(getString(R.string.FlexyStudioTitle), R.drawable.flexy_studio_layers, true);
+                     } else if (position == pluginsRow) {
+                         cell.setTextAndIcon(getString(R.string.OpenExteraPlugins), R.drawable.msg_plugins, true);
+                     } else if (position == otherRow) {
+diff --git a/TMessagesProj/src/main/java/org/telegram/messenger/ApplicationLoader.java b/TMessagesProj/src/main/java/org/telegram/messenger/ApplicationLoader.java
+index 152bf9dff..64f0f19bf 100644
+--- a/TMessagesProj/src/main/java/org/telegram/messenger/ApplicationLoader.java
++++ b/TMessagesProj/src/main/java/org/telegram/messenger/ApplicationLoader.java
+@@ -288,6 +288,7 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
+         NaConfig.init();
+         OpenExteraConfig.init();
+         app.exteraless.icons.IconPacksConfig.init();
++        if (BuildConfig.CONNECTED_ALPHA) app.flexygram.studio.FlexyStudioStore.recoverIfNeeded();
+         app.exteraless.pillstack.PillStackConfig.init();
+         app.exteraless.appearance.AppearanceConfig.init();
+         app.exteraless.chats.ChatsConfig.init();
+diff --git a/TMessagesProj/src/main/java/org/telegram/ui/Cells/ChatMessageCell.java b/TMessagesProj/src/main/java/org/telegram/ui/Cells/ChatMessageCell.java
+index 8153bf037..ea22e2357 100644
+--- a/TMessagesProj/src/main/java/org/telegram/ui/Cells/ChatMessageCell.java
++++ b/TMessagesProj/src/main/java/org/telegram/ui/Cells/ChatMessageCell.java
+@@ -580,6 +580,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
+     }
+ 
+     public interface ChatMessageCellDelegate {
++        default boolean didPressFlexyStudioDocument(ChatMessageCell cell) { return false; }
+         default boolean isReplyOrSelf() {
+             return false;
+         }
+@@ -18289,6 +18290,8 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
+             delegate.didPressRevealSensitiveContent(this);
+             return;
+         }
++        if (currentMessageObject != null && app.flexygram.studio.FlexyStyleInstallHelper.recognized(currentMessageObject.getDocumentName())
++                && delegate != null && delegate.didPressFlexyStudioDocument(this)) return;
+         if (currentMessageObject != null && !currentMessageObject.isAnyKindOfSticker()) {
+             currentMessageObject.putInDownloadsStore = true;
+         }
+diff --git a/TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java b/TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java
+index fd86fac45..01e05abd8 100644
+--- a/TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java
++++ b/TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java
+@@ -3746,6 +3746,7 @@ public class ChatActivity extends BaseFragment implements
+ 
+     @Override
+     public void onFragmentDestroy() {
++        app.flexygram.studio.FlexyStyleInstallHelper.cancel(this);
+         app.exteraless.plugins.menus.MenuInjector.releaseMessageMenu(this);
+         super.onFragmentDestroy();
+         if (commentsMessagesObserver != null) {
+@@ -29115,6 +29116,7 @@ public class ChatActivity extends BaseFragment implements
+     @Override
+     public void onTransitionAnimationEnd(boolean isOpen, boolean backward) {
+         super.onTransitionAnimationEnd(isOpen, backward);
++        app.flexygram.studio.FlexyStyleInstallHelper.resume(this);
+         if (isOpen) {
+             if (backward) {
+                 if (showPinBulletin && pinBulletin != null) {
+@@ -31761,11 +31763,24 @@ public class ChatActivity extends BaseFragment implements
+         }
+     }
+ 
++    /** Scoped Studio refresh: no fragment recreation, list reload or navigation change. */
++    public void onFlexyStudioApplied(java.util.Set<String> sections) {
++        if (sections.contains("bubbles") && chatListView != null) chatListView.invalidateViews();
++        if (sections.contains("header") && signatureChatHeader != null) {
++            var params = (android.widget.FrameLayout.LayoutParams) avatarContainer.getLayoutParams();
++            params.leftMargin = usesSignatureHeader() ? 0 : AndroidUtilities.dp(!inPreviewMode ? 52 : 0);
++            params.rightMargin = isTitleCentered() ? 0 : AndroidUtilities.dp(52);
++            avatarContainer.setLayoutParams(params);
++            updateSignatureHeaderCounter(); signatureChatHeader.changed();
++        }
++    }
++
+     Bulletin.Delegate bulletinDelegate;
+ 
+     @Override
+     public void onResume() {
+         super.onResume();
++        app.flexygram.studio.FlexyStyleInstallHelper.resume(this);
+         if (BuildConfig.CONNECTED_ALPHA) app.flexygram.header.HeaderConfig.load();
+         if (signatureChatHeader != null) {
+             var params = (android.widget.FrameLayout.LayoutParams) avatarContainer.getLayoutParams();
+@@ -31994,6 +32009,7 @@ public class ChatActivity extends BaseFragment implements
+ 
+     @Override
+     public void onPause() {
++        app.flexygram.studio.FlexyStyleInstallHelper.cancel(this);
+         super.onPause();
+         scrolling = false;
+         if (scrimPopupWindow != null) {
+@@ -44657,6 +44673,7 @@ public class ChatActivity extends BaseFragment implements
+                     // exteraless plugins: файл плагина ставится, а не открывается
+                     // в подсветке кода (.plugin зарегистрирован как Python
+                     // в MarkdownUtils). Проверка идёт до просмотрщиков, как у exteraGram.
++                    if (app.flexygram.studio.FlexyStyleInstallHelper.handleMessageTap(ChatActivity.this, message, cell)) return;
+                     if (app.exteraless.plugins.PluginInstallHelper.handleMessageTap(getParentActivity(), message)) {
+                         return;
+                     }
+@@ -44759,9 +44776,15 @@ public class ChatActivity extends BaseFragment implements
+             }
+         }
+ 
++        @Override
++        public boolean didPressFlexyStudioDocument(ChatMessageCell cell) {
++            return app.flexygram.studio.FlexyStyleInstallHelper.handleMessageTap(ChatActivity.this, cell.getMessageObject(), cell);
++        }
++
+         @Override
+         public void didPressImage(ChatMessageCell cell, float x, float y, boolean fullPreview) {
+             MessageObject message = cell.getMessageObject();
++            if (app.flexygram.studio.FlexyStyleInstallHelper.handleMessageTap(ChatActivity.this, message, cell)) return;
+             if (message.type == MessageObject.TYPE_STORY) {
+                 if (message.messageOwner.media.storyItem != null && !(message.messageOwner.media.storyItem instanceof TL_stories.TL_storyItemDeleted)) {
+                     TL_stories.StoryItem storyItem = message.messageOwner.media.storyItem;
+@@ -45020,6 +45043,7 @@ public class ChatActivity extends BaseFragment implements
+                     // exteraless plugins: файл плагина ставится, а не открывается
+                     // в подсветке кода (.plugin зарегистрирован как Python
+                     // в MarkdownUtils). Проверка идёт до просмотрщиков, как у exteraGram.
++                    if (app.flexygram.studio.FlexyStyleInstallHelper.handleMessageTap(ChatActivity.this, message, cell)) return;
+                     if (app.exteraless.plugins.PluginInstallHelper.handleMessageTap(getParentActivity(), message)) {
+                         return;
+                     }
+diff --git a/TMessagesProj/src/main/java/org/telegram/ui/Components/ChatActivityEnterView.java b/TMessagesProj/src/main/java/org/telegram/ui/Components/ChatActivityEnterView.java
+index f330169e2..5fb2a825c 100644
+--- a/TMessagesProj/src/main/java/org/telegram/ui/Components/ChatActivityEnterView.java
++++ b/TMessagesProj/src/main/java/org/telegram/ui/Components/ChatActivityEnterView.java
+@@ -711,7 +711,17 @@ public class ChatActivityEnterView extends FrameLayout implements
+ 
+     private int flexyNativeFieldRight = -1;
+     private int flexyAppliedFieldRight = -1;
++    private final Runnable flexyStudioRefresh = this::refreshFlexyStudioComposer;
++    public void refreshFlexyStudioComposer() {
++        readFlexyGeometry(); checkUi_IslandTotalHeight();
++        flexyCompactRequested = app.flexygram.composer.FlexyComposerConfig.compact();
++        if (messageEditTextContainer != null) messageEditTextContainer.requestLayout(); else requestLayout();
++        if (flexyCompactLayout) { updateFlexyIconStyle(); updateFlexyIconColors(); }
++        if (audioVideoButtonContainer != null) audioVideoButtonContainer.invalidate();
++        invalidate();
++    }
+     private final SharedPreferences.OnSharedPreferenceChangeListener flexyComposerListener = (prefs, key) -> {
++        if (app.flexygram.studio.FlexyStudioStore.deferComposer(flexyStudioRefresh)) return;
+         if (app.flexygram.composer.FlexyComposerConfig.STYLE.equals(key)
+                 || app.flexygram.composer.FlexyComposerConfig.POSITION.equals(key)
+                 || app.flexygram.composer.FlexyComposerConfig.LEVEL.equals(key)
+diff --git a/TMessagesProj/src/main/java/org/telegram/ui/Components/SharedMediaLayout.java b/TMessagesProj/src/main/java/org/telegram/ui/Components/SharedMediaLayout.java
+index 5e78d5483..f4500f1b2 100644
+--- a/TMessagesProj/src/main/java/org/telegram/ui/Components/SharedMediaLayout.java
++++ b/TMessagesProj/src/main/java/org/telegram/ui/Components/SharedMediaLayout.java
+@@ -7894,6 +7894,7 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
+                 if (view instanceof SharedDocumentCell) {
+                     SharedDocumentCell cell = (SharedDocumentCell) view;
+                     TLRPC.Document document = message.getDocument();
++                    if (app.flexygram.studio.FlexyStyleInstallHelper.handleMessageTap(profileActivity, message, cell)) return;
+                     if (cell.isLoaded()) {
+                         if (message.canPreviewDocument()) {
+                             PhotoViewer.getInstance().setParentActivity(profileActivity);
+diff --git a/TMessagesProj/src/main/java/org/telegram/ui/LaunchActivity.java b/TMessagesProj/src/main/java/org/telegram/ui/LaunchActivity.java
+index efe0ca18b..8f17aad54 100644
+--- a/TMessagesProj/src/main/java/org/telegram/ui/LaunchActivity.java
++++ b/TMessagesProj/src/main/java/org/telegram/ui/LaunchActivity.java
+@@ -1603,6 +1603,10 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
+     // before, вернувший true, глотает интент (оригинальная обработка не выполняется);
+     // after зовётся всегда (finally) после оригинальной обработки.
+     private boolean handleIntent(Intent intent, boolean isNew, boolean restore, boolean fromPassword, Browser.Progress progress, boolean rebuildFragments, boolean openedTelegram) {
++        // Studio data never enters plugin/Python intent handlers; native passcode gates still run below.
++        if (app.flexygram.studio.FlexyStyleInstallHelper.isStudioIntent(intent)) {
++            return handleIntentInternal(intent, isNew, restore, fromPassword, progress, rebuildFragments, openedTelegram);
++        }
+         if (intent != null && app.exteraless.plugins.PluginsController.getInstance().isEngineEnabled()
+                 && app.exteraless.plugins.intents.IntentsDispatcher.hasHandlers()) {
+             java.util.Map<String, Object> pluginContext = app.exteraless.plugins.intents.IntentsDispatcher.buildIntentContext(
+@@ -1643,7 +1647,8 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
+         }
+         int flags = intent.getFlags();
+         String action = intent.getAction();
+-        final int[] intentAccount = new int[]{intent.getIntExtra("currentAccount", UserConfig.selectedAccount)};
++        final boolean flexyStudioIntent = app.flexygram.studio.FlexyStyleInstallHelper.isStudioIntent(intent);
++        final int[] intentAccount = new int[]{flexyStudioIntent ? UserConfig.selectedAccount : intent.getIntExtra("currentAccount", UserConfig.selectedAccount)};
+         switchToAccount(intentAccount[0], true);
+         final boolean isVoipIntent = action != null && action.equals("voip");
+         final boolean isVoipAnswerIntent = action != null && action.equals("voip_answer");
+@@ -1660,6 +1665,12 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
+                 return false;
+             }
+         }
++        if (flexyStudioIntent) {
++            app.flexygram.studio.FlexyStyleInstallHelper.acceptExternal(this, intent.getData());
++            // Keep normal cold-start/login initialization; consume only the document routing data.
++            intent = new Intent(Intent.ACTION_MAIN);
++            action = Intent.ACTION_MAIN;
++        }
+         boolean pushOpened = false;
+         long push_user_id = 0;
+         boolean userIdLink = false;
+@@ -3555,6 +3566,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
+         }
+ 
+         intent.setAction(null);
++        if (flexyStudioIntent) actionBarLayout.getView().post(() -> app.flexygram.studio.FlexyStyleInstallHelper.resumeExternal(this));
+         return pushOpened;
+     }
+ 
+@@ -7088,6 +7100,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
+ 
+     @Override
+     protected void onDestroy() {
++        app.flexygram.studio.FlexyStyleInstallHelper.cancelExternal(this);
+         app.exteraless.icons.picker.IconPickerController.onDestroy();
+         app.exteraless.plugins.PluginsController.getInstance().executeOnAppEvent(app.exteraless.plugins.PluginsConstants.EVENT_APP_STOP);
+         GramWalletStorageAuth.onActivityDestroyed(this);
+@@ -7210,6 +7223,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
+     @Override
+     protected void onResume() {
+         super.onResume();
++        app.flexygram.studio.FlexyStyleInstallHelper.resumeExternal(this);
+         isResumed = true;
+         app.exteraless.plugins.PluginsController.getInstance().executeOnAppEvent(app.exteraless.plugins.PluginsConstants.EVENT_APP_RESUME);
+         app.exteraless.plugins.PluginDenialNotice.flush();
