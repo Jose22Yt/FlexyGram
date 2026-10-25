@@ -14,6 +14,8 @@ def original(path):
  r=subprocess.run(['git','show',BASE+':'+path],cwd=ROOT,capture_output=True)
  return r.stdout if r.returncode==0 else None
 def restore1271(path,data):
+ from next_alpha_contract import restore1272
+ data=restore1272(path,data)
  path=str(path);p=ROOT/'tools/connected_alpha/stabilization1272.patch'
  if not p.exists():return data
  section=sections(p.stat().st_mtime_ns).get(('a/'+path+' b/'+path).encode())
@@ -25,3 +27,6 @@ def restore1271(path,data):
   r=subprocess.run(['git','apply','--reverse','-'],input=section,cwd=d,capture_output=True)
   if r.returncode or (target.read_bytes() if target.exists() else None)!=base:raise ValueError('Unreviewed corrective delta: '+path)
  return base or b''
+
+from next_alpha_contract import PATHS as NEXT_PATHS
+PATHS = PATHS | NEXT_PATHS

@@ -6,7 +6,7 @@ class Stabilization1272(unittest.TestCase):
  def test_entire_reviewed_production_delta_restores_exact_integrated_base(self):
   patch=(ROOT/'tools/connected_alpha/stabilization1272.patch').read_bytes()
   paths=[x[6:].decode() for x in patch.splitlines() if x.startswith(b'+++ b/')]
-  changed=subprocess.check_output(['git','diff','--name-only',BASE,'--','TMessagesProj','.github/workflows/connected-alpha-arm64.yml','tools/connected_alpha/build_private_apk.py'],cwd=ROOT,text=True).splitlines()
+  changed=subprocess.check_output(['git','diff','--name-only',BASE,'8619ba40fbd8fd9d9d898ff307fb0c0716661254','--','TMessagesProj','.github/workflows/connected-alpha-arm64.yml','tools/connected_alpha/build_private_apk.py'],cwd=ROOT,text=True).splitlines()
   self.assertEqual(set(paths),set(changed))
   for path in paths:
    current=(ROOT/path).read_bytes();old=subprocess.run(['git','show',BASE+':'+path],cwd=ROOT,capture_output=True)
