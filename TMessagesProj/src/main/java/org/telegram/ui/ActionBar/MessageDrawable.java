@@ -658,10 +658,14 @@ public class MessageDrawable extends Drawable {
                 canvas.drawPath(path, selectedPaint);
             }
             flexyBorderPaint.setStyle(Paint.Style.STROKE);
-            flexyBorderPaint.setStrokeWidth(Math.max(1f, AndroidUtilities.density * .65f));
+            // Keep the contour inside Telegram's unchanged message silhouette.
+            flexyBorderPaint.setStrokeWidth(2f * AndroidUtilities.density * app.flexygram.bubbles.BubbleConfig.borderDp());
             flexyBorderPaint.setColor(ColorUtils.setAlphaComponent(
                 app.flexygram.bubbles.BubbleStyle.outline(color, Theme.isCurrentThemeDark()), Math.round(200 * alpha / 255f)));
+            canvas.save();
+            canvas.clipPath(path);
             canvas.drawPath(path, flexyBorderPaint);
+            canvas.restore();
         } else {
             canvas.drawPath(path, p);
         }

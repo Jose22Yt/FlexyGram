@@ -12,4 +12,12 @@
     <string name="FlexyMessagesGestures">Messages and gestures</string>
     <string name="FlexyStickersMedia">Stickers and media</string>
     <string name="FlexyThemeWallpaper">Chat theme and wallpaper</string>
+    <string name="FlexyChatsPersonalization">Personalization</string>
+    <string name="FlexyChatsInteraction">Interaction and content</string>
+    <string name="FlexyChatsAdditional">Additional options</string>
+    <string name="FlexyConversationBar">Conversation bar</string>
+    <string name="FlexyBubbleBorderWidth">Border width</string>
+    <string name="FlexyBubblePreviewIncoming">Hello</string>
+    <string name="FlexyBubblePreviewOutgoing">Hello!</string>
+    <string name="FlexyBubbleBlurUnavailable">Background blur is unavailable in this test build. Matte keeps text and outlines sharp.</string>
 </resources>

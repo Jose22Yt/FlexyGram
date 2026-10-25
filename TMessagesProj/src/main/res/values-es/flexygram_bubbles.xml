@@ -12,4 +12,12 @@
     <string name="FlexyMessagesGestures">Mensajes y gestos</string>
     <string name="FlexyStickersMedia">Stickers y multimedia</string>
     <string name="FlexyThemeWallpaper">Tema y fondo de chat</string>
+    <string name="FlexyChatsPersonalization">Personalización</string>
+    <string name="FlexyChatsInteraction">Interacción y contenido</string>
+    <string name="FlexyChatsAdditional">Opciones adicionales</string>
+    <string name="FlexyConversationBar">Barra de conversación</string>
+    <string name="FlexyBubbleBorderWidth">Grosor del borde</string>
+    <string name="FlexyBubblePreviewIncoming">Hola</string>
+    <string name="FlexyBubblePreviewOutgoing">¡Hola!</string>
+    <string name="FlexyBubbleBlurUnavailable">El desenfoque de fondo no está disponible en esta compilación de prueba. Matte conserva nítidos el texto y el contorno.</string>
 </resources>

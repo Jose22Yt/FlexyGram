@@ -195,6 +195,7 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
 
     private int inputHeaderRow = -1;
     private int composerSettingsRow = -1;
+    private int signaturePersonalHeader = -1, signatureInteractionHeader = -1, signatureAdditionalHeader = -1;
     private int flexyBubblesRow = -1;
     private int signatureMessagesRow = -1, signatureStickersRow = -1, signatureThemeRow = -1;
     private int inputDividerRow = -1;
@@ -433,12 +434,16 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
         }
     }
 
+    @Override protected int matteHeaderColor() { return screen == SCREEN_CHATS ? getThemedColor(Theme.key_windowBackgroundWhiteBlueHeader) : super.matteHeaderColor(); }
     private void updateSignatureHubRows() {
+        signaturePersonalHeader = addRow();
         flexyBubblesRow = addRow("flexyBubbles");
         composerSettingsRow = addRow("flexyComposerSettings");
-        signatureMessagesRow = addRow("flexyMessagesGestures");
         signatureThemeRow = addRow("flexyThemeWallpaper");
+        signatureInteractionHeader = addRow();
+        signatureMessagesRow = addRow("flexyMessagesGestures");
         signatureStickersRow = addRow("flexyStickersMedia");
+        signatureAdditionalHeader = addRow();
         chatSettingsRow = addRow("chatSettings");
         linksDividerRow = addRow();
     }
@@ -2377,7 +2382,7 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
             View view;
             switch (viewType) {
                 case TYPE_SIGNATURE_ENTRY:
-                    view = new app.flexygram.settings.MatteTextSettingsCell(mContext, resourcesProvider);
+                    view = new app.flexygram.settings.SignatureNavigationCell(mContext, resourcesProvider);
                     break;
                 case TYPE_STICKER_SIZE:
                     stickerSizeCell = new StickerSizeCell(mContext);
@@ -2457,6 +2462,7 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
                     || viewType == TYPE_WIDE_CHANNEL_PREVIEW) {
                 return true;
             }
+            if (screen == SCREEN_CHATS && viewType == TYPE_HEADER) return false;
             return super.isSectionContent(viewType);
         }
 
@@ -2465,11 +2471,17 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
             switch (holder.getItemViewType()) {
                 case TYPE_SIGNATURE_ENTRY:
                     int label = position == flexyBubblesRow ? R.string.FlexyBubblesTitle
-                        : position == composerSettingsRow ? R.string.FlexyComposerSettings
+                        : position == composerSettingsRow ? R.string.FlexyConversationBar
                         : position == signatureMessagesRow ? R.string.FlexyMessagesGestures
                         : position == signatureThemeRow ? R.string.FlexyThemeWallpaper
                         : position == signatureStickersRow ? R.string.FlexyStickersMedia : R.string.FlexyClassicOptions;
-                    ((app.flexygram.settings.MatteTextSettingsCell)holder.itemView).setText(getString(label), position != chatSettingsRow);
+                    int icon = position == flexyBubblesRow ? R.drawable.msg_discussion
+                        : position == composerSettingsRow ? R.drawable.msg_message
+                        : position == signatureThemeRow ? R.drawable.msg_theme
+                        : position == signatureMessagesRow ? R.drawable.msg_list
+                        : position == signatureStickersRow ? R.drawable.msg_emoji_stickers : R.drawable.msg_settings;
+                    ((app.flexygram.settings.SignatureNavigationCell)holder.itemView).bind(getString(label), icon,
+                            position == flexyBubblesRow || position == composerSettingsRow || position == signatureMessagesRow);
                     break;
                 case TYPE_SET_REACTION:
                     ((DoubleTapCell.SetReactionCell) holder.itemView).update(false);
@@ -2503,7 +2515,10 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
         }
 
         private void bindHeader(HeaderCell cell, int position) {
-            if (position == stickerShapeHeaderRow) {
+            if (screen == SCREEN_CHATS && (position == signaturePersonalHeader || position == signatureInteractionHeader || position == signatureAdditionalHeader)) {
+                cell.setText(getString(position == signaturePersonalHeader ? R.string.FlexyChatsPersonalization : position == signatureInteractionHeader ? R.string.FlexyChatsInteraction : R.string.FlexyChatsAdditional));
+                cell.setTextColor(getThemedColor(Theme.key_windowBackgroundWhiteBlueHeader));
+            } else if (position == stickerShapeHeaderRow) {
                 cell.setText(getString(R.string.OEChatsStickerShape));
             } else if (position == linksHeaderRow) {
                 cell.setText(getString(R.string.OEChatsSections));
@@ -3100,6 +3115,7 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
 
         @Override
         public int getItemViewType(int position) {
+            if (screen == SCREEN_CHATS && (position == signaturePersonalHeader || position == signatureInteractionHeader || position == signatureAdditionalHeader)) return TYPE_HEADER;
             if (screen == SCREEN_CHATS && position != linksDividerRow) return TYPE_SIGNATURE_ENTRY;
             if (position == stickerSizeRow) return TYPE_STICKER_SIZE;
             if (position == stickerShapeRow) return TYPE_STICKER_SHAPE;

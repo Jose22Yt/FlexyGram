@@ -12,4 +12,12 @@
     <string name="FlexyMessagesGestures">Сообщения и жесты</string>
     <string name="FlexyStickersMedia">Стикеры и медиа</string>
     <string name="FlexyThemeWallpaper">Тема и фон чата</string>
+    <string name="FlexyChatsPersonalization">Персонализация</string>
+    <string name="FlexyChatsInteraction">Взаимодействие и контент</string>
+    <string name="FlexyChatsAdditional">Дополнительные параметры</string>
+    <string name="FlexyConversationBar">Панель переписки</string>
+    <string name="FlexyBubbleBorderWidth">Толщина контура</string>
+    <string name="FlexyBubblePreviewIncoming">Привет</string>
+    <string name="FlexyBubblePreviewOutgoing">Да!</string>
+    <string name="FlexyBubbleBlurUnavailable">Размытие фона недоступно в этой тестовой сборке. Matte сохраняет чёткость текста и контура.</string>
 </resources>

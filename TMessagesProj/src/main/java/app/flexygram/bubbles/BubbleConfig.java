@@ -9,13 +9,14 @@ public final class BubbleConfig {
     public static final String FILE = "flexygram_bubbles";
     public static final String GLASS = "glass", TRANSPARENCY = "transparency", BORDER = "border", EDGES = "edges";
     private static boolean loaded, glass, border, edges;
-    private static int transparency = 35;
+    private static int transparency = 35, borderTenths = 11;
     private BubbleConfig() { }
     private static SharedPreferences preferences() {
         return ApplicationLoader.applicationContext.getSharedPreferences(FILE, Context.MODE_PRIVATE);
     }
     public static void load() {
         SharedPreferences p = preferences();
+        borderTenths = Math.max(5, Math.min(20, p.getInt("signature_border_tenths", 11)));
         glass = p.getBoolean(GLASS, false); border = p.getBoolean(BORDER, false);
         edges = p.getBoolean(EDGES, false); transparency = BubbleStyle.transparency(p.getInt(TRANSPARENCY, 35)); loaded = true;
     }
@@ -23,6 +24,15 @@ public final class BubbleConfig {
     public static boolean border() { return loaded && border; }
     public static boolean edges() { return loaded && edges; }
     public static int transparency() { return transparency; }
+    public static int borderTenths() { return borderTenths; }
+    public static float borderDp() { return borderTenths / 10f; }
+    public static void setBorderTenths(int value) {
+        if (!loaded) load();
+        value = Math.max(5, Math.min(20, value));
+        if (borderTenths == value) return;
+        borderTenths = value;
+        preferences().edit().putInt("signature_border_tenths", value).apply();
+    }
     public static void setGlass(boolean value) {
         if (!loaded) load(); glass = value; preferences().edit().putBoolean(GLASS, value).apply();
     }
