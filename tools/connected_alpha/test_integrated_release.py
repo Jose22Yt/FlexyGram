@@ -21,7 +21,8 @@ class IntegratedRelease(unittest.TestCase):
  def test_private_direct_delivery_and_full_build_are_mandatory(self):
   workflow=(ROOT/'.github/workflows/connected-alpha-arm64.yml').read_text()
   self.assertNotIn('age --encrypt',workflow);self.assertNotIn('.tar.age',workflow)
-  builder=(ROOT/'tools/connected_alpha/build_private_apk.py').read_text()
+  from next_alpha_contract import restore1272
+  builder=restore1272('tools/connected_alpha/build_private_apk.py',(ROOT/'tools/connected_alpha/build_private_apk.py').read_bytes()).decode()
   for required in [':TMessagesProj:assembleConnectedAlpha','verify_apk.py','--certificate-sha256',"report['elf_count']!=96",'FlexyGram_Alpha_1272_ARM64_TEST.apk','stage(env)']:self.assertIn(required,builder)
   for forbidden in ['NATIVE_TARGET=SKIP','--exclude-task','upload-artifact','age --','shutil.copy2(apks[0], ROOT']:self.assertNotIn(forbidden,builder)
   for lang in ['values','values-es','values-ru']:

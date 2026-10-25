@@ -20,6 +20,8 @@ public class CoverImage extends BackupImageView {
     private final RectF rect = new RectF();
     private final PlayerIcon note;
     private int radius;
+    private SignatureCoverFade signatureFade;
+    private int signatureSurface;
     private String currentKey;
     private MessageObject message;
     private int fallbackSeed;
@@ -50,6 +52,18 @@ public class CoverImage extends BackupImageView {
         placeholderPaint.setColor(background);
         note.setColor(foreground);
         invalidate();
+    }
+
+    /** Enabled only by the full Signature sheet; compact covers retain their native presentation. */
+    public void setSignatureSurface(int color) {
+        if (signatureFade == null) signatureFade = new SignatureCoverFade();
+        signatureSurface = color;
+        signatureFade.update(getWidth(), getHeight(), color);
+        invalidate();
+    }
+    @Override protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        if (signatureFade != null) signatureFade.update(w, h, signatureSurface);
     }
 
     public MessageObject getMessage() {
@@ -107,5 +121,6 @@ public class CoverImage extends BackupImageView {
             note.draw(canvas);
         }
         super.onDraw(canvas);
+        if (signatureFade != null) signatureFade.draw(canvas);
     }
 }

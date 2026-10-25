@@ -1480,6 +1480,9 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
         return isCentered() && menu != null && menu.getVisibleItemsCount() > 2;
     }
 
+    private app.flexygram.header.SignatureChatHeader signatureHeader;
+    public void setSignatureHeader(app.flexygram.header.SignatureChatHeader header) { signatureHeader = header; requestLayout(); }
+
     private int centeredTitleAvailableWidth(int width) {
         final int titleLeft = centerTitleLeft();
         final int rightBound = Math.max(titleLeft, centerTitleRightBound(width));
@@ -1504,6 +1507,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
         int width = MeasureSpec.getSize(widthMeasureSpec);
         int height = MeasureSpec.getSize(heightMeasureSpec);
         int actionBarHeight = getCurrentActionBarHeight();
+        if (signatureHeader != null && signatureHeader.enabled()) actionBarHeight = signatureHeader.measure(width, occupyStatusBar ? AndroidUtilities.statusBarHeight : 0, actionBarHeight);
         int actionBarHeightSpec = MeasureSpec.makeMeasureSpec(actionBarHeight, MeasureSpec.EXACTLY);
 
         ignoreLayoutRequest = true;
@@ -1620,6 +1624,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
             }
             measureChildWithMargins(child, widthMeasureSpec, 0, MeasureSpec.makeMeasureSpec(getMeasuredHeight(), MeasureSpec.EXACTLY), 0);
         }
+        if (signatureHeader != null) signatureHeader.measureControls();
     }
 
     public void setMenuOffsetSuppressed(boolean menuOffsetSuppressed) {
@@ -1757,6 +1762,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
             }
             child.layout(childLeft, childTop, childLeft + width, childTop + height);
         }
+        if (signatureHeader != null) signatureHeader.layoutControls();
     }
 
     public void onMenuButtonPressed() {
@@ -2437,7 +2443,9 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
         final int t = getHeight() - (getCurrentActionBarHeight() + s) / 2 - p;
         final int b = t + s + p * 2;
 
-        if (glassDrawable != null && drawGlassMiddlePill && !glassOnlyBack && drawGlassTitle) {
+        boolean signature = signatureHeader != null && signatureHeader.active();
+        if (signature) signatureHeader.draw(canvas);
+        if (!signature && glassDrawable != null && drawGlassMiddlePill && !glassOnlyBack && drawGlassTitle) {
             final int menuWidthWithPadding = menuWidth + ((hasForcedMenuWidth || hasForcedMenuMinWidth) ? (menuWidth > 0 ? p : 0) : (int) (p * animatorHasMenuItems.getFloatValue()));
             final int rightOffset = lerp(menuWidthWithPadding, Math.max(menuWidthWithPadding, p + s), chatAvatarContainer == null ? 0f : 1f - animatorAvatarContainerHasAvatar.getFloatValue());
 
@@ -2471,11 +2479,11 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
             glassDrawable.setBounds(left, t, right, b);
             glassDrawable.draw(canvas);
         }
-        if (glassDrawableBack != null && hasBackButton) {
+        if (!signature && glassDrawableBack != null && hasBackButton) {
             glassDrawableBack.setBounds(0, t, s + p * 2, b);
             glassDrawableBack.draw(canvas);
         }
-        if (glassDrawableMenu != null && menuWidth > 0 && !glassOnlyBack && !doNotDrawGlassMenu) {
+        if (!signature && glassDrawableMenu != null && menuWidth > 0 && !glassOnlyBack && !doNotDrawGlassMenu) {
             int menuLeft = getWidth() - Math.max(s, menuWidth) - p * 2;
             int menuTop = t;
             int menuRight = getWidth();
@@ -2514,7 +2522,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
             glassDrawableMenu.draw(canvas);
         }
 
-        if (blurredBackground && actionBarColor != Color.TRANSPARENT) {
+        if (!signature && blurredBackground && actionBarColor != Color.TRANSPARENT) {
             rectTmp.set(0, 0, getMeasuredWidth(), getMeasuredHeight());
             blurScrimPaint.setColor(actionBarColor);
             if (adaptiveBackground) {
@@ -2611,7 +2619,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
     }
 
     public void unreadBadgeSetCount(int count) {
-        if (backButtonImageView != null && NekoConfig.unreadBadgeOnBackButton.Bool()) {
+        if ((signatureHeader == null || !signatureHeader.enabled()) && backButtonImageView != null && NekoConfig.unreadBadgeOnBackButton.Bool()) {
             backButtonImageView.setUnread(count);
         }
     }

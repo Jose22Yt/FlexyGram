@@ -629,6 +629,10 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
             rebuildAllAndSelf(view, enable);
             return;
         } else if (position == iosChatHeaderRow) {
+            if (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) {
+                presentFragment(new app.flexygram.header.HeaderSettingsActivity());
+                return;
+            }
             AppearanceConfig.iosChatHeader.setConfigBool(!AppearanceConfig.iosChatHeader.Bool());
             rebuildAllAndSelf(view, AppearanceConfig.iosChatHeader.Bool());
             return;
@@ -996,7 +1000,9 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
                 }
                 case TYPE_SETTINGS: {
                     TextSettingsCell cell = (TextSettingsCell) holder.itemView;
-                    if (position == dividerStyleRow) {
+                    if (position == iosChatHeaderRow) {
+                        cell.setTextAndValue(getString(R.string.OEAppearanceIosChatHeader), "", false);
+                    } else if (position == dividerStyleRow) {
                         String[] v = {getString(R.string.OEAppearanceDividerHidden), getString(R.string.OEAppearanceDividerLine), getString(R.string.OEAppearanceDividerSegments)};
                         cell.setTextAndValue(getString(R.string.OEAppearanceDividerStyle), v[clamp(AppearanceConfig.dividerStyle.Int(), v.length)], false);
                     } else if (position == glassOutlineRow) {
@@ -1111,6 +1117,8 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
                 return TYPE_DETAIL_SETTINGS;
             } else if (position == md3GroupRow || position == iosGroupRow) {
                 return TYPE_EXPANDABLE_SWITCH;
+            } else if (position == iosChatHeaderRow && org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) {
+                return TYPE_SETTINGS;
             } else if (position == md3LoadingRow || position == md3SliderRow
                     || position == md3SwitchRow || position == md3ChatHeaderRow
                     || position == md3NavBarRow || position == md3ListItemsRow
@@ -1178,7 +1186,8 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
     private int iosSelectedCount() {
         int n = 0;
         if (AppearanceConfig.iosNavigationBarStyle.Bool()) n++;
-        if (AppearanceConfig.iosChatHeader.Bool()) n++;
+        if (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA
+                ? app.flexygram.header.HeaderConfig.signature() : AppearanceConfig.iosChatHeader.Bool()) n++;
         return n;
     }
 
@@ -1186,6 +1195,9 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
         boolean enable = iosSelectedCount() == 0;
         AppearanceConfig.iosNavigationBarStyle.setConfigBool(enable);
         AppearanceConfig.iosChatHeader.setConfigBool(enable);
+        if (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) {
+            app.flexygram.header.HeaderConfig.style(enable);
+        }
         if (enable) {
             AppearanceConfig.newNavigationBarStyle.setConfigBool(false);
         }

@@ -5646,6 +5646,18 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         if (!onlySelect && initialDialogsType == DIALOGS_TYPE_DEFAULT) {
             blurredView = new View(context) {
                 @Override
+                public boolean onTouchEvent(MotionEvent event) {
+                    // Opt-in Telegram logging: numeric ownership only, never chat/account data.
+                    if (BuildVars.LOGS_ENABLED && event.getActionMasked() == MotionEvent.ACTION_DOWN) {
+                        FileLog.d("SignaturePreview overlay DOWN preview="
+                                + (parentLayout != null && parentLayout.isInPreviewMode())
+                                + " transition=" + (parentLayout != null && parentLayout.isTransitionAnimationInProgress())
+                                + " alpha=" + getAlpha());
+                    }
+                    return super.onTouchEvent(event);
+                }
+
+                @Override
                 public void setAlpha(float alpha) {
                     super.setAlpha(alpha);
                     if (fragmentView != null) {
@@ -7687,9 +7699,28 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         canShowStoryHint = true;
     }
 
+    /** The tab owner receives this even if an interrupted preview never advanced
+     * FragmentState visibility and therefore emitted no child transition end. */
+    @Override
+    public void onParentBecomeFullyVisible() {
+        clearClosedPreviewOverlay();
+    }
+
+    private void clearClosedPreviewOverlay() {
+        if (parentLayout != null && !parentLayout.isInPreviewMode()
+                && !parentLayout.isTransitionAnimationInProgress()
+                && blurredView != null && blurredView.getVisibility() != View.GONE) {
+            blurredView.setVisibility(View.GONE);
+            blurredView.setBackground(null);
+            blurredView.setAlpha(0f);
+            checkUi_mainTabsVisible();
+        }
+    }
+
     @Override
     public void onBecomeFullyVisible() {
         super.onBecomeFullyVisible();
+        clearClosedPreviewOverlay();
         if (isArchive()) {
             SharedPreferences preferences = MessagesController.getGlobalMainSettings();
             boolean showArchiveHint = preferences.getBoolean("archivehint", true);

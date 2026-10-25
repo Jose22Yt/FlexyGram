@@ -3,7 +3,7 @@ name: Pull request
 on:
   # Registered workflow ID 388683996: support entry point for the same native jobs.
   push:
-    branches: [support/connected-alpha-ci-20261022, integration/connected-alpha-unified, integration/connected-alpha-javac-fix, integration/connected-alpha-2-compact, fix/alpha2-compact-trailing-action, fix/alpha2-signature-personalization, fix/alpha2-ios-composer-refinement, fix/alpha2-iphone-reference-port, fix/alpha2-approved-composer-integrated-ui, fix/alpha2-signature-matte-build, fix/alpha-ios-bubbles-glass-home2, feat/alpha1271-signature-ui]
+    branches: [support/connected-alpha-ci-20261022, integration/connected-alpha-unified, integration/connected-alpha-javac-fix, integration/connected-alpha-2-compact, fix/alpha2-compact-trailing-action, fix/alpha2-signature-personalization, fix/alpha2-ios-composer-refinement, fix/alpha2-iphone-reference-port, fix/alpha2-approved-composer-integrated-ui, fix/alpha2-signature-matte-build, fix/alpha-ios-bubbles-glass-home2, feat/alpha1271-signature-ui, integration/connected-alpha-1273-signature]
     paths:
       - '.github/workflows/connected-alpha-arm64.yml'
       - '.github/workflows/pr.yml'
@@ -33,7 +33,7 @@ permissions:
 
 jobs:
   connected-alpha-native:
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/support/connected-alpha-ci-20261022' || github.ref == 'refs/heads/integration/connected-alpha-unified' || github.ref == 'refs/heads/integration/connected-alpha-javac-fix' || github.ref == 'refs/heads/integration/connected-alpha-2-compact' || github.ref == 'refs/heads/fix/alpha2-compact-trailing-action' || github.ref == 'refs/heads/fix/alpha2-signature-personalization' || github.ref == 'refs/heads/fix/alpha2-ios-composer-refinement' || github.ref == 'refs/heads/fix/alpha2-iphone-reference-port' || github.ref == 'refs/heads/fix/alpha2-approved-composer-integrated-ui' || github.ref == 'refs/heads/fix/alpha2-signature-matte-build' || github.ref == 'refs/heads/fix/alpha-ios-bubbles-glass-home2' || github.ref == 'refs/heads/feat/alpha1271-signature-ui')
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/support/connected-alpha-ci-20261022' || github.ref == 'refs/heads/integration/connected-alpha-unified' || github.ref == 'refs/heads/integration/connected-alpha-javac-fix' || github.ref == 'refs/heads/integration/connected-alpha-2-compact' || github.ref == 'refs/heads/fix/alpha2-compact-trailing-action' || github.ref == 'refs/heads/fix/alpha2-signature-personalization' || github.ref == 'refs/heads/fix/alpha2-ios-composer-refinement' || github.ref == 'refs/heads/fix/alpha2-iphone-reference-port' || github.ref == 'refs/heads/fix/alpha2-approved-composer-integrated-ui' || github.ref == 'refs/heads/fix/alpha2-signature-matte-build' || github.ref == 'refs/heads/fix/alpha-ios-bubbles-glass-home2' || github.ref == 'refs/heads/feat/alpha1271-signature-ui' || github.ref == 'refs/heads/integration/connected-alpha-1273-signature')
     uses: ./.github/workflows/connected-alpha-arm64.yml
     secrets:
       TELEGRAM_APP_ID: ${{ secrets.TELEGRAM_APP_ID }}
@@ -72,9 +72,26 @@ jobs:
           for probe in bubble_visual matte_visual composer_visual home_visual login_visual music_visual; do
             python3 "tools/connected_alpha/$probe/run.py" --sdk-root "$ANDROID_HOME"
           done
+          python3 tools/connected_alpha/header_visual/run.py --sdk-root "$ANDROID_HOME"
+          python3 tools/connected_alpha/performance/native/run.py --sdk-root "$ANDROID_HOME"
           python3 tools/connected_alpha/music_visual/reproduce_detach.py --sdk-root "$ANDROID_HOME"
+          python3 tools/connected_alpha/preview_visual/run.py --sdk-root "$ANDROID_HOME"
+      - name: Retain synthetic renderer evidence (no owner screenshots or APK)
+        uses: actions/upload-artifact@v4
+        with:
+          name: isolated-signature-renderers
+          path: |
+            build/connected-alpha-bubble-visual/signature-preview-*.png
+            build/connected-alpha-bubble-visual/target/surefire-reports/*.xml
+            build/connected-alpha-matte-visual/target/surefire-reports/*.xml
+            build/connected-alpha-music-visual/android-music-isolated.png
+            build/connected-alpha-music-visual/target/surefire-reports/*.xml
+            build/connected-alpha-header-visual/signature-header-synthetic.png
+            build/connected-alpha-header-visual/target/surefire-reports/*.xml
+          retention-days: 7
+          if-no-files-found: error
   build:
-    if: github.event_name == 'pull_request' && github.head_ref != 'feat/alpha1271-signature-ui' && github.head_ref != 'feat/signature-native-login' && github.head_ref != 'feat/signature-music2' && github.head_ref != 'fix/alpha-ios-bubbles-glass-home2' && github.head_ref != 'fix/signature-matte-general-appearance' && github.head_ref != 'alpha/connected-exteraless-baseline' && !startsWith(github.head_ref, 'support/connected-alpha-ci-') && !startsWith(github.head_ref, 'integration/connected-alpha-') && !startsWith(github.head_ref, 'fix/alpha2-')
+    if: github.event_name == 'pull_request' && github.head_ref != 'perf/alpha1273-engineering2' && github.head_ref != 'feat/alpha1271-signature-ui' && github.head_ref != 'feat/signature-native-login' && github.head_ref != 'feat/signature-music2' && github.head_ref != 'fix/alpha-ios-bubbles-glass-home2' && github.head_ref != 'fix/signature-matte-general-appearance' && github.head_ref != 'alpha/connected-exteraless-baseline' && !startsWith(github.head_ref, 'support/connected-alpha-ci-') && !startsWith(github.head_ref, 'integration/connected-alpha-') && !startsWith(github.head_ref, 'fix/alpha2-')
     name: Gradle Build
     runs-on: ubuntu-latest
     env:

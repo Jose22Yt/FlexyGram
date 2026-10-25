@@ -20,4 +20,8 @@
     <string name="FlexyBubblePreviewIncoming">Привет</string>
     <string name="FlexyBubblePreviewOutgoing">Да!</string>
     <string name="FlexyBubbleBlurUnavailable">Размытие фона недоступно в этой тестовой сборке. Matte сохраняет чёткость текста и контура.</string>
+    <string name="FlexyBubblePreviewGroupIncoming">Это локальный пример переписки.</string>
+    <string name="FlexyBubblePreviewGroupOutgoing">Изменения видны сразу.</string>
+    <string name="FlexyBubbleBackgroundBlur">Размытие фона</string>
+    <string name="FlexyBubbleBlurCompatibility">Размытие доступно для совместимых статичных изображений. Анимированные и неподдерживаемые фоны сохраняют Matte.</string>
 </resources>

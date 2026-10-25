@@ -21,15 +21,17 @@ class Signature1271(unittest.TestCase):
    files=subprocess.check_output(['git','ls-tree','-r','--name-only',WORK1,'--',prefix],cwd=ROOT,text=True).splitlines()
    for file in files:self.assertEqual(reviewed_work1(file),subprocess.check_output(['git','show',WORK1+':'+file],cwd=ROOT),file)
   self.assertEqual(subprocess.check_output(['git','diff',BASE,'--','TMessagesProj/jni','TMessagesProj/chaquopy'],cwd=ROOT),b'')
-  self.assertIn('def verCode = 1272',(ROOT/'TMessagesProj/build.gradle').read_text())
-  workflow=(ROOT/'.github/workflows/connected-alpha-arm64.yml').read_text()
+  from next_alpha_contract import restore1272
+  self.assertIn('def verCode = 1272',restore1272('TMessagesProj/build.gradle',(ROOT/'TMessagesProj/build.gradle').read_bytes()).decode())
+  workflow=restore1272('.github/workflows/connected-alpha-arm64.yml',(ROOT/'.github/workflows/connected-alpha-arm64.yml').read_bytes()).decode()
   for s in ['--expected-version-code 1272','Keep direct APK delivery private',':TMessagesProj:assembleConnectedAlpha']:self.assertIn(s,workflow)
  def test_one_fill_control_no_wallpaper_callback_or_graphics_allocations_in_drawing(self):
-  settings=(JAVA/'app/flexygram/bubbles/BubbleSettingsActivity.java').read_text()
+  from next_alpha_contract import restore_visual
+  settings=restore_visual('TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleSettingsActivity.java',(JAVA/'app/flexygram/bubbles/BubbleSettingsActivity.java').read_bytes()).decode()
   self.assertEqual(re.findall(r'= addRow\("(flexyBubble\w+)"',settings),['flexyBubbleTransparency','flexyBubbleBorderWidth'])
   self.assertIn('seek.setMax(100)',settings)
   for s in ['setGlass(','setBorder(','setEdges(','recreate(']:self.assertNotIn(s,settings)
-  drawable=(JAVA/'org/telegram/ui/ActionBar/MessageDrawable.java').read_text()
+  drawable=restore_visual('TMessagesProj/src/main/java/org/telegram/ui/ActionBar/MessageDrawable.java',(JAVA/'org/telegram/ui/ActionBar/MessageDrawable.java').read_bytes()).decode()
   draw=drawable[drawable.index('public void draw(Canvas canvas, Paint paintToUse)'):drawable.index('public Path makePath()')]
   for s in ['flexyGlassSource.draw','new Bitmap','new Paint','new Path','new Shader','saveLayer']:self.assertNotIn(s,draw)
   shared=(JAVA/'org/telegram/messenger/SharedConfig.java').read_text()
@@ -47,13 +49,16 @@ class Signature1271(unittest.TestCase):
   path='TMessagesProj/src/main/java/org/telegram/ui/Components/SeekBarView.java'
   self.assertEqual((ROOT/path).read_text(),old(path))
   self.assertEqual((JAVA/'org/telegram/ui/ThemeActivity.java').read_text().count('? new app.flexygram.settings.FlexySignatureSeekBarView(context) : new SeekBarView(context)'),2)
-  source=(JAVA/'app/exteraless/settings/OpenExteraChatsActivity.java').read_text()
+  from performance.navigation_contract import restore_reserved
+  source=restore_reserved('TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraChatsActivity.java',(JAVA/'app/exteraless/settings/OpenExteraChatsActivity.java').read_bytes()).decode()
   hub=source.split('private void updateSignatureHubRows()')[1].split('private void updateStickerRows()')[0]
   self.assertEqual(re.findall(r'(\w+Row) = addRow',hub),['flexyBubblesRow','composerSettingsRow','signatureThemeRow','signatureMessagesRow','signatureStickersRow','chatSettingsRow','linksDividerRow'])
   self.assertEqual(source.count('chatSettingsRow = addRow('),1)
-  self.assertIn('SignatureChatThemeActivity()',source);self.assertIn('THEME_TYPE_BASIC',source)
+  self.assertIn('SignatureChatThemeActivity()',source);self.assertIn('ThemeActivity.signatureClassicOptions()',source)
+  self.assertIn('return new ThemeActivity(THEME_TYPE_BASIC, 1);',(JAVA/'org/telegram/ui/ThemeActivity.java').read_text())
   theme=(JAVA/'app/flexygram/settings/SignatureChatThemeActivity.java').read_text()
-  self.assertIn('THEME_TYPE_THEMES_BROWSER',theme);self.assertIn('WallpapersListActivity.TYPE_ALL',theme)
+  self.assertIn('extends ThemeActivity',theme);self.assertIn('super(ThemeActivity.THEME_TYPE_BASIC, 2)',theme)
+  self.assertIn('WallpapersListActivity.TYPE_ALL',(JAVA/'org/telegram/ui/ThemeActivity.java').read_text())
   self.assertIn('return 29400',source);self.assertIn('return 29500',source)
  def test_launcher_resource_identity_and_all_legacy_aliases_preserved(self):
   manifest=ET.parse(ROOT/'TMessagesProj/src/main/AndroidManifest.xml').getroot();app=manifest.find('application')

@@ -44,11 +44,10 @@ public class MessageDrawable extends Drawable {
     }
     private int signatureColor() {
         if (overrideColor != null) return overrideColor;
-        // Explicit chat themes retain their colors; default themes get the Signature palette.
-        int key = isOut ? Theme.key_chat_outBubble : Theme.key_chat_inBubble;
-        if (resourcesProvider != null && getColor(key) != Theme.getColor(key)) return getColor(key);
-        boolean dark = Theme.isCurrentThemeDark();
-        return isOut ? (dark ? 0xff245a94 : 0xffb8daff) : (dark ? 0xff282c33 : 0xffedf0f4);
+        // Theme is the sole palette owner, including installed and per-chat themes.
+        return getColor(isOut
+                ? (isSelected ? Theme.key_chat_outBubbleSelected : Theme.key_chat_outBubble)
+                : (isSelected ? Theme.key_chat_inBubbleSelected : Theme.key_chat_inBubble));
     }
 
     private Shader gradientShader;
@@ -216,10 +215,6 @@ public class MessageDrawable extends Drawable {
             gradientColor1 = 0;
             gradientColor2 = 0;
             gradientColor3 = 0;
-            animatedGradient = false;
-        } else if (flexySurface()) {
-            color = signatureColor();
-            gradientColor1 = gradientColor2 = gradientColor3 = 0;
             animatedGradient = false;
         } else if (isOut) {
             color = getColor(isSelected ? Theme.key_chat_outBubbleSelected : Theme.key_chat_outBubble);
@@ -648,20 +643,24 @@ public class MessageDrawable extends Drawable {
             // Stable theme color, independent of wallpaper/blur availability and animation phase.
             // Instance paints and the native geometry cache are reused for every draw.
             int color = signatureColor();
+            if (alpha == 255 && app.flexygram.bubbles.BubbleConfig.backgroundBlur() && flexyGlassSource != null) {
+                // Keep native crossfades as Matte: the legacy coordinate bridge has no drawable-alpha parameter.
+                // Reusing opaque wallpaper there would leave a visible bubble even at alpha zero.
+                // Legacy-named coordinate callback, new bounded static cache; legacy Glass flags are ignored.
+                flexyGlassSource.draw(canvas, path);
+            }
             flexyFillPaint.setColor(color);
+            // Reuse Telegram's cached gradient and matrix; no new shader per frame.
+            flexyFillPaint.setShader(p.getShader());
             flexyFillPaint.setAlpha(Math.round(alpha * app.flexygram.bubbles.BubbleStyle.tintAlpha(
                 app.flexygram.bubbles.BubbleConfig.transparency()) / 255f));
             canvas.drawPath(path, flexyFillPaint);
-            if (isSelected) {
-                selectedPaint.setColor(getColor(isOut ? Theme.key_chat_outBubbleSelected : Theme.key_chat_inBubbleSelected));
-                selectedPaint.setAlpha(Math.round(90 * alpha / 255f));
-                canvas.drawPath(path, selectedPaint);
-            }
             flexyBorderPaint.setStyle(Paint.Style.STROKE);
             // Keep the contour inside Telegram's unchanged message silhouette.
             flexyBorderPaint.setStrokeWidth(2f * AndroidUtilities.density * app.flexygram.bubbles.BubbleConfig.borderDp());
             flexyBorderPaint.setColor(ColorUtils.setAlphaComponent(
-                app.flexygram.bubbles.BubbleStyle.outline(color, Theme.isCurrentThemeDark()), Math.round(200 * alpha / 255f)));
+                app.flexygram.bubbles.BubbleStyle.outline(color,
+                    (Color.red(color) * 299 + Color.green(color) * 587 + Color.blue(color) * 114) < 128000), Math.round(200 * alpha / 255f)));
             canvas.save();
             canvas.clipPath(path);
             canvas.drawPath(path, flexyBorderPaint);
@@ -738,7 +737,7 @@ public class MessageDrawable extends Drawable {
                 if (currentType == TYPE_MEDIA || oeNoTail) {
                     path.moveTo(bounds.right - dp(8) - radToUse, bounds.bottom - padding);
                 } else {
-                    path.moveTo(bounds.right - dp(2.6f), bounds.bottom - padding);
+                    path.moveTo(bounds.right - dp(flexySurface() ? 5f : 2.6f), bounds.bottom - padding);
                 }
                 path.lineTo(bounds.left + padding + radToUse, bounds.bottom - padding);
                 rect.set(bounds.left + padding, bounds.bottom - padding - radToUse * 2, bounds.left + padding + radToUse * 2, bounds.bottom - padding);
@@ -793,9 +792,22 @@ public class MessageDrawable extends Drawable {
                         rect.set(bounds.right - dp(8) - radToUse * 2, bounds.bottom - padding - radToUse * 2, bounds.right - dp(8), bounds.bottom - padding);
                         path.arcTo(rect, 0, 90, false);
                     } else {
+                        if (flexySurface()) {
+                            // Own short curved tail. Both sides share mirrored control points.
+                            float edge = bounds.right - dp(8);
+                            float tip = bounds.right - dp(5);
+                            float bottom = bounds.bottom - padding;
+                            float cap = AndroidUtilities.dpf2(.7f);
+                            path.lineTo(edge, bottom - dp(9));
+                            path.cubicTo(edge, bottom - dp(4), tip + cap, bottom - AndroidUtilities.dpf2(1.6f),
+                                    tip + cap, bottom - cap);
+                            path.cubicTo(tip + cap, bottom - AndroidUtilities.dpf2(.25f),
+                                    tip + AndroidUtilities.dpf2(.3f), bottom, tip, bottom);
+                        } else {
                     path.lineTo(bounds.right - dp(8), bounds.bottom - padding - smallRad - dp(3));
                     rect.set(bounds.right - dp(8), bounds.bottom - padding - smallRad * 2 - dp(9), bounds.right - dp(7) + smallRad * 2, bounds.bottom - padding - dp(1));
                     path.arcTo(rect, 180, -83, false);
+                        }
                     }
                 } else {
                     path.lineTo(bounds.right - dp(8), top - topY + currentBackgroundHeight);
@@ -808,7 +820,7 @@ public class MessageDrawable extends Drawable {
                 if (currentType == TYPE_MEDIA || oeNoTail) {
                     path.moveTo(bounds.left + dp(8) + radToUse, bounds.bottom - padding);
                 } else {
-                    path.moveTo(bounds.left + dp(2.6f), bounds.bottom - padding);
+                    path.moveTo(bounds.left + dp(flexySurface() ? 5f : 2.6f), bounds.bottom - padding);
                 }
                 path.lineTo(bounds.right - padding - radToUse, bounds.bottom - padding);
                 rect.set(bounds.right - padding - radToUse * 2, bounds.bottom - padding - radToUse * 2, bounds.right - padding, bounds.bottom - padding);
@@ -857,9 +869,22 @@ public class MessageDrawable extends Drawable {
                         rect.set(bounds.left + dp(8), bounds.bottom - padding - radToUse * 2, bounds.left + dp(8) + radToUse * 2, bounds.bottom - padding);
                         path.arcTo(rect, 180, -90, false);
                     } else {
+                        if (flexySurface()) {
+                            // Own short curved tail. Both sides share mirrored control points.
+                            float edge = bounds.left + dp(8);
+                            float tip = bounds.left + dp(5);
+                            float bottom = bounds.bottom - padding;
+                            float cap = AndroidUtilities.dpf2(.7f);
+                            path.lineTo(edge, bottom - dp(9));
+                            path.cubicTo(edge, bottom - dp(4), tip - cap, bottom - AndroidUtilities.dpf2(1.6f),
+                                    tip - cap, bottom - cap);
+                            path.cubicTo(tip - cap, bottom - AndroidUtilities.dpf2(.25f),
+                                    tip - AndroidUtilities.dpf2(.3f), bottom, tip, bottom);
+                        } else {
                     path.lineTo(bounds.left + dp(8), bounds.bottom - padding - smallRad - dp(3));
                     rect.set(bounds.left + dp(7) - smallRad * 2, bounds.bottom - padding - smallRad * 2 - dp(9), bounds.left + dp(8), bounds.bottom - padding - dp(1));
                     path.arcTo(rect, 0, 83, false);
+                        }
                     }
                 } else {
                     path.lineTo(bounds.left + dp(8), top - topY + currentBackgroundHeight);

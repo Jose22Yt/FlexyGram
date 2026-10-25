@@ -4662,6 +4662,7 @@ public class ChatActivity extends BaseFragment implements
             checkUi_messagesSearchListPadding();
             checkUi_topFade();
         });
+        if (signatureChatHeader != null) { signatureChatHeader.detach(); signatureChatHeader = null; }
         if (avatarContainer != null) {
             avatarContainer.onDestroy();
         }
@@ -4683,6 +4684,11 @@ public class ChatActivity extends BaseFragment implements
 
             @Override
             protected boolean onAvatarClick() {
+                if (usesSignatureHeader()) return false; // Keep the native avatar -> profile action.
+                return openNativeHeaderOptions();
+            }
+            @Override protected void onSignatureOptionsClick() { openNativeHeaderOptions(); }
+            private boolean openNativeHeaderOptions() {
                 if (isTitleCentered()) {
                     if (editTextItem != null && editTextItem.getTag() != null) {
                         checkEditTextItemMenu();
@@ -4719,6 +4725,15 @@ public class ChatActivity extends BaseFragment implements
             }
         };
         app.exteraless.appearance.ChatHeaderUiHelper.setupGlassAvatarContainer(avatarContainer);
+        if (BuildConfig.CONNECTED_ALPHA && !inPreviewMode && !inBubbleMode && !isInsideContainer && chatMode == MODE_DEFAULT
+                && (!isThreadChat() || isTopic) && !isReport() && !UserObject.isReplyUser(currentUser)) {
+            app.flexygram.header.HeaderConfig.load();
+            signatureChatHeader = new app.flexygram.header.SignatureChatHeader(actionBar, avatarContainer, themeDelegate);
+            avatarContainer.setSignatureHeader(signatureChatHeader);
+            actionBar.setSignatureHeader(signatureChatHeader);
+            updateSignatureHeaderCounter();
+        }
+
         avatarContainer.allowShorterStatus = true;
         avatarContainer.premiumIconHiddable = true;
         avatarContainer.allowDrawStories = dialog_id < 0 && !isTopic;
@@ -4780,7 +4795,7 @@ public class ChatActivity extends BaseFragment implements
             });
             getConnectionsManager().bindRequestToGuid(req, classGuid);
         } else {
-            actionBar.addView(avatarContainer, 0, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.MATCH_PARENT, Gravity.TOP | Gravity.LEFT, !inPreviewMode ? 52 : 0, 0, 52, 0));
+            actionBar.addView(avatarContainer, 0, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.MATCH_PARENT, Gravity.TOP | Gravity.LEFT, usesSignatureHeader() ? 0 : !inPreviewMode ? 52 : 0, 0, usesSignatureHeader() ? 0 : 52, 0));
             actionBar.createMenu().bringToFront();
         }
         actionBar.setOnActionModeFactorChangeListener(() -> {
@@ -18424,6 +18439,16 @@ public class ChatActivity extends BaseFragment implements
     }
 
     public class ChatActivityFragmentView extends SizeNotifierFrameLayout {
+        private app.flexygram.bubbles.SignatureWallpaperBlur.Owner signatureWallpaperBlur;
+        private void refreshSignatureWallpaperBlur() {
+            if (signatureWallpaperBlur != null) signatureWallpaperBlur.prepare(getBackgroundImage(),
+                    getNewDrawableMotion(), getThemedColor(Theme.key_windowBackgroundGray));
+        }
+        @Override protected void onBackgroundViewInvalidate() {
+            super.onBackgroundViewInvalidate();
+            refreshSignatureWallpaperBlur();
+        }
+
 
         @Override
         public int measureKeyboardHeight() {
@@ -18567,6 +18592,7 @@ public class ChatActivity extends BaseFragment implements
         @Override
         public void onUpdateBackgroundDrawable(Drawable drawable) {
             super.onUpdateBackgroundDrawable(drawable);
+            refreshSignatureWallpaperBlur();
             if (drawable instanceof MotionBackgroundDrawable) {
                 ((MotionBackgroundDrawable) drawable).setFastRenderAllowed();
             }
@@ -18720,6 +18746,8 @@ public class ChatActivity extends BaseFragment implements
         @Override
         protected void onAttachedToWindow() {
             super.onAttachedToWindow();
+            signatureWallpaperBlur = new app.flexygram.bubbles.SignatureWallpaperBlur.Owner(chatListView != null ? chatListView : this);
+            refreshSignatureWallpaperBlur();
             if (isInsideContainer) {
                 adjustPanLayoutHelper.setResizableView(contentView);
             } else if (parentLayout != null && parentLayout.isSheet()) {
@@ -18739,6 +18767,7 @@ public class ChatActivity extends BaseFragment implements
 
         @Override
         protected void onDetachedFromWindow() {
+            if (signatureWallpaperBlur != null) { signatureWallpaperBlur.close(); signatureWallpaperBlur = null; }
             super.onDetachedFromWindow();
             adjustPanLayoutHelper.onDetach();
             if (pullingDownDrawable != null) {
@@ -31661,7 +31690,7 @@ public class ChatActivity extends BaseFragment implements
         }
         if (avatarContainer != null) {
             avatarContainer.setOccupyStatusBar(!value);
-            avatarContainer.setLayoutParams(LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.MATCH_PARENT, Gravity.TOP | Gravity.LEFT, !inPreviewMode ? 52 : 0, 0, isTitleCentered() ? 0 : 52, 0));
+            avatarContainer.setLayoutParams(LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.MATCH_PARENT, Gravity.TOP | Gravity.LEFT, usesSignatureHeader() ? 0 : !inPreviewMode ? 52 : 0, 0, isTitleCentered() ? 0 : 52, 0));
         }
         if (chatActivityEnterView != null) {
             chatActivityEnterView.setVisibility(!value ? View.VISIBLE : View.INVISIBLE);
@@ -31737,6 +31766,14 @@ public class ChatActivity extends BaseFragment implements
     @Override
     public void onResume() {
         super.onResume();
+        if (BuildConfig.CONNECTED_ALPHA) app.flexygram.header.HeaderConfig.load();
+        if (signatureChatHeader != null) {
+            var params = (android.widget.FrameLayout.LayoutParams) avatarContainer.getLayoutParams();
+            params.leftMargin = usesSignatureHeader() ? 0 : AndroidUtilities.dp(!inPreviewMode ? 52 : 0);
+            params.rightMargin = isTitleCentered() ? 0 : AndroidUtilities.dp(52);
+            avatarContainer.setLayoutParams(params);
+            updateSignatureHeaderCounter(); signatureChatHeader.changed();
+        }
         app.flexygram.bubbles.BubbleConfig.load();
         if (chatActivityFadeView != null) {
             chatActivityFadeView.setFlexyEdgeBlur(false, glassBackgroundDrawableFactoryFrosted);
@@ -38348,6 +38385,7 @@ public class ChatActivity extends BaseFragment implements
                     final NotificationCenter.NotificationCenterDelegate observer = new NotificationCenter.NotificationCenterDelegate() {
                         @Override
                         public void didReceivedNotification(int id, int account, Object... args) {
+        if (id == NotificationCenter.dialogsUnreadCounterChanged) updateSignatureHeaderCounter();
                             if (id == NotificationCenter.messagesDidLoad && (Integer) args[10] == commentsClassGuid) {
                                 openCommentsChat.run();
                                 AndroidUtilities.runOnUIThread(() -> {
@@ -42189,19 +42227,11 @@ public class ChatActivity extends BaseFragment implements
     private class ChatMessageCellDelegate implements ChatMessageCell.ChatMessageCellDelegate {
         @Override
         public boolean drawFlexyBubbleWallpaper(ChatMessageCell cell, Canvas canvas, android.graphics.Path path) {
-            if (contentView == null || chatListView == null || navbarContentSourceWallpaper.getSource() == null
-                    || !canvas.isHardwareAccelerated() || cell.getAlpha() < 1f || cell.getTranslationX() != 0) return false;
-            if (navbarContentSourceWallpaper.getSource() instanceof BlurredBackgroundSourceBitmap) {
-                Bitmap bitmap = ((BlurredBackgroundSourceBitmap) navbarContentSourceWallpaper.getSource()).getBitmap();
-                if (bitmap == null || bitmap.isRecycled()) return false;
-            }
-            // WallpaperBitmapProvider memoizes a 90x120 image blur. No bitmap or blur work in this draw.
-            int save = canvas.save();
-            canvas.clipPath(path);
-            canvas.translate(-cell.getX() - chatListView.getX(), -cell.getY() - chatListView.getY());
-            navbarContentSourceWallpaper.draw(canvas, 0, 0, contentView.getWidth(), contentView.getHeight());
-            canvas.restoreToCount(save);
-            return true;
+            if (contentView == null || chatListView == null || contentView.signatureWallpaperBlur == null
+                    || cell.getAlpha() < 1f || cell.getTranslationX() != 0 || Theme.isAnimatingColor()) return false;
+            // Existing cell/root coordinate bridge; only the new static asynchronous cache is sampled.
+            return contentView.signatureWallpaperBlur.draw(canvas, path,
+                    cell.getX() + chatListView.getX(), cell.getY() + chatListView.getY());
         }
 
         @Override
@@ -50954,12 +50984,24 @@ public class ChatActivity extends BaseFragment implements
         return chatMode == MODE_DEFAULT && messageObject != null && messageObject.isWelcomeAnchored();
     }
 
+    private app.flexygram.header.SignatureChatHeader signatureChatHeader;
+    private boolean usesSignatureHeader() { return signatureChatHeader != null && signatureChatHeader.enabled(); }
+    private void updateSignatureHeaderCounter() {
+        if (signatureChatHeader == null) return;
+        int count = -1;
+        if (arguments != null && arguments.containsKey("dialog_folder_id") && arguments.containsKey("dialog_filter_id")) {
+            if (dialogFilterId == 0) count = dialogFolderId == 0 ? getMessagesStorage().getMainUnreadCount() : dialogFolderId == 1 ? getMessagesStorage().getArchiveUnreadCount() : -1;
+            else for (var filter : getMessagesController().getDialogFilters()) if (filter.id == dialogFilterId) { count = filter.unreadCount; break; }
+        }
+        signatureChatHeader.setCount(count);
+    }
+
     private boolean isTitleCentered() {
         return canShowCenteredTitle(this);
     }
 
     private boolean canShowCenteredTitle(ChatActivity parentFragment) {
-        if (!app.exteraless.appearance.AppearanceConfig.iosChatHeader()) {
+        if (!(BuildConfig.CONNECTED_ALPHA ? app.flexygram.header.HeaderConfig.signature() : app.exteraless.appearance.AppearanceConfig.iosChatHeader())) {
             return false;
         }
         if (parentFragment == null) {
@@ -51224,7 +51266,9 @@ public class ChatActivity extends BaseFragment implements
             parentChatActivity.checkUi_messagesSearchListPadding();
         }
 
-        final int top = AndroidUtilities.statusBarHeight + ActionBar.getCurrentActionBarHeight() + dp(2)
+        final int nativeBarHeight = AndroidUtilities.statusBarHeight + ActionBar.getCurrentActionBarHeight();
+        final int barHeight = usesSignatureHeader() ? Math.max(nativeBarHeight, actionBar.getMeasuredHeight()) : nativeBarHeight;
+        final int top = barHeight + dp(2)
             + ((int) finalTopPanelHeight(getTopPanelHeightWithPadding(dp(7))))
             + (actionBarSearchTags != null ? dp((28 + 7) * actionBarSearchTags.shownT) : 0)
             + dp((36 + 7) * getHashtagTabsShownT());

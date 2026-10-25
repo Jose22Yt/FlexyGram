@@ -16,7 +16,7 @@ import static org.junit.Assert.*;
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
 public class BubbleVisualTest {
  @Before public void setup(){
-  ApplicationLoader.applicationContext=RuntimeEnvironment.getApplication();
+  ApplicationLoader.applicationContext=RuntimeEnvironment.getApplication();BubbleConfig.load();BubbleConfig.setBackgroundBlur(false);
   ApplicationLoader.applicationContext.getSharedPreferences(BubbleConfig.FILE,0).edit().clear().commit();
   BuildConfig.CONNECTED_ALPHA=true;Theme.dark=false;
   BubbleConfig.load(); SharedConfig.bubbleRadius=20; AndroidUtilities.density=1; ChatsConfig.removeMessageTail.value=false;
@@ -55,7 +55,7 @@ public class BubbleVisualTest {
   MessageDrawable m=new MessageDrawable(MessageDrawable.TYPE_TEXT,true,false);m.setBounds(0,0,180,70);m.setTop(0,220,100,false,false);
   MessageDrawable.PathDrawParams cache=new MessageDrawable.PathDrawParams();
   int[] calls={0};m.setFlexyGlassSource((canvas,path)->{calls[0]++;return false;});
-  BubbleConfig.setTransparency(0);m.drawCached(c,cache);int color=b.getPixel(80,35);assertEquals(0xffb8daff,color);
+  BubbleConfig.setTransparency(0);m.drawCached(c,cache);int color=b.getPixel(80,35);assertEquals(Theme.getColor(Theme.key_chat_outBubble),color);
   float[] shape=m.makePath(cache).approximate(.1f);
   SharedConfig.bubbleRadius=0;ChatsConfig.removeMessageTail.value=true;
   assertArrayEquals(shape,m.makePath(cache).approximate(.1f),0f);
@@ -66,7 +66,29 @@ public class BubbleVisualTest {
   for(int y=0;y<75;y++)for(int x=0;x<185;x++)if(Color.alpha(b.getPixel(x,y))>0)contour=true;
   assertTrue(contour);
   Paint overlay=new Paint();overlay.setColor(Color.RED);m.drawCached(c,cache,overlay);assertEquals(Color.RED,b.getPixel(80,35));
-  Theme.dark=true;m.setTop(0,220,100,false,false);BubbleConfig.setTransparency(0);b.eraseColor(Color.TRANSPARENT);m.drawCached(c,cache);assertEquals(0xff245a94,b.getPixel(80,35));
+  Theme.dark=true;m.setTop(0,220,100,false,false);BubbleConfig.setTransparency(0);b.eraseColor(Color.TRANSPARENT);m.drawCached(c,cache);assertEquals(Theme.getColor(Theme.key_chat_outBubble),b.getPixel(80,35));
+ }
+ @Test public void matchingThemeProviderRetainsInstalledColorsAndCachedGradient() {
+  for(boolean out:new boolean[]{false,true}) {
+   MessageDrawable m=new MessageDrawable(MessageDrawable.TYPE_TEXT,out,false,k->Theme.getColor(k));
+   Bitmap b=Bitmap.createBitmap(220,100,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(b);
+   m.setBounds(0,0,180,70);m.setTop(0,220,100,false,false);BubbleConfig.setTransparency(0);m.draw(c);
+   assertEquals(Theme.getColor(out?Theme.key_chat_outBubble:Theme.key_chat_inBubble),b.getPixel(80,35));
+  }
+  Theme.ResourcesProvider gradient=k->k==Theme.key_chat_outBubble?0xff228855:k==Theme.key_chat_outBubbleGradient1?0xff6622aa:0;
+  MessageDrawable m=new MessageDrawable(MessageDrawable.TYPE_TEXT,true,false,gradient);m.setBounds(0,0,180,90);m.setTop(0,220,100,false,false);
+  Shader shader=m.paint.getShader();assertNotNull(shader);
+  Bitmap b=Bitmap.createBitmap(220,100,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(b);m.draw(c);assertNotEquals(b.getPixel(80,20),b.getPixel(80,75));
+  for(int i=0;i<100;i++){m.setTop(0,220,100,false,false);m.draw(c);assertSame(shader,m.paint.getShader());}
+ }
+ @Test public void signatureTailIsShortRoundedAndMirrored() {
+  AndroidUtilities.density=3;
+  MessageDrawable in=new MessageDrawable(MessageDrawable.TYPE_TEXT,false,false),out=new MessageDrawable(MessageDrawable.TYPE_TEXT,true,false);
+  for(MessageDrawable m:new MessageDrawable[]{in,out}){m.setBounds(0,0,660,210);m.setTop(0,660,900,false,false);}
+  RectF a=new RectF(),b=new RectF();in.makePath().computeBounds(a,true);out.makePath().computeBounds(b,true);
+  assertTrue(a.left>=AndroidUtilities.dp(4));assertTrue(b.right<=660-AndroidUtilities.dp(4));
+  Matrix mirror=new Matrix();mirror.setScale(-1,1);mirror.postTranslate(660,0);Path mirrored=new Path(in.makePath());mirrored.transform(mirror);
+  Region clip=new Region(0,0,660,210),left=new Region(),right=new Region();left.setPath(mirrored,clip);right.setPath(out.makePath(),clip);left.op(right,Region.Op.XOR);assertTrue(left.isEmpty());
  }
  @Test public void renderNativeBubblesInLightDarkAndCustomThemes() throws Exception {
   Bitmap b=Bitmap.createBitmap(640,480,Bitmap.Config.ARGB_8888);Canvas canvas=new Canvas(b);

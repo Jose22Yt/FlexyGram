@@ -121,4 +121,19 @@ public class MatteVisualTest {
    File out=new File(System.getProperty("probe.root"),"matte-native-cells-"+(dark?"dark":"light")+".png");try(FileOutputStream f=new FileOutputStream(out)){b.compress(Bitmap.CompressFormat.PNG,100,f);}
   }
  }
+ @Test public void groupedRowSurfaceReusesGeometryAndRoundsOnlyGroupBoundaries() {
+  Context c=context(1);View top=new View(c),bottom=new View(c);
+  for(int color:new int[]{0xfffafafc,0xff242b34}) {
+   SignatureNativeRowSurface.bind(top,color,true,false);SignatureNativeRowSurface.bind(bottom,color,false,true);
+   top.layout(0,0,320,56);bottom.layout(0,0,320,56);
+   top.getBackground().setBounds(0,0,320,56);bottom.getBackground().setBounds(0,0,320,56);
+   Bitmap a=Bitmap.createBitmap(320,56,Bitmap.Config.ARGB_8888),b=Bitmap.createBitmap(320,56,Bitmap.Config.ARGB_8888);
+   top.getBackground().draw(new Canvas(a));bottom.getBackground().draw(new Canvas(b));
+   assertEquals(0,Color.alpha(a.getPixel(0,0)));assertEquals(color,a.getPixel(0,55));
+   assertEquals(color,b.getPixel(0,0));assertEquals(0,Color.alpha(b.getPixel(0,55)));
+   android.graphics.drawable.Drawable same=top.getBackground();for(int n=0;n<100;n++)SignatureNativeRowSurface.bind(top,color,true,false);
+   assertSame(same,top.getBackground());assertTrue(top.getClipToOutline());assertTrue(bottom.getClipToOutline());
+  }
+ }
+
 }

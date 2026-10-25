@@ -73,7 +73,7 @@ jobs:
       - name: Retain isolated native bubble graphics (not full app screenshots)
         uses: actions/upload-artifact@v4
         with:
-          name: FlexyGram-Alpha1272-native-bubble-probe
+          name: FlexyGram-Alpha1273-native-bubble-probe
           path: |
             build/connected-alpha-bubble-visual/android-native-bubbles.png
             build/connected-alpha-bubble-visual/android-signature-icons.png
@@ -249,14 +249,21 @@ jobs:
             echo '::error::Expected exactly one Connected Alpha APK.'
             exit 1
           fi
-          python3 tools/connected_alpha/verify_apk.py "${packages[0]}" --build-tools "$ANDROID_HOME/build-tools/36.0.0" --certificate-sha256 "$ALPHA_CERTIFICATE_SHA256" --expected-version-code 1272 > connected-alpha-verification.json
+          python3 tools/connected_alpha/verify_apk.py "${packages[0]}" --build-tools "$ANDROID_HOME/build-tools/36.0.0" --certificate-sha256 "$ALPHA_CERTIFICATE_SHA256" --expected-version-code 1273 > connected-alpha-verification.json
           python3 - <<'PY'
           import json, os
           from pathlib import Path
           report = Path('connected-alpha-verification.json')
           data = json.loads(report.read_text())
           data['commit'] = os.environ['COMMIT_ID']
+          if data['elf_count'] != 96:
+              raise ValueError('Full Connected Alpha must contain exactly 96 ARM64 ELF payloads')
+          if data['certificate_sha256'] != 'c8f04cad685ca5757d35b25ea4b0b4613c7399909948d821e6ada61f9fb12b2c':
+              raise ValueError('APK certificate differs from the authorized installed Alpha identity')
           report.write_text(json.dumps(data, indent=2) + '\n')
+          # Only public artifact metadata; never APK bytes or private signing inputs.
+          public = {key: data[key] for key in ('commit', 'sha256', 'application_id', 'version_code', 'elf_count', 'bytes')}
+          print('PUBLIC_APK_VERIFICATION ' + json.dumps(public, sort_keys=True))
           with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as f:
               f.write('Artifact verification passed. Android launch/login: NOT TESTED.\n\n')
               f.write('APK SHA-256: ' + data['sha256'] + '\n')

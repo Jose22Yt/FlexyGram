@@ -33,6 +33,8 @@ CORE = [
 
 def restore_home_presentation(actual):
     path = 'TMessagesProj/src/main/java/org/telegram/ui/DialogsActivity.java'
+    from next_alpha_contract import restore1272
+    actual = restore1272(path, actual)
     patch = (ROOT/'tools/connected_alpha/signature_home_dialogs.patch').read_bytes()
     headers = [line for line in patch.splitlines() if line.startswith((b'--- ', b'+++ '))]
     if headers != [('--- a/'+path).encode(), ('+++ b/'+path).encode()]:

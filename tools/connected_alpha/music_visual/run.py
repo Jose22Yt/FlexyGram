@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[3]
 HERE = Path(__file__).resolve().parent
 
 
-def main():
+def main(here=HERE, test_class="MusicVisualTest", stubs_writer=None, resource_writer=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--sdk-root', type=Path, required=True)
     parser.add_argument('--maven', default='mvn')
@@ -37,6 +37,8 @@ def main():
     res.mkdir(parents=True, exist_ok=True)
     for path in (ROOT/'TMessagesProj/src/main/res/drawable').glob('flexy_home_*.xml'):
         shutil.copyfile(path, res/path.name)
+    if resource_writer is not None:
+        resource_writer(ROOT, res)
     manifest = output/'AndroidManifest.xml'
     manifest.write_text('<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="app.flexygram.visualprobe"><uses-sdk android:minSdkVersion="24"/><application/></manifest>')
     subprocess.run([str(aapt), 'compile', '--dir', str(res.parent), '-o', str(output/'resources.zip')], check=True)
@@ -46,9 +48,11 @@ def main():
     shutil.rmtree(output/'target/test-classes', ignore_errors=True)
     source = output/'src/test/java'
     source.mkdir(parents=True, exist_ok=True)
-    from stubs import write_stubs
-    write_stubs(source, ROOT)
-    shutil.copyfile(HERE/'MusicVisualTest.java.in', source/'MusicVisualTest.java')
+    if stubs_writer is None:
+        from stubs import write_stubs
+        stubs_writer = write_stubs
+    stubs_writer(source, ROOT)
+    shutil.copyfile(here/(test_class+'.java.in'), source/(test_class+'.java'))
     shutil.copyfile(HERE/'pom.xml', output/'pom.xml')
     repository = Path.home()/'.m2/repository'
     command = [args.maven, '-B', '-f', str(output/'pom.xml'), '-Dandroid.sdk.jar='+str(android)]

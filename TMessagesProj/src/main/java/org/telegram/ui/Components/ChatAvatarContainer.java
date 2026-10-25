@@ -845,8 +845,74 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
         subtitleTextView.setTag(subtitle);
     }
 
+    private app.flexygram.header.SignatureChatHeader signatureHeader;
+    private android.widget.ImageView signatureMore;
+    private boolean signatureMeasured;
+    protected void onSignatureOptionsClick() { }
+    public void setSignatureHeader(app.flexygram.header.SignatureChatHeader header) {
+        signatureHeader = header;
+        if (signatureMore == null) {
+            signatureMore = new android.widget.ImageView(getContext());
+            signatureMore.setScaleType(android.widget.ImageView.ScaleType.CENTER);
+            signatureMore.setImageResource(R.drawable.ic_ab_other);
+            signatureMore.setContentDescription(getString(R.string.AccDescrMoreOptions));
+            signatureMore.setOnClickListener(v -> onSignatureOptionsClick());
+            addView(signatureMore);
+        }
+        requestLayout();
+    }
+    private boolean signatureActive() { return signatureHeader != null && signatureHeader.active(); }
+    private void measureSignature(int widthMeasureSpec, int heightMeasureSpec) {
+        int width = MeasureSpec.getSize(widthMeasureSpec);
+        int textWidth = Math.max(0, Math.round(signatureHeader.geometry.title.width()) - dp(64));
+        titleTextView.setTextSizePx(Math.round(signatureHeader.titlePx));
+        titleTextView.setGravity(Gravity.CENTER_HORIZONTAL);
+        titleTextView.measure(MeasureSpec.makeMeasureSpec(textWidth, MeasureSpec.AT_MOST), MeasureSpec.makeMeasureSpec((int)Math.ceil(signatureHeader.titlePx) + dp(8), MeasureSpec.AT_MOST));
+        if (subtitleTextView != null) { subtitleTextView.setTextSizePx(Math.round(signatureHeader.subtitlePx)); subtitleTextView.setGravity(Gravity.CENTER_HORIZONTAL); }
+        else if (animatedSubtitleTextView != null) animatedSubtitleTextView.setTextSize(signatureHeader.subtitlePx);
+        getSubtitleTextView().measure(MeasureSpec.makeMeasureSpec(textWidth, MeasureSpec.AT_MOST), signatureHeader.subtitleFits ? MeasureSpec.makeMeasureSpec((int)Math.ceil(signatureHeader.subtitlePx) + dp(8), MeasureSpec.AT_MOST) : MeasureSpec.makeMeasureSpec(0, MeasureSpec.EXACTLY));
+        int photo = Math.max(1, Math.round(signatureHeader.height) - dp(2));
+        avatarImageView.measure(MeasureSpec.makeMeasureSpec(photo, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(photo, MeasureSpec.EXACTLY));
+        avatarImageView.setRoundRadius(photo / 2);
+        signatureMore.measure(MeasureSpec.makeMeasureSpec(dp(32), MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(Math.round(signatureHeader.height), MeasureSpec.EXACTLY));
+        signatureMore.setColorFilter(getThemedColor(Theme.key_actionBarDefaultTitle));
+        if (timeItem != null) timeItem.measure(MeasureSpec.makeMeasureSpec(dp(34), MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(dp(34), MeasureSpec.EXACTLY));
+        if (communityItem != null) communityItem.measure(MeasureSpec.makeMeasureSpec(dp(14), MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(dp(14), MeasureSpec.EXACTLY));
+        if (starBgItem != null) starBgItem.measure(MeasureSpec.makeMeasureSpec(dp(20), MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(dp(20), MeasureSpec.EXACTLY));
+        if (starFgItem != null) starFgItem.measure(MeasureSpec.makeMeasureSpec(dp(20), MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(dp(20), MeasureSpec.EXACTLY));
+        setMeasuredDimension(width, MeasureSpec.getSize(heightMeasureSpec));
+    }
+    private void layoutSignature() {
+        android.graphics.RectF a = signatureHeader.geometry.avatar, title = signatureHeader.geometry.title;
+        int photo = avatarImageView.getMeasuredWidth();
+        int x = Math.round(a.centerX() - photo / 2f), y = Math.round(a.centerY() - photo / 2f);
+        avatarImageView.layout(x, y, x + photo, y + photo);
+        View subtitle = getSubtitleTextView();
+        int th = titleTextView.getMeasuredHeight(), sh = !signatureHeader.subtitleFits || subtitle.getVisibility() == GONE ? 0 : subtitle.getMeasuredHeight();
+        int textY = Math.round(title.centerY() - (th + sh + (sh == 0 ? 0 : dp(2))) / 2f);
+        x = Math.round(title.centerX() - titleTextView.getMeasuredWidth() / 2f);
+        titleTextView.layout(x, textY, x + titleTextView.getMeasuredWidth(), textY + th);
+        x = Math.round(title.centerX() - subtitle.getMeasuredWidth() / 2f);
+        subtitle.layout(x, textY + th + dp(2), x + subtitle.getMeasuredWidth(), textY + th + dp(2) + sh);
+        x = LocaleController.isRTL ? Math.round(title.left) + dp(2) : Math.round(title.right) - dp(34);
+        signatureMore.layout(x, Math.round(title.top), x + dp(32), Math.round(title.bottom));
+        if (timeItem != null) { int tx = Math.round(a.left) - dp(6), ty = Math.round(a.top) - dp(4); timeItem.layout(tx, ty, tx + dp(34), ty + dp(34)); }
+        if (communityItem != null) { int tx = Math.round(a.right) - dp(14), ty = Math.round(a.bottom) - dp(14); communityItem.layout(tx, ty, tx + dp(14), ty + dp(14)); }
+        int sx = Math.round(a.right) - dp(20), sy = Math.round(a.bottom) - dp(20);
+        if (starBgItem != null) starBgItem.layout(sx, sy, sx + dp(20), sy + dp(20));
+        if (starFgItem != null) starFgItem.layout(sx, sy, sx + dp(20), sy + dp(20));
+    }
+
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        if (signatureMore != null) signatureMore.setVisibility(signatureActive() ? VISIBLE : GONE);
+        if (signatureActive()) { signatureMeasured = true; measureSignature(widthMeasureSpec, heightMeasureSpec); return; }
+        if (signatureMeasured) {
+            signatureMeasured = false; setGlassMode(); applyAvatarRadius(avatarSizeInDp, avatarRadiusForum, avatarRadiusHasStories);
+            titleTextView.setGravity(isCentered() ? Gravity.CENTER_HORIZONTAL : Gravity.LEFT);
+            if (subtitleTextView != null) subtitleTextView.setGravity(isCentered() ? Gravity.CENTER_HORIZONTAL : Gravity.LEFT);
+            else if (animatedSubtitleTextView != null) animatedSubtitleTextView.setTextSize(dp(14));
+        }
         int padding = isCentered() ? dp(isPreviewMode() ? 35 : 10) : 0;
         final int width = MeasureSpec.getSize(widthMeasureSpec);
         // Ширина под текст считается от размера аватарки,
@@ -967,6 +1033,7 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        if (signatureActive()) { layoutSignature(); return; }
         // M3-шапка двигает аватарку и подписи
         final boolean material3 = ChatHeaderUiHelper.isMaterial3ChatHeaderStyle();
         final int avatarInsetPx = ChatHeaderUiHelper.getAvatarInsetPx();

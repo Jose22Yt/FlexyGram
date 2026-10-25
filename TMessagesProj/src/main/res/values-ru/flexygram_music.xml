@@ -2,4 +2,8 @@
 <resources>
     <string name="FlexyMusicCompact">Свернуть плеер</string>
     <string name="FlexyMusicExpand">Развернуть плеер</string>
+    <string name="FlexyMusicSpeed">Скорость</string>
+    <string name="FlexyMusicMore">Ещё</string>
+    <string name="FlexyMusicPlayingFrom">Источник</string>
+    <string name="FlexyMusicMyMusic">Моя музыка</string>
 </resources>

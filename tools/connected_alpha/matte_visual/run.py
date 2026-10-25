@@ -32,7 +32,7 @@ def main():
         dest=src/path;dest.parent.mkdir(parents=True,exist_ok=True);dest.write_text(text)
     for path,text in sources(native).items():
         dest=src/path;dest.parent.mkdir(parents=True,exist_ok=True);dest.write_text(text)
-    for name in ('MatteSettingsLayout','MatteTextSettingsCell','MatteDetailSettingsCell','MatteExpandableSwitchCell','MatteTextCheckCell','FreshInstallSavePath'):
+    for name in ('MatteSettingsLayout','MatteTextSettingsCell','MatteDetailSettingsCell','MatteExpandableSwitchCell','MatteTextCheckCell','FreshInstallSavePath','SignatureNativeRowSurface'):
         path='app/flexygram/settings/'+name+'.java';dest=src/path;dest.parent.mkdir(parents=True,exist_ok=True)
         shutil.copyfile(ROOT/'TMessagesProj/src/main/java'/path,dest)
     shutil.copyfile(HERE/'MatteVisualTest.java.in',src/'MatteVisualTest.java')
