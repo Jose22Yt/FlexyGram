@@ -1,0 +1,51 @@
+name: Performance engineering validation
+on:
+  push:
+    branches: [perf/alpha1271-engineering]
+  pull_request:
+    types: [opened, reopened, synchronize]
+permissions:
+  contents: read
+concurrency:
+  group: performance-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  lab:
+    if: github.event_name == 'push' || github.head_ref == 'perf/alpha1271-engineering'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python3 -m pip install -r tools/connected_alpha/requirements-ci.txt
+      - run: git submodule update --init --depth 1 TMessagesProj_Modules/media
+      - run: python3 tools/connected_alpha/run_checks.py
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: 'build-tools;36.0.0 platforms;android-37.0'
+      - run: python3 tools/connected_alpha/check_resources.py --sdk-root "$ANDROID_HOME"
+      - name: Validate existing native graphics probes
+        run: |
+          for probe in bubble_visual matte_visual composer_visual home_visual login_visual music_visual; do
+            python3 "tools/connected_alpha/$probe/run.py" --sdk-root "$ANDROID_HOME"
+          done
+      - run: python3 tools/connected_alpha/performance/native/run.py --sdk-root "$ANDROID_HOME" --output-dir build/connected-alpha-performance-native
+      - run: python3 -m tools.connected_alpha.performance.audit --out build/performance/source-audit.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: performance-engineering-evidence
+          path: |
+            build/connected-alpha-performance-native/performance-native-result.json
+            build/connected-alpha-performance-native/target/surefire-reports/TEST-*.xml
+            build/connected-alpha-music-visual/target/surefire-reports/TEST-*.xml
+            build/performance/source-audit.json
+          retention-days: 7
+          if-no-files-found: error

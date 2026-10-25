@@ -1,0 +1,22 @@
+package app.exteraless.player;
+import static org.telegram.messenger.AndroidUtilities.dp;
+import android.content.*;import android.graphics.*;import android.os.*;import android.text.*;import android.util.*;import android.view.*;import android.widget.*;
+import androidx.annotation.*;import androidx.core.graphics.ColorUtils;
+import org.telegram.messenger.MediaController;
+/** Actual LineView source and outer detach body inside an explicit fixture shell. */
+public class LyricsHarness extends FrameLayout {
+ public Lyrics lyrics; public long positionMs,positionAt;public int colorActive=0xff152c3e;
+ public int followCalls,scrollCalls;private final Runnable resumeFollow=()->followCalls++;
+ private final Runnable scrollToCurrent=()->scrollCalls++;
+ private static class TestList extends FrameLayout {int stops;Runnable onStop;TestList(Context c){super(c);}void stopScroll(){stops++;if(onStop!=null)onStop.run();}}
+ private final TestList list;private final LineView line;
+ public LyricsHarness(Context c){super(c);list=new TestList(c);list.onStop=()->postDelayed(resumeFollow,750);addView(list);line=new LineView(c);list.addView(line,new FrameLayout.LayoutParams(-1,-2));}
+ public View line(){return line;}
+ public void bind(String text){line.index=0;line.setText(text,false);line.setRole(1,false);}
+ public void schedule(){postDelayed(resumeFollow,750);postDelayed(scrollToCurrent,750);}
+ public int stops(){return list.stops;}
+_CURRENT_
+_PLAYING_
+_DETACH_
+_LINE_
+}
