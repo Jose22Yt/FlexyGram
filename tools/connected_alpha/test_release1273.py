@@ -1,13 +1,16 @@
 """Current native release identity and private delivery, beyond historical audits."""
 import re,subprocess,unittest,yaml
 from next_alpha_contract import ROOT,restore1272,RELEASE_PATHS
+from refinement1274_contract import restore as restore_refinement
+# Preserve historical1273 checks against exact restored bytes; current1274 is checked independently.
+def historical(path):return restore_refinement(path,(ROOT/path).read_bytes()).decode()
 class Release1273(unittest.TestCase):
  def test_version_and_private_verifier_agree_without_identity_or_signing_changes(self):
-  gradle=(ROOT/'TMessagesProj/build.gradle').read_text()
+  gradle=historical('TMessagesProj/build.gradle')
   self.assertEqual(re.search(r'def verCode = (\d+)',gradle)[1],'1273')
   old=subprocess.check_output(['git','show','8619ba40fbd8fd9d9d898ff307fb0c0716661254:TMessagesProj/build.gradle'],cwd=ROOT,text=True)
   self.assertEqual(gradle.replace('def verCode = 1273','def verCode = 1272'),old)
-  builder=(ROOT/'tools/connected_alpha/build_private_apk.py').read_text()
+  builder=historical('tools/connected_alpha/build_private_apk.py')
   self.assertIn('FlexyGram_Alpha_1273_ARM64_TEST.apk',builder)
   self.assertIn("'--expected-version-code','1273'",builder)
   self.assertIn("CERT='c8f04cad685ca5757d35b25ea4b0b4613c7399909948d821e6ada61f9fb12b2c'",builder)
@@ -20,7 +23,7 @@ class Release1273(unittest.TestCase):
    self.assertEqual(restored,subprocess.check_output(['git','show','8619ba40fbd8fd9d9d898ff307fb0c0716661254:'+path],cwd=ROOT))
    with self.assertRaises(ValueError):restore1272(path,data+b'\nUNREVIEWED\n')
  def test_full_build_remains_guarded_and_plaintext_apk_is_never_uploaded(self):
-  workflow=(ROOT/'.github/workflows/connected-alpha-arm64.yml').read_text()
+  workflow=historical('.github/workflows/connected-alpha-arm64.yml')
   self.assertIn('--expected-version-code 1273',workflow)
   jobs=yaml.safe_load(workflow)['jobs']
   self.assertEqual(jobs['build-arm64']['needs'],['source-checks','credentials-present'])
@@ -35,7 +38,7 @@ class Release1273(unittest.TestCase):
  def test_real_workflow_report_enforces_payload_and_pin_without_exposing_extra_fields(self):
   import json,os,sys,tempfile
   from pathlib import Path
-  workflow=yaml.safe_load((ROOT/'.github/workflows/connected-alpha-arm64.yml').read_text())
+  workflow=yaml.safe_load(historical('.github/workflows/connected-alpha-arm64.yml'))
   step=next(s for s in workflow['jobs']['build-arm64']['steps'] if s.get('name')=='Verify APK against independently authorized certificate')
   script=step['run'].split("python3 - <<'PY'\n",1)[1].split('\nPY',1)[0]
   base=dict(sha256='0'*64,application_id='io.github.jose22yt.flexygram.alpha',version_code=1273,elf_count=96,bytes=1,certificate_sha256='c8f04cad685ca5757d35b25ea4b0b4613c7399909948d821e6ada61f9fb12b2c',elfs=['PRIVATE_DECOY_FIELD'])

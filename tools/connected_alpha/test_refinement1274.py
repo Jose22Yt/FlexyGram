@@ -33,3 +33,21 @@ class Refinement(unittest.TestCase):
   self.assertIn("github.head_ref != 'integration/alpha1274-signature-refinement-studio'",data['jobs']['build']['if'])
   checks=yaml.safe_load((ROOT/'.github/workflows/refinement1274.yml').read_text())
   self.assertIn('studio_native',str(checks));self.assertNotIn('*.apk',str(checks))
+
+ def test_current_release_identity_is1274_and_all_original_signing_guards_remain(self):
+  import re,yaml
+  gradle=(ROOT/'TMessagesProj/build.gradle').read_text()
+  self.assertEqual(re.search(r'def verCode = (\d+)',gradle)[1],'1274')
+  self.assertEqual(restore('TMessagesProj/build.gradle',gradle.encode()),subprocess.check_output(['git','show',BASE+':TMessagesProj/build.gradle'],cwd=ROOT))
+  flow=(ROOT/'.github/workflows/connected-alpha-arm64.yml').read_text()
+  self.assertIn('--expected-version-code 1274',flow)
+  self.assertIn("c8f04cad685ca5757d35b25ea4b0b4613c7399909948d821e6ada61f9fb12b2c",flow)
+  self.assertIn("data['elf_count'] != 96",flow)
+  self.assertIn('assembleConnectedAlpha',flow)
+  for step in yaml.safe_load(flow)['jobs']['build-arm64']['steps']:self.assertNotIn('upload-artifact',step.get('uses',''))
+ def test_real_outline_policy_preserves_chroma_and_pearl_is_tinted_not_flat_white(self):
+  code="""import app.flexygram.bubbles.BubbleOutline;class OutlineProbe{public static void main(String[]args){int cases=0;for(int c:new int[]{0xff2255aa,0xff8833bb,0xff228844,0xffaaaaaa})for(boolean dark:new boolean[]{false,true})for(int style:new int[]{0,1})for(int intensity:new int[]{0,55,100}){int out=BubbleOutline.color(c,dark,style,intensity);int r=(out>>>16)&255,g=(out>>>8)&255,b=out&255;int cr=(c>>>16)&255,cg=(c>>>8)&255,cb=c&255;if(Integer.compare(r,g)!=Integer.compare(cr,cg)||Integer.compare(g,b)!=Integer.compare(cg,cb))throw new AssertionError("chroma");if(style==1&&(out&0xffffff)==0xffffff)throw new AssertionError("flat white");if(out!=BubbleOutline.color(c,dark,style,intensity))throw new AssertionError("unstable");cases++;}if(BubbleOutline.palette(0xff22aa44,0,0,0)!=0xff22aa44)throw new AssertionError("flat palette");System.out.println(cases);}}"""
+  with tempfile.TemporaryDirectory()as d:
+   p=Path(d)/'OutlineProbe.java';p.write_text(code)
+   subprocess.run(['java','-m','jdk.compiler/com.sun.tools.javac.Main','-d',d,str(p),str(ROOT/'TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleOutline.java')],check=True,capture_output=True)
+   self.assertEqual(subprocess.check_output(['java','-cp',d,'OutlineProbe'],text=True).strip(),'48')

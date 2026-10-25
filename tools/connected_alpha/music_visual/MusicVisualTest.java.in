@@ -51,6 +51,17 @@ public class MusicVisualTest {
   assertEquals(0f,(Float)field(bar,"phase"),0f);assertEquals(0L,field(bar,"lastFrame"));
   for(int w:new int[]{192,240,264,272,300,320,600}){ControlsRow row=new ControlsRow(activity);size(row,w,200);View[] actions={row.shuffle,row.prev,row.play,row.next,row.repeat};for(View v:actions){assertTrue(v.getWidth()>=48);assertTrue(v.getHeight()>=48);assertTrue(v.getLeft()>=0);assertTrue(v.getRight()<=w);}if(w>=264){for(int n=1;n<5;n++)assertTrue(actions[n-1].getRight()<=actions[n].getLeft());}}
  }
+ @Test public void actionLabelsReflowForLargeFontsWithoutTruncationOrTouchOverlap()throws Exception{
+  for(float font:new float[]{1,2,3})for(int width:new int[]{192,312,552}){
+   Configuration config=new Configuration(activity.getResources().getConfiguration());config.fontScale=font;Context context=activity.createConfigurationContext(config);
+   SignatureMusicActions grid=new SignatureMusicActions(context);
+   for(String label:new String[]{"Velocidad","Letras","Cola","Más"}){MorphButton button=new MorphButton(context,PlayerIcon.stroke(PlayerIcon.SPEED,20));button.setStackedLabel(true);button.setText(label);grid.addView(button,new LinearLayout.LayoutParams(0,72,1));}
+   grid.measure(View.MeasureSpec.makeMeasureSpec(width,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(0,View.MeasureSpec.UNSPECIFIED));grid.layout(0,0,width,grid.getMeasuredHeight());
+   for(int i=0;i<4;i++){View v=grid.getChildAt(i);assertTrue(v.getHeight()>=48);assertTrue(v.getWidth()>=48);String displayed=(String)field(v,"displayText");assertEquals(v.getContentDescription().toString(),displayed);
+    for(int j=i+1;j<4;j++){View other=grid.getChildAt(j);android.graphics.Rect r=new android.graphics.Rect(v.getLeft(),v.getTop(),v.getRight(),v.getBottom());assertFalse(r.intersect(other.getLeft(),other.getTop(),other.getRight(),other.getBottom()));}}
+   if(font==1&&width==312)assertEquals(grid.getChildAt(0).getTop(),grid.getChildAt(3).getTop());
+  }
+ }
  @Test public void heroFadeReusesShaderAndArtworkPaletteIsBounded()throws Exception{
   for(boolean dark:new boolean[]{false,true})for(int seed:new int[]{0xff000000,0xffffffff,0xffff0000,0xff0000ff}){
    PlayerColors c=PlayerColors.fromSignatureArtwork(seed,dark);for(int n=0;n<100;n++)assertSame(c,PlayerColors.fromSignatureArtwork(seed,dark));assertTrue(androidx.core.graphics.ColorUtils.calculateContrast(c.onSurface,c.surface)>=4.5);assertTrue(androidx.core.graphics.ColorUtils.calculateContrast(c.onPrimary,c.primary)>=4.5);

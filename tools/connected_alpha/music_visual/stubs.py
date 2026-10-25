@@ -7,7 +7,7 @@ import shutil
 
 PRODUCTION = ('SignatureMusicStyle','SignatureMusicPresentation','SignatureMusicBubble',
               'SignatureMusicHost','ControlsRow','MorphButton','PlayerIcon','Spring',
-              'WavySeekBar','RingPlayButton','PlayerBarView','PlayerMiniView','PlayerColors','CoverImage','SignatureCoverFade')
+              'WavySeekBar','RingPlayButton','PlayerBarView','PlayerMiniView','PlayerColors','CoverImage','SignatureCoverFade','SignatureMusicActions')
 
 def write_stubs(source, root):
     def put(path, text):

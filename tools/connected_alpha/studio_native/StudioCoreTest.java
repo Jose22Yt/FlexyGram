@@ -19,6 +19,15 @@ public class StudioCoreTest {
   }
  }
  public static void main(String[] args)throws Exception {
+  check(StudioSchema.keys().size()==21);
+  for(String key:new String[]{"outlineStyle","pearlIntensity","outlineEnabled"}){
+   Object valid=key.equals("outlineEnabled")?Boolean.FALSE:key.equals("outlineStyle")?1:72;
+   var preset=StudioCodec.create("Pearl.flexyGram",Map.of("bubbles",Map.of(key,valid)));check(preset.minApp==1274);
+   check(StudioCodec.decode(StudioCodec.encode(preset),1274).sections.get("bubbles").get(key).equals(valid));reject(()->StudioCodec.decode(StudioCodec.encode(preset),1273));
+  }
+  reject(()->StudioCodec.create("bad.flexyGram",Map.of("bubbles",Map.of("outlineStyle",2))));
+  reject(()->StudioCodec.create("bad.flexyGram",Map.of("bubbles",Map.of("pearlIntensity",101))));
+  reject(()->StudioCodec.create("bad.flexyGram",Map.of("header",Map.of("counterPresentation",0))));
   var defaults=defaults();reject(()->StudioCodec.export("MiFlexyGram.flexyGram",defaults,Set.of()));
   defaults.get("bubbles").put("transparency",74);
   var one=StudioCodec.export("SoloBurbujas.flexyGram",defaults,Set.of());check(one.sections.keySet().equals(Set.of("bubbles")));check(one.sections.get("bubbles").size()==1);
