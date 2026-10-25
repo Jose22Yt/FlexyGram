@@ -57,3 +57,25 @@ class HeaderTests(unittest.TestCase):
   avatar=(ROOT/'TMessagesProj/src/main/java/org/telegram/ui/Components/ChatAvatarContainer.java').read_text()
   for name in ['titlePx','subtitlePx']:
    self.assertIn('setTextSizePx(Math.round(signatureHeader.'+name+'))',avatar)
+
+ def test_actual_search_padding_tracks_signature_height_and_preserves_native_fallback(self):
+  from test_signature_matte import body
+  method=body((ROOT/'TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java').read_text(),'private void checkUi_messagesSearchListPadding(')
+  code="""class SearchPaddingProbe {
+ static class AndroidUtilities {static int statusBarHeight=24;}
+ static class ActionBar {static int getCurrentActionBarHeight(){return 56;}int measured;int getMeasuredHeight(){return measured;}}
+ static class View {int top,bottom;float y,shownT;View linearLayout=this;void setPadding(int l,int t,int r,int b){top=t;bottom=b;}void setTopBottomPadding(int t,int b){top=t;bottom=b;}void setFade(int t,int b){top=t;bottom=b;}void setTranslationY(float value){y=value;}}
+ static class Insets {float getAnimatedMaxBottomInset(){return 16;}}
+ SearchPaddingProbe parentChatActivity;ActionBar actionBar=new ActionBar();boolean signature;boolean usesSignatureHeader(){return signature;}
+ View actionBarSearchTags, messagesSearchListView=new View(),hashtagHistoryView=new View(),messagesSearchListContainer=new View(),hashtagLoadingView=new View(),hashtagSearchEmptyView=new View();Insets windowInsetsStateHolder=new Insets();
+ static int dp(float n){return Math.round(n);}float getTopPanelHeightWithPadding(int n){return 41;}float finalTopPanelHeight(float h){return h;}float getHashtagTabsShownT(){return 0;}
+ void checkUi_messagesSearchListPadding(){_METHOD_}
+ public static void main(String[] args){int cases=0;for(boolean signature:new boolean[]{false,true})for(int height:new int[]{0,56,80,88,144,240}){SearchPaddingProbe p=new SearchPaddingProbe();p.signature=signature;p.actionBar.measured=height;p.checkUi_messagesSearchListPadding();int top=(signature?Math.max(80,height):80)+43;
+ if(p.messagesSearchListView.top!=top||p.hashtagHistoryView.top!=top||p.messagesSearchListContainer.top!=top||p.hashtagLoadingView.y!=top)throw new AssertionError("search overlap");
+ if(p.messagesSearchListView.bottom!=76||p.hashtagSearchEmptyView.y!=(top-76)/2f+32)throw new AssertionError("native keyboard/inset policy");cases++;}System.out.println(cases);}
+ }""".replace('_METHOD_',method)
+  with tempfile.TemporaryDirectory()as d:
+   p=Path(d)/'SearchPaddingProbe.java';p.write_text(code)
+   subprocess.run(['java','-m','jdk.compiler/com.sun.tools.javac.Main','-d',d,str(p)],check=True,capture_output=True)
+   result=subprocess.run(['java','-cp',d,'SearchPaddingProbe'],check=True,capture_output=True,text=True)
+   self.assertEqual(result.stdout.strip(),'12')

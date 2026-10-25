@@ -864,7 +864,7 @@ index 9cc9450c4..11980f8dc 100644
          }
      }
 diff --git a/TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java b/TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java
-index 88f89fdfe..0e7016af0 100644
+index 88f89fdfe..fd86fac45 100644
 --- a/TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java
 +++ b/TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java
 @@ -4662,6 +4662,7 @@ public class ChatActivity extends BaseFragment implements
@@ -970,6 +970,17 @@ index 88f89fdfe..0e7016af0 100644
              return false;
          }
          if (parentFragment == null) {
+@@ -51230,7 +51266,9 @@ public class ChatActivity extends BaseFragment implements
+             parentChatActivity.checkUi_messagesSearchListPadding();
+         }
+ 
+-        final int top = AndroidUtilities.statusBarHeight + ActionBar.getCurrentActionBarHeight() + dp(2)
++        final int nativeBarHeight = AndroidUtilities.statusBarHeight + ActionBar.getCurrentActionBarHeight();
++        final int barHeight = usesSignatureHeader() ? Math.max(nativeBarHeight, actionBar.getMeasuredHeight()) : nativeBarHeight;
++        final int top = barHeight + dp(2)
+             + ((int) finalTopPanelHeight(getTopPanelHeightWithPadding(dp(7))))
+             + (actionBarSearchTags != null ? dp((28 + 7) * actionBarSearchTags.shownT) : 0)
+             + dp((36 + 7) * getHashtagTabsShownT());
 diff --git a/TMessagesProj/src/main/java/org/telegram/ui/Components/ChatAvatarContainer.java b/TMessagesProj/src/main/java/org/telegram/ui/Components/ChatAvatarContainer.java
 index 4a55347b4..d8d41b3ff 100644
 --- a/TMessagesProj/src/main/java/org/telegram/ui/Components/ChatAvatarContainer.java

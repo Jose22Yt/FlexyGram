@@ -51266,7 +51266,9 @@ public class ChatActivity extends BaseFragment implements
             parentChatActivity.checkUi_messagesSearchListPadding();
         }
 
-        final int top = AndroidUtilities.statusBarHeight + ActionBar.getCurrentActionBarHeight() + dp(2)
+        final int nativeBarHeight = AndroidUtilities.statusBarHeight + ActionBar.getCurrentActionBarHeight();
+        final int barHeight = usesSignatureHeader() ? Math.max(nativeBarHeight, actionBar.getMeasuredHeight()) : nativeBarHeight;
+        final int top = barHeight + dp(2)
             + ((int) finalTopPanelHeight(getTopPanelHeightWithPadding(dp(7))))
             + (actionBarSearchTags != null ? dp((28 + 7) * actionBarSearchTags.shownT) : 0)
             + dp((36 + 7) * getHashtagTabsShownT());
