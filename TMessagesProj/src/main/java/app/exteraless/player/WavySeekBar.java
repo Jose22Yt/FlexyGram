@@ -34,6 +34,7 @@ public class WavySeekBar extends View {
     private final Paint wavePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint trackPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint fillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint signatureInactivePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Path path = new Path();
     private final RectF rect = new RectF();
     private Delegate delegate;
@@ -67,6 +68,7 @@ public class WavySeekBar extends View {
         wavePaint.setColor(active);
         fillPaint.setColor(active);
         trackPaint.setColor(inactive);
+        signatureInactivePaint.setColor(inactive);
         invalidate();
     }
 
@@ -167,6 +169,7 @@ public class WavySeekBar extends View {
 
     @Override
     protected void onDraw(@NonNull Canvas canvas) {
+        if (BuildConfig.CONNECTED_ALPHA) { drawSignatureColumns(canvas); return; }
         long now = SystemClock.elapsedRealtime();
         float dt = lastFrame == 0 ? 0.016f : Math.min(0.05f, (now - lastFrame) / 1000f);
         lastFrame = now;
@@ -225,6 +228,21 @@ public class WavySeekBar extends View {
         } else {
             lastFrame = 0;
         }
+    }
+
+    /** Decorative deterministic columns, not measured audio. Only progress/touch invalidates this track. */
+    private void drawSignatureColumns(Canvas canvas) {
+        float center = getHeight() / 2f, start = left(), end = right();
+        float at = start + Math.max(0f, Math.min(1f, getProgress())) * Math.max(0, end - start);
+        float step = dp(6), thickness = Math.max(1, dp(3));
+        int index = 0;
+        for (float x = start + thickness / 2; x <= end - thickness / 2; x += step, index++) {
+            float height = dp(8 + ((index * 17 + index * index * 3) % 23));
+            rect.set(x - thickness / 2, center - height / 2, x + thickness / 2, center + height / 2);
+            canvas.drawRoundRect(rect, thickness / 2, thickness / 2, x <= at ? fillPaint : signatureInactivePaint);
+        }
+        rect.set(at - dp(1), center - dp(17), at + dp(1), center + dp(17));
+        canvas.drawRoundRect(rect, dp(1), dp(1), fillPaint);
     }
 
     @Override

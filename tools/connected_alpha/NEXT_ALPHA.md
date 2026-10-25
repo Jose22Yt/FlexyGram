@@ -56,3 +56,10 @@ Local15bubble/preview/cache graphics tests also PASS. A local-first failure expo
 ## Optional blur / native-alpha regression
 
 A stronger isolated native test reproduced an opaque wallpaper ghost at drawable alpha zero: the legacy coordinate callback has no alpha parameter, so its cached image ignored MessageDrawable.setAlpha while native fill/contour faded correctly. Reverting only the new alpha gate in the generated probe reproduces expected0/actual255; candidate15bubble/preview/cache tests PASS with the gate, including alpha0/64/128/254 and unchanged pixel assertions. During these native transitions the optional cache stays warm but rendering conservatively uses Matte; normal alpha255 restores cached sampling. No saveLayer, offscreen compositing, timer, cell measurement, native animation or navigation changes. Physical smoothness of this conservative transition fallback remains pending.
+
+
+## Music3 recovered presentation checkpoint
+
+Full-sheet hero now spans the width and fades into the controls surface with one shader rebuilt only on size/color changes. Artwork palette uses the existing PlayerArt queue and a bounded8entry cache; mini/pills keep their previous palette. Alpha has deterministic decorative columns without a playback invalidation loop; seeking/cancel/accessibility handlers and audio transport remain native. Main order is shuffle/previous/play/next/repeat, with the existing accessible two-row fallback only where five48dp targets cannot fit. Four tiles remain Speed/Lyrics/Queue/More. No owner reference artwork is included.
+
+Before the environment reset these14isolated native Music tests and4host boundary tests passed, including theme contrast, stable columns, bounded palette, shader reuse, responsive/large-font layout and unchanged compact controls. Recovered source is checkpointed for a new CI run; this is not a complete-module/device pass. Header and selective PR93 integration remain pending. PR93 metadata verified at0602aadcccbba39936e9fb161901dee88e785f62; no duplicate PR90 integration. No final next-Alpha APK exists.

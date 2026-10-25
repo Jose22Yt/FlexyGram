@@ -1,8 +1,8 @@
 diff --git a/.github/workflows/pr.yml b/.github/workflows/pr.yml
-index e24190450..fbea8825d 100644
+index e24190450..e422060ca 100644
 --- a/.github/workflows/pr.yml
 +++ b/.github/workflows/pr.yml
-@@ -72,8 +72,19 @@ jobs:
+@@ -72,8 +72,21 @@ jobs:
            for probe in bubble_visual matte_visual composer_visual home_visual login_visual music_visual; do
              python3 "tools/connected_alpha/$probe/run.py" --sdk-root "$ANDROID_HOME"
            done
@@ -17,11 +17,90 @@ index e24190450..fbea8825d 100644
 +            build/connected-alpha-bubble-visual/signature-preview-*.png
 +            build/connected-alpha-bubble-visual/target/surefire-reports/*.xml
 +            build/connected-alpha-matte-visual/target/surefire-reports/*.xml
++            build/connected-alpha-music-visual/android-music-isolated.png
++            build/connected-alpha-music-visual/target/surefire-reports/*.xml
 +          retention-days: 7
 +          if-no-files-found: error
    build:
      if: github.event_name == 'pull_request' && github.head_ref != 'feat/alpha1271-signature-ui' && github.head_ref != 'feat/signature-native-login' && github.head_ref != 'feat/signature-music2' && github.head_ref != 'fix/alpha-ios-bubbles-glass-home2' && github.head_ref != 'fix/signature-matte-general-appearance' && github.head_ref != 'alpha/connected-exteraless-baseline' && !startsWith(github.head_ref, 'support/connected-alpha-ci-') && !startsWith(github.head_ref, 'integration/connected-alpha-') && !startsWith(github.head_ref, 'fix/alpha2-')
      name: Gradle Build
+diff --git a/TMessagesProj/src/main/java/app/exteraless/player/ControlsRow.java b/TMessagesProj/src/main/java/app/exteraless/player/ControlsRow.java
+index 99bd0cc8a..8a1a8f64a 100644
+--- a/TMessagesProj/src/main/java/app/exteraless/player/ControlsRow.java
++++ b/TMessagesProj/src/main/java/app/exteraless/player/ControlsRow.java
+@@ -159,13 +159,24 @@ public class ControlsRow extends ViewGroup implements MorphButton.PressListener
+         int width = MeasureSpec.getSize(widthMeasureSpec);
+         scale = Math.min(1f, (width - dp(16)) / (float) dp(312));
+         int height = BuildConfig.CONNECTED_ALPHA ? Math.max(dp(64), Math.round(dp(88) * scale)) + dp(60) : Math.round(dp(88) * scale);
++        signatureInline = BuildConfig.CONNECTED_ALPHA && width >= dp(264);
++        signaturePlaySize = Math.max(dp(64), Math.min(dp(88), width - dp(224)));
++        if (signatureInline) height = signaturePlaySize + dp(16);
+         measureButtons();
+         setMeasuredDimension(width, height);
+     }
+ 
++    private boolean signatureInline;
++    private int signaturePlaySize;
+     private void measureButtons() {
+         for (MorphButton b : buttons) {
+             b.scale = scale;
++            if (signatureInline) {
++                int size = b == play ? signaturePlaySize : dp(48);
++                b.scale = b == play ? signaturePlaySize / (float) dp(88) : 1f;
++                b.measure(MeasureSpec.makeMeasureSpec(size, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(size, MeasureSpec.EXACTLY));
++                continue;
++            }
+             int minimum = BuildConfig.CONNECTED_ALPHA ? dp(b == play ? 64 : 48) : 1;
+             int w = Math.max(minimum, Math.round(b.width.value * scale));
+             int h = Math.max(minimum, Math.round(b.baseHeight * scale));
+@@ -184,7 +195,7 @@ public class ControlsRow extends ViewGroup implements MorphButton.PressListener
+     }
+ 
+     private void layoutButtons(int width, int height) {
+-        if (BuildConfig.CONNECTED_ALPHA) {
++        if (BuildConfig.CONNECTED_ALPHA && !signatureInline) {
+             int center = width / 2;
+             place(play, center, 0);
+             place(prev, center - Math.round(dp(100) * scale), Math.round(dp(12) * scale));
+diff --git a/TMessagesProj/src/main/java/app/exteraless/player/CoverImage.java b/TMessagesProj/src/main/java/app/exteraless/player/CoverImage.java
+index c81117296..f1d80339a 100644
+--- a/TMessagesProj/src/main/java/app/exteraless/player/CoverImage.java
++++ b/TMessagesProj/src/main/java/app/exteraless/player/CoverImage.java
+@@ -20,6 +20,8 @@ public class CoverImage extends BackupImageView {
+     private final RectF rect = new RectF();
+     private final PlayerIcon note;
+     private int radius;
++    private SignatureCoverFade signatureFade;
++    private int signatureSurface;
+     private String currentKey;
+     private MessageObject message;
+     private int fallbackSeed;
+@@ -52,6 +54,18 @@ public class CoverImage extends BackupImageView {
+         invalidate();
+     }
+ 
++    /** Enabled only by the full Signature sheet; compact covers retain their native presentation. */
++    public void setSignatureSurface(int color) {
++        if (signatureFade == null) signatureFade = new SignatureCoverFade();
++        signatureSurface = color;
++        signatureFade.update(getWidth(), getHeight(), color);
++        invalidate();
++    }
++    @Override protected void onSizeChanged(int w, int h, int oldw, int oldh) {
++        super.onSizeChanged(w, h, oldw, oldh);
++        if (signatureFade != null) signatureFade.update(w, h, signatureSurface);
++    }
++
+     public MessageObject getMessage() {
+         return message;
+     }
+@@ -107,5 +121,6 @@ public class CoverImage extends BackupImageView {
+             note.draw(canvas);
+         }
+         super.onDraw(canvas);
++        if (signatureFade != null) signatureFade.draw(canvas);
+     }
+ }
 diff --git a/TMessagesProj/src/main/java/app/exteraless/player/LyricsFill.java b/TMessagesProj/src/main/java/app/exteraless/player/LyricsFill.java
 new file mode 100644
 index 000000000..73c69128b
@@ -127,6 +206,284 @@ index 39c637492..bd85bb750 100644
          private void drawInterlude(Canvas canvas, boolean live, float progress, float alpha, long now) {
              float size = textSize() * 0.32f;
              float gap = size * 0.55f;
+diff --git a/TMessagesProj/src/main/java/app/exteraless/player/PlayerColors.java b/TMessagesProj/src/main/java/app/exteraless/player/PlayerColors.java
+index a988ad341..bd7160f46 100644
+--- a/TMessagesProj/src/main/java/app/exteraless/player/PlayerColors.java
++++ b/TMessagesProj/src/main/java/app/exteraless/player/PlayerColors.java
+@@ -83,6 +83,20 @@ public final class PlayerColors {
+         });
+     }
+ 
++    // Only the full Music3 sheet opts in. Mini/pills keep fromSeed's Pearl/Midnight identity.
++    private static final android.util.LruCache<Long, PlayerColors> artworkPalettes = new android.util.LruCache<>(8);
++    public static PlayerColors fromSignatureArtwork(int seed, boolean dark) {
++        long key = ((seed & 0xffffffffL) << 1) | (dark ? 1 : 0);
++        PlayerColors cached = artworkPalettes.get(key);
++        if (cached != null) return cached;
++        PlayerColors base = dark ? MIDNIGHT : PEARL;
++        int[] values = base.values();
++        for (int i = 0; i < 4; i++) values[i] = ColorUtils.blendARGB(values[i], seed | 0xff000000, .08f);
++        PlayerColors result = new PlayerColors(dark, values);
++        artworkPalettes.put(key, result);
++        return result;
++    }
++
+     public static PlayerColors lerp(PlayerColors a, PlayerColors b, float t) {
+         if (t <= 0f) {
+             return a;
+diff --git a/TMessagesProj/src/main/java/app/exteraless/player/PlayerSheet.java b/TMessagesProj/src/main/java/app/exteraless/player/PlayerSheet.java
+index 01e521446..834ddecb0 100644
+--- a/TMessagesProj/src/main/java/app/exteraless/player/PlayerSheet.java
++++ b/TMessagesProj/src/main/java/app/exteraless/player/PlayerSheet.java
+@@ -186,7 +186,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
+         dark = PlayerColors.isDark(resourcesProvider);
+         fallbackSeed = PlayerColors.noCoverSeed(resourcesProvider);
+         Integer seed = PlayerArt.cachedSeed(playing);
+-        colors = PlayerColors.fromSeed(seed != null ? seed : fallbackSeed, dark);
++        colors = sheetColors(seed != null ? seed : fallbackSeed);
+ 
+         root = new FrameLayout(context) {
+             @Override
+@@ -299,15 +299,16 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
+         layout.addView(header);
+ 
+         cover = new CoverImage(context, 120);
+-        cover.setRadius(dp(28));
+-        if (!BuildConfig.CONNECTED_ALPHA) cover.setListener(fallbackSeed, this::onSeed);
++        cover.setRadius(BuildConfig.CONNECTED_ALPHA ? 0 : dp(28));
++        cover.setListener(fallbackSeed, this::onSeed);
+         cover.setOutlineProvider(new ViewOutlineProvider() {
+             @Override
+             public void getOutline(View view, Outline outline) {
+                 outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), dp(28));
+             }
+         });
+-        cover.setElevation(dp(BuildConfig.CONNECTED_ALPHA ? 2 : 14));
++        cover.setElevation(dp(BuildConfig.CONNECTED_ALPHA ? 0 : 14));
++        if (BuildConfig.CONNECTED_ALPHA) cover.setOutlineProvider(null);
+         cover.setOnTouchListener(this::onCoverTouch);
+         layout.addView(cover);
+ 
+@@ -470,7 +471,8 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
+                 ((MorphButton) group.getChildAt(i)).setRadius(dp(18), false);
+             }
+             MorphButton options = new MorphButton(context, PlayerIcon.fill(PlayerIcon.MORE, 20));
+-            options.setText(getString(R.string.AccDescrMoreOptions));
++            options.setText(getString(R.string.FlexyMusicMore));
++            options.setContentDescription(getString(R.string.AccDescrMoreOptions));
+             options.setStackedLabel(true);
+             options.setRadius(dp(18), false);
+             options.setColors(colors.surfaceHigh, colors.onSurface, colors.surfaceHigh, colors.onSurface);
+@@ -489,6 +491,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
+         bubble.setVisibility(View.GONE);
+         bubble.setAlpha(0f);
+         layout.addView(bubble);
++        if (BuildConfig.CONNECTED_ALPHA) { collapseButton.setRotation(90); header.bringToFront(); }
+ 
+         applyColors(colors);
+         bind(playing, false);
+@@ -961,7 +964,8 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
+     public void didReceivedNotification(int id, int account, Object... args) {
+         if (id == NotificationCenter.didSetNewTheme && BuildConfig.CONNECTED_ALPHA) {
+             dark = PlayerColors.isDark(resourcesProvider);
+-            animateColors(PlayerColors.fromSeed(0, dark), false);
++            Integer seed = PlayerArt.cachedSeed(current);
++            animateColors(sheetColors(seed != null ? seed : fallbackSeed), false);
+             return;
+         }
+         if (id == NotificationCenter.messagePlayingDidStart) {
+@@ -1025,13 +1029,11 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
+         cover.setMessage(mo);
+         smallCover.setMessage(mo);
+         if (changed) {
+-            if (!BuildConfig.CONNECTED_ALPHA) {
+-                Integer seed = PlayerArt.cachedSeed(mo);
+-                if (seed != null) {
+-                    animateColors(PlayerColors.fromSeed(seed, dark), animated);
+-                } else if (PlayerArt.fileCover(mo) == null && PlayerArt.fullLocation(mo) == null && PlayerArt.thumbLocation(mo) == null) {
+-                    animateColors(PlayerColors.fromSeed(fallbackSeed, dark), animated);
+-                }
++            Integer seed = PlayerArt.cachedSeed(mo);
++            if (seed != null) {
++                animateColors(sheetColors(seed), animated);
++            } else if (PlayerArt.fileCover(mo) == null && PlayerArt.fullLocation(mo) == null && PlayerArt.thumbLocation(mo) == null) {
++                animateColors(sheetColors(fallbackSeed), animated);
+             }
+             lyricsKey = null;
+             if (lyricsMode) {
+@@ -1046,9 +1048,13 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
+         updateProgress();
+     }
+ 
++    private PlayerColors sheetColors(int seed) {
++        return BuildConfig.CONNECTED_ALPHA ? PlayerColors.fromSignatureArtwork(seed, dark) : PlayerColors.fromSeed(seed, dark);
++    }
++
+     private void onSeed(MessageObject mo, int seed) {
+         if (mo == current) {
+-            animateColors(PlayerColors.fromSeed(seed, dark), true);
++            animateColors(sheetColors(seed), true);
+         }
+     }
+ 
+@@ -1073,6 +1079,10 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
+                 headerTitle.setText(DialogObject.getName(account, did));
+             }
+         }
++        if (BuildConfig.CONNECTED_ALPHA) {
++            headerLabel.setText(getString(R.string.FlexyMusicPlayingFrom));
++            if (mo.getDialogId() == UserConfig.getInstance(account).getClientUserId()) headerTitle.setText(getString(R.string.FlexyMusicMyMusic));
++        }
+     }
+ 
+     private void updateLike(boolean animated) {
+@@ -1132,7 +1142,8 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
+         float speed = MediaController.getInstance().getPlaybackSpeed(true);
+         DecimalFormat format = new DecimalFormat("0.##", DecimalFormatSymbols.getInstance(currentLocale()));
+         String label = format.format(speed) + "×";
+-        speedButton.setText(label);
++        speedButton.setText(BuildConfig.CONNECTED_ALPHA ? getString(R.string.FlexyMusicSpeed) : label);
++        if (BuildConfig.CONNECTED_ALPHA) speedButton.setBadge(format.format(speed), false);
+         speedButton.setContentDescription(getString(R.string.OEPlayerSpeed) + " " + label);
+     }
+ 
+@@ -1558,11 +1569,12 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
+     }
+ 
+     private void animateColors(PlayerColors target, boolean animated) {
++        if (BuildConfig.CONNECTED_ALPHA && colors == target) return;
+         if (colorAnimator != null) {
+             colorAnimator.cancel();
+             colorAnimator = null;
+         }
+-        if (!animated) {
++        if (BuildConfig.CONNECTED_ALPHA || !animated) {
+             applyColors(target);
+             return;
+         }
+@@ -1585,6 +1597,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
+         headerLabel.setTextColor(c.onSurfaceVariant);
+         headerTitle.setTextColor(c.onSurface);
+         cover.setColors(c.primaryContainer, c.onPrimaryContainer);
++        if (BuildConfig.CONNECTED_ALPHA) cover.setSignatureSurface(c.surface);
+         smallCover.setColors(c.primaryContainer, c.onPrimaryContainer);
+         if (Build.VERSION.SDK_INT >= 28) {
+             cover.setOutlineSpotShadowColor(c.shadow());
+@@ -1609,6 +1622,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
+         controls.next.setColors(c.primaryContainer, c.onPrimaryContainer, c.primaryContainer, c.onPrimaryContainer);
+         controls.play.setColors(c.primary, c.onPrimary, c.primary, c.onPrimary);
+         speedButton.setColors(c.surfaceHigh, c.onSurface, c.surfaceHigh, c.onSurface);
++        if (BuildConfig.CONNECTED_ALPHA) speedButton.setBadgeColors(c.primaryContainer, c.onPrimaryContainer);
+         lyricsButton.setColors(c.surfaceHigh, c.onSurface, c.primary, c.onPrimary);
+         queueButton.setColors(c.surfaceHigh, c.onSurface, c.surfaceHigh, c.onSurface);
+         if (BuildConfig.CONNECTED_ALPHA && group.getChildCount() > 3)
+@@ -1670,6 +1684,17 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
+             group.measure(exactW, MeasureSpec.makeMeasureSpec(groupHeight, MeasureSpec.EXACTLY));
+             titleRow.measure(exactW, MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+             bubble.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
++            if (BuildConfig.CONNECTED_ALPHA) {
++                // Full-width hero; short/large-font screens scroll rather than squeezing hit targets.
++                coverSize = Math.max(dp(220), Math.min(width, dp(440)));
++                stageHeight = coverSize - dp(56) + dp(16) + titleRow.getMeasuredHeight();
++                cover.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(top + coverSize, MeasureSpec.EXACTLY));
++                lyricsPanel.measure(exactW, MeasureSpec.makeMeasureSpec(stageHeight, MeasureSpec.EXACTLY));
++                int minimum = top + dp(56) + stageHeight + dp(6 + 40 + 12 + 24 + 28) + timeRow.getMeasuredHeight()
++                        + controls.getMeasuredHeight() + group.getMeasuredHeight() + bottom;
++                setMeasuredDimension(width, Math.max(height, minimum));
++                return;
++            }
+             int fixed = dp(56) + dp(6) + dp(40) + timeRow.getMeasuredHeight() + dp(12) + controls.getMeasuredHeight() + group.getMeasuredHeight() + dp(28) + dp(16);
+             int available = height - top - bottom - fixed;
+             int titleH = titleRow.getMeasuredHeight();
+@@ -1697,8 +1722,9 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
+             y += dp(56);
+             int stageTop = y;
+             int coverLeft = (width - coverSize) / 2;
+-            cover.layout(coverLeft, y + dp(16), coverLeft + coverSize, y + dp(16) + coverSize);
+-            int titleTop = y + dp(16) + coverSize + dp(26);
++            if (BuildConfig.CONNECTED_ALPHA) cover.layout(0, 0, width, top + coverSize);
++            else cover.layout(coverLeft, y + dp(16), coverLeft + coverSize, y + dp(16) + coverSize);
++            int titleTop = BuildConfig.CONNECTED_ALPHA ? top + coverSize + dp(16) : y + dp(16) + coverSize + dp(26);
+             titleRow.layout(side, titleTop, side + contentW, titleTop + titleRow.getMeasuredHeight());
+             lyricsPanel.layout(side, stageTop, side + contentW, stageTop + stageHeight);
+             y = stageTop + stageHeight + dp(6);
+diff --git a/TMessagesProj/src/main/java/app/exteraless/player/SignatureCoverFade.java b/TMessagesProj/src/main/java/app/exteraless/player/SignatureCoverFade.java
+new file mode 100644
+index 000000000..571b5c4a8
+--- /dev/null
++++ b/TMessagesProj/src/main/java/app/exteraless/player/SignatureCoverFade.java
+@@ -0,0 +1,21 @@
++package app.exteraless.player;
++
++import android.graphics.Canvas;
++import android.graphics.LinearGradient;
++import android.graphics.Paint;
++import android.graphics.Shader;
++
++/** Hero overlay only: no artwork copy, blur, sampling or animation in drawing. */
++final class SignatureCoverFade {
++    private final Paint paint = new Paint();
++    private int width, height, color;
++    void update(int width, int height, int color) {
++        if (this.width == width && this.height == height && this.color == color) return;
++        this.width = width; this.height = height; this.color = color;
++        int clear = color & 0x00ffffff;
++        paint.setShader(height > 0 ? new LinearGradient(0, 0, 0, height,
++                new int[]{(color & 0x00ffffff) | 0xcc000000, clear, clear, color | 0xff000000},
++                new float[]{0, .25f, .48f, 1}, Shader.TileMode.CLAMP) : null);
++    }
++    void draw(Canvas canvas) { if (width > 0 && height > 0) canvas.drawRect(0, 0, width, height, paint); }
++}
+diff --git a/TMessagesProj/src/main/java/app/exteraless/player/WavySeekBar.java b/TMessagesProj/src/main/java/app/exteraless/player/WavySeekBar.java
+index 7dc236a88..ecb313e3a 100644
+--- a/TMessagesProj/src/main/java/app/exteraless/player/WavySeekBar.java
++++ b/TMessagesProj/src/main/java/app/exteraless/player/WavySeekBar.java
+@@ -34,6 +34,7 @@ public class WavySeekBar extends View {
+     private final Paint wavePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+     private final Paint trackPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+     private final Paint fillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
++    private final Paint signatureInactivePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+     private final Path path = new Path();
+     private final RectF rect = new RectF();
+     private Delegate delegate;
+@@ -67,6 +68,7 @@ public class WavySeekBar extends View {
+         wavePaint.setColor(active);
+         fillPaint.setColor(active);
+         trackPaint.setColor(inactive);
++        signatureInactivePaint.setColor(inactive);
+         invalidate();
+     }
+ 
+@@ -167,6 +169,7 @@ public class WavySeekBar extends View {
+ 
+     @Override
+     protected void onDraw(@NonNull Canvas canvas) {
++        if (BuildConfig.CONNECTED_ALPHA) { drawSignatureColumns(canvas); return; }
+         long now = SystemClock.elapsedRealtime();
+         float dt = lastFrame == 0 ? 0.016f : Math.min(0.05f, (now - lastFrame) / 1000f);
+         lastFrame = now;
+@@ -227,6 +230,21 @@ public class WavySeekBar extends View {
+         }
+     }
+ 
++    /** Decorative deterministic columns, not measured audio. Only progress/touch invalidates this track. */
++    private void drawSignatureColumns(Canvas canvas) {
++        float center = getHeight() / 2f, start = left(), end = right();
++        float at = start + Math.max(0f, Math.min(1f, getProgress())) * Math.max(0, end - start);
++        float step = dp(6), thickness = Math.max(1, dp(3));
++        int index = 0;
++        for (float x = start + thickness / 2; x <= end - thickness / 2; x += step, index++) {
++            float height = dp(8 + ((index * 17 + index * index * 3) % 23));
++            rect.set(x - thickness / 2, center - height / 2, x + thickness / 2, center + height / 2);
++            canvas.drawRoundRect(rect, thickness / 2, thickness / 2, x <= at ? fillPaint : signatureInactivePaint);
++        }
++        rect.set(at - dp(1), center - dp(17), at + dp(1), center + dp(17));
++        canvas.drawRoundRect(rect, dp(1), dp(1), fillPaint);
++    }
++
+     @Override
+     protected void onDetachedFromWindow() {
+         removeCallbacks(waveFrame);
 diff --git a/TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraChatsActivity.java b/TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraChatsActivity.java
 index 25d865b63..78691450c 100644
 --- a/TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraChatsActivity.java
@@ -1194,6 +1551,19 @@ index 03a06e33e..4d9d62b5e 100644
 +    <string name="FlexyBubbleBackgroundBlur">Desenfoque de fondo</string>
 +    <string name="FlexyBubbleBlurCompatibility">El desenfoque está disponible para fondos de imagen estáticos compatibles. Los fondos animados o no compatibles mantienen Matte.</string>
  </resources>
+diff --git a/TMessagesProj/src/main/res/values-es/flexygram_music.xml b/TMessagesProj/src/main/res/values-es/flexygram_music.xml
+index e010b1188..fe685c551 100644
+--- a/TMessagesProj/src/main/res/values-es/flexygram_music.xml
++++ b/TMessagesProj/src/main/res/values-es/flexygram_music.xml
+@@ -2,4 +2,8 @@
+ <resources>
+     <string name="FlexyMusicCompact">Comprimir reproductor</string>
+     <string name="FlexyMusicExpand">Expandir reproductor</string>
++    <string name="FlexyMusicSpeed">Velocidad</string>
++    <string name="FlexyMusicMore">Más</string>
++    <string name="FlexyMusicPlayingFrom">Reproduciendo desde</string>
++    <string name="FlexyMusicMyMusic">Mi música</string>
+ </resources>
 diff --git a/TMessagesProj/src/main/res/values-ru/flexygram_bubbles.xml b/TMessagesProj/src/main/res/values-ru/flexygram_bubbles.xml
 index 16073b0fd..f89abe870 100644
 --- a/TMessagesProj/src/main/res/values-ru/flexygram_bubbles.xml
@@ -1207,6 +1577,19 @@ index 16073b0fd..f89abe870 100644
 +    <string name="FlexyBubbleBackgroundBlur">Размытие фона</string>
 +    <string name="FlexyBubbleBlurCompatibility">Размытие доступно для совместимых статичных изображений. Анимированные и неподдерживаемые фоны сохраняют Matte.</string>
  </resources>
+diff --git a/TMessagesProj/src/main/res/values-ru/flexygram_music.xml b/TMessagesProj/src/main/res/values-ru/flexygram_music.xml
+index 47d451207..561e37151 100644
+--- a/TMessagesProj/src/main/res/values-ru/flexygram_music.xml
++++ b/TMessagesProj/src/main/res/values-ru/flexygram_music.xml
+@@ -2,4 +2,8 @@
+ <resources>
+     <string name="FlexyMusicCompact">Свернуть плеер</string>
+     <string name="FlexyMusicExpand">Развернуть плеер</string>
++    <string name="FlexyMusicSpeed">Скорость</string>
++    <string name="FlexyMusicMore">Ещё</string>
++    <string name="FlexyMusicPlayingFrom">Источник</string>
++    <string name="FlexyMusicMyMusic">Моя музыка</string>
+ </resources>
 diff --git a/TMessagesProj/src/main/res/values/flexygram_bubbles.xml b/TMessagesProj/src/main/res/values/flexygram_bubbles.xml
 index fd56638f3..510e7bb92 100644
 --- a/TMessagesProj/src/main/res/values/flexygram_bubbles.xml
@@ -1219,4 +1602,17 @@ index fd56638f3..510e7bb92 100644
 +    <string name="FlexyBubblePreviewGroupOutgoing">Your changes appear immediately.</string>
 +    <string name="FlexyBubbleBackgroundBlur">Background blur</string>
 +    <string name="FlexyBubbleBlurCompatibility">Blur is available for compatible static image wallpapers. Animated or unsupported backgrounds keep Matte.</string>
+ </resources>
+diff --git a/TMessagesProj/src/main/res/values/flexygram_music.xml b/TMessagesProj/src/main/res/values/flexygram_music.xml
+index 9b45e29f1..e1552c299 100644
+--- a/TMessagesProj/src/main/res/values/flexygram_music.xml
++++ b/TMessagesProj/src/main/res/values/flexygram_music.xml
+@@ -2,4 +2,8 @@
+ <resources>
+     <string name="FlexyMusicCompact">Compact music player</string>
+     <string name="FlexyMusicExpand">Expand music player</string>
++    <string name="FlexyMusicSpeed">Speed</string>
++    <string name="FlexyMusicMore">More</string>
++    <string name="FlexyMusicPlayingFrom">Playing from</string>
++    <string name="FlexyMusicMyMusic">My music</string>
  </resources>

@@ -7,7 +7,7 @@ import shutil
 
 PRODUCTION = ('SignatureMusicStyle','SignatureMusicPresentation','SignatureMusicBubble',
               'SignatureMusicHost','ControlsRow','MorphButton','PlayerIcon','Spring',
-              'WavySeekBar','RingPlayButton','PlayerBarView','PlayerMiniView','PlayerColors','CoverImage')
+              'WavySeekBar','RingPlayButton','PlayerBarView','PlayerMiniView','PlayerColors','CoverImage','SignatureCoverFade')
 
 def write_stubs(source, root):
     def put(path, text):
@@ -85,10 +85,12 @@ public static LinearLayout.LayoutParams createLinear(float w,float h,float weigh
 }''')
     put('org/telegram/messenger/ImageLocation.java','package org.telegram.messenger; public class ImageLocation {}')
     put('org/telegram/ui/Components/BackupImageView.java','''package org.telegram.ui.Components; public class BackupImageView extends android.view.View {
-public BackupImageView(android.content.Context c){super(c);}public void setRoundRadius(int r){}public void setImageDrawable(Object o){}public void setImageBitmap(android.graphics.Bitmap b){}
+private android.graphics.Bitmap bitmap;private final android.graphics.Paint paint=new android.graphics.Paint(2);private final android.graphics.Rect target=new android.graphics.Rect();
+public BackupImageView(android.content.Context c){super(c);}public void setRoundRadius(int r){}public void setImageDrawable(Object o){bitmap=null;}public void setImageBitmap(android.graphics.Bitmap b){bitmap=b;}
+@Override protected void onDraw(android.graphics.Canvas c){if(bitmap!=null){target.set(0,0,getWidth(),getHeight());c.drawBitmap(bitmap,null,target,paint);}}
 public void setImage(Object a,Object b,Object c,Object d,Object e,int f,int g,Object h){}
 public interface Delegate {void didSet(Receiver r,boolean set,boolean thumb,boolean mem);}
-public static class Receiver {public void setDelegate(Delegate d){}public android.graphics.Bitmap getBitmap(){return null;}public boolean hasBitmapImage(){return false;}}
+public class Receiver {public void setDelegate(Delegate d){}public android.graphics.Bitmap getBitmap(){return bitmap;}public boolean hasBitmapImage(){return bitmap!=null;}}
 private Receiver r=new Receiver();public Receiver getImageReceiver(){return r;}}
 ''')
     put('app/exteraless/player/PlayerArt.java','''package app.exteraless.player; import org.telegram.messenger.*;import android.graphics.Bitmap;

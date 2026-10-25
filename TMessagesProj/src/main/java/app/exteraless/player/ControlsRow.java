@@ -159,13 +159,24 @@ public class ControlsRow extends ViewGroup implements MorphButton.PressListener 
         int width = MeasureSpec.getSize(widthMeasureSpec);
         scale = Math.min(1f, (width - dp(16)) / (float) dp(312));
         int height = BuildConfig.CONNECTED_ALPHA ? Math.max(dp(64), Math.round(dp(88) * scale)) + dp(60) : Math.round(dp(88) * scale);
+        signatureInline = BuildConfig.CONNECTED_ALPHA && width >= dp(264);
+        signaturePlaySize = Math.max(dp(64), Math.min(dp(88), width - dp(224)));
+        if (signatureInline) height = signaturePlaySize + dp(16);
         measureButtons();
         setMeasuredDimension(width, height);
     }
 
+    private boolean signatureInline;
+    private int signaturePlaySize;
     private void measureButtons() {
         for (MorphButton b : buttons) {
             b.scale = scale;
+            if (signatureInline) {
+                int size = b == play ? signaturePlaySize : dp(48);
+                b.scale = b == play ? signaturePlaySize / (float) dp(88) : 1f;
+                b.measure(MeasureSpec.makeMeasureSpec(size, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(size, MeasureSpec.EXACTLY));
+                continue;
+            }
             int minimum = BuildConfig.CONNECTED_ALPHA ? dp(b == play ? 64 : 48) : 1;
             int w = Math.max(minimum, Math.round(b.width.value * scale));
             int h = Math.max(minimum, Math.round(b.baseHeight * scale));
@@ -184,7 +195,7 @@ public class ControlsRow extends ViewGroup implements MorphButton.PressListener 
     }
 
     private void layoutButtons(int width, int height) {
-        if (BuildConfig.CONNECTED_ALPHA) {
+        if (BuildConfig.CONNECTED_ALPHA && !signatureInline) {
             int center = width / 2;
             place(play, center, 0);
             place(prev, center - Math.round(dp(100) * scale), Math.round(dp(12) * scale));

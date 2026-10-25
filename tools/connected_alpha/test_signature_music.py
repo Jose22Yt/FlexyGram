@@ -51,7 +51,7 @@ class ParseMusic {public static void main(String[] args)throws Exception{JavaCom
     def test_no_cover_extraction_or_layout_springs_in_alpha_path(self):
         colors=(PLAYER/'PlayerColors.java').read_text()
         self.assertIn('if (BuildConfig.CONNECTED_ALPHA) return dark ? MIDNIGHT : PEARL;',colors)
-        sheet=(PLAYER/'PlayerSheet.java').read_text()
+        sheet=restore1271('TMessagesProj/src/main/java/app/exteraless/player/PlayerSheet.java',(PLAYER/'PlayerSheet.java').read_bytes()).decode()
         self.assertIn('if (!BuildConfig.CONNECTED_ALPHA) cover.setListener',sheet)
         controls=(PLAYER/'ControlsRow.java').read_text().split('private void updateTargets(boolean animated) {')[1]
         branch=controls.split('        float prevW')[0]

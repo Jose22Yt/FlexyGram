@@ -2,4 +2,8 @@
 <resources>
     <string name="FlexyMusicCompact">Comprimir reproductor</string>
     <string name="FlexyMusicExpand">Expandir reproductor</string>
+    <string name="FlexyMusicSpeed">Velocidad</string>
+    <string name="FlexyMusicMore">Más</string>
+    <string name="FlexyMusicPlayingFrom">Reproduciendo desde</string>
+    <string name="FlexyMusicMyMusic">Mi música</string>
 </resources>

@@ -47,3 +47,8 @@ PATHS = PATHS | frozenset(["tools/connected_alpha/test_cached_blur1273.py"])
 from performance.contract import PATHS as PERFORMANCE_PATHS, PRODUCTION as PERFORMANCE_PRODUCTION
 VISUAL_PATHS = VISUAL_PATHS | PERFORMANCE_PRODUCTION
 PATHS = PATHS | PERFORMANCE_PATHS | PERFORMANCE_PRODUCTION
+
+MUSIC3_PATHS = frozenset(["TMessagesProj/src/main/java/app/exteraless/player/"+n+".java" for n in ("SignatureCoverFade","CoverImage","PlayerSheet","PlayerColors","WavySeekBar","ControlsRow")]) | frozenset(["TMessagesProj/src/main/res/"+v+"/flexygram_music.xml" for v in ("values","values-es","values-ru")])
+VISUAL_PATHS = VISUAL_PATHS | MUSIC3_PATHS
+PATHS = PATHS | MUSIC3_PATHS
+PATHS = PATHS | frozenset(["tools/connected_alpha/test_music3_1273.py","tools/connected_alpha/music_visual/LayoutFixture.java.in"])

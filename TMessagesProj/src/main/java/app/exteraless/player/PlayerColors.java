@@ -83,6 +83,20 @@ public final class PlayerColors {
         });
     }
 
+    // Only the full Music3 sheet opts in. Mini/pills keep fromSeed's Pearl/Midnight identity.
+    private static final android.util.LruCache<Long, PlayerColors> artworkPalettes = new android.util.LruCache<>(8);
+    public static PlayerColors fromSignatureArtwork(int seed, boolean dark) {
+        long key = ((seed & 0xffffffffL) << 1) | (dark ? 1 : 0);
+        PlayerColors cached = artworkPalettes.get(key);
+        if (cached != null) return cached;
+        PlayerColors base = dark ? MIDNIGHT : PEARL;
+        int[] values = base.values();
+        for (int i = 0; i < 4; i++) values[i] = ColorUtils.blendARGB(values[i], seed | 0xff000000, .08f);
+        PlayerColors result = new PlayerColors(dark, values);
+        artworkPalettes.put(key, result);
+        return result;
+    }
+
     public static PlayerColors lerp(PlayerColors a, PlayerColors b, float t) {
         if (t <= 0f) {
             return a;
