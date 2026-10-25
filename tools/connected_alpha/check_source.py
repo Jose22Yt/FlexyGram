@@ -53,7 +53,8 @@ def main():
     for path in CORE:
         path = 'TMessagesProj/' + path
         expected = subprocess.check_output(['git', 'show', f'{BASE}:{path}'], cwd=ROOT)
-        actual = (ROOT/path).read_bytes()
+        from stabilization_contract import restore1271
+        actual = restore1271(path,(ROOT/path).read_bytes())
         if path.endswith('/ui/DialogsActivity.java') and actual != expected:
             restored = restore_home_presentation(actual)
             if restored != expected:

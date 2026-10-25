@@ -1942,9 +1942,10 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
                 }
             });
             currentSpringAnimation.addEndListener((animation, canceled, value, velocity) -> {
-                predictiveBackInProgress = false;
-                m3PredictiveBack = false;
-                onSlideAnimationEnd(backAnimation);
+                if (animation != currentSpringAnimation) return;
+                currentSpringAnimation = null;
+                resetPredictiveBackState();
+                onSlideAnimationEnd(canceled || backAnimation);
             });
             currentSpringAnimation.start();
 
@@ -2074,10 +2075,9 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
             currentAnimation = null;
         }
         if (currentSpringAnimation != null) {
-            if (byCheck) {
-                currentSpringAnimation.cancel();
-            }
+            SpringAnimation finishedAnimation = currentSpringAnimation;
             currentSpringAnimation = null;
+            if (byCheck) finishedAnimation.cancel();
         }
         // openExtera: подложка и масштаб карточки живут только на время перехода
         springRouteBackgroundDrawable = null;

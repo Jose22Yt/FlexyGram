@@ -3,6 +3,7 @@ import re,subprocess,tempfile,unittest
 from pathlib import Path
 from xml.etree import ElementTree as ET
 from release_1271_contract import BASE
+from stabilization_contract import restore1271
 from integration_contract import WORK1,combined_paths,reviewed_work1
 PATHS=combined_paths()
 ROOT=Path(__file__).resolve().parents[2]
@@ -20,12 +21,12 @@ class Signature1271(unittest.TestCase):
    files=subprocess.check_output(['git','ls-tree','-r','--name-only',WORK1,'--',prefix],cwd=ROOT,text=True).splitlines()
    for file in files:self.assertEqual(reviewed_work1(file),subprocess.check_output(['git','show',WORK1+':'+file],cwd=ROOT),file)
   self.assertEqual(subprocess.check_output(['git','diff',BASE,'--','TMessagesProj/jni','TMessagesProj/chaquopy'],cwd=ROOT),b'')
-  self.assertIn('def verCode = 1271',(ROOT/'TMessagesProj/build.gradle').read_text())
+  self.assertIn('def verCode = 1272',(ROOT/'TMessagesProj/build.gradle').read_text())
   workflow=(ROOT/'.github/workflows/connected-alpha-arm64.yml').read_text()
-  for s in ['--expected-version-code 1271','Keep direct APK delivery private',':TMessagesProj:assembleConnectedAlpha']:self.assertIn(s,workflow)
+  for s in ['--expected-version-code 1272','Keep direct APK delivery private',':TMessagesProj:assembleConnectedAlpha']:self.assertIn(s,workflow)
  def test_one_fill_control_no_wallpaper_callback_or_graphics_allocations_in_drawing(self):
   settings=(JAVA/'app/flexygram/bubbles/BubbleSettingsActivity.java').read_text()
-  self.assertEqual(re.findall(r'= addRow\("(flexyBubble\w+)"',settings),['flexyBubbleTransparency'])
+  self.assertEqual(re.findall(r'= addRow\("(flexyBubble\w+)"',settings),['flexyBubbleTransparency','flexyBubbleBorderWidth'])
   self.assertIn('seek.setMax(100)',settings)
   for s in ['setGlass(','setBorder(','setEdges(','recreate(']:self.assertNotIn(s,settings)
   drawable=(JAVA/'org/telegram/ui/ActionBar/MessageDrawable.java').read_text()
@@ -35,7 +36,10 @@ class Signature1271(unittest.TestCase):
   self.assertIn('BubbleStyle.effectiveRadius(BuildConfig.CONNECTED_ALPHA, bubbleRadius)',shared)
   self.assertNotIn('putInt("bubbleRadius", 20)',shared)
   config=(JAVA/'app/flexygram/bubbles/BubbleConfig.java').read_text()
-  self.assertEqual(config,old('TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleConfig.java'))
+  path='TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleConfig.java'
+  self.assertEqual(restore1271(path,config.encode()).decode(),old(path))
+  self.assertIn('seek.setMax(border ? 15 : 100)',settings)
+  self.assertIn('setBorderTenths(value+5)',settings)
  def test_setting_slider_changes_are_skin_only_and_leave_native_media_sliders_untouched(self):
   for path in ['app/exteraless/appearance/AvatarCornersSeekBar.java','app/exteraless/appearance/AltSeekbar.java','tw/nekomimi/nekogram/settings/NekoChatSettingsActivity.java','tw/nekomimi/nekogram/settings/NekoTranslatorSettingsActivity.java']:
    current=(JAVA/path).read_text().replace('new app.flexygram.settings.FlexySignatureSeekBarView(', 'new SeekBarView(')
@@ -45,7 +49,7 @@ class Signature1271(unittest.TestCase):
   self.assertEqual((JAVA/'org/telegram/ui/ThemeActivity.java').read_text().count('? new app.flexygram.settings.FlexySignatureSeekBarView(context) : new SeekBarView(context)'),2)
   source=(JAVA/'app/exteraless/settings/OpenExteraChatsActivity.java').read_text()
   hub=source.split('private void updateSignatureHubRows()')[1].split('private void updateStickerRows()')[0]
-  self.assertEqual(re.findall(r'(\w+Row) = addRow',hub),['flexyBubblesRow','composerSettingsRow','signatureMessagesRow','signatureThemeRow','signatureStickersRow','chatSettingsRow','linksDividerRow'])
+  self.assertEqual(re.findall(r'(\w+Row) = addRow',hub),['flexyBubblesRow','composerSettingsRow','signatureThemeRow','signatureMessagesRow','signatureStickersRow','chatSettingsRow','linksDividerRow'])
   self.assertEqual(source.count('chatSettingsRow = addRow('),1)
   self.assertIn('SignatureChatThemeActivity()',source);self.assertIn('THEME_TYPE_BASIC',source)
   theme=(JAVA/'app/flexygram/settings/SignatureChatThemeActivity.java').read_text()
@@ -81,7 +85,7 @@ class Signature1271(unittest.TestCase):
    'org/telegram/messenger/R.java':'package org.telegram.messenger; public class R {'+''.join('public static class '+k+'{'+''.join('public static int '+n+';' for n in v)+'}' for k,v in resources.items())+'}',
    'android/os/Build.java':'package android.os;public class Build {public static class VERSION{public static int SDK_INT=37;}}',
    'android/content/ComponentName.java':'package android.content;public class ComponentName{public final String key;public ComponentName(String p,String k){key=k;}}',
-   'android/content/SharedPreferences.java':'package android.content;public class SharedPreferences{String selected="";public String getString(String k,String d){return selected.isEmpty()?d:selected;}public SharedPreferences edit(){return this;}public SharedPreferences putString(String k,String v){selected=v;return this;}public void apply(){}}',
+   'android/content/SharedPreferences.java':'package android.content;public class SharedPreferences{String selected="";public String getString(String k,String d){return selected.isEmpty()?d:selected;}public Editor edit(){return new Editor(this);}public static class Editor{final SharedPreferences p;Editor(SharedPreferences p){this.p=p;}public Editor putString(String k,String v){p.selected=v;return this;}public Editor putInt(String k,int v){return this;}public void apply(){}}}',
    'android/content/Context.java':'package android.content;public class Context {public static final int MODE_PRIVATE=0;public final android.content.pm.PackageManager pm=new android.content.pm.PackageManager();final SharedPreferences prefs=new SharedPreferences();public String getPackageName(){return "io.github.jose22yt.flexygram.alpha";}public android.content.pm.PackageManager getPackageManager(){return pm;}public SharedPreferences getSharedPreferences(String n,int m){return prefs;}}',
    'android/content/pm/PackageManager.java':'''package android.content.pm;import android.content.ComponentName;import java.util.*;
 public class PackageManager{public static final int COMPONENT_ENABLED_STATE_DEFAULT=0,COMPONENT_ENABLED_STATE_ENABLED=1,COMPONENT_ENABLED_STATE_DISABLED=2,DONT_KILL_APP=1;public HashMap<String,Integer> states=new HashMap<>();public boolean fail;public int batches,minEnabled=999;
@@ -92,7 +96,7 @@ public void setComponentEnabledSetting(ComponentName c,int s,int flags){states.p
    'org/telegram/messenger/ApplicationLoader.java':'package org.telegram.messenger;public class ApplicationLoader {public static android.content.Context applicationContext=new android.content.Context();}',
    'LauncherRegression.java':'''import org.telegram.ui.LauncherIconController;import org.telegram.ui.LauncherIconController.LauncherIcon;import org.telegram.messenger.ApplicationLoader;
 public class LauncherRegression{static void check(boolean v){if(!v)throw new AssertionError();}static int count(){int n=0;for(LauncherIcon i:LauncherIcon.values())if(LauncherIconController.isEnabled(i))n++;return n;}public static void main(String[]args){
-check(count()==1);check(LauncherIconController.isEnabled(LauncherIcon.EXTERALESS));
+ApplicationLoader.applicationContext.pm.fail=true;LauncherIconController.tryFixLauncherIconIfNeeded();check(ApplicationLoader.applicationContext.pm.states.isEmpty());ApplicationLoader.applicationContext.pm.fail=false;LauncherIconController.tryFixLauncherIconIfNeeded();check(count()==1);check(LauncherIconController.isEnabled(LauncherIcon.EXTERALESS));check(ApplicationLoader.applicationContext.pm.states.get("org.telegram.messenger.ExteralessIcon")==2);
 for(int sdk:new int[]{32,37}){android.os.Build.VERSION.SDK_INT=sdk;for(LauncherIcon i:LauncherIcon.values()){LauncherIconController.setIcon(i);check(count()==1);check(LauncherIconController.isEnabled(i));LauncherIconController.tryFixLauncherIconIfNeeded();check(LauncherIconController.isEnabled(i));}}
 check(ApplicationLoader.applicationContext.pm.minEnabled>=1);check(ApplicationLoader.applicationContext.pm.batches>0);
 android.os.Build.VERSION.SDK_INT=37;LauncherIconController.setIcon(LauncherIcon.FLEX_GREEN);ApplicationLoader.applicationContext.pm.fail=true;try{LauncherIconController.setIcon(LauncherIcon.FLEX_CORAL);throw new AssertionError();}catch(SecurityException expected){}check(count()==1);check(LauncherIconController.isEnabled(LauncherIcon.FLEX_GREEN));ApplicationLoader.applicationContext.pm.fail=false;

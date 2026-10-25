@@ -18,6 +18,7 @@ import tw.nekomimi.nekogram.settings.BaseNekoSettingsActivity;
 
 /** Opt-in for General/Appearance only. No preference writes or changes to global Glass. */
 public abstract class SignatureMatteSettingsActivity extends BaseNekoSettingsActivity {
+    protected int matteHeaderColor() { return getThemedColor(Theme.key_windowBackgroundWhiteGrayText2); }
     @Override protected boolean usesSolidSettingsSurfaces() { return true; }
     @Override protected boolean needActionBarBlur() { return false; }
     @Override protected void setupAdaptiveBackground() {
@@ -60,7 +61,7 @@ public abstract class SignatureMatteSettingsActivity extends BaseNekoSettingsAct
             super.onBindViewHolder(holder, position);
             if (holder.itemView instanceof tw.nekomimi.nekogram.ui.cells.HeaderCell) {
                 tw.nekomimi.nekogram.ui.cells.HeaderCell header = (tw.nekomimi.nekogram.ui.cells.HeaderCell) holder.itemView;
-                header.setTextColor(getThemedColor(Theme.key_windowBackgroundWhiteGrayText2));
+                header.setTextColor(matteHeaderColor());
                 header.getTextView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
                 header.getTextView().setSingleLine(false);
                 header.getTextView().setMaxLines(Integer.MAX_VALUE);

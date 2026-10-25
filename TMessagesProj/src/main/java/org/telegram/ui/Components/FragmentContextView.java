@@ -1415,7 +1415,7 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
 
     @Override
     protected void onDetachedFromWindow() {
-        if (signatureMusicHost != null) { signatureMusicHost.detach(); signatureMusicHost = null; }
+        if (signatureMusicHost != null) { signatureMusicHost.detachFromWindow(); signatureMusicHost = null; }
         super.onDetachedFromWindow();
         if (animatorSet != null) {
             animatorSet.cancel();
@@ -1549,7 +1549,7 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, AndroidUtilities.dp2(getStyleHeight()));
+        super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(AndroidUtilities.dp2(getStyleHeight()), MeasureSpec.EXACTLY));
     }
 
     @Override

@@ -73,7 +73,7 @@ jobs:
       - name: Retain isolated native bubble graphics (not full app screenshots)
         uses: actions/upload-artifact@v4
         with:
-          name: FlexyGram-Alpha1271-native-bubble-probe
+          name: FlexyGram-Alpha1272-native-bubble-probe
           path: |
             build/connected-alpha-bubble-visual/android-native-bubbles.png
             build/connected-alpha-bubble-visual/android-signature-icons.png
@@ -249,7 +249,7 @@ jobs:
             echo '::error::Expected exactly one Connected Alpha APK.'
             exit 1
           fi
-          python3 tools/connected_alpha/verify_apk.py "${packages[0]}" --build-tools "$ANDROID_HOME/build-tools/36.0.0" --certificate-sha256 "$ALPHA_CERTIFICATE_SHA256" --expected-version-code 1271 > connected-alpha-verification.json
+          python3 tools/connected_alpha/verify_apk.py "${packages[0]}" --build-tools "$ANDROID_HOME/build-tools/36.0.0" --certificate-sha256 "$ALPHA_CERTIFICATE_SHA256" --expected-version-code 1272 > connected-alpha-verification.json
           python3 - <<'PY'
           import json, os
           from pathlib import Path

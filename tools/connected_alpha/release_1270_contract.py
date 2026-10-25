@@ -11,3 +11,6 @@ from integration_contract import INTEGRATION_PATHS
 from login_contract import PATHS as LOGIN_PATHS
 from music_contract import PATHS as MUSIC_PATHS
 PATHS = PATHS | LOGIN_PATHS | MUSIC_PATHS | INTEGRATION_PATHS
+
+from stabilization_contract import PATHS as CORRECTIVE_PATHS
+PATHS = PATHS | CORRECTIVE_PATHS
