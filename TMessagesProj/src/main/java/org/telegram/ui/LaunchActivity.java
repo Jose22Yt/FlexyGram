@@ -1603,6 +1603,10 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
     // before, вернувший true, глотает интент (оригинальная обработка не выполняется);
     // after зовётся всегда (finally) после оригинальной обработки.
     private boolean handleIntent(Intent intent, boolean isNew, boolean restore, boolean fromPassword, Browser.Progress progress, boolean rebuildFragments, boolean openedTelegram) {
+        // Studio data never enters plugin/Python intent handlers; native passcode gates still run below.
+        if (app.flexygram.studio.FlexyStyleInstallHelper.isStudioIntent(intent)) {
+            return handleIntentInternal(intent, isNew, restore, fromPassword, progress, rebuildFragments, openedTelegram);
+        }
         if (intent != null && app.exteraless.plugins.PluginsController.getInstance().isEngineEnabled()
                 && app.exteraless.plugins.intents.IntentsDispatcher.hasHandlers()) {
             java.util.Map<String, Object> pluginContext = app.exteraless.plugins.intents.IntentsDispatcher.buildIntentContext(
@@ -1643,7 +1647,8 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         }
         int flags = intent.getFlags();
         String action = intent.getAction();
-        final int[] intentAccount = new int[]{intent.getIntExtra("currentAccount", UserConfig.selectedAccount)};
+        final boolean flexyStudioIntent = app.flexygram.studio.FlexyStyleInstallHelper.isStudioIntent(intent);
+        final int[] intentAccount = new int[]{flexyStudioIntent ? UserConfig.selectedAccount : intent.getIntExtra("currentAccount", UserConfig.selectedAccount)};
         switchToAccount(intentAccount[0], true);
         final boolean isVoipIntent = action != null && action.equals("voip");
         final boolean isVoipAnswerIntent = action != null && action.equals("voip_answer");
@@ -1659,6 +1664,12 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                 passcodeSaveIntentIsRestore = restore;
                 return false;
             }
+        }
+        if (flexyStudioIntent) {
+            app.flexygram.studio.FlexyStyleInstallHelper.acceptExternal(this, intent.getData());
+            // Keep normal cold-start/login initialization; consume only the document routing data.
+            intent = new Intent(Intent.ACTION_MAIN);
+            action = Intent.ACTION_MAIN;
         }
         boolean pushOpened = false;
         long push_user_id = 0;
@@ -3555,6 +3566,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         }
 
         intent.setAction(null);
+        if (flexyStudioIntent) actionBarLayout.getView().post(() -> app.flexygram.studio.FlexyStyleInstallHelper.resumeExternal(this));
         return pushOpened;
     }
 
@@ -7088,6 +7100,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
 
     @Override
     protected void onDestroy() {
+        app.flexygram.studio.FlexyStyleInstallHelper.cancelExternal(this);
         app.exteraless.icons.picker.IconPickerController.onDestroy();
         app.exteraless.plugins.PluginsController.getInstance().executeOnAppEvent(app.exteraless.plugins.PluginsConstants.EVENT_APP_STOP);
         GramWalletStorageAuth.onActivityDestroyed(this);
@@ -7210,6 +7223,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
     @Override
     protected void onResume() {
         super.onResume();
+        app.flexygram.studio.FlexyStyleInstallHelper.resumeExternal(this);
         isResumed = true;
         app.exteraless.plugins.PluginsController.getInstance().executeOnAppEvent(app.exteraless.plugins.PluginsConstants.EVENT_APP_RESUME);
         app.exteraless.plugins.PluginDenialNotice.flush();

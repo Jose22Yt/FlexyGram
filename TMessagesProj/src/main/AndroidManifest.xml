@@ -179,6 +179,19 @@
                 <category android:name="android.intent.category.DEFAULT"/>
                 <data android:mimeType="vnd.android.cursor.item/vnd.io.github.jose22yt.flexygram.alpha.android.profile"/>
             </intent-filter>
+            <!-- FlexyStudio: own MIME, or an exact extension on a content URI. No catch-all association. -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="content" android:mimeType="application/vnd.flexygram.configuration+json" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="content" android:host="*" android:pathPattern=".*\\.flexyGram" />
+                <data android:mimeType="application/octet-stream" />
+                <data android:mimeType="application/json" />
+            </intent-filter>
             <!-- exteraless plugins: файл плагина, открытый из чата, файлового
                  менеджера или «Поделиться». Без этого фильтра система показывает
                  обычный выбор приложения, а установить плагин негде. -->
@@ -1144,6 +1157,11 @@
 
         <meta-data android:name="firebase_crashlytics_collection_enabled" android:value="false" />
 
+        <provider android:name="app.flexygram.studio.FlexyStudioProvider"
+            android:authorities="${applicationId}.flexystudio" android:exported="false" android:grantUriPermissions="true">
+            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/flexystudio_paths" />
+        </provider>
+        <service android:name="app.flexygram.studio.FlexyStudioCleanup" android:exported="true" android:permission="android.permission.BIND_JOB_SERVICE" />
     </application>
 
 </manifest>
