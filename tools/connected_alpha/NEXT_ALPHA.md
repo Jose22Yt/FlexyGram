@@ -44,3 +44,10 @@ Validation so far: read-only native static-source eligibility executes with expl
 ## Selective PR90 performance integration
 
 Reviewed upstream production commits0e24b6ada0713914d63ef5102d4f4c0057c4f073 and1f059b067f0fca68b87927749559736dbcb900da apply cleanly without restoring any older Work1 source: LyricsFill reuses the identical gradient for unchanged colors, and LyricsView owns/cancels its coalesced scroll/follow work and releases line shaders on detach. The full PR90 lab and its20host regressions are retained. Native pixel-equivalence/shader-reuse/lifecycle probes are added to the existing CI graphics gate; no device speedup or final integrated build is claimed. Existing historical bubble audit now uses the exact reviewed reverse-patch chain to test the preserved legacy renderer; current optional-cache behavior is covered by the separate actual cache/preview tests.
+
+
+## Validated B/C + PR90 checkpoint
+
+HEADbf2c5703c4ec2ce75cffc4ff09c8a29bbe77b14e CI40179982727/job121128784272 SUCCESS:177host tests,144general PASS/31optional external-corpus/R8 skips, AndroidAPI37 resources,55isolated API35 native graphics tests. This includes actual bounded blur/kernel/shader alignment/cancellation/retry, synthetic blur-off/on previews, grouped Matte theme surfaces, cached lyric-shader pixel equivalence and detach cancellation, all prior login/music/composer/home probes, native input recovery and the independent original detach-NPE reproducer. Original P0 full module checkpoint remains separate; no new full app build or physical performance claim follows from these isolated probes.
+
+Local15bubble/preview/cache graphics tests also PASS. A local-first failure exposed fixture leakage of CONNECTED_ALPHA/density from an earlier test; CachedBlurVisualTest now resets its complete mode/theme/preferences/geometry inputs in @Before, without changing production or relaxing pixel assertions. Synthetic blur-off/on images were visually inspected: source texture is softened inside native bubble paths; text/ticks/contour remain sharp. The fixtures do not contain private chat data or reference screenshots.
