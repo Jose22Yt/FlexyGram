@@ -14,7 +14,10 @@ def write_stubs(source,root):
  def put(path,text):p=source/path;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(text)
  folder=root/'TMessagesProj/src/main/java/app/flexygram/header'
  for name in ['HeaderConfig','HeaderGeometry','HeaderSurface','SignatureChatHeader','HeaderPreviewView']:put('app/flexygram/header/'+name+'.java',(folder/(name+'.java')).read_text())
+ actual=(root/'TMessagesProj/src/main/java/org/telegram/ui/Components/ChatAvatarContainer.java').read_text()
+ avatar_methods='\n'.join(body(actual,a)for a in ['public void setSignatureHeader(', 'private boolean signatureActive(', 'private void measureSignature(', 'private void layoutSignature('])
  code='\n'.join((folder/(n+'.java')).read_text()for n in ['HeaderConfig','HeaderSurface','SignatureChatHeader','HeaderPreviewView'])
+ code+='\n'+avatar_methods
  r=source/'org/telegram/messenger/R.java';s=r.read_text();missing=set(re.findall(r'R.string.(\w+)',code))-set(re.findall(r'int (\w+)=',s));s=s.replace('class string {','class string {'+''.join('public static final int '+n+'='+str(1000+i)+';'for i,n in enumerate(sorted(missing))));s=s.replace('public class R {','public class R {public static class drawable {public static int ic_ab_back,ic_ab_other;}');r.write_text(s)
  t=source/'org/telegram/ui/ActionBar/Theme.java';s=t.read_text();keys=set(re.findall(r'Theme.(key_\w+)',code))-set(re.findall(r'int (key_\w+)=',s));s=s.replace('public static boolean dark;', ''.join('public static final int '+n+'='+str(2000+i)+';'for i,n in enumerate(sorted(keys)))+'public static boolean dark;');s=s.replace('public static int getColor(int k,ResourcesProvider r){','public static int getColor(int k){return getColor(k,null);}public static int getColor(int k,ResourcesProvider r){if(k==key_actionBarDefaultTitle)return dark?0xffeeeeee:0xff152c3e;if(k==key_divider)return dark?0xff899099:0xff9babb9;');t.write_text(s)
  l=source/'org/telegram/messenger/LocaleController.java';s=l.read_text().replace('public class LocaleController {','public class LocaleController {public static boolean isRTL;public static String formatString(int id,Object... args){return "Unread: "+args[0];}');s=s.replace('public static String getString(int id){','public static String getString(int id){if(id==R.string.FlexyHeaderPreviewName)return "Alex";if(id==R.string.Online)return "online";');l.write_text(s)
@@ -31,14 +34,14 @@ public class ActionBar extends FrameLayout{
  @Override protected void onLayout(boolean ch,int l,int t,int r,int b){for(int i=0;i<getChildCount();i++)getChildAt(i).layout(0,0,getChildAt(i).getMeasuredWidth(),getChildAt(i).getMeasuredHeight());backButtonImageView.layout(0,24,54,80);if(header!=null)header.layoutControls();}
  @Override protected void dispatchDraw(Canvas c){if(header!=null&&header.active())header.draw(c);super.dispatchDraw(c);}
 }''')
- actual=(root/'TMessagesProj/src/main/java/org/telegram/ui/Components/ChatAvatarContainer.java').read_text();methods='\n'.join(body(actual,a)for a in ['public void setSignatureHeader(', 'private boolean signatureActive(', 'private void measureSignature(', 'private void layoutSignature('])
+ methods=avatar_methods
  put('org/telegram/ui/Components/ChatAvatarContainer.java','''package org.telegram.ui.Components;
 import static org.telegram.messenger.AndroidUtilities.dp;import static org.telegram.messenger.LocaleController.getString;
 import android.content.Context;import android.graphics.Canvas;import android.view.*;import android.widget.*;import org.telegram.messenger.*;import org.telegram.ui.ActionBar.Theme;
 public class ChatAvatarContainer extends FrameLayout{
  private app.flexygram.header.SignatureChatHeader signatureHeader;private ImageView signatureMore;public int profiles,menus;
  public static class Simple extends TextView{Simple(Context c){super(c);setSingleLine(true);setEllipsize(android.text.TextUtils.TruncateAt.END);}public void setTextSizePx(float v){setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX,v);}}
- public static class Photo extends ImageView{public int radius;Photo(Context c){super(c);setBackgroundColor(0xff2288cc);}public void setRoundRadius(int r){radius=r;}@Override protected void onDraw(Canvas c){android.graphics.Paint p=new android.graphics.Paint(3);p.setColor(0xff2288cc);c.drawCircle(getWidth()/2f,getHeight()/2f,getWidth()/2f,p);}}
+ public static class Photo extends ImageView{public int radius;Photo(Context c){super(c);}public void setRoundRadius(int r){radius=r;}@Override protected void onDraw(Canvas c){android.graphics.Paint p=new android.graphics.Paint(3);p.setColor(0xff2288cc);c.drawCircle(getWidth()/2f,getHeight()/2f,getWidth()/2f,p);}}
  private final Simple titleTextView,subtitleTextView;private final Photo avatarImageView;private Simple animatedSubtitleTextView;private View timeItem,communityItem,starBgItem,starFgItem;
  public ChatAvatarContainer(Context c){super(c);titleTextView=new Simple(c);titleTextView.setText("A long contact name");subtitleTextView=new Simple(c);subtitleTextView.setText("online");avatarImageView=new Photo(c);addView(titleTextView);addView(subtitleTextView);addView(avatarImageView);setOnClickListener(v->profiles++);avatarImageView.setOnClickListener(v->profiles++);}
  private View getSubtitleTextView(){return subtitleTextView;}private int getThemedColor(int key){return Theme.getColor(key,null);}protected void onSignatureOptionsClick(){menus++;}
