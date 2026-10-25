@@ -45,6 +45,10 @@ def validate(report):
             errors.append('Empty frame capture')
         if capture.get('frames', {}).get('unbudgeted_frame_count', 1):
             errors.append('Per-frame refresh budget unavailable')
+        for point in ('memory_before', 'memory_after'):
+            for value in capture.get(point, {}).values():
+                if value is not None and (isinstance(value, bool) or not isinstance(value,(int,float)) or not math.isfinite(value) or value < 0):
+                    errors.append('Invalid memory snapshot')
         health = capture.get('health', {})
         if not health.get('eligible', False):
             errors.append('Thermal/battery conditions unavailable or outside declared bounds')
@@ -55,11 +59,26 @@ def validate(report):
     return sorted(set(errors))
 
 
-def compare(reports):
+def compare(reports, cohort="legacy"):
+    if cohort not in ("legacy", "navigation2"):
+        raise ValueError("Unknown comparison cohort")
     errors = []
     labels = [r.get('label') for r in reports]
-    if len(reports) != 3 or set(labels) != REQUIRED_LABELS:
-        errors.append('Exactly one Exteraless, Alpha1271 and candidate report required')
+    required = REQUIRED_LABELS if cohort == 'legacy' else {'exteraless', 'alpha1272', 'pr92', 'candidate'}
+    if len(reports) != len(required) or set(labels) != required:
+        errors.append('Exactly one report per cohort label required: ' + ','.join(sorted(required)))
+    if cohort == 'navigation2':
+        pinned = {'exteraless':'1ad6a60a6834ffca722b1a22f4fba27ecb29a061',
+                  'alpha1272':'8619ba40fbd8fd9d9d898ff307fb0c0716661254',
+                  'pr92':'340cd323f5f5809abc746507b2e252da71298720'}
+        modes = [r.get('environment', {}).get('build_mode') for r in reports]
+        if any(m in (None, '', 'unknown', 'unverified') for m in modes) or len(set(modes)) != 1:
+            errors.append('Verified equal build modes required')
+        for report in reports:
+            if report.get('label') in pinned and report.get('source_commit') != pinned[report['label']]:
+                errors.append('Incorrect source for pinned cohort: ' + report['label'])
+            if report.get('label') == 'candidate' and report.get('source_commit') in pinned.values():
+                errors.append('Candidate must identify its own source revision')
     for report in reports:
         errors += [str(report.get('label')) + ': ' + e for e in validate(report)]
     if reports:
@@ -98,6 +117,8 @@ def compare(reports):
                      'sample_p95s_ms': summary(p95s), 'startup_ms': summary(starts),
                      'over_interval_frames': sum(c['frames']['over_interval_frames'] for c in captures),
                      'frame_count': sum(c['frames']['duration_ms']['count'] for c in captures),
+                     'memory_before_pss_kib': summary([c['memory_before']['total_pss_kib'] for c in captures if c.get('memory_before', {}).get('total_pss_kib') is not None]),
+                     'memory_after_pss_kib': summary([c['memory_after']['total_pss_kib'] for c in captures if c.get('memory_after', {}).get('total_pss_kib') is not None]),
                      'touch_to_visible_ms': None, 'surfaceflinger_jank': None})
     return {'comparable': True, 'reasons': [], 'rows': rows,
             'superiority': 'NOT_AUTOMATICALLY_ESTABLISHED',
@@ -106,10 +127,11 @@ def compare(reports):
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument('reports', type=Path, nargs=3)
+    p.add_argument('reports', type=Path, nargs='+')
+    p.add_argument('--cohort', choices=['legacy','navigation2'], default='legacy')
     p.add_argument('--out', type=Path, required=True)
     a = p.parse_args()
-    result = compare([json.loads(f.read_text()) for f in a.reports])
+    result = compare([json.loads(f.read_text()) for f in a.reports], a.cohort)
     a.out.parent.mkdir(parents=True, exist_ok=True)
     a.out.write_text(json.dumps(result, indent=2, allow_nan=False) + '\n')
     return 0 if result['comparable'] else 2

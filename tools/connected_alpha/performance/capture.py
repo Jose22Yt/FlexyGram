@@ -66,6 +66,7 @@ def collect_environment(device, args):
     for key in ('theme', 'cache_state', 'conversation_fixture', 'workload_id', 'music_state',
                 'refresh_profile', 'installation_state', 'test_session_state'):
         result[key] = getattr(args, key)
+    result['build_mode'] = getattr(args, 'build_mode', 'unverified')
     result['thermal_policy'] = f'status<={args.max_thermal};temperature<={args.max_temperature_c}'
     result['battery_policy'] = f'level>={args.min_battery};charging={args.charging}'
     return result
@@ -122,8 +123,9 @@ def main():
     p.add_argument('--package', required=True)
     p.add_argument('--component')
     p.add_argument('--source-commit', required=True)
-    p.add_argument('--label', required=True, choices=['exteraless', 'alpha1271', 'candidate'])
+    p.add_argument('--label', required=True, choices=['exteraless', 'alpha1271', 'alpha1272', 'pr92', 'candidate'])
     p.add_argument('--scenario', required=True, choices=SCENARIOS)
+    p.add_argument('--build-mode', required=True, help='Same release/profileable/debug mode for all compared builds')
     p.add_argument('--iterations', type=int, default=20)
     p.add_argument('--verified-hz', type=float, help='Explicit operator-verified fallback only; FrameInterval wins')
     p.add_argument('--confirm-test-device', action='store_true', required=True)
