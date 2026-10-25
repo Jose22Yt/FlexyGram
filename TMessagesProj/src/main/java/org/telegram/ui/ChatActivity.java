@@ -3746,6 +3746,7 @@ public class ChatActivity extends BaseFragment implements
 
     @Override
     public void onFragmentDestroy() {
+        app.flexygram.studio.FlexyStyleInstallHelper.cancel(this);
         app.exteraless.plugins.menus.MenuInjector.releaseMessageMenu(this);
         super.onFragmentDestroy();
         if (commentsMessagesObserver != null) {
@@ -18444,9 +18445,10 @@ public class ChatActivity extends BaseFragment implements
             if (signatureWallpaperBlur != null) signatureWallpaperBlur.prepare(getBackgroundImage(),
                     getNewDrawableMotion(), getThemedColor(Theme.key_windowBackgroundGray));
         }
-        @Override protected void onBackgroundViewInvalidate() {
-            super.onBackgroundViewInvalidate();
-            refreshSignatureWallpaperBlur();
+        @Override protected void onBackgroundDrawn(android.graphics.drawable.Drawable drawable, boolean moving) {
+            super.onBackgroundDrawn(drawable, moving);
+            if (signatureWallpaperBlur != null) signatureWallpaperBlur.prepare(drawable, moving,
+                    getThemedColor(Theme.key_windowBackgroundGray));
         }
 
 
@@ -29115,6 +29117,7 @@ public class ChatActivity extends BaseFragment implements
     @Override
     public void onTransitionAnimationEnd(boolean isOpen, boolean backward) {
         super.onTransitionAnimationEnd(isOpen, backward);
+        app.flexygram.studio.FlexyStyleInstallHelper.resume(this);
         if (isOpen) {
             if (backward) {
                 if (showPinBulletin && pinBulletin != null) {
@@ -31761,11 +31764,24 @@ public class ChatActivity extends BaseFragment implements
         }
     }
 
+    /** Scoped Studio refresh: no fragment recreation, list reload or navigation change. */
+    public void onFlexyStudioApplied(java.util.Set<String> sections) {
+        if (sections.contains("bubbles") && chatListView != null) chatListView.invalidateViews();
+        if (sections.contains("header") && signatureChatHeader != null) {
+            var params = (android.widget.FrameLayout.LayoutParams) avatarContainer.getLayoutParams();
+            params.leftMargin = usesSignatureHeader() ? 0 : AndroidUtilities.dp(!inPreviewMode ? 52 : 0);
+            params.rightMargin = isTitleCentered() ? 0 : AndroidUtilities.dp(52);
+            avatarContainer.setLayoutParams(params);
+            updateSignatureHeaderCounter(); signatureChatHeader.changed();
+        }
+    }
+
     Bulletin.Delegate bulletinDelegate;
 
     @Override
     public void onResume() {
         super.onResume();
+        app.flexygram.studio.FlexyStyleInstallHelper.resume(this);
         if (BuildConfig.CONNECTED_ALPHA) app.flexygram.header.HeaderConfig.load();
         if (signatureChatHeader != null) {
             var params = (android.widget.FrameLayout.LayoutParams) avatarContainer.getLayoutParams();
@@ -31994,6 +32010,7 @@ public class ChatActivity extends BaseFragment implements
 
     @Override
     public void onPause() {
+        app.flexygram.studio.FlexyStyleInstallHelper.cancel(this);
         super.onPause();
         scrolling = false;
         if (scrimPopupWindow != null) {
@@ -42227,11 +42244,14 @@ public class ChatActivity extends BaseFragment implements
     private class ChatMessageCellDelegate implements ChatMessageCell.ChatMessageCellDelegate {
         @Override
         public boolean drawFlexyBubbleWallpaper(ChatMessageCell cell, Canvas canvas, android.graphics.Path path) {
-            if (contentView == null || chatListView == null || contentView.signatureWallpaperBlur == null
-                    || cell.getAlpha() < 1f || cell.getTranslationX() != 0 || Theme.isAnimatingColor()) return false;
+            return drawFlexyBubbleWallpaper(cell, canvas, path, 255);
+        }
+        @Override
+        public boolean drawFlexyBubbleWallpaper(ChatMessageCell cell, Canvas canvas, android.graphics.Path path, int alpha) {
+            if (contentView == null || chatListView == null || contentView.signatureWallpaperBlur == null) return false;
             // Existing cell/root coordinate bridge; only the new static asynchronous cache is sampled.
             return contentView.signatureWallpaperBlur.draw(canvas, path,
-                    cell.getX() + chatListView.getX(), cell.getY() + chatListView.getY());
+                    cell.getX() + chatListView.getX(), cell.getY() + chatListView.getY(), alpha);
         }
 
         @Override
@@ -44657,6 +44677,7 @@ public class ChatActivity extends BaseFragment implements
                     // exteraless plugins: файл плагина ставится, а не открывается
                     // в подсветке кода (.plugin зарегистрирован как Python
                     // в MarkdownUtils). Проверка идёт до просмотрщиков, как у exteraGram.
+                    if (app.flexygram.studio.FlexyStyleInstallHelper.handleMessageTap(ChatActivity.this, message, cell)) return;
                     if (app.exteraless.plugins.PluginInstallHelper.handleMessageTap(getParentActivity(), message)) {
                         return;
                     }
@@ -44760,8 +44781,14 @@ public class ChatActivity extends BaseFragment implements
         }
 
         @Override
+        public boolean didPressFlexyStudioDocument(ChatMessageCell cell) {
+            return app.flexygram.studio.FlexyStyleInstallHelper.handleMessageTap(ChatActivity.this, cell.getMessageObject(), cell);
+        }
+
+        @Override
         public void didPressImage(ChatMessageCell cell, float x, float y, boolean fullPreview) {
             MessageObject message = cell.getMessageObject();
+            if (app.flexygram.studio.FlexyStyleInstallHelper.handleMessageTap(ChatActivity.this, message, cell)) return;
             if (message.type == MessageObject.TYPE_STORY) {
                 if (message.messageOwner.media.storyItem != null && !(message.messageOwner.media.storyItem instanceof TL_stories.TL_storyItemDeleted)) {
                     TL_stories.StoryItem storyItem = message.messageOwner.media.storyItem;
@@ -45020,6 +45047,7 @@ public class ChatActivity extends BaseFragment implements
                     // exteraless plugins: файл плагина ставится, а не открывается
                     // в подсветке кода (.plugin зарегистрирован как Python
                     // в MarkdownUtils). Проверка идёт до просмотрщиков, как у exteraGram.
+                    if (app.flexygram.studio.FlexyStyleInstallHelper.handleMessageTap(ChatActivity.this, message, cell)) return;
                     if (app.exteraless.plugins.PluginInstallHelper.handleMessageTap(getParentActivity(), message)) {
                         return;
                     }

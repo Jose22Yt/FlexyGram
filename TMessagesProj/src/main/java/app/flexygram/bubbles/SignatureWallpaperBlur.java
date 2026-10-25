@@ -221,10 +221,16 @@ public final class SignatureWallpaperBlur {
         public boolean isReady() { return !closed && shader != null && entry != null && entry.bitmap != null && !entry.bitmap.isRecycled(); }
         public boolean isSupported() { return supported; }
         public boolean draw(Canvas canvas, Path shape, float rootOffsetX, float rootOffsetY) {
-            if (!BubbleConfig.backgroundBlur() || !isReady() || bitmap(source) != sourceBitmap
-                    || sourceBitmap.isRecycled() || sourceBitmap.getGenerationId() != generation || mapping.isEmpty()) return false;
+            return draw(canvas, shape, rootOffsetX, rootOffsetY, 255);
+        }
+        public boolean draw(Canvas canvas, Path shape, float rootOffsetX, float rootOffsetY, int alpha) {
+            // Mapping is captured once by the wallpaper owner after its native draw. A shared
+            // Drawable can be drawn by another screen; never read its mutable bounds per message.
+            if (!BubbleConfig.backgroundBlur() || !supported || !isReady()
+                    || sourceBitmap == null || sourceBitmap.isRecycled() || sourceBitmap.getGenerationId() != generation || mapping.isEmpty()) return false;
             matrix.setScale(mapping.width() / entry.bitmap.getWidth(), mapping.height() / entry.bitmap.getHeight());
             matrix.postTranslate(mapping.left - rootOffsetX, mapping.top - rootOffsetY); shader.setLocalMatrix(matrix);
+            paint.setAlpha(Math.max(0, Math.min(255, alpha)));
             canvas.drawPath(shape, paint); return true;
         }
         private void release() {

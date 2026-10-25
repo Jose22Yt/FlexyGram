@@ -7894,6 +7894,7 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
                 if (view instanceof SharedDocumentCell) {
                     SharedDocumentCell cell = (SharedDocumentCell) view;
                     TLRPC.Document document = message.getDocument();
+                    if (app.flexygram.studio.FlexyStyleInstallHelper.handleMessageTap(profileActivity, message, cell)) return;
                     if (cell.isLoaded()) {
                         if (message.canPreviewDocument()) {
                             PhotoViewer.getInstance().setParentActivity(profileActivity);

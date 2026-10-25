@@ -53,13 +53,13 @@ class BubbleReleaseTests(unittest.TestCase):
  def test_actual_cell_glass_callback_compiles_before_late_declared_delegate(self):
   source=(JAVA/'org/telegram/ui/Cells/ChatMessageCell.java').read_text()
   start=source.index('    private final MessageDrawable.GlassSource flexyBubbleSource =')
-  field=source[start:source.index(';',start)+1]
-  runner="""class MessageDrawable {interface GlassSource {boolean draw(Object canvas,Object path);}}
+  field=source[start:source.index('    private void drawFlexyBubble(',start)].replace('android.graphics.Path','Object').replace('Canvas','Object').replace('ChatMessageCell.this','CallbackProbe.this')
+  runner="""class MessageDrawable {interface GlassSource {boolean draw(Object canvas,Object path);default boolean draw(Object canvas,Object path,int alpha){return alpha==255&&draw(canvas,path);}}}
 class CallbackProbe {
 _FIELD_
- interface Delegate {boolean drawFlexyBubbleWallpaper(Object cell,Object canvas,Object path);}
- Delegate delegate=(a,b,c)->true;boolean drawForBlur;
- public static void main(String[] args){CallbackProbe p=new CallbackProbe();if(!p.flexyBubbleSource.draw(null,null))throw new AssertionError();p.drawForBlur=true;if(p.flexyBubbleSource.draw(null,null))throw new AssertionError();}
+ interface Delegate {boolean drawFlexyBubbleWallpaper(Object cell,Object canvas,Object path,int alpha);}
+ Delegate delegate=(a,b,c,alpha)->alpha>0;boolean drawForBlur;
+ public static void main(String[] args){CallbackProbe p=new CallbackProbe();if(!p.flexyBubbleSource.draw(null,null))throw new AssertionError();if(!p.flexyBubbleSource.draw(null,null,128)||p.flexyBubbleSource.draw(null,null,0))throw new AssertionError();p.drawForBlur=true;if(p.flexyBubbleSource.draw(null,null))throw new AssertionError();}
 }""".replace('_FIELD_',field)
   import tempfile
   with tempfile.TemporaryDirectory() as temp:

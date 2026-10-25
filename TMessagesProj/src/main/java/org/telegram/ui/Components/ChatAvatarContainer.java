@@ -166,6 +166,8 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
 
         @Override
         public void setTranslationY(float translationY) {
+            // Signature owns the measured two-line block; classic subtitle animations use a title offset.
+            if (signatureActive() && this == titleTextView) translationY = 0;
             if (reference != null) {
                 SimpleTextView connected = reference.get();
                 if (connected != null) {
@@ -866,6 +868,9 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
         int width = MeasureSpec.getSize(widthMeasureSpec);
         int textWidth = Math.max(0, Math.round(signatureHeader.geometry.title.width()) - dp(64));
         titleTextView.setTextSizePx(Math.round(signatureHeader.titlePx));
+        // Classic title padding (6 + 12 dp) is outside the Signature text block.
+        titleTextView.setPadding(0, 0, 0, 0);
+        getSubtitleTextView().setPadding(0, 0, 0, 0);
         titleTextView.setGravity(Gravity.CENTER_HORIZONTAL);
         titleTextView.measure(MeasureSpec.makeMeasureSpec(textWidth, MeasureSpec.AT_MOST), MeasureSpec.makeMeasureSpec((int)Math.ceil(signatureHeader.titlePx) + dp(8), MeasureSpec.AT_MOST));
         if (subtitleTextView != null) { subtitleTextView.setTextSizePx(Math.round(signatureHeader.subtitlePx)); subtitleTextView.setGravity(Gravity.CENTER_HORIZONTAL); }
@@ -888,7 +893,7 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
         int x = Math.round(a.centerX() - photo / 2f), y = Math.round(a.centerY() - photo / 2f);
         avatarImageView.layout(x, y, x + photo, y + photo);
         View subtitle = getSubtitleTextView();
-        int th = titleTextView.getMeasuredHeight(), sh = !signatureHeader.subtitleFits || subtitle.getVisibility() == GONE ? 0 : subtitle.getMeasuredHeight();
+        int th = titleTextView.getMeasuredHeight(), sh = !signatureHeader.subtitleFits || subtitle.getVisibility() != VISIBLE ? 0 : subtitle.getMeasuredHeight();
         int textY = Math.round(title.centerY() - (th + sh + (sh == 0 ? 0 : dp(2))) / 2f);
         x = Math.round(title.centerX() - titleTextView.getMeasuredWidth() / 2f);
         titleTextView.layout(x, textY, x + titleTextView.getMeasuredWidth(), textY + th);
@@ -908,7 +913,8 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
         if (signatureMore != null) signatureMore.setVisibility(signatureActive() ? VISIBLE : GONE);
         if (signatureActive()) { signatureMeasured = true; measureSignature(widthMeasureSpec, heightMeasureSpec); return; }
         if (signatureMeasured) {
-            signatureMeasured = false; setGlassMode(); applyAvatarRadius(avatarSizeInDp, avatarRadiusForum, avatarRadiusHasStories);
+            signatureMeasured = false; titleTextView.setPadding(0, dp(6), 0, dp(12));
+            getSubtitleTextView().setPadding(0, 0, isCentered() ? 0 : dp(10), 0); setGlassMode(); applyAvatarRadius(avatarSizeInDp, avatarRadiusForum, avatarRadiusHasStories);
             titleTextView.setGravity(isCentered() ? Gravity.CENTER_HORIZONTAL : Gravity.LEFT);
             if (subtitleTextView != null) subtitleTextView.setGravity(isCentered() ? Gravity.CENTER_HORIZONTAL : Gravity.LEFT);
             else if (animatedSubtitleTextView != null) animatedSubtitleTextView.setTextSize(dp(14));

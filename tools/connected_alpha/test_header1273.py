@@ -54,6 +54,8 @@ class HeaderTests(unittest.TestCase):
   fixture=(ROOT/'tools/connected_alpha/header_visual/stubs.py').read_text()
   self.assertIn('setTextSizePx(int v)',fixture)
   self.assertNotIn('setTextSizePx(float v)',fixture)
+  self.assertIn('setIncludeFontPadding(false)',fixture)
+  self.assertIn('getAlignment(), 1.0f, 0.0f, false)',native)
   avatar=(ROOT/'TMessagesProj/src/main/java/org/telegram/ui/Components/ChatAvatarContainer.java').read_text()
   for name in ['titlePx','subtitlePx']:
    self.assertIn('setTextSizePx(Math.round(signatureHeader.'+name+'))',avatar)

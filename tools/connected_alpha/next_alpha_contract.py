@@ -23,6 +23,10 @@ VISUAL_BASE='43e14d876601d16890b8c6f24c515103e6ece54f'
 VISUAL_PATHS=frozenset(['TMessagesProj/src/main/java/org/telegram/ui/ActionBar/MessageDrawable.java', 'TMessagesProj/src/main/java/app/flexygram/bubbles/BubblePreviewView.java', 'TMessagesProj/src/main/res/values/flexygram_bubbles.xml', 'TMessagesProj/src/main/res/values-es/flexygram_bubbles.xml', 'TMessagesProj/src/main/res/values-ru/flexygram_bubbles.xml', 'TMessagesProj/src/main/java/org/telegram/ui/ThemeActivity.java', 'TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraChatsActivity.java', 'TMessagesProj/src/main/java/app/flexygram/settings/SignatureChatThemeActivity.java', 'TMessagesProj/src/main/java/app/flexygram/settings/SignatureNativeRowSurface.java', '.github/workflows/pr.yml', 'TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleConfig.java', 'TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleSettingsActivity.java', 'TMessagesProj/src/main/java/app/flexygram/bubbles/SignatureWallpaperBlur.java', 'TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java', 'TMessagesProj/src/main/java/org/telegram/ui/ChatBackgroundDrawable.java'])
 PATHS = PATHS | VISUAL_PATHS | frozenset(['tools/connected_alpha/test_signature_next1273.py','tools/connected_alpha/signature_next1273.patch','tools/connected_alpha/bubble_visual/BubbleVisualTest.java.in','tools/connected_alpha/bubble_visual/BubblePreviewVisualTest.java.in','tools/connected_alpha/bubble_visual/stubs.py','tools/connected_alpha/bubble_visual/run.py'])
 def restore_visual(path,data):
+ from refinement1274_contract import restore as restore_refinement
+ data=restore_refinement(path,data)
+ from studio_contract import restore as restore_studio
+ data=restore_studio(path,data) if any(marker in data for marker in (b"FlexyStudio",b"FlexyStyleInstallHelper",b"flexystudio")) else data
  if path not in VISUAL_PATHS:return data
  probe=subprocess.run(['git','show',VISUAL_BASE+':'+path],cwd=ROOT,capture_output=True)
  original=probe.stdout if probe.returncode==0 else None
@@ -67,3 +71,9 @@ PATHS = PATHS | NAVIGATION2_PATHS | NAVIGATION2_PRODUCTION | frozenset(["tools/c
 RELEASE_PATHS=frozenset(['TMessagesProj/build.gradle','.github/workflows/connected-alpha-arm64.yml','tools/connected_alpha/build_private_apk.py'])
 VISUAL_PATHS = VISUAL_PATHS | RELEASE_PATHS
 PATHS = PATHS | RELEASE_PATHS | frozenset(['tools/connected_alpha/test_release1273.py'])
+
+from studio_contract import PATHS as STUDIO_PATHS
+PATHS = PATHS | STUDIO_PATHS
+
+from refinement1274_contract import PATHS as REFINEMENT_PATHS
+PATHS = PATHS | REFINEMENT_PATHS

@@ -7,7 +7,7 @@ STUBS['androidx/core/graphics/ColorUtils.java']=STUBS['androidx/core/graphics/Co
 def write_stubs(source, root):
     for name,text in STUBS.items():
         p=source/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(text)
-    for name in ('org/telegram/ui/ActionBar/MessageDrawable.java','org/telegram/ui/Components/blur3/utils/NinePatchBuilder.java','app/flexygram/bubbles/BubbleStyle.java','app/flexygram/bubbles/BubblePreviewView.java','app/flexygram/bubbles/SignatureWallpaperBlur.java','app/flexygram/bubbles/BubbleConfig.java','app/flexygram/settings/FlexySignatureSlider.java','app/flexygram/composer/ComposerSliderTrack.java'):
+    for name in ('org/telegram/ui/ActionBar/MessageDrawable.java','org/telegram/ui/Components/blur3/utils/NinePatchBuilder.java','app/flexygram/bubbles/BubbleStyle.java','app/flexygram/bubbles/BubbleOutline.java','app/flexygram/bubbles/BubblePreviewView.java','app/flexygram/bubbles/SignatureWallpaperBlur.java','app/flexygram/bubbles/BubbleConfig.java','app/flexygram/settings/FlexySignatureSlider.java','app/flexygram/composer/ComposerSliderTrack.java'):
         p=source/name;p.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(root/'TMessagesProj/src/main/java'/name,p)
 
 STUBS["org/telegram/messenger/AndroidUtilities.java"] = STUBS["org/telegram/messenger/AndroidUtilities.java"].replace("public static int dp(float v)", "public static float dpf2(float v){return v*density;}public static int dp(float v)")

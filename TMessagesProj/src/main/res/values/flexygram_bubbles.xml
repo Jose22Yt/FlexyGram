@@ -24,4 +24,9 @@
     <string name="FlexyBubblePreviewGroupOutgoing">Your changes appear immediately.</string>
     <string name="FlexyBubbleBackgroundBlur">Background blur</string>
     <string name="FlexyBubbleBlurCompatibility">Blur is available for compatible static image wallpapers. Animated or unsupported backgrounds keep Matte.</string>
+    <string name="FlexyBubbleOutlineEnabled">Show border</string>
+    <string name="FlexyBubbleOutlineStyle">Border style</string>
+    <string name="FlexyBubbleIntelligentColor">Intelligent color</string>
+    <string name="FlexyBubbleGlassPearl">Glass Pearl</string>
+    <string name="FlexyBubblePearlIntensity">Glass Pearl intensity</string>
 </resources>

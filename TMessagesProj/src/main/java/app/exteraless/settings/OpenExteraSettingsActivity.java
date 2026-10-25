@@ -37,6 +37,7 @@ public class OpenExteraSettingsActivity extends BaseNekoSettingsActivity {
     private int appearanceRow;
     private int chatsRow;
     private int pluginsRow;
+    private int flexyStudioRow = -1;
     private int otherRow;
     private int categoriesDividerRow;
 
@@ -60,6 +61,7 @@ public class OpenExteraSettingsActivity extends BaseNekoSettingsActivity {
         generalRow = addRow("general");
         appearanceRow = addRow("appearance");
         chatsRow = addRow("chats");
+        flexyStudioRow = org.telegram.messenger.BuildConfig.CONNECTED_ALPHA ? addRow("flexystudio") : -1;
         pluginsRow = addRow("plugins");
         otherRow = addRow("other");
         categoriesDividerRow = addRow();
@@ -182,6 +184,8 @@ public class OpenExteraSettingsActivity extends BaseNekoSettingsActivity {
             presentFragment(new OpenExteraAppearanceActivity());
         } else if (position == chatsRow) {
             presentFragment(new OpenExteraChatsActivity());
+        } else if (position == flexyStudioRow && flexyStudioRow >= 0) {
+            presentFragment(new app.flexygram.studio.FlexyStudioActivity());
         } else if (position == pluginsRow) {
             presentFragment(new app.exteraless.plugins.ui.PluginsActivity());
         } else if (position == otherRow) {
@@ -269,6 +273,8 @@ public class OpenExteraSettingsActivity extends BaseNekoSettingsActivity {
                         cell.setTextAndIcon(getString(R.string.OpenExteraAppearance), R.drawable.msg_theme, true);
                     } else if (position == chatsRow) {
                         cell.setTextAndIcon(getString(R.string.OpenExteraChats), R.drawable.msg_discussion, true);
+                    } else if (position == flexyStudioRow && flexyStudioRow >= 0) {
+                        cell.setTextAndIcon(getString(R.string.FlexyStudioTitle), R.drawable.flexy_studio_layers, true);
                     } else if (position == pluginsRow) {
                         cell.setTextAndIcon(getString(R.string.OpenExteraPlugins), R.drawable.msg_plugins, true);
                     } else if (position == otherRow) {

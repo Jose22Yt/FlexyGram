@@ -6,4 +6,6 @@
     <string name="FlexyMusicMore">Ещё</string>
     <string name="FlexyMusicPlayingFrom">Источник</string>
     <string name="FlexyMusicMyMusic">Моя музыка</string>
+    <string name="FlexyMusicLyrics">Текст</string>
+    <string name="FlexyMusicQueue">Очередь</string>
 </resources>

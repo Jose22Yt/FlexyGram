@@ -33,7 +33,7 @@ class UnifiedIntegration(unittest.TestCase):
                 if {'android.intent.action.MAIN'} <= actions and {'android.intent.category.LAUNCHER'} <= categories:
                     launchers.append(alias)
         self.assertEqual([alias.get(A+'name') for alias in launchers],
-                         ['org.telegram.messenger.ExteralessIcon'])
+                         ['org.telegram.messenger.FlexyBlueIcon'])
         self.assertEqual(launchers[0].get(A+'exported'), 'true')
 
     def test_baseline_stray_text_rejected_and_current_values_clean(self):

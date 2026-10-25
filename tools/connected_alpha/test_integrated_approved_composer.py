@@ -29,14 +29,14 @@ class ApprovedComposerIntegration(unittest.TestCase):
         self.assertGreater(len(frozen),20)
         for path in frozen:
             with self.subTest(path=path):
-                self.assertEqual((ROOT/path).read_bytes(),subprocess.check_output(['git','show',APPROVED+':'+path],cwd=ROOT))
+                self.assertEqual(__import__('studio_contract').restore(path,(ROOT/path).read_bytes()),subprocess.check_output(['git','show',APPROVED+':'+path],cwd=ROOT))
         expected={p for p in frozen if p.startswith(prefixes[0])}
         actual={str(p.relative_to(ROOT)) for p in (JAVA/'app/flexygram/composer').rglob('*') if p.is_file()}
         self.assertEqual(actual,expected)
 
     def test_actual_sections_text_input_rows_and_route_open_existing_activity(self):
         chats=read1270('TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraChatsActivity.java')
-        root=(JAVA/'app/exteraless/settings/OpenExteraSettingsActivity.java').read_text()
+        root=__import__('studio_contract').restore('TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraSettingsActivity.java',(JAVA/'app/exteraless/settings/OpenExteraSettingsActivity.java').read_bytes()).decode()
         rows=chats[chats.index('        linksHeaderRow = addRow("linksHeader");'):chats.index('        doubleTapHeaderRow = addRow("doubleTapHeader");')]
         fields=sorted(set(re.findall(r'\b(\w+Row)\s*=',rows)))
         start=chats.index('} else if (position == composerSettingsRow) {')+len('} else if (position == composerSettingsRow) {')

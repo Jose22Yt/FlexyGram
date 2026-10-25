@@ -711,7 +711,17 @@ public class ChatActivityEnterView extends FrameLayout implements
 
     private int flexyNativeFieldRight = -1;
     private int flexyAppliedFieldRight = -1;
+    private final Runnable flexyStudioRefresh = this::refreshFlexyStudioComposer;
+    public void refreshFlexyStudioComposer() {
+        readFlexyGeometry(); checkUi_IslandTotalHeight();
+        flexyCompactRequested = app.flexygram.composer.FlexyComposerConfig.compact();
+        if (messageEditTextContainer != null) messageEditTextContainer.requestLayout(); else requestLayout();
+        if (flexyCompactLayout) { updateFlexyIconStyle(); updateFlexyIconColors(); }
+        if (audioVideoButtonContainer != null) audioVideoButtonContainer.invalidate();
+        invalidate();
+    }
     private final SharedPreferences.OnSharedPreferenceChangeListener flexyComposerListener = (prefs, key) -> {
+        if (app.flexygram.studio.FlexyStudioStore.deferComposer(flexyStudioRefresh)) return;
         if (app.flexygram.composer.FlexyComposerConfig.STYLE.equals(key)
                 || app.flexygram.composer.FlexyComposerConfig.POSITION.equals(key)
                 || app.flexygram.composer.FlexyComposerConfig.LEVEL.equals(key)

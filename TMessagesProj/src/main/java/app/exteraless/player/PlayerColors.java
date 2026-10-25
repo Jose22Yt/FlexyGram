@@ -91,7 +91,11 @@ public final class PlayerColors {
         if (cached != null) return cached;
         PlayerColors base = dark ? MIDNIGHT : PEARL;
         int[] values = base.values();
-        for (int i = 0; i < 4; i++) values[i] = ColorUtils.blendARGB(values[i], seed | 0xff000000, .08f);
+        for (int i = 0; i < 4; i++) values[i] = ColorUtils.blendARGB(values[i], seed | 0xff000000, .16f);
+        // Artwork identity belongs to the full sheet only; transport and mini players are unchanged.
+        values[7] = ColorUtils.blendARGB(seed | 0xff000000, dark ? 0xffffffff : 0xff000000, dark ? .32f : .24f);
+        values[8] = ColorUtils.calculateContrast(0xffffffff, values[7]) >= 4.5 ? 0xffffffff : 0xff101820;
+        values[9] = ColorUtils.blendARGB(values[0], seed | 0xff000000, .18f);
         PlayerColors result = new PlayerColors(dark, values);
         artworkPalettes.put(key, result);
         return result;

@@ -6,4 +6,6 @@
     <string name="FlexyMusicMore">More</string>
     <string name="FlexyMusicPlayingFrom">Playing from</string>
     <string name="FlexyMusicMyMusic">My music</string>
+    <string name="FlexyMusicLyrics">Lyrics</string>
+    <string name="FlexyMusicQueue">Queue</string>
 </resources>

@@ -284,8 +284,14 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     private final static float EPHEMERAL_HINT_HEIGHT = 25f;
 
     public boolean clipToGroupBounds;
-    private final MessageDrawable.GlassSource flexyBubbleSource = (canvas, path) ->
-        this.delegate != null && !this.drawForBlur && this.delegate.drawFlexyBubbleWallpaper(this, canvas, path);
+    private final MessageDrawable.GlassSource flexyBubbleSource = new MessageDrawable.GlassSource() {
+        @Override public boolean draw(Canvas canvas, android.graphics.Path path) {
+            return draw(canvas, path, 255);
+        }
+        @Override public boolean draw(Canvas canvas, android.graphics.Path path, int alpha) {
+            return delegate != null && !drawForBlur && delegate.drawFlexyBubbleWallpaper(ChatMessageCell.this, canvas, path, alpha);
+        }
+    };
     private void drawFlexyBubble(Canvas canvas, MessageDrawable drawable, Paint customPaint) {
         // Drawables are shared by native themes: never retain a cell/activity between draws.
         drawable.setFlexyGlassSource(flexyBubbleSource);
@@ -580,6 +586,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     }
 
     public interface ChatMessageCellDelegate {
+        default boolean didPressFlexyStudioDocument(ChatMessageCell cell) { return false; }
         default boolean isReplyOrSelf() {
             return false;
         }
@@ -855,6 +862,9 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             return false;
         }
 
+        default boolean drawFlexyBubbleWallpaper(ChatMessageCell cell, Canvas canvas, android.graphics.Path path, int alpha) {
+            return alpha == 255 && drawFlexyBubbleWallpaper(cell, canvas, path);
+        }
         default boolean drawFlexyBubbleWallpaper(ChatMessageCell cell, Canvas canvas, android.graphics.Path path) {
             return false;
         }
@@ -18289,6 +18299,8 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             delegate.didPressRevealSensitiveContent(this);
             return;
         }
+        if (currentMessageObject != null && app.flexygram.studio.FlexyStyleInstallHelper.recognized(currentMessageObject.getDocumentName())
+                && delegate != null && delegate.didPressFlexyStudioDocument(this)) return;
         if (currentMessageObject != null && !currentMessageObject.isAnyKindOfSticker()) {
             currentMessageObject.putInDownloadsStore = true;
         }

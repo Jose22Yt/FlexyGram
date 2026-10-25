@@ -24,4 +24,9 @@
     <string name="FlexyBubblePreviewGroupOutgoing">Tus cambios se muestran al instante.</string>
     <string name="FlexyBubbleBackgroundBlur">Desenfoque de fondo</string>
     <string name="FlexyBubbleBlurCompatibility">El desenfoque está disponible para fondos de imagen estáticos compatibles. Los fondos animados o no compatibles mantienen Matte.</string>
+    <string name="FlexyBubbleOutlineEnabled">Mostrar borde</string>
+    <string name="FlexyBubbleOutlineStyle">Estilo del borde</string>
+    <string name="FlexyBubbleIntelligentColor">Color inteligente</string>
+    <string name="FlexyBubbleGlassPearl">Glass Pearl</string>
+    <string name="FlexyBubblePearlIntensity">Intensidad Glass Pearl</string>
 </resources>

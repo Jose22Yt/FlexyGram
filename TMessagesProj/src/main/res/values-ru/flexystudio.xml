@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyStudioTitle">FlexyStudio</string>
+    <string name="FlexyStudioConfiguration">КОНФИГУРАЦИЯ</string>
+    <string name="FlexyStudioExport">Экспорт конфигурации</string>
+    <string name="FlexyStudioImport">Импорт конфигурации</string>
+    <string name="FlexyStudioShare">Поделиться конфигурацией</string>
+    <string name="FlexyStudioApplyTitle">Применить конфигурацию</string>
+    <string name="FlexyStudioApply">Применить</string>
+    <string name="FlexyStudioApplying">Применение…</string>
+    <string name="FlexyStudioFileDescription">Конфигурация FlexyGram</string>
+    <string name="FlexyStudioCompatible">Совместимо с FlexyGram</string>
+    <string name="FlexyStudioIncludes">Включает следующие настройки:</string>
+    <string name="FlexyStudioApplyInfo">Включённые настройки будут применены во FlexyGram.</string>
+    <string name="FlexyStudioBubbles">Облачка сообщений</string>
+    <string name="FlexyStudioHeader">Заголовок чата</string>
+    <string name="FlexyStudioComposer">Панель ввода сообщения</string>
+    <string name="FlexyStudioIcon">Значок приложения</string>
+    <string name="FlexyStudioNoChanges">Нет изменений для экспорта</string>
+    <string name="FlexyStudioChooseSections">Выберите совместимые разделы для экспорта с текущими значениями.</string>
+    <string name="FlexyStudioNothingSelected">Выберите хотя бы один раздел. Файл не создан.</string>
+    <string name="FlexyStudioInvalid">Файл повреждён, слишком велик или несовместим. Настройки не изменены.</string>
+    <string name="FlexyStudioReadError">Не удалось прочитать файл. Попробуйте ещё раз.</string>
+    <string name="FlexyStudioWriteError">Не удалось сохранить файл. Используйте точное расширение .flexyGram.</string>
+    <string name="FlexyStudioSaved">Конфигурация сохранена</string>
+    <string name="FlexyStudioApplied">Конфигурация применена</string>
+    <string name="FlexyStudioApplyError">Не удалось применить. Предыдущие значения восстановлены.</string>
+    <string name="FlexyStudioRecoveryPending">Не удалось завершить восстановление. Локальная копия сохранена для следующего запуска FlexyGram.</string>
+    <string name="FlexyStudioUndoQuestion">Восстановить значения до этого импорта?</string>
+    <string name="FlexyStudioUndoConflict">Отмена невозможна: настройки изменены после импорта.</string>
+    <string name="FlexyStudioBusy">Выполняется другая операция. Попробуйте ещё раз.</string>
+    <string name="FlexyStudioLoginFirst">Откройте FlexyGram и войдите перед импортом конфигурации.</string>
+    <string name="FlexyStudioUnsupported">Не поддерживается: %1$s. Ни один раздел не применён.</string>
+</resources>
