@@ -73,6 +73,14 @@ public class StudioNativeTest {
   FlexyStudioStore.recoverIfNeeded();AtomicBoolean done=new AtomicBoolean();for(int i=0;i<200;i++){Thread.sleep(5);Shadows.shadowOf(Looper.getMainLooper()).idle();if(!journal.exists()){done.set(true);break;}}
   assertTrue(done.get());assertEquals(41,activity.getSharedPreferences(key.file,0).getInt(key.preference,0));
  }
+ @Test public void dismissingOldSheetCannotForgetNewDownloadRequest()throws Exception{
+  File file=new File(activity.getCacheDir(),"old-sheet.flexyGram");try(FileOutputStream out=new FileOutputStream(file)){out.write(StudioCodec.encode(preset(1)));}FileLoader.file=file;
+  View source=new View(activity);root.addView(source);FlexyStyleInstallHelper.handleMessageTap(fragment,new MessageObject(),source);
+  for(int i=0;i<200&&fragment.dialog==null;i++){Thread.sleep(5);Shadows.shadowOf(Looper.getMainLooper()).idle();}assertTrue(fragment.dialog instanceof FlexyStudioSheet);
+  android.app.Dialog old=fragment.dialog;FileLoader.file=new File(activity.getCacheDir(),"new-missing");FileLoader.file.delete();MessageObject second=new MessageObject();second.id=2;
+  FlexyStyleInstallHelper.handleMessageTap(fragment,second,source);assertNotNull(DownloadController.listener);
+  old.dismiss();Shadows.shadowOf(Looper.getMainLooper()).idle();FlexyStyleInstallHelper.cancel(fragment);assertNull("new observer must remain owned until cancellation",DownloadController.listener);
+ }
  public static class FixtureProvider extends android.content.ContentProvider {
   static File file;static String displayName;static long declaredSize;static int opens;
   public boolean onCreate(){return true;}public String getType(android.net.Uri uri){return StudioSchema.MIME;}

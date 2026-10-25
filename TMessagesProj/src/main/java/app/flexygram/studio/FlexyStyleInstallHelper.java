@@ -98,7 +98,7 @@ public final class FlexyStyleInstallHelper {
         File file;Uri uri;String filename;int account,tag=-1,bytes,messageId;long dialogId;boolean waiting,showing;
         StudioCodec.Preset preset;Animator pulse;Runnable cancelDownload;
         final Runnable timeout;
-        Request(BaseFragment fragment,View view){owner=new WeakReference<>(fragment);source=new WeakReference<>(view);timeout=()->{BaseFragment current=owner.get();if(current!=null&&!canceled){cancel();pending.remove(current);error(current,R.string.FlexyStudioReadError);}};if(view!=null)view.addOnAttachStateChangeListener(this);}
+        Request(BaseFragment fragment,View view){owner=new WeakReference<>(fragment);source=new WeakReference<>(view);timeout=()->{BaseFragment current=owner.get();if(current!=null&&!canceled){cancel();forget(current);error(current,R.string.FlexyStudioReadError);}};if(view!=null)view.addOnAttachStateChangeListener(this);}
         void pulse() {
             View view=source.get();if(view==null||!SharedConfig.animationsEnabled()||(Build.VERSION.SDK_INT>=26&&!ValueAnimator.areAnimatorsEnabled())||view.getScaleX()!=1f||view.getScaleY()!=1f)return;
             pulse=ObjectAnimator.ofPropertyValuesHolder(view,PropertyValuesHolder.ofFloat(View.SCALE_X,1f,.98f,1f),PropertyValuesHolder.ofFloat(View.SCALE_Y,1f,.98f,1f));pulse.setDuration(120);pulse.start();
@@ -128,22 +128,23 @@ public final class FlexyStyleInstallHelper {
                 AndroidUtilities.runOnUIThread(()->{
                     ApplicationLoader.applicationHandler.removeCallbacks(timeout);if(canceled)return;
                     BaseFragment fragment=owner.get();if(fragment==null){cancel();return;}
-                    if(ready==null){pending.remove(fragment);cancel();if(incompatible!=null)Toast.makeText(fragment.getParentActivity(),LocaleController.formatString("FlexyStudioUnsupported",R.string.FlexyStudioUnsupported,incompatible),Toast.LENGTH_LONG).show();else error(fragment,R.string.FlexyStudioInvalid);return;}
+                    if(ready==null){forget(fragment);cancel();if(incompatible!=null)Toast.makeText(fragment.getParentActivity(),LocaleController.formatString("FlexyStudioUnsupported",R.string.FlexyStudioUnsupported,incompatible),Toast.LENGTH_LONG).show();else error(fragment,R.string.FlexyStudioInvalid);return;}
                     preset=ready;filename=actual;bytes=size;show();
                 });
-            });}catch(java.util.concurrent.RejectedExecutionException busy){BaseFragment f=owner.get();if(f!=null){pending.remove(f);error(f,R.string.FlexyStudioBusy);}cancel();}
+            });}catch(java.util.concurrent.RejectedExecutionException busy){BaseFragment f=owner.get();if(f!=null){forget(f);error(f,R.string.FlexyStudioBusy);}cancel();}
         }
         void show() {
             BaseFragment fragment=owner.get();
             if(canceled||preset==null||showing||fragment==null||fragment.getParentActivity()==null||fragment.isPaused()||fragment.getFragmentView()==null||!fragment.getFragmentView().isAttachedToWindow())return;
             FlexyStudioSheet sheet=new FlexyStudioSheet(fragment,preset,filename,bytes);
-            if(fragment.showDialog(sheet,false,d->{pending.remove(fragment);cancel();})!=null){showing=true;if(pulse!=null){pulse.cancel();View v=source.get();if(v!=null){v.setScaleX(1f);v.setScaleY(1f);}}}
+            if(fragment.showDialog(sheet,false,d->{forget(fragment);cancel();})!=null){showing=true;if(pulse!=null){pulse.cancel();View v=source.get();if(v!=null){v.setScaleX(1f);v.setScaleY(1f);}}}
         }
         private void closeDescriptor(){AssetFileDescriptor fd=descriptor;descriptor=null;if(fd!=null)try{fd.close();}catch(IOException ignored){}}
+        void forget(BaseFragment fragment){if(pending.get(fragment)==this)pending.remove(fragment);}
         void cancel(){if(canceled)return;canceled=true;try{signal.cancel();}catch(RuntimeException ignored){}closeDescriptor();FlexyStudioIO.cancel(work);ApplicationLoader.applicationHandler.removeCallbacks(timeout);if(tag>=0)DownloadController.getInstance(account).removeLoadingFileObserver(this);View view=source.get();if(view!=null){view.removeOnAttachStateChangeListener(this);if(pulse!=null){pulse.cancel();view.setScaleX(1f);view.setScaleY(1f);}}preset=null;}
         public void onViewAttachedToWindow(View v){}
-        public void onViewDetachedFromWindow(View v){BaseFragment fragment=owner.get();if(fragment!=null)pending.remove(fragment);cancel();}
-        public void onFailedDownload(String name,boolean userCanceled){if(canceled)return;BaseFragment fragment=owner.get();if(fragment!=null)pending.remove(fragment);cancel();if(!userCanceled&&fragment!=null)error(fragment,R.string.FlexyStudioReadError);}
+        public void onViewDetachedFromWindow(View v){BaseFragment fragment=owner.get();if(fragment!=null)forget(fragment);cancel();}
+        public void onFailedDownload(String name,boolean userCanceled){if(canceled)return;BaseFragment fragment=owner.get();if(fragment!=null)forget(fragment);cancel();if(!userCanceled&&fragment!=null)error(fragment,R.string.FlexyStudioReadError);}
         public void onSuccessDownload(String name){read();}
         public void onProgressDownload(String name,long downloaded,long total){if(!canceled&&(downloaded>StudioSchema.MAX_BYTES||total>StudioSchema.MAX_BYTES)){if(cancelDownload!=null)cancelDownload.run();onFailedDownload(name,false);}}
         public void onProgressUpload(String name,long uploaded,long total,boolean encrypted){}
