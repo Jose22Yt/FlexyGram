@@ -5,7 +5,8 @@ import unittest
 from pathlib import Path
 from release_1270_contract import BASE,PATHS
 from music_contract import PATHS as MUSIC_PATHS
-PATHS = PATHS | MUSIC_PATHS
+from performance.contract import PATHS as PERFORMANCE_PATHS
+PATHS = PATHS | MUSIC_PATHS | PERFORMANCE_PATHS
 from bubble_parity import restore_bubble_presentation
 ROOT=Path(__file__).resolve().parents[2]
 JAVA=ROOT/'TMessagesProj/src/main/java'

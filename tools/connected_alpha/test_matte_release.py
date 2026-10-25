@@ -22,6 +22,8 @@ class MatteReleaseTests(unittest.TestCase):
         allowed.update(LOGIN_PATHS)
         from music_contract import PATHS as MUSIC_PATHS
         allowed.update(MUSIC_PATHS)
+        from performance.contract import PATHS as PERFORMANCE_PATHS
+        allowed.update(PERFORMANCE_PATHS)
         changes=subprocess.check_output(['git','diff','--name-only',BASE],cwd=ROOT,text=True).splitlines()
         self.assertTrue(set(changes)<=allowed,set(changes)-allowed)
         previous=subprocess.check_output(['git','show',BASE+':.github/workflows/connected-alpha-arm64.yml'],cwd=ROOT,text=True)

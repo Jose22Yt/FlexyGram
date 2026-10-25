@@ -10,7 +10,8 @@ def combined_paths():
  from release_1271_contract import PATHS as UI
  from login_contract import PATHS as L
  from music_contract import PATHS as M
- return UI|L|M|INTEGRATION_PATHS
+ from performance.contract import PATHS as P
+ return UI|L|M|INTEGRATION_PATHS|P
 
 def reverse_patch(path,data,filename):
  patch=(ROOT/'tools/connected_alpha'/filename).read_bytes()

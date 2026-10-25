@@ -174,6 +174,8 @@ public class HomePolicyProbe {
         allowed.update(LOGIN_PATHS)
         from music_contract import PATHS as MUSIC_PATHS
         allowed.update(MUSIC_PATHS)
+        from performance.contract import PATHS as PERFORMANCE_PATHS
+        allowed.update(PERFORMANCE_PATHS)
         changed=subprocess.check_output(['git','diff','--name-only',BASE],cwd=ROOT,text=True).splitlines()
         self.assertTrue(changed)
         self.assertEqual(set(changed)-allowed,set())

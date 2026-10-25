@@ -43,7 +43,8 @@ class SignatureMatteTests(unittest.TestCase):
         paths+=subprocess.check_output(['git','ls-files','--others','--exclude-standard'],cwd=ROOT,text=True).splitlines()
         from release_1270_contract import PATHS
         from music_contract import PATHS as MUSIC_PATHS
-        PATHS = PATHS | MUSIC_PATHS
+        from performance.contract import PATHS as PERFORMANCE_PATHS
+        PATHS = PATHS | MUSIC_PATHS | PERFORMANCE_PATHS
         paths=[p for p in paths if not p.startswith("TMessagesProj/jni/")]
         from login_contract import PATHS as LOGIN_PATHS
         self.assertTrue(set(paths)<=CANDIDATE_PATHS|PATHS|LOGIN_PATHS, set(paths)-CANDIDATE_PATHS-PATHS-LOGIN_PATHS)
