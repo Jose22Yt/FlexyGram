@@ -166,6 +166,8 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
 
         @Override
         public void setTranslationY(float translationY) {
+            // Signature owns the measured two-line block; classic subtitle animations use a title offset.
+            if (signatureActive() && this == titleTextView) translationY = 0;
             if (reference != null) {
                 SimpleTextView connected = reference.get();
                 if (connected != null) {
@@ -891,7 +893,7 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
         int x = Math.round(a.centerX() - photo / 2f), y = Math.round(a.centerY() - photo / 2f);
         avatarImageView.layout(x, y, x + photo, y + photo);
         View subtitle = getSubtitleTextView();
-        int th = titleTextView.getMeasuredHeight(), sh = !signatureHeader.subtitleFits || subtitle.getVisibility() == GONE ? 0 : subtitle.getMeasuredHeight();
+        int th = titleTextView.getMeasuredHeight(), sh = !signatureHeader.subtitleFits || subtitle.getVisibility() != VISIBLE ? 0 : subtitle.getMeasuredHeight();
         int textY = Math.round(title.centerY() - (th + sh + (sh == 0 ? 0 : dp(2))) / 2f);
         x = Math.round(title.centerX() - titleTextView.getMeasuredWidth() / 2f);
         titleTextView.layout(x, textY, x + titleTextView.getMeasuredWidth(), textY + th);

@@ -16,10 +16,12 @@ public class LauncherIconController {
         Context context = ApplicationLoader.applicationContext;
         int legacyState = context.getPackageManager().getComponentEnabledSetting(legacyPrimary(context));
         boolean legacyEnabled = legacyState == PackageManager.COMPONENT_ENABLED_STATE_ENABLED;
-        if (count == 1 && !legacyEnabled) return;
         String saved = ApplicationLoader.applicationContext.getSharedPreferences("flexy_launcher", Context.MODE_PRIVATE).getString("selected", "");
-        try { LauncherIcon remembered = LauncherIcon.valueOf(saved); active = remembered; }
+        LauncherIcon remembered = null;
+        try { remembered = LauncherIcon.valueOf(saved); }
         catch (IllegalArgumentException ignored) { }
+        if (count == 1 && !legacyEnabled && (remembered == null || active == remembered)) return;
+        if (remembered != null) active = remembered;
         try {
             applyIcon(active == null ? LauncherIcon.EXTERALESS : active, false);
         } catch (IllegalArgumentException | SecurityException rejected) {

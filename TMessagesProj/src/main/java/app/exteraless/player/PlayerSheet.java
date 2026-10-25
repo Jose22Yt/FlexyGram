@@ -328,6 +328,10 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         artistView.setSingleLine(true);
         artistView.setEllipsize(TextUtils.TruncateAt.END);
         titles.addView(artistView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 4, 0, 0));
+        if (BuildConfig.CONNECTED_ALPHA) {
+            // Equal reservation opposite the48dp favorite and its12dp margin keeps text truly centered.
+            titles.setPadding(dp(60),0,0,0);titleView.setGravity(Gravity.CENTER_HORIZONTAL);artistView.setGravity(Gravity.CENTER_HORIZONTAL);
+        }
         titleRow.addView(titles, LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1f));
         likeButton = new MorphButton(context, heartIcon);
         likeButton.setRadius(dp(24), false);
@@ -449,7 +453,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         controls.next.setContentDescription(getString(R.string.Next));
         layout.addView(controls);
 
-        group = new LinearLayout(context);
+        group = BuildConfig.CONNECTED_ALPHA ? new SignatureMusicActions(context) : new LinearLayout(context);
         group.setOrientation(LinearLayout.HORIZONTAL);
         speedButton = new MorphButton(context, PlayerIcon.stroke(PlayerIcon.SPEED, 20));
         speedButton.setRadius(dp(26), dp(8), false);
@@ -1677,11 +1681,8 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
             seekBar.measure(exactW, MeasureSpec.makeMeasureSpec(dp(40), MeasureSpec.EXACTLY));
             timeRow.measure(exactW, MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
             controls.measure(exactW, MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
-            int groupHeight = BuildConfig.CONNECTED_ALPHA ? Math.max(dp(72), (int) Math.ceil(dp(38) + 16 * getResources().getDisplayMetrics().scaledDensity)) : dp(52);
-            if (BuildConfig.CONNECTED_ALPHA) {
-                for (int i = 0; i < group.getChildCount(); i++) group.getChildAt(i).getLayoutParams().height = groupHeight;
-            }
-            group.measure(exactW, MeasureSpec.makeMeasureSpec(groupHeight, MeasureSpec.EXACTLY));
+            group.measure(exactW, BuildConfig.CONNECTED_ALPHA ? MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED)
+                    : MeasureSpec.makeMeasureSpec(dp(52), MeasureSpec.EXACTLY));
             titleRow.measure(exactW, MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
             bubble.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
             if (BuildConfig.CONNECTED_ALPHA) {

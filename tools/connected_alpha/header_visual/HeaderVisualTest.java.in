@@ -20,7 +20,7 @@ public class HeaderVisualTest {
    assertTrue("title above surface",title.getTop()>=g.title.top-.5f);
    assertTrue("status below surface",status.getBottom()<=g.title.bottom+.5f);
    assertTrue("text lines overlap",title.getBottom()<=status.getTop());
-   assertEquals(width/2f,title.getLeft()+title.getWidth()/2f,.5f);assertEquals(Math.round(header.height),bar.backButtonImageView.getHeight());
+   assertEquals(width/2f,title.getLeft()+title.getWidth()/2f,.5f);assertTrue(bar.backButtonImageView.getHeight()>=48);assertEquals(g.back.centerY(),bar.backButtonImageView.getTop()+bar.backButtonImageView.getHeight()/2f,.5f);
    assertTrue(g.back.left>=0&&g.avatar.left>=0);assertTrue(g.back.right<=width&&g.avatar.right<=width);header.detach();
   }
  }

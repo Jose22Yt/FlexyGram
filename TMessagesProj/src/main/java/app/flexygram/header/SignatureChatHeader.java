@@ -43,8 +43,8 @@ public final class SignatureChatHeader {
     public void changed() { avatar.requestLayout(); bar.requestLayout(); bar.invalidate(); }
     public int measure(int width, int status, int nativeHeight) {
         var metrics = bar.getResources().getDisplayMetrics();
-        titlePx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 17.5f, metrics);
-        subtitlePx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 13.5f, metrics);
+        titlePx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, HeaderConfig.compact() ? 16f : 17.5f, metrics);
+        subtitlePx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, HeaderConfig.compact() ? 12f : 13.5f, metrics);
         textMetrics.setTextSize(titlePx); textMetrics.getFontMetricsInt(fontMetrics);
         int titleLine = fontMetrics.descent - fontMetrics.ascent;
         textMetrics.setTextSize(subtitlePx); textMetrics.getFontMetricsInt(fontMetrics);
@@ -63,7 +63,7 @@ public final class SignatureChatHeader {
     public void measureControls() {
         if (bar.backButtonImageView == null) return;
         if (active()) {
-            bar.backButtonImageView.measure(exact(geometry.back.width()), exact(height));
+            bar.backButtonImageView.measure(exact(Math.max(AndroidUtilities.dp(48), geometry.back.width())), exact(Math.max(AndroidUtilities.dp(48), height)));
             countView.measure(exact(geometry.countVisible ? geometry.badge.width() : 0), exact(geometry.separateCount ? geometry.badge.height() : height));
         }
         countView.setVisibility(active() && geometry.countVisible ? View.VISIBLE : View.GONE);
@@ -76,7 +76,9 @@ public final class SignatureChatHeader {
             int extra = Math.round(geometry.back.width() - height);
             int pl = LocaleController.isRTL ? extra : 0, pr = LocaleController.isRTL ? 0 : extra;
             if (back.getPaddingLeft() != pl || back.getPaddingRight() != pr) back.setPadding(pl, 0, pr, 0);
-            back.layout(Math.round(geometry.back.left), Math.round(geometry.back.top), Math.round(geometry.back.right), Math.round(geometry.back.bottom));
+            int hitLeft = Math.round(geometry.back.centerX() - back.getMeasuredWidth() / 2f);
+            int hitTop = Math.round(geometry.back.centerY() - back.getMeasuredHeight() / 2f);
+            back.layout(hitLeft, hitTop, hitLeft + back.getMeasuredWidth(), hitTop + back.getMeasuredHeight());
             float x = geometry.badge.left;
             float y = geometry.separateCount ? geometry.badge.top : geometry.back.top;
             countView.layout(Math.round(x), Math.round(y), Math.round(x + countView.getMeasuredWidth()), Math.round(y + countView.getMeasuredHeight()));
