@@ -39,4 +39,23 @@ public class PerformanceNativeTest {
     }
     @Test public void detachCancelsOuterPendingFollowAndScrollCallbacks(){LyricsHarness current=new LyricsHarness(activity);BaselineLyricsHarness old=new BaselineLyricsHarness(activity);root.addView(current);root.addView(old);current.schedule();old.schedule();root.removeAllViews();org.robolectric.Shadows.shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(800));assertEquals("outer follow",0,current.followCalls);assertEquals("list scroll",0,current.scrollCalls);assertEquals(1,current.stops());assertEquals(1,old.followCalls);assertEquals(1,old.scrollCalls);}
     @Test public void lineCacheIsReleasedOnDetachAndRebuiltOnReuse()throws Exception{LyricsHarness current=new LyricsHarness(activity);current.bind("Synthetic lyric");root.addView(current);View line=current.line();Field cached=line.getClass().getDeclaredField("fillShader");cached.setAccessible(true);LyricsFill cache=(LyricsFill)cached.get(line);LinearGradient first=cache.get(1,2);root.removeView(current);assertNotSame(first,cache.get(1,2));root.addView(current);size(line,240,100);line.draw(new Canvas(Bitmap.createBitmap(240,100,Bitmap.Config.ARGB_8888)));root.removeView(current);}
+    @Test public void actualRadiusMethodsPreserveNativeClippingAcrossAvatarModes(){
+        perf.BaselineRadius before=new perf.BaselineRadius();perf.CandidateRadius after=new perf.CandidateRadius();
+        int[] request={30,18,12,4};int[] a=new int[64*64],b=new int[64*64];
+        Bitmap old=Bitmap.createBitmap(64,64,Bitmap.Config.ARGB_8888),now=Bitmap.createBitmap(64,64,Bitmap.Config.ARGB_8888);
+        for(int corners:new int[]{0,1,14,27,28})for(boolean uniform:new boolean[]{false,true})for(boolean applied:new boolean[]{false,true}){
+            app.exteraless.appearance.AppearanceConfig.corners=corners;app.exteraless.appearance.AppearanceConfig.uniform=uniform;
+            before.avatar(true,61.5f,applied);after.avatar(true,61.5f,applied);before.setRoundRadius(request);after.setRoundRadius(request);
+            assertArrayEquals(before.roundRadius,after.roundRadius);assertArrayEquals(request,after.requested());
+            old.eraseColor(0);now.eraseColor(0);
+            renderRadius(old,before.roundRadius);renderRadius(now,after.roundRadius);
+            old.getPixels(a,0,64,0,0,64,64);now.getPixels(b,0,64,0,0,64,64);assertArrayEquals(a,b);
+        }
+        app.exteraless.appearance.AppearanceConfig.corners=28;app.exteraless.appearance.AppearanceConfig.uniform=false;
+    }
+    private void renderRadius(Bitmap bitmap,int[] radii){
+        Path path=new Path();float[] r=new float[8];for(int i=0;i<4;i++)r[2*i]=r[2*i+1]=radii[i];
+        path.addRoundRect(new RectF(1,1,63,63),r,Path.Direction.CW);Canvas canvas=new Canvas(bitmap);canvas.clipPath(path);
+        Paint paint=new Paint(Paint.ANTI_ALIAS_FLAG);paint.setColor(0xff2b6cd4);canvas.drawRect(0,0,64,64,paint);
+    }
 }

@@ -19,3 +19,7 @@ def restore(path,data):
   result=subprocess.run(['git','apply','--reverse','-'],input=matches[0],cwd=temp,capture_output=True)
   if result.returncode:raise ValueError('Performance delta differs from reviewed patch: '+path)
   return target.read_bytes()
+
+# PR93 lab; no second integration of PR90 production.
+from .navigation_contract import PATHS as NAVIGATION_PATHS
+PATHS = PATHS | NAVIGATION_PATHS

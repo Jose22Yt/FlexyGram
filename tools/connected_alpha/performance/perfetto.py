@@ -18,6 +18,7 @@ data_sources { config { name: "linux.ftrace" ftrace_config {
   ftrace_events: "sched/sched_waking"
   atrace_categories: "gfx"
   atrace_categories: "view"
+  atrace_categories: "input"
   atrace_categories: "wm"
   atrace_categories: "am"
   atrace_categories: "dalvik"

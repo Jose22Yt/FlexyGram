@@ -58,3 +58,7 @@ VISUAL_PATHS = VISUAL_PATHS | HEADER_PATHS
 PATHS = PATHS | HEADER_PATHS | frozenset(["tools/connected_alpha/test_header1273.py"])
 
 PATHS = PATHS | frozenset(["tools/connected_alpha/header_visual/run.py","tools/connected_alpha/header_visual/stubs.py","tools/connected_alpha/header_visual/HeaderVisualTest.java.in"])
+
+from performance.navigation_contract import PATHS as NAVIGATION2_PATHS, PRODUCTION as NAVIGATION2_PRODUCTION
+VISUAL_PATHS = VISUAL_PATHS | NAVIGATION2_PRODUCTION
+PATHS = PATHS | NAVIGATION2_PATHS | NAVIGATION2_PRODUCTION | frozenset(["tools/connected_alpha/performance/work1_after340.patch"])
