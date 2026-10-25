@@ -8,6 +8,7 @@ from xml.etree import ElementTree as ET
 from login_parity import BASE,PATCH_PATHS,restore_login_presentation
 from measure_login import stats,frame_times
 from integration_contract import WORK1,combined_paths,reviewed_work1
+from stabilization_contract import restore1271
 ROOT=Path(__file__).resolve().parents[2]
 JAVA=ROOT/'TMessagesProj/src/main/java'
 
@@ -73,7 +74,8 @@ class SignatureLoginTests(unittest.TestCase):
   self.assertIn('getIdentifier("ic_flexy_blue", "mipmap"',identity)
   self.assertNotIn('exteraless_icon',identity)
   self.assertIn('R.drawable.msg_send',identity)
-  self.assertEqual(subprocess.check_output(['git','diff',WORK1,'--','TMessagesProj/src/main/res/mipmap*','TMessagesProj/src/main/AndroidManifest.xml'],cwd=ROOT),b'')
+  self.assertEqual(subprocess.check_output(['git','diff',WORK1,'--','TMessagesProj/src/main/res/mipmap*'],cwd=ROOT),b'')
+  path='TMessagesProj/src/main/AndroidManifest.xml';self.assertEqual(restore1271(path,(ROOT/path).read_bytes()),subprocess.check_output(['git','show',WORK1+':'+path],cwd=ROOT))
  def test_candidate_scope_and_frozen_work1_files(self):
   from login_contract import PATHS
   changes=set(subprocess.check_output(['git','diff','--name-only',BASE],cwd=ROOT,text=True).splitlines())

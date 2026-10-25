@@ -11,6 +11,8 @@ PATCH_PATHS=frozenset([
  'TMessagesProj/src/main/java/app/exteraless/updater/GitHubUpdater.java',
  'TMessagesProj/src/main/java/app/exteraless/updater/UpdaterSheet.java'])
 def restore_login_presentation(path, data):
+    from stabilization_contract import restore1271
+    data=restore1271(path,data)
     if path not in PATCH_PATHS: raise ValueError('Unreviewed login presentation path')
     patch=(ROOT/'tools/connected_alpha/login_native_presentation.patch').read_bytes()
     with tempfile.TemporaryDirectory(prefix='login-parity-') as directory:

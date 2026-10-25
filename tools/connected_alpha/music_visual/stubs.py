@@ -32,7 +32,7 @@ public static Drawable createSelectorDrawable(int c,int mask){android.graphics.d
 }''')
     put('org/telegram/messenger/BuildConfig.java','package org.telegram.messenger; public class BuildConfig {public static boolean CONNECTED_ALPHA=true;}')
     put('org/telegram/messenger/AndroidUtilities.java','''package org.telegram.messenger; public class AndroidUtilities {
-public static float density=1;public static int dp(float v){return (int)Math.ceil(density*v);} public static float dpf2(float v){return density*v;}
+public static int dp2(float v){return dp(v);}public static float density=1;public static int dp(float v){return (int)Math.ceil(density*v);} public static float dpf2(float v){return density*v;}
 public static android.graphics.Typeface bold(){return android.graphics.Typeface.create("sans-serif",1);}
 }''')
     put('org/telegram/messenger/LiteMode.java','package org.telegram.messenger; public class LiteMode {public static boolean isPowerSaverApplied(){return false;}}')
@@ -109,3 +109,14 @@ public static boolean isPlaying(MessageObject m){return true;}public interface C
     sheet=(player/'PlayerSheet.java').read_text();start=sheet.index('    private class PlayerLayout extends ViewGroup'); layout=sheet[start:sheet.rfind('\n}')]
     fixture=(Path(__file__).parent/'LayoutFixture.java.in').read_text().replace('_LAYOUT_',layout)
     put('app/exteraless/player/LayoutFixture.java',fixture)
+
+    # Extract the real context measurement contract; other chat/translation dependencies
+    # are explicit plain Views in the test, not a full Telegram chat simulation.
+    context=(root/'TMessagesProj/src/main/java/org/telegram/ui/Components/FragmentContextView.java').read_text()
+    def method(anchor):
+        a=context.index('\n    '+anchor)+5;o=context.index('{',a);n=1;b=o+1
+        while n:
+            n+=(context[b]=='{')-(context[b]=='}');b+=1
+        return context[a:b]
+    body=method('protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)')+'\n'+method('public int getStyleHeight()')
+    put('app/exteraless/player/NativeContextMeasure.java','package app.exteraless.player; import android.content.Context; import android.widget.FrameLayout; import org.telegram.messenger.AndroidUtilities; public class NativeContextMeasure extends FrameLayout { public int currentStyle;public boolean md3Music=true;private static final int STYLE_INACTIVE_GROUP_CALL=2;public NativeContextMeasure(Context c){super(c);}void updateJoinButtonWidth(int width){}'+body+'}')

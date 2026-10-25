@@ -3,10 +3,11 @@ import json,os,re,subprocess,tempfile,unittest
 from pathlib import Path
 from integration_contract import WORK1,LOGIN,MUSIC,restore_delivery,combined_paths
 from music_contract import PRODUCTION
+from stabilization_contract import restore1271
 from build_private_apk import CERT,ROOT,load_private_inputs,redact
 class IntegratedRelease(unittest.TestCase):
  def test_music_design_and_engine_sources_match_exact_approved_work2(self):
-  for path in PRODUCTION:self.assertEqual((ROOT/path).read_bytes(),subprocess.check_output(['git','show',MUSIC+':'+path],cwd=ROOT),path)
+  for path in PRODUCTION:self.assertEqual(restore1271(path,(ROOT/path).read_bytes()),subprocess.check_output(['git','show',MUSIC+':'+path],cwd=ROOT),path)
   for name in ['MediaController','MusicPlayerService','NotificationsController','UserConfig']:
    path='TMessagesProj/src/main/java/org/telegram/messenger/'+name+'.java';self.assertEqual((ROOT/path).read_bytes(),subprocess.check_output(['git','show',WORK1+':'+path],cwd=ROOT),path)
  def test_login_production_matches_approved_candidate_except_direct_delivery_copy(self):
@@ -15,12 +16,13 @@ class IntegratedRelease(unittest.TestCase):
    if path.endswith('.java') and '/src/' in path:self.assertEqual(restore_delivery(path,(ROOT/path).read_bytes()),subprocess.check_output(['git','show',LOGIN+':'+path],cwd=ROOT),path)
  def test_approved_composer_home_icons_and_session_identity_are_preserved(self):
   for prefix in ['TMessagesProj/src/main/java/app/flexygram/composer','TMessagesProj/src/main/java/app/flexygram/home','TMessagesProj/src/main/java/app/exteraless/appicons','TMessagesProj/src/main/AndroidManifest.xml','gradle.properties']:
-   self.assertEqual(subprocess.check_output(['git','diff',WORK1,'--',prefix],cwd=ROOT),b'',prefix)
+   for path in subprocess.check_output(['git','ls-tree','-r','--name-only',WORK1,'--',prefix],cwd=ROOT,text=True).splitlines():
+    self.assertEqual(restore1271(path,(ROOT/path).read_bytes()),subprocess.check_output(['git','show',WORK1+':'+path],cwd=ROOT),path)
  def test_private_direct_delivery_and_full_build_are_mandatory(self):
   workflow=(ROOT/'.github/workflows/connected-alpha-arm64.yml').read_text()
   self.assertNotIn('age --encrypt',workflow);self.assertNotIn('.tar.age',workflow)
   builder=(ROOT/'tools/connected_alpha/build_private_apk.py').read_text()
-  for required in [':TMessagesProj:assembleConnectedAlpha','verify_apk.py','--certificate-sha256',"report['elf_count']!=96",'FlexyGram_Alpha_1271_ARM64_TEST.apk','stage(env)']:self.assertIn(required,builder)
+  for required in [':TMessagesProj:assembleConnectedAlpha','verify_apk.py','--certificate-sha256',"report['elf_count']!=96",'FlexyGram_Alpha_1272_ARM64_TEST.apk','stage(env)']:self.assertIn(required,builder)
   for forbidden in ['NATIVE_TARGET=SKIP','--exclude-task','upload-artifact','age --','shutil.copy2(apks[0], ROOT']:self.assertNotIn(forbidden,builder)
   for lang in ['values','values-es','values-ru']:
    copy=(ROOT/f'TMessagesProj/src/main/res/{lang}/flexygram_login.xml').read_text();self.assertIn('APK',copy);self.assertNotIn('entrega cifrada original',copy)

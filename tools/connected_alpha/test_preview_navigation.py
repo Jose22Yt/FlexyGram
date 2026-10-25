@@ -5,6 +5,7 @@ The old checkTransitionAnimation can remove the preview before its caller choose
 which fragment to close. A second release/back then begins closing Home.
 """
 import subprocess,tempfile,unittest
+from stabilization_contract import restore1271
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
 PATH='TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java'
@@ -59,6 +60,6 @@ class PreviewNavigation(unittest.TestCase):
     file=Path(d)/'PreviewRegression.java';file.write_text(fixture(source));subprocess.run(['java','-m','jdk.compiler/com.sun.tools.javac.Main','-d',d,str(file)],check=True);subprocess.run(['java','-cp',d,'PreviewRegression',*args],check=True)
  def test_recorded_delta_preserves_the_rest_of_native_navigation(self):
   with tempfile.TemporaryDirectory() as d:
-   p=Path(d)/PATH;p.parent.mkdir(parents=True);p.write_bytes((ROOT/PATH).read_bytes())
+   p=Path(d)/PATH;p.parent.mkdir(parents=True);p.write_bytes(restore1271(PATH,(ROOT/PATH).read_bytes()))
    subprocess.run(['git','apply','--reverse','-'],cwd=d,input=(ROOT/'tools/connected_alpha/preview_navigation.patch').read_bytes(),check=True,capture_output=True)
    self.assertEqual(p.read_bytes(),subprocess.check_output(['git','show',BASE+':'+PATH],cwd=ROOT))

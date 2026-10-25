@@ -21,7 +21,11 @@ public class LauncherIconController {
         String saved = ApplicationLoader.applicationContext.getSharedPreferences("flexy_launcher", Context.MODE_PRIVATE).getString("selected", "");
         try { LauncherIcon remembered = LauncherIcon.valueOf(saved); if (count == 0 || isEnabled(remembered)) active = remembered; }
         catch (IllegalArgumentException ignored) { }
-        applyIcon(active == null ? LauncherIcon.EXTERALESS : active, false);
+        try {
+            applyIcon(active == null ? LauncherIcon.EXTERALESS : active, false);
+        } catch (IllegalArgumentException | SecurityException rejected) {
+            // Atomic migration rejected: keep the existing launcher and retry next startup.
+        }
     }
 
     public static boolean isEnabled(LauncherIcon icon) {

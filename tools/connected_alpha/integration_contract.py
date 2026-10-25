@@ -10,7 +10,8 @@ def combined_paths():
  from release_1271_contract import PATHS as UI
  from login_contract import PATHS as L
  from music_contract import PATHS as M
- return UI|L|M|INTEGRATION_PATHS
+ from stabilization_contract import PATHS as C
+ return UI|L|M|INTEGRATION_PATHS|C
 
 def reverse_patch(path,data,filename):
  patch=(ROOT/'tools/connected_alpha'/filename).read_bytes()
@@ -25,7 +26,9 @@ def reverse_patch(path,data,filename):
   if result.returncode:raise ValueError('Integrated delta differs from reviewed patch: '+str(path))
   return target.read_bytes()
 def restore_preview(path,data):return reverse_patch(path,data,'preview_navigation.patch')
-def restore_delivery(path,data):return reverse_patch(path,data,'direct_delivery.patch')
+def restore_delivery(path,data):
+ from stabilization_contract import restore1271
+ return reverse_patch(path,restore1271(path,data),'direct_delivery.patch')
 def reviewed_work1(path):
  data=restore_preview(path,restore_delivery(path,(ROOT/path).read_bytes()))
  from login_parity import PATCH_PATHS,restore_login_presentation

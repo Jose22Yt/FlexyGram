@@ -4,6 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from music_contract import BASE, PRODUCTION
+from stabilization_contract import restore1271
 from integration_contract import WORK1,combined_paths,reviewed_work1
 PATHS=combined_paths()
 ROOT=Path(__file__).resolve().parents[2]
@@ -27,7 +28,7 @@ class SignatureMusicTests(unittest.TestCase):
         self.assertTrue(set(files)<=PRODUCTION)
         with tempfile.TemporaryDirectory() as tmp:
             for path in files:
-                f=Path(tmp)/path;f.parent.mkdir(parents=True,exist_ok=True);f.write_bytes((ROOT/path).read_bytes())
+                f=Path(tmp)/path;f.parent.mkdir(parents=True,exist_ok=True);f.write_bytes(restore1271(path,(ROOT/path).read_bytes()))
             subprocess.run(['git','apply','--reverse','-'],input=patch,cwd=tmp,check=True,capture_output=True)
             for path in files:self.assertEqual((Path(tmp)/path).read_bytes(),subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT))
     def test_all_changed_production_java_parses_without_requiring_credentials(self):
