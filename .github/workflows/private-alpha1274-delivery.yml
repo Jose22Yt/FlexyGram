@@ -146,10 +146,11 @@ jobs:
           sparse-checkout: |
             .github
             tools/private_alpha1274
+            tools/connected_alpha
           persist-credentials: false
       - run: python3 -m pip install PyYAML==6.0.3
       - name: Test private delivery transport and frozen source contract
-        run: python3 -m unittest discover -s tools/private_alpha1274 -p 'test_*.py' -v
+        run: PYTHONPATH=tools/connected_alpha python3 -m unittest discover -s tools/private_alpha1274 -p 'test_*.py' -v
       - id: destination
         name: Verify unpublished destination with a harmless probe before compiling
         env:
@@ -280,7 +281,7 @@ jobs:
             echo '::error::Expected exactly one Connected Alpha APK.'
             exit 1
           fi
-          python3 tools/connected_alpha/verify_apk.py "${packages[0]}" --build-tools "$ANDROID_HOME/build-tools/36.0.0" --certificate-sha256 "$ALPHA_CERTIFICATE_SHA256" --expected-version-code 1274 > connected-alpha-verification.json
+          PYTHONPATH=tools/connected_alpha python3 "$GITHUB_WORKSPACE/delivery-control/tools/private_alpha1274/signature_verifier.py" "${packages[0]}" --build-tools "$ANDROID_HOME/build-tools/36.0.0" --certificate-sha256 "$ALPHA_CERTIFICATE_SHA256" --expected-version-code 1274 > connected-alpha-verification.json
           python3 - <<'PY'
           import json, os
           from pathlib import Path
