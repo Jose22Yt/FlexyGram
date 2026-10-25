@@ -1,0 +1,65 @@
+import android.app.Activity;
+import android.graphics.drawable.ColorDrawable;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.FrameLayout;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.Robolectric;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
+import org.robolectric.annotation.GraphicsMode;
+import static org.junit.Assert.*;
+
+@RunWith(RobolectricTestRunner.class)
+@Config(sdk=35, manifest=Config.NONE)
+@GraphicsMode(GraphicsMode.Mode.NATIVE)
+public class PreviewInputAndroidTest {
+ static class Layout {
+  boolean preview,transition;
+  boolean isInPreviewMode(){return preview;}
+  boolean isTransitionAnimationInProgress(){return transition;}
+ }
+ static class Dialogs {
+  Layout parentLayout=new Layout(); View blurredView; int updates;
+  void checkUi_mainTabsVisible(){updates++;}
+  _METHODS_
+ }
+ static void tap(FrameLayout root){
+  MotionEvent down=MotionEvent.obtain(0,0,MotionEvent.ACTION_DOWN,40,40,0);
+  MotionEvent up=MotionEvent.obtain(0,1,MotionEvent.ACTION_UP,40,40,0);
+  root.dispatchTouchEvent(down);root.dispatchTouchEvent(up);down.recycle();up.recycle();
+  org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();
+ }
+ @Test public void alphaZeroStillInterceptsAndOwnerReturnRestoresListTouch() {
+  try(var controller=Robolectric.buildActivity(Activity.class).setup()){
+   Activity a=controller.get();FrameLayout root=new FrameLayout(a);a.setContentView(root);
+   int[] listClicks={0},overlayClicks={0};
+   View list=new View(a);list.setOnClickListener(v->listClicks[0]++);
+   root.addView(list,new FrameLayout.LayoutParams(-1,-1));
+   Dialogs d=new Dialogs();d.blurredView=new View(a);
+   d.blurredView.setBackground(new ColorDrawable(0xff333333));
+   d.blurredView.setAlpha(0);d.blurredView.setOnClickListener(v->overlayClicks[0]++);
+   root.addView(d.blurredView,new FrameLayout.LayoutParams(-1,-1));
+   root.measure(View.MeasureSpec.makeMeasureSpec(200,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(300,View.MeasureSpec.EXACTLY));root.layout(0,0,200,300);
+   // Original1272 zero-frame path: child transition end absent, View remains VISIBLE.
+   tap(root);assertEquals(0,listClicks[0]);assertEquals(1,overlayClicks[0]);
+   for(int i=0;i<100;i++){
+    d.blurredView.setVisibility(View.VISIBLE);d.blurredView.setBackground(new ColorDrawable(0xff333333));
+    d.onParentBecomeFullyVisible();tap(root);
+    assertEquals(i+1,listClicks[0]);assertEquals(1,overlayClicks[0]);
+    assertEquals(View.GONE,d.blurredView.getVisibility());assertNull(d.blurredView.getBackground());
+    d.onParentBecomeFullyVisible();assertEquals(i+1,d.updates);
+   }
+  }
+ }
+ @Test public void activePreviewAndTransitionKeepTheirOwnedOverlay(){
+  try(var controller=Robolectric.buildActivity(Activity.class).setup()){
+   Dialogs d=new Dialogs();d.blurredView=new View(controller.get());
+   d.parentLayout.preview=true;d.onParentBecomeFullyVisible();assertEquals(View.VISIBLE,d.blurredView.getVisibility());
+   d.parentLayout.preview=false;d.parentLayout.transition=true;d.onParentBecomeFullyVisible();assertEquals(View.VISIBLE,d.blurredView.getVisibility());
+   d.parentLayout.transition=false;d.onParentBecomeFullyVisible();assertEquals(View.GONE,d.blurredView.getVisibility());
+   d.parentLayout=null;d.onParentBecomeFullyVisible();assertEquals(1,d.updates);
+  }
+ }
+}
