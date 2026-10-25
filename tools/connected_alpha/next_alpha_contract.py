@@ -62,3 +62,8 @@ PATHS = PATHS | frozenset(["tools/connected_alpha/header_visual/run.py","tools/c
 from performance.navigation_contract import PATHS as NAVIGATION2_PATHS, PRODUCTION as NAVIGATION2_PRODUCTION
 VISUAL_PATHS = VISUAL_PATHS | NAVIGATION2_PRODUCTION
 PATHS = PATHS | NAVIGATION2_PATHS | NAVIGATION2_PRODUCTION | frozenset(["tools/connected_alpha/performance/work1_after340.patch"])
+
+# Release metadata is reviewed separately from the immutable Alpha1272 contracts.
+RELEASE_PATHS=frozenset(['TMessagesProj/build.gradle','.github/workflows/connected-alpha-arm64.yml','tools/connected_alpha/build_private_apk.py'])
+VISUAL_PATHS = VISUAL_PATHS | RELEASE_PATHS
+PATHS = PATHS | RELEASE_PATHS | frozenset(['tools/connected_alpha/test_release1273.py'])

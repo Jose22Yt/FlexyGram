@@ -1,3 +1,16 @@
+diff --git a/TMessagesProj/build.gradle b/TMessagesProj/build.gradle
+index 6c90838da..2052bf720 100644
+--- a/TMessagesProj/build.gradle
++++ b/TMessagesProj/build.gradle
+@@ -26,7 +26,7 @@ def buildTimestamp = System.getenv('BUILD_TIMESTAMP') ?: '0'
+ def commitId = System.getenv('COMMIT_ID')
+ def shortCommit = commitId?.take(7) ?: ''
+ def verName = "${APP_VERSION_NAME}${shortCommit ? "-${shortCommit}" : ''}"
+-def verCode = 1272
++def verCode = 1273
+ 
+ def officialVer = APP_VERSION_NAME
+ def officialCode = APP_VERSION_CODE
 diff --git a/TMessagesProj/src/main/java/app/exteraless/player/ControlsRow.java b/TMessagesProj/src/main/java/app/exteraless/player/ControlsRow.java
 index 99bd0cc8a..8a1a8f64a 100644
 --- a/TMessagesProj/src/main/java/app/exteraless/player/ControlsRow.java
@@ -354,17 +367,59 @@ index 7dc236a88..ecb313e3a 100644
      protected void onDetachedFromWindow() {
          removeCallbacks(waveFrame);
 diff --git a/TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraAppearanceActivity.java b/TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraAppearanceActivity.java
-index 02dc4bddf..ae8f61b03 100644
+index 02dc4bddf..db0f0981e 100644
 --- a/TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraAppearanceActivity.java
 +++ b/TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraAppearanceActivity.java
-@@ -231,7 +231,7 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
-         iosGroupRow = addRow("iosStyles");
-         if (iosExpanded) {
-             iosNavBarRow = addRow("iosNavBar");
--            iosChatHeaderRow = addRow("iosChatHeader");
-+            iosChatHeaderRow = org.telegram.messenger.BuildConfig.CONNECTED_ALPHA ? -1 : addRow("iosChatHeader");
-         } else {
-             iosNavBarRow = iosChatHeaderRow = -1;
+@@ -629,6 +629,10 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
+             rebuildAllAndSelf(view, enable);
+             return;
+         } else if (position == iosChatHeaderRow) {
++            if (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) {
++                presentFragment(new app.flexygram.header.HeaderSettingsActivity());
++                return;
++            }
+             AppearanceConfig.iosChatHeader.setConfigBool(!AppearanceConfig.iosChatHeader.Bool());
+             rebuildAllAndSelf(view, AppearanceConfig.iosChatHeader.Bool());
+             return;
+@@ -996,7 +1000,9 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
+                 }
+                 case TYPE_SETTINGS: {
+                     TextSettingsCell cell = (TextSettingsCell) holder.itemView;
+-                    if (position == dividerStyleRow) {
++                    if (position == iosChatHeaderRow) {
++                        cell.setTextAndValue(getString(R.string.OEAppearanceIosChatHeader), "", false);
++                    } else if (position == dividerStyleRow) {
+                         String[] v = {getString(R.string.OEAppearanceDividerHidden), getString(R.string.OEAppearanceDividerLine), getString(R.string.OEAppearanceDividerSegments)};
+                         cell.setTextAndValue(getString(R.string.OEAppearanceDividerStyle), v[clamp(AppearanceConfig.dividerStyle.Int(), v.length)], false);
+                     } else if (position == glassOutlineRow) {
+@@ -1111,6 +1117,8 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
+                 return TYPE_DETAIL_SETTINGS;
+             } else if (position == md3GroupRow || position == iosGroupRow) {
+                 return TYPE_EXPANDABLE_SWITCH;
++            } else if (position == iosChatHeaderRow && org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) {
++                return TYPE_SETTINGS;
+             } else if (position == md3LoadingRow || position == md3SliderRow
+                     || position == md3SwitchRow || position == md3ChatHeaderRow
+                     || position == md3NavBarRow || position == md3ListItemsRow
+@@ -1178,7 +1186,8 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
+     private int iosSelectedCount() {
+         int n = 0;
+         if (AppearanceConfig.iosNavigationBarStyle.Bool()) n++;
+-        if (AppearanceConfig.iosChatHeader.Bool()) n++;
++        if (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA
++                ? app.flexygram.header.HeaderConfig.signature() : AppearanceConfig.iosChatHeader.Bool()) n++;
+         return n;
+     }
+ 
+@@ -1186,6 +1195,9 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
+         boolean enable = iosSelectedCount() == 0;
+         AppearanceConfig.iosNavigationBarStyle.setConfigBool(enable);
+         AppearanceConfig.iosChatHeader.setConfigBool(enable);
++        if (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) {
++            app.flexygram.header.HeaderConfig.style(enable);
++        }
+         if (enable) {
+             AppearanceConfig.newNavigationBarStyle.setConfigBool(false);
          }
 diff --git a/TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraChatsActivity.java b/TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraChatsActivity.java
 index 78691450c..09e8108ab 100644

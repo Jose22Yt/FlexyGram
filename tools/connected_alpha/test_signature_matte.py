@@ -74,7 +74,9 @@ class SignatureMatteTests(unittest.TestCase):
             self.assertIn('class ListAdapter extends MatteListAdapter',after)
 
     def test_groups_use_independent_existing_preferences_and_order(self):
-        s=(JAVA/'app/exteraless/settings/OpenExteraAppearanceActivity.java').read_text()
+        from next_alpha_contract import restore_visual
+        path='TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraAppearanceActivity.java'
+        s=restore_visual(path,(ROOT/path).read_bytes()).decode()
         rows=body(s,'protected void updateRows()')
         ordered=['avatarsHeaderRow =','chatListHeaderRow =','foldersHeaderRow =','iconsHeaderRow =',
                  'linksHeaderRow =','appearanceHeaderRow =','md3HeaderRow =','iosHeaderRow =',

@@ -31,3 +31,19 @@ class HeaderTests(unittest.TestCase):
    strings={n.get('name'):n.text for n in ET.parse(ROOT/'TMessagesProj/src/main/res'/locale/'flexygram_header.xml').getroot()};self.assertTrue(all(strings.values()));keys=set(strings)if keys is None else keys;self.assertEqual(set(strings),keys)
   hub=(ROOT/'TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraChatsActivity.java').read_text();self.assertIn('new app.flexygram.header.HeaderSettingsActivity()',hub)
   settings=(ROOT/(HEADER+'HeaderSettingsActivity.java')).read_text();self.assertIn('FlexySignatureSlider',settings);self.assertNotIn('rebuild',settings);self.assertNotIn('recreate',settings)
+
+ def test_appearance_routes_to_one_header_selector_and_master_tracks_actual_style(self):
+  from test_signature_matte import body
+  s=(ROOT/'TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraAppearanceActivity.java').read_text()
+  click=body(s,'protected void onItemClick(')
+  branch=click[click.index('position == iosChatHeaderRow'):click.index('position == dividerStyleRow')]
+  self.assertIn('BuildConfig.CONNECTED_ALPHA',branch)
+  self.assertIn('presentFragment(new app.flexygram.header.HeaderSettingsActivity())',branch)
+  self.assertIn('AppearanceConfig.iosChatHeader.setConfigBool',branch)
+  self.assertIn('HeaderConfig.signature()',body(s,'private int iosSelectedCount('))
+  master=body(s,'private void toggleAllIosStyles(')
+  self.assertIn('HeaderConfig.style(enable)',master)
+  self.assertIn('AppearanceConfig.iosChatHeader.setConfigBool(enable)',master)
+  self.assertIn('BuildConfig.CONNECTED_ALPHA',master)
+  self.assertIn('iosChatHeaderRow = addRow("iosChatHeader")',body(s,'protected void updateRows()'))
+  self.assertIn('position == iosChatHeaderRow && org.telegram.messenger.BuildConfig.CONNECTED_ALPHA',s)

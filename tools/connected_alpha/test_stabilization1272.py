@@ -38,6 +38,7 @@ class Stabilization1272(unittest.TestCase):
   with tempfile.TemporaryDirectory()as d:
    p=Path(d)/'BackEndProbe.java';p.write_text(fixture);subprocess.run(['java','-m','jdk.compiler/com.sun.tools.javac.Main','-d',d,str(p)],check=True);subprocess.run(['java','-cp',d,'BackEndProbe'],check=True)
  def test_current_release_version_increases_without_changing_package(self):
-  source=(ROOT/'TMessagesProj/build.gradle').read_text();before=subprocess.check_output(['git','show',BASE+':TMessagesProj/build.gradle'],cwd=ROOT,text=True)
+  from next_alpha_contract import restore1272
+  source=restore1272('TMessagesProj/build.gradle',(ROOT/'TMessagesProj/build.gradle').read_bytes()).decode();before=subprocess.check_output(['git','show',BASE+':TMessagesProj/build.gradle'],cwd=ROOT,text=True)
   new=int(re.search(r'def verCode = (\d+)',source)[1]);old=int(re.search(r'def verCode = (\d+)',before)[1]);self.assertEqual(new,1272);self.assertGreater(new,old)
   self.assertEqual((ROOT/'gradle.properties').read_bytes(),subprocess.check_output(['git','show',BASE+':gradle.properties'],cwd=ROOT))

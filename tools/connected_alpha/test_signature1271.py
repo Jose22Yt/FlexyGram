@@ -21,8 +21,9 @@ class Signature1271(unittest.TestCase):
    files=subprocess.check_output(['git','ls-tree','-r','--name-only',WORK1,'--',prefix],cwd=ROOT,text=True).splitlines()
    for file in files:self.assertEqual(reviewed_work1(file),subprocess.check_output(['git','show',WORK1+':'+file],cwd=ROOT),file)
   self.assertEqual(subprocess.check_output(['git','diff',BASE,'--','TMessagesProj/jni','TMessagesProj/chaquopy'],cwd=ROOT),b'')
-  self.assertIn('def verCode = 1272',(ROOT/'TMessagesProj/build.gradle').read_text())
-  workflow=(ROOT/'.github/workflows/connected-alpha-arm64.yml').read_text()
+  from next_alpha_contract import restore1272
+  self.assertIn('def verCode = 1272',restore1272('TMessagesProj/build.gradle',(ROOT/'TMessagesProj/build.gradle').read_bytes()).decode())
+  workflow=restore1272('.github/workflows/connected-alpha-arm64.yml',(ROOT/'.github/workflows/connected-alpha-arm64.yml').read_bytes()).decode()
   for s in ['--expected-version-code 1272','Keep direct APK delivery private',':TMessagesProj:assembleConnectedAlpha']:self.assertIn(s,workflow)
  def test_one_fill_control_no_wallpaper_callback_or_graphics_allocations_in_drawing(self):
   from next_alpha_contract import restore_visual

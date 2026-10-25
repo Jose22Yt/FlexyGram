@@ -1,7 +1,47 @@
+diff --git a/.github/workflows/connected-alpha-arm64.yml b/.github/workflows/connected-alpha-arm64.yml
+index 3fb0701ea..6731292d7 100644
+--- a/.github/workflows/connected-alpha-arm64.yml
++++ b/.github/workflows/connected-alpha-arm64.yml
+@@ -73,7 +73,7 @@ jobs:
+       - name: Retain isolated native bubble graphics (not full app screenshots)
+         uses: actions/upload-artifact@v4
+         with:
+-          name: FlexyGram-Alpha1272-native-bubble-probe
++          name: FlexyGram-Alpha1273-native-bubble-probe
+           path: |
+             build/connected-alpha-bubble-visual/android-native-bubbles.png
+             build/connected-alpha-bubble-visual/android-signature-icons.png
+@@ -249,7 +249,7 @@ jobs:
+             echo '::error::Expected exactly one Connected Alpha APK.'
+             exit 1
+           fi
+-          python3 tools/connected_alpha/verify_apk.py "${packages[0]}" --build-tools "$ANDROID_HOME/build-tools/36.0.0" --certificate-sha256 "$ALPHA_CERTIFICATE_SHA256" --expected-version-code 1272 > connected-alpha-verification.json
++          python3 tools/connected_alpha/verify_apk.py "${packages[0]}" --build-tools "$ANDROID_HOME/build-tools/36.0.0" --certificate-sha256 "$ALPHA_CERTIFICATE_SHA256" --expected-version-code 1273 > connected-alpha-verification.json
+           python3 - <<'PY'
+           import json, os
+           from pathlib import Path
 diff --git a/.github/workflows/pr.yml b/.github/workflows/pr.yml
-index e24190450..e81825b0a 100644
+index e24190450..b2a63b900 100644
 --- a/.github/workflows/pr.yml
 +++ b/.github/workflows/pr.yml
+@@ -3,7 +3,7 @@ name: Pull request
+ on:
+   # Registered workflow ID 388683996: support entry point for the same native jobs.
+   push:
+-    branches: [support/connected-alpha-ci-20261022, integration/connected-alpha-unified, integration/connected-alpha-javac-fix, integration/connected-alpha-2-compact, fix/alpha2-compact-trailing-action, fix/alpha2-signature-personalization, fix/alpha2-ios-composer-refinement, fix/alpha2-iphone-reference-port, fix/alpha2-approved-composer-integrated-ui, fix/alpha2-signature-matte-build, fix/alpha-ios-bubbles-glass-home2, feat/alpha1271-signature-ui]
++    branches: [support/connected-alpha-ci-20261022, integration/connected-alpha-unified, integration/connected-alpha-javac-fix, integration/connected-alpha-2-compact, fix/alpha2-compact-trailing-action, fix/alpha2-signature-personalization, fix/alpha2-ios-composer-refinement, fix/alpha2-iphone-reference-port, fix/alpha2-approved-composer-integrated-ui, fix/alpha2-signature-matte-build, fix/alpha-ios-bubbles-glass-home2, feat/alpha1271-signature-ui, integration/connected-alpha-1273-signature]
+     paths:
+       - '.github/workflows/connected-alpha-arm64.yml'
+       - '.github/workflows/pr.yml'
+@@ -33,7 +33,7 @@ permissions:
+ 
+ jobs:
+   connected-alpha-native:
+-    if: github.event_name == 'push' && (github.ref == 'refs/heads/support/connected-alpha-ci-20261022' || github.ref == 'refs/heads/integration/connected-alpha-unified' || github.ref == 'refs/heads/integration/connected-alpha-javac-fix' || github.ref == 'refs/heads/integration/connected-alpha-2-compact' || github.ref == 'refs/heads/fix/alpha2-compact-trailing-action' || github.ref == 'refs/heads/fix/alpha2-signature-personalization' || github.ref == 'refs/heads/fix/alpha2-ios-composer-refinement' || github.ref == 'refs/heads/fix/alpha2-iphone-reference-port' || github.ref == 'refs/heads/fix/alpha2-approved-composer-integrated-ui' || github.ref == 'refs/heads/fix/alpha2-signature-matte-build' || github.ref == 'refs/heads/fix/alpha-ios-bubbles-glass-home2' || github.ref == 'refs/heads/feat/alpha1271-signature-ui')
++    if: github.event_name == 'push' && (github.ref == 'refs/heads/support/connected-alpha-ci-20261022' || github.ref == 'refs/heads/integration/connected-alpha-unified' || github.ref == 'refs/heads/integration/connected-alpha-javac-fix' || github.ref == 'refs/heads/integration/connected-alpha-2-compact' || github.ref == 'refs/heads/fix/alpha2-compact-trailing-action' || github.ref == 'refs/heads/fix/alpha2-signature-personalization' || github.ref == 'refs/heads/fix/alpha2-ios-composer-refinement' || github.ref == 'refs/heads/fix/alpha2-iphone-reference-port' || github.ref == 'refs/heads/fix/alpha2-approved-composer-integrated-ui' || github.ref == 'refs/heads/fix/alpha2-signature-matte-build' || github.ref == 'refs/heads/fix/alpha-ios-bubbles-glass-home2' || github.ref == 'refs/heads/feat/alpha1271-signature-ui' || github.ref == 'refs/heads/integration/connected-alpha-1273-signature')
+     uses: ./.github/workflows/connected-alpha-arm64.yml
+     secrets:
+       TELEGRAM_APP_ID: ${{ secrets.TELEGRAM_APP_ID }}
 @@ -72,10 +72,26 @@ jobs:
            for probe in bubble_visual matte_visual composer_visual home_visual login_visual music_visual; do
              python3 "tools/connected_alpha/$probe/run.py" --sdk-root "$ANDROID_HOME"
@@ -30,6 +70,19 @@ index e24190450..e81825b0a 100644
      name: Gradle Build
      runs-on: ubuntu-latest
      env:
+diff --git a/TMessagesProj/build.gradle b/TMessagesProj/build.gradle
+index 6c90838da..2052bf720 100644
+--- a/TMessagesProj/build.gradle
++++ b/TMessagesProj/build.gradle
+@@ -26,7 +26,7 @@ def buildTimestamp = System.getenv('BUILD_TIMESTAMP') ?: '0'
+ def commitId = System.getenv('COMMIT_ID')
+ def shortCommit = commitId?.take(7) ?: ''
+ def verName = "${APP_VERSION_NAME}${shortCommit ? "-${shortCommit}" : ''}"
+-def verCode = 1272
++def verCode = 1273
+ 
+ def officialVer = APP_VERSION_NAME
+ def officialCode = APP_VERSION_CODE
 diff --git a/TMessagesProj/src/main/java/app/exteraless/player/ControlsRow.java b/TMessagesProj/src/main/java/app/exteraless/player/ControlsRow.java
 index 99bd0cc8a..8a1a8f64a 100644
 --- a/TMessagesProj/src/main/java/app/exteraless/player/ControlsRow.java
@@ -491,17 +544,59 @@ index 7dc236a88..ecb313e3a 100644
      protected void onDetachedFromWindow() {
          removeCallbacks(waveFrame);
 diff --git a/TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraAppearanceActivity.java b/TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraAppearanceActivity.java
-index 02dc4bddf..ae8f61b03 100644
+index 02dc4bddf..db0f0981e 100644
 --- a/TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraAppearanceActivity.java
 +++ b/TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraAppearanceActivity.java
-@@ -231,7 +231,7 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
-         iosGroupRow = addRow("iosStyles");
-         if (iosExpanded) {
-             iosNavBarRow = addRow("iosNavBar");
--            iosChatHeaderRow = addRow("iosChatHeader");
-+            iosChatHeaderRow = org.telegram.messenger.BuildConfig.CONNECTED_ALPHA ? -1 : addRow("iosChatHeader");
-         } else {
-             iosNavBarRow = iosChatHeaderRow = -1;
+@@ -629,6 +629,10 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
+             rebuildAllAndSelf(view, enable);
+             return;
+         } else if (position == iosChatHeaderRow) {
++            if (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) {
++                presentFragment(new app.flexygram.header.HeaderSettingsActivity());
++                return;
++            }
+             AppearanceConfig.iosChatHeader.setConfigBool(!AppearanceConfig.iosChatHeader.Bool());
+             rebuildAllAndSelf(view, AppearanceConfig.iosChatHeader.Bool());
+             return;
+@@ -996,7 +1000,9 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
+                 }
+                 case TYPE_SETTINGS: {
+                     TextSettingsCell cell = (TextSettingsCell) holder.itemView;
+-                    if (position == dividerStyleRow) {
++                    if (position == iosChatHeaderRow) {
++                        cell.setTextAndValue(getString(R.string.OEAppearanceIosChatHeader), "", false);
++                    } else if (position == dividerStyleRow) {
+                         String[] v = {getString(R.string.OEAppearanceDividerHidden), getString(R.string.OEAppearanceDividerLine), getString(R.string.OEAppearanceDividerSegments)};
+                         cell.setTextAndValue(getString(R.string.OEAppearanceDividerStyle), v[clamp(AppearanceConfig.dividerStyle.Int(), v.length)], false);
+                     } else if (position == glassOutlineRow) {
+@@ -1111,6 +1117,8 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
+                 return TYPE_DETAIL_SETTINGS;
+             } else if (position == md3GroupRow || position == iosGroupRow) {
+                 return TYPE_EXPANDABLE_SWITCH;
++            } else if (position == iosChatHeaderRow && org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) {
++                return TYPE_SETTINGS;
+             } else if (position == md3LoadingRow || position == md3SliderRow
+                     || position == md3SwitchRow || position == md3ChatHeaderRow
+                     || position == md3NavBarRow || position == md3ListItemsRow
+@@ -1178,7 +1186,8 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
+     private int iosSelectedCount() {
+         int n = 0;
+         if (AppearanceConfig.iosNavigationBarStyle.Bool()) n++;
+-        if (AppearanceConfig.iosChatHeader.Bool()) n++;
++        if (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA
++                ? app.flexygram.header.HeaderConfig.signature() : AppearanceConfig.iosChatHeader.Bool()) n++;
+         return n;
+     }
+ 
+@@ -1186,6 +1195,9 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
+         boolean enable = iosSelectedCount() == 0;
+         AppearanceConfig.iosNavigationBarStyle.setConfigBool(enable);
+         AppearanceConfig.iosChatHeader.setConfigBool(enable);
++        if (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) {
++            app.flexygram.header.HeaderConfig.style(enable);
++        }
+         if (enable) {
+             AppearanceConfig.newNavigationBarStyle.setConfigBool(false);
          }
 diff --git a/TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraChatsActivity.java b/TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraChatsActivity.java
 index 25d865b63..09e8108ab 100644
@@ -2416,3 +2511,25 @@ index 9b45e29f1..e1552c299 100644
 +    <string name="FlexyMusicPlayingFrom">Playing from</string>
 +    <string name="FlexyMusicMyMusic">My music</string>
  </resources>
+diff --git a/tools/connected_alpha/build_private_apk.py b/tools/connected_alpha/build_private_apk.py
+index 37c75002d..300dc2a5a 100644
+--- a/tools/connected_alpha/build_private_apk.py
++++ b/tools/connected_alpha/build_private_apk.py
+@@ -46,14 +46,14 @@ def main():
+    if proc.wait()!=0:raise RuntimeError('Full Android build failed; inspect the redacted build log')
+   apks=list((ROOT/'TMessagesProj/build/outputs/apk/connectedAlpha').rglob('*.apk'))
+   if len(apks)!=1:raise ValueError('Expected exactly one full Connected Alpha APK')
+-  name='FlexyGram_Alpha_1272_ARM64_TEST.apk';target=out/name
+-  result=subprocess.run([sys.executable,str(ROOT/'tools/connected_alpha/verify_apk.py'),str(apks[0]),'--build-tools',str(sdk/'build-tools/36.0.0'),'--certificate-sha256',CERT,'--expected-version-code','1272'],cwd=ROOT,env=env,check=True,capture_output=True,text=True)
++  name='FlexyGram_Alpha_1273_ARM64_TEST.apk';target=out/name
++  result=subprocess.run([sys.executable,str(ROOT/'tools/connected_alpha/verify_apk.py'),str(apks[0]),'--build-tools',str(sdk/'build-tools/36.0.0'),'--certificate-sha256',CERT,'--expected-version-code','1273'],cwd=ROOT,env=env,check=True,capture_output=True,text=True)
+   report=json.loads(result.stdout)
+   if report['application_id']!=APP or report['elf_count']!=96:raise ValueError('Full native APK identity/integrity mismatch')
+   shutil.copy2(apks[0],target);target.chmod(0o600)
+   if hashlib.sha256(target.read_bytes()).hexdigest()!=report['sha256']:raise ValueError('Final handoff copy mismatch')
+   report.update(commit=commit,delivery='PRIVATE_DIRECT_SIGNED_APK',filename=name,physical_install_update='NOT_TESTED',preview_physical_freeze='PENDING_OWNER_TEST',exteraless_performance_comparison='NOT_ESTABLISHED')
+-  (out/'FlexyGram_Alpha_1272_verificacion.json').write_text(json.dumps(report,indent=2)+'\n')
++  (out/'FlexyGram_Alpha_1273_verificacion.json').write_text(json.dumps(report,indent=2)+'\n')
+   print(json.dumps({k:report[k]for k in ['filename','sha256','certificate_sha256','application_id','version_code','elf_count','commit']},indent=2))
+  finally:
+   criteria.write_bytes(original)
