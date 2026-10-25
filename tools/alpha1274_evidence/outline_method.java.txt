@@ -1,0 +1,22 @@
+
+ @Test public void newContourModesRemainIndependentFromCachedWallpaperAndDisableReallyRemovesStroke()throws Exception{
+  java.lang.reflect.Field field=MessageDrawable.class.getDeclaredField("flexyBorderPaint");field.setAccessible(true);
+  Bitmap sheet=Bitmap.createBitmap(720,480,Bitmap.Config.ARGB_8888);Canvas result=new Canvas(sheet);
+  int[] palette={0xff2255aa,0xff8833bb,0xff228844};
+  try{
+   for(int theme=0;theme<2;theme++)for(int style=0;style<2;style++)for(int index=0;index<3;index++){
+    int base=palette[index];Theme.dark=theme==1;BubbleConfig.setOutlineEnabled(true);BubbleConfig.setOutlineStyle(style);BubbleConfig.setPearlIntensity(55);BubbleConfig.setTransparency(100);BubbleConfig.setBackgroundBlur(false);
+    MessageDrawable message=new MessageDrawable(MessageDrawable.TYPE_TEXT,true,false,k->k==Theme.key_chat_outBubble?base:0);
+    message.setBounds(10,16,226,96);message.setTop(0,240,120,false,false);MessageDrawable.PathDrawParams cache=new MessageDrawable.PathDrawParams();
+    Bitmap cell=Bitmap.createBitmap(240,120,Bitmap.Config.ARGB_8888);message.drawCached(new Canvas(cell),cache);
+    int without=((Paint)field.get(message)).getColor();float[] geometry=message.makePath(cache).approximate(.1f);
+    BubbleConfig.setBackgroundBlur(true);
+    message.setFlexyGlassSource((canvas,path)->{int n=canvas.save();canvas.clipPath(path);canvas.drawColor(0xff565146);canvas.restoreToCount(n);return true;});
+    message.drawCached(new Canvas(cell),cache);assertEquals(without,((Paint)field.get(message)).getColor());assertArrayEquals(geometry,message.makePath(cache).approximate(.1f),0f);
+    BubbleConfig.setOutlineEnabled(false);BubbleConfig.load();assertFalse(BubbleConfig.outlineEnabled());BubbleConfig.setBackgroundBlur(false);cell.eraseColor(0);message.drawCached(new Canvas(cell),cache);
+    for(int y=0;y<120;y++)for(int x=0;x<240;x++)assertEquals("disabled contour still draws",0,Color.alpha(cell.getPixel(x,y)));
+    BubbleConfig.setOutlineEnabled(true);BubbleConfig.setTransparency(35);int n=result.save();result.translate(index*240,(theme*2+style)*120);result.clipRect(0,0,240,120);result.drawColor(theme==1?0xff14171b:0xfff4f1ec);message.drawCached(result,cache);result.restoreToCount(n);
+   }
+   try(java.io.FileOutputStream output=new java.io.FileOutputStream(System.getProperty("probe.root")+"/alpha1274-native-contours.png")){assertTrue(sheet.compress(Bitmap.CompressFormat.PNG,100,output));}
+  }finally{BubbleConfig.setOutlineEnabled(true);BubbleConfig.setOutlineStyle(0);BubbleConfig.setBackgroundBlur(false);BubbleConfig.setTransparency(35);BubbleConfig.load();}
+ }

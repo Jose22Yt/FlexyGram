@@ -1,0 +1,52 @@
+name: Alpha1274 supplemental native renderer evidence
+on:
+  push:
+    branches: [evidence/alpha1274-renderer]
+permissions:
+  contents: read
+jobs:
+  renderer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 8d4fe2f0a7d47e05a34c2a2c7fc8c706ed781881
+          path: approved
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          path: control
+          sparse-checkout: tools/alpha1274_evidence
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: 'build-tools;36.0.0 platforms;android-37.0'
+      - run: python3 control/tools/alpha1274_evidence/prepare.py approved
+      - name: Verify frozen application tree and run additional native graphics checks
+        working-directory: approved
+        run: |
+          git diff --exit-code -- TMessagesProj
+          for probe in bubble_visual header_visual music_visual; do
+            python3 "tools/connected_alpha/$probe/run.py" --sdk-root "$ANDROID_HOME"
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Alpha1274-supplemental-synthetic-renderers
+          path: |
+            approved/build/connected-alpha-bubble-visual/alpha1274-native-contours.png
+            approved/build/connected-alpha-bubble-visual/target/surefire-reports/*.xml
+            approved/build/connected-alpha-header-visual/signature-header-synthetic.png
+            approved/build/connected-alpha-header-visual/target/surefire-reports/*.xml
+            approved/build/connected-alpha-music-visual/android-music-isolated.png
+            approved/build/connected-alpha-music-visual/target/surefire-reports/*.xml
+          retention-days: 7
+          if-no-files-found: error
