@@ -34,7 +34,7 @@ class BubbleReleaseTests(unittest.TestCase):
  def test_glass_uses_native_path_shared_wallpaper_and_restores_shared_drawable(self):
   m=read1270('TMessagesProj/src/main/java/org/telegram/ui/ActionBar/MessageDrawable.java')
   cell=(JAVA/'org/telegram/ui/Cells/ChatMessageCell.java').read_text()
-  chat=(JAVA/'org/telegram/ui/ChatActivity.java').read_text()
+  chat=read1270('TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java')
   self.assertIn('finally { drawable.setFlexyGlassSource(null); }',cell)
   self.assertIn('p.setAlpha(originalAlpha)',m)
   self.assertIn('navbarContentSourceWallpaper.draw(canvas',chat)

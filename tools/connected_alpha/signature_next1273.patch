@@ -1,9 +1,12 @@
 diff --git a/.github/workflows/pr.yml b/.github/workflows/pr.yml
-index e24190450..420fcf990 100644
+index e24190450..fbea8825d 100644
 --- a/.github/workflows/pr.yml
 +++ b/.github/workflows/pr.yml
-@@ -74,6 +74,16 @@ jobs:
+@@ -72,8 +72,19 @@ jobs:
+           for probe in bubble_visual matte_visual composer_visual home_visual login_visual music_visual; do
+             python3 "tools/connected_alpha/$probe/run.py" --sdk-root "$ANDROID_HOME"
            done
++          python3 tools/connected_alpha/performance/native/run.py --sdk-root "$ANDROID_HOME"
            python3 tools/connected_alpha/music_visual/reproduce_detach.py --sdk-root "$ANDROID_HOME"
            python3 tools/connected_alpha/preview_visual/run.py --sdk-root "$ANDROID_HOME"
 +      - name: Retain synthetic renderer evidence (no owner screenshots or APK)
@@ -19,6 +22,111 @@ index e24190450..420fcf990 100644
    build:
      if: github.event_name == 'pull_request' && github.head_ref != 'feat/alpha1271-signature-ui' && github.head_ref != 'feat/signature-native-login' && github.head_ref != 'feat/signature-music2' && github.head_ref != 'fix/alpha-ios-bubbles-glass-home2' && github.head_ref != 'fix/signature-matte-general-appearance' && github.head_ref != 'alpha/connected-exteraless-baseline' && !startsWith(github.head_ref, 'support/connected-alpha-ci-') && !startsWith(github.head_ref, 'integration/connected-alpha-') && !startsWith(github.head_ref, 'fix/alpha2-')
      name: Gradle Build
+diff --git a/TMessagesProj/src/main/java/app/exteraless/player/LyricsFill.java b/TMessagesProj/src/main/java/app/exteraless/player/LyricsFill.java
+new file mode 100644
+index 000000000..73c69128b
+--- /dev/null
++++ b/TMessagesProj/src/main/java/app/exteraless/player/LyricsFill.java
+@@ -0,0 +1,24 @@
++package app.exteraless.player;
++
++import android.graphics.LinearGradient;
++import android.graphics.Shader;
++
++/** One shader per visible/recycled lyric line. Geometry stays in the caller's matrix. */
++final class LyricsFill {
++    private LinearGradient shader;
++    private int filled;
++    private int unfilled;
++
++    LinearGradient get(int filledColor, int unfilledColor) {
++        if (shader == null || filled != filledColor || unfilled != unfilledColor) {
++            filled = filledColor;
++            unfilled = unfilledColor;
++            shader = new LinearGradient(0, 0, 0, 1, filled, unfilled, Shader.TileMode.CLAMP);
++        }
++        return shader;
++    }
++
++    void clear() {
++        shader = null;
++    }
++}
+diff --git a/TMessagesProj/src/main/java/app/exteraless/player/LyricsView.java b/TMessagesProj/src/main/java/app/exteraless/player/LyricsView.java
+index 39c637492..bd85bb750 100644
+--- a/TMessagesProj/src/main/java/app/exteraless/player/LyricsView.java
++++ b/TMessagesProj/src/main/java/app/exteraless/player/LyricsView.java
+@@ -86,6 +86,8 @@ public class LyricsView extends FrameLayout {
+         scrollToActive(true);
+     };
+ 
++    private final Runnable scrollToCurrent = () -> scrollToActive(false);
++
+     private static final long FOLLOW_RESUME_MS = 750;
+     private static final int MAX_BLUR_DISTANCE = 4;
+     private static final float BLUR_PER_LINE_DP = 1.25f;
+@@ -257,7 +259,8 @@ public class LyricsView extends FrameLayout {
+         userScrollAt = 0;
+         applyPadding();
+         adapter.notifyDataSetChanged();
+-        list.post(() -> scrollToActive(false));
++        removeCallbacks(scrollToCurrent);
++        post(scrollToCurrent);
+     }
+ 
+     public void setPosition(long ms) {
+@@ -395,10 +398,19 @@ public class LyricsView extends FrameLayout {
+         bottomFade = new LinearGradient(0, h - dp(40), 0, h, 0x00000000, 0xff000000, Shader.TileMode.CLAMP);
+         if (h != oldh) {
+             applyPadding();
+-            list.post(() -> scrollToActive(false));
++            removeCallbacks(scrollToCurrent);
++            post(scrollToCurrent);
+         }
+     }
+ 
++    @Override
++    protected void onDetachedFromWindow() {
++        list.stopScroll();
++        removeCallbacks(resumeFollow);
++        removeCallbacks(scrollToCurrent);
++        super.onDetachedFromWindow();
++    }
++
+     private class Adapter extends RecyclerListView.SelectionAdapter {
+ 
+         @Override
+@@ -445,6 +457,7 @@ public class LyricsView extends FrameLayout {
+         private final TextPaint paint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+         private final Paint dotPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+         private final Matrix fillMatrix = new Matrix();
++        private final LyricsFill fillShader = new LyricsFill();
+         private final Spring opacity = new Spring(OPACITY_FUTURE, 260f, 1f, 0.004f);
+         private final Spring scale = new Spring(1f, 320f, 0.75f, 0.0005f);
+         private int index = -1;
+@@ -569,7 +582,7 @@ public class LyricsView extends FrameLayout {
+                 int filled = ColorUtils.setAlphaComponent(colorActive, (int) (alpha * baseAlpha));
+                 int unfilled = ColorUtils.setAlphaComponent(colorActive, (int) (alpha * baseAlpha * UNFILLED_ALPHA));
+                 float height = layout.getHeight();
+-                LinearGradient fill = new LinearGradient(0, 0, 0, 1, filled, unfilled, Shader.TileMode.CLAMP);
++                LinearGradient fill = fillShader.get(filled, unfilled);
+                 fillMatrix.setScale(1f, Math.max(1f, height * 0.2f));
+                 fillMatrix.postTranslate(0, (progress * 1.2f - 0.2f) * height);
+                 fill.setLocalMatrix(fillMatrix);
+@@ -598,6 +611,13 @@ public class LyricsView extends FrameLayout {
+             }
+         }
+ 
++        @Override
++        protected void onDetachedFromWindow() {
++            fillShader.clear();
++            lastFrame = 0;
++            super.onDetachedFromWindow();
++        }
++
+         private void drawInterlude(Canvas canvas, boolean live, float progress, float alpha, long now) {
+             float size = textSize() * 0.32f;
+             float gap = size * 0.55f;
 diff --git a/TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraChatsActivity.java b/TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraChatsActivity.java
 index 25d865b63..78691450c 100644
 --- a/TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraChatsActivity.java

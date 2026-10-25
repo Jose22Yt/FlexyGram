@@ -1,0 +1,5 @@
+captures/
+*.perfetto-trace
+*.pftrace
+*.hprof
+*.heapprofd

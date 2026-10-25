@@ -42,3 +42,8 @@ PATHS = PATHS | frozenset(["tools/connected_alpha/test_theme_sections1273.py","t
 PATHS = PATHS | frozenset(["tools/connected_alpha/bubble_visual/CachedBlurVisualTest.java.in"])
 
 PATHS = PATHS | frozenset(["tools/connected_alpha/test_cached_blur1273.py"])
+
+# Selective PR90 production + its lab; original branch UI remains outside this integration.
+from performance.contract import PATHS as PERFORMANCE_PATHS, PRODUCTION as PERFORMANCE_PRODUCTION
+VISUAL_PATHS = VISUAL_PATHS | PERFORMANCE_PRODUCTION
+PATHS = PATHS | PERFORMANCE_PATHS | PERFORMANCE_PRODUCTION

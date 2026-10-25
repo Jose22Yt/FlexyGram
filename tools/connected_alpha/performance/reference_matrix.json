@@ -1,0 +1,49 @@
+{
+  "evidence": "unmeasured_reference_matrix",
+  "rows": [
+    {
+      "label": "exteraless",
+      "source_commit": "1ad6a60a6834ffca722b1a22f4fba27ecb29a061",
+      "candidate_commit_rule": null,
+      "physical_startup_ms": null,
+      "physical_frame_median_ms": null,
+      "physical_frame_p95_ms": null,
+      "physical_jank": null,
+      "physical_memory_kib": null,
+      "physical_cpu_gpu": null,
+      "status": "PENDING_TEST_DEVICE"
+    },
+    {
+      "label": "alpha1271",
+      "source_commit": "997ac40a65be00c672dc8009b61f55825537d498",
+      "candidate_commit_rule": null,
+      "physical_startup_ms": null,
+      "physical_frame_median_ms": null,
+      "physical_frame_p95_ms": null,
+      "physical_jank": null,
+      "physical_memory_kib": null,
+      "physical_cpu_gpu": null,
+      "status": "PENDING_TEST_DEVICE"
+    },
+    {
+      "label": "candidate",
+      "source_commit": null,
+      "candidate_commit_rule": "Use final PR HEAD at capture",
+      "physical_startup_ms": null,
+      "physical_frame_median_ms": null,
+      "physical_frame_p95_ms": null,
+      "physical_jank": null,
+      "physical_memory_kib": null,
+      "physical_cpu_gpu": null,
+      "status": "PENDING_TEST_DEVICE"
+    }
+  ],
+  "isolated_native_graphics": {
+    "stable_lyric_draws": 1000,
+    "baseline_distinct_shaders": 1000,
+    "candidate_distinct_shaders": 1,
+    "changed_pixels": 0,
+    "baseline": "integrated1271 actual inner LineView in explicit fixture"
+  },
+  "superiority": "NOT_ESTABLISHED"
+}

@@ -1,0 +1,42 @@
+package app.exteraless.player;
+import android.app.*;import android.graphics.*;import android.os.*;import android.text.*;import android.view.*;import android.widget.*;
+import org.junit.*;import org.junit.runner.RunWith;import org.robolectric.*;import org.robolectric.annotation.*;
+import java.io.*;import java.lang.reflect.*;import java.time.Duration;import java.util.*;import static org.junit.Assert.*;
+/** Native graphics + actual inner LineView. Test shell/metadata/controller are explicit doubles. */
+@RunWith(RobolectricTestRunner.class) @Config(manifest=Config.NONE,sdk=35) @GraphicsMode(GraphicsMode.Mode.NATIVE)
+public class PerformanceNativeTest {
+    private Activity activity;
+    private FrameLayout root;
+    @Before public void setup(){activity=Robolectric.buildActivity(Activity.class).setup().get();root=new FrameLayout(activity);activity.setContentView(root);org.telegram.messenger.AndroidUtilities.density=1;org.telegram.messenger.MediaController.getInstance().paused=false;}
+    private void size(View view,int w,int h){view.measure(View.MeasureSpec.makeMeasureSpec(w,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(h,View.MeasureSpec.EXACTLY));view.layout(0,0,w,h);}
+    private static class ShaderPaint extends TextPaint {
+        final Set<Shader> unique=Collections.newSetFromMap(new IdentityHashMap<>());
+        ShaderPaint(TextPaint original){super(original);}
+        @Override public Shader setShader(Shader shader){if(shader!=null)unique.add(shader);return super.setShader(shader);}
+    }
+    private ShaderPaint count(View line)throws Exception{Field field=line.getClass().getDeclaredField("paint");field.setAccessible(true);ShaderPaint paint=new ShaderPaint((TextPaint)field.get(line));field.set(line,paint);return paint;}
+    @Test public void singleEntryCacheTracksAllColorAndAlphaChanges(){LyricsFill cache=new LyricsFill();LinearGradient first=cache.get(0xff123456,0x77123456);for(int i=0;i<10000;i++)assertSame(first,cache.get(0xff123456,0x77123456));LinearGradient changed=cache.get(0xff123457,0x77123456);assertNotSame(first,changed);assertSame(changed,cache.get(0xff123457,0x77123456));assertNotSame(changed,cache.get(0x80123457,0x77123456));cache.clear();assertNotSame(first,cache.get(0xff123456,0x77123456));}
+    @Test public void actualDrawingPreservesPixelsAndEliminatesStableShaderChurn()throws Exception {
+        LyricsHarness candidate=new LyricsHarness(activity);BaselineLyricsHarness base=new BaselineLyricsHarness(activity);
+        root.addView(candidate);root.addView(base);Lyrics words=Lyrics.parse("[00:00.00]Synthetic lyric\n[00:20.00]Second line",Lyrics.SOURCE_FILE);
+        candidate.lyrics=base.lyrics=words;candidate.bind("Synthetic lyric");base.bind("Synthetic lyric");
+        ShaderPaint after=count(candidate.line()),before=count(base.line());size(candidate.line(),240,100);size(base.line(),240,100);
+        Bitmap a=Bitmap.createBitmap(240,100,Bitmap.Config.ARGB_8888),b=Bitmap.createBitmap(240,100,Bitmap.Config.ARGB_8888);
+        int[] pixelsA=new int[24000],pixelsB=new int[24000];int changed=0;
+        for(int frame=0;frame<1000;frame++){
+            candidate.positionAt=base.positionAt=SystemClock.elapsedRealtime();candidate.positionMs=base.positionMs=frame*19L;
+            a.eraseColor(0);b.eraseColor(0);candidate.line().draw(new Canvas(a));base.line().draw(new Canvas(b));
+            a.getPixels(pixelsA,0,240,0,0,240,100);b.getPixels(pixelsB,0,240,0,0,240,100);
+            for(int i=0;i<pixelsA.length;i++)if(pixelsA[i]!=pixelsB[i])changed++;
+        }
+        assertEquals(0,changed);assertEquals(1000,before.unique.size());assertEquals(1,after.unique.size());
+        for(int color:new int[]{0xffedf5fa,0x80152c3e,0xff152c3e}){
+            candidate.colorActive=base.colorActive=color;a.eraseColor(0);b.eraseColor(0);candidate.line().draw(new Canvas(a));base.line().draw(new Canvas(b));
+            a.getPixels(pixelsA,0,240,0,0,240,100);b.getPixels(pixelsB,0,240,0,0,240,100);assertArrayEquals(pixelsB,pixelsA);
+        }
+        try(FileWriter out=new FileWriter(new File(System.getProperty("probe.root"),"performance-native-result.json"))){out.write("{\"evidence\":\"isolated_API35_native_graphics\",\"stable_draws\":1000,\"baseline_distinct_shaders\":1000,\"candidate_distinct_shaders\":1,\"changed_pixels\":0,\"physical_frame_time_ms\":null,\"ART_allocated_bytes\":null,\"superiority\":\"NOT_ESTABLISHED\"}\n");}
+        root.removeAllViews();
+    }
+    @Test public void detachCancelsOuterPendingFollowAndScrollCallbacks(){LyricsHarness current=new LyricsHarness(activity);BaselineLyricsHarness old=new BaselineLyricsHarness(activity);root.addView(current);root.addView(old);current.schedule();old.schedule();root.removeAllViews();org.robolectric.Shadows.shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(800));assertEquals("outer follow",0,current.followCalls);assertEquals("list scroll",0,current.scrollCalls);assertEquals(1,current.stops());assertEquals(1,old.followCalls);assertEquals(1,old.scrollCalls);}
+    @Test public void lineCacheIsReleasedOnDetachAndRebuiltOnReuse()throws Exception{LyricsHarness current=new LyricsHarness(activity);current.bind("Synthetic lyric");root.addView(current);View line=current.line();Field cached=line.getClass().getDeclaredField("fillShader");cached.setAccessible(true);LyricsFill cache=(LyricsFill)cached.get(line);LinearGradient first=cache.get(1,2);root.removeView(current);assertNotSame(first,cache.get(1,2));root.addView(current);size(line,240,100);line.draw(new Canvas(Bitmap.createBitmap(240,100,Bitmap.Config.ARGB_8888)));root.removeView(current);}
+}
