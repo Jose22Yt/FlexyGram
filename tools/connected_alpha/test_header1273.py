@@ -47,3 +47,13 @@ class HeaderTests(unittest.TestCase):
   self.assertIn('BuildConfig.CONNECTED_ALPHA',master)
   self.assertIn('iosChatHeaderRow = addRow("iosChatHeader")',body(s,'protected void updateRows()'))
   self.assertIn('position == iosChatHeaderRow && org.telegram.messenger.BuildConfig.CONNECTED_ALPHA',s)
+
+ def test_native_text_fixture_matches_real_integer_pixel_api(self):
+  native=(ROOT/'TMessagesProj/src/main/java/org/telegram/ui/ActionBar/SimpleTextView.java').read_text()
+  self.assertIn('public void setTextSizePx(int newSize)',native)
+  fixture=(ROOT/'tools/connected_alpha/header_visual/stubs.py').read_text()
+  self.assertIn('setTextSizePx(int v)',fixture)
+  self.assertNotIn('setTextSizePx(float v)',fixture)
+  avatar=(ROOT/'TMessagesProj/src/main/java/org/telegram/ui/Components/ChatAvatarContainer.java').read_text()
+  for name in ['titlePx','subtitlePx']:
+   self.assertIn('setTextSizePx(Math.round(signatureHeader.'+name+'))',avatar)

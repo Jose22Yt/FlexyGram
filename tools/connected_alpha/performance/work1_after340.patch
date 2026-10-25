@@ -971,7 +971,7 @@ index 88f89fdfe..0e7016af0 100644
          }
          if (parentFragment == null) {
 diff --git a/TMessagesProj/src/main/java/org/telegram/ui/Components/ChatAvatarContainer.java b/TMessagesProj/src/main/java/org/telegram/ui/Components/ChatAvatarContainer.java
-index 4a55347b4..7fc9364ec 100644
+index 4a55347b4..d8d41b3ff 100644
 --- a/TMessagesProj/src/main/java/org/telegram/ui/Components/ChatAvatarContainer.java
 +++ b/TMessagesProj/src/main/java/org/telegram/ui/Components/ChatAvatarContainer.java
 @@ -845,8 +845,74 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
@@ -998,10 +998,10 @@ index 4a55347b4..7fc9364ec 100644
 +    private void measureSignature(int widthMeasureSpec, int heightMeasureSpec) {
 +        int width = MeasureSpec.getSize(widthMeasureSpec);
 +        int textWidth = Math.max(0, Math.round(signatureHeader.geometry.title.width()) - dp(64));
-+        titleTextView.setTextSizePx(signatureHeader.titlePx);
++        titleTextView.setTextSizePx(Math.round(signatureHeader.titlePx));
 +        titleTextView.setGravity(Gravity.CENTER_HORIZONTAL);
 +        titleTextView.measure(MeasureSpec.makeMeasureSpec(textWidth, MeasureSpec.AT_MOST), MeasureSpec.makeMeasureSpec((int)Math.ceil(signatureHeader.titlePx) + dp(8), MeasureSpec.AT_MOST));
-+        if (subtitleTextView != null) { subtitleTextView.setTextSizePx(signatureHeader.subtitlePx); subtitleTextView.setGravity(Gravity.CENTER_HORIZONTAL); }
++        if (subtitleTextView != null) { subtitleTextView.setTextSizePx(Math.round(signatureHeader.subtitlePx)); subtitleTextView.setGravity(Gravity.CENTER_HORIZONTAL); }
 +        else if (animatedSubtitleTextView != null) animatedSubtitleTextView.setTextSize(signatureHeader.subtitlePx);
 +        getSubtitleTextView().measure(MeasureSpec.makeMeasureSpec(textWidth, MeasureSpec.AT_MOST), signatureHeader.subtitleFits ? MeasureSpec.makeMeasureSpec((int)Math.ceil(signatureHeader.subtitlePx) + dp(8), MeasureSpec.AT_MOST) : MeasureSpec.makeMeasureSpec(0, MeasureSpec.EXACTLY));
 +        int photo = Math.max(1, Math.round(signatureHeader.height) - dp(2));

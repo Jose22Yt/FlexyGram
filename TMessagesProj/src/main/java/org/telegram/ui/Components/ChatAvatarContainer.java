@@ -865,10 +865,10 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
     private void measureSignature(int widthMeasureSpec, int heightMeasureSpec) {
         int width = MeasureSpec.getSize(widthMeasureSpec);
         int textWidth = Math.max(0, Math.round(signatureHeader.geometry.title.width()) - dp(64));
-        titleTextView.setTextSizePx(signatureHeader.titlePx);
+        titleTextView.setTextSizePx(Math.round(signatureHeader.titlePx));
         titleTextView.setGravity(Gravity.CENTER_HORIZONTAL);
         titleTextView.measure(MeasureSpec.makeMeasureSpec(textWidth, MeasureSpec.AT_MOST), MeasureSpec.makeMeasureSpec((int)Math.ceil(signatureHeader.titlePx) + dp(8), MeasureSpec.AT_MOST));
-        if (subtitleTextView != null) { subtitleTextView.setTextSizePx(signatureHeader.subtitlePx); subtitleTextView.setGravity(Gravity.CENTER_HORIZONTAL); }
+        if (subtitleTextView != null) { subtitleTextView.setTextSizePx(Math.round(signatureHeader.subtitlePx)); subtitleTextView.setGravity(Gravity.CENTER_HORIZONTAL); }
         else if (animatedSubtitleTextView != null) animatedSubtitleTextView.setTextSize(signatureHeader.subtitlePx);
         getSubtitleTextView().measure(MeasureSpec.makeMeasureSpec(textWidth, MeasureSpec.AT_MOST), signatureHeader.subtitleFits ? MeasureSpec.makeMeasureSpec((int)Math.ceil(signatureHeader.subtitlePx) + dp(8), MeasureSpec.AT_MOST) : MeasureSpec.makeMeasureSpec(0, MeasureSpec.EXACTLY));
         int photo = Math.max(1, Math.round(signatureHeader.height) - dp(2));
