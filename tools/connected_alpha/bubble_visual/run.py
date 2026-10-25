@@ -35,6 +35,10 @@ def main():
     res.mkdir(parents=True, exist_ok=True)
     for path in (ROOT/'TMessagesProj/src/main/res/drawable').glob('flexy_*.xml'):
         shutil.copyfile(path, res/path.name)
+    for name in ('msg_check_s', 'msg_halfcheck'):
+        paths = list((ROOT/'TMessagesProj/src/main/res').glob('drawable*/'+name+'.*'))
+        if not paths: raise SystemExit('Missing native message tick asset: '+name)
+        shutil.copyfile(paths[0], res/paths[0].name)
     manifest = output/'AndroidManifest.xml'
     manifest.write_text('<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="app.flexygram.visualprobe"><uses-sdk android:minSdkVersion="24"/><application/></manifest>')
     subprocess.run([str(aapt), 'compile', '--dir', str(res.parent), '-o', str(output/'resources.zip')], check=True)
@@ -48,6 +52,7 @@ def main():
     write_stubs(source, ROOT)
     shutil.copyfile(HERE/'BubbleVisualTest.java.in', source/'BubbleVisualTest.java')
     shutil.copyfile(HERE/'SignatureControlsVisualTest.java.in', source/'SignatureControlsVisualTest.java')
+    shutil.copyfile(HERE/'BubblePreviewVisualTest.java.in', source/'BubblePreviewVisualTest.java')
     shutil.copyfile(HERE/'pom.xml', output/'pom.xml')
     repository = Path.home()/'.m2/repository'
     command = [args.maven, '-B', '-f', str(output/'pom.xml'), '-Dandroid.sdk.jar='+str(android)]

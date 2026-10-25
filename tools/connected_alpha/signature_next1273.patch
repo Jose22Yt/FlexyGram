@@ -1,0 +1,355 @@
+diff --git a/TMessagesProj/src/main/java/app/flexygram/bubbles/BubblePreviewView.java b/TMessagesProj/src/main/java/app/flexygram/bubbles/BubblePreviewView.java
+index ba533b774..9e308a741 100644
+--- a/TMessagesProj/src/main/java/app/flexygram/bubbles/BubblePreviewView.java
++++ b/TMessagesProj/src/main/java/app/flexygram/bubbles/BubblePreviewView.java
+@@ -1,44 +1,168 @@
+ package app.flexygram.bubbles;
++
+ import android.content.Context;
+ import android.graphics.Canvas;
+ import android.graphics.Paint;
++import android.graphics.Path;
++import android.graphics.Rect;
++import android.graphics.RectF;
++import android.graphics.drawable.BitmapDrawable;
++import android.graphics.drawable.Drawable;
++import android.text.Layout;
++import android.text.StaticLayout;
+ import android.text.TextPaint;
+ import android.text.TextUtils;
+ import android.view.View;
+ import org.telegram.messenger.AndroidUtilities;
+ import org.telegram.messenger.LocaleController;
++import org.telegram.messenger.NotificationCenter;
+ import org.telegram.messenger.R;
+ import org.telegram.ui.ActionBar.MessageDrawable;
+ import org.telegram.ui.ActionBar.Theme;
+-/** Two synthetic native bubbles; no accounts, observers or permanent draw loop. */
+-public final class BubblePreviewView extends View {
+-    private final MessageDrawable incoming=new MessageDrawable(MessageDrawable.TYPE_TEXT,false,false);
+-    private final MessageDrawable outgoing=new MessageDrawable(MessageDrawable.TYPE_TEXT,true,false);
+-    private final MessageDrawable.PathDrawParams inCache=new MessageDrawable.PathDrawParams(),outCache=new MessageDrawable.PathDrawParams();
+-    private final TextPaint text=new TextPaint(Paint.ANTI_ALIAS_FLAG);
+-    private final String inLabel=LocaleController.getString(R.string.FlexyBubblePreviewIncoming),outLabel=LocaleController.getString(R.string.FlexyBubblePreviewOutgoing);
+-    private String visibleIn="",visibleOut="";
+-    private int rowHeight;
+-    public BubblePreviewView(Context context){super(context);setContentDescription(inLabel+". "+outLabel);}
+-    @Override protected void onMeasure(int w,int h){
+-        text.setTextSize(14*getResources().getDisplayMetrics().scaledDensity);
+-        rowHeight=Math.max(AndroidUtilities.dp(52),Math.round(text.getFontSpacing())+AndroidUtilities.dp(24));
+-        setMeasuredDimension(MeasureSpec.getSize(w),rowHeight*2+AndroidUtilities.dp(40));
+-    }
+-    @Override protected void onSizeChanged(int w,int h,int oldw,int oldh){
+-        int side=AndroidUtilities.dp(16),offset=AndroidUtilities.dp(40),top=AndroidUtilities.dp(12);
+-        incoming.setBounds(side,top,w-side-offset,top+rowHeight);
+-        outgoing.setBounds(side+offset,top+rowHeight+AndroidUtilities.dp(8),w-side,top+rowHeight*2+AndroidUtilities.dp(8));
+-        incoming.setTop(0,w,h,false,false);outgoing.setTop(0,w,h,false,false);
+-        visibleIn=TextUtils.ellipsize(inLabel,text,Math.max(0,incoming.getBounds().width()-AndroidUtilities.dp(32)),TextUtils.TruncateAt.END).toString();
+-        visibleOut=TextUtils.ellipsize(outLabel,text,Math.max(0,outgoing.getBounds().width()-AndroidUtilities.dp(32)),TextUtils.TruncateAt.END).toString();
+-    }
+-    @Override protected void onDraw(Canvas canvas){
+-        incoming.drawCached(canvas,inCache);outgoing.drawCached(canvas,outCache);
+-        text.setColor(Theme.getColor(Theme.key_chat_messageTextIn));
+-        float y=incoming.getBounds().centerY()-(text.ascent()+text.descent())/2;
+-        canvas.drawText(visibleIn,incoming.getBounds().left+AndroidUtilities.dp(16),y,text);
+-        text.setColor(Theme.getColor(Theme.key_chat_messageTextOut));y=outgoing.getBounds().centerY()-(text.ascent()+text.descent())/2;
+-        canvas.drawText(visibleOut,outgoing.getBounds().left+AndroidUtilities.dp(16),y,text);
++import org.telegram.ui.ChatBackgroundDrawable;
++import org.telegram.ui.Components.AnimatedFileDrawable;
++import org.telegram.ui.Components.MotionBackgroundDrawable;
++
++/** Synthetic conversation using the real bubble renderer and current theme wallpaper.
++ * No messages/accounts, private chat loading, background animation or permanent draw loop. */
++public final class BubblePreviewView extends View implements NotificationCenter.NotificationCenterDelegate {
++    private final MessageDrawable[] bubbles = new MessageDrawable[4];
++    private final MessageDrawable.PathDrawParams[] caches = new MessageDrawable.PathDrawParams[4];
++    private final StaticLayout[] labels = new StaticLayout[4];
++    private final int[] tops = new int[4];
++    private final String[] samples;
++    private final TextPaint text = new TextPaint(Paint.ANTI_ALIAS_FLAG);
++    private final TextPaint time = new TextPaint(Paint.ANTI_ALIAS_FLAG);
++    private final Paint backdrop = new Paint(Paint.ANTI_ALIAS_FLAG);
++    private final Path frame = new Path();
++    private final RectF frameBounds = new RectF();
++    private final Rect wallpaperBounds = new Rect();
++    private final Drawable check, halfCheck;
++    private Drawable wallpaper;
++    private int checkColor;
++    private static final String TIME = "09:41";
++
++    public BubblePreviewView(Context context) {
++        super(context);
++        samples = new String[]{LocaleController.getString(R.string.FlexyBubblePreviewIncoming),
++                LocaleController.getString(R.string.FlexyBubblePreviewGroupIncoming),
++                LocaleController.getString(R.string.FlexyBubblePreviewOutgoing),
++                LocaleController.getString(R.string.FlexyBubblePreviewGroupOutgoing)};
++        for (int i = 0; i < 4; i++) {
++            bubbles[i] = new MessageDrawable(i % 2 == 0 ? MessageDrawable.TYPE_MEDIA : MessageDrawable.TYPE_TEXT, i >= 2, false);
++            caches[i] = new MessageDrawable.PathDrawParams();
++        }
++        check = context.getResources().getDrawable(R.drawable.msg_check_s).mutate();
++        halfCheck = context.getResources().getDrawable(R.drawable.msg_halfcheck).mutate();
++        setContentDescription(String.join(". ", samples));
++        refreshTheme();
++    }
++
++    private void refreshTheme() {
++        Theme.createChatResources(getContext(), false);
++        if (Theme.chat_msgTextPaint != null) text.set(Theme.chat_msgTextPaint);
++        else text.setTextSize(14 * getResources().getDisplayMetrics().scaledDensity);
++        if (Theme.chat_timePaint != null) time.set(Theme.chat_timePaint);
++        else time.setTextSize(11 * getResources().getDisplayMetrics().scaledDensity);
++        checkColor = Theme.getColor(Theme.key_chat_outSentCheckRead);
++        check.setTint(checkColor); halfCheck.setTint(checkColor);
++        Drawable source = Theme.getCachedWallpaperNonBlocking();
++        if (source instanceof ChatBackgroundDrawable) source = ((ChatBackgroundDrawable) source).getDrawable(false);
++        // Borrow only a still bitmap from animated gradients. Never attach/start their renderer.
++        if (source instanceof MotionBackgroundDrawable) {
++            android.graphics.Bitmap bitmap = ((MotionBackgroundDrawable) source).getBitmap();
++            wallpaper = bitmap != null && !bitmap.isRecycled() ? new BitmapDrawable(getResources(), bitmap) : null;
++        } else if (source instanceof AnimatedFileDrawable) {
++            wallpaper = null;
++        } else if (source != null && source.getConstantState() != null) {
++            wallpaper = source.getConstantState().newDrawable(getResources()).mutate();
++        } else wallpaper = null;
++        if (wallpaper instanceof BitmapDrawable) ((BitmapDrawable) wallpaper).setFilterBitmap(true);
++        updateWallpaperBounds(getWidth(), getHeight());
++        requestLayout();
++        invalidate();
++    }
++
++    @Override protected void onAttachedToWindow() {
++        super.onAttachedToWindow();
++        NotificationCenter center = NotificationCenter.getGlobalInstance();
++        center.addObserver(this, NotificationCenter.didSetNewTheme);
++        center.addObserver(this, NotificationCenter.didApplyNewTheme);
++        center.addObserver(this, NotificationCenter.didSetNewWallpapper);
++        refreshTheme();
++    }
++    @Override protected void onDetachedFromWindow() {
++        NotificationCenter center = NotificationCenter.getGlobalInstance();
++        center.removeObserver(this, NotificationCenter.didSetNewTheme);
++        center.removeObserver(this, NotificationCenter.didApplyNewTheme);
++        center.removeObserver(this, NotificationCenter.didSetNewWallpapper);
++        wallpaper = null; // Never recycle the theme owner's original bitmap.
++        super.onDetachedFromWindow();
++    }
++    @Override public void didReceivedNotification(int id, int account, Object... args) { refreshTheme(); }
++
++    private StaticLayout layout(String sample, int width) {
++        return StaticLayout.Builder.obtain(sample, 0, sample.length(), text, Math.max(1, width))
++                .setAlignment(Layout.Alignment.ALIGN_NORMAL).setIncludePad(false)
++                .setMaxLines(2).setEllipsize(TextUtils.TruncateAt.END).build();
++    }
++    @Override protected void onMeasure(int widthSpec, int heightSpec) {
++        int width = MeasureSpec.getSize(widthSpec), side = AndroidUtilities.dp(16);
++        int maximum = Math.max(1, Math.min(width - side * 2, Math.round(width * .78f)));
++        int y = AndroidUtilities.dp(12), inset = AndroidUtilities.dp(14);
++        int metadata = Math.round(time.getFontSpacing()) + AndroidUtilities.dp(10);
++        for (int i = 0; i < 4; i++) {
++            StaticLayout measured = layout(samples[i], maximum - inset * 2);
++            float longest = 0;
++            for (int line = 0; line < measured.getLineCount(); line++) longest = Math.max(longest, measured.getLineWidth(line));
++            int bubbleWidth = Math.min(maximum, Math.max(AndroidUtilities.dp(i >= 2 ? 98 : 82), (int) Math.ceil(longest) + inset * 2));
++            labels[i] = layout(samples[i], bubbleWidth - inset * 2);
++            int height = Math.max(AndroidUtilities.dp(48), labels[i].getHeight() + metadata + AndroidUtilities.dp(20));
++            int left = i < 2 ? side : Math.max(side, width - side - bubbleWidth);
++            tops[i] = y;
++            bubbles[i].setBounds(left, y, left + bubbleWidth, y + height);
++            y += height + (i == 1 ? AndroidUtilities.dp(6) : 0);
++        }
++        int height = y + AndroidUtilities.dp(12);
++        for (int i = 0; i < 4; i++) bubbles[i].setTop(tops[i], width, height, i % 2 != 0, i % 2 == 0);
++        setMeasuredDimension(width, height);
++    }
++    private void updateWallpaperBounds(int width, int height) {
++        frameBounds.set(AndroidUtilities.dp(8), 0, Math.max(AndroidUtilities.dp(8), width - AndroidUtilities.dp(8)), height);
++        frame.rewind();frame.addRoundRect(frameBounds, AndroidUtilities.dp(16), AndroidUtilities.dp(16), Path.Direction.CW);
++        if (wallpaper == null) return;
++        int iw = wallpaper.getIntrinsicWidth(), ih = wallpaper.getIntrinsicHeight();
++        if (iw > 0 && ih > 0) {
++            float scale = Math.max((float) width / iw, (float) height / ih);
++            int w = (int) Math.ceil(iw * scale), h = (int) Math.ceil(ih * scale);
++            wallpaperBounds.set((width - w) / 2, (height - h) / 2, (width + w) / 2, (height + h) / 2);
++        } else wallpaperBounds.set(0, 0, width, height);
++        wallpaper.setBounds(wallpaperBounds);
++    }
++    @Override protected void onSizeChanged(int w, int h, int oldw, int oldh) { updateWallpaperBounds(w, h); }
++    @Override protected void onDraw(Canvas canvas) {
++        int save = canvas.save();canvas.clipPath(frame);
++        backdrop.setColor(Theme.getColor(Theme.key_windowBackgroundGray));canvas.drawRect(frameBounds, backdrop);
++        if (wallpaper != null && (!(wallpaper instanceof BitmapDrawable)
++                || !((BitmapDrawable) wallpaper).getBitmap().isRecycled())) wallpaper.draw(canvas);
++        for (int i = 0; i < 4; i++) {
++            boolean out = i >= 2;
++            bubbles[i].drawCached(canvas, caches[i]);
++            Rect bounds = bubbles[i].getBounds();
++            text.setColor(Theme.getColor(out ? Theme.key_chat_messageTextOut : Theme.key_chat_messageTextIn));
++            int labelSave = canvas.save();canvas.translate(bounds.left + AndroidUtilities.dp(14), bounds.top + AndroidUtilities.dp(10));
++            labels[i].draw(canvas);canvas.restoreToCount(labelSave);
++            time.setColor(Theme.getColor(out ? Theme.key_chat_outTimeText : Theme.key_chat_inTimeText));
++            float baseline = bounds.bottom - AndroidUtilities.dp(8) - time.descent();
++            float x = bounds.right - AndroidUtilities.dp(out ? 34 : 14) - time.measureText(TIME);
++            canvas.drawText(TIME, x, baseline, time);
++            if (out) {
++                int right = bounds.right - AndroidUtilities.dp(11), top = Math.round(baseline - AndroidUtilities.dp(10));
++                int h = AndroidUtilities.dp(11), w = AndroidUtilities.dp(10);
++                halfCheck.setBounds(right - w - AndroidUtilities.dp(5), top, right - AndroidUtilities.dp(5), top + h);halfCheck.draw(canvas);
++                check.setBounds(right - w, top, right, top + h);check.draw(canvas);
++            }
++        }
++        canvas.restoreToCount(save);
+     }
+ }
+diff --git a/TMessagesProj/src/main/java/org/telegram/ui/ActionBar/MessageDrawable.java b/TMessagesProj/src/main/java/org/telegram/ui/ActionBar/MessageDrawable.java
+index b3f0c1d59..140bad16f 100644
+--- a/TMessagesProj/src/main/java/org/telegram/ui/ActionBar/MessageDrawable.java
++++ b/TMessagesProj/src/main/java/org/telegram/ui/ActionBar/MessageDrawable.java
+@@ -44,11 +44,10 @@ public class MessageDrawable extends Drawable {
+     }
+     private int signatureColor() {
+         if (overrideColor != null) return overrideColor;
+-        // Explicit chat themes retain their colors; default themes get the Signature palette.
+-        int key = isOut ? Theme.key_chat_outBubble : Theme.key_chat_inBubble;
+-        if (resourcesProvider != null && getColor(key) != Theme.getColor(key)) return getColor(key);
+-        boolean dark = Theme.isCurrentThemeDark();
+-        return isOut ? (dark ? 0xff245a94 : 0xffb8daff) : (dark ? 0xff282c33 : 0xffedf0f4);
++        // Theme is the sole palette owner, including installed and per-chat themes.
++        return getColor(isOut
++                ? (isSelected ? Theme.key_chat_outBubbleSelected : Theme.key_chat_outBubble)
++                : (isSelected ? Theme.key_chat_inBubbleSelected : Theme.key_chat_inBubble));
+     }
+ 
+     private Shader gradientShader;
+@@ -217,10 +216,6 @@ public class MessageDrawable extends Drawable {
+             gradientColor2 = 0;
+             gradientColor3 = 0;
+             animatedGradient = false;
+-        } else if (flexySurface()) {
+-            color = signatureColor();
+-            gradientColor1 = gradientColor2 = gradientColor3 = 0;
+-            animatedGradient = false;
+         } else if (isOut) {
+             color = getColor(isSelected ? Theme.key_chat_outBubbleSelected : Theme.key_chat_outBubble);
+             gradientColor1 = getCurrentColor(Theme.key_chat_outBubbleGradient1);
+@@ -649,19 +644,17 @@ public class MessageDrawable extends Drawable {
+             // Instance paints and the native geometry cache are reused for every draw.
+             int color = signatureColor();
+             flexyFillPaint.setColor(color);
++            // Reuse Telegram's cached gradient and matrix; no new shader per frame.
++            flexyFillPaint.setShader(p.getShader());
+             flexyFillPaint.setAlpha(Math.round(alpha * app.flexygram.bubbles.BubbleStyle.tintAlpha(
+                 app.flexygram.bubbles.BubbleConfig.transparency()) / 255f));
+             canvas.drawPath(path, flexyFillPaint);
+-            if (isSelected) {
+-                selectedPaint.setColor(getColor(isOut ? Theme.key_chat_outBubbleSelected : Theme.key_chat_inBubbleSelected));
+-                selectedPaint.setAlpha(Math.round(90 * alpha / 255f));
+-                canvas.drawPath(path, selectedPaint);
+-            }
+             flexyBorderPaint.setStyle(Paint.Style.STROKE);
+             // Keep the contour inside Telegram's unchanged message silhouette.
+             flexyBorderPaint.setStrokeWidth(2f * AndroidUtilities.density * app.flexygram.bubbles.BubbleConfig.borderDp());
+             flexyBorderPaint.setColor(ColorUtils.setAlphaComponent(
+-                app.flexygram.bubbles.BubbleStyle.outline(color, Theme.isCurrentThemeDark()), Math.round(200 * alpha / 255f)));
++                app.flexygram.bubbles.BubbleStyle.outline(color,
++                    (Color.red(color) * 299 + Color.green(color) * 587 + Color.blue(color) * 114) < 128000), Math.round(200 * alpha / 255f)));
+             canvas.save();
+             canvas.clipPath(path);
+             canvas.drawPath(path, flexyBorderPaint);
+@@ -738,7 +731,7 @@ public class MessageDrawable extends Drawable {
+                 if (currentType == TYPE_MEDIA || oeNoTail) {
+                     path.moveTo(bounds.right - dp(8) - radToUse, bounds.bottom - padding);
+                 } else {
+-                    path.moveTo(bounds.right - dp(2.6f), bounds.bottom - padding);
++                    path.moveTo(bounds.right - dp(flexySurface() ? 5f : 2.6f), bounds.bottom - padding);
+                 }
+                 path.lineTo(bounds.left + padding + radToUse, bounds.bottom - padding);
+                 rect.set(bounds.left + padding, bounds.bottom - padding - radToUse * 2, bounds.left + padding + radToUse * 2, bounds.bottom - padding);
+@@ -793,9 +786,22 @@ public class MessageDrawable extends Drawable {
+                         rect.set(bounds.right - dp(8) - radToUse * 2, bounds.bottom - padding - radToUse * 2, bounds.right - dp(8), bounds.bottom - padding);
+                         path.arcTo(rect, 0, 90, false);
+                     } else {
++                        if (flexySurface()) {
++                            // Own short curved tail. Both sides share mirrored control points.
++                            float edge = bounds.right - dp(8);
++                            float tip = bounds.right - dp(5);
++                            float bottom = bounds.bottom - padding;
++                            float cap = AndroidUtilities.dpf2(.7f);
++                            path.lineTo(edge, bottom - dp(9));
++                            path.cubicTo(edge, bottom - dp(4), tip + cap, bottom - AndroidUtilities.dpf2(1.6f),
++                                    tip + cap, bottom - cap);
++                            path.cubicTo(tip + cap, bottom - AndroidUtilities.dpf2(.25f),
++                                    tip + AndroidUtilities.dpf2(.3f), bottom, tip, bottom);
++                        } else {
+                     path.lineTo(bounds.right - dp(8), bounds.bottom - padding - smallRad - dp(3));
+                     rect.set(bounds.right - dp(8), bounds.bottom - padding - smallRad * 2 - dp(9), bounds.right - dp(7) + smallRad * 2, bounds.bottom - padding - dp(1));
+                     path.arcTo(rect, 180, -83, false);
++                        }
+                     }
+                 } else {
+                     path.lineTo(bounds.right - dp(8), top - topY + currentBackgroundHeight);
+@@ -808,7 +814,7 @@ public class MessageDrawable extends Drawable {
+                 if (currentType == TYPE_MEDIA || oeNoTail) {
+                     path.moveTo(bounds.left + dp(8) + radToUse, bounds.bottom - padding);
+                 } else {
+-                    path.moveTo(bounds.left + dp(2.6f), bounds.bottom - padding);
++                    path.moveTo(bounds.left + dp(flexySurface() ? 5f : 2.6f), bounds.bottom - padding);
+                 }
+                 path.lineTo(bounds.right - padding - radToUse, bounds.bottom - padding);
+                 rect.set(bounds.right - padding - radToUse * 2, bounds.bottom - padding - radToUse * 2, bounds.right - padding, bounds.bottom - padding);
+@@ -857,9 +863,22 @@ public class MessageDrawable extends Drawable {
+                         rect.set(bounds.left + dp(8), bounds.bottom - padding - radToUse * 2, bounds.left + dp(8) + radToUse * 2, bounds.bottom - padding);
+                         path.arcTo(rect, 180, -90, false);
+                     } else {
++                        if (flexySurface()) {
++                            // Own short curved tail. Both sides share mirrored control points.
++                            float edge = bounds.left + dp(8);
++                            float tip = bounds.left + dp(5);
++                            float bottom = bounds.bottom - padding;
++                            float cap = AndroidUtilities.dpf2(.7f);
++                            path.lineTo(edge, bottom - dp(9));
++                            path.cubicTo(edge, bottom - dp(4), tip - cap, bottom - AndroidUtilities.dpf2(1.6f),
++                                    tip - cap, bottom - cap);
++                            path.cubicTo(tip - cap, bottom - AndroidUtilities.dpf2(.25f),
++                                    tip - AndroidUtilities.dpf2(.3f), bottom, tip, bottom);
++                        } else {
+                     path.lineTo(bounds.left + dp(8), bounds.bottom - padding - smallRad - dp(3));
+                     rect.set(bounds.left + dp(7) - smallRad * 2, bounds.bottom - padding - smallRad * 2 - dp(9), bounds.left + dp(8), bounds.bottom - padding - dp(1));
+                     path.arcTo(rect, 0, 83, false);
++                        }
+                     }
+                 } else {
+                     path.lineTo(bounds.left + dp(8), top - topY + currentBackgroundHeight);
+diff --git a/TMessagesProj/src/main/res/values-es/flexygram_bubbles.xml b/TMessagesProj/src/main/res/values-es/flexygram_bubbles.xml
+index 03a06e33e..49fd34e07 100644
+--- a/TMessagesProj/src/main/res/values-es/flexygram_bubbles.xml
++++ b/TMessagesProj/src/main/res/values-es/flexygram_bubbles.xml
+@@ -20,4 +20,6 @@
+     <string name="FlexyBubblePreviewIncoming">Hola</string>
+     <string name="FlexyBubblePreviewOutgoing">¡Hola!</string>
+     <string name="FlexyBubbleBlurUnavailable">El desenfoque de fondo no está disponible en esta compilación de prueba. Matte conserva nítidos el texto y el contorno.</string>
++    <string name="FlexyBubblePreviewGroupIncoming">Esta conversación es una vista previa local.</string>
++    <string name="FlexyBubblePreviewGroupOutgoing">Tus cambios se muestran al instante.</string>
+ </resources>
+diff --git a/TMessagesProj/src/main/res/values-ru/flexygram_bubbles.xml b/TMessagesProj/src/main/res/values-ru/flexygram_bubbles.xml
+index 16073b0fd..b4eab7332 100644
+--- a/TMessagesProj/src/main/res/values-ru/flexygram_bubbles.xml
++++ b/TMessagesProj/src/main/res/values-ru/flexygram_bubbles.xml
+@@ -20,4 +20,6 @@
+     <string name="FlexyBubblePreviewIncoming">Привет</string>
+     <string name="FlexyBubblePreviewOutgoing">Да!</string>
+     <string name="FlexyBubbleBlurUnavailable">Размытие фона недоступно в этой тестовой сборке. Matte сохраняет чёткость текста и контура.</string>
++    <string name="FlexyBubblePreviewGroupIncoming">Это локальный пример переписки.</string>
++    <string name="FlexyBubblePreviewGroupOutgoing">Изменения видны сразу.</string>
+ </resources>
+diff --git a/TMessagesProj/src/main/res/values/flexygram_bubbles.xml b/TMessagesProj/src/main/res/values/flexygram_bubbles.xml
+index fd56638f3..3a62bc07b 100644
+--- a/TMessagesProj/src/main/res/values/flexygram_bubbles.xml
++++ b/TMessagesProj/src/main/res/values/flexygram_bubbles.xml
+@@ -20,4 +20,6 @@
+     <string name="FlexyBubblePreviewIncoming">Hello</string>
+     <string name="FlexyBubblePreviewOutgoing">Hello!</string>
+     <string name="FlexyBubbleBlurUnavailable">Background blur is unavailable in this test build. Matte keeps text and outlines sharp.</string>
++    <string name="FlexyBubblePreviewGroupIncoming">This conversation is a local preview.</string>
++    <string name="FlexyBubblePreviewGroupOutgoing">Your changes appear immediately.</string>
+ </resources>

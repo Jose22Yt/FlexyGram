@@ -6,6 +6,7 @@ BASE='8619ba40fbd8fd9d9d898ff307fb0c0716661254'
 PATHS=frozenset(['TMessagesProj/src/main/java/org/telegram/ui/DialogsActivity.java','tools/connected_alpha/preview_input1273.patch','tools/connected_alpha/next_alpha_contract.py','tools/connected_alpha/test_preview_input1273.py','tools/connected_alpha/check_source.py','tools/connected_alpha/stabilization_contract.py','tools/connected_alpha/test_stabilization1272.py','tools/connected_alpha/NEXT_ALPHA.md','tools/connected_alpha/preview_visual/run.py','tools/connected_alpha/preview_visual/PreviewInputAndroidTest.java.in','.github/workflows/pr.yml'])
 def restore1272(path,data):
  path=str(path)
+ data=restore_visual(path,data)
  patch=(ROOT/'tools/connected_alpha/preview_input1273.patch').read_bytes()
  sections={x.split(b'\n',1)[0]:b'diff --git '+x for x in patch.split(b'diff --git ')[1:]}
  section=sections.get(('a/'+path+' b/'+path).encode())
@@ -16,4 +17,21 @@ def restore1272(path,data):
   target=Path(tmp)/path;target.parent.mkdir(parents=True);target.write_bytes(data)
   result=subprocess.run(['git','apply','--reverse','-'],input=section,cwd=tmp,capture_output=True)
   if result.returncode or target.read_bytes()!=original:raise ValueError('Unreviewed next-alpha delta: '+path)
+ return original
+
+VISUAL_BASE='43e14d876601d16890b8c6f24c515103e6ece54f'
+VISUAL_PATHS=frozenset(['TMessagesProj/src/main/java/org/telegram/ui/ActionBar/MessageDrawable.java', 'TMessagesProj/src/main/java/app/flexygram/bubbles/BubblePreviewView.java', 'TMessagesProj/src/main/res/values/flexygram_bubbles.xml', 'TMessagesProj/src/main/res/values-es/flexygram_bubbles.xml', 'TMessagesProj/src/main/res/values-ru/flexygram_bubbles.xml'])
+PATHS = PATHS | VISUAL_PATHS | frozenset(['tools/connected_alpha/test_signature_next1273.py','tools/connected_alpha/signature_next1273.patch','tools/connected_alpha/bubble_visual/BubbleVisualTest.java.in','tools/connected_alpha/bubble_visual/BubblePreviewVisualTest.java.in','tools/connected_alpha/bubble_visual/stubs.py','tools/connected_alpha/bubble_visual/run.py'])
+def restore_visual(path,data):
+ if path not in VISUAL_PATHS:return data
+ original=subprocess.check_output(['git','show',VISUAL_BASE+':'+path],cwd=ROOT)
+ if data==original:return data
+ patch=(ROOT/'tools/connected_alpha/signature_next1273.patch').read_bytes()
+ sections={x.split(b'\n',1)[0]:b'diff --git '+x for x in patch.split(b'diff --git ')[1:]}
+ section=sections.get(('a/'+path+' b/'+path).encode())
+ if section is None:raise ValueError('Missing reviewed visual delta: '+path)
+ with tempfile.TemporaryDirectory()as tmp:
+  target=Path(tmp)/path;target.parent.mkdir(parents=True);target.write_bytes(data)
+  result=subprocess.run(['git','apply','--reverse','-'],input=section,cwd=tmp,capture_output=True)
+  if result.returncode or target.read_bytes()!=original:raise ValueError('Unreviewed next-alpha visual delta: '+path)
  return original
