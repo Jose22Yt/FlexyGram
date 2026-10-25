@@ -801,7 +801,7 @@ index 000000000..c3348c049
 +    @Override public int getOpacity() { return PixelFormat.TRANSLUCENT; }
 +}
 diff --git a/TMessagesProj/src/main/java/org/telegram/ui/ActionBar/MessageDrawable.java b/TMessagesProj/src/main/java/org/telegram/ui/ActionBar/MessageDrawable.java
-index b3f0c1d59..0bb32e1d9 100644
+index b3f0c1d59..c25b17f40 100644
 --- a/TMessagesProj/src/main/java/org/telegram/ui/ActionBar/MessageDrawable.java
 +++ b/TMessagesProj/src/main/java/org/telegram/ui/ActionBar/MessageDrawable.java
 @@ -44,11 +44,10 @@ public class MessageDrawable extends Drawable {
@@ -831,11 +831,13 @@ index b3f0c1d59..0bb32e1d9 100644
          } else if (isOut) {
              color = getColor(isSelected ? Theme.key_chat_outBubbleSelected : Theme.key_chat_outBubble);
              gradientColor1 = getCurrentColor(Theme.key_chat_outBubbleGradient1);
-@@ -648,20 +643,22 @@ public class MessageDrawable extends Drawable {
+@@ -648,20 +643,24 @@ public class MessageDrawable extends Drawable {
              // Stable theme color, independent of wallpaper/blur availability and animation phase.
              // Instance paints and the native geometry cache are reused for every draw.
              int color = signatureColor();
-+            if (app.flexygram.bubbles.BubbleConfig.backgroundBlur() && flexyGlassSource != null) {
++            if (alpha == 255 && app.flexygram.bubbles.BubbleConfig.backgroundBlur() && flexyGlassSource != null) {
++                // Keep native crossfades as Matte: the legacy coordinate bridge has no drawable-alpha parameter.
++                // Reusing opaque wallpaper there would leave a visible bubble even at alpha zero.
 +                // Legacy-named coordinate callback, new bounded static cache; legacy Glass flags are ignored.
 +                flexyGlassSource.draw(canvas, path);
 +            }
@@ -860,7 +862,7 @@ index b3f0c1d59..0bb32e1d9 100644
              canvas.save();
              canvas.clipPath(path);
              canvas.drawPath(path, flexyBorderPaint);
-@@ -738,7 +735,7 @@ public class MessageDrawable extends Drawable {
+@@ -738,7 +737,7 @@ public class MessageDrawable extends Drawable {
                  if (currentType == TYPE_MEDIA || oeNoTail) {
                      path.moveTo(bounds.right - dp(8) - radToUse, bounds.bottom - padding);
                  } else {
@@ -869,7 +871,7 @@ index b3f0c1d59..0bb32e1d9 100644
                  }
                  path.lineTo(bounds.left + padding + radToUse, bounds.bottom - padding);
                  rect.set(bounds.left + padding, bounds.bottom - padding - radToUse * 2, bounds.left + padding + radToUse * 2, bounds.bottom - padding);
-@@ -793,9 +790,22 @@ public class MessageDrawable extends Drawable {
+@@ -793,9 +792,22 @@ public class MessageDrawable extends Drawable {
                          rect.set(bounds.right - dp(8) - radToUse * 2, bounds.bottom - padding - radToUse * 2, bounds.right - dp(8), bounds.bottom - padding);
                          path.arcTo(rect, 0, 90, false);
                      } else {
@@ -892,7 +894,7 @@ index b3f0c1d59..0bb32e1d9 100644
                      }
                  } else {
                      path.lineTo(bounds.right - dp(8), top - topY + currentBackgroundHeight);
-@@ -808,7 +818,7 @@ public class MessageDrawable extends Drawable {
+@@ -808,7 +820,7 @@ public class MessageDrawable extends Drawable {
                  if (currentType == TYPE_MEDIA || oeNoTail) {
                      path.moveTo(bounds.left + dp(8) + radToUse, bounds.bottom - padding);
                  } else {
@@ -901,7 +903,7 @@ index b3f0c1d59..0bb32e1d9 100644
                  }
                  path.lineTo(bounds.right - padding - radToUse, bounds.bottom - padding);
                  rect.set(bounds.right - padding - radToUse * 2, bounds.bottom - padding - radToUse * 2, bounds.right - padding, bounds.bottom - padding);
-@@ -857,9 +867,22 @@ public class MessageDrawable extends Drawable {
+@@ -857,9 +869,22 @@ public class MessageDrawable extends Drawable {
                          rect.set(bounds.left + dp(8), bounds.bottom - padding - radToUse * 2, bounds.left + dp(8) + radToUse * 2, bounds.bottom - padding);
                          path.arcTo(rect, 180, -90, false);
                      } else {

@@ -643,7 +643,9 @@ public class MessageDrawable extends Drawable {
             // Stable theme color, independent of wallpaper/blur availability and animation phase.
             // Instance paints and the native geometry cache are reused for every draw.
             int color = signatureColor();
-            if (app.flexygram.bubbles.BubbleConfig.backgroundBlur() && flexyGlassSource != null) {
+            if (alpha == 255 && app.flexygram.bubbles.BubbleConfig.backgroundBlur() && flexyGlassSource != null) {
+                // Keep native crossfades as Matte: the legacy coordinate bridge has no drawable-alpha parameter.
+                // Reusing opaque wallpaper there would leave a visible bubble even at alpha zero.
                 // Legacy-named coordinate callback, new bounded static cache; legacy Glass flags are ignored.
                 flexyGlassSource.draw(canvas, path);
             }

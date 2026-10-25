@@ -29,8 +29,9 @@ public class CachedBlurVisualTest {
   assertTrue(a.draw(canvas,shape,0,0));assertTrue(Color.red(result.getPixel(800,600))>90&&Color.red(result.getPixel(800,600))<165);
   Bitmap same=cached(a);for(int n=0;n<100;n++)assertTrue(a.draw(canvas,shape,0,0));assertSame(same,cached(a));assertEquals(0,Utilities.globalQueue.pending());
   org.telegram.ui.ActionBar.MessageDrawable bubble=new org.telegram.ui.ActionBar.MessageDrawable(org.telegram.ui.ActionBar.MessageDrawable.TYPE_TEXT,true,false);
-  bubble.setBounds(0,0,120,70);bubble.setTop(0,1600,1200,false,false);bubble.setFlexyGlassSource((c,p)->b.draw(c,p,0,0));BubbleConfig.setTransparency(100);
+  bubble.setBounds(0,0,120,70);bubble.setTop(0,1600,1200,false,false);int[] samples={0};bubble.setFlexyGlassSource((c,p)->{samples[0]++;return b.draw(c,p,0,0);});BubbleConfig.setTransparency(100);
   Bitmap cell=Bitmap.createBitmap(120,70,Bitmap.Config.ARGB_8888);bubble.draw(new Canvas(cell));assertTrue(Color.alpha(cell.getPixel(50,35))>0);
+  int sampled=samples[0];for(int alpha:new int[]{0,64,128,254}){bubble.setAlpha(alpha);cell.eraseColor(Color.TRANSPARENT);bubble.draw(new Canvas(cell));assertEquals(0,Color.alpha(cell.getPixel(50,35)));assertEquals(sampled,samples[0]);}bubble.setAlpha(255);
   BubbleConfig.setBackgroundBlur(false);cell.eraseColor(Color.TRANSPARENT);bubble.draw(new Canvas(cell));assertEquals(0,Color.alpha(cell.getPixel(50,35)));BubbleConfig.setBackgroundBlur(true);
   a.close();assertTrue(b.isReady());assertFalse(same.isRecycled());b.close();assertTrue(same.isRecycled());assertFalse(source.getBitmap().isRecycled());
  }
