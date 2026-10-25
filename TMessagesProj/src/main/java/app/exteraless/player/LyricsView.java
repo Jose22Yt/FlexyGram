@@ -86,6 +86,8 @@ public class LyricsView extends FrameLayout {
         scrollToActive(true);
     };
 
+    private final Runnable scrollToCurrent = () -> scrollToActive(false);
+
     private static final long FOLLOW_RESUME_MS = 750;
     private static final int MAX_BLUR_DISTANCE = 4;
     private static final float BLUR_PER_LINE_DP = 1.25f;
@@ -257,7 +259,8 @@ public class LyricsView extends FrameLayout {
         userScrollAt = 0;
         applyPadding();
         adapter.notifyDataSetChanged();
-        list.post(() -> scrollToActive(false));
+        removeCallbacks(scrollToCurrent);
+        post(scrollToCurrent);
     }
 
     public void setPosition(long ms) {
@@ -395,8 +398,17 @@ public class LyricsView extends FrameLayout {
         bottomFade = new LinearGradient(0, h - dp(40), 0, h, 0x00000000, 0xff000000, Shader.TileMode.CLAMP);
         if (h != oldh) {
             applyPadding();
-            list.post(() -> scrollToActive(false));
+            removeCallbacks(scrollToCurrent);
+            post(scrollToCurrent);
         }
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        list.stopScroll();
+        removeCallbacks(resumeFollow);
+        removeCallbacks(scrollToCurrent);
+        super.onDetachedFromWindow();
     }
 
     private class Adapter extends RecyclerListView.SelectionAdapter {
