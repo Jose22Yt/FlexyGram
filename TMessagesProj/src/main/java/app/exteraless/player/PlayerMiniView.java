@@ -271,7 +271,7 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
 
     @Override
     protected void onDetachedFromWindow() {
-        if (signatureHost != null) { signatureHost.detach(); signatureHost = null; }
+        if (signatureHost != null) { signatureHost.detachFromWindow(); signatureHost = null; }
         super.onDetachedFromWindow();
         NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.didSetNewTheme);
         if (showAnimator != null) { showAnimator.cancel(); showAnimator = null; }

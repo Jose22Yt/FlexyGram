@@ -21,6 +21,10 @@ public final class SignatureMusicHost implements SignatureMusicPresentation.List
         if (bubble == null) bubble = SignatureMusicBubble.attach(fragment);
         if (bubble != null) bubble.update(allowed, PlayerColors.isDark(provider));
     }
+    public void detachFromWindow() {
+        SignatureMusicPresentation.remove(this);
+        if (bubble != null) { bubble.releaseFromWindow(); bubble = null; }
+    }
     public void detach() {
         SignatureMusicPresentation.remove(this);
         if (bubble != null) { bubble.release(); bubble = null; }

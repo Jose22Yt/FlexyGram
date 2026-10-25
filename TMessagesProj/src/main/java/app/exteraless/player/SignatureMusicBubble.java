@@ -30,6 +30,7 @@ public final class SignatureMusicBubble extends FrameLayout {
     private MessageObject bound;
     private Boolean darkTheme;
     private boolean paused;
+    private boolean released;
     private final OnLayoutChangeListener boundsListener = (v,l,t,r,b,ol,ot,or,ob) -> confine();
 
     private SignatureMusicBubble(FrameLayout host) {
@@ -65,18 +66,41 @@ public final class SignatureMusicBubble extends FrameLayout {
     public static SignatureMusicBubble attach(BaseFragment fragment) {
         if (fragment == null || !(fragment.getFragmentView() instanceof FrameLayout)) return null;
         FrameLayout host = (FrameLayout) fragment.getFragmentView();
+        // Do not mutate the child array during an ancestor's window detach.
+        for (int i = 0; i < host.getChildCount(); i++) {
+            View child = host.getChildAt(i);
+            if (child instanceof SignatureMusicBubble && ((SignatureMusicBubble) child).released) {
+                SignatureMusicBubble bubble = (SignatureMusicBubble) child;
+                bubble.released = false;
+                host.addOnLayoutChangeListener(bubble.boundsListener);
+                return bubble;
+            }
+        }
         SignatureMusicBubble bubble = new SignatureMusicBubble(host);
         host.addView(bubble, new FrameLayout.LayoutParams(AndroidUtilities.dp(56), AndroidUtilities.dp(56), Gravity.TOP | Gravity.LEFT));
         return bubble;
     }
 
     public void release() {
+        release(false);
+    }
+    public void releaseFromWindow() { release(true); }
+    private void release(boolean windowDetaching) {
+        if (released) return;
+        released = true;
         host.removeOnLayoutChangeListener(boundsListener);
-        host.removeView(this);
+        cancelLongPress(); dragging = false; setPressed(false); setVisibility(GONE);
+        host.requestDisallowInterceptTouchEvent(false);
+        play.setPlaying(false, false);
+        bound = null;
         art.setMessage(null);
+        // The fragment root owns this inert child. attach() reuses it, keeping
+        // dispatchDetachedFromWindow's children snapshot stable and bounded.
+        if (!windowDetaching && getParent() == host) host.removeView(this);
     }
 
     public void update(boolean allowed, boolean dark) {
+        if (released) return;
         MessageObject message = MediaController.getInstance().getPlayingMessageObject();
         boolean show = allowed && SignatureMusicPresentation.isCompact() && message != null && message.isMusic();
         setVisibility(show ? VISIBLE : GONE);
