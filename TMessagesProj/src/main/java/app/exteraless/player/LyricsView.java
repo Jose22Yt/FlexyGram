@@ -445,6 +445,7 @@ public class LyricsView extends FrameLayout {
         private final TextPaint paint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
         private final Paint dotPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         private final Matrix fillMatrix = new Matrix();
+        private final LyricsFill fillShader = new LyricsFill();
         private final Spring opacity = new Spring(OPACITY_FUTURE, 260f, 1f, 0.004f);
         private final Spring scale = new Spring(1f, 320f, 0.75f, 0.0005f);
         private int index = -1;
@@ -569,7 +570,7 @@ public class LyricsView extends FrameLayout {
                 int filled = ColorUtils.setAlphaComponent(colorActive, (int) (alpha * baseAlpha));
                 int unfilled = ColorUtils.setAlphaComponent(colorActive, (int) (alpha * baseAlpha * UNFILLED_ALPHA));
                 float height = layout.getHeight();
-                LinearGradient fill = new LinearGradient(0, 0, 0, 1, filled, unfilled, Shader.TileMode.CLAMP);
+                LinearGradient fill = fillShader.get(filled, unfilled);
                 fillMatrix.setScale(1f, Math.max(1f, height * 0.2f));
                 fillMatrix.postTranslate(0, (progress * 1.2f - 0.2f) * height);
                 fill.setLocalMatrix(fillMatrix);
@@ -596,6 +597,13 @@ public class LyricsView extends FrameLayout {
             } else {
                 lastFrame = 0;
             }
+        }
+
+        @Override
+        protected void onDetachedFromWindow() {
+            fillShader.clear();
+            lastFrame = 0;
+            super.onDetachedFromWindow();
         }
 
         private void drawInterlude(Canvas canvas, boolean live, float progress, float alpha, long now) {
