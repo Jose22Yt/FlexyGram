@@ -15,11 +15,10 @@ public class LauncherIconController {
         for (LauncherIcon icon : LauncherIcon.values()) if (isEnabled(icon)) { active = icon; count++; }
         Context context = ApplicationLoader.applicationContext;
         int legacyState = context.getPackageManager().getComponentEnabledSetting(legacyPrimary(context));
-        boolean legacyEnabled = legacyState == PackageManager.COMPONENT_ENABLED_STATE_DEFAULT
-                || legacyState == PackageManager.COMPONENT_ENABLED_STATE_ENABLED;
+        boolean legacyEnabled = legacyState == PackageManager.COMPONENT_ENABLED_STATE_ENABLED;
         if (count == 1 && !legacyEnabled) return;
         String saved = ApplicationLoader.applicationContext.getSharedPreferences("flexy_launcher", Context.MODE_PRIVATE).getString("selected", "");
-        try { LauncherIcon remembered = LauncherIcon.valueOf(saved); if (count == 0 || isEnabled(remembered)) active = remembered; }
+        try { LauncherIcon remembered = LauncherIcon.valueOf(saved); active = remembered; }
         catch (IllegalArgumentException ignored) { }
         try {
             applyIcon(active == null ? LauncherIcon.EXTERALESS : active, false);
@@ -31,11 +30,9 @@ public class LauncherIconController {
     public static boolean isEnabled(LauncherIcon icon) {
         Context ctx = ApplicationLoader.applicationContext;
         int i = ctx.getPackageManager().getComponentEnabledSetting(icon.getComponentName(ctx));
-        // Пока пользователь ничего не выбирал, включённой считается наша иконка:
-        // именно она стоит у <application> в манифесте, и переключатель должен
-        // показывать выбранным то, что человек видит на рабочем столе.
-        // Modern aliases start disabled; ApplicationLoader migrates one atomically.
-        return i == PackageManager.COMPONENT_ENABLED_STATE_ENABLED;
+        // Manifest default is effective before the process starts. Explicit overrides survive updates.
+        return i == PackageManager.COMPONENT_ENABLED_STATE_ENABLED
+                || i == PackageManager.COMPONENT_ENABLED_STATE_DEFAULT && icon == LauncherIcon.EXTERALESS;
     }
 
     private static ComponentName legacyPrimary(Context ctx) {

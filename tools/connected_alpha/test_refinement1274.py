@@ -8,7 +8,8 @@ class Refinement(unittest.TestCase):
   self.assertGreater(len(paths),10)
   for path in paths:
    actual=(ROOT/path).read_bytes()
-   self.assertEqual(restore(path,actual),subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT),path)
+   before=subprocess.run(['git','show',BASE+':'+path],cwd=ROOT,capture_output=True)
+   self.assertEqual(restore(path,actual),before.stdout if before.returncode==0 else b'',path)
    with self.assertRaises(ValueError,msg=path):restore(path,actual+b'\nUNREVIEWED\n')
  def test_preview_fix_auth_and_audio_engine_are_byte_exact_to_physically_accepted_1273(self):
   for path in ['org/telegram/ui/ActionBar/ActionBarLayout.java','org/telegram/ui/DialogsActivity.java','org/telegram/ui/LoginActivity.java','org/telegram/messenger/MediaController.java','org/telegram/messenger/ImageReceiver.java']:

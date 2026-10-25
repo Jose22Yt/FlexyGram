@@ -24,4 +24,9 @@
     <string name="FlexyBubblePreviewGroupOutgoing">Изменения видны сразу.</string>
     <string name="FlexyBubbleBackgroundBlur">Размытие фона</string>
     <string name="FlexyBubbleBlurCompatibility">Размытие доступно для совместимых статичных изображений. Анимированные и неподдерживаемые фоны сохраняют Matte.</string>
+    <string name="FlexyBubbleOutlineEnabled">Показывать контур</string>
+    <string name="FlexyBubbleOutlineStyle">Стиль контура</string>
+    <string name="FlexyBubbleIntelligentColor">Умный цвет</string>
+    <string name="FlexyBubbleGlassPearl">Glass Pearl</string>
+    <string name="FlexyBubblePearlIntensity">Интенсивность Glass Pearl</string>
 </resources>

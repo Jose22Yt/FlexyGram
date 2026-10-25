@@ -31,10 +31,25 @@ import java.util.Arrays;
 
 public class MessageDrawable extends Drawable {
 
-    public interface GlassSource { boolean draw(Canvas canvas, Path path); }
+    public interface GlassSource {
+        boolean draw(Canvas canvas, Path path);
+        // Older embedders retain their safe Matte fallback during partial-alpha transitions.
+        default boolean draw(Canvas canvas, Path path, int alpha) { return alpha == 255 && draw(canvas, path); }
+    }
     private GlassSource flexyGlassSource;
     private final Paint flexyFillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint flexyBorderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private int outlineBase, outlineMode = -1, outlineIntensity = -1, outlineColor;
+    private int signatureOutline(int base) {
+        int mode = app.flexygram.bubbles.BubbleConfig.outlineStyle();
+        int intensity = app.flexygram.bubbles.BubbleConfig.pearlIntensity();
+        if (outlineBase != base || outlineMode != mode || outlineIntensity != intensity) {
+            outlineBase = base; outlineMode = mode; outlineIntensity = intensity;
+            outlineColor = app.flexygram.bubbles.BubbleOutline.color(base,
+                    (Color.red(base) * 299 + Color.green(base) * 587 + Color.blue(base) * 114) < 128000, mode, intensity);
+        }
+        return outlineColor;
+    }
     public void setFlexyGlassSource(GlassSource source) { flexyGlassSource = source; }
     private boolean flexySurface() {
         return currentType != TYPE_PREVIEW && app.flexygram.bubbles.BubbleStyle.signature();
@@ -643,11 +658,9 @@ public class MessageDrawable extends Drawable {
             // Stable theme color, independent of wallpaper/blur availability and animation phase.
             // Instance paints and the native geometry cache are reused for every draw.
             int color = signatureColor();
-            if (alpha == 255 && app.flexygram.bubbles.BubbleConfig.backgroundBlur() && flexyGlassSource != null) {
-                // Keep native crossfades as Matte: the legacy coordinate bridge has no drawable-alpha parameter.
-                // Reusing opaque wallpaper there would leave a visible bubble even at alpha zero.
-                // Legacy-named coordinate callback, new bounded static cache; legacy Glass flags are ignored.
-                flexyGlassSource.draw(canvas, path);
+            if (alpha > 0 && app.flexygram.bubbles.BubbleConfig.backgroundBlur() && flexyGlassSource != null) {
+                // The native bridge carries drawable alpha; message transitions sample the same cache.
+                flexyGlassSource.draw(canvas, path, alpha);
             }
             flexyFillPaint.setColor(color);
             // Reuse Telegram's cached gradient and matrix; no new shader per frame.
@@ -658,13 +671,16 @@ public class MessageDrawable extends Drawable {
             flexyBorderPaint.setStyle(Paint.Style.STROKE);
             // Keep the contour inside Telegram's unchanged message silhouette.
             flexyBorderPaint.setStrokeWidth(2f * AndroidUtilities.density * app.flexygram.bubbles.BubbleConfig.borderDp());
-            flexyBorderPaint.setColor(ColorUtils.setAlphaComponent(
-                app.flexygram.bubbles.BubbleStyle.outline(color,
-                    (Color.red(color) * 299 + Color.green(color) * 587 + Color.blue(color) * 114) < 128000), Math.round(200 * alpha / 255f)));
-            canvas.save();
-            canvas.clipPath(path);
-            canvas.drawPath(path, flexyBorderPaint);
-            canvas.restore();
+            if (app.flexygram.bubbles.BubbleConfig.outlineEnabled()) {
+                int contourBase = isOut && p.getShader() != null
+                        ? app.flexygram.bubbles.BubbleOutline.palette(color, currentGradientColor1, currentGradientColor2, currentGradientColor3) : color;
+                int contour = signatureOutline(contourBase);
+                flexyBorderPaint.setColor(ColorUtils.setAlphaComponent(contour, Math.round(Color.alpha(contour) * alpha / 255f)));
+                canvas.save();
+                canvas.clipPath(path);
+                canvas.drawPath(path, flexyBorderPaint);
+                canvas.restore();
+            }
         } else {
             canvas.drawPath(path, p);
         }
@@ -723,6 +739,16 @@ public class MessageDrawable extends Drawable {
         return path;
     }
 
+    /** Mirrored cubic contour: vertical tangent, rounded short tip and continuous return to body. */
+    private void appendSignatureTail(Path path, float edge, float bottom, float direction) {
+        float d = AndroidUtilities.density, x = direction * d;
+        path.lineTo(edge, bottom - 14 * d);
+        path.cubicTo(edge, bottom - 8 * d, edge + .6f * x, bottom - 4 * d, edge + 3 * x, bottom - 2 * d);
+        path.cubicTo(edge + 3.6f * x, bottom - 1.5f * d, edge + 3.4f * x, bottom - .5f * d, edge + 2.6f * x, bottom - .5f * d);
+        path.cubicTo(edge + 1.2f * x, bottom - .5f * d, edge - x, bottom - 3 * d, edge - 3 * x, bottom - 3 * d);
+        path.cubicTo(edge - 6 * x, bottom - 3 * d, edge - 9 * x, bottom, edge - 14 * x, bottom);
+    }
+
     private void generatePath(Path path, Rect bounds, int padding, int rad, int smallRad, int nearRad, int top, boolean drawFullBottom, boolean drawFullTop, boolean customPaint) {
         path.rewind();
         int heightHalf = (bounds.height() - padding) >> 1;
@@ -737,7 +763,7 @@ public class MessageDrawable extends Drawable {
                 if (currentType == TYPE_MEDIA || oeNoTail) {
                     path.moveTo(bounds.right - dp(8) - radToUse, bounds.bottom - padding);
                 } else {
-                    path.moveTo(bounds.right - dp(flexySurface() ? 5f : 2.6f), bounds.bottom - padding);
+                    path.moveTo(bounds.right - dp(flexySurface() ? 22f : 2.6f), bounds.bottom - padding);
                 }
                 path.lineTo(bounds.left + padding + radToUse, bounds.bottom - padding);
                 rect.set(bounds.left + padding, bounds.bottom - padding - radToUse * 2, bounds.left + padding + radToUse * 2, bounds.bottom - padding);
@@ -793,16 +819,7 @@ public class MessageDrawable extends Drawable {
                         path.arcTo(rect, 0, 90, false);
                     } else {
                         if (flexySurface()) {
-                            // Own short curved tail. Both sides share mirrored control points.
-                            float edge = bounds.right - dp(8);
-                            float tip = bounds.right - dp(5);
-                            float bottom = bounds.bottom - padding;
-                            float cap = AndroidUtilities.dpf2(.7f);
-                            path.lineTo(edge, bottom - dp(9));
-                            path.cubicTo(edge, bottom - dp(4), tip + cap, bottom - AndroidUtilities.dpf2(1.6f),
-                                    tip + cap, bottom - cap);
-                            path.cubicTo(tip + cap, bottom - AndroidUtilities.dpf2(.25f),
-                                    tip + AndroidUtilities.dpf2(.3f), bottom, tip, bottom);
+                            appendSignatureTail(path, bounds.right - dp(8), bounds.bottom - padding, 1);
                         } else {
                     path.lineTo(bounds.right - dp(8), bounds.bottom - padding - smallRad - dp(3));
                     rect.set(bounds.right - dp(8), bounds.bottom - padding - smallRad * 2 - dp(9), bounds.right - dp(7) + smallRad * 2, bounds.bottom - padding - dp(1));
@@ -820,7 +837,7 @@ public class MessageDrawable extends Drawable {
                 if (currentType == TYPE_MEDIA || oeNoTail) {
                     path.moveTo(bounds.left + dp(8) + radToUse, bounds.bottom - padding);
                 } else {
-                    path.moveTo(bounds.left + dp(flexySurface() ? 5f : 2.6f), bounds.bottom - padding);
+                    path.moveTo(bounds.left + dp(flexySurface() ? 22f : 2.6f), bounds.bottom - padding);
                 }
                 path.lineTo(bounds.right - padding - radToUse, bounds.bottom - padding);
                 rect.set(bounds.right - padding - radToUse * 2, bounds.bottom - padding - radToUse * 2, bounds.right - padding, bounds.bottom - padding);
@@ -870,16 +887,7 @@ public class MessageDrawable extends Drawable {
                         path.arcTo(rect, 180, -90, false);
                     } else {
                         if (flexySurface()) {
-                            // Own short curved tail. Both sides share mirrored control points.
-                            float edge = bounds.left + dp(8);
-                            float tip = bounds.left + dp(5);
-                            float bottom = bounds.bottom - padding;
-                            float cap = AndroidUtilities.dpf2(.7f);
-                            path.lineTo(edge, bottom - dp(9));
-                            path.cubicTo(edge, bottom - dp(4), tip - cap, bottom - AndroidUtilities.dpf2(1.6f),
-                                    tip - cap, bottom - cap);
-                            path.cubicTo(tip - cap, bottom - AndroidUtilities.dpf2(.25f),
-                                    tip - AndroidUtilities.dpf2(.3f), bottom, tip, bottom);
+                            appendSignatureTail(path, bounds.left + dp(8), bounds.bottom - padding, -1);
                         } else {
                     path.lineTo(bounds.left + dp(8), bounds.bottom - padding - smallRad - dp(3));
                     rect.set(bounds.left + dp(7) - smallRad * 2, bounds.bottom - padding - smallRad * 2 - dp(9), bounds.left + dp(8), bounds.bottom - padding - dp(1));

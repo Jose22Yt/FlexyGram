@@ -30,11 +30,12 @@ public final class StudioCodec {
                 copy.put(section.getKey(),Collections.unmodifiableMap(values));
             }
             if(copy.isEmpty())throw new IllegalArgumentException("empty");
+            if(minApp<StudioSchema.minimumApp(copy))throw new IllegalArgumentException("version");
             sections=Collections.unmodifiableMap(copy);
         }
     }
     private StudioCodec(){}
-    public static Preset create(String name,Map<String,Map<String,Object>> values){return new Preset(name,StudioSchema.MIN_APP,values);}
+    public static Preset create(String name,Map<String,Map<String,Object>> values){return new Preset(name,StudioSchema.minimumApp(values),values);}
     public static Preset export(String name,Map<String,Map<String,Object>> snapshot,Set<String> explicitlyIncluded) {
         Map<String,Map<String,Object>> result=new TreeMap<>();
         for(String section:snapshot.keySet()) {

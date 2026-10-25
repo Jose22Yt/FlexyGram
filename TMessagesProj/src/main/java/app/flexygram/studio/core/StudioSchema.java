@@ -36,9 +36,13 @@ public final class StudioSchema {
         i("bubbles","transparency","flexygram_bubbles","transparency",35,0,100),
         i("bubbles","borderTenths","flexygram_bubbles","signature_border_tenths",11,5,20),
         b("bubbles","cachedBlur","flexygram_bubbles","signature_cached_blur",false),
+        b("bubbles","outlineEnabled","flexygram_bubbles","signature_outline_enabled",true),
+        i("bubbles","outlineStyle","flexygram_bubbles","signature_outline_style",0,0,1),
+        i("bubbles","pearlIntensity","flexygram_bubbles","signature_pearl_intensity",55,0,100),
         i("header","style","flexygram_header","style",0,0,1),
         b("header","compact","flexygram_header","compact",false),
         b("header","counter","flexygram_header","counter",true),
+        i("header","counterPresentation","flexygram_header","counter_mode",1,1,2),
         i("header","opacity","flexygram_header","opacity",85,0,100),
         i("composer","style","flexygram_composer","style",0,0,1),
         b("composer","glass","flexygram_composer","pearlGlass",false),
@@ -66,6 +70,12 @@ public final class StudioSchema {
         Object result=key.validate(raw);
         if(key.section.equals("composer")&&key.id.equals("gap")&&result.equals(1))throw new IllegalArgumentException("value");
         return result;
+    }
+    /** Additive schema1 keys require Alpha1274; older valid schema1 files remain accepted. */
+    public static int minimumApp(Map<String,Map<String,Object>> sections) {
+        Map<String,Object> bubbles=sections.get("bubbles"),header=sections.get("header");
+        return bubbles!=null&&(bubbles.containsKey("outlineEnabled")||bubbles.containsKey("outlineStyle")||bubbles.containsKey("pearlIntensity"))
+            ||header!=null&&header.containsKey("counterPresentation")?1274:MIN_APP;
     }
     public static boolean filename(String name) {
         if(name==null||name.length()>192||!name.endsWith(EXTENSION)||name.length()<=EXTENSION.length())return false;

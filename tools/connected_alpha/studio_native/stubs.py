@@ -29,7 +29,7 @@ if(key==key_divider)return dark?0xff354256:0xffd9e0ea;
 return dark?(key==key_windowBackgroundGray?0xff11151c:0xff1b2533):(key==key_windowBackgroundGray?0xfff7f8fa:0xffffffff);}
 public static Drawable createSimpleSelectorRoundRectDrawable(int radius,int fill,int pressed){GradientDrawable d=new GradientDrawable();d.setColor(fill);d.setCornerRadius(radius);return new RippleDrawable(android.content.res.ColorStateList.valueOf(pressed),d,null);}}
 ''')
- put('org/telegram/messenger/BuildConfig.java','package org.telegram.messenger;public class BuildConfig {public static final boolean CONNECTED_ALPHA=true;public static final int VERSION_CODE=1273;}')
+ put('org/telegram/messenger/BuildConfig.java','package org.telegram.messenger;public class BuildConfig {public static final boolean CONNECTED_ALPHA=true;public static final int VERSION_CODE=1274;}')
  put('org/telegram/messenger/ApplicationLoader.java','''package org.telegram.messenger;public class ApplicationLoader {
 public static android.content.Context applicationContext;public static android.os.Handler applicationHandler=new android.os.Handler(android.os.Looper.getMainLooper());public static String getApplicationId(){return applicationContext.getPackageName();}}''')
  put('org/telegram/messenger/AndroidUtilities.java','''package org.telegram.messenger;public class AndroidUtilities {

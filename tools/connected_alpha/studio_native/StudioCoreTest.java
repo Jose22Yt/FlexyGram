@@ -25,7 +25,8 @@ public class StudioCoreTest {
   defaults.get("header").put("compact",true);defaults.get("composer").put("style",1);
   var three=StudioCodec.export("Tres.flexyGram",defaults,Set.of());check(three.sections.size()==3);
   var full=StudioCodec.export("Completo.flexyGram",defaults,StudioSchema.sections());check(full.sections.size()==4);check(full.sections.values().stream().mapToInt(Map::size).sum()==StudioSchema.keys().size());
-  byte[] encoded=StudioCodec.encode(full);check(Arrays.equals(encoded,StudioCodec.encode(StudioCodec.decode(encoded,1273))));
+  byte[] encoded=StudioCodec.encode(full);check(Arrays.equals(encoded,StudioCodec.encode(StudioCodec.decode(encoded,1274))));
+  check(full.minApp==1274);reject(()->StudioCodec.decode(encoded,1273));
   Map<String,Map<String,Object>> reversed=new LinkedHashMap<>();List<String> ids=new ArrayList<>(full.sections.keySet());Collections.reverse(ids);for(String s:ids)reversed.put(s,full.sections.get(s));check(Arrays.equals(encoded,StudioCodec.encode(StudioCodec.create(full.name,reversed))));
   check(StudioCodec.decode(StudioCodec.encode(one),1273).sections.equals(one.sections));
   try{one.sections.put("icon",Map.of());throw new AssertionError();}catch(UnsupportedOperationException expected){checks++;}

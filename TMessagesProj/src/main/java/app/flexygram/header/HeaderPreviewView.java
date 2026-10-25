@@ -18,7 +18,7 @@ public final class HeaderPreviewView extends View {
     private final String name, status;
     private int iconColor;
     private float titlePx, subtitlePx, previewHeight, titleBaseline, subtitleBaseline;
-    private final Paint.FontMetricsInt metrics = new Paint.FontMetricsInt();
+    private final Paint.FontMetricsInt fontMetrics = new Paint.FontMetricsInt();
     private String displayName = "", displayStatus = "";
     public HeaderPreviewView(Context context) {
         super(context); text.setTextAlign(Paint.Align.CENTER);
@@ -31,8 +31,8 @@ public final class HeaderPreviewView extends View {
         int width=MeasureSpec.getSize(widthSpec); var metrics=getResources().getDisplayMetrics();
         titlePx=android.util.TypedValue.applyDimension(android.util.TypedValue.COMPLEX_UNIT_SP,17.5f,metrics);
         subtitlePx=android.util.TypedValue.applyDimension(android.util.TypedValue.COMPLEX_UNIT_SP,13.5f,metrics);
-        text.setTextSize(titlePx); text.getFontMetricsInt(metrics); int titleLine=metrics.descent-metrics.ascent;
-        text.setTextSize(subtitlePx); text.getFontMetricsInt(metrics); int subtitleLine=metrics.descent-metrics.ascent;
+        text.setTextSize(titlePx); text.getFontMetricsInt(fontMetrics); int titleLine=fontMetrics.descent-fontMetrics.ascent;
+        text.setTextSize(subtitlePx); text.getFontMetricsInt(fontMetrics); int subtitleLine=fontMetrics.descent-fontMetrics.ascent;
         previewHeight=HeaderGeometry.height(width,titleLine,subtitleLine,AndroidUtilities.density,HeaderConfig.compact());
         float fit=Math.min(1f,(previewHeight-AndroidUtilities.dp(8))/(titleLine+subtitleLine));titlePx*=fit;subtitlePx*=fit;
         titlePx=Math.min(titlePx,previewHeight-AndroidUtilities.dp(8));

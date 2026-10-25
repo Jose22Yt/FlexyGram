@@ -9,13 +9,17 @@ public final class BubbleConfig {
     public static final String FILE = "flexygram_bubbles";
     public static final String GLASS = "glass", TRANSPARENCY = "transparency", BORDER = "border", EDGES = "edges";
     private static boolean loaded, glass, border, edges, cachedBlur;
-    private static int transparency = 35, borderTenths = 11;
+    private static int transparency = 35, borderTenths = 11, outlineStyle, pearlIntensity = 55;
+    private static boolean outlineEnabled = true;
     private BubbleConfig() { }
     private static SharedPreferences preferences() {
         return ApplicationLoader.applicationContext.getSharedPreferences(FILE, Context.MODE_PRIVATE);
     }
     public static void load() {
         SharedPreferences p = preferences();
+        outlineEnabled = p.getBoolean("signature_outline_enabled", true);
+        outlineStyle = Math.max(0, Math.min(1, p.getInt("signature_outline_style", 0)));
+        pearlIntensity = Math.max(0, Math.min(100, p.getInt("signature_pearl_intensity", 55)));
         cachedBlur = p.getBoolean("signature_cached_blur", false);
         borderTenths = Math.max(5, Math.min(20, p.getInt("signature_border_tenths", 11)));
         glass = p.getBoolean(GLASS, false); border = p.getBoolean(BORDER, false);
@@ -31,6 +35,12 @@ public final class BubbleConfig {
         cachedBlur = value;
         preferences().edit().putBoolean("signature_cached_blur", value).apply();
     }
+    public static boolean outlineEnabled() { return outlineEnabled; }
+    public static int outlineStyle() { return outlineStyle; }
+    public static int pearlIntensity() { return pearlIntensity; }
+    public static void setOutlineEnabled(boolean value) { if (!loaded) load(); outlineEnabled = value; preferences().edit().putBoolean("signature_outline_enabled", value).apply(); }
+    public static void setOutlineStyle(int value) { if (!loaded) load(); outlineStyle = Math.max(0, Math.min(1, value)); preferences().edit().putInt("signature_outline_style", outlineStyle).apply(); }
+    public static void setPearlIntensity(int value) { if (!loaded) load(); value = Math.max(0, Math.min(100, value)); if (value == pearlIntensity) return; pearlIntensity = value; preferences().edit().putInt("signature_pearl_intensity", value).apply(); }
     public static int transparency() { return transparency; }
     public static int borderTenths() { return borderTenths; }
     public static float borderDp() { return borderTenths / 10f; }

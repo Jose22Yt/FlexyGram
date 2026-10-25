@@ -257,11 +257,14 @@
                 android:name="com.google.mlkit.vision.DEPENDENCIES"
                 android:value="subject_segment" />
         </activity>
+        <receiver android:name="app.flexygram.icons.SignatureLauncherUpdateReceiver" android:exported="false">
+            <intent-filter><action android:name="android.intent.action.MY_PACKAGE_REPLACED" /></intent-filter>
+        </receiver>
         <!-- Единственный включённый alias: именно он даёт запись в лаунчере.
              У NagramX эту роль играл BlueIcon, из-за чего на свежей установке
              на рабочем столе появлялась синяя иконка апстрима. -->
         <activity-alias
-            android:enabled="true"
+            android:enabled="false"
             android:name="org.telegram.messenger.ExteralessIcon"
             android:targetActivity="org.telegram.ui.LaunchActivity"
             android:icon="@mipmap/ic_flexy_blue"
@@ -277,7 +280,7 @@
         </activity-alias>
 
         <activity-alias
-            android:enabled="false"
+            android:enabled="true"
             android:name="org.telegram.messenger.FlexyBlueIcon"
             android:targetActivity="org.telegram.ui.LaunchActivity"
             android:icon="@mipmap/ic_flexy_blue"

@@ -456,12 +456,12 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         speedButton.setOnClickListener(v -> cycleSpeed());
         group.addView(speedButton, LayoutHelper.createLinear(0, 52, 1f));
         lyricsButton = new MorphButton(context, PlayerIcon.stroke(PlayerIcon.LYRICS, 20));
-        lyricsButton.setText(getString(R.string.OEPlayerLyrics));
+        lyricsButton.setText(getString(BuildConfig.CONNECTED_ALPHA ? R.string.FlexyMusicLyrics : R.string.OEPlayerLyrics));
         lyricsButton.setRadius(dp(8), false);
         lyricsButton.setOnClickListener(v -> setLyricsMode(!lyricsMode, true));
         group.addView(lyricsButton, LayoutHelper.createLinear(0, 52, 1f, 4, 0, 4, 0));
         queueButton = new MorphButton(context, PlayerIcon.stroke(PlayerIcon.QUEUE, 20));
-        queueButton.setText(getString(R.string.OEPlayerQueue));
+        queueButton.setText(getString(BuildConfig.CONNECTED_ALPHA ? R.string.FlexyMusicQueue : R.string.OEPlayerQueue));
         queueButton.setRadius(dp(8), dp(26), false);
         queueButton.setOnClickListener(v -> openQueue());
         group.addView(queueButton, LayoutHelper.createLinear(0, 52, 1f));
@@ -1686,8 +1686,9 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
             bubble.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
             if (BuildConfig.CONNECTED_ALPHA) {
                 // Full-width hero; short/large-font screens scroll rather than squeezing hit targets.
-                coverSize = Math.max(dp(220), Math.min(width, dp(440)));
-                stageHeight = coverSize - dp(56) + dp(16) + titleRow.getMeasuredHeight();
+                coverSize = Math.max(dp(250), Math.min(Math.round(width * 1.22f), dp(560)));
+                // Title overlays the opaque end of the cached artwork fade, instead of a separate panel.
+                stageHeight = coverSize - dp(56 + 64) + titleRow.getMeasuredHeight();
                 cover.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(top + coverSize, MeasureSpec.EXACTLY));
                 lyricsPanel.measure(exactW, MeasureSpec.makeMeasureSpec(stageHeight, MeasureSpec.EXACTLY));
                 int minimum = top + dp(56) + stageHeight + dp(6 + 40 + 12 + 24 + 28) + timeRow.getMeasuredHeight()
@@ -1724,7 +1725,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
             int coverLeft = (width - coverSize) / 2;
             if (BuildConfig.CONNECTED_ALPHA) cover.layout(0, 0, width, top + coverSize);
             else cover.layout(coverLeft, y + dp(16), coverLeft + coverSize, y + dp(16) + coverSize);
-            int titleTop = BuildConfig.CONNECTED_ALPHA ? top + coverSize + dp(16) : y + dp(16) + coverSize + dp(26);
+            int titleTop = BuildConfig.CONNECTED_ALPHA ? top + coverSize - dp(64) : y + dp(16) + coverSize + dp(26);
             titleRow.layout(side, titleTop, side + contentW, titleTop + titleRow.getMeasuredHeight());
             lyricsPanel.layout(side, stageTop, side + contentW, stageTop + stageHeight);
             y = stageTop + stageHeight + dp(6);

@@ -66,7 +66,7 @@ class Signature1271(unittest.TestCase):
   aliases=app.findall('activity-alias');previous=ET.fromstring(old('TMessagesProj/src/main/AndroidManifest.xml')).find('application').findall('activity-alias')
   self.assertTrue({x.get(A+'name') for x in previous}<={x.get(A+'name') for x in aliases})
   launchers=[x for x in aliases if x.find("intent-filter/category[@"+A+"name='android.intent.category.LAUNCHER']") is not None]
-  self.assertEqual([x.get(A+'name') for x in launchers if x.get(A+'enabled')=='true'],['org.telegram.messenger.ExteralessIcon'])
+  self.assertEqual([x.get(A+'name') for x in launchers if x.get(A+'enabled')=='true'],['org.telegram.messenger.FlexyBlueIcon'])
   for name in ['blue','green','coral','mono','blueprint','nya','quack','go']:
    for suffix in ['','_round']:
     for density in ['mdpi','hdpi','xhdpi','xxhdpi','xxxhdpi']:self.assertTrue((ROOT/f'TMessagesProj/src/main/res/mipmap-{density}/ic_flexy_{name}{suffix}.png').is_file())
@@ -101,7 +101,10 @@ public void setComponentEnabledSetting(ComponentName c,int s,int flags){states.p
    'org/telegram/messenger/ApplicationLoader.java':'package org.telegram.messenger;public class ApplicationLoader {public static android.content.Context applicationContext=new android.content.Context();}',
    'LauncherRegression.java':'''import org.telegram.ui.LauncherIconController;import org.telegram.ui.LauncherIconController.LauncherIcon;import org.telegram.messenger.ApplicationLoader;
 public class LauncherRegression{static void check(boolean v){if(!v)throw new AssertionError();}static int count(){int n=0;for(LauncherIcon i:LauncherIcon.values())if(LauncherIconController.isEnabled(i))n++;return n;}public static void main(String[]args){
-ApplicationLoader.applicationContext.pm.fail=true;LauncherIconController.tryFixLauncherIconIfNeeded();check(ApplicationLoader.applicationContext.pm.states.isEmpty());ApplicationLoader.applicationContext.pm.fail=false;LauncherIconController.tryFixLauncherIconIfNeeded();check(count()==1);check(LauncherIconController.isEnabled(LauncherIcon.EXTERALESS));check(ApplicationLoader.applicationContext.pm.states.get("org.telegram.messenger.ExteralessIcon")==2);
+// Fresh install resolves the blue alias without any startup mutation.
+check(count()==1);LauncherIconController.tryFixLauncherIconIfNeeded();check(ApplicationLoader.applicationContext.pm.states.isEmpty());
+// An old explicit primary override is retired atomically; a rejected migration keeps it intact.
+ApplicationLoader.applicationContext.pm.states.put("org.telegram.messenger.ExteralessIcon",1);ApplicationLoader.applicationContext.pm.fail=true;LauncherIconController.tryFixLauncherIconIfNeeded();check(ApplicationLoader.applicationContext.pm.states.get("org.telegram.messenger.ExteralessIcon")==1);ApplicationLoader.applicationContext.pm.fail=false;LauncherIconController.tryFixLauncherIconIfNeeded();check(count()==1);check(LauncherIconController.isEnabled(LauncherIcon.EXTERALESS));check(ApplicationLoader.applicationContext.pm.states.get("org.telegram.messenger.ExteralessIcon")==2);
 for(int sdk:new int[]{32,37}){android.os.Build.VERSION.SDK_INT=sdk;for(LauncherIcon i:LauncherIcon.values()){LauncherIconController.setIcon(i);check(count()==1);check(LauncherIconController.isEnabled(i));LauncherIconController.tryFixLauncherIconIfNeeded();check(LauncherIconController.isEnabled(i));}}
 check(ApplicationLoader.applicationContext.pm.minEnabled>=1);check(ApplicationLoader.applicationContext.pm.batches>0);
 android.os.Build.VERSION.SDK_INT=37;LauncherIconController.setIcon(LauncherIcon.FLEX_GREEN);ApplicationLoader.applicationContext.pm.fail=true;try{LauncherIconController.setIcon(LauncherIcon.FLEX_CORAL);throw new AssertionError();}catch(SecurityException expected){}check(count()==1);check(LauncherIconController.isEnabled(LauncherIcon.FLEX_GREEN));ApplicationLoader.applicationContext.pm.fail=false;

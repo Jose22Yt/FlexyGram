@@ -18445,9 +18445,10 @@ public class ChatActivity extends BaseFragment implements
             if (signatureWallpaperBlur != null) signatureWallpaperBlur.prepare(getBackgroundImage(),
                     getNewDrawableMotion(), getThemedColor(Theme.key_windowBackgroundGray));
         }
-        @Override protected void onBackgroundViewInvalidate() {
-            super.onBackgroundViewInvalidate();
-            refreshSignatureWallpaperBlur();
+        @Override protected void onBackgroundDrawn(android.graphics.drawable.Drawable drawable, boolean moving) {
+            super.onBackgroundDrawn(drawable, moving);
+            if (signatureWallpaperBlur != null) signatureWallpaperBlur.prepare(drawable, moving,
+                    getThemedColor(Theme.key_windowBackgroundGray));
         }
 
 
@@ -42243,11 +42244,14 @@ public class ChatActivity extends BaseFragment implements
     private class ChatMessageCellDelegate implements ChatMessageCell.ChatMessageCellDelegate {
         @Override
         public boolean drawFlexyBubbleWallpaper(ChatMessageCell cell, Canvas canvas, android.graphics.Path path) {
-            if (contentView == null || chatListView == null || contentView.signatureWallpaperBlur == null
-                    || cell.getAlpha() < 1f || cell.getTranslationX() != 0 || Theme.isAnimatingColor()) return false;
+            return drawFlexyBubbleWallpaper(cell, canvas, path, 255);
+        }
+        @Override
+        public boolean drawFlexyBubbleWallpaper(ChatMessageCell cell, Canvas canvas, android.graphics.Path path, int alpha) {
+            if (contentView == null || chatListView == null || contentView.signatureWallpaperBlur == null) return false;
             // Existing cell/root coordinate bridge; only the new static asynchronous cache is sampled.
             return contentView.signatureWallpaperBlur.draw(canvas, path,
-                    cell.getX() + chatListView.getX(), cell.getY() + chatListView.getY());
+                    cell.getX() + chatListView.getX(), cell.getY() + chatListView.getY(), alpha);
         }
 
         @Override

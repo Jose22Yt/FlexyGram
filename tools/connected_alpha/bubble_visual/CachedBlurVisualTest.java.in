@@ -42,6 +42,18 @@ public class CachedBlurVisualTest {
   for(int top:new int[]{0,21,100,160}){Bitmap sample=Bitmap.createBitmap(64,48,Bitmap.Config.ARGB_8888);assertTrue(a.draw(new Canvas(sample),local,12,top));assertEquals(expected.getPixel(32,top+24),sample.getPixel(20,24));}
   a.prepare(source,true,0xffcccccc);assertFalse(a.isReady());assertFalse(a.isSupported());assertFalse(a.draw(new Canvas(expected),whole,0,0));assertEquals(0,Utilities.globalQueue.pending());
  }
+ @Test public void capturedMappingSurvivesSharedDrawableBoundsAndPartialAlphaDoesNotToggleMatte()throws Exception{
+  var a=owner(new View(ApplicationLoader.applicationContext));BitmapDrawable source=image(128,256,0);
+  for(int y=0;y<256;y++)for(int x=0;x<128;x++)source.getBitmap().setPixel(x,y,Color.rgb(x*2,y,80));
+  a.prepare(source,false,0xffcccccc);complete();Bitmap prepared=cached(a);
+  Path shape=new Path();shape.addRect(0,0,64,48,Path.Direction.CW);
+  Bitmap full=Bitmap.createBitmap(64,48,Bitmap.Config.ARGB_8888);assertTrue(a.draw(new Canvas(full),shape,12,100));
+  // Another view drawing the same Drawable must not rewrite this conversation's sampling transform.
+  source.setBounds(0,0,1024,2048);
+  Bitmap sample=Bitmap.createBitmap(64,48,Bitmap.Config.ARGB_8888);assertTrue(a.draw(new Canvas(sample),shape,12,100));assertEquals(full.getPixel(20,24),sample.getPixel(20,24));
+  for(int alpha:new int[]{0,64,128,254,255}){sample.eraseColor(Color.TRANSPARENT);assertTrue(a.draw(new Canvas(sample),shape,12,100,alpha));assertEquals(alpha,Color.alpha(sample.getPixel(20,24)));assertSame(prepared,cached(a));}
+  assertEquals(0,Utilities.globalQueue.pending());
+ }
  @Test public void cancellationLateResultsCapacityAndGenerationAreControlled()throws Exception{
   class Counter extends View{int changes;Counter(){super(ApplicationLoader.applicationContext);}@Override public void invalidate(){super.invalidate();changes++;}}
   Counter target=new Counter();var a=owner(target);var b=owner(target);var c=owner(target);
