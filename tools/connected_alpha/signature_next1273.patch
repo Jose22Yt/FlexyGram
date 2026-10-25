@@ -1,5 +1,5 @@
 diff --git a/.github/workflows/connected-alpha-arm64.yml b/.github/workflows/connected-alpha-arm64.yml
-index 3fb0701ea..6731292d7 100644
+index 3fb0701ea..52b539464 100644
 --- a/.github/workflows/connected-alpha-arm64.yml
 +++ b/.github/workflows/connected-alpha-arm64.yml
 @@ -73,7 +73,7 @@ jobs:
@@ -11,7 +11,7 @@ index 3fb0701ea..6731292d7 100644
            path: |
              build/connected-alpha-bubble-visual/android-native-bubbles.png
              build/connected-alpha-bubble-visual/android-signature-icons.png
-@@ -249,7 +249,7 @@ jobs:
+@@ -249,14 +249,21 @@ jobs:
              echo '::error::Expected exactly one Connected Alpha APK.'
              exit 1
            fi
@@ -20,6 +20,20 @@ index 3fb0701ea..6731292d7 100644
            python3 - <<'PY'
            import json, os
            from pathlib import Path
+           report = Path('connected-alpha-verification.json')
+           data = json.loads(report.read_text())
+           data['commit'] = os.environ['COMMIT_ID']
++          if data['elf_count'] != 96:
++              raise ValueError('Full Connected Alpha must contain exactly 96 ARM64 ELF payloads')
++          if data['certificate_sha256'] != 'c8f04cad685ca5757d35b25ea4b0b4613c7399909948d821e6ada61f9fb12b2c':
++              raise ValueError('APK certificate differs from the authorized installed Alpha identity')
+           report.write_text(json.dumps(data, indent=2) + '\n')
++          # Only public artifact metadata; never APK bytes or private signing inputs.
++          public = {key: data[key] for key in ('commit', 'sha256', 'application_id', 'version_code', 'elf_count', 'bytes')}
++          print('PUBLIC_APK_VERIFICATION ' + json.dumps(public, sort_keys=True))
+           with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as f:
+               f.write('Artifact verification passed. Android launch/login: NOT TESTED.\n\n')
+               f.write('APK SHA-256: ' + data['sha256'] + '\n')
 diff --git a/.github/workflows/pr.yml b/.github/workflows/pr.yml
 index e24190450..b2a63b900 100644
 --- a/.github/workflows/pr.yml

@@ -32,3 +32,21 @@ class Release1273(unittest.TestCase):
   self.assertIn("github.event_name == 'push'",entry['if'])
   self.assertIn("refs/heads/integration/connected-alpha-1273-signature",entry['if'])
   self.assertEqual(entry['uses'],'./.github/workflows/connected-alpha-arm64.yml')
+ def test_real_workflow_report_enforces_payload_and_pin_without_exposing_extra_fields(self):
+  import json,os,sys,tempfile
+  from pathlib import Path
+  workflow=yaml.safe_load((ROOT/'.github/workflows/connected-alpha-arm64.yml').read_text())
+  step=next(s for s in workflow['jobs']['build-arm64']['steps'] if s.get('name')=='Verify APK against independently authorized certificate')
+  script=step['run'].split("python3 - <<'PY'\n",1)[1].split('\nPY',1)[0]
+  base=dict(sha256='0'*64,application_id='io.github.jose22yt.flexygram.alpha',version_code=1273,elf_count=96,bytes=1,certificate_sha256='c8f04cad685ca5757d35b25ea4b0b4613c7399909948d821e6ada61f9fb12b2c',elfs=['PRIVATE_DECOY_FIELD'])
+  with tempfile.TemporaryDirectory() as d:
+   env=dict(os.environ,COMMIT_ID='isolated-source-test',GITHUB_STEP_SUMMARY=str(Path(d)/'summary'))
+   def execute(data):
+    (Path(d)/'connected-alpha-verification.json').write_text(json.dumps(data))
+    return subprocess.run([sys.executable,'-c',script],cwd=d,env=env,capture_output=True,text=True)
+   result=execute(base);self.assertEqual(result.returncode,0,result.stderr)
+   report=json.loads(result.stdout.removeprefix('PUBLIC_APK_VERIFICATION '))
+   self.assertEqual(set(report),{'commit','sha256','application_id','version_code','elf_count','bytes'})
+   self.assertNotIn('PRIVATE_DECOY_FIELD',result.stdout)
+   for count in [0,95,97]:self.assertNotEqual(execute(dict(base,elf_count=count)).returncode,0)
+   self.assertNotEqual(execute(dict(base,certificate_sha256='0'*64)).returncode,0)
