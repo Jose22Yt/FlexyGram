@@ -19,3 +19,7 @@ def restore(path,data):
   result=subprocess.run(['git','apply','--reverse','-'],input=matches[0],cwd=temp,capture_output=True)
   if result.returncode:raise ValueError('Performance delta differs from reviewed patch: '+path)
   return target.read_bytes()
+
+# Independent PR92 descendant: exact inventory and production reversal live separately.
+from .navigation_contract import PATHS as NAVIGATION_PATHS
+PATHS = PATHS | NAVIGATION_PATHS

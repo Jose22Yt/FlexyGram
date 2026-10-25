@@ -17,6 +17,10 @@ def method(source, anchor):
 
 
 def write_stubs(source, root):
+    radius_spec = importlib.util.spec_from_file_location('radius_probe_fixture', root/'tools/connected_alpha/performance/radius_probe.py')
+    radius = importlib.util.module_from_spec(radius_spec)
+    radius_spec.loader.exec_module(radius)
+    radius.write_sources(source)
     spec = importlib.util.spec_from_file_location('original_music_stubs', root/'tools/connected_alpha/music_visual/stubs.py')
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)

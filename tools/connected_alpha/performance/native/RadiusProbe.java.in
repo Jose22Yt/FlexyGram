@@ -1,0 +1,53 @@
+package perf;
+import java.util.*;
+import java.lang.management.ManagementFactory;
+import app.exteraless.appearance.AppearanceConfig;
+/** Actual extracted radius methods; drawable notification and preference dependencies are doubles. */
+public class RadiusProbe {
+ static void same(BaselineRadius a,CandidateRadius b){
+  if(!Arrays.equals(a.roundRadius,b.roundRadius)||!Arrays.equals(a.requested(),b.requested())||a.isRoundRect!=b.isRoundRect||a.updates!=b.updates||a.digest!=b.digest)throw new AssertionError("radius/callback parity");
+ }
+ static long allocation(boolean candidate,boolean uniform){
+  var bean=(com.sun.management.ThreadMXBean)ManagementFactory.getThreadMXBean();
+  if(!bean.isThreadAllocatedMemorySupported())return -1;
+  bean.setThreadAllocatedMemoryEnabled(true);
+  var a=new BaselineRadius();var b=new CandidateRadius();int[] requested={23,18,9,0};
+  AppearanceConfig.corners=14;AppearanceConfig.uniform=uniform;a.avatar(true,46,false);b.avatar(true,46,false);
+  for(int n=0;n<20000;n++){if(candidate)b.setRoundRadius(requested);else a.setRoundRadius(requested);}
+  long id=Thread.currentThread().getId();long before=bean.getThreadAllocatedBytes(id);
+  for(int n=0;n<20000;n++){requested[0]=(n&15)+8;if(candidate)b.setRoundRadius(requested);else a.setRoundRadius(requested);}
+  long bytes=bean.getThreadAllocatedBytes(id)-before;
+  if(candidate&&b.roundRadius[0]<0)throw new AssertionError();if(!candidate&&a.roundRadius[0]<0)throw new AssertionError();
+  return bytes;
+ }
+ public static void main(String[] args){
+  var r=new Random(87123);var a=new BaselineRadius();var b=new CandidateRadius();
+  Object[] drawables={new Object(),new Object(),new Object(),new Object()};
+  a.currentImageDrawable=b.currentImageDrawable=drawables[0];a.currentMediaDrawable=b.currentMediaDrawable=drawables[1];
+  a.currentThumbDrawable=b.currentThumbDrawable=drawables[2];a.staticThumbDrawable=b.staticThumbDrawable=drawables[3];
+  float[] widths={0,1,2,17.5f,48,1000,-1,Float.NaN,Float.POSITIVE_INFINITY};
+  for(int n=0;n<30000;n++){
+   AppearanceConfig.corners=r.nextInt(29);AppearanceConfig.uniform=r.nextBoolean();
+   boolean avatar=r.nextBoolean(),applied=r.nextBoolean();float w=widths[r.nextInt(widths.length)];
+   Object shader=r.nextBoolean()?drawables[0]:null;a.imageShader=b.imageShader=shader;a.mediaShader=b.mediaShader=shader;
+   a.avatar(avatar,w,applied);b.avatar(avatar,w,applied);same(a,b);
+   switch(n%6){
+    case 0->{int v=r.nextInt(150)-10;a.setRoundRadius(v);b.setRoundRadius(v);}
+    case 1->{int x=r.nextInt(),y=r.nextInt(),z=r.nextInt(),q=r.nextInt();a.setRoundRadius(x,y,z,q);b.setRoundRadius(x,y,z,q);}
+    case 2->{int[] v=new int[r.nextInt(7)];for(int i=0;i<v.length;i++)v[i]=r.nextInt(140);a.setRoundRadius(v);b.setRoundRadius(v);}
+    case 3->{boolean v=r.nextBoolean();a.setAvatarCornersApplied(v);b.setAvatarCornersApplied(v);}
+    case 4->{float v=widths[r.nextInt(widths.length)];a.resize(v);b.resize(v);}
+    case 5->{float v=r.nextFloat()*120;a.setRoundRadiusForAvatar(v);b.setRoundRadiusForAvatar(v);}
+   }
+   same(a,b);
+  }
+  // Public scalar overloads must still dispatch through subclasses' array overload.
+  class A extends BaselineRadius{int calls;public void setRoundRadius(int[] v){calls++;super.setRoundRadius(v);}}
+  class B extends CandidateRadius{int calls;public void setRoundRadius(int[] v){calls++;super.setRoundRadius(v);}}
+  A x=new A();B y=new B();x.setRoundRadius(12);y.setRoundRadius(12);x.setRoundRadius(1,2,3,4);y.setRoundRadius(1,2,3,4);same(x,y);
+  if(x.calls!=2||y.calls!=2)throw new AssertionError("virtual delegation");
+  long oldScaled=allocation(false,false),newScaled=allocation(true,false),oldUniform=allocation(false,true),newUniform=allocation(true,true);
+  if(oldScaled<0||oldUniform<0||oldScaled<=newScaled||oldUniform<=newUniform)throw new AssertionError("host allocation counter unavailable/no reduction");
+  System.out.println("{\"evidence\":\"isolated_HotSpot_actual_methods_dependency_doubles_escape_analysis_disabled\",\"differential_steps\":30000,\"allocation_calls_per_mode\":20000,\"baseline_scaled_host_bytes\":"+oldScaled+",\"candidate_scaled_host_bytes\":"+newScaled+",\"baseline_uniform_host_bytes\":"+oldUniform+",\"candidate_uniform_host_bytes\":"+newUniform+",\"ART_bytes\":null,\"physical_scroll_ms\":null,\"superiority\":\"NOT_ESTABLISHED\"}");
+ }
+}

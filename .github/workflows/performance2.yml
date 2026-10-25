@@ -1,0 +1,54 @@
+name: Performance Engineering 2 (no APK)
+on:
+  push:
+    branches: [perf/alpha1273-engineering2]
+  pull_request:
+    types: [opened, reopened, synchronize]
+permissions:
+  contents: read
+concurrency:
+  group: performance2-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  regression:
+    if: github.event_name == 'push' || github.head_ref == 'perf/alpha1273-engineering2'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - run: python3 -m pip install -r tools/connected_alpha/requirements-ci.txt
+      - run: git submodule update --init --depth 1 TMessagesProj_Modules/media
+      - run: python3 tools/connected_alpha/run_checks.py
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: 'build-tools;36.0.0 platforms;android-37.0'
+      - run: python3 tools/connected_alpha/check_resources.py --sdk-root "$ANDROID_HOME"
+      - name: Existing isolated Android regressions, not full app tests
+        run: |
+          for probe in bubble_visual matte_visual composer_visual home_visual login_visual music_visual; do
+            python3 "tools/connected_alpha/$probe/run.py" --sdk-root "$ANDROID_HOME"
+          done
+          python3 tools/connected_alpha/performance/native/run.py --sdk-root "$ANDROID_HOME"
+          python3 tools/connected_alpha/music_visual/reproduce_detach.py --sdk-root "$ANDROID_HOME"
+          python3 tools/connected_alpha/preview_visual/run.py --sdk-root "$ANDROID_HOME"
+      - run: python3 tools/connected_alpha/performance/radius_probe.py
+      - run: python3 -m tools.connected_alpha.performance.navigation_audit --out build/performance2/source-audit.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: performance2-isolated-evidence
+          path: |
+            build/performance2/radius-host.json
+            build/performance2/source-audit.json
+            build/connected-alpha-performance-native/performance-native-result.json
+            build/connected-alpha-*/target/surefire-reports/*.xml
+          if-no-files-found: error
+          retention-days: 7
