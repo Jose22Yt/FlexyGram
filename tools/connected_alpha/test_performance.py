@@ -94,21 +94,28 @@ class PerformanceLab(unittest.TestCase):
             with self.assertRaises(ValueError):startup(value)
     def test_capture_uses_only_readonly_telemetry_and_no_ui_or_owner_data(self):
         calls=[]
+        args_holder=[]
         class FakeDevice:
             def shell(self,*args):
                 calls.append(args)
                 if args==('dumpsys','thermalservice'):return 'Thermal Status: 0'
                 if args==('dumpsys','battery'):return 'level: 80\ntemperature: 300\nUSB powered: false'
-                if args[0:2]==('dumpsys','gfxinfo'):return SAMPLE
+                if args[0:2]==('am','start'):return 'TotalTime: 234\n'
+                if args[0:2]==('dumpsys','gfxinfo'):return HEADER if args_holder[0].scenario=='cold_start' else SAMPLE
                 if args[0:2]==('dumpsys','meminfo'):return 'TOTAL PSS: 123'
                 return 'test'
         with tempfile.TemporaryDirectory() as directory:
             args=SimpleNamespace(serial='NEVER_SAVE_SERIAL',label='candidate',source_commit=BASE,scenario='music_navigation',package='test.app',iterations=1,verified_hz=None,max_thermal=1,min_battery=30,max_temperature_c=38,charging='unplugged',output=Path(directory)/'result.json',**{k:'test' for k in ('theme','cache_state','conversation_fixture','workload_id','music_state','refresh_profile','installation_state','test_session_state')})
+            args_holder.append(args)
             report=run(args,FakeDevice(),prompt=lambda s:None)
             report['evidence']='synthetic' # explicitly not a physical measurement
             text=json.dumps(report)
             self.assertNotIn(args.serial,text)
             self.assertIsNone(report['captures'][0]['memory_after']['allocations'])
+            args.scenario='cold_start';args.component='test.app/TestActivity';args.allow_test_force_stop=True
+            cold=run(args,FakeDevice(),prompt=lambda s:None)
+            self.assertEqual(cold['captures'][0]['startup_ms'],234)
+            self.assertEqual(cold['captures'][0]['frames']['duration_ms']['count'],0)
         for args in calls:
             self.assertFalse(any(x in args for x in ('input','uiautomator','logcat','screencap','clear','install','setprop','put')))
     def test_perfetto_queries_execute_with_explicit_synthetic_tables(self):
@@ -168,3 +175,18 @@ class PerformanceLab(unittest.TestCase):
         with sqlite3.connect(':memory:') as db:
             db.executescript("CREATE TABLE android_startups(startup_id INT,package TEXT,startup_type TEXT,dur INT);CREATE TABLE android_startup_time_to_display(startup_id INT,time_to_initial_display INT,time_to_full_display INT);INSERT INTO android_startups VALUES(1,'test.app','warm',10000000);INSERT INTO android_startup_time_to_display VALUES(1,8000000,NULL);")
             self.assertEqual(db.execute(sql).fetchone(),('warm',10,8,None))
+
+    def test_cold_start_can_compare_startup_without_fabricating_graphics(self):
+        reports=self.reports()
+        for report in reports:
+            report['scenario']='cold_start'
+            for capture in report['captures']:
+                capture['startup_ms']=234
+                capture['frames']=gfxinfo(HEADER)
+        result=compare(reports)
+        self.assertTrue(result['comparable'])
+        self.assertEqual(result['rows'][0]['startup_ms']['median'],234)
+        self.assertIsNone(result['rows'][0]['sample_medians_ms']['median'])
+        self.assertEqual(result['rows'][0]['frame_count'],0)
+        reports[0]['scenario']='warm_start'
+        self.assertFalse(compare(reports)['comparable'])

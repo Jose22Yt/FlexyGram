@@ -40,7 +40,7 @@ public class TypefaceHelper {public static android.graphics.Typeface lyricsTypef
         shell = shell.replace(token, replacement)
     put('app/exteraless/player/LyricsHarness.java', shell)
     original = subprocess.check_output(['git','show','997ac40a65be00c672dc8009b61f55825537d498:TMessagesProj/src/main/java/app/exteraless/player/LyricsView.java'], cwd=root, text=True)
-    before = (Path(__file__).parent/'LyricsHarness.java.in').read_text().replace('LyricsHarness','BaselineLyricsHarness').replace('postDelayed(scrollToCurrent,750)', 'list.postDelayed(scrollToCurrent,750)')
+    before = (Path(__file__).parent/'LyricsHarness.java.in').read_text().replace('LyricsHarness','BaselineLyricsHarness').replace('post(scrollToCurrent)', 'list.post(scrollToCurrent)')
     for token, replacement in {'_LINE_': original[original.index('    private class LineView extends View'):original.rfind('\n}')],
             '_CURRENT_': method(original,'    private long currentMs()'), '_PLAYING_': method(original,'    private boolean isPlaying()'),
             '_DETACH_': ''}.items(): before = before.replace(token,replacement)

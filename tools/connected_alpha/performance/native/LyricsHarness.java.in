@@ -13,7 +13,7 @@ public class LyricsHarness extends FrameLayout {
  public LyricsHarness(Context c){super(c);list=new TestList(c);list.onStop=()->postDelayed(resumeFollow,750);addView(list);line=new LineView(c);list.addView(line,new FrameLayout.LayoutParams(-1,-2));}
  public View line(){return line;}
  public void bind(String text){line.index=0;line.setText(text,false);line.setRole(1,false);}
- public void schedule(){postDelayed(resumeFollow,750);postDelayed(scrollToCurrent,750);}
+ public void schedule(){postDelayed(resumeFollow,750);post(scrollToCurrent);}
  public int stops(){return list.stops;}
 _CURRENT_
 _PLAYING_

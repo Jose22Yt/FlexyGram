@@ -32,7 +32,8 @@ def validate(report):
         errors.append('At least20 valid repetitions are required for acceptance comparison')
     for capture in captures:
         metric = capture.get('frames', {}).get('duration_ms', {})
-        for key in ('median', 'p95', 'min', 'max'):
+        startup_only = report.get('scenario') == 'cold_start' and capture.get('startup_ms') is not None and metric.get('count') == 0
+        for key in (() if startup_only else ('median', 'p95', 'min', 'max')):
             value = metric.get(key)
             if not isinstance(value, (int, float)) or not math.isfinite(value) or value < 0:
                 errors.append('Invalid summary metric: ' + key)
@@ -40,7 +41,7 @@ def validate(report):
             value = capture['startup_ms']
             if not isinstance(value, (int, float)) or not math.isfinite(value) or value < 0:
                 errors.append('Invalid startup metric')
-        if capture.get('frames', {}).get('duration_ms', {}).get('count', 0) == 0:
+        if capture.get('frames', {}).get('duration_ms', {}).get('count', 0) == 0 and not startup_only:
             errors.append('Empty frame capture')
         if capture.get('frames', {}).get('unbudgeted_frame_count', 1):
             errors.append('Per-frame refresh budget unavailable')
@@ -89,8 +90,8 @@ def compare(reports):
     rows = []
     for report in reports:
         captures = report['captures']
-        medians = [c['frames']['duration_ms']['median'] for c in captures]
-        p95s = [c['frames']['duration_ms']['p95'] for c in captures]
+        medians = [c['frames']['duration_ms']['median'] for c in captures if c['frames']['duration_ms']['median'] is not None]
+        p95s = [c['frames']['duration_ms']['p95'] for c in captures if c['frames']['duration_ms']['p95'] is not None]
         starts = [c['startup_ms'] for c in captures if c.get('startup_ms') is not None]
         rows.append({'label': report['label'], 'source_commit': report['source_commit'],
                      'repetitions': len(captures), 'sample_medians_ms': summary(medians),

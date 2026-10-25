@@ -72,6 +72,8 @@ def collect_environment(device, args):
 
 
 def run(args, device, prompt=input):
+    if args.scenario == 'cold_start' and not getattr(args, 'allow_test_force_stop', False):
+        raise ValueError('Cold start requires explicit TEST-package force-stop authorization')
     environment = collect_environment(device, args)
     report = {'schema': 1, 'evidence': 'test_device', 'label': args.label,
               'prepared_test_device': True, 'source_commit': args.source_commit,
@@ -98,7 +100,7 @@ def run(args, device, prompt=input):
             start_ms = startup(device.shell('am', 'start', '-W', '-n', args.component))
         prompt('Perform/finish the declared TEST interaction, then Enter: ')
         frame_report = gfxinfo(device.shell('dumpsys', 'gfxinfo', args.package, 'framestats'), args.verified_hz)
-        if not frame_report['duration_ms']['count']:
+        if not frame_report['duration_ms']['count'] and start_ms is None:
             raise ValueError('Empty frame telemetry; no result inferred')
         after = health()
         if not after['eligible']:
