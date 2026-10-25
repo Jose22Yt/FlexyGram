@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyHeaderTitle">Chat header</string>
+    <string name="FlexyHeaderStyle">Style</string>
+    <string name="FlexyHeaderSignature">Signature iOS 27</string>
+    <string name="FlexyHeaderClassic">Classic</string>
+    <string name="FlexyHeaderCounter">Show unread chat count</string>
+    <string name="FlexyHeaderSize">Size</string>
+    <string name="FlexyHeaderNormal">Normal</string>
+    <string name="FlexyHeaderCompact">Compact</string>
+    <string name="FlexyHeaderOpacity">Surface opacity</string>
+    <string name="FlexyHeaderUnread">Unread chats in the source list: %1$d</string>
+    <string name="FlexyHeaderPreviewName">Alex</string>
+</resources>

@@ -197,6 +197,7 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
     private int composerSettingsRow = -1;
     private int signaturePersonalHeader = -1, signatureInteractionHeader = -1, signatureAdditionalHeader = -1;
     private int flexyBubblesRow = -1;
+    private int signatureHeaderRow = -1;
     private int signatureMessagesRow = -1, signatureStickersRow = -1, signatureThemeRow = -1;
     private int inputDividerRow = -1;
     private int searchHeaderRow = -1;
@@ -438,6 +439,7 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
     private void updateSignatureHubRows() {
         signaturePersonalHeader = addRow();
         flexyBubblesRow = addRow("flexyBubbles");
+        signatureHeaderRow = addRow("signatureChatHeader");
         composerSettingsRow = addRow("flexyComposerSettings");
         signatureThemeRow = addRow("flexyThemeWallpaper");
         signatureInteractionHeader = addRow();
@@ -1871,6 +1873,8 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
             presentFragment(new OpenExteraChatsActivity(SCREEN_SIGNATURE_STICKERS)); return;
         } else if (position == signatureThemeRow) {
             presentFragment(new app.flexygram.settings.SignatureChatThemeActivity()); return;
+        } else if (position == signatureHeaderRow) {
+            presentFragment(new app.flexygram.header.HeaderSettingsActivity()); return;
         } else if (position == flexyBubblesRow) {
             presentFragment(new app.flexygram.bubbles.BubbleSettingsActivity());
             return;
@@ -2471,17 +2475,19 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
             switch (holder.getItemViewType()) {
                 case TYPE_SIGNATURE_ENTRY:
                     int label = position == flexyBubblesRow ? R.string.FlexyBubblesTitle
+                        : position == signatureHeaderRow ? R.string.FlexyHeaderTitle
                         : position == composerSettingsRow ? R.string.FlexyConversationBar
                         : position == signatureMessagesRow ? R.string.FlexyMessagesGestures
                         : position == signatureThemeRow ? R.string.FlexyThemeWallpaper
                         : position == signatureStickersRow ? R.string.FlexyStickersMedia : R.string.FlexyClassicOptions;
                     int icon = position == flexyBubblesRow ? R.drawable.msg_discussion
+                        : position == signatureHeaderRow ? R.drawable.msg_info
                         : position == composerSettingsRow ? R.drawable.msg_message
                         : position == signatureThemeRow ? R.drawable.msg_theme
                         : position == signatureMessagesRow ? R.drawable.msg_list
                         : position == signatureStickersRow ? R.drawable.msg_emoji_stickers : R.drawable.msg_settings;
                     ((app.flexygram.settings.SignatureNavigationCell)holder.itemView).bind(getString(label), icon,
-                            position == flexyBubblesRow || position == composerSettingsRow || position == signatureMessagesRow);
+                            position == flexyBubblesRow || position == signatureHeaderRow || position == composerSettingsRow || position == signatureMessagesRow);
                     break;
                 case TYPE_SET_REACTION:
                     ((DoubleTapCell.SetReactionCell) holder.itemView).update(false);
@@ -3124,7 +3130,7 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
             if (position == doubleTapReactionRow) return TYPE_SET_REACTION;
             if (isHeader(position)) return TYPE_HEADER;
             if (isDivider(position)) return TYPE_INFO_PRIVACY;
-            if (position == signatureMessagesRow || position == signatureStickersRow || position == signatureThemeRow || position == flexyBubblesRow || position == composerSettingsRow || position == aiChatRow || position == chatSettingsRow
+            if (position == signatureMessagesRow || position == signatureStickersRow || position == signatureThemeRow || position == flexyBubblesRow || position == signatureHeaderRow || position == composerSettingsRow || position == aiChatRow || position == chatSettingsRow
                     || position == menusRow || position == mediaRow) {
                 return TYPE_TEXT;
             }

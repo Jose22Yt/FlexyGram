@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[3]
 HERE = Path(__file__).resolve().parent
 
 
-def main(here=HERE, test_class="MusicVisualTest", stubs_writer=None):
+def main(here=HERE, test_class="MusicVisualTest", stubs_writer=None, resource_writer=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--sdk-root', type=Path, required=True)
     parser.add_argument('--maven', default='mvn')
@@ -37,6 +37,8 @@ def main(here=HERE, test_class="MusicVisualTest", stubs_writer=None):
     res.mkdir(parents=True, exist_ok=True)
     for path in (ROOT/'TMessagesProj/src/main/res/drawable').glob('flexy_home_*.xml'):
         shutil.copyfile(path, res/path.name)
+    if resource_writer is not None:
+        resource_writer(ROOT, res)
     manifest = output/'AndroidManifest.xml'
     manifest.write_text('<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="app.flexygram.visualprobe"><uses-sdk android:minSdkVersion="24"/><application/></manifest>')
     subprocess.run([str(aapt), 'compile', '--dir', str(res.parent), '-o', str(output/'resources.zip')], check=True)

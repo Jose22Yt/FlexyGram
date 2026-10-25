@@ -654,6 +654,7 @@ object AppearanceConfig {
 
     private fun migrateIosChatHeader() {
         if (getPreferences().contains(iosChatHeader.key)) return
+        getPreferences().edit().putBoolean("OEAppearanceIosChatHeaderAuto", true).apply()
         iosChatHeader.setConfigBool(NaConfig.centerActionBarTitle.Bool())
     }
 

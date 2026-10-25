@@ -72,6 +72,7 @@ jobs:
           for probe in bubble_visual matte_visual composer_visual home_visual login_visual music_visual; do
             python3 "tools/connected_alpha/$probe/run.py" --sdk-root "$ANDROID_HOME"
           done
+          python3 tools/connected_alpha/header_visual/run.py --sdk-root "$ANDROID_HOME"
           python3 tools/connected_alpha/performance/native/run.py --sdk-root "$ANDROID_HOME"
           python3 tools/connected_alpha/music_visual/reproduce_detach.py --sdk-root "$ANDROID_HOME"
           python3 tools/connected_alpha/preview_visual/run.py --sdk-root "$ANDROID_HOME"
@@ -85,6 +86,8 @@ jobs:
             build/connected-alpha-matte-visual/target/surefire-reports/*.xml
             build/connected-alpha-music-visual/android-music-isolated.png
             build/connected-alpha-music-visual/target/surefire-reports/*.xml
+            build/connected-alpha-header-visual/signature-header-synthetic.png
+            build/connected-alpha-header-visual/target/surefire-reports/*.xml
           retention-days: 7
           if-no-files-found: error
   build:

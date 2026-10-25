@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyHeaderTitle">Cabecera del chat</string>
+    <string name="FlexyHeaderStyle">Estilo</string>
+    <string name="FlexyHeaderSignature">Signature iOS 27</string>
+    <string name="FlexyHeaderClassic">Clásico</string>
+    <string name="FlexyHeaderCounter">Mostrar chats sin leer</string>
+    <string name="FlexyHeaderSize">Tamaño</string>
+    <string name="FlexyHeaderNormal">Normal</string>
+    <string name="FlexyHeaderCompact">Compacto</string>
+    <string name="FlexyHeaderOpacity">Opacidad de la superficie</string>
+    <string name="FlexyHeaderUnread">Chats sin leer en la lista de origen: %1$d</string>
+    <string name="FlexyHeaderPreviewName">Alex</string>
+</resources>

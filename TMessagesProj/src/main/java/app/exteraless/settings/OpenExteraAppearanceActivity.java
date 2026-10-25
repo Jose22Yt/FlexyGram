@@ -231,7 +231,7 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
         iosGroupRow = addRow("iosStyles");
         if (iosExpanded) {
             iosNavBarRow = addRow("iosNavBar");
-            iosChatHeaderRow = addRow("iosChatHeader");
+            iosChatHeaderRow = org.telegram.messenger.BuildConfig.CONNECTED_ALPHA ? -1 : addRow("iosChatHeader");
         } else {
             iosNavBarRow = iosChatHeaderRow = -1;
         }
