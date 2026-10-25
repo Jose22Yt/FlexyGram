@@ -17,8 +17,8 @@ public class HeaderVisualTest {
    HeaderGeometry g=header.geometry;assertEquals(g.back.height(),g.title.height(),.001f);assertEquals(g.title.height(),g.avatar.height(),.001f);assertEquals(width/2f,g.title.centerX(),.001f);
    View title=(View)field(avatar,"titleTextView");View status=(View)field(avatar,"subtitleTextView");
    assertEquals(0,title.getPaddingTop());assertEquals(0,title.getPaddingBottom());
-   assertTrue("title above surface",title.getTop()>=g.title.top-.5f);
-   assertTrue("status below surface",status.getBottom()<=g.title.bottom+.5f);
+   assertTrue("title above surface: width="+width+" font="+font+" top="+title.getTop()+" surface="+g.title,title.getTop()>=g.title.top-.5f);
+   assertTrue("status below surface: width="+width+" font="+font+" bottom="+status.getBottom()+" surface="+g.title,status.getBottom()<=g.title.bottom+.5f);
    assertTrue("text lines overlap",title.getBottom()<=status.getTop());
    assertEquals(width/2f,title.getLeft()+title.getWidth()/2f,.5f);assertTrue(bar.backButtonImageView.getHeight()>=48);assertEquals(g.back.centerY(),bar.backButtonImageView.getTop()+bar.backButtonImageView.getHeight()/2f,.5f);
    assertTrue(g.back.left>=0&&g.avatar.left>=0);assertTrue(g.back.right<=width&&g.avatar.right<=width);header.detach();
