@@ -17,7 +17,8 @@ public final class HeaderPreviewView extends View {
     private final android.graphics.drawable.Drawable back, more;
     private final String name, status;
     private int iconColor;
-    private float titlePx, subtitlePx, previewHeight;
+    private float titlePx, subtitlePx, previewHeight, titleBaseline, subtitleBaseline;
+    private final Paint.FontMetricsInt metrics = new Paint.FontMetricsInt();
     private String displayName = "", displayStatus = "";
     public HeaderPreviewView(Context context) {
         super(context); text.setTextAlign(Paint.Align.CENTER);
@@ -30,10 +31,13 @@ public final class HeaderPreviewView extends View {
         int width=MeasureSpec.getSize(widthSpec); var metrics=getResources().getDisplayMetrics();
         titlePx=android.util.TypedValue.applyDimension(android.util.TypedValue.COMPLEX_UNIT_SP,17.5f,metrics);
         subtitlePx=android.util.TypedValue.applyDimension(android.util.TypedValue.COMPLEX_UNIT_SP,13.5f,metrics);
-        previewHeight=HeaderGeometry.height(width,titlePx,subtitlePx,AndroidUtilities.density,HeaderConfig.compact());
+        text.setTextSize(titlePx); text.getFontMetricsInt(metrics); int titleLine=metrics.descent-metrics.ascent;
+        text.setTextSize(subtitlePx); text.getFontMetricsInt(metrics); int subtitleLine=metrics.descent-metrics.ascent;
+        previewHeight=HeaderGeometry.height(width,titleLine,subtitleLine,AndroidUtilities.density,HeaderConfig.compact());
+        float fit=Math.min(1f,(previewHeight-AndroidUtilities.dp(8))/(titleLine+subtitleLine));titlePx*=fit;subtitlePx*=fit;
         titlePx=Math.min(titlePx,previewHeight-AndroidUtilities.dp(8));
         int h=Math.round(previewHeight)+AndroidUtilities.dp(80);setMeasuredDimension(width,h);
-        text.setTextSize(AndroidUtilities.dp(16));geometry.update(width,(h-previewHeight)/2,previewHeight,HeaderConfig.counter()?text.measureText("3"):0,AndroidUtilities.density,LocaleController.isRTL);
+        text.setTextSize(AndroidUtilities.dp(16));geometry.update(width,(h-previewHeight)/2,previewHeight,HeaderConfig.counter()?text.measureText("3"):0,AndroidUtilities.density,LocaleController.isRTL,HeaderConfig.counterMode());
         text.setTextSize(titlePx);displayName=android.text.TextUtils.ellipsize(name,new android.text.TextPaint(text),Math.max(0,geometry.title.width()-AndroidUtilities.dp(64)),android.text.TextUtils.TruncateAt.END).toString();
         text.setTextSize(subtitlePx);displayStatus=android.text.TextUtils.ellipsize(status,new android.text.TextPaint(text),Math.max(0,geometry.title.width()-AndroidUtilities.dp(64)),android.text.TextUtils.TruncateAt.END).toString();
     }
@@ -41,7 +45,7 @@ public final class HeaderPreviewView extends View {
     @Override protected void onDraw(Canvas canvas) {
         float d = AndroidUtilities.density, height = previewHeight;
         canvas.drawColor(Theme.getColor(Theme.key_windowBackgroundGray));
-        text.setTextSize(AndroidUtilities.dp(16)); geometry.update(getWidth(), (getHeight()-height)/2, height, HeaderConfig.counter() ? text.measureText("3") : 0, d, LocaleController.isRTL);
+        text.setTextSize(AndroidUtilities.dp(16)); geometry.update(getWidth(), (getHeight()-height)/2, height, HeaderConfig.counter() ? text.measureText("3") : 0, d, LocaleController.isRTL,HeaderConfig.counterMode());
         if (!HeaderConfig.signature()) { text.setColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText)); canvas.drawText(name, getWidth()/2f, getHeight()/2f, text); return; }
         surface.draw(canvas, geometry, d, null);
         int color = Theme.getColor(Theme.key_actionBarDefaultTitle);
@@ -50,9 +54,11 @@ public final class HeaderPreviewView extends View {
         int side=AndroidUtilities.dp(24), y=Math.round(geometry.back.centerY());
         back.setBounds(Math.round(arrow)-side/2,y-side/2,Math.round(arrow)+side/2,y+side/2); back.draw(canvas);
         text.setColor(color); if (geometry.countVisible) canvas.drawText("3",LocaleController.isRTL ? geometry.back.left+(geometry.back.width()-height)/2 : geometry.back.left+height+(geometry.back.width()-height)/2, y+AndroidUtilities.dp(5),text);
-        boolean statusFits=titlePx+subtitlePx+AndroidUtilities.dp(12)<=height;
-        text.setTextSize(titlePx); canvas.drawText(displayName,geometry.title.centerX(),statusFits?y-AndroidUtilities.dp(1):y-(text.ascent()+text.descent())/2,text);
-        if(statusFits){text.setTextSize(subtitlePx);canvas.drawText(displayStatus,geometry.title.centerX(),y+subtitlePx+AndroidUtilities.dp(2),text);}
+        text.setTextSize(titlePx); float titleHeight=text.descent()-text.ascent(), titleAscent=text.ascent();
+        text.setTextSize(subtitlePx); float subtitleHeight=text.descent()-text.ascent();
+        float blockTop=geometry.title.centerY()-(titleHeight+subtitleHeight+AndroidUtilities.dp(2))/2;
+        text.setTextSize(titlePx); canvas.drawText(displayName,geometry.title.centerX(),blockTop-titleAscent,text);
+        text.setTextSize(subtitlePx);canvas.drawText(displayStatus,geometry.title.centerX(),blockTop+titleHeight+AndroidUtilities.dp(2)-text.ascent(),text);
         int mx=LocaleController.isRTL ? Math.round(geometry.title.left)+AndroidUtilities.dp(14):Math.round(geometry.title.right)-AndroidUtilities.dp(14);
         more.setBounds(mx-side/2,y-side/2,mx+side/2,y+side/2);more.draw(canvas);
         avatar.setColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText));canvas.drawCircle(geometry.avatar.centerX(),geometry.avatar.centerY(),height/2-AndroidUtilities.dp(1),avatar);

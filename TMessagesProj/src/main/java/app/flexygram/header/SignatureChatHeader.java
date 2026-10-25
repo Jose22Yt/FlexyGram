@@ -20,6 +20,8 @@ public final class SignatureChatHeader {
     private final ChatAvatarContainer avatar;
     private final Theme.ResourcesProvider provider;
     private final TextView countView;
+    private final android.graphics.Paint textMetrics = new android.graphics.Paint();
+    private final android.graphics.Paint.FontMetricsInt fontMetrics = new android.graphics.Paint.FontMetricsInt();
     private int count = -1;
     private String number = "";
     public float height, titlePx, subtitlePx;
@@ -43,19 +45,26 @@ public final class SignatureChatHeader {
         var metrics = bar.getResources().getDisplayMetrics();
         titlePx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 17.5f, metrics);
         subtitlePx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 13.5f, metrics);
-        height = HeaderGeometry.height(width, titlePx, subtitlePx, AndroidUtilities.density, HeaderConfig.compact());
-        subtitleFits = titlePx + subtitlePx + AndroidUtilities.dp(12) <= height;
+        textMetrics.setTextSize(titlePx); textMetrics.getFontMetricsInt(fontMetrics);
+        int titleLine = fontMetrics.descent - fontMetrics.ascent;
+        textMetrics.setTextSize(subtitlePx); textMetrics.getFontMetricsInt(fontMetrics);
+        int subtitleLine = fontMetrics.descent - fontMetrics.ascent;
+        height = HeaderGeometry.height(width, titleLine, subtitleLine, AndroidUtilities.density, HeaderConfig.compact());
+        // Narrow windows cap side geometry; retain both lines by fitting the text block together.
+        float fit = Math.min(1f, (height - AndroidUtilities.dp(8)) / (titleLine + subtitleLine));
+        titlePx *= fit; subtitlePx *= fit;
+        subtitleFits = true;
         titlePx = Math.min(titlePx, height - AndroidUtilities.dp(8));
         int content = Math.max(nativeHeight, Math.round(height) + AndroidUtilities.dp(12));
-        float digits = HeaderConfig.counter() && count >= 0 ? countView.getPaint().measureText(number) : 0;
-        geometry.update(width, status + (content - height) / 2f, height, digits, AndroidUtilities.density, LocaleController.isRTL);
+        float digits = HeaderConfig.counter() && count > 0 ? countView.getPaint().measureText(number) : 0;
+        geometry.update(width, status + (content - height) / 2f, height, digits, AndroidUtilities.density, LocaleController.isRTL, HeaderConfig.counterMode());
         return content;
     }
     public void measureControls() {
         if (bar.backButtonImageView == null) return;
         if (active()) {
             bar.backButtonImageView.measure(exact(geometry.back.width()), exact(height));
-            countView.measure(exact(Math.max(0, geometry.back.width() - height)), exact(height));
+            countView.measure(exact(geometry.countVisible ? geometry.badge.width() : 0), exact(geometry.separateCount ? geometry.badge.height() : height));
         }
         countView.setVisibility(active() && geometry.countVisible ? View.VISIBLE : View.GONE);
     }
@@ -68,8 +77,9 @@ public final class SignatureChatHeader {
             int pl = LocaleController.isRTL ? extra : 0, pr = LocaleController.isRTL ? 0 : extra;
             if (back.getPaddingLeft() != pl || back.getPaddingRight() != pr) back.setPadding(pl, 0, pr, 0);
             back.layout(Math.round(geometry.back.left), Math.round(geometry.back.top), Math.round(geometry.back.right), Math.round(geometry.back.bottom));
-            float x = LocaleController.isRTL ? geometry.back.left : geometry.back.left + height;
-            countView.layout(Math.round(x), Math.round(geometry.back.top), Math.round(x + extra), Math.round(geometry.back.bottom));
+            float x = geometry.badge.left;
+            float y = geometry.separateCount ? geometry.badge.top : geometry.back.top;
+            countView.layout(Math.round(x), Math.round(y), Math.round(x + countView.getMeasuredWidth()), Math.round(y + countView.getMeasuredHeight()));
             back.setUnread(0);
             back.setContentDescription(LocaleController.getString(R.string.AccDescrGoBack) + (count >= 0 && HeaderConfig.counter() ? ", " + LocaleController.formatString(R.string.FlexyHeaderUnread, count) : ""));
             avatar.setTranslationX(0);

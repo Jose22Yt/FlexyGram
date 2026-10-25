@@ -25,7 +25,9 @@ public final class HeaderSettingsActivity extends SignatureMatteSettingsActivity
     @Override protected BaseListAdapter createAdapter(Context c) { return new Adapter(c); }
     private void changed(int row) { listAdapter.notifyItemChanged(row); if(preview!=null)preview.settingsChanged(); }
     @Override protected void onItemClick(View v,int position,float x,float y) {
-        if(position==counterRow){HeaderConfig.counter(!HeaderConfig.counter());changed(position);}
+        if(position==counterRow){
+            showDialog(new AlertDialog.Builder(getParentActivity(),resourcesProvider).setTitle(getString(R.string.FlexyHeaderCounter)).setItems(new CharSequence[]{getString(R.string.FlexyHeaderCounterOff),getString(R.string.FlexyHeaderCounterIntegrated),getString(R.string.FlexyHeaderCounterBadge)},(dialog,which)->{HeaderConfig.counterMode(which);changed(position);}).create());
+        }
         else if(position==styleRow||position==sizeRow){boolean style=position==styleRow;
             showDialog(new AlertDialog.Builder(getParentActivity(),resourcesProvider).setTitle(getString(style?R.string.FlexyHeaderStyle:R.string.FlexyHeaderSize)).setItems(style?new CharSequence[]{getString(R.string.FlexyHeaderSignature),getString(R.string.FlexyHeaderClassic)}:new CharSequence[]{getString(R.string.FlexyHeaderNormal),getString(R.string.FlexyHeaderCompact)},(dialog,which)->{if(style)HeaderConfig.style(which==0);else HeaderConfig.compact(which==1);changed(position);}).create());
         }
@@ -38,9 +40,9 @@ public final class HeaderSettingsActivity extends SignatureMatteSettingsActivity
     }
     private final class Adapter extends MatteListAdapter {
         Adapter(Context c){super(c);}
-        @Override public int getItemViewType(int p){return p==previewRow?111:p==opacityRow?112:p==counterRow?TYPE_CHECK:TYPE_SETTINGS;}
+        @Override public int getItemViewType(int p){return p==previewRow?111:p==opacityRow?112:TYPE_SETTINGS;}
         @Override public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup p,int type){if(type==111){preview=new HeaderPreviewView(p.getContext());return new RecyclerListView.Holder(preview);}if(type==112)return new RecyclerListView.Holder(new OpacityCell(p.getContext()));return super.onCreateViewHolder(p,type);}
-        @Override public void onBindViewHolder(RecyclerView.ViewHolder h,int p,boolean partial){if(p==previewRow){h.itemView.invalidate();return;}if(p==opacityRow){((OpacityCell)h.itemView).bind();return;}if(p==counterRow){((TextCheckCell)h.itemView).setTextAndCheck(getString(R.string.FlexyHeaderCounter),HeaderConfig.counter(),true);return;}((TextSettingsCell)h.itemView).setTextAndValue(getString(p==styleRow?R.string.FlexyHeaderStyle:R.string.FlexyHeaderSize),getString(p==styleRow?(HeaderConfig.signature()?R.string.FlexyHeaderSignature:R.string.FlexyHeaderClassic):(HeaderConfig.compact()?R.string.FlexyHeaderCompact:R.string.FlexyHeaderNormal)),true);}
+        @Override public void onBindViewHolder(RecyclerView.ViewHolder h,int p,boolean partial){if(p==previewRow){h.itemView.invalidate();return;}if(p==opacityRow){((OpacityCell)h.itemView).bind();return;}if(p==counterRow){((TextSettingsCell)h.itemView).setTextAndValue(getString(R.string.FlexyHeaderCounter),getString(HeaderConfig.counterMode()==0?R.string.FlexyHeaderCounterOff:HeaderConfig.counterMode()==1?R.string.FlexyHeaderCounterIntegrated:R.string.FlexyHeaderCounterBadge),true);return;}((TextSettingsCell)h.itemView).setTextAndValue(getString(p==styleRow?R.string.FlexyHeaderStyle:R.string.FlexyHeaderSize),getString(p==styleRow?(HeaderConfig.signature()?R.string.FlexyHeaderSignature:R.string.FlexyHeaderClassic):(HeaderConfig.compact()?R.string.FlexyHeaderCompact:R.string.FlexyHeaderNormal)),true);}
         @Override public boolean isEnabled(RecyclerView.ViewHolder h){int p=h.getAdapterPosition();return p==counterRow||p==styleRow||p==sizeRow;}
     }
 }

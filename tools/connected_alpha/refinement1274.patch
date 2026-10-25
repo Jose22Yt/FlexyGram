@@ -1,0 +1,343 @@
+diff --git a/.github/workflows/pr.yml b/.github/workflows/pr.yml
+index ad5bcf1b2..589653240 100644
+--- a/.github/workflows/pr.yml
++++ b/.github/workflows/pr.yml
+@@ -91,7 +91,7 @@ jobs:
+           retention-days: 7
+           if-no-files-found: error
+   build:
+-    if: github.event_name == 'pull_request' && github.head_ref != 'feat/flexystudio-native-presets' && github.head_ref != 'perf/alpha1273-engineering2' && github.head_ref != 'feat/alpha1271-signature-ui' && github.head_ref != 'feat/signature-native-login' && github.head_ref != 'feat/signature-music2' && github.head_ref != 'fix/alpha-ios-bubbles-glass-home2' && github.head_ref != 'fix/signature-matte-general-appearance' && github.head_ref != 'alpha/connected-exteraless-baseline' && !startsWith(github.head_ref, 'support/connected-alpha-ci-') && !startsWith(github.head_ref, 'integration/connected-alpha-') && !startsWith(github.head_ref, 'fix/alpha2-')
++    if: github.event_name == 'pull_request' && github.head_ref != 'integration/alpha1274-signature-refinement-studio' && github.head_ref != 'feat/flexystudio-native-presets' && github.head_ref != 'perf/alpha1273-engineering2' && github.head_ref != 'feat/alpha1271-signature-ui' && github.head_ref != 'feat/signature-native-login' && github.head_ref != 'feat/signature-music2' && github.head_ref != 'fix/alpha-ios-bubbles-glass-home2' && github.head_ref != 'fix/signature-matte-general-appearance' && github.head_ref != 'alpha/connected-exteraless-baseline' && !startsWith(github.head_ref, 'support/connected-alpha-ci-') && !startsWith(github.head_ref, 'integration/connected-alpha-') && !startsWith(github.head_ref, 'fix/alpha2-')
+     name: Gradle Build
+     runs-on: ubuntu-latest
+     env:
+diff --git a/TMessagesProj/src/main/java/app/flexygram/header/HeaderConfig.java b/TMessagesProj/src/main/java/app/flexygram/header/HeaderConfig.java
+index 981def566..50c8a8ffe 100644
+--- a/TMessagesProj/src/main/java/app/flexygram/header/HeaderConfig.java
++++ b/TMessagesProj/src/main/java/app/flexygram/header/HeaderConfig.java
+@@ -9,7 +9,7 @@ import java.util.Map;
+ /** UI-owned snapshot. Legacy choices are read conservatively and never overwritten. */
+ public final class HeaderConfig {
+     private static boolean loaded, signature = true, compact, counter = true;
+-    private static int opacity = 85;
++    private static int opacity = 85, counterMode = 1;
+     private HeaderConfig() { }
+     private static SharedPreferences prefs() { return ApplicationLoader.applicationContext.getSharedPreferences("flexygram_header", Context.MODE_PRIVATE); }
+     public static void load() {
+@@ -19,6 +19,8 @@ public final class HeaderConfig {
+         boolean legacy = Boolean.TRUE.equals(old.get("OEAppearanceIosChatHeaderAuto")) || !(previous instanceof Boolean) || (Boolean) previous;
+         Object style = p.get("style"); signature = style instanceof Integer ? (Integer) style == 0 : legacy;
+         compact = Boolean.TRUE.equals(p.get("compact")); counter = !Boolean.FALSE.equals(p.get("counter"));
++        Object mode = p.get("counter_mode");
++        counterMode = mode instanceof Integer ? Math.max(1, Math.min(2, (Integer) mode)) : 1;
+         Object value = p.get("opacity"); opacity = value instanceof Integer ? Math.max(0, Math.min(100, (Integer) value)) : 85;
+         loaded = true;
+     }
+@@ -26,9 +28,11 @@ public final class HeaderConfig {
+     public static boolean signature() { ensure(); return signature; }
+     public static boolean compact() { ensure(); return compact; }
+     public static boolean counter() { ensure(); return counter; }
++    public static int counterMode() { ensure(); return counter ? counterMode : 0; }
++    public static void counterMode(int value) { ensure(); counter = value != 0; if (counter) counterMode = Math.max(1, Math.min(2, value)); prefs().edit().putInt("counter_mode", counterMode).putBoolean("counter", counter).apply(); }
+     public static int opacity() { ensure(); return opacity; }
+     public static void style(boolean value) { ensure(); signature = value; prefs().edit().putInt("style", value ? 0 : 1).apply(); }
+     public static void compact(boolean value) { ensure(); compact = value; prefs().edit().putBoolean("compact", value).apply(); }
+-    public static void counter(boolean value) { ensure(); counter = value; prefs().edit().putBoolean("counter", value).apply(); }
++    public static void counter(boolean value) { counterMode(value ? 1 : 0); }
+     public static void opacity(int value) { ensure(); opacity = Math.max(0, Math.min(100, value)); prefs().edit().putInt("opacity", opacity).apply(); }
+ }
+diff --git a/TMessagesProj/src/main/java/app/flexygram/header/HeaderGeometry.java b/TMessagesProj/src/main/java/app/flexygram/header/HeaderGeometry.java
+index 6a658a5ad..3d6a02f69 100644
+--- a/TMessagesProj/src/main/java/app/flexygram/header/HeaderGeometry.java
++++ b/TMessagesProj/src/main/java/app/flexygram/header/HeaderGeometry.java
+@@ -4,22 +4,31 @@ import android.graphics.RectF;
+ 
+ /** One layout, three equal outer heights. Title always centered in the useful window width. */
+ public final class HeaderGeometry {
+-    public final RectF back = new RectF(), title = new RectF(), avatar = new RectF();
++    public final RectF back = new RectF(), title = new RectF(), avatar = new RectF(), badge = new RectF();
++    public boolean separateCount;
+     public boolean countVisible;
+     public static float height(int width, float titlePx, float subtitlePx, float density, boolean compact) {
+-        float wanted = Math.max((compact ? 48 : 52) * density, (float) Math.ceil(titlePx + subtitlePx + 12 * density));
++        float wanted = Math.max((compact ? 40 : 44) * density, (float) Math.ceil(titlePx + subtitlePx + 8 * density));
+         float maximum = Math.max(48 * density, (width - 108 * density) / 2f);
+         return Math.min(wanted, maximum);
+     }
+     public void update(int width, float top, float height, float numberWidth, float density, boolean rtl) {
++        update(width, top, height, numberWidth, density, rtl, 1);
++    }
++    public void update(int width, float top, float height, float numberWidth, float density, boolean rtl, int counterMode) {
+         float edge = 8 * density, gap = 6 * density;
+         float maxSide = Math.max(height, Math.min(width * .28f, (width - 64 * density) / 2 - edge - gap));
+-        countVisible = numberWidth > 0 && height + numberWidth + 8 * density <= maxSide;
+-        float side = height + (countVisible ? numberWidth + 8 * density : 0);
++        float extra = counterMode == 2 ? Math.max(height * .65f, numberWidth + 8 * density) + 3 * density : numberWidth + 8 * density;
++        countVisible = counterMode != 0 && numberWidth > 0 && height + extra <= maxSide;
++        separateCount = countVisible && counterMode == 2;
++        float side = height + (countVisible ? extra : 0);
+         back.set(edge, top, edge + side, top + height);
+         avatar.set(width - edge - height, top, width - edge, top + height);
+         float inset = edge + Math.max(side, height) + gap;
+         title.set(Math.min(width / 2f, inset), top, Math.max(width / 2f, width - inset), top + height);
++        float badgeSize = separateCount ? extra - 3 * density : extra;
++        float badgeLeft = rtl ? width - edge - side : back.left + height + (separateCount ? 3 * density : 0);
++        badge.set(badgeLeft, top + (height - badgeSize) / 2f, badgeLeft + badgeSize, top + (height + badgeSize) / 2f);
+         if (rtl) { back.offset(width - edge * 2 - side, 0); avatar.offset(-(width - edge * 2 - height), 0); }
+     }
+ }
+diff --git a/TMessagesProj/src/main/java/app/flexygram/header/HeaderPreviewView.java b/TMessagesProj/src/main/java/app/flexygram/header/HeaderPreviewView.java
+index 42b30b3b2..e041fd63f 100644
+--- a/TMessagesProj/src/main/java/app/flexygram/header/HeaderPreviewView.java
++++ b/TMessagesProj/src/main/java/app/flexygram/header/HeaderPreviewView.java
+@@ -17,7 +17,8 @@ public final class HeaderPreviewView extends View {
+     private final android.graphics.drawable.Drawable back, more;
+     private final String name, status;
+     private int iconColor;
+-    private float titlePx, subtitlePx, previewHeight;
++    private float titlePx, subtitlePx, previewHeight, titleBaseline, subtitleBaseline;
++    private final Paint.FontMetricsInt metrics = new Paint.FontMetricsInt();
+     private String displayName = "", displayStatus = "";
+     public HeaderPreviewView(Context context) {
+         super(context); text.setTextAlign(Paint.Align.CENTER);
+@@ -30,10 +31,13 @@ public final class HeaderPreviewView extends View {
+         int width=MeasureSpec.getSize(widthSpec); var metrics=getResources().getDisplayMetrics();
+         titlePx=android.util.TypedValue.applyDimension(android.util.TypedValue.COMPLEX_UNIT_SP,17.5f,metrics);
+         subtitlePx=android.util.TypedValue.applyDimension(android.util.TypedValue.COMPLEX_UNIT_SP,13.5f,metrics);
+-        previewHeight=HeaderGeometry.height(width,titlePx,subtitlePx,AndroidUtilities.density,HeaderConfig.compact());
++        text.setTextSize(titlePx); text.getFontMetricsInt(metrics); int titleLine=metrics.descent-metrics.ascent;
++        text.setTextSize(subtitlePx); text.getFontMetricsInt(metrics); int subtitleLine=metrics.descent-metrics.ascent;
++        previewHeight=HeaderGeometry.height(width,titleLine,subtitleLine,AndroidUtilities.density,HeaderConfig.compact());
++        float fit=Math.min(1f,(previewHeight-AndroidUtilities.dp(8))/(titleLine+subtitleLine));titlePx*=fit;subtitlePx*=fit;
+         titlePx=Math.min(titlePx,previewHeight-AndroidUtilities.dp(8));
+         int h=Math.round(previewHeight)+AndroidUtilities.dp(80);setMeasuredDimension(width,h);
+-        text.setTextSize(AndroidUtilities.dp(16));geometry.update(width,(h-previewHeight)/2,previewHeight,HeaderConfig.counter()?text.measureText("3"):0,AndroidUtilities.density,LocaleController.isRTL);
++        text.setTextSize(AndroidUtilities.dp(16));geometry.update(width,(h-previewHeight)/2,previewHeight,HeaderConfig.counter()?text.measureText("3"):0,AndroidUtilities.density,LocaleController.isRTL,HeaderConfig.counterMode());
+         text.setTextSize(titlePx);displayName=android.text.TextUtils.ellipsize(name,new android.text.TextPaint(text),Math.max(0,geometry.title.width()-AndroidUtilities.dp(64)),android.text.TextUtils.TruncateAt.END).toString();
+         text.setTextSize(subtitlePx);displayStatus=android.text.TextUtils.ellipsize(status,new android.text.TextPaint(text),Math.max(0,geometry.title.width()-AndroidUtilities.dp(64)),android.text.TextUtils.TruncateAt.END).toString();
+     }
+@@ -41,7 +45,7 @@ public final class HeaderPreviewView extends View {
+     @Override protected void onDraw(Canvas canvas) {
+         float d = AndroidUtilities.density, height = previewHeight;
+         canvas.drawColor(Theme.getColor(Theme.key_windowBackgroundGray));
+-        text.setTextSize(AndroidUtilities.dp(16)); geometry.update(getWidth(), (getHeight()-height)/2, height, HeaderConfig.counter() ? text.measureText("3") : 0, d, LocaleController.isRTL);
++        text.setTextSize(AndroidUtilities.dp(16)); geometry.update(getWidth(), (getHeight()-height)/2, height, HeaderConfig.counter() ? text.measureText("3") : 0, d, LocaleController.isRTL,HeaderConfig.counterMode());
+         if (!HeaderConfig.signature()) { text.setColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText)); canvas.drawText(name, getWidth()/2f, getHeight()/2f, text); return; }
+         surface.draw(canvas, geometry, d, null);
+         int color = Theme.getColor(Theme.key_actionBarDefaultTitle);
+@@ -50,9 +54,11 @@ public final class HeaderPreviewView extends View {
+         int side=AndroidUtilities.dp(24), y=Math.round(geometry.back.centerY());
+         back.setBounds(Math.round(arrow)-side/2,y-side/2,Math.round(arrow)+side/2,y+side/2); back.draw(canvas);
+         text.setColor(color); if (geometry.countVisible) canvas.drawText("3",LocaleController.isRTL ? geometry.back.left+(geometry.back.width()-height)/2 : geometry.back.left+height+(geometry.back.width()-height)/2, y+AndroidUtilities.dp(5),text);
+-        boolean statusFits=titlePx+subtitlePx+AndroidUtilities.dp(12)<=height;
+-        text.setTextSize(titlePx); canvas.drawText(displayName,geometry.title.centerX(),statusFits?y-AndroidUtilities.dp(1):y-(text.ascent()+text.descent())/2,text);
+-        if(statusFits){text.setTextSize(subtitlePx);canvas.drawText(displayStatus,geometry.title.centerX(),y+subtitlePx+AndroidUtilities.dp(2),text);}
++        text.setTextSize(titlePx); float titleHeight=text.descent()-text.ascent(), titleAscent=text.ascent();
++        text.setTextSize(subtitlePx); float subtitleHeight=text.descent()-text.ascent();
++        float blockTop=geometry.title.centerY()-(titleHeight+subtitleHeight+AndroidUtilities.dp(2))/2;
++        text.setTextSize(titlePx); canvas.drawText(displayName,geometry.title.centerX(),blockTop-titleAscent,text);
++        text.setTextSize(subtitlePx);canvas.drawText(displayStatus,geometry.title.centerX(),blockTop+titleHeight+AndroidUtilities.dp(2)-text.ascent(),text);
+         int mx=LocaleController.isRTL ? Math.round(geometry.title.left)+AndroidUtilities.dp(14):Math.round(geometry.title.right)-AndroidUtilities.dp(14);
+         more.setBounds(mx-side/2,y-side/2,mx+side/2,y+side/2);more.draw(canvas);
+         avatar.setColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText));canvas.drawCircle(geometry.avatar.centerX(),geometry.avatar.centerY(),height/2-AndroidUtilities.dp(1),avatar);
+diff --git a/TMessagesProj/src/main/java/app/flexygram/header/HeaderSettingsActivity.java b/TMessagesProj/src/main/java/app/flexygram/header/HeaderSettingsActivity.java
+index f4b247836..340471485 100644
+--- a/TMessagesProj/src/main/java/app/flexygram/header/HeaderSettingsActivity.java
++++ b/TMessagesProj/src/main/java/app/flexygram/header/HeaderSettingsActivity.java
+@@ -25,7 +25,9 @@ public final class HeaderSettingsActivity extends SignatureMatteSettingsActivity
+     @Override protected BaseListAdapter createAdapter(Context c) { return new Adapter(c); }
+     private void changed(int row) { listAdapter.notifyItemChanged(row); if(preview!=null)preview.settingsChanged(); }
+     @Override protected void onItemClick(View v,int position,float x,float y) {
+-        if(position==counterRow){HeaderConfig.counter(!HeaderConfig.counter());changed(position);}
++        if(position==counterRow){
++            showDialog(new AlertDialog.Builder(getParentActivity(),resourcesProvider).setTitle(getString(R.string.FlexyHeaderCounter)).setItems(new CharSequence[]{getString(R.string.FlexyHeaderCounterOff),getString(R.string.FlexyHeaderCounterIntegrated),getString(R.string.FlexyHeaderCounterBadge)},(dialog,which)->{HeaderConfig.counterMode(which);changed(position);}).create());
++        }
+         else if(position==styleRow||position==sizeRow){boolean style=position==styleRow;
+             showDialog(new AlertDialog.Builder(getParentActivity(),resourcesProvider).setTitle(getString(style?R.string.FlexyHeaderStyle:R.string.FlexyHeaderSize)).setItems(style?new CharSequence[]{getString(R.string.FlexyHeaderSignature),getString(R.string.FlexyHeaderClassic)}:new CharSequence[]{getString(R.string.FlexyHeaderNormal),getString(R.string.FlexyHeaderCompact)},(dialog,which)->{if(style)HeaderConfig.style(which==0);else HeaderConfig.compact(which==1);changed(position);}).create());
+         }
+@@ -38,9 +40,9 @@ public final class HeaderSettingsActivity extends SignatureMatteSettingsActivity
+     }
+     private final class Adapter extends MatteListAdapter {
+         Adapter(Context c){super(c);}
+-        @Override public int getItemViewType(int p){return p==previewRow?111:p==opacityRow?112:p==counterRow?TYPE_CHECK:TYPE_SETTINGS;}
++        @Override public int getItemViewType(int p){return p==previewRow?111:p==opacityRow?112:TYPE_SETTINGS;}
+         @Override public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup p,int type){if(type==111){preview=new HeaderPreviewView(p.getContext());return new RecyclerListView.Holder(preview);}if(type==112)return new RecyclerListView.Holder(new OpacityCell(p.getContext()));return super.onCreateViewHolder(p,type);}
+-        @Override public void onBindViewHolder(RecyclerView.ViewHolder h,int p,boolean partial){if(p==previewRow){h.itemView.invalidate();return;}if(p==opacityRow){((OpacityCell)h.itemView).bind();return;}if(p==counterRow){((TextCheckCell)h.itemView).setTextAndCheck(getString(R.string.FlexyHeaderCounter),HeaderConfig.counter(),true);return;}((TextSettingsCell)h.itemView).setTextAndValue(getString(p==styleRow?R.string.FlexyHeaderStyle:R.string.FlexyHeaderSize),getString(p==styleRow?(HeaderConfig.signature()?R.string.FlexyHeaderSignature:R.string.FlexyHeaderClassic):(HeaderConfig.compact()?R.string.FlexyHeaderCompact:R.string.FlexyHeaderNormal)),true);}
++        @Override public void onBindViewHolder(RecyclerView.ViewHolder h,int p,boolean partial){if(p==previewRow){h.itemView.invalidate();return;}if(p==opacityRow){((OpacityCell)h.itemView).bind();return;}if(p==counterRow){((TextSettingsCell)h.itemView).setTextAndValue(getString(R.string.FlexyHeaderCounter),getString(HeaderConfig.counterMode()==0?R.string.FlexyHeaderCounterOff:HeaderConfig.counterMode()==1?R.string.FlexyHeaderCounterIntegrated:R.string.FlexyHeaderCounterBadge),true);return;}((TextSettingsCell)h.itemView).setTextAndValue(getString(p==styleRow?R.string.FlexyHeaderStyle:R.string.FlexyHeaderSize),getString(p==styleRow?(HeaderConfig.signature()?R.string.FlexyHeaderSignature:R.string.FlexyHeaderClassic):(HeaderConfig.compact()?R.string.FlexyHeaderCompact:R.string.FlexyHeaderNormal)),true);}
+         @Override public boolean isEnabled(RecyclerView.ViewHolder h){int p=h.getAdapterPosition();return p==counterRow||p==styleRow||p==sizeRow;}
+     }
+ }
+diff --git a/TMessagesProj/src/main/java/app/flexygram/header/HeaderSurface.java b/TMessagesProj/src/main/java/app/flexygram/header/HeaderSurface.java
+index 61168f8ee..77b0ef918 100644
+--- a/TMessagesProj/src/main/java/app/flexygram/header/HeaderSurface.java
++++ b/TMessagesProj/src/main/java/app/flexygram/header/HeaderSurface.java
+@@ -7,13 +7,20 @@ import org.telegram.ui.ActionBar.Theme;
+ 
+ /** Shared by the real header and synthetic settings preview. No blur, shaders or frame allocations. */
+ public final class HeaderSurface {
++    private final RectF backSurface = new RectF();
+     private final Paint fill = new Paint(Paint.ANTI_ALIAS_FLAG), stroke = new Paint(Paint.ANTI_ALIAS_FLAG);
+     public void draw(Canvas canvas, HeaderGeometry g, float density, Theme.ResourcesProvider provider) {
+         int color = Theme.getColor(Theme.key_windowBackgroundWhite, provider);
+         fill.setColor((color & 0xffffff) | (Math.round(HeaderConfig.opacity() * 2.55f) << 24));
+         stroke.setStyle(Paint.Style.STROKE); stroke.setStrokeWidth(Math.max(1, density * .65f));
+         stroke.setColor((Theme.getColor(Theme.key_divider, provider) & 0xffffff) | 0x66000000);
+-        piece(canvas, g.back); piece(canvas, g.title); piece(canvas, g.avatar);
++        if (g.separateCount) {
++            backSurface.set(g.back);
++            if (org.telegram.messenger.LocaleController.isRTL) backSurface.left = backSurface.right - g.back.height();
++            else backSurface.right = backSurface.left + g.back.height();
++            piece(canvas, backSurface); piece(canvas, g.badge);
++        } else piece(canvas, g.back);
++        piece(canvas, g.title); piece(canvas, g.avatar);
+     }
+     private void piece(Canvas c, RectF r) { float radius = r.height() / 2; c.drawRoundRect(r, radius, radius, fill); c.drawRoundRect(r, radius, radius, stroke); }
+ }
+diff --git a/TMessagesProj/src/main/java/app/flexygram/header/SignatureChatHeader.java b/TMessagesProj/src/main/java/app/flexygram/header/SignatureChatHeader.java
+index 8a17ca400..ed8185c7b 100644
+--- a/TMessagesProj/src/main/java/app/flexygram/header/SignatureChatHeader.java
++++ b/TMessagesProj/src/main/java/app/flexygram/header/SignatureChatHeader.java
+@@ -20,6 +20,8 @@ public final class SignatureChatHeader {
+     private final ChatAvatarContainer avatar;
+     private final Theme.ResourcesProvider provider;
+     private final TextView countView;
++    private final android.graphics.Paint textMetrics = new android.graphics.Paint();
++    private final android.graphics.Paint.FontMetricsInt fontMetrics = new android.graphics.Paint.FontMetricsInt();
+     private int count = -1;
+     private String number = "";
+     public float height, titlePx, subtitlePx;
+@@ -43,19 +45,26 @@ public final class SignatureChatHeader {
+         var metrics = bar.getResources().getDisplayMetrics();
+         titlePx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 17.5f, metrics);
+         subtitlePx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 13.5f, metrics);
+-        height = HeaderGeometry.height(width, titlePx, subtitlePx, AndroidUtilities.density, HeaderConfig.compact());
+-        subtitleFits = titlePx + subtitlePx + AndroidUtilities.dp(12) <= height;
++        textMetrics.setTextSize(titlePx); textMetrics.getFontMetricsInt(fontMetrics);
++        int titleLine = fontMetrics.descent - fontMetrics.ascent;
++        textMetrics.setTextSize(subtitlePx); textMetrics.getFontMetricsInt(fontMetrics);
++        int subtitleLine = fontMetrics.descent - fontMetrics.ascent;
++        height = HeaderGeometry.height(width, titleLine, subtitleLine, AndroidUtilities.density, HeaderConfig.compact());
++        // Narrow windows cap side geometry; retain both lines by fitting the text block together.
++        float fit = Math.min(1f, (height - AndroidUtilities.dp(8)) / (titleLine + subtitleLine));
++        titlePx *= fit; subtitlePx *= fit;
++        subtitleFits = true;
+         titlePx = Math.min(titlePx, height - AndroidUtilities.dp(8));
+         int content = Math.max(nativeHeight, Math.round(height) + AndroidUtilities.dp(12));
+-        float digits = HeaderConfig.counter() && count >= 0 ? countView.getPaint().measureText(number) : 0;
+-        geometry.update(width, status + (content - height) / 2f, height, digits, AndroidUtilities.density, LocaleController.isRTL);
++        float digits = HeaderConfig.counter() && count > 0 ? countView.getPaint().measureText(number) : 0;
++        geometry.update(width, status + (content - height) / 2f, height, digits, AndroidUtilities.density, LocaleController.isRTL, HeaderConfig.counterMode());
+         return content;
+     }
+     public void measureControls() {
+         if (bar.backButtonImageView == null) return;
+         if (active()) {
+             bar.backButtonImageView.measure(exact(geometry.back.width()), exact(height));
+-            countView.measure(exact(Math.max(0, geometry.back.width() - height)), exact(height));
++            countView.measure(exact(geometry.countVisible ? geometry.badge.width() : 0), exact(geometry.separateCount ? geometry.badge.height() : height));
+         }
+         countView.setVisibility(active() && geometry.countVisible ? View.VISIBLE : View.GONE);
+     }
+@@ -68,8 +77,9 @@ public final class SignatureChatHeader {
+             int pl = LocaleController.isRTL ? extra : 0, pr = LocaleController.isRTL ? 0 : extra;
+             if (back.getPaddingLeft() != pl || back.getPaddingRight() != pr) back.setPadding(pl, 0, pr, 0);
+             back.layout(Math.round(geometry.back.left), Math.round(geometry.back.top), Math.round(geometry.back.right), Math.round(geometry.back.bottom));
+-            float x = LocaleController.isRTL ? geometry.back.left : geometry.back.left + height;
+-            countView.layout(Math.round(x), Math.round(geometry.back.top), Math.round(x + extra), Math.round(geometry.back.bottom));
++            float x = geometry.badge.left;
++            float y = geometry.separateCount ? geometry.badge.top : geometry.back.top;
++            countView.layout(Math.round(x), Math.round(y), Math.round(x + countView.getMeasuredWidth()), Math.round(y + countView.getMeasuredHeight()));
+             back.setUnread(0);
+             back.setContentDescription(LocaleController.getString(R.string.AccDescrGoBack) + (count >= 0 && HeaderConfig.counter() ? ", " + LocaleController.formatString(R.string.FlexyHeaderUnread, count) : ""));
+             avatar.setTranslationX(0);
+diff --git a/TMessagesProj/src/main/java/org/telegram/ui/Components/ChatAvatarContainer.java b/TMessagesProj/src/main/java/org/telegram/ui/Components/ChatAvatarContainer.java
+index d8d41b3ff..c864b6a6a 100644
+--- a/TMessagesProj/src/main/java/org/telegram/ui/Components/ChatAvatarContainer.java
++++ b/TMessagesProj/src/main/java/org/telegram/ui/Components/ChatAvatarContainer.java
+@@ -866,6 +866,9 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
+         int width = MeasureSpec.getSize(widthMeasureSpec);
+         int textWidth = Math.max(0, Math.round(signatureHeader.geometry.title.width()) - dp(64));
+         titleTextView.setTextSizePx(Math.round(signatureHeader.titlePx));
++        // Classic title padding (6 + 12 dp) is outside the Signature text block.
++        titleTextView.setPadding(0, 0, 0, 0);
++        getSubtitleTextView().setPadding(0, 0, 0, 0);
+         titleTextView.setGravity(Gravity.CENTER_HORIZONTAL);
+         titleTextView.measure(MeasureSpec.makeMeasureSpec(textWidth, MeasureSpec.AT_MOST), MeasureSpec.makeMeasureSpec((int)Math.ceil(signatureHeader.titlePx) + dp(8), MeasureSpec.AT_MOST));
+         if (subtitleTextView != null) { subtitleTextView.setTextSizePx(Math.round(signatureHeader.subtitlePx)); subtitleTextView.setGravity(Gravity.CENTER_HORIZONTAL); }
+@@ -908,7 +911,8 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
+         if (signatureMore != null) signatureMore.setVisibility(signatureActive() ? VISIBLE : GONE);
+         if (signatureActive()) { signatureMeasured = true; measureSignature(widthMeasureSpec, heightMeasureSpec); return; }
+         if (signatureMeasured) {
+-            signatureMeasured = false; setGlassMode(); applyAvatarRadius(avatarSizeInDp, avatarRadiusForum, avatarRadiusHasStories);
++            signatureMeasured = false; titleTextView.setPadding(0, dp(6), 0, dp(12));
++            getSubtitleTextView().setPadding(0, 0, isCentered() ? 0 : dp(10), 0); setGlassMode(); applyAvatarRadius(avatarSizeInDp, avatarRadiusForum, avatarRadiusHasStories);
+             titleTextView.setGravity(isCentered() ? Gravity.CENTER_HORIZONTAL : Gravity.LEFT);
+             if (subtitleTextView != null) subtitleTextView.setGravity(isCentered() ? Gravity.CENTER_HORIZONTAL : Gravity.LEFT);
+             else if (animatedSubtitleTextView != null) animatedSubtitleTextView.setTextSize(dp(14));
+diff --git a/TMessagesProj/src/main/res/values-es/flexygram_header.xml b/TMessagesProj/src/main/res/values-es/flexygram_header.xml
+index d49ab2dc4..2565c9e57 100644
+--- a/TMessagesProj/src/main/res/values-es/flexygram_header.xml
++++ b/TMessagesProj/src/main/res/values-es/flexygram_header.xml
+@@ -11,4 +11,7 @@
+     <string name="FlexyHeaderOpacity">Opacidad de la superficie</string>
+     <string name="FlexyHeaderUnread">Chats sin leer en la lista de origen: %1$d</string>
+     <string name="FlexyHeaderPreviewName">Alex</string>
++    <string name="FlexyHeaderCounterOff">Desactivado</string>
++    <string name="FlexyHeaderCounterIntegrated">Integrado</string>
++    <string name="FlexyHeaderCounterBadge">En bolita</string>
+ </resources>
+diff --git a/TMessagesProj/src/main/res/values-ru/flexygram_header.xml b/TMessagesProj/src/main/res/values-ru/flexygram_header.xml
+index f17139c1e..acbc261f0 100644
+--- a/TMessagesProj/src/main/res/values-ru/flexygram_header.xml
++++ b/TMessagesProj/src/main/res/values-ru/flexygram_header.xml
+@@ -11,4 +11,7 @@
+     <string name="FlexyHeaderOpacity">Непрозрачность поверхности</string>
+     <string name="FlexyHeaderUnread">Непрочитанные чаты в исходном списке: %1$d</string>
+     <string name="FlexyHeaderPreviewName">Алекс</string>
++    <string name="FlexyHeaderCounterOff">Выключен</string>
++    <string name="FlexyHeaderCounterIntegrated">Встроенный</string>
++    <string name="FlexyHeaderCounterBadge">Отдельный значок</string>
+ </resources>
+diff --git a/TMessagesProj/src/main/res/values/flexygram_header.xml b/TMessagesProj/src/main/res/values/flexygram_header.xml
+index 60f8c1fd6..4e6d568e1 100644
+--- a/TMessagesProj/src/main/res/values/flexygram_header.xml
++++ b/TMessagesProj/src/main/res/values/flexygram_header.xml
+@@ -11,4 +11,7 @@
+     <string name="FlexyHeaderOpacity">Surface opacity</string>
+     <string name="FlexyHeaderUnread">Unread chats in the source list: %1$d</string>
+     <string name="FlexyHeaderPreviewName">Alex</string>
++    <string name="FlexyHeaderCounterOff">Off</string>
++    <string name="FlexyHeaderCounterIntegrated">Integrated</string>
++    <string name="FlexyHeaderCounterBadge">Separate badge</string>
+ </resources>
+diff --git a/tools/connected_alpha/header_visual/HeaderVisualTest.java.in b/tools/connected_alpha/header_visual/HeaderVisualTest.java.in
+index 60741e414..df27e5582 100644
+--- a/tools/connected_alpha/header_visual/HeaderVisualTest.java.in
++++ b/tools/connected_alpha/header_visual/HeaderVisualTest.java.in
+@@ -15,7 +15,12 @@ public class HeaderVisualTest {
+   for(float font:new float[]{1,1.5f,2,3})for(int width:new int[]{240,320,401,600})for(boolean rtl:new boolean[]{false,true}){
+    LocaleController.isRTL=rtl;Context c=context(font);ActionBar bar=new ActionBar(c);ChatAvatarContainer avatar=new ChatAvatarContainer(c);bar.addView(avatar,0,new FrameLayout.LayoutParams(-1,-1));SignatureChatHeader header=new SignatureChatHeader(bar,avatar,null);bar.setSignatureHeader(header);avatar.setSignatureHeader(header);header.setCount(12345);size(bar,width);
+    HeaderGeometry g=header.geometry;assertEquals(g.back.height(),g.title.height(),.001f);assertEquals(g.title.height(),g.avatar.height(),.001f);assertEquals(width/2f,g.title.centerX(),.001f);
+-   View title=(View)field(avatar,"titleTextView");assertEquals(width/2f,title.getLeft()+title.getWidth()/2f,.5f);assertEquals(Math.round(header.height),bar.backButtonImageView.getHeight());
++   View title=(View)field(avatar,"titleTextView");View status=(View)field(avatar,"subtitleTextView");
++   assertEquals(0,title.getPaddingTop());assertEquals(0,title.getPaddingBottom());
++   assertTrue("title above surface",title.getTop()>=g.title.top-.5f);
++   assertTrue("status below surface",status.getBottom()<=g.title.bottom+.5f);
++   assertTrue("text lines overlap",title.getBottom()<=status.getTop());
++   assertEquals(width/2f,title.getLeft()+title.getWidth()/2f,.5f);assertEquals(Math.round(header.height),bar.backButtonImageView.getHeight());
+    assertTrue(g.back.left>=0&&g.avatar.left>=0);assertTrue(g.back.right<=width&&g.avatar.right<=width);header.detach();
+   }
+  }
+diff --git a/tools/connected_alpha/header_visual/stubs.py b/tools/connected_alpha/header_visual/stubs.py
+index 88130c020..a535d9f9d 100644
+--- a/tools/connected_alpha/header_visual/stubs.py
++++ b/tools/connected_alpha/header_visual/stubs.py
+@@ -43,7 +43,7 @@ public class ChatAvatarContainer extends FrameLayout{
+  public static class Simple extends TextView{Simple(Context c){super(c);setSingleLine(true);setEllipsize(android.text.TextUtils.TruncateAt.END);}public void setTextSizePx(int v){setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX,v);}}
+  public static class Photo extends ImageView{public int radius;Photo(Context c){super(c);}public void setRoundRadius(int r){radius=r;}@Override protected void onDraw(Canvas c){android.graphics.Paint p=new android.graphics.Paint(3);p.setColor(0xff2288cc);c.drawCircle(getWidth()/2f,getHeight()/2f,getWidth()/2f,p);}}
+  private final Simple titleTextView,subtitleTextView;private final Photo avatarImageView;private Simple animatedSubtitleTextView;private View timeItem,communityItem,starBgItem,starFgItem;
+- public ChatAvatarContainer(Context c){super(c);titleTextView=new Simple(c);titleTextView.setText("A long contact name");subtitleTextView=new Simple(c);subtitleTextView.setText("online");avatarImageView=new Photo(c);addView(titleTextView);addView(subtitleTextView);addView(avatarImageView);setOnClickListener(v->profiles++);avatarImageView.setOnClickListener(v->profiles++);}
++ public ChatAvatarContainer(Context c){super(c);titleTextView=new Simple(c);titleTextView.setText("A long contact name");titleTextView.setPadding(0,dp(6),0,dp(12));subtitleTextView=new Simple(c);subtitleTextView.setText("online");avatarImageView=new Photo(c);addView(titleTextView);addView(subtitleTextView);addView(avatarImageView);setOnClickListener(v->profiles++);avatarImageView.setOnClickListener(v->profiles++);}
+  private View getSubtitleTextView(){return subtitleTextView;}private int getThemedColor(int key){return Theme.getColor(key,null);}protected void onSignatureOptionsClick(){menus++;}
+  @Override protected void onMeasure(int w,int h){if(signatureActive()){measureSignature(w,h);return;}super.onMeasure(w,h);}
+  @Override protected void onLayout(boolean c,int l,int t,int r,int b){if(signatureActive())layoutSignature();else super.onLayout(c,l,t,r,b);}

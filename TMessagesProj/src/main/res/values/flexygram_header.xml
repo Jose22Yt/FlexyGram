@@ -11,4 +11,7 @@
     <string name="FlexyHeaderOpacity">Surface opacity</string>
     <string name="FlexyHeaderUnread">Unread chats in the source list: %1$d</string>
     <string name="FlexyHeaderPreviewName">Alex</string>
+    <string name="FlexyHeaderCounterOff">Off</string>
+    <string name="FlexyHeaderCounterIntegrated">Integrated</string>
+    <string name="FlexyHeaderCounterBadge">Separate badge</string>
 </resources>
