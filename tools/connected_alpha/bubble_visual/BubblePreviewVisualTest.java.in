@@ -39,7 +39,9 @@ public class BubblePreviewVisualTest {
    Theme.dark=dark;Theme.wallpaper=new GradientDrawable(GradientDrawable.Orientation.TL_BR,new int[]{dark?0xff163142:0xffe4c8b8,dark?0xff24223c:0xffc4d9e6});
    Theme.chat_msgTextPaint.setTextSize(16);Theme.chat_timePaint.setTextSize(11);
    BubblePreviewView preview=new BubblePreviewView(context(ApplicationLoader.applicationContext));measure(preview);
-   int height=preview.getHeight();assertTrue(height>200);assertTrue(preview.getContentDescription().toString().contains("local preview"));
+   int height=preview.getHeight();assertTrue(height>=100&&height<220);
+   assertEquals("Do you know what time it is?\nIt is morning in Tokyo 😎",preview.getContentDescription().toString());
+   java.lang.reflect.Field drawables=BubblePreviewView.class.getDeclaredField("bubbles");drawables.setAccessible(true);assertEquals(2,((Object[])drawables.get(preview)).length);
    Bitmap image=Bitmap.createBitmap(360,height,Bitmap.Config.ARGB_8888);Canvas canvas=new Canvas(image);
    BubbleConfig.setTransparency(35);BubbleConfig.setBorderTenths(11);preview.draw(canvas);
    assertNotEquals(image.getPixel(12,12),image.getPixel(12,height-12));

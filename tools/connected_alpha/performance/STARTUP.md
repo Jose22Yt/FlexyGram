@@ -56,3 +56,23 @@ check contention and memory before accepting the candidate. All account/service
 initialization and synchronization remain present; this is scheduling, not a claim
 that initialization itself is now free. Revert this startup commit to restore the
 previous scheduling without touching user data or PR100 features.
+
+## Separate visual checkpoint (stage B)
+
+The bubble preview now has exactly two localized incoming/outgoing messages and
+native text/timestamp/tick rendering. It retains the real wallpaper and shared
+cached blur, and measures actual text rather than truncating large-font samples.
+The long footer is removed. The contour switch preserves the last selected side;
+legacy position zero stays disabled without rewriting preferences on load.
+Original (0), Pearl (1), Satin (2) retain persisted IDs; Glass Original uses new ID3
+and the exact native RGB. Five directional positions live behind the switch.
+The optional automatic position is not offered because no consistent adaptive
+rule has been verified. Original style does not apply glass fusion/intensity.
+
+Partial contours still use segments of Telegram's native Path. A geometry/RGB
+cached linear alpha taper softens their endpoints in the same stroke passes,
+clipped within the unchanged silhouette. Animation alpha does not recreate the
+shader; full contours use no shader. There is no per-message blur, extra layer or
+new draw loop. Native Android tests cover both directions, every style/side,
+geometry bounds, toggle persistence, shader reuse and compact-preview content.
+Full app/physical appearance and scroll performance remain pending.

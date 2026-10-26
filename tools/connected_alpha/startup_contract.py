@@ -1,4 +1,4 @@
-"""Exact, reversible startup delta on the validated PR100 application.
+"""Exact, reversible Ultra-Smooth mission delta on the validated PR100 application.
 Historical release audits still run against their byte-exact original sources.
 """
 from pathlib import Path

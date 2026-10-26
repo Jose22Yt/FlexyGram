@@ -671,11 +671,11 @@ public class MessageDrawable extends Drawable {
             flexyFillPaint.setAlpha(Math.round(alpha * app.flexygram.bubbles.BubbleStyle.tintAlpha(
                 app.flexygram.bubbles.BubbleConfig.transparency()) / 255f));
             canvas.drawPath(path, flexyFillPaint);
-            flexyBorderPaint.setStyle(Paint.Style.STROKE);
-            // Keep the contour inside Telegram's unchanged message silhouette.
-            flexyBorderPaint.setStrokeWidth(2f * AndroidUtilities.density * app.flexygram.bubbles.BubbleConfig.borderDp()
-                    );
             if (app.flexygram.bubbles.BubbleConfig.outlineEnabled()) {
+                flexyBorderPaint.setStyle(Paint.Style.STROKE);
+                // Keep the contour inside Telegram's unchanged message silhouette.
+                flexyBorderPaint.setStrokeWidth(2f * AndroidUtilities.density * app.flexygram.bubbles.BubbleConfig.borderDp()
+                        );
                 int contourBase = isOut && p.getShader() != null
                         ? app.flexygram.bubbles.BubbleOutline.palette(color, currentGradientColor1, currentGradientColor2, currentGradientColor3) : color;
                 int contour = signatureOutline(contourBase);
@@ -687,11 +687,13 @@ public class MessageDrawable extends Drawable {
                         (isTopNear ? 1 : 0) | (isBottomNear ? 2 : 0) | (botButtonsBottom ? 4 : 0)
                                 | (drawFullBubble ? 8 : 0) | (isOut ? 16 : 0)
                                 | (drawFullTop ? 32 : 0) | (drawFullBottom ? 64 : 0), top);
+                flexyBorderPaint.setShader(app.flexygram.bubbles.BubbleConfig.borderPosition() == 5
+                        ? null : signatureBorderPath.fade(contour));
                 flexyBorderPaint.setStrokeCap(Paint.Cap.ROUND);
                 flexyBorderPaint.setStrokeJoin(Paint.Join.ROUND);
                 float stroke = flexyBorderPaint.getStrokeWidth();
                 int edgeColor = flexyBorderPaint.getColor();
-                if (app.flexygram.bubbles.BubbleConfig.fuseGlass()) {
+                if (app.flexygram.bubbles.BubbleConfig.fuseGlass() && app.flexygram.bubbles.BubbleConfig.outlineStyle() != 0) {
                     flexyBorderPaint.setStrokeWidth(stroke * 3f);
                     flexyBorderPaint.setColor(ColorUtils.setAlphaComponent(edgeColor, Math.round(Color.alpha(edgeColor) * .12f)));
                     canvas.drawPath(contourPath, flexyBorderPaint);
