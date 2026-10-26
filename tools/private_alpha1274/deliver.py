@@ -11,10 +11,10 @@ import urllib.parse
 import urllib.request
 
 REPO = 'Jose22Yt/FlexyGram'
-SOURCE = '8d4fe2f0a7d47e05a34c2a2c7fc8c706ed781881'
+SOURCE = 'c43b072a78df7868322f39d3c97b18ee00caee31'
 CERT = 'c8f04cad685ca5757d35b25ea4b0b4613c7399909948d821e6ada61f9fb12b2c'
 APP = 'io.github.jose22yt.flexygram.alpha'
-NAME = 'FlexyGram_Alpha_1274_ARM64_TEST.apk'
+NAME = 'FlexyGram_Alpha_1275_ARM64_TEST.apk'
 API = 'https://api.github.com/repos/' + REPO
 
 
@@ -123,7 +123,7 @@ class Client:
 
 
 def validate(report, apk):
-    expected = {'commit': SOURCE, 'application_id': APP, 'version_code': 1274, 'certificate_sha256': CERT, 'elf_count': 96, 'status': 'PASS_ARTIFACT_ONLY'}
+    expected = {'commit': SOURCE, 'application_id': APP, 'version_code': 1275, 'certificate_sha256': CERT, 'elf_count': 96, 'status': 'PASS_ARTIFACT_ONLY'}
     if any(report.get(k) != v for k, v in expected.items()):
         raise DeliveryError('Full approved APK verification report required')
     with apk.open('rb') as f:
@@ -138,9 +138,9 @@ def preflight(client, directory):
     # authenticated roundtrip and two independent anonymous denial checks.
     run = os.environ['GITHUB_RUN_ID'] + '-' + os.environ['GITHUB_RUN_ATTEMPT']
     release = client.json('/releases', method='POST', data={
-        'tag_name': 'alpha1274-private-' + run,
+        'tag_name': 'alpha1275-private-' + run,
         'target_commitish': SOURCE,
-        'name': 'FlexyGram Alpha 1274 — PRIVATE TEST ' + run,
+        'name': 'FlexyGram Alpha 1275 — PRIVATE TEST ' + run,
         'body': 'PRIVATE UNPUBLISHED TEST DELIVERY. Keep draft. Approved source: ' + SOURCE + '. No APK transferred yet.',
         'draft': True, 'prerelease': True, 'make_latest': 'false'})
     rid = int(release['id'])
@@ -161,7 +161,7 @@ def deliver(client, rid, apk, report_path):
     release = client.draft(rid)
     # Preserve the verifier evidence privately too. If the network fails after an
     # upload, the unpublished assets survive runner cleanup and can be rechecked.
-    client.upload(rid, report_path, 'FlexyGram_Alpha_1274_verificacion.json')
+    client.upload(rid, report_path, 'FlexyGram_Alpha_1275_verificacion.json')
     asset = client.upload(rid, apk, NAME)
     proof = dict(source_commit=SOURCE, sha256=sha, bytes=size, release_id=rid, asset_id=asset['id'],
                  private_download_url=asset['browser_download_url'], draft_url=release['html_url'],

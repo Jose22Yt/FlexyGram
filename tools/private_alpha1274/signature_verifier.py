@@ -1,4 +1,4 @@
-"""Alpha1274 packaged launcher policy; all other original APK checks stay unchanged."""
+"""Alpha1275 packaged launcher policy; all other original APK checks stay unchanged."""
 import verify_apk as original
 
 def has_signature_launcher(xmltree):
