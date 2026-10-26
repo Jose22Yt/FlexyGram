@@ -1074,8 +1074,25 @@ index 000000000..7aa92e1cb
 +def paths():
 +    return frozenset(header[6:].decode() for header in PATCH.read_bytes().splitlines()
 +                     if header.startswith(b'+++ b/'))
+diff --git a/tools/connected_alpha/header_visual/HeaderVisualTest.java.in b/tools/connected_alpha/header_visual/HeaderVisualTest.java.in
+index b3a7ed18c..0952faf3e 100644
+--- a/tools/connected_alpha/header_visual/HeaderVisualTest.java.in
++++ b/tools/connected_alpha/header_visual/HeaderVisualTest.java.in
+@@ -26,9 +26,9 @@ public class HeaderVisualTest {
+  }
+  @Test public void counterTextDoesNotStealBackTapsAndMenuAndProfileStayIndependent()throws Exception{
+   Context c=context(1);ActionBar bar=new ActionBar(c);ChatAvatarContainer avatar=new ChatAvatarContainer(c);bar.addView(avatar,0,new FrameLayout.LayoutParams(-1,-1));SignatureChatHeader header=new SignatureChatHeader(bar,avatar,null);bar.setSignatureHeader(header);avatar.setSignatureHeader(header);header.setCount(3);root.addView(bar);size(bar,401);
+-  assertTrue(header.geometry.countVisible);assertFalse(((View)field(header,"countView")).isClickable());float x=header.geometry.back.right-4,y=header.geometry.back.centerY();for(int n=0;n<100;n++)tap(bar,x,y);assertEquals(100,bar.backs);assertEquals(0,avatar.profiles);
+-  View menu=(View)field(avatar,"signatureMore");tap(bar,menu.getLeft()+menu.getWidth()/2f,menu.getTop()+menu.getHeight()/2f);assertEquals(1,avatar.menus);assertEquals(0,avatar.profiles);
+-  tap(bar,header.geometry.avatar.centerX(),header.geometry.avatar.centerY());assertEquals(1,avatar.profiles);assertEquals(1,avatar.menus);
++  assertFalse(header.geometry.countVisible);assertEquals(View.GONE,((View)field(header,"countView")).getVisibility());float x=header.geometry.back.right-4,y=header.geometry.back.centerY();for(int n=0;n<100;n++)tap(bar,x,y);assertEquals(100,bar.backs);assertEquals(0,avatar.profiles);
++  tap(bar,header.geometry.avatar.centerX(),header.geometry.avatar.centerY());assertEquals(1,avatar.menus);assertEquals(0,avatar.profiles);
++  tap(bar,header.geometry.title.centerX(),header.geometry.title.centerY());assertEquals(1,avatar.profiles);assertEquals(1,avatar.menus);
+   header.setCount(-1);size(bar,401);assertFalse(header.geometry.countVisible);assertFalse(bar.backButtonImageView.getContentDescription().toString().contains("Unread"));
+   bar.search=true;size(bar,401);assertFalse(header.active());assertEquals(View.GONE,((View)field(header,"countView")).getVisibility());bar.search=false;bar.selection=true;size(bar,401);assertFalse(header.active());header.detach();header.detach();
+  }
 diff --git a/tools/connected_alpha/header_visual/stubs.py b/tools/connected_alpha/header_visual/stubs.py
-index 9d119f964..c0382881d 100644
+index 9d119f964..43a8c31f1 100644
 --- a/tools/connected_alpha/header_visual/stubs.py
 +++ b/tools/connected_alpha/header_visual/stubs.py
 @@ -15,7 +15,7 @@ def write_stubs(source,root):
@@ -1087,6 +1104,15 @@ index 9d119f964..c0382881d 100644
   code='\n'.join((folder/(n+'.java')).read_text()for n in ['HeaderConfig','HeaderSurface','SignatureChatHeader','HeaderPreviewView'])
   code+='\n'+avatar_methods
   r=source/'org/telegram/messenger/R.java';s=r.read_text();missing=set(re.findall(r'R.string.(\w+)',code))-set(re.findall(r'int (\w+)=',s));s=s.replace('class string {','class string {'+''.join('public static final int '+n+'='+str(1000+i)+';'for i,n in enumerate(sorted(missing))));s=s.replace('public class R {','public class R {public static class drawable {public static int ic_ab_back,ic_ab_other;}');r.write_text(s)
+@@ -43,7 +43,7 @@ public class ChatAvatarContainer extends FrameLayout{
+  public static class Simple extends TextView{Simple(Context c){super(c);setIncludeFontPadding(false);setSingleLine(true);setEllipsize(android.text.TextUtils.TruncateAt.END);}public void setTextSizePx(int v){setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX,v);}}
+  public static class Photo extends ImageView{public int radius;Photo(Context c){super(c);}public void setRoundRadius(int r){radius=r;}@Override protected void onDraw(Canvas c){android.graphics.Paint p=new android.graphics.Paint(3);p.setColor(0xff2288cc);c.drawCircle(getWidth()/2f,getHeight()/2f,getWidth()/2f,p);}}
+  private final Simple titleTextView,subtitleTextView;private final Photo avatarImageView;private Simple animatedSubtitleTextView;private View timeItem,communityItem,starBgItem,starFgItem;
+- public ChatAvatarContainer(Context c){super(c);titleTextView=new Simple(c);titleTextView.setText("A long contact name");titleTextView.setPadding(0,dp(6),0,dp(12));subtitleTextView=new Simple(c);subtitleTextView.setText("online");avatarImageView=new Photo(c);addView(titleTextView);addView(subtitleTextView);addView(avatarImageView);setOnClickListener(v->profiles++);avatarImageView.setOnClickListener(v->profiles++);}
++ public ChatAvatarContainer(Context c){super(c);titleTextView=new Simple(c);titleTextView.setText("A long contact name");titleTextView.setPadding(0,dp(6),0,dp(12));subtitleTextView=new Simple(c);subtitleTextView.setText("online");avatarImageView=new Photo(c);addView(titleTextView);addView(subtitleTextView);addView(avatarImageView);setOnClickListener(v->profiles++);avatarImageView.setOnClickListener(v->menus++);}
+  private View getSubtitleTextView(){return subtitleTextView;}private int getThemedColor(int key){return Theme.getColor(key,null);}protected void onSignatureOptionsClick(){menus++;}
+  @Override protected void onMeasure(int w,int h){if(signatureActive()){measureSignature(w,h);return;}super.onMeasure(w,h);}
+  @Override protected void onLayout(boolean c,int l,int t,int r,int b){if(signatureActive())layoutSignature();else super.onLayout(c,l,t,r,b);}
 diff --git a/tools/connected_alpha/integration_contract.py b/tools/connected_alpha/integration_contract.py
 index 8f51e2821..896df8cce 100644
 --- a/tools/connected_alpha/integration_contract.py
