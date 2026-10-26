@@ -39,6 +39,20 @@ public class HeaderVisualTest {
   var original=old.getAll();HeaderConfig.style(false);HeaderConfig.counter(false);HeaderConfig.compact(true);HeaderConfig.opacity(1000);HeaderConfig.load();assertFalse(HeaderConfig.signature());assertFalse(HeaderConfig.counter());assertTrue(HeaderConfig.compact());assertEquals(100,HeaderConfig.opacity());assertEquals(original,old.getAll());
   HeaderConfig.opacity(-20);assertEquals(0,HeaderConfig.opacity());prefs.edit().putString("opacity","corrupt").putString("style","corrupt").commit();HeaderConfig.load();assertEquals(85,HeaderConfig.opacity());assertTrue(HeaderConfig.signature());
  }
+ @Test public void importedCounterOptionsCannotChangeTheThreePiecePreview()throws Exception{
+  HeaderConfig.style(true);
+  for(boolean rtl:new boolean[]{false,true})for(float font:new float[]{1,2,3}){
+   LocaleController.isRTL=rtl;
+   HeaderConfig.counterMode(0);HeaderPreviewView preview=new HeaderPreviewView(context(font));size(preview,320);
+   Bitmap before=Bitmap.createBitmap(320,preview.getMeasuredHeight(),Bitmap.Config.ARGB_8888);preview.draw(new Canvas(before));
+   for(int mode:new int[]{1,2}){
+    HeaderConfig.counterMode(mode);preview.settingsChanged();size(preview,320);
+    Bitmap after=Bitmap.createBitmap(320,preview.getMeasuredHeight(),Bitmap.Config.ARGB_8888);preview.draw(new Canvas(after));
+    assertTrue("legacy counter must not change preview pixels",before.sameAs(after));after.recycle();
+   }
+   before.recycle();
+  }
+ }
  @Test public void renderSyntheticPreviewLightDarkAndOpacityChangesOnlySurface()throws Exception{
   Bitmap image=Bitmap.createBitmap(401,400,Bitmap.Config.ARGB_8888);Canvas canvas=new Canvas(image);
   for(int i=0;i<2;i++){Theme.dark=i==1;HeaderPreviewView preview=new HeaderPreviewView(context(1));size(preview,401);canvas.save();canvas.translate(0,i*200);preview.draw(canvas);canvas.restore();assertTrue(preview.getContentDescription().toString().contains("Alex"));HeaderConfig.opacity(0);preview.invalidate();preview.draw(new Canvas(Bitmap.createBitmap(401,200,Bitmap.Config.ARGB_8888)));HeaderConfig.opacity(85);}
