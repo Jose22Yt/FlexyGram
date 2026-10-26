@@ -1,0 +1,30 @@
+name: FlexyGram identity and pre-Beta audit
+on:
+  push:
+    branches: [integration/connected-alpha-identity-beta-audit]
+permissions:
+  contents: read
+concurrency:
+  group: prebeta-audit-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: 'build-tools;36.0.0 platforms;android-37.0'
+      - name: Verify audit, staged identity patch, inactive policy and synthetic SDK signatures
+        run: python3 -m unittest discover -s tools/connected_alpha/prebeta -p 'test_*.py' -v
+      - name: Check whitespace
+        run: git diff --check 8d4fe2f0a7d47e05a34c2a2c7fc8c706ed781881

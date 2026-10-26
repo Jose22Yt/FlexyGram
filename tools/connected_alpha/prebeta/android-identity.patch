@@ -1,0 +1,191 @@
+diff --git a/TMessagesProj/src/connectedAlpha/res/values-es/flexygram_identity.xml b/TMessagesProj/src/connectedAlpha/res/values-es/flexygram_identity.xml
+new file mode 100644
+--- /dev/null
++++ b/TMessagesProj/src/connectedAlpha/res/values-es/flexygram_identity.xml
+@@ -0,0 +1,9 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!-- Visible labels only. Preserve all existing resource keys and component identities. -->
++<resources>
++    <string name="AppName">FlexyGram Alpha</string>
++    <string name="AppNameBeta">FlexyGram Alpha</string>
++    <string name="NagramX">FlexyGram Alpha</string>
++    <string name="OpenExtera">FlexyGram</string>
++    <string name="CustomTitleHint">Deja el campo vacío para usar FlexyGram</string>
++</resources>
+diff --git a/TMessagesProj/src/connectedAlpha/res/values-ru/flexygram_identity.xml b/TMessagesProj/src/connectedAlpha/res/values-ru/flexygram_identity.xml
+new file mode 100644
+--- /dev/null
++++ b/TMessagesProj/src/connectedAlpha/res/values-ru/flexygram_identity.xml
+@@ -0,0 +1,9 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!-- Visible labels only. Preserve all existing resource keys and component identities. -->
++<resources>
++    <string name="AppName">FlexyGram Alpha</string>
++    <string name="AppNameBeta">FlexyGram Alpha</string>
++    <string name="NagramX">FlexyGram Alpha</string>
++    <string name="OpenExtera">FlexyGram</string>
++    <string name="CustomTitleHint">Оставьте пустым, чтобы использовать FlexyGram</string>
++</resources>
+diff --git a/TMessagesProj/src/connectedAlpha/res/values/flexygram_identity.xml b/TMessagesProj/src/connectedAlpha/res/values/flexygram_identity.xml
+--- a/TMessagesProj/src/connectedAlpha/res/values/flexygram_identity.xml
++++ b/TMessagesProj/src/connectedAlpha/res/values/flexygram_identity.xml
+@@ -1,3 +1,9 @@
+ <?xml version="1.0" encoding="utf-8"?>
+-<!-- UI label only; preserve the inherited key and all attribution resources. -->
+-<resources><string name="NagramX" translatable="false">FlexyGram Alpha</string></resources>
++<!-- Visible labels only. Preserve all existing resource keys and component identities. -->
++<resources>
++    <string name="AppName">FlexyGram Alpha</string>
++    <string name="AppNameBeta">FlexyGram Alpha</string>
++    <string name="NagramX">FlexyGram Alpha</string>
++    <string name="OpenExtera">FlexyGram</string>
++    <string name="CustomTitleHint">Leave blank to use FlexyGram</string>
++</resources>
+diff --git a/TMessagesProj/src/main/java/org/telegram/messenger/LocaleController.java b/TMessagesProj/src/main/java/org/telegram/messenger/LocaleController.java
+--- a/TMessagesProj/src/main/java/org/telegram/messenger/LocaleController.java
++++ b/TMessagesProj/src/main/java/org/telegram/messenger/LocaleController.java
+@@ -1473,6 +1473,6 @@
+         try {
+             return ApplicationLoader.applicationContext.getString(R.string.OpenExtera);
+         } catch (Exception ignore) {
+-            return "exteraless";
++            return "FlexyGram";
+         }
+     }
+diff --git a/TMessagesProj/src/main/res/values-ar/strings.xml b/TMessagesProj/src/main/res/values-ar/strings.xml
+--- a/TMessagesProj/src/main/res/values-ar/strings.xml
++++ b/TMessagesProj/src/main/res/values-ar/strings.xml
+@@ -1,7 +1,7 @@
+ <?xml version="1.0" encoding="utf-8"?>
+ <resources>
+-    <string name="AppName">Nagram X</string>
+-    <string name="AppNameBeta">(Beta) تيليجرام</string>
++    <string name="AppName">FlexyGram</string>
++    <string name="AppNameBeta">FlexyGram Beta</string>
+     <string name="LanguageName">العربية</string>
+     <string name="English">الإنجليزية</string>
+     <string name="LanguageNameInEnglish">Arabic</string>
+diff --git a/TMessagesProj/src/main/res/values-de/strings.xml b/TMessagesProj/src/main/res/values-de/strings.xml
+--- a/TMessagesProj/src/main/res/values-de/strings.xml
++++ b/TMessagesProj/src/main/res/values-de/strings.xml
+@@ -1,7 +1,7 @@
+ <?xml version="1.0" encoding="utf-8"?>
+ <resources>
+-    <string name="AppName">Nagram X</string>
+-    <string name="AppNameBeta">Telegram Beta</string>
++    <string name="AppName">FlexyGram</string>
++    <string name="AppNameBeta">FlexyGram Beta</string>
+     <string name="LanguageName">Deutsch</string>
+     <string name="English">Englisch</string>
+     <string name="LanguageNameInEnglish">German</string>
+diff --git a/TMessagesProj/src/main/res/values-es/strings.xml b/TMessagesProj/src/main/res/values-es/strings.xml
+--- a/TMessagesProj/src/main/res/values-es/strings.xml
++++ b/TMessagesProj/src/main/res/values-es/strings.xml
+@@ -1,7 +1,7 @@
+ <?xml version="1.0" encoding="utf-8"?>
+ <resources>
+-    <string name="AppName">Nagram X</string>
+-    <string name="AppNameBeta">Telegram Beta</string>
++    <string name="AppName">FlexyGram</string>
++    <string name="AppNameBeta">FlexyGram Beta</string>
+     <string name="LanguageName">Español</string>
+     <string name="English">Inglés</string>
+     <string name="LanguageNameInEnglish">Spanish</string>
+diff --git a/TMessagesProj/src/main/res/values-it/strings.xml b/TMessagesProj/src/main/res/values-it/strings.xml
+--- a/TMessagesProj/src/main/res/values-it/strings.xml
++++ b/TMessagesProj/src/main/res/values-it/strings.xml
+@@ -1,7 +1,7 @@
+ <?xml version="1.0" encoding="utf-8"?>
+ <resources>
+-    <string name="AppName">Nagram X</string>
+-    <string name="AppNameBeta">Telegram Beta</string>
++    <string name="AppName">FlexyGram</string>
++    <string name="AppNameBeta">FlexyGram Beta</string>
+     <string name="LanguageName">Italiano</string>
+     <string name="English">Inglese</string>
+     <string name="LanguageNameInEnglish">Italian</string>
+diff --git a/TMessagesProj/src/main/res/values-ko/strings.xml b/TMessagesProj/src/main/res/values-ko/strings.xml
+--- a/TMessagesProj/src/main/res/values-ko/strings.xml
++++ b/TMessagesProj/src/main/res/values-ko/strings.xml
+@@ -1,7 +1,7 @@
+ <?xml version="1.0" encoding="utf-8"?>
+ <resources>
+-    <string name="AppName">Nagram X</string>
+-    <string name="AppNameBeta">텔레그램</string>
++    <string name="AppName">FlexyGram</string>
++    <string name="AppNameBeta">FlexyGram Beta</string>
+     <string name="LanguageName">한국어</string>
+     <string name="English">영어</string>
+     <string name="LanguageNameInEnglish">한국어</string>
+diff --git a/TMessagesProj/src/main/res/values-nl/strings.xml b/TMessagesProj/src/main/res/values-nl/strings.xml
+--- a/TMessagesProj/src/main/res/values-nl/strings.xml
++++ b/TMessagesProj/src/main/res/values-nl/strings.xml
+@@ -1,7 +1,7 @@
+ <?xml version="1.0" encoding="utf-8"?>
+ <resources>
+-    <string name="AppName">Nagram X</string>
+-    <string name="AppNameBeta">Telegram-bèta</string>
++    <string name="AppName">FlexyGram</string>
++    <string name="AppNameBeta">FlexyGram Beta</string>
+     <string name="LanguageName">Nederlands</string>
+     <string name="English">Engels</string>
+     <string name="LanguageNameInEnglish">Dutch</string>
+diff --git a/TMessagesProj/src/main/res/values-pt-rBR/strings.xml b/TMessagesProj/src/main/res/values-pt-rBR/strings.xml
+--- a/TMessagesProj/src/main/res/values-pt-rBR/strings.xml
++++ b/TMessagesProj/src/main/res/values-pt-rBR/strings.xml
+@@ -1,7 +1,7 @@
+ <?xml version="1.0" encoding="utf-8"?>
+ <resources>
+-    <string name="AppName">Nagram X</string>
+-    <string name="AppNameBeta">Telegram Beta</string>
++    <string name="AppName">FlexyGram</string>
++    <string name="AppNameBeta">FlexyGram Beta</string>
+     <string name="LanguageName">Português (Brasil)</string>
+     <string name="English">Inglês</string>
+     <string name="LanguageNameInEnglish">Portuguese (Brazil)</string>
+diff --git a/TMessagesProj/src/main/res/values/strings.xml b/TMessagesProj/src/main/res/values/strings.xml
+--- a/TMessagesProj/src/main/res/values/strings.xml
++++ b/TMessagesProj/src/main/res/values/strings.xml
+@@ -1,7 +1,7 @@
+ <?xml version="1.0" encoding="utf-8"?>
+ <resources>
+-    <string name="AppName">exteraless</string>
+-    <string name="AppNameBeta">Telegram Beta</string>
++    <string name="AppName">FlexyGram</string>
++    <string name="AppNameBeta">FlexyGram Beta</string>
+     <string name="LanguageName">English</string>
+     <string name="English">English</string>
+     <string name="LanguageNameInEnglish">English</string>
+diff --git a/TMessagesProj/src/main/res/values/strings_na.xml b/TMessagesProj/src/main/res/values/strings_na.xml
+--- a/TMessagesProj/src/main/res/values/strings_na.xml
++++ b/TMessagesProj/src/main/res/values/strings_na.xml
+@@ -9,7 +9,7 @@
+     <string name="SendReactions">Send Reactions</string>
+     <string name="ShowReactions">Show Reactions</string>
+     <string name="CustomTitle">Custom Title</string>
+-    <string name="CustomTitleHint">Leave blank to use exteraless</string>
++    <string name="CustomTitleHint">Leave blank to use FlexyGram</string>
+     <string name="CreateMono">Create Monospace</string>
+     <string name="CreateMonoLanguage">Code Language</string>
+     <string name="CopyPhoto">Copy Photo</string>
+diff --git a/TMessagesProj/src/main/res/values/strings_nax.xml b/TMessagesProj/src/main/res/values/strings_nax.xml
+--- a/TMessagesProj/src/main/res/values/strings_nax.xml
++++ b/TMessagesProj/src/main/res/values/strings_nax.xml
+@@ -1,6 +1,6 @@
+ <?xml version="1.0" encoding="utf-8"?>
+ <resources>
+-    <string name="NagramX" translatable="false">exteraless</string>
++    <string name="NagramX" translatable="false">FlexyGram</string>
+     <string name="XChannel">Nagram X Channel</string>
+     <string name="EnableSaveDeletedMessages">Save Deleted Messages</string>
+     <string name="DeletedMessage">deleted</string>
+diff --git a/TMessagesProj/src/main/res/values/strings_oe.xml b/TMessagesProj/src/main/res/values/strings_oe.xml
+--- a/TMessagesProj/src/main/res/values/strings_oe.xml
++++ b/TMessagesProj/src/main/res/values/strings_oe.xml
+@@ -1,5 +1,5 @@
+ <?xml version="1.0" encoding="utf-8"?>
+ <!-- Строки фич, перенесённых из exteraGram. -->
+ <resources>
+-    <string name="OpenExtera" translatable="false">exteraless</string>
++    <string name="OpenExtera" translatable="false">FlexyGram</string>
+     <string name="OpenExteraInfo">Make the client truly yours</string>

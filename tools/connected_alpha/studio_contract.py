@@ -20,3 +20,7 @@ def restore(path,data):
   result=subprocess.run(['git','apply','--reverse','-'],input=section,cwd=tmp,capture_output=True)
   if result.returncode or target.read_bytes()!=original:raise ValueError('Unreviewed FlexyStudio hook: '+path)
  return original
+
+# Audit-only documentation/tools; no additional production file is authorized.
+from prebeta.contract import PATHS as PREBETA_PATHS
+PATHS = PATHS | PREBETA_PATHS
