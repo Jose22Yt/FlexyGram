@@ -443,7 +443,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         }
 
         instance = this;
-        ApplicationLoader.postInitApplication();
+        ApplicationLoader.postInitApplication(true);
         AndroidUtilities.checkDisplaySize(this, getResources().getConfiguration());
         currentAccount = UserConfig.selectedAccount;
         registerReceiver(batteryReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));

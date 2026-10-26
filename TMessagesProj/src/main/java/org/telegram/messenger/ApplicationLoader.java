@@ -228,9 +228,18 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
     }
 
     public static void postInitApplication() {
-        if (applicationInited || applicationContext == null) {
+        postInitApplication(false);
+    }
+
+    /** Launch requests local dialogs early; background push initialization does not prefetch UI data. */
+    public static void postInitApplication(boolean prepareDialogs) {
+        if (applicationContext == null) return;
+        if (applicationInited) {
+            if (prepareDialogs) prepareSelectedDialogs();
             return;
         }
+        android.os.Trace.beginSection("Flexy.startup.post_init");
+        try {
         applicationInited = true;
         NativeLoader.initNativeLibs(ApplicationLoader.applicationContext);
 
@@ -309,7 +318,11 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
         }
         SharedPrefsHelper.init(applicationContext);
         FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(!BuildConfig.CONNECTED_ALPHA && AndroidUtil.shouldEnableCrashlytics());
-        for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) { //TODO improve account
+        // Account zero must load first: it owns the persisted selectedAccount preference.
+        UserConfig.getInstance(0).loadConfig();
+        final int startupAccount = UserConfig.selectedAccount;
+        for (int position = 0; position < UserConfig.MAX_ACCOUNT_COUNT; position++) {
+            final int a = app.flexygram.performance.StartupAccounts.accountAt(position, startupAccount, UserConfig.MAX_ACCOUNT_COUNT);
             UserConfig.getInstance(a).loadConfig();
             MessagesController.getInstance(a);
             if (a == 0) {
@@ -320,6 +333,9 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
             TLRPC.User user = UserConfig.getInstance(a).getCurrentUser();
             if (user != null) {
                 MessagesController.getInstance(a).putUser(user, true);
+                // Enqueue the selected account's native SQLite read before ancillary accounts/services.
+                // Native loading/reset guards, notifications, validation and network sync stay intact.
+                if (prepareDialogs && a == startupAccount) prepareSelectedDialogs();
                 SendMessagesHelper.getInstance(a).checkUnsentMessages();
             }
         }
@@ -336,6 +352,29 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
             DownloadController.getInstance(a);
         }
         BillingController.getInstance().startConnection();
+        } finally {
+            android.os.Trace.endSection();
+        }
+    }
+
+    private static void prepareSelectedDialogs() {
+        // loadDialogs mutates native UI-owned state; preserve that ownership for service callers.
+        if (android.os.Looper.myLooper() != android.os.Looper.getMainLooper()) {
+            AndroidUtilities.runOnUIThread(ApplicationLoader::prepareSelectedDialogs);
+            return;
+        }
+        final int account = UserConfig.selectedAccount;
+        if (account < 0 || account >= UserConfig.MAX_ACCOUNT_COUNT) return;
+        UserConfig config = UserConfig.getInstance(account);
+        if (!config.isClientActivated() || config.getCurrentUser() == null) return;
+        MessagesController controller = MessagesController.getInstance(account);
+        if (controller.dialogsLoaded || !controller.getDialogs(0).isEmpty()) return;
+        android.os.Trace.beginSection("Flexy.startup.request_local_dialogs");
+        try {
+            controller.loadDialogs(0, 0, 100, true);
+        } finally {
+            android.os.Trace.endSection();
+        }
     }
 
     public ApplicationLoader() {
