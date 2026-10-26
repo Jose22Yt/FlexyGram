@@ -53,7 +53,7 @@ final class FlexyFilesDirectSend {
             ArrayList<String> paths=new ArrayList<>();paths.add(copy.file.getAbsolutePath());
             SendMessagesHelper.prepareSendingDocuments(AccountInstance.getInstance(account),paths,paths,null,
                     null,null,null,dialog,null,null,null,null,null,true,0,0,null,
-                    SendMessageChatArguments.EMPTY,0,false,payStars,null,null);
+                    SendMessageChatArguments.EMPTY,0,false,payStars,0,null);
             queued.run();
         });
     }
