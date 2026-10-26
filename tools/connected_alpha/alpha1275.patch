@@ -74,7 +74,7 @@ index a43ab2704..9fd067414 100644
  def officialVer = APP_VERSION_NAME
  def officialCode = APP_VERSION_CODE
 diff --git a/TMessagesProj/src/main/java/app/exteraless/player/PlayerColors.java b/TMessagesProj/src/main/java/app/exteraless/player/PlayerColors.java
-index 0ab617915..ac4342d52 100644
+index 0ab617915..b1c266174 100644
 --- a/TMessagesProj/src/main/java/app/exteraless/player/PlayerColors.java
 +++ b/TMessagesProj/src/main/java/app/exteraless/player/PlayerColors.java
 @@ -85,6 +85,7 @@ public final class PlayerColors {
@@ -91,7 +91,7 @@ index 0ab617915..ac4342d52 100644
  
 +    /** Compact Modern uses the active Telegram theme, independently of album art. */
 +    public static PlayerColors fromSignatureTheme(boolean dark) {
-+        int accent = Theme.getColor(Theme.key_windowBackgroundWhiteBlueText, null);
++        int accent = Theme.getColor(Theme.key_windowBackgroundWhiteBlueText, (Theme.ResourcesProvider) null);
 +        long key = ((accent & 0xffffffffL) << 1) | (dark ? 1 : 0);
 +        PlayerColors cached = themePalettes.get(key);
 +        if (cached != null) return cached;
@@ -171,7 +171,7 @@ index 28709f749..62b250ce9 100644
              lyricsPanel.layout(side, stageTop, side + contentW, stageTop + stageHeight);
              y = stageTop + stageHeight + dp(6);
 diff --git a/TMessagesProj/src/main/java/app/exteraless/player/SignatureMusicBubble.java b/TMessagesProj/src/main/java/app/exteraless/player/SignatureMusicBubble.java
-index f5e36efcb..5c23b4f3c 100644
+index f5e36efcb..8c740ea02 100644
 --- a/TMessagesProj/src/main/java/app/exteraless/player/SignatureMusicBubble.java
 +++ b/TMessagesProj/src/main/java/app/exteraless/player/SignatureMusicBubble.java
 @@ -2,6 +2,9 @@ package app.exteraless.player;
@@ -286,7 +286,7 @@ index f5e36efcb..5c23b4f3c 100644
          setVisibility(show ? VISIBLE : GONE);
          if (!show) { play.setPlaying(false, false); return; }
 -        if (darkTheme == null || darkTheme != dark) {
-+        int accent = Theme.getColor(Theme.key_windowBackgroundWhiteBlueText, null);
++        int accent = Theme.getColor(Theme.key_windowBackgroundWhiteBlueText, (Theme.ResourcesProvider) null);
 +        if (darkTheme == null || darkTheme != dark || themeAccent != accent) {
              darkTheme = dark;
 -            PlayerColors colors = PlayerColors.fromSeed(0, dark);

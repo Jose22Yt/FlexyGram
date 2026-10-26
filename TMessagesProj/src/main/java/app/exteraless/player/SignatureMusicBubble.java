@@ -159,7 +159,7 @@ public final class SignatureMusicBubble extends FrameLayout {
         boolean show = allowed && SignatureMusicPresentation.isCompact() && message != null && message.isMusic();
         setVisibility(show ? VISIBLE : GONE);
         if (!show) { play.setPlaying(false, false); return; }
-        int accent = Theme.getColor(Theme.key_windowBackgroundWhiteBlueText, null);
+        int accent = Theme.getColor(Theme.key_windowBackgroundWhiteBlueText, (Theme.ResourcesProvider) null);
         if (darkTheme == null || darkTheme != dark || themeAccent != accent) {
             darkTheme = dark;
             themeAccent = accent;
