@@ -102,12 +102,13 @@ class Navigation2(unittest.TestCase):
         changed.update(subprocess.check_output(['git','ls-files','-o','--exclude-standard'],cwd=ROOT,text=True).splitlines())
         changed.difference_update(alpha1275_paths() | {'tools/connected_alpha/alpha1275.patch'})
         self.assertFalse(changed-(PATHS|combined_paths()),changed-(PATHS|combined_paths()))
+        from performance.universal_contract import PRODUCTION as UNIVERSAL3_PRODUCTION
         from studio_contract import PATHS as STUDIO_PATHS
         from refinement1274_contract import PRODUCTION as REFINEMENT_PRODUCTION, restore as restore_refinement
         for path in REFINEMENT_PRODUCTION:
             expected=subprocess.run(['git','show','534b30c4edea3dffa0fc726eaec254ed8ebadbc1:'+path],cwd=ROOT,capture_output=True)
             self.assertEqual(restore_refinement(path,(ROOT/path).read_bytes()),expected.stdout if expected.returncode==0 else b'')
-        self.assertEqual({p for p in changed if p.startswith('TMessagesProj/') and p not in work1 and p not in STUDIO_PATHS and p not in REFINEMENT_PRODUCTION},set(PRODUCTION))
+        self.assertEqual({p for p in changed if p.startswith('TMessagesProj/') and p not in work1 and p not in STUDIO_PATHS and p not in REFINEMENT_PRODUCTION and p not in UNIVERSAL3_PRODUCTION},set(PRODUCTION))
 
     def test_window_and_package_validation_rejects_injection_and_invalid_clocks(self):
         for window in ((0,0),(20,10),(-1,10),(False,10),(0,60_000_000_001)):

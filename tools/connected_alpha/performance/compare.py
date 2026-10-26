@@ -60,17 +60,19 @@ def validate(report):
 
 
 def compare(reports, cohort="legacy"):
-    if cohort not in ("legacy", "navigation2"):
+    if cohort not in ("legacy", "navigation2", "universal3"):
         raise ValueError("Unknown comparison cohort")
     errors = []
     labels = [r.get('label') for r in reports]
-    required = REQUIRED_LABELS if cohort == 'legacy' else {'exteraless', 'alpha1272', 'pr92', 'candidate'}
+    required = REQUIRED_LABELS if cohort == 'legacy' else {'exteraless', 'alpha1275', 'candidate'} if cohort == 'universal3' else {'exteraless', 'alpha1272', 'pr92', 'candidate'}
     if len(reports) != len(required) or set(labels) != required:
         errors.append('Exactly one report per cohort label required: ' + ','.join(sorted(required)))
-    if cohort == 'navigation2':
+    if cohort in ('navigation2', 'universal3'):
         pinned = {'exteraless':'1ad6a60a6834ffca722b1a22f4fba27ecb29a061',
                   'alpha1272':'8619ba40fbd8fd9d9d898ff307fb0c0716661254',
                   'pr92':'340cd323f5f5809abc746507b2e252da71298720'}
+        if cohort == 'universal3':
+            pinned = {'exteraless':'1ad6a60a6834ffca722b1a22f4fba27ecb29a061','alpha1275':'8c47e5532a600f9a8b4ccbfdac5090d09a1075a0'}
         modes = [r.get('environment', {}).get('build_mode') for r in reports]
         if any(m in (None, '', 'unknown', 'unverified') for m in modes) or len(set(modes)) != 1:
             errors.append('Verified equal build modes required')
@@ -128,7 +130,7 @@ def compare(reports, cohort="legacy"):
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('reports', type=Path, nargs='+')
-    p.add_argument('--cohort', choices=['legacy','navigation2'], default='legacy')
+    p.add_argument('--cohort', choices=['legacy','navigation2','universal3'], default='legacy')
     p.add_argument('--out', type=Path, required=True)
     a = p.parse_args()
     result = compare([json.loads(f.read_text()) for f in a.reports], a.cohort)
