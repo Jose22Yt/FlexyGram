@@ -1,170 +1,55 @@
 <div align="center">
+<img src="tools/connected_alpha/identity/flexygram-blue-original.png" width="128" alt="Logotipo de FlexyGram">
 
-<img src="assets/logo.png" width="128" alt="exteraless">
+# FlexyGram
 
-# exteraless
+**Tu Telegram, a tu manera.**
 
-Открытая версия exteraGram — с моделью разрешений для плагинов
+Cliente Android no oficial que utiliza la API de Telegram, con personalización nativa Signature y una prioridad constante: estabilidad, respuesta táctil y fluidez.
 
-[![Канал](https://img.shields.io/badge/Telegram-@exteraless-2CA5E0?logo=telegram&logoColor=white)](https://t.me/exteraless)
+**Creador y responsable: @Lukhou23** · **Cuenta GitHub: [Jose22Yt](https://github.com/Jose22Yt)**
 
+[Proyecto](https://github.com/Jose22Yt/FlexyGram) · [Desarrollo](https://github.com/Jose22Yt/FlexyGram/pulls) · [Incidencias](https://github.com/Jose22Yt/FlexyGram/issues) · [CI](https://github.com/Jose22Yt/FlexyGram/actions) · [GPL-3.0](LICENSE)
 </div>
 
----
+## Estado del desarrollo
 
-## Что это
+FlexyGram está en **Connected Alpha**, preparando su primera Beta. Ya existe código funcional, integración continua y un proceso real de compilación, firma y verificación ARM64. La distribución de las Alpha firmadas es privada; los informes o imágenes de CI no equivalen a una APK descargable.
 
-exteraless — форк [NagramX](https://github.com/risin42/NagramX), в котором возможности
-exteraGram реализованы с открытым исходным кодом.
+| Referencia | Estado verificable |
+| --- | --- |
+| [Alpha 1274, PR #95](https://github.com/Jose22Yt/FlexyGram/pull/95) | Base integrada aprobada para esta auditoría: `8d4fe2f0a7d47e05a34c2a2c7fc8c706ed781881`. [CI de refinamiento aprobada](https://github.com/Jose22Yt/FlexyGram/actions/runs/40237236269). |
+| Alpha 1275 | Trabajo activo de Work 1 en `integration/alpha1275-signature-performance-ui`; no se anuncia como versión terminada ni validada físicamente. |
+| Beta 1.0 | Preparación y auditoría. No se declara publicada, aceptada en dispositivo ni lista para distribución general. |
 
-Отдельный упор — **безопасность плагинов**. В exteraGram плагин не ограничен ни в чём;
-здесь у него есть модель разрешений: плагин объявляет, что ему нужно, это
-видно на экране установки, и получает он только заявленное.
+Las primeras pruebas físicas de Connected Alpha fueron confirmadas por el propietario. Cada revisión posterior necesita su propia validación: no trasladamos automáticamente esa aceptación a otra Alpha. Las mediciones de host o ensayos Android aislados tampoco demuestran mayor velocidad que Exteraless en un teléfono.
 
-Проект **в бете**: часть возможностей exteraGram ещё не перенесена. Если заметили, что
-каких-то функций не хватает, — откройте issue или напишите в [канал](https://t.me/exteraless?direct).
+## La experiencia FlexyGram
 
-* Имя пакета: `com.exteraless.app`
-* Что перенесено: экраны настроек, оформление и параметры чатов, иконпаки, полоса
-  пилюль (Pill Stack), боковое меню, движок Python-плагинов
+- **Signature Native:** identidad propia, Home, cabecera, compositor iPhone, burbujas y superficies Pearl/Midnight, desarrollados sobre las vistas existentes.
+- **Signature Music:** reproductor, minirreproductores y representación compacta, conservando el motor multimedia nativo.
+- **FlexyStudio — Comparte tu FlexyGram:** exportación, intercambio e importación nativa de archivos `.flexyGram`, con validación y lista explícita de preferencias admitidas. La base 1274 amplía el esquema de la primera entrega; consulta [su registro real](TMessagesProj/src/main/java/app/flexygram/studio/core/StudioSchema.java) antes de prometer una categoría.
+- **Personalización compatible:** ajustes Signature y mecanismos nativos de temas e iconos; las sesiones y el transporte de Telegram siguen siendo responsabilidad de su arquitectura original.
+- **Ingeniería de rendimiento:** herramientas reproducibles, reducción selectiva de trabajo y pruebas de regresión. El objetivo de igualar o superar a Exteraless necesita mediciones comparables, no porcentajes supuestos.
 
-### Ссылки
+Son componentes presentes en el código integrado, no una garantía de que todos los escenarios estén aprobados físicamente. Consulta la [matriz pre-Beta](docs/PRE_BETA.md) para límites, bloqueos y pruebas pendientes.
 
-* Канал: [@exteraless](https://t.me/exteraless)
-* Исходники: [github.com/exteraless/exteraless](https://github.com/exteraless/exteraless)
+## Tecnología y desarrollo
 
-### Сборка
+Android nativo con Java/Kotlin, componentes de Telegram/Exteraless, MTProto, bibliotecas JNI y reproducción multimedia existentes. Chaquopy integra el entorno Python heredado; FlexyStudio no usa el intérprete de plugins para aplicar configuraciones. El proceso Connected Alpha compila y verifica la aplicación real, incluidos sus componentes nativos.
 
-1. Склонировать репозиторий вместе с подмодулями:
+- [Compilar y validar la base actual](docs/BUILDING.md)
+- [Contribuir y coordinar trabajos](CONTRIBUTING.md)
+- [Auditoría de identidad Android](docs/ANDROID_IDENTITY.md)
+- [Actualizador: auditoría y propuesta todavía desactivada](docs/UPDATER.md)
+- [Preparación para Beta 1.0](docs/PRE_BETA.md)
 
-    ```bash
-    git clone --recursive --shallow-submodules https://github.com/exteraless/exteraless.git exteraless
-    ```
+No se incluyen capturas antiguas, montajes ni renders de pruebas como si fueran pantallas aprobadas de esta versión. Las capturas reales se añadirán cuando estén identificadas por versión, aprobadas y libres de información privada. El logotipo mostrado reutiliza el archivo de identidad ya incorporado al proyecto; no sustituye los recursos activos del launcher.
 
-    Если репозиторий уже склонирован без подмодулей:
+## Origen, licencias y agradecimientos
 
-    ```bash
-    git submodule update --init --recursive --depth=1
-    ```
+FlexyGram es un fork de [Exteraless](https://github.com/exteraless/exteraless), con código y recursos procedentes de Telegram, NagramX, exteraGram y otros proyectos. Su desarrollo propio no implica autoría de los componentes heredados.
 
-2. Получить `TELEGRAM_APP_ID` и `TELEGRAM_APP_HASH` на [my.telegram.org](https://my.telegram.org/auth)
-   и создать `local.properties` в корне проекта:
+La licencia principal es **GNU GPL versión 3**: [LICENSE](LICENSE). Se conservan el historial, los avisos de copyright y las condiciones particulares de bibliotecas y recursos. Los iconos y diseños heredados de exteraGram mantienen los créditos a **@the8055u** y **@BlueprintDsgn**. No se presume que la licencia del código conceda derechos sobre todos los recursos gráficos.
 
-   ```properties
-   TELEGRAM_APP_ID=<ваш_app_id>
-   TELEGRAM_APP_HASH=<ваш_app_hash>
-   ```
-
-3. Для подписи APK положить свой `TMessagesProj/release.keystore` и дописать в `local.properties`:
-
-   ```properties
-   KEYSTORE_PASS=<пароль_хранилища>
-   ALIAS_NAME=<имя_ключа>
-   ALIAS_PASS=<пароль_ключа>
-   ```
-
-   Ключа в репозитории нет намеренно. Без него сборка не падает — APK подписывается
-   отладочным ключом Android.
-
-4. Для push-уведомлений положить свой `TMessagesProj/google-services.json`
-   (Firebase, имя пакета `com.exteraless.app`).
-
-5. Заменить метаданные проекта:
-
-    - ключ Google Maps в записи `com.google.android.maps.v2.API_KEY` в `TMessagesProj/src/main/AndroidManifest.xml`;
-    - `BaseRemoteHelper.CHANNEL_METADATA_ID` — числовой id вашего канала метаданных, без префикса `-100`.
-
-6. Собрать: `./gradlew :TMessagesProj:assembleDebug` или открыть проект в Android Studio.
-
-**Про ABI.** Собираются только 64-битные `arm64-v8a` и `x86_64`: Chaquopy собирает
-Python 3.12 лишь под них, и на `armeabi-v7a` конфигурация обрывается. Переменная
-`NATIVE_TARGET` задаёт цель: `arm64-v8a` (один ABI, быстрее), `universal` (оба),
-`SKIP` (без нативной части — только Java и ресурсы).
-
-### Сборка через GitHub Actions
-
-Нужны два секрета репозитория:
-
-* `LOCAL_PROPERTIES` — содержимое `local.properties` в base64:
-
-  ```bash
-  base64 -w0 local.properties
-  ```
-
-* `RELEASE_KEYSTORE` — файл ключа в base64:
-
-  ```bash
-  base64 -w0 TMessagesProj/release.keystore
-  ```
-
-Дальше запустить workflow **Release Build**. Готовый APK лежит в артефактах прогона.
-
-### Авторы дизайна
-
-Иконки и оформление, унаследованные от exteraGram, созданы его дизайнером —
-[@the8055u](https://t.me/the8055u) и студией [@BlueprintDsgn](https://t.me/BlueprintDsgn).
-Права на эти материалы принадлежат авторам.
-
-### Благодарности
-
-- [AyuGram](https://github.com/AyuGram/AyuGram4A)
-- [Cherrygram](https://github.com/arsLan4k1390/Cherrygram)
-- [Dr4iv3rNope](https://github.com/Dr4iv3rNope/NotSoAndroidAyuGram)
-- [exteraGram](https://github.com/exteraSquad/exteraGram)
-- [Inugram](https://github.com/teidesu/inugram)
-- [Nagram](https://github.com/NextAlone/Nagram)
-- [NagramX](https://github.com/risin42/NagramX)
-- [Nekogram](https://github.com/Nekogram/Nekogram)
-- [OctoGram](https://github.com/OctoGramApp/OctoGram)
-
----
-
-## English
-
-### What this is
-
-exteraless is a fork of [NagramX](https://github.com/risin42/NagramX) that implements
-exteraGram's features open-source.
-
-The special focus is **plugin security**. In exteraGram a plugin is not restricted in
-any way; here it comes with a permission model and isolation: a plugin declares what it
-needs, you see that on the install sheet, and it gets only what was declared.
-
-The project is **in beta**: some exteraGram features have not been ported yet. If you
-notice a missing feature, open an issue or write to the [channel](https://t.me/exteraless?direct).
-
-* Package name: `com.exteraless.app`
-
-### Design credits
-
-Icons and visual design inherited from exteraGram are the work of its designer,
-[@the8055u](https://t.me/the8055u), and the [@BlueprintDsgn](https://t.me/BlueprintDsgn)
-studio. Rights to those materials belong to their authors.
-
-### Building
-
-1. Clone with submodules:
-
-    ```bash
-    git clone --recursive --shallow-submodules https://github.com/exteraless/exteraless.git exteraless
-    ```
-
-2. Get `TELEGRAM_APP_ID` and `TELEGRAM_APP_HASH` from [my.telegram.org](https://my.telegram.org/auth)
-   and put them into `local.properties` in the project root.
-
-3. For release signing, drop your own `TMessagesProj/release.keystore` and add
-   `KEYSTORE_PASS`, `ALIAS_NAME`, `ALIAS_PASS` to `local.properties`. No keystore is
-   shipped with the repository; without one the build is signed with the Android debug key.
-
-4. For push notifications, replace `TMessagesProj/google-services.json` with your own
-   Firebase config for `com.exteraless.app`.
-
-5. Build with `./gradlew :TMessagesProj:assembleDebug` or from Android Studio.
-
-Only 64-bit ABIs are built (`arm64-v8a`, `x86_64`): Chaquopy ships Python 3.12 for those
-only, and `armeabi-v7a` fails at configuration time. `NATIVE_TARGET` selects the target:
-`arm64-v8a`, `universal` (both) or `SKIP` (no native part).
-
-For CI, set two repository secrets — `LOCAL_PROPERTIES` and `RELEASE_KEYSTORE`, both
-base64-encoded — and run the **Release Build** workflow. The APK ends up in the run
-artifacts.
+Consulta [procedencia y agradecimientos](docs/UPSTREAM.md), [inventario de atribuciones](docs/ATTRIBUTIONS.md) y la [documentación original archivada](docs/upstream/README.exteraless.md). FlexyGram utiliza la API de Telegram y no es una aplicación oficial de Telegram.

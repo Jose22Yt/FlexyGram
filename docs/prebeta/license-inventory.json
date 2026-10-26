@@ -1,0 +1,322 @@
+{
+  "base": "8d4fe2f0a7d47e05a34c2a2c7fc8c706ed781881",
+  "root_license_unchanged_sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+  "tracked_license_files": [
+    {
+      "path": "LICENSE",
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "bytes": 35149,
+      "family_hint": "GPL (inspect version/exception)",
+      "classification": "heuristic_only_not_legal_clearance"
+    },
+    {
+      "path": "TMessagesProj/jni/boringssl/LICENSE",
+      "sha256": "005fc765ddc5115da796cca915baa9557abae13ff35e0a47c47affc56f6c414d",
+      "bytes": 14870,
+      "family_hint": "Apache (inspect notice)",
+      "classification": "heuristic_only_not_legal_clearance"
+    },
+    {
+      "path": "TMessagesProj/jni/boringssl/third_party/fiat/LICENSE",
+      "sha256": "9eacbcb81be660840c714a560a9d65ba07913db98dd4baf969f78dd499fdd60f",
+      "bytes": 638,
+      "family_hint": "Apache (inspect notice)",
+      "classification": "heuristic_only_not_legal_clearance"
+    },
+    {
+      "path": "TMessagesProj/jni/boringssl/third_party/googletest/LICENSE",
+      "sha256": "9702de7e4117a8e2b20dafab11ffda58c198aede066406496bef670d40a22138",
+      "bytes": 1475,
+      "family_hint": "BSD-style (inspect exact clauses)",
+      "classification": "heuristic_only_not_legal_clearance"
+    },
+    {
+      "path": "TMessagesProj/jni/boringssl/third_party/wycheproof_testvectors/LICENSE",
+      "sha256": "58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd",
+      "bytes": 11357,
+      "family_hint": "Apache (inspect notice)",
+      "classification": "heuristic_only_not_legal_clearance"
+    },
+    {
+      "path": "TMessagesProj/jni/exoplayer/COPYING.FDL",
+      "sha256": "f45cc81b400a048b56c9edbd4c3317f7a8958463dfd55aa96f268ecfd6baa12c",
+      "bytes": 20403,
+      "family_hint": "GPL (inspect version/exception)",
+      "classification": "heuristic_only_not_legal_clearance"
+    },
+    {
+      "path": "TMessagesProj/jni/exoplayer/COPYING.GPL",
+      "sha256": "8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643",
+      "bytes": 18092,
+      "family_hint": "GPL (inspect version/exception)",
+      "classification": "heuristic_only_not_legal_clearance"
+    },
+    {
+      "path": "TMessagesProj/jni/exoplayer/COPYING.LGPL",
+      "sha256": "5df07007198989c622f5d41de8d703e7bef3d0e79d62e24332ee739a452af62a",
+      "bytes": 26436,
+      "family_hint": "GPL (inspect version/exception)",
+      "classification": "heuristic_only_not_legal_clearance"
+    },
+    {
+      "path": "TMessagesProj/jni/exoplayer/COPYING.Xiph",
+      "sha256": "946b733afbaa20a192c8dc022b4e43090e78f28fd293494d1b307f7301552c9b",
+      "bytes": 1509,
+      "family_hint": "BSD-style (inspect exact clauses)",
+      "classification": "heuristic_only_not_legal_clearance"
+    },
+    {
+      "path": "TMessagesProj/jni/ffmpeg/COPYING.GPLv2",
+      "sha256": "8177f97513213526df2cf6184d8ff986c675afb514d4e68a404010521b880643",
+      "bytes": 18092,
+      "family_hint": "GPL (inspect version/exception)",
+      "classification": "heuristic_only_not_legal_clearance"
+    },
+    {
+      "path": "TMessagesProj/jni/ffmpeg/COPYING.GPLv3",
+      "sha256": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+      "bytes": 35147,
+      "family_hint": "GPL (inspect version/exception)",
+      "classification": "heuristic_only_not_legal_clearance"
+    },
+    {
+      "path": "TMessagesProj/jni/ffmpeg/COPYING.LGPLv2.1",
+      "sha256": "b634ab5640e258563c536e658cad87080553df6f34f62269a21d554844e58bfe",
+      "bytes": 26526,
+      "family_hint": "GPL (inspect version/exception)",
+      "classification": "heuristic_only_not_legal_clearance"
+    },
+    {
+      "path": "TMessagesProj/jni/ffmpeg/COPYING.LGPLv3",
+      "sha256": "da7eabb7bafdf7d3ae5e9f223aa5bdc1eece45ac569dc21b3b037520b4464768",
+      "bytes": 7651,
+      "family_hint": "LGPL (inspect version/exception)",
+      "classification": "heuristic_only_not_legal_clearance"
+    },
+    {
+      "path": "TMessagesProj/jni/ffmpeg/LICENSE.md",
+      "sha256": "cb77a08f3ee3deb5240a8b3d197436710621ee87f4f0fed03947f825e082fb28",
+      "bytes": 3949,
+      "family_hint": "GPL (inspect version/exception)",
+      "classification": "heuristic_only_not_legal_clearance"
+    },
+    {
+      "path": "TMessagesProj/jni/third_party/breakpad/src/third_party/curl/COPYING",
+      "sha256": "4d03f91b94e0db3bdc9ddaf0060dd41cc94a2096094fbc1417713a2f059658c7",
+      "bytes": 1045,
+      "family_hint": "UNRESOLVED",
+      "classification": "heuristic_only_not_legal_clearance"
+    },
+    {
+      "path": "TMessagesProj/jni/third_party/libsrtp/LICENSE",
+      "sha256": "8e19d42a1eec9561f3f347253ddf2e385c55f392f025bb0fd41b88dbf38db5ae",
+      "bytes": 1614,
+      "family_hint": "BSD-style (inspect exact clauses)",
+      "classification": "heuristic_only_not_legal_clearance"
+    },
+    {
+      "path": "TMessagesProj/jni/third_party/libyuv/LICENSE",
+      "sha256": "2b2cc1180c7e6988328ad2033b04b80117419db9c4c584918bbb3cfec7e9364f",
+      "bytes": 1506,
+      "family_hint": "BSD-style (inspect exact clauses)",
+      "classification": "heuristic_only_not_legal_clearance"
+    },
+    {
+      "path": "TMessagesProj/jni/third_party/openh264/LICENSE",
+      "sha256": "dd5c1c9668512530fa5a96e4c29ac4033d70a7eeb0eed7a42fddb6dd794ebdbb",
+      "bytes": 1295,
+      "family_hint": "BSD-style (inspect exact clauses)",
+      "classification": "heuristic_only_not_legal_clearance"
+    },
+    {
+      "path": "TMessagesProj/jni/third_party/pffft/LICENSE",
+      "sha256": "a46200592eb193853527250da098e6bb0c75424e7a2c7db8da526c4f301c3d88",
+      "bytes": 1919,
+      "family_hint": "UNRESOLVED",
+      "classification": "heuristic_only_not_legal_clearance"
+    },
+    {
+      "path": "TMessagesProj/jni/third_party/rnnoise/COPYING",
+      "sha256": "e2f59ff41d9d03adc3dcf3deff170f8c8cf4a6eb4a9b174762a7656d23200ffa",
+      "bytes": 1581,
+      "family_hint": "BSD-style (inspect exact clauses)",
+      "classification": "heuristic_only_not_legal_clearance"
+    },
+    {
+      "path": "TMessagesProj/jni/voip/rnnoise/COPYING",
+      "sha256": "e2f59ff41d9d03adc3dcf3deff170f8c8cf4a6eb4a9b174762a7656d23200ffa",
+      "bytes": 1581,
+      "family_hint": "BSD-style (inspect exact clauses)",
+      "classification": "heuristic_only_not_legal_clearance"
+    },
+    {
+      "path": "TMessagesProj/jni/voip/third_party/jni_zero/LICENSE",
+      "sha256": "57faf03e216d5628169a779df31a842347e55c8e6567e1107b6cb8fb90175b59",
+      "bytes": 1458,
+      "family_hint": "BSD-style (inspect exact clauses)",
+      "classification": "heuristic_only_not_legal_clearance"
+    },
+    {
+      "path": "TMessagesProj/jni/voip/third_party/libevent/LICENSE",
+      "sha256": "9ad1d4223b80349f3d3ab9cec92f93431b9da14a1b5d41de468ce054a28cf8aa",
+      "bytes": 2343,
+      "family_hint": "BSD-style (inspect exact clauses)",
+      "classification": "heuristic_only_not_legal_clearance"
+    },
+    {
+      "path": "TMessagesProj/jni/voip/webrtc/common_audio/third_party/ooura/LICENSE",
+      "sha256": "25b7731b70c77ecd5f3bb19303fbaa99be18860f81d44f71da670fdcd04829db",
+      "bytes": 272,
+      "family_hint": "UNRESOLVED",
+      "classification": "heuristic_only_not_legal_clearance"
+    },
+    {
+      "path": "TMessagesProj/jni/voip/webrtc/common_audio/third_party/spl_sqrt_floor/LICENSE",
+      "sha256": "41d791701e3e1c1073470403de7e342442d1e6a2af72681023b13a2f45f2125c",
+      "bytes": 915,
+      "family_hint": "UNRESOLVED",
+      "classification": "heuristic_only_not_legal_clearance"
+    },
+    {
+      "path": "TMessagesProj/jni/voip/webrtc/modules/third_party/fft/LICENSE",
+      "sha256": "6fdbabd2c95c5efc6f1e46175278239afb9343120a3022ed0e0cb04267a6aeb3",
+      "bytes": 1125,
+      "family_hint": "UNRESOLVED",
+      "classification": "heuristic_only_not_legal_clearance"
+    },
+    {
+      "path": "TMessagesProj/jni/voip/webrtc/modules/third_party/g711/LICENSE",
+      "sha256": "b29c8f13f91feb2dab7d6655444369fa9f29c0d7121a52dab90ff97e40343a85",
+      "bytes": 429,
+      "family_hint": "UNRESOLVED",
+      "classification": "heuristic_only_not_legal_clearance"
+    },
+    {
+      "path": "TMessagesProj/jni/voip/webrtc/modules/third_party/g722/LICENSE",
+      "sha256": "61862327fd00d6a4deb2c1276577782c2500f4fe103e072018fc369d8e37e876",
+      "bytes": 611,
+      "family_hint": "UNRESOLVED",
+      "classification": "heuristic_only_not_legal_clearance"
+    },
+    {
+      "path": "TMessagesProj/jni/voip/webrtc/modules/third_party/portaudio/LICENSE",
+      "sha256": "641007ea2810c4cfc10a5d1a44db33983ec1409305e953c7119cc2457ec5c536",
+      "bytes": 4057,
+      "family_hint": "UNRESOLVED",
+      "classification": "heuristic_only_not_legal_clearance"
+    },
+    {
+      "path": "TMessagesProj/jni/voip/webrtc/rtc_base/third_party/base64/LICENSE",
+      "sha256": "a508773ebf00f8c777a910e941e5fd0072195843e1b72a90eb8787d26d4ab1d7",
+      "bytes": 550,
+      "family_hint": "UNRESOLVED",
+      "classification": "heuristic_only_not_legal_clearance"
+    },
+    {
+      "path": "TMessagesProj/jni/voip/webrtc/rtc_base/third_party/sigslot/LICENSE",
+      "sha256": "905bc5ab1c66eea2669aee6cb5185488508264df6492f71ae1a6595180ff8c2b",
+      "bytes": 262,
+      "family_hint": "UNRESOLVED",
+      "classification": "heuristic_only_not_legal_clearance"
+    }
+  ],
+  "submodules": [
+    {
+      "path": "TMessagesProj/jni/third_party/libvpx",
+      "url": "https://github.com/webmproject/libvpx.git",
+      "commit": "1024874c5919305883187e2953de8fcb4c3d7fa6",
+      "license_status": "requires_pinned_submodule_and_packaged_dependency_review"
+    },
+    {
+      "path": "TMessagesProj/jni/third_party/dav1d",
+      "url": "https://github.com/videolan/dav1d.git",
+      "commit": "54706fc6bc0cdecab7e9593974a4039cc038fca7",
+      "license_status": "requires_pinned_submodule_and_packaged_dependency_review"
+    },
+    {
+      "path": "TMessagesProj/jni/third_party/ffmpeg",
+      "url": "https://github.com/FFmpeg/FFmpeg.git",
+      "commit": "45f1910444f34b02621f9f0426ea1a538a613c41",
+      "license_status": "requires_pinned_submodule_and_packaged_dependency_review"
+    },
+    {
+      "path": "TMessagesProj/jni/third_party/xiph/ogg",
+      "url": "https://github.com/xiph/ogg.git",
+      "commit": "be05b13e98b048f0b5a0f5fa8ce514d56db5f822",
+      "license_status": "requires_pinned_submodule_and_packaged_dependency_review"
+    },
+    {
+      "path": "TMessagesProj/jni/third_party/xiph/opus",
+      "url": "https://github.com/xiph/opus.git",
+      "commit": "22244de5a79bd1d6d623c32e72bf1954b56235be",
+      "license_status": "requires_pinned_submodule_and_packaged_dependency_review"
+    },
+    {
+      "path": "TMessagesProj/jni/third_party/xiph/opusfile",
+      "url": "https://github.com/xiph/opusfile.git",
+      "commit": "a55c164e9891a9326188b7d4d216ec9a88373739",
+      "license_status": "requires_pinned_submodule_and_packaged_dependency_review"
+    },
+    {
+      "path": "TMessagesProj/lib/jlatexmath",
+      "url": "https://github.com/dkaraush/jlatexmath-android.git",
+      "commit": "f59d6eecfac6fb58d6e3b7d6cff6c8aed9dbd5b4",
+      "license_status": "requires_pinned_submodule_and_packaged_dependency_review"
+    },
+    {
+      "path": "TMessagesProj/jni/tlottie",
+      "url": "https://github.com/dkaraush/tlottie.git",
+      "commit": "31f1b542f88e7b4be9a01e749920d857535fc715",
+      "license_status": "requires_pinned_submodule_and_packaged_dependency_review"
+    },
+    {
+      "path": "TMessagesProj_Modules/media",
+      "url": "https://github.com/Arseny271/media.git",
+      "commit": "c430d207677071b1873f9f18266d55ec45722180",
+      "license_status": "requires_pinned_submodule_and_packaged_dependency_review"
+    },
+    {
+      "path": "TMessagesProj/jni/third_party/absl",
+      "url": "https://github.com/abseil/abseil-cpp.git",
+      "commit": "54fac219c4ef0bc379dfffb0b8098725d77ac81b",
+      "license_status": "requires_pinned_submodule_and_packaged_dependency_review"
+    },
+    {
+      "path": "TMessagesProj/jni/third_party/wamr",
+      "url": "https://github.com/wasm-micro-runtime/wasm-micro-runtime.git",
+      "commit": "25bd7eb63e828e4bd242cc9b38d260b4b31c6605",
+      "license_status": "requires_pinned_submodule_and_packaged_dependency_review"
+    },
+    {
+      "path": "TMessagesProj/jni/tgcalls",
+      "url": "https://github.com/TelegramMessenger/tgcalls.git",
+      "commit": "ccbb57965020768c94f5b205ea08547a7e0fe49d",
+      "license_status": "requires_pinned_submodule_and_packaged_dependency_review"
+    },
+    {
+      "path": "TMessagesProj/jni/wallet-engine",
+      "url": "https://github.com/dkaraush/wallet-engine.git",
+      "commit": "5c65e47cb8d68727c20d89382d0bc51292486b9a",
+      "license_status": "requires_pinned_submodule_and_packaged_dependency_review"
+    },
+    {
+      "path": "TMessagesProj/jni/third_party/boost-regex",
+      "url": "https://github.com/boostorg/regex.git",
+      "commit": "4cbcd3078e6ae10d05124379623a1bf03fcb9350",
+      "license_status": "requires_pinned_submodule_and_packaged_dependency_review"
+    },
+    {
+      "path": "TMessagesProj/jni/third_party/libprisma",
+      "url": "https://github.com/TelegramMessenger/libprisma.git",
+      "commit": "31a5d6fbbef8136e4a2b3adaf7b95e2ccaa7436d",
+      "license_status": "requires_pinned_submodule_and_packaged_dependency_review"
+    },
+    {
+      "path": "TMessagesProj/chaquopy",
+      "url": "https://github.com/exteraless/chaquopy.git",
+      "commit": "d47b4a1e1817b4590b9c56dfd4ee5fcfdd6f0cbd",
+      "license_status": "requires_pinned_submodule_and_packaged_dependency_review"
+    }
+  ],
+  "limits": "License-file inventory is not an exhaustive packaged SBOM. Maven/AAR transitives, Python wheels, codecs, fonts, artwork and submodule notices need release-specific verification."
+}

@@ -1,0 +1,3619 @@
+{
+  "base": "8d4fe2f0a7d47e05a34c2a2c7fc8c706ed781881",
+  "scope": "All tracked src resource values and Java/Kotlin brand literals; declarations are findings, not proof of runtime visibility. Legal/internal rows are not automatic replacement targets.",
+  "resources": [
+    {
+      "path": "TMessagesProj/src/connectedAlpha/res/values-ar/alpha_name.xml",
+      "line": 2,
+      "key": "AppName",
+      "value": "FlexyGram Alpha",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/connectedAlpha/res/values-ar/alpha_name.xml",
+      "line": 3,
+      "key": "AppNameBeta",
+      "value": "FlexyGram Alpha",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/connectedAlpha/res/values-ar/alpha_name.xml",
+      "line": 4,
+      "key": "OpenExtera",
+      "value": "FlexyGram",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/connectedAlpha/res/values-de/alpha_name.xml",
+      "line": 2,
+      "key": "AppName",
+      "value": "FlexyGram Alpha",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/connectedAlpha/res/values-de/alpha_name.xml",
+      "line": 3,
+      "key": "AppNameBeta",
+      "value": "FlexyGram Alpha",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/connectedAlpha/res/values-de/alpha_name.xml",
+      "line": 4,
+      "key": "OpenExtera",
+      "value": "FlexyGram",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/connectedAlpha/res/values-es/alpha_name.xml",
+      "line": 2,
+      "key": "AppName",
+      "value": "FlexyGram Alpha",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/connectedAlpha/res/values-es/alpha_name.xml",
+      "line": 3,
+      "key": "AppNameBeta",
+      "value": "FlexyGram Alpha",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/connectedAlpha/res/values-es/alpha_name.xml",
+      "line": 4,
+      "key": "OpenExtera",
+      "value": "FlexyGram",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/connectedAlpha/res/values-it/alpha_name.xml",
+      "line": 2,
+      "key": "AppName",
+      "value": "FlexyGram Alpha",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/connectedAlpha/res/values-it/alpha_name.xml",
+      "line": 3,
+      "key": "AppNameBeta",
+      "value": "FlexyGram Alpha",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/connectedAlpha/res/values-it/alpha_name.xml",
+      "line": 4,
+      "key": "OpenExtera",
+      "value": "FlexyGram",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/connectedAlpha/res/values-ko/alpha_name.xml",
+      "line": 2,
+      "key": "AppName",
+      "value": "FlexyGram Alpha",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/connectedAlpha/res/values-ko/alpha_name.xml",
+      "line": 3,
+      "key": "AppNameBeta",
+      "value": "FlexyGram Alpha",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/connectedAlpha/res/values-ko/alpha_name.xml",
+      "line": 4,
+      "key": "OpenExtera",
+      "value": "FlexyGram",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/connectedAlpha/res/values-nl/alpha_name.xml",
+      "line": 2,
+      "key": "AppName",
+      "value": "FlexyGram Alpha",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/connectedAlpha/res/values-nl/alpha_name.xml",
+      "line": 3,
+      "key": "AppNameBeta",
+      "value": "FlexyGram Alpha",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/connectedAlpha/res/values-nl/alpha_name.xml",
+      "line": 4,
+      "key": "OpenExtera",
+      "value": "FlexyGram",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/connectedAlpha/res/values-pt-rBR/alpha_name.xml",
+      "line": 2,
+      "key": "AppName",
+      "value": "FlexyGram Alpha",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/connectedAlpha/res/values-pt-rBR/alpha_name.xml",
+      "line": 3,
+      "key": "AppNameBeta",
+      "value": "FlexyGram Alpha",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/connectedAlpha/res/values-pt-rBR/alpha_name.xml",
+      "line": 4,
+      "key": "OpenExtera",
+      "value": "FlexyGram",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/connectedAlpha/res/values/alpha_name.xml",
+      "line": 2,
+      "key": "AppName",
+      "value": "FlexyGram Alpha",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/connectedAlpha/res/values/alpha_name.xml",
+      "line": 3,
+      "key": "AppNameBeta",
+      "value": "FlexyGram Alpha",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/connectedAlpha/res/values/alpha_name.xml",
+      "line": 4,
+      "key": "OpenExtera",
+      "value": "FlexyGram",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/connectedAlpha/res/values/flexygram_identity.xml",
+      "line": 3,
+      "key": "NagramX",
+      "value": "FlexyGram Alpha",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-ar/strings.xml",
+      "line": 3,
+      "key": "AppName",
+      "value": "Nagram X",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-ar/strings.xml",
+      "line": 4,
+      "key": "AppNameBeta",
+      "value": "(Beta) تيليجرام",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-ar/strings_oe_chats.xml",
+      "line": 147,
+      "key": "OELocalPremiumInfo",
+      "value": "تُرسل إيموجي Premium كروابط يعرضها exteraless والعملاء الآخرون الداعمون لذلك كإيموجي حقيقية. أما ميزات Premium الأخرى فتعمل على هذا الجهاز فقط.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-ar/strings_oe_chats.xml",
+      "line": 148,
+      "key": "OELocalPremiumEmojiHint",
+      "value": "ليس لديك **Telegram Premium**، لذا سيُرسل هذا الإيموجي كرابط: سيراه فقط مستخدمو **exteraless** والعملاء الداعمون لذلك.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-ar/strings_oe_general.xml",
+      "line": 49,
+      "key": "OEGeneralExportFormatExtera",
+      "value": "صيغة exteraGram (.extera)",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-ar/strings_oe_general.xml",
+      "line": 51,
+      "key": "OEGeneralImportEtgEmpty",
+      "value": "لم يُعثر على إعدادات exteraGram في هذا الملف.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-ar/strings_oe_general.xml",
+      "line": 55,
+      "key": "OEGeneralResetSettingsDone",
+      "value": "تمت إعادة تعيين تفضيلات exteraless.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-ar/strings_oe_general.xml",
+      "line": 61,
+      "key": "OEGeneralNagramSettings",
+      "value": "إعدادات NagramX",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-ar/strings_oe_general.xml",
+      "line": 97,
+      "key": "OECrashTitle",
+      "value": "تعطّل exteraless",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-ar/strings_oe_general.xml",
+      "line": 112,
+      "key": "OECloudHeroText",
+      "value": "احتفظ بإعدادات exteraless في Telegram واستعدها على أي جهاز مسجّل الدخول إلى هذا الحساب.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-ar/strings_oe_general.xml",
+      "line": 174,
+      "key": "OEAyuDatabaseImportInfo",
+      "value": "ستُضاف الرسائل المحذوفة والمعدّلة من هذا الملف إلى الرسائل المحفوظة. ملفات التصدير من exteraless وAyuGram مدعومة. قد لا تتوفر الوسائط من تطبيق آخر.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-ar/strings_oe_glyph.xml",
+      "line": 11,
+      "key": "OEGlyphInfo",
+      "value": "تُضيء واجهة Glyph على ظهر هاتف Nothing: وميض للرسائل الواردة، وشعار exteraless على Glyph Matrix في Phone (3)، وتوهج متنفّس أثناء تسجيل الرسائل الصوتية أو استقبال مكالمة. المحادثات المكتومة لا تُطلق الوميض أبدًا.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-de/strings.xml",
+      "line": 3,
+      "key": "AppName",
+      "value": "Nagram X",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-de/strings.xml",
+      "line": 4,
+      "key": "AppNameBeta",
+      "value": "Telegram Beta",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-es-rES/strings_na.xml",
+      "line": 12,
+      "key": "CustomTitleHint",
+      "value": "Dejar en blanco para usar Nagram X",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-es-rES/strings_nax.xml",
+      "line": 3,
+      "key": "XChannel",
+      "value": "Canal de Nagram X",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-es-rES/strings_nax.xml",
+      "line": 312,
+      "key": "UnifiedPushNeverReceivedNotifications",
+      "value": "Nunca recibiste notificaciones con UnifiedPush desde que se inició Nagram X.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-es-rES/strings_nax.xml",
+      "line": 313,
+      "key": "UnifiedPushLastReceivedNotification",
+      "value": "La última notificación recibida con UnifiedPush fue hace %1$d segundos.\\n\\nHas recibido %2$d notificaciones desde que Nagram X se inició.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-es/flexygram_composer.xml",
+      "line": 7,
+      "key": "FlexyComposerInfo",
+      "value": "Los cambios se aplican sin reiniciar. Clásica conserva la barra original de Exteraless. Compacta mantiene los controles nativos, el tamaño del texto y las zonas táctiles; los controles especiales y las ventanas muy estrechas conservan su distribución original. El cristal solo cambia el acabado, nunca la altura del teclado. La grabación y las vistas previas conservan su fondo nativo.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-es/flexygram_icons.xml",
+      "line": 10,
+      "key": "FlexyIconLegacy",
+      "value": "Exteraless clásico",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-es/flexygram_settings_info.xml",
+      "line": 9,
+      "key": "FlexySettingsAboutBody",
+      "value": "FlexyGram es un cliente independiente de Telegram basado en el proyecto de código abierto Exteraless. Su código fuente y cambios están disponibles en GitHub.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-es/flexygram_settings_info.xml",
+      "line": 10,
+      "key": "FlexySettingsCreditsBody",
+      "value": "FlexyGram se distribuye bajo GNU GPL-3.0. Está basado en Exteraless y sus proyectos de código abierto anteriores. Reconocimientos del diseño original: @the8055u (iconos y diseño), @BlueprintDsgn (estudio de diseño). Se conservan los avisos de autoría y las licencias aplicables al código y los recursos originales.",
+      "classification": "legal_credit_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-es/strings.xml",
+      "line": 3,
+      "key": "AppName",
+      "value": "Nagram X",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-es/strings.xml",
+      "line": 4,
+      "key": "AppNameBeta",
+      "value": "Telegram Beta",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-es/strings_oe_chats.xml",
+      "line": 143,
+      "key": "OELocalPremiumInfo",
+      "value": "Los emoji premium se envían como enlaces que exteraless y otros clientes compatibles muestran como emoji reales. Las demás funciones Premium solo funcionan en este dispositivo.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-es/strings_oe_chats.xml",
+      "line": 144,
+      "key": "OELocalPremiumEmojiHint",
+      "value": "No tienes **Telegram Premium**, así que este emoji se envía como enlace: solo lo verán los usuarios de **exteraless** y clientes compatibles.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-es/strings_oe_general.xml",
+      "line": 49,
+      "key": "OEGeneralExportFormatExtera",
+      "value": "Formato de exteraGram (.extera)",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-es/strings_oe_general.xml",
+      "line": 51,
+      "key": "OEGeneralImportEtgEmpty",
+      "value": "No se encontraron ajustes de exteraGram en este archivo.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-es/strings_oe_general.xml",
+      "line": 55,
+      "key": "OEGeneralResetSettingsDone",
+      "value": "Se restablecieron los ajustes de exteraless.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-es/strings_oe_general.xml",
+      "line": 61,
+      "key": "OEGeneralNagramSettings",
+      "value": "Ajustes de NagramX",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-es/strings_oe_general.xml",
+      "line": 97,
+      "key": "OECrashTitle",
+      "value": "exteraless se cerró inesperadamente",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-es/strings_oe_general.xml",
+      "line": 132,
+      "key": "OEAyuDatabaseImportInfo",
+      "value": "Los mensajes eliminados y editados de este archivo se añadirán a los ya guardados. Se admiten exportaciones de exteraless y AyuGram. Es posible que los archivos multimedia de otra app no estén disponibles.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-fa-rIR/strings_na.xml",
+      "line": 12,
+      "key": "CustomTitleHint",
+      "value": "خالی بگذارید تا از Nagram X استفاده شود",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-fa-rIR/strings_nax.xml",
+      "line": 3,
+      "key": "XChannel",
+      "value": "کانال Nagram X",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-in-rID/strings_na.xml",
+      "line": 12,
+      "key": "CustomTitleHint",
+      "value": "Biarkan kosong untuk menggunakan Nagram X",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-in-rID/strings_nax.xml",
+      "line": 3,
+      "key": "XChannel",
+      "value": "Saluran Nagram X",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-in-rID/strings_nax.xml",
+      "line": 312,
+      "key": "UnifiedPushNeverReceivedNotifications",
+      "value": "Anda tidak pernah menerima pemberitahuan dengan UnifiedPush sejak Nagram X dimulai.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-in-rID/strings_nax.xml",
+      "line": 313,
+      "key": "UnifiedPushLastReceivedNotification",
+      "value": "Pemberitahuan terakhir yang diterima dengan UnifiedPush adalah %1$d detik yang lalu.\\n\\nAnda menerima %2$d pemberitahuan sejak Nagram X dimulai.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-it-rIT/strings_na.xml",
+      "line": 12,
+      "key": "CustomTitleHint",
+      "value": "Lascia vuoto per usare Nagram X",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-it-rIT/strings_nax.xml",
+      "line": 3,
+      "key": "XChannel",
+      "value": "Canale Nagram X",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-it-rIT/strings_nax.xml",
+      "line": 316,
+      "key": "UnifiedPushNeverReceivedNotifications",
+      "value": "Non hai mai ricevuto notifiche con UnifiedPush da quando è stato avviato Nagram X.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-it-rIT/strings_nax.xml",
+      "line": 317,
+      "key": "UnifiedPushLastReceivedNotification",
+      "value": "L\\'ultima notifica ricevuta con UnifiedPush è stata %1$d secondi fa.\\n\\nHai ricevuto %2$d notifiche da quando è stato avviato Nagram X.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-it/strings.xml",
+      "line": 3,
+      "key": "AppName",
+      "value": "Nagram X",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-it/strings.xml",
+      "line": 4,
+      "key": "AppNameBeta",
+      "value": "Telegram Beta",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-ja-rJP/strings_na.xml",
+      "line": 12,
+      "key": "CustomTitleHint",
+      "value": "空白のままにすると、Nagram X が使用されます",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-ja-rJP/strings_nax.xml",
+      "line": 3,
+      "key": "XChannel",
+      "value": "Nagram X チャンネル",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-ja-rJP/strings_nax.xml",
+      "line": 312,
+      "key": "UnifiedPushNeverReceivedNotifications",
+      "value": "Nagram X の起動以降、UnifiedPush 経由で通知を受信したことはありません。",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-ja-rJP/strings_nax.xml",
+      "line": 313,
+      "key": "UnifiedPushLastReceivedNotification",
+      "value": "UnifiedPush で最後に受信した通知は %1$d 秒前です。\\n\\nNagram X の起動以降、 %2$d 件の通知を受信しました。",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-ko/strings.xml",
+      "line": 3,
+      "key": "AppName",
+      "value": "Nagram X",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-ko/strings.xml",
+      "line": 4,
+      "key": "AppNameBeta",
+      "value": "텔레그램",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-ko/strings_na.xml",
+      "line": 12,
+      "key": "CustomTitleHint",
+      "value": "비워 두면 Nagram X를 사용합니다",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-ko/strings_nax.xml",
+      "line": 3,
+      "key": "XChannel",
+      "value": "Nagram X 채널",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-ko/strings_nax.xml",
+      "line": 312,
+      "key": "UnifiedPushNeverReceivedNotifications",
+      "value": "Nagram X가 시작된 이후 UnifiedPush로 알림을 받은 적이 없습니다.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-ko/strings_nax.xml",
+      "line": 313,
+      "key": "UnifiedPushLastReceivedNotification",
+      "value": "마지막으로 UnifiedPush 알림을 받은 것은 %1$d초 전입니다.\\n\\nNagram X가 시작된 이후 %2$d개의 알림을 받았습니다.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-nl/strings.xml",
+      "line": 3,
+      "key": "AppName",
+      "value": "Nagram X",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-nl/strings.xml",
+      "line": 4,
+      "key": "AppNameBeta",
+      "value": "Telegram-bèta",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-pl-rPL/strings_na.xml",
+      "line": 12,
+      "key": "CustomTitleHint",
+      "value": "Pozostaw puste, aby użyć Nagram X",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-pl-rPL/strings_nax.xml",
+      "line": 3,
+      "key": "XChannel",
+      "value": "Kanał Nagram X",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-pl-rPL/strings_nax.xml",
+      "line": 312,
+      "key": "UnifiedPushNeverReceivedNotifications",
+      "value": "Od uruchomienia Nagram X nie otrzymano powiadomień przez UnifiedPush.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-pl-rPL/strings_nax.xml",
+      "line": 313,
+      "key": "UnifiedPushLastReceivedNotification",
+      "value": "Ostatnie powiadomienie przez UnifiedPush otrzymano %1$d s temu.\\n\\nOd uruchomienia Nagram X otrzymano %2$d powiadomień.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-pl-rPL/strings_oe_chats.xml",
+      "line": 143,
+      "key": "OELocalPremiumInfo",
+      "value": "Emoji premium są wysyłane jako linki, które exteraless i inne obsługujące to klienty wyświetlają jako prawdziwe emoji. Pozostałe funkcje Premium działają tylko na tym urządzeniu.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-pl-rPL/strings_oe_chats.xml",
+      "line": 144,
+      "key": "OELocalPremiumEmojiHint",
+      "value": "Nie masz **Telegram Premium**, więc to emoji zostanie wysłane jako link: zobaczą je tylko użytkownicy **exteraless** i klientów, które to obsługują.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-pl-rPL/strings_oe_general.xml",
+      "line": 49,
+      "key": "OEGeneralExportFormatExtera",
+      "value": "Format exteraGram (.extera)",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-pl-rPL/strings_oe_general.xml",
+      "line": 51,
+      "key": "OEGeneralImportEtgEmpty",
+      "value": "W tym pliku nie znaleziono ustawień exteraGram.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-pl-rPL/strings_oe_general.xml",
+      "line": 55,
+      "key": "OEGeneralResetSettingsDone",
+      "value": "Ustawienia exteraless zostały zresetowane.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-pl-rPL/strings_oe_general.xml",
+      "line": 61,
+      "key": "OEGeneralNagramSettings",
+      "value": "Ustawienia NagramX",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-pl-rPL/strings_oe_general.xml",
+      "line": 97,
+      "key": "OECrashTitle",
+      "value": "exteraless uległ awarii",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-pl-rPL/strings_oe_general.xml",
+      "line": 132,
+      "key": "OEAyuDatabaseImportInfo",
+      "value": "Usunięte i edytowane wiadomości z tego pliku zostaną dodane do już zapisanych. Obsługiwane są eksporty z exteraless i AyuGram. Multimedia z innej aplikacji mogą być niedostępne.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-pt-rBR/strings.xml",
+      "line": 3,
+      "key": "AppName",
+      "value": "Nagram X",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-pt-rBR/strings.xml",
+      "line": 4,
+      "key": "AppNameBeta",
+      "value": "Telegram Beta",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-pt-rBR/strings_na.xml",
+      "line": 12,
+      "key": "CustomTitleHint",
+      "value": "Deixe em branco para usar o Nagram X",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-pt-rBR/strings_nax.xml",
+      "line": 3,
+      "key": "XChannel",
+      "value": "Canal Nagram X",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-pt-rBR/strings_nax.xml",
+      "line": 311,
+      "key": "UnifiedPushNeverReceivedNotifications",
+      "value": "Você não recebeu notificações via UnifiedPush desde que o Nagram X foi iniciado.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-pt-rBR/strings_nax.xml",
+      "line": 312,
+      "key": "UnifiedPushLastReceivedNotification",
+      "value": "A última notificação recebida via UnifiedPush foi há %1$d segundos.\\n\\nVocê recebeu %2$d notificações desde que o Nagram X foi iniciado.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-ru-rRU/strings_na.xml",
+      "line": 12,
+      "key": "CustomTitleHint",
+      "value": "Оставьте поле пустым, чтобы использовать «exteraless»",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-ru-rRU/strings_nax.xml",
+      "line": 3,
+      "key": "XChannel",
+      "value": "Канал Nagram X",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-ru-rRU/strings_oe.xml",
+      "line": 26,
+      "key": "AppIconExteraless",
+      "value": "exteraless",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-ru-rRU/strings_oe_chats.xml",
+      "line": 155,
+      "key": "OELocalPremiumInfo",
+      "value": "Премиум-эмодзи уходят ссылками, которые exteraless и поддерживающие это клиенты показывают как настоящие эмодзи. Остальные функции Premium работают только на этом устройстве.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-ru-rRU/strings_oe_chats.xml",
+      "line": 156,
+      "key": "OELocalPremiumEmojiHint",
+      "value": "У вас нет **Telegram Premium**, поэтому эмодзи уйдёт ссылкой: увидят его только пользователи **exteraless** и клиентов, поддерживающих это.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-ru-rRU/strings_oe_general.xml",
+      "line": 64,
+      "key": "OEGeneralExportFormatExtera",
+      "value": "Формат exteraGram (.extera)",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-ru-rRU/strings_oe_general.xml",
+      "line": 66,
+      "key": "OEGeneralImportEtgEmpty",
+      "value": "В файле нет настроек exteraGram.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-ru-rRU/strings_oe_general.xml",
+      "line": 70,
+      "key": "OEGeneralResetSettingsDone",
+      "value": "Настройки exteraless сброшены.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-ru-rRU/strings_oe_general.xml",
+      "line": 77,
+      "key": "OEGeneralNagramSettings",
+      "value": "Настройки NagramX",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-ru-rRU/strings_oe_general.xml",
+      "line": 114,
+      "key": "OECrashTitle",
+      "value": "exteraless аварийно завершился",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-ru-rRU/strings_oe_general.xml",
+      "line": 129,
+      "key": "OECloudHeroText",
+      "value": "Храните настройки exteraless в Telegram и восстанавливайте их на любом устройстве с этим аккаунтом.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-ru-rRU/strings_oe_general.xml",
+      "line": 191,
+      "key": "OEAyuDatabaseImportInfo",
+      "value": "Удалённые и изменённые сообщения из файла добавятся к уже сохранённым. Подходят выгрузки exteraless и AyuGram. Медиа из другого приложения могут не открыться.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-ru-rRU/strings_oe_glyph.xml",
+      "line": 11,
+      "key": "OEGlyphInfo",
+      "value": "Подсветка задней панели Nothing Phone: вспышка на входящие сообщения, логотип exteraless на Glyph Matrix Phone (3) и «дыхание» во время записи голосовых или входящего звонка. Заглушённые чаты вспышку не вызывают.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-ru/flexygram_icons.xml",
+      "line": 10,
+      "key": "FlexyIconLegacy",
+      "value": "Exteraless классический",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-ru/flexygram_settings_info.xml",
+      "line": 9,
+      "key": "FlexySettingsAboutBody",
+      "value": "FlexyGram — независимый клиент Telegram на основе открытого проекта Exteraless. Исходный код и изменения доступны на GitHub.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-ru/flexygram_settings_info.xml",
+      "line": 10,
+      "key": "FlexySettingsCreditsBody",
+      "value": "FlexyGram распространяется на условиях GNU GPL-3.0 и основан на Exteraless и других открытых проектах. Благодарности за оригинальное оформление: @the8055u (иконки и дизайн), @BlueprintDsgn (дизайн-студия). Сохраняются все применимые уведомления об авторстве и лицензиях исходного кода и ресурсов.",
+      "classification": "legal_credit_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-tr-rTR/strings_na.xml",
+      "line": 12,
+      "key": "CustomTitleHint",
+      "value": "Nagram X kullanmak için boş bırakın",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-tr-rTR/strings_nax.xml",
+      "line": 3,
+      "key": "XChannel",
+      "value": "Nagram X Kanalı",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-tr-rTR/strings_nax.xml",
+      "line": 311,
+      "key": "UnifiedPushNeverReceivedNotifications",
+      "value": "Nagram X başlatıldığından beri UnifiedPush ile hiç bildirim almadınız.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-tr-rTR/strings_nax.xml",
+      "line": 312,
+      "key": "UnifiedPushLastReceivedNotification",
+      "value": "UnifiedPush ile en son alınan bildirim %1$d saniye önceydi.\\n\\nNagram X başlatıldığından beri %2$d bildirim aldınız.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-uk-rUA/strings_na.xml",
+      "line": 12,
+      "key": "CustomTitleHint",
+      "value": "Залиште порожнім, щоб використовувати Nagram X",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-uk-rUA/strings_nax.xml",
+      "line": 3,
+      "key": "XChannel",
+      "value": "Канал Nagram X",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-uk-rUA/strings_nax.xml",
+      "line": 312,
+      "key": "UnifiedPushNeverReceivedNotifications",
+      "value": "З моменту запуску Nagram X сповіщень через UnifiedPush не надходило.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-uk-rUA/strings_nax.xml",
+      "line": 313,
+      "key": "UnifiedPushLastReceivedNotification",
+      "value": "Останнє сповіщення через UnifiedPush надійшло %1$d сек. тому.\\n\\nВи отримали %2$d сповіщень з моменту запуску Nagram X.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-vi-rVN/strings_na.xml",
+      "line": 3,
+      "key": "N_Config",
+      "value": "Cấu hình NagramX",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-vi-rVN/strings_na.xml",
+      "line": 12,
+      "key": "CustomTitleHint",
+      "value": "Để trống để sử dụng Nagram X",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-vi-rVN/strings_nax.xml",
+      "line": 3,
+      "key": "XChannel",
+      "value": "Kênh Nagram X",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-vi-rVN/strings_nax.xml",
+      "line": 299,
+      "key": "UnifiedPushNeverReceivedNotifications",
+      "value": "Bạn chưa từng nhận được thông báo nào từ UnifiedPush kể từ khi Nagram X được khởi chạy.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-vi-rVN/strings_nax.xml",
+      "line": 300,
+      "key": "UnifiedPushLastReceivedNotification",
+      "value": "Thông báo gần nhất nhận được qua UnifiedPush là từ %1$d giây trước.\\n\\nBạn đã nhận được %2$d thông báo kể từ khi Nagram X khởi động.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-vi-rVN/strings_neko.xml",
+      "line": 3,
+      "key": "NekoSettings",
+      "value": "Cài đặt Nagram X",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-vi-rVN/strings_neko.xml",
+      "line": 154,
+      "key": "CloudConfigDesc",
+      "value": "Lưu Cài đặt NagramX của bạn vào đám mây Telegram.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-zh-rCN/strings_na.xml",
+      "line": 12,
+      "key": "CustomTitleHint",
+      "value": "留空则使用 Nagram X",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-zh-rCN/strings_nax.xml",
+      "line": 3,
+      "key": "XChannel",
+      "value": "Nagram X 频道",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-zh-rCN/strings_nax.xml",
+      "line": 312,
+      "key": "UnifiedPushNeverReceivedNotifications",
+      "value": "自 Nagram X 启动后，您从未收到 UnifiedPush 的通知。",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-zh-rCN/strings_nax.xml",
+      "line": 313,
+      "key": "UnifiedPushLastReceivedNotification",
+      "value": "最后一次通过 UnifiedPush 接收到的通知是 %1$d 秒前。\\n\\n自 Nagram X 启动以来，您已收到 %2$d 条通知。",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-zh-rCN/strings_oe_chats.xml",
+      "line": 143,
+      "key": "OELocalPremiumInfo",
+      "value": "高级表情会以链接形式发送，exteraless 及其他支持此功能的客户端会将其显示为真正的表情。其他 Premium 功能仅在此设备上生效。",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-zh-rCN/strings_oe_chats.xml",
+      "line": 144,
+      "key": "OELocalPremiumEmojiHint",
+      "value": "你没有 **Telegram Premium**，因此此表情会以链接形式发送：只有 **exteraless** 及支持此功能的客户端用户能看到它。",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-zh-rCN/strings_oe_general.xml",
+      "line": 49,
+      "key": "OEGeneralExportFormatExtera",
+      "value": "exteraGram 格式 (.extera)",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-zh-rCN/strings_oe_general.xml",
+      "line": 51,
+      "key": "OEGeneralImportEtgEmpty",
+      "value": "该文件中没有找到 exteraGram 的设置。",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-zh-rCN/strings_oe_general.xml",
+      "line": 55,
+      "key": "OEGeneralResetSettingsDone",
+      "value": "exteraless 设置已重置。",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-zh-rCN/strings_oe_general.xml",
+      "line": 61,
+      "key": "OEGeneralNagramSettings",
+      "value": "NagramX 设置",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-zh-rCN/strings_oe_general.xml",
+      "line": 97,
+      "key": "OECrashTitle",
+      "value": "exteraless 已崩溃",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-zh-rCN/strings_oe_general.xml",
+      "line": 132,
+      "key": "OEAyuDatabaseImportInfo",
+      "value": "此文件中被删除和编辑的消息将添加到已保存的消息中。支持 exteraless 和 AyuGram 的导出文件。来自其他应用的媒体可能无法打开。",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-zh-rTW/strings_na.xml",
+      "line": 12,
+      "key": "CustomTitleHint",
+      "value": "留空則使用 Nagram X",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-zh-rTW/strings_na.xml",
+      "line": 67,
+      "key": "PushServiceTypeInApp",
+      "value": "Nagram X",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-zh-rTW/strings_nax.xml",
+      "line": 3,
+      "key": "XChannel",
+      "value": "Nagram X 頻道",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-zh-rTW/strings_nax.xml",
+      "line": 312,
+      "key": "UnifiedPushNeverReceivedNotifications",
+      "value": "自 Nagram X 啟動後，您從未收到 UnifiedPush 的通知。",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values-zh-rTW/strings_nax.xml",
+      "line": 313,
+      "key": "UnifiedPushLastReceivedNotification",
+      "value": "最後一次透過 UnifiedPush 接收到的通知是 %1$d 秒前。\\n\\n自 Nagram X 啟動以來，您已收到 %2$d 條通知。",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values/flexygram_composer.xml",
+      "line": 7,
+      "key": "FlexyComposerInfo",
+      "value": "Changes apply without restarting. Classic keeps the original Exteraless bar. Compact keeps native controls, text size and touch areas; specialized controls and very narrow windows retain their original layout. Glass changes only the surface, never keyboard height. Recording and previews retain their native background.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values/flexygram_icons.xml",
+      "line": 10,
+      "key": "FlexyIconLegacy",
+      "value": "Exteraless Classic",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values/flexygram_settings_info.xml",
+      "line": 9,
+      "key": "FlexySettingsAboutBody",
+      "value": "FlexyGram is an independent Telegram client based on the open-source Exteraless project. Source code and project changes are available on GitHub.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values/flexygram_settings_info.xml",
+      "line": 10,
+      "key": "FlexySettingsCreditsBody",
+      "value": "FlexyGram is distributed under GNU GPL-3.0. It builds upon Exteraless and its open-source predecessors. Original design acknowledgements: @the8055u (icons and design), @BlueprintDsgn (design studio). Applicable upstream copyright, asset and license notices remain in force.",
+      "classification": "legal_credit_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values/strings.xml",
+      "line": 3,
+      "key": "AppName",
+      "value": "exteraless",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values/strings.xml",
+      "line": 4,
+      "key": "AppNameBeta",
+      "value": "Telegram Beta",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values/strings_na.xml",
+      "line": 12,
+      "key": "CustomTitleHint",
+      "value": "Leave blank to use exteraless",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values/strings_na.xml",
+      "line": 42,
+      "key": "Nagram",
+      "value": "exteraless",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values/strings_nax.xml",
+      "line": 3,
+      "key": "NagramX",
+      "value": "exteraless",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values/strings_nax.xml",
+      "line": 4,
+      "key": "XChannel",
+      "value": "Nagram X Channel",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values/strings_oe.xml",
+      "line": 4,
+      "key": "OpenExtera",
+      "value": "exteraless",
+      "classification": "visible_client_brand"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values/strings_oe.xml",
+      "line": 28,
+      "key": "AppIconExteraless",
+      "value": "exteraless",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values/strings_oe_chats.xml",
+      "line": 158,
+      "key": "OELocalPremiumInfo",
+      "value": "Premium emoji are sent as links that exteraless and other clients that support this show as the real emoji. Other Premium features work only on this device.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values/strings_oe_chats.xml",
+      "line": 159,
+      "key": "OELocalPremiumEmojiHint",
+      "value": "You don\\'t have **Telegram Premium**, so this emoji is sent as a link: only users of **exteraless** and clients that support this will see it.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values/strings_oe_general.xml",
+      "line": 68,
+      "key": "OEGeneralExportFormatExtera",
+      "value": "exteraGram format (.extera)",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values/strings_oe_general.xml",
+      "line": 70,
+      "key": "OEGeneralImportEtgEmpty",
+      "value": "No exteraGram settings found in this file.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values/strings_oe_general.xml",
+      "line": 74,
+      "key": "OEGeneralResetSettingsDone",
+      "value": "exteraless preferences have been reset.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values/strings_oe_general.xml",
+      "line": 80,
+      "key": "OEGeneralNagramSettings",
+      "value": "NagramX settings",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values/strings_oe_general.xml",
+      "line": 116,
+      "key": "OECrashTitle",
+      "value": "exteraless crashed",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values/strings_oe_general.xml",
+      "line": 132,
+      "key": "OECloudHeroText",
+      "value": "Keep your exteraless settings in Telegram and restore them on any device signed in to this account.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values/strings_oe_general.xml",
+      "line": 194,
+      "key": "OEAyuDatabaseImportInfo",
+      "value": "Deleted and edited messages from this file will be added to the ones already saved. Exports from exteraless and AyuGram are supported. Media from another app may be unavailable.",
+      "classification": "review_visible_context"
+    },
+    {
+      "path": "TMessagesProj/src/main/res/values/strings_oe_glyph.xml",
+      "line": 12,
+      "key": "OEGlyphInfo",
+      "value": "Lights up the Glyph Interface on the back of your Nothing phone: a flash for incoming messages, the exteraless logo on the Phone (3) Glyph Matrix and a breathing glow while recording voice messages or receiving a call. Muted chats never trigger the flash.",
+      "classification": "review_visible_context"
+    }
+  ],
+  "literals": [
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/ai/network/Client.java",
+      "line": 351,
+      "value": "https://github.com/exteraless/exteraless",
+      "classification": "upstream_url_review"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/ai/network/Client.java",
+      "line": 352,
+      "value": "exteraless",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/ai/ui/AiSettingsActivity.java",
+      "line": 116,
+      "value": "exteraless_ai",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/appicons/AppIcons.java",
+      "line": 34,
+      "value": "EXTERALESS",
+      "classification": "visible_literal_review"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/backup/EtgBackup.java",
+      "line": 134,
+      "value": "exteraless-",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/crash/CrashLog.java",
+      "line": 42,
+      "value": "exteraless ",
+      "classification": "visible_literal_review"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/crash/CrashReportDialog.java",
+      "line": 78,
+      "value": "exteraless crash",
+      "classification": "visible_literal_review"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/debug/EnergyProfiler.java",
+      "line": 56,
+      "value": "exteraless_energy_profiler",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/debug/EnergyProfiler.java",
+      "line": 751,
+      "value": "exteraless energy profile\\n",
+      "classification": "visible_literal_review"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/debug/JankProfiler.java",
+      "line": 68,
+      "value": "app.exteraless.",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/debug/JankProfiler.java",
+      "line": 69,
+      "value": "com.exteragram.",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/debug/JankProfiler.java",
+      "line": 636,
+      "value": "exteraless jank profile\\n",
+      "classification": "visible_literal_review"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/notifications/NotificationsHelper.kt",
+      "line": 12,
+      "value": "exteraless_notifications",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/nowplaying/ProfileMusicStamp.java",
+      "line": 56,
+      "value": "exteraless_profile_music",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/player/OnlineLyrics.java",
+      "line": 423,
+      "value": "exteraless/",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/player/OnlineLyrics.java",
+      "line": 423,
+      "value": " (https://github.com/exteraless/exteraless)",
+      "classification": "visible_literal_review"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 5,
+      "value": "com.exteragram.messenger",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 12,
+      "value": "com.exteragram.messenger.utils.chats.ChatUtils",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 12,
+      "value": "com.exteragram.messenger.utils.chats.ChatUtils",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 13,
+      "value": "com.exteragram.messenger.utils.ChatUtils",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 13,
+      "value": "com.exteragram.messenger.utils.chats.ChatUtils",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 14,
+      "value": "com.exteragram.messenger.utils.text.LocaleUtils",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 14,
+      "value": "com.exteragram.messenger.utils.text.LocaleUtils",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 15,
+      "value": "com.exteragram.messenger.utils.LocaleUtils",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 15,
+      "value": "com.exteragram.messenger.utils.text.LocaleUtils",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 16,
+      "value": "com.exteragram.messenger.utils.AppUtils",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 16,
+      "value": "com.exteragram.messenger.utils.AppUtils",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 17,
+      "value": "com.exteragram.messenger.R",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 18,
+      "value": "com.exteragram.messenger.utils.system.VibratorUtils",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 18,
+      "value": "com.exteragram.messenger.utils.system.VibratorUtils",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 19,
+      "value": "com.exteragram.messenger.ai.AiConfig",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 19,
+      "value": "app.exteraless.ai.AiConfig",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 20,
+      "value": "com.exteragram.messenger.ai.AiController",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 20,
+      "value": "com.exteragram.messenger.ai.AiController",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 21,
+      "value": "com.exteragram.messenger.ai.ui.ResponseAlert",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 21,
+      "value": "com.exteragram.messenger.ai.ui.ResponseAlert",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 22,
+      "value": "com.exteragram.messenger.ai.ui.GenerateFromMessageBottomSheet",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 22,
+      "value": "com.exteragram.messenger.ai.ui.GenerateFromMessageBottomSheet",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 23,
+      "value": "com.exteragram.messenger.plugins.ui.components.InstallPluginBottomSheet",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 23,
+      "value": "com.exteragram.messenger.plugins.ui.components.InstallPluginBottomSheet",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 24,
+      "value": "com.exteragram.messenger.utils.system.SystemUtils",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 24,
+      "value": "com.exteragram.messenger.utils.system.SystemUtils",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 25,
+      "value": "com.exteragram.messenger.utils.SystemUtils",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 25,
+      "value": "com.exteragram.messenger.utils.system.SystemUtils",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 26,
+      "value": "com.exteragram.messenger.preferences.MainPreferencesActivity",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 26,
+      "value": "app.exteraless.settings.OpenExteraSettingsActivity",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 27,
+      "value": "com.exteragram.messenger.preferences.GeneralPreferencesActivity",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 27,
+      "value": "app.exteraless.settings.OpenExteraGeneralActivity",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 28,
+      "value": "com.exteragram.messenger.preferences.AppearancePreferencesActivity",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 28,
+      "value": "app.exteraless.settings.OpenExteraAppearanceActivity",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 29,
+      "value": "com.exteragram.messenger.preferences.ChatsPreferencesActivity",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 29,
+      "value": "app.exteraless.settings.OpenExteraChatsActivity",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 30,
+      "value": "com.exteragram.messenger.preferences.OtherPreferencesActivity",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 30,
+      "value": "app.exteraless.settings.OpenExteraOtherActivity",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 31,
+      "value": "com.exteragram.messenger.preferences.AppNavigationPreferencesActivity",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 31,
+      "value": "app.exteraless.settings.OpenExteraAppNavigationActivity",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 32,
+      "value": "com.exteragram.messenger.preferences.BasePreferencesActivity",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 32,
+      "value": "com.exteragram.messenger.preferences.BasePreferencesActivity",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 33,
+      "value": "com.exteragram.messenger.preferences.components.AltSeekbar",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 33,
+      "value": "app.exteraless.appearance.AltSeekbar",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 34,
+      "value": "com.exteragram.messenger.utils.chats.MainMenuHelper",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 34,
+      "value": "app.exteraless.drawer.MainMenuHelper",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 35,
+      "value": "com.exteragram.messenger.icons.ui.IconPacksActivity",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 35,
+      "value": "app.exteraless.icons.IconPacksActivity",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 36,
+      "value": "com.exteragram.messenger.pillstack.ui.pills.crypto.utils.ColoredBackground",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 36,
+      "value": "app.exteraless.pillstack.pills.ColoredBackground",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 37,
+      "value": "com.exteragram.messenger.pillstack.ui.pills.weather.WeatherPill",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 37,
+      "value": "app.exteraless.pillstack.pills.WeatherPill",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 38,
+      "value": "com.exteragram.messenger.pillstack.ui.PillStackPreferencesActivity",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 38,
+      "value": "app.exteraless.pillstack.PillStackSettingsActivity",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 39,
+      "value": "com.exteragram.messenger.pillstack.ui.PillStackLayout",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 39,
+      "value": "app.exteraless.pillstack.PillStackView",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 40,
+      "value": "com.exteragram.messenger.pillstack.ui.pills.weather.WeatherPreferencesActivity",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 40,
+      "value": "app.exteraless.pillstack.pills.weather.WeatherSettingsActivity",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 41,
+      "value": "com.exteragram.messenger.preferences.appearance.AppearancePreferencesActivity",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 41,
+      "value": "app.exteraless.settings.OpenExteraAppearanceActivity",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 42,
+      "value": "com.exteragram.messenger.nowplaying.ui.components.NowPlayingCard",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 42,
+      "value": "app.exteraless.components.ProfileMusicCard",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 43,
+      "value": "com.exteragram.messenger.nowplaying.NowPlayingController",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 43,
+      "value": "app.exteraless.nowplaying.NowPlayingController",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 44,
+      "value": "com.exteragram.messenger.proxy.ProxyController",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 44,
+      "value": "app.exteraless.proxy.ProxyController",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 45,
+      "value": "com.exteragram.messenger.utils.ui.UIUtil",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 45,
+      "value": "app.exteraless.utils.UIUtil",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 46,
+      "value": "com.exteragram.messenger.utils.ui.MainTabsUiHelper",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 46,
+      "value": "app.exteraless.appearance.MainTabsUiHelper",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 56,
+      "value": "com.exteragram.messenger.ai.data.",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 56,
+      "value": "app.exteraless.ai.data.",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 57,
+      "value": "com.exteragram.messenger.ai.network.",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 57,
+      "value": "app.exteraless.ai.network.",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 58,
+      "value": "com.exteragram.messenger.pillstack.core.",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 58,
+      "value": "app.exteraless.pillstack.",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 59,
+      "value": "com.exteragram.messenger.pillstack.ui.pills.",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 59,
+      "value": "app.exteraless.pillstack.pills.",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 60,
+      "value": "com.exteragram.messenger.pillstack.ui.",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 60,
+      "value": "app.exteraless.pillstack.",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 61,
+      "value": "com.exteragram.messenger.preferences.",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 61,
+      "value": "app.exteraless.settings.",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 62,
+      "value": "com.exteragram.messenger.plugins.",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 62,
+      "value": "app.exteraless.plugins.",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 63,
+      "value": "com.exteragram.messenger.icons.",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 63,
+      "value": "app.exteraless.icons.",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 64,
+      "value": "com.exteragram.messenger.camera.",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 64,
+      "value": "app.exteraless.camera.",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 65,
+      "value": "com.exteragram.messenger.backup.",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 65,
+      "value": "app.exteraless.backup.",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 66,
+      "value": "com.exteragram.messenger.feed.",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 66,
+      "value": "app.exteraless.feed.",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 67,
+      "value": "com.exteragram.messenger.drawer.",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 67,
+      "value": "app.exteraless.drawer.",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 68,
+      "value": "com.exteragram.messenger.components.",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 68,
+      "value": "app.exteraless.components.",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 69,
+      "value": "com.exteragram.messenger.utils.",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ClassAliases.java",
+      "line": 69,
+      "value": "app.exteraless.utils.",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/PluginGrantStore.java",
+      "line": 14,
+      "value": "exteraless_plugin_grants",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/PluginLog.java",
+      "line": 108,
+      "value": "exteraless ",
+      "classification": "visible_literal_review"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/PluginSinkGate.java",
+      "line": 69,
+      "value": "app.exteraless.plugins.PluginPermissions",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/PluginSinkGate.java",
+      "line": 70,
+      "value": "app.exteraless.plugins.PluginTrustLevel",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/PluginSinkGate.java",
+      "line": 71,
+      "value": "app.exteraless.plugins.PluginGrantStore",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/PluginSinkGate.java",
+      "line": 72,
+      "value": "app.exteraless.plugins.SignedGrantPreferences",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/PluginSinkGate.java",
+      "line": 73,
+      "value": "app.exteraless.plugins.PluginSinkGate",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/PluginSinkGate.java",
+      "line": 74,
+      "value": "app.exteraless.plugins.PluginsWatchdog",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/PluginSinkGate.java",
+      "line": 75,
+      "value": "app.exteraless.plugins.PluginRuntime",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/PluginSinkGate.java",
+      "line": 76,
+      "value": "app.exteraless.plugins.PluginServices",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/PluginSinkGate.java",
+      "line": 77,
+      "value": "app.exteraless.plugins.PluginAuditJournal",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/PluginSinkGate.java",
+      "line": 78,
+      "value": "app.exteraless.plugins.PluginDenialNotice",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/PluginSinkGate.java",
+      "line": 79,
+      "value": "app.exteraless.plugins.files.FilesControllerJava",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/PluginSinkGate.java",
+      "line": 80,
+      "value": "app.exteraless.plugins.intents.IntentsDispatcher",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/PluginSinkGate.java",
+      "line": 81,
+      "value": "app.exteraless.plugins.menus.MenusController",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/PluginSinkGate.java",
+      "line": 256,
+      "value": "exteraless-gate",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/PluginSinkGate.java",
+      "line": 1187,
+      "value": "app.exteraless.plugins.PluginSinkGate",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/PluginSinkGate.java",
+      "line": 1188,
+      "value": "app.exteraless.plugins.PluginAuditJournal",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/PluginsConstants.java",
+      "line": 14,
+      "value": "exteraless_plugins",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/PluginsController.java",
+      "line": 1105,
+      "value": "exteraless_plugin_foreign_settings",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/SignedGrantPreferences.java",
+      "line": 25,
+      "value": "exteraless_plugin_grants_v1",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ui/PluginsInfoActivity.java",
+      "line": 55,
+      "value": "https://plugins.exteragram.app",
+      "classification": "upstream_url_review"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/utils/ClassProxyFactory.java",
+      "line": 81,
+      "value": "app.exteraless.plugins.proxy.",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/xposed/XposedHooks.java",
+      "line": 238,
+      "value": "com.exteragram.",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/xposed/XposedHooks.java",
+      "line": 240,
+      "value": "app.exteraless.",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/xposed/XposedHooks.java",
+      "line": 240,
+      "value": "com.exteragram.",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/proxy/ProxyController.java",
+      "line": 23,
+      "value": "exteraless_proxy_names",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraAppNavigationActivity.java",
+      "line": 297,
+      "value": "exteraless_navigation",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraAppearanceActivity.java",
+      "line": 278,
+      "value": "exteraless_appearance",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraAyuMomentsActivity.java",
+      "line": 214,
+      "value": "exteraless_ayumoments",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraChatsActivity.java",
+      "line": 885,
+      "value": "exteraless_menus",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraChatsActivity.java",
+      "line": 887,
+      "value": "exteraless_media",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraChatsActivity.java",
+      "line": 889,
+      "value": "exteraless_hiding",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraChatsActivity.java",
+      "line": 891,
+      "value": "exteraless_chats",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraCloudActivity.java",
+      "line": 113,
+      "value": "exteraless_cloud",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraGeneralActivity.java",
+      "line": 260,
+      "value": "exteraless_general",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraGlyphActivity.java",
+      "line": 84,
+      "value": "exteraless_glyph",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraOtherActivity.java",
+      "line": 184,
+      "value": "exteraless_other",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraSettingsActivity.java",
+      "line": 171,
+      "value": "exteraless",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraSettingsActivity.java",
+      "line": 229,
+      "value": "https://github.com/exteraless/exteraless",
+      "classification": "upstream_url_review"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/shortcuts/QuickToggleActivity.java",
+      "line": 17,
+      "value": "app.exteraless.action.TOGGLE_GHOST_MODE",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/shortcuts/QuickToggleActivity.java",
+      "line": 18,
+      "value": "app.exteraless.action.TOGGLE_SAFE_MODE",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/updater/GitHubUpdater.java",
+      "line": 47,
+      "value": "exteraless/exteraless",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/updater/GitHubUpdater.java",
+      "line": 51,
+      "value": "exteraless_updater",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/updater/GitHubUpdater.java",
+      "line": 191,
+      "value": "exteraless",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/updater/GitHubUpdater.java",
+      "line": 388,
+      "value": "exteraless",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/flexygram/studio/FlexyStudioStore.java",
+      "line": 58,
+      "value": "EXTERALESS",
+      "classification": "visible_literal_review"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/flexygram/studio/core/StudioSchema.java",
+      "line": 54,
+      "value": "EXTERALESS",
+      "classification": "visible_literal_review"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/flexygram/studio/core/StudioSchema.java",
+      "line": 55,
+      "value": "EXTERALESS",
+      "classification": "visible_literal_review"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/flexygram/studio/core/StudioSchema.java",
+      "line": 56,
+      "value": "LEGACY_EXTERALESS",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/com/exteragram/messenger/badges/BadgesController.java",
+      "line": 37,
+      "value": "exteraless_badges",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/com/exteragram/messenger/utils/AppUtils.java",
+      "line": 225,
+      "value": "\\nbased on @exteraless",
+      "classification": "visible_literal_review"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/com/exteragram/messenger/utils/text/LocaleUtils.java",
+      "line": 201,
+      "value": "exteraless",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/messenger/ApplicationLoader.java",
+      "line": 422,
+      "value": "exteraless/",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/messenger/ApplicationLoader.java",
+      "line": 422,
+      "value": " (+https://github.com/exteraless/exteraless)",
+      "classification": "visible_literal_review"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/messenger/LocaleController.java",
+      "line": 1476,
+      "value": "exteraless",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/messenger/UnifiedPushService.java",
+      "line": 101,
+      "value": "nagramx:wp",
+      "classification": "visible_literal_review"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/Cells/SessionCell.java",
+      "line": 366,
+      "value": "Nagram X",
+      "classification": "visible_literal_review"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/Cells/SessionCell.java",
+      "line": 366,
+      "value": "NagramX",
+      "classification": "visible_literal_review"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/Cells/SessionCell.java",
+      "line": 367,
+      "value": "exteraless",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/LauncherIconController.java",
+      "line": 41,
+      "value": "org.telegram.messenger.ExteralessIcon",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/LauncherIconController.java",
+      "line": 83,
+      "value": "FlexyLegacyExteralessIcon",
+      "classification": "visible_literal_review"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/NekoConfig.java",
+      "line": 133,
+      "value": "exteraless",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/helpers/AppRestartHelper.java",
+      "line": 18,
+      "value": "nagramx_restart_intents",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/helpers/AppRestartHelper.java",
+      "line": 19,
+      "value": "nagramx_main_process_pid",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/helpers/CloudStorageHelper.java",
+      "line": 18,
+      "value": "exteralesscloudbot",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/helpers/SettingsHelper.java",
+      "line": 44,
+      "value": "exteraless",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/helpers/SettingsHelper.java",
+      "line": 162,
+      "value": "exteraless",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/helpers/SettingsHelper.java",
+      "line": 164,
+      "value": "exteraless_general",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/helpers/SettingsHelper.java",
+      "line": 166,
+      "value": "exteraless_appearance",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/helpers/SettingsHelper.java",
+      "line": 168,
+      "value": "exteraless_chats",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/helpers/SettingsHelper.java",
+      "line": 170,
+      "value": "exteraless_menus",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/helpers/SettingsHelper.java",
+      "line": 172,
+      "value": "exteraless_media",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/helpers/SettingsHelper.java",
+      "line": 174,
+      "value": "exteraless_hiding",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/helpers/SettingsHelper.java",
+      "line": 176,
+      "value": "exteraless_other",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/helpers/SettingsHelper.java",
+      "line": 178,
+      "value": "exteraless_ayumoments",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/helpers/SettingsHelper.java",
+      "line": 182,
+      "value": "exteraless_navigation",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/helpers/SettingsHelper.java",
+      "line": 217,
+      "value": "exteraless_",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/helpers/SettingsHelper.java",
+      "line": 218,
+      "value": "exteraless_",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/helpers/SettingsHelper.java",
+      "line": 298,
+      "value": "exteraless",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/helpers/SettingsHelper.java",
+      "line": 301,
+      "value": "exteraless_general",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/helpers/SettingsHelper.java",
+      "line": 309,
+      "value": "exteraless_appearance",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/helpers/SettingsHelper.java",
+      "line": 313,
+      "value": "exteraless_chats",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/helpers/SettingsHelper.java",
+      "line": 316,
+      "value": "exteraless_other",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/helpers/SettingsHelper.java",
+      "line": 319,
+      "value": "exteraless_ayumoments",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/helpers/remote/BaseRemoteHelper.java",
+      "line": 26,
+      "value": "nagramx_remote_metadata",
+      "classification": "internal_identifier_preserve"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/settings/NekoAboutActivity.java",
+      "line": 47,
+      "value": "NagramX",
+      "classification": "visible_literal_review"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/settings/NekoAboutActivity.java",
+      "line": 53,
+      "value": "https://crowdin.com/project/NagramX",
+      "classification": "upstream_url_review"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/settings/NekoAboutActivity.java",
+      "line": 55,
+      "value": "https://github.com/risin42/NagramX",
+      "classification": "upstream_url_review"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/settings/NekoAboutActivity.java",
+      "line": 77,
+      "value": "@NagramX",
+      "classification": "visible_literal_review"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/settings/NekoChatSettingsActivity.java",
+      "line": 140,
+      "value": "Nekogram",
+      "classification": "visible_literal_review"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/translate/source/GoogleTranslator.kt",
+      "line": 46,
+      "value": "Cloud Translation API request failed, trying to use Nekogram's translation API...",
+      "classification": "visible_literal_review"
+    },
+    {
+      "path": "TMessagesProj/src/main/kotlin/app/exteraless/appearance/AppearanceConfig.kt",
+      "line": 682,
+      "value": "Nagram X",
+      "classification": "visible_literal_review"
+    },
+    {
+      "path": "TMessagesProj/src/main/kotlin/app/exteraless/appearance/AppearanceConfig.kt",
+      "line": 686,
+      "value": "exteraless",
+      "classification": "internal_identifier_preserve"
+    }
+  ],
+  "brand_references": [
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/drawer/MainMenuHelper.java",
+      "line": 314,
+      "expression": "return new MenuItemInfo(R.drawable.msg_plugins, LocaleController.getString(R.string.OpenExteraPlugins),",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/drawer/MainMenuHelper.java",
+      "line": 458,
+      "expression": "case PLUGINS -> new MenuItemInfo(R.drawable.msg_plugins, LocaleController.getString(R.string.OpenExteraPlugins), null, null);",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/player/PlayerActions.java",
+      "line": 131,
+      "expression": "builder.setTitle(LocaleController.getString(R.string.AppName));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/menus/MenuInjector.java",
+      "line": 363,
+      "expression": "LocaleController.getString(R.string.OpenExteraPlugins), wrapper.getSwipeBack());",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/plugins/ui/PluginsActivity.java",
+      "line": 84,
+      "expression": "actionBar.setTitle(getString(R.string.OpenExteraPlugins));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraChatsActivity.java",
+      "line": 836,
+      "expression": "return getString(R.string.OpenExteraChats);",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraChatsActivity.java",
+      "line": 2536,
+      "expression": "cell.setText(getString(R.string.OpenExteraChats));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraOtherActivity.java",
+      "line": 485,
+      "expression": "alert.setTitle(getString(R.string.AppName));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraSettingsActivity.java",
+      "line": 210,
+      "expression": "builder.setPositiveButton(getString(R.string.OpenExteraSource), (dialog, which) ->",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraSettingsActivity.java",
+      "line": 262,
+      "expression": "cell.setText(getString(R.string.OpenExteraCategories));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraSettingsActivity.java",
+      "line": 271,
+      "expression": "cell.setTextAndIcon(getString(R.string.OpenExteraGeneral), R.drawable.msg_media, true);",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraSettingsActivity.java",
+      "line": 273,
+      "expression": "cell.setTextAndIcon(getString(R.string.OpenExteraAppearance), R.drawable.msg_theme, true);",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraSettingsActivity.java",
+      "line": 275,
+      "expression": "cell.setTextAndIcon(getString(R.string.OpenExteraChats), R.drawable.msg_discussion, true);",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraSettingsActivity.java",
+      "line": 279,
+      "expression": "cell.setTextAndIcon(getString(R.string.OpenExteraPlugins), R.drawable.msg_plugins, true);",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraSettingsActivity.java",
+      "line": 281,
+      "expression": "cell.setTextAndIcon(getString(R.string.OpenExteraOther), R.drawable.msg_fave, false);",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraSettingsActivity.java",
+      "line": 287,
+      "expression": "cell.setTextAndValueAndIcon(getString(R.string.OpenExteraSource),",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/app/exteraless/updater/UpdaterSheet.java",
+      "line": 112,
+      "expression": "title.setText(getString(org.telegram.messenger.BuildConfig.CONNECTED_ALPHA ? R.string.FlexySignatureName : R.string.OpenExtera));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/com/exteragram/messenger/utils/AppUtils.java",
+      "line": 212,
+      "expression": "builder.append(LocaleUtils.getAppName());",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/com/exteragram/messenger/utils/text/LocaleUtils.java",
+      "line": 197,
+      "expression": "public static String getAppName() {",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/com/exteragram/messenger/utils/text/LocaleUtils.java",
+      "line": 199,
+      "expression": "return ApplicationLoader.applicationContext.getString(R.string.OpenExtera);",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/com/exteragram/messenger/utils/text/LocaleUtils.java",
+      "line": 218,
+      "expression": "return getAppName();",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/messenger/AndroidUtilities.java",
+      "line": 3746,
+      "expression": "LocaleController.getAppName());",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/messenger/ChannelBoostsController.java",
+      "line": 46,
+      "expression": "builder.setTitle(LocaleController.getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/messenger/ImportingService.java",
+      "line": 92,
+      "expression": "builder.setContentTitle(LocaleController.getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/messenger/LocaleController.java",
+      "line": 1472,
+      "expression": "public static String getAppName() {",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/messenger/LocaleController.java",
+      "line": 1474,
+      "expression": "return ApplicationLoader.applicationContext.getString(R.string.OpenExtera);",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/messenger/LocaleController.java",
+      "line": 1484,
+      "expression": "// где заголовок берут как getString(R.string.AppName).",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/messenger/LocaleController.java",
+      "line": 1486,
+      "expression": "return getAppName();",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/messenger/LocationSharingService.java",
+      "line": 144,
+      "expression": "builder.setContentTitle(LocaleController.getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/messenger/NotificationsController.java",
+      "line": 409,
+      "expression": ".setContentTitle(LocaleController.getString(R.string.AppName))",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/messenger/NotificationsController.java",
+      "line": 4653,
+      "expression": "name = LocaleController.getString(R.string.NagramX);",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/messenger/NotificationsService.java",
+      "line": 44,
+      "expression": "LocaleController.getString(R.string.NagramXPushService),",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/messenger/NotificationsService.java",
+      "line": 53,
+      "expression": ".setContentText(LocaleController.getString(R.string.NagramXPushService))",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/messenger/SecretChatHelper.java",
+      "line": 2043,
+      "expression": "builder.setTitle(LocaleController.getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/messenger/VideoEncodingService.java",
+      "line": 141,
+      "expression": "builder.setContentTitle(LocaleController.getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/ActionIntroActivity.java",
+      "line": 699,
+      "expression": ".setTitle(LocaleController.getString(R.string.NagramX))",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/Business/ChatAttachAlertQuickRepliesLayout.java",
+      "line": 455,
+      "expression": "new AlertDialog.Builder(getContext(), resourcesProvider).setTitle(LocaleController.getString(R.string.NagramX)).setMessage(error).setPositiveButton(LocaleController.getString(R.string.OK), null).show();",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/Cells/ChatMessageCell.java",
+      "line": 13867,
+      "expression": "str = getString(R.string.AppUpdate).replace(\"Telegram\", getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/Cells/ThemePreviewMessagesCell.java",
+      "line": 133,
+      "expression": "message.media.webpage.site_name = LocaleController.getString(R.string.NagramX);",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/ChannelAdminLogActivity.java",
+      "line": 2177,
+      "expression": "builder.setTitle(getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/ChannelAdminLogActivity.java",
+      "line": 2192,
+      "expression": "builder.setTitle(getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/ChannelAdminLogActivity.java",
+      "line": 2785,
+      "expression": "builder.setTitle(getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/ChannelCreateActivity.java",
+      "line": 1224,
+      "expression": "builder.setTitle(LocaleController.getString(R.string.AppName));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/ChannelCreateActivity.java",
+      "line": 1358,
+      "expression": "builder.setTitle(LocaleController.getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java",
+      "line": 7900,
+      "expression": "builder.setTitle(LocaleController.getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java",
+      "line": 8234,
+      "expression": "builder.setTitle(LocaleController.getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java",
+      "line": 9303,
+      "expression": "builder.setTitle(LocaleController.getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java",
+      "line": 15476,
+      "expression": "builder.setTitle(LocaleController.getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java",
+      "line": 20215,
+      "expression": "builder.setTitle(LocaleController.getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java",
+      "line": 21388,
+      "expression": "builder.setTitle(getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java",
+      "line": 24422,
+      "expression": "builder.setTitle(LocaleController.getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java",
+      "line": 35331,
+      "expression": "builder.setTitle(LocaleController.getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java",
+      "line": 35864,
+      "expression": "builder.setTitle(LocaleController.getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java",
+      "line": 35883,
+      "expression": "builder.setTitle(LocaleController.getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java",
+      "line": 37564,
+      "expression": "builder.setTitle(LocaleController.getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java",
+      "line": 38280,
+      "expression": "builder.setTitle(LocaleController.getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java",
+      "line": 46656,
+      "expression": "builder2.setTitle(getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/ChatEditTypeActivity.java",
+      "line": 1328,
+      "expression": "builder.setTitle(LocaleController.getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/ChatUsersActivity.java",
+      "line": 1363,
+      "expression": "builder.setTitle(getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/ChatUsersActivity.java",
+      "line": 1952,
+      "expression": ".setTitle(getString(R.string.NagramX))",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/Components/AlertsCreator.java",
+      "line": 688,
+      "expression": "builder.setTitle(LocaleController.getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/Components/AlertsCreator.java",
+      "line": 855,
+      "expression": "builder.setTitle(title == null ? LocaleController.getString(R.string.NagramX) : title);",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/Components/AlertsCreator.java",
+      "line": 890,
+      "expression": "builder.setTitle(title == null ? LocaleController.getString(R.string.AppName) : title);",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/Components/AlertsCreator.java",
+      "line": 6773,
+      "expression": "builder.setTitle(LocaleController.getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/Components/AlertsCreator.java",
+      "line": 6844,
+      "expression": "builder.setTitle(LocaleController.getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/Components/AudioPlayerAlert.java",
+      "line": 3228,
+      "expression": "builder.setTitle(LocaleController.getString(R.string.AppName));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/Components/BlockingUpdateView.java",
+      "line": 98,
+      "expression": "titleTextView.setText(LocaleController.getString(R.string.UpdateTelegram).replace(\"Telegram\", LocaleController.getString(R.string.NagramX)));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/Components/ChatAttachAlertAudioLayout.java",
+      "line": 677,
+      "expression": "new AlertDialog.Builder(getContext(), resourcesProvider).setTitle(LocaleController.getString(R.string.NagramX)).setMessage(error).setPositiveButton(LocaleController.getString(R.string.OK), null).show();",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/Components/ChatAttachAlertContactsLayout.java",
+      "line": 563,
+      "expression": "new AlertDialog.Builder(getContext(), resourcesProvider).setTitle(LocaleController.getString(R.string.NagramX)).setMessage(error).setPositiveButton(LocaleController.getString(R.string.OK), null).show();",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/Components/ChatAttachAlertDocumentLayout.java",
+      "line": 1275,
+      "expression": "new AlertDialog.Builder(getContext(), resourcesProvider).setTitle(LocaleController.getString(R.string.NagramX)).setMessage(error).setPositiveButton(LocaleController.getString(R.string.OK), null).show();",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/Components/EditTextEmoji.java",
+      "line": 966,
+      "expression": "builder.setTitle(LocaleController.getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/Components/PasscodeView.java",
+      "line": 1283,
+      "expression": ".setTitle(LocaleController.getString(R.string.UnlockToUse).replace(\"Telegram\", LocaleController.getString(R.string.NagramX)))",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/Components/TermsOfServiceView.java",
+      "line": 102,
+      "expression": "builder12.setTitle(LocaleController.getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/Components/TermsOfServiceView.java",
+      "line": 123,
+      "expression": "builder1.setTitle(LocaleController.getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/Components/UpdateAppAlertDialog.java",
+      "line": 259,
+      "expression": "textView.setText(LocaleController.getString(R.string.UpdateTelegram).replace(\"Telegram\", LocaleController.getString(R.string.NagramX)));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/Components/UpdateLayout.java",
+      "line": 147,
+      "expression": "setUpdateText(LocaleController.getString(R.string.AppUpdate).replace(\"Telegram\", LocaleController.getString(R.string.NagramX)), animated);",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/ContactsActivity.java",
+      "line": 758,
+      "expression": "builder.setTitle(getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/ContactsActivity.java",
+      "line": 1148,
+      "expression": "builder.setTitle(getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/DocumentSelectActivity.java",
+      "line": 1283,
+      "expression": "new AlertDialog.Builder(getParentActivity()).setTitle(LocaleController.getString(R.string.NagramX)).setMessage(error).setPositiveButton(LocaleController.getString(\"OK\", R.string.OK), null).show();",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/ExternalActionActivity.java",
+      "line": 288,
+      "expression": "builder.setTitle(LocaleController.getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/GroupCreateActivity.java",
+      "line": 583,
+      "expression": "builder.setTitle(getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/IntroActivity.java",
+      "line": 192,
+      "expression": "titles[0] = LocaleController.getAppName();",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/LaunchActivity.java",
+      "line": 4227,
+      "expression": "builder.setTitle(LocaleController.getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/LaunchActivity.java",
+      "line": 5194,
+      "expression": "builder.setTitle(LocaleController.getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/LaunchActivity.java",
+      "line": 5262,
+      "expression": "builder.setTitle(LocaleController.getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/LaunchActivity.java",
+      "line": 7475,
+      "expression": "builder.setTitle(LocaleController.getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/LaunchActivity.java",
+      "line": 7542,
+      "expression": "builder.setTitle(LocaleController.getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/LoginActivity.java",
+      "line": 3162,
+      "expression": "builder.setTitle(getString(org.telegram.messenger.BuildConfig.CONNECTED_ALPHA ? R.string.FlexySignatureName : R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/LoginActivity.java",
+      "line": 4217,
+      "expression": "needShowAlert(getString(org.telegram.messenger.BuildConfig.CONNECTED_ALPHA ? R.string.FlexySignatureName : R.string.NagramX), getString(\"NoMailInstalled\", R.string.NoMailInstalled));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/LoginActivity.java",
+      "line": 8650,
+      "expression": "needShowAlert(LocaleController.getString(org.telegram.messenger.BuildConfig.CONNECTED_ALPHA ? R.string.FlexySignatureName : R.string.NagramX), error.text);",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/LoginActivity.java",
+      "line": 8654,
+      "expression": "needShowAlert(LocaleController.getString(org.telegram.messenger.BuildConfig.CONNECTED_ALPHA ? R.string.FlexySignatureName : R.string.NagramX), getString(R.string.FloodWait) + \"\\n\" + errorText);",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/LoginActivity.java",
+      "line": 8656,
+      "expression": "needShowAlert(LocaleController.getString(org.telegram.messenger.BuildConfig.CONNECTED_ALPHA ? R.string.FlexySignatureName : R.string.NagramX), errorText);",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/LoginActivity.java",
+      "line": 10322,
+      "expression": "needShowAlert(getString(R.string.AppName), getString(\"NoMailInstalled\", R.string.NoMailInstalled));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/PassportActivity.java",
+      "line": 1000,
+      "expression": "builder.setTitle(LocaleController.getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/PassportActivity.java",
+      "line": 1667,
+      "expression": "showAlertWithText(LocaleController.getString(R.string.NagramX), LocaleController.formatString(\"FloodWaitTime\", R.string.FloodWaitTime, timeString));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/PassportActivity.java",
+      "line": 1669,
+      "expression": "showAlertWithText(LocaleController.getString(R.string.NagramX), error.text);",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/PassportActivity.java",
+      "line": 1908,
+      "expression": "showAlertWithText(LocaleController.getString(R.string.NagramX), error1.text);",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/PassportActivity.java",
+      "line": 1940,
+      "expression": "showAlertWithText(LocaleController.getString(R.string.NagramX), LocaleController.formatString(\"FloodWaitTime\", R.string.FloodWaitTime, timeString));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/PassportActivity.java",
+      "line": 1942,
+      "expression": "showAlertWithText(LocaleController.getString(R.string.NagramX), error.text);",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/PassportActivity.java",
+      "line": 2399,
+      "expression": "showAlertWithText(LocaleController.getString(R.string.NagramX), error.text);",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/PassportActivity.java",
+      "line": 3548,
+      "expression": "builder.setTitle(LocaleController.getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/PassportActivity.java",
+      "line": 4911,
+      "expression": "builder.setTitle(LocaleController.getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/PassportActivity.java",
+      "line": 5830,
+      "expression": "showAlertWithText(LocaleController.getString(R.string.NagramX), error.text);",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/PassportActivity.java",
+      "line": 5992,
+      "expression": "builder.setTitle(LocaleController.getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/PassportActivity.java",
+      "line": 6290,
+      "expression": "builder.setTitle(LocaleController.getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/PassportActivity.java",
+      "line": 6651,
+      "expression": "builder.setTitle(LocaleController.getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/PassportActivity.java",
+      "line": 6823,
+      "expression": "showAlertWithText(LocaleController.getString(R.string.NagramX), LocaleController.formatString(\"PassportUploadMaxReached\", R.string.PassportUploadMaxReached, LocaleController.formatPluralString(\"Files\", 20)));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/PassportActivity.java",
+      "line": 7848,
+      "expression": "builder.setTitle(LocaleController.getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/PaymentFormActivity.java",
+      "line": 2674,
+      "expression": "builder.setTitle(LocaleController.getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/PaymentFormActivity.java",
+      "line": 3652,
+      "expression": "showAlertWithText(LocaleController.getString(R.string.NagramX), LocaleController.formatString(\"FloodWaitTime\", R.string.FloodWaitTime, timeString));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/PaymentFormActivity.java",
+      "line": 3654,
+      "expression": "showAlertWithText(LocaleController.getString(R.string.NagramX), error.text);",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/PaymentFormActivity.java",
+      "line": 3751,
+      "expression": "showAlertWithText(LocaleController.getString(R.string.NagramX), LocaleController.getString(R.string.PasswordEmailInvalid));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/PaymentFormActivity.java",
+      "line": 3760,
+      "expression": "showAlertWithText(LocaleController.getString(R.string.NagramX), LocaleController.formatString(\"FloodWaitTime\", R.string.FloodWaitTime, timeString));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/PaymentFormActivity.java",
+      "line": 3762,
+      "expression": "showAlertWithText(LocaleController.getString(R.string.NagramX), error.text);",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/PhotoViewer.java",
+      "line": 4705,
+      "expression": "builder.setTitle(getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/PhotoViewer.java",
+      "line": 11040,
+      "expression": "builder.setTitle(getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/PhotoViewer.java",
+      "line": 13288,
+      "expression": "builder.setTitle(getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/PopupNotificationActivity.java",
+      "line": 566,
+      "expression": "builder.setTitle(LocaleController.getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/PrivacyControlActivity.java",
+      "line": 1221,
+      "expression": "builder.setTitle(LocaleController.getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/PrivacyControlActivity.java",
+      "line": 1696,
+      "expression": "builder.setTitle(LocaleController.getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/ProfileActivity.java",
+      "line": 4672,
+      "expression": "builder1.setTitle(LocaleController.getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/ProfileActivity.java",
+      "line": 7520,
+      "expression": ".setTitle(LocaleController.getString(R.string.NagramX))",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/ProfileActivity.java",
+      "line": 13684,
+      "expression": "LocaleController.getAppName() + \"-\" + System.currentTimeMillis() + \".log\");",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/SettingsActivity.java",
+      "line": 788,
+      "expression": "items.add(SettingCell.Factory.of(-1, 0xFF0753BC, 0xFF0753BC, R.drawable.flexygram_brand_tile, getString(R.string.FlexyPreferences), getString(R.string.OpenExteraInfo)));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/Stories/PeerStoriesView.java",
+      "line": 3815,
+      "expression": "builder.setTitle(getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/Stories/PeerStoriesView.java",
+      "line": 4462,
+      "expression": "buttonTextView.setText(getString(R.string.AppUpdate).replace(\"Telegram\", LocaleController.getString(R.string.NagramX)));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/Stories/recorder/StoryUploadingService.java",
+      "line": 101,
+      "expression": "builder.setContentTitle(LocaleController.getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/TwoStepVerificationActivity.java",
+      "line": 607,
+      "expression": "showAlertWithText(getString(R.string.NagramX), LocaleController.formatString(\"FloodWaitTime\", R.string.FloodWaitTime, timeString));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/TwoStepVerificationActivity.java",
+      "line": 609,
+      "expression": "showAlertWithText(getString(R.string.NagramX), error.text);",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/TwoStepVerificationActivity.java",
+      "line": 984,
+      "expression": "showAlertWithText(getString(R.string.NagramX), LocaleController.formatString(\"FloodWaitTime\", R.string.FloodWaitTime, timeString));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/TwoStepVerificationActivity.java",
+      "line": 986,
+      "expression": "showAlertWithText(getString(R.string.NagramX), error.text);",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/TwoStepVerificationActivity.java",
+      "line": 1123,
+      "expression": "showAlertWithText(getString(R.string.NagramX), LocaleController.formatString(\"FloodWaitTime\", R.string.FloodWaitTime, timeString));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/TwoStepVerificationActivity.java",
+      "line": 1125,
+      "expression": "showAlertWithText(getString(R.string.NagramX), error.text);",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/TwoStepVerificationSetupActivity.java",
+      "line": 1402,
+      "expression": "showAlertWithText(LocaleController.getString(R.string.NagramX), LocaleController.formatString(\"FloodWaitTime\", R.string.FloodWaitTime, timeString));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/TwoStepVerificationSetupActivity.java",
+      "line": 1404,
+      "expression": "showAlertWithText(LocaleController.getString(R.string.NagramX), error.text);",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/TwoStepVerificationSetupActivity.java",
+      "line": 1591,
+      "expression": "showAlertWithText(LocaleController.getString(R.string.NagramX), LocaleController.formatString(\"FloodWaitTime\", R.string.FloodWaitTime, timeString));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/TwoStepVerificationSetupActivity.java",
+      "line": 1593,
+      "expression": "showAlertWithText(LocaleController.getString(R.string.NagramX), error.text);",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/TwoStepVerificationSetupActivity.java",
+      "line": 2001,
+      "expression": "showAlertWithText(LocaleController.getString(R.string.NagramX), LocaleController.getString(R.string.PasswordEmailInvalid));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/TwoStepVerificationSetupActivity.java",
+      "line": 2010,
+      "expression": "showAlertWithText(LocaleController.getString(R.string.NagramX), LocaleController.formatString(\"FloodWaitTime\", R.string.FloodWaitTime, timeString));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/org/telegram/ui/TwoStepVerificationSetupActivity.java",
+      "line": 2012,
+      "expression": "showAlertWithText(LocaleController.getString(R.string.NagramX), error.text);",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/NekoXConfig.java",
+      "line": 211,
+      "expression": "restart.setTitle(getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/helpers/CloudSettingsHelper.java",
+      "line": 236,
+      "expression": "restart.setTitle(getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/helpers/SettingsBackupHelper.java",
+      "line": 183,
+      "expression": "restart.setTitle(getString(R.string.NagramX));",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/helpers/SettingsHelper.java",
+      "line": 440,
+      "expression": "String e_title = getString(R.string.OpenExtera);",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/settings/NekoGeneralSettingsActivity.java",
+      "line": 133,
+      "expression": "getString(R.string.NagramX),",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/settings/NekoGeneralSettingsActivity.java",
+      "line": 215,
+      "expression": "getString(R.string.OpenExtera)",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/utils/AlertUtil.kt",
+      "line": 83,
+      "expression": "builder.setTitle(title ?: getString(R.string.NagramX))",
+      "classification": "call_site_resolve_resource_at_runtime"
+    },
+    {
+      "path": "TMessagesProj/src/main/java/tw/nekomimi/nekogram/utils/AndroidUtil.java",
+      "line": 212,
+      "expression": "return org.telegram.messenger.LocaleController.getAppName() + \" v\" + versionName + \"(\" + BuildConfig.VERSION_CODE + \") \" + Build.SUPPORTED_ABIS[0].toLowerCase(Locale.ROOT) + \" \" + BuildConfig.BUILD_TYPE + (BuildVars.LOGS_ENABLED ? \" \" + BuildConfig.BUILD_TIMESTAMP : \"\");",
+      "classification": "call_site_resolve_resource_at_runtime"
+    }
+  ],
+  "manifest_labels": [
+    {
+      "component": "application",
+      "label": "@string/NagramX"
+    }
+  ],
+  "permissions": [
+    {
+      "name": "android.permission.READ_CLIPBOARD",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.BLUETOOTH_CONNECT",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.INTERNET",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.FOREGROUND_SERVICE",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.FOREGROUND_SERVICE_DATA_SYNC",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.FOREGROUND_SERVICE_CAMERA",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.FOREGROUND_SERVICE_LOCATION",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.FOREGROUND_SERVICE_MICROPHONE",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.FOREGROUND_SERVICE_REMOTE_MESSAGING",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.RECORD_AUDIO",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.MODIFY_AUDIO_SETTINGS",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.ACCESS_NETWORK_STATE",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.ACCESS_WIFI_STATE",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.WAKE_LOCK",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.READ_EXTERNAL_STORAGE",
+      "max_sdk": "32"
+    },
+    {
+      "name": "android.permission.READ_MEDIA_IMAGES",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.READ_MEDIA_VIDEO",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.READ_MEDIA_AUDIO",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.GET_ACCOUNTS",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.READ_CONTACTS",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.WRITE_CONTACTS",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.MANAGE_ACCOUNTS",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.READ_PROFILE",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.WRITE_SYNC_SETTINGS",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.READ_SYNC_SETTINGS",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.AUTHENTICATE_ACCOUNTS",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.VIBRATE",
+      "max_sdk": null
+    },
+    {
+      "name": "com.nothing.ketchum.permission.ENABLE",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.SYSTEM_ALERT_WINDOW",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.READ_PHONE_STATE",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.RECEIVE_BOOT_COMPLETED",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.USE_FINGERPRINT",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.USE_BIOMETRIC",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.INSTALL_SHORTCUT",
+      "max_sdk": null
+    },
+    {
+      "name": "com.android.launcher.permission.INSTALL_SHORTCUT",
+      "max_sdk": null
+    },
+    {
+      "name": "com.android.launcher.permission.UNINSTALL_SHORTCUT",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.CAMERA",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.BLUETOOTH",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.MANAGE_OWN_CALLS",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.USE_FULL_SCREEN_INTENT",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.REQUEST_INSTALL_PACKAGES",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.READ_PHONE_NUMBERS",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.POST_NOTIFICATIONS",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS",
+      "max_sdk": null
+    },
+    {
+      "name": "com.sec.android.provider.badge.permission.READ",
+      "max_sdk": null
+    },
+    {
+      "name": "com.sec.android.provider.badge.permission.WRITE",
+      "max_sdk": null
+    },
+    {
+      "name": "com.htc.launcher.permission.READ_SETTINGS",
+      "max_sdk": null
+    },
+    {
+      "name": "com.htc.launcher.permission.UPDATE_SHORTCUT",
+      "max_sdk": null
+    },
+    {
+      "name": "com.sonyericsson.home.permission.BROADCAST_BADGE",
+      "max_sdk": null
+    },
+    {
+      "name": "com.sonymobile.home.permission.PROVIDER_INSERT_BADGE",
+      "max_sdk": null
+    },
+    {
+      "name": "com.anddoes.launcher.permission.UPDATE_COUNT",
+      "max_sdk": null
+    },
+    {
+      "name": "com.majeur.launcher.permission.UPDATE_BADGE",
+      "max_sdk": null
+    },
+    {
+      "name": "com.huawei.android.launcher.permission.CHANGE_BADGE",
+      "max_sdk": null
+    },
+    {
+      "name": "com.huawei.android.launcher.permission.READ_SETTINGS",
+      "max_sdk": null
+    },
+    {
+      "name": "com.huawei.android.launcher.permission.WRITE_SETTINGS",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.READ_APP_BADGE",
+      "max_sdk": null
+    },
+    {
+      "name": "com.oppo.launcher.permission.READ_SETTINGS",
+      "max_sdk": null
+    },
+    {
+      "name": "com.oppo.launcher.permission.WRITE_SETTINGS",
+      "max_sdk": null
+    },
+    {
+      "name": "me.everything.badger.permission.BADGE_COUNT_READ",
+      "max_sdk": null
+    },
+    {
+      "name": "me.everything.badger.permission.BADGE_COUNT_WRITE",
+      "max_sdk": null
+    },
+    {
+      "name": "com.android.vending.BILLING",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.WRITE_EXTERNAL_STORAGE",
+      "max_sdk": "29"
+    },
+    {
+      "name": "android.permission.ACCESS_BACKGROUND_LOCATION",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.ACCESS_COARSE_LOCATION",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.ACCESS_FINE_LOCATION",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.ACCESS_MEDIA_LOCATION",
+      "max_sdk": null
+    },
+    {
+      "name": "android.permission.CREDENTIAL_MANAGER_SET_ORIGIN",
+      "max_sdk": null
+    }
+  ],
+  "connected_alpha_overlay": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<!-- UI label only; preserve the inherited key and all attribution resources. -->\n<resources><string name=\"NagramX\" translatable=\"false\">FlexyGram Alpha</string></resources>\n",
+  "counts": {
+    "resources": 169,
+    "literals": 208,
+    "permissions": 69
+  }
+}
