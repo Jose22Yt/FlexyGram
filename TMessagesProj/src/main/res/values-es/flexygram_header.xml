@@ -14,4 +14,5 @@
     <string name="FlexyHeaderCounterOff">Desactivado</string>
     <string name="FlexyHeaderCounterIntegrated">Integrado</string>
     <string name="FlexyHeaderCounterBadge">En bolita</string>
+    <string name="FlexyHeaderLastSeenTime">Últ.vez %1$s</string>
 </resources>

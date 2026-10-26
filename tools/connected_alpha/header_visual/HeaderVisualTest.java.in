@@ -26,11 +26,11 @@ public class HeaderVisualTest {
  }
  @Test public void counterTextDoesNotStealBackTapsAndMenuAndProfileStayIndependent()throws Exception{
   Context c=context(1);ActionBar bar=new ActionBar(c);ChatAvatarContainer avatar=new ChatAvatarContainer(c);bar.addView(avatar,0,new FrameLayout.LayoutParams(-1,-1));SignatureChatHeader header=new SignatureChatHeader(bar,avatar,null);bar.setSignatureHeader(header);avatar.setSignatureHeader(header);header.setCount(3);root.addView(bar);size(bar,401);
-  assertFalse(header.geometry.countVisible);assertEquals(View.GONE,((View)field(header,"countView")).getVisibility());float x=header.geometry.back.right-4,y=header.geometry.back.centerY();for(int n=0;n<100;n++)tap(bar,x,y);assertEquals(100,bar.backs);assertEquals(0,avatar.profiles);
+  assertFalse(header.geometry.countVisible);assertEquals(2,bar.getChildCount());float x=header.geometry.back.right-4,y=header.geometry.back.centerY();for(int n=0;n<100;n++)tap(bar,x,y);assertEquals(100,bar.backs);assertEquals(0,avatar.profiles);
   tap(bar,header.geometry.avatar.centerX(),header.geometry.avatar.centerY());assertEquals(1,avatar.menus);assertEquals(0,avatar.profiles);
   tap(bar,header.geometry.title.centerX(),header.geometry.title.centerY());assertEquals(1,avatar.profiles);assertEquals(1,avatar.menus);
   header.setCount(-1);size(bar,401);assertFalse(header.geometry.countVisible);assertFalse(bar.backButtonImageView.getContentDescription().toString().contains("Unread"));
-  bar.search=true;size(bar,401);assertFalse(header.active());assertEquals(View.GONE,((View)field(header,"countView")).getVisibility());bar.search=false;bar.selection=true;size(bar,401);assertFalse(header.active());header.detach();header.detach();
+  bar.search=true;size(bar,401);assertFalse(header.active());assertEquals(2,bar.getChildCount());bar.search=false;bar.selection=true;size(bar,401);assertFalse(header.active());header.detach();header.detach();
  }
  @Test public void preferencesPreserveLegacyChoicesAndOnlyWriteTheirOwnFile(){
   var old=activity.getSharedPreferences("appearance",0);var prefs=activity.getSharedPreferences("flexygram_header",0);assertTrue(HeaderConfig.signature());
@@ -38,6 +38,20 @@ public class HeaderVisualTest {
   old.edit().putBoolean("OEAppearanceIosChatHeaderAuto",true).commit();HeaderConfig.load();assertTrue(HeaderConfig.signature());
   var original=old.getAll();HeaderConfig.style(false);HeaderConfig.counter(false);HeaderConfig.compact(true);HeaderConfig.opacity(1000);HeaderConfig.load();assertFalse(HeaderConfig.signature());assertFalse(HeaderConfig.counter());assertTrue(HeaderConfig.compact());assertEquals(100,HeaderConfig.opacity());assertEquals(original,old.getAll());
   HeaderConfig.opacity(-20);assertEquals(0,HeaderConfig.opacity());prefs.edit().putString("opacity","corrupt").putString("style","corrupt").commit();HeaderConfig.load();assertEquals(85,HeaderConfig.opacity());assertTrue(HeaderConfig.signature());
+ }
+ @Test public void importedCounterOptionsCannotChangeTheThreePiecePreview()throws Exception{
+  HeaderConfig.style(true);
+  for(boolean rtl:new boolean[]{false,true})for(float font:new float[]{1,2,3}){
+   LocaleController.isRTL=rtl;
+   HeaderConfig.counterMode(0);HeaderPreviewView preview=new HeaderPreviewView(context(font));size(preview,320);
+   Bitmap before=Bitmap.createBitmap(320,preview.getMeasuredHeight(),Bitmap.Config.ARGB_8888);preview.draw(new Canvas(before));
+   for(int mode:new int[]{1,2}){
+    HeaderConfig.counterMode(mode);preview.settingsChanged();size(preview,320);
+    Bitmap after=Bitmap.createBitmap(320,preview.getMeasuredHeight(),Bitmap.Config.ARGB_8888);preview.draw(new Canvas(after));
+    assertTrue("legacy counter must not change preview pixels",before.sameAs(after));after.recycle();
+   }
+   before.recycle();
+  }
  }
  @Test public void renderSyntheticPreviewLightDarkAndOpacityChangesOnlySurface()throws Exception{
   Bitmap image=Bitmap.createBitmap(401,400,Bitmap.Config.ARGB_8888);Canvas canvas=new Canvas(image);

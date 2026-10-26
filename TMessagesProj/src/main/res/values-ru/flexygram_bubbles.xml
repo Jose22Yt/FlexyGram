@@ -33,4 +33,13 @@
     <string name="FlexyBubbleIntelligentColor">Умный цвет</string>
     <string name="FlexyBubbleGlassPearl">Glass Pearl</string>
     <string name="FlexyBubblePearlIntensity">Интенсивность Glass Pearl</string>
+    <string name="FlexyBubbleBorderPosition">Расположение контура</string>
+    <string name="FlexyBubbleBorderNone">Без контура</string>
+    <string name="FlexyBubbleBorderTop">Сверху</string>
+    <string name="FlexyBubbleBorderBottom">Снизу</string>
+    <string name="FlexyBubbleBorderLeft">Слева</string>
+    <string name="FlexyBubbleBorderRight">Справа</string>
+    <string name="FlexyBubbleBorderFull">Полный</string>
+    <string name="FlexyBubbleGlassSatin">Glass Satin</string>
+    <string name="FlexyBubbleFuseGlass">Смешивать стеклянный контур</string>
 </resources>

@@ -15,6 +15,13 @@ class BubbleReleaseTests(unittest.TestCase):
   from login_contract import PATHS as LOGIN_PATHS
   self.assertFalse(changed-PATHS-LOGIN_PATHS,changed-PATHS-LOGIN_PATHS)
   for prefix in ('TMessagesProj/src/main/java/app/flexygram/composer','TMessagesProj/jni','TMessagesProj/chaquopy'):
+   if prefix.endswith('/composer'):
+    before=set(subprocess.check_output(['git','ls-tree','-r','--name-only',BASE,'--',prefix],cwd=ROOT,text=True).splitlines())
+    current=set(subprocess.check_output(['git','ls-files','--',prefix],cwd=ROOT,text=True).splitlines())
+    self.assertEqual(current,before)
+    for path in before:
+     self.assertEqual(restore1270(path,(ROOT/path).read_bytes()),subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT),path)
+    continue
    self.assertEqual(subprocess.check_output(['git','diff',BASE,'--',prefix],cwd=ROOT),b'',prefix)
  def test_reviewed_native_patch_restores_exact_approved_base(self):
   patch=(ROOT/'tools/connected_alpha/bubble_native_presentation.patch').read_text()

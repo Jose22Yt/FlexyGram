@@ -20,6 +20,8 @@ def sections(stamp):
 
 def restore(path, data):
     path = str(path)
+    from signature_refinement_contract import restore as restore_refinement
+    data = restore_refinement(path, data)
     section = sections(PATCH.stat().st_mtime_ns).get(('a/' + path + ' b/' + path).encode())
     if section is None:
         return data

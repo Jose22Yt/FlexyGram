@@ -33,4 +33,13 @@
     <string name="FlexyBubbleIntelligentColor">Color inteligente</string>
     <string name="FlexyBubbleGlassPearl">Glass Pearl</string>
     <string name="FlexyBubblePearlIntensity">Intensidad Glass Pearl</string>
+    <string name="FlexyBubbleBorderPosition">Posición del borde</string>
+    <string name="FlexyBubbleBorderNone">Sin borde</string>
+    <string name="FlexyBubbleBorderTop">Superior</string>
+    <string name="FlexyBubbleBorderBottom">Inferior</string>
+    <string name="FlexyBubbleBorderLeft">Izquierdo</string>
+    <string name="FlexyBubbleBorderRight">Derecho</string>
+    <string name="FlexyBubbleBorderFull">Completo</string>
+    <string name="FlexyBubbleGlassSatin">Glass Satin</string>
+    <string name="FlexyBubbleFuseGlass">Fusionar borde glass</string>
 </resources>

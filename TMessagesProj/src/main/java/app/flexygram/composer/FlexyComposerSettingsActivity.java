@@ -29,6 +29,9 @@ public final class FlexyComposerSettingsActivity extends BaseNekoSettingsActivit
     private static final int POSITION = 100, GAP = 101, PREVIEW = 102;
     private int styleRow, previewRow, positionRow, positionResetRow, levelRow, gapRow, iconsRow, glassRow, resetRow, infoRow;
     private Preview preview;
+    private final Drawable contextualWallpaper;
+    public FlexyComposerSettingsActivity() { this(null); }
+    public FlexyComposerSettingsActivity(Drawable contextualWallpaper) { this.contextualWallpaper = contextualWallpaper; }
     @Override protected void updateRows() {
         super.updateRows();
         styleRow = addRow("flexyComposerStyle");
@@ -126,17 +129,36 @@ public final class FlexyComposerSettingsActivity extends BaseNekoSettingsActivit
         }
     }
     /** Lightweight settings preview, never substitutes the real native composer. */
-    private final class Preview extends View {
+    private final class Preview extends View implements org.telegram.messenger.NotificationCenter.NotificationCenterDelegate {
+        private final app.flexygram.preview.SignatureWallpaperPreview wallpaperPreview;
         final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         final Drawable plus, clip, smile, folded, voice;
         Preview(Context c) {
             super(c); setContentDescription(getString(R.string.FlexyComposerPreview));
+            wallpaperPreview = new app.flexygram.preview.SignatureWallpaperPreview(this, contextualWallpaper, this::invalidate);
             clip = c.getResources().getDrawable(R.drawable.flexy_composer_clip).mutate();
             folded = c.getResources().getDrawable(R.drawable.flexy_composer_folded).mutate();
             plus = c.getResources().getDrawable(R.drawable.flexy_composer_add).mutate();
             smile = c.getResources().getDrawable(R.drawable.flexy_composer_smile).mutate();
             voice = c.getResources().getDrawable(R.drawable.flexy_composer_voice).mutate();
         }
+        @Override protected void onAttachedToWindow() {
+            super.onAttachedToWindow();
+            var center = org.telegram.messenger.NotificationCenter.getGlobalInstance();
+            center.addObserver(this, org.telegram.messenger.NotificationCenter.didSetNewTheme);
+            center.addObserver(this, org.telegram.messenger.NotificationCenter.didApplyNewTheme);
+            center.addObserver(this, org.telegram.messenger.NotificationCenter.didSetNewWallpapper);
+            wallpaperPreview.attach();
+        }
+        @Override protected void onDetachedFromWindow() {
+            var center = org.telegram.messenger.NotificationCenter.getGlobalInstance();
+            center.removeObserver(this, org.telegram.messenger.NotificationCenter.didSetNewTheme);
+            center.removeObserver(this, org.telegram.messenger.NotificationCenter.didApplyNewTheme);
+            center.removeObserver(this, org.telegram.messenger.NotificationCenter.didSetNewWallpapper);
+            wallpaperPreview.close(); super.onDetachedFromWindow();
+        }
+        @Override public void didReceivedNotification(int id, int account, Object... args) { wallpaperPreview.refresh(); }
+        @Override protected void onSizeChanged(int w, int h, int ow, int oh) { wallpaperPreview.resize(w, h); }
         private void icon(Canvas canvas, Drawable icon, float x, float y, int color) {
             int half = dp(14);
             icon.setTint(color);
@@ -145,8 +167,9 @@ public final class FlexyComposerSettingsActivity extends BaseNekoSettingsActivit
         }
         @Override protected void onMeasure(int w, int h) { setMeasuredDimension(MeasureSpec.getSize(w), dp(96)); }
         @Override protected void onDraw(Canvas c) {
+            c.drawColor(getThemedColor(Theme.key_windowBackgroundGray));
+            wallpaperPreview.draw(c);
             if (!FlexyComposerConfig.compact()) {
-                c.drawColor(getThemedColor(Theme.key_windowBackgroundGray));
                 paint.setTextSize(dp(16)); paint.setColor(getThemedColor(Theme.key_windowBackgroundWhiteBlackText));
                 paint.setTextAlign(Paint.Align.CENTER);
                 c.drawText(getString(R.string.FlexyComposerClassic),getWidth()/2f,dp(54),paint); return;
@@ -155,7 +178,7 @@ public final class FlexyComposerSettingsActivity extends BaseNekoSettingsActivit
             float y = dp(54 - ComposerStyle.offset(FlexyComposerConfig.position())), gap = dp(FlexyComposerConfig.gap());
             boolean dark = ColorUtils.calculateLuminance(getThemedColor(Theme.key_chat_messagePanelBackground)) < 0.4;
             int surface = ComposerStyle.surface(dark, FlexyComposerConfig.glass()), ink = ComposerStyle.icon(dark);
-            c.drawColor(getThemedColor(Theme.key_windowBackgroundGray)); paint.setColor(surface);
+            paint.setColor(surface);
             float side = ComposerStyle.sideMargin(getWidth(), org.telegram.messenger.AndroidUtilities.density, dp(7));
             float left = side + dp(22), right = getWidth() - side - dp(22);
             c.drawCircle(left,y,radius,paint); c.drawCircle(right,y,radius,paint);
@@ -163,7 +186,7 @@ public final class FlexyComposerSettingsActivity extends BaseNekoSettingsActivit
             icon(c, FlexyComposerConfig.referenceIcons() ? clip : plus, left, y, ink); icon(c, voice, right, y, ink);
             icon(c, FlexyComposerConfig.referenceIcons() ? folded : smile, right-radius-gap-dp(20), y, ComposerStyle.innerIcon(dark));
             paint.setColor(ComposerStyle.innerIcon(dark));
-            paint.setTextAlign(Paint.Align.LEFT); paint.setTextSize(dp(18));
+            paint.setTextAlign(Paint.Align.LEFT); paint.setTextSize(16 * getResources().getDisplayMetrics().scaledDensity);
             c.drawText(getString(R.string.TypeMessage),left+radius+gap+dp(ComposerStyle.padding(level)),y-(paint.ascent()+paint.descent())/2,paint);
         }
     }

@@ -9310,7 +9310,7 @@ public class ChatActivityEnterView extends FrameLayout implements
                             if (sideButtons != null && (!NekoConfig.useChatAttachMediaMenu.Bool() || isStories)) {
                                 sideButtons.showButton(ChatActivitySideControlsButtonsLayout.BUTTON_ATTACH, false, true);
                             }
-                            if (attachButton != null && (!NekoConfig.useChatAttachMediaMenu.Bool() || isStories)) {
+                            if (attachButton != null && !keepFlexyAttachment() && (!NekoConfig.useChatAttachMediaMenu.Bool() || isStories)) {
                                 animators.add(ObjectAnimator.ofFloat(attachButton, View.ALPHA, attachButtonAlpha = 0.0f));
                                 animators.add(ObjectAnimator.ofFloat(attachButton, View.SCALE_X, 0.5f));
                                 animators.add(ObjectAnimator.ofFloat(attachButton, View.SCALE_Y, 0.5f));
@@ -9453,7 +9453,7 @@ public class ChatActivityEnterView extends FrameLayout implements
                                 if (sideButtons != null) {
                                     sideButtons.showButton(ChatActivitySideControlsButtonsLayout.BUTTON_ATTACH, false, false);
                                 }
-                                if (attachButton != null) {
+                                if (attachButton != null && !keepFlexyAttachment()) {
                                     attachButton.setAlpha(attachButtonAlpha = 0.0f);
                                     attachButton.setScaleX(0.5f);
                                     attachButton.setScaleY(0.5f);
@@ -9711,7 +9711,7 @@ public class ChatActivityEnterView extends FrameLayout implements
                                     attachButton.setScaleX(captionNearAttach ? 0.5f : 1.0f);
                                     attachButton.setScaleY(captionNearAttach ? 0.5f : 1.0f);
                                 }
-                            } else if (attachButton != null) {
+                            } else if (attachButton != null && !keepFlexyAttachment()) {
                                 attachButton.setAlpha(attachButtonAlpha = 0.0f);
                                 attachButton.setScaleX(0.5f);
                                 attachButton.setScaleY(0.5f);
@@ -9775,7 +9775,7 @@ public class ChatActivityEnterView extends FrameLayout implements
                     if (sideButtons != null && (!NekoConfig.useChatAttachMediaMenu.Bool() || isStories)) {
                         sideButtons.showButton(ChatActivitySideControlsButtonsLayout.BUTTON_ATTACH, false, true);
                     }
-                    if (attachButton != null && (!NekoConfig.useChatAttachMediaMenu.Bool() || isStories)) {
+                    if (attachButton != null && !keepFlexyAttachment() && (!NekoConfig.useChatAttachMediaMenu.Bool() || isStories)) {
                         if (attachButtonAnimator != null) {
                             attachButtonAnimator.cancel();
                             attachButtonAnimator = null;
@@ -9960,7 +9960,7 @@ public class ChatActivityEnterView extends FrameLayout implements
                     if (sideButtons != null && (!NekoConfig.useChatAttachMediaMenu.Bool() || isStories)) {
                         sideButtons.showButton(ChatActivitySideControlsButtonsLayout.BUTTON_ATTACH, false, true);
                     }
-                    if (attachButton != null && (!NekoConfig.useChatAttachMediaMenu.Bool() || isStories)) {
+                    if (attachButton != null && !keepFlexyAttachment() && (!NekoConfig.useChatAttachMediaMenu.Bool() || isStories)) {
                         if (attachButtonAnimator != null) {
                             attachButtonAnimator.cancel();
                             attachButtonAnimator = null;
@@ -16638,6 +16638,9 @@ public class ChatActivityEnterView extends FrameLayout implements
             flexyAppliedFieldRight = text.rightMargin;
         }
         if (sendButton != null) sendButton.setCompactVisualInset(compact ? dp(flexyInsetDp) : -1);
+        if (compact != wasCompact && messageEditText != null) {
+            messageEditText.setTextSize(compact ? TypedValue.COMPLEX_UNIT_SP : TypedValue.COMPLEX_UNIT_DIP, compact ? 16 : 18);
+        }
         if (compact != wasCompact || compact && flexyMenuState != isInInput) {
             flexyMenuState = isInInput;
             // Change artwork only; reference/plus variants never change the action.
