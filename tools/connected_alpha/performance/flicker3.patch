@@ -1,0 +1,44 @@
+diff --git a/TMessagesProj/src/main/java/org/telegram/ui/Components/voip/CellFlickerDrawable.java b/TMessagesProj/src/main/java/org/telegram/ui/Components/voip/CellFlickerDrawable.java
+--- a/TMessagesProj/src/main/java/org/telegram/ui/Components/voip/CellFlickerDrawable.java
++++ b/TMessagesProj/src/main/java/org/telegram/ui/Components/voip/CellFlickerDrawable.java
+@@ -28,6 +28,7 @@
+     private Paint paintOutline = new Paint(Paint.ANTI_ALIAS_FLAG);
+     private Shader gradientShader2;
+     int size;
++    private int shaderSize, shaderColor1, shaderColor2;
+ 
+     int parentWidth;
+     public float progress;
+@@ -52,8 +53,11 @@
+     }
+     public CellFlickerDrawable(int a1, int a2, int size) {
+         this.size = AndroidUtilities.dp(size);
+-        gradientShader = new LinearGradient(0, 0, this.size, 0, new int[]{Color.TRANSPARENT, ColorUtils.setAlphaComponent(Color.WHITE, a1), Color.TRANSPARENT}, null, Shader.TileMode.CLAMP);
+-        gradientShader2 = new LinearGradient(0, 0, this.size, 0, new int[]{Color.TRANSPARENT, ColorUtils.setAlphaComponent(Color.WHITE, a2), Color.TRANSPARENT}, null, Shader.TileMode.CLAMP);
++        shaderSize = this.size;
++        shaderColor1 = ColorUtils.setAlphaComponent(Color.WHITE, a1);
++        shaderColor2 = ColorUtils.setAlphaComponent(Color.WHITE, a2);
++        gradientShader = new LinearGradient(0, 0, this.size, 0, new int[]{Color.TRANSPARENT, shaderColor1, Color.TRANSPARENT}, null, Shader.TileMode.CLAMP);
++        gradientShader2 = new LinearGradient(0, 0, this.size, 0, new int[]{Color.TRANSPARENT, shaderColor2, Color.TRANSPARENT}, null, Shader.TileMode.CLAMP);
+         paint.setShader(gradientShader);
+         paintOutline.setShader(gradientShader2);
+         paintOutline.setStyle(Paint.Style.STROKE);
+@@ -69,8 +73,16 @@
+     }
+ 
+     public void setColors(int color, int alpha1, int alpha2) {
+-        gradientShader = new LinearGradient(0, 0, size, 0, new int[]{Color.TRANSPARENT, ColorUtils.setAlphaComponent(color, alpha1), Color.TRANSPARENT}, null, Shader.TileMode.CLAMP);
+-        gradientShader2 = new LinearGradient(0, 0, size, 0, new int[]{Color.TRANSPARENT, ColorUtils.setAlphaComponent(color, alpha2), Color.TRANSPARENT}, null, Shader.TileMode.CLAMP);
++        final int color1 = ColorUtils.setAlphaComponent(color, alpha1);
++        final int color2 = ColorUtils.setAlphaComponent(color, alpha2);
++        if (gradientShader != null && shaderSize == size && shaderColor1 == color1 && shaderColor2 == color2) {
++            return;
++        }
++        shaderSize = size;
++        shaderColor1 = color1;
++        shaderColor2 = color2;
++        gradientShader = new LinearGradient(0, 0, size, 0, new int[]{Color.TRANSPARENT, color1, Color.TRANSPARENT}, null, Shader.TileMode.CLAMP);
++        gradientShader2 = new LinearGradient(0, 0, size, 0, new int[]{Color.TRANSPARENT, color2, Color.TRANSPARENT}, null, Shader.TileMode.CLAMP);
+         paint.setShader(gradientShader);
+         paintOutline.setShader(gradientShader2);
+     }
