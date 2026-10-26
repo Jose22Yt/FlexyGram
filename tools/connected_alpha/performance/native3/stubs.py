@@ -22,3 +22,18 @@ def write_stubs(source,root):
  fixture=Path(__file__).with_name('ClipNativeTest.java.in')
  if fixture.is_file():put('org/telegram/ui/Components/ClipNativeTest.java',fixture.read_text())
 
+ path='TMessagesProj/src/main/java/org/telegram/ui/Components/ReplaceableIconDrawable.java'
+ baseline=subprocess.check_output(['git','show',BASE+':'+path],cwd=root,text=True)
+ candidate=baseline
+ patch=Path(__file__).parents[1]/'motion3.patch'
+ if patch.is_file():
+  import tempfile
+  with tempfile.TemporaryDirectory()as d:
+   target=Path(d)/path;target.parent.mkdir(parents=True);target.write_text(baseline)
+   subprocess.run(['git','apply','--check',str(patch.resolve())],cwd=d,check=True,capture_output=True)
+   subprocess.run(['git','apply',str(patch.resolve())],cwd=d,check=True,capture_output=True)
+   candidate=target.read_text()
+ put('org/telegram/ui/Components/BaselineReplaceableIconDrawable.java',baseline.replace('ReplaceableIconDrawable','BaselineReplaceableIconDrawable'))
+ put('org/telegram/ui/Components/CandidateReplaceableIconDrawable.java',candidate.replace('ReplaceableIconDrawable','CandidateReplaceableIconDrawable'))
+ fixture=Path(__file__).with_name('MotionNativeTest.java.in')
+ if fixture.is_file():put('org/telegram/ui/Components/MotionNativeTest.java',fixture.read_text())

@@ -1,0 +1,55 @@
+diff --git a/TMessagesProj/src/main/java/org/telegram/ui/Components/ReplaceableIconDrawable.java b/TMessagesProj/src/main/java/org/telegram/ui/Components/ReplaceableIconDrawable.java
+--- a/TMessagesProj/src/main/java/org/telegram/ui/Components/ReplaceableIconDrawable.java
++++ b/TMessagesProj/src/main/java/org/telegram/ui/Components/ReplaceableIconDrawable.java
+@@ -51,6 +51,9 @@
+
+     public void setIcon(Drawable drawable, boolean animated) {
+         if (drawable == null) {
++            cancelAnimation();
++            currentResId = 0;
++            progress = 1f;
+             currentDrawable = null;
+             outDrawable = null;
+             invalidateSelf();
+@@ -74,13 +77,11 @@
+         updateBounds(currentDrawable, getBounds());
+         updateBounds(outDrawable, getBounds());
+
+-        if (animation != null) {
+-            animation.removeAllListeners();
+-            animation.cancel();
+-        }
++        cancelAnimation();
+
+         if (!animated) {
+             progress = 1f;
+             outDrawable = null;
++            invalidateSelf();
+             return;
+         }
+@@ -95,6 +96,16 @@
+         animation.start();
+     }
+
++
++    private void cancelAnimation() {
++        ValueAnimator previous = animation;
++        animation = null;
++        if (previous != null) {
++            previous.removeAllListeners();
++            previous.removeAllUpdateListeners();
++            previous.cancel();
++        }
++    }
+
+     @Override
+     protected void onBoundsChange(Rect bounds) {
+@@ -190,6 +201,8 @@
+
+     @Override
+     public void onAnimationEnd(Animator animation) {
++        if (this.animation != animation) return;
++        this.animation = null;
+         outDrawable = null;
+         invalidateSelf();
+     }

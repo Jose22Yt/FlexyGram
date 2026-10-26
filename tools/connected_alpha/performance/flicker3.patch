@@ -6,7 +6,7 @@ diff --git a/TMessagesProj/src/main/java/org/telegram/ui/Components/voip/CellFli
      private Shader gradientShader2;
      int size;
 +    private int shaderSize, shaderColor1, shaderColor2;
- 
+
      int parentWidth;
      public float progress;
 @@ -52,8 +53,11 @@
@@ -25,7 +25,7 @@ diff --git a/TMessagesProj/src/main/java/org/telegram/ui/Components/voip/CellFli
          paintOutline.setStyle(Paint.Style.STROKE);
 @@ -69,8 +73,16 @@
      }
- 
+
      public void setColors(int color, int alpha1, int alpha2) {
 -        gradientShader = new LinearGradient(0, 0, size, 0, new int[]{Color.TRANSPARENT, ColorUtils.setAlphaComponent(color, alpha1), Color.TRANSPARENT}, null, Shader.TileMode.CLAMP);
 -        gradientShader2 = new LinearGradient(0, 0, size, 0, new int[]{Color.TRANSPARENT, ColorUtils.setAlphaComponent(color, alpha2), Color.TRANSPARENT}, null, Shader.TileMode.CLAMP);

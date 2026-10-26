@@ -7,11 +7,11 @@ diff --git a/TMessagesProj/src/main/java/org/telegram/ui/Components/ClipRoundedD
  import android.graphics.RectF;
 +import android.graphics.Rect;
  import android.graphics.drawable.Drawable;
- 
+
  import androidx.annotation.NonNull;
 @@ -52,6 +53,8 @@
      }
- 
+
      private Path path;
 +    private final Rect pathBounds = new Rect();
 +    private boolean pathDirty = true;
@@ -42,7 +42,7 @@ diff --git a/TMessagesProj/src/main/java/org/telegram/ui/Components/ClipRoundedD
          updatePath();
          return this;
      }
- 
+
      public ClipRoundedDrawable setPadding(float left, float top, float right, float bottom) {
          padding.set(left, top, right, bottom);
 +        pathDirty = true;
@@ -79,5 +79,5 @@ diff --git a/TMessagesProj/src/main/java/org/telegram/ui/Components/ClipRoundedD
 +        pathBounds.set(bounds);
 +        pathDirty = false;
      }
- 
+
      @Override
