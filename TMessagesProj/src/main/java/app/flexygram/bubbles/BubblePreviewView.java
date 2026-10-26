@@ -146,7 +146,11 @@ public final class BubblePreviewView extends View implements NotificationCenter.
         frame.rewind();frame.addRoundRect(frameBounds, AndroidUtilities.dp(16), AndroidUtilities.dp(16), Path.Direction.CW);
         wallpaperPreview.resize(width, height);
     }
-    @Override protected void onSizeChanged(int w, int h, int oldw, int oldh) { updateWallpaperBounds(w, h); }
+    @Override protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        updateWallpaperBounds(w, h);
+        // A resize changes the wallpaper crop even when the shared bitmap/cache is unchanged.
+        if (blurOwner != null) blurOwner.prepare(wallpaper, wallpaperMotion, Theme.getColor(Theme.key_windowBackgroundGray));
+    }
     @Override protected void onDraw(Canvas canvas) {
         int save = canvas.save();canvas.clipPath(frame);
         backdrop.setColor(Theme.getColor(Theme.key_windowBackgroundGray));canvas.drawRect(frameBounds, backdrop);

@@ -865,7 +865,8 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
         CharSequence title = titleTextView.getText();
         measure.setTextSize(titlePx);
         float titleWidth = title == null ? 0 : measure.measureText(title.toString());
-        CharSequence status = subtitleTextView == null ? null : subtitleTextView.getText();
+        CharSequence status = subtitleTextView != null ? subtitleTextView.getText()
+                : animatedSubtitleTextView != null ? animatedSubtitleTextView.getText() : null;
         measure.setTextSize(subtitlePx);
         float statusWidth = status == null ? 0 : measure.measureText(status.toString());
         return Math.max(titleWidth, statusWidth) + dp(24);
@@ -1619,6 +1620,9 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
             useOnlineColor = true;
             setTypingAnimation(true);
         }
+        boolean signatureTextChanged = signatureActive() && !TextUtils.equals(newSubtitle,
+                subtitleTextView != null ? subtitleTextView.getText()
+                        : animatedSubtitleTextView != null ? animatedSubtitleTextView.getText() : null);
         lastSubtitleColorKey = useOnlineColor ? Theme.key_chat_status : Theme.key_actionBarDefaultSubtitle;
         if (lastSubtitle == null) {
             if (subtitleTextView != null) {
@@ -1642,6 +1646,7 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
             lastSubtitle = newSubtitle;
         }
         checkActionBar(animated);
+        if (signatureTextChanged) signatureHeader.changed();
     }
 
     public static CharSequence getChatSubtitle(TLRPC.Chat chat, TLRPC.ChatFull info, int onlineCount) {
