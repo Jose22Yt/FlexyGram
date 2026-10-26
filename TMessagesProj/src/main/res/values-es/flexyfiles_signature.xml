@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyFilesSignatureContents">CONTENIDO DEL ARCHIVO</string>
+    <string name="FlexyFilesSignatureOriginal">Solo este documento · El original no se modifica</string>
+    <string name="FlexyFilesSignatureFolder">Carpeta</string>
+    <string name="FlexyFilesSignatureDocument">Documento</string>
+    <string name="FlexyFilesSignatureEmpty">No se encontraron elementos</string>
+    <string name="FlexyFilesSignatureParent">Volver a carpeta anterior</string>
+    <string name="FlexyFilesSignatureCount">%1$d elementos</string>
+</resources>

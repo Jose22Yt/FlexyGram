@@ -43,6 +43,7 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
     @Override protected String getActionBarTitle() { return getString(R.string.FlexyBubblesTitle); }
     @Override protected BaseListAdapter createAdapter(Context context) { return new Adapter(context); }
     @Override protected void onItemClick(View view, int position, float x, float y) {
+        if (position < 0) return;
         if (position == enabledRow) {
             BubbleConfig.setOutlineEnabled(!BubbleConfig.outlineEnabled());
             updateRows(); listAdapter.notifyDataSetChanged(); if (preview != null) preview.settingsChanged();
@@ -124,6 +125,6 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
 
 
         }
-        @Override public boolean isEnabled(RecyclerView.ViewHolder holder) { int p = holder.getAdapterPosition(); return p == blurRow || p == styleRow || p == fuseRow || p == enabledRow; }
+        @Override public boolean isEnabled(RecyclerView.ViewHolder holder) { int p = holder.getAdapterPosition(); if (p < 0) return false; return p == blurRow || p == styleRow || p == fuseRow || p == enabledRow; }
     }
 }

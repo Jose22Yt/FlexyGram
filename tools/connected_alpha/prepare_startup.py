@@ -23,6 +23,21 @@ PATHS=[
  'tools/connected_alpha/bubble_visual/BubblePreviewVisualTest.java.in',
  'tools/connected_alpha/bubble_visual/BubbleVisualTest.java.in',
  'tools/connected_alpha/bubble_visual/stubs.py',
+'TMessagesProj/src/main/java/app/flexygram/files/FlexyFilesSheet.java',
+'TMessagesProj/src/main/java/app/flexygram/files/FlexyFileEditorActivity.java',
+'TMessagesProj/src/main/java/app/flexygram/files/FlexyFiles.java',
+'TMessagesProj/src/main/java/app/flexygram/files/FlexyEditorToolsSheet.java',
+'TMessagesProj/src/main/java/app/flexygram/files/FlexyEditorFileTypes.java',
+'TMessagesProj/src/main/java/app/flexygram/files/FlexyFilesDirectSend.java',
+'TMessagesProj/src/main/res/values/flexyfiles_signature.xml',
+'TMessagesProj/src/main/res/values-es/flexyfiles_signature.xml',
+'TMessagesProj/src/main/res/values-ru/flexyfiles_signature.xml',
+'TMessagesProj/src/main/res/values/flexyfiles_editor_signature.xml',
+'TMessagesProj/src/main/res/values-es/flexyfiles_editor_signature.xml',
+'TMessagesProj/src/main/res/values-ru/flexyfiles_editor_signature.xml',
+ 'tools/connected_alpha/files_native/stubs.py',
+ 'tools/connected_alpha/files_native/FilesNativeTest.java.in',
+
 
 ]
 spec={'base':'175b299e0d4faeb246eca8e1be16a362a3a62213','reviewed':{path:hashlib.sha256((ROOT/path).read_bytes()).hexdigest()for path in PATHS},'paths':sorted(PATHS+['tools/connected_alpha/startup_review.json'])}

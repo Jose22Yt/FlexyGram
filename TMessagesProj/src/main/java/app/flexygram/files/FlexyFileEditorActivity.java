@@ -31,6 +31,7 @@ public final class FlexyFileEditorActivity extends BaseFragment {
     private final EditHistory history=new EditHistory();private boolean internal,dirty,ready;private int revision;private File output;private WebView html;
     private final Pattern syntax=Pattern.compile("\"[^\"\\r\\n]*\"|\\b(?:true|false|null|if|else|return|class|const|let|var|function|import|public|private)\\b|\\b[0-9]+(?:\\.[0-9]+)?\\b");
     private String retainedText;private int retainedStart,retainedEnd;
+    private FlexyFilesDirectSend.Copy directCopy;
     private final Runnable highlight=()->highlightParagraph();
     public FlexyFileEditorActivity(File file,String name,String entry,long dialog,int account){source=file;originalName=name;this.entry=entry;this.dialog=dialog;this.account=account;}
     private String filename(){String name=entry==null?originalName:entry.substring(entry.lastIndexOf('/')+1);return name==null?"edited.txt":name;}
@@ -39,9 +40,8 @@ public final class FlexyFileEditorActivity extends BaseFragment {
         retainEditor();AndroidUtilities.cancelRunOnUIThread(highlight);work.cancel();
         if(actionBar==null)actionBar=createActionBar(c);
         actionBar.setBackButtonImage(R.drawable.ic_ab_back);actionBar.setTitle("FlexyFiles");actionBar.setAllowOverlayTitle(false);
-        actionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick(){@Override public void onItemClick(int id){if(id==-1){if(onBackPressed(true))finishFragment();}else command(id);}});
-        ActionBarMenuItem menu=actionBar.createMenu().addItem(0,R.drawable.ic_ab_other);
-        menu.addSubItem(1,getString(R.string.FlexyFilesUndo));menu.addSubItem(2,getString(R.string.FlexyFilesRedo));menu.addSubItem(3,getString(R.string.FlexyFilesSave));menu.addSubItem(4,getString(R.string.FlexyFilesShare));menu.addSubItem(5,getString(R.string.FlexyFilesSend));menu.addSubItem(6,getString(R.string.FlexyFilesDraft));menu.addSubItem(7,getString(R.string.FlexyFilesValidate));menu.addSubItem(8,getString(R.string.FlexyFilesHtml));menu.addSubItem(9,getString(R.string.FlexyFilesZipCopy));menu.addSubItem(10,getString(R.string.Search));menu.addSubItem(11,getString(R.string.FlexyFilesReplace));menu.addSubItem(12,getString(R.string.FlexyFilesIndent));
+        actionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick(){@Override public void onItemClick(int id){if(id==-1){if(onBackPressed(true))finishFragment();}else if(id==0)showTools();else command(id);}});
+        actionBar.createMenu().addItem(0,R.drawable.ic_ab_other);
         panel=new LinearLayout(c);panel.setOrientation(LinearLayout.VERTICAL);panel.setBackgroundColor(color(Theme.key_windowBackgroundWhite));status=new TextView(c);status.setTextColor(color(Theme.key_windowBackgroundWhiteGrayText2));status.setTextSize(13);status.setPadding(dp(16),dp(10),dp(16),dp(10));status.setText(getString(R.string.Loading));panel.addView(status,new LinearLayout.LayoutParams(-1,-2));
         editor=new FilesCodeView(c,color(Theme.key_windowBackgroundWhiteBlackText),color(Theme.key_windowBackgroundWhiteGrayText2));editor.setEnabled(false);panel.addView(editor,new LinearLayout.LayoutParams(-1,0,1));
         editor.addTextChangedListener(new TextWatcher(){String before;int start;
@@ -69,9 +69,42 @@ public final class FlexyFileEditorActivity extends BaseFragment {
     private void image(){String lower=filename().toLowerCase(Locale.ROOT);if(!(lower.endsWith(".png")||lower.endsWith(".jpg")||lower.endsWith(".jpeg")||lower.endsWith(".webp")))return;byte[] data=binary;
         job(()->{BitmapFactory.Options options=new BitmapFactory.Options();options.inJustDecodeBounds=true;BitmapFactory.decodeByteArray(data,0,data.length,options);if(options.outWidth<=0||options.outHeight<=0||(long)options.outWidth*options.outHeight>32_000_000)throw new IOException();options.inSampleSize=1;while(options.outWidth/options.inSampleSize>1024||options.outHeight/options.inSampleSize>1024)options.inSampleSize*=2;options.inJustDecodeBounds=false;return BitmapFactory.decodeByteArray(data,0,data.length,options);},(owner,value)->{if(value!=null){ImageView image=new ImageView(owner.getParentActivity());image.setScaleType(ImageView.ScaleType.FIT_CENTER);image.setImageBitmap((Bitmap)value);owner.panel.addView(image,new LinearLayout.LayoutParams(-1,0,1));}});
     }
+    /** On-demand grouped sheet, shared look and spacing with the native .flexyGram sheet. */
+    private void showTools(){
+        if(getParentActivity()==null||!ready)return;
+        String lower=filename().toLowerCase(Locale.ROOT);
+        boolean htmlFile=lower.endsWith(".html")||lower.endsWith(".htm");
+        // .plugin files are handled as documents; only decoded text is editable.
+        boolean pluginEditable=FlexyEditorFileTypes.canEditPlugin(filename(),text!=null);
+        showDialog(new FlexyEditorToolsSheet(this,filename(),text!=null || pluginEditable,entry!=null,htmlFile,this::command));
+    }
+    /** Confirmed direct-to-origin-dialog native send; never silently choose a new chat. */
+    private void confirmChatSend(){
+        if(directCopy==null||dialog==0||getParentActivity()==null){FlexyFiles.error(this);return;}
+        if(!FlexyFilesDirectSend.topicSupported(account,dialog)){
+            showDialog(new AlertDialog.Builder(getParentActivity(),getResourceProvider()).setTitle("FlexyFiles")
+                .setMessage(getString(R.string.FlexyFilesTopicUnavailable)).setPositiveButton(getString(R.string.OK),null).create());return;
+        }
+        final FlexyFilesDirectSend.Copy copy=directCopy;
+        String destination=DialogObject.getShortName(account,dialog);
+        if(destination.isEmpty()){FlexyFiles.error(this);return;}
+        showDialog(new AlertDialog.Builder(getParentActivity(),getResourceProvider())
+            .setTitle(getString(R.string.FlexyFilesSendCopyTitle))
+            .setMessage(copy.name+"\n"+destination+"\n\n"+getString(R.string.FlexyFilesSendCopyMessage))
+            .setPositiveButton(getString(R.string.FlexyFilesSendCopyConfirm),(d,w)->{
+                try {
+                    FlexyFilesDirectSend.enqueueCopy(this,copy,dialog,account,()->{
+                        if(status!=null)status.setText(getString(R.string.FlexyFilesSendQueued));
+                        finishFragment();
+                    });
+                } catch(Exception failure) {
+                    if(status!=null)status.setText(getString(R.string.FlexyFilesError));
+                }
+            }).setNegativeButton(getString(R.string.Cancel),null).create());
+    }
     private void command(int id){if(!ready||getParentActivity()==null)return;
         if(id==1||id==2){if(text==null)return;EditHistory.Change change=id==1?history.undo():history.redo();if(change!=null){internal=true;String old=id==1?change.after:change.before,next=id==1?change.before:change.after;editor.getText().replace(change.start,change.start+old.length(),next);editor.setSelection(Math.min(editor.length(),change.start+next.length()));internal=false;dirty=true;revision++;highlightParagraph();}return;}
-        if(id==3||id==4||id==5||id==9){if(id==9&&(entry==null||text==null)){status.setText(getString(R.string.FlexyFilesZipOnly));return;}export(id);return;}
+        if(id==3||id==4||id==5||id==9||id==13){if(id==9&&(entry==null||text==null)){status.setText(getString(R.string.FlexyFilesZipOnly));return;}export(id);return;}
         if(id==6){draft(false);return;}if(text==null)return;
         if(id==7){validate();return;}if(id==8){previewHtml();return;}if(id==10||id==11){search(id==11);return;}
         if(id==12){int pos=Math.max(0,editor.getSelectionStart());editor.getText().insert(pos,"    ");}
@@ -86,7 +119,7 @@ public final class FlexyFileEditorActivity extends BaseFragment {
         org.telegram.ui.ActionBar.AlertDialog dialog=new AlertDialog.Builder(getParentActivity(),getResourceProvider()).setTitle(getString(R.string.FlexyFilesHtml)).setView(html).setPositiveButton(getString(R.string.Close),null).create();dialog.setOnDismissListener(d->destroyHtml());showDialog(dialog);}
     private void destroyHtml(){if(html!=null){html.stopLoading();html.loadUrl("about:blank");html.destroy();html=null;}}
     private void export(int action){String value=text==null?null:editor.getText().toString(),name=filename();byte[] raw=binary;SelectedDocument.Text original=text;SelectedDocument reader=document;ready=false;
-        job(()->{byte[] bytes=original==null?raw:original.encode(value);File result=FilesCache.output(action==9?"edited-"+originalName:"edited-"+name);boolean complete=false;try(OutputStream out=new FileOutputStream(result)){if(action==9)reader.writeZipCopy(out,entry,bytes);else out.write(bytes);complete=true;}finally{if(!complete)result.delete();}return result;},(owner,result)->{owner.ready=true;owner.output=(File)result;if(action==3||action==9){Intent intent=new Intent(Intent.ACTION_CREATE_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType(action==9?"application/zip":"application/octet-stream").putExtra(Intent.EXTRA_TITLE,owner.output.getName());owner.startActivityForResult(intent,SAVE);}else owner.share(action==5);});}
+        job(()->{byte[] bytes=original==null?raw:original.encode(value);boolean revisedZip=action==9||(action==13&&entry!=null);File result=FilesCache.output(revisedZip?"edited-"+originalName:"edited-"+name);boolean complete=false;try(OutputStream out=new FileOutputStream(result)){if(revisedZip)reader.writeZipCopy(out,entry,bytes);else out.write(bytes);complete=true;}finally{if(!complete)result.delete();}if(action==13)directCopy=FlexyFilesDirectSend.prepare(result);return result;},(owner,result)->{owner.ready=true;owner.output=(File)result;if(action==3||action==9){Intent intent=new Intent(Intent.ACTION_CREATE_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType(action==9?"application/zip":"application/octet-stream").putExtra(Intent.EXTRA_TITLE,owner.output.getName());owner.startActivityForResult(intent,SAVE);}else if(action==13)owner.confirmChatSend();else owner.share(action==5);});}
     private void share(boolean currentChat){try{Uri uri=FileProvider.getUriForFile(getParentActivity(),ApplicationLoader.applicationContext.getPackageName()+".provider",output);Intent intent=new Intent(Intent.ACTION_SEND).setType("application/octet-stream").putExtra(Intent.EXTRA_STREAM,uri).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);intent.setClipData(ClipData.newRawUri("FlexyFiles",uri));if(currentChat){intent.setClass(getParentActivity(),org.telegram.ui.LaunchActivity.class);intent.putExtra("currentAccount",account);if(SharedConfig.directShare&&SharedConfig.directShareHash!=null){intent.putExtra("dialogId",dialog);intent.putExtra("hash",SharedConfig.directShareHash);}intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);}startActivityForResult(currentChat?intent:Intent.createChooser(intent,getString(R.string.FlexyFilesShare)),0x464d);}catch(Exception unavailable){FlexyFiles.error(this);}}
     @Override public void onActivityResultFragment(int request,int result,Intent data){super.onActivityResultFragment(request,result,data);if(request!=SAVE||result!=Activity.RESULT_OK||data==null||data.getData()==null||output==null)return;Uri uri=data.getData();if(!"content".equals(uri.getScheme()))return;File generated=output;Context app=ApplicationLoader.applicationContext;ready=false;
         job(()->{try(InputStream in=new FileInputStream(generated);OutputStream out=app.getContentResolver().openOutputStream(uri,"w")){if(out==null)throw new IOException();byte[] buffer=new byte[8192];int count;while((count=in.read(buffer))!=-1){if(Thread.currentThread().isInterrupted())throw new InterruptedIOException();out.write(buffer,0,count);}out.flush();}return null;},(owner,value)->{owner.ready=true;owner.status.setText(getString(R.string.FlexyFilesSaved));});}
@@ -94,5 +127,5 @@ public final class FlexyFileEditorActivity extends BaseFragment {
     @Override public boolean isSwipeBackEnabled(MotionEvent event){return !dirty&&ready&&super.isSwipeBackEnabled(event);}
     @Override public boolean onBackPressed(boolean invoked){if(!dirty)return super.onBackPressed(invoked);if(invoked)showDialog(new AlertDialog.Builder(getParentActivity(),getResourceProvider()).setTitle(getString(R.string.FlexyFilesUnsaved)).setPositiveButton(getString(R.string.FlexyFilesDraft),(d,w)->draft(true)).setNegativeButton(getString(R.string.FlexyFilesDiscard),(d,w)->{dirty=false;finishFragment();}).setNeutralButton(getString(R.string.Cancel),null).create());return false;}
     private void highlightParagraph(){if(text==null||editor==null)return;Editable data=editor.getText();int cursor=Math.max(0,editor.getSelectionStart()),start=cursor,end=cursor;while(start>0&&data.charAt(start-1)!='\n'&&cursor-start<2048)start--;while(end<data.length()&&data.charAt(end)!='\n'&&end-cursor<2048)end++;for(ForegroundColorSpan span:data.getSpans(start,end,ForegroundColorSpan.class))data.removeSpan(span);String line=data.subSequence(start,end).toString();Matcher matcher=syntax.matcher(line);int count=0,color=color(Theme.key_windowBackgroundWhiteBlueText);while(matcher.find()&&count++<128)data.setSpan(new ForegroundColorSpan(color),start+matcher.start(),start+matcher.end(),android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);}
-    @Override public void onFragmentDestroy(){AndroidUtilities.cancelRunOnUIThread(highlight);work.close();destroyHtml();SelectedDocument previous=document;document=null;if(previous!=null)try{previous.close();}catch(IOException ignored){}binary=null;text=null;retainedText=null;history.clear();super.onFragmentDestroy();}
+    @Override public void onFragmentDestroy(){AndroidUtilities.cancelRunOnUIThread(highlight);work.close();destroyHtml();SelectedDocument previous=document;document=null;if(previous!=null)try{previous.close();}catch(IOException ignored){}binary=null;text=null;directCopy=null;retainedText=null;history.clear();super.onFragmentDestroy();}
 }

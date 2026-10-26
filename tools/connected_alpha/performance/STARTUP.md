@@ -76,3 +76,30 @@ shader; full contours use no shader. There is no per-message blur, extra layer o
 new draw loop. Native Android tests cover both directions, every style/side,
 geometry bounds, toggle persistence, shader reuse and compact-preview content.
 Full app/physical appearance and scroll performance remain pending.
+
+## Prepared Signature Files packages (stage C)
+
+The supplied Explorer patch applies exactly to the reviewed PR100 sheet blob;
+the Editor integration script verified the exact Work2 editor blob before applying.
+The engine, worker, cache, codec and preset import/export are preserved. The package
+provides solid Matte surfaces, native grouped tools and recycled folder rows. New
+.plugin eligibility only exposes bounded text/image inspection; it does not run or
+install plugin code and does not intercept ordinary plugin opening.
+
+The prepared direct-send adapter required a safety modification: generated-copy
+validation now runs on the existing worker, while the UI confirmation includes the
+actual copy filename and captured destination name. The native Telegram paid-message
+confirmation and bulk document path carry the captured account/dialog and price.
+Cached rights and native slow mode are checked before submitting; an atomic guard
+rejects duplicate confirmation callbacks and closed editors cannot enqueue later.
+Queued is never called delivered. Native uploads and server-side rights are not
+simulated by the editor.
+
+Forum/monoforum sending is explicitly unavailable because the prepared handoff has
+no captured thread capability. Its action explains the limit and sends nothing;
+it never falls back to the general topic or conversation picker. A future thread-
+aware route requires physical/native server validation before enabling it.
+RAR/7z remain unsupported as in PR100. Native widget tests use named Telegram send,
+account, navigation and icon-resource doubles; they are not real Telegram uploads
+or physical acceptance. Production resource linkage and full ARM64 build are still
+required. No new permissions, idle observers, scans, services, or graphics engines.
