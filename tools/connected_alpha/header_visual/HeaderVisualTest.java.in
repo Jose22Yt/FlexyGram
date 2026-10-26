@@ -26,11 +26,11 @@ public class HeaderVisualTest {
  }
  @Test public void counterTextDoesNotStealBackTapsAndMenuAndProfileStayIndependent()throws Exception{
   Context c=context(1);ActionBar bar=new ActionBar(c);ChatAvatarContainer avatar=new ChatAvatarContainer(c);bar.addView(avatar,0,new FrameLayout.LayoutParams(-1,-1));SignatureChatHeader header=new SignatureChatHeader(bar,avatar,null);bar.setSignatureHeader(header);avatar.setSignatureHeader(header);header.setCount(3);root.addView(bar);size(bar,401);
-  assertFalse(header.geometry.countVisible);assertEquals(View.GONE,((View)field(header,"countView")).getVisibility());float x=header.geometry.back.right-4,y=header.geometry.back.centerY();for(int n=0;n<100;n++)tap(bar,x,y);assertEquals(100,bar.backs);assertEquals(0,avatar.profiles);
+  assertFalse(header.geometry.countVisible);assertEquals(2,bar.getChildCount());float x=header.geometry.back.right-4,y=header.geometry.back.centerY();for(int n=0;n<100;n++)tap(bar,x,y);assertEquals(100,bar.backs);assertEquals(0,avatar.profiles);
   tap(bar,header.geometry.avatar.centerX(),header.geometry.avatar.centerY());assertEquals(1,avatar.menus);assertEquals(0,avatar.profiles);
   tap(bar,header.geometry.title.centerX(),header.geometry.title.centerY());assertEquals(1,avatar.profiles);assertEquals(1,avatar.menus);
   header.setCount(-1);size(bar,401);assertFalse(header.geometry.countVisible);assertFalse(bar.backButtonImageView.getContentDescription().toString().contains("Unread"));
-  bar.search=true;size(bar,401);assertFalse(header.active());assertEquals(View.GONE,((View)field(header,"countView")).getVisibility());bar.search=false;bar.selection=true;size(bar,401);assertFalse(header.active());header.detach();header.detach();
+  bar.search=true;size(bar,401);assertFalse(header.active());assertEquals(2,bar.getChildCount());bar.search=false;bar.selection=true;size(bar,401);assertFalse(header.active());header.detach();header.detach();
  }
  @Test public void preferencesPreserveLegacyChoicesAndOnlyWriteTheirOwnFile(){
   var old=activity.getSharedPreferences("appearance",0);var prefs=activity.getSharedPreferences("flexygram_header",0);assertTrue(HeaderConfig.signature());
