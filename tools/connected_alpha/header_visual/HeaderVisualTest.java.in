@@ -67,8 +67,8 @@ public class HeaderVisualTest {
   tap(bar,g.text.centerX(),g.text.centerY()+header.fusionTop);assertEquals(1,avatar.profiles);
   tap(bar,g.portrait.centerX(),g.portrait.centerY()+header.fusionTop);assertEquals(2,avatar.profiles);
   ((TextView)field(avatar,"titleTextView")).setText("Extremely long native name that must stay inside its pill");size(bar,401);assertEquals(backLeft,g.back.left,.01f);assertEquals(moreRight,g.more.right,.01f);
-  avatar.callable=false;size(bar,401);assertEquals(48,g.actions.width(),.01f);assertEquals(View.GONE,((View)field(avatar,"signatureCall")).getVisibility());
-  HeaderConfig.style(0);size(bar,401);assertFalse(header.fusionActive());assertEquals(View.GONE,((View)field(avatar,"signatureMore")).getVisibility());assertEquals(header.geometry.avatar.height(),header.geometry.back.height(),.01f);
+  avatar.callable=false;header.changed();size(bar,401);assertEquals(48,g.actions.width(),.01f);assertEquals(View.GONE,((View)field(avatar,"signatureCall")).getVisibility());
+  HeaderConfig.style(0);header.changed();size(bar,401);assertFalse(header.fusionActive());assertEquals(View.GONE,((View)field(avatar,"signatureMore")).getVisibility());assertEquals(header.geometry.avatar.height(),header.geometry.back.height(),.01f);
  }
  @Test public void fusionFallsBackForLargeFontsAndNarrowWindowsWithoutOverlappingControls()throws Exception{
   HeaderConfig.style(2);for(boolean rtl:new boolean[]{false,true})for(float font:new float[]{1,2,3})for(int width:new int[]{240,320,401}){
