@@ -10,6 +10,16 @@ public class StudioNativeTest {
  StudioCodec.Preset preset(int sections){Map<String,Map<String,Object>> map=new LinkedHashMap<>();map.put("bubbles",Map.of("transparency",72));if(sections>1)map.put("header",Map.of("compact",true));if(sections>2)map.put("composer",Map.of("style",1,"density",2));if(sections>3)map.put("icon",Map.of("selected","FLEX_BLUEPRINT"));return StudioCodec.create("Configuración-de-prueba-con-nombre-extenso.flexyGram",map);}
  List<TextView> texts(View view){List<TextView> result=new ArrayList<>();if(view instanceof TextView)result.add((TextView)view);if(view instanceof ViewGroup)for(int i=0;i<((ViewGroup)view).getChildCount();i++)result.addAll(texts(((ViewGroup)view).getChildAt(i)));return result;}
  void waitFor(AtomicBoolean done)throws Exception{for(int i=0;i<200&&!done.get();i++){Thread.sleep(5);Shadows.shadowOf(Looper.getMainLooper()).idle();}assertTrue("background operation completed",done.get());}
+ @Test public void originalStudioActionsStayInOrderAndFilesEnablementOnlyChangesLocalPreference()throws Exception {
+  FlexyStudioActivity settings=new FlexyStudioActivity();settings.activity=activity;settings.view=root;
+  Method update=FlexyStudioActivity.class.getDeclaredMethod("updateRows");update.setAccessible(true);update.invoke(settings);
+  String[] names={"export","importRow","share","files"};int[] positions=new int[4];for(int i=0;i<4;i++){Field f=FlexyStudioActivity.class.getDeclaredField(names[i]);f.setAccessible(true);positions[i]=f.getInt(settings);}
+  assertArrayEquals(new int[]{1,2,3,6},positions);app.flexygram.files.FlexyFiles.enabled(false);
+  Method click=FlexyStudioActivity.class.getDeclaredMethod("onItemClick",View.class,int.class,float.class,float.class);click.setAccessible(true);
+  org.telegram.ui.Cells.TextCheckCell cell=new org.telegram.ui.Cells.TextCheckCell(activity);click.invoke(settings,cell,positions[3],0f,0f);
+  assertTrue(app.flexygram.files.FlexyFiles.enabled());assertTrue(cell.isChecked());assertEquals(0,FileLoader.loads);assertEquals(0,DownloadController.adds);
+  click.invoke(settings,cell,positions[3],0f,0f);assertFalse(app.flexygram.files.FlexyFiles.enabled());assertFalse(cell.isChecked());settings.onFragmentDestroy();
+ }
  @Test public void cardListsExactlyPresentSectionsBeforeAnyPreferencesChange(){
   for(int count=1;count<=4;count++){FlexyStudioSheet sheet=new FlexyStudioSheet(fragment,preset(count),"SoloBurbujas.flexyGram",834);sheet.show();List<TextView> all=texts(sheet.content);for(String id:StudioSchema.sections()){String label=LocaleController.getString(FlexyStudioText.section(id));long found=all.stream().filter(t->label.contentEquals(t.getText())).count();assertEquals(preset(count).sections.containsKey(id)?1:0,found);}assertFalse(activity.getSharedPreferences("flexygram_bubbles",0).contains("transparency"));sheet.dismiss();}
  }

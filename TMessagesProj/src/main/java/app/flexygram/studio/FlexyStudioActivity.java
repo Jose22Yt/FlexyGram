@@ -25,15 +25,17 @@ import java.util.concurrent.Future;
 /** Exactly three functional rows. SAF and Android sharing do not need storage permission. */
 public final class FlexyStudioActivity extends SignatureMatteSettingsActivity {
     private static final int NAV=110, SAVE=0x4651, OPEN=0x4652;
-    private int header,export,importRow,share,shadow;
+    private int header,export,importRow,share,shadow,tools,files,help,toolsShadow;
     private byte[] pendingExport;
     private boolean busy;
     private Future<?> work;
     private int generation;
     @Override protected String getActionBarTitle(){return getString(R.string.FlexyStudioTitle);}
-    @Override protected void updateRows(){super.updateRows();header=addRow();export=addRow("flexystudioExport");importRow=addRow("flexystudioImport");share=addRow("flexystudioShare");shadow=addRow();}
+    @Override protected void updateRows(){super.updateRows();header=addRow();export=addRow("flexystudioExport");importRow=addRow("flexystudioImport");share=addRow("flexystudioShare");shadow=addRow();tools=addRow();files=addRow("flexyfilesEnabled");help=addRow("flexyfilesHelp");toolsShadow=addRow();}
     @Override protected BaseListAdapter createAdapter(Context context){return new Adapter(context);}
     @Override protected void onItemClick(View view,int position,float x,float y) {
+        if(position==files){app.flexygram.files.FlexyFiles.enabled(!app.flexygram.files.FlexyFiles.enabled());if(view instanceof org.telegram.ui.Cells.TextCheckCell)((org.telegram.ui.Cells.TextCheckCell)view).setTextAndValueAndCheck(getString(R.string.FlexyFilesEnable),getString(app.flexygram.files.FlexyFiles.enabled()?R.string.FlexyFilesDormant:R.string.FlexyFilesDisabled),app.flexygram.files.FlexyFiles.enabled(),true,true,false);return;}
+        if(position==help){showDialog(new AlertDialog.Builder(getParentActivity(),getResourceProvider()).setTitle("FlexyFiles").setMessage(getString(R.string.FlexyFilesHelp)).setPositiveButton(getString(R.string.OK),null).create());return;}
         if(busy)return;
         if(position==importRow){Intent intent=new Intent(Intent.ACTION_OPEN_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType("*/*");intent.putExtra(Intent.EXTRA_MIME_TYPES,new String[]{StudioSchema.MIME,"application/octet-stream","application/json"});startActivityForResult(intent,OPEN);}
         else if(position==export||position==share)generate(position==share,Collections.emptySet());
@@ -97,12 +99,14 @@ public final class FlexyStudioActivity extends SignatureMatteSettingsActivity {
     @Override public void restoreSelfArgs(Bundle args){super.restoreSelfArgs(args);byte[] saved=args.getByteArray("flexystudioExport");if(saved!=null&&saved.length<=StudioSchema.MAX_BYTES)pendingExport=saved;}
     private final class Adapter extends MatteListAdapter {
         Adapter(Context context){super(context);}
-        @Override public int getItemViewType(int position){return position==header?TYPE_HEADER:position==shadow?TYPE_SHADOW:NAV;}
+        @Override public int getItemViewType(int position){return position==header||position==tools?TYPE_HEADER:position==shadow||position==toolsShadow?TYPE_SHADOW:position==files?TYPE_CHECK:NAV;}
         @Override public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent,int type){if(type==NAV)return new RecyclerListView.Holder(new SignatureNavigationCell(parent.getContext(),resourcesProvider));return super.onCreateViewHolder(parent,type);}
         @Override public void onBindViewHolder(RecyclerView.ViewHolder holder,int position,boolean partial){
-            if(position==header)((tw.nekomimi.nekogram.ui.cells.HeaderCell)holder.itemView).setText(getString(R.string.FlexyStudioConfiguration));
-            else if(position!=shadow)((SignatureNavigationCell)holder.itemView).bind(getString(position==export?R.string.FlexyStudioExport:position==importRow?R.string.FlexyStudioImport:R.string.FlexyStudioShare),position==export?R.drawable.flexy_studio_export:position==importRow?R.drawable.flexy_studio_import:R.drawable.flexy_studio_share,position!=share);
+            if(position==header||position==tools)((tw.nekomimi.nekogram.ui.cells.HeaderCell)holder.itemView).setText(getString(position==header?R.string.FlexyStudioConfiguration:R.string.FlexyFilesTools));
+            else if(position==files)((org.telegram.ui.Cells.TextCheckCell)holder.itemView).setTextAndValueAndCheck(getString(R.string.FlexyFilesEnable),getString(app.flexygram.files.FlexyFiles.enabled()?R.string.FlexyFilesDormant:R.string.FlexyFilesDisabled),app.flexygram.files.FlexyFiles.enabled(),true,true,false);
+            else if(position==help)((SignatureNavigationCell)holder.itemView).bind(getString(R.string.FlexyFilesHow),R.drawable.msg_info,false);
+            else if(position!=shadow&&position!=toolsShadow)((SignatureNavigationCell)holder.itemView).bind(getString(position==export?R.string.FlexyStudioExport:position==importRow?R.string.FlexyStudioImport:R.string.FlexyStudioShare),position==export?R.drawable.flexy_studio_export:position==importRow?R.drawable.flexy_studio_import:R.drawable.flexy_studio_share,position!=share);
         }
-        @Override public boolean isEnabled(RecyclerView.ViewHolder holder){return holder.getItemViewType()==NAV;}
+        @Override public boolean isEnabled(RecyclerView.ViewHolder holder){return holder.getItemViewType()==NAV||holder.getItemViewType()==TYPE_CHECK;}
     }
 }

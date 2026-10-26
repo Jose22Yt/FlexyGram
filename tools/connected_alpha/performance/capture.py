@@ -123,7 +123,7 @@ def main():
     p.add_argument('--package', required=True)
     p.add_argument('--component')
     p.add_argument('--source-commit', required=True)
-    p.add_argument('--label', required=True, choices=['exteraless', 'alpha1271', 'alpha1272', 'pr92', 'candidate'])
+    p.add_argument('--label', required=True, choices=['exteraless', 'alpha1271', 'alpha1272', 'pr92', 'alpha1275', 'candidate'])
     p.add_argument('--scenario', required=True, choices=SCENARIOS)
     p.add_argument('--build-mode', required=True, help='Same release/profileable/debug mode for all compared builds')
     p.add_argument('--iterations', type=int, default=20)

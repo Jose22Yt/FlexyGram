@@ -2,7 +2,11 @@
 import subprocess
 import unittest
 
-from alpha1275_contract import BASE, ROOT, paths, restore
+from alpha1275_contract import BASE, ROOT, paths, restore as restore_alpha1275
+from performance.universal_contract import restore as restore_performance3
+
+def restore(path, data):
+    return restore_alpha1275(path, restore_performance3(path, data))
 
 
 class Alpha1275Integration(unittest.TestCase):

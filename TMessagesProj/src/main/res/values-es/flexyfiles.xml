@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyFilesTools">HERRAMIENTAS FLEXYGRAM</string>
+    <string name="FlexyFilesEnable">Activar FlexyFiles</string>
+    <string name="FlexyFilesDormant">Habilitado · inactivo hasta abrir un archivo</string>
+    <string name="FlexyFilesDisabled">Desactivado</string>
+    <string name="FlexyFilesHow">Cómo funciona FlexyFiles</string>
+    <string name="FlexyFilesHelp">FlexyFiles solo accede al archivo que decides abrir. No examina otros archivos ni conversaciones. Aunque esté activado, permanece inactivo hasta que abres un documento desde su menú → Explorar contenido. El procesamiento es local. Los cambios se guardan en una copia; el original permanece intacto. Las herramientas se liberan al cerrar. ZIP y textos de hasta 256 KiB son compatibles, con límites de seguridad. RAR, 7z, archivos protegidos o demasiado grandes no son compatibles en esta versión. Una entrada ZIP puede requerir extracción temporal. Los borradores solo se conservan si decides guardarlos.</string>
+    <string name="FlexyFilesExplore">Explorar contenido</string>
+    <string name="FlexyFilesDownloadInfo">Descarga el documento con Telegram y vuelve a elegir Explorar contenido cuando termine.</string>
+    <string name="FlexyFilesError">No se pudo completar la operación. El archivo puede no ser compatible, estar dañado o superar los límites. El original no se ha modificado.</string>
+    <string name="FlexyFilesSave">Guardar una copia</string>
+    <string name="FlexyFilesSend">Enviar al chat con Telegram</string>
+    <string name="FlexyFilesDraft">Guardar borrador</string>
+    <string name="FlexyFilesRecover">Hay un borrador guardado. ¿Quieres recuperarlo?</string>
+    <string name="FlexyFilesValidate">Validar XML / formatear JSON</string>
+    <string name="FlexyFilesHtml">Vista HTML aislada</string>
+    <string name="FlexyFilesHtmlOnly">Esta vista solo está disponible para HTML. No ejecuta scripts ni accede a la red.</string>
+    <string name="FlexyFilesZipCopy">Guardar ZIP con la entrada editada</string>
+    <string name="FlexyFilesZipOnly">Esta acción requiere editar una entrada de texto de un ZIP.</string>
+    <string name="FlexyFilesReplace">Buscar y reemplazar</string>
+    <string name="FlexyFilesIndent">Insertar sangría</string>
+    <string name="FlexyFilesBinary">Vista de código no disponible. Puedes guardar o compartir una copia.</string>
+    <string name="FlexyFilesValid">Estructura válida</string>
+    <string name="FlexyFilesSaved">Copia o borrador guardado</string>
+    <string name="FlexyFilesUnsaved">Hay cambios sin guardar</string>
+    <string name="FlexyFilesUndo">Deshacer</string>
+    <string name="FlexyFilesRedo">Rehacer</string>
+    <string name="FlexyFilesRestore">Recuperar</string>
+    <string name="FlexyFilesDiscard">Descartar</string>
+    <string name="FlexyFilesShare">Compartir archivo</string>
+    <string name="FlexyFilesDownload">Descargar</string>
+</resources>

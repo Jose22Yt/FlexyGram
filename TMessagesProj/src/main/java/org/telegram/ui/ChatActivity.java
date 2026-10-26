@@ -35556,6 +35556,12 @@ public class ChatActivity extends BaseFragment implements
             closeMenu();
             return;
         }
+        if (option == app.flexygram.files.FlexyFiles.MENU) {
+            MessageObject document = selectedObject;
+            closeMenu();
+            app.flexygram.files.FlexyFiles.open(this, document);
+            return;
+        }
         if (app.exteraless.plugins.menus.MenuInjector.handleMessageMenuOption(option)) {
             return;
         }
@@ -51016,6 +51022,11 @@ public class ChatActivity extends BaseFragment implements
             items.add(LocaleController.getString(R.string.OEAiAsk));
             options.add(oebtn_ask_ai);
             icons.add(R.drawable.msg_discussion);
+        }
+        if (app.flexygram.files.FlexyFiles.eligible(message) && (currentChat == null || !currentChat.noforwards)) {
+            items.add(getString(R.string.FlexyFilesExplore));
+            options.add(app.flexygram.files.FlexyFiles.MENU);
+            icons.add(R.drawable.msg_folders_archive);
         }
         // exteraless plugins: пункты плагинов в конце контекстного меню сообщения.
         app.exteraless.plugins.menus.MenuInjector.fillMessageMenu(this, message, currentChat, currentUser, currentEncryptedChat, dialog_id, currentAccount, icons, items, options);
