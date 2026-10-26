@@ -21,7 +21,11 @@ def restore(path, data):
     # Historical audits may enter again after an earlier layer has restored its base.
     for revision in (BASE, '8d4fe2f0a7d47e05a34c2a2c7fc8c706ed781881',
                      '534b30c4edea3dffa0fc726eaec254ed8ebadbc1',
-                     '751c926d91acd536d96b427af5f34f2fe6bedbc4'):
+                     '751c926d91acd536d96b427af5f34f2fe6bedbc4',
+                     '43e14d876601d16890b8c6f24c515103e6ece54f',
+                     '8619ba40fbd8fd9d9d898ff307fb0c0716661254',
+                     '997ac40a65be00c672dc8009b61f55825537d498',
+                     '0e359f0e7841a99d61c79f996dd162b7c836a9bf'):
         accepted = subprocess.run(['git', 'show', revision + ':' + path], cwd=ROOT, capture_output=True)
         if accepted.returncode == 0 and data == accepted.stdout:
             return data
