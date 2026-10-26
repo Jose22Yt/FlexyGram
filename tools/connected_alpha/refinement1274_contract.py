@@ -51,3 +51,5 @@ PATHS = PATHS | PRODUCTION | frozenset(['tools/connected_alpha/test_flexy_compos
                                       'tools/connected_alpha/test_stabilization1272.py'])
 PRODUCTION = PRODUCTION | frozenset(['TMessagesProj/src/main/java/app/flexygram/files/core/SelectedDocument.java'])
 PATHS = PATHS | PRODUCTION | frozenset(['tools/connected_alpha/test_flexyfiles_core.py'])
+PRODUCTION = PRODUCTION | frozenset(['TMessagesProj/src/main/java/app/flexygram/bubbles/BubblePreviewView.java'])
+PATHS = PATHS | PRODUCTION | frozenset(['tools/connected_alpha/test_bubbles1270.py'])
