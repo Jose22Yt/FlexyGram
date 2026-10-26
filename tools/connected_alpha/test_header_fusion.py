@@ -20,3 +20,14 @@ class FusionGeometry(unittest.TestCase):
    self.assertEqual(result.returncode,0,result.stderr)
    self.assertIn('1828',subprocess.check_output(['java','-cp',tmp,'SignatureFusionGeometryTest'],text=True))
    self.assertIn('20000',subprocess.check_output(['java','-cp',tmp,'FusionReuse'],text=True))
+
+ def test_document_adapter_double_retains_every_native_primitive_argument(self):
+  import re
+  native=(ROOT/'TMessagesProj/src/main/java/org/telegram/messenger/SendMessagesHelper.java').read_text()
+  signatures=re.findall(r'public static void prepareSendingDocuments\(([^\n]+)\)',native)
+  actual=next(x for x in signatures if len(x.split(','))==23 and 'SendMessageChatArguments sendMessageChatArguments' in x)
+  fixture=(ROOT/'tools/connected_alpha/files_native/stubs.py').read_text()
+  double=re.search(r'public static void prepareSendingDocuments\(([^)]+)\)',fixture).group(1)
+  primitives=lambda sig:{i:part.strip().split()[0]for i,part in enumerate(sig.split(','))if part.strip().split()[0]in {'long','int','boolean','float','double'}}
+  self.assertEqual(primitives(actual),primitives(double))
+  self.assertEqual(primitives(actual)[21],'long')

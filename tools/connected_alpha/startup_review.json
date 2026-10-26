@@ -63,10 +63,10 @@
     "TMessagesProj/src/main/res/values-ru/flexygram_header.xml": "efab1b2fcb8c26230ac4e0151d6d9a12c338495f87baf140ad0b7627766b0032",
     "tools/connected_alpha/header_visual/stubs.py": "b59471bcb5bf8e68cddc265894fe19c391526aa0d5510e57f9ec3cc1ddf9b910",
     "tools/connected_alpha/header_visual/run.py": "745b51a185a84184bd199a65c8f127dcd78a6dae2a5f814a7a3069ce52a781ee",
-    "tools/connected_alpha/header_visual/HeaderVisualTest.java.in": "bc8589d42fbe9a823db996e9bedd3214a86a41cd4b0f9c2b4f1da41299ed6951",
+    "tools/connected_alpha/header_visual/HeaderVisualTest.java.in": "b8e3ed865ad291fe56af73015fa18642789b09c11289461788bd9f688ab1ca67",
     "tools/connected_alpha/header_visual/SignatureFusionGeometryTest.java": "75bb321b35cfd10383ea874ad2748de3619d69b4b85743359a0709b7ec16e870",
     "tools/connected_alpha/header_visual/FUSION.md": "87eea0940332d863bdd0b3bebcd40c867996d7b163965c310032bd28139e684a",
-    "tools/connected_alpha/test_header_fusion.py": "073aeaf622c72c6290adda3b68de4f2aca346e265a193a4c927efef6af65bc00"
+    "tools/connected_alpha/test_header_fusion.py": "1f7a99ec6072f39e005e53af21270e46097846b2d4fd8a192cd80f1ba1105dd9"
   },
   "paths": [
     ".github/workflows/connected-alpha-arm64.yml",
