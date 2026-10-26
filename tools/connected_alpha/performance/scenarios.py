@@ -21,3 +21,14 @@ SCENARIOS = {
     'memory_pressure': 'Operator-controlled test pressure; no system memory settings changed.',
     'refresh_change': 'Observe operator-selected display changes; never change device settings.',
 }
+
+# Performance3 extends the same operator-driven lab; no generated touch events.
+SCENARIOS.update({
+    'multitap': 'Operator performs fixed rapid test-chat taps/Back interruptions; never owner conversations.',
+    'image_messages': 'Scroll an equivalent synthetic image corpus, with matched thumbnail/cache state.',
+    'stickers': 'Scroll the same licensed test sticker/emoji corpus and reaction state.',
+    'typing': 'Operator types/sends synthetic test text; separate keyboard timing from layout/frame duration.',
+    'player_idle': 'Same test workload with playback stopped and no pending player transition.',
+    'glass_on': 'Same approved Glass style enabled; record exact theme/wallpaper/cache state.',
+    'glass_off': 'Same workload with Glass disabled by operator; do not change global device settings.',
+})

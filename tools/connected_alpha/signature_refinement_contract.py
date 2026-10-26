@@ -10,6 +10,8 @@ REVIEWED = {'TMessagesProj/src/main/java/app/flexygram/header/HeaderSettingsActi
 
 def restore(path, data):
     path = str(path)
+    from files_completion_contract import restore as restore_files
+    data = restore_files(path, data)
     if path not in REVIEWED:
         return data
     before = subprocess.run(['git', 'show', BASE + ':' + path], cwd=ROOT, capture_output=True)
