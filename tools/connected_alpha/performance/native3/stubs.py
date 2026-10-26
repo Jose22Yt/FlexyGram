@@ -15,3 +15,10 @@ def write_stubs(source,root):
  put('org/telegram/messenger/SvgHelper.java','''package org.telegram.messenger;public class SvgHelper {public static class SvgDrawable extends android.graphics.drawable.ColorDrawable {public void setPaint(android.graphics.Paint p){}public float getScale(int w,int h){return 1;}}}''')
  put('org/telegram/ui/Components/voip/GroupCallMiniTextureView.java','''package org.telegram.ui.Components.voip;public class GroupCallMiniTextureView extends android.view.View {public Texture textureView;public GroupCallMiniTextureView(android.content.Context c){super(c);textureView=new Texture(c);}public static class Texture extends android.view.View {public float currentClipHorizontal,currentClipVertical,roundRadius;public Texture(android.content.Context c){super(c);}}}''')
 
+ path='TMessagesProj/src/main/java/org/telegram/ui/Components/ClipRoundedDrawable.java'
+ candidate=(root/path).read_text();baseline=subprocess.check_output(['git','show',BASE+':'+path],cwd=root,text=True)
+ put('org/telegram/ui/Components/ClipRoundedDrawable.java',candidate)
+ put('org/telegram/ui/Components/BaselineClipRoundedDrawable.java',baseline.replace('ClipRoundedDrawable','BaselineClipRoundedDrawable'))
+ fixture=Path(__file__).with_name('ClipNativeTest.java.in')
+ if fixture.is_file():put('org/telegram/ui/Components/ClipNativeTest.java',fixture.read_text())
+

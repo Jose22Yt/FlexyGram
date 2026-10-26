@@ -1,0 +1,41 @@
+package org.telegram.ui.Components;
+import android.graphics.*;import android.graphics.drawable.*;
+import org.junit.*;import org.junit.runner.RunWith;import org.robolectric.*;import org.robolectric.annotation.*;
+import java.lang.reflect.*;import java.util.*;import java.io.*;import static org.junit.Assert.*;
+@RunWith(RobolectricTestRunner.class) @Config(manifest=Config.NONE,sdk=35) @GraphicsMode(GraphicsMode.Mode.NATIVE)
+public class ClipNativeTest {
+ static class CountPath extends Path {int builds;@Override public void addRoundRect(RectF rect,float[] radii,Direction direction){builds++;super.addRoundRect(rect,radii,direction);}}
+ static void path(Object d,Path path)throws Exception{Field f=d.getClass().getDeclaredField("path");f.setAccessible(true);f.set(d,path);}
+ @Test public void stableDrawsDoNotRebuildGeometry()throws Exception{
+  ClipRoundedDrawable current=new ClipRoundedDrawable(new ColorDrawable(0xff447799));BaselineClipRoundedDrawable old=new BaselineClipRoundedDrawable(new ColorDrawable(0xff447799));
+  CountPath before=new CountPath(),after=new CountPath();path(current,after);path(old,before);current.setBounds(0,0,100,80);old.setBounds(0,0,100,80);current.setRadius(12);old.setRadius(12);before.builds=after.builds=0;
+  Canvas canvas=new Canvas(Bitmap.createBitmap(100,80,Bitmap.Config.ARGB_8888));for(int i=0;i<1000;i++){current.draw(canvas);old.draw(canvas);}
+  assertEquals(1000,before.builds);assertEquals(0,after.builds);
+  try(FileWriter out=new FileWriter(new File(System.getProperty("probe.root"),"native3-clip-counts.json"))){out.write("{\"evidence\":\"isolated_API35_actual_Path_calls\",\"stable_draws\":1000,\"baseline_round_rect_builds\":"+before.builds+",\"candidate_round_rect_builds\":"+after.builds+",\"HWUI_ms\":null,\"GPU_ms\":null,\"device_frame_ms\":null}\n");}
+ }
+ @Test public void differentialPixelsForEverySetterAndMutatedBounds()throws Exception{
+  ClipRoundedDrawable current=new ClipRoundedDrawable(new ColorDrawable(0xff447799));BaselineClipRoundedDrawable old=new BaselineClipRoundedDrawable(new ColorDrawable(0xff447799));
+  current.setBounds(5,7,90,75);old.setBounds(5,7,90,75);Random random=new Random(48117);
+  Bitmap a=Bitmap.createBitmap(100,80,Bitmap.Config.ARGB_8888),b=Bitmap.createBitmap(100,80,Bitmap.Config.ARGB_8888);int[] pa=new int[8000],pb=new int[8000];
+  for(int step=0;step<1000;step++){
+   float v=random.nextInt(22)-3;
+   switch(step%11){
+    case 0:current.setRadius(v);old.setRadius(v);break;
+    case 1:current.setRadii(v,15);old.setRadii(v,15);break;
+    case 2:current.setRadii(v,3,18,7);old.setRadii(v,3,18,7);break;
+    case 3:float[] r={v,2,7,14,20,5,10,3};current.setRadii(r);old.setRadii(r);r[0]=999;break;
+    case 4:current.setPadding(v,1,2,3);old.setPadding(v,1,2,3);break;
+    case 5:current.setRadii(new float[]{v,2,4,8});old.setRadii(new float[]{v,2,4,8});break;
+    case 6:current.getBounds().offset(1,-1);old.getBounds().offset(1,-1);break;
+    case 7:current.setBounds(5,7,90+(int)v,75);old.setBounds(5,7,90+(int)v,75);break;
+    case 8:current.setRadii((float[])null);old.setRadii((float[])null);break;
+    case 9:current.setRadii(new float[]{1,2,3});old.setRadii(new float[]{1,2,3});break;
+    case 10:current.setAlpha((step*17)%256);old.setAlpha((step*17)%256);break;
+   }
+   a.eraseColor(0);b.eraseColor(0);current.draw(new Canvas(a));old.draw(new Canvas(b));a.getPixels(pa,0,100,0,0,100,80);b.getPixels(pb,0,100,0,0,100,80);assertArrayEquals("step"+step,pb,pa);
+  }
+ }
+ @Test public void childReplacementNullAndCallbackDelegationRemainNative(){
+  ClipRoundedDrawable d=new ClipRoundedDrawable();d.setBounds(0,0,80,60);d.setRadius(8);ColorDrawable first=new ColorDrawable(0xff112233),second=new ColorDrawable(0xffaabbcc);d.setDrawable(first);assertNotNull(first.getCallback());d.setDrawable(second);assertNull(first.getCallback());assertNotNull(second.getCallback());d.setDrawable(null);assertNull(second.getCallback());d.draw(new Canvas(Bitmap.createBitmap(80,60,Bitmap.Config.ARGB_8888)));d.setDrawable(first);d.draw(new Canvas(Bitmap.createBitmap(80,60,Bitmap.Config.ARGB_8888)));
+ }
+}
