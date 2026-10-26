@@ -180,7 +180,12 @@ public final class SignatureWallpaperBlur {
         private Entry entry;
         private boolean closed, supported, waitingForSlot;
         private BitmapShader shader;
-        public Owner(View target) { this.target = new WeakReference<>(target); }
+        private Runnable availabilityChanged;
+        public Owner(View target) { this(target, null); }
+        public Owner(View target, Runnable availabilityChanged) {
+            this.target = new WeakReference<>(target);
+            this.availabilityChanged = availabilityChanged;
+        }
 
         private Bitmap bitmap(Drawable drawable) {
             if (drawable instanceof AnimatedFileDrawable) return null;
@@ -217,6 +222,7 @@ public final class SignatureWallpaperBlur {
                 paint.setShader(shader);
             }
             View view = target.get(); if (!closed && view != null) view.invalidate();
+            if (!closed && availabilityChanged != null) availabilityChanged.run();
         }
         public boolean isReady() { return !closed && shader != null && entry != null && entry.bitmap != null && !entry.bitmap.isRecycled(); }
         public boolean isSupported() { return supported; }
@@ -245,7 +251,11 @@ public final class SignatureWallpaperBlur {
             sourceBitmap = null;
             if (freed) resumeWaiting();
         }
-        private void clear() { release(); source = null; supported = false; }
-        public void close() { if (closed) return; closed = true; clear(); target.clear(); }
+        private void clear() {
+            boolean wasReady = isReady();
+            release(); source = null; supported = false;
+            if (wasReady && !closed && availabilityChanged != null) availabilityChanged.run();
+        }
+        public void close() { if (closed) return; closed = true; clear(); availabilityChanged = null; target.clear(); }
     }
 }

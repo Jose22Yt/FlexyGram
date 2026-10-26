@@ -80,6 +80,25 @@ public class CachedBlurVisualTest {
   }
   expected.recycle();
  }
+ @Test public void sourceAvailabilityNotifiesOnceAndIdleScrollDoesNotInvalidateCells()throws Exception{
+  int[] changed={0};var a=new SignatureWallpaperBlur.Owner(new View(ApplicationLoader.applicationContext),()->changed[0]++);owners.add(a);
+  BitmapDrawable source=image(128,256,0);a.prepare(source,false,0xffcccccc);complete();
+  int ready=changed[0];assertTrue(ready>0);
+  for(int n=0;n<200;n++)a.prepare(source,false,0xffcccccc);
+  assertEquals(ready,changed[0]);assertEquals(0,Utilities.globalQueue.pending());
+  a.prepare(source,true,0xffcccccc);assertEquals(ready+1,changed[0]);assertFalse(a.isReady());
+  a.prepare(source,true,0xffcccccc);assertEquals(ready+1,changed[0]);
+  a.close();assertEquals(ready+1,changed[0]);
+ }
+ @Test public void parentDrawPolicyUpdatesBothDirectionsAndLeavesOtherEmbeddersNative(){
+  for(boolean out:new boolean[]{false,true})for(boolean allowed:new boolean[]{false,true})for(boolean gradient:new boolean[]{false,true}){
+   NativeParentPolicy cell=new NativeParentPolicy();cell.canDrawBackgroundInParent=allowed;cell.currentMessageObject=new NativeParentPolicy.Message(out);cell.gradient=gradient;
+   assertEquals(allowed&&out&&gradient,cell.drawBackgroundInParent());
+   cell.delegate=()->true;assertEquals(allowed,cell.drawBackgroundInParent());
+   cell.delegate=()->false;assertEquals(allowed&&out&&gradient,cell.drawBackgroundInParent());
+   cell.currentMessageObject=null;assertFalse(cell.drawBackgroundInParent());
+  }
+ }
  @Test public void cancellationLateResultsCapacityAndGenerationAreControlled()throws Exception{
   class Counter extends View{int changes;Counter(){super(ApplicationLoader.applicationContext);}@Override public void invalidate(){super.invalidate();changes++;}}
   Counter target=new Counter();var a=owner(target);var b=owner(target);var c=owner(target);

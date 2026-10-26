@@ -862,6 +862,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             return false;
         }
 
+        default boolean hasFlexyBubbleWallpaper() { return false; }
         default boolean drawFlexyBubbleWallpaper(ChatMessageCell cell, Canvas canvas, android.graphics.Path path, int alpha) {
             return alpha == 255 && drawFlexyBubbleWallpaper(cell, canvas, path);
         }
@@ -21477,6 +21478,12 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     }
 
     public boolean drawBackgroundInParent() {
+        // RecyclerView can move a cached child RenderNode without calling onDraw.
+        // A wallpaper shader must instead use the native parent pass in both directions.
+        if (canDrawBackgroundInParent && currentMessageObject != null && delegate != null
+                && delegate.hasFlexyBubbleWallpaper()) {
+            return true;
+        }
         if (canDrawBackgroundInParent && currentMessageObject != null && currentMessageObject.isOutOwner()) {
             return getThemedColor(Theme.key_chat_outBubbleGradient1) != 0;
         }

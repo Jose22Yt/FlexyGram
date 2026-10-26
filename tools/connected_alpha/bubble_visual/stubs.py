@@ -10,6 +10,25 @@ def write_stubs(source, root):
     for name in ('org/telegram/ui/ActionBar/MessageDrawable.java','org/telegram/ui/Components/blur3/utils/NinePatchBuilder.java','app/flexygram/bubbles/BubbleStyle.java','app/flexygram/bubbles/BubbleOutline.java','app/flexygram/bubbles/SignatureBorderPath.java','app/flexygram/bubbles/BubblePreviewView.java','app/flexygram/bubbles/SignatureWallpaperBlur.java','app/flexygram/bubbles/BubbleConfig.java','app/flexygram/settings/FlexySignatureSlider.java','app/flexygram/composer/ComposerSliderTrack.java'):
         p=source/name;p.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(root/'TMessagesProj/src/main/java'/name,p)
 
+    # Extract the actual parent/cell render decision; no alternate implementation in this fixture.
+    cell = (root/'TMessagesProj/src/main/java/org/telegram/ui/Cells/ChatMessageCell.java').read_text()
+    start = cell.index('    public boolean drawBackgroundInParent()')
+    end = cell.index('{', start) + 1
+    depth = 1
+    while depth:
+        depth += (cell[end] == '{') - (cell[end] == '}')
+        end += 1
+    policy = '''package app.flexygram.bubbles;
+import org.telegram.ui.ActionBar.Theme;
+public class NativeParentPolicy {
+ public boolean canDrawBackgroundInParent, gradient; public Message currentMessageObject; public Delegate delegate;
+ public interface Delegate { boolean hasFlexyBubbleWallpaper(); }
+ public static class Message { private final boolean out; public Message(boolean out){this.out=out;} public boolean isOutOwner(){return out;} }
+ private int getThemedColor(int key){return gradient?1:0;}
+'''+cell[start:end]+'\n}'
+    target = source/'app/flexygram/bubbles/NativeParentPolicy.java'
+    target.write_text(policy)
+
 STUBS["org/telegram/messenger/AndroidUtilities.java"] = STUBS["org/telegram/messenger/AndroidUtilities.java"].replace("public static int dp(float v)", "public static float dpf2(float v){return v*density;}public static int dp(float v)")
 
 # Preview dependencies are explicit theme/notification doubles; graphics and View are Android.

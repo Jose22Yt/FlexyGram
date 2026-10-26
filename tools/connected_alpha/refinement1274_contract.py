@@ -41,4 +41,5 @@ PATHS = PATHS | alpha1275_paths() | frozenset(['tools/connected_alpha/alpha1275_
 PATHS = PATHS | frozenset(['tools/connected_alpha/signature_refinement_contract.py',
                          'tools/connected_alpha/test_signature_refinement.py'])
 
-PATHS = PATHS | frozenset(['TMessagesProj/src/main/java/app/flexygram/bubbles/SignatureBorderPath.java'])
+PRODUCTION = PRODUCTION | frozenset(['TMessagesProj/src/main/java/app/flexygram/bubbles/SignatureBorderPath.java'])
+PATHS = PATHS | PRODUCTION
