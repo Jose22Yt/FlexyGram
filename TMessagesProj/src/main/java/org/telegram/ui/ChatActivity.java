@@ -4685,7 +4685,10 @@ public class ChatActivity extends BaseFragment implements
 
             @Override
             protected boolean onAvatarClick() {
-                if (usesSignatureHeader()) return false; // Keep the native avatar -> profile action.
+                if (usesSignatureHeader() && headerItem != null && headerItem.hasSubMenu()) {
+                    headerItem.toggleSubMenu();
+                    return true;
+                }
                 return openNativeHeaderOptions();
             }
             @Override protected void onSignatureOptionsClick() { openNativeHeaderOptions(); }
@@ -4890,7 +4893,7 @@ public class ChatActivity extends BaseFragment implements
             if (avatarContainer != null) {
                 avatarContainer.setAvatarOptionsMenuItem(headerItem);
             }
-            headerItem.setForceHidden(isTitleCentered());
+            headerItem.setForceHidden(isTitleCentered() || usesSignatureHeader());
 
             if (currentUser != null && currentUser.self && chatMode != MODE_SAVED) {
                 savedChatsItem = headerItem.lazilyAddSubItem(view_as_topics, R.drawable.msg_topics, LocaleController.getString(R.string.SavedViewAsChats));

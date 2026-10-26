@@ -12,9 +12,10 @@ class Refinement(unittest.TestCase):
    self.assertEqual(restore(path,actual),before.stdout if before.returncode==0 else b'',path)
    with self.assertRaises(ValueError,msg=path):restore(path,actual+b'\nUNREVIEWED\n')
  def test_preview_fix_auth_and_audio_engine_are_byte_exact_to_physically_accepted_1273(self):
+  from alpha1275_contract import restore as restore_alpha1275
   for path in ['org/telegram/ui/ActionBar/ActionBarLayout.java','org/telegram/ui/DialogsActivity.java','org/telegram/ui/LoginActivity.java','org/telegram/messenger/MediaController.java','org/telegram/messenger/ImageReceiver.java']:
    path='TMessagesProj/src/main/java/'+path
-   self.assertEqual((ROOT/path).read_bytes(),subprocess.check_output(['git','show','751c926d91acd536d96b427af5f34f2fe6bedbc4:'+path],cwd=ROOT))
+   self.assertEqual(restore_alpha1275(path,(ROOT/path).read_bytes()),subprocess.check_output(['git','show','751c926d91acd536d96b427af5f34f2fe6bedbc4:'+path],cwd=ROOT))
  def test_real_geometry_handles_counter_modes_rtl_and_compact_surfaces(self):
   rect='package android.graphics;public class RectF{public float left,top,right,bottom;public void set(float l,float t,float r,float b){left=l;top=t;right=r;bottom=b;}public float width(){return right-left;}public float height(){return bottom-top;}public float centerX(){return(left+right)/2;}public void offset(float x,float y){left+=x;right+=x;top+=y;bottom+=y;}}'
   code='''import app.flexygram.header.HeaderGeometry;class Probe{public static void main(String[]args){int cases=0;for(float d:new float[]{.75f,1,2,3,4})for(int w:new int[]{240,320,401,600})for(boolean rtl:new boolean[]{false,true})for(int mode=0;mode<3;mode++)for(int digits:new int[]{0,1,2,3,4}){
@@ -37,10 +38,12 @@ class Refinement(unittest.TestCase):
  def test_current_release_identity_is1274_and_all_original_signing_guards_remain(self):
   import re,yaml
   gradle=(ROOT/'TMessagesProj/build.gradle').read_text()
-  self.assertEqual(re.search(r'def verCode = (\d+)',gradle)[1],'1274')
+  self.assertEqual(re.search(r'def verCode = (\d+)',gradle)[1],'1275')
   self.assertEqual(restore('TMessagesProj/build.gradle',gradle.encode()),subprocess.check_output(['git','show',BASE+':TMessagesProj/build.gradle'],cwd=ROOT))
-  flow=(ROOT/'.github/workflows/connected-alpha-arm64.yml').read_text()
+  from alpha1275_contract import restore as restore_alpha1275
+  flow=restore_alpha1275('.github/workflows/connected-alpha-arm64.yml',(ROOT/'.github/workflows/connected-alpha-arm64.yml').read_bytes()).decode()
   self.assertIn('--expected-version-code 1274',flow)
+  self.assertIn('--expected-version-code 1275',(ROOT/'.github/workflows/connected-alpha-arm64.yml').read_text())
   self.assertIn("c8f04cad685ca5757d35b25ea4b0b4613c7399909948d821e6ada61f9fb12b2c",flow)
   self.assertIn("data['elf_count'] != 96",flow)
   self.assertIn('assembleConnectedAlpha',flow)

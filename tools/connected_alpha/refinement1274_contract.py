@@ -10,6 +10,8 @@ def sections(stamp):
  return {part.split(b'\n',1)[0]:b'diff --git '+part for part in PATCH.read_bytes().split(b'diff --git ')[1:]}
 def restore(path,data):
  path=str(path)
+ from alpha1275_contract import restore as restore_alpha1275
+ data=restore_alpha1275(path,data)
  section=sections(PATCH.stat().st_mtime_ns).get(('a/'+path+' b/'+path).encode())
  if section is None:return data
  before=subprocess.run(['git','show',BASE+':'+path],cwd=ROOT,capture_output=True)
@@ -33,3 +35,6 @@ PATHS=frozenset(['tools/connected_alpha/refinement1274_contract.py','tools/conne
 
 PRODUCTION=frozenset(["TMessagesProj/build.gradle","TMessagesProj/src/main/AndroidManifest.xml","TMessagesProj/src/main/java/app/exteraless/player/PlayerColors.java","TMessagesProj/src/main/java/app/exteraless/player/PlayerSheet.java","TMessagesProj/src/main/java/app/exteraless/player/SignatureCoverFade.java","TMessagesProj/src/main/java/app/exteraless/player/SignatureMusicActions.java","TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleConfig.java","TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleOutline.java","TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleSettingsActivity.java","TMessagesProj/src/main/java/app/flexygram/bubbles/SignatureWallpaperBlur.java","TMessagesProj/src/main/java/app/flexygram/header/HeaderConfig.java","TMessagesProj/src/main/java/app/flexygram/header/HeaderGeometry.java","TMessagesProj/src/main/java/app/flexygram/header/HeaderPreviewView.java","TMessagesProj/src/main/java/app/flexygram/header/HeaderSettingsActivity.java","TMessagesProj/src/main/java/app/flexygram/header/HeaderSurface.java","TMessagesProj/src/main/java/app/flexygram/header/SignatureChatHeader.java","TMessagesProj/src/main/java/app/flexygram/icons/SignatureLauncherUpdateReceiver.java","TMessagesProj/src/main/java/app/flexygram/studio/core/StudioCodec.java","TMessagesProj/src/main/java/app/flexygram/studio/core/StudioSchema.java","TMessagesProj/src/main/java/org/telegram/ui/ActionBar/MessageDrawable.java","TMessagesProj/src/main/java/org/telegram/ui/Cells/ChatMessageCell.java","TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java","TMessagesProj/src/main/java/org/telegram/ui/Components/ChatAvatarContainer.java","TMessagesProj/src/main/java/org/telegram/ui/Components/SizeNotifierFrameLayout.java","TMessagesProj/src/main/java/org/telegram/ui/LauncherIconController.java","TMessagesProj/src/main/res/values-es/flexygram_bubbles.xml","TMessagesProj/src/main/res/values-es/flexygram_header.xml","TMessagesProj/src/main/res/values-es/flexygram_music.xml","TMessagesProj/src/main/res/values-ru/flexygram_bubbles.xml","TMessagesProj/src/main/res/values-ru/flexygram_header.xml","TMessagesProj/src/main/res/values-ru/flexygram_music.xml","TMessagesProj/src/main/res/values/flexygram_bubbles.xml","TMessagesProj/src/main/res/values/flexygram_header.xml","TMessagesProj/src/main/res/values/flexygram_music.xml"])
 PATHS = PATHS | PRODUCTION
+
+from alpha1275_contract import paths as alpha1275_paths
+PATHS = PATHS | alpha1275_paths() | frozenset(['tools/connected_alpha/alpha1275_contract.py','tools/connected_alpha/alpha1275.patch'])

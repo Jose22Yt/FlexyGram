@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="FlexySkinClassic">Классический Flexy</string>
+    <string name="FlexySkinElevated">Объёмный 3D</string>
+    <string name="FlexySkinFine">Тонкий контур</string>
+    <string name="FlexySkinFloating">Парящий</string>
     <string name="FlexyBubblesTitle">Пузыри сообщений</string>
     <string name="FlexyBubblesGlass">Стеклянные пузыри</string>
     <string name="FlexyBubblesTransparency">Прозрачность</string>

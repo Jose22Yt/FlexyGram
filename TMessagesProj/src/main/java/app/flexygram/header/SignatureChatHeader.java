@@ -56,8 +56,9 @@ public final class SignatureChatHeader {
         subtitleFits = true;
         titlePx = Math.min(titlePx, height - AndroidUtilities.dp(8));
         int content = Math.max(nativeHeight, Math.round(height) + AndroidUtilities.dp(12));
-        float digits = HeaderConfig.counter() && count > 0 ? countView.getPaint().measureText(number) : 0;
-        geometry.update(width, status + (content - height) / 2f, height, digits, AndroidUtilities.density, LocaleController.isRTL, HeaderConfig.counterMode());
+        float titleWidth = avatar.signaturePreferredTitleWidth(titlePx, subtitlePx, textMetrics);
+        geometry.update(width, status + (content - height) / 2f, height, 0,
+                AndroidUtilities.density, LocaleController.isRTL, 0, titleWidth);
         return content;
     }
     public void measureControls() {
@@ -66,7 +67,7 @@ public final class SignatureChatHeader {
             bar.backButtonImageView.measure(exact(Math.max(AndroidUtilities.dp(48), geometry.back.width())), exact(Math.max(AndroidUtilities.dp(48), height)));
             countView.measure(exact(geometry.countVisible ? geometry.badge.width() : 0), exact(geometry.separateCount ? geometry.badge.height() : height));
         }
-        countView.setVisibility(active() && geometry.countVisible ? View.VISIBLE : View.GONE);
+        countView.setVisibility(View.GONE);
     }
     public void layoutControls() {
         if (bar.backButtonImageView == null) return;
@@ -83,7 +84,7 @@ public final class SignatureChatHeader {
             float y = geometry.separateCount ? geometry.badge.top : geometry.back.top;
             countView.layout(Math.round(x), Math.round(y), Math.round(x + countView.getMeasuredWidth()), Math.round(y + countView.getMeasuredHeight()));
             back.setUnread(0);
-            back.setContentDescription(LocaleController.getString(R.string.AccDescrGoBack) + (count >= 0 && HeaderConfig.counter() ? ", " + LocaleController.formatString(R.string.FlexyHeaderUnread, count) : ""));
+            back.setContentDescription(LocaleController.getString(R.string.AccDescrGoBack));
             avatar.setTranslationX(0);
         } else { bar.backButtonImageView.setPadding(AndroidUtilities.dp(1), 0, 0, 0); }
         countView.setTextColor(Theme.getColor(Theme.key_actionBarDefaultTitle, provider));

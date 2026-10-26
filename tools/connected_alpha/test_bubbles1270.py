@@ -28,9 +28,10 @@ class BubbleReleaseTests(unittest.TestCase):
    except ValueError: continue
    self.assertNotEqual(restored,expected)
  def test_home2_production_delta_is_exact_work2_without_version_or_workflow_rollback(self):
+  from alpha1275_contract import restore as restore_alpha1275
   for path in ('app/flexygram/home/SignatureHomePainter.java','app/flexygram/home/SignatureHomeStyle.java','app/flexygram/home/SignatureHomeTint.java','org/telegram/ui/Components/FilterTabsView.java'):
    path='TMessagesProj/src/main/java/'+path
-   self.assertEqual((ROOT/path).read_bytes(),subprocess.check_output(['git','show','cb2c98234aa7e88550853d54132e52d629b2674f:'+path],cwd=ROOT))
+   self.assertEqual(restore_alpha1275(path,(ROOT/path).read_bytes()),subprocess.check_output(['git','show','cb2c98234aa7e88550853d54132e52d629b2674f:'+path],cwd=ROOT))
  def test_glass_uses_native_path_shared_wallpaper_and_restores_shared_drawable(self):
   m=read1270('TMessagesProj/src/main/java/org/telegram/ui/ActionBar/MessageDrawable.java')
   cell=(JAVA/'org/telegram/ui/Cells/ChatMessageCell.java').read_text()

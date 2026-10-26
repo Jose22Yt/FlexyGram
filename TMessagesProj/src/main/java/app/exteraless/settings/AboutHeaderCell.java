@@ -1,6 +1,7 @@
 package app.exteraless.settings;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.text.TextUtils;
 import android.graphics.Canvas;
@@ -21,6 +22,7 @@ import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.Theme;
+import org.telegram.ui.LauncherIconController;
 import org.telegram.ui.Components.LayoutHelper;
 
 /**
@@ -41,6 +43,41 @@ public class AboutHeaderCell extends LinearLayout {
     /** Путь формы логотипа. Считается один раз, сбрасывается при смене режима. */
     private Path shapePath;
     private final ImageView logo;
+    private final SharedPreferences launcherPrefs;
+    private final SharedPreferences.OnSharedPreferenceChangeListener iconListener =
+            (prefs, key) -> { if ("selected".equals(key)) refreshLauncherIcon(); };
+
+    private void refreshLauncherIcon() {
+        LauncherIconController.LauncherIcon selected = null;
+        String remembered = launcherPrefs.getString("selected", "");
+        try {
+            LauncherIconController.LauncherIcon requested = LauncherIconController.LauncherIcon.valueOf(remembered);
+            if (LauncherIconController.isEnabled(requested)) selected = requested;
+        } catch (IllegalArgumentException ignored) { }
+        for (LauncherIconController.LauncherIcon candidate : LauncherIconController.LauncherIcon.values()) {
+            if (selected == null && LauncherIconController.isEnabled(candidate)) { selected = candidate; break; }
+        }
+        if (selected == null) selected = LauncherIconController.LauncherIcon.EXTERALESS;
+        try {
+            logo.setImageDrawable(getContext().getPackageManager().getActivityIcon(selected.getComponentName(getContext())));
+            logo.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+        } catch (android.content.pm.PackageManager.NameNotFoundException ignored) {
+            logo.setImageResource(R.drawable.flexygram_brand);
+        }
+    }
+    @Override protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        launcherPrefs.registerOnSharedPreferenceChangeListener(iconListener);
+        refreshLauncherIcon();
+    }
+    @Override protected void onDetachedFromWindow() {
+        launcherPrefs.unregisterOnSharedPreferenceChangeListener(iconListener);
+        super.onDetachedFromWindow();
+    }
+    @Override public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) refreshLauncherIcon();
+    }
 
     private Path shapePath() {
         if (shapePath == null) {
@@ -51,6 +88,7 @@ public class AboutHeaderCell extends LinearLayout {
 
     public AboutHeaderCell(Context context) {
         super(context);
+        launcherPrefs = context.getSharedPreferences("flexy_launcher", Context.MODE_PRIVATE);
         setOrientation(VERTICAL);
         setGravity(Gravity.CENTER);
 

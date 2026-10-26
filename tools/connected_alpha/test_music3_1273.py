@@ -6,8 +6,9 @@ BASE='340cd323f5f5809abc746507b2e252da71298720'
 PLAYER='TMessagesProj/src/main/java/app/exteraless/player/'
 class Music3(unittest.TestCase):
  def test_native_audio_compact_players_and_preview_fix_are_unchanged(self):
+  from alpha1275_contract import restore as restore_alpha1275
   for p in ['TMessagesProj/src/main/java/org/telegram/messenger/'+x+'.java'for x in ['MediaController','MusicPlayerService']]+[PLAYER+x+'.java'for x in ['PlayerMiniView','PlayerBarView','SignatureMusicBubble','SignatureMusicHost','LyricsView','LyricsFill']]+['TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java','TMessagesProj/src/main/java/org/telegram/ui/DialogsActivity.java']:
-   self.assertEqual((ROOT/p).read_bytes(),subprocess.check_output(['git','show',BASE+':'+p],cwd=ROOT),p)
+   self.assertEqual(restore_alpha1275(p,(ROOT/p).read_bytes()),subprocess.check_output(['git','show',BASE+':'+p],cwd=ROOT),p)
  def test_seek_actions_and_playback_transport_handlers_are_native(self):
   from test_signature_matte import body
   p=PLAYER+'PlayerSheet.java';before=subprocess.check_output(['git','show',BASE+':'+p],cwd=ROOT,text=True);after=(ROOT/p).read_text()

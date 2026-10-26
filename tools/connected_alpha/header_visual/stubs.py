@@ -15,7 +15,7 @@ def write_stubs(source,root):
  folder=root/'TMessagesProj/src/main/java/app/flexygram/header'
  for name in ['HeaderConfig','HeaderGeometry','HeaderSurface','SignatureChatHeader','HeaderPreviewView']:put('app/flexygram/header/'+name+'.java',(folder/(name+'.java')).read_text())
  actual=(root/'TMessagesProj/src/main/java/org/telegram/ui/Components/ChatAvatarContainer.java').read_text()
- avatar_methods='\n'.join(body(actual,a)for a in ['public void setSignatureHeader(', 'private boolean signatureActive(', 'private void measureSignature(', 'private void layoutSignature('])
+ avatar_methods='\n'.join(body(actual,a)for a in ['public void setSignatureHeader(', 'private boolean signatureActive(', 'public float signaturePreferredTitleWidth(', 'private void measureSignature(', 'private void layoutSignature('])
  code='\n'.join((folder/(n+'.java')).read_text()for n in ['HeaderConfig','HeaderSurface','SignatureChatHeader','HeaderPreviewView'])
  code+='\n'+avatar_methods
  r=source/'org/telegram/messenger/R.java';s=r.read_text();missing=set(re.findall(r'R.string.(\w+)',code))-set(re.findall(r'int (\w+)=',s));s=s.replace('class string {','class string {'+''.join('public static final int '+n+'='+str(1000+i)+';'for i,n in enumerate(sorted(missing))));s=s.replace('public class R {','public class R {public static class drawable {public static int ic_ab_back,ic_ab_other;}');r.write_text(s)
@@ -43,7 +43,7 @@ public class ChatAvatarContainer extends FrameLayout{
  public static class Simple extends TextView{Simple(Context c){super(c);setIncludeFontPadding(false);setSingleLine(true);setEllipsize(android.text.TextUtils.TruncateAt.END);}public void setTextSizePx(int v){setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX,v);}}
  public static class Photo extends ImageView{public int radius;Photo(Context c){super(c);}public void setRoundRadius(int r){radius=r;}@Override protected void onDraw(Canvas c){android.graphics.Paint p=new android.graphics.Paint(3);p.setColor(0xff2288cc);c.drawCircle(getWidth()/2f,getHeight()/2f,getWidth()/2f,p);}}
  private final Simple titleTextView,subtitleTextView;private final Photo avatarImageView;private Simple animatedSubtitleTextView;private View timeItem,communityItem,starBgItem,starFgItem;
- public ChatAvatarContainer(Context c){super(c);titleTextView=new Simple(c);titleTextView.setText("A long contact name");titleTextView.setPadding(0,dp(6),0,dp(12));subtitleTextView=new Simple(c);subtitleTextView.setText("online");avatarImageView=new Photo(c);addView(titleTextView);addView(subtitleTextView);addView(avatarImageView);setOnClickListener(v->profiles++);avatarImageView.setOnClickListener(v->profiles++);}
+ public ChatAvatarContainer(Context c){super(c);titleTextView=new Simple(c);titleTextView.setText("A long contact name");titleTextView.setPadding(0,dp(6),0,dp(12));subtitleTextView=new Simple(c);subtitleTextView.setText("online");avatarImageView=new Photo(c);addView(titleTextView);addView(subtitleTextView);addView(avatarImageView);setOnClickListener(v->profiles++);avatarImageView.setOnClickListener(v->menus++);}
  private View getSubtitleTextView(){return subtitleTextView;}private int getThemedColor(int key){return Theme.getColor(key,null);}protected void onSignatureOptionsClick(){menus++;}
  @Override protected void onMeasure(int w,int h){if(signatureActive()){measureSignature(w,h);return;}super.onMeasure(w,h);}
  @Override protected void onLayout(boolean c,int l,int t,int r,int b){if(signatureActive())layoutSignature();else super.onLayout(c,l,t,r,b);}

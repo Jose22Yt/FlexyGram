@@ -853,20 +853,26 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
     protected void onSignatureOptionsClick() { }
     public void setSignatureHeader(app.flexygram.header.SignatureChatHeader header) {
         signatureHeader = header;
-        if (signatureMore == null) {
-            signatureMore = new android.widget.ImageView(getContext());
-            signatureMore.setScaleType(android.widget.ImageView.ScaleType.CENTER);
-            signatureMore.setImageResource(R.drawable.ic_ab_other);
-            signatureMore.setContentDescription(getString(R.string.AccDescrMoreOptions));
-            signatureMore.setOnClickListener(v -> onSignatureOptionsClick());
-            addView(signatureMore);
+        if (header != null) {
+            if (signatureMore != null) signatureMore.setVisibility(GONE);
+            requestLayout();
+            return;
         }
         requestLayout();
     }
     private boolean signatureActive() { return signatureHeader != null && signatureHeader.active(); }
+    public float signaturePreferredTitleWidth(float titlePx, float subtitlePx, android.graphics.Paint measure) {
+        CharSequence title = titleTextView.getText();
+        measure.setTextSize(titlePx);
+        float titleWidth = title == null ? 0 : measure.measureText(title.toString());
+        CharSequence status = subtitleTextView == null ? null : subtitleTextView.getText();
+        measure.setTextSize(subtitlePx);
+        float statusWidth = status == null ? 0 : measure.measureText(status.toString());
+        return Math.max(titleWidth, statusWidth) + dp(24);
+    }
     private void measureSignature(int widthMeasureSpec, int heightMeasureSpec) {
         int width = MeasureSpec.getSize(widthMeasureSpec);
-        int textWidth = Math.max(0, Math.round(signatureHeader.geometry.title.width()) - dp(64));
+        int textWidth = Math.max(0, Math.round(signatureHeader.geometry.title.width()) - dp(24));
         titleTextView.setTextSizePx(Math.round(signatureHeader.titlePx));
         // Classic title padding (6 + 12 dp) is outside the Signature text block.
         titleTextView.setPadding(0, 0, 0, 0);
@@ -879,8 +885,7 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
         int photo = Math.max(1, Math.round(signatureHeader.height) - dp(2));
         avatarImageView.measure(MeasureSpec.makeMeasureSpec(photo, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(photo, MeasureSpec.EXACTLY));
         avatarImageView.setRoundRadius(photo / 2);
-        signatureMore.measure(MeasureSpec.makeMeasureSpec(dp(32), MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(Math.round(signatureHeader.height), MeasureSpec.EXACTLY));
-        signatureMore.setColorFilter(getThemedColor(Theme.key_actionBarDefaultTitle));
+        if (signatureMore != null) signatureMore.measure(MeasureSpec.makeMeasureSpec(dp(32), MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(Math.round(signatureHeader.height), MeasureSpec.EXACTLY));
         if (timeItem != null) timeItem.measure(MeasureSpec.makeMeasureSpec(dp(34), MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(dp(34), MeasureSpec.EXACTLY));
         if (communityItem != null) communityItem.measure(MeasureSpec.makeMeasureSpec(dp(14), MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(dp(14), MeasureSpec.EXACTLY));
         if (starBgItem != null) starBgItem.measure(MeasureSpec.makeMeasureSpec(dp(20), MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(dp(20), MeasureSpec.EXACTLY));
@@ -900,7 +905,7 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
         x = Math.round(title.centerX() - subtitle.getMeasuredWidth() / 2f);
         subtitle.layout(x, textY + th + dp(2), x + subtitle.getMeasuredWidth(), textY + th + dp(2) + sh);
         x = LocaleController.isRTL ? Math.round(title.left) + dp(2) : Math.round(title.right) - dp(34);
-        signatureMore.layout(x, Math.round(title.top), x + dp(32), Math.round(title.bottom));
+        if (signatureMore != null) signatureMore.layout(x, Math.round(title.top), x + dp(32), Math.round(title.bottom));
         if (timeItem != null) { int tx = Math.round(a.left) - dp(6), ty = Math.round(a.top) - dp(4); timeItem.layout(tx, ty, tx + dp(34), ty + dp(34)); }
         if (communityItem != null) { int tx = Math.round(a.right) - dp(14), ty = Math.round(a.bottom) - dp(14); communityItem.layout(tx, ty, tx + dp(14), ty + dp(14)); }
         int sx = Math.round(a.right) - dp(20), sy = Math.round(a.bottom) - dp(20);
@@ -910,7 +915,7 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        if (signatureMore != null) signatureMore.setVisibility(signatureActive() ? VISIBLE : GONE);
+        if (signatureMore != null) signatureMore.setVisibility(GONE);
         if (signatureActive()) { signatureMeasured = true; measureSignature(widthMeasureSpec, heightMeasureSpec); return; }
         if (signatureMeasured) {
             signatureMeasured = false; titleTextView.setPadding(0, dp(6), 0, dp(12));

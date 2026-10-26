@@ -232,6 +232,17 @@ public class WavySeekBar extends View {
 
     /** Decorative deterministic columns, not measured audio. Only progress/touch invalidates this track. */
     private void drawSignatureColumns(Canvas canvas) {
+        if (BuildConfig.CONNECTED_ALPHA) {
+            float start = left(), end = right(), center = getHeight() / 2f;
+            float at = start + Math.max(0f, Math.min(1f, getProgress())) * Math.max(0, end - start);
+            rect.set(start, center - dp(2), end, center + dp(2));
+            canvas.drawRoundRect(rect, dp(2), dp(2), signatureInactivePaint);
+            rect.right = at;
+            canvas.drawRoundRect(rect, dp(2), dp(2), fillPaint);
+            rect.set(at - dp(7), center - dp(7), at + dp(7), center + dp(7));
+            canvas.drawOval(rect, fillPaint);
+            return;
+        }
         float center = getHeight() / 2f, start = left(), end = right();
         float at = start + Math.max(0f, Math.min(1f, getProgress())) * Math.max(0, end - start);
         float step = dp(6), thickness = Math.max(1, dp(3));

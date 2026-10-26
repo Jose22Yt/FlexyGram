@@ -13,8 +13,9 @@ class HeaderTests(unittest.TestCase):
    subprocess.run(['java','-m','jdk.compiler/com.sun.tools.javac.Main','-d',tmp,str(p/'android/graphics/RectF.java'),str(ROOT/(HEADER+'HeaderGeometry.java')),str(p/'Geometry.java')],check=True,capture_output=True)
    result=subprocess.run(['java','-cp',tmp,'Geometry'],check=True,capture_output=True,text=True);self.assertIn('1920',result.stdout)
  def test_p0_engine_auth_and_compact_music_are_preserved(self):
+  from alpha1275_contract import restore as restore_alpha1275
   for p in ['TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java','TMessagesProj/src/main/java/org/telegram/ui/DialogsActivity.java','TMessagesProj/src/main/java/org/telegram/ui/LoginActivity.java','TMessagesProj/src/main/java/org/telegram/messenger/MediaController.java','TMessagesProj/src/main/java/app/exteraless/player/SignatureMusicBubble.java']:
-   self.assertEqual((ROOT/p).read_bytes(),subprocess.check_output(['git','show',BASE+':'+p],cwd=ROOT),p)
+   self.assertEqual(restore_alpha1275(p,(ROOT/p).read_bytes()),subprocess.check_output(['git','show',BASE+':'+p],cwd=ROOT),p)
  def test_real_cached_source_counter_and_existing_navigation_handlers(self):
   from test_signature_matte import body
   chat=(ROOT/'TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java').read_text()

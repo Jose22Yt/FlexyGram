@@ -1378,6 +1378,14 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         @Override
         public boolean onInterceptTouchEvent(MotionEvent ev) {
             int action = ev.getActionMasked();
+            if (BuildConfig.CONNECTED_ALPHA && action == MotionEvent.ACTION_DOWN
+                    && tabsAnimationInProgress && tabsAnimation != null && filterTabsView != null
+                    && ev.getY() >= filterTabsView.getY()
+                    && ev.getY() <= filterTabsView.getY() + filterTabsView.getHeight()) {
+                // Let a new folder tap reach the tab strip. The native end callback
+                // commits the old swipe and restores its view/adapter state once.
+                tabsAnimation.end();
+            }
             if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
                 if (actionBar.isActionModeShowed()) {
                     allowMoving = true;

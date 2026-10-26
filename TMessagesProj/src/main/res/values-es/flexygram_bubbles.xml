@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="FlexySkinClassic">Clásico Flexy</string>
+    <string name="FlexySkinElevated">Elevado 3D</string>
+    <string name="FlexySkinFine">Contorno fino</string>
+    <string name="FlexySkinFloating">Flotante</string>
     <string name="FlexyBubblesTitle">Burbujas de chat</string>
     <string name="FlexyBubblesGlass">Burbujas de cristal</string>
     <string name="FlexyBubblesTransparency">Transparencia</string>

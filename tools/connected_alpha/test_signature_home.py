@@ -43,9 +43,10 @@ class SignatureHomeTests(unittest.TestCase):
         self.assertNotEqual(hashlib.sha256(result).hexdigest(),expected)
 
     def test_original_search_menu_back_and_filter_actions_unchanged(self):
+        from alpha1275_contract import restore as restore_alpha1275
         for path, anchor, expected in BEHAVIOR_PINS:
             with self.subTest(anchor=anchor):
-                actual = body((ROOT/path).read_text(), anchor)
+                actual = body(restore_alpha1275(path,(ROOT/path).read_bytes()).decode(), anchor)
                 self.assertEqual(hashlib.sha256(actual.encode()).hexdigest(), expected)
 
     def test_home_scope_and_native_special_states(self):

@@ -30,7 +30,11 @@ def restore_delivery(path,data):
  from stabilization_contract import restore1271
  return reverse_patch(path,restore1271(path,data),'direct_delivery.patch')
 def reviewed_work1(path):
- data=restore_preview(path,restore_delivery(path,(ROOT/path).read_bytes()))
+ # Sparse local checkouts can omit untouched JNI sources; CI checks out the
+ # complete tree. A missing local file is read from this exact HEAD object.
+ source=ROOT/path
+ actual=source.read_bytes() if source.exists() else subprocess.check_output(['git','show','HEAD:'+path],cwd=ROOT)
+ data=restore_preview(path,restore_delivery(path,actual))
  from login_parity import PATCH_PATHS,restore_login_presentation
  if path in PATCH_PATHS:data=restore_login_presentation(path,data)
  return data
