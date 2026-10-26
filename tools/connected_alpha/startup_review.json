@@ -6,7 +6,7 @@
     "TMessagesProj/src/main/java/org/telegram/messenger/MessagesStorage.java": "27b7f1edc02438c5f47790e2658d1e0dbc7f70eadb4ba94dcf41cc7212118db5",
     "TMessagesProj/src/main/java/org/telegram/ui/LaunchActivity.java": "a13f3ee832ad2da61f9a1defa42a3ed573363ad870428081c1f581623ee4d1b4",
     "TMessagesProj/src/main/java/org/telegram/ui/DialogsActivity.java": "53d99c1341b869ee4519b918bd77dca8cdd72bbe090988d954fedf89263a247e",
-    "tools/connected_alpha/startup_contract.py": "9c858c5d5a9cc19ad0c911c0008e7de52460fb2a65dd57690d64cd4ef0a96e61",
+    "tools/connected_alpha/startup_contract.py": "48929e91d23c1e797acef4309885492d1c0c3478732f337242fd69dbcdbbb071",
     "tools/connected_alpha/files_completion_contract.py": "6e46c225c9179e2379cc462a563a7476a8b7fcc099857e0d45d92e083877b253",
     "tools/connected_alpha/test_startup.py": "d4ee589a3e781e2abf02c1f4690931db0ffcba5454901b77095e435f64167633",
     "tools/connected_alpha/prepare_startup.py": "89bc975c5ef86a43f9232aa0ea5a05d8750290c66614ab658147dd7363dbc0b0",
