@@ -11,10 +11,10 @@ import urllib.parse
 import urllib.request
 
 REPO = 'Jose22Yt/FlexyGram'
-SOURCE = '1b225c7aad951be6452d69f481957ced31bcb46f'
+SOURCE = '274cf11a5ddda2518d11cdc9a6ee2e93ca2cf608'
 CERT = 'c8f04cad685ca5757d35b25ea4b0b4613c7399909948d821e6ada61f9fb12b2c'
 APP = 'io.github.jose22yt.flexygram.alpha'
-NAME = 'FlexyGram_Alpha_1276_Startup_ARM64_TEST.apk'
+NAME = 'FlexyGram_Alpha_1276_ARM64_TEST.apk'
 API = 'https://api.github.com/repos/' + REPO
 
 
@@ -138,9 +138,9 @@ def preflight(client, directory):
     # authenticated roundtrip and two independent anonymous denial checks.
     run = os.environ['GITHUB_RUN_ID'] + '-' + os.environ['GITHUB_RUN_ATTEMPT']
     release = client.json('/releases', method='POST', data={
-        'tag_name': 'alpha1276-startup-private-' + run,
+        'tag_name': 'alpha1276-universal-private-' + run,
         'target_commitish': SOURCE,
-        'name': 'FlexyGram Alpha 1276 Startup checkpoint — PRIVATE TEST ' + run,
+        'name': 'FlexyGram Alpha 1276 Universal Signature — PRIVATE TEST ' + run,
         'body': 'PRIVATE UNPUBLISHED TEST DELIVERY. Keep draft. Approved source: ' + SOURCE + '. No APK transferred yet.',
         'draft': True, 'prerelease': True, 'make_latest': 'false'})
     rid = int(release['id'])
@@ -161,7 +161,7 @@ def deliver(client, rid, apk, report_path):
     release = client.draft(rid)
     # Preserve the verifier evidence privately too. If the network fails after an
     # upload, the unpublished assets survive runner cleanup and can be rechecked.
-    client.upload(rid, report_path, 'FlexyGram_Alpha_1276_Startup_verificacion.json')
+    client.upload(rid, report_path, 'FlexyGram_Alpha_1276_verificacion.json')
     asset = client.upload(rid, apk, NAME)
     proof = dict(source_commit=SOURCE, sha256=sha, bytes=size, release_id=rid, asset_id=asset['id'],
                  private_download_url=asset['browser_download_url'], draft_url=release['html_url'],

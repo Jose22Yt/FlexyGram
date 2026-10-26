@@ -1,4 +1,4 @@
-name: Alpha 1276 Startup checkpoint private signed delivery
+name: Alpha 1276 Universal Signature private signed delivery
 
 on:
   push:
@@ -12,7 +12,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: private-alpha1276-startup-${{ github.sha }}
+  group: private-alpha1276-universal-${{ github.sha }}
   cancel-in-progress: false
 
 jobs:
@@ -22,7 +22,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: 1b225c7aad951be6452d69f481957ced31bcb46f
+          ref: 274cf11a5ddda2518d11cdc9a6ee2e93ca2cf608
           fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-java@v4
@@ -169,11 +169,11 @@ jobs:
         working-directory: approved
     env:
       NATIVE_TARGET: arm64-v8a
-      COMMIT_ID: 1b225c7aad951be6452d69f481957ced31bcb46f
+      COMMIT_ID: 274cf11a5ddda2518d11cdc9a6ee2e93ca2cf608
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: 1b225c7aad951be6452d69f481957ced31bcb46f
+          ref: 274cf11a5ddda2518d11cdc9a6ee2e93ca2cf608
           path: approved
           fetch-depth: 0
           submodules: recursive
@@ -185,7 +185,7 @@ jobs:
           sparse-checkout: tools/private_alpha1274
           persist-credentials: false
       - name: Require the exact approved application commit
-        run: test "$(git rev-parse HEAD)" = 1b225c7aad951be6452d69f481957ced31bcb46f
+        run: test "$(git rev-parse HEAD)" = 274cf11a5ddda2518d11cdc9a6ee2e93ca2cf608
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
