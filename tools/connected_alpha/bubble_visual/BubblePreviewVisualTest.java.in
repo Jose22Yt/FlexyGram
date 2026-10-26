@@ -59,6 +59,12 @@ public class BubblePreviewVisualTest {
   Theme.wallpaper=new ColorDrawable(Color.GREEN);preview.didReceivedNotification(NotificationCenter.didSetNewWallpapper,0);measure(preview);preview.draw(new Canvas(bitmap));
   assertEquals(Color.BLUE,bitmap.getPixel(12,12));assertEquals(new Rect(3,5,19,29),chat.getBounds());bitmap.recycle();
  }
+ @Test public void defaultMovingPaletteHasAStillPreviewBeforeItsFirstFrame(){
+  var moving=new org.telegram.ui.Components.MotionBackgroundDrawable(){@Override public int[] getColors(){return new int[]{0xffcc2244,0xff2244cc,0,0};}};
+  View target=new View(ApplicationLoader.applicationContext);var helper=new app.flexygram.preview.SignatureWallpaperPreview(target,moving,()->{});
+  helper.attach();helper.resize(100,100);assertNotNull(helper.drawable());assertEquals(0,Utilities.globalQueue.pending());
+  Bitmap bitmap=Bitmap.createBitmap(100,100,Bitmap.Config.ARGB_8888);helper.draw(new Canvas(bitmap));assertNotEquals(bitmap.getPixel(5,5),bitmap.getPixel(95,95));helper.close();bitmap.recycle();
+ }
  @Test public void movingWallpaperIsFrozenOnceOffUiAndReleasedWithoutRecyclingOriginal()throws Exception{
   Bitmap original=Bitmap.createBitmap(1024,768,Bitmap.Config.ARGB_8888);original.eraseColor(Color.BLUE);
   org.telegram.ui.Components.MotionBackgroundDrawable moving=new org.telegram.ui.Components.MotionBackgroundDrawable(){@Override public Bitmap getBitmap(){return original;}};

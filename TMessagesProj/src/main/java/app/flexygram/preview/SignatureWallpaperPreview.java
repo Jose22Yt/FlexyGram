@@ -6,6 +6,8 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.GradientDrawable;
 import android.view.View;
 import java.lang.ref.WeakReference;
 import org.telegram.messenger.AndroidUtilities;
@@ -48,6 +50,19 @@ public final class SignatureWallpaperPreview {
         Bitmap frame = source instanceof MotionBackgroundDrawable ? ((MotionBackgroundDrawable) source).getBitmap()
                 : source instanceof AnimatedFileDrawable ? ((AnimatedFileDrawable) source).getAnimatedBitmap()
                 : shade > 0 && source instanceof BitmapDrawable ? ((BitmapDrawable) source).getBitmap() : null;
+        if (source instanceof MotionBackgroundDrawable && (frame == null || frame.isRecycled())) {
+            // A default animated gradient may not have rendered a frame yet. Its native
+            // palette still provides an appropriate static representation without starting it.
+            int[] palette = ((MotionBackgroundDrawable) source).getColors();
+            int count = 0;
+            for (int color : palette) if (color != 0) count++;
+            int[] colors = new int[count];
+            int i = 0;
+            for (int color : palette) if (color != 0) colors[i++] = color;
+            publish(count > 1 ? new GradientDrawable(GradientDrawable.Orientation.TL_BR, colors)
+                    : count == 1 ? new ColorDrawable(colors[0]) : null, null);
+            return;
+        }
         if (source instanceof MotionBackgroundDrawable || source instanceof AnimatedFileDrawable || shade > 0) {
             // Freeze one bounded frame off the UI thread; never attach or start the source renderer.
             publish(null, null);
