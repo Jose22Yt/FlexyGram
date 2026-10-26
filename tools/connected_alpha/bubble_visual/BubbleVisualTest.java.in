@@ -21,6 +21,41 @@ public class BubbleVisualTest {
   BuildConfig.CONNECTED_ALPHA=true;Theme.dark=false;
   BubbleConfig.load(); SharedConfig.bubbleRadius=20; AndroidUtilities.density=1; ChatsConfig.removeMessageTail.value=false;
  }
+ @Test public void sixOrganicBordersAndBothGlassFinishesRemainInsideNativeSilhouette() {
+  BubbleConfig.setTransparency(100);
+  for(boolean out:new boolean[]{false,true})for(int style:new int[]{1,2}){
+   BubbleConfig.setOutlineStyle(style);
+   MessageDrawable bubble=new MessageDrawable(MessageDrawable.TYPE_TEXT,out,false);
+   bubble.setBounds(4,4,164,84);bubble.setTop(0,180,100,false,false);
+   MessageDrawable.PathDrawParams cache=new MessageDrawable.PathDrawParams();
+   Bitmap bitmap=Bitmap.createBitmap(180,100,Bitmap.Config.ARGB_8888);Canvas canvas=new Canvas(bitmap);
+   int full=0;
+   for(int mode:new int[]{5,0,1,2,3,4})for(boolean fuse:new boolean[]{false,true}){
+    BubbleConfig.setBorderPosition(mode);BubbleConfig.setFuseGlass(fuse);
+    bitmap.eraseColor(Color.TRANSPARENT);bubble.drawCached(canvas,cache);
+    int count=0;for(int y=0;y<100;y++)for(int x=0;x<180;x++){
+     if(Color.alpha(bitmap.getPixel(x,y))>0){count++;assertTrue(x>=3&&x<=165&&y>=3&&y<=85);}
+    }
+    assertEquals(0,Color.alpha(bitmap.getPixel(80,40)));
+    if(mode==0)assertEquals(0,count);else assertTrue(count>0);
+    if(mode==5&&!fuse)full=count;
+    if(mode>0&&mode<5&&!fuse)assertTrue(count<full);
+    Bitmap repeated=Bitmap.createBitmap(180,100,Bitmap.Config.ARGB_8888);
+    bubble.drawCached(new Canvas(repeated),cache);assertTrue(bitmap.sameAs(repeated));repeated.recycle();
+   }
+   bitmap.recycle();
+  }
+ }
+ @Test public void retiredSkinPreferenceDoesNotAlterTheOriginalBubble() {
+  Bitmap reference=null;
+  for(int skin:new int[]{0,1,3,5,9}){
+   ApplicationLoader.applicationContext.getSharedPreferences(BubbleConfig.FILE,0).edit().putInt("signature_skin",skin).commit();BubbleConfig.load();
+   MessageDrawable bubble=new MessageDrawable(MessageDrawable.TYPE_TEXT,false,false);bubble.setBounds(4,4,164,84);bubble.setTop(0,180,100,false,false);
+   Bitmap bitmap=Bitmap.createBitmap(180,100,Bitmap.Config.ARGB_8888);bubble.draw(new Canvas(bitmap));
+   if(reference==null)reference=bitmap;else{assertTrue(reference.sameAs(bitmap));bitmap.recycle();}
+  }
+  reference.recycle();
+ }
  @Test public void nativePathsAndNinePatchLightDarkBothDirections() {
   BuildConfig.CONNECTED_ALPHA=false;
   Bitmap image=Bitmap.createBitmap(640,1000,Bitmap.Config.ARGB_8888);Canvas canvas=new Canvas(image);

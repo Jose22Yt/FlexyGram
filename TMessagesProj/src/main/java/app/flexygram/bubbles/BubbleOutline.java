@@ -14,6 +14,12 @@ public final class BubbleOutline {
     public static int color(int base, boolean dark, int style, int intensity) {
         int r=(base>>>16)&255,g=(base>>>8)&255,b=base&255;
         int luminance=(r*299+g*587+b*114)/1000;
+        if (style == 2) {
+            int strength = Math.max(0, Math.min(100, intensity));
+            int satin = 14 + strength * 18 / 100;
+            return ((150 + strength * 40 / 100) << 24) | (mix(r, 255, satin) << 16)
+                    | (mix(g, 255, satin) << 8) | mix(b, 255, satin);
+        }
         if (style == 1) {
             int strength=Math.max(0,Math.min(100,intensity));
             int pearl=28+strength*42/100;

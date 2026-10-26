@@ -9,8 +9,8 @@ public final class BubbleConfig {
     public static final String FILE = "flexygram_bubbles";
     public static final String GLASS = "glass", TRANSPARENCY = "transparency", BORDER = "border", EDGES = "edges";
     private static boolean loaded, glass, border, edges, cachedBlur;
-    private static int transparency = 35, borderTenths = 11, outlineStyle, pearlIntensity = 55, skin;
-    private static boolean outlineEnabled = true;
+    private static int transparency = 35, borderTenths = 11, outlineStyle = 1, pearlIntensity = 55, borderPosition = 5;
+    private static boolean outlineEnabled = true, fuseGlass;
     private BubbleConfig() { }
     private static SharedPreferences preferences() {
         return ApplicationLoader.applicationContext.getSharedPreferences(FILE, Context.MODE_PRIVATE);
@@ -18,9 +18,11 @@ public final class BubbleConfig {
     public static void load() {
         SharedPreferences p = preferences();
         outlineEnabled = p.getBoolean("signature_outline_enabled", true);
-        outlineStyle = Math.max(0, Math.min(1, p.getInt("signature_outline_style", 0)));
+        outlineStyle = Math.max(1, Math.min(2, p.getInt("signature_outline_style", 1)));
+        borderPosition = Math.max(0, Math.min(5, p.getInt("signature_border_position", outlineEnabled ? 5 : 0)));
+        fuseGlass = p.getBoolean("signature_fuse_glass", false);
         pearlIntensity = Math.max(0, Math.min(100, p.getInt("signature_pearl_intensity", 55)));
-        skin = sanitizeSkin(p.getInt("signature_skin", 0));
+        // Retired signature_skin preferences remain stored and have no rendering effect.
         cachedBlur = p.getBoolean("signature_cached_blur", false);
         borderTenths = Math.max(5, Math.min(20, p.getInt("signature_border_tenths", 11)));
         glass = p.getBoolean(GLASS, false); border = p.getBoolean(BORDER, false);
@@ -36,20 +38,26 @@ public final class BubbleConfig {
         cachedBlur = value;
         preferences().edit().putBoolean("signature_cached_blur", value).apply();
     }
-    public static boolean outlineEnabled() { return outlineEnabled; }
+    public static boolean outlineEnabled() { return borderPosition != 0; }
     public static int outlineStyle() { return outlineStyle; }
     public static int pearlIntensity() { return pearlIntensity; }
-    private static int sanitizeSkin(int value) { return value == 1 || value == 3 || value == 5 || value == 9 ? value : 0; }
-    public static int skin() { return skin; }
-    public static void setSkin(int value) {
+    public static int skin() { return 0; }
+    public static void setSkin(int value) { }
+    public static int borderPosition() { return borderPosition; }
+    public static void setBorderPosition(int value) {
         if (!loaded) load();
-        value = sanitizeSkin(value);
-        if (skin == value) return;
-        skin = value;
-        preferences().edit().putInt("signature_skin", value).apply();
+        value = Math.max(0, Math.min(5, value));
+        if (borderPosition == value) return;
+        borderPosition = value;
+        preferences().edit().putInt("signature_border_position", value).apply();
     }
-    public static void setOutlineEnabled(boolean value) { if (!loaded) load(); outlineEnabled = value; preferences().edit().putBoolean("signature_outline_enabled", value).apply(); }
-    public static void setOutlineStyle(int value) { if (!loaded) load(); outlineStyle = Math.max(0, Math.min(1, value)); preferences().edit().putInt("signature_outline_style", outlineStyle).apply(); }
+    public static boolean fuseGlass() { return fuseGlass; }
+    public static void setFuseGlass(boolean value) {
+        if (!loaded) load(); if (value == fuseGlass) return;
+        fuseGlass = value; preferences().edit().putBoolean("signature_fuse_glass", value).apply();
+    }
+    public static void setOutlineEnabled(boolean value) { if (!loaded) load(); outlineEnabled = value; borderPosition = value ? 5 : 0; preferences().edit().putBoolean("signature_outline_enabled", value).apply(); }
+    public static void setOutlineStyle(int value) { if (!loaded) load(); outlineStyle = Math.max(1, Math.min(2, value)); preferences().edit().putInt("signature_outline_style", outlineStyle).apply(); }
     public static void setPearlIntensity(int value) { if (!loaded) load(); value = Math.max(0, Math.min(100, value)); if (value == pearlIntensity) return; pearlIntensity = value; preferences().edit().putInt("signature_pearl_intensity", value).apply(); }
     public static int transparency() { return transparency; }
     public static int borderTenths() { return borderTenths; }

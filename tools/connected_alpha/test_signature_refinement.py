@@ -9,7 +9,8 @@ class SignatureRefinement(unittest.TestCase):
         for path in REVIEWED:
             with self.subTest(path=path):
                 data = (ROOT / path).read_bytes()
-                before = subprocess.check_output(['git', 'show', BASE + ':' + path], cwd=ROOT)
+                baseline = subprocess.run(['git', 'show', BASE + ':' + path], cwd=ROOT, capture_output=True)
+                before = baseline.stdout if baseline.returncode == 0 else b''
                 self.assertEqual(restore(path, data), before)
                 self.assertEqual(restore(path, before), before)
                 with self.assertRaises(ValueError):
