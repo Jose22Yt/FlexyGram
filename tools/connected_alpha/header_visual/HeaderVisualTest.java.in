@@ -7,7 +7,7 @@ import org.junit.*;import org.junit.runner.RunWith;import org.robolectric.*;impo
 public class HeaderVisualTest {
  private Activity activity;private FrameLayout root;
  @Before public void setup()throws Exception{activity=Robolectric.buildActivity(Activity.class).setup().get();root=new FrameLayout(activity);activity.setContentView(root);ApplicationLoader.applicationContext=activity;activity.getSharedPreferences("flexygram_header",0).edit().clear().commit();activity.getSharedPreferences("appearance",0).edit().clear().commit();HeaderConfig.load();AndroidUtilities.density=1;LocaleController.isRTL=false;Theme.dark=false;}
- private Context context(float font)throws Exception{AssetManager assets=AssetManager.class.getDeclaredConstructor().newInstance();assertTrue((Integer)AssetManager.class.getMethod("addAssetPath",String.class).invoke(assets,System.getProperty("probe.root")+"/resources.ap_")>0);DisplayMetrics m=new DisplayMetrics();m.density=1;m.densityDpi=160;m.scaledDensity=font;Configuration config=new Configuration();config.fontScale=font;Resources r=new Resources(assets,m,config);R.drawable.ic_ab_back=r.getIdentifier("ic_ab_back","drawable","app.flexygram.visualprobe");R.drawable.ic_ab_other=r.getIdentifier("ic_ab_other","drawable","app.flexygram.visualprobe");assertTrue(R.drawable.ic_ab_back!=0&&R.drawable.ic_ab_other!=0);return new ContextWrapper(activity){@Override public Resources getResources(){return r;}};}
+ private Context context(float font)throws Exception{AssetManager assets=AssetManager.class.getDeclaredConstructor().newInstance();assertTrue((Integer)AssetManager.class.getMethod("addAssetPath",String.class).invoke(assets,System.getProperty("probe.root")+"/resources.ap_")>0);DisplayMetrics m=new DisplayMetrics();m.density=1;m.densityDpi=160;m.scaledDensity=font;Configuration config=new Configuration();config.fontScale=font;Resources r=new Resources(assets,m,config);R.drawable.ic_ab_back=r.getIdentifier("ic_ab_back","drawable","app.flexygram.visualprobe");R.drawable.ic_ab_other=r.getIdentifier("ic_ab_other","drawable","app.flexygram.visualprobe");R.drawable.msg_callback=r.getIdentifier("msg_callback","drawable","app.flexygram.visualprobe");assertTrue(R.drawable.ic_ab_back!=0&&R.drawable.ic_ab_other!=0&&R.drawable.msg_callback!=0);return new ContextWrapper(activity){@Override public Resources getResources(){return r;}};}
  private void size(View view,int width){view.measure(View.MeasureSpec.makeMeasureSpec(width,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(0,View.MeasureSpec.UNSPECIFIED));view.layout(0,0,width,view.getMeasuredHeight());}
  private Object field(Object target,String name)throws Exception{var f=target.getClass().getDeclaredField(name);f.setAccessible(true);return f.get(target);}
  private void tap(View parent,float x,float y){MotionEvent down=MotionEvent.obtain(0,0,MotionEvent.ACTION_DOWN,x,y,0),up=MotionEvent.obtain(0,1,MotionEvent.ACTION_UP,x,y,0);parent.dispatchTouchEvent(down);parent.dispatchTouchEvent(up);down.recycle();up.recycle();org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();}
@@ -58,4 +58,43 @@ public class HeaderVisualTest {
   for(int i=0;i<2;i++){Theme.dark=i==1;HeaderPreviewView preview=new HeaderPreviewView(context(1));size(preview,401);canvas.save();canvas.translate(0,i*200);preview.draw(canvas);canvas.restore();assertTrue(preview.getContentDescription().toString().contains("Alex"));HeaderConfig.opacity(0);preview.invalidate();preview.draw(new Canvas(Bitmap.createBitmap(401,200,Bitmap.Config.ARGB_8888)));HeaderConfig.opacity(85);}
   try(var file=new java.io.FileOutputStream(new java.io.File(System.getProperty("probe.root"),"signature-header-synthetic.png"))){assertTrue(image.compress(Bitmap.CompressFormat.PNG,100,file));}
  }
+ @Test public void optionalFusionUsesNativeSizedPartsRoutesActionsAndRestoresAdaptive()throws Exception{
+  HeaderConfig.style(2);Context c=context(1);ActionBar bar=new ActionBar(c);ChatAvatarContainer avatar=new ChatAvatarContainer(c);avatar.callable=true;bar.addView(avatar,0,new FrameLayout.LayoutParams(-1,-1));SignatureChatHeader header=new SignatureChatHeader(bar,avatar,null);bar.setSignatureHeader(header);avatar.setSignatureHeader(header);root.addView(bar);size(bar,401);
+  assertTrue(header.fusionActive());var g=header.fusionGeometry();assertEquals(50,g.center.height(),.01f);assertEquals(46,g.back.height(),.01f);assertEquals(96,g.actions.width(),.01f);assertEquals(46,g.actions.height(),.01f);
+  float backLeft=g.back.left,moreRight=g.more.right;tap(bar,g.back.centerX(),g.back.centerY()+header.fusionTop);assertEquals(1,bar.backs);
+  tap(bar,g.call.centerX(),g.call.centerY()+header.fusionTop);assertEquals(1,avatar.calls);
+  tap(bar,g.more.centerX(),g.more.centerY()+header.fusionTop);assertEquals(1,avatar.menus);
+  tap(bar,g.text.centerX(),g.text.centerY()+header.fusionTop);assertEquals(1,avatar.profiles);
+  tap(bar,g.portrait.centerX(),g.portrait.centerY()+header.fusionTop);assertEquals(2,avatar.profiles);
+  ((TextView)field(avatar,"titleTextView")).setText("Extremely long native name that must stay inside its pill");size(bar,401);assertEquals(backLeft,g.back.left,.01f);assertEquals(moreRight,g.more.right,.01f);
+  avatar.callable=false;size(bar,401);assertEquals(48,g.actions.width(),.01f);assertEquals(View.GONE,((View)field(avatar,"signatureCall")).getVisibility());
+  HeaderConfig.style(0);size(bar,401);assertFalse(header.fusionActive());assertEquals(View.GONE,((View)field(avatar,"signatureMore")).getVisibility());assertEquals(header.geometry.avatar.height(),header.geometry.back.height(),.01f);
+ }
+ @Test public void fusionFallsBackForLargeFontsAndNarrowWindowsWithoutOverlappingControls()throws Exception{
+  HeaderConfig.style(2);for(boolean rtl:new boolean[]{false,true})for(float font:new float[]{1,2,3})for(int width:new int[]{240,320,401}){
+   LocaleController.isRTL=rtl;Context c=context(font);ActionBar bar=new ActionBar(c);ChatAvatarContainer avatar=new ChatAvatarContainer(c);avatar.callable=true;bar.addView(avatar,0,new FrameLayout.LayoutParams(-1,-1));SignatureChatHeader header=new SignatureChatHeader(bar,avatar,null);bar.setSignatureHeader(header);avatar.setSignatureHeader(header);size(bar,width);
+   if(width==240||font>1)assertFalse(header.fusionActive());
+   if(header.fusionActive()){var g=header.fusionGeometry();assertTrue(g.fits);assertTrue(g.text.width()>=48);assertEquals(50,header.height,.01f);}
+   else{assertTrue(header.geometry.title.left>=0);assertTrue(header.geometry.title.right<=width);}
+  }
+ }
+ @Test public void nativeHeaderCancelReleasesPressWithoutOpeningProfile()throws Exception{
+  ChatAvatarContainer avatar=new ChatAvatarContainer(context(1));avatar.searchingAllowed=true;
+  long t=SystemClock.uptimeMillis();MotionEvent down=MotionEvent.obtain(t,t,MotionEvent.ACTION_DOWN,100,40,0),cancel=MotionEvent.obtain(t,t+10,MotionEvent.ACTION_CANCEL,100,40,0);
+  avatar.onTouchEvent(down);avatar.onTouchEvent(cancel);assertEquals(0,avatar.profiles);assertFalse(avatar.pressed);down.recycle();cancel.recycle();
+ }
+ @Test public void realAlphaMaskIsBoundedReusesShaderAndDoesNotFadeTextOrSurfaces()throws Exception{
+  var mask=new app.flexygram.header.fusion.SignatureFusionAvatarMask();Bitmap image=Bitmap.createBitmap(100,60,Bitmap.Config.ARGB_8888);Canvas canvas=new Canvas(image);Paint paint=new Paint(3);paint.setColor(Color.BLUE);
+  for(boolean rtl:new boolean[]{false,true}){
+   image.eraseColor(Color.TRANSPARENT);mask.prepare(40,70,rtl);Object shader=field(mask,"gradient");
+   int save=mask.begin(canvas,0,0,73,50);canvas.drawRect(0,0,73,50,paint);mask.finish(canvas,save,73,50,40,70,rtl);
+   assertTrue(Color.alpha(image.getPixel(rtl?71:5,25))>240);assertTrue(Color.alpha(image.getPixel(rtl?5:71,25))<15);assertEquals(0,Color.alpha(image.getPixel(90,25)));
+   for(int i=0;i<1000;i++)mask.prepare(40,70,rtl);assertSame(shader,field(mask,"gradient"));
+  }
+  image.recycle();
+ }
+ @Test public void defaultAdaptiveAllocatesNoFusionControllerOrControls()throws Exception{
+  HeaderConfig.style(0);ActionBar bar=new ActionBar(context(1));ChatAvatarContainer avatar=new ChatAvatarContainer(bar.getContext());bar.addView(avatar,0,new FrameLayout.LayoutParams(-1,-1));SignatureChatHeader header=new SignatureChatHeader(bar,avatar,null);bar.setSignatureHeader(header);avatar.setSignatureHeader(header);size(bar,401);assertNull(field(header,"fusion"));assertNull(field(avatar,"signatureCall"));assertNull(field(avatar,"signaturePhotoMask"));
+ }
+
 }

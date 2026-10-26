@@ -2,7 +2,7 @@
 <resources>
     <string name="FlexyHeaderTitle">Chat header</string>
     <string name="FlexyHeaderStyle">Style</string>
-    <string name="FlexyHeaderSignature">Signature iOS 27</string>
+    <string name="FlexyHeaderSignature">Signature Adaptive</string>
     <string name="FlexyHeaderClassic">Classic</string>
     <string name="FlexyHeaderCounter">Show unread chat count</string>
     <string name="FlexyHeaderSize">Size</string>
@@ -15,4 +15,5 @@
     <string name="FlexyHeaderCounterIntegrated">Integrated</string>
     <string name="FlexyHeaderCounterBadge">Separate badge</string>
     <string name="FlexyHeaderLastSeenTime">Last seen %1$s</string>
+    <string name="FlexyHeaderFusion">Signature Fusion</string>
 </resources>

@@ -233,7 +233,7 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
 
             @Override
             protected void onDraw(Canvas canvas) {
-                if (allowDrawStories && animatedEmojiDrawable == null && !isCentered()) {
+                if (allowDrawStories && animatedEmojiDrawable == null && !isCentered() && !signatureFusionActive()) {
                     params.originalAvatarRect.set(0, 0, getMeasuredWidth(), getMeasuredHeight());
                     params.drawSegments = true;
                     params.drawInside = true;
@@ -327,7 +327,7 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
                         setPressed(false);
                     }
                 }
-                if (allowDrawStories && !isCentered()) {
+                if (allowDrawStories && !isCentered() && !signatureFusionActive()) {
                     if (params.checkOnTouchEvent(event, this)) {
                         return true;
                     }
@@ -363,6 +363,7 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
                 ScaleStateListAnimator.apply(avatarImageView, .05f, 1.2f);
             }
             avatarImageView.setOnClickListener(v -> {
+                if (signatureFusionActive()) { openProfile(false); return; }
                 if (!onAvatarClick()) {
                     openProfile(true);
                 }
@@ -500,7 +501,7 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
             if (pressed) {
                 bounce.setPressed(false);
                 pressed = false;
-                if (isClickable()) {
+                if (ev.getAction() == MotionEvent.ACTION_UP && isClickable()) {
                     openProfile(false);
                 }
                 AndroidUtilities.cancelRunOnUIThread(this.onLongClick);
@@ -522,10 +523,18 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
         canvas.scale(s, s, getPivotX(), getHeight() - ActionBar.getCurrentActionBarHeight() / 2f);
         super.dispatchDraw(canvas);
         canvas.restore();
+        if (signatureFusionActive()) signatureHeader.drawForeground(canvas);
     }
 
     @Override
     protected boolean drawChild(@NonNull Canvas canvas, View child, long drawingTime) {
+        final boolean fusionPhoto = child == avatarImageView && signatureFusionActive();
+        int fusionSave = 0, fusionLayer = 0;
+        if (fusionPhoto) {
+            fusionSave = canvas.save(); canvas.clipPath(signaturePhotoClip);
+            fusionLayer = signaturePhotoMask.begin(canvas, child.getX(), child.getY(),
+                    child.getX() + child.getWidth(), child.getY() + child.getHeight());
+        }
         final boolean unscaleAvatar = glassMode && isCentered() && (child == avatarImageView || child == timeItem || child == communityItem);
         if (unscaleAvatar) {
             final float scale = bounce.getScale(.02f);
@@ -563,6 +572,13 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
         if (unscaleAvatar) {
             canvas.restore();
         }
+        if (fusionPhoto) {
+            var g = signatureHeader.fusionGeometry();
+            canvas.translate(child.getX(), child.getY());
+            signaturePhotoMask.finish(canvas, fusionLayer, child.getWidth(), child.getHeight(),
+                    g.fadeStartX - g.portrait.left, g.fadeEndX - g.portrait.left, g.rtl);
+            canvas.restoreToCount(fusionSave);
+        }
         return b;
     }
 
@@ -570,6 +586,12 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         if (ignoreTouches) return false;
+        if (signatureFusionActive() && ev.getActionMasked() == MotionEvent.ACTION_DOWN) {
+            var g = signatureHeader.fusionGeometry(); float x = ev.getX(), y = ev.getY() - signatureHeader.fusionTop;
+            boolean center = x >= g.center.left && x <= g.center.right && y >= g.center.top && y <= g.center.bottom;
+            boolean actions = x >= g.actions.left && x <= g.actions.right && y >= g.actions.top && y <= g.actions.bottom;
+            if (!center && !actions) return false;
+        }
         return super.dispatchTouchEvent(ev);
     }
 
@@ -848,11 +870,35 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
     }
 
     private app.flexygram.header.SignatureChatHeader signatureHeader;
-    private android.widget.ImageView signatureMore;
+    private android.widget.ImageView signatureMore, signatureCall;
+    private app.flexygram.header.fusion.SignatureFusionAvatarMask signaturePhotoMask;
+    private android.graphics.Path signaturePhotoClip;
     private boolean signatureMeasured;
+    protected boolean isSignatureCallAvailable() { return false; }
+    protected void onSignatureCallClick() { }
+    public boolean signatureCallAvailable() { return isSignatureCallAvailable(); }
+    private boolean signatureFusionActive() { return signatureHeader != null && signatureHeader.fusionActive(); }
+    private void prepareFusionControls() {
+        if (signatureMore != null) return;
+        signaturePhotoMask = new app.flexygram.header.fusion.SignatureFusionAvatarMask();
+        signaturePhotoClip = new android.graphics.Path();
+        signatureMore = new android.widget.ImageView(getContext()); signatureMore.setImageResource(R.drawable.ic_ab_other);
+        signatureMore.setRotation(90); signatureMore.setScaleType(android.widget.ImageView.ScaleType.CENTER);
+        signatureMore.setContentDescription(getString(R.string.AccDescrMoreOptions));
+        signatureMore.setOnClickListener(v -> onSignatureOptionsClick());
+        signatureCall = new android.widget.ImageView(getContext()); signatureCall.setImageResource(R.drawable.msg_callback);
+        signatureCall.setScaleType(android.widget.ImageView.ScaleType.CENTER);
+        signatureCall.setContentDescription(getString(R.string.Call));
+        signatureCall.setOnClickListener(v -> { if (isSignatureCallAvailable()) onSignatureCallClick(); });
+        signatureMore.setBackground(Theme.createSimpleSelectorRoundRectDrawable(dp(23),0,getThemedColor(Theme.key_listSelector)));
+        signatureCall.setBackground(Theme.createSimpleSelectorRoundRectDrawable(dp(23),0,getThemedColor(Theme.key_listSelector)));
+        addView(signatureMore); addView(signatureCall);
+    }
     protected void onSignatureOptionsClick() { }
     public void setSignatureHeader(app.flexygram.header.SignatureChatHeader header) {
         signatureHeader = header;
+        if (signatureCall != null) signatureCall.setVisibility(GONE);
+        if (signatureMore != null) signatureMore.setVisibility(GONE);
         if (header != null) {
             if (signatureMore != null) signatureMore.setVisibility(GONE);
             requestLayout();
@@ -873,20 +919,35 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
     }
     private void measureSignature(int widthMeasureSpec, int heightMeasureSpec) {
         int width = MeasureSpec.getSize(widthMeasureSpec);
-        int textWidth = Math.max(0, Math.round(signatureHeader.geometry.title.width()) - dp(24));
+        boolean fusion = signatureFusionActive();
+        if (fusion) prepareFusionControls();
+        if (signatureCall != null) signatureCall.setVisibility(fusion && signatureHeader.fusionGeometry().callAvailable ? VISIBLE : GONE);
+        if (signatureMore != null) signatureMore.setVisibility(fusion ? VISIBLE : GONE);
+        int textWidth = Math.max(0, Math.round(signatureHeader.geometry.title.width()) - (fusion ? 0 : dp(24)));
         titleTextView.setTextSizePx(Math.round(signatureHeader.titlePx));
         // Classic title padding (6 + 12 dp) is outside the Signature text block.
         titleTextView.setPadding(0, 0, 0, 0);
         getSubtitleTextView().setPadding(0, 0, 0, 0);
-        titleTextView.setGravity(Gravity.CENTER_HORIZONTAL);
+        titleTextView.setGravity(fusion ? (LocaleController.isRTL ? Gravity.RIGHT : Gravity.LEFT) : Gravity.CENTER_HORIZONTAL);
         titleTextView.measure(MeasureSpec.makeMeasureSpec(textWidth, MeasureSpec.AT_MOST), MeasureSpec.makeMeasureSpec((int)Math.ceil(signatureHeader.titlePx) + dp(8), MeasureSpec.AT_MOST));
-        if (subtitleTextView != null) { subtitleTextView.setTextSizePx(Math.round(signatureHeader.subtitlePx)); subtitleTextView.setGravity(Gravity.CENTER_HORIZONTAL); }
-        else if (animatedSubtitleTextView != null) animatedSubtitleTextView.setTextSize(signatureHeader.subtitlePx);
+        if (subtitleTextView != null) { subtitleTextView.setTextSizePx(Math.round(signatureHeader.subtitlePx)); subtitleTextView.setGravity(fusion ? (LocaleController.isRTL ? Gravity.RIGHT : Gravity.LEFT) : Gravity.CENTER_HORIZONTAL); }
+        else if (animatedSubtitleTextView != null) {
+            animatedSubtitleTextView.setTextSize(signatureHeader.subtitlePx);
+            animatedSubtitleTextView.setGravity(fusion ? (LocaleController.isRTL ? Gravity.RIGHT : Gravity.LEFT) : Gravity.CENTER_HORIZONTAL);
+        }
         getSubtitleTextView().measure(MeasureSpec.makeMeasureSpec(textWidth, MeasureSpec.AT_MOST), signatureHeader.subtitleFits ? MeasureSpec.makeMeasureSpec((int)Math.ceil(signatureHeader.subtitlePx) + dp(8), MeasureSpec.AT_MOST) : MeasureSpec.makeMeasureSpec(0, MeasureSpec.EXACTLY));
         int photo = Math.max(1, Math.round(signatureHeader.height) - dp(2));
-        avatarImageView.measure(MeasureSpec.makeMeasureSpec(photo, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(photo, MeasureSpec.EXACTLY));
-        avatarImageView.setRoundRadius(photo / 2);
-        if (signatureMore != null) signatureMore.measure(MeasureSpec.makeMeasureSpec(dp(32), MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(Math.round(signatureHeader.height), MeasureSpec.EXACTLY));
+        int photoWidth = fusion ? Math.round(signatureHeader.geometry.avatar.width()) : photo;
+        int photoHeight = fusion ? Math.round(signatureHeader.geometry.avatar.height()) : photo;
+        avatarImageView.measure(MeasureSpec.makeMeasureSpec(photoWidth, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(photoHeight, MeasureSpec.EXACTLY));
+        avatarImageView.setRoundRadius(fusion ? 0 : photo / 2);
+        if (fusion) {
+            var g = signatureHeader.fusionGeometry();
+            signatureMore.measure(MeasureSpec.makeMeasureSpec(Math.round(g.more.width()), MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(Math.round(g.more.height()), MeasureSpec.EXACTLY));
+            signatureCall.measure(MeasureSpec.makeMeasureSpec(Math.round(g.call.width()), MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(Math.round(g.call.height()), MeasureSpec.EXACTLY));
+            int tint = getThemedColor(Theme.key_actionBarDefaultTitle);
+            signatureMore.setColorFilter(tint); signatureCall.setColorFilter(tint);
+        }
         if (timeItem != null) timeItem.measure(MeasureSpec.makeMeasureSpec(dp(34), MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(dp(34), MeasureSpec.EXACTLY));
         if (communityItem != null) communityItem.measure(MeasureSpec.makeMeasureSpec(dp(14), MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(dp(14), MeasureSpec.EXACTLY));
         if (starBgItem != null) starBgItem.measure(MeasureSpec.makeMeasureSpec(dp(20), MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(dp(20), MeasureSpec.EXACTLY));
@@ -895,18 +956,27 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
     }
     private void layoutSignature() {
         android.graphics.RectF a = signatureHeader.geometry.avatar, title = signatureHeader.geometry.title;
-        int photo = avatarImageView.getMeasuredWidth();
-        int x = Math.round(a.centerX() - photo / 2f), y = Math.round(a.centerY() - photo / 2f);
-        avatarImageView.layout(x, y, x + photo, y + photo);
+        boolean fusion = signatureFusionActive();
+        int photo = avatarImageView.getMeasuredWidth(), photoHeight = avatarImageView.getMeasuredHeight();
+        int x = Math.round(a.centerX() - photo / 2f), y = Math.round(a.centerY() - photoHeight / 2f);
+        avatarImageView.layout(x, y, x + photo, y + photoHeight);
         View subtitle = getSubtitleTextView();
         int th = titleTextView.getMeasuredHeight(), sh = !signatureHeader.subtitleFits || subtitle.getVisibility() != VISIBLE ? 0 : subtitle.getMeasuredHeight();
         int textY = Math.round(title.centerY() - (th + sh + (sh == 0 ? 0 : dp(2))) / 2f);
-        x = Math.round(title.centerX() - titleTextView.getMeasuredWidth() / 2f);
+        x = fusion ? Math.round(LocaleController.isRTL ? title.right - titleTextView.getMeasuredWidth() : title.left) : Math.round(title.centerX() - titleTextView.getMeasuredWidth() / 2f);
         titleTextView.layout(x, textY, x + titleTextView.getMeasuredWidth(), textY + th);
-        x = Math.round(title.centerX() - subtitle.getMeasuredWidth() / 2f);
+        x = fusion ? Math.round(LocaleController.isRTL ? title.right - subtitle.getMeasuredWidth() : title.left) : Math.round(title.centerX() - subtitle.getMeasuredWidth() / 2f);
         subtitle.layout(x, textY + th + dp(2), x + subtitle.getMeasuredWidth(), textY + th + dp(2) + sh);
         x = LocaleController.isRTL ? Math.round(title.left) + dp(2) : Math.round(title.right) - dp(34);
-        if (signatureMore != null) signatureMore.layout(x, Math.round(title.top), x + dp(32), Math.round(title.bottom));
+        if (fusion) {
+            var g = signatureHeader.fusionGeometry(); float offset = signatureHeader.fusionTop;
+            signatureMore.layout(Math.round(g.more.left),Math.round(g.more.top+offset),Math.round(g.more.right),Math.round(g.more.bottom+offset));
+            signatureCall.layout(Math.round(g.call.left),Math.round(g.call.top+offset),Math.round(g.call.right),Math.round(g.call.bottom+offset));
+            signaturePhotoClip.rewind();
+            signaturePhotoClip.addRoundRect(g.center.left,g.center.top+offset,g.center.right,g.center.bottom+offset,
+                    g.center.height()/2,g.center.height()/2,android.graphics.Path.Direction.CW);
+            signaturePhotoMask.prepare(g.fadeStartX-g.portrait.left,g.fadeEndX-g.portrait.left,g.rtl);
+        }
         if (timeItem != null) { int tx = Math.round(a.left) - dp(6), ty = Math.round(a.top) - dp(4); timeItem.layout(tx, ty, tx + dp(34), ty + dp(34)); }
         if (communityItem != null) { int tx = Math.round(a.right) - dp(14), ty = Math.round(a.bottom) - dp(14); communityItem.layout(tx, ty, tx + dp(14), ty + dp(14)); }
         int sx = Math.round(a.right) - dp(20), sy = Math.round(a.bottom) - dp(20);
@@ -917,6 +987,7 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         if (signatureMore != null) signatureMore.setVisibility(GONE);
+        if (signatureCall != null) signatureCall.setVisibility(GONE);
         if (signatureActive()) { signatureMeasured = true; measureSignature(widthMeasureSpec, heightMeasureSpec); return; }
         if (signatureMeasured) {
             signatureMeasured = false; titleTextView.setPadding(0, dp(6), 0, dp(12));

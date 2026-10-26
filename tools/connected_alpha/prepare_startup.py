@@ -50,8 +50,24 @@ PATHS=[
  'tools/connected_alpha/test_private_release1276.py',
 '.github/workflows/pr.yml',
 
-
-
+'TMessagesProj/src/main/java/app/flexygram/header/HeaderConfig.java',
+'TMessagesProj/src/main/java/app/flexygram/header/HeaderPreviewView.java',
+'TMessagesProj/src/main/java/app/flexygram/header/HeaderSettingsActivity.java',
+'TMessagesProj/src/main/java/app/flexygram/header/SignatureChatHeader.java',
+'TMessagesProj/src/main/java/app/flexygram/header/fusion/SignatureFusionGeometry.java',
+'TMessagesProj/src/main/java/app/flexygram/header/fusion/SignatureFusionSurface.java',
+'TMessagesProj/src/main/java/app/flexygram/header/fusion/SignatureFusionAvatarMask.java',
+'TMessagesProj/src/main/java/org/telegram/ui/Components/ChatAvatarContainer.java',
+'TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java',
+'TMessagesProj/src/main/res/values/flexygram_header.xml',
+'TMessagesProj/src/main/res/values-es/flexygram_header.xml',
+'TMessagesProj/src/main/res/values-ru/flexygram_header.xml',
+'tools/connected_alpha/header_visual/stubs.py',
+'tools/connected_alpha/header_visual/run.py',
+'tools/connected_alpha/header_visual/HeaderVisualTest.java.in',
+'tools/connected_alpha/header_visual/SignatureFusionGeometryTest.java',
+'tools/connected_alpha/header_visual/FUSION.md',
+'tools/connected_alpha/test_header_fusion.py',
 ]
 spec={'base':'175b299e0d4faeb246eca8e1be16a362a3a62213','reviewed':{path:hashlib.sha256((ROOT/path).read_bytes()).hexdigest()for path in PATHS},'paths':sorted(PATHS+['tools/connected_alpha/startup_review.json'])}
 (ROOT/'tools/connected_alpha/startup_review.json').write_text(json.dumps(spec,indent=2)+'\n')
