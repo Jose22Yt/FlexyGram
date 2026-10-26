@@ -242,6 +242,7 @@ public class PresentationRegression {
  static final int VISIBLE=0;
  static class android { static class graphics { static class Typeface {static Object DEFAULT=new Object();} } }
  static class Gravity { static final int LEFT=3, RIGHT=5, BOTTOM=80; }
+ static class TypedValue { static final int COMPLEX_UNIT_DIP=1, COMPLEX_UNIT_SP=2; }
  static class R { static class drawable { static final int msg_add=1, msg_input_attach2=2; } }
  static class AndroidUtilities { static float density=1; }
  static int dp(float n){return Math.round(n);}
@@ -258,6 +259,8 @@ public class PresentationRegression {
   void invalidate() {}
   void setCompactVisualInset(int inset) {}
   void setStaticHintTypeface(Object face) {}
+  int textSize=18, textUnit=TypedValue.COMPLEX_UNIT_DIP;
+  void setTextSize(int unit,int size) {textUnit=unit;textSize=size;}
   int width(){return width;}
   float getAlpha(){return alpha;}
  }
@@ -295,8 +298,10 @@ public class PresentationRegression {
    p.require(p.messageEditText.p.leftMargin==64);
    p.require(p.messageEditText.p.rightMargin>=56+Math.max(0,-p.nativeAttachTranslationX()));
    p.require(p.messageEditText==originalText && p.draft==originalDraft);
+   p.require(p.messageEditText.textSize==16 && p.messageEditText.textUnit==TypedValue.COMPLEX_UNIT_SP);
    p.nativeMeasure();p.flexyCompactRequested=false;p.applyFlexyComposerPresentation(335);
    p.require(!p.flexyCompactLayout && p.messageEditText.p.rightMargin==end);
+   p.require(p.messageEditText.textSize==18 && p.messageEditText.textUnit==TypedValue.COMPLEX_UNIT_DIP);
    p.require(p.messageEditText.p.leftMargin==50 && p.emojiButton.p.leftMargin==3 && p.emojiButton.p.rightMargin==0);
    p.require(p.attachButton.p.gravity==(Gravity.BOTTOM|Gravity.RIGHT));
    p.require(p.attachButton.imageResource==R.drawable.msg_input_attach2);

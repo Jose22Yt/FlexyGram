@@ -46,3 +46,6 @@ PATHS = PATHS | PRODUCTION
 
 PRODUCTION = PRODUCTION | frozenset(['TMessagesProj/src/main/java/app/flexygram/preview/SignatureWallpaperPreview.java'])
 PATHS = PATHS | PRODUCTION
+PRODUCTION = PRODUCTION | frozenset(['TMessagesProj/src/main/java/app/flexygram/composer/FlexyComposerSettingsActivity.java'])
+PATHS = PATHS | PRODUCTION | frozenset(['tools/connected_alpha/test_flexy_composer.py',
+                                      'tools/connected_alpha/test_stabilization1272.py'])
