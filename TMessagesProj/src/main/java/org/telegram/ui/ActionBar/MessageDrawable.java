@@ -39,6 +39,8 @@ public class MessageDrawable extends Drawable {
     private GlassSource flexyGlassSource;
     private final Paint flexyFillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint flexyBorderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private int flexySkinPreview = -1;
+    public void setFlexySkinPreview(int skin) { flexySkinPreview = skin; invalidateSelf(); }
     private int outlineBase, outlineMode = -1, outlineIntensity = -1, outlineColor;
     private int signatureOutline(int base) {
         int mode = app.flexygram.bubbles.BubbleConfig.outlineStyle();
@@ -657,24 +659,37 @@ public class MessageDrawable extends Drawable {
         if (paintToUse == null && flexySurface()) {
             // Stable theme color, independent of wallpaper/blur availability and animation phase.
             // Instance paints and the native geometry cache are reused for every draw.
+            int skin = flexySkinPreview >= 0 ? flexySkinPreview : app.flexygram.bubbles.BubbleConfig.skin();
             int color = signatureColor();
             if (alpha > 0 && app.flexygram.bubbles.BubbleConfig.backgroundBlur() && flexyGlassSource != null) {
                 // The native bridge carries drawable alpha; message transitions sample the same cache.
                 flexyGlassSource.draw(canvas, path, alpha);
             }
+            if (skin == 3) color = ColorUtils.blendARGB(color, 0xffffffff, .055f);
             flexyFillPaint.setColor(color);
             // Reuse Telegram's cached gradient and matrix; no new shader per frame.
             flexyFillPaint.setShader(p.getShader());
             flexyFillPaint.setAlpha(Math.round(alpha * app.flexygram.bubbles.BubbleStyle.tintAlpha(
                 app.flexygram.bubbles.BubbleConfig.transparency()) / 255f));
+            if (skin == 9) {
+                // A bounded ambient edge, using the cached native path and instance paint.
+                flexyBorderPaint.setShader(null);
+                flexyBorderPaint.setStyle(Paint.Style.STROKE);
+                flexyBorderPaint.setStrokeWidth(4f * AndroidUtilities.density);
+                flexyBorderPaint.setColor((Math.round(alpha * .13f) << 24) | (color & 0x00ffffff));
+                canvas.drawPath(path, flexyBorderPaint);
+            }
             canvas.drawPath(path, flexyFillPaint);
             flexyBorderPaint.setStyle(Paint.Style.STROKE);
             // Keep the contour inside Telegram's unchanged message silhouette.
-            flexyBorderPaint.setStrokeWidth(2f * AndroidUtilities.density * app.flexygram.bubbles.BubbleConfig.borderDp());
+            flexyBorderPaint.setStrokeWidth(2f * AndroidUtilities.density * app.flexygram.bubbles.BubbleConfig.borderDp()
+                    * (skin == 5 ? .55f : 1f));
             if (app.flexygram.bubbles.BubbleConfig.outlineEnabled()) {
                 int contourBase = isOut && p.getShader() != null
                         ? app.flexygram.bubbles.BubbleOutline.palette(color, currentGradientColor1, currentGradientColor2, currentGradientColor3) : color;
                 int contour = signatureOutline(contourBase);
+                if (skin == 3) contour = ColorUtils.blendARGB(contour, 0xffffffff, .17f);
+                if (skin == 9) contour = ColorUtils.blendARGB(contour, color, .28f);
                 flexyBorderPaint.setColor(ColorUtils.setAlphaComponent(contour, Math.round(Color.alpha(contour) * alpha / 255f)));
                 canvas.save();
                 canvas.clipPath(path);

@@ -1320,6 +1320,11 @@ public class FilterTabsView extends FrameLayout {
             }
             return;
         }
+        if (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA && animatingIndicator) {
+            AndroidUtilities.cancelRunOnUIThread(animationRunnable);
+            animatingIndicator = false;
+            setAnimationIdicatorProgress(1f); // Finish the previous native page before replacing it.
+        }
         boolean scrollingForward = currentPosition < position;
         scrollingToChild = -1;
         previousPosition = currentPosition;
@@ -1334,15 +1339,19 @@ public class FilterTabsView extends FrameLayout {
 
         animationTime = 0;
         animatingIndicatorProgress = 0;
-        animatingIndicator = true;
-        setEnabled(false);
-
-        AndroidUtilities.runOnUIThread(animationRunnable, 16);
+        animatingIndicator = !org.telegram.messenger.BuildConfig.CONNECTED_ALPHA;
+        if (animatingIndicator) {
+            setEnabled(false);
+            AndroidUtilities.runOnUIThread(animationRunnable, 16);
+        }
 
         if (delegate != null) {
             delegate.onPageSelected(tab, scrollingForward);
             delegate.onTabSelected(tab, scrollingForward, true);
             oldAnimatedTab = currentPosition;
+        }
+        if (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) {
+            setAnimationIdicatorProgress(1f);
         }
         scrollToChild(position);
         if (NekoConfig.hideAllTab.Bool() && !currentTabIsDefault()) {

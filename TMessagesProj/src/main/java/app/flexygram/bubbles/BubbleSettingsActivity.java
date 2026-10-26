@@ -22,11 +22,12 @@ import app.flexygram.settings.SignatureMatteSettingsActivity;
 /** Local native preview, fill opacity, border width and optional cached wallpaper blur. */
 public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity {
     private static final int SLIDER = 110;
-    private int transparencyRow, borderRow, previewRow, blurRow, infoRow, enabledRow, styleRow, pearlRow;
+    private int transparencyRow, borderRow, previewRow, skinsRow, blurRow, infoRow, enabledRow, styleRow, pearlRow;
     private BubblePreviewView preview;
+    private BubbleSkinPickerView picker;
     @Override protected void updateRows() {
         super.updateRows(); BubbleConfig.load();
-        previewRow = addRow(); transparencyRow = addRow("flexyBubbleTransparency"); borderRow = addRow("flexyBubbleBorderWidth"); blurRow = addRow("flexyBubbleBackgroundBlur"); enabledRow = addRow("flexyBubbleOutlineEnabled"); styleRow = addRow("flexyBubbleOutlineStyle"); pearlRow = addRow("flexyBubblePearlIntensity"); infoRow = addRow();
+        skinsRow = addRow("signatureBubbleSkin"); previewRow = addRow(); transparencyRow = addRow("flexyBubbleTransparency"); borderRow = addRow("flexyBubbleBorderWidth"); blurRow = addRow("flexyBubbleBackgroundBlur"); enabledRow = addRow("flexyBubbleOutlineEnabled"); styleRow = addRow("flexyBubbleOutlineStyle"); pearlRow = addRow("flexyBubblePearlIntensity"); infoRow = addRow();
     }
     @Override protected String getActionBarTitle() { return getString(R.string.FlexyBubblesTitle); }
     @Override protected BaseListAdapter createAdapter(Context context) { return new Adapter(context); }
@@ -81,26 +82,31 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
     private final class Adapter extends MatteListAdapter {
         Adapter(Context context) { super(context); }
         @Override public int getItemViewType(int position) {
-            return position == previewRow ? 111 : position == blurRow || position == enabledRow ? TYPE_CHECK : position == styleRow ? TYPE_SETTINGS : position == transparencyRow || position == borderRow || position == pearlRow ? SLIDER : TYPE_INFO_PRIVACY;
+            return position == skinsRow ? 112 : position == previewRow ? 111 : position == blurRow || position == enabledRow ? TYPE_CHECK : position == styleRow ? TYPE_SETTINGS : position == transparencyRow || position == borderRow || position == pearlRow ? SLIDER : TYPE_INFO_PRIVACY;
         }
         @Override public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int type) {
             if (type == 111) { preview = new BubblePreviewView(parent.getContext()); return new RecyclerListView.Holder(preview); }
+            if (type == 112) {
+                picker = new BubbleSkinPickerView(parent.getContext(), new String[]{getString(R.string.FlexySkinClassic),
+                        getString(R.string.FlexySkinElevated), getString(R.string.FlexySkinFine), getString(R.string.FlexySkinFloating)},
+                        () -> { if (preview != null) preview.settingsChanged(); });
+                return new RecyclerListView.Holder(picker);
+            }
             if (type == SLIDER) return new RecyclerListView.Holder(new TransparencyCell(parent.getContext()));
             return super.onCreateViewHolder(parent, type);
         }
         @Override public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, boolean partial) {
             if (position == previewRow) { holder.itemView.invalidate(); return; }
-            if (position == transparencyRow || position == borderRow) { ((TransparencyCell)holder.itemView).bind(position == borderRow); return; }
+            if (position == skinsRow) { ((BubbleSkinPickerView)holder.itemView).settingsChanged(); return; }
+            if (position == transparencyRow || position == borderRow || position == pearlRow) { ((TransparencyCell)holder.itemView).bind(position == borderRow, position == pearlRow); return; }
             if (position == enabledRow) {
-            BubbleConfig.setOutlineEnabled(!BubbleConfig.outlineEnabled());
-            listAdapter.notifyItemChanged(position); if (preview != null) preview.settingsChanged();
-        } else if (position == styleRow) {
-            showDialog(new AlertDialog.Builder(getParentActivity(), resourcesProvider).setTitle(getString(R.string.FlexyBubbleOutlineStyle))
-                .setItems(new CharSequence[]{getString(R.string.FlexyBubbleIntelligentColor),getString(R.string.FlexyBubbleGlassPearl)},(dialog,which)->{
-                    BubbleConfig.setOutlineStyle(which); listAdapter.notifyItemChanged(styleRow); listAdapter.notifyItemChanged(pearlRow);
-                    if (preview != null) preview.settingsChanged();
-                }).create());
-        } else if (position == blurRow) { ((TextCheckCell)holder.itemView).setTextAndCheck(getString(R.string.FlexyBubbleBackgroundBlur), BubbleConfig.backgroundBlur(), false); return; }
+                ((TextCheckCell)holder.itemView).setTextAndCheck(getString(R.string.FlexyBubbleOutlineEnabled), BubbleConfig.outlineEnabled(), false); return;
+            }
+            if (position == styleRow) {
+                ((TextSettingsCell)holder.itemView).setTextAndValue(getString(R.string.FlexyBubbleOutlineStyle),
+                        getString(BubbleConfig.outlineStyle() == 0 ? R.string.FlexyBubbleIntelligentColor : R.string.FlexyBubbleGlassPearl), true); return;
+            }
+            if (position == blurRow) { ((TextCheckCell)holder.itemView).setTextAndCheck(getString(R.string.FlexyBubbleBackgroundBlur), BubbleConfig.backgroundBlur(), false); return; }
             if (position == infoRow) { ((TextInfoPrivacyCell)holder.itemView).setText(getString(R.string.FlexyBubblesInfo) + "\n\n" + getString(R.string.FlexyBubbleBlurCompatibility)); return; }
 
         }

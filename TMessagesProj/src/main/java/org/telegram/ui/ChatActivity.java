@@ -4685,7 +4685,7 @@ public class ChatActivity extends BaseFragment implements
 
             @Override
             protected boolean onAvatarClick() {
-                if (usesSignatureHeader()) return false; // Keep the native avatar -> profile action.
+                if (usesSignatureHeader()) return openNativeHeaderOptions();
                 return openNativeHeaderOptions();
             }
             @Override protected void onSignatureOptionsClick() { openNativeHeaderOptions(); }

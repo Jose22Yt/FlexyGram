@@ -299,7 +299,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         layout.addView(header);
 
         cover = new CoverImage(context, 120);
-        cover.setRadius(BuildConfig.CONNECTED_ALPHA ? 0 : dp(28));
+        cover.setRadius(dp(BuildConfig.CONNECTED_ALPHA ? 22 : 28));
         cover.setListener(fallbackSeed, this::onSeed);
         cover.setOutlineProvider(new ViewOutlineProvider() {
             @Override
@@ -308,7 +308,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
             }
         });
         cover.setElevation(dp(BuildConfig.CONNECTED_ALPHA ? 0 : 14));
-        if (BuildConfig.CONNECTED_ALPHA) cover.setOutlineProvider(null);
+        if (BuildConfig.CONNECTED_ALPHA) cover.setElevation(0);
         cover.setOnTouchListener(this::onCoverTouch);
         layout.addView(cover);
 
@@ -1053,10 +1053,11 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
     }
 
     private PlayerColors sheetColors(int seed) {
-        return BuildConfig.CONNECTED_ALPHA ? PlayerColors.fromSignatureArtwork(seed, dark) : PlayerColors.fromSeed(seed, dark);
+        return BuildConfig.CONNECTED_ALPHA ? PlayerColors.fromSignatureTheme(dark) : PlayerColors.fromSeed(seed, dark);
     }
 
     private void onSeed(MessageObject mo, int seed) {
+        if (BuildConfig.CONNECTED_ALPHA) return; // Album changes never restart a theme-color transition.
         if (mo == current) {
             animateColors(sheetColors(seed), true);
         }
@@ -1686,11 +1687,10 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
             titleRow.measure(exactW, MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
             bubble.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
             if (BuildConfig.CONNECTED_ALPHA) {
-                // Full-width hero; short/large-font screens scroll rather than squeezing hit targets.
-                coverSize = Math.max(dp(250), Math.min(Math.round(width * 1.22f), dp(560)));
-                // Title overlays the opaque end of the cached artwork fade, instead of a separate panel.
-                stageHeight = coverSize - dp(56 + 64) + titleRow.getMeasuredHeight();
-                cover.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(top + coverSize, MeasureSpec.EXACTLY));
+                coverSize = Math.max(dp(220), Math.min(contentW, dp(340)));
+                stageHeight = dp(12) + coverSize + dp(18) + titleRow.getMeasuredHeight();
+                int artMeasure = MeasureSpec.makeMeasureSpec(coverSize, MeasureSpec.EXACTLY);
+                cover.measure(artMeasure, artMeasure);
                 lyricsPanel.measure(exactW, MeasureSpec.makeMeasureSpec(stageHeight, MeasureSpec.EXACTLY));
                 int minimum = top + dp(56) + stageHeight + dp(6 + 40 + 12 + 24 + 28) + timeRow.getMeasuredHeight()
                         + controls.getMeasuredHeight() + group.getMeasuredHeight() + bottom;
@@ -1724,9 +1724,9 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
             y += dp(56);
             int stageTop = y;
             int coverLeft = (width - coverSize) / 2;
-            if (BuildConfig.CONNECTED_ALPHA) cover.layout(0, 0, width, top + coverSize);
+            if (BuildConfig.CONNECTED_ALPHA) cover.layout(coverLeft, y + dp(12), coverLeft + coverSize, y + dp(12) + coverSize);
             else cover.layout(coverLeft, y + dp(16), coverLeft + coverSize, y + dp(16) + coverSize);
-            int titleTop = BuildConfig.CONNECTED_ALPHA ? top + coverSize - dp(64) : y + dp(16) + coverSize + dp(26);
+            int titleTop = BuildConfig.CONNECTED_ALPHA ? y + dp(12) + coverSize + dp(18) : y + dp(16) + coverSize + dp(26);
             titleRow.layout(side, titleTop, side + contentW, titleTop + titleRow.getMeasuredHeight());
             lyricsPanel.layout(side, stageTop, side + contentW, stageTop + stageHeight);
             y = stageTop + stageHeight + dp(6);

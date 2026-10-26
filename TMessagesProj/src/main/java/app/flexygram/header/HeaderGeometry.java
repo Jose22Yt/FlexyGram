@@ -16,6 +16,9 @@ public final class HeaderGeometry {
         update(width, top, height, numberWidth, density, rtl, 1);
     }
     public void update(int width, float top, float height, float numberWidth, float density, boolean rtl, int counterMode) {
+        update(width, top, height, numberWidth, density, rtl, counterMode, Float.MAX_VALUE);
+    }
+    public void update(int width, float top, float height, float numberWidth, float density, boolean rtl, int counterMode, float desiredTitleWidth) {
         float edge = 8 * density, gap = 6 * density;
         float maxSide = Math.max(height, Math.min(width * .28f, (width - 64 * density) / 2 - edge - gap));
         float extra = counterMode == 2 ? Math.max(height * .65f, numberWidth + 8 * density) + 3 * density : numberWidth + 8 * density;
@@ -26,6 +29,8 @@ public final class HeaderGeometry {
         avatar.set(width - edge - height, top, width - edge, top + height);
         float inset = edge + Math.max(side, height) + gap;
         title.set(Math.min(width / 2f, inset), top, Math.max(width / 2f, width - inset), top + height);
+        float preferred = Math.min(title.width(), Math.max(80 * density, desiredTitleWidth));
+        title.set(width / 2f - preferred / 2f, top, width / 2f + preferred / 2f, top + height);
         float badgeSize = separateCount ? extra - 3 * density : extra;
         float badgeLeft = rtl ? width - edge - side : back.left + height + (separateCount ? 3 * density : 0);
         badge.set(badgeLeft, top + (height - badgeSize) / 2f, badgeLeft + badgeSize, top + (height + badgeSize) / 2f);

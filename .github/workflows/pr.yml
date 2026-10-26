@@ -3,7 +3,7 @@ name: Pull request
 on:
   # Registered workflow ID 388683996: support entry point for the same native jobs.
   push:
-    branches: [support/connected-alpha-ci-20261022, integration/connected-alpha-unified, integration/connected-alpha-javac-fix, integration/connected-alpha-2-compact, fix/alpha2-compact-trailing-action, fix/alpha2-signature-personalization, fix/alpha2-ios-composer-refinement, fix/alpha2-iphone-reference-port, fix/alpha2-approved-composer-integrated-ui, fix/alpha2-signature-matte-build, fix/alpha-ios-bubbles-glass-home2, feat/alpha1271-signature-ui, integration/connected-alpha-1273-signature]
+    branches: [support/connected-alpha-ci-20261022, integration/connected-alpha-unified, integration/connected-alpha-javac-fix, integration/connected-alpha-2-compact, fix/alpha2-compact-trailing-action, fix/alpha2-signature-personalization, fix/alpha2-ios-composer-refinement, fix/alpha2-iphone-reference-port, fix/alpha2-approved-composer-integrated-ui, fix/alpha2-signature-matte-build, fix/alpha-ios-bubbles-glass-home2, feat/alpha1271-signature-ui, integration/connected-alpha-1273-signature, integration/alpha1275-signature-performance-ui]
     paths:
       - '.github/workflows/connected-alpha-arm64.yml'
       - '.github/workflows/pr.yml'
@@ -33,7 +33,7 @@ permissions:
 
 jobs:
   connected-alpha-native:
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/support/connected-alpha-ci-20261022' || github.ref == 'refs/heads/integration/connected-alpha-unified' || github.ref == 'refs/heads/integration/connected-alpha-javac-fix' || github.ref == 'refs/heads/integration/connected-alpha-2-compact' || github.ref == 'refs/heads/fix/alpha2-compact-trailing-action' || github.ref == 'refs/heads/fix/alpha2-signature-personalization' || github.ref == 'refs/heads/fix/alpha2-ios-composer-refinement' || github.ref == 'refs/heads/fix/alpha2-iphone-reference-port' || github.ref == 'refs/heads/fix/alpha2-approved-composer-integrated-ui' || github.ref == 'refs/heads/fix/alpha2-signature-matte-build' || github.ref == 'refs/heads/fix/alpha-ios-bubbles-glass-home2' || github.ref == 'refs/heads/feat/alpha1271-signature-ui' || github.ref == 'refs/heads/integration/connected-alpha-1273-signature')
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/support/connected-alpha-ci-20261022' || github.ref == 'refs/heads/integration/connected-alpha-unified' || github.ref == 'refs/heads/integration/connected-alpha-javac-fix' || github.ref == 'refs/heads/integration/connected-alpha-2-compact' || github.ref == 'refs/heads/fix/alpha2-compact-trailing-action' || github.ref == 'refs/heads/fix/alpha2-signature-personalization' || github.ref == 'refs/heads/fix/alpha2-ios-composer-refinement' || github.ref == 'refs/heads/fix/alpha2-iphone-reference-port' || github.ref == 'refs/heads/fix/alpha2-approved-composer-integrated-ui' || github.ref == 'refs/heads/fix/alpha2-signature-matte-build' || github.ref == 'refs/heads/fix/alpha-ios-bubbles-glass-home2' || github.ref == 'refs/heads/feat/alpha1271-signature-ui' || github.ref == 'refs/heads/integration/connected-alpha-1273-signature' || github.ref == 'refs/heads/integration/alpha1275-signature-performance-ui')
     uses: ./.github/workflows/connected-alpha-arm64.yml
     secrets:
       TELEGRAM_APP_ID: ${{ secrets.TELEGRAM_APP_ID }}
@@ -45,7 +45,7 @@ jobs:
       ALPHA_KEYSTORE_B64: ${{ secrets.ALPHA_KEYSTORE_B64 }}
       ALPHA_CERTIFICATE_SHA256: ${{ secrets.ALPHA_CERTIFICATE_SHA256 }}
   connected-alpha-static:
-    if: github.event_name == 'pull_request' && (github.head_ref == 'alpha/connected-exteraless-baseline' || startsWith(github.head_ref, 'support/connected-alpha-ci-') || startsWith(github.head_ref, 'integration/connected-alpha-') || startsWith(github.head_ref, 'fix/alpha2-') || github.head_ref == 'fix/alpha-ios-bubbles-glass-home2' || github.head_ref == 'feat/alpha1271-signature-ui')
+    if: github.event_name == 'pull_request' && (github.head_ref == 'alpha/connected-exteraless-baseline' || startsWith(github.head_ref, 'support/connected-alpha-ci-') || startsWith(github.head_ref, 'integration/connected-alpha-') || startsWith(github.head_ref, 'fix/alpha2-') || github.head_ref == 'fix/alpha-ios-bubbles-glass-home2' || github.head_ref == 'feat/alpha1271-signature-ui' || github.head_ref == 'integration/alpha1275-signature-performance-ui')
     name: Connected Alpha source checks (no APK)
     runs-on: ubuntu-latest
     steps:

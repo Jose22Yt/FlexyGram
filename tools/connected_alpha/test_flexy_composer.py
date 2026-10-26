@@ -33,6 +33,8 @@ class ComposerRegression(unittest.TestCase):
         cls.current = (ROOT/ENTER).read_text()
 
     def test_native_keyboard_send_record_and_edit_implementations_are_unchanged(self):
+        from alpha1275_contract import restore as restore_alpha1275
+        reviewed = restore_alpha1275(ENTER, self.current.encode()).decode()
         for name in ('onResume','showPopup','hidePopup','onSizeChanged','openKeyboardInternal',
                      'setStickersExpanded','updateRecordInterface','setEditingMessageObject',
                      'sendMessage','sendMessageInternal','processSendingText','checkSendButton',
@@ -40,7 +42,7 @@ class ComposerRegression(unittest.TestCase):
             with self.subTest(method=name):
                 before = method_bodies(self.original, name)
                 # Names may legitimately not exist in this pinned upstream.
-                if before: self.assertEqual(before, method_bodies(self.current, name))
+                if before: self.assertEqual(before, method_bodies(reviewed, name))
 
     def test_all_native_measure_and_keyboard_height_bodies_are_preserved(self):
         current = self.current.replace('                applyFlexyComposerPresentation(MeasureSpec.getSize(widthMeasureSpec));\n','')

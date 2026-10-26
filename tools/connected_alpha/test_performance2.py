@@ -92,13 +92,15 @@ class Navigation2(unittest.TestCase):
         self.assertIn('setRoundRadius(new int[]{value, value, value, value})',after)
 
     def test_work1_reservations_and_entire_pr92_production_are_byte_exact(self):
+        from alpha1275_contract import restore as restore_alpha1275, paths as alpha1275_paths
         protected=reserved();self.assertGreater(len(protected),50)
         work1=validate_work1()
         from integration_contract import combined_paths
         for path in protected:
-            self.assertEqual(restore_reserved(path,(ROOT/path).read_bytes()),subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT),path)
+            self.assertEqual(restore_reserved(path,restore_alpha1275(path,(ROOT/path).read_bytes())),subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT),path)
         changed=set(subprocess.check_output(['git','diff','--name-only',BASE],cwd=ROOT,text=True).splitlines())
         changed.update(subprocess.check_output(['git','ls-files','-o','--exclude-standard'],cwd=ROOT,text=True).splitlines())
+        changed.difference_update(alpha1275_paths() | {'tools/connected_alpha/alpha1275.patch'})
         self.assertFalse(changed-(PATHS|combined_paths()),changed-(PATHS|combined_paths()))
         from studio_contract import PATHS as STUDIO_PATHS
         from refinement1274_contract import PRODUCTION as REFINEMENT_PRODUCTION, restore as restore_refinement

@@ -85,6 +85,7 @@ public final class PlayerColors {
 
     // Only the full Music3 sheet opts in. Mini/pills keep fromSeed's Pearl/Midnight identity.
     private static final android.util.LruCache<Long, PlayerColors> artworkPalettes = new android.util.LruCache<>(8);
+    private static final android.util.LruCache<Long, PlayerColors> themePalettes = new android.util.LruCache<>(4);
     public static PlayerColors fromSignatureArtwork(int seed, boolean dark) {
         long key = ((seed & 0xffffffffL) << 1) | (dark ? 1 : 0);
         PlayerColors cached = artworkPalettes.get(key);
@@ -98,6 +99,21 @@ public final class PlayerColors {
         values[9] = ColorUtils.blendARGB(values[0], seed | 0xff000000, .18f);
         PlayerColors result = new PlayerColors(dark, values);
         artworkPalettes.put(key, result);
+        return result;
+    }
+
+    /** Compact Modern uses the active Telegram theme, independently of album art. */
+    public static PlayerColors fromSignatureTheme(boolean dark) {
+        int accent = Theme.getColor(Theme.key_windowBackgroundWhiteBlueText);
+        long key = ((accent & 0xffffffffL) << 1) | (dark ? 1 : 0);
+        PlayerColors cached = themePalettes.get(key);
+        if (cached != null) return cached;
+        int[] values = (dark ? MIDNIGHT : PEARL).values();
+        values[7] = accent;
+        values[8] = ColorUtils.calculateContrast(0xffffffff, accent) >= 4.5 ? 0xffffffff : 0xff101820;
+        values[9] = ColorUtils.blendARGB(values[0], accent, .10f);
+        PlayerColors result = new PlayerColors(dark, values);
+        themePalettes.put(key, result);
         return result;
     }
 
