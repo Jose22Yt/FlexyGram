@@ -1,8 +1,8 @@
-name: Alpha 1275 FlexyFiles private signed delivery
+name: Alpha 1276 Startup checkpoint private signed delivery
 
 on:
   push:
-    branches: [delivery/alpha1275-flexyfiles-private]
+    branches: [delivery/alpha1276-ultrasmooth-private]
     paths:
       - '.github/workflows/private-alpha1274-delivery.yml'
       - 'tools/private_alpha1274/**'
@@ -12,7 +12,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: private-alpha1275-files-${{ github.sha }}
+  group: private-alpha1276-startup-${{ github.sha }}
   cancel-in-progress: false
 
 jobs:
@@ -22,7 +22,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: 175b299e0d4faeb246eca8e1be16a362a3a62213
+          ref: a8e9d16ff335dae2e53b01d60ff8a06c36780f37
           fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-java@v4
@@ -47,7 +47,7 @@ jobs:
       - name: Retain isolated native bubble graphics (not full app screenshots)
         uses: actions/upload-artifact@v4
         with:
-          name: FlexyGram-Alpha1275-native-bubble-probe
+          name: FlexyGram-Alpha1276-native-bubble-probe
           path: |
             build/connected-alpha-bubble-visual/android-native-bubbles.png
             build/connected-alpha-bubble-visual/android-signature-icons.png
@@ -89,7 +89,7 @@ jobs:
       - name: Retain synthetic corrected music and header evidence
         uses: actions/upload-artifact@v4
         with:
-          name: Alpha1275-integrated-renderer-evidence
+          name: Alpha1276-integrated-renderer-evidence
           path: |
             build/connected-alpha-header-visual/*.png
             build/connected-alpha-header-visual/target/surefire-reports/*.xml
@@ -133,7 +133,7 @@ jobs:
 
   private-destination:
     needs: credentials-present
-    if: needs.credentials-present.outputs.ready == 'true' && github.repository == 'Jose22Yt/FlexyGram' && github.ref == 'refs/heads/delivery/alpha1275-flexyfiles-private'
+    if: needs.credentials-present.outputs.ready == 'true' && github.repository == 'Jose22Yt/FlexyGram' && github.ref == 'refs/heads/delivery/alpha1276-ultrasmooth-private'
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -169,11 +169,11 @@ jobs:
         working-directory: approved
     env:
       NATIVE_TARGET: arm64-v8a
-      COMMIT_ID: 175b299e0d4faeb246eca8e1be16a362a3a62213
+      COMMIT_ID: a8e9d16ff335dae2e53b01d60ff8a06c36780f37
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: 175b299e0d4faeb246eca8e1be16a362a3a62213
+          ref: a8e9d16ff335dae2e53b01d60ff8a06c36780f37
           path: approved
           fetch-depth: 0
           submodules: recursive
@@ -185,7 +185,7 @@ jobs:
           sparse-checkout: tools/private_alpha1274
           persist-credentials: false
       - name: Require the exact approved application commit
-        run: test "$(git rev-parse HEAD)" = 175b299e0d4faeb246eca8e1be16a362a3a62213
+        run: test "$(git rev-parse HEAD)" = a8e9d16ff335dae2e53b01d60ff8a06c36780f37
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -281,7 +281,7 @@ jobs:
             echo '::error::Expected exactly one Connected Alpha APK.'
             exit 1
           fi
-          PYTHONPATH=tools/connected_alpha python3 "$GITHUB_WORKSPACE/delivery-control/tools/private_alpha1274/signature_verifier.py" "${packages[0]}" --build-tools "$ANDROID_HOME/build-tools/36.0.0" --certificate-sha256 "$ALPHA_CERTIFICATE_SHA256" --expected-version-code 1275 > connected-alpha-verification.json
+          PYTHONPATH=tools/connected_alpha python3 "$GITHUB_WORKSPACE/delivery-control/tools/private_alpha1274/signature_verifier.py" "${packages[0]}" --build-tools "$ANDROID_HOME/build-tools/36.0.0" --certificate-sha256 "$ALPHA_CERTIFICATE_SHA256" --expected-version-code 1276 > connected-alpha-verification.json
           python3 - <<'PY'
           import json, os
           from pathlib import Path
@@ -316,3 +316,4 @@ jobs:
         run: |
           rm -f local.properties TMessagesProj/src/connectedAlpha/google-services.json config/connected-alpha-test.keystore connected-alpha-verification.json
           rm -rf TMessagesProj/build TMessagesProj/.cxx .gradle "$RUNNER_TEMP/alpha-delivery"
+
