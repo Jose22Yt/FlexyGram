@@ -9,5 +9,6 @@ final class FilesWork implements Closeable {
     int token(){return generation;}
     boolean current(int token){return !closed&&generation==token;}
     void submit(Runnable work){if(closed)return;if(future!=null)future.cancel(true);pool.purge();generation++;future=pool.submit(work);}
+    void cancel(){generation++;if(future!=null)future.cancel(true);pool.purge();}
     @Override public void close(){closed=true;generation++;if(future!=null)future.cancel(true);pool.shutdownNow();}
 }

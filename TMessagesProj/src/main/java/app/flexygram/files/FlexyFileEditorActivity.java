@@ -30,11 +30,14 @@ public final class FlexyFileEditorActivity extends BaseFragment {
     private FilesCodeView editor;private TextView status;private LinearLayout panel;private byte[] binary;private SelectedDocument.Text text;
     private final EditHistory history=new EditHistory();private boolean internal,dirty,ready;private int revision;private File output;private WebView html;
     private final Pattern syntax=Pattern.compile("\"[^\"\\r\\n]*\"|\\b(?:true|false|null|if|else|return|class|const|let|var|function|import|public|private)\\b|\\b[0-9]+(?:\\.[0-9]+)?\\b");
+    private String retainedText;private int retainedStart,retainedEnd;
     private final Runnable highlight=()->highlightParagraph();
     public FlexyFileEditorActivity(File file,String name,String entry,long dialog,int account){source=file;originalName=name;this.entry=entry;this.dialog=dialog;this.account=account;}
     private String filename(){String name=entry==null?originalName:entry.substring(entry.lastIndexOf('/')+1);return name==null?"edited.txt":name;}
     private int color(int key){return Theme.getColor(key,getResourceProvider());}
     @Override public View createView(Context c){
+        retainEditor();AndroidUtilities.cancelRunOnUIThread(highlight);work.cancel();
+        if(actionBar==null)actionBar=createActionBar(c);
         actionBar.setBackButtonImage(R.drawable.ic_ab_back);actionBar.setTitle("FlexyFiles");actionBar.setAllowOverlayTitle(false);
         actionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick(){@Override public void onItemClick(int id){if(id==-1){if(onBackPressed(true))finishFragment();}else command(id);}});
         ActionBarMenuItem menu=actionBar.createMenu().addItem(0,R.drawable.ic_ab_other);
@@ -45,15 +48,19 @@ public final class FlexyFileEditorActivity extends BaseFragment {
             public void beforeTextChanged(CharSequence s,int st,int count,int after){if(!internal){start=st;before=s.subSequence(st,st+count).toString();}}
             public void onTextChanged(CharSequence s,int st,int count,int after){if(!internal){history.record(start,before,s.subSequence(st,st+after).toString());dirty=true;revision++;}}
             public void afterTextChanged(Editable e){if(!internal){AndroidUtilities.cancelRunOnUIThread(highlight);AndroidUtilities.runOnUIThread(highlight,120);}}
-        });fragmentView=panel;load();return fragmentView;
+        });fragmentView=panel;
+        if(retainedText!=null&&text!=null&&document!=null){internal=true;editor.setText(retainedText);editor.setSelection(Math.min(editor.length(),Math.max(0,retainedStart)),Math.min(editor.length(),Math.max(0,retainedEnd)));internal=false;editor.setEnabled(true);ready=true;retainedText=null;status.setText(filename()+" · "+text.encoding+" · "+text.newline);highlightParagraph();}
+        else load();return fragmentView;
     }
+    private void retainEditor(){if(editor!=null&&text!=null){retainedText=editor.getText().toString();retainedStart=editor.getSelectionStart();retainedEnd=editor.getSelectionEnd();}}
+    @Override public void clearViews(){retainEditor();AndroidUtilities.cancelRunOnUIThread(highlight);work.cancel();destroyHtml();editor=null;status=null;panel=null;super.clearViews();}
     private interface Result {void ready(FlexyFileEditorActivity owner,Object value);}
     private interface Job {Object run()throws Exception;}
     private void job(Job job,Result result){FilesWork tasks=work;int token=tasks.token()+1;WeakReference<FlexyFileEditorActivity> weak=new WeakReference<>(this);
         tasks.submit(()->{Object value=null;boolean ok=true;try{value=job.run();}catch(Exception failure){ok=false;}Object done=value;boolean success=ok;
-            AndroidUtilities.runOnUIThread(()->{FlexyFileEditorActivity owner=weak.get();if(owner==null||!tasks.current(token)||owner.getParentActivity()==null)return;if(success)result.ready(owner,done);else{owner.status.setText(getString(R.string.FlexyFilesError));owner.ready=owner.text!=null||owner.binary!=null;}});});
+            AndroidUtilities.runOnUIThread(()->{FlexyFileEditorActivity owner=weak.get();if(owner==null||!tasks.current(token)||owner.getParentActivity()==null||owner.status==null)return;if(success)result.ready(owner,done);else{owner.status.setText(getString(R.string.FlexyFilesError));owner.ready=owner.text!=null||owner.binary!=null;}});});
     }
-    private void load(){File selected=source;String path=entry;job(()->{SelectedDocument reader=new SelectedDocument(selected);document=reader;if(Thread.currentThread().isInterrupted()){reader.close();throw new InterruptedIOException();}return reader.read(path,SelectedDocument.MAX_ENTRY);},(owner,value)->{
+    private void load(){File selected=source;String path=entry;job(()->{SelectedDocument previous=document;document=null;if(previous!=null)previous.close();SelectedDocument reader=new SelectedDocument(selected);document=reader;if(Thread.currentThread().isInterrupted()){reader.close();throw new InterruptedIOException();}return reader.read(path,SelectedDocument.MAX_ENTRY);},(owner,value)->{
         owner.binary=(byte[])value;owner.ready=true;try{owner.text=SelectedDocument.text(owner.binary);owner.internal=true;owner.editor.setText(owner.text.value);owner.editor.setEnabled(true);owner.internal=false;owner.status.setText(owner.filename()+" · "+owner.text.encoding+" · "+owner.text.newline);owner.highlightParagraph();owner.recoverDraft();}
         catch(IOException binary){owner.editor.setVisibility(View.GONE);owner.status.setText(owner.filename()+" · "+AndroidUtilities.formatFileSize(owner.binary.length)+"\n"+getString(R.string.FlexyFilesBinary));owner.image();}
     });}
@@ -87,5 +94,5 @@ public final class FlexyFileEditorActivity extends BaseFragment {
     @Override public boolean isSwipeBackEnabled(MotionEvent event){return !dirty&&ready&&super.isSwipeBackEnabled(event);}
     @Override public boolean onBackPressed(boolean invoked){if(!dirty)return super.onBackPressed(invoked);if(invoked)showDialog(new AlertDialog.Builder(getParentActivity(),getResourceProvider()).setTitle(getString(R.string.FlexyFilesUnsaved)).setPositiveButton(getString(R.string.FlexyFilesDraft),(d,w)->draft(true)).setNegativeButton(getString(R.string.FlexyFilesDiscard),(d,w)->{dirty=false;finishFragment();}).setNeutralButton(getString(R.string.Cancel),null).create());return false;}
     private void highlightParagraph(){if(text==null||editor==null)return;Editable data=editor.getText();int cursor=Math.max(0,editor.getSelectionStart()),start=cursor,end=cursor;while(start>0&&data.charAt(start-1)!='\n'&&cursor-start<2048)start--;while(end<data.length()&&data.charAt(end)!='\n'&&end-cursor<2048)end++;for(ForegroundColorSpan span:data.getSpans(start,end,ForegroundColorSpan.class))data.removeSpan(span);String line=data.subSequence(start,end).toString();Matcher matcher=syntax.matcher(line);int count=0,color=color(Theme.key_windowBackgroundWhiteBlueText);while(matcher.find()&&count++<128)data.setSpan(new ForegroundColorSpan(color),start+matcher.start(),start+matcher.end(),android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);}
-    @Override public void onFragmentDestroy(){AndroidUtilities.cancelRunOnUIThread(highlight);work.close();destroyHtml();SelectedDocument previous=document;document=null;if(previous!=null)try{previous.close();}catch(IOException ignored){}binary=null;history.clear();super.onFragmentDestroy();}
+    @Override public void onFragmentDestroy(){AndroidUtilities.cancelRunOnUIThread(highlight);work.close();destroyHtml();SelectedDocument previous=document;document=null;if(previous!=null)try{previous.close();}catch(IOException ignored){}binary=null;text=null;retainedText=null;history.clear();super.onFragmentDestroy();}
 }
