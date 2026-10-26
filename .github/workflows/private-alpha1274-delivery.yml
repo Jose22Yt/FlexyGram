@@ -22,7 +22,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: da212e7196b73dcdfc6de82adf0bf3e76113677b
+          ref: 8c47e5532a600f9a8b4ccbfdac5090d09a1075a0
           fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-java@v4
@@ -169,11 +169,11 @@ jobs:
         working-directory: approved
     env:
       NATIVE_TARGET: arm64-v8a
-      COMMIT_ID: da212e7196b73dcdfc6de82adf0bf3e76113677b
+      COMMIT_ID: 8c47e5532a600f9a8b4ccbfdac5090d09a1075a0
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: da212e7196b73dcdfc6de82adf0bf3e76113677b
+          ref: 8c47e5532a600f9a8b4ccbfdac5090d09a1075a0
           path: approved
           fetch-depth: 0
           submodules: recursive
@@ -185,7 +185,7 @@ jobs:
           sparse-checkout: tools/private_alpha1274
           persist-credentials: false
       - name: Require the exact approved application commit
-        run: test "$(git rev-parse HEAD)" = da212e7196b73dcdfc6de82adf0bf3e76113677b
+        run: test "$(git rev-parse HEAD)" = 8c47e5532a600f9a8b4ccbfdac5090d09a1075a0
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
