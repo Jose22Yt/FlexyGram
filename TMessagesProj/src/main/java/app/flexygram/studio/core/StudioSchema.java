@@ -37,9 +37,11 @@ public final class StudioSchema {
         i("bubbles","borderTenths","flexygram_bubbles","signature_border_tenths",11,5,20),
         b("bubbles","cachedBlur","flexygram_bubbles","signature_cached_blur",false),
         b("bubbles","outlineEnabled","flexygram_bubbles","signature_outline_enabled",true),
-        i("bubbles","outlineStyle","flexygram_bubbles","signature_outline_style",0,0,1),
+        i("bubbles","outlineStyle","flexygram_bubbles","signature_outline_style",1,0,3),
+        i("bubbles","borderPosition","flexygram_bubbles","signature_border_position",5,0,5),
+        b("bubbles","fuseGlass","flexygram_bubbles","signature_fuse_glass",false),
         i("bubbles","pearlIntensity","flexygram_bubbles","signature_pearl_intensity",55,0,100),
-        i("header","style","flexygram_header","style",0,0,1),
+        i("header","style","flexygram_header","style",0,0,2),
         b("header","compact","flexygram_header","compact",false),
         b("header","counter","flexygram_header","counter",true),
         i("header","counterPresentation","flexygram_header","counter_mode",1,1,2),
@@ -74,6 +76,9 @@ public final class StudioSchema {
     /** Additive schema1 keys require Alpha1274; older valid schema1 files remain accepted. */
     public static int minimumApp(Map<String,Map<String,Object>> sections) {
         Map<String,Object> bubbles=sections.get("bubbles"),header=sections.get("header");
+        if (header != null && header.get("style") instanceof Number && ((Number)header.get("style")).intValue() == 2) return 1276;
+        if (bubbles != null && (bubbles.containsKey("borderPosition") || bubbles.containsKey("fuseGlass")
+                || bubbles.get("outlineStyle") instanceof Number && ((Number)bubbles.get("outlineStyle")).intValue() >= 2)) return 1276;
         return bubbles!=null&&(bubbles.containsKey("outlineEnabled")||bubbles.containsKey("outlineStyle")||bubbles.containsKey("pearlIntensity"))
             ||header!=null&&header.containsKey("counterPresentation")?1274:MIN_APP;
     }

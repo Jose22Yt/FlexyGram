@@ -26,10 +26,10 @@ import org.telegram.ui.Components.MotionBackgroundDrawable;
 /** Synthetic conversation using the real bubble renderer and current theme wallpaper.
  * No messages/accounts, private chat loading, background animation or permanent draw loop. */
 public final class BubblePreviewView extends View implements NotificationCenter.NotificationCenterDelegate {
-    private final MessageDrawable[] bubbles = new MessageDrawable[4];
-    private final MessageDrawable.PathDrawParams[] caches = new MessageDrawable.PathDrawParams[4];
-    private final StaticLayout[] labels = new StaticLayout[4];
-    private final int[] tops = new int[4];
+    private final MessageDrawable[] bubbles = new MessageDrawable[2];
+    private final MessageDrawable.PathDrawParams[] caches = new MessageDrawable.PathDrawParams[2];
+    private final StaticLayout[] labels = new StaticLayout[2];
+    private final int[] tops = new int[2];
     private final String[] samples;
     private final TextPaint text = new TextPaint(Paint.ANTI_ALIAS_FLAG);
     private final TextPaint time = new TextPaint(Paint.ANTI_ALIAS_FLAG);
@@ -56,16 +56,14 @@ public final class BubblePreviewView extends View implements NotificationCenter.
         super(context);
         wallpaperPreview = new app.flexygram.preview.SignatureWallpaperPreview(this, contextualWallpaper, this::wallpaperChanged);
         samples = new String[]{LocaleController.getString(R.string.FlexyBubblePreviewIncoming),
-                LocaleController.getString(R.string.FlexyBubblePreviewGroupIncoming),
-                LocaleController.getString(R.string.FlexyBubblePreviewOutgoing),
-                LocaleController.getString(R.string.FlexyBubblePreviewGroupOutgoing)};
-        for (int i = 0; i < 4; i++) {
-            bubbles[i] = new MessageDrawable(i % 2 == 0 ? MessageDrawable.TYPE_MEDIA : MessageDrawable.TYPE_TEXT, i >= 2, false);
+                LocaleController.getString(R.string.FlexyBubblePreviewOutgoing)};
+        for (int i = 0; i < bubbles.length; i++) {
+            bubbles[i] = new MessageDrawable(MessageDrawable.TYPE_TEXT, i == 1, false);
             caches[i] = new MessageDrawable.PathDrawParams();
         }
         check = context.getResources().getDrawable(R.drawable.msg_check_s).mutate();
         halfCheck = context.getResources().getDrawable(R.drawable.msg_halfcheck).mutate();
-        setContentDescription(String.join(". ", samples));
+        setContentDescription(String.join("\n", samples));
         refreshTheme();
     }
 
@@ -118,27 +116,27 @@ public final class BubblePreviewView extends View implements NotificationCenter.
     private StaticLayout layout(String sample, int width) {
         return StaticLayout.Builder.obtain(sample, 0, sample.length(), text, Math.max(1, width))
                 .setAlignment(Layout.Alignment.ALIGN_NORMAL).setIncludePad(false)
-                .setMaxLines(2).setEllipsize(TextUtils.TruncateAt.END).build();
+                .build();
     }
     @Override protected void onMeasure(int widthSpec, int heightSpec) {
         int width = MeasureSpec.getSize(widthSpec), side = AndroidUtilities.dp(16);
         int maximum = Math.max(1, Math.min(width - side * 2, Math.round(width * .78f)));
         int y = AndroidUtilities.dp(12), inset = AndroidUtilities.dp(14);
         int metadata = Math.round(time.getFontSpacing()) + AndroidUtilities.dp(10);
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < bubbles.length; i++) {
             StaticLayout measured = layout(samples[i], maximum - inset * 2);
             float longest = 0;
             for (int line = 0; line < measured.getLineCount(); line++) longest = Math.max(longest, measured.getLineWidth(line));
-            int bubbleWidth = Math.min(maximum, Math.max(AndroidUtilities.dp(i >= 2 ? 98 : 82), (int) Math.ceil(longest) + inset * 2));
+            int bubbleWidth = Math.min(maximum, Math.max(AndroidUtilities.dp(i == 1 ? 98 : 82), (int) Math.ceil(longest) + inset * 2));
             labels[i] = layout(samples[i], bubbleWidth - inset * 2);
             int height = Math.max(AndroidUtilities.dp(48), labels[i].getHeight() + metadata + AndroidUtilities.dp(20));
-            int left = i < 2 ? side : Math.max(side, width - side - bubbleWidth);
+            int left = i == 0 ? side : Math.max(side, width - side - bubbleWidth);
             tops[i] = y;
             bubbles[i].setBounds(left, y, left + bubbleWidth, y + height);
-            y += height + (i == 1 ? AndroidUtilities.dp(6) : 0);
+            y += height + AndroidUtilities.dp(6);
         }
         int height = y + AndroidUtilities.dp(12);
-        for (int i = 0; i < 4; i++) bubbles[i].setTop(tops[i], width, height, i % 2 != 0, i % 2 == 0);
+        for (int i = 0; i < bubbles.length; i++) bubbles[i].setTop(tops[i], width, height, false, false);
         setMeasuredDimension(width, height);
     }
     private void updateWallpaperBounds(int width, int height) {
@@ -155,8 +153,8 @@ public final class BubblePreviewView extends View implements NotificationCenter.
         int save = canvas.save();canvas.clipPath(frame);
         backdrop.setColor(Theme.getColor(Theme.key_windowBackgroundGray));canvas.drawRect(frameBounds, backdrop);
         wallpaperPreview.draw(canvas);
-        for (int i = 0; i < 4; i++) {
-            boolean out = i >= 2;
+        for (int i = 0; i < bubbles.length; i++) {
+            boolean out = i == 1;
             bubbles[i].drawCached(canvas, caches[i]);
             Rect bounds = bubbles[i].getBounds();
             text.setColor(Theme.getColor(out ? Theme.key_chat_messageTextOut : Theme.key_chat_messageTextIn));

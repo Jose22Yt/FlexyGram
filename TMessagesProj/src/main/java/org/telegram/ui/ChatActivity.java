@@ -4691,7 +4691,20 @@ public class ChatActivity extends BaseFragment implements
                 }
                 return openNativeHeaderOptions();
             }
-            @Override protected void onSignatureOptionsClick() { openNativeHeaderOptions(); }
+            @Override protected void onSignatureOptionsClick() {
+                if (usesSignatureHeader() && headerItem != null && headerItem.hasSubMenu()) headerItem.toggleSubMenu();
+                else openNativeHeaderOptions();
+            }
+            @Override protected boolean isSignatureCallAvailable() {
+                return currentUser != null && !currentUser.bot && !UserObject.isDeleted(currentUser)
+                        && !UserObject.isUserSelf(currentUser) && chatMode != MODE_SAVED
+                        && userInfo != null && userInfo.phone_calls_available;
+            }
+            @Override protected void onSignatureCallClick() {
+                if (isSignatureCallAvailable() && actionBar.getActionBarMenuOnItemClick() != null)
+                    actionBar.getActionBarMenuOnItemClick().onItemClick(call);
+            }
+
             private boolean openNativeHeaderOptions() {
                 if (isTitleCentered()) {
                     if (editTextItem != null && editTextItem.getTag() != null) {
@@ -25700,6 +25713,7 @@ public class ChatActivity extends BaseFragment implements
             Long uid = (Long) args[0];
             if (currentUser != null && currentUser.id == uid) {
                 userInfo = (TLRPC.UserFull) args[1];
+                if (signatureChatHeader != null && app.flexygram.header.HeaderConfig.fusion()) signatureChatHeader.changed();
                 updateGreetingLock();
                 updateGreetInfo();
                 updateBottomOverlay();

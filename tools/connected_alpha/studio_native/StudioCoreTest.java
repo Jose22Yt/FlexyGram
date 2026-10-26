@@ -19,13 +19,27 @@ public class StudioCoreTest {
   }
  }
  public static void main(String[] args)throws Exception {
-  check(StudioSchema.keys().size()==21);
+  check(StudioSchema.keys().size()==23);
   for(String key:new String[]{"outlineStyle","pearlIntensity","outlineEnabled"}){
    Object valid=key.equals("outlineEnabled")?Boolean.FALSE:key.equals("outlineStyle")?1:72;
    var preset=StudioCodec.create("Pearl.flexyGram",Map.of("bubbles",Map.of(key,valid)));check(preset.minApp==1274);
    check(StudioCodec.decode(StudioCodec.encode(preset),1274).sections.get("bubbles").get(key).equals(valid));reject(()->StudioCodec.decode(StudioCodec.encode(preset),1273));
   }
-  reject(()->StudioCodec.create("bad.flexyGram",Map.of("bubbles",Map.of("outlineStyle",2))));
+  reject(()->StudioCodec.create("bad.flexyGram",Map.of("bubbles",Map.of("outlineStyle",4))));
+  for(int style:new int[]{2,3}){
+   var newStyle=StudioCodec.create("Finish.flexyGram",Map.of("bubbles",Map.of("outlineStyle",style)));
+   check(newStyle.minApp==1276);check(StudioCodec.decode(StudioCodec.encode(newStyle),1276).sections.get("bubbles").get("outlineStyle").equals(style));
+   reject(()->StudioCodec.decode(StudioCodec.encode(newStyle),1275));
+  }
+  var fusion=StudioCodec.create("Fusion.flexyGram",Map.of("header",Map.of("style",2)));
+  check(fusion.minApp==1276);check(StudioCodec.decode(StudioCodec.encode(fusion),1276).sections.get("header").get("style").equals(2));
+  reject(()->StudioCodec.decode(StudioCodec.encode(fusion),1275));
+  reject(()->StudioCodec.create("bad.flexyGram",Map.of("header",Map.of("style",3))));
+  for(String key:new String[]{"borderPosition","fuseGlass"}){
+   Object value=key.equals("borderPosition")?3:Boolean.TRUE;var newSetting=StudioCodec.create("Contour.flexyGram",Map.of("bubbles",Map.of(key,value)));
+   check(newSetting.minApp==1276);check(StudioCodec.decode(StudioCodec.encode(newSetting),1276).sections.get("bubbles").get(key).equals(value));
+   reject(()->StudioCodec.decode(StudioCodec.encode(newSetting),1275));
+  }
   reject(()->StudioCodec.create("bad.flexyGram",Map.of("bubbles",Map.of("pearlIntensity",101))));
   reject(()->StudioCodec.create("bad.flexyGram",Map.of("header",Map.of("counterPresentation",0))));
   var defaults=defaults();reject(()->StudioCodec.export("MiFlexyGram.flexyGram",defaults,Set.of()));
@@ -34,8 +48,10 @@ public class StudioCoreTest {
   defaults.get("header").put("compact",true);defaults.get("composer").put("style",1);
   var three=StudioCodec.export("Tres.flexyGram",defaults,Set.of());check(three.sections.size()==3);
   var full=StudioCodec.export("Completo.flexyGram",defaults,StudioSchema.sections());check(full.sections.size()==4);check(full.sections.values().stream().mapToInt(Map::size).sum()==StudioSchema.keys().size());
-  byte[] encoded=StudioCodec.encode(full);check(Arrays.equals(encoded,StudioCodec.encode(StudioCodec.decode(encoded,1274))));
-  check(full.minApp==1274);reject(()->StudioCodec.decode(encoded,1273));
+  byte[] encoded=StudioCodec.encode(full);check(Arrays.equals(encoded,StudioCodec.encode(StudioCodec.decode(encoded,1276))));
+  check(full.minApp==1276);reject(()->StudioCodec.decode(encoded,1275));
+  var legacy=defaults();legacy.get("bubbles").remove("borderPosition");legacy.get("bubbles").remove("fuseGlass");
+  var legacyPreset=StudioCodec.export("Legacy.flexyGram",legacy,StudioSchema.sections());check(legacyPreset.minApp==1274);check(StudioCodec.decode(StudioCodec.encode(legacyPreset),1276).sections.equals(legacyPreset.sections));
   Map<String,Map<String,Object>> reversed=new LinkedHashMap<>();List<String> ids=new ArrayList<>(full.sections.keySet());Collections.reverse(ids);for(String s:ids)reversed.put(s,full.sections.get(s));check(Arrays.equals(encoded,StudioCodec.encode(StudioCodec.create(full.name,reversed))));
   check(StudioCodec.decode(StudioCodec.encode(one),1273).sections.equals(one.sections));
   try{one.sections.put("icon",Map.of());throw new AssertionError();}catch(UnsupportedOperationException expected){checks++;}

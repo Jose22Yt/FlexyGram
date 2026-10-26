@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyFilesSignatureContents">СОДЕРЖИМОЕ ФАЙЛА</string>
+    <string name="FlexyFilesSignatureOriginal">Только этот документ · Оригинал не изменяется</string>
+    <string name="FlexyFilesSignatureFolder">Папка</string>
+    <string name="FlexyFilesSignatureDocument">Документ</string>
+    <string name="FlexyFilesSignatureEmpty">Ничего не найдено</string>
+    <string name="FlexyFilesSignatureParent">На уровень выше</string>
+    <string name="FlexyFilesSignatureCount">Элементов: %1$d</string>
+</resources>

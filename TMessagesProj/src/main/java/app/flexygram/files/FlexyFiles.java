@@ -18,7 +18,7 @@ public final class FlexyFiles {
         if (name==null) return false;
         int dot=name.lastIndexOf('.');if(dot<0)return false;
         switch(name.substring(dot+1).toLowerCase(Locale.ROOT)) {
-            case "zip": case "txt": case "html": case "htm": case "css": case "js": case "json": case "xml": case "md": case "csv": case "log": case "yaml": case "yml": case "java": case "kt": case "py": case "png": case "jpg": case "jpeg": case "webp": return true;
+            case "plugin": case "zip": case "txt": case "html": case "htm": case "css": case "js": case "json": case "xml": case "md": case "csv": case "log": case "yaml": case "yml": case "java": case "kt": case "py": case "png": case "jpg": case "jpeg": case "webp": return true;
             default:return false;
         }
     }

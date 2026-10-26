@@ -25,7 +25,7 @@ public final class HeaderSettingsActivity extends SignatureMatteSettingsActivity
     private void changed(int row) { listAdapter.notifyItemChanged(row); if(preview!=null)preview.settingsChanged(); }
     @Override protected void onItemClick(View v,int position,float x,float y) {
         if(position==styleRow||position==sizeRow){boolean style=position==styleRow;
-            showDialog(new AlertDialog.Builder(getParentActivity(),resourcesProvider).setTitle(getString(style?R.string.FlexyHeaderStyle:R.string.FlexyHeaderSize)).setItems(style?new CharSequence[]{getString(R.string.FlexyHeaderSignature),getString(R.string.FlexyHeaderClassic)}:new CharSequence[]{getString(R.string.FlexyHeaderNormal),getString(R.string.FlexyHeaderCompact)},(dialog,which)->{if(style)HeaderConfig.style(which==0);else HeaderConfig.compact(which==1);changed(position);}).create());
+            showDialog(new AlertDialog.Builder(getParentActivity(),resourcesProvider).setTitle(getString(style?R.string.FlexyHeaderStyle:R.string.FlexyHeaderSize)).setItems(style?new CharSequence[]{getString(R.string.FlexyHeaderSignature),getString(R.string.FlexyHeaderFusion),getString(R.string.FlexyHeaderClassic)}:new CharSequence[]{getString(R.string.FlexyHeaderNormal),getString(R.string.FlexyHeaderCompact)},(dialog,which)->{if(style)HeaderConfig.style(new int[]{0,2,1}[which]);else HeaderConfig.compact(which==1);changed(position);}).create());
         }
     }
     private final class OpacityCell extends LinearLayout {
@@ -38,7 +38,7 @@ public final class HeaderSettingsActivity extends SignatureMatteSettingsActivity
         Adapter(Context c){super(c);}
         @Override public int getItemViewType(int p){return p==previewRow?111:p==opacityRow?112:TYPE_SETTINGS;}
         @Override public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup p,int type){if(type==111){preview=new HeaderPreviewView(p.getContext());return new RecyclerListView.Holder(preview);}if(type==112)return new RecyclerListView.Holder(new OpacityCell(p.getContext()));return super.onCreateViewHolder(p,type);}
-        @Override public void onBindViewHolder(RecyclerView.ViewHolder h,int p,boolean partial){if(p==previewRow){h.itemView.invalidate();return;}if(p==opacityRow){((OpacityCell)h.itemView).bind();return;}((TextSettingsCell)h.itemView).setTextAndValue(getString(p==styleRow?R.string.FlexyHeaderStyle:R.string.FlexyHeaderSize),getString(p==styleRow?(HeaderConfig.signature()?R.string.FlexyHeaderSignature:R.string.FlexyHeaderClassic):(HeaderConfig.compact()?R.string.FlexyHeaderCompact:R.string.FlexyHeaderNormal)),true);}
+        @Override public void onBindViewHolder(RecyclerView.ViewHolder h,int p,boolean partial){if(p==previewRow){h.itemView.invalidate();return;}if(p==opacityRow){((OpacityCell)h.itemView).bind();return;}((TextSettingsCell)h.itemView).setTextAndValue(getString(p==styleRow?R.string.FlexyHeaderStyle:R.string.FlexyHeaderSize),getString(p==styleRow?(HeaderConfig.fusion()?R.string.FlexyHeaderFusion:HeaderConfig.signature()?R.string.FlexyHeaderSignature:R.string.FlexyHeaderClassic):(HeaderConfig.compact()?R.string.FlexyHeaderCompact:R.string.FlexyHeaderNormal)),true);}
         @Override public boolean isEnabled(RecyclerView.ViewHolder h){int p=h.getAdapterPosition();return p==styleRow||p==sizeRow;}
     }
 }

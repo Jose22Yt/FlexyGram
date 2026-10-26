@@ -35,15 +35,16 @@ class Refinement(unittest.TestCase):
   checks=yaml.safe_load((ROOT/'.github/workflows/refinement1274.yml').read_text())
   self.assertIn('studio_native',str(checks));self.assertNotIn('*.apk',str(checks))
 
- def test_current_release_identity_is1274_and_all_original_signing_guards_remain(self):
+ def test_historical_release_identity_and_all_original_signing_guards_remain(self):
   import re,yaml
-  gradle=(ROOT/'TMessagesProj/build.gradle').read_text()
+  from startup_contract import restore as restore_current
+  gradle=restore_current('TMessagesProj/build.gradle',(ROOT/'TMessagesProj/build.gradle').read_bytes()).decode()
   self.assertEqual(re.search(r'def verCode = (\d+)',gradle)[1],'1275')
   self.assertEqual(restore('TMessagesProj/build.gradle',gradle.encode()),subprocess.check_output(['git','show',BASE+':TMessagesProj/build.gradle'],cwd=ROOT))
   from alpha1275_contract import restore as restore_alpha1275
   flow=restore_alpha1275('.github/workflows/connected-alpha-arm64.yml',(ROOT/'.github/workflows/connected-alpha-arm64.yml').read_bytes()).decode()
   self.assertIn('--expected-version-code 1274',flow)
-  self.assertIn('--expected-version-code 1275',(ROOT/'.github/workflows/connected-alpha-arm64.yml').read_text())
+  self.assertIn('--expected-version-code 1275',restore_current('.github/workflows/connected-alpha-arm64.yml',(ROOT/'.github/workflows/connected-alpha-arm64.yml').read_bytes()).decode())
   self.assertIn("c8f04cad685ca5757d35b25ea4b0b4613c7399909948d821e6ada61f9fb12b2c",flow)
   self.assertIn("data['elf_count'] != 96",flow)
   self.assertIn('assembleConnectedAlpha',flow)

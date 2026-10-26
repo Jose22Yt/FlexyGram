@@ -23,7 +23,7 @@ public class BubbleVisualTest {
  }
  @Test public void sixOrganicBordersAndBothGlassFinishesRemainInsideNativeSilhouette() {
   BubbleConfig.setTransparency(100);
-  for(boolean out:new boolean[]{false,true})for(int style:new int[]{1,2}){
+  for(boolean out:new boolean[]{false,true})for(int style:new int[]{0,1,2,3}){
    BubbleConfig.setOutlineStyle(style);
    MessageDrawable bubble=new MessageDrawable(MessageDrawable.TYPE_TEXT,out,false);
    bubble.setBounds(4,4,164,84);bubble.setTop(0,180,100,false,false);
@@ -152,4 +152,31 @@ public class BubbleVisualTest {
   for(int stored=-20;stored<100;stored++){assertEquals(20,BubbleStyle.effectiveRadius(true,stored));assertEquals(stored,BubbleStyle.effectiveRadius(false,stored));}
   assertEquals(20,BubbleStyle.defaultRadius(true));assertEquals(17,BubbleStyle.defaultRadius(false));
  }
+ @Test public void contourSwitchPreservesTheSelectedSideAndLegacyNoneSurvivesReload() {
+  BubbleConfig.setTransparency(65);BubbleConfig.setBorderTenths(17);BubbleConfig.setBorderPosition(3);
+  BubbleConfig.setOutlineEnabled(false);BubbleConfig.load();assertFalse(BubbleConfig.outlineEnabled());assertEquals(3,BubbleConfig.borderPosition());
+  BubbleConfig.setOutlineEnabled(true);BubbleConfig.load();assertTrue(BubbleConfig.outlineEnabled());assertEquals(3,BubbleConfig.borderPosition());
+  assertEquals(65,BubbleConfig.transparency());assertEquals(17,BubbleConfig.borderTenths());
+  ApplicationLoader.applicationContext.getSharedPreferences(BubbleConfig.FILE,0).edit().putInt("signature_border_position",0).putBoolean("signature_outline_enabled",true).commit();
+  BubbleConfig.load();assertFalse(BubbleConfig.outlineEnabled());BubbleConfig.setOutlineEnabled(true);BubbleConfig.load();assertTrue(BubbleConfig.outlineEnabled());assertEquals(5,BubbleConfig.borderPosition());
+  for(int style:new int[]{0,1,2,3}){BubbleConfig.setOutlineStyle(style);BubbleConfig.load();assertEquals(style,BubbleConfig.outlineStyle());}
+ }
+ @Test public void glassOriginalKeepsNativeRgbAndPartialShaderIsReusedAcrossAnimationAlpha() {
+  int nativeColor=0xff235a97;assertEquals(nativeColor&0xffffff,BubbleOutline.color(nativeColor,true,3,55)&0xffffff);
+  for(boolean out:new boolean[]{false,true}){
+   MessageDrawable bubble=new MessageDrawable(MessageDrawable.TYPE_TEXT,out,false);
+   Rect rect=new Rect(4,4,164,84);bubble.setBounds(rect);bubble.setTop(0,180,100,false,false);Path nativePath=bubble.makePath();
+   SignatureBorderPath cached=new SignatureBorderPath();
+   for(int mode=1;mode<=4;mode++){
+    Path part=cached.get(nativePath,mode,rect,20,6,6,2,MessageDrawable.TYPE_TEXT,0,4);
+    assertFalse(part.isEmpty());Shader shader=cached.fade(nativeColor);assertNotNull(shader);
+    for(int frame=0;frame<1000;frame++){
+     assertSame(part,cached.get(nativePath,mode,rect,20,6,6,2,MessageDrawable.TYPE_TEXT,0,4));
+     assertSame(shader,cached.fade(((frame%256)<<24)|(nativeColor&0xffffff)));
+    }
+   }
+   assertSame(nativePath,cached.get(nativePath,5,rect,20,6,6,2,MessageDrawable.TYPE_TEXT,0,4));assertNull(cached.fade(nativeColor));
+  }
+ }
+
 }

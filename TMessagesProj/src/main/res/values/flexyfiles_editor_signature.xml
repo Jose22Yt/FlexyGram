@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyEditorToolsTitle">File tools</string>
+    <string name="FlexyEditorToolsFile">SAVE &amp; SEND</string>
+    <string name="FlexyEditorToolsEdit">EDITING</string>
+    <string name="FlexyEditorToolsAdvanced">MORE TOOLS</string>
+    <string name="FlexyFilesSendCopyToChat">Send edited copy to this chat</string>
+    <string name="FlexyFilesSendCopyTitle">Send copy to current chat?</string>
+    <string name="FlexyFilesSendCopyMessage">A separate edited copy will be sent to the chat where you opened this file. The original remains unchanged.</string>
+    <string name="FlexyFilesSendCopyConfirm">Send copy</string>
+    <string name="FlexyFilesSendQueued">The copy was handed to Telegram for sending. Check delivery in the chat.</string>
+    <string name="FlexyFilesTopicUnavailable">Sending to a forum or monoforum is unavailable until its topic can be preserved safely. No file has been sent.</string>
+</resources>

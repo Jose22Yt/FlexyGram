@@ -21,18 +21,18 @@
     <string name="FlexyChatsAdditional">Opciones adicionales</string>
     <string name="FlexyConversationBar">Barra de conversación</string>
     <string name="FlexyBubbleBorderWidth">Grosor del borde</string>
-    <string name="FlexyBubblePreviewIncoming">Hola</string>
-    <string name="FlexyBubblePreviewOutgoing">¡Hola!</string>
+    <string name="FlexyBubblePreviewIncoming">¿Sabes qué hora es?</string>
+    <string name="FlexyBubblePreviewOutgoing">Es de mañana en Tokio 😎</string>
     <string name="FlexyBubbleBlurUnavailable">El desenfoque de fondo no está disponible en esta compilación de prueba. Matte conserva nítidos el texto y el contorno.</string>
     <string name="FlexyBubblePreviewGroupIncoming">Esta conversación es una vista previa local.</string>
     <string name="FlexyBubblePreviewGroupOutgoing">Tus cambios se muestran al instante.</string>
     <string name="FlexyBubbleBackgroundBlur">Desenfoque de fondo</string>
     <string name="FlexyBubbleBlurCompatibility">El desenfoque está disponible para fondos de imagen estáticos compatibles. Los fondos animados o no compatibles mantienen Matte.</string>
-    <string name="FlexyBubbleOutlineEnabled">Mostrar borde</string>
+    <string name="FlexyBubbleOutlineEnabled">Activar borde de burbuja</string>
     <string name="FlexyBubbleOutlineStyle">Estilo del borde</string>
     <string name="FlexyBubbleIntelligentColor">Color inteligente</string>
     <string name="FlexyBubbleGlassPearl">Glass Pearl</string>
-    <string name="FlexyBubblePearlIntensity">Intensidad Glass Pearl</string>
+    <string name="FlexyBubblePearlIntensity">Intensidad glass</string>
     <string name="FlexyBubbleBorderPosition">Posición del borde</string>
     <string name="FlexyBubbleBorderNone">Sin borde</string>
     <string name="FlexyBubbleBorderTop">Superior</string>
@@ -42,4 +42,6 @@
     <string name="FlexyBubbleBorderFull">Completo</string>
     <string name="FlexyBubbleGlassSatin">Glass Satin</string>
     <string name="FlexyBubbleFuseGlass">Fusionar borde glass</string>
+    <string name="FlexyBubbleOriginal">Original</string>
+    <string name="FlexyBubbleGlassOriginal">Glass Original</string>
 </resources>

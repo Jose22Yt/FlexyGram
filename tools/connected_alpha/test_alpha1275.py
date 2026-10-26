@@ -34,9 +34,10 @@ class Alpha1275Integration(unittest.TestCase):
     def test_direct_signed_apk_remains_private(self):
         import re
         import yaml
-        gradle = (ROOT / 'TMessagesProj/build.gradle').read_text()
+        from startup_contract import restore as restore_current
+        gradle = restore_current('TMessagesProj/build.gradle', (ROOT / 'TMessagesProj/build.gradle').read_bytes()).decode()
         self.assertEqual(re.search(r'def verCode = (\d+)', gradle)[1], '1275')
-        workflow = yaml.safe_load((ROOT / '.github/workflows/connected-alpha-arm64.yml').read_text())
+        workflow = yaml.safe_load(restore_current('.github/workflows/connected-alpha-arm64.yml', (ROOT / '.github/workflows/connected-alpha-arm64.yml').read_bytes()).decode())
         steps = workflow['jobs']['build-arm64']['steps']
         verifier = next(step['run'] for step in steps if step.get('name') == 'Verify APK against independently authorized certificate')
         self.assertIn('tools/connected_alpha/signature_verifier.py', verifier)

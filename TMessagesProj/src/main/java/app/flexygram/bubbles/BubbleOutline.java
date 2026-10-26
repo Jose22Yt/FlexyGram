@@ -14,6 +14,11 @@ public final class BubbleOutline {
     public static int color(int base, boolean dark, int style, int intensity) {
         int r=(base>>>16)&255,g=(base>>>8)&255,b=base&255;
         int luminance=(r*299+g*587+b*114)/1000;
+        if (style == 3) {
+            // Glass Original keeps the exact native hue; intensity changes only contour opacity.
+            int strength = Math.max(0, Math.min(100, intensity));
+            return ((140 + strength * 90 / 100) << 24) | (base & 0x00ffffff);
+        }
         if (style == 2) {
             int strength = Math.max(0, Math.min(100, intensity));
             int satin = 14 + strength * 18 / 100;

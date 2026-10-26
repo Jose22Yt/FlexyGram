@@ -21,18 +21,18 @@
     <string name="FlexyChatsAdditional">Дополнительные параметры</string>
     <string name="FlexyConversationBar">Панель переписки</string>
     <string name="FlexyBubbleBorderWidth">Толщина контура</string>
-    <string name="FlexyBubblePreviewIncoming">Привет</string>
-    <string name="FlexyBubblePreviewOutgoing">Да!</string>
+    <string name="FlexyBubblePreviewIncoming">Знаешь, который час?</string>
+    <string name="FlexyBubblePreviewOutgoing">В Токио утро 😎</string>
     <string name="FlexyBubbleBlurUnavailable">Размытие фона недоступно в этой тестовой сборке. Matte сохраняет чёткость текста и контура.</string>
     <string name="FlexyBubblePreviewGroupIncoming">Это локальный пример переписки.</string>
     <string name="FlexyBubblePreviewGroupOutgoing">Изменения видны сразу.</string>
     <string name="FlexyBubbleBackgroundBlur">Размытие фона</string>
     <string name="FlexyBubbleBlurCompatibility">Размытие доступно для совместимых статичных изображений. Анимированные и неподдерживаемые фоны сохраняют Matte.</string>
-    <string name="FlexyBubbleOutlineEnabled">Показывать контур</string>
+    <string name="FlexyBubbleOutlineEnabled">Включить контур пузырьков</string>
     <string name="FlexyBubbleOutlineStyle">Стиль контура</string>
     <string name="FlexyBubbleIntelligentColor">Умный цвет</string>
     <string name="FlexyBubbleGlassPearl">Glass Pearl</string>
-    <string name="FlexyBubblePearlIntensity">Интенсивность Glass Pearl</string>
+    <string name="FlexyBubblePearlIntensity">Интенсивность glass</string>
     <string name="FlexyBubbleBorderPosition">Расположение контура</string>
     <string name="FlexyBubbleBorderNone">Без контура</string>
     <string name="FlexyBubbleBorderTop">Сверху</string>
@@ -42,4 +42,6 @@
     <string name="FlexyBubbleBorderFull">Полный</string>
     <string name="FlexyBubbleGlassSatin">Glass Satin</string>
     <string name="FlexyBubbleFuseGlass">Смешивать стеклянный контур</string>
+    <string name="FlexyBubbleOriginal">Оригинальный</string>
+    <string name="FlexyBubbleGlassOriginal">Glass Original</string>
 </resources>

@@ -121,4 +121,12 @@ public class StudioNativeTest {
    Bitmap image=Bitmap.createBitmap(400,content.getMeasuredHeight(),Bitmap.Config.ARGB_8888);content.draw(new Canvas(image));try(FileOutputStream out=new FileOutputStream(new File(System.getProperty("probe.root"),"studio-"+(dark?"midnight":"pearl")+"-"+count+"-isolated.png"))){image.compress(Bitmap.CompressFormat.PNG,100,out);}sheet.dismiss();
   }
  }
+ @Test public void currentBubbleMaterialsAndContourSettingsExportWithoutChangingTheCodec(){
+  SharedPreferences prefs=activity.getSharedPreferences("flexygram_bubbles",0);
+  prefs.edit().putInt("signature_outline_style",3).putInt("signature_border_position",4).putBoolean("signature_fuse_glass",true).commit();
+  var snapshot=FlexyStudioStore.snapshot();var preset=StudioCodec.export("Contour.flexyGram",snapshot,Set.of("bubbles"));
+  assertEquals(1276,preset.minApp);var decoded=StudioCodec.decode(StudioCodec.encode(preset),org.telegram.messenger.BuildConfig.VERSION_CODE);
+  assertEquals(3,decoded.sections.get("bubbles").get("outlineStyle"));assertEquals(4,decoded.sections.get("bubbles").get("borderPosition"));assertEquals(true,decoded.sections.get("bubbles").get("fuseGlass"));assertFalse(decoded.sections.get("bubbles").containsKey("flexyfiles_local"));
+ }
+
 }

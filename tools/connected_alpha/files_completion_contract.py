@@ -11,6 +11,8 @@ def original(revision,path):
  return r.stdout if r.returncode==0 else None
 
 def restore(path,data):
+ from startup_contract import restore as restore_startup
+ data=restore_startup(path,data)
  path=str(path);spec=json.loads(MANIFEST.read_text());digest=spec['existing'].get(path)
  if digest is None:return data
  before=original(BASE,path)
@@ -19,4 +21,6 @@ def restore(path,data):
   if data==original(revision,path):return data
  raise ValueError('Unreviewed FlexyFiles continuation delta: '+path)
 
-def paths():return frozenset(json.loads(MANIFEST.read_text())['paths'])
+def paths():
+ from startup_contract import paths as startup_paths
+ return frozenset(json.loads(MANIFEST.read_text())['paths']) | startup_paths()

@@ -14,7 +14,8 @@ class FilesCompletion(unittest.TestCase):
     with self.assertRaises(ValueError):restore(path,data+b'\nUNREVIEWED\n')
  def test_manifest_identity_sessions_and_original_studio_codec_are_unchanged(self):
   for path in ['TMessagesProj/src/main/AndroidManifest.xml','TMessagesProj/build.gradle','TMessagesProj/src/main/java/app/flexygram/studio/core/StudioCodec.java','TMessagesProj/src/main/java/app/flexygram/studio/core/StudioSchema.java','TMessagesProj/src/main/java/app/flexygram/studio/FlexyStyleInstallHelper.java','TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java','TMessagesProj/src/main/java/org/telegram/messenger/SendMessagesHelper.java','TMessagesProj/src/main/java/org/telegram/messenger/MediaController.java']:
-   self.assertEqual((ROOT/path).read_bytes(),subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT),path)
+   from startup_contract import restore as restore_current
+   self.assertEqual(restore_current(path,(ROOT/path).read_bytes()),subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT),path)
  def test_translations_cover_same_actual_labels(self):
   values=[]
   for lang in ['values','values-es','values-ru']:

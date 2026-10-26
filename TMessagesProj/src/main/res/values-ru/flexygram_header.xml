@@ -2,7 +2,7 @@
 <resources>
     <string name="FlexyHeaderTitle">Шапка чата</string>
     <string name="FlexyHeaderStyle">Стиль</string>
-    <string name="FlexyHeaderSignature">Signature iOS 27</string>
+    <string name="FlexyHeaderSignature">Signature Adaptive</string>
     <string name="FlexyHeaderClassic">Классический</string>
     <string name="FlexyHeaderCounter">Показывать непрочитанные чаты</string>
     <string name="FlexyHeaderSize">Размер</string>
@@ -15,4 +15,5 @@
     <string name="FlexyHeaderCounterIntegrated">Встроенный</string>
     <string name="FlexyHeaderCounterBadge">Отдельный значок</string>
     <string name="FlexyHeaderLastSeenTime">Был(а) %1$s</string>
+    <string name="FlexyHeaderFusion">Signature Fusion</string>
 </resources>

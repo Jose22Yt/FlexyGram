@@ -17136,6 +17136,7 @@ public class MessagesStorage extends BaseController {
             TLRPC.messages_Dialogs dialogs = new TLRPC.TL_messages_dialogs();
             ArrayList<TLRPC.EncryptedChat> encryptedChats = new ArrayList<>();
             SQLiteCursor cursor = null;
+            android.os.Trace.beginSection("Flexy.dialogs.read_local");
             try {
                 ArrayList<Long> usersToLoad = new ArrayList<>();
                 HashSet<Long> dialogUsers = new HashSet<>();
@@ -17445,8 +17446,10 @@ public class MessagesStorage extends BaseController {
                 checkSQLException(e);
                 getMessagesController().processLoadedDialogs(dialogs, encryptedChats, null, folderId, 0, 100, 1, true, false, true);
             } finally {
-                if (cursor != null) {
-                    cursor.dispose();
+                try {
+                    if (cursor != null) cursor.dispose();
+                } finally {
+                    android.os.Trace.endSection();
                 }
             }
         });

@@ -1,0 +1,13 @@
+# Optional Signature Fusion integration — Alpha 1276
+
+Source: owner-provided `SignatureFusion_Header_Work1_Reference.zip`. The approved geometry and original 1,828-assertion geometry fixture are retained. The live controller additionally updates a retained Layout rather than allocating its Rects on each measure. No reference artwork or private contact photo is packaged.
+
+Adaptive (style 0) remains the default. Classic (stable style 1) remains available. Fusion uses new stable style 2. Existing preferences are read without rewriting them; Studio accepts the optional style only with app 1276 or later. Native Studio codec/transactions/import-install/export paths are unchanged.
+
+Fusion uses 46dp back, 50dp center, 96x46dp native call/menu pair (48x46dp menu alone when the native call is unavailable), 10dp gaps and the reference's portrait/text/fade domains, mirrored for RTL. Narrow windows or enlarged text that cannot fit the 50dp center use Adaptive geometry. The current native BackupImageView supplies the photo: no additional ImageReceiver, decoding, observer, bitmap or permanent animation. A clipped bounded portrait layer uses cached DST_IN alpha; its gradient is prepared during layout. Center contour draws once after the photo. Title/subtitle and other views are outside the mask. Default Adaptive creates none of these Fusion objects.
+
+The central text and integrated photo open the existing profile route. Call delegates to the original ChatActivity call menu action and permission flow. Overflow delegates to the existing native menu. Stories remain available through native profile; the optional integrated portrait does not render or intercept the old circular story-ring gesture. Search/action selection and normal navigation keep their native routes. Native ACTION_CANCEL now releases a header search press without opening a profile; ACTION_UP retains the original action.
+
+Validation: host reference geometry and 20,000 reused-layout differential checks; isolated Android tests exercise real controller/helpers/measure-layout/draw and touch methods with explicit native navigation/theme/image doubles. They are not full ChatActivity or full-app physical acceptance. Full application Java/JNI/Chaquopy build is a separate gate.
+
+Physical checks pending: real photos, live avatars, RTL, font scaling, split screen/rotation, keyboard, calls and menu placement, rapid back/search/select/profile gestures, theme/opacity changes, preview transitions, and gfxinfo/FrameTimeline comparison against Adaptive. The 50dp alpha layer cost must be measured on hardware; no FPS/latency gain or visual acceptance is claimed. Fusion is optional and does not change the already accepted default design.

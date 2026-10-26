@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyEditorToolsTitle">Инструменты файла</string>
+    <string name="FlexyEditorToolsFile">СОХРАНИТЬ И ОТПРАВИТЬ</string>
+    <string name="FlexyEditorToolsEdit">РЕДАКТИРОВАНИЕ</string>
+    <string name="FlexyEditorToolsAdvanced">ДОПОЛНИТЕЛЬНО</string>
+    <string name="FlexyFilesSendCopyToChat">Отправить копию в этот чат</string>
+    <string name="FlexyFilesSendCopyTitle">Отправить копию в текущий чат?</string>
+    <string name="FlexyFilesSendCopyMessage">Изменённая копия будет отправлена в чат, из которого вы открыли файл. Оригинал не изменится.</string>
+    <string name="FlexyFilesSendCopyConfirm">Отправить копию</string>
+    <string name="FlexyFilesSendQueued">Копия передана Telegram для отправки. Проверьте доставку в чате.</string>
+    <string name="FlexyFilesTopicUnavailable">Отправка в форумы и монофорумы недоступна, пока нельзя безопасно сохранить тему. Файл не отправлен.</string>
+</resources>
