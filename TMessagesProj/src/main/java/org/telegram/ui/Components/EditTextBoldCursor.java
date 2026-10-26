@@ -649,7 +649,7 @@ public class EditTextBoldCursor extends EditTextEffects {
             paint = staticHintPaint;
         }
         if (hintAnimatedDrawable != null) {
-            hintAnimatedDrawable.setText(text, !LocaleController.isRTL);
+            hintAnimatedDrawable.setText(text, animated && getMeasuredWidth() > 0 && !LocaleController.isRTL);
         } else {
             if (text == null) {
                 text = "";

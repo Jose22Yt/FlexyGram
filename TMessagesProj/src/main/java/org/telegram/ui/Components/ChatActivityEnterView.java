@@ -9492,7 +9492,7 @@ public class ChatActivityEnterView extends FrameLayout implements
             } else {
                 color = getThemedColor(Theme.key_chat_messagePanelSend);
             }
-            boolean captionNearAttach = messageEditText != null && (!TextUtils.isEmpty(messageEditText.getCaption()) || messageEditText.isNearRightCaption(dp(DEFAULT_HEIGHT))) || LocaleController.isRTL;
+            boolean captionNearAttach = !keepFlexyAttachment() && messageEditText != null && (!TextUtils.isEmpty(messageEditText.getCaption()) || messageEditText.isNearRightCaption(dp(DEFAULT_HEIGHT))) || !keepFlexyAttachment() && LocaleController.isRTL;
 
             if (color != sendButtonBackgroundColor) {
                 sendButtonBackgroundColor = color;
@@ -9531,7 +9531,7 @@ public class ChatActivityEnterView extends FrameLayout implements
                                     animators.add(ObjectAnimator.ofFloat(attachButton, View.SCALE_X, captionNearAttach ? 0.5f : 1.0f));
                                     animators.add(ObjectAnimator.ofFloat(attachButton, View.SCALE_Y, captionNearAttach ? 0.5f : 1.0f));
                                 }
-                            } else if (attachButton != null && (!NekoConfig.useChatAttachMediaMenu.Bool() || isStories)) {
+                            } else if (attachButton != null && !keepFlexyAttachment() && (!NekoConfig.useChatAttachMediaMenu.Bool() || isStories)) {
                                 animators.add(ObjectAnimator.ofFloat(attachButton, View.ALPHA, attachButtonAlpha = 0.0f));
                                 animators.add(ObjectAnimator.ofFloat(attachButton, View.SCALE_X, 0.5f));
                                 animators.add(ObjectAnimator.ofFloat(attachButton, View.SCALE_Y, 0.5f));
@@ -16560,6 +16560,12 @@ public class ChatActivityEnterView extends FrameLayout implements
         if (scheduledButton != null) {
             scheduledButton.setTranslationX(scheduledButton.getTranslationX());
         }
+    }
+
+    /** The compact attachment occupies its own left slot, independent of Send. */
+    private boolean keepFlexyAttachment() {
+        return flexyCompactLayout && !isStories && !recordingAudioVideo && recordInterfaceState == 0
+            && editingMessageObject == null && !richDraftActive;
     }
 
     private boolean isSendButtonEnabled() {
