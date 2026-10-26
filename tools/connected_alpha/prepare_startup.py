@@ -41,6 +41,8 @@ PATHS=[
 '.github/workflows/connected-alpha-arm64.yml',
 'TMessagesProj/src/main/java/app/flexygram/studio/core/StudioSchema.java',
  'tools/connected_alpha/studio_native/StudioCoreTest.java',
+ 'tools/connected_alpha/studio_native/StudioNativeTest.java.in',
+ 'tools/connected_alpha/studio_native/stubs.py',
  'tools/connected_alpha/test_files_completion.py',
  'tools/connected_alpha/test_universal3.py',
  'tools/connected_alpha/test_alpha1275.py',
