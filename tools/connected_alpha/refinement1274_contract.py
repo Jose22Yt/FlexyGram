@@ -43,3 +43,6 @@ PATHS = PATHS | frozenset(['tools/connected_alpha/signature_refinement_contract.
 
 PRODUCTION = PRODUCTION | frozenset(['TMessagesProj/src/main/java/app/flexygram/bubbles/SignatureBorderPath.java'])
 PATHS = PATHS | PRODUCTION
+
+PRODUCTION = PRODUCTION | frozenset(['TMessagesProj/src/main/java/app/flexygram/preview/SignatureWallpaperPreview.java'])
+PATHS = PATHS | PRODUCTION

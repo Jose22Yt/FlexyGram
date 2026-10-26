@@ -34,7 +34,7 @@ public final class SignatureChatHeader {
     public int measure(int width, int status, int nativeHeight) {
         var metrics = bar.getResources().getDisplayMetrics();
         titlePx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, HeaderConfig.compact() ? 16f : 17.5f, metrics);
-        subtitlePx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, HeaderConfig.compact() ? 12f : 13.5f, metrics);
+        subtitlePx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 12f, metrics);
         textMetrics.setTextSize(titlePx); textMetrics.getFontMetricsInt(fontMetrics);
         int titleLine = fontMetrics.descent - fontMetrics.ascent;
         textMetrics.setTextSize(subtitlePx); textMetrics.getFontMetricsInt(fontMetrics);

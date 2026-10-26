@@ -39,6 +39,7 @@ public final class BubblePreviewView extends View implements NotificationCenter.
     private final Rect wallpaperBounds = new Rect();
     private final Drawable check, halfCheck;
     private Drawable wallpaper;
+    private final app.flexygram.preview.SignatureWallpaperPreview wallpaperPreview;
     private boolean wallpaperMotion;
     private SignatureWallpaperBlur.Owner blurOwner;
     private final MessageDrawable.GlassSource cachedWallpaper = (canvas, shape) ->
@@ -50,8 +51,10 @@ public final class BubblePreviewView extends View implements NotificationCenter.
     private int checkColor;
     private static final String TIME = "09:41";
 
-    public BubblePreviewView(Context context) {
+    public BubblePreviewView(Context context) { this(context, null); }
+    public BubblePreviewView(Context context, Drawable contextualWallpaper) {
         super(context);
+        wallpaperPreview = new app.flexygram.preview.SignatureWallpaperPreview(this, contextualWallpaper, this::wallpaperChanged);
         samples = new String[]{LocaleController.getString(R.string.FlexyBubblePreviewIncoming),
                 LocaleController.getString(R.string.FlexyBubblePreviewGroupIncoming),
                 LocaleController.getString(R.string.FlexyBubblePreviewOutgoing),
@@ -74,23 +77,18 @@ public final class BubblePreviewView extends View implements NotificationCenter.
         else time.setTextSize(11 * getResources().getDisplayMetrics().scaledDensity);
         checkColor = Theme.getColor(Theme.key_chat_outSentCheckRead);
         check.setTint(checkColor); halfCheck.setTint(checkColor);
-        Drawable source = Theme.getCachedWallpaperNonBlocking();
-        wallpaperMotion = Theme.isWallpaperMotion() || source instanceof MotionBackgroundDrawable || source instanceof AnimatedFileDrawable;
-        if (source instanceof ChatBackgroundDrawable) source = ((ChatBackgroundDrawable) source).getDrawable(false);
-        // Borrow only a still bitmap from animated gradients. Never attach/start their renderer.
-        if (source instanceof MotionBackgroundDrawable) {
-            android.graphics.Bitmap bitmap = ((MotionBackgroundDrawable) source).getBitmap();
-            wallpaper = bitmap != null && !bitmap.isRecycled() ? new BitmapDrawable(getResources(), bitmap) : null;
-        } else if (source instanceof AnimatedFileDrawable) {
-            wallpaper = null;
-        } else if (source != null && source.getConstantState() != null) {
-            wallpaper = source.getConstantState().newDrawable(getResources()).mutate();
-        } else wallpaper = null;
-        if (wallpaper instanceof BitmapDrawable) ((BitmapDrawable) wallpaper).setFilterBitmap(true);
+        wallpaperPreview.refresh();
         updateWallpaperBounds(getWidth(), getHeight());
         settingsChanged();
         requestLayout();
         invalidate();
+    }
+
+    private void wallpaperChanged() {
+        wallpaper = wallpaperPreview.drawable();
+        wallpaperMotion = false; // Animated sources are represented by a bounded, frozen frame.
+        updateWallpaperBounds(getWidth(), getHeight());
+        settingsChanged();
     }
 
     @Override protected void onAttachedToWindow() {
@@ -102,6 +100,7 @@ public final class BubblePreviewView extends View implements NotificationCenter.
         center.addObserver(this, NotificationCenter.didApplyNewTheme);
         center.addObserver(this, NotificationCenter.didSetNewWallpapper);
         refreshTheme();
+        wallpaperPreview.attach();
     }
     @Override protected void onDetachedFromWindow() {
         NotificationCenter center = NotificationCenter.getGlobalInstance();
@@ -110,6 +109,7 @@ public final class BubblePreviewView extends View implements NotificationCenter.
         center.removeObserver(this, NotificationCenter.didSetNewWallpapper);
         if (blurOwner != null) { blurOwner.close(); blurOwner = null; }
         for (MessageDrawable bubble : bubbles) bubble.setFlexyGlassSource(null);
+        wallpaperPreview.close();
         wallpaper = null; // Never recycle the theme owner's original bitmap.
         super.onDetachedFromWindow();
     }
@@ -144,21 +144,13 @@ public final class BubblePreviewView extends View implements NotificationCenter.
     private void updateWallpaperBounds(int width, int height) {
         frameBounds.set(AndroidUtilities.dp(8), 0, Math.max(AndroidUtilities.dp(8), width - AndroidUtilities.dp(8)), height);
         frame.rewind();frame.addRoundRect(frameBounds, AndroidUtilities.dp(16), AndroidUtilities.dp(16), Path.Direction.CW);
-        if (wallpaper == null) return;
-        int iw = wallpaper.getIntrinsicWidth(), ih = wallpaper.getIntrinsicHeight();
-        if (iw > 0 && ih > 0) {
-            float scale = Math.max((float) width / iw, (float) height / ih);
-            int w = (int) Math.ceil(iw * scale), h = (int) Math.ceil(ih * scale);
-            wallpaperBounds.set((width - w) / 2, (height - h) / 2, (width + w) / 2, (height + h) / 2);
-        } else wallpaperBounds.set(0, 0, width, height);
-        wallpaper.setBounds(wallpaperBounds);
+        wallpaperPreview.resize(width, height);
     }
     @Override protected void onSizeChanged(int w, int h, int oldw, int oldh) { updateWallpaperBounds(w, h); }
     @Override protected void onDraw(Canvas canvas) {
         int save = canvas.save();canvas.clipPath(frame);
         backdrop.setColor(Theme.getColor(Theme.key_windowBackgroundGray));canvas.drawRect(frameBounds, backdrop);
-        if (wallpaper != null && (!(wallpaper instanceof BitmapDrawable)
-                || !((BitmapDrawable) wallpaper).getBitmap().isRecycled())) wallpaper.draw(canvas);
+        wallpaperPreview.draw(canvas);
         for (int i = 0; i < 4; i++) {
             boolean out = i >= 2;
             bubbles[i].drawCached(canvas, caches[i]);

@@ -24,6 +24,9 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
     private static final int SLIDER = 110;
     private int transparencyRow, borderRow, previewRow, positionRow, blurRow, infoRow, fuseRow, styleRow, pearlRow;
     private BubblePreviewView preview;
+    private final android.graphics.drawable.Drawable contextualWallpaper;
+    public BubbleSettingsActivity() { this(null); }
+    public BubbleSettingsActivity(android.graphics.drawable.Drawable contextualWallpaper) { this.contextualWallpaper = contextualWallpaper; }
     @Override protected void updateRows() {
         super.updateRows(); BubbleConfig.load();
         previewRow = addRow(); transparencyRow = addRow("flexyBubbleTransparency"); borderRow = addRow("flexyBubbleBorderWidth"); blurRow = addRow("flexyBubbleBackgroundBlur"); positionRow = addRow("flexyBubbleBorderPosition"); fuseRow = addRow("flexyBubbleFuseGlass"); styleRow = addRow("flexyBubbleOutlineStyle"); pearlRow = addRow("flexyBubblePearlIntensity"); infoRow = addRow();
@@ -90,7 +93,7 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
             return position == previewRow ? 111 : position == blurRow || position == fuseRow ? TYPE_CHECK : position == styleRow ? TYPE_SETTINGS : position == transparencyRow || position == borderRow || position == pearlRow || position == positionRow ? SLIDER : TYPE_INFO_PRIVACY;
         }
         @Override public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int type) {
-            if (type == 111) { preview = new BubblePreviewView(parent.getContext()); return new RecyclerListView.Holder(preview); }
+            if (type == 111) { preview = new BubblePreviewView(parent.getContext(), contextualWallpaper); return new RecyclerListView.Holder(preview); }
             if (type == SLIDER) return new RecyclerListView.Holder(new TransparencyCell(parent.getContext()));
             return super.onCreateViewHolder(parent, type);
         }

@@ -30,7 +30,7 @@ public final class HeaderPreviewView extends View {
     @Override protected void onMeasure(int widthSpec, int heightSpec) {
         int width=MeasureSpec.getSize(widthSpec); var metrics=getResources().getDisplayMetrics();
         titlePx=android.util.TypedValue.applyDimension(android.util.TypedValue.COMPLEX_UNIT_SP,HeaderConfig.compact()?16f:17.5f,metrics);
-        subtitlePx=android.util.TypedValue.applyDimension(android.util.TypedValue.COMPLEX_UNIT_SP,HeaderConfig.compact()?12f:13.5f,metrics);
+        subtitlePx=android.util.TypedValue.applyDimension(android.util.TypedValue.COMPLEX_UNIT_SP,12f,metrics);
         text.setTextSize(titlePx); text.getFontMetricsInt(fontMetrics); int titleLine=fontMetrics.descent-fontMetrics.ascent;
         text.setTextSize(subtitlePx); text.getFontMetricsInt(fontMetrics); int subtitleLine=fontMetrics.descent-fontMetrics.ascent;
         previewHeight=HeaderGeometry.height(width,titleLine,subtitleLine,AndroidUtilities.density,HeaderConfig.compact());

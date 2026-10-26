@@ -1567,6 +1567,16 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
                 } else {
                     isOnline[0] = false;
                     newStatus = LocaleController.formatUserStatus(currentAccount, user, isOnline, allowShorterStatus ? statusMadeShorter : null, new boolean[1]);
+                    if (signatureActive() && !isOnline[0] && !UserObject.isDeleted(user)
+                            && user.status instanceof TLRPC.TL_userStatusOffline && user.status.expires > 0) {
+                        long seen = user.status.expires * 1000L;
+                        long now = ConnectionsManager.getInstance(currentAccount).getCurrentTime() * 1000L;
+                        LocaleController locale = LocaleController.getInstance();
+                        String date = locale.getFormatterYear().format(seen);
+                        String when = locale.getFormatterDay().format(seen);
+                        if (!date.equals(locale.getFormatterYear().format(now))) when = date + " " + when;
+                        newStatus = LocaleController.formatString(R.string.FlexyHeaderLastSeenTime, when);
+                    }
                     useOnlineColor = isOnline[0];
                 }
                 newSubtitle = newStatus;
