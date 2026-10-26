@@ -104,7 +104,7 @@ public final class PlayerColors {
 
     /** Compact Modern uses the active Telegram theme, independently of album art. */
     public static PlayerColors fromSignatureTheme(boolean dark) {
-        int accent = Theme.getColor(Theme.key_windowBackgroundWhiteBlueText);
+        int accent = Theme.getColor(Theme.key_windowBackgroundWhiteBlueText, null);
         long key = ((accent & 0xffffffffL) << 1) | (dark ? 1 : 0);
         PlayerColors cached = themePalettes.get(key);
         if (cached != null) return cached;

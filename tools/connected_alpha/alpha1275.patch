@@ -1,5 +1,5 @@
 diff --git a/.github/workflows/connected-alpha-arm64.yml b/.github/workflows/connected-alpha-arm64.yml
-index 2996e99d8..19665b95a 100644
+index 2996e99d8..33929b9ac 100644
 --- a/.github/workflows/connected-alpha-arm64.yml
 +++ b/.github/workflows/connected-alpha-arm64.yml
 @@ -73,7 +73,7 @@ jobs:
@@ -16,7 +16,7 @@ index 2996e99d8..19665b95a 100644
              exit 1
            fi
 -          python3 tools/connected_alpha/verify_apk.py "${packages[0]}" --build-tools "$ANDROID_HOME/build-tools/36.0.0" --certificate-sha256 "$ALPHA_CERTIFICATE_SHA256" --expected-version-code 1274 > connected-alpha-verification.json
-+          python3 tools/connected_alpha/verify_apk.py "${packages[0]}" --build-tools "$ANDROID_HOME/build-tools/36.0.0" --certificate-sha256 "$ALPHA_CERTIFICATE_SHA256" --expected-version-code 1275 > connected-alpha-verification.json
++          python3 tools/connected_alpha/signature_verifier.py "${packages[0]}" --build-tools "$ANDROID_HOME/build-tools/36.0.0" --certificate-sha256 "$ALPHA_CERTIFICATE_SHA256" --expected-version-code 1275 > connected-alpha-verification.json
            python3 - <<'PY'
            import json, os
            from pathlib import Path
@@ -74,7 +74,7 @@ index a43ab2704..9fd067414 100644
  def officialVer = APP_VERSION_NAME
  def officialCode = APP_VERSION_CODE
 diff --git a/TMessagesProj/src/main/java/app/exteraless/player/PlayerColors.java b/TMessagesProj/src/main/java/app/exteraless/player/PlayerColors.java
-index 0ab617915..9e67049ac 100644
+index 0ab617915..ac4342d52 100644
 --- a/TMessagesProj/src/main/java/app/exteraless/player/PlayerColors.java
 +++ b/TMessagesProj/src/main/java/app/exteraless/player/PlayerColors.java
 @@ -85,6 +85,7 @@ public final class PlayerColors {
@@ -91,7 +91,7 @@ index 0ab617915..9e67049ac 100644
  
 +    /** Compact Modern uses the active Telegram theme, independently of album art. */
 +    public static PlayerColors fromSignatureTheme(boolean dark) {
-+        int accent = Theme.getColor(Theme.key_windowBackgroundWhiteBlueText);
++        int accent = Theme.getColor(Theme.key_windowBackgroundWhiteBlueText, null);
 +        long key = ((accent & 0xffffffffL) << 1) | (dark ? 1 : 0);
 +        PlayerColors cached = themePalettes.get(key);
 +        if (cached != null) return cached;
@@ -171,7 +171,7 @@ index 28709f749..62b250ce9 100644
              lyricsPanel.layout(side, stageTop, side + contentW, stageTop + stageHeight);
              y = stageTop + stageHeight + dp(6);
 diff --git a/TMessagesProj/src/main/java/app/exteraless/player/SignatureMusicBubble.java b/TMessagesProj/src/main/java/app/exteraless/player/SignatureMusicBubble.java
-index f5e36efcb..a7507b689 100644
+index f5e36efcb..5c23b4f3c 100644
 --- a/TMessagesProj/src/main/java/app/exteraless/player/SignatureMusicBubble.java
 +++ b/TMessagesProj/src/main/java/app/exteraless/player/SignatureMusicBubble.java
 @@ -2,6 +2,9 @@ package app.exteraless.player;
@@ -286,7 +286,7 @@ index f5e36efcb..a7507b689 100644
          setVisibility(show ? VISIBLE : GONE);
          if (!show) { play.setPlaying(false, false); return; }
 -        if (darkTheme == null || darkTheme != dark) {
-+        int accent = Theme.getColor(Theme.key_windowBackgroundWhiteBlueText);
++        int accent = Theme.getColor(Theme.key_windowBackgroundWhiteBlueText, null);
 +        if (darkTheme == null || darkTheme != dark || themeAccent != accent) {
              darkTheme = dark;
 -            PlayerColors colors = PlayerColors.fromSeed(0, dark);
@@ -552,10 +552,10 @@ index a8580c23b..f56ba748a 100644
          }
 diff --git a/TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleSkinPickerView.java b/TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleSkinPickerView.java
 new file mode 100644
-index 000000000..1b832e677
+index 000000000..ce025ebd3
 --- /dev/null
 +++ b/TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleSkinPickerView.java
-@@ -0,0 +1,90 @@
+@@ -0,0 +1,107 @@
 +package app.flexygram.bubbles;
 +
 +import android.content.Context;
@@ -566,11 +566,12 @@ index 000000000..1b832e677
 +import android.view.View;
 +import android.widget.LinearLayout;
 +import org.telegram.messenger.AndroidUtilities;
++import org.telegram.messenger.NotificationCenter;
 +import org.telegram.ui.ActionBar.MessageDrawable;
 +import org.telegram.ui.ActionBar.Theme;
 +
 +/** Four selectable samples drawn with the same cached native bubble paths as the chat. */
-+final class BubbleSkinPickerView extends LinearLayout {
++final class BubbleSkinPickerView extends LinearLayout implements NotificationCenter.NotificationCenterDelegate {
 +    private static final int[] SKINS = {1, 3, 5, 9};
 +    private final SkinTile[] tiles = new SkinTile[4];
 +
@@ -597,6 +598,22 @@ index 000000000..1b832e677
 +    }
 +
 +    void settingsChanged() { for (SkinTile tile : tiles) tile.invalidate(); }
++
++    @Override protected void onAttachedToWindow() {
++        super.onAttachedToWindow();
++        NotificationCenter center = NotificationCenter.getGlobalInstance();
++        center.addObserver(this, NotificationCenter.didSetNewTheme);
++        center.addObserver(this, NotificationCenter.didApplyNewTheme);
++    }
++
++    @Override protected void onDetachedFromWindow() {
++        NotificationCenter center = NotificationCenter.getGlobalInstance();
++        center.removeObserver(this, NotificationCenter.didSetNewTheme);
++        center.removeObserver(this, NotificationCenter.didApplyNewTheme);
++        super.onDetachedFromWindow();
++    }
++
++    @Override public void didReceivedNotification(int id, int account, Object... args) { settingsChanged(); }
 +
 +    private static final class SkinTile extends View {
 +        private final int skin;
@@ -756,18 +773,30 @@ index ca4fc09bd..3f9e14f41 100644
                  canvas.save();
                  canvas.clipPath(path);
 diff --git a/TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java b/TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java
-index a83909091..97a3a9686 100644
+index a83909091..7ec4fca21 100644
 --- a/TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java
 +++ b/TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java
-@@ -4685,7 +4685,7 @@ public class ChatActivity extends BaseFragment implements
+@@ -4685,7 +4685,10 @@ public class ChatActivity extends BaseFragment implements
  
              @Override
              protected boolean onAvatarClick() {
 -                if (usesSignatureHeader()) return false; // Keep the native avatar -> profile action.
-+                if (usesSignatureHeader()) return openNativeHeaderOptions();
++                if (usesSignatureHeader() && headerItem != null && headerItem.hasSubMenu()) {
++                    headerItem.toggleSubMenu();
++                    return true;
++                }
                  return openNativeHeaderOptions();
              }
              @Override protected void onSignatureOptionsClick() { openNativeHeaderOptions(); }
+@@ -4890,7 +4893,7 @@ public class ChatActivity extends BaseFragment implements
+             if (avatarContainer != null) {
+                 avatarContainer.setAvatarOptionsMenuItem(headerItem);
+             }
+-            headerItem.setForceHidden(isTitleCentered());
++            headerItem.setForceHidden(isTitleCentered() || usesSignatureHeader());
+ 
+             if (currentUser != null && currentUser.self && chatMode != MODE_SAVED) {
+                 savedChatsItem = headerItem.lazilyAddSubItem(view_as_topics, R.drawable.msg_topics, LocaleController.getString(R.string.SavedViewAsChats));
 diff --git a/TMessagesProj/src/main/java/org/telegram/ui/Components/ChatActivityEnterView.java b/TMessagesProj/src/main/java/org/telegram/ui/Components/ChatActivityEnterView.java
 index 5fb2a825c..02c2a3d1d 100644
 --- a/TMessagesProj/src/main/java/org/telegram/ui/Components/ChatActivityEnterView.java
@@ -1082,12 +1111,56 @@ index b51ea15cc..7539ad0c8 100644
 +
 +from alpha1275_contract import paths as alpha1275_paths
 +PATHS = PATHS | alpha1275_paths() | frozenset(['tools/connected_alpha/alpha1275_contract.py','tools/connected_alpha/alpha1275.patch'])
+diff --git a/tools/connected_alpha/signature_verifier.py b/tools/connected_alpha/signature_verifier.py
+new file mode 100644
+index 000000000..f753eeff6
+--- /dev/null
++++ b/tools/connected_alpha/signature_verifier.py
+@@ -0,0 +1,38 @@
++"""Connected Alpha launcher policy; all other APK checks remain active."""
++import verify_apk as original
++
++def has_signature_launcher(xmltree):
++    """Require one exported MAIN/LAUNCHER alias, the approved blue default."""
++    def enabled(node):
++        return node['attrs'].get('enabled', 'true') not in ('false', '(type 0x12)0x0', '0x0')
++    launchers = []
++    for app in original.application_nodes(xmltree):
++        if not enabled(app):
++            continue
++        activities = set()
++        for node in app['children']:
++            if node['tag'] == 'activity':
++                if enabled(node):
++                    activities.add(node['attrs'].get('name'))
++            if node['tag'] not in ('activity', 'activity-alias') or not enabled(node):
++                continue
++            for intent in node['children']:
++                if intent['tag'] != 'intent-filter':
++                    continue
++                actions = {c['attrs'].get('name') for c in intent['children'] if c['tag'] == 'action'}
++                categories = {c['attrs'].get('name') for c in intent['children'] if c['tag'] == 'category'}
++                if 'android.intent.action.MAIN' in actions and 'android.intent.category.LAUNCHER' in categories:
++                    launchers.append((node, set(activities)))
++                    break
++    if len(launchers) != 1:
++        return False
++    node, activities = launchers[0]
++    attrs = node['attrs']
++    return (node['tag'] == 'activity-alias'
++            and attrs.get('name') == 'org.telegram.messenger.FlexyBlueIcon'
++            and attrs.get('targetActivity') in activities
++            and attrs.get('exported') in ('true', '(type 0x12)0xffffffff'))
++
++if __name__ == '__main__':
++    original.has_launcher_alias = has_signature_launcher
++    original.main()
 diff --git a/tools/connected_alpha/test_alpha1275.py b/tools/connected_alpha/test_alpha1275.py
 new file mode 100644
-index 000000000..dcce16753
+index 000000000..d5bb971b1
 --- /dev/null
 +++ b/tools/connected_alpha/test_alpha1275.py
-@@ -0,0 +1,42 @@
+@@ -0,0 +1,43 @@
 +"""Alpha1275 changes must reverse exactly onto the physically accepted Alpha1274."""
 +import subprocess
 +import unittest
@@ -1125,6 +1198,7 @@ index 000000000..dcce16753
 +        workflow = yaml.safe_load((ROOT / '.github/workflows/connected-alpha-arm64.yml').read_text())
 +        steps = workflow['jobs']['build-arm64']['steps']
 +        verifier = next(step['run'] for step in steps if step.get('name') == 'Verify APK against independently authorized certificate')
++        self.assertIn('tools/connected_alpha/signature_verifier.py', verifier)
 +        self.assertIn('--expected-version-code 1275', verifier)
 +        self.assertIn("data['elf_count'] != 96", verifier)
 +        self.assertFalse(any('upload-artifact' in step.get('uses', '') for step in steps))
@@ -1266,3 +1340,47 @@ index 1a0231e8a..4e0a2c617 100644
                  self.assertEqual(hashlib.sha256(actual.encode()).hexdigest(), expected)
  
      def test_home_scope_and_native_special_states(self):
+diff --git a/tools/connected_alpha/test_signature_launcher1275.py b/tools/connected_alpha/test_signature_launcher1275.py
+new file mode 100644
+index 000000000..7be914729
+--- /dev/null
++++ b/tools/connected_alpha/test_signature_launcher1275.py
+@@ -0,0 +1,38 @@
++"""Exercise the current packaged alias and all inherited negative cases."""
++import unittest
++from test_verify_apk import PACKAGED_MANIFEST, PackagedLauncherVerification
++from signature_verifier import has_signature_launcher
++import test_verify_apk as inherited
++
++BLUE = PACKAGED_MANIFEST.replace('ExteralessIcon', 'FlexyBlueIcon')
++
++class SignatureLauncherPolicy(unittest.TestCase):
++    def test_blue_default_and_original_negative_cases(self):
++        previous = inherited.has_launcher_alias
++        fixture = inherited.PACKAGED_MANIFEST
++        try:
++            inherited.has_launcher_alias = has_signature_launcher
++            inherited.PACKAGED_MANIFEST = BLUE
++            # Every original packaged-launcher positive/negative assertion applies.
++            suite = unittest.TestSuite(PackagedLauncherVerification(name)
++                for name in unittest.defaultTestLoader.getTestCaseNames(PackagedLauncherVerification)
++                if name.startswith(('test_accepts_', 'test_rejects_')))
++            result = unittest.TestResult()
++            suite.run(result)
++            self.assertEqual(result.errors, [])
++            self.assertEqual(result.failures, [])
++            self.assertTrue(result.wasSuccessful())
++        finally:
++            inherited.has_launcher_alias = previous
++            inherited.PACKAGED_MANIFEST = fixture
++
++    def test_old_unknown_disabled_and_duplicate_defaults_rejected(self):
++        self.assertTrue(has_signature_launcher(BLUE))
++        self.assertFalse(has_signature_launcher(PACKAGED_MANIFEST))
++        self.assertFalse(has_signature_launcher(BLUE.replace('FlexyBlueIcon', 'UnknownIcon')))
++        alias = BLUE[BLUE.index('    E: activity-alias'):]
++        self.assertFalse(has_signature_launcher(BLUE + alias))
++        self.assertFalse(has_signature_launcher(BLUE + alias.replace('FlexyBlueIcon', 'ExteralessIcon')))
++        self.assertTrue(has_signature_launcher(BLUE + alias.replace('FlexyBlueIcon', 'ExteralessIcon').replace(
++            'android:enabled(0x0101000e)=(type 0x12)0xffffffff',
++            'android:enabled(0x0101000e)=(type 0x12)0x0')))

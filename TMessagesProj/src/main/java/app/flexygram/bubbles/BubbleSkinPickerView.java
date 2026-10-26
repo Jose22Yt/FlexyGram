@@ -8,11 +8,12 @@ import android.text.TextPaint;
 import android.view.View;
 import android.widget.LinearLayout;
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.NotificationCenter;
 import org.telegram.ui.ActionBar.MessageDrawable;
 import org.telegram.ui.ActionBar.Theme;
 
 /** Four selectable samples drawn with the same cached native bubble paths as the chat. */
-final class BubbleSkinPickerView extends LinearLayout {
+final class BubbleSkinPickerView extends LinearLayout implements NotificationCenter.NotificationCenterDelegate {
     private static final int[] SKINS = {1, 3, 5, 9};
     private final SkinTile[] tiles = new SkinTile[4];
 
@@ -39,6 +40,22 @@ final class BubbleSkinPickerView extends LinearLayout {
     }
 
     void settingsChanged() { for (SkinTile tile : tiles) tile.invalidate(); }
+
+    @Override protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        NotificationCenter center = NotificationCenter.getGlobalInstance();
+        center.addObserver(this, NotificationCenter.didSetNewTheme);
+        center.addObserver(this, NotificationCenter.didApplyNewTheme);
+    }
+
+    @Override protected void onDetachedFromWindow() {
+        NotificationCenter center = NotificationCenter.getGlobalInstance();
+        center.removeObserver(this, NotificationCenter.didSetNewTheme);
+        center.removeObserver(this, NotificationCenter.didApplyNewTheme);
+        super.onDetachedFromWindow();
+    }
+
+    @Override public void didReceivedNotification(int id, int account, Object... args) { settingsChanged(); }
 
     private static final class SkinTile extends View {
         private final int skin;

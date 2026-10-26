@@ -35,6 +35,7 @@ class Alpha1275Integration(unittest.TestCase):
         workflow = yaml.safe_load((ROOT / '.github/workflows/connected-alpha-arm64.yml').read_text())
         steps = workflow['jobs']['build-arm64']['steps']
         verifier = next(step['run'] for step in steps if step.get('name') == 'Verify APK against independently authorized certificate')
+        self.assertIn('tools/connected_alpha/signature_verifier.py', verifier)
         self.assertIn('--expected-version-code 1275', verifier)
         self.assertIn("data['elf_count'] != 96", verifier)
         self.assertFalse(any('upload-artifact' in step.get('uses', '') for step in steps))
