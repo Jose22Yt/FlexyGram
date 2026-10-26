@@ -9,8 +9,8 @@
     "tools/connected_alpha/startup_contract.py": "9c858c5d5a9cc19ad0c911c0008e7de52460fb2a65dd57690d64cd4ef0a96e61",
     "tools/connected_alpha/files_completion_contract.py": "6e46c225c9179e2379cc462a563a7476a8b7fcc099857e0d45d92e083877b253",
     "tools/connected_alpha/test_startup.py": "d4ee589a3e781e2abf02c1f4690931db0ffcba5454901b77095e435f64167633",
-    "tools/connected_alpha/prepare_startup.py": "142e2a5729013b19b7cc9d8150f4f035755144e48edd20061ae929c79371e7e0",
-    "tools/connected_alpha/performance/STARTUP.md": "d058a21224ed9707a88ecfc0094b948441baa1c01ffbf867ffec2c3d5ece5e82",
+    "tools/connected_alpha/prepare_startup.py": "6ff838de4d85a7cac7bb7a672478059911083ea5d946d21560f638a4fea3fbf5",
+    "tools/connected_alpha/performance/STARTUP.md": "b049c191a1526e98a7af138f900749afd94a971ae84c2d624b48c4c7da194e48",
     "TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleConfig.java": "579a40501bc5d50892d19c1d9d68e39dae2a386fc506cc34876d78fbe6054d77",
     "TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleOutline.java": "1ab7eadb45b049bb92b52ad1aafebebde2612d351d22776eb2dcd20ecc65a5a1",
     "TMessagesProj/src/main/java/app/flexygram/bubbles/BubblePreviewView.java": "5e442aa17fec3dd360aeb3b27e0d7c684818bc0682acb977a990eef62ed708b5",
@@ -36,9 +36,22 @@
     "TMessagesProj/src/main/res/values-es/flexyfiles_editor_signature.xml": "a5642ff6c95f5aa6b60c072e5fad98268f1eb04c183fa0115c43ffe175fad0ea",
     "TMessagesProj/src/main/res/values-ru/flexyfiles_editor_signature.xml": "b3a91e0cd2076abeb027d1e3a7234f65a8b6ad866410295d8479a8e1b32d0963",
     "tools/connected_alpha/files_native/stubs.py": "d478dbca136ce9b9b94004601c755e3152f23380be7f4150b95eac69bbeaf6ed",
-    "tools/connected_alpha/files_native/FilesNativeTest.java.in": "21bd53161d850b9b4426601ef6a1e1a43b4e3be1539ffadc9d67acee5b12aeec"
+    "tools/connected_alpha/files_native/FilesNativeTest.java.in": "21bd53161d850b9b4426601ef6a1e1a43b4e3be1539ffadc9d67acee5b12aeec",
+    "TMessagesProj/build.gradle": "30fec4352b5da5e0990f801579f5287dd454417304133e5f4398118a1e6bc2f2",
+    ".github/workflows/connected-alpha-arm64.yml": "5c418eb139b42fca220016750e069e405bf829369a853c906771f4e623f1afd2",
+    "TMessagesProj/src/main/java/app/flexygram/studio/core/StudioSchema.java": "ac4e81aa3c476200526f9f21ccb2f2e3393efe827dfdb6c51f62121e5110ce0a",
+    "tools/connected_alpha/studio_native/StudioCoreTest.java": "c8c750d7f81ededc9de51fbc92a383fdbb19fa9c98adc45da88ccfe9aecd6cf2",
+    "tools/connected_alpha/test_files_completion.py": "6777f2410085d3a919c0a56e0fb62dfe74dc6d82d1872caeb3a58827d0d64024",
+    "tools/connected_alpha/test_universal3.py": "4df4ff4c453ee22e997d991450e55f0b12168b5b415fbc97bff21e3e2ec9354e",
+    "tools/connected_alpha/test_alpha1275.py": "892656622a830910b7ace79553cd9419c3609cc18b7e86ab459b9729f9b194c8",
+    "tools/connected_alpha/test_refinement1274.py": "bec1c33e88f164db3f6988b8619b18df723d4675e2085f0fafbab88e803deab2",
+    "tools/connected_alpha/test_private_release1276.py": "a6adc103941b779d4704d620a6b3a7501f6a6a78c4961d3154d81485e91aef7c",
+    ".github/workflows/pr.yml": "69230e77d9c520f582d04a19adfa85dbfbcae4b9ff43fbc996462bee44b4fac3"
   },
   "paths": [
+    ".github/workflows/connected-alpha-arm64.yml",
+    ".github/workflows/pr.yml",
+    "TMessagesProj/build.gradle",
     "TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleConfig.java",
     "TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleOutline.java",
     "TMessagesProj/src/main/java/app/flexygram/bubbles/BubblePreviewView.java",
@@ -51,6 +64,7 @@
     "TMessagesProj/src/main/java/app/flexygram/files/FlexyFilesDirectSend.java",
     "TMessagesProj/src/main/java/app/flexygram/files/FlexyFilesSheet.java",
     "TMessagesProj/src/main/java/app/flexygram/performance/StartupAccounts.java",
+    "TMessagesProj/src/main/java/app/flexygram/studio/core/StudioSchema.java",
     "TMessagesProj/src/main/java/org/telegram/messenger/ApplicationLoader.java",
     "TMessagesProj/src/main/java/org/telegram/messenger/MessagesStorage.java",
     "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/MessageDrawable.java",
@@ -75,6 +89,12 @@
     "tools/connected_alpha/prepare_startup.py",
     "tools/connected_alpha/startup_contract.py",
     "tools/connected_alpha/startup_review.json",
-    "tools/connected_alpha/test_startup.py"
+    "tools/connected_alpha/studio_native/StudioCoreTest.java",
+    "tools/connected_alpha/test_alpha1275.py",
+    "tools/connected_alpha/test_files_completion.py",
+    "tools/connected_alpha/test_private_release1276.py",
+    "tools/connected_alpha/test_refinement1274.py",
+    "tools/connected_alpha/test_startup.py",
+    "tools/connected_alpha/test_universal3.py"
   ]
 }

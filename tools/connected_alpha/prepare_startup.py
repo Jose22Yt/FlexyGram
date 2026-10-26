@@ -37,6 +37,17 @@ PATHS=[
 'TMessagesProj/src/main/res/values-ru/flexyfiles_editor_signature.xml',
  'tools/connected_alpha/files_native/stubs.py',
  'tools/connected_alpha/files_native/FilesNativeTest.java.in',
+'TMessagesProj/build.gradle',
+'.github/workflows/connected-alpha-arm64.yml',
+'TMessagesProj/src/main/java/app/flexygram/studio/core/StudioSchema.java',
+ 'tools/connected_alpha/studio_native/StudioCoreTest.java',
+ 'tools/connected_alpha/test_files_completion.py',
+ 'tools/connected_alpha/test_universal3.py',
+ 'tools/connected_alpha/test_alpha1275.py',
+ 'tools/connected_alpha/test_refinement1274.py',
+ 'tools/connected_alpha/test_private_release1276.py',
+'.github/workflows/pr.yml',
+
 
 
 ]

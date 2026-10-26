@@ -103,3 +103,21 @@ RAR/7z remain unsupported as in PR100. Native widget tests use named Telegram se
 account, navigation and icon-resource doubles; they are not real Telegram uploads
 or physical acceptance. Production resource linkage and full ARM64 build are still
 required. No new permissions, idle observers, scans, services, or graphics engines.
+
+## Release/Studio compatibility guard
+
+Candidate versionCode is 1276. Gradle's only change is this integer; package,
+certificate, native dependencies and the manifest are unchanged. The reusable
+verifier expects the same version. Private delivery still requires the separately
+pinned delivery-control build; source CI never publishes an APK.
+
+A real compatibility defect was found: Studio's finite outlineStyle range ended
+at 1, causing snapshot/export to throw for Satin (2) and Glass Original (3).
+The bounded enum now accepts exactly 0..3; its default matches the native Pearl
+snapshot. Border position/fusion are explicit safe new schema1 keys. Presets using
+new keys or finishes declare minApp1276, while old valid presets remain accepted.
+The original codec, transactional apply/undo, file opening, permissions and the
+three Studio actions are unchanged. Host tests run the actual codec/transaction
+against roundtrips, legacy presets, invalid values and the 5000-mutation corpus.
+Studio native widget tests are also included in the integrated PR renderer job.
+No activation of FlexyFiles is exportable.

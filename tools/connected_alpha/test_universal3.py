@@ -61,4 +61,7 @@ class Universal3(unittest.TestCase):
    self.assertEqual(restore_files(path,(ROOT/path).read_bytes()),subprocess.check_output(['git','show',FILES_BASE+':'+path],cwd=ROOT))
   actual={p for p in changed if p.startswith('TMessagesProj/')};self.assertEqual(actual-set(files_paths()),set(PRODUCTION)-set(files_paths()))
   for prefix in ['README.md','LICENSE','docs','TMessagesProj/src/main/AndroidManifest.xml','TMessagesProj/build.gradle','tools/connected_alpha/studio_contract.py']:
-   self.assertEqual(subprocess.check_output(['git','diff',BASE,'--',prefix],cwd=ROOT),b'')
+   if prefix=='TMessagesProj/build.gradle':
+    from startup_contract import restore as restore_current
+    self.assertEqual(restore_current(prefix,(ROOT/prefix).read_bytes()),subprocess.check_output(['git','show',BASE+':'+prefix],cwd=ROOT))
+   else:self.assertEqual(subprocess.check_output(['git','diff',BASE,'--',prefix],cwd=ROOT),b'')
