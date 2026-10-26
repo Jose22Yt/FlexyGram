@@ -4,6 +4,23 @@ import difflib,re,subprocess
 from pathlib import Path
 from scan import BASE,ROOT,blob,paths
 
+def clean_context(lines):
+ # Context-only blank lines are valid diff syntax but become trailing whitespace
+ # when the diff itself is versioned. Trim only trailing context, retaining anchors.
+ result=[];i=0
+ while i<len(lines):
+  header=lines[i]
+  if not header.startswith('@@ '):result.append(header);i+=1;continue
+  match=re.fullmatch(r'@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@(.*)\n',header)
+  assert match,header
+  j=i+1
+  while j<len(lines)and not lines[j].startswith('@@ '):j+=1
+  body=lines[i+1:j];removed=0
+  while body and body[-1]==' \n':body.pop();removed+=1
+  old=int(match[2] or 1)-removed;new=int(match[4] or 1)-removed
+  result.append(f'@@ -{match[1]},{old} +{match[3]},{new} @@{match[5]}\n');result.extend(body);i=j
+ return result
+
 def prepare():
  changes={}
  for path in paths():
@@ -27,7 +44,7 @@ def prepare():
  for path,(before,after)in sorted(changes.items()):
   patch.append('diff --git a/'+path+' b/'+path+'\n')
   if not before:patch.append('new file mode 100644\n')
-  patch.extend(difflib.unified_diff(before.splitlines(True),after.splitlines(True),fromfile='a/'+path if before else '/dev/null',tofile='b/'+path))
+  patch.extend(clean_context(list(difflib.unified_diff(before.splitlines(True),after.splitlines(True),fromfile='a/'+path if before else '/dev/null',tofile='b/'+path))))
  return ''.join(patch),changes
 if __name__=='__main__':
  patch,changes=prepare();out=ROOT/'tools/connected_alpha/prebeta/android-identity.patch';out.write_text(patch);print('Staged only:',len(changes),'files; application worktree unchanged')

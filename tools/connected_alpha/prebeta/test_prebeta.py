@@ -59,6 +59,8 @@ class Audit(unittest.TestCase):
    self.assertIn('runtime DISABLED',result);self.assertIn('archive evidence is a double',result);print(result.strip())
  def test_patch_is_deterministic_scoped_and_reversible(self):
   patch,changes=prepare();self.assertEqual((HERE/'android-identity.patch').read_text(),patch)
+  self.assertFalse(any(line.endswith((' ','\t'))for line in patch.splitlines()))
+  self.assertFalse(patch.endswith('\n\n'))
   work1=set(subprocess.check_output(['git','diff','--name-only',BASE,WORK1],cwd=ROOT,text=True).splitlines());self.assertFalse(set(changes)&work1)
   with tempfile.TemporaryDirectory()as d:
    root=Path(d)

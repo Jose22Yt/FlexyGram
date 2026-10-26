@@ -44,7 +44,7 @@ diff --git a/TMessagesProj/src/connectedAlpha/res/values/flexygram_identity.xml 
 diff --git a/TMessagesProj/src/main/java/org/telegram/messenger/LocaleController.java b/TMessagesProj/src/main/java/org/telegram/messenger/LocaleController.java
 --- a/TMessagesProj/src/main/java/org/telegram/messenger/LocaleController.java
 +++ b/TMessagesProj/src/main/java/org/telegram/messenger/LocaleController.java
-@@ -1473,7 +1473,7 @@
+@@ -1473,6 +1473,6 @@
          try {
              return ApplicationLoader.applicationContext.getString(R.string.OpenExtera);
          } catch (Exception ignore) {
@@ -52,7 +52,6 @@ diff --git a/TMessagesProj/src/main/java/org/telegram/messenger/LocaleController
 +            return "FlexyGram";
          }
      }
- 
 diff --git a/TMessagesProj/src/main/res/values-ar/strings.xml b/TMessagesProj/src/main/res/values-ar/strings.xml
 --- a/TMessagesProj/src/main/res/values-ar/strings.xml
 +++ b/TMessagesProj/src/main/res/values-ar/strings.xml
@@ -183,12 +182,10 @@ diff --git a/TMessagesProj/src/main/res/values/strings_nax.xml b/TMessagesProj/s
 diff --git a/TMessagesProj/src/main/res/values/strings_oe.xml b/TMessagesProj/src/main/res/values/strings_oe.xml
 --- a/TMessagesProj/src/main/res/values/strings_oe.xml
 +++ b/TMessagesProj/src/main/res/values/strings_oe.xml
-@@ -1,7 +1,7 @@
+@@ -1,5 +1,5 @@
  <?xml version="1.0" encoding="utf-8"?>
  <!-- Строки фич, перенесённых из exteraGram. -->
  <resources>
 -    <string name="OpenExtera" translatable="false">exteraless</string>
 +    <string name="OpenExtera" translatable="false">FlexyGram</string>
      <string name="OpenExteraInfo">Make the client truly yours</string>
- 
- 

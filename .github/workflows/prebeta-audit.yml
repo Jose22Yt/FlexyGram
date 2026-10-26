@@ -27,4 +27,4 @@ jobs:
       - name: Verify audit, staged identity patch, inactive policy and synthetic SDK signatures
         run: python3 -m unittest discover -s tools/connected_alpha/prebeta -p 'test_*.py' -v
       - name: Check whitespace
-        run: git diff --check HEAD^
+        run: git diff --check 8d4fe2f0a7d47e05a34c2a2c7fc8c706ed781881
