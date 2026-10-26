@@ -54,6 +54,32 @@ public class CachedBlurVisualTest {
   for(int alpha:new int[]{0,64,128,254,255}){sample.eraseColor(Color.TRANSPARENT);assertTrue(a.draw(new Canvas(sample),shape,12,100,alpha));assertEquals(alpha,Color.alpha(sample.getPixel(20,24)));assertSame(prepared,cached(a));}
   assertEquals(0,Utilities.globalQueue.pending());
  }
+ @Test public void nativeIncomingAndOutgoingStayOnOneCacheAcrossRecycledScrollDraws()throws Exception{
+  var a=owner(new View(ApplicationLoader.applicationContext));BitmapDrawable source=image(320,640,0);
+  for(int y=0;y<640;y++)for(int x=0;x<320;x++)source.getBitmap().setPixel(x,y,Color.rgb(x*255/320,y*255/640,80));
+  a.prepare(source,false,0xffcccccc);complete();Bitmap prepared=cached(a);
+  Path whole=new Path();whole.addRect(0,0,320,640,Path.Direction.CW);
+  Bitmap expected=Bitmap.createBitmap(320,640,Bitmap.Config.ARGB_8888);a.draw(new Canvas(expected),whole,0,0);
+  BubbleConfig.setTransparency(100);BubbleConfig.setOutlineEnabled(false);
+  for(boolean outgoing:new boolean[]{false,true}){
+   var bubble=new org.telegram.ui.ActionBar.MessageDrawable(org.telegram.ui.ActionBar.MessageDrawable.TYPE_TEXT,outgoing,false);
+   bubble.setBounds(0,0,100,64);int[] root={0,0};
+   bubble.setFlexyGlassSource(new org.telegram.ui.ActionBar.MessageDrawable.GlassSource(){
+    public boolean draw(Canvas c,Path p){return draw(c,p,255);}
+    public boolean draw(Canvas c,Path p,int alpha){return a.draw(c,p,root[0],root[1],alpha);}
+   });
+   Bitmap cell=Bitmap.createBitmap(100,64,Bitmap.Config.ARGB_8888);Canvas canvas=new Canvas(cell);
+   for(int n=0;n<240;n++){
+    root[0]=outgoing?200:12;root[1]=(n*37)%560;
+    a.prepare(source,false,0xffcccccc);bubble.setTop(root[1],320,640,false,false);
+    cell.eraseColor(Color.TRANSPARENT);bubble.draw(canvas);
+    assertEquals("wallpaper sample outgoing="+outgoing+" step="+n,expected.getPixel(root[0]+40,root[1]+30),cell.getPixel(40,30));
+    assertSame(prepared,cached(a));assertEquals(0,Utilities.globalQueue.pending());
+   }
+   bubble.setFlexyGlassSource(null);cell.recycle();
+  }
+  expected.recycle();
+ }
  @Test public void cancellationLateResultsCapacityAndGenerationAreControlled()throws Exception{
   class Counter extends View{int changes;Counter(){super(ApplicationLoader.applicationContext);}@Override public void invalidate(){super.invalidate();changes++;}}
   Counter target=new Counter();var a=owner(target);var b=owner(target);var c=owner(target);

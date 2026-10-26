@@ -38,3 +38,5 @@ PATHS = PATHS | PRODUCTION
 
 from alpha1275_contract import paths as alpha1275_paths
 PATHS = PATHS | alpha1275_paths() | frozenset(['tools/connected_alpha/alpha1275_contract.py','tools/connected_alpha/alpha1275.patch'])
+PATHS = PATHS | frozenset(['tools/connected_alpha/signature_refinement_contract.py',
+                         'tools/connected_alpha/test_signature_refinement.py'])
