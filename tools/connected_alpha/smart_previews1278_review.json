@@ -1,0 +1,32 @@
+{
+  "base": "14e586b4ddb7a686f39cda3cb175920c49cecf11",
+  "reviewed": {
+    "TMessagesProj/src/main/java/app/flexygram/home/SignatureSmartPreviewPalette.java": "dd68e28af25a42d2291b99e61e3cb9b4e7312334",
+    "TMessagesProj/src/main/java/app/flexygram/home/SignatureSmartPreviews.java": "d6c580e3b13a765dc78859c158df3e6789b17624",
+    "TMessagesProj/src/main/java/org/telegram/ui/Cells/DialogCell.java": "43a731bce2cf996ec8abc3ac150ab3ab6e016ab0",
+    "TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraChatsActivity.java": "039827f4b1295f814b355d785886e3edccb0bd2c",
+    "TMessagesProj/src/main/res/values/flexygram_smart_previews.xml": "69fd269d4c5be27c7e29a081cbd20112b7d06713",
+    "TMessagesProj/src/main/res/values-es/flexygram_smart_previews.xml": "5b541cb2d87614fa9435c607f0901414c2e68045",
+    "TMessagesProj/src/main/res/values-ru/flexygram_smart_previews.xml": "5f7b62b1e4ff648943fa42613779702efcd830f9",
+    "tools/connected_alpha/test_signature_smart_previews.py": "ecb1341214d415f8008e07f2f39cf5898a233f08",
+    "tools/connected_alpha/smart_previews1278_contract.py": "6c1466be058ca67a878c8e0ace7eea14c521870b",
+    "tools/connected_alpha/signature1278_contract.py": "3e4f5fa741a12885bedffe8e88aac1390bff1590",
+    "tools/connected_alpha/next_alpha_contract.py": "097f51b69964315583260fd11ed9aa929aeb659f",
+    "tools/connected_alpha/test_signature_matte.py": "b72076acc3b406f3050fb28ece74a6c534acae44"
+  },
+  "paths": [
+    "TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraChatsActivity.java",
+    "TMessagesProj/src/main/java/app/flexygram/home/SignatureSmartPreviewPalette.java",
+    "TMessagesProj/src/main/java/app/flexygram/home/SignatureSmartPreviews.java",
+    "TMessagesProj/src/main/java/org/telegram/ui/Cells/DialogCell.java",
+    "TMessagesProj/src/main/res/values-es/flexygram_smart_previews.xml",
+    "TMessagesProj/src/main/res/values-ru/flexygram_smart_previews.xml",
+    "TMessagesProj/src/main/res/values/flexygram_smart_previews.xml",
+    "tools/connected_alpha/next_alpha_contract.py",
+    "tools/connected_alpha/signature1278_contract.py",
+    "tools/connected_alpha/smart_previews1278_contract.py",
+    "tools/connected_alpha/smart_previews1278_review.json",
+    "tools/connected_alpha/test_signature_matte.py",
+    "tools/connected_alpha/test_signature_smart_previews.py"
+  ]
+}
