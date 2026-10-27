@@ -15,7 +15,7 @@
     "TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java": "40f59569aad1d8def5efe5133b71ed89f4d2dc79359855804840f7497c48e06f",
     "TMessagesProj/src/main/java/org/telegram/ui/Components/ChatActivityEnterView.java": "a4c4296addc10a3b8d3963180185acab6cd1b826166a578d56bd733102614674",
     "TMessagesProj/src/main/java/org/telegram/ui/Components/ChatAvatarContainer.java": "03d1be9023f18936c8cc9b4cc27651bce1a0e3101afdfb18a2060d1ef0a4a914",
-    "TMessagesProj/src/main/java/org/telegram/ui/Components/FilterTabsView.java": "b106d9cc95afe02987ccf7166dc82cc074eb06545a5f646cae5b90ad75b48dd3",
+    "TMessagesProj/src/main/java/org/telegram/ui/Components/FilterTabsView.java": "bf65bac80c54d8a705a97d9a2d102911ffd5b91e5cadda26b50053505375fef5",
     "TMessagesProj/src/main/java/org/telegram/ui/Components/ReactionsContainerLayout.java": "04efd59775bbd709c89ed3dac55fafc33f822abe395e49c0149fe93c1078540e",
     "TMessagesProj/src/main/java/org/telegram/ui/Components/chat/ChatInputViewsContainer.java": "3d021c4ba6928059c995d16b3c46e32146bd64279aa6ab04eb9942de9bc3fdbc",
     "TMessagesProj/src/main/java/org/telegram/ui/Components/chat/buttons/ChatActivityBlurredRoundButton.java": "2d76b6d3424eb1effc71a87c9e1ff4ca7b893886fd15b14d4cfdb50226a82b6c",
@@ -46,7 +46,7 @@
     "tools/connected_alpha/test_integration.py": "82304898d9e475c95b5ec194fb02127c2f771a9a5b527ca9fcf1a36d683dcd2f",
     "tools/connected_alpha/test_performance2.py": "e98a35da7276169fe739a62cb08d0031a3d41e6c2a8c746b0fbf235dd7f9f9bd",
     "tools/connected_alpha/test_refinement1274.py": "6d3227e5a92298827555eaf52795293d900a239d480852e61970f74c225c64d5",
-    "tools/connected_alpha/test_signature1278.py": "8b9f06fe17e004beb98a3b480233d4bb0417af30351b29d11025e8178ec9383a",
+    "tools/connected_alpha/test_signature1278.py": "4619036a31010d2aaafa5726914378fa23c802ffe5a104a78b42e37ddff4f6e4",
     "tools/connected_alpha/test_signature_custom.py": "fa01b68d7db77c9a0e33d248d71e44bba63a4d71306a392e3a68d08d408c0485",
     "tools/connected_alpha/test_stability1277.py": "a428ffc4ee238cd2fc28e828068070e0d76e0589732e0e7ef030c5d560ceb7c5",
     "tools/connected_alpha/test_stabilization1272.py": "239e697d02edcf7a905e1b6616b97c2c7784313282ef17ab4af10826fb61a425"
