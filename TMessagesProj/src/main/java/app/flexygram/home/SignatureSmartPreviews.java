@@ -44,6 +44,14 @@ public final class SignatureSmartPreviews {
     public static boolean allowsSingleMessagePreview(java.util.List<?> groupedMessages) {
         return groupedMessages == null || groupedMessages.size() <= 1;
     }
+    /**
+     * Telegram's dialogMessage cache normally contains a one-item list even
+     * for a single latest message. Only multi-item grouped/albums should
+     * keep their native combined preview instead of a single media badge.
+     */
+    public static boolean allowsSingleMessageGroup(java.util.List<?> latest) {
+        return latest == null || latest.size() <= 1;
+    }
     public static int kind(MessageObject message){
         if(message==null||message.messageOwner==null||message.hasHighlightedWords()||message.needDrawBluredPreview())return 0;
         if(message.messageOwner.media!=null&&message.messageOwner.media.ttl_seconds!=0)return 0;
