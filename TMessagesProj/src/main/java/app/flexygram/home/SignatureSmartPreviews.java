@@ -23,13 +23,13 @@ public final class SignatureSmartPreviews {
             if(cachedMode<0){
                 int stored=ApplicationLoader.applicationContext.getSharedPreferences(PREFS,Context.MODE_PRIVATE)
                         .getInt("palette",SignatureSmartPreviewPalette.ADAPTIVE);
-                cachedMode=stored>=0&&stored<=2?stored:0;
+                cachedMode=stored>=0&&stored<=3?stored:0;
             }
             return cachedMode;
         }
     }
     public static void setMode(int next){
-        if(next<0||next>2)throw new IllegalArgumentException("palette mode");
+        if(next<0||next>3)throw new IllegalArgumentException("palette mode");
         cachedMode=next;
         ApplicationLoader.applicationContext.getSharedPreferences(PREFS,Context.MODE_PRIVATE)
                 .edit().putInt("palette",next).apply();
