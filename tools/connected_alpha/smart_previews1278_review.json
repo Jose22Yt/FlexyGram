@@ -1,0 +1,34 @@
+{
+  "base": "14e586b4ddb7a686f39cda3cb175920c49cecf11",
+  "reviewed": {
+    "TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraChatsActivity.java": "244ed510d187d60aae3b599ff65bfc1fcaa5faac",
+    "TMessagesProj/src/main/java/app/flexygram/home/SignatureSmartPreviewPalette.java": "dd68e28af25a42d2291b99e61e3cb9b4e7312334",
+    "TMessagesProj/src/main/java/app/flexygram/home/SignatureSmartPreviews.java": "0e3abcf3e496b5d3a06d956f243940e58c9a2555",
+    "TMessagesProj/src/main/java/org/telegram/ui/Cells/DialogCell.java": "46f4c0fd9bec6f26c683c5ce5e0840fa280049f6",
+    "TMessagesProj/src/main/res/values-es/flexygram_smart_previews.xml": "5d4ecfd9571dc8800f6e9d09cdd379c1f13b5b83",
+    "TMessagesProj/src/main/res/values-ru/flexygram_smart_previews.xml": "551413fb2ffc0c52136de169fe78e747edcb2cdf",
+    "TMessagesProj/src/main/res/values/flexygram_smart_previews.xml": "67a1a9bdcc7acf50b46dc3dff31d6bc259f3a16f",
+    "tools/connected_alpha/next_alpha_contract.py": "097f51b69964315583260fd11ed9aa929aeb659f",
+    "tools/connected_alpha/signature1278_contract.py": "3e4f5fa741a12885bedffe8e88aac1390bff1590",
+    "tools/connected_alpha/smart_previews1278_contract.py": "6c1466be058ca67a878c8e0ace7eea14c521870b",
+    "tools/connected_alpha/test_signature_matte.py": "b72076acc3b406f3050fb28ece74a6c534acae44",
+    "tools/connected_alpha/test_signature_smart_previews.py": "a7340992459e42c7b3a50ec81f07d1bd51551b1a",
+    "tools/connected_alpha/test_stabilization1272.py": "8923aa477f3cf52dc07f8e1484eac126dd0a25f4"
+  },
+  "paths": [
+    "TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraChatsActivity.java",
+    "TMessagesProj/src/main/java/app/flexygram/home/SignatureSmartPreviewPalette.java",
+    "TMessagesProj/src/main/java/app/flexygram/home/SignatureSmartPreviews.java",
+    "TMessagesProj/src/main/java/org/telegram/ui/Cells/DialogCell.java",
+    "TMessagesProj/src/main/res/values-es/flexygram_smart_previews.xml",
+    "TMessagesProj/src/main/res/values-ru/flexygram_smart_previews.xml",
+    "TMessagesProj/src/main/res/values/flexygram_smart_previews.xml",
+    "tools/connected_alpha/next_alpha_contract.py",
+    "tools/connected_alpha/signature1278_contract.py",
+    "tools/connected_alpha/smart_previews1278_contract.py",
+    "tools/connected_alpha/smart_previews1278_review.json",
+    "tools/connected_alpha/test_signature_matte.py",
+    "tools/connected_alpha/test_signature_smart_previews.py",
+    "tools/connected_alpha/test_stabilization1272.py"
+  ]
+}
