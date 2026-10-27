@@ -14225,20 +14225,18 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                         if (Theme.getTheme(nightThemeName) == null || !Theme.getTheme(nightThemeName).isDark()) {
                             nightThemeName = "Dark Blue";
                         }
-                        Theme.ThemeInfo themeInfo = Theme.getActiveTheme();
-                        if (dayThemeName.equals(nightThemeName)) {
-                            if (themeInfo.isDark() || dayThemeName.equals("Dark Blue") || dayThemeName.equals("Night")) {
-                                dayThemeName = "Blue";
-                            } else {
-                                nightThemeName = "Dark Blue";
-                            }
+                        // The current global theme's darkness is the source of truth.
+                        // Comparing the active theme's KEY with lastDayTheme fails for
+                        // imported/custom themes and can select another *light* theme.
+                        final boolean toDark = !Theme.isCurrentThemeDark();
+                        Theme.ThemeInfo themeInfo = Theme.getTheme(toDark ? nightThemeName : dayThemeName);
+                        if (themeInfo == null || themeInfo.isDark() != toDark) {
+                            themeInfo = Theme.getTheme(toDark ? "Dark Blue" : "Blue");
                         }
-
-                        boolean toDark;
-                        if (toDark = dayThemeName.equals(themeInfo.getKey())) {
-                            themeInfo = Theme.getTheme(nightThemeName);
-                        } else {
-                            themeInfo = Theme.getTheme(dayThemeName);
+                        // Never enqueue a null/wrong-contrast theme or latch the guard.
+                        if (themeInfo == null || themeInfo.isDark() != toDark) {
+                            switchingTheme = false;
+                            return;
                         }
                         switchTheme(themeInfo, toDark);
                         Theme.turnOffAutoNight(BulletinFactory.of(this), () -> {
