@@ -41,7 +41,7 @@ class SmartPreviews(unittest.TestCase):
             "org/telegram/messenger/R.java": '''package org.telegram.messenger;
                 public final class R { public static final class string {
                     public static final int FlexySmartFile=1,FlexySmartMusic=2,FlexySmartLink=3,
-                            FlexySmartPhoto=4,FlexySmartVideo=5,FlexySmartGroupEvent=6;
+                            FlexySmartPhoto=4,FlexySmartVideo=5,FlexySmartGroupEvent=6,FlexySmartLocation=7,FlexySmartContact=8;
                 }}''',
             "org/telegram/messenger/LocaleController.java": '''package org.telegram.messenger;
                 public class LocaleController {
@@ -53,10 +53,15 @@ class SmartPreviews(unittest.TestCase):
             "org/telegram/tgnet/TLRPC.java": '''package org.telegram.tgnet;
                 public final class TLRPC {
                     public static class Document {public String file_name;}
-                    public static class Message { public Media media;public String message;
+                    public static class Message { public MessageMedia media;public String message;
                         public Object action;public java.util.ArrayList<Object> restriction_reason=new java.util.ArrayList<>();
                         public java.util.ArrayList<MessageEntity> entities=new java.util.ArrayList<>();}
-                    public static class Media { public int ttl_seconds; }
+                    public static class MessageMedia { public int ttl_seconds;public String first_name,last_name; }
+                    public static class Media extends MessageMedia {}
+                    public static class TL_messageMediaContact extends MessageMedia{}
+                    public static class TL_messageMediaGeo extends MessageMedia{}
+                    public static class TL_messageMediaGeoLive extends MessageMedia{}
+                    public static class TL_messageMediaVenue extends MessageMedia{}
                     public static class TL_messageMediaWebPage extends Media{}
                     public static class TL_messageActionChatAddUser{}
                     public static class TL_messageActionChatJoinedByLink{}
@@ -68,10 +73,10 @@ class SmartPreviews(unittest.TestCase):
                 public class MessageObject {
                     public final TLRPC.Message messageOwner=new TLRPC.Message();
                     public CharSequence messageText;
-                    public boolean highlighted,voice,music,file,video,photo,empty=true;
+                    public boolean highlighted,voice,music,file,video,photo,concealed,empty=true;
                     public double duration;public String musicTitle;
                     public TLRPC.Document document=new TLRPC.Document();
-                    public boolean hasHighlightedWords(){return highlighted;}
+                    public boolean hasHighlightedWords(){return highlighted;}public boolean needDrawBluredPreview(){return concealed;}
                     public boolean isVoice(){return voice;}
                     public boolean isMusic(){return music;}
                     public boolean isDocument(){return file;}
@@ -99,7 +104,7 @@ class SmartPreviews(unittest.TestCase):
                         verify(3,music);ok(SignatureSmartPreviews.label(music,3).contains("Track"),"title");
                         MessageObject file=m();file.file=true;file.document.file_name="report.pdf";
                         verify(1,file);ok(SignatureSmartPreviews.label(file,1).contains("report.pdf"),"document name");
-                        MessageObject photo=m();photo.photo=true;verify(6,photo);
+                        MessageObject photo=m();photo.photo=true;verify(6,photo);photo.concealed=true;verify(0,photo);photo.concealed=false;
                         MessageObject video=m();video.video=true;verify(7,video);
                         MessageObject group=m();group.messageOwner.action=new TLRPC.TL_messageActionChatAddUser();
                         group.messageText="Joined group";verify(5,group);
@@ -107,6 +112,17 @@ class SmartPreviews(unittest.TestCase):
                         link.messageOwner.message="https://example.com/path?token=secret";verify(4,link);
                         String compact=SignatureSmartPreviews.label(link,4);
                         ok(compact.contains("example.com")&&!compact.contains("secret")&&!compact.contains("path"),"private URL path not surfaced");
+                        link.messageOwner.message="https://user:secret@example.com/p?track=hidden";
+                        compact=SignatureSmartPreviews.label(link,4);
+                        ok(compact.equals("🔗  example.com"),"credentials and tracking never surfaced");
+                        MessageObject contact=m();contact.messageOwner.media=new TLRPC.TL_messageMediaContact();
+                        contact.messageOwner.media.first_name="Ana";contact.messageOwner.media.last_name="López";
+                        verify(9,contact);ok(SignatureSmartPreviews.label(contact,9).contains("Ana López"),"contact name");
+                        contact.messageOwner.media.ttl_seconds=10;verify(0,contact);
+                        MessageObject location=m();location.messageOwner.media=new TLRPC.TL_messageMediaGeo();verify(8,location);
+                        location.messageOwner.media=new TLRPC.TL_messageMediaGeoLive();verify(8,location);
+                        location.messageOwner.media=new TLRPC.TL_messageMediaVenue();verify(8,location);
+                        location.messageOwner.entities.add(new TLRPC.TL_messageEntitySpoiler());verify(0,location);
                         link.messageOwner.message="Please visit https://example.com";verify(0,link);
                         MessageObject simpleLink=m();simpleLink.messageOwner.message="https://example.com";
                         verify(4,simpleLink);
@@ -124,7 +140,7 @@ class SmartPreviews(unittest.TestCase):
                         SignatureSmartPreviews.setMode(SignatureSmartPreviewPalette.OFF);
                         ok(SignatureSmartPreviews.mode()==3,"off");
                         for(int mode=0;mode<=2;mode++){
-                            for(int type=1;type<=7;type++){
+                            for(int type=1;type<=9;type++){
                                 for(int surface:new int[]{0xfff7f7f9,0xff141b25,0xff777777}){
                                     SignatureSmartPreviewPalette palette=new SignatureSmartPreviewPalette();
                                     ok(palette.update(type,mode,0xff189c6d,surface),"cache initial");
@@ -179,7 +195,7 @@ class SmartPreviews(unittest.TestCase):
             p=ROOT/"TMessagesProj/src/main/res"/locale/"flexygram_smart_previews.xml"
             tree=ET.parse(p)
             names={c.attrib["name"] for c in tree.getroot()}
-            self.assertEqual(len(names),11)
+            self.assertEqual(len(names),13)
 
     def test_exact_review(self):
         from smart_previews1278_contract import verify_current

@@ -36,6 +36,7 @@ class Signature1278(unittest.TestCase):
   callback=source[start:end]
   code="""public class FolderThemeCompletionProbe {
    static class Animator {}
+   Animator colorChangeAnimator;
    int tabLineColorKey=1,activeTextColorKey=2,backgroundColorKey=3,unactiveTextColorKey=4;
    int aTabLineColorKey=11,aActiveTextColorKey=12,aBackgroundColorKey=13,aUnactiveTextColorKey=14;
    boolean signatureHome=true;int refreshes;
@@ -46,9 +47,12 @@ class Signature1278(unittest.TestCase):
    }
    """+callback+"""
    public static void main(String[]args){
-    var p=new FolderThemeCompletionProbe();p.onAnimationEnd(new Animator());
+    var p=new FolderThemeCompletionProbe();Animator first=new Animator();p.colorChangeAnimator=first;p.onAnimationEnd(first);
     if(p.refreshes!=1||p.aTabLineColorKey!=-1||p.aActiveTextColorKey!=-1)throw new AssertionError("completion");
-    p.signatureHome=false;p.onAnimationEnd(new Animator());if(p.refreshes!=1)throw new AssertionError("non-Signature");
+    if(p.colorChangeAnimator!=null)throw new AssertionError("retained owner");
+    Animator next=new Animator();p.colorChangeAnimator=next;p.aTabLineColorKey=21;p.aActiveTextColorKey=22;
+    p.onAnimationEnd(first);if(p.colorChangeAnimator!=next||p.refreshes!=1||p.aTabLineColorKey!=21)throw new AssertionError("stale owner");
+    p.signatureHome=false;p.onAnimationEnd(next);if(p.refreshes!=1||p.colorChangeAnimator!=null)throw new AssertionError("non-Signature");
    }
   }"""
   with tempfile.TemporaryDirectory() as folder:
@@ -69,7 +73,8 @@ class Signature1278(unittest.TestCase):
  def test_current_release_changes_only_version_and_preserves_all_signing_gates(self):
   base='79ae7c6a4d52d3a787ca8dfddb11660d028bf24f'
   for name,old,new in [('TMessagesProj/build.gradle','def verCode = 1277','def verCode = 1278'),('.github/workflows/connected-alpha-arm64.yml','--expected-version-code 1277','--expected-version-code 1278')]:
-   current=(ROOT/name).read_text();self.assertIn(new,current)
+   from integration1279_contract import project
+   current=project("base",name,(ROOT/name).read_bytes()).decode();self.assertIn(new,current)
    original=subprocess.check_output(['git','show',base+':'+name],cwd=ROOT,text=True)
    self.assertEqual(current.replace(new,old),original)
  def test_comparison_requires_pinned_alpha1277_and_real_device_evidence(self):

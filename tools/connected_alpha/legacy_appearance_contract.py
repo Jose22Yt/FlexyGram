@@ -30,6 +30,8 @@ def paths():
 
 
 def restore(path, data):
+    from integration1279_contract import project
+    data=project("legacy",path,data)
     path = str(path)
     expected = json.loads(MANIFEST.read_text())["reviewed"].get(path)
     if expected is not None and _blob(data) == expected:
@@ -38,16 +40,18 @@ def restore(path, data):
 
 
 def verify_current():
+    from integration1279_contract import project,verify_current as verify_integration,paths as integration_paths
+    verify_integration()
     data = json.loads(MANIFEST.read_text())
     if data["base"] != BASE:
         raise ValueError("Unexpected approved Alpha1278 base")
     for path, expected in data["reviewed"].items():
-        raw = (ROOT / path).read_bytes()
+        raw = project("legacy",path,(ROOT / path).read_bytes())
         if _blob(raw) != expected:
             raise ValueError("Unreviewed legacy Appearance removal: " + path)
     changed = set(subprocess.check_output(
         ["git", "diff", BASE, "--name-only"], cwd=ROOT, text=True).splitlines())
-    extra = changed - paths()
+    extra = changed - paths() - integration_paths()
     if extra:
         raise ValueError("Legacy Appearance change outside reviewed scope: " + repr(sorted(extra)))
     print("PASS: exact scoped Exteraless Appearance retirement; physical UI pending.")

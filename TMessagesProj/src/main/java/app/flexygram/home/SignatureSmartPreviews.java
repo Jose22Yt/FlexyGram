@@ -37,7 +37,7 @@ public final class SignatureSmartPreviews {
                 .edit().putInt("palette",next).apply();
     }
     public static int kind(MessageObject message){
-        if(message==null||message.messageOwner==null||message.hasHighlightedWords())return 0;
+        if(message==null||message.messageOwner==null||message.hasHighlightedWords()||message.needDrawBluredPreview())return 0;
         if(message.messageOwner.media!=null&&message.messageOwner.media.ttl_seconds!=0)return 0;
         // Never reveal the contents of an intentionally concealed spoiler by
         // converting it into a plain text URL/document preview.
@@ -69,6 +69,12 @@ public final class SignatureSmartPreviews {
                     || message.isVideo() || message.isPhoto()))return 0;
         if(message.messageOwner.media!=null
                 &&!TextUtils.isEmpty(message.messageOwner.message))return 0;
+        if(message.messageOwner.media instanceof TLRPC.TL_messageMediaContact)
+            return SignatureSmartPreviewPalette.CONTACT;
+        if(message.messageOwner.media instanceof TLRPC.TL_messageMediaGeo
+                ||message.messageOwner.media instanceof TLRPC.TL_messageMediaGeoLive
+                ||message.messageOwner.media instanceof TLRPC.TL_messageMediaVenue)
+            return SignatureSmartPreviewPalette.LOCATION;
         if(message.isVoice())return SignatureSmartPreviewPalette.VOICE;
         if(message.isMusic())return SignatureSmartPreviewPalette.MUSIC;
         if(message.isDocument())return SignatureSmartPreviewPalette.FILE;
@@ -113,8 +119,18 @@ public final class SignatureSmartPreviews {
                 end=firstStop(url,end,'\n');
                 end=firstStop(url,end,'\r');
                 url=url.substring(0,end);
+                int credentials=url.lastIndexOf('@');
+                if(credentials>=0)url=url.substring(credentials+1);
                 if(url.length()>52)url=url.substring(0,52);
                 return "🔗  "+(url.isEmpty()?LocaleController.getString(R.string.FlexySmartLink):url);
+            }
+            case SignatureSmartPreviewPalette.LOCATION:
+                return "⌖  "+LocaleController.getString(R.string.FlexySmartLocation);
+            case SignatureSmartPreviewPalette.CONTACT:{
+                if(!(message.messageOwner.media instanceof TLRPC.TL_messageMediaContact))return "";
+                TLRPC.MessageMedia contact=message.messageOwner.media;
+                String name=((contact.first_name==null?"":contact.first_name)+" "+(contact.last_name==null?"":contact.last_name)).trim();
+                return "♙  "+(name.isEmpty()?LocaleController.getString(R.string.FlexySmartContact):name);
             }
             case SignatureSmartPreviewPalette.PHOTO:return "▣  "+LocaleController.getString(R.string.FlexySmartPhoto);
             case SignatureSmartPreviewPalette.VIDEO:return "▶  "+LocaleController.getString(R.string.FlexySmartVideo);

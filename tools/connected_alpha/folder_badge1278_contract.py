@@ -24,17 +24,21 @@ def paths():
     return frozenset(json.loads(MANIFEST.read_text())["paths"])
 
 def restore(path,data):
+    from integration1279_contract import project
+    data=project("folders",path,data)
     expected=json.loads(MANIFEST.read_text())["reviewed"].get(str(path))
     return original(path) if expected is not None and blob(data)==expected else data
 
 def verify_current():
+    from integration1279_contract import project,verify_current as verify_integration,paths as integration_paths
+    verify_integration()
     spec=json.loads(MANIFEST.read_text())
     if spec["base"]!=BASE:raise ValueError("Unexpected base for folder badge fix")
     for name,expected in spec["reviewed"].items():
-        actual=(ROOT/name).read_bytes()
+        actual=project("folders",name,(ROOT/name).read_bytes())
         if blob(actual)!=expected:raise ValueError("Unreviewed Signature folder fix: "+name)
     changed=set(subprocess.check_output(["git","diff",BASE,"--name-only"],cwd=ROOT,text=True).splitlines())
-    if changed-paths():raise ValueError("Unreviewed Signature folder scope: "+str(sorted(changed-paths())))
+    if changed-paths()-integration_paths():raise ValueError("Unreviewed Signature folder scope: "+str(sorted(changed-paths())))
     print("PASS: reviewed folder badge code and tests; runtime acceptance pending.")
 
 if __name__=="__main__":verify_current()

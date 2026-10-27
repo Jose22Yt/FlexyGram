@@ -22,19 +22,23 @@ def paths():
     return frozenset(json.loads(MANIFEST.read_text())["paths"])
 
 def restore(path,data):
+    from integration1279_contract import project
+    data=project("previews",path,data)
     expected=json.loads(MANIFEST.read_text())["reviewed"].get(str(path))
     return original(path) if expected is not None and blob(data)==expected else data
 
 def verify_current():
+    from integration1279_contract import project,verify_current as verify_integration,paths as integration_paths
+    verify_integration()
     info=json.loads(MANIFEST.read_text())
     if info["base"]!=BASE:raise ValueError("Incorrect Alpha1278 source base")
     for name,expected in info["reviewed"].items():
-        raw=(ROOT/name).read_bytes()
+        raw=project("previews",name,(ROOT/name).read_bytes())
         if blob(raw)!=expected:
             raise ValueError("Unreviewed Smart Previews change: "+name)
     changed=set(subprocess.check_output(
         ["git","diff",BASE,"--name-only"],cwd=ROOT,text=True).splitlines())
-    unexpected=changed-paths()
+    unexpected=changed-paths()-integration_paths()
     if unexpected:raise ValueError("Unreviewed Smart Previews scope: "+str(sorted(unexpected)))
     print("PASS: scoped Signature Smart Previews source review. Physical validation still pending.")
 

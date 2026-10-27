@@ -1,0 +1,35 @@
+/* Actual DialogCell draw methods/native StaticLayout; explicit theme/mode/service doubles. */
+import android.graphics.*;import android.text.*;import app.flexygram.home.*;
+import org.junit.*;import org.junit.runner.RunWith;import org.robolectric.*;import org.robolectric.annotation.*;
+import static org.junit.Assert.*;
+@RunWith(RobolectricTestRunner.class) @Config(manifest=Config.NONE,sdk=35) @GraphicsMode(GraphicsMode.Mode.NATIVE)
+public class SmartPreviewsVisualTest {
+ @Test public void allKindsThemesFontScalesAndRtlStayInsideTheOriginalRow(){
+  for(boolean rtl:new boolean[]{false,true})for(float font:new float[]{1,1.3f,1.6f,2})for(int mode=0;mode<3;mode++)for(int kind=1;kind<=9;kind++){
+   SignatureSmartPreviews.value=mode;SmartPreviewCellProbe.Theme.surface=rtl?0xff151920:0xfff8f8fa;
+   var v=new SmartPreviewCellProbe();v.bind(rtl?"ملف طويل document.pdf":"A very long document name.pdf",kind,rtl,font,320,72,0);
+   Bitmap b=v.render(1);int pixels=0;
+   for(int y=0;y<72;y++)for(int x=0;x<320;x++)if(Color.alpha(b.getPixel(x,y))>0){pixels++;assertTrue(x>=6&&x<314);assertTrue(y>=24&&y<70);}
+   assertTrue("visible capsule",pixels>100);assertEquals(72,v.getHeight());
+   assertTrue(SignatureSmartPreviewPalette.contrast(v.smartPreviewPalette.background(),v.smartPreviewPalette.foreground())>=4.5);
+   Object paint=v.smartPreviewPaint;Bitmap second=v.render(.5f);assertSame(paint,v.smartPreviewPaint);
+   second.recycle();b.recycle();
+  }
+ }
+ @Test public void photoAndVideoKeepNativeThumbnailReservationAndText(){
+  for(boolean rtl:new boolean[]{false,true})for(int kind:new int[]{6,7}){
+   SignatureSmartPreviews.value=0;var v=new SmartPreviewCellProbe();v.bind("Photo",kind,rtl,1,320,72,1);
+   assertTrue(v.messageLayout.getText() instanceof Spanned);
+   Spanned text=(Spanned)v.messageLayout.getText();var spans=text.getSpans(0,text.length(),SmartPreviewCellProbe.ThumbnailSpan.class);
+   assertEquals(1,spans.length);assertEquals(0,text.getSpanStart(spans[0]));assertTrue(text.toString().contains("Photo"));
+   assertEquals(25,spans[0].getSize(v.messageLayout.getPaint(),text,0,1,null));
+   v.render(1).recycle();assertEquals(72,v.getHeight());
+  }
+ }
+ @Test public void recycledNormalRowsAndOffModeNeverRetainACapsule(){
+  var v=new SmartPreviewCellProbe();SignatureSmartPreviews.value=0;v.bind("0:23",2,false,1,320,72,0);assertTrue(Color.alpha(v.render(1).getPixel(30,30))>0);
+  v.bind("Normal",0,false,1,320,72,0);Bitmap blank=v.render(1);assertEquals(0,blank.getPixel(30,30));blank.recycle();
+  v.bind("0:23",2,true,1,320,72,0);SignatureSmartPreviews.value=3;blank=v.render(1);
+  for(int y=0;y<72;y++)for(int x=0;x<320;x++)assertEquals(0,blank.getPixel(x,y));blank.recycle();
+ }
+}

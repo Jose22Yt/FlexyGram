@@ -93,7 +93,8 @@ public class FlexyMotionProbe {
         import motion_contract as review
         spec=json.loads(review.MANIFEST.read_text())
         for name,sha in spec['reviewed'].items():
-            current=(ROOT/name).read_bytes()
+            from integration1279_contract import project
+            current=project("motion",name,(ROOT/name).read_bytes())
             self.assertEqual(sha,hashlib.sha256(current).hexdigest(),name)
             original=subprocess.run(['git','show',review.BASE+':'+name],cwd=ROOT,capture_output=True)
             self.assertEqual(original.stdout if original.returncode==0 else b'',review.restore(name,current),name)
@@ -259,7 +260,8 @@ public class FlexyMotionProbe {
         from motion_native.player_probe import method
         path='TMessagesProj/src/main/java/org/telegram/ui/Components/FilterTabsView.java'
         old=subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT,text=True)
-        new=(ROOT/path).read_text()
+        from integration1279_contract import project
+        new=project("motion",path,(ROOT/path).read_bytes()).decode()
         factory=method(new,'    private Animator createFolderColorTransition(')
         new=new.replace(factory+'\n\n','').replace('private Animator colorChangeAnimator;','private AnimatorSet colorChangeAnimator;').replace('private final AnimationProperties.FloatProperty<FilterTabsView> COLORS','private final Property<FilterTabsView, Float> COLORS')
         new=new.replace('        colorChangeAnimator = createFolderColorTransition();','        colorChangeAnimator = new AnimatorSet();\n        colorChangeAnimator.playTogether(ObjectAnimator.ofFloat(this, COLORS, 0.0f, 1.0f));')

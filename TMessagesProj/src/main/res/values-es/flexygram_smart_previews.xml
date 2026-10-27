@@ -11,4 +11,6 @@
     <string name="FlexySmartPhoto">Foto</string>
     <string name="FlexySmartVideo">Vídeo</string>
     <string name="FlexySmartGroupEvent">Evento del grupo</string>
+    <string name="FlexySmartLocation">Ubicación</string>
+    <string name="FlexySmartContact">Contacto</string>
 </resources>

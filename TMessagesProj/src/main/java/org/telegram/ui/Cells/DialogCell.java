@@ -604,6 +604,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
     private void drawSmartPreviewBackground(Canvas canvas, float top, float alpha) {
         if (smartPreviewKind == 0 || messageLayout == null || messageLayout.getLineCount() == 0 || alpha <= 0f) return;
         int mode=app.flexygram.home.SignatureSmartPreviews.mode();
+        if(mode==app.flexygram.home.SignatureSmartPreviewPalette.OFF)return;
         int accent=Theme.getColor(Theme.key_actionBarTabLine,resourcesProvider);
         int surface=Theme.getColor(Theme.key_windowBackgroundWhite,resourcesProvider);
         smartPreviewPalette.update(smartPreviewKind,mode,accent,surface);
@@ -618,7 +619,8 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
         float left=Math.max(dp(6),lineLeft-dp(rtl&&voice?36:6));
         float right=Math.min(getMeasuredWidth()-dp(6),lineRight+dp(!rtl&&voice?36:9));
         if (right-left < dp(16))return; // Narrow/recycled rows remain native.
-        float height=Math.min(dp(22),messageLayout.getLineBottom(0)+dp(3));
+        float height=Math.min(getMeasuredHeight()-top-dp(2),Math.max(dp(18),messageLayout.getLineBottom(0)+dp(3)));
+        if(height<=0f)return;
         float bottom=top+height;
         canvas.drawRoundRect(left,top-dp(2),right,bottom,dp(12),dp(12),smartPreviewPaint);
         if(voice){
@@ -2808,7 +2810,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                 && message != null && draftMessage == null && !draftVoice
                 && TextUtils.isEmpty(printingString) && customDialog == null
                 && !isForumCell() && !isFolderCell() && !hasTags()
-                && thumbsCount == 0 && groupMessages == null
+                && groupMessages == null
                 // Sender names are on a separate native row in three-line
                 // group layouts. Two-line inline-sender previews stay native.
                 && (messageNameString == null || useForceThreeLines || SharedConfig.useThreeLinesLayout)
@@ -2819,7 +2821,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                 String label=app.flexygram.home.SignatureSmartPreviews.label(message,candidate);
                 if (!TextUtils.isEmpty(label)) {
                     smartPreviewKind=candidate;
-                    messageString=label;
+                    messageString=applyThumbs(label);
                     checkMessage=false;
                 }
             }

@@ -25,8 +25,8 @@ PATHS = PATHS | VISUAL_PATHS | frozenset(['tools/connected_alpha/test_signature_
 def restore_visual(path,data):
  # Normalize only exact, separately reviewed post-1278 appearance deltas so
  # historical visual audits continue to see their original frozen sources.
- from legacy_appearance_contract import restore as restore_legacy
- data=restore_legacy(path,data)
+ from integration1279_contract import project
+ data=project("base",path,data)
  from performance.universal_contract import restore as restore_universal3
  data=restore_universal3(path,data)
  from refinement1274_contract import restore as restore_refinement
