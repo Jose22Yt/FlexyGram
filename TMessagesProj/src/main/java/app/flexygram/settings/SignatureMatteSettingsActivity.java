@@ -58,6 +58,9 @@ public abstract class SignatureMatteSettingsActivity extends BaseNekoSettingsAct
 
         @Override
         public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+            if (holder.itemView instanceof MatteTextSettingsCell) ((MatteTextSettingsCell) holder.itemView).resetMotion();
+            if (holder.itemView instanceof MatteTextCheckCell) ((MatteTextCheckCell) holder.itemView).resetMotion();
+            if (holder.itemView instanceof MatteDetailSettingsCell) ((MatteDetailSettingsCell) holder.itemView).resetMotion();
             super.onBindViewHolder(holder, position);
             if (holder.itemView instanceof tw.nekomimi.nekogram.ui.cells.HeaderCell) {
                 tw.nekomimi.nekogram.ui.cells.HeaderCell header = (tw.nekomimi.nekogram.ui.cells.HeaderCell) holder.itemView;

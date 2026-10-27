@@ -6,7 +6,7 @@ Implemented: analytic damped spring (under/critical/over damping); one Choreogra
 
 Native HyperStudio → Animations page: Flash / Flow / Signature, explicit reduce motion, interactive button, safe speed/stiffness/damping/compression controls, restore selected profile defaults. ES/EN/RU resources. Values affect **migrated components only**. Default Flow remains; choosing a profile resets that profile's tuning while preserving explicit reduced motion. This page is separate from FlexyStudio import/export; no existing preferences are renamed.
 
-Touch migration: SignatureNavigationCell and preview use draw-only compression around the touch point. They never modify View.scale/pivot/layout/hit bounds, consume events, replace click/scroll listeners, or capture a partially animated base scale. Bind, detach and hidden-window reset release the drawn transform. Existing native press/click behavior stays active. No blanket global touch listener or hierarchy traversal.
+Touch migration: SignatureNavigationCell, Matte selector/switch/detail rows and preview use draw-only compression around the touch point. They never modify View.scale/pivot/layout/hit bounds, consume events, replace click/scroll listeners, or capture a partially animated base scale. Native Matte adapter bind, detach and hidden-window reset release the drawn transform. Existing native press/click behavior stays active. No blanket global touch listener or hierarchy traversal.
 
 Confirmed preliminary defects: repeated DOWN during spring return captured a partially compressed scale as a new baseline; fixed by unit-factor drawing. Driver advanced a fixed 1/120 second on both start and first frame, irrespective of actual time; removed. SharedPreferences were looked up on every action; replaced by cached state. Preliminary numeric integration varied with substeps/refresh; analytic solution matches equal elapsed time at 60/240Hz within JVM tolerances. These are code/test findings, **not device FPS improvements**.
 
@@ -16,7 +16,7 @@ CI scope: independent exact-hash motion manifest layered over the unchanged Alph
 
 ## Validation and limitations
 
-Host production math compiles/runs on the JVM. `motion_native/run.py` compiles the actual production motion Java including settings page and navigation cell against API37, then executes Robolectric API35 with real Android widgets, Canvas and Choreographer. Telegram theme/settings/navigation scaffolding is explicitly doubled. Window visibility is explicitly set in the isolated fixture because Robolectric has no real visible system window. Animator scales 0/.5/1/2/5 are varied only inside that process by the test fixture; production never changes system scales. These are not full app, Android17/Poco, GPU timing, IME, touch-latency or signed APK results.
+Host production math compiles/runs on the JVM. `motion_native/run.py` compiles the actual production motion Java including settings page and navigation cell against API37, then executes Robolectric API35 with real Android widgets, Canvas and Choreographer. Telegram theme/settings/navigation scaffolding is explicitly doubled. The motion package is instrumented for Robolectric’s virtual clock and paused vsync; window visibility is explicitly set in the isolated fixture because Robolectric has no real visible system window. Animator scales 0/.5/1/2/5 are varied only inside that process by the test fixture; production never changes system scales. These are not full app, Android17/Poco, GPU timing, IME, touch-latency or signed APK results.
 
 Run:
 ```
