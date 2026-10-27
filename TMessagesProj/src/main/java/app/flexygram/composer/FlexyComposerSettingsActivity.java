@@ -74,7 +74,16 @@ public final class FlexyComposerSettingsActivity extends BaseNekoSettingsActivit
     }
     private CharSequence[] levels() { return new CharSequence[]{getString(R.string.FlexyComposerDefault),
         getString(R.string.FlexyComposerSmall), getString(R.string.FlexyComposerExtraSmall)}; }
-    private final class Slider extends LinearLayout {
+    private final class Slider extends LinearLayout implements Theme.Colorable {
+        @Override public void updateColors(){
+            setBackgroundColor(getThemedColor(Theme.key_windowBackgroundWhite));
+            label.setTextColor(getThemedColor(Theme.key_windowBackgroundWhiteBlackText));
+            int accent=getThemedColor(Theme.key_windowBackgroundWhiteBlueText);
+            valueLabel.setTextColor(accent);
+            track.configure(accent,ColorUtils.blendARGB(getThemedColor(Theme.key_windowBackgroundWhite),getThemedColor(Theme.key_windowBackgroundWhiteBlackText),.16f));
+            if(bar.getThumb() instanceof GradientDrawable)((GradientDrawable)bar.getThumb()).setColor(accent);
+            bar.invalidate();
+        }
         final TextView label, valueLabel;
         final ComposerSliderTrack track = new ComposerSliderTrack();
         final SeekBar bar;

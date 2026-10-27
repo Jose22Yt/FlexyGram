@@ -67,7 +67,8 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
                 getString(R.string.FlexyBubbleBorderBottom), getString(R.string.FlexyBubbleBorderLeft),
                 getString(R.string.FlexyBubbleBorderRight), getString(R.string.FlexyBubbleBorderFull)};
     }
-    private final class TransparencyCell extends LinearLayout {
+    private final class TransparencyCell extends LinearLayout implements Theme.Colorable {
+        @Override public void updateColors(){title.setTextColor(getThemedColor(Theme.key_windowBackgroundWhiteBlackText));seek.invalidate();}
         boolean border, pearl, position;
         final TextView title;
         final SeekBar seek;
