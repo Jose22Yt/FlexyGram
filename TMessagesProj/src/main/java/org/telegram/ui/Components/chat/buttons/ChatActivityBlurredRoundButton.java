@@ -55,9 +55,12 @@ public class ChatActivityBlurredRoundButton extends FrameLayout implements Facto
         backgroundDrawable.setBounds(0, 0, w, h);
     }
 
+    private boolean drawSurface=true;
+    public void setDrawSurface(boolean value){if(drawSurface!=value){drawSurface=value;invalidate();}}
+
     @Override
     public void draw(@NonNull Canvas canvas) {
-        backgroundDrawable.draw(canvas);
+        if(drawSurface)backgroundDrawable.draw(canvas);
         super.draw(canvas);
     }
 
