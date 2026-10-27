@@ -44,3 +44,7 @@ public class PopupMotionProbe extends PopupWindow {
 
  from tabs_probe import write as write_tabs
  write_tabs(put,root)
+
+ put('org/telegram/ui/Components/ButtonBounce.java',(root/'TMessagesProj/src/main/java/org/telegram/ui/Components/ButtonBounce.java').read_text())
+ put('org/telegram/messenger/BuildConfig.java','package org.telegram.messenger;public class BuildConfig {public static boolean CONNECTED_ALPHA=true;}')
+ put('org/telegram/ui/Components/CubicBezierInterpolator.java','package org.telegram.ui.Components;public class CubicBezierInterpolator {public static final android.view.animation.Interpolator DEFAULT=new android.view.animation.LinearInterpolator();}')

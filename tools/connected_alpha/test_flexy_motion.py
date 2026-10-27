@@ -153,6 +153,25 @@ public class FlexyMotionProbe {
         click='TMessagesProj/src/main/java/me/vkryl/android/util/ClickHelper.java'
         self.assertEqual(subprocess.check_output(['git','show',BASE+':'+click],cwd=ROOT),(ROOT/click).read_bytes())
 
+    def test_native_bounce_fallback_and_tab_geometry_remain_reviewable(self):
+        import sys
+        sys.path.insert(0,str(ROOT/'tools/connected_alpha'))
+        from motion_contract import BASE
+        path='TMessagesProj/src/main/java/org/telegram/ui/Components/ButtonBounce.java'
+        old=subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT,text=True)
+        new=(ROOT/path).read_text()
+        # Original ValueAnimator blocks remain verbatim behind the explicit connected/owner bridge.
+        for start,end in [('            ValueAnimator pastAnimator', '    public void bounce()'),('        if (bounceAnimator != null)', '    public float isPressedProgress()')]:
+            a=old[old.index(start):old.index(end)]
+            self.assertIn(a,new)
+        self.assertIn('!org.telegram.messenger.BuildConfig.CONNECTED_ALPHA || view == null',new)
+        path='TMessagesProj/src/main/java/app/exteraless/appearance/MainTabsUiHelper.java'
+        old=subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT,text=True)
+        self.assertEqual(old,(ROOT/path).read_text().replace('import app.flexygram.motion.FlexyBooleanMotion;','import me.vkryl.android.animator.BoolAnimator;').replace('FlexyBooleanMotion','BoolAnimator'))
+        source=(ROOT/'TMessagesProj/src/main/java/org/telegram/ui/Components/ScaleStateListAnimator.java').read_text()
+        self.assertIn('instanceof app.flexygram.motion.FlexyPressOwner',source)
+        self.assertIn('view.setStateListAnimator(scaleStateListAnimator);',source)
+
     def test_runtime_uses_frame_clock_not_system_duration_scale(self):
         frame = (JAVA / "FlexyFrameMotion.java").read_text()
         settings = (JAVA / "FlexyMotionSettings.java").read_text()

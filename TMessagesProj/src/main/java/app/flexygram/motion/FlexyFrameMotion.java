@@ -15,6 +15,8 @@ public final class FlexyFrameMotion implements View.OnAttachStateChangeListener 
     private static boolean posted,ticking;
     private static final Choreographer.FrameCallback CLOCK=FlexyFrameMotion::frame;
     private final View owner;private final Listener listener;private final FlexyMotionSpring spring;
+    private float speedMultiplier=1;
+    public void setSpeedMultiplier(float value){checkMain();if(!Float.isFinite(value)||value<.1f||value>10)throw new IllegalArgumentException("speed");speedMultiplier=value;}
     private boolean timed;private float timedStart,timedTarget;private double timedElapsed,timedDuration;
     private long previousFrameNanos;private boolean running,disposed;private Runnable end;private Runnable configurationChanged;private long generation;
     public FlexyFrameMotion(View owner,float initial,Listener listener){
@@ -62,12 +64,12 @@ public final class FlexyFrameMotion implements View.OnAttachStateChangeListener 
         spring.configure(s.stiffness,s.damping);long delta=Math.max(0,frameTimeNanos-previousFrameNanos);previousFrameNanos=Math.max(previousFrameNanos,frameTimeNanos);
         long ticket=generation;float value;boolean settled;
         if(timed){
-            timedElapsed+=delta*1e-9*s.speed/s.profile.timelineScale;
+            timedElapsed+=delta*1e-9*s.speed*speedMultiplier/s.profile.timelineScale;
             double fraction=Math.min(1,timedElapsed/timedDuration);settled=fraction>=1;
             value=timedStart+(timedTarget-timedStart)*(float)fraction;
-            float velocity=settled?0:(timedTarget-timedStart)*s.speed/(float)(timedDuration*s.profile.timelineScale);
+            float velocity=settled?0:(timedTarget-timedStart)*s.speed*speedMultiplier/(float)(timedDuration*s.profile.timelineScale);
             spring.state(value,velocity,timedTarget);
-        }else{value=spring.advance(delta*1e-9f*s.speed);settled=spring.settled();}
+        }else{value=spring.advance(delta*1e-9f*s.speed*speedMultiplier);settled=spring.settled();}
         if(settled)stop();listener.onValue(value);if(settled&&!running&&ticket==generation)finish();
     }
     public void setOnSettingsChanged(Runnable listener){checkMain();configurationChanged=listener;}

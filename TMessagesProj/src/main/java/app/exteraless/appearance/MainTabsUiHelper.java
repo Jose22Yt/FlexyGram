@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import me.vkryl.android.animator.BoolAnimator;
+import app.flexygram.motion.FlexyBooleanMotion;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.ui.ActionBar.Theme;
@@ -190,7 +190,7 @@ public final class MainTabsUiHelper {
         return material3 ? 1.0f : getSelectedBackgroundScaleX(false, factor);
     }
 
-    public static void applyMaterial3MainTabStyle(TextView textView, BoolAnimator animator) {
+    public static void applyMaterial3MainTabStyle(TextView textView, FlexyBooleanMotion animator) {
         animator.setDuration(500L);
         animator.setInterpolator(CubicBezierInterpolator.Emphasized);
         textView.setIncludeFontPadding(false);
@@ -198,7 +198,7 @@ public final class MainTabsUiHelper {
         textView.setLayoutParams(LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 16.0f, 49, 0.0f, 42.0f, 0.0f, 0.0f));
     }
 
-    public static void setMaterial3MainTabSelected(BoolAnimator selected, BoolAnimator background, boolean value, boolean animated) {
+    public static void setMaterial3MainTabSelected(FlexyBooleanMotion selected, FlexyBooleanMotion background, boolean value, boolean animated) {
         selected.setValue(value, animated);
         background.setDuration(value ? 100L : 200L);
         background.setInterpolator(value ? CubicBezierInterpolator.Emphasized : CubicBezierInterpolator.EmphasizedAccelerate);
