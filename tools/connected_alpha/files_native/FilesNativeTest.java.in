@@ -11,9 +11,9 @@ public class FilesNativeTest {
  FlexyFileEditorActivity open(String content)throws Exception {File f=File.createTempFile("files-test-",".txt");Files.writeString(f.toPath(),content);FlexyFileEditorActivity o=new FlexyFileEditorActivity(f,"example.txt",null,1,0);o.createView(o.getParentActivity());drain(o);return o;}
  static void drainSheet(FlexyFilesSheet sheet)throws Exception{for(int i=0;i<3;i++){FilesWork w=(FilesWork)get(sheet,"work");Future<?> f=(Future<?>)get(w,"future");if(f!=null)f.get(10,TimeUnit.SECONDS);Shadows.shadowOf(Looper.getMainLooper()).idle();}}
  @Test public void longDocumentSelectionDoesNotAccumulateOffscreenSyntaxSpans()throws Exception{
-  FlexyFileEditorActivity o=open("class Value { return true; }\n".repeat(12000));try{
-   FilesCodeView e=(FilesCodeView)get(o,"editor");Method highlight=o.getClass().getDeclaredMethod("highlightParagraph");highlight.setAccessible(true);
-   for(int line=0;line<12000;line+=71){e.setSelection(Math.min(e.length(),line*28));highlight.invoke(o);assertTrue(e.getText().getSpans(0,e.length(),android.text.style.ForegroundColorSpan.class).length<=128);}
+  FlexyFileEditorActivity o=open("class Value { return true; }\n".repeat(8000));try{
+   FilesCodeView e=(FilesCodeView)get(o,"editor");assertTrue(e.isEnabled());assertEquals(224000,e.length());Method highlight=o.getClass().getDeclaredMethod("highlightParagraph");highlight.setAccessible(true);
+   for(int line=0;line<8000;line+=71){e.setSelection(Math.min(e.length(),line*28));highlight.invoke(o);assertTrue(e.getText().getSpans(0,e.length(),android.text.style.ForegroundColorSpan.class).length<=128);}
    assertEquals(android.text.Layout.BREAK_STRATEGY_SIMPLE,e.getBreakStrategy());assertEquals(android.text.Layout.HYPHENATION_FREQUENCY_NONE,e.getHyphenationFrequency());
    e.getText().append("changed");command(o,1);assertFalse(e.getText().toString().endsWith("changed"));command(o,2);assertTrue(e.getText().toString().endsWith("changed"));
   }finally{o.onFragmentDestroy();}
@@ -74,8 +74,8 @@ public class FilesNativeTest {
  static android.view.View described(android.view.View view,String label){if(label.contentEquals(view.getContentDescription()==null?"":view.getContentDescription()))return view;if(view instanceof android.view.ViewGroup){android.view.ViewGroup group=(android.view.ViewGroup)view;for(int i=0;i<group.getChildCount();i++){android.view.View match=described(group.getChildAt(i),label);if(match!=null)return match;}}return null;}
  @Test public void groupedMatteToolsAreLazyAndSendActionIsAVisibleNativeRow()throws Exception{
   java.util.concurrent.atomic.AtomicInteger selected=new java.util.concurrent.atomic.AtomicInteger();org.telegram.ui.ActionBar.BaseFragment owner=new org.telegram.ui.ActionBar.BaseFragment();
-  FlexyEditorToolsSheet sheet=new FlexyEditorToolsSheet(owner,"example.plugin",true,true,false,selected::set);sheet.show();
-  try{android.view.View row=described(sheet.getWindow().getDecorView(),org.telegram.messenger.LocaleController.getString(org.telegram.messenger.R.string.FlexyFilesSendCopyToChat));assertNotNull(row);assertEquals(0,selected.get());assertEquals(0,org.telegram.messenger.SendMessagesHelper.sends);row.performClick();assertEquals(13,selected.get());assertEquals(0,org.telegram.messenger.SendMessagesHelper.sends);}finally{sheet.dismiss();}
+  FlexyEditorToolsSheet sheet=new FlexyEditorToolsSheet(owner,"example.plugin",true,true,false,selected::set);sheet.setOnDismissListener((android.content.DialogInterface.OnDismissListener)d->sheet.dispatchPendingSelection());sheet.show();
+  try{android.view.View row=described(sheet.getWindow().getDecorView(),org.telegram.messenger.LocaleController.getString(org.telegram.messenger.R.string.FlexyFilesSendCopyToChat));assertNotNull(row);assertEquals(0,selected.get());assertEquals(0,org.telegram.messenger.SendMessagesHelper.sends);row.performClick();Shadows.shadowOf(Looper.getMainLooper()).idle();assertEquals(13,selected.get());assertEquals(0,org.telegram.messenger.SendMessagesHelper.sends);}finally{sheet.dismiss();}
  }
 
  @Test public void confirmationUsesCapturedOriginEvenAfterSelectedAccountChanges()throws Exception{

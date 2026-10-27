@@ -28,6 +28,7 @@ final class FlexyEditorToolsSheet extends BottomSheet {
     private int pendingAction = -1;
     /** Consume only after the sheet has finished dismissing; otherwise search can lose IME focus. */
     int consumePendingAction() { int value = pendingAction; pendingAction = -1; return value; }
+    void dispatchPendingSelection(){int action=consumePendingAction();if(action>=0)selection.selected(action);}
     private void selectAfterDismiss(int action) { pendingAction = action; dismiss(); }
 
     FlexyEditorToolsSheet(BaseFragment fragment, String fileName, boolean text,

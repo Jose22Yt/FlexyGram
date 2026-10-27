@@ -116,7 +116,7 @@ public final class FlexyFileEditorActivity extends BaseFragment {
         // .plugin files are handled as documents; only decoded text is editable.
         boolean pluginEditable=FlexyEditorFileTypes.canEditPlugin(filename(),text!=null);
         FlexyEditorToolsSheet sheet=new FlexyEditorToolsSheet(this,filename(),text!=null || pluginEditable,entry!=null,htmlFile,this::command);
-        showDialog(sheet,d->{int selected=sheet.consumePendingAction();if(selected>=0&&getParentActivity()!=null)command(selected);});
+        showDialog(sheet,d->{if(getParentActivity()!=null)sheet.dispatchPendingSelection();});
     }
     /** Confirmed direct-to-origin-dialog native send; never silently choose a new chat. */
     private void confirmChatSend(){
