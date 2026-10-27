@@ -53,7 +53,11 @@ public final class SignatureSmartPreviews {
         }
         if(message.messageOwner.media instanceof TLRPC.TL_messageMediaWebPage && standaloneUrl)
             return SignatureSmartPreviewPalette.LINK;
-        // Captions are user-written text and should retain the native preview.
+        // A caption is native user text even for media messages without a
+        // fully resolved media object (e.g. preloading, synthetic test doubles).
+        if(!TextUtils.isEmpty(message.messageOwner.message)
+                && (message.isVoice() || message.isMusic() || message.isDocument()
+                    || message.isVideo() || message.isPhoto()))return 0;
         if(message.messageOwner.media!=null
                 &&!TextUtils.isEmpty(message.messageOwner.message))return 0;
         if(message.isVoice())return SignatureSmartPreviewPalette.VOICE;
