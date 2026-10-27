@@ -43,3 +43,10 @@ SCENARIOS.update({
     'files_back': 'Operator repeats editor/folder/root Back with matched document/draft state.',
     'composer_multiline': 'Operator types/deletes/pastes the same multiline fixture with the same IME.'
 })
+
+# Signature1278 reuses manual test workloads; no generated reactions/messages/settings.
+SCENARIOS.update({
+ 'reactions_motion':'Operator opens, reverses and cancels the same synthetic message reaction menu.',
+ 'channel_actions':'Operator uses permitted discussion, gift entry and search on a prepared test channel; never sends a paid gift.',
+ 'bot_composer':'Operator switches native commands, keyboard and web-app menu on a prepared test bot with synthetic draft text.'
+})

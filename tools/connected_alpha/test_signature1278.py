@@ -40,6 +40,16 @@ class Signature1278(unittest.TestCase):
    current=(ROOT/name).read_text();self.assertIn(new,current)
    original=subprocess.check_output(['git','show',base+':'+name],cwd=ROOT,text=True)
    self.assertEqual(current.replace(new,old),original)
+ def test_comparison_requires_pinned_alpha1277_and_real_device_evidence(self):
+  import copy
+  from test_performance import PerformanceLab
+  from performance.compare import compare
+  old=PerformanceLab().reports();reports=[]
+  for label,sha in [('alpha1277','79ae7c6a4d52d3a787ca8dfddb11660d028bf24f'),('candidate','a'*40)]:
+   r=copy.deepcopy(old[0]);r.update(label=label,source_commit=sha);r['environment']['build_mode']='release';reports.append(r)
+  result=compare(reports,'signature1278');self.assertTrue(result['comparable']);self.assertEqual(result['superiority'],'NOT_AUTOMATICALLY_ESTABLISHED')
+  wrong=copy.deepcopy(reports);wrong[0]['source_commit']='b'*40;self.assertFalse(compare(wrong,'signature1278')['comparable'])
+  wrong=copy.deepcopy(reports);wrong[-1]['evidence']='synthetic';self.assertFalse(compare(wrong,'signature1278')['comparable'])
  def test_historical_review_is_immutable(self):
   path='tools/connected_alpha/stability1277_review.json'
   baseline=subprocess.check_output(['git','show','79ae7c6a4d52d3a787ca8dfddb11660d028bf24f:'+path],cwd=ROOT)
