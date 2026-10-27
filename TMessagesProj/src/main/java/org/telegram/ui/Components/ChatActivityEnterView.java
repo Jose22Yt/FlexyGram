@@ -16288,7 +16288,8 @@ public class ChatActivityEnterView extends FrameLayout implements
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int wasHeight = textFieldContainer.getMeasuredHeight();
-        if (botCommandsMenuButton != null && botCommandsMenuButton.getTag() != null) {
+        updateFlexyBotRow();
+        if (!flexyBotRow && botCommandsMenuButton != null && botCommandsMenuButton.getTag() != null) {
             botCommandsMenuButton.measure(widthMeasureSpec, heightMeasureSpec);
             ((MarginLayoutParams) emojiButton.getLayoutParams()).leftMargin = dp(10) + (botCommandsMenuButton == null ? 0 : botCommandsMenuButton.getMeasuredWidth());
             if (deleteRichDraftButton != null) {
@@ -16597,15 +16598,34 @@ public class ChatActivityEnterView extends FrameLayout implements
         return dp(app.flexygram.composer.ComposerGeometry.TEXT_END_SLOT);
     }
 
+    private boolean flexyBotRow;
+    private boolean wantsFlexyBotRow() {
+        return flexyCompactRequested && isChat && parentFragment!=null && !isStories
+            && botCommandsMenuButton!=null && botMenuButtonType!=BotMenuButtonType.NO_BUTTON && dialog_id>0;
+    }
+    /** Keep the real bot menu/web-app action on a secondary row, not in the text slot. */
+    private void updateFlexyBotRow() {
+        boolean row=wantsFlexyBotRow();
+        if(row==flexyBotRow)return;
+        flexyBotRow=row;
+        if(botCommandsMenuButton!=null){
+            ViewGroup parent=(ViewGroup)botCommandsMenuButton.getParent();
+            if(parent!=null)parent.removeView(botCommandsMenuButton);
+            if(row)textFieldContainer.addView(botCommandsMenuButton,LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT,32,Gravity.TOP|Gravity.LEFT,8,6,8,6));
+            else messageEditTextContainer.addView(botCommandsMenuButton,LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT,32,Gravity.BOTTOM|Gravity.LEFT,8,6,8,6));
+        }
+        ((MarginLayoutParams)messageEditTextContainer.getLayoutParams()).topMargin=row?dp(44):0;
+    }
+
     private boolean hasFlexySpecialControls() {
         return !isChat || parentFragment == null || isStories
             || senderSelectView != null && senderSelectView.getVisibility() == VISIBLE
-            || botCommandsMenuButton != null && (botCommandsMenuButton.getTag() != null || botCommandsMenuButton.getVisibility() == VISIBLE)
+            || !wantsFlexyBotRow() && botCommandsMenuButton != null && (botCommandsMenuButton.getTag() != null || botCommandsMenuButton.getVisibility() == VISIBLE)
             || botWebViewButton != null && botWebViewButton.getVisibility() == VISIBLE
             // Use the logical state rather than the 420ms transition's
             // temporarily VISIBLE view, which can repeatedly switch layouts.
             || aiButton != null && shownAiButton
-            || ((MarginLayoutParams) emojiButton.getLayoutParams()).leftMargin > dp(3);
+            || !wantsFlexyBotRow() && ((MarginLayoutParams) emojiButton.getLayoutParams()).leftMargin > dp(3);
     }
 
     public int getFlexyHorizontalMargin(int width, int nativeMargin) {
