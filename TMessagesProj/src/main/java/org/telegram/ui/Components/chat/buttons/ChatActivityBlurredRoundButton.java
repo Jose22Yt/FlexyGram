@@ -27,10 +27,13 @@ import org.telegram.ui.Components.blur3.BlurredBackgroundDrawableViewFactory;
 import org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawable;
 import org.telegram.ui.Components.blur3.drawable.color.BlurredBackgroundColorProvider;
 
-import me.vkryl.android.animator.BoolAnimator;
+import app.flexygram.motion.FlexyBooleanMotion;
+import app.flexygram.motion.FlexyPressOwner;
+import app.flexygram.motion.FlexyTouchFeedback;
+import android.view.MotionEvent;
 import me.vkryl.android.animator.FactorAnimator;
 
-public class ChatActivityBlurredRoundButton extends FrameLayout implements FactorAnimator.Target {
+public class ChatActivityBlurredRoundButton extends FrameLayout implements FactorAnimator.Target, FlexyPressOwner {
     public static final int CLICK_ZONE_MARGIN = 6;
     public static final int BUTTON_SIZE = 44;
 
@@ -41,8 +44,8 @@ public class ChatActivityBlurredRoundButton extends FrameLayout implements Facto
     private static final int ANIMATOR_ID_LOADING_VISIBILITY = 0;
     private static final int ANIMATOR_ID_IS_ENABLED = 1;
 
-    private final BoolAnimator animatorLoadingVisibility = new BoolAnimator(ANIMATOR_ID_LOADING_VISIBILITY, this, CubicBezierInterpolator.EASE_OUT_QUINT, 320);
-    private final BoolAnimator animatorIsEnabled = new BoolAnimator(ANIMATOR_ID_IS_ENABLED, this, CubicBezierInterpolator.EASE_OUT_QUINT, 320, true);
+    private final FlexyBooleanMotion animatorLoadingVisibility = new FlexyBooleanMotion(this, 320, CubicBezierInterpolator.EASE_OUT_QUINT, factor -> onFactorChanged(ANIMATOR_ID_LOADING_VISIBILITY, factor, -1, null));
+    private final FlexyBooleanMotion animatorIsEnabled = new FlexyBooleanMotion(this, 320, CubicBezierInterpolator.EASE_OUT_QUINT, factor -> onFactorChanged(ANIMATOR_ID_IS_ENABLED, factor, -1, null), true);
 
     private @Nullable ImageView imageView;
     private @Nullable ImageView loadingIndicatorView;
@@ -55,13 +58,40 @@ public class ChatActivityBlurredRoundButton extends FrameLayout implements Facto
         backgroundDrawable.setBounds(0, 0, w, h);
     }
 
+    private FlexyTouchFeedback pressFeedback;
+    @Override public void setFlexyPressEnabled(boolean enabled) {
+        if (enabled && pressFeedback == null) pressFeedback = new FlexyTouchFeedback(this);
+        else if (!enabled && pressFeedback != null) { pressFeedback.dispose(); pressFeedback = null; }
+    }
+    @Override public boolean dispatchTouchEvent(MotionEvent event) {
+        if (pressFeedback != null) pressFeedback.onTouch(event);
+        return super.dispatchTouchEvent(event);
+    }
+    @Override protected void onDetachedFromWindow() {
+        if (pressFeedback != null) pressFeedback.reset();
+        animatorLoadingVisibility.disposeFrames();
+        animatorIsEnabled.disposeFrames();
+        super.onDetachedFromWindow();
+    }
+    @Override protected void onWindowVisibilityChanged(int visibility) {
+        super.onWindowVisibilityChanged(visibility);
+        if (visibility != VISIBLE) {
+            if (pressFeedback != null) pressFeedback.reset();
+            if (animatorLoadingVisibility != null) animatorLoadingVisibility.finish();
+            if (animatorIsEnabled != null) animatorIsEnabled.finish();
+        }
+    }
+
     private boolean drawSurface=true;
     public void setDrawSurface(boolean value){if(drawSurface!=value){drawSurface=value;invalidate();}}
 
     @Override
     public void draw(@NonNull Canvas canvas) {
+        final int save = canvas.save();
+        if (pressFeedback != null) pressFeedback.transform(canvas);
         if(drawSurface)backgroundDrawable.draw(canvas);
         super.draw(canvas);
+        canvas.restoreToCount(save);
     }
 
     @Override
@@ -118,6 +148,7 @@ public class ChatActivityBlurredRoundButton extends FrameLayout implements Facto
 
     public void setEnabled(boolean enabled, boolean animated) {
         super.setEnabled(enabled);
+        if (!enabled && pressFeedback != null) pressFeedback.reset();
         animatorIsEnabled.setValue(enabled, animated);
     }
 

@@ -1,4 +1,5 @@
 """Execute corrected production decisions; no physical acceptance or latency claims."""
+from motion_contract import restore_navigation
 from pathlib import Path
 import subprocess,tempfile,unittest
 from test_flexy_composer import method_bodies
@@ -54,7 +55,7 @@ class Stability1277(unittest.TestCase):
  def test_theme_engine_system_follow_auth_and_protocol_are_preserved(self):
   for p in ('org/telegram/ui/ActionBar/Theme.java','org/telegram/ui/LaunchActivity.java','org/telegram/ui/LoginActivity.java','org/telegram/ui/ActionBar/ActionBarLayout.java','org/telegram/tgnet/ConnectionsManager.java'):
    path='TMessagesProj/src/main/java/'+p
-   self.assertEqual((ROOT/path).read_bytes(),subprocess.check_output(['git','show','38e677d60847e117ede1c25731f7b6c4fd2970e2:'+path],cwd=ROOT))
+   self.assertEqual(restore_navigation(path,(ROOT/path).read_bytes()),subprocess.check_output(['git','show','38e677d60847e117ede1c25731f7b6c4fd2970e2:'+path],cwd=ROOT))
 
  def test_release1277_keeps_package_certificate_and_native_payload_requirements(self):
   from signature1278_contract import restore as restore1278

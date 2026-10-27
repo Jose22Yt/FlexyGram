@@ -33,21 +33,23 @@ class HeaderTests(unittest.TestCase):
   hub=(ROOT/'TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraChatsActivity.java').read_text();self.assertIn('new app.flexygram.header.HeaderSettingsActivity()',hub)
   settings=(ROOT/(HEADER+'HeaderSettingsActivity.java')).read_text();self.assertIn('FlexySignatureSlider',settings);self.assertNotIn('rebuild',settings);self.assertNotIn('recreate',settings)
 
- def test_appearance_routes_to_one_header_selector_and_master_tracks_actual_style(self):
+ def test_legacy_appearance_is_retired_and_native_header_selector_remains(self):
+  # The original 1273 appearance route is preserved in the immutable historic
+  # commit, but Alpha1278 deliberately retires its conflicting parent switch.
   from test_signature_matte import body
-  s=(ROOT/'TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraAppearanceActivity.java').read_text()
-  click=body(s,'protected void onItemClick(')
-  branch=click[click.index('position == iosChatHeaderRow'):click.index('position == dividerStyleRow')]
-  self.assertIn('BuildConfig.CONNECTED_ALPHA',branch)
-  self.assertIn('presentFragment(new app.flexygram.header.HeaderSettingsActivity())',branch)
-  self.assertIn('AppearanceConfig.iosChatHeader.setConfigBool',branch)
-  self.assertIn('HeaderConfig.signature()',body(s,'private int iosSelectedCount('))
-  master=body(s,'private void toggleAllIosStyles(')
-  self.assertIn('HeaderConfig.style(enable)',master)
-  self.assertIn('AppearanceConfig.iosChatHeader.setConfigBool(enable)',master)
-  self.assertIn('BuildConfig.CONNECTED_ALPHA',master)
-  self.assertIn('iosChatHeaderRow = addRow("iosChatHeader")',body(s,'protected void updateRows()'))
-  self.assertIn('position == iosChatHeaderRow && org.telegram.messenger.BuildConfig.CONNECTED_ALPHA',s)
+  path='TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraAppearanceActivity.java'
+  historical=subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT,text=True)
+  self.assertIn('iosChatHeaderRow',historical)
+  live=(ROOT/path).read_text()
+  self.assertNotIn('iosChatHeaderRow',live)
+  self.assertNotIn('toggleAllIosStyles',live)
+  self.assertNotIn('md3ChatHeaderRow',live)
+  self.assertNotIn('toggleAllMd3Styles',live)
+  self.assertIn('sectionsHeaderRow = addRow("sectionsHeader")',body(live,'protected void updateRows()'))
+  hub=(ROOT/'TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraChatsActivity.java').read_text()
+  self.assertIn('new app.flexygram.header.HeaderSettingsActivity()',hub)
+  header=(ROOT/'TMessagesProj/src/main/java/app/flexygram/header/HeaderConfig.java').read_text()
+  self.assertIn('prefs().edit().putInt("style", currentStyle)',header)
 
  def test_native_text_fixture_matches_real_integer_pixel_api(self):
   native=(ROOT/'TMessagesProj/src/main/java/org/telegram/ui/ActionBar/SimpleTextView.java').read_text()

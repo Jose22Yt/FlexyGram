@@ -32,9 +32,9 @@ public class HeaderVisualTest {
   header.setCount(-1);size(bar,401);assertFalse(header.geometry.countVisible);assertFalse(bar.backButtonImageView.getContentDescription().toString().contains("Unread"));
   bar.search=true;size(bar,401);assertFalse(header.active());assertEquals(2,bar.getChildCount());bar.search=false;bar.selection=true;size(bar,401);assertFalse(header.active());header.detach();header.detach();
  }
- @Test public void preferencesPreserveLegacyChoicesAndOnlyWriteTheirOwnFile(){
+ @Test public void preferencesIgnoreRetiredMastersPreserveSignatureChoicesAndOnlyWriteTheirOwnFile(){
   var old=activity.getSharedPreferences("appearance",0);var prefs=activity.getSharedPreferences("flexygram_header",0);assertTrue(HeaderConfig.signature());
-  old.edit().putBoolean("OEAppearanceIosChatHeader",false).commit();HeaderConfig.load();assertFalse(HeaderConfig.signature());
+  old.edit().putBoolean("OEAppearanceIosChatHeader",false).commit();HeaderConfig.load();assertTrue("retired master cannot select classic header",HeaderConfig.signature());
   old.edit().putBoolean("OEAppearanceIosChatHeaderAuto",true).commit();HeaderConfig.load();assertTrue(HeaderConfig.signature());
   var original=old.getAll();HeaderConfig.style(false);HeaderConfig.counter(false);HeaderConfig.compact(true);HeaderConfig.opacity(1000);HeaderConfig.load();assertFalse(HeaderConfig.signature());assertFalse(HeaderConfig.counter());assertTrue(HeaderConfig.compact());assertEquals(100,HeaderConfig.opacity());assertEquals(original,old.getAll());
   HeaderConfig.opacity(-20);assertEquals(0,HeaderConfig.opacity());prefs.edit().putString("opacity","corrupt").putString("style","corrupt").commit();HeaderConfig.load();assertEquals(85,HeaderConfig.opacity());assertTrue(HeaderConfig.signature());
@@ -61,6 +61,12 @@ public class HeaderVisualTest {
  @Test public void optionalFusionUsesNativeSizedPartsRoutesActionsAndRestoresAdaptive()throws Exception{
   HeaderConfig.style(2);Context c=context(1);ActionBar bar=new ActionBar(c);ChatAvatarContainer avatar=new ChatAvatarContainer(c);avatar.callable=true;bar.addView(avatar,0,new FrameLayout.LayoutParams(-1,-1));SignatureChatHeader header=new SignatureChatHeader(bar,avatar,null);bar.setSignatureHeader(header);avatar.setSignatureHeader(header);root.addView(bar);size(bar,401);
   assertTrue(header.fusionActive());var g=header.fusionGeometry();assertEquals(46,g.center.height(),.01f);assertEquals(48,g.back.height(),.01f);assertEquals(96,g.actions.width(),.01f);assertEquals(48,g.actions.height(),.01f);
+  View titleView=(View)field(avatar,"titleTextView"),statusView=(View)field(avatar,"subtitleTextView");
+  assertEquals("name independent center",
+      app.flexygram.header.fusion.SignatureFusionGeometry.titleCenterX(g,titleView.getMeasuredWidth()),
+      titleView.getLeft()+titleView.getWidth()/2f,1.01f);
+  assertEquals("status original location",g.text.centerX(),
+      statusView.getLeft()+statusView.getWidth()/2f,1.01f);
   float backLeft=g.back.left,moreRight=g.more.right;tap(bar,g.back.centerX(),g.back.centerY()+header.fusionTop);assertEquals(1,bar.backs);
   tap(bar,g.call.centerX(),g.call.centerY()+header.fusionTop);assertEquals(1,avatar.calls);
   tap(bar,g.more.centerX(),g.more.centerY()+header.fusionTop);assertEquals(1,avatar.menus);
@@ -101,7 +107,14 @@ public class HeaderVisualTest {
    int name=Math.round((rtl?g.text.right:g.text.left)-g.portrait.left);
    for(int background:new int[]{0xfff7f8fa,0xff11151c})for(int photo:new int[]{Color.BLACK,Color.WHITE,0xff2288cc}){
     Bitmap image=Bitmap.createBitmap(w,h,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(image);c.drawColor(background);var mask=new app.flexygram.header.fusion.SignatureFusionAvatarMask();mask.prepare(start,end,g.fadeSafeStop,rtl);Object shader=field(mask,"gradient");int save=mask.begin(c,0,0,w,h);Paint p=new Paint();p.setColor(photo);c.drawRect(0,0,w,h,p);mask.finish(c,save,w,h,start,end,g.fadeSafeStop,rtl);
-    int color=image.getPixel(Math.max(0,Math.min(w-1,name)),h/2);assertTrue(Math.abs(Color.red(color)-Color.red(background))<=16);assertTrue(Math.abs(Color.green(color)-Color.green(background))<=16);assertTrue(Math.abs(Color.blue(color)-Color.blue(background))<=16);
+    int sample=Math.max(0,Math.min(w-1,name)),color=image.getPixel(sample,h/2);
+    float fraction=rtl?(start-(sample+.5f))/(start-end):((sample+.5f)-start)/(end-start);
+    float opacity=app.flexygram.header.fusion.SignatureFusionFade.opacityAt(fraction,g.fadeSafeStop);
+    for(int shift:new int[]{0,8,16}){
+     int bg=(background>>>shift)&255,fg=(photo>>>shift)&255,actual=(color>>>shift)&255;
+     int expected=Math.round(bg+(fg-bg)*opacity);
+     assertTrue("native mask width="+width+" density="+density+" rtl="+rtl+" opacity="+opacity+" expected="+expected+" actual="+actual,Math.abs(actual-expected)<=3);
+    }
     assertEquals(photo,image.getPixel(rtl?w-Math.round(4*density):Math.round(4*density),h/2));for(int i=0;i<1000;i++)mask.prepare(start,end,g.fadeSafeStop,rtl);assertSame(shader,field(mask,"gradient"));image.recycle();
    }
   }

@@ -1,4 +1,5 @@
 """Alpha1275 changes must reverse exactly onto the physically accepted Alpha1274."""
+from motion_contract import restore_navigation
 import subprocess
 import unittest
 
@@ -29,7 +30,7 @@ class Alpha1275Integration(unittest.TestCase):
                      'TMessagesProj/src/main/java/app/flexygram/studio/core/StudioCodec.java'):
             with self.subTest(path=path):
                 baseline = subprocess.check_output(['git', 'show', BASE + ':' + path], cwd=ROOT)
-                self.assertEqual((ROOT / path).read_bytes(), baseline)
+                self.assertEqual(restore_navigation(path, (ROOT / path).read_bytes()), baseline)
 
     def test_direct_signed_apk_remains_private(self):
         import re

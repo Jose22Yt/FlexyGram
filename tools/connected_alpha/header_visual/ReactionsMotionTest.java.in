@@ -1,10 +1,13 @@
 import android.animation.ObjectAnimator;import android.content.Context;
 import org.junit.*;import org.junit.runner.RunWith;import org.robolectric.*;import org.robolectric.annotation.*;
 import static org.junit.Assert.*;
-/** Production methods + real Android ObjectAnimator; Telegram notification/layout dependencies are doubles. */
-@RunWith(RobolectricTestRunner.class) @Config(manifest=Config.NONE,sdk=35) @LooperMode(LooperMode.Mode.PAUSED)
+/** Production methods + independent motion adapter with real Android frame APIs; Telegram notification/layout dependencies are doubles. */
+@RunWith(RobolectricTestRunner.class) @Config(manifest=Config.NONE,sdk=35,instrumentedPackages={"app.flexygram.motion"}) @LooperMode(LooperMode.Mode.PAUSED)
 public class ReactionsMotionTest {
- ReactionsMotionProbe open(){return new ReactionsMotionProbe(RuntimeEnvironment.getApplication());}
+ android.app.Activity activity;android.widget.FrameLayout root;
+ @Before public void setup(){org.robolectric.shadows.ShadowChoreographer.setPaused(true);org.robolectric.shadows.ShadowChoreographer.setFrameDelay(java.time.Duration.ofMillis(16));activity=Robolectric.buildActivity(android.app.Activity.class).setup().visible().get();root=new android.widget.FrameLayout(activity);activity.setContentView(root);org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(java.time.Duration.ofMillis(32));app.flexygram.motion.FlexyMotionSettings.setProfile(activity,app.flexygram.motion.FlexyMotionProfile.FLOW);app.flexygram.motion.FlexyMotionSettings.setReduceMotion(activity,false);}
+ @After public void cleanup(){root.removeAllViews();activity.finish();assertEquals(0,app.flexygram.motion.FlexyFrameMotion.activeCount());}
+ ReactionsMotionProbe open(){var v=new ReactionsMotionProbe(activity);root.addView(v,new android.widget.FrameLayout.LayoutParams(300,100));v.layout(0,0,300,100);org.robolectric.util.ReflectionHelpers.setField(org.robolectric.util.ReflectionHelpers.getField(v,"mAttachInfo"),"mWindowVisibility",android.view.View.VISIBLE);return v;}
  @Test public void reversesWithoutRestartingFromOneOrZero(){
   var v=open();v.startEnterAnimation(true);var enter=v.current();enter.setCurrentFraction(.35f);float rendered=v.transitionProgress;
   v.startCloseAnimation();assertNotSame(enter,v.current());assertEquals(rendered,v.transitionProgress,.0001f);

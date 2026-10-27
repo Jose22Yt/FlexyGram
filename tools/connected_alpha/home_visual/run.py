@@ -50,6 +50,8 @@ def main():
     for name in ('SignatureHomeStyle.java', 'SignatureHomePainter.java', 'SignatureHomeTint.java'):
         shutil.copyfile(production/name, package/name)
     shutil.copyfile(HERE/'HomeVisualTest.java.in', source/'HomeVisualTest.java')
+    from smart_probe import write_probe
+    write_probe(source,ROOT)
     shutil.copyfile(HERE/'pom.xml', output/'pom.xml')
     repository = Path.home()/'.m2/repository'
     command = [args.maven, '-B', '-f', str(output/'pom.xml'), '-Dandroid.sdk.jar='+str(android)]

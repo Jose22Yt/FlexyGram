@@ -7,7 +7,9 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
-import android.os.SystemClock;
+import android.view.MotionEvent;
+import app.flexygram.motion.FlexyVisualSpring;
+import app.flexygram.motion.FlexyTouchFeedback;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.util.TypedValue;
@@ -26,11 +28,11 @@ public class MorphButton extends android.view.View {
     }
 
     final Spring width = new Spring(0, 700f, 1f, 0.5f);
-    private final Spring radiusLeft = new Spring(0, 520f, 0.55f, 0.3f);
-    private final Spring radiusRight = new Spring(0, 520f, 0.55f, 0.3f);
-    private final Spring alt = new Spring(0, 520f, 0.6f, 0.002f);
-    private final Spring active = new Spring(0, 600f, 1f, 0.002f);
-    private final Spring badge = new Spring(0, 600f, 1f, 0.002f);
+    private final FlexyVisualSpring radiusLeft = new FlexyVisualSpring(this, 0, .3f, 3f);
+    private final FlexyVisualSpring radiusRight = new FlexyVisualSpring(this, 0, .3f, 3f);
+    private final FlexyVisualSpring alt = new FlexyVisualSpring(this, 0, .0006f, .004f);
+    private final FlexyVisualSpring active = new FlexyVisualSpring(this, 0, .0006f, .004f);
+    private final FlexyVisualSpring badge = new FlexyVisualSpring(this, 0, .0006f, .004f);
     private final Paint bgPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint badgePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final TextPaint textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
@@ -52,7 +54,7 @@ public class MorphButton extends android.view.View {
     private int activeFgColor;
     private int badgeBg;
     private int badgeFg;
-    private long lastFrame;
+    private FlexyTouchFeedback pressFeedback;
     private PressListener pressListener;
     float baseHeight;
     float scale = 1f;
@@ -109,8 +111,8 @@ public class MorphButton extends android.view.View {
 
     public void setRadius(float left, float right, boolean animated) {
         if (animated) {
-            radiusLeft.target = left;
-            radiusRight.target = right;
+            radiusLeft.animateTo(left);
+            radiusRight.animateTo(right);
         } else {
             radiusLeft.snap(left);
             radiusRight.snap(right);
@@ -124,7 +126,7 @@ public class MorphButton extends android.view.View {
 
     public void setAlt(boolean value, boolean animated) {
         if (animated) {
-            alt.target = value ? 1f : 0f;
+            alt.animateTo(value ? 1f : 0f);
         } else {
             alt.snap(value ? 1f : 0f);
         }
@@ -133,7 +135,7 @@ public class MorphButton extends android.view.View {
 
     public void setActive(boolean value, boolean animated) {
         if (animated) {
-            active.target = value ? 1f : 0f;
+            active.animateTo(value ? 1f : 0f);
         } else {
             active.snap(value ? 1f : 0f);
         }
@@ -145,7 +147,7 @@ public class MorphButton extends android.view.View {
             badgeText = value;
         }
         if (animated) {
-            badge.target = value != null ? 1f : 0f;
+            badge.animateTo(value != null ? 1f : 0f);
         } else {
             badge.snap(value != null ? 1f : 0f);
         }
@@ -180,6 +182,42 @@ public class MorphButton extends android.view.View {
         }
     }
 
+    @Override public boolean dispatchTouchEvent(MotionEvent event) {
+        if (pressFeedback == null && isEnabled() && event.getActionMasked() == MotionEvent.ACTION_DOWN) pressFeedback = new FlexyTouchFeedback(this);
+        if (pressFeedback != null) pressFeedback.onTouch(event);
+        return super.dispatchTouchEvent(event);
+    }
+
+    @Override public void draw(Canvas canvas) {
+        if (pressFeedback == null) { super.draw(canvas); return; }
+        final int save = canvas.save();
+        if (pressFeedback != null) pressFeedback.transform(canvas);
+        super.draw(canvas);
+        canvas.restoreToCount(save);
+    }
+
+    @Override protected void onDetachedFromWindow() {
+        if (pressFeedback != null) pressFeedback.reset();
+        radiusLeft.disposeFrames();
+        radiusRight.disposeFrames();
+        alt.disposeFrames();
+        active.disposeFrames();
+        badge.disposeFrames();
+        super.onDetachedFromWindow();
+    }
+
+    @Override protected void onWindowVisibilityChanged(int visibility) {
+        super.onWindowVisibilityChanged(visibility);
+        if (visibility != VISIBLE) {
+            if (pressFeedback != null) pressFeedback.reset();
+            if (radiusLeft != null) radiusLeft.finish();
+            if (radiusRight != null) radiusRight.finish();
+            if (alt != null) alt.finish();
+            if (active != null) active.finish();
+            if (badge != null) badge.finish();
+        }
+    }
+
     @Override
     public boolean performClick() {
         performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP);
@@ -189,23 +227,14 @@ public class MorphButton extends android.view.View {
 
     @Override
     protected void onDraw(@NonNull Canvas canvas) {
-        long now = SystemClock.elapsedRealtime();
-        float dt = lastFrame == 0 ? 0.016f : (now - lastFrame) / 1000f;
-        lastFrame = now;
-        boolean animating = radiusLeft.step(dt);
-        animating |= radiusRight.step(dt);
-        animating |= alt.step(dt);
-        animating |= active.step(dt);
-        animating |= badge.step(dt);
-
         float w = getWidth();
         float h = getHeight();
-        float a = Math.max(0f, Math.min(1f, active.value));
+        float a = Math.max(0f, Math.min(1f, active.value()));
         int bg = ColorUtils.blendARGB(bgColor, activeBgColor, a);
         int fg = ColorUtils.blendARGB(fgColor, activeFgColor, a);
         float half = Math.min(w, h) / 2f;
-        float rl = Math.max(0f, Math.min(half, radiusLeft.value * scale));
-        float rr = Math.max(0f, Math.min(half, radiusRight.value * scale));
+        float rl = Math.max(0f, Math.min(half, radiusLeft.value() * scale));
+        float rr = Math.max(0f, Math.min(half, radiusRight.value() * scale));
         if ((bg >>> 24) != 0) {
             bgPaint.setColor(bg);
             rect.set(0, 0, w, h);
@@ -226,7 +255,7 @@ public class MorphButton extends android.view.View {
         if (altIcon == null) {
             drawIcon(canvas, icon, iconCx, cy, fg, 1f, 1f);
         } else {
-            float t = alt.value;
+            float t = alt.value();
             drawIcon(canvas, icon, iconCx, cy, fg, 1f - t, 1f - 0.4f * t);
             drawIcon(canvas, altIcon, iconCx, cy, fg, t, 0.6f + 0.4f * t);
         }
@@ -236,7 +265,7 @@ public class MorphButton extends android.view.View {
             float ty = stackedLabel ? h - dp(10) - textPaint.descent() : cy - (textPaint.descent() + textPaint.ascent()) / 2f;
             canvas.drawText(displayText, tx, ty, textPaint);
         }
-        float b = Math.max(0f, Math.min(1f, badge.value));
+        float b = Math.max(0f, Math.min(1f, badge.value()));
         if (b > 0f && badgeText != null) {
             float r = dp(7.5f) * (0.6f + 0.4f * b);
             float bx = w - dp(3) - dp(7.5f);
@@ -247,11 +276,6 @@ public class MorphButton extends android.view.View {
             canvas.drawText(badgeText, bx, by - (badgeTextPaint.descent() + badgeTextPaint.ascent()) / 2f, badgeTextPaint);
         }
 
-        if (animating) {
-            postInvalidateOnAnimation();
-        } else {
-            lastFrame = 0;
-        }
     }
 
     private void drawIcon(Canvas canvas, PlayerIcon drawable, float cx, float cy, int color, float alpha, float s) {

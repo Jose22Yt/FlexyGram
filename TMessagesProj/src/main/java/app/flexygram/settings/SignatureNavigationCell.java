@@ -1,6 +1,8 @@
 package app.flexygram.settings;
 import android.content.Context;
 import android.view.View;
+import android.view.MotionEvent;
+import app.flexygram.motion.FlexyTouchFeedback;
 import android.widget.ImageView;
 import android.widget.TextView;
 import org.telegram.messenger.AndroidUtilities;
@@ -11,9 +13,11 @@ import org.telegram.ui.Cells.TextSettingsCell;
 /** Native settings title, existing line icons and trailing chevron. No colored icon tile. */
 public final class SignatureNavigationCell extends TextSettingsCell {
     private final ImageView icon, arrow;
+    private final FlexyTouchFeedback motionFeedback;
     private final Theme.ResourcesProvider provider;
     public SignatureNavigationCell(Context context, Theme.ResourcesProvider provider) {
         super(context, provider);this.provider=provider;
+        motionFeedback = new FlexyTouchFeedback(this);
         icon=new ImageView(context);arrow=new ImageView(context);
         arrow.setImageResource(R.drawable.round_keyboard_arrow_right_24);addView(icon);addView(arrow);
         icon.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
@@ -21,9 +25,24 @@ public final class SignatureNavigationCell extends TextSettingsCell {
         getTextView().setSingleLine(false);getTextView().setMaxLines(Integer.MAX_VALUE);getTextView().setEllipsize(null);
     }
     public void bind(String text,int resource,boolean divider) {
+        motionFeedback.reset();
         setText(text,divider);icon.setImageResource(resource);
         icon.setColorFilter(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText,provider));
         arrow.setColorFilter(Theme.getColor(Theme.key_windowBackgroundWhiteGrayIcon,provider));setContentDescription(text);
+    }
+    @Override public boolean dispatchTouchEvent(MotionEvent event) {
+        motionFeedback.onTouch(event);
+        return super.dispatchTouchEvent(event);
+    }
+    @Override protected void dispatchDraw(android.graphics.Canvas canvas) {
+        int save=canvas.save();motionFeedback.transform(canvas);super.dispatchDraw(canvas);canvas.restoreToCount(save);
+    }
+    @Override protected void onWindowVisibilityChanged(int visibility) {
+        super.onWindowVisibilityChanged(visibility);if(visibility!=View.VISIBLE&&motionFeedback!=null)motionFeedback.reset();
+    }
+    @Override protected void onDetachedFromWindow() {
+        motionFeedback.reset();
+        super.onDetachedFromWindow();
     }
     @Override protected void onMeasure(int w,int h) {
         int width=MeasureSpec.getSize(w),d=AndroidUtilities.dp(22);

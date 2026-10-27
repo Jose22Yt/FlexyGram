@@ -593,6 +593,50 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
     private int buttonLeft;
     private int typingLeft;
     private StaticLayout messageLayout;
+    // Signature Smart Previews: one cached content type per updated dialog row.
+    // The original message layout, row geometry and Telegram click targets remain.
+    private int smartPreviewKind;
+    private int smartPreviewModeLastBuilt=-1;
+    private final app.flexygram.home.SignatureSmartPreviewPalette smartPreviewPalette =
+            new app.flexygram.home.SignatureSmartPreviewPalette();
+    private final Paint smartPreviewPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private static final int[] SMART_VOICE_BARS = {5,9,13,6,11,7,4};
+    private void drawSmartPreviewBackground(Canvas canvas, float top, float alpha) {
+        if (smartPreviewKind == 0 || messageLayout == null || messageLayout.getLineCount() == 0 || alpha <= 0f) return;
+        int mode=app.flexygram.home.SignatureSmartPreviews.mode();
+        if(mode==app.flexygram.home.SignatureSmartPreviewPalette.OFF)return;
+        int accent=Theme.getColor(Theme.key_actionBarTabLine,resourcesProvider);
+        int surface=Theme.getColor(Theme.key_windowBackgroundWhite,resourcesProvider);
+        smartPreviewPalette.update(smartPreviewKind,mode,accent,surface);
+        smartPreviewPaint.setColor(smartPreviewPalette.background());
+        smartPreviewPaint.setAlpha(Math.round(255f*Math.max(0f,Math.min(1f,alpha))));
+        // Message layout can be RTL; use its real visual line bounds rather
+        // than assuming the first glyph starts at messageLeft.
+        boolean rtl=LocaleController.isRTL;
+        boolean voice=smartPreviewKind==app.flexygram.home.SignatureSmartPreviewPalette.VOICE;
+        float lineLeft=messageLeft+messageLayout.getLineLeft(0);
+        float lineRight=messageLeft+messageLayout.getLineRight(0);
+        float left=Math.max(dp(6),lineLeft-dp(rtl&&voice?36:6));
+        float right=Math.min(getMeasuredWidth()-dp(6),lineRight+dp(!rtl&&voice?36:9));
+        if (right-left < dp(16))return; // Narrow/recycled rows remain native.
+        float height=Math.min(getMeasuredHeight()-top-dp(2),Math.max(dp(18),messageLayout.getLineBottom(0)+dp(3)));
+        if(height<=0f)return;
+        float bottom=top+height;
+        canvas.drawRoundRect(left,top-dp(2),right,bottom,dp(12),dp(12),smartPreviewPaint);
+        if(voice){
+            smartPreviewPaint.setColor(smartPreviewPalette.foreground());
+            smartPreviewPaint.setAlpha(Math.round(255f*Math.max(0f,Math.min(1f,alpha))));
+            float waveX=rtl?left+dp(8):lineRight+dp(12);
+            float cy=(bottom+top-dp(2))*.5f;
+            float barWidth=dp(2f);
+            for(int i=0;i<SMART_VOICE_BARS.length;i++){
+                float h=dp(SMART_VOICE_BARS[i]);
+                float x=waveX+dp(3.5f)*i;
+                if (x+barWidth>right-dp(4))break;
+                canvas.drawRoundRect(x,cy-h*.5f,x+barWidth,cy+h*.5f,barWidth*.5f,barWidth*.5f,smartPreviewPaint);
+            }
+        }
+    }
     private StaticLayout typingLayout;
 
     private int buttonTop;
@@ -1314,12 +1358,18 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
         if (isTransitionSupport) {
             return;
         }
+        // The mode may change without a Telegram message update. An explicit
+        // dialogsNeedReload must still rebuild preview text, even if the
+        // original updateHelper reports that the message itself is unchanged.
+        int smartModeNow=app.flexygram.home.SignatureSmartPreviews.mode();
+        boolean smartModeChanged=smartPreviewModeLastBuilt!=smartModeNow;
         if (isDialogCell || isTopic) {
             boolean needUpdate = updateHelper.update();
-            if (!needUpdate && currentDialogFolderId == 0 && currentDialogCommunityId == 0 && encryptedChat == null) {
+            if (!needUpdate && !smartModeChanged && currentDialogFolderId == 0 && currentDialogCommunityId == 0 && encryptedChat == null) {
                 return;
             }
         }
+        smartPreviewModeLastBuilt=smartModeNow;
 
         if (useForceThreeLines || SharedConfig.useThreeLinesLayout || true) {
             Theme.dialogs_namePaint[0].setTextSize(dp(17));
@@ -2747,6 +2797,35 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
             }
         }
 
+        // Replace only uncaptioned, ordinary last-message snippets. No media
+        // downloads, no re-layout of rows and no alteration of native chat text.
+        smartPreviewKind=0;
+        if (app.flexygram.home.SignatureSmartPreviews.mode() != app.flexygram.home.SignatureSmartPreviewPalette.OFF
+                // Keep this identical to DialogsActivity's real main-list
+                // modes (default and both primary folder filters). Do not
+                // reference nonexistent DIALOGS_TYPE_FOLDER1/FOLDER2 constants.
+                && (dialogsType == DialogsActivity.DIALOGS_TYPE_DEFAULT
+                    || dialogsType == 7 || dialogsType == 8)
+                && currentDialogFolderId == 0 && currentDialogCommunityId == 0
+                && message != null && draftMessage == null && !draftVoice
+                && TextUtils.isEmpty(printingString) && customDialog == null
+                && !isForumCell() && !isFolderCell() && !hasTags()
+                && groupMessages == null
+                // Sender names are on a separate native row in three-line
+                // group layouts. Two-line inline-sender previews stay native.
+                && (messageNameString == null || useForceThreeLines || SharedConfig.useThreeLinesLayout)
+                && !isTopic && (message.messageOwner.restriction_reason == null
+                     || message.messageOwner.restriction_reason.isEmpty())) {
+            int candidate=app.flexygram.home.SignatureSmartPreviews.kind(message);
+            if (candidate != 0) {
+                String label=app.flexygram.home.SignatureSmartPreviews.lineLabel(message,candidate);
+                if (!TextUtils.isEmpty(label)) {
+                    smartPreviewKind=candidate;
+                    messageString=applyThumbs(label);
+                    checkMessage=false;
+                }
+            }
+        }
         if (checkMessage) {
             if (messageString == null) {
                 messageString = "";
@@ -2847,6 +2926,11 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
 
         try {
             CharSequence messageStringFinal;
+            if (smartPreviewKind != 0) {
+                // A one-line capsule, clipped by the same native message width.
+                messageString=TextUtils.ellipsize(messageString,currentMessagePaint,
+                        Math.max(dp(20),Math.min(dp(224),messageWidth-dp(20))),TextUtils.TruncateAt.END);
+            }
             // Removing links and bold spans to get rid of underlining and boldness
             if (messageString instanceof Spannable) {
                 Spannable messageStringSpannable = (Spannable) messageString;
@@ -2860,7 +2944,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                 messageStringFinal = messageNameString;
                 messageNameString = null;
                 currentMessagePaint = Theme.dialogs_messagePaint[paintIndex];
-            } else if (!useForceThreeLines && !SharedConfig.useThreeLinesLayout || hasTags() || messageNameString != null || ChatObject.isMonoForum(chat) && ChatObject.canManageMonoForum(currentAccount, chat)) {
+            } else if (smartPreviewKind != 0 || !useForceThreeLines && !SharedConfig.useThreeLinesLayout || hasTags() || messageNameString != null || ChatObject.isMonoForum(chat) && ChatObject.canManageMonoForum(currentAccount, chat)) {
                 if (!isForumCell() && messageString instanceof Spanned && ((Spanned) messageString).getSpans(0, messageString.length(), ThumbnailSpan.class).length <= 0) {
                     messageStringFinal = TextUtils.ellipsize(messageString, currentMessagePaint, messageWidth - dp(12 + (thumbsCount * (thumbSize + 2) - 2) + 5), TextUtils.TruncateAt.END);
                 } else {
@@ -4427,8 +4511,13 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                     top -= dp(isForumCell() ? 10 : 11);
                 }
                 if (updateHelper.typingProgres != 1f) {
+                    drawSmartPreviewBackground(canvas,top,1f-updateHelper.typingProgres);
                     canvas.save();
                     canvas.translate(messageLeft, top);
+                    int oldInk=messageLayout.getPaint().getColor();
+                    if (smartPreviewKind != 0) {
+                        messageLayout.getPaint().setColor(smartPreviewPalette.foreground());
+                    }
                     int oldAlpha = messageLayout.getPaint().getAlpha();
                     messageLayout.getPaint().setAlpha((int) (oldAlpha * (1f - updateHelper.typingProgres)));
                     if (!spoilers.isEmpty()) {
@@ -4452,6 +4541,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                         AnimatedEmojiSpan.drawAnimatedEmojis(canvas, messageLayout, animatedEmojiStack, -.075f, null, 0, 0, 0, 1f, getAdaptiveEmojiColorFilter(2, messageLayout.getPaint().getColor()));
                     }
                     messageLayout.getPaint().setAlpha(oldAlpha);
+                    if (smartPreviewKind != 0)messageLayout.getPaint().setColor(oldInk);
                     canvas.restore();
                 }
 

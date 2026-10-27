@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexySmartPreviewsTitle">Vistas previas inteligentes</string>
+    <string name="FlexySmartPreviewAdaptive">Semántico adaptativo</string>
+    <string name="FlexySmartPreviewAccent">Acento del tema</string>
+    <string name="FlexySmartPreviewMatte">Signature Matte</string>
+    <string name="FlexySmartPreviewOff">Desactivadas</string>
+    <string name="FlexySmartFile">Documento</string>
+    <string name="FlexySmartMusic">Música</string>
+    <string name="FlexySmartLink">Enlace</string>
+    <string name="FlexySmartPhoto">Foto</string>
+    <string name="FlexySmartVideo">Vídeo</string>
+    <string name="FlexySmartGroupEvent">Evento del grupo</string>
+    <string name="FlexySmartLocation">Ubicación</string>
+    <string name="FlexySmartContact">Contacto</string>
+</resources>
