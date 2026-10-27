@@ -27,17 +27,17 @@ public final class SignatureFusionSurface {
         border.setStrokeWidth(.7f * density);
         separator.setColor(separatorColor);
         separator.setStrokeWidth(.7f * density);
-        drawPill(canvas,g.back);
+        drawPill(canvas,g.backVisual);
         drawCenterFill(canvas,g.center);
-        drawPill(canvas,g.actions);
+        drawPill(canvas,g.actionsVisual);
         drawCenterBorder(canvas, g, borderColor, density);
         // The two separate native touch zones within one shared right mini-pill.
         if (g.callAvailable) {
-            float x = g.more.left == g.actions.left ? g.more.right : g.call.right;
-            float cy = g.actions.centerY();
+            float x = g.actions.centerX();
+            float cy = g.actionsVisual.centerY();
             float inset = 10f*density;
-            canvas.drawLine(x,cy-g.actions.height()*.5f+inset,
-                    x,cy+g.actions.height()*.5f-inset,separator);
+            canvas.drawLine(x,g.actionsVisual.top+inset,
+                    x,g.actionsVisual.bottom-inset,separator);
         }
     }
     /** Same background, but no center stroke until the native portrait has been composited. */
@@ -45,9 +45,9 @@ public final class SignatureFusionSurface {
                      int surfaceColor, int borderColor, int separatorColor, float density) {
         fill.setColor(surfaceColor); border.setColor(borderColor); border.setStrokeWidth(.7f * density);
         separator.setColor(separatorColor); separator.setStrokeWidth(.7f * density);
-        drawPill(canvas,g.back); drawCenterFill(canvas,g.center); drawPill(canvas,g.actions);
-        if(g.callAvailable){float x=g.more.left==g.actions.left?g.more.right:g.call.right;float cy=g.actions.centerY();
-            canvas.drawLine(x,cy-g.actions.height()*.5f+10f*density,x,cy+g.actions.height()*.5f-10f*density,separator);}
+        drawPill(canvas,g.backVisual); drawCenterFill(canvas,g.center); drawPill(canvas,g.actionsVisual);
+        if(g.callAvailable){float x=g.actions.centerX();
+            canvas.drawLine(x,g.actionsVisual.top+10f*density,x,g.actionsVisual.bottom-10f*density,separator);}
     }
     private void drawCenterFill(Canvas canvas, SignatureFusionGeometry.Rect r) {
         work.set(r.left,r.top,r.right,r.bottom);canvas.drawRoundRect(work,r.height()*.5f,r.height()*.5f,fill);

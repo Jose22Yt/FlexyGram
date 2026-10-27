@@ -19,19 +19,22 @@ public final class SignatureFusionGeometryTest {
         yes(g.actions.left >= 0 && g.actions.right <= width,"actions inside screen");
         yes(g.center.left >= 0 && g.center.right <= width,"center inside screen");
         yes(g.center.width() >= 0,"center valid");
-        close(g.center.height(),50*density,"center height");
-        close(g.back.height(),46*density,"back height");
-        close(g.actions.height(),46*density,"action height");
-        yes(g.center.height()>g.back.height(),"center only slightly taller");
-        close(g.back.width(),46*density,"back width");
+        close(g.center.height(),46*density,"center height");
+        close(g.back.height(),48*density,"back native hit height");
+        close(g.actions.height(),48*density,"action native hit height");
+        yes(g.center.height()>g.backVisual.height(),"center taller than visible back");
+        close(g.backVisual.height(),42*density,"back visible size");
+        close(g.actionsVisual.height(),40*density,"actions visible height");
+        close(g.back.width(),48*density,"back hit width");
+        close(g.actionsVisual.width(),(calling?84:40)*density,"actions visible width");
         close(g.actions.width(),(calling?96:48)*density,"right action width");
         if (g.fits) {
             if (!rtl) {
-                yes(g.center.left-g.back.right>=9.99f*density,"left 10dp gap");
-                yes(g.actions.left-g.center.right>=9.99f*density,"right 10dp gap");
+                yes(g.center.left-g.back.right>=7.99f*density,"left 8dp gap");
+                yes(g.actions.left-g.center.right>=7.99f*density,"right 8dp gap");
             } else {
-                yes(g.back.left-g.center.right>=9.99f*density,"right 10dp gap rtl");
-                yes(g.center.left-g.actions.right>=9.99f*density,"left 10dp gap rtl");
+                yes(g.back.left-g.center.right>=7.99f*density,"right 8dp gap rtl");
+                yes(g.center.left-g.actions.right>=7.99f*density,"left 8dp gap rtl");
             }
             yes(g.text.left>=g.center.left && g.text.right<=g.center.right,"text in card");
             yes(g.portrait.left>=g.center.left && g.portrait.right<=g.center.right,"portrait in card");
