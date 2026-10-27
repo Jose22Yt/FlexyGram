@@ -88,7 +88,7 @@ public class FilterTabsView extends FrameLayout {
         boolean dark=resourcesProvider!=null?resourcesProvider.isDark():Theme.isCurrentThemeDark();
         int neutral=app.flexygram.home.SignatureHomeStyle.surface(dark,false);
         signatureAccentColors.update(Theme.getColor(tabLineColorKey,resourcesProvider),
-            Theme.getColor(activeTextColorKey,resourcesProvider),neutral);
+            Theme.getColor(activeTextColorKey,resourcesProvider),neutral,app.flexygram.home.SignatureHomeStyle.text(dark,false));
         signatureAccent=signatureAccentColors.color;
         signatureAccentInk=signatureAccentColors.ink;
     }
@@ -105,7 +105,7 @@ public class FilterTabsView extends FrameLayout {
     public void setSignatureHome(boolean enabled) {
         if (signatureHome == enabled) return;
         signatureHome = enabled;
-        refreshSignatureAccent();
+        if(enabled)refreshSignatureAccent();
         requestLayout();
         invalidate();
     }
@@ -425,9 +425,10 @@ public class FilterTabsView extends FrameLayout {
                         dark, !signatureHomeOpaquePreview && org.telegram.messenger.LiteMode.isEnabled(org.telegram.messenger.LiteMode.FLAG_LIQUID_GLASS), selected,
                         app.exteraless.appearance.AppearanceConfig.folderThemeAccent.Bool()?signatureAccent:
                         app.flexygram.home.SignatureHomeStyle.selectedSurface(dark,!signatureHomeOpaquePreview && org.telegram.messenger.LiteMode.isEnabled(org.telegram.messenger.LiteMode.FLAG_LIQUID_GLASS)));
-                textPaint.setColor(app.flexygram.home.SignatureHomePainter.blend(
-                        app.flexygram.home.SignatureHomeStyle.text(dark, false),
-                        (app.exteraless.appearance.AppearanceConfig.folderThemeAccent.Bool()?signatureAccentInk:app.flexygram.home.SignatureHomeStyle.text(dark, true)), selected));
+                textPaint.setColor(app.exteraless.appearance.AppearanceConfig.folderThemeAccent.Bool()
+                        ? signatureAccentColors.inkAt(selected)
+                        : app.flexygram.home.SignatureHomePainter.blend(
+                            app.flexygram.home.SignatureHomeStyle.text(dark,false),app.flexygram.home.SignatureHomeStyle.text(dark,true),selected));
             }
             ColorFilter emojiColorFilter = signatureHome
                     ? signatureHomeTint.get(textPaint.getColor())
@@ -1524,7 +1525,7 @@ public class FilterTabsView extends FrameLayout {
         backgroundColorKey = background;
         activeTextColorKey = active;
         unactiveTextColorKey = unactive;
-        refreshSignatureAccent();
+        if(signatureHome)refreshSignatureAccent();
         selectorDrawable.setColor(Theme.getColor(tabLineColorKey, resourcesProvider));
         listView.setSelectorDrawableColor(Theme.getColor(selector, resourcesProvider));
 

@@ -9,6 +9,11 @@ class Signature1278(unittest.TestCase):
     int a=0xff000000|(r<<16)|(g<<8)|b;c.update(a,0xffeeeeee,0xff303236);
     if(c.color!=a||SignatureFolderAccent.contrast(c.ink,c.color)<4.5)throw new AssertionError("contrast");
     for(int n=0;n<4;n++)if(c.update(a,0xffeeeeee,0xff303236))throw new AssertionError("cache");
+    for(int n=0;n<=128;n++){
+     float f=n/128f;int bg=0xff000000;
+     for(int shift=0;shift<=16;shift+=8)bg|=Math.round(((0xff303236>>>shift)&255)+(((a>>>shift)&255)-((0xff303236>>>shift)&255))*f)<<shift;
+     if(SignatureFolderAccent.contrast(c.inkAt(f),bg)<4.5)throw new AssertionError("transition contrast");
+    }
    }
    c.update(0x80336699,0xffffffff,0xff000000);if(c.color!=0xff1a334d)throw new AssertionError("composite");
    c.update(0xffffff00,0xffffffff,0xff000000);if(c.ink!=0xff000000)throw new AssertionError("yellow contrast");
