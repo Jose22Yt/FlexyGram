@@ -31,6 +31,12 @@ class Stability1277(unittest.TestCase):
   self.assertNotIn('dayThemeName.equals(themeInfo.getKey())',body)
   self.assertIn('themeInfo.isDark() != toDark',body)
   self.assertNotIn('preferences.edit()',body)
+ def test_drawer_selector_uses_global_contrast_and_validates_target_before_latching(self):
+  s=(JAVA/'app/exteraless/drawer/DrawerContainer.java').read_text()
+  body=method_bodies(s,'toggleTheme')[0]
+  self.assertIn('final boolean toDark = !Theme.isCurrentThemeDark();',body)
+  self.assertNotIn('dayThemeName.equals(activeTheme.getKey())',body)
+  self.assertLess(body.index('themeInfo.isDark() != toDark'),body.index('DialogsActivity.switchingTheme = true;'))
  def test_height_target_guard_executes_actual_measure_code(self):
   s=(JAVA/'org/telegram/ui/Components/ChatActivityEnterView.java').read_text()
   start=s.index('                if (animatorInputFieldHeight.getToFactor() != height)')
