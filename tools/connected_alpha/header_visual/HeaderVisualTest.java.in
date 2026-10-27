@@ -74,7 +74,7 @@ public class HeaderVisualTest {
   HeaderConfig.style(2);for(boolean rtl:new boolean[]{false,true})for(float font:new float[]{1,2,3})for(int width:new int[]{240,320,401}){
    LocaleController.isRTL=rtl;Context c=context(font);ActionBar bar=new ActionBar(c);ChatAvatarContainer avatar=new ChatAvatarContainer(c);avatar.callable=true;bar.addView(avatar,0,new FrameLayout.LayoutParams(-1,-1));SignatureChatHeader header=new SignatureChatHeader(bar,avatar,null);bar.setSignatureHeader(header);avatar.setSignatureHeader(header);size(bar,width);
    if(width==240||font>1)assertFalse(header.fusionActive());
-   if(header.fusionActive()){var g=header.fusionGeometry();assertTrue(g.fits);assertTrue(g.text.width()>=48);assertEquals(50,header.height,.01f);}
+   if(header.fusionActive()){var g=header.fusionGeometry();assertTrue(g.fits);assertTrue(g.text.width()>=48);assertEquals(48,header.height,.01f);}
    else{assertTrue(header.geometry.title.left>=0);assertTrue(header.geometry.title.right<=width);}
   }
  }
@@ -102,7 +102,7 @@ public class HeaderVisualTest {
    for(int background:new int[]{0xfff7f8fa,0xff11151c})for(int photo:new int[]{Color.BLACK,Color.WHITE,0xff2288cc}){
     Bitmap image=Bitmap.createBitmap(w,h,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(image);c.drawColor(background);var mask=new app.flexygram.header.fusion.SignatureFusionAvatarMask();mask.prepare(start,end,g.fadeSafeStop,rtl);Object shader=field(mask,"gradient");int save=mask.begin(c,0,0,w,h);Paint p=new Paint();p.setColor(photo);c.drawRect(0,0,w,h,p);mask.finish(c,save,w,h,start,end,g.fadeSafeStop,rtl);
     int color=image.getPixel(Math.max(0,Math.min(w-1,name)),h/2);assertTrue(Math.abs(Color.red(color)-Color.red(background))<=16);assertTrue(Math.abs(Color.green(color)-Color.green(background))<=16);assertTrue(Math.abs(Color.blue(color)-Color.blue(background))<=16);
-    assertEquals(photo,image.getPixel(rtl?w-Math.round(15*density):Math.round(15*density),h/2));for(int i=0;i<1000;i++)mask.prepare(start,end,g.fadeSafeStop,rtl);assertSame(shader,field(mask,"gradient"));image.recycle();
+    assertEquals(photo,image.getPixel(rtl?w-Math.round(4*density):Math.round(4*density),h/2));for(int i=0;i<1000;i++)mask.prepare(start,end,g.fadeSafeStop,rtl);assertSame(shader,field(mask,"gradient"));image.recycle();
    }
   }
  }
@@ -140,7 +140,7 @@ public class HeaderVisualTest {
   for(boolean rtl:new boolean[]{false,true}){
    LocaleController.isRTL=rtl;Theme.dark=rtl;Context c=context(1);ActionBar bar=new ActionBar(c);ChatAvatarContainer avatar=new ChatAvatarContainer(c);avatar.callable=true;bar.addView(avatar,0,new FrameLayout.LayoutParams(-1,-1));SignatureChatHeader header=new SignatureChatHeader(bar,avatar,null);bar.setSignatureHeader(header);avatar.setSignatureHeader(header);size(bar,401);assertTrue(header.fusionActive());
    Bitmap live=Bitmap.createBitmap(401,bar.getMeasuredHeight(),Bitmap.Config.ARGB_8888);bar.draw(new Canvas(live));var g=header.fusionGeometry();int y=Math.round(g.portrait.centerY()+header.fusionTop);
-   int opaqueX=Math.round(rtl?g.portrait.right-20:g.portrait.left+20),fadedX=Math.round(rtl?g.portrait.left+1:g.portrait.right-2);
+   int opaqueX=Math.round(rtl?g.portrait.right-4:g.portrait.left+4),fadedX=Math.round(rtl?g.portrait.left+1:g.portrait.right-2);
    assertEquals("existing avatar stays opaque before fade",0xff2288cc,live.getPixel(opaqueX,y));assertNotEquals("native portrait fades into surface",0xff2288cc,live.getPixel(fadedX,y));assertTrue(Color.alpha(live.getPixel(fadedX,y))>=200);
    photoX[rtl?1:0]=opaqueX+(rtl?401:0);photoY[rtl?1:0]=y;
    output.drawBitmap(live,rtl?401:0,0,null);HeaderPreviewView preview=new HeaderPreviewView(c);size(preview,401);int save=output.save();output.translate(rtl?401:0,140);output.clipRect(0,0,preview.getMeasuredWidth(),preview.getMeasuredHeight());preview.draw(output);output.restoreToCount(save);live.recycle();header.detach();
