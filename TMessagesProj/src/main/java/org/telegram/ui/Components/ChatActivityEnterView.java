@@ -16599,6 +16599,7 @@ public class ChatActivityEnterView extends FrameLayout implements
     }
 
     private boolean flexyBotRow;
+    private int getFlexyBotRowHeight(){return flexyBotRow?dp(44):0;}
     private boolean wantsFlexyBotRow() {
         return flexyCompactRequested && isChat && parentFragment!=null && !isStories
             && botCommandsMenuButton!=null && botMenuButtonType!=BotMenuButtonType.NO_BUTTON && dialog_id>0;
@@ -17644,7 +17645,7 @@ public class ChatActivityEnterView extends FrameLayout implements
         // Reserve raised islands through the existing chat-list padding callback.
         // Negative positions retain the native reservation, leaving extra clearance.
         return fieldHeight + (topView != null ? topView.getMeasuredHeight() : 0) * topViewVisibility
-            + getFlexyVerticalReservation();
+            + getFlexyVerticalReservation() + getFlexyBotRowHeight();
     }
 
 

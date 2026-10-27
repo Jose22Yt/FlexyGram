@@ -39,11 +39,16 @@ def write_probe(source,root):
  public static android.graphics.drawable.Drawable createInsetRoundRectDrawable(int c,int r,int i){return new android.graphics.drawable.ColorDrawable(0);}
 ''');p.write_text(s)
  actual=(java/'org/telegram/ui/Components/ChatActivityEnterView.java').read_text()
- methods='\n'.join(body(actual,a)for a in ['private boolean wantsFlexyBotRow(', 'private void updateFlexyBotRow('])
+ methods='\n'.join(body(actual,a)for a in ['private boolean wantsFlexyBotRow(', 'private void updateFlexyBotRow(', 'private int getFlexyBotRowHeight(', 'private float calculateIslandTotalHeight('])
  put('AdaptiveBotProbe.java','''import android.content.Context;import android.view.*;import android.widget.*;import org.telegram.ui.Components.LayoutHelper;
 public class AdaptiveBotProbe extends FrameLayout {
  public boolean flexyCompactRequested=true,isChat=true,isStories,flexyBotRow;public Object parentFragment=new Object();
  enum BotMenuButtonType{NO_BUTTON,COMMANDS,WEB_VIEW}public BotMenuButtonType botMenuButtonType=BotMenuButtonType.COMMANDS;public long dialog_id=1;
+ public View topView;public class Height{public float getFactor(){return messageEditTextContainer.getMeasuredHeight();}public float getToFactor(){return getFactor();}}
+ public class Top{public boolean getValue(){return false;}public float getFloatValue(){return 0;}}
+ public final Height animatorInputFieldHeight=new Height();public final Top animatorTopViewVisibility=new Top();
+ private int getFlexyVerticalReservation(){return 0;}
+ public float reservedHeight(){return calculateIslandTotalHeight(false);}
  public FrameLayout textFieldContainer,messageEditTextContainer;public TextView botCommandsMenuButton;public EditText text;public int clicks;
  static int dp(float v){return org.telegram.messenger.AndroidUtilities.dp(v);}
  public AdaptiveBotProbe(Context c){super(c);textFieldContainer=new FrameLayout(c);addView(textFieldContainer,new FrameLayout.LayoutParams(-1,-2));messageEditTextContainer=new FrameLayout(c);messageEditTextContainer.setMinimumHeight(dp(44));textFieldContainer.addView(messageEditTextContainer,new FrameLayout.LayoutParams(-1,-2,Gravity.BOTTOM));text=new EditText(c);text.setText("draft");messageEditTextContainer.addView(text,new FrameLayout.LayoutParams(-1,-2));botCommandsMenuButton=new TextView(c);botCommandsMenuButton.setText("Store");botCommandsMenuButton.setOnClickListener(v->clicks++);messageEditTextContainer.addView(botCommandsMenuButton,new FrameLayout.LayoutParams(120,32,Gravity.BOTTOM|Gravity.LEFT));}
