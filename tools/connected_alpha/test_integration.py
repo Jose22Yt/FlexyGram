@@ -54,7 +54,8 @@ class UnifiedIntegration(unittest.TestCase):
         def strings(data):
             return {element.get('name'): ET.tostring(element, encoding='unicode').split('</string>')[0]
                     for element in ET.fromstring(data) if element.tag == 'string'}
-        self.assertEqual(strings(before), strings((ROOT/path).read_bytes()))
+        from signature1278_contract import restore as restore1278
+        self.assertEqual(strings(before),strings(restore1278(path,(ROOT/path).read_bytes())))
 
     def test_root_discovery_includes_stability_cases(self):
         suite = unittest.TestLoader().discover(str(ROOT/'tools/connected_alpha'), pattern='test_*.py')

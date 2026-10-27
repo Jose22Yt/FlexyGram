@@ -69,19 +69,20 @@ public class ChatActivityChannelButtonsLayout extends FrameLayout implements Fac
 
     private static final int[] signatureLeft={BUTTON_DIRECT,BUTTON_GIFT,BUTTON_GIGA_GROUP_INFO,BUTTON_RECENT_ACTIONS_INFO};
     private static final int[] signatureRight={BUTTON_SEARCH};
-    private boolean signatureCompact,signatureGlass;
+    private boolean signatureCompact,signatureGlass,signatureRtl;
     private int signatureInset,signatureGap,signatureSurface,signaturePosition;
     private final Paint signaturePaint=new Paint(Paint.ANTI_ALIAS_FLAG);
-    private int[] leftOrder(){return signatureCompact?signatureLeft:buttonsOrderLeft;}
-    private int[] rightOrder(){return signatureCompact?signatureRight:buttonsOrderRight;}
+    private int[] leftOrder(){return signatureCompact?(signatureRtl?signatureRight:signatureLeft):buttonsOrderLeft;}
+    private int[] rightOrder(){return signatureCompact?(signatureRtl?signatureLeft:signatureRight):buttonsOrderRight;}
     private int step(){return signatureCompact?48:54;}
     private void refreshSignature(int width){
         boolean compact=app.flexygram.composer.FlexyComposerConfig.compact();
         int count=0;
         for(ButtonHolder holder:buttonHolders)if(holder!=null&&holder.visibilityAnimator.getValue())count++;
         // Keep native fallback for narrow or unusually action-dense overlays.
-        compact &= width<=0 || width>=dp(count*48+112);
+        compact &= width<=0 || width>=dp(count*48+144);
         signatureCompact=compact;
+        signatureRtl=org.telegram.messenger.LocaleController.isRTL;
         signatureGlass=app.flexygram.composer.FlexyComposerConfig.glass();
         signatureInset=dp(app.flexygram.composer.ComposerStyle.inset(app.flexygram.composer.FlexyComposerConfig.level()));
         signatureGap=dp(app.flexygram.composer.FlexyComposerConfig.gap());

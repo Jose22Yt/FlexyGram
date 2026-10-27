@@ -6,7 +6,8 @@ from pathlib import Path
 def write_probe(source,root):
  text=(root/'TMessagesProj/src/main/java/org/telegram/ui/Components/ReactionsContainerLayout.java').read_text()
  methods=text[text.index('    private ObjectAnimator signatureTransitionAnimator;'):text.index('    public int getTotalWidth()')]
- cleanup=text[text.index('        cancelSignatureTransition();',text.index('    protected void onDetachedFromWindow() {')):text.index('        super.onDetachedFromWindow();',text.index('    protected void onDetachedFromWindow() {'))]
+ detach=text.rindex('\n    protected void onDetachedFromWindow() {')
+ cleanup=text[text.index('        cancelSignatureTransition();',detach):text.index('        super.onDetachedFromWindow();',detach)]
  code='''import android.animation.*;import android.content.Context;import android.view.*;import android.view.animation.OvershootInterpolator;
 import org.telegram.ui.Components.CubicBezierInterpolator;
 public class ReactionsMotionProbe extends View {
