@@ -145,6 +145,8 @@ class SmartPreviews(unittest.TestCase):
         self.assertIn("drawSmartPreviewBackground(canvas,top,1f-updateHelper.typingProgres)",s)
         self.assertIn("smartPreviewPalette.foreground()",s)
         self.assertIn("smartPreviewKind=0",s)
+        self.assertIn("smartModeChanged=smartPreviewModeLastBuilt!=smartModeNow",s)
+        self.assertIn("!needUpdate && !smartModeChanged",s)
         self.assertIn("draftMessage == null && !draftVoice",s)
         self.assertIn("!hasTags()",s)
         self.assertIn("spoilers.isEmpty()",s)
