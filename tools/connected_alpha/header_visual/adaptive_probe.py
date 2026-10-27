@@ -56,15 +56,20 @@ public class AdaptiveBotProbe extends FrameLayout {
 '''+methods+'}')
  parent=(java/'org/telegram/ui/Components/chat/ChatInputViewsContainer.java').read_text()
  fields=parent[parent.index('    private final RectF signatureChannelMiddle='):parent.index('    /** Same native backdrop')]
- method=body(parent,'private void drawSignatureChannelBackground(')
+ method=body(parent,'private void drawSignatureChannelBackground(')+'\n'+body(parent,'private void checkViewsPositions(')
+ bottom=re.search(r'INPUT_BUBBLE_BOTTOM\s*=\s*(\d+)',parent).group(1)
  put('ChannelBackdropProbe.java','''import android.graphics.*;import android.graphics.drawable.ColorDrawable;import android.view.*;import android.widget.*;import androidx.core.graphics.ColorUtils;import org.telegram.messenger.AndroidUtilities;
 public class ChannelBackdropProbe {
  public org.telegram.ui.Components.chat.layouts.ChatActivityChannelButtonsLayout flexyChannels;
  public FrameLayout inputIslandBubbleContainer=new FrameLayout(org.robolectric.RuntimeEnvironment.getApplication());
+ public static final int INPUT_BUBBLE_BOTTOM=__BOTTOM__;public float maxBottomInset=20,imeBottomInset=60;
+ public FrameLayout inAppKeyboardBubbleContainer=new FrameLayout(org.robolectric.RuntimeEnvironment.getApplication());
+ public static class Composer{public int offset=13;public int getFlexyVerticalOffset(){return offset;}}public Composer flexyComposer;
+ public void position(){checkViewsPositions();}
  public boolean flexyPearlGlass;public final CountingBackdrop blurredBackgroundDrawable=new CountingBackdrop();
  public static class CountingBackdrop extends ColorDrawable{public int draws;public CountingBackdrop(){super(0xff303236);}@Override public void draw(Canvas c){draws++;super.draw(c);}}
  final Rect tmpRect=new Rect();final RectF tmpRectF=new RectF();final Paint flexySurface=new Paint(3),flexyPearl=new Paint(3);
  static int dp(float v){return AndroidUtilities.dp(v);}
  public void render(Canvas c){drawSignatureChannelBackground(c);}
-'''+fields+method+'}')
+'''.replace('__BOTTOM__',bottom)+fields+method+'}')
  (source/'AdaptiveControlsTest.java').write_bytes(Path(__file__).with_name('AdaptiveControlsTest.java.in').read_bytes())

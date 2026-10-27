@@ -33,4 +33,10 @@ public class AdaptiveControlsTest {
    assertEquals(glass?1:0,p.blurredBackgroundDrawable.draws);
   }
  }
+ @Test public void channelOffsetUsesNativeVisibilityAndDoesNotAlterImeTranslation(){
+  var v=new ChatActivityChannelButtonsLayout(RuntimeEnvironment.getApplication(),null,null,new BlurredBackgroundDrawableViewFactory());v.setSignaturePresentation(true);v.showButton(0,true,false);
+  var p=new ChannelBackdropProbe();p.flexyChannels=v;p.inAppKeyboardBubbleContainer.measure(View.MeasureSpec.makeMeasureSpec(400,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(100,View.MeasureSpec.EXACTLY));
+  for(int pos:new int[]{-4,0,16})for(float factor:new float[]{0,.25f,.5f,1}){FlexyComposerConfig.setPosition(pos);v.requestLayout();layout(v,400);v.setTotalVisibilityFactor(factor);p.position();assertEquals(-20-ChannelBackdropProbe.INPUT_BUBBLE_BOTTOM-(10+pos)*factor,p.inputIslandBubbleContainer.getTranslationY(),.01f);assertEquals(40,p.inAppKeyboardBubbleContainer.getTranslationY(),.01f);}
+  p.flexyChannels=null;p.flexyComposer=new ChannelBackdropProbe.Composer();p.position();assertEquals(-20-ChannelBackdropProbe.INPUT_BUBBLE_BOTTOM-13,p.inputIslandBubbleContainer.getTranslationY(),.01f);assertEquals(40,p.inAppKeyboardBubbleContainer.getTranslationY(),.01f);
+ }
 }
