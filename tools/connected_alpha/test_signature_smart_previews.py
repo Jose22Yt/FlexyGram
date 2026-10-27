@@ -150,8 +150,11 @@ class SmartPreviews(unittest.TestCase):
         s=SETTINGS.read_text()
         for x in ('smartPreviewsRow = addRow("flexySmartPreviews")',
                   'SignatureSmartPreviews.setMode(selected)',
-                  'SignatureSmartPreviews.setMode(selected)'):
+                  'NotificationCenter.dialogsNeedReload'):
             self.assertIn(x,s)
+        picker=s[s.index('} else if (position == smartPreviewsRow)'):
+                 s.index('} else if (position == signatureMessagesRow)')]
+        self.assertNotIn('rebuildChats()',picker)
         for locale in ("values","values-es","values-ru"):
             p=ROOT/"TMessagesProj/src/main/res"/locale/"flexygram_smart_previews.xml"
             tree=ET.parse(p)
