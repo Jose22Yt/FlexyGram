@@ -103,7 +103,7 @@ public final class HeaderPreviewView extends View {
         int clip=canvas.save();canvas.clipPath(fusion.clip);
         int layer=fusion.mask.begin(canvas,g.portrait.left,g.portrait.top,g.portrait.right,g.portrait.bottom);
         avatar.setColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText));canvas.drawRect(g.portrait.left,g.portrait.top,g.portrait.right,g.portrait.bottom,avatar);
-        text.setTextSize(AndroidUtilities.dp(22));text.setColor(0xffffffff);canvas.drawText("A",g.portrait.centerX(),g.portrait.centerY()+AndroidUtilities.dp(7),text);
+        text.setTextSize(AndroidUtilities.dp(22));text.setColor(0xffffffff);canvas.drawText("A",g.rtl ? g.portrait.right-AndroidUtilities.dp(24) : g.portrait.left+AndroidUtilities.dp(24),g.portrait.centerY()+AndroidUtilities.dp(7),text);
         canvas.translate(g.portrait.left,g.portrait.top);
         fusion.mask.finish(canvas,layer,g.portrait.width(),g.portrait.height(),g.fadeStartX-g.portrait.left,g.fadeEndX-g.portrait.left,g.fadeSafeStop,g.rtl);canvas.restoreToCount(clip);
         text.setColor(color);text.setTextSize(titlePx);float th=text.descent()-text.ascent(),ta=text.ascent();text.setTextSize(subtitlePx);float sh=text.descent()-text.ascent();
