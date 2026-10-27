@@ -25,6 +25,10 @@ final class FlexyEditorToolsSheet extends BottomSheet {
     interface Selection { void selected(int action); }
     private final Theme.ResourcesProvider provider;
     private final Selection selection;
+    private int pendingAction = -1;
+    /** Consume only after the sheet has finished dismissing; otherwise search can lose IME focus. */
+    int consumePendingAction() { int value = pendingAction; pendingAction = -1; return value; }
+    private void selectAfterDismiss(int action) { pendingAction = action; dismiss(); }
 
     FlexyEditorToolsSheet(BaseFragment fragment, String fileName, boolean text,
                          boolean zipEntry, boolean html, Selection selection) {
@@ -144,7 +148,7 @@ final class FlexyEditorToolsSheet extends BottomSheet {
                 0x00000000, color(Theme.key_listSelector)));
         cell.setContentDescription(label);
         cell.setFocusable(true);
-        cell.setOnClickListener(v -> { dismiss(); selection.selected(action); });
+        cell.setOnClickListener(v -> selectAfterDismiss(action));
         container.addView(cell, new LinearLayout.LayoutParams(0, -1, 1));
     }
 
@@ -178,7 +182,7 @@ final class FlexyEditorToolsSheet extends BottomSheet {
         item.addView(value, new LinearLayout.LayoutParams(0, -2, 1));
         item.setContentDescription(label);
         item.setFocusable(true);
-        item.setOnClickListener(v -> { dismiss(); selection.selected(action); });
+        item.setOnClickListener(v -> selectAfterDismiss(action));
         container.addView(item, new LinearLayout.LayoutParams(-1, -2));
     }
 }
