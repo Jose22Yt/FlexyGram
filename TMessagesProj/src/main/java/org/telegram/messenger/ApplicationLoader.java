@@ -346,12 +346,24 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
         initPushServices();
         FileLog.d("app initied");
 
-        MediaController.getInstance();
-        for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) { //TODO improve account
-            ContactsController.getInstance(a).checkAppAccount();
-            DownloadController.getInstance(a);
+        initializeAccountServices();
+        } finally {
+            android.os.Trace.endSection();
         }
-        BillingController.getInstance().startConnection();
+    }
+
+    /** All sessions/configs are loaded above; inactive slots retain native lazy getInstance(). */
+    private static void initializeAccountServices() {
+        android.os.Trace.beginSection("Flexy.startup.account_services");
+        try {
+            MediaController.getInstance();
+            for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
+                ContactsController.getInstance(a).checkAppAccount();
+                // Do not parse presets/register a download receiver for an empty slot.
+                // Every activated session retains eager native download initialization.
+                if (UserConfig.getInstance(a).isClientActivated()) DownloadController.getInstance(a);
+            }
+            BillingController.getInstance().startConnection();
         } finally {
             android.os.Trace.endSection();
         }
