@@ -24,6 +24,13 @@ class Stability1277(unittest.TestCase):
   Theme.all.clear();Theme.all.put("Blue",new Theme.ThemeInfo(false));Theme.all.put("Dark Blue",new Theme.ThemeInfo(true));Theme.all.put("CustomDay",new Theme.ThemeInfo(false));Theme.all.put("CustomNight",new Theme.ThemeInfo(true));Theme.all.put("WrongDay",new Theme.ThemeInfo(true));Theme.all.put("WrongNight",new Theme.ThemeInfo(false));Theme.dark=dark;Probe p=new Probe();p.switchingTheme=true;p.toggle(day,night);if(p.chosen==null||p.chosen.isDark()==dark||p.target==dark)throw new AssertionError();}
   Theme.all.clear();Probe p=new Probe();p.switchingTheme=true;p.toggle("missing","missing");if(p.chosen!=null||p.switchingTheme)throw new AssertionError();}}
   ''')
+ def test_settings_selector_uses_the_same_global_contrast_and_preserves_preferences(self):
+  s=(JAVA/'org/telegram/ui/ThemeActivity.java').read_text()
+  a=s.index('} else if (id == day_night_switch)');b=s.index('int[] pos = new int[2];',a);body=s[a:b]
+  self.assertIn('final boolean toDark = !Theme.isCurrentThemeDark();',body)
+  self.assertNotIn('dayThemeName.equals(themeInfo.getKey())',body)
+  self.assertIn('themeInfo.isDark() != toDark',body)
+  self.assertNotIn('preferences.edit()',body)
  def test_height_target_guard_executes_actual_measure_code(self):
   s=(JAVA/'org/telegram/ui/Components/ChatActivityEnterView.java').read_text()
   start=s.index('                if (animatorInputFieldHeight.getToFactor() != height)')
