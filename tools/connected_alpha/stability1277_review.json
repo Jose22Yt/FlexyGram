@@ -24,7 +24,7 @@
     "tools/connected_alpha/build_private_apk.py": "e716e44dcca3d7067e33514bac0527ea601ed35a294aa617c19056e166176116",
     "tools/connected_alpha/files_native/FilesNativeTest.java.in": "e4ffdb7f1cca06314db95879eef92f98e3600eab93e513ed6e3957f7e8d44db2",
     "tools/connected_alpha/files_native/stubs.py": "f5621dc668bbb7e916feddf5279056348113e4ed2d6163ba27a24b03fdddf6f9",
-    "tools/connected_alpha/header_visual/HeaderVisualTest.java.in": "37b02296b3d5610ed509f597aeb599cac4d52589c12f7a70a389b2974ad4caa4",
+    "tools/connected_alpha/header_visual/HeaderVisualTest.java.in": "17d5eda703ac506b3a033cc2397c4d6786dae16956111cb4d7d3dd5c9c0c7786",
     "tools/connected_alpha/performance/capture.py": "758c507f52c0084d077159855c342da6f2af03b53580ad3a5d20fe6f0eeb62b5",
     "tools/connected_alpha/performance/compare.py": "ddd45f27c946ecffd324c6cc1c5164fa6c78280dc8ebe88f322ff5bec95f1a3f",
     "tools/connected_alpha/performance/perfetto.py": "6e98ac2721931d2ae23c998f11a28349a40f2edb5290a3b83e430827721052ae",
