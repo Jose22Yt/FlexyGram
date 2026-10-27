@@ -1876,10 +1876,14 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
                 getString(R.string.FlexySmartPreviewMatte),
                 getString(R.string.FlexySmartPreviewOff)
             },selected->{
-                app.flexygram.home.SignatureSmartPreviews.setMode(selected);
-                // Only when the user changes the option: rebuild existing dialog
-                // rows; no polling, timers or additional per-frame work.
-                rebuildChats();
+                if (selected != app.flexygram.home.SignatureSmartPreviews.mode()) {
+                    app.flexygram.home.SignatureSmartPreviews.setMode(selected);
+                    // Invalidate only actual Telegram dialog lists. Rebuilding
+                    // the entire fragment stack for a badge-color change risks
+                    // jank and interrupted chat navigation.
+                    NotificationCenter.getInstance(org.telegram.messenger.UserConfig.selectedAccount)
+                            .postNotificationName(NotificationCenter.dialogsNeedReload);
+                }
                 reloadList();
             });
             return;
