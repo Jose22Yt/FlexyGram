@@ -576,7 +576,8 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
             var g = signatureHeader.fusionGeometry();
             canvas.translate(child.getX(), child.getY());
             signaturePhotoMask.finish(canvas, fusionLayer, child.getWidth(), child.getHeight(),
-                    g.fadeStartX - g.portrait.left, g.fadeEndX - g.portrait.left, g.rtl);
+                    g.fadeStartX - g.portrait.left, g.fadeEndX - g.portrait.left,
+                    g.fadeSafeStop, g.rtl);
             canvas.restoreToCount(fusionSave);
         }
         return b;
@@ -928,12 +929,12 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
         // Classic title padding (6 + 12 dp) is outside the Signature text block.
         titleTextView.setPadding(0, 0, 0, 0);
         getSubtitleTextView().setPadding(0, 0, 0, 0);
-        titleTextView.setGravity(fusion ? (LocaleController.isRTL ? Gravity.RIGHT : Gravity.LEFT) : Gravity.CENTER_HORIZONTAL);
+        titleTextView.setGravity(Gravity.CENTER_HORIZONTAL);
         titleTextView.measure(MeasureSpec.makeMeasureSpec(textWidth, MeasureSpec.AT_MOST), MeasureSpec.makeMeasureSpec((int)Math.ceil(signatureHeader.titlePx) + dp(8), MeasureSpec.AT_MOST));
-        if (subtitleTextView != null) { subtitleTextView.setTextSizePx(Math.round(signatureHeader.subtitlePx)); subtitleTextView.setGravity(fusion ? (LocaleController.isRTL ? Gravity.RIGHT : Gravity.LEFT) : Gravity.CENTER_HORIZONTAL); }
+        if (subtitleTextView != null) { subtitleTextView.setTextSizePx(Math.round(signatureHeader.subtitlePx)); subtitleTextView.setGravity(Gravity.CENTER_HORIZONTAL); }
         else if (animatedSubtitleTextView != null) {
             animatedSubtitleTextView.setTextSize(signatureHeader.subtitlePx);
-            animatedSubtitleTextView.setGravity(fusion ? (LocaleController.isRTL ? Gravity.RIGHT : Gravity.LEFT) : Gravity.CENTER_HORIZONTAL);
+            animatedSubtitleTextView.setGravity(Gravity.CENTER_HORIZONTAL);
         }
         getSubtitleTextView().measure(MeasureSpec.makeMeasureSpec(textWidth, MeasureSpec.AT_MOST), signatureHeader.subtitleFits ? MeasureSpec.makeMeasureSpec((int)Math.ceil(signatureHeader.subtitlePx) + dp(8), MeasureSpec.AT_MOST) : MeasureSpec.makeMeasureSpec(0, MeasureSpec.EXACTLY));
         int photo = Math.max(1, Math.round(signatureHeader.height) - dp(2));
@@ -963,9 +964,9 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
         View subtitle = getSubtitleTextView();
         int th = titleTextView.getMeasuredHeight(), sh = !signatureHeader.subtitleFits || subtitle.getVisibility() != VISIBLE ? 0 : subtitle.getMeasuredHeight();
         int textY = Math.round(title.centerY() - (th + sh + (sh == 0 ? 0 : dp(2))) / 2f);
-        x = fusion ? Math.round(LocaleController.isRTL ? title.right - titleTextView.getMeasuredWidth() : title.left) : Math.round(title.centerX() - titleTextView.getMeasuredWidth() / 2f);
+        x = Math.round(title.centerX() - titleTextView.getMeasuredWidth() / 2f);
         titleTextView.layout(x, textY, x + titleTextView.getMeasuredWidth(), textY + th);
-        x = fusion ? Math.round(LocaleController.isRTL ? title.right - subtitle.getMeasuredWidth() : title.left) : Math.round(title.centerX() - subtitle.getMeasuredWidth() / 2f);
+        x = Math.round(title.centerX() - subtitle.getMeasuredWidth() / 2f);
         subtitle.layout(x, textY + th + dp(2), x + subtitle.getMeasuredWidth(), textY + th + dp(2) + sh);
         x = LocaleController.isRTL ? Math.round(title.left) + dp(2) : Math.round(title.right) - dp(34);
         if (fusion) {
@@ -975,7 +976,8 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
             signaturePhotoClip.rewind();
             signaturePhotoClip.addRoundRect(g.center.left,g.center.top+offset,g.center.right,g.center.bottom+offset,
                     g.center.height()/2,g.center.height()/2,android.graphics.Path.Direction.CW);
-            signaturePhotoMask.prepare(g.fadeStartX-g.portrait.left,g.fadeEndX-g.portrait.left,g.rtl);
+            signaturePhotoMask.prepare(g.fadeStartX-g.portrait.left,g.fadeEndX-g.portrait.left,
+                    g.fadeSafeStop,g.rtl);
         }
         if (timeItem != null) { int tx = Math.round(a.left) - dp(6), ty = Math.round(a.top) - dp(4); timeItem.layout(tx, ty, tx + dp(34), ty + dp(34)); }
         if (communityItem != null) { int tx = Math.round(a.right) - dp(14), ty = Math.round(a.bottom) - dp(14); communityItem.layout(tx, ty, tx + dp(14), ty + dp(14)); }
