@@ -93,6 +93,19 @@ public class HeaderVisualTest {
   }
   image.recycle();
  }
+ @Test public void extendedNativeMaskReachesNameAgainstRealLightAndDarkSurfaces()throws Exception{
+  for(boolean rtl:new boolean[]{false,true})for(float density:new float[]{1,2,3})for(int width:new int[]{320,393,600}){
+   var g=app.flexygram.header.fusion.SignatureFusionGeometry.calculate(width*density,density,rtl,true);if(!g.fits)continue;
+   int w=Math.round(g.portrait.width()),h=Math.round(g.portrait.height());
+   float start=g.fadeStartX-g.portrait.left,end=g.fadeEndX-g.portrait.left;
+   int name=Math.round((rtl?g.text.right:g.text.left)-g.portrait.left);
+   for(int background:new int[]{0xfff7f8fa,0xff11151c})for(int photo:new int[]{Color.BLACK,Color.WHITE,0xff2288cc}){
+    Bitmap image=Bitmap.createBitmap(w,h,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(image);c.drawColor(background);var mask=new app.flexygram.header.fusion.SignatureFusionAvatarMask();mask.prepare(start,end,rtl);Object shader=field(mask,"gradient");int save=mask.begin(c,0,0,w,h);Paint p=new Paint();p.setColor(photo);c.drawRect(0,0,w,h,p);mask.finish(c,save,w,h,start,end,rtl);
+    int color=image.getPixel(Math.max(0,Math.min(w-1,name)),h/2);assertTrue(Math.abs(Color.red(color)-Color.red(background))<=16);assertTrue(Math.abs(Color.green(color)-Color.green(background))<=16);assertTrue(Math.abs(Color.blue(color)-Color.blue(background))<=16);
+    assertEquals(photo,image.getPixel(rtl?w-Math.round(15*density):Math.round(15*density),h/2));for(int i=0;i<1000;i++)mask.prepare(start,end,rtl);assertSame(shader,field(mask,"gradient"));image.recycle();
+   }
+  }
+ }
  @Test public void defaultAdaptiveAllocatesNoFusionControllerOrControls()throws Exception{
   HeaderConfig.style(0);ActionBar bar=new ActionBar(context(1));ChatAvatarContainer avatar=new ChatAvatarContainer(bar.getContext());bar.addView(avatar,0,new FrameLayout.LayoutParams(-1,-1));SignatureChatHeader header=new SignatureChatHeader(bar,avatar,null);bar.setSignatureHeader(header);avatar.setSignatureHeader(header);size(bar,401);assertNull(field(header,"fusion"));assertNull(field(avatar,"signatureCall"));assertNull(field(avatar,"signaturePhotoMask"));
  }
