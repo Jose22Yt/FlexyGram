@@ -46,7 +46,9 @@ class SignatureMatteTests(unittest.TestCase):
         PATHS = PATHS | MUSIC_PATHS
         paths=[p for p in paths if not p.startswith("TMessagesProj/jni/")]
         from login_contract import PATHS as LOGIN_PATHS
-        self.assertTrue(set(paths)<=CANDIDATE_PATHS|PATHS|LOGIN_PATHS, set(paths)-CANDIDATE_PATHS-PATHS-LOGIN_PATHS)
+        from legacy_appearance_contract import paths as legacy_paths
+        self.assertTrue(set(paths)<=CANDIDATE_PATHS|PATHS|LOGIN_PATHS|legacy_paths(),
+                        set(paths)-CANDIDATE_PATHS-PATHS-LOGIN_PATHS-legacy_paths())
         for directory in ('app/flexygram/composer','app/flexygram/home','app/exteraless/appearance'):
             prefix='TMessagesProj/src/main/java/'+directory
             for path in subprocess.check_output(['git','ls-tree','-r','--name-only',BASE,'--',prefix],cwd=ROOT,text=True).splitlines():

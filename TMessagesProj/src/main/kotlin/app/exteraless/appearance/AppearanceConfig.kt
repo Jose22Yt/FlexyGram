@@ -640,7 +640,7 @@ object AppearanceConfig {
         migrateLegacyTitleName()
         migrateCustomTitle()
         migrateCenterTitle()
-        migrateIosChatHeader()
+        retireConflictingLegacyStyles()
         migrateModernStyles()
         migrateDecorations()
     }
@@ -653,6 +653,25 @@ object AppearanceConfig {
         val type = NaConfig.centerActionBarTitleType.Int()
         if (type == 2 || type == 3) {
             NaConfig.centerActionBarTitleType.setConfigInt(1)
+        }
+    }
+
+    /**
+     * The retired Exteraless MD3/iOS Appearance groups must not override
+     * FlexyGram's own Signature header or bottom navigation. Keep unrelated
+     * rendering defaults (loading, player, controls) intact.
+     */
+    private fun retireConflictingLegacyStyles() {
+        if (!org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) {
+            migrateIosChatHeader()
+            return
+        }
+        if (newChatHeaderStyle.Bool()) newChatHeaderStyle.setConfigBool(false)
+        if (newNavigationBarStyle.Bool()) newNavigationBarStyle.setConfigBool(false)
+        if (iosNavigationBarStyle.Bool()) iosNavigationBarStyle.setConfigBool(false)
+        if (iosChatHeader.Bool()) iosChatHeader.setConfigBool(false)
+        if (getPreferences().contains("OEAppearanceIosChatHeaderAuto")) {
+            getPreferences().edit().remove("OEAppearanceIosChatHeaderAuto").apply()
         }
     }
 
