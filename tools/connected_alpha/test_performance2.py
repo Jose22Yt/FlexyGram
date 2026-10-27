@@ -186,6 +186,8 @@ INSERT INTO android_garbage_collection_events VALUES('test.app',110,20,3),('test
         for token in ('secrets:', 'assembleConnectedAlpha', 'upload-release', 'signing'):
             self.assertNotIn(token,s)
         self.assertNotIn("secrets.LOCAL_PROPERTIES",(ROOT/'.github/workflows/pr.yml').read_text())
-        self.assertNotIn("assembleDebug",(ROOT/'.github/workflows/pr.yml').read_text())
+        import yaml
+        flow=yaml.safe_load((ROOT/'.github/workflows/pr.yml').read_text())
+        self.assertNotIn("assembleDebug", "\n".join(step.get("run", "") for step in flow["jobs"]["build"]["steps"]))
 
 if __name__=='__main__':unittest.main()

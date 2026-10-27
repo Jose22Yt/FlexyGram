@@ -40,9 +40,10 @@
     "tools/connected_alpha/test_fusion_v3.py": "a2f4cbce9dc84a865a848cb1393971b8db81ea12eae4531b0687b7d91b8f4ee2",
     "tools/connected_alpha/test_header_fusion.py": "6f275664c4268c25b6fdd98ed36727f7fc5cce4328df2bcf4f1f435fb05bb5a5",
     "tools/connected_alpha/test_integration.py": "82304898d9e475c95b5ec194fb02127c2f771a9a5b527ca9fcf1a36d683dcd2f",
-    "tools/connected_alpha/test_performance2.py": "f2e227d6af2ed4728cfde4f6c9399dfb6d3b6b76fdbc8bd11b0884d458773c08",
+    "tools/connected_alpha/test_performance2.py": "e98a35da7276169fe739a62cb08d0031a3d41e6c2a8c746b0fbf235dd7f9f9bd",
     "tools/connected_alpha/test_refinement1274.py": "6d3227e5a92298827555eaf52795293d900a239d480852e61970f74c225c64d5",
-    "tools/connected_alpha/test_signature1278.py": "9bc31d446d61d793da8b0e6983e7708f9e8ce6aced9235662e3009acd083e6bf",
+    "tools/connected_alpha/test_signature1278.py": "96a8d9fb14ae376b6b2bb016c11dafa9ffd378bca27b26182050bc1f13e6fe38",
+    "tools/connected_alpha/test_stability1277.py": "a428ffc4ee238cd2fc28e828068070e0d76e0589732e0e7ef030c5d560ceb7c5",
     "tools/connected_alpha/test_stabilization1272.py": "239e697d02edcf7a905e1b6616b97c2c7784313282ef17ab4af10826fb61a425"
   },
   "paths": [
@@ -88,6 +89,7 @@
     "tools/connected_alpha/test_performance2.py",
     "tools/connected_alpha/test_refinement1274.py",
     "tools/connected_alpha/test_signature1278.py",
+    "tools/connected_alpha/test_stability1277.py",
     "tools/connected_alpha/test_stabilization1272.py",
     "tools/connected_alpha/signature1278_review.json"
   ]

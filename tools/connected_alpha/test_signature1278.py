@@ -29,6 +29,12 @@ class Signature1278(unittest.TestCase):
   self.assertIn('chatInfo.stargifts_available',channel);self.assertIn('checkCanOpenChat(args,ChatActivity.this)',channel)
   self.assertIn('setDiscussionButton(useSignatureChannelDiscussion())',channel)
   self.assertIn('new GiftSheet(getContext(), currentAccount, getDialogId()',channel)
+ def test_current_release_changes_only_version_and_preserves_all_signing_gates(self):
+  base='79ae7c6a4d52d3a787ca8dfddb11660d028bf24f'
+  for name,old,new in [('TMessagesProj/build.gradle','def verCode = 1277','def verCode = 1278'),('.github/workflows/connected-alpha-arm64.yml','--expected-version-code 1277','--expected-version-code 1278')]:
+   current=(ROOT/name).read_text();self.assertIn(new,current)
+   original=subprocess.check_output(['git','show',base+':'+name],cwd=ROOT,text=True)
+   self.assertEqual(current.replace(new,old),original)
  def test_historical_review_is_immutable(self):
   path='tools/connected_alpha/stability1277_review.json'
   baseline=subprocess.check_output(['git','show','79ae7c6a4d52d3a787ca8dfddb11660d028bf24f:'+path],cwd=ROOT)
