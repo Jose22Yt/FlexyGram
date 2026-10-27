@@ -1,0 +1,19 @@
+import android.animation.ObjectAnimator;import android.content.Context;
+import org.junit.*;import org.junit.runner.RunWith;import org.robolectric.*;import org.robolectric.annotation.*;
+import static org.junit.Assert.*;
+/** Production methods + real Android ObjectAnimator; Telegram notification/layout dependencies are doubles. */
+@RunWith(RobolectricTestRunner.class) @Config(manifest=Config.NONE,sdk=35) @LooperMode(LooperMode.Mode.PAUSED)
+public class ReactionsMotionTest {
+ ReactionsMotionProbe open(){return new ReactionsMotionProbe(RuntimeEnvironment.getApplication());}
+ @Test public void reversesWithoutRestartingFromOneOrZero(){
+  var v=open();v.startEnterAnimation(true);var enter=v.current();enter.setCurrentFraction(.35f);float rendered=v.transitionProgress;
+  v.startCloseAnimation();assertNotSame(enter,v.current());assertEquals(rendered,v.transitionProgress,.0001f);
+  var exit=v.current();exit.setCurrentFraction(.4f);rendered=v.transitionProgress;
+  v.startEnterAnimation(true);assertEquals(rendered,v.transitionProgress,.0001f);v.current().end();
+  assertEquals(1f,v.transitionProgress,0);assertFalse(v.notificationsLocker.held);assertNull(v.current());
+ }
+ @Test public void sameTargetDoesNotQueueAnimators(){var v=open();v.startEnterAnimation(true);var first=v.current();for(int i=0;i<100;i++)v.startEnterAnimation(true);assertSame(first,v.current());assertEquals(1,v.notificationsLocker.locks);v.detachNow();assertNull(v.current());assertFalse(v.notificationsLocker.held);}
+ @Test public void rapidDirectionChangesRetainOneOwnerAndReleaseOnDetach(){var v=open();for(int i=0;i<100;i++){if(i%2==0)v.startEnterAnimation(true);else v.startCloseAnimation();assertNotNull(v.current());v.current().setCurrentFraction(.2f);assertTrue(v.notificationsLocker.held);}v.detachNow();assertEquals(v.notificationsLocker.locks,v.notificationsLocker.releases);assertNull(v.current());assertEquals(1f,v.transitionProgress,0);}
+ @Test public void closeSettledZeroDoesNotHoldNotifications(){var v=open();v.setTransitionProgress(0);v.startCloseAnimation();assertNull(v.current());assertFalse(v.notificationsLocker.held);assertEquals(0f,v.transitionProgress,0);}
+ @Test public void completeExitIsShortAndDoesNotBounceBack(){var v=open();v.setTransitionProgress(1);v.startCloseAnimation();assertEquals(180,v.current().getDuration());float previous=1;for(int i=1;i<=20;i++){v.current().setCurrentFraction(i/20f);assertTrue(v.transitionProgress<=previous+.001f);previous=v.transitionProgress;}v.current().end();assertEquals(0f,v.transitionProgress,0);assertFalse(v.notificationsLocker.held);}
+}

@@ -45,4 +45,5 @@ class Alpha1275Integration(unittest.TestCase):
         self.assertIn("data['elf_count'] != 96", verifier)
         self.assertFalse(any('upload-artifact' in step.get('uses', '') for step in steps))
         pr = yaml.safe_load((ROOT / '.github/workflows/pr.yml').read_text())
-        self.assertIn("github.head_ref != 'integration/alpha1275-signature-performance-ui'", pr['jobs']['build']['if'])
+        self.assertNotIn("secrets.LOCAL_PROPERTIES",str(pr["jobs"]["build"]))
+        self.assertIn(":TMessagesProj:assembleConnectedAlpha --dry-run",str(pr["jobs"]["build"]))

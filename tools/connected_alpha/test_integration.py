@@ -54,7 +54,8 @@ class UnifiedIntegration(unittest.TestCase):
         def strings(data):
             return {element.get('name'): ET.tostring(element, encoding='unicode').split('</string>')[0]
                     for element in ET.fromstring(data) if element.tag == 'string'}
-        self.assertEqual(strings(before), strings((ROOT/path).read_bytes()))
+        from signature1278_contract import restore as restore1278
+        self.assertEqual(strings(before),strings(restore1278(path,(ROOT/path).read_bytes())))
 
     def test_root_discovery_includes_stability_cases(self):
         suite = unittest.TestLoader().discover(str(ROOT/'tools/connected_alpha'), pattern='test_*.py')
@@ -92,7 +93,9 @@ class UnifiedIntegration(unittest.TestCase):
                        'integration/connected-alpha-javac-fix'):
             with self.subTest(branch=branch):
                 self.assertTrue(enabled('connected-alpha-static', 'pull_request', branch))
-                self.assertFalse(enabled('build', 'pull_request', branch))
+                self.assertTrue(enabled('build', 'pull_request', branch))
+                self.assertIn(':TMessagesProj:assembleConnectedAlpha --dry-run',str(workflow['jobs']['build']))
+                self.assertNotIn('secrets.LOCAL_PROPERTIES',str(workflow['jobs']['build']))
                 self.assertFalse(enabled('connected-alpha-native', 'pull_request', branch))
         self.assertTrue(enabled('build', 'pull_request', 'unrelated/feature'))
         self.assertTrue(enabled('connected-alpha-native', 'push', 'support/connected-alpha-ci-20261022'))

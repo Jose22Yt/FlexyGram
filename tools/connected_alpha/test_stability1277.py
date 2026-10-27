@@ -57,11 +57,12 @@ class Stability1277(unittest.TestCase):
    self.assertEqual((ROOT/path).read_bytes(),subprocess.check_output(['git','show','38e677d60847e117ede1c25731f7b6c4fd2970e2:'+path],cwd=ROOT))
 
  def test_release1277_keeps_package_certificate_and_native_payload_requirements(self):
-  gradle=(ROOT/'TMessagesProj/build.gradle').read_text()
+  from signature1278_contract import restore as restore1278
+  gradle=restore1278('TMessagesProj/build.gradle',(ROOT/'TMessagesProj/build.gradle').read_bytes()).decode()
   self.assertIn('def verCode = 1277',gradle)
   before=subprocess.check_output(['git','show','38e677d60847e117ede1c25731f7b6c4fd2970e2:TMessagesProj/build.gradle'],cwd=ROOT,text=True)
   self.assertEqual(gradle.replace('def verCode = 1277','def verCode = 1276'),before)
-  workflow=(ROOT/'.github/workflows/connected-alpha-arm64.yml').read_text()
+  workflow=restore1278('.github/workflows/connected-alpha-arm64.yml',(ROOT/'.github/workflows/connected-alpha-arm64.yml').read_bytes()).decode()
   self.assertIn('--expected-version-code 1277',workflow)
   self.assertIn("data['elf_count'] != 96",workflow)
   self.assertIn('c8f04cad685ca5757d35b25ea4b0b4613c7399909948d821e6ada61f9fb12b2c',workflow)

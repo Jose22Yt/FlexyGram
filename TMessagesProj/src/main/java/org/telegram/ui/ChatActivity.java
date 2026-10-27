@@ -9149,6 +9149,11 @@ public class ChatActivity extends BaseFragment implements
             showDialog(new GiftSheet(getContext(), currentAccount, getDialogId(), null, null));
         });
         bottomChannelButtonsLayout.setButtonOnClickListener(ChatActivityChannelButtonsLayout.BUTTON_DIRECT, v -> {
+            if(useSignatureChannelDiscussion()){
+                Bundle args=new Bundle();args.putLong("chat_id",chatInfo.linked_chat_id);
+                if(getMessagesController().checkCanOpenChat(args,ChatActivity.this))presentFragment(new ChatActivity(args));
+                return;
+            }
             HintsController.Hint.ChannelSuggestHint.doNotShowAgain();
             if (currentChat != null && currentChat.linked_monoforum_id != 0) {
                 getMessagesController().putMonoForumLinkedChat(currentChat.id, currentChat.linked_monoforum_id);
@@ -9162,7 +9167,7 @@ public class ChatActivity extends BaseFragment implements
         bottomChannelButtonsLayout.setButtonOnFullyVisibleListener(ChatActivityChannelButtonsLayout.BUTTON_GIFT, (v, id, firstTime) -> {
             if (!NaConfig.INSTANCE.getDisableChannelMuteButton().Bool() && bottomGiftHintView == null && firstTime && (bottomSuggestHintView == null || !bottomSuggestHintView.shown()) && HintsController.Hint.ChannelGiftHint.show()) {
                 AndroidUtilities.runOnUIThread(() -> {
-                    if (getContext() == null) return;
+                    if (getContext() == null || (bottomSuggestHintView != null && bottomSuggestHintView.shown())) return;
                     final float offset = windowInsetsStateHolder.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom / AndroidUtilities.density;
                     final float translate = (contentView.getWidth() - (v.getX() + v.getWidth()) + v.getWidth() / 2f) / AndroidUtilities.density;
 
@@ -9181,7 +9186,7 @@ public class ChatActivity extends BaseFragment implements
         bottomChannelButtonsLayout.setButtonOnFullyVisibleListener(ChatActivityChannelButtonsLayout.BUTTON_DIRECT, (v, id, firstTime) -> {
             if (!NaConfig.INSTANCE.getDisableChannelMuteButton().Bool() && bottomSuggestHintView == null && firstTime && HintsController.Hint.ChannelSuggestHint.show()) {
                 AndroidUtilities.runOnUIThread(() -> {
-                    if (getContext() == null) return;
+                    if (getContext() == null || (bottomGiftHintView != null && bottomGiftHintView.shown())) return;
                     final float offset = windowInsetsStateHolder.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom / AndroidUtilities.density;
                     final float translate = (contentView.getWidth() - (v.getX() + v.getWidth()) + v.getWidth() / 2f) / AndroidUtilities.density;
 
@@ -9371,7 +9376,7 @@ public class ChatActivity extends BaseFragment implements
                                 getNotificationCenter().postNotificationName(NotificationCenter.peerSettingsDidLoad, dialog_id);
                             }
                         }
-                    } else if (shouldShowDiscussButton()) {
+                    } else if (shouldShowDiscussButton() && !useSignatureChannelDiscussion()) {
                         openDiscussion();
                     } else {
                         toggleMute(true);
@@ -29814,7 +29819,7 @@ public class ChatActivity extends BaseFragment implements
                     bottomOverlayChatText.setTextInfo(LocaleController.getString(R.string.ForumReplyToMessagesInTopic));
                     bottomOverlayChatText.setEnabled(false);
                 } else if (!isThreadChat()) {
-                    if (shouldShowDiscussButton()) {
+                    if (shouldShowDiscussButton() && !useSignatureChannelDiscussion()) {
                         bottomOverlayChatText.setText(LocaleController.getString(R.string.ProfileActionsDiscuss), false);
                         bottomOverlayChatText.setEnabled(true);
                     } else if (!getMessagesController().isDialogMuted(dialog_id, getTopicId())) {
@@ -30076,11 +30081,18 @@ public class ChatActivity extends BaseFragment implements
         bottomChannelButtonsLayout.setCenterAccentBackground(accentTextButton, animated);
         bottomChannelButtonsLayout.updateWrappingVisible(animated);
         bottomChannelButtonsLayout.showButton(ChatActivityChannelButtonsLayout.BUTTON_SEARCH, showSearchButton && bottomChannelButtonsLayout.getVisibility() == View.VISIBLE, animated);
-        bottomChannelButtonsLayout.showButton(ChatActivityChannelButtonsLayout.BUTTON_DIRECT, showSuggestButton && bottomChannelButtonsLayout.getVisibility() == View.VISIBLE, animated);
-        bottomChannelButtonsLayout.showButton(ChatActivityChannelButtonsLayout.BUTTON_GIFT, !showSuggestButton && showGiftButton && !NaConfig.INSTANCE.getHideGiftButtonInChannel().Bool() && bottomChannelButtonsLayout.getVisibility() == View.VISIBLE, animated);
+        bottomChannelButtonsLayout.showButton(ChatActivityChannelButtonsLayout.BUTTON_DIRECT, (showSuggestButton || useSignatureChannelDiscussion()) && bottomChannelButtonsLayout.getVisibility() == View.VISIBLE, animated);
+        bottomChannelButtonsLayout.setDiscussionButton(useSignatureChannelDiscussion());
+        bottomChannelButtonsLayout.showButton(ChatActivityChannelButtonsLayout.BUTTON_GIFT, (!showSuggestButton || app.flexygram.composer.FlexyComposerConfig.compact()) && showGiftButton && !NaConfig.INSTANCE.getHideGiftButtonInChannel().Bool() && bottomChannelButtonsLayout.getVisibility() == View.VISIBLE, animated);
         bottomChannelButtonsLayout.showButton(ChatActivityChannelButtonsLayout.BUTTON_GIGA_GROUP_INFO, showGigaGroupButton && bottomChannelButtonsLayout.getVisibility() == View.VISIBLE, animated);
 
         checkRaiseSensors();
+    }
+
+    private boolean useSignatureChannelDiscussion(){
+        return app.flexygram.composer.FlexyComposerConfig.compact() && chatMode==0 && !isReport() && !inPreviewMode
+            && !isThreadChat() && ChatObject.isChannelAndNotMegaGroup(currentChat)
+            && !ChatObject.isNotInChat(currentChat) && chatInfo!=null && chatInfo.linked_chat_id!=0;
     }
 
     private boolean shouldDisplaySwipeToLeftToReplyInForum() {
@@ -51237,7 +51249,11 @@ public class ChatActivity extends BaseFragment implements
         final float enterViewIslandHeight = Math.max(
             chatActivityEnterView != null ? chatActivityEnterView.getIslandTotalHeight(target): 0, dp(44));
 
-        final float defaultIslandHeight = dp(44);
+        final float signatureChannelReservation=bottomChannelButtonsLayout!=null&&bottomChannelButtonsLayout.isSignatureCompactPresentation()
+            ? bottomChannelButtonsLayout.getSignatureVerticalOffset()*(target
+                ? (bottomViewsVisibilityController.getCurrentPriorityContainerId()==BOTTOM_OVERLAY_CHAT_CONTAINER?1f:0f)
+                : bottomViewsVisibilityController.getVisibility(BOTTOM_OVERLAY_CHAT_CONTAINER)) : 0f;
+        final float defaultIslandHeight = dp(44)+signatureChannelReservation;
         final float enterViewFactor;
         float visibility;
         float pollAddVisibility;

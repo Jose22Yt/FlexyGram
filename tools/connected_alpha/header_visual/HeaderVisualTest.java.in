@@ -60,7 +60,7 @@ public class HeaderVisualTest {
  }
  @Test public void optionalFusionUsesNativeSizedPartsRoutesActionsAndRestoresAdaptive()throws Exception{
   HeaderConfig.style(2);Context c=context(1);ActionBar bar=new ActionBar(c);ChatAvatarContainer avatar=new ChatAvatarContainer(c);avatar.callable=true;bar.addView(avatar,0,new FrameLayout.LayoutParams(-1,-1));SignatureChatHeader header=new SignatureChatHeader(bar,avatar,null);bar.setSignatureHeader(header);avatar.setSignatureHeader(header);root.addView(bar);size(bar,401);
-  assertTrue(header.fusionActive());var g=header.fusionGeometry();assertEquals(50,g.center.height(),.01f);assertEquals(46,g.back.height(),.01f);assertEquals(96,g.actions.width(),.01f);assertEquals(46,g.actions.height(),.01f);
+  assertTrue(header.fusionActive());var g=header.fusionGeometry();assertEquals(46,g.center.height(),.01f);assertEquals(48,g.back.height(),.01f);assertEquals(96,g.actions.width(),.01f);assertEquals(48,g.actions.height(),.01f);
   float backLeft=g.back.left,moreRight=g.more.right;tap(bar,g.back.centerX(),g.back.centerY()+header.fusionTop);assertEquals(1,bar.backs);
   tap(bar,g.call.centerX(),g.call.centerY()+header.fusionTop);assertEquals(1,avatar.calls);
   tap(bar,g.more.centerX(),g.more.centerY()+header.fusionTop);assertEquals(1,avatar.menus);
@@ -74,7 +74,7 @@ public class HeaderVisualTest {
   HeaderConfig.style(2);for(boolean rtl:new boolean[]{false,true})for(float font:new float[]{1,2,3})for(int width:new int[]{240,320,401}){
    LocaleController.isRTL=rtl;Context c=context(font);ActionBar bar=new ActionBar(c);ChatAvatarContainer avatar=new ChatAvatarContainer(c);avatar.callable=true;bar.addView(avatar,0,new FrameLayout.LayoutParams(-1,-1));SignatureChatHeader header=new SignatureChatHeader(bar,avatar,null);bar.setSignatureHeader(header);avatar.setSignatureHeader(header);size(bar,width);
    if(width==240||font>1)assertFalse(header.fusionActive());
-   if(header.fusionActive()){var g=header.fusionGeometry();assertTrue(g.fits);assertTrue(g.text.width()>=48);assertEquals(50,header.height,.01f);}
+   if(header.fusionActive()){var g=header.fusionGeometry();assertTrue(g.fits);assertTrue(g.text.width()>=48);assertEquals(48,header.height,.01f);}
    else{assertTrue(header.geometry.title.left>=0);assertTrue(header.geometry.title.right<=width);}
   }
  }
@@ -100,10 +100,35 @@ public class HeaderVisualTest {
    float start=g.fadeStartX-g.portrait.left,end=g.fadeEndX-g.portrait.left;
    int name=Math.round((rtl?g.text.right:g.text.left)-g.portrait.left);
    for(int background:new int[]{0xfff7f8fa,0xff11151c})for(int photo:new int[]{Color.BLACK,Color.WHITE,0xff2288cc}){
-    Bitmap image=Bitmap.createBitmap(w,h,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(image);c.drawColor(background);var mask=new app.flexygram.header.fusion.SignatureFusionAvatarMask();mask.prepare(start,end,rtl);Object shader=field(mask,"gradient");int save=mask.begin(c,0,0,w,h);Paint p=new Paint();p.setColor(photo);c.drawRect(0,0,w,h,p);mask.finish(c,save,w,h,start,end,rtl);
+    Bitmap image=Bitmap.createBitmap(w,h,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(image);c.drawColor(background);var mask=new app.flexygram.header.fusion.SignatureFusionAvatarMask();mask.prepare(start,end,g.fadeSafeStop,rtl);Object shader=field(mask,"gradient");int save=mask.begin(c,0,0,w,h);Paint p=new Paint();p.setColor(photo);c.drawRect(0,0,w,h,p);mask.finish(c,save,w,h,start,end,g.fadeSafeStop,rtl);
     int color=image.getPixel(Math.max(0,Math.min(w-1,name)),h/2);assertTrue(Math.abs(Color.red(color)-Color.red(background))<=16);assertTrue(Math.abs(Color.green(color)-Color.green(background))<=16);assertTrue(Math.abs(Color.blue(color)-Color.blue(background))<=16);
-    assertEquals(photo,image.getPixel(rtl?w-Math.round(15*density):Math.round(15*density),h/2));for(int i=0;i<1000;i++)mask.prepare(start,end,rtl);assertSame(shader,field(mask,"gradient"));image.recycle();
+    assertEquals(photo,image.getPixel(rtl?w-Math.round(4*density):Math.round(4*density),h/2));for(int i=0;i<1000;i++)mask.prepare(start,end,g.fadeSafeStop,rtl);assertSame(shader,field(mask,"gradient"));image.recycle();
    }
+  }
+ }
+ @Test public void nativeInitialsFallbackStaysAtPortraitEdgeAndNeverRequiresAnotherImage()throws Exception{
+  HeaderConfig.style(2);
+  for(boolean rtl:new boolean[]{false,true}){
+   LocaleController.isRTL=rtl;Context c=context(1);
+   ActionBar bar=new ActionBar(c);ChatAvatarContainer avatar=new ChatAvatarContainer(c);
+   avatar.callable=true;bar.addView(avatar,0,new FrameLayout.LayoutParams(-1,-1));
+   SignatureChatHeader header=new SignatureChatHeader(bar,avatar,null);
+   bar.setSignatureHeader(header);avatar.setSignatureHeader(header);
+   ChatAvatarContainer.Photo photo=(ChatAvatarContainer.Photo)field(avatar,"avatarImageView");
+   photo.receiver.photo=false;size(bar,401);
+   assertTrue(header.fusionActive());
+   var g=header.fusionGeometry();
+   assertTrue("native initials remain in a <=73dp viewport",photo.getMeasuredWidth()<=73);
+   if(rtl)assertEquals(g.portrait.right,photo.getRight(),1.01f);
+   else assertEquals(g.portrait.left,photo.getLeft(),1.01f);
+   Bitmap b=Bitmap.createBitmap(401,bar.getMeasuredHeight(),Bitmap.Config.ARGB_8888);
+   bar.draw(new Canvas(b));
+   int x=photo.getLeft()+Math.round(photo.getWidth()*.42f);
+   assertTrue("placeholder remains visible",Color.blue(b.getPixel(x,Math.round(g.portrait.centerY()+header.fusionTop)))>80);
+   b.recycle();
+   photo.receiver.photo=true;header.changed();size(bar,401);
+   assertTrue("actual image uses full extended portrait",photo.getMeasuredWidth()>=g.center.width()*.75f);
+   header.detach();
   }
  }
  @Test public void defaultAdaptiveAllocatesNoFusionControllerOrControls()throws Exception{
@@ -113,12 +138,17 @@ public class HeaderVisualTest {
  @Test public void liveFusionCompositesOnlyExistingPortraitAndPreviewDrawsTheSameGeometry()throws Exception{
   HeaderConfig.style(2);Bitmap evidence=Bitmap.createBitmap(802,400,Bitmap.Config.ARGB_8888);Canvas output=new Canvas(evidence);int[] photoX=new int[2],photoY=new int[2];
   for(boolean rtl:new boolean[]{false,true}){
-   LocaleController.isRTL=rtl;Theme.dark=rtl;Context c=context(1);ActionBar bar=new ActionBar(c);ChatAvatarContainer avatar=new ChatAvatarContainer(c);avatar.callable=true;bar.addView(avatar,0,new FrameLayout.LayoutParams(-1,-1));SignatureChatHeader header=new SignatureChatHeader(bar,avatar,null);bar.setSignatureHeader(header);avatar.setSignatureHeader(header);size(bar,401);assertTrue(header.fusionActive());
-   Bitmap live=Bitmap.createBitmap(401,bar.getMeasuredHeight(),Bitmap.Config.ARGB_8888);bar.draw(new Canvas(live));var g=header.fusionGeometry();int y=Math.round(g.portrait.centerY()+header.fusionTop);
-   int opaqueX=Math.round(rtl?g.portrait.right-20:g.portrait.left+20),fadedX=Math.round(rtl?g.portrait.left+1:g.portrait.right-2);
+   LocaleController.isRTL=rtl;Theme.dark=rtl;Context c=context(1);ActionBar bar=new ActionBar(c);ChatAvatarContainer avatar=new ChatAvatarContainer(c);avatar.callable=true;bar.addView(avatar,0,new FrameLayout.LayoutParams(-1,-1));SignatureChatHeader header=new SignatureChatHeader(bar,avatar,null);bar.setSignatureHeader(header);avatar.setSignatureHeader(header);root.addView(bar);org.robolectric.Shadows.shadowOf(Looper.getMainLooper()).idle();size(bar,401);bar.getViewTreeObserver().dispatchOnPreDraw();assertTrue(header.fusionActive());
+   Bitmap live=Bitmap.createBitmap(401,bar.getMeasuredHeight(),Bitmap.Config.ARGB_8888);bar.draw(new Canvas(live));try(var diagnostic=new java.io.FileOutputStream(new java.io.File(System.getProperty("probe.root"),"signature-header-live-"+(rtl?"rtl":"ltr")+".png"))){assertTrue(live.compress(Bitmap.CompressFormat.PNG,100,diagnostic));}var g=header.fusionGeometry();int y=Math.round(g.portrait.centerY()+header.fusionTop);
+   View title=(View)field(avatar,"titleTextView"),status=(View)field(avatar,"subtitleTextView");
+   assertTrue(title.getWidth()>0&&title.getHeight()>0&&status.getWidth()>0&&status.getHeight()>0);
+   title.setVisibility(View.INVISIBLE);status.setVisibility(View.INVISIBLE);Bitmap hidden=Bitmap.createBitmap(401,bar.getMeasuredHeight(),Bitmap.Config.ARGB_8888);bar.draw(new Canvas(hidden));title.setVisibility(View.VISIBLE);status.setVisibility(View.VISIBLE);
+   for(View label:new View[]{title,status}){int changed=0;for(int py=Math.max(0,label.getTop());py<Math.min(live.getHeight(),label.getBottom());py++)for(int px=Math.max(0,label.getLeft());px<Math.min(live.getWidth(),label.getRight());px++)if(live.getPixel(px,py)!=hidden.getPixel(px,py))changed++;assertTrue("native "+(label==title?"title":"status")+" glyphs: pixels="+changed+" width="+label.getWidth()+" height="+label.getHeight()+" color="+Integer.toHexString(((TextView)label).getCurrentTextColor())+" alpha="+label.getAlpha(),changed>8);}
+   hidden.recycle();
+   int opaqueX=Math.round(rtl?g.portrait.right-4:g.portrait.left+4),fadedX=Math.round(rtl?g.portrait.left+1:g.portrait.right-2);
    assertEquals("existing avatar stays opaque before fade",0xff2288cc,live.getPixel(opaqueX,y));assertNotEquals("native portrait fades into surface",0xff2288cc,live.getPixel(fadedX,y));assertTrue(Color.alpha(live.getPixel(fadedX,y))>=200);
    photoX[rtl?1:0]=opaqueX+(rtl?401:0);photoY[rtl?1:0]=y;
-   output.drawBitmap(live,rtl?401:0,0,null);HeaderPreviewView preview=new HeaderPreviewView(c);size(preview,401);int save=output.save();output.translate(rtl?401:0,140);output.clipRect(0,0,preview.getMeasuredWidth(),preview.getMeasuredHeight());preview.draw(output);output.restoreToCount(save);live.recycle();header.detach();
+   output.drawBitmap(live,rtl?401:0,0,null);HeaderPreviewView preview=new HeaderPreviewView(c);size(preview,401);int save=output.save();output.translate(rtl?401:0,140);output.clipRect(0,0,preview.getMeasuredWidth(),preview.getMeasuredHeight());preview.draw(output);output.restoreToCount(save);live.recycle();header.detach();root.removeView(bar);
   }
   for(int i=0;i<2;i++)assertEquals("saved composite retains each real portrait",0xff2288cc,evidence.getPixel(photoX[i],photoY[i]));
   try(var file=new java.io.FileOutputStream(new java.io.File(System.getProperty("probe.root"),"signature-header-fusion-synthetic.png"))){assertTrue(evidence.compress(Bitmap.CompressFormat.PNG,100,file));}evidence.recycle();

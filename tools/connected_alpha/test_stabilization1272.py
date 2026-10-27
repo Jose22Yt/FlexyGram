@@ -15,10 +15,12 @@ class Stabilization1272(unittest.TestCase):
     with self.assertRaises(ValueError,msg=path):restore1271(path,current.replace(b'public ',b'private ',1))
  def test_authentication_playback_sessions_composer_home_and_message_layout_unchanged(self):
   for prefix in ['TMessagesProj/src/main/java/org/telegram/tgnet','TMessagesProj/jni','TMessagesProj/chaquopy','TMessagesProj/src/main/java/app/flexygram/composer','TMessagesProj/src/main/java/app/flexygram/home']:
-   if prefix.endswith('/composer'):
+   if prefix.endswith(('/composer','/home')):
     before=set(subprocess.check_output(['git','ls-tree','-r','--name-only',BASE,'--',prefix],cwd=ROOT,text=True).splitlines())
     current=set(subprocess.check_output(['git','ls-files','--',prefix],cwd=ROOT,text=True).splitlines())
-    self.assertEqual(current,before)
+    expectedNew={'TMessagesProj/src/main/java/app/flexygram/home/SignatureFolderAccent.java'} if prefix.endswith('/home') else set()
+    self.assertEqual(current,before|expectedNew)
+    for path in expectedNew:self.assertEqual(restore1271(path,(ROOT/path).read_bytes()),b'')
     for path in before:
      self.assertEqual(restore1271(path,(ROOT/path).read_bytes()),subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT),path)
     continue

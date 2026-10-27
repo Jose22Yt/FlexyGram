@@ -53,11 +53,15 @@ public final class HeaderPreviewView extends View {
                 fusionMode=true;previewHeight=g.height;
                 int h=Math.round(previewHeight)+AndroidUtilities.dp(80);setMeasuredDimension(width,h);fusionTop=(h-previewHeight)/2;
                 text.setTextSize(titlePx);displayName=android.text.TextUtils.ellipsize(name,new android.text.TextPaint(text),g.text.width(),android.text.TextUtils.TruncateAt.END).toString();
-                fusionTitleX=g.rtl?g.text.right-text.measureText(displayName)/2:g.text.left+text.measureText(displayName)/2;
+                fusionTitleX=g.text.centerX();
                 text.setTextSize(subtitlePx);displayStatus=android.text.TextUtils.ellipsize(status,new android.text.TextPaint(text),g.text.width(),android.text.TextUtils.TruncateAt.END).toString();
-                fusionStatusX=g.rtl?g.text.right-text.measureText(displayStatus)/2:g.text.left+text.measureText(displayStatus)/2;
+                fusionStatusX=g.text.centerX();
                 fusion.clip.rewind();fusion.clip.addRoundRect(g.center.left,g.center.top,g.center.right,g.center.bottom,g.center.height()/2,g.center.height()/2,android.graphics.Path.Direction.CW);
-                fusion.mask.prepare(g.fadeStartX-g.portrait.left,g.fadeEndX-g.portrait.left,g.rtl);
+                // Preview contact has initials only: keep the initial in the small native left slot.
+                float placeholderW = Math.min(g.portrait.width(), AndroidUtilities.dp(73));
+                float previewStart = g.rtl ? g.portrait.width()-placeholderW*.45f : placeholderW*.55f;
+                float previewEnd = g.rtl ? g.portrait.width()-placeholderW : placeholderW;
+                fusion.mask.prepare(previewStart,previewEnd,.9f,g.rtl);
                 return;
             }
         }
@@ -102,10 +106,18 @@ public final class HeaderPreviewView extends View {
         fusion.surface.drawBackdrop(canvas,g,fill,edge,edge,d);
         int clip=canvas.save();canvas.clipPath(fusion.clip);
         int layer=fusion.mask.begin(canvas,g.portrait.left,g.portrait.top,g.portrait.right,g.portrait.bottom);
-        avatar.setColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText));canvas.drawRect(g.portrait.left,g.portrait.top,g.portrait.right,g.portrait.bottom,avatar);
-        text.setTextSize(AndroidUtilities.dp(22));text.setColor(0xffffffff);canvas.drawText("A",g.portrait.centerX(),g.portrait.centerY()+AndroidUtilities.dp(7),text);
+        // The synthetic preview has no real bitmap; mimic the same initials fallback as ChatAvatarContainer.
+        float placeholderW = Math.min(g.portrait.width(), AndroidUtilities.dp(73));
+        float placeholderLeft = g.rtl ? g.portrait.right-placeholderW : g.portrait.left;
+        avatar.setColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText));
+        canvas.drawRect(placeholderLeft,g.portrait.top,placeholderLeft+placeholderW,g.portrait.bottom,avatar);
+        text.setTextSize(AndroidUtilities.dp(22));text.setColor(0xffffffff);
+        canvas.drawText("A",placeholderLeft+placeholderW*.5f,g.portrait.centerY()+AndroidUtilities.dp(7),text);
+        float fadeStart = g.rtl ? g.portrait.width()-placeholderW*.45f : placeholderW*.55f;
+        float fadeEnd = g.rtl ? g.portrait.width()-placeholderW : placeholderW;
         canvas.translate(g.portrait.left,g.portrait.top);
-        fusion.mask.finish(canvas,layer,g.portrait.width(),g.portrait.height(),g.fadeStartX-g.portrait.left,g.fadeEndX-g.portrait.left,g.rtl);canvas.restoreToCount(clip);
+        fusion.mask.finish(canvas,layer,g.portrait.width(),g.portrait.height(),
+                fadeStart,fadeEnd,.9f,g.rtl);canvas.restoreToCount(clip);
         text.setColor(color);text.setTextSize(titlePx);float th=text.descent()-text.ascent(),ta=text.ascent();text.setTextSize(subtitlePx);float sh=text.descent()-text.ascent();
         float top=g.text.centerY()-(th+sh+AndroidUtilities.dp(2))/2;
         text.setTextSize(titlePx);canvas.drawText(displayName,fusionTitleX,top-ta,text);text.setTextSize(subtitlePx);canvas.drawText(displayStatus,fusionStatusX,top+th+AndroidUtilities.dp(2)-text.ascent(),text);

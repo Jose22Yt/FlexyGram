@@ -7358,6 +7358,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     @Override
     public void onResume() {
         super.onResume();
+        if(filterTabsView!=null)filterTabsView.updateColors();
         if (dialogStoriesCell != null) {
             dialogStoriesCell.onResume();
         }

@@ -53,7 +53,9 @@ public class Policy {
     def test_one_parent_offset_and_native_insets_keyboard_translation_preserved(self):
         old=subprocess.check_output(['git','show',BASE+':'+CONTAINER],cwd=ROOT,text=True)
         now=(ROOT/CONTAINER).read_text()
-        actual=method_bodies(now,'checkViewsPositions')[0]
+        from signature1278_contract import restore as restore1278
+        reviewed1277=restore1278(CONTAINER,now.encode()).decode()
+        actual=method_bodies(reviewed1277,'checkViewsPositions')[0]
         native=method_bodies(old,'checkViewsPositions')[0]
         self.assertEqual(actual.replace('\n            - (flexyComposer == null ? 0 : flexyComposer.getFlexyVerticalOffset())',''),native)
         for n in ('checkInsets','checkInAppKeyboardChild','checkInAppKeyboardViewHeight','setInputBubbleHeight'):

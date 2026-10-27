@@ -237,7 +237,7 @@ public class PillBoundsRegression {
 
     def test_actual_presentation_method_handles_native_three_dp_margin_and_live_recovery(self):
         methods = '\n'.join(method_bodies(self.current,n)[0] for n in (
-            'hasFlexySpecialControls','applyFlexyComposerPresentation','updateAttachButtonTranslationX','nativeAttachTranslationX','flexyCompactTextEnd'))
+            'wantsFlexyBotRow','hasFlexySpecialControls','applyFlexyComposerPresentation','updateAttachButtonTranslationX','nativeAttachTranslationX','flexyCompactTextEnd'))
         fixture = '''
 public class PresentationRegression {
  static final int VISIBLE=0;
@@ -265,6 +265,8 @@ public class PresentationRegression {
   int width(){return width;}
   float getAlpha(){return alpha;}
  }
+ enum BotMenuButtonType {NO_BUTTON,COMMANDS,WEB_VIEW}
+ BotMenuButtonType botMenuButtonType=BotMenuButtonType.NO_BUTTON;long dialog_id=1;
  boolean shownAiButton;
  boolean isChat=true,isStories=false,flexyCompactRequested,flexyCompactLayout,flexyMenuState,isInInput;
  Object parentFragment=new Object();

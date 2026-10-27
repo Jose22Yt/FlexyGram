@@ -10,20 +10,25 @@ def original(path):
     r=subprocess.run(['git','show',BASE+':'+str(path)],cwd=ROOT,capture_output=True)
     return r.stdout if r.returncode==0 else b''
 def restore(path,data):
+    from signature1278_contract import restore as restore1278
+    data=restore1278(path,data)
     expected=json.loads(MANIFEST.read_text())['reviewed'].get(str(path))
     if expected is not None and hashlib.sha256(data).hexdigest()==expected:
         return original(path)
     # Older immutable audits handle their own historical inputs and reject unknown bytes.
     return data
 def paths():
-    return frozenset(json.loads(MANIFEST.read_text())['paths'])
+    from signature1278_contract import paths as paths1278
+    return frozenset(json.loads(MANIFEST.read_text())['paths']) | paths1278()
 
 def verify_current():
+    from signature1278_contract import verify_current as verify1278,restore as restore1278
+    verify1278()
     spec=json.loads(MANIFEST.read_text())
     for name,expected in spec['reviewed'].items():
-        actual=hashlib.sha256((ROOT/name).read_bytes()).hexdigest()
+        actual=hashlib.sha256(restore1278(name,(ROOT/name).read_bytes())).hexdigest()
         if actual!=expected:raise ValueError('Corrective source differs from reviewed bytes: '+name)
     changed=set(subprocess.check_output(['git','diff',BASE,'--name-only'],cwd=ROOT,text=True).splitlines())
-    if changed-set(spec['paths']):raise ValueError('Corrective scope is missing paths: '+str(sorted(changed-set(spec['paths']))))
+    if changed-set(paths()):raise ValueError('Corrective scope is missing paths: '+str(sorted(changed-set(paths()))))
     print('PASS: exact reviewed Alpha1277 sources and scope; physical acceptance is separate.')
 if __name__=='__main__':verify_current()

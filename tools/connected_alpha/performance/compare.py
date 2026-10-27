@@ -60,15 +60,16 @@ def validate(report):
 
 
 def compare(reports, cohort="legacy"):
-    if cohort not in ("legacy", "navigation2", "universal3", "stability1277"):
+    if cohort not in ("legacy", "navigation2", "universal3", "stability1277", "signature1278"):
         raise ValueError("Unknown comparison cohort")
     errors = []
     labels = [r.get('label') for r in reports]
     required = REQUIRED_LABELS if cohort == 'legacy' else {'exteraless', 'alpha1275', 'candidate'} if cohort == 'universal3' else {'exteraless', 'alpha1272', 'pr92', 'candidate'}
+    if cohort == 'signature1278': required = {'alpha1277','candidate'}
     if cohort == 'stability1277': required = {'exteraless', 'alpha1276', 'candidate'}
     if len(reports) != len(required) or set(labels) != required:
         errors.append('Exactly one report per cohort label required: ' + ','.join(sorted(required)))
-    if cohort in ('navigation2', 'universal3', 'stability1277'):
+    if cohort in ('navigation2', 'universal3', 'stability1277', 'signature1278'):
         pinned = {'exteraless':'1ad6a60a6834ffca722b1a22f4fba27ecb29a061',
                   'alpha1272':'8619ba40fbd8fd9d9d898ff307fb0c0716661254',
                   'pr92':'340cd323f5f5809abc746507b2e252da71298720'}
@@ -80,6 +81,7 @@ def compare(reports, cohort="legacy"):
                 values = [r.get('environment',{}).get(key) for r in reports]
                 if any(v in (None,'','unknown','unverified') for v in values) or len(set(values)) != 1:
                     errors.append('Verified equal condition required: ' + key)
+        if cohort == 'signature1278': pinned={'alpha1277':'79ae7c6a4d52d3a787ca8dfddb11660d028bf24f'}
         modes = [r.get('environment', {}).get('build_mode') for r in reports]
         if any(m in (None, '', 'unknown', 'unverified') for m in modes) or len(set(modes)) != 1:
             errors.append('Verified equal build modes required')
@@ -137,7 +139,7 @@ def compare(reports, cohort="legacy"):
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('reports', type=Path, nargs='+')
-    p.add_argument('--cohort', choices=['legacy','navigation2','universal3','stability1277'], default='legacy')
+    p.add_argument('--cohort', choices=['legacy','navigation2','universal3','stability1277','signature1278'], default='legacy')
     p.add_argument('--out', type=Path, required=True)
     a = p.parse_args()
     result = compare([json.loads(f.read_text()) for f in a.reports], a.cohort)
