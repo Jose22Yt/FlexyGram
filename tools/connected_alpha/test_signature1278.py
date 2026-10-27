@@ -16,8 +16,12 @@ class Signature1278(unittest.TestCase):
     }
    }
    c.update(0x80336699,0xffffffff,0xff000000);if(c.color!=0xff1a334d)throw new AssertionError("composite");
-   c.update(0xffffff00,0xffffffff,0xff000000);if(c.ink!=0xff000000)throw new AssertionError("yellow contrast");
-   c.update(0xff000000,0xffffffff,0xffffffff);if(c.ink!=0xffffffff)throw new AssertionError("dark contrast");
+   c.update(0xffffff00,0xffffffff,0xff000000);
+   if(SignatureFolderAccent.contrast(c.ink,c.color)<4.5||c.ink==0xff000000)
+    throw new AssertionError("yellow uses legible charcoal without hard black");
+   c.update(0xff000000,0xffffffff,0xffffffff);
+   if(SignatureFolderAccent.contrast(c.ink,c.color)<4.5||c.ink==0xffffffff)
+    throw new AssertionError("dark uses legible pearl without hard white");
    System.out.println("PASS native theme accent gamut and cached resolution");}}'''
   with tempfile.TemporaryDirectory() as folder:
    p=Path(folder)/'AccentProbe.java';p.write_text(code)
