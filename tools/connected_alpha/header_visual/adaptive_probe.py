@@ -49,4 +49,17 @@ public class AdaptiveBotProbe extends FrameLayout {
  public AdaptiveBotProbe(Context c){super(c);textFieldContainer=new FrameLayout(c);addView(textFieldContainer,new FrameLayout.LayoutParams(-1,-2));messageEditTextContainer=new FrameLayout(c);messageEditTextContainer.setMinimumHeight(dp(44));textFieldContainer.addView(messageEditTextContainer,new FrameLayout.LayoutParams(-1,-2,Gravity.BOTTOM));text=new EditText(c);text.setText("draft");messageEditTextContainer.addView(text,new FrameLayout.LayoutParams(-1,-2));botCommandsMenuButton=new TextView(c);botCommandsMenuButton.setText("Store");botCommandsMenuButton.setOnClickListener(v->clicks++);messageEditTextContainer.addView(botCommandsMenuButton,new FrameLayout.LayoutParams(120,32,Gravity.BOTTOM|Gravity.LEFT));}
  @Override protected void onMeasure(int w,int h){updateFlexyBotRow();super.onMeasure(w,h);}
 '''+methods+'}')
+ parent=(java/'org/telegram/ui/Components/chat/ChatInputViewsContainer.java').read_text()
+ fields=parent[parent.index('    private final RectF signatureChannelMiddle='):parent.index('    /** Same native backdrop')]
+ method=body(parent,'private void drawSignatureChannelBackground(')
+ put('ChannelBackdropProbe.java','''import android.graphics.*;import android.graphics.drawable.ColorDrawable;import android.view.*;import android.widget.*;import androidx.core.graphics.ColorUtils;import org.telegram.messenger.AndroidUtilities;
+public class ChannelBackdropProbe {
+ public org.telegram.ui.Components.chat.layouts.ChatActivityChannelButtonsLayout flexyChannels;
+ public FrameLayout inputIslandBubbleContainer=new FrameLayout(org.robolectric.RuntimeEnvironment.getApplication());
+ public boolean flexyPearlGlass;public final CountingBackdrop blurredBackgroundDrawable=new CountingBackdrop();
+ public static class CountingBackdrop extends ColorDrawable{public int draws;public CountingBackdrop(){super(0xff303236);}@Override public void draw(Canvas c){draws++;super.draw(c);}}
+ final Rect tmpRect=new Rect();final RectF tmpRectF=new RectF();final Paint flexySurface=new Paint(3),flexyPearl=new Paint(3);
+ static int dp(float v){return AndroidUtilities.dp(v);}
+ public void render(Canvas c){drawSignatureChannelBackground(c);}
+'''+fields+method+'}')
  (source/'AdaptiveControlsTest.java').write_bytes(Path(__file__).with_name('AdaptiveControlsTest.java.in').read_bytes())

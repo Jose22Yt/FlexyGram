@@ -239,7 +239,7 @@ public class ChatInputViewsContainer extends FrameLayout {
 
     private void checkViewsPositions() {
         inputIslandBubbleContainer.setTranslationY(-maxBottomInset - dp(INPUT_BUBBLE_BOTTOM)
-            - (flexyChannels!=null&&flexyChannels.isSignatureCompactPresentation()?flexyChannels.getSignatureVerticalOffset():
+            - (flexyChannels!=null&&flexyChannels.isSignatureCompactPresentation()?flexyChannels.getSignatureVerticalOffset()*flexyChannels.getSignatureAlpha():
                 (flexyComposer == null ? 0 : flexyComposer.getFlexyVerticalOffset())));
         inAppKeyboardBubbleContainer.setTranslationY(inAppKeyboardBubbleContainer.getMeasuredHeight() - imeBottomInset);
     }
@@ -366,8 +366,8 @@ public class ChatInputViewsContainer extends FrameLayout {
         }
         int panel=flexyChannels.getSignatureSurfaceColor();boolean dark=ColorUtils.calculateLuminance(panel)<.4;
         if(flexyPearlGlass){
-            tmpRect.set(signatureChannelMiddle);if(!signatureChannelLeft.isEmpty())tmpRect.union(signatureChannelLeft);if(!signatureChannelRight.isEmpty())tmpRect.union(signatureChannelRight);
-            tmpRect.inset(-dp(7),-dp(7));blurredBackgroundDrawable.setBounds(tmpRect);
+            tmpRectF.set(signatureChannelMiddle);if(!signatureChannelLeft.isEmpty())tmpRectF.union(signatureChannelLeft);if(!signatureChannelRight.isEmpty())tmpRectF.union(signatureChannelRight);
+            tmpRectF.inset(-dp(7),-dp(7));tmpRectF.round(tmpRect);blurredBackgroundDrawable.setBounds(tmpRect);
             canvas.save();canvas.clipPath(signatureChannelMask);blurredBackgroundDrawable.draw(canvas);canvas.restore();
             flexySurface.setColor(ColorUtils.setAlphaComponent(app.flexygram.composer.ComposerStyle.surface(dark,false),(dark?80:60)*blurredBackgroundDrawable.getAlpha()/255));
         }else flexySurface.setColor(app.flexygram.composer.ComposerStyle.surface(dark,false));

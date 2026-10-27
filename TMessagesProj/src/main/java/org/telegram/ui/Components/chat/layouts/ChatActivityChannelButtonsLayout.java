@@ -69,7 +69,7 @@ public class ChatActivityChannelButtonsLayout extends FrameLayout implements Fac
 
     private static final int[] signatureLeft={BUTTON_DIRECT,BUTTON_GIFT,BUTTON_GIGA_GROUP_INFO,BUTTON_RECENT_ACTIONS_INFO};
     private static final int[] signatureRight={BUTTON_SEARCH};
-    private boolean signatureCompact,signatureGlass,signatureRtl,signaturePresentation;
+    private boolean signatureCompact,signatureRtl,signaturePresentation;
     private int signatureInset,signatureGap,signatureSurface,signaturePosition;
     private int[] leftOrder(){return signatureCompact?(signatureRtl?signatureRight:signatureLeft):buttonsOrderLeft;}
     private int[] rightOrder(){return signatureCompact?(signatureRtl?signatureLeft:signatureRight):buttonsOrderRight;}
@@ -82,7 +82,6 @@ public class ChatActivityChannelButtonsLayout extends FrameLayout implements Fac
         compact &= width<=0 || width>=dp(count*48+144);
         signatureCompact=compact;
         signatureRtl=org.telegram.messenger.LocaleController.isRTL;
-        signatureGlass=app.flexygram.composer.FlexyComposerConfig.glass();
         signatureInset=dp(app.flexygram.composer.ComposerStyle.inset(app.flexygram.composer.FlexyComposerConfig.level()));
         signatureGap=dp(app.flexygram.composer.FlexyComposerConfig.gap());
         signaturePosition=dp(app.flexygram.composer.ComposerStyle.offset(app.flexygram.composer.FlexyComposerConfig.position()));

@@ -51249,7 +51249,11 @@ public class ChatActivity extends BaseFragment implements
         final float enterViewIslandHeight = Math.max(
             chatActivityEnterView != null ? chatActivityEnterView.getIslandTotalHeight(target): 0, dp(44));
 
-        final float defaultIslandHeight = dp(44);
+        final float signatureChannelReservation=bottomChannelButtonsLayout!=null&&bottomChannelButtonsLayout.isSignatureCompactPresentation()
+            ? bottomChannelButtonsLayout.getSignatureVerticalOffset()*(target
+                ? (bottomViewsVisibilityController.getCurrentPriorityContainerId()==BOTTOM_OVERLAY_CHAT_CONTAINER?1f:0f)
+                : bottomViewsVisibilityController.getVisibility(BOTTOM_OVERLAY_CHAT_CONTAINER)) : 0f;
+        final float defaultIslandHeight = dp(44)+signatureChannelReservation;
         final float enterViewFactor;
         float visibility;
         float pollAddVisibility;

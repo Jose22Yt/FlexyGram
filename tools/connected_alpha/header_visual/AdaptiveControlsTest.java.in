@@ -22,4 +22,15 @@ public class AdaptiveControlsTest {
   assertEquals(20,v.clicks);
  }
  @Test public void botWithoutMenuDoesNotReserveSecondaryRow(){var v=new AdaptiveBotProbe(RuntimeEnvironment.getApplication());v.botMenuButtonType=AdaptiveBotProbe.BotMenuButtonType.NO_BUTTON;layout(v,360);assertFalse(v.flexyBotRow);assertEquals(0,((ViewGroup.MarginLayoutParams)v.messageEditTextContainer.getLayoutParams()).topMargin);}
+ @Test public void channelBackdropHasRealGapsAndOnlyOneNativePass(){
+  for(boolean glass:new boolean[]{false,true}){
+   var v=new ChatActivityChannelButtonsLayout(RuntimeEnvironment.getApplication(),null,null,new BlurredBackgroundDrawableViewFactory());v.setSignaturePresentation(true);v.setTotalVisibilityFactor(1);
+   FlexyComposerConfig.setLevel(1);for(int id=0;id<3;id++)v.showButton(id,true,false);layout(v,400);
+   var p=new ChannelBackdropProbe();p.flexyChannels=v;p.flexyPearlGlass=glass;
+   var b=android.graphics.Bitmap.createBitmap(400,80,android.graphics.Bitmap.Config.ARGB_8888);var c=new android.graphics.Canvas(b);p.render(c);
+   assertTrue((b.getPixel(30,28)>>>24)>0);assertTrue((b.getPixel(200,28)>>>24)>0);assertTrue((b.getPixel(370,28)>>>24)>0);
+   assertEquals(0,b.getPixel(104,28));assertEquals(0,b.getPixel(344,28));assertEquals(0,b.getPixel(200,0));assertEquals(0,b.getPixel(200,60));
+   assertEquals(glass?1:0,p.blurredBackgroundDrawable.draws);
+  }
+ }
 }
