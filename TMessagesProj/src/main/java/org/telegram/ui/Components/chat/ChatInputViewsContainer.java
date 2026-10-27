@@ -43,6 +43,7 @@ public class ChatInputViewsContainer extends FrameLayout {
     private final FrameLayout inputIslandBubbleContainer;
     private final FrameLayout inAppKeyboardBubbleContainer;
     private ChatActivityEnterView flexyComposer;
+    private org.telegram.ui.Components.chat.layouts.ChatActivityChannelButtonsLayout flexyChannels;
     private int flexyNativeLeftMargin, flexyNativeRightMargin;
     private boolean flexyPearlGlass;
     private final SharedPreferences.OnSharedPreferenceChangeListener flexyListener = (prefs, key) -> {
@@ -66,6 +67,10 @@ public class ChatInputViewsContainer extends FrameLayout {
             }
             @Override public void onViewAdded(View child) {
                 super.onViewAdded(child);
+                if(child instanceof org.telegram.ui.Components.chat.layouts.ChatActivityChannelButtonsLayout){
+                    flexyChannels=(org.telegram.ui.Components.chat.layouts.ChatActivityChannelButtonsLayout)child;
+                    flexyChannels.setSignaturePresentation(true);
+                }
                 if (child instanceof ChatActivityEnterView) {
                     flexyComposer = (ChatActivityEnterView) child;
                     LayoutParams lp = (LayoutParams) child.getLayoutParams();
@@ -76,6 +81,7 @@ public class ChatInputViewsContainer extends FrameLayout {
             @Override public void onViewRemoved(View child) {
                 super.onViewRemoved(child);
                 if (child == flexyComposer) flexyComposer = null;
+                if (child == flexyChannels) flexyChannels = null;
             }
         };
         addView(inputIslandBubbleContainer,
@@ -233,7 +239,8 @@ public class ChatInputViewsContainer extends FrameLayout {
 
     private void checkViewsPositions() {
         inputIslandBubbleContainer.setTranslationY(-maxBottomInset - dp(INPUT_BUBBLE_BOTTOM)
-            - (flexyComposer == null ? 0 : flexyComposer.getFlexyVerticalOffset()));
+            - (flexyChannels!=null&&flexyChannels.isSignatureCompactPresentation()?flexyChannels.getSignatureVerticalOffset():
+                (flexyComposer == null ? 0 : flexyComposer.getFlexyVerticalOffset())));
         inAppKeyboardBubbleContainer.setTranslationY(inAppKeyboardBubbleContainer.getMeasuredHeight() - imeBottomInset);
     }
 
@@ -324,6 +331,8 @@ public class ChatInputViewsContainer extends FrameLayout {
         if (drawInputBackground) {
             if (flexyComposer != null && flexyComposer.isFlexyCompactPresentation()) {
                 drawFlexyCompactBackground(canvas);
+            } else if(flexyChannels!=null&&flexyChannels.isSignatureCompactPresentation()){
+                drawSignatureChannelBackground(canvas);
             } else {
                 blurredBackgroundDrawable.draw(canvas);
             }
@@ -335,6 +344,44 @@ public class ChatInputViewsContainer extends FrameLayout {
         }
 
         super.dispatchDraw(canvas);
+    }
+
+    private final RectF signatureChannelMiddle=new RectF(),signatureChannelLeft=new RectF(),signatureChannelRight=new RectF();
+    private final RectF signatureChannelLastMiddle=new RectF(),signatureChannelLastLeft=new RectF(),signatureChannelLastRight=new RectF();
+    private final Path signatureChannelMask=new Path();
+    /** Same native backdrop as the ordinary composer; one pass clipped to three independent pieces. */
+    private void drawSignatureChannelBackground(Canvas canvas){
+        flexyChannels.getSignatureBounds(signatureChannelMiddle,signatureChannelLeft,signatureChannelRight);
+        float x=inputIslandBubbleContainer.getX()+flexyChannels.getX();
+        float y=inputIslandBubbleContainer.getY()+flexyChannels.getY();
+        signatureChannelMiddle.offset(x,y);
+        if(!signatureChannelLeft.isEmpty())signatureChannelLeft.offset(x,y);
+        if(!signatureChannelRight.isEmpty())signatureChannelRight.offset(x,y);
+        float radius=(dp(44)-2*flexyChannels.getSignatureVisualInset())/2f;
+        if(!signatureChannelMiddle.equals(signatureChannelLastMiddle)||!signatureChannelLeft.equals(signatureChannelLastLeft)||!signatureChannelRight.equals(signatureChannelLastRight)){
+            signatureChannelMask.rewind();signatureChannelMask.addRoundRect(signatureChannelMiddle,radius,radius,Path.Direction.CW);
+            if(!signatureChannelLeft.isEmpty())signatureChannelMask.addRoundRect(signatureChannelLeft,radius,radius,Path.Direction.CW);
+            if(!signatureChannelRight.isEmpty())signatureChannelMask.addRoundRect(signatureChannelRight,radius,radius,Path.Direction.CW);
+            signatureChannelLastMiddle.set(signatureChannelMiddle);signatureChannelLastLeft.set(signatureChannelLeft);signatureChannelLastRight.set(signatureChannelRight);
+        }
+        int panel=flexyChannels.getSignatureSurfaceColor();boolean dark=ColorUtils.calculateLuminance(panel)<.4;
+        if(flexyPearlGlass){
+            tmpRect.set(signatureChannelMiddle);if(!signatureChannelLeft.isEmpty())tmpRect.union(signatureChannelLeft);if(!signatureChannelRight.isEmpty())tmpRect.union(signatureChannelRight);
+            tmpRect.inset(-dp(7),-dp(7));blurredBackgroundDrawable.setBounds(tmpRect);
+            canvas.save();canvas.clipPath(signatureChannelMask);blurredBackgroundDrawable.draw(canvas);canvas.restore();
+            flexySurface.setColor(ColorUtils.setAlphaComponent(app.flexygram.composer.ComposerStyle.surface(dark,false),(dark?80:60)*blurredBackgroundDrawable.getAlpha()/255));
+        }else flexySurface.setColor(app.flexygram.composer.ComposerStyle.surface(dark,false));
+        flexySurface.setAlpha(Math.round(flexySurface.getAlpha()*flexyChannels.getSignatureAlpha()));
+        canvas.drawRoundRect(signatureChannelMiddle,radius,radius,flexySurface);
+        if(!signatureChannelLeft.isEmpty())canvas.drawRoundRect(signatureChannelLeft,radius,radius,flexySurface);
+        if(!signatureChannelRight.isEmpty())canvas.drawRoundRect(signatureChannelRight,radius,radius,flexySurface);
+        if(flexyPearlGlass){
+            flexyPearl.setColor(ColorUtils.setAlphaComponent(Color.WHITE,(dark?28:76)*blurredBackgroundDrawable.getAlpha()/255));
+            flexyPearl.setStyle(Paint.Style.STROKE);flexyPearl.setStrokeWidth(.65f*AndroidUtilities.density);
+            canvas.drawRoundRect(signatureChannelMiddle,radius,radius,flexyPearl);
+            if(!signatureChannelLeft.isEmpty())canvas.drawRoundRect(signatureChannelLeft,radius,radius,flexyPearl);
+            if(!signatureChannelRight.isEmpty())canvas.drawRoundRect(signatureChannelRight,radius,radius,flexyPearl);
+        }
     }
 
     private final RectF flexyPill = new RectF();

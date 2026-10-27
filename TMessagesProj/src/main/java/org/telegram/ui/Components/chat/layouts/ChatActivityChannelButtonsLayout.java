@@ -69,14 +69,13 @@ public class ChatActivityChannelButtonsLayout extends FrameLayout implements Fac
 
     private static final int[] signatureLeft={BUTTON_DIRECT,BUTTON_GIFT,BUTTON_GIGA_GROUP_INFO,BUTTON_RECENT_ACTIONS_INFO};
     private static final int[] signatureRight={BUTTON_SEARCH};
-    private boolean signatureCompact,signatureGlass,signatureRtl;
+    private boolean signatureCompact,signatureGlass,signatureRtl,signaturePresentation;
     private int signatureInset,signatureGap,signatureSurface,signaturePosition;
-    private final Paint signaturePaint=new Paint(Paint.ANTI_ALIAS_FLAG);
     private int[] leftOrder(){return signatureCompact?(signatureRtl?signatureRight:signatureLeft):buttonsOrderLeft;}
     private int[] rightOrder(){return signatureCompact?(signatureRtl?signatureLeft:signatureRight):buttonsOrderRight;}
     private int step(){return signatureCompact?48:54;}
     private void refreshSignature(int width){
-        boolean compact=app.flexygram.composer.FlexyComposerConfig.compact();
+        boolean compact=signaturePresentation && app.flexygram.composer.FlexyComposerConfig.compact();
         int count=0;
         for(ButtonHolder holder:buttonHolders)if(holder!=null&&holder.visibilityAnimator.getValue())count++;
         // Keep native fallback for narrow or unusually action-dense overlays.
@@ -86,24 +85,27 @@ public class ChatActivityChannelButtonsLayout extends FrameLayout implements Fac
         signatureGlass=app.flexygram.composer.FlexyComposerConfig.glass();
         signatureInset=dp(app.flexygram.composer.ComposerStyle.inset(app.flexygram.composer.FlexyComposerConfig.level()));
         signatureGap=dp(app.flexygram.composer.FlexyComposerConfig.gap());
-        signaturePosition=dp(app.flexygram.composer.ComposerStyle.position(app.flexygram.composer.FlexyComposerConfig.position()));
-        container.setTranslationY(compact?-signaturePosition:0);
+        signaturePosition=dp(app.flexygram.composer.ComposerStyle.offset(app.flexygram.composer.FlexyComposerConfig.position()));
+        container.setTranslationY(0);
         signatureSurface=Theme.getColor(Theme.key_chat_messagePanelBackground,resourcesProvider);
         for(ButtonHolder holder:buttonHolders)if(holder!=null){
             holder.button.setDrawSurface(!compact);
             holder.button.getLayoutParams().width=dp(compact?48:56);
         }
     }
-    private void drawSignatureSurface(Canvas canvas,float l,float r){
-        if(r<=l)return;
-        float top=(getHeight()-dp(44))/2f+signatureInset-signaturePosition;
-        tmpRect.set(l,top,r,top+dp(44)-2*signatureInset);
-        if(signatureGlass&&containerDrawable!=null){
-            tmpRect.round(AndroidUtilities.rectTmp2);containerDrawable.setBounds(AndroidUtilities.rectTmp2);containerDrawable.draw(canvas);
-        }else{
-            signaturePaint.setColor(signatureSurface);signaturePaint.setAlpha(Math.round((signatureSurface>>>24)*totalVisibilityFactor));
-            canvas.drawRoundRect(tmpRect,tmpRect.height()/2,tmpRect.height()/2,signaturePaint);
-        }
+    public void setSignaturePresentation(boolean enabled){signaturePresentation=enabled;}
+    public boolean isSignatureCompactPresentation(){return signatureCompact&&getVisibility()==VISIBLE;}
+    public int getSignatureVerticalOffset(){return isSignatureCompactPresentation()?signaturePosition:0;}
+    public int getSignatureVisualInset(){return signatureInset;}
+    public int getSignatureSurfaceColor(){return signatureSurface;}
+    public float getSignatureAlpha(){return totalVisibilityFactor;}
+    /** Bounds in this layout's coordinates; actual native permission/visibility factors decide slots. */
+    public void getSignatureBounds(RectF middle,RectF left,RectF right){
+        float top=(getHeight()-dp(44))/2f+signatureInset;
+        float bottom=top+dp(44)-2*signatureInset;
+        middle.set(container.getLeft(),top,container.getRight(),bottom);
+        if(totalWidthLeft>0)left.set(dp(9)+signatureInset,top,dp(5)+totalWidthLeft-signatureInset,bottom);else left.setEmpty();
+        if(totalWidthRight>0)right.set(getWidth()-dp(5)-totalWidthRight+signatureInset,top,getWidth()-dp(9)-signatureInset,bottom);else right.setEmpty();
     }
 
     private final Theme.ResourcesProvider resourcesProvider;
@@ -362,7 +364,7 @@ public class ChatActivityChannelButtonsLayout extends FrameLayout implements Fac
 
             final float width = holder.visibilityAnimator.getFloatValue() * dp(step());    // width + margin
             holder.button.setTranslationX(dp(signatureCompact?7:1) + totalWidthLeft);
-            holder.button.setTranslationY(signatureCompact?-signaturePosition:0);
+            holder.button.setTranslationY(0);
             totalWidthLeft += width;
         }
 
@@ -374,7 +376,7 @@ public class ChatActivityChannelButtonsLayout extends FrameLayout implements Fac
 
             final float width = holder.visibilityAnimator.getFloatValue() * dp(step());    // width + margin
             holder.button.setTranslationX(getMeasuredWidth() - holder.button.getMeasuredWidth() - dp(signatureCompact?7:1) - totalWidthRight);
-            holder.button.setTranslationY(signatureCompact?-signaturePosition:0);
+            holder.button.setTranslationY(0);
             totalWidthRight += width;
         }
 
@@ -463,7 +465,7 @@ public class ChatActivityChannelButtonsLayout extends FrameLayout implements Fac
     @Override
     protected boolean drawChild(@NonNull Canvas canvas, View child, long drawingTime) {
         if(child==container&&signatureCompact){
-            drawSignatureSurface(canvas,container.getLeft(),container.getRight());
+            // The common input parent owns the three clipped native surfaces.
         }else if (child == container && containerDrawable != null) {
             tmpRect.set(
                 totalWidthLeft + dp(1), 0,
@@ -480,10 +482,6 @@ public class ChatActivityChannelButtonsLayout extends FrameLayout implements Fac
 
     @Override
     protected void dispatchDraw(@NonNull Canvas canvas) {
-        if(signatureCompact){
-            if(totalWidthLeft>0)drawSignatureSurface(canvas,dp(9)+signatureInset,dp(5)+totalWidthLeft-signatureInset);
-            if(totalWidthRight>0)drawSignatureSurface(canvas,getWidth()-dp(5)-totalWidthRight+signatureInset,getWidth()-dp(9)-signatureInset);
-        }
         final int accentAlpha = (int) (255 * totalVisibilityFactor * animatorCenterAccentBackground.getFloatValue());
         if (accentAlpha > 0) {
             tmpRect.set(

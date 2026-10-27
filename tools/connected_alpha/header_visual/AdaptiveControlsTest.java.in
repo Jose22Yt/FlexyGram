@@ -7,7 +7,7 @@ public class AdaptiveControlsTest {
  static void layout(View v,int width){v.measure(View.MeasureSpec.makeMeasureSpec(width,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(300,View.MeasureSpec.AT_MOST));v.layout(0,0,v.getMeasuredWidth(),v.getMeasuredHeight());}
  @Test public void channelActionsRemainIndependentAndSearchMovesToOtherSide(){
   for(boolean rtl:new boolean[]{false,true}){
-   org.telegram.messenger.LocaleController.isRTL=rtl;var v=new ChatActivityChannelButtonsLayout(RuntimeEnvironment.getApplication(),null,null,new BlurredBackgroundDrawableViewFactory());v.setTotalVisibilityFactor(1);
+   org.telegram.messenger.LocaleController.isRTL=rtl;var v=new ChatActivityChannelButtonsLayout(RuntimeEnvironment.getApplication(),null,null,new BlurredBackgroundDrawableViewFactory());v.setSignaturePresentation(true);v.setTotalVisibilityFactor(1);
    int[] calls={0,0,0};for(int id=0;id<3;id++){final int i=id;v.setButtonOnClickListener(id,x->calls[i]++);v.showButton(id,true,false);}layout(v,400);
    assertEquals(4,v.getChildCount());View search=v.getChildAt(1),gift=v.getChildAt(2),direct=v.getChildAt(3);
    assertTrue(rtl?search.getX()<gift.getX():search.getX()>gift.getX());assertTrue(rtl?direct.getX()>gift.getX():direct.getX()<gift.getX());
@@ -15,7 +15,7 @@ public class AdaptiveControlsTest {
    search.performClick();gift.performClick();direct.performClick();assertArrayEquals(new int[]{1,1,1},calls);
   }
  }
- @Test public void channelMissingActionsCollapseWithoutEmptySlots(){var v=new ChatActivityChannelButtonsLayout(RuntimeEnvironment.getApplication(),null,null,new BlurredBackgroundDrawableViewFactory());v.setTotalVisibilityFactor(1);v.showButton(0,true,false);layout(v,360);int without=v.getContainer().getWidth();v.showButton(1,true,false);layout(v,360);assertTrue(v.getContainer().getWidth()<without);v.showButton(1,false,false);layout(v,360);assertEquals(without,v.getContainer().getWidth());}
+ @Test public void channelMissingActionsCollapseWithoutEmptySlots(){var v=new ChatActivityChannelButtonsLayout(RuntimeEnvironment.getApplication(),null,null,new BlurredBackgroundDrawableViewFactory());v.setSignaturePresentation(true);v.setTotalVisibilityFactor(1);v.showButton(0,true,false);layout(v,360);int without=v.getContainer().getWidth();v.showButton(1,true,false);layout(v,360);assertTrue(v.getContainer().getWidth()<without);v.showButton(1,false,false);layout(v,360);assertEquals(without,v.getContainer().getWidth());}
  @Test public void secondaryBotMenuRetainsActionTextAndEditableIdentity(){
   Activity a=Robolectric.buildActivity(Activity.class).setup().get();var v=new AdaptiveBotProbe(a);a.setContentView(v);v.text.setText("draft with lines\nsecond line");v.text.requestFocus();v.text.setSelection(5);var text=v.text.getText();View menu=v.botCommandsMenuButton;
   for(int i=0;i<20;i++){v.flexyCompactRequested=i%2==0;layout(v,360);assertSame(text,v.text.getText());assertEquals(5,v.text.getSelectionStart());assertTrue(v.text.hasFocus());assertSame(menu,v.botCommandsMenuButton);assertSame(v.flexyCompactRequested?v.textFieldContainer:v.messageEditTextContainer,menu.getParent());menu.performClick();}
