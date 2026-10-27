@@ -134,11 +134,11 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
     private boolean backPreview;
     private float backProgress;
     private int backDirection;
-    private ValueAnimator backAnimator;
+    private app.flexygram.motion.FlexyMotionAnimator backAnimator;
     private boolean skipMorph;
     private boolean closing;
     private boolean detached;
-    private ValueAnimator morphAnimator;
+    private app.flexygram.motion.FlexyMotionAnimator morphAnimator;
     private float morphProgress = -1f;
     private float morphFromRadius;
     private float morphToRadius;
@@ -153,11 +153,12 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
     private final RectF backgroundRect = new RectF();
     private PlayerColors colors;
     private ValueAnimator colorAnimator;
+    private app.flexygram.motion.FlexyMotionAnimator elevationAnimator;
     private MessageObject current;
     private String currentKey;
     private boolean lyricsMode;
     private float lyricsFraction;
-    private ValueAnimator lyricsAnimator;
+    private app.flexygram.motion.FlexyMotionAnimator lyricsAnimator;
     private String lyricsKey;
     private boolean seeking;
     private float seekProgress;
@@ -630,7 +631,15 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
             clearMorph();
             restoreMorphCover();
             cover.setTranslationZ(-cover.getElevation());
-            cover.animate().translationZ(0).setDuration(250).start();
+            if (elevationAnimator != null) { elevationAnimator.removeAllListeners(); elevationAnimator.cancel(); }
+            elevationAnimator = new app.flexygram.motion.FlexyMotionAnimator(cover, cover.getTranslationZ(), 0, cover::setTranslationZ);
+            elevationAnimator.setDuration(250);
+            elevationAnimator.addListener(new AnimatorListenerAdapter() {
+                @Override public void onAnimationEnd(Animator animation) {
+                    if (elevationAnimator == animation) elevationAnimator = null;
+                }
+            });
+            elevationAnimator.start();
             morphBarsState = -1;
             applySystemBars(true);
             onOpenAnimationEnd();
@@ -681,9 +690,8 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
             return;
         }
         cancelBackAnimator();
-        backAnimator = ValueAnimator.ofFloat(backProgress, 0f);
-        backAnimator.addUpdateListener(a -> {
-            backProgress = (float) a.getAnimatedValue();
+        backAnimator = new app.flexygram.motion.FlexyMotionAnimator(root, backProgress, 0f, value -> {
+            backProgress = value;
             applyBackPreview();
         });
         backAnimator.addListener(new AnimatorListenerAdapter() {
@@ -805,9 +813,8 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         }
         morphProgress = from;
         applyMorph();
-        morphAnimator = ValueAnimator.ofFloat(from, to);
-        morphAnimator.addUpdateListener(a -> {
-            morphProgress = (float) a.getAnimatedValue();
+        morphAnimator = new app.flexygram.motion.FlexyMotionAnimator(root, from, to, value -> {
+            morphProgress = value;
             applyMorph();
         });
         morphAnimator.addListener(new AnimatorListenerAdapter() {
@@ -953,6 +960,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         if (colorAnimator != null) colorAnimator.cancel();
         if (lyricsAnimator != null) { lyricsAnimator.removeAllListeners(); lyricsAnimator.cancel(); }
         cover.animate().cancel();
+        if (elevationAnimator != null) { elevationAnimator.removeAllListeners(); elevationAnimator.cancel(); elevationAnimator = null; }
         bubble.animate().cancel();
         cover.setListener(fallbackSeed, null);
         seekBar.setPlaying(false);
@@ -1286,8 +1294,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         lyricsPanel.setVisibility(View.VISIBLE);
         cover.setVisibility(View.VISIBLE);
         titleRow.setVisibility(View.VISIBLE);
-        lyricsAnimator = ValueAnimator.ofFloat(lyricsFraction, target);
-        lyricsAnimator.addUpdateListener(a -> setLyricsFraction((float) a.getAnimatedValue()));
+        lyricsAnimator = new app.flexygram.motion.FlexyMotionAnimator(root, lyricsFraction, target, this::setLyricsFraction);
         lyricsAnimator.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {

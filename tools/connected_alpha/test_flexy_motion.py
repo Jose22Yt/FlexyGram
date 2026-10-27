@@ -105,7 +105,7 @@ public class FlexyMotionProbe {
         import sys
         sys.path.insert(0,str(ROOT/'tools/connected_alpha'))
         from motion_contract import BASE
-        for name in ['org/telegram/ui/ActionBar/ActionBarLayout.java','org/telegram/ui/DialogsActivity.java','app/exteraless/player/PlayerSheet.java']:
+        for name in ['org/telegram/ui/ActionBar/ActionBarLayout.java','org/telegram/ui/DialogsActivity.java']:
             path='TMessagesProj/src/main/java/'+name
             self.assertEqual(subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT),(ROOT/path).read_bytes(),name)
 
@@ -171,6 +171,43 @@ public class FlexyMotionProbe {
         source=(ROOT/'TMessagesProj/src/main/java/org/telegram/ui/Components/ScaleStateListAnimator.java').read_text()
         self.assertIn('instanceof app.flexygram.motion.FlexyPressOwner',source)
         self.assertIn('view.setStateListAnimator(scaleStateListAnimator);',source)
+
+    def test_player_transition_delta_preserves_all_playback_and_layout_code(self):
+        import sys
+        sys.path.insert(0,str(ROOT/'tools/connected_alpha'))
+        from motion_contract import BASE
+        path='TMessagesProj/src/main/java/app/exteraless/player/PlayerSheet.java'
+        old=subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT,text=True)
+        new=(ROOT/path).read_text()
+        for name in ['backAnimator','morphAnimator','lyricsAnimator']:
+            new=new.replace('private app.flexygram.motion.FlexyMotionAnimator '+name+';','private ValueAnimator '+name+';')
+        new=new.replace('    private app.flexygram.motion.FlexyMotionAnimator elevationAnimator;\n','')
+        new=new.replace('backAnimator = new app.flexygram.motion.FlexyMotionAnimator(root, backProgress, 0f, value -> {\n            backProgress = value;', 'backAnimator = ValueAnimator.ofFloat(backProgress, 0f);\n        backAnimator.addUpdateListener(a -> {\n            backProgress = (float) a.getAnimatedValue();')
+        new=new.replace('morphAnimator = new app.flexygram.motion.FlexyMotionAnimator(root, from, to, value -> {\n            morphProgress = value;', 'morphAnimator = ValueAnimator.ofFloat(from, to);\n        morphAnimator.addUpdateListener(a -> {\n            morphProgress = (float) a.getAnimatedValue();')
+        new=new.replace('lyricsAnimator = new app.flexygram.motion.FlexyMotionAnimator(root, lyricsFraction, target, this::setLyricsFraction);','lyricsAnimator = ValueAnimator.ofFloat(lyricsFraction, target);\n        lyricsAnimator.addUpdateListener(a -> setLyricsFraction((float) a.getAnimatedValue()));')
+        start=new.index('            if (elevationAnimator != null)')
+        end=new.index('            elevationAnimator.start();',start)+len('            elevationAnimator.start();')
+        new=new[:start]+'            cover.animate().translationZ(0).setDuration(250).start();'+new[end:]
+        new=new.replace('        if (elevationAnimator != null) { elevationAnimator.removeAllListeners(); elevationAnimator.cancel(); elevationAnimator = null; }\n','')
+        self.assertEqual(old,new)
+
+    def test_music_geometry_and_actions_preserved_without_draw_time_integration(self):
+        import sys
+        sys.path.insert(0,str(ROOT/'tools/connected_alpha'))
+        from motion_contract import BASE
+        path='TMessagesProj/src/main/java/app/exteraless/player/MorphButton.java'
+        old=subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT,text=True)
+        new=(ROOT/path).read_text()
+        for signature,end in [('    public boolean performClick()', '    @Override\n    protected void onDraw'),('    private void drawIcon(',None)]:
+            self.assertEqual(old[old.index(signature):old.index(end) if end else len(old)],new[new.index(signature):new.index(end) if end else len(new)])
+        a=old[old.index('        float w = getWidth();',old.index('protected void onDraw')):old.index('        if (animating)')].strip()
+        b=new[new.index('        float w = getWidth();',new.index('protected void onDraw')):new.index('    private void drawIcon')].rsplit('    }',1)[0].strip()
+        for name in ['radiusLeft','radiusRight','alt','active','badge']:b=b.replace(name+'.value()',name+'.value')
+        self.assertEqual(a,b)
+        self.assertNotIn('SystemClock',new);self.assertNotIn('postInvalidateOnAnimation',new)
+        for name in ['ControlsRow.java','WavySeekBar.java']:
+            path='TMessagesProj/src/main/java/app/exteraless/player/'+name
+            self.assertEqual(subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT),(ROOT/path).read_bytes())
 
     def test_runtime_uses_frame_clock_not_system_duration_scale(self):
         frame = (JAVA / "FlexyFrameMotion.java").read_text()

@@ -53,6 +53,8 @@ def main(here=HERE, test_class="MusicVisualTest", stubs_writer=None, resource_wr
         stubs_writer = write_stubs
     stubs_writer(source, ROOT)
     shutil.copyfile(here/(test_class+'.java.in'), source/(test_class+'.java'))
+    if here.resolve() == HERE.resolve() and test_class == 'MusicVisualTest':
+        shutil.copyfile(HERE/'MusicMotionTest.java.in', source/'MusicMotionTest.java')
     shutil.copyfile(HERE/'pom.xml', output/'pom.xml')
     repository = Path.home()/'.m2/repository'
     command = [args.maven, '-B', '-f', str(output/'pom.xml'), '-Dandroid.sdk.jar='+str(android)]

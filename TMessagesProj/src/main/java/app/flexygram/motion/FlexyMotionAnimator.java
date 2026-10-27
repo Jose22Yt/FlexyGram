@@ -58,7 +58,9 @@ public final class FlexyMotionAnimator extends Animator implements View.OnAttach
     }
     @Override public void start(){
         main();if(detachedPending)throw new IllegalStateException("Detached animation is completing");if(running)cancel();running=true;paused=false;fraction=0;
-        frames=new FlexyFrameMotion(owner,0,this::render);owner.addOnAttachStateChangeListener(this);
+        frames=new FlexyFrameMotion(owner,0,this::render);
+        frames.setOnSettingsChanged(()->{if(running&&FlexyMotionSettings.state(owner.getContext()).instant())finish(false,true);});
+        owner.addOnAttachStateChangeListener(this);
         notifyEvent(0);if(!running)return;
         frames.animateTimedTo(1,duration,()->finish(false,true));
     }

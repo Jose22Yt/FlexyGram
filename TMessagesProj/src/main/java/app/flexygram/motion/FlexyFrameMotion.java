@@ -75,7 +75,7 @@ public final class FlexyFrameMotion implements View.OnAttachStateChangeListener 
     public void setOnSettingsChanged(Runnable listener){checkMain();configurationChanged=listener;}
     static void settingsChanged(){
         checkMain(); // rare settings event; allocation is outside the frame loop
-        for(FlexyFrameMotion motion:instances.keySet().toArray(new FlexyFrameMotion[0]))if(motion!=null&&!motion.disposed){if(motion.configurationChanged!=null)motion.configurationChanged.run();if(motion.disposed)continue;FlexyMotionSettings.State s=FlexyMotionSettings.state(motion.owner.getContext());if(s.instant()){motion.completeInstant();}else motion.spring.configure(s.stiffness,s.damping);}
+        for(FlexyFrameMotion motion:instances.keySet().toArray(new FlexyFrameMotion[0]))if(motion!=null&&!motion.disposed){if(motion.configurationChanged!=null)motion.configurationChanged.run();if(motion.disposed)continue;FlexyMotionSettings.State s=FlexyMotionSettings.state(motion.owner.getContext());if(s.instant()&&motion.running){motion.completeInstant();}else motion.spring.configure(s.stiffness,s.damping);}
     }
     public static int activeCount(){checkMain();return active.size();}
     @Override public void onViewAttachedToWindow(View v){}
