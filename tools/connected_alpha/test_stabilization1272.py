@@ -19,8 +19,13 @@ class Stabilization1272(unittest.TestCase):
     before=set(subprocess.check_output(['git','ls-tree','-r','--name-only',BASE,'--',prefix],cwd=ROOT,text=True).splitlines())
     current=set(subprocess.check_output(['git','ls-files','--',prefix],cwd=ROOT,text=True).splitlines())
     expectedNew={'TMessagesProj/src/main/java/app/flexygram/home/SignatureFolderAccent.java'} if prefix.endswith('/home') else set()
+    from smart_previews1278_contract import paths as smart_paths, restore as restore_smart
+    # Permit ONLY new Smart Previews classes reviewed by the independent
+    # exact-blob contract; no arbitrary additions in protected home/composer.
+    expectedNew|={p for p in smart_paths() if p.startswith(prefix+'/') and p.endswith('.java')}
     self.assertEqual(current,before|expectedNew)
-    for path in expectedNew:self.assertEqual(restore1271(path,(ROOT/path).read_bytes()),b'')
+    for path in expectedNew:
+     self.assertEqual(restore1271(path,restore_smart(path,(ROOT/path).read_bytes())),b'')
     for path in before:
      self.assertEqual(restore1271(path,(ROOT/path).read_bytes()),subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT),path)
     continue
