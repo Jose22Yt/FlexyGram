@@ -86,6 +86,7 @@ public class ChatActivityChannelButtonsLayout extends FrameLayout implements Fac
         signatureInset=dp(app.flexygram.composer.ComposerStyle.inset(app.flexygram.composer.FlexyComposerConfig.level()));
         signatureGap=dp(app.flexygram.composer.FlexyComposerConfig.gap());
         signaturePosition=dp(app.flexygram.composer.ComposerStyle.position(app.flexygram.composer.FlexyComposerConfig.position()));
+        container.setTranslationY(compact?-signaturePosition:0);
         signatureSurface=Theme.getColor(Theme.key_chat_messagePanelBackground,resourcesProvider);
         for(ButtonHolder holder:buttonHolders)if(holder!=null){
             holder.button.setDrawSurface(!compact);
@@ -203,6 +204,11 @@ public class ChatActivityChannelButtonsLayout extends FrameLayout implements Fac
         }
 
         return buttonHolders[buttonId].visibilityAnimator.getValue();
+    }
+
+    public void setDiscussionButton(boolean discussion){
+        ButtonHolder holder=buttonHolders[BUTTON_DIRECT];
+        if(holder!=null)holder.button.setContentDescription(getString(discussion?R.string.ProfileActionsDiscuss:R.string.ChannelOpenDirect));
     }
 
     public void setButtonOnClickListener(int buttonId, View.OnClickListener listener) {
@@ -474,8 +480,8 @@ public class ChatActivityChannelButtonsLayout extends FrameLayout implements Fac
     @Override
     protected void dispatchDraw(@NonNull Canvas canvas) {
         if(signatureCompact){
-            if(totalWidthLeft>0)drawSignatureSurface(canvas,dp(7),dp(7)+totalWidthLeft);
-            if(totalWidthRight>0)drawSignatureSurface(canvas,getWidth()-dp(7)-totalWidthRight,getWidth()-dp(7));
+            if(totalWidthLeft>0)drawSignatureSurface(canvas,dp(9)+signatureInset,dp(5)+totalWidthLeft-signatureInset);
+            if(totalWidthRight>0)drawSignatureSurface(canvas,getWidth()-dp(5)-totalWidthRight+signatureInset,getWidth()-dp(9)-signatureInset);
         }
         final int accentAlpha = (int) (255 * totalVisibilityFactor * animatorCenterAccentBackground.getFloatValue());
         if (accentAlpha > 0) {
