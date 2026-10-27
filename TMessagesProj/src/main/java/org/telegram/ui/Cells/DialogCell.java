@@ -596,6 +596,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
     // Signature Smart Previews: one cached content type per updated dialog row.
     // The original message layout, row geometry and Telegram click targets remain.
     private int smartPreviewKind;
+    private int smartPreviewModeLastBuilt=-1;
     private final app.flexygram.home.SignatureSmartPreviewPalette smartPreviewPalette =
             new app.flexygram.home.SignatureSmartPreviewPalette();
     private final Paint smartPreviewPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -1355,12 +1356,18 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
         if (isTransitionSupport) {
             return;
         }
+        // The mode may change without a Telegram message update. An explicit
+        // dialogsNeedReload must still rebuild preview text, even if the
+        // original updateHelper reports that the message itself is unchanged.
+        int smartModeNow=app.flexygram.home.SignatureSmartPreviews.mode();
+        boolean smartModeChanged=smartPreviewModeLastBuilt!=smartModeNow;
         if (isDialogCell || isTopic) {
             boolean needUpdate = updateHelper.update();
-            if (!needUpdate && currentDialogFolderId == 0 && currentDialogCommunityId == 0 && encryptedChat == null) {
+            if (!needUpdate && !smartModeChanged && currentDialogFolderId == 0 && currentDialogCommunityId == 0 && encryptedChat == null) {
                 return;
             }
         }
+        smartPreviewModeLastBuilt=smartModeNow;
 
         if (useForceThreeLines || SharedConfig.useThreeLinesLayout || true) {
             Theme.dialogs_namePaint[0].setTextSize(dp(17));
