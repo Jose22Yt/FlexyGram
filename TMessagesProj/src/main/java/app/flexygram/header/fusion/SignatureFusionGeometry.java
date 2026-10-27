@@ -130,13 +130,15 @@ public final class SignatureFusionGeometry {
         // The native portrait extends under nearly the entire card. The mask reaches
         // <=4% alpha at the FIRST text pixel; the remaining tail fades to zero.
         // Both lines use one common horizontal center without shifting side actions.
-        float originalPhotoW = Math.min(73f * d, Math.max(0f, cw - 60f * d));
         float photoW = SignatureFusionFade.portraitWidth(cw, d);
         float fadeInset = SignatureFusionFade.fadeStartInset(photoW, d);
-        float labelPad = 7f * d;
+        // The two centered lines share one axis, closer to the actual middle
+        // of the pill than the previous avatar-width-constrained label region.
+        // Full-card alpha is already below four percent at this text boundary.
+        float textInset = Math.min(50f * d, Math.max(0f, cw * .35f));
         if (!rtl) {
             g.portrait.set(g.center.left, cTop, g.center.left + photoW, cTop + centerH);
-            g.text.set(g.center.left + Math.max(0f, originalPhotoW - 5f * d) + labelPad, cTop,
+            g.text.set(g.center.left + textInset, cTop,
                     g.center.right - TEXT_RIGHT_PAD_DP * d, cTop + centerH);
             g.fadeStartX = g.portrait.left + fadeInset;
             g.fadeEndX = g.portrait.right;
@@ -144,7 +146,7 @@ public final class SignatureFusionGeometry {
         } else {
             g.portrait.set(g.center.right - photoW, cTop, g.center.right, cTop + centerH);
             g.text.set(g.center.left + TEXT_RIGHT_PAD_DP * d, cTop,
-                    g.center.right - Math.max(0f, originalPhotoW - 5f * d) - labelPad, cTop + centerH);
+                    g.center.right - textInset, cTop + centerH);
             g.fadeStartX = g.portrait.right - fadeInset;
             g.fadeEndX = g.portrait.left;
             g.fadeSafeStop = SignatureFusionFade.safeStop(g.fadeStartX, g.fadeEndX, g.text.right, true);
