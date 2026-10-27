@@ -92,7 +92,9 @@ class UnifiedIntegration(unittest.TestCase):
                        'integration/connected-alpha-javac-fix'):
             with self.subTest(branch=branch):
                 self.assertTrue(enabled('connected-alpha-static', 'pull_request', branch))
-                self.assertFalse(enabled('build', 'pull_request', branch))
+                self.assertTrue(enabled('build', 'pull_request', branch))
+                self.assertIn(':TMessagesProj:assembleConnectedAlpha --dry-run',str(workflow['jobs']['build']))
+                self.assertNotIn('secrets.LOCAL_PROPERTIES',str(workflow['jobs']['build']))
                 self.assertFalse(enabled('connected-alpha-native', 'pull_request', branch))
         self.assertTrue(enabled('build', 'pull_request', 'unrelated/feature'))
         self.assertTrue(enabled('connected-alpha-native', 'push', 'support/connected-alpha-ci-20261022'))

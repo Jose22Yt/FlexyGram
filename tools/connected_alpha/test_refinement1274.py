@@ -31,7 +31,8 @@ class Refinement(unittest.TestCase):
  def test_no_public_apk_upload_on_integration_pr(self):
   import yaml
   data=yaml.safe_load((ROOT/'.github/workflows/pr.yml').read_text())
-  self.assertIn("github.head_ref != 'integration/alpha1274-signature-refinement-studio'",data['jobs']['build']['if'])
+  self.assertNotIn("secrets.LOCAL_PROPERTIES",str(data["jobs"]["build"]))
+  self.assertIn(":TMessagesProj:assembleConnectedAlpha --dry-run",str(data["jobs"]["build"]))
   checks=yaml.safe_load((ROOT/'.github/workflows/refinement1274.yml').read_text())
   self.assertIn('studio_native',str(checks));self.assertNotIn('*.apk',str(checks))
 
