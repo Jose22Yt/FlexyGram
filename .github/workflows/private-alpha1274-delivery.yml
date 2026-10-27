@@ -22,7 +22,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: 440a79099305ed9fa231e44e43be92df3a75fd1a
+          ref: 0ced066575fbed9b88f3355cbe30bb66169de6fa
           fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-java@v4
@@ -42,6 +42,8 @@ jobs:
           packages: 'build-tools;36.0.0 platforms;android-37.0'
       - name: Compile resources and link isolated provider probe against API 37
         run: python3 tools/connected_alpha/check_resources.py --sdk-root "$ANDROID_HOME"
+      - name: Verify corrected native editor, keyboard and back regressions
+        run: python3 tools/connected_alpha/files_native/run.py --sdk-root "$ANDROID_HOME"
       - name: Verify native iOS bubble paths, glass and saved preference policy
         run: python3 tools/connected_alpha/bubble_visual/run.py --sdk-root "$ANDROID_HOME"
       - name: Retain isolated native bubble graphics (not full app screenshots)
@@ -83,7 +85,7 @@ jobs:
 
       - name: Verify integrated Studio, login, music, header, preview and performance Android regressions
         run: |
-          for probe in files_native studio_native login_visual music_visual header_visual preview_visual performance/native performance/native3; do
+          for probe in studio_native login_visual music_visual header_visual preview_visual performance/native performance/native3; do
             python3 "tools/connected_alpha/$probe/run.py" --sdk-root "$ANDROID_HOME"
           done
       - name: Retain synthetic corrected music and header evidence
@@ -169,11 +171,11 @@ jobs:
         working-directory: approved
     env:
       NATIVE_TARGET: arm64-v8a
-      COMMIT_ID: 440a79099305ed9fa231e44e43be92df3a75fd1a
+      COMMIT_ID: 0ced066575fbed9b88f3355cbe30bb66169de6fa
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: 440a79099305ed9fa231e44e43be92df3a75fd1a
+          ref: 0ced066575fbed9b88f3355cbe30bb66169de6fa
           path: approved
           fetch-depth: 0
           submodules: recursive
@@ -185,7 +187,7 @@ jobs:
           sparse-checkout: tools/private_alpha1274
           persist-credentials: false
       - name: Require the exact approved application commit
-        run: test "$(git rev-parse HEAD)" = 440a79099305ed9fa231e44e43be92df3a75fd1a
+        run: test "$(git rev-parse HEAD)" = 0ced066575fbed9b88f3355cbe30bb66169de6fa
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
