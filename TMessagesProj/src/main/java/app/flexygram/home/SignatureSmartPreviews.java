@@ -41,8 +41,19 @@ public final class SignatureSmartPreviews {
                 ||message.messageOwner.action instanceof TLRPC.TL_messageActionChatJoinedByLink){
             return SignatureSmartPreviewPalette.EVENT;
         }
-        // Captions are user-written text and should retain the native preview,
-        // including all formatting, spoilers, sender names and thumbnails.
+        // A standalone URL with a Telegram webpage preview is still a LINK.
+        // Non-standalone prose, link captions and media captions keep native
+        // text/spoilers/formatting; never parse URLs by network.
+        String text=message.messageOwner.message;
+        boolean standaloneUrl=false;
+        if(text!=null){
+            String value=text.trim();
+            standaloneUrl=!value.isEmpty()&&!value.contains(" ")&&!value.contains("\\n")
+                    &&(value.startsWith("https://")||value.startsWith("http://")||value.startsWith("www."));
+        }
+        if(message.messageOwner.media instanceof TLRPC.TL_messageMediaWebPage && standaloneUrl)
+            return SignatureSmartPreviewPalette.LINK;
+        // Captions are user-written text and should retain the native preview.
         if(message.messageOwner.media!=null
                 &&!TextUtils.isEmpty(message.messageOwner.message))return 0;
         if(message.isVoice())return SignatureSmartPreviewPalette.VOICE;
@@ -50,16 +61,8 @@ public final class SignatureSmartPreviews {
         if(message.isDocument())return SignatureSmartPreviewPalette.FILE;
         if(message.isVideo())return SignatureSmartPreviewPalette.VIDEO;
         if(message.isPhoto())return SignatureSmartPreviewPalette.PHOTO;
-        if(message.messageOwner.media instanceof TLRPC.TL_messageMediaWebPage){
+        if(standaloneUrl && (message.messageOwner.media==null || message.isMediaEmpty()))
             return SignatureSmartPreviewPalette.LINK;
-        }
-        // Only visibly standalone URLs, not arbitrary prose containing a link.
-        String text=message.messageOwner.message;
-        if(text!=null){
-            String value=text.trim();
-            if(!value.contains(" ")&&(value.startsWith("https://")||value.startsWith("http://")||value.startsWith("www.")))
-                return SignatureSmartPreviewPalette.LINK;
-        }
         return 0;
     }
     public static String label(MessageObject message,int kind){
