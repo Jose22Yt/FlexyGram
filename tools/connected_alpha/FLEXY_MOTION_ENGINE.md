@@ -1,6 +1,6 @@
 # Flexy Motion Engine — reviewed continuation of PR107
 
-Base: PR107 `1ad96133e7bceaede4067905c68f1f97bdb829b2`, reconciled with Work1 PR106 `a2d8f2bc06279aa5809f7574ea41646936556d2b` in a separate branch. No PR106/107/main/develop update or merge. Version, identity, distribution, credentials and native libraries unchanged.
+Base: PR107 `1ad96133e7bceaede4067905c68f1f97bdb829b2`, reconciled with Work1 PR106 `29ddf88a280e43c7acd3a413041bc5fbe665d27f` in a separate branch. No PR106/107/main/develop update or merge. Version, identity, distribution, credentials and native libraries unchanged.
 
 Implemented: analytic damped spring (under/critical/over damping); one Choreographer callback shared by active motions; real elapsed frame timestamps without a fabricated 120Hz step; velocity-preserving retarget; bounded long-gap recovery; cancellation on detach/hide; weak registry for immediate profile/reduced-motion updates; one cached immutable local settings snapshot. No idle frame callbacks or disk reads per frame. Temporary frame batch is reused; it grows only at an active-owner high-water mark.
 

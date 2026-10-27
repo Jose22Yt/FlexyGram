@@ -2,7 +2,7 @@
 from pathlib import Path
 import hashlib,json,subprocess
 ROOT=Path(__file__).resolve().parents[2]
-BASE='a2d8f2bc06279aa5809f7574ea41646936556d2b'
+BASE='29ddf88a280e43c7acd3a413041bc5fbe665d27f'
 MANIFEST=ROOT/'tools/connected_alpha/motion_review.json'
 def spec():return json.loads(MANIFEST.read_text())
 def paths():return frozenset(spec()['paths'])
