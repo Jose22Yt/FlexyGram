@@ -30,12 +30,12 @@ public final class SignatureFusionFade {
         float width = Math.abs(end - start);
         if (!(width > 0)) return .5f;
         float t = rtl ? (start - textEdge) / width : (textEdge - start) / width;
-        return Math.max(.17f, Math.min(.86f, t));
+        return Math.max(.12f, Math.min(.86f, t));
     }
     public static void fillStops(float safe, boolean rtl, float[] out) {
         if (out == null || out.length != 8)
             throw new IllegalArgumentException("eight stop slots required");
-        safe = Math.max(.17f, Math.min(.86f, safe));
+        safe = Math.max(.12f, Math.min(.86f, safe));
         if (!rtl) {
             out[0]=0f; out[1]=safe*.18f; out[2]=safe*.44f; out[3]=safe*.73f;
             out[4]=safe; out[5]=safe+(1f-safe)*.35f;
