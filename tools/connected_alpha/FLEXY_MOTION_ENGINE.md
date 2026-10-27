@@ -1,0 +1,35 @@
+# Flexy Motion Engine — reviewed continuation of PR107
+
+Base: PR107 `1ad96133e7bceaede4067905c68f1f97bdb829b2`, reconciled with Work1 PR106 `a2d8f2bc06279aa5809f7574ea41646936556d2b` in a separate branch. No PR106/107/main/develop update or merge. Version, identity, distribution, credentials and native libraries unchanged.
+
+Implemented: analytic damped spring (under/critical/over damping); one Choreographer callback shared by active motions; real elapsed frame timestamps without a fabricated 120Hz step; velocity-preserving retarget; bounded long-gap recovery; cancellation on detach/hide; weak registry for immediate profile/reduced-motion updates; one cached immutable local settings snapshot. No idle frame callbacks or disk reads per frame. Temporary frame batch is reused; it grows only at an active-owner high-water mark.
+
+Native HyperStudio → Animations page: Flash / Flow / Signature, explicit reduce motion, interactive button, safe speed/stiffness/damping/compression controls, restore selected profile defaults. ES/EN/RU resources. Values affect **migrated components only**. Default Flow remains; choosing a profile resets that profile's tuning while preserving explicit reduced motion. This page is separate from FlexyStudio import/export; no existing preferences are renamed.
+
+Touch migration: SignatureNavigationCell and preview use draw-only compression around the touch point. They never modify View.scale/pivot/layout/hit bounds, consume events, replace click/scroll listeners, or capture a partially animated base scale. Bind, detach and hidden-window reset release the drawn transform. Existing native press/click behavior stays active. No blanket global touch listener or hierarchy traversal.
+
+Confirmed preliminary defects: repeated DOWN during spring return captured a partially compressed scale as a new baseline; fixed by unit-factor drawing. Driver advanced a fixed 1/120 second on both start and first frame, irrespective of actual time; removed. SharedPreferences were looked up on every action; replaced by cached state. Preliminary numeric integration varied with substeps/refresh; analytic solution matches equal elapsed time at 60/240Hz within JVM tolerances. These are code/test findings, **not device FPS improvements**.
+
+`motion_inventory.csv` is a source-derived inventory of FlexyGram components and primary Telegram/Exteraless interaction owners. It includes line evidence and distinguishes migrated touch from paths still using Android animators. No claim of complete global coverage. Reactions, chat navigation, main tabs/folders, composer, bots/channels, player and viewer retain their original engines. Work1's reversible reaction progress/notification lock cleanup remain unchanged; migration must preserve that single-owner protocol, finish/cancel behavior, and detach release. Never run both owners on transitionProgress.
+
+CI scope: independent exact-hash motion manifest layered over the unchanged Alpha1278 review. Only exact reviewed child bytes restore to the pinned Work1 bytes; tampered/unknown bytes remain visible to every historical audit. No disabled integrity gates.
+
+## Validation and limitations
+
+Host production math compiles/runs on the JVM. `motion_native/run.py` compiles the actual production motion Java including settings page and navigation cell against API37, then executes Robolectric API35 with real Android widgets, Canvas and Choreographer. Telegram theme/settings/navigation scaffolding is explicitly doubled. Window visibility is explicitly set in the isolated fixture because Robolectric has no real visible system window. Animator scales 0/.5/1/2/5 are varied only inside that process by the test fixture; production never changes system scales. These are not full app, Android17/Poco, GPU timing, IME, touch-latency or signed APK results.
+
+Run:
+```
+python3 -m unittest tools.connected_alpha.test_flexy_motion -v
+python3 tools/connected_alpha/run_checks.py
+python3 tools/connected_alpha/motion_native/run.py --sdk-root "$ANDROID_HOME"
+```
+Do not regenerate `motion_review.json` to hide unknown changes. Review diff against the pinned Work1 head first. Revert the independent motion delta to restore native behavior; do not roll back Work1.
+
+## Physical acceptance — all PENDING
+
+For Flash, Flow and Signature separately, test Android scales 0x, .5x, 1x, 2x and 5x (15 combinations), plus explicit reduced motion. Only migrated controls are expected independent. Verify native click timing, long press, scrolling, 50 rapid press/release cycles, cell recycle, profile change while held/returning, dark/light, large text, RTL, rotation, background/foreground, lock/unlock and detach. Do not change system settings automatically. Navigation/reaction stress remains the original Work1 acceptance: 50 open/back and 50 open/cancel; this branch does not claim to fix that P0.
+
+Reuse tools/connected_alpha/performance for paired baseline/candidate Perfetto/framestats runs on synthetic accounts/content, actual refresh and equivalent thermal/battery/caches/build mode. At least20 repetitions where practical; report median/p95, frame-budget exceedances, jank, CPU/RenderThread, GC and memory. Frame duration is not touch latency. No device is available here: all physical timings, thermal behavior and superiority claims remain unmeasured.
+
+Next integrations require separate reviewed changes/tests: bounded progress driver for reaction lock lifecycle; main-tab indicator direct drag/retarget; navigation completion/cancel ownership; composer/send/voice, music and bot/channel controls. Do not attach a second owner to properties controlled by those native systems.

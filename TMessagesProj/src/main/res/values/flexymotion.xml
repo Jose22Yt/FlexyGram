@@ -1,0 +1,15 @@
+<resources>
+    <string name="FlexyMotionAnimations">Animations</string>
+    <string name="FlexyMotionTitle">Flexy Motion Engine</string>
+    <string name="FlexyMotionProfiles">Profiles</string>
+    <string name="FlexyMotionPhysics">Physics</string>
+    <string name="FlexyMotionReduced">Reduce motion</string>
+    <string name="FlexyMotionSelected">Selected</string>
+    <string name="FlexyMotionSpeed">Motion speed</string>
+    <string name="FlexyMotionStiffness">Spring stiffness</string>
+    <string name="FlexyMotionDamping">Damping / bounce</string>
+    <string name="FlexyMotionPress">Touch compression</string>
+    <string name="FlexyMotionReset">Restore profile defaults</string>
+    <string name="FlexyMotionPreview">Tap to try the selected profile</string>
+    <string name="FlexyMotionCoverage">Controls apply immediately to migrated Signature rows and this preview. Native chat, reaction, player and system transitions retain their existing behavior until individually migrated. Reduce motion takes priority.</string>
+</resources>

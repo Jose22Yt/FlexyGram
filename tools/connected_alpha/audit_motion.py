@@ -1,0 +1,16 @@
+"""Rebuild source evidence inventory; no runtime performance claims."""
+from pathlib import Path
+import csv,re
+r=Path(__file__).resolve().parents[2];t=r/'tools/connected_alpha'
+paths=set((r/'TMessagesProj/src/main/java/app/flexygram').rglob('*.java'))
+for name in ['org/telegram/ui/MainTabsLayout.java','org/telegram/ui/DialogsActivity.java','org/telegram/ui/ChatActivity.java','org/telegram/ui/ActionBar/ActionBarLayout.java','org/telegram/ui/Components/FilterTabsView.java','org/telegram/ui/Components/ReactionsContainerLayout.java','org/telegram/ui/Components/ChatActivityEnterView.java','org/telegram/ui/Components/ChatAvatarContainer.java','org/telegram/ui/Cells/ChatMessageCell.java','org/telegram/ui/bots/BotKeyboardView.java','org/telegram/ui/Components/FragmentContextView.java','org/telegram/ui/PhotoViewer.java','app/exteraless/player/PlayerSheet.java','app/exteraless/player/PlayerBarView.java','app/exteraless/drawer/DrawerContainer.java']:
+ f=r/'TMessagesProj/src/main/java'/name
+ if f.is_file():paths.add(f)
+with (t/'motion_inventory.csv').open('w')as out:
+ writer=csv.writer(out);writer.writerow(['component','file','existing_animation_evidence','android_scale_dependency','direct_finger_evidence','integration_risk','status','validation'])
+ for f in sorted(paths):
+  lines=f.read_text().splitlines();evidence=[f'{i+1}: {s.strip()[:160]}'for i,s in enumerate(lines)if re.search(r'(?:ObjectAnimator|ValueAnimator)\.(?:of|set)|new (?:SpringAnimation|AnimatorSet)|\.animate\(|FlexyTouchFeedback|FlexyFrameMotion',s)][:8]
+  finger=[f'{i+1}: {s.strip()[:110]}'for i,s in enumerate(lines)if re.search(r'\b(onTouchEvent|dispatchTouchEvent|onScroll|onLongPressMove)\(',s)][:4]
+  migrated=f.name in ['SignatureNavigationCell.java','FlexyMotionActivity.java']
+  scaled=any('ObjectAnimator.'in s or'ValueAnimator.'in s or '.animate('in s for s in lines)
+  writer.writerow([f.stem,str(f.relative_to(r)),' | '.join(evidence)or'No direct animator construction found; inherited/delayed work requires review','Migrated draw compression: independent'if migrated else'At least one Android animator path; not migrated'if scaled else'Not established by this static inventory',' | '.join(finger)or'No direct override found; native/inherited handlers require review','Low: isolated drawing'if migrated else'High: preserve lifecycle/gesture/property ownership'if f.name in ['ActionBarLayout.java','ChatActivity.java','ReactionsContainerLayout.java','ChatMessageCell.java']else'Review before integration','MIGRATED_TOUCH_ONLY'if migrated else'NOT_MIGRATED','API35 isolated native tests; physical pending'if migrated else'Static source references only; runtime pending'])

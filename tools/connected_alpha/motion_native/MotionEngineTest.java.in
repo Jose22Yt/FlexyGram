@@ -1,0 +1,52 @@
+import app.flexygram.motion.*;
+import android.app.Activity;
+import android.graphics.*;
+import android.os.Looper;
+import android.view.*;
+import android.widget.Button;
+import java.time.Duration;
+import org.junit.*;
+import org.junit.runner.RunWith;
+import static org.junit.Assert.*;
+import org.robolectric.*;
+import org.robolectric.annotation.*;
+import org.robolectric.shadows.ShadowValueAnimator;
+
+@RunWith(RobolectricTestRunner.class)
+@Config(sdk=35,manifest=Config.NONE,instrumentedPackages={"app.flexygram.motion"})
+@LooperMode(LooperMode.Mode.PAUSED)
+public class MotionEngineTest {
+ Activity activity;Button button;
+ void advance(int ms){Shadows.shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(ms));}
+ @Before public void setup(){org.robolectric.shadows.ShadowChoreographer.setPaused(true);org.robolectric.shadows.ShadowChoreographer.setFrameDelay(Duration.ofMillis(16));activity=Robolectric.buildActivity(Activity.class).setup().visible().get();button=new Button(activity);activity.setContentView(button);button.layout(0,0,200,100);advance(32);org.robolectric.util.ReflectionHelpers.setField(org.robolectric.util.ReflectionHelpers.getField(button,"mAttachInfo"),"mWindowVisibility",View.VISIBLE);assertTrue("attached",button.isAttachedToWindow());assertTrue("shown",button.isShown());assertEquals("window visibility",View.VISIBLE,button.getWindowVisibility());FlexyMotionSettings.setProfile(activity,FlexyMotionProfile.FLOW);FlexyMotionSettings.setReduceMotion(activity,false);}
+ @After public void finish(){activity.finish();advance(32);assertEquals(0,FlexyFrameMotion.activeCount());}
+ @Test public void scalesDoNotControlMigratedClock(){
+  for(FlexyMotionProfile profile:FlexyMotionProfile.values()){FlexyMotionSettings.setProfile(activity,profile);float reference=0;
+  for(float scale:new float[]{0,.5f,1,2,5}){
+   org.robolectric.util.ReflectionHelpers.callStaticMethod(android.animation.ValueAnimator.class,"setDurationScale",org.robolectric.util.ReflectionHelpers.ClassParameter.from(float.class,scale));
+   final float[] value={0};FlexyFrameMotion m=new FlexyFrameMotion(button,0,v->value[0]=v);m.animateTo(1);if(profile!=FlexyMotionProfile.FLASH)assertEquals(0,value[0],0);else assertEquals(1,value[0],0);advance(100);
+   assertTrue(value[0]>0);if(scale==0)reference=value[0];else assertEquals(reference,value[0],.04f);
+   m.dispose();
+  }}
+ }
+ @Test public void retargetDoesNotJumpOrDuplicateClock(){final float[] value={0};FlexyFrameMotion m=new FlexyFrameMotion(button,0,v->value[0]=v);m.animateTo(1);advance(80);float before=value[0];m.animateTo(0);assertEquals(before,value[0],0);assertEquals(1,FlexyFrameMotion.activeCount());advance(1500);assertEquals(0,value[0],.001f);assertFalse(m.isRunning());m.dispose();}
+ @Test public void flashAndReducedFinishImmediately(){int[] complete={0};FlexyFrameMotion m=new FlexyFrameMotion(button,0,v->{});FlexyMotionSettings.setProfile(activity,FlexyMotionProfile.FLASH);m.animateTo(1,()->complete[0]++);assertEquals(1,m.current(),0);assertEquals(1,complete[0]);assertEquals(0,FlexyFrameMotion.activeCount());FlexyMotionSettings.setProfile(activity,FlexyMotionProfile.SIGNATURE);m.animateTo(0,()->complete[0]++);FlexyMotionSettings.setReduceMotion(activity,true);assertEquals(0,m.current(),0);assertEquals(2,complete[0]);m.dispose();}
+ @Test public void cancelNeverCompletesAndDetachStops(){int[] complete={0};FlexyFrameMotion m=new FlexyFrameMotion(button,0,v->{});m.animateTo(1,()->complete[0]++);m.cancel();advance(1500);assertEquals(0,complete[0]);m.animateTo(1,()->complete[0]++);activity.setContentView(new View(activity));advance(1500);assertFalse(m.isRunning());assertEquals(0,complete[0]);m.dispose();}
+ @Test public void touchNeverChangesHitTransformOrAccumulatesScale(){FlexyTouchFeedback touch=new FlexyTouchFeedback(button);int width=button.getWidth();for(int i=0;i<50;i++){MotionEvent down=MotionEvent.obtain(0,0,0,80,40,0);touch.onTouch(down);advance(30);MotionEvent up=MotionEvent.obtain(0,30,1,80,40,0);touch.onTouch(up);down.recycle();up.recycle();assertEquals(1,button.getScaleX(),0);assertEquals(1,button.getScaleY(),0);assertEquals(width,button.getWidth());}advance(1500);assertEquals(1,touch.factor(),.001f);touch.dispose();}
+ @Test public void reducedResetsHeldOrSettledPress(){FlexyTouchFeedback touch=new FlexyTouchFeedback(button);MotionEvent down=MotionEvent.obtain(0,0,0,80,40,0);touch.onTouch(down);advance(1500);assertTrue(touch.factor()<1);FlexyMotionSettings.setReduceMotion(activity,true);assertEquals(1,touch.factor(),0);assertEquals(0,FlexyFrameMotion.activeCount());down.recycle();touch.dispose();}
+ @Test public void canvasCompressionDoesNotMutatePivotOrViewMatrix(){FlexyTouchFeedback touch=new FlexyTouchFeedback(button);MotionEvent down=MotionEvent.obtain(0,0,0,80,40,0);touch.onTouch(down);advance(80);Canvas c=new Canvas(Bitmap.createBitmap(200,100,Bitmap.Config.ARGB_8888));int save=c.save();touch.transform(c);assertEquals(1,button.getScaleX(),0);c.restoreToCount(save);touch.reset();assertEquals(1,touch.factor(),0);down.recycle();touch.dispose();}
+ @Test public void settingsHaveSafeLimits(){FlexyMotionSettings.tune(activity,999,Float.NaN,-20,-1);FlexyMotionSettings.State s=FlexyMotionSettings.state(activity);assertEquals(2,s.speed,0);assertEquals(560,s.stiffness,0);assertEquals(.55f,s.damping,0);assertEquals(.94f,s.pressedScale,0);FlexyMotionSettings.setProfile(activity,FlexyMotionProfile.SIGNATURE);assertEquals(.945f,FlexyMotionSettings.state(activity).pressedScale,0);}
+ @Test public void nativeNavigationRowNeverConsumesOrChangesHitBounds(){
+  app.flexygram.settings.SignatureNavigationCell cell=new app.flexygram.settings.SignatureNavigationCell(activity,null);activity.setContentView(cell);cell.layout(0,0,300,60);int[] clicks={0};cell.setOnClickListener(v->clicks[0]++);
+  MotionEvent down=MotionEvent.obtain(0,0,0,80,30,0),up=MotionEvent.obtain(0,50,1,80,30,0);assertTrue(cell.dispatchTouchEvent(down));advance(50);cell.dispatchTouchEvent(up);advance(50);assertEquals(1,clicks[0]);assertEquals(1,cell.getScaleX(),0);cell.bind("recycled",1,false);assertEquals(0,FlexyFrameMotion.activeCount());down.recycle();up.recycle();
+ }
+ @Test public void profilePageControlsMutateCentralStateWithoutRestart() throws Exception {
+  app.flexygram.settings.SignatureMatteSettingsActivity.host=activity;FlexyMotionActivity page=new FlexyMotionActivity();java.lang.reflect.Method rows=FlexyMotionActivity.class.getDeclaredMethod("updateRows");rows.setAccessible(true);rows.invoke(page);java.lang.reflect.Method tap=FlexyMotionActivity.class.getDeclaredMethod("onItemClick",View.class,int.class,float.class,float.class);tap.setAccessible(true);
+  java.lang.reflect.Field signature=FlexyMotionActivity.class.getDeclaredField("signature");signature.setAccessible(true);tap.invoke(page,button,signature.getInt(page),0f,0f);assertEquals(FlexyMotionProfile.SIGNATURE,FlexyMotionSettings.profile(activity));
+  java.lang.reflect.Field reduced=FlexyMotionActivity.class.getDeclaredField("reduced");reduced.setAccessible(true);tap.invoke(page,button,reduced.getInt(page),0f,0f);assertTrue(FlexyMotionSettings.reduceMotion(activity));
+ }
+ @Test public void manualSnapDiscardsOldCompletion(){int[] completed={0};FlexyFrameMotion m=new FlexyFrameMotion(button,0,v->{});m.animateTo(1,()->completed[0]++);advance(32);m.snapTo(.5f);advance(1500);assertEquals(0,completed[0]);assertEquals(.5f,m.current(),0);m.dispose();}
+ @Test public void hiddenOwnerStopsAtNextFrame(){FlexyFrameMotion m=new FlexyFrameMotion(button,0,v->{});m.animateTo(1);button.setVisibility(View.GONE);advance(32);assertFalse(m.isRunning());assertEquals(0,FlexyFrameMotion.activeCount());m.dispose();}
+ @Test public void cancelAnotherOwnerDuringCallbackDoesNotSkipCleanup(){final FlexyFrameMotion[] other={null};FlexyFrameMotion first=new FlexyFrameMotion(button,0,v->{if(other[0]!=null)other[0].cancel();});other[0]=new FlexyFrameMotion(button,0,v->{});first.animateTo(1);other[0].animateTo(1);advance(100);assertFalse(other[0].isRunning());first.dispose();other[0].dispose();}
+ @Test public void multipleOwnersShareClockAndReleaseAll(){FlexyFrameMotion a=new FlexyFrameMotion(button,0,v->{}),b=new FlexyFrameMotion(button,1,v->{});a.animateTo(1);b.animateTo(0);assertEquals(2,FlexyFrameMotion.activeCount());advance(1500);assertEquals(0,FlexyFrameMotion.activeCount());a.dispose();b.dispose();}
+}
