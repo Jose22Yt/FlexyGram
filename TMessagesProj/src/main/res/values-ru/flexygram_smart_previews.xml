@@ -5,4 +5,10 @@
     <string name="FlexySmartPreviewAccent">Акцент темы</string>
     <string name="FlexySmartPreviewMatte">Signature Matte</string>
     <string name="FlexySmartPreviewOff">Выключено</string>
+    <string name="FlexySmartFile">Документ</string>
+    <string name="FlexySmartMusic">Музыка</string>
+    <string name="FlexySmartLink">Ссылка</string>
+    <string name="FlexySmartPhoto">Фото</string>
+    <string name="FlexySmartVideo">Видео</string>
+    <string name="FlexySmartGroupEvent">Событие в группе</string>
 </resources>
