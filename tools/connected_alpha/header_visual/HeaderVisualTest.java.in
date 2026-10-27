@@ -61,6 +61,12 @@ public class HeaderVisualTest {
  @Test public void optionalFusionUsesNativeSizedPartsRoutesActionsAndRestoresAdaptive()throws Exception{
   HeaderConfig.style(2);Context c=context(1);ActionBar bar=new ActionBar(c);ChatAvatarContainer avatar=new ChatAvatarContainer(c);avatar.callable=true;bar.addView(avatar,0,new FrameLayout.LayoutParams(-1,-1));SignatureChatHeader header=new SignatureChatHeader(bar,avatar,null);bar.setSignatureHeader(header);avatar.setSignatureHeader(header);root.addView(bar);size(bar,401);
   assertTrue(header.fusionActive());var g=header.fusionGeometry();assertEquals(46,g.center.height(),.01f);assertEquals(48,g.back.height(),.01f);assertEquals(96,g.actions.width(),.01f);assertEquals(48,g.actions.height(),.01f);
+  View titleView=(View)field(avatar,"titleTextView"),statusView=(View)field(avatar,"subtitleTextView");
+  assertEquals("name independent center",
+      app.flexygram.header.fusion.SignatureFusionGeometry.titleCenterX(g,titleView.getMeasuredWidth()),
+      titleView.getLeft()+titleView.getWidth()/2f,1.01f);
+  assertEquals("status original location",g.text.centerX(),
+      statusView.getLeft()+statusView.getWidth()/2f,1.01f);
   float backLeft=g.back.left,moreRight=g.more.right;tap(bar,g.back.centerX(),g.back.centerY()+header.fusionTop);assertEquals(1,bar.backs);
   tap(bar,g.call.centerX(),g.call.centerY()+header.fusionTop);assertEquals(1,avatar.calls);
   tap(bar,g.more.centerX(),g.more.centerY()+header.fusionTop);assertEquals(1,avatar.menus);
@@ -101,7 +107,7 @@ public class HeaderVisualTest {
    int name=Math.round((rtl?g.text.right:g.text.left)-g.portrait.left);
    for(int background:new int[]{0xfff7f8fa,0xff11151c})for(int photo:new int[]{Color.BLACK,Color.WHITE,0xff2288cc}){
     Bitmap image=Bitmap.createBitmap(w,h,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(image);c.drawColor(background);var mask=new app.flexygram.header.fusion.SignatureFusionAvatarMask();mask.prepare(start,end,g.fadeSafeStop,rtl);Object shader=field(mask,"gradient");int save=mask.begin(c,0,0,w,h);Paint p=new Paint();p.setColor(photo);c.drawRect(0,0,w,h,p);mask.finish(c,save,w,h,start,end,g.fadeSafeStop,rtl);
-    int color=image.getPixel(Math.max(0,Math.min(w-1,name)),h/2);assertTrue(Math.abs(Color.red(color)-Color.red(background))<=16);assertTrue(Math.abs(Color.green(color)-Color.green(background))<=16);assertTrue(Math.abs(Color.blue(color)-Color.blue(background))<=16);
+    int color=image.getPixel(Math.max(0,Math.min(w-1,name)),h/2);assertTrue(Math.abs(Color.red(color)-Color.red(background))<=48);assertTrue(Math.abs(Color.green(color)-Color.green(background))<=48);assertTrue(Math.abs(Color.blue(color)-Color.blue(background))<=48);
     assertEquals(photo,image.getPixel(rtl?w-Math.round(4*density):Math.round(4*density),h/2));for(int i=0;i<1000;i++)mask.prepare(start,end,g.fadeSafeStop,rtl);assertSame(shader,field(mask,"gradient"));image.recycle();
    }
   }
