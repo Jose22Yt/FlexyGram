@@ -1,0 +1,26 @@
+{
+  "base": "14e586b4ddb7a686f39cda3cb175920c49cecf11",
+  "reviewed": {
+    "TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraAppearanceActivity.java": "473a36d63df63840634df5c8314ef2300ef7b675",
+    "TMessagesProj/src/main/java/app/exteraless/appearance/ChatHeaderUiHelper.java": "92dbc1ef440354cee05aecbbd06cecdb9586e210",
+    "TMessagesProj/src/main/java/app/flexygram/header/HeaderConfig.java": "0a9edfde26283903e9cbafbc06168e702dd30719",
+    "TMessagesProj/src/main/kotlin/app/exteraless/appearance/AppearanceConfig.kt": "53ecde3d5cc45be83d638021ec5c213c454d9597",
+    "tools/connected_alpha/signature1278_contract.py": "289f271fa4452ea7dcf5ad9f31006149a8bbd0f2",
+    "tools/connected_alpha/next_alpha_contract.py": "b89803f9eeeec77010bc677b4bc9ef4ffc05c985",
+    "tools/connected_alpha/test_signature_matte.py": "db9e1e451361d6be7a25daa790f425116456439d",
+    "tools/connected_alpha/legacy_appearance_contract.py": "2cde3e71dc4b518327154493e642ca4f6a19fbc9",
+    "tools/connected_alpha/test_legacy_appearance.py": "e96c1e5647c0ab9ce1190cadca3af5ff5b1ed782"
+  },
+  "paths": [
+    "TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraAppearanceActivity.java",
+    "TMessagesProj/src/main/java/app/exteraless/appearance/ChatHeaderUiHelper.java",
+    "TMessagesProj/src/main/java/app/flexygram/header/HeaderConfig.java",
+    "TMessagesProj/src/main/kotlin/app/exteraless/appearance/AppearanceConfig.kt",
+    "tools/connected_alpha/signature1278_contract.py",
+    "tools/connected_alpha/next_alpha_contract.py",
+    "tools/connected_alpha/test_signature_matte.py",
+    "tools/connected_alpha/legacy_appearance_contract.py",
+    "tools/connected_alpha/test_legacy_appearance.py",
+    "tools/connected_alpha/legacy_appearance_review.json"
+  ]
+}
