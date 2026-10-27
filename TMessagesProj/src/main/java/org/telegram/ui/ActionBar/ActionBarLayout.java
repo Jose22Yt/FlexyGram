@@ -620,7 +620,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
     /* Contest */
     private ActionBarPopupWindow.ActionBarPopupWindowLayout previewMenu;
 
-    private AnimatorSet currentAnimation;
+    private Animator currentAnimation;
     private DecelerateInterpolator decelerateInterpolator = new DecelerateInterpolator(1.5f);
     private OvershootInterpolator overshootInterpolator = new OvershootInterpolator(1.02f);
     private AccelerateDecelerateInterpolator accelerateDecelerateInterpolator = new AccelerateDecelerateInterpolator();
@@ -1710,12 +1710,30 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         invalidate();
     }
 
-    /** Докатывание/откат M3-жеста. */
-    private void animatePredictiveBackEndAnimation(final boolean backAnimation) {
-        final float startProgress = predictiveBackAnimation.getProgress();
-        final float startAlpha = containerView.getAlpha();
-        final float slideDistance = predictiveBackAnimation.getSlideDistance();
-
+    private Animator createPredictiveBackEndTransition(boolean backAnimation, float startProgress, float startAlpha, float slideDistance) {
+        if (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) {
+            if (!backAnimation) predictiveBackAnimation.prepareCommit();
+            app.flexygram.motion.FlexyMotionAnimator animation = new app.flexygram.motion.FlexyMotionAnimator(this, 0f, 1f, progress -> {
+                if (backAnimation) {
+                    final float value = startProgress * (1f - progress);
+                    applyPredictiveBackProgress(value, predictiveBackY);
+                    predictiveBackAnimation.setScrimAlphaMultiplier(startProgress != 0 ? value / startProgress : 0f);
+                    if (containerView.getAlpha() != 1f) {
+                        containerView.setAlpha(startAlpha + (1f - startAlpha) * progress);
+                    }
+                } else {
+                    predictiveBackAnimation.updateCommitProgress(progress);
+                    containerView.setAlpha(predictiveBackAnimation.getClosingAlpha());
+                    setInnerTranslationX(slideDistance + (containerView.getMeasuredWidth() - slideDistance) * progress);
+                    containerView.invalidate();
+                    containerViewBack.invalidate();
+                    invalidate();
+                }
+            });
+            animation.setDuration(backAnimation ? Math.max(120, (int) (startProgress * 220f)) : predictiveBackAnimation.getPostCommitDuration());
+            if (backAnimation) animation.setInterpolator(CubicBezierInterpolator.EASE_OUT_QUINT);
+            return animation;
+        }
         final ValueAnimator animator;
         if (backAnimation) {
             animator = ValueAnimator.ofFloat(startProgress, 0f);
@@ -1745,6 +1763,16 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
 
         final AnimatorSet animatorSet = new AnimatorSet();
         animatorSet.playTogether(animator);
+        return animatorSet;
+    }
+
+    /** Докатывание/откат M3-жеста. */
+    private void animatePredictiveBackEndAnimation(final boolean backAnimation) {
+        final float startProgress = predictiveBackAnimation.getProgress();
+        final float startAlpha = containerView.getAlpha();
+        final float slideDistance = predictiveBackAnimation.getSlideDistance();
+
+        final Animator animatorSet = createPredictiveBackEndTransition(backAnimation, startProgress, startAlpha, slideDistance);
         animatorSet.addListener(new AnimatorListenerAdapter() {
             private boolean cancelled;
 
@@ -1883,7 +1911,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
     }
 
     private boolean backAnimatorIsBack;
-    private AnimatorSet backAnimator;
+    private Animator backAnimator;
     private void animateBackEndAnimation(boolean backAnimation, float velX) {
         final BaseFragment currentFragment = !fragmentsStack.isEmpty() ? fragmentsStack.get(fragmentsStack.size() - 1) : null;
         if (currentFragment == null) return;
@@ -2190,6 +2218,26 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
             fragment.detachSheets();
         }
         containerViewBack.setVisibility(View.INVISIBLE);
+    }
+
+    private Animator createRootAlphaTransition(boolean opening) {
+        if (backgroundView != null && opening) backgroundView.setVisibility(VISIBLE);
+        if (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) {
+            return new app.flexygram.motion.FlexyMotionAnimator(this, opening ? 0f : 1f, opening ? 1f : 0f, value -> {
+                setAlpha(value);
+                setScaleX(0.9f + 0.1f * value);
+                setScaleY(0.9f + 0.1f * value);
+                if (backgroundView != null) backgroundView.setAlpha(value);
+            });
+        }
+        ArrayList<Animator> animators = new ArrayList<>();
+        animators.add(ObjectAnimator.ofFloat(this, View.ALPHA, opening ? 0f : 1f, opening ? 1f : 0f));
+        animators.add(ObjectAnimator.ofFloat(this, View.SCALE_X, opening ? 0.9f : 1f, opening ? 1f : 0.9f));
+        animators.add(ObjectAnimator.ofFloat(this, View.SCALE_Y, opening ? 0.9f : 1f, opening ? 1f : 0.9f));
+        if (backgroundView != null) animators.add(ObjectAnimator.ofFloat(backgroundView, View.ALPHA, opening ? 0f : 1f, opening ? 1f : 0f));
+        AnimatorSet nativeAnimator = new AnimatorSet();
+        nativeAnimator.playTogether(animators);
+        return nativeAnimator;
     }
 
     private void startFlexyTimedLayoutAnimation(final boolean open, final boolean preview) {
@@ -2756,20 +2804,12 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
                     fragment.onTransitionAnimationEnd(true, false);
                     fragment.onBecomeFullyVisible();
                 };
-                ArrayList<Animator> animators = new ArrayList<>();
-                animators.add(ObjectAnimator.ofFloat(this, View.ALPHA, 0.0f, 1.0f));
-                animators.add(ObjectAnimator.ofFloat(this, View.SCALE_X, 0.9f, 1.0f));
-                animators.add(ObjectAnimator.ofFloat(this, View.SCALE_Y, 0.9f, 1.0f));
-                if (backgroundView != null) {
-                    backgroundView.setVisibility(VISIBLE);
-                    animators.add(ObjectAnimator.ofFloat(backgroundView, View.ALPHA, 0.0f, 1.0f));
-                }
+                Animator alphaTransition = createRootAlphaTransition(true);
                 if (currentFragment != null) {
                     currentFragment.onTransitionAnimationStart(false, false);
                 }
                 fragment.onTransitionAnimationStart(true, false);
-                currentAnimation = new AnimatorSet();
-                currentAnimation.playTogether(animators);
+                currentAnimation = alphaTransition;
                 currentAnimation.setInterpolator(CubicBezierInterpolator.EASE_OUT_QUINT);
                 currentAnimation.setDuration(200);
                 currentAnimation.addListener(new AnimatorListenerAdapter() {
@@ -3381,16 +3421,9 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
                     }
                 };
 
-                ArrayList<Animator> animators = new ArrayList<>();
-                animators.add(ObjectAnimator.ofFloat(this, View.ALPHA, 1.0f, 0.0f));
-                animators.add(ObjectAnimator.ofFloat(this, View.SCALE_X, 1.0f, 0.9f));
-                animators.add(ObjectAnimator.ofFloat(this, View.SCALE_Y, 1.0f, 0.9f));
-                if (backgroundView != null) {
-                    animators.add(ObjectAnimator.ofFloat(backgroundView, View.ALPHA, 1.0f, 0.0f));
-                }
+                Animator alphaTransition = createRootAlphaTransition(false);
 
-                currentAnimation = new AnimatorSet();
-                currentAnimation.playTogether(animators);
+                currentAnimation = alphaTransition;
                 currentAnimation.setInterpolator(accelerateDecelerateInterpolator);
                 currentAnimation.setDuration(200);
                 currentAnimation.addListener(new AnimatorListenerAdapter() {
@@ -3854,7 +3887,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
     private void onCloseAnimationEnd() {
         if (transitionAnimationInProgress && onCloseAnimationEndRunnable != null) {
             if (currentAnimation != null) {
-                AnimatorSet animatorSet = currentAnimation;
+                Animator animatorSet = currentAnimation;
                 currentAnimation = null;
                 animatorSet.cancel();
             }

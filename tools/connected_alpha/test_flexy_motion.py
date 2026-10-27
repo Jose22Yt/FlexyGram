@@ -237,6 +237,19 @@ public class FlexyMotionProbe {
         new=new.replace('import app.flexygram.motion.SpringAnimation;','import androidx.dynamicanimation.animation.SpringAnimation;').replace('new SpringAnimation(this, valueHolder)','new SpringAnimation(valueHolder)')
         new=new.replace('            finishedAnimation.cancel();','            if (byCheck) finishedAnimation.cancel();')
         new=new.replace('            currentSpringAnimation.addEndListener((animation, canceled, value, velocity) -> {\n                if (animation != currentSpringAnimation) return;\n                currentSpringAnimation = null;\n                presentFragmentInternalRemoveOld(false, prevFragment);','            currentSpringAnimation.addEndListener((animation, canceled, value, velocity) -> {\n                presentFragmentInternalRemoveOld(false, prevFragment);')
+        predictive=method(new,'    private Animator createPredictiveBackEndTransition(')
+        new=new.replace(predictive+'\n\n','').replace('private Animator backAnimator;', 'private AnimatorSet backAnimator;')
+        a=old.index('        final ValueAnimator animator;',old.index('    private void animatePredictiveBackEndAnimation('))
+        b=old.index('        animatorSet.addListener(',a)
+        self.assertIn(old[a:b],predictive)
+        new=new.replace('        final Animator animatorSet = createPredictiveBackEndTransition(backAnimation, startProgress, startAlpha, slideDistance);\n',old[a:b])
+        root=method(new,'    private Animator createRootAlphaTransition(')
+        new=new.replace(root+'\n\n','').replace('private Animator currentAnimation;', 'private AnimatorSet currentAnimation;').replace('Animator animatorSet = currentAnimation;', 'AnimatorSet animatorSet = currentAnimation;')
+        for opening,anchor in [(True,'if (useAlphaAnimations && fragmentsStack.size() == 1)'),(False,'if (useAlphaAnimations && !forceNoAnimation)')]:
+            a=old.index('                ArrayList<Animator> animators = new ArrayList<>();',old.index(anchor))
+            b=old.index('\n',old.index('                }',a))+1
+            new=new.replace('                Animator alphaTransition = createRootAlphaTransition('+str(opening).lower()+');\n',old[a:b],1)
+        new=new.replace('                currentAnimation = alphaTransition;', '                currentAnimation = new AnimatorSet();\n                currentAnimation.playTogether(animators);')
         self.assertEqual(old,new)
 
     def test_runtime_uses_frame_clock_not_system_duration_scale(self):

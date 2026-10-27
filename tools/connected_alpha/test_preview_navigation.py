@@ -23,7 +23,7 @@ def fixture(source):
  return '''import java.util.*;public class PreviewRegression {
  static class BaseFragment {boolean closeLastFragment(){return false;}boolean onBackPressed(boolean p){return true;}}
  static class Container {void setAlpha(float f){}void setScaleX(float f){}void setScaleY(float f){}void setTranslationX(float f){}void setTranslationY(float f){}}
- static class AnimatorSet{void cancel(){}} static class SpringAnimation{void cancel(){}}
+ static class Animator{void cancel(){}} static class AnimatorSet extends Animator{} static class SpringAnimation{void cancel(){}}
  static class AndroidUtilities{static void cancelRunOnUIThread(Runnable r){}}
  static class GroupCallPip{static boolean onBackPressed(){return false;}}
  static class Bar {boolean isActionModeShowed(){return false;}boolean isSearchFieldVisible;void closeSearchField(){}}
@@ -31,7 +31,7 @@ def fixture(source):
  ArrayList<BaseFragment> fragmentsStack=new ArrayList<>();BaseFragment sheetFragment,newFragment,oldFragment;Bar currentActionBar;Delegate delegate;
  boolean inPreviewMode,transitionAnimationPreviewMode,transitionAnimationInProgress,animationInProgress,startedTracking,previewOpenAnimationInProgress;
  long transitionAnimationStartTime;Object layoutToIgnore,springRouteBackgroundDrawable,previewMenu;float springRouteYRatio;boolean USE_ACTIONBAR_CROSSFADE;
- Container containerView=new Container(),containerViewBack=new Container();AnimatorSet currentAnimation;SpringAnimation currentSpringAnimation;
+ Container containerView=new Container(),containerViewBack=new Container();Animator currentAnimation;SpringAnimation currentSpringAnimation;
  Runnable onCloseAnimationEndRunnable,onOpenAnimationEndRunnable,waitingForKeyboardCloseRunnable,animationRunnable,delayedOpenAnimationRunnable;
  void setAlpha(float f){}void invalidateActionBars(){}void checkNeedRebuild(){}boolean storyViewerAttached(){return false;}
  BaseFragment getLastFragment(){return fragmentsStack.isEmpty()?null:fragmentsStack.get(fragmentsStack.size()-1);}
@@ -51,7 +51,7 @@ _METHODS_
  PreviewRegression early=create();early.fragmentsStack.add(new BaseFragment());early.transitionAnimationInProgress=true;early.transitionAnimationPreviewMode=true;early.transitionAnimationStartTime=System.currentTimeMillis();early.onOpenAnimationEndRunnable=()->{early.inPreviewMode=true;early.previewMenu=new Object();};early.onBackPressed();early.drain();check(early.fragmentsStack.size()==1&&!early.inPreviewMode);
  for(int n=0;n<200;n++){release.preview();release.finishPreviewFragment();release.onBackPressed();release.finishPreviewFragment();release.drain();check(release.fragmentsStack.size()==1);}
  release.fragmentsStack.add(new BaseFragment());release.onBackPressed();release.drain();check(release.fragmentsStack.size()==1);
- }}'''.replace('_METHODS_','\n'.join(bodies))
+ }}'''.replace('_METHODS_','\n'.join(bodies)).replace('Animator currentAnimation;', 'Animator currentAnimation;' if 'private Animator currentAnimation;' in source else 'AnimatorSet currentAnimation;')
 class PreviewNavigation(unittest.TestCase):
  def test_actual_native_double_close_reproduces_before_and_preserves_home_after(self):
   fixed=(ROOT/PATH).read_text();old=subprocess.check_output(['git','show',BASE+':'+PATH],cwd=ROOT,text=True)

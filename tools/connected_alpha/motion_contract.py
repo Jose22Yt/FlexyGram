@@ -11,6 +11,9 @@ def restore(path,data):
  if expected is None or hashlib.sha256(data).hexdigest()!=expected:return data
  p=subprocess.run(['git','show',BASE+':'+str(path)],cwd=ROOT,capture_output=True)
  return p.stdout if p.returncode==0 else b''
+def restore_navigation(path,data):
+ # Historical release guards accept only the exact reviewed navigation delta.
+ return restore(path,data) if str(path)=='TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java' else data
 def verify_current():
  s=spec()
  for name,sha in s['reviewed'].items():
