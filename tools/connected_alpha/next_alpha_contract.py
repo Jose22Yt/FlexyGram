@@ -23,6 +23,10 @@ VISUAL_BASE='43e14d876601d16890b8c6f24c515103e6ece54f'
 VISUAL_PATHS=frozenset(['TMessagesProj/src/main/java/org/telegram/ui/ActionBar/MessageDrawable.java', 'TMessagesProj/src/main/java/app/flexygram/bubbles/BubblePreviewView.java', 'TMessagesProj/src/main/res/values/flexygram_bubbles.xml', 'TMessagesProj/src/main/res/values-es/flexygram_bubbles.xml', 'TMessagesProj/src/main/res/values-ru/flexygram_bubbles.xml', 'TMessagesProj/src/main/java/org/telegram/ui/ThemeActivity.java', 'TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraChatsActivity.java', 'TMessagesProj/src/main/java/app/flexygram/settings/SignatureChatThemeActivity.java', 'TMessagesProj/src/main/java/app/flexygram/settings/SignatureNativeRowSurface.java', '.github/workflows/pr.yml', 'TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleConfig.java', 'TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleSettingsActivity.java', 'TMessagesProj/src/main/java/app/flexygram/bubbles/SignatureWallpaperBlur.java', 'TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java', 'TMessagesProj/src/main/java/org/telegram/ui/ChatBackgroundDrawable.java'])
 PATHS = PATHS | VISUAL_PATHS | frozenset(['tools/connected_alpha/test_signature_next1273.py','tools/connected_alpha/signature_next1273.patch','tools/connected_alpha/bubble_visual/BubbleVisualTest.java.in','tools/connected_alpha/bubble_visual/BubblePreviewVisualTest.java.in','tools/connected_alpha/bubble_visual/stubs.py','tools/connected_alpha/bubble_visual/run.py'])
 def restore_visual(path,data):
+ # Legacy historical tests see only immutable Alpha1278 bytes, not the reviewed
+ # later folder badge palette modifications.
+ from folder_badge1278_contract import restore as restore_folder
+ data=restore_folder(path,data)
  from performance.universal_contract import restore as restore_universal3
  data=restore_universal3(path,data)
  from refinement1274_contract import restore as restore_refinement
