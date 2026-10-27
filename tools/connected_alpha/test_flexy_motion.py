@@ -252,6 +252,20 @@ public class FlexyMotionProbe {
         new=new.replace('                currentAnimation = alphaTransition;', '                currentAnimation = new AnimatorSet();\n                currentAnimation.playTogether(animators);')
         self.assertEqual(old,new)
 
+    def test_folder_color_delta_preserves_work1_selection_layout_and_gestures(self):
+        import sys
+        sys.path.insert(0,str(ROOT/'tools/connected_alpha'))
+        from motion_contract import BASE
+        from motion_native.player_probe import method
+        path='TMessagesProj/src/main/java/org/telegram/ui/Components/FilterTabsView.java'
+        old=subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT,text=True)
+        new=(ROOT/path).read_text()
+        factory=method(new,'    private Animator createFolderColorTransition(')
+        new=new.replace(factory+'\n\n','').replace('private Animator colorChangeAnimator;','private AnimatorSet colorChangeAnimator;').replace('private final AnimationProperties.FloatProperty<FilterTabsView> COLORS','private final Property<FilterTabsView, Float> COLORS')
+        new=new.replace('        colorChangeAnimator = createFolderColorTransition();','        colorChangeAnimator = new AnimatorSet();\n        colorChangeAnimator.playTogether(ObjectAnimator.ofFloat(this, COLORS, 0.0f, 1.0f));')
+        new=new.replace('                if (colorChangeAnimator != animation) return;\n                colorChangeAnimator = null;\n','')
+        self.assertEqual(old,new)
+
     def test_runtime_uses_frame_clock_not_system_duration_scale(self):
         frame = (JAVA / "FlexyFrameMotion.java").read_text()
         settings = (JAVA / "FlexyMotionSettings.java").read_text()

@@ -57,3 +57,6 @@ public class PopupMotionProbe extends PopupWindow {
 
  from navigation_probe import write as write_navigation
  write_navigation(put,root,source)
+
+ from folder_probe import write as write_folder
+ write_folder(put,root)
