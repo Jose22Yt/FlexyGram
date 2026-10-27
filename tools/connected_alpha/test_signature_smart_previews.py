@@ -150,7 +150,7 @@ class SmartPreviews(unittest.TestCase):
         s=SETTINGS.read_text()
         for x in ('smartPreviewsRow = addRow("flexySmartPreviews")',
                   'SignatureSmartPreviews.setMode(selected)',
-                  'SignatureSmartPreviews.mode()'):
+                  'SignatureSmartPreviews.setMode(selected)'):
             self.assertIn(x,s)
         for locale in ("values","values-es","values-ru"):
             p=ROOT/"TMessagesProj/src/main/res"/locale/"flexygram_smart_previews.xml"
