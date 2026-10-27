@@ -862,14 +862,12 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
             } else if (position == appearanceHeaderRow || position == sectionsHeaderRow
                     || position == blurHeaderRow || position == chatListHeaderRow
                     || position == foldersHeaderRow || position == linksHeaderRow
-                    || position == avatarsHeaderRow || position == iconsHeaderRow
-) {
+                    || position == avatarsHeaderRow || position == iconsHeaderRow) {
                 return TYPE_HEADER;
             } else if (position == appearanceDividerRow || position == sectionsDividerRow
                     || position == blurDividerRow || position == avatarsDividerRow
                     || position == chatListDividerRow || position == foldersDividerRow
-                    || position == linksDividerRow || position == iconsDividerRow
-) {
+                    || position == linksDividerRow || position == iconsDividerRow) {
                 return TYPE_INFO_PRIVACY;
             } else if (position == fabShapeRow) {
                 return TYPE_FAB_SHAPE;
