@@ -152,7 +152,7 @@ jobs:
       - name: Test private delivery transport and frozen source contract
         run: PYTHONPATH=tools/connected_alpha python3 -m unittest discover -s tools/private_alpha1274 -p 'test_*.py' -v
       - id: destination
-        name: Verify unpublished destination with a harmless probe before compiling
+        name: Verify unpublished destination with a harmless probe before compiling (controlled diagnostics)
         env:
           GH_TOKEN: ${{ github.token }}
         run: python3 tools/private_alpha1274/deliver.py preflight

@@ -191,6 +191,8 @@ def main():
 if __name__ == '__main__':
     try:
         main()
-    except (DeliveryError, OSError, ValueError, KeyError):
+    except DeliveryError as failure:
+        raise SystemExit('Private delivery: '+str(failure))
+    except (OSError, ValueError, KeyError):
         raise SystemExit('Private delivery failed. No release is published and no APK is uploaded as an Actions artifact.')
 
