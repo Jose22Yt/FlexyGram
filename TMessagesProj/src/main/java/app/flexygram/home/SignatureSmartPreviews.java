@@ -78,6 +78,10 @@ public final class SignatureSmartPreviews {
             return SignatureSmartPreviewPalette.LINK;
         return 0;
     }
+    private static int firstStop(String value,int end,char separator){
+        int pos=value.indexOf(separator);
+        return pos>=0&&pos<end?pos:end;
+    }
     public static String label(MessageObject message,int kind){
         if(message==null||message.messageOwner==null)return "";
         switch(kind){
@@ -103,10 +107,11 @@ public final class SignatureSmartPreviews {
                 int scheme=url.indexOf("://");
                 if(scheme>=0)url=url.substring(scheme+3);
                 int end=url.length();
-                for(char c:new char[]{'/','?','#','\n','\r'}){
-                    int pos=url.indexOf(c);
-                    if(pos>=0&&pos<end)end=pos;
-                }
+                end=firstStop(url,end,'/');
+                end=firstStop(url,end,'?');
+                end=firstStop(url,end,'#');
+                end=firstStop(url,end,'\n');
+                end=firstStop(url,end,'\r');
                 url=url.substring(0,end);
                 if(url.length()>52)url=url.substring(0,52);
                 return "🔗  "+(url.isEmpty()?LocaleController.getString(R.string.FlexySmartLink):url);
