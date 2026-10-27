@@ -599,6 +599,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
     private final app.flexygram.home.SignatureSmartPreviewPalette smartPreviewPalette =
             new app.flexygram.home.SignatureSmartPreviewPalette();
     private final Paint smartPreviewPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private static final int[] SMART_VOICE_BARS = {5,9,13,6,11,7,4};
     private void drawSmartPreviewBackground(Canvas canvas, float top, float alpha) {
         if (smartPreviewKind == 0 || messageLayout == null || messageLayout.getLineCount() == 0 || alpha <= 0f) return;
         int mode=app.flexygram.home.SignatureSmartPreviews.mode();
@@ -607,10 +608,29 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
         smartPreviewPalette.update(smartPreviewKind,mode,accent,surface);
         smartPreviewPaint.setColor(smartPreviewPalette.background());
         smartPreviewPaint.setAlpha(Math.round(255f*Math.max(0f,Math.min(1f,alpha))));
-        float left = messageLeft - dp(6);
-        float right = messageLeft + Math.min(messageLayout.getLineWidth(0),dp(245)) + dp(9);
-        float height = Math.min(dp(22),messageLayout.getLineBottom(0)+dp(3));
-        canvas.drawRoundRect(left,top-dp(2),right,top+height,dp(12),dp(12),smartPreviewPaint);
+        // Message layout can be RTL; use its real visual line bounds rather
+        // than assuming the first glyph starts at messageLeft.
+        boolean rtl=LocaleController.isRTL;
+        boolean voice=smartPreviewKind==app.flexygram.home.SignatureSmartPreviewPalette.VOICE;
+        float lineLeft=messageLeft+messageLayout.getLineLeft(0);
+        float lineRight=messageLeft+messageLayout.getLineRight(0);
+        float left=lineLeft-dp(rtl&&voice?36:6);
+        float right=lineRight+dp(!rtl&&voice?36:9);
+        float height=Math.min(dp(22),messageLayout.getLineBottom(0)+dp(3));
+        float bottom=top+height;
+        canvas.drawRoundRect(left,top-dp(2),right,bottom,dp(12),dp(12),smartPreviewPaint);
+        if(voice){
+            smartPreviewPaint.setColor(smartPreviewPalette.foreground());
+            smartPreviewPaint.setAlpha(Math.round(255f*Math.max(0f,Math.min(1f,alpha))));
+            float waveX=rtl?left+dp(8):lineRight+dp(12);
+            float cy=(bottom+top-dp(2))*.5f;
+            float barWidth=dp(2f);
+            for(int i=0;i<SMART_VOICE_BARS.length;i++){
+                float h=dp(SMART_VOICE_BARS[i]);
+                float x=waveX+dp(3.5f)*i;
+                canvas.drawRoundRect(x,cy-h*.5f,x+barWidth,cy+h*.5f,barWidth*.5f,barWidth*.5f,smartPreviewPaint);
+            }
+        }
     }
     private StaticLayout typingLayout;
 
