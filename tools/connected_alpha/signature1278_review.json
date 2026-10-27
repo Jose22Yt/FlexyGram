@@ -2,7 +2,7 @@
   "base": "79ae7c6a4d52d3a787ca8dfddb11660d028bf24f",
   "reviewed": {
     ".github/workflows/connected-alpha-arm64.yml": "b47943bb21aa5ebec2b16c60eba0dcc029a4698dbe42f8ef07cf50cf3dc162a9",
-    ".github/workflows/pr.yml": "a637471fa65c3c1a3ceb0961ae15ebfcdcf18422380c18a078826ed69f0c89cd",
+    ".github/workflows/pr.yml": "8c0872ce86ac54cf50227817c3e11d377a7854b1515600faf43097cdc86999dd",
     "TMessagesProj/build.gradle": "92cfafc6cd452342180d190f2b436bc619ab3f556078737787241fbaebd610c7",
     "TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraAppearanceActivity.java": "28c90bab59ad58bb534d9e96ffe79ab86d8faf4e0780853a084ad50704ed6614",
     "TMessagesProj/src/main/java/app/flexygram/header/HeaderPreviewView.java": "0db93a03cf7ca4daafc3b8b4c551061c160dd72c48e77e588443a6f89e5913a0",

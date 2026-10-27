@@ -77,6 +77,7 @@ jobs:
           python3 tools/connected_alpha/music_visual/reproduce_detach.py --sdk-root "$ANDROID_HOME"
           python3 tools/connected_alpha/preview_visual/run.py --sdk-root "$ANDROID_HOME"
       - name: Retain synthetic renderer evidence (no owner screenshots or APK)
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: isolated-signature-renderers
@@ -86,7 +87,7 @@ jobs:
             build/connected-alpha-matte-visual/target/surefire-reports/*.xml
             build/connected-alpha-music-visual/android-music-isolated.png
             build/connected-alpha-music-visual/target/surefire-reports/*.xml
-            build/connected-alpha-header-visual/signature-header-synthetic.png
+            build/connected-alpha-header-visual/signature-header*.png
             build/connected-alpha-header-visual/target/surefire-reports/*.xml
           retention-days: 7
           if-no-files-found: error
