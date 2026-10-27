@@ -140,6 +140,11 @@ public class HeaderVisualTest {
   for(boolean rtl:new boolean[]{false,true}){
    LocaleController.isRTL=rtl;Theme.dark=rtl;Context c=context(1);ActionBar bar=new ActionBar(c);ChatAvatarContainer avatar=new ChatAvatarContainer(c);avatar.callable=true;bar.addView(avatar,0,new FrameLayout.LayoutParams(-1,-1));SignatureChatHeader header=new SignatureChatHeader(bar,avatar,null);bar.setSignatureHeader(header);avatar.setSignatureHeader(header);size(bar,401);assertTrue(header.fusionActive());
    Bitmap live=Bitmap.createBitmap(401,bar.getMeasuredHeight(),Bitmap.Config.ARGB_8888);bar.draw(new Canvas(live));var g=header.fusionGeometry();int y=Math.round(g.portrait.centerY()+header.fusionTop);
+   View title=(View)field(avatar,"titleTextView"),status=(View)field(avatar,"subtitleTextView");
+   assertTrue(title.getWidth()>0&&title.getHeight()>0&&status.getWidth()>0&&status.getHeight()>0);
+   title.setVisibility(View.INVISIBLE);status.setVisibility(View.INVISIBLE);Bitmap hidden=Bitmap.createBitmap(401,bar.getMeasuredHeight(),Bitmap.Config.ARGB_8888);bar.draw(new Canvas(hidden));title.setVisibility(View.VISIBLE);status.setVisibility(View.VISIBLE);
+   for(View label:new View[]{title,status}){int changed=0;for(int py=Math.max(0,label.getTop());py<Math.min(live.getHeight(),label.getBottom());py++)for(int px=Math.max(0,label.getLeft());px<Math.min(live.getWidth(),label.getRight());px++)if(live.getPixel(px,py)!=hidden.getPixel(px,py))changed++;assertTrue("both native labels must actually render, not only occupy centered bounds",changed>8);}
+   hidden.recycle();
    int opaqueX=Math.round(rtl?g.portrait.right-4:g.portrait.left+4),fadedX=Math.round(rtl?g.portrait.left+1:g.portrait.right-2);
    assertEquals("existing avatar stays opaque before fade",0xff2288cc,live.getPixel(opaqueX,y));assertNotEquals("native portrait fades into surface",0xff2288cc,live.getPixel(fadedX,y));assertTrue(Color.alpha(live.getPixel(fadedX,y))>=200);
    photoX[rtl?1:0]=opaqueX+(rtl?401:0);photoY[rtl?1:0]=y;
