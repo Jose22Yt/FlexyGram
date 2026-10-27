@@ -5,4 +5,10 @@
     <string name="FlexySmartPreviewAccent">Theme accent</string>
     <string name="FlexySmartPreviewMatte">Signature Matte</string>
     <string name="FlexySmartPreviewOff">Disabled</string>
+    <string name="FlexySmartFile">Document</string>
+    <string name="FlexySmartMusic">Music</string>
+    <string name="FlexySmartLink">Link</string>
+    <string name="FlexySmartPhoto">Photo</string>
+    <string name="FlexySmartVideo">Video</string>
+    <string name="FlexySmartGroupEvent">Group event</string>
 </resources>
