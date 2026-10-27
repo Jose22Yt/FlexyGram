@@ -45,11 +45,14 @@ class SmartPreviews(unittest.TestCase):
                 public final class TLRPC {
                     public static class Document {public String file_name;}
                     public static class Message { public Media media;public String message;
-                        public Object action;public java.util.ArrayList<Object> restriction_reason=new java.util.ArrayList<>();}
+                        public Object action;public java.util.ArrayList<Object> restriction_reason=new java.util.ArrayList<>();
+                        public java.util.ArrayList<MessageEntity> entities=new java.util.ArrayList<>();}
                     public static class Media { public int ttl_seconds; }
                     public static class TL_messageMediaWebPage extends Media{}
                     public static class TL_messageActionChatAddUser{}
                     public static class TL_messageActionChatJoinedByLink{}
+                    public static class MessageEntity{}
+                    public static class TL_messageEntitySpoiler extends MessageEntity{}
                 }''',
             "org/telegram/messenger/MessageObject.java": '''package org.telegram.messenger;
                 import org.telegram.tgnet.TLRPC;
@@ -97,6 +100,10 @@ class SmartPreviews(unittest.TestCase):
                         MessageObject simpleLink=m();simpleLink.messageOwner.message="https://example.com";
                         verify(4,simpleLink);
                         simpleLink.messageOwner.message="Just a text";verify(0,simpleLink);
+                        link.messageOwner.message="https://example.com";
+                        link.messageOwner.entities.add(new TLRPC.TL_messageEntitySpoiler());
+                        verify(0,link);
+                        link.messageOwner.entities.clear();verify(4,link);
                         voice.highlighted=true;verify(0,voice);voice.highlighted=false;
                         voice.messageOwner.message="Caption";verify(0,voice);
                         voice.messageOwner.message="";voice.messageOwner.media=new TLRPC.Media();
