@@ -127,9 +127,11 @@ public final class SignatureFusionGeometry {
         }
 
 
-        // The native portrait extends under nearly the entire card. The mask reaches
-        // <=4% alpha at the FIRST text pixel; the remaining tail fades to zero.
-        // Both lines use one common horizontal center without shifting side actions.
+        // The native portrait extends under nearly the entire card. Its alpha now
+        // fades across the left half (right half in RTL) of the card, not abruptly
+        // before the first letter. Native title/status views are drawn ON TOP of the
+        // avatar; no text layer is faded. The subtitle keeps its previous axis.
+        // Title placement is independently centered on the whole pill.
         float photoW = SignatureFusionFade.portraitWidth(cw, d);
         float fadeInset = SignatureFusionFade.fadeStartInset(photoW, d);
         // The two centered lines share one axis, closer to the actual middle
@@ -141,18 +143,34 @@ public final class SignatureFusionGeometry {
             g.text.set(g.center.left + textInset, cTop,
                     g.center.right - TEXT_RIGHT_PAD_DP * d, cTop + centerH);
             g.fadeStartX = g.portrait.left + fadeInset;
-            g.fadeEndX = g.portrait.right;
+            g.fadeEndX = g.center.left + cw * .56f;
             g.fadeSafeStop = SignatureFusionFade.safeStop(g.fadeStartX, g.fadeEndX, g.text.left, false);
         } else {
             g.portrait.set(g.center.right - photoW, cTop, g.center.right, cTop + centerH);
             g.text.set(g.center.left + TEXT_RIGHT_PAD_DP * d, cTop,
                     g.center.right - textInset, cTop + centerH);
             g.fadeStartX = g.portrait.right - fadeInset;
-            g.fadeEndX = g.portrait.left;
+            g.fadeEndX = g.center.right - cw * .56f;
             g.fadeSafeStop = SignatureFusionFade.safeStop(g.fadeStartX, g.fadeEndX, g.text.right, true);
         }
         // A fallback is preferable to clipping text or creating overlapping buttons.
         g.fits &= g.text.width() >= 48f*d;
         return g;
+    }
+
+    /**
+     * Center the contact NAME on the whole pill, independently of the subtitle.
+     * Clamp to the text-safe rectangle so names/icons never cover the portrait.
+     * A long name is automatically moved into the available text region.
+     * The original subtitle axis, sizing and last-seen baseline remain unchanged.
+     */
+    public static float titleCenterX(Layout g, float measuredTitleWidth) {
+        if (g == null || Float.isNaN(measuredTitleWidth) || measuredTitleWidth < 0f)
+            throw new IllegalArgumentException("valid title geometry required");
+        float half = Math.min(g.text.width(), measuredTitleWidth) * .5f;
+        float min = g.text.left + half;
+        float max = g.text.right - half;
+        if (max < min) return g.text.centerX();
+        return Math.max(min, Math.min(g.center.centerX(), max));
     }
 }
