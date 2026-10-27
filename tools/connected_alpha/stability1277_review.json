@@ -16,6 +16,7 @@
     "TMessagesProj/src/main/java/app/flexygram/header/fusion/SignatureFusionGeometry.java": "bf59c87a381fb119540a9e348394e5bbb0dbe2f968fb06b73e1d3ee592b5946d",
     "TMessagesProj/src/main/java/org/telegram/messenger/ApplicationLoader.java": "e4aa5b2d64c69cdd0f6278ca555da7ea6d939be9b18704c63c18f1b2acd8af73",
     "TMessagesProj/src/main/java/org/telegram/messenger/DownloadController.java": "f6233bc2a99d7cb7f618c98429e24445ff734384ccb033ca31f9ebd861cda3dd",
+    "TMessagesProj/src/main/java/org/telegram/messenger/MessagesController.java": "60a7fa97f4110f99576ee90bc42f9cd7b1923762c3c5d65abf8db4e6ec742623",
     "TMessagesProj/src/main/java/org/telegram/ui/Components/ChatActivityEnterView.java": "d044792323d262458ea40e1f143026e105ae31f89ee2f793c1b532fc9f8198cf",
     "TMessagesProj/src/main/java/org/telegram/ui/DialogsActivity.java": "211c0ef19cac87f6ac18ea8a802f034b070b0505acac93500b709436ed35c8e3",
     "TMessagesProj/src/main/java/org/telegram/ui/ThemeActivity.java": "c7ef9e5425a908179f699646ea16acadc34be71104e2ddb18d3ce88fe268f432",
@@ -32,12 +33,13 @@
     "tools/connected_alpha/stability1277_contract.py": "bcd68659678009e4bed64cefe7ec2ecd67776782e6f27b89823d45280b3c4568",
     "tools/connected_alpha/startup_contract.py": "7057ae1823dd6003f6dbda1407dcfd5fd71289a659cb9216eed5a3e537fe29d7",
     "tools/connected_alpha/test_composer_reference.py": "a3c10676d0cdf79236dca82ab2b092dbaa961dff40530cfe1904eb945109649d",
-    "tools/connected_alpha/test_fast_connect1277.py": "f71967afc4de82c41e08b1ffb0cddded84f273d911bb29e689e6a865219fbfcb",
+    "tools/connected_alpha/test_fast_connect1277.py": "d8c0403594d1144105098b5ae94052b1b526117ce095867ec30bcb71a3a78eff",
     "tools/connected_alpha/test_flexy_composer.py": "4ece548ec2e919a430fbf5e90a6c72121341d43e04a219d3af0fde56dcf3917c",
     "tools/connected_alpha/test_fusion_v3.py": "b9400f0fc50c1fc6eddf760d26f0bfd9d3dd78b1c53af72940678d932a5d65d7",
     "tools/connected_alpha/test_header_fusion.py": "5bf7ee91738370a46dca217b9efcf62e9bf98dd6508f5b0a2dbf3466642d7482",
     "tools/connected_alpha/test_private_release1276.py": "5981d74ac6f24e64d70ef410709176bc5acca46d8074a290000f7be3b0865eec",
-    "tools/connected_alpha/test_stability1277.py": "3e63216583841f6fcb463fb533a1399b9bbd8035d72c982aaa71728a4c257f1a"
+    "tools/connected_alpha/test_stability1277.py": "3e63216583841f6fcb463fb533a1399b9bbd8035d72c982aaa71728a4c257f1a",
+    "tools/connected_alpha/test_startup.py": "ebb7be5cf1520f7072653f2f184ca0e692e26cc40a808ee7d7db4553d29910b7"
   },
   "paths": [
     ".github/workflows/connected-alpha-arm64.yml",
@@ -55,6 +57,7 @@
     "TMessagesProj/src/main/java/app/flexygram/header/fusion/SignatureFusionGeometry.java",
     "TMessagesProj/src/main/java/org/telegram/messenger/ApplicationLoader.java",
     "TMessagesProj/src/main/java/org/telegram/messenger/DownloadController.java",
+    "TMessagesProj/src/main/java/org/telegram/messenger/MessagesController.java",
     "TMessagesProj/src/main/java/org/telegram/ui/Components/ChatActivityEnterView.java",
     "TMessagesProj/src/main/java/org/telegram/ui/DialogsActivity.java",
     "TMessagesProj/src/main/java/org/telegram/ui/ThemeActivity.java",
@@ -77,6 +80,7 @@
     "tools/connected_alpha/test_header_fusion.py",
     "tools/connected_alpha/test_private_release1276.py",
     "tools/connected_alpha/test_stability1277.py",
+    "tools/connected_alpha/test_startup.py",
     "tools/connected_alpha/stability1277_review.json"
   ]
 }

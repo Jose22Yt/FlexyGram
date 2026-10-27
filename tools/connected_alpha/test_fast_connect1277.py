@@ -38,7 +38,10 @@ class FastConnect1277(unittest.TestCase):
   self.assertEqual(method(current,'public static DownloadController getInstance(int num)'),method(old,'public static DownloadController getInstance(int num)'))
   for suffix in ('org/telegram/messenger/MessagesController.java','org/telegram/messenger/MessagesStorage.java','org/telegram/tgnet/ConnectionsManager.java'):
    p='TMessagesProj/src/main/java/'+suffix
-   self.assertEqual((ROOT/p).read_bytes(),subprocess.check_output(['git','show','38e677d60847e117ede1c25731f7b6c4fd2970e2:'+p],cwd=ROOT))
+   data=(ROOT/p).read_bytes()
+   if suffix.endswith('/MessagesController.java'):
+    data=data.replace(b'if (getUserConfig().isClientActivated()) getDownloadController().loadAutoDownloadConfig(false);',b'getDownloadController().loadAutoDownloadConfig(false);',1)
+   self.assertEqual(data,subprocess.check_output(['git','show','38e677d60847e117ede1c25731f7b6c4fd2970e2:'+p],cwd=ROOT))
 
  def test_phase_queries_separate_local_work_from_visible_or_network_readiness(self):
   import sqlite3
@@ -62,3 +65,9 @@ class FastConnect1277(unittest.TestCase):
    bad=copy.deepcopy(reports);bad[-1]['environment'][key]='unverified';self.assertFalse(compare(bad,'stability1277')['comparable'])
   bad=copy.deepcopy(reports);bad[1]['source_commit']='b'*40;self.assertFalse(compare(bad,'stability1277')['comparable'])
   bad=copy.deepcopy(reports);bad[-1]['evidence']='synthetic';self.assertFalse(compare(bad,'stability1277')['comparable'])
+
+ def test_actual_config_callback_does_not_construct_an_inactive_download_controller(self):
+  source=(JAVA/'org/telegram/messenger/MessagesController.java').read_text()
+  body=method(source,'public void updateConfig(final TLRPC.TL_config config)')
+  statement=body.split('AndroidUtilities.runOnUIThread(() -> {',1)[1].split('loadAppConfig(true);',1)[0]
+  self.java('class Probe{boolean active;int created,requests;class Config{boolean isClientActivated(){return active;}}Config getUserConfig(){return new Config();}class Downloads{void loadAutoDownloadConfig(boolean force){requests++;}}Downloads getDownloadController(){created++;return new Downloads();}void callback(){'+statement+'}public static void main(String[]a){Probe p=new Probe();p.callback();if(p.created!=0||p.requests!=0)throw new AssertionError();p.active=true;p.callback();if(p.created!=1||p.requests!=1)throw new AssertionError();}}')

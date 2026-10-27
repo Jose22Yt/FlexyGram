@@ -5723,7 +5723,7 @@ public class MessagesController extends BaseController implements NotificationCe
 
     public void updateConfig(final TLRPC.TL_config config) {
         AndroidUtilities.runOnUIThread(() -> {
-            getDownloadController().loadAutoDownloadConfig(false);
+            if (getUserConfig().isClientActivated()) getDownloadController().loadAutoDownloadConfig(false);
             loadAppConfig(true);
             checkPeerColors(true);
             remoteConfigLoaded = true;
