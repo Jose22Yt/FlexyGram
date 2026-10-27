@@ -614,8 +614,9 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
         boolean voice=smartPreviewKind==app.flexygram.home.SignatureSmartPreviewPalette.VOICE;
         float lineLeft=messageLeft+messageLayout.getLineLeft(0);
         float lineRight=messageLeft+messageLayout.getLineRight(0);
-        float left=lineLeft-dp(rtl&&voice?36:6);
-        float right=lineRight+dp(!rtl&&voice?36:9);
+        float left=Math.max(dp(6),lineLeft-dp(rtl&&voice?36:6));
+        float right=Math.min(getMeasuredWidth()-dp(6),lineRight+dp(!rtl&&voice?36:9));
+        if (right-left < dp(16))return; // Narrow/recycled rows remain native.
         float height=Math.min(dp(22),messageLayout.getLineBottom(0)+dp(3));
         float bottom=top+height;
         canvas.drawRoundRect(left,top-dp(2),right,bottom,dp(12),dp(12),smartPreviewPaint);
@@ -628,6 +629,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
             for(int i=0;i<SMART_VOICE_BARS.length;i++){
                 float h=dp(SMART_VOICE_BARS[i]);
                 float x=waveX+dp(3.5f)*i;
+                if (x+barWidth>right-dp(4))break;
                 canvas.drawRoundRect(x,cy-h*.5f,x+barWidth,cy+h*.5f,barWidth*.5f,barWidth*.5f,smartPreviewPaint);
             }
         }
