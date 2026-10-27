@@ -98,7 +98,7 @@ public class Reference {
         # Execute production coordinate method in existing host fixture as well.
         enter=(ROOT/ENTER).read_text()
         self.assertIn('TOUCH_SLOT) - dp(flexyInsetDp), dp(flexyGapDp)',enter)
-        self.assertIn('dp(flexyGapDp) - dp(flexyInsetDp), nativeAttachTranslationX()',enter)
+        self.assertIn('dp(flexyGapDp) - dp(flexyInsetDp), 0)',enter)
         self.assertIn('+ flexyGapDp - flexyInsetDp + flexyTextPaddingDp',enter)
         for scale in (1,1.5,2,2.625,3,4):
             dp=lambda n:int(n*scale+0.5)

@@ -76,6 +76,21 @@ public final class FlexyFileEditorActivity extends BaseFragment {
         if(retainedText!=null&&text!=null&&document!=null){internal=true;editor.setText(retainedText);editor.setSelection(Math.min(editor.length(),Math.max(0,retainedStart)),Math.min(editor.length(),Math.max(0,retainedEnd)));internal=false;editor.setEnabled(true);ready=true;retainedText=null;status.setText(filename()+" · "+text.encoding+" · "+text.newline);highlightParagraph();}
         else load();return fragmentView;
     }
+    /** Participate in Telegram's native theme animation without rebuilding the document. */
+    @Override public ArrayList<org.telegram.ui.ActionBar.ThemeDescription> getThemeDescriptions(){
+        ArrayList<org.telegram.ui.ActionBar.ThemeDescription> result=super.getThemeDescriptions();
+        int[] keys={Theme.key_windowBackgroundWhite,Theme.key_windowBackgroundWhiteBlackText,
+            Theme.key_windowBackgroundWhiteGrayText2,Theme.key_windowBackgroundWhiteBlueText,
+            Theme.key_actionBarDefault,Theme.key_actionBarDefaultIcon,Theme.key_actionBarDefaultTitle};
+        for(int key:keys)result.add(new org.telegram.ui.ActionBar.ThemeDescription(null,0,null,(Paint)null,null,this::updateEditorColors,key));
+        return result;
+    }
+    private void updateEditorColors(){
+        if(panel!=null)panel.setBackgroundColor(color(Theme.key_windowBackgroundWhite));
+        if(status!=null)status.setTextColor(color(Theme.key_windowBackgroundWhiteGrayText2));
+        if(editor!=null){editor.updateColors(color(Theme.key_windowBackgroundWhiteBlackText),color(Theme.key_windowBackgroundWhiteGrayText2));highlightParagraph();}
+        if(actionBar!=null){actionBar.setBackgroundColor(color(Theme.key_actionBarDefault));actionBar.setItemsColor(color(Theme.key_actionBarDefaultIcon),false);actionBar.setTitleColor(color(Theme.key_actionBarDefaultTitle));}
+    }
     private void retainEditor(){if(editor!=null&&text!=null){retainedText=editor.getText().toString();retainedStart=editor.getSelectionStart();retainedEnd=editor.getSelectionEnd();}}
     @Override public void clearViews(){retainEditor();AndroidUtilities.cancelRunOnUIThread(highlight);work.cancel();destroyHtml();activeSyntaxHighlights.clear();editor=null;status=null;panel=null;super.clearViews();}
     private interface Result {void ready(FlexyFileEditorActivity owner,Object value);}
