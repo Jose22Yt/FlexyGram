@@ -51,11 +51,16 @@ public final class FlexyFileEditorActivity extends BaseFragment {
         if(explorerReturnScheduled||explorerOwner==null)return;
         explorerReturnScheduled=true;
         BaseFragment host=explorerOwner;String folder=explorerFolder,searchQuery=explorerQuery;android.os.Parcelable scroll=explorerScroll;
-        host.whenFullyVisible(()->{
-            if(host.getParentActivity()==null||!FlexyFiles.enabled())return;
-            FlexyFilesSheet next=new FlexyFilesSheet(host,source,originalName,dialog,account,folder,true,searchQuery,scroll);
+        File browserSource=source;String browserName=originalName;long browserDialog=dialog;int browserAccount=account;
+        // Swipe flags are reset AFTER onBecomeFullyVisible returns. Post once to
+        // the next UI turn; this is event ordering, not a timed delay or polling.
+        host.whenFullyVisible(()->AndroidUtilities.runOnUIThread(()->{
+            Activity activity=host.getParentActivity();
+            if(activity==null||activity.isFinishing()||activity.isDestroyed()||!FlexyFiles.enabled()
+                ||host.getParentLayout()==null||host.getParentLayout().getLastFragment()!=host)return;
+            FlexyFilesSheet next=new FlexyFilesSheet(host,browserSource,browserName,browserDialog,browserAccount,folder,true,searchQuery,scroll);
             if(host.showDialog(next)==null)next.dismiss();
-        });
+        }));
     }
     private String filename(){String name=entry==null?originalName:entry.substring(entry.lastIndexOf('/')+1);return name==null?"edited.txt":name;}
     private int color(int key){return Theme.getColor(key,getResourceProvider());}
