@@ -2815,7 +2815,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                 // former groupMessages == null gate therefore disabled Smart
                 // Previews on the actual home chat list. Preserve multi-item
                 // album/group previews instead of replacing their captions.
-                && (groupMessages == null || groupMessages.size() <= 1)
+                && app.flexygram.home.SignatureSmartPreviews.allowsSingleMessagePreview(groupMessages)
                 // Sender names are on a separate native row in three-line
                 // group layouts. Two-line inline-sender previews stay native.
                 && (messageNameString == null || useForceThreeLines || SharedConfig.useThreeLinesLayout)
