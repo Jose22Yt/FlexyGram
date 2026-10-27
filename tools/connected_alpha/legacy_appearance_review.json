@@ -14,6 +14,7 @@
     "tools/connected_alpha/next_alpha_contract.py": "b89803f9eeeec77010bc677b4bc9ef4ffc05c985",
     "tools/connected_alpha/signature1278_contract.py": "289f271fa4452ea7dcf5ad9f31006149a8bbd0f2",
     "tools/connected_alpha/test_fusion_v3.py": "2bc81115b5c96206b178ddd743f6211d907d63ec",
+    "tools/connected_alpha/test_header1273.py": "bfa92495c4d432c4d8efdf0a8f63df79ed8a77fa",
     "tools/connected_alpha/test_legacy_appearance.py": "e96c1e5647c0ab9ce1190cadca3af5ff5b1ed782",
     "tools/connected_alpha/test_signature_matte.py": "db9e1e451361d6be7a25daa790f425116456439d"
   },
@@ -32,6 +33,7 @@
     "tools/connected_alpha/next_alpha_contract.py",
     "tools/connected_alpha/signature1278_contract.py",
     "tools/connected_alpha/test_fusion_v3.py",
+    "tools/connected_alpha/test_header1273.py",
     "tools/connected_alpha/test_legacy_appearance.py",
     "tools/connected_alpha/test_signature_matte.py"
   ]
