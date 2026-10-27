@@ -50,8 +50,6 @@ import tw.nekomimi.nekogram.settings.NekoEmojiSettingsActivity;
 import tw.nekomimi.nekogram.ui.cells.HeaderCell;
 import xyz.nextalone.nagram.NaConfig;
 
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Экран «Оформление» раздела openExtera — визуальный порт AppearancePreferencesActivity
@@ -68,15 +66,10 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
     private static final int TYPE_CHAT_LIST = 101;
     private static final int TYPE_FOLDERS = 102;
     private static final int TYPE_SECTION_SLIDER = 103;
-    /** Сворачиваемая группа со счётчиком и шевроном. */
-    private static final int TYPE_EXPANDABLE_SWITCH = 104;
-    /** Круглая галочка внутри группы. */
-    private static final int TYPE_ROUND_CHECK = 105;
     /** Две карточки-превью формы плавающей кнопки. */
     private static final int TYPE_FAB_SHAPE = 106;
 
     private int avatarsHeaderRow, iconsHeaderRow, iconsDividerRow;
-    private int md3HeaderRow, md3DividerRow, iosHeaderRow, iosDividerRow;
 
     // Appearance
     private int appearanceHeaderRow;
@@ -111,21 +104,6 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
     private int chatListPreviewRow;
     private int forceSnowRow;
     private int centerTitleRow;
-    // Material Design 3: сворачиваемая группа и пять вложенных стилей.
-    private int md3GroupRow;
-    private int md3LoadingRow;
-    private int md3SliderRow;
-    private int md3SwitchRow;
-    private int md3ChatHeaderRow;
-    private int md3NavBarRow;
-    private int md3ListItemsRow;
-    private int md3PlayerRow;
-    private int md3MiniPlayerRow;
-    private boolean md3Expanded;
-    private int iosGroupRow;
-    private int iosNavBarRow;
-    private int iosChatHeaderRow;
-    private boolean iosExpanded;
     private int senderMiniAvatarsRow;
     private int titleTextRow;
     private int chatListDividerRow;
@@ -163,13 +141,6 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
     public OpenExteraAppearanceActivity() {
         super();
         AppearanceConfig.init();
-    }
-
-    @Override
-    protected List<CollapsibleGroup> collapsibleGroups() {
-        return Arrays.asList(
-                new CollapsibleGroup(() -> md3Expanded, expanded -> md3Expanded = expanded),
-                new CollapsibleGroup(() -> iosExpanded, expanded -> iosExpanded = expanded));
     }
 
     @Override
@@ -212,32 +183,6 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
         useSystemFontsRow = addRow("useSystemFonts");
         customThemesRow = addRow("customThemes");
         appearanceDividerRow = addRow();
-
-        md3HeaderRow = addRow("matteMd3Header");
-        md3GroupRow = addRow("md3Styles");
-        if (md3Expanded) {
-            md3LoadingRow = addRow("md3Loading");
-            md3SliderRow = addRow("md3Slider");
-            md3SwitchRow = addRow("md3Switch");
-            md3ChatHeaderRow = addRow("md3ChatHeader");
-            md3NavBarRow = addRow("md3NavBar");
-            md3ListItemsRow = addRow("md3ListItems");
-            md3PlayerRow = addRow("md3Player");
-            md3MiniPlayerRow = addRow("md3MiniPlayer");
-        } else {
-            md3LoadingRow = md3SliderRow = md3SwitchRow = md3ChatHeaderRow = md3NavBarRow = md3ListItemsRow = -1;
-            md3PlayerRow = md3MiniPlayerRow = -1;
-        }
-        md3DividerRow = addRow();
-        iosHeaderRow = addRow("matteIosHeader");
-        iosGroupRow = addRow("iosStyles");
-        if (iosExpanded) {
-            iosNavBarRow = addRow("iosNavBar");
-            iosChatHeaderRow = addRow("iosChatHeader");
-        } else {
-            iosNavBarRow = iosChatHeaderRow = -1;
-        }
-        iosDividerRow = addRow();
 
         sectionsHeaderRow = addRow("sectionsHeader");
         sectionRadiusRow = addRow("sectionRadius");
@@ -327,24 +272,6 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
         if (listAdapter != null && row >= 0) {
             listAdapter.notifyItemChanged(row);
         }
-    }
-
-    private void rebuildAllAndSelf(View clicked, boolean checked) {
-        if (clicked instanceof org.telegram.ui.Cells.CheckBoxCell) {
-            ((org.telegram.ui.Cells.CheckBoxCell) clicked).setChecked(checked, true);
-        }
-        if (listAdapter != null && md3GroupRow >= 0) {
-            listAdapter.notifyItemChanged(md3GroupRow);
-        }
-        if (listAdapter != null && iosGroupRow >= 0) {
-            listAdapter.notifyItemChanged(iosGroupRow);
-        }
-        if (listView != null) {
-            for (int i = 0; i < listView.getChildCount(); i++) {
-                listView.getChildAt(i).invalidate();
-            }
-        }
-        rebuildAll();
     }
 
     private void showRestartHint() {
@@ -566,78 +493,6 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
         } else if (position == hidingRow) {
             presentFragment(new OpenExteraChatsActivity(OpenExteraChatsActivity.SCREEN_HIDING));
             return;
-        } else if (position == md3GroupRow) {
-            md3Expanded = !md3Expanded;
-            rebuildRowsAndNotify();
-            return;
-        } else if (position == md3LoadingRow) {
-            AppearanceConfig.newLoadingStyle.setConfigBool(!AppearanceConfig.newLoadingStyle.Bool());
-            rebuildAllAndSelf(view, AppearanceConfig.newLoadingStyle.Bool());
-            return;
-        } else if (position == md3SliderRow) {
-            // Стиль слайдера читается в SeekBarView.getEffectiveSliderStyle() на каждой отрисовке,
-            // стиль переключателя — в Switch на каждой; перезапуск не нужен, хватает пересборки
-            // вьюх — так же делает NekoGeneralSettingsActivity.
-            NaConfig.INSTANCE.getSliderStyle().setConfigInt(
-                    isMd3(NaConfig.INSTANCE.getSliderStyle().Int()) ? 0 : STYLE_MD3);
-            if (avatarCornersPreviewCell != null) {
-                avatarCornersPreviewCell.invalidate();
-            }
-            rebuildAllAndSelf(view, isMd3(NaConfig.INSTANCE.getSliderStyle().Int()));
-            return;
-        } else if (position == md3SwitchRow) {
-            NaConfig.INSTANCE.getSwitchStyle().setConfigInt(
-                    isMd3(NaConfig.INSTANCE.getSwitchStyle().Int()) ? 0 : STYLE_MD3);
-            rebuildAllAndSelf(view, isMd3(NaConfig.INSTANCE.getSwitchStyle().Int()));
-            return;
-        } else if (position == md3ChatHeaderRow) {
-            AppearanceConfig.newChatHeaderStyle.setConfigBool(!AppearanceConfig.newChatHeaderStyle.Bool());
-            rebuildAllAndSelf(view, AppearanceConfig.newChatHeaderStyle.Bool());
-            return;
-        } else if (position == md3NavBarRow) {
-            boolean enable = !AppearanceConfig.newNavigationBarStyle.Bool();
-            AppearanceConfig.newNavigationBarStyle.setConfigBool(enable);
-            if (enable) {
-                AppearanceConfig.iosNavigationBarStyle.setConfigBool(false);
-                notifyRow(iosNavBarRow);
-                leaveFloatingBottomNavigation();
-            }
-            rebuildAllAndSelf(view, enable);
-            return;
-        } else if (position == md3ListItemsRow) {
-            AppearanceConfig.m3ListItems.setConfigBool(!AppearanceConfig.m3ListItems.Bool());
-            onM3ListItemsChanged();
-            rebuildAllAndSelf(view, AppearanceConfig.m3ListItems.Bool());
-            return;
-        } else if (position == md3PlayerRow) {
-            AppearanceConfig.md3Player.setConfigBool(!AppearanceConfig.md3Player.Bool());
-            rebuildAllAndSelf(view, AppearanceConfig.md3Player.Bool());
-            return;
-        } else if (position == md3MiniPlayerRow) {
-            AppearanceConfig.md3MiniPlayer.setConfigBool(!AppearanceConfig.md3MiniPlayer.Bool());
-            rebuildAllAndSelf(view, AppearanceConfig.md3MiniPlayer.Bool());
-            return;
-        } else if (position == iosGroupRow) {
-            iosExpanded = !iosExpanded;
-            rebuildRowsAndNotify();
-            return;
-        } else if (position == iosNavBarRow) {
-            boolean enable = !AppearanceConfig.iosNavigationBarStyle.Bool();
-            AppearanceConfig.iosNavigationBarStyle.setConfigBool(enable);
-            if (enable) {
-                AppearanceConfig.newNavigationBarStyle.setConfigBool(false);
-                notifyRow(md3NavBarRow);
-            }
-            rebuildAllAndSelf(view, enable);
-            return;
-        } else if (position == iosChatHeaderRow) {
-            if (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) {
-                presentFragment(new app.flexygram.header.HeaderSettingsActivity());
-                return;
-            }
-            AppearanceConfig.iosChatHeader.setConfigBool(!AppearanceConfig.iosChatHeader.Bool());
-            rebuildAllAndSelf(view, AppearanceConfig.iosChatHeader.Bool());
-            return;
         } else if (position == dividerStyleRow) {
             showSelector(position, getString(R.string.OEAppearanceDividerStyle), new CharSequence[]{
                     getString(R.string.OEAppearanceDividerHidden),
@@ -829,21 +684,6 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
         public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View view;
             switch (viewType) {
-                case TYPE_EXPANDABLE_SWITCH:
-                    view = new app.flexygram.settings.MatteExpandableSwitchCell(mContext);
-                    view.setBackgroundColor(getThemedColor(Theme.key_windowBackgroundWhite));
-                    break;
-                case TYPE_ROUND_CHECK: {
-                    // Тип 4 — круглая галочка с отступом под вложенный пункт,
-                    // ровно как у exteraGram в UniversalAdapter (view type 35).
-                    org.telegram.ui.Cells.CheckBoxCell checkBoxCell =
-                            new org.telegram.ui.Cells.CheckBoxCell(mContext, 4, 21, resourcesProvider);
-                    checkBoxCell.getCheckBoxRound().setColor(Theme.key_switch2TrackChecked,
-                            Theme.key_radioBackground, Theme.key_checkboxCheck);
-                    checkBoxCell.setBackgroundColor(getThemedColor(Theme.key_windowBackgroundWhite));
-                    view = checkBoxCell;
-                    break;
-                }
                 case TYPE_AVATAR_CORNERS:
                     avatarCornersPreviewCell = new AvatarCornersPreviewCell(mContext,
                             OpenExteraAppearanceActivity.this::rebuildAll);
@@ -893,10 +733,6 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
                         cell.setText(getString(R.string.FlexyMatteAvatars));
                     } else if (position == iconsHeaderRow) {
                         cell.setText(getString(R.string.FlexyMatteIcons));
-                    } else if (position == md3HeaderRow) {
-                        cell.setText(getString(R.string.OEAppearanceMaterialDesign3));
-                    } else if (position == iosHeaderRow) {
-                        cell.setText(getString(R.string.OEAppearanceIosDesign));
                     } else if (position == appearanceHeaderRow) {
                         cell.setText(getString(R.string.FlexyMatteInterface));
                     } else if (position == sectionsHeaderRow) {
@@ -946,72 +782,9 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
                     }
                     break;
                 }
-                case TYPE_EXPANDABLE_SWITCH: {
-                    org.telegram.ui.Cells.TextCheckCell2 cell =
-                            (org.telegram.ui.Cells.TextCheckCell2) holder.itemView;
-                    // Иначе выключенная группа горит красным: Switch по умолчанию
-                    // идёт в «разрешительных» цветах экрана прав участника.
-                    cell.useStandardSwitchColors();
-                    if (position == iosGroupRow) {
-                        cell.setTextAndCheck(getString(R.string.OEAppearanceIosDesign),
-                                iosSelectedCount() > 0, true);
-                        cell.setCollapseArrow(iosSelectedCount() + "/" + IOS_STYLE_COUNT, !iosExpanded,
-                                OpenExteraAppearanceActivity.this::toggleAllIosStyles);
-                        break;
-                    }
-                    cell.setTextAndCheck(getString(R.string.OEAppearanceMaterialDesign3),
-                            md3SelectedCount() > 0, true);
-                    // Правая зона (76 dp за разделителем) — сам переключатель, как у exteraGram:
-                    // туда уходит клик по мастер-тумблеру. Тело строки сворачивает группу.
-                    cell.setCollapseArrow(md3SelectedCount() + "/" + MD3_STYLE_COUNT, !md3Expanded,
-                            OpenExteraAppearanceActivity.this::toggleAllMd3StylesFromCell);
-                    break;
-                }
-                case TYPE_ROUND_CHECK: {
-                    org.telegram.ui.Cells.CheckBoxCell cell =
-                            (org.telegram.ui.Cells.CheckBoxCell) holder.itemView;
-                    if (position == md3LoadingRow) {
-                        cell.setText(getString(R.string.OEAppearanceNewLoadingStyle), "",
-                                AppearanceConfig.newLoadingStyle.Bool(), true, true);
-                    } else if (position == md3SliderRow) {
-                        cell.setText(getString(R.string.OEAppearanceSliderStyle), "",
-                                isMd3(NaConfig.INSTANCE.getSliderStyle().Int()), true, true);
-                    } else if (position == md3SwitchRow) {
-                        cell.setText(getString(R.string.OEAppearanceSwitchStyle), "",
-                                isMd3(NaConfig.INSTANCE.getSwitchStyle().Int()), true, true);
-                    } else if (position == md3ChatHeaderRow) {
-                        cell.setText(getString(R.string.OEAppearanceNewChatHeaderStyle), "",
-                                AppearanceConfig.newChatHeaderStyle.Bool(), true, true);
-                    } else if (position == md3NavBarRow) {
-                        cell.setText(getString(R.string.OEAppearanceNewNavigationBarStyle), "",
-                                AppearanceConfig.newNavigationBarStyle.Bool(), true, true);
-                    } else if (position == md3ListItemsRow) {
-                        cell.setText(getString(R.string.OEAppearanceM3ListItems), "",
-                                AppearanceConfig.m3ListItems.Bool(), true, true);
-                    } else if (position == md3PlayerRow) {
-                        cell.setText(getString(R.string.OEAppearanceMd3Player), "",
-                                AppearanceConfig.md3Player.Bool(), true, true);
-                    } else if (position == md3MiniPlayerRow) {
-                        cell.setText(getString(R.string.OEAppearanceMd3MiniPlayer), "",
-                                AppearanceConfig.md3MiniPlayer.Bool(), false, true);
-                    } else if (position == iosNavBarRow) {
-                        cell.setText(getString(R.string.OEAppearanceIosNavigationBarStyle), "",
-                                AppearanceConfig.iosNavigationBarStyle.Bool(), true, true);
-                    } else if (position == iosChatHeaderRow) {
-                        cell.setText(getString(R.string.OEAppearanceIosChatHeader), "",
-                                AppearanceConfig.iosChatHeader.Bool(), false, true);
-                    }
-                    cell.setPad(1);
-                    // По умолчанию ячейка этого типа красит текст серым; у exteraGram
-                    // вложенные пункты того же цвета, что и обычные строки.
-                    cell.setTextColor(getThemedColor(Theme.key_windowBackgroundWhiteBlackText));
-                    break;
-                }
                 case TYPE_SETTINGS: {
                     TextSettingsCell cell = (TextSettingsCell) holder.itemView;
-                    if (position == iosChatHeaderRow) {
-                        cell.setTextAndValue(getString(R.string.OEAppearanceIosChatHeader), "", false);
-                    } else if (position == dividerStyleRow) {
+                    if (position == dividerStyleRow) {
                         String[] v = {getString(R.string.OEAppearanceDividerHidden), getString(R.string.OEAppearanceDividerLine), getString(R.string.OEAppearanceDividerSegments)};
                         cell.setTextAndValue(getString(R.string.OEAppearanceDividerStyle), v[clamp(AppearanceConfig.dividerStyle.Int(), v.length)], false);
                     } else if (position == glassOutlineRow) {
@@ -1055,11 +828,7 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
                     // Скруглённый «хвост» списка положен последней тени, а она у нас после блока
                     // Blur, а не после строк-переходов.
                     boolean bottom = position == blurDividerRow;
-                    if (position == md3DividerRow) {
-                        cell.setText(getString(R.string.FlexyMatteMd3Info));
-                    } else if (position == iosDividerRow) {
-                        cell.setText(getString(R.string.FlexyMatteIosInfo));
-                    } else if (position == appearanceDividerRow) {
+                    if (position == appearanceDividerRow) {
                         cell.setText(getString(R.string.OEAppearanceCustomThemesInfo));
                     } else if (position == blurDividerRow) {
                         cell.setText(getString(R.string.OEAppearanceBlurInfo));
@@ -1080,23 +849,6 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
             }
         }
 
-        /**
-         * Свои типы ячеек базовый адаптер считает некликабельными.
-         *
-         * Для превью это верно, а группа Material Design 3 и галочки внутри неё
-         * обработчики имеют: RecyclerListView не только не доводил до них клик,
-         * но и звал setEnabled(false) на строке (onChildAttachedToWindow) — из-за
-         * чего вся группа выглядела погашенной.
-         */
-        @Override
-        public boolean isEnabled(RecyclerView.ViewHolder holder) {
-            final int type = holder.getItemViewType();
-            if (type == TYPE_EXPANDABLE_SWITCH || type == TYPE_ROUND_CHECK) {
-                return true;
-            }
-            return super.isEnabled(holder);
-        }
-
         @Override
         public int getItemViewType(int position) {
             if (position == avatarCornersPreviewRow) {
@@ -1111,29 +863,19 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
                     || position == blurHeaderRow || position == chatListHeaderRow
                     || position == foldersHeaderRow || position == linksHeaderRow
                     || position == avatarsHeaderRow || position == iconsHeaderRow
-                    || position == md3HeaderRow || position == iosHeaderRow) {
+) {
                 return TYPE_HEADER;
             } else if (position == appearanceDividerRow || position == sectionsDividerRow
                     || position == blurDividerRow || position == avatarsDividerRow
                     || position == chatListDividerRow || position == foldersDividerRow
                     || position == linksDividerRow || position == iconsDividerRow
-                    || position == md3DividerRow || position == iosDividerRow) {
+) {
                 return TYPE_INFO_PRIVACY;
             } else if (position == fabShapeRow) {
                 return TYPE_FAB_SHAPE;
             } else if (position == appNavigationRow || position == iconPacksRow
                     || position == emojiSetsRow || position == pillStackRow || position == hidingRow) {
                 return TYPE_DETAIL_SETTINGS;
-            } else if (position == md3GroupRow || position == iosGroupRow) {
-                return TYPE_EXPANDABLE_SWITCH;
-            } else if (position == iosChatHeaderRow && org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) {
-                return TYPE_SETTINGS;
-            } else if (position == md3LoadingRow || position == md3SliderRow
-                    || position == md3SwitchRow || position == md3ChatHeaderRow
-                    || position == md3NavBarRow || position == md3ListItemsRow
-                    || position == md3PlayerRow || position == md3MiniPlayerRow
-                    || position == iosNavBarRow || position == iosChatHeaderRow) {
-                return TYPE_ROUND_CHECK;
             } else if (position == dividerStyleRow || position == glassOutlineRow
                     || position == tabTitleStyleRow
                     || position == tabCounterRow || position == titleTextRow) {
@@ -1141,100 +883,6 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
             }
             return TYPE_CHECK;
         }
-    }
-
-    /** Сколько стилей MD3 включено. Счётчик «N/8» рядом с шевроном. */
-    private static final int MD3_STYLE_COUNT = 8;
-    /** Значение селектора NagramX, соответствующее Material Design 3. */
-    private static final int STYLE_MD3 = 2;
-
-    private static boolean isMd3(int styleValue) {
-        return styleValue == STYLE_MD3;
-    }
-
-    private int md3SelectedCount() {
-        int n = 0;
-        if (AppearanceConfig.newLoadingStyle.Bool()) n++;
-        if (isMd3(NaConfig.INSTANCE.getSliderStyle().Int())) n++;
-        if (isMd3(NaConfig.INSTANCE.getSwitchStyle().Int())) n++;
-        if (AppearanceConfig.newChatHeaderStyle.Bool()) n++;
-        if (AppearanceConfig.newNavigationBarStyle.Bool()) n++;
-        if (AppearanceConfig.m3ListItems.Bool()) n++;
-        if (AppearanceConfig.md3Player.Bool()) n++;
-        if (AppearanceConfig.md3MiniPlayer.Bool()) n++;
-        return n;
-    }
-
-    private void onM3ListItemsChanged() {
-        AppearanceConfig.invalidateDividerStyle();
-        Theme.applyCommonTheme();
-        if (listAdapter != null && separateHeadersRow >= 0) {
-            listAdapter.notifyItemChanged(separateHeadersRow);
-        }
-        if (listView != null) {
-            listView.invalidateItemDecorations();
-        }
-    }
-
-    /**
-     * Клик по мастер-переключателю группы: если включено хоть что-то — гасим всё,
-     * иначе включаем всё. Так же ведёт себя handleMD3StylesSwitchClick exteraGram.
-     */
-    private void toggleAllMd3StylesFromCell() {
-        toggleAllMd3Styles();
-    }
-
-    private static void leaveFloatingBottomNavigation() {
-        if (MainTabsLayout.isBottomNavigationFloating()) {
-            MainTabsLayout.setBottomNavigationMode(MainTabsLayout.BOTTOM_NAVIGATION_MODE_SHOW);
-        }
-    }
-
-    private static final int IOS_STYLE_COUNT = 2;
-
-    private int iosSelectedCount() {
-        int n = 0;
-        if (AppearanceConfig.iosNavigationBarStyle.Bool()) n++;
-        if (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA
-                ? app.flexygram.header.HeaderConfig.signature() : AppearanceConfig.iosChatHeader.Bool()) n++;
-        return n;
-    }
-
-    private void toggleAllIosStyles() {
-        boolean enable = iosSelectedCount() == 0;
-        AppearanceConfig.iosNavigationBarStyle.setConfigBool(enable);
-        AppearanceConfig.iosChatHeader.setConfigBool(enable);
-        if (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) {
-            app.flexygram.header.HeaderConfig.style(enable);
-        }
-        if (enable) {
-            AppearanceConfig.newNavigationBarStyle.setConfigBool(false);
-        }
-        rebuildAll();
-        rebuildRowsAndNotify();
-    }
-
-    private void toggleAllMd3Styles() {
-        boolean enable = md3SelectedCount() == 0;
-        AppearanceConfig.newLoadingStyle.setConfigBool(enable);
-        AppearanceConfig.newChatHeaderStyle.setConfigBool(enable);
-        AppearanceConfig.newNavigationBarStyle.setConfigBool(enable);
-        AppearanceConfig.m3ListItems.setConfigBool(enable);
-        AppearanceConfig.md3Player.setConfigBool(enable);
-        AppearanceConfig.md3MiniPlayer.setConfigBool(enable);
-        onM3ListItemsChanged();
-        if (enable) {
-            AppearanceConfig.iosNavigationBarStyle.setConfigBool(false);
-            leaveFloatingBottomNavigation();
-        }
-        NaConfig.INSTANCE.getSliderStyle().setConfigInt(enable ? STYLE_MD3 : 0);
-        NaConfig.INSTANCE.getSwitchStyle().setConfigInt(enable ? STYLE_MD3 : 0);
-        if (avatarCornersPreviewCell != null) {
-            avatarCornersPreviewCell.invalidate();
-        }
-        // Перезапуск не нужен: все восемь стилей читаются при отрисовке или при создании вьюх.
-        rebuildAll();
-        rebuildRowsAndNotify();
     }
 
     private static int clamp(int value, int size) {
