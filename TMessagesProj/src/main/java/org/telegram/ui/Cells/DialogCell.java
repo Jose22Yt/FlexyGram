@@ -2793,7 +2793,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                 && message != null && draftMessage == null && !draftVoice
                 && TextUtils.isEmpty(printingString) && customDialog == null
                 && !isForumCell() && !isFolderCell() && !hasTags()
-                && messageNameString == null && groupMessages == null
+                && thumbsCount == 0 && messageNameString == null && groupMessages == null
                 && !isTopic && (message.messageOwner.restriction_reason == null
                      || message.messageOwner.restriction_reason.isEmpty())) {
             int candidate=app.flexygram.home.SignatureSmartPreviews.kind(message);
