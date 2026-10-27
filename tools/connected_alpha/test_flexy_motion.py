@@ -209,6 +209,16 @@ public class FlexyMotionProbe {
             path='TMessagesProj/src/main/java/app/exteraless/player/'+name
             self.assertEqual(subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT),(ROOT/path).read_bytes())
 
+    def test_bot_native_model_layout_and_command_binding_are_unchanged(self):
+        import sys
+        sys.path.insert(0,str(ROOT/'tools/connected_alpha'))
+        from motion_contract import BASE
+        path='TMessagesProj/src/main/java/org/telegram/ui/bots/BotKeyboardView.java'
+        old=subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT,text=True)
+        new=(ROOT/path).read_text()
+        self.assertEqual(1,new.count('private class Button extends app.flexygram.motion.FlexyPressFrameLayout'))
+        self.assertEqual(old,new.replace('private class Button extends app.flexygram.motion.FlexyPressFrameLayout','private class Button extends FrameLayout'))
+
     def test_runtime_uses_frame_clock_not_system_duration_scale(self):
         frame = (JAVA / "FlexyFrameMotion.java").read_text()
         settings = (JAVA / "FlexyMotionSettings.java").read_text()

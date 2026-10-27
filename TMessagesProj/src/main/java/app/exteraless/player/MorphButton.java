@@ -183,12 +183,13 @@ public class MorphButton extends android.view.View {
     }
 
     @Override public boolean dispatchTouchEvent(MotionEvent event) {
-        if (pressFeedback == null && event.getActionMasked() == MotionEvent.ACTION_DOWN) pressFeedback = new FlexyTouchFeedback(this);
+        if (pressFeedback == null && isEnabled() && event.getActionMasked() == MotionEvent.ACTION_DOWN) pressFeedback = new FlexyTouchFeedback(this);
         if (pressFeedback != null) pressFeedback.onTouch(event);
         return super.dispatchTouchEvent(event);
     }
 
     @Override public void draw(Canvas canvas) {
+        if (pressFeedback == null) { super.draw(canvas); return; }
         final int save = canvas.save();
         if (pressFeedback != null) pressFeedback.transform(canvas);
         super.draw(canvas);

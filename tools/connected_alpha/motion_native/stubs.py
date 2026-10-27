@@ -51,3 +51,6 @@ public class PopupMotionProbe extends PopupWindow {
 
  from player_probe import write as write_player
  write_player(put,root)
+
+ from bot_probe import write as write_bot
+ write_bot(put,root,source)

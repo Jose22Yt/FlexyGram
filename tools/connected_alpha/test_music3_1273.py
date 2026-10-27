@@ -12,6 +12,10 @@ class Music3(unittest.TestCase):
  def test_seek_actions_and_playback_transport_handlers_are_native(self):
   from test_signature_matte import body
   p=PLAYER+'PlayerSheet.java';before=subprocess.check_output(['git','show',BASE+':'+p],cwd=ROOT,text=True);after=(ROOT/p).read_text()
+  # Normalize only the reviewed visual timeline factory. Transport/seek/queue logic stays raw.
+  migrated='lyricsAnimator = new app.flexygram.motion.FlexyMotionAnimator(root, lyricsFraction, target, this::setLyricsFraction);'
+  native='lyricsAnimator = ValueAnimator.ofFloat(lyricsFraction, target);\n        lyricsAnimator.addUpdateListener(a -> setLyricsFraction((float) a.getAnimatedValue()));'
+  self.assertEqual(1,after.count(migrated));after=after.replace(migrated,native)
   for anchor in ['public void onSeekStart(', 'public void onSeekMove(', 'public void onSeekEnd(', 'private void togglePlay(', 'private void cycleSpeed(', 'private void openQueue(', 'private void setLyricsMode(', 'private void toggleProfile(']:self.assertEqual(body(before,anchor),body(after,anchor),anchor)
   self.assertIn('if (BuildConfig.CONNECTED_ALPHA || !animated)',after);self.assertIn('cover.setListener(fallbackSeed, null)',after)
  def test_static_columns_and_fade_have_no_frame_work_or_extra_bitmaps(self):
