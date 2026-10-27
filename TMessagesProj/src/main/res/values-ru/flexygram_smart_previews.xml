@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexySmartPreviewsTitle">Умный предпросмотр сообщений</string>
+    <string name="FlexySmartPreviewAdaptive">Адаптивные цвета по типу</string>
+    <string name="FlexySmartPreviewAccent">Акцент темы</string>
+    <string name="FlexySmartPreviewMatte">Signature Matte</string>
+    <string name="FlexySmartPreviewOff">Выключено</string>
+</resources>
