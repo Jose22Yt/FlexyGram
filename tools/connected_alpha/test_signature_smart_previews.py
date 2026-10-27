@@ -38,6 +38,15 @@ class SmartPreviews(unittest.TestCase):
                 public static boolean isEmpty(CharSequence s){return s==null||s.length()==0;} }''',
             "org/telegram/messenger/ApplicationLoader.java": '''package org.telegram.messenger;
                 public class ApplicationLoader{public static android.content.Context applicationContext=new android.content.Context();}''',
+            "org/telegram/messenger/R.java": '''package org.telegram.messenger;
+                public final class R { public static final class string {
+                    public static final int FlexySmartFile=1,FlexySmartMusic=2,FlexySmartLink=3,
+                            FlexySmartPhoto=4,FlexySmartVideo=5,FlexySmartGroupEvent=6;
+                }}''',
+            "org/telegram/messenger/LocaleController.java": '''package org.telegram.messenger;
+                public class LocaleController {
+                    public static String getString(int id){return "Label"+id;}
+                }''',
             "org/telegram/messenger/FileLoader.java": '''package org.telegram.messenger;
                 public class FileLoader{public static String getDocumentFileName(org.telegram.tgnet.TLRPC.Document d){
                     return d==null?"":d.file_name;} }''',
@@ -95,7 +104,9 @@ class SmartPreviews(unittest.TestCase):
                         MessageObject group=m();group.messageOwner.action=new TLRPC.TL_messageActionChatAddUser();
                         group.messageText="Joined group";verify(5,group);
                         MessageObject link=m();link.messageOwner.media=new TLRPC.TL_messageMediaWebPage();
-                        link.messageOwner.message="https://example.com";verify(4,link);
+                        link.messageOwner.message="https://example.com/path?token=secret";verify(4,link);
+                        String compact=SignatureSmartPreviews.label(link,4);
+                        ok(compact.contains("example.com")&&!compact.contains("secret")&&!compact.contains("path"),"private URL path not surfaced");
                         link.messageOwner.message="Please visit https://example.com";verify(0,link);
                         MessageObject simpleLink=m();simpleLink.messageOwner.message="https://example.com";
                         verify(4,simpleLink);
@@ -168,7 +179,7 @@ class SmartPreviews(unittest.TestCase):
             p=ROOT/"TMessagesProj/src/main/res"/locale/"flexygram_smart_previews.xml"
             tree=ET.parse(p)
             names={c.attrib["name"] for c in tree.getroot()}
-            self.assertEqual(len(names),5)
+            self.assertEqual(len(names),11)
 
     def test_exact_review(self):
         from smart_previews1278_contract import verify_current
