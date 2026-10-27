@@ -18,7 +18,7 @@ import org.robolectric.shadows.ShadowValueAnimator;
 public class MotionEngineTest {
  Activity activity;Button button;
  void advance(int ms){Shadows.shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(ms));}
- @Before public void setup(){org.robolectric.shadows.ShadowChoreographer.setPaused(true);org.robolectric.shadows.ShadowChoreographer.setFrameDelay(Duration.ofMillis(16));activity=Robolectric.buildActivity(Activity.class).setup().visible().get();button=new Button(activity);activity.setContentView(button);button.layout(0,0,200,100);advance(32);org.robolectric.util.ReflectionHelpers.setField(org.robolectric.util.ReflectionHelpers.getField(button,"mAttachInfo"),"mWindowVisibility",View.VISIBLE);assertTrue("attached",button.isAttachedToWindow());assertTrue("shown",button.isShown());assertEquals("window visibility",View.VISIBLE,button.getWindowVisibility());FlexyMotionSettings.setProfile(activity,FlexyMotionProfile.FLOW);FlexyMotionSettings.setReduceMotion(activity,false);}
+ @Before public void setup(){org.robolectric.util.ReflectionHelpers.callStaticMethod(android.animation.ValueAnimator.class,"setDurationScale",org.robolectric.util.ReflectionHelpers.ClassParameter.from(float.class,1f));org.robolectric.shadows.ShadowChoreographer.setPaused(true);org.robolectric.shadows.ShadowChoreographer.setFrameDelay(Duration.ofMillis(16));activity=Robolectric.buildActivity(Activity.class).setup().visible().get();button=new Button(activity);activity.setContentView(button);button.layout(0,0,200,100);advance(32);org.robolectric.util.ReflectionHelpers.setField(org.robolectric.util.ReflectionHelpers.getField(button,"mAttachInfo"),"mWindowVisibility",View.VISIBLE);assertTrue("attached",button.isAttachedToWindow());assertTrue("shown",button.isShown());assertEquals("window visibility",View.VISIBLE,button.getWindowVisibility());FlexyMotionSettings.setProfile(activity,FlexyMotionProfile.FLOW);FlexyMotionSettings.setReduceMotion(activity,false);}
  @After public void finish(){activity.finish();advance(32);assertEquals(0,FlexyFrameMotion.activeCount());}
  @Test public void scalesDoNotControlMigratedClock(){
   for(FlexyMotionProfile profile:FlexyMotionProfile.values()){FlexyMotionSettings.setProfile(activity,profile);float reference=0;
@@ -49,4 +49,38 @@ public class MotionEngineTest {
  @Test public void hiddenOwnerStopsAtNextFrame(){FlexyFrameMotion m=new FlexyFrameMotion(button,0,v->{});m.animateTo(1);button.setVisibility(View.GONE);advance(32);assertFalse(m.isRunning());assertEquals(0,FlexyFrameMotion.activeCount());m.dispose();}
  @Test public void cancelAnotherOwnerDuringCallbackDoesNotSkipCleanup(){final FlexyFrameMotion[] other={null};FlexyFrameMotion first=new FlexyFrameMotion(button,0,v->{if(other[0]!=null)other[0].cancel();});other[0]=new FlexyFrameMotion(button,0,v->{});first.animateTo(1);other[0].animateTo(1);advance(100);assertFalse(other[0].isRunning());first.dispose();other[0].dispose();}
  @Test public void multipleOwnersShareClockAndReleaseAll(){FlexyFrameMotion a=new FlexyFrameMotion(button,0,v->{}),b=new FlexyFrameMotion(button,1,v->{});a.animateTo(1);b.animateTo(0);assertEquals(2,FlexyFrameMotion.activeCount());advance(1500);assertEquals(0,FlexyFrameMotion.activeCount());a.dispose();b.dispose();}
+ PopupMotionProbe popup(){
+  android.widget.FrameLayout content=new android.widget.FrameLayout(activity);content.addView(new PopupMotionProbe.ActionBarPopupWindowLayout(activity),new android.widget.FrameLayout.LayoutParams(300,100));
+  PopupMotionProbe p=new PopupMotionProbe(content);p.setAnimationStyle(0);p.setFlexyMotionEnabled(true);p.showAtLocation(button,Gravity.TOP|Gravity.LEFT,0,0);advance(32);
+  org.robolectric.util.ReflectionHelpers.setField(org.robolectric.util.ReflectionHelpers.getField(content,"mAttachInfo"),"mWindowVisibility",View.VISIBLE);
+  assertTrue(content.isAttachedToWindow());assertTrue(content.isShown());return p;
+ }
+ @Test public void optedInPopupHasOnlyOneOwnerAndForcedCloseReleasesExactlyOnce(){
+  PopupMotionProbe p=popup();p.dismiss(true);Object owner=p.current();assertNotNull(owner);assertTrue(p.notificationsLocker.held);assertNull(org.robolectric.util.ReflectionHelpers.getField(p,"windowAnimatorSet"));
+  for(int i=0;i<50;i++)p.dismiss(true);assertSame(owner,p.current());assertEquals(1,p.notificationsLocker.locks);advance(64);assertTrue(p.isShowing());
+  p.dismiss(false);assertFalse(p.isShowing());assertNull(p.current());assertEquals(1,p.notificationsLocker.releases);assertEquals(1,p.unregisters);advance(500);assertEquals(1,p.unregisters);
+ }
+ @Test public void optedInPopupCompletesNativeDismissAndUnlocks(){PopupMotionProbe p=popup();p.dismiss(true);advance(500);assertFalse(p.isShowing());assertNull(p.current());assertEquals(1,p.unregisters);assertEquals(p.notificationsLocker.locks,p.notificationsLocker.releases);assertEquals(0,FlexyFrameMotion.activeCount());}
+ @Test public void popupClockIsIndependentForEveryProfileAndAndroidScale(){
+  for(FlexyMotionProfile profile:FlexyMotionProfile.values())for(float scale:new float[]{0,.5f,1,2,5}){
+   org.robolectric.util.ReflectionHelpers.callStaticMethod(android.animation.ValueAnimator.class,"setDurationScale",org.robolectric.util.ReflectionHelpers.ClassParameter.from(float.class,scale));
+   FlexyMotionSettings.setProfile(activity,profile);PopupMotionProbe p=popup();p.dismiss(true);
+   if(profile==FlexyMotionProfile.FLASH)assertFalse(p.isShowing());else{assertTrue(p.isShowing());advance(64);assertTrue(p.isShowing());advance(500);assertFalse(p.isShowing());}
+   assertEquals(1,p.unregisters);assertEquals(1,p.notificationsLocker.releases);
+  }
+ }
+ @Test public void reduceMotionFinishesPopupWithoutStaleCompletion(){PopupMotionProbe p=popup();p.dismiss(true);advance(32);FlexyMotionSettings.setReduceMotion(activity,true);assertFalse(p.isShowing());assertEquals(1,p.unregisters);advance(500);assertEquals(1,p.unregisters);assertEquals(1,p.notificationsLocker.releases);}
+ @Test public void popupDetachStillReleasesNativeWindowAndNotifications(){PopupMotionProbe p=popup();p.dismiss(true);View content=p.getContentView();((android.view.ViewGroup)content.getParent()).removeView(content);advance(32);assertFalse(p.isShowing());assertEquals(1,p.notificationsLocker.releases);assertNull(p.current());}
+ @Test public void adapterPauseSeekResumeAndCancelPreserveListenerContract(){
+  int[] events={0,0,0,0,0};float[] value={0};FlexyMotionAnimator a=new FlexyMotionAnimator(button,0,1,v->value[0]=v);a.setDuration(240);
+  a.addListener(new android.animation.AnimatorListenerAdapter(){public void onAnimationStart(android.animation.Animator x){events[0]++;}public void onAnimationCancel(android.animation.Animator x){events[1]++;}public void onAnimationEnd(android.animation.Animator x){events[2]++;}});
+  a.addPauseListener(new android.animation.Animator.AnimatorPauseListener(){public void onAnimationPause(android.animation.Animator x){events[3]++;}public void onAnimationResume(android.animation.Animator x){events[4]++;}});
+  a.start();advance(32);a.setCurrentFraction(.4f);float before=value[0];assertTrue(a.isPaused());advance(100);assertEquals(before,value[0],0);a.resume();advance(32);assertTrue(value[0]>=before);a.cancel();advance(500);assertEquals(1,events[0]);assertEquals(1,events[1]);assertEquals(1,events[2]);assertEquals(1,events[3]);assertEquals(1,events[4]);assertEquals(0,FlexyFrameMotion.activeCount());
+ }
+
+ @Test public void unoptedPopupRetainsNativeAnimator(){PopupMotionProbe p=popup();p.setFlexyMotionEnabled(false);p.dismiss(true);assertNull(p.current());assertNotNull(org.robolectric.util.ReflectionHelpers.getField(p,"windowAnimatorSet"));p.dismiss(false);advance(500);assertFalse(p.isShowing());assertEquals(p.notificationsLocker.locks,p.notificationsLocker.releases);}
+ @Test public void cancelRemovesDeferredDetachCompletion(){int[] ends={0};FlexyMotionAnimator a=new FlexyMotionAnimator(button,0,1,v->{});a.addListener(new android.animation.AnimatorListenerAdapter(){public void onAnimationEnd(android.animation.Animator x){ends[0]++;}});a.start();activity.setContentView(new View(activity));assertEquals(0,ends[0]);assertEquals(0,FlexyFrameMotion.activeCount());a.cancel();assertEquals(1,ends[0]);advance(500);assertEquals(1,ends[0]);}
+
+ @Test public void unchangedReducedMotionIsNotRedispatchedRecursively(){FlexyMotionSettings.setReduceMotion(activity,true);int[] callbacks={0};FlexyFrameMotion m=new FlexyFrameMotion(button,0,v->{callbacks[0]++;if(v==1)FlexyMotionSettings.setReduceMotion(activity,true);});m.animateTo(1);assertEquals(1,callbacks[0]);assertEquals(0,FlexyFrameMotion.activeCount());m.dispose();}
+
 }

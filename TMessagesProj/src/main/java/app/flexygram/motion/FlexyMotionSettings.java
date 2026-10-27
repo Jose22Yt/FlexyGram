@@ -23,7 +23,10 @@ public final class FlexyMotionSettings {
         synchronized(FlexyMotionSettings.class){if(state==null){prefs=c.getApplicationContext().getSharedPreferences(FILE,Context.MODE_PRIVATE);FlexyMotionProfile p=FlexyMotionProfile.parse(prefs.getString(PROFILE,"FLOW"));state=new State(p,prefs.getBoolean(REDUCE_MOTION,false),bounded(prefs.getFloat("speed",1),.5f,2,1),bounded(prefs.getFloat("stiffness",Math.max(200,p.stiffness)),200,1000,560),bounded(prefs.getFloat("damping",p.dampingRatio),.55f,1.2f,.92f),bounded(prefs.getFloat("press",p.pressedScale),.94f,1, .975f));}return state;}
     }
     private static void change(Context c,State s){
-        if(Looper.myLooper()!=Looper.getMainLooper())throw new IllegalStateException("main thread");state(c);state=s;
+        if(Looper.myLooper()!=Looper.getMainLooper())throw new IllegalStateException("main thread");
+        State previous=state(c);
+        if(previous.profile==s.profile&&previous.reduceMotion==s.reduceMotion&&previous.speed==s.speed&&previous.stiffness==s.stiffness&&previous.damping==s.damping&&previous.pressedScale==s.pressedScale)return;
+        state=s;
         prefs.edit().putString(PROFILE,s.profile.name()).putBoolean(REDUCE_MOTION,s.reduceMotion).putFloat("speed",s.speed).putFloat("stiffness",s.stiffness).putFloat("damping",s.damping).putFloat("press",s.pressedScale).apply();
         FlexyFrameMotion.settingsChanged();
     }

@@ -5,7 +5,7 @@ from pathlib import Path
 
 def write_probe(source,root):
  text=(root/'TMessagesProj/src/main/java/org/telegram/ui/Components/ReactionsContainerLayout.java').read_text()
- methods=text[text.index('    private ObjectAnimator signatureTransitionAnimator;'):text.index('    public int getTotalWidth()')]
+ methods=text[text.index('    private app.flexygram.motion.FlexyMotionAnimator signatureTransitionAnimator;'):text.index('    public int getTotalWidth()')]
  detach=text.rindex('\n    protected void onDetachedFromWindow() {')
  cleanup=text[text.index('        cancelSignatureTransition();',detach):text.index('        super.onDetachedFromWindow();',detach)]
  code='''import android.animation.*;import android.content.Context;import android.view.*;import android.view.animation.OvershootInterpolator;
@@ -17,9 +17,12 @@ public class ReactionsMotionProbe extends View {
  public static final android.util.Property<ReactionsMotionProbe,Float> TRANSITION_PROGRESS_VALUE=new android.util.Property<ReactionsMotionProbe,Float>(Float.class,"progress"){
  public Float get(ReactionsMotionProbe o){return o.transitionProgress;}public void set(ReactionsMotionProbe o,Float v){o.setTransitionProgress(v);}};
  public ReactionsMotionProbe(Context c){super(c);}public void setTransitionProgress(float p){transitionProgress=p;}
- public ObjectAnimator current(){return signatureTransitionAnimator;}public void detachNow(){onDetachedFromWindow();}
+ public app.flexygram.motion.FlexyMotionAnimator current(){return signatureTransitionAnimator;}public void detachNow(){onDetachedFromWindow();}
  @Override protected void onDetachedFromWindow(){'''+cleanup+'''super.onDetachedFromWindow();}
 '''+methods+'}'
+ for file in (root/'TMessagesProj/src/main/java/app/flexygram/motion').glob('*.java'):
+  if file.name=='FlexyMotionActivity.java':continue
+  target=source/'app/flexygram/motion'/file.name;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(file.read_bytes())
  (source/'ReactionsMotionProbe.java').write_text(code)
  template=Path(__file__).with_name('ReactionsMotionTest.java.in')
  (source/'ReactionsMotionTest.java').write_bytes(template.read_bytes())

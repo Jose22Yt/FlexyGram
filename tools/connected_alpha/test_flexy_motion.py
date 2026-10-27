@@ -101,13 +101,42 @@ public class FlexyMotionProbe {
         historical='tools/connected_alpha/signature1278_review.json'
         self.assertEqual(subprocess.check_output(['git','show',review.BASE+':'+historical],cwd=ROOT),(ROOT/historical).read_bytes())
 
-    def test_no_protected_navigation_or_reaction_owner_is_modified(self):
+    def test_critical_navigation_is_untouched_and_reaction_binding_is_narrow(self):
         import sys
         sys.path.insert(0,str(ROOT/'tools/connected_alpha'))
         from motion_contract import BASE
-        for name in ['org/telegram/ui/ActionBar/ActionBarLayout.java','org/telegram/ui/ChatActivity.java','org/telegram/ui/DialogsActivity.java','org/telegram/ui/Components/ReactionsContainerLayout.java','app/exteraless/player/PlayerSheet.java']:
+        for name in ['org/telegram/ui/ActionBar/ActionBarLayout.java','org/telegram/ui/DialogsActivity.java','app/exteraless/player/PlayerSheet.java']:
             path='TMessagesProj/src/main/java/'+name
             self.assertEqual(subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT),(ROOT/path).read_bytes(),name)
+
+    def test_native_reaction_protocol_is_kept_with_one_standalone_owner(self):
+        import sys
+        sys.path.insert(0,str(ROOT/'tools/connected_alpha'))
+        from motion_contract import BASE
+        path='TMessagesProj/src/main/java/org/telegram/ui/Components/ReactionsContainerLayout.java'
+        old=subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT,text=True)
+        new=(ROOT/path).read_text().replace('app.flexygram.motion.FlexyMotionAnimator','ObjectAnimator')
+        new=new.replace('new ObjectAnimator(this,from,target,this::setTransitionProgress)','ObjectAnimator.ofFloat(this,TRANSITION_PROGRESS_VALUE,from,target)')
+        self.assertEqual(old,new)
+        path='TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java'
+        old=subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT,text=True)
+        new=(ROOT/path).read_text()
+        line='            scrimPopupWindow.setFlexyMotionEnabled(org.telegram.messenger.BuildConfig.CONNECTED_ALPHA && finalReactionsLayout1 != null);\n'
+        self.assertEqual(1,new.count(line));self.assertEqual(old,new.replace(line,''))
+
+    def test_real_build_validation_is_scoped_and_preserves_original_gates(self):
+        import yaml,sys
+        sys.path.insert(0,str(ROOT/'tools/connected_alpha'))
+        from motion_contract import BASE
+        workflow=yaml.safe_load((ROOT/'.github/workflows/flexy-motion-arm64.yml').read_text())
+        triggers=workflow.get('on',workflow.get(True))
+        self.assertEqual(['validation/flexy-motion-arm64'],triggers['push']['branches'])
+        self.assertNotIn('pull_request',triggers);self.assertEqual({'contents':'read'},workflow['permissions'])
+        job=workflow['jobs']['compile']
+        self.assertEqual('./.github/workflows/connected-alpha-arm64.yml',job['uses'])
+        self.assertEqual(8,len(job['secrets']))
+        for p in ['.github/workflows/connected-alpha-arm64.yml','TMessagesProj/build.gradle','TMessagesProj/src/main/AndroidManifest.xml']:
+            self.assertEqual(subprocess.check_output(['git','show',BASE+':'+p],cwd=ROOT),(ROOT/p).read_bytes())
 
     def test_runtime_uses_frame_clock_not_system_duration_scale(self):
         frame = (JAVA / "FlexyFrameMotion.java").read_text()

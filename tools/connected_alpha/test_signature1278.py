@@ -23,6 +23,34 @@ class Signature1278(unittest.TestCase):
    p=Path(folder)/'AccentProbe.java';p.write_text(code)
    r=subprocess.run(['java','-m','jdk.compiler/com.sun.tools.javac.Main','-d',folder,str(ROOT/'TMessagesProj/src/main/java/app/flexygram/home/SignatureFolderAccent.java'),str(p)],capture_output=True,text=True);self.assertEqual(0,r.returncode,r.stderr)
    r=subprocess.run(['java','-cp',folder,'AccentProbe'],capture_output=True,text=True);self.assertEqual(0,r.returncode,r.stderr)
+ def test_folder_theme_completion_resolves_the_new_accent_and_text_together(self):
+  source=(ROOT/'TMessagesProj/src/main/java/org/telegram/ui/Components/FilterTabsView.java').read_text()
+  source=source[source.index('public void animateColorsTo('):]
+  start=source.index('public void onAnimationEnd(');brace=source.index('{',start);end=brace+1;depth=1
+  while depth:
+   depth+=(source[end]=='{')-(source[end]=='}');end+=1
+  callback=source[start:end]
+  code="""public class FolderThemeCompletionProbe {
+   static class Animator {}
+   int tabLineColorKey=1,activeTextColorKey=2,backgroundColorKey=3,unactiveTextColorKey=4;
+   int aTabLineColorKey=11,aActiveTextColorKey=12,aBackgroundColorKey=13,aUnactiveTextColorKey=14;
+   boolean signatureHome=true;int refreshes;
+   void refreshSignatureAccent(){
+    if(tabLineColorKey!=11||activeTextColorKey!=12||backgroundColorKey!=13||unactiveTextColorKey!=14)
+     throw new AssertionError("mixed old/new theme at cache refresh");
+    refreshes++;
+   }
+   """+callback+"""
+   public static void main(String[]args){
+    var p=new FolderThemeCompletionProbe();p.onAnimationEnd(new Animator());
+    if(p.refreshes!=1||p.aTabLineColorKey!=-1||p.aActiveTextColorKey!=-1)throw new AssertionError("completion");
+    p.signatureHome=false;p.onAnimationEnd(new Animator());if(p.refreshes!=1)throw new AssertionError("non-Signature");
+   }
+  }"""
+  with tempfile.TemporaryDirectory() as folder:
+   p=Path(folder)/'FolderThemeCompletionProbe.java';p.write_text(code)
+   r=subprocess.run(['java','-m','jdk.compiler/com.sun.tools.javac.Main','-d',folder,str(p)],capture_output=True,text=True);self.assertEqual(0,r.returncode,r.stderr)
+   r=subprocess.run(['java','-cp',folder,'FolderThemeCompletionProbe'],capture_output=True,text=True);self.assertEqual(0,r.returncode,r.stderr)
  def test_shared_preferences_and_native_actions_remain(self):
   root=ROOT/'TMessagesProj/src/main'
   config=(root/'kotlin/app/exteraless/appearance/AppearanceConfig.kt').read_text()

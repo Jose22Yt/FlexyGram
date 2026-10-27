@@ -22,6 +22,10 @@ public final class FlexyMotionSpring {
     }
     public void target(float next){if(!Float.isFinite(next))throw new IllegalArgumentException("target");target=next;}
     public void snapTo(float next){target(next);value=next;velocity=0;}
+    void state(float position,float speed,float destination) {
+        if(!Float.isFinite(position)||!Float.isFinite(speed))throw new IllegalArgumentException("state");
+        target(destination);value=position;velocity=speed;
+    }
     public boolean settled(){return Math.abs(value-target)<=.0006&&Math.abs(velocity)<=.004;}
     public float advance(float seconds){
         if(!(seconds>0)||!Float.isFinite(seconds))return value();

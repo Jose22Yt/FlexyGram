@@ -27,3 +27,17 @@ def write(source,root):
  protected class BaseListAdapter {protected static final int TYPE_HEADER=1,TYPE_SHADOW=2,TYPE_CHECK=3,TYPE_INFO_PRIVACY=4,TYPE_SETTINGS=5;public int getItemViewType(int p){return 0;}public androidx.recyclerview.widget.RecyclerView.ViewHolder onCreateViewHolder(android.view.ViewGroup p,int t){return new org.telegram.ui.Components.RecyclerListView.Holder(new android.view.View(p.getContext()));}public void onBindViewHolder(androidx.recyclerview.widget.RecyclerView.ViewHolder h,int p,boolean b){}public boolean isEnabled(androidx.recyclerview.widget.RecyclerView.ViewHolder h){return false;}}
  protected class MatteListAdapter extends BaseListAdapter {protected MatteListAdapter(android.content.Context c){}}
 }''')
+
+ # Compile the exact opt-in popup dismissal body; window manager and native PopupWindow remain real.
+ popup=(root/'TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarPopupWindow.java').read_text()
+ fields=popup[popup.index('    private AnimatorSet windowAnimatorSet;'):popup.index('    private boolean animationEnabled')]
+ methods=popup[popup.index('    @Override\n    public void dismiss() {'):popup.index('    public void setEmptyOutAnimation')]
+ methods=methods.replace('ActionBarPopupWindow.super.dismiss()','PopupMotionProbe.super.dismiss()')
+ put('PopupMotionProbe.java','''import android.animation.*;import android.view.*;import android.widget.*;import java.util.*;
+public class PopupMotionProbe extends PopupWindow {
+ public static class ActionBarPopupWindowLayout extends FrameLayout {public ActionBarPopupWindowLayout(android.content.Context c){super(c);}ArrayList<AnimatorSet> itemAnimators=new ArrayList<>();boolean shownFromBottom;}
+ public boolean animationEnabled=true,pauseNotifications=true,scaleOut,isClosingAnimated;public int dismissAnimationDuration=220,unregisters,dims;public long outEmptyTime=-1;
+ public static class Locker {public int locks,releases;boolean held;public void lock(){if(held)throw new AssertionError("duplicate lock");held=true;locks++;}public void unlock(){if(held){held=false;releases++;}}}
+ public final Locker notificationsLocker=new Locker();public void unregisterListener(){unregisters++;}public void dismissDim(){dims++;}public static int dp(float v){return (int)v;}
+ public PopupMotionProbe(View content){super(content,300,150,true);}public app.flexygram.motion.FlexyMotionAnimator current(){return flexyDismissAnimator;}
+'''+fields+methods+'}')
