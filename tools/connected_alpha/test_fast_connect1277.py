@@ -49,3 +49,16 @@ class FastConnect1277(unittest.TestCase):
   rows=db.execute(sql).fetchall();self.assertEqual(len(rows),2);self.assertEqual(rows[0][3:],(5.0,19.0,14.0));self.assertEqual(rows[1][0:3],(2,'warm','Flexy.startup.account_services'))
   self.assertIn('NOT_INFERRED',spec['limits']['local_rows_visible'])
   self.assertIn('REQUIRES_SUCCESSFUL',spec['limits']['useful_connection'])
+
+ def test_new_comparison_requires_real_equivalent_conditions_and_pinned1276(self):
+  import copy
+  from test_performance import PerformanceLab
+  from performance.compare import compare
+  reports=copy.deepcopy(PerformanceLab().reports())
+  for r,label,sha in zip(reports,('exteraless','alpha1276','candidate'),('1ad6a60a6834ffca722b1a22f4fba27ecb29a061','38e677d60847e117ede1c25731f7b6c4fd2970e2','a'*40)):
+   r['label']=label;r['source_commit']=sha;r['environment'].update(build_mode='release',network_profile='same-test-wifi',sync_state='same-pending-updates')
+  result=compare(reports,'stability1277');self.assertTrue(result['comparable']);self.assertEqual(result['superiority'],'NOT_AUTOMATICALLY_ESTABLISHED')
+  for key in ('network_profile','sync_state','build_mode'):
+   bad=copy.deepcopy(reports);bad[-1]['environment'][key]='unverified';self.assertFalse(compare(bad,'stability1277')['comparable'])
+  bad=copy.deepcopy(reports);bad[1]['source_commit']='b'*40;self.assertFalse(compare(bad,'stability1277')['comparable'])
+  bad=copy.deepcopy(reports);bad[-1]['evidence']='synthetic';self.assertFalse(compare(bad,'stability1277')['comparable'])
