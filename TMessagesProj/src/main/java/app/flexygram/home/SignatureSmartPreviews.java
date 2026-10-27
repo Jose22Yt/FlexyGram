@@ -48,7 +48,7 @@ public final class SignatureSmartPreviews {
         boolean standaloneUrl=false;
         if(text!=null){
             String value=text.trim();
-            standaloneUrl=!value.isEmpty()&&!value.contains(" ")&&!value.contains("\\n")
+            standaloneUrl=!value.isEmpty()&&!value.contains(" ")&&value.indexOf((char)10)<0 && value.indexOf((char)9)<0
                     &&(value.startsWith("https://")||value.startsWith("http://")||value.startsWith("www."));
         }
         if(message.messageOwner.media instanceof TLRPC.TL_messageMediaWebPage && standaloneUrl)
