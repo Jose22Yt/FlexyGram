@@ -1,4 +1,4 @@
-name: Alpha 1277 Universal Signature private signed delivery
+name: Alpha 1277 Stability Fast Connect Fusion v3 private signed delivery
 
 on:
   push:
@@ -22,7 +22,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: 28d7e39cd8f7001f41c958fbb160f30b10d180e9
+          ref: fdabe9fe241a4cca62fd6da18905e4e8be22c3cb
           fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-java@v4
@@ -171,11 +171,11 @@ jobs:
         working-directory: approved
     env:
       NATIVE_TARGET: arm64-v8a
-      COMMIT_ID: 28d7e39cd8f7001f41c958fbb160f30b10d180e9
+      COMMIT_ID: fdabe9fe241a4cca62fd6da18905e4e8be22c3cb
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: 28d7e39cd8f7001f41c958fbb160f30b10d180e9
+          ref: fdabe9fe241a4cca62fd6da18905e4e8be22c3cb
           path: approved
           fetch-depth: 0
           submodules: recursive
@@ -187,7 +187,7 @@ jobs:
           sparse-checkout: tools/private_alpha1274
           persist-credentials: false
       - name: Require the exact approved application commit
-        run: test "$(git rev-parse HEAD)" = 28d7e39cd8f7001f41c958fbb160f30b10d180e9
+        run: test "$(git rev-parse HEAD)" = fdabe9fe241a4cca62fd6da18905e4e8be22c3cb
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
