@@ -24,7 +24,8 @@ import android.graphics.Shader;
 public final class SignatureFusionAvatarMask {
     private final Paint fadePaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
     private LinearGradient gradient;
-    private float previousStart = Float.NaN, previousEnd = Float.NaN;
+    private float previousStart = Float.NaN, previousEnd = Float.NaN, previousSafe = Float.NaN;
+    private final float[] cachedStops = new float[8];
     private boolean previousRtl;
 
     public SignatureFusionAvatarMask() {
@@ -37,17 +38,23 @@ public final class SignatureFusionAvatarMask {
 
     /** Configure during layout so the first draw also reuses its cached shader. */
     public void prepare(float fadeStart, float fadeEnd, boolean rtl) {
-        if (gradient == null || fadeStart != previousStart || fadeEnd != previousEnd || rtl != previousRtl) {
+        prepare(fadeStart, fadeEnd, .40f, rtl);
+    }
+    public void prepare(float fadeStart, float fadeEnd, float safeStop, boolean rtl) {
+        if (gradient == null || fadeStart != previousStart || fadeEnd != previousEnd
+                || safeStop != previousSafe || rtl != previousRtl) {
             // RTL: from transparent at left to opaque at right.
             float x0 = Math.min(fadeStart, fadeEnd);
             float x1 = Math.max(fadeStart, fadeEnd);
             if (x1 <= x0) x1 = x0 + 1f;
+            SignatureFusionFade.fillStops(safeStop, rtl, cachedStops);
             gradient = new LinearGradient(x0, 0, x1, 0,
                     rtl ? SignatureFusionFade.RTL_COLORS : SignatureFusionFade.LTR_COLORS,
-                    rtl ? SignatureFusionFade.RTL_STOPS : SignatureFusionFade.LTR_STOPS, Shader.TileMode.CLAMP);
+                    cachedStops, Shader.TileMode.CLAMP);
             fadePaint.setShader(gradient);
             previousStart = fadeStart;
             previousEnd = fadeEnd;
+            previousSafe = safeStop;
             previousRtl = rtl;
         }
     }
@@ -55,9 +62,14 @@ public final class SignatureFusionAvatarMask {
     /** Local x positions of fade start/end relative to the avatar panel. */
     public void finish(Canvas canvas, int saveCount, float width, float height,
                        float fadeStart, float fadeEnd, boolean rtl) {
-        if (width <= 0 || height <= 0) { canvas.restoreToCount(saveCount); return; }
-        prepare(fadeStart, fadeEnd, rtl);
-        canvas.drawRect(0, 0, width, height, fadePaint);
+        finish(canvas, saveCount, width, height, fadeStart, fadeEnd, .40f, rtl);
+    }
+    public void finish(Canvas canvas, int saveCount, float width, float height,
+                       float fadeStart, float fadeEnd, float safeStop, boolean rtl) {
+        if (width > 0 && height > 0) {
+            prepare(fadeStart, fadeEnd, safeStop, rtl);
+            canvas.drawRect(0, 0, width, height, fadePaint);
+        }
         canvas.restoreToCount(saveCount);
     }
 }

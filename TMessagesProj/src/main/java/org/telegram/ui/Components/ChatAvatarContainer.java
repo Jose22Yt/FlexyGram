@@ -575,8 +575,11 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
         if (fusionPhoto) {
             var g = signatureHeader.fusionGeometry();
             canvas.translate(child.getX(), child.getY());
+            boolean initials = child.getWidth() < g.portrait.width() - 1f;
+            float start = initials ? child.getWidth() * (g.rtl ? .45f : .55f) : g.fadeStartX - child.getX();
+            float end = initials ? (g.rtl ? 0f : child.getWidth()) : g.fadeEndX - child.getX();
             signaturePhotoMask.finish(canvas, fusionLayer, child.getWidth(), child.getHeight(),
-                    g.fadeStartX - g.portrait.left, g.fadeEndX - g.portrait.left, g.rtl);
+                    start, end, initials ? .9f : g.fadeSafeStop, g.rtl);
             canvas.restoreToCount(fusionSave);
         }
         return b;
@@ -878,6 +881,16 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
     protected void onSignatureCallClick() { }
     public boolean signatureCallAvailable() { return isSignatureCallAvailable(); }
     private boolean signatureFusionActive() { return signatureHeader != null && signatureHeader.fusionActive(); }
+    /** Keep Telegram's native initial/placeholder at the left (right for RTL).
+     * A genuinely loaded or requested picture still fills the full Fusion card.
+     * This does not request images, decode frames or allocate a second receiver.
+     */
+    private boolean signatureFusionHasPhoto() {
+        var receiver = avatarImageView.getImageReceiver();
+        return receiver != null && (receiver.getImageLocation() != null ||
+                receiver.getMediaLocation() != null || receiver.getThumbLocation() != null ||
+                receiver.hasNotThumb());
+    }
     private void prepareFusionControls() {
         if (signatureMore != null) return;
         signaturePhotoMask = new app.flexygram.header.fusion.SignatureFusionAvatarMask();
@@ -928,16 +941,19 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
         // Classic title padding (6 + 12 dp) is outside the Signature text block.
         titleTextView.setPadding(0, 0, 0, 0);
         getSubtitleTextView().setPadding(0, 0, 0, 0);
-        titleTextView.setGravity(fusion ? (LocaleController.isRTL ? Gravity.RIGHT : Gravity.LEFT) : Gravity.CENTER_HORIZONTAL);
+        titleTextView.setGravity(Gravity.CENTER_HORIZONTAL);
         titleTextView.measure(MeasureSpec.makeMeasureSpec(textWidth, MeasureSpec.AT_MOST), MeasureSpec.makeMeasureSpec((int)Math.ceil(signatureHeader.titlePx) + dp(8), MeasureSpec.AT_MOST));
-        if (subtitleTextView != null) { subtitleTextView.setTextSizePx(Math.round(signatureHeader.subtitlePx)); subtitleTextView.setGravity(fusion ? (LocaleController.isRTL ? Gravity.RIGHT : Gravity.LEFT) : Gravity.CENTER_HORIZONTAL); }
+        if (subtitleTextView != null) { subtitleTextView.setTextSizePx(Math.round(signatureHeader.subtitlePx)); subtitleTextView.setGravity(Gravity.CENTER_HORIZONTAL); }
         else if (animatedSubtitleTextView != null) {
             animatedSubtitleTextView.setTextSize(signatureHeader.subtitlePx);
-            animatedSubtitleTextView.setGravity(fusion ? (LocaleController.isRTL ? Gravity.RIGHT : Gravity.LEFT) : Gravity.CENTER_HORIZONTAL);
+            animatedSubtitleTextView.setGravity(Gravity.CENTER_HORIZONTAL);
         }
         getSubtitleTextView().measure(MeasureSpec.makeMeasureSpec(textWidth, MeasureSpec.AT_MOST), signatureHeader.subtitleFits ? MeasureSpec.makeMeasureSpec((int)Math.ceil(signatureHeader.subtitlePx) + dp(8), MeasureSpec.AT_MOST) : MeasureSpec.makeMeasureSpec(0, MeasureSpec.EXACTLY));
         int photo = Math.max(1, Math.round(signatureHeader.height) - dp(2));
-        int photoWidth = fusion ? Math.round(signatureHeader.geometry.avatar.width()) : photo;
+        int photoWidth = fusion ?
+                (signatureFusionHasPhoto() ? Math.round(signatureHeader.geometry.avatar.width())
+                        : Math.min(Math.round(signatureHeader.geometry.avatar.width()), dp(73)))
+                : photo;
         int photoHeight = fusion ? Math.round(signatureHeader.geometry.avatar.height()) : photo;
         avatarImageView.measure(MeasureSpec.makeMeasureSpec(photoWidth, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(photoHeight, MeasureSpec.EXACTLY));
         avatarImageView.setRoundRadius(fusion ? 0 : photo / 2);
@@ -958,14 +974,16 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
         android.graphics.RectF a = signatureHeader.geometry.avatar, title = signatureHeader.geometry.title;
         boolean fusion = signatureFusionActive();
         int photo = avatarImageView.getMeasuredWidth(), photoHeight = avatarImageView.getMeasuredHeight();
-        int x = Math.round(a.centerX() - photo / 2f), y = Math.round(a.centerY() - photoHeight / 2f);
+        int x = fusion ? (LocaleController.isRTL ? Math.round(a.right) - photo : Math.round(a.left))
+                : Math.round(a.centerX() - photo / 2f);
+        int y = Math.round(a.centerY() - photoHeight / 2f);
         avatarImageView.layout(x, y, x + photo, y + photoHeight);
         View subtitle = getSubtitleTextView();
         int th = titleTextView.getMeasuredHeight(), sh = !signatureHeader.subtitleFits || subtitle.getVisibility() != VISIBLE ? 0 : subtitle.getMeasuredHeight();
         int textY = Math.round(title.centerY() - (th + sh + (sh == 0 ? 0 : dp(2))) / 2f);
-        x = fusion ? Math.round(LocaleController.isRTL ? title.right - titleTextView.getMeasuredWidth() : title.left) : Math.round(title.centerX() - titleTextView.getMeasuredWidth() / 2f);
+        x = Math.round(title.centerX() - titleTextView.getMeasuredWidth() / 2f);
         titleTextView.layout(x, textY, x + titleTextView.getMeasuredWidth(), textY + th);
-        x = fusion ? Math.round(LocaleController.isRTL ? title.right - subtitle.getMeasuredWidth() : title.left) : Math.round(title.centerX() - subtitle.getMeasuredWidth() / 2f);
+        x = Math.round(title.centerX() - subtitle.getMeasuredWidth() / 2f);
         subtitle.layout(x, textY + th + dp(2), x + subtitle.getMeasuredWidth(), textY + th + dp(2) + sh);
         x = LocaleController.isRTL ? Math.round(title.left) + dp(2) : Math.round(title.right) - dp(34);
         if (fusion) {
@@ -975,7 +993,12 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
             signaturePhotoClip.rewind();
             signaturePhotoClip.addRoundRect(g.center.left,g.center.top+offset,g.center.right,g.center.bottom+offset,
                     g.center.height()/2,g.center.height()/2,android.graphics.Path.Direction.CW);
-            signaturePhotoMask.prepare(g.fadeStartX-g.portrait.left,g.fadeEndX-g.portrait.left,g.rtl);
+            boolean initials = avatarImageView.getMeasuredWidth() < g.portrait.width() - 1f;
+            float fadeStart = initials ? avatarImageView.getMeasuredWidth() * (g.rtl ? .45f : .55f)
+                    : g.fadeStartX - avatarImageView.getLeft();
+            float fadeEnd = initials ? (g.rtl ? 0f : avatarImageView.getMeasuredWidth())
+                    : g.fadeEndX - avatarImageView.getLeft();
+            signaturePhotoMask.prepare(fadeStart,fadeEnd,initials ? .9f : g.fadeSafeStop,g.rtl);
         }
         if (timeItem != null) { int tx = Math.round(a.left) - dp(6), ty = Math.round(a.top) - dp(4); timeItem.layout(tx, ty, tx + dp(34), ty + dp(34)); }
         if (communityItem != null) { int tx = Math.round(a.right) - dp(14), ty = Math.round(a.bottom) - dp(14); communityItem.layout(tx, ty, tx + dp(14), ty + dp(14)); }
