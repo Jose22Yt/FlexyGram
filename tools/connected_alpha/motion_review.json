@@ -70,6 +70,7 @@
     "tools/connected_alpha/test_music3_1273.py",
     "tools/connected_alpha/test_preview_navigation.py",
     "tools/connected_alpha/test_private_release1276.py",
+    "tools/connected_alpha/test_signature1278.py",
     "tools/connected_alpha/test_signature_refinement.py",
     "tools/connected_alpha/test_stability1277.py"
   ],
@@ -142,6 +143,7 @@
     "tools/connected_alpha/test_music3_1273.py": "333d5a4011f09cdc49ee38ee2f215bc03438114f076a866c935088ff62b0c8af",
     "tools/connected_alpha/test_preview_navigation.py": "efa0cd7fa86f23dee616985eab4ed69d1826beafabf8376267be65f46bb59a94",
     "tools/connected_alpha/test_private_release1276.py": "97bdea5f51f8608c76eaaa5810fddf5d73e6db913ca05170960eb28900a117ad",
+    "tools/connected_alpha/test_signature1278.py": "4405d5e8f50f0f1a4bd8c9216f744d98295029413ca245982274c45151e83250",
     "tools/connected_alpha/test_signature_refinement.py": "5aca28a629cbe321141741e56e7c816c52cb4b8a3ba40ce73994dac5a6b66852",
     "tools/connected_alpha/test_stability1277.py": "bdba2fea8b877f543daca7f46ba575bec1124b211ed897d6b3e3d4c78b2bb445"
   }
