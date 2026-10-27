@@ -981,7 +981,13 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
         View subtitle = getSubtitleTextView();
         int th = titleTextView.getMeasuredHeight(), sh = !signatureHeader.subtitleFits || subtitle.getVisibility() != VISIBLE ? 0 : subtitle.getMeasuredHeight();
         int textY = Math.round(title.centerY() - (th + sh + (sh == 0 ? 0 : dp(2))) / 2f);
-        x = Math.round(title.centerX() - titleTextView.getMeasuredWidth() / 2f);
+        // Fusion: visually center only the contact name inside its pill.
+        // Keep last-seen/status on its approved existing text axis.
+        float nameAxis = fusion
+                ? app.flexygram.header.fusion.SignatureFusionGeometry.titleCenterX(
+                        signatureHeader.fusionGeometry(), titleTextView.getMeasuredWidth())
+                : title.centerX();
+        x = Math.round(nameAxis - titleTextView.getMeasuredWidth() / 2f);
         titleTextView.layout(x, textY, x + titleTextView.getMeasuredWidth(), textY + th);
         x = Math.round(title.centerX() - subtitle.getMeasuredWidth() / 2f);
         subtitle.layout(x, textY + th + dp(2), x + subtitle.getMeasuredWidth(), textY + th + dp(2) + sh);

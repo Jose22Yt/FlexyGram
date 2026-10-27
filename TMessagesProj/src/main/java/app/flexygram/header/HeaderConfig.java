@@ -18,7 +18,11 @@ public final class HeaderConfig {
         Object previous = old.get("OEAppearanceIosChatHeader");
         boolean legacy = Boolean.TRUE.equals(old.get("OEAppearanceIosChatHeaderAuto")) || !(previous instanceof Boolean) || (Boolean) previous;
         Object style = p.get("style");
-        currentStyle = style instanceof Integer ? (Integer)style == 2 ? 2 : (Integer)style == 0 ? 0 : 1 : legacy ? 0 : 1;
+        // Once the deprecated iOS Design master switch is retired, its stale
+        // preferences cannot choose the conversation header implicitly.
+        // Explicit FlexyGram header choices (0/1/2) remain fully respected.
+        currentStyle = style instanceof Integer ? (Integer)style == 2 ? 2 : (Integer)style == 0 ? 0 : 1
+                : org.telegram.messenger.BuildConfig.CONNECTED_ALPHA ? 0 : legacy ? 0 : 1;
         signature = currentStyle != 1;
         compact = Boolean.TRUE.equals(p.get("compact")); counter = !Boolean.FALSE.equals(p.get("counter"));
         Object mode = p.get("counter_mode");

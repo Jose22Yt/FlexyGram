@@ -1,18 +1,19 @@
 package app.flexygram.header.fusion;
 
 /**
- * Full-card portrait fade: predominantly opaque on the extreme photo edge,
- * below 4.1% alpha at the FIRST label pixel, and almost invisible across
- * the rest of the card. No per-frame bitmaps or animation callbacks.
+ * Theme-neutral portrait alpha mask for Signature Fusion. The portrait blends
+ * gradually across the card until roughly its midpoint in LTR or RTL.
+ * Native title and last-seen text are painted afterwards at full opacity.
+ * No theme-specific fill, blur, frame bitmaps or animation callbacks.
  */
 public final class SignatureFusionFade {
     static final int[] LTR_COLORS = {
-        0xFFFFFFFF, 0xF0FFFFFF, 0xB7FFFFFF, 0x4DFFFFFF,
-        0x0AFFFFFF, 0x04FFFFFF, 0x01FFFFFF, 0x00FFFFFF
+        0xFFFFFFFF, 0xF5FFFFFF, 0xCEFFFFFF, 0x86FFFFFF,
+        0x2CFFFFFF, 0x16FFFFFF, 0x07FFFFFF, 0x00FFFFFF
     };
     static final int[] RTL_COLORS = {
-        0x00FFFFFF, 0x01FFFFFF, 0x04FFFFFF, 0x0AFFFFFF,
-        0x4DFFFFFF, 0xB7FFFFFF, 0xF0FFFFFF, 0xFFFFFFFF
+        0x00FFFFFF, 0x07FFFFFF, 0x16FFFFFF, 0x2CFFFFFF,
+        0x86FFFFFF, 0xCEFFFFFF, 0xF5FFFFFF, 0xFFFFFFFF
     };
     // Default stop reference for existing consumers. Real geometry uses fillStops().
     static final float[] LTR_STOPS = {0f,.072f,.176f,.292f,.40f,.61f,.832f,1f};
