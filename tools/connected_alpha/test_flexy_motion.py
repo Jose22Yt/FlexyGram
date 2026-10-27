@@ -105,7 +105,7 @@ public class FlexyMotionProbe {
         import sys
         sys.path.insert(0,str(ROOT/'tools/connected_alpha'))
         from motion_contract import BASE
-        for name in ['org/telegram/ui/ActionBar/ActionBarLayout.java','org/telegram/ui/DialogsActivity.java']:
+        for name in ['org/telegram/ui/DialogsActivity.java']:
             path='TMessagesProj/src/main/java/'+name
             self.assertEqual(subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT),(ROOT/path).read_bytes(),name)
 
@@ -218,6 +218,26 @@ public class FlexyMotionProbe {
         new=(ROOT/path).read_text()
         self.assertEqual(1,new.count('private class Button extends app.flexygram.motion.FlexyPressFrameLayout'))
         self.assertEqual(old,new.replace('private class Button extends app.flexygram.motion.FlexyPressFrameLayout','private class Button extends FrameLayout'))
+
+    def test_navigation_delta_preserves_native_renderers_and_preview_protocol(self):
+        import sys
+        sys.path.insert(0,str(ROOT/'tools/connected_alpha'))
+        from motion_contract import BASE
+        from motion_native.player_probe import method
+        path='TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java'
+        old=subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT,text=True)
+        new=(ROOT/path).read_text()
+        helper=method(new,'    private void startFlexyTimedLayoutAnimation(')
+        # The timed renderer body is copied unchanged from the native route.
+        a=old.index('        AndroidUtilities.runOnUIThread(animationRunnable = new Runnable() {',old.index('    private void startLayoutAnimation('))
+        a=old.index('                if (newFragment != null)',a);b=old.index('                if (animationProgress < 1)',a)
+        self.assertIn(old[a:b],helper)
+        new=new.replace(helper+'\n\n','')
+        new=new.replace('        if (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA && !USE_SPRING_ANIMATION) {\n            startFlexyTimedLayoutAnimation(open, preview);\n            return;\n        }\n','')
+        new=new.replace('import app.flexygram.motion.SpringAnimation;','import androidx.dynamicanimation.animation.SpringAnimation;').replace('new SpringAnimation(this, valueHolder)','new SpringAnimation(valueHolder)')
+        new=new.replace('            finishedAnimation.cancel();','            if (byCheck) finishedAnimation.cancel();')
+        new=new.replace('            currentSpringAnimation.addEndListener((animation, canceled, value, velocity) -> {\n                if (animation != currentSpringAnimation) return;\n                currentSpringAnimation = null;\n                presentFragmentInternalRemoveOld(false, prevFragment);','            currentSpringAnimation.addEndListener((animation, canceled, value, velocity) -> {\n                presentFragmentInternalRemoveOld(false, prevFragment);')
+        self.assertEqual(old,new)
 
     def test_runtime_uses_frame_clock_not_system_duration_scale(self):
         frame = (JAVA / "FlexyFrameMotion.java").read_text()

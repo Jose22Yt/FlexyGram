@@ -65,7 +65,7 @@ import androidx.core.math.MathUtils;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.dynamicanimation.animation.FloatValueHolder;
-import androidx.dynamicanimation.animation.SpringAnimation;
+import app.flexygram.motion.SpringAnimation;
 import androidx.dynamicanimation.animation.SpringForce;
 
 import org.telegram.messenger.AndroidUtilities;
@@ -1906,7 +1906,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
 
         if (USE_SPRING_ANIMATION) {
             FloatValueHolder valueHolder = new FloatValueHolder((x / containerView.getMeasuredWidth()) * SPRING_MULTIPLIER);
-            currentSpringAnimation = new SpringAnimation(valueHolder)
+            currentSpringAnimation = new SpringAnimation(this, valueHolder)
                     .setSpring(new SpringForce(backAnimation ? 0f : SPRING_MULTIPLIER)
                             .setStiffness(SPRING_STIFFNESS)
                             .setDampingRatio(SpringForce.DAMPING_RATIO_NO_BOUNCY));
@@ -2077,7 +2077,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         if (currentSpringAnimation != null) {
             SpringAnimation finishedAnimation = currentSpringAnimation;
             currentSpringAnimation = null;
-            if (byCheck) finishedAnimation.cancel();
+            finishedAnimation.cancel();
         }
         // openExtera: подложка и масштаб карточки живут только на время перехода
         springRouteBackgroundDrawable = null;
@@ -2192,10 +2192,109 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         containerViewBack.setVisibility(View.INVISIBLE);
     }
 
+    private void startFlexyTimedLayoutAnimation(final boolean open, final boolean preview) {
+        if (currentSpringAnimation != null) {
+            SpringAnimation previous = currentSpringAnimation;
+            currentSpringAnimation = null;
+            previous.cancel();
+        }
+        transitionAnimationStartTime = System.currentTimeMillis();
+        currentSpringAnimation = new SpringAnimation(this, new FloatValueHolder(0))
+                .setSpring(new SpringForce(1)).setDuration(preview && open ? 190 : 150);
+        currentSpringAnimation.addUpdateListener((animation, value, velocity) -> {
+            animationProgress = value;
+                if (newFragment != null) {
+                    newFragment.onTransitionAnimationProgress(true, animationProgress);
+                }
+                if (oldFragment != null) {
+                    oldFragment.onTransitionAnimationProgress(false, animationProgress);
+                }
+                Integer oldNavigationBarColor = oldFragment != null ? oldFragment.getNavigationBarColor() : null;
+                Integer newNavigationBarColor = newFragment != null ? newFragment.getNavigationBarColor() : null;
+                if (oldFragment != null && oldFragment.isSupportEdgeToEdge() && newNavigationBarColor != null) {
+                    oldNavigationBarColor = newNavigationBarColor;
+                }
+                if (newFragment != null && newFragment.isSupportEdgeToEdge() && oldNavigationBarColor != null) {
+                    newNavigationBarColor = oldNavigationBarColor;
+                }
+
+                if (newFragment != null && oldNavigationBarColor != null && newNavigationBarColor != null) {
+                    float ratio = MathUtils.clamp(4f * animationProgress, 0f, 1f);
+                    int color = ColorUtils.blendARGB(oldNavigationBarColor, newNavigationBarColor, ratio);
+                    if (sheetFragment != null) {
+                        if (sheetFragment.sheetsStack != null) {
+                            for (int i = 0; i < sheetFragment.sheetsStack.size(); ++i) {
+                                BaseFragment.AttachedSheet sheet = sheetFragment.sheetsStack.get(i);
+                                if (sheet.attachedToParent()) {
+                                    color = sheet.getNavigationBarColor(color);
+                                }
+                            }
+                        }
+                    }
+                    newFragment.setNavigationBarColor(color);
+                }
+                float interpolated;
+                if (preview) {
+                    if (open) {
+                        interpolated = overshootInterpolator.getInterpolation(animationProgress);
+                    } else {
+                        interpolated = CubicBezierInterpolator.EASE_OUT_QUINT.getInterpolation(animationProgress);
+                    }
+                } else {
+                    interpolated = decelerateInterpolator.getInterpolation(animationProgress);
+                }
+                if (open) {
+                    float clampedInterpolated = MathUtils.clamp(interpolated, 0, 1);
+                    containerView.setAlpha(clampedInterpolated);
+                    if (preview) {
+                        containerView.setScaleX(0.7f + 0.3f * interpolated);
+                        containerView.setScaleY(0.7f + 0.3f * interpolated);
+                        if (previewMenu != null) {
+                            containerView.setTranslationY(dp(40) * (1f - interpolated));
+                            previewMenu.setTranslationY(-dp(40 + 30) * (1f - interpolated));
+                            previewMenu.setScaleX(0.95f + 0.05f * interpolated);
+                            previewMenu.setScaleY(0.95f + 0.05f * interpolated);
+                        }
+                        previewBackgroundDrawable.setAlpha((int) (0x2e * clampedInterpolated));
+                        Theme.moveUpDrawable.setAlpha((int) (255 * clampedInterpolated));
+                        containerView.invalidate();
+                        invalidate();
+                    } else {
+                        containerView.setTranslationX(dp(48) * (1.0f - interpolated));
+                    }
+                } else {
+                    float clampedReverseInterpolated = MathUtils.clamp(1f - interpolated, 0, 1);
+                    containerViewBack.setAlpha(clampedReverseInterpolated);
+                    if (preview) {
+                        containerViewBack.setScaleX(0.9f + 0.1f * (1.0f - interpolated));
+                        containerViewBack.setScaleY(0.9f + 0.1f * (1.0f - interpolated));
+                        previewBackgroundDrawable.setAlpha((int) (0x2e * clampedReverseInterpolated));
+                        if (previewMenu == null) {
+                            Theme.moveUpDrawable.setAlpha((int) (255 * clampedReverseInterpolated));
+                        }
+                        containerView.invalidate();
+                        invalidate();
+                    } else {
+                        containerViewBack.setTranslationX(dp(48) * interpolated);
+                    }
+                }
+        });
+        currentSpringAnimation.addEndListener((animation, cancelled, value, velocity) -> {
+            if (animation != currentSpringAnimation) return;
+            currentSpringAnimation = null;
+            onAnimationEndCheck(cancelled);
+        });
+        currentSpringAnimation.start();
+    }
+
     private void startLayoutAnimation(final boolean open, final boolean first, final boolean preview) {
         if (first) {
             animationProgress = 0.0f;
             lastFrameTime = System.nanoTime() / 1000000;
+        }
+        if (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA && !USE_SPRING_ANIMATION) {
+            startFlexyTimedLayoutAnimation(open, preview);
+            return;
         }
         if (USE_SPRING_ANIMATION) {
             if (USE_ACTIONBAR_CROSSFADE) {
@@ -2211,7 +2310,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
                                 fragmentsStack, getLastFragment());
             }
             FloatValueHolder valueHolder = new FloatValueHolder(0);
-            currentSpringAnimation = new SpringAnimation(valueHolder)
+            currentSpringAnimation = new SpringAnimation(this, valueHolder)
                     .setSpring(new SpringForce(SPRING_MULTIPLIER)
                             .setStiffness(preview ? open ? SPRING_STIFFNESS_PREVIEW : SPRING_STIFFNESS_PREVIEW_OUT : SPRING_STIFFNESS)
                             .setDampingRatio(preview ? 0.6f : 1f));
@@ -3028,7 +3127,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
             }
 
             FloatValueHolder valueHolder = new FloatValueHolder(0);
-            currentSpringAnimation = new SpringAnimation(valueHolder)
+            currentSpringAnimation = new SpringAnimation(this, valueHolder)
                     .setSpring(new SpringForce(SPRING_MULTIPLIER)
                             .setStiffness(SPRING_STIFFNESS_PREVIEW_EXPAND)
                             .setDampingRatio(0.6f));
@@ -3045,6 +3144,8 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
                 }
             });
             currentSpringAnimation.addEndListener((animation, canceled, value, velocity) -> {
+                if (animation != currentSpringAnimation) return;
+                currentSpringAnimation = null;
                 presentFragmentInternalRemoveOld(false, prevFragment);
                 previewOpenAnimationInProgress = false;
                 fragment.onPreviewOpenAnimationEnd();

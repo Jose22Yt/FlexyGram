@@ -27,6 +27,8 @@ public final class FlexyFrameMotion implements View.OnAttachStateChangeListener 
     }
     private static void checkMain(){if(Looper.myLooper()!=Looper.getMainLooper())throw new IllegalStateException("main thread");}
     public float current(){return spring.value();}
+    public float velocity(){return spring.velocity();}
+    public void setVelocity(float value){checkMain();if(disposed)return;spring.state(spring.value(),value,spring.target());}
     public boolean isRunning(){return running;}
     public void animateTo(float target){animateTo(target,null);}
     public void animateTo(float target,Runnable completion){

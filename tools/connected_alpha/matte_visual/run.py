@@ -36,7 +36,8 @@ def main():
         path='app/flexygram/settings/'+name+'.java';dest=src/path;dest.parent.mkdir(parents=True,exist_ok=True)
         shutil.copyfile(ROOT/'TMessagesProj/src/main/java'/path,dest)
     for file in (ROOT/'TMessagesProj/src/main/java/app/flexygram/motion').glob('*.java'):
-        if file.name == 'FlexyMotionActivity.java': continue
+        # Navigation bridge is compiled in motion_native; this fixture covers Matte pressure.
+        if file.name in ('FlexyMotionActivity.java', 'SpringAnimation.java'): continue
         dest=src/'app/flexygram/motion'/file.name
         dest.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(file,dest)
     shutil.copyfile(HERE/'MatteVisualTest.java.in',src/'MatteVisualTest.java')

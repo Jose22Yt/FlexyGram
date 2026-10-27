@@ -47,10 +47,13 @@ public class PopupMotionProbe extends PopupWindow {
 
  put('org/telegram/ui/Components/ButtonBounce.java',(root/'TMessagesProj/src/main/java/org/telegram/ui/Components/ButtonBounce.java').read_text())
  put('org/telegram/messenger/BuildConfig.java','package org.telegram.messenger;public class BuildConfig {public static boolean CONNECTED_ALPHA=true;}')
- put('org/telegram/ui/Components/CubicBezierInterpolator.java','package org.telegram.ui.Components;public class CubicBezierInterpolator {public static final android.view.animation.Interpolator DEFAULT=new android.view.animation.LinearInterpolator();}')
+ put('org/telegram/ui/Components/CubicBezierInterpolator.java',(root/'TMessagesProj/src/main/java/org/telegram/ui/Components/CubicBezierInterpolator.java').read_text())
 
  from player_probe import write as write_player
  write_player(put,root)
 
  from bot_probe import write as write_bot
  write_bot(put,root,source)
+
+ from navigation_probe import write as write_navigation
+ write_navigation(put,root,source)
