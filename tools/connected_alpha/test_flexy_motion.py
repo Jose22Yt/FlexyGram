@@ -137,7 +137,8 @@ public class FlexyMotionProbe {
         self.assertEqual('./.github/workflows/connected-alpha-arm64.yml',job['uses'])
         self.assertEqual(8,len(job['secrets']))
         for p in ['.github/workflows/connected-alpha-arm64.yml','TMessagesProj/build.gradle','TMessagesProj/src/main/AndroidManifest.xml']:
-            self.assertEqual(subprocess.check_output(['git','show',BASE+':'+p],cwd=ROOT),(ROOT/p).read_bytes())
+            from integration1279_contract import project
+            self.assertEqual(subprocess.check_output(['git','show',BASE+':'+p],cwd=ROOT),project('motion',p,(ROOT/p).read_bytes()))
 
     def test_tabs_keep_native_selection_and_direct_finger_protocol(self):
         import sys

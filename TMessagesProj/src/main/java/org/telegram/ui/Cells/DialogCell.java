@@ -2818,7 +2818,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                      || message.messageOwner.restriction_reason.isEmpty())) {
             int candidate=app.flexygram.home.SignatureSmartPreviews.kind(message);
             if (candidate != 0) {
-                String label=app.flexygram.home.SignatureSmartPreviews.label(message,candidate);
+                String label=app.flexygram.home.SignatureSmartPreviews.lineLabel(message,candidate);
                 if (!TextUtils.isEmpty(label)) {
                     smartPreviewKind=candidate;
                     messageString=applyThumbs(label);

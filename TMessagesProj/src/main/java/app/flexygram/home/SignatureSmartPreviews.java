@@ -88,6 +88,10 @@ public final class SignatureSmartPreviews {
         int pos=value.indexOf(separator);
         return pos>=0&&pos<end?pos:end;
     }
+    /** A filename/contact may contain control characters; never grow the native preview row. */
+    public static String lineLabel(MessageObject message,int kind){
+        return label(message,kind).replace('\n',' ').replace('\r',' ').replace('\t',' ');
+    }
     public static String label(MessageObject message,int kind){
         if(message==null||message.messageOwner==null)return "";
         switch(kind){
@@ -125,12 +129,12 @@ public final class SignatureSmartPreviews {
                 return "🔗  "+(url.isEmpty()?LocaleController.getString(R.string.FlexySmartLink):url);
             }
             case SignatureSmartPreviewPalette.LOCATION:
-                return "⌖  "+LocaleController.getString(R.string.FlexySmartLocation);
+                return "📍  "+LocaleController.getString(R.string.FlexySmartLocation);
             case SignatureSmartPreviewPalette.CONTACT:{
                 if(!(message.messageOwner.media instanceof TLRPC.TL_messageMediaContact))return "";
                 TLRPC.MessageMedia contact=message.messageOwner.media;
                 String name=((contact.first_name==null?"":contact.first_name)+" "+(contact.last_name==null?"":contact.last_name)).trim();
-                return "♙  "+(name.isEmpty()?LocaleController.getString(R.string.FlexySmartContact):name);
+                return "👤  "+(name.isEmpty()?LocaleController.getString(R.string.FlexySmartContact):name);
             }
             case SignatureSmartPreviewPalette.PHOTO:return "▣  "+LocaleController.getString(R.string.FlexySmartPhoto);
             case SignatureSmartPreviewPalette.VIDEO:return "▶  "+LocaleController.getString(R.string.FlexySmartVideo);

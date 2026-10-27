@@ -118,6 +118,8 @@ class SmartPreviews(unittest.TestCase):
                         MessageObject contact=m();contact.messageOwner.media=new TLRPC.TL_messageMediaContact();
                         contact.messageOwner.media.first_name="Ana";contact.messageOwner.media.last_name="López";
                         verify(9,contact);ok(SignatureSmartPreviews.label(contact,9).contains("Ana López"),"contact name");
+                        contact.messageOwner.media.first_name="Ana\\nMaría";
+                        ok(!SignatureSmartPreviews.lineLabel(contact,9).contains("\\n"),"contact stays one line");
                         contact.messageOwner.media.ttl_seconds=10;verify(0,contact);
                         MessageObject location=m();location.messageOwner.media=new TLRPC.TL_messageMediaGeo();verify(8,location);
                         location.messageOwner.media=new TLRPC.TL_messageMediaGeoLive();verify(8,location);
