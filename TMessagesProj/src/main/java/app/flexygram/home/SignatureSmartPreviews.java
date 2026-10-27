@@ -6,6 +6,8 @@ import android.text.TextUtils;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.FileLoader;
 import org.telegram.messenger.MessageObject;
+import org.telegram.messenger.LocaleController;
+import org.telegram.messenger.R;
 import org.telegram.tgnet.TLRPC;
 
 /**
@@ -85,25 +87,35 @@ public final class SignatureSmartPreviews {
             }
             case SignatureSmartPreviewPalette.FILE:{
                 String file=FileLoader.getDocumentFileName(message.getDocument());
-                return "📄  "+(TextUtils.isEmpty(file)?"Documento":file);
+                return "📄  "+(TextUtils.isEmpty(file)?LocaleController.getString(R.string.FlexySmartFile):file);
             }
             case SignatureSmartPreviewPalette.MUSIC:{
                 String title=message.getMusicTitle();
-                return "♫  "+(TextUtils.isEmpty(title)?"Música":title);
+                return "♫  "+(TextUtils.isEmpty(title)?LocaleController.getString(R.string.FlexySmartMusic):title);
             }
             case SignatureSmartPreviewPalette.LINK:{
                 String url=message.messageOwner.message;
-                if(TextUtils.isEmpty(url))return "🔗  Enlace";
-                // No network request. Limit to the first line of the existing caption.
-                int end=url.indexOf('\n');
-                if(end>=0)url=url.substring(0,end);
-                return "🔗  "+url;
+                if(TextUtils.isEmpty(url))return "🔗  "+LocaleController.getString(R.string.FlexySmartLink);
+                // The preview is a compact host label, never a network fetch.
+                // Discard paths, queries and fragments to keep tracking codes or
+                // long tokens out of the main chat list.
+                url=url.trim();
+                int scheme=url.indexOf("://");
+                if(scheme>=0)url=url.substring(scheme+3);
+                int end=url.length();
+                for(char c:new char[]{'/','?','#','\n','\r'}){
+                    int pos=url.indexOf(c);
+                    if(pos>=0&&pos<end)end=pos;
+                }
+                url=url.substring(0,end);
+                if(url.length()>52)url=url.substring(0,52);
+                return "🔗  "+(url.isEmpty()?LocaleController.getString(R.string.FlexySmartLink):url);
             }
-            case SignatureSmartPreviewPalette.PHOTO:return "▣  Foto";
-            case SignatureSmartPreviewPalette.VIDEO:return "▶  Vídeo";
+            case SignatureSmartPreviewPalette.PHOTO:return "▣  "+LocaleController.getString(R.string.FlexySmartPhoto);
+            case SignatureSmartPreviewPalette.VIDEO:return "▶  "+LocaleController.getString(R.string.FlexySmartVideo);
             case SignatureSmartPreviewPalette.EVENT:{
                 CharSequence event=message.messageText;
-                return "♧  "+(TextUtils.isEmpty(event)?"Evento del grupo":event.toString());
+                return "♧  "+(TextUtils.isEmpty(event)?LocaleController.getString(R.string.FlexySmartGroupEvent):event.toString());
             }
             default:return "";
         }
