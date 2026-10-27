@@ -2792,9 +2792,11 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
         // downloads, no re-layout of rows and no alteration of native chat text.
         smartPreviewKind=0;
         if (app.flexygram.home.SignatureSmartPreviews.mode() != app.flexygram.home.SignatureSmartPreviewPalette.OFF
+                // Keep this identical to DialogsActivity's real main-list
+                // modes (default and both primary folder filters). Do not
+                // reference nonexistent DIALOGS_TYPE_FOLDER1/FOLDER2 constants.
                 && (dialogsType == DialogsActivity.DIALOGS_TYPE_DEFAULT
-                    || dialogsType == DialogsActivity.DIALOGS_TYPE_FOLDER1
-                    || dialogsType == DialogsActivity.DIALOGS_TYPE_FOLDER2)
+                    || dialogsType == 7 || dialogsType == 8)
                 && currentDialogFolderId == 0 && currentDialogCommunityId == 0
                 && message != null && draftMessage == null && !draftVoice
                 && TextUtils.isEmpty(printingString) && customDialog == null
