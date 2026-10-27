@@ -2820,10 +2820,15 @@ public class ChatActivityEnterView extends FrameLayout implements
                 applyFlexyComposerPresentation(MeasureSpec.getSize(widthMeasureSpec));
                 super.onMeasure(widthMeasureSpec, heightMeasureSpec);
                 final int height = Math.max(dp(44), getMeasuredHeight());
-                if (animatorInputFieldHeight.getFactor() > 0) {
-                    animatorInputFieldHeight.animateTo(height);
-                } else {
-                    animatorInputFieldHeight.forceFactor(height);
+                // FactorAnimator.animateTo() cancels a running animation
+                // BEFORE checking the requested target. Repeated measure passes
+                // during multiline typing must not restart that same animation.
+                if (animatorInputFieldHeight.getToFactor() != height) {
+                    if (animatorInputFieldHeight.getFactor() > 0) {
+                        animatorInputFieldHeight.animateTo(height);
+                    } else {
+                        animatorInputFieldHeight.forceFactor(height);
+                    }
                 }
                 checkUi_TopViewVisibility();
             }
@@ -16586,7 +16591,10 @@ public class ChatActivityEnterView extends FrameLayout implements
     }
 
     private int flexyCompactTextEnd() {
-        return dp(app.flexygram.composer.ComposerGeometry.TEXT_END_SLOT) + Math.round(Math.max(0, -nativeAttachTranslationX()));
+        // Reserve the stable native text slot. Animated sender alpha and
+        // translation must NOT alter EditText margins on every animation frame.
+        // updateFieldRight() already accounts for wider special send actions.
+        return dp(app.flexygram.composer.ComposerGeometry.TEXT_END_SLOT);
     }
 
     private boolean hasFlexySpecialControls() {
@@ -16594,7 +16602,9 @@ public class ChatActivityEnterView extends FrameLayout implements
             || senderSelectView != null && senderSelectView.getVisibility() == VISIBLE
             || botCommandsMenuButton != null && (botCommandsMenuButton.getTag() != null || botCommandsMenuButton.getVisibility() == VISIBLE)
             || botWebViewButton != null && botWebViewButton.getVisibility() == VISIBLE
-            || aiButton != null && aiButton.getVisibility() == VISIBLE
+            // Use the logical state rather than the 420ms transition's
+            // temporarily VISIBLE view, which can repeatedly switch layouts.
+            || aiButton != null && shownAiButton
             || ((MarginLayoutParams) emojiButton.getLayoutParams()).leftMargin > dp(3);
     }
 
@@ -16607,8 +16617,13 @@ public class ChatActivityEnterView extends FrameLayout implements
     private void applyFlexyComposerPresentation(int width) {
         if (!flexyCompactRequested && !flexyCompactLayout) return;
         final boolean specialControls = hasFlexySpecialControls();
+        // Layout eligibility depends on native available width and
+        // stable feature state, never per-frame send-button translation.
+        // Paid expanded send buttons stay on native layout for correct space.
+        final boolean expandedPaidSend = sendButton != null
+            && sendButton.starsPrice > 0 && sendButton.isOpen();
         final boolean compact = flexyCompactRequested && app.flexygram.composer.ComposerGeometry.supportsCompact(
-            (width + Math.min(0, nativeAttachTranslationX())) / AndroidUtilities.density, specialControls);
+            width / AndroidUtilities.density, specialControls || expandedPaidSend);
         if (!compact && !flexyCompactLayout) return;
         final boolean wasCompact = flexyCompactLayout;
         flexyCompactLayout = compact;
@@ -16723,7 +16738,9 @@ public class ChatActivityEnterView extends FrameLayout implements
         out.set(app.flexygram.composer.ComposerGeometry.pillLeft(x,
                 dp(app.flexygram.composer.ComposerGeometry.TOUCH_SLOT) - dp(flexyInsetDp), dp(flexyGapDp)),
             y + dp(flexyInsetDp), app.flexygram.composer.ComposerGeometry.pillRight(
-                x + messageEditTextContainer.getWidth(), dp(flexyGapDp) - dp(flexyInsetDp), nativeAttachTranslationX()),
+                // Draw text pill against the same stable layout bounds.
+                // The send button continues using its native animated transform.
+                x + messageEditTextContainer.getWidth(), dp(flexyGapDp) - dp(flexyInsetDp), 0),
             y + messageEditTextContainer.getHeight() - dp(flexyInsetDp));
         return out.width() > 0 && out.height() > 0;
     }
