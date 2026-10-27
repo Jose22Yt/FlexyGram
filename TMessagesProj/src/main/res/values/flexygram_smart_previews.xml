@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexySmartPreviewsTitle">Signature Smart Previews</string>
+    <string name="FlexySmartPreviewAdaptive">Semantic adaptive</string>
+    <string name="FlexySmartPreviewAccent">Theme accent</string>
+    <string name="FlexySmartPreviewMatte">Signature Matte</string>
+    <string name="FlexySmartPreviewOff">Disabled</string>
+</resources>
