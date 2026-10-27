@@ -81,15 +81,16 @@ public class FilterTabsView extends FrameLayout {
     private boolean signatureHome;
     private boolean signatureHomeOpaquePreview;
     private int signatureAccent, signatureAccentInk;
+    private final app.flexygram.home.SignatureFolderAccent signatureAccentColors=new app.flexygram.home.SignatureFolderAccent();
     /** Native theme callbacks own color/contrast resolution; draw only interpolates cached ints. */
     private void refreshSignatureAccent() {
         app.exteraless.appearance.AppearanceConfig.ensureLoaded();
         boolean dark=resourcesProvider!=null?resourcesProvider.isDark():Theme.isCurrentThemeDark();
         int neutral=app.flexygram.home.SignatureHomeStyle.surface(dark,false);
-        signatureAccent=ColorUtils.compositeColors(Theme.getColor(tabLineColorKey,resourcesProvider),neutral);
-        int preferred=ColorUtils.setAlphaComponent(Theme.getColor(activeTextColorKey,resourcesProvider),255);
-        signatureAccentInk=ColorUtils.calculateContrast(preferred,signatureAccent)>=4.5?preferred:
-            (ColorUtils.calculateContrast(0xff000000,signatureAccent)>=ColorUtils.calculateContrast(0xffffffff,signatureAccent)?0xff000000:0xffffffff);
+        signatureAccentColors.update(Theme.getColor(tabLineColorKey,resourcesProvider),
+            Theme.getColor(activeTextColorKey,resourcesProvider),neutral);
+        signatureAccent=signatureAccentColors.color;
+        signatureAccentInk=signatureAccentColors.ink;
     }
 
 
@@ -592,7 +593,7 @@ public class FilterTabsView extends FrameLayout {
                 counterPaint.setColor(app.flexygram.home.SignatureHomePainter.blend(counterPaint.getColor(),signatureAccentInk,selected));
                 textCounterPaint.setColor(app.flexygram.home.SignatureHomePainter.blend(textCounterPaint.getColor(),signatureAccent,selected));
             }
-            float titleWidth = currentTab.titleWidth;
+                float titleWidth = currentTab.titleWidth;
                 if (animateTextChange) {
                     titleWidth = animateFromTitleWidth * (1f - changeProgress) + currentTab.titleWidth * changeProgress;
                 }

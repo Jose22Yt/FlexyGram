@@ -86,4 +86,14 @@ public class HomeVisualTest {
    assertEquals(0,b.getPixel(0,25));assertEquals(0,b.getPixel(149,25));assertTrue((b.getPixel(75,25)>>>24)>0);
   }
  }
+ @Test public void onlySelectedSurfaceUsesThemeAccentAndDisabledPathIsUnchanged(){
+  SignatureHomePainter p=new SignatureHomePainter();
+  for(boolean dark:new boolean[]{false,true})for(int accent:new int[]{0xff0066cc,0xff168a45,0xff9933cc,0xffffff00,0xff000000,0xffffffff}){
+   Bitmap b=Bitmap.createBitmap(150,50,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(b);
+   p.category(c,150,50,1,dark,false,1,accent);assertEquals(accent,b.getPixel(75,25));
+   b.eraseColor(0);p.category(c,150,50,1,dark,false,0,accent);assertEquals(SignatureHomeStyle.surface(dark,false),b.getPixel(75,25));
+   b.eraseColor(0);p.category(c,150,50,1,dark,false,1);assertEquals(SignatureHomeStyle.selectedSurface(dark,false),b.getPixel(75,25));
+   for(float t:new float[]{0,.25f,.5f,.75f,1}){b.eraseColor(0);p.category(c,150,50,1,dark,false,t,accent);assertEquals(SignatureHomePainter.blend(SignatureHomeStyle.surface(dark,false),accent,t),b.getPixel(75,25));}
+  }
+ }
 }

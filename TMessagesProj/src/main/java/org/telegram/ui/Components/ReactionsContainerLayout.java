@@ -1614,7 +1614,7 @@ public class ReactionsContainerLayout extends FrameLayout implements Notificatio
         notificationsLocker.lock();
         final ObjectAnimator animator=ObjectAnimator.ofFloat(this,TRANSITION_PROGRESS_VALUE,from,target);
         signatureTransitionAnimator=animator;
-        animator.setDuration(Math.max(80L,Math.round((opening?240L:180L)*Math.min(1f,Math.abs(target-from)))));
+        animator.setDuration(Math.max(1L,Math.round((opening?240L:180L)*Math.min(1f,Math.abs(target-from)))));
         animator.setInterpolator(opening?new OvershootInterpolator(.5f):CubicBezierInterpolator.EASE_OUT_QUINT);
         animator.addListener(new AnimatorListenerAdapter(){
             @Override public void onAnimationEnd(Animator animation){
