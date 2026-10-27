@@ -593,6 +593,25 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
     private int buttonLeft;
     private int typingLeft;
     private StaticLayout messageLayout;
+    // Signature Smart Previews: one cached content type per updated dialog row.
+    // The original message layout, row geometry and Telegram click targets remain.
+    private int smartPreviewKind;
+    private final app.flexygram.home.SignatureSmartPreviewPalette smartPreviewPalette =
+            new app.flexygram.home.SignatureSmartPreviewPalette();
+    private final Paint smartPreviewPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private void drawSmartPreviewBackground(Canvas canvas, float top, float alpha) {
+        if (smartPreviewKind == 0 || messageLayout == null || messageLayout.getLineCount() == 0 || alpha <= 0f) return;
+        int mode=app.flexygram.home.SignatureSmartPreviews.mode();
+        int accent=Theme.getColor(Theme.key_actionBarTabLine,resourcesProvider);
+        int surface=Theme.getColor(Theme.key_windowBackgroundWhite,resourcesProvider);
+        smartPreviewPalette.update(smartPreviewKind,mode,accent,surface);
+        smartPreviewPaint.setColor(smartPreviewPalette.background());
+        smartPreviewPaint.setAlpha(Math.round(255f*Math.max(0f,Math.min(1f,alpha))));
+        float left = messageLeft - dp(6);
+        float right = messageLeft + Math.min(messageLayout.getLineWidth(0),dp(245)) + dp(9);
+        float height = Math.min(dp(22),messageLayout.getLineBottom(0)+dp(3));
+        canvas.drawRoundRect(left,top-dp(2),right,top+height,dp(12),dp(12),smartPreviewPaint);
+    }
     private StaticLayout typingLayout;
 
     private int buttonTop;
@@ -2747,6 +2766,25 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
             }
         }
 
+        // Replace only uncaptioned, ordinary last-message snippets. No media
+        // downloads, no re-layout of rows and no alteration of native chat text.
+        smartPreviewKind=0;
+        if (currentDialogFolderId == 0 && currentDialogCommunityId == 0
+                && message != null && draftMessage == null && !draftVoice
+                && TextUtils.isEmpty(printingString) && customDialog == null
+                && !isForumCell() && !isFolderCell() && !hasTags()
+                && messageNameString == null && groupMessages == null
+                && !isTopic && restrictionReason == null) {
+            int candidate=app.flexygram.home.SignatureSmartPreviews.kind(message);
+            if (candidate != 0) {
+                String label=app.flexygram.home.SignatureSmartPreviews.label(message,candidate);
+                if (!TextUtils.isEmpty(label)) {
+                    smartPreviewKind=candidate;
+                    messageString=label;
+                    checkMessage=false;
+                }
+            }
+        }
         if (checkMessage) {
             if (messageString == null) {
                 messageString = "";
@@ -2847,6 +2885,11 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
 
         try {
             CharSequence messageStringFinal;
+            if (smartPreviewKind != 0) {
+                // A one-line capsule, clipped by the same native message width.
+                messageString=TextUtils.ellipsize(messageString,currentMessagePaint,
+                        Math.max(dp(20),Math.min(dp(224),messageWidth-dp(20))),TextUtils.TruncateAt.END);
+            }
             // Removing links and bold spans to get rid of underlining and boldness
             if (messageString instanceof Spannable) {
                 Spannable messageStringSpannable = (Spannable) messageString;
@@ -2860,7 +2903,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                 messageStringFinal = messageNameString;
                 messageNameString = null;
                 currentMessagePaint = Theme.dialogs_messagePaint[paintIndex];
-            } else if (!useForceThreeLines && !SharedConfig.useThreeLinesLayout || hasTags() || messageNameString != null || ChatObject.isMonoForum(chat) && ChatObject.canManageMonoForum(currentAccount, chat)) {
+            } else if (smartPreviewKind != 0 || !useForceThreeLines && !SharedConfig.useThreeLinesLayout || hasTags() || messageNameString != null || ChatObject.isMonoForum(chat) && ChatObject.canManageMonoForum(currentAccount, chat)) {
                 if (!isForumCell() && messageString instanceof Spanned && ((Spanned) messageString).getSpans(0, messageString.length(), ThumbnailSpan.class).length <= 0) {
                     messageStringFinal = TextUtils.ellipsize(messageString, currentMessagePaint, messageWidth - dp(12 + (thumbsCount * (thumbSize + 2) - 2) + 5), TextUtils.TruncateAt.END);
                 } else {
@@ -4427,8 +4470,13 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                     top -= dp(isForumCell() ? 10 : 11);
                 }
                 if (updateHelper.typingProgres != 1f) {
+                    drawSmartPreviewBackground(canvas,top,1f-updateHelper.typingProgres);
                     canvas.save();
                     canvas.translate(messageLeft, top);
+                    int oldInk=messageLayout.getPaint().getColor();
+                    if (smartPreviewKind != 0) {
+                        messageLayout.getPaint().setColor(smartPreviewPalette.foreground());
+                    }
                     int oldAlpha = messageLayout.getPaint().getAlpha();
                     messageLayout.getPaint().setAlpha((int) (oldAlpha * (1f - updateHelper.typingProgres)));
                     if (!spoilers.isEmpty()) {
@@ -4452,6 +4500,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                         AnimatedEmojiSpan.drawAnimatedEmojis(canvas, messageLayout, animatedEmojiStack, -.075f, null, 0, 0, 0, 1f, getAdaptiveEmojiColorFilter(2, messageLayout.getPaint().getColor()));
                     }
                     messageLayout.getPaint().setAlpha(oldAlpha);
+                    if (smartPreviewKind != 0)messageLayout.getPaint().setColor(oldInk);
                     canvas.restore();
                 }
 
