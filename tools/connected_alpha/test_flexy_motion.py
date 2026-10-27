@@ -138,6 +138,21 @@ public class FlexyMotionProbe {
         for p in ['.github/workflows/connected-alpha-arm64.yml','TMessagesProj/build.gradle','TMessagesProj/src/main/AndroidManifest.xml']:
             self.assertEqual(subprocess.check_output(['git','show',BASE+':'+p],cwd=ROOT),(ROOT/p).read_bytes())
 
+    def test_tabs_keep_native_selection_and_direct_finger_protocol(self):
+        import sys
+        sys.path.insert(0,str(ROOT/'tools/connected_alpha'))
+        from motion_contract import BASE
+        path='TMessagesProj/src/main/java/org/telegram/ui/MainTabsLayout.java'
+        old=subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT,text=True)
+        new=(ROOT/path).read_text()
+        for start,end in [('    public void setTabSelected(', '    private final Runnable restoreDrawSelector'),('    private void checkLongMove(', '    private final Set<View>'),('    private void checkPivot(', '    private static float clampXToChildrenCenters')]:
+            self.assertEqual(old[old.index(start):old.index(end)],new[new.index(start):new.index(end)])
+        self.assertNotIn('SpringAnimation',new)
+        self.assertIn('if (motionDetaching) return;',new)
+        self.assertIn('onWindowVisibilityChanged',new)
+        click='TMessagesProj/src/main/java/me/vkryl/android/util/ClickHelper.java'
+        self.assertEqual(subprocess.check_output(['git','show',BASE+':'+click],cwd=ROOT),(ROOT/click).read_bytes())
+
     def test_runtime_uses_frame_clock_not_system_duration_scale(self):
         frame = (JAVA / "FlexyFrameMotion.java").read_text()
         settings = (JAVA / "FlexyMotionSettings.java").read_text()

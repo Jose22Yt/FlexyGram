@@ -19,7 +19,7 @@ public class MotionEngineTest {
  Activity activity;Button button;
  void advance(int ms){Shadows.shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(ms));}
  @Before public void setup(){org.robolectric.util.ReflectionHelpers.callStaticMethod(android.animation.ValueAnimator.class,"setDurationScale",org.robolectric.util.ReflectionHelpers.ClassParameter.from(float.class,1f));org.robolectric.shadows.ShadowChoreographer.setPaused(true);org.robolectric.shadows.ShadowChoreographer.setFrameDelay(Duration.ofMillis(16));activity=Robolectric.buildActivity(Activity.class).setup().visible().get();button=new Button(activity);activity.setContentView(button);button.layout(0,0,200,100);advance(32);org.robolectric.util.ReflectionHelpers.setField(org.robolectric.util.ReflectionHelpers.getField(button,"mAttachInfo"),"mWindowVisibility",View.VISIBLE);assertTrue("attached",button.isAttachedToWindow());assertTrue("shown",button.isShown());assertEquals("window visibility",View.VISIBLE,button.getWindowVisibility());FlexyMotionSettings.setProfile(activity,FlexyMotionProfile.FLOW);FlexyMotionSettings.setReduceMotion(activity,false);}
- @After public void finish(){activity.finish();advance(32);assertEquals(0,FlexyFrameMotion.activeCount());}
+ @After public void finish(){activity.setContentView(new View(activity));activity.finish();advance(32);assertEquals(0,FlexyFrameMotion.activeCount());}
  @Test public void scalesDoNotControlMigratedClock(){
   for(FlexyMotionProfile profile:FlexyMotionProfile.values()){FlexyMotionSettings.setProfile(activity,profile);float reference=0;
   for(float scale:new float[]{0,.5f,1,2,5}){
@@ -83,4 +83,38 @@ public class MotionEngineTest {
 
  @Test public void unchangedReducedMotionIsNotRedispatchedRecursively(){FlexyMotionSettings.setReduceMotion(activity,true);int[] callbacks={0};FlexyFrameMotion m=new FlexyFrameMotion(button,0,v->{callbacks[0]++;if(v==1)FlexyMotionSettings.setReduceMotion(activity,true);});m.animateTo(1);assertEquals(1,callbacks[0]);assertEquals(0,FlexyFrameMotion.activeCount());m.dispose();}
 
+
+ MainTabsLayout tabs(){
+  MainTabsLayout tabs=new MainTabsLayout(activity);activity.setContentView(tabs);advance(32);
+  for(int i=0;i<3;i++){MainTabsLayout.GlassTabView child=new MainTabsLayout.GlassTabView(activity);tabs.addView(child,new android.widget.FrameLayout.LayoutParams(100,50));}
+  tabs.measure(View.MeasureSpec.makeMeasureSpec(300,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(50,View.MeasureSpec.EXACTLY));tabs.layout(0,0,300,50);
+  for(int i=0;i<3;i++)tabs.getChildAt(i).layout(i*100,0,(i+1)*100,50);
+  tabs.setTabSelected(tabs.getChildAt(0),false);return tabs;
+ }
+ @Test public void tabFingerWritesRemainAuthoritativeAcrossRetargetAndSettings(){
+  MainTabsLayout t=tabs();FlexyMotionSettings.setProfile(activity,FlexyMotionProfile.SIGNATURE);
+  t.begin(50);t.move(210);assertEquals(210,t.center(),0);advance(32);assertEquals(210,t.center(),0);
+  FlexyMotionSettings.setProfile(activity,FlexyMotionProfile.FLOW);assertEquals(210,t.center(),0);t.finish(210);advance(1500);assertEquals(250,t.center(),0);assertFalse(t.custom());
+ }
+ @Test public void tabDetachCancelsLongPressWithoutCommittingNavigation(){
+  MainTabsLayout t=tabs();int[] clicks={0};for(int i=0;i<3;i++)t.getChildAt(i).setOnClickListener(v->clicks[0]++);
+  t.begin(50);t.move(210);activity.setContentView(new View(activity));advance(1500);
+  assertEquals(0,clicks[0]);assertFalse(t.custom());assertEquals(1,t.getScaleX(),0);assertEquals(1,t.getScaleY(),0);assertEquals(0,FlexyFrameMotion.activeCount());
+ }
+ @Test public void tabProfilesRespectEveryAndroidScaleAndKeepClickImmediate(){
+  for(FlexyMotionProfile p:FlexyMotionProfile.values())for(float scale:new float[]{0,.5f,1,2,5}){
+   org.robolectric.util.ReflectionHelpers.callStaticMethod(android.animation.ValueAnimator.class,"setDurationScale",org.robolectric.util.ReflectionHelpers.ClassParameter.from(float.class,scale));
+   FlexyMotionSettings.setProfile(activity,p);MainTabsLayout t=tabs();int[] clicks={0};t.getChildAt(2).setOnClickListener(v->clicks[0]++);
+   t.begin(50);t.move(210);t.finish(210);assertEquals(1,clicks[0]);
+   if(p==FlexyMotionProfile.FLASH){assertEquals(250,t.center(),0);assertFalse(t.custom());assertEquals(1,t.getScaleX(),0);}else{advance(32);assertTrue(t.center()!=250);advance(1500);assertEquals(250,t.center(),0);assertFalse(t.custom());}
+   activity.setContentView(new View(activity));advance(32);assertEquals(0,FlexyFrameMotion.activeCount());
+  }
+ }
+ @Test public void tabReduceMotionDuringDragKeepsFingerPositionAndClearsPulse(){MainTabsLayout t=tabs();t.begin(50);t.move(190);advance(64);FlexyMotionSettings.setReduceMotion(activity,true);assertEquals(190,t.center(),0);assertEquals(1,t.getScaleX(),0);t.finish(190);assertEquals(150,t.center(),0);assertFalse(t.custom());}
+ @Test public void pixelSpringSettlesExactlyAndDisposesWithoutIdleFrames(){float[] p={0};FlexyBoundSpring s=new FlexyBoundSpring(button,()->p[0],v->p[0]=v);s.animateToFinalPosition(100);advance(1500);assertEquals(100,p[0],0);assertEquals(0,FlexyFrameMotion.activeCount());p[0]=80;s.animateToFinalPosition(20);advance(32);assertTrue(p[0]>20&&p[0]<80);s.dispose();advance(1000);assertEquals(0,FlexyFrameMotion.activeCount());}
+
+ @Test public void flashDuringTabReturnRestoresSelectorImmediately(){MainTabsLayout t=tabs();t.begin(50);t.move(210);t.finish(210);assertTrue(t.custom());FlexyMotionSettings.setProfile(activity,FlexyMotionProfile.FLASH);assertFalse(t.custom());assertEquals(250,t.center(),0);assertEquals(1,t.getScaleX(),0);}
+ @Test public void hidingTabWindowCancelsWithoutSelectionAndCanReattach(){MainTabsLayout t=tabs();int[] clicks={0};t.getChildAt(2).setOnClickListener(v->clicks[0]++);t.begin(50);t.move(210);t.onWindowVisibilityChanged(View.INVISIBLE);advance(1000);assertEquals(0,clicks[0]);assertFalse(t.custom());assertEquals(0,FlexyFrameMotion.activeCount());t.onWindowVisibilityChanged(View.VISIBLE);t.begin(50);t.move(210);t.finish(210);assertEquals(1,clicks[0]);}
+
+ @Test public void settingsCallbackCanDisposeWithoutWritingDestroyedView(){int[] writes={0};FlexyFrameMotion m=new FlexyFrameMotion(button,0,v->writes[0]++);m.setOnSettingsChanged(m::dispose);FlexyMotionSettings.setProfile(activity,FlexyMotionProfile.FLASH);assertEquals(0,writes[0]);assertEquals(0,FlexyFrameMotion.activeCount());}
 }

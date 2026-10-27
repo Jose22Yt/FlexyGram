@@ -6,6 +6,7 @@ public final class FlexyMotionSpring {
     private double value, velocity, target, stiffness, dampingRatio;
     private double omega, alpha, frequency, pole1, pole2;
     private boolean critical;
+    private double positionThreshold=.0006, velocityThreshold=.004;
     public FlexyMotionSpring(float initial) { configure(FlexyMotionProfile.FLOW); snapTo(initial); }
     public float value(){return (float)value;}
     public float velocity(){return (float)velocity;}
@@ -26,7 +27,11 @@ public final class FlexyMotionSpring {
         if(!Float.isFinite(position)||!Float.isFinite(speed))throw new IllegalArgumentException("state");
         target(destination);value=position;velocity=speed;
     }
-    public boolean settled(){return Math.abs(value-target)<=.0006&&Math.abs(velocity)<=.004;}
+    void thresholds(float position,float velocity){
+        if(!Float.isFinite(position)||!Float.isFinite(velocity)||position<=0||velocity<=0)throw new IllegalArgumentException("thresholds");
+        positionThreshold=position;velocityThreshold=velocity;
+    }
+    public boolean settled(){return Math.abs(value-target)<=positionThreshold&&Math.abs(velocity)<=velocityThreshold;}
     public float advance(float seconds){
         if(!(seconds>0)||!Float.isFinite(seconds))return value();
         if(settled()||seconds>=.25f){snapTo(target());return value();}
