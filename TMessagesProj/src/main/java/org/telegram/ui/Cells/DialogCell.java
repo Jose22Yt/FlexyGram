@@ -2797,7 +2797,10 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                 && message != null && draftMessage == null && !draftVoice
                 && TextUtils.isEmpty(printingString) && customDialog == null
                 && !isForumCell() && !isFolderCell() && !hasTags()
-                && thumbsCount == 0 && messageNameString == null && groupMessages == null
+                && thumbsCount == 0 && groupMessages == null
+                // Sender names are on a separate native row in three-line
+                // group layouts. Two-line inline-sender previews stay native.
+                && (messageNameString == null || useForceThreeLines || SharedConfig.useThreeLinesLayout)
                 && !isTopic && (message.messageOwner.restriction_reason == null
                      || message.messageOwner.restriction_reason.isEmpty())) {
             int candidate=app.flexygram.home.SignatureSmartPreviews.kind(message);
