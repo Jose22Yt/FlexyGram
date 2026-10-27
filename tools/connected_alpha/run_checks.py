@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parents[2]
 
 def main():
     commands = [
+        [sys.executable, 'tools/connected_alpha/stability1277_contract.py'],
         [sys.executable, 'tools/connected_alpha/check_source.py'],
         [sys.executable, 'tools/connected_alpha/stability/audit_sources.py'],
         [sys.executable, '-m', 'unittest', 'discover', '-s', 'tools/connected_alpha', '-p', 'test_*.py', '-v'],

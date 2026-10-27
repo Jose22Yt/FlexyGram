@@ -45,7 +45,8 @@ class ComposerRegression(unittest.TestCase):
                 if before: self.assertEqual(before, method_bodies(reviewed, name))
 
     def test_all_native_measure_and_keyboard_height_bodies_are_preserved(self):
-        current = self.current.replace('                applyFlexyComposerPresentation(MeasureSpec.getSize(widthMeasureSpec));\n','')
+        from stability1277_contract import restore
+        current = restore(ENTER,self.current.encode()).decode().replace('                applyFlexyComposerPresentation(MeasureSpec.getSize(widthMeasureSpec));\n','')
         for name in ('onMeasure', 'onWindowSizeChanged', 'resizeForTopView', 'checkStickresExpandHeight'):
             self.assertEqual(method_bodies(self.original, name), method_bodies(current, name), name)
         self.assertIn('public static final int DEFAULT_HEIGHT = 44;', self.current)
@@ -128,7 +129,7 @@ public class GeometryRegression {
         self.assertIn('flexyPill.offset(offsetX, offsetY)', draw)
         bounds = method_bodies(self.current, 'getFlexyTextPillBounds')[0]
         self.assertIn('messageEditTextContainer.getWidth()', bounds)
-        self.assertIn('nativeAttachTranslationX()', bounds)
+        self.assertNotIn('nativeAttachTranslationX()', bounds)
         # Test actual production geometry in px across multiple screen densities.
         production = ROOT/'TMessagesProj/src/main/java/app/flexygram/composer/ComposerGeometry.java'
         test = '''
@@ -194,7 +195,7 @@ public class PillBoundsRegression {
     require(p.getFlexyTextPillBounds(r),"missing valid surface");
     float x=p.textFieldContainer.x+p.messageEditTextContainer.x;
     float y=p.textFieldContainer.y+p.messageEditTextContainer.y;
-    float end=x+p.messageEditTextContainer.width+p.actionShift;
+    float end=x+p.messageEditTextContainer.width;
     require(r.left-(x+dp(44)-dp(p.flexyInsetDp))>=dp(gap),"attachment merged into pill");
     require(end+dp(p.flexyInsetDp)-r.right>=dp(gap),"send merged into pill");
     float emojiCenter=end-dp(3)-dp(22);
@@ -250,7 +251,7 @@ public class PresentationRegression {
  static class FrameLayout { static class LayoutParams extends MarginLayoutParams {} }
  static class V {
   FrameLayout.LayoutParams p=new FrameLayout.LayoutParams(); int visibility=8; Object tag;
-  float translation,alpha=1; int width=44, imageResource;
+  float translation,alpha=1; int width=44, imageResource; long starsPrice; boolean isOpen(){return width>44;}
   FrameLayout.LayoutParams getLayoutParams(){return p;}
   int getVisibility(){return visibility;}
   Object getTag(){return tag;}
@@ -264,6 +265,7 @@ public class PresentationRegression {
   int width(){return width;}
   float getAlpha(){return alpha;}
  }
+ boolean shownAiButton;
  boolean isChat=true,isStories=false,flexyCompactRequested,flexyCompactLayout,flexyMenuState,isInInput;
  Object parentFragment=new Object();
  V senderSelectView=new V(),botCommandsMenuButton=new V(),botWebViewButton=new V(),aiButton=new V();
@@ -296,7 +298,7 @@ public class PresentationRegression {
    p.require(p.attachButton.imageResource==R.drawable.msg_add);
    p.require(p.emojiButton.p.gravity==(Gravity.BOTTOM|Gravity.RIGHT));
    p.require(p.messageEditText.p.leftMargin==64);
-   p.require(p.messageEditText.p.rightMargin>=56+Math.max(0,-p.nativeAttachTranslationX()));
+   p.require(p.messageEditText.p.rightMargin>=56);
    p.require(p.messageEditText==originalText && p.draft==originalDraft);
    p.require(p.messageEditText.textSize==16 && p.messageEditText.textUnit==TypedValue.COMPLEX_UNIT_SP);
    p.nativeMeasure();p.flexyCompactRequested=false;p.applyFlexyComposerPresentation(335);
@@ -310,9 +312,9 @@ public class PresentationRegression {
   p.botCommandsMenuButton.tag=new Object();p.emojiButton.p.leftMargin=80;p.messageEditText.p.leftMargin=120;
   p.applyFlexyComposerPresentation(335);
   p.require(!p.flexyCompactLayout && p.emojiButton.p.leftMargin==80 && p.messageEditText.p.leftMargin==120);
-  p.botCommandsMenuButton.tag=null;p.nativeMeasure();p.sendButton.width=240;p.applyFlexyComposerPresentation(335);
+  p.botCommandsMenuButton.tag=null;p.nativeMeasure();p.sendButton.starsPrice=1;p.sendButton.width=240;p.applyFlexyComposerPresentation(335);
   p.require(!p.flexyCompactLayout); // paid action leaves insufficient width
-  p.sendButton.width=44;p.nativeMeasure();p.applyFlexyComposerPresentation(200);
+  p.sendButton.starsPrice=0;p.sendButton.width=44;p.nativeMeasure();p.applyFlexyComposerPresentation(200);
   p.require(!p.flexyCompactLayout);
   System.out.print("PASS: actual production presentation method; native margin, paid widths, draft identity, special controls and 10000 recoveries");
  }

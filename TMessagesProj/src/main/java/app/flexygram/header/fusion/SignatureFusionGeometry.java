@@ -111,24 +111,24 @@ public final class SignatureFusionGeometry {
             g.call.set(0,0,0,0);
         }
 
-        // The photo reaches the rounded left edge, fades before the text begins.
-        // No detached circular badge and no image behind legible text.
-        float photoW = Math.min(73f*d, Math.max(0f, cw - 60f*d));
-        float minVisible = Math.min(38f*d, photoW);
-        float fadeTail = Math.min(28f*d, Math.max(0f, photoW - minVisible));
+        // Preserve the approved text/control geometry. Only the photo/mask extends.
+        // The sampled smooth fade continues into the name area at under 5% alpha.
+        float originalPhotoW = Math.min(73f*d, Math.max(0f, cw - 60f*d));
+        float photoW = SignatureFusionFade.portraitWidth(cw,d);
+        float fadeTail = SignatureFusionFade.fadeTail(photoW,d);
         float labelPad = 7f*d;
         if (!rtl) {
             g.portrait.set(g.center.left, 0, g.center.left+photoW, centerH);
             g.fadeStartX = g.portrait.right - fadeTail;
             g.fadeEndX = g.portrait.right;
-            g.text.set(g.center.left + Math.max(0f, photoW - 5f*d) + labelPad, 0,
+            g.text.set(g.center.left + Math.max(0f, originalPhotoW - 5f*d) + labelPad, 0,
                     g.center.right - TEXT_RIGHT_PAD_DP*d, centerH);
         } else {
             g.portrait.set(g.center.right-photoW, 0, g.center.right, centerH);
             g.fadeStartX = g.portrait.left + fadeTail;
             g.fadeEndX = g.portrait.left;
             g.text.set(g.center.left + TEXT_RIGHT_PAD_DP*d, 0,
-                    g.center.right - Math.max(0f,photoW-5f*d) - labelPad, centerH);
+                    g.center.right - Math.max(0f,originalPhotoW-5f*d) - labelPad, centerH);
         }
         // A fallback is preferable to clipping text or creating overlapping buttons.
         g.fits &= g.text.width() >= 48f*d;

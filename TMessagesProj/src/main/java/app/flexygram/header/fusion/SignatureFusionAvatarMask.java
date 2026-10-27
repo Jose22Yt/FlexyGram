@@ -39,13 +39,12 @@ public final class SignatureFusionAvatarMask {
     public void prepare(float fadeStart, float fadeEnd, boolean rtl) {
         if (gradient == null || fadeStart != previousStart || fadeEnd != previousEnd || rtl != previousRtl) {
             // RTL: from transparent at left to opaque at right.
-            int startColor = rtl ? 0x00FFFFFF : 0xFFFFFFFF;
-            int endColor = rtl ? 0xFFFFFFFF : 0x00FFFFFF;
             float x0 = Math.min(fadeStart, fadeEnd);
             float x1 = Math.max(fadeStart, fadeEnd);
             if (x1 <= x0) x1 = x0 + 1f;
             gradient = new LinearGradient(x0, 0, x1, 0,
-                    startColor, endColor, Shader.TileMode.CLAMP);
+                    rtl ? SignatureFusionFade.RTL_COLORS : SignatureFusionFade.LTR_COLORS,
+                    rtl ? SignatureFusionFade.RTL_STOPS : SignatureFusionFade.LTR_STOPS, Shader.TileMode.CLAMP);
             fadePaint.setShader(gradient);
             previousStart = fadeStart;
             previousEnd = fadeEnd;

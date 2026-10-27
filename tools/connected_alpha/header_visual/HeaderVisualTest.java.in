@@ -55,7 +55,7 @@ public class HeaderVisualTest {
  }
  @Test public void renderSyntheticPreviewLightDarkAndOpacityChangesOnlySurface()throws Exception{
   Bitmap image=Bitmap.createBitmap(401,400,Bitmap.Config.ARGB_8888);Canvas canvas=new Canvas(image);
-  for(int i=0;i<2;i++){Theme.dark=i==1;HeaderPreviewView preview=new HeaderPreviewView(context(1));size(preview,401);canvas.save();canvas.translate(0,i*200);preview.draw(canvas);canvas.restore();assertTrue(preview.getContentDescription().toString().contains("Alex"));HeaderConfig.opacity(0);preview.invalidate();preview.draw(new Canvas(Bitmap.createBitmap(401,200,Bitmap.Config.ARGB_8888)));HeaderConfig.opacity(85);}
+  for(int i=0;i<2;i++){Theme.dark=i==1;HeaderPreviewView preview=new HeaderPreviewView(context(1));size(preview,401);canvas.save();canvas.translate(0,i*200);canvas.clipRect(0,0,preview.getMeasuredWidth(),preview.getMeasuredHeight());preview.draw(canvas);canvas.restore();assertTrue(preview.getContentDescription().toString().contains("Alex"));HeaderConfig.opacity(0);preview.invalidate();preview.draw(new Canvas(Bitmap.createBitmap(401,200,Bitmap.Config.ARGB_8888)));HeaderConfig.opacity(85);}
   try(var file=new java.io.FileOutputStream(new java.io.File(System.getProperty("probe.root"),"signature-header-synthetic.png"))){assertTrue(image.compress(Bitmap.CompressFormat.PNG,100,file));}
  }
  @Test public void optionalFusionUsesNativeSizedPartsRoutesActionsAndRestoresAdaptive()throws Exception{
@@ -93,19 +93,34 @@ public class HeaderVisualTest {
   }
   image.recycle();
  }
+ @Test public void extendedNativeMaskReachesNameAgainstRealLightAndDarkSurfaces()throws Exception{
+  for(boolean rtl:new boolean[]{false,true})for(float density:new float[]{1,2,3})for(int width:new int[]{320,393,600}){
+   var g=app.flexygram.header.fusion.SignatureFusionGeometry.calculate(width*density,density,rtl,true);if(!g.fits)continue;
+   int w=Math.round(g.portrait.width()),h=Math.round(g.portrait.height());
+   float start=g.fadeStartX-g.portrait.left,end=g.fadeEndX-g.portrait.left;
+   int name=Math.round((rtl?g.text.right:g.text.left)-g.portrait.left);
+   for(int background:new int[]{0xfff7f8fa,0xff11151c})for(int photo:new int[]{Color.BLACK,Color.WHITE,0xff2288cc}){
+    Bitmap image=Bitmap.createBitmap(w,h,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(image);c.drawColor(background);var mask=new app.flexygram.header.fusion.SignatureFusionAvatarMask();mask.prepare(start,end,rtl);Object shader=field(mask,"gradient");int save=mask.begin(c,0,0,w,h);Paint p=new Paint();p.setColor(photo);c.drawRect(0,0,w,h,p);mask.finish(c,save,w,h,start,end,rtl);
+    int color=image.getPixel(Math.max(0,Math.min(w-1,name)),h/2);assertTrue(Math.abs(Color.red(color)-Color.red(background))<=16);assertTrue(Math.abs(Color.green(color)-Color.green(background))<=16);assertTrue(Math.abs(Color.blue(color)-Color.blue(background))<=16);
+    assertEquals(photo,image.getPixel(rtl?w-Math.round(15*density):Math.round(15*density),h/2));for(int i=0;i<1000;i++)mask.prepare(start,end,rtl);assertSame(shader,field(mask,"gradient"));image.recycle();
+   }
+  }
+ }
  @Test public void defaultAdaptiveAllocatesNoFusionControllerOrControls()throws Exception{
   HeaderConfig.style(0);ActionBar bar=new ActionBar(context(1));ChatAvatarContainer avatar=new ChatAvatarContainer(bar.getContext());bar.addView(avatar,0,new FrameLayout.LayoutParams(-1,-1));SignatureChatHeader header=new SignatureChatHeader(bar,avatar,null);bar.setSignatureHeader(header);avatar.setSignatureHeader(header);size(bar,401);assertNull(field(header,"fusion"));assertNull(field(avatar,"signatureCall"));assertNull(field(avatar,"signaturePhotoMask"));
  }
 
  @Test public void liveFusionCompositesOnlyExistingPortraitAndPreviewDrawsTheSameGeometry()throws Exception{
-  HeaderConfig.style(2);Bitmap evidence=Bitmap.createBitmap(802,400,Bitmap.Config.ARGB_8888);Canvas output=new Canvas(evidence);
+  HeaderConfig.style(2);Bitmap evidence=Bitmap.createBitmap(802,400,Bitmap.Config.ARGB_8888);Canvas output=new Canvas(evidence);int[] photoX=new int[2],photoY=new int[2];
   for(boolean rtl:new boolean[]{false,true}){
    LocaleController.isRTL=rtl;Theme.dark=rtl;Context c=context(1);ActionBar bar=new ActionBar(c);ChatAvatarContainer avatar=new ChatAvatarContainer(c);avatar.callable=true;bar.addView(avatar,0,new FrameLayout.LayoutParams(-1,-1));SignatureChatHeader header=new SignatureChatHeader(bar,avatar,null);bar.setSignatureHeader(header);avatar.setSignatureHeader(header);size(bar,401);assertTrue(header.fusionActive());
    Bitmap live=Bitmap.createBitmap(401,bar.getMeasuredHeight(),Bitmap.Config.ARGB_8888);bar.draw(new Canvas(live));var g=header.fusionGeometry();int y=Math.round(g.portrait.centerY()+header.fusionTop);
    int opaqueX=Math.round(rtl?g.portrait.right-20:g.portrait.left+20),fadedX=Math.round(rtl?g.portrait.left+1:g.portrait.right-2);
    assertEquals("existing avatar stays opaque before fade",0xff2288cc,live.getPixel(opaqueX,y));assertNotEquals("native portrait fades into surface",0xff2288cc,live.getPixel(fadedX,y));assertTrue(Color.alpha(live.getPixel(fadedX,y))>=200);
-   output.drawBitmap(live,rtl?401:0,0,null);HeaderPreviewView preview=new HeaderPreviewView(c);size(preview,401);int save=output.save();output.translate(rtl?401:0,140);preview.draw(output);output.restoreToCount(save);live.recycle();header.detach();
+   photoX[rtl?1:0]=opaqueX+(rtl?401:0);photoY[rtl?1:0]=y;
+   output.drawBitmap(live,rtl?401:0,0,null);HeaderPreviewView preview=new HeaderPreviewView(c);size(preview,401);int save=output.save();output.translate(rtl?401:0,140);output.clipRect(0,0,preview.getMeasuredWidth(),preview.getMeasuredHeight());preview.draw(output);output.restoreToCount(save);live.recycle();header.detach();
   }
+  for(int i=0;i<2;i++)assertEquals("saved composite retains each real portrait",0xff2288cc,evidence.getPixel(photoX[i],photoY[i]));
   try(var file=new java.io.FileOutputStream(new java.io.File(System.getProperty("probe.root"),"signature-header-fusion-synthetic.png"))){assertTrue(evidence.compress(Bitmap.CompressFormat.PNG,100,file));}evidence.recycle();
  }
 

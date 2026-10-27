@@ -1153,21 +1153,12 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
                     if (Theme.getTheme(nightThemeName) == null || !Theme.getTheme(nightThemeName).isDark()) {
                         nightThemeName = "Dark Blue";
                     }
-                    Theme.ThemeInfo themeInfo = Theme.getActiveTheme();
-                    if (dayThemeName.equals(nightThemeName)) {
-                        if (themeInfo.isDark() || dayThemeName.equals("Dark Blue") || dayThemeName.equals("Night")) {
-                            dayThemeName = "Blue";
-                        } else {
-                            nightThemeName = "Dark Blue";
-                        }
+                    final boolean toDark = !Theme.isCurrentThemeDark();
+                    Theme.ThemeInfo themeInfo = Theme.getTheme(toDark ? nightThemeName : dayThemeName);
+                    if (themeInfo == null || themeInfo.isDark() != toDark) {
+                        themeInfo = Theme.getTheme(toDark ? "Dark Blue" : "Blue");
                     }
-
-                    boolean toDark;
-                    if (toDark = dayThemeName.equals(themeInfo.getKey())) {
-                        themeInfo = Theme.getTheme(nightThemeName);
-                    } else {
-                        themeInfo = Theme.getTheme(dayThemeName);
-                    }
+                    if (themeInfo == null || themeInfo.isDark() != toDark) return;
 
                     int[] pos = new int[2];
                     menuItem.getIconView().getLocationInWindow(pos);

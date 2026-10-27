@@ -53,7 +53,9 @@ class Startup(unittest.TestCase):
   state=method(launch,'private void updateCurrentConnectionState(int account)')
   original=subprocess.check_output(['git','show','175b299e0d4faeb246eca8e1be16a362a3a62213:TMessagesProj/src/main/java/org/telegram/ui/LaunchActivity.java'],cwd=ROOT,text=True)
   self.assertEqual(state,method(original,'private void updateCurrentConnectionState(int account)'))
-  native=(JAVA/'org/telegram/messenger/MessagesController.java').read_text()
+  from stability1277_contract import restore as restore_stability
+  native_path='TMessagesProj/src/main/java/org/telegram/messenger/MessagesController.java'
+  native=restore_stability(native_path,(ROOT/native_path).read_bytes()).decode()
   self.assertEqual(native,subprocess.check_output(['git','show','175b299e0d4faeb246eca8e1be16a362a3a62213:TMessagesProj/src/main/java/org/telegram/messenger/MessagesController.java'],cwd=ROOT,text=True))
 
  def test_exact_checkpoint_reverses_and_rejects_mutations(self):

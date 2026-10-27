@@ -32,3 +32,14 @@ SCENARIOS.update({
     'glass_on': 'Same approved Glass style enabled; record exact theme/wallpaper/cache state.',
     'glass_off': 'Same workload with Glass disabled by operator; do not change global device settings.',
 })
+
+# Stability1277: same operator-driven lab, no settings/network writes or generated touches.
+SCENARIOS.update({
+    'network_reconnect': 'Operator restores connectivity; match prior offline interval and network profile.',
+    'network_handover': 'Operator changes Wi-Fi/mobile; preserve the same declared synchronization state.',
+    'account_switch': 'Operator switches between the same prepared test accounts.',
+    'files_scroll': 'Scroll the same compatible long text/ZIP entry; same syntax/cursor state.',
+    'files_ime': 'Operator searches in the same test document/ZIP/editor with the same IME.',
+    'files_back': 'Operator repeats editor/folder/root Back with matched document/draft state.',
+    'composer_multiline': 'Operator types/deletes/pastes the same multiline fixture with the same IME.'
+})

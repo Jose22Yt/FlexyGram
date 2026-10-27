@@ -59,6 +59,8 @@ final class FlexyFilesSheet extends BottomSheet {
     private List<Row> rows = Collections.emptyList();
     private String path = "";
     private boolean closed;
+    private final boolean restored;
+    private android.os.Parcelable pendingScroll;
 
     private final LinearLayout location;
     private final TextView breadcrumb;
@@ -86,12 +88,26 @@ final class FlexyFilesSheet extends BottomSheet {
     }
 
     FlexyFilesSheet(BaseFragment owner, File file, String name, long dialog, int account) {
-        super(owner.getParentActivity(), false, owner.getResourceProvider());
+        this(owner, file, name, dialog, account, "");
+    }
+    /** Restore the ZIP folder after leaving the editor, without holding the old sheet alive. */
+    FlexyFilesSheet(BaseFragment owner, File file, String name, long dialog, int account, String initialPath) {
+        this(owner, file, name, dialog, account, initialPath, false);
+    }
+    /** Restored single-file overview prevents closing directly to Telegram chat. */
+    FlexyFilesSheet(BaseFragment owner, File file, String name, long dialog, int account, String initialPath, boolean restored) {
+        this(owner,file,name,dialog,account,initialPath,restored,"",null);
+    }
+    FlexyFilesSheet(BaseFragment owner,File file,String name,long dialog,int account,String initialPath,boolean restored,String initialQuery,android.os.Parcelable scroll){
+        super(owner.getParentActivity(), true, owner.getResourceProvider());
         this.owner = owner;
         this.file = file;
         this.name = name;
         this.dialog = dialog;
         this.account = account;
+        this.path = initialPath == null ? "" : initialPath;
+        this.restored = restored;
+        this.pendingScroll=scroll;
 
         Context c = getContext();
         setApplyTopPadding(false);
@@ -99,6 +115,7 @@ final class FlexyFilesSheet extends BottomSheet {
 
         LinearLayout root = vertical(c);
         root.setPadding(dp(18), dp(18), dp(18), dp(16));
+        root.setFocusableInTouchMode(true);root.requestFocus();
 
         TextView title = text(c, getString(R.string.FlexyFilesExplore), 21,
                 Theme.key_windowBackgroundWhiteBlackText);
@@ -168,6 +185,7 @@ final class FlexyFilesSheet extends BottomSheet {
                 color(Theme.key_windowBackgroundWhiteGrayIcon));
         search.addView(searchMark, new LinearLayout.LayoutParams(dp(20), dp(20)));
         query = new EditText(c);
+        query.setFocusableInTouchMode(true);
         query.setBackground(null);
         query.setSingleLine(true);
         query.setTextSize(15);
@@ -176,6 +194,7 @@ final class FlexyFilesSheet extends BottomSheet {
         query.setTextColor(color(Theme.key_windowBackgroundWhiteBlackText));
         query.setHintTextColor(color(Theme.key_windowBackgroundWhiteGrayText2));
         query.setEnabled(false);
+        query.setText(initialQuery);
         query.setMaxLines(1);
         query.setImeOptions(android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH);
         search.addView(query, new LinearLayout.LayoutParams(0, dp(48), 1f));
@@ -200,7 +219,7 @@ final class FlexyFilesSheet extends BottomSheet {
                 else query.setText("");
             } else {
                 if (owner.presentFragment(new FlexyFileEditorActivity(
-                        file, name, selected.path, dialog, account))) dismiss();
+                        file, name, document != null && document.isArchive() ? selected.path : null, dialog, account, owner, path).returnContext(query.getText().toString(),list.getLayoutManager().onSaveInstanceState()))) dismiss();
             }
         });
         // Keep the sheet compact, even on phones using enlarged font scaling.
@@ -331,6 +350,12 @@ final class FlexyFilesSheet extends BottomSheet {
         }
     }
 
+    /** Back clears search, then climbs one ZIP directory, then dismisses at root. */
+    @Override public void onBackPressed() {
+        if (query != null && query.length() > 0) { query.setText(""); return; }
+        if (!path.isEmpty()) { goUp(); return; }
+        super.onBackPressed();
+    }
     private void goUp() {
         if (path.isEmpty() || closed) return;
         String withoutSlash = path.substring(0, path.length() - 1);
@@ -368,8 +393,11 @@ final class FlexyFilesSheet extends BottomSheet {
                             AndroidUtilities.formatFileSize(ready.size()));
                     sheet.query.setEnabled(true);
                     if (!ready.isArchive()) {
-                        if (sheet.owner.presentFragment(new FlexyFileEditorActivity(
-                                sheet.file, sheet.name, null, sheet.dialog, sheet.account)))
+                        if (sheet.restored) {
+                            sheet.rows=Collections.singletonList(new Row(sheet.name, sheet.name, false, ready.size()));
+                            sheet.refreshLocation();sheet.adapter.notifyDataSetChanged();
+                        } else if (sheet.owner.presentFragment(new FlexyFileEditorActivity(
+                                sheet.file, sheet.name, null, sheet.dialog, sheet.account, sheet.owner, "")))
                             sheet.dismiss();
                     } else sheet.filter();
                 });
@@ -425,6 +453,7 @@ final class FlexyFilesSheet extends BottomSheet {
                 sheet.rows = result;
                 sheet.refreshLocation();
                 sheet.adapter.notifyDataSetChanged();
+                if(sheet.pendingScroll!=null){sheet.list.getLayoutManager().onRestoreInstanceState(sheet.pendingScroll);sheet.pendingScroll=null;}
             });
         });
     }

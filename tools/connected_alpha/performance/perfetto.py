@@ -53,10 +53,31 @@ SELECT s.startup_type, s.dur/1e6 AS startup_duration_ms,
 FROM android_startups s LEFT JOIN android_startup_time_to_display t USING(startup_id)
 WHERE s.package = '{package}';
 """
-    return {'config': config, 'frame_sql': sql, 'cpu_sql': cpu, 'startup_sql': startup,
+    phases = f"""-- Phase completion is NOT visible rows, useful connection or interactive readiness.
+INCLUDE PERFETTO MODULE android.startup.startups;
+WITH starts AS (
+ SELECT startup_id,startup_type,ts,LEAD(ts) OVER(ORDER BY ts) AS next_ts
+ FROM android_startups WHERE package = '{package}'
+)
+SELECT s.startup_id,s.startup_type,ph.name AS phase,
+ (ph.ts-s.ts)/1e6 AS phase_start_ms,(ph.ts+ph.dur-s.ts)/1e6 AS phase_complete_ms,
+ ph.dur/1e6 AS phase_duration_ms
+FROM starts s JOIN slice ph ON ph.ts>=s.ts AND (s.next_ts IS NULL OR ph.ts<s.next_ts)
+ JOIN thread_track tt ON tt.id=ph.track_id JOIN thread th ON th.utid=tt.utid
+ JOIN process p ON p.upid=th.upid
+WHERE (p.name='{package}' OR p.name GLOB '{package}:*') AND ph.dur>=0
+ AND ph.name IN ('Flexy.startup.post_init','Flexy.startup.request_local_dialogs',
+ 'Flexy.dialogs.read_local','Flexy.startup.account_services')
+ORDER BY s.startup_id,ph.ts;
+"""
+    return {'config': config, 'frame_sql': sql, 'cpu_sql': cpu, 'startup_sql': startup, 'startup_phases_sql': phases,
             'limits': {'touch_latency': 'NOT_IMPLEMENTED_WITHOUT_INPUT_TO_PRESENT_FLOW',
                        'gpu_utilization': 'REQUIRES_SUPPORTED_DEVICE_GPU_COUNTERS',
                        'allocation_counts': 'REQUIRES_SEPARATE_HEAPPROFD_OR_ART_CAPTURE',
+                       'local_rows_visible': 'NOT_INFERRED_FROM_SQLITE_OR_ENQUEUE_COMPLETION',
+                       'useful_connection': 'REQUIRES_SUCCESSFUL_NETWORK_RESPONSE_TIMING',
+                       'new_updates': 'REQUIRES_SERVER_UPDATE_TIMING',
+                       'chat_load': 'REQUIRES_MATCHED_CHAT_INPUT_TO_PRESENT_CAPTURE',
                        'account': 'PREPARED_TEST_DEVICE_ONLY', 'buffer_mib': 32, 'seconds': seconds}}
 
 
@@ -68,7 +89,7 @@ def main():
     a = p.parse_args()
     result = plan(a.package, a.seconds)
     a.out_dir.mkdir(parents=True, exist_ok=True)
-    for key, name in [('config', 'test_trace.pbtxt'), ('frame_sql', 'frame_timeline.sql'), ('cpu_sql', 'scheduled_cpu.sql'), ('startup_sql', 'startup.sql')]:
+    for key, name in [('config', 'test_trace.pbtxt'), ('frame_sql', 'frame_timeline.sql'), ('cpu_sql', 'scheduled_cpu.sql'), ('startup_sql', 'startup.sql'), ('startup_phases_sql', 'startup_phases.sql')]:
         (a.out_dir / name).write_text(result[key])
     (a.out_dir / 'limits.json').write_text(json.dumps(result['limits'], indent=2) + '\n')
 

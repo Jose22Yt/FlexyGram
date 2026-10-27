@@ -67,6 +67,8 @@ def collect_environment(device, args):
                 'refresh_profile', 'installation_state', 'test_session_state'):
         result[key] = getattr(args, key)
     result['build_mode'] = getattr(args, 'build_mode', 'unverified')
+    result['network_profile'] = getattr(args, 'network_profile', 'unverified')
+    result['sync_state'] = getattr(args, 'sync_state', 'unverified')
     result['thermal_policy'] = f'status<={args.max_thermal};temperature<={args.max_temperature_c}'
     result['battery_policy'] = f'level>={args.min_battery};charging={args.charging}'
     return result
@@ -123,7 +125,7 @@ def main():
     p.add_argument('--package', required=True)
     p.add_argument('--component')
     p.add_argument('--source-commit', required=True)
-    p.add_argument('--label', required=True, choices=['exteraless', 'alpha1271', 'alpha1272', 'pr92', 'alpha1275', 'candidate'])
+    p.add_argument('--label', required=True, choices=['exteraless', 'alpha1271', 'alpha1272', 'pr92', 'alpha1275', 'alpha1276', 'candidate'])
     p.add_argument('--scenario', required=True, choices=SCENARIOS)
     p.add_argument('--build-mode', required=True, help='Same release/profileable/debug mode for all compared builds')
     p.add_argument('--iterations', type=int, default=20)
@@ -133,6 +135,8 @@ def main():
     for key in ('theme', 'cache-state', 'conversation-fixture', 'workload-id', 'music-state',
                 'refresh-profile', 'installation-state', 'test-session-state'):
         p.add_argument('--' + key, required=True)
+    p.add_argument('--network-profile', default='unverified', help='Operator-declared equivalent network conditions; no network changes are automated')
+    p.add_argument('--sync-state', default='unverified', help='Operator-declared equivalent initial synchronization state')
     p.add_argument('--max-thermal', type=int, default=1)
     p.add_argument('--min-battery', type=int, default=30)
     p.add_argument('--max-temperature-c', type=float, default=38)
