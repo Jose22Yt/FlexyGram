@@ -1,0 +1,22 @@
+{
+  "base": "14e586b4ddb7a686f39cda3cb175920c49cecf11",
+  "reviewed": {
+    "TMessagesProj/src/main/java/app/flexygram/home/SignatureFolderAccent.java": "5bea801a1b25116289de6b73da035752ca9cfbbe",
+    "TMessagesProj/src/main/java/org/telegram/ui/Components/FilterTabsView.java": "098ea06037773a4e1ee6200617ce56ce244722d0",
+    "tools/connected_alpha/folder_badge1278_contract.py": "ba8d8dcd31802e2bbbc6871cf3d4199fd751ec1a",
+    "tools/connected_alpha/test_folder_badges1278.py": "510af9ffd290b625bc7e647113e5cae65e3512ac",
+    "tools/connected_alpha/signature1278_contract.py": "58cf210afb1b1b0f31fb348d2958fd838c08fbc7",
+    "tools/connected_alpha/next_alpha_contract.py": "9ddf15f234e7732156ffc6b6a53de90dea126cea",
+    "tools/connected_alpha/test_signature_matte.py": "3a69d3e9153646ebaab83032a8e5c6535fad32db"
+  },
+  "paths": [
+    "TMessagesProj/src/main/java/app/flexygram/home/SignatureFolderAccent.java",
+    "TMessagesProj/src/main/java/org/telegram/ui/Components/FilterTabsView.java",
+    "tools/connected_alpha/folder_badge1278_contract.py",
+    "tools/connected_alpha/folder_badge1278_review.json",
+    "tools/connected_alpha/next_alpha_contract.py",
+    "tools/connected_alpha/signature1278_contract.py",
+    "tools/connected_alpha/test_folder_badges1278.py",
+    "tools/connected_alpha/test_signature_matte.py"
+  ]
+}
