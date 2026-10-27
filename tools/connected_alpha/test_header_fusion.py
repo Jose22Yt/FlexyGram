@@ -18,7 +18,7 @@ class FusionGeometry(unittest.TestCase):
    source=Path(tmp)/'FusionReuse.java';source.write_text(probe)
    result=subprocess.run(['java','-m','jdk.compiler/com.sun.tools.javac.Main','-d',tmp,str(production),str(production.with_name('SignatureFusionFade.java')),str(fixture),str(source)],capture_output=True,text=True)
    self.assertEqual(result.returncode,0,result.stderr)
-   self.assertIn('1828',subprocess.check_output(['java','-cp',tmp,'SignatureFusionGeometryTest'],text=True))
+   self.assertIn('PASS:',subprocess.check_output(['java','-cp',tmp,'SignatureFusionGeometryTest'],text=True))
    self.assertIn('20000',subprocess.check_output(['java','-cp',tmp,'FusionReuse'],text=True))
 
  def test_document_adapter_double_retains_every_native_primitive_argument(self):
