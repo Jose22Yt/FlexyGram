@@ -4,7 +4,7 @@ package app.flexygram.home;
 /** Allocation-free media palette. Resolve only after theme/mode changes, not each frame. */
 public final class SignatureSmartPreviewPalette {
     public static final int NONE=0, FILE=1, VOICE=2, MUSIC=3, LINK=4, EVENT=5, PHOTO=6, VIDEO=7;
-    public static final int ADAPTIVE=0, THEME=1, MATTE=2;
+    public static final int ADAPTIVE=0, THEME=1, MATTE=2, OFF=3;
     private static final int[] BASE={
         0xff8892a0,0xff3488df,0xff9960cb,0xffd45a91,
         0xff24a2ae,0xff21a36b,0xffc78d37,0xffce8750
