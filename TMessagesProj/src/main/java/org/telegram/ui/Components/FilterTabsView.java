@@ -1552,6 +1552,7 @@ public class FilterTabsView extends FrameLayout {
             @Override
             public void onAnimationEnd(Animator animation) {
                 tabLineColorKey = aTabLineColorKey;
+                if(signatureHome)refreshSignatureAccent();
                 backgroundColorKey = aBackgroundColorKey;
                 activeTextColorKey = aActiveTextColorKey;
                 unactiveTextColorKey = aUnactiveTextColorKey;
