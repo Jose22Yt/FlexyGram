@@ -2769,7 +2769,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
         // Replace only uncaptioned, ordinary last-message snippets. No media
         // downloads, no re-layout of rows and no alteration of native chat text.
         smartPreviewKind=0;
-        if (currentDialogFolderId == 0 && currentDialogCommunityId == 0
+        if (app.flexygram.home.SignatureSmartPreviews.mode() != app.flexygram.home.SignatureSmartPreviewPalette.OFF && currentDialogFolderId == 0 && currentDialogCommunityId == 0
                 && message != null && draftMessage == null && !draftVoice
                 && TextUtils.isEmpty(printingString) && customDialog == null
                 && !isForumCell() && !isFolderCell() && !hasTags()
