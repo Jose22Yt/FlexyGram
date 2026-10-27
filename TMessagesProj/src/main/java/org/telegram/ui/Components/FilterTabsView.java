@@ -80,6 +80,18 @@ import tw.nekomimi.nekogram.folder.FolderIconHelper;
 public class FilterTabsView extends FrameLayout {
     private boolean signatureHome;
     private boolean signatureHomeOpaquePreview;
+    private int signatureAccent, signatureAccentInk;
+    /** Native theme callbacks own color/contrast resolution; draw only interpolates cached ints. */
+    private void refreshSignatureAccent() {
+        app.exteraless.appearance.AppearanceConfig.ensureLoaded();
+        boolean dark=resourcesProvider!=null?resourcesProvider.isDark():Theme.isCurrentThemeDark();
+        int neutral=app.flexygram.home.SignatureHomeStyle.surface(dark,false);
+        signatureAccent=ColorUtils.compositeColors(Theme.getColor(tabLineColorKey,resourcesProvider),neutral);
+        int preferred=ColorUtils.setAlphaComponent(Theme.getColor(activeTextColorKey,resourcesProvider),255);
+        signatureAccentInk=ColorUtils.calculateContrast(preferred,signatureAccent)>=4.5?preferred:
+            (ColorUtils.calculateContrast(0xff000000,signatureAccent)>=ColorUtils.calculateContrast(0xffffffff,signatureAccent)?0xff000000:0xffffffff);
+    }
+
 
     /** Settings-only solid sample; never changes the global Liquid Glass preference. */
     public void setSignatureHomeOpaquePreview(boolean opaque) {
@@ -92,6 +104,7 @@ public class FilterTabsView extends FrameLayout {
     public void setSignatureHome(boolean enabled) {
         if (signatureHome == enabled) return;
         signatureHome = enabled;
+        refreshSignatureAccent();
         requestLayout();
         invalidate();
     }
@@ -408,10 +421,12 @@ public class FilterTabsView extends FrameLayout {
                 float selected = app.flexygram.home.SignatureHomeStyle.selection(currentTab.id, id1, id2,
                         animatingIndicator || manualScrollingToId != -1, animatingIndicatorProgress);
                 signatureHomePainter.category(canvas, getMeasuredWidth(), getMeasuredHeight(), AndroidUtilities.density,
-                        dark, !signatureHomeOpaquePreview && org.telegram.messenger.LiteMode.isEnabled(org.telegram.messenger.LiteMode.FLAG_LIQUID_GLASS), selected);
+                        dark, !signatureHomeOpaquePreview && org.telegram.messenger.LiteMode.isEnabled(org.telegram.messenger.LiteMode.FLAG_LIQUID_GLASS), selected,
+                        app.exteraless.appearance.AppearanceConfig.folderThemeAccent.Bool()?signatureAccent:
+                        app.flexygram.home.SignatureHomeStyle.selectedSurface(dark,!signatureHomeOpaquePreview && org.telegram.messenger.LiteMode.isEnabled(org.telegram.messenger.LiteMode.FLAG_LIQUID_GLASS)));
                 textPaint.setColor(app.flexygram.home.SignatureHomePainter.blend(
                         app.flexygram.home.SignatureHomeStyle.text(dark, false),
-                        app.flexygram.home.SignatureHomeStyle.text(dark, true), selected));
+                        (app.exteraless.appearance.AppearanceConfig.folderThemeAccent.Bool()?signatureAccentInk:app.flexygram.home.SignatureHomeStyle.text(dark, true)), selected));
             }
             ColorFilter emojiColorFilter = signatureHome
                     ? signatureHomeTint.get(textPaint.getColor())
@@ -571,7 +586,13 @@ public class FilterTabsView extends FrameLayout {
                 }
 
                 float x;
-                float titleWidth = currentTab.titleWidth;
+                if(signatureHome && app.exteraless.appearance.AppearanceConfig.folderThemeAccent.Bool()) {
+                float selected=app.flexygram.home.SignatureHomeStyle.selection(currentTab.id,id1,id2,
+                    animatingIndicator || manualScrollingToId!=-1,animatingIndicatorProgress);
+                counterPaint.setColor(app.flexygram.home.SignatureHomePainter.blend(counterPaint.getColor(),signatureAccentInk,selected));
+                textCounterPaint.setColor(app.flexygram.home.SignatureHomePainter.blend(textCounterPaint.getColor(),signatureAccent,selected));
+            }
+            float titleWidth = currentTab.titleWidth;
                 if (animateTextChange) {
                     titleWidth = animateFromTitleWidth * (1f - changeProgress) + currentTab.titleWidth * changeProgress;
                 }
@@ -1502,6 +1523,7 @@ public class FilterTabsView extends FrameLayout {
         backgroundColorKey = background;
         activeTextColorKey = active;
         unactiveTextColorKey = unactive;
+        refreshSignatureAccent();
         selectorDrawable.setColor(Theme.getColor(tabLineColorKey, resourcesProvider));
         listView.setSelectorDrawableColor(Theme.getColor(selector, resourcesProvider));
 
@@ -1731,6 +1753,8 @@ public class FilterTabsView extends FrameLayout {
     }
 
     public void updateColors() {
+        if(signatureHome)refreshSignatureAccent();
+        listView.invalidateViews();
         if (blurredBackgroundDrawable != null) {
             blurredBackgroundDrawable.updateColors();
         }

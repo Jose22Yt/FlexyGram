@@ -133,6 +133,7 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
     // Folders
     private int foldersHeaderRow;
     private int foldersPreviewRow;
+    private int folderThemeAccentRow;
     private int tabTitleStyleRow;
     private int tabCounterRow;
     private int foldersDividerRow;
@@ -190,6 +191,7 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
 
         foldersHeaderRow = addRow("foldersHeader");
         foldersPreviewRow = addRow("foldersPreview");
+        folderThemeAccentRow = addRow("folderThemeAccent");
         tabTitleStyleRow = addRow("tabTitleStyle");
         tabCounterRow = addRow("tabCounter");
         foldersDividerRow = addRow();
@@ -650,6 +652,11 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
                     getString(R.string.OEAppearanceGlassOutlineHidden)
             }, AppearanceConfig.glassOutlineStyle, null);
             return;
+        } else if (position == folderThemeAccentRow) {
+            AppearanceConfig.folderThemeAccent.toggleConfigBool();
+            if(view instanceof TextCheckCell)((TextCheckCell)view).setChecked(AppearanceConfig.folderThemeAccent.Bool());
+            if(foldersPreviewCell!=null)foldersPreviewCell.invalidate();
+            return;
         } else if (position == tabTitleStyleRow) {
             if (getParentActivity() == null) {
                 return;
@@ -932,6 +939,8 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
                         cell.setTextAndCheck(getString(R.string.OEAppearanceSingleCornerRadius), AppearanceConfig.singleCornerRadius.Bool(), false);
                     } else if (position == forceSnowRow) {
                         cell.setTextAndValueAndCheck(getString(R.string.OEAppearanceForceSnow), getString(R.string.OEAppearanceForceSnowInfo), NekoConfig.actionBarDecoration.Int() == 1, true, true);
+                    } else if (position == folderThemeAccentRow) {
+                        cell.setTextAndCheck(getString(R.string.FlexyFolderThemeAccent),AppearanceConfig.folderThemeAccent.Bool(),true);
                     } else if (position == senderMiniAvatarsRow) {
                         cell.setTextAndCheck(getString(R.string.OEAppearanceSenderMiniAvatars), AppearanceConfig.senderMiniAvatars.Bool(), false);
                     }

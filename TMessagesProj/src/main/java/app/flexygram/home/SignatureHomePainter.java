@@ -20,13 +20,18 @@ public final class SignatureHomePainter {
 
     public void category(Canvas canvas, float width, float height, float density,
                          boolean dark, boolean glass, float selection) {
+        category(canvas,width,height,density,dark,glass,selection,SignatureHomeStyle.selectedSurface(dark,glass));
+    }
+
+    public void category(Canvas canvas,float width,float height,float density,boolean dark,boolean glass,
+                         float selection,int selectedColor) {
         float h = SignatureHomeStyle.categoryHeight(height, density);
         // Inset each native cell, including RTL and reordered/animated cells.
         // No item decoration changes positions or filter hit testing.
         bounds.set(3 * density, (height - h) / 2, width - 3 * density, (height + h) / 2);
         if (bounds.width() <= 0 || h <= 0) return;
         int color = blend(SignatureHomeStyle.surface(dark, glass),
-                SignatureHomeStyle.selectedSurface(dark, glass), selection);
+                selectedColor, selection);
         surface(canvas, h / 2, density, dark, color, 1);
     }
 

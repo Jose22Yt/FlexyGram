@@ -46,6 +46,10 @@ object AppearanceConfig {
     @JvmStatic
     fun getPreferences(): SharedPreferences = NekoConfig.getPreferences()
 
+    /** Signature Home active folder inherits the native theme accent; no separate palette. */
+    @JvmField
+    val folderThemeAccent = addConfig("FlexyFolderThemeAccent", ConfigItem.configTypeBool, true)
+
     // ---- Аватары ----
 
     /** Закругление аватарок: 0 — квадрат, [AVATAR_CORNERS_MAX] — круг. */
