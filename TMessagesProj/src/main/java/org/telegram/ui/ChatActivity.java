@@ -34597,6 +34597,7 @@ public class ChatActivity extends BaseFragment implements
                     }
                 }
             };
+            scrimPopupWindow.setFlexyMotionEnabled(org.telegram.messenger.BuildConfig.CONNECTED_ALPHA && finalReactionsLayout1 != null);
             scrimPopupWindow.setPauseNotifications(true);
             scrimPopupWindow.setDismissAnimationDuration(220);
             scrimPopupWindow.setOutsideTouchable(true);

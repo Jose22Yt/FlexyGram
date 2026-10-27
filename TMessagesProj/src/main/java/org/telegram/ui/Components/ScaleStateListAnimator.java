@@ -17,6 +17,12 @@ public class ScaleStateListAnimator {
             return;
         }
 
+        if (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA && view instanceof app.flexygram.motion.FlexyPressOwner) {
+            view.setStateListAnimator(null);
+            ((app.flexygram.motion.FlexyPressOwner) view).setFlexyPressEnabled(true);
+            return;
+        }
+
         AnimatorSet pressedAnimator = new AnimatorSet();
         pressedAnimator.playTogether(
                 ObjectAnimator.ofFloat(view, View.SCALE_X, 1f - scale),
@@ -41,6 +47,7 @@ public class ScaleStateListAnimator {
     }
 
     public static void reset(View view) {
+        if (view instanceof app.flexygram.motion.FlexyPressOwner) ((app.flexygram.motion.FlexyPressOwner) view).setFlexyPressEnabled(false);
         view.setStateListAnimator(null);
     }
 

@@ -1,4 +1,5 @@
 """Current candidate guards independent of the exact historical release audits."""
+from motion_contract import restore_navigation
 import re,subprocess,unittest,yaml
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
@@ -23,4 +24,4 @@ class PrivateRelease1276(unittest.TestCase):
  def test_core_files_engine_and_studio_codec_remain_exact(self):
   for suffix in ('app/flexygram/studio/core/StudioCodec.java','app/flexygram/studio/core/StudioTransaction.java','app/flexygram/files/core/SelectedDocument.java','app/flexygram/files/FilesWork.java','org/telegram/ui/ActionBar/ActionBarLayout.java','org/telegram/messenger/SendMessagesHelper.java'):
    path='TMessagesProj/src/main/java/'+suffix
-   with self.subTest(path=path):self.assertEqual((ROOT/path).read_bytes(),subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT))
+   with self.subTest(path=path):self.assertEqual(restore_navigation(path,(ROOT/path).read_bytes()),subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT))

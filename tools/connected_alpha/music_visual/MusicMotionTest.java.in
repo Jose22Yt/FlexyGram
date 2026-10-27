@@ -1,0 +1,32 @@
+/* Production music controls; virtual frame clock. Playback/services/art remain explicit doubles. */
+import android.app.*;import android.view.*;import android.widget.*;import android.os.*;import app.exteraless.player.*;import org.junit.*;import org.junit.runner.RunWith;import org.robolectric.*;import org.robolectric.annotation.*;import static org.junit.Assert.*;
+@RunWith(RobolectricTestRunner.class) @Config(manifest=Config.NONE,sdk=35,instrumentedPackages={"app.flexygram.motion"}) @LooperMode(LooperMode.Mode.PAUSED) @GraphicsMode(GraphicsMode.Mode.NATIVE)
+public class MusicMotionTest {
+ private Activity activity;private FrameLayout root;
+ @Before public void setup(){org.robolectric.shadows.ShadowChoreographer.setPaused(true);org.robolectric.shadows.ShadowChoreographer.setFrameDelay(java.time.Duration.ofMillis(16));activity=Robolectric.buildActivity(Activity.class).setup().visible().get();root=new FrameLayout(activity);activity.setContentView(root);org.telegram.messenger.AndroidUtilities.density=1;org.telegram.messenger.BuildConfig.CONNECTED_ALPHA=true;app.flexygram.motion.FlexyMotionSettings.setProfile(activity,app.flexygram.motion.FlexyMotionProfile.FLOW);app.flexygram.motion.FlexyMotionSettings.setReduceMotion(activity,false);}
+ private void size(View v,int w,int h){v.measure(View.MeasureSpec.makeMeasureSpec(w,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(h,View.MeasureSpec.EXACTLY));v.layout(0,0,w,h);}
+ private Object field(Object o,String name)throws Exception{java.lang.reflect.Field f=o.getClass().getDeclaredField(name);f.setAccessible(true);return f.get(o);}
+ private void advance(int ms){Shadows.shadowOf(Looper.getMainLooper()).idleFor(java.time.Duration.ofMillis(ms));}
+ private void visibleRoot(){advance(32);org.robolectric.util.ReflectionHelpers.setField(org.robolectric.util.ReflectionHelpers.getField(root,"mAttachInfo"),"mWindowVisibility",View.VISIBLE);}
+ @After public void releaseMotionOwners(){root.removeAllViews();advance(32);assertEquals(0,app.flexygram.motion.FlexyFrameMotion.activeCount());activity.finish();}
+ @Test public void nativeMusicStateFactorsFollowOwnProfilesAndFinishWithoutDrawPolling()throws Exception{
+  for(app.flexygram.motion.FlexyMotionProfile profile:app.flexygram.motion.FlexyMotionProfile.values())for(float scale:new float[]{0,.5f,1,2,5}){
+   org.robolectric.util.ReflectionHelpers.callStaticMethod(android.animation.ValueAnimator.class,"setDurationScale",org.robolectric.util.ReflectionHelpers.ClassParameter.from(float.class,scale));app.flexygram.motion.FlexyMotionSettings.setProfile(activity,profile);
+   MorphButton b=new MorphButton(activity,PlayerIcon.fill(PlayerIcon.PLAY,24));root.addView(b);visibleRoot();size(b,88,88);b.setAlt(true,true);b.setActive(true,true);b.setBadge("1",true);
+   var alt=(app.flexygram.motion.FlexyVisualSpring)field(b,"alt");
+   if(profile==app.flexygram.motion.FlexyMotionProfile.FLASH)assertEquals(1,alt.value(),0);else{advance(32);assertTrue(alt.value()>0&&alt.value()<1);advance(1500);assertEquals(1,alt.value(),0);}
+   assertEquals(0,app.flexygram.motion.FlexyFrameMotion.activeCount());root.removeView(b);
+  }
+ }
+ @Test public void nativeMusicPressureKeepsPlaybackClickAndBounds()throws Exception{
+  MorphButton b=new MorphButton(activity,PlayerIcon.fill(PlayerIcon.PLAY,24));root.addView(b);visibleRoot();size(b,88,88);int[] clicks={0};b.setOnClickListener(v->clicks[0]++);
+  MotionEvent down=MotionEvent.obtain(0,0,MotionEvent.ACTION_DOWN,44,44,0);b.dispatchTouchEvent(down);down.recycle();advance(32);assertEquals(1,b.getScaleX(),0);assertEquals(88,b.getWidth());
+  var feedback=(app.flexygram.motion.FlexyTouchFeedback)field(b,"pressFeedback");assertTrue(feedback.factor()<1);
+  MotionEvent up=MotionEvent.obtain(0,40,MotionEvent.ACTION_UP,44,44,0);b.dispatchTouchEvent(up);up.recycle();advance(1500);assertEquals(1,clicks[0]);assertEquals(1,feedback.factor(),.00001f);
+ }
+ @Test public void liveFlashStopsMusicMorphAndDetachReleasesAllDrivers()throws Exception{
+  MorphButton b=new MorphButton(activity,PlayerIcon.fill(PlayerIcon.PLAY,24));root.addView(b);visibleRoot();size(b,88,88);b.setRadius(22,true);b.setAlt(true,true);advance(32);app.flexygram.motion.FlexyMotionSettings.setProfile(activity,app.flexygram.motion.FlexyMotionProfile.FLASH);
+  assertEquals(1,((app.flexygram.motion.FlexyVisualSpring)field(b,"alt")).value(),0);assertEquals(22,((app.flexygram.motion.FlexyVisualSpring)field(b,"radiusLeft")).value(),0);assertEquals(0,app.flexygram.motion.FlexyFrameMotion.activeCount());
+  app.flexygram.motion.FlexyMotionSettings.setProfile(activity,app.flexygram.motion.FlexyMotionProfile.SIGNATURE);b.setAlt(false,true);root.removeView(b);advance(32);assertEquals(0,app.flexygram.motion.FlexyFrameMotion.activeCount());
+ }
+}

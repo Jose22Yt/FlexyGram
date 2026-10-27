@@ -1,0 +1,22 @@
+name: Flexy Motion ARM64 validation (no APK distribution)
+on:
+  push:
+    branches: [validation/flexy-motion-arm64]
+permissions:
+  contents: read
+concurrency:
+  group: flexy-motion-arm64-validation
+  cancel-in-progress: false
+jobs:
+  compile:
+    if: github.repository == 'Jose22Yt/FlexyGram' && github.ref == 'refs/heads/validation/flexy-motion-arm64'
+    uses: ./.github/workflows/connected-alpha-arm64.yml
+    secrets:
+      TELEGRAM_APP_ID: ${{ secrets.TELEGRAM_APP_ID }}
+      TELEGRAM_APP_HASH: ${{ secrets.TELEGRAM_APP_HASH }}
+      ALPHA_STORE_PASSWORD: ${{ secrets.ALPHA_STORE_PASSWORD }}
+      ALPHA_KEY_ALIAS: ${{ secrets.ALPHA_KEY_ALIAS }}
+      ALPHA_KEY_PASSWORD: ${{ secrets.ALPHA_KEY_PASSWORD }}
+      ALPHA_FIREBASE_JSON_B64: ${{ secrets.ALPHA_FIREBASE_JSON_B64 }}
+      ALPHA_KEYSTORE_B64: ${{ secrets.ALPHA_KEYSTORE_B64 }}
+      ALPHA_CERTIFICATE_SHA256: ${{ secrets.ALPHA_CERTIFICATE_SHA256 }}

@@ -1,0 +1,15 @@
+<resources>
+    <string name="FlexyMotionAnimations">Анимации</string>
+    <string name="FlexyMotionTitle">Flexy Motion Engine</string>
+    <string name="FlexyMotionProfiles">Профили</string>
+    <string name="FlexyMotionPhysics">Физика</string>
+    <string name="FlexyMotionReduced">Уменьшить движение</string>
+    <string name="FlexyMotionSelected">Выбрано</string>
+    <string name="FlexyMotionSpeed">Скорость движения</string>
+    <string name="FlexyMotionStiffness">Жёсткость пружины</string>
+    <string name="FlexyMotionDamping">Затухание / отскок</string>
+    <string name="FlexyMotionPress">Сжатие при касании</string>
+    <string name="FlexyMotionReset">Сбросить настройки профиля</string>
+    <string name="FlexyMotionPreview">Нажмите для проверки профиля</string>
+    <string name="FlexyMotionCoverage">Настройки сразу применяются к перенесённым строкам Signature и этому примеру. Переходы чатов, реакций, плеера и системы сохраняют прежнее поведение до отдельного переноса. Уменьшение движения имеет приоритет.</string>
+</resources>

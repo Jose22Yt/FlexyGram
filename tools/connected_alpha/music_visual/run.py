@@ -53,6 +53,8 @@ def main(here=HERE, test_class="MusicVisualTest", stubs_writer=None, resource_wr
         stubs_writer = write_stubs
     stubs_writer(source, ROOT)
     shutil.copyfile(here/(test_class+'.java.in'), source/(test_class+'.java'))
+    if here.resolve() == HERE.resolve() and test_class == 'MusicVisualTest':
+        shutil.copyfile(HERE/'MusicMotionTest.java.in', source/'MusicMotionTest.java')
     shutil.copyfile(HERE/'pom.xml', output/'pom.xml')
     repository = Path.home()/'.m2/repository'
     command = [args.maven, '-B', '-f', str(output/'pom.xml'), '-Dandroid.sdk.jar='+str(android)]
@@ -72,7 +74,7 @@ def main(here=HERE, test_class="MusicVisualTest", stubs_writer=None, resource_wr
         subprocess.run(command + ['dependency:resolve'], check=True)
         aar_dir = output/'target/aar'
         aar_dir.mkdir(parents=True, exist_ok=True)
-        for group, artifact, version in [('androidx.core', 'core', '1.17.0'), ('androidx.test', 'monitor', '1.8.0'), ('androidx.test.espresso', 'espresso-idling-resource', '3.7.0')]:
+        for group, artifact, version in [('androidx.dynamicanimation', 'dynamicanimation', '1.0.0'), ('androidx.core', 'core', '1.17.0'), ('androidx.test', 'monitor', '1.8.0'), ('androidx.test.espresso', 'espresso-idling-resource', '3.7.0')]:
             path = repository/group.replace('.', '/')/artifact/version/(artifact+'-'+version+'.aar')
             with zipfile.ZipFile(path) as archive:
                 (aar_dir/(artifact+'.jar')).write_bytes(archive.read('classes.jar'))

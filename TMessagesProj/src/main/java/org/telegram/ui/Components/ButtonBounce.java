@@ -49,6 +49,23 @@ public class ButtonBounce {
 
     public void setView(View view) {
         this.view = view;
+        if (signatureMotion != null) signatureMotion.setOwner(view);
+    }
+
+    private app.flexygram.motion.FlexyButtonBounce signatureMotion;
+
+    private app.flexygram.motion.FlexyButtonBounce signatureMotion() {
+        if (!org.telegram.messenger.BuildConfig.CONNECTED_ALPHA || view == null) {
+            if (signatureMotion != null) signatureMotion.setOwner(null);
+            return null;
+        }
+        if (signatureMotion == null) {
+            if (animator != null) { animator.removeAllListeners(); animator.cancel(); animator = null; }
+            if (bounceAnimator != null) { bounceAnimator.removeAllListeners(); bounceAnimator.cancel(); bounceAnimator = null; }
+            signatureMotion = new app.flexygram.motion.FlexyButtonBounce(view, this::invalidate);
+        }
+        else if (signatureMotion != null) signatureMotion.setOwner(view);
+        return signatureMotion;
     }
 
     private ValueAnimator animator;
@@ -58,6 +75,14 @@ public class ButtonBounce {
     private float pressedT;
 
     public void setPressed(boolean pressed) {
+        app.flexygram.motion.FlexyButtonBounce motion = signatureMotion();
+        if (motion != null) {
+            if (isPressed != pressed) {
+                isPressed = pressed;
+                motion.setPressed(pressed, durationPressMultiplier, durationReleaseMultiplier, releaseDelay);
+            }
+            return;
+        }
         if (isPressed != pressed) {
             isPressed = pressed;
             ValueAnimator pastAnimator = animator;
@@ -94,6 +119,8 @@ public class ButtonBounce {
     }
 
     public void bounce() {
+        app.flexygram.motion.FlexyButtonBounce motion = signatureMotion();
+        if (motion != null) { motion.bounce(); return; }
         if (bounceAnimator != null) {
             bounceAnimator.cancel();
         }
@@ -118,10 +145,12 @@ public class ButtonBounce {
     }
 
     public float isPressedProgress() {
+        if (signatureMotion != null && view != null) { signatureMotion.setOwner(view); return signatureMotion.progress(); }
         return pressedT;
     }
 
     public float getScale(float diff) {
+        if (signatureMotion != null && view != null) { signatureMotion.setOwner(view); return signatureMotion.scale(diff); }
         return ((1f - diff) + diff * (1f - pressedT)) * bounceScale;
     }
 
