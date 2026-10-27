@@ -11,9 +11,9 @@ public class FilesNativeTest {
  FlexyFileEditorActivity open(String content)throws Exception {File f=File.createTempFile("files-test-",".txt");Files.writeString(f.toPath(),content);FlexyFileEditorActivity o=new FlexyFileEditorActivity(f,"example.txt",null,1,0);o.createView(o.getParentActivity());drain(o);return o;}
  static void drainSheet(FlexyFilesSheet sheet)throws Exception{for(int i=0;i<3;i++){FilesWork w=(FilesWork)get(sheet,"work");Future<?> f=(Future<?>)get(w,"future");if(f!=null)f.get(10,TimeUnit.SECONDS);Shadows.shadowOf(Looper.getMainLooper()).idle();}}
  @Test public void longDocumentSelectionDoesNotAccumulateOffscreenSyntaxSpans()throws Exception{
-  FlexyFileEditorActivity o=open("class Value { return true; }\n".repeat(8000));try{
-   FilesCodeView e=(FilesCodeView)get(o,"editor");assertTrue(e.isEnabled());assertEquals(224000,e.length());Method highlight=o.getClass().getDeclaredMethod("highlightParagraph");highlight.setAccessible(true);
-   for(int line=0;line<8000;line+=71){e.setSelection(Math.min(e.length(),line*28));highlight.invoke(o);assertTrue(e.getText().getSpans(0,e.length(),android.text.style.ForegroundColorSpan.class).length<=128);}
+  String document="class Value { return true; }\n".repeat(8000);FlexyFileEditorActivity o=open(document);try{
+   FilesCodeView e=(FilesCodeView)get(o,"editor");assertTrue(e.isEnabled());assertEquals(document,e.getText().toString());Method highlight=o.getClass().getDeclaredMethod("highlightParagraph");highlight.setAccessible(true);
+   for(int line=0;line<8000;line+=71){e.setSelection(Math.min(e.length(),line*29));highlight.invoke(o);assertTrue(e.getText().getSpans(0,e.length(),android.text.style.ForegroundColorSpan.class).length<=128);}
    assertEquals(android.text.Layout.BREAK_STRATEGY_SIMPLE,e.getBreakStrategy());assertEquals(android.text.Layout.HYPHENATION_FREQUENCY_NONE,e.getHyphenationFrequency());
    e.getText().append("changed");command(o,1);assertFalse(e.getText().toString().endsWith("changed"));command(o,2);assertTrue(e.getText().toString().endsWith("changed"));
   }finally{o.onFragmentDestroy();}
