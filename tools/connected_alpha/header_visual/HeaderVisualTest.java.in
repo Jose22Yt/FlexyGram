@@ -106,6 +106,31 @@ public class HeaderVisualTest {
    }
   }
  }
+ @Test public void nativeInitialsFallbackStaysAtPortraitEdgeAndNeverRequiresAnotherImage()throws Exception{
+  HeaderConfig.style(2);
+  for(boolean rtl:new boolean[]{false,true}){
+   LocaleController.isRTL=rtl;Context c=context(1);
+   ActionBar bar=new ActionBar(c);ChatAvatarContainer avatar=new ChatAvatarContainer(c);
+   avatar.callable=true;bar.addView(avatar,0,new FrameLayout.LayoutParams(-1,-1));
+   SignatureChatHeader header=new SignatureChatHeader(bar,avatar,null);
+   bar.setSignatureHeader(header);avatar.setSignatureHeader(header);
+   ChatAvatarContainer.Photo photo=(ChatAvatarContainer.Photo)field(avatar,"avatarImageView");
+   photo.receiver.photo=false;size(bar,401);
+   assertTrue(header.fusionActive());
+   var g=header.fusionGeometry();
+   assertTrue("native initials remain in a <=73dp viewport",photo.getMeasuredWidth()<=73);
+   if(rtl)assertEquals(g.portrait.right,photo.getRight(),1.01f);
+   else assertEquals(g.portrait.left,photo.getLeft(),1.01f);
+   Bitmap b=Bitmap.createBitmap(401,bar.getMeasuredHeight(),Bitmap.Config.ARGB_8888);
+   bar.draw(new Canvas(b));
+   int x=photo.getLeft()+Math.round(photo.getWidth()*.42f);
+   assertTrue("placeholder remains visible",Color.blue(b.getPixel(x,Math.round(g.portrait.centerY()+header.fusionTop)))>80);
+   b.recycle();
+   photo.receiver.photo=true;header.changed();size(bar,401);
+   assertTrue("actual image uses full extended portrait",photo.getMeasuredWidth()>=g.center.width()*.75f);
+   header.detach();
+  }
+ }
  @Test public void defaultAdaptiveAllocatesNoFusionControllerOrControls()throws Exception{
   HeaderConfig.style(0);ActionBar bar=new ActionBar(context(1));ChatAvatarContainer avatar=new ChatAvatarContainer(bar.getContext());bar.addView(avatar,0,new FrameLayout.LayoutParams(-1,-1));SignatureChatHeader header=new SignatureChatHeader(bar,avatar,null);bar.setSignatureHeader(header);avatar.setSignatureHeader(header);size(bar,401);assertNull(field(header,"fusion"));assertNull(field(avatar,"signatureCall"));assertNull(field(avatar,"signaturePhotoMask"));
  }
