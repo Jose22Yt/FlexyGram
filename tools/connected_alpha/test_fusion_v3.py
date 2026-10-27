@@ -48,6 +48,8 @@ public final class FusionCompactProbe {
                             check(g.portrait.width() >= .75f * g.center.width(), "near full card avatar");
                             check(g.portrait.left >= g.center.left && g.portrait.right <= g.center.right, "portrait clipped");
                             check(g.text.left >= g.center.left && g.text.right <= g.center.right, "text within pill");
+                            check(Math.abs(g.text.centerX() - g.center.centerX()) <= 21f * d,
+                                    "both label centers stay visually near pill midpoint");
                             float firstText = rtl ? g.text.right : g.text.left;
                             float totalFade = Math.abs(g.fadeEndX - g.fadeStartX);
                             float t = Math.abs(firstText - g.fadeStartX) / totalFade;
