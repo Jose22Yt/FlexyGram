@@ -3,12 +3,15 @@ import re,subprocess,unittest,yaml
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
 BASE='175b299e0d4faeb246eca8e1be16a362a3a62213'
+def historical(path):
+ from stability1277_contract import restore
+ return restore(path,(ROOT/path).read_bytes()).decode()
 class PrivateRelease1276(unittest.TestCase):
  def test_only_version_changes_in_gradle_and_verifier_keeps_every_original_gate(self):
-  path='TMessagesProj/build.gradle';current=(ROOT/path).read_text();before=subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT,text=True)
+  path='TMessagesProj/build.gradle';current=historical(path);before=subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT,text=True)
   self.assertEqual(re.search(r'def verCode = (\d+)',current)[1],'1276')
   self.assertEqual(current.replace('def verCode = 1276','def verCode = 1275'),before)
-  path='.github/workflows/connected-alpha-arm64.yml';current=(ROOT/path).read_text();before=subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT,text=True)
+  path='.github/workflows/connected-alpha-arm64.yml';current=historical(path);before=subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT,text=True)
   self.assertEqual(current.replace('--expected-version-code 1276','--expected-version-code 1275'),before)
   jobs=yaml.safe_load(current)['jobs'];steps=jobs['build-arm64']['steps']
   self.assertFalse(any('upload-artifact' in s.get('uses','')for s in steps))

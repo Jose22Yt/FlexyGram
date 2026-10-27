@@ -1,33 +1,41 @@
 {
   "base": "38e677d60847e117ede1c25731f7b6c4fd2970e2",
   "reviewed": {
+    ".github/workflows/connected-alpha-arm64.yml": "9eadc875845baa38a596e8d16e27a2510b90bbd1747c44af5587d1f9a8448549",
+    "TMessagesProj/build.gradle": "cab8913983985fd25d3867fd87093954068f18db540694dddb034a0936080379",
     "TMessagesProj/src/main/java/app/flexygram/files/FilesCodeView.java": "8bcf4c5704d9351f9a811d377a513b833953fd203b6f7bf48601824637e3285e",
     "TMessagesProj/src/main/java/app/flexygram/files/FlexyEditorToolsSheet.java": "01ac22ca1e1a6e46efaefe329f42b13f61a33fc40cd566fdd58ce6a2fddd766c",
     "TMessagesProj/src/main/java/app/flexygram/files/FlexyFileEditorActivity.java": "cb22e93190c3cd4ecdaea5d429feac1126edece2961d51d8504b347172de303a",
     "TMessagesProj/src/main/java/app/flexygram/files/FlexyFilesSheet.java": "ea3a5ba9c3d476b306309d2a98771bebe5924151c46c7f7f3f5e2578b973d089",
     "TMessagesProj/src/main/java/org/telegram/ui/Components/ChatActivityEnterView.java": "d044792323d262458ea40e1f143026e105ae31f89ee2f793c1b532fc9f8198cf",
     "TMessagesProj/src/main/java/org/telegram/ui/DialogsActivity.java": "211c0ef19cac87f6ac18ea8a802f034b070b0505acac93500b709436ed35c8e3",
+    "tools/connected_alpha/build_private_apk.py": "e716e44dcca3d7067e33514bac0527ea601ed35a294aa617c19056e166176116",
     "tools/connected_alpha/files_native/FilesNativeTest.java.in": "2cec8d35cbd4506ac272e6aa64cdc442ee3dba2e3f9ee63e2e66c69a68ffa4ae",
     "tools/connected_alpha/files_native/stubs.py": "df0d9db3a207558112da5f0a5f4883d40754ff833c9917dd70d63abadaf46977",
     "tools/connected_alpha/stability1277_contract.py": "5bf56646a25164fd1d5dee237eb81db76ea1054890195ea4d63f108bb0265706",
     "tools/connected_alpha/startup_contract.py": "7057ae1823dd6003f6dbda1407dcfd5fd71289a659cb9216eed5a3e537fe29d7",
     "tools/connected_alpha/test_composer_reference.py": "a3c10676d0cdf79236dca82ab2b092dbaa961dff40530cfe1904eb945109649d",
     "tools/connected_alpha/test_flexy_composer.py": "4ece548ec2e919a430fbf5e90a6c72121341d43e04a219d3af0fde56dcf3917c",
-    "tools/connected_alpha/test_stability1277.py": "35e51356cf879d532db7d4da8968cc5ef9535dc86318449ea5c77484f66400eb"
+    "tools/connected_alpha/test_private_release1276.py": "5981d74ac6f24e64d70ef410709176bc5acca46d8074a290000f7be3b0865eec",
+    "tools/connected_alpha/test_stability1277.py": "7032480a74e357ed8f0132c95889180f4f1567496a4de8bc6d694e18b1440794"
   },
   "paths": [
+    ".github/workflows/connected-alpha-arm64.yml",
+    "TMessagesProj/build.gradle",
     "TMessagesProj/src/main/java/app/flexygram/files/FilesCodeView.java",
     "TMessagesProj/src/main/java/app/flexygram/files/FlexyEditorToolsSheet.java",
     "TMessagesProj/src/main/java/app/flexygram/files/FlexyFileEditorActivity.java",
     "TMessagesProj/src/main/java/app/flexygram/files/FlexyFilesSheet.java",
     "TMessagesProj/src/main/java/org/telegram/ui/Components/ChatActivityEnterView.java",
     "TMessagesProj/src/main/java/org/telegram/ui/DialogsActivity.java",
+    "tools/connected_alpha/build_private_apk.py",
     "tools/connected_alpha/files_native/FilesNativeTest.java.in",
     "tools/connected_alpha/files_native/stubs.py",
     "tools/connected_alpha/stability1277_contract.py",
     "tools/connected_alpha/startup_contract.py",
     "tools/connected_alpha/test_composer_reference.py",
     "tools/connected_alpha/test_flexy_composer.py",
+    "tools/connected_alpha/test_private_release1276.py",
     "tools/connected_alpha/test_stability1277.py",
     "tools/connected_alpha/stability1277_review.json"
   ]

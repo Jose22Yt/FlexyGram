@@ -42,3 +42,13 @@ class Stability1277(unittest.TestCase):
   for p in ('org/telegram/ui/ActionBar/Theme.java','org/telegram/ui/LaunchActivity.java','org/telegram/ui/LoginActivity.java','org/telegram/ui/ActionBar/ActionBarLayout.java','org/telegram/tgnet/ConnectionsManager.java'):
    path='TMessagesProj/src/main/java/'+p
    self.assertEqual((ROOT/path).read_bytes(),subprocess.check_output(['git','show','38e677d60847e117ede1c25731f7b6c4fd2970e2:'+path],cwd=ROOT))
+
+ def test_release1277_keeps_package_certificate_and_native_payload_requirements(self):
+  gradle=(ROOT/'TMessagesProj/build.gradle').read_text()
+  self.assertIn('def verCode = 1277',gradle)
+  before=subprocess.check_output(['git','show','38e677d60847e117ede1c25731f7b6c4fd2970e2:TMessagesProj/build.gradle'],cwd=ROOT,text=True)
+  self.assertEqual(gradle.replace('def verCode = 1277','def verCode = 1276'),before)
+  workflow=(ROOT/'.github/workflows/connected-alpha-arm64.yml').read_text()
+  self.assertIn('--expected-version-code 1277',workflow)
+  self.assertIn("data['elf_count'] != 96",workflow)
+  self.assertIn('c8f04cad685ca5757d35b25ea4b0b4613c7399909948d821e6ada61f9fb12b2c',workflow)
