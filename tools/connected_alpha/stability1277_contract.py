@@ -17,3 +17,13 @@ def restore(path,data):
     return data
 def paths():
     return frozenset(json.loads(MANIFEST.read_text())['paths'])
+
+def verify_current():
+    spec=json.loads(MANIFEST.read_text())
+    for name,expected in spec['reviewed'].items():
+        actual=hashlib.sha256((ROOT/name).read_bytes()).hexdigest()
+        if actual!=expected:raise ValueError('Corrective source differs from reviewed bytes: '+name)
+    changed=set(subprocess.check_output(['git','diff',BASE,'--name-only'],cwd=ROOT,text=True).splitlines())
+    if changed-set(spec['paths']):raise ValueError('Corrective scope is missing paths: '+str(sorted(changed-set(spec['paths']))))
+    print('PASS: exact reviewed Alpha1277 sources and scope; physical acceptance is separate.')
+if __name__=='__main__':verify_current()
