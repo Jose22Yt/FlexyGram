@@ -50,10 +50,10 @@ public final class FlexyFileEditorActivity extends BaseFragment {
     private void scheduleExplorerReturn(){
         if(explorerReturnScheduled||explorerOwner==null)return;
         explorerReturnScheduled=true;
-        BaseFragment host=explorerOwner;String folder=explorerFolder;
+        BaseFragment host=explorerOwner;String folder=explorerFolder,searchQuery=explorerQuery;android.os.Parcelable scroll=explorerScroll;
         host.whenFullyVisible(()->{
             if(host.getParentActivity()==null||!FlexyFiles.enabled())return;
-            FlexyFilesSheet next=new FlexyFilesSheet(host,source,originalName,dialog,account,folder,true,explorerQuery,explorerScroll);
+            FlexyFilesSheet next=new FlexyFilesSheet(host,source,originalName,dialog,account,folder,true,searchQuery,scroll);
             if(host.showDialog(next)==null)next.dismiss();
         });
     }
@@ -152,12 +152,8 @@ public final class FlexyFileEditorActivity extends BaseFragment {
     @Override public void onActivityResultFragment(int request,int result,Intent data){super.onActivityResultFragment(request,result,data);if(request!=SAVE||result!=Activity.RESULT_OK||data==null||data.getData()==null||output==null)return;Uri uri=data.getData();if(!"content".equals(uri.getScheme()))return;File generated=output;Context app=ApplicationLoader.applicationContext;ready=false;
         job(()->{try(InputStream in=new FileInputStream(generated);OutputStream out=app.getContentResolver().openOutputStream(uri,"w")){if(out==null)throw new IOException();byte[] buffer=new byte[8192];int count;while((count=in.read(buffer))!=-1){if(Thread.currentThread().isInterrupted())throw new InterruptedIOException();out.write(buffer,0,count);}out.flush();}return null;},(owner,value)->{owner.ready=true;owner.status.setText(getString(R.string.FlexyFilesSaved));});}
     private void draft(boolean leave){if(text==null)return;String value=editor.getText().toString();File selected=source;String path=entry;int rev=revision;byte[] bytes=value.getBytes(StandardCharsets.UTF_8);job(()->{FilesCache.draftWrite(FilesCache.draft(selected,path),bytes);return null;},(owner,done)->{if(owner.revision==rev)owner.dirty=false;owner.status.setText(getString(R.string.FlexyFilesSaved));if(leave&&!owner.dirty){owner.scheduleExplorerReturn();owner.finishFragment();}});}
-    @Override public void onTransitionAnimationEnd(boolean isOpen,boolean backward){
-        super.onTransitionAnimationEnd(isOpen,backward);
-        if(!isOpen&&backward)scheduleExplorerReturn();
-    }
     @Override public boolean isSwipeBackEnabled(MotionEvent event){return !dirty&&ready&&super.isSwipeBackEnabled(event);}
     @Override public boolean onBackPressed(boolean invoked){if(!dirty){boolean allow=super.onBackPressed(invoked);if(allow&&invoked)scheduleExplorerReturn();return allow;}if(invoked)showDialog(new AlertDialog.Builder(getParentActivity(),getResourceProvider()).setTitle(getString(R.string.FlexyFilesUnsaved)).setPositiveButton(getString(R.string.FlexyFilesDraft),(d,w)->draft(true)).setNegativeButton(getString(R.string.FlexyFilesDiscard),(d,w)->{dirty=false;scheduleExplorerReturn();finishFragment();}).setNeutralButton(getString(R.string.Cancel),null).create());return false;}
     private void highlightParagraph(){if(text==null||editor==null)return;Editable data=editor.getText();for(ForegroundColorSpan span:activeSyntaxHighlights)data.removeSpan(span);activeSyntaxHighlights.clear();int cursor=Math.max(0,editor.getSelectionStart()),start=cursor,end=cursor;while(start>0&&data.charAt(start-1)!='\n'&&cursor-start<2048)start--;while(end<data.length()&&data.charAt(end)!='\n'&&end-cursor<2048)end++;String line=data.subSequence(start,end).toString();Matcher matcher=syntax.matcher(line);int count=0,color=color(Theme.key_windowBackgroundWhiteBlueText);while(matcher.find()&&count++<128){ForegroundColorSpan span=new ForegroundColorSpan(color);data.setSpan(span,start+matcher.start(),start+matcher.end(),android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);activeSyntaxHighlights.add(span);}}
-    @Override public void onFragmentDestroy(){AndroidUtilities.cancelRunOnUIThread(highlight);work.close();destroyHtml();SelectedDocument previous=document;document=null;if(previous!=null)try{previous.close();}catch(IOException ignored){}activeSyntaxHighlights.clear();explorerOwner=null;explorerScroll=null;binary=null;text=null;directCopy=null;retainedText=null;history.clear();super.onFragmentDestroy();}
+    @Override public void onFragmentDestroy(){if(!dirty)scheduleExplorerReturn();AndroidUtilities.cancelRunOnUIThread(highlight);work.close();destroyHtml();SelectedDocument previous=document;document=null;if(previous!=null)try{previous.close();}catch(IOException ignored){}activeSyntaxHighlights.clear();explorerOwner=null;explorerScroll=null;binary=null;text=null;directCopy=null;retainedText=null;history.clear();super.onFragmentDestroy();}
 }

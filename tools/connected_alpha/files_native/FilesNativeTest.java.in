@@ -10,6 +10,22 @@ public class FilesNativeTest {
  static void drain(FlexyFileEditorActivity o)throws Exception{for(int i=0;i<3;i++){FilesWork w=(FilesWork)get(o,"work");Future<?> f=(Future<?>)get(w,"future");if(f!=null)f.get(10,TimeUnit.SECONDS);Shadows.shadowOf(Looper.getMainLooper()).idle();}}
  FlexyFileEditorActivity open(String content)throws Exception {File f=File.createTempFile("files-test-",".txt");Files.writeString(f.toPath(),content);FlexyFileEditorActivity o=new FlexyFileEditorActivity(f,"example.txt",null,1,0);o.createView(o.getParentActivity());drain(o);return o;}
  static void drainSheet(FlexyFilesSheet sheet)throws Exception{for(int i=0;i<3;i++){FilesWork w=(FilesWork)get(sheet,"work");Future<?> f=(Future<?>)get(w,"future");if(f!=null)f.get(10,TimeUnit.SECONDS);Shadows.shadowOf(Looper.getMainLooper()).idle();}}
+ @Test public void longDocumentSelectionDoesNotAccumulateOffscreenSyntaxSpans()throws Exception{
+  FlexyFileEditorActivity o=open("class Value { return true; }\n".repeat(12000));try{
+   FilesCodeView e=(FilesCodeView)get(o,"editor");Method highlight=o.getClass().getDeclaredMethod("highlightParagraph");highlight.setAccessible(true);
+   for(int line=0;line<12000;line+=71){e.setSelection(Math.min(e.length(),line*28));highlight.invoke(o);assertTrue(e.getText().getSpans(0,e.length(),android.text.style.ForegroundColorSpan.class).length<=128);}
+   assertEquals(android.text.Layout.BREAK_STRATEGY_SIMPLE,e.getBreakStrategy());assertEquals(android.text.Layout.HYPHENATION_FREQUENCY_NONE,e.getHyphenationFrequency());
+   e.getText().append("changed");command(o,1);assertFalse(e.getText().toString().endsWith("changed"));command(o,2);assertTrue(e.getText().toString().endsWith("changed"));
+  }finally{o.onFragmentDestroy();}
+ }
+ @Test public void cleanBackReturnsToStandaloneOverviewAndCanReopen()throws Exception{
+  FlexyFiles.enabled(true);File f=File.createTempFile("files-return-",".txt");Files.writeString(f.toPath(),"original");org.telegram.ui.ActionBar.BaseFragment host=new org.telegram.ui.ActionBar.BaseFragment();
+  FlexyFileEditorActivity o=new FlexyFileEditorActivity(f,"document.txt",null,1,0,host,"");o.createView(o.getParentActivity());drain(o);assertTrue(o.onBackPressed(true));o.onFragmentDestroy();host.onBecomeFullyVisible();
+  FlexyFilesSheet sheet=(FlexyFilesSheet)org.telegram.ui.ActionBar.BaseFragment.lastDialog;assertNotNull(sheet);try{drainSheet(sheet);assertEquals(1,((java.util.List<?>)get(sheet,"rows")).size());org.telegram.ui.Components.RecyclerListView.last.click(0);assertNull(get(org.telegram.ui.ActionBar.BaseFragment.presented,"entry"));org.telegram.ui.ActionBar.BaseFragment.presented.onFragmentDestroy();}finally{sheet.dismiss();}
+ }
+ @Test public void searchDialogAllowsImeAndRestoresEditorFocus()throws Exception{
+  FlexyFileEditorActivity o=open("one two three");try{command(o,10);org.telegram.ui.ActionBar.AlertDialog d=org.telegram.ui.ActionBar.AlertDialog.last;Shadows.shadowOf(Looper.getMainLooper()).idle();assertTrue(d.isShowing());assertFalse((d.getWindow().getAttributes().flags & android.view.WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)!=0);d.dismiss();Shadows.shadowOf(Looper.getMainLooper()).idle();assertTrue(((FilesCodeView)get(o,"editor")).hasFocus());}finally{o.onFragmentDestroy();}
+ }
  @Test public void actualZipSheetListsFoldersWithoutExtractingPayloadAndClosesCleanly()throws Exception{
   File zip=File.createTempFile("files-browse-",".zip");try(java.util.zip.ZipOutputStream out=new java.util.zip.ZipOutputStream(new FileOutputStream(zip))){out.putNextEntry(new java.util.zip.ZipEntry("folder/example.txt"));out.write("hello".getBytes(StandardCharsets.UTF_8));out.closeEntry();}
   org.telegram.ui.ActionBar.BaseFragment owner=new org.telegram.ui.ActionBar.BaseFragment();FlexyFilesSheet sheet=new FlexyFilesSheet(owner,zip,"example.zip",1,0);drainSheet(sheet);

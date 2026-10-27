@@ -1,0 +1,32 @@
+{
+  "base": "38e677d60847e117ede1c25731f7b6c4fd2970e2",
+  "reviewed": {
+    "TMessagesProj/src/main/java/app/flexygram/files/FilesCodeView.java": "e8ce1927e00fba04636f41d419cb80247ddce489271b33202985ae345f500b1e",
+    "TMessagesProj/src/main/java/app/flexygram/files/FlexyEditorToolsSheet.java": "01ac22ca1e1a6e46efaefe329f42b13f61a33fc40cd566fdd58ce6a2fddd766c",
+    "TMessagesProj/src/main/java/app/flexygram/files/FlexyFileEditorActivity.java": "c9c95dc7b83b8b995490b12f1b15f108e69dcfe9cd3c6f4ef58d7fde8c663613",
+    "TMessagesProj/src/main/java/app/flexygram/files/FlexyFilesSheet.java": "ea3a5ba9c3d476b306309d2a98771bebe5924151c46c7f7f3f5e2578b973d089",
+    "TMessagesProj/src/main/java/org/telegram/ui/Components/ChatActivityEnterView.java": "d044792323d262458ea40e1f143026e105ae31f89ee2f793c1b532fc9f8198cf",
+    "TMessagesProj/src/main/java/org/telegram/ui/DialogsActivity.java": "211c0ef19cac87f6ac18ea8a802f034b070b0505acac93500b709436ed35c8e3",
+    "tools/connected_alpha/files_native/FilesNativeTest.java.in": "2cec8d35cbd4506ac272e6aa64cdc442ee3dba2e3f9ee63e2e66c69a68ffa4ae",
+    "tools/connected_alpha/files_native/stubs.py": "fb7cd298ad06865f1bd80588e36247d7366092719eac17992358df9089183960",
+    "tools/connected_alpha/stability1277_contract.py": "5bf56646a25164fd1d5dee237eb81db76ea1054890195ea4d63f108bb0265706",
+    "tools/connected_alpha/startup_contract.py": "7057ae1823dd6003f6dbda1407dcfd5fd71289a659cb9216eed5a3e537fe29d7",
+    "tools/connected_alpha/test_flexy_composer.py": "4ece548ec2e919a430fbf5e90a6c72121341d43e04a219d3af0fde56dcf3917c",
+    "tools/connected_alpha/test_stability1277.py": "35e51356cf879d532db7d4da8968cc5ef9535dc86318449ea5c77484f66400eb"
+  },
+  "paths": [
+    "TMessagesProj/src/main/java/app/flexygram/files/FilesCodeView.java",
+    "TMessagesProj/src/main/java/app/flexygram/files/FlexyEditorToolsSheet.java",
+    "TMessagesProj/src/main/java/app/flexygram/files/FlexyFileEditorActivity.java",
+    "TMessagesProj/src/main/java/app/flexygram/files/FlexyFilesSheet.java",
+    "TMessagesProj/src/main/java/org/telegram/ui/Components/ChatActivityEnterView.java",
+    "TMessagesProj/src/main/java/org/telegram/ui/DialogsActivity.java",
+    "tools/connected_alpha/files_native/FilesNativeTest.java.in",
+    "tools/connected_alpha/files_native/stubs.py",
+    "tools/connected_alpha/stability1277_contract.py",
+    "tools/connected_alpha/startup_contract.py",
+    "tools/connected_alpha/test_flexy_composer.py",
+    "tools/connected_alpha/test_stability1277.py",
+    "tools/connected_alpha/stability1277_review.json"
+  ]
+}

@@ -13,6 +13,8 @@ def original(revision,path):
  return result.stdout if result.returncode==0 else None
 
 def restore(path,data):
+ from stability1277_contract import restore as restore_stability
+ data=restore_stability(path,data)
  spec=json.loads(MANIFEST.read_text());path=str(path)
  expected=spec['reviewed'].get(path)
  if expected is None:return data
@@ -27,3 +29,7 @@ def restore(path,data):
  raise ValueError('Unreviewed startup delta: '+path)
 
 def paths():return frozenset(json.loads(MANIFEST.read_text())['paths'])
+
+from stability1277_contract import paths as stability_paths
+_original_paths=paths
+def paths():return _original_paths() | stability_paths()
