@@ -9167,7 +9167,7 @@ public class ChatActivity extends BaseFragment implements
         bottomChannelButtonsLayout.setButtonOnFullyVisibleListener(ChatActivityChannelButtonsLayout.BUTTON_GIFT, (v, id, firstTime) -> {
             if (!NaConfig.INSTANCE.getDisableChannelMuteButton().Bool() && bottomGiftHintView == null && firstTime && (bottomSuggestHintView == null || !bottomSuggestHintView.shown()) && HintsController.Hint.ChannelGiftHint.show()) {
                 AndroidUtilities.runOnUIThread(() -> {
-                    if (getContext() == null) return;
+                    if (getContext() == null || (bottomSuggestHintView != null && bottomSuggestHintView.shown())) return;
                     final float offset = windowInsetsStateHolder.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom / AndroidUtilities.density;
                     final float translate = (contentView.getWidth() - (v.getX() + v.getWidth()) + v.getWidth() / 2f) / AndroidUtilities.density;
 
@@ -9186,7 +9186,7 @@ public class ChatActivity extends BaseFragment implements
         bottomChannelButtonsLayout.setButtonOnFullyVisibleListener(ChatActivityChannelButtonsLayout.BUTTON_DIRECT, (v, id, firstTime) -> {
             if (!NaConfig.INSTANCE.getDisableChannelMuteButton().Bool() && bottomSuggestHintView == null && firstTime && HintsController.Hint.ChannelSuggestHint.show()) {
                 AndroidUtilities.runOnUIThread(() -> {
-                    if (getContext() == null) return;
+                    if (getContext() == null || (bottomGiftHintView != null && bottomGiftHintView.shown())) return;
                     final float offset = windowInsetsStateHolder.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom / AndroidUtilities.density;
                     final float translate = (contentView.getWidth() - (v.getX() + v.getWidth()) + v.getWidth() / 2f) / AndroidUtilities.density;
 

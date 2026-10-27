@@ -12,7 +12,7 @@
     "TMessagesProj/src/main/java/app/flexygram/header/fusion/SignatureFusionSurface.java": "3fa505834cd072edabe2221aee90853f7c6ea8aa62ac743fe3b5c243f2635eb0",
     "TMessagesProj/src/main/java/app/flexygram/home/SignatureFolderAccent.java": "367d71bdd271d9b5cf84a0463983c6d1a23002a37b0ffafb72ebfd644088fa09",
     "TMessagesProj/src/main/java/app/flexygram/home/SignatureHomePainter.java": "5d5a369f9947c95f6eea44c6e57f49c33e68db408f1309c1bf43e63bc816a462",
-    "TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java": "a302a4971e7a7c66144d2d71c20142b3ba93ff89921d1befd0a264066d68bec8",
+    "TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java": "40f59569aad1d8def5efe5133b71ed89f4d2dc79359855804840f7497c48e06f",
     "TMessagesProj/src/main/java/org/telegram/ui/Components/ChatActivityEnterView.java": "a4c4296addc10a3b8d3963180185acab6cd1b826166a578d56bd733102614674",
     "TMessagesProj/src/main/java/org/telegram/ui/Components/ChatAvatarContainer.java": "03d1be9023f18936c8cc9b4cc27651bce1a0e3101afdfb18a2060d1ef0a4a914",
     "TMessagesProj/src/main/java/org/telegram/ui/Components/FilterTabsView.java": "b106d9cc95afe02987ccf7166dc82cc074eb06545a5f646cae5b90ad75b48dd3",
