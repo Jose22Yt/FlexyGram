@@ -37,6 +37,13 @@ public final class SignatureSmartPreviews {
     public static int kind(MessageObject message){
         if(message==null||message.messageOwner==null||message.hasHighlightedWords())return 0;
         if(message.messageOwner.media!=null&&message.messageOwner.media.ttl_seconds!=0)return 0;
+        // Never reveal the contents of an intentionally concealed spoiler by
+        // converting it into a plain text URL/document preview.
+        if (message.messageOwner.entities != null) {
+            for (TLRPC.MessageEntity entity : message.messageOwner.entities) {
+                if (entity instanceof TLRPC.TL_messageEntitySpoiler) return 0;
+            }
+        }
         if(message.messageOwner.action instanceof TLRPC.TL_messageActionChatAddUser
                 ||message.messageOwner.action instanceof TLRPC.TL_messageActionChatJoinedByLink){
             return SignatureSmartPreviewPalette.EVENT;
