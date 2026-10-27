@@ -1,7 +1,7 @@
 {
   "base": "14e586b4ddb7a686f39cda3cb175920c49cecf11",
   "reviewed": {
-    "TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraChatsActivity.java": "039827f4b1295f814b355d785886e3edccb0bd2c",
+    "TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraChatsActivity.java": "244ed510d187d60aae3b599ff65bfc1fcaa5faac",
     "TMessagesProj/src/main/java/app/flexygram/home/SignatureSmartPreviewPalette.java": "dd68e28af25a42d2291b99e61e3cb9b4e7312334",
     "TMessagesProj/src/main/java/app/flexygram/home/SignatureSmartPreviews.java": "c320ae4c082583d19c3fdfe3dc8a6fcffda0addd",
     "TMessagesProj/src/main/java/org/telegram/ui/Cells/DialogCell.java": "5fb8c8615f1b9e75184a7901b39395a2f6df0b15",
@@ -12,7 +12,7 @@
     "tools/connected_alpha/signature1278_contract.py": "3e4f5fa741a12885bedffe8e88aac1390bff1590",
     "tools/connected_alpha/smart_previews1278_contract.py": "6c1466be058ca67a878c8e0ace7eea14c521870b",
     "tools/connected_alpha/test_signature_matte.py": "b72076acc3b406f3050fb28ece74a6c534acae44",
-    "tools/connected_alpha/test_signature_smart_previews.py": "ecb1341214d415f8008e07f2f39cf5898a233f08",
+    "tools/connected_alpha/test_signature_smart_previews.py": "446b9e79489a22c7c06c4b5c7a661922719a7fa3",
     "tools/connected_alpha/test_stabilization1272.py": "8923aa477f3cf52dc07f8e1484eac126dd0a25f4"
   },
   "paths": [
