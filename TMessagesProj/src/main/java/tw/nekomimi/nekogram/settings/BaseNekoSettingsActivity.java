@@ -25,6 +25,7 @@ import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.ActionBarLayout;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
+import org.telegram.ui.ActionBar.ThemeDescription;
 import org.telegram.ui.Cells.CheckBoxCell;
 import org.telegram.ui.Cells.CreationTextCell;
 import org.telegram.ui.Cells.NotificationsCheckCell;
@@ -235,6 +236,31 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment {
         if (listAdapter != null) {
             listAdapter.notifyDataSetChanged();
         }
+    }
+
+    /** Native theme bindings also update the currently visible Signature/settings screen. */
+    @Override public ArrayList<ThemeDescription> getThemeDescriptions() {
+        ArrayList<ThemeDescription> colors = super.getThemeDescriptions();
+        colors.add(new ThemeDescription(fragmentView, ThemeDescription.FLAG_BACKGROUND, null, null, null, null, Theme.key_windowBackgroundGray));
+        if (hasWhiteActionBar()) {
+            colors.add(new ThemeDescription(actionBar, ThemeDescription.FLAG_BACKGROUND, null, null, null, null, Theme.key_windowBackgroundWhite));
+            colors.add(new ThemeDescription(actionBar, ThemeDescription.FLAG_AB_ITEMSCOLOR, null, null, null, null, Theme.key_windowBackgroundWhiteBlackText));
+            colors.add(new ThemeDescription(actionBar, ThemeDescription.FLAG_AB_TITLECOLOR, null, null, null, null, Theme.key_windowBackgroundWhiteBlackText));
+        }
+        ThemeDescription.ThemeDescriptionDelegate invalidate = () -> {
+            if (listView != null) listView.invalidateViews();
+            if (fragmentView != null) fragmentView.invalidate();
+        };
+        colors.add(new ThemeDescription(listView, ThemeDescription.FLAG_SELECTOR, null, null, null, invalidate, Theme.key_listSelector));
+        colors.add(new ThemeDescription(listView, 0, new Class[]{View.class}, Theme.dividerPaint, null, invalidate, Theme.key_divider));
+        Class[] titleCells = {TextSettingsCell.class, TextCheckCell.class, TextCheckCell2.class, TextDetailSettingsCell.class, NotificationsCheckCell.class, TextCell.class, TextRadioCell.class, CheckBoxCell.class};
+        colors.add(new ThemeDescription(listView, 0, titleCells, new String[]{"textView"}, null, null, null, Theme.key_windowBackgroundWhiteBlackText));
+        colors.add(new ThemeDescription(listView, 0, new Class[]{TextSettingsCell.class}, new String[]{"valueTextView"}, null, null, null, Theme.key_windowBackgroundWhiteValueText));
+        colors.add(new ThemeDescription(listView, 0, new Class[]{TextCheckCell.class, TextCheckCell2.class, TextDetailSettingsCell.class, NotificationsCheckCell.class}, new String[]{"valueTextView"}, null, null, null, Theme.key_windowBackgroundWhiteGrayText2));
+        colors.add(new ThemeDescription(listView, 0, new Class[]{tw.nekomimi.nekogram.ui.cells.HeaderCell.class}, new String[]{"textView"}, null, null, null, Theme.key_windowBackgroundWhiteBlueHeader));
+        colors.add(new ThemeDescription(listView, 0, new Class[]{TextInfoPrivacyCell.class}, new String[]{"textView"}, null, null, null, Theme.key_windowBackgroundWhiteGrayText4));
+        colors.add(new ThemeDescription(listView, ThemeDescription.FLAG_LINKCOLOR, new Class[]{TextInfoPrivacyCell.class}, new String[]{"textView"}, null, null, null, Theme.key_windowBackgroundWhiteLinkText));
+        return colors;
     }
 
     protected boolean hasWhiteActionBar() {
