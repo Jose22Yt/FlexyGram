@@ -7,7 +7,7 @@ def write_probe(source,root):
  def put(name,text):
   p=source/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(text)
  java=root/'TMessagesProj/src/main/java'
- files=['org/telegram/ui/Components/chat/layouts/ChatActivityChannelButtonsLayout.java',
+ files=['org/telegram/ui/Components/CubicBezierInterpolator.java','org/telegram/ui/Components/chat/layouts/ChatActivityChannelButtonsLayout.java',
  'org/telegram/ui/Components/chat/buttons/ChatActivityBlurredRoundButton.java',
  'me/vkryl/android/animator/BoolAnimator.java','me/vkryl/android/animator/FactorAnimator.java',
  'me/vkryl/android/AnimatorUtils.java','me/vkryl/core/BitwiseUtils.java',
@@ -26,6 +26,7 @@ def write_probe(source,root):
  put('org/telegram/ui/Components/blur3/BlurredBackgroundDrawableViewFactory.java','''package org.telegram.ui.Components.blur3;public class BlurredBackgroundDrawableViewFactory{
  public org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawable create(android.view.View v){return new org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawable();}
  public org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawable create(android.view.View v,org.telegram.ui.Components.blur3.drawable.color.BlurredBackgroundColorProvider p){return create(v);}}''')
+ p=source/'org/telegram/messenger/AndroidUtilities.java';s=p.read_text().replace('public class AndroidUtilities {','public class AndroidUtilities {public static final android.graphics.Rect rectTmp2=new android.graphics.Rect();public static float lerp(float a,float b,float p){return a+(b-a)*p;}');p.write_text(s)
  code='\n'.join((java/n).read_text()for n in files)
  p=source/'org/telegram/messenger/R.java';s=p.read_text()
  for kind in ['string','drawable']:
