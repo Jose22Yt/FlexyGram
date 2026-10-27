@@ -53,7 +53,8 @@ public final class HeaderPreviewView extends View {
                 fusionMode=true;previewHeight=g.height;
                 int h=Math.round(previewHeight)+AndroidUtilities.dp(80);setMeasuredDimension(width,h);fusionTop=(h-previewHeight)/2;
                 text.setTextSize(titlePx);displayName=android.text.TextUtils.ellipsize(name,new android.text.TextPaint(text),g.text.width(),android.text.TextUtils.TruncateAt.END).toString();
-                fusionTitleX=g.text.centerX();
+                fusionTitleX=app.flexygram.header.fusion.SignatureFusionGeometry.titleCenterX(
+                        g, text.measureText(displayName));
                 text.setTextSize(subtitlePx);displayStatus=android.text.TextUtils.ellipsize(status,new android.text.TextPaint(text),g.text.width(),android.text.TextUtils.TruncateAt.END).toString();
                 fusionStatusX=g.text.centerX();
                 fusion.clip.rewind();fusion.clip.addRoundRect(g.center.left,g.center.top,g.center.right,g.center.bottom,g.center.height()/2,g.center.height()/2,android.graphics.Path.Direction.CW);
