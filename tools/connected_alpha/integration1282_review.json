@@ -10,12 +10,14 @@
     "tools/connected_alpha/native_motion_restore_contract.py",
     "tools/connected_alpha/native_touch/INTEGRATION.md",
     "tools/connected_alpha/native_touch/NativeInstantTouchPolicyTest.java",
+    "tools/connected_alpha/native_touch/NativeTouchTargetTest.java.in",
     "tools/connected_alpha/native_touch/check_wiring.py",
+    "tools/connected_alpha/native_touch/run.py",
     "tools/connected_alpha/test_integration1282.py",
     "tools/connected_alpha/test_native_motion_restore.py"
   ],
   "reviewed": {
-    ".github/workflows/native-instant-touch.yml": "d67619b3aae2caf260eee83475a30c01f068f9f47b01c156b1c52f862690984f",
+    ".github/workflows/native-instant-touch.yml": "c4fb9cdc0996d7a02662a6c23ce62b9f0911a15e13660a76a800e1f9f3342c9f",
     "TMessagesProj/src/main/java/app/flexygram/navigation/NativeInstantTouchPolicy.java": "0afff0b5b91b624d9fc189b379e429b29a3ae76fd7a5b7efbd6e30dcfa3efa55",
     "TMessagesProj/src/main/java/app/flexygram/navigation/NativeInstantTouchTarget.java": "796a687c8162024134bf868ef64a56b3c13f0ae5ec5b7d4ce84d4c61be74495f",
     "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java": "e529cb4572356ee8d6ebbcb42dd678aefa396f45888b454da897ff36faa90421",
@@ -23,7 +25,9 @@
     "tools/connected_alpha/native_motion_restore_contract.py": "d7fa8a52995353dc2d1178275fe4c5345db0da62e246033ea39c954ee71e91b7",
     "tools/connected_alpha/native_touch/INTEGRATION.md": "11497a9cda3df2aaf616c2a6523db1e41aa2561280c76c2d8108e774f9dbb422",
     "tools/connected_alpha/native_touch/NativeInstantTouchPolicyTest.java": "dbee6ac7f011e3d36c47c0414b187bb6b2b969640b1b899b093bf12b94f38488",
+    "tools/connected_alpha/native_touch/NativeTouchTargetTest.java.in": "1dbad7de06f63d203f2870a3e527f57ff494bf34413c68ec3a2cb75f18c1cff0",
     "tools/connected_alpha/native_touch/check_wiring.py": "95748506875b8f76795f26dea16f9169560bd55db5076ebfcd7fe2fde543d736",
+    "tools/connected_alpha/native_touch/run.py": "aa7b6001b7ecdcc432ca2157390d15a0e7d483ed3570ba0084a69242befc7677",
     "tools/connected_alpha/test_integration1282.py": "d919b123d29af93fc09312bb2c7dcf76601630e9b8a4e4860e2c943633a943d7",
     "tools/connected_alpha/test_native_motion_restore.py": "9f4219ed45c59d447bbe08bb08a1888a807a902869a63c103c354980aa04bd0b"
   }
