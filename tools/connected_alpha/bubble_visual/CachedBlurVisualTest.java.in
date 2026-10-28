@@ -11,7 +11,7 @@ import org.robolectric.annotation.*;
 import org.telegram.messenger.*;
 import app.flexygram.bubbles.*;
 import static org.junit.Assert.*;
-@RunWith(RobolectricTestRunner.class) @Config(manifest=Config.NONE,sdk=35) @GraphicsMode(GraphicsMode.Mode.NATIVE) @LooperMode(LooperMode.Mode.PAUSED)
+@RunWith(RobolectricTestRunner.class) @Config(manifest=Config.NONE,sdk=35,instrumentedPackages={"app.flexygram.motion"}) @GraphicsMode(GraphicsMode.Mode.NATIVE) @LooperMode(LooperMode.Mode.PAUSED)
 public class CachedBlurVisualTest {
  private final java.util.ArrayList<View> views=new java.util.ArrayList<>();
  private View keep(View v){views.add(v);return v;}
