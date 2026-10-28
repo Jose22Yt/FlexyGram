@@ -1081,7 +1081,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
                 || !transitionAnimationInProgress || onCloseAnimationEndRunnable == null
                 || animationInProgress || startedTracking || predictiveBackInProgress
                 || inPreviewMode || transitionAnimationPreviewMode || previewOpenAnimationInProgress
-                || inActionMode || isSheet || isLayersLayout || sheetFragment != null
+                || inActionMode || isSheet || isLayersLayout || isRightLayout || sheetFragment != null
                 || fragmentsStack.size() < 2 || containerView == null || containerViewBack == null) {
             return false;
         }
@@ -1089,6 +1089,14 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         BaseFragment destination = fragmentsStack.get(fragmentsStack.size() - 2);
         if (!(outgoing instanceof ChatActivity)
                 || !(destination instanceof MainTabsActivity || destination instanceof DialogsActivity)) {
+            return false;
+        }
+        Dialog outgoingDialog = outgoing.getVisibleDialog();
+        Dialog destinationDialog = destination.getVisibleDialog();
+        Dialog activityDialog = LaunchActivity.instance != null ? LaunchActivity.instance.getVisibleDialog() : null;
+        if (outgoingDialog != null && outgoingDialog.isShowing()
+                || destinationDialog != null && destinationDialog.isShowing()
+                || activityDialog != null && activityDialog.isShowing()) {
             return false;
         }
         if (!FlexyNavigationHandoffPolicy.canHandoffClosingDown(
