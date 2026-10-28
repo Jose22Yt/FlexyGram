@@ -25,6 +25,23 @@ public final class BubbleStudioContractTest {
         yes(!BubbleTouchPolicy.mayConvertToSticker(true,true,false,false,true,true,true),"spoiler");
         yes(!BubbleTouchPolicy.mayConvertToSticker(true,true,false,false,false,false,true),"not supported");
         yes(!BubbleTouchPolicy.mayConvertToSticker(true,true,false,false,false,true,false),"cannot send");
+        app.flexygram.bubbles.interaction.BubbleTapGestureState state =
+                new app.flexygram.bubbles.interaction.BubbleTapGestureState();
+        state.down(10, 10, 8, true);
+        yes(state.isPressed(), "bubble down");
+        yes(!state.move(13, 12), "small movement still press");
+        yes(state.up(true), "one genuine tap");
+        state.down(10, 10, 8, true);
+        yes(state.move(100, 10), "scroll cancels press");
+        yes(!state.up(true), "scroll no bubble click");
+        state.down(10, 10, 8, true);
+        state.longPress();
+        yes(!state.up(true), "long press not simple tap");
+        state.down(10, 10, 8, true);
+        yes(!state.up(false), "native click veto respected");
+        state.down(10, 10, 8, true);
+        state.cancel();
+        yes(!state.up(true), "cancelled native stream");
         int[] square = BubbleStickerSpec.dimensions(120,120);
         yes(square[0]==512&&square[1]==512,"square");
         int[] wide = BubbleStickerSpec.dimensions(360,180);
