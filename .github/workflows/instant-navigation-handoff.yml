@@ -35,5 +35,3 @@ jobs:
             TMessagesProj/src/main/java/org/telegram/ui/ActionBar/FlexyNavigationHandoffPolicy.java \
             tools/connected_alpha/motion/InstantHandoffPolicyTest.java
           java -cp "$classes" InstantHandoffPolicyTest
-      - name: Diff whitespace check
-        run: git diff --check HEAD^ HEAD || true
