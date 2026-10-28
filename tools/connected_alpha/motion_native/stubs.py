@@ -77,3 +77,6 @@ public class PopupMotionProbe extends PopupWindow {
 
  from gesture_opening_probe import write as write_gesture_opening
  write_gesture_opening(put,root)
+
+ from gesture_dispatch_probe import write as write_gesture_dispatch
+ write_gesture_dispatch(put,root)

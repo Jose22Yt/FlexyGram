@@ -8,6 +8,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[3]
 SOURCE = ROOT / "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java"
 BASE_GIT_BLOB = "78b0b482add965ca590d9da397bc083dd7a5ab3c"
+LAUNCH = ROOT / "TMessagesProj/src/main/java/org/telegram/ui/LaunchActivity.java"
+BASE_LAUNCH_BLOB = "45f2b98e7cd27683f9bf075de19ca07e26766eb4"
 
 START = "    private FlexyInstantNavigationCoordinator instantNavigation;"
 END = "    @Override\n    public void requestDisallowInterceptTouchEvent"
@@ -172,6 +174,26 @@ def main() -> None:
         "rebase and explicitly review new upstream edits"
     )
     print("Instant handoff scope: PASS (entire upstream ActionBarLayout recovered byte-for-byte)")
+    launch = LAUNCH.read_text(encoding="utf-8")
+    terminal_cleanup = """                        final var cancelledLayout = actionBarLayout;
+                        final var cancelledDrawer = drawerLayoutContainer == null ? null : drawerLayoutContainer.getDrawerContainer();
+                        if (!onBackPressed(true)) {
+                            // The higher-priority surface consumed the terminal event, not the child gesture.
+                            if (drawerPredictiveBackStarted) {
+                                if (cancelledDrawer != null) cancelledDrawer.cancelPredictiveBack();
+                                drawerPredictiveBackStarted = false;
+                            } else if (cancelledLayout != null) {
+                                cancelledLayout.onBackCancelled();
+                            }
+                            return;
+                        }"""
+    assert launch.count(terminal_cleanup) == 1, "Unexpected launcher terminal ownership scope"
+    launch = launch.replace(terminal_cleanup, "                        if (!onBackPressed(true))\n                            return;")
+    data = launch.encode("utf-8")
+    launch_sha = hashlib.sha1(b"blob " + str(len(data)).encode() + b"\0" + data).hexdigest()
+    assert launch_sha == BASE_LAUNCH_BLOB, "Unreviewed LaunchActivity change: " + launch_sha
+    print("Launcher terminal scope: PASS (entire upstream LaunchActivity recovered byte-for-byte)")
+
 
 
 if __name__ == "__main__":

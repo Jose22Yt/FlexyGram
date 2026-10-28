@@ -807,8 +807,18 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                             onBackPressed();
                             return;
                         }
-                        if (!onBackPressed(true))
+                        final var cancelledLayout = actionBarLayout;
+                        final var cancelledDrawer = drawerLayoutContainer == null ? null : drawerLayoutContainer.getDrawerContainer();
+                        if (!onBackPressed(true)) {
+                            // The higher-priority surface consumed the terminal event, not the child gesture.
+                            if (drawerPredictiveBackStarted) {
+                                if (cancelledDrawer != null) cancelledDrawer.cancelPredictiveBack();
+                                drawerPredictiveBackStarted = false;
+                            } else if (cancelledLayout != null) {
+                                cancelledLayout.onBackCancelled();
+                            }
                             return;
+                        }
                         if (drawerPredictiveBackStarted && drawerLayoutContainer != null && drawerLayoutContainer.getDrawerContainer() != null) {
                             drawerLayoutContainer.getDrawerContainer().commitPredictiveBack();
                             drawerPredictiveBackStarted = false;
