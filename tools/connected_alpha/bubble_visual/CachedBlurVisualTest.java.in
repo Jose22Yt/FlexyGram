@@ -153,8 +153,11 @@ public class CachedBlurVisualTest {
   assertTrue("blur enabled",BubbleConfig.backgroundBlur());
   assertTrue("static source supported",a.isSupported());
   assertFalse("cold draw must use fallback before worker",a.draw(canvas,path,0,0));
+  Object diagnosticEntry=entry(a);var stageField=diagnosticEntry.getClass().getDeclaredField("outcome");stageField.setAccessible(true);
+  var keyField=diagnosticEntry.getClass().getDeclaredField("key");keyField.setAccessible(true);Object key=keyField.get(diagnosticEntry);var genField=key.getClass().getDeclaredField("generation");genField.setAccessible(true);
+  System.out.println("cold before completion stage="+stageField.getInt(diagnosticEntry)+" queue="+Utilities.globalQueue.pending()+" keygen="+genField.getInt(key)+" sourcegen="+source.getBitmap().getGenerationId());
   complete();
-  assertTrue("publication ready: "+java.util.Arrays.toString(SignatureWallpaperBlur.diagnostics()),a.isReady());
+  assertTrue("publication ready: "+java.util.Arrays.toString(SignatureWallpaperBlur.diagnostics())+" stage="+stageField.getInt(diagnosticEntry)+" queue="+Utilities.globalQueue.pending()+" keygen="+genField.getInt(key)+" sourcegen="+source.getBitmap().getGenerationId()+" cached="+cached(a),a.isReady());
   var mappingField=a.getClass().getDeclaredField("mapping");mappingField.setAccessible(true);
   assertTrue("ready draw supported="+a.isSupported()+" mapping="+mappingField.get(a)+" generation="+source.getBitmap().getGenerationId()+" enabled="+BubbleConfig.backgroundBlur(),a.draw(canvas,path,0,0));
   assertEquals("first cold reveal stays transparent",0,Color.alpha(pixels.getPixel(40,40)));
