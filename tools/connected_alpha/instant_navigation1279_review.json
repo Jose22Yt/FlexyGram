@@ -9,7 +9,7 @@
     ".github/workflows/instant-navigation-handoff.yml": "8dba73296bb8cae71a4f860d3296b3053a719f02",
     "tools/connected_alpha/integration1279_contract.py": "b29d69ef30f20da7b6148a848ee8275bdf71662c",
     "tools/connected_alpha/instant_navigation1279_contract.py": "3848af94cc53a812649c3194c9b97da7b1c1b16d",
-    "tools/connected_alpha/test_instant_navigation1279.py": "8f2ecdd62c60b43cb8f1efefb7de719beaa51c48",
+    "tools/connected_alpha/test_instant_navigation1279.py": "a20c95da669d7b1e3d74f8a92218bdf54db0216e",
     "tools/connected_alpha/motion_native/stubs.py": "0aa95d57af7a7d3e4b83676007e4b30690ac670d",
     "tools/connected_alpha/motion_native/MotionEngineTest.java.in": "5a10b5b7487d91e67603bfe36a03a3f724916133"
   },
