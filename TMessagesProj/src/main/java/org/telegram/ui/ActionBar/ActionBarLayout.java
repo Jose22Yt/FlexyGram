@@ -79,6 +79,7 @@ import org.telegram.messenger.SharedConfig;
 import org.telegram.messenger.Utilities;
 import org.telegram.messenger.utils.ViewOutlineProviderImpl;
 import org.telegram.ui.ChatActivity;
+import org.telegram.ui.DialogsActivity;
 import org.telegram.ui.Components.AnimatedFloat;
 import org.telegram.ui.Components.BackButtonMenu;
 import org.telegram.ui.EmptyBaseFragment;
@@ -1065,8 +1066,52 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         }
     }
 
+    /**
+     * One-touch handoff for an exposed chat-list surface during a normal chat
+     * close. The outgoing view may visually occupy the right-hand side while
+     * the list is already attached on the left. Commit that exact close on
+     * ACTION_DOWN, then let ViewGroup dispatch the original event normally to
+     * the now-stable list. We never synthesize/replay DOWN or UP events.
+     *
+     * This is intentionally limited to chat -> main list; sheet, preview,
+     * predictive back, active swipe and modal owners retain native behavior.
+     */
+    private boolean tryHandoffClosingChatDown(MotionEvent event) {
+        if (event == null || event.getActionMasked() != MotionEvent.ACTION_DOWN
+                || !transitionAnimationInProgress || onCloseAnimationEndRunnable == null
+                || animationInProgress || startedTracking || predictiveBackInProgress
+                || inPreviewMode || transitionAnimationPreviewMode || previewOpenAnimationInProgress
+                || inActionMode || isSheet || isLayersLayout || sheetFragment != null
+                || fragmentsStack.size() < 2 || containerView == null || containerViewBack == null) {
+            return false;
+        }
+        BaseFragment outgoing = fragmentsStack.get(fragmentsStack.size() - 1);
+        BaseFragment destination = fragmentsStack.get(fragmentsStack.size() - 2);
+        if (!(outgoing instanceof ChatActivity)
+                || !(destination instanceof MainTabsActivity || destination instanceof DialogsActivity)) {
+            return false;
+        }
+        if (!FlexyNavigationHandoffPolicy.canHandoffClosingDown(
+                true, false,
+                containerViewBack.getVisibility() == View.VISIBLE,
+                containerView.getVisibility() == View.VISIBLE && containerView.getChildCount() > 0,
+                event.getX(), event.getY(), containerViewBack.getTranslationX(),
+                getWidth(), getHeight(), dp(16))) {
+            return false;
+        }
+        // Complete native lifecycle/stack operations before Android hit-tests
+        // the original ACTION_DOWN against the destination's attached rows.
+        // onAnimationEndCheck owns spring/animator cancellation and clean-up.
+        onAnimationEndCheck(true);
+        return !transitionAnimationInProgress && !animationInProgress
+                && !startedTracking && getLastFragment() == destination;
+    }
+
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
+        if (tryHandoffClosingChatDown(ev)) {
+            return false;
+        }
         return animationInProgress || checkTransitionAnimation() || onTouchEvent(ev);
     }
 
