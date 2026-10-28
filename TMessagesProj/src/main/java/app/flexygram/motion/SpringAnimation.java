@@ -22,7 +22,7 @@ public final class SpringAnimation implements View.OnAttachStateChangeListener {
     private final ArrayList<EndListener> ends=new ArrayList<>();
     private SpringForce force;
     private float initialVelocity;
-    private boolean timed;
+    private boolean timed,renderInitialValue;
     private long duration;
     private android.animation.ValueAnimator legacyTimeline;
     public SpringAnimation setDuration(long millis){main();if(running||millis<0)throw new IllegalArgumentException("duration");timed=true;duration=millis;return this;}
@@ -42,6 +42,12 @@ public final class SpringAnimation implements View.OnAttachStateChangeListener {
     public SpringAnimation addUpdateListener(UpdateListener listener){main();if(listener==null)throw new IllegalArgumentException("listener");updates.add(listener);return this;}
     public SpringAnimation addEndListener(EndListener listener){main();if(listener==null)throw new IllegalArgumentException("listener");ends.add(listener);return this;}
     public boolean isRunning(){return running;}
+    /** Snapshot only an active analytic trajectory; timed/legacy/queued completion has no transferable velocity. */
+    public boolean canContinue(){main();return BuildConfig.CONNECTED_ALPHA&&running&&!queued&&!timed&&frames!=null&&frames.isRunning()&&owner.isAttachedToWindow()&&owner.isShown()&&owner.getWindowVisibility()==View.VISIBLE&&!FlexyMotionSettings.state(owner.getContext()).instant();}
+    public float continuationValue(){main();if(!canContinue())throw new IllegalStateException("inactive trajectory");return holder.getValue();}
+    public float continuationVelocity(){main();if(!canContinue())throw new IllegalStateException("inactive trajectory");return frames.velocity()*NAVIGATION_RATE*FlexyMotionSettings.state(owner.getContext()).speed;}
+    /** Opt-in only for a native renderer seeded from a previous trajectory. */
+    public SpringAnimation setRenderInitialValue(boolean value){main();if(running)throw new IllegalStateException("running");renderInitialValue=value;return this;}
     private void update(float value){
         holder.setValue(value);
         float velocity=frames==null?0:frames.velocity()*(timed?1:NAVIGATION_RATE)*FlexyMotionSettings.state(owner.getContext()).speed;
@@ -68,7 +74,15 @@ public final class SpringAnimation implements View.OnAttachStateChangeListener {
         frames.setOnSettingsChanged(()->{if(running&&FlexyMotionSettings.state(owner.getContext()).instant())queue(false);});
         if(FlexyMotionSettings.state(owner.getContext()).instant()||!owner.isAttachedToWindow()||!owner.isShown())queue(false);
         else if(timed) frames.animateTimedTo(force.getFinalPosition(),duration,()->queue(false));
-        else frames.animateTo(force.getFinalPosition(),()->queue(false));
+        else {
+            if(renderInitialValue){
+                long ticket=generation;
+                update(holder.getValue());
+                // Rendering can synchronously cancel/restart this actor or accept a newer scene.
+                if(!running||ticket!=generation||frames==null||queued)return;
+            }
+            frames.animateTo(force.getFinalPosition(),()->queue(false));
+        }
     }
     private void queue(boolean cancelled){
         if(!running)return;if(frames!=null)frames.cancel();

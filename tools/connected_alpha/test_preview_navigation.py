@@ -20,20 +20,22 @@ def fixture(source):
  if 'private void reportInstantNavigation(' in source:bodies+=[method(source,'private void reportInstantNavigation('),method(source,'private boolean isObsoleteInstantCompletion(')]
  if 'private boolean isObsoleteInstantCompletion(' in source:
   a=source.index('            currentSpringAnimation.addEndListener(',source.index('    private void startLayoutAnimation('));b=source.index('            currentSpringAnimation.start();',a)
-  bodies+=['void installNativeSpringCallback(){'+source[a:b]+'}']
+  bodies+=['void installNativeSpringCallback(){final long springGeneration=instantNavigation==null?0:instantNavigation.generation();'+source[a:b]+'}']
+  if 'private boolean isObsoleteInstantFrame(' in source:bodies+=[method(source,'private boolean isObsoleteInstantFrame(')]
  if 'private boolean prepareInstantBack(' in source:bodies+=[method(source,'private boolean prepareInstantBack('),method(source,'private boolean hasInstantBackModal(')]
+ if 'private void clearInstantBackSeed(' in source:bodies+=[method(source,'private void clearInstantBackSeed(')]
  if 'private boolean finishClosingPreview()' in source:bodies+=[method(source,'private boolean finishClosingPreview()')]
  a=source.index('public void closeLastFragment(boolean animated, boolean forceNoAnimation)');b=source.index('        if (parentActivity.getCurrentFocus()',a)
  bodies+=[source[a:b]+' beginClose(getLastFragment()); }']
  return '''import java.util.*;import org.telegram.ui.ActionBar.FlexyInstantNavigationCoordinator;public class PreviewRegression {
- FlexyInstantNavigationCoordinator instantNavigation;
+ FlexyInstantNavigationCoordinator instantNavigation;boolean instantBackSeed;float instantBackValue,instantBackVelocity;long instantBackGeneration,instantBackDialog;static final float SPRING_MULTIPLIER=1000;boolean USE_SPRING_ANIMATION=true;
  static class ChatActivity extends BaseFragment {long getDialogId(){return 42;}}
  static class Dialog{boolean showing;Dialog(boolean value){showing=value;}boolean isShowing(){return showing;}}
  static class LaunchActivity{static LaunchActivity instance;Dialog getVisibleDialog(){return null;}}
  static class View{static final int VISIBLE=0;}
  static class BaseFragment {Dialog dialog;boolean sheet,allowBack=true;Dialog getVisibleDialog(){return dialog;}boolean hasSheet(){return sheet;}boolean closeLastFragment(){return false;}boolean onBackPressed(boolean p){return allowBack;}}
- static class Container {float x;boolean isAttachedToWindow(){return true;}int getVisibility(){return 0;}int getChildCount(){return 1;}void setAlpha(float f){}void setScaleX(float f){}void setScaleY(float f){}void setTranslationX(float f){x=f;}void setTranslationY(float f){}}
- static class Animator{boolean cancelled;Runnable callback;void removeAllListeners(){callback=null;}void cancel(){if(cancelled)return;cancelled=true;if(callback!=null)callback.run();}} static class AnimatorSet extends Animator{} static class SpringAnimation{interface End{void onEnd(SpringAnimation a,boolean c,float v,float speed);}boolean cancelled;boolean isRunning(){return !cancelled;}End listener;void addEndListener(End l){listener=l;}void finish(){listener.onEnd(this,false,1,0);}void cancel(){if(cancelled)return;cancelled=true;if(listener!=null)listener.onEnd(this,true,0,0);}}
+ static class Container {boolean isKeyboardVisible;float x;boolean isAttachedToWindow(){return true;}int getVisibility(){return 0;}int getChildCount(){return 1;}void setAlpha(float f){}void setScaleX(float f){}void setScaleY(float f){}void setTranslationX(float f){x=f;}void setTranslationY(float f){}}
+ static class Animator{boolean cancelled;Runnable callback;void removeAllListeners(){callback=null;}void cancel(){if(cancelled)return;cancelled=true;if(callback!=null)callback.run();}} static class AnimatorSet extends Animator{} static class SpringAnimation{interface End{void onEnd(SpringAnimation a,boolean c,float v,float speed);}boolean cancelled;boolean canContinue(){return false;}float continuationValue(){return 0;}float continuationVelocity(){return 0;}boolean isRunning(){return !cancelled;}End listener;void addEndListener(End l){listener=l;}void finish(){listener.onEnd(this,false,1,0);}void cancel(){if(cancelled)return;cancelled=true;if(listener!=null)listener.onEnd(this,true,0,0);}}
  static class AndroidUtilities{static void cancelRunOnUIThread(Runnable r){}}
  static class GroupCallPip{static boolean onBackPressed(){return false;}}
  static class Bar {boolean isActionModeShowed(){return false;}boolean isSearchFieldVisible;void closeSearchField(){}}

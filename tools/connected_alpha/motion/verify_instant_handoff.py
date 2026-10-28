@@ -50,6 +50,30 @@ def main() -> None:
         assert prohibited not in delta, "No synthetic event, injected click or wait: " + prohibited
 
     reconstructed = (content[:start] + ORIGINAL + content[end:]).replace(NEW_IMPORT, "", 1)
+    # Remove only the synchronous seed scope around the unchanged native Back body.
+    begin = "        try { // Instant Back owns a seed only within this native call.\n"
+    finish = "        } finally {\n            clearInstantBackSeed();\n        }"
+    assert reconstructed.count(begin) == 1 and reconstructed.count(finish) == 1
+    a = reconstructed.index(begin)
+    b = reconstructed.index(finish, a)
+    native_back = reconstructed[a + len(begin):b]
+    assert all(line.startswith("    ") for line in native_back.splitlines())
+    reconstructed = reconstructed[:a] + "\n".join(line[4:] for line in native_back.splitlines()) + reconstructed[b + len(finish):]
+    seeded_factory = "            currentSpringAnimation = createInstantLayoutSpring(open, preview);"
+    original_factory = """            FloatValueHolder valueHolder = new FloatValueHolder(0);
+            currentSpringAnimation = new SpringAnimation(this, valueHolder)
+                    .setSpring(new SpringForce(SPRING_MULTIPLIER)
+                            .setStiffness(preview ? open ? SPRING_STIFFNESS_PREVIEW : SPRING_STIFFNESS_PREVIEW_OUT : SPRING_STIFFNESS)
+                            .setDampingRatio(preview ? 0.6f : 1f));"""
+    assert reconstructed.count(seeded_factory) == 1
+    reconstructed = reconstructed.replace(seeded_factory, original_factory)
+    frame_generation = "            final long springGeneration = instantNavigation == null ? 0 : instantNavigation.generation();\n"
+    assert reconstructed.count(frame_generation) == 1
+    reconstructed = reconstructed.replace(frame_generation, "")
+    frame_entry = "                if (isObsoleteInstantFrame(animation, springGeneration)) return;\n"
+    frame_callback = "                    if (isObsoleteInstantFrame(animation, springGeneration)) return;\n"
+    assert reconstructed.count(frame_entry) == 4 and reconstructed.count(frame_callback) == 2
+    reconstructed = reconstructed.replace(frame_callback, "").replace(frame_entry, "")
     hooks = (
         ("        if (!prepareInstantBack()) return;\n", 1),
         ("        final long instantGeneration = instantNavigation == null ? 0 : instantNavigation.generation();\n", 1),

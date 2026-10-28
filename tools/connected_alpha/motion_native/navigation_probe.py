@@ -13,7 +13,7 @@ def write(put,root,source):
  start=s.index('    private void startLayoutAnimation(')
  a=s.index('            currentSpringAnimation.addUpdateListener(',start)
  b=s.index('            currentSpringAnimation.start();',a)
- spring=s[a:b]
+ spring='final long springGeneration = instantNavigation == null ? 0 : instantNavigation.generation();'+s[a:b]
  put('NavigationMotionProbe.java','''import android.animation.*;import java.util.ArrayList;import android.view.*;import android.widget.*;import android.graphics.drawable.*;import androidx.core.graphics.ColorUtils;import androidx.core.math.MathUtils;
 import androidx.dynamicanimation.animation.FloatValueHolder;import androidx.dynamicanimation.animation.SpringForce;import app.flexygram.motion.SpringAnimation;import org.telegram.ui.Components.CubicBezierInterpolator;import org.telegram.ui.ActionBar.Theme;import org.telegram.messenger.AndroidUtilities;
 public class NavigationMotionProbe extends FrameLayout {
@@ -35,7 +35,7 @@ public class NavigationMotionProbe extends FrameLayout {
  public void spring(boolean open,boolean preview){currentSpringAnimation=new SpringAnimation(this,new FloatValueHolder(0)).setSpring(new SpringForce(SPRING_MULTIPLIER));
 '''+spring+'''currentSpringAnimation.start();}
  public void abort(){if(currentSpringAnimation!=null){SpringAnimation old=currentSpringAnimation;currentSpringAnimation=null;old.cancel();}}
-'''+alpha+'\n'+predictive+'\n'+gesture+'\n'+settle+'\n'+reset+'\n'+timed+'}')
+'''+method(s,'    private boolean isObsoleteInstantFrame(')+'\n'+alpha+'\n'+predictive+'\n'+gesture+'\n'+settle+'\n'+reset+'\n'+timed+'}')
  p=source/'NavigationMotionProbe.java';p.write_text(p.read_text().replace('__CLEANUP__',cleanup))
  p=source/'org/telegram/ui/ActionBar/Theme.java';p.write_text(p.read_text().replace('public class Theme {','public class Theme {public static final android.graphics.drawable.ColorDrawable moveUpDrawable=new android.graphics.drawable.ColorDrawable();'))
 

@@ -1067,13 +1067,51 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
     }
 
     private FlexyInstantNavigationCoordinator instantNavigation;
+    // One synchronous Back transaction only. Never retained across native veto, IME delay or modal work.
+    private boolean instantBackSeed;
+    private float instantBackValue, instantBackVelocity;
+    private long instantBackGeneration, instantBackDialog;
+
+    private void clearInstantBackSeed() {
+        instantBackSeed = false;
+        instantBackValue = instantBackVelocity = 0;
+        instantBackGeneration = instantBackDialog = 0;
+    }
+
+    private SpringAnimation createInstantLayoutSpring(boolean open, boolean preview) {
+        boolean seeded = !open && !preview && instantBackSeed && instantNavigation != null
+                && instantNavigation.isCurrent(instantBackGeneration)
+                && instantNavigation.state() == FlexyInstantNavigationCoordinator.State.CLOSING;
+        float value = seeded ? instantBackValue : 0;
+        float velocity = seeded ? instantBackVelocity : 0;
+        clearInstantBackSeed();
+        SpringAnimation animation = new SpringAnimation(this, new FloatValueHolder(value))
+                .setSpring(new SpringForce(SPRING_MULTIPLIER)
+                        .setStiffness(preview ? open ? SPRING_STIFFNESS_PREVIEW : SPRING_STIFFNESS_PREVIEW_OUT : SPRING_STIFFNESS)
+                        .setDampingRatio(preview ? 0.6f : 1f));
+        if (seeded) animation.setStartVelocity(velocity).setRenderInitialValue(true);
+        return animation;
+    }
+
+    private boolean isObsoleteInstantFrame(SpringAnimation animation, long generation) {
+        if (instantNavigation == null || animation == currentSpringAnimation && instantNavigation.isCurrent(generation)) return false;
+        // A deferred newer scene may not have installed its actor yet. Stop the old clock as well as its writes.
+        if (currentSpringAnimation == animation) currentSpringAnimation = null;
+        animation.cancel();
+        return true;
+    }
 
     private void reportInstantNavigation(FlexyInstantNavigationCoordinator.State state, BaseFragment target,
                                          FlexyInstantNavigationCoordinator.Kind kind) {
         if (instantNavigation != null) {
             long destinationId = target instanceof ChatActivity ? ((ChatActivity) target).getDialogId() : 0;
-            instantNavigation.begin(state, new FlexyInstantNavigationCoordinator.Intent(kind, destinationId,
+            boolean keepSeed = instantBackSeed && instantNavigation.isCurrent(instantBackGeneration)
+                    && state == FlexyInstantNavigationCoordinator.State.CLOSING
+                    && kind == FlexyInstantNavigationCoordinator.Kind.BACK && destinationId == instantBackDialog;
+            long ticket = instantNavigation.begin(state, new FlexyInstantNavigationCoordinator.Intent(kind, destinationId,
                     target == null ? null : target.getClass().getName()), false);
+            if (keepSeed) instantBackGeneration = ticket;
+            else clearInstantBackSeed();
         }
     }
 
@@ -1107,6 +1145,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
 
     /** Finish only a ready, ordinary chat opening; the same native Back then decides the action. */
     private boolean prepareInstantBack() {
+        clearInstantBackSeed();
         if (!transitionAnimationInProgress || onOpenAnimationEndRunnable == null || onCloseAnimationEndRunnable != null
                 || animationInProgress || startedTracking || predictiveBackInProgress || storyViewerAttached()
                 || inPreviewMode || transitionAnimationPreviewMode || previewOpenAnimationInProgress
@@ -1118,6 +1157,13 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         BaseFragment outgoing = getLastFragment();
         BaseFragment previous = fragmentsStack.get(fragmentsStack.size() - 2);
         if (!(outgoing instanceof ChatActivity) || hasInstantBackModal(outgoing, previous)) return true;
+        boolean continuable = USE_SPRING_ANIMATION && containerViewBack != null
+                && !containerView.isKeyboardVisible && !containerViewBack.isKeyboardVisible
+                && currentSpringAnimation.canContinue();
+        float openingValue = continuable ? currentSpringAnimation.continuationValue() : 0;
+        float openingVelocity = continuable ? currentSpringAnimation.continuationVelocity() : 0;
+        continuable &= Float.isFinite(openingValue) && Float.isFinite(openingVelocity)
+                && openingValue >= -0.25f * SPRING_MULTIPLIER && openingValue <= 1.25f * SPRING_MULTIPLIER;
         if (instantNavigation == null) instantNavigation = new FlexyInstantNavigationCoordinator();
         long ticket = instantNavigation.begin(FlexyInstantNavigationCoordinator.State.OPENING,
                 new FlexyInstantNavigationCoordinator.Intent(FlexyInstantNavigationCoordinator.Kind.BACK,
@@ -1128,6 +1174,13 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         // A reentrant accepted destination consumes this old Back; never redirect it to that destination.
         if (!completed || transitionAnimationInProgress || animationInProgress || startedTracking || getLastFragment() != outgoing) return false;
         if (hasInstantBackModal(outgoing, previous) || sheetFragment != null || storyViewerAttached()) return false;
+        if (continuable) {
+            instantBackSeed = true;
+            instantBackValue = SPRING_MULTIPLIER - openingValue;
+            instantBackVelocity = -openingVelocity;
+            instantBackGeneration = instantNavigation.generation();
+            instantBackDialog = ((ChatActivity) outgoing).getDialogId();
+        }
         setInnerTranslationX(0);
         if (USE_ACTIONBAR_CROSSFADE) {
             swipeProgress = 0f;
@@ -2200,24 +2253,28 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
             return;
         }
         if (!prepareInstantBack()) return;
-        if (transitionAnimationPreviewMode || startedTracking || checkTransitionAnimation() || fragmentsStack.isEmpty()) {
-            return;
-        }
-        if (GroupCallPip.onBackPressed()) {
-            return;
-        }
-        if (!storyViewerAttached() && currentActionBar != null && !currentActionBar.isActionModeShowed() && currentActionBar.isSearchFieldVisible) {
-            currentActionBar.closeSearchField();
-            return;
-        }
-        if (sheetFragment != null && !sheetFragment.onBackPressed(true)) {
-            return;
-        }
-        BaseFragment lastFragment = fragmentsStack.get(fragmentsStack.size() - 1);
-        if (lastFragment.onBackPressed(true)) {
-            if (!fragmentsStack.isEmpty()) {
-                closeLastFragment(true);
+        try { // Instant Back owns a seed only within this native call.
+            if (transitionAnimationPreviewMode || startedTracking || checkTransitionAnimation() || fragmentsStack.isEmpty()) {
+                return;
             }
+            if (GroupCallPip.onBackPressed()) {
+                return;
+            }
+            if (!storyViewerAttached() && currentActionBar != null && !currentActionBar.isActionModeShowed() && currentActionBar.isSearchFieldVisible) {
+                currentActionBar.closeSearchField();
+                return;
+            }
+            if (sheetFragment != null && !sheetFragment.onBackPressed(true)) {
+                return;
+            }
+            BaseFragment lastFragment = fragmentsStack.get(fragmentsStack.size() - 1);
+            if (lastFragment.onBackPressed(true)) {
+                if (!fragmentsStack.isEmpty()) {
+                    closeLastFragment(true);
+                }
+            }
+        } finally {
+            clearInstantBackSeed();
         }
     }
 
@@ -2503,21 +2560,21 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
                         app.exteraless.utils.PredictiveBackAnimationHelper.getTransitionBackground(
                                 fragmentsStack, getLastFragment());
             }
-            FloatValueHolder valueHolder = new FloatValueHolder(0);
-            currentSpringAnimation = new SpringAnimation(this, valueHolder)
-                    .setSpring(new SpringForce(SPRING_MULTIPLIER)
-                            .setStiffness(preview ? open ? SPRING_STIFFNESS_PREVIEW : SPRING_STIFFNESS_PREVIEW_OUT : SPRING_STIFFNESS)
-                            .setDampingRatio(preview ? 0.6f : 1f));
+            currentSpringAnimation = createInstantLayoutSpring(open, preview);
+            final long springGeneration = instantNavigation == null ? 0 : instantNavigation.generation();
             currentSpringAnimation.addUpdateListener((animation, value, velocity) -> {
+                if (isObsoleteInstantFrame(animation, springGeneration)) return;
                 animationProgress = value / SPRING_MULTIPLIER;
                 if (USE_ACTIONBAR_CROSSFADE) {
                     swipeProgress = MathUtils.clamp(open ? (1f - animationProgress) : animationProgress, 0f, 1f);
                 }
                 if (newFragment != null) {
                     newFragment.onTransitionAnimationProgress(true, animationProgress);
+                    if (isObsoleteInstantFrame(animation, springGeneration)) return;
                 }
                 if (oldFragment != null) {
                     oldFragment.onTransitionAnimationProgress(false, animationProgress);
+                    if (isObsoleteInstantFrame(animation, springGeneration)) return;
                 }
                 if (preview) {
                     Integer oldNavigationBarColor = oldFragment != null ? oldFragment.getNavigationBarColor() : null;
@@ -2590,6 +2647,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
                 if (animation != currentSpringAnimation) {
                     return;
                 }
+                if (isObsoleteInstantFrame(animation, springGeneration)) return;
                 springRouteBackgroundDrawable = null;
                 containerView.setScaleX(1f);
                 containerView.setScaleY(1f);
