@@ -26,5 +26,7 @@ jobs:
       - name: Check no settings or animation engine imports
         run: python3 tools/connected_alpha/native_touch/check_wiring.py
       - uses: android-actions/setup-android@v3
+        with:
+          packages: 'build-tools;36.0.0 platforms;android-37.0'
       - name: Compile production hit test and check Android view clipping
         run: python3 tools/connected_alpha/native_touch/run.py --sdk-root "$ANDROID_HOME"

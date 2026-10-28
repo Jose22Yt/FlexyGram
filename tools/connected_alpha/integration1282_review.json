@@ -17,7 +17,7 @@
     "tools/connected_alpha/test_native_motion_restore.py"
   ],
   "reviewed": {
-    ".github/workflows/native-instant-touch.yml": "c4fb9cdc0996d7a02662a6c23ce62b9f0911a15e13660a76a800e1f9f3342c9f",
+    ".github/workflows/native-instant-touch.yml": "d7c817deef5789464417541ab5f6275429291aa8f2c2a8282942ee3955a60075",
     "TMessagesProj/src/main/java/app/flexygram/navigation/NativeInstantTouchPolicy.java": "0afff0b5b91b624d9fc189b379e429b29a3ae76fd7a5b7efbd6e30dcfa3efa55",
     "TMessagesProj/src/main/java/app/flexygram/navigation/NativeInstantTouchTarget.java": "796a687c8162024134bf868ef64a56b3c13f0ae5ec5b7d4ce84d4c61be74495f",
     "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java": "e529cb4572356ee8d6ebbcb42dd678aefa396f45888b454da897ff36faa90421",
