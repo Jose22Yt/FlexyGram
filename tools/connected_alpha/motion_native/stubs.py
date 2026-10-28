@@ -58,5 +58,10 @@ public class PopupMotionProbe extends PopupWindow {
  from navigation_probe import write as write_navigation
  write_navigation(put,root,source)
 
+ # Compile the exact P1 production predicate in the Android widget/dispatch
+ # probe. Navigation fragments and Telegram services remain explicit doubles.
+ put('org/telegram/ui/ActionBar/FlexyNavigationHandoffPolicy.java',
+     (root/'TMessagesProj/src/main/java/org/telegram/ui/ActionBar/FlexyNavigationHandoffPolicy.java').read_text())
+
  from folder_probe import write as write_folder
  write_folder(put,root)
