@@ -1,0 +1,33 @@
+name: Alpha1280 focused blur diagnostics (no APK)
+on:
+  push:
+    branches: [validation/alpha1280-blur-probe]
+    paths: ['.github/workflows/alpha1280-blur-probe.yml']
+permissions:
+  contents: read
+concurrency:
+  group: alpha1280-blur-probe
+  cancel-in-progress: true
+jobs:
+  native-blur:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 782f587753576d7e926c92557568006737891790
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: 'build-tools;36.0.0 platforms;android-37.0'
+      - run: python3 tools/connected_alpha/bubble_visual/run.py --sdk-root "$ANDROID_HOME"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: alpha1280-blur-diagnostics
+          path: build/connected-alpha-bubble-visual/target/surefire-reports/*
+          retention-days: 7
