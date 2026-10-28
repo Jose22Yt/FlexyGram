@@ -1,8 +1,8 @@
-name: Alpha 1282 native touch and Matte checkpoint private signed delivery
+name: Alpha 1282 native Header4 and Context Panel continuation private signed delivery
 
 on:
   push:
-    branches: [delivery/alpha1282-native-checkpoint-private]
+    branches: [delivery/alpha1282-completion-private]
     paths:
       - '.github/workflows/private-alpha1274-delivery.yml'
       - 'tools/private_alpha1274/**'
@@ -22,7 +22,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: d526bd5b59b34c460b7dff3f3e3e674abece5e32
+          ref: bb3af73e085f3cdb3e9e92f35f6d1b692c04afcb
           fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-java@v4
@@ -85,7 +85,7 @@ jobs:
 
       - name: Verify integrated Studio, login, music, header, preview and performance Android regressions
         run: |
-          for probe in studio_native login_visual music_visual header_visual preview_visual performance/native performance/native3 native_motion_restore native_touch; do
+          for probe in studio_native login_visual music_visual header_visual preview_visual performance/native performance/native3 native_motion_restore native_touch context_panel; do
             python3 "tools/connected_alpha/$probe/run.py" --sdk-root "$ANDROID_HOME"
           done
       - name: Retain synthetic corrected music and header evidence
@@ -135,7 +135,7 @@ jobs:
 
   private-destination:
     needs: credentials-present
-    if: needs.credentials-present.outputs.ready == 'true' && github.repository == 'Jose22Yt/FlexyGram' && github.ref == 'refs/heads/delivery/alpha1282-native-checkpoint-private'
+    if: needs.credentials-present.outputs.ready == 'true' && github.repository == 'Jose22Yt/FlexyGram' && github.ref == 'refs/heads/delivery/alpha1282-completion-private'
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -171,11 +171,11 @@ jobs:
         working-directory: approved
     env:
       NATIVE_TARGET: arm64-v8a
-      COMMIT_ID: d526bd5b59b34c460b7dff3f3e3e674abece5e32
+      COMMIT_ID: bb3af73e085f3cdb3e9e92f35f6d1b692c04afcb
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: d526bd5b59b34c460b7dff3f3e3e674abece5e32
+          ref: bb3af73e085f3cdb3e9e92f35f6d1b692c04afcb
           path: approved
           fetch-depth: 0
           submodules: recursive
@@ -187,7 +187,7 @@ jobs:
           sparse-checkout: tools/private_alpha1274
           persist-credentials: false
       - name: Require the exact approved application commit
-        run: test "$(git rev-parse HEAD)" = d526bd5b59b34c460b7dff3f3e3e674abece5e32
+        run: test "$(git rev-parse HEAD)" = bb3af73e085f3cdb3e9e92f35f6d1b692c04afcb
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
