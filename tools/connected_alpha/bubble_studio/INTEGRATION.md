@@ -7,18 +7,21 @@ This is an **incremental code branch**, NOT a claim of a finished APK or Telegra
 
 - BubbleTapMotion: shared FlexyFrameMotion spring, scaling the bubble drawing only, no cell transforms; DOWN/UP/cancel/dispose API.
 - BubbleTouchPolicy: conservative admission for native interactive children, protected/TTL/spoiler/unsupported messages.
+- BubbleTapGestureState: one bounded DOWN/MOVE/UP sequence, no panel on scroll, long press or native veto.
 - BubbleStickerEncoder: native bubble painter contract, exact original-pixel capture, 512px WebP encode, bounded size, private cache file.
 - NativeStickerMetadata: Telegram MIME, image dimensions and TL_documentAttributeSticker + TL_inputStickerSetEmpty.
 - BubbleActionPanelView: theme-aware Signature Matte, tabs Acciones / Sticker / Seleccionar, delegated actions and confirm-to-send CTA.
 - BubbleInteractionSettingsActivity accessible from Chats -> Burbujas via BubbleSettingsActivity.
 - Isolated pure Java tests run by workflow.
 
+CI: `Bubble Studio isolated contracts` passed on the draft PR at checkpoint `4c046fe`; later commits must revalidate. This is **not** an Android APK, message render, or sticker send check.
+
 ## Native integration required for a user-visible feature
 
 **The repository connector does not return the full body of giant ChatMessageCell.java / ChatActivity.java files.**
 Do not edit them by guess or replace them with truncated versions.
 
-1. In ChatMessageCell's *existing* hit-test path, call BubbleTouchPolicy.mayAnimate only for a valid bubble interior and not for links, buttons, embedded controls, gestures or action mode. On eligible original DOWN call BubbleTapMotion.down(), and on actual UP/CANCEL call up()/cancel(). Never fabricate events. Host MUST call reset and dispose when cell is rebound/detached; do not retain MessageObject.
+1. In ChatMessageCell's *existing* hit-test path, call BubbleTouchPolicy.mayAnimate only for a valid bubble interior and not for links, buttons, embedded controls, gestures or action mode. On eligible original DOWN initialize BubbleTapGestureState.down() and call BubbleTapMotion.down(); on MOVE crossing native touchSlop cancel; on long press call gesture.longPress(); on actual UP/CANCEL call BubbleTapMotion.up()/cancel(). Only an accepted native single-tap may open the optional Signature panel. Never fabricate events. Host MUST call reset and dispose when cell is rebound/detached; do not retain MessageObject.
 2. Apply BubbleTapMotion.saveBubble(canvas, actualBubbleRect) and restoreBubble(canvas,saved) surrounding ONLY the native message background/content draw operations, not the whole RecyclerView cell or click targets. If native draw order makes this impossible, use a safe transform at the smallest paint boundary. Test baseline and extreme multitap on hardware.
 3. In native message context menu, render BubbleActionPanelView only after the existing permission checks and opt-in. Bind each Action to the actual Telegram handler, preserving reply/edit/copy/forward/pin/delete/select behavior and original restrictions. Native long press must still work. Single tap may animate without opening a menu; no forced long-press side effects.
 4. After selecting the Sticker tab, use BubbleTouchPolicy.mayConvertToSticker with **actual** message permission/TTL/hidden flags and peer sending restrictions. The NativeBubblePainter must render only the already visible original message bubble (including original style/tail/text and permitted media, not the wallpaper or surrounding content). Never decode protected/hidden media.
