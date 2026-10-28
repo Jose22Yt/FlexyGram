@@ -157,7 +157,7 @@ class PerformanceLab(unittest.TestCase):
         self.assertIn('n<2000',code)
         with tempfile.TemporaryDirectory() as temp:
             source=Path(temp)/'PreviewRegression.java';source.write_text(code)
-            subprocess.run(['java','-m','jdk.compiler/com.sun.tools.javac.Main','-d',temp,str(source)],check=True,capture_output=True)
+            subprocess.run(['java','-m','jdk.compiler/com.sun.tools.javac.Main','-d',temp,str(source),str(ROOT/'TMessagesProj/src/main/java/org/telegram/ui/ActionBar/FlexyInstantNavigationCoordinator.java')],check=True,capture_output=True)
             subprocess.run(['java','-cp',temp,'PreviewRegression'],check=True,capture_output=True)
     def test_complete_changed_android_sources_parse_without_private_build_inputs(self):
         # Reuse the existing JDK AST parser; parsing is not semantic/full-module compilation.

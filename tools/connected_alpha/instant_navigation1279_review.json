@@ -15,7 +15,8 @@
     "tools/connected_alpha/test_flexy_motion.py": "b0f8a0266b89bfe29f0a97c00719fd2b409c02b4",
     "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/FlexyInstantNavigationCoordinator.java": "24760215b29df1f16f7c08c2203f05c7da5b876b",
     "tools/connected_alpha/motion/InstantNavigationCoordinatorTest.java": "5ef592426952c31e498a7d5a69f1235b140198c3",
-    "tools/connected_alpha/test_preview_navigation.py": "c88bc0041f6c7192a3f874c3364bc3d3fa127a2b"
+    "tools/connected_alpha/test_preview_navigation.py": "c88bc0041f6c7192a3f874c3364bc3d3fa127a2b",
+    "tools/connected_alpha/test_performance.py": "c7c281a51eacc624e786afdac1affcdacd63c859"
   },
   "paths": [
     ".github/workflows/instant-navigation-handoff.yml",
@@ -33,6 +34,7 @@
     "tools/connected_alpha/motion_native/stubs.py",
     "tools/connected_alpha/test_flexy_motion.py",
     "tools/connected_alpha/test_instant_navigation1279.py",
+    "tools/connected_alpha/test_performance.py",
     "tools/connected_alpha/test_preview_navigation.py"
   ]
 }
