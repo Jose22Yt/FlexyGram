@@ -7,8 +7,13 @@ STUBS['androidx/core/graphics/ColorUtils.java']=STUBS['androidx/core/graphics/Co
 def write_stubs(source, root):
     for name,text in STUBS.items():
         p=source/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(text)
-    for name in ('org/telegram/ui/ActionBar/MessageDrawable.java','org/telegram/ui/Components/blur3/utils/NinePatchBuilder.java','app/flexygram/bubbles/BubbleStyle.java','app/flexygram/bubbles/BubbleOutline.java','app/flexygram/bubbles/SignatureBorderPath.java','app/flexygram/preview/SignatureWallpaperPreview.java','app/flexygram/bubbles/BubblePreviewView.java','app/flexygram/bubbles/SignatureWallpaperBlur.java','app/flexygram/bubbles/BubbleConfig.java','app/flexygram/settings/FlexySignatureSlider.java','app/flexygram/composer/ComposerSliderTrack.java'):
+    for name in ('org/telegram/ui/ActionBar/MessageDrawable.java','org/telegram/ui/Components/blur3/utils/NinePatchBuilder.java','app/flexygram/bubbles/BubbleStyle.java','app/flexygram/bubbles/BubbleOutline.java','app/flexygram/bubbles/SignatureBorderPath.java','app/flexygram/preview/SignatureWallpaperPreview.java','app/flexygram/bubbles/BubblePreviewView.java','app/flexygram/bubbles/SignatureWallpaperBlur.java','app/flexygram/motion/FlexyFrameMotion.java','app/flexygram/motion/FlexyMotionSpring.java','app/flexygram/motion/FlexyMotionSettings.java','app/flexygram/motion/FlexyMotionProfile.java','app/flexygram/bubbles/BubbleConfig.java','app/flexygram/settings/FlexySignatureSlider.java','app/flexygram/composer/ComposerSliderTrack.java'):
         p=source/name;p.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(root/'TMessagesProj/src/main/java'/name,p)
+
+    import subprocess
+    baseline = subprocess.check_output(['git','show','d50677f723292d0e405eae8e1529f65416ff9cbd:TMessagesProj/src/main/java/app/flexygram/bubbles/SignatureWallpaperBlur.java'],cwd=root,text=True)
+    baseline = baseline.replace('SignatureWallpaperBlur','Alpha1279WallpaperBlur')
+    (source/'app/flexygram/bubbles/Alpha1279WallpaperBlur.java').write_text(baseline)
 
     # Extract the actual parent/cell render decision; no alternate implementation in this fixture.
     cell = (root/'TMessagesProj/src/main/java/org/telegram/ui/Cells/ChatMessageCell.java').read_text()

@@ -11,11 +11,11 @@ import org.robolectric.annotation.*;
 import org.telegram.messenger.*;
 import app.flexygram.bubbles.*;
 import static org.junit.Assert.*;
-@RunWith(RobolectricTestRunner.class) @Config(manifest=Config.NONE,sdk=35) @GraphicsMode(GraphicsMode.Mode.NATIVE)
+@RunWith(RobolectricTestRunner.class) @Config(manifest=Config.NONE,sdk=35) @GraphicsMode(GraphicsMode.Mode.NATIVE) @LooperMode(LooperMode.Mode.PAUSED)
 public class CachedBlurVisualTest {
  private final java.util.ArrayList<SignatureWallpaperBlur.Owner> owners=new java.util.ArrayList<>();
- @Before public void setup(){ApplicationLoader.applicationContext=RuntimeEnvironment.getApplication();ApplicationLoader.applicationContext.getSharedPreferences(BubbleConfig.FILE,0).edit().clear().commit();BuildConfig.CONNECTED_ALPHA=true;AndroidUtilities.density=1;SharedConfig.bubbleRadius=20;org.telegram.ui.ActionBar.Theme.dark=false;app.exteraless.chats.ChatsConfig.removeMessageTail.value=false;BubbleConfig.load();BubbleConfig.setBackgroundBlur(true);}
- @After public void close(){for(var owner:owners)owner.close();org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();BubbleConfig.setBackgroundBlur(false);}
+ @Before public void setup(){SignatureWallpaperBlur.trimMemory(80);ApplicationLoader.applicationContext=RuntimeEnvironment.getApplication();ApplicationLoader.applicationContext.getSharedPreferences(BubbleConfig.FILE,0).edit().clear().commit();BuildConfig.CONNECTED_ALPHA=true;AndroidUtilities.density=1;SharedConfig.bubbleRadius=20;org.telegram.ui.ActionBar.Theme.dark=false;app.exteraless.chats.ChatsConfig.removeMessageTail.value=false;BubbleConfig.load();BubbleConfig.setBackgroundBlur(true);}
+ @After public void close(){for(var owner:owners)owner.close();org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();BubbleConfig.setBackgroundBlur(false);SignatureWallpaperBlur.trimMemory(80);}
  private SignatureWallpaperBlur.Owner owner(View target){var owner=new SignatureWallpaperBlur.Owner(target);owners.add(owner);return owner;}
  private BitmapDrawable image(int width,int height,int seed){Bitmap b=Bitmap.createBitmap(width,height,Bitmap.Config.ARGB_8888);int[] row=new int[width];for(int y=0;y<height;y++){for(int x=0;x<width;x++)row[x]=((x+y+seed)%2==0)?Color.BLACK:Color.WHITE;b.setPixels(row,0,width,0,y,width,1);}BitmapDrawable d=new BitmapDrawable(Resources.getSystem(),b);d.setBounds(0,0,width,height);return d;}
  private void complete()throws Exception{Utilities.globalQueue.runAllOnWorker();org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();}
@@ -27,13 +27,13 @@ public class CachedBlurVisualTest {
   complete();assertTrue(a.isReady());assertTrue(b.isReady());assertSame(cached(a),cached(b));assertTrue(cached(a).getWidth()<=384&&cached(a).getHeight()<=384);assertTrue(cached(a).getAllocationByteCount()<=384*384*4);
   Bitmap result=Bitmap.createBitmap(1600,1200,Bitmap.Config.ARGB_8888);Canvas canvas=new Canvas(result);Path shape=new Path();shape.addRect(0,0,1600,1200,Path.Direction.CW);
   assertTrue(a.draw(canvas,shape,0,0));assertTrue(Color.red(result.getPixel(800,600))>90&&Color.red(result.getPixel(800,600))<165);
-  Bitmap same=cached(a);for(int n=0;n<100;n++)assertTrue(a.draw(canvas,shape,0,0));assertSame(same,cached(a));assertEquals(0,Utilities.globalQueue.pending());
+  Bitmap same=cached(a);long matrices=SignatureWallpaperBlur.diagnostics()[6];for(int n=0;n<100;n++)assertTrue(a.draw(canvas,shape,0,0));assertEquals(matrices,SignatureWallpaperBlur.diagnostics()[6]);assertSame(same,cached(a));assertEquals(0,Utilities.globalQueue.pending());
   org.telegram.ui.ActionBar.MessageDrawable bubble=new org.telegram.ui.ActionBar.MessageDrawable(org.telegram.ui.ActionBar.MessageDrawable.TYPE_TEXT,true,false);
   bubble.setBounds(0,0,120,70);bubble.setTop(0,1600,1200,false,false);int[] samples={0};bubble.setFlexyGlassSource((c,p)->{samples[0]++;return b.draw(c,p,0,0);});BubbleConfig.setTransparency(100);
   Bitmap cell=Bitmap.createBitmap(120,70,Bitmap.Config.ARGB_8888);bubble.draw(new Canvas(cell));assertTrue(Color.alpha(cell.getPixel(50,35))>0);
   int sampled=samples[0];for(int alpha:new int[]{0,64,128,254}){bubble.setAlpha(alpha);cell.eraseColor(Color.TRANSPARENT);bubble.draw(new Canvas(cell));assertEquals(0,Color.alpha(cell.getPixel(50,35)));assertEquals(sampled,samples[0]);}bubble.setAlpha(255);
   BubbleConfig.setBackgroundBlur(false);cell.eraseColor(Color.TRANSPARENT);bubble.draw(new Canvas(cell));assertEquals(0,Color.alpha(cell.getPixel(50,35)));BubbleConfig.setBackgroundBlur(true);
-  a.close();assertTrue(b.isReady());assertFalse(same.isRecycled());b.close();assertTrue(same.isRecycled());assertFalse(source.getBitmap().isRecycled());
+  a.close();assertTrue(b.isReady());assertFalse(same.isRecycled());b.close();assertFalse(same.isRecycled());assertFalse(source.getBitmap().isRecycled());
  }
  @Test public void cellScrollCoordinatesTrackWallpaperAndUnsupportedMotionKeepsMatte()throws Exception{
   View target=new View(ApplicationLoader.applicationContext);var a=owner(target);BitmapDrawable source=image(128,256,0);for(int y=0;y<256;y++)for(int x=0;x<128;x++)source.getBitmap().setPixel(x,y,Color.rgb(x*2,y,(x+y)%256));a.prepare(source,false,0xffcccccc);complete();
@@ -105,7 +105,65 @@ public class CachedBlurVisualTest {
   BitmapDrawable first=image(80,90,0),second=image(81,90,1),third=image(82,90,2);
   a.prepare(first,false,0xffeeeeee);b.prepare(second,false,0xffeeeeee);c.prepare(third,false,0xffeeeeee);assertEquals(2,Utilities.globalQueue.pending());assertNull(entry(c));
   a.close();assertEquals(2,Utilities.globalQueue.pending());assertNotNull(entry(c));complete();assertTrue(b.isReady());assertTrue(c.isReady());
-  Bitmap previous=cached(c);third.getBitmap().eraseColor(Color.RED);c.prepare(third,false,0xffeeeeee);assertTrue(previous.isRecycled());assertFalse(c.isReady());complete();assertTrue(c.isReady());assertEquals(Color.RED,cached(c).getPixel(20,20));
+  Bitmap previous=cached(c);third.getBitmap().eraseColor(Color.RED);c.prepare(third,false,0xffeeeeee);assertFalse(previous.isRecycled());assertFalse(c.isReady());complete();assertTrue(c.isReady());assertEquals(Color.RED,cached(c).getPixel(20,20));
   var late=owner(target);b.close();late.prepare(first,false,0xffeeeeee);Utilities.globalQueue.runAllOnWorker();int before=target.changes;late.close();org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();assertEquals(before,target.changes);assertFalse(late.isReady());
  }
+ @Test public void warmReopenAndSharedWallpaperNeedZeroNewJobsAndAreReadyBeforeFirstDraw()throws Exception{
+  BitmapDrawable source=image(1600,1200,0);var a=owner(new View(ApplicationLoader.applicationContext));
+  long[] before=SignatureWallpaperBlur.diagnostics();a.prepare(source,false,0xffeeeeee);complete();
+  Bitmap ready=cached(a);a.close();long[] prepared=SignatureWallpaperBlur.diagnostics();
+  for(int n=0;n<50;n++){
+   var b=owner(new View(ApplicationLoader.applicationContext));b.prepare(source,false,0xffeeeeee);
+   assertTrue("ready synchronously on reopen "+n,b.isReady());assertSame(ready,cached(b));
+   assertEquals(0,Utilities.globalQueue.pending());b.close();
+  }
+  long[] after=SignatureWallpaperBlur.diagnostics();
+  assertEquals(1,after[2]-before[2]);assertEquals(50,after[0]-prepared[0]);
+  assertEquals(prepared[1],after[1]);assertTrue(after[5]<=2);
+  System.out.println("InstantBlur measured lifecycle: 51 openings, 1 render, 50 synchronous hits, 0 warm jobs; device frame latency NOT_MEASURED");
+ }
+ @Test public void lruEvictionTrimAndGenerationNeverRecyclePublishedDrawResources()throws Exception{
+  BitmapDrawable first=image(384,384,0),second=image(384,384,1),third=image(384,384,2);
+  var a=owner(new View(ApplicationLoader.applicationContext));a.prepare(first,false,1);complete();Bitmap one=cached(a);a.close();
+  var b=owner(new View(ApplicationLoader.applicationContext));b.prepare(second,false,1);complete();b.close();
+  var hit=owner(new View(ApplicationLoader.applicationContext));hit.prepare(first,false,1);assertSame(one,cached(hit));hit.close();
+  var c=owner(new View(ApplicationLoader.applicationContext));c.prepare(third,false,1);complete();
+  assertEquals(2,SignatureWallpaperBlur.diagnostics()[5]);assertFalse(one.isRecycled());
+  SignatureWallpaperBlur.trimMemory(80);assertTrue(c.isReady());assertEquals(1,SignatureWallpaperBlur.diagnostics()[5]);
+  c.close();SignatureWallpaperBlur.trimMemory(80);assertEquals(0,SignatureWallpaperBlur.diagnostics()[5]);assertFalse(one.isRecycled());
+  var again=owner(new View(ApplicationLoader.applicationContext));again.prepare(first,false,1);assertFalse(again.isReady());complete();
+  first.getBitmap().eraseColor(Color.RED);again.prepare(first,false,1);assertFalse(again.isReady());complete();assertEquals(Color.RED,cached(again).getPixel(100,100));
+ }
+ @Test public void coldNotificationIsSingleAndDeadWorkNeverReachesClosedView()throws Exception{
+  int[] changes={0};var a=new SignatureWallpaperBlur.Owner(new View(ApplicationLoader.applicationContext),()->changes[0]++);owners.add(a);
+  a.prepare(image(100,200,0),false,1);assertEquals("no visual change yet",0,changes[0]);complete();assertEquals(1,changes[0]);
+  a.close();SignatureWallpaperBlur.trimMemory(80);
+  var b=new SignatureWallpaperBlur.Owner(new View(ApplicationLoader.applicationContext),()->changes[0]++);owners.add(b);
+  b.prepare(image(100,200,1),false,1);Utilities.globalQueue.runAllOnWorker();b.close();org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();assertEquals(1,changes[0]);assertFalse(b.isReady());
+ }
+ @Test public void genuinelyColdVisibleSourceRevealsOnExistingClockAndDetachCancels()throws Exception{
+  org.robolectric.shadows.ShadowChoreographer.setPaused(true);org.robolectric.shadows.ShadowChoreographer.setFrameDelay(java.time.Duration.ofMillis(16));
+  var controller=Robolectric.buildActivity(android.app.Activity.class).setup().visible();var activity=controller.get();View view=new View(activity);activity.setContentView(view);
+  view.layout(0,0,100,200);org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(java.time.Duration.ofMillis(32));
+  org.robolectric.util.ReflectionHelpers.setField(org.robolectric.util.ReflectionHelpers.getField(view,"mAttachInfo"),"mWindowVisibility",View.VISIBLE);
+  app.flexygram.motion.FlexyMotionSettings.setProfile(activity,app.flexygram.motion.FlexyMotionProfile.FLOW);
+  app.flexygram.motion.FlexyMotionSettings.setReduceMotion(activity,false);
+  var a=owner(view);BitmapDrawable source=image(100,200,0);
+  a.prepare(source,false,1);Path path=new Path();path.addRect(0,0,100,200,Path.Direction.CW);Bitmap pixels=Bitmap.createBitmap(100,200,Bitmap.Config.ARGB_8888);Canvas canvas=new Canvas(pixels);
+  assertFalse(a.draw(canvas,path,0,0));complete();assertTrue(a.isReady());assertTrue(a.draw(canvas,path,0,0));assertEquals(0,Color.alpha(pixels.getPixel(40,40)));
+  org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(java.time.Duration.ofMillis(64));pixels.eraseColor(Color.TRANSPARENT);assertTrue(a.draw(canvas,path,0,0));int alpha=Color.alpha(pixels.getPixel(40,40));assertTrue("controlled reveal "+alpha,alpha>0&&alpha<255);
+  org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(java.time.Duration.ofMillis(200));pixels.eraseColor(Color.TRANSPARENT);a.draw(canvas,path,0,0);assertEquals(255,Color.alpha(pixels.getPixel(40,40)));
+  a.close();assertEquals(0,app.flexygram.motion.FlexyFrameMotion.activeCount());controller.pause().stop().destroy();
+ }
+
+ @Test public void exactAlpha1279BaselineRecomputesEveryReopenUnderSameWorkload()throws Exception{
+  BitmapDrawable source=image(1600,1200,0);int jobs=0;
+  for(int n=0;n<51;n++){
+   var old=new Alpha1279WallpaperBlur.Owner(new View(ApplicationLoader.applicationContext));
+   old.prepare(source,false,0xffeeeeee);assertFalse(old.isReady());assertEquals(1,Utilities.globalQueue.pending());jobs++;complete();assertTrue(old.isReady());old.close();
+  }
+  assertEquals(51,jobs);
+  System.out.println("Alpha1279 measured lifecycle, same source/size/queue: 51 openings, 51 render jobs, 0 synchronous reopens; NOT a device benchmark");
+ }
+
 }

@@ -14,6 +14,9 @@ import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.os.Trace;
+import android.content.ComponentCallbacks2;
+import app.flexygram.motion.FlexyFrameMotion;
 import android.view.View;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -30,7 +33,23 @@ public final class SignatureWallpaperBlur {
     private static final int MAX_ENTRIES = 2, MAX_EDGE = 384, RADIUS = 8;
     private static final LinkedHashMap<Key, Entry> entries = new LinkedHashMap<>(4, .75f, true);
     private static final ArrayList<WeakReference<Owner>> waiting = new ArrayList<>();
+    // Counters contain no source/account identifiers. Snapshots are requested by tests only.
+    private static long hits, misses, renders, cancellations, notifications, matrixUpdates;
+    public static long[] diagnostics() { return new long[]{hits, misses, renders, cancellations, notifications, entries.size(), matrixUpdates}; }
     private SignatureWallpaperBlur() { }
+
+    /** UI-owned, no periodic sweeper. Keep at most two completed images while idle.
+     * Published images are never explicitly recycled: a recorded HWUI draw may still own them. */
+    public static void trimMemory(int level) {
+        if (level == ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN || level < ComponentCallbacks2.TRIM_MEMORY_RUNNING_LOW) return;
+        Iterator<Entry> iterator = entries.values().iterator();
+        while (iterator.hasNext()) {
+            Entry entry = iterator.next();
+            entry.owners.removeIf(reference -> reference.get() == null);
+            if (entry.owners.isEmpty()) { iterator.remove(); dispose(entry); }
+        }
+        resumeWaiting();
+    }
 
     private static final class Key {
         final WeakReference<Bitmap> source;
@@ -57,18 +76,29 @@ public final class SignatureWallpaperBlur {
         Entry(Key key) { this.key = key; }
     }
     private static void dispose(Entry entry) {
+        if (entry.task != null) cancellations++;
         entry.canceled = true;
         if (entry.task != null) Utilities.globalQueue.cancelRunnable(entry.task);
         entry.task = null;
-        if (entry.bitmap != null) { entry.bitmap.recycle(); entry.bitmap = null; }
+        entry.bitmap = null; // Drop our reference; do not recycle a published/recorded bitmap.
     }
     private static void sweep() {
         Iterator<Entry> iterator = entries.values().iterator();
         while (iterator.hasNext()) {
             Entry entry = iterator.next();
             entry.owners.removeIf(reference -> reference.get() == null);
-            if (entry.owners.isEmpty()) { iterator.remove(); dispose(entry); }
+            Bitmap source = entry.key.source.get();
+            boolean stale = source == null || source.isRecycled() || source.getGenerationId() != entry.key.generation;
+            if (entry.owners.isEmpty() && (stale || entry.bitmap == null)) { iterator.remove(); dispose(entry); }
         }
+    }
+    private static boolean evictIdle() {
+        Iterator<Entry> iterator = entries.values().iterator();
+        while (iterator.hasNext()) {
+            Entry entry = iterator.next();
+            if (entry.owners.isEmpty()) { iterator.remove(); dispose(entry); return true; }
+        }
+        return false;
     }
     private static Entry acquire(Owner owner, Bitmap source, int background, int dim) {
         sweep();
@@ -76,23 +106,25 @@ public final class SignatureWallpaperBlur {
         Entry entry = entries.get(key);
         boolean created = entry == null;
         if (created) {
-            if (entries.size() >= MAX_ENTRIES) {
+            if (entries.size() >= MAX_ENTRIES && !evictIdle()) {
                 if (!owner.waitingForSlot) { waiting.add(new WeakReference<>(owner)); owner.waitingForSlot = true; }
                 return null; // Matte until an attached owner releases a slot; no retry timer.
             }
-            entry = new Entry(key); entries.put(key, entry);
+            misses++; entry = new Entry(key); entries.put(key, entry);
         }
+        if (!created) { hits++; Trace.beginSection("Flexy.blur.cache_hit"); Trace.endSection(); }
         entry.owners.add(new WeakReference<>(owner));
         if (created) {
             Entry pending = entry;
             entry.task = () -> {
                 Bitmap result = null;
+                Trace.beginSection("Flexy.blur.render");
                 try {
                     if (!pending.canceled && !source.isRecycled() && source.getGenerationId() == key.generation)
                         result = render(source, background, dim, pending);
                 } catch (IllegalArgumentException | IllegalStateException | OutOfMemoryError unavailable) {
                     // Optional resource boundary only. No navigation/auth exceptions are intercepted.
-                }
+                } finally { Trace.endSection(); }
                 Bitmap prepared = result;
                 AndroidUtilities.runOnUIThread(() -> {
                     pending.task = null;
@@ -100,6 +132,7 @@ public final class SignatureWallpaperBlur {
                         if (prepared != null) prepared.recycle();
                         return;
                     }
+                    if (prepared != null) renders++;
                     pending.bitmap = prepared;
                     for (WeakReference<Owner> reference : pending.owners) {
                         Owner current = reference.get();
@@ -181,6 +214,10 @@ public final class SignatureWallpaperBlur {
         private boolean closed, supported, waitingForSlot;
         private BitmapShader shader;
         private Runnable availabilityChanged;
+        private FlexyFrameMotion revealMotion;
+        private float reveal = 1;
+        private boolean sawFallback, firstDraw;
+        private float mappedLeft = Float.NaN, mappedTop, mappedWidth, mappedHeight;
         public Owner(View target) { this(target, null); }
         public Owner(View target, Runnable availabilityChanged) {
             this.target = new WeakReference<>(target);
@@ -211,18 +248,33 @@ public final class SignatureWallpaperBlur {
                     ? Math.max(0, Math.min(255, Math.round(((ChatBackgroundDrawable) drawable).getDimAmount() * 255))) : 0;
             source = drawable; supported = true;
             if (sourceBitmap == bitmap && generation == bitmap.getGenerationId() && background == backgroundColor && dim == dimAlpha) return;
+            boolean wasReady = isReady();
             release(); source = drawable; sourceBitmap = bitmap; generation = bitmap.getGenerationId(); background = backgroundColor; dim = dimAlpha;
             entry = acquire(this, bitmap, backgroundColor, dimAlpha);
             ready();
+            if (wasReady && !isReady()) invalidateVisual();
+        }
+        private void invalidateVisual() {
+            if (closed) return;
+            View view = target.get();
+            if (view == null) return;
+            notifications++;
+            if (availabilityChanged != null) availabilityChanged.run(); else view.invalidate();
         }
         private void ready() {
-            paint.setShader(null); shader = null;
-            if (entry != null && entry.bitmap != null && !entry.bitmap.isRecycled()) {
-                shader = new BitmapShader(entry.bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
-                paint.setShader(shader);
-            }
-            View view = target.get(); if (!closed && view != null) view.invalidate();
-            if (!closed && availabilityChanged != null) availabilityChanged.run();
+            if (closed || entry == null || entry.bitmap == null || entry.bitmap.isRecycled() || shader != null) return;
+            Trace.beginSection("Flexy.blur.available"); Trace.endSection();
+            shader = new BitmapShader(entry.bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
+            paint.setShader(shader); mappedLeft = Float.NaN;
+            View view = target.get();
+            if (sawFallback && view != null && view.isAttachedToWindow() && view.isShown()) {
+                // A genuinely cold source is revealed on the existing active-only clock, never
+                // by delaying navigation or starting an independent/per-message animation.
+                reveal = 0;
+                revealMotion = new FlexyFrameMotion(view, 0, value -> { reveal = value; invalidateVisual(); });
+                revealMotion.animateTimedTo(1, 120, null);
+            } else reveal = 1; // Warm reuse is final from its very first draw.
+            invalidateVisual();
         }
         public boolean isReady() { return !closed && shader != null && entry != null && entry.bitmap != null && !entry.bitmap.isRecycled(); }
         public boolean isSupported() { return supported; }
@@ -232,21 +284,37 @@ public final class SignatureWallpaperBlur {
         public boolean draw(Canvas canvas, Path shape, float rootOffsetX, float rootOffsetY, int alpha) {
             // Mapping is captured once by the wallpaper owner after its native draw. A shared
             // Drawable can be drawn by another screen; never read its mutable bounds per message.
-            if (!BubbleConfig.backgroundBlur() || !supported || !isReady()
-                    || sourceBitmap == null || sourceBitmap.isRecycled() || sourceBitmap.getGenerationId() != generation || mapping.isEmpty()) return false;
-            matrix.setScale(mapping.width() / entry.bitmap.getWidth(), mapping.height() / entry.bitmap.getHeight());
-            matrix.postTranslate(mapping.left - rootOffsetX, mapping.top - rootOffsetY); shader.setLocalMatrix(matrix);
-            paint.setAlpha(Math.max(0, Math.min(255, alpha)));
+            if (!BubbleConfig.backgroundBlur() || !supported) return false;
+            if (!firstDraw) {
+                firstDraw = true;
+                Trace.beginSection(isReady() ? "Flexy.blur.first_draw.ready" : "Flexy.blur.first_draw.fallback"); Trace.endSection();
+            }
+            if (!isReady()) { sawFallback = true; return false; }
+            if (sourceBitmap == null || sourceBitmap.isRecycled() || sourceBitmap.getGenerationId() != generation || mapping.isEmpty()) return false;
+            float left = mapping.left - rootOffsetX, top = mapping.top - rootOffsetY;
+            if (mappedLeft != left || mappedTop != top || mappedWidth != mapping.width() || mappedHeight != mapping.height()) {
+                matrixUpdates++;
+                mappedLeft = left; mappedTop = top; mappedWidth = mapping.width(); mappedHeight = mapping.height();
+                matrix.setScale(mappedWidth / entry.bitmap.getWidth(), mappedHeight / entry.bitmap.getHeight());
+                matrix.postTranslate(left, top); shader.setLocalMatrix(matrix);
+            }
+            paint.setAlpha(Math.round(Math.max(0, Math.min(255, alpha)) * reveal));
             canvas.drawPath(shape, paint); return true;
         }
         private void release() {
             boolean freed = false;
+            if (revealMotion != null) { revealMotion.dispose(); revealMotion = null; }
+            sawFallback = false; firstDraw = false; reveal = 1;
             if (waitingForSlot) { waiting.removeIf(reference -> reference.get() == null || reference.get() == this); waitingForSlot = false; }
             if (shader != null) { paint.setShader(null); shader = null; }
             if (entry != null) {
                 Entry previous = entry; entry = null;
                 previous.owners.removeIf(reference -> reference.get() == null || reference.get() == this);
-                if (previous.owners.isEmpty()) { entries.remove(previous.key); dispose(previous); freed = true; }
+                if (previous.owners.isEmpty()) {
+                    freed = true;
+                    // Completed results remain in the bounded LRU. Work with no recipient is canceled.
+                    if (previous.bitmap == null) { entries.remove(previous.key); dispose(previous); }
+                }
             }
             sourceBitmap = null;
             if (freed) resumeWaiting();
@@ -254,7 +322,7 @@ public final class SignatureWallpaperBlur {
         private void clear() {
             boolean wasReady = isReady();
             release(); source = null; supported = false;
-            if (wasReady && !closed && availabilityChanged != null) availabilityChanged.run();
+            if (wasReady) invalidateVisual();
         }
         public void close() { if (closed) return; closed = true; clear(); availabilityChanged = null; target.clear(); }
     }

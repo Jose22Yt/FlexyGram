@@ -3749,6 +3749,9 @@ public class ChatActivity extends BaseFragment implements
         app.flexygram.studio.FlexyStyleInstallHelper.cancel(this);
         app.exteraless.plugins.menus.MenuInjector.releaseMessageMenu(this);
         super.onFragmentDestroy();
+        if (contentView != null && contentView.signatureWallpaperBlur != null) {
+            contentView.signatureWallpaperBlur.close(); contentView.signatureWallpaperBlur = null;
+        }
         if (commentsMessagesObserver != null) {
             getNotificationCenter().removeObserver(commentsMessagesObserver, NotificationCenter.messagesDidLoad);
             commentsMessagesObserver = null;
@@ -18471,6 +18474,10 @@ public class ChatActivity extends BaseFragment implements
             }
             chatListView.invalidate();
         }
+        private void ensureSignatureWallpaperBlur() {
+            if (signatureWallpaperBlur == null) signatureWallpaperBlur = new app.flexygram.bubbles.SignatureWallpaperBlur.Owner(
+                    chatListView != null ? chatListView : this, this::invalidateSignatureWallpaperCells);
+        }
         private void refreshSignatureWallpaperBlur() {
             if (signatureWallpaperBlur != null) signatureWallpaperBlur.prepare(getBackgroundImage(),
                     getNewDrawableMotion(), getThemedColor(Theme.key_windowBackgroundGray));
@@ -18624,6 +18631,7 @@ public class ChatActivity extends BaseFragment implements
         @Override
         public void onUpdateBackgroundDrawable(Drawable drawable) {
             super.onUpdateBackgroundDrawable(drawable);
+            ensureSignatureWallpaperBlur();
             refreshSignatureWallpaperBlur();
             if (drawable instanceof MotionBackgroundDrawable) {
                 ((MotionBackgroundDrawable) drawable).setFastRenderAllowed();
@@ -18778,8 +18786,7 @@ public class ChatActivity extends BaseFragment implements
         @Override
         protected void onAttachedToWindow() {
             super.onAttachedToWindow();
-            signatureWallpaperBlur = new app.flexygram.bubbles.SignatureWallpaperBlur.Owner(
-                    chatListView != null ? chatListView : this, this::invalidateSignatureWallpaperCells);
+            ensureSignatureWallpaperBlur();
             refreshSignatureWallpaperBlur();
             if (isInsideContainer) {
                 adjustPanLayoutHelper.setResizableView(contentView);
