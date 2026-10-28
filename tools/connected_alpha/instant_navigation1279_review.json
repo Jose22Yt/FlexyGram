@@ -1,0 +1,26 @@
+{
+  "pin": "d50677f723292d0e405eae8e1529f65416ff9cbd",
+  "reviewed": {
+    "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java": "590150e5e81b16e45d62b1c5175bc80bee5570a5",
+    "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/FlexyNavigationHandoffPolicy.java": "4b8d7d15dc4f1d0db180c572e35bd4393460f66a",
+    "tools/connected_alpha/motion/INSTANT_NAVIGATION_P1.md": "8fc81320f772f2d4effd146f739b72c0e2344709",
+    "tools/connected_alpha/motion/InstantHandoffPolicyTest.java": "4f9a0dd2ebf3700573cae7e0cf8c2bedf8b3fd06",
+    "tools/connected_alpha/motion/verify_instant_handoff.py": "8a60708d3d72e6c64cef9426bc56fa7c1c89d1cd",
+    ".github/workflows/instant-navigation-handoff.yml": "8dba73296bb8cae71a4f860d3296b3053a719f02",
+    "tools/connected_alpha/integration1279_contract.py": "b29d69ef30f20da7b6148a848ee8275bdf71662c",
+    "tools/connected_alpha/instant_navigation1279_contract.py": "3848af94cc53a812649c3194c9b97da7b1c1b16d",
+    "tools/connected_alpha/test_instant_navigation1279.py": "8f2ecdd62c60b43cb8f1efefb7de719beaa51c48"
+  },
+  "paths": [
+    "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java",
+    "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/FlexyNavigationHandoffPolicy.java",
+    "tools/connected_alpha/motion/INSTANT_NAVIGATION_P1.md",
+    "tools/connected_alpha/motion/InstantHandoffPolicyTest.java",
+    "tools/connected_alpha/motion/verify_instant_handoff.py",
+    ".github/workflows/instant-navigation-handoff.yml",
+    "tools/connected_alpha/integration1279_contract.py",
+    "tools/connected_alpha/instant_navigation1279_contract.py",
+    "tools/connected_alpha/test_instant_navigation1279.py",
+    "tools/connected_alpha/instant_navigation1279_review.json"
+  ]
+}
