@@ -2807,8 +2807,15 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
         smartPreviewPrefixEnd=0;
         boolean inlineSender = messageNameString != null && (!(useForceThreeLines || SharedConfig.useThreeLinesLayout)
                 || hasTags() || currentDialogFolderId != 0 && currentDialogFolderDialogsCount > 1);
-        boolean prefixAvailable = !inlineSender || !TextUtils.isEmpty(messageString) && offsetName > 0 && offsetName <= messageString.length()
-                && thumbsCount == 0 && Layout.getDesiredWidth(messageString,0,offsetName,currentMessagePaint) < messageWidth * .35f;
+        int senderEnd=offsetName;
+        if (inlineSender && senderEnd <= 0 && !TextUtils.isEmpty(messageString)
+                && messageString.length() > messageNameString.length()
+                && messageString.charAt(messageNameString.length()) == ':'
+                && TextUtils.equals(messageString.subSequence(0,messageNameString.length()),messageNameString)) {
+            senderEnd=messageNameString.length()+1;
+        }
+        boolean prefixAvailable = !inlineSender || !TextUtils.isEmpty(messageString) && senderEnd > 0 && senderEnd <= messageString.length()
+                && thumbsCount == 0 && Layout.getDesiredWidth(messageString,0,senderEnd,currentMessagePaint) < messageWidth * .35f;
         float compactTextSize=android.util.TypedValue.applyDimension(android.util.TypedValue.COMPLEX_UNIT_SP,12f,getResources().getDisplayMetrics());
         if (app.flexygram.home.SignatureSmartPreviews.mode() != app.flexygram.home.SignatureSmartPreviewPalette.OFF
                 && app.flexygram.home.SignaturePreviewContext.isMessageRow(isDialogCell,isTopic,isShareToStoryCell,
@@ -2832,7 +2839,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                     pill.setSpan(new android.text.style.AbsoluteSizeSpan(Math.round(compactTextSize)),1,pill.length(),Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                     CharSequence withThumbs=applyThumbs(pill);
                     SpannableStringBuilder combined=new SpannableStringBuilder();
-                    if (inlineSender) { combined.append(messageString,0,offsetName); combined.append(" "); }
+                    if (inlineSender) { combined.append(messageString,0,senderEnd); combined.append(" "); }
                     smartPreviewPrefixEnd=combined.length()+(thumbsCount>0?1:0);
                     combined.append(withThumbs);
                     smartPreviewKind=candidate;
