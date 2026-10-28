@@ -44,6 +44,13 @@ public final class SpringAnimation implements View.OnAttachStateChangeListener {
     public boolean isRunning(){return running;}
     /** Snapshot only an active analytic trajectory; timed/legacy/queued completion has no transferable velocity. */
     public boolean canContinue(){main();return BuildConfig.CONNECTED_ALPHA&&running&&!queued&&!timed&&frames!=null&&frames.isRunning()&&owner.isAttachedToWindow()&&owner.isShown()&&owner.getWindowVisibility()==View.VISIBLE&&!FlexyMotionSettings.state(owner.getContext()).instant();}
+    /** A visible native timed renderer can transfer its current View properties, not spring velocity. */
+    public boolean canCaptureTimed() {
+        main();
+        return BuildConfig.CONNECTED_ALPHA && running && !queued && timed && frames != null && frames.isRunning()
+                && owner.isAttachedToWindow() && owner.isShown() && owner.getWindowVisibility() == View.VISIBLE
+                && !FlexyMotionSettings.state(owner.getContext()).instant();
+    }
     public float continuationValue(){main();if(!canContinue())throw new IllegalStateException("inactive trajectory");return holder.getValue();}
     public float continuationVelocity(){main();if(!canContinue())throw new IllegalStateException("inactive trajectory");return frames.velocity()*NAVIGATION_RATE*FlexyMotionSettings.state(owner.getContext()).speed;}
     /** Opt-in only for a native renderer seeded from a previous trajectory. */

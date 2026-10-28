@@ -1079,36 +1079,55 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
     private float instantGestureOrigin, instantGestureValue, instantGestureVelocity;
     private long instantGestureNanos, instantGestureGeneration;
     private int instantGestureOwnerGuid;
+    private int instantGestureStyle;
+    private float instantGestureOpeningX, instantGestureOpeningAlpha = 1f;
 
     private void clearInstantGesture() {
         instantGesturePending = instantGestureActive = false;
         instantGestureOrigin = instantGestureValue = instantGestureVelocity = 0;
         instantGestureNanos = instantGestureGeneration = 0;
-        instantGestureOwnerGuid = 0;
+        instantGestureOwnerGuid = instantGestureStyle = 0;
+        instantGestureOpeningX = 0;
+        instantGestureOpeningAlpha = 1f;
     }
 
     private boolean prepareInstantGestureBack() {
         instantGestureAbandoned = false;
         clearInstantGesture();
-        if (!transitionAnimationInProgress || !USE_SPRING_ANIMATION
-                || NaConfig.INSTANCE.getBackAnimationStyle().Int() != BACK_ANIMATION_SPRING
-                || currentSpringAnimation == null || !currentSpringAnimation.canContinue()
+        final int style = NaConfig.INSTANCE.getBackAnimationStyle().Int();
+        if (!transitionAnimationInProgress || currentSpringAnimation == null
                 || containerView == null || containerViewBack == null
                 || containerView.getMeasuredWidth() <= 0 || getWidth() - getPaddingLeft() - getPaddingRight() <= 0
                 || containerView.isKeyboardVisible || containerViewBack.isKeyboardVisible) return true;
-        float value = currentSpringAnimation.continuationValue();
-        if (!Float.isFinite(value) || value < -0.25f * SPRING_MULTIPLIER || value > 1.25f * SPRING_MULTIPLIER) return true;
+        final BaseFragment owner = getLastFragment();
+        final boolean spring = USE_SPRING_ANIMATION && style == BACK_ANIMATION_SPRING && currentSpringAnimation.canContinue();
+        final boolean timed = !USE_SPRING_ANIMATION && supportsInstantBackScreen(owner)
+                && !owner.shouldOverrideSlideTransition(false, false) && !owner.shouldOverrideSlideTransition(false, true)
+                && (style == BACK_ANIMATION_PREDICTIVE || style == BACK_ANIMATION_SLIDE)
+                && currentSpringAnimation.canCaptureTimed() && containerView.getScaleX() == 1f
+                && containerView.getScaleY() == 1f && containerView.getTranslationY() == 0f
+                && containerViewBack.getTranslationX() == 0f && containerViewBack.getAlpha() == 1f
+                && containerViewBack.getScaleX() == 1f && containerViewBack.getScaleY() == 1f;
+        if (!spring && !timed) return true;
+        float value = spring ? currentSpringAnimation.continuationValue() : 0;
+        final float openingX = containerView.getTranslationX(), openingAlpha = containerView.getAlpha();
+        if (!Float.isFinite(value) || value < -0.25f * SPRING_MULTIPLIER || value > 1.25f * SPRING_MULTIPLIER
+                || !Float.isFinite(openingX) || timed && (openingX < 0 || openingX > dp(48)) || !Float.isFinite(openingAlpha) || openingAlpha < 0 || openingAlpha > 1) return true;
         if (!prepareInstantBack()) {
             instantGestureAbandoned = true;
             return false;
         }
-        if (instantBackSeed) {
+        if (instantBackSeed || timed && instantNavigation != null && !transitionAnimationInProgress
+                && getLastFragment() == owner && supportsInstantBackScreen(owner)) {
             instantGesturePending = true;
+            instantGestureStyle = style;
             instantGestureOrigin = instantBackValue / SPRING_MULTIPLIER;
             instantGestureValue = instantBackValue;
             instantGestureVelocity = instantBackVelocity;
-            instantGestureGeneration = instantBackGeneration;
-            instantGestureOwnerGuid = instantBackOwnerGuid;
+            instantGestureGeneration = instantNavigation.generation();
+            instantGestureOwnerGuid = owner.getClassGuid();
+            instantGestureOpeningX = timed ? openingX : 0;
+            instantGestureOpeningAlpha = timed ? openingAlpha : 1;
             clearInstantBackSeed();
         }
         return true;
@@ -1135,10 +1154,19 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         instantGestureGeneration = instantNavigation.begin(FlexyInstantNavigationCoordinator.State.DRAGGING,
                 new FlexyInstantNavigationCoordinator.Intent(FlexyInstantNavigationCoordinator.Kind.BACK,
                         instantDestinationId(owner), owner.getClass().getName()), false);
-        springRouteYRatio = 0f;
-        springRouteBackgroundDrawable = app.exteraless.utils.PredictiveBackAnimationHelper
-                .getTransitionBackground(fragmentsStack, owner);
-        renderInstantGestureValue(instantGestureValue);
+        if (instantGestureStyle == BACK_ANIMATION_SPRING) {
+            springRouteYRatio = 0f;
+            springRouteBackgroundDrawable = app.exteraless.utils.PredictiveBackAnimationHelper
+                    .getTransitionBackground(fragmentsStack, owner);
+            renderInstantGestureValue(instantGestureValue);
+        } else if (instantGestureStyle == BACK_ANIMATION_PREDICTIVE) {
+            predictiveBackAnimation.continueOpening(instantGestureOpeningX, instantGestureOpeningAlpha);
+            applyPredictiveBackProgress(0f, predictiveBackY);
+        } else {
+            containerView.setTranslationX(instantGestureOpeningX);
+            containerView.setAlpha(instantGestureOpeningAlpha);
+            setInnerTranslationX(0);
+        }
     }
 
     /** Same ordinary spring geometry, with the finger controlling its progress. No animator while dragging. */
@@ -1162,6 +1190,18 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         if (instantNavigation == null || !instantNavigation.isCurrent(instantGestureGeneration)) return true;
         if (!Float.isFinite(progress)) return true;
         float fraction = CubicBezierInterpolator.StandardDecelerate.getInterpolation(MathUtils.clamp(progress, 0f, 1f));
+        if (instantGestureStyle == BACK_ANIMATION_PREDICTIVE) {
+            applyPredictiveBackProgress(MathUtils.clamp(progress, 0f, 1f), predictiveBackY);
+            return true;
+        }
+        if (instantGestureStyle == BACK_ANIMATION_SLIDE) {
+            float dx = dp(180) * fraction;
+            containerView.setTranslationX(instantGestureOpeningX * (1f - fraction) + dx);
+            containerView.setAlpha(AndroidUtilities.lerp(instantGestureOpeningAlpha, 1f, fraction));
+            setInnerTranslationX(dx);
+            predictiveBackHasProgress = progress > 0;
+            return true;
+        }
         float value = (instantGestureOrigin + (1f - instantGestureOrigin) * fraction) * SPRING_MULTIPLIER;
         long now = android.os.SystemClock.elapsedRealtimeNanos();
         long delta = now - instantGestureNanos;
@@ -1185,6 +1225,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         instantGestureGeneration = instantNavigation.begin(FlexyInstantNavigationCoordinator.State.SETTLING,
                 new FlexyInstantNavigationCoordinator.Intent(FlexyInstantNavigationCoordinator.Kind.BACK,
                         instantDestinationId(owner), owner.getClass().getName()), false);
+        if (instantGestureStyle != BACK_ANIMATION_SPRING) return 0;
         long age = android.os.SystemClock.elapsedRealtimeNanos() - instantGestureNanos;
         float velocity = age >= 0 && age <= 150_000_000L ? instantGestureVelocity : 0;
         return velocity / SPRING_MULTIPLIER * containerView.getMeasuredWidth();
@@ -1194,6 +1235,45 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         if (!instantGestureAbandoned) return false;
         instantGestureAbandoned = false;
         return true;
+    }
+
+    private boolean isObsoleteInstantAnimator(Animator animation, long generation) {
+        if (backAnimator == animation && (instantNavigation == null || instantNavigation.isCurrent(generation))) return false;
+        if (backAnimator == animation) backAnimator = null;
+        animation.removeAllListeners();
+        animation.cancel();
+        return true;
+    }
+
+    /** Guard the native Slide property writes without replacing its AnimatorSet or custom children. */
+    private final class InstantSlideTarget {
+        final Animator owner;
+        final long generation = instantGestureGeneration;
+        InstantSlideTarget(Animator owner) { this.owner = owner; }
+        boolean current() { return !isObsoleteInstantAnimator(owner, generation); }
+        ActionBarLayout layout() { return ActionBarLayout.this; }
+    }
+
+    private static final android.util.FloatProperty<InstantSlideTarget> INSTANT_SLIDE_X = new android.util.FloatProperty<InstantSlideTarget>("instantSlideX") {
+        @Override public Float get(InstantSlideTarget target) { return target.layout().containerView.getTranslationX(); }
+        @Override public void setValue(InstantSlideTarget target, float value) { if (target.current()) target.layout().containerView.setTranslationX(value); }
+    };
+    private static final android.util.FloatProperty<InstantSlideTarget> INSTANT_SLIDE_INNER = new android.util.FloatProperty<InstantSlideTarget>("instantSlideInner") {
+        @Override public Float get(InstantSlideTarget target) { return target.layout().innerTranslationX; }
+        @Override public void setValue(InstantSlideTarget target, float value) { if (target.current()) target.layout().setInnerTranslationX(value); }
+    };
+    private static final android.util.FloatProperty<InstantSlideTarget> INSTANT_SLIDE_ALPHA = new android.util.FloatProperty<InstantSlideTarget>("instantSlideAlpha") {
+        @Override public Float get(InstantSlideTarget target) { return target.layout().containerView.getAlpha(); }
+        @Override public void setValue(InstantSlideTarget target, float value) { if (target.current()) target.layout().containerView.setAlpha(value); }
+    };
+
+    private ObjectAnimator instantSlideX(InstantSlideTarget target, float value) {
+        return target == null ? ObjectAnimator.ofFloat(containerView, View.TRANSLATION_X, value)
+                : ObjectAnimator.ofFloat(target, INSTANT_SLIDE_X, value);
+    }
+    private ObjectAnimator instantSlideInner(InstantSlideTarget target, float value) {
+        return target == null ? ObjectAnimator.ofFloat(this, "innerTranslationX", value)
+                : ObjectAnimator.ofFloat(target, INSTANT_SLIDE_INNER, value);
     }
 
     private void clearInstantBackSeed() {
@@ -1219,7 +1299,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
     }
 
     private boolean isObsoleteInstantFrame(SpringAnimation animation, long generation) {
-        if (instantNavigation == null || animation == currentSpringAnimation && instantNavigation.isCurrent(generation)) return false;
+        if (animation == currentSpringAnimation && (instantNavigation == null || instantNavigation.isCurrent(generation))) return false;
         // A deferred newer scene may not have installed its actor yet. Stop the old clock as well as its writes.
         if (currentSpringAnimation == animation) currentSpringAnimation = null;
         animation.cancel();
@@ -1520,6 +1600,14 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         if (child != bottomSheetTabs && bottomSheetTabsClip != null) {
             bottomSheetTabsClip.clip(canvas, withShadow, isKeyboardVisible, getWidth(), (int) getY() + getHeight(), 1.0f);
             withShadow = false;
+        }
+
+        if (instantGestureActive && instantGestureStyle == BACK_ANIMATION_SLIDE
+                && (child == containerView || child == containerViewBack)) {
+            // The timed opening is translucent; retain the whole native rear surface, not an opaque-edge clip.
+            final boolean result = super.drawChild(canvas, child, drawingTime);
+            canvas.restoreToCount(restoreCount2);
+            return result;
         }
 
         // Material 3 predictive back: закрывающийся фрагмент — карточка, за ним уменьшенный предыдущий,
@@ -2076,9 +2164,12 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
 
     private void applyPredictiveBackProgress(float progress, float touchY) {
         final float p = clamp01(progress);
-        predictiveBackHasProgress = p > 0 || animationInProgress;
+        predictiveBackHasProgress = p > 0 || animationInProgress || instantGestureActive;
         predictiveBackY = touchY;
         predictiveBackAnimation.update(p, touchY);
+        if (instantGestureActive && instantGestureStyle == BACK_ANIMATION_PREDICTIVE) {
+            containerView.setAlpha(predictiveBackAnimation.getClosingAlpha());
+        }
         containerView.setTranslationX(0);
         containerViewBack.setTranslationX(0);
         setInnerTranslationX(predictiveBackAnimation.getSlideDistance());
@@ -2090,8 +2181,13 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
     private Animator createPredictiveBackEndTransition(boolean backAnimation, float startProgress, float startAlpha, float slideDistance) {
         if (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) {
             if (!backAnimation) predictiveBackAnimation.prepareCommit();
+            final boolean openingOwned = instantGestureActive && instantGestureStyle == BACK_ANIMATION_PREDICTIVE;
+            final long openingTicket = instantGestureGeneration;
+            final Animator[] openingActor = openingOwned ? new Animator[1] : null;
             app.flexygram.motion.FlexyMotionAnimator animation = new app.flexygram.motion.FlexyMotionAnimator(this, 0f, 1f, progress -> {
+                if (openingOwned && isObsoleteInstantAnimator(openingActor[0], openingTicket)) return;
                 if (backAnimation) {
+                    if (openingOwned) predictiveBackAnimation.setOpeningContinuationWeight(1f - progress);
                     final float value = startProgress * (1f - progress);
                     applyPredictiveBackProgress(value, predictiveBackY);
                     predictiveBackAnimation.setScrimAlphaMultiplier(startProgress != 0 ? value / startProgress : 0f);
@@ -2107,6 +2203,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
                     invalidate();
                 }
             });
+            if (openingOwned) openingActor[0] = animation;
             animation.setDuration(backAnimation ? Math.max(120, (int) (startProgress * 220f)) : predictiveBackAnimation.getPostCommitDuration());
             if (backAnimation) animation.setInterpolator(CubicBezierInterpolator.EASE_OUT_QUINT);
             return animation;
@@ -2149,6 +2246,8 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         final float startAlpha = containerView.getAlpha();
         final float slideDistance = predictiveBackAnimation.getSlideDistance();
 
+        final boolean openingOwned = instantGestureActive && instantGestureStyle == BACK_ANIMATION_PREDICTIVE;
+        final long openingTicket = instantGestureGeneration;
         final Animator animatorSet = createPredictiveBackEndTransition(backAnimation, startProgress, startAlpha, slideDistance);
         animatorSet.addListener(new AnimatorListenerAdapter() {
             private boolean cancelled;
@@ -2156,20 +2255,25 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
             @Override
             public void onAnimationCancel(Animator animation) {
                 cancelled = true;
+                if (openingOwned && isObsoleteInstantAnimator(animation, openingTicket)) return;
                 if (backAnimator != animation) return;
                 backAnimator = null;
                 resetPredictiveBackState();
                 containerView.setAlpha(1.0f);
                 onSlideAnimationEnd(true);
+                if (openingOwned && instantNavigation != null) instantNavigation.complete(openingTicket);
             }
 
             @Override
             public void onAnimationEnd(Animator animation) {
-                if (cancelled || backAnimator != animation) return;
+                if (cancelled) return;
+                if (openingOwned && isObsoleteInstantAnimator(animation, openingTicket)) return;
+                if (backAnimator != animation) return;
                 backAnimator = null;
                 resetPredictiveBackState();
                 containerView.setAlpha(1.0f);
                 onSlideAnimationEnd(backAnimation);
+                if (openingOwned && instantNavigation != null) instantNavigation.complete(openingTicket);
             }
         });
         backAnimator = animatorSet;
@@ -2261,6 +2365,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         // Чувствительность применяется только к живому жесту; докат и откат зовут
         // applyPredictiveBackProgress напрямую, иначе множитель наложился бы дважды
         t = app.exteraless.utils.UtilsConfig.adjustPredictiveBackProgress(t);
+        if (instantGestureActive) predictiveBackY = touchY;
         if (applyInstantGestureProgress(t)) return;
         if (NaConfig.INSTANCE.getBackAnimationStyle().Int() == BACK_ANIMATION_SLIDE) {
             final float dx = dp(180) * CubicBezierInterpolator.StandardDecelerate.getInterpolation(t);
@@ -2321,6 +2426,8 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
 
         float x = containerView.getX();
         AnimatorSet animatorSet = new AnimatorSet();
+        final InstantSlideTarget openingSlide = instantGestureActive && instantGestureStyle == BACK_ANIMATION_SLIDE
+                ? new InstantSlideTarget(animatorSet) : null;
         float distToMove;
         boolean overrideTransition = currentFragment.shouldOverrideSlideTransition(false, backAnimation);
 
@@ -2398,9 +2505,10 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
             int duration = Math.max((int) (200.0f / containerView.getMeasuredWidth() * distToMove), newBackTransitions() ? 380 : 50);
             if (!overrideTransition) {
                 animatorSet.playTogether(
-                    ObjectAnimator.ofFloat(containerView, View.TRANSLATION_X, (containerView.getMeasuredWidth() + (predictiveBackInProgress ? dp(56) : 0))).setDuration(duration),
-                    ObjectAnimator.ofFloat(this, "innerTranslationX", (float) containerView.getMeasuredWidth()).setDuration(duration)
+                    instantSlideX(openingSlide, (containerView.getMeasuredWidth() + (predictiveBackInProgress ? dp(56) : 0))).setDuration(duration),
+                    instantSlideInner(openingSlide, (float) containerView.getMeasuredWidth()).setDuration(duration)
                 );
+                if (openingSlide != null) animatorSet.playTogether(ObjectAnimator.ofFloat(openingSlide, INSTANT_SLIDE_ALPHA, 1f).setDuration(duration));
                 if (newBackTransitions()) {
                     animatorSet.setInterpolator(CubicBezierInterpolator.EASE_OUT_QUINT);
                 }
@@ -2410,9 +2518,10 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
             int duration = Math.max((int) (320.0f / containerView.getMeasuredWidth() * distToMove), newBackTransitions() ? 320 : 120);
             if (!overrideTransition) {
                 animatorSet.playTogether(
-                    ObjectAnimator.ofFloat(containerView, View.TRANSLATION_X, 0).setDuration(duration),
-                    ObjectAnimator.ofFloat(this, "innerTranslationX", 0.0f).setDuration(duration)
+                    instantSlideX(openingSlide, 0).setDuration(duration),
+                    instantSlideInner(openingSlide, 0.0f).setDuration(duration)
                 );
+                if (openingSlide != null) animatorSet.playTogether(ObjectAnimator.ofFloat(openingSlide, INSTANT_SLIDE_ALPHA, 1f).setDuration(duration));
                 if (newBackTransitions()) {
                     animatorSet.setInterpolator(CubicBezierInterpolator.EASE_OUT_QUINT);
                 }
@@ -2437,27 +2546,34 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
             @Override
             public void onAnimationCancel(Animator animation) {
                 cancelled = true;
+                if (openingSlide != null && isObsoleteInstantAnimator(animation, openingSlide.generation)) return;
                 if (backAnimator != animation) return;
                 backAnimator = null;
                 predictiveBackInProgress = false;
                 m3PredictiveBack = false;
                 containerView.setAlpha(1.0f);
+                clearInstantGesture();
                 onSlideAnimationEnd(true);
+                if (openingSlide != null && instantNavigation != null) instantNavigation.complete(openingSlide.generation);
             }
             @Override
             public void onAnimationEnd(Animator animator) {
-                if (cancelled || backAnimator != animator) return;
+                if (cancelled) return;
+                if (openingSlide != null && isObsoleteInstantAnimator(animator, openingSlide.generation)) return;
+                if (backAnimator != animator) return;
                 backAnimator = null;
                 predictiveBackInProgress = false;
                 m3PredictiveBack = false;
                 containerView.setAlpha(1.0f);
+                clearInstantGesture();
                 onSlideAnimationEnd(backAnimation);
+                if (openingSlide != null && instantNavigation != null) instantNavigation.complete(openingSlide.generation);
             }
         });
         backAnimator = animatorSet;
         backAnimatorIsBack = backAnimation;
-        animatorSet.start();
         animationInProgress = true;
+        animatorSet.start();
         layoutToIgnore = containerViewBack;
     }
 
@@ -2668,13 +2784,17 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         transitionAnimationStartTime = System.currentTimeMillis();
         currentSpringAnimation = new SpringAnimation(this, new FloatValueHolder(0))
                 .setSpring(new SpringForce(1)).setDuration(preview && open ? 190 : 150);
+        final long timedGeneration = instantNavigation == null ? 0 : instantNavigation.generation();
         currentSpringAnimation.addUpdateListener((animation, value, velocity) -> {
+            if (isObsoleteInstantFrame(animation, timedGeneration)) return;
             animationProgress = value;
                 if (newFragment != null) {
                     newFragment.onTransitionAnimationProgress(true, animationProgress);
+                    if (isObsoleteInstantFrame(animation, timedGeneration)) return;
                 }
                 if (oldFragment != null) {
                     oldFragment.onTransitionAnimationProgress(false, animationProgress);
+                    if (isObsoleteInstantFrame(animation, timedGeneration)) return;
                 }
                 Integer oldNavigationBarColor = oldFragment != null ? oldFragment.getNavigationBarColor() : null;
                 Integer newNavigationBarColor = newFragment != null ? newFragment.getNavigationBarColor() : null;
@@ -2748,6 +2868,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         });
         currentSpringAnimation.addEndListener((animation, cancelled, value, velocity) -> {
             if (animation != currentSpringAnimation) return;
+            if (isObsoleteInstantFrame(animation, timedGeneration)) return;
             currentSpringAnimation = null;
             onAnimationEndCheck(cancelled);
         });

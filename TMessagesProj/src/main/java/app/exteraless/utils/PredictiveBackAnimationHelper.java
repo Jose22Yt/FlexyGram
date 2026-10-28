@@ -57,6 +57,46 @@ public final class PredictiveBackAnimationHelper {
     private float closingAlpha = 1.0f;
     private float scrimAlphaMultiplier = 1.0f;
 
+    // Optional native timed-opening residual. All storage is bounded primitive state, never a screenshot.
+    private boolean openingContinuation, continuationCancelling;
+    private float continuationX, continuationAlpha = 1f, continuationWeight = 1f, continuationCancelScrim = 1f;
+    private float enteringLeftDelta, enteringTopDelta, enteringRightDelta, enteringBottomDelta;
+    private float commitStartAlpha = 1f;
+    private float continuationCommitRadius;
+
+    private void clearOpeningContinuation() {
+        openingContinuation = continuationCancelling = false;
+        continuationX = enteringLeftDelta = enteringTopDelta = enteringRightDelta = enteringBottomDelta = 0;
+        continuationAlpha = continuationWeight = continuationCancelScrim = commitStartAlpha = 1f;
+        continuationCommitRadius = 0;
+    }
+
+    /** Called only after start(), for the known unscaled native timed opening. */
+    public void continueOpening(float translationX, float alpha) {
+        if (!Float.isFinite(translationX) || !Float.isFinite(alpha) || alpha < 0 || alpha > 1
+                || startClosingRect.isEmpty()) throw new IllegalArgumentException("opening continuation");
+        openingContinuation = true;
+        continuationX = translationX;
+        continuationAlpha = alpha;
+        continuationWeight = 1f;
+        continuationCancelling = false;
+        enteringLeftDelta = startClosingRect.left - startEnteringRect.left;
+        enteringTopDelta = startClosingRect.top - startEnteringRect.top;
+        enteringRightDelta = startClosingRect.right - startEnteringRect.right;
+        enteringBottomDelta = startClosingRect.bottom - startEnteringRect.bottom;
+        update(0, initialTouchY);
+    }
+
+    /** Native cancellation fades the opening residual out while returning to the full screen. */
+    public void setOpeningContinuationWeight(float weight) {
+        if (!openingContinuation) return;
+        if (!continuationCancelling) {
+            continuationCancelScrim = 1f - (1f - interpolatedProgress) * continuationWeight;
+            continuationCancelling = true;
+        }
+        continuationWeight = Utilities.clamp01(weight);
+    }
+
     private static Interpolator createEmphasizedInterpolator() {
         final Path path = new Path();
         path.moveTo(0.0f, 0.0f);
@@ -163,7 +203,9 @@ public final class PredictiveBackAnimationHelper {
     }
 
     public int getScrimAlpha(boolean dark) {
-        return (int) ((dark ? 0.8f : 0.2f) * 255.0f * scrimAlphaMultiplier);
+        float continuationScrim = !openingContinuation ? 1f : continuationCancelling ? continuationCancelScrim
+                : 1f - (1f - interpolatedProgress) * continuationWeight;
+        return (int) ((dark ? 0.8f : 0.2f) * 255.0f * scrimAlphaMultiplier * continuationScrim);
     }
 
     public float getSlideDistance() {
@@ -171,6 +213,8 @@ public final class PredictiveBackAnimationHelper {
     }
 
     public void prepareCommit() {
+        commitStartAlpha = closingAlpha;
+        continuationCommitRadius = currentCornerRadius;
         commitStartClosingRect.set(currentClosingRect);
         commitStartEnteringRect.set(currentEnteringRect);
         commitTargetEnteringRect.set(startClosingRect);
@@ -179,6 +223,7 @@ public final class PredictiveBackAnimationHelper {
     }
 
     public void reset() {
+        clearOpeningContinuation();
         startClosingRect.setEmpty();
         targetClosingRect.setEmpty();
         currentClosingRect.setEmpty();
@@ -208,6 +253,7 @@ public final class PredictiveBackAnimationHelper {
      * @param cornerRadius стартовый радиус (физические углы экрана)
      */
     public void start(int width, int height, float touchY, boolean toRight, float cornerRadius) {
+        clearOpeningContinuation();
         initialTouchY = touchY;
         progress = 0.0f;
         interpolatedProgress = 0.0f;
@@ -245,15 +291,24 @@ public final class PredictiveBackAnimationHelper {
         interpolate(currentEnteringRect, startEnteringRect, targetEnteringRect, interpolatedProgress);
         currentEnteringRect.offset(0.0f, yOffset);
         currentCornerRadius = AndroidUtilities.lerp(startCornerRadius, targetCornerRadius, interpolatedProgress);
+        if (openingContinuation) {
+            float residual = (1f - interpolatedProgress) * continuationWeight;
+            currentClosingRect.offset(continuationX * residual, 0);
+            currentEnteringRect.left += enteringLeftDelta * residual;
+            currentEnteringRect.top += enteringTopDelta * residual;
+            currentEnteringRect.right += enteringRightDelta * residual;
+            currentEnteringRect.bottom += enteringBottomDelta * residual;
+            closingAlpha = 1f + (continuationAlpha - 1f) * residual;
+        }
     }
 
     public void updateCommitProgress(float rawProgress) {
         final float t = Utilities.clamp01(rawProgress);
         final float interpolated = postCommitInterpolator.getInterpolation(t);
-        closingAlpha = Math.max(1.0f - 5.0f * t, 0.0f);
+        closingAlpha = commitStartAlpha * Math.max(1.0f - 5.0f * t, 0.0f);
         scrimAlphaMultiplier = 1.0f - t;
         interpolate(currentClosingRect, commitStartClosingRect, commitTargetClosingRect, interpolated);
         interpolate(currentEnteringRect, commitStartEnteringRect, commitTargetEnteringRect, interpolated);
-        currentCornerRadius = AndroidUtilities.lerp(targetCornerRadius, startCornerRadius, interpolated);
+        currentCornerRadius = AndroidUtilities.lerp(openingContinuation ? continuationCommitRadius : targetCornerRadius, startCornerRadius, interpolated);
     }
 }

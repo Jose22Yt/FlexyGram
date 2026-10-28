@@ -50,6 +50,24 @@ class InstantNavigation1279Regression(unittest.TestCase):
                      "TMessagesProj/src/main/java/org/telegram/tgnet/ConnectionsManager.java"):
             self.assertEqual(b"unknown",restore_navigation(path,b"unknown"))
 
+    def test_timed_scope_rejects_modified_hunks_and_preserves_unknown_bytes(self):
+        import importlib.util
+        path=ROOT/'tools/connected_alpha/motion/timed_gesture_scope.py'
+        spec=importlib.util.spec_from_file_location('timed_scope_probe',path)
+        scope=importlib.util.module_from_spec(spec);spec.loader.exec_module(scope)
+        for name in (scope.ACTION,scope.HELPER,scope.BRIDGE):
+            source=(ROOT/name).read_text()
+            if name==scope.ACTION:
+                a=source.index('    private FlexyInstantNavigationCoordinator instantNavigation;')
+                b=source.index('    @Override\n    public void requestDisallowInterceptTouchEvent',a)
+                source=source[:a]+source[b:]
+            restored=scope.restore(name,source)
+            self.assertNotEqual(source,restored)
+            self.assertEqual(restored+'// unknown',scope.restore(name,source+'// unknown'))
+        helper=(ROOT/scope.HELPER).read_text()
+        with self.assertRaises(AssertionError):
+            scope.restore(scope.HELPER,helper.replace('commitStartAlpha = closingAlpha;', 'commitStartAlpha = 0;',1))
+
     def test_actual_coordinator_protocol(self):
         import subprocess,tempfile
         with tempfile.TemporaryDirectory() as folder:

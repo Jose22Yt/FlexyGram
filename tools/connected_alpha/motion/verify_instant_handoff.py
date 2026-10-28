@@ -56,6 +56,8 @@ def main() -> None:
         assert prohibited not in delta, "No synthetic event, injected click or wait: " + prohibited
 
     reconstructed = (content[:start] + ORIGINAL + content[end:]).replace(NEW_IMPORT, "", 1)
+    from timed_gesture_scope import restore, ACTION, HELPER, BRIDGE
+    reconstructed = restore(ACTION, reconstructed)
     gesture_begin = "        try { // Instant gesture owns pending state only during native admission.\n"
     gesture_finish = "        } finally {\n            clearInstantBackSeed();\n            if (!instantGestureActive) clearInstantGesture();\n        }"
     assert reconstructed.count(gesture_begin) == 1 and reconstructed.count(gesture_finish) == 1
@@ -193,6 +195,12 @@ def main() -> None:
     launch_sha = hashlib.sha1(b"blob " + str(len(data)).encode() + b"\0" + data).hexdigest()
     assert launch_sha == BASE_LAUNCH_BLOB, "Unreviewed LaunchActivity change: " + launch_sha
     print("Launcher terminal scope: PASS (entire upstream LaunchActivity recovered byte-for-byte)")
+    for path, expected in ((HELPER, "dca5f827cc8e88901f268aca01c769260890cacf"),
+                           (BRIDGE, "df649ac16b85270db441e7670329a0f7057fccc1")):
+        data = restore(path, (ROOT / path).read_text()).encode("utf-8")
+        recovered = hashlib.sha1(b"blob " + str(len(data)).encode() + b"\0" + data).hexdigest()
+        assert recovered == expected, "Unreviewed timed continuation source: " + path
+    print("Timed gesture scope: PASS (complete helper and prior bridge recovered byte-for-byte)")
 
 
 

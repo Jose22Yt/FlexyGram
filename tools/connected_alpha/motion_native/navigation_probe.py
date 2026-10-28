@@ -18,7 +18,7 @@ def write(put,root,source):
  # Unmodified native non-M3 end/cancel listener, with an explicit test-only timeline.
  listener_a=s.index('        animatorSet.addListener(',s.index('    private void animateBackEndAnimation('))
  listener_b=s.index('        backAnimator = animatorSet;',listener_a)
- slide_listener='public void nonM3(boolean backAnimation){AnimatorSet animatorSet=new AnimatorSet();animatorSet.playTogether(ValueAnimator.ofFloat(0,1).setDuration(200));'+s[listener_a:listener_b]+'backAnimator=animatorSet;backAnimatorIsBack=backAnimation;animationInProgress=true;layoutToIgnore=containerViewBack;animatorSet.start();}'
+ slide_listener='public void nonM3(boolean backAnimation){InstantSlideTarget openingSlide=null;AnimatorSet animatorSet=new AnimatorSet();animatorSet.playTogether(ValueAnimator.ofFloat(0,1).setDuration(200));'+s[listener_a:listener_b]+'backAnimator=animatorSet;backAnimatorIsBack=backAnimation;animationInProgress=true;layoutToIgnore=containerViewBack;animatorSet.start();}'
  cleanup=method(method(s,'    private void onAnimationEndCheck('),'        if (currentSpringAnimation != null)')
  start=s.index('    private void startLayoutAnimation(')
  a=s.index('            currentSpringAnimation.addUpdateListener(',start)
@@ -27,7 +27,7 @@ def write(put,root,source):
  put('NavigationMotionProbe.java','''import android.animation.*;import java.util.ArrayList;import android.view.*;import android.widget.*;import android.graphics.drawable.*;import androidx.core.graphics.ColorUtils;import androidx.core.math.MathUtils;
 import androidx.dynamicanimation.animation.FloatValueHolder;import androidx.dynamicanimation.animation.SpringForce;import app.flexygram.motion.SpringAnimation;import org.telegram.ui.Components.CubicBezierInterpolator;import org.telegram.ui.ActionBar.Theme;import org.telegram.messenger.AndroidUtilities;
 public class NavigationMotionProbe extends FrameLayout {
- public final View backgroundView=new View(getContext());public android.animation.Animator alpha(boolean opening){return createRootAlphaTransition(opening);}
+ static final int BACK_ANIMATION_PREDICTIVE=2;class InstantSlideTarget{long generation;}\n public final View backgroundView=new View(getContext());public android.animation.Animator alpha(boolean opening){return createRootAlphaTransition(opening);}
  public boolean predictiveBackHasProgress,animationInProgress,predictiveBackInProgress,m3PredictiveBack,backAnimatorIsBack;public float predictiveBackY;public Object predictiveBackBackgroundDrawable,layoutToIgnore;public Animator backAnimator;public int slideCompletions;public boolean slideCancelled;public Runnable afterSlide;
  public final app.exteraless.utils.PredictiveBackAnimationHelper predictiveBackAnimation=new app.exteraless.utils.PredictiveBackAnimationHelper();
  public void predictive(boolean revert){animatePredictiveBackEndAnimation(revert);}public Animator predictiveTimeline(boolean revert){return createPredictiveBackEndTransition(revert,predictiveBackAnimation.getProgress(),containerView.getAlpha(),predictiveBackAnimation.getSlideDistance());}void onSlideAnimationEnd(boolean reverted){slideCompletions++;slideCancelled=reverted;animationInProgress=false;layoutToIgnore=null;if(afterSlide!=null)afterSlide.run();}static float clamp01(float v){return Math.max(0,Math.min(1,v));}
@@ -45,7 +45,7 @@ public class NavigationMotionProbe extends FrameLayout {
  public void spring(boolean open,boolean preview){currentSpringAnimation=new SpringAnimation(this,new FloatValueHolder(0)).setSpring(new SpringForce(SPRING_MULTIPLIER));
 '''+spring+'''currentSpringAnimation.start();}
  public void abort(){if(currentSpringAnimation!=null){SpringAnimation old=currentSpringAnimation;currentSpringAnimation=null;old.cancel();}}
-'''+fields(s)+'\n'+method(s,'    private void clearInstantGesture(')+'\n'+slide_listener+'\n'+start_prefix+'\n'+method(s,'    private boolean isObsoleteInstantFrame(')+'\n'+alpha+'\n'+predictive+'\n'+gesture+'\n'+settle+'\n'+reset+'\n'+timed+'}')
+'''+fields(s)+'\n'+method(s,'    private void clearInstantGesture(')+'\n'+slide_listener+'\n'+start_prefix+'\n'+method(s,'    private boolean isObsoleteInstantAnimator(')+'\n'+method(s,'    private boolean isObsoleteInstantFrame(')+'\n'+alpha+'\n'+predictive+'\n'+gesture+'\n'+settle+'\n'+reset+'\n'+timed+'}')
  p=source/'NavigationMotionProbe.java';p.write_text(p.read_text().replace('__CLEANUP__',cleanup))
  p=source/'org/telegram/ui/ActionBar/Theme.java';p.write_text(p.read_text().replace('public class Theme {','public class Theme {public static final android.graphics.drawable.ColorDrawable moveUpDrawable=new android.graphics.drawable.ColorDrawable();'))
 
