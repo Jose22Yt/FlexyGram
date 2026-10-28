@@ -1,0 +1,36 @@
+name: Alpha1281 isolated Smart Previews graphics (no APK)
+on:
+  push:
+    branches: [validation/alpha1281-smart-previews]
+    paths: ['.github/workflows/alpha1281-preview-probe.yml']
+permissions:
+  contents: read
+concurrency:
+  group: alpha1281-preview-probe
+  cancel-in-progress: true
+jobs:
+  graphics:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 8f1b7c588d0425ed9252a4279c1706e69e9316da
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: 'build-tools;36.0.0 platforms;android-37.0'
+      - run: python3 tools/connected_alpha/home_visual/run.py --sdk-root "$ANDROID_HOME"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: alpha1281-preview-synthetic-renders
+          path: |
+            build/connected-alpha-home-visual/smart-preview-micro-synthetic.png
+            build/connected-alpha-home-visual/target/surefire-reports/*
+          retention-days: 7
+          if-no-files-found: warn
