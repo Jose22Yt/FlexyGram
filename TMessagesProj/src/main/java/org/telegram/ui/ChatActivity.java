@@ -33205,6 +33205,7 @@ public class ChatActivity extends BaseFragment implements
             }
 
             final boolean compactContext = v instanceof ChatMessageCell
+                    && selectedObject == ((ChatMessageCell)v).getMessageObject()
                     && selectedObject != null && selectedObjectGroup == null && !selectedObject.isSponsored()
                     && !selectedObject.isEphemeral() && !suggestEdit && AndroidUtilities.displaySize.x >= dp(320)
                     && getParentActivity().getResources().getDisplayMetrics().scaledDensity

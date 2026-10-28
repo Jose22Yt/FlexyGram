@@ -80,7 +80,7 @@
     "TMessagesProj/src/main/java/app/flexygram/navigation/NativeInstantTouchTarget.java": "796a687c8162024134bf868ef64a56b3c13f0ae5ec5b7d4ce84d4c61be74495f",
     "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java": "e529cb4572356ee8d6ebbcb42dd678aefa396f45888b454da897ff36faa90421",
     "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/MessageDrawable.java": "164b858bf4968feb81d6b3e19844aaef1cb544703a8b708794446ac1d4c70985",
-    "TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java": "ec4cedf16069dba8bc23db56167dde965a3964026efc70fed2b049dc7e025495",
+    "TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java": "cc2fd625a9f75da164b2ea38a0ffb7a82094c88067063a6fe12db05b89578333",
     "TMessagesProj/src/main/java/org/telegram/ui/ChatBackgroundDrawable.java": "6cdb6151a82d685f35a819af3768d59aab64947bba4d41a305f67d0805a5effa",
     "TMessagesProj/src/main/java/org/telegram/ui/Components/ChatAvatarContainer.java": "8b3bd712ec011da65884f7d50a23fe396b5b588bdb0d7d4ddc18a5deab442ab3",
     "TMessagesProj/src/main/java/org/telegram/ui/Components/MotionBackgroundDrawable.java": "b7da4814b1da31b30f72b5ca240d6ef81f53ba7aafa9e78380417611641787e3",
