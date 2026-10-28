@@ -38,6 +38,21 @@ SELECT COUNT(*) AS app_surface_frame_records,
  MIN(dur)/1e6 AS min_surface_frame_ms, MAX(dur)/1e6 AS max_surface_frame_ms
 FROM app_frames;
 '''
+    frame_quantiles = f'''-- Nearest-rank quantiles of app SURFACE durations, not display FPS or input latency.
+WITH frames AS (
+ SELECT a.dur/1e6 AS ms FROM actual_frame_timeline_slice a JOIN process p USING(upid)
+ WHERE (p.name = '{package}' OR p.name GLOB '{package}:*') AND a.dur >= 0
+), ranked AS (SELECT ms,ROW_NUMBER() OVER(ORDER BY ms) AS rn,COUNT(*) OVER() AS n FROM frames)
+SELECT COUNT(*) AS surface_records,
+ MIN(CASE WHEN rn >= (n*50+99)/100 THEN ms END) AS p50_ms,
+ MIN(CASE WHEN rn >= (n*95+99)/100 THEN ms END) AS p95_ms,
+ MIN(CASE WHEN rn >= (n*99+99)/100 THEN ms END) AS p99_ms FROM ranked;
+'''
+    blur = f'''-- Explicit local markers, no wallpaper/chat/user identifiers.
+SELECT s.name,COUNT(*) AS events,SUM(s.dur)/1e6 AS total_ms,MAX(s.dur)/1e6 AS max_ms
+FROM slice s JOIN thread_track tt ON tt.id=s.track_id JOIN thread t USING(utid) JOIN process p USING(upid)
+WHERE (p.name = '{package}' OR p.name GLOB '{package}:*') AND s.name GLOB 'Flexy.blur.*' AND s.dur>=0 GROUP BY s.name;
+'''
     cpu = f'''-- Scheduled CPU duration only, not wall time/RenderThread GPU utilization.
 SELECT CASE WHEN t.tid = p.pid THEN 'main' WHEN t.name = 'RenderThread' THEN 'render' ELSE 'other' END AS thread_role,
  COUNT(*) AS scheduled_slices, SUM(s.dur)/1e6 AS scheduled_cpu_ms
@@ -70,7 +85,7 @@ WHERE (p.name='{package}' OR p.name GLOB '{package}:*') AND ph.dur>=0
  'Flexy.dialogs.read_local','Flexy.startup.account_services')
 ORDER BY s.startup_id,ph.ts;
 """
-    return {'config': config, 'frame_sql': sql, 'cpu_sql': cpu, 'startup_sql': startup, 'startup_phases_sql': phases,
+    return {'config': config, 'frame_sql': sql, 'frame_quantiles_sql': frame_quantiles, 'blur_sql': blur, 'cpu_sql': cpu, 'startup_sql': startup, 'startup_phases_sql': phases,
             'limits': {'touch_latency': 'NOT_IMPLEMENTED_WITHOUT_INPUT_TO_PRESENT_FLOW',
                        'gpu_utilization': 'REQUIRES_SUPPORTED_DEVICE_GPU_COUNTERS',
                        'allocation_counts': 'REQUIRES_SEPARATE_HEAPPROFD_OR_ART_CAPTURE',
@@ -89,7 +104,7 @@ def main():
     a = p.parse_args()
     result = plan(a.package, a.seconds)
     a.out_dir.mkdir(parents=True, exist_ok=True)
-    for key, name in [('config', 'test_trace.pbtxt'), ('frame_sql', 'frame_timeline.sql'), ('cpu_sql', 'scheduled_cpu.sql'), ('startup_sql', 'startup.sql'), ('startup_phases_sql', 'startup_phases.sql')]:
+    for key, name in [('config', 'test_trace.pbtxt'), ('frame_sql', 'frame_timeline.sql'), ('frame_quantiles_sql', 'frame_quantiles.sql'), ('blur_sql', 'instant_blur.sql'), ('cpu_sql', 'scheduled_cpu.sql'), ('startup_sql', 'startup.sql'), ('startup_phases_sql', 'startup_phases.sql')]:
         (a.out_dir / name).write_text(result[key])
     (a.out_dir / 'limits.json').write_text(json.dumps(result['limits'], indent=2) + '\n')
 

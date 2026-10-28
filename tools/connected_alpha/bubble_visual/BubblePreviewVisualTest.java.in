@@ -72,7 +72,7 @@ public class BubblePreviewVisualTest {
   org.telegram.ui.Components.MotionBackgroundDrawable moving=new org.telegram.ui.Components.MotionBackgroundDrawable(){@Override public Bitmap getBitmap(){return original;}};
   View target=new View(ApplicationLoader.applicationContext);int[] changes={0};
   var helper=new app.flexygram.preview.SignatureWallpaperPreview(target,moving,()->changes[0]++);
-  helper.attach();assertEquals(1,Utilities.globalQueue.pending());Utilities.globalQueue.runAllOnWorker();org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();
+  helper.attach();assertEquals(1,Utilities.globalQueue.pending());Utilities.globalQueue.runAllOnWorker();AndroidUtilities.drainMain();org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();
   Bitmap snapshot=((BitmapDrawable)helper.drawable()).getBitmap();assertTrue(snapshot.getAllocationByteCount()<=512*512*4);
   original.eraseColor(Color.RED);assertEquals(Color.BLUE,snapshot.getPixel(10,10));int stable=changes[0];
   for(int n=0;n<100;n++)helper.resize(360,240);
@@ -96,7 +96,7 @@ public class BubblePreviewVisualTest {
    Bitmap original=Bitmap.createBitmap(400,700,Bitmap.Config.ARGB_8888);original.eraseColor(Color.BLUE);
    Theme.wallpaper=new BitmapDrawable(resources,original);BubbleConfig.setBackgroundBlur(true);
    BubblePreviewView preview=new BubblePreviewView(context(a));root.addView(preview);measure(preview);
-   Utilities.globalQueue.runAllOnWorker();org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();
+   Utilities.globalQueue.runAllOnWorker();AndroidUtilities.drainMain();org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();
    var field=BubblePreviewView.class.getDeclaredField("blurOwner");field.setAccessible(true);SignatureWallpaperBlur.Owner owner=(SignatureWallpaperBlur.Owner)field.get(preview);
    var crop=SignatureWallpaperBlur.Owner.class.getDeclaredField("mapping");crop.setAccessible(true);RectF before=new RectF((RectF)crop.get(owner));assertFalse(before.isEmpty());assertTrue(owner.isReady());
    preview.measure(View.MeasureSpec.makeMeasureSpec(240,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(0,View.MeasureSpec.UNSPECIFIED));preview.layout(0,0,240,preview.getMeasuredHeight());
@@ -112,7 +112,7 @@ public class BubblePreviewVisualTest {
    wallpaper.setPixels(pixels,0,512,0,0,512,512);Theme.dark=false;Theme.wallpaper=new BitmapDrawable(resources,wallpaper);Theme.chat_msgTextPaint.setTextSize(16);Theme.chat_timePaint.setTextSize(11);
    BubblePreviewView preview=new BubblePreviewView(context(a));root.addView(preview);measure(preview);BubbleConfig.setTransparency(80);BubbleConfig.setBorderTenths(11);
    Bitmap before=Bitmap.createBitmap(360,preview.getHeight(),Bitmap.Config.ARGB_8888);preview.draw(new Canvas(before));
-   BubbleConfig.setBackgroundBlur(true);preview.settingsChanged();assertEquals(1,Utilities.globalQueue.pending());Utilities.globalQueue.runAllOnWorker();org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();measure(preview);
+   BubbleConfig.setBackgroundBlur(true);preview.settingsChanged();assertEquals(1,Utilities.globalQueue.pending());Utilities.globalQueue.runAllOnWorker();AndroidUtilities.drainMain();org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();measure(preview);
    Bitmap after=Bitmap.createBitmap(360,preview.getHeight(),Bitmap.Config.ARGB_8888);preview.draw(new Canvas(after));assertEquals(before.getHeight(),after.getHeight());
    int changed=0;for(int y=0;y<after.getHeight();y++)for(int x=0;x<360;x++)if(before.getPixel(x,y)!=after.getPixel(x,y))changed++;
    assertTrue(changed>500);assertEquals(before.getPixel(12,12),after.getPixel(12,12));

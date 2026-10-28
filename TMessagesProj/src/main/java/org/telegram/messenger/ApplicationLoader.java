@@ -550,6 +550,18 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
     }
 
     @Override
+    public void onTrimMemory(int level) {
+        super.onTrimMemory(level);
+        app.flexygram.bubbles.SignatureWallpaperBlur.trimMemory(level);
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        app.flexygram.bubbles.SignatureWallpaperBlur.trimMemory(android.content.ComponentCallbacks2.TRIM_MEMORY_COMPLETE);
+    }
+
+    @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         try {

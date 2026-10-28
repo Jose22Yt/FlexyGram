@@ -1,0 +1,20 @@
+{
+  "pin": "d50677f723292d0e405eae8e1529f65416ff9cbd",
+  "reviewed": {
+    "TMessagesProj/src/main/java/org/telegram/ui/Cells/DialogCell.java": "f414183dad7ebde9e832e93fdb8a75275636144e",
+    "TMessagesProj/src/main/java/app/flexygram/home/SignatureSmartPreviews.java": "95989bd846079c5e43e700347863bdd72f6daef5",
+    "tools/connected_alpha/integration1279_contract.py": "4dcbbf3d137793780d32a1324e1dd418ccdde4b4",
+    "tools/connected_alpha/test_signature_smart_previews.py": "ff37472cef7c4fe62888eb8949ea18ff014c7699",
+    "tools/connected_alpha/smart_previews1279_hotfix_contract.py": "8eb4aeb2c93838c3f7e226d4d61680e67891119e",
+    "tools/connected_alpha/test_smart_previews1279_hotfix.py": "3bf0621a7b1eb9a3803942ea0a3f4afec784eb1d"
+  },
+  "paths": [
+    "TMessagesProj/src/main/java/app/flexygram/home/SignatureSmartPreviews.java",
+    "TMessagesProj/src/main/java/org/telegram/ui/Cells/DialogCell.java",
+    "tools/connected_alpha/integration1279_contract.py",
+    "tools/connected_alpha/smart_previews1279_hotfix_contract.py",
+    "tools/connected_alpha/smart_previews1279_hotfix_review.json",
+    "tools/connected_alpha/test_signature_smart_previews.py",
+    "tools/connected_alpha/test_smart_previews1279_hotfix.py"
+  ]
+}

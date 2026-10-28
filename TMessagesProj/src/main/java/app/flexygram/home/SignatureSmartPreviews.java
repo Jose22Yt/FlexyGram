@@ -36,6 +36,14 @@ public final class SignatureSmartPreviews {
         ApplicationLoader.applicationContext.getSharedPreferences(PREFS,Context.MODE_PRIVATE)
                 .edit().putInt("palette",next).apply();
     }
+    /**
+     * Telegram stores ordinary dialog previews as singleton ArrayLists in
+     * MessagesController.dialogMessage; null is NOT the normal non-album case.
+     * Only multi-message albums should retain the native grouped caption.
+     */
+    public static boolean allowsSingleMessagePreview(java.util.List<?> groupedMessages) {
+        return groupedMessages == null || groupedMessages.size() <= 1;
+    }
     public static int kind(MessageObject message){
         if(message==null||message.messageOwner==null||message.hasHighlightedWords()||message.needDrawBluredPreview())return 0;
         if(message.messageOwner.media!=null&&message.messageOwner.media.ttl_seconds!=0)return 0;
