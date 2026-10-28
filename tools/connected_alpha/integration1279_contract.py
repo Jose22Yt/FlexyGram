@@ -16,12 +16,12 @@ PROJECTIONS=ROOT/'tools/connected_alpha/integration1279_projections.json'
 # Review additive Instant Navigation P1 only by its exact Git blob, keeping all
 # frozen Alpha1279 projections and historical audits intact.
 HANDOFF_NAV='TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java'
-HANDOFF_NAV_BLOB='ed29d8e4f9a3125804f9ae1b1fde70dff9797b83'
+HANDOFF_NAV_BLOB='590150e5e81b16e45d62b1c5175bc80bee5570a5'
 HANDOFF_NAV_BASE_BLOB='78b0b482add965ca590d9da397bc083dd7a5ab3c'
 HANDOFF_ADDITIONS={
     'TMessagesProj/src/main/java/org/telegram/ui/ActionBar/FlexyNavigationHandoffPolicy.java': '4b8d7d15dc4f1d0db180c572e35bd4393460f66a',
     'tools/connected_alpha/motion/InstantHandoffPolicyTest.java': '4f9a0dd2ebf3700573cae7e0cf8c2bedf8b3fd06',
-    'tools/connected_alpha/motion/verify_instant_handoff.py': '0c67697c6694244ce30325d1c9632d57b743ea9d',
+    'tools/connected_alpha/motion/verify_instant_handoff.py': '8a60708d3d72e6c64cef9426bc56fa7c1c89d1cd',
     'tools/connected_alpha/motion/INSTANT_NAVIGATION_P1.md': '8fc81320f772f2d4effd146f739b72c0e2344709',
     '.github/workflows/instant-navigation-handoff.yml': '8dba73296bb8cae71a4f860d3296b3053a719f02',
 }
