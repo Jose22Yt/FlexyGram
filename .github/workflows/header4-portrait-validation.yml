@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: 5c9fd2f5fcbe1cf94d6f33956af2fe7851fc7c13
+          ref: e1811bb93c733b1cf84a5ac8fee126969d034b0d
           fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-java@v4
@@ -21,11 +21,13 @@ jobs:
         with:
           packages: 'build-tools;36.0.0 platforms;android-37.0'
       - run: python3 tools/connected_alpha/header_visual/run.py --sdk-root "$ANDROID_HOME"
+      - run: python3 tools/connected_alpha/context_panel/run.py --sdk-root "$ANDROID_HOME"
       - uses: actions/upload-artifact@v4
         with:
           name: Header4-Portrait-native-synthetic-evidence
           path: |
             build/connected-alpha-header-visual/*.png
             build/connected-alpha-header-visual/target/surefire-reports/*.xml
+            build/connected-alpha-context-panel/target/surefire-reports/*.xml
           if-no-files-found: error
           retention-days: 7
