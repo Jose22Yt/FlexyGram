@@ -12,6 +12,7 @@ public final class FlexyFrameMotion implements View.OnAttachStateChangeListener 
     private static final ArrayList<FlexyFrameMotion> active=new ArrayList<>();
     private static final WeakHashMap<FlexyFrameMotion,Boolean> instances=new WeakHashMap<>();
     private static FlexyFrameMotion[] batch=new FlexyFrameMotion[16];
+    private static long[] batchGeneration=new long[16];
     private static boolean posted,ticking;
     private static final Choreographer.FrameCallback CLOCK=FlexyFrameMotion::frame;
     private final View owner;private final Listener listener;private final FlexyMotionSpring spring;
@@ -55,8 +56,9 @@ public final class FlexyFrameMotion implements View.OnAttachStateChangeListener 
     private void finish(){Runnable r=end;end=null;if(r!=null)r.run();}
     private static void post(){if(!posted&&!ticking&&!active.isEmpty()){posted=true;Choreographer.getInstance().postFrameCallback(CLOCK);}}
     private static void frame(long frameTimeNanos){
-        posted=false;ticking=true;int n=active.size();if(batch.length<n)batch=new FlexyFrameMotion[Math.max(n,batch.length*2)];active.toArray(batch);
-        try{for(int i=0;i<n;i++){FlexyFrameMotion motion=batch[i];batch[i]=null;if(motion!=null&&motion.running&&!motion.disposed)motion.step(frameTimeNanos);}}
+        posted=false;ticking=true;int n=active.size();if(batch.length<n){batch=new FlexyFrameMotion[Math.max(n,batch.length*2)];batchGeneration=new long[batch.length];}active.toArray(batch);
+        for(int i=0;i<n;i++)batchGeneration[i]=batch[i].generation;
+        try{for(int i=0;i<n;i++){FlexyFrameMotion motion=batch[i];batch[i]=null;if(motion!=null&&motion.running&&!motion.disposed&&motion.generation==batchGeneration[i])motion.step(frameTimeNanos);}}
         finally{for(int i=0;i<n;i++)batch[i]=null;ticking=false;post();}
     }
     private void step(long frameTimeNanos){
