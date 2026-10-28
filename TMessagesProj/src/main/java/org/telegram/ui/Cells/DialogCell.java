@@ -2809,7 +2809,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                 || hasTags() || currentDialogFolderId != 0 && currentDialogFolderDialogsCount > 1);
         boolean prefixAvailable = !inlineSender || !TextUtils.isEmpty(messageString) && offsetName > 0 && offsetName <= messageString.length()
                 && thumbsCount == 0 && Layout.getDesiredWidth(messageString,0,offsetName,currentMessagePaint) < messageWidth * .35f;
-        float compactTextSize=12f*getResources().getDisplayMetrics().scaledDensity;
+        float compactTextSize=android.util.TypedValue.applyDimension(android.util.TypedValue.COMPLEX_UNIT_SP,12f,getResources().getDisplayMetrics());
         if (app.flexygram.home.SignatureSmartPreviews.mode() != app.flexygram.home.SignatureSmartPreviewPalette.OFF
                 && app.flexygram.home.SignaturePreviewContext.isMessageRow(isDialogCell,isTopic,isShareToStoryCell,
                     isDialogFolder(),isForumCell(),isFolderCell())
