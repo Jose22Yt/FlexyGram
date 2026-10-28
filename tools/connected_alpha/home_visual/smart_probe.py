@@ -34,11 +34,21 @@ public class SmartPreviewCellProbe extends View {
   pill.setSpan(new SignaturePreviewIcon(Math.max(1,kind)),0,1,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
   pill.append(text);pill.setSpan(new AbsoluteSizeSpan(Math.round(12*font)),1,pill.length(),Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
   CharSequence label=applyThumbs(pill);smartPreviewPrefixEnd=thumbs>0?1:0;smartPreviewClipRight=width-6;
-  label=TextUtils.ellipsize(label,paint,Math.max(20,width-90),TextUtils.TruncateAt.END);
+  label=TextUtils.ellipsize(label,paint,Math.max(20,width-90),kind==1?TextUtils.TruncateAt.MIDDLE:TextUtils.TruncateAt.END);
   messageLayout=StaticLayout.Builder.obtain(label,0,label.length(),paint,width-48)
    .setMaxLines(1).setIncludePad(false).setTextDirection(rtl?TextDirectionHeuristics.RTL:TextDirectionHeuristics.LTR).build();
   measure(MeasureSpec.makeMeasureSpec(width,MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(height,MeasureSpec.EXACTLY));layout(0,0,width,height);
  }
+ void bindInline(String sender,String text,boolean rtl,int width){
+  smartPreviewKind=4;LocaleController.isRTL=rtl;thumbsCount=0;smartPreviewClipRight=width-6;
+  TextPaint paint=new TextPaint(3);paint.setTextSize(15);paint.setColor(0xff253547);
+  SpannableStringBuilder value=new SpannableStringBuilder(sender);smartPreviewPrefixEnd=value.length();value.append("\ufffc");
+  value.setSpan(new SignaturePreviewIcon(4),smartPreviewPrefixEnd,smartPreviewPrefixEnd+1,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+  value.append(text);value.setSpan(new AbsoluteSizeSpan(12),smartPreviewPrefixEnd+1,value.length(),Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+  messageLayout=StaticLayout.Builder.obtain(value,0,value.length(),paint,width-48).setMaxLines(1).setIncludePad(false).setTextDirection(rtl?TextDirectionHeuristics.RTL:TextDirectionHeuristics.LTR).build();
+  measure(MeasureSpec.makeMeasureSpec(width,MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(72,MeasureSpec.EXACTLY));layout(0,0,width,72);
+ }
+ Bitmap renderBackground(){Bitmap b=Bitmap.createBitmap(getWidth(),getHeight(),Bitmap.Config.ARGB_8888);drawSmartPreviewBackground(new Canvas(b),26,1);return b;}
  Bitmap render(float alpha){Bitmap b=Bitmap.createBitmap(getWidth(),getHeight(),Bitmap.Config.ARGB_8888);Canvas c=new Canvas(b);drawSmartPreviewBackground(c,26,alpha);if(smartPreviewKind!=0&&SignatureSmartPreviews.mode()!=3){c.save();c.translate(messageLeft,26);messageLayout.getPaint().setColor(smartPreviewPalette.foreground());messageLayout.draw(c);c.restore();}return b;}
 }
 '''

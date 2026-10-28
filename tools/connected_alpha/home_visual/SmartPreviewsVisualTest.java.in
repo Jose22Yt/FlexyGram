@@ -50,6 +50,21 @@ public class SmartPreviewsVisualTest {
    int pixels=0;for(int y=0;y<24;y++)for(int x=0;x<32;x++)if(Color.alpha(b.getPixel(x,y))!=0){pixels++;assertTrue(x>=2&&x<=15);assertTrue(y>=4&&y<=20);}assertTrue("kind "+kind,pixels>2);
   }b.recycle();
  }
+ @Test public void longFileKeepsIconAndSuffixWhenSpaceAllows(){
+  SignatureSmartPreviews.value=0;SmartPreviewCellProbe v=new SmartPreviewCellProbe();v.bind("nagramxf_glass_bubbles_very_long_name.plugin",1,false,1,200,72,0);
+  CharSequence text=v.messageLayout.getText();assertTrue(text.toString().startsWith("\ufffc"));assertTrue(text.toString().contains("…"));assertTrue(text.toString().endsWith(".plugin"));
+  assertEquals(1,((Spanned)text).getSpans(0,text.length(),SignaturePreviewIcon.class).length);
+ }
+ @Test public void backgroundDoesNotCoverInlineSenderLtrOrRtl(){
+  for(boolean rtl:new boolean[]{false,true}){
+   SignatureSmartPreviews.value=0;SmartPreviewCellProbe v=new SmartPreviewCellProbe();v.bindInline(rtl?"أحمد: ":"Ana: ","example.org",rtl,320);
+   float a=v.messageLeft+v.messageLayout.getPrimaryHorizontal(0),b=v.messageLeft+v.messageLayout.getPrimaryHorizontal(v.smartPreviewPrefixEnd);
+   float e=v.messageLeft+v.messageLayout.getPrimaryHorizontal(v.messageLayout.getLineEnd(0));Bitmap image=v.renderBackground();
+   int sender=Math.round((a+b)/2),pill=Math.round((b+e)/2);assertTrue(sender>=0&&sender<320&&pill>=0&&pill<320);
+   assertEquals("sender must stay outside pill, rtl="+rtl,0,Color.alpha(image.getPixel(sender,30)));
+   assertTrue("eligible content has background, rtl="+rtl,Color.alpha(image.getPixel(pill,30))>0);image.recycle();
+  }
+ }
  @Test public void forumAccentUsesExistingOpacityAndKeepsFixtureTextLegible(){
   for(boolean dark:new boolean[]{false,true})for(int accent:new int[]{0xff3986dd,0xff3baf77,0xff9970ce})for(int mode=0;mode<4;mode++){
    SignatureSmartPreviews.value=mode;int overlay=SignatureTopicAccent.overlay(accent,dark);assertEquals(accent&0xffffff,overlay&0xffffff);assertEquals(dark?36:26,Color.alpha(overlay));
