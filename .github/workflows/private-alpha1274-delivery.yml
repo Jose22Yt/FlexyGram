@@ -2,7 +2,7 @@ name: Alpha 1281 integrated Signature and Motion private signed delivery
 
 on:
   push:
-    branches: [delivery/alpha1281-integrated-private]
+    branches: [delivery/alpha1281-micro-previews-private]
     paths:
       - '.github/workflows/private-alpha1274-delivery.yml'
       - 'tools/private_alpha1274/**'
@@ -135,7 +135,7 @@ jobs:
 
   private-destination:
     needs: credentials-present
-    if: needs.credentials-present.outputs.ready == 'true' && github.repository == 'Jose22Yt/FlexyGram' && github.ref == 'refs/heads/delivery/alpha1281-integrated-private'
+    if: needs.credentials-present.outputs.ready == 'true' && github.repository == 'Jose22Yt/FlexyGram' && github.ref == 'refs/heads/delivery/alpha1281-micro-previews-private'
     runs-on: ubuntu-24.04
     permissions:
       contents: write
