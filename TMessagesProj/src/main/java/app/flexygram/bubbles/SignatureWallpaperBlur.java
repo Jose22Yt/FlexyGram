@@ -71,7 +71,6 @@ public final class SignatureWallpaperBlur {
         final Key key;
         final ArrayList<WeakReference<Owner>> owners = new ArrayList<>();
         volatile boolean canceled;
-        volatile int outcome; // Diagnostic lifecycle stage only; no source/account identifiers.
         Bitmap bitmap;
         Runnable task;
         Entry(Key key) { this.key = key; }
@@ -117,28 +116,22 @@ public final class SignatureWallpaperBlur {
         entry.owners.add(new WeakReference<>(owner));
         if (created) {
             Entry pending = entry;
-            pending.outcome = 1;
             entry.task = () -> {
-                pending.outcome = 2;
                 Bitmap result = null;
                 Trace.beginSection("Flexy.blur.render");
                 try {
                     if (!pending.canceled && !source.isRecycled() && source.getGenerationId() == key.generation)
                         result = render(source, background, dim, pending);
-                    pending.outcome = result == null ? 3 : 4;
                 } catch (IllegalArgumentException | IllegalStateException | OutOfMemoryError unavailable) {
-                    pending.outcome = unavailable instanceof OutOfMemoryError ? 53 : unavailable instanceof IllegalArgumentException ? 51 : 52;
                     // Optional resource boundary only. No navigation/auth exceptions are intercepted.
                 } finally { Trace.endSection(); }
                 Bitmap prepared = result;
                 AndroidUtilities.runOnUIThread(() -> {
                     pending.task = null;
                     if (pending.canceled || entries.get(key) != pending || source.isRecycled() || source.getGenerationId() != key.generation) {
-                        pending.outcome = 6;
                         if (prepared != null) prepared.recycle();
                         return;
                     }
-                    if (prepared != null) pending.outcome = 7;
                     if (prepared != null) renders++;
                     pending.bitmap = prepared;
                     // Availability callbacks may detach/replace owners synchronously.
