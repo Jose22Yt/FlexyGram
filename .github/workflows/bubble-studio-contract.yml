@@ -22,5 +22,6 @@ jobs:
           javac -encoding UTF-8 -d /tmp/flexy-bubble-contracts \
             TMessagesProj/src/main/java/app/flexygram/bubbles/interaction/BubbleStickerSpec.java \
             TMessagesProj/src/main/java/app/flexygram/bubbles/interaction/BubbleTouchPolicy.java \
+            TMessagesProj/src/main/java/app/flexygram/bubbles/interaction/BubbleTapGestureState.java \
             tools/connected_alpha/bubble_studio/BubbleStudioContractTest.java
           java -cp /tmp/flexy-bubble-contracts BubbleStudioContractTest
