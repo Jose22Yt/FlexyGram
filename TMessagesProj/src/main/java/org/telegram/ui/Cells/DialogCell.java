@@ -2832,7 +2832,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                     pill.setSpan(new android.text.style.AbsoluteSizeSpan(Math.round(compactTextSize)),1,pill.length(),Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                     CharSequence withThumbs=applyThumbs(pill);
                     SpannableStringBuilder combined=new SpannableStringBuilder();
-                    if (inlineSender) combined.append(messageString,0,offsetName);
+                    if (inlineSender) { combined.append(messageString,0,offsetName); combined.append(" "); }
                     smartPreviewPrefixEnd=combined.length()+(thumbsCount>0?1:0);
                     combined.append(withThumbs);
                     smartPreviewKind=candidate;
@@ -2966,9 +2966,9 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                 currentMessagePaint = Theme.dialogs_messagePaint[paintIndex];
             } else if (smartPreviewKind != 0 || !useForceThreeLines && !SharedConfig.useThreeLinesLayout || hasTags() || messageNameString != null || ChatObject.isMonoForum(chat) && ChatObject.canManageMonoForum(currentAccount, chat)) {
                 if (!isForumCell() && messageString instanceof Spanned && ((Spanned) messageString).getSpans(0, messageString.length(), ThumbnailSpan.class).length <= 0) {
-                    messageStringFinal = TextUtils.ellipsize(messageString, currentMessagePaint, messageWidth - dp(12 + (thumbsCount * (thumbSize + 2) - 2) + 5), TextUtils.TruncateAt.END);
+                    messageStringFinal = TextUtils.ellipsize(messageString, currentMessagePaint, messageWidth - dp(12 + (thumbsCount * (thumbSize + 2) - 2) + 5), smartPreviewKind == app.flexygram.home.SignatureSmartPreviewPalette.FILE ? TextUtils.TruncateAt.MIDDLE : TextUtils.TruncateAt.END);
                 } else {
-                    messageStringFinal = TextUtils.ellipsize(messageString, currentMessagePaint, messageWidth - dp(12), TextUtils.TruncateAt.END);
+                    messageStringFinal = TextUtils.ellipsize(messageString, currentMessagePaint, messageWidth - dp(12), smartPreviewKind == app.flexygram.home.SignatureSmartPreviewPalette.FILE ? TextUtils.TruncateAt.MIDDLE : TextUtils.TruncateAt.END);
                 }
             } else {
                 messageStringFinal = messageString;
