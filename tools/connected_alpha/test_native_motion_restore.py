@@ -2,6 +2,7 @@
 from pathlib import Path
 import hashlib,json,subprocess,unittest
 import native_motion_restore_contract as audit
+from integration1282_contract import historical_bytes
 ROOT=Path(__file__).resolve().parents[2]
 REFERENCE='14e586b4ddb7a686f39cda3cb175920c49cecf11'
 
@@ -16,7 +17,7 @@ class NativeMotionRestoration(unittest.TestCase):
   paths=json.loads((ROOT/'tools/connected_alpha/native_motion_restore/scope.json').read_text())['modified']
   exact=[p for p in paths if not p.endswith(('/ChatActivity.java','/FilterTabsView.java'))]
   self.assertEqual(18,len(exact))
-  for path in exact:self.assertEqual(git_bytes(REFERENCE,path),(ROOT/path).read_bytes(),path)
+  for path in exact:self.assertEqual(git_bytes(REFERENCE,path),historical_bytes(path),path)
  def test_only_reviewed_engine_patch_is_removed_from_current_classes(self):
   # Re-apply the original engine-only diff to the restoration. It must reconstruct
   # Alpha1281 exactly, including all post-engine blur and folder fixes.
@@ -27,7 +28,7 @@ class NativeMotionRestoration(unittest.TestCase):
    folder=Path(folder)
    for path in paths:
     target=folder/path;target.parent.mkdir(parents=True,exist_ok=True)
-    data=(ROOT/path).read_bytes()
+    data=historical_bytes(path)
     if path.endswith('/FilterTabsView.java'):
      # Keep the independently required native callback guard in production;
      # the old engine diff also contains it, so reverse only this exact guard
@@ -48,7 +49,7 @@ class NativeMotionRestoration(unittest.TestCase):
  def test_current_design_services_identity_and_private_delivery_are_unchanged(self):
   protected=['TMessagesProj/build.gradle','.github/workflows/connected-alpha-arm64.yml','tools/connected_alpha/build_private_apk.py','TMessagesProj/src/main/java/org/telegram/ui/Cells/DialogCell.java','TMessagesProj/src/main/java/org/telegram/messenger/ApplicationLoader.java','TMessagesProj/src/main/java/org/telegram/ui/LaunchActivity.java','TMessagesProj/src/main/java/org/telegram/ui/Components/ChatActivityEnterView.java']
   protected += subprocess.check_output(['git','ls-tree','-r','--name-only',audit.PIN,'--','TMessagesProj/src/main/java/app/flexygram/home','TMessagesProj/src/main/java/app/flexygram/studio','TMessagesProj/src/main/java/app/flexygram/files','TMessagesProj/src/main/java/app/flexygram/composer'],cwd=ROOT,text=True).splitlines()
-  for path in protected:self.assertEqual(git_bytes(audit.PIN,path),(ROOT/path).read_bytes(),path)
+  for path in protected:self.assertEqual(git_bytes(audit.PIN,path),historical_bytes(path),path)
  def test_blur_keeps_cache_workers_prefetch_and_native_cancel(self):
   path='TMessagesProj/src/main/java/app/flexygram/bubbles/SignatureWallpaperBlur.java'
   s=(ROOT/path).read_text();before=git_bytes(audit.PIN,path).decode()

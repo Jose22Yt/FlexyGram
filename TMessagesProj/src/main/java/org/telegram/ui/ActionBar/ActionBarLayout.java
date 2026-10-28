@@ -9,6 +9,8 @@
 package org.telegram.ui.ActionBar;
 
 import app.exteraless.utils.AppUtils;
+import app.flexygram.navigation.NativeInstantTouchPolicy;
+import app.flexygram.navigation.NativeInstantTouchTarget;
 
 import static org.telegram.messenger.AndroidUtilities.dp;
 import static org.telegram.messenger.AndroidUtilities.dpf2;
@@ -4003,6 +4005,58 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         return Math.max(0, usableViewHeight - (rect.bottom - rect.top));
     }
 
+    /**
+     * Native-first input continuation. The first genuine DOWN is still delivered
+     * unmodified to the original RecyclerListView after closing Chat A.
+     * No synthetic events, new animations, profile, preference or second tap.
+     * Only a visible native dialog cell in an exposed part of the list qualifies.
+     */
+    private void nativeInstantTouchDown(MotionEvent ev) {
+        if (ev == null || ev.getActionMasked() != MotionEvent.ACTION_DOWN
+                || ev.getPointerCount() != 1 || fragmentsStack == null
+                || fragmentsStack.size() < 2 || containerView == null
+                || containerViewBack == null || !transitionAnimationInProgress
+                || onCloseAnimationEndRunnable == null || onOpenAnimationEndRunnable != null) {
+            return;
+        }
+        final BaseFragment outgoing = fragmentsStack.get(fragmentsStack.size() - 1);
+        final BaseFragment previous = fragmentsStack.get(fragmentsStack.size() - 2);
+        final boolean previousIsDialogList = previous instanceof org.telegram.ui.DialogsActivity
+                || previous instanceof MainTabsActivity
+                    && ((MainTabsActivity) previous).getCurrentVisibleFragment() instanceof org.telegram.ui.DialogsActivity;
+        final BaseFragment dialogFragment = previous instanceof MainTabsActivity
+                ? ((MainTabsActivity) previous).getCurrentVisibleFragment()
+                : previous;
+        final View dialogRoot = dialogFragment == null ? null : dialogFragment.fragmentView;
+        final float x = ev.getRawX(), y = ev.getRawY();
+        final boolean exposedDialogRow = previousIsDialogList
+                && NativeInstantTouchTarget.isVisibleDialogRow(dialogRoot, x, y);
+        final boolean outgoingCoversTouch = containerViewBack.isShown()
+                && containerViewBack.getAlpha() > .95f
+                && NativeInstantTouchTarget.containsVisiblePoint(containerViewBack, x, y);
+        final boolean previewOrPopup = inPreviewMode || transitionAnimationPreviewMode
+                || previewOpenAnimationInProgress || previewMenu != null
+                || storyViewerAttached();
+        final boolean sheetOrKeyboard = sheetFragment != null
+                || containerView.isKeyboardVisible || containerViewBack.isKeyboardVisible
+                || measureKeyboardHeight() > dp(40);
+        final boolean nativeGesture = startedTracking || animationInProgress
+                || predictiveBackInProgress || inActionMode;
+        final boolean nativeClosing = transitionAnimationInProgress
+                && onCloseAnimationEndRunnable != null && onOpenAnimationEndRunnable == null
+                && outgoing instanceof ChatActivity;
+        final boolean outsideTabs = ev.getY() >= 0
+                && ev.getY() < getHeight() - getBottomTabsHeight(true) - systemAndDisplayInsets.bottom;
+        if (NativeInstantTouchPolicy.canFinishNativeCloseForDown(
+                outsideTabs, attached && main && !isSheet && !isLayersLayout,
+                nativeClosing, previousIsDialogList, exposedDialogRow,
+                outgoingCoversTouch, previewOrPopup, sheetOrKeyboard, nativeGesture)) {
+            // Native cleanup owns fragment detach, listener release and stack changes.
+            // This is done *before* super.dispatchTouchEvent consumes the real DOWN.
+            onAnimationEndCheck(true);
+        }
+    }
+
     private boolean tabsEvents;
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
@@ -4031,6 +4085,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         if (ev.getAction() == MotionEvent.ACTION_UP || ev.getAction() == MotionEvent.ACTION_CANCEL) {
             tabsEvents = false;
         }
+        nativeInstantTouchDown(ev);
         return super.dispatchTouchEvent(ev);
     }
 

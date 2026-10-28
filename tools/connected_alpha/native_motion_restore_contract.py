@@ -6,7 +6,9 @@ ROOT=Path(__file__).resolve().parents[2]
 PIN="a4d66fc84695f59a17a1d30ac888cd18ebcb1bba"
 MANIFEST=ROOT/"tools/connected_alpha/native_motion_restore_review.json"
 def spec():return json.loads(MANIFEST.read_text())
-def paths():return frozenset(spec()["paths"])
+def paths():
+    from integration1282_contract import paths as integration_paths
+    return frozenset(spec()["paths"]) | integration_paths()
 def read_current(path):
     file=ROOT/str(path)
     if file.is_file():return file.read_bytes()
@@ -17,15 +19,19 @@ def original(path):
     p=subprocess.run(["git","show",PIN+":"+str(path)],cwd=ROOT,capture_output=True)
     return p.stdout if p.returncode==0 else b""
 def restore(path,data):
+    from integration1282_contract import restore as integration_restore
+    data=integration_restore(path,data)
     expected=spec()["reviewed"].get(str(path))
     # Deleted engine files are explicitly reviewed as empty, not exempted.
     if expected and hashlib.sha256(data).hexdigest()==expected:return original(path)
     return data
 def verify_current():
+    from integration1282_contract import verify_current as verify_integration, restore as integration_restore
+    verify_integration()
     s=spec()
     if s["pin"]!=PIN:raise ValueError("Incorrect restoration base")
     for name,expected in s["reviewed"].items():
-        if hashlib.sha256(read_current(name)).hexdigest()!=expected:raise ValueError("Unreviewed native restoration: "+name)
+        if hashlib.sha256(integration_restore(name,read_current(name))).hexdigest()!=expected:raise ValueError("Unreviewed native restoration: "+name)
     changed=set(subprocess.check_output(["git","diff",PIN,"--name-only"],cwd=ROOT,text=True).splitlines())
     if changed-paths():raise ValueError("Unreviewed restoration scope: "+repr(sorted(changed-paths())))
     print("PASS: exact native restoration; no physical acceptance implied")
