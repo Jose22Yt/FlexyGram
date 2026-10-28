@@ -37,7 +37,12 @@ public final class BubbleTapMotion {
         pressed = false;
         FlexyMotionSettings.State s = FlexyMotionSettings.state(owner.getContext());
         if (s.instant()) reset();
-        else scale.animateTo(1f); // continuous spring from current position/velocity
+        else {
+            // A very fast tap may arrive before the first timed press frame.
+            // Guarantee a visible small impulse without restarting an in-flight spring.
+            if (factor > .995f) scale.snapTo(Math.max(.94f, Math.min(.985f, s.pressedScale)));
+            scale.animateTo(1f); // continuous spring from current position/velocity
+        }
     }
     public void cancel() {
         pressed = false;
