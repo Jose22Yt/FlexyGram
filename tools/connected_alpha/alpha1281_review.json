@@ -1,0 +1,40 @@
+{
+  "base": "55e3a47917604624d6998f56abe08265585412fa",
+  "reviewed": {
+    ".github/workflows/connected-alpha-arm64.yml": "9fbfe5cbdeabc611a9ca36bc29b3faea92a3800a9712011cf7eaf522061db320",
+    ".github/workflows/pr.yml": "09b22369a7c91e2001caa759de99f805aac007fcca40beeb238dae62a344c733",
+    "TMessagesProj/build.gradle": "d66b379932c09df7ecb2b75f5aeb145f9ed14f67705b3af2d3a4b500ab4619ca",
+    "TMessagesProj/src/main/java/app/flexygram/home/SignaturePreviewContext.java": "51017105b816b79df241f6bb1c5bbf54df7f4e2e9d00d53e877e7329ce6ec998",
+    "TMessagesProj/src/main/java/app/flexygram/home/SignaturePreviewIcon.java": "0586dead69c54127259cc52df5d322ba2e9874ff387797971befb40ad4b534d1",
+    "TMessagesProj/src/main/java/app/flexygram/home/SignatureSmartPreviewPalette.java": "ab2187758dd117db6ec6c284dd319e0c99bc1aacf9b7313b020633928a383dfc",
+    "TMessagesProj/src/main/java/app/flexygram/home/SignatureTopicAccent.java": "e88e9609852dbf745e74bb56c4e64b834ac9077f99e6a610ffba250387dbcb43",
+    "TMessagesProj/src/main/java/org/telegram/ui/Cells/DialogCell.java": "f2ecc52e04e6faea4bfa229f10172ee5cc9f347782086a1b92d45ab377681742",
+    "tools/connected_alpha/alpha1280_contract.py": "2bebe992d68a0252144bd4a973bec3f9918e8d941c3d36f23021f9e673515f34",
+    "tools/connected_alpha/alpha1281_contract.py": "fb517b45077c604c13ea63bc2cead9839d158079dd17c02f135d8635d953ccb7",
+    "tools/connected_alpha/build_private_apk.py": "0bd240c9ec81442b4232d5c917122d84c81eed07744f8355a33bc57efd1500b8",
+    "tools/connected_alpha/home_visual/SmartPreviewsVisualTest.java.in": "5078b48ea807802dcef32947fe46ee40044140548aebdd19620307529611aa51",
+    "tools/connected_alpha/home_visual/smart_probe.py": "ea3d1057d87fe081850c2c99607ddace8aa72b775f8a4d276d8ca62e6e16d34c",
+    "tools/connected_alpha/test_alpha1280.py": "bafdd56d9e565bf0b908106293f26cd2794e03d1bf761d4be1d8be2b143429a2",
+    "tools/connected_alpha/test_alpha1281.py": "bdc04a059e87b37bc228d78391ca157740c8c54cd9c4bf2fdce4bcb883729042",
+    "tools/connected_alpha/test_smart_previews1279_hotfix.py": "adbf6bb21cd737b58524178afe7838f7961028913b67546e642d6562544132d4"
+  },
+  "paths": [
+    ".github/workflows/connected-alpha-arm64.yml",
+    ".github/workflows/pr.yml",
+    "TMessagesProj/build.gradle",
+    "TMessagesProj/src/main/java/app/flexygram/home/SignaturePreviewContext.java",
+    "TMessagesProj/src/main/java/app/flexygram/home/SignaturePreviewIcon.java",
+    "TMessagesProj/src/main/java/app/flexygram/home/SignatureSmartPreviewPalette.java",
+    "TMessagesProj/src/main/java/app/flexygram/home/SignatureTopicAccent.java",
+    "TMessagesProj/src/main/java/org/telegram/ui/Cells/DialogCell.java",
+    "tools/connected_alpha/alpha1280_contract.py",
+    "tools/connected_alpha/alpha1281_contract.py",
+    "tools/connected_alpha/alpha1281_review.json",
+    "tools/connected_alpha/build_private_apk.py",
+    "tools/connected_alpha/home_visual/SmartPreviewsVisualTest.java.in",
+    "tools/connected_alpha/home_visual/smart_probe.py",
+    "tools/connected_alpha/test_alpha1280.py",
+    "tools/connected_alpha/test_alpha1281.py",
+    "tools/connected_alpha/test_smart_previews1279_hotfix.py"
+  ]
+}

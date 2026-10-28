@@ -11,7 +11,8 @@ class Alpha1280(unittest.TestCase):
             self.assertEqual(raw,audit.restore(path,raw),path)
     def test_version_is_only_change_to_signing_and_build_gates(self):
         for path in ('TMessagesProj/build.gradle','.github/workflows/connected-alpha-arm64.yml','tools/connected_alpha/build_private_apk.py'):
-            before=audit.original(path);current=(ROOT/path).read_bytes()
+            from alpha1281_contract import restore
+            before=audit.original(path);current=restore(path,(ROOT/path).read_bytes())
             self.assertIn(b'1280',current)
             self.assertEqual(before,current.replace(b'1280',b'1279'),path)
     def test_previous_reviews_and_protocol_storage_files_unchanged(self):

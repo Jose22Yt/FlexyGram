@@ -87,6 +87,8 @@ jobs:
             build/connected-alpha-matte-visual/target/surefire-reports/*.xml
             build/connected-alpha-music-visual/android-music-isolated.png
             build/connected-alpha-music-visual/target/surefire-reports/*.xml
+            build/connected-alpha-home-visual/smart-preview-micro-synthetic.png
+            build/connected-alpha-home-visual/target/surefire-reports/*.xml
             build/connected-alpha-header-visual/signature-header*.png
             build/connected-alpha-header-visual/target/surefire-reports/*.xml
           retention-days: 7
