@@ -134,7 +134,9 @@ public final class SignatureWallpaperBlur {
                     }
                     if (prepared != null) renders++;
                     pending.bitmap = prepared;
-                    for (WeakReference<Owner> reference : pending.owners) {
+                    // Availability callbacks may detach/replace owners synchronously.
+                    // Snapshot only on publication, never in the draw/scroll loop.
+                    for (WeakReference<Owner> reference : new ArrayList<>(pending.owners)) {
                         Owner current = reference.get();
                         if (current != null && !current.closed && current.entry == pending) current.ready();
                     }

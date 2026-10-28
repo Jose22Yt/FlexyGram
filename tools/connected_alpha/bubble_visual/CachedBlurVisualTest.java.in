@@ -166,4 +166,20 @@ public class CachedBlurVisualTest {
   System.out.println("Alpha1279 measured lifecycle, same source/size/queue: 51 openings, 51 render jobs, 0 synchronous reopens; NOT a device benchmark");
  }
 
+ @Test public void availabilityCallbackCanCloseAllOwnersWithoutMutatingPublicationTraversal()throws Exception{
+  SignatureWallpaperBlur.Owner[] a={null},b={null};int[] callbacks={0};
+  a[0]=new SignatureWallpaperBlur.Owner(new View(ApplicationLoader.applicationContext),()->{callbacks[0]++;a[0].close();b[0].close();});owners.add(a[0]);
+  b[0]=owner(new View(ApplicationLoader.applicationContext));BitmapDrawable source=image(80,90,0);
+  a[0].prepare(source,false,1);b[0].prepare(source,false,1);complete();
+  assertEquals(1,callbacks[0]);assertFalse(a[0].isReady());assertFalse(b[0].isReady());
+  var warm=owner(new View(ApplicationLoader.applicationContext));warm.prepare(source,false,1);assertTrue(warm.isReady());assertEquals(0,Utilities.globalQueue.pending());
+  warm.close();SignatureWallpaperBlur.trimMemory(android.content.ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN);
+  var resumed=owner(new View(ApplicationLoader.applicationContext));resumed.prepare(source,false,1);assertTrue(resumed.isReady());
+ }
+ @Test public void distinctThemeSurfaceKeysAndCanceledColdRevealRemainSafe()throws Exception{
+  BitmapDrawable source=image(80,90,0);var a=owner(new View(ApplicationLoader.applicationContext));a.prepare(source,false,0xffeeeeee);complete();Bitmap light=cached(a);a.close();
+  var b=owner(new View(ApplicationLoader.applicationContext));b.prepare(source,false,0xff111111);assertFalse(b.isReady());complete();assertNotSame(light,cached(b));
+  var c=owner(new View(ApplicationLoader.applicationContext));c.prepare(source,true,0xff111111);assertFalse(c.isReady());assertFalse(c.isSupported());c.close();assertTrue(b.isReady());
+ }
+
 }
