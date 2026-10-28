@@ -2815,7 +2815,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
             senderEnd=messageNameString.length()+1;
         }
         boolean prefixAvailable = !inlineSender || !TextUtils.isEmpty(messageString) && senderEnd > 0 && senderEnd <= messageString.length()
-                && thumbsCount == 0 && Layout.getDesiredWidth(messageString,0,senderEnd,currentMessagePaint) < messageWidth * .35f;
+                && thumbsCount == 0;
         float compactTextSize=android.util.TypedValue.applyDimension(android.util.TypedValue.COMPLEX_UNIT_SP,12f,getResources().getDisplayMetrics());
         if (app.flexygram.home.SignatureSmartPreviews.mode() != app.flexygram.home.SignatureSmartPreviewPalette.OFF
                 && app.flexygram.home.SignaturePreviewContext.isMessageRow(isDialogCell,isTopic,isShareToStoryCell,
@@ -2828,7 +2828,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                 && app.flexygram.home.SignatureSmartPreviews.allowsSingleMessagePreview(groupMessages)
                 && (message.messageOwner.restriction_reason == null || message.messageOwner.restriction_reason.isEmpty())) {
             int candidate=app.flexygram.home.SignatureSmartPreviews.kind(message);
-            if (candidate != 0) {
+            if (candidate != 0 && (!inlineSender || Layout.getDesiredWidth(messageString,0,senderEnd,currentMessagePaint) < messageWidth * .35f)) {
                 String label=app.flexygram.home.SignatureSmartPreviews.lineLabel(message,candidate);
                 int iconEnd=label.indexOf("  ");
                 if (iconEnd >= 0) label=label.substring(iconEnd+2);
