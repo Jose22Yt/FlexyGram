@@ -150,7 +150,14 @@ public class CachedBlurVisualTest {
   app.flexygram.motion.FlexyMotionSettings.setReduceMotion(activity,false);
   var a=owner(view);BitmapDrawable source=image(100,200,0);
   a.prepare(source,false,1);Path path=new Path();path.addRect(0,0,100,200,Path.Direction.CW);Bitmap pixels=Bitmap.createBitmap(100,200,Bitmap.Config.ARGB_8888);Canvas canvas=new Canvas(pixels);
-  assertFalse(a.draw(canvas,path,0,0));complete();assertTrue(a.isReady());assertTrue(a.draw(canvas,path,0,0));assertEquals(0,Color.alpha(pixels.getPixel(40,40)));
+  assertTrue("blur enabled",BubbleConfig.backgroundBlur());
+  assertTrue("static source supported",a.isSupported());
+  assertFalse("cold draw must use fallback before worker",a.draw(canvas,path,0,0));
+  complete();
+  assertTrue("publication ready: "+java.util.Arrays.toString(SignatureWallpaperBlur.diagnostics()),a.isReady());
+  var mappingField=a.getClass().getDeclaredField("mapping");mappingField.setAccessible(true);
+  assertTrue("ready draw supported="+a.isSupported()+" mapping="+mappingField.get(a)+" generation="+source.getBitmap().getGenerationId()+" enabled="+BubbleConfig.backgroundBlur(),a.draw(canvas,path,0,0));
+  assertEquals("first cold reveal stays transparent",0,Color.alpha(pixels.getPixel(40,40)));
   org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(java.time.Duration.ofMillis(64));pixels.eraseColor(Color.TRANSPARENT);assertTrue(a.draw(canvas,path,0,0));int alpha=Color.alpha(pixels.getPixel(40,40));assertTrue("controlled reveal "+alpha,alpha>0&&alpha<255);
   org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(java.time.Duration.ofMillis(200));pixels.eraseColor(Color.TRANSPARENT);a.draw(canvas,path,0,0);assertEquals(255,Color.alpha(pixels.getPixel(40,40)));
   a.close();assertEquals(0,app.flexygram.motion.FlexyFrameMotion.activeCount());controller.pause().stop().destroy();
