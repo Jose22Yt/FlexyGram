@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyBubbleMatteEnabled">Матовое покрытие пузырей</string>
+    <string name="FlexyBubbleMatteStrength">Интенсивность матового эффекта</string>
+</resources>
