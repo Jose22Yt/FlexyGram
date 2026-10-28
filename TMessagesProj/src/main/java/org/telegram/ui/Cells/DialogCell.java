@@ -596,6 +596,8 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
     // Signature Smart Previews: one cached content type per updated dialog row.
     // The original message layout, row geometry and Telegram click targets remain.
     private int smartPreviewKind;
+    private int smartPreviewPrefixEnd;
+    private int smartPreviewClipLeft, smartPreviewClipRight;
     private int smartPreviewModeLastBuilt=-1;
     private final app.flexygram.home.SignatureSmartPreviewPalette smartPreviewPalette =
             new app.flexygram.home.SignatureSmartPreviewPalette();
@@ -614,24 +616,26 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
         // than assuming the first glyph starts at messageLeft.
         boolean rtl=LocaleController.isRTL;
         boolean voice=smartPreviewKind==app.flexygram.home.SignatureSmartPreviewPalette.VOICE;
-        float lineLeft=messageLeft+messageLayout.getLineLeft(0);
-        float lineRight=messageLeft+messageLayout.getLineRight(0);
-        float left=Math.max(dp(6),lineLeft-dp(rtl&&voice?36:6));
-        float right=Math.min(getMeasuredWidth()-dp(6),lineRight+dp(!rtl&&voice?36:9));
+        int start=Math.min(smartPreviewPrefixEnd,messageLayout.getLineEnd(0));
+        float x1=messageLeft+messageLayout.getPrimaryHorizontal(start);
+        float x2=messageLeft+messageLayout.getPrimaryHorizontal(messageLayout.getLineEnd(0));
+        float lineLeft=Math.min(x1,x2), lineRight=Math.max(x1,x2);
+        float left=Math.max(smartPreviewClipLeft,lineLeft-dp(rtl&&voice?19:5));
+        float right=Math.min(smartPreviewClipRight,lineRight+dp(!rtl&&voice?19:5));
         if (right-left < dp(16))return; // Narrow/recycled rows remain native.
-        float height=Math.min(getMeasuredHeight()-top-dp(2),Math.max(dp(18),messageLayout.getLineBottom(0)+dp(3)));
+        float height=Math.min(getMeasuredHeight()-top,Math.max(dp(20),messageLayout.getLineBottom(0)+dp(2)));
         if(height<=0f)return;
-        float bottom=top+height;
-        canvas.drawRoundRect(left,top-dp(2),right,bottom,dp(12),dp(12),smartPreviewPaint);
+        float bottom=top+height-dp(2);
+        canvas.drawRoundRect(left,top-dp(2),right,bottom,dp(10),dp(10),smartPreviewPaint);
         if(voice){
             smartPreviewPaint.setColor(smartPreviewPalette.foreground());
             smartPreviewPaint.setAlpha(Math.round(255f*Math.max(0f,Math.min(1f,alpha))));
-            float waveX=rtl?left+dp(8):lineRight+dp(12);
+            float waveX=rtl?left+dp(3):lineRight+dp(4);
             float cy=(bottom+top-dp(2))*.5f;
-            float barWidth=dp(2f);
+            float barWidth=dp(1f);
             for(int i=0;i<SMART_VOICE_BARS.length;i++){
-                float h=dp(SMART_VOICE_BARS[i]);
-                float x=waveX+dp(3.5f)*i;
+                float h=dp(SMART_VOICE_BARS[i]*.65f);
+                float x=waveX+dp(2f)*i;
                 if (x+barWidth>right-dp(4))break;
                 canvas.drawRoundRect(x,cy-h*.5f,x+barWidth,cy+h*.5f,barWidth*.5f,barWidth*.5f,smartPreviewPaint);
             }
@@ -2797,36 +2801,45 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
             }
         }
 
-        // Replace only uncaptioned, ordinary last-message snippets. No media
-        // downloads, no re-layout of rows and no alteration of native chat text.
+        // A real conversation/topic with a last message can appear in any
+        // filter or the archive. Special rows and multi-topic summaries remain native.
         smartPreviewKind=0;
+        smartPreviewPrefixEnd=0;
+        boolean inlineSender = messageNameString != null && (!(useForceThreeLines || SharedConfig.useThreeLinesLayout)
+                || hasTags() || currentDialogFolderId != 0 && currentDialogFolderDialogsCount > 1);
+        boolean prefixAvailable = !inlineSender || !TextUtils.isEmpty(messageString) && offsetName > 0 && offsetName <= messageString.length()
+                && thumbsCount == 0 && Layout.getDesiredWidth(messageString,0,offsetName,currentMessagePaint) < messageWidth * .35f;
+        float compactTextSize=12f*getResources().getDisplayMetrics().scaledDensity;
         if (app.flexygram.home.SignatureSmartPreviews.mode() != app.flexygram.home.SignatureSmartPreviewPalette.OFF
-                // Keep this identical to DialogsActivity's real main-list
-                // modes (default and both primary folder filters). Do not
-                // reference nonexistent DIALOGS_TYPE_FOLDER1/FOLDER2 constants.
-                && (dialogsType == DialogsActivity.DIALOGS_TYPE_DEFAULT
-                    || dialogsType == 7 || dialogsType == 8)
-                && currentDialogFolderId == 0 && currentDialogCommunityId == 0
-                && message != null && draftMessage == null && !draftVoice
-                && TextUtils.isEmpty(printingString) && customDialog == null
-                && !isForumCell() && !isFolderCell() && !hasTags()
-                // dialogMessage.get(dialog.id) usually returns a list with
-                // ONE latest message even in ordinary private dialogs. The
-                // former groupMessages == null gate therefore disabled Smart
-                // Previews on the actual home chat list. Preserve multi-item
-                // album/group previews instead of replacing their captions.
+                && app.flexygram.home.SignaturePreviewContext.isMessageRow(isDialogCell,isTopic,isShareToStoryCell,
+                    isDialogFolder(),isForumCell(),isFolderCell())
+                && message != null && message.messageOwner != null && draftMessage == null && !draftVoice
+                && TextUtils.isEmpty(printingString) && TextUtils.isEmpty(customMessage) && customDialog == null
+                && prefixAvailable && messageWidth >= dp(68)
+                // Keep the existing row height at large accessibility scales.
+                && compactTextSize <= dp(17)
                 && app.flexygram.home.SignatureSmartPreviews.allowsSingleMessagePreview(groupMessages)
-                // Sender names are on a separate native row in three-line
-                // group layouts. Two-line inline-sender previews stay native.
-                && (messageNameString == null || useForceThreeLines || SharedConfig.useThreeLinesLayout)
-                && !isTopic && (message.messageOwner.restriction_reason == null
-                     || message.messageOwner.restriction_reason.isEmpty())) {
+                && (message.messageOwner.restriction_reason == null || message.messageOwner.restriction_reason.isEmpty())) {
             int candidate=app.flexygram.home.SignatureSmartPreviews.kind(message);
             if (candidate != 0) {
                 String label=app.flexygram.home.SignatureSmartPreviews.lineLabel(message,candidate);
+                int iconEnd=label.indexOf("  ");
+                if (iconEnd >= 0) label=label.substring(iconEnd+2);
                 if (!TextUtils.isEmpty(label)) {
+                    SpannableStringBuilder pill=new SpannableStringBuilder("\ufffc");
+                    pill.setSpan(new app.flexygram.home.SignaturePreviewIcon(candidate),0,1,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    pill.append(label);
+                    pill.setSpan(new android.text.style.AbsoluteSizeSpan(Math.round(compactTextSize)),1,pill.length(),Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    CharSequence withThumbs=applyThumbs(pill);
+                    SpannableStringBuilder combined=new SpannableStringBuilder();
+                    if (inlineSender) combined.append(messageString,0,offsetName);
+                    smartPreviewPrefixEnd=combined.length()+(thumbsCount>0?1:0);
+                    combined.append(withThumbs);
                     smartPreviewKind=candidate;
-                    messageString=applyThumbs(label);
+                    smartPreviewClipLeft=Math.max(dp(6),messageLeft);
+                    smartPreviewClipRight=Math.min(getMeasuredWidth()-dp(6),messageLeft+messageWidth);
+                    messageLeft+=dp(5);messageWidth-=dp(10);
+                    messageString=combined;
                     checkMessage=false;
                 }
             }
@@ -2933,8 +2946,10 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
             CharSequence messageStringFinal;
             if (smartPreviewKind != 0) {
                 // A one-line capsule, clipped by the same native message width.
+                int reserve=smartPreviewKind==app.flexygram.home.SignatureSmartPreviewPalette.VOICE?dp(24):dp(10);
                 messageString=TextUtils.ellipsize(messageString,currentMessagePaint,
-                        Math.max(dp(20),Math.min(dp(224),messageWidth-dp(20))),TextUtils.TruncateAt.END);
+                        Math.max(dp(20),messageWidth-reserve),
+                        smartPreviewKind==app.flexygram.home.SignatureSmartPreviewPalette.FILE ? TextUtils.TruncateAt.MIDDLE : TextUtils.TruncateAt.END);
             }
             // Removing links and bold spans to get rid of underlining and boldness
             if (messageString instanceof Spannable) {
@@ -4615,7 +4630,9 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                 }
 
                 if (lastTopicMessageUnread && topMessageTopicEndIndex != topMessageTopicStartIndex && (dialogsType == DialogsActivity.DIALOGS_TYPE_DEFAULT || dialogsType == DialogsActivity.DIALOGS_TYPE_FOLDER1 || dialogsType == DialogsActivity.DIALOGS_TYPE_FOLDER2)) {
-                    canvasButton.setColor(ColorUtils.setAlphaComponent(currentMessagePaint.getColor(), Theme.isCurrentThemeDark() ? 36 : 26));
+                    int topicSurfaceColor = org.telegram.messenger.BuildConfig.CONNECTED_ALPHA
+                            ? Theme.getColor(Theme.key_actionBarTabLine, resourcesProvider) : currentMessagePaint.getColor();
+                    canvasButton.setColor(ColorUtils.setAlphaComponent(topicSurfaceColor, Theme.isCurrentThemeDark() ? 36 : 26));
                     if (!buttonCreated) {
                         canvasButton.rewind();
                         if (topMessageTopicEndIndex != topMessageTopicStartIndex && topMessageTopicEndIndex > 0) {
