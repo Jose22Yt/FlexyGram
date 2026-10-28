@@ -65,6 +65,10 @@ def main() -> None:
     for hook, count in hooks:
         assert reconstructed.count(hook) == count, "Unexpected coordinator hook scope"
         reconstructed = reconstructed.replace(hook, "")
+    spring_end = "                final long endingGeneration = instantNavigation == null ? 0 : instantNavigation.generation();\n"
+    spring_reset = "                if (instantNavigation == null || instantNavigation.isCurrent(endingGeneration)) setInnerTranslationX(0);"
+    assert reconstructed.count(spring_end) == 1 and reconstructed.count(spring_reset) == 1, "Unexpected spring completion scope"
+    reconstructed = reconstructed.replace(spring_end, "").replace(spring_reset, "                setInnerTranslationX(0);")
     data = reconstructed.encode("utf-8")
     blob_sha = hashlib.sha1(b"blob " + str(len(data)).encode() + b"\0" + data).hexdigest()
     assert blob_sha == BASE_GIT_BLOB, (

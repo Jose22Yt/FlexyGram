@@ -2553,8 +2553,9 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
                 containerView.setScaleY(1f);
                 containerViewBack.setScaleX(1f);
                 containerViewBack.setScaleY(1f);
+                final long endingGeneration = instantNavigation == null ? 0 : instantNavigation.generation();
                 onAnimationEndCheck(false);
-                setInnerTranslationX(0);
+                if (instantNavigation == null || instantNavigation.isCurrent(endingGeneration)) setInnerTranslationX(0);
             });
             currentSpringAnimation.start();
             return;

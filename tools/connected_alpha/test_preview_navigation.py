@@ -18,6 +18,9 @@ def method(source,anchor):
 def fixture(source):
  bodies=[method(source,x) for x in ['public boolean checkTransitionAnimation()', 'public void finishPreviewFragment()', 'public void onBackPressed()', 'private void onCloseAnimationEnd()', 'private void onOpenAnimationEnd()', 'private void onAnimationEndCheck(boolean byCheck)']]
  if 'private void reportInstantNavigation(' in source:bodies+=[method(source,'private void reportInstantNavigation('),method(source,'private boolean isObsoleteInstantCompletion(')]
+ if 'private boolean isObsoleteInstantCompletion(' in source:
+  a=source.index('            currentSpringAnimation.addEndListener(',source.index('    private void startLayoutAnimation('));b=source.index('            currentSpringAnimation.start();',a)
+  bodies+=['void installNativeSpringCallback(){'+source[a:b]+'}']
  if 'private boolean finishClosingPreview()' in source:bodies+=[method(source,'private boolean finishClosingPreview()')]
  a=source.index('public void closeLastFragment(boolean animated, boolean forceNoAnimation)');b=source.index('        if (parentActivity.getCurrentFocus()',a)
  bodies+=[source[a:b]+' beginClose(getLastFragment()); }']
@@ -26,7 +29,7 @@ def fixture(source):
  static class ChatActivity extends BaseFragment {long getDialogId(){return 42;}}
  static class BaseFragment {boolean closeLastFragment(){return false;}boolean onBackPressed(boolean p){return true;}}
  static class Container {float x;void setAlpha(float f){}void setScaleX(float f){}void setScaleY(float f){}void setTranslationX(float f){x=f;}void setTranslationY(float f){}}
- static class Animator{boolean cancelled;Runnable callback;void removeAllListeners(){callback=null;}void cancel(){if(cancelled)return;cancelled=true;if(callback!=null)callback.run();}} static class AnimatorSet extends Animator{} static class SpringAnimation{boolean cancelled;void cancel(){cancelled=true;}}
+ static class Animator{boolean cancelled;Runnable callback;void removeAllListeners(){callback=null;}void cancel(){if(cancelled)return;cancelled=true;if(callback!=null)callback.run();}} static class AnimatorSet extends Animator{} static class SpringAnimation{interface End{void onEnd(SpringAnimation a,boolean c,float v,float speed);}boolean cancelled;End listener;void addEndListener(End l){listener=l;}void finish(){listener.onEnd(this,false,1,0);}void cancel(){if(cancelled)return;cancelled=true;if(listener!=null)listener.onEnd(this,true,0,0);}}
  static class AndroidUtilities{static void cancelRunOnUIThread(Runnable r){}}
  static class GroupCallPip{static boolean onBackPressed(){return false;}}
  static class Bar {boolean isActionModeShowed(){return false;}boolean isSearchFieldVisible;void closeSearchField(){}}
@@ -36,6 +39,7 @@ def fixture(source):
  long transitionAnimationStartTime;Object layoutToIgnore,springRouteBackgroundDrawable,previewMenu;float springRouteYRatio;boolean USE_ACTIONBAR_CROSSFADE;
  Container containerView=new Container(),containerViewBack=new Container();Animator currentAnimation;SpringAnimation currentSpringAnimation;
  Runnable onCloseAnimationEndRunnable,onOpenAnimationEndRunnable,waitingForKeyboardCloseRunnable,animationRunnable,delayedOpenAnimationRunnable;
+ float inner;void setInnerTranslationX(float value){inner=value;}
  void setAlpha(float f){}void invalidateActionBars(){}void checkNeedRebuild(){}boolean storyViewerAttached(){return false;}
  BaseFragment getLastFragment(){return fragmentsStack.isEmpty()?null:fragmentsStack.get(fragmentsStack.size()-1);}
  void closeLastFragment(boolean animated){closeLastFragment(animated,false);}
@@ -78,7 +82,7 @@ class InstantCompletionOwnership(unittest.TestCase):
     new FlexyInstantNavigationCoordinator.Intent(FlexyInstantNavigationCoordinator.Kind.OPEN_CHAT,123,null),false);
    p.transitionAnimationInProgress=true;
    p.currentAnimation=new AnimatorSet();p.currentSpringAnimation=new SpringAnimation();
-   p.animationRunnable=()->{};p.containerView.x=123;
+   p.animationRunnable=()->{};p.containerView.x=123;p.inner=123;
   }
   static PreviewRegression ownership(boolean opening,boolean nestedCancel){
    PreviewRegression p=create();p.instantNavigation=new FlexyInstantNavigationCoordinator();
@@ -100,6 +104,8 @@ class InstantCompletionOwnership(unittest.TestCase):
     check(oldSpring.cancelled);check(p.containerView.x==123);
     check(p.instantNavigation.state()==FlexyInstantNavigationCoordinator.State.OPENING);
    }
+   PreviewRegression spring=ownership(false,false);spring.installNativeSpringCallback();spring.currentSpringAnimation.finish();
+   check(spring.inner==123);check(spring.currentAnimation!=null&&!spring.currentAnimation.cancelled);
   }
   """
   code=code.replace(' public static void main(String[]args)',extras+' public static void main(String[]args)').replace('boolean original=args.length>0;','boolean original=args.length>0;verifyOwnership();')
@@ -113,3 +119,6 @@ class InstantCompletionOwnership(unittest.TestCase):
   guard=method(source,'private boolean isObsoleteInstantCompletion(')
   mutant=source.replace(guard,guard[:guard.index('{')]+'{return false;}')
   self.run_fixture(mutant,False)
+  tail="                if (instantNavigation == null || instantNavigation.isCurrent(endingGeneration)) setInnerTranslationX(0);"
+  self.assertIn(tail,source)
+  self.run_fixture(source.replace(tail,"                setInnerTranslationX(0);"),False)

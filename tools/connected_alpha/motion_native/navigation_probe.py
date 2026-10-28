@@ -24,7 +24,7 @@ public class NavigationMotionProbe extends FrameLayout {
  final FrameLayout containerView,containerViewBack;final View previewMenu;final ColorDrawable previewBackgroundDrawable=new ColorDrawable();
  static final float SPRING_MULTIPLIER=1000;float animationProgress,swipeProgress,inner;boolean USE_ACTIONBAR_CROSSFADE=true;long transitionAnimationStartTime;Object springRouteBackgroundDrawable;
  final android.view.animation.OvershootInterpolator overshootInterpolator=new android.view.animation.OvershootInterpolator();final android.view.animation.DecelerateInterpolator decelerateInterpolator=new android.view.animation.DecelerateInterpolator();
- SpringAnimation currentSpringAnimation;public int completions;public boolean lastCancelled;
+ org.telegram.ui.ActionBar.FlexyInstantNavigationCoordinator instantNavigation;SpringAnimation currentSpringAnimation;public int completions;public boolean lastCancelled;
  static class BaseFragment {interface AttachedSheet{boolean attachedToParent();int getNavigationBarColor(int color);}}
  static class Fragment {public java.util.ArrayList<BaseFragment.AttachedSheet> sheetsStack;int updates,color=0xff333333;float progress;void onTransitionAnimationProgress(boolean opening,float v){updates++;progress=v;}Integer getNavigationBarColor(){return color;}void setNavigationBarColor(int v){color=v;}boolean isSupportEdgeToEdge(){return false;}}
  Fragment newFragment=new Fragment(),oldFragment=new Fragment(),sheetFragment;
