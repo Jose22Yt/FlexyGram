@@ -87,7 +87,8 @@ class InstantNavigation1279Regression(unittest.TestCase):
         self.assertNotEqual(source,restored)
         self.assertEqual(restored+'// unknown',scope.restore(NAV,source+'// unknown'))
         for old,new in [('&& !revealOpen','&& revealOpen'),
-                        ('setInstantRevealTranslationX(containerView,','containerView.setTranslationX(')]:
+                        ('setInstantRevealTranslationX(containerView,','containerView.setTranslationX('),
+                        ('!instantNavigation.isCurrent(fallbackGeneration)','instantNavigation.isCurrent(fallbackGeneration)')]:
             mutant=source.replace(old,new,1)
             self.assertNotEqual(source,mutant)
             with self.assertRaises(AssertionError):scope.restore(NAV,mutant)

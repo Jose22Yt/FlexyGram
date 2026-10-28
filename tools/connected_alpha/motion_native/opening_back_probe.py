@@ -19,7 +19,7 @@ def write(put,root):
  code=code.replace('static class AndroidUtilities{','static class AndroidUtilities{static int dp(float v){return (int)v;}static float lerp(float a,float b,float t){return a+(b-a)*t;}')
  code=code.replace('Dialog dialog;boolean sheet,allowBack=true;','Runnable onProgress;int updates;float progress;void onTransitionAnimationProgress(boolean open,float v){updates++;progress=v;if(onProgress!=null)onProgress.run();}Integer getNavigationBarColor(){return 0xff333333;}void setNavigationBarColor(int c){}Dialog dialog;boolean sheet,allowBack=true;')
  start=s.index('    private void startLayoutAnimation(')
- a=s.index('            currentSpringAnimation = createInstantLayoutSpring(',start)
+ a=s.index('            final boolean springRevealContainerWidth =',start)
  b=s.index('            currentSpringAnimation.start();',a)
  spring=s[a:b]+'currentSpringAnimation.start();'
  code=code.replace(method(code,'void beginClose('),'''void beginClose(BaseFragment target){closeRequests++;transitionAnimationStartTime=System.currentTimeMillis();transitionAnimationInProgress=true;layoutToIgnore=containerView;Container temp=containerView;containerView=containerViewBack;containerViewBack=temp;newFragment=fragmentsStack.get(0);oldFragment=target;onCloseAnimationEndRunnable=()->{fragmentsStack.remove(target);inPreviewMode=false;previewMenu=null;};startNativeSpring(false,false);}''')
@@ -29,6 +29,6 @@ def write(put,root):
  public Runnable afterOpen;
  public OpeningBackProbe(android.content.Context c){super(c);containerView=new Container(c);containerViewBack=new Container(c);addView(containerViewBack,new android.widget.FrameLayout.LayoutParams(300,600));addView(containerView,new android.widget.FrameLayout.LayoutParams(300,600));fragmentsStack.add(new BaseFragment());fragmentsStack.add(new ChatActivity());}
  public void startOpening(boolean timed){USE_SPRING_ANIMATION=!timed;USE_ACTIONBAR_CROSSFADE=true;transitionAnimationInProgress=true;transitionAnimationStartTime=System.currentTimeMillis();newFragment=getLastFragment();oldFragment=fragmentsStack.get(0);onOpenAnimationEndRunnable=()->{if(afterOpen!=null)afterOpen.run();};containerView.setTranslationX(getWidth());containerView.setScaleX(.85f);containerView.setScaleY(.85f);if(timed){currentSpringAnimation=new SpringAnimation(this,new FloatValueHolder(0)).setSpring(new SpringForce(1000)).setDuration(2000);currentSpringAnimation.start();}else startNativeSpring(true,false);}
- '''+method(s,'    private SpringAnimation createInstantLayoutSpring(')+'\n'+'void startNativeSpring(boolean open,boolean preview){'+spring+'}')
+ '''+method(s,'    private boolean hasInstantRevealOpeningSeed(')+'\n'+method(s,'    private SpringAnimation createInstantLayoutSpring(')+'\n'+'void startNativeSpring(boolean open,boolean preview){'+spring+'}')
  code=code[:code.rfind('}')]+'void setInstantRevealTranslationX(android.view.View surface,float x){surface.setTranslationX(x);}' +code[code.rfind('}'):]
  put('OpeningBackProbe.java',code)

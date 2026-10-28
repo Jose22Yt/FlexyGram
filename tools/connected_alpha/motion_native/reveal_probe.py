@@ -17,14 +17,14 @@ def write(put,root):
  a=source.index('    // A real exposed-list touch');b=source.index('    private void clearInstantBackSeed()',a)
  reveal=source[a:b]
  # Seed primitives/method are already copied by the existing native probe fixture.
- seed_a=reveal.index('    private boolean instantRevealSeed;');seed_b=reveal.index('    private void clearInstantRevealTouch(',seed_a)
+ seed_a=reveal.index('    private boolean instantRevealSeed, instantRevealContainerWidth;');seed_b=reveal.index('    private void clearInstantRevealTouch(',seed_a)
  reveal=reveal[:seed_a]+reveal[seed_b:]
  reveal=re.sub(r'\bViewGroup\b','android.view.ViewGroup',reveal)
  reveal=re.sub(r'\bView\b','android.view.View',reveal)
  code=code.replace('import java.util.*;', 'import java.util.*;import android.view.MotionEvent;import org.telegram.ui.ActionBar.FlexyNavigationHandoffPolicy;')
  # Existing constructor's two containers are real; the home is a deterministic non-private row.
  code=code.replace('fragmentsStack.add(new BaseFragment());','fragmentsStack.add(new MainTabsActivity());',1)
- code=code.replace('static class ChatActivity extends BaseFragment', 'static class MainTabsActivity extends BaseFragment{}static class DialogsActivity extends BaseFragment{}static class ChatActivity extends BaseFragment')
+ code=code.replace('static class ChatActivity extends BaseFragment', 'static class TopicsFragment extends BaseFragment{}static class MainTabsActivity extends BaseFragment{}static class DialogsActivity extends BaseFragment{}static class ChatActivity extends BaseFragment')
  code=code.replace('static class BaseFragment {', 'static class BaseFragment {int creates,destroys;boolean createAllowed=true,deferred;Runnable onCreate;boolean onFragmentCreate(){creates++;if(onCreate!=null)onCreate.run();return createAllowed;}void onFragmentDestroy(){destroys++;}AttachedSheet getLastSheet(){return null;}')
  code=code.replace('interface AttachedSheet{','interface AttachedSheet{default android.view.View getWindowView(){return null;}')
  code=code.replace('public RevealProbe(android.content.Context c){super(c);','public RevealProbe(android.content.Context c){super(c);')
@@ -50,14 +50,14 @@ def write(put,root):
  void beginOrdinaryClose(){beginClose(getLastFragment());}
 '''
  # Exact native admission through report/try ownership; subsequent view/stack creation is explicitly doubled.
- a=source.index('    private boolean presentNativeRevealFragment(NavigationParams params)');b=source.index('        final EdgeToEdgeSupportMode',a)
+ a=source.index('    private boolean presentNativeRevealFragment(');b=source.index('        final EdgeToEdgeSupportMode',a)
  admission=source[a:b].replace('ActionBarPopupWindow.ActionBarPopupWindowLayout menu','Object menu')
  body+=admission+'''
         opens++;BaseFragment home=getLastFragment();fragmentsStack.add(fragment);oldFragment=home;newFragment=fragment;
         Container previous=containerView;containerView=containerViewBack;containerViewBack=previous;
         containerView.setVisibility(android.view.View.VISIBLE);containerViewBack.setVisibility(android.view.View.VISIBLE);containerView.setTranslationX(getWidth()-getPaddingLeft()-getPaddingRight());containerView.setScaleX(.85f);containerView.setScaleY(.85f);containerViewBack.setTranslationX(0);containerView.removeAllViews();containerView.addView(new android.view.View(getContext()),new android.widget.FrameLayout.LayoutParams(300,600));containerView.setBackgroundColor(0xff3344cc);bringChildToFront(containerView);
         transitionAnimationInProgress=true;transitionAnimationStartTime=System.currentTimeMillis();onOpenAnimationEndRunnable=()->{};
-        if(!fragment.deferred) startNativeSpring(true,false);
+        if(forceWithoutAnimation)onAnimationEndCheck(false);else if(!fragment.deferred) startNativeSpring(true,false);
         return true;
     }
 '''

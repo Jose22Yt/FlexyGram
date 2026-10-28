@@ -23,7 +23,7 @@ def write(put,root,source):
  start=s.index('    private void startLayoutAnimation(')
  a=s.index('            currentSpringAnimation.addUpdateListener(',start)
  b=s.index('            currentSpringAnimation.start();',a)
- spring='final long springGeneration = instantNavigation == null ? 0 : instantNavigation.generation();'+s[a:b]
+ spring='final boolean springRevealContainerWidth=false;final long springGeneration = instantNavigation == null ? 0 : instantNavigation.generation();'+s[a:b]
  put('NavigationMotionProbe.java','''import android.animation.*;import java.util.ArrayList;import android.view.*;import android.widget.*;import android.graphics.drawable.*;import androidx.core.graphics.ColorUtils;import androidx.core.math.MathUtils;
 import androidx.dynamicanimation.animation.FloatValueHolder;import androidx.dynamicanimation.animation.SpringForce;import app.flexygram.motion.SpringAnimation;import org.telegram.ui.Components.CubicBezierInterpolator;import org.telegram.ui.ActionBar.Theme;import org.telegram.messenger.AndroidUtilities;
 public class NavigationMotionProbe extends FrameLayout {
