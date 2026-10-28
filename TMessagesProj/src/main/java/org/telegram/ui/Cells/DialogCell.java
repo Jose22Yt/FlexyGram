@@ -4632,7 +4632,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                 if (lastTopicMessageUnread && topMessageTopicEndIndex != topMessageTopicStartIndex && (dialogsType == DialogsActivity.DIALOGS_TYPE_DEFAULT || dialogsType == DialogsActivity.DIALOGS_TYPE_FOLDER1 || dialogsType == DialogsActivity.DIALOGS_TYPE_FOLDER2)) {
                     int topicSurfaceColor = org.telegram.messenger.BuildConfig.CONNECTED_ALPHA
                             ? Theme.getColor(Theme.key_actionBarTabLine, resourcesProvider) : currentMessagePaint.getColor();
-                    canvasButton.setColor(ColorUtils.setAlphaComponent(topicSurfaceColor, Theme.isCurrentThemeDark() ? 36 : 26));
+                    canvasButton.setColor(app.flexygram.home.SignatureTopicAccent.overlay(topicSurfaceColor, Theme.isCurrentThemeDark()));
                     if (!buttonCreated) {
                         canvasButton.rewind();
                         if (topMessageTopicEndIndex != topMessageTopicStartIndex && topMessageTopicEndIndex > 0) {
