@@ -661,13 +661,24 @@ public class MessageDrawable extends Drawable {
             // Stable theme color, independent of wallpaper/blur availability and animation phase.
             // Instance paints and the native geometry cache are reused for every draw.
             int color = signatureColor();
+            final boolean matte = app.flexygram.bubbles.BubbleConfig.matteEnabled();
+            if (matte) {
+                // Active per-chat theme owns the palette; average native gradient colors
+                // when present, then diffuse into one flat, low-gloss Matte color.
+                int palette = isOut && p.getShader() != null
+                        ? app.flexygram.bubbles.BubbleOutline.palette(color,
+                            currentGradientColor1, currentGradientColor2, currentGradientColor3)
+                        : color;
+                color = app.flexygram.bubbles.SignatureMatteFinish.color(
+                        palette, app.flexygram.bubbles.BubbleConfig.matteStrength());
+            }
             if (alpha > 0 && app.flexygram.bubbles.BubbleConfig.backgroundBlur() && flexyGlassSource != null) {
                 // The native bridge carries drawable alpha; message transitions sample the same cache.
                 flexyGlassSource.draw(canvas, path, alpha);
             }
             flexyFillPaint.setColor(color);
             // Reuse Telegram's cached gradient and matrix; no new shader per frame.
-            flexyFillPaint.setShader(p.getShader());
+            flexyFillPaint.setShader(matte ? null : p.getShader());
             flexyFillPaint.setAlpha(Math.round(alpha * app.flexygram.bubbles.BubbleStyle.tintAlpha(
                 app.flexygram.bubbles.BubbleConfig.transparency()) / 255f));
             canvas.drawPath(path, flexyFillPaint);
