@@ -12,7 +12,7 @@
     "tools/connected_alpha/alpha1280_contract.py": "2bebe992d68a0252144bd4a973bec3f9918e8d941c3d36f23021f9e673515f34",
     "tools/connected_alpha/alpha1281_contract.py": "fb517b45077c604c13ea63bc2cead9839d158079dd17c02f135d8635d953ccb7",
     "tools/connected_alpha/build_private_apk.py": "0bd240c9ec81442b4232d5c917122d84c81eed07744f8355a33bc57efd1500b8",
-    "tools/connected_alpha/home_visual/SmartPreviewsVisualTest.java.in": "5078b48ea807802dcef32947fe46ee40044140548aebdd19620307529611aa51",
+    "tools/connected_alpha/home_visual/SmartPreviewsVisualTest.java.in": "9ff67023ce340f102ba24b972a856b0c4b73d7af792fbbf3a00dda0bb38d1963",
     "tools/connected_alpha/home_visual/smart_probe.py": "ea3d1057d87fe081850c2c99607ddace8aa72b775f8a4d276d8ca62e6e16d34c",
     "tools/connected_alpha/test_alpha1280.py": "bafdd56d9e565bf0b908106293f26cd2794e03d1bf761d4be1d8be2b143429a2",
     "tools/connected_alpha/test_alpha1281.py": "bdc04a059e87b37bc228d78391ca157740c8c54cd9c4bf2fdce4bcb883729042",
