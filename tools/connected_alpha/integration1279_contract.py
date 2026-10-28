@@ -14,7 +14,9 @@ MANIFEST=ROOT/'tools/connected_alpha/integration1279_review.json'
 PROJECTIONS=ROOT/'tools/connected_alpha/integration1279_projections.json'
 
 def spec():return json.loads(MANIFEST.read_text())
-def paths():return frozenset(spec()['paths'])
+def paths():
+    from instant_navigation1279_contract import paths as handoff_paths
+    return frozenset(spec()['paths']) | handoff_paths()
 def sha(data):return hashlib.sha256(data).hexdigest()
 
 @lru_cache(maxsize=512)
@@ -27,7 +29,9 @@ def blob(oid):
     return subprocess.check_output(['git','cat-file','blob',oid],cwd=ROOT)
 
 def project(scope,path,data):
+    from instant_navigation1279_contract import restore as restore_handoff
     path=str(path)
+    data=restore_handoff(path,data)
     expected=spec()['reviewed'].get(path)
     if expected is None or sha(data)!=expected:return data
     views=json.loads(PROJECTIONS.read_text())
@@ -36,10 +40,12 @@ def project(scope,path,data):
     return blob(oid) if oid else baseline(path)
 
 def verify_current():
+    from instant_navigation1279_contract import verify_current as verify_handoff, restore as restore_handoff
+    verify_handoff()
     s=spec()
     if s['base']!=BASE:raise ValueError('Incorrect Alpha1279 base')
     for path,expected in s['reviewed'].items():
-        if sha((ROOT/path).read_bytes())!=expected:
+        if sha(restore_handoff(path,(ROOT/path).read_bytes()))!=expected:
             raise ValueError('Unreviewed Alpha1279 integrated source: '+path)
     changed=set(subprocess.check_output(['git','diff',BASE,'--name-only'],cwd=ROOT,text=True).splitlines())
     if changed-paths():raise ValueError('Unreviewed Alpha1279 scope: '+repr(sorted(changed-paths())))
