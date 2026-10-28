@@ -21,7 +21,7 @@ public final class SignatureSmartPreviewPalette {
         int base=BASE[kind];
         int main=mode==THEME?(accent|0xff000000):
                 mode==MATTE?blend(opaqueSurface,base,.16f):blend(base,accent|0xff000000,.14f);
-        float tint=mode==MATTE?.09f:.18f;
+        float tint=mode==MATTE?.07f:.12f;
         background=blend(opaqueSurface,main,tint);
         int ink=blend(main,luminance(background)>.48?0xff172332:0xfff7f9fc,.58f);
         if(contrast(ink,background)<4.5)ink=luminance(background)>.23?0xff172332:0xfff7f9fc;
