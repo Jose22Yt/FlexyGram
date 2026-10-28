@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyContextActions">Actions</string>
+    <string name="FlexyContextSticker">Sticker</string>
+    <string name="FlexyContextSelect">Select</string>
+    <string name="FlexyContextMore">More</string>
+    <string name="FlexyContextSendHere">Send here</string>
+    <string name="FlexyContextPanel">Flexy Context Panel</string>
+</resources>

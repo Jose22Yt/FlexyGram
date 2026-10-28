@@ -1,0 +1,38 @@
+import android.app.Activity;
+import android.view.*;
+import android.widget.*;
+import java.util.*;
+import org.junit.*;
+import org.junit.runner.RunWith;
+import org.robolectric.*;
+import org.robolectric.annotation.*;
+import static org.junit.Assert.*;
+import app.flexygram.bubbles.interaction.*;
+import app.flexygram.bubbles.interaction.BubbleActionPanelView.Action;
+@RunWith(RobolectricTestRunner.class) @Config(manifest=Config.NONE,sdk=35)
+public class ContextPanelTest {
+ Activity activity;FrameLayout root;
+ @Before public void start(){activity=Robolectric.buildActivity(Activity.class).setup().get();root=new FrameLayout(activity);activity.setContentView(root);}
+ @After public void end(){activity.finish();}
+ View named(View v,String label){if(v instanceof TextView&&label.contentEquals(((TextView)v).getText()))return v;if(label.contentEquals(v.getContentDescription()==null?"":v.getContentDescription()))return v;if(v instanceof ViewGroup){for(int i=0;i<((ViewGroup)v).getChildCount();i++){View found=named(((ViewGroup)v).getChildAt(i),label);if(found!=null)return found;}}return null;}
+ @Test public void onlyNativeAdmittedActionsAreShownAndNoStickerIsAdvertised(){
+  var panel=new BubbleActionPanelView(activity,null);panel.setAllowedActions(EnumSet.of(Action.REPLY,Action.COPY,Action.SELECT));
+  assertNotNull(named(panel,"Reply"));assertNotNull(named(panel,"Copy"));assertNull(named(panel,"Edit"));assertNull(named(panel,"Delete"));assertNull(named(panel,"FlexyContextSticker"));
+ }
+ @Test public void clicksDelegateOnceAndDetachReleasesListener(){
+  var panel=new BubbleActionPanelView(activity,null);panel.setAllowedActions(EnumSet.of(Action.REPLY,Action.DELETE));ArrayList<Action> received=new ArrayList<>();panel.setListener(received::add);root.addView(panel);
+  View reply=named(panel,"Reply");assertTrue(reply.performClick());assertEquals(Collections.singletonList(Action.REPLY),received);
+  assertTrue(named(panel,"FlexyContextMore").performClick());assertEquals(Action.MORE,received.get(1));
+  root.removeView(panel);reply.performClick();assertEquals(2,received.size());
+ }
+ @Test public void selectionRequiresItsExplicitButton(){
+  var panel=new BubbleActionPanelView(activity,null);panel.setAllowedActions(EnumSet.of(Action.SELECT));ArrayList<Action> received=new ArrayList<>();panel.setListener(received::add);
+  named(panel,"FlexyContextSelect").performClick();assertTrue(received.isEmpty());named(((ViewGroup)panel).getChildAt(1),"FlexyContextSelect").performClick();assertEquals(Collections.singletonList(Action.SELECT),received);
+ }
+ @Test public void actualNativePermissionAdapterPreservesAllCombinations(){
+  for(int bits=0;bits<64;bits++){var host=new PanelHostProbe();var s=host.lastMessageMenuStatus;s.allowReply=(bits&1)!=0;s.allowCopy=(bits&2)!=0;s.allowForward=(bits&4)!=0;s.allowEdit=(bits&8)!=0;s.allowDelete=(bits&16)!=0;
+   var options=new ArrayList<Integer>();if((bits&32)!=0)options.add(13);var a=host.signatureContextActions(options);
+   assertEquals(s.allowReply,a.contains(Action.REPLY));assertEquals(s.allowCopy,a.contains(Action.COPY));assertEquals(s.allowForward,a.contains(Action.FORWARD));assertEquals(s.allowEdit,a.contains(Action.EDIT));assertEquals(s.allowDelete,a.contains(Action.DELETE));assertEquals((bits&32)!=0,a.contains(Action.PIN));
+  }
+ }
+}

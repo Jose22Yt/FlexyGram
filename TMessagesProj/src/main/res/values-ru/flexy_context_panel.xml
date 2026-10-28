@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyContextActions">Действия</string>
+    <string name="FlexyContextSticker">Стикер</string>
+    <string name="FlexyContextSelect">Выбрать</string>
+    <string name="FlexyContextMore">Ещё</string>
+    <string name="FlexyContextSendHere">Отправить сюда</string>
+    <string name="FlexyContextPanel">Контекстная панель FlexyGram</string>
+</resources>

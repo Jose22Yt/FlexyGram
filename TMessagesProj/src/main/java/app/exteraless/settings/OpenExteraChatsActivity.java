@@ -197,6 +197,7 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
     private int composerSettingsRow = -1;
     private int signaturePersonalHeader = -1, signatureInteractionHeader = -1, signatureAdditionalHeader = -1;
     private int flexyBubblesRow = -1;
+    private int flexyContextPanelRow = -1;
     private int signatureHeaderRow = -1;
     private int signatureMessagesRow = -1, signatureStickersRow = -1, signatureThemeRow = -1;
     private int smartPreviewsRow = -1;
@@ -485,6 +486,7 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
     private void updateChatRows() {
         linksHeaderRow = addRow("linksHeader");
         menusRow = addRow("menus");
+        flexyContextPanelRow = addRow("flexyContextPanel");
         mediaRow = addRow("media");
         aiChatRow = addRow("aiChat");
         linksDividerRow = addRow();
@@ -1887,6 +1889,10 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
                 reloadList();
             });
             return;
+        } else if (position == flexyContextPanelRow) {
+            boolean value=!app.flexygram.bubbles.interaction.BubbleInteractionSettings.signaturePanel(getParentActivity());
+            app.flexygram.bubbles.interaction.BubbleInteractionSettings.setSignaturePanel(getParentActivity(),value);
+            listAdapter.notifyItemChanged(position);return;
         } else if (position == signatureMessagesRow) {
             presentFragment(new OpenExteraChatsActivity(SCREEN_SIGNATURE_MESSAGES)); return;
         } else if (position == signatureStickersRow) {
@@ -2888,7 +2894,9 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
         }
 
         private void bindCheck(TextCheckCell cell, int position) {
-            if (position == adminShortcutsRow) {
+            if (position == flexyContextPanelRow) {
+                cell.setTextAndCheck(getString(R.string.FlexyContextPanel),app.flexygram.bubbles.interaction.BubbleInteractionSettings.signaturePanel(getParentActivity()),true);
+            } else if (position == adminShortcutsRow) {
                 cell.setTextAndCheck(getString(R.string.OEChatsAdminShortcuts), isQuickAdminShortcuts(), false);
             } else if (position == disableGreetingRow) {
                 cell.setTextAndCheck(getString(R.string.OEChatsDisableGreetingSticker), NekoConfig.dontSendGreetingSticker.Bool(), false);
