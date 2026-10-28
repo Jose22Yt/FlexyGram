@@ -1066,6 +1066,35 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         }
     }
 
+    private FlexyInstantNavigationCoordinator instantNavigation;
+
+    private void reportInstantNavigation(FlexyInstantNavigationCoordinator.State state, BaseFragment target,
+                                         FlexyInstantNavigationCoordinator.Kind kind) {
+        if (instantNavigation != null) {
+            long destinationId = target instanceof ChatActivity ? ((ChatActivity) target).getDialogId() : 0;
+            instantNavigation.begin(state, new FlexyInstantNavigationCoordinator.Intent(kind, destinationId,
+                    target == null ? null : target.getClass().getName()), false);
+        }
+    }
+
+    private boolean isObsoleteInstantCompletion(long generation, SpringAnimation spring, Animator animator, Runnable frame) {
+        if (instantNavigation == null || instantNavigation.isCurrent(generation)) return false;
+        if (spring != null) {
+            if (currentSpringAnimation == spring) currentSpringAnimation = null;
+            spring.cancel();
+        }
+        if (animator != null) {
+            if (currentAnimation == animator) currentAnimation = null;
+            animator.removeAllListeners();
+            animator.cancel();
+        }
+        if (frame != null) {
+            if (animationRunnable == frame) animationRunnable = null;
+            AndroidUtilities.cancelRunOnUIThread(frame);
+        }
+        return true;
+    }
+
     /**
      * One-touch handoff for an exposed chat-list surface during a normal chat
      * close. The outgoing view may visually occupy the right-hand side while
@@ -1110,8 +1139,14 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         // Complete native lifecycle/stack operations before Android hit-tests
         // the original ACTION_DOWN against the destination's attached rows.
         // onAnimationEndCheck owns spring/animator cancellation and clean-up.
-        onAnimationEndCheck(true);
-        boolean completed = !transitionAnimationInProgress && !animationInProgress
+        if (instantNavigation == null) instantNavigation = new FlexyInstantNavigationCoordinator();
+        long ticket = instantNavigation.begin(FlexyInstantNavigationCoordinator.State.CLOSING,
+                new FlexyInstantNavigationCoordinator.Intent(FlexyInstantNavigationCoordinator.Kind.REVEAL_SURFACE,
+                        0, destination.getClass().getName()), true);
+        boolean committed = instantNavigation.commit(ticket, () -> {
+            onAnimationEndCheck(true);
+        });
+        boolean completed = committed && !transitionAnimationInProgress && !animationInProgress
                 && !startedTracking && getLastFragment() == destination;
         if (completed) {
             // A cancelled spring will not run its normal end-listener cleanup.
@@ -2152,8 +2187,14 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
     }
 
     private void onAnimationEndCheck(boolean byCheck) {
+        final long instantGeneration = instantNavigation == null ? 0 : instantNavigation.generation();
+        final SpringAnimation endingSpring = currentSpringAnimation;
+        final Animator endingAnimator = currentAnimation;
+        final Runnable endingFrame = animationRunnable;
         onCloseAnimationEnd();
+        if (isObsoleteInstantCompletion(instantGeneration, endingSpring, endingAnimator, endingFrame)) return;
         onOpenAnimationEnd();
+        if (isObsoleteInstantCompletion(instantGeneration, endingSpring, endingAnimator, endingFrame)) return;
         if (waitingForKeyboardCloseRunnable != null) {
             AndroidUtilities.cancelRunOnUIThread(waitingForKeyboardCloseRunnable);
             waitingForKeyboardCloseRunnable = null;
@@ -2200,6 +2241,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         if (USE_ACTIONBAR_CROSSFADE) {
             invalidateActionBars();
         }
+        if (instantNavigation != null) instantNavigation.complete(instantGeneration);
     }
 
     public BaseFragment getLastFragment() {
@@ -2660,6 +2702,8 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         if (fragment == null || checkTransitionAnimation() || animationInProgress || startedTracking || delegate != null && check && !delegate.needPresentFragment(this, params) || !fragment.onFragmentCreate()) {
             return false;
         }
+        reportInstantNavigation(FlexyInstantNavigationCoordinator.State.OPENING, fragment,
+                fragment instanceof ChatActivity ? FlexyInstantNavigationCoordinator.Kind.OPEN_CHAT : FlexyInstantNavigationCoordinator.Kind.OPEN_SCREEN);
         final EdgeToEdgeSupportMode edgeToEdgeSupportMode = fragment.getEdgeToEdgeSupportMode();
         final boolean isSupportEdgeToEdge = edgeToEdgeSupportMode != EdgeToEdgeSupportMode.NONE;
         final boolean drawNavigationBar = fragment.drawEdgeNavigationBar();
@@ -3324,6 +3368,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         if (delegate != null && !delegate.needCloseLastFragment(this) || checkTransitionAnimation() || animationInProgress || startedTracking || fragmentsStack.isEmpty()) {
             return;
         }
+        reportInstantNavigation(FlexyInstantNavigationCoordinator.State.CLOSING, getLastFragment(), FlexyInstantNavigationCoordinator.Kind.BACK);
         if (transitionAnimationPreviewMode && transitionAnimationInProgress) {
             final boolean alreadyClosing = onCloseAnimationEndRunnable != null;
             onAnimationEndCheck(true);
@@ -3948,10 +3993,12 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
 
     private void onCloseAnimationEnd() {
         if (transitionAnimationInProgress && onCloseAnimationEndRunnable != null) {
+            final long closeGeneration = instantNavigation == null ? 0 : instantNavigation.generation();
             if (currentAnimation != null) {
                 Animator animatorSet = currentAnimation;
                 currentAnimation = null;
                 animatorSet.cancel();
+                if (instantNavigation != null && !instantNavigation.isCurrent(closeGeneration)) return;
             }
             transitionAnimationInProgress = false;
             layoutToIgnore = null;

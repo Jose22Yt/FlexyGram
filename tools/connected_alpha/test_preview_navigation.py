@@ -17,13 +17,16 @@ def method(source,anchor):
  return source[a:b].replace('@Override','')
 def fixture(source):
  bodies=[method(source,x) for x in ['public boolean checkTransitionAnimation()', 'public void finishPreviewFragment()', 'public void onBackPressed()', 'private void onCloseAnimationEnd()', 'private void onOpenAnimationEnd()', 'private void onAnimationEndCheck(boolean byCheck)']]
+ if 'private void reportInstantNavigation(' in source:bodies+=[method(source,'private void reportInstantNavigation('),method(source,'private boolean isObsoleteInstantCompletion(')]
  if 'private boolean finishClosingPreview()' in source:bodies+=[method(source,'private boolean finishClosingPreview()')]
  a=source.index('public void closeLastFragment(boolean animated, boolean forceNoAnimation)');b=source.index('        if (parentActivity.getCurrentFocus()',a)
  bodies+=[source[a:b]+' beginClose(getLastFragment()); }']
- return '''import java.util.*;public class PreviewRegression {
+ return '''import java.util.*;import org.telegram.ui.ActionBar.FlexyInstantNavigationCoordinator;public class PreviewRegression {
+ FlexyInstantNavigationCoordinator instantNavigation;
+ static class ChatActivity extends BaseFragment {long getDialogId(){return 42;}}
  static class BaseFragment {boolean closeLastFragment(){return false;}boolean onBackPressed(boolean p){return true;}}
- static class Container {void setAlpha(float f){}void setScaleX(float f){}void setScaleY(float f){}void setTranslationX(float f){}void setTranslationY(float f){}}
- static class Animator{void cancel(){}} static class AnimatorSet extends Animator{} static class SpringAnimation{void cancel(){}}
+ static class Container {float x;void setAlpha(float f){}void setScaleX(float f){}void setScaleY(float f){}void setTranslationX(float f){x=f;}void setTranslationY(float f){}}
+ static class Animator{boolean cancelled;Runnable callback;void removeAllListeners(){callback=null;}void cancel(){if(cancelled)return;cancelled=true;if(callback!=null)callback.run();}} static class AnimatorSet extends Animator{} static class SpringAnimation{boolean cancelled;void cancel(){cancelled=true;}}
  static class AndroidUtilities{static void cancelRunOnUIThread(Runnable r){}}
  static class GroupCallPip{static boolean onBackPressed(){return false;}}
  static class Bar {boolean isActionModeShowed(){return false;}boolean isSearchFieldVisible;void closeSearchField(){}}
@@ -57,9 +60,56 @@ class PreviewNavigation(unittest.TestCase):
   fixed=(ROOT/PATH).read_text();old=subprocess.check_output(['git','show',BASE+':'+PATH],cwd=ROOT,text=True)
   for source,args in [(old,['original']),(fixed,[])]:
    with tempfile.TemporaryDirectory() as d:
-    file=Path(d)/'PreviewRegression.java';file.write_text(fixture(source));subprocess.run(['java','-m','jdk.compiler/com.sun.tools.javac.Main','-d',d,str(file)],check=True);subprocess.run(['java','-cp',d,'PreviewRegression',*args],check=True)
+    file=Path(d)/'PreviewRegression.java';file.write_text(fixture(source));subprocess.run(['java','-m','jdk.compiler/com.sun.tools.javac.Main','-d',d,str(file),str(ROOT/'TMessagesProj/src/main/java/org/telegram/ui/ActionBar/FlexyInstantNavigationCoordinator.java')],check=True);subprocess.run(['java','-cp',d,'PreviewRegression',*args],check=True)
  def test_recorded_delta_preserves_the_rest_of_native_navigation(self):
   with tempfile.TemporaryDirectory() as d:
    p=Path(d)/PATH;p.parent.mkdir(parents=True);p.write_bytes(restore1271(PATH,(ROOT/PATH).read_bytes()))
    subprocess.run(['git','apply','--reverse','-'],cwd=d,input=(ROOT/'tools/connected_alpha/preview_navigation.patch').read_bytes(),check=True,capture_output=True)
    self.assertEqual(p.read_bytes(),subprocess.check_output(['git','show',BASE+':'+PATH],cwd=ROOT))
+
+class InstantCompletionOwnership(unittest.TestCase):
+ def run_fixture(self,source,should_pass):
+  code=fixture(source)
+  extras="""
+  static int installed;
+  static void newer(PreviewRegression p){
+   installed++;
+   p.instantNavigation.begin(FlexyInstantNavigationCoordinator.State.OPENING,
+    new FlexyInstantNavigationCoordinator.Intent(FlexyInstantNavigationCoordinator.Kind.OPEN_CHAT,123,null),false);
+   p.transitionAnimationInProgress=true;
+   p.currentAnimation=new AnimatorSet();p.currentSpringAnimation=new SpringAnimation();
+   p.animationRunnable=()->{};p.containerView.x=123;
+  }
+  static PreviewRegression ownership(boolean opening,boolean nestedCancel){
+   PreviewRegression p=create();p.instantNavigation=new FlexyInstantNavigationCoordinator();
+   p.instantNavigation.begin(opening?FlexyInstantNavigationCoordinator.State.OPENING:FlexyInstantNavigationCoordinator.State.CLOSING,
+    new FlexyInstantNavigationCoordinator.Intent(FlexyInstantNavigationCoordinator.Kind.BACK,42,null),true);
+   p.transitionAnimationInProgress=true;
+   if(opening)p.onOpenAnimationEndRunnable=()->newer(p);else p.onCloseAnimationEndRunnable=()->newer(p);
+   p.currentSpringAnimation=new SpringAnimation();
+   if(opening||nestedCancel){p.currentAnimation=new AnimatorSet();if(nestedCancel)p.currentAnimation.callback=()->p.onAnimationEndCheck(true);}
+   return p;
+  }
+  static void verifyOwnership(){
+   for(int mode=0;mode<3;mode++){
+    PreviewRegression p=ownership(mode==1,mode==2);SpringAnimation oldSpring=p.currentSpringAnimation;Animator oldAnimator=p.currentAnimation;
+    int before=installed;p.onAnimationEndCheck(true);
+    check(installed==before+1);check(p.transitionAnimationInProgress);
+    check(p.currentSpringAnimation!=oldSpring&&!p.currentSpringAnimation.cancelled);
+    check(p.currentAnimation!=oldAnimator&&!p.currentAnimation.cancelled);
+    check(oldSpring.cancelled);check(p.containerView.x==123);
+    check(p.instantNavigation.state()==FlexyInstantNavigationCoordinator.State.OPENING);
+   }
+  }
+  """
+  code=code.replace(' public static void main(String[]args)',extras+' public static void main(String[]args)').replace('boolean original=args.length>0;','boolean original=args.length>0;verifyOwnership();')
+  with tempfile.TemporaryDirectory() as d:
+   path=Path(d)/'PreviewRegression.java';path.write_text(code)
+   subprocess.run(['java','-m','jdk.compiler/com.sun.tools.javac.Main','-d',d,str(path),str(ROOT/'TMessagesProj/src/main/java/org/telegram/ui/ActionBar/FlexyInstantNavigationCoordinator.java')],check=True)
+   result=subprocess.run(['java','-cp',d,'PreviewRegression'],capture_output=True)
+   self.assertEqual(should_pass,result.returncode==0,result.stderr.decode())
+ def test_native_completion_preserves_new_owner_and_stops_old_controllers(self):
+  source=(ROOT/PATH).read_text();self.run_fixture(source,True)
+  guard=method(source,'private boolean isObsoleteInstantCompletion(')
+  mutant=source.replace(guard,guard[:guard.index('{')]+'{return false;}')
+  self.run_fixture(mutant,False)

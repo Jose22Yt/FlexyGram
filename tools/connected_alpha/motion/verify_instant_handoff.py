@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[3]
 SOURCE = ROOT / "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java"
 BASE_GIT_BLOB = "78b0b482add965ca590d9da397bc083dd7a5ab3c"
 
-START = "    /**\n     * One-touch handoff for an exposed chat-list surface"
+START = "    private FlexyInstantNavigationCoordinator instantNavigation;"
 END = "    @Override\n    public void requestDisallowInterceptTouchEvent"
 ORIGINAL = (
     "    @Override\n"
@@ -50,6 +50,21 @@ def main() -> None:
         assert prohibited not in delta, "No synthetic event, injected click or wait: " + prohibited
 
     reconstructed = (content[:start] + ORIGINAL + content[end:]).replace(NEW_IMPORT, "", 1)
+    hooks = (
+        ("        final long instantGeneration = instantNavigation == null ? 0 : instantNavigation.generation();\n", 1),
+        ("        final SpringAnimation endingSpring = currentSpringAnimation;\n", 1),
+        ("        final Animator endingAnimator = currentAnimation;\n", 1),
+        ("        final Runnable endingFrame = animationRunnable;\n", 1),
+        ("        if (isObsoleteInstantCompletion(instantGeneration, endingSpring, endingAnimator, endingFrame)) return;\n", 2),
+        ("            final long closeGeneration = instantNavigation == null ? 0 : instantNavigation.generation();\n", 1),
+        ("                if (instantNavigation != null && !instantNavigation.isCurrent(closeGeneration)) return;\n", 1),
+        ("        if (instantNavigation != null) instantNavigation.complete(instantGeneration);\n", 1),
+        ("        reportInstantNavigation(FlexyInstantNavigationCoordinator.State.OPENING, fragment,\n                fragment instanceof ChatActivity ? FlexyInstantNavigationCoordinator.Kind.OPEN_CHAT : FlexyInstantNavigationCoordinator.Kind.OPEN_SCREEN);\n", 1),
+        ("        reportInstantNavigation(FlexyInstantNavigationCoordinator.State.CLOSING, getLastFragment(), FlexyInstantNavigationCoordinator.Kind.BACK);\n", 1),
+    )
+    for hook, count in hooks:
+        assert reconstructed.count(hook) == count, "Unexpected coordinator hook scope"
+        reconstructed = reconstructed.replace(hook, "")
     data = reconstructed.encode("utf-8")
     blob_sha = hashlib.sha1(b"blob " + str(len(data)).encode() + b"\0" + data).hexdigest()
     assert blob_sha == BASE_GIT_BLOB, (

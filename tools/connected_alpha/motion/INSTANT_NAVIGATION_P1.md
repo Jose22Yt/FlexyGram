@@ -120,3 +120,11 @@ Revert the ActionBarLayout-specific commit and delete
 `FlexyNavigationHandoffPolicy.java`; the PR108/112 motion engine and all
 settings remain intact. No user preferences, data, build identity or
 migration changes.
+
+## P2 coordinator checkpoint
+
+The lazy, thread-confined FlexyInstantNavigationCoordinator stores logical intent IDs, states and generations. It has no clock, queue, retained callbacks or View references. Native accepted open/close operations report their ownership after the existing acceptance guards. The exposed-list DOWN transaction finalizes only its generation once; the actual row recognizer still decides which chat to open. Unknown/covered/modal input retains native handling. No cached or fabricated click is executed.
+
+Native completion snapshots its old controllers before invoking fragment callbacks. If a callback accepts newer navigation, cleanup stops only the old spring/animator/runnable and preserves the new owner and transforms. A reentrant Animator cancellation cannot resume older close cleanup over a newer screen. Host tests execute the actual native completion bodies with explicit fragment/view/controller doubles, and fail when the new guard is disabled. Android tests use real ViewGroup dispatch and the actual coordinator/policy, but the fragment transaction remains an explicit double. Protocol stress covers10,000 replacements; it is not device latency or FPS evidence.
+
+Alpha1280 PR115 head55e3a479 leaves ActionBarLayout unchanged relative to Alpha1279. Do not restore an older FlexyFrameMotion over its generation-batch fix. Future integration must combine both appended MotionEngine tests and compose the exact alpha1280/handoff contract projections; no Work1 branch has been modified or merged. Native gestures, opening interrupted by Back, geometric/velocity retargeting and broad surface coverage remain subsequent stages. No app identity, version, authentication, certificate or distribution changes.

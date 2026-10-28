@@ -32,6 +32,14 @@ class InstantNavigation1279Regression(unittest.TestCase):
         guard=(ROOT/'tools/connected_alpha/test_flexy_motion.py').read_text()
         self.assertIn('new=restore_handoff(path,(ROOT/path).read_bytes()).decode()',guard)
 
+    def test_actual_coordinator_protocol(self):
+        import subprocess,tempfile
+        with tempfile.TemporaryDirectory() as folder:
+            subprocess.run(['java','-m','jdk.compiler/com.sun.tools.javac.Main','-d',folder,
+                str(ROOT/'TMessagesProj/src/main/java/org/telegram/ui/ActionBar/FlexyInstantNavigationCoordinator.java'),
+                str(ROOT/'tools/connected_alpha/motion/InstantNavigationCoordinatorTest.java')],check=True)
+            subprocess.run(['java','-cp',folder,'InstantNavigationCoordinatorTest'],check=True)
+
     def test_new_policy_rejects_unknown_bytes(self):
         import instant_navigation1279_contract as handoff
         source = (ROOT / POLICY).read_bytes()

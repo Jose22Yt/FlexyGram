@@ -184,6 +184,7 @@ public class MotionEngineTest {
   final android.widget.FrameLayout exposed;
   final android.widget.Button row;
   final View outgoing;
+  final org.telegram.ui.ActionBar.FlexyInstantNavigationCoordinator coordinator=new org.telegram.ui.ActionBar.FlexyInstantNavigationCoordinator();
   boolean closing=true, blocked=false;
   int completed;
   HandoffTouchRoot(android.content.Context ctx){
@@ -206,10 +207,10 @@ public class MotionEngineTest {
        e.getX(),e.getY(),outgoing.getTranslationX(),
        getWidth(),getHeight(),16);
    if(allow){
-    completed++;
-    closing=false;
-    outgoing.setVisibility(View.GONE);
-    return false; // framework must give the same original DOWN to B
+    long ticket=coordinator.begin(org.telegram.ui.ActionBar.FlexyInstantNavigationCoordinator.State.CLOSING,
+      new org.telegram.ui.ActionBar.FlexyInstantNavigationCoordinator.Intent(org.telegram.ui.ActionBar.FlexyInstantNavigationCoordinator.Kind.REVEAL_SURFACE,0,"main"),true);
+    if(coordinator.commit(ticket,()->{completed++;closing=false;outgoing.setVisibility(View.GONE);}))return false;
+    // The framework must still own the original sequence, never a replay.
    }
    return closing || super.onInterceptTouchEvent(e);
   }
@@ -220,7 +221,7 @@ public class MotionEngineTest {
   java.util.ArrayList<Integer> actions=new java.util.ArrayList<>();
   java.util.ArrayList<Long> times=new java.util.ArrayList<>();
   root.row.setOnTouchListener((v,e)->{actions.add(e.getActionMasked());times.add(e.getEventTime());return false;});
-  root.row.setOnClickListener(v->clicks[0]++);
+  root.row.setOnClickListener(v->{clicks[0]++;root.coordinator.begin(org.telegram.ui.ActionBar.FlexyInstantNavigationCoordinator.State.OPENING,new org.telegram.ui.ActionBar.FlexyInstantNavigationCoordinator.Intent(org.telegram.ui.ActionBar.FlexyInstantNavigationCoordinator.Kind.OPEN_CHAT,123,null),false);});
   activity.setContentView(root);
   root.measure(View.MeasureSpec.makeMeasureSpec(400,View.MeasureSpec.EXACTLY),
      View.MeasureSpec.makeMeasureSpec(800,View.MeasureSpec.EXACTLY));
@@ -231,6 +232,7 @@ public class MotionEngineTest {
   try{
    assertTrue(root.dispatchTouchEvent(down));
    assertEquals(1,root.completed);
+   long closingGeneration=root.coordinator.generation();
    assertTrue(root.dispatchTouchEvent(up));
    assertEquals(java.util.Arrays.asList(MotionEvent.ACTION_DOWN,MotionEvent.ACTION_UP),actions);
    assertEquals(java.util.Arrays.asList(100L,140L),times);
@@ -240,6 +242,9 @@ public class MotionEngineTest {
    assertEquals(1,clicks[0]);
    assertEquals(View.GONE,root.outgoing.getVisibility());
    assertFalse(root.closing);
+   assertEquals(123,root.coordinator.intent().destinationId);
+   assertFalse(root.coordinator.complete(closingGeneration));
+   assertEquals(org.telegram.ui.ActionBar.FlexyInstantNavigationCoordinator.State.OPENING,root.coordinator.state());
    advance(100);
    assertEquals(1,clicks[0]);
   }finally{down.recycle();up.recycle();}

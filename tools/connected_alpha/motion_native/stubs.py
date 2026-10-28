@@ -65,3 +65,6 @@ public class PopupMotionProbe extends PopupWindow {
 
  from folder_probe import write as write_folder
  write_folder(put,root)
+
+ put('org/telegram/ui/ActionBar/FlexyInstantNavigationCoordinator.java',
+     (root/'TMessagesProj/src/main/java/org/telegram/ui/ActionBar/FlexyInstantNavigationCoordinator.java').read_text())

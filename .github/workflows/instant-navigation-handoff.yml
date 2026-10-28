@@ -5,6 +5,7 @@ on:
       - '.github/workflows/instant-navigation-handoff.yml'
       - 'TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java'
       - 'TMessagesProj/src/main/java/org/telegram/ui/ActionBar/FlexyNavigationHandoffPolicy.java'
+      - 'TMessagesProj/src/main/java/org/telegram/ui/ActionBar/FlexyInstantNavigationCoordinator.java'
       - 'tools/connected_alpha/motion/**'
   workflow_dispatch:
 
@@ -33,5 +34,8 @@ jobs:
           trap 'rm -rf "$classes"' EXIT
           javac -d "$classes" \
             TMessagesProj/src/main/java/org/telegram/ui/ActionBar/FlexyNavigationHandoffPolicy.java \
-            tools/connected_alpha/motion/InstantHandoffPolicyTest.java
+            tools/connected_alpha/motion/InstantHandoffPolicyTest.java \
+            TMessagesProj/src/main/java/org/telegram/ui/ActionBar/FlexyInstantNavigationCoordinator.java \
+            tools/connected_alpha/motion/InstantNavigationCoordinatorTest.java
           java -cp "$classes" InstantHandoffPolicyTest
+          java -cp "$classes" InstantNavigationCoordinatorTest

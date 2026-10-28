@@ -1,32 +1,38 @@
 {
   "pin": "d50677f723292d0e405eae8e1529f65416ff9cbd",
   "reviewed": {
-    "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java": "956a9ca73d5aad96776d72b8433e1d14500424c6",
+    "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java": "46c1846b39c1e3800b72cf64b9d3bd53a0c42914",
     "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/FlexyNavigationHandoffPolicy.java": "4b8d7d15dc4f1d0db180c572e35bd4393460f66a",
-    "tools/connected_alpha/motion/INSTANT_NAVIGATION_P1.md": "8fc81320f772f2d4effd146f739b72c0e2344709",
+    "tools/connected_alpha/motion/INSTANT_NAVIGATION_P1.md": "084d8bc52d25b579612cd5b8988f5276b2131fd2",
     "tools/connected_alpha/motion/InstantHandoffPolicyTest.java": "4f9a0dd2ebf3700573cae7e0cf8c2bedf8b3fd06",
-    "tools/connected_alpha/motion/verify_instant_handoff.py": "c56359653e8cb3f001788b7609ec95a5eb58a418",
-    ".github/workflows/instant-navigation-handoff.yml": "8dba73296bb8cae71a4f860d3296b3053a719f02",
+    "tools/connected_alpha/motion/verify_instant_handoff.py": "7c48974ae3ddc8e4ed9116bb9558aa96aa791bed",
+    ".github/workflows/instant-navigation-handoff.yml": "fa50365461dc2ace40898d67a5b932af96f8d0dd",
     "tools/connected_alpha/integration1279_contract.py": "b29d69ef30f20da7b6148a848ee8275bdf71662c",
     "tools/connected_alpha/instant_navigation1279_contract.py": "3848af94cc53a812649c3194c9b97da7b1c1b16d",
-    "tools/connected_alpha/test_instant_navigation1279.py": "e736afd73a35c069dcde42e413ed965e0e0f6f26",
-    "tools/connected_alpha/motion_native/stubs.py": "0aa95d57af7a7d3e4b83676007e4b30690ac670d",
-    "tools/connected_alpha/motion_native/MotionEngineTest.java.in": "9d0b2488d546a0f11649f2332176009e4164c43b",
-    "tools/connected_alpha/test_flexy_motion.py": "b0f8a0266b89bfe29f0a97c00719fd2b409c02b4"
+    "tools/connected_alpha/test_instant_navigation1279.py": "1d8081455f66ee0863af468f7a6747bfd710a2a8",
+    "tools/connected_alpha/motion_native/stubs.py": "a21010f42c8be3b7d750ccc9286857ce61131dd3",
+    "tools/connected_alpha/motion_native/MotionEngineTest.java.in": "0ce1be7c1686a82d690a7bdd1fb47985b0106f3a",
+    "tools/connected_alpha/test_flexy_motion.py": "b0f8a0266b89bfe29f0a97c00719fd2b409c02b4",
+    "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/FlexyInstantNavigationCoordinator.java": "24760215b29df1f16f7c08c2203f05c7da5b876b",
+    "tools/connected_alpha/motion/InstantNavigationCoordinatorTest.java": "5ef592426952c31e498a7d5a69f1235b140198c3",
+    "tools/connected_alpha/test_preview_navigation.py": "c88bc0041f6c7192a3f874c3364bc3d3fa127a2b"
   },
   "paths": [
+    ".github/workflows/instant-navigation-handoff.yml",
     "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java",
+    "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/FlexyInstantNavigationCoordinator.java",
     "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/FlexyNavigationHandoffPolicy.java",
+    "tools/connected_alpha/instant_navigation1279_contract.py",
+    "tools/connected_alpha/instant_navigation1279_review.json",
+    "tools/connected_alpha/integration1279_contract.py",
     "tools/connected_alpha/motion/INSTANT_NAVIGATION_P1.md",
     "tools/connected_alpha/motion/InstantHandoffPolicyTest.java",
+    "tools/connected_alpha/motion/InstantNavigationCoordinatorTest.java",
     "tools/connected_alpha/motion/verify_instant_handoff.py",
-    ".github/workflows/instant-navigation-handoff.yml",
-    "tools/connected_alpha/integration1279_contract.py",
-    "tools/connected_alpha/instant_navigation1279_contract.py",
-    "tools/connected_alpha/test_instant_navigation1279.py",
-    "tools/connected_alpha/instant_navigation1279_review.json",
-    "tools/connected_alpha/motion_native/stubs.py",
     "tools/connected_alpha/motion_native/MotionEngineTest.java.in",
-    "tools/connected_alpha/test_flexy_motion.py"
+    "tools/connected_alpha/motion_native/stubs.py",
+    "tools/connected_alpha/test_flexy_motion.py",
+    "tools/connected_alpha/test_instant_navigation1279.py",
+    "tools/connected_alpha/test_preview_navigation.py"
   ]
 }
