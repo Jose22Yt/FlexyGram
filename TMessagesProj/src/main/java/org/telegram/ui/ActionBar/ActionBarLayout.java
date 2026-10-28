@@ -1095,6 +1095,47 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         return true;
     }
 
+    private boolean hasInstantBackModal(BaseFragment outgoing, BaseFragment previous) {
+        if (outgoing.hasSheet() || previous.hasSheet()) return true;
+        Dialog outgoingDialog = outgoing.getVisibleDialog();
+        Dialog previousDialog = previous.getVisibleDialog();
+        Dialog activityDialog = LaunchActivity.instance != null ? LaunchActivity.instance.getVisibleDialog() : null;
+        return outgoingDialog != null && outgoingDialog.isShowing()
+                || previousDialog != null && previousDialog.isShowing()
+                || activityDialog != null && activityDialog.isShowing();
+    }
+
+    /** Finish only a ready, ordinary chat opening; the same native Back then decides the action. */
+    private boolean prepareInstantBack() {
+        if (!transitionAnimationInProgress || onOpenAnimationEndRunnable == null || onCloseAnimationEndRunnable != null
+                || animationInProgress || startedTracking || predictiveBackInProgress || storyViewerAttached()
+                || inPreviewMode || transitionAnimationPreviewMode || previewOpenAnimationInProgress
+                || inActionMode || isSheet || isLayersLayout || isRightLayout || sheetFragment != null
+                || waitingForKeyboardCloseRunnable != null || delayedOpenAnimationRunnable != null
+                || fragmentsStack.size() < 2 || currentSpringAnimation == null || !currentSpringAnimation.isRunning()
+                || containerView == null || !containerView.isAttachedToWindow()
+                || containerView.getVisibility() != View.VISIBLE || containerView.getChildCount() == 0) return true;
+        BaseFragment outgoing = getLastFragment();
+        BaseFragment previous = fragmentsStack.get(fragmentsStack.size() - 2);
+        if (!(outgoing instanceof ChatActivity) || hasInstantBackModal(outgoing, previous)) return true;
+        if (instantNavigation == null) instantNavigation = new FlexyInstantNavigationCoordinator();
+        long ticket = instantNavigation.begin(FlexyInstantNavigationCoordinator.State.OPENING,
+                new FlexyInstantNavigationCoordinator.Intent(FlexyInstantNavigationCoordinator.Kind.BACK,
+                        ((ChatActivity) outgoing).getDialogId(), outgoing.getClass().getName()), true);
+        boolean completed = instantNavigation.commit(ticket, () -> {
+            onAnimationEndCheck(true);
+        });
+        // A reentrant accepted destination consumes this old Back; never redirect it to that destination.
+        if (!completed || transitionAnimationInProgress || animationInProgress || startedTracking || getLastFragment() != outgoing) return false;
+        if (hasInstantBackModal(outgoing, previous) || sheetFragment != null || storyViewerAttached()) return false;
+        setInnerTranslationX(0);
+        if (USE_ACTIONBAR_CROSSFADE) {
+            swipeProgress = 0f;
+            invalidateActionBars();
+        }
+        return true;
+    }
+
     /**
      * One-touch handoff for an exposed chat-list surface during a normal chat
      * close. The outgoing view may visually occupy the right-hand side while
@@ -2158,6 +2199,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
             finishPreviewFragment();
             return;
         }
+        if (!prepareInstantBack()) return;
         if (transitionAnimationPreviewMode || startedTracking || checkTransitionAnimation() || fragmentsStack.isEmpty()) {
             return;
         }

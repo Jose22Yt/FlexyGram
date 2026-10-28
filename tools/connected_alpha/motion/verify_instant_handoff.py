@@ -51,6 +51,7 @@ def main() -> None:
 
     reconstructed = (content[:start] + ORIGINAL + content[end:]).replace(NEW_IMPORT, "", 1)
     hooks = (
+        ("        if (!prepareInstantBack()) return;\n", 1),
         ("        final long instantGeneration = instantNavigation == null ? 0 : instantNavigation.generation();\n", 1),
         ("        final SpringAnimation endingSpring = currentSpringAnimation;\n", 1),
         ("        final Animator endingAnimator = currentAnimation;\n", 1),

@@ -21,20 +21,25 @@ def fixture(source):
  if 'private boolean isObsoleteInstantCompletion(' in source:
   a=source.index('            currentSpringAnimation.addEndListener(',source.index('    private void startLayoutAnimation('));b=source.index('            currentSpringAnimation.start();',a)
   bodies+=['void installNativeSpringCallback(){'+source[a:b]+'}']
+ if 'private boolean prepareInstantBack(' in source:bodies+=[method(source,'private boolean prepareInstantBack('),method(source,'private boolean hasInstantBackModal(')]
  if 'private boolean finishClosingPreview()' in source:bodies+=[method(source,'private boolean finishClosingPreview()')]
  a=source.index('public void closeLastFragment(boolean animated, boolean forceNoAnimation)');b=source.index('        if (parentActivity.getCurrentFocus()',a)
  bodies+=[source[a:b]+' beginClose(getLastFragment()); }']
  return '''import java.util.*;import org.telegram.ui.ActionBar.FlexyInstantNavigationCoordinator;public class PreviewRegression {
  FlexyInstantNavigationCoordinator instantNavigation;
  static class ChatActivity extends BaseFragment {long getDialogId(){return 42;}}
- static class BaseFragment {boolean closeLastFragment(){return false;}boolean onBackPressed(boolean p){return true;}}
- static class Container {float x;void setAlpha(float f){}void setScaleX(float f){}void setScaleY(float f){}void setTranslationX(float f){x=f;}void setTranslationY(float f){}}
- static class Animator{boolean cancelled;Runnable callback;void removeAllListeners(){callback=null;}void cancel(){if(cancelled)return;cancelled=true;if(callback!=null)callback.run();}} static class AnimatorSet extends Animator{} static class SpringAnimation{interface End{void onEnd(SpringAnimation a,boolean c,float v,float speed);}boolean cancelled;End listener;void addEndListener(End l){listener=l;}void finish(){listener.onEnd(this,false,1,0);}void cancel(){if(cancelled)return;cancelled=true;if(listener!=null)listener.onEnd(this,true,0,0);}}
+ static class Dialog{boolean showing;Dialog(boolean value){showing=value;}boolean isShowing(){return showing;}}
+ static class LaunchActivity{static LaunchActivity instance;Dialog getVisibleDialog(){return null;}}
+ static class View{static final int VISIBLE=0;}
+ static class BaseFragment {Dialog dialog;boolean sheet,allowBack=true;Dialog getVisibleDialog(){return dialog;}boolean hasSheet(){return sheet;}boolean closeLastFragment(){return false;}boolean onBackPressed(boolean p){return allowBack;}}
+ static class Container {float x;boolean isAttachedToWindow(){return true;}int getVisibility(){return 0;}int getChildCount(){return 1;}void setAlpha(float f){}void setScaleX(float f){}void setScaleY(float f){}void setTranslationX(float f){x=f;}void setTranslationY(float f){}}
+ static class Animator{boolean cancelled;Runnable callback;void removeAllListeners(){callback=null;}void cancel(){if(cancelled)return;cancelled=true;if(callback!=null)callback.run();}} static class AnimatorSet extends Animator{} static class SpringAnimation{interface End{void onEnd(SpringAnimation a,boolean c,float v,float speed);}boolean cancelled;boolean isRunning(){return !cancelled;}End listener;void addEndListener(End l){listener=l;}void finish(){listener.onEnd(this,false,1,0);}void cancel(){if(cancelled)return;cancelled=true;if(listener!=null)listener.onEnd(this,true,0,0);}}
  static class AndroidUtilities{static void cancelRunOnUIThread(Runnable r){}}
  static class GroupCallPip{static boolean onBackPressed(){return false;}}
  static class Bar {boolean isActionModeShowed(){return false;}boolean isSearchFieldVisible;void closeSearchField(){}}
  interface Delegate{boolean needCloseLastFragment(PreviewRegression p);}
  ArrayList<BaseFragment> fragmentsStack=new ArrayList<>();BaseFragment sheetFragment,newFragment,oldFragment;Bar currentActionBar;Delegate delegate;
+ boolean predictiveBackInProgress,inActionMode,isSheet,isLayersLayout,isRightLayout;float swipeProgress;
  boolean inPreviewMode,transitionAnimationPreviewMode,transitionAnimationInProgress,animationInProgress,startedTracking,previewOpenAnimationInProgress;
  long transitionAnimationStartTime;Object layoutToIgnore,springRouteBackgroundDrawable,previewMenu;float springRouteYRatio;boolean USE_ACTIONBAR_CROSSFADE;
  Container containerView=new Container(),containerViewBack=new Container();Animator currentAnimation;SpringAnimation currentSpringAnimation;
@@ -43,7 +48,7 @@ def fixture(source):
  void setAlpha(float f){}void invalidateActionBars(){}void checkNeedRebuild(){}boolean storyViewerAttached(){return false;}
  BaseFragment getLastFragment(){return fragmentsStack.isEmpty()?null:fragmentsStack.get(fragmentsStack.size()-1);}
  void closeLastFragment(boolean animated){closeLastFragment(animated,false);}
- void beginClose(BaseFragment target){transitionAnimationStartTime=System.currentTimeMillis();transitionAnimationInProgress=true;layoutToIgnore=containerView;
+ int closeRequests;void beginClose(BaseFragment target){closeRequests++;transitionAnimationStartTime=System.currentTimeMillis();transitionAnimationInProgress=true;layoutToIgnore=containerView;
  onCloseAnimationEndRunnable=()->{fragmentsStack.remove(target);inPreviewMode=false;previewMenu=null;};}
  void drain(){onAnimationEndCheck(true);}
  void preview(){fragmentsStack.add(new BaseFragment());inPreviewMode=true;previewMenu=new Object();}
@@ -122,3 +127,25 @@ class InstantCompletionOwnership(unittest.TestCase):
   tail="                if (instantNavigation == null || instantNavigation.isCurrent(endingGeneration)) setInnerTranslationX(0);"
   self.assertIn(tail,source)
   self.run_fixture(source.replace(tail,"                setInnerTranslationX(0);"),False)
+
+class OpeningBackOwnership(unittest.TestCase):
+ def test_same_native_back_closes_ready_opening_and_keeps_newer_destinations(self):
+  code=fixture((ROOT/PATH).read_text())
+  extras="""
+  static PreviewRegression opening(){PreviewRegression p=create();p.fragmentsStack.add(new ChatActivity());p.transitionAnimationInProgress=true;p.transitionAnimationStartTime=System.currentTimeMillis();p.onOpenAnimationEndRunnable=()->{};p.currentSpringAnimation=new SpringAnimation();return p;}
+  static void verifyOpeningBack(){
+   PreviewRegression p=opening();SpringAnimation old=p.currentSpringAnimation;p.onBackPressed();
+   check(p.closeRequests==1&&old.cancelled&&p.onOpenAnimationEndRunnable==null&&p.onCloseAnimationEndRunnable!=null);
+   p.onBackPressed();check(p.closeRequests==1);p.drain();check(p.fragmentsStack.size()==1);
+   PreviewRegression newer=opening();newer.onOpenAnimationEndRunnable=()->{newer.instantNavigation.begin(FlexyInstantNavigationCoordinator.State.OPENING,new FlexyInstantNavigationCoordinator.Intent(FlexyInstantNavigationCoordinator.Kind.OPEN_CHAT,99,null),false);newer.transitionAnimationInProgress=true;newer.currentSpringAnimation=new SpringAnimation();newer.containerView.x=99;};newer.onBackPressed();
+   check(newer.closeRequests==0&&newer.containerView.x==99&&newer.instantNavigation.intent().destinationId==99);
+   PreviewRegression modal=opening();modal.getLastFragment().dialog=new Dialog(true);modal.onBackPressed();check(modal.closeRequests==0&&!modal.currentSpringAnimation.cancelled);
+   PreviewRegression lateModal=opening();lateModal.onOpenAnimationEndRunnable=()->lateModal.getLastFragment().dialog=new Dialog(true);lateModal.onBackPressed();check(lateModal.closeRequests==0&&lateModal.fragmentsStack.size()==2);
+   PreviewRegression veto=opening();veto.getLastFragment().allowBack=false;veto.onBackPressed();check(veto.closeRequests==0&&veto.fragmentsStack.size()==2&&veto.onOpenAnimationEndRunnable==null);
+  }
+  """
+  code=code.replace(' public static void main(String[]args)',extras+' public static void main(String[]args)').replace('boolean original=args.length>0;','boolean original=args.length>0;verifyOpeningBack();')
+  with tempfile.TemporaryDirectory() as d:
+   path=Path(d)/'PreviewRegression.java';path.write_text(code)
+   subprocess.run(['java','-m','jdk.compiler/com.sun.tools.javac.Main','-d',d,str(path),str(ROOT/'TMessagesProj/src/main/java/org/telegram/ui/ActionBar/FlexyInstantNavigationCoordinator.java')],check=True)
+   subprocess.run(['java','-cp',d,'PreviewRegression'],check=True)
