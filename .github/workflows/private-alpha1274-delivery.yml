@@ -12,8 +12,8 @@ permissions:
   contents: read
 
 concurrency:
-  group: private-alpha1281-universal-${{ github.sha }}
-  cancel-in-progress: false
+  group: private-alpha1281-universal-01ba5b48187a0837926935db91e067011c4db725
+  cancel-in-progress: true
 
 jobs:
   source-checks:
@@ -22,7 +22,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: eef26442866447fdeb53447fe9dab11ce2a69539
+          ref: a4d66fc84695f59a17a1d30ac888cd18ebcb1bba
           fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-java@v4
@@ -171,11 +171,11 @@ jobs:
         working-directory: approved
     env:
       NATIVE_TARGET: arm64-v8a
-      COMMIT_ID: eef26442866447fdeb53447fe9dab11ce2a69539
+      COMMIT_ID: a4d66fc84695f59a17a1d30ac888cd18ebcb1bba
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: eef26442866447fdeb53447fe9dab11ce2a69539
+          ref: a4d66fc84695f59a17a1d30ac888cd18ebcb1bba
           path: approved
           fetch-depth: 0
           submodules: recursive
@@ -187,7 +187,7 @@ jobs:
           sparse-checkout: tools/private_alpha1274
           persist-credentials: false
       - name: Require the exact approved application commit
-        run: test "$(git rev-parse HEAD)" = eef26442866447fdeb53447fe9dab11ce2a69539
+        run: test "$(git rev-parse HEAD)" = a4d66fc84695f59a17a1d30ac888cd18ebcb1bba
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
