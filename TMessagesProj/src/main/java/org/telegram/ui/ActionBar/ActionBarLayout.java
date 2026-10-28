@@ -1072,11 +1072,13 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
     private boolean instantBackSeed;
     private float instantBackValue, instantBackVelocity;
     private long instantBackGeneration, instantBackDialog;
+    private int instantBackOwnerGuid;
 
     private void clearInstantBackSeed() {
         instantBackSeed = false;
         instantBackValue = instantBackVelocity = 0;
         instantBackGeneration = instantBackDialog = 0;
+        instantBackOwnerGuid = 0;
     }
 
     private SpringAnimation createInstantLayoutSpring(boolean open, boolean preview) {
@@ -1102,14 +1104,30 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         return true;
     }
 
+    private long instantDestinationId(BaseFragment fragment) {
+        return fragment instanceof ChatActivity ? ((ChatActivity) fragment).getDialogId()
+                : fragment == null ? 0 : fragment.getClassGuid();
+    }
+
+    /** Only known ordinary native routes; authentication, sheets and custom owners stay native. */
+    private boolean supportsInstantBackScreen(BaseFragment fragment) {
+        return fragment != null && fragment.getClassGuid() != 0
+                && (fragment instanceof ChatActivity
+                || fragment instanceof org.telegram.ui.SettingsActivity
+                || fragment instanceof org.telegram.ui.ProfileActivity
+                || fragment instanceof org.telegram.ui.ContactsActivity
+                || fragment instanceof app.flexygram.settings.SignatureMatteSettingsActivity);
+    }
+
     private void reportInstantNavigation(FlexyInstantNavigationCoordinator.State state, BaseFragment target,
                                          FlexyInstantNavigationCoordinator.Kind kind) {
         instantSwipeSettlingClosing = false;
         if (instantNavigation != null) {
-            long destinationId = target instanceof ChatActivity ? ((ChatActivity) target).getDialogId() : 0;
+            long destinationId = instantDestinationId(target);
             boolean keepSeed = instantBackSeed && instantNavigation.isCurrent(instantBackGeneration)
                     && state == FlexyInstantNavigationCoordinator.State.CLOSING
-                    && kind == FlexyInstantNavigationCoordinator.Kind.BACK && destinationId == instantBackDialog;
+                    && kind == FlexyInstantNavigationCoordinator.Kind.BACK && destinationId == instantBackDialog
+                    && target != null && target.getClassGuid() == instantBackOwnerGuid;
             long ticket = instantNavigation.begin(state, new FlexyInstantNavigationCoordinator.Intent(kind, destinationId,
                     target == null ? null : target.getClass().getName()), false);
             if (keepSeed) instantBackGeneration = ticket;
@@ -1145,7 +1163,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
                 || activityDialog != null && activityDialog.isShowing();
     }
 
-    /** Finish only a ready, ordinary chat opening; the same native Back then decides the action. */
+    /** Finish only a ready ordinary opening on a known native route; the same Back decides the action. */
     private boolean prepareInstantBack() {
         clearInstantBackSeed();
         if (!transitionAnimationInProgress || onOpenAnimationEndRunnable == null || onCloseAnimationEndRunnable != null
@@ -1153,12 +1171,13 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
                 || inPreviewMode || transitionAnimationPreviewMode || previewOpenAnimationInProgress
                 || inActionMode || isSheet || isLayersLayout || isRightLayout || sheetFragment != null
                 || waitingForKeyboardCloseRunnable != null || delayedOpenAnimationRunnable != null
-                || fragmentsStack.size() < 2 || currentSpringAnimation == null || !currentSpringAnimation.isRunning()
+                || fragmentsStack.size() < 2 || currentAnimation != null || animationRunnable != null
+                || currentSpringAnimation == null || !currentSpringAnimation.isRunning()
                 || containerView == null || !containerView.isAttachedToWindow()
                 || containerView.getVisibility() != View.VISIBLE || containerView.getChildCount() == 0) return true;
         BaseFragment outgoing = getLastFragment();
         BaseFragment previous = fragmentsStack.get(fragmentsStack.size() - 2);
-        if (!(outgoing instanceof ChatActivity) || hasInstantBackModal(outgoing, previous)) return true;
+        if (!supportsInstantBackScreen(outgoing) || hasInstantBackModal(outgoing, previous)) return true;
         boolean continuable = USE_SPRING_ANIMATION && containerViewBack != null
                 && !containerView.isKeyboardVisible && !containerViewBack.isKeyboardVisible
                 && currentSpringAnimation.canContinue();
@@ -1169,7 +1188,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         if (instantNavigation == null) instantNavigation = new FlexyInstantNavigationCoordinator();
         long ticket = instantNavigation.begin(FlexyInstantNavigationCoordinator.State.OPENING,
                 new FlexyInstantNavigationCoordinator.Intent(FlexyInstantNavigationCoordinator.Kind.BACK,
-                        ((ChatActivity) outgoing).getDialogId(), outgoing.getClass().getName()), true);
+                        instantDestinationId(outgoing), outgoing.getClass().getName()), true);
         boolean completed = instantNavigation.commit(ticket, () -> {
             onAnimationEndCheck(true);
         });
@@ -1181,7 +1200,8 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
             instantBackValue = SPRING_MULTIPLIER - openingValue;
             instantBackVelocity = -openingVelocity;
             instantBackGeneration = instantNavigation.generation();
-            instantBackDialog = ((ChatActivity) outgoing).getDialogId();
+            instantBackDialog = instantDestinationId(outgoing);
+            instantBackOwnerGuid = outgoing.getClassGuid();
         }
         setInnerTranslationX(0);
         if (USE_ACTIONBAR_CROSSFADE) {

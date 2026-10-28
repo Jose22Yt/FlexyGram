@@ -18,6 +18,11 @@ def method(source,anchor):
 def fixture(source):
  bodies=[method(source,x) for x in ['public boolean checkTransitionAnimation()', 'public void finishPreviewFragment()', 'public void onBackPressed()', 'private void onCloseAnimationEnd()', 'private void onOpenAnimationEnd()', 'private void onAnimationEndCheck(boolean byCheck)']]
  if 'private void reportInstantNavigation(' in source:bodies+=[method(source,'private void reportInstantNavigation('),method(source,'private boolean isObsoleteInstantCompletion(')]
+ if 'private long instantDestinationId(' in source:bodies+=[method(source,'private long instantDestinationId(')]
+ if 'private boolean supportsInstantBackScreen(' in source:
+  helper=method(source,'private boolean supportsInstantBackScreen(')
+  for name in ('org.telegram.ui.SettingsActivity','org.telegram.ui.ProfileActivity','org.telegram.ui.ContactsActivity','app.flexygram.settings.SignatureMatteSettingsActivity'):helper=helper.replace(name,name.rsplit('.',1)[1])
+  bodies+=[helper]
  if 'private boolean isObsoleteInstantCompletion(' in source:
   a=source.index('            currentSpringAnimation.addEndListener(',source.index('    private void startLayoutAnimation('));b=source.index('            currentSpringAnimation.start();',a)
   bodies+=['void installNativeSpringCallback(){final long springGeneration=instantNavigation==null?0:instantNavigation.generation();'+source[a:b]+'}']
@@ -28,12 +33,13 @@ def fixture(source):
  a=source.index('public void closeLastFragment(boolean animated, boolean forceNoAnimation)');b=source.index('        if (parentActivity.getCurrentFocus()',a)
  bodies+=[source[a:b]+' beginClose(getLastFragment()); }']
  return '''import java.util.*;import org.telegram.ui.ActionBar.FlexyInstantNavigationCoordinator;public class PreviewRegression {
- FlexyInstantNavigationCoordinator instantNavigation;boolean instantSwipeSettlingClosing;boolean instantBackSeed;float instantBackValue,instantBackVelocity;long instantBackGeneration,instantBackDialog;static final float SPRING_MULTIPLIER=1000;boolean USE_SPRING_ANIMATION=true;
+ FlexyInstantNavigationCoordinator instantNavigation;boolean instantSwipeSettlingClosing;boolean instantBackSeed;float instantBackValue,instantBackVelocity;long instantBackGeneration,instantBackDialog;int instantBackOwnerGuid;static final float SPRING_MULTIPLIER=1000;boolean USE_SPRING_ANIMATION=true;
  static class ChatActivity extends BaseFragment {long getDialogId(){return 42;}}
+ static class SettingsActivity extends BaseFragment{}static class ProfileActivity extends BaseFragment{}static class ContactsActivity extends BaseFragment{}static class SignatureMatteSettingsActivity extends BaseFragment{}static class UnsupportedScreen extends BaseFragment{}
  static class Dialog{boolean showing;Dialog(boolean value){showing=value;}boolean isShowing(){return showing;}}
  static class LaunchActivity{static LaunchActivity instance;Dialog getVisibleDialog(){return null;}}
  static class View{static final int VISIBLE=0;}
- static class BaseFragment {Dialog dialog;boolean sheet,allowBack=true;Dialog getVisibleDialog(){return dialog;}boolean hasSheet(){return sheet;}boolean closeLastFragment(){return false;}boolean onBackPressed(boolean p){return allowBack;}}
+ static class BaseFragment {static int nextGuid;int guid=++nextGuid;int getClassGuid(){return guid;}Dialog dialog;boolean sheet,allowBack=true;Dialog getVisibleDialog(){return dialog;}boolean hasSheet(){return sheet;}boolean closeLastFragment(){return false;}boolean onBackPressed(boolean p){return allowBack;}}
  static class Container {boolean isKeyboardVisible;float x;boolean isAttachedToWindow(){return true;}int getVisibility(){return 0;}int getChildCount(){return 1;}void setAlpha(float f){}void setScaleX(float f){}void setScaleY(float f){}void setTranslationX(float f){x=f;}void setTranslationY(float f){}}
  static class Animator{boolean cancelled;Runnable callback;void removeAllListeners(){callback=null;}void cancel(){if(cancelled)return;cancelled=true;if(callback!=null)callback.run();}} static class AnimatorSet extends Animator{} static class SpringAnimation{interface End{void onEnd(SpringAnimation a,boolean c,float v,float speed);}boolean cancelled;boolean canContinue(){return false;}float continuationValue(){return 0;}float continuationVelocity(){return 0;}boolean isRunning(){return !cancelled;}End listener;void addEndListener(End l){listener=l;}void finish(){listener.onEnd(this,false,1,0);}void cancel(){if(cancelled)return;cancelled=true;if(listener!=null)listener.onEnd(this,true,0,0);}}
  static class AndroidUtilities{static void cancelRunOnUIThread(Runnable r){}}
