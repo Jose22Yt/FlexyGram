@@ -137,6 +137,15 @@ class SmartPreviews(unittest.TestCase):
                         voice.messageOwner.message="Caption";verify(0,voice);
                         voice.messageOwner.message="";voice.messageOwner.media=new TLRPC.Media();
                         voice.messageOwner.media.ttl_seconds=15;verify(0,voice);
+                        // REAL production eligibility: ordinary private chats
+                        // have a one-element dialogMessage ArrayList, not null.
+                        ok(SignatureSmartPreviews.allowsSingleMessagePreview(null),"missing grouped cache");
+                        java.util.ArrayList<MessageObject> latest=new java.util.ArrayList<>();
+                        ok(SignatureSmartPreviews.allowsSingleMessagePreview(latest),"empty grouped cache");
+                        latest.add(file);
+                        ok(SignatureSmartPreviews.allowsSingleMessagePreview(latest),"normal singleton file dialog");
+                        latest.add(photo);
+                        ok(!SignatureSmartPreviews.allowsSingleMessagePreview(latest),"multi-item album stays native");
                         SignatureSmartPreviews.setMode(SignatureSmartPreviewPalette.MATTE);
                         ok(SignatureSmartPreviews.mode()==2,"mode stored");
                         SignatureSmartPreviews.setMode(SignatureSmartPreviewPalette.OFF);
@@ -171,6 +180,8 @@ class SmartPreviews(unittest.TestCase):
     def test_dialog_cell_integration_preserves_native_list_and_layout(self):
         s=DIALOG.read_text()
         self.assertIn("SignatureSmartPreviews.kind(message)",s)
+        self.assertIn("SignatureSmartPreviews.allowsSingleMessagePreview(groupMessages)",s)
+        self.assertNotIn("&& groupMessages == null",s)
         self.assertIn("drawSmartPreviewBackground(canvas,top,1f-updateHelper.typingProgres)",s)
         self.assertIn("smartPreviewPalette.foreground()",s)
         self.assertIn("smartPreviewKind=0",s)
