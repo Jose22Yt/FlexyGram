@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: e1811bb93c733b1cf84a5ac8fee126969d034b0d
+          ref: bb3af73e085f3cdb3e9e92f35f6d1b692c04afcb
           fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-java@v4
