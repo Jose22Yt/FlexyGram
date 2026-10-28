@@ -51,6 +51,14 @@ public final class SpringAnimation implements View.OnAttachStateChangeListener {
                 && owner.isAttachedToWindow() && owner.isShown() && owner.getWindowVisibility() == View.VISIBLE
                 && !FlexyMotionSettings.state(owner.getContext()).instant();
     }
+    /** Readiness only: final 0..1 property value and stopped updates; caller validates the scene. */
+    public boolean canFinalizeRenderedTimed() {
+        main();
+        return BuildConfig.CONNECTED_ALPHA && running && timed && !queuedCancelled
+                && force != null && force.getFinalPosition() == 1f && holder.getValue() == 1f
+                && frames != null && !frames.isRunning() && owner.isAttachedToWindow() && owner.isShown()
+                && owner.getWindowVisibility() == View.VISIBLE;
+    }
     public float continuationValue(){main();if(!canContinue())throw new IllegalStateException("inactive trajectory");return holder.getValue();}
     public float continuationVelocity(){main();if(!canContinue())throw new IllegalStateException("inactive trajectory");return frames.velocity()*NAVIGATION_RATE*FlexyMotionSettings.state(owner.getContext()).speed;}
     /** Opt-in only for a native renderer seeded from a previous trajectory. */

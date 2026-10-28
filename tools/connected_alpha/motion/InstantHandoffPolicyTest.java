@@ -27,6 +27,13 @@ public final class InstantHandoffPolicyTest {
                 x, y, outgoingX, 400f, 800f, 16f);
     }
 
+    private static void timed(String name, boolean expected, boolean ready, boolean blocked, boolean attached,
+                               float alpha, float x, float y, float width, float height, float inset) {
+        cases++;
+        boolean actual=FlexyNavigationHandoffPolicy.canHandoffRenderedTimedCloseDown(ready,blocked,attached,alpha,x,y,width,height,inset);
+        if(actual!=expected)throw new AssertionError(name+" expected="+expected+", actual="+actual);
+    }
+
     public static void main(String[] args) {
         sample("exposed middle of outgoing close", true, true, false, true, true, 80f, 200f, 220f);
         sample("exposed near left", true, true, false, true, true, 16f, 200f, 220f);
@@ -58,6 +65,18 @@ public final class InstantHandoffPolicyTest {
         check("Infinity inset", false, true, false, true, true, 80f, 200f, 220f, 400f, 800f, Float.POSITIVE_INFINITY);
         check("tiny screen", false, true, false, true, true, 80f, 200f, 220f, 12f, 12f, 16f);
         check("zero inset at x zero", true, true, false, true, true, 0f, 20f, 100f, 400f, 800f, 0f);
+        timed("rendered timed body",true,true,false,true,0,120,240,300,600,16);
+        timed("running timed",false,false,false,true,0,120,240,300,600,16);
+        timed("visible outgoing",false,true,false,true,.001f,120,240,300,600,16);
+        timed("modal",false,true,true,true,0,120,240,300,600,16);
+        timed("detached",false,true,false,false,0,120,240,300,600,16);
+        timed("NaN alpha",false,true,false,true,Float.NaN,120,240,300,600,16);
+        timed("infinite x",false,true,false,true,0,Float.POSITIVE_INFINITY,240,300,600,16);
+        timed("outside right",false,true,false,true,0,284,240,300,600,16);
+        timed("outside bottom",false,true,false,true,0,120,584,300,600,16);
+        timed("negative inset",false,true,false,true,0,120,240,300,600,-1);
+        timed("invalid dimensions",false,true,false,true,0,120,240,Float.NaN,600,16);
+        timed("too small",false,true,false,true,0,16,16,32,32,16);
         System.out.println("Instant navigation handoff policy: " + cases + " PASS");
     }
 }

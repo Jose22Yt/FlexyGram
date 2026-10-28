@@ -48,6 +48,15 @@ public final class FlexyNavigationHandoffPolicy {
                 && touchY < height - safetyInset;
     }
 
+    /** A fully invisible, already-rendered timed close exposes the complete native destination. */
+    public static boolean canHandoffRenderedTimedCloseDown(boolean ready, boolean blocked, boolean attached,
+            float alpha, float x, float y, float width, float height, float inset) {
+        return ready && !blocked && attached && finite(alpha) && alpha == 0f
+                && finite(x) && finite(y) && finite(width) && finite(height) && finite(inset)
+                && inset >= 0f && width > inset * 2f && height > inset * 2f
+                && x >= inset && x < width - inset && y >= inset && y < height - inset;
+    }
+
     private static boolean finite(float value) {
         return !Float.isNaN(value) && !Float.isInfinite(value);
     }

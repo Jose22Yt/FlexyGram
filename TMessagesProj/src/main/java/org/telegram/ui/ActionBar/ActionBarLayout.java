@@ -1472,6 +1472,22 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         return true;
     }
 
+    private boolean canHandoffRenderedTimedClose(MotionEvent event, BaseFragment outgoing, BaseFragment destination) {
+        if (event.getPointerCount() != 1 || onOpenAnimationEndRunnable != null
+                || currentSpringAnimation == null || !currentSpringAnimation.canFinalizeRenderedTimed()
+                || currentAnimation != null || animationRunnable != null || backAnimator != null || velocityTracker != null
+                || waitingForKeyboardCloseRunnable != null || delayedOpenAnimationRunnable != null
+                || predictiveInput || storyViewerAttached() || hasInstantBackModal(outgoing, destination)
+                || outgoing.getClassGuid() == 0 || destination.getClassGuid() == 0
+                || containerView.isKeyboardVisible || containerViewBack.isKeyboardVisible
+                || getAlpha() != 1f || !containerView.isShown() || containerView.getAlpha() != 1f
+                || containerView.getTranslationX() != 0f || containerView.getTranslationY() != 0f
+                || containerView.getScaleX() != 1f || containerView.getScaleY() != 1f) return false;
+        return FlexyNavigationHandoffPolicy.canHandoffRenderedTimedCloseDown(true, false,
+                containerView.isAttachedToWindow(), containerViewBack.getAlpha(), event.getX(), event.getY(),
+                getWidth(), getHeight(), dp(16));
+    }
+
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
         int action = event.getActionMasked();
@@ -1730,7 +1746,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
                 containerViewBack.getVisibility() == View.VISIBLE,
                 containerView.getVisibility() == View.VISIBLE && containerView.getChildCount() > 0,
                 event.getX(), event.getY(), containerViewBack.getTranslationX(),
-                getWidth(), getHeight(), dp(16))) {
+                getWidth(), getHeight(), dp(16)) && !canHandoffRenderedTimedClose(event, outgoing, destination)) {
             return false;
         }
         // Complete native lifecycle/stack operations before Android hit-tests
