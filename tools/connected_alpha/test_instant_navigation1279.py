@@ -32,6 +32,24 @@ class InstantNavigation1279Regression(unittest.TestCase):
         guard=(ROOT/'tools/connected_alpha/test_flexy_motion.py').read_text()
         self.assertIn('new=restore_handoff(path,(ROOT/path).read_bytes()).decode()',guard)
 
+    def test_historical_launcher_guard_projects_only_exact_reviewed_cleanup(self):
+        import instant_navigation1279_contract as handoff
+        from motion_contract import restore_navigation
+        path="TMessagesProj/src/main/java/org/telegram/ui/LaunchActivity.java"
+        source=(ROOT/path).read_bytes()
+        self.assertEqual(handoff.original(path),restore_navigation(path,source))
+        mutations=[source+b"// unknown",source+b"\n",
+            source.replace(b"cancelledLayout.onBackCancelled();",b"cancelledLayout.onBackInvoked();",1),
+            source.replace(b"passcodeDialog != null",b"passcodeDialog == null",1)]
+        for mutant in mutations:
+            self.assertNotEqual(source,mutant)
+            self.assertEqual(mutant,restore_navigation(path,mutant))
+            self.assertNotEqual(handoff.original(path),restore_navigation(path,mutant))
+        for path in ("TMessagesProj/src/main/java/org/telegram/ui/LoginActivity.java",
+                     "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/Theme.java",
+                     "TMessagesProj/src/main/java/org/telegram/tgnet/ConnectionsManager.java"):
+            self.assertEqual(b"unknown",restore_navigation(path,b"unknown"))
+
     def test_actual_coordinator_protocol(self):
         import subprocess,tempfile
         with tempfile.TemporaryDirectory() as folder:

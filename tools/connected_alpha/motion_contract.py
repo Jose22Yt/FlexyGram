@@ -14,7 +14,10 @@ def restore(path,data):
  p=subprocess.run(['git','show',BASE+':'+str(path)],cwd=ROOT,capture_output=True)
  return p.stdout if p.returncode==0 else b''
 def restore_navigation(path,data):
- # Historical release guards accept only the exact reviewed navigation delta.
+ # Historical release guards accept only exact reviewed navigation deltas.
+ if str(path)=='TMessagesProj/src/main/java/org/telegram/ui/LaunchActivity.java':
+  from instant_navigation1279_contract import restore as restore_handoff
+  return restore_handoff(path,data)
  return restore(path,data) if str(path)=='TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java' else data
 def verify_current():
  from integration1279_contract import project,verify_current as verify_integration,paths as integration_paths

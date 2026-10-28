@@ -9,7 +9,7 @@
     ".github/workflows/instant-navigation-handoff.yml": "fa50365461dc2ace40898d67a5b932af96f8d0dd",
     "tools/connected_alpha/integration1279_contract.py": "b29d69ef30f20da7b6148a848ee8275bdf71662c",
     "tools/connected_alpha/instant_navigation1279_contract.py": "3848af94cc53a812649c3194c9b97da7b1c1b16d",
-    "tools/connected_alpha/test_instant_navigation1279.py": "1d8081455f66ee0863af468f7a6747bfd710a2a8",
+    "tools/connected_alpha/test_instant_navigation1279.py": "c486fad4e3cc93b5662364794dfb389333c0da2d",
     "tools/connected_alpha/motion_native/stubs.py": "7d47cb758c3874636f4c0d2c57b23ac2e43c326f",
     "tools/connected_alpha/motion_native/MotionEngineTest.java.in": "c4e087a1c2495514bcf7702074e26d982adde371",
     "tools/connected_alpha/test_flexy_motion.py": "b0f8a0266b89bfe29f0a97c00719fd2b409c02b4",
@@ -25,7 +25,8 @@
     "tools/connected_alpha/motion_native/gesture_opening_probe.py": "8a929e296bf9241cf90ebba8cbd4f58af78fac21",
     "tools/connected_alpha/motion_native/gesture_support.py": "998ff8e2f9d94ad4e0f2055ccbe3ae15c57c7138",
     "TMessagesProj/src/main/java/org/telegram/ui/LaunchActivity.java": "fa5cce68d3d1ecfd2997efef3270c29ff1331e9e",
-    "tools/connected_alpha/motion_native/gesture_dispatch_probe.py": "b1988090e3981abd686402fcc9b09c24af5ad462"
+    "tools/connected_alpha/motion_native/gesture_dispatch_probe.py": "b1988090e3981abd686402fcc9b09c24af5ad462",
+    "tools/connected_alpha/motion_contract.py": "ac1c0ad82079425a79adf1ab72d6e7bda5443887"
   },
   "paths": [
     ".github/workflows/instant-navigation-handoff.yml",
@@ -41,6 +42,7 @@
     "tools/connected_alpha/motion/InstantHandoffPolicyTest.java",
     "tools/connected_alpha/motion/InstantNavigationCoordinatorTest.java",
     "tools/connected_alpha/motion/verify_instant_handoff.py",
+    "tools/connected_alpha/motion_contract.py",
     "tools/connected_alpha/motion_native/MotionEngineTest.java.in",
     "tools/connected_alpha/motion_native/gesture_dispatch_probe.py",
     "tools/connected_alpha/motion_native/gesture_opening_probe.py",
