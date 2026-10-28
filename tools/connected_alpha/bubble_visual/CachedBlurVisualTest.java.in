@@ -122,8 +122,9 @@ public class CachedBlurVisualTest {
   int ready=changed[0];assertTrue(ready>0);
   for(int n=0;n<200;n++)a.prepare(source,false,0xffcccccc);
   assertEquals(ready,changed[0]);assertEquals(0,Utilities.globalQueue.pending());
-  a.prepare(source,true,0xffcccccc);assertEquals(ready+1,changed[0]);assertFalse(a.isReady());
-  a.prepare(source,true,0xffcccccc);assertEquals(ready+1,changed[0]);
+  a.prepare(source,true,0xffcccccc);assertEquals(ready,changed[0]);assertTrue(a.isReady());
+  a.prepare(null,true,0xffcccccc);assertEquals(ready+1,changed[0]);assertFalse(a.isReady());
+  a.prepare(null,true,0xffcccccc);assertEquals(ready+1,changed[0]);
   a.close();assertEquals(ready+1,changed[0]);
  }
  @Test public void parentDrawPolicyUpdatesBothDirectionsAndLeavesOtherEmbeddersNative(){
@@ -224,7 +225,7 @@ public class CachedBlurVisualTest {
  @Test public void distinctThemeSurfaceKeysAndCanceledColdRevealRemainSafe()throws Exception{
   BitmapDrawable source=image(80,90,0);var a=owner(keep(new View(ApplicationLoader.applicationContext)));a.prepare(source,false,0xffeeeeee);complete();Bitmap light=cached(a);a.close();
   var b=owner(keep(new View(ApplicationLoader.applicationContext)));b.prepare(source,false,0xff111111);assertFalse(b.isReady());complete();assertNotSame(light,cached(b));
-  var c=owner(keep(new View(ApplicationLoader.applicationContext)));c.prepare(source,true,0xff111111);assertFalse(c.isReady());assertFalse(c.isSupported());c.close();assertTrue(b.isReady());
+  var c=owner(keep(new View(ApplicationLoader.applicationContext)));c.prepare(null,true,0xff111111);assertFalse(c.isReady());assertFalse(c.isSupported());c.close();assertTrue(b.isReady());
  }
 
 }
