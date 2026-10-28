@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: eef26442866447fdeb53447fe9dab11ce2a69539
+          ref: a4d66fc84695f59a17a1d30ac888cd18ebcb1bba
           fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-java@v4
