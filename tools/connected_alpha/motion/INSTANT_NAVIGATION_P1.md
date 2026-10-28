@@ -1,0 +1,122 @@
+# Flexy Motion Instant Navigation — P1 exposed-surface handoff
+
+## Status and precise scope
+
+**Experimental production integration, not physically accepted.**
+Base: Alpha1279 / PR112, commit `d50677f723292d0e405eae8e1529f65416ff9cbd`.
+Independent branch; no merge to main/develop, no APK/signing/release, no telemetry claims.
+
+Existing PR108/112 already integrates shared motion clock and configurable motion
+presets. This work **does not replace those animations**. It changes only one
+touch-dispatch decision in `ActionBarLayout` and adds a small fail-closed policy.
+
+## Real user-facing behavior: one tap opens B
+
+When closing a regular `ChatActivity` to `MainTabsActivity` or `DialogsActivity`,
+the departing chat translates to the right. The list is already attached and
+visible behind it. During this limited exposed interval:
+
+1. Android delivers **the original** `ACTION_DOWN` to `ActionBarLayout`.
+2. The policy confirms the point is **well inside the exposed list area**,
+   not in the outgoing chat, a modal, preview, sheet or gesture.
+3. The existing native `onAnimationEndCheck(true)` completes the closing
+   transition and its fragment/lifecycle cleanup.
+4. `onInterceptTouchEvent` returns **false**. Android's normal
+   `ViewGroup.dispatchTouchEvent` hit testing now dispatches the *same*
+   original DOWN to the list, without synthetic taps.
+5. The list's real row handler receives subsequent MOVE/UP normally. If the
+   user completes a valid click on chat B, **B opens with the existing native
+   animation without requiring a second tap**.
+
+No interaction is fired merely because a finger touched down: scrolling,
+gesture slop, cancellation and the click's own action ownership still belong
+to the actual destination view.
+
+### Eligibility
+
+- A normal close transition is active, with a valid native close callback.
+- Stack top is `ChatActivity`, below is `MainTabsActivity` or `DialogsActivity`.
+- Previous container is attached/visible, outgoing container visible and
+  translated right; `ACTION_DOWN` is inside a conservative left-hand region.
+- At least 16dp from exposed boundary, container edges and top/bottom.
+- No previews, popup/sheet ownership, Android predictive-back progress,
+  active tracking, action mode, or layer/sheet layout.
+- Bounds must be finite; no unknown geometry or no-exposure triggers.
+
+For all other cases the original interception and transition guards remain
+unchanged, including opening animations and non-chat screens.
+
+### Why not call `performClick` or clone `MotionEvent`?
+
+Touch streams need a consistent DOWN/MOVE/UP owner. Faking a second event or
+replaying UP into a newly attached view can open the wrong item, trigger
+double actions or violate gesture cancellation. The safer narrow P1 solution
+commits the old close *before* the framework resolves the original DOWN's
+target and then lets Android do standard dispatch.
+
+### Known limitations / items Work 2 must extend
+
+1. This **does not** make the entire app interruptible. It covers an
+   exposed, directly touchable region of chat-list during a *standard close*.
+2. Taps inside the still-visible outgoing chat remain owned/blocked as
+   before; do not ghost-click a row hidden behind opaque content.
+3. Opening A, reversing halfway; close via predictive-back; profile/settings
+   transitions; tab switches; sheet gestures; transparent overlays; and
+   rapid intent coalescing still need distinct, state-aware implementations.
+4. Position/velocity-preserving spring retargeting needs a generation-owned
+   transition coordinator; forcing completion may create a visible snap.
+5. This P1 may still exhibit an unwanted snap on release or expose a hitbox
+   that has moved under a shared animated surface. **Physical testing is
+   mandatory before integration.**
+6. Commit to **one owner** for each event. Never indiscriminately return
+   false for every animation, disable native guards, or replay stale clicks.
+7. The Work1 Alpha1279 Smart Preview hotfix / PR113 is a parallel branch.
+   Rebase carefully and keep its reviewed changes and test contracts.
+
+## Required testing and observed evidence
+
+Quick host checks (no Android account, no APK):
+
+```bash
+python3 tools/connected_alpha/motion/verify_instant_handoff.py
+mkdir -p /tmp/flexy-handoff-classes
+javac -d /tmp/flexy-handoff-classes \
+  TMessagesProj/src/main/java/org/telegram/ui/ActionBar/FlexyNavigationHandoffPolicy.java \
+  tools/connected_alpha/motion/InstantHandoffPolicyTest.java
+java -cp /tmp/flexy-handoff-classes InstantHandoffPolicyTest
+```
+
+The source-scope test reconstructs upstream ActionBarLayout **byte-for-byte**
+and verifies its Git blob SHA; unknown upstream changes must be explicitly
+reviewed, never silently normalized.
+
+### Physical Poco acceptance matrix
+
+Test Alpha1279 baseline vs this candidate with display refresh mode,
+thermal state and settings fixed. For 0%, 10%, 25%, 50%, 75%, 95% close
+progress: tap **only once** on an actually exposed row B. Observe whether
+B opens, whether any first tap is lost, and whether the row under the finger
+remains stable. Repeat with FLASH / FLOW / SIGNATURE and maximum elastic
+setting, 30+ valid taps per condition, plus abort/cancel/scroll cases.
+
+Include: RTL/large fonts; back-gesture and predictive back; keyboard open;
+music mini player; spoilers/previews; dark/light theme; orientation;
+concurrent rapid A -> list -> B -> list -> C; view detach; notifications;
+and lifecycle interruption. Test no double navigation and no ghost clicks.
+
+Record FrameTimeline/Perfetto touch-to-response, jank, p50/p95 transition
+start, GC and thermal comparability. No fabricated FPS/latency. An
+isolated Android API35 probe should exercise **real ViewGroup dispatch**
+with the integration before calling this fully done.
+
+**P1 acceptance:** original single DOWN/UP opens exposed B, exactly once,
+without waiting for A's full animation; no regression in protected modes.
+**Global Instant Navigation 1.0 remains unfinished** until Work2 builds a
+coordinator for additional transitions and validates physical behavior.
+
+## Rollback
+
+Revert the ActionBarLayout-specific commit and delete
+`FlexyNavigationHandoffPolicy.java`; the PR108/112 motion engine and all
+settings remain intact. No user preferences, data, build identity or
+migration changes.
