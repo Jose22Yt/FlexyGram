@@ -29,7 +29,7 @@ def fixture(source):
   a=source.index('            currentSpringAnimation.addEndListener(',source.index('    private void startLayoutAnimation('));b=source.index('            currentSpringAnimation.start();',a)
   bodies+=['void installNativeSpringCallback(){final long springGeneration=instantNavigation==null?0:instantNavigation.generation();'+source[a:b]+'}']
   if 'private boolean isObsoleteInstantFrame(' in source:bodies+=[method(source,'private boolean isObsoleteInstantFrame(')]
- if 'private boolean prepareInstantBack(' in source:bodies+=[method(source,'private boolean prepareInstantBack('),method(source,'private boolean hasInstantBackModal(')]
+ if 'private boolean prepareInstantBack(' in source:bodies+=[method(source,'private boolean prepareInstantBack('),method(source,'private boolean hasInstantBackModal('),method(source,'private boolean instantLayoutUsesContainerWidth(')]
  if 'private void clearInstantBackSeed(' in source:bodies+=[method(source,'private void clearInstantBackSeed(')]
  if 'private void clearInstantGesture(' in source:bodies+=[method(source,'private void clearInstantGesture(')]
  # Legacy probes leave reveal inactive; RevealProbe executes the active native wrappers/helpers.

@@ -1080,6 +1080,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
     private long instantGestureNanos, instantGestureGeneration;
     private int instantGestureOwnerGuid;
     private int instantGestureStyle;
+    private boolean instantGestureContainerWidth;
     private float instantGestureOpeningX, instantGestureOpeningAlpha = 1f;
 
     private void clearInstantGesture() {
@@ -1087,6 +1088,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         instantGestureOrigin = instantGestureValue = instantGestureVelocity = 0;
         instantGestureNanos = instantGestureGeneration = 0;
         instantGestureOwnerGuid = instantGestureStyle = 0;
+        instantGestureContainerWidth = false;
         instantGestureOpeningX = 0;
         instantGestureOpeningAlpha = 1f;
     }
@@ -1124,6 +1126,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
             instantGestureOrigin = instantBackValue / SPRING_MULTIPLIER;
             instantGestureValue = instantBackValue;
             instantGestureVelocity = instantBackVelocity;
+            instantGestureContainerWidth = spring && instantBackContainerWidth;
             instantGestureGeneration = instantNavigation.generation();
             instantGestureOwnerGuid = owner.getClassGuid();
             instantGestureOpeningX = timed ? openingX : 0;
@@ -1172,7 +1175,8 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
     /** Same ordinary spring geometry, with the finger controlling its progress. No animator while dragging. */
     private void renderInstantGestureValue(float value) {
         float progress = value / SPRING_MULTIPLIER;
-        float width = getWidth() - getPaddingLeft() - getPaddingRight();
+        float width = instantGestureContainerWidth ? containerView.getMeasuredWidth()
+                : getWidth() - getPaddingLeft() - getPaddingRight();
         containerView.setTranslationX(progress * width);
         containerViewBack.setTranslationX(-(1f - progress) * .35f * width);
         float scale = AndroidUtilities.lerp(1f, .85f, progress);
@@ -1289,6 +1293,8 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
     private float instantRevealOpenValue, instantRevealOpenVelocity, instantRevealOpenWidth;
     private long instantRevealOpenGeneration;
     private int instantRevealOpenGuid;
+    private boolean instantBackContainerWidth;
+    private long instantLayoutWidthGeneration = -1;
 
     private void clearInstantRevealSeed() {
         instantRevealSeed = instantRevealContainerWidth = false;
@@ -1440,6 +1446,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         if (!Float.isFinite(value) || !Float.isFinite(velocity) || value < -.25f * SPRING_MULTIPLIER || value > 1.25f * SPRING_MULTIPLIER) return false;
         final int homeGuid = instantRevealHomeGuid;
         final boolean settling = instantRevealSettling;
+        final boolean containerWidth = settling || instantLayoutUsesContainerWidth();
         final float outgoingWidth = (settling ? containerView : containerViewBack).getMeasuredWidth();
         clearInstantRevealTouch(false);
         long ticket = instantNavigation.begin(FlexyInstantNavigationCoordinator.State.CLOSING,
@@ -1458,7 +1465,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         instantRevealSeed = true;
         instantRevealOpenValue = SPRING_MULTIPLIER - value;
         instantRevealOpenVelocity = -velocity;
-        instantRevealContainerWidth = settling;
+        instantRevealContainerWidth = containerWidth;
         instantRevealOpenWidth = outgoingWidth;
         instantRevealOpenGeneration = instantNavigation.generation();
         instantRevealOpenGuid = target.getClassGuid();
@@ -1507,10 +1514,22 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
     }
 
     private void clearInstantBackSeed() {
-        instantBackSeed = false;
+        instantBackSeed = instantBackContainerWidth = false;
         instantBackValue = instantBackVelocity = 0;
         instantBackGeneration = instantBackDialog = 0;
         instantBackOwnerGuid = 0;
+    }
+
+    private boolean instantLayoutUsesContainerWidth() {
+        return currentSpringAnimation != null && instantNavigation != null
+                && instantNavigation.isCurrent(instantLayoutWidthGeneration);
+    }
+
+    private boolean usesInstantLayoutContainerWidth(boolean open, boolean preview) {
+        if (open) return hasInstantRevealOpeningSeed(open, preview) && instantRevealContainerWidth;
+        return !preview && instantBackSeed && instantBackContainerWidth && instantNavigation != null
+                && instantNavigation.isCurrent(instantBackGeneration)
+                && instantNavigation.state() == FlexyInstantNavigationCoordinator.State.CLOSING;
     }
 
     private boolean hasInstantRevealOpeningSeed(boolean open, boolean preview) {
@@ -1564,6 +1583,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
 
     private void reportInstantNavigation(FlexyInstantNavigationCoordinator.State state, BaseFragment target,
                                          FlexyInstantNavigationCoordinator.Kind kind) {
+        instantLayoutWidthGeneration = -1;
         clearInstantRevealTouch(true);
         boolean keepReveal = instantRevealSeed && instantNavigation != null && instantNavigation.isCurrent(instantRevealOpenGeneration)
                 && state == FlexyInstantNavigationCoordinator.State.OPENING && kind == FlexyInstantNavigationCoordinator.Kind.OPEN_CHAT
@@ -1644,6 +1664,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         float openingVelocity = continuable ? currentSpringAnimation.continuationVelocity() : 0;
         continuable &= Float.isFinite(openingValue) && Float.isFinite(openingVelocity)
                 && openingValue >= -0.25f * SPRING_MULTIPLIER && openingValue <= 1.25f * SPRING_MULTIPLIER;
+        final boolean containerWidth = continuable && instantLayoutUsesContainerWidth();
         if (instantNavigation == null) instantNavigation = new FlexyInstantNavigationCoordinator();
         long ticket = instantNavigation.begin(FlexyInstantNavigationCoordinator.State.OPENING,
                 new FlexyInstantNavigationCoordinator.Intent(FlexyInstantNavigationCoordinator.Kind.BACK,
@@ -1658,6 +1679,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
             instantBackSeed = true;
             instantBackValue = SPRING_MULTIPLIER - openingValue;
             instantBackVelocity = -openingVelocity;
+            instantBackContainerWidth = containerWidth;
             instantBackGeneration = instantNavigation.generation();
             instantBackDialog = instantDestinationId(outgoing);
             instantBackOwnerGuid = outgoing.getClassGuid();
@@ -2877,6 +2899,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
 
     private void onAnimationEndCheck(boolean byCheck) {
         final long instantGeneration = instantNavigation == null ? 0 : instantNavigation.generation();
+        instantLayoutWidthGeneration = -1;
         final SpringAnimation endingSpring = currentSpringAnimation;
         final Animator endingAnimator = currentAnimation;
         final Runnable endingFrame = animationRunnable;
@@ -3156,9 +3179,10 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
                         app.exteraless.utils.PredictiveBackAnimationHelper.getTransitionBackground(
                                 fragmentsStack, getLastFragment());
             }
-            final boolean springRevealContainerWidth = hasInstantRevealOpeningSeed(open, preview) && instantRevealContainerWidth;
+            final boolean springRevealContainerWidth = usesInstantLayoutContainerWidth(open, preview);
             currentSpringAnimation = createInstantLayoutSpring(open, preview);
             final long springGeneration = instantNavigation == null ? 0 : instantNavigation.generation();
+            instantLayoutWidthGeneration = springRevealContainerWidth ? springGeneration : -1;
             currentSpringAnimation.addUpdateListener((animation, value, velocity) -> {
                 if (isObsoleteInstantFrame(animation, springGeneration)) return;
                 animationProgress = value / SPRING_MULTIPLIER;
@@ -3182,7 +3206,8 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
                     }
                 }
                 float interpolated = animationProgress;
-                float widthNoPaddings = springRevealContainerWidth ? containerView.getMeasuredWidth()
+                float widthNoPaddings = springRevealContainerWidth
+                        ? (open ? containerView : containerViewBack).getMeasuredWidth()
                         : getWidth() - getPaddingLeft() - getPaddingRight();
                 if (open) {
                     float clampedInterpolated = MathUtils.clamp(interpolated, 0, 1);
@@ -3246,6 +3271,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
                     return;
                 }
                 if (isObsoleteInstantFrame(animation, springGeneration)) return;
+                if (instantLayoutWidthGeneration == springGeneration) instantLayoutWidthGeneration = -1;
                 springRouteBackgroundDrawable = null;
                 containerView.setScaleX(1f);
                 containerView.setScaleY(1f);
@@ -4941,6 +4967,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
     protected void onDetachedFromWindow() {
         clearInstantRevealTouch(false);
         clearInstantRevealSeed();
+        instantLayoutWidthGeneration = -1;
         super.onDetachedFromWindow();
         attached = false;
     }
