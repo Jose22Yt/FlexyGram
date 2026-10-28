@@ -23,6 +23,32 @@ public class CachedBlurVisualTest {
  private void complete()throws Exception{Utilities.globalQueue.runAllOnWorker();AndroidUtilities.drainMain();org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();}
  private Object entry(SignatureWallpaperBlur.Owner owner)throws Exception{var f=owner.getClass().getDeclaredField("entry");f.setAccessible(true);return f.get(owner);}
  private Bitmap cached(SignatureWallpaperBlur.Owner owner)throws Exception{Object e=entry(owner);var f=e.getClass().getDeclaredField("bitmap");f.setAccessible(true);return (Bitmap)f.get(e);}
+ @Test public void nativeGradientAndSolidSourcesRenderThroughRealBubblesWithoutRepeatJobs() throws Exception {
+  int[] stripes=new int[41];for(int i=0;i<stripes.length;i++)stripes[i]=i%2==0?Color.BLACK:Color.WHITE;
+  for(boolean dark:new boolean[]{false,true}) {
+   org.telegram.ui.ActionBar.Theme.dark=dark;
+   for(Drawable wallpaper:new Drawable[]{new ColorDrawable(dark?0xff202020:0xffeeeeee),new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT,stripes)}) {
+    wallpaper.setBounds(0,0,180,100);
+    var a=owner(keep(new View(ApplicationLoader.applicationContext)));a.prepare(wallpaper,false,0xff888888);complete();assertTrue(a.isReady());
+    Bitmap prepared=cached(a);assertTrue(prepared.getWidth()<=384);assertTrue(prepared.getHeight()<=384);
+    if(wallpaper instanceof GradientDrawable) {int red=Color.red(prepared.getPixel(90,50));assertTrue(red>60&&red<195);}
+    for(boolean out:new boolean[]{false,true})for(boolean matte:new boolean[]{false,true}) {
+     BubbleConfig.setMatteEnabled(matte);BubbleConfig.setMatteStrength(75);BubbleConfig.setTransparency(100);BubbleConfig.setOutlineEnabled(false);
+     var bubble=new org.telegram.ui.ActionBar.MessageDrawable(org.telegram.ui.ActionBar.MessageDrawable.TYPE_TEXT,out,false);
+     bubble.setBounds(0,0,160,85);bubble.setTop(0,180,100,false,false);
+     int[] samples={0};bubble.setFlexyGlassSource(new org.telegram.ui.ActionBar.MessageDrawable.GlassSource(){
+      public boolean draw(Canvas c,Path path){return draw(c,path,255);}
+      public boolean draw(Canvas c,Path path,int alpha){samples[0]++;return a.draw(c,path,0,0,alpha);}
+     });
+     Bitmap rendered=Bitmap.createBitmap(180,100,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(rendered);
+     bubble.draw(c);assertTrue(samples[0]>0);assertEquals(255,Color.alpha(rendered.getPixel(80,40)));
+     for(int n=0;n<100;n++){a.prepare(wallpaper,true,0xff888888);bubble.draw(c);}
+     assertSame(prepared,cached(a));assertEquals(0,Utilities.globalQueue.pending());rendered.recycle();
+    }
+    a.close();
+   }
+  }
+ }
  @Test public void oneSharedBoundedImagePreparedOffUiAndSampledWithoutNewJobs()throws Exception{
   View target=keep(new View(ApplicationLoader.applicationContext));var a=owner(target);var b=owner(target);BitmapDrawable source=image(1600,1200,0);
   a.prepare(source,false,0xffeeeeee);b.prepare(source,false,0xffeeeeee);assertFalse(a.isReady());assertEquals(1,Utilities.globalQueue.pending());assertSame(entry(a),entry(b));
@@ -37,12 +63,12 @@ public class CachedBlurVisualTest {
   BubbleConfig.setBackgroundBlur(false);cell.eraseColor(Color.TRANSPARENT);bubble.draw(new Canvas(cell));assertEquals(0,Color.alpha(cell.getPixel(50,35)));BubbleConfig.setBackgroundBlur(true);
   a.close();assertTrue(b.isReady());assertFalse(same.isRecycled());b.close();assertFalse(same.isRecycled());assertFalse(source.getBitmap().isRecycled());
  }
- @Test public void cellScrollCoordinatesTrackWallpaperAndUnsupportedMotionKeepsMatte()throws Exception{
+ @Test public void cellScrollCoordinatesTrackWallpaperAndParallaxReusesBlur()throws Exception{
   View target=keep(new View(ApplicationLoader.applicationContext));var a=owner(target);BitmapDrawable source=image(128,256,0);for(int y=0;y<256;y++)for(int x=0;x<128;x++)source.getBitmap().setPixel(x,y,Color.rgb(x*2,y,(x+y)%256));a.prepare(source,false,0xffcccccc);complete();
   Bitmap expected=Bitmap.createBitmap(128,256,Bitmap.Config.ARGB_8888);Path whole=new Path();whole.addRect(0,0,128,256,Path.Direction.CW);a.draw(new Canvas(expected),whole,0,0);
   Path local=new Path();local.addRect(0,0,64,48,Path.Direction.CW);
   for(int top:new int[]{0,21,100,160}){Bitmap sample=Bitmap.createBitmap(64,48,Bitmap.Config.ARGB_8888);assertTrue(a.draw(new Canvas(sample),local,12,top));assertEquals(expected.getPixel(32,top+24),sample.getPixel(20,24));}
-  a.prepare(source,true,0xffcccccc);assertFalse(a.isReady());assertFalse(a.isSupported());assertFalse(a.draw(new Canvas(expected),whole,0,0));assertEquals(0,Utilities.globalQueue.pending());
+  a.prepare(source,true,0xffcccccc);assertTrue(a.isReady());assertTrue(a.isSupported());assertTrue(a.draw(new Canvas(expected),whole,0,0));assertEquals(0,Utilities.globalQueue.pending());
  }
  @Test public void capturedMappingSurvivesSharedDrawableBoundsAndPartialAlphaDoesNotToggleMatte()throws Exception{
   var a=owner(keep(new View(ApplicationLoader.applicationContext)));BitmapDrawable source=image(128,256,0);

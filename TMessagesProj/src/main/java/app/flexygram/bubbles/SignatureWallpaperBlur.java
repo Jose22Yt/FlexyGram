@@ -13,6 +13,8 @@ import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.Trace;
 import android.content.ComponentCallbacks2;
@@ -27,6 +29,7 @@ import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.Utilities;
 import org.telegram.ui.ChatBackgroundDrawable;
 import org.telegram.ui.Components.AnimatedFileDrawable;
+import org.telegram.ui.Components.MotionBackgroundDrawable;
 
 /** Shared source-image blur, never a screen capture. Cache bookkeeping/publication is UI-owned;
  * scaling and the bounded CPU kernel run on Telegram's existing background queue. */
@@ -211,6 +214,9 @@ public final class SignatureWallpaperBlur {
         private final Matrix matrix = new Matrix();
         private final RectF mapping = new RectF();
         private Drawable source;
+        private Drawable snapshotSource;
+        private Bitmap staticSnapshot;
+        private int snapshotBackground, snapshotColor;
         private Bitmap sourceBitmap;
         private int generation, background, dim;
         private Entry entry;
@@ -227,8 +233,12 @@ public final class SignatureWallpaperBlur {
             this.availabilityChanged = availabilityChanged;
         }
 
-        private Bitmap bitmap(Drawable drawable) {
+        private Bitmap bitmap(Drawable drawable, int backgroundColor) {
             if (drawable instanceof AnimatedFileDrawable) return null;
+            if (drawable instanceof MotionBackgroundDrawable) {
+                mapping.set(drawable.getBounds());
+                return ((MotionBackgroundDrawable) drawable).getSignatureBlurBitmap();
+            }
             if (drawable instanceof BitmapDrawable) {
                 BitmapDrawable image = (BitmapDrawable) drawable;
                 if (image.getTileModeX() != null || image.getTileModeY() != null
@@ -237,18 +247,45 @@ public final class SignatureWallpaperBlur {
                 return image.getBitmap();
             }
             if (drawable instanceof ChatBackgroundDrawable)
-                return ((ChatBackgroundDrawable) drawable).getSignatureStaticBitmap(mapping);
+                return ((ChatBackgroundDrawable) drawable).getSignatureBlurBitmap(mapping);
+            if (drawable instanceof ColorDrawable || drawable instanceof GradientDrawable) {
+                mapping.set(drawable.getBounds());
+                if (mapping.isEmpty() || drawable.getAlpha() != 255) return null;
+                int color = drawable instanceof ColorDrawable ? ((ColorDrawable) drawable).getColor() : 0;
+                if (snapshotSource != drawable || staticSnapshot == null
+                        || snapshotBackground != backgroundColor || snapshotColor != color) {
+                    Drawable.ConstantState state = drawable.getConstantState();
+                    if (state == null) return null;
+                    Drawable copy = state.newDrawable().mutate();
+                    copy.setColorFilter(drawable.getColorFilter());
+                    float scale = Math.min(1f, MAX_EDGE / Math.max(mapping.width(), mapping.height()));
+                    int width = Math.max(1, Math.round(mapping.width() * scale));
+                    int height = Math.max(1, Math.round(mapping.height() * scale));
+                    Bitmap snapshot = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+                    copy.setBounds(0, 0, width, height); copy.draw(new Canvas(snapshot));
+                    snapshotSource = drawable; staticSnapshot = snapshot;
+                    snapshotBackground = backgroundColor; snapshotColor = color;
+                }
+                return staticSnapshot;
+            }
             return null;
         }
         public void prepare(Drawable drawable, boolean motion, int backgroundColor) {
             if (closed) return;
             if (!BubbleConfig.backgroundBlur() && entry == null && source == null) return;
-            Bitmap bitmap = !motion && BubbleConfig.backgroundBlur() ? bitmap(drawable) : null;
+            // Native motion gradients use a frozen bounded frame. Parallax does
+            // not invalidate the source image; the native draw updates mapping.
+            Bitmap bitmap = null;
+            try {
+                if (BubbleConfig.backgroundBlur()) bitmap = bitmap(drawable, backgroundColor);
+            } catch (IllegalArgumentException | IllegalStateException | OutOfMemoryError unavailable) {
+                // Optional, bounded snapshot resource failure retains the native surface.
+            }
             if (bitmap == null || bitmap.isRecycled() || (Build.VERSION.SDK_INT >= 26 && bitmap.getConfig() == Bitmap.Config.HARDWARE)) {
                 clear(); supported = false; return;
             }
-            int dimAlpha = drawable instanceof ChatBackgroundDrawable
-                    ? Math.max(0, Math.min(255, Math.round(((ChatBackgroundDrawable) drawable).getDimAmount() * 255))) : 0;
+            // Native ChatBackground snapshots already include their receiver's dim.
+            int dimAlpha = 0;
             source = drawable; supported = true;
             if (sourceBitmap == bitmap && generation == bitmap.getGenerationId() && background == backgroundColor && dim == dimAlpha) return;
             boolean wasReady = isReady();
@@ -339,6 +376,6 @@ public final class SignatureWallpaperBlur {
             release(); source = null; supported = false;
             if (wasReady) invalidateVisual();
         }
-        public void close() { if (closed) return; closed = true; clear(); availabilityChanged = null; target.clear(); }
+        public void close() { if (closed) return; closed = true; clear(); snapshotSource = null; staticSnapshot = null; availabilityChanged = null; target.clear(); }
     }
 }

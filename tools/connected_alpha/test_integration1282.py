@@ -3,6 +3,24 @@ import hashlib, subprocess, unittest
 import integration1282_contract as audit
 
 class Integration1282(unittest.TestCase):
+    def test_snapshot_keeps_native_draw_and_shared_blur_worker(self):
+        def body(source, signature):
+            start=source.index('{',source.index(signature));depth=1;end=start+1
+            while depth:
+                depth+=(source[end]=='{')-(source[end]=='}');end+=1
+            return source[start:end]
+        path='TMessagesProj/src/main/java/org/telegram/ui/Components/MotionBackgroundDrawable.java'
+        current=(audit.ROOT/path).read_text();before=audit.original(path).decode()
+        expected=body(before,'public void draw(Canvas canvas)').replace('updateAnimation();','if (advanceAnimation) updateAnimation();')
+        self.assertEqual(expected,body(current,'private void drawSignatureContent'))
+        snapshot=body(current,'public Bitmap getSignatureBlurBitmap()')
+        self.assertIn('384f',snapshot);self.assertIn('drawSignatureContent(canvas, false)',snapshot)
+        self.assertIn('signatureBlurStamp != stamp',snapshot)
+        path='TMessagesProj/src/main/java/app/flexygram/bubbles/SignatureWallpaperBlur.java'
+        current=(audit.ROOT/path).read_text();before=audit.original(path).decode()
+        for method in ['private static Bitmap render(', 'private static boolean box(', 'private static Entry acquire(']:
+            self.assertEqual(body(before,method),body(current,method),method)
+
     def test_reviewed_snapshot_rejects_unknown_bytes(self):
         audit.verify_current()
         for path in audit.spec()['reviewed']:

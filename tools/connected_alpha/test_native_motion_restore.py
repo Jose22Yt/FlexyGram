@@ -54,7 +54,7 @@ class NativeMotionRestoration(unittest.TestCase):
   path='TMessagesProj/src/main/java/app/flexygram/bubbles/SignatureWallpaperBlur.java'
   s=(ROOT/path).read_text();before=git_bytes(audit.PIN,path).decode()
   # The worker/cache portion preceding Owner is entirely unchanged except imports.
-  a=s[:s.index('    public static final class Owner')];b=before[:before.index('    public static final class Owner')]
+  a=s[s.index('public final class SignatureWallpaperBlur'):s.index('    public static final class Owner')];b=before[before.index('public final class SignatureWallpaperBlur'):before.index('    public static final class Owner')]
   a=a.replace('import android.animation.ValueAnimator;\nimport android.view.animation.LinearInterpolator;','import app.flexygram.motion.FlexyFrameMotion;')
   self.assertEqual(b,a)
   self.assertIn('ValueAnimator.ofFloat(0, 1)',s);self.assertIn('setDuration(120)',s)
