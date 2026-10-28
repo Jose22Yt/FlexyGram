@@ -22,14 +22,14 @@ import app.flexygram.settings.SignatureMatteSettingsActivity;
 /** Local native preview, fill opacity, border width and optional cached wallpaper blur. */
 public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity {
     private static final int SLIDER = 110;
-    private int transparencyRow, borderRow, previewRow, positionRow, blurRow, enabledRow, fuseRow, styleRow, pearlRow;
+    private int transparencyRow, borderRow, previewRow, positionRow, blurRow, enabledRow, fuseRow, styleRow, pearlRow, interactionRow;
     private BubblePreviewView preview;
     private final android.graphics.drawable.Drawable contextualWallpaper;
     public BubbleSettingsActivity() { this(null); }
     public BubbleSettingsActivity(android.graphics.drawable.Drawable contextualWallpaper) { this.contextualWallpaper = contextualWallpaper; }
     @Override protected void updateRows() {
         super.updateRows(); BubbleConfig.load();
-        previewRow = addRow(); transparencyRow = addRow("flexyBubbleTransparency");
+        previewRow = addRow(); interactionRow = addRow("flexyBubbleInteraction"); transparencyRow = addRow("flexyBubbleTransparency");
         blurRow = addRow("flexyBubbleBackgroundBlur"); enabledRow = addRow("flexyBubbleOutlineEnabled");
         borderRow = positionRow = fuseRow = styleRow = pearlRow = -1;
         if (BubbleConfig.outlineEnabled()) {
@@ -44,7 +44,10 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
     @Override protected BaseListAdapter createAdapter(Context context) { return new Adapter(context); }
     @Override protected void onItemClick(View view, int position, float x, float y) {
         if (position < 0) return;
-        if (position == enabledRow) {
+        if (position == interactionRow) {
+            presentFragment(new app.flexygram.bubbles.interaction.BubbleInteractionSettingsActivity());
+            return;
+        } else if (position == enabledRow) {
             BubbleConfig.setOutlineEnabled(!BubbleConfig.outlineEnabled());
             updateRows(); listAdapter.notifyDataSetChanged(); if (preview != null) preview.settingsChanged();
         } else if (position == fuseRow) {
@@ -104,7 +107,7 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
     private final class Adapter extends MatteListAdapter {
         Adapter(Context context) { super(context); }
         @Override public int getItemViewType(int position) {
-            return position == previewRow ? 111 : position == blurRow || position == fuseRow || position == enabledRow ? TYPE_CHECK : position == styleRow ? TYPE_SETTINGS : position == transparencyRow || position == borderRow || position == pearlRow || position == positionRow ? SLIDER : TYPE_INFO_PRIVACY;
+            return position == previewRow ? 111 : position == blurRow || position == fuseRow || position == enabledRow ? TYPE_CHECK : position == styleRow || position == interactionRow ? TYPE_SETTINGS : position == transparencyRow || position == borderRow || position == pearlRow || position == positionRow ? SLIDER : TYPE_INFO_PRIVACY;
         }
         @Override public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int type) {
             if (type == 111) { preview = new BubblePreviewView(parent.getContext(), contextualWallpaper); return new RecyclerListView.Holder(preview); }
@@ -118,6 +121,7 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
             if (position == fuseRow) {
                 ((TextCheckCell)holder.itemView).setTextAndCheck(getString(R.string.FlexyBubbleFuseGlass), BubbleConfig.fuseGlass(), false); return;
             }
+            if (position == interactionRow) { ((TextSettingsCell)holder.itemView).setTextAndValue("Interacción de mensajes", "Rebote, acciones y sticker", true); return; }
             if (position == styleRow) {
                 ((TextSettingsCell)holder.itemView).setTextAndValue(getString(R.string.FlexyBubbleOutlineStyle),
                         getString(BubbleConfig.outlineStyle() == 0 ? R.string.FlexyBubbleOriginal : BubbleConfig.outlineStyle() == 3 ? R.string.FlexyBubbleGlassOriginal : BubbleConfig.outlineStyle() == 2 ? R.string.FlexyBubbleGlassSatin : R.string.FlexyBubbleGlassPearl), true); return;
@@ -126,6 +130,6 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
 
 
         }
-        @Override public boolean isEnabled(RecyclerView.ViewHolder holder) { int p = holder.getAdapterPosition(); if (p < 0) return false; return p == blurRow || p == styleRow || p == fuseRow || p == enabledRow; }
+        @Override public boolean isEnabled(RecyclerView.ViewHolder holder) { int p = holder.getAdapterPosition(); if (p < 0) return false; return p == blurRow || p == styleRow || p == interactionRow || p == fuseRow || p == enabledRow; }
     }
 }

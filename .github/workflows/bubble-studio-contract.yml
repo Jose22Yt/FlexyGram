@@ -1,0 +1,27 @@
+name: Bubble Studio isolated contracts
+on:
+  pull_request:
+    paths:
+      - 'TMessagesProj/src/main/java/app/flexygram/bubbles/interaction/**'
+      - 'TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleSettingsActivity.java'
+      - 'tools/connected_alpha/bubble_studio/**'
+      - '.github/workflows/bubble-studio-contract.yml'
+  workflow_dispatch:
+jobs:
+  pure-contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Compile pure Java policy and format rules
+        run: |
+          mkdir -p /tmp/flexy-bubble-contracts
+          javac -encoding UTF-8 -d /tmp/flexy-bubble-contracts \
+            TMessagesProj/src/main/java/app/flexygram/bubbles/interaction/BubbleStickerSpec.java \
+            TMessagesProj/src/main/java/app/flexygram/bubbles/interaction/BubbleTouchPolicy.java \
+            TMessagesProj/src/main/java/app/flexygram/bubbles/interaction/BubbleTapGestureState.java \
+            tools/connected_alpha/bubble_studio/BubbleStudioContractTest.java
+          java -cp /tmp/flexy-bubble-contracts BubbleStudioContractTest
