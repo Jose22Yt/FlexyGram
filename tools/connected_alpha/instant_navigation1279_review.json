@@ -1,9 +1,9 @@
 {
   "pin": "d50677f723292d0e405eae8e1529f65416ff9cbd",
   "reviewed": {
-    "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java": "bf10e7a7886be94bfa6c84cda2c00e66b68d9fe4",
+    "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java": "04a5ca8a11fa6e70ae0d2cb9b9fe04cc0dbd007f",
     "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/FlexyNavigationHandoffPolicy.java": "4b8d7d15dc4f1d0db180c572e35bd4393460f66a",
-    "tools/connected_alpha/motion/INSTANT_NAVIGATION_P1.md": "75b6040196db4c9ff096b9e2aab5768b943a3d73",
+    "tools/connected_alpha/motion/INSTANT_NAVIGATION_P1.md": "1e39f130ee512375107785d3cea67d506594b1b6",
     "tools/connected_alpha/motion/InstantHandoffPolicyTest.java": "4f9a0dd2ebf3700573cae7e0cf8c2bedf8b3fd06",
     "tools/connected_alpha/motion/verify_instant_handoff.py": "36a087ad3beeedb50cbeca087481945587cd327f",
     ".github/workflows/instant-navigation-handoff.yml": "fa50365461dc2ace40898d67a5b932af96f8d0dd",
@@ -11,7 +11,7 @@
     "tools/connected_alpha/instant_navigation1279_contract.py": "3848af94cc53a812649c3194c9b97da7b1c1b16d",
     "tools/connected_alpha/test_instant_navigation1279.py": "734f2a76dae83d0927b6fb7bbe544fd186af845e",
     "tools/connected_alpha/motion_native/stubs.py": "7d47cb758c3874636f4c0d2c57b23ac2e43c326f",
-    "tools/connected_alpha/motion_native/MotionEngineTest.java.in": "1cc39bc5d91f69d83fcfa40bda43c16911d25ee5",
+    "tools/connected_alpha/motion_native/MotionEngineTest.java.in": "8b8544e502a9d29a6b0572a6b8758b42443fbee5",
     "tools/connected_alpha/test_flexy_motion.py": "b0f8a0266b89bfe29f0a97c00719fd2b409c02b4",
     "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/FlexyInstantNavigationCoordinator.java": "24760215b29df1f16f7c08c2203f05c7da5b876b",
     "tools/connected_alpha/motion/InstantNavigationCoordinatorTest.java": "5ef592426952c31e498a7d5a69f1235b140198c3",
@@ -28,7 +28,7 @@
     "tools/connected_alpha/motion_native/gesture_dispatch_probe.py": "b1988090e3981abd686402fcc9b09c24af5ad462",
     "tools/connected_alpha/motion_contract.py": "ac1c0ad82079425a79adf1ab72d6e7bda5443887",
     "TMessagesProj/src/main/java/app/exteraless/utils/PredictiveBackAnimationHelper.java": "d2e79ca5ce7420ac0167c4576d02908c12129320",
-    "tools/connected_alpha/motion/timed_gesture_review.json": "c89016c3656b24396313883977bd82c898367a95",
+    "tools/connected_alpha/motion/timed_gesture_review.json": "20bb6d74a6dff271b4b6d5bc5d93dcc23c0829a4",
     "tools/connected_alpha/motion/timed_gesture_scope.py": "5a03f8761e50d80d016fba4bddb577c9bf7b77e4"
   },
   "paths": [

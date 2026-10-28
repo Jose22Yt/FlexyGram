@@ -2552,7 +2552,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
                 predictiveBackInProgress = false;
                 m3PredictiveBack = false;
                 containerView.setAlpha(1.0f);
-                clearInstantGesture();
+                if (openingSlide != null) clearInstantGesture();
                 onSlideAnimationEnd(true);
                 if (openingSlide != null && instantNavigation != null) instantNavigation.complete(openingSlide.generation);
             }
@@ -2565,16 +2565,24 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
                 predictiveBackInProgress = false;
                 m3PredictiveBack = false;
                 containerView.setAlpha(1.0f);
-                clearInstantGesture();
+                if (openingSlide != null) clearInstantGesture();
                 onSlideAnimationEnd(backAnimation);
                 if (openingSlide != null && instantNavigation != null) instantNavigation.complete(openingSlide.generation);
             }
         });
         backAnimator = animatorSet;
         backAnimatorIsBack = backAnimation;
-        animationInProgress = true;
+        if (openingSlide != null) {
+            if (app.flexygram.motion.FlexyMotionSettings.state(getContext()).instant()
+                    || !isAttachedToWindow() || !isShown()) animatorSet.setDuration(0);
+            animationInProgress = true;
+            layoutToIgnore = containerViewBack;
+        }
         animatorSet.start();
-        layoutToIgnore = containerViewBack;
+        if (openingSlide == null) {
+            animationInProgress = true;
+            layoutToIgnore = containerViewBack;
+        }
     }
 
     @Override
