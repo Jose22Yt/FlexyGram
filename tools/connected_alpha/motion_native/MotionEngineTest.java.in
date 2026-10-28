@@ -217,6 +217,9 @@ public class MotionEngineTest {
  @Test public void actualAndroidDispatchTransfersOriginalDownUpToExposedChatOnce(){
   HandoffTouchRoot root=new HandoffTouchRoot(activity);
   int[] clicks={0};
+  java.util.ArrayList<Integer> actions=new java.util.ArrayList<>();
+  java.util.ArrayList<Long> times=new java.util.ArrayList<>();
+  root.row.setOnTouchListener((v,e)->{actions.add(e.getActionMasked());times.add(e.getEventTime());return false;});
   root.row.setOnClickListener(v->clicks[0]++);
   activity.setContentView(root);
   root.measure(View.MeasureSpec.makeMeasureSpec(400,View.MeasureSpec.EXACTLY),
@@ -229,6 +232,11 @@ public class MotionEngineTest {
    assertTrue(root.dispatchTouchEvent(down));
    assertEquals(1,root.completed);
    assertTrue(root.dispatchTouchEvent(up));
+   assertEquals(java.util.Arrays.asList(MotionEvent.ACTION_DOWN,MotionEvent.ACTION_UP),actions);
+   assertEquals(java.util.Arrays.asList(100L,140L),times);
+   // View.post delivers the click on a subsequent virtual UI frame.
+   // This is queue execution, not a physical latency measurement.
+   advance(16);
    assertEquals(1,clicks[0]);
    assertEquals(View.GONE,root.outgoing.getVisibility());
    assertFalse(root.closing);

@@ -9,9 +9,10 @@
     ".github/workflows/instant-navigation-handoff.yml": "8dba73296bb8cae71a4f860d3296b3053a719f02",
     "tools/connected_alpha/integration1279_contract.py": "b29d69ef30f20da7b6148a848ee8275bdf71662c",
     "tools/connected_alpha/instant_navigation1279_contract.py": "3848af94cc53a812649c3194c9b97da7b1c1b16d",
-    "tools/connected_alpha/test_instant_navigation1279.py": "b54c16893a69494700779a2002c7c18ed99c40fe",
+    "tools/connected_alpha/test_instant_navigation1279.py": "e736afd73a35c069dcde42e413ed965e0e0f6f26",
     "tools/connected_alpha/motion_native/stubs.py": "0aa95d57af7a7d3e4b83676007e4b30690ac670d",
-    "tools/connected_alpha/motion_native/MotionEngineTest.java.in": "5a10b5b7487d91e67603bfe36a03a3f724916133"
+    "tools/connected_alpha/motion_native/MotionEngineTest.java.in": "9d0b2488d546a0f11649f2332176009e4164c43b",
+    "tools/connected_alpha/test_flexy_motion.py": "b0f8a0266b89bfe29f0a97c00719fd2b409c02b4"
   },
   "paths": [
     "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java",
@@ -25,6 +26,7 @@
     "tools/connected_alpha/test_instant_navigation1279.py",
     "tools/connected_alpha/instant_navigation1279_review.json",
     "tools/connected_alpha/motion_native/stubs.py",
-    "tools/connected_alpha/motion_native/MotionEngineTest.java.in"
+    "tools/connected_alpha/motion_native/MotionEngineTest.java.in",
+    "tools/connected_alpha/test_flexy_motion.py"
   ]
 }

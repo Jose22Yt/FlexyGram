@@ -20,6 +20,18 @@ class InstantNavigation1279Regression(unittest.TestCase):
             self.assertEqual(integration.project(scope, NAV, handoff.original(NAV)),
                              integration.project(scope, NAV, source))
 
+    def test_motion_guard_projects_only_the_exact_navigation_overlay(self):
+        import instant_navigation1279_contract as handoff
+        source=(ROOT/NAV).read_bytes()
+        original=handoff.original(NAV)
+        self.assertEqual(original,handoff.restore(NAV,source))
+        for marker in (b"// unknown",b"\n"):
+            changed=source+marker
+            self.assertEqual(changed,handoff.restore(NAV,changed))
+            self.assertNotEqual(original,handoff.restore(NAV,changed))
+        guard=(ROOT/'tools/connected_alpha/test_flexy_motion.py').read_text()
+        self.assertIn('new=restore_handoff(path,(ROOT/path).read_bytes()).decode()',guard)
+
     def test_new_policy_rejects_unknown_bytes(self):
         import instant_navigation1279_contract as handoff
         source = (ROOT / POLICY).read_bytes()

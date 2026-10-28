@@ -228,7 +228,8 @@ public class FlexyMotionProbe {
         from motion_native.player_probe import method
         path='TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java'
         old=subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT,text=True)
-        new=(ROOT/path).read_text()
+        from instant_navigation1279_contract import restore as restore_handoff
+        new=restore_handoff(path,(ROOT/path).read_bytes()).decode()
         helper=method(new,'    private void startFlexyTimedLayoutAnimation(')
         # The timed renderer body is copied unchanged from the native route.
         a=old.index('        AndroidUtilities.runOnUIThread(animationRunnable = new Runnable() {',old.index('    private void startLayoutAnimation('))
