@@ -1103,8 +1103,17 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         // the original ACTION_DOWN against the destination's attached rows.
         // onAnimationEndCheck owns spring/animator cancellation and clean-up.
         onAnimationEndCheck(true);
-        return !transitionAnimationInProgress && !animationInProgress
+        boolean completed = !transitionAnimationInProgress && !animationInProgress
                 && !startedTracking && getLastFragment() == destination;
+        if (completed) {
+            // A cancelled spring will not run its normal end-listener cleanup.
+            setInnerTranslationX(0);
+            if (USE_ACTIONBAR_CROSSFADE) {
+                swipeProgress = 1f;
+                invalidateActionBars();
+            }
+        }
+        return completed;
     }
 
     @Override
