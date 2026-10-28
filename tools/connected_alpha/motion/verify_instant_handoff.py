@@ -33,6 +33,10 @@ def main() -> None:
     for required in (
         "event.getActionMasked() != MotionEvent.ACTION_DOWN",
         "onCloseAnimationEndRunnable == null",
+        "isRightLayout || sheetFragment != null",
+        "outgoingDialog != null && outgoingDialog.isShowing()",
+        "destinationDialog != null && destinationDialog.isShowing()",
+        "activityDialog != null && activityDialog.isShowing()",
         "destination instanceof MainTabsActivity || destination instanceof DialogsActivity",
         "FlexyNavigationHandoffPolicy.canHandoffClosingDown(",
         "onAnimationEndCheck(true);",
