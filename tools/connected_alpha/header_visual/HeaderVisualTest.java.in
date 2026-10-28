@@ -144,6 +144,23 @@ public class HeaderVisualTest {
    header.detach();
   }
  }
+ @Test public void mattePortraitKeepsNativeActionsAndUsesSquareAvatarViewport()throws Exception{
+  HeaderConfig.style(3);Bitmap evidence=Bitmap.createBitmap(802,160,Bitmap.Config.ARGB_8888);Canvas image=new Canvas(evidence);
+  for(boolean rtl:new boolean[]{false,true}){
+   LocaleController.isRTL=rtl;Theme.dark=rtl;Context c=context(1);ActionBar bar=new ActionBar(c);ChatAvatarContainer avatar=new ChatAvatarContainer(c);avatar.callable=true;
+   bar.addView(avatar,0,new FrameLayout.LayoutParams(-1,-1));SignatureChatHeader header=new SignatureChatHeader(bar,avatar,null);bar.setSignatureHeader(header);avatar.setSignatureHeader(header);root.addView(bar);size(bar,401);
+   assertTrue(HeaderConfig.portrait());assertTrue(header.fusionActive());var g=header.fusionGeometry();assertTrue(g.mattePortrait);
+   View photo=(View)field(avatar,"avatarImageView");assertEquals(photo.getMeasuredWidth(),photo.getMeasuredHeight());assertEquals(38,photo.getMeasuredWidth());
+   assertEquals(g.center.height(),g.backVisual.height(),.01f);assertEquals(g.center.height(),g.moreVisual.height(),.01f);
+   tap(bar,g.call.centerX(),g.call.centerY()+header.fusionTop);assertEquals(1,avatar.calls);
+   tap(bar,g.more.centerX(),g.more.centerY()+header.fusionTop);assertEquals(1,avatar.menus);
+   tap(bar,g.text.centerX(),g.text.centerY()+header.fusionTop);assertEquals(1,avatar.profiles);
+   HeaderPreviewView preview=new HeaderPreviewView(c);preview.measure(View.MeasureSpec.makeMeasureSpec(401,View.MeasureSpec.EXACTLY),0);preview.layout(0,0,401,preview.getMeasuredHeight());
+   int save=image.save();image.translate(rtl?401:0,0);preview.draw(image);image.restoreToCount(save);
+   header.detach();
+  }
+  try(var out=new java.io.FileOutputStream(new java.io.File(System.getProperty("probe.root"),"signature-header-portrait-synthetic.png"))){assertTrue(evidence.compress(Bitmap.CompressFormat.PNG,100,out));}evidence.recycle();
+ }
  @Test public void defaultAdaptiveAllocatesNoFusionControllerOrControls()throws Exception{
   HeaderConfig.style(0);ActionBar bar=new ActionBar(context(1));ChatAvatarContainer avatar=new ChatAvatarContainer(bar.getContext());bar.addView(avatar,0,new FrameLayout.LayoutParams(-1,-1));SignatureChatHeader header=new SignatureChatHeader(bar,avatar,null);bar.setSignatureHeader(header);avatar.setSignatureHeader(header);size(bar,401);assertNull(field(header,"fusion"));assertNull(field(avatar,"signatureCall"));assertNull(field(avatar,"signaturePhotoMask"));
  }

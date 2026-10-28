@@ -48,7 +48,7 @@ public final class HeaderPreviewView extends View {
         fusionMode=false;
         if(HeaderConfig.fusion()){
             if(fusion==null)fusion=new FusionPreview(getContext());
-            var g=app.flexygram.header.fusion.SignatureFusionGeometry.update(fusion.geometry,width,AndroidUtilities.density,LocaleController.isRTL,true);
+            var g=HeaderConfig.portrait() ? app.flexygram.header.fusion.SignatureFusionGeometry.updatePortrait(fusion.geometry,width,AndroidUtilities.density,LocaleController.isRTL,true) : app.flexygram.header.fusion.SignatureFusionGeometry.update(fusion.geometry,width,AndroidUtilities.density,LocaleController.isRTL,true);
             if(g.fits&&titleLine+subtitleLine+AndroidUtilities.dp(2)<=g.height-AndroidUtilities.dp(8)){
                 fusionMode=true;previewHeight=g.height;
                 int h=Math.round(previewHeight)+AndroidUtilities.dp(80);setMeasuredDimension(width,h);fusionTop=(h-previewHeight)/2;
@@ -62,7 +62,7 @@ public final class HeaderPreviewView extends View {
                 float placeholderW = Math.min(g.portrait.width(), AndroidUtilities.dp(73));
                 float previewStart = g.rtl ? g.portrait.width()-placeholderW*.45f : placeholderW*.55f;
                 float previewEnd = g.rtl ? g.portrait.width()-placeholderW : placeholderW;
-                fusion.mask.prepare(previewStart,previewEnd,.9f,g.rtl);
+                if (!HeaderConfig.portrait()) fusion.mask.prepare(previewStart,previewEnd,.9f,g.rtl);
                 return;
             }
         }
@@ -101,11 +101,17 @@ public final class HeaderPreviewView extends View {
         var g=fusion.geometry;float d=AndroidUtilities.density;
         int color=Theme.getColor(Theme.key_actionBarDefaultTitle);
         if(fusion.color!=color){fusion.color=color;iconColor=color;fusion.phone.setColorFilter(color,android.graphics.PorterDuff.Mode.SRC_IN);fusion.more.setColorFilter(color,android.graphics.PorterDuff.Mode.SRC_IN);back.setColorFilter(color,android.graphics.PorterDuff.Mode.SRC_IN);}
-        int fill=(Theme.getColor(Theme.key_windowBackgroundWhite)&0xffffff)|(Math.round(HeaderConfig.opacity()*2.55f)<<24);
+        int fill=(Theme.getColor(Theme.key_windowBackgroundWhite)&0xffffff)|((HeaderConfig.portrait()?255:Math.round(HeaderConfig.opacity()*2.55f))<<24);
         int edge=(Theme.getColor(Theme.key_divider)&0xffffff)|0x66000000;
         int outer=canvas.save();canvas.translate(0,fusionTop);
         fusion.surface.drawBackdrop(canvas,g,fill,edge,edge,d);
         int clip=canvas.save();canvas.clipPath(fusion.clip);
+        if (g.mattePortrait) {
+            avatar.setColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText));
+            canvas.drawCircle(g.portrait.centerX(),g.portrait.centerY(),g.portrait.height()*.5f,avatar);
+            text.setTextSize(AndroidUtilities.dp(20));text.setColor(0xffffffff);
+            canvas.drawText("A",g.portrait.centerX(),g.portrait.centerY()+AndroidUtilities.dp(7),text);
+        } else {
         int layer=fusion.mask.begin(canvas,g.portrait.left,g.portrait.top,g.portrait.right,g.portrait.bottom);
         // The synthetic preview has no real bitmap; mimic the same initials fallback as ChatAvatarContainer.
         float placeholderW = Math.min(g.portrait.width(), AndroidUtilities.dp(73));
@@ -118,7 +124,9 @@ public final class HeaderPreviewView extends View {
         float fadeEnd = g.rtl ? g.portrait.width()-placeholderW : placeholderW;
         canvas.translate(g.portrait.left,g.portrait.top);
         fusion.mask.finish(canvas,layer,g.portrait.width(),g.portrait.height(),
-                fadeStart,fadeEnd,.9f,g.rtl);canvas.restoreToCount(clip);
+                fadeStart,fadeEnd,.9f,g.rtl);
+        }
+        canvas.restoreToCount(clip);
         text.setColor(color);text.setTextSize(titlePx);float th=text.descent()-text.ascent(),ta=text.ascent();text.setTextSize(subtitlePx);float sh=text.descent()-text.ascent();
         float top=g.text.centerY()-(th+sh+AndroidUtilities.dp(2))/2;
         text.setTextSize(titlePx);canvas.drawText(displayName,fusionTitleX,top-ta,text);text.setTextSize(subtitlePx);canvas.drawText(displayStatus,fusionStatusX,top+th+AndroidUtilities.dp(2)-text.ascent(),text);
