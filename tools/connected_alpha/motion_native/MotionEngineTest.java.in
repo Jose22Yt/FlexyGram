@@ -330,4 +330,27 @@ public class MotionEngineTest {
   var a=new app.flexygram.motion.SpringAnimation(button,new androidx.dynamicanimation.animation.FloatValueHolder(0)).setSpring(new androidx.dynamicanimation.animation.SpringForce(1000));org.telegram.messenger.BuildConfig.CONNECTED_ALPHA=false;try{a.start();assertFalse(a.canContinue());a.cancel();}finally{org.telegram.messenger.BuildConfig.CONNECTED_ALPHA=true;}
   a.start();assertTrue(a.canContinue());button.setVisibility(View.INVISIBLE);assertFalse(a.canContinue());a.cancel();try{a.continuationValue();fail("cancelled value");}catch(IllegalStateException expected){}try{a.continuationVelocity();fail("cancelled velocity");}catch(IllegalStateException expected){}assertEquals(0,FlexyFrameMotion.activeCount());
  }
+
+ @Test public void predictiveCompletionCannotClearAnimatorAcceptedByNativeSlideCallback(){
+  for(boolean cancel:new boolean[]{false,true}){
+   NavigationMotionProbe p=navigation();p.predictiveBackAnimation.start(300,600,200,true,16);p.predictiveBackAnimation.update(.5f,220);p.predictiveBackY=220;p.predictive(false);android.animation.Animator old=p.backAnimator;
+   p.afterSlide=()->{p.afterSlide=null;p.predictiveBackAnimation.start(300,600,200,true,16);p.predictiveBackAnimation.update(.4f,240);p.predictiveBackY=240;p.predictive(true);};
+   if(cancel)old.cancel();else old.end();assertNotNull(p.backAnimator);assertNotSame(old,p.backAnimator);assertTrue(p.animationInProgress);assertEquals(1,p.slideCompletions);frames(150);assertEquals(2,p.slideCompletions);assertNull(p.backAnimator);assertEquals(0,FlexyFrameMotion.activeCount());
+  }
+ }
+
+ @Test public void startingBackDuringSettleCannotEraseReentrantPredictiveAnimator(){
+  NavigationMotionProbe p=navigation();p.predictiveBackAnimation.start(300,600,200,true,16);p.predictiveBackAnimation.update(.5f,220);p.predictiveBackY=220;p.predictive(false);android.animation.Animator old=p.backAnimator;
+  p.afterSlide=()->{p.afterSlide=null;p.predictiveBackAnimation.start(300,600,200,true,16);p.predictiveBackAnimation.update(.4f,240);p.predictive(true);};assertFalse(p.startWhileSettling());assertNotNull(p.backAnimator);assertNotSame(old,p.backAnimator);assertTrue(p.animationInProgress);frames(150);assertEquals(2,p.slideCompletions);assertNull(p.backAnimator);assertEquals(0,FlexyFrameMotion.activeCount());
+ }
+ @Test public void obsoletePredictiveCancelCannotResetNewerSettlement(){
+  NavigationMotionProbe p=navigation();p.predictiveBackAnimation.start(300,600,200,true,16);p.predictiveBackAnimation.update(.5f,220);p.predictive(false);android.animation.Animator old=p.backAnimator;
+  p.predictiveBackAnimation.start(300,600,200,true,16);p.predictiveBackAnimation.update(.4f,240);p.predictive(true);android.animation.Animator newer=p.backAnimator;float progress=p.predictiveBackAnimation.getProgress();old.cancel();assertSame(newer,p.backAnimator);assertEquals(progress,p.predictiveBackAnimation.getProgress(),0);assertEquals(0,p.slideCompletions);assertTrue(p.animationInProgress);frames(150);assertEquals(1,p.slideCompletions);assertNull(p.backAnimator);assertEquals(0,FlexyFrameMotion.activeCount());
+ }
+
+ @Test public void nativeNonM3EndAndCancelCannotEraseReentrantSettlement(){
+  for(boolean cancel:new boolean[]{false,true}){
+   NavigationMotionProbe p=navigation();p.nonM3(false);android.animation.Animator old=p.backAnimator;p.afterSlide=()->{p.afterSlide=null;p.nonM3(true);};if(cancel)old.cancel();else old.end();assertNotNull(p.backAnimator);assertNotSame(old,p.backAnimator);assertTrue(p.animationInProgress);assertEquals(1,p.slideCompletions);frames(30);assertEquals(2,p.slideCompletions);assertNull(p.backAnimator);
+  }
+ }
 }

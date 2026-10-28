@@ -1970,19 +1970,20 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
             @Override
             public void onAnimationCancel(Animator animation) {
                 cancelled = true;
+                if (backAnimator != animation) return;
+                backAnimator = null;
                 resetPredictiveBackState();
                 containerView.setAlpha(1.0f);
                 onSlideAnimationEnd(true);
-                backAnimator = null;
             }
 
             @Override
             public void onAnimationEnd(Animator animation) {
-                if (cancelled) return;
+                if (cancelled || backAnimator != animation) return;
+                backAnimator = null;
                 resetPredictiveBackState();
                 containerView.setAlpha(1.0f);
                 onSlideAnimationEnd(backAnimation);
-                backAnimator = null;
             }
         });
         backAnimator = animatorSet;
@@ -2003,8 +2004,9 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
     public boolean onBackStarted(float touchX, float touchY) {
         if (animationInProgress) {
             if (backAnimator != null) {
-                backAnimator.end();
-                backAnimator = null;
+                Animator finishingBackAnimator = backAnimator;
+                finishingBackAnimator.end();
+                if (backAnimator == finishingBackAnimator) backAnimator = null;
             } else {
                 return false;
             }
@@ -2222,20 +2224,21 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
             @Override
             public void onAnimationCancel(Animator animation) {
                 cancelled = true;
+                if (backAnimator != animation) return;
+                backAnimator = null;
                 predictiveBackInProgress = false;
                 m3PredictiveBack = false;
                 containerView.setAlpha(1.0f);
                 onSlideAnimationEnd(true);
-                backAnimator = null;
             }
             @Override
             public void onAnimationEnd(Animator animator) {
-                if (cancelled) return;
+                if (cancelled || backAnimator != animator) return;
+                backAnimator = null;
                 predictiveBackInProgress = false;
                 m3PredictiveBack = false;
                 containerView.setAlpha(1.0f);
                 onSlideAnimationEnd(backAnimation);
-                backAnimator = null;
             }
         });
         backAnimator = animatorSet;

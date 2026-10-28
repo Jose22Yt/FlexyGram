@@ -9,6 +9,15 @@ def write(put,root,source):
  gesture=method(s,'    private void applyPredictiveBackProgress(')
  settle=method(s,'    private void animatePredictiveBackEndAnimation(')
  reset=method(s,'    private void resetPredictiveBackState(')
+ # Execute the exact settling-prefix of onBackStarted; full gesture admission remains outside this double.
+ start_back=s.index('    public boolean onBackStarted(')
+ begin=s.index('{',start_back)+1
+ end=s.index('        if (predictiveBackInProgress || predictiveInput)',begin)
+ start_prefix='public boolean startWhileSettling(){'+s[begin:end]+'return false;}'
+ # Unmodified native non-M3 end/cancel listener, with an explicit test-only timeline.
+ listener_a=s.index('        animatorSet.addListener(',s.index('    private void animateBackEndAnimation('))
+ listener_b=s.index('        backAnimator = animatorSet;',listener_a)
+ slide_listener='public void nonM3(boolean backAnimation){AnimatorSet animatorSet=new AnimatorSet();animatorSet.playTogether(ValueAnimator.ofFloat(0,1).setDuration(200));'+s[listener_a:listener_b]+'backAnimator=animatorSet;backAnimatorIsBack=backAnimation;animationInProgress=true;layoutToIgnore=containerViewBack;animatorSet.start();}'
  cleanup=method(method(s,'    private void onAnimationEndCheck('),'        if (currentSpringAnimation != null)')
  start=s.index('    private void startLayoutAnimation(')
  a=s.index('            currentSpringAnimation.addUpdateListener(',start)
@@ -18,9 +27,9 @@ def write(put,root,source):
 import androidx.dynamicanimation.animation.FloatValueHolder;import androidx.dynamicanimation.animation.SpringForce;import app.flexygram.motion.SpringAnimation;import org.telegram.ui.Components.CubicBezierInterpolator;import org.telegram.ui.ActionBar.Theme;import org.telegram.messenger.AndroidUtilities;
 public class NavigationMotionProbe extends FrameLayout {
  public final View backgroundView=new View(getContext());public android.animation.Animator alpha(boolean opening){return createRootAlphaTransition(opening);}
- public boolean predictiveBackHasProgress,animationInProgress,predictiveBackInProgress,m3PredictiveBack,backAnimatorIsBack;public float predictiveBackY;public Object predictiveBackBackgroundDrawable,layoutToIgnore;public Animator backAnimator;public int slideCompletions;public boolean slideCancelled;
+ public boolean predictiveBackHasProgress,animationInProgress,predictiveBackInProgress,m3PredictiveBack,backAnimatorIsBack;public float predictiveBackY;public Object predictiveBackBackgroundDrawable,layoutToIgnore;public Animator backAnimator;public int slideCompletions;public boolean slideCancelled;public Runnable afterSlide;
  public final app.exteraless.utils.PredictiveBackAnimationHelper predictiveBackAnimation=new app.exteraless.utils.PredictiveBackAnimationHelper();
- public void predictive(boolean revert){animatePredictiveBackEndAnimation(revert);}public Animator predictiveTimeline(boolean revert){return createPredictiveBackEndTransition(revert,predictiveBackAnimation.getProgress(),containerView.getAlpha(),predictiveBackAnimation.getSlideDistance());}void onSlideAnimationEnd(boolean reverted){slideCompletions++;slideCancelled=reverted;animationInProgress=false;layoutToIgnore=null;}static float clamp01(float v){return Math.max(0,Math.min(1,v));}
+ public void predictive(boolean revert){animatePredictiveBackEndAnimation(revert);}public Animator predictiveTimeline(boolean revert){return createPredictiveBackEndTransition(revert,predictiveBackAnimation.getProgress(),containerView.getAlpha(),predictiveBackAnimation.getSlideDistance());}void onSlideAnimationEnd(boolean reverted){slideCompletions++;slideCancelled=reverted;animationInProgress=false;layoutToIgnore=null;if(afterSlide!=null)afterSlide.run();}static float clamp01(float v){return Math.max(0,Math.min(1,v));}
  final FrameLayout containerView,containerViewBack;final View previewMenu;final ColorDrawable previewBackgroundDrawable=new ColorDrawable();
  static final float SPRING_MULTIPLIER=1000;float animationProgress,swipeProgress,inner;boolean USE_ACTIONBAR_CROSSFADE=true;long transitionAnimationStartTime;Object springRouteBackgroundDrawable;
  final android.view.animation.OvershootInterpolator overshootInterpolator=new android.view.animation.OvershootInterpolator();final android.view.animation.DecelerateInterpolator decelerateInterpolator=new android.view.animation.DecelerateInterpolator();
@@ -35,7 +44,7 @@ public class NavigationMotionProbe extends FrameLayout {
  public void spring(boolean open,boolean preview){currentSpringAnimation=new SpringAnimation(this,new FloatValueHolder(0)).setSpring(new SpringForce(SPRING_MULTIPLIER));
 '''+spring+'''currentSpringAnimation.start();}
  public void abort(){if(currentSpringAnimation!=null){SpringAnimation old=currentSpringAnimation;currentSpringAnimation=null;old.cancel();}}
-'''+method(s,'    private boolean isObsoleteInstantFrame(')+'\n'+alpha+'\n'+predictive+'\n'+gesture+'\n'+settle+'\n'+reset+'\n'+timed+'}')
+'''+slide_listener+'\n'+start_prefix+'\n'+method(s,'    private boolean isObsoleteInstantFrame(')+'\n'+alpha+'\n'+predictive+'\n'+gesture+'\n'+settle+'\n'+reset+'\n'+timed+'}')
  p=source/'NavigationMotionProbe.java';p.write_text(p.read_text().replace('__CLEANUP__',cleanup))
  p=source/'org/telegram/ui/ActionBar/Theme.java';p.write_text(p.read_text().replace('public class Theme {','public class Theme {public static final android.graphics.drawable.ColorDrawable moveUpDrawable=new android.graphics.drawable.ColorDrawable();'))
 

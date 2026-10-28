@@ -94,6 +94,27 @@ def main() -> None:
     spring_reset = "                if (instantNavigation == null || instantNavigation.isCurrent(endingGeneration)) setInnerTranslationX(0);"
     assert reconstructed.count(spring_end) == 1 and reconstructed.count(spring_reset) == 1, "Unexpected spring completion scope"
     reconstructed = reconstructed.replace(spring_end, "").replace(spring_reset, "                setInnerTranslationX(0);")
+    finishing = """                Animator finishingBackAnimator = backAnimator;
+                finishingBackAnimator.end();
+                if (backAnimator == finishingBackAnimator) backAnimator = null;"""
+    assert reconstructed.count(finishing) == 1
+    reconstructed = reconstructed.replace(finishing, "                backAnimator.end();\n                backAnimator = null;")
+    for first, last, end_parameter in (
+        ("    private void animatePredictiveBackEndAnimation(", "    private void resetPredictiveBackState()", "animation"),
+        ("    private void animateBackEndAnimation(", "    @Override\n    public void onBackPressed()", "animator"),
+    ):
+        a = reconstructed.index(first)
+        b = reconstructed.index(last, a)
+        renderer = reconstructed[a:b]
+        cancel_guard = "                if (backAnimator != animation) return;\n                backAnimator = null;\n"
+        end_guard = "                if (cancelled || backAnimator != " + end_parameter + ") return;\n                backAnimator = null;"
+        assert renderer.count(cancel_guard) == 1 and renderer.count(end_guard) == 1
+        renderer = renderer.replace(cancel_guard, "").replace(end_guard, "                if (cancelled) return;")
+        for callback in ("onSlideAnimationEnd(true);", "onSlideAnimationEnd(backAnimation);"):
+            line = "                " + callback
+            assert renderer.count(line) == 1
+            renderer = renderer.replace(line, line + "\n                backAnimator = null;")
+        reconstructed = reconstructed[:a] + renderer + reconstructed[b:]
     data = reconstructed.encode("utf-8")
     blob_sha = hashlib.sha1(b"blob " + str(len(data)).encode() + b"\0" + data).hexdigest()
     assert blob_sha == BASE_GIT_BLOB, (

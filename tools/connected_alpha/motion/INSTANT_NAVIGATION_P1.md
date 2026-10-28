@@ -7,8 +7,10 @@ Base: Alpha1279 / PR112, commit `d50677f723292d0e405eae8e1529f65416ff9cbd`.
 Independent branch; no merge to main/develop, no APK/signing/release, no telemetry claims.
 
 Existing PR108/112 already integrates shared motion clock and configurable motion
-presets. This work **does not replace those animations**. It changes only one
-touch-dispatch decision in `ActionBarLayout` and adds a small fail-closed policy.
+presets. This work **does not replace those animations**. P1 below describes the initial
+exposed-surface touch policy. The P2–P5 checkpoints add generation ownership,
+ordinary opening/Back continuity and settling callback safety; the full-client
+mission remains in progress.
 
 ## Real user-facing behavior: one tap opens B
 
@@ -43,8 +45,8 @@ to the actual destination view.
   active tracking, action mode, or layer/sheet layout.
 - Bounds must be finite; no unknown geometry or no-exposure triggers.
 
-For all other cases the original interception and transition guards remain
-unchanged, including opening animations and non-chat screens.
+Outside P1 the original interception guards remain; the separately guarded
+ordinary chat opening/Back route is described in P3–P4 below.
 
 ### Why not call `performClick` or clone `MotionEvent`?
 
@@ -60,11 +62,11 @@ target and then lets Android do standard dispatch.
    exposed, directly touchable region of chat-list during a *standard close*.
 2. Taps inside the still-visible outgoing chat remain owned/blocked as
    before; do not ghost-click a row hidden behind opaque content.
-3. Opening A, reversing halfway; close via predictive-back; profile/settings
-   transitions; tab switches; sheet gestures; transparent overlays; and
-   rapid intent coalescing still need distinct, state-aware implementations.
-4. Position/velocity-preserving spring retargeting needs a generation-owned
-   transition coordinator; forcing completion may create a visible snap.
+3. P4 adds ordinary analytic opening A → Back reversal. Predictive-back
+   continuity, profile/settings transitions, sheet gestures, transparent overlays
+   and broader intent handoff still need distinct, state-aware integration.
+4. P4 preserves position/velocity in its scoped reversal. P1 close A → list B
+   still forces completion and may create a visible snap.
 5. This P1 may still exhibit an unwanted snap on release or expose a hitbox
    that has moved under a shared animated surface. **Physical testing is
    mandatory before integration.**
@@ -151,3 +153,9 @@ The standard actor captures its generation once at construction, not anew every 
 The Android probe now compiles the exact standard opening **and closing renderer**, factory, Back and completion bodies using real FrameLayouts and the actual spring/coordinator. Only fragment/account/dialog services and fragment-stack transactions remain explicit doubles. Regressions compare transforms and inverted physical velocity in the same UI call under Flow/Signature and several speeds/progress points, including overshoot; they exercise timed/IME fallback, veto/seed cleanup, hidden/legacy snapshot refusal, reentrant/deferred replacement and first-render cancel/restart. These are API35 Robolectric checks compiled against API37, not a full-app run, touch-latency measurement or Poco/Android17 acceptance.
 
 Remaining: close A → exposed row B still uses P1 early completion and has no full geometric/velocity handoff; swipe/predictive Back continuity and broader surfaces are not completed. Physical comparison, FrameTimeline/jank and integration over Work1 remain pending. Rollback of this P4 commit removes only its bridge snapshot/seed and ownership additions, leaving P1–P3 and all application data/settings unchanged.
+
+## P5 settling ownership checkpoint (not full gesture continuity)
+
+A regression reproduced the old predictive end/cancel listener clearing `backAnimator` after the slide-completion callback had accepted a replacement. Predictive and native non-M3 listeners now release only their own field **before** invoking slide completion and ignore obsolete end/cancel events. The existing `onBackStarted` settling prefix retains a replacement installed synchronously by the finishing animator; it no longer unconditionally clears that newer owner.
+
+Tests execute the exact predictive renderer/end/cancel bodies, the exact non-M3 listener (with an explicitly synthetic test-only timeline), and the exact settling prefix of `onBackStarted`. They cover normal end, cancellation, stale cancellation and replacement accepted by the slide-completion double. The slide/fragment-stack transaction remains a double: these tests do **not** validate the full `onSlideAnimationEnd` lifecycle or prove the physical preview P0 fixed. Reentrant cleanup inside that native transaction and continuous swipe/predictive reversal remain pending. There are no new gesture effects, geometry changes, synthetic input, delivery changes or Work1 edits. Reverting this checkpoint restores the prior callback ownership behavior without data changes.
