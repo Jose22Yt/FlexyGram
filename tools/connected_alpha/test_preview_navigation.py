@@ -28,7 +28,7 @@ def fixture(source):
  a=source.index('public void closeLastFragment(boolean animated, boolean forceNoAnimation)');b=source.index('        if (parentActivity.getCurrentFocus()',a)
  bodies+=[source[a:b]+' beginClose(getLastFragment()); }']
  return '''import java.util.*;import org.telegram.ui.ActionBar.FlexyInstantNavigationCoordinator;public class PreviewRegression {
- FlexyInstantNavigationCoordinator instantNavigation;boolean instantBackSeed;float instantBackValue,instantBackVelocity;long instantBackGeneration,instantBackDialog;static final float SPRING_MULTIPLIER=1000;boolean USE_SPRING_ANIMATION=true;
+ FlexyInstantNavigationCoordinator instantNavigation;boolean instantSwipeSettlingClosing;boolean instantBackSeed;float instantBackValue,instantBackVelocity;long instantBackGeneration,instantBackDialog;static final float SPRING_MULTIPLIER=1000;boolean USE_SPRING_ANIMATION=true;
  static class ChatActivity extends BaseFragment {long getDialogId(){return 42;}}
  static class Dialog{boolean showing;Dialog(boolean value){showing=value;}boolean isShowing(){return showing;}}
  static class LaunchActivity{static LaunchActivity instance;Dialog getVisibleDialog(){return null;}}

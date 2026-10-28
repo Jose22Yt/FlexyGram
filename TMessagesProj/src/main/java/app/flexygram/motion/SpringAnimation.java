@@ -84,6 +84,8 @@ public final class SpringAnimation implements View.OnAttachStateChangeListener {
             frames.animateTo(force.getFinalPosition(),()->queue(false));
         }
     }
+    /** Synchronously complete a visible analytic actor already approved by its native navigation owner. */
+    public boolean finishNow(){main();if(!canContinue())return false;finish(false);return true;}
     private void queue(boolean cancelled){
         if(!running)return;if(frames!=null)frames.cancel();
         queuedCancelled|=cancelled;

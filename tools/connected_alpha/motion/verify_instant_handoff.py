@@ -43,7 +43,11 @@ def main() -> None:
         "getLastFragment() == destination;",
         "setInnerTranslationX(0);",
         "swipeProgress = 1f;",
-        "if (tryHandoffClosingChatDown(ev)) {\n            return false;",
+        "if (tryHandoffSettlingChatDown(ev) || tryHandoffClosingChatDown(ev)) {\n            return false;",
+        "!instantSwipeSettlingClosing || !animationInProgress || !startedTracking",
+        "backAnimator != null || velocityTracker != null",
+        "!currentSpringAnimation.canContinue()",
+        "settling.finishNow()",
     ):
         assert required in delta, "Missing safety contract: " + required
     for prohibited in ("MotionEvent.obtain(", "dispatchTouchEvent(", "performClick(", "postDelayed("):
@@ -115,6 +119,13 @@ def main() -> None:
             assert renderer.count(line) == 1
             renderer = renderer.replace(line, line + "\n                backAnimator = null;")
         reconstructed = reconstructed[:a] + renderer + reconstructed[b:]
+    for swipe_hook in (
+        "                instantSwipeSettlingClosing = false;\n",
+        "            instantSwipeSettlingClosing = !backAnimation && !predictiveBackInProgress;\n",
+        "        instantSwipeSettlingClosing = false;\n",
+    ):
+        assert reconstructed.count(swipe_hook) == 1, "Unexpected released-swipe scope"
+        reconstructed = reconstructed.replace(swipe_hook, "")
     data = reconstructed.encode("utf-8")
     blob_sha = hashlib.sha1(b"blob " + str(len(data)).encode() + b"\0" + data).hexdigest()
     assert blob_sha == BASE_GIT_BLOB, (

@@ -353,4 +353,30 @@ public class MotionEngineTest {
    NavigationMotionProbe p=navigation();p.nonM3(false);android.animation.Animator old=p.backAnimator;p.afterSlide=()->{p.afterSlide=null;p.nonM3(true);};if(cancel)old.cancel();else old.end();assertNotNull(p.backAnimator);assertNotSame(old,p.backAnimator);assertTrue(p.animationInProgress);assertEquals(1,p.slideCompletions);frames(30);assertEquals(2,p.slideCompletions);assertNull(p.backAnimator);
   }
  }
+
+ SwipeHandoffProbe swipe(){SwipeHandoffProbe p=new SwipeHandoffProbe(activity);activity.setContentView(p);advance(32);p.measure(View.MeasureSpec.makeMeasureSpec(300,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(600,View.MeasureSpec.EXACTLY));p.layout(0,0,300,600);return p;}
+ void swipeEvent(SwipeHandoffProbe p,int action,float x,float y,long time){MotionEvent event=MotionEvent.obtain(10,time,action,x,y,0);p.dispatchTouchEvent(event);event.recycle();}
+ @Test public void releasedSwipeTransfersOriginalDownUpAfterExactNativeSlideCommit(){
+  for(FlexyMotionProfile profile:new FlexyMotionProfile[]{FlexyMotionProfile.FLOW,FlexyMotionProfile.SIGNATURE})for(float progress:new float[]{.35f,.5f,.8f}){
+   FlexyMotionSettings.setProfile(activity,profile);SwipeHandoffProbe p=swipe();p.stageReleasedSwipe(progress,false,0);app.flexygram.motion.SpringAnimation old=p.currentSpringAnimation;assertTrue(p.instantSwipeSettlingClosing);assertTrue(old.canContinue());assertEquals(2,p.fragmentsStack.size());
+   swipeEvent(p,MotionEvent.ACTION_DOWN,30,240,10);assertEquals(1,p.commits);assertEquals(1,p.fragmentsStack.size());assertSame(p.destination,p.getLastFragment());assertEquals(1,p.outgoing.destroys);assertEquals(1,p.destination.resumes);assertFalse(p.animationInProgress);assertFalse(p.startedTracking);assertFalse(old.isRunning());assertNull(p.currentSpringAnimation);assertEquals(0,FlexyFrameMotion.activeCount());assertEquals(1,p.downs);assertEquals(10,p.downTime);
+   swipeEvent(p,MotionEvent.ACTION_UP,30,240,27);advance(16);assertEquals(1,p.ups);assertEquals(27,p.upTime);assertEquals(1,p.clicks);frames(30);assertEquals(1,p.clicks);assertEquals(1,p.commits);assertEquals(org.telegram.ui.ActionBar.FlexyInstantNavigationCoordinator.State.IDLE,p.instantNavigation.state());
+  }
+ }
+ @Test public void settlingSwipeRejectsCoveredModalPredictiveActiveAndCancelledOwners(){
+  for(int blocked=0;blocked<11;blocked++){
+   SwipeHandoffProbe p=swipe();if(blocked==1)p.predictiveBackInProgress=true;p.stageReleasedSwipe(.5f,blocked==2,0);if(blocked==3)p.outgoing.dialog=new SwipeHandoffProbe.Dialog();if(blocked==4)p.destination.sheet=true;if(blocked==5)p.isRightLayout=true;if(blocked==6)p.inPreviewMode=true;if(blocked==7)p.instantSwipeSettlingClosing=false;if(blocked==8)p.backAnimator=android.animation.ValueAnimator.ofFloat(0,1);if(blocked==9)p.inActionMode=true;if(blocked==10)p.sheetFragment=new SwipeHandoffProbe.BaseFragment();
+   swipeEvent(p,MotionEvent.ACTION_DOWN,blocked==0?280:30,240,10);swipeEvent(p,MotionEvent.ACTION_UP,blocked==0?280:30,240,27);assertEquals(0,p.commits);assertEquals(0,p.clicks);assertEquals(2,p.fragmentsStack.size());assertTrue(p.currentSpringAnimation.isRunning());p.stop();assertEquals(0,FlexyFrameMotion.activeCount());
+  }
+ }
+ @Test public void cancelledOrDraggedTouchAfterSwipeCommitCannotGhostClick(){
+  for(boolean cancel:new boolean[]{false,true}){SwipeHandoffProbe p=swipe();p.stageReleasedSwipe(.6f,false,0);swipeEvent(p,MotionEvent.ACTION_DOWN,30,240,10);assertEquals(1,p.commits);if(cancel)swipeEvent(p,MotionEvent.ACTION_CANCEL,30,240,27);else{swipeEvent(p,MotionEvent.ACTION_MOVE,30,500,27);swipeEvent(p,MotionEvent.ACTION_UP,30,500,45);}advance(32);assertEquals(0,p.clicks);assertEquals(1,p.commits);assertEquals(0,FlexyFrameMotion.activeCount());}
+ }
+ @Test public void releasedSwipeNormalCompletionAndRevertKeepNativeLifecycle(){
+  for(boolean revert:new boolean[]{false,true}){SwipeHandoffProbe p=swipe();p.stageReleasedSwipe(.6f,revert,0);frames(150);assertEquals(revert?2:1,p.fragmentsStack.size());assertEquals(revert?0:1,p.outgoing.destroys);assertEquals(revert?0:1,p.commits);assertFalse(p.animationInProgress);assertFalse(p.startedTracking);assertFalse(p.instantSwipeSettlingClosing);assertEquals(0,FlexyFrameMotion.activeCount());}
+ }
+ @Test public void synchronousAnalyticCompletionIsSingleAndRejectsOtherRoutes(){
+  int[] ends={0};var a=new app.flexygram.motion.SpringAnimation(button,new androidx.dynamicanimation.animation.FloatValueHolder(100)).setSpring(new androidx.dynamicanimation.animation.SpringForce(1000));a.addEndListener((x,c,v,w)->{assertFalse(c);assertEquals(1000,v,0);ends[0]++;});assertFalse(a.finishNow());a.start();assertTrue(a.finishNow());assertEquals(1,ends[0]);assertFalse(a.finishNow());advance(32);assertEquals(1,ends[0]);assertEquals(0,FlexyFrameMotion.activeCount());
+  var timed=new app.flexygram.motion.SpringAnimation(button,new androidx.dynamicanimation.animation.FloatValueHolder(100)).setSpring(new androidx.dynamicanimation.animation.SpringForce(1000)).setDuration(2000);timed.start();assertFalse(timed.finishNow());assertTrue(timed.isRunning());timed.cancel();FlexyMotionSettings.setReduceMotion(activity,true);a.start();assertFalse(a.finishNow());advance(32);assertEquals(2,ends[0]);assertEquals(0,FlexyFrameMotion.activeCount());
+ }
 }

@@ -1067,6 +1067,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
     }
 
     private FlexyInstantNavigationCoordinator instantNavigation;
+    private boolean instantSwipeSettlingClosing;
     // One synchronous Back transaction only. Never retained across native veto, IME delay or modal work.
     private boolean instantBackSeed;
     private float instantBackValue, instantBackVelocity;
@@ -1103,6 +1104,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
 
     private void reportInstantNavigation(FlexyInstantNavigationCoordinator.State state, BaseFragment target,
                                          FlexyInstantNavigationCoordinator.Kind kind) {
+        instantSwipeSettlingClosing = false;
         if (instantNavigation != null) {
             long destinationId = target instanceof ChatActivity ? ((ChatActivity) target).getDialogId() : 0;
             boolean keepSeed = instantBackSeed && instantNavigation.isCurrent(instantBackGeneration)
@@ -1253,9 +1255,41 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         return completed;
     }
 
+    /** Original DOWN may reach the list after a released, committed edge-swipe settles. */
+    private boolean tryHandoffSettlingChatDown(MotionEvent event) {
+        if (event == null || event.getActionMasked() != MotionEvent.ACTION_DOWN
+                || !instantSwipeSettlingClosing || !animationInProgress || !startedTracking
+                || transitionAnimationInProgress || predictiveBackInProgress || storyViewerAttached()
+                || inPreviewMode || transitionAnimationPreviewMode || previewOpenAnimationInProgress
+                || inActionMode || isSheet || isLayersLayout || isRightLayout || sheetFragment != null
+                || backAnimator != null || velocityTracker != null
+                || fragmentsStack.size() < 2 || containerView == null || containerViewBack == null
+                || !containerView.isAttachedToWindow() || !containerViewBack.isAttachedToWindow()
+                || currentSpringAnimation == null || !currentSpringAnimation.canContinue()) return false;
+        BaseFragment outgoing = getLastFragment();
+        BaseFragment destination = fragmentsStack.get(fragmentsStack.size() - 2);
+        if (!(outgoing instanceof ChatActivity)
+                || !(destination instanceof MainTabsActivity || destination instanceof DialogsActivity)
+                || hasInstantBackModal(outgoing, destination)) return false;
+        if (!FlexyNavigationHandoffPolicy.canHandoffClosingDown(
+                true, false,
+                containerView.getVisibility() == View.VISIBLE,
+                containerViewBack.getVisibility() == View.VISIBLE && containerViewBack.getChildCount() > 0,
+                event.getX(), event.getY(), containerView.getTranslationX(),
+                getWidth(), getHeight(), dp(16))) return false;
+        final SpringAnimation settling = currentSpringAnimation;
+        if (instantNavigation == null) instantNavigation = new FlexyInstantNavigationCoordinator();
+        long ticket = instantNavigation.begin(FlexyInstantNavigationCoordinator.State.SETTLING,
+                new FlexyInstantNavigationCoordinator.Intent(FlexyInstantNavigationCoordinator.Kind.REVEAL_SURFACE,
+                        0, destination.getClass().getName()), true);
+        boolean committed = instantNavigation.commit(ticket, () -> settling.finishNow());
+        return committed && !animationInProgress && !startedTracking && !transitionAnimationInProgress
+                && getLastFragment() == destination;
+    }
+
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
-        if (tryHandoffClosingChatDown(ev)) {
+        if (tryHandoffSettlingChatDown(ev) || tryHandoffClosingChatDown(ev)) {
             return false;
         }
         return animationInProgress || checkTransitionAnimation() || onTouchEvent(ev);
@@ -2106,6 +2140,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
     private boolean backAnimatorIsBack;
     private Animator backAnimator;
     private void animateBackEndAnimation(boolean backAnimation, float velX) {
+        instantSwipeSettlingClosing = false;
         final BaseFragment currentFragment = !fragmentsStack.isEmpty() ? fragmentsStack.get(fragmentsStack.size() - 1) : null;
         if (currentFragment == null) return;
 
@@ -2164,10 +2199,12 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
             });
             currentSpringAnimation.addEndListener((animation, canceled, value, velocity) -> {
                 if (animation != currentSpringAnimation) return;
+                instantSwipeSettlingClosing = false;
                 currentSpringAnimation = null;
                 resetPredictiveBackState();
                 onSlideAnimationEnd(canceled || backAnimation);
             });
+            instantSwipeSettlingClosing = !backAnimation && !predictiveBackInProgress;
             currentSpringAnimation.start();
 
             animationInProgress = true;
