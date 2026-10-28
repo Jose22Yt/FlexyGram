@@ -52,8 +52,10 @@ public final class BubbleStudioContractTest {
         throwsInvalid(()->BubbleStickerSpec.dimensions(100,0),"zero height");
         throwsInvalid(()->BubbleStickerSpec.dimensions(1000,100),"extreme aspect ratio");
         throwsInvalid(()->BubbleStickerSpec.dimensions(5000,20),"huge");
-        byte[] webp = {'R','I','F','F',0,0,0,0,'W','E','B','P',0,0,0,0};
+        byte[] webp = {'R','I','F','F',12,0,0,0,'W','E','B','P','V','P','8',' ',0,0,0,0};
         yes(BubbleStickerSpec.isWebp(webp),"webp container");
+        webp[4] = 11;
+        yes(!BubbleStickerSpec.isWebp(webp),"RIFF length mismatch");
         yes(!BubbleStickerSpec.isWebp(new byte[]{'P','N','G'}),"not png");
         yes(!BubbleStickerSpec.isWebp(new byte[0]),"not empty");
         yes(!BubbleStickerSpec.isWebp(new byte[BubbleStickerSpec.MAX_BYTES + 1]),"oversize");
