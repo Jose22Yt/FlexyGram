@@ -16,7 +16,8 @@
     "tools/connected_alpha/home_visual/smart_probe.py": "ea3d1057d87fe081850c2c99607ddace8aa72b775f8a4d276d8ca62e6e16d34c",
     "tools/connected_alpha/test_alpha1280.py": "bafdd56d9e565bf0b908106293f26cd2794e03d1bf761d4be1d8be2b143429a2",
     "tools/connected_alpha/test_alpha1281.py": "bdc04a059e87b37bc228d78391ca157740c8c54cd9c4bf2fdce4bcb883729042",
-    "tools/connected_alpha/test_smart_previews1279_hotfix.py": "adbf6bb21cd737b58524178afe7838f7961028913b67546e642d6562544132d4"
+    "tools/connected_alpha/test_smart_previews1279_hotfix.py": "adbf6bb21cd737b58524178afe7838f7961028913b67546e642d6562544132d4",
+    "tools/connected_alpha/test_stabilization1272.py": "41016f30d3651bf8c190043016eecfdf2af5472af4e9c672e96cc26d9c285e41"
   },
   "paths": [
     ".github/workflows/connected-alpha-arm64.yml",
@@ -35,6 +36,7 @@
     "tools/connected_alpha/home_visual/smart_probe.py",
     "tools/connected_alpha/test_alpha1280.py",
     "tools/connected_alpha/test_alpha1281.py",
-    "tools/connected_alpha/test_smart_previews1279_hotfix.py"
+    "tools/connected_alpha/test_smart_previews1279_hotfix.py",
+    "tools/connected_alpha/test_stabilization1272.py"
   ]
 }
