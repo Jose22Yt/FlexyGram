@@ -965,7 +965,7 @@ public class FilterTabsView extends FrameLayout {
     private float editingAnimationProgress;
     private float editingStartAnimationProgress;
 
-    private Animator colorChangeAnimator;
+    private AnimatorSet colorChangeAnimator;
 
     private boolean orderChanged;
 
@@ -1054,7 +1054,7 @@ public class FilterTabsView extends FrameLayout {
     };
 
     private float animationValue;
-    private final AnimationProperties.FloatProperty<FilterTabsView> COLORS = new AnimationProperties.FloatProperty<FilterTabsView>("animationValue") {
+    private final Property<FilterTabsView, Float> COLORS = new AnimationProperties.FloatProperty<FilterTabsView>("animationValue") {
         @Override
         public void setValue(FilterTabsView object, float value) {
             animationValue = value;
@@ -1539,15 +1539,6 @@ public class FilterTabsView extends FrameLayout {
         invalidate();
     }
 
-    private Animator createFolderColorTransition() {
-        if (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) {
-            return new app.flexygram.motion.FlexyMotionAnimator(this, 0f, 1f, value -> COLORS.setValue(this, value));
-        }
-        AnimatorSet nativeAnimator = new AnimatorSet();
-        nativeAnimator.playTogether(ObjectAnimator.ofFloat(this, COLORS, 0.0f, 1.0f));
-        return nativeAnimator;
-    }
-
     public void animateColorsTo(int line, int active, int unactive, int selector, int background) {
         if (colorChangeAnimator != null) {
             colorChangeAnimator.cancel();
@@ -1559,13 +1550,12 @@ public class FilterTabsView extends FrameLayout {
         selectorColorKey = selector;
         listView.setSelectorDrawableColor(Theme.getColor(selectorColorKey, resourcesProvider));
 
-        colorChangeAnimator = createFolderColorTransition();
+        colorChangeAnimator = new AnimatorSet();
+        colorChangeAnimator.playTogether(ObjectAnimator.ofFloat(this, COLORS, 0.0f, 1.0f));
         colorChangeAnimator.setDuration(320);
         colorChangeAnimator.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                if (colorChangeAnimator != animation) return;
-                colorChangeAnimator = null;
                 tabLineColorKey = aTabLineColorKey;
                 backgroundColorKey = aBackgroundColorKey;
                 activeTextColorKey = aActiveTextColorKey;

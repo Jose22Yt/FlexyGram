@@ -1581,12 +1581,12 @@ public class ReactionsContainerLayout extends FrameLayout implements Notificatio
         }
     }
 
-    private app.flexygram.motion.FlexyMotionAnimator signatureTransitionAnimator;
+    private ObjectAnimator signatureTransitionAnimator;
     private boolean signatureTransitionOpening;
 
     /** One native progress owner, reversible from the currently rendered value. */
     private void cancelSignatureTransition() {
-        app.flexygram.motion.FlexyMotionAnimator previous=signatureTransitionAnimator;
+        ObjectAnimator previous=signatureTransitionAnimator;
         signatureTransitionAnimator=null;
         if(previous!=null){previous.removeAllListeners();previous.cancel();}
         notificationsLocker.unlock();
@@ -1612,7 +1612,7 @@ public class ReactionsContainerLayout extends FrameLayout implements Notificatio
         setTransitionProgress(from);
         if(Math.abs(from-target)<.001f){setTransitionProgress(target);return;}
         notificationsLocker.lock();
-        final app.flexygram.motion.FlexyMotionAnimator animator=new app.flexygram.motion.FlexyMotionAnimator(this,from,target,this::setTransitionProgress);
+        final ObjectAnimator animator=ObjectAnimator.ofFloat(this,TRANSITION_PROGRESS_VALUE,from,target);
         signatureTransitionAnimator=animator;
         animator.setDuration(Math.max(1L,Math.round((opening?240L:180L)*Math.min(1f,Math.abs(target-from)))));
         animator.setInterpolator(opening?new OvershootInterpolator(.5f):CubicBezierInterpolator.EASE_OUT_QUINT);

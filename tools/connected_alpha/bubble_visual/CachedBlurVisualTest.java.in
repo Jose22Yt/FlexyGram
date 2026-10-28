@@ -11,7 +11,7 @@ import org.robolectric.annotation.*;
 import org.telegram.messenger.*;
 import app.flexygram.bubbles.*;
 import static org.junit.Assert.*;
-@RunWith(RobolectricTestRunner.class) @Config(manifest=Config.NONE,sdk=35,instrumentedPackages={"app.flexygram.motion"}) @GraphicsMode(GraphicsMode.Mode.NATIVE) @LooperMode(LooperMode.Mode.PAUSED)
+@RunWith(RobolectricTestRunner.class) @Config(manifest=Config.NONE,sdk=35) @GraphicsMode(GraphicsMode.Mode.NATIVE) @LooperMode(LooperMode.Mode.PAUSED)
 public class CachedBlurVisualTest {
  private final java.util.ArrayList<View> views=new java.util.ArrayList<>();
  private View keep(View v){views.add(v);return v;}
@@ -143,13 +143,11 @@ public class CachedBlurVisualTest {
   var b=new SignatureWallpaperBlur.Owner(keep(new View(ApplicationLoader.applicationContext)),()->changes[0]++);owners.add(b);
   b.prepare(image(100,200,1),false,1);Utilities.globalQueue.runAllOnWorker();b.close();AndroidUtilities.drainMain();org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();assertEquals(1,changes[0]);assertFalse(b.isReady());
  }
- @Test public void genuinelyColdVisibleSourceRevealsOnExistingClockAndDetachCancels()throws Exception{
+ @Test public void genuinelyColdVisibleSourceUsesNativeFadeAndCloseCancels()throws Exception{
   org.robolectric.shadows.ShadowChoreographer.setPaused(true);org.robolectric.shadows.ShadowChoreographer.setFrameDelay(java.time.Duration.ofMillis(16));
   var controller=Robolectric.buildActivity(android.app.Activity.class).setup().visible();var activity=controller.get();View view=new View(activity);activity.setContentView(view);
   view.layout(0,0,100,200);org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(java.time.Duration.ofMillis(32));
   org.robolectric.util.ReflectionHelpers.setField(org.robolectric.util.ReflectionHelpers.getField(view,"mAttachInfo"),"mWindowVisibility",View.VISIBLE);
-  app.flexygram.motion.FlexyMotionSettings.setProfile(activity,app.flexygram.motion.FlexyMotionProfile.FLOW);
-  app.flexygram.motion.FlexyMotionSettings.setReduceMotion(activity,false);
   var a=owner(view);BitmapDrawable source=image(100,200,0);
   a.prepare(source,false,1);Path path=new Path();path.addRect(0,0,100,200,Path.Direction.CW);Bitmap pixels=Bitmap.createBitmap(100,200,Bitmap.Config.ARGB_8888);Canvas canvas=new Canvas(pixels);
   assertTrue("blur enabled",BubbleConfig.backgroundBlur());
@@ -162,9 +160,11 @@ public class CachedBlurVisualTest {
   var mappingField=a.getClass().getDeclaredField("mapping");mappingField.setAccessible(true);
   assertTrue("ready draw supported="+a.isSupported()+" mapping="+mappingField.get(a)+" generation="+source.getBitmap().getGenerationId()+" enabled="+BubbleConfig.backgroundBlur(),a.draw(canvas,path,0,0));
   assertEquals("first cold reveal stays transparent",0,Color.alpha(pixels.getPixel(40,40)));
-  org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(java.time.Duration.ofMillis(64));pixels.eraseColor(Color.TRANSPARENT);assertTrue(a.draw(canvas,path,0,0));int alpha=Color.alpha(pixels.getPixel(40,40));assertTrue("controlled reveal "+alpha,alpha>0&&alpha<255);
-  org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(java.time.Duration.ofMillis(200));pixels.eraseColor(Color.TRANSPARENT);a.draw(canvas,path,0,0);assertEquals(255,Color.alpha(pixels.getPixel(40,40)));
-  a.close();assertEquals(0,app.flexygram.motion.FlexyFrameMotion.activeCount());controller.pause().stop().destroy();
+  var fadeField=a.getClass().getDeclaredField("revealMotion");fadeField.setAccessible(true);var fade=(android.animation.ValueAnimator)fadeField.get(a);assertNotNull(fade);assertEquals(120,fade.getDuration());
+  // Deterministic native animator sampling: this is not a physical frame-clock measurement.
+  fade.setCurrentPlayTime(64);pixels.eraseColor(Color.TRANSPARENT);assertTrue(a.draw(canvas,path,0,0));int alpha=Color.alpha(pixels.getPixel(40,40));assertTrue("controlled reveal "+alpha,alpha>0&&alpha<255);
+  fade.end();pixels.eraseColor(Color.TRANSPARENT);a.draw(canvas,path,0,0);assertEquals(255,Color.alpha(pixels.getPixel(40,40)));
+  a.close();assertNull(fadeField.get(a));assertFalse(fade.isStarted());controller.pause().stop().destroy();
  }
 
  @Test public void exactAlpha1279BaselineRecomputesEveryReopenUnderSameWorkload()throws Exception{

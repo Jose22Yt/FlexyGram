@@ -1,3 +1,4 @@
+from native_motion_restore_contract import read_current
 """Exact Alpha1280 overlay over reviewed PR113; behavioral tests run actual production."""
 from pathlib import Path
 from functools import lru_cache
@@ -24,7 +25,7 @@ def verify_current():
     s=spec()
     if s['base']!=BASE:raise ValueError('Incorrect Alpha1280 base')
     for name,expected in s['reviewed'].items():
-        if hashlib.sha256(next_restore(name,(ROOT/name).read_bytes())).hexdigest()!=expected:raise ValueError('Unreviewed Alpha1280 source: '+name)
+        if hashlib.sha256(next_restore(name,read_current(name))).hexdigest()!=expected:raise ValueError('Unreviewed Alpha1280 source: '+name)
     changed=set(subprocess.check_output(['git','diff',BASE,'--name-only'],cwd=ROOT,text=True).splitlines())
     if changed-paths():raise ValueError('Unreviewed Alpha1280 scope: '+repr(sorted(changed-paths())))
     print('PASS exact Alpha1280 overlay; physical performance acceptance remains separate.')

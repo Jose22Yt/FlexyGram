@@ -181,7 +181,7 @@ public class BotKeyboardView extends LinearLayout implements InAppKeyboardInsetV
         }
     }
 
-    private class Button extends app.flexygram.motion.FlexyPressFrameLayout {
+    private class Button extends FrameLayout {
         private final SpoilersTextView textView;
         private final ImageView icon;
         private final TL_keyboard.KeyboardButton button;

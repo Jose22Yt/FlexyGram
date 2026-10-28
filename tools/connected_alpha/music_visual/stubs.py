@@ -14,8 +14,6 @@ def write_stubs(source, root):
         dest=source/path;dest.parent.mkdir(parents=True,exist_ok=True);dest.write_text(text)
     for annotation in ('NonNull','Nullable'):
         put('androidx/annotation/'+annotation+'.java', 'package androidx.annotation; public @interface '+annotation+' {}')
-    for f in (root/'TMessagesProj/src/main/java/app/flexygram/motion').glob('*.java'):
-        if f.name != 'FlexyMotionActivity.java': put('app/flexygram/motion/'+f.name,f.read_text())
     player=root/'TMessagesProj/src/main/java/app/exteraless/player'
     for name in PRODUCTION:
         put('app/exteraless/player/'+name+'.java',(player/(name+'.java')).read_text())

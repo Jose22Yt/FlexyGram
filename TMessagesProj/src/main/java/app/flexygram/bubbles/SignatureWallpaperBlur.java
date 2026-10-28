@@ -16,7 +16,8 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Trace;
 import android.content.ComponentCallbacks2;
-import app.flexygram.motion.FlexyFrameMotion;
+import android.animation.ValueAnimator;
+import android.view.animation.LinearInterpolator;
 import android.view.View;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -216,7 +217,7 @@ public final class SignatureWallpaperBlur {
         private boolean closed, supported, waitingForSlot;
         private BitmapShader shader;
         private Runnable availabilityChanged;
-        private FlexyFrameMotion revealMotion;
+        private ValueAnimator revealMotion;
         private float reveal = 1;
         private boolean sawFallback, firstDraw;
         private float mappedLeft = Float.NaN, mappedTop, mappedWidth, mappedHeight;
@@ -270,11 +271,23 @@ public final class SignatureWallpaperBlur {
             paint.setShader(shader); mappedLeft = Float.NaN;
             View view = target.get();
             if (sawFallback && view != null && view.isAttachedToWindow() && view.isShown()) {
-                // A genuinely cold source is revealed on the existing active-only clock, never
-                // by delaying navigation or starting an independent/per-message animation.
+                // One native, finite owner-level fade for cold publication only. Warm
+                // cache reuse remains final on its first draw; navigation never waits.
                 reveal = 0;
-                revealMotion = new FlexyFrameMotion(view, 0, value -> { reveal = value; invalidateVisual(); });
-                revealMotion.animateTimedTo(1, 120, null);
+                revealMotion = ValueAnimator.ofFloat(0, 1);
+                revealMotion.setDuration(120);
+                revealMotion.setInterpolator(new LinearInterpolator());
+                revealMotion.addUpdateListener(animation -> {
+                    View owner = target.get();
+                    if (closed || owner == null || !owner.isAttachedToWindow() || !owner.isShown()) {
+                        animation.cancel();
+                        reveal = 1;
+                        return;
+                    }
+                    reveal = (float) animation.getAnimatedValue();
+                    invalidateVisual();
+                });
+                revealMotion.start();
             } else reveal = 1; // Warm reuse is final from its very first draw.
             invalidateVisual();
         }
@@ -305,7 +318,7 @@ public final class SignatureWallpaperBlur {
         }
         private void release() {
             boolean freed = false;
-            if (revealMotion != null) { revealMotion.dispose(); revealMotion = null; }
+            if (revealMotion != null) { revealMotion.removeAllUpdateListeners(); revealMotion.cancel(); revealMotion = null; }
             sawFallback = false; firstDraw = false; reveal = 1;
             if (waitingForSlot) { waiting.removeIf(reference -> reference.get() == null || reference.get() == this); waitingForSlot = false; }
             if (shader != null) { paint.setShader(null); shader = null; }
