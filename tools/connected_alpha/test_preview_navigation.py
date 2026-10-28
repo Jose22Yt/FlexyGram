@@ -16,6 +16,7 @@ def method(source,anchor):
   depth+=(source[b]=='{')-(source[b]=='}');b+=1
  return source[a:b].replace('@Override','')
 def fixture(source):
+ from motion_native.gesture_support import fields
  bodies=[method(source,x) for x in ['public boolean checkTransitionAnimation()', 'public void finishPreviewFragment()', 'public void onBackPressed()', 'private void onCloseAnimationEnd()', 'private void onOpenAnimationEnd()', 'private void onAnimationEndCheck(boolean byCheck)']]
  if 'private void reportInstantNavigation(' in source:bodies+=[method(source,'private void reportInstantNavigation('),method(source,'private boolean isObsoleteInstantCompletion(')]
  if 'private long instantDestinationId(' in source:bodies+=[method(source,'private long instantDestinationId(')]
@@ -29,6 +30,7 @@ def fixture(source):
   if 'private boolean isObsoleteInstantFrame(' in source:bodies+=[method(source,'private boolean isObsoleteInstantFrame(')]
  if 'private boolean prepareInstantBack(' in source:bodies+=[method(source,'private boolean prepareInstantBack('),method(source,'private boolean hasInstantBackModal(')]
  if 'private void clearInstantBackSeed(' in source:bodies+=[method(source,'private void clearInstantBackSeed(')]
+ if 'private void clearInstantGesture(' in source:bodies+=[method(source,'private void clearInstantGesture(')]
  if 'private boolean finishClosingPreview()' in source:bodies+=[method(source,'private boolean finishClosingPreview()')]
  a=source.index('public void closeLastFragment(boolean animated, boolean forceNoAnimation)');b=source.index('        if (parentActivity.getCurrentFocus()',a)
  bodies+=[source[a:b]+' beginClose(getLastFragment()); }']
@@ -47,7 +49,7 @@ def fixture(source):
  static class Bar {boolean isActionModeShowed(){return false;}boolean isSearchFieldVisible;void closeSearchField(){}}
  interface Delegate{boolean needCloseLastFragment(PreviewRegression p);}
  ArrayList<BaseFragment> fragmentsStack=new ArrayList<>();BaseFragment sheetFragment,newFragment,oldFragment;Bar currentActionBar;Delegate delegate;
- boolean predictiveBackInProgress,inActionMode,isSheet,isLayersLayout,isRightLayout;float swipeProgress;
+ boolean predictiveInput,predictiveBackInProgress,predictiveBackHasProgress,inActionMode,isSheet,isLayersLayout,isRightLayout;float swipeProgress;
  boolean inPreviewMode,transitionAnimationPreviewMode,transitionAnimationInProgress,animationInProgress,startedTracking,previewOpenAnimationInProgress;
  long transitionAnimationStartTime;Object layoutToIgnore,springRouteBackgroundDrawable,previewMenu;float springRouteYRatio;boolean USE_ACTIONBAR_CROSSFADE;
  Container containerView=new Container(),containerViewBack=new Container();Animator currentAnimation;SpringAnimation currentSpringAnimation;
@@ -71,7 +73,7 @@ _METHODS_
  PreviewRegression early=create();early.fragmentsStack.add(new BaseFragment());early.transitionAnimationInProgress=true;early.transitionAnimationPreviewMode=true;early.transitionAnimationStartTime=System.currentTimeMillis();early.onOpenAnimationEndRunnable=()->{early.inPreviewMode=true;early.previewMenu=new Object();};early.onBackPressed();early.drain();check(early.fragmentsStack.size()==1&&!early.inPreviewMode);
  for(int n=0;n<200;n++){release.preview();release.finishPreviewFragment();release.onBackPressed();release.finishPreviewFragment();release.drain();check(release.fragmentsStack.size()==1);}
  release.fragmentsStack.add(new BaseFragment());release.onBackPressed();release.drain();check(release.fragmentsStack.size()==1);
- }}'''.replace('_METHODS_','\n'.join(bodies)).replace('Animator currentAnimation;', 'Animator currentAnimation;' if 'private Animator currentAnimation;' in source else 'AnimatorSet currentAnimation;')
+ }}'''.replace('_METHODS_',fields(source)+'\n'+'\n'.join(bodies)).replace('Animator currentAnimation;', 'Animator currentAnimation;' if 'private Animator currentAnimation;' in source else 'AnimatorSet currentAnimation;')
 class PreviewNavigation(unittest.TestCase):
  def test_actual_native_double_close_reproduces_before_and_preserves_home_after(self):
   fixed=(ROOT/PATH).read_text();old=subprocess.check_output(['git','show',BASE+':'+PATH],cwd=ROOT,text=True)

@@ -54,6 +54,45 @@ def main() -> None:
         assert prohibited not in delta, "No synthetic event, injected click or wait: " + prohibited
 
     reconstructed = (content[:start] + ORIGINAL + content[end:]).replace(NEW_IMPORT, "", 1)
+    gesture_begin = "        try { // Instant gesture owns pending state only during native admission.\n"
+    gesture_finish = "        } finally {\n            clearInstantBackSeed();\n            if (!instantGestureActive) clearInstantGesture();\n        }"
+    assert reconstructed.count(gesture_begin) == 1 and reconstructed.count(gesture_finish) == 1
+    ga = reconstructed.index(gesture_begin)
+    gb = reconstructed.index(gesture_finish, ga)
+    gesture_native = reconstructed[ga + len(gesture_begin):gb]
+    assert all(not line or line.startswith("    ") for line in gesture_native.splitlines())
+    reconstructed = reconstructed[:ga] + "\n".join(line[4:] if line else "" for line in gesture_native.splitlines()) + reconstructed[gb + len(gesture_finish):]
+    for gesture_hook in (
+        "        if (!prepareInstantGestureBack()) return false;\n",
+        "        adoptInstantGesture(currentFragment);\n",
+        "        if (applyInstantGestureProgress(t)) return;\n",
+        "        clearInstantGesture();\n",
+        "        velX = prepareInstantGestureSettleVelocity(velX);\n",
+        "            final boolean instantGestureOwned = instantGestureActive;\n",
+        "            final long instantGestureTicket = instantGestureGeneration;\n",
+        "                if (instantGestureOwned && instantNavigation != null) instantNavigation.complete(instantGestureTicket);\n",
+    ):
+        assert reconstructed.count(gesture_hook) == 1, "Unexpected opening gesture hook: " + gesture_hook
+        reconstructed = reconstructed.replace(gesture_hook, "")
+    terminal_guard = "        if (consumeAbandonedInstantGesture()) return;\n"
+    assert reconstructed.count(terminal_guard) == 2
+    reconstructed = reconstructed.replace(terminal_guard, "")
+    for gesture_hook, count in (
+        ("                    if (instantGestureOwned && isObsoleteInstantFrame(animation, instantGestureTicket)) return;\n", 3),
+        ("                if (instantGestureOwned && isObsoleteInstantFrame(animation, instantGestureTicket)) return;\n", 2),
+    ):
+        assert reconstructed.count(gesture_hook) == count
+        reconstructed = reconstructed.replace(gesture_hook, "")
+    renderer_begin = "                if (instantGestureOwned) {\n                    renderInstantGestureValue(value);\n                } else { // Preserve the unowned native gesture renderer.\n"
+    assert reconstructed.count(renderer_begin) == 1
+    ra = reconstructed.index(renderer_begin)
+    rb = reconstructed.index("\n                }\n\n                if (!backAnimation)", ra)
+    native_renderer = reconstructed[ra + len(renderer_begin):rb]
+    assert all(not line or line.startswith("    ") for line in native_renderer.splitlines())
+    reconstructed = reconstructed[:ra] + "\n".join(line[4:] if line else "" for line in native_renderer.splitlines()) + reconstructed[rb + len("\n                }"):]
+    gesture_initial = "new FloatValueHolder(instantGestureActive ? instantGestureValue : (x / containerView.getMeasuredWidth()) * SPRING_MULTIPLIER)"
+    assert reconstructed.count(gesture_initial) == 1
+    reconstructed = reconstructed.replace(gesture_initial, "new FloatValueHolder((x / containerView.getMeasuredWidth()) * SPRING_MULTIPLIER)")
     # Remove only the synchronous seed scope around the unchanged native Back body.
     begin = "        try { // Instant Back owns a seed only within this native call.\n"
     finish = "        } finally {\n            clearInstantBackSeed();\n        }"

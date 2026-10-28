@@ -37,22 +37,23 @@ class Stabilization1272(unittest.TestCase):
  def test_cancelled_spring_rolls_back_and_stale_callback_cannot_close_another_fragment(self):
   source=(ROOT/'TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java').read_text();start=source.index('currentSpringAnimation.addEndListener(',source.index('private void animateBackEndAnimation'))
   statement=source[start:source.index('            currentSpringAnimation.start();',start)]
-  fixture='''public class BackEndProbe {
+  fixture='''import org.telegram.ui.ActionBar.FlexyInstantNavigationCoordinator;public class BackEndProbe {
  interface End {void end(SpringAnimation a,boolean canceled,float v,float speed);}
- static class SpringAnimation {End listener;void addEndListener(End l){listener=l;}void finish(boolean canceled){listener.end(this,canceled,0,0);}}
- SpringAnimation currentSpringAnimation;boolean rollback,instantSwipeSettlingClosing,predictiveBackInProgress;int calls,resets;
+ static class SpringAnimation {void cancel(){finish(true);}End listener;void addEndListener(End l){listener=l;}void finish(boolean canceled){listener.end(this,canceled,0,0);}}
+ FlexyInstantNavigationCoordinator instantNavigation;SpringAnimation currentSpringAnimation;boolean rollback,instantSwipeSettlingClosing,predictiveBackInProgress;int calls,resets;
  void resetPredictiveBackState(){resets++;}
  void onSlideAnimationEnd(boolean b){if(currentSpringAnimation!=null)throw new AssertionError();rollback=b;calls++;}
- void install(boolean backAnimation){_STATEMENT_}
+ void install(boolean backAnimation){boolean instantGestureOwned=false;long instantGestureTicket=0;_STATEMENT_}
+ _OBSOLETE_
  static void check(boolean b){if(!b)throw new AssertionError();}
  public static void main(String[] a){
   BackEndProbe p=new BackEndProbe();p.currentSpringAnimation=new SpringAnimation();SpringAnimation first=p.currentSpringAnimation;p.install(false);first.finish(true);check(p.rollback&&p.calls==1&&p.resets==1&&!p.instantSwipeSettlingClosing);first.finish(false);check(p.calls==1);
   p.currentSpringAnimation=new SpringAnimation();SpringAnimation stale=p.currentSpringAnimation;p.install(false);p.currentSpringAnimation=new SpringAnimation();stale.finish(false);check(p.calls==1);p.install(false);p.currentSpringAnimation.finish(false);check(!p.rollback&&p.calls==2&&!p.instantSwipeSettlingClosing);
   p.predictiveBackInProgress=true;p.currentSpringAnimation=new SpringAnimation();p.install(false);check(!p.instantSwipeSettlingClosing);p.currentSpringAnimation.finish(false);check(!p.rollback&&p.calls==3);
   p.predictiveBackInProgress=false;p.currentSpringAnimation=new SpringAnimation();p.install(true);check(!p.instantSwipeSettlingClosing);p.currentSpringAnimation.finish(false);check(p.rollback&&p.calls==4);
- }}'''.replace('_STATEMENT_',statement)
+ }}'''.replace('_STATEMENT_',statement).replace('_OBSOLETE_',__import__('test_preview_navigation').method(source,'private boolean isObsoleteInstantFrame('))
   with tempfile.TemporaryDirectory()as d:
-   p=Path(d)/'BackEndProbe.java';p.write_text(fixture);subprocess.run(['java','-m','jdk.compiler/com.sun.tools.javac.Main','-d',d,str(p)],check=True);subprocess.run(['java','-cp',d,'BackEndProbe'],check=True)
+   p=Path(d)/'BackEndProbe.java';p.write_text(fixture);subprocess.run(['java','-m','jdk.compiler/com.sun.tools.javac.Main','-d',d,str(p),str(ROOT/'TMessagesProj/src/main/java/org/telegram/ui/ActionBar/FlexyInstantNavigationCoordinator.java')],check=True);subprocess.run(['java','-cp',d,'BackEndProbe'],check=True)
  def test_current_release_version_increases_without_changing_package(self):
   from next_alpha_contract import restore1272
   source=restore1272('TMessagesProj/build.gradle',(ROOT/'TMessagesProj/build.gradle').read_bytes()).decode();before=subprocess.check_output(['git','show',BASE+':TMessagesProj/build.gradle'],cwd=ROOT,text=True)

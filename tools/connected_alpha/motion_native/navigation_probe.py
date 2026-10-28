@@ -1,5 +1,6 @@
 """Actual navigation renderer/callback excerpts with real Android containers; fragments are explicit doubles."""
 from player_probe import method
+from gesture_support import fields
 
 def write(put,root,source):
  s=(root/'TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java').read_text()
@@ -44,7 +45,7 @@ public class NavigationMotionProbe extends FrameLayout {
  public void spring(boolean open,boolean preview){currentSpringAnimation=new SpringAnimation(this,new FloatValueHolder(0)).setSpring(new SpringForce(SPRING_MULTIPLIER));
 '''+spring+'''currentSpringAnimation.start();}
  public void abort(){if(currentSpringAnimation!=null){SpringAnimation old=currentSpringAnimation;currentSpringAnimation=null;old.cancel();}}
-'''+slide_listener+'\n'+start_prefix+'\n'+method(s,'    private boolean isObsoleteInstantFrame(')+'\n'+alpha+'\n'+predictive+'\n'+gesture+'\n'+settle+'\n'+reset+'\n'+timed+'}')
+'''+fields(s)+'\n'+method(s,'    private void clearInstantGesture(')+'\n'+slide_listener+'\n'+start_prefix+'\n'+method(s,'    private boolean isObsoleteInstantFrame(')+'\n'+alpha+'\n'+predictive+'\n'+gesture+'\n'+settle+'\n'+reset+'\n'+timed+'}')
  p=source/'NavigationMotionProbe.java';p.write_text(p.read_text().replace('__CLEANUP__',cleanup))
  p=source/'org/telegram/ui/ActionBar/Theme.java';p.write_text(p.read_text().replace('public class Theme {','public class Theme {public static final android.graphics.drawable.ColorDrawable moveUpDrawable=new android.graphics.drawable.ColorDrawable();'))
 

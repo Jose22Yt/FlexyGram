@@ -4,12 +4,16 @@ Real Android containers, Button, dispatch, spring and coordinator. The initial
 edge swipe is staged, not injected or claimed to be a full physical gesture.
 """
 from player_probe import method
+from gesture_support import fields
 
 def write(put, root):
  s=(root/'TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java').read_text()
  a=s.index('        if (USE_SPRING_ANIMATION) {',s.index('    private void animateBackEndAnimation('))
  spring=method(s[a:],'        if (USE_SPRING_ANIMATION)')
  body='\n'.join(method(s,x) for x in [
+  '    private void clearInstantGesture(',
+  '    private boolean isObsoleteInstantFrame(',
+  '    private void renderInstantGestureValue(',
   '    private boolean tryHandoffSettlingChatDown(',
   '    private boolean hasInstantBackModal(',
   '    private void onSlideAnimationEnd(',
@@ -39,4 +43,4 @@ public class SwipeHandoffProbe extends FrameLayout {
 '''+spring+'''
  }
  public void stop(){if(currentSpringAnimation!=null)currentSpringAnimation.cancel();}
-'''+body+'}')
+'''+fields(s)+'\n'+body+'}')
