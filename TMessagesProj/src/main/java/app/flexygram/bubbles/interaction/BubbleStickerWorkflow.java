@@ -115,11 +115,11 @@ public final class BubbleStickerWorkflow {
         sending = true;
         try {
             sender.send(file, readyDocument, (serverDocument, failure) -> main.post(() -> {
-                if (ticket != generation.get()) return;
+                if (ticket != generation.get()) { file.delete(); return; }
                 sending = false;
                 if (failure == null && NativeStickerMetadata.isNativeStaticSticker(serverDocument)) {
-                    listener.onSent();
                     cancel();
+                    listener.onSent();
                 } else {
                     listener.onError("Telegram no confirmó un sticker auténtico");
                 }
