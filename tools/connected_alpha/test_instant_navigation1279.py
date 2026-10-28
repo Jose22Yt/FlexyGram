@@ -55,18 +55,42 @@ class InstantNavigation1279Regression(unittest.TestCase):
         path=ROOT/'tools/connected_alpha/motion/timed_gesture_scope.py'
         spec=importlib.util.spec_from_file_location('timed_scope_probe',path)
         scope=importlib.util.module_from_spec(spec);spec.loader.exec_module(scope)
+        spec=importlib.util.spec_from_file_location('reveal_scope_probe',ROOT/'tools/connected_alpha/motion/reveal_scope.py')
+        reveal=importlib.util.module_from_spec(spec);spec.loader.exec_module(reveal)
         for name in (scope.ACTION,scope.HELPER,scope.BRIDGE):
             source=(ROOT/name).read_text()
             if name==scope.ACTION:
                 a=source.index('    private FlexyInstantNavigationCoordinator instantNavigation;')
                 b=source.index('    @Override\n    public void requestDisallowInterceptTouchEvent',a)
                 source=source[:a]+source[b:]
-            restored=scope.restore(name,source)
+            restored=scope.restore(name,reveal.restore(name,source))
             self.assertNotEqual(source,restored)
-            self.assertEqual(restored+'// unknown',scope.restore(name,source+'// unknown'))
+            self.assertEqual(restored+'// unknown',scope.restore(name,reveal.restore(name,source+'// unknown')))
         helper=(ROOT/scope.HELPER).read_text()
         with self.assertRaises(AssertionError):
             scope.restore(scope.HELPER,helper.replace('commitStartAlpha = closingAlpha;', 'commitStartAlpha = 0;',1))
+
+    def test_reveal_scope_and_original_touch_wrapper_are_fail_closed(self):
+        import importlib.util
+        spec=importlib.util.spec_from_file_location('reveal_scope_test',ROOT/'tools/connected_alpha/motion/reveal_scope.py')
+        scope=importlib.util.module_from_spec(spec);spec.loader.exec_module(scope)
+        source=(ROOT/NAV).read_text()
+        self.assertEqual(1,source.count('public boolean dispatchTouchEvent(MotionEvent event)'))
+        self.assertIn('return dispatchNativeRevealTouch(event);',source)
+        self.assertIn('handled = dispatchNativeRevealTouch(event);',source)
+        self.assertIn('instantRevealDrawX - instantRevealHitX',source)
+        self.assertIn('findInstantRevealRow(surface, windowX, windowY, 0) != 1',source)
+        a=source.index('    private FlexyInstantNavigationCoordinator instantNavigation;')
+        b=source.index('    @Override\n    public void requestDisallowInterceptTouchEvent',a)
+        source=source[:a]+source[b:]
+        restored=scope.restore(NAV,source)
+        self.assertNotEqual(source,restored)
+        self.assertEqual(restored+'// unknown',scope.restore(NAV,source+'// unknown'))
+        for old,new in [('&& !revealOpen','&& revealOpen'),
+                        ('setInstantRevealTranslationX(containerView,','containerView.setTranslationX(')]:
+            mutant=source.replace(old,new,1)
+            self.assertNotEqual(source,mutant)
+            with self.assertRaises(AssertionError):scope.restore(NAV,mutant)
 
     def test_actual_coordinator_protocol(self):
         import subprocess,tempfile

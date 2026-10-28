@@ -93,6 +93,19 @@ public final class SpringAnimation implements View.OnAttachStateChangeListener {
     }
     /** Synchronously complete a visible analytic actor already approved by its native navigation owner. */
     public boolean finishNow(){main();if(!canContinue())return false;finish(false);return true;}
+    /** Drain only an already queued, non-cancelled visible analytic completion approved by the host. */
+    public boolean canFinishQueued() {
+        main();
+        return BuildConfig.CONNECTED_ALPHA && running && queued && !queuedCancelled && !timed
+                && frames != null && owner.isAttachedToWindow() && owner.isShown()
+                && owner.getWindowVisibility() == View.VISIBLE;
+    }
+    public boolean finishQueuedNow() {
+        main();
+        if (!canFinishQueued()) return false;
+        finish(false);
+        return true;
+    }
     private void queue(boolean cancelled){
         if(!running)return;if(frames!=null)frames.cancel();
         queuedCancelled|=cancelled;

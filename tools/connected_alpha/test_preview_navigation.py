@@ -17,6 +17,7 @@ def method(source,anchor):
  return source[a:b].replace('@Override','')
 def fixture(source):
  from motion_native.gesture_support import fields
+ from motion_native.reveal_support import seed_fields
  bodies=[method(source,x) for x in ['public boolean checkTransitionAnimation()', 'public void finishPreviewFragment()', 'public void onBackPressed()', 'private void onCloseAnimationEnd()', 'private void onOpenAnimationEnd()', 'private void onAnimationEndCheck(boolean byCheck)']]
  if 'private void reportInstantNavigation(' in source:bodies+=[method(source,'private void reportInstantNavigation('),method(source,'private boolean isObsoleteInstantCompletion(')]
  if 'private long instantDestinationId(' in source:bodies+=[method(source,'private long instantDestinationId(')]
@@ -31,6 +32,10 @@ def fixture(source):
  if 'private boolean prepareInstantBack(' in source:bodies+=[method(source,'private boolean prepareInstantBack('),method(source,'private boolean hasInstantBackModal(')]
  if 'private void clearInstantBackSeed(' in source:bodies+=[method(source,'private void clearInstantBackSeed(')]
  if 'private void clearInstantGesture(' in source:bodies+=[method(source,'private void clearInstantGesture(')]
+ # Legacy probes leave reveal inactive; RevealProbe executes the active native wrappers/helpers.
+ if 'private void clearInstantRevealSeed(' in source:
+  bodies+=[seed_fields(source),method(source,'private void clearInstantRevealSeed('),
+   'void clearInstantRevealTouch(boolean restore){} void settleInstantRevealTouch(){}']
  if 'private boolean finishClosingPreview()' in source:bodies+=[method(source,'private boolean finishClosingPreview()')]
  a=source.index('public void closeLastFragment(boolean animated, boolean forceNoAnimation)');b=source.index('        if (parentActivity.getCurrentFocus()',a)
  bodies+=[source[a:b]+' beginClose(getLastFragment()); }']

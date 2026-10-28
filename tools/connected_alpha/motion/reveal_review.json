@@ -1,0 +1,46 @@
+{
+  "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java": [
+    {
+      "before": "        if ((inPreviewMode || transitionAnimationPreviewMode) && child == containerView) {\n            drawPreviewDrawables(canvas, containerView);\n        }\n        final boolean result = super.drawChild(canvas, child, drawingTime);\n        canvas.restoreToCount(restoreCount);\n\n",
+      "after": "        if ((inPreviewMode || transitionAnimationPreviewMode) && child == containerView) {\n            drawPreviewDrawables(canvas, containerView);\n        }\n        if (child == instantRevealSurface) canvas.translate(instantRevealDrawX - instantRevealHitX, 0);\n        final boolean result = super.drawChild(canvas, child, drawingTime);\n        canvas.restoreToCount(restoreCount);\n\n"
+    },
+    {
+      "before": "        if (USE_ACTIONBAR_CROSSFADE) {\n            invalidateActionBars();\n        }\n    }\n\n    private void prepareForMoving() {\n",
+      "after": "        if (USE_ACTIONBAR_CROSSFADE) {\n            invalidateActionBars();\n        }\n        settleInstantRevealTouch();\n    }\n\n    private void prepareForMoving() {\n"
+    },
+    {
+      "before": "                    renderInstantGestureValue(value);\n                } else { // Preserve the unowned native gesture renderer.\n                    containerView.setTranslationX(progress * containerView.getMeasuredWidth());\n                    containerViewBack.setTranslationX(-(containerView.getMeasuredWidth() - progress * containerView.getMeasuredWidth()) * 0.35f);\n                    setInnerTranslationX(progress * containerView.getMeasuredWidth());\n                    if (USE_ACTIONBAR_CROSSFADE) {\n                        swipeProgress = progress;\n",
+      "after": "                    renderInstantGestureValue(value);\n                } else { // Preserve the unowned native gesture renderer.\n                    containerView.setTranslationX(progress * containerView.getMeasuredWidth());\n                    setInstantRevealTranslationX(containerViewBack, -(containerView.getMeasuredWidth() - progress * containerView.getMeasuredWidth()) * 0.35f);\n                    setInnerTranslationX(progress * containerView.getMeasuredWidth());\n                    if (USE_ACTIONBAR_CROSSFADE) {\n                        swipeProgress = progress;\n"
+    },
+    {
+      "before": "            invalidateActionBars();\n        }\n        if (instantNavigation != null) instantNavigation.complete(instantGeneration);\n    }\n\n    public BaseFragment getLastFragment() {\n",
+      "after": "            invalidateActionBars();\n        }\n        if (instantNavigation != null) instantNavigation.complete(instantGeneration);\n        settleInstantRevealTouch();\n    }\n\n    public BaseFragment getLastFragment() {\n"
+    },
+    {
+      "before": "                        invalidate();\n                    } else {\n                        containerViewBack.setTranslationX(interpolated * widthNoPaddings);\n                        containerView.setTranslationX(-(1f - interpolated) * 0.35f * widthNoPaddings);\n                        setInnerTranslationX(interpolated * widthNoPaddings);\n                        // openExtera: закрывающийся экран сжимается карточкой (exteraGram)\n                        final float m3s = AndroidUtilities.lerp(1.0f, 0.85f, interpolated);\n",
+      "after": "                        invalidate();\n                    } else {\n                        containerViewBack.setTranslationX(interpolated * widthNoPaddings);\n                        setInstantRevealTranslationX(containerView, -(1f - interpolated) * 0.35f * widthNoPaddings);\n                        setInnerTranslationX(interpolated * widthNoPaddings);\n                        // openExtera: закрывающийся экран сжимается карточкой (exteraGram)\n                        final float m3s = AndroidUtilities.lerp(1.0f, 0.85f, interpolated);\n"
+    },
+    {
+      "before": "        return isInPreviewMode() && previewMenu != null;\n    }\n\n    @Override\n    public boolean presentFragment(NavigationParams params) {\n        BaseFragment fragment = params.fragment;\n        boolean removeLast = params.removeLast;\n        boolean forceWithoutAnimation = params.noAnimation;\n",
+      "after": "        return isInPreviewMode() && previewMenu != null;\n    }\n\n    private boolean presentNativeRevealFragment(NavigationParams params) {\n        BaseFragment fragment = params.fragment;\n        boolean removeLast = params.removeLast;\n        boolean forceWithoutAnimation = params.noAnimation;\n"
+    },
+    {
+      "before": "        boolean preview = params.preview;\n        ActionBarPopupWindow.ActionBarPopupWindowLayout menu = params.menuView;\n\n        if (fragment == null || checkTransitionAnimation() || animationInProgress || startedTracking || delegate != null && check && !delegate.needPresentFragment(this, params) || !fragment.onFragmentCreate()) {\n            return false;\n        }\n        reportInstantNavigation(FlexyInstantNavigationCoordinator.State.OPENING, fragment,\n",
+      "after": "        boolean preview = params.preview;\n        ActionBarPopupWindow.ActionBarPopupWindowLayout menu = params.menuView;\n\n        final boolean revealOpen = canTakeInstantRevealOpen(fragment, removeLast, forceWithoutAnimation, preview);\n        if (fragment == null || (checkTransitionAnimation() || animationInProgress || startedTracking) && !revealOpen || delegate != null && check && !delegate.needPresentFragment(this, params) || !fragment.onFragmentCreate()) {\n            return false;\n        }\n        if (!prepareInstantRevealOpen(fragment, removeLast, forceWithoutAnimation, preview, revealOpen)) {\n            fragment.onFragmentDestroy();\n            return false;\n        }\n        reportInstantNavigation(FlexyInstantNavigationCoordinator.State.OPENING, fragment,\n"
+    },
+    {
+      "before": "\n    @Override\n    protected void onDetachedFromWindow() {\n        super.onDetachedFromWindow();\n        attached = false;\n    }\n",
+      "after": "\n    @Override\n    protected void onDetachedFromWindow() {\n        clearInstantRevealTouch(false);\n        clearInstantRevealSeed();\n        super.onDetachedFromWindow();\n        attached = false;\n    }\n"
+    },
+    {
+      "before": "    }\n\n    private boolean tabsEvents;\n    @Override\n    public boolean dispatchTouchEvent(MotionEvent ev) {\n        final boolean tabs = ev.getY() > getHeight() - getBottomTabsHeight(true) - systemAndDisplayInsets.bottom;\n\n        BaseFragment.AttachedSheet lastSheet = null;\n",
+      "after": "    }\n\n    private boolean tabsEvents;\n    private boolean dispatchNativeRevealTouch(MotionEvent ev) {\n        final boolean tabs = ev.getY() > getHeight() - getBottomTabsHeight(true) - systemAndDisplayInsets.bottom;\n\n        BaseFragment.AttachedSheet lastSheet = null;\n"
+    }
+  ],
+  "TMessagesProj/src/main/java/app/flexygram/motion/SpringAnimation.java": [
+    {
+      "before": "    }\n    /** Synchronously complete a visible analytic actor already approved by its native navigation owner. */\n    public boolean finishNow(){main();if(!canContinue())return false;finish(false);return true;}\n    private void queue(boolean cancelled){\n        if(!running)return;if(frames!=null)frames.cancel();\n        queuedCancelled|=cancelled;\n",
+      "after": "    }\n    /** Synchronously complete a visible analytic actor already approved by its native navigation owner. */\n    public boolean finishNow(){main();if(!canContinue())return false;finish(false);return true;}\n    /** Drain only an already queued, non-cancelled visible analytic completion approved by the host. */\n    public boolean canFinishQueued() {\n        main();\n        return BuildConfig.CONNECTED_ALPHA && running && queued && !queuedCancelled && !timed\n                && frames != null && owner.isAttachedToWindow() && owner.isShown()\n                && owner.getWindowVisibility() == View.VISIBLE;\n    }\n    public boolean finishQueuedNow() {\n        main();\n        if (!canFinishQueued()) return false;\n        finish(false);\n        return true;\n    }\n    private void queue(boolean cancelled){\n        if(!running)return;if(frames!=null)frames.cancel();\n        queuedCancelled|=cancelled;\n"
+    }
+  ]
+}

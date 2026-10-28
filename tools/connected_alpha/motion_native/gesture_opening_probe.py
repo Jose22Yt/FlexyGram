@@ -35,7 +35,7 @@ def write(put,root):
  body=re.sub(r'app\.exteraless\.utils\.PredictiveBackAnimationHelper\s*\.getTransitionBackground','backgroundForGesture',body)
  body+='\n'+method(s,'    private void animateBackEndAnimation(')
  body+='\n'+method(s,'    private void startFlexyTimedLayoutAnimation(')
- a=s.index('    private final class InstantSlideTarget {');b=s.index('    private void clearInstantBackSeed()',a)
+ a=s.index('    private final class InstantSlideTarget {');b=s.index('    // A real exposed-list touch',a)
  body+='\n'+s[a:b]
  body=body.replace('ActionBarLayout','GestureOpeningProbe').replace('innerTranslationX;','inner;').replace('View.TRANSLATION_X','android.view.View.TRANSLATION_X')
  code=code.replace('int slideBegins;', 'int slideBegins;int customRequests;android.animation.Animator customSlide;boolean overrideSlide;boolean shouldOverrideSlideTransition(boolean a,boolean b){return overrideSlide;}android.animation.Animator getCustomSlideTransition(boolean a,boolean b,float d){customRequests++;return customSlide;}boolean isSupportEdgeToEdge(){return false;}java.util.ArrayList<AttachedSheet> sheetsStack;interface AttachedSheet{boolean attachedToParent();int getNavigationBarColor(int color);}')

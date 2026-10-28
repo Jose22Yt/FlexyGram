@@ -21,7 +21,7 @@ def write(put, root):
   '    public boolean onInterceptTouchEvent('])
  put('SwipeHandoffProbe.java','''import android.view.*;import android.widget.*;import android.animation.Animator;import java.util.ArrayList;import androidx.dynamicanimation.animation.*;import androidx.core.math.MathUtils;import app.flexygram.motion.SpringAnimation;import org.telegram.ui.ActionBar.FlexyInstantNavigationCoordinator;import org.telegram.ui.ActionBar.FlexyNavigationHandoffPolicy;
 public class SwipeHandoffProbe extends FrameLayout {
- static final float SPRING_MULTIPLIER=1000,SPRING_STIFFNESS=900;
+ void settleInstantRevealTouch(){}boolean isInstantRevealTouchValid(){return false;}boolean tryBeginInstantRevealTouch(MotionEvent e){return false;}void setInstantRevealTranslationX(android.view.View surface,float x){surface.setTranslationX(x); }\n static final float SPRING_MULTIPLIER=1000,SPRING_STIFFNESS=900;
  static class LayoutContainer extends FrameLayout {LayoutContainer(android.content.Context c){super(c);}}
  static class Bar extends View {Bar(android.content.Context c){super(c);}boolean shouldAddToContainer(){return true;}}
  static class Dialog {boolean showing=true;boolean isShowing(){return showing;}}

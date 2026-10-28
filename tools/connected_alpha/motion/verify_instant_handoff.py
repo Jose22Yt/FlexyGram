@@ -52,11 +52,19 @@ def main() -> None:
         "settling.finishNow()",
     ):
         assert required in delta, "Missing safety contract: " + required
+    dispatch_signature = "    @Override\n    public boolean dispatchTouchEvent(MotionEvent event) {"
+    assert delta.count(dispatch_signature) == 1, "Exactly one real-input scope wrapper"
+    assert delta.count("handled = dispatchNativeRevealTouch(event);") == 1, "Forward one owned event once"
+    assert delta.count("return dispatchNativeRevealTouch(event);") == 1, "One unowned fast path"
+    assert "if (instantRevealSurface == null && action != MotionEvent.ACTION_DOWN)" in delta
+    input_body = delta.replace(dispatch_signature, "", 1)
     for prohibited in ("MotionEvent.obtain(", "dispatchTouchEvent(", "performClick(", "postDelayed("):
-        assert prohibited not in delta, "No synthetic event, injected click or wait: " + prohibited
+        assert prohibited not in input_body, "No synthetic event, injected click or wait: " + prohibited
 
     reconstructed = (content[:start] + ORIGINAL + content[end:]).replace(NEW_IMPORT, "", 1)
     from timed_gesture_scope import restore, ACTION, HELPER, BRIDGE
+    from reveal_scope import restore as restore_reveal
+    reconstructed = restore_reveal(ACTION, reconstructed)
     reconstructed = restore(ACTION, reconstructed)
     gesture_begin = "        try { // Instant gesture owns pending state only during native admission.\n"
     gesture_finish = "        } finally {\n            clearInstantBackSeed();\n            if (!instantGestureActive) clearInstantGesture();\n        }"
@@ -197,7 +205,7 @@ def main() -> None:
     print("Launcher terminal scope: PASS (entire upstream LaunchActivity recovered byte-for-byte)")
     for path, expected in ((HELPER, "dca5f827cc8e88901f268aca01c769260890cacf"),
                            (BRIDGE, "df649ac16b85270db441e7670329a0f7057fccc1")):
-        data = restore(path, (ROOT / path).read_text()).encode("utf-8")
+        data = restore(path, restore_reveal(path, (ROOT / path).read_text())).encode("utf-8")
         recovered = hashlib.sha1(b"blob " + str(len(data)).encode() + b"\0" + data).hexdigest()
         assert recovered == expected, "Unreviewed timed continuation source: " + path
     print("Timed gesture scope: PASS (complete helper and prior bridge recovered byte-for-byte)")

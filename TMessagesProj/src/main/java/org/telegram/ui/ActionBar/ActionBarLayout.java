@@ -1276,6 +1276,216 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
                 : ObjectAnimator.ofFloat(target, INSTANT_SLIDE_INNER, value);
     }
 
+    // A real exposed-list touch owns only stable hit geometry, not a queued navigation or screenshot.
+    private View instantRevealSurface;
+    private SpringAnimation instantRevealActor;
+    private long instantRevealDownTime, instantRevealGeneration;
+    private int instantRevealOwnerGuid, instantRevealHomeGuid;
+    private float instantRevealDrawX, instantRevealHitX;
+    private int[] instantRevealLocation;
+    private int instantRevealHitBudget;
+    private boolean instantRevealUp, instantRevealSettling;
+    private boolean instantRevealSeed;
+    private float instantRevealOpenValue, instantRevealOpenVelocity;
+    private long instantRevealOpenGeneration;
+    private int instantRevealOpenGuid;
+
+    private void clearInstantRevealSeed() {
+        instantRevealSeed = false;
+        instantRevealOpenValue = instantRevealOpenVelocity = 0;
+        instantRevealOpenGeneration = 0;
+        instantRevealOpenGuid = 0;
+    }
+
+    private void clearInstantRevealTouch(boolean restore) {
+        if (restore && instantRevealSurface != null
+                && instantNavigation != null && instantNavigation.isCurrent(instantRevealGeneration)) {
+            instantRevealSurface.setTranslationX(instantRevealDrawX);
+        }
+        instantRevealSurface = null;
+        instantRevealActor = null;
+        instantRevealDownTime = instantRevealGeneration = 0;
+        instantRevealOwnerGuid = instantRevealHomeGuid = 0;
+        instantRevealDrawX = instantRevealHitX = 0;
+        instantRevealSettling = false;
+    }
+
+    private boolean isInstantRevealTouchValid() {
+        BaseFragment current = getLastFragment();
+        return instantRevealSurface != null && instantNavigation != null
+                && instantNavigation.isCurrent(instantRevealGeneration)
+                && instantRevealSurface.isAttachedToWindow() && instantRevealSurface.getVisibility() == View.VISIBLE
+                && current != null && (current.getClassGuid() == instantRevealHomeGuid
+                        || current.getClassGuid() == instantRevealOwnerGuid && fragmentsStack.size() > 1
+                            && fragmentsStack.get(fragmentsStack.size() - 2).getClassGuid() == instantRevealHomeGuid);
+    }
+
+    private boolean tryBeginInstantRevealTouch(MotionEvent event) {
+        if (event == null || event.getActionMasked() != MotionEvent.ACTION_DOWN || event.getPointerCount() != 1
+                || !USE_SPRING_ANIMATION || currentSpringAnimation == null || !currentSpringAnimation.canContinue()
+                || backAnimator != null || velocityTracker != null || predictiveBackInProgress || predictiveInput
+                || inPreviewMode || transitionAnimationPreviewMode || previewOpenAnimationInProgress
+                || inActionMode || isSheet || isLayersLayout || isRightLayout || sheetFragment != null
+                || fragmentsStack.size() < 2 || containerView == null || containerViewBack == null
+                || containerView.isKeyboardVisible || containerViewBack.isKeyboardVisible
+                || storyViewerAttached()) return false;
+        boolean settling = instantSwipeSettlingClosing && animationInProgress && startedTracking && !transitionAnimationInProgress;
+        boolean closing = transitionAnimationInProgress && onCloseAnimationEndRunnable != null
+                && onOpenAnimationEndRunnable == null && !animationInProgress && !startedTracking;
+        if (!settling && !closing || settling && containerView.getMeasuredWidth()
+                != getWidth() - getPaddingLeft() - getPaddingRight()) return false;
+        BaseFragment owner = getLastFragment(), home = fragmentsStack.get(fragmentsStack.size() - 2);
+        if (!(owner instanceof ChatActivity) || !(home instanceof MainTabsActivity || home instanceof DialogsActivity)
+                || owner.getClassGuid() == 0 || home.getClassGuid() == 0 || hasInstantBackModal(owner, home)) return false;
+        View surface = settling ? containerViewBack : containerView;
+        View outgoing = settling ? containerView : containerViewBack;
+        if (!surface.isAttachedToWindow() || !FlexyNavigationHandoffPolicy.canHandoffClosingDown(
+                true, false, surface.getVisibility() == View.VISIBLE,
+                outgoing.getVisibility() == View.VISIBLE && ((ViewGroup) outgoing).getChildCount() > 0,
+                event.getX(), event.getY(), outgoing.getTranslationX(), getWidth(), getHeight(), dp(16))) return false;
+        if (instantRevealLocation == null) instantRevealLocation = new int[2];
+        getLocationInWindow(instantRevealLocation);
+        float windowX = instantRevealLocation[0] + event.getX(), windowY = instantRevealLocation[1] + event.getY();
+        instantRevealHitBudget = 128;
+        if (findInstantRevealRow(surface, windowX, windowY, 0) != 1) return false;
+        if (instantNavigation == null) instantNavigation = new FlexyInstantNavigationCoordinator();
+        instantRevealSurface = surface;
+        instantRevealActor = currentSpringAnimation;
+        instantRevealGeneration = instantNavigation.generation();
+        instantRevealOwnerGuid = owner.getClassGuid();
+        instantRevealHomeGuid = home.getClassGuid();
+        instantRevealDownTime = event.getDownTime();
+        instantRevealSettling = settling;
+        instantRevealDrawX = instantRevealHitX = surface.getTranslationX();
+        return true;
+    }
+
+    /** Bounded DOWN-only hit test. Headers, stories, avatars and trailing controls keep native fallback. */
+    private int findInstantRevealRow(View node, float windowX, float windowY, int depth) {
+        if (--instantRevealHitBudget < 0 || depth > 24) return -1;
+        if (node.getVisibility() != View.VISIBLE || node.getAlpha() == 0) return 0;
+        node.getLocationInWindow(instantRevealLocation);
+        float x = windowX - instantRevealLocation[0], y = windowY - instantRevealLocation[1];
+        if (x < 0 || y < 0 || x >= node.getWidth() || y >= node.getHeight()) return 0;
+        if (node.getScaleX() != 1 || node.getScaleY() != 1 || node.getRotation() != 0) return -1;
+        if (node instanceof org.telegram.ui.Components.RecyclerListView) {
+            View row = ((org.telegram.ui.Components.RecyclerListView) node).findChildViewUnder(x, y);
+            if (!(row instanceof org.telegram.ui.Cells.DialogCell) || !row.isEnabled()
+                    || row.getScaleX() != 1 || row.getScaleY() != 1 || row.getRotation() != 0) return -1;
+            float rowX = x - row.getX(), rowY = y - row.getY();
+            return rowX >= dp(72) && rowX < row.getWidth() - dp(72)
+                    && rowY >= dp(4) && rowY < row.getHeight() - dp(4) ? 1 : -1;
+        }
+        if (node instanceof ViewGroup) {
+            ViewGroup group = (ViewGroup) node;
+            for (int i = group.getChildCount() - 1; i >= 0; i--) {
+                int hit = findInstantRevealRow(group.getChildAt(i), windowX, windowY, depth + 1);
+                if (hit != 0) return hit;
+            }
+        }
+        return node.isClickable() || node.isLongClickable() ? -1 : 0;
+    }
+
+    /** Same native visual position; only the exposed list's hit transform stays stable during this touch. */
+    private void setInstantRevealTranslationX(View surface, float translationX) {
+        if (surface == instantRevealSurface && isInstantRevealTouchValid()) {
+            instantRevealDrawX = translationX;
+        } else {
+            surface.setTranslationX(translationX);
+        }
+    }
+
+    private void settleInstantRevealTouch() {
+        if (instantRevealSurface != null && getLastFragment() != null
+                && getLastFragment().getClassGuid() == instantRevealHomeGuid && !transitionAnimationInProgress && !animationInProgress) {
+            instantRevealDrawX = 0;
+            instantRevealSurface.setTranslationX(instantRevealHitX);
+            instantRevealActor = null;
+        }
+    }
+
+    private boolean canTakeInstantRevealOpen(BaseFragment target, boolean removeLast, boolean noAnimation, boolean preview) {
+        if (!instantRevealUp || !isInstantRevealTouchValid() || !(target instanceof ChatActivity)
+                || target.getClassGuid() == 0 || removeLast || noAnimation || preview || inPreviewMode || transitionAnimationPreviewMode
+                || inActionMode || sheetFragment != null || storyViewerAttached()) return false;
+        BaseFragment owner = getLastFragment();
+        BaseFragment home = owner.getClassGuid() == instantRevealHomeGuid ? owner : fragmentsStack.get(fragmentsStack.size() - 2);
+        return !hasInstantBackModal(owner, home) && !target.hasSheet()
+                && !containerView.isKeyboardVisible && !containerViewBack.isKeyboardVisible;
+    }
+
+    private boolean prepareInstantRevealOpen(BaseFragment target, boolean removeLast, boolean noAnimation, boolean preview, boolean required) {
+        clearInstantRevealSeed();
+        if (!canTakeInstantRevealOpen(target, removeLast, noAnimation, preview)) return !required;
+        if (getLastFragment().getClassGuid() == instantRevealHomeGuid) {
+            clearInstantRevealTouch(true);
+            return true; // The native close finished naturally while the finger was held.
+        }
+        SpringAnimation closing = currentSpringAnimation;
+        if (closing == null || closing != instantRevealActor) return false;
+        final boolean continuous = closing.canContinue();
+        if (!continuous && !closing.canFinishQueued()) return false;
+        float value = continuous ? closing.continuationValue() : SPRING_MULTIPLIER;
+        float velocity = continuous ? closing.continuationVelocity() : 0;
+        if (!Float.isFinite(value) || !Float.isFinite(velocity) || value < -.25f * SPRING_MULTIPLIER || value > 1.25f * SPRING_MULTIPLIER) return false;
+        final int homeGuid = instantRevealHomeGuid;
+        final boolean settling = instantRevealSettling;
+        clearInstantRevealTouch(false);
+        long ticket = instantNavigation.begin(FlexyInstantNavigationCoordinator.State.CLOSING,
+                new FlexyInstantNavigationCoordinator.Intent(FlexyInstantNavigationCoordinator.Kind.REVEAL_SURFACE,
+                        homeGuid, null), true);
+        boolean completed = instantNavigation.commit(ticket, () -> {
+            if (settling) {
+                if (continuous) closing.finishNow();
+                else closing.finishQueuedNow();
+            } else onAnimationEndCheck(true);
+        });
+        BaseFragment home = getLastFragment();
+        if (!completed || home == null || home.getClassGuid() != homeGuid || transitionAnimationInProgress
+                || animationInProgress || startedTracking || hasInstantBackModal(home, home)) return false;
+        if (!continuous) return true;
+        instantRevealSeed = true;
+        instantRevealOpenValue = SPRING_MULTIPLIER - value;
+        instantRevealOpenVelocity = -velocity;
+        instantRevealOpenGeneration = instantNavigation.generation();
+        instantRevealOpenGuid = target.getClassGuid();
+        return true;
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        int action = event.getActionMasked();
+        if (instantRevealSurface == null && action != MotionEvent.ACTION_DOWN) {
+            return dispatchNativeRevealTouch(event);
+        }
+        if (action == MotionEvent.ACTION_DOWN || event.getPointerCount() != 1
+                || instantRevealSurface != null && (event.getDownTime() != instantRevealDownTime || !isInstantRevealTouchValid())) {
+            clearInstantRevealTouch(true);
+            clearInstantRevealSeed();
+        }
+        instantRevealUp = action == MotionEvent.ACTION_UP && isInstantRevealTouchValid();
+        boolean handled = false;
+        try {
+            handled = dispatchNativeRevealTouch(event);
+            return handled;
+        } finally {
+            if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL
+                    || action == MotionEvent.ACTION_DOWN && !handled) clearInstantRevealTouch(true);
+            instantRevealUp = false;
+            clearInstantRevealSeed();
+        }
+    }
+
+    @Override
+    public boolean presentFragment(NavigationParams params) {
+        try {
+            return presentNativeRevealFragment(params);
+        } finally {
+            // A seed cannot escape a native custom, deferred, vetoed or failed presentation.
+            clearInstantRevealSeed();
+        }
+    }
+
     private void clearInstantBackSeed() {
         instantBackSeed = false;
         instantBackValue = instantBackVelocity = 0;
@@ -1287,14 +1497,19 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         boolean seeded = !open && !preview && instantBackSeed && instantNavigation != null
                 && instantNavigation.isCurrent(instantBackGeneration)
                 && instantNavigation.state() == FlexyInstantNavigationCoordinator.State.CLOSING;
-        float value = seeded ? instantBackValue : 0;
-        float velocity = seeded ? instantBackVelocity : 0;
+        boolean reveal = open && !preview && instantRevealSeed && instantNavigation != null
+                && instantNavigation.isCurrent(instantRevealOpenGeneration)
+                && instantNavigation.state() == FlexyInstantNavigationCoordinator.State.OPENING
+                && getLastFragment() != null && getLastFragment().getClassGuid() == instantRevealOpenGuid;
+        float value = reveal ? instantRevealOpenValue : seeded ? instantBackValue : 0;
+        float velocity = reveal ? instantRevealOpenVelocity : seeded ? instantBackVelocity : 0;
+        clearInstantRevealSeed();
         clearInstantBackSeed();
         SpringAnimation animation = new SpringAnimation(this, new FloatValueHolder(value))
                 .setSpring(new SpringForce(SPRING_MULTIPLIER)
                         .setStiffness(preview ? open ? SPRING_STIFFNESS_PREVIEW : SPRING_STIFFNESS_PREVIEW_OUT : SPRING_STIFFNESS)
                         .setDampingRatio(preview ? 0.6f : 1f));
-        if (seeded) animation.setStartVelocity(velocity).setRenderInitialValue(true);
+        if (seeded || reveal) animation.setStartVelocity(velocity).setRenderInitialValue(true);
         return animation;
     }
 
@@ -1323,6 +1538,11 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
 
     private void reportInstantNavigation(FlexyInstantNavigationCoordinator.State state, BaseFragment target,
                                          FlexyInstantNavigationCoordinator.Kind kind) {
+        clearInstantRevealTouch(true);
+        boolean keepReveal = instantRevealSeed && instantNavigation != null && instantNavigation.isCurrent(instantRevealOpenGeneration)
+                && state == FlexyInstantNavigationCoordinator.State.OPENING && kind == FlexyInstantNavigationCoordinator.Kind.OPEN_CHAT
+                && target != null && target.getClassGuid() == instantRevealOpenGuid;
+        if (!keepReveal) clearInstantRevealSeed();
         instantSwipeSettlingClosing = false;
         if (instantGestureActive || instantGesturePending) {
             instantGestureAbandoned |= predictiveInput;
@@ -1343,6 +1563,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
                     target == null ? null : target.getClass().getName()), false);
             if (keepSeed) instantBackGeneration = ticket;
             else clearInstantBackSeed();
+            if (keepReveal) instantRevealOpenGeneration = ticket;
         }
     }
 
@@ -1521,6 +1742,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
+        if (isInstantRevealTouchValid() || tryBeginInstantRevealTouch(ev)) return false;
         if (tryHandoffSettlingChatDown(ev) || tryHandoffClosingChatDown(ev)) {
             return false;
         }
@@ -1709,6 +1931,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         if ((inPreviewMode || transitionAnimationPreviewMode) && child == containerView) {
             drawPreviewDrawables(canvas, containerView);
         }
+        if (child == instantRevealSurface) canvas.translate(instantRevealDrawX - instantRevealHitX, 0);
         final boolean result = super.drawChild(canvas, child, drawingTime);
         canvas.restoreToCount(restoreCount);
 
@@ -1913,6 +2136,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         if (USE_ACTIONBAR_CROSSFADE) {
             invalidateActionBars();
         }
+        settleInstantRevealTouch();
     }
 
     private void prepareForMoving() {
@@ -2453,7 +2677,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
                     renderInstantGestureValue(value);
                 } else { // Preserve the unowned native gesture renderer.
                     containerView.setTranslationX(progress * containerView.getMeasuredWidth());
-                    containerViewBack.setTranslationX(-(containerView.getMeasuredWidth() - progress * containerView.getMeasuredWidth()) * 0.35f);
+                    setInstantRevealTranslationX(containerViewBack, -(containerView.getMeasuredWidth() - progress * containerView.getMeasuredWidth()) * 0.35f);
                     setInnerTranslationX(progress * containerView.getMeasuredWidth());
                     if (USE_ACTIONBAR_CROSSFADE) {
                         swipeProgress = progress;
@@ -2681,6 +2905,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
             invalidateActionBars();
         }
         if (instantNavigation != null) instantNavigation.complete(instantGeneration);
+        settleInstantRevealTouch();
     }
 
     public BaseFragment getLastFragment() {
@@ -2979,7 +3204,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
                         invalidate();
                     } else {
                         containerViewBack.setTranslationX(interpolated * widthNoPaddings);
-                        containerView.setTranslationX(-(1f - interpolated) * 0.35f * widthNoPaddings);
+                        setInstantRevealTranslationX(containerView, -(1f - interpolated) * 0.35f * widthNoPaddings);
                         setInnerTranslationX(interpolated * widthNoPaddings);
                         // openExtera: закрывающийся экран сжимается карточкой (exteraGram)
                         final float m3s = AndroidUtilities.lerp(1.0f, 0.85f, interpolated);
@@ -3136,8 +3361,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         return isInPreviewMode() && previewMenu != null;
     }
 
-    @Override
-    public boolean presentFragment(NavigationParams params) {
+    private boolean presentNativeRevealFragment(NavigationParams params) {
         BaseFragment fragment = params.fragment;
         boolean removeLast = params.removeLast;
         boolean forceWithoutAnimation = params.noAnimation;
@@ -3145,7 +3369,12 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         boolean preview = params.preview;
         ActionBarPopupWindow.ActionBarPopupWindowLayout menu = params.menuView;
 
-        if (fragment == null || checkTransitionAnimation() || animationInProgress || startedTracking || delegate != null && check && !delegate.needPresentFragment(this, params) || !fragment.onFragmentCreate()) {
+        final boolean revealOpen = canTakeInstantRevealOpen(fragment, removeLast, forceWithoutAnimation, preview);
+        if (fragment == null || (checkTransitionAnimation() || animationInProgress || startedTracking) && !revealOpen || delegate != null && check && !delegate.needPresentFragment(this, params) || !fragment.onFragmentCreate()) {
+            return false;
+        }
+        if (!prepareInstantRevealOpen(fragment, removeLast, forceWithoutAnimation, preview, revealOpen)) {
+            fragment.onFragmentDestroy();
             return false;
         }
         reportInstantNavigation(FlexyInstantNavigationCoordinator.State.OPENING, fragment,
@@ -4678,6 +4907,8 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
 
     @Override
     protected void onDetachedFromWindow() {
+        clearInstantRevealTouch(false);
+        clearInstantRevealSeed();
         super.onDetachedFromWindow();
         attached = false;
     }
@@ -4693,8 +4924,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
     }
 
     private boolean tabsEvents;
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
+    private boolean dispatchNativeRevealTouch(MotionEvent ev) {
         final boolean tabs = ev.getY() > getHeight() - getBottomTabsHeight(true) - systemAndDisplayInsets.bottom;
 
         BaseFragment.AttachedSheet lastSheet = null;
