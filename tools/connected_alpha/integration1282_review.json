@@ -99,7 +99,7 @@
     "tools/connected_alpha/build_private_apk.py": "c1aea09ec1331138b65b4db116b37efdde8d9d7482ca543a335c703301101e2b",
     "tools/connected_alpha/context_panel/ContextPanelTest.java.in": "8e0ee5165ffb45b6e6f0a55979281d66026c11ddca5336c214be445283f84909",
     "tools/connected_alpha/context_panel/run.py": "bae89ec004f9311c93b6db7693af3b6d24b6815d9129b8e09ce1d96f1b922486",
-    "tools/connected_alpha/header_visual/HeaderVisualTest.java.in": "93e8a5544cfc1d21422f14ce774c80ec3f642ed22d10104f905144ee8383beff",
+    "tools/connected_alpha/header_visual/HeaderVisualTest.java.in": "5b12c40faec2396df37c220ef2ad625fc28bce7e57e3012a0377914b65a0fb29",
     "tools/connected_alpha/integration1282_contract.py": "13cb00a273b11beeb22b6a3dd5b09905b6a9218f344b53f3584f6ca83991563e",
     "tools/connected_alpha/matte_bubbles/MatteFinishContractTest.java": "cc690c734ed83ac6c9f3a76c5365762db641bab82789c20fdeeaf1c5af4167b5",
     "tools/connected_alpha/matte_bubbles/test_matte_integration.py": "6b1765cc8c327cc39013cb6bc14b4bf07cab47af5adfd5d0126a2d9131743edf",
