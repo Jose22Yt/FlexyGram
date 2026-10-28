@@ -50,3 +50,11 @@ SCENARIOS.update({
  'channel_actions':'Operator uses permitted discussion, gift entry and search on a prepared test channel; never sends a paid gift.',
  'bot_composer':'Operator switches native commands, keyboard and web-app menu on a prepared test bot with synthetic draft text.'
 })
+
+# Alpha1280: distinguish genuinely cold work from shared-source cache reuse.
+SCENARIOS.update({
+ 'blur_cold':'Open a prepared test chat with a newly assigned static wallpaper; record source/cache state explicitly.',
+ 'blur_warm':'Reopen the same chat/wallpaper after completion; no theme or bitmap generation change.',
+ 'blur_shared':'Open a different test chat sharing the exact same static wallpaper; preserve cache state.',
+ 'blur_lifecycle':'Operator closes/replaces a test chat while optional blur is queued; repeat Back and resume.',
+})

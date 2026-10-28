@@ -14,4 +14,13 @@ class Measurements1280(unittest.TestCase):
   c.execute('DELETE FROM actual_frame_timeline_slice');self.assertEqual((0,None,None,None),c.execute(sql).fetchone())
  def test_summary_p99_uses_original_raw_samples(self):
   self.assertEqual(990,summary(list(range(1,1001)))['p99']);self.assertIsNone(summary([])['p99'])
+ def test_new_cohort_requires_exact_1279_source_and_matched_real_device_evidence(self):
+  from performance.compare import compare
+  from test_universal3 import Universal3
+  reports=Universal3().reports()
+  reports[1].update(label='alpha1279',source_commit='d50677f723292d0e405eae8e1529f65416ff9cbd')
+  self.assertTrue(compare(reports,'alpha1280')['comparable'])
+  reports[1]['source_commit']='f'*40;self.assertFalse(compare(reports,'alpha1280')['comparable'])
+  reports[1]['source_commit']='d50677f723292d0e405eae8e1529f65416ff9cbd'
+  reports[2]['evidence']='synthetic';self.assertFalse(compare(reports,'alpha1280')['comparable'])
 if __name__=='__main__':unittest.main()
