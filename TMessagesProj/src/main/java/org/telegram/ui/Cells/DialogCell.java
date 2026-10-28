@@ -2810,7 +2810,12 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                 && message != null && draftMessage == null && !draftVoice
                 && TextUtils.isEmpty(printingString) && customDialog == null
                 && !isForumCell() && !isFolderCell() && !hasTags()
-                && groupMessages == null
+                // dialogMessage.get(dialog.id) usually returns a list with
+                // ONE latest message even in ordinary private dialogs. The
+                // former groupMessages == null gate therefore disabled Smart
+                // Previews on the actual home chat list. Preserve multi-item
+                // album/group previews instead of replacing their captions.
+                && app.flexygram.home.SignatureSmartPreviews.allowsSingleMessagePreview(groupMessages)
                 // Sender names are on a separate native row in three-line
                 // group layouts. Two-line inline-sender previews stay native.
                 && (messageNameString == null || useForceThreeLines || SharedConfig.useThreeLinesLayout)
