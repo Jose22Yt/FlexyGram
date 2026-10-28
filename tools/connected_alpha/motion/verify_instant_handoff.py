@@ -37,6 +37,8 @@ def main() -> None:
         "FlexyNavigationHandoffPolicy.canHandoffClosingDown(",
         "onAnimationEndCheck(true);",
         "getLastFragment() == destination;",
+        "setInnerTranslationX(0);",
+        "swipeProgress = 1f;",
         "if (tryHandoffClosingChatDown(ev)) {\n            return false;",
     ):
         assert required in delta, "Missing safety contract: " + required
