@@ -40,14 +40,16 @@ class Stabilization1272(unittest.TestCase):
   fixture='''public class BackEndProbe {
  interface End {void end(SpringAnimation a,boolean canceled,float v,float speed);}
  static class SpringAnimation {End listener;void addEndListener(End l){listener=l;}void finish(boolean canceled){listener.end(this,canceled,0,0);}}
- SpringAnimation currentSpringAnimation;boolean rollback;int calls,resets;
+ SpringAnimation currentSpringAnimation;boolean rollback,instantSwipeSettlingClosing,predictiveBackInProgress;int calls,resets;
  void resetPredictiveBackState(){resets++;}
  void onSlideAnimationEnd(boolean b){if(currentSpringAnimation!=null)throw new AssertionError();rollback=b;calls++;}
  void install(boolean backAnimation){_STATEMENT_}
  static void check(boolean b){if(!b)throw new AssertionError();}
  public static void main(String[] a){
-  BackEndProbe p=new BackEndProbe();p.currentSpringAnimation=new SpringAnimation();SpringAnimation first=p.currentSpringAnimation;p.install(false);first.finish(true);check(p.rollback&&p.calls==1&&p.resets==1);first.finish(false);check(p.calls==1);
-  p.currentSpringAnimation=new SpringAnimation();SpringAnimation stale=p.currentSpringAnimation;p.install(false);p.currentSpringAnimation=new SpringAnimation();stale.finish(false);check(p.calls==1);p.install(false);p.currentSpringAnimation.finish(false);check(!p.rollback&&p.calls==2);
+  BackEndProbe p=new BackEndProbe();p.currentSpringAnimation=new SpringAnimation();SpringAnimation first=p.currentSpringAnimation;p.install(false);first.finish(true);check(p.rollback&&p.calls==1&&p.resets==1&&!p.instantSwipeSettlingClosing);first.finish(false);check(p.calls==1);
+  p.currentSpringAnimation=new SpringAnimation();SpringAnimation stale=p.currentSpringAnimation;p.install(false);p.currentSpringAnimation=new SpringAnimation();stale.finish(false);check(p.calls==1);p.install(false);p.currentSpringAnimation.finish(false);check(!p.rollback&&p.calls==2&&!p.instantSwipeSettlingClosing);
+  p.predictiveBackInProgress=true;p.currentSpringAnimation=new SpringAnimation();p.install(false);check(!p.instantSwipeSettlingClosing);p.currentSpringAnimation.finish(false);check(!p.rollback&&p.calls==3);
+  p.predictiveBackInProgress=false;p.currentSpringAnimation=new SpringAnimation();p.install(true);check(!p.instantSwipeSettlingClosing);p.currentSpringAnimation.finish(false);check(p.rollback&&p.calls==4);
  }}'''.replace('_STATEMENT_',statement)
   with tempfile.TemporaryDirectory()as d:
    p=Path(d)/'BackEndProbe.java';p.write_text(fixture);subprocess.run(['java','-m','jdk.compiler/com.sun.tools.javac.Main','-d',d,str(p)],check=True);subprocess.run(['java','-cp',d,'BackEndProbe'],check=True)

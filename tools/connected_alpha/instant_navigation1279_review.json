@@ -20,7 +20,8 @@
     "tools/connected_alpha/motion_native/navigation_probe.py": "29732d7622e711764d4ad4e2a3d425a70e7ee0e7",
     "tools/connected_alpha/motion_native/opening_back_probe.py": "3629cde82154992dbdb28048824ed985e28dd2eb",
     "TMessagesProj/src/main/java/app/flexygram/motion/SpringAnimation.java": "df649ac16b85270db441e7670329a0f7057fccc1",
-    "tools/connected_alpha/motion_native/swipe_handoff_probe.py": "b8f687a040e3b5f6ec933637d454af7e703a2208"
+    "tools/connected_alpha/motion_native/swipe_handoff_probe.py": "b8f687a040e3b5f6ec933637d454af7e703a2208",
+    "tools/connected_alpha/test_stabilization1272.py": "62ad967b4347fe8a07f4dfe9eccee63933c0d131"
   },
   "paths": [
     ".github/workflows/instant-navigation-handoff.yml",
@@ -43,6 +44,7 @@
     "tools/connected_alpha/test_flexy_motion.py",
     "tools/connected_alpha/test_instant_navigation1279.py",
     "tools/connected_alpha/test_performance.py",
-    "tools/connected_alpha/test_preview_navigation.py"
+    "tools/connected_alpha/test_preview_navigation.py",
+    "tools/connected_alpha/test_stabilization1272.py"
   ]
 }
