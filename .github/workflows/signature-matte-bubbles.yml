@@ -1,0 +1,28 @@
+name: Signature Matte bubble contracts
+on:
+  pull_request:
+    paths:
+      - 'TMessagesProj/src/main/java/app/flexygram/bubbles/**'
+      - 'TMessagesProj/src/main/java/org/telegram/ui/ActionBar/MessageDrawable.java'
+      - 'TMessagesProj/src/main/res/values*/flexy_bubble_matte.xml'
+      - 'tools/connected_alpha/matte_bubbles/**'
+      - '.github/workflows/signature-matte-bubbles.yml'
+  workflow_dispatch:
+jobs:
+  isolated-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Java color/alpha regression tests
+        run: |
+          mkdir -p /tmp/flexy-matte-contract
+          javac -encoding UTF-8 -d /tmp/flexy-matte-contract \
+            TMessagesProj/src/main/java/app/flexygram/bubbles/SignatureMatteFinish.java \
+            tools/connected_alpha/matte_bubbles/MatteFinishContractTest.java
+          java -cp /tmp/flexy-matte-contract MatteFinishContractTest
+      - name: Settings/render/preview/source assertions
+        run: python3 tools/connected_alpha/matte_bubbles/test_matte_integration.py
