@@ -35,6 +35,9 @@ class InstantNavigation1279Regression(unittest.TestCase):
         self.assertIn("getLastFragment() == destination", source)
         self.assertIn("setInnerTranslationX(0);", source)
         self.assertIn("swipeProgress = 1f;", source)
+        self.assertIn("outgoingDialog != null && outgoingDialog.isShowing()", source)
+        self.assertIn("destinationDialog != null && destinationDialog.isShowing()", source)
+        self.assertIn("activityDialog != null && activityDialog.isShowing()", source)
         self.assertNotIn("MotionEvent.obtain(", source[source.index("private boolean tryHandoffClosingChatDown"):source.index("public void requestDisallowInterceptTouchEvent")])
 
 
