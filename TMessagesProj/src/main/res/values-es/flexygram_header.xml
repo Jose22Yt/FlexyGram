@@ -16,4 +16,5 @@
     <string name="FlexyHeaderCounterBadge">En bolita</string>
     <string name="FlexyHeaderLastSeenTime">Últ.vez %1$s</string>
     <string name="FlexyHeaderFusion">Signature Fusion</string>
+    <string name="FlexyHeaderPortrait">Signature Matte Portrait</string>
 </resources>

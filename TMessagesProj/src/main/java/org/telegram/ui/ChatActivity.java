@@ -32716,6 +32716,18 @@ public class ChatActivity extends BaseFragment implements
         }
     }
 
+    /** Native menu policy is the authority; no independent permission rules. */
+    private java.util.EnumSet<app.flexygram.bubbles.interaction.BubbleActionPanelView.Action> signatureContextActions(ArrayList<Integer> options) {
+        var actions=java.util.EnumSet.noneOf(app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.class);
+        if(lastMessageMenuStatus.allowReply)actions.add(app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.REPLY);
+        if(lastMessageMenuStatus.allowCopy)actions.add(app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.COPY);
+        if(lastMessageMenuStatus.allowForward)actions.add(app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.FORWARD);
+        if(lastMessageMenuStatus.allowEdit)actions.add(app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.EDIT);
+        if(lastMessageMenuStatus.allowDelete)actions.add(app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.DELETE);
+        if(options.contains(OPTION_PIN))actions.add(app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.PIN);
+        return actions;
+    }
+
     private boolean createMenu(View v, boolean single, boolean listView, float x, float y, boolean longpress) {
         return createMenu(v, single, listView, x, y, true, longpress);
     }
@@ -33192,6 +33204,14 @@ public class ChatActivity extends BaseFragment implements
                 flags |= ActionBarPopupWindow.ActionBarPopupWindowLayout.FLAG_USE_SWIPEBACK;
             }
 
+            final boolean compactContext = v instanceof ChatMessageCell
+                    && selectedObject == ((ChatMessageCell)v).getMessageObject()
+                    && selectedObject != null && selectedObjectGroup == null && !selectedObject.isSponsored()
+                    && !selectedObject.isEphemeral() && !suggestEdit && AndroidUtilities.displaySize.x >= dp(320)
+                    && getParentActivity().getResources().getDisplayMetrics().scaledDensity
+                        <= getParentActivity().getResources().getDisplayMetrics().density * 1.3f
+                    && app.flexygram.bubbles.interaction.BubbleInteractionSettings.signaturePanel(getParentActivity());
+            if(compactContext) flags |= ActionBarPopupWindow.ActionBarPopupWindowLayout.FLAG_USE_SWIPEBACK;
             ActionBarPopupWindow.ActionBarPopupWindowLayout popupLayout = new ActionBarPopupWindow.ActionBarPopupWindowLayout(getParentActivity(), R.drawable.popup_fixed_alert4, themeDelegate, flags);
             popupLayout.setMinimumWidth(AndroidUtilities.dp(200));
             Rect backgroundPaddings = new Rect();
@@ -33201,7 +33221,7 @@ public class ChatActivity extends BaseFragment implements
             // openExtera: матовое стекло под меню сообщения.
             // Гейт тот же, что в exteraGram: настройка + доступный блюр.
             // Флаг выключен или блюр недоступен -> ниже ничего не меняется, popup остаётся прежним.
-            final boolean glassMenu = GlassMenuHelper.isEnabled(currentAccount, themeDelegate);
+            final boolean glassMenu = !compactContext && GlassMenuHelper.isEnabled(currentAccount, themeDelegate);
             if (glassMenu) {
                 GlassMenuHelper.applyToPopup(scrimBlur3Factory, themeDelegate, popupLayout);
             }
@@ -33209,7 +33229,8 @@ public class ChatActivity extends BaseFragment implements
 
             updateScrimSourceBitmap();
 
-            popupLayout.setBackground(scrimBlur3Factory.create(popupLayout, true)
+            if (compactContext) popupLayout.setBackground(Theme.createRoundRectDrawable(dp(22),getThemedColor(Theme.key_windowBackgroundWhite)));
+            else popupLayout.setBackground(scrimBlur3Factory.create(popupLayout, true)
                 .setColorProvider(BlurredBackgroundProviderImpl.messageMenuBackground(resourceProvider))
                 .setRadius(dp(12))
                 .setPadding(dp(8)));
@@ -34291,6 +34312,49 @@ public class ChatActivity extends BaseFragment implements
                     popupLayout.addView(groupedIconsView.linearLayout);
                 }
 
+            }
+
+            if (compactContext) {
+                final MessageObject panelMessage=selectedObject;
+                final ChatMessageCell panelCell=(ChatMessageCell)v;
+                final var panel=new app.flexygram.bubbles.interaction.BubbleActionPanelView(getParentActivity(),themeDelegate);
+                final var admitted=signatureContextActions(options);
+                if (!admitted.isEmpty()) {
+                    admitted.add(app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.SELECT);
+                    panel.setAllowedActions(admitted);panel.setMinimumWidth(dp(260));
+                    ArrayList<View> nativeItems=new ArrayList<>();
+                    for(int i=0;i<popupLayout.getItemsCount();i++)nativeItems.add(popupLayout.getItemAt(i));
+                    popupLayout.removeInnerViews();
+                    LinearLayout nativeMenu=new LinearLayout(getParentActivity());nativeMenu.setOrientation(LinearLayout.VERTICAL);
+                    ActionBarMenuSubItem backToActions=new ActionBarMenuSubItem(getParentActivity(),true,false,themeDelegate);
+                    backToActions.setTextAndIcon(getString(R.string.FlexyContextActions),R.drawable.ic_ab_back);
+                    backToActions.setOnClickListener(view->popupLayout.getSwipeBack().closeForeground());nativeMenu.addView(backToActions);
+                    for(View nativeItem:nativeItems)nativeMenu.addView(nativeItem);
+                    android.widget.ScrollView nativeScroll=new android.widget.ScrollView(getParentActivity());nativeScroll.addView(nativeMenu);
+                    final int nativeMenuIndex=popupLayout.addViewToSwipeBack(nativeScroll);
+                    popupLayout.addView(panel);
+                    panel.setListener(action->{
+                        if(selectedObject!=panelMessage || panelCell.getMessageObject()!=panelMessage || getParentActivity()==null)return;
+                        if(action==app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.MORE){
+                            popupLayout.getSwipeBack().openForeground(nativeMenuIndex);return;
+                        }
+                        if(action==app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.SELECT){
+                            createMenu(panelCell,false,false,x,y,false,true,false,false);return;
+                        }
+                        ArrayList<Integer> freshIcons=new ArrayList<>(),freshOptions=new ArrayList<>();
+                        ArrayList<CharSequence> freshItems=new ArrayList<>();
+                        fillMessageMenu(panelCell.getPrimaryMessageObject(),freshIcons,freshItems,freshOptions);
+                        if(!signatureContextActions(freshOptions).contains(action))return;
+                        switch(action){
+                            case REPLY:processSelectedOption(OPTION_REPLY);break;
+                            case COPY:processSelectedOption(OPTION_COPY);break;
+                            case FORWARD:processSelectedOption(OPTION_FORWARD);break;
+                            case EDIT:processSelectedOption(OPTION_EDIT);break;
+                            case PIN:processSelectedOption(OPTION_PIN);break;
+                            case DELETE:processSelectedOption(OPTION_DELETE);break;
+                        }
+                    });
+                }
             }
 
             if (selectedObject != null && selectedObject.isEphemeral() && chatMode != MODE_WELCOME_MESSAGES && !showWelcomeMessageRevertOption(selectedObject)) {

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyContextActions">Acciones</string>
+    <string name="FlexyContextSticker">Sticker</string>
+    <string name="FlexyContextSelect">Seleccionar</string>
+    <string name="FlexyContextMore">Más</string>
+    <string name="FlexyContextSendHere">Enviar aquí</string>
+    <string name="FlexyContextPanel">Panel contextual FlexyGram</string>
+</resources>

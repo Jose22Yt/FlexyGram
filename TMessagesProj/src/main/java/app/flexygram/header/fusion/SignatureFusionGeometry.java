@@ -39,6 +39,8 @@ public final class SignatureFusionGeometry {
     public static final class Layout {
         public final Rect back = new Rect(), center = new Rect(), actions = new Rect();
         public final Rect backVisual = new Rect(), actionsVisual = new Rect();
+        public final Rect callVisual = new Rect(), moreVisual = new Rect();
+        public boolean mattePortrait;
         /** The avatar image is cropped to this panel inside the central pill. */
         public final Rect portrait = new Rect();
         /** Logical hit targets, ordered phone then overflow for LTR; mirrored for RTL. */
@@ -69,6 +71,7 @@ public final class SignatureFusionGeometry {
         if (!(density > 0) || Float.isInfinite(density) || Float.isNaN(widthPx) || Float.isInfinite(widthPx))
             throw new IllegalArgumentException("finite width and density required");
         g.rtl = rtl;
+        g.mattePortrait = false;
         g.callAvailable = callAvailable;
         float d = density;
         float edge = EDGE_DP * d, gap = GAP_DP * d;
@@ -155,6 +158,23 @@ public final class SignatureFusionGeometry {
         }
         // A fallback is preferable to clipping text or creating overlapping buttons.
         g.fits &= g.text.width() >= 48f*d;
+        return g;
+    }
+
+    /** Matte Portrait reuses the original native 48dp controls and center bounds. */
+    public static Layout updatePortrait(Layout g, float width, float density, boolean rtl, boolean callAvailable) {
+        update(g, width, density, rtl, callAvailable);
+        g.mattePortrait = true;
+        float radius = CENTER_HEIGHT_DP * density * .5f;
+        g.backVisual.set(g.back.centerX()-radius,g.back.centerY()-radius,g.back.centerX()+radius,g.back.centerY()+radius);
+        g.callVisual.set(g.call.centerX()-radius,g.call.centerY()-radius,g.call.centerX()+radius,g.call.centerY()+radius);
+        g.moreVisual.set(g.more.centerX()-radius,g.more.centerY()-radius,g.more.centerX()+radius,g.more.centerY()+radius);
+        float photo = 38f*density, inset = 4f*density;
+        float left = rtl ? g.center.right-inset-photo : g.center.left+inset;
+        g.portrait.set(left,g.center.centerY()-photo*.5f,left+photo,g.center.centerY()+photo*.5f);
+        if (rtl) g.text.set(g.center.left+10f*density,g.center.top,g.portrait.left-8f*density,g.center.bottom);
+        else g.text.set(g.portrait.right+8f*density,g.center.top,g.center.right-10f*density,g.center.bottom);
+        g.fits &= g.text.width() >= 48f*density;
         return g;
     }
 

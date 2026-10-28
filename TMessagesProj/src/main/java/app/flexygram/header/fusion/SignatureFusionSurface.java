@@ -29,10 +29,10 @@ public final class SignatureFusionSurface {
         separator.setStrokeWidth(.7f * density);
         drawPill(canvas,g.backVisual);
         drawCenterFill(canvas,g.center);
-        drawPill(canvas,g.actionsVisual);
+        drawActions(canvas,g);
         drawCenterBorder(canvas, g, borderColor, density);
         // The two separate native touch zones within one shared right mini-pill.
-        if (g.callAvailable) {
+        if (g.callAvailable && !g.mattePortrait) {
             float x = g.actions.centerX();
             float cy = g.actionsVisual.centerY();
             float inset = 10f*density;
@@ -45,9 +45,15 @@ public final class SignatureFusionSurface {
                      int surfaceColor, int borderColor, int separatorColor, float density) {
         fill.setColor(surfaceColor); border.setColor(borderColor); border.setStrokeWidth(.7f * density);
         separator.setColor(separatorColor); separator.setStrokeWidth(.7f * density);
-        drawPill(canvas,g.backVisual); drawCenterFill(canvas,g.center); drawPill(canvas,g.actionsVisual);
-        if(g.callAvailable){float x=g.actions.centerX();
+        drawPill(canvas,g.backVisual); drawCenterFill(canvas,g.center); drawActions(canvas,g);
+        if(g.callAvailable && !g.mattePortrait){float x=g.actions.centerX();
             canvas.drawLine(x,g.actionsVisual.top+10f*density,x,g.actionsVisual.bottom-10f*density,separator);}
+    }
+    private void drawActions(Canvas canvas, SignatureFusionGeometry.Layout g) {
+        if (g.mattePortrait) {
+            if (g.callAvailable) drawPill(canvas,g.callVisual);
+            drawPill(canvas,g.moreVisual);
+        } else drawPill(canvas,g.actionsVisual);
     }
     private void drawCenterFill(Canvas canvas, SignatureFusionGeometry.Rect r) {
         work.set(r.left,r.top,r.right,r.bottom);canvas.drawRoundRect(work,r.height()*.5f,r.height()*.5f,fill);

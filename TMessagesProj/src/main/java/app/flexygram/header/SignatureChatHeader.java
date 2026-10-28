@@ -51,8 +51,11 @@ public final class SignatureChatHeader {
         fusionLayout = false;
         if (HeaderConfig.fusion() && active()) {
             if (fusion == null) fusion = new Fusion();
-            var g = app.flexygram.header.fusion.SignatureFusionGeometry.update(fusion.layout,
-                    width, AndroidUtilities.density, LocaleController.isRTL, avatar.signatureCallAvailable());
+            var g = HeaderConfig.portrait()
+                    ? app.flexygram.header.fusion.SignatureFusionGeometry.updatePortrait(fusion.layout,
+                        width, AndroidUtilities.density, LocaleController.isRTL, avatar.signatureCallAvailable())
+                    : app.flexygram.header.fusion.SignatureFusionGeometry.update(fusion.layout,
+                        width, AndroidUtilities.density, LocaleController.isRTL, avatar.signatureCallAvailable());
             // Keep the approved compact sizes; large fonts/narrow windows use the existing Adaptive path.
             if (g.fits && titleLine + subtitleLine + AndroidUtilities.dp(2) <= g.height - AndroidUtilities.dp(8)) {
                 fusionLayout = true; height = g.height; subtitleFits = true;
@@ -102,7 +105,7 @@ public final class SignatureChatHeader {
     public void draw(Canvas canvas) {
         if (!fusionActive()) { surface.draw(canvas, geometry, AndroidUtilities.density, provider); return; }
         int fill = Theme.getColor(Theme.key_windowBackgroundWhite, provider);
-        fill = (fill & 0xffffff) | (Math.round(HeaderConfig.opacity() * 2.55f) << 24);
+        fill = (fill & 0xffffff) | ((HeaderConfig.portrait() ? 255 : Math.round(HeaderConfig.opacity() * 2.55f)) << 24);
         int border = (Theme.getColor(Theme.key_divider, provider) & 0xffffff) | 0x66000000;
         int save = canvas.save(); canvas.translate(0, fusionTop);
         fusion.surface.drawBackdrop(canvas, fusion.layout, fill, border, border, AndroidUtilities.density);
