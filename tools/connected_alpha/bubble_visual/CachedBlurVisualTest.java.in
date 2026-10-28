@@ -24,15 +24,16 @@ public class CachedBlurVisualTest {
  private Object entry(SignatureWallpaperBlur.Owner owner)throws Exception{var f=owner.getClass().getDeclaredField("entry");f.setAccessible(true);return f.get(owner);}
  private Bitmap cached(SignatureWallpaperBlur.Owner owner)throws Exception{Object e=entry(owner);var f=e.getClass().getDeclaredField("bitmap");f.setAccessible(true);return (Bitmap)f.get(e);}
  @Test public void nativeGradientAndSolidSourcesRenderThroughRealBubblesWithoutRepeatJobs() throws Exception {
-  Bitmap evidence=Bitmap.createBitmap(720,480,Bitmap.Config.ARGB_8888);Canvas montage=new Canvas(evidence);int tile=0;
+  Bitmap evidence=Bitmap.createBitmap(720,720,Bitmap.Config.ARGB_8888);Canvas montage=new Canvas(evidence);int tile=0;
   int[] stripes=new int[41];for(int i=0;i<stripes.length;i++)stripes[i]=i%2==0?Color.BLACK:Color.WHITE;
   for(boolean dark:new boolean[]{false,true}) {
    org.telegram.ui.ActionBar.Theme.dark=dark;
-   for(Drawable wallpaper:new Drawable[]{new ColorDrawable(dark?0xff202020:0xffeeeeee),new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT,stripes)}) {
+   BitmapDrawable tiled=image(4,4,0);tiled.setTileModeXY(Shader.TileMode.REPEAT,Shader.TileMode.REPEAT);
+   for(Drawable wallpaper:new Drawable[]{new ColorDrawable(dark?0xff202020:0xffeeeeee),new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT,stripes),tiled}) {
     wallpaper.setBounds(0,0,180,100);
     var a=owner(keep(new View(ApplicationLoader.applicationContext)));a.prepare(wallpaper,false,0xff888888);complete();assertTrue(a.isReady());
     Bitmap prepared=cached(a);assertTrue(prepared.getWidth()<=384);assertTrue(prepared.getHeight()<=384);
-    if(wallpaper instanceof GradientDrawable) {int red=Color.red(prepared.getPixel(90,50));assertTrue(red>60&&red<195);}
+    if(wallpaper instanceof GradientDrawable || wallpaper==tiled) {int red=Color.red(prepared.getPixel(90,50));assertTrue(red>60&&red<195);}
     for(boolean out:new boolean[]{false,true})for(boolean matte:new boolean[]{false,true}) {
      BubbleConfig.setMatteEnabled(matte);BubbleConfig.setMatteStrength(75);BubbleConfig.setTransparency(100);BubbleConfig.setOutlineEnabled(false);
      var bubble=new org.telegram.ui.ActionBar.MessageDrawable(org.telegram.ui.ActionBar.MessageDrawable.TYPE_TEXT,out,false);

@@ -233,6 +233,28 @@ public final class SignatureWallpaperBlur {
             this.availabilityChanged = availabilityChanged;
         }
 
+        private Bitmap snapshot(Drawable drawable, int backgroundColor, int color) {
+            mapping.set(drawable.getBounds());
+            if (mapping.isEmpty() || drawable.getAlpha() != 255) return null;
+            if (snapshotSource != drawable || staticSnapshot == null
+                    || snapshotBackground != backgroundColor || snapshotColor != color) {
+                Drawable.ConstantState state = drawable.getConstantState();
+                if (state == null) return null;
+                Drawable copy = state.newDrawable().mutate();
+                copy.setColorFilter(drawable.getColorFilter());
+                float scale = Math.min(1f, MAX_EDGE / Math.max(mapping.width(), mapping.height()));
+                int width = Math.max(1, Math.round(mapping.width() * scale));
+                int height = Math.max(1, Math.round(mapping.height() * scale));
+                Bitmap snapshot = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+                copy.setBounds(0, 0, Math.round(mapping.width()), Math.round(mapping.height()));
+                Canvas canvas = new Canvas(snapshot);
+                canvas.scale(width / mapping.width(), height / mapping.height());
+                copy.draw(canvas);
+                snapshotSource = drawable; staticSnapshot = snapshot;
+                snapshotBackground = backgroundColor; snapshotColor = color;
+            }
+            return staticSnapshot;
+        }
         private Bitmap bitmap(Drawable drawable, int backgroundColor) {
             if (drawable instanceof AnimatedFileDrawable) return null;
             if (drawable instanceof MotionBackgroundDrawable) {
@@ -241,33 +263,19 @@ public final class SignatureWallpaperBlur {
             }
             if (drawable instanceof BitmapDrawable) {
                 BitmapDrawable image = (BitmapDrawable) drawable;
-                if (image.getTileModeX() != null || image.getTileModeY() != null
-                        || image.getAlpha() != 255 || image.getColorFilter() != null) return null;
+                if (image.getAlpha() != 255) return null;
+                if (image.getTileModeX() != null || image.getTileModeY() != null || image.getColorFilter() != null) {
+                    Bitmap bitmap = image.getBitmap();
+                    if (bitmap == null || bitmap.isRecycled()) return null;
+                    return snapshot(drawable, backgroundColor, System.identityHashCode(bitmap) ^ bitmap.getGenerationId());
+                }
                 mapping.set(image.getBounds());
                 return image.getBitmap();
             }
             if (drawable instanceof ChatBackgroundDrawable)
                 return ((ChatBackgroundDrawable) drawable).getSignatureBlurBitmap(mapping);
-            if (drawable instanceof ColorDrawable || drawable instanceof GradientDrawable) {
-                mapping.set(drawable.getBounds());
-                if (mapping.isEmpty() || drawable.getAlpha() != 255) return null;
-                int color = drawable instanceof ColorDrawable ? ((ColorDrawable) drawable).getColor() : 0;
-                if (snapshotSource != drawable || staticSnapshot == null
-                        || snapshotBackground != backgroundColor || snapshotColor != color) {
-                    Drawable.ConstantState state = drawable.getConstantState();
-                    if (state == null) return null;
-                    Drawable copy = state.newDrawable().mutate();
-                    copy.setColorFilter(drawable.getColorFilter());
-                    float scale = Math.min(1f, MAX_EDGE / Math.max(mapping.width(), mapping.height()));
-                    int width = Math.max(1, Math.round(mapping.width() * scale));
-                    int height = Math.max(1, Math.round(mapping.height() * scale));
-                    Bitmap snapshot = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-                    copy.setBounds(0, 0, width, height); copy.draw(new Canvas(snapshot));
-                    snapshotSource = drawable; staticSnapshot = snapshot;
-                    snapshotBackground = backgroundColor; snapshotColor = color;
-                }
-                return staticSnapshot;
-            }
+            if (drawable instanceof ColorDrawable || drawable instanceof GradientDrawable)
+                return snapshot(drawable, backgroundColor, drawable instanceof ColorDrawable ? ((ColorDrawable) drawable).getColor() : 0);
             return null;
         }
         public void prepare(Drawable drawable, boolean motion, int backgroundColor) {
