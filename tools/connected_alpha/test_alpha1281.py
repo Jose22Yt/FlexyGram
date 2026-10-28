@@ -20,5 +20,6 @@ class Alpha1281(unittest.TestCase):
   self.assertIn('allowsSingleMessagePreview(groupMessages)',s);self.assertNotIn('&& groupMessages == null',s)
   self.assertIn('SignaturePreviewContext.isMessageRow',s);self.assertIn('restriction_reason.isEmpty()',s)
   self.assertIn('draftMessage == null && !draftVoice',s);self.assertIn('TextUtils.isEmpty(printingString)',s)
+  self.assertIn('!clearingDialog && drawTime && currentDialogCommunityId == 0 && !promoDialog',s)
   self.assertIn('SignatureTopicAccent.overlay(topicSurfaceColor',s)
 if __name__=='__main__':unittest.main()

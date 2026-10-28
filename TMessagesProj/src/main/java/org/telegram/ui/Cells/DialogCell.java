@@ -2821,6 +2821,8 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                 && app.flexygram.home.SignaturePreviewContext.isMessageRow(isDialogCell,isTopic,isShareToStoryCell,
                     isDialogFolder(),isForumCell(),isFolderCell())
                 && message != null && message.messageOwner != null && draftMessage == null && !draftVoice
+                // Native status/selection/community summaries are not last-message snippets.
+                && !clearingDialog && drawTime && currentDialogCommunityId == 0 && !promoDialog
                 && TextUtils.isEmpty(printingString) && TextUtils.isEmpty(customMessage) && customDialog == null
                 && prefixAvailable && messageWidth >= dp(68)
                 // Keep the existing row height at large accessibility scales.
