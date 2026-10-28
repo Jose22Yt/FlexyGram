@@ -12,8 +12,8 @@ permissions:
   contents: read
 
 concurrency:
-  group: private-alpha1281-universal-01ba5b48187a0837926935db91e067011c4db725
-  cancel-in-progress: true
+  group: private-alpha1281-universal-${{ github.sha }}
+  cancel-in-progress: false
 
 jobs:
   source-checks:
