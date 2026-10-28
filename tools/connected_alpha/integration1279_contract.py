@@ -28,7 +28,7 @@ HANDOFF_ADDITIONS={
 HANDOFF_CONTRACT='tools/connected_alpha/integration1279_contract.py'
 
 def git_blob_sha(data):
-    return hashlib.sha1(b'blob '+str(len(data)).encode()+b'\\0'+data).hexdigest()
+    return hashlib.sha1(b'blob '+str(len(data)).encode()+b'\0'+data).hexdigest()
 
 def restore_handoff(path,data):
     if str(path)==HANDOFF_NAV and git_blob_sha(data)==HANDOFF_NAV_BLOB:
