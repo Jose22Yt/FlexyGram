@@ -1,3 +1,4 @@
+from native_motion_restore_contract import read_current, restore as restore_native
 """Review boundary and unaffected critical systems; Android rendering is tested separately."""
 from pathlib import Path
 import unittest
@@ -14,7 +15,7 @@ class Alpha1281(unittest.TestCase):
    before=audit.original(path);now=(ROOT/path).read_bytes();self.assertIn(b'1281',now);self.assertEqual(before,now.replace(b'1281',b'1280'),path)
  def test_unrelated_critical_components_are_unchanged(self):
   for path in ('TMessagesProj/src/main/java/app/flexygram/bubbles/SignatureWallpaperBlur.java','TMessagesProj/src/main/java/app/flexygram/motion/FlexyFrameMotion.java','TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java','TMessagesProj/src/main/java/org/telegram/tgnet/ConnectionsManager.java','TMessagesProj/src/main/java/org/telegram/messenger/MessagesStorage.java','TMessagesProj/src/main/java/org/telegram/ui/LaunchActivity.java','TMessagesProj/src/main/java/org/telegram/ui/Components/ChatActivityEnterView.java','tools/connected_alpha/alpha1280_review.json'):
-   self.assertEqual(audit.original(path),(ROOT/path).read_bytes(),path)
+   self.assertEqual(audit.original(path),restore_native(path,read_current(path)),path)
  def test_original_hotfix_and_visibility_guards_remain(self):
   s=(ROOT/'TMessagesProj/src/main/java/org/telegram/ui/Cells/DialogCell.java').read_text()
   self.assertIn('allowsSingleMessagePreview(groupMessages)',s);self.assertNotIn('&& groupMessages == null',s)

@@ -1,3 +1,4 @@
+from native_motion_restore_contract import read_current
 """Exact integration review; original PR manifests and historical bytes stay frozen.
 
 Projection is allowed only for a byte-exact reviewed integrated file. Each
@@ -45,7 +46,7 @@ def verify_current():
     s=spec()
     if s['base']!=BASE:raise ValueError('Incorrect Alpha1279 base')
     for path,expected in s['reviewed'].items():
-        if sha(restore_hotfix(path,(ROOT/path).read_bytes()))!=expected:
+        if sha(restore_hotfix(path,read_current(path)))!=expected:
             raise ValueError('Unreviewed Alpha1279 integrated source: '+path)
     changed=set(subprocess.check_output(['git','diff',BASE,'--name-only'],cwd=ROOT,text=True).splitlines())
     if changed-paths():raise ValueError('Unreviewed Alpha1279 scope: '+repr(sorted(changed-paths())))

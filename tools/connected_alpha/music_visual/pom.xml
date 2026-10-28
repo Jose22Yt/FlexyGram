@@ -11,8 +11,6 @@
     <maven.compiler.target>17</maven.compiler.target>
   </properties>
   <dependencies>
-    <dependency><groupId>androidx.collection</groupId><artifactId>collection</artifactId><version>1.0.0</version><scope>test</scope></dependency>
-    <dependency><groupId>androidx.dynamicanimation</groupId><artifactId>dynamicanimation</artifactId><version>1.0.0</version><type>aar</type><scope>test</scope><exclusions><exclusion><groupId>*</groupId><artifactId>*</artifactId></exclusion></exclusions></dependency>
     <dependency><groupId>androidx.core</groupId><artifactId>core</artifactId><version>1.17.0</version><type>aar</type><scope>test</scope><exclusions><exclusion><groupId>*</groupId><artifactId>*</artifactId></exclusion></exclusions></dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -34,7 +32,7 @@
       <systemPath>${android.sdk.jar}</systemPath>
     </dependency>
   </dependencies>
-  <profiles><profile><id>music-compile</id><dependencies><dependency><groupId>local.androidx</groupId><artifactId>dynamicanimation</artifactId><version>1.0.0</version><scope>system</scope><systemPath>${project.basedir}/target/aar/dynamicanimation.jar</systemPath></dependency><dependency><groupId>local.androidx</groupId><artifactId>core</artifactId><version>1.17.0</version><scope>system</scope><systemPath>${project.basedir}/target/aar/core.jar</systemPath></dependency></dependencies></profile></profiles>
+  <profiles><profile><id>music-compile</id><dependencies><dependency><groupId>local.androidx</groupId><artifactId>core</artifactId><version>1.17.0</version><scope>system</scope><systemPath>${project.basedir}/target/aar/core.jar</systemPath></dependency></dependencies></profile></profiles>
   <repositories>
     <repository>
       <id>central</id>

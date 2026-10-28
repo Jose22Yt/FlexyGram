@@ -1,15 +1,15 @@
-name: Flexy Motion ARM64 validation (no APK distribution)
+name: Native animation restoration ARM64 validation (no APK distribution)
 on:
   push:
-    branches: [validation/flexy-motion-arm64]
+    branches: [restore/alpha1281-native-animations]
 permissions:
   contents: read
 concurrency:
-  group: flexy-motion-arm64-validation
+  group: native-animation-restoration-arm64-validation
   cancel-in-progress: false
 jobs:
   compile:
-    if: github.repository == 'Jose22Yt/FlexyGram' && github.ref == 'refs/heads/validation/flexy-motion-arm64'
+    if: github.repository == 'Jose22Yt/FlexyGram' && github.ref == 'refs/heads/restore/alpha1281-native-animations'
     uses: ./.github/workflows/connected-alpha-arm64.yml
     secrets:
       TELEGRAM_APP_ID: ${{ secrets.TELEGRAM_APP_ID }}
