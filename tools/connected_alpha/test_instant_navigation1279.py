@@ -16,7 +16,9 @@ class InstantNavigation1279Regression(unittest.TestCase):
         source = (ROOT / NAV).read_bytes()
         self.assertEqual(handoff.original(NAV), handoff.restore(NAV, source))
         self.assertEqual(source + b"// unknown", handoff.restore(NAV, source + b"// unknown"))
-        self.assertEqual(handoff.original(NAV), integration.project("base", NAV, source) if NAV not in integration.spec()["reviewed"] else handoff.restore(NAV, source))
+        for scope in ("base", "motion", "smart"):
+            self.assertEqual(integration.project(scope, NAV, handoff.original(NAV)),
+                             integration.project(scope, NAV, source))
 
     def test_new_policy_rejects_unknown_bytes(self):
         import instant_navigation1279_contract as handoff
