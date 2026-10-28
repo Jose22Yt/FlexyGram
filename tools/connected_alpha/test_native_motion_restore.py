@@ -26,7 +26,15 @@ class NativeMotionRestoration(unittest.TestCase):
   with tempfile.TemporaryDirectory() as folder:
    folder=Path(folder)
    for path in paths:
-    target=folder/path;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes((ROOT/path).read_bytes())
+    target=folder/path;target.parent.mkdir(parents=True,exist_ok=True)
+    data=(ROOT/path).read_bytes()
+    if path.endswith('/FilterTabsView.java'):
+     # Keep the independently required native callback guard in production;
+     # the old engine diff also contains it, so reverse only this exact guard
+     # before using that diff as a reconstruction proof.
+     guard=b"                if (colorChangeAnimator != animation) return;\n                colorChangeAnimator = null;\n"
+     self.assertEqual(1,data.count(guard));data=data.replace(guard,b'',1)
+    target.write_bytes(data)
    subprocess.run(['git','apply','--unsafe-paths','-'],cwd=folder,input=patch,check=True,capture_output=True)
    for path in paths:self.assertEqual(git_bytes(audit.PIN,path),(folder/path).read_bytes(),path)
  def test_no_engine_or_instant_consumers_in_new_or_changed_production(self):

@@ -1556,6 +1556,8 @@ public class FilterTabsView extends FrameLayout {
         colorChangeAnimator.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
+                if (colorChangeAnimator != animation) return;
+                colorChangeAnimator = null;
                 tabLineColorKey = aTabLineColorKey;
                 backgroundColorKey = aBackgroundColorKey;
                 activeTextColorKey = aActiveTextColorKey;
