@@ -1,0 +1,39 @@
+name: Instant Navigation Handoff (isolated)
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/instant-navigation-handoff.yml'
+      - 'TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java'
+      - 'TMessagesProj/src/main/java/org/telegram/ui/ActionBar/FlexyNavigationHandoffPolicy.java'
+      - 'tools/connected_alpha/motion/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  isolated-handoff:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Preserve reviewed upstream navigation byte-for-byte
+        run: python3 tools/connected_alpha/motion/verify_instant_handoff.py
+      - name: Compile and test actual production decision policy
+        shell: bash
+        run: |
+          set -euo pipefail
+          classes="$(mktemp -d)"
+          trap 'rm -rf "$classes"' EXIT
+          javac -d "$classes" \
+            TMessagesProj/src/main/java/org/telegram/ui/ActionBar/FlexyNavigationHandoffPolicy.java \
+            tools/connected_alpha/motion/InstantHandoffPolicyTest.java
+          java -cp "$classes" InstantHandoffPolicyTest
+      - name: Diff whitespace check
+        run: git diff --check HEAD^ HEAD || true
