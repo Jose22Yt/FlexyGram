@@ -16,6 +16,8 @@ class Integration1282(unittest.TestCase):
         snapshot=body(current,'public Bitmap getSignatureBlurBitmap()')
         self.assertIn('384f',snapshot);self.assertIn('drawSignatureContent(canvas, false)',snapshot)
         self.assertIn('signatureBlurStamp != stamp',snapshot)
+        self.assertLess(snapshot.index('patternAlpha != 1f'),snapshot.index('Bitmap.createBitmap'))
+        self.assertIn('stamp * 31 + patternColor',snapshot)
         path='TMessagesProj/src/main/java/app/flexygram/bubbles/SignatureWallpaperBlur.java'
         current=(audit.ROOT/path).read_text();before=audit.original(path).decode()
         for method in ['private static Bitmap render(', 'private static boolean box(', 'private static Entry acquire(']:

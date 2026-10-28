@@ -50,7 +50,7 @@
     "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java": "e529cb4572356ee8d6ebbcb42dd678aefa396f45888b454da897ff36faa90421",
     "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/MessageDrawable.java": "164b858bf4968feb81d6b3e19844aaef1cb544703a8b708794446ac1d4c70985",
     "TMessagesProj/src/main/java/org/telegram/ui/ChatBackgroundDrawable.java": "6cdb6151a82d685f35a819af3768d59aab64947bba4d41a305f67d0805a5effa",
-    "TMessagesProj/src/main/java/org/telegram/ui/Components/MotionBackgroundDrawable.java": "be9bf52acf76b772dd0a022cbc0d57e9e17cdbfb3f9d66be851197bcc2a3a36e",
+    "TMessagesProj/src/main/java/org/telegram/ui/Components/MotionBackgroundDrawable.java": "b7da4814b1da31b30f72b5ca240d6ef81f53ba7aafa9e78380417611641787e3",
     "TMessagesProj/src/main/res/values-es/flexy_bubble_matte.xml": "399eef31d45514098c96d41051a77b168a5c9ad4f74177debdd00995deb02059",
     "TMessagesProj/src/main/res/values-ru/flexy_bubble_matte.xml": "ef513706502fc2a0d2a17e1539fa6e654c6c31f68173f0bb1eef50297de9b506",
     "TMessagesProj/src/main/res/values/flexy_bubble_matte.xml": "42911ee09d44a4c20c4ed90bf90416643c2a5447ae8a07f0d1718ae578caa3cd",
@@ -68,7 +68,7 @@
     "tools/connected_alpha/native_touch/check_wiring.py": "95748506875b8f76795f26dea16f9169560bd55db5076ebfcd7fe2fde543d736",
     "tools/connected_alpha/native_touch/run.py": "aa7b6001b7ecdcc432ca2157390d15a0e7d483ed3570ba0084a69242befc7677",
     "tools/connected_alpha/test_alpha1281.py": "e8664d881c36f18bc8633fe92bd6a00064e53335b9a4176821bc8dba5b5687e7",
-    "tools/connected_alpha/test_integration1282.py": "cee39b73429966e7eb0e208e7d574b2675a33c32a85e9357c26016ea35cbd568",
+    "tools/connected_alpha/test_integration1282.py": "38e7a58f86145b4b437e5d5b103d5de0f6c14803d424186d3ec51a2bd36a3941",
     "tools/connected_alpha/test_native_motion_restore.py": "5353127709ff033eb9bd165d1ddbf57f1e68b2ffbf005ed98a443ad08ca1e109"
   }
 }

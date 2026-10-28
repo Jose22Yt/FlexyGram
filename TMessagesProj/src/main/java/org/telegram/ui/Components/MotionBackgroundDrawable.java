@@ -183,13 +183,15 @@ public class MotionBackgroundDrawable extends Drawable {
     /** Bounded frozen native rendering for cached bubble blur, never a live blur loop. */
     public Bitmap getSignatureBlurBitmap() {
         android.graphics.Rect bounds = getBounds();
-        if (bounds.isEmpty() || alpha != 255 || giftImageReceiver != null) return null;
+        // Native theme/pattern fades are transient: do not snapshot each alpha step.
+        if (bounds.isEmpty() || alpha != 255 || patternAlpha != 1f || giftImageReceiver != null) return null;
         float scale = Math.min(1f, 384f / Math.max(bounds.width(), bounds.height()));
         int width = Math.max(1, Math.round(bounds.width() * scale));
         int height = Math.max(1, Math.round(bounds.height() * scale));
         long stamp = bounds.width() > bounds.height() ? 1 : 2;
         for (int color : colors) stamp = stamp * 31 + color;
         stamp = stamp * 31 + intensity;
+        stamp = stamp * 31 + patternColor;
         stamp = stamp * 31 + System.identityHashCode(patternBitmap);
         stamp = stamp * 31 + (patternBitmap == null || patternBitmap.isRecycled() ? 0 : patternBitmap.getGenerationId());
         stamp = stamp * 31 + Float.floatToIntBits(patternAlpha);
