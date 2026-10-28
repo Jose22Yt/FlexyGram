@@ -121,7 +121,8 @@ public class FlexyMotionProbe {
         self.assertEqual(old,new)
         path='TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java'
         old=subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT,text=True)
-        new=(ROOT/path).read_text()
+        from alpha1280_contract import restore as restore_latest
+        new=restore_latest(path,(ROOT/path).read_bytes()).decode()
         line='            scrimPopupWindow.setFlexyMotionEnabled(org.telegram.messenger.BuildConfig.CONNECTED_ALPHA && finalReactionsLayout1 != null);\n'
         self.assertEqual(1,new.count(line));self.assertEqual(old,new.replace(line,''))
 

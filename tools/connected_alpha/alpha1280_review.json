@@ -17,7 +17,8 @@
     "tools/connected_alpha/smart_previews1279_hotfix_contract.py": "ca94b8ba6be5b7f9d06d16f000a24df7e511e4b736d36ebff59dc7ec60dc84e3",
     "tools/connected_alpha/test_alpha1280.py": "ae6f13e2224c7eb152c727a2d6b2afa820f8531c2ba56a4fccb2c24e42c54822",
     "tools/connected_alpha/test_alpha1280_performance.py": "5a00b63acce673765c0afd1b422057de4906aee3ff6a98c9673491a5eb465233",
-    "tools/connected_alpha/test_integration1279.py": "af43da9065be9fa9a5aded90e16c84d77d5775e55c09e07212dae170eb289030"
+    "tools/connected_alpha/test_integration1279.py": "af43da9065be9fa9a5aded90e16c84d77d5775e55c09e07212dae170eb289030",
+    "tools/connected_alpha/test_flexy_motion.py": "d740b6a239fdc34d5e0d115781ea19f7957b2772c9745b4c99e31855232affe8"
   },
   "paths": [
     ".github/workflows/connected-alpha-arm64.yml",
@@ -37,6 +38,7 @@
     "tools/connected_alpha/smart_previews1279_hotfix_contract.py",
     "tools/connected_alpha/test_alpha1280.py",
     "tools/connected_alpha/test_alpha1280_performance.py",
+    "tools/connected_alpha/test_flexy_motion.py",
     "tools/connected_alpha/test_integration1279.py"
   ]
 }
