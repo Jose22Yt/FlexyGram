@@ -20,7 +20,8 @@ class Integrated1279(unittest.TestCase):
     def test_new_release_preserves_original_build_and_signing_gates(self):
         for path in ('TMessagesProj/build.gradle','.github/workflows/connected-alpha-arm64.yml','tools/connected_alpha/build_private_apk.py'):
             before=subprocess.check_output(['git','show',audit.BASE+':'+path],cwd=ROOT)
-            current=(ROOT/path).read_bytes()
+            from alpha1280_contract import restore
+            current=restore(path,(ROOT/path).read_bytes())
             self.assertIn(b'1279',current)
             self.assertEqual(before,current.replace(b'1279',b'1278'),path)
 

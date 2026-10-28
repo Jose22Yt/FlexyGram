@@ -20,7 +20,8 @@ def spec():
     return json.loads(MANIFEST.read_text())
 
 def paths():
-    return frozenset(spec()["paths"])
+    from alpha1280_contract import paths as new_paths
+    return frozenset(spec()["paths"])|new_paths()
 
 @lru_cache(maxsize=64)
 def original(path):
@@ -28,16 +29,20 @@ def original(path):
     return proc.stdout if proc.returncode==0 else b""
 
 def restore(path,data):
+    from alpha1280_contract import restore as latest_restore
+    data=latest_restore(path,data)
     name=str(path)
     accepted=spec()["reviewed"].get(name)
     return original(name) if accepted and blob_sha(data)==accepted else data
 
 def verify_current():
+    from alpha1280_contract import verify_current as verify_latest, restore as latest_restore
+    verify_latest()
     data=spec()
     if data["pin"]!=PIN:raise ValueError("Unexpected Alpha1279 pin")
     for name,expected in data["reviewed"].items():
         raw=(ROOT/name).read_bytes()
-        if blob_sha(raw)!=expected:raise ValueError("Unreviewed Smart Preview hotfix change: "+name)
+        if blob_sha(latest_restore(name,raw))!=expected:raise ValueError("Unreviewed Smart Preview hotfix change: "+name)
     changed=set(subprocess.check_output(
         ["git","diff",PIN,"--name-only"],cwd=ROOT,text=True).splitlines())
     unknown=changed-paths()

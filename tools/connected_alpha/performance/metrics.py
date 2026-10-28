@@ -11,12 +11,12 @@ MAX_TIME = 9223372036854775807
 
 def summary(values):
     if not values:
-        return {'count': 0, 'median': None, 'p95': None, 'min': None, 'max': None}
+        return {'count': 0, 'median': None, 'p95': None, 'p99': None, 'min': None, 'max': None}
     if any(not math.isfinite(x) or x < 0 for x in values):
         raise ValueError('Nonfinite/negative metrics cannot be compared')
     ordered = sorted(values)
     return {'count': len(values), 'median': statistics.median(values),
-            'p95': ordered[math.ceil(.95 * len(values)) - 1], 'min': ordered[0], 'max': ordered[-1]}
+            'p95': ordered[math.ceil(.95 * len(values)) - 1], 'p99': ordered[math.ceil(.99 * len(values)) - 1], 'min': ordered[0], 'max': ordered[-1]}
 
 
 def gfxinfo(text, fallback_hz=None):
