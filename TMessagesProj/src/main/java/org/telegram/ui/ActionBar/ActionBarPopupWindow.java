@@ -65,16 +65,6 @@ public class ActionBarPopupWindow extends PopupWindow {
     private static final Field superListenerField;
     private static DecelerateInterpolator decelerateInterpolator = new DecelerateInterpolator();
     private AnimatorSet windowAnimatorSet;
-    private boolean flexyMotionEnabled;
-    private boolean flexyNotificationsLocked;
-    private app.flexygram.motion.FlexyMotionAnimator flexyDismissAnimator;
-
-    /** Opt-in for the reaction popup only; never changes unrelated native windows. */
-    public void setFlexyMotionEnabled(boolean enabled) {
-        if (windowAnimatorSet != null || flexyDismissAnimator != null) throw new IllegalStateException("Active popup motion");
-        flexyMotionEnabled = enabled;
-    }
-
     private boolean animationEnabled = true;
     private int dismissAnimationDuration = 150;
     private boolean isClosingAnimated;
@@ -928,7 +918,6 @@ public class ActionBarPopupWindow extends PopupWindow {
     }
 
     public void startAnimation(boolean fromStickersAlert) {
-        if (flexyDismissAnimator != null) return;
         if (animationEnabled) {
             if (windowAnimatorSet != null) {
                 return;
@@ -1049,13 +1038,6 @@ public class ActionBarPopupWindow extends PopupWindow {
     }
 
     public void dismiss(boolean animated) {
-        if (flexyDismissAnimator != null) {
-            if (animated) return;
-            app.flexygram.motion.FlexyMotionAnimator previous = flexyDismissAnimator;
-            flexyDismissAnimator = null;
-            previous.removeAllListeners();previous.cancel();
-            if (flexyNotificationsLocked) {flexyNotificationsLocked=false;notificationsLocker.unlock();}
-        }
         setFocusable(false);
         dismissDim();
         if (windowAnimatorSet != null) {
@@ -1084,32 +1066,6 @@ public class ActionBarPopupWindow extends PopupWindow {
                     }
                     content.itemAnimators.clear();
                 }
-            }
-            if (flexyMotionEnabled) {
-                final float initialAlpha=viewGroup.getAlpha(), initialScaleX=viewGroup.getScaleX(), initialScaleY=viewGroup.getScaleY(), initialY=viewGroup.getTranslationY();
-                final float targetY=dp((content != null && content.shownFromBottom) ? 5 : -5);
-                final app.flexygram.motion.FlexyMotionAnimator animator=new app.flexygram.motion.FlexyMotionAnimator(viewGroup,0,1,progress->{
-                    if (outEmptyTime > 0) return;
-                    viewGroup.setAlpha(initialAlpha*(1-progress));
-                    if (scaleOut) {
-                        viewGroup.setScaleX(initialScaleX+(.8f-initialScaleX)*progress);
-                        viewGroup.setScaleY(initialScaleY+(.8f-initialScaleY)*progress);
-                    } else viewGroup.setTranslationY(initialY+(targetY-initialY)*progress);
-                });
-                flexyDismissAnimator=animator;
-                animator.setDuration(outEmptyTime > 0 ? outEmptyTime : dismissAnimationDuration);
-                animator.addListener(new AnimatorListenerAdapter(){
-                    @Override public void onAnimationEnd(Animator animation){
-                        if(flexyDismissAnimator!=animation)return;
-                        flexyDismissAnimator=null;isClosingAnimated=false;setFocusable(false);
-                        try { ActionBarPopupWindow.super.dismiss(); } catch(Exception ignore) { }
-                        unregisterListener();
-                        if(flexyNotificationsLocked){flexyNotificationsLocked=false;notificationsLocker.unlock();}
-                    }
-                });
-                if(pauseNotifications){notificationsLocker.lock();flexyNotificationsLocked=true;}
-                animator.start();
-                return;
             }
             windowAnimatorSet = new AnimatorSet();
             if (outEmptyTime > 0) {

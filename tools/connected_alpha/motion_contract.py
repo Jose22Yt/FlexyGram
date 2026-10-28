@@ -1,3 +1,4 @@
+from native_motion_restore_contract import read_current
 """Exact independently reviewed motion delta above Work1; unknown mutations never normalize away."""
 from pathlib import Path
 import hashlib,json,subprocess
@@ -21,7 +22,7 @@ def verify_current():
  verify_integration()
  s=spec()
  for name,sha in s['reviewed'].items():
-  if hashlib.sha256(project("motion",name,(ROOT/name).read_bytes())).hexdigest()!=sha:raise ValueError('Unreviewed Motion source: '+name)
+  if hashlib.sha256(project("motion",name,read_current(name))).hexdigest()!=sha:raise ValueError('Unreviewed Motion source: '+name)
  changed=set(subprocess.check_output(['git','diff',BASE,'--name-only'],cwd=ROOT,text=True).splitlines())
  if changed-paths()-integration_paths():raise ValueError('Unreviewed Motion scope: '+str(sorted(changed-paths())))
  print('PASS: independently reviewed motion delta; device/performance acceptance remains pending.')

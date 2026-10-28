@@ -17,8 +17,7 @@ def write_probe(source,root):
  put('androidx/annotation/DrawableRes.java','package androidx.annotation;public @interface DrawableRes{}')
  put('me/vkryl/android/animator/Animated.java','package me.vkryl.android.animator;public interface Animated{default void runOnceViewBecomesReady(android.view.View v,Runnable r){v.post(r);}}')
  put('org/telegram/messenger/utils/ViewOutlineProviderImpl.java','package org.telegram.messenger.utils;public class ViewOutlineProviderImpl{public static android.view.ViewOutlineProvider boundsWithPaddingRoundRect(int p,int r){return new android.view.ViewOutlineProvider(){public void getOutline(android.view.View v,android.graphics.Outline o){o.setRoundRect(0,0,v.getWidth(),v.getHeight(),r);}};}}')
- put('org/telegram/ui/Components/ScaleStateListAnimator.java',(java/'org/telegram/ui/Components/ScaleStateListAnimator.java').read_text())
- put('org/telegram/messenger/BuildConfig.java','package org.telegram.messenger;public class BuildConfig {public static final boolean CONNECTED_ALPHA=true;}')
+ put('org/telegram/ui/Components/ScaleStateListAnimator.java','package org.telegram.ui.Components;public class ScaleStateListAnimator{public static void apply(android.view.View v,float a,float b){}}')
  put('org/telegram/ui/Components/CircularProgressDrawable.java','package org.telegram.ui.Components;public class CircularProgressDrawable extends android.graphics.drawable.ColorDrawable{public CircularProgressDrawable(int a,float b,int c,int d){}public void setAngleOffset(int a){}public void reset(){}}')
  put('org/telegram/ui/Components/blur3/drawable/color/BlurredBackgroundColorProvider.java','package org.telegram.ui.Components.blur3.drawable.color;public interface BlurredBackgroundColorProvider{}')
  put('org/telegram/ui/Components/blur3/drawable/BlurredBackgroundDrawable.java','''package org.telegram.ui.Components.blur3.drawable;public class BlurredBackgroundDrawable extends android.graphics.drawable.ColorDrawable{

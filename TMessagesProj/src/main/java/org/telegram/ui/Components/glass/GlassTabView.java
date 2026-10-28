@@ -52,7 +52,7 @@ import app.exteraless.appearance.MainTabsUiHelper;
 import app.exteraless.components.ChatActivityEnterViewStaticIconView;
 
 import me.vkryl.android.AnimatorUtils;
-import app.flexygram.motion.FlexyBooleanMotion;
+import me.vkryl.android.animator.BoolAnimator;
 import me.vkryl.android.animator.FactorAnimator;
 
 public class GlassTabView extends FrameLayout implements MainTabsLayout.Tab, FactorAnimator.Target {
@@ -68,10 +68,10 @@ public class GlassTabView extends FrameLayout implements MainTabsLayout.Tab, Fac
     private static final int ANIMATOR_ID_COUNTER_ERROR = 2;
     private static final int ANIMATOR_ID_SELECTED_INDICATOR_ALPHA = 3;
 
-    private final FlexyBooleanMotion isSelectedAnimator = new FlexyBooleanMotion(this, 320, AnimatorUtils.DECELERATE_INTERPOLATOR, factor -> onFactorChanged(ANIMATOR_ID_IS_SELECTED, factor, -1, null));
-    private final FlexyBooleanMotion isHasCounterAnimator = new FlexyBooleanMotion(this, 380, CubicBezierInterpolator.EASE_OUT_QUINT, factor -> onFactorChanged(ANIMATOR_ID_COUNTER_VISIBLE, factor, -1, null));
-    private final FlexyBooleanMotion isHasCounterErrorAnimator = new FlexyBooleanMotion(this, 380, CubicBezierInterpolator.EASE_OUT_QUINT, factor -> onFactorChanged(ANIMATOR_ID_COUNTER_ERROR, factor, -1, null));
-    private final FlexyBooleanMotion selectedIndicatorAlphaAnimator = new FlexyBooleanMotion(this, 0L, AnimatorUtils.DECELERATE_INTERPOLATOR, factor -> onFactorChanged(ANIMATOR_ID_SELECTED_INDICATOR_ALPHA, factor, -1, null));
+    private final BoolAnimator isSelectedAnimator = new BoolAnimator(ANIMATOR_ID_IS_SELECTED, this, AnimatorUtils.DECELERATE_INTERPOLATOR, 320);
+    private final BoolAnimator isHasCounterAnimator = new BoolAnimator(ANIMATOR_ID_COUNTER_VISIBLE, this, CubicBezierInterpolator.EASE_OUT_QUINT, 380);
+    private final BoolAnimator isHasCounterErrorAnimator = new BoolAnimator(ANIMATOR_ID_COUNTER_ERROR, this, CubicBezierInterpolator.EASE_OUT_QUINT, 380);
+    private final BoolAnimator selectedIndicatorAlphaAnimator = new BoolAnimator(ANIMATOR_ID_SELECTED_INDICATOR_ALPHA, this, AnimatorUtils.DECELERATE_INTERPOLATOR, 0L);
     private int colorSelected;
     private int colorSelectedText;
     private int colorDefault;
@@ -106,29 +106,6 @@ public class GlassTabView extends FrameLayout implements MainTabsLayout.Tab, Fac
         counter.setGravity(Gravity.CENTER);
         counter.setTextColor(Color.WHITE);
         counter.setTextSize(dp(10));
-        isSelectedAnimator.setOnSettingsChanged(this::syncMotionIcon);
-    }
-
-    @Override
-    protected void onDetachedFromWindow() {
-        imageView.stopAnimation();
-        isSelectedAnimator.disposeFrames();
-        isHasCounterAnimator.disposeFrames();
-        isHasCounterErrorAnimator.disposeFrames();
-        selectedIndicatorAlphaAnimator.disposeFrames();
-        super.onDetachedFromWindow();
-    }
-
-    @Override
-    protected void onWindowVisibilityChanged(int visibility) {
-        super.onWindowVisibilityChanged(visibility);
-        if (visibility != VISIBLE && isSelectedAnimator != null) {
-            if (imageView != null) imageView.stopAnimation();
-            isSelectedAnimator.finish();
-            isHasCounterAnimator.finish();
-            isHasCounterErrorAnimator.finish();
-            selectedIndicatorAlphaAnimator.finish();
-        }
     }
 
     private boolean hasVisualWidth;
@@ -274,7 +251,7 @@ public class GlassTabView extends FrameLayout implements MainTabsLayout.Tab, Fac
     private Drawable premiumStarDrawable;
 
     public void setCounter(String text, boolean isError, boolean animated) {
-        counter.setText(text, animated && !app.flexygram.motion.FlexyMotionSettings.state(getContext()).instant());
+        counter.setText(text, animated);
         isHasCounterAnimator.setValue(!TextUtils.isEmpty(text), animated);
         isHasCounterErrorAnimator.setValue(isError, animated);
     }
@@ -336,25 +313,7 @@ public class GlassTabView extends FrameLayout implements MainTabsLayout.Tab, Fac
     private int lastIconAnimationRaw;
     private long lastBotIconId;
 
-    private void syncMotionIcon() {
-        if (!app.flexygram.motion.FlexyMotionSettings.state(getContext()).instant() || tabAnimation == null) return;
-        final RLottieDrawable drawable = imageView.getAnimatedDrawable();
-        if (drawable == null) return;
-        imageView.stopAnimation();
-        final int endFrame = tabAnimation.endFrameMid != -1
-                ? (isSelectedAnimator.getValue() ? tabAnimation.endFrameMid : tabAnimation.endFrameEnd - 1)
-                : (tabAnimation.iconToFilled != tabAnimation.iconToOutline || isSelectedAnimator.getValue()
-                        ? drawable.getFramesCount() - 1 : 0);
-        drawable.setCurrentFrame(Math.max(0, endFrame), false);
-    }
-
     private void checkPlayAnimation(boolean animated) {
-        animated = animated && !app.flexygram.motion.FlexyMotionSettings.state(getContext()).instant();
-        updateTabIcon(animated);
-        syncMotionIcon();
-    }
-
-    private void updateTabIcon(boolean animated) {
         final boolean isSelected = isSelectedAnimator.getValue();
 
         if (tabAnimationBot !=  null) {
@@ -428,16 +387,14 @@ public class GlassTabView extends FrameLayout implements MainTabsLayout.Tab, Fac
                         drawable.setCurrentFrame(0, false);
                     }
                     if (drawable.getCurrentFrame() <= tabAnimation.endFrameMid) {
-                        if (animated) drawable.start();
-                        else drawable.setCurrentFrame(tabAnimation.endFrameMid);
+                        drawable.start();
                     } else {
                         drawable.setCurrentFrame(tabAnimation.endFrameMid);
                     }
                 } else {
                     if (drawable.getCurrentFrame() >= tabAnimation.endFrameMid - 1) {
                         drawable.setCustomEndFrame(tabAnimation.endFrameEnd - 1);
-                        if (animated) drawable.start();
-                        else drawable.setCurrentFrame(tabAnimation.endFrameEnd - 1);
+                        drawable.start();
                     } else {
                         drawable.setCustomEndFrame(0);
                         drawable.setCurrentFrame(0);
@@ -484,8 +441,7 @@ public class GlassTabView extends FrameLayout implements MainTabsLayout.Tab, Fac
                 drawable.setCurrentFrame(drawable.getFramesCount());
                 drawable.setCustomEndFrame(0);
             }
-            if (animated) imageView.playAnimation();
-            else drawable.setCurrentFrame(isSelected ? drawable.getFramesCount() - 1 : 0, false);
+            imageView.playAnimation();
         }
     }
 

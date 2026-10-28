@@ -14,23 +14,6 @@ import org.telegram.ui.Components.AnimatedTextView;
 
 /** Native selector row: full-width title, value below only when they would collide. */
 public final class MatteTextSettingsCell extends TextSettingsCell {
-    private final app.flexygram.motion.FlexyTouchFeedback motion = new app.flexygram.motion.FlexyTouchFeedback(this);
-    public void resetMotion() { if (motion != null) motion.reset(); }
-    @Override public boolean dispatchTouchEvent(android.view.MotionEvent event) {
-        motion.onTouch(event);
-        return super.dispatchTouchEvent(event);
-    }
-    @Override protected void dispatchDraw(android.graphics.Canvas canvas) {
-        int save = canvas.save();
-        motion.transform(canvas);
-        super.dispatchDraw(canvas);
-        canvas.restoreToCount(save);
-    }
-    @Override protected void onWindowVisibilityChanged(int visibility) {
-        super.onWindowVisibilityChanged(visibility);
-        if (visibility != View.VISIBLE) resetMotion();
-    }
-
     private boolean stacked;
     private int inset;
     private int gap;

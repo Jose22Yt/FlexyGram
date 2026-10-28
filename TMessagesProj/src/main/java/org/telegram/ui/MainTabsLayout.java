@@ -14,22 +14,26 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.dynamicanimation.animation.DynamicAnimation;
+import androidx.dynamicanimation.animation.FloatPropertyCompat;
+import androidx.dynamicanimation.animation.SpringAnimation;
+import androidx.dynamicanimation.animation.SpringForce;
 
+import android.util.Log;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.AnimatedLinearLayout;
+import org.telegram.ui.Components.CubicBezierInterpolator;
 import org.telegram.ui.Components.glass.GlassTabView;
 
 import app.exteraless.appearance.MainTabsUiHelper;
-import app.flexygram.motion.FlexyBoundSpring;
-import app.flexygram.motion.FlexyFrameMotion;
-import app.flexygram.motion.FlexyMotionSettings;
 
 import java.util.HashSet;
 import java.util.Set;
 
+import me.vkryl.android.animator.BoolAnimator;
 import me.vkryl.android.animator.ListAnimator;
 import me.vkryl.android.util.ClickHelper;
 
@@ -422,20 +426,51 @@ public class MainTabsLayout extends AnimatedLinearLayout {
     final Paint dividerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     final Paint selectorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final android.graphics.RectF selectorRect = new android.graphics.RectF();
+    final SpringAnimation scaleX = new SpringAnimation(this, DynamicAnimation.SCALE_X, 1f);
+    final SpringAnimation scaleY = new SpringAnimation(this, DynamicAnimation.SCALE_Y, 1f);
+
+    final SpringAnimation selectedTabPositionOffsetX = new SpringAnimation(this, new FloatPropertyCompat<MainTabsLayout>("selectedTabPositionOffsetX") {
+        @Override
+        public float getValue(MainTabsLayout object) {
+            return object.animatedLongSelectedViewOffsetX;
+        }
+
+        @Override
+        public void setValue(MainTabsLayout object, float value) {
+            object.animatedLongSelectedViewOffsetX = value;
+            object.invalidate();
+        }
+    });
+    final SpringAnimation selectedTabPositionX = new SpringAnimation(this, new FloatPropertyCompat<MainTabsLayout>("selectedTabPositionX") {
+        @Override
+        public float getValue(MainTabsLayout object) {
+            return object.animatedLongSelectedViewCenterX;
+        }
+
+        @Override
+        public void setValue(MainTabsLayout object, float value) {
+            object.animatedLongSelectedViewCenterX = value;
+            object.invalidate();
+        }
+    });
+
+    {
+        selectedTabPositionOffsetX.setSpring(new SpringForce(1)
+            .setStiffness(SpringForce.STIFFNESS_MEDIUM)
+            .setDampingRatio(SpringForce.DAMPING_RATIO_LOW_BOUNCY));
+        scaleX.setSpring(new SpringForce(1f)
+            .setStiffness(250)
+            .setDampingRatio(0.25f));
+        scaleY.setSpring(new SpringForce(1f)
+            .setStiffness(250)
+            .setDampingRatio(0.25f));
+        selectedTabPositionX.setSpring(new SpringForce(1f)
+            .setStiffness(SpringForce.STIFFNESS_MEDIUM)
+            .setDampingRatio(SpringForce.DAMPING_RATIO_LOW_BOUNCY));
+    }
+
     private float animatedLongSelectedViewCenterX;
     private float animatedLongSelectedViewOffsetX;
-
-    private final FlexyBoundSpring selectedTabPositionOffsetX = new FlexyBoundSpring(this,
-            () -> animatedLongSelectedViewOffsetX, value -> {
-                animatedLongSelectedViewOffsetX = value;
-                invalidate();
-            });
-    private final FlexyBoundSpring selectedTabPositionX = new FlexyBoundSpring(this,
-            () -> animatedLongSelectedViewCenterX, value -> {
-                animatedLongSelectedViewCenterX = value;
-                invalidate();
-            });
-
 
     private boolean isInLongPress;
     private float lastLongSelectedViewCenterX;
@@ -499,68 +534,10 @@ public class MainTabsLayout extends AnimatedLinearLayout {
         tabsWithIgnoreClick.add(v);
     }
 
-    private FlexyFrameMotion tabPressMotion;
-    private boolean motionDetaching;
-
-    private void animateTabPress(boolean pressed) {
-        if (tabPressMotion == null) {
-            tabPressMotion = new FlexyFrameMotion(this, 0, factor -> {
-                setScaleX(lerp(1, 1.019f, factor));
-                setScaleY(lerp(1, 1.019f, factor));
-            });
-            tabPressMotion.setOnSettingsChanged(() -> {
-                if (FlexyMotionSettings.state(getContext()).instant()) {
-                    tabPressMotion.snapTo(0);
-                    if (!isInLongPress) scheduleSelectorRestore();
-                }
-            });
-        }
-        tabPressMotion.animateTo(pressed && !FlexyMotionSettings.state(getContext()).instant() ? 1 : 0);
-    }
-
-    private void scheduleSelectorRestore() {
-        AndroidUtilities.cancelRunOnUIThread(restoreDrawSelector);
-        app.flexygram.motion.FlexyMotionSettings.State state = FlexyMotionSettings.state(getContext());
-        if (state.instant()) restoreDrawSelector.run();
-        else AndroidUtilities.runOnUIThread(restoreDrawSelector, (long) (450 * state.profile.timelineScale / state.speed));
-    }
-
-    @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-        motionDetaching = false;
-    }
-
-    @Override
-    protected void onDetachedFromWindow() {
-        resetMotionInteraction();
-        super.onDetachedFromWindow();
-    }
-
-    @Override
-    protected void onWindowVisibilityChanged(int visibility) {
-        super.onWindowVisibilityChanged(visibility);
-        if (visibility == View.VISIBLE) motionDetaching = false;
-        else resetMotionInteraction();
-    }
-
-    private void resetMotionInteraction() {
-        // ClickHelper.cancel invokes finish for an active long press: never commit navigation here.
-        motionDetaching = true;
-        if (clickHelper != null) clickHelper.cancel(this, 0, 0);
-        AndroidUtilities.cancelRunOnUIThread(restoreDrawSelector);
-        if (selectedTabPositionX != null) selectedTabPositionX.dispose();
-        if (selectedTabPositionOffsetX != null) selectedTabPositionOffsetX.dispose();
-        if (tabPressMotion != null) {
-            tabPressMotion.dispose();
-            tabPressMotion = null;
-        }
-        isInLongPress = false;
-        lastLongSelectedView = null;
-        setScaleX(1);
-        setScaleY(1);
-        setSkipDrawSelector(false);
-    }
+    private final BoolAnimator animatorIsScaled = new BoolAnimator(0, (a, factor, c, g) -> {
+        setScaleX(lerp(1, 1.019f, factor));
+        setScaleY(lerp(1, 1.019f, factor));
+    }, CubicBezierInterpolator.EASE_OUT_QUINT, 380);
 
     private final ClickHelper clickHelper = new ClickHelper(new ClickHelper.Delegate() {
         @Override
@@ -611,11 +588,10 @@ public class MainTabsLayout extends AnimatedLinearLayout {
 
         @Override
         public void onLongPressFinish(View view, float x, float y) {
-            if (motionDetaching) return;
             checkPivot(view, x, y);
             checkLongMove(x, y, false, true);
             isInLongPress = false;
-            scheduleSelectorRestore();
+            AndroidUtilities.runOnUIThread(restoreDrawSelector, 450);
             if (lastLongSelectedView != null) {
                 lastLongSelectedView.performClick();
             }
@@ -626,22 +602,39 @@ public class MainTabsLayout extends AnimatedLinearLayout {
 
         @Override
         public void onLongPressCancelled(View view, float x, float y) {
-            if (motionDetaching) return;
             checkPivot(view, x, y);
             checkLongMove(x, y, false, true);
             isInLongPress = false;
-            scheduleSelectorRestore();
+            AndroidUtilities.runOnUIThread(restoreDrawSelector, 450);
             lastLongSelectedView = null;
             invalidate();
             longTouchEnd();
         }
 
         private void longTouchStart() {
-            animateTabPress(true);
+            animatorIsScaled.setValue(true, true);
+
+            /*
+            if (!scaleX.isRunning()) {
+                scaleX.setStartVelocity(-0.45f);
+                scaleY.setStartVelocity(-0.45f);
+            }
+            scaleX.animateToFinalPosition(1.012f);
+            scaleY.animateToFinalPosition(1.012f);
+            */
         }
 
         private void longTouchEnd() {
-            animateTabPress(false);
+            animatorIsScaled.setValue(false, true);
+
+            /*
+            if (!scaleX.isRunning()) {
+                scaleX.setStartVelocity(0.25f);
+                scaleY.setStartVelocity(0.25f);
+            }
+            scaleX.animateToFinalPosition(1f);
+            scaleY.animateToFinalPosition(1f);
+            */
         }
     });
 

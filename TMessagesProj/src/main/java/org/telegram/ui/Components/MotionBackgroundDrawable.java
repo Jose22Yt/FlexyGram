@@ -178,6 +178,38 @@ public class MotionBackgroundDrawable extends Drawable {
         return currentBitmap;
     }
 
+    private Bitmap signatureBlurSnapshot;
+    private long signatureBlurStamp;
+    /** Bounded frozen native rendering for cached bubble blur, never a live blur loop. */
+    public Bitmap getSignatureBlurBitmap() {
+        android.graphics.Rect bounds = getBounds();
+        // Native theme/pattern fades are transient: do not snapshot each alpha step.
+        if (bounds.isEmpty() || alpha != 255 || patternAlpha != 1f || giftImageReceiver != null) return null;
+        float scale = Math.min(1f, 384f / Math.max(bounds.width(), bounds.height()));
+        int width = Math.max(1, Math.round(bounds.width() * scale));
+        int height = Math.max(1, Math.round(bounds.height() * scale));
+        long stamp = bounds.width() > bounds.height() ? 1 : 2;
+        for (int color : colors) stamp = stamp * 31 + color;
+        stamp = stamp * 31 + intensity;
+        stamp = stamp * 31 + patternColor;
+        stamp = stamp * 31 + System.identityHashCode(patternBitmap);
+        stamp = stamp * 31 + (patternBitmap == null || patternBitmap.isRecycled() ? 0 : patternBitmap.getGenerationId());
+        stamp = stamp * 31 + Float.floatToIntBits(patternAlpha);
+        stamp = stamp * 31 + Float.floatToIntBits(backgroundAlpha);
+        // Phase/progress intentionally excluded: animated gradients use one frozen
+        // native frame until palette, pattern, intensity or viewport changes.
+        if (signatureBlurSnapshot == null || signatureBlurStamp != stamp) {
+            Bitmap snapshot = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(snapshot);
+            canvas.scale(width / (float) bounds.width(), height / (float) bounds.height());
+            canvas.translate(-bounds.left, -bounds.top);
+            drawSignatureContent(canvas, false);
+            signatureBlurSnapshot = snapshot;
+            signatureBlurStamp = stamp;
+        }
+        return signatureBlurSnapshot;
+    }
+
     public Bitmap getPatternBitmap() {
         return patternBitmap;
     }
@@ -487,6 +519,10 @@ public class MotionBackgroundDrawable extends Drawable {
 
     @Override
     public void draw(Canvas canvas) {
+        drawSignatureContent(canvas, true);
+    }
+
+    private void drawSignatureContent(Canvas canvas, boolean advanceAnimation) {
         android.graphics.Rect bounds = getBounds();
         canvas.save();
 
@@ -640,7 +676,7 @@ public class MotionBackgroundDrawable extends Drawable {
         }
         canvas.restore();
 
-        updateAnimation();
+        if (advanceAnimation) updateAnimation();
     }
 
     public void setAnimationProgressProvider(GenericProvider<MotionBackgroundDrawable, Float> animationProgressProvider) {

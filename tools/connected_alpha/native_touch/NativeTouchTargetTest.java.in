@@ -1,0 +1,46 @@
+import android.app.Activity;
+import android.view.View;
+import android.widget.FrameLayout;
+import org.junit.*;
+import org.junit.runner.RunWith;
+import org.robolectric.*;
+import org.robolectric.annotation.*;
+import static org.junit.Assert.*;
+import org.telegram.ui.Cells.DialogCell;
+import app.flexygram.navigation.NativeInstantTouchTarget;
+
+/** Android view bounds/clipping tests, not full Activity navigation acceptance. */
+@RunWith(RobolectricTestRunner.class)
+@Config(manifest=Config.NONE,sdk=35)
+public class NativeTouchTargetTest {
+    Activity activity; FrameLayout root; DialogCell row;
+    @Before public void setup() {
+        activity=Robolectric.buildActivity(Activity.class).setup().get();
+        root=new FrameLayout(activity); row=new DialogCell(activity);
+        root.addView(row,new FrameLayout.LayoutParams(300,60));
+        activity.setContentView(root);
+        root.measure(View.MeasureSpec.makeMeasureSpec(300,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(300,View.MeasureSpec.EXACTLY));
+        root.layout(0,0,300,300);
+    }
+    boolean hit(float x,float y) {
+        int[] screen=new int[2];root.getLocationOnScreen(screen);
+        return NativeInstantTouchTarget.isVisibleDialogRow(root,screen[0]+x,screen[1]+y);
+    }
+    @After public void close() { activity.finish(); }
+    @Test public void realVisibleRowAndEmptyArea() {
+        assertTrue(hit(150,30)); assertFalse(hit(150,90)); assertFalse(hit(-1,30));
+    }
+    @Test public void hiddenDisabledAndTransparentRowsAreRejected() {
+        row.setVisibility(View.GONE); assertFalse(hit(150,30));
+        row.setVisibility(View.VISIBLE); row.setEnabled(false); assertFalse(hit(150,30));
+        row.setEnabled(true); row.setAlpha(0); assertFalse(hit(150,30));
+    }
+    @Test public void translatedRowUsesScreenBoundsAndParentClipping() {
+        row.setTranslationX(100); assertFalse(hit(50,30)); assertTrue(hit(150,30)); assertFalse(hit(350,30));
+    }
+    @Test public void invalidCoordinatesAndDetachedRootAreRejected() {
+        assertFalse(NativeInstantTouchTarget.isVisibleDialogRow(root,Float.NaN,0));
+        assertFalse(NativeInstantTouchTarget.isVisibleDialogRow(null,0,0));
+        root.removeView(row);assertFalse(hit(150,30));
+    }
+}

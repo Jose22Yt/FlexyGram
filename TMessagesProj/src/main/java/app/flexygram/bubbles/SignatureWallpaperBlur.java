@@ -13,10 +13,13 @@ import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.Trace;
 import android.content.ComponentCallbacks2;
-import app.flexygram.motion.FlexyFrameMotion;
+import android.animation.ValueAnimator;
+import android.view.animation.LinearInterpolator;
 import android.view.View;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -26,6 +29,7 @@ import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.Utilities;
 import org.telegram.ui.ChatBackgroundDrawable;
 import org.telegram.ui.Components.AnimatedFileDrawable;
+import org.telegram.ui.Components.MotionBackgroundDrawable;
 
 /** Shared source-image blur, never a screen capture. Cache bookkeeping/publication is UI-owned;
  * scaling and the bounded CPU kernel run on Telegram's existing background queue. */
@@ -210,13 +214,16 @@ public final class SignatureWallpaperBlur {
         private final Matrix matrix = new Matrix();
         private final RectF mapping = new RectF();
         private Drawable source;
+        private Drawable snapshotSource;
+        private Bitmap staticSnapshot;
+        private int snapshotBackground, snapshotColor;
         private Bitmap sourceBitmap;
         private int generation, background, dim;
         private Entry entry;
         private boolean closed, supported, waitingForSlot;
         private BitmapShader shader;
         private Runnable availabilityChanged;
-        private FlexyFrameMotion revealMotion;
+        private ValueAnimator revealMotion;
         private float reveal = 1;
         private boolean sawFallback, firstDraw;
         private float mappedLeft = Float.NaN, mappedTop, mappedWidth, mappedHeight;
@@ -226,28 +233,67 @@ public final class SignatureWallpaperBlur {
             this.availabilityChanged = availabilityChanged;
         }
 
-        private Bitmap bitmap(Drawable drawable) {
+        private Bitmap snapshot(Drawable drawable, int backgroundColor, int color) {
+            mapping.set(drawable.getBounds());
+            if (mapping.isEmpty() || drawable.getAlpha() != 255) return null;
+            if (snapshotSource != drawable || staticSnapshot == null
+                    || snapshotBackground != backgroundColor || snapshotColor != color) {
+                Drawable.ConstantState state = drawable.getConstantState();
+                if (state == null) return null;
+                Drawable copy = state.newDrawable().mutate();
+                copy.setColorFilter(drawable.getColorFilter());
+                float scale = Math.min(1f, MAX_EDGE / Math.max(mapping.width(), mapping.height()));
+                int width = Math.max(1, Math.round(mapping.width() * scale));
+                int height = Math.max(1, Math.round(mapping.height() * scale));
+                Bitmap snapshot = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+                copy.setBounds(0, 0, Math.round(mapping.width()), Math.round(mapping.height()));
+                Canvas canvas = new Canvas(snapshot);
+                canvas.scale(width / mapping.width(), height / mapping.height());
+                copy.draw(canvas);
+                snapshotSource = drawable; staticSnapshot = snapshot;
+                snapshotBackground = backgroundColor; snapshotColor = color;
+            }
+            return staticSnapshot;
+        }
+        private Bitmap bitmap(Drawable drawable, int backgroundColor) {
             if (drawable instanceof AnimatedFileDrawable) return null;
+            if (drawable instanceof MotionBackgroundDrawable) {
+                mapping.set(drawable.getBounds());
+                return ((MotionBackgroundDrawable) drawable).getSignatureBlurBitmap();
+            }
             if (drawable instanceof BitmapDrawable) {
                 BitmapDrawable image = (BitmapDrawable) drawable;
-                if (image.getTileModeX() != null || image.getTileModeY() != null
-                        || image.getAlpha() != 255 || image.getColorFilter() != null) return null;
+                if (image.getAlpha() != 255) return null;
+                if (image.getTileModeX() != null || image.getTileModeY() != null || image.getColorFilter() != null) {
+                    Bitmap bitmap = image.getBitmap();
+                    if (bitmap == null || bitmap.isRecycled()) return null;
+                    return snapshot(drawable, backgroundColor, System.identityHashCode(bitmap) ^ bitmap.getGenerationId());
+                }
                 mapping.set(image.getBounds());
                 return image.getBitmap();
             }
             if (drawable instanceof ChatBackgroundDrawable)
-                return ((ChatBackgroundDrawable) drawable).getSignatureStaticBitmap(mapping);
+                return ((ChatBackgroundDrawable) drawable).getSignatureBlurBitmap(mapping);
+            if (drawable instanceof ColorDrawable || drawable instanceof GradientDrawable)
+                return snapshot(drawable, backgroundColor, drawable instanceof ColorDrawable ? ((ColorDrawable) drawable).getColor() : 0);
             return null;
         }
         public void prepare(Drawable drawable, boolean motion, int backgroundColor) {
             if (closed) return;
             if (!BubbleConfig.backgroundBlur() && entry == null && source == null) return;
-            Bitmap bitmap = !motion && BubbleConfig.backgroundBlur() ? bitmap(drawable) : null;
+            // Native motion gradients use a frozen bounded frame. Parallax does
+            // not invalidate the source image; the native draw updates mapping.
+            Bitmap bitmap = null;
+            try {
+                if (BubbleConfig.backgroundBlur()) bitmap = bitmap(drawable, backgroundColor);
+            } catch (IllegalArgumentException | IllegalStateException | OutOfMemoryError unavailable) {
+                // Optional, bounded snapshot resource failure retains the native surface.
+            }
             if (bitmap == null || bitmap.isRecycled() || (Build.VERSION.SDK_INT >= 26 && bitmap.getConfig() == Bitmap.Config.HARDWARE)) {
                 clear(); supported = false; return;
             }
-            int dimAlpha = drawable instanceof ChatBackgroundDrawable
-                    ? Math.max(0, Math.min(255, Math.round(((ChatBackgroundDrawable) drawable).getDimAmount() * 255))) : 0;
+            // Native ChatBackground snapshots already include their receiver's dim.
+            int dimAlpha = 0;
             source = drawable; supported = true;
             if (sourceBitmap == bitmap && generation == bitmap.getGenerationId() && background == backgroundColor && dim == dimAlpha) return;
             boolean wasReady = isReady();
@@ -270,11 +316,23 @@ public final class SignatureWallpaperBlur {
             paint.setShader(shader); mappedLeft = Float.NaN;
             View view = target.get();
             if (sawFallback && view != null && view.isAttachedToWindow() && view.isShown()) {
-                // A genuinely cold source is revealed on the existing active-only clock, never
-                // by delaying navigation or starting an independent/per-message animation.
+                // One native, finite owner-level fade for cold publication only. Warm
+                // cache reuse remains final on its first draw; navigation never waits.
                 reveal = 0;
-                revealMotion = new FlexyFrameMotion(view, 0, value -> { reveal = value; invalidateVisual(); });
-                revealMotion.animateTimedTo(1, 120, null);
+                revealMotion = ValueAnimator.ofFloat(0, 1);
+                revealMotion.setDuration(120);
+                revealMotion.setInterpolator(new LinearInterpolator());
+                revealMotion.addUpdateListener(animation -> {
+                    View owner = target.get();
+                    if (closed || owner == null || !owner.isAttachedToWindow() || !owner.isShown()) {
+                        animation.cancel();
+                        reveal = 1;
+                        return;
+                    }
+                    reveal = (float) animation.getAnimatedValue();
+                    invalidateVisual();
+                });
+                revealMotion.start();
             } else reveal = 1; // Warm reuse is final from its very first draw.
             invalidateVisual();
         }
@@ -305,7 +363,7 @@ public final class SignatureWallpaperBlur {
         }
         private void release() {
             boolean freed = false;
-            if (revealMotion != null) { revealMotion.dispose(); revealMotion = null; }
+            if (revealMotion != null) { revealMotion.removeAllUpdateListeners(); revealMotion.cancel(); revealMotion = null; }
             sawFallback = false; firstDraw = false; reveal = 1;
             if (waitingForSlot) { waiting.removeIf(reference -> reference.get() == null || reference.get() == this); waitingForSlot = false; }
             if (shader != null) { paint.setShader(null); shader = null; }
@@ -326,6 +384,6 @@ public final class SignatureWallpaperBlur {
             release(); source = null; supported = false;
             if (wasReady) invalidateVisual();
         }
-        public void close() { if (closed) return; closed = true; clear(); availabilityChanged = null; target.clear(); }
+        public void close() { if (closed) return; closed = true; clear(); snapshotSource = null; staticSnapshot = null; availabilityChanged = null; target.clear(); }
     }
 }

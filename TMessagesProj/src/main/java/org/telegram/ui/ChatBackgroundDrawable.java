@@ -222,6 +222,37 @@ public class ChatBackgroundDrawable extends Drawable {
         return bitmap != null && !bitmap.isRecycled() ? bitmap : null;
     }
 
+    private Bitmap signatureBlurSnapshot, signatureBlurImage;
+    private int signatureBlurGeneration;
+    /** Uses the actual native pattern/gradient renderer, including its theme colors. */
+    public Bitmap getSignatureBlurBitmap(android.graphics.RectF region) {
+        if (alpha != 255) return null;
+        region.set(getBounds());
+        if (region.isEmpty()) return null;
+        if (motionBackgroundDrawable != null) {
+            return motionBackgroundDrawable.getSignatureBlurBitmap();
+        }
+        if (!imageReceiver.hasImageLoaded() || imageReceiver.getCurrentAlpha() != 1f) return null;
+        Drawable image = imageReceiver.getDrawable();
+        if (!(image instanceof BitmapDrawable) || image instanceof org.telegram.ui.Components.AnimatedFileDrawable) return null;
+        Bitmap bitmap = ((BitmapDrawable) image).getBitmap();
+        if (bitmap == null || bitmap.isRecycled()) return null;
+        if (signatureBlurSnapshot == null || signatureBlurImage != bitmap
+                || signatureBlurGeneration != bitmap.getGenerationId()) {
+            float scale = Math.min(1f, 384f / Math.max(region.width(), region.height()));
+            int width = Math.max(1, Math.round(region.width() * scale));
+            int height = Math.max(1, Math.round(region.height() * scale));
+            Bitmap snapshot = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(snapshot);
+            canvas.scale(width / region.width(), height / region.height());
+            canvas.translate(-region.left, -region.top);
+            draw(canvas); // Same native receiver, color filter, crop and dim; static only.
+            signatureBlurSnapshot = snapshot; signatureBlurImage = bitmap;
+            signatureBlurGeneration = bitmap.getGenerationId();
+        }
+        return signatureBlurSnapshot;
+    }
+
     public float getDimAmount() {
         if (motionBackgroundDrawable == null) {
             return dimAmount;

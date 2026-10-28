@@ -11,7 +11,7 @@ import org.robolectric.annotation.*;
 import org.telegram.messenger.*;
 import app.flexygram.bubbles.*;
 import static org.junit.Assert.*;
-@RunWith(RobolectricTestRunner.class) @Config(manifest=Config.NONE,sdk=35,instrumentedPackages={"app.flexygram.motion"}) @GraphicsMode(GraphicsMode.Mode.NATIVE) @LooperMode(LooperMode.Mode.PAUSED)
+@RunWith(RobolectricTestRunner.class) @Config(manifest=Config.NONE,sdk=35) @GraphicsMode(GraphicsMode.Mode.NATIVE) @LooperMode(LooperMode.Mode.PAUSED)
 public class CachedBlurVisualTest {
  private final java.util.ArrayList<View> views=new java.util.ArrayList<>();
  private View keep(View v){views.add(v);return v;}
@@ -23,6 +23,41 @@ public class CachedBlurVisualTest {
  private void complete()throws Exception{Utilities.globalQueue.runAllOnWorker();AndroidUtilities.drainMain();org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();}
  private Object entry(SignatureWallpaperBlur.Owner owner)throws Exception{var f=owner.getClass().getDeclaredField("entry");f.setAccessible(true);return f.get(owner);}
  private Bitmap cached(SignatureWallpaperBlur.Owner owner)throws Exception{Object e=entry(owner);var f=e.getClass().getDeclaredField("bitmap");f.setAccessible(true);return (Bitmap)f.get(e);}
+ @Test public void nativeGradientAndSolidSourcesRenderThroughRealBubblesWithoutRepeatJobs() throws Exception {
+  Bitmap evidence=Bitmap.createBitmap(720,720,Bitmap.Config.ARGB_8888);Canvas montage=new Canvas(evidence);int tile=0;
+  int[] stripes=new int[41];for(int i=0;i<stripes.length;i++)stripes[i]=i%2==0?Color.BLACK:Color.WHITE;
+  for(boolean dark:new boolean[]{false,true}) {
+   org.telegram.ui.ActionBar.Theme.dark=dark;
+   BitmapDrawable tiled=image(4,4,0);tiled.setTileModeXY(Shader.TileMode.REPEAT,Shader.TileMode.REPEAT);
+   for(Drawable wallpaper:new Drawable[]{new ColorDrawable(dark?0xff202020:0xffeeeeee),new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT,stripes),tiled}) {
+    wallpaper.setBounds(0,0,180,100);
+    var a=owner(keep(new View(ApplicationLoader.applicationContext)));a.prepare(wallpaper,false,0xff888888);complete();assertTrue(a.isReady());
+    Bitmap prepared=cached(a);assertTrue(prepared.getWidth()<=384);assertTrue(prepared.getHeight()<=384);
+    if(wallpaper instanceof GradientDrawable || wallpaper==tiled) {int red=Color.red(prepared.getPixel(90,50));assertTrue(red>60&&red<195);}
+    for(boolean out:new boolean[]{false,true})for(boolean matte:new boolean[]{false,true}) {
+     BubbleConfig.setMatteEnabled(matte);BubbleConfig.setMatteStrength(75);BubbleConfig.setTransparency(100);BubbleConfig.setOutlineEnabled(false);
+     var bubble=new org.telegram.ui.ActionBar.MessageDrawable(org.telegram.ui.ActionBar.MessageDrawable.TYPE_TEXT,out,false);
+     bubble.setBounds(0,0,160,85);bubble.setTop(0,180,100,false,false);
+     int[] samples={0};bubble.setFlexyGlassSource(new org.telegram.ui.ActionBar.MessageDrawable.GlassSource(){
+      public boolean draw(Canvas c,Path path){return draw(c,path,255);}
+      public boolean draw(Canvas c,Path path,int alpha){samples[0]++;return a.draw(c,path,0,0,alpha);}
+     });
+     Bitmap rendered=Bitmap.createBitmap(180,100,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(rendered);
+     bubble.draw(c);assertTrue(samples[0]>0);assertEquals(255,Color.alpha(rendered.getPixel(80,40)));
+     for(int n=0;n<100;n++){a.prepare(wallpaper,true,0xff888888);bubble.draw(c);}
+     assertSame(prepared,cached(a));assertEquals(0,Utilities.globalQueue.pending());
+     int saved=montage.save();montage.translate((tile%4)*180,(tile/4)*120);montage.clipRect(0,0,180,120);
+     wallpaper.draw(montage);montage.drawBitmap(rendered,0,0,null);
+     Paint label=new Paint(Paint.ANTI_ALIAS_FLAG);label.setColor(dark?Color.WHITE:Color.BLACK);label.setTextSize(10);
+     montage.drawText((dark?"dark ":"light ")+(out?"out ":"in ")+(matte?"matte":"native"),4,114,label);
+     montage.restoreToCount(saved);tile++;rendered.recycle();
+    }
+    a.close();
+   }
+  }
+  try(var stream=new java.io.FileOutputStream(new java.io.File(System.getProperty("basedir"),"android-native-wallpaper-blur.png"))){assertTrue(evidence.compress(Bitmap.CompressFormat.PNG,100,stream));}
+  evidence.recycle();
+ }
  @Test public void oneSharedBoundedImagePreparedOffUiAndSampledWithoutNewJobs()throws Exception{
   View target=keep(new View(ApplicationLoader.applicationContext));var a=owner(target);var b=owner(target);BitmapDrawable source=image(1600,1200,0);
   a.prepare(source,false,0xffeeeeee);b.prepare(source,false,0xffeeeeee);assertFalse(a.isReady());assertEquals(1,Utilities.globalQueue.pending());assertSame(entry(a),entry(b));
@@ -37,12 +72,12 @@ public class CachedBlurVisualTest {
   BubbleConfig.setBackgroundBlur(false);cell.eraseColor(Color.TRANSPARENT);bubble.draw(new Canvas(cell));assertEquals(0,Color.alpha(cell.getPixel(50,35)));BubbleConfig.setBackgroundBlur(true);
   a.close();assertTrue(b.isReady());assertFalse(same.isRecycled());b.close();assertFalse(same.isRecycled());assertFalse(source.getBitmap().isRecycled());
  }
- @Test public void cellScrollCoordinatesTrackWallpaperAndUnsupportedMotionKeepsMatte()throws Exception{
+ @Test public void cellScrollCoordinatesTrackWallpaperAndParallaxReusesBlur()throws Exception{
   View target=keep(new View(ApplicationLoader.applicationContext));var a=owner(target);BitmapDrawable source=image(128,256,0);for(int y=0;y<256;y++)for(int x=0;x<128;x++)source.getBitmap().setPixel(x,y,Color.rgb(x*2,y,(x+y)%256));a.prepare(source,false,0xffcccccc);complete();
   Bitmap expected=Bitmap.createBitmap(128,256,Bitmap.Config.ARGB_8888);Path whole=new Path();whole.addRect(0,0,128,256,Path.Direction.CW);a.draw(new Canvas(expected),whole,0,0);
   Path local=new Path();local.addRect(0,0,64,48,Path.Direction.CW);
   for(int top:new int[]{0,21,100,160}){Bitmap sample=Bitmap.createBitmap(64,48,Bitmap.Config.ARGB_8888);assertTrue(a.draw(new Canvas(sample),local,12,top));assertEquals(expected.getPixel(32,top+24),sample.getPixel(20,24));}
-  a.prepare(source,true,0xffcccccc);assertFalse(a.isReady());assertFalse(a.isSupported());assertFalse(a.draw(new Canvas(expected),whole,0,0));assertEquals(0,Utilities.globalQueue.pending());
+  a.prepare(source,true,0xffcccccc);assertTrue(a.isReady());assertTrue(a.isSupported());assertTrue(a.draw(new Canvas(expected),whole,0,0));assertEquals(0,Utilities.globalQueue.pending());
  }
  @Test public void capturedMappingSurvivesSharedDrawableBoundsAndPartialAlphaDoesNotToggleMatte()throws Exception{
   var a=owner(keep(new View(ApplicationLoader.applicationContext)));BitmapDrawable source=image(128,256,0);
@@ -88,8 +123,9 @@ public class CachedBlurVisualTest {
   int ready=changed[0];assertTrue(ready>0);
   for(int n=0;n<200;n++)a.prepare(source,false,0xffcccccc);
   assertEquals(ready,changed[0]);assertEquals(0,Utilities.globalQueue.pending());
-  a.prepare(source,true,0xffcccccc);assertEquals(ready+1,changed[0]);assertFalse(a.isReady());
-  a.prepare(source,true,0xffcccccc);assertEquals(ready+1,changed[0]);
+  a.prepare(source,true,0xffcccccc);assertEquals(ready,changed[0]);assertTrue(a.isReady());
+  a.prepare(null,true,0xffcccccc);assertEquals(ready+1,changed[0]);assertFalse(a.isReady());
+  a.prepare(null,true,0xffcccccc);assertEquals(ready+1,changed[0]);
   a.close();assertEquals(ready+1,changed[0]);
  }
  @Test public void parentDrawPolicyUpdatesBothDirectionsAndLeavesOtherEmbeddersNative(){
@@ -143,13 +179,11 @@ public class CachedBlurVisualTest {
   var b=new SignatureWallpaperBlur.Owner(keep(new View(ApplicationLoader.applicationContext)),()->changes[0]++);owners.add(b);
   b.prepare(image(100,200,1),false,1);Utilities.globalQueue.runAllOnWorker();b.close();AndroidUtilities.drainMain();org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();assertEquals(1,changes[0]);assertFalse(b.isReady());
  }
- @Test public void genuinelyColdVisibleSourceRevealsOnExistingClockAndDetachCancels()throws Exception{
+ @Test public void genuinelyColdVisibleSourceUsesNativeFadeAndCloseCancels()throws Exception{
   org.robolectric.shadows.ShadowChoreographer.setPaused(true);org.robolectric.shadows.ShadowChoreographer.setFrameDelay(java.time.Duration.ofMillis(16));
   var controller=Robolectric.buildActivity(android.app.Activity.class).setup().visible();var activity=controller.get();View view=new View(activity);activity.setContentView(view);
   view.layout(0,0,100,200);org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(java.time.Duration.ofMillis(32));
   org.robolectric.util.ReflectionHelpers.setField(org.robolectric.util.ReflectionHelpers.getField(view,"mAttachInfo"),"mWindowVisibility",View.VISIBLE);
-  app.flexygram.motion.FlexyMotionSettings.setProfile(activity,app.flexygram.motion.FlexyMotionProfile.FLOW);
-  app.flexygram.motion.FlexyMotionSettings.setReduceMotion(activity,false);
   var a=owner(view);BitmapDrawable source=image(100,200,0);
   a.prepare(source,false,1);Path path=new Path();path.addRect(0,0,100,200,Path.Direction.CW);Bitmap pixels=Bitmap.createBitmap(100,200,Bitmap.Config.ARGB_8888);Canvas canvas=new Canvas(pixels);
   assertTrue("blur enabled",BubbleConfig.backgroundBlur());
@@ -162,9 +196,11 @@ public class CachedBlurVisualTest {
   var mappingField=a.getClass().getDeclaredField("mapping");mappingField.setAccessible(true);
   assertTrue("ready draw supported="+a.isSupported()+" mapping="+mappingField.get(a)+" generation="+source.getBitmap().getGenerationId()+" enabled="+BubbleConfig.backgroundBlur(),a.draw(canvas,path,0,0));
   assertEquals("first cold reveal stays transparent",0,Color.alpha(pixels.getPixel(40,40)));
-  org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(java.time.Duration.ofMillis(64));pixels.eraseColor(Color.TRANSPARENT);assertTrue(a.draw(canvas,path,0,0));int alpha=Color.alpha(pixels.getPixel(40,40));assertTrue("controlled reveal "+alpha,alpha>0&&alpha<255);
-  org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(java.time.Duration.ofMillis(200));pixels.eraseColor(Color.TRANSPARENT);a.draw(canvas,path,0,0);assertEquals(255,Color.alpha(pixels.getPixel(40,40)));
-  a.close();assertEquals(0,app.flexygram.motion.FlexyFrameMotion.activeCount());controller.pause().stop().destroy();
+  var fadeField=a.getClass().getDeclaredField("revealMotion");fadeField.setAccessible(true);var fade=(android.animation.ValueAnimator)fadeField.get(a);assertNotNull(fade);assertEquals(120,fade.getDuration());
+  // Deterministic native animator sampling: this is not a physical frame-clock measurement.
+  fade.setCurrentPlayTime(64);pixels.eraseColor(Color.TRANSPARENT);assertTrue(a.draw(canvas,path,0,0));int alpha=Color.alpha(pixels.getPixel(40,40));assertTrue("controlled reveal "+alpha,alpha>0&&alpha<255);
+  fade.end();pixels.eraseColor(Color.TRANSPARENT);a.draw(canvas,path,0,0);assertEquals(255,Color.alpha(pixels.getPixel(40,40)));
+  a.close();assertNull(fadeField.get(a));assertFalse(fade.isStarted());controller.pause().stop().destroy();
  }
 
  @Test public void exactAlpha1279BaselineRecomputesEveryReopenUnderSameWorkload()throws Exception{
@@ -190,7 +226,7 @@ public class CachedBlurVisualTest {
  @Test public void distinctThemeSurfaceKeysAndCanceledColdRevealRemainSafe()throws Exception{
   BitmapDrawable source=image(80,90,0);var a=owner(keep(new View(ApplicationLoader.applicationContext)));a.prepare(source,false,0xffeeeeee);complete();Bitmap light=cached(a);a.close();
   var b=owner(keep(new View(ApplicationLoader.applicationContext)));b.prepare(source,false,0xff111111);assertFalse(b.isReady());complete();assertNotSame(light,cached(b));
-  var c=owner(keep(new View(ApplicationLoader.applicationContext)));c.prepare(source,true,0xff111111);assertFalse(c.isReady());assertFalse(c.isSupported());c.close();assertTrue(b.isReady());
+  var c=owner(keep(new View(ApplicationLoader.applicationContext)));c.prepare(null,true,0xff111111);assertFalse(c.isReady());assertFalse(c.isSupported());c.close();assertTrue(b.isReady());
  }
 
 }

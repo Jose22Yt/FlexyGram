@@ -1,3 +1,7 @@
+# CANCELLED — historical Flexy Motion Engine record
+
+This engine was cancelled by the owner. Its production classes and preferences UI are removed by the Alpha1281 native restoration. Do not integrate PR107, PR108 or PR114. See `native_motion_restore/RESTORATION.md` for the active native path. The following describes historical implementation only.
+
 # Flexy Motion Engine — reviewed continuation of PR107
 
 Base: PR107 `1ad96133e7bceaede4067905c68f1f97bdb829b2`, reconciled with Work1 PR106 `14e586b4ddb7a686f39cda3cb175920c49cecf11` in a separate branch. No PR106/107/main/develop update or merge. Version, identity, distribution, credentials and native libraries unchanged.
