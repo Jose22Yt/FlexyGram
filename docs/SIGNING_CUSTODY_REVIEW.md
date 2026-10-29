@@ -1,37 +1,25 @@
-# Informe de custodia de firma — 29 de octubre de 2026
+# Registro público de firma — 29 de octubre de 2026
 
-Base revisada: PR #131, `feat/official-identity-beta-preparation`, commit inicial `432aad76c5bcc8305e4ff917827c522a0dd93f8e`.
+## Evidencia recibida
 
-| Punto | Estado real |
-| --- | --- |
-| Clave oficial generada | No |
-| Keystore accesible en esta sesión | No se ha creado ni recibido uno |
-| Entrega al propietario | No realizada |
-| Dos copias cifradas y recuperación real | Pendientes de ejecución y confirmación del propietario |
-| Certificado público / SHA-256 Beta | Pendientes, sin valores ficticios |
-| Custodia propuesta | Generación local por @Lukhou23, original protegido y backups age en dos soportes separados |
-| Alias / formato / algoritmo | flexygram-release / PKCS12 / RSA-3072, SHA256withRSA |
-| Firma Alpha | Sin cambios |
-| Paquete | com.flexygram.messenger, sin cambios |
-| Secretos de Actions | Nombres y procedimiento preparados; ninguno creado, leído ni cargado |
-| APK/AAB | Ninguna compilación, empaquetado, firma o publicación |
+El propietario confirmó generación local y acceso con PASS/POSSESSION_VERIFIED. Se recibieron `flexygram-release.cer` y `public-verification.json`, ambos públicos. El JSON recibido muestra PASS para el certificado, `private_key=NOT_CHECKED`, `custody=OWNER_CONFIRMATION_REQUIRED` y `android_apk=NOT_TESTED`. No es un informe de inspección de PKCS12 ni de doble recuperación. No se recibió ninguna clave privada o contraseña.
 
-La condición de no generar una clave definitiva en una sesión temporal se aplica porque no existe confirmación de entrega, acceso y recuperación en soportes del propietario. La alternativa implementada es [el procedimiento de generación y custodia local](SIGNING_OWNER_CUSTODY.md).
+El certificado DER tiene SHA-256 **5a598fb5ba42949b67b7c2635106fafd5f23179397e4c098757a73cd2d2ef66c**. Coincide exactamente con la huella indicada por el propietario y con el JSON. OpenSSL y el verificador Java comprobaron el certificado; RSA-3072, SHA256withRSA, autofirma válida y CN=FlexyGram Release Key / OU=@Lukhou23. Vigencia UTC: 2026-10-29T22:39:21Z a 2054-03-16T22:39:21Z. No es el certificado Alpha conocido.
 
-Revisión de configuración: se exige un almacén PKCS12 real con una sola identidad y alias fijo; certificado vigente, autofirmado y CN correcto; RSA de 3072 bits y firma SHA256withRSA; huella pública fijada y rechazo del certificado Alpha conocido/debug. Se agrega prueba en memoria de correspondencia entre clave privada y certificado; no firma APK. Se conservan paquete, configuración y archivos de Alpha. El nombre del certificado no demuestra autoría o propiedad: el control de la clave corresponde al propietario.
+## Registro implementado
 
-Comprobaciones locales: el verificador Java compila con el compilador JDK 17 disponible (compatible a nivel de código con el JDK 21 previsto para el proyecto). Cinco casos inválidos o sin terminal interactiva se rechazan sin imprimir datos de entrada. Se revisan XML/documentación, hashes de identidad y diffs. No se genera ningún par de claves de prueba ni definitivo para aparentar una validación positiva. No se ha ejecutado Gradle ni Android. El PKCS12 real, su contraseña, posesión, certificado, vigencia efectiva, huella y restauración deberán verificarse cuando existan en el dispositivo del propietario.
+- `config/signing/flexygram-release.cer`: solo certificado público DER.
+- `config/signing/identity.properties`: asociación del paquete `com.flexygram.messenger`, alias aprobado `flexygram-release`, PKCS12 y SHA-256 oficial.
+- Gradle exige coincidencia con el pin y el certificado público. El entorno no puede introducir una huella alternativa. Se conservan las protecciones contra claves Debug/Alpha, tipo/algoritmo/alias y correspondencia de clave privada.
+- Verificador y asistente local fijan esta identidad. La generación local de nuevas claves se retira: una pérdida requiere recuperar el PKCS12 original, no regenerar.
+- Toolkit actualizado con código y certificado públicos, sin PKCS12, contraseñas o backups. No se reescribe el historial.
 
-Pruebas reproducibles sin Android: `python3 tools/signing/check_verifier.py` y `python3 tools/identity/check_identity.py`. La ejecución del comprobador Java sobre un PKCS12 real se hace únicamente por el propietario, con contraseña interactiva. El asistente podrá revisar después exclusivamente el certificado público DER y su SHA-256.
+## Alcance real
 
-Cierre pendiente: el propietario genera la clave una sola vez, exporta `.cer`, verifica original y las restauraciones A/B, confirma custodia y comparte solo el certificado público. Entonces se contrasta y registra la huella. La incorporación a GitHub Actions requiere autorización posterior y protecciones verificadas. La compilación y verificación de una APK Beta continúan pendientes de autorización expresa.
+La clave fue generada por el propietario, no por el asistente. El propietario conserva el PKCS12. No hay entrega ni custodia privada por este entorno. El alias, la presencia y acceso a la clave privada se volverán a comprobar cuando el propietario ejecute la inspección del PKCS12 o se autorice un entorno de firma. El asistente verificó únicamente el certificado público; no atribuye a este archivo una prueba de posesión privada.
 
-## Automatización local adicional
+Un certificado X.509 no incluye el applicationId de Android. La asociación con Beta se comprueba en Gradle y metadatos; RSA-3072/SHA256withRSA son coherentes con la política del proyecto. La compatibilidad definitiva requiere una futura compilación autorizada y verificación de APK/manifiesto/firma. No se afirma instalación ni actualización probada.
 
-Se inspeccionó la disponibilidad de transferencia de archivos autenticados. Eso no acredita que exista un destinatario de cifrado verificado ni una recuperación efectiva bajo control del propietario; no se generó una clave en esta sesión. Se implementa la alternativa local autorizada mediante `tools/signing/owner_wizard.py`, con documentación para Android/Termux y paquete de herramientas pequeño, sin material privado.
+Pendiente: confirmación de dos backups cifrados independientes y su recuperación; configuración de servicios propios de Beta; autorización separada de carga a Actions; futura compilación y validación Android. La falta de confirmación de backups no impide registrar el certificado público, pero impide declarar la custodia completa.
 
-El asistente local verifica precondiciones, exige contraseña de gestor de 32 caracteres o más, usa contraseñas solo en el entorno de procesos hijos, conserva el almacén en carpeta privada fuera de Git y rechaza CI/entorno del asistente. Reanuda sin regenerar; si una huella ya fijada pierde su almacén, exige recuperación. Los backups existentes no se sobrescriben. Exige dos descifrados y comparación exacta, prueba de clave privada y confirmación explícita del propietario sobre independencia de soportes y recuperación de contraseñas. El software no puede probar esa independencia física.
-
-Pruebas nuevas: 16 casos de ciclo de vida/recuperación con herramientas simuladas y bytes expresamente ficticios, sin crear pares de claves. El verificador Java pasa 6 rechazos de entradas inválidas/no interactivas. No se acredita un éxito PKCS12 real ni se prueba Android físicamente. El paquete contiene únicamente fuentes, guía, pruebas, licencia y sumas de integridad. Los comandos de generación/cifrado/recuperación se ejecutarán después por el propietario en su dispositivo.
-
-Estado de cierre sin cambios: clave y huella Beta aún no existen aquí; entrega privada y confirmación de backups pendientes. Ninguna APK/AAB ni nuevo pipeline ejecutado; no se cargan secretos.
+No se genera otra clave, no se lee el PKCS12, no se cargan secretos y no se compila/empaqueta/firma/publica APK/AAB. CI se omite con `[skip ci]`; comprobaciones de fuentes y certificado realizadas localmente.

@@ -11,7 +11,7 @@ from unittest.mock import patch
 import owner_wizard as wizard
 
 FAKE_KEY = b'NOT_A_KEY: synthetic test bytes'
-FINGERPRINT = 'a' * 64
+FINGERPRINT = wizard.OFFICIAL_SHA256
 PASSWORD = 'SYNTHETIC_NON_SECRET_TEST_INPUT_123456'
 REPORT = dict(status='PASS', sha256=FINGERPRINT, private_key='POSSESSION_VERIFIED',
               public_key='RSA-3072', signature='SHA256withRSA', not_before='TEST', not_after='TEST')
@@ -74,20 +74,13 @@ class OwnerWizardTests(unittest.TestCase):
         self.assertEqual(store.read_bytes(), FAKE_KEY)
         self.assertEqual(wizard.load_state(self.vault)['sha256'], FINGERPRINT)
 
-    def test_new_generation_uses_password_env_names_without_password_arguments(self):
-        def simulated(command, password):
-            self.assertNotIn(password, command)
-            if '-genkeypair' in command:
-                self.assertIn('-storepass:env', command)
-                self.assertIn('-keypass:env', command)
-                (self.vault / 'flexygram-release.p12').write_bytes(FAKE_KEY)
-            else:
-                self.assertIn('-exportcert', command)
-                (self.vault / 'flexygram-release.cer').write_bytes(b'FAKE_CERT')
-            return ''
-        with patch('builtins.input', return_value='GENERAR'), patch('owner_wizard.private_command', side_effect=simulated), patch('owner_wizard.inspect', return_value=REPORT), patch('owner_wizard.subprocess.run', return_value=subprocess.CompletedProcess([], 0)):
-            wizard.create_or_resume(self.vault, PASSWORD, self.state)
-        self.assertNotIn(PASSWORD, (self.vault / 'custody-state.json').read_text())
+    def test_new_generation_is_disabled_after_official_identity_registration(self):
+        with patch('owner_wizard.private_command') as command, patch('builtins.input') as prompt:
+            with self.assertRaises(wizard.CustodyError):
+                wizard.create_or_resume(self.vault, PASSWORD, self.state)
+            command.assert_not_called()
+            prompt.assert_not_called()
+        self.assertFalse((self.vault / 'flexygram-release.p12').exists())
 
     def test_child_password_never_enters_command_arguments_or_parent_environment(self):
         def simulated(command, **kwargs):

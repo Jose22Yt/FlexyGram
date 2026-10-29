@@ -23,9 +23,23 @@ def validateBeta = tasks.register('validateFlexyGramBetaConfiguration') {
         if (!(id ==~ /[1-9][0-9]{0,9}/) || id.toLong() > Integer.MAX_VALUE || id in ['4', '6', '2040'] || !(hash ==~ /[a-fA-F0-9]{32}/)) {
             throw new GradleException('Configure authorized Telegram credentials privately.')
         }
+        def identity = new Properties()
+        rootProject.file('config/signing/identity.properties').withInputStream { identity.load(it) }
+        if (identity.getProperty('applicationId') != APP_PACKAGE || identity.getProperty('alias') != 'flexygram-release' || identity.getProperty('storeType') != 'PKCS12') {
+            throw new GradleException('Official Beta identity metadata differs from the approved package, alias or store type.')
+        }
+        def pinned = identity.getProperty('certificateSha256')
+        if (!(pinned ==~ /[a-f0-9]{64}/)) throw new GradleException('Missing official Beta certificate pin.')
+        def publicFile = rootProject.file(identity.getProperty('certificateFile'))
+        def registered = publicFile.withInputStream { java.security.cert.CertificateFactory.getInstance('X.509').generateCertificate(it) }
+        def publicHash = java.security.MessageDigest.getInstance('SHA-256').digest(registered.encoded).encodeHex().toString()
+        if (publicHash != pinned) throw new GradleException('Registered Beta public certificate does not match the repository pin.')
+        def suppliedPin = betaPrivateValue('FLEXYGRAM_RELEASE_CERT_SHA256')
+        if (suppliedPin && suppliedPin.replace(':', '').toLowerCase(java.util.Locale.ROOT) != pinned) {
+            throw new GradleException('An external fingerprint cannot replace the registered official Beta identity.')
+        }
         def names = ['FLEXYGRAM_RELEASE_KEYSTORE', 'FLEXYGRAM_RELEASE_STORE_PASSWORD',
-                     'FLEXYGRAM_RELEASE_KEY_ALIAS', 'FLEXYGRAM_RELEASE_KEY_PASSWORD',
-                     'FLEXYGRAM_RELEASE_CERT_SHA256']
+                     'FLEXYGRAM_RELEASE_KEY_ALIAS', 'FLEXYGRAM_RELEASE_KEY_PASSWORD']
         names.each { name ->
             if (!betaPrivateValue(name)) throw new GradleException('Missing Beta signing input: ' + name)
         }
@@ -67,7 +81,7 @@ def validateBeta = tasks.register('validateFlexyGramBetaConfiguration') {
             java.util.Arrays.fill(nonce, (byte) 0)
             java.util.Arrays.fill(signed, (byte) 0)
             def fingerprint = java.security.MessageDigest.getInstance('SHA-256').digest(cert.encoded).encodeHex().toString()
-            def expected = betaPrivateValue('FLEXYGRAM_RELEASE_CERT_SHA256').replace(':', '').toLowerCase(java.util.Locale.ROOT)
+            def expected = pinned
             if (!(expected ==~ /[a-f0-9]{64}/) || fingerprint != expected) {
                 throw new GradleException('Beta certificate differs from the owner-pinned SHA-256.')
             }

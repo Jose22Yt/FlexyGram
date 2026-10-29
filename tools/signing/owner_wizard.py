@@ -17,6 +17,7 @@ import sys
 import tempfile
 import warnings
 
+OFFICIAL_SHA256 = '5a598fb5ba42949b67b7c2635106fafd5f23179397e4c098757a73cd2d2ef66c'
 ALIAS = 'flexygram-release'
 PACKAGE = 'com.flexygram.messenger'
 PASSWORD_ENV = 'FLEXYGRAM_LOCAL_STORE_PASSWORD'
@@ -136,6 +137,7 @@ def inspect(store, password, expected=None):
     report = json.loads(private_command(command, password))
     require(report.get('status') == 'PASS' and report.get('private_key') == 'POSSESSION_VERIFIED', 'No se acreditó acceso a la clave privada.')
     require(re.fullmatch(r'[a-f0-9]{64}', report.get('sha256', '')), 'El verificador no devolvió una huella pública válida.')
+    require(hmac.compare_digest(report['sha256'], OFFICIAL_SHA256), 'La clave no corresponde a la identidad oficial registrada.')
     require(expected is None or hmac.compare_digest(report['sha256'], expected), 'La identidad difiere de la huella fijada.')
     return report
 
@@ -143,22 +145,10 @@ def inspect(store, password, expected=None):
 def create_or_resume(vault, password, state):
     store = vault / 'flexygram-release.p12'
     require(not store.is_symlink(), 'No se admite un enlace como almacén privado.')
-    if not store.exists():
-        require(state.get('status') == 'PENDING' and not state.get('sha256'), 'Ya existe una huella fijada: recupera el almacén original, no generes otra identidad.')
-        require(not any(vault.glob('*.p12')) and not any(vault.glob('*.keystore')), 'Hay otro almacén en esta carpeta; revísalo antes de continuar.')
-        require(input('Para generar UNA clave definitiva en este dispositivo escribe GENERAR: ').strip() == 'GENERAR', 'Generación cancelada.')
-        state['status'] = 'GENERATION_STARTED_NOT_CUSTODIED'
-        write_state(vault, state)
-        private_command(['keytool', '-genkeypair', '-keystore', str(store), '-storetype', 'PKCS12',
-                         '-alias', ALIAS, '-keyalg', 'RSA', '-keysize', '3072', '-sigalg', 'SHA256withRSA',
-                         '-validity', '10000', '-dname', 'CN=FlexyGram Release Key,OU=@Lukhou23',
-                         '-storepass:env', PASSWORD_ENV, '-keypass:env', PASSWORD_ENV], password)
-        require(store.is_file(), 'La herramienta no creó un almacén; no se reintenta automáticamente.')
-        if os.name == 'posix':
-            store.chmod(0o600)
-    else:
-        print('Se encontró el original: se verificará y NO se generará otra clave.')
-    report = inspect(store, password, state.get('sha256'))
+    require(store.is_file(), 'La identidad oficial ya existe. Recupera tu PKCS12 original en esta carpeta; no se permite generar otra clave.')
+    require(state.get('sha256') in (None, OFFICIAL_SHA256), 'El registro local corresponde a otra identidad; no se sustituye.')
+    print('Se verificará el original oficial; este asistente ya no genera claves.')
+    report = inspect(store, password, OFFICIAL_SHA256)
     state.update(sha256=report['sha256'], status='KEY_VERIFIED_BACKUPS_PENDING')
     write_state(vault, state)
     cert = vault / 'flexygram-release.cer'
@@ -228,7 +218,8 @@ def run_setup(vault):
     for label in ('A', 'B'):
         target = backup_target(input('Ruta del archivo .age en el soporte final ' + label + ': ').strip(), vault, targets)
         targets.append(target)
-    password = ask_password(confirm=not (vault / 'flexygram-release.p12').exists())
+    require((vault / 'flexygram-release.p12').is_file(), 'Recupera el PKCS12 oficial antes de continuar; no se generan nuevas identidades.')
+    password = ask_password(confirm=False)
     try:
         store, report = create_or_resume(vault, password, state)
         state['backups'] = []
@@ -274,7 +265,7 @@ def run_setup(vault):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Asistente LOCAL para la firma definitiva de FlexyGram. No genera APK.')
+    parser = argparse.ArgumentParser(description='Asistente LOCAL de recuperación y custodia de la firma oficial de FlexyGram. No genera claves ni APK.')
     parser.add_argument('--vault', default=str(Path.home() / 'FlexyGramSigning'))
     parser.add_argument('--status', action='store_true', help='Muestra solo el estado público local; no abre ni genera claves')
     args = parser.parse_args()

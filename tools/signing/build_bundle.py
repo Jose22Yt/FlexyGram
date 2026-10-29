@@ -11,6 +11,8 @@ NAMES = ['owner_wizard.py', 'VerifySigning.java', 'README_LOCAL.md', 'check_veri
 
 def main():
     entries = {name: (HERE / name).read_bytes() for name in NAMES}
+    entries['flexygram-release.cer'] = (ROOT / 'config/signing/flexygram-release.cer').read_bytes()
+    entries['identity.properties'] = (ROOT / 'config/signing/identity.properties').read_bytes()
     entries['LICENSE'] = (ROOT / 'LICENSE').read_bytes()
     entries['SHA256SUMS'] = ''.join(hashlib.sha256(data).hexdigest() + '  ' + name + '\n'
                                   for name, data in sorted(entries.items())).encode()
@@ -25,7 +27,7 @@ def main():
     with zipfile.ZipFile(output) as archive:
         assert set(archive.namelist()) == {'FlexyGram_Firma_Local/' + n for n in entries}
         assert archive.testzip() is None
-    print('PASS: source-only toolkit ZIP built from explicit whitelist; no signing material included.')
+    print('PASS: source-only toolkit ZIP built from explicit whitelist; no private keys, passwords or backups included.')
 
 
 if __name__ == '__main__':

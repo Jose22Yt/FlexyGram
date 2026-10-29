@@ -1,47 +1,49 @@
-# Firma oficial de FlexyGram
+# Firma oficial de FlexyGram Beta
 
-**Estado real:** la nueva clave no se ha generado. No existe huella oficial Beta registrada por esta misión. Gradle está preparado para exigir una identidad propia; ninguna APK ha sido firmada ni verificada.
+El propietario confirmó haber generado la clave en su teléfono y tener acceso a ella. El asistente recibió **solo el certificado público y un informe de comprobación pública**, nunca el PKCS12 ni contraseñas. Certificado verificado el 29 de octubre de 2026 con Java y OpenSSL.
 
-## Custodia por el propietario
+| Campo | Identidad registrada |
+| --- | --- |
+| Paquete Beta | com.flexygram.messenger |
+| Alias aprobado | flexygram-release |
+| Almacén privado esperado | PKCS12, bajo control del propietario |
+| Clave pública | RSA-3072 |
+| Algoritmo del certificado | SHA256withRSA |
+| Sujeto / emisor | CN=FlexyGram Release Key, OU=@Lukhou23 |
+| Vigencia UTC | 2026-10-29 22:39:21 a 2054-03-16 22:39:21 |
+| SHA-256 | 5a598fb5ba42949b67b7c2635106fafd5f23179397e4c098757a73cd2d2ef66c |
 
-El propietario debe generar y conservar la clave en su equipo o almacén seguro permanente. No la generes en un runner o sesión efímera como única copia. Conserva dos copias cifradas separadas y las contraseñas en un gestor seguro; comprueba la restauración antes de usarla para un lanzamiento. La Library, los PR y los artefactos públicos no son una entrega apropiada de claves privadas.
+Fuentes públicas de la configuración: [identity.properties](../config/signing/identity.properties) y [flexygram-release.cer](../config/signing/flexygram-release.cer). El certificado contiene únicamente la clave pública. No demuestra por sí mismo el alias del almacén ni su custodia, y no incorpora un applicationId Android: la asociación con el paquete se fija en la configuración del proyecto. La compatibilidad aquí es de fuentes/configuración, no una APK firmada o instalada.
 
-Ejemplo **para ejecutar localmente por el propietario**, fuera del repositorio, usando JDK 21. `keytool` solicitará las contraseñas sin incluirlas en el comando:
+## Protección de identidad
+
+Gradle exige que el certificado del PKCS12 tenga la huella que coincide con la identidad pública registrada. Una variable externa no puede sustituir esa huella: si `FLEXYGRAM_RELEASE_CERT_SHA256` se proporciona, debe coincidir. Se conservan PKCS12 real, una sola entrada, alias fijo, RSA-3072, autofirma SHA256withRSA/CN, vigencia y prueba de correspondencia privada/pública en memoria. Debug y Alpha siguen rechazados. La firma Alpha permanece intacta.
+
+El verificador Java y el asistente local también fijan esta huella. **El asistente ya no genera claves**: únicamente verifica, recupera y respalda el PKCS12 oficial existente. Si el original falta, debe recuperarse desde un backup; no se sustituye por otra identidad.
+
+## Entradas para una futura compilación autorizada
+
+| Entrada privada/configuración | Valor o uso |
+| --- | --- |
+| FLEXYGRAM_RELEASE_KEYSTORE | Ruta al PKCS12 oficial fuera del checkout |
+| FLEXYGRAM_RELEASE_STORE_PASSWORD | Contraseña privada del almacén |
+| FLEXYGRAM_RELEASE_KEY_ALIAS | flexygram-release |
+| FLEXYGRAM_RELEASE_KEY_PASSWORD | Contraseña privada de la entrada |
+| FLEXYGRAM_RELEASE_CERT_SHA256 | Opcional; si existe, debe coincidir con el pin registrado |
+| FLEXYGRAM_GOOGLE_AUTH_CLIENT_ID | OAuth propio de Beta, opcional |
+
+No se han cargado secretos ni configurado servicios externos. Si posteriormente se autoriza incorporar la clave a Actions, usar un entorno protegido `flexygram-beta` con revisión del propietario y restricciones verificadas. El PKCS12 podrá transportarse exclusivamente como secreto protegido `FLEXYGRAM_RELEASE_KEYSTORE_B64`; base64 no cifra. Decodificar fuera del checkout, comprobar el pin y limpiar inputs incluso al fallar. No imprimir el entorno, activar trazas de secretos, cachear la clave ni subirla como artefacto. El nombre de un entorno no garantiza sus protecciones: deben verificarse antes de cargar el material privado.
+
+Firebase, Maps y OAuth deben registrarse por el propietario para el paquete Beta y esta huella cuando corresponda. No se reutilizan credenciales Alpha ni se crean registros externos automáticamente.
+
+## Comprobaciones sin Android
 
 ```bash
-keytool -genkeypair -keystore /ruta/privada/flexygram-release.p12 -storetype PKCS12 -alias flexygram-release -keyalg RSA -keysize 3072 -sigalg SHA256withRSA -validity 10000 -dname "CN=FlexyGram Release Key"
-keytool -list -v -keystore /ruta/privada/flexygram-release.p12 -storetype PKCS12 -alias flexygram-release
+java tools/signing/VerifySigning.java certificate config/signing/flexygram-release.cer 5a598fb5ba42949b67b7c2635106fafd5f23179397e4c098757a73cd2d2ef66c
+python3 tools/signing/check_verifier.py
+python3 tools/identity/check_identity.py
 ```
 
-Con PKCS12 usa la misma contraseña de almacén y clave cuando lo exija el proveedor JDK. El nombre del certificado no sustituye la verificación de su huella. Anota la SHA-256 pública mostrada, la fecha y el alias en el registro de lanzamiento; solo el certificado público y su huella pueden compartirse. No se genera un certificado a nombre de terceros.
+Para verificar el PKCS12, el propietario puede usar el modo interactivo `keystore` o el [asistente local](../tools/signing/README_LOCAL.md). La clave privada no debe enviarse al asistente.
 
-## Configuración privada
-
-| Entrada | Contenido |
-| --- | --- |
-| FLEXYGRAM_RELEASE_KEYSTORE | Ruta absoluta al PKCS12, fuera del checkout |
-| FLEXYGRAM_RELEASE_STORE_PASSWORD | Contraseña del almacén |
-| FLEXYGRAM_RELEASE_KEY_ALIAS | Alias de la clave oficial |
-| FLEXYGRAM_RELEASE_KEY_PASSWORD | Contraseña de la clave |
-| FLEXYGRAM_RELEASE_CERT_SHA256 | Huella pública SHA-256 fijada por el propietario |
-| FLEXYGRAM_GOOGLE_AUTH_CLIENT_ID | Cliente OAuth Beta, opcional |
-
-Se admiten variables de entorno o `local.properties`; no añadas valores reales a ejemplos ni registros. `LOCAL_PROPERTIES` base64 sigue el mecanismo existente, pero base64 no cifra secretos. Las rutas con barras invertidas en Properties deben escaparse o usar `/`.
-
-El gate previo a `preBetaBuild` exige clave privada accesible, certificado vigente, huella correcta, JSON Firebase del paquete Beta y credenciales Telegram válidas en formato. Rechaza el certificado Alpha conocido y el certificado Android Debug. No demuestra por sí mismo que una clave sea de propiedad legítima: la custodia y la aprobación de la huella corresponden al propietario. La verificación de una APK resultante queda pendiente.
-
-## Preparación de CI futura
-
-No se crean ni modifican secretos de GitHub en esta misión. En una fase posterior autorizada, usar un entorno protegido Beta con las entradas anteriores y un secreto `FLEXYGRAM_RELEASE_KEYSTORE_B64`. El runner deberá decodificarlo en `$RUNNER_TEMP`, fuera del checkout, exportar su ruta, verificar la huella antes de compilar y borrar inputs/archivos privados incluso al fallar. Evitar `set -x`, volcado del entorno, caches con credenciales y subida del PKCS12 como artefacto. Base64 solo transporta el archivo.
-
-Los secretos Alpha no se renombran ni se copian a Beta. No existe un pipeline nuevo de publicación automática. Antes de entregar cualquier APK futura debe existir un verificador Beta revisado que compruebe paquete, versión, firma y payload completo, además del transporte privado autorizado.
-
-## Procedimiento completo y comprobador sin Android
-
-Sigue [SIGNING_OWNER_CUSTODY.md](SIGNING_OWNER_CUSTODY.md) para generar una sola vez en un dispositivo propio, crear dos backups cifrados, probar su restauración y confirmar la custodia. `tools/signing/VerifySigning.java` inspecciona localmente el PKCS12 sin exportar su clave privada, o verifica únicamente un certificado público DER. No genera claves ni procesa APK/AAB.
-
-La política revisada exige alias `flexygram-release`, un único par de claves en PKCS12 real, RSA-3072, certificado autofirmado SHA256withRSA con CN `FlexyGram Release Key`, vigencia y huella fijada. Verifica la correspondencia privada/pública con un desafío en memoria. La clave y su huella siguen pendientes: todavía no existe una identidad Beta confirmada.
-
-Para la futura carga autorizada en GitHub Actions, preparar un entorno `flexygram-beta` con revisión del propietario y acceso restringido a la rama aprobada cuando las capacidades de la cuenta/repositorio lo permitan. Secretos: `FLEXYGRAM_RELEASE_KEYSTORE_B64`, `FLEXYGRAM_RELEASE_STORE_PASSWORD`, `FLEXYGRAM_RELEASE_KEY_PASSWORD`. Variable pública fijada: `FLEXYGRAM_RELEASE_CERT_SHA256`; alias fijo `FLEXYGRAM_RELEASE_KEY_ALIAS=flexygram-release`. En el runner, `FLEXYGRAM_RELEASE_KEYSTORE` será una ruta temporal fuera del checkout. Las claves de Telegram, Firebase y OAuth siguen siendo entradas separadas. Verifica disponibilidad de las protecciones antes de cargar material privado: el nombre del entorno por sí solo no lo protege. No se han creado esos recursos ni cargado secretos en esta tarea.
-
-La alternativa guiada está en [tools/signing/README_LOCAL.md](../tools/signing/README_LOCAL.md). `owner_wizard.py` automatiza la generación local, exportación pública, cifrado y doble restauración; nunca declara completa la custodia sin confirmación del propietario. No hay clave oficial generada por el asistente.
+Pendientes: confirmación de dos backups independientes y su recuperación, acceso al PKCS12 en el entorno futuro autorizado, validación real de Gradle y firma/payload de una futura APK. No se ha compilado, firmado ni publicado una APK/AAB. [Informe de alcance](SIGNING_CUSTODY_REVIEW.md).

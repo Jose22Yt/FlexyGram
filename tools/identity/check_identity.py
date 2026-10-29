@@ -81,7 +81,15 @@ def main():
             require(name == 'TMessagesProj/src/main/java/org/telegram/messenger/SharedConfig.java', 'Functional source modified: ' + name)
             expected = original(name).decode().replace('"'+ALPHA+'".equals(ApplicationLoader.applicationContext.getPackageName())', 'BuildConfig.CONNECTED_ALPHA')
             require(read(name) == expected, 'Unreviewed SharedConfig change')
+    identity = dict(re.findall(r'^(\w+)=(.*)$', read('config/signing/identity.properties'), re.M))
+    official = '5a598fb5ba42949b67b7c2635106fafd5f23179397e4c098757a73cd2d2ef66c'
+    require(identity['applicationId'] == BETA and identity['alias'] == 'flexygram-release', 'Registered identity/package mismatch')
+    require(identity['certificateSha256'] == official, 'Official fingerprint changed')
+    require(hashlib.sha256((ROOT/identity['certificateFile']).read_bytes()).hexdigest() == official, 'Registered public DER mismatch')
+    require(official in read('tools/signing/VerifySigning.java') and official in read('tools/signing/owner_wizard.py'), 'Local verifier/wizard pin mismatch')
+    require("'-genkeypair'" not in read('tools/signing/owner_wizard.py'), 'New key generation must remain disabled')
     signing = read('gradle/flexygram-beta.gradle')
+    require('def expected = pinned' in signing and 'An external fingerprint cannot replace' in signing, 'Environment may not replace official identity')
     for token in ['FLEXYGRAM_RELEASE_CERT_SHA256', 'KeyStore.getInstance(keyFile, storePass)', 'java.security.PrivateKey', 'cert.checkValidity()', 'CN=Android Debug', 'preBetaBuild', 'src/beta/google-services.json', 'keyFile.toPath().startsWith']:
         require(token in signing, 'Missing signing gate: ' + token)
     # Every new source file is text/approved icon data, never a private input or APK.
@@ -113,7 +121,7 @@ def main():
     print(json.dumps({'status': 'PASS_SOURCE_ONLY', 'base': BASE, 'alpha_application_id': ALPHA,
                       'beta_application_id': BETA, 'alpha_assets_preserved': len(assets),
                       'manifest_sha256': hashlib.sha256(original('TMessagesProj/src/main/AndroidManifest.xml')).hexdigest(),
-                      'historical_full_suite': 'NOT_RUN_BY_THIS_CHECK', 'beta_key': 'NOT_CREATED', 'gradle_and_apk': 'NOT_RUN', 'android_runtime': 'NOT_TESTED'}, indent=2))
+                      'historical_full_suite': 'NOT_RUN_BY_THIS_CHECK', 'beta_key': 'OWNER_REPORTED_CREATED_PRIVATE_NOT_RECEIVED', 'certificate_sha256': official, 'independent_backups': 'OWNER_CONFIRMATION_PENDING', 'gradle_and_apk': 'NOT_RUN', 'android_runtime': 'NOT_TESTED'}, indent=2))
 
 
 if __name__ == '__main__':

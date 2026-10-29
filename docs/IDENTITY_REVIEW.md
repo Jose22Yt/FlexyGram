@@ -31,3 +31,5 @@ Tras recuperar el submódulo multimedia fijado, la suite general `pytest tests/`
 La misión adicional de custodia se documenta en [SIGNING_CUSTODY_REVIEW.md](SIGNING_CUSTODY_REVIEW.md). Se preparan generación y recuperación locales; no se genera ni entrega una clave definitiva en el entorno temporal.
 
 La alternativa local automatizada de custodia y sus límites están en tools/signing/README_LOCAL.md; no se ha generado la clave definitiva en esta sesión.
+
+Actualización de registro público: el propietario confirmó generación y acceso a su clave. Se registraron certificado DER y SHA-256 oficial en config/signing; la validación Java y OpenSSL pasó. Gradle y las herramientas locales fijan esta identidad y no permiten sustitución por otra huella externa. El asistente local ya no genera claves. No se recibió PKCS12; el JSON adjunto solo verifica el certificado público. Backups independientes pendientes de confirmación. Ver SIGNING_CUSTODY_REVIEW.md para el estado vigente, que sustituye los estados de generación pendiente de las etapas anteriores.

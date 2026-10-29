@@ -1,6 +1,6 @@
-# Firma definitiva en tu dispositivo
+# Custodia de la firma oficial en tu dispositivo
 
-Este paquete contiene solo herramientas y texto. **No contiene una clave, una contraseña ni una APK.** El asistente no ha generado la identidad definitiva. El original se generará en tu dispositivo cuando tú ejecutes el asistente, nunca al descargar o abrir este texto.
+Este paquete contiene herramientas, guía y el certificado público oficial. **No contiene una clave privada, una contraseña ni una APK.** La identidad oficial ya fue generada por el propietario y su certificado público está registrado. Esta versión NO genera claves: verifica y respalda únicamente el PKCS12 oficial existente.
 
 ## Inicio en Android con Termux
 
@@ -30,13 +30,15 @@ Si trabajas desde el repositorio, ejecuta `python3 tools/signing/owner_wizard.py
 ## Qué te pedirá
 
 - Dos rutas de archivos `.age` en carpetas accesibles distintas para los backups A y B. Ejemplo: una unidad externa y otro soporte independiente. Las carpetas deben existir; el nombre completo termina en `.age`.
-- Una contraseña PKCS12 aleatoria de **32 caracteres o más**, creada y conservada en tu gestor. Se pide sin mostrarla y sin ponerla en argumentos.
-- Escribir `GENERAR` solo si todavía no existe el original.
+- La contraseña actual de tu PKCS12 oficial, de **32 caracteres o más**, conservada en tu gestor; no inventes una contraseña nueva para abrir el almacén existente. Se pide sin mostrarla y sin ponerla en argumentos.
+- Tener el PKCS12 oficial existente en `~/FlexyGramSigning/flexygram-release.p12`. Si falta, recupera el original; no se genera otro.
 - Contraseñas fuertes para los backups cuando age las solicite, diferentes de la del PKCS12. Guárdalas en el gestor con recuperación independiente del teléfono. No dejes sin registrar ninguna frase generada por age.
 - Descifrar A y B para comprobar recuperación. Se compara cada archivo recuperado con el original y se prueba la posesión de la misma clave privada. Las copias temporales se mantienen en la carpeta privada y se retiran después; borrar un archivo no garantiza borrado físico en flash.
 - Escribir `CONFIRMO` únicamente cuando los dos backups estén en soportes independientes y puedas recuperar sus contraseñas sin depender solo del teléfono original.
 
 El programa no puede demostrar físicamente dónde están tus soportes: esa confirmación es tuya. Dos carpetas de un teléfono no cumplen la condición. Si necesitas trasladar los `.age` con el gestor de archivos a una nube privada u otro soporte, **no confirmes todavía**. Mueve solo los archivos cifrados, comprueba que están allí, recupera cada uno desde su destino a carpetas distintas accesibles y vuelve a ejecutar el asistente indicando los archivos recuperados. Si ya existen, no los sobrescribe: solo comprueba que recuperan exactamente el original. La confirmación final se refiere a las copias conservadas fuera del teléfono, no a los archivos temporales descargados para verificarlas.
+
+Nunca importes una clave diferente para resolver un fallo. El certificado público está incluido para comprobación.
 
 No se requieren claves de Telegram, Firebase ni secretos de GitHub para este proceso. El asistente no hace conexiones de red ni configura Actions. La instalación de herramientas sí usa la red.
 
@@ -61,7 +63,7 @@ Solo estos dos archivos públicos de `~/FlexyGramSigning/`:
 - `flexygram-release.cer`: certificado público DER, sin clave privada.
 - `public-verification.json`: huella y resultado público sin contraseñas ni rutas de backups.
 
-Nunca compartas el `.p12`, los backups `.age`, `custody-state.json` o las contraseñas. Después de tu confirmación y revisión del `.cer`, se podrá registrar la SHA-256 pública exacta en el PR. No está registrada todavía.
+Nunca compartas el `.p12`, los backups `.age`, `custody-state.json` o las contraseñas. La SHA-256 registrada es `5a598fb5ba42949b67b7c2635106fafd5f23179397e4c098757a73cd2d2ef66c`. Las dos copias independientes siguen pendientes de confirmación al proyecto.
 
 ## Protecciones y límites
 
@@ -69,6 +71,6 @@ Alias `flexygram-release`, PKCS12, RSA-3072, certificado autofirmado SHA256withR
 
 La contraseña se transmite a keytool y al verificador únicamente en el entorno de su proceso hijo, nunca en argumentos, archivos de configuración ni informes. Esto evita exponerla en el historial normal de órdenes; no protege frente a otro proceso malicioso con acceso a tu usuario, root o memoria. Python/JVM no garantizan eliminar todas las copias de contraseñas en memoria. Usa un dispositivo confiable con cifrado, sin grabación de pantalla/terminal. Una carpeta con permisos privados no sustituye el cifrado del dispositivo.
 
-Pruebas del paquete: `python -m unittest discover -s . -p 'test_owner_wizard.py' -v` (herramientas criptográficas simuladas; no genera claves) y `python check_verifier.py` (compila el verificador Java y rechaza entradas inválidas). La generación real, age y recuperación en tu dispositivo permanecen pendientes hasta que tú las ejecutes.
+Pruebas del paquete: `python -m unittest discover -s . -p 'test_owner_wizard.py' -v` (herramientas criptográficas simuladas; no genera claves) y `python check_verifier.py` (compila el verificador Java y rechaza entradas inválidas). La generación fue confirmada por el propietario. La recuperación real de dos backups sigue pendiente de confirmación; las pruebas simuladas del código no la sustituyen.
 
 Referencias oficiales: JDK keytool https://docs.oracle.com/en/java/javase/21/docs/specs/man/keytool.html; age https://github.com/FiloSottile/age; paquetes Termux https://github.com/termux/termux-packages.

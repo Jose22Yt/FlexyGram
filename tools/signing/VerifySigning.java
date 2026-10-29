@@ -17,6 +17,7 @@ import java.util.Locale;
 import javax.naming.ldap.LdapName;
 
 class VerifySigning {
+    private static final String OFFICIAL_SHA256 = "5a598fb5ba42949b67b7c2635106fafd5f23179397e4c098757a73cd2d2ef66c";
     private static final String ALIAS = "flexygram-release";
     private static final String ALPHA_SHA256 =
         "c8f04cad685ca5757d35b25ea4b0b4613c7399909948d821e6ada61f9fb12b2c";
@@ -52,6 +53,9 @@ class VerifySigning {
         String sha = HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(cert.getEncoded()));
         if (sha.equals(ALPHA_SHA256)) {
             throw new IllegalArgumentException("The Alpha certificate cannot be used for Beta.");
+        }
+        if (!sha.equals(OFFICIAL_SHA256)) {
+            throw new IllegalArgumentException("Certificate is not the registered official FlexyGram Beta identity.");
         }
         if (expected != null && !sha.equals(expected)) {
             throw new IllegalArgumentException("Certificate SHA-256 differs from the pinned fingerprint.");

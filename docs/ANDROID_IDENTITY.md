@@ -7,7 +7,7 @@
 | Nombre | FlexyGram Alpha | FlexyGram |
 | Versión prevista | Alpha 1286 | 1.0.0-beta.1 / 1287 |
 | Namespace de clases y R | org.telegram.messenger | org.telegram.messenger |
-| Firma | Identidad Alpha existente | Nueva clave oficial, pendiente de creación y custodia |
+| Firma | Identidad Alpha existente | Certificado oficial registrado; PKCS12 bajo control del propietario |
 
 `APP_PACKAGE` define la identidad Beta. Android Components fija explícitamente el applicationId Alpha y el Beta por variante. Los overrides de versión solo afectan a Beta. El namespace, JNI, clases, claves internas y formatos de preferencias no se renombran.
 
