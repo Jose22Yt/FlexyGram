@@ -5036,10 +5036,18 @@ public class ChatActivityEnterView extends FrameLayout implements
         }
         int bottom = top + Theme.chat_composeShadowDrawable.getIntrinsicHeight();
 
-        if (withComposeShadowDrawable) {
+        final boolean flexyIslands = allowBlur && canDrawFlexyNativeGlass(canvas);
+        // Do not first paint an opaque full-width native bar behind translucent islands;
+        // otherwise even a real native blur still looks solid on screen.
+        if (withComposeShadowDrawable && !flexyIslands) {
             Theme.chat_composeShadowDrawable.setAlpha((int) (composeShadowAlpha * 0xFF));
             Theme.chat_composeShadowDrawable.setBounds(0, top, getMeasuredWidth(), bottom);
             Theme.chat_composeShadowDrawable.draw(canvas);
+        }
+
+        if (flexyIslands) {
+            drawFlexyNativeGlassIslands(canvas);
+            return;
         }
 
         if (allowBlur) {
