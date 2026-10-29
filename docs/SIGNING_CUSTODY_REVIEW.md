@@ -25,3 +25,13 @@ Comprobaciones locales: el verificador Java compila con el compilador JDK 17 dis
 Pruebas reproducibles sin Android: `python3 tools/signing/check_verifier.py` y `python3 tools/identity/check_identity.py`. La ejecución del comprobador Java sobre un PKCS12 real se hace únicamente por el propietario, con contraseña interactiva. El asistente podrá revisar después exclusivamente el certificado público DER y su SHA-256.
 
 Cierre pendiente: el propietario genera la clave una sola vez, exporta `.cer`, verifica original y las restauraciones A/B, confirma custodia y comparte solo el certificado público. Entonces se contrasta y registra la huella. La incorporación a GitHub Actions requiere autorización posterior y protecciones verificadas. La compilación y verificación de una APK Beta continúan pendientes de autorización expresa.
+
+## Automatización local adicional
+
+Se inspeccionó la disponibilidad de transferencia de archivos autenticados. Eso no acredita que exista un destinatario de cifrado verificado ni una recuperación efectiva bajo control del propietario; no se generó una clave en esta sesión. Se implementa la alternativa local autorizada mediante `tools/signing/owner_wizard.py`, con documentación para Android/Termux y paquete de herramientas pequeño, sin material privado.
+
+El asistente local verifica precondiciones, exige contraseña de gestor de 32 caracteres o más, usa contraseñas solo en el entorno de procesos hijos, conserva el almacén en carpeta privada fuera de Git y rechaza CI/entorno del asistente. Reanuda sin regenerar; si una huella ya fijada pierde su almacén, exige recuperación. Los backups existentes no se sobrescriben. Exige dos descifrados y comparación exacta, prueba de clave privada y confirmación explícita del propietario sobre independencia de soportes y recuperación de contraseñas. El software no puede probar esa independencia física.
+
+Pruebas nuevas: 16 casos de ciclo de vida/recuperación con herramientas simuladas y bytes expresamente ficticios, sin crear pares de claves. El verificador Java pasa 6 rechazos de entradas inválidas/no interactivas. No se acredita un éxito PKCS12 real ni se prueba Android físicamente. El paquete contiene únicamente fuentes, guía, pruebas, licencia y sumas de integridad. Los comandos de generación/cifrado/recuperación se ejecutarán después por el propietario en su dispositivo.
+
+Estado de cierre sin cambios: clave y huella Beta aún no existen aquí; entrega privada y confirmación de backups pendientes. Ninguna APK/AAB ni nuevo pipeline ejecutado; no se cargan secretos.

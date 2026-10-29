@@ -6,6 +6,10 @@ No se ha generado una clave oficial en el entorno temporal. No hay entrega priva
 
 Nunca envíes el PKCS12, contraseñas o backups al chat, a un comentario o a un PR. La única entrada necesaria para revisión externa será el **certificado público DER `.cer`** y su SHA-256, junto con el resultado público del verificador. Un certificado permite comprobar la identidad pública; no acredita por sí solo custodia de la clave o copias de seguridad.
 
+## Alternativa automatizada
+
+Para el flujo guiado, usa [README_LOCAL.md](../tools/signing/README_LOCAL.md) y `python3 tools/signing/owner_wizard.py`. La herramienta genera únicamente en una terminal propia, conserva el original si se interrumpe, cifra dos copias y exige dos restauraciones más confirmación del propietario. Los pasos manuales siguientes siguen disponibles.
+
 ## 1. Preparación local
 
 Usa un dispositivo propio actualizado, almacenamiento cifrado y una sesión sin grabación de pantalla ni registro de terminal. Requisitos: JDK 21 (`java` y `keytool`), `age` oficial y acceso al código del PR #131. Los ejemplos siguientes son para una terminal POSIX (Linux/macOS o Android con una terminal y JDK compatibles). En Windows usa rutas y controles de acceso equivalentes; no ejecutes comandos de otra plataforma sin adaptarlos.
@@ -45,7 +49,7 @@ keytool -exportcert -keystore "$FG_SIGN_DIR/flexygram-release.p12" -storetype PK
 java tools/signing/VerifySigning.java certificate "$FG_SIGN_DIR/flexygram-release.cer"
 ```
 
-El verificador exige un PKCS12 con una única entrada privada `flexygram-release`, RSA de 3072 bits, certificado autofirmado SHA256withRSA, CN exacto, vigencia actual y separación del certificado Alpha conocido. Comprueba la correspondencia de clave privada y certificado mediante un desafío aleatorio en memoria. Eso no firma una APK/AAB ni publica material privado. No usa contraseñas por argumentos ni tuberías; necesita terminal interactiva.
+El verificador exige un PKCS12 con una única entrada privada `flexygram-release`, RSA de 3072 bits, certificado autofirmado SHA256withRSA, CN exacto, vigencia actual y separación del certificado Alpha conocido. Comprueba la correspondencia de clave privada y certificado mediante un desafío aleatorio en memoria. Eso no firma una APK/AAB ni publica material privado. El modo manual no usa contraseñas por argumentos ni tuberías y necesita terminal interactiva. La alternativa automatizada owner_wizard.py transmite la contraseña solo en el entorno de su proceso hijo al modo keystore-env, sin guardarla ni imprimirla.
 
 `keytool -exportcert` sin `-rfc` exporta un certificado DER público, **sin la clave privada**. Ambos informes deben dar la misma SHA-256. Guarda esa huella pública y copia su valor de 64 dígitos hexadecimales en la siguiente variable; no copies una contraseña:
 

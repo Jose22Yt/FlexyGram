@@ -29,3 +29,5 @@ Resultados adicionales: paridad de fuentes `check_source.py` aprobada (11 compon
 Tras recuperar el submódulo multimedia fijado, la suite general `pytest tests/` terminó con **144 aprobadas y 31 omitidas** (corpus externo de plugins/informe R8 no disponibles). No se modifica el puntero del submódulo. El parseo YAML y `git diff --check` también pasan. Esto no convierte la suite histórica de Connected Alpha en completa ni acredita ejecución Android.
 
 La misión adicional de custodia se documenta en [SIGNING_CUSTODY_REVIEW.md](SIGNING_CUSTODY_REVIEW.md). Se preparan generación y recuperación locales; no se genera ni entrega una clave definitiva en el entorno temporal.
+
+La alternativa local automatizada de custodia y sus límites están en tools/signing/README_LOCAL.md; no se ha generado la clave definitiva en esta sesión.

@@ -165,4 +165,5 @@ jobs:
           python-version: '3.11'
       - run: python3 tools/identity/check_identity.py
       - run: python3 tools/signing/check_verifier.py
+      - run: python3 -m unittest discover -s tools/signing -p test_owner_wizard.py -v
       - run: git diff --check HEAD^ HEAD

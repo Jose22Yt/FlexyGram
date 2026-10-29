@@ -59,12 +59,18 @@ class VerifySigning {
         return sha;
     }
 
-    private static X509Certificate inspectKeystore(Path file) throws Exception {
-        Console console = System.console();
-        if (console == null) {
-            throw new IllegalArgumentException("Use an interactive terminal; password piping and command-line passwords are not supported.");
+    private static X509Certificate inspectKeystore(Path file, boolean fromOwnerWizard) throws Exception {
+        char[] password;
+        if (fromOwnerWizard) {
+            String supplied = System.getenv("FLEXYGRAM_LOCAL_STORE_PASSWORD");
+            password = supplied == null ? null : supplied.toCharArray();
+        } else {
+            Console console = System.console();
+            if (console == null) {
+                throw new IllegalArgumentException("Use an interactive terminal; password piping and command-line passwords are not supported.");
+            }
+            password = console.readPassword("PKCS12 password (not displayed): ");
         }
-        char[] password = console.readPassword("PKCS12 password (not displayed): ");
         if (password == null || password.length == 0) {
             throw new IllegalArgumentException("A password is required.");
         }
@@ -103,7 +109,7 @@ class VerifySigning {
 
     public static void main(String[] args) {
         try {
-            if (args.length < 2 || args.length > 3 || !(args[0].equals("keystore") || args[0].equals("certificate"))) {
+            if (args.length < 2 || args.length > 3 || !(args[0].equals("keystore") || args[0].equals("keystore-env") || args[0].equals("certificate"))) {
                 throw new IllegalArgumentException("Usage: java VerifySigning.java keystore|certificate PATH [EXPECTED_SHA256]");
             }
             String expected = args.length == 3 ? expectedFingerprint(args[2]) : null;
@@ -112,8 +118,8 @@ class VerifySigning {
                 throw new IllegalArgumentException("Input must be an existing regular file.");
             }
             X509Certificate cert;
-            if (args[0].equals("keystore")) {
-                cert = inspectKeystore(file);
+            if (args[0].startsWith("keystore")) {
+                cert = inspectKeystore(file, args[0].equals("keystore-env"));
             } else {
                 try (InputStream stream = Files.newInputStream(file)) {
                     cert = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(stream);
@@ -127,7 +133,7 @@ class VerifySigning {
             System.out.println("{\"status\":\"PASS\",\"sha256\":\"" + sha
                 + "\",\"public_key\":\"RSA-3072\",\"signature\":\"SHA256withRSA\",\"not_before\":\""
                 + cert.getNotBefore().toInstant() + "\",\"not_after\":\"" + cert.getNotAfter().toInstant()
-                + "\",\"private_key\":\"" + (args[0].equals("keystore") ? "POSSESSION_VERIFIED" : "NOT_CHECKED")
+                + "\",\"private_key\":\"" + (args[0].startsWith("keystore") ? "POSSESSION_VERIFIED" : "NOT_CHECKED")
                 + "\",\"custody\":\"OWNER_CONFIRMATION_REQUIRED\",\"android_apk\":\"NOT_TESTED\"}");
         } catch (Exception error) {
             // Do not echo provider exceptions: they may contain sensitive local details.

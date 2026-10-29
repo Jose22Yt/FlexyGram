@@ -76,13 +76,19 @@
     "tools/connected_alpha/test_signature1271.py",
     "tools/identity/check_identity.py",
     "tools/identity/review.json",
+    "tools/signing/FlexyGram_Firma_Local.zip",
+    "tools/signing/FlexyGram_Firma_Local.zip.sha256",
+    "tools/signing/README_LOCAL.md",
     "tools/signing/VerifySigning.java",
-    "tools/signing/check_verifier.py"
+    "tools/signing/build_bundle.py",
+    "tools/signing/check_verifier.py",
+    "tools/signing/owner_wizard.py",
+    "tools/signing/test_owner_wizard.py"
   ],
   "reviewed": {
     ".github/ISSUE_TEMPLATE/bug_report.md": "3d1897468e0bce65efc895d07999de4a2c2a3eeada78025189edca01544b90ba",
     ".github/ISSUE_TEMPLATE/feature_request.md": "5f09193c0efa5b546ffa767044e858a30e2753a83882e4bee47d7a552d30f7a6",
-    ".github/workflows/pr.yml": "4e6c4cb7cb4f3fc18f82b77b74e6f7a9896f39df9553a27495542b6b30108c68",
+    ".github/workflows/pr.yml": "e65aaed2815376d24b946e1522c7dbb7e29f3011f9355d0a93f87e10b70f3c38",
     ".gitignore": "a365cf37e68e0ae4ddc1b63db5a395d644608e06b8bf8eb32f93a461fb62c206",
     "CHANGELOG.md": "ae87946a5b8b98bdbc003eecdf542f029214b8849ccb5acf481c5ff88b9e644e",
     "CONTRIBUTING.md": "945755bd94726780703ef7cd78f47c75703d1f32d5a67333302530f2d55b8ec9",
@@ -141,10 +147,10 @@
     "docs/ANDROID_IDENTITY.md": "744df7a32bdae61a0e92362bcfd829db5424188a2f7e3a594828d56c482b1bc2",
     "docs/BUILDING.md": "724f68f559945c0e18f6154212bba0d78eeea8ac534403e945667b92caa57552",
     "docs/FEATURES.md": "2ffa961d965e52df405ae3409d3decad6695bcb251fd5ee4667a3bf2c976f40c",
-    "docs/IDENTITY_REVIEW.md": "a66ecd3c5da72cac757f817a4ea2d268eab6afd2f65a71d8e8258b7ebafdea56",
-    "docs/SIGNING.md": "6910bd38c4f144c1eef58c5647e025b95f9bfc9b2cc7e183ae8ad466b29fe3d3",
-    "docs/SIGNING_CUSTODY_REVIEW.md": "bc61c2da7d82957376fda68466469bf44333b23072a7012b72a3fed6b457a4c5",
-    "docs/SIGNING_OWNER_CUSTODY.md": "97ea8611381437db8a739a9aba623665dae67867417033966c3af989043b34ac",
+    "docs/IDENTITY_REVIEW.md": "53d4387b9de4712cd566aa6865add6c0d3fc5bd9a3680463caa43fa04397a972",
+    "docs/SIGNING.md": "defa151be7120ce449fd3f702cd7f33fc0880280d108e1e2b22b87048aa9ff8e",
+    "docs/SIGNING_CUSTODY_REVIEW.md": "f2a36bd021bcfd8bc638e5667d87a37a79d31e77d0d3f8d05bcb239af85d8037",
+    "docs/SIGNING_OWNER_CUSTODY.md": "10cae4e75c3ffdb4b86d6aaf263b2d820402ca976a85fba6777e1aa7a6abcca2",
     "docs/screenshots/README.md": "7abd6dfa4154e0e5dcbe256f6d80ea7e383b9f0c255c4acaa38be393dbe1aba1",
     "gradle.properties": "9b6a27e8af7293ef2e530559a3e992d18aab5c7fd7916958c2809bd29259f9b1",
     "gradle/flexygram-beta.gradle": "a47eff8d301d21c98d9e5b35388768cac0fb7fdf28ebe4094baa15bdf155cf84",
@@ -154,7 +160,13 @@
     "tools/connected_alpha/interaction1286_contract.py": "1ddac56e06f314cce1bcdf5f5e04c66fb5fed95d81b5d258b5c608d3ed6700ef",
     "tools/connected_alpha/test_signature1271.py": "79ec7358f22bddfc44e518b36950ad75016bac4c7cabf50bcba2b9fb2bf39d97",
     "tools/identity/check_identity.py": "25b4ede0bd0a12fbdf1c96d6879ed0cd045f27f4dbef329b39104554a4c6804c",
-    "tools/signing/VerifySigning.java": "8ab91f93fe0315d8a9f380b05dab7d1cf4b55c6f26fa02fc027ccafc69e14a0b",
-    "tools/signing/check_verifier.py": "cd23dc20eadf731ce7ad924782bbd9f93991543a16532ec70a94531aab9501b0"
+    "tools/signing/FlexyGram_Firma_Local.zip": "6141622231e46ef467a66480440dec79bea7b52de3683634ef159cf769d86318",
+    "tools/signing/FlexyGram_Firma_Local.zip.sha256": "f37aa2f7220d1be089d44cda030419d0f223bc446cfbd43d8c254faa110a25d1",
+    "tools/signing/README_LOCAL.md": "d45fb0efcc18395a7c9ca044e3db23ca63b7ad96a3d3139e52a673ec5162e9c1",
+    "tools/signing/VerifySigning.java": "64feaceaa5e46c2f8c46a708e8ebf7bc31ab195ad6c44f7b6b2c70deae4ba857",
+    "tools/signing/build_bundle.py": "09364f6d0f74df72e1d038b037f2fea8bad738181a7062217136474f411b8fd6",
+    "tools/signing/check_verifier.py": "5197f727b3a406bed779b3adbca65d4403f92892ac30bf6b8dcbf58b250a390b",
+    "tools/signing/owner_wizard.py": "78a4779788eca4bc77c9cc780d9f4e2868efada35941bf0ad75656e8c56bc1ab",
+    "tools/signing/test_owner_wizard.py": "5b77f18dc646e2ca74ff1d885152a689d93e3c3fdd021c25939fa054aa76230d"
   }
 }

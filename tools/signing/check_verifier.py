@@ -4,8 +4,7 @@ from pathlib import Path
 import subprocess
 import tempfile
 
-ROOT = Path(__file__).resolve().parents[2]
-SOURCE = ROOT / 'tools/signing/VerifySigning.java'
+SOURCE = Path(__file__).resolve().with_name('VerifySigning.java')
 
 
 def main():
@@ -15,7 +14,7 @@ def main():
         invalid = work / 'PRIVATE_PATH_DECOY.cer'
         invalid.write_bytes(b'INVALID_CERTIFICATE_PRIVATE_DECOY')
         commands = [[], ['generate', str(invalid)], ['certificate', str(invalid)],
-                    ['certificate', str(invalid), 'PRIVATE_PASSWORD_DECOY'], ['keystore', str(invalid)]]
+                    ['certificate', str(invalid), 'PRIVATE_PASSWORD_DECOY'], ['keystore', str(invalid)], ['keystore-env', str(invalid)]]
         for arguments in commands:
             result = subprocess.run(['java', '-cp', str(work), 'VerifySigning', *arguments],
                                     stdin=subprocess.DEVNULL, capture_output=True, text=True)
@@ -25,7 +24,7 @@ def main():
                 raise AssertionError('Verifier echoed sensitive input')
         if any(work.glob('*.p12')) or any(work.glob('*.keystore')):
             raise AssertionError('Verifier tests must not create signing identities')
-    print('PASS: verifier compiled; 5 rejection/non-disclosure cases passed; no key or Android artifact generated.')
+    print('PASS: verifier compiled; 6 rejection/non-disclosure cases passed; no key or Android artifact generated.')
 
 
 if __name__ == '__main__':
