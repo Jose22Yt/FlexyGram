@@ -29,6 +29,8 @@ def write_stubs(source,root):
  put('org/telegram/ui/ActionBar/ActionBar.java','''package org.telegram.ui.ActionBar;
 import android.content.Context;import android.graphics.Canvas;import android.widget.*;import android.view.*;import app.flexygram.header.*;
 public class ActionBar extends FrameLayout{
+ public boolean drawSignatureNativeGlass(android.graphics.Canvas c,app.flexygram.header.SignatureChatHeader h){return false;}
+
  public final UnreadImageView backButtonImageView;public boolean search,selection;public int backs;private SignatureChatHeader header;
  public static int getCurrentActionBarHeight(){return 56;}public static class UnreadImageView extends ImageView{public UnreadImageView(Context c){super(c);}public void setUnread(int count){}}
  public ActionBar(Context c){super(c);backButtonImageView=new UnreadImageView(c);backButtonImageView.setOnClickListener(v->backs++);addView(backButtonImageView);}

@@ -17,7 +17,7 @@ public final class SelectedBubbleMotion {
 
     public void enter(Runnable invalidate) {
         reset();
-        if (!ValueAnimator.areAnimatorsEnabled()) return;
+        if ((android.os.Build.VERSION.SDK_INT >= 26 && !ValueAnimator.areAnimatorsEnabled())) return;
         this.invalidate = invalidate;
         scale = .962f;
         invalidate.run();
@@ -26,7 +26,7 @@ public final class SelectedBubbleMotion {
 
     public void close() {
         stop();
-        if (invalidate == null || scale == 1f || !ValueAnimator.areAnimatorsEnabled()) {
+        if (invalidate == null || scale == 1f || (android.os.Build.VERSION.SDK_INT >= 26 && !ValueAnimator.areAnimatorsEnabled())) {
             reset();
             return;
         }

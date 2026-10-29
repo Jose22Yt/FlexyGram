@@ -22,6 +22,10 @@ assert "matteStrengthRow" not in settings
 assert "BubbleConfig.backgroundBlur(isOut)" in renderer
 assert "flexyGlassSource.draw(canvas, path, alpha)" in renderer
 assert "flexyFillPaint.setShader(p.getShader())" in renderer
+assert "matteGradientFilter" not in renderer
+assert "SignatureMatteFinish" not in renderer
+assert "BubbleConfig.matteEnabled" not in renderer
+assert "signature_glass_outgoing" in config and "signature_glass_incoming" in config
 assert "bubbles[i].drawCached(canvas, caches[i])" in preview
 assert "bubble.setFlexyGlassSource(cachedWallpaper)" in preview
 

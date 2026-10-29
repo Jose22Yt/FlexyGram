@@ -293,7 +293,7 @@ public final class BubbleActionPanelView extends LinearLayout {
         setScaleY(1f);
         setTranslationY(0f);
         if (!BubbleInteractionSettings.springBounce(getContext())
-                || !ValueAnimator.areAnimatorsEnabled()) return;
+                || (android.os.Build.VERSION.SDK_INT >= 26 && !ValueAnimator.areAnimatorsEnabled())) return;
 
         // First response is immediate; do not wait for pre-draw, layout or a delayed Runnable.
         final float initialScale = .962f;

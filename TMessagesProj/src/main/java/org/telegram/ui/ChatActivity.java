@@ -18816,6 +18816,8 @@ public class ChatActivity extends BaseFragment implements
 
         @Override
         protected void onDetachedFromWindow() {
+            selectedBubbleMotion.reset();
+            selectedBubbleMotionMessage = null;
             if (signatureWallpaperBlur != null) { signatureWallpaperBlur.close(); signatureWallpaperBlur = null; }
             super.onDetachedFromWindow();
             adjustPanLayoutHelper.onDetach();

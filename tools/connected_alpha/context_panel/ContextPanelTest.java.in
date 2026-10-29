@@ -66,6 +66,22 @@ public class ContextPanelTest {
   assertEquals(1f,panel.getScaleY(),0.000001f);
   assertEquals(0f,panel.getTranslationY(),0.000001f);
  }
+ @Test public void selectedOverlayCancelsAndReleasesItsInvalidator() {
+  final int[] draws={0}; SelectedBubbleMotion motion=new SelectedBubbleMotion();
+  motion.enter(()->draws[0]++);
+  assertTrue(motion.scale()>=.962f && motion.scale()<=1.006f);
+  motion.reset(); assertFalse(motion.isRunning()); assertEquals(1f,motion.scale(),0f);
+  int stopped=draws[0]; org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(java.time.Duration.ofSeconds(1));
+  assertEquals(stopped,draws[0]);
+  motion.enter(()->draws[0]++);motion.close();motion.reset();
+  assertEquals(1f,motion.scale(),0f);assertFalse(motion.isRunning());
+ }
+ @Test public void selectedOverlayInterruptionKeepsOnlyTheLatestMenuCallback() {
+  int[] first={0},second={0}; SelectedBubbleMotion motion=new SelectedBubbleMotion();
+  motion.enter(()->first[0]++); motion.enter(()->second[0]++); int before=first[0];
+  org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(java.time.Duration.ofSeconds(1));
+  assertEquals(before,first[0]);assertTrue(second[0]>0);assertEquals(1f,motion.scale(),0f);assertFalse(motion.isRunning());
+ }
  @Test public void localBounceAndStickerOptionsPersist() {
   var context=activity.getApplicationContext();
   BubbleInteractionSettings.setSpringBounce(context,false);
