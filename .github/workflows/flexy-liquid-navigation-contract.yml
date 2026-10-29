@@ -1,0 +1,29 @@
+name: Flexy Liquid Navigation source and math contracts
+on:
+  pull_request:
+    paths:
+      - 'TMessagesProj/src/main/java/app/flexygram/navigation/LiquidNavigation*.java'
+      - 'TMessagesProj/src/main/java/org/telegram/ui/MainTabsLayout.java'
+      - 'TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraAppearanceActivity.java'
+      - 'TMessagesProj/src/main/res/values*/flexy_liquid_navigation.xml'
+      - 'tools/connected_alpha/liquid_navigation/**'
+      - '.github/workflows/flexy-liquid-navigation-contract.yml'
+  workflow_dispatch:
+jobs:
+  source-and-math:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Verify Android integration source contracts
+        run: python3 tools/connected_alpha/liquid_navigation/check_navigation_source.py
+      - name: Run allocation-free liquid indicator bounds tests
+        run: |
+          mkdir -p /tmp/flexy-liquid-contract
+          javac -encoding UTF-8 -d /tmp/flexy-liquid-contract \
+            TMessagesProj/src/main/java/app/flexygram/navigation/LiquidNavigationMath.java \
+            tools/connected_alpha/liquid_navigation/LiquidNavigationMathTest.java
+          java -cp /tmp/flexy-liquid-contract LiquidNavigationMathTest

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyLiquidNavTitle">Flexy Liquid Navigation</string>
+    <string name="FlexyLiquidNavEnabled">Indicador líquido deslizante</string>
+    <string name="FlexyLiquidNavElasticity">Elasticidad del indicador</string>
+    <string name="FlexyLiquidNavOpacity">Transparencia del indicador</string>
+    <string name="FlexyLiquidNavContacts">Mostrar Contactos</string>
+    <string name="FlexyLiquidNavProfile">Mostrar Perfil</string>
+    <string name="FlexyLiquidNavCalls">Mostrar Llamadas en lugar de Ajustes</string>
+    <string name="FlexyLiquidNavFeed">Mostrar Feed en lugar de Contactos</string>
+    <string name="FlexyLiquidNavTabs">Pestañas de navegación disponibles</string>
+    <string name="FlexyLiquidNavPreview">Vista previa: arrastra el indicador</string>
+    <string name="FlexyLiquidNavChatsFixed">Chats permanece visible para conservar la navegación</string>
+    <string name="FlexyLiquidNavReloadHint">Algunos cambios de pestañas se aplican al regresar a la pantalla principal</string>
+</resources>
