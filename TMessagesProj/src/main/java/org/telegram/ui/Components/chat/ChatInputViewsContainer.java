@@ -139,12 +139,17 @@ public class ChatInputViewsContainer extends FrameLayout {
     }
 
     public void updateNativeLiquidGlassPolicy(boolean allowed) {
-        if (Build.VERSION.SDK_INT >= 33
-                && blurredBackgroundDrawable instanceof org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawableRenderNode) {
-            ((org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawableRenderNode)blurredBackgroundDrawable).setLiquidGlassEffectAllowed(allowed);
-        }
-        if (blurredBackgroundDrawable!=null) blurredBackgroundDrawable.updateColors();
+        updateNativeLiquidGlassDrawable(blurredBackgroundDrawable, allowed);
+        updateNativeLiquidGlassDrawable(underKeyboardBackgroundDrawable, allowed);
         invalidate();
+    }
+
+    private static void updateNativeLiquidGlassDrawable(BlurredBackgroundDrawable drawable, boolean allowed) {
+        if (Build.VERSION.SDK_INT >= 33
+                && drawable instanceof org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawableRenderNode) {
+            ((org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawableRenderNode)drawable).setLiquidGlassEffectAllowed(allowed);
+        }
+        if (drawable!=null) drawable.updateColors();
     }
 
     public void setUnderKeyboardBackgroundDrawable(BlurredBackgroundDrawable drawable) {

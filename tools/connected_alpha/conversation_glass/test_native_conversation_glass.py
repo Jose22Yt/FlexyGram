@@ -68,3 +68,5 @@ assert ".setRadius(" not in header[start:end], "Do not rebuild native radius/str
 assert "if(signatureGlassRadius==radius)return" in header
 assert "int padding=signature ? 0 : dp(6)" in header
 assert "configureSignatureGlassGeometry(signature)" in header
+
+assert "updateNativeLiquidGlassDrawable(underKeyboardBackgroundDrawable, allowed)" in parent
