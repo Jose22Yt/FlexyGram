@@ -371,9 +371,10 @@ public class MainTabsLayout extends AnimatedLinearLayout {
     }
 
     private final Runnable restoreDrawSelector = () -> setSkipDrawSelector(flexyLiquidEnabled());
-    private final Runnable finishNativeTap = () -> {
+    private final Runnable finishNativeTap = this::finishPostedNativeTap;
+    private void finishPostedNativeTap() {
         if (isAttachedToWindow() && flexyPressed && !flexyDragging) flexyFinishDrag(false);
-    };
+    }
     private boolean liquidPreview;
     public void setLiquidPreview(boolean preview) { liquidPreview=preview; refreshLiquidAppearance(); }
     public void refreshLiquidAppearance() { setSkipDrawSelector(flexyLiquidEnabled()); requestLayout(); invalidate(); }

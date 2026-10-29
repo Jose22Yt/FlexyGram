@@ -1025,14 +1025,14 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
     }
 
     public GlassTabView[] tabs;
-    private int[] flexyShownDestinations = new int[0];
+    private int[] flexyShownDestinations = new int[0], flexyConfiguredDestinations = new int[0];
     private void applyFlexyTabs() {
         if (tabsView == null || tabs == null || !app.flexygram.navigation.LiquidNavigationConfig.configured()) return;
         int width = tabsViewWrapper != null && tabsViewWrapper.getWidth() > 0
                 ? tabsViewWrapper.getWidth() : AndroidUtilities.displaySize.x;
         int slots = Math.max(2, Math.min(6, (width - dp(56)) / dp(48)));
-        int[] shown = app.flexygram.navigation.LiquidNavigationDestinations.fit(
-                app.flexygram.navigation.LiquidNavigationConfig.order(), slots);
+        flexyConfiguredDestinations = app.flexygram.navigation.LiquidNavigationConfig.order();
+        int[] shown = app.flexygram.navigation.LiquidNavigationDestinations.fit(flexyConfiguredDestinations, slots);
         boolean orderChanged = !java.util.Arrays.equals(shown, flexyShownDestinations);
         for (int id = 0; id < tabs.length; id++) {
             tabsView.setViewVisible(tabs[id], app.flexygram.navigation.LiquidNavigationDestinations.contains(shown,id), false);
@@ -1049,11 +1049,19 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         }
         int oldHeight=tabsView.getLayoutParams()!=null ? tabsView.getLayoutParams().height : -1;
         MainTabsUiHelper.applyTabsLayoutStyle(tabsView,dp(328 + DialogsActivity.MAIN_TABS_MARGIN * 2));
+        if (tabsViewBackground!=null) tabsViewBackground.setRadius(MainTabsUiHelper.getBackgroundRadius());
         if (tabsViewWrapper != null) MainTabsUiHelper.applyTabsBottomInset(tabsView,tabsViewWrapper,navigationBarHeight,insetLeft,insetRight);
         if (tabsView.getLayoutParams()!=null && oldHeight!=tabsView.getLayoutParams().height && fragmentView!=null)
             androidx.core.view.ViewCompat.requestApplyInsets(fragmentView);
         tabsView.refreshLiquidAppearance();
-        selectTab(viewPager.getCurrentPosition(), false);
+        int current=viewPager.getCurrentPosition();boolean represented=false;
+        for (int id : flexyConfiguredDestinations) if (indexToPosition(id)==current) {represented=true;break;}
+        if (!represented && current!=getPositionChats() && !viewPager.isManualScrolling() && !viewPager.isTouch()) {
+            selectTab(getPositionChats(),false);
+            viewPager.scrollToPosition(getPositionChats());
+            return;
+        }
+        selectTab(current, false);
     }
     private void openFlexySettings() {
         Bundle args = new Bundle();
@@ -1102,16 +1110,33 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
 
 
     public void selectTab(int position, boolean animated) {
+        boolean overflowSelected = false;
+        if (app.flexygram.navigation.LiquidNavigationConfig.configured()
+                && app.flexygram.navigation.LiquidNavigationDestinations.contains(flexyShownDestinations,9)) {
+            for (int id : flexyConfiguredDestinations) {
+                if (indexToPosition(id)==position
+                        && !app.flexygram.navigation.LiquidNavigationDestinations.contains(flexyShownDestinations,id)) {
+                    overflowSelected=true;break;
+                }
+            }
+        }
         for (int a = 0; a < tabs.length; a++) {
             GlassTabView tab = tabs[a];
-            tab.setSelected(indexToPosition(a) == position, animated);
+            tab.setSelected(a==9 ? overflowSelected : indexToPosition(a)==position, animated);
         }
     }
 
     public void setGestureSelectedOverride(float animatedPosition, boolean allow) {
         for (int index = 0; index < tabs.length; index++) {
             final int position = indexToPosition(index);
-            final float visibility = position < 0 ? 0f : Math.max(0, 1f - Math.abs(position - animatedPosition));
+            float visibility = position < 0 ? 0f : Math.max(0, 1f - Math.abs(position - animatedPosition));
+            if (index==9 && app.flexygram.navigation.LiquidNavigationConfig.configured()) {
+                for (int id : flexyConfiguredDestinations) {
+                    int nativePosition=indexToPosition(id);
+                    if (nativePosition>=0 && !app.flexygram.navigation.LiquidNavigationDestinations.contains(flexyShownDestinations,id))
+                        visibility=Math.max(visibility,Math.max(0,1f-Math.abs(nativePosition-animatedPosition)));
+                }
+            }
             tabs[index].setGestureSelectedOverride(visibility, allow);
         }
         tabsView.invalidate();

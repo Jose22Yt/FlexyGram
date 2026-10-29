@@ -38,6 +38,13 @@ def write(source,root):
  public NativeTabsVisibilityProbe(MainTabsLayout bar,FrameLayout wrapper){tabsView=bar;tabsViewWrapper=wrapper;}
  public void apply(float value){factor=value;checkUi_tabsPosition();}
  '''+method+'}')
+
+ selection=native[native.index('    public void selectTab('):native.index('    public void setGestureSelectedOverride(')]
+ put('NativeTabSelectionProbe.java','''import org.telegram.ui.Components.glass.GlassTabView;
+ public class NativeTabSelectionProbe{
+ public GlassTabView[] tabs;public int[] flexyShownDestinations,flexyConfiguredDestinations;
+ int indexToPosition(int id){return id==0?0:id==1?1:id==2?2:id==4?3:-1;}
+ '''+selection+'}')
 if __name__=='__main__':
  if '--output-dir' not in sys.argv:sys.argv+=['--output-dir',str(HERE.parents[2]/'build/connected-alpha-liquid-navigation')]
  raise SystemExit(p.main(here=HERE,test_class='LiquidNavigationTest',stubs_writer=write,extra_aars=(('androidx.dynamicanimation','dynamicanimation','1.0.0'),)))

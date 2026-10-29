@@ -69,6 +69,13 @@ public class LiquidNavigationTest {
   assertArrayEquals(new int[]{8,6,0,2,7,3},LiquidNavigationConfig.order());
   assertEquals(87,LiquidNavigationConfig.value(LiquidNavigationConfig.Parameter.SPEED));assertFalse(LiquidNavigationConfig.labels());
  }
+ @Test public void nativeSelectionShowsOverflowWhenTheCurrentPageMovesIntoMore(){
+  NativeTabSelectionProbe host=new NativeTabSelectionProbe();host.tabs=new GlassTabView[10];
+  for(int i=0;i<10;i++)host.tabs[i]=new GlassTabView(activity);
+  host.flexyShownDestinations=new int[]{0,1,9};host.flexyConfiguredDestinations=new int[]{0,1,2,4};
+  host.selectTab(2,false);assertTrue(host.tabs[9].isTabSelected());assertFalse(host.tabs[0].isTabSelected());
+  host.selectTab(0,false);assertFalse(host.tabs[9].isTabSelected());assertTrue(host.tabs[0].isTabSelected());
+ }
  @Test public void nativeLayoutRetainsAccessibleSlotsAndReordersWithoutDetach(){
   for(GlassTabView tab:tabs)assertTrue(tab.getWidth()>=48);
   tabs[0].bringToFront();layout();assertSame(bar,tabs[0].getParent());assertEquals(tabs[0],bar.getChildAt(3));

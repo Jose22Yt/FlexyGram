@@ -193,7 +193,7 @@ public final class BubbleActionPanelView extends LinearLayout {
         LinearLayout line = new LinearLayout(getContext());
         line.setOrientation(HORIZONTAL);
         line.setGravity(Gravity.CENTER_VERTICAL);
-        line.setPadding(dp(getContext(), 12), 0, dp(getContext(), 10), 0);
+        line.setPaddingRelative(dp(getContext(), 12), 0, dp(getContext(), 10), 0);
         if (highlighted) line.setBackground(round(getContext(), secondary, 18));
         ImageView glyph = new ImageView(getContext());
         if (action == Action.BUILD_STICKER)
@@ -209,7 +209,7 @@ public final class BubbleActionPanelView extends LinearLayout {
         title.setTextColor(action == Action.DELETE ? danger : foreground);
         title.setGravity(Gravity.CENTER_VERTICAL);
         LayoutParams textParams = new LayoutParams(0, -1, 1f);
-        textParams.leftMargin = dp(getContext(), 14);
+        textParams.setMarginStart(dp(getContext(), 14));
         line.addView(title, textParams);
         content.addView(line, new LayoutParams(-1, dp(getContext(), 48)));
         line.setContentDescription(name);

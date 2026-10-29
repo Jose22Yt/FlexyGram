@@ -11,8 +11,9 @@ import org.telegram.ui.Components.glass.GlassTabView;
 import org.telegram.ui.MainTabsLayout;
 
 /** The real native bar, views and gesture implementation; preview clicks only change selection. */
-public final class LiquidNavigationPreviewView extends FrameLayout {
+public final class LiquidNavigationPreviewView extends FrameLayout implements Theme.Colorable {
     private final MainTabsLayout bar;
+    private final android.graphics.drawable.GradientDrawable surface=new android.graphics.drawable.GradientDrawable();
     private final GlassTabView[] tabs=new GlassTabView[10];
     private int selected;
     private int[] lastShown=new int[0];
@@ -21,7 +22,7 @@ public final class LiquidNavigationPreviewView extends FrameLayout {
     public LiquidNavigationPreviewView(Context context){
         super(context);setMinimumHeight(AndroidUtilities.dp(120));
         bar=new MainTabsLayout(context,null);bar.setLiquidPreview(true);
-        bar.setBackground(Theme.createRoundRectDrawable(AndroidUtilities.dp(36),Theme.getColor(Theme.key_windowBackgroundWhite)));
+        surface.setColor(Theme.getColor(Theme.key_windowBackgroundWhite));bar.setBackground(surface);
         app.exteraless.appearance.MainTabsUiHelper.applyTabsLayoutStyle(bar,0);
         addView(bar,LayoutHelper.createFrame(-2,80,android.view.Gravity.CENTER));
         for(int id=0;id<tabs.length;id++){
@@ -30,6 +31,11 @@ public final class LiquidNavigationPreviewView extends FrameLayout {
             bar.addView(tabs[id]);bar.addTabToIgnoreClick(tabs[id]);
         }
         settingsChanged();
+    }
+    @Override public void updateColors(){
+        surface.setColor(Theme.getColor(Theme.key_windowBackgroundWhite));
+        for(GlassTabView tab:tabs)if(tab!=null)tab.updateColorsLottie();
+        bar.invalidate();
     }
     private void updateSelection(){for(int i=0;i<tabs.length;i++)tabs[i].setSelected(i==selected,true);bar.invalidate();}
     public void settingsChanged(){
@@ -47,6 +53,7 @@ public final class LiquidNavigationPreviewView extends FrameLayout {
             }
             lastShown=shown;
         }
+        surface.setCornerRadius(AndroidUtilities.dp(LiquidNavigationConfig.heightDp()/2f));
         bar.refreshLiquidAppearance();
         android.view.ViewGroup.LayoutParams lp=bar.getLayoutParams();int height=AndroidUtilities.dp(LiquidNavigationConfig.heightDp()+16);if(lp.height!=height){lp.height=height;bar.setLayoutParams(lp);}
         updateSelection();requestLayout();invalidate();
