@@ -599,12 +599,24 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
     private int smartPreviewPrefixEnd;
     private int smartPreviewClipLeft, smartPreviewClipRight;
     private int smartPreviewModeLastBuilt=-1;
+    private float smartPreviewStartX, smartPreviewEndX;
+    private boolean smartPreviewMetricsReady;
+    /** Layout-relative metrics: built once with the immutable native StaticLayout, not on scroll. */
+    private void prepareSmartPreviewMetrics() {
+        smartPreviewMetricsReady=false;
+        if(smartPreviewKind==0 || messageLayout==null || messageLayout.getLineCount()==0)return;
+        int end=messageLayout.getLineEnd(0);
+        smartPreviewStartX=messageLayout.getPrimaryHorizontal(Math.min(smartPreviewPrefixEnd,end));
+        smartPreviewEndX=messageLayout.getPrimaryHorizontal(end);
+        smartPreviewMetricsReady=Float.isFinite(smartPreviewStartX)&&Float.isFinite(smartPreviewEndX);
+    }
+
     private final app.flexygram.home.SignatureSmartPreviewPalette smartPreviewPalette =
             new app.flexygram.home.SignatureSmartPreviewPalette();
     private final Paint smartPreviewPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private static final int[] SMART_VOICE_BARS = {5,9,13,6,11,7,4};
     private void drawSmartPreviewBackground(Canvas canvas, float top, float alpha) {
-        if (smartPreviewKind == 0 || messageLayout == null || messageLayout.getLineCount() == 0 || alpha <= 0f) return;
+        if (smartPreviewKind == 0 || !smartPreviewMetricsReady || messageLayout == null || alpha <= 0f) return;
         int mode=app.flexygram.home.SignatureSmartPreviews.mode();
         if(mode==app.flexygram.home.SignatureSmartPreviewPalette.OFF)return;
         int accent=Theme.getColor(Theme.key_actionBarTabLine,resourcesProvider);
@@ -616,9 +628,8 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
         // than assuming the first glyph starts at messageLeft.
         boolean rtl=LocaleController.isRTL;
         boolean voice=smartPreviewKind==app.flexygram.home.SignatureSmartPreviewPalette.VOICE;
-        int start=Math.min(smartPreviewPrefixEnd,messageLayout.getLineEnd(0));
-        float x1=messageLeft+messageLayout.getPrimaryHorizontal(start);
-        float x2=messageLeft+messageLayout.getPrimaryHorizontal(messageLayout.getLineEnd(0));
+        float x1=messageLeft+smartPreviewStartX;
+        float x2=messageLeft+smartPreviewEndX;
         float lineLeft=Math.min(x1,x2), lineRight=Math.max(x1,x2);
         float left=Math.max(smartPreviewClipLeft,lineLeft-dp(rtl&&voice?19:5));
         float right=Math.min(smartPreviewClipRight,lineRight+dp(!rtl&&voice?19:5));
@@ -2804,6 +2815,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
         // A real conversation/topic with a last message can appear in any
         // filter or the archive. Special rows and multi-topic summaries remain native.
         smartPreviewKind=0;
+        smartPreviewMetricsReady=false;
         smartPreviewPrefixEnd=0;
         boolean inlineSender = messageNameString != null && (!(useForceThreeLines || SharedConfig.useThreeLinesLayout)
                 || hasTags() || currentDialogFolderId != 0 && currentDialogFolderDialogsCount > 1);
@@ -3008,6 +3020,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
             messageLayout = null;
             FileLog.e(e);
         }
+        prepareSmartPreviewMetrics();
         animatedEmojiStack = AnimatedEmojiSpan.update(AnimatedEmojiDrawable.CACHE_TYPE_MESSAGES, this, animatedEmojiStack, messageLayout);
 
         double widthpx;

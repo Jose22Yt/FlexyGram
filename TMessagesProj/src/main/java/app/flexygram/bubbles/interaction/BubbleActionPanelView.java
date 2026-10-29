@@ -17,7 +17,7 @@ import org.telegram.ui.ActionBar.Theme;
  * Host must keep the selected MessageObject/peer and invalidate on detach.
  */
 public final class BubbleActionPanelView extends LinearLayout {
-    public enum Action { REPLY, COPY, FORWARD, EDIT, PIN, DELETE, SELECT, BUILD_STICKER, SEND_STICKER, MORE }
+    public enum Action { REPLY, COPY, FORWARD, EDIT, PIN, DELETE, SELECT, BUILD_STICKER, SEND_STICKER, SAVE_STICKER, MORE }
     public interface Listener { void onAction(Action action); }
 
     private static final int TAB_ACTIONS = 0, TAB_STICKER = 1, TAB_SELECT = 2;
@@ -25,10 +25,21 @@ public final class BubbleActionPanelView extends LinearLayout {
     private final LinearLayout tabs;
     private final ImageView stickerPreview;
     private final TextView sendButton;
+    private final TextView saveButton, stickerStatus;
+    private Runnable onDispose;
+    public void setOnDispose(Runnable callback) { onDispose=callback; }
+    public void setStickerEnabled(boolean enabled) { stickerEnabled=enabled; if (!enabled && tab==TAB_STICKER) tab=TAB_ACTIONS; refresh(); }
+    public void setStickerStatus(String status) { stickerStatus.setText(status); }
+    public void setStickerActions(boolean send, boolean save) { sendButton.setEnabled(send); sendButton.setAlpha(send?1f:.5f); saveButton.setEnabled(save); saveButton.setAlpha(save?1f:.5f); }
     private Listener listener;
     private java.util.EnumSet<Action> allowed=java.util.EnumSet.noneOf(Action.class);
     private boolean stickerEnabled;
     public void setAllowedActions(java.util.EnumSet<Action> actions){allowed=actions.clone();refresh();}
+    public void setConfiguration(java.util.EnumSet<Action> actions,boolean sticker) {
+        allowed=actions.clone();stickerEnabled=sticker;
+        if(!sticker && tab==TAB_STICKER)tab=TAB_ACTIONS;
+        refresh();
+    }
     private String label(int id){return org.telegram.messenger.LocaleController.getString(id);}
     private int tab = TAB_ACTIONS;
     private boolean canSendSticker;
@@ -61,6 +72,11 @@ public final class BubbleActionPanelView extends LinearLayout {
         sendButton.setEnabled(false);
         sendButton.setAlpha(.5f);
         sendButton.setOnClickListener(v -> dispatch(Action.SEND_STICKER));
+        saveButton = button(label(org.telegram.messenger.R.string.FlexyContextSave), false);
+        saveButton.setOnClickListener(v -> dispatch(Action.SAVE_STICKER));
+        stickerStatus = button(label(org.telegram.messenger.R.string.FlexyContextStickerPreparing), false);
+        stickerStatus.setBackground(null);
+        setStickerActions(false,false);
         refresh();
     }
     private GradientDrawable round(Context c, int color, float radius) {
@@ -73,8 +89,7 @@ public final class BubbleActionPanelView extends LinearLayout {
     public void setStickerPreview(Bitmap preview) {
         stickerPreview.setImageBitmap(preview);
         canSendSticker = preview != null;
-        sendButton.setEnabled(canSendSticker);
-        sendButton.setAlpha(canSendSticker ? 1f : .5f);
+        setStickerActions(canSendSticker,canSendSticker);
     }
     public void clearStickerPreview() { setStickerPreview(null); }
     private void dispatch(Action action) {
@@ -128,6 +143,8 @@ public final class BubbleActionPanelView extends LinearLayout {
         headerTab(label(org.telegram.messenger.R.string.FlexyContextActions), TAB_ACTIONS);
         if(stickerEnabled) headerTab(label(org.telegram.messenger.R.string.FlexyContextSticker), TAB_STICKER);
         if(allowed.contains(Action.SELECT)) headerTab(label(org.telegram.messenger.R.string.FlexyContextSelect), TAB_SELECT);
+        if (sendButton.getParent() instanceof android.view.ViewGroup) ((android.view.ViewGroup)sendButton.getParent()).removeView(sendButton);
+        if (saveButton.getParent() instanceof android.view.ViewGroup) ((android.view.ViewGroup)saveButton.getParent()).removeView(saveButton);
         content.removeAllViews();
         if (tab == TAB_ACTIONS) {
             LinearLayout one = new LinearLayout(getContext());
@@ -144,14 +161,17 @@ public final class BubbleActionPanelView extends LinearLayout {
             content.addView(two, row);
             TextView more=button(label(org.telegram.messenger.R.string.FlexyContextMore),false);more.setOnClickListener(v->dispatch(Action.MORE));content.addView(more,new LayoutParams(-1,dp(getContext(),48)));
         } else if (tab == TAB_STICKER) {
-            TextView info = button(label(org.telegram.messenger.R.string.FlexyContextSticker), false);
-            content.addView(info, new LayoutParams(-1, dp(getContext(), 40)));
+            content.addView(stickerStatus, new LayoutParams(-1, -2));
             LayoutParams preview = new LayoutParams(-1, dp(getContext(), 142));
             preview.topMargin = dp(getContext(), 8);
             content.addView(stickerPreview, preview);
-            LayoutParams send = new LayoutParams(-1, dp(getContext(), 45));
+            LayoutParams send = new LayoutParams(-1, dp(getContext(), 48));
             send.topMargin = dp(getContext(), 8);
-            content.addView(sendButton, send);
+            LinearLayout actions = new LinearLayout(getContext());
+            actions.addView(sendButton,new LayoutParams(0,dp(getContext(),48),1));
+            LayoutParams save = new LayoutParams(0,dp(getContext(),48),1);save.leftMargin=dp(getContext(),6);
+            actions.addView(saveButton,save);
+            content.addView(actions, send);
         } else {
             TextView select = button(label(org.telegram.messenger.R.string.FlexyContextSelect), true);
             content.addView(select, new LayoutParams(-1, dp(getContext(), 52)));
@@ -159,6 +179,8 @@ public final class BubbleActionPanelView extends LinearLayout {
         }
     }
     @Override protected void onDetachedFromWindow() {
+        Runnable dispose=onDispose;onDispose=null;
+        if(dispose!=null)dispose.run();
         clearStickerPreview();
         listener = null;
         super.onDetachedFromWindow();

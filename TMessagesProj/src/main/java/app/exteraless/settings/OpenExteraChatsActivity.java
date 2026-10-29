@@ -446,6 +446,7 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
         signatureThemeRow = addRow("flexyThemeWallpaper");
         smartPreviewsRow = addRow("flexySmartPreviews");
         signatureInteractionHeader = addRow();
+        flexyContextPanelRow = addRow("flexyContextPanel");
         signatureMessagesRow = addRow("flexyMessagesGestures");
         signatureStickersRow = addRow("flexyStickersMedia");
         signatureAdditionalHeader = addRow();
@@ -1890,9 +1891,7 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
             });
             return;
         } else if (position == flexyContextPanelRow) {
-            boolean value=!app.flexygram.bubbles.interaction.BubbleInteractionSettings.signaturePanel(getParentActivity());
-            app.flexygram.bubbles.interaction.BubbleInteractionSettings.setSignaturePanel(getParentActivity(),value);
-            listAdapter.notifyItemChanged(position);return;
+            presentFragment(new app.flexygram.bubbles.interaction.BubbleInteractionSettingsActivity());return;
         } else if (position == signatureMessagesRow) {
             presentFragment(new OpenExteraChatsActivity(SCREEN_SIGNATURE_MESSAGES)); return;
         } else if (position == signatureStickersRow) {
@@ -2500,14 +2499,16 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
         public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, boolean partial) {
             switch (holder.getItemViewType()) {
                 case TYPE_SIGNATURE_ENTRY:
-                    int label = position == flexyBubblesRow ? R.string.FlexyBubblesTitle
+                    int label = position == flexyContextPanelRow ? R.string.FlexyContextInteractions
+                        : position == flexyBubblesRow ? R.string.FlexyBubblesTitle
                         : position == signatureHeaderRow ? R.string.FlexyHeaderTitle
                         : position == composerSettingsRow ? R.string.FlexyConversationBar
                         : position == smartPreviewsRow ? R.string.FlexySmartPreviewsTitle
                         : position == signatureMessagesRow ? R.string.FlexyMessagesGestures
                         : position == signatureThemeRow ? R.string.FlexyThemeWallpaper
                         : position == signatureStickersRow ? R.string.FlexyStickersMedia : R.string.FlexyClassicOptions;
-                    int icon = position == flexyBubblesRow ? R.drawable.msg_discussion
+                    int icon = position == flexyContextPanelRow ? R.drawable.msg_discussion
+                        : position == flexyBubblesRow ? R.drawable.msg_discussion
                         : position == signatureHeaderRow ? R.drawable.msg_info
                         : position == composerSettingsRow ? R.drawable.msg_message
                         : position == signatureThemeRow ? R.drawable.msg_theme
@@ -2894,9 +2895,7 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
         }
 
         private void bindCheck(TextCheckCell cell, int position) {
-            if (position == flexyContextPanelRow) {
-                cell.setTextAndCheck(getString(R.string.FlexyContextPanel),app.flexygram.bubbles.interaction.BubbleInteractionSettings.signaturePanel(getParentActivity()),true);
-            } else if (position == adminShortcutsRow) {
+            if (position == adminShortcutsRow) {
                 cell.setTextAndCheck(getString(R.string.OEChatsAdminShortcuts), isQuickAdminShortcuts(), false);
             } else if (position == disableGreetingRow) {
                 cell.setTextAndCheck(getString(R.string.OEChatsDisableGreetingSticker), NekoConfig.dontSendGreetingSticker.Bool(), false);
@@ -3024,7 +3023,9 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
         }
 
         private void bindText(TextCell cell, int position) {
-            if (position == smartPreviewsRow) {
+            if (position == flexyContextPanelRow) {
+                cell.setTextAndIcon(getString(R.string.FlexyContextInteractions),R.drawable.msg_discussion,true);
+            } else if (position == smartPreviewsRow) {
                 cell.setTextAndIcon(getString(R.string.FlexySmartPreviewsTitle), R.drawable.msg_list, false);
             } else if (position == signatureMessagesRow) {
                 cell.setTextAndIcon(getString(R.string.FlexyMessagesGestures), R.drawable.msg_list, false);
@@ -3162,7 +3163,7 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
             if (position == doubleTapReactionRow) return TYPE_SET_REACTION;
             if (isHeader(position)) return TYPE_HEADER;
             if (isDivider(position)) return TYPE_INFO_PRIVACY;
-            if (position == smartPreviewsRow || position == signatureMessagesRow || position == signatureStickersRow || position == signatureThemeRow || position == flexyBubblesRow || position == signatureHeaderRow || position == composerSettingsRow || position == aiChatRow || position == chatSettingsRow
+            if (position == flexyContextPanelRow || position == smartPreviewsRow || position == signatureMessagesRow || position == signatureStickersRow || position == signatureThemeRow || position == flexyBubblesRow || position == signatureHeaderRow || position == composerSettingsRow || position == aiChatRow || position == chatSettingsRow
                     || position == menusRow || position == mediaRow) {
                 return TYPE_TEXT;
             }

@@ -6,4 +6,15 @@
     <string name="FlexyContextMore">Ещё</string>
     <string name="FlexyContextSendHere">Отправить сюда</string>
     <string name="FlexyContextPanel">Контекстная панель FlexyGram</string>
+    <string name="FlexyContextSave">Сохранить</string>
+    <string name="FlexyContextStickerPreparing">Подготовка стикера…</string>
+    <string name="FlexyContextStickerReady">Готово к отправке</string>
+    <string name="FlexyContextStickerSending">Отправка…</string>
+    <string name="FlexyContextStickerSent">Стикер подтверждён Telegram</string>
+    <string name="FlexyContextStickerFailed">Не удалось подготовить сообщение</string>
+    <string name="FlexyContextStickerUnconfirmed">Telegram не подтвердил стикер. Проверьте исходящее сообщение перед повтором.</string>
+    <string name="FlexyContextStickerSaved">Стикер сохранён</string>
+    <string name="FlexyContextStickerSaveFailed">Не удалось сохранить стикер</string>
+    <string name="FlexyContextInteractions">Взаимодействие с сообщениями</string>
+    <string name="FlexyContextDescription">Нативная панель Matte. В стикеры преобразуются полностью видимые текстовые сообщения без ограничений в совместимых облачных чатах. В остальных случаях доступны нативные меню.</string>
 </resources>
