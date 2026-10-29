@@ -3417,7 +3417,7 @@ public class ChatActivityEnterView extends FrameLayout implements
                     if (flexyCompactLayout) {
                         final int panel = getThemedColor(Theme.key_chat_messagePanelBackground);
                         final boolean dark = ColorUtils.calculateLuminance(panel) < 0.4;
-                        paint.setColor(flexyNativeLiquidGlass() && SharedConfig.chatBlurEnabled()
+                        paint.setColor(flexyNativeGlassIslandsAvailable()
                             ? app.flexygram.composer.ComposerStyle.nativeGlassButton(dark)
                             : app.flexygram.composer.ComposerStyle.surface(dark,
                                 app.flexygram.composer.FlexyComposerConfig.glass()));
@@ -4985,10 +4985,13 @@ public class ChatActivityEnterView extends FrameLayout implements
         return org.telegram.messenger.LiteMode.isEnabled(
                 org.telegram.messenger.LiteMode.FLAG_LIQUID_GLASS);
     }
-    private boolean canDrawFlexyNativeGlass(Canvas canvas) {
-        return flexyNativeLiquidGlass() && canvas.isHardwareAccelerated()
+    private boolean flexyNativeGlassIslandsAvailable() {
+        return flexyNativeLiquidGlass() && isHardwareAccelerated()
                 && SharedConfig.chatBlurEnabled() && sizeNotifierLayout != null
                 && isFlexyCompactPresentation();
+    }
+    private boolean canDrawFlexyNativeGlass(Canvas canvas) {
+        return canvas.isHardwareAccelerated() && flexyNativeGlassIslandsAvailable();
     }
     /** Draw a single *native* cached blur region; no new snapshot/bitmap/render effect. */
     private void drawFlexyNativeGlassIsland(Canvas canvas, RectF shape) {
@@ -17479,8 +17482,7 @@ public class ChatActivityEnterView extends FrameLayout implements
             if (isNewDesignSendButton) {
                 final int sendFill = Theme.getColor(Theme.key_chat_messagePanelSend, resourcesProvider);
                 backgroundPaint.setColor(compactVisualInset >= 0
-                        && org.telegram.messenger.LiteMode.isEnabled(org.telegram.messenger.LiteMode.FLAG_LIQUID_GLASS)
-                        && SharedConfig.chatBlurEnabled()
+                        && flexyNativeGlassIslandsAvailable()
                         ? app.flexygram.composer.ComposerStyle.nativeGlassTint(sendFill) : sendFill);
             } else if (shouldDrawBackground()) {
                 backgroundPaint.setColor(getFillColor());
