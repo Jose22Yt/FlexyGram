@@ -61,7 +61,8 @@
     "tools/connected_alpha/test_alpha1283.py",
     "tools/connected_alpha/test_context_panel.py",
     "tools/connected_alpha/test_interaction1286.py",
-    "tools/connected_alpha/test_liquid_navigation.py"
+    "tools/connected_alpha/test_liquid_navigation.py",
+    "tools/connected_alpha/test_reconstruction1285.py"
   ],
   "reviewed": {
     ".github/workflows/connected-alpha-arm64.yml": "3a8f7ebceb38a36e56ea0449a82e873af20c48bb5da8b7d9e554b7dc7f8602c3",
@@ -123,6 +124,7 @@
     "tools/connected_alpha/test_alpha1283.py": "75f7dcbbfd6f57bf646155e32ddd25a73bb04a0d00ee9604bb2ecd3261126b63",
     "tools/connected_alpha/test_context_panel.py": "c4f3dbe89e63d03929fca0cec677da4a2476cc4f1661fe84acf59dd72d51cf38",
     "tools/connected_alpha/test_interaction1286.py": "1d24196a369ef1920889edbcf17c3c2b1ab64f03ac1ee4fd394fe8ec163d40fa",
-    "tools/connected_alpha/test_liquid_navigation.py": "e6daef8d515065f3453c9454b3d7fb284213a3836184b79e52378dc594adca84"
+    "tools/connected_alpha/test_liquid_navigation.py": "e6daef8d515065f3453c9454b3d7fb284213a3836184b79e52378dc594adca84",
+    "tools/connected_alpha/test_reconstruction1285.py": "1b588f686c5e58f120abfe8b082f26d5198f24766a9198641488a0557c616bd8"
   }
 }

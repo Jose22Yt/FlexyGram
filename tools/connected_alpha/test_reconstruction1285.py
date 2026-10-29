@@ -47,6 +47,7 @@ class Reconstruction1285(unittest.TestCase):
   renderer=self.text(J+'app/flexygram/navigation/LiquidLensRenderer.java')
   for bad in ['SharedPreferences','createBitmap','getColor(','key_glass_tabSelected']:self.assertNotIn(bad,renderer)
   bar=self.text(J+'org/telegram/ui/MainTabsLayout.java')
-  self.assertIn('flexyMoveDrag(ev.getX(pointer))',bar)
+  self.assertIn('float x=ev.getX(pointer)',bar)
+  self.assertIn('flexyMoveDrag(x)',bar)
   self.assertIn('canvas.clipPath(liquidLens.shape()',bar)
 if __name__=='__main__':unittest.main()
