@@ -1,10 +1,10 @@
-name: Signature Matte bubble contracts
+name: Bubble Glass rendering contracts
 on:
   pull_request:
     paths:
       - 'TMessagesProj/src/main/java/app/flexygram/bubbles/**'
       - 'TMessagesProj/src/main/java/org/telegram/ui/ActionBar/MessageDrawable.java'
-      - 'TMessagesProj/src/main/res/values*/flexy_bubble_matte.xml'
+      - 'TMessagesProj/src/main/res/values*/flexy_bubble_glass.xml'
       - 'tools/connected_alpha/matte_bubbles/**'
       - '.github/workflows/signature-matte-bubbles.yml'
   workflow_dispatch:
@@ -17,12 +17,12 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      - name: Java color/alpha regression tests
+      - name: Glass alpha/transition math checks
         run: |
-          mkdir -p /tmp/flexy-matte-contract
-          javac -encoding UTF-8 -d /tmp/flexy-matte-contract \
-            TMessagesProj/src/main/java/app/flexygram/bubbles/SignatureMatteFinish.java \
-            tools/connected_alpha/matte_bubbles/MatteFinishContractTest.java
-          java -cp /tmp/flexy-matte-contract MatteFinishContractTest
+          mkdir -p /tmp/flexy-glass-contract
+          javac -encoding UTF-8 -d /tmp/flexy-glass-contract \
+            TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleGlassPolicy.java \
+            tools/connected_alpha/matte_bubbles/GlassPolicyContractTest.java
+          java -cp /tmp/flexy-glass-contract GlassPolicyContractTest
       - name: Settings/render/preview/source assertions
         run: python3 tools/connected_alpha/matte_bubbles/test_matte_integration.py
