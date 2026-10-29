@@ -74,7 +74,7 @@ class Signature1271(unittest.TestCase):
      icon=ET.parse(ROOT/f'TMessagesProj/src/main/res/mipmap-anydpi-v{version}/ic_flexy_{name}{suffix}.xml').getroot()
      self.assertEqual(icon.tag,'adaptive-icon')
      if version==33:self.assertIsNotNone(icon.find('monochrome'))
-  self.assertEqual('io.github.jose22yt.flexygram.alpha',re.search(r'^APP_PACKAGE=(.+)$',(ROOT/'gradle.properties').read_text(),re.M)[1])
+  self.assertIn("variant.buildType == 'connectedAlpha' ? 'io.github.jose22yt.flexygram.alpha'", (ROOT/'TMessagesProj/build.gradle').read_text())
  def test_new_settings_resource_identifiers_exist(self):
   resources=set()
   for file in (ROOT/'TMessagesProj/src/main/res/values').glob('*.xml'):

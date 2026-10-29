@@ -1,0 +1,105 @@
+// Pre-build checks only; never create or substitute a release identity.
+def betaPrivateValue = { String name ->
+    def values = new Properties()
+    def encoded = System.getenv('LOCAL_PROPERTIES')
+    if (encoded) {
+        values.load(new ByteArrayInputStream(Base64.decoder.decode(encoded)))
+    } else {
+        def local = rootProject.file('local.properties')
+        if (local.exists()) local.withInputStream { values.load(it) }
+    }
+    values.getProperty(name) ?: System.getenv(name)
+}
+def validateBeta = tasks.register('validateFlexyGramBetaConfiguration') {
+    doLast {
+        if (APP_PACKAGE != 'com.flexygram.messenger') {
+            throw new GradleException('Official Beta requires com.flexygram.messenger.')
+        }
+        if ((System.getenv('NATIVE_TARGET') ?: '') != 'arm64-v8a') {
+            throw new GradleException('Beta requires the complete ARM64 native build: NATIVE_TARGET=arm64-v8a.')
+        }
+        def id = betaPrivateValue('TELEGRAM_APP_ID')
+        def hash = betaPrivateValue('TELEGRAM_APP_HASH')
+        if (!(id ==~ /[1-9][0-9]{0,9}/) || id.toLong() > Integer.MAX_VALUE || id in ['4', '6', '2040'] || !(hash ==~ /[a-fA-F0-9]{32}/)) {
+            throw new GradleException('Configure authorized Telegram credentials privately.')
+        }
+        def identity = new Properties()
+        rootProject.file('config/signing/identity.properties').withInputStream { identity.load(it) }
+        if (identity.getProperty('applicationId') != APP_PACKAGE || identity.getProperty('alias') != 'flexygram-release' || identity.getProperty('storeType') != 'PKCS12') {
+            throw new GradleException('Official Beta identity metadata differs from the approved package, alias or store type.')
+        }
+        def pinned = identity.getProperty('certificateSha256')
+        if (!(pinned ==~ /[a-f0-9]{64}/)) throw new GradleException('Missing official Beta certificate pin.')
+        def publicFile = rootProject.file(identity.getProperty('certificateFile'))
+        def registered = publicFile.withInputStream { java.security.cert.CertificateFactory.getInstance('X.509').generateCertificate(it) }
+        def publicHash = java.security.MessageDigest.getInstance('SHA-256').digest(registered.encoded).encodeHex().toString()
+        if (publicHash != pinned) throw new GradleException('Registered Beta public certificate does not match the repository pin.')
+        def suppliedPin = betaPrivateValue('FLEXYGRAM_RELEASE_CERT_SHA256')
+        if (suppliedPin && suppliedPin.replace(':', '').toLowerCase(java.util.Locale.ROOT) != pinned) {
+            throw new GradleException('An external fingerprint cannot replace the registered official Beta identity.')
+        }
+        def names = ['FLEXYGRAM_RELEASE_KEYSTORE', 'FLEXYGRAM_RELEASE_STORE_PASSWORD',
+                     'FLEXYGRAM_RELEASE_KEY_ALIAS', 'FLEXYGRAM_RELEASE_KEY_PASSWORD']
+        names.each { name ->
+            if (!betaPrivateValue(name)) throw new GradleException('Missing Beta signing input: ' + name)
+        }
+        def keyFile = rootProject.file(betaPrivateValue('FLEXYGRAM_RELEASE_KEYSTORE')).canonicalFile
+        // Owner custody is external to this working tree, including CI temporary files.
+        if (!keyFile.isFile() || keyFile.toPath().startsWith(rootProject.projectDir.canonicalFile.toPath())) {
+            throw new GradleException('Beta keystore must exist outside the repository.')
+        }
+        def storePass = betaPrivateValue('FLEXYGRAM_RELEASE_STORE_PASSWORD').toCharArray()
+        def keyPass = betaPrivateValue('FLEXYGRAM_RELEASE_KEY_PASSWORD').toCharArray()
+        try {
+            def store = java.security.KeyStore.getInstance(keyFile, storePass)
+            if (!store.type.equalsIgnoreCase('PKCS12') || store.size() != 1) {
+                throw new GradleException('Beta requires a dedicated PKCS12 store containing exactly one identity.')
+            }
+            def alias = betaPrivateValue('FLEXYGRAM_RELEASE_KEY_ALIAS')
+            if (alias != 'flexygram-release' || !store.isKeyEntry(alias) || !(store.getKey(alias, keyPass) instanceof java.security.PrivateKey)) {
+                throw new GradleException('Beta alias must contain an accessible private signing key.')
+            }
+            def cert = store.getCertificate(alias)
+            cert.checkValidity()
+            if (!(cert.publicKey instanceof java.security.interfaces.RSAPublicKey) || cert.publicKey.modulus.bitLength() != 3072 || !cert.sigAlgName.equalsIgnoreCase('SHA256withRSA')) {
+                throw new GradleException('Beta requires an RSA-3072 certificate using SHA256withRSA.')
+            }
+            def commonNames = new javax.naming.ldap.LdapName(cert.subjectX500Principal.name).rdns.findAll { it.type.equalsIgnoreCase('CN') }
+            if (commonNames.size() != 1 || commonNames[0].value != 'FlexyGram Release Key' || cert.subjectX500Principal != cert.issuerX500Principal) {
+                throw new GradleException('Beta requires the dedicated self-signed FlexyGram Release Key certificate.')
+            }
+            cert.verify(cert.publicKey)
+            def nonce = new byte[32]
+            new java.security.SecureRandom().nextBytes(nonce)
+            def proof = java.security.Signature.getInstance('SHA256withRSA')
+            proof.initSign(store.getKey(alias, keyPass))
+            proof.update(nonce)
+            def signed = proof.sign()
+            proof.initVerify(cert.publicKey)
+            proof.update(nonce)
+            if (!proof.verify(signed)) throw new GradleException('Beta private key does not match its certificate.')
+            java.util.Arrays.fill(nonce, (byte) 0)
+            java.util.Arrays.fill(signed, (byte) 0)
+            def fingerprint = java.security.MessageDigest.getInstance('SHA-256').digest(cert.encoded).encodeHex().toString()
+            def expected = pinned
+            if (!(expected ==~ /[a-f0-9]{64}/) || fingerprint != expected) {
+                throw new GradleException('Beta certificate differs from the owner-pinned SHA-256.')
+            }
+            if (fingerprint == 'c8f04cad685ca5757d35b25ea4b0b4613c7399909948d821e6ada61f9fb12b2c' || cert.subjectX500Principal.name.contains('CN=Android Debug')) {
+                throw new GradleException('Beta requires a new exclusive release certificate, independent of Alpha/debug.')
+            }
+        } finally {
+            java.util.Arrays.fill(storePass, (char) 0)
+            java.util.Arrays.fill(keyPass, (char) 0)
+        }
+        def google = file('src/beta/google-services.json')
+        if (!google.isFile()) throw new GradleException('Supply owner Firebase configuration in src/beta/google-services.json.')
+        def config = new groovy.json.JsonSlurper().parse(google)
+        if (!config.client.any { it.client_info?.android_client_info?.package_name == APP_PACKAGE }) {
+            throw new GradleException('Firebase must register the official Beta package.')
+        }
+    }
+}
+tasks.configureEach { task ->
+    if (task.name == 'preBetaBuild') task.dependsOn(validateBeta)
+}

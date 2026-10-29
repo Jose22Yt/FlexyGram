@@ -58,6 +58,10 @@ keystorePwd = keystorePwd ?: System.getenv('KEYSTORE_PASS')
 alias = alias ?: System.getenv('ALIAS_NAME')
 pwd = pwd ?: System.getenv('ALIAS_PASS')
 
+// Beta credentials are deliberately separate from Alpha and inherited signing inputs.
+def betaValue = { String name -> properties?.getProperty(name) ?: System.getenv(name) }
+def betaKeystorePath = betaValue('FLEXYGRAM_RELEASE_KEYSTORE')
+
 def nativeTarget = System.getenv('NATIVE_TARGET') ?: ''
 
 if (nativeTarget == 'SKIP') {
@@ -231,9 +235,7 @@ android {
         }
     }
 
-    // Ключ подписи в репозиторий не кладётся. Положи свой release.keystore рядом
-    // с этим файлом и пропиши KEYSTORE_PASS / ALIAS_NAME / ALIAS_PASS в
-    // local.properties; без него сборка подписывается отладочным ключом Android.
+    // Legacy configuration remains isolated; release builds never fall back to debug.
     def releaseKeystore = project.file('release.keystore')
     def hasReleaseKeystore = releaseKeystore.exists() && keystorePwd != null && alias != null
 
@@ -249,6 +251,16 @@ android {
     }
 
     signingConfigs {
+        beta {
+            if (betaKeystorePath) storeFile rootProject.file(betaKeystorePath)
+            storeType 'PKCS12'
+            storePassword betaValue('FLEXYGRAM_RELEASE_STORE_PASSWORD')
+            keyAlias betaValue('FLEXYGRAM_RELEASE_KEY_ALIAS')
+            keyPassword betaValue('FLEXYGRAM_RELEASE_KEY_PASSWORD')
+            enableV1Signing true
+            enableV2Signing true
+            enableV3Signing true
+        }
         connectedAlpha {
             // Deliberately never fall back to an inherited release/debug key.
             storeFile rootProject.file('config/connected-alpha-test.keystore')
@@ -266,7 +278,7 @@ android {
             debuggable = true
             jniDebuggable = true
             multiDexEnabled = true
-            signingConfig = hasReleaseKeystore ? signingConfigs.release : signingConfigs.debug
+            signingConfig = signingConfigs.debug
         }
 
         staging {
@@ -277,7 +289,7 @@ android {
             multiDexEnabled = true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             matchingFallbacks = ['release', 'staging', 'debug']
-            signingConfig = hasReleaseKeystore ? signingConfigs.release : signingConfigs.debug
+            signingConfig = signingConfigs.release
         }
 
         release {
@@ -288,7 +300,7 @@ android {
             multiDexEnabled = true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             matchingFallbacks = ['release', 'staging', 'debug']
-            signingConfig = hasReleaseKeystore ? signingConfigs.release : signingConfigs.debug
+            signingConfig = signingConfigs.release
         }
     }
 
@@ -302,21 +314,37 @@ android {
         versionNameSuffix = '-alpha2-signature-ui'
     }
 
+    buildTypes.create('beta') {
+        initWith buildTypes.connectedAlpha
+        versionNameSuffix = ''
+        signingConfig = signingConfigs.beta
+        matchingFallbacks = ['release', 'debug']
+        buildConfigField 'String', 'BUILD_VERSION_STRING', '"' + BETA_VERSION_NAME + '"'
+        buildConfigField 'String', 'ALPHA_GOOGLE_AUTH_CLIENT_ID', '"' + (betaValue('FLEXYGRAM_GOOGLE_AUTH_CLIENT_ID') ?: '') + '"'
+    }
+
     sourceSets.main.jniLibs.srcDirs = ['./jni/']
 
     namespace = 'org.telegram.messenger'
 }
 
 apply from: rootProject.file('gradle/connected-alpha.gradle')
+apply from: rootProject.file('gradle/flexygram-beta.gradle')
 
 androidComponents {
     beforeVariants(selector().all()) { builder ->
-        builder.enable = builder.buildType == 'connectedAlpha'
+        builder.enable = builder.buildType in ['connectedAlpha', 'beta']
     }
     onVariants(selector().all()) { variant ->
+        variant.applicationId.set(variant.buildType == 'connectedAlpha' ? 'io.github.jose22yt.flexygram.alpha' : APP_PACKAGE)
         variant.outputs.forEach { output ->
-            String gramName = 'FlexyGram-Alpha'
-            String first = String.format('%s-v%s(%s)', gramName, verName, verCode)
+            boolean beta = variant.buildType == 'beta'
+            if (beta) {
+                output.versionName.set(BETA_VERSION_NAME)
+                output.versionCode.set(BETA_VERSION_CODE.toInteger())
+            }
+            String gramName = beta ? 'FlexyGram-Beta' : 'FlexyGram-Alpha'
+            String first = String.format('%s-v%s(%s)', gramName, beta ? BETA_VERSION_NAME : verName, beta ? BETA_VERSION_CODE : verCode)
             output.outputFileName.set(
                 output.outputFileName.get()
                     .replace('TMessagesProj', first)
