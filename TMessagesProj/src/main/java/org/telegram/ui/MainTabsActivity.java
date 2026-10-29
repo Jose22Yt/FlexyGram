@@ -1047,6 +1047,11 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
             }
             flexyShownDestinations = shown;
         }
+        int oldHeight=tabsView.getLayoutParams()!=null ? tabsView.getLayoutParams().height : -1;
+        MainTabsUiHelper.applyTabsLayoutStyle(tabsView,dp(328 + DialogsActivity.MAIN_TABS_MARGIN * 2));
+        if (tabsViewWrapper != null) MainTabsUiHelper.applyTabsBottomInset(tabsView,tabsViewWrapper,navigationBarHeight,insetLeft,insetRight);
+        if (tabsView.getLayoutParams()!=null && oldHeight!=tabsView.getLayoutParams().height && fragmentView!=null)
+            androidx.core.view.ViewCompat.requestApplyInsets(fragmentView);
         tabsView.refreshLiquidAppearance();
         selectTab(viewPager.getCurrentPosition(), false);
     }

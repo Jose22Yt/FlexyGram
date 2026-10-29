@@ -17,6 +17,8 @@ class LiquidNavigation(unittest.TestCase):
    self.assertIn(token,source)
   start=source.index('private void applyFlexyTabs()');end=source.index('private void openFlexySettings()',start)
   self.assertNotIn('removeAllViews',source[start:end]);self.assertNotIn('dropFragment',source[start:end])
+  self.assertIn('MainTabsUiHelper.applyTabsBottomInset(',source[start:end])
+  self.assertIn('ViewCompat.requestApplyInsets(fragmentView)',source[start:end])
  def test_fully_visible_bar_is_enabled_at_the_native_terminal_factor(self):
   source=(JAVA/'org/telegram/ui/MainTabsActivity.java').read_text()
   self.assertIn('tabsView.setEnabled(factor >= .999f)',source)

@@ -767,6 +767,11 @@ public class GlassTabView extends FrameLayout implements MainTabsLayout.Tab, Fac
             lp.width = lp.height = size;
             icon.setLayoutParams(lp);
         }
+        if (!compact && lp instanceof android.widget.FrameLayout.LayoutParams) {
+            android.widget.FrameLayout.LayoutParams text = (android.widget.FrameLayout.LayoutParams) textView.getLayoutParams();
+            int top = ((android.widget.FrameLayout.LayoutParams)lp).topMargin + size + dp(1);
+            if (text.topMargin != top) { text.topMargin=top; textView.setLayoutParams(text); }
+        }
     }
 
     public void setMainTabsCompact(boolean compact) {

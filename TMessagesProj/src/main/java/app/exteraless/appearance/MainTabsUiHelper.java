@@ -94,6 +94,7 @@ public final class MainTabsUiHelper {
 
     /** Сдвиг кнопки «написать» над панелью: в M3 всегда 64. */
     public static int getTabsFabOffsetDp() {
+        if (app.flexygram.navigation.LiquidNavigationConfig.configured()) return getTabsViewHeightDp();
         return isMaterial3NavigationBar() ? 64 : MainTabsHelper.getMainTabsHeight() + MainTabsHelper.getMainTabsMargin();
     }
 
@@ -147,7 +148,8 @@ public final class MainTabsUiHelper {
         final int top;
         if (isMaterial3NavigationBar()) {
             bottom = view.getMeasuredHeight();
-            top = bottom - AndroidUtilities.dp(64) - bottomInset;
+            top = bottom - AndroidUtilities.dp(app.flexygram.navigation.LiquidNavigationConfig.configured()
+                    ? getTabsViewHeightDp() : 64) - bottomInset;
         } else {
             bottom = view.getMeasuredHeight() - bottomInset - AndroidUtilities.dp(MainTabsHelper.getMainTabsMargin());
             top = bottom - AndroidUtilities.dp(MainTabsHelper.getMainTabsHeight());
