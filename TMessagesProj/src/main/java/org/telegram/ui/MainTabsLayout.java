@@ -322,12 +322,14 @@ public class MainTabsLayout extends AnimatedLinearLayout {
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         super.onLayout(changed, l, t, r, b);
+        if (changed) cancelLiquidForLayout();
         checkVisualWidth();
     }
 
     @Override
     protected void onItemsChanged() {
         super.onItemsChanged();
+        if (flexyPressed || flexyDragging || flexyTracking) cancelLiquidForLayout();
         checkVisualWidth();
     }
 
@@ -390,7 +392,29 @@ public class MainTabsLayout extends AnimatedLinearLayout {
     }
     private boolean liquidPreview;
     public void setLiquidPreview(boolean preview) { liquidPreview=preview; refreshLiquidAppearance(); }
-    public void refreshLiquidAppearance() { setSkipDrawSelector(flexyLiquidEnabled()); requestLayout(); invalidate(); }
+    public void refreshLiquidAppearance() {
+        cancelLiquidForLayout();setSkipDrawSelector(flexyLiquidEnabled());requestLayout();invalidate();
+    }
+    private void cancelLiquidForLayout() {
+        boolean owned=flexyPressed || flexyDragging || flexyTracking;
+        removeCallbacks(finishNativeTap);
+        flexyPressed=flexyDragging=flexyTracking=false;
+        flexyPointerId=MotionEvent.INVALID_POINTER_ID;
+        flexyStretch=flexyDirection=0;
+        if(selectedTabPositionX!=null)selectedTabPositionX.cancel();
+        if(selectedTabPositionOffsetX!=null)selectedTabPositionOffsetX.cancel();
+        if(flexyDeformation!=null)flexyDeformation.cancel();
+        if(owned){
+            // Cancel the native child click/long press and consume the old sequence through UP.
+            flexyIgnoreUntilUp=true;
+            long now=android.os.SystemClock.uptimeMillis();
+            MotionEvent cancel=MotionEvent.obtain(now,now,MotionEvent.ACTION_CANCEL,0,0,0);
+            try{super.dispatchTouchEvent(cancel);}finally{cancel.recycle();}
+        }
+        View selected=findSelectedTab();
+        if(selected!=null)animatedLongSelectedViewCenterX=selected.getX()+selected.getWidth()*.5f;
+        animatedLongSelectedViewOffsetX=0;
+    }
 
     private boolean drawCustomSelector;
     private void setSkipDrawSelector(boolean skipDrawSelector) {
