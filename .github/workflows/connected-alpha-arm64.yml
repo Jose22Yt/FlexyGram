@@ -249,7 +249,7 @@ jobs:
             echo '::error::Expected exactly one Connected Alpha APK.'
             exit 1
           fi
-          python3 tools/connected_alpha/signature_verifier.py "${packages[0]}" --build-tools "$ANDROID_HOME/build-tools/36.0.0" --certificate-sha256 "$ALPHA_CERTIFICATE_SHA256" --expected-version-code 1283 > connected-alpha-verification.json
+          python3 tools/connected_alpha/signature_verifier.py "${packages[0]}" --build-tools "$ANDROID_HOME/build-tools/36.0.0" --certificate-sha256 "$ALPHA_CERTIFICATE_SHA256" --expected-version-code 1284 > connected-alpha-verification.json
           python3 - <<'PY'
           import json, os
           from pathlib import Path

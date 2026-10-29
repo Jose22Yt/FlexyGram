@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyLiquidNavTitle">Flexy Liquid Navigation</string>
+    <string name="FlexyLiquidNavEnabled">Liquid indicator</string>
+    <string name="FlexyLiquidNavElasticity">Indicator elasticity</string>
+    <string name="FlexyLiquidNavOpacity">Indicator transparency</string>
+    <string name="FlexyLiquidNavContacts">Show Contacts tab</string>
+    <string name="FlexyLiquidNavProfile">Show Profile tab</string>
+    <string name="FlexyLiquidNavCalls">Show Calls instead of Settings</string>
+    <string name="FlexyLiquidNavFeed">Show Feed instead of Contacts</string>
+    <string name="FlexyLiquidNavTabs">Available navigation tabs</string>
+    <string name="FlexyLiquidNavPreview">Preview — drag the indicator</string>
+    <string name="FlexyLiquidNavChatsFixed">Chats stays visible to preserve navigation</string>
+    <string name="FlexyLiquidNavReloadHint">Changes to native tabs may take effect on reopening the home screen</string>
+    <string name="FlexyLiquidNavGroups">Groups</string>
+    <string name="FlexyLiquidNavChannels">Channels</string>
+    <string name="FlexyLiquidNavSaved">Saved Messages</string>
+    <string name="FlexyLiquidNavVisible">Visible tabs</string>
+    <string name="FlexyLiquidNavAvailable">Add a destination</string>
+    <string name="FlexyLiquidNavReorderHint">Hold and drag to reorder. Tap to remove. Chats is required; keep at least two tabs.</string>
+    <string name="FlexyLiquidNavLimit">Up to six destinations can be enabled.</string>
+    <string name="FlexyLiquidNavDeformation">Deformation</string>
+    <string name="FlexyLiquidNavSpeed">Speed</string>
+    <string name="FlexyLiquidNavDamping">Damping</string>
+    <string name="FlexyLiquidNavRebound">Rebound</string>
+    <string name="FlexyLiquidNavFollow">Finger tracking</string>
+    <string name="FlexyLiquidNavSettle">Settling pace</string>
+    <string name="FlexyLiquidNavHeight">Bar height</string>
+    <string name="FlexyLiquidNavCompact">Compactness</string>
+    <string name="FlexyLiquidNavSpacing">Tab spacing</string>
+    <string name="FlexyLiquidNavIcon">Icon size</string>
+    <string name="FlexyLiquidNavWidth">Pill width</string>
+    <string name="FlexyLiquidNavLabels">Show labels</string>
+    <string name="FlexyLiquidNavIndicator">Liquid indicator</string>
+    <string name="FlexyLiquidNavMotion">Motion</string>
+    <string name="FlexyLiquidNavDesign">Layout and size</string>
+</resources>

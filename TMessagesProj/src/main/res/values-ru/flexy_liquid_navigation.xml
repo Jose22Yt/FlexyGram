@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyLiquidNavTitle">Flexy Liquid Navigation</string>
+    <string name="FlexyLiquidNavEnabled">Жидкий индикатор</string>
+    <string name="FlexyLiquidNavElasticity">Упругость индикатора</string>
+    <string name="FlexyLiquidNavOpacity">Прозрачность индикатора</string>
+    <string name="FlexyLiquidNavContacts">Показывать Контакты</string>
+    <string name="FlexyLiquidNavProfile">Показывать Профиль</string>
+    <string name="FlexyLiquidNavCalls">Звонки вместо Настроек</string>
+    <string name="FlexyLiquidNavFeed">Лента вместо Контактов</string>
+    <string name="FlexyLiquidNavTabs">Доступные вкладки</string>
+    <string name="FlexyLiquidNavPreview">Предпросмотр: перетащите индикатор</string>
+    <string name="FlexyLiquidNavChatsFixed">Чаты всегда остаются доступными</string>
+    <string name="FlexyLiquidNavReloadHint">Изменения вкладок применяются после возвращения на главный экран</string>
+    <string name="FlexyLiquidNavGroups">Группы</string>
+    <string name="FlexyLiquidNavChannels">Каналы</string>
+    <string name="FlexyLiquidNavSaved">Избранное</string>
+    <string name="FlexyLiquidNavVisible">Видимые вкладки</string>
+    <string name="FlexyLiquidNavAvailable">Добавить раздел</string>
+    <string name="FlexyLiquidNavReorderHint">Удерживайте и перетащите для изменения порядка. Нажмите для удаления. Чаты обязательны; минимум две вкладки.</string>
+    <string name="FlexyLiquidNavLimit">Можно включить до шести разделов.</string>
+    <string name="FlexyLiquidNavDeformation">Деформация</string>
+    <string name="FlexyLiquidNavSpeed">Скорость</string>
+    <string name="FlexyLiquidNavDamping">Затухание</string>
+    <string name="FlexyLiquidNavRebound">Отскок</string>
+    <string name="FlexyLiquidNavFollow">Следование за пальцем</string>
+    <string name="FlexyLiquidNavSettle">Стабилизация</string>
+    <string name="FlexyLiquidNavHeight">Высота панели</string>
+    <string name="FlexyLiquidNavCompact">Компактность</string>
+    <string name="FlexyLiquidNavSpacing">Расстояние между вкладками</string>
+    <string name="FlexyLiquidNavIcon">Размер значков</string>
+    <string name="FlexyLiquidNavWidth">Ширина панели</string>
+    <string name="FlexyLiquidNavLabels">Показывать подписи</string>
+    <string name="FlexyLiquidNavIndicator">Жидкий индикатор</string>
+    <string name="FlexyLiquidNavMotion">Движение</string>
+    <string name="FlexyLiquidNavDesign">Расположение и размер</string>
+</resources>

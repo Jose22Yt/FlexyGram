@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyBubbleGlassEnabled">Glass on chat bubbles</string>
+    <string name="FlexyBubbleGlassStrength">Glass blend</string>
+    <string name="FlexyBubbleSurface">Bubble surface</string>
+    <string name="FlexyBubbleSurfaceClassic">Classic</string>
+    <string name="FlexyBubbleGlassOutgoing">Apply to outgoing messages</string>
+    <string name="FlexyBubbleGlassIncoming">Apply to incoming messages</string>
+</resources>

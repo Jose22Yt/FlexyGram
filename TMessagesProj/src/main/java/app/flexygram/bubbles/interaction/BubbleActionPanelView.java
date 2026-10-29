@@ -9,6 +9,10 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ValueAnimator;
+import android.view.animation.LinearInterpolator;
 import org.telegram.ui.ActionBar.Theme;
 
 /**
@@ -27,8 +31,9 @@ public final class BubbleActionPanelView extends LinearLayout {
     private final TextView sendButton;
     private final TextView saveButton, stickerStatus;
     private Runnable onDispose;
+    private ValueAnimator bounce;
     public void setOnDispose(Runnable callback) { onDispose=callback; }
-    public void setStickerEnabled(boolean enabled) { stickerEnabled=enabled; if (!enabled && tab==TAB_STICKER) tab=TAB_ACTIONS; refresh(); }
+    public void setStickerEnabled(boolean enabled) { stickerEnabled=enabled && BubbleInteractionSettings.stickerConversion(getContext()); if (!stickerEnabled && tab==TAB_STICKER) tab=TAB_ACTIONS; refresh(); }
     public void setStickerStatus(String status) { stickerStatus.setText(status); }
     public void setStickerActions(boolean send, boolean save) { sendButton.setEnabled(send); sendButton.setAlpha(send?1f:.5f); saveButton.setEnabled(save); saveButton.setAlpha(save?1f:.5f); }
     private Listener listener;
@@ -36,8 +41,8 @@ public final class BubbleActionPanelView extends LinearLayout {
     private boolean stickerEnabled;
     public void setAllowedActions(java.util.EnumSet<Action> actions){allowed=actions.clone();refresh();}
     public void setConfiguration(java.util.EnumSet<Action> actions,boolean sticker) {
-        allowed=actions.clone();stickerEnabled=sticker;
-        if(!sticker && tab==TAB_STICKER)tab=TAB_ACTIONS;
+        allowed=actions.clone();stickerEnabled=sticker && BubbleInteractionSettings.stickerConversion(getContext());
+        if(!stickerEnabled && tab==TAB_STICKER)tab=TAB_ACTIONS;
         refresh();
     }
     private String label(int id){return org.telegram.messenger.LocaleController.getString(id);}
@@ -56,15 +61,16 @@ public final class BubbleActionPanelView extends LinearLayout {
         secondary = Theme.getColor(Theme.key_windowBackgroundGray,provider);
         danger = Theme.getColor(Theme.key_text_RedRegular,provider);
         setOrientation(VERTICAL);
-        setPadding(dp(context, 10), dp(context, 10), dp(context, 10), dp(context, 12));
-        setBackground(round(context, surface, 22));
+        setPadding(dp(context, 9), dp(context, 9), dp(context, 9), dp(context, 10));
+        setBackground(round(context, surface, 24));
         tabs = new LinearLayout(context);
         tabs.setOrientation(HORIZONTAL);
-        addView(tabs, new LayoutParams(-1, dp(context, 48)));
+        addView(tabs, new LayoutParams(-1, 0));
+        tabs.setVisibility(GONE);
         content = new LinearLayout(context);
         content.setOrientation(VERTICAL);
         LayoutParams contentLp = new LayoutParams(-1, -2);
-        contentLp.topMargin = dp(context, 8);
+        contentLp.topMargin = 0;
         addView(content, contentLp);
         stickerPreview = new ImageView(context);
         stickerPreview.setScaleType(ImageView.ScaleType.FIT_CENTER);
@@ -115,70 +121,215 @@ public final class BubbleActionPanelView extends LinearLayout {
         tabs.addView(t, p);
         t.setOnClickListener(v -> { tab = id; refresh(); if (id == TAB_STICKER) dispatch(Action.BUILD_STICKER); });
     }
+
+    /** Vector-painted local glyphs: no additional resource pack, allocations or raster assets. */
+    private static final class CompactGlyph extends android.graphics.drawable.Drawable {
+        private final android.graphics.Paint paint =
+                new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+        private final int color;
+        private final boolean more;
+        CompactGlyph(int color, boolean more) { this.color = color; this.more = more; }
+        @Override public void draw(android.graphics.Canvas canvas) {
+            android.graphics.Rect bounds = getBounds();
+            float size = Math.min(bounds.width(), bounds.height());
+            if (size <= 0) return;
+            int save = canvas.save();
+            canvas.translate(bounds.exactCenterX(), bounds.exactCenterY());
+            paint.setColor(color);
+            paint.setStyle(android.graphics.Paint.Style.FILL);
+            if (more) {
+                for (int i = -1; i <= 1; i++)
+                    canvas.drawCircle(i * size * .24f, 0f, size * .075f, paint);
+            } else {
+                float left = -size * .38f, top = -size * .38f, right = size * .38f;
+                paint.setStyle(android.graphics.Paint.Style.STROKE);
+                paint.setStrokeWidth(size * .075f);
+                paint.setStrokeJoin(android.graphics.Paint.Join.ROUND);
+                canvas.drawRoundRect(left, top, right, right, size * .14f, size * .14f, paint);
+                canvas.drawLine(size * .09f, right, right, size * .09f, paint);
+                canvas.drawCircle(-size * .15f, -size * .10f, size * .018f, paint);
+                canvas.drawCircle(size * .10f, -size * .10f, size * .018f, paint);
+                canvas.drawArc(-size * .16f, -size * .12f, size * .13f, size * .17f,
+                        12f, 140f, false, paint);
+            }
+            canvas.restoreToCount(save);
+        }
+        @Override public void setAlpha(int alpha) { paint.setAlpha(alpha); invalidateSelf(); }
+        @Override public void setColorFilter(android.graphics.ColorFilter filter) {
+            paint.setColorFilter(filter); invalidateSelf();
+        }
+        @Override public int getOpacity() { return android.graphics.PixelFormat.TRANSLUCENT; }
+    }
     private void addTile(LinearLayout row, String title, int icon, Action action) {
-        if (!allowed.contains(action)) return;
+        if (action != Action.MORE && !allowed.contains(action)) return;
         LinearLayout tile = new LinearLayout(getContext());
         tile.setGravity(Gravity.CENTER);
         tile.setOrientation(VERTICAL);
         tile.setBackground(round(getContext(), secondary, 13));
         ImageView glyph = new ImageView(getContext());
-        glyph.setScaleType(ImageView.ScaleType.CENTER);glyph.setImageResource(icon);
+        glyph.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        if (action == Action.MORE) glyph.setImageDrawable(new CompactGlyph(foreground, true));
+        else glyph.setImageResource(icon);
         glyph.setColorFilter(action == Action.DELETE ? danger : foreground);
-        tile.addView(glyph, new LayoutParams(-1, dp(getContext(), 32)));
+        tile.addView(glyph, new LayoutParams(-1, dp(getContext(), 26)));
         TextView label = new TextView(getContext());
         label.setText(title);
-        label.setTextSize(12);
+        label.setTextSize(11);
         label.setTextColor(action == Action.DELETE ? danger : foreground);
         label.setGravity(Gravity.CENTER);
-        tile.addView(label, new LayoutParams(-1, dp(getContext(), 22)));
-        LayoutParams p = new LayoutParams(0, dp(getContext(), 77), 1f);
-        p.leftMargin = dp(getContext(), 3);
-        p.rightMargin = dp(getContext(), 3);
+        tile.addView(label, new LayoutParams(-1, dp(getContext(), 19)));
+        LayoutParams p = new LayoutParams(0, dp(getContext(), 64), 1f);
+        p.leftMargin = dp(getContext(), 2);
+        p.rightMargin = dp(getContext(), 2);
         row.addView(tile, p);
         tile.setContentDescription(title);tile.setFocusable(true);
         tile.setOnClickListener(v -> dispatch(action));
     }
+
+    /** Short context surface; native host remains the sole permission/action authority. */
+    private void actionLine(String name, int icon, Action action, boolean highlighted) {
+        if (action == Action.BUILD_STICKER ? !stickerEnabled || !allowed.contains(action)
+                : !allowed.contains(action)) return;
+        LinearLayout line = new LinearLayout(getContext());
+        line.setOrientation(HORIZONTAL);
+        line.setGravity(Gravity.CENTER_VERTICAL);
+        line.setPaddingRelative(dp(getContext(), 12), 0, dp(getContext(), 10), 0);
+        if (highlighted) line.setBackground(round(getContext(), secondary, 18));
+        ImageView glyph = new ImageView(getContext());
+        if (action == Action.BUILD_STICKER)
+            glyph.setImageDrawable(new CompactGlyph(foreground, false));
+        else glyph.setImageResource(icon);
+        glyph.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        if (action != Action.BUILD_STICKER)
+            glyph.setColorFilter(action == Action.DELETE ? danger : foreground);
+        line.addView(glyph, new LayoutParams(dp(getContext(), 23), dp(getContext(), 23)));
+        TextView title = new TextView(getContext());
+        title.setText(name);
+        title.setTextSize(15);
+        title.setTextColor(action == Action.DELETE ? danger : foreground);
+        title.setGravity(Gravity.CENTER_VERTICAL);
+        LayoutParams textParams = new LayoutParams(0, -1, 1f);
+        textParams.setMarginStart(dp(getContext(), 14));
+        line.addView(title, textParams);
+        content.addView(line, new LayoutParams(-1, dp(getContext(), 48)));
+        line.setContentDescription(name);
+        line.setClickable(true);
+        line.setFocusable(true);
+        line.setOnClickListener(v -> {
+            if (action == Action.BUILD_STICKER) {
+                tab = TAB_STICKER;
+                refresh();
+            }
+            dispatch(action);
+        });
+    }
     private void refresh() {
         tabs.removeAllViews();
-        headerTab(label(org.telegram.messenger.R.string.FlexyContextActions), TAB_ACTIONS);
-        if(stickerEnabled) headerTab(label(org.telegram.messenger.R.string.FlexyContextSticker), TAB_STICKER);
-        if(allowed.contains(Action.SELECT)) headerTab(label(org.telegram.messenger.R.string.FlexyContextSelect), TAB_SELECT);
-        if (sendButton.getParent() instanceof android.view.ViewGroup) ((android.view.ViewGroup)sendButton.getParent()).removeView(sendButton);
-        if (saveButton.getParent() instanceof android.view.ViewGroup) ((android.view.ViewGroup)saveButton.getParent()).removeView(saveButton);
+        tabs.setVisibility(GONE);
+        if (sendButton.getParent() instanceof android.view.ViewGroup)
+            ((android.view.ViewGroup) sendButton.getParent()).removeView(sendButton);
+        if (saveButton.getParent() instanceof android.view.ViewGroup)
+            ((android.view.ViewGroup) saveButton.getParent()).removeView(saveButton);
         content.removeAllViews();
         if (tab == TAB_ACTIONS) {
-            LinearLayout one = new LinearLayout(getContext());
-            addTile(one,label(org.telegram.messenger.R.string.Reply),org.telegram.messenger.R.drawable.msg_reply_small,Action.REPLY);
-            addTile(one,label(org.telegram.messenger.R.string.Copy),org.telegram.messenger.R.drawable.msg_copy,Action.COPY);
-            addTile(one,label(org.telegram.messenger.R.string.Forward),org.telegram.messenger.R.drawable.msg_forward,Action.FORWARD);
-            content.addView(one, new LayoutParams(-1,-2));
-            LinearLayout two = new LinearLayout(getContext());
-            addTile(two,label(org.telegram.messenger.R.string.Edit),org.telegram.messenger.R.drawable.msg_edit,Action.EDIT);
-            addTile(two,label(org.telegram.messenger.R.string.PinToTop),org.telegram.messenger.R.drawable.msg_pin,Action.PIN);
-            addTile(two,label(org.telegram.messenger.R.string.Delete),org.telegram.messenger.R.drawable.msg_delete,Action.DELETE);
-            LayoutParams row = new LayoutParams(-1,-2);
-            row.topMargin = dp(getContext(), 6);
-            content.addView(two, row);
-            TextView more=button(label(org.telegram.messenger.R.string.FlexyContextMore),false);more.setOnClickListener(v->dispatch(Action.MORE));content.addView(more,new LayoutParams(-1,dp(getContext(),48)));
+            LinearLayout quick = new LinearLayout(getContext());
+            quick.setOrientation(HORIZONTAL);
+            addTile(quick, label(org.telegram.messenger.R.string.Reply),
+                    org.telegram.messenger.R.drawable.msg_reply_small, Action.REPLY);
+            addTile(quick, label(org.telegram.messenger.R.string.Copy),
+                    org.telegram.messenger.R.drawable.msg_copy, Action.COPY);
+            addTile(quick, label(org.telegram.messenger.R.string.Forward),
+                    org.telegram.messenger.R.drawable.msg_forward, Action.FORWARD);
+            addTile(quick, label(org.telegram.messenger.R.string.FlexyContextMore),
+                    org.telegram.messenger.R.drawable.msg_forward, Action.MORE);
+            content.addView(quick, new LayoutParams(-1, -2));
+            View separator = new View(getContext());
+            separator.setBackgroundColor(muted);
+            separator.setAlpha(.18f);
+            LayoutParams divider = new LayoutParams(-1, dp(getContext(), 1));
+            divider.topMargin = dp(getContext(), 7);
+            divider.bottomMargin = dp(getContext(), 5);
+            content.addView(separator, divider);
+            actionLine(label(org.telegram.messenger.R.string.PinToTop),
+                    org.telegram.messenger.R.drawable.msg_pin, Action.PIN, false);
+            actionLine(label(org.telegram.messenger.R.string.FlexyContextConvertSticker),
+                    org.telegram.messenger.R.drawable.msg_edit, Action.BUILD_STICKER, true);
+            actionLine(label(org.telegram.messenger.R.string.Delete),
+                    org.telegram.messenger.R.drawable.msg_delete, Action.DELETE, false);
         } else if (tab == TAB_STICKER) {
-            content.addView(stickerStatus, new LayoutParams(-1, -2));
-            LayoutParams preview = new LayoutParams(-1, dp(getContext(), 142));
-            preview.topMargin = dp(getContext(), 8);
+            TextView back = button(label(org.telegram.messenger.R.string.FlexyContextActions), false);
+            back.setOnClickListener(v -> { tab = TAB_ACTIONS; refresh(); });
+            content.addView(back, new LayoutParams(-1, dp(getContext(), 48)));
+            content.addView(stickerStatus, new LayoutParams(-1, dp(getContext(), 32)));
+            LayoutParams preview = new LayoutParams(-1, dp(getContext(), 122));
+            preview.topMargin = dp(getContext(), 4);
             content.addView(stickerPreview, preview);
-            LayoutParams send = new LayoutParams(-1, dp(getContext(), 48));
-            send.topMargin = dp(getContext(), 8);
             LinearLayout actions = new LinearLayout(getContext());
-            actions.addView(sendButton,new LayoutParams(0,dp(getContext(),48),1));
-            LayoutParams save = new LayoutParams(0,dp(getContext(),48),1);save.leftMargin=dp(getContext(),6);
-            actions.addView(saveButton,save);
-            content.addView(actions, send);
+            actions.addView(sendButton, new LayoutParams(0, dp(getContext(), 48), 1f));
+            LayoutParams save = new LayoutParams(0, dp(getContext(), 48), 1f);
+            save.leftMargin = dp(getContext(), 6);
+            actions.addView(saveButton, save);
+            LayoutParams buttons = new LayoutParams(-1, dp(getContext(), 48));
+            buttons.topMargin = dp(getContext(), 7);
+            content.addView(actions, buttons);
         } else {
-            TextView select = button(label(org.telegram.messenger.R.string.FlexyContextSelect), true);
-            content.addView(select, new LayoutParams(-1, dp(getContext(), 52)));
-            select.setOnClickListener(v -> dispatch(Action.SELECT));
+            // Native selection remains available from MORE; never a hidden no-op tile.
+            tab = TAB_ACTIONS;
+            refresh();
         }
     }
+
+
+    private void cancelBounce() {
+        ValueAnimator running = bounce;
+        bounce = null;
+        if (running != null) running.cancel();
+    }
+
+    @Override protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        cancelBounce();
+        setScaleX(1f);
+        setScaleY(1f);
+        setTranslationY(0f);
+        if (!BubbleInteractionSettings.springBounce(getContext())
+                || (android.os.Build.VERSION.SDK_INT >= 26 && !ValueAnimator.areAnimatorsEnabled())) return;
+
+        // First response is immediate; do not wait for pre-draw, layout or a delayed Runnable.
+        final float initialScale = .962f;
+        final float displacement = dp(getContext(), 7);
+        setScaleX(initialScale);
+        setScaleY(initialScale);
+        setTranslationY(displacement);
+
+        final ValueAnimator running = ValueAnimator.ofFloat(0f, 1f);
+        bounce = running;
+        running.setInterpolator(new LinearInterpolator());
+        running.setDuration(DampedSpringCurve.DURATION_MS);
+        running.addUpdateListener(frame -> {
+            if (bounce != running) return;
+            float seconds = frame.getAnimatedFraction() * DampedSpringCurve.DURATION_MS / 1000f;
+            float response = DampedSpringCurve.progress(seconds);
+            float scale = initialScale + (1f - initialScale) * response;
+            setScaleX(scale);
+            setScaleY(scale);
+            setTranslationY(displacement * (1f - response));
+        });
+        running.addListener(new AnimatorListenerAdapter() {
+            @Override public void onAnimationEnd(Animator animation) {
+                if (bounce == running) {
+                    bounce = null;
+                    setScaleX(1f);
+                    setScaleY(1f);
+                    setTranslationY(0f);
+                }
+            }
+        });
+        running.start();
+    }
     @Override protected void onDetachedFromWindow() {
+        cancelBounce();
+        setScaleX(1f); setScaleY(1f); setTranslationY(0f);
         Runnable dispose=onDispose;onDispose=null;
         if(dispose!=null)dispose.run();
         clearStickerPreview();

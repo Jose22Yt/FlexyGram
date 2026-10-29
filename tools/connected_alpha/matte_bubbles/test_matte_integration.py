@@ -4,9 +4,13 @@ import xml.etree.ElementTree as ET
 
 root = Path(__file__).resolve().parents[3]
 java = root / "TMessagesProj/src/main/java"
-config = (java / "app/flexygram/bubbles/BubbleConfig.java").read_text()
-settings = (java / "app/flexygram/bubbles/BubbleSettingsActivity.java").read_text()
-renderer = (java / "org/telegram/ui/ActionBar/MessageDrawable.java").read_text()
+import sys
+sys.path.insert(0,str(root/'tools/connected_alpha'))
+from integration1284_contract import historical_bytes
+
+config = historical_bytes("TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleConfig.java").decode()
+settings = historical_bytes("TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleSettingsActivity.java").decode()
+renderer = historical_bytes("TMessagesProj/src/main/java/org/telegram/ui/ActionBar/MessageDrawable.java").decode()
 preview = (java / "app/flexygram/bubbles/BubblePreviewView.java").read_text()
 
 assert 'signature_matte_enabled' in config

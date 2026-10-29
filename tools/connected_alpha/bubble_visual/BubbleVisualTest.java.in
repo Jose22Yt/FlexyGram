@@ -21,7 +21,7 @@ public class BubbleVisualTest {
   BuildConfig.CONNECTED_ALPHA=true;Theme.dark=false;
   BubbleConfig.load(); SharedConfig.bubbleRadius=20; AndroidUtilities.density=1; ChatsConfig.removeMessageTail.value=false;
  }
- @Test public void mattePreservesGradientGeometryAlphaAndReusesFilter() throws Exception {
+ @Test public void retiredMatteCannotChangeNativeGradientOrAlpha() throws Exception {
   BubbleConfig.setOutlineEnabled(false);BubbleConfig.setTransparency(0);
   Theme.ResourcesProvider gradient=k->k==Theme.key_chat_outBubble?0xff228855:k==Theme.key_chat_outBubbleGradient1?0xff6622aa:0;
   MessageDrawable bubble=new MessageDrawable(MessageDrawable.TYPE_TEXT,true,false,gradient);
@@ -29,13 +29,17 @@ public class BubbleVisualTest {
   MessageDrawable.PathDrawParams cache=new MessageDrawable.PathDrawParams();
   Bitmap nativeImage=Bitmap.createBitmap(180,100,Bitmap.Config.ARGB_8888);
   bubble.drawCached(new Canvas(nativeImage),cache);
+  ApplicationLoader.applicationContext.getSharedPreferences(BubbleConfig.FILE,0).edit()
+   .putBoolean("signature_matte_enabled",true).putInt("signature_matte_strength",100).commit();
+  BubbleConfig.load();assertFalse(BubbleConfig.matteEnabled());
   BubbleConfig.setMatteEnabled(true);BubbleConfig.setMatteStrength(75);
   Bitmap matteImage=Bitmap.createBitmap(180,100,Bitmap.Config.ARGB_8888);
   bubble.drawCached(new Canvas(matteImage),cache);
   for(int y=0;y<100;y++)for(int x=0;x<180;x++)assertEquals(Color.alpha(nativeImage.getPixel(x,y)),Color.alpha(matteImage.getPixel(x,y)));
   assertNotEquals(matteImage.getPixel(80,15),matteImage.getPixel(80,70));
   var field=MessageDrawable.class.getDeclaredField("flexyFillPaint");field.setAccessible(true);
-  Paint fill=(Paint)field.get(bubble);assertNotNull(fill.getShader());Object filter=fill.getColorFilter();assertNotNull(filter);
+  Paint fill=(Paint)field.get(bubble);assertNotNull(fill.getShader());Object filter=fill.getColorFilter();assertNull(filter);
+  assertTrue(nativeImage.sameAs(matteImage));
   bubble.drawCached(new Canvas(matteImage),cache);assertSame(filter,fill.getColorFilter());
   BubbleConfig.setMatteEnabled(false);bubble.drawCached(new Canvas(matteImage),cache);assertNull(fill.getColorFilter());
   nativeImage.recycle();matteImage.recycle();

@@ -66,8 +66,8 @@ class BubbleReleaseTests(unittest.TestCase):
 class CallbackProbe {
 _FIELD_
  interface Delegate {boolean drawFlexyBubbleWallpaper(Object cell,Object canvas,Object path,int alpha);}
- Delegate delegate=(a,b,c,alpha)->alpha>0;boolean drawForBlur;
- public static void main(String[] args){CallbackProbe p=new CallbackProbe();if(!p.flexyBubbleSource.draw(null,null))throw new AssertionError();if(!p.flexyBubbleSource.draw(null,null,128)||p.flexyBubbleSource.draw(null,null,0))throw new AssertionError();p.drawForBlur=true;if(p.flexyBubbleSource.draw(null,null))throw new AssertionError();}
+ Delegate delegate=(a,b,c,alpha)->alpha>0;boolean drawForBlur,drawForSignatureExport;
+ public static void main(String[] args){CallbackProbe p=new CallbackProbe();if(!p.flexyBubbleSource.draw(null,null))throw new AssertionError();if(!p.flexyBubbleSource.draw(null,null,128)||p.flexyBubbleSource.draw(null,null,0))throw new AssertionError();p.drawForSignatureExport=true;if(p.flexyBubbleSource.draw(null,null))throw new AssertionError();p.drawForSignatureExport=false;p.drawForBlur=true;if(p.flexyBubbleSource.draw(null,null))throw new AssertionError();}
 }""".replace('_FIELD_',field)
   import tempfile
   with tempfile.TemporaryDirectory() as temp:

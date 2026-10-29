@@ -284,12 +284,13 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     private final static float EPHEMERAL_HINT_HEIGHT = 25f;
 
     public boolean clipToGroupBounds;
+    public boolean drawForSignatureExport;
     private final MessageDrawable.GlassSource flexyBubbleSource = new MessageDrawable.GlassSource() {
         @Override public boolean draw(Canvas canvas, android.graphics.Path path) {
             return draw(canvas, path, 255);
         }
         @Override public boolean draw(Canvas canvas, android.graphics.Path path, int alpha) {
-            return delegate != null && !drawForBlur && delegate.drawFlexyBubbleWallpaper(ChatMessageCell.this, canvas, path, alpha);
+            return delegate != null && !drawForBlur && !drawForSignatureExport && delegate.drawFlexyBubbleWallpaper(ChatMessageCell.this, canvas, path, alpha);
         }
     };
     private void drawFlexyBubble(Canvas canvas, MessageDrawable drawable, Paint customPaint) {

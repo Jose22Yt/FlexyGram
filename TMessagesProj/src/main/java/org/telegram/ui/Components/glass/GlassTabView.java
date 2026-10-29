@@ -578,6 +578,7 @@ public class GlassTabView extends FrameLayout implements MainTabsLayout.Tab, Fac
 
     @Override
     public float measureTextWidth(float textSizeDp) {
+        if (textView.getVisibility() != VISIBLE) return 0;
         if (scaledTextPaint == null) {
             scaledTextPaint = new TextPaint(defaultTextPaint);
         }
@@ -605,6 +606,10 @@ public class GlassTabView extends FrameLayout implements MainTabsLayout.Tab, Fac
         CHATS(R.raw.tab_chats, R.drawable.tabs_chats_active_24, R.drawable.tabs_chats_24, -1, -1),
         SETTINGS(R.raw.tab_settings, R.drawable.filled_profile_settings, R.drawable.outline_profile_settings, -1, -1),
         FEED(TabAnimationType.STATIC, R.drawable.ic_feed),
+        NAV_GROUPS(TabAnimationType.STATIC, R.drawable.msg_groups),
+        NAV_CHANNELS(TabAnimationType.STATIC, R.drawable.msg_channel),
+        NAV_SAVED(TabAnimationType.STATIC, R.drawable.msg_saved),
+        NAV_MORE(TabAnimationType.STATIC, R.drawable.ic_ab_other),
 
         CHECKLIST(R.raw.tab_checklist, R.raw.tab_checklist_reverse),
         COLORS(R.raw.tab_colors, R.raw.tab_colors_reverse),
@@ -751,6 +756,22 @@ public class GlassTabView extends FrameLayout implements MainTabsLayout.Tab, Fac
 
     public void onPreBind() {
 
+    }
+
+    public void setMainTabsAppearance(boolean compact, int iconDp) {
+        setMainTabsCompact(compact);
+        android.view.View icon = backupImageView != null ? backupImageView : imageView;
+        android.view.ViewGroup.LayoutParams lp = icon.getLayoutParams();
+        int size = dp(Math.max(18, Math.min(28, iconDp)));
+        if (lp.width != size || lp.height != size) {
+            lp.width = lp.height = size;
+            icon.setLayoutParams(lp);
+        }
+        if (!compact && lp instanceof android.widget.FrameLayout.LayoutParams) {
+            android.widget.FrameLayout.LayoutParams text = (android.widget.FrameLayout.LayoutParams) textView.getLayoutParams();
+            int top = ((android.widget.FrameLayout.LayoutParams)lp).topMargin + size + dp(1);
+            if (text.topMargin != top) { text.topMargin=top; textView.setLayoutParams(text); }
+        }
     }
 
     public void setMainTabsCompact(boolean compact) {

@@ -138,6 +138,21 @@ public class ChatInputViewsContainer extends FrameLayout {
         blurredBackgroundDrawable.setRadius(dp(INPUT_BUBBLE_RADIUS));
     }
 
+    public void updateNativeLiquidGlassPolicy(boolean allowed) {
+        updateNativeLiquidGlassDrawable(blurredBackgroundDrawable, allowed);
+        updateNativeLiquidGlassDrawable(underKeyboardBackgroundDrawable, allowed);
+        if (flexyComposer!=null) flexyComposer.invalidateNativeGlassColors();
+        invalidate();
+    }
+
+    private static void updateNativeLiquidGlassDrawable(BlurredBackgroundDrawable drawable, boolean allowed) {
+        if (Build.VERSION.SDK_INT >= 33
+                && drawable instanceof org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawableRenderNode) {
+            ((org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawableRenderNode)drawable).setLiquidGlassEffectAllowed(allowed);
+        }
+        if (drawable!=null) drawable.updateColors();
+    }
+
     public void setUnderKeyboardBackgroundDrawable(BlurredBackgroundDrawable drawable) {
         underKeyboardBackgroundDrawable = drawable;
         underKeyboardBackgroundDrawable.enableInAppKeyboardOptimization();
@@ -316,6 +331,7 @@ public class ChatInputViewsContainer extends FrameLayout {
         );
 
         flexyVoiceDrawn = false;
+        if (flexyComposer != null) flexyComposer.setFlexyNativeGlassBackdropDrawn(false);
         final int blurTop = getMeasuredHeight() - currentBlurredHeight;
 
         tmpRect.set(
@@ -386,6 +402,7 @@ public class ChatInputViewsContainer extends FrameLayout {
 
     private final RectF flexyPill = new RectF();
     private final RectF flexyAttach = new RectF();
+    private final RectF flexySend = new RectF();
     private final RectF flexyVoice = new RectF();
     private final RectF flexyLastVoice = new RectF();
     private boolean flexyLastHasVoice;
@@ -397,6 +414,28 @@ public class ChatInputViewsContainer extends FrameLayout {
     private final Paint flexySurface = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint flexyPearl = new Paint(Paint.ANTI_ALIAS_FLAG);
 
+    /** The existing blur3 factory owns this single backdrop pass for all compact islands. */
+    private void drawFlexyNativeGlassIslands(Canvas canvas, float offsetX, float offsetY,
+            float radius, boolean attach) {
+        final boolean voice = flexyComposer.getFlexyVoiceBounds(flexyVoice);
+        if (voice) flexyVoice.offset(offsetX, offsetY);
+        final boolean send = flexyComposer.getFlexySendBounds(flexySend);
+        if (send) flexySend.offset(offsetX, offsetY);
+        flexyMask.rewind();
+        flexyMask.addRoundRect(flexyPill, radius, radius, Path.Direction.CW);
+        if (attach) flexyMask.addRoundRect(flexyAttach, radius, radius, Path.Direction.CW);
+        if (voice) flexyMask.addRoundRect(flexyVoice, radius, radius, Path.Direction.CW);
+        if (send) flexyMask.addRoundRect(flexySend, radius, radius, Path.Direction.CW);
+        int save = canvas.save();
+        canvas.clipPath(flexyMask);
+        blurredBackgroundDrawable.draw(canvas);
+        canvas.restoreToCount(save);
+        flexyVoiceDrawn = voice;
+        flexyComposer.setFlexyNativeGlassBackdropDrawn(true);
+        // Invalidate the legacy mask cache after a native ON/OFF switch.
+        flexyLastPill.setEmpty();
+    }
+
     private void drawFlexyCompactBackground(Canvas canvas) {
         if (!flexyComposer.getFlexyTextPillBounds(flexyPill)) return;
         final float offsetX = inputIslandBubbleContainer.getX() + flexyComposer.getX();
@@ -405,6 +444,12 @@ public class ChatInputViewsContainer extends FrameLayout {
         final boolean attach = flexyComposer.getFlexyAttachmentBounds(flexyAttach);
         if (attach) flexyAttach.offset(offsetX, offsetY);
         final float radius = (dp(44) - 2 * flexyComposer.getFlexyVisualInset()) / 2f;
+        final boolean nativeGlass = canvas.isHardwareAccelerated()
+                && flexyComposer.flexyNativeGlassIslandsAvailable();
+        if (nativeGlass) {
+            drawFlexyNativeGlassIslands(canvas, offsetX, offsetY, radius, attach);
+            return;
+        }
         if (flexyPearlGlass) {
             final boolean voice = flexyComposer.getFlexyVoiceBounds(flexyVoice);
             if (voice) flexyVoice.offset(offsetX, offsetY);

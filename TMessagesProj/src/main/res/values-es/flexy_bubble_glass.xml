@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyBubbleGlassEnabled">Glass en las burbujas</string>
+    <string name="FlexyBubbleGlassStrength">Mezcla del Glass</string>
+    <string name="FlexyBubbleSurface">Superficie de burbujas</string>
+    <string name="FlexyBubbleSurfaceClassic">Clásico</string>
+    <string name="FlexyBubbleGlassOutgoing">Aplicar a mensajes propios</string>
+    <string name="FlexyBubbleGlassIncoming">Aplicar a mensajes recibidos</string>
+</resources>

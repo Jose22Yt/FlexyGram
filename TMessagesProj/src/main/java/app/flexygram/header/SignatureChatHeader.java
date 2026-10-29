@@ -58,6 +58,7 @@ public final class SignatureChatHeader {
                         width, AndroidUtilities.density, LocaleController.isRTL, avatar.signatureCallAvailable());
             // Keep the approved compact sizes; large fonts/narrow windows use the existing Adaptive path.
             if (g.fits && titleLine + subtitleLine + AndroidUtilities.dp(2) <= g.height - AndroidUtilities.dp(8)) {
+                bar.prepareSignatureNativeGlass(g.mattePortrait && g.callAvailable);
                 fusionLayout = true; height = g.height; subtitleFits = true;
                 int content = Math.max(nativeHeight, Math.round(height) + AndroidUtilities.dp(12));
                 fusionTop = status + (content - height) / 2f;
@@ -103,6 +104,10 @@ public final class SignatureChatHeader {
         } else { bar.backButtonImageView.setPadding(AndroidUtilities.dp(1), 0, 0, 0); }
     }
     public void draw(Canvas canvas) {
+        // Native Liquid Glass is a Telegram power-saving flag, not a new Flexy master switch.
+        // Use the existing ActionBar blur3 sources only when they are ready.
+        // Solid Signature rendering remains bit-for-bit unchanged when the flag is off.
+        if (bar.drawSignatureNativeGlass(canvas, this)) return;
         if (!fusionActive()) { surface.draw(canvas, geometry, AndroidUtilities.density, provider); return; }
         int fill = Theme.getColor(Theme.key_windowBackgroundWhite, provider);
         fill = (fill & 0xffffff) | ((HeaderConfig.portrait() ? 255 : Math.round(HeaderConfig.opacity() * 2.55f)) << 24);

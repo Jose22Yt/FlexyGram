@@ -25,6 +25,9 @@ public final class MainTabsHelper {
     }
 
     public static int getMainTabsHeight() {
+        if (app.flexygram.navigation.LiquidNavigationConfig.configured()) {
+            return app.flexygram.navigation.LiquidNavigationConfig.heightDp();
+        }
         if (isMainTabsHideTitleStyle()) {
             return FILTER_TABS_HEIGHT;
         }

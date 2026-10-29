@@ -1,0 +1,30 @@
+name: Conversation native Liquid Glass contracts
+on:
+  pull_request:
+    paths:
+      - 'TMessagesProj/src/main/java/app/flexygram/header/SignatureChatHeader.java'
+      - 'TMessagesProj/src/main/java/app/flexygram/composer/ComposerStyle.java'
+      - 'TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBar.java'
+      - 'TMessagesProj/src/main/java/org/telegram/ui/Components/ChatActivityEnterView.java'
+      - 'tools/connected_alpha/conversation_glass/**'
+      - '.github/workflows/conversation-native-liquid-glass.yml'
+  workflow_dispatch:
+jobs:
+  scoped-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Native flag / header and composer source contracts
+        run: python3 tools/connected_alpha/conversation_glass/test_native_conversation_glass.py
+      - name: Compile and run pure tint / geometry contracts
+        run: |
+          mkdir -p /tmp/flexy-conversation-glass-contract
+          javac -encoding UTF-8 -d /tmp/flexy-conversation-glass-contract \
+            TMessagesProj/src/main/java/app/flexygram/composer/ComposerGeometry.java \
+            TMessagesProj/src/main/java/app/flexygram/composer/ComposerStyle.java \
+            tools/connected_alpha/conversation_glass/GlassUiPolicyContractTest.java
+          java -cp /tmp/flexy-conversation-glass-contract GlassUiPolicyContractTest

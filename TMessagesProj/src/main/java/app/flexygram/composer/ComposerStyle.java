@@ -11,6 +11,17 @@ public final class ComposerStyle {
     public static int diameter(int level) { return ComposerGeometry.TOUCH_SLOT - 2 * inset(level); }
     // Native 18sp text and 44dp touch targets remain intact at every density.
     public static int surface(boolean dark, boolean glass) { return dark ? (glass ? 0xE8303236 : 0xFF303236) : (glass ? 0xF5FAFAFC : 0xFFFAFAFC); }
+    /**
+     * Visual tint over Telegram's existing blur surface; it does NOT generate or
+     * emulate blur and is only used while native Liquid Glass is active.
+     * High enough alpha for text/button contrast in light and dark themes.
+     */
+    public static int nativeGlassTint(int themedColor) {
+        return (themedColor & 0x00ffffff) | 0x9a000000;
+    }
+    public static int nativeGlassButton(boolean dark) {
+        return dark ? 0xa6383b42 : 0xa6f8f9fc;
+    }
     public static int icon(boolean dark) { return dark ? 0xFFF0F1F4 : 0xFF202329; }
     public static int innerIcon(boolean dark) { return dark ? 0xFFA6A8AE : 0xFF687078; }
     public static int padding(int level) { return 14 - level(level); }

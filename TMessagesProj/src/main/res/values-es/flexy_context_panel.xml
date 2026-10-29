@@ -15,6 +15,9 @@
     <string name="FlexyContextStickerUnconfirmed">Telegram no confirmó este sticker. Revisa el mensaje saliente antes de reintentar.</string>
     <string name="FlexyContextStickerSaved">Sticker guardado</string>
     <string name="FlexyContextStickerSaveFailed">No se pudo guardar el sticker</string>
+    <string name="FlexyContextConvertSticker">Convertir en sticker</string>
+    <string name="FlexyContextBounce">Rebote iOS 27 del menú</string>
+    <string name="FlexyContextStickerEnabled">Convertir burbujas a stickers</string>
     <string name="FlexyContextInteractions">Interacción de mensajes</string>
     <string name="FlexyContextDescription">Usar el panel contextual Matte nativo. La conversión a sticker está disponible para burbujas de texto completamente visibles y sin restricciones en chats compatibles. Los demás casos conservan los menús nativos.</string>
 </resources>

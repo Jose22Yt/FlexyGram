@@ -8,9 +8,9 @@ import org.telegram.messenger.ApplicationLoader;
 public final class BubbleConfig {
     public static final String FILE = "flexygram_bubbles";
     public static final String GLASS = "glass", TRANSPARENCY = "transparency", BORDER = "border", EDGES = "edges";
-    private static boolean loaded, glass, border, edges, cachedBlur;
-    private static int transparency = 35, borderTenths = 11, outlineStyle = 1, pearlIntensity = 55, borderPosition = 5, matteStrength = 50;
-    private static boolean outlineEnabled = true, fuseGlass, matteEnabled;
+    private static boolean loaded, glass, border, edges, cachedBlur, glassOutgoing = true, glassIncoming = true;
+    private static int transparency = 35, borderTenths = 11, outlineStyle = 1, pearlIntensity = 55, borderPosition = 5, glassIntensity = 70;
+    private static boolean outlineEnabled = true, fuseGlass;
     private BubbleConfig() { }
     private static SharedPreferences preferences() {
         return ApplicationLoader.applicationContext.getSharedPreferences(FILE, Context.MODE_PRIVATE);
@@ -26,8 +26,11 @@ public final class BubbleConfig {
         pearlIntensity = Math.max(0, Math.min(100, p.getInt("signature_pearl_intensity", 55)));
         // Retired signature_skin preferences remain stored and have no rendering effect.
         cachedBlur = p.getBoolean("signature_cached_blur", false);
-        matteEnabled = p.getBoolean("signature_matte_enabled", false);
-        matteStrength = SignatureMatteFinish.clampStrength(p.getInt("signature_matte_strength", 50));
+        // Legacy matte preference is intentionally ignored; no migration into Glass.
+        // The cached wallpaper blur remains the sole native glass source.
+        glassOutgoing = p.getBoolean("signature_glass_outgoing", true);
+        glassIncoming = p.getBoolean("signature_glass_incoming", true);
+        glassIntensity = BubbleGlassPolicy.clamp(p.getInt("signature_glass_intensity", 70));
         borderTenths = Math.max(5, Math.min(20, p.getInt("signature_border_tenths", 11)));
         glass = p.getBoolean(GLASS, false); border = p.getBoolean(BORDER, false);
         edges = p.getBoolean(EDGES, false); transparency = BubbleStyle.transparency(p.getInt(TRANSPARENCY, 35)); loaded = true;
@@ -36,21 +39,37 @@ public final class BubbleConfig {
     public static boolean border() { return loaded && border; }
     public static boolean edges() { return loaded && edges; }
     public static boolean backgroundBlur() { return cachedBlur; }
-    public static boolean matteEnabled() { return matteEnabled; }
-    public static int matteStrength() { return matteStrength; }
-    public static void setMatteEnabled(boolean value) {
-        if (!loaded) load();
-        if (matteEnabled == value) return;
-        matteEnabled = value;
-        preferences().edit().putBoolean("signature_matte_enabled", value).apply();
+    public static boolean backgroundBlur(boolean outgoing) {
+        return cachedBlur && (outgoing ? glassOutgoing : glassIncoming);
     }
-    public static void setMatteStrength(int value) {
+    public static boolean glassOutgoing() { return glassOutgoing; }
+    public static boolean glassIncoming() { return glassIncoming; }
+    public static void setGlassOutgoing(boolean enabled) {
         if (!loaded) load();
-        value = SignatureMatteFinish.clampStrength(value);
-        if (matteStrength == value) return;
-        matteStrength = value;
-        preferences().edit().putInt("signature_matte_strength", value).apply();
+        glassOutgoing = enabled;
+        preferences().edit().putBoolean("signature_glass_outgoing", enabled).apply();
     }
+    public static void setGlassIncoming(boolean enabled) {
+        if (!loaded) load();
+        glassIncoming = enabled;
+        preferences().edit().putBoolean("signature_glass_incoming", enabled).apply();
+    }
+    /** Renderer compatibility only: saved matte flags can never tint a bubble again. */
+    @Deprecated public static boolean matteEnabled() { return false; }
+    @Deprecated public static int matteStrength() { return 0; }
+    @Deprecated public static void setMatteEnabled(boolean ignored) { }
+    @Deprecated public static void setMatteStrength(int ignored) { }
+    public static int glassIntensity() { return glassIntensity; }
+    public static void setGlassIntensity(int value) {
+        if (!loaded) load();
+        value = BubbleGlassPolicy.clamp(value);
+        if (glassIntensity == value) return;
+        glassIntensity = value;
+        preferences().edit().putInt("signature_glass_intensity", value).apply();
+    }
+    /** Explicitly scoped to the existing wallpaper-in-message bubble renderer. */
+    public static boolean bubbleGlassEnabled() { return backgroundBlur(); }
+    public static void setBubbleGlassEnabled(boolean value) { setBackgroundBlur(value); }
     public static void setBackgroundBlur(boolean value) {
         if (!loaded) load();
         if (cachedBlur == value) return;

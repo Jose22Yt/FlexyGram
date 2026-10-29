@@ -24,7 +24,7 @@ class Stabilization1272(unittest.TestCase):
     # exact-blob contract; no arbitrary additions in protected home/composer.
     expectedNew|={p for p in smart_paths() if p.startswith(prefix+'/') and p.endswith('.java')}
     from alpha1281_contract import paths as latest_paths, restore as restore_latest
-    expectedNew|={p for p in latest_paths() if p.startswith(prefix+'/') and p.endswith('.java')}
+    expectedNew|={p for p in latest_paths() if p not in before and p.startswith(prefix+'/') and p.endswith('.java')}
     self.assertEqual(current,before|expectedNew)
     for path in expectedNew:
      self.assertEqual(restore1271(path,restore_smart(path,restore_latest(path,(ROOT/path).read_bytes()))),b'')

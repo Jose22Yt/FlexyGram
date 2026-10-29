@@ -14,7 +14,7 @@ def write(put):
  public boolean isSponsored(){return sponsored;}public boolean isEphemeral(){return ephemeral;}public long getGroupIdForUse(){return group;}public long getDialogId(){return dialog;}public int getId(){return messageOwner.id;}}
 ''')
  put('org/telegram/ui/Cells/ChatMessageCell.java',r'''package org.telegram.ui.Cells;import android.view.*;import android.content.*;import android.graphics.*;import org.telegram.messenger.MessageObject;
- public class ChatMessageCell extends View{public MessageObject message;public int left=10,top=10,right=210,bottom=90;public static class TransitionParams{public float animateChangeProgress=1;}private TransitionParams transition=new TransitionParams();
+ public class ChatMessageCell extends View{public boolean drawForSignatureExport;public MessageObject message;public int left=10,top=10,right=210,bottom=90;public static class TransitionParams{public float animateChangeProgress=1;}private TransitionParams transition=new TransitionParams();
  public ChatMessageCell(Context c){super(c);}public MessageObject getMessageObject(){return message;}public TransitionParams getTransitionParams(){return transition;}
  public Object getCurrentBackgroundDrawable(boolean update){return message==null?null:this;}public int getBackgroundDrawableLeft(){return left;}public int getBackgroundDrawableRight(){return right;}public int getBackgroundDrawableTop(){return top;}public int getBackgroundDrawableBottom(){return bottom;}
  public boolean parentBackground;public int parentPasses,outboundsPasses;

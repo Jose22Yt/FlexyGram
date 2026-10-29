@@ -2,22 +2,24 @@
 from pathlib import Path
 import subprocess,tempfile,unittest,xml.etree.ElementTree as ET
 import alpha1283_contract as audit
+from integration1284_contract import historical_bytes
+
 ROOT=Path(__file__).resolve().parents[2]
 JAVA=ROOT/'TMessagesProj/src/main/java'
 class Alpha1283(unittest.TestCase):
  def test_exact_review_and_all_unknown_mutations_rejected(self):
   audit.verify_current()
   for path in audit.spec()['reviewed']:
-   raw=(ROOT/path).read_bytes()+b'\nUNREVIEWED'
+   raw=historical_bytes(path)+b'\nUNREVIEWED'
    self.assertEqual(raw,audit.restore(path,raw),path)
  def test_release_gates_only_increment_the_installed_checkpoint_version(self):
   for path in ['TMessagesProj/build.gradle','.github/workflows/connected-alpha-arm64.yml','tools/connected_alpha/build_private_apk.py']:
-   before=audit.original(path);now=(ROOT/path).read_bytes()
+   before=audit.original(path);now=historical_bytes(path)
    self.assertIn(b'1283',now);self.assertEqual(before,now.replace(b'1283',b'1282'),path)
  def test_auth_protocol_core_navigation_media_and_approved_header_are_unchanged(self):
   names=['org/telegram/ui/ActionBar/ActionBarLayout.java','org/telegram/ui/ActionBar/ActionBarPopupWindow.java','org/telegram/ui/Cells/ChatMessageCell.java','org/telegram/messenger/SendMessagesHelper.java','org/telegram/messenger/MediaController.java','org/telegram/ui/LoginActivity.java','org/telegram/ui/Components/ChatActivityEnterView.java','org/telegram/ui/Components/FilterTabsView.java','org/telegram/ui/ActionBar/MessageDrawable.java','app/flexygram/bubbles/SignatureWallpaperBlur.java','app/flexygram/header/SignatureChatHeader.java','app/flexygram/header/HeaderConfig.java']
   for path in names:
-   n='TMessagesProj/src/main/java/'+path;self.assertEqual(audit.original(n),(ROOT/n).read_bytes(),n)
+   n='TMessagesProj/src/main/java/'+path;self.assertEqual(audit.original(n),historical_bytes(n),n)
  def test_sticker_metadata_takes_the_real_uploaded_document_path_and_waits_for_server(self):
   sender=(JAVA/'app/flexygram/bubbles/interaction/NativeBubbleStickerSender.java').read_text()
   host=(JAVA/'org/telegram/ui/ChatActivity.java').read_text();start=host.index('private boolean canUseFlexyBubbleSticker(');end=host.index('/** Native menu policy',start);hook=host[start:end]

@@ -46,14 +46,14 @@ def main():
    if proc.wait()!=0:raise RuntimeError('Full Android build failed; inspect the redacted build log')
   apks=list((ROOT/'TMessagesProj/build/outputs/apk/connectedAlpha').rglob('*.apk'))
   if len(apks)!=1:raise ValueError('Expected exactly one full Connected Alpha APK')
-  name='FlexyGram_Alpha_1283_ARM64_TEST.apk';target=out/name
-  result=subprocess.run([sys.executable,str(ROOT/'tools/connected_alpha/verify_apk.py'),str(apks[0]),'--build-tools',str(sdk/'build-tools/36.0.0'),'--certificate-sha256',CERT,'--expected-version-code','1283'],cwd=ROOT,env=env,check=True,capture_output=True,text=True)
+  name='FlexyGram_Alpha_1284_ARM64_TEST.apk';target=out/name
+  result=subprocess.run([sys.executable,str(ROOT/'tools/connected_alpha/verify_apk.py'),str(apks[0]),'--build-tools',str(sdk/'build-tools/36.0.0'),'--certificate-sha256',CERT,'--expected-version-code','1284'],cwd=ROOT,env=env,check=True,capture_output=True,text=True)
   report=json.loads(result.stdout)
   if report['application_id']!=APP or report['elf_count']!=96:raise ValueError('Full native APK identity/integrity mismatch')
   shutil.copy2(apks[0],target);target.chmod(0o600)
   if hashlib.sha256(target.read_bytes()).hexdigest()!=report['sha256']:raise ValueError('Final handoff copy mismatch')
   report.update(commit=commit,delivery='PRIVATE_DIRECT_SIGNED_APK',filename=name,physical_install_update='NOT_TESTED',preview_physical_freeze='PENDING_OWNER_TEST',exteraless_performance_comparison='NOT_ESTABLISHED')
-  (out/'FlexyGram_Alpha_1283_verificacion.json').write_text(json.dumps(report,indent=2)+'\n')
+  (out/'FlexyGram_Alpha_1284_verificacion.json').write_text(json.dumps(report,indent=2)+'\n')
   print(json.dumps({k:report[k]for k in ['filename','sha256','certificate_sha256','application_id','version_code','elf_count','commit']},indent=2))
  finally:
   criteria.write_bytes(original)

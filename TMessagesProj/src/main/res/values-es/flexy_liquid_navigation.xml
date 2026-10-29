@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyLiquidNavTitle">Flexy Liquid Navigation</string>
+    <string name="FlexyLiquidNavEnabled">Indicador líquido deslizante</string>
+    <string name="FlexyLiquidNavElasticity">Elasticidad del indicador</string>
+    <string name="FlexyLiquidNavOpacity">Transparencia del indicador</string>
+    <string name="FlexyLiquidNavContacts">Mostrar Contactos</string>
+    <string name="FlexyLiquidNavProfile">Mostrar Perfil</string>
+    <string name="FlexyLiquidNavCalls">Mostrar Llamadas en lugar de Ajustes</string>
+    <string name="FlexyLiquidNavFeed">Mostrar Feed en lugar de Contactos</string>
+    <string name="FlexyLiquidNavTabs">Pestañas de navegación disponibles</string>
+    <string name="FlexyLiquidNavPreview">Vista previa: arrastra el indicador</string>
+    <string name="FlexyLiquidNavChatsFixed">Chats permanece visible para conservar la navegación</string>
+    <string name="FlexyLiquidNavReloadHint">Algunos cambios de pestañas se aplican al regresar a la pantalla principal</string>
+    <string name="FlexyLiquidNavGroups">Grupos</string>
+    <string name="FlexyLiquidNavChannels">Canales</string>
+    <string name="FlexyLiquidNavSaved">Mensajes guardados</string>
+    <string name="FlexyLiquidNavVisible">Pestañas visibles</string>
+    <string name="FlexyLiquidNavAvailable">Agregar un destino</string>
+    <string name="FlexyLiquidNavReorderHint">Mantén pulsado y arrastra para ordenar. Toca para quitar. Chats es obligatorio; conserva al menos dos pestañas.</string>
+    <string name="FlexyLiquidNavLimit">Puedes activar hasta seis destinos.</string>
+    <string name="FlexyLiquidNavDeformation">Deformación</string>
+    <string name="FlexyLiquidNavSpeed">Velocidad</string>
+    <string name="FlexyLiquidNavDamping">Amortiguación</string>
+    <string name="FlexyLiquidNavRebound">Rebote</string>
+    <string name="FlexyLiquidNavFollow">Seguimiento del dedo</string>
+    <string name="FlexyLiquidNavSettle">Estabilización</string>
+    <string name="FlexyLiquidNavHeight">Altura de la barra</string>
+    <string name="FlexyLiquidNavCompact">Compactación</string>
+    <string name="FlexyLiquidNavSpacing">Espaciado entre pestañas</string>
+    <string name="FlexyLiquidNavIcon">Tamaño de iconos</string>
+    <string name="FlexyLiquidNavWidth">Anchura de la píldora</string>
+    <string name="FlexyLiquidNavLabels">Mostrar etiquetas</string>
+    <string name="FlexyLiquidNavIndicator">Indicador Liquid</string>
+    <string name="FlexyLiquidNavMotion">Movimiento</string>
+    <string name="FlexyLiquidNavDesign">Diseño y tamaño</string>
+</resources>

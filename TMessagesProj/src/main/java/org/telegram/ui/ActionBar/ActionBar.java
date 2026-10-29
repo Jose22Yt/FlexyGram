@@ -234,6 +234,11 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
         setClipChildren(false);
         glassMode = true;
         glassModeIsForum = isForum;
+        signatureGlassFactory=factory;
+        signatureGlassColorProvider=colorProvider;
+        signatureGlassCall=null;
+        signatureGlassGeometryApplied=false;
+        signatureGlassRadius=-1;
 
         glassDrawable = factory.create(this)
             .setColorProvider(colorProvider)
@@ -1480,8 +1485,136 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
         return isCentered() && menu != null && menu.getVisibleItemsCount() > 2;
     }
 
+    private BlurredBackgroundDrawable signatureGlassCall;
+    private boolean signatureGlassGeometryApplied;
+    private float signatureGlassRadius=-1;
+    private BlurredBackgroundDrawableViewFactory signatureGlassFactory;
+    private BlurredBackgroundColorProvider signatureGlassColorProvider;
     private app.flexygram.header.SignatureChatHeader signatureHeader;
     public void setSignatureHeader(app.flexygram.header.SignatureChatHeader header) { signatureHeader = header; requestLayout(); }
+
+    /**
+     * Flexy Signature reuses the host's own blur3 drawables when Telegram's
+     * Power Saving > Animations in Chats > Liquid Glass is enabled.
+     * No secondary blur cache, screen capture or synthetic background is created.
+     * All coordinates stay in ActionBar canvas space and only draw surfaces.
+     */
+    private void configureSignatureGlassGeometry(boolean signature) {
+        if (signatureGlassGeometryApplied==signature) return;
+        signatureGlassGeometryApplied=signature;
+        signatureGlassRadius=-1;
+        // Native padding INSETS painted bounds. Signature geometry already describes the visible pill.
+        int padding=signature ? 0 : dp(6);
+        if(glassDrawable!=null)glassDrawable.setPadding(padding);
+        if(glassDrawableBack!=null)glassDrawableBack.setPadding(padding);
+        if(glassDrawableMenu!=null)glassDrawableMenu.setPadding(padding);
+        if(!signature){
+            if(glassDrawable!=null)glassDrawable.setRadius(glassDrawableLeftRadius,dp(23),dp(23),glassDrawableLeftRadius);
+            if(glassDrawableBack!=null)glassDrawableBack.setRadius(dp(23));
+            if(glassDrawableMenu!=null)glassDrawableMenu.setRadius(dp(23));
+            glassMenuAppliedOuterRadius=glassMenuAppliedInnerRadius=-1;
+        }
+    }
+    private void setSignatureGlassRadius(float radius) {
+        if(signatureGlassRadius==radius)return;
+        signatureGlassRadius=radius;
+        glassDrawable.setRadius(radius);glassDrawableBack.setRadius(radius);glassDrawableMenu.setRadius(radius);
+        if(signatureGlassCall!=null)signatureGlassCall.setRadius(radius);
+    }
+
+    public void prepareSignatureNativeGlass(boolean separateCall) {
+        if (separateCall && signatureGlassCall==null && signatureGlassFactory!=null
+                && org.telegram.messenger.LiteMode.isEnabled(org.telegram.messenger.LiteMode.FLAG_LIQUID_GLASS)) {
+            // Each painted island needs its own retained RenderNode/transform, sharing the same native source.
+            signatureGlassCall=signatureGlassFactory.create(this).setColorProvider(signatureGlassColorProvider)
+                    .setRadius(dp(23)).setPadding(0);
+        }
+    }
+
+    public void updateSignatureNativeGlassPolicy(boolean allowed) {
+        if (allowed && signatureHeader!=null && signatureHeader.fusionActive()) {
+            var g=signatureHeader.fusionGeometry();
+            prepareSignatureNativeGlass(g!=null && g.mattePortrait && g.callAvailable);
+        }
+        updateSignatureNativeGlassDrawable(glassDrawable,allowed);
+        updateSignatureNativeGlassDrawable(glassDrawableBack,allowed);
+        updateSignatureNativeGlassDrawable(glassDrawableMenu,allowed);
+        updateSignatureNativeGlassDrawable(signatureGlassCall,allowed);
+    }
+    private static void updateSignatureNativeGlassDrawable(
+            org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawable drawable, boolean allowed) {
+        if (android.os.Build.VERSION.SDK_INT >= 33
+                && drawable instanceof org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawableRenderNode) {
+            ((org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawableRenderNode)drawable).setLiquidGlassEffectAllowed(allowed);
+        }
+        if (drawable!=null) drawable.updateColors();
+    }
+
+    public boolean drawSignatureNativeGlass(Canvas canvas,
+            app.flexygram.header.SignatureChatHeader header) {
+        if (header == null || !header.active() || !glassMode
+                || glassDrawable == null || glassDrawableBack == null || glassDrawableMenu == null
+                || !org.telegram.messenger.LiteMode.isEnabled(
+                    org.telegram.messenger.LiteMode.FLAG_LIQUID_GLASS)) return false;
+        glassDrawable.setAlpha(255);
+        glassDrawableBack.setAlpha(255);
+        glassDrawableMenu.setAlpha(255);
+        if (header.fusionActive()) {
+            var g = header.fusionGeometry();
+            if (g == null || !g.fits || g.mattePortrait && g.callAvailable && signatureGlassCall==null) return false;
+            setSignatureGlassRadius((g.center.bottom-g.center.top)*.5f);
+            final int offset = Math.round(header.fusionTop);
+
+            glassDrawableBack.setBounds(Math.round(g.backVisual.left),
+                    Math.round(g.backVisual.top) + offset, Math.round(g.backVisual.right),
+                    Math.round(g.backVisual.bottom) + offset);
+            glassDrawableBack.draw(canvas);
+
+            glassDrawable.setBounds(Math.round(g.center.left),
+                    Math.round(g.center.top) + offset, Math.round(g.center.right),
+                    Math.round(g.center.bottom) + offset);
+            glassDrawable.draw(canvas);
+            // Portrait layout has two distinct action circles; keep both native hit targets.
+            if (g.mattePortrait) {
+                if (g.callAvailable) {
+                    if (signatureGlassCall==null) return false;
+                    signatureGlassCall.setAlpha(255);
+
+                    signatureGlassCall.setBounds(Math.round(g.callVisual.left),
+                        Math.round(g.callVisual.top) + offset, Math.round(g.callVisual.right),
+                        Math.round(g.callVisual.bottom) + offset);
+                    signatureGlassCall.draw(canvas);
+                }
+                glassDrawableMenu.setBounds(Math.round(g.moreVisual.left),
+                    Math.round(g.moreVisual.top) + offset, Math.round(g.moreVisual.right),
+                    Math.round(g.moreVisual.bottom) + offset);
+            } else {
+
+                glassDrawableMenu.setBounds(Math.round(g.actionsVisual.left),
+                    Math.round(g.actionsVisual.top) + offset, Math.round(g.actionsVisual.right),
+                    Math.round(g.actionsVisual.bottom) + offset);
+            }
+            glassDrawableMenu.draw(canvas);
+            return true;
+        }
+        var g = header.geometry;
+        setSignatureGlassRadius(g.back.height()*.5f);
+        // Adaptive back pill, centered text pill and avatar island are kept independent.
+
+        glassDrawableBack.setBounds(Math.round(g.back.left), Math.round(g.back.top),
+                Math.round(g.back.right), Math.round(g.back.bottom));
+        glassDrawableBack.draw(canvas);
+
+        glassDrawable.setBounds(Math.round(g.title.left), Math.round(g.title.top),
+                Math.round(g.title.right), Math.round(g.title.bottom));
+        glassDrawable.draw(canvas);
+
+        glassDrawableMenu.setBounds(Math.round(g.avatar.left), Math.round(g.avatar.top),
+                Math.round(g.avatar.right), Math.round(g.avatar.bottom));
+        glassDrawableMenu.draw(canvas);
+        return true;
+    }
+
 
     private int centeredTitleAvailableWidth(int width) {
         final int titleLeft = centerTitleLeft();
@@ -2444,6 +2577,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
         final int b = t + s + p * 2;
 
         boolean signature = signatureHeader != null && signatureHeader.active();
+        configureSignatureGlassGeometry(signature);
         if (signature) signatureHeader.draw(canvas);
         if (!signature && glassDrawable != null && drawGlassMiddlePill && !glassOnlyBack && drawGlassTitle) {
             final int menuWidthWithPadding = menuWidth + ((hasForcedMenuWidth || hasForcedMenuMinWidth) ? (menuWidth > 0 ? p : 0) : (int) (p * animatorHasMenuItems.getFloatValue()));

@@ -33,25 +33,11 @@ public class MessageDrawable extends Drawable {
 
     public interface GlassSource {
         boolean draw(Canvas canvas, Path path);
-        // Older embedders retain their safe Matte fallback during partial-alpha transitions.
+        // Older embedders retain their native tint fallback during partial-alpha transitions.
         default boolean draw(Canvas canvas, Path path, int alpha) { return alpha == 255 && draw(canvas, path); }
     }
     private GlassSource flexyGlassSource;
     private final Paint flexyFillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private int flexyMatteStrength = -1;
-    private android.graphics.ColorMatrixColorFilter flexyMatteGradientFilter;
-    private android.graphics.ColorMatrixColorFilter matteGradientFilter(int strength) {
-        if (flexyMatteStrength != strength) {
-            flexyMatteStrength = strength;
-            float mute = ((strength * 34 + 50) / 100) / 100f;
-            float keep = 1f - mute, r = .299f * mute, g = .587f * mute, b = .114f * mute;
-            // Allocated only when the setting changes; keeps the native gradient shader.
-            flexyMatteGradientFilter = new android.graphics.ColorMatrixColorFilter(new float[] {
-                keep+r,g,b,0,0, r,keep+g,b,0,0, r,g,keep+b,0,0, 0,0,0,1,0
-            });
-        }
-        return flexyMatteGradientFilter;
-    }
     private final Paint flexyBorderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final app.flexygram.bubbles.SignatureBorderPath signatureBorderPath = new app.flexygram.bubbles.SignatureBorderPath();
     /** Kept for old preview callers; skins no longer alter the native geometry or finish. */
@@ -675,20 +661,13 @@ public class MessageDrawable extends Drawable {
             // Stable theme color, independent of wallpaper/blur availability and animation phase.
             // Instance paints and the native geometry cache are reused for every draw.
             int color = signatureColor();
-            final boolean matte = app.flexygram.bubbles.BubbleConfig.matteEnabled();
-            if (matte && p.getShader() == null) {
-                color = app.flexygram.bubbles.SignatureMatteFinish.color(
-                        color, app.flexygram.bubbles.BubbleConfig.matteStrength());
-            }
-            if (alpha > 0 && app.flexygram.bubbles.BubbleConfig.backgroundBlur() && flexyGlassSource != null) {
+            if (alpha > 0 && app.flexygram.bubbles.BubbleConfig.backgroundBlur(isOut) && flexyGlassSource != null) {
                 // The native bridge carries drawable alpha; message transitions sample the same cache.
                 flexyGlassSource.draw(canvas, path, alpha);
             }
             flexyFillPaint.setColor(color);
             // Reuse Telegram's cached gradient and matrix; no new shader per frame.
             flexyFillPaint.setShader(p.getShader());
-            flexyFillPaint.setColorFilter(matte && p.getShader() != null
-                    ? matteGradientFilter(app.flexygram.bubbles.BubbleConfig.matteStrength()) : null);
             flexyFillPaint.setAlpha(Math.round(alpha * app.flexygram.bubbles.BubbleStyle.tintAlpha(
                 app.flexygram.bubbles.BubbleConfig.transparency()) / 255f));
             canvas.drawPath(path, flexyFillPaint);
