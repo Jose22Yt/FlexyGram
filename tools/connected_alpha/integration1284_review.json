@@ -11,7 +11,7 @@
     ".github/workflows/conversation-native-liquid-glass.yml": "b09efdea2df7ddebdb05a54da02dd40eb647abc62d03dc7bc22c74d790220c76",
     ".github/workflows/flexy-liquid-navigation-contract.yml": "14854cfc6a9a6fa955a29d93e15aeb366969c84bbcd04b5565d0d057178d1ce1",
     ".github/workflows/pr.yml": "f51a352d0ec667196cbdb107787647fecdbbeae0c6c1b23cdf2baaca36139f80",
-    ".github/workflows/signature-matte-bubbles.yml": "87d9b92db442b4d6caaa7bc9facaf8f9806f1dc2ae4fe79cd46545472bfa653e",
+    ".github/workflows/signature-matte-bubbles.yml": "3e246139ed10a5dae7f8a2576ba33b49f93c04733b7c35b751ef7283ee54ffa3",
     "TMessagesProj/build.gradle": "2f8f1616babb4e92f31221f2013c35b6ba8baf7bd1117f10ea9713385231902d",
     "TMessagesProj/src/main/java/app/exteraless/appearance/MainTabsUiHelper.java": "c89a0daa98ad69f3f978e317801eca62e38a6b4155fa8405dbc2beb0fbb99ebe",
     "TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraAppearanceActivity.java": "74835806d432dba1867578db574b299e856a99bacf48a9bda074202cf041111d",
@@ -40,7 +40,7 @@
     "TMessagesProj/src/main/java/org/telegram/ui/Components/ChatActivityEnterView.java": "2da88b68a60d8b9e16d604613a9fe668bfa4a4287f55db6d0a25e2c34daca95b",
     "TMessagesProj/src/main/java/org/telegram/ui/Components/chat/ChatInputViewsContainer.java": "994300123528fa7d3afa5ce2004298f3d6928d71d00b535b3b2a5ce089f2bd4b",
     "TMessagesProj/src/main/java/org/telegram/ui/Components/glass/GlassTabView.java": "1a1d947120e852a9d3170256583eb632a7db9811fcfad10f91c419adde9e7e96",
-    "TMessagesProj/src/main/java/org/telegram/ui/MainTabsActivity.java": "05d1c5345af901b866c127e755c5c45dd6c6744c4f8e77f9df32134de844df9c",
+    "TMessagesProj/src/main/java/org/telegram/ui/MainTabsActivity.java": "75d8ab5c10764efdfb304bc52a36516cb901e47c1c3ee7147382a1f2901ecc07",
     "TMessagesProj/src/main/java/org/telegram/ui/MainTabsLayout.java": "5b2b97d44a414f43b85d43d12099443c5e10bb6467c192d33a18834bee18dc28",
     "TMessagesProj/src/main/java/tw/nekomimi/nekogram/helpers/MainTabsHelper.java": "5f2ecd2664f453450ef07fc269949bacb6665226cac68e675e694631092f5442",
     "TMessagesProj/src/main/res/values-es/flexy_bubble_glass.xml": "7ba085c709ea67ab3d222424f4baaa0f563c4a81cae178ffbdb93539afc7ba73",
@@ -79,7 +79,7 @@
     "tools/connected_alpha/test_alpha1283.py": "42d8bed40bddd520188a0d1f9c7c9b142bea559c5b0cffa0891be4957a3514cd",
     "tools/connected_alpha/test_context_panel.py": "d9547151531259571578e39be08bcdfb9de64f566c54d89f1906238fce768844",
     "tools/connected_alpha/test_integration1284.py": "e72c4758a6bbc3c217cf457318912f5d902d1d0e570061db519f8a4662f7d609",
-    "tools/connected_alpha/test_liquid_navigation.py": "863c3c7958dc04329a314d881af11459c0eea46cec250482a700073f3f39e4e6",
+    "tools/connected_alpha/test_liquid_navigation.py": "1fc1d8117743527d45bca771c58658a63e720f194bc2f9460131b18daecb574a",
     "tools/connected_alpha/test_stabilization1272.py": "82c4b7e820f68cc28201933b8fcb72dee610ef063b52137a0e1a0144fcd063ea"
   },
   "paths": [
