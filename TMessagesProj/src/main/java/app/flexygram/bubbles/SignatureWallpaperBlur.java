@@ -358,7 +358,9 @@ public final class SignatureWallpaperBlur {
                 matrix.setScale(mappedWidth / entry.bitmap.getWidth(), mappedHeight / entry.bitmap.getHeight());
                 matrix.postTranslate(left, top); shader.setLocalMatrix(matrix);
             }
-            paint.setAlpha(Math.round(Math.max(0, Math.min(255, alpha)) * reveal));
+            // The shared blurred wallpaper is painted only through MessageDrawable's bubble path.
+            // Intensity changes blend opacity, not the cached kernel or per-bubble source.
+            paint.setAlpha(Math.round(BubbleGlassPolicy.opacity(alpha, BubbleConfig.glassIntensity()) * reveal));
             canvas.drawPath(shape, paint); return true;
         }
         private void release() {

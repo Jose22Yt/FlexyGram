@@ -22,7 +22,7 @@ import app.flexygram.settings.SignatureMatteSettingsActivity;
 /** Local native preview, fill opacity, border width and optional cached wallpaper blur. */
 public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity {
     private static final int SLIDER = 110;
-    private int transparencyRow, borderRow, previewRow, positionRow, blurRow, enabledRow, fuseRow, styleRow, pearlRow, matteRow, matteStrengthRow;
+    private int transparencyRow, borderRow, previewRow, positionRow, blurRow, enabledRow, fuseRow, styleRow, pearlRow, glassStrengthRow;
     private BubblePreviewView preview;
     private final android.graphics.drawable.Drawable contextualWallpaper;
     public BubbleSettingsActivity() { this(null); }
@@ -30,8 +30,8 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
     @Override protected void updateRows() {
         super.updateRows(); BubbleConfig.load();
         previewRow = addRow(); transparencyRow = addRow("flexyBubbleTransparency");
-        blurRow = addRow("flexyBubbleBackgroundBlur"); matteRow = addRow("flexyBubbleMatteEnabled");
-        matteStrengthRow = BubbleConfig.matteEnabled() ? addRow("flexyBubbleMatteStrength") : -1;
+        blurRow = addRow("flexyBubbleGlassEnabled");
+        glassStrengthRow = BubbleConfig.bubbleGlassEnabled() ? addRow("flexyBubbleGlassStrength") : -1;
         enabledRow = addRow("flexyBubbleOutlineEnabled");
         borderRow = positionRow = fuseRow = styleRow = pearlRow = -1;
         if (BubbleConfig.outlineEnabled()) {
@@ -46,10 +46,7 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
     @Override protected BaseListAdapter createAdapter(Context context) { return new Adapter(context); }
     @Override protected void onItemClick(View view, int position, float x, float y) {
         if (position < 0) return;
-        if (position == matteRow) {
-            BubbleConfig.setMatteEnabled(!BubbleConfig.matteEnabled());
-            updateRows(); listAdapter.notifyDataSetChanged(); if (preview != null) preview.settingsChanged();
-        } else if (position == enabledRow) {
+        if (position == enabledRow) {
             BubbleConfig.setOutlineEnabled(!BubbleConfig.outlineEnabled());
             updateRows(); listAdapter.notifyDataSetChanged(); if (preview != null) preview.settingsChanged();
         } else if (position == fuseRow) {
@@ -62,8 +59,8 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
                     if (preview != null) preview.settingsChanged();
                 }).create());
         } else if (position == blurRow) {
-            BubbleConfig.setBackgroundBlur(!BubbleConfig.backgroundBlur());
-            if (view instanceof TextCheckCell) ((TextCheckCell) view).setChecked(BubbleConfig.backgroundBlur());
+            BubbleConfig.setBubbleGlassEnabled(!BubbleConfig.bubbleGlassEnabled());
+            updateRows(); listAdapter.notifyDataSetChanged();
             if (preview != null) preview.settingsChanged();
         }
     }
@@ -74,7 +71,7 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
     }
     private final class TransparencyCell extends LinearLayout implements Theme.Colorable {
         @Override public void updateColors(){title.setTextColor(getThemedColor(Theme.key_windowBackgroundWhiteBlackText));seek.invalidate();}
-        boolean border, pearl, position, matte;
+        boolean border, pearl, position, glassIntensity;
         final TextView title;
         final SeekBar seek;
         boolean binding;
@@ -89,27 +86,27 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
                 public void onStartTrackingTouch(SeekBar bar) { bar.getParent().requestDisallowInterceptTouchEvent(true); }
                 public void onStopTrackingTouch(SeekBar bar) { bar.getParent().requestDisallowInterceptTouchEvent(false); }
                 public void onProgressChanged(SeekBar bar, int value, boolean user) {
-                    if (user && !binding) { if (position) BubbleConfig.setBorderPosition(value + 1); else if (border) BubbleConfig.setBorderTenths(value+5); else if (pearl) BubbleConfig.setPearlIntensity(value); else if (matte) BubbleConfig.setMatteStrength(value); else BubbleConfig.setTransparency(value); if (preview != null) preview.settingsChanged(); }
+                    if (user && !binding) { if (position) BubbleConfig.setBorderPosition(value + 1); else if (border) BubbleConfig.setBorderTenths(value+5); else if (pearl) BubbleConfig.setPearlIntensity(value); else if (glassIntensity) BubbleConfig.setGlassIntensity(value); else BubbleConfig.setTransparency(value); if (preview != null) preview.settingsChanged(); }
                     label(value);
                 }
             });
         }
         void label(int value) {
-            String text = position ? getString(R.string.FlexyBubbleBorderPosition) + " · " + borderPositions()[value] : border ? getString(R.string.FlexyBubbleBorderWidth) + " · " + String.format(java.util.Locale.US, "%.1f dp", (value+5)/10f) : getString(matte ? R.string.FlexyBubbleMatteStrength : pearl ? R.string.FlexyBubblePearlIntensity : R.string.FlexyBubblesTransparency) + " · " + value + " %";
+            String text = position ? getString(R.string.FlexyBubbleBorderPosition) + " · " + borderPositions()[value] : border ? getString(R.string.FlexyBubbleBorderWidth) + " · " + String.format(java.util.Locale.US, "%.1f dp", (value+5)/10f) : getString(glassIntensity ? R.string.FlexyBubbleGlassStrength : pearl ? R.string.FlexyBubblePearlIntensity : R.string.FlexyBubblesTransparency) + " · " + value + " %";
             title.setText(text); seek.setContentDescription(text);
         }
         void bind(boolean border) { bind(border, false, false, false); }
-        void bind(boolean border, boolean pearl, boolean position, boolean matte) {
+        void bind(boolean border, boolean pearl, boolean position, boolean glassIntensity) {
             this.position = position;
-            this.border = border; this.pearl = pearl; this.matte = matte;
-            binding = true; seek.setMax(position ? 4 : border ? 15 : 100); int value = position ? BubbleConfig.borderPosition() - 1 : border ? BubbleConfig.borderTenths()-5 : pearl ? BubbleConfig.pearlIntensity() : matte ? BubbleConfig.matteStrength() : BubbleConfig.transparency(); seek.setProgress(value); label(value);
+            this.border = border; this.pearl = pearl; this.glassIntensity = glassIntensity;
+            binding = true; seek.setMax(position ? 4 : border ? 15 : 100); int value = position ? BubbleConfig.borderPosition() - 1 : border ? BubbleConfig.borderTenths()-5 : pearl ? BubbleConfig.pearlIntensity() : glassIntensity ? BubbleConfig.glassIntensity() : BubbleConfig.transparency(); seek.setProgress(value); label(value);
             seek.setEnabled(!pearl || BubbleConfig.outlineStyle() >= 1); setAlpha(!pearl || BubbleConfig.outlineStyle() >= 1 ? 1f : .5f); binding = false;
         }
     }
     private final class Adapter extends MatteListAdapter {
         Adapter(Context context) { super(context); }
         @Override public int getItemViewType(int position) {
-            return position == previewRow ? 111 : position == blurRow || position == matteRow || position == fuseRow || position == enabledRow ? TYPE_CHECK : position == styleRow ? TYPE_SETTINGS : position == transparencyRow || position == borderRow || position == pearlRow || position == positionRow || position == matteStrengthRow ? SLIDER : TYPE_INFO_PRIVACY;
+            return position == previewRow ? 111 : position == blurRow || position == fuseRow || position == enabledRow ? TYPE_CHECK : position == styleRow ? TYPE_SETTINGS : position == transparencyRow || position == borderRow || position == pearlRow || position == positionRow || position == glassStrengthRow ? SLIDER : TYPE_INFO_PRIVACY;
         }
         @Override public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int type) {
             if (type == 111) { preview = new BubblePreviewView(parent.getContext(), contextualWallpaper); return new RecyclerListView.Holder(preview); }
@@ -118,8 +115,7 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
         }
         @Override public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, boolean partial) {
             if (position == previewRow) { holder.itemView.invalidate(); return; }
-            if (position == transparencyRow || position == borderRow || position == pearlRow || position == positionRow || position == matteStrengthRow) { ((TransparencyCell)holder.itemView).bind(position == borderRow, position == pearlRow, position == positionRow, position == matteStrengthRow); return; }
-            if (position == matteRow) { ((TextCheckCell)holder.itemView).setTextAndCheck(getString(R.string.FlexyBubbleMatteEnabled), BubbleConfig.matteEnabled(), false); return; }
+            if (position == transparencyRow || position == borderRow || position == pearlRow || position == positionRow || position == glassStrengthRow) { ((TransparencyCell)holder.itemView).bind(position == borderRow, position == pearlRow, position == positionRow, position == glassStrengthRow); return; }
             if (position == enabledRow) { ((TextCheckCell)holder.itemView).setTextAndCheck(getString(R.string.FlexyBubbleOutlineEnabled), BubbleConfig.outlineEnabled(), false); return; }
             if (position == fuseRow) {
                 ((TextCheckCell)holder.itemView).setTextAndCheck(getString(R.string.FlexyBubbleFuseGlass), BubbleConfig.fuseGlass(), false); return;
@@ -128,10 +124,10 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
                 ((TextSettingsCell)holder.itemView).setTextAndValue(getString(R.string.FlexyBubbleOutlineStyle),
                         getString(BubbleConfig.outlineStyle() == 0 ? R.string.FlexyBubbleOriginal : BubbleConfig.outlineStyle() == 3 ? R.string.FlexyBubbleGlassOriginal : BubbleConfig.outlineStyle() == 2 ? R.string.FlexyBubbleGlassSatin : R.string.FlexyBubbleGlassPearl), true); return;
             }
-            if (position == blurRow) { ((TextCheckCell)holder.itemView).setTextAndCheck(getString(R.string.FlexyBubbleBackgroundBlur), BubbleConfig.backgroundBlur(), false); return; }
+            if (position == blurRow) { ((TextCheckCell)holder.itemView).setTextAndCheck(getString(R.string.FlexyBubbleGlassEnabled), BubbleConfig.bubbleGlassEnabled(), false); return; }
 
 
         }
-        @Override public boolean isEnabled(RecyclerView.ViewHolder holder) { int p = holder.getAdapterPosition(); if (p < 0) return false; return p == blurRow || p == matteRow || p == styleRow || p == fuseRow || p == enabledRow; }
+        @Override public boolean isEnabled(RecyclerView.ViewHolder holder) { int p = holder.getAdapterPosition(); if (p < 0) return false; return p == blurRow || p == styleRow || p == fuseRow || p == enabledRow; }
     }
 }
