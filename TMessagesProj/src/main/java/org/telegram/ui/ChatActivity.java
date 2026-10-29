@@ -1197,6 +1197,9 @@ public class ChatActivity extends BaseFragment implements
     private Paint actionBarBackgroundPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private float scrimPaintAlpha = 0f;
     private boolean scrimProgressDirection;
+    private final app.flexygram.bubbles.interaction.SelectedBubbleMotion selectedBubbleMotion =
+            new app.flexygram.bubbles.interaction.SelectedBubbleMotion();
+    private MessageObject selectedBubbleMotionMessage;
     private View scrimView;
     private float scrimViewAlpha = 1f;
     private float scrimViewProgress = 0f;
@@ -3746,6 +3749,8 @@ public class ChatActivity extends BaseFragment implements
 
     @Override
     public void onFragmentDestroy() {
+        selectedBubbleMotion.reset();
+        selectedBubbleMotionMessage = null;
         if(flexyBubbleStickerSession!=null){flexyBubbleStickerSession.close();flexyBubbleStickerSession=null;}
         if(flexyBubbleStickerExport!=null){flexyBubbleStickerExport.cancel();flexyBubbleStickerExport=null;}
         app.flexygram.studio.FlexyStyleInstallHelper.cancel(this);
@@ -11763,6 +11768,8 @@ public class ChatActivity extends BaseFragment implements
                 ((ChatMessageCell) this.scrimView).getPhotoImage().setLayerNum(0);
             }
         }
+        selectedBubbleMotion.reset();
+        selectedBubbleMotionMessage = null;
         this.scrimView = scrimView;
         if (this.scrimView instanceof ChatActionCell) {
             ((ChatActionCell) this.scrimView).setInvalidateWithParent(fragmentView);
@@ -19371,6 +19378,15 @@ public class ChatActivity extends BaseFragment implements
                                 canvas.translate(0, cell.getPaddingTop());
                                 cell.drawBackgroundInternal(canvas, true);
                                 canvas.restore();
+                            }
+                            // Scale the selected overlay, never a recycled cell's properties.
+                            if (cell != null && scrimGroup == null && scrimViewTask == null
+                                    && scrimViewReaction == null
+                                    && selectedBubbleMotionMessage == cell.getMessageObject()) {
+                                float scale = selectedBubbleMotion.scale();
+                                canvas.scale(scale, scale,
+                                        (cell.getBackgroundDrawableLeft() + cell.getBackgroundDrawableRight()) * .5f,
+                                        (cell.getBackgroundDrawableTop() + cell.getBackgroundDrawableBottom()) * .5f);
                             }
                             child.draw(canvas);
                             if (cell != null && cell.hasOutboundsContent()) {
@@ -33268,7 +33284,7 @@ public class ChatActivity extends BaseFragment implements
             // openExtera: матовое стекло под меню сообщения.
             // Гейт тот же, что в exteraGram: настройка + доступный блюр.
             // Флаг выключен или блюр недоступен -> ниже ничего не меняется, popup остаётся прежним.
-            final boolean glassMenu = !compactContext && GlassMenuHelper.isEnabled(currentAccount, themeDelegate);
+            final boolean glassMenu = GlassMenuHelper.isEnabled(currentAccount, themeDelegate);
             if (glassMenu) {
                 GlassMenuHelper.applyToPopup(scrimBlur3Factory, themeDelegate, popupLayout);
             }
@@ -33276,10 +33292,9 @@ public class ChatActivity extends BaseFragment implements
 
             updateScrimSourceBitmap();
 
-            if (compactContext) popupLayout.setBackground(Theme.createRoundRectDrawable(dp(22),getThemedColor(Theme.key_windowBackgroundWhite)));
-            else popupLayout.setBackground(scrimBlur3Factory.create(popupLayout, true)
+            popupLayout.setBackground(scrimBlur3Factory.create(popupLayout, true)
                 .setColorProvider(BlurredBackgroundProviderImpl.messageMenuBackground(resourceProvider))
-                .setRadius(dp(12))
+                .setRadius(dp(compactContext ? 24 : 12))
                 .setPadding(dp(8)));
 
             boolean addGap = false;
@@ -34374,6 +34389,7 @@ public class ChatActivity extends BaseFragment implements
                         admitted.add(app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.SEND_STICKER);
                         admitted.add(app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.SAVE_STICKER);
                     }
+                    panel.setBackground(null); // Shared native popup Glass, no opaque second card.
                     panel.setMinimumWidth(dp(260));panel.setConfiguration(admitted,stickerAllowed);
                     final app.flexygram.bubbles.interaction.BubbleStickerSession stickerSession=stickerAllowed
                             ? createFlexyBubbleStickerSession(panel,panelCell,panelMessage):null;
@@ -34722,6 +34738,7 @@ public class ChatActivity extends BaseFragment implements
 
                 @Override
                 public void dismiss(boolean animated) {
+                    selectedBubbleMotion.close();
                     super.dismiss(animated);
                     if (finalReactionsLayout1 != null) {
                         finalReactionsLayout1.dismissParent(animated);
@@ -34816,6 +34833,12 @@ public class ChatActivity extends BaseFragment implements
                 GlassMenuHelper.captureBlur(scrimBlur3SourceBitmap, scrimBlur3Factory, fragmentView);
             }
             dimBehindView(v, true);
+            if (compactContext && app.flexygram.bubbles.interaction.BubbleInteractionSettings.springBounce(getParentActivity())) {
+                selectedBubbleMotionMessage = selectedObject;
+                selectedBubbleMotion.enter(() -> {
+                    if (contentView != null) contentView.invalidate();
+                });
+            }
             hideHints(false);
             if (topUndoView != null) {
                 topUndoView.hide(true, 1);
@@ -35090,6 +35113,7 @@ public class ChatActivity extends BaseFragment implements
     private ValueAnimator scrimViewAlphaAnimator;
 
     private void closeMenu(boolean hideDim) {
+        selectedBubbleMotion.close();
         scrimPopupWindowHideDimOnDismiss = hideDim;
         if (scrimPopupWindow != null) {
             scrimPopupWindow.dismiss();

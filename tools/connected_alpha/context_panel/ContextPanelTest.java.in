@@ -25,9 +25,57 @@ public class ContextPanelTest {
   assertTrue(named(panel,"FlexyContextMore").performClick());assertEquals(Action.MORE,received.get(1));
   root.removeView(panel);reply.performClick();assertEquals(2,received.size());
  }
- @Test public void selectionRequiresItsExplicitButton(){
+ @Test public void selectionRemainsInNativeOverflowInsteadOfClutteringQuickActions(){
   var panel=new BubbleActionPanelView(activity,null);panel.setAllowedActions(EnumSet.of(Action.SELECT));ArrayList<Action> received=new ArrayList<>();panel.setListener(received::add);
-  named(panel,"FlexyContextSelect").performClick();assertTrue(received.isEmpty());named(((ViewGroup)panel).getChildAt(1),"FlexyContextSelect").performClick();assertEquals(Collections.singletonList(Action.SELECT),received);
+  assertNull(named(panel,"FlexyContextSelect"));
+  assertNotNull(named(panel,"FlexyContextMore"));
+  named(panel,"FlexyContextMore").performClick();
+  assertEquals(Collections.singletonList(Action.MORE),received);
+ }
+ @Test public void transparentStickerOpensOnlyWhenAdmittedAndEnabled() {
+  var panel=new BubbleActionPanelView(activity,null);ArrayList<Action> received=new ArrayList<>();panel.setListener(received::add);
+  BubbleInteractionSettings.setStickerConversion(activity,true);
+  panel.setConfiguration(EnumSet.of(Action.REPLY,Action.BUILD_STICKER,Action.SEND_STICKER,Action.SAVE_STICKER),true);
+  assertNotNull(named(panel,"FlexyContextConvertSticker"));
+  named(panel,"FlexyContextConvertSticker").performClick();
+  assertEquals(Collections.singletonList(Action.BUILD_STICKER),received);
+  assertNotNull(named(panel,"FlexyContextSendHere"));
+  assertNotNull(named(panel,"FlexyContextSave"));
+  BubbleInteractionSettings.setStickerConversion(activity,false);
+  panel.setConfiguration(EnumSet.of(Action.BUILD_STICKER),true);
+  assertNull(named(panel,"FlexyContextConvertSticker"));
+  BubbleInteractionSettings.setStickerConversion(activity,true);
+ }
+ @Test public void dampedSpringIsSoftBoundedAndRestoresExactIdle() {
+  assertEquals(0f,DampedSpringCurve.progress(0f),0.000001f);
+  assertTrue(DampedSpringCurve.progress(.05f)>0f);
+  assertTrue(DampedSpringCurve.progress(.05f)<1f);
+  float overshoot=DampedSpringCurve.progress(.15f);
+  assertTrue("Elastic peak should exist",overshoot>1f);
+  assertTrue("Peak must remain subtle",overshoot<1.14f);
+  assertTrue("Residual should decay",Math.abs(DampedSpringCurve.progress(.28f)-1f)<.025f);
+  assertEquals(1f,DampedSpringCurve.progress(.33f),0.000001f);
+  assertEquals(1f,DampedSpringCurve.progress(1f),0.000001f);
+ }
+ @Test public void panelReturnsToIdleAfterDetachedAnimation() {
+  BubbleInteractionSettings.setSpringBounce(activity,true);
+  var panel=new BubbleActionPanelView(activity,null);
+  root.addView(panel);
+  root.removeView(panel);
+  assertEquals(1f,panel.getScaleX(),0.000001f);
+  assertEquals(1f,panel.getScaleY(),0.000001f);
+  assertEquals(0f,panel.getTranslationY(),0.000001f);
+ }
+ @Test public void localBounceAndStickerOptionsPersist() {
+  var context=activity.getApplicationContext();
+  BubbleInteractionSettings.setSpringBounce(context,false);
+  BubbleInteractionSettings.setStickerConversion(context,false);
+  org.robolectric.util.ReflectionHelpers.setStaticField(BubbleInteractionSettings.class,"bounce",null);
+  org.robolectric.util.ReflectionHelpers.setStaticField(BubbleInteractionSettings.class,"stickers",null);
+  assertFalse(BubbleInteractionSettings.springBounce(context));
+  assertFalse(BubbleInteractionSettings.stickerConversion(context));
+  BubbleInteractionSettings.setSpringBounce(context,true);
+  BubbleInteractionSettings.setStickerConversion(context,true);
  }
  @Test public void optInPersistsWithoutMotionPreferencesOrNoOpMenuState(){
   var context=activity.getApplicationContext();BubbleInteractionSettings.setSignaturePanel(context,true);
