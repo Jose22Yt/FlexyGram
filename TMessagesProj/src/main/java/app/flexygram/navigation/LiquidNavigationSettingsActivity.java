@@ -56,8 +56,12 @@ public final class LiquidNavigationSettingsActivity extends SignatureMatteSettin
             final boolean enabled = MainTabsHelper.isCallsTabShown(account);
             if (!enabled) NaConfig.INSTANCE.getMainTabsHideCallsSettings().setConfigBool(false);
             UserConfig.getInstance(account).setShowCallsTab(!enabled);
+            org.telegram.messenger.NotificationCenter.getInstance(account).postNotificationName(
+                    org.telegram.messenger.NotificationCenter.callTabsVisibleToggled);
         } else if (position == feedRow) {
             AppearanceConfig.showFeedTab.setConfigBool(!AppearanceConfig.showFeedTab());
+            org.telegram.messenger.NotificationCenter.getInstance(UserConfig.selectedAccount).postNotificationName(
+                    org.telegram.messenger.NotificationCenter.feedTabVisibleToggled);
         } else return;
         if (preview != null) preview.settingsChanged();
         if (listAdapter != null) listAdapter.notifyDataSetChanged();
