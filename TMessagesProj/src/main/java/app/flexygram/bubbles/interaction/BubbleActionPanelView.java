@@ -9,9 +9,10 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
-import android.view.animation.DecelerateInterpolator;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ValueAnimator;
+import android.view.animation.LinearInterpolator;
 import org.telegram.ui.ActionBar.Theme;
 
 /**
@@ -30,7 +31,7 @@ public final class BubbleActionPanelView extends LinearLayout {
     private final TextView sendButton;
     private final TextView saveButton, stickerStatus;
     private Runnable onDispose;
-    private AnimatorSet bounce;
+    private ValueAnimator bounce;
     public void setOnDispose(Runnable callback) { onDispose=callback; }
     public void setStickerEnabled(boolean enabled) { stickerEnabled=enabled && BubbleInteractionSettings.stickerConversion(getContext()); if (!stickerEnabled && tab==TAB_STICKER) tab=TAB_ACTIONS; refresh(); }
     public void setStickerStatus(String status) { stickerStatus.setText(status); }
@@ -278,27 +279,53 @@ public final class BubbleActionPanelView extends LinearLayout {
         }
     }
 
+
     private void cancelBounce() {
-        if (bounce != null) bounce.cancel();
+        ValueAnimator running = bounce;
         bounce = null;
+        if (running != null) running.cancel();
     }
+
     @Override protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        if (!BubbleInteractionSettings.springBounce(getContext())
-                || !android.animation.ValueAnimator.areAnimatorsEnabled()) return;
         cancelBounce();
-        setPivotY(0);
-        bounce = new AnimatorSet();
-        // Local four-keyframe elastic motion; does not intercept cell touches or native navigation.
-        bounce.playTogether(
-            ObjectAnimator.ofFloat(this, View.SCALE_X, .94f, 1.045f, .988f, 1f),
-            ObjectAnimator.ofFloat(this, View.SCALE_Y, .94f, 1.045f, .988f, 1f),
-            ObjectAnimator.ofFloat(this, View.TRANSLATION_Y, dp(getContext(), 8),
-                    -dp(getContext(), 3), dp(getContext(), 1), 0f)
-        );
-        bounce.setDuration(270L);
-        bounce.setInterpolator(new DecelerateInterpolator(1.05f));
-        bounce.start();
+        setScaleX(1f);
+        setScaleY(1f);
+        setTranslationY(0f);
+        if (!BubbleInteractionSettings.springBounce(getContext())
+                || !ValueAnimator.areAnimatorsEnabled()) return;
+
+        // First response is immediate; do not wait for pre-draw, layout or a delayed Runnable.
+        final float initialScale = .962f;
+        final float displacement = dp(getContext(), 7);
+        setScaleX(initialScale);
+        setScaleY(initialScale);
+        setTranslationY(displacement);
+
+        final ValueAnimator running = ValueAnimator.ofFloat(0f, 1f);
+        bounce = running;
+        running.setInterpolator(new LinearInterpolator());
+        running.setDuration(DampedSpringCurve.DURATION_MS);
+        running.addUpdateListener(frame -> {
+            if (bounce != running) return;
+            float seconds = frame.getAnimatedFraction() * DampedSpringCurve.DURATION_MS / 1000f;
+            float response = DampedSpringCurve.progress(seconds);
+            float scale = initialScale + (1f - initialScale) * response;
+            setScaleX(scale);
+            setScaleY(scale);
+            setTranslationY(displacement * (1f - response));
+        });
+        running.addListener(new AnimatorListenerAdapter() {
+            @Override public void onAnimationEnd(Animator animation) {
+                if (bounce == running) {
+                    bounce = null;
+                    setScaleX(1f);
+                    setScaleY(1f);
+                    setTranslationY(0f);
+                }
+            }
+        });
+        running.start();
     }
     @Override protected void onDetachedFromWindow() {
         cancelBounce();
