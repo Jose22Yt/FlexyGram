@@ -11,6 +11,9 @@ import android.graphics.Paint;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewConfiguration;
+import app.flexygram.navigation.LiquidNavigationConfig;
+import app.flexygram.navigation.LiquidNavigationMath;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -390,7 +393,13 @@ public class MainTabsLayout extends AnimatedLinearLayout {
     protected void dispatchDraw(@NonNull Canvas canvas) {
         if (drawCustomSelector) {
             final float x = animatedLongSelectedViewCenterX + animatedLongSelectedViewOffsetX;
-            final float sWidth = getInterpolatedWidthByX(x, this);
+            final float rawWidth = getInterpolatedWidthByX(x, this);
+            final float sWidth = flexyDragging
+                    ? LiquidNavigationMath.width(rawWidth, flexyStretch) : rawWidth;
+            if (flexyDragging) {
+                final int color = Theme.getColor(Theme.key_glass_tabSelected, resourcesProvider);
+                selectorPaint.setColor(Theme.multAlpha(color, LiquidNavigationConfig.opacity() / 100f));
+            }
             if (MainTabsUiHelper.isMaterial3NavigationBar()) {
                 MainTabsUiHelper.setMainTabSelectedIndicatorBounds(selectorRect, sWidth,
                         getHeight() - getPaddingTop() - getPaddingBottom());
@@ -402,7 +411,9 @@ public class MainTabsLayout extends AnimatedLinearLayout {
                 canvas.drawRoundRect(
                         x - sWidth / 2f, (getHeight() - sHeight) / 2f,
                         x + sWidth / 2f, (getHeight() + sHeight) / 2f,
-                        sHeight / 2f, sHeight / 2f, selectorPaint);
+                        sHeight * LiquidNavigationMath.compression(flexyStretch) / 2f,
+                        sHeight * LiquidNavigationMath.compression(flexyStretch) / 2f,
+                        selectorPaint);
             }
         }
 
@@ -472,6 +483,56 @@ public class MainTabsLayout extends AnimatedLinearLayout {
     private float animatedLongSelectedViewCenterX;
     private float animatedLongSelectedViewOffsetX;
 
+    // Direct drag gesture, independent from legacy long-press clickHelper.
+    private boolean flexyDragging, flexyTracking, flexyEligible;
+    private int flexyPointerId = MotionEvent.INVALID_POINTER_ID;
+    private float flexyDownX, flexyDownY, flexyPreviousX, flexyStretch;
+    private final int flexyTouchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
+    private boolean flexyLiquidEnabled() {
+        return LiquidNavigationConfig.enabled() && getVisibility() == View.VISIBLE && isEnabled()
+                && !isInLongPress && MainTabsUiHelper.isIosNavigationBar();
+    }
+    private void flexyBeginDrag(float x) {
+        flexyDragging = true;
+        selectedTabPositionX.cancel();
+        selectedTabPositionOffsetX.cancel();
+        animatedLongSelectedViewCenterX = clampXToChildrenCenters(x, this);
+        animatedLongSelectedViewOffsetX = 0f;
+        flexyPreviousX = x;
+        flexyStretch = 0f;
+        AndroidUtilities.cancelRunOnUIThread(restoreDrawSelector);
+        setSkipDrawSelector(true);
+    }
+    private void flexyMoveDrag(float x) {
+        final float clamped = clampXToChildrenCenters(x, this);
+        final float width = Math.max(1f, getInterpolatedWidthByX(clamped, this));
+        flexyStretch = LiquidNavigationMath.stretch(clamped - flexyPreviousX, width,
+                LiquidNavigationConfig.elasticity());
+        flexyPreviousX = clamped;
+        animatedLongSelectedViewCenterX = clamped;
+        animatedLongSelectedViewOffsetX = 0f;
+        invalidate();
+    }
+    private void flexyFinishDrag(boolean cancelled) {
+        if (!flexyDragging) return;
+        flexyDragging = false;
+        flexyStretch = 0f;
+        final View target = cancelled ? findSelectedTab()
+                : findNearestVisibleChildByX(animatedLongSelectedViewCenterX, this);
+        if (target != null) {
+            final float center = target.getX() + target.getWidth() * .5f;
+            selectedTabPositionX.setSpring(new SpringForce(center)
+                    .setStiffness(460f).setDampingRatio(.76f));
+            selectedTabPositionX.animateToFinalPosition(center);
+            if (!cancelled && target != findSelectedTab()) {
+                setTabSelected(target, true);
+                target.performClick(); // One native navigation operation only, on release.
+            }
+        }
+        AndroidUtilities.cancelRunOnUIThread(restoreDrawSelector);
+        AndroidUtilities.runOnUIThread(restoreDrawSelector, 370);
+        invalidate();
+    }
     private boolean isInLongPress;
     private float lastLongSelectedViewCenterX;
     private float lastLongSelectedViewWidth;
@@ -705,8 +766,57 @@ public class MainTabsLayout extends AnimatedLinearLayout {
     }
 
     @Override
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
+        if (!flexyLiquidEnabled()) return super.onInterceptTouchEvent(ev);
+        final int action = ev.getActionMasked();
+        if (action == MotionEvent.ACTION_DOWN) {
+            flexyTracking = true;
+            flexyDragging = false;
+            flexyPointerId = ev.getPointerId(0);
+            flexyDownX = flexyPreviousX = ev.getX();
+            flexyDownY = ev.getY();
+            flexyEligible = findChildUnder(this, flexyDownX, flexyDownY) != null;
+            return false;
+        }
+        if (action == MotionEvent.ACTION_MOVE && flexyTracking && flexyEligible) {
+            final int p = ev.findPointerIndex(flexyPointerId);
+            if (p < 0) return false;
+            final float dx = ev.getX(p) - flexyDownX;
+            final float dy = ev.getY(p) - flexyDownY;
+            if (Math.abs(dx) > flexyTouchSlop &&
+                    Math.abs(dx) > Math.abs(dy) * 1.1f) {
+                flexyBeginDrag(ev.getX(p));
+                return true; // cancels the child click without waiting for a long press
+            }
+        }
+        return super.onInterceptTouchEvent(ev);
+    }
+    @Override
+    public boolean onTouchEvent(MotionEvent ev) {
+        if (flexyDragging) {
+            final int action = ev.getActionMasked();
+            if (action == MotionEvent.ACTION_MOVE) {
+                int pointer = ev.findPointerIndex(flexyPointerId);
+                if (pointer < 0) { flexyFinishDrag(true); return true; }
+                flexyMoveDrag(ev.getX(pointer));
+                return true;
+            } else if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
+                if (action == MotionEvent.ACTION_UP) flexyMoveDrag(ev.getX());
+                flexyFinishDrag(action == MotionEvent.ACTION_CANCEL);
+                flexyTracking = false;
+                flexyPointerId = MotionEvent.INVALID_POINTER_ID;
+                return true;
+            }
+            return true;
+        }
+        return super.onTouchEvent(ev);
+    }
+    @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        clickHelper.onTouchEvent(this, ev);
+        // Legacy ClickHelper continues unchanged when Flexy liquid gesture is disabled.
+        if (!LiquidNavigationConfig.enabled() || !MainTabsUiHelper.isIosNavigationBar()) {
+            clickHelper.onTouchEvent(this, ev);
+        }
         return super.dispatchTouchEvent(ev);
     }
 
