@@ -31,3 +31,9 @@ This branch starts from **PR #123**, SHA `e00b33e806921017ad74ff50eb5ec88607131d
 
 ## Code ownership / privacy
 Settings only store appearance preferences. No chat content, media or Telegram account identifiers are serialized by the Liquid indicator. No gestures are recorded or uploaded. Preview is synthetic and does not read messages.
+
+## CI divergence found during PR #127 verification
+- Scoped `Flexy Liquid Navigation source and math contracts` run **40812959480**: **PASS** (the geometry/bounds and source wiring that belong to this new PR).
+- General Connected Alpha run **40812959334**, step `Run python3 tools/connected_alpha/run_checks.py`: **FAIL**; full traceback/log detail unavailable from the present GitHub connector. An additional evidence retention step also reports failure. The Gradle task-graph job was still running at the latest poll, not proven successful.
+- `tools/connected_alpha/stability1277_contract.py` is a strict historic allowlist/hash audit that calls `signature1278_contract.verify_current()` and compares reviewed bytes, then checks `git diff BASE --name-only`. New navigation files and `MainTabsLayout` changes were not part of the historic reviewed set; **scope rejection is a likely explanation**, but not confirmed without job logs. Work 1 must inspect logs and add a **new signed-off PR127 integration audit/allowlist with exact deltas**, not loosen/delete the old Alpha1277/1278 contracts.
+- DO NOT interpret isolated CI success as a fully passing build. No APK shall be considered ready until general contracts AND Gradle AND physical gestures have passed.
