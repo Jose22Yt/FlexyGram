@@ -760,7 +760,7 @@ public class GlassTabView extends FrameLayout implements MainTabsLayout.Tab, Fac
 
     public void setMainTabsAppearance(boolean compact, int iconDp) {
         setMainTabsCompact(compact);
-        View icon = backupImageView != null ? backupImageView : imageView;
+        android.view.View icon = backupImageView != null ? backupImageView : imageView;
         android.view.ViewGroup.LayoutParams lp = icon.getLayoutParams();
         int size = dp(Math.max(18, Math.min(28, iconDp)));
         if (lp.width != size || lp.height != size) {

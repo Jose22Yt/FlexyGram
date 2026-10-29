@@ -17438,7 +17438,8 @@ public class ChatActivityEnterView extends FrameLayout implements
             if (isNewDesignSendButton) {
                 final int sendFill = Theme.getColor(Theme.key_chat_messagePanelSend, resourcesProvider);
                 backgroundPaint.setColor(compactVisualInset >= 0
-                        && flexyNativeGlassIslandsAvailable()
+                        && org.telegram.messenger.LiteMode.isEnabled(org.telegram.messenger.LiteMode.FLAG_LIQUID_GLASS)
+                        && SharedConfig.chatBlurEnabled() && isHardwareAccelerated()
                         ? app.flexygram.composer.ComposerStyle.nativeGlassTint(sendFill) : sendFill);
             } else if (shouldDrawBackground()) {
                 backgroundPaint.setColor(getFillColor());
