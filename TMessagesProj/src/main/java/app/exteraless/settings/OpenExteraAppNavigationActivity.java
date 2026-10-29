@@ -68,6 +68,7 @@ public class OpenExteraAppNavigationActivity extends BaseFragment {
     private static final int ID_HIDE_CONTACTS_TAB = -108;
     private static final int ID_HIDE_CALLS_TAB = -109;
     private static final int ID_HIDE_PROFILE_TAB = -110;
+    private static final int ID_FLEXY_NAVIGATION = -111;
 
     /** Кнопка «добавить разделитель». */
     private static final int ID_ADD_DIVIDER = -200;
@@ -123,6 +124,11 @@ public class OpenExteraAppNavigationActivity extends BaseFragment {
         return fragmentView;
     }
 
+    @Override public void onResume() {
+        super.onResume();
+        if (listView != null) update();
+    }
+
     private void resetMenuLayout() {
         MainMenuLayout.reset();
         stableDividerIds.clear();
@@ -162,7 +168,9 @@ public class OpenExteraAppNavigationActivity extends BaseFragment {
         items.add(UItem.asHeader(getString(R.string.OEBottomNavigationBar)));
         items.add(UItem.asButton(ID_BOTTOM_NAVIGATION_BAR, getString(R.string.OEBottomNavigationBarMode),
                 bottomNavigationModes()[MainTabsLayout.getBottomNavigationMode()]));
-        if (hasBottomTabs()) {
+        if (hasBottomTabs() && app.flexygram.navigation.LiquidNavigationConfig.configured()) {
+            items.add(UItem.asButton(ID_FLEXY_NAVIGATION, R.drawable.msg_settings, getString(R.string.FlexyLiquidNavTitle)));
+        } else if (hasBottomTabs()) {
             items.add(UItem.asCheck(ID_HIDE_TAB_TITLES, getString(R.string.MainTabsHideTitles))
                     .setChecked(NaConfig.INSTANCE.getMainTabsHideTitles().Bool()));
             items.add(UItem.asCheck(ID_HIDE_CONTACTS_TAB, getString(R.string.MainTabsHideContacts))
@@ -374,6 +382,10 @@ public class OpenExteraAppNavigationActivity extends BaseFragment {
             AppearanceConfig.immersiveDrawerAnimation.setConfigBool(!AppearanceConfig.immersiveDrawerAnimation());
             update();
             return;
+        }
+        if (id == ID_FLEXY_NAVIGATION) {
+            var settings = new app.flexygram.navigation.LiquidNavigationSettingsActivity();
+            settings.setCurrentAccount(currentAccount);presentFragment(settings);return;
         }
         if (id == ID_HIDE_TAB_TITLES || id == ID_HIDE_CONTACTS_TAB
                 || id == ID_HIDE_CALLS_TAB || id == ID_HIDE_PROFILE_TAB) {

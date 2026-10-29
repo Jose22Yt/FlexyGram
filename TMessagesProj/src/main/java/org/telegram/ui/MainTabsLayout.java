@@ -371,6 +371,9 @@ public class MainTabsLayout extends AnimatedLinearLayout {
     }
 
     private final Runnable restoreDrawSelector = () -> setSkipDrawSelector(flexyLiquidEnabled());
+    private final Runnable finishNativeTap = () -> {
+        if (isAttachedToWindow() && flexyPressed && !flexyDragging) flexyFinishDrag(false);
+    };
     private boolean liquidPreview;
     public void setLiquidPreview(boolean preview) { liquidPreview=preview; refreshLiquidAppearance(); }
     public void refreshLiquidAppearance() { setSkipDrawSelector(flexyLiquidEnabled()); requestLayout(); invalidate(); }
@@ -851,7 +854,7 @@ public class MainTabsLayout extends AnimatedLinearLayout {
         int ownedPointer=ev.findPointerIndex(flexyPointerId);
         if(action==MotionEvent.ACTION_DOWN)flexyFingerX=ev.getX();
         else if(ownedPointer>=0)flexyFingerX=ev.getX(ownedPointer);
-        if(action==MotionEvent.ACTION_DOWN)flexyIgnoreUntilUp=false;
+        if(action==MotionEvent.ACTION_DOWN){removeCallbacks(finishNativeTap);flexyIgnoreUntilUp=false;}
         if(flexyIgnoreUntilUp)return true;
         if(action==MotionEvent.ACTION_POINTER_DOWN || action==MotionEvent.ACTION_POINTER_UP
                 || action==MotionEvent.ACTION_MOVE && flexyPressed
@@ -875,7 +878,11 @@ public class MainTabsLayout extends AnimatedLinearLayout {
         }
         boolean result=super.dispatchTouchEvent(ev);
         if(action==MotionEvent.ACTION_UP || action==MotionEvent.ACTION_CANCEL) {
-            flexyFinishDrag(action==MotionEvent.ACTION_CANCEL);
+            if (action==MotionEvent.ACTION_UP && flexyPressed && !flexyDragging) {
+                // Android posts the child's native click. Settle after that same queue turn,
+                // so a normal tap cannot spring back to the previously selected tab.
+                post(finishNativeTap);
+            } else flexyFinishDrag(action==MotionEvent.ACTION_CANCEL);
             flexyPointerId=MotionEvent.INVALID_POINTER_ID;
         }
         return result;
@@ -883,6 +890,7 @@ public class MainTabsLayout extends AnimatedLinearLayout {
     @Override protected void onVisibilityChanged(@NonNull View changed, int visibility) {
         super.onVisibilityChanged(changed, visibility);
         if (visibility != VISIBLE) {
+            removeCallbacks(finishNativeTap);
             flexyDragging=flexyPressed=flexyTracking=false;flexyPointerId=MotionEvent.INVALID_POINTER_ID;
             flexyStretch=0;
             if (selectedTabPositionX != null) selectedTabPositionX.cancel();
@@ -890,6 +898,7 @@ public class MainTabsLayout extends AnimatedLinearLayout {
         }
     }
     @Override protected void onDetachedFromWindow() {
+        removeCallbacks(finishNativeTap);
         flexyDragging=flexyPressed=flexyTracking=flexyIgnoreUntilUp=false;
         flexyPointerId=MotionEvent.INVALID_POINTER_ID;flexyStretch=0;
         selectedTabPositionX.cancel();selectedTabPositionOffsetX.cancel();flexyDeformation.cancel();

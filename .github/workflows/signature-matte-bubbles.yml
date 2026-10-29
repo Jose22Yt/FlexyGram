@@ -26,6 +26,10 @@ jobs:
             TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleGlassPolicy.java \
             tools/connected_alpha/matte_bubbles/GlassPolicyContractTest.java
           java -cp /tmp/flexy-glass-contract GlassPolicyContractTest
+          javac -encoding UTF-8 -d /tmp/flexy-glass-contract \
+            TMessagesProj/src/main/java/app/flexygram/bubbles/SignatureMatteFinish.java \
+            tools/connected_alpha/matte_bubbles/MatteFinishContractTest.java
+          java -cp /tmp/flexy-glass-contract MatteFinishContractTest
       - name: Settings/render/preview/source assertions
         run: |
           python3 tools/connected_alpha/matte_bubbles/test_matte_integration.py
