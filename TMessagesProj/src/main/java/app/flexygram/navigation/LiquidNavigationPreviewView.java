@@ -15,6 +15,9 @@ public final class LiquidNavigationPreviewView extends FrameLayout {
     private final MainTabsLayout bar;
     private final GlassTabView[] tabs=new GlassTabView[10];
     private int selected;
+    private int[] lastShown=new int[0];
+    private final Runnable afterSize=()->{if(isAttachedToWindow())settingsChanged();};
+    public void motionSettingsChanged(){bar.invalidate();}
     public LiquidNavigationPreviewView(Context context){
         super(context);setMinimumHeight(AndroidUtilities.dp(120));
         bar=new MainTabsLayout(context,null);bar.setLiquidPreview(true);
@@ -37,14 +40,18 @@ public final class LiquidNavigationPreviewView extends FrameLayout {
             bar.setViewVisible(tabs[id],LiquidNavigationDestinations.contains(shown,id),false);
             tabs[id].setMainTabsAppearance(!LiquidNavigationConfig.labels()||shown.length>=6,LiquidNavigationConfig.iconDp());
         }
-        for(int i=0;i<shown.length;i++){
-            bar.setPriority(tabs[shown[i]],org.telegram.messenger.LocaleController.isRTL ? -i : i);
-            tabs[shown[i]].bringToFront();
+        if(!java.util.Arrays.equals(shown,lastShown)){
+            for(int i=0;i<shown.length;i++){
+                bar.setPriority(tabs[shown[i]],org.telegram.messenger.LocaleController.isRTL ? -i : i);
+                tabs[shown[i]].bringToFront();
+            }
+            lastShown=shown;
         }
         bar.refreshLiquidAppearance();
-        android.view.ViewGroup.LayoutParams lp=bar.getLayoutParams();lp.height=AndroidUtilities.dp(LiquidNavigationConfig.heightDp()+16);bar.setLayoutParams(lp);
+        android.view.ViewGroup.LayoutParams lp=bar.getLayoutParams();int height=AndroidUtilities.dp(LiquidNavigationConfig.heightDp()+16);if(lp.height!=height){lp.height=height;bar.setLayoutParams(lp);}
         updateSelection();requestLayout();invalidate();
     }
-    @Override protected void onSizeChanged(int w,int h,int oldw,int oldh){super.onSizeChanged(w,h,oldw,oldh);if(w!=oldw)post(this::settingsChanged);}
+    @Override protected void onSizeChanged(int w,int h,int oldw,int oldh){super.onSizeChanged(w,h,oldw,oldh);if(w!=oldw){removeCallbacks(afterSize);post(afterSize);}}
+    @Override protected void onDetachedFromWindow(){removeCallbacks(afterSize);super.onDetachedFromWindow();}
     @Override protected void onMeasure(int w,int h){super.onMeasure(w,MeasureSpec.makeMeasureSpec(AndroidUtilities.dp(LiquidNavigationConfig.heightDp()+44),MeasureSpec.EXACTLY));}
 }

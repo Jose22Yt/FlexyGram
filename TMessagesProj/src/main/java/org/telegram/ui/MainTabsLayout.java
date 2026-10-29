@@ -535,7 +535,7 @@ public class MainTabsLayout extends AnimatedLinearLayout {
             new FloatPropertyCompat<MainTabsLayout>("flexyDeformation") {
                 public float getValue(MainTabsLayout v){return v.flexyStretch;}
                 public void setValue(MainTabsLayout v,float value){v.flexyStretch=Math.max(0,value);v.invalidate();}
-            });
+            }).setMinimumVisibleChange(.001f);
     private void flexyFinishDrag(boolean cancelled) {
         if (!flexyPressed && !flexyDragging) return;
         boolean commit = flexyDragging && !cancelled;
@@ -879,6 +879,15 @@ public class MainTabsLayout extends AnimatedLinearLayout {
             flexyPointerId=MotionEvent.INVALID_POINTER_ID;
         }
         return result;
+    }
+    @Override protected void onVisibilityChanged(@NonNull View changed, int visibility) {
+        super.onVisibilityChanged(changed, visibility);
+        if (visibility != VISIBLE) {
+            flexyDragging=flexyPressed=flexyTracking=false;flexyPointerId=MotionEvent.INVALID_POINTER_ID;
+            flexyStretch=0;
+            if (selectedTabPositionX != null) selectedTabPositionX.cancel();
+            if (flexyDeformation != null) flexyDeformation.cancel();
+        }
     }
     @Override protected void onDetachedFromWindow() {
         flexyDragging=flexyPressed=flexyTracking=flexyIgnoreUntilUp=false;

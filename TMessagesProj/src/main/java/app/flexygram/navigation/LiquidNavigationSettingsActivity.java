@@ -62,7 +62,7 @@ public final class LiquidNavigationSettingsActivity extends SignatureMatteSettin
             seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
                 public void onStartTrackingTouch(SeekBar b){if(b.getParent()!=null)b.getParent().requestDisallowInterceptTouchEvent(true);}
                 public void onStopTrackingTouch(SeekBar b){if(b.getParent()!=null)b.getParent().requestDisallowInterceptTouchEvent(false);}
-                public void onProgressChanged(SeekBar b,int v,boolean user){if(user&&!binding&&parameter!=null){LiquidNavigationConfig.value(parameter,v);if(preview!=null)preview.settingsChanged();}show(v);}
+                public void onProgressChanged(SeekBar b,int v,boolean user){if(user&&!binding&&parameter!=null){LiquidNavigationConfig.value(parameter,v);if(preview!=null){if(parameter.ordinal()<Parameter.HEIGHT.ordinal())preview.motionSettingsChanged();else preview.settingsChanged();}}show(v);}
             });
         }
         public void updateColors(){title.setTextColor(getThemedColor(Theme.key_windowBackgroundWhiteBlackText));seek.invalidate();}

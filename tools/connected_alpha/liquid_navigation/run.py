@@ -8,7 +8,7 @@ def write(source,root):
  def put(path,text):
   dest=source/path;dest.parent.mkdir(parents=True,exist_ok=True);dest.write_text(text)
  java=root/'TMessagesProj/src/main/java'
- files=['org/telegram/ui/MainTabsLayout.java','org/telegram/ui/Components/AnimatedLinearLayout.java','org/telegram/ui/Components/CubicBezierInterpolator.java','me/vkryl/android/animator/BoolAnimator.java','me/vkryl/android/animator/FactorAnimator.java','me/vkryl/android/animator/ListAnimator.java','me/vkryl/android/animator/Animated.java','me/vkryl/android/AnimatorUtils.java','me/vkryl/android/util/ClickHelper.java','me/vkryl/core/ArrayUtils.java','me/vkryl/core/BitwiseUtils.java','me/vkryl/core/lambda/Destroyable.java','app/flexygram/navigation/LiquidNavigationConfig.java','app/flexygram/navigation/LiquidNavigationMath.java','app/flexygram/navigation/LiquidNavigationDestinations.java']
+ files=['org/telegram/ui/MainTabsLayout.java','org/telegram/ui/Components/AnimatedLinearLayout.java','org/telegram/ui/Components/CubicBezierInterpolator.java','me/vkryl/android/animator/BoolAnimator.java','me/vkryl/android/animator/FactorAnimator.java','me/vkryl/android/animator/ListAnimator.java','me/vkryl/android/animator/VariableFloat.java','me/vkryl/android/animator/VariableRect.java','me/vkryl/android/animator/Animatable.java','me/vkryl/android/animator/Animated.java','me/vkryl/android/AnimatorUtils.java','me/vkryl/android/util/ClickHelper.java','me/vkryl/core/ArrayUtils.java','me/vkryl/core/BitwiseUtils.java','me/vkryl/core/lambda/Destroyable.java','app/flexygram/navigation/LiquidNavigationConfig.java','app/flexygram/navigation/LiquidNavigationMath.java','app/flexygram/navigation/LiquidNavigationDestinations.java']
  for name in files:put(name,(java/name).read_text())
  for name in ['NonNull','Nullable']:put('androidx/annotation/'+name+'.java','package androidx.annotation;public @interface '+name+'{}')
  put('androidx/annotation/FloatRange.java','package androidx.annotation;public @interface FloatRange{double from() default Double.NEGATIVE_INFINITY;double to() default Double.POSITIVE_INFINITY;}')
@@ -20,6 +20,24 @@ def write(source,root):
  put('xyz/nextalone/nagram/NaConfig.java','''package xyz.nextalone.nagram;public class NaConfig{public static NaConfig INSTANCE=new NaConfig();public static class Flag{boolean value;public boolean Bool(){return value;}public void setConfigBool(boolean v){value=v;}}private final Flag hide=new Flag();public Flag getHideBottomNavigationBar(){return hide;}}''')
  put('me/vkryl/android/ViewUtils.java','''package me.vkryl.android;public class ViewUtils{public static void hapticVibrate(android.view.View v,boolean a,boolean b){}public static void onClick(android.view.View v){}public static void runJustBeforeBeingDrawn(android.view.View v,Runnable r){v.post(r);}}''')
  put('org/telegram/ui/Components/glass/GlassTabView.java','''package org.telegram.ui.Components.glass;public class GlassTabView extends android.widget.FrameLayout implements org.telegram.ui.MainTabsLayout.Tab{private boolean selected,skip;public GlassTabView(android.content.Context c){super(c);setClickable(true);}public boolean isTabSelected(){return selected;}public void setSelected(boolean value,boolean animated){selected=value;}public void setSkipDrawSelector(boolean v){skip=v;}public void setVisualWidth(float w){}public float measureTextWidth(){return 32;}public float measureTextWidth(float v){return 32;}public void setTextSizeDp(float v){}}''')
+
+ # Execute the actual MainTabsActivity visibility method, not a rewritten condition.
+ native=(java/'org/telegram/ui/MainTabsActivity.java').read_text()
+ anchor=native.index('    private void checkUi_tabsPosition()')
+ end=native.index('    private void checkUi_callTabVisible(',anchor)
+ method=native[anchor:end]
+ put('NativeTabsVisibilityProbe.java','''import android.widget.FrameLayout;import android.view.View;import org.telegram.ui.MainTabsLayout;import xyz.nextalone.nagram.NaConfig;
+ public class NativeTabsVisibilityProbe {
+ final MainTabsLayout tabsView;final FrameLayout tabsViewWrapper;float factor;
+ static int dp(float v){return org.telegram.messenger.AndroidUtilities.dp(v);}static float lerp(float a,float b,float t){return a+(b-a)*t;}
+ static class MainTabsHelper{static boolean isMainTabsHideTitleStyle(){return false;}}
+ static class UpdateLayoutWrapper{static int HEIGHT=48;boolean isUpdateLayoutVisible(){return false;}}
+ final UpdateLayoutWrapper updateLayoutWrapper=new UpdateLayoutWrapper();
+ final Factor animatorTabsVisible=new Factor();class Factor{float getFloatValue(){return factor;}}
+ void checkUi_miniPlayer(){}
+ public NativeTabsVisibilityProbe(MainTabsLayout bar,FrameLayout wrapper){tabsView=bar;tabsViewWrapper=wrapper;}
+ public void apply(float value){factor=value;checkUi_tabsPosition();}
+ '''+method+'}')
 if __name__=='__main__':
  if '--output-dir' not in sys.argv:sys.argv+=['--output-dir',str(HERE.parents[2]/'build/connected-alpha-liquid-navigation')]
  raise SystemExit(p.main(here=HERE,test_class='LiquidNavigationTest',stubs_writer=write,extra_aars=(('androidx.dynamicanimation','dynamicanimation','1.0.0'),)))

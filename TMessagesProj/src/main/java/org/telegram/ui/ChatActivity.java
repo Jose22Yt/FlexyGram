@@ -33269,7 +33269,7 @@ public class ChatActivity extends BaseFragment implements
                 flags |= ActionBarPopupWindow.ActionBarPopupWindowLayout.FLAG_USE_SWIPEBACK;
             }
 
-            final boolean compactContext = v instanceof ChatMessageCell
+            final boolean compactContext = longpress && !onDoubleTapped && v instanceof ChatMessageCell
                     && selectedObject == ((ChatMessageCell)v).getMessageObject()
                     && selectedObject != null && selectedObjectGroup == null && !selectedObject.isSponsored()
                     && !selectedObject.isEphemeral() && !suggestEdit && AndroidUtilities.displaySize.x >= dp(320)

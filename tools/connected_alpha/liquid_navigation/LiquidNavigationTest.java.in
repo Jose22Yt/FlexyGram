@@ -32,6 +32,15 @@ public class LiquidNavigationTest {
  void event(int action,float x){MotionEvent e=MotionEvent.obtain(0,android.os.SystemClock.uptimeMillis(),action,x,30,0);try{bar.dispatchTouchEvent(e);}finally{e.recycle();}}
  float center(int i){return tabs[i].getX()+tabs[i].getWidth()/2f;}
  @After public void end(){activity.finish();}
+ @Test public void actualHostVisibilityMethodEnablesTheBarOnlyWhenShown(){
+  var host=new NativeTabsVisibilityProbe(bar,root);host.apply(0f);assertFalse(bar.isEnabled());
+  host.apply(.5f);assertFalse(bar.isEnabled());host.apply(1f);assertTrue(bar.isEnabled());assertEquals(View.VISIBLE,bar.getVisibility());
+ }
+ @Test public void rtlPriorityRetainsLogicalDestinationOrderWithoutReparenting(){
+  bar.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+  for(int i=0;i<tabs.length;i++)bar.setPriority(tabs[i],-i);
+  layout();assertTrue(center(0)>center(3));for(var tab:tabs)assertSame(bar,tab.getParent());
+ }
  @Test public void tapHighlightsImmediatelyAndDispatchesOnlyOneNativeClick(){
   event(MotionEvent.ACTION_DOWN,center(2));
   assertTrue(ReflectionHelpers.<Boolean>getField(bar,"flexyPressed"));
