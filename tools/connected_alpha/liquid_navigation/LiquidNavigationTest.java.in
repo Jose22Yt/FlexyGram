@@ -131,4 +131,27 @@ public class LiquidNavigationTest {
   }
  }
 
+ @Test public void geometryChangesCancelTheOldFingerSequenceWithoutNavigation(){
+  event(MotionEvent.ACTION_DOWN,center(0));event(MotionEvent.ACTION_MOVE,center(3));
+  bar.setMaxWidth(250);layout();
+  assertFalse(ReflectionHelpers.<Boolean>getField(bar,"flexyDragging"));
+  assertFalse(ReflectionHelpers.<Boolean>getField(bar,"flexyPressed"));
+  event(MotionEvent.ACTION_UP,center(3));assertEquals(0,clicks);
+  event(MotionEvent.ACTION_DOWN,center(1));event(MotionEvent.ACTION_UP,center(1));
+  Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();assertEquals(1,clicks);
+ }
+ @Test public void twoThroughSixNativeTabsKeepTargetsAndFixedOuterGeometry(){
+  java.util.ArrayList<GlassTabView> all=new java.util.ArrayList<>(java.util.Arrays.asList(tabs));
+  for(int count=2;count<=6;count++){
+   while(all.size()<count){var tab=new GlassTabView(activity);all.add(tab);bar.addView(tab);}
+   for(int i=0;i<all.size();i++)bar.setViewVisible(all.get(i),i<count,false);
+   layout();
+   for(int i=0;i<count;i++)assertTrue(all.get(i).getWidth()>=48);
+   int width=bar.getWidth(),height=bar.getHeight();
+   event(MotionEvent.ACTION_DOWN,center(0));event(MotionEvent.ACTION_MOVE,center(1));
+   assertEquals(width,bar.getWidth());assertEquals(height,bar.getHeight());
+   event(MotionEvent.ACTION_CANCEL,center(1));
+  }
+ }
+
 }
