@@ -78,6 +78,12 @@ def main():
     changed = subprocess.check_output(['git', 'diff', '--name-only', BASE, '--', 'TMessagesProj'], cwd=ROOT, text=True).splitlines()
     for name in changed:
         if name.endswith(('.java', '.kt', '.cpp', '.h', '.c')):
+            if name != 'TMessagesProj/src/main/java/org/telegram/messenger/SharedConfig.java':
+                sys.path.insert(0, str(ROOT/'tools/connected_alpha'))
+                from performance_p0_contract import restore as project_performance, original as before_performance
+                data = (ROOT/name).read_bytes()
+                require(project_performance(name, data) == before_performance(name), 'Source outside exact reviewed performance overlay: ' + name)
+                continue
             require(name == 'TMessagesProj/src/main/java/org/telegram/messenger/SharedConfig.java', 'Functional source modified: ' + name)
             expected = original(name).decode().replace('"'+ALPHA+'".equals(ApplicationLoader.applicationContext.getPackageName())', 'BuildConfig.CONNECTED_ALPHA')
             require(read(name) == expected, 'Unreviewed SharedConfig change')

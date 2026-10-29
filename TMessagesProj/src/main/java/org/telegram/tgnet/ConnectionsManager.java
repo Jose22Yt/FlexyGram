@@ -714,6 +714,14 @@ public class ConnectionsManager extends BaseController {
         native_setUserId(currentAccount, id);
     }
 
+    private final app.flexygram.performance.CoalescedTask networkCheck =
+            new app.flexygram.performance.CoalescedTask(
+                    task -> Utilities.stageQueue.postRunnable(task), this::checkConnection);
+
+    /** Connectivity broadcasts must not enumerate network interfaces on the UI thread.
+     * Repeated pending events share one task; events during a check schedule a fresh check. */
+    public void scheduleConnectionCheck() { networkCheck.request(); }
+
     public void checkConnection() {
         byte selectedStrategy = getIpStrategy();
         if (BuildVars.LOGS_ENABLED) {

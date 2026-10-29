@@ -14,11 +14,17 @@ public final class LiquidLensRenderer {
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Drawable backdrop;
     private boolean reduceOptics;
+    private boolean geometryReady;
+    private float lastX, lastY, lastWidth, lastHeight, lastStretch, lastDirection;
     public Path shape() { return shape; }
     public Drawable backdrop() { return backdrop; }
     public void backdrop(Drawable value) { backdrop = value; }
     public void prepare(float x, float y, float width, float height, float stretch, float direction) {
         reduceOptics=LiquidNavigationConfig.adaptiveQuality()&&stretch>.12f;
+        if (geometryReady && x == lastX && y == lastY && width == lastWidth && height == lastHeight
+                && stretch == lastStretch && direction == lastDirection) return;
+        geometryReady = true;
+        lastX=x; lastY=y; lastWidth=width; lastHeight=height; lastStretch=stretch; lastDirection=direction;
         float halfH=Math.max(0,height*.5f), halfW=Math.max(height*1.55f,width)*.5f;
         bounds.set(x - halfW, y - halfH, x + halfW, y + halfH);
         // Signed head/tail curvature changes immediately on reversal; outer capsule stays fixed.

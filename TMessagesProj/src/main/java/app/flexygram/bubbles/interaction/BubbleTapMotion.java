@@ -38,6 +38,9 @@ public final class BubbleTapMotion implements Runnable {
         if(t>=1){scale=1;running=false;}else owner.postOnAnimation(this);
         invalidate();
     }
-    public void reset(){owner.removeCallbacks(this);pressed=running=false;scale=1;invalidate();}
+    public void reset(){
+        if(!pressed&&!running&&scale==1f)return;
+        owner.removeCallbacks(this);pressed=running=false;scale=1;invalidate();
+    }
     private void invalidate(){owner.invalidate();if(owner.getParent() instanceof View)((View)owner.getParent()).invalidate();}
 }
