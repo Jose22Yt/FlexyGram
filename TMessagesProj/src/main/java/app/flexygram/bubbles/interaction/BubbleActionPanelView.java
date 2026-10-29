@@ -165,7 +165,7 @@ public final class BubbleActionPanelView extends LinearLayout {
             LayoutParams preview = new LayoutParams(-1, dp(getContext(), 142));
             preview.topMargin = dp(getContext(), 8);
             content.addView(stickerPreview, preview);
-            LayoutParams send = new LayoutParams(-1, dp(getContext(), 45));
+            LayoutParams send = new LayoutParams(-1, dp(getContext(), 48));
             send.topMargin = dp(getContext(), 8);
             LinearLayout actions = new LinearLayout(getContext());
             actions.addView(sendButton,new LayoutParams(0,dp(getContext(),48),1));
