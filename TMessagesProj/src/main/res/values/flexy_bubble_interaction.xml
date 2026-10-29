@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="FlexyTapAnimation">Bubble tap animation</string>
+  <string name="FlexyTapPanel">Reactions and panel with one tap</string>
+  <string name="FlexyTapCompression">Compression</string>
+  <string name="FlexyTapRebound">Rebound</string>
+  <string name="FlexyTapRecovery">Recovery speed</string>
+</resources>

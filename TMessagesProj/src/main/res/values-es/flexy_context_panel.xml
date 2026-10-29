@@ -6,5 +6,5 @@
     <string name="FlexyContextPanel">Panel contextual Signature</string>
     <string name="FlexyContextBounce">Animación de selección iOS 27</string>
     <string name="FlexyContextInteractions">Interacción de mensajes</string>
-    <string name="FlexyContextDescription">Destaca el mensaje con desenfoque y un rebote suave. Conserva las reacciones, los permisos y las acciones nativas de Telegram.</string>
+    <string name="FlexyContextDescription">El contacto anima la burbuja de forma independiente del menú. Activa por separado las reacciones y el panel mediante un toque. Los controles y la pulsación prolongada conservan sus acciones nativas.</string>
 </resources>

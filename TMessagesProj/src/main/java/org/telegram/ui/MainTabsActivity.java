@@ -1059,13 +1059,13 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         if (tabsView == null || tabs == null || !app.flexygram.navigation.LiquidNavigationConfig.configured()) return;
         int width = tabsViewWrapper != null && tabsViewWrapper.getWidth() > 0
                 ? tabsViewWrapper.getWidth() : AndroidUtilities.displaySize.x;
-        int slots = Math.max(2, Math.min(6, (width - dp(56)) / dp(48)));
+        int slots = Math.max(2, (width - dp(56)) / dp(48));
         flexyConfiguredDestinations = app.flexygram.navigation.LiquidNavigationConfig.order();
-        int[] shown = app.flexygram.navigation.LiquidNavigationDestinations.fit(flexyConfiguredDestinations, slots);
+        int[] shown = app.flexygram.navigation.LiquidNavigationConfig.shown(slots);
         boolean orderChanged = !java.util.Arrays.equals(shown, flexyShownDestinations);
         for (int id = 0; id < tabs.length; id++) {
             tabsView.setViewVisible(tabs[id], app.flexygram.navigation.LiquidNavigationDestinations.contains(shown,id), false);
-            tabs[id].setMainTabsAppearance(!app.flexygram.navigation.LiquidNavigationConfig.labels() || shown.length >= 6,
+            tabs[id].setMainTabsAppearance(app.flexygram.navigation.LiquidNavigationConfig.hideLabels(shown.length,(int)(width/AndroidUtilities.density)),
                     app.flexygram.navigation.LiquidNavigationConfig.iconDp());
         }
         if (orderChanged) {
@@ -1078,7 +1078,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         }
         int oldHeight=tabsView.getLayoutParams()!=null ? tabsView.getLayoutParams().height : -1;
         MainTabsUiHelper.applyTabsLayoutStyle(tabsView,dp(328 + DialogsActivity.MAIN_TABS_MARGIN * 2));
-        if (tabsViewBackground!=null) tabsViewBackground.setRadius(MainTabsUiHelper.getBackgroundRadius());
+        if (tabsViewBackground!=null){tabsViewBackground.setRadius(MainTabsUiHelper.getBackgroundRadius());tabsViewBackground.setPadding(MainTabsUiHelper.getBackgroundInset());}
         if (tabsViewWrapper != null) MainTabsUiHelper.applyTabsBottomInset(tabsView,tabsViewWrapper,navigationBarHeight,insetLeft,insetRight);
         if (tabsView.getLayoutParams()!=null && oldHeight!=tabsView.getLayoutParams().height && fragmentView!=null)
             androidx.core.view.ViewCompat.requestApplyInsets(fragmentView);
@@ -1090,7 +1090,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
             viewPager.scrollToPosition(getPositionChats());
             return;
         }
-        selectTab(current, false);
+        selectTab(current, false);tabsView.revealSelectedDestination();
     }
     private void openFlexySettings() {
         Bundle args = new Bundle();
@@ -1153,6 +1153,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
             GlassTabView tab = tabs[a];
             tab.setSelected(a==9 ? overflowSelected : indexToPosition(a)==position, animated);
         }
+        if(tabsView!=null)tabsView.revealSelectedDestination();
     }
 
     public void setGestureSelectedOverride(float animatedPosition, boolean allow) {

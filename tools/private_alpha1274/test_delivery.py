@@ -24,7 +24,7 @@ class Tests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             p = Path(tmp) / 'synthetic.bin'
             p.write_bytes(b'isolated transport fixture, not an APK')
-            report = dict(commit=d.SOURCE, application_id=d.APP, version_code=1285,
+            report = dict(commit=d.SOURCE, application_id=d.APP, version_code=1286,
                           certificate_sha256=d.CERT, elf_count=96, status='PASS_ARTIFACT_ONLY',
                           sha256=hashlib.sha256(p.read_bytes()).hexdigest(), bytes=p.stat().st_size)
             self.assertEqual(d.validate(report, p), (report['sha256'], report['bytes']))

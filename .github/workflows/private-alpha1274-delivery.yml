@@ -1,8 +1,8 @@
-name: Alpha 1285 Signature iOS27 integration private signed delivery
+name: Alpha 1286 Signature iOS27 integration private signed delivery
 
 on:
   push:
-    branches: [delivery/alpha1285-signature-reconstruction-private]
+    branches: [delivery/alpha1286-interaction2-private]
     paths:
       - '.github/workflows/private-alpha1274-delivery.yml'
       - 'tools/private_alpha1274/**'
@@ -12,7 +12,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: private-alpha1285-universal-${{ github.sha }}
+  group: private-alpha1286-universal-${{ github.sha }}
   cancel-in-progress: false
 
 jobs:
@@ -22,7 +22,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: e0c8e1b78acc120481cc9675de149771f59ddd6c
+          ref: db07dcc1cdb83db6befde35ae988aad034eac2d1
           fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-java@v4
@@ -49,7 +49,7 @@ jobs:
       - name: Retain isolated native bubble graphics (not full app screenshots)
         uses: actions/upload-artifact@v4
         with:
-          name: FlexyGram-Alpha1285-native-bubble-probe
+          name: FlexyGram-Alpha1286-native-bubble-probe
           path: |
             build/connected-alpha-bubble-visual/android-native-bubbles.png
             build/connected-alpha-bubble-visual/android-signature-icons.png
@@ -85,14 +85,17 @@ jobs:
 
       - name: Verify integrated Studio, login, music, header, preview and performance Android regressions
         run: |
-          for probe in liquid_navigation studio_native login_visual music_visual header_visual preview_visual performance/native performance/native3 native_motion_restore native_touch context_panel; do
+          for probe in liquid_navigation studio_native login_visual music_visual header_visual preview_visual performance/native performance/native3 native_motion_restore native_touch context_panel interaction2; do
             python3 "tools/connected_alpha/$probe/run.py" --sdk-root "$ANDROID_HOME"
           done
       - name: Retain synthetic corrected music and header evidence
         uses: actions/upload-artifact@v4
         with:
-          name: Alpha1285-integrated-renderer-evidence
+          name: Alpha1286-integrated-renderer-evidence
           path: |
+            build/interaction2/*.png
+            build/interaction2/target/surefire-reports/*.xml
+            build/connected-alpha-bubble-visual/*isolated.png
             build/connected-alpha-header-visual/*.png
             build/connected-alpha-header-visual/target/surefire-reports/*.xml
             build/connected-alpha-music-visual/*.png
@@ -135,7 +138,7 @@ jobs:
 
   private-destination:
     needs: credentials-present
-    if: needs.credentials-present.outputs.ready == 'true' && github.repository == 'Jose22Yt/FlexyGram' && github.ref == 'refs/heads/delivery/alpha1285-signature-reconstruction-private'
+    if: needs.credentials-present.outputs.ready == 'true' && github.repository == 'Jose22Yt/FlexyGram' && github.ref == 'refs/heads/delivery/alpha1286-interaction2-private'
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -171,11 +174,11 @@ jobs:
         working-directory: approved
     env:
       NATIVE_TARGET: arm64-v8a
-      COMMIT_ID: e0c8e1b78acc120481cc9675de149771f59ddd6c
+      COMMIT_ID: db07dcc1cdb83db6befde35ae988aad034eac2d1
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: e0c8e1b78acc120481cc9675de149771f59ddd6c
+          ref: db07dcc1cdb83db6befde35ae988aad034eac2d1
           path: approved
           fetch-depth: 0
           submodules: recursive
@@ -187,7 +190,7 @@ jobs:
           sparse-checkout: tools/private_alpha1274
           persist-credentials: false
       - name: Require the exact approved application commit
-        run: test "$(git rev-parse HEAD)" = e0c8e1b78acc120481cc9675de149771f59ddd6c
+        run: test "$(git rev-parse HEAD)" = db07dcc1cdb83db6befde35ae988aad034eac2d1
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -283,7 +286,7 @@ jobs:
             echo '::error::Expected exactly one Connected Alpha APK.'
             exit 1
           fi
-          PYTHONPATH=tools/connected_alpha python3 "$GITHUB_WORKSPACE/delivery-control/tools/private_alpha1274/signature_verifier.py" "${packages[0]}" --build-tools "$ANDROID_HOME/build-tools/36.0.0" --certificate-sha256 "$ALPHA_CERTIFICATE_SHA256" --expected-version-code 1285 > connected-alpha-verification.json
+          PYTHONPATH=tools/connected_alpha python3 "$GITHUB_WORKSPACE/delivery-control/tools/private_alpha1274/signature_verifier.py" "${packages[0]}" --build-tools "$ANDROID_HOME/build-tools/36.0.0" --certificate-sha256 "$ALPHA_CERTIFICATE_SHA256" --expected-version-code 1286 > connected-alpha-verification.json
           python3 - <<'PY'
           import json, os
           from pathlib import Path

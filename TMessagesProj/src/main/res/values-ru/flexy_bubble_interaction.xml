@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="FlexyTapAnimation">Анимация касания сообщения</string>
+  <string name="FlexyTapPanel">Реакции и меню одним касанием</string>
+  <string name="FlexyTapCompression">Сжатие</string>
+  <string name="FlexyTapRebound">Отскок</string>
+  <string name="FlexyTapRecovery">Скорость восстановления</string>
+</resources>

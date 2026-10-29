@@ -51,7 +51,7 @@ public final class MainTabsUiHelper {
 
     /** M3 — 64dp, иначе высота из MainTabsHelper. */
     public static int getTabsViewHeightDp() {
-        if (app.flexygram.navigation.LiquidNavigationConfig.configured()) return app.flexygram.navigation.LiquidNavigationConfig.heightDp()+16;
+        if (app.flexygram.navigation.LiquidNavigationConfig.configured()) return app.flexygram.navigation.LiquidNavigationConfig.heightDp()+32;
         return isMaterial3NavigationBar() ? 64 : MainTabsHelper.getMainTabsHeightWithMargins();
     }
 
@@ -65,7 +65,7 @@ public final class MainTabsUiHelper {
 
     /** В iOS-стиле капсула на 4dp выше, но таб внутри остаётся 48dp — лишнее уходит в паддинг. */
     public static int getTabsInnerPaddingVertical() {
-        if (app.flexygram.navigation.LiquidNavigationConfig.configured()) return AndroidUtilities.dp(8);
+        if (app.flexygram.navigation.LiquidNavigationConfig.configured()) return AndroidUtilities.dp(16);
         if (isMaterial3NavigationBar()) {
             return 0;
         }
@@ -73,11 +73,13 @@ public final class MainTabsUiHelper {
     }
 
     public static int getTabsInnerPaddingHorizontal() {
+        if(app.flexygram.navigation.LiquidNavigationConfig.configured())return AndroidUtilities.dp(app.flexygram.navigation.LiquidNavigationConfig.innerMarginDp());
         return isMaterial3NavigationBar() ? 0 : AndroidUtilities.dp(MainTabsHelper.getMainTabsMargin() + 4);
     }
 
     /** В M3 подложка без отступа от краёв. */
     public static int getBackgroundInset() {
+        if(app.flexygram.navigation.LiquidNavigationConfig.configured())return AndroidUtilities.dp(16);
         return isMaterial3NavigationBar() ? 0 : AndroidUtilities.dp(MainTabsHelper.getMainTabsMargin() - 0.334f);
     }
 
@@ -112,8 +114,8 @@ public final class MainTabsUiHelper {
      */
     public static void applyTabsBottomInset(MainTabsLayout layout, View wrapper, int bottomInset, int leftInset, int rightInset) {
         applyTabsBottomInset(layout, bottomInset);
-        final int side = getWrapperSideInset();
-        wrapper.setPadding(leftInset + side, 0, rightInset + side, isMaterial3NavigationBar() ? 0 : bottomInset);
+        final int side = app.flexygram.navigation.LiquidNavigationConfig.configured()?AndroidUtilities.dp(app.flexygram.navigation.LiquidNavigationConfig.sideGapDp()):getWrapperSideInset();
+        wrapper.setPadding(leftInset + side, 0, rightInset + side, isMaterial3NavigationBar() ? 0 : bottomInset+(app.flexygram.navigation.LiquidNavigationConfig.configured()?AndroidUtilities.dp(app.flexygram.navigation.LiquidNavigationConfig.bottomGapDp()):0));
     }
 
     public static void applyTabsBottomInset(MainTabsLayout layout, int bottomInset) {

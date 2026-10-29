@@ -6,5 +6,5 @@
     <string name="FlexyContextPanel">Signature context panel</string>
     <string name="FlexyContextBounce">iOS 27 selection animation</string>
     <string name="FlexyContextInteractions">Message interactions</string>
-    <string name="FlexyContextDescription">Highlights the message with background blur and a gentle rebound. Preserves native Telegram reactions, permissions and actions.</string>
+    <string name="FlexyContextDescription">Single contact animates the bubble independently from the context menu. Enable reactions and panel with one tap separately. Native controls and long press retain their actions.</string>
 </resources>

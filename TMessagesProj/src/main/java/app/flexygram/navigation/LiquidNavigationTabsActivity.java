@@ -41,12 +41,11 @@ public final class LiquidNavigationTabsActivity extends BaseFragment {
     }
     private void click(UItem item,View view,int position,float x,float y){
         int[] order=LiquidNavigationConfig.order();
-        if(item.id>=100 && item.id<109){
+        if(item.id>=100 && item.id<100+LiquidNavigationDestinations.COUNT){
             int id=item.id-100;if(id==0 || order.length<=2)return;
             int[] next=new int[order.length-1];int n=0;for(int value:order)if(value!=id)next[n++]=value;
             LiquidNavigationConfig.order(next);
-        }else if(item.id>=200 && item.id<209){
-            if(order.length>=6){BulletinFactory.of(this).createErrorBulletin(getString(R.string.FlexyLiquidNavLimit)).show();return;}
+        }else if(item.id>=200 && item.id<200+LiquidNavigationDestinations.COUNT){
             int[] next=java.util.Arrays.copyOf(order,order.length+1);next[order.length]=item.id-200;LiquidNavigationConfig.order(next);
         }else return;
         preview.settingsChanged();list.adapter.update(true);

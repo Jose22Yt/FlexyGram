@@ -13,29 +13,35 @@ public final class LiquidLensRenderer {
     private final RectF bounds = new RectF();
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Drawable backdrop;
+    private boolean reduceOptics;
     public Path shape() { return shape; }
     public Drawable backdrop() { return backdrop; }
     public void backdrop(Drawable value) { backdrop = value; }
     public void prepare(float x, float y, float width, float height, float stretch, float direction) {
-        float halfW = Math.max(0, width * .5f), halfH = Math.max(0, height * .5f);
+        reduceOptics=LiquidNavigationConfig.adaptiveQuality()&&stretch>.12f;
+        float halfH=Math.max(0,height*.5f), halfW=Math.max(height*1.55f,width)*.5f;
         bounds.set(x - halfW, y - halfH, x + halfW, y + halfH);
         // Signed head/tail curvature changes immediately on reversal; outer capsule stays fixed.
         float skew = Math.max(-1f, Math.min(1f, direction)) * Math.min(.19f, stretch);
         float leftH = halfH * (1f - skew * .8f);
         float rightH = halfH * (1f + skew * .8f);
-        float k = .58f;
-        shape.rewind();
-        shape.moveTo(x, y - halfH);
-        shape.cubicTo(x + halfW*k, y-halfH, bounds.right, y-rightH*k, bounds.right, y);
-        shape.cubicTo(bounds.right, y+rightH*k, x+halfW*k, y+halfH, x, y+halfH);
-        shape.cubicTo(x-halfW*k, y+halfH, bounds.left, y+leftH*k, bounds.left, y);
-        shape.cubicTo(bounds.left, y-leftH*k, x-halfW*k, y-halfH, x, y-halfH);
+        // A horizontal capsule, including during press and drag. Never an ellipse/circle.
+        float radius=Math.min(halfH,halfW/1.55f), k=.5522848f;
+        float left=bounds.left,right=bounds.right,top=bounds.top,bottom=bounds.bottom;
+        float l=left+radius,r=right-radius;
+        float leftRadius=radius*(1-skew*.3f),rightRadius=radius*(1+skew*.3f);
+        shape.rewind();shape.moveTo(l,top);shape.lineTo(r,top);
+        shape.cubicTo(r+rightRadius*k,top,right,y-rightH*k,right,y);
+        shape.cubicTo(right,y+rightH*k,r+rightRadius*k,bottom,r,bottom);
+        shape.lineTo(l,bottom);
+        shape.cubicTo(l-leftRadius*k,bottom,left,y+leftH*k,left,y);
+        shape.cubicTo(left,y-leftH*k,l-leftRadius*k,top,l,top);
         shape.close();
     }
     public void surface(Canvas canvas) {
         int save = canvas.save();
         canvas.clipPath(shape);
-        if (backdrop != null) {
+        if (backdrop != null && !reduceOptics) {
             backdrop.setBounds((int)bounds.left, (int)bounds.top,
                     (int)Math.ceil(bounds.right), (int)Math.ceil(bounds.bottom));
             backdrop.draw(canvas);
@@ -67,6 +73,6 @@ public final class LiquidLensRenderer {
         paint.setStyle(Paint.Style.FILL);
     }
     public float magnification() {
-        return 1f + .42f * LiquidNavigationConfig.value(LiquidNavigationConfig.Parameter.INTENSITY) / 100f;
+        return 1f + (reduceOptics?.12f:.42f) * LiquidNavigationConfig.value(LiquidNavigationConfig.Parameter.REFRACTION) / 100f;
     }
 }
