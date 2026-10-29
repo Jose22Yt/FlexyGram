@@ -42,6 +42,7 @@ public class MessageDrawable extends Drawable {
     private final app.flexygram.bubbles.SignatureBorderPath signatureBorderPath = new app.flexygram.bubbles.SignatureBorderPath();
     /** Kept for old preview callers; skins no longer alter the native geometry or finish. */
     public void setFlexySkinPreview(int skin) { }
+    private final app.flexygram.bubbles.BubbleFusion bubbleFusion=new app.flexygram.bubbles.BubbleFusion();
     private int outlineBase, outlineMode = -1, outlineIntensity = -1, outlineColor;
     private int signatureOutline(int base) {
         int mode = app.flexygram.bubbles.BubbleConfig.outlineStyle();
@@ -693,7 +694,10 @@ public class MessageDrawable extends Drawable {
                 flexyBorderPaint.setStrokeJoin(Paint.Join.ROUND);
                 float stroke = flexyBorderPaint.getStrokeWidth();
                 int edgeColor = flexyBorderPaint.getColor();
-                if (app.flexygram.bubbles.BubbleConfig.fuseGlass() && app.flexygram.bubbles.BubbleConfig.outlineStyle() != 0) {
+                if(app.flexygram.bubbles.BubbleConfig.fusionMode()==2){
+                    bubbleFusion.draw(canvas,contourPath,flexyBorderPaint,stroke,edgeColor,contourBase,
+                            app.flexygram.bubbles.BubbleConfig.fusionIntensity(),app.flexygram.bubbles.BubbleConfig.fusionAdapt());
+                } else if (app.flexygram.bubbles.BubbleConfig.fuseGlass() && app.flexygram.bubbles.BubbleConfig.outlineStyle() != 0) {
                     flexyBorderPaint.setStrokeWidth(stroke * 3f);
                     flexyBorderPaint.setColor(ColorUtils.setAlphaComponent(edgeColor, Math.round(Color.alpha(edgeColor) * .12f)));
                     canvas.drawPath(contourPath, flexyBorderPaint);

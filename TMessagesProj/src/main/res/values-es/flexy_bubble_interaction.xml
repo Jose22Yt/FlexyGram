@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="FlexyTapAnimation">Animación al tocar una burbuja</string>
+  <string name="FlexyTapPanel">Reacciones y panel mediante un toque</string>
+  <string name="FlexyTapCompression">Intensidad de compresión</string>
+  <string name="FlexyTapRebound">Intensidad del rebote</string>
+  <string name="FlexyTapRecovery">Velocidad de recuperación</string>
+</resources>

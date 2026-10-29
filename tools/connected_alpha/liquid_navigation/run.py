@@ -42,7 +42,7 @@ def write(source,root):
  selection=native[native.index('    public void selectTab('):native.index('    public void setGestureSelectedOverride(')]
  put('NativeTabSelectionProbe.java','''import org.telegram.ui.Components.glass.GlassTabView;
  public class NativeTabSelectionProbe{
- public GlassTabView[] tabs;public int[] flexyShownDestinations,flexyConfiguredDestinations;
+ public org.telegram.ui.MainTabsLayout tabsView;public GlassTabView[] tabs;public int[] flexyShownDestinations,flexyConfiguredDestinations;
  int indexToPosition(int id){return id==0?0:id==1?1:id==2?2:id==4?3:-1;}
  '''+selection+'}')
 

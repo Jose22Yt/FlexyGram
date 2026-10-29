@@ -609,6 +609,7 @@ public class GlassTabView extends FrameLayout implements MainTabsLayout.Tab, Fac
         NAV_GROUPS(TabAnimationType.STATIC, R.drawable.msg_groups),
         NAV_CHANNELS(TabAnimationType.STATIC, R.drawable.msg_channel),
         NAV_SAVED(TabAnimationType.STATIC, R.drawable.msg_saved),
+        NAV_PROFILE(TabAnimationType.STATIC,R.drawable.msg_contact),
         NAV_MORE(TabAnimationType.STATIC, R.drawable.ic_ab_other),
 
         CHECKLIST(R.raw.tab_checklist, R.raw.tab_checklist_reverse),
@@ -762,14 +763,15 @@ public class GlassTabView extends FrameLayout implements MainTabsLayout.Tab, Fac
         setMainTabsCompact(compact);
         android.view.View icon = backupImageView != null ? backupImageView : imageView;
         android.view.ViewGroup.LayoutParams lp = icon.getLayoutParams();
-        int size = dp(Math.max(18, Math.min(28, iconDp)));
+        int safeIcon=compact?28:Math.max(18,Math.min(28,app.flexygram.navigation.LiquidNavigationConfig.configured()?app.flexygram.navigation.LiquidNavigationConfig.heightDp()-24-app.flexygram.navigation.LiquidNavigationConfig.labelGapDp():28));
+        int size = dp(Math.max(18, Math.min(safeIcon, iconDp)));
         if (lp.width != size || lp.height != size) {
             lp.width = lp.height = size;
             icon.setLayoutParams(lp);
         }
         if (!compact && lp instanceof android.widget.FrameLayout.LayoutParams) {
             android.widget.FrameLayout.LayoutParams text = (android.widget.FrameLayout.LayoutParams) textView.getLayoutParams();
-            int top = ((android.widget.FrameLayout.LayoutParams)lp).topMargin + size + dp(1);
+            int top = ((android.widget.FrameLayout.LayoutParams)lp).topMargin + size + dp(app.flexygram.navigation.LiquidNavigationConfig.configured()?app.flexygram.navigation.LiquidNavigationConfig.labelGapDp():1);
             if (text.topMargin != top) { text.topMargin=top; textView.setLayoutParams(text); }
         }
     }

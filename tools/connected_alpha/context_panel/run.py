@@ -11,7 +11,7 @@ def write(source,root):
         dest=source/path;dest.parent.mkdir(parents=True,exist_ok=True);dest.write_text(text)
     java=root/'TMessagesProj/src/main/java'
     code=''
-    for name in ['BubbleActionPanelView','DampedSpringCurve','SelectedBubbleMotion','BubbleInteractionSettings']:
+    for name in ['BubbleTapMotion','BubbleActionPanelView','DampedSpringCurve','SelectedBubbleMotion','BubbleInteractionSettings']:
         path='app/flexygram/bubbles/interaction/'+name+'.java';text=(java/path).read_text();put(path,text);code+=text
     strings=sorted(set(re.findall(r'R.string.(\w+)',code)));icons=sorted(set(re.findall(r'R.drawable.(\w+)',code)))
     put('org/telegram/messenger/R.java','package org.telegram.messenger; public class R {public static class string {'+''.join('public static final int '+n+'='+str(i+1)+';' for i,n in enumerate(strings))+'} public static class drawable {'+''.join('public static final int '+n+'=android.R.drawable.ic_menu_edit;' for n in icons)+'}}')

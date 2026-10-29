@@ -1923,6 +1923,7 @@ public class ChatActivity extends BaseFragment implements
             if((scrimPopupWindow != null && NaConfig.INSTANCE.getDoubleTapAction().Int() == DoubleTap.DOUBLE_TAP_ACTION_SHOW_REACTIONS))
                 return false;
             wasManualScroll = true;
+            if(view instanceof ChatMessageCell)((ChatMessageCell)view).cancelSignatureTap();
             boolean result = true;
             boolean showMenu = true;
             if (view instanceof ChatActionCell) {
@@ -2143,11 +2144,19 @@ public class ChatActivity extends BaseFragment implements
                     return;
                 }
             }
+            if(view instanceof ChatMessageCell && ((ChatMessageCell)view).isSignatureTap()){
+                if(app.flexygram.bubbles.interaction.BubbleInteractionSettings.tapPanel(view.getContext())){
+                    ((ChatMessageCell)view).cancelSignatureTap();
+                    createMenu(view,false,false,x,y,true);
+                }
+                return; // animation-only single tap never opens a menu
+            }
             createMenu(view, true, false, x, y, false);
         }
 
         @Override
         public boolean hasDoubleTap(View view, int position) {
+            if(view instanceof ChatMessageCell && app.flexygram.bubbles.interaction.BubbleInteractionSettings.tapPanel(view.getContext()))return false;
             if (isQuickRepliesOrWelcomeMessagesMode()) return false;
             MessageObject message;
             if (view instanceof ChatMessageCell) {
@@ -5369,6 +5378,23 @@ public class ChatActivity extends BaseFragment implements
         }
 
         chatListView = new ChatListRecyclerView(context, themeDelegate) {
+            private ChatMessageCell tapCandidate;
+            @Override public boolean dispatchTouchEvent(MotionEvent event){
+                // Observe; never intercept or consume. Native RecyclerListView still arbitrates
+                // scrolling, double taps, long press and every embedded control.
+                int action=event.getActionMasked();
+                if(action==MotionEvent.ACTION_DOWN && tapCandidate!=null){tapCandidate.cancelSignatureTap();tapCandidate=null;}
+                if(tapCandidate!=null) {
+                    MotionEvent local=MotionEvent.obtain(event);
+                    local.offsetLocation(-tapCandidate.getX(),-tapCandidate.getY());
+                    tapCandidate.signatureTapEvent(local);local.recycle();
+                }
+                boolean handled=super.dispatchTouchEvent(event);
+                if(action==MotionEvent.ACTION_DOWN && getPressedChildView() instanceof ChatMessageCell)
+                    tapCandidate=(ChatMessageCell)getPressedChildView();
+                if(action==MotionEvent.ACTION_UP || action==MotionEvent.ACTION_CANCEL)tapCandidate=null;
+                return handled;
+            }
             private int lastWidth;
 
             private final ArrayList<ChatMessageCell> drawTimeAfter = new ArrayList<>();
@@ -32119,6 +32145,9 @@ public class ChatActivity extends BaseFragment implements
 
     @Override
     public void onPause() {
+        if(chatListView!=null)for(int i=0;i<chatListView.getChildCount();i++){
+            View child=chatListView.getChildAt(i);if(child instanceof ChatMessageCell)((ChatMessageCell)child).cancelSignatureTap();
+        }
         app.flexygram.studio.FlexyStyleInstallHelper.cancel(this);
         super.onPause();
         scrolling = false;
@@ -33271,7 +33300,8 @@ public class ChatActivity extends BaseFragment implements
                     && selectedObject == ((ChatMessageCell)v).getMessageObject()
                     && selectedObject != null && selectedObjectGroup == null && !selectedObject.isSponsored()
                     && !selectedObject.isEphemeral() && !suggestEdit
-                    && app.flexygram.bubbles.interaction.BubbleInteractionSettings.signaturePanel(getParentActivity());
+                    && (app.flexygram.bubbles.interaction.BubbleInteractionSettings.signaturePanel(getParentActivity())
+                    || app.flexygram.bubbles.interaction.BubbleInteractionSettings.tapPanel(getParentActivity()));
             if(compactContext) flags |= ActionBarPopupWindow.ActionBarPopupWindowLayout.FLAG_USE_SWIPEBACK;
             ActionBarPopupWindow.ActionBarPopupWindowLayout popupLayout = new ActionBarPopupWindow.ActionBarPopupWindowLayout(getParentActivity(), R.drawable.popup_fixed_alert4, themeDelegate, flags);
             popupLayout.setMinimumWidth(AndroidUtilities.dp(200));
@@ -35982,6 +36012,15 @@ public class ChatActivity extends BaseFragment implements
                 if (messagePreviewParams != null) {
                     messagePreviewParams.setHideForwardSendersName(noForwardQuote);
                     messagePreviewParams.hideCaption = noForwardCaption;
+                }
+                if(app.flexygram.share.FlexyShareConfig.enabled(getParentActivity()) && selectedObject!=null
+                        && !isSecretChat() && !selectedObject.isPoll() && !selectedObject.isTodo()
+                        && !selectedObject.isInvoice() && !ChatObject.isMonoForum(currentChat)
+                        && selectedObject.canForwardMessage() && !getMessagesController().isPeerNoForwards(dialog_id)){
+                    ArrayList<MessageObject> sharing=new ArrayList<>();
+                    if(selectedObjectGroup!=null)sharing.addAll(selectedObjectGroup.messages);else sharing.add(selectedObject);
+                    showDialog(new ShareAlert(getParentActivity(),this,sharing,null,null,ChatObject.isChannel(currentChat),null,null,false,false,false,null,themeDelegate));
+                    break;
                 }
                 forwardingMessage = selectedObject;
                 forwardingMessageGroup = selectedObjectGroup;

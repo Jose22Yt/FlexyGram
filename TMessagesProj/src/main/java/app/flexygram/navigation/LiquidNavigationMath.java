@@ -15,5 +15,5 @@ public final class LiquidNavigationMath {
     }
     public static float compression(float stretch) { return 1f - clamp(stretch, 0f, .19f) * .3f; }
     public static int clampPercent(int value) { return Math.max(0, Math.min(100, value)); }
-    public static int clampTabs(int value) { return Math.max(2, Math.min(6, value)); }
+    public static int clampTabs(int value) { return Math.max(2, value); }
 }

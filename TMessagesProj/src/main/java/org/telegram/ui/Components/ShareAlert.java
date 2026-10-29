@@ -149,6 +149,8 @@ import xyz.nextalone.nagram.NaConfig;
 
 public class ShareAlert extends BottomSheet implements NotificationCenter.NotificationCenterDelegate {
 
+    private boolean flexyShareActive;
+    private app.flexygram.share.FlexyShareHeader flexyShareHeader;
     private FrameLayout frameLayout;
     private FrameLayout frameLayout2;
     private EditTextEmoji commentTextView;
@@ -394,6 +396,10 @@ public class ShareAlert extends BottomSheet implements NotificationCenter.Notifi
 
     public ShareAlert(final Context context, ChatActivity fragment, ArrayList<MessageObject> messages, final String text, final String text2, boolean channel, final String copyLink, final String copyLink2, boolean fullScreen, boolean forCall, boolean includeStory, Integer video_timestamp, Theme.ResourcesProvider theme) {
         super(context, true, theme);
+        // Resolve the native account before creating adapters, requests or content views.
+        if(fragment!=null)currentAccount=fragment.getCurrentAccount();
+        else if(messages!=null&&!messages.isEmpty())currentAccount=messages.get(0).currentAccount;
+        flexyShareActive=app.flexygram.share.FlexyShareConfig.enabled(context)&&!forCall&&!fullScreen;
         AndroidUtilities.enableEdgeToEdge(getWindow());
 
         iBlur3SourceColor = new BlurredBackgroundSourceColor();
@@ -708,9 +714,9 @@ public class ShareAlert extends BottomSheet implements NotificationCenter.Notifi
                 int availableHeight = totalHeight - getPaddingTop();
 
                 int size = Math.max(searchAdapter.getItemCount(), listAdapter.getItemCount() - 1);
-                int contentSize = dp(103) + dp(48) + Math.max(2, (int) Math.ceil(size / 4.0f)) * dp(103) + backgroundPaddingTop;
+                int contentSize = dp(103+(flexyShareActive?flexyHeaderHeight()-58:0)) + dp(48) + Math.max(2, (int) Math.ceil(size / 4.0f)) * dp(103) + backgroundPaddingTop;
                 if (topicsGridView.getVisibility() != View.GONE) {
-                    int topicsSize = dp(103) + dp(48) + Math.max(2, (int) Math.ceil((shareTopicsAdapter.getItemCount() - 1) / 4.0f)) * dp(103) + backgroundPaddingTop;
+                    int topicsSize = dp(103+(flexyShareActive?flexyHeaderHeight()-58:0)) + dp(48) + Math.max(2, (int) Math.ceil((shareTopicsAdapter.getItemCount() - 1) / 4.0f)) * dp(103) + backgroundPaddingTop;
                     if (topicsSize > contentSize) {
                         contentSize = AndroidUtilities.lerp(contentSize, topicsSize, topicsGridView.getAlpha());
                     }
@@ -1093,6 +1099,17 @@ public class ShareAlert extends BottomSheet implements NotificationCenter.Notifi
             AndroidUtilities.showKeyboard(searchView.editText);
         });
 
+        if(flexyShareActive){
+            flexyShareHeader=new app.flexygram.share.FlexyShareHeader(context,resourcesProvider,this::useClassicShareLayout);
+            CharSequence summary=text;
+            if(messages!=null&&!messages.isEmpty()){
+                MessageObject first=messages.get(0);
+                summary=!TextUtils.isEmpty(first.caption)?first.caption:!TextUtils.isEmpty(first.messageText)?first.messageText:first.getDocumentName();
+                if(messages.size()>1)summary=messages.size()+" · "+summary;
+            }
+            flexyShareHeader.preview(summary);
+            frameLayout.addView(flexyShareHeader,LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT,app.flexygram.share.FlexyShareHeader.contentHeightDp(context),Gravity.TOP));
+        }
         frameLayout.addView(searchView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 40, Gravity.BOTTOM | Gravity.LEFT, 11, 7, 11, 11));
         topicsBackActionBar = new ActionBar(context);
         topicsBackActionBar.setOccupyStatusBar(false);
@@ -1170,14 +1187,14 @@ public class ShareAlert extends BottomSheet implements NotificationCenter.Notifi
 
             @Override
             protected boolean allowSelectChildAtPosition(float x, float y) {
-                return y >= dp(darkTheme && linkToCopy[1] != null ? 111 : 58) + systemInsets.top;
+                return y >= dp(flexyHeaderHeight()) + systemInsets.top;
             }
 
             @Override
             public void draw(Canvas canvas) {
                 if (topicsGridView.getVisibility() != View.GONE) {
                     canvas.save();
-                    canvas.clipRect(0, scrollOffsetY + dp(darkTheme && linkToCopy[1] != null ? 111 : 58), getWidth(), getHeight());
+                    canvas.clipRect(0, scrollOffsetY + dp(flexyHeaderHeight()), getWidth(), getHeight());
                 }
                 super.draw(canvas);
                 if (topicsGridView.getVisibility() != View.GONE) {
@@ -1254,14 +1271,14 @@ public class ShareAlert extends BottomSheet implements NotificationCenter.Notifi
 
             @Override
             protected boolean allowSelectChildAtPosition(float x, float y) {
-                return y >= dp(darkTheme && linkToCopy[1] != null ? 111 : 58) + systemInsets.top;
+                return y >= dp(flexyHeaderHeight()) + systemInsets.top;
             }
 
             @Override
             public void draw(Canvas canvas) {
                 if (topicsGridView.getVisibility() != View.GONE) {
                     canvas.save();
-                    canvas.clipRect(0, scrollOffsetY + dp(darkTheme && linkToCopy[1] != null ? 111 : 58), getWidth(), getHeight());
+                    canvas.clipRect(0, scrollOffsetY + dp(flexyHeaderHeight()), getWidth(), getHeight());
                 }
                 super.draw(canvas);
                 if (topicsGridView.getVisibility() != View.GONE) {
@@ -1353,14 +1370,14 @@ public class ShareAlert extends BottomSheet implements NotificationCenter.Notifi
         containerView.addView(bottomFadeView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 300, Gravity.BOTTOM));
 
         FrameLayout.LayoutParams frameLayoutParams = new FrameLayout.LayoutParams(LayoutHelper.MATCH_PARENT, AndroidUtilities.getShadowHeight(), Gravity.TOP | Gravity.LEFT);
-        frameLayoutParams.topMargin = dp(darkTheme && linkToCopy[1] != null ? 111 : 58);
+        frameLayoutParams.topMargin = dp(flexyHeaderHeight());
         shadow[0] = new View(context);
         shadow[0].setBackgroundColor(getThemedColor(Theme.key_dialogShadowLine));
         shadow[0].setAlpha(0.0f);
         shadow[0].setTag(1);
         containerView.addView(shadow[0], frameLayoutParams);
 
-        containerView.addView(frameLayout, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, darkTheme && linkToCopy[1] != null ? 111 : 58, Gravity.LEFT | Gravity.TOP));
+        containerView.addView(frameLayout, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, flexyHeaderHeight(), Gravity.LEFT | Gravity.TOP));
 
         frameLayoutParams = new FrameLayout.LayoutParams(LayoutHelper.MATCH_PARENT, AndroidUtilities.getShadowHeight(), Gravity.BOTTOM | Gravity.LEFT);
         frameLayoutParams.bottomMargin = dp(48);
@@ -2924,7 +2941,26 @@ public class ShareAlert extends BottomSheet implements NotificationCenter.Notifi
         return true;
     }
 
+    private int flexyHeaderHeight(){return flexyShareActive?app.flexygram.share.FlexyShareHeader.contentHeightDp(getContext())+48:darkTheme&&linkToCopy[1]!=null?111:58;}
+    private void useClassicShareLayout(){
+        flexyShareActive=false;if(flexyShareHeader!=null)flexyShareHeader.setVisibility(View.GONE);
+        ViewGroup.LayoutParams lp=frameLayout.getLayoutParams();lp.height=dp(flexyHeaderHeight());frameLayout.setLayoutParams(lp);
+        FrameLayout.LayoutParams shadowParams=(FrameLayout.LayoutParams)shadow[0].getLayoutParams();shadowParams.topMargin=dp(flexyHeaderHeight());shadow[0].setLayoutParams(shadowParams);
+        listAdapter.notifyDataSetChanged();shareTopicsAdapter.notifyDataSetChanged();searchAdapter.notifyDataSetChanged();containerView.requestLayout();
+    }
+
     public void updateSelectedCount(int animated) {
+        if(flexyShareHeader!=null){
+            StringBuilder names=new StringBuilder();
+            for(int i=0;i<Math.min(2,selectedDialogs.size());i++){
+                long did=selectedDialogs.valueAt(i).id;String name;
+                if(did>0)name=UserObject.getUserName(MessagesController.getInstance(currentAccount).getUser(did));
+                else{TLRPC.Chat chat=MessagesController.getInstance(currentAccount).getChat(-did);name=chat==null?"":chat.title;}
+                if(names.length()>0)names.append(", ");names.append(name);
+            }
+            if(selectedDialogs.size()>2)names.append(" +").append(selectedDialogs.size()-2);
+            flexyShareHeader.recipients(selectedDialogs.size(),names);
+        }
         if (selectedDialogs.size() == 0) {
             showCommentTextView(false);
         } else {
@@ -3083,7 +3119,7 @@ public class ShareAlert extends BottomSheet implements NotificationCenter.Notifi
                 case 1:
                 default: {
                     view = new View(context);
-                    view.setLayoutParams(new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, dp(darkTheme && linkToCopy[1] != null ? 109 : 56)));
+                    view.setLayoutParams(new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, dp(flexyHeaderHeight()-2)));
                     break;
                 }
             }
@@ -3092,6 +3128,7 @@ public class ShareAlert extends BottomSheet implements NotificationCenter.Notifi
 
         @Override
         public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+            if(holder.getItemViewType()==1){ViewGroup.LayoutParams lp=holder.itemView.getLayoutParams();lp.height=dp(flexyHeaderHeight()-2);holder.itemView.setLayoutParams(lp);}
             if (holder.getItemViewType() == 0) {
                 ShareDialogCell cell = (ShareDialogCell) holder.itemView;
                 TLRPC.Dialog dialog = getItem(position);
@@ -3157,7 +3194,7 @@ public class ShareAlert extends BottomSheet implements NotificationCenter.Notifi
                 case 1:
                 default: {
                     view = new View(context);
-                    view.setLayoutParams(new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, ActionBar.getCurrentActionBarHeight()));
+                    view.setLayoutParams(new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, flexyShareActive?dp(flexyHeaderHeight()-2):ActionBar.getCurrentActionBarHeight()));
                     break;
                 }
             }
@@ -3166,6 +3203,7 @@ public class ShareAlert extends BottomSheet implements NotificationCenter.Notifi
 
         @Override
         public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+            if(holder.getItemViewType()==1){ViewGroup.LayoutParams lp=holder.itemView.getLayoutParams();lp.height=flexyShareActive?dp(flexyHeaderHeight()-2):ActionBar.getCurrentActionBarHeight();holder.itemView.setLayoutParams(lp);}
             if (holder.getItemViewType() == 0) {
                 ShareTopicCell cell = (ShareTopicCell) holder.itemView;
                 if (position == 1 && isBotForum) {
@@ -3630,7 +3668,7 @@ public class ShareAlert extends BottomSheet implements NotificationCenter.Notifi
                 default:
                 case 1: {
                     view = new View(context);
-                    view.setLayoutParams(new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, dp(darkTheme && linkToCopy[1] != null ? 109 : 56)));
+                    view.setLayoutParams(new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, dp(flexyHeaderHeight()-2)));
                     break;
                 }
                 case 2: {
@@ -3736,6 +3774,7 @@ public class ShareAlert extends BottomSheet implements NotificationCenter.Notifi
 
         @Override
         public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+            if(holder.getItemViewType()==1){ViewGroup.LayoutParams lp=holder.itemView.getLayoutParams();lp.height=dp(flexyHeaderHeight()-2);holder.itemView.setLayoutParams(lp);}
             if (holder.getItemViewType() == 0 || holder.getItemViewType() == 5) {
 //                ShareDialogCell cell = (ShareDialogCell) holder.itemView;
 //                ProfileSearchCell cell = (ProfileSearchCell) holder.itemView;

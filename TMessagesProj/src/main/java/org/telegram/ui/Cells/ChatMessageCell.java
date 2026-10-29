@@ -5051,6 +5051,27 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         return replyPressed;
     }
 
+    private final app.flexygram.bubbles.interaction.BubbleTapMotion signatureTapMotion =
+            new app.flexygram.bubbles.interaction.BubbleTapMotion(this);
+    private boolean signatureTapEligible;
+    private float signatureTapX, signatureTapY;
+    private long signatureTapReleased;
+    public void signatureTapEvent(MotionEvent event) {
+        int action=event.getActionMasked();
+        if(action==MotionEvent.ACTION_MOVE && signatureTapEligible){
+            float slop=android.view.ViewConfiguration.get(getContext()).getScaledTouchSlop();
+            if(Math.abs(event.getX()-signatureTapX)>slop || Math.abs(event.getY()-signatureTapY)>slop)cancelSignatureTap();
+        } else if(action==MotionEvent.ACTION_UP && signatureTapEligible){
+            signatureTapReleased=android.os.SystemClock.uptimeMillis();signatureTapMotion.release();
+        } else if(action==MotionEvent.ACTION_CANCEL || action==MotionEvent.ACTION_POINTER_DOWN || action==MotionEvent.ACTION_POINTER_UP)cancelSignatureTap();
+    }
+    public boolean isSignatureTap(){return signatureTapEligible && android.os.SystemClock.uptimeMillis()-signatureTapReleased<500;}
+    public void cancelSignatureTap(){signatureTapEligible=false;signatureTapReleased=0;signatureTapMotion.reset();}
+    private void applySignatureTap(Canvas canvas){
+        float scale=signatureTapMotion.scale();
+        if(scale!=1f)canvas.scale(scale,scale,(getBackgroundDrawableLeft()+getBackgroundDrawableRight())*.5f,getHeight()*.5f);
+    }
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (currentMessageObject == null || delegate != null && !delegate.canPerformActions() || animationRunning) {
@@ -5506,6 +5527,26 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                         }
                     }
                     invalidate();
+                }
+            }
+        }
+        if(event.getActionMasked()==MotionEvent.ACTION_DOWN){
+            cancelSignatureTap();
+            // Only unclaimed bubble background. Native links, spoilers, media, polls, buttons,
+            // reply headers, reactions and avatars have already run their own hit testing.
+            signatureTapEligible=!result && currentMessageObject!=null && delegate!=null
+                    && !delegate.hasSelectedMessages() && !currentMessageObject.preview
+                    && !currentMessageObject.isSponsored() && !currentMessageObject.isEphemeral()
+                    && currentMessagesGroup==null && !currentMessageObject.shouldDrawWithoutBackground()
+                    && isInsideBackground(getEventX(event),getEventY(event));
+            if(signatureTapEligible){
+                signatureTapX=getEventX(event);signatureTapY=getEventY(event);
+                if(app.flexygram.bubbles.interaction.BubbleInteractionSettings.tapAnimation(getContext())
+                        && !AndroidUtilities.isAccessibilityScreenReaderEnabled()
+                        && !(android.os.Build.VERSION.SDK_INT>=26 && !android.animation.ValueAnimator.areAnimatorsEnabled())){
+                    signatureTapMotion.press(.012f+.0005f*app.flexygram.bubbles.interaction.BubbleInteractionSettings.compression(getContext()),
+                            app.flexygram.bubbles.interaction.BubbleInteractionSettings.rebound(getContext())/100f,
+                            440-3L*app.flexygram.bubbles.interaction.BubbleInteractionSettings.recovery(getContext()));
                 }
             }
         }
@@ -6498,6 +6539,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
 
     @Override
     protected void onDetachedFromWindow() {
+        cancelSignatureTap();
         super.onDetachedFromWindow();
 
         if (observersGroup != null) {
@@ -7025,6 +7067,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             transChanged = true;
         }
 
+        if(currentMessageObject!=messageObject)cancelSignatureTap();
         ayuDeleted = messageObject.isAyuDeleted();
         final boolean ayuDeletedChanged = ayuDeleted != lastAyuDeleted;
         lastAyuDeleted = ayuDeleted;
@@ -12431,6 +12474,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
 
     @Override
     protected boolean onLongPress() {
+        cancelSignatureTap();
         if (isRoundVideo && isPlayingRound && MediaController.getInstance().isPlayingMessage(currentMessageObject)) {
             float touchRadius = (lastTouchX - photoImage.getCenterX()) * (lastTouchX - photoImage.getCenterX()) + (lastTouchY - photoImage.getCenterY()) * (lastTouchY - photoImage.getCenterY());
             float r1 = (photoImage.getImageWidth() / 2f) * (photoImage.getImageWidth() / 2f);
@@ -20713,6 +20757,10 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     }
     @SuppressLint("WrongCall")
     public void drawInternal(Canvas canvas) {
+        int save=canvas.save();applySignatureTap(canvas);
+        try{drawSignatureContent(canvas);}finally{canvas.restoreToCount(save);}
+    }
+    private void drawSignatureContent(Canvas canvas) {
         if (currentMessageObject == null) {
             return;
         }
@@ -20965,7 +21013,8 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     }
 
     public void drawBackgroundInternal(Canvas canvas, boolean fromParent) {
-        drawBackgroundInternal(canvas, fromParent, false);
+        int save=canvas.save();if(fromParent)applySignatureTap(canvas);
+        try{drawBackgroundInternal(canvas, fromParent, false);}finally{canvas.restoreToCount(save);}
     }
 
     @SuppressLint("WrongCall")

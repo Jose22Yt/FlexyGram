@@ -10,7 +10,8 @@ public final class BubbleConfig {
     public static final String GLASS = "glass", TRANSPARENCY = "transparency", BORDER = "border", EDGES = "edges";
     private static boolean loaded, glass, border, edges, cachedBlur;
     private static int transparency = 35, borderTenths = 11, outlineStyle = 1, pearlIntensity = 55, borderPosition = 5;
-    private static boolean outlineEnabled = true, fuseGlass;
+    private static boolean outlineEnabled = true, fuseGlass, fusionAdapt=true;
+    private static int fusionMode,fusionIntensity=60;
     private BubbleConfig() { }
     private static SharedPreferences preferences() {
         return ApplicationLoader.applicationContext.getSharedPreferences(FILE, Context.MODE_PRIVATE);
@@ -23,6 +24,9 @@ public final class BubbleConfig {
         outlineEnabled = outlineEnabled && storedPosition != 0;
         borderPosition = storedPosition == 0 ? 5 : Math.max(1, Math.min(5, storedPosition));
         fuseGlass = p.getBoolean("signature_fuse_glass", false);
+        fusionMode=Math.max(0,Math.min(2,p.getInt("signature_fusion_mode",fuseGlass?1:0)));
+        fusionIntensity=Math.max(0,Math.min(100,p.getInt("signature_fusion_intensity",60)));
+        fusionAdapt=p.getBoolean("signature_fusion_adapt",true);
         pearlIntensity = Math.max(0, Math.min(100, p.getInt("signature_pearl_intensity", 55)));
         // Retired signature_skin preferences remain stored and have no rendering effect.
         cachedBlur = p.getBoolean("signature_cached_blur", false);
@@ -60,10 +64,16 @@ public final class BubbleConfig {
         borderPosition = value; outlineEnabled = true;
         preferences().edit().putInt("signature_border_position", value).putBoolean("signature_outline_enabled", true).apply();
     }
-    public static boolean fuseGlass() { return fuseGlass; }
+    public static int fusionMode(){return fusionMode;}
+    public static int fusionIntensity(){return fusionIntensity;}
+    public static boolean fusionAdapt(){return fusionAdapt;}
+    public static void setFusionMode(int mode){if(!loaded)load();fusionMode=Math.max(0,Math.min(2,mode));fuseGlass=fusionMode==1;preferences().edit().putInt("signature_fusion_mode",fusionMode).putBoolean("signature_fuse_glass",fuseGlass).apply();}
+    public static void setFusionIntensity(int value){if(!loaded)load();fusionIntensity=Math.max(0,Math.min(100,value));preferences().edit().putInt("signature_fusion_intensity",fusionIntensity).apply();}
+    public static void setFusionAdapt(boolean value){if(!loaded)load();fusionAdapt=value;preferences().edit().putBoolean("signature_fusion_adapt",value).apply();}
+    public static boolean fuseGlass() { return fusionMode==1; }
     public static void setFuseGlass(boolean value) {
-        if (!loaded) load(); if (value == fuseGlass) return;
-        fuseGlass = value; preferences().edit().putBoolean("signature_fuse_glass", value).apply();
+        if (!loaded) load(); if ((value?1:0) == fusionMode) return;
+        setFusionMode(value?1:0);
     }
     public static void setOutlineEnabled(boolean value) { if (!loaded) load(); outlineEnabled = value; preferences().edit().putBoolean("signature_outline_enabled", value).putInt("signature_border_position", borderPosition).apply(); }
     public static void setOutlineStyle(int value) { if (!loaded) load(); outlineStyle = Math.max(0, Math.min(3, value)); preferences().edit().putInt("signature_outline_style", outlineStyle).apply(); }

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyShareClassic">Classic</string>
+    <string name="FlexyShareChooseRecipients">Choose recipients below</string>
+    <string name="FlexyShareEnabled">Use Flexy Share Sheet</string>
+    <string name="FlexyShareDescription">Local presentation of the native Telegram share panel. Search, selection and sending remain native. Use Classic in the panel for compatibility. Special forwarding flows keep their native screen. No external uploads or services.</string>
+</resources>

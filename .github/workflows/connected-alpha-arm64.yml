@@ -70,6 +70,21 @@ jobs:
         run: python3 tools/connected_alpha/check_resources.py --sdk-root "$ANDROID_HOME"
       - name: Verify native iOS bubble paths, glass and saved preference policy
         run: python3 tools/connected_alpha/bubble_visual/run.py --sdk-root "$ANDROID_HOME"
+      - name: Verify Interaction 2.0 production gesture, preview and settings probes
+        run: |
+          python3 tools/connected_alpha/context_panel/run.py --sdk-root "$ANDROID_HOME"
+          python3 tools/connected_alpha/liquid_navigation/run.py --sdk-root "$ANDROID_HOME"
+          python3 tools/connected_alpha/interaction2/run.py --sdk-root "$ANDROID_HOME"
+      - name: Retain synthetic Interaction 2.0 graphics (not device acceptance)
+        uses: actions/upload-artifact@v4
+        with:
+          name: interaction2-isolated-graphics
+          path: |
+            build/interaction2/*.png
+            build/connected-alpha-bubble-visual/*isolated.png
+            build/interaction2/target/surefire-reports/*.xml
+          retention-days: 7
+          if-no-files-found: error
       - name: Retain isolated native bubble graphics (not full app screenshots)
         uses: actions/upload-artifact@v4
         with:
@@ -249,7 +264,7 @@ jobs:
             echo '::error::Expected exactly one Connected Alpha APK.'
             exit 1
           fi
-          python3 tools/connected_alpha/signature_verifier.py "${packages[0]}" --build-tools "$ANDROID_HOME/build-tools/36.0.0" --certificate-sha256 "$ALPHA_CERTIFICATE_SHA256" --expected-version-code 1285 > connected-alpha-verification.json
+          python3 tools/connected_alpha/signature_verifier.py "${packages[0]}" --build-tools "$ANDROID_HOME/build-tools/36.0.0" --certificate-sha256 "$ALPHA_CERTIFICATE_SHA256" --expected-version-code 1286 > connected-alpha-verification.json
           python3 - <<'PY'
           import json, os
           from pathlib import Path

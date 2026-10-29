@@ -41,4 +41,25 @@
     <string name="FlexyLiquidNavProfilePreset">Профиль движения</string>
     <string name="FlexyLiquidNavFluid">Плавный</string>
     <string name="FlexyLiquidNavMinimal">Минимальный</string>
+    <string name="FlexyLiquidNavLensAppearance">Вид линзы</string>
+    <string name="FlexyLiquidNavDimensions">Размеры и плотность</string>
+    <string name="FlexyLiquidNavPresets">Профили и сброс</string>
+    <string name="FlexyLiquidNavCompaction">Плотность панели</string>
+    <string name="FlexyLiquidNavDistribution">Расположение вкладок</string>
+    <string name="FlexyLiquidNavScrollable">Прокручиваемые вкладки</string>
+    <string name="FlexyLiquidNavOverflow">Меню дополнительных вкладок</string>
+    <string name="FlexyLiquidNavNormal">Обычная</string>
+    <string name="FlexyLiquidNavVeryCompact">Очень компактная</string>
+    <string name="FlexyLiquidNavAutomatic">Автоматическая</string>
+    <string name="FlexyLiquidNavCustom">Своя</string>
+    <string name="FlexyLiquidNavExpansion">Расширение линзы при касании</string>
+    <string name="FlexyLiquidNavAdaptiveQuality">Адаптивное качество оптики</string>
+    <string name="FlexyLiquidNavExpandX">Горизонтальное расширение</string>
+    <string name="FlexyLiquidNavExpandY">Вертикальное расширение</string>
+    <string name="FlexyLiquidNavLensHeight">Высота линзы в покое</string>
+    <string name="FlexyLiquidNavRefraction">Преломление</string>
+    <string name="FlexyLiquidNavLabelGap">Отступ подписи от значка</string>
+    <string name="FlexyLiquidNavInnerMargin">Внутренние отступы</string>
+    <string name="FlexyLiquidNavBottomGap">Отступ над системными жестами</string>
+    <string name="FlexyLiquidNavSideGap">Боковые отступы</string>
 </resources>
