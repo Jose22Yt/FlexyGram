@@ -104,4 +104,32 @@ public class ContextPanelTest {
    assertEquals(s.allowReply,a.contains(Action.REPLY));assertEquals(s.allowCopy,a.contains(Action.COPY));assertEquals(s.allowForward,a.contains(Action.FORWARD));assertEquals(s.allowEdit,a.contains(Action.EDIT));assertEquals(s.allowDelete,a.contains(Action.DELETE));assertEquals((bits&32)!=0,a.contains(Action.PIN));
   }
  }
+
+ @Test public void singleContactCompressesRealOwnerImmediatelyWithoutMenu(){
+  View cell=new View(activity);root.addView(cell);BubbleTapMotion motion=new BubbleTapMotion(cell);
+  motion.press(.04f,.45f,270);assertEquals(.96f,motion.scale(),.00001f);assertTrue(motion.pressed());
+  assertEquals(1f,cell.getScaleX(),0); // Canvas-owned: native cell properties stay untouched.
+  motion.release();org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(java.time.Duration.ofMillis(100));
+  assertTrue(motion.scale()>.96f);
+  org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(java.time.Duration.ofSeconds(1));assertEquals(1f,motion.scale(),0);
+ }
+ @Test public void tapSpringHasBoundedOvershootAndIndependentRecovery(){
+  float peak=1;for(int i=0;i<=100;i++)peak=Math.max(peak,BubbleTapMotion.recovery(i/100f,1));
+  assertTrue(peak>1);assertTrue(peak<1.25f);assertEquals(1f,BubbleTapMotion.recovery(1,1),0);
+  assertNotEquals(BubbleTapMotion.recovery(.3f,0),BubbleTapMotion.recovery(.3f,1),.001f);
+ }
+ @Test public void cancelRecycleAndRapidTapsDoNotLeaveScaleOrCallbacks(){
+  View cell=new View(activity);root.addView(cell);BubbleTapMotion motion=new BubbleTapMotion(cell);
+  for(int i=0;i<50;i++){motion.press(.06f,.8f,140);motion.release();motion.reset();}
+  org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(java.time.Duration.ofSeconds(1));assertEquals(1f,motion.scale(),0);assertFalse(motion.pressed());
+ }
+ @Test public void singleTapSettingsPersistSeparatelyFromContextBounce(){
+  BubbleInteractionSettings.resetTap(activity);assertTrue(BubbleInteractionSettings.tapAnimation(activity));assertFalse(BubbleInteractionSettings.tapPanel(activity));
+  BubbleInteractionSettings.tapPanel(activity,true);BubbleInteractionSettings.tapAnimation(activity,false);BubbleInteractionSettings.parameter(activity,0,1000);
+  org.robolectric.util.ReflectionHelpers.setStaticField(BubbleInteractionSettings.class,"tap",null);
+  org.robolectric.util.ReflectionHelpers.setStaticField(BubbleInteractionSettings.class,"tapPanel",null);
+  org.robolectric.util.ReflectionHelpers.setStaticField(BubbleInteractionSettings.class,"compression",-1);
+  assertTrue(BubbleInteractionSettings.tapPanel(activity));assertFalse(BubbleInteractionSettings.tapAnimation(activity));assertEquals(100,BubbleInteractionSettings.compression(activity));
+  BubbleInteractionSettings.resetTap(activity);
+ }
 }

@@ -8,11 +8,12 @@ import org.telegram.messenger.ApplicationLoader;
 /** Cached UI-thread preferences; drawing performs no SharedPreferences lookup. */
 public final class LiquidNavigationConfig {
     private static final String NAME="flexy_liquid_navigation";
-    private static boolean loaded,configured,enabled,labels=true;
+    private static boolean loaded,configured,enabled,labels=true,expansion=true,adaptiveQuality=true;
+    private static int distribution,compaction=3;
     private static int[] order=LiquidNavigationDestinations.defaults();
     public enum Parameter {
         OPACITY(70), REFLECTION(65), OUTLINE(65), INTENSITY(80), LENS_SIZE(60), ELASTICITY(65), DEFORMATION(65), SPEED(50), DAMPING(76),
-        REBOUND(30), FOLLOW(100), SETTLE(50), HEIGHT(0), COMPACT(50), SPACING(50), ICON(50), WIDTH(100);
+        REBOUND(30), FOLLOW(100), SETTLE(50), HEIGHT(0), COMPACT(50), SPACING(50), ICON(50), WIDTH(100), LENS_HEIGHT(50), EXPAND_X(65), EXPAND_Y(60), REFRACTION(80), LABEL_GAP(50), INNER_MARGIN(40), BOTTOM_GAP(25), SIDE_GAP(30);
         final int initial; int value;
         Parameter(int initial){this.initial=initial;this.value=initial;}
     }
@@ -38,8 +39,8 @@ public final class LiquidNavigationConfig {
     private static SharedPreferences prefs(){return ApplicationLoader.applicationContext.getSharedPreferences(NAME,Context.MODE_PRIVATE);}
     public static void load(){
         if(loaded)return;
-        SharedPreferences p=prefs();configured=p.getBoolean("configured",false);
-        enabled=p.getBoolean("drag_indicator",false);labels=p.getBoolean("labels",true);
+        SharedPreferences p=prefs();distribution=p.getInt("distribution",0)==1?1:0;compaction=Math.max(0,Math.min(4,p.getInt("compaction",3)));configured=p.getBoolean("configured",false);
+        adaptiveQuality=p.getBoolean("adaptive_quality",true);expansion=p.getBoolean("lens_expansion",true);enabled=p.getBoolean("drag_indicator",false);labels=p.getBoolean("labels",true);
         for(Parameter v:Parameter.values())v.value=LiquidNavigationMath.clampPercent(p.getInt(v.name().toLowerCase(java.util.Locale.ROOT),v.initial));
         String[] raw=p.getString("destinations","0,1,2,4").split(",");int[] ids=new int[Math.min(raw.length,64)];
         for(int i=0;i<ids.length;i++){try{ids[i]=Integer.parseInt(raw[i]);}catch(NumberFormatException e){ids[i]=-1;}}
@@ -58,7 +59,24 @@ public final class LiquidNavigationConfig {
     public static void labels(boolean v){load();labels=v;configured=true;prefs().edit().putBoolean("labels",v).putBoolean("configured",true).apply();}
     public static int[] order(){load();return order.clone();}
     public static void order(int[] ids){load();order=LiquidNavigationDestinations.sanitize(ids);configured=true;StringBuilder s=new StringBuilder();for(int id:order){if(s.length()>0)s.append(',');s.append(id);}prefs().edit().putString("destinations",s.toString()).putBoolean("configured",true).apply();}
-    public static int heightDp(){return 60+value(Parameter.HEIGHT)*24/100;}
+    public static boolean adaptiveQuality(){load();return adaptiveQuality;}
+    public static void adaptiveQuality(boolean v){load();adaptiveQuality=v;configured=true;prefs().edit().putBoolean("adaptive_quality",v).putBoolean("configured",true).apply();}
+    public static boolean expansion(){load();return expansion;}
+    public static void expansion(boolean v){load();expansion=v;configured=true;prefs().edit().putBoolean("lens_expansion",v).putBoolean("configured",true).apply();}
+    public static float lensWidthDp(){return 60+value(Parameter.LENS_SIZE)*.28f;}
+    public static float lensHeightDp(){return 34+value(Parameter.LENS_HEIGHT)*.16f;}
+    public static int distribution(){load();return distribution;}
+    public static void distribution(int v){load();distribution=v==1?1:0;configured=true;prefs().edit().putInt("distribution",distribution).putBoolean("configured",true).apply();}
+    public static int compaction(){load();return compaction;}
+    public static void compaction(int v){load();compaction=Math.max(0,Math.min(4,v));configured=true;prefs().edit().putInt("compaction",compaction).putBoolean("configured",true).apply();}
+    public static int[] shown(int slots){return distribution()==1?LiquidNavigationDestinations.fit(order(),slots):order();}
+    public static int slotDp(int count,int availableDp){int mode=compaction();return mode==0?76:mode==1?64:mode==2?52:mode==3?(count*64>availableDp?52:72):Math.max(48,56+value(Parameter.COMPACT)*24/100+spacingDp());}
+    public static boolean hideLabels(int count,int availableDp){return !labels()||compaction()==2||compaction()==3&&count*64>availableDp;}
+    public static int heightDp(){return compaction()==4?48+value(Parameter.HEIGHT)*24/100:compaction()==2?48:compaction()==1?52:compaction()==3&&order.length>6?48:60;}
+    public static int innerMarginDp(){return 16+value(Parameter.INNER_MARGIN)*8/100;}
+    public static int bottomGapDp(){return 4+value(Parameter.BOTTOM_GAP)*20/100;}
+    public static int sideGapDp(){return 4+value(Parameter.SIDE_GAP)*20/100;}
+    public static int labelGapDp(){return 1+value(Parameter.LABEL_GAP)*5/100;}
     public static int iconDp(){return 18+value(Parameter.ICON)*10/100;}
     public static int spacingDp(){return 4+value(Parameter.SPACING)*8/100;}
     public static float damping(){return .65f+value(Parameter.DAMPING)*.0034f;}

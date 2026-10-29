@@ -8,7 +8,7 @@ public final class LiquidNavigationMathTest {
         test(LiquidNavigationMath.clampPercent(-3)==0,"negative transparency");
         test(LiquidNavigationMath.clampPercent(103)==100,"high transparency");
         test(LiquidNavigationMath.clampTabs(1)==2,"minimum viable tab count");
-        test(LiquidNavigationMath.clampTabs(7)==6,"bounded preview count");
+        test(LiquidNavigationMath.clampTabs(9)==9,"no artificial maximum");
         test(LiquidNavigationMath.center(20,50,200)==50,"left bound");
         test(LiquidNavigationMath.center(500,50,200)==200,"right bound");
         test(LiquidNavigationMath.center(101,50,200)==101,"center follows finger");

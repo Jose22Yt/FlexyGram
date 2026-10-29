@@ -17,6 +17,10 @@ public final class LiquidNavigationTabs {
             case 8:return R.string.FlexyLiquidNavSaved;default:return R.string.FlexyContextMore;
         }
     }
+    public static GlassTabView createPreview(Context context,int id){
+        // Never binds a real account/avatar in the simulated scene.
+        return id==LiquidNavigationDestinations.PROFILE?GlassTabView.createMainTab(context,null,GlassTabView.TabAnimation.NAV_PROFILE,label(id)):create(context,null,0,id);
+    }
     public static GlassTabView create(Context context,Theme.ResourcesProvider provider,int account,int id){
         if(id==4)return GlassTabView.createAvatar(context,provider,account,label(id));
         GlassTabView.TabAnimation animation;

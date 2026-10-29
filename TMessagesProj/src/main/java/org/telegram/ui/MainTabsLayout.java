@@ -103,6 +103,7 @@ public class MainTabsLayout extends AnimatedLinearLayout {
     public MainTabsLayout(Context context, Theme.ResourcesProvider resourcesProvider) {
         super(context);
         this.resourcesProvider = resourcesProvider;
+        setClipToPadding(false);
     }
 
     private static final float[] PASS_TEXT_SIZES_DP = {12f, 12f, 10f};
@@ -130,10 +131,21 @@ public class MainTabsLayout extends AnimatedLinearLayout {
         final boolean customSizing = LiquidNavigationConfig.configured();
         if (customSizing) {
             int count=0;for(int i=0;i<getChildCount();i++)if(isViewVisible(getChildAt(i)))count++;
-            int minimum=dp(48)*count+getPaddingLeft()+getPaddingRight();
-            int desired=dp(64+LiquidNavigationConfig.value(LiquidNavigationConfig.Parameter.COMPACT)*24/100)*count+getPaddingLeft()+getPaddingRight();
+            int slot=dp(LiquidNavigationConfig.slotDp(count,(int)(width/getResources().getDisplayMetrics().density)));
             int userWidth=width*(70+LiquidNavigationConfig.value(LiquidNavigationConfig.Parameter.WIDTH)*30/100)/100;
-            width=Math.min(width,Math.max(minimum,Math.min(desired,userWidth)));
+            width=Math.min(width,Math.max(dp(48)*Math.min(2,count)+getPaddingLeft()+getPaddingRight(),userWidth));
+            measureTabTexts(LiquidNavigationConfig.compaction()==2?10:11);
+            applyPassTextSize(LiquidNavigationConfig.compaction()==2?2:1);
+            int inner=Math.max(1,width-getPaddingLeft()-getPaddingRight());
+            int each=count*slot<=inner?inner/Math.max(1,count):slot;
+            int total=0;
+            for(int i=0;i<getChildCount();i++){
+                View child=getChildAt(i);tabsWidth[i]=isViewVisible(child)?each:0;
+                tabsLeftPos[i]=total;total+=tabsWidth[i];
+                child.measure(MeasureSpec.makeMeasureSpec(tabsWidth[i],MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(tabHeight,MeasureSpec.EXACTLY));
+            }
+            flexyContentWidth=total+getPaddingLeft()+getPaddingRight();
+            setMeasuredDimension(width,height);calculateTotalSizesAfterMeasure();return;
         }
         final boolean fillWidth = customSizing || MainTabsUiHelper.isMaterial3NavigationBar() || MainTabsUiHelper.isIosNavigationBar();
         final int maxTotalWidthForTabs = width - getPaddingLeft() - getPaddingRight();
@@ -244,6 +256,37 @@ public class MainTabsLayout extends AnimatedLinearLayout {
         calculateTotalSizesAfterMeasure();
     }
 
+    private float uniformSlotWidth(){float width=Float.MAX_VALUE;for(int i=0;i<getChildCount();i++){View c=getChildAt(i);if(isViewVisible(c)&&c.getWidth()>0)width=Math.min(width,c.getWidth());}return width==Float.MAX_VALUE?dp(64):width;}
+    private float viewportOffset;
+    private int flexyContentWidth;
+    private boolean flexyScrollGesture;
+    private boolean scrollable(){return LiquidNavigationConfig.configured()&&flexyContentWidth>getWidth()+1;}
+    private void applyViewportOffset(){
+        for(int i=0;i<getEntriesCount();i++){
+            final ListAnimator.Entry<Holder> e=getEntry(i);View child=e.item.view;
+            child.setTranslationX(getPaddingLeft()+e.getRectF().left-child.getLeft()-viewportOffset);
+        }
+    }
+    private void scrollViewport(float offset){
+        float next=Math.max(0,Math.min(Math.max(0,flexyContentWidth-getWidth()),offset));
+        if(next!=viewportOffset){viewportOffset=next;applyViewportOffset();if(flexyScrollGesture){View selected=findSelectedTab();if(selected!=null)animatedLongSelectedViewCenterX=getCenterX(selected);}invalidate();}
+    }
+    private void ensureSelectedVisible(){
+        View selected=findSelectedTab();if(selected==null||!scrollable())return;
+        float left=selected.getX(),right=left+selected.getWidth();
+        if(left<getPaddingLeft())scrollViewport(viewportOffset+left-getPaddingLeft());
+        else if(right>getWidth()-getPaddingRight())scrollViewport(viewportOffset+right-getWidth()+getPaddingRight());
+    }
+    public void revealSelectedDestination(){ensureSelectedVisible();invalidate();}
+    private void edgeScroll(){
+        if(!flexyPressed||!flexyDragging||!scrollable())return;
+        float edge=dp(32),delta=flexyFingerX<edge?-dp(3)*(1-flexyFingerX/edge):flexyFingerX>getWidth()-edge?dp(3)*(flexyFingerX-getWidth()+edge)/edge:0;
+        if(delta==0)return;
+        scrollViewport(viewportOffset+Math.max(-dp(4),Math.min(dp(4),delta)));
+        flexyMoveDrag(flexyFingerX);postOnAnimation(edgeScroller);
+    }
+    private final Runnable edgeScroller=this::edgeScroll;
+
     public interface Tab {
         float measureTextWidth();
         default float measureTextWidth(float textSizeDp) { return measureTextWidth(); }
@@ -323,14 +366,15 @@ public class MainTabsLayout extends AnimatedLinearLayout {
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         super.onLayout(changed, l, t, r, b);
         if (changed) cancelLiquidForLayout();
-        checkVisualWidth();
+        viewportOffset=Math.max(0,Math.min(viewportOffset,Math.max(0,flexyContentWidth-getWidth())));
+        applyViewportOffset();ensureSelectedVisible();checkVisualWidth();
     }
 
     @Override
     protected void onItemsChanged() {
         super.onItemsChanged();
         if (flexyPressed || flexyDragging || flexyTracking) cancelLiquidForLayout();
-        checkVisualWidth();
+        applyViewportOffset();checkVisualWidth();
     }
 
     private void checkVisualWidth() {
@@ -355,6 +399,7 @@ public class MainTabsLayout extends AnimatedLinearLayout {
                 ((GlassTabView) child).setSelected(child == tab, animated);
             }
         }
+        if(!flexyPressed&&!flexyDragging)ensureSelectedVisible();
     }
 
     private View findSelectedTab() {
@@ -397,10 +442,11 @@ public class MainTabsLayout extends AnimatedLinearLayout {
     }
     private void cancelLiquidForLayout() {
         boolean owned=flexyPressed || flexyDragging || flexyTracking;
-        removeCallbacks(finishNativeTap);
+        removeCallbacks(finishNativeTap);removeCallbacks(edgeScroller);flexyScrollGesture=false;
         flexyPressed=flexyDragging=flexyTracking=false;
         flexyPointerId=MotionEvent.INVALID_POINTER_ID;
-        flexyStretch=flexyDirection=0;
+        flexyStretch=flexyDirection=flexyExpansion=0;flexyOwnLens=false;
+        if(flexyExpansionSpring!=null)flexyExpansionSpring.cancel();
         if(selectedTabPositionX!=null)selectedTabPositionX.cancel();
         if(selectedTabPositionOffsetX!=null)selectedTabPositionOffsetX.cancel();
         if(flexyDeformation!=null)flexyDeformation.cancel();
@@ -450,16 +496,23 @@ public class MainTabsLayout extends AnimatedLinearLayout {
                 if(selected!=null) animatedLongSelectedViewCenterX=selected.getX()+selected.getWidth()*.5f;
             }
             final float x = animatedLongSelectedViewCenterX + animatedLongSelectedViewOffsetX;
-            final float rawWidth = getInterpolatedWidthByX(x, this);
+            final float rawWidth = flexyLiquidEnabled()?Math.min(dp(LiquidNavigationConfig.lensWidthDp()),uniformSlotWidth()*.96f):getInterpolatedWidthByX(x, this);
             final float wantedWidth = flexyLiquidEnabled()
                     ? LiquidNavigationMath.width(rawWidth, flexyStretch) : rawWidth;
             final float room=Math.max(0,Math.min(x-getPaddingLeft(),getWidth()-getPaddingRight()-x))*2f;
             final float sWidth=flexyLiquidEnabled() ? Math.min(wantedWidth,room) : wantedWidth;
             if (flexyLiquidEnabled()) {
-                float size=.80f+LiquidNavigationConfig.value(LiquidNavigationConfig.Parameter.LENS_SIZE)*.0015f;
-                float lensHeight=Math.max(1,getHeight()-getPaddingTop()-getPaddingBottom()-dp(4));
-                liquidLens.prepare(x,getHeight()*.5f,Math.min(sWidth*size,room),
-                        lensHeight*LiquidNavigationMath.compression(flexyStretch),flexyStretch,flexyDirection);
+                float expansion=LiquidNavigationConfig.expansion()?Math.max(0,Math.min(1.12f,flexyExpansion)):0;
+                float lensHeight=Math.min(dp(LiquidNavigationConfig.lensHeightDp()),rawWidth/1.55f);
+                float expandedHeight=lensHeight+expansion*dp(16+LiquidNavigationConfig.value(LiquidNavigationConfig.Parameter.EXPAND_Y)*.14f);
+                float expandedWidth=rawWidth*(1+expansion*(.16f+LiquidNavigationConfig.value(LiquidNavigationConfig.Parameter.EXPAND_X)*.006f));
+                // Lens can overhang the fixed capsule vertically; its own frame reserves room.
+                // Width is destination independent, and aspect ratio stays horizontal at all settings.
+                float safeWidth=Math.min(getWidth()-dp(2),uniformSlotWidth()+2f*Math.min(getPaddingLeft(),getPaddingRight())-dp(2));
+                expandedWidth=Math.min(safeWidth,Math.max(expandedWidth,expandedHeight*1.55f)*(1+Math.min(.14f,flexyStretch)));
+                expandedHeight=Math.min(expandedHeight,Math.min(getHeight()-dp(2),expandedWidth/1.55f));
+                float lensX=x;
+                liquidLens.prepare(lensX,getHeight()*.5f,expandedWidth,expandedHeight,flexyStretch,flexyDirection);
                 liquidLens.surface(canvas);
             } else if (MainTabsUiHelper.isMaterial3NavigationBar()) {
                 MainTabsUiHelper.setMainTabSelectedIndicatorBounds(selectorRect, sWidth,
@@ -559,6 +612,18 @@ public class MainTabsLayout extends AnimatedLinearLayout {
     private float animatedLongSelectedViewOffsetX;
 
     // Direct drag gesture, independent from legacy long-press clickHelper.
+    private boolean flexyOwnLens;
+    private float flexyExpansion;
+    private final SpringAnimation flexyExpansionSpring=new SpringAnimation(this,new FloatPropertyCompat<MainTabsLayout>("lensExpansion"){
+        public float getValue(MainTabsLayout v){return v.flexyExpansion;}
+        public void setValue(MainTabsLayout v,float value){v.flexyExpansion=value;v.invalidate();}
+    }).setMinimumVisibleChange(.001f);
+    private void expandLens(boolean pressed){
+        flexyExpansionSpring.cancel();
+        if(pressed)flexyExpansion=Math.max(.12f,flexyExpansion);
+        flexyExpansionSpring.setSpring(new SpringForce(pressed?1:0).setStiffness(LiquidNavigationConfig.stiffness()).setDampingRatio(LiquidNavigationConfig.damping()));
+        flexyExpansionSpring.animateToFinalPosition(pressed?1:0);invalidate();
+    }
     private boolean flexyDragging, flexyTracking, flexyEligible, flexyPressed, flexyIgnoreUntilUp;
     private int flexyPointerId = MotionEvent.INVALID_POINTER_ID;
     private float flexyDownX, flexyDownY, flexyPreviousX, flexyStretch, flexyFingerX;
@@ -570,6 +635,7 @@ public class MainTabsLayout extends AnimatedLinearLayout {
     }
     private void flexyBeginDrag(float x) {
         flexyPressed = true;
+        expandLens(true);
         selectedTabPositionX.cancel();
         selectedTabPositionOffsetX.cancel();
         animatedLongSelectedViewCenterX = clampXToChildrenCenters(x, this);
@@ -606,6 +672,7 @@ public class MainTabsLayout extends AnimatedLinearLayout {
     private void flexyFinishDrag(boolean cancelled) {
         if (!flexyPressed && !flexyDragging) return;
         boolean commit = flexyDragging && !cancelled;
+        expandLens(false);removeCallbacks(edgeScroller);
         flexyDragging = flexyPressed = flexyTracking = false;
         View target = commit ? findNearestVisibleChildByX(flexyFingerX,this) : findSelectedTab();
         if (commit && target != null && target != findSelectedTab()) target.performClick();
@@ -623,6 +690,7 @@ public class MainTabsLayout extends AnimatedLinearLayout {
             flexyDeformation.setSpring(new SpringForce(0).setStiffness(LiquidNavigationConfig.stiffness()).setDampingRatio(damping));
             flexyDeformation.animateToFinalPosition(0);
         }
+        if(!flexyScrollGesture)ensureSelectedVisible();
         AndroidUtilities.cancelRunOnUIThread(restoreDrawSelector);
         invalidate();
     }
@@ -640,8 +708,8 @@ public class MainTabsLayout extends AnimatedLinearLayout {
 
             if (child.getVisibility() != View.VISIBLE) continue;
 
-            if (x >= child.getLeft() && x <= child.getRight()
-                    && y >= child.getTop() && y <= child.getBottom()) {
+            if (x >= child.getX() && x <= child.getX()+child.getWidth()
+                    && y >= child.getY() && y <= child.getY()+child.getHeight()) {
                 return child;
             }
         }
@@ -869,7 +937,7 @@ public class MainTabsLayout extends AnimatedLinearLayout {
             flexyDownX = flexyPreviousX = ev.getX();
             flexyDownY = ev.getY();
             flexyEligible = findChildUnder(this, flexyDownX, flexyDownY) != null;
-            return false;
+            return flexyOwnLens;
         }
         if (action == MotionEvent.ACTION_MOVE && flexyTracking && flexyEligible) {
             final int p = ev.findPointerIndex(flexyPointerId);
@@ -878,7 +946,8 @@ public class MainTabsLayout extends AnimatedLinearLayout {
             final float dy = ev.getY(p) - flexyDownY;
             if (Math.abs(dx) > flexyTouchSlop &&
                     Math.abs(dx) > Math.abs(dy) * 1.1f) {
-                flexyDragging = true;
+                if(scrollable()&&!flexyOwnLens){flexyScrollGesture=true;flexyDragging=false;expandLens(false);}
+                else flexyDragging = true;
                 return true; // cancels the child click without waiting for a long press
             }
         }
@@ -886,7 +955,12 @@ public class MainTabsLayout extends AnimatedLinearLayout {
     }
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
-        if (flexyDragging) {
+        if(flexyScrollGesture){
+            int action=ev.getActionMasked();
+            if(action==MotionEvent.ACTION_UP||action==MotionEvent.ACTION_CANCEL){flexyFinishDrag(true);flexyScrollGesture=false;}
+            return true;
+        }
+        if (flexyDragging || flexyOwnLens) {
             final int action = ev.getActionMasked();
             if (action == MotionEvent.ACTION_POINTER_DOWN || action == MotionEvent.ACTION_POINTER_UP) {
                 flexyFinishDrag(true);return true;
@@ -900,6 +974,8 @@ public class MainTabsLayout extends AnimatedLinearLayout {
                 if (action == MotionEvent.ACTION_UP) {
                     animatedLongSelectedViewCenterX=clampXToChildrenCenters(ev.getX(),this);
                 }
+                if(action==MotionEvent.ACTION_UP && flexyOwnLens && !flexyDragging){View selected=findSelectedTab();if(selected!=null)selected.performClick();}
+                flexyOwnLens=false;
                 flexyFinishDrag(action == MotionEvent.ACTION_CANCEL);
                 flexyTracking = false;
                 flexyPointerId = MotionEvent.INVALID_POINTER_ID;
@@ -933,11 +1009,19 @@ public class MainTabsLayout extends AnimatedLinearLayout {
             return true;
         }
         if(action==MotionEvent.ACTION_DOWN && findChildUnder(this,ev.getX(),ev.getY())!=null) {
-            flexyBeginDrag(ev.getX()); // Immediate visual response; native child keeps its click/long press.
+            View selected=findSelectedTab();
+            flexyOwnLens=selected!=null && Math.abs(ev.getX()-getCenterX(selected))<=dp(LiquidNavigationConfig.lensWidthDp())*.5f;
+            flexyBeginDrag(ev.getX()); // Native child clicks remain authoritative away from selected lens.
         } else if(action==MotionEvent.ACTION_MOVE && flexyPressed) {
             int pointer=ev.findPointerIndex(flexyPointerId);
             if(pointer>=0) {
-                flexyMoveDrag(ev.getX(pointer));
+                float x=ev.getX(pointer);
+                if(flexyScrollGesture){scrollViewport(viewportOffset+flexyPreviousX-x);flexyPreviousX=x;}
+                else{
+                    if(flexyOwnLens && Math.abs(x-flexyDownX)>flexyTouchSlop)flexyDragging=true;
+                    flexyMoveDrag(x);
+                    removeCallbacks(edgeScroller);if(flexyDragging)postOnAnimation(edgeScroller);
+                }
             }
         } else if(action==MotionEvent.ACTION_POINTER_DOWN || action==MotionEvent.ACTION_POINTER_UP) {
             flexyFinishDrag(true);
@@ -956,17 +1040,18 @@ public class MainTabsLayout extends AnimatedLinearLayout {
     @Override protected void onVisibilityChanged(@NonNull View changed, int visibility) {
         super.onVisibilityChanged(changed, visibility);
         if (visibility != VISIBLE) {
-            removeCallbacks(finishNativeTap);
+            removeCallbacks(finishNativeTap);removeCallbacks(edgeScroller);flexyScrollGesture=false;
             flexyDragging=flexyPressed=flexyTracking=false;flexyPointerId=MotionEvent.INVALID_POINTER_ID;
-            flexyStretch=0;
+            flexyStretch=flexyExpansion=0;flexyOwnLens=false;
+            if(flexyExpansionSpring!=null)flexyExpansionSpring.cancel();
             if (selectedTabPositionX != null) selectedTabPositionX.cancel();
             if (flexyDeformation != null) flexyDeformation.cancel();
         }
     }
     @Override protected void onDetachedFromWindow() {
-        removeCallbacks(finishNativeTap);
+        removeCallbacks(finishNativeTap);removeCallbacks(edgeScroller);flexyScrollGesture=false;
         flexyDragging=flexyPressed=flexyTracking=flexyIgnoreUntilUp=false;
-        flexyPointerId=MotionEvent.INVALID_POINTER_ID;flexyStretch=0;
+        flexyPointerId=MotionEvent.INVALID_POINTER_ID;flexyStretch=flexyExpansion=0;flexyOwnLens=false;flexyExpansionSpring.cancel();
         selectedTabPositionX.cancel();selectedTabPositionOffsetX.cancel();flexyDeformation.cancel();
         AndroidUtilities.cancelRunOnUIThread(restoreDrawSelector);
         super.onDetachedFromWindow();

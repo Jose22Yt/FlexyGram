@@ -41,4 +41,25 @@
     <string name="FlexyLiquidNavProfilePreset">Motion preset</string>
     <string name="FlexyLiquidNavFluid">Fluid</string>
     <string name="FlexyLiquidNavMinimal">Minimal</string>
+    <string name="FlexyLiquidNavLensAppearance">Lens appearance</string>
+    <string name="FlexyLiquidNavDimensions">Dimensions and compactness</string>
+    <string name="FlexyLiquidNavPresets">Presets and reset</string>
+    <string name="FlexyLiquidNavCompaction">Compactness level</string>
+    <string name="FlexyLiquidNavDistribution">Tab layout</string>
+    <string name="FlexyLiquidNavScrollable">Scrollable tabs</string>
+    <string name="FlexyLiquidNavOverflow">Overflow menu</string>
+    <string name="FlexyLiquidNavNormal">Normal</string>
+    <string name="FlexyLiquidNavVeryCompact">Very compact</string>
+    <string name="FlexyLiquidNavAutomatic">Intelligent automatic</string>
+    <string name="FlexyLiquidNavCustom">Custom</string>
+    <string name="FlexyLiquidNavExpansion">Expand lens on contact</string>
+    <string name="FlexyLiquidNavAdaptiveQuality">Adaptive optical quality</string>
+    <string name="FlexyLiquidNavExpandX">Horizontal expansion</string>
+    <string name="FlexyLiquidNavExpandY">Vertical expansion</string>
+    <string name="FlexyLiquidNavLensHeight">Resting lens height</string>
+    <string name="FlexyLiquidNavRefraction">Refraction</string>
+    <string name="FlexyLiquidNavLabelGap">Icon to label spacing</string>
+    <string name="FlexyLiquidNavInnerMargin">Inner margins</string>
+    <string name="FlexyLiquidNavBottomGap">Distance above system gestures</string>
+    <string name="FlexyLiquidNavSideGap">Side margins</string>
 </resources>

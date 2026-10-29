@@ -41,4 +41,25 @@
     <string name="FlexyLiquidNavProfilePreset">Perfil de movimiento</string>
     <string name="FlexyLiquidNavFluid">Fluido</string>
     <string name="FlexyLiquidNavMinimal">Minimal</string>
+    <string name="FlexyLiquidNavLensAppearance">Apariencia de la lente</string>
+    <string name="FlexyLiquidNavDimensions">Dimensiones y compactación</string>
+    <string name="FlexyLiquidNavPresets">Presets y restauración</string>
+    <string name="FlexyLiquidNavCompaction">Nivel de compactación</string>
+    <string name="FlexyLiquidNavDistribution">Distribución de pestañas</string>
+    <string name="FlexyLiquidNavScrollable">Pestañas desplazables</string>
+    <string name="FlexyLiquidNavOverflow">Menú de desbordamiento</string>
+    <string name="FlexyLiquidNavNormal">Normal</string>
+    <string name="FlexyLiquidNavVeryCompact">Muy compacta</string>
+    <string name="FlexyLiquidNavAutomatic">Automática inteligente</string>
+    <string name="FlexyLiquidNavCustom">Personalizada</string>
+    <string name="FlexyLiquidNavExpansion">Ampliar la lente al tocar</string>
+    <string name="FlexyLiquidNavAdaptiveQuality">Calidad óptica adaptativa</string>
+    <string name="FlexyLiquidNavExpandX">Expansión horizontal</string>
+    <string name="FlexyLiquidNavExpandY">Expansión vertical</string>
+    <string name="FlexyLiquidNavLensHeight">Altura de la lente en reposo</string>
+    <string name="FlexyLiquidNavRefraction">Refracción</string>
+    <string name="FlexyLiquidNavLabelGap">Separación entre icono y etiqueta</string>
+    <string name="FlexyLiquidNavInnerMargin">Márgenes internos</string>
+    <string name="FlexyLiquidNavBottomGap">Distancia sobre los gestos del sistema</string>
+    <string name="FlexyLiquidNavSideGap">Espaciado lateral</string>
 </resources>

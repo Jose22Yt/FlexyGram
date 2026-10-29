@@ -202,4 +202,22 @@ public class BubbleVisualTest {
   }
  }
 
+
+ @Test public void fusionModesMigrateAndPersistWithoutRetiringStyles(){
+  var prefs=ApplicationLoader.applicationContext.getSharedPreferences(BubbleConfig.FILE,0);prefs.edit().putBoolean("signature_fuse_glass",true).remove("signature_fusion_mode").commit();BubbleConfig.load();assertEquals(1,BubbleConfig.fusionMode());
+  BubbleConfig.setOutlineStyle(3);BubbleConfig.setFusionMode(2);BubbleConfig.setFusionIntensity(85);BubbleConfig.setFusionAdapt(false);BubbleConfig.load();assertEquals(2,BubbleConfig.fusionMode());assertEquals(85,BubbleConfig.fusionIntensity());assertFalse(BubbleConfig.fusionAdapt());assertEquals(3,BubbleConfig.outlineStyle());assertFalse(BubbleConfig.matteEnabled());
+ }
+ Bitmap fusionImage(boolean out,int mode,int intensity){BubbleConfig.setFusionMode(mode);BubbleConfig.setFusionIntensity(intensity);BubbleConfig.setFusionAdapt(true);BubbleConfig.setTransparency(35);BubbleConfig.setOutlineStyle(1);BubbleConfig.setBorderPosition(5);MessageDrawable d=new MessageDrawable(MessageDrawable.TYPE_TEXT,out,false);d.setBounds(4,4,164,84);d.setTop(0,180,100,false,false);Bitmap b=Bitmap.createBitmap(180,100,Bitmap.Config.ARGB_8888);d.drawCached(new Canvas(b),new MessageDrawable.PathDrawParams());return b;}
+ @Test public void fusionIntensityChangesOnlyItsContourRegionAndZeroMatchesNoFusion(){
+  for(boolean dark:new boolean[]{false,true})for(boolean out:new boolean[]{false,true}){Theme.dark=dark;Bitmap none=fusionImage(out,0,60),zero=fusionImage(out,2,0),low=fusionImage(out,2,20),high=fusionImage(out,2,100);assertTrue(none.sameAs(zero));assertFalse(low.sameAs(high));assertEquals(none.getPixel(80,40),high.getPixel(80,40));assertEquals(0,high.getPixel(0,0));none.recycle();zero.recycle();low.recycle();high.recycle();}
+ }
+ @Test public void fusionReusesNativePathsAndDoesNotAllocateNewShaders(){
+  BubbleConfig.setFusionMode(2);BubbleConfig.setFusionIntensity(80);BubbleConfig.setBorderPosition(1);MessageDrawable d=new MessageDrawable(MessageDrawable.TYPE_TEXT,true,false);d.setBounds(4,4,164,84);d.setTop(0,180,100,false,false);var cache=new MessageDrawable.PathDrawParams();Bitmap b=Bitmap.createBitmap(180,100,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(b);d.drawCached(c,cache);
+  var paint=org.robolectric.util.ReflectionHelpers.<Paint>getField(d,"flexyBorderPaint");Object shader=paint.getShader();assertNotNull(shader);for(int i=0;i<50;i++)d.drawCached(c,cache);assertSame(shader,paint.getShader());b.recycle();
+ }
+ @Test public void renderFusionModesWithProductionDrawableSynthetic()throws Exception{
+  Bitmap sheet=Bitmap.createBitmap(540,200,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(sheet);
+  for(int row=0;row<2;row++){Theme.dark=row==1;for(int mode=0;mode<3;mode++){Bitmap b=fusionImage(row==1,mode,90);c.drawBitmap(b,mode*180,row*100,null);b.recycle();}}
+  try(var f=new java.io.FileOutputStream("bubble-fusion-modes-isolated.png")){sheet.compress(Bitmap.CompressFormat.PNG,100,f);}sheet.recycle();
+ }
 }
