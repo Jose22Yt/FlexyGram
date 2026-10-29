@@ -33295,7 +33295,7 @@ public class ChatActivity extends BaseFragment implements
                 .setRadius(dp(compactContext ? 24 : 12))
                 .setPadding(dp(8)));
 
-            if (compactContext) {
+            if (compactContext && !signatureContextActions(options).isEmpty()) {
                 android.graphics.drawable.GradientDrawable surface = new android.graphics.drawable.GradientDrawable();
                 surface.setColor(0xe62b3540);
                 surface.setCornerRadius(dp(20));
