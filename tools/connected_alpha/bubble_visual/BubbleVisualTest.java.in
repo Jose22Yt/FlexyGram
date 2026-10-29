@@ -220,4 +220,16 @@ public class BubbleVisualTest {
   for(int row=0;row<2;row++){Theme.dark=row==1;for(int mode=0;mode<3;mode++){Bitmap b=fusionImage(row==1,mode,90);c.drawBitmap(b,mode*180,row*100,null);b.recycle();}}
   try(var f=new java.io.FileOutputStream("bubble-fusion-modes-isolated.png")){sheet.compress(Bitmap.CompressFormat.PNG,100,f);}sheet.recycle();
  }
+
+ @Test public void renderSingleContactWithProductionMotionAndBubbleIsolated()throws Exception{
+  android.app.Activity a=Robolectric.buildActivity(android.app.Activity.class).setup().get();android.view.View owner=new android.view.View(a);a.setContentView(owner);
+  var motion=new app.flexygram.bubbles.interaction.BubbleTapMotion(owner);MessageDrawable d=new MessageDrawable(MessageDrawable.TYPE_TEXT,true,false);d.setBounds(8,30,172,110);d.setTop(0,180,140,false,false);var cache=new MessageDrawable.PathDrawParams();
+  BubbleConfig.setFusionMode(0);Bitmap sheet=Bitmap.createBitmap(900,140,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(sheet);
+  motion.press(.05f,.7f,280);
+  for(int frame=0;frame<5;frame++){
+   if(frame==1)motion.release();if(frame>1)Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(java.time.Duration.ofMillis(frame==4?350:70));
+   c.save();c.translate(frame*180,0);c.scale(motion.scale(),motion.scale(),90,70);d.drawCached(c,cache);c.restore();
+  }
+  try(var f=new java.io.FileOutputStream("single-tap-bubble-frames-isolated.png")){sheet.compress(Bitmap.CompressFormat.PNG,100,f);}sheet.recycle();motion.reset();a.finish();
+ }
 }

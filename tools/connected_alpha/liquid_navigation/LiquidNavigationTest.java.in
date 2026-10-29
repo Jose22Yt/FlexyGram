@@ -17,7 +17,7 @@ import static org.junit.Assert.*;
 public class LiquidNavigationTest {
  Activity activity; FrameLayout root; MainTabsLayout bar; GlassTabView[] tabs; int clicks;
  @Before public void setup(){
-  activity=Robolectric.buildActivity(Activity.class).setup().get();
+  activity=Robolectric.buildActivity(Activity.class).setup().get();org.telegram.messenger.ApplicationLoader.applicationContext=activity.getApplicationContext();
   activity.getSharedPreferences("flexy_liquid_navigation",0).edit().clear().commit();
   ReflectionHelpers.setStaticField(LiquidNavigationConfig.class,"loaded",false);
   LiquidNavigationConfig.enabled(true);
@@ -190,5 +190,17 @@ public class LiquidNavigationTest {
   for(int i=0;i<5;i++){var tab=new GlassTabView(activity);bar.addView(tab);bar.setViewVisible(tab,true,false);}layout();
   event(MotionEvent.ACTION_DOWN,center(2));event(MotionEvent.ACTION_MOVE,center(2)-20);event(MotionEvent.ACTION_MOVE,20);event(MotionEvent.ACTION_UP,20);
   assertEquals(0,clicks);assertTrue(ReflectionHelpers.<Float>getField(bar,"viewportOffset")>0);assertTrue(tabs[0].isTabSelected());
+ }
+
+ @Test public void alpha1285DimensionsMigrateOnceAndRetainAllDestinations(){
+  var p=activity.getSharedPreferences("flexy_liquid_navigation",0);p.edit().clear().putBoolean("configured",true).putBoolean("drag_indicator",true).putInt("height",50).putString("destinations","8,6,0,2,7,3").commit();ReflectionHelpers.setStaticField(LiquidNavigationConfig.class,"loaded",false);
+  assertEquals(72,LiquidNavigationConfig.heightDp());assertEquals(4,LiquidNavigationConfig.compaction());assertArrayEquals(new int[]{8,6,0,2,7,3},LiquidNavigationConfig.order());
+  ReflectionHelpers.setStaticField(LiquidNavigationConfig.class,"loaded",false);assertEquals(72,LiquidNavigationConfig.heightDp());assertTrue(LiquidNavigationConfig.enabled());
+ }
+
+ @Test public void translatedNinthTabReceivesOneRealNativeClick(){
+  GlassTabView ninth=null;final int[] delivered={0};for(int i=4;i<9;i++){var tab=new GlassTabView(activity);bar.addView(tab);bar.setViewVisible(tab,true,false);tab.setOnClickListener(v->{delivered[0]++;bar.setTabSelected(tab,false);});ninth=tab;}
+  layout();ReflectionHelpers.callInstanceMethod(bar,"scrollViewport",ReflectionHelpers.ClassParameter.from(float.class,10000f));
+  assertNotNull(ninth);float x=ninth.getX()+ninth.getWidth()*.5f;assertTrue(x>=0&&x<=bar.getWidth());event(MotionEvent.ACTION_DOWN,x);event(MotionEvent.ACTION_UP,x);Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();assertEquals(1,delivered[0]);assertTrue(ninth.isTabSelected());
  }
 }

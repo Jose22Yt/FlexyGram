@@ -25,7 +25,7 @@ class LiquidNavigation(unittest.TestCase):
   self.assertNotIn('tabsView.setEnabled(factor > 1)',source)
  def test_settings_preview_uses_the_actual_bar_and_native_reorder_list(self):
   preview=(JAVA/'app/flexygram/navigation/LiquidNavigationPreviewView.java').read_text()
-  self.assertIn('new MainTabsLayout(',preview);self.assertIn('LiquidNavigationTabs.create(',preview)
+  self.assertIn('new MainTabsLayout(',preview);self.assertIn('LiquidNavigationTabs.createPreview(',preview)
   self.assertNotIn('onTouchEvent(',preview)
   editor=(JAVA/'app/flexygram/navigation/LiquidNavigationTabsActivity.java').read_text()
   for token in ['allowReorder(true)','listenReorder','LiquidNavigationConfig.order(ids)','preview.settingsChanged()']:

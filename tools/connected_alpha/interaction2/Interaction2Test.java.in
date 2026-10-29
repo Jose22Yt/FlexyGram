@@ -2,7 +2,7 @@ import org.junit.*;import org.junit.runner.RunWith;import static org.junit.Asser
 @RunWith(RobolectricTestRunner.class) @Config(manifest=Config.NONE,sdk=35) @LooperMode(LooperMode.Mode.PAUSED)
 public class Interaction2Test{
  Activity a;FrameLayout root;LiquidNavigationPreviewView preview;
- @Before public void setup(){a=Robolectric.buildActivity(Activity.class).setup().get();LiquidNavigationConfig.reset();LiquidNavigationConfig.enabled(true);root=new FrameLayout(a);a.setContentView(root);preview=new LiquidNavigationPreviewView(a);root.addView(preview,new FrameLayout.LayoutParams(360,-2));layout();}
+ @Before public void setup(){a=Robolectric.buildActivity(Activity.class).setup().get();org.telegram.messenger.ApplicationLoader.applicationContext=a.getApplicationContext();LiquidNavigationConfig.reset();LiquidNavigationConfig.enabled(true);root=new FrameLayout(a);a.setContentView(root);preview=new LiquidNavigationPreviewView(a);root.addView(preview,new FrameLayout.LayoutParams(360,-2));layout();}
  void layout(){root.measure(View.MeasureSpec.makeMeasureSpec(360,1073741824),View.MeasureSpec.makeMeasureSpec(600,1073741824));root.layout(0,0,360,600);Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(Duration.ofSeconds(2));}
  @After public void end(){root.removeAllViews();a.finish();}
  @Test public void previewNeverBindsAnAccountAvatar(){assertEquals(0,org.telegram.ui.Components.glass.GlassTabView.avatarBinds);assertTrue(preview.getHeight()>300);}
@@ -16,4 +16,15 @@ public class Interaction2Test{
    var tab=bar.getChildAt(0);float x=tab.getX()+tab.getWidth()/2f;MotionEvent e=MotionEvent.obtain(0,0,0,x,40,0);bar.dispatchTouchEvent(e);e.recycle();Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(Duration.ofMillis(280));preview.draw(c);save(b,"preview-expanded-"+(dark?"dark":"light")+"-isolated.png");e=MotionEvent.obtain(0,300,3,x,40,0);bar.dispatchTouchEvent(e);e.recycle();Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(Duration.ofSeconds(2));b.recycle();}
  }
  void save(Bitmap b,String name)throws Exception{try(var f=new java.io.FileOutputStream(name)){b.compress(Bitmap.CompressFormat.PNG,100,f);}}
+
+ @Test public void shareHeaderClassicIsAnExplicitLocalActionAndLongPreviewsAreBounded(){
+  int[] invoked={0};var header=new app.flexygram.share.FlexyShareHeader(a,null,()->invoked[0]++);header.preview("x".repeat(1000));header.recipients(2,"Alex, Design team");
+  assertEquals(0,invoked[0]);assertTrue(header.getChildAt(1).performClick());assertEquals(1,invoked[0]);assertEquals(200,((android.widget.TextView)header.getChildAt(2)).length());
+ }
+ @Test public void shareConfigurationSurvivesReloadAndClassicIsTheDefault(){
+  a.getSharedPreferences("flexy_share",0).edit().clear().commit();ReflectionHelpers.setStaticField(app.flexygram.share.FlexyShareConfig.class,"enabled",null);assertFalse(app.flexygram.share.FlexyShareConfig.enabled(a));app.flexygram.share.FlexyShareConfig.enabled(a,true);ReflectionHelpers.setStaticField(app.flexygram.share.FlexyShareConfig.class,"enabled",null);assertTrue(app.flexygram.share.FlexyShareConfig.enabled(a));
+ }
+ @Test @GraphicsMode(GraphicsMode.Mode.NATIVE) public void renderShareHeaderSynthetic()throws Exception{
+  var header=new app.flexygram.share.FlexyShareHeader(a,null,()->{});header.preview("Photo · Weekend plans");header.recipients(2,"Alex, Design team");header.measure(View.MeasureSpec.makeMeasureSpec(360,1073741824),View.MeasureSpec.makeMeasureSpec(80,1073741824));header.layout(0,0,360,80);Bitmap b=Bitmap.createBitmap(360,80,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(b);c.drawColor(0xfff6f8fa);header.draw(c);save(b,"share-header-isolated.png");b.recycle();
+ }
 }

@@ -72,7 +72,7 @@ public final class BubbleConfig {
     public static void setFusionAdapt(boolean value){if(!loaded)load();fusionAdapt=value;preferences().edit().putBoolean("signature_fusion_adapt",value).apply();}
     public static boolean fuseGlass() { return fusionMode==1; }
     public static void setFuseGlass(boolean value) {
-        if (!loaded) load(); if (value == fuseGlass) return;
+        if (!loaded) load(); if ((value?1:0) == fusionMode) return;
         setFusionMode(value?1:0);
     }
     public static void setOutlineEnabled(boolean value) { if (!loaded) load(); outlineEnabled = value; preferences().edit().putBoolean("signature_outline_enabled", value).putInt("signature_border_position", borderPosition).apply(); }

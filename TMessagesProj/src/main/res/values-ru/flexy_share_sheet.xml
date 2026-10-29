@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyShareClassic">Классический</string>
+    <string name="FlexyShareChooseRecipients">Выберите получателей ниже</string>
+    <string name="FlexyShareEnabled">Использовать Flexy Share Sheet</string>
+    <string name="FlexyShareDescription">Локальное оформление встроенной панели Telegram. Поиск, выбор и отправка остаются встроенными. Кнопка «Классический» сохраняет совместимость. Особые виды пересылки используют стандартный экран. Без сторонних загрузок и сервисов.</string>
+</resources>

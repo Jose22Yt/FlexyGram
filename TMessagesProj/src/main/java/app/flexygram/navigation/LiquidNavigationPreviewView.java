@@ -95,7 +95,7 @@ public final class LiquidNavigationPreviewView extends FrameLayout implements Th
         surface.setCornerRadius(AndroidUtilities.dp(LiquidNavigationConfig.heightDp()/2f));
         if(nativeSurface!=null)nativeSurface.setRadius(AndroidUtilities.dp(LiquidNavigationConfig.heightDp()/2f));
         bar.refreshLiquidAppearance();
-        android.view.ViewGroup.LayoutParams lp=bar.getLayoutParams();int height=AndroidUtilities.dp(LiquidNavigationConfig.heightDp()+32);if(lp.height!=height){lp.height=height;bar.setLayoutParams(lp);}
+        android.widget.FrameLayout.LayoutParams lp=(android.widget.FrameLayout.LayoutParams)bar.getLayoutParams();int height=AndroidUtilities.dp(LiquidNavigationConfig.heightDp()+32);int side=AndroidUtilities.dp(LiquidNavigationConfig.sideGapDp()),bottom=AndroidUtilities.dp(LiquidNavigationConfig.bottomGapDp());if(lp.height!=height||lp.leftMargin!=side||lp.bottomMargin!=bottom){lp.height=height;lp.setMargins(side,0,side,bottom);bar.setLayoutParams(lp);}
         updateSelection();requestLayout();invalidate();
     }
     private final android.graphics.Paint scenePaint=new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
@@ -121,5 +121,5 @@ public final class LiquidNavigationPreviewView extends FrameLayout implements Th
     @Override protected void onDetachedFromWindow(){
         org.telegram.messenger.LiteMode.removeOnPowerSaverAppliedListener(powerListener);removeCallbacks(afterSize);super.onDetachedFromWindow();
     }
-    @Override protected void onMeasure(int w,int h){super.onMeasure(w,MeasureSpec.makeMeasureSpec(AndroidUtilities.dp(LiquidNavigationConfig.heightDp()+300),MeasureSpec.EXACTLY));}
+    @Override protected void onMeasure(int w,int h){super.onMeasure(w,MeasureSpec.makeMeasureSpec(AndroidUtilities.dp(LiquidNavigationConfig.heightDp()+344),MeasureSpec.EXACTLY));}
 }

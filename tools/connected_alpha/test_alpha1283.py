@@ -37,7 +37,9 @@ class Alpha1283(unittest.TestCase):
   folder=JAVA/'app/flexygram/bubbles/interaction'
   for p in folder.glob('*.java'):
    s=p.read_text();self.assertNotIn('app.flexygram.motion',s);self.assertNotIn('FlexyFrameMotion',s)
-  self.assertFalse((folder/'BubbleTapMotion.java').exists())
+  # Alpha1285 deliberately omitted single-tap animation. Alpha1286 adds a cell-local
+  # controller by explicit owner request; the cancelled global engine stays forbidden.
+  self.assertEqual(b'',__import__('interaction1286_contract').original('TMessagesProj/src/main/java/app/flexygram/bubbles/interaction/BubbleTapMotion.java'))
   workflow=prior_bytes('TMessagesProj/src/main/java/app/flexygram/bubbles/interaction/BubbleStickerWorkflow.java').decode();self.assertIn('new ArrayBlockingQueue<>(2)',workflow);self.assertIn('WORKER.allowCoreThreadTimeOut(true)',workflow)
   self.assertIn('sending || submitted',workflow);self.assertIn('!owner.sending',workflow)
   self.assertIn('if (!submitted && readyFile != null) readyFile.delete()',workflow)

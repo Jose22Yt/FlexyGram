@@ -1010,7 +1010,7 @@ public class MainTabsLayout extends AnimatedLinearLayout {
         }
         if(action==MotionEvent.ACTION_DOWN && findChildUnder(this,ev.getX(),ev.getY())!=null) {
             View selected=findSelectedTab();
-            flexyOwnLens=selected!=null && Math.abs(ev.getX()-getCenterX(selected))<=dp(LiquidNavigationConfig.lensWidthDp())*.5f;
+            flexyOwnLens=selected!=null && Math.abs(ev.getX()-getCenterX(selected))<=Math.min(dp(LiquidNavigationConfig.lensWidthDp()),uniformSlotWidth()*.96f)*.5f;
             flexyBeginDrag(ev.getX()); // Native child clicks remain authoritative away from selected lens.
         } else if(action==MotionEvent.ACTION_MOVE && flexyPressed) {
             int pointer=ev.findPointerIndex(flexyPointerId);

@@ -42,10 +42,20 @@ public final class LiquidNavigationConfig {
         SharedPreferences p=prefs();distribution=p.getInt("distribution",0)==1?1:0;compaction=Math.max(0,Math.min(4,p.getInt("compaction",3)));configured=p.getBoolean("configured",false);
         adaptiveQuality=p.getBoolean("adaptive_quality",true);expansion=p.getBoolean("lens_expansion",true);enabled=p.getBoolean("drag_indicator",false);labels=p.getBoolean("labels",true);
         for(Parameter v:Parameter.values())v.value=LiquidNavigationMath.clampPercent(p.getInt(v.name().toLowerCase(java.util.Locale.ROOT),v.initial));
+        if(!p.getBoolean("layout_schema2",false)){
+            SharedPreferences.Editor migration=p.edit().putBoolean("layout_schema2",true);
+            if(configured){
+                int oldHeight=60+valueWithoutLoad(Parameter.HEIGHT)*24/100;
+                Parameter.HEIGHT.value=LiquidNavigationMath.clampPercent(Math.round((oldHeight-48)*100f/36f));
+                compaction=4;migration.putInt("height",Parameter.HEIGHT.value).putInt("compaction",4);
+            }
+            migration.apply();
+        }
         String[] raw=p.getString("destinations","0,1,2,4").split(",");int[] ids=new int[Math.min(raw.length,64)];
         for(int i=0;i<ids.length;i++){try{ids[i]=Integer.parseInt(raw[i]);}catch(NumberFormatException e){ids[i]=-1;}}
         order=LiquidNavigationDestinations.sanitize(ids);loaded=true;
     }
+    private static int valueWithoutLoad(Parameter p){return p.value;}
     public static boolean configured(){load();return configured;}
     public static boolean enabled(){load();return enabled;}
     public static void enabled(boolean v){load();enabled=v;configured=true;prefs().edit().putBoolean("drag_indicator",v).putBoolean("configured",true).apply();}
@@ -72,7 +82,7 @@ public final class LiquidNavigationConfig {
     public static int[] shown(int slots){return distribution()==1?LiquidNavigationDestinations.fit(order(),slots):order();}
     public static int slotDp(int count,int availableDp){int mode=compaction();return mode==0?76:mode==1?64:mode==2?52:mode==3?(count*64>availableDp?52:72):Math.max(48,56+value(Parameter.COMPACT)*24/100+spacingDp());}
     public static boolean hideLabels(int count,int availableDp){return !labels()||compaction()==2||compaction()==3&&count*64>availableDp;}
-    public static int heightDp(){return compaction()==4?48+value(Parameter.HEIGHT)*24/100:compaction()==2?48:compaction()==1?52:compaction()==3&&order.length>6?48:60;}
+    public static int heightDp(){return compaction()==4?48+Math.round(value(Parameter.HEIGHT)*.36f):compaction()==2?48:compaction()==1?52:compaction()==3&&order.length>6?48:60;}
     public static int innerMarginDp(){return 16+value(Parameter.INNER_MARGIN)*8/100;}
     public static int bottomGapDp(){return 4+value(Parameter.BOTTOM_GAP)*20/100;}
     public static int sideGapDp(){return 4+value(Parameter.SIDE_GAP)*20/100;}

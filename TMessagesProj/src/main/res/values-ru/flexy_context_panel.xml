@@ -6,5 +6,5 @@
     <string name="FlexyContextPanel">Контекстная панель Signature</string>
     <string name="FlexyContextBounce">Анимация выбора iOS 27</string>
     <string name="FlexyContextInteractions">Взаимодействие с сообщениями</string>
-    <string name="FlexyContextDescription">Выделяет сообщение размытием фона и мягким отскоком. Сохраняет реакции, разрешения и действия Telegram.</string>
+    <string name="FlexyContextDescription">Касание анимирует сообщение независимо от меню. Реакции и меню одним касанием включаются отдельно. Встроенные элементы и долгое нажатие сохраняют свои действия.</string>
 </resources>
