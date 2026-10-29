@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyLiquidNavTitle">Flexy Liquid Navigation</string>
+    <string name="FlexyLiquidNavEnabled">Liquid indicator</string>
+    <string name="FlexyLiquidNavElasticity">Indicator elasticity</string>
+    <string name="FlexyLiquidNavOpacity">Indicator transparency</string>
+    <string name="FlexyLiquidNavContacts">Show Contacts tab</string>
+    <string name="FlexyLiquidNavProfile">Show Profile tab</string>
+    <string name="FlexyLiquidNavCalls">Show Calls instead of Settings</string>
+    <string name="FlexyLiquidNavFeed">Show Feed instead of Contacts</string>
+    <string name="FlexyLiquidNavTabs">Available navigation tabs</string>
+    <string name="FlexyLiquidNavPreview">Preview — drag the indicator</string>
+    <string name="FlexyLiquidNavChatsFixed">Chats stays visible to preserve navigation</string>
+    <string name="FlexyLiquidNavReloadHint">Changes to native tabs may take effect on reopening the home screen</string>
+</resources>
