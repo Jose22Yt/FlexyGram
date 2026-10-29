@@ -63,7 +63,7 @@
     "tools/connected_alpha/bubble_visual/CachedBlurVisualTest.java.in": "e9bda92962e67fd03f130b1787044ad350a6b9cdad5a928e54371b92c184cf42",
     "tools/connected_alpha/bubble_visual/stubs.py": "af1f01c3bacf1134666223fabb00ba0935e36558f5c4d3fb180c446916c177dc",
     "tools/connected_alpha/build_private_apk.py": "96deb140f0abf19393dba570d5fba58c8a143e04c985ac49ecd4b865f653569e",
-    "tools/connected_alpha/context_panel/BubbleStickerNativeTest.java.in": "735723fecec7ef48efd79591406ad1f953ca344d048e815989e07d529bfd2411",
+    "tools/connected_alpha/context_panel/BubbleStickerNativeTest.java.in": "2183e1468c983aef7caabda18045c08c85203cbaa433de6230c8667d28d0d153",
     "tools/connected_alpha/context_panel/COMPACT_IOS27_HANDOFF.md": "31af0e21445dbc3c7f2686108f7562840ed82fedb21f1343ad6541ce2d88876a",
     "tools/connected_alpha/context_panel/ContextPanelTest.java.in": "fc90227e7cfd8e86538aa9b4cc0c214b8a2320165f964fe4aaf0170d36331b31",
     "tools/connected_alpha/context_panel/run.py": "575ae6797eb5c349abb9a1225a21f25d8dcca27e61f0b51cc4adf7f950a41153",
