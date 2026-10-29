@@ -126,7 +126,15 @@ public class MainTabsLayout extends AnimatedLinearLayout {
             width = maxWidthPx;
         }
 
-        final boolean fillWidth = MainTabsUiHelper.isMaterial3NavigationBar() || MainTabsUiHelper.isIosNavigationBar();
+        final boolean customSizing = LiquidNavigationConfig.configured();
+        if (customSizing) {
+            int count=0;for(int i=0;i<getChildCount();i++)if(isViewVisible(getChildAt(i)))count++;
+            int minimum=dp(48)*count+getPaddingLeft()+getPaddingRight();
+            int desired=dp(64+LiquidNavigationConfig.value(LiquidNavigationConfig.Parameter.COMPACT)*24/100)*count+getPaddingLeft()+getPaddingRight();
+            int userWidth=width*(70+LiquidNavigationConfig.value(LiquidNavigationConfig.Parameter.WIDTH)*30/100)/100;
+            width=Math.min(width,Math.max(minimum,Math.min(desired,userWidth)));
+        }
+        final boolean fillWidth = customSizing || MainTabsUiHelper.isMaterial3NavigationBar() || MainTabsUiHelper.isIosNavigationBar();
         final int maxTotalWidthForTabs = width - getPaddingLeft() - getPaddingRight();
         final int minTotalWidthForTabs = fillWidth
                 ? maxTotalWidthForTabs
@@ -155,7 +163,7 @@ public class MainTabsLayout extends AnimatedLinearLayout {
 
         applyPassTextSize(chosenPass);
 
-        final int tabPadding = dp(PASS_PADDINGS_DP[chosenPass]);
+        final int tabPadding = dp(customSizing ? LiquidNavigationConfig.spacingDp() : PASS_PADDINGS_DP[chosenPass]);
         final int maxTabTextWidthIfEq = (maxTotalWidthForTabs / Math.max(1, visibleChildCount)) - tabPadding * 2;
 
         float totalWidth = 0;
@@ -362,7 +370,10 @@ public class MainTabsLayout extends AnimatedLinearLayout {
         return null;
     }
 
-    private final Runnable restoreDrawSelector = () -> setSkipDrawSelector(false);
+    private final Runnable restoreDrawSelector = () -> setSkipDrawSelector(flexyLiquidEnabled());
+    private boolean liquidPreview;
+    public void setLiquidPreview(boolean preview) { liquidPreview=preview; refreshLiquidAppearance(); }
+    public void refreshLiquidAppearance() { setSkipDrawSelector(flexyLiquidEnabled()); requestLayout(); invalidate(); }
 
     private boolean drawCustomSelector;
     private void setSkipDrawSelector(boolean skipDrawSelector) {
@@ -391,14 +402,19 @@ public class MainTabsLayout extends AnimatedLinearLayout {
 
     @Override
     protected void dispatchDraw(@NonNull Canvas canvas) {
+        if (flexyLiquidEnabled() && !drawCustomSelector) setSkipDrawSelector(true);
         if (drawCustomSelector) {
+            if (flexyLiquidEnabled() && !flexyPressed && !flexyDragging && !selectedTabPositionX.isRunning()) {
+                View selected=findSelectedTab();
+                if(selected!=null) animatedLongSelectedViewCenterX=selected.getX()+selected.getWidth()*.5f;
+            }
             final float x = animatedLongSelectedViewCenterX + animatedLongSelectedViewOffsetX;
             final float rawWidth = getInterpolatedWidthByX(x, this);
-            final float sWidth = flexyDragging
+            final float sWidth = flexyLiquidEnabled()
                     ? LiquidNavigationMath.width(rawWidth, flexyStretch) : rawWidth;
-            if (flexyDragging) {
+            if (flexyLiquidEnabled()) {
                 final int color = Theme.getColor(Theme.key_glass_tabSelected, resourcesProvider);
-                selectorPaint.setColor(Theme.multAlpha(color, LiquidNavigationConfig.opacity() / 100f));
+                selectorPaint.setColor(Theme.multAlpha(color, (100-LiquidNavigationConfig.opacity()) / 100f));
             }
             if (MainTabsUiHelper.isMaterial3NavigationBar()) {
                 MainTabsUiHelper.setMainTabSelectedIndicatorBounds(selectorRect, sWidth,
@@ -484,21 +500,22 @@ public class MainTabsLayout extends AnimatedLinearLayout {
     private float animatedLongSelectedViewOffsetX;
 
     // Direct drag gesture, independent from legacy long-press clickHelper.
-    private boolean flexyDragging, flexyTracking, flexyEligible;
+    private boolean flexyDragging, flexyTracking, flexyEligible, flexyPressed, flexyIgnoreUntilUp;
     private int flexyPointerId = MotionEvent.INVALID_POINTER_ID;
-    private float flexyDownX, flexyDownY, flexyPreviousX, flexyStretch;
+    private float flexyDownX, flexyDownY, flexyPreviousX, flexyStretch, flexyFingerX;
     private final int flexyTouchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
     private boolean flexyLiquidEnabled() {
         return LiquidNavigationConfig.enabled() && getVisibility() == View.VISIBLE && isEnabled()
-                && !isInLongPress && MainTabsUiHelper.isIosNavigationBar();
+                && !isInLongPress;
     }
     private void flexyBeginDrag(float x) {
-        flexyDragging = true;
+        flexyPressed = true;
         selectedTabPositionX.cancel();
         selectedTabPositionOffsetX.cancel();
         animatedLongSelectedViewCenterX = clampXToChildrenCenters(x, this);
         animatedLongSelectedViewOffsetX = 0f;
-        flexyPreviousX = x;
+        flexyPreviousX = flexyFingerX = x;
+        flexyDeformation.cancel();
         flexyStretch = 0f;
         AndroidUtilities.cancelRunOnUIThread(restoreDrawSelector);
         setSkipDrawSelector(true);
@@ -507,30 +524,39 @@ public class MainTabsLayout extends AnimatedLinearLayout {
         final float clamped = clampXToChildrenCenters(x, this);
         final float width = Math.max(1f, getInterpolatedWidthByX(clamped, this));
         flexyStretch = LiquidNavigationMath.stretch(clamped - flexyPreviousX, width,
-                LiquidNavigationConfig.elasticity());
+                LiquidNavigationConfig.elasticity()
+                * LiquidNavigationConfig.value(LiquidNavigationConfig.Parameter.DEFORMATION)/100f);
         flexyPreviousX = clamped;
         animatedLongSelectedViewCenterX = clamped;
         animatedLongSelectedViewOffsetX = 0f;
         invalidate();
     }
+    private final SpringAnimation flexyDeformation = new SpringAnimation(this,
+            new FloatPropertyCompat<MainTabsLayout>("flexyDeformation") {
+                public float getValue(MainTabsLayout v){return v.flexyStretch;}
+                public void setValue(MainTabsLayout v,float value){v.flexyStretch=Math.max(0,value);v.invalidate();}
+            });
     private void flexyFinishDrag(boolean cancelled) {
-        if (!flexyDragging) return;
-        flexyDragging = false;
-        flexyStretch = 0f;
-        final View target = cancelled ? findSelectedTab()
-                : findNearestVisibleChildByX(animatedLongSelectedViewCenterX, this);
+        if (!flexyPressed && !flexyDragging) return;
+        boolean commit = flexyDragging && !cancelled;
+        flexyDragging = flexyPressed = flexyTracking = false;
+        View target = commit ? findNearestVisibleChildByX(flexyFingerX,this) : findSelectedTab();
+        if (commit && target != null && target != findSelectedTab()) target.performClick();
+        // A rejected navigation or shortcut leaves native selection authoritative.
+        View selected=findSelectedTab();
+        if (selected != null) target=selected;
         if (target != null) {
-            final float center = target.getX() + target.getWidth() * .5f;
+            final float center=target.getX()+target.getWidth()*.5f;
+            float pace=310f/LiquidNavigationConfig.settleMillis();
+            float damping=Math.max(.65f,LiquidNavigationConfig.damping()
+                    -LiquidNavigationConfig.value(LiquidNavigationConfig.Parameter.REBOUND)*.002f);
             selectedTabPositionX.setSpring(new SpringForce(center)
-                    .setStiffness(460f).setDampingRatio(.76f));
+                    .setStiffness(LiquidNavigationConfig.stiffness()*pace*pace).setDampingRatio(damping));
             selectedTabPositionX.animateToFinalPosition(center);
-            if (!cancelled && target != findSelectedTab()) {
-                setTabSelected(target, true);
-                target.performClick(); // One native navigation operation only, on release.
-            }
+            flexyDeformation.setSpring(new SpringForce(0).setStiffness(LiquidNavigationConfig.stiffness()).setDampingRatio(damping));
+            flexyDeformation.animateToFinalPosition(0);
         }
         AndroidUtilities.cancelRunOnUIThread(restoreDrawSelector);
-        AndroidUtilities.runOnUIThread(restoreDrawSelector, 370);
         invalidate();
     }
     private boolean isInLongPress;
@@ -785,7 +811,7 @@ public class MainTabsLayout extends AnimatedLinearLayout {
             final float dy = ev.getY(p) - flexyDownY;
             if (Math.abs(dx) > flexyTouchSlop &&
                     Math.abs(dx) > Math.abs(dy) * 1.1f) {
-                flexyBeginDrag(ev.getX(p));
+                flexyDragging = true;
                 return true; // cancels the child click without waiting for a long press
             }
         }
@@ -795,13 +821,16 @@ public class MainTabsLayout extends AnimatedLinearLayout {
     public boolean onTouchEvent(MotionEvent ev) {
         if (flexyDragging) {
             final int action = ev.getActionMasked();
+            if (action == MotionEvent.ACTION_POINTER_DOWN || action == MotionEvent.ACTION_POINTER_UP) {
+                flexyFinishDrag(true);return true;
+            }
             if (action == MotionEvent.ACTION_MOVE) {
                 int pointer = ev.findPointerIndex(flexyPointerId);
                 if (pointer < 0) { flexyFinishDrag(true); return true; }
-                flexyMoveDrag(ev.getX(pointer));
+                flexyMoveDrag(flexyDownX+(ev.getX(pointer)-flexyDownX)*(.85f+LiquidNavigationConfig.value(LiquidNavigationConfig.Parameter.FOLLOW)*.0015f));
                 return true;
             } else if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
-                if (action == MotionEvent.ACTION_UP) flexyMoveDrag(ev.getX());
+                if (action == MotionEvent.ACTION_UP) flexyMoveDrag(flexyDownX+(ev.getX()-flexyDownX)*(.85f+LiquidNavigationConfig.value(LiquidNavigationConfig.Parameter.FOLLOW)*.0015f));
                 flexyFinishDrag(action == MotionEvent.ACTION_CANCEL);
                 flexyTracking = false;
                 flexyPointerId = MotionEvent.INVALID_POINTER_ID;
@@ -813,11 +842,50 @@ public class MainTabsLayout extends AnimatedLinearLayout {
     }
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        // Legacy ClickHelper continues unchanged when Flexy liquid gesture is disabled.
-        if (!LiquidNavigationConfig.enabled() || !MainTabsUiHelper.isIosNavigationBar()) {
+        if (!LiquidNavigationConfig.enabled()) {
+            if (flexyPressed || flexyDragging) flexyFinishDrag(true);
             clickHelper.onTouchEvent(this, ev);
+            return super.dispatchTouchEvent(ev);
         }
-        return super.dispatchTouchEvent(ev);
+        int action=ev.getActionMasked();
+        int ownedPointer=ev.findPointerIndex(flexyPointerId);
+        if(action==MotionEvent.ACTION_DOWN)flexyFingerX=ev.getX();
+        else if(ownedPointer>=0)flexyFingerX=ev.getX(ownedPointer);
+        if(action==MotionEvent.ACTION_DOWN)flexyIgnoreUntilUp=false;
+        if(flexyIgnoreUntilUp)return true;
+        if(action==MotionEvent.ACTION_POINTER_DOWN || action==MotionEvent.ACTION_POINTER_UP
+                || action==MotionEvent.ACTION_MOVE && flexyPressed
+                && Math.abs(ev.getY()-flexyDownY)>flexyTouchSlop
+                && Math.abs(ev.getY()-flexyDownY)>Math.abs(ev.getX()-flexyDownX)*1.1f) {
+            flexyFinishDrag(true);flexyIgnoreUntilUp=true;
+            MotionEvent cancel=MotionEvent.obtain(ev);cancel.setAction(MotionEvent.ACTION_CANCEL);
+            try {super.dispatchTouchEvent(cancel);}finally{cancel.recycle();}
+            return true;
+        }
+        if(action==MotionEvent.ACTION_DOWN && findChildUnder(this,ev.getX(),ev.getY())!=null) {
+            flexyBeginDrag(ev.getX()); // Immediate visual response; native child keeps its click/long press.
+        } else if(action==MotionEvent.ACTION_MOVE && flexyPressed) {
+            int pointer=ev.findPointerIndex(flexyPointerId);
+            if(pointer>=0) {
+                float gain=.85f+LiquidNavigationConfig.value(LiquidNavigationConfig.Parameter.FOLLOW)*.0015f;
+                flexyMoveDrag(flexyDownX+(ev.getX(pointer)-flexyDownX)*gain);
+            }
+        } else if(action==MotionEvent.ACTION_POINTER_DOWN || action==MotionEvent.ACTION_POINTER_UP) {
+            flexyFinishDrag(true);
+        }
+        boolean result=super.dispatchTouchEvent(ev);
+        if(action==MotionEvent.ACTION_UP || action==MotionEvent.ACTION_CANCEL) {
+            flexyFinishDrag(action==MotionEvent.ACTION_CANCEL);
+            flexyPointerId=MotionEvent.INVALID_POINTER_ID;
+        }
+        return result;
+    }
+    @Override protected void onDetachedFromWindow() {
+        flexyDragging=flexyPressed=flexyTracking=flexyIgnoreUntilUp=false;
+        flexyPointerId=MotionEvent.INVALID_POINTER_ID;flexyStretch=0;
+        selectedTabPositionX.cancel();selectedTabPositionOffsetX.cancel();flexyDeformation.cancel();
+        AndroidUtilities.cancelRunOnUIThread(restoreDrawSelector);
+        super.onDetachedFromWindow();
     }
 
 

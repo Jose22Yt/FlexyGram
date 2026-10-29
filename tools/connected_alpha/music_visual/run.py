@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[3]
 HERE = Path(__file__).resolve().parent
 
 
-def main(here=HERE, test_class="MusicVisualTest", stubs_writer=None, resource_writer=None):
+def main(here=HERE, test_class="MusicVisualTest", stubs_writer=None, resource_writer=None, extra_aars=()):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--sdk-root', type=Path, required=True)
     parser.add_argument('--maven', default='mvn')
@@ -54,6 +54,19 @@ def main(here=HERE, test_class="MusicVisualTest", stubs_writer=None, resource_wr
     stubs_writer(source, ROOT)
     shutil.copyfile(here/(test_class+'.java.in'), source/(test_class+'.java'))
     shutil.copyfile(HERE/'pom.xml', output/'pom.xml')
+    if extra_aars:
+        ns={'m':'http://maven.apache.org/POM/4.0.0'}
+        ET.register_namespace('', ns['m'])
+        pom=ET.parse(output/'pom.xml'); top=pom.getroot()
+        for group,artifact,version in extra_aars:
+            dependency=ET.SubElement(top.find('m:dependencies',ns),'{'+ns['m']+'}dependency')
+            for key,value in [('groupId',group),('artifactId',artifact),('version',version),('type','aar'),('scope','test')]:
+                ET.SubElement(dependency,'{'+ns['m']+'}'+key).text=value
+            dependency=ET.SubElement(top.find('m:profiles/m:profile/m:dependencies',ns),'{'+ns['m']+'}dependency')
+            for key,value in [('groupId','local.androidx'),('artifactId',artifact),('version',version),('scope','system'),('systemPath','${project.basedir}/target/aar/'+artifact+'.jar')]:
+                ET.SubElement(dependency,'{'+ns['m']+'}'+key).text=value
+        pom.write(output/'pom.xml',encoding='utf-8',xml_declaration=True)
+
     repository = Path.home()/'.m2/repository'
     command = [args.maven, '-B', '-f', str(output/'pom.xml'), '-Dandroid.sdk.jar='+str(android)]
     proxy = urlparse(os.environ.get('HTTPS_PROXY') or os.environ.get('https_proxy') or '')
@@ -72,7 +85,7 @@ def main(here=HERE, test_class="MusicVisualTest", stubs_writer=None, resource_wr
         subprocess.run(command + ['dependency:resolve'], check=True)
         aar_dir = output/'target/aar'
         aar_dir.mkdir(parents=True, exist_ok=True)
-        for group, artifact, version in [('androidx.core', 'core', '1.17.0'), ('androidx.test', 'monitor', '1.8.0'), ('androidx.test.espresso', 'espresso-idling-resource', '3.7.0')]:
+        for group, artifact, version in [('androidx.core', 'core', '1.17.0'), ('androidx.test', 'monitor', '1.8.0'), ('androidx.test.espresso', 'espresso-idling-resource', '3.7.0'), *extra_aars]:
             path = repository/group.replace('.', '/')/artifact/version/(artifact+'-'+version+'.aar')
             with zipfile.ZipFile(path) as archive:
                 (aar_dir/(artifact+'.jar')).write_bytes(archive.read('classes.jar'))

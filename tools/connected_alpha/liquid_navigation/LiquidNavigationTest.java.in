@@ -1,0 +1,68 @@
+/* Real bar/layout and AndroidX springs; tab content/application services are doubles. */
+import android.app.Activity;
+import android.view.*;
+import android.widget.FrameLayout;
+import java.time.Duration;
+import org.junit.*;
+import org.junit.runner.RunWith;
+import org.robolectric.*;
+import org.robolectric.annotation.*;
+import org.robolectric.util.ReflectionHelpers;
+import org.telegram.ui.MainTabsLayout;
+import org.telegram.ui.Components.glass.GlassTabView;
+import app.flexygram.navigation.*;
+import static org.junit.Assert.*;
+@RunWith(RobolectricTestRunner.class) @Config(manifest=Config.NONE,sdk=35)
+@LooperMode(LooperMode.Mode.PAUSED)
+public class LiquidNavigationTest {
+ Activity activity; FrameLayout root; MainTabsLayout bar; GlassTabView[] tabs; int clicks;
+ @Before public void setup(){
+  activity=Robolectric.buildActivity(Activity.class).setup().get();
+  activity.getSharedPreferences("flexy_liquid_navigation",0).edit().clear().commit();
+  ReflectionHelpers.setStaticField(LiquidNavigationConfig.class,"loaded",false);
+  LiquidNavigationConfig.enabled(true);
+  root=new FrameLayout(activity);activity.setContentView(root);
+  bar=new MainTabsLayout(activity,null);bar.setLiquidPreview(true);bar.setPadding(8,8,8,8);
+  root.addView(bar,new FrameLayout.LayoutParams(328,76));
+  tabs=new GlassTabView[4];
+  for(int i=0;i<4;i++){final int id=i;tabs[i]=new GlassTabView(activity);bar.addView(tabs[i]);bar.setViewVisible(tabs[i],true,false);tabs[i].setOnClickListener(v->{clicks++;bar.setTabSelected(tabs[id],false);});}
+  bar.setTabSelected(tabs[0],false);layout();
+ }
+ void layout(){root.measure(View.MeasureSpec.makeMeasureSpec(328,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(100,View.MeasureSpec.EXACTLY));root.layout(0,0,328,100);Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(Duration.ofSeconds(2));}
+ void event(int action,float x){MotionEvent e=MotionEvent.obtain(0,android.os.SystemClock.uptimeMillis(),action,x,30,0);try{bar.dispatchTouchEvent(e);}finally{e.recycle();}}
+ float center(int i){return tabs[i].getX()+tabs[i].getWidth()/2f;}
+ @After public void end(){activity.finish();}
+ @Test public void tapHighlightsImmediatelyAndDispatchesOnlyOneNativeClick(){
+  event(MotionEvent.ACTION_DOWN,center(2));
+  assertTrue(ReflectionHelpers.<Boolean>getField(bar,"flexyPressed"));
+  assertEquals(0,clicks);event(MotionEvent.ACTION_UP,center(2));assertEquals(1,clicks);assertTrue(tabs[2].isTabSelected());
+ }
+ @Test public void draggingDoesNotNavigateUntilReleaseAndSettlesWithActualAndroidXSpring(){
+  event(MotionEvent.ACTION_DOWN,center(0));event(MotionEvent.ACTION_MOVE,center(3));
+  assertEquals(0,clicks);assertTrue(ReflectionHelpers.<Boolean>getField(bar,"flexyDragging"));
+  assertEquals(center(3),ReflectionHelpers.<Float>getField(bar,"animatedLongSelectedViewCenterX"),.1f);
+  event(MotionEvent.ACTION_UP,center(3));assertEquals(1,clicks);assertTrue(tabs[3].isTabSelected());
+  Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(Duration.ofSeconds(3));
+  assertEquals(center(3),ReflectionHelpers.<Float>getField(bar,"animatedLongSelectedViewCenterX"),1f);
+  assertEquals(0f,ReflectionHelpers.<Float>getField(bar,"flexyStretch"),.01f);
+ }
+ @Test public void cancellationAndDetachNeverCommitOrKeepRunningTheNewSprings(){
+  event(MotionEvent.ACTION_DOWN,center(0));event(MotionEvent.ACTION_MOVE,center(3));event(MotionEvent.ACTION_CANCEL,center(3));assertEquals(0,clicks);
+  event(MotionEvent.ACTION_DOWN,center(0));event(MotionEvent.ACTION_MOVE,center(2));root.removeView(bar);
+  assertFalse(ReflectionHelpers.<Boolean>getField(bar,"flexyDragging"));assertFalse(ReflectionHelpers.<Boolean>getField(bar,"flexyPressed"));
+  androidx.dynamicanimation.animation.SpringAnimation animation=ReflectionHelpers.getField(bar,"selectedTabPositionX");assertFalse(animation.isRunning());
+  Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(Duration.ofSeconds(2));assertEquals(0,clicks);
+ }
+ @Test public void destinationOrderAndMotionSettingsSurviveReload(){
+  LiquidNavigationConfig.order(new int[]{8,6,0,2,7,3});
+  LiquidNavigationConfig.value(LiquidNavigationConfig.Parameter.SPEED,87);LiquidNavigationConfig.labels(false);
+  ReflectionHelpers.setStaticField(LiquidNavigationConfig.class,"loaded",false);
+  assertArrayEquals(new int[]{8,6,0,2,7,3},LiquidNavigationConfig.order());
+  assertEquals(87,LiquidNavigationConfig.value(LiquidNavigationConfig.Parameter.SPEED));assertFalse(LiquidNavigationConfig.labels());
+ }
+ @Test public void nativeLayoutRetainsAccessibleSlotsAndReordersWithoutDetach(){
+  for(GlassTabView tab:tabs)assertTrue(tab.getWidth()>=48);
+  tabs[0].bringToFront();layout();assertSame(bar,tabs[0].getParent());assertEquals(tabs[0],bar.getChildAt(3));
+  assertTrue(center(0)>center(1));
+ }
+}

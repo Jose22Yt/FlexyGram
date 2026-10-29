@@ -18,7 +18,8 @@ class Alpha1280(unittest.TestCase):
             self.assertEqual(before,current.replace(b'1280',b'1279'),path)
     def test_previous_reviews_and_protocol_storage_files_unchanged(self):
         for path in ('tools/connected_alpha/integration1279_review.json','tools/connected_alpha/signature1278_review.json','tools/connected_alpha/stability1277_review.json','tools/connected_alpha/smart_previews1279_hotfix_review.json','TMessagesProj/src/main/java/org/telegram/tgnet/ConnectionsManager.java','TMessagesProj/src/main/java/org/telegram/messenger/MessagesController.java','TMessagesProj/src/main/java/org/telegram/messenger/MessagesStorage.java','TMessagesProj/src/main/java/org/telegram/ui/LaunchActivity.java','TMessagesProj/src/main/java/org/telegram/ui/Components/ChatActivityEnterView.java'):
-            self.assertEqual(audit.original(path),read_current(path),path)
+            from integration1284_contract import restore as restore_integration
+            self.assertEqual(audit.original(path),restore_integration(path,read_current(path)),path)
     def test_prefetch_and_memory_pressure_have_native_lifecycle_hooks(self):
         s=(ROOT/'TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java').read_text()
         self.assertIn('super.onUpdateBackgroundDrawable(drawable);\n            ensureSignatureWallpaperBlur();',s)

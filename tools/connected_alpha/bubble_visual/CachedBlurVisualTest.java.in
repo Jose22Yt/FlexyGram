@@ -58,6 +58,25 @@ public class CachedBlurVisualTest {
   try(var stream=new java.io.FileOutputStream(new java.io.File(System.getProperty("basedir"),"android-native-wallpaper-blur.png"))){assertTrue(evidence.compress(Bitmap.CompressFormat.PNG,100,stream));}
   evidence.recycle();
  }
+ @Test public void glassBlendAndOutgoingIncomingScopesUseTheSameRealCache()throws Exception{
+  var owner=owner(keep(new View(ApplicationLoader.applicationContext)));var wallpaper=image(180,100,0);
+  owner.prepare(wallpaper,false,0xff888888);complete();Bitmap prepared=cached(owner);
+  BubbleConfig.setTransparency(100);BubbleConfig.setOutlineEnabled(false);
+  for(boolean out:new boolean[]{false,true}){
+   var bubble=new org.telegram.ui.ActionBar.MessageDrawable(org.telegram.ui.ActionBar.MessageDrawable.TYPE_TEXT,out,false);
+   bubble.setBounds(0,0,160,85);bubble.setTop(0,180,100,false,false);
+   bubble.setFlexyGlassSource(new org.telegram.ui.ActionBar.MessageDrawable.GlassSource(){public boolean draw(Canvas c,Path p){return draw(c,p,255);}public boolean draw(Canvas c,Path p,int alpha){return owner.draw(c,p,0,0,alpha);}});
+   Bitmap result=Bitmap.createBitmap(180,100,Bitmap.Config.ARGB_8888);Canvas canvas=new Canvas(result);
+   for(int blend:new int[]{0,25,50,75,100}){
+    BubbleConfig.setGlassIntensity(blend);result.eraseColor(Color.TRANSPARENT);bubble.draw(canvas);
+    assertEquals(BubbleGlassPolicy.opacity(255,blend),Color.alpha(result.getPixel(80,40)));
+    assertSame(prepared,cached(owner));assertEquals(0,Utilities.globalQueue.pending());
+   }
+   if(out)BubbleConfig.setGlassOutgoing(false);else BubbleConfig.setGlassIncoming(false);
+   result.eraseColor(Color.TRANSPARENT);bubble.draw(canvas);assertEquals(0,Color.alpha(result.getPixel(80,40)));
+   BubbleConfig.setGlassOutgoing(true);BubbleConfig.setGlassIncoming(true);result.recycle();
+  }
+ }
  @Test public void oneSharedBoundedImagePreparedOffUiAndSampledWithoutNewJobs()throws Exception{
   View target=keep(new View(ApplicationLoader.applicationContext));var a=owner(target);var b=owner(target);BitmapDrawable source=image(1600,1200,0);
   a.prepare(source,false,0xffeeeeee);b.prepare(source,false,0xffeeeeee);assertFalse(a.isReady());assertEquals(1,Utilities.globalQueue.pending());assertSame(entry(a),entry(b));
