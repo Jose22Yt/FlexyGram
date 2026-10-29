@@ -103,6 +103,10 @@ public final class SignatureChatHeader {
         } else { bar.backButtonImageView.setPadding(AndroidUtilities.dp(1), 0, 0, 0); }
     }
     public void draw(Canvas canvas) {
+        // Native Liquid Glass is a Telegram power-saving flag, not a new Flexy master switch.
+        // Use the existing ActionBar blur3 sources only when they are ready.
+        // Solid Signature rendering remains bit-for-bit unchanged when the flag is off.
+        if (bar.drawSignatureNativeGlass(canvas, this)) return;
         if (!fusionActive()) { surface.draw(canvas, geometry, AndroidUtilities.density, provider); return; }
         int fill = Theme.getColor(Theme.key_windowBackgroundWhite, provider);
         fill = (fill & 0xffffff) | ((HeaderConfig.portrait() ? 255 : Math.round(HeaderConfig.opacity() * 2.55f)) << 24);
