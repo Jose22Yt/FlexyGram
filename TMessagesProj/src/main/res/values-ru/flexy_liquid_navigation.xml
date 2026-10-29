@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyLiquidNavTitle">Flexy Liquid Navigation</string>
+    <string name="FlexyLiquidNavEnabled">Жидкий индикатор</string>
+    <string name="FlexyLiquidNavElasticity">Упругость индикатора</string>
+    <string name="FlexyLiquidNavOpacity">Прозрачность индикатора</string>
+    <string name="FlexyLiquidNavContacts">Показывать Контакты</string>
+    <string name="FlexyLiquidNavProfile">Показывать Профиль</string>
+    <string name="FlexyLiquidNavCalls">Звонки вместо Настроек</string>
+    <string name="FlexyLiquidNavFeed">Лента вместо Контактов</string>
+    <string name="FlexyLiquidNavTabs">Доступные вкладки</string>
+    <string name="FlexyLiquidNavPreview">Предпросмотр: перетащите индикатор</string>
+    <string name="FlexyLiquidNavChatsFixed">Чаты всегда остаются доступными</string>
+    <string name="FlexyLiquidNavReloadHint">Изменения вкладок применяются после возвращения на главный экран</string>
+</resources>
