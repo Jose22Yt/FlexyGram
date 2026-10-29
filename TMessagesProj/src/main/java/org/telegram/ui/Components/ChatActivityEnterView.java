@@ -5031,6 +5031,7 @@ public class ChatActivityEnterView extends FrameLayout implements
 
     public void drawBackground(Canvas canvas, boolean withComposeShadowDrawable) {
         if (!shouldDrawBackground) {
+            setFlexyVoiceBackdropDrawn(false);
             return;
         }
         int top = animatedTop;
