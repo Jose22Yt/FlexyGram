@@ -1,0 +1,29 @@
+{
+  "assertions": 308755,
+  "startup_loop_controller_calls_one_active": {
+    "before": 10,
+    "after": 1
+  },
+  "burst_1000_queued_checks": 1,
+  "stationary_lens_builds_1000_prepares": {
+    "before": 1000,
+    "after": 1
+  },
+  "contour_bounds_queries": {
+    "before": 259328,
+    "after": 1600
+  },
+  "idle_cell_invalidations_1000_resets": {
+    "before": 1000,
+    "after": 0
+  },
+  "device_fps": null,
+  "evidence": "ISOLATED_OPERATION_COUNTS_NOT_DEVICE_TIMING",
+  "actual_startup_loop_matrix": "PASS_10240_STATES_EACH_REVISION_ISOLATED_DOUBLES",
+  "voice_bar_dp_calls_1000_full_width_draws": {
+    "before": 22000,
+    "after": 10,
+    "density_change_rebuilds": true
+  },
+  "official_android_api_compile": "PASS_NOT_FULL_APP"
+}

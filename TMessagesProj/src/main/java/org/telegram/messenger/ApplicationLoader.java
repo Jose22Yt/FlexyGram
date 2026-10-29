@@ -87,8 +87,8 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
     private static ConnectivityManager connectivityManager;
     private static volatile boolean applicationInited = false;
     private static volatile  ConnectivityManager.NetworkCallback networkCallback;
-    private static long lastNetworkCheckTypeTime;
-    private static int lastKnownNetworkType = -1;
+    private static volatile long lastNetworkCheckTypeTime;
+    private static volatile int lastKnownNetworkType = -1;
 
     public static long startTime;
 
@@ -256,13 +256,17 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
                 public void onReceive(Context context, Intent intent) {
                     try {
                         currentNetworkInfo = connectivityManager.getActiveNetworkInfo();
+                        lastNetworkCheck = SystemClock.elapsedRealtime();
+                        lastKnownNetworkType = -1;
                     } catch (Throwable ignore) {
 
                     }
 
                     boolean isSlow = isConnectionSlow();
                     for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
-                        ConnectionsManager.getInstance(a).checkConnection();
+                        if (!app.flexygram.performance.StartupAccounts.needsControllers(a, UserConfig.selectedAccount,
+                                UserConfig.getInstance(a).isClientActivated())) continue;
+                        ConnectionsManager.getInstance(a).scheduleConnectionCheck();
                         FileLoader.getInstance(a).onNetworkChanged(isSlow);
                     }
                 }
@@ -323,7 +327,10 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
         final int startupAccount = UserConfig.selectedAccount;
         for (int position = 0; position < UserConfig.MAX_ACCOUNT_COUNT; position++) {
             final int a = app.flexygram.performance.StartupAccounts.accountAt(position, startupAccount, UserConfig.MAX_ACCOUNT_COUNT);
-            UserConfig.getInstance(a).loadConfig();
+            // Account zero was loaded above to resolve selectedAccount; do not read it twice.
+            if (a != 0) UserConfig.getInstance(a).loadConfig();
+            if (!app.flexygram.performance.StartupAccounts.needsControllers(a, startupAccount,
+                    UserConfig.getInstance(a).isClientActivated())) continue;
             MessagesController.getInstance(a);
             if (a == 0) {
                 SharedConfig.pushStringStatus = "__FIREBASE_GENERATING_SINCE_" + ConnectionsManager.getInstance(a).getCurrentTime() + "__";
@@ -358,7 +365,10 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
         try {
             MediaController.getInstance();
             for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
-                ContactsController.getInstance(a).checkAppAccount();
+                // Account zero still reconciles stale Android accounts against ALL loaded users.
+                if (a == 0 || UserConfig.getInstance(a).isClientActivated()) {
+                    ContactsController.getInstance(a).checkAppAccount();
+                }
                 // Do not parse presets/register a download receiver for an empty slot.
                 // Every activated session retains eager native download initialization.
                 if (UserConfig.getInstance(a).isClientActivated()) DownloadController.getInstance(a);
@@ -619,11 +629,14 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
         return true;
     }*/
 
-    private static long lastNetworkCheck = -1;
+    private static volatile long lastNetworkCheck = -1;
+    private static void invalidateNetworkSnapshot() {
+        currentNetworkInfo = null;
+        lastKnownNetworkType = -1;
+    }
     private static void ensureCurrentNetworkGet() {
-        final long now = System.currentTimeMillis();
-        ensureCurrentNetworkGet(now - lastNetworkCheck > 5000);
-        lastNetworkCheck = now;
+        final long now = SystemClock.elapsedRealtime();
+        ensureCurrentNetworkGet(app.flexygram.performance.NetworkSnapshotAge.expired(now, lastNetworkCheck));
     }
 
     private static void ensureCurrentNetworkGet(boolean force) {
@@ -633,17 +646,24 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
                     connectivityManager = (ConnectivityManager) ApplicationLoader.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE);
                 }
                 currentNetworkInfo = connectivityManager.getActiveNetworkInfo();
+                // A cache hit must never postpone the next real connectivity query.
+                lastNetworkCheck = SystemClock.elapsedRealtime();
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     if (networkCallback == null) {
                         networkCallback = new ConnectivityManager.NetworkCallback() {
                             @Override
                             public void onAvailable(@NonNull Network network) {
-                                lastKnownNetworkType = -1;
+                                invalidateNetworkSnapshot();
                             }
 
                             @Override
                             public void onCapabilitiesChanged(@NonNull Network network, @NonNull NetworkCapabilities networkCapabilities) {
-                                lastKnownNetworkType = -1;
+                                invalidateNetworkSnapshot();
+                            }
+
+                            @Override
+                            public void onLost(@NonNull Network network) {
+                                invalidateNetworkSnapshot();
                             }
                         };
                         connectivityManager.registerDefaultNetworkCallback(networkCallback);
@@ -718,7 +738,7 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
                 return StatsController.TYPE_MOBILE;
             }
             if (currentNetworkInfo.getType() == ConnectivityManager.TYPE_WIFI || currentNetworkInfo.getType() == ConnectivityManager.TYPE_ETHERNET) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && (lastKnownNetworkType == StatsController.TYPE_MOBILE || lastKnownNetworkType == StatsController.TYPE_WIFI) && System.currentTimeMillis() - lastNetworkCheckTypeTime < 5000) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && (lastKnownNetworkType == StatsController.TYPE_MOBILE || lastKnownNetworkType == StatsController.TYPE_WIFI) && SystemClock.elapsedRealtime() - lastNetworkCheckTypeTime < 5000) {
                     return lastKnownNetworkType;
                 }
                 if (connectivityManager.isActiveNetworkMetered()) {
@@ -726,7 +746,7 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
                 } else {
                     lastKnownNetworkType = StatsController.TYPE_WIFI;
                 }
-                lastNetworkCheckTypeTime = System.currentTimeMillis();
+                lastNetworkCheckTypeTime = SystemClock.elapsedRealtime();
                 return lastKnownNetworkType;
             }
             if (currentNetworkInfo.isRoaming()) {

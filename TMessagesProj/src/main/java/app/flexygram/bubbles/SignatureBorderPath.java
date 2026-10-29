@@ -21,6 +21,7 @@ public final class SignatureBorderPath {
     private Shader fadeShader;
     private int fadeRgb;
     private boolean initialized;
+    private float centerX, centerY, normalizationWidth, normalizationHeight;
     private int mode = -1;
 
     public Path get(Path path, int position, Rect rect, int radius, int near, int small,
@@ -33,6 +34,9 @@ public final class SignatureBorderPath {
         initialized = true; mode = position; result.rewind(); fadeShader = null;
         if (position == 0) return result;
         path.computeBounds(bounds, true);
+        centerX = bounds.centerX(); centerY = bounds.centerY();
+        normalizationWidth = Math.max(1, bounds.width());
+        normalizationHeight = Math.max(1, bounds.height());
         measure.setPath(path, false);
         do {
             float length = measure.getLength();
@@ -90,8 +94,8 @@ public final class SignatureBorderPath {
 
     private boolean belongs(float distance, int position) {
         measure.getPosTan(distance, point, null);
-        float x = (point[0] - bounds.centerX()) / Math.max(1, bounds.width());
-        float y = (point[1] - bounds.centerY()) / Math.max(1, bounds.height());
+        float x = (point[0] - centerX) / normalizationWidth;
+        float y = (point[1] - centerY) / normalizationHeight;
         int side = Math.abs(y) >= Math.abs(x) ? (y < 0 ? 1 : 2) : (x < 0 ? 3 : 4);
         return side == position;
     }

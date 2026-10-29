@@ -1,0 +1,19 @@
+{
+  "base": "0030904ae2e41d7720f43b7906c6a302ed339839",
+  "production_java_against_isolated_api_doubles": "PASS",
+  "official_android37_helper_compile": "PASS_NOT_FULL_APP",
+  "startup_actual_loop_matrix": "PASS_10240_SELECTED_ACTIVE_STATES_PER_REVISION_ISOLATED",
+  "geometry_and_motion_baseline_equivalence": "PASS_ISOLATED_NOT_PIXEL_GPU_VALIDATION",
+  "network_burst_and_refresh_lifecycle": "PASS_ISOLATED",
+  "capture_comparison_gate_tests": {"passed_methods": 3, "fixture_evidence": "SYNTHETIC_UNIT_INPUT_ONLY"},
+  "existing_interaction1286": {"passed_methods": 8, "failed": 0},
+  "general_pytest": {"passed": 144, "skipped": 31, "failed": 0, "skip_reason": "external plugin corpus or R8 release report unavailable"},
+  "existing_startup_suite": {"passed_methods": 4, "errored_methods": 1, "errored_subcases": ["TMessagesProj/build.gradle", ".github/workflows/pr.yml"], "status": "NOT_FULLY_PASSED_LEGACY_PROJECTION_NEEDS_FULL_HISTORY_REVIEW"},
+  "signing_package_jni_and_native_protocol_sources": "UNCHANGED",
+  "identity_checks_and_exact_overlay": "PASS",
+  "diff_check": "PASS",
+  "apk": "NOT_BUILT",
+  "private_signing_inputs": "NOT_REQUESTED_OR_ACCESSED",
+  "physical_startup_scroll_network_memory_battery": "NOT_MEASURED",
+  "fps120": "NOT_VERIFIED"
+}

@@ -1,0 +1,10 @@
+{
+  "evidence": "NOT_MEASURED_NO_ATTACHED_DEVICE",
+  "code_base": "0030904ae2e41d7720f43b7906c6a302ed339839",
+  "existing_alpha1286_source": "258dd3590f40ca0083a4b7bad6b413433c4e2c14",
+  "device_target_declared_by_owner": "POCO X8 Pro / Android 17 / HyperOS 4 / up to 120 Hz",
+  "before": {"cold_ttid_ms": null, "warm_ttid_ms": null, "hot_resume_ms": null, "useful_list_ms": null, "sync_ms": null, "frame_p50_ms": null, "frame_p95_ms": null, "frame_p99_ms": null, "jank": null, "input_latency_ms": null, "memory_pss_kib": null},
+  "after": {"cold_ttid_ms": null, "warm_ttid_ms": null, "hot_resume_ms": null, "useful_list_ms": null, "sync_ms": null, "frame_p50_ms": null, "frame_p95_ms": null, "frame_p99_ms": null, "jank": null, "input_latency_ms": null, "memory_pss_kib": null},
+  "fps_120_verified": false,
+  "regression_acceptance": "PHYSICAL_VALIDATION_REQUIRED"
+}

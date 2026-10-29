@@ -15,7 +15,8 @@ def spec():
 
 
 def paths():
-    return frozenset(spec()['paths'])
+    from performance_p0_contract import paths as performance_paths
+    return frozenset(spec()['paths']) | performance_paths()
 
 
 @lru_cache(maxsize=256)
@@ -25,6 +26,8 @@ def original(path):
 
 
 def restore(path, data):
+    from performance_p0_contract import restore as performance_restore
+    data = performance_restore(path, data)
     expected = spec()['reviewed'].get(str(path))
     if expected and hashlib.sha256(data).hexdigest() == expected:
         return original(path)
@@ -32,12 +35,14 @@ def restore(path, data):
 
 
 def verify_current():
+    from performance_p0_contract import verify_current as verify_performance, restore as performance_restore
+    verify_performance()
     current = spec()
     if current['base'] != BASE:
         raise ValueError('Incorrect identity base')
     for path, expected in current['reviewed'].items():
         file = ROOT / path
-        data = file.read_bytes() if file.is_file() else b''
+        data = performance_restore(path, file.read_bytes() if file.is_file() else b'')
         if hashlib.sha256(data).hexdigest() != expected:
             raise ValueError('Unreviewed identity source: ' + path)
     changed = set(subprocess.check_output(['git', 'diff', '--no-renames', BASE, '--name-only'], cwd=ROOT, text=True).splitlines())

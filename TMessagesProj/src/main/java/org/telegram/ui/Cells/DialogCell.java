@@ -615,6 +615,16 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
             new app.flexygram.home.SignatureSmartPreviewPalette();
     private final Paint smartPreviewPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private static final int[] SMART_VOICE_BARS = {5,9,13,6,11,7,4};
+    private float smartVoiceDensity = -1;
+    private final float[] smartVoiceHeights = new float[SMART_VOICE_BARS.length];
+    private float smartVoiceBarWidth, smartVoiceSpacing, smartVoiceInset;
+    private void prepareSmartVoiceGeometry() {
+        float density = AndroidUtilities.density;
+        if (smartVoiceDensity == density) return;
+        smartVoiceDensity = density;
+        smartVoiceBarWidth = dp(1f); smartVoiceSpacing = dp(2f); smartVoiceInset = dp(4f);
+        for (int i=0;i<SMART_VOICE_BARS.length;i++) smartVoiceHeights[i]=dp(SMART_VOICE_BARS[i]*.65f);
+    }
     private void drawSmartPreviewBackground(Canvas canvas, float top, float alpha) {
         if (smartPreviewKind == 0 || !smartPreviewMetricsReady || messageLayout == null || alpha <= 0f) return;
         int mode=app.flexygram.home.SignatureSmartPreviews.mode();
@@ -643,11 +653,12 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
             smartPreviewPaint.setAlpha(Math.round(255f*Math.max(0f,Math.min(1f,alpha))));
             float waveX=rtl?left+dp(3):lineRight+dp(4);
             float cy=(bottom+top-dp(2))*.5f;
-            float barWidth=dp(1f);
+            prepareSmartVoiceGeometry();
+            float barWidth=smartVoiceBarWidth;
             for(int i=0;i<SMART_VOICE_BARS.length;i++){
-                float h=dp(SMART_VOICE_BARS[i]*.65f);
-                float x=waveX+dp(2f)*i;
-                if (x+barWidth>right-dp(4))break;
+                float h=smartVoiceHeights[i];
+                float x=waveX+smartVoiceSpacing*i;
+                if (x+barWidth>right-smartVoiceInset)break;
                 canvas.drawRoundRect(x,cy-h*.5f,x+barWidth,cy+h*.5f,barWidth*.5f,barWidth*.5f,smartPreviewPaint);
             }
         }
