@@ -35,6 +35,7 @@ class Interaction1286(unittest.TestCase):
   path='org/telegram/ui/Components/ShareAlert.java';now=self.text(path);old=audit.original('TMessagesProj/src/main/java/'+path).decode()
   for start,end in [('    protected void sendInternal(', '    private int getCurrentTop('),('    private void selectDialog(', '    private boolean isBotForumWithNotEmptyTopics(')]:
    self.assertEqual(old[old.index(start):old.index(end)],now[now.index(start):now.index(end)])
+  self.assertIn('!getMessagesController().isPeerNoForwards(dialog_id)',self.text('org/telegram/ui/ChatActivity.java'))
   for token in ['currentAccount=fragment.getCurrentAccount()','currentAccount=messages.get(0).currentAccount','useClassicShareLayout','flexyShareHeader.preview(summary)']:self.assertIn(token,now)
  def test_fusion_is_optional_and_does_not_restore_glass_or_matte(self):
   config=self.text('app/flexygram/bubbles/BubbleConfig.java');self.assertIn('signature_fusion_mode",fuseGlass?1:0',config);self.assertIn('matteEnabled() { return false; }',config);self.assertIn('getBoolean("signature_cached_blur", false)',config)

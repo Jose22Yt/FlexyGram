@@ -20,7 +20,7 @@ public final class FlexyShareHeader extends FrameLayout {
         int titleHeight=(int)Math.ceil(24*font),previewHeight=(int)Math.ceil(22*font),recipientsHeight=(int)Math.ceil(20*font);
         TextView title=text(c,17,Theme.getColor(Theme.key_dialogTextBlack,provider));title.setText("Flexy Share Sheet");
         addView(title,LayoutHelper.createFrame(-1,titleHeight,Gravity.TOP,16,6,94,0));
-        TextView compatibility=text(c,12,Theme.getColor(Theme.key_dialogTextBlue,provider));compatibility.setGravity(Gravity.CENTER);compatibility.setText(LocaleController.getString(R.string.FlexyShareClassic));
+        TextView compatibility=text(c,12,Theme.getColor(Theme.key_dialogTextBlue,provider));compatibility.setGravity(Gravity.CENTER_VERTICAL|Gravity.START);compatibility.setPadding(AndroidUtilities.dp(12),0,AndroidUtilities.dp(8),0);compatibility.setText(LocaleController.getString(R.string.FlexyShareClassic));
         compatibility.setMinWidth(AndroidUtilities.dp(64));compatibility.setContentDescription(LocaleController.getString(R.string.FlexyShareClassic));
         addView(compatibility,LayoutHelper.createFrame(80,48,Gravity.TOP|Gravity.RIGHT,0,0,8,0));compatibility.setOnClickListener(v->classic.run());
         preview=text(c,14,Theme.getColor(Theme.key_dialogTextBlack,provider));addView(preview,LayoutHelper.createFrame(-1,previewHeight,Gravity.TOP,16,10+titleHeight,16,0));
