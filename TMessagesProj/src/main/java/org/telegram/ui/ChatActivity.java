@@ -36016,7 +36016,7 @@ public class ChatActivity extends BaseFragment implements
                 if(app.flexygram.share.FlexyShareConfig.enabled(getParentActivity()) && selectedObject!=null
                         && !isSecretChat() && !selectedObject.isPoll() && !selectedObject.isTodo()
                         && !selectedObject.isInvoice() && !ChatObject.isMonoForum(currentChat)
-                        && selectedObject.canForwardMessage() && (currentChat==null || !getMessagesController().isChatNoForwards(currentChat))){
+                        && selectedObject.canForwardMessage() && !getMessagesController().isPeerNoForwards(dialog_id)){
                     ArrayList<MessageObject> sharing=new ArrayList<>();
                     if(selectedObjectGroup!=null)sharing.addAll(selectedObjectGroup.messages);else sharing.add(selectedObject);
                     showDialog(new ShareAlert(getParentActivity(),this,sharing,null,null,ChatObject.isChannel(currentChat),null,null,false,false,false,null,themeDelegate));
