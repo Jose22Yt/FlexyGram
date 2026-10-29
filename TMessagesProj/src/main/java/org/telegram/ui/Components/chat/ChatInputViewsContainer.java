@@ -141,6 +141,7 @@ public class ChatInputViewsContainer extends FrameLayout {
     public void updateNativeLiquidGlassPolicy(boolean allowed) {
         updateNativeLiquidGlassDrawable(blurredBackgroundDrawable, allowed);
         updateNativeLiquidGlassDrawable(underKeyboardBackgroundDrawable, allowed);
+        if (flexyComposer!=null) flexyComposer.invalidateNativeGlassColors();
         invalidate();
     }
 

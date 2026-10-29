@@ -70,3 +70,11 @@ assert "int padding=signature ? 0 : dp(6)" in header
 assert "configureSignatureGlassGeometry(signature)" in header
 
 assert "updateNativeLiquidGlassDrawable(underKeyboardBackgroundDrawable, allowed)" in parent
+
+# A parent invalidation alone can reuse stale hardware child display lists after a policy change.
+assert "flexyComposer.invalidateNativeGlassColors()" in parent
+start=composer.index("public void invalidateNativeGlassColors()")
+end=composer.index("public boolean flexyNativeGlassIslandsAvailable()",start)
+assert "sendButton.invalidate()" in composer[start:end]
+assert "audioVideoButtonContainer.invalidate()" in composer[start:end]
+assert composer.count("invalidateNativeGlassColors()") == 1, "No per-frame composer invalidation loop"

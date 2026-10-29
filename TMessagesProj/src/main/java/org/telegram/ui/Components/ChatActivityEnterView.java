@@ -4980,6 +4980,13 @@ public class ChatActivityEnterView extends FrameLayout implements
     public void setFlexyNativeGlassBackdropDrawn(boolean drawn) {
         flexyNativeGlassBackdropDrawn = drawn;
     }
+    /** Policy changes must refresh retained child display lists, not just the parent backdrop. */
+    public void invalidateNativeGlassColors() {
+        if (sendButton != null) sendButton.invalidate();
+        if (audioVideoButtonContainer != null) audioVideoButtonContainer.invalidate();
+        invalidate();
+    }
+
     public boolean flexyNativeGlassIslandsAvailable() {
         return org.telegram.messenger.LiteMode.isEnabled(org.telegram.messenger.LiteMode.FLAG_LIQUID_GLASS)
                 && isHardwareAccelerated() && SharedConfig.chatBlurEnabled()
