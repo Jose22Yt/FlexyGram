@@ -4993,38 +4993,41 @@ public class ChatActivityEnterView extends FrameLayout implements
     private boolean canDrawFlexyNativeGlass(Canvas canvas) {
         return canvas.isHardwareAccelerated() && flexyNativeGlassIslandsAvailable();
     }
-    /** Draw a single *native* cached blur region; no new snapshot/bitmap/render effect. */
-    private void drawFlexyNativeGlassIsland(Canvas canvas, RectF shape) {
+    /** Reuse a combined clip for all islands: one native blur compositing pass/frame. */
+    private void appendFlexyNativeGlassIsland(RectF shape) {
         if (shape.isEmpty()) return;
         final float radius = shape.height() * .5f;
-        flexyNativeGlassClip.rewind();
         flexyNativeGlassClip.addRoundRect(shape, radius, radius, Path.Direction.CW);
-        flexyNativeGlassBounds.set(Math.round(shape.left), Math.round(shape.top),
-                Math.round(shape.right), Math.round(shape.bottom));
-        final int save = canvas.save();
-        canvas.clipPath(flexyNativeGlassClip);
-        sizeNotifierLayout.drawBlurRect(canvas, getTop(), flexyNativeGlassBounds,
-                flexyNativeGlassPaint, false);
-        canvas.restoreToCount(save);
+        final int left = (int) Math.floor(shape.left), top = (int) Math.floor(shape.top);
+        final int right = (int) Math.ceil(shape.right), bottom = (int) Math.ceil(shape.bottom);
+        if (flexyNativeGlassBounds.isEmpty()) flexyNativeGlassBounds.set(left, top, right, bottom);
+        else flexyNativeGlassBounds.union(left, top, right, bottom);
     }
     private void drawFlexyNativeGlassIslands(Canvas canvas) {
         if (!canDrawFlexyNativeGlass(canvas)) {
             setFlexyVoiceBackdropDrawn(false);
             return;
         }
+        flexyNativeGlassClip.rewind();
+        flexyNativeGlassBounds.setEmpty();
+        if (getFlexyAttachmentBounds(flexyNativeGlassShape))
+            appendFlexyNativeGlassIsland(flexyNativeGlassShape);
+        if (getFlexyTextPillBounds(flexyNativeGlassShape))
+            appendFlexyNativeGlassIsland(flexyNativeGlassShape);
+        // Settled send and voice controls are mutually exclusive in the native state.
+        if (getFlexySendBounds(flexyNativeGlassShape))
+            appendFlexyNativeGlassIsland(flexyNativeGlassShape);
+        final boolean voice = getFlexyVoiceBounds(flexyNativeGlassShape);
+        if (voice) appendFlexyNativeGlassIsland(flexyNativeGlassShape);
+        setFlexyVoiceBackdropDrawn(voice);
+        if (flexyNativeGlassBounds.isEmpty()) return;
         flexyNativeGlassPaint.setColor(app.flexygram.composer.ComposerStyle.nativeGlassTint(
                 getThemedColor(Theme.key_chat_messagePanelBackground)));
-        if (getFlexyAttachmentBounds(flexyNativeGlassShape))
-            drawFlexyNativeGlassIsland(canvas, flexyNativeGlassShape);
-        if (getFlexyTextPillBounds(flexyNativeGlassShape))
-            drawFlexyNativeGlassIsland(canvas, flexyNativeGlassShape);
-        // Once the native send transition is fully settled, its independent circle
-        // receives the same shared wallpaper blur; gestures and animations stay native.
-        if (getFlexySendBounds(flexyNativeGlassShape))
-            drawFlexyNativeGlassIsland(canvas, flexyNativeGlassShape);
-        final boolean voice = getFlexyVoiceBounds(flexyNativeGlassShape);
-        if (voice) drawFlexyNativeGlassIsland(canvas, flexyNativeGlassShape);
-        setFlexyVoiceBackdropDrawn(voice);
+        final int save = canvas.save();
+        canvas.clipPath(flexyNativeGlassClip);
+        sizeNotifierLayout.drawBlurRect(canvas, getTop(), flexyNativeGlassBounds,
+                flexyNativeGlassPaint, false);
+        canvas.restoreToCount(save);
     }
 
     @Override
