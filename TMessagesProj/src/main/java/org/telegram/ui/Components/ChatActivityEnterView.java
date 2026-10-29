@@ -3417,8 +3417,10 @@ public class ChatActivityEnterView extends FrameLayout implements
                     if (flexyCompactLayout) {
                         final int panel = getThemedColor(Theme.key_chat_messagePanelBackground);
                         final boolean dark = ColorUtils.calculateLuminance(panel) < 0.4;
-                        paint.setColor(app.flexygram.composer.ComposerStyle.surface(dark,
-                            app.flexygram.composer.FlexyComposerConfig.glass()));
+                        paint.setColor(flexyNativeLiquidGlass() && SharedConfig.chatBlurEnabled()
+                            ? app.flexygram.composer.ComposerStyle.nativeGlassButton(dark)
+                            : app.flexygram.composer.ComposerStyle.surface(dark,
+                                app.flexygram.composer.FlexyComposerConfig.glass()));
                     } else {
                         paint.setColor(getThemedColor(Theme.key_chat_messagePanelSend));
                     }
@@ -4974,6 +4976,49 @@ public class ChatActivityEnterView extends FrameLayout implements
     Paint backgroundPaint = new Paint();
     private float composeShadowAlpha = 1f;
     private Rect blurBounds = new Rect();
+    // Reused per ChatActivityEnterView, never allocated during input/scroll frames.
+    private final RectF flexyNativeGlassShape = new RectF();
+    private final Rect flexyNativeGlassBounds = new Rect();
+    private final Path flexyNativeGlassClip = new Path();
+    private final Paint flexyNativeGlassPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private boolean flexyNativeLiquidGlass() {
+        return org.telegram.messenger.LiteMode.isEnabled(
+                org.telegram.messenger.LiteMode.FLAG_LIQUID_GLASS);
+    }
+    private boolean canDrawFlexyNativeGlass(Canvas canvas) {
+        return flexyNativeLiquidGlass() && canvas.isHardwareAccelerated()
+                && SharedConfig.chatBlurEnabled() && sizeNotifierLayout != null
+                && isFlexyCompactPresentation();
+    }
+    /** Draw a single *native* cached blur region; no new snapshot/bitmap/render effect. */
+    private void drawFlexyNativeGlassIsland(Canvas canvas, RectF shape) {
+        if (shape.isEmpty()) return;
+        final float radius = shape.height() * .5f;
+        flexyNativeGlassClip.rewind();
+        flexyNativeGlassClip.addRoundRect(shape, radius, radius, Path.Direction.CW);
+        flexyNativeGlassBounds.set(Math.round(shape.left), Math.round(shape.top),
+                Math.round(shape.right), Math.round(shape.bottom));
+        final int save = canvas.save();
+        canvas.clipPath(flexyNativeGlassClip);
+        sizeNotifierLayout.drawBlurRect(canvas, getTop(), flexyNativeGlassBounds,
+                flexyNativeGlassPaint, false);
+        canvas.restoreToCount(save);
+    }
+    private void drawFlexyNativeGlassIslands(Canvas canvas) {
+        if (!canDrawFlexyNativeGlass(canvas)) {
+            setFlexyVoiceBackdropDrawn(false);
+            return;
+        }
+        flexyNativeGlassPaint.setColor(app.flexygram.composer.ComposerStyle.nativeGlassTint(
+                getThemedColor(Theme.key_chat_messagePanelBackground)));
+        if (getFlexyAttachmentBounds(flexyNativeGlassShape))
+            drawFlexyNativeGlassIsland(canvas, flexyNativeGlassShape);
+        if (getFlexyTextPillBounds(flexyNativeGlassShape))
+            drawFlexyNativeGlassIsland(canvas, flexyNativeGlassShape);
+        final boolean voice = getFlexyVoiceBounds(flexyNativeGlassShape);
+        if (voice) drawFlexyNativeGlassIsland(canvas, flexyNativeGlassShape);
+        setFlexyVoiceBackdropDrawn(voice);
+    }
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -5008,6 +5053,8 @@ public class ChatActivityEnterView extends FrameLayout implements
         } else {
             canvas.drawRect(0, bottom, getWidth(), getHeight(), getThemedPaint(Theme.key_paint_chatComposeBackground));
         }
+        // Only the Telegram LiteMode Liquid Glass flag opts in; fallback remains native.
+        drawFlexyNativeGlassIslands(canvas);
     }
 
     public float getVisualHeight() {
@@ -17402,7 +17449,11 @@ public class ChatActivityEnterView extends FrameLayout implements
                 drawableInverse.setColorFilter(new PorterDuffColorFilter(Theme.getColor(Theme.key_chat_messagePanelVoicePressed, resourcesProvider), PorterDuff.Mode.SRC_IN));
             }
             if (isNewDesignSendButton) {
-                backgroundPaint.setColor(Theme.getColor(Theme.key_chat_messagePanelSend, resourcesProvider));
+                final int sendFill = Theme.getColor(Theme.key_chat_messagePanelSend, resourcesProvider);
+                backgroundPaint.setColor(compactVisualInset >= 0
+                        && org.telegram.messenger.LiteMode.isEnabled(org.telegram.messenger.LiteMode.FLAG_LIQUID_GLASS)
+                        && SharedConfig.chatBlurEnabled()
+                        ? app.flexygram.composer.ComposerStyle.nativeGlassTint(sendFill) : sendFill);
             } else if (shouldDrawBackground()) {
                 backgroundPaint.setColor(getFillColor());
             } else {
