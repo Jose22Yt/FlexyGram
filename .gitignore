@@ -34,3 +34,8 @@ config/*.keystore
 *.jks
 *.pem
 *.key
+
+# Official signing inputs (never commit private material)
+*.keystore
+*.p12
+*.pfx

@@ -30,7 +30,7 @@ def probe_manifest(root=ROOT):
     gradle = (root/'build.gradle').read_text()
     if not re.search(r'\bcompileSdk\s*=\s*37\b', gradle) or not re.search(r'\btargetSdk\s*=\s*36\b', gradle):
         raise ValueError('Review resource probe SDK contract after changing compile/target SDK')
-    if 'APP_PACKAGE='+APP not in (root/'gradle.properties').read_text():
+    if "variant.buildType == 'connectedAlpha' ? '"+APP+"'" not in (root/'TMessagesProj/build.gradle').read_text():
         raise ValueError('Unexpected application identity')
     manifest = ET.Element('manifest', {'package': APP})
     ET.SubElement(manifest, 'uses-sdk', {A+'minSdkVersion': '24', A+'targetSdkVersion': '36'})

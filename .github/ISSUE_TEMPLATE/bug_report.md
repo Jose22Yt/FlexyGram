@@ -1,35 +1,24 @@
 ---
-name: Bug report
-about: Create a report to help us improve
-title: ''
+name: Error en FlexyGram
+about: Describe un fallo reproducible del cliente
 labels: ''
 assignees: ''
-
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+**Versión y dispositivo**
+- Versión de FlexyGram y variante (Alpha/Beta):
+- Modelo y versión de Android:
+- Tema y opciones de apariencia relacionadas:
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+**Pasos para reproducir**
+1.
+2.
+3.
 
-**Logcat**
-Settings - click version - "Enable Log", then click "Send Logs" to save the log file, and upload the log file here.
+**Resultado observado y resultado esperado**
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+**Frecuencia y contexto**
+Indica si ocurre con varias cuentas, tras una actualización o solo con una opción activa.
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
-
-**Smartphone (please complete the following information):**
- - Device: [e.g. MI6]
- - OS: [e.g. Android8.1]
- - Version [e.g. 5.15.0]
-
-**Additional context**
-Add any other context about the problem here.
+**Evidencia opcional**
+Adjunta únicamente capturas o registros depurados, sin números, chats privados, tokens ni sesiones. No actives registros de cuenta si tu variante no los permite. No publiques APK ni credenciales.

@@ -94,7 +94,7 @@ def main():
     assert app.get(A+'name') == 'org.telegram.messenger.ApplicationLoader'
     for provider in app.findall('provider'):
         assert provider.get(A+'authorities').startswith('${applicationId}.')
-    xml = ROOT/'TMessagesProj/src/main/res/xml'
+    xml = ROOT/'TMessagesProj/src/connectedAlpha/res/xml'
     for name in ['auth.xml', 'sync_contacts.xml']:
         assert ET.parse(xml/name).getroot().get(A+'accountType') == APP
     for name in ['auth_menu.xml','shortcuts.xml','contacts.xml']:
@@ -104,7 +104,7 @@ def main():
     login = (ROOT/'TMessagesProj/src/main/java/org/telegram/ui/LoginActivity.java').read_text()
     assert 'LOCAL_LOGIN_UNAVAILABLE' not in login
     assert all(f'class {name}' in login for name in ['PhoneView','LoginActivitySmsView','LoginActivityPasswordView'])
-    assert 'APP_PACKAGE='+APP in (ROOT/'gradle.properties').read_text()
+    assert "variant.buildType == 'connectedAlpha' ? '"+APP+"'" in (ROOT/'TMessagesProj/build.gradle').read_text()
     for f in (ROOT/'TMessagesProj/src/connectedAlpha/res').glob('values*/*.xml'):
         ET.parse(f)
     print(json.dumps({'status':'PASS_STATIC_ONLY','upstream_components_identical':len(evidence),
