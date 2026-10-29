@@ -1483,6 +1483,71 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
     private app.flexygram.header.SignatureChatHeader signatureHeader;
     public void setSignatureHeader(app.flexygram.header.SignatureChatHeader header) { signatureHeader = header; requestLayout(); }
 
+    /**
+     * Flexy Signature reuses the host's own blur3 drawables when Telegram's
+     * Power Saving > Animations in Chats > Liquid Glass is enabled.
+     * No secondary blur cache, screen capture or synthetic background is created.
+     * All coordinates stay in ActionBar canvas space and only draw surfaces.
+     */
+    public boolean drawSignatureNativeGlass(Canvas canvas,
+            app.flexygram.header.SignatureChatHeader header) {
+        if (header == null || !header.active() || !glassMode
+                || glassDrawable == null || glassDrawableBack == null || glassDrawableMenu == null
+                || !org.telegram.messenger.LiteMode.isEnabled(
+                    org.telegram.messenger.LiteMode.FLAG_LIQUID_GLASS)) return false;
+        if (header.fusionActive()) {
+            var g = header.fusionGeometry();
+            if (g == null || !g.fits) return false;
+            final int offset = Math.round(header.fusionTop);
+            glassDrawableBack.setRadius(dp(23));
+            glassDrawableBack.setBounds(Math.round(g.backVisual.left),
+                    Math.round(g.backVisual.top) + offset, Math.round(g.backVisual.right),
+                    Math.round(g.backVisual.bottom) + offset);
+            glassDrawableBack.draw(canvas);
+            glassDrawable.setRadius(dp(23));
+            glassDrawable.setBounds(Math.round(g.center.left),
+                    Math.round(g.center.top) + offset, Math.round(g.center.right),
+                    Math.round(g.center.bottom) + offset);
+            glassDrawable.draw(canvas);
+            // Portrait layout has two distinct action circles; keep both native hit targets.
+            if (g.mattePortrait) {
+                if (g.callAvailable) {
+                    glassDrawableMenu.setRadius(dp(23));
+                    glassDrawableMenu.setBounds(Math.round(g.callVisual.left),
+                        Math.round(g.callVisual.top) + offset, Math.round(g.callVisual.right),
+                        Math.round(g.callVisual.bottom) + offset);
+                    glassDrawableMenu.draw(canvas);
+                }
+                glassDrawableMenu.setBounds(Math.round(g.moreVisual.left),
+                    Math.round(g.moreVisual.top) + offset, Math.round(g.moreVisual.right),
+                    Math.round(g.moreVisual.bottom) + offset);
+            } else {
+                glassDrawableMenu.setRadius(dp(23));
+                glassDrawableMenu.setBounds(Math.round(g.actionsVisual.left),
+                    Math.round(g.actionsVisual.top) + offset, Math.round(g.actionsVisual.right),
+                    Math.round(g.actionsVisual.bottom) + offset);
+            }
+            glassDrawableMenu.draw(canvas);
+            return true;
+        }
+        var g = header.geometry;
+        // Adaptive back pill, centered text pill and avatar island are kept independent.
+        glassDrawableBack.setRadius(dp(23));
+        glassDrawableBack.setBounds(Math.round(g.back.left), Math.round(g.back.top),
+                Math.round(g.back.right), Math.round(g.back.bottom));
+        glassDrawableBack.draw(canvas);
+        glassDrawable.setRadius(dp(23));
+        glassDrawable.setBounds(Math.round(g.title.left), Math.round(g.title.top),
+                Math.round(g.title.right), Math.round(g.title.bottom));
+        glassDrawable.draw(canvas);
+        glassDrawableMenu.setRadius(dp(23));
+        glassDrawableMenu.setBounds(Math.round(g.avatar.left), Math.round(g.avatar.top),
+                Math.round(g.avatar.right), Math.round(g.avatar.bottom));
+        glassDrawableMenu.draw(canvas);
+        return true;
+    }
+
+
     private int centeredTitleAvailableWidth(int width) {
         final int titleLeft = centerTitleLeft();
         final int rightBound = Math.max(titleLeft, centerTitleRightBound(width));
