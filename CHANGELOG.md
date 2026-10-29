@@ -3,6 +3,7 @@
 ## Sin publicar — preparación 1.0.0-beta.1
 
 - Nueva variante `beta`, paquete `com.flexygram.messenger`, nombre FlexyGram y versión prevista `1.0.0-beta.1` (código 1287).
+- Procedimiento de custodia local, dos backups cifrados y verificador público/PKCS12 sin Android; clave oficial aún pendiente.
 - Firma Beta independiente, con certificado fijado por su SHA-256 y sin sustitución por firma debug o Alpha.
 - Recursos de cuentas, contactos y shortcuts separados por identidad; iconos aprobados conservados.
 - README, créditos y guías de compilación, migración y custodia de firma.

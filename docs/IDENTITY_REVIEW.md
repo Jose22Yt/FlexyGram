@@ -27,3 +27,5 @@ El intento ampliado de suites históricas encontró errores/fallos y accesos a b
 Resultados adicionales: paridad de fuentes `check_source.py` aprobada (11 componentes idénticos y proyecciones revisadas); 8/8 pruebas `test_interaction1286.py` aprobadas. En `test_signature1271.py`, 5 pruebas pasan y la comparación histórica restante necesita el blob de ComposerStyle del SHA `0e359f0e…`, no disponible localmente. Las plantillas de incidencias se actualizan para pedir versión/variante y evidencia sin datos privados.
 
 Tras recuperar el submódulo multimedia fijado, la suite general `pytest tests/` terminó con **144 aprobadas y 31 omitidas** (corpus externo de plugins/informe R8 no disponibles). No se modifica el puntero del submódulo. El parseo YAML y `git diff --check` también pasan. Esto no convierte la suite histórica de Connected Alpha en completa ni acredita ejecución Android.
+
+La misión adicional de custodia se documenta en [SIGNING_CUSTODY_REVIEW.md](SIGNING_CUSTODY_REVIEW.md). Se preparan generación y recuperación locales; no se genera ni entrega una clave definitiva en el entorno temporal.

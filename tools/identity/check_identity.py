@@ -82,7 +82,7 @@ def main():
             expected = original(name).decode().replace('"'+ALPHA+'".equals(ApplicationLoader.applicationContext.getPackageName())', 'BuildConfig.CONNECTED_ALPHA')
             require(read(name) == expected, 'Unreviewed SharedConfig change')
     signing = read('gradle/flexygram-beta.gradle')
-    for token in ['FLEXYGRAM_RELEASE_CERT_SHA256', "KeyStore.getInstance('PKCS12')", 'java.security.PrivateKey', 'cert.checkValidity()', 'CN=Android Debug', 'preBetaBuild', 'src/beta/google-services.json', 'keyFile.toPath().startsWith']:
+    for token in ['FLEXYGRAM_RELEASE_CERT_SHA256', 'KeyStore.getInstance(keyFile, storePass)', 'java.security.PrivateKey', 'cert.checkValidity()', 'CN=Android Debug', 'preBetaBuild', 'src/beta/google-services.json', 'keyFile.toPath().startsWith']:
         require(token in signing, 'Missing signing gate: ' + token)
     # Every new source file is text/approved icon data, never a private input or APK.
     paths = subprocess.check_output(['git', 'ls-files', '--cached', '--others', '--exclude-standard'], cwd=ROOT, text=True).splitlines()
@@ -91,7 +91,7 @@ def main():
         if name.endswith(('.keystore', '.jks', '.p12', '.pfx', '.apk', '.aab', '.pem', '.key')) or name.endswith('google-services.json'):
             raise ValueError('Private/generated material in source delivery: ' + name)
     docs = [ROOT/p for p in ['README.md', 'CREDITS.md', 'CHANGELOG.md', 'CONTRIBUTING.md']]
-    docs += [ROOT/'docs'/p for p in ['BUILDING.md', 'SIGNING.md', 'FEATURES.md', 'ANDROID_IDENTITY.md', 'IDENTITY_REVIEW.md', 'screenshots/README.md']]
+    docs += [ROOT/'docs'/p for p in ['BUILDING.md', 'SIGNING.md', 'FEATURES.md', 'ANDROID_IDENTITY.md', 'IDENTITY_REVIEW.md', 'screenshots/README.md', 'SIGNING_OWNER_CUSTODY.md', 'SIGNING_CUSTODY_REVIEW.md']]
     for doc in docs:
         for target in re.findall(r'\]\(([^)]+)\)', doc.read_text()):
             if not re.match(r'[a-z]+:|#', target):

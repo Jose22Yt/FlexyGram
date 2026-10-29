@@ -64,6 +64,8 @@
     "docs/FEATURES.md",
     "docs/IDENTITY_REVIEW.md",
     "docs/SIGNING.md",
+    "docs/SIGNING_CUSTODY_REVIEW.md",
+    "docs/SIGNING_OWNER_CUSTODY.md",
     "docs/screenshots/README.md",
     "gradle.properties",
     "gradle/flexygram-beta.gradle",
@@ -73,14 +75,16 @@
     "tools/connected_alpha/interaction1286_contract.py",
     "tools/connected_alpha/test_signature1271.py",
     "tools/identity/check_identity.py",
-    "tools/identity/review.json"
+    "tools/identity/review.json",
+    "tools/signing/VerifySigning.java",
+    "tools/signing/check_verifier.py"
   ],
   "reviewed": {
     ".github/ISSUE_TEMPLATE/bug_report.md": "3d1897468e0bce65efc895d07999de4a2c2a3eeada78025189edca01544b90ba",
     ".github/ISSUE_TEMPLATE/feature_request.md": "5f09193c0efa5b546ffa767044e858a30e2753a83882e4bee47d7a552d30f7a6",
-    ".github/workflows/pr.yml": "48d9506be6935e2fa90be47e543f75cdaf1cf33cc3f2af97a6972387afb8de58",
+    ".github/workflows/pr.yml": "4e6c4cb7cb4f3fc18f82b77b74e6f7a9896f39df9553a27495542b6b30108c68",
     ".gitignore": "a365cf37e68e0ae4ddc1b63db5a395d644608e06b8bf8eb32f93a461fb62c206",
-    "CHANGELOG.md": "1ab81db0116af43ecab27f0e2b0ddbdd24027147f92f9f3d8d0fce52cc04dd52",
+    "CHANGELOG.md": "ae87946a5b8b98bdbc003eecdf542f029214b8849ccb5acf481c5ff88b9e644e",
     "CONTRIBUTING.md": "945755bd94726780703ef7cd78f47c75703d1f32d5a67333302530f2d55b8ec9",
     "CREDITS.md": "2af2d0e18a1b7648368b221d88b916ea639e5108e4b7b948471cff5c37e0ebdd",
     "README.md": "41ba633f48c6956aacf546bce86bec4c46a12fc64801bb4cd2de432b162eed75",
@@ -137,16 +141,20 @@
     "docs/ANDROID_IDENTITY.md": "744df7a32bdae61a0e92362bcfd829db5424188a2f7e3a594828d56c482b1bc2",
     "docs/BUILDING.md": "724f68f559945c0e18f6154212bba0d78eeea8ac534403e945667b92caa57552",
     "docs/FEATURES.md": "2ffa961d965e52df405ae3409d3decad6695bcb251fd5ee4667a3bf2c976f40c",
-    "docs/IDENTITY_REVIEW.md": "45038915c12d0056ec458641c1f9c4a58fc6450c616c8654fc8dabe5f16590f2",
-    "docs/SIGNING.md": "9ad8903e3253cf4eaea2eb4baaa722bb32cd5038273de58ccb0f0e3414dcb5e9",
+    "docs/IDENTITY_REVIEW.md": "a66ecd3c5da72cac757f817a4ea2d268eab6afd2f65a71d8e8258b7ebafdea56",
+    "docs/SIGNING.md": "6910bd38c4f144c1eef58c5647e025b95f9bfc9b2cc7e183ae8ad466b29fe3d3",
+    "docs/SIGNING_CUSTODY_REVIEW.md": "bc61c2da7d82957376fda68466469bf44333b23072a7012b72a3fed6b457a4c5",
+    "docs/SIGNING_OWNER_CUSTODY.md": "97ea8611381437db8a739a9aba623665dae67867417033966c3af989043b34ac",
     "docs/screenshots/README.md": "7abd6dfa4154e0e5dcbe256f6d80ea7e383b9f0c255c4acaa38be393dbe1aba1",
     "gradle.properties": "9b6a27e8af7293ef2e530559a3e992d18aab5c7fd7916958c2809bd29259f9b1",
-    "gradle/flexygram-beta.gradle": "b5a4de0fe0ff66bf087518815da887b62fcd789434dbe6129d9ab7a28e02c8df",
+    "gradle/flexygram-beta.gradle": "a47eff8d301d21c98d9e5b35388768cac0fb7fdf28ebe4094baa15bdf155cf84",
     "tools/connected_alpha/check_resources.py": "c07a95dbcf318fb06f17e3ca92f57d7ad982157cd0bc1c73bee021931c91b436",
     "tools/connected_alpha/check_source.py": "8248b5a757a107fe184fe1dfdd57a9f3df6f95f7bb8603242db9dc513a8a06c5",
     "tools/connected_alpha/identity_beta_contract.py": "b62534449315fc3e539c7f0309368632a80cc29ef5d83566e3c959e715f9ee88",
     "tools/connected_alpha/interaction1286_contract.py": "1ddac56e06f314cce1bcdf5f5e04c66fb5fed95d81b5d258b5c608d3ed6700ef",
     "tools/connected_alpha/test_signature1271.py": "79ec7358f22bddfc44e518b36950ad75016bac4c7cabf50bcba2b9fb2bf39d97",
-    "tools/identity/check_identity.py": "5e4acd8d0572f67edc1c1e7d4a26f573a44b11243b544be58bd82afbefa85ae3"
+    "tools/identity/check_identity.py": "25b4ede0bd0a12fbdf1c96d6879ed0cd045f27f4dbef329b39104554a4c6804c",
+    "tools/signing/VerifySigning.java": "8ab91f93fe0315d8a9f380b05dab7d1cf4b55c6f26fa02fc027ccafc69e14a0b",
+    "tools/signing/check_verifier.py": "cd23dc20eadf731ce7ad924782bbd9f93991543a16532ec70a94531aab9501b0"
   }
 }

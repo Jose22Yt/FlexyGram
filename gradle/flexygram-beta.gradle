@@ -34,17 +34,38 @@ def validateBeta = tasks.register('validateFlexyGramBetaConfiguration') {
         if (!keyFile.isFile() || keyFile.toPath().startsWith(rootProject.projectDir.canonicalFile.toPath())) {
             throw new GradleException('Beta keystore must exist outside the repository.')
         }
-        def store = java.security.KeyStore.getInstance('PKCS12')
         def storePass = betaPrivateValue('FLEXYGRAM_RELEASE_STORE_PASSWORD').toCharArray()
         def keyPass = betaPrivateValue('FLEXYGRAM_RELEASE_KEY_PASSWORD').toCharArray()
         try {
-            keyFile.withInputStream { store.load(it, storePass) }
+            def store = java.security.KeyStore.getInstance(keyFile, storePass)
+            if (!store.type.equalsIgnoreCase('PKCS12') || store.size() != 1) {
+                throw new GradleException('Beta requires a dedicated PKCS12 store containing exactly one identity.')
+            }
             def alias = betaPrivateValue('FLEXYGRAM_RELEASE_KEY_ALIAS')
-            if (!store.isKeyEntry(alias) || !(store.getKey(alias, keyPass) instanceof java.security.PrivateKey)) {
+            if (alias != 'flexygram-release' || !store.isKeyEntry(alias) || !(store.getKey(alias, keyPass) instanceof java.security.PrivateKey)) {
                 throw new GradleException('Beta alias must contain an accessible private signing key.')
             }
             def cert = store.getCertificate(alias)
             cert.checkValidity()
+            if (!(cert.publicKey instanceof java.security.interfaces.RSAPublicKey) || cert.publicKey.modulus.bitLength() != 3072 || !cert.sigAlgName.equalsIgnoreCase('SHA256withRSA')) {
+                throw new GradleException('Beta requires an RSA-3072 certificate using SHA256withRSA.')
+            }
+            def commonNames = new javax.naming.ldap.LdapName(cert.subjectX500Principal.name).rdns.findAll { it.type.equalsIgnoreCase('CN') }
+            if (commonNames.size() != 1 || commonNames[0].value != 'FlexyGram Release Key' || cert.subjectX500Principal != cert.issuerX500Principal) {
+                throw new GradleException('Beta requires the dedicated self-signed FlexyGram Release Key certificate.')
+            }
+            cert.verify(cert.publicKey)
+            def nonce = new byte[32]
+            new java.security.SecureRandom().nextBytes(nonce)
+            def proof = java.security.Signature.getInstance('SHA256withRSA')
+            proof.initSign(store.getKey(alias, keyPass))
+            proof.update(nonce)
+            def signed = proof.sign()
+            proof.initVerify(cert.publicKey)
+            proof.update(nonce)
+            if (!proof.verify(signed)) throw new GradleException('Beta private key does not match its certificate.')
+            java.util.Arrays.fill(nonce, (byte) 0)
+            java.util.Arrays.fill(signed, (byte) 0)
             def fingerprint = java.security.MessageDigest.getInstance('SHA-256').digest(cert.encoded).encodeHex().toString()
             def expected = betaPrivateValue('FLEXYGRAM_RELEASE_CERT_SHA256').replace(':', '').toLowerCase(java.util.Locale.ROOT)
             if (!(expected ==~ /[a-f0-9]{64}/) || fingerprint != expected) {

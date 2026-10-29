@@ -164,4 +164,5 @@ jobs:
         with:
           python-version: '3.11'
       - run: python3 tools/identity/check_identity.py
+      - run: python3 tools/signing/check_verifier.py
       - run: git diff --check HEAD^ HEAD
