@@ -3746,6 +3746,8 @@ public class ChatActivity extends BaseFragment implements
 
     @Override
     public void onFragmentDestroy() {
+        if(flexyBubbleStickerSession!=null){flexyBubbleStickerSession.close();flexyBubbleStickerSession=null;}
+        if(flexyBubbleStickerExport!=null){flexyBubbleStickerExport.cancel();flexyBubbleStickerExport=null;}
         app.flexygram.studio.FlexyStyleInstallHelper.cancel(this);
         app.exteraless.plugins.menus.MenuInjector.releaseMessageMenu(this);
         super.onFragmentDestroy();
@@ -21855,6 +21857,9 @@ public class ChatActivity extends BaseFragment implements
 
     @Override
     public void onActivityResultFragment(int requestCode, int resultCode, Intent data) {
+        if(requestCode==app.flexygram.bubbles.interaction.BubbleStickerExport.REQUEST){
+            if(flexyBubbleStickerExport!=null)flexyBubbleStickerExport.result(resultCode,data);return;
+        }
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == 0 || requestCode == 2) {
                 createChatAttachView();
@@ -32716,6 +32721,48 @@ public class ChatActivity extends BaseFragment implements
         }
     }
 
+    private app.flexygram.bubbles.interaction.BubbleStickerSession flexyBubbleStickerSession;
+    private app.flexygram.bubbles.interaction.BubbleStickerExport flexyBubbleStickerExport;
+
+    /** Revalidate native content/send permissions at preparation AND the explicit send click. */
+    private boolean canUseFlexyBubbleSticker(ChatMessageCell cell, MessageObject message) {
+        if (getParentActivity()==null || cell==null || message==null || message.currentAccount!=currentAccount
+                || selectedObject!=message || message.getDialogId()!=dialog_id
+                || cell.getPrimaryMessageObject()!=message || chatMode!=MODE_DEFAULT || !canSendMessage()
+                || chatActivityEnterView==null || chatActivityEnterView.getSlowModeTimer()!=null
+                || getMessagesController().getSendPaidMessagesStars(dialog_id)>0
+                || currentChat!=null && (!ChatObject.canSendStickers(currentChat) || !ChatObject.canWriteToChat(currentChat))) return false;
+        ArrayList<Integer> icons=new ArrayList<>(),options=new ArrayList<>();
+        ArrayList<CharSequence> items=new ArrayList<>();
+        fillMessageMenu(message,icons,items,options);
+        return lastMessageMenuStatus.allowCopy && lastMessageMenuStatus.allowForward
+                && app.flexygram.bubbles.interaction.NativeBubbleStickerPainter.eligible(cell,message);
+    }
+
+    private app.flexygram.bubbles.interaction.BubbleStickerSession createFlexyBubbleStickerSession(
+            app.flexygram.bubbles.interaction.BubbleActionPanelView panel, ChatMessageCell cell, MessageObject message) {
+        if(flexyBubbleStickerSession!=null)flexyBubbleStickerSession.close();
+        if(flexyBubbleStickerExport==null)flexyBubbleStickerExport=new app.flexygram.bubbles.interaction.BubbleStickerExport(this);
+        final int account=currentAccount;
+        final long dialog=dialog_id;
+        return flexyBubbleStickerSession=new app.flexygram.bubbles.interaction.BubbleStickerSession(panel,
+                getParentActivity().getCacheDir(),()->currentAccount==account && dialog_id==dialog && canUseFlexyBubbleSticker(cell,message),
+                ()->new app.flexygram.bubbles.interaction.NativeBubbleStickerPainter(cell,message),
+                (file,metadata,result)->{
+                    if(currentAccount!=account || dialog_id!=dialog || !canUseFlexyBubbleSticker(cell,message)) {
+                        result.complete(null,new IllegalStateException("Native send admission changed"));return;
+                    }
+                    SendMessagesHelper.SendMessageParams request=SendMessagesHelper.SendMessageParams.of(
+                            (TLRPC.TL_document)metadata,null,file.getAbsolutePath(),dialog,
+                            replyingMessageObject,getThreadMessage(),null,null,null,null,true,0,0,0,null,null,false);
+                    request.replyQuote=replyingQuote;
+                    request.sendMessageChatArguments=getMessageChatSendParams();
+                    request.monoForumPeer=getSendMonoForumPeerId();
+                    request.suggestionParams=getSendMessageSuggestionParams();
+                    app.flexygram.bubbles.interaction.NativeBubbleStickerSender.send(account,request,file,result);
+                },file->flexyBubbleStickerExport.save(file));
+    }
+
     /** Native menu policy is the authority; no independent permission rules. */
     private java.util.EnumSet<app.flexygram.bubbles.interaction.BubbleActionPanelView.Action> signatureContextActions(ArrayList<Integer> options) {
         var actions=java.util.EnumSet.noneOf(app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.class);
@@ -34321,7 +34368,15 @@ public class ChatActivity extends BaseFragment implements
                 final var admitted=signatureContextActions(options);
                 if (!admitted.isEmpty()) {
                     admitted.add(app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.SELECT);
-                    panel.setAllowedActions(admitted);panel.setMinimumWidth(dp(260));
+                    final boolean stickerAllowed=canUseFlexyBubbleSticker(panelCell,panelMessage);
+                    if(stickerAllowed){
+                        admitted.add(app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.BUILD_STICKER);
+                        admitted.add(app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.SEND_STICKER);
+                        admitted.add(app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.SAVE_STICKER);
+                    }
+                    panel.setMinimumWidth(dp(260));panel.setConfiguration(admitted,stickerAllowed);
+                    final app.flexygram.bubbles.interaction.BubbleStickerSession stickerSession=stickerAllowed
+                            ? createFlexyBubbleStickerSession(panel,panelCell,panelMessage):null;
                     ArrayList<View> nativeItems=new ArrayList<>();
                     for(int i=0;i<popupLayout.getItemsCount();i++)nativeItems.add(popupLayout.getItemAt(i));
                     popupLayout.removeInnerViews();
@@ -34335,6 +34390,11 @@ public class ChatActivity extends BaseFragment implements
                     popupLayout.addView(panel);
                     panel.setListener(action->{
                         if(selectedObject!=panelMessage || panelCell.getMessageObject()!=panelMessage || getParentActivity()==null)return;
+                        if(action==app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.BUILD_STICKER
+                                || action==app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.SEND_STICKER
+                                || action==app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.SAVE_STICKER){
+                            if(stickerSession!=null)stickerSession.handle(action);return;
+                        }
                         if(action==app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.MORE){
                             popupLayout.getSwipeBack().openForeground(nativeMenuIndex);return;
                         }

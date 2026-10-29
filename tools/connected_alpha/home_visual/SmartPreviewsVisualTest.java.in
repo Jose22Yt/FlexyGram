@@ -72,6 +72,14 @@ public class SmartPreviewsVisualTest {
    assertTrue(SignatureSmartPreviewPalette.contrast(b.getPixel(0,0),dark?0xffe9edf3:0xff26313d)>=4.5);b.recycle();
   }
  }
+ @Test public void bindTimeMetricsMatchTheActualAlpha1282RendererAfterRebinds(){
+  for(boolean rtl:new boolean[]{false,true})for(float scale:new float[]{1,1.3f,2})for(int kind:new int[]{1,2,3,4,6,7}){
+   SignatureSmartPreviews.value=0;var v=new SmartPreviewCellProbe();v.bind("long file name.plugin",kind,rtl,scale,320,72,kind==6?1:0);
+   Bitmap a=v.renderBackground(),b=v.renderBaselineBackground();assertTrue("exact baseline pixels",a.sameAs(b));a.recycle();b.recycle();
+   v.messageLeft+=7;a=v.renderBackground();b=v.renderBaselineBackground();assertTrue("translation remains live",a.sameAs(b));a.recycle();b.recycle();
+   v.bindInline(rtl?"أحمد: ":"Ana: ","example.org",rtl,320);a=v.renderBackground();b=v.renderBaselineBackground();assertTrue("new layout invalidates metrics",a.sameAs(b));a.recycle();b.recycle();
+  }
+ }
  @Test public void generateSyntheticProductionCellMethodGrid()throws Exception{
   String[] names={"entry7555.zip","nagramxf_glass_bubbles.plugin","example.org","0:23","Song title","Photo","Video","Group event","Location","Contact","Topics · blue","Topics · green","Topics · violet"};
   int[] kinds={1,1,4,2,3,6,7,5,8,9,5,5,5};int[] accents={0xff3986dd,0xff3baf77,0xff9970ce};

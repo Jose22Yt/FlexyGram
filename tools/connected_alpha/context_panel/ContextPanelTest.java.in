@@ -29,6 +29,13 @@ public class ContextPanelTest {
   var panel=new BubbleActionPanelView(activity,null);panel.setAllowedActions(EnumSet.of(Action.SELECT));ArrayList<Action> received=new ArrayList<>();panel.setListener(received::add);
   named(panel,"FlexyContextSelect").performClick();assertTrue(received.isEmpty());named(((ViewGroup)panel).getChildAt(1),"FlexyContextSelect").performClick();assertEquals(Collections.singletonList(Action.SELECT),received);
  }
+ @Test public void optInPersistsWithoutMotionPreferencesOrNoOpMenuState(){
+  var context=activity.getApplicationContext();BubbleInteractionSettings.setSignaturePanel(context,true);
+  org.robolectric.util.ReflectionHelpers.setStaticField(BubbleInteractionSettings.class,"panel",null);
+  assertTrue(BubbleInteractionSettings.signaturePanel(context));BubbleInteractionSettings.setSignaturePanel(context,false);
+  org.robolectric.util.ReflectionHelpers.setStaticField(BubbleInteractionSettings.class,"panel",null);
+  assertFalse(BubbleInteractionSettings.signaturePanel(context));
+ }
  @Test public void actualNativePermissionAdapterPreservesAllCombinations(){
   for(int bits=0;bits<64;bits++){var host=new PanelHostProbe();var s=host.lastMessageMenuStatus;s.allowReply=(bits&1)!=0;s.allowCopy=(bits&2)!=0;s.allowForward=(bits&4)!=0;s.allowEdit=(bits&8)!=0;s.allowDelete=(bits&16)!=0;
    var options=new ArrayList<Integer>();if((bits&32)!=0)options.add(13);var a=host.signatureContextActions(options);

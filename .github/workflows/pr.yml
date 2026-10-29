@@ -69,7 +69,7 @@ jobs:
           java-version: '21'
       - name: Validate all integrated native graphics without accounts or private inputs
         run: |
-          for probe in native_motion_restore studio_native files_native performance/native3 bubble_visual matte_visual composer_visual home_visual login_visual music_visual; do
+          for probe in context_panel native_touch native_motion_restore studio_native files_native performance/native3 bubble_visual matte_visual composer_visual home_visual login_visual music_visual; do
             python3 "tools/connected_alpha/$probe/run.py" --sdk-root "$ANDROID_HOME"
           done
           python3 tools/connected_alpha/header_visual/run.py --sdk-root "$ANDROID_HOME"

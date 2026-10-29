@@ -1,5 +1,6 @@
 """Actual DialogCell drawing/thumbnail methods; theme, mode and services are doubles."""
 from pathlib import Path
+import subprocess
 
 def method(source,anchor):
     start=source.index(anchor);end=source.index('{',start)+1;depth=1
@@ -11,12 +12,13 @@ def write_probe(source,root):
     java=root/'TMessagesProj/src/main/java'
     actual=(java/'org/telegram/ui/Cells/DialogCell.java').read_text()
     methods='\n'.join(method(actual,a) for a in [
-        'private void drawSmartPreviewBackground(', 'private CharSequence applyThumbs(',
+        'private void prepareSmartPreviewMetrics(', 'private void drawSmartPreviewBackground(', 'private CharSequence applyThumbs(',
         'public static class ThumbnailSpan ', 'public static class FixedWidthSpan '])
     code='''import android.graphics.*;import android.text.*;import android.text.style.*;import android.view.View;
 import org.robolectric.RuntimeEnvironment;import app.flexygram.home.*;
 public class SmartPreviewCellProbe extends View {
  int smartPreviewKind,messageLeft=24,thumbsCount,thumbSize=20,smartPreviewPrefixEnd,smartPreviewClipLeft=6,smartPreviewClipRight=314;
+ float smartPreviewStartX,smartPreviewEndX;boolean smartPreviewMetricsReady;
  StaticLayout messageLayout;Object resourcesProvider;
  final SignatureSmartPreviewPalette smartPreviewPalette=new SignatureSmartPreviewPalette();
  final Paint smartPreviewPaint=new Paint(3);
@@ -37,6 +39,7 @@ public class SmartPreviewCellProbe extends View {
   label=TextUtils.ellipsize(label,paint,Math.max(20,width-90),kind==1?TextUtils.TruncateAt.MIDDLE:TextUtils.TruncateAt.END);
   messageLayout=StaticLayout.Builder.obtain(label,0,label.length(),paint,width-48)
    .setMaxLines(1).setIncludePad(false).setTextDirection(rtl?TextDirectionHeuristics.RTL:TextDirectionHeuristics.LTR).build();
+  prepareSmartPreviewMetrics();
   measure(MeasureSpec.makeMeasureSpec(width,MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(height,MeasureSpec.EXACTLY));layout(0,0,width,height);
  }
  void bindInline(String sender,String text,boolean rtl,int width){
@@ -46,12 +49,17 @@ public class SmartPreviewCellProbe extends View {
   value.setSpan(new SignaturePreviewIcon(4),smartPreviewPrefixEnd,smartPreviewPrefixEnd+1,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
   value.append(text);value.setSpan(new AbsoluteSizeSpan(12),smartPreviewPrefixEnd+1,value.length(),Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
   messageLayout=StaticLayout.Builder.obtain(value,0,value.length(),paint,width-48).setMaxLines(1).setIncludePad(false).setTextDirection(rtl?TextDirectionHeuristics.RTL:TextDirectionHeuristics.LTR).build();
+  prepareSmartPreviewMetrics();
   measure(MeasureSpec.makeMeasureSpec(width,MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(72,MeasureSpec.EXACTLY));layout(0,0,width,72);
  }
  Bitmap renderBackground(){Bitmap b=Bitmap.createBitmap(getWidth(),getHeight(),Bitmap.Config.ARGB_8888);drawSmartPreviewBackground(new Canvas(b),26,1);return b;}
  Bitmap render(float alpha){Bitmap b=Bitmap.createBitmap(getWidth(),getHeight(),Bitmap.Config.ARGB_8888);Canvas c=new Canvas(b);drawSmartPreviewBackground(c,26,alpha);if(smartPreviewKind!=0&&SignatureSmartPreviews.mode()!=3){c.save();c.translate(messageLeft,26);messageLayout.getPaint().setColor(smartPreviewPalette.foreground());messageLayout.draw(c);c.restore();}return b;}
 }
 '''
+    baseline=subprocess.check_output(['git','show','bb3af73e085f3cdb3e9e92f35f6d1b692c04afcb:TMessagesProj/src/main/java/org/telegram/ui/Cells/DialogCell.java'],cwd=root,text=True)
+    original=method(baseline,'private void drawSmartPreviewBackground(').replace('drawSmartPreviewBackground(','drawSmartPreviewBackgroundBaseline(',1)
+    methods+='\n'+original
+    methods+='\n Bitmap renderBaselineBackground(){Bitmap b=Bitmap.createBitmap(getWidth(),getHeight(),Bitmap.Config.ARGB_8888);drawSmartPreviewBackgroundBaseline(new Canvas(b),26,1);return b;}\n'
     code=code.replace('\n}\n','\n'+methods+'\n}\n')
     (source/'SmartPreviewCellProbe.java').write_text(code)
     package=source/'app/flexygram/home';package.mkdir(parents=True,exist_ok=True)

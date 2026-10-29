@@ -49,7 +49,8 @@ class Integration1282(unittest.TestCase):
 
     def test_release_gates_only_increment_existing_version(self):
         for path in ['TMessagesProj/build.gradle','.github/workflows/connected-alpha-arm64.yml','tools/connected_alpha/build_private_apk.py']:
-            data=(audit.ROOT/path).read_bytes()
+            from alpha1283_contract import restore as restore_next
+            data=restore_next(path,(audit.ROOT/path).read_bytes())
             self.assertIn(b'1282',data)
             self.assertEqual(audit.original(path),data.replace(b'1282',b'1281'),path)
 

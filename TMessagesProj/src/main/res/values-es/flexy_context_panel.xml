@@ -6,4 +6,15 @@
     <string name="FlexyContextMore">Más</string>
     <string name="FlexyContextSendHere">Enviar aquí</string>
     <string name="FlexyContextPanel">Panel contextual FlexyGram</string>
+    <string name="FlexyContextSave">Guardar</string>
+    <string name="FlexyContextStickerPreparing">Preparando sticker…</string>
+    <string name="FlexyContextStickerReady">Listo para enviar</string>
+    <string name="FlexyContextStickerSending">Enviando…</string>
+    <string name="FlexyContextStickerSent">Sticker confirmado por Telegram</string>
+    <string name="FlexyContextStickerFailed">No se pudo preparar este mensaje</string>
+    <string name="FlexyContextStickerUnconfirmed">Telegram no confirmó este sticker. Revisa el mensaje saliente antes de reintentar.</string>
+    <string name="FlexyContextStickerSaved">Sticker guardado</string>
+    <string name="FlexyContextStickerSaveFailed">No se pudo guardar el sticker</string>
+    <string name="FlexyContextInteractions">Interacción de mensajes</string>
+    <string name="FlexyContextDescription">Usar el panel contextual Matte nativo. La conversión a sticker está disponible para burbujas de texto completamente visibles y sin restricciones en chats compatibles. Los demás casos conservan los menús nativos.</string>
 </resources>

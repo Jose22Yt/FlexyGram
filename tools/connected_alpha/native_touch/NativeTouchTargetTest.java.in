@@ -38,6 +38,12 @@ public class NativeTouchTargetTest {
     @Test public void translatedRowUsesScreenBoundsAndParentClipping() {
         row.setTranslationX(100); assertFalse(hit(50,30)); assertTrue(hit(150,30)); assertFalse(hit(350,30));
     }
+    @Test public void pathologicalWideTreeFallsBackWithoutAcceptingHiddenRows() {
+        for(int i=0;i<200;i++) {View v=new View(activity);root.addView(v,new FrameLayout.LayoutParams(300,60));v.layout(0,0,300,60);}
+        assertFalse(hit(150,30));
+        root.removeView(row);root.addView(row,new FrameLayout.LayoutParams(300,60));row.layout(0,0,300,60);
+        assertTrue(hit(150,30));
+    }
     @Test public void invalidCoordinatesAndDetachedRootAreRejected() {
         assertFalse(NativeInstantTouchTarget.isVisibleDialogRow(root,Float.NaN,0));
         assertFalse(NativeInstantTouchTarget.isVisibleDialogRow(null,0,0));
