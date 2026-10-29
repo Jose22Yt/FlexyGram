@@ -1,23 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="FlexyContextActions">Actions</string>
-    <string name="FlexyContextSticker">Sticker</string>
     <string name="FlexyContextSelect">Select</string>
     <string name="FlexyContextMore">More</string>
-    <string name="FlexyContextSendHere">Send here</string>
-    <string name="FlexyContextPanel">Flexy Context Panel</string>
-    <string name="FlexyContextSave">Save</string>
-    <string name="FlexyContextStickerPreparing">Preparing sticker…</string>
-    <string name="FlexyContextStickerReady">Ready to send</string>
-    <string name="FlexyContextStickerSending">Sending…</string>
-    <string name="FlexyContextStickerSent">Sticker confirmed by Telegram</string>
-    <string name="FlexyContextStickerFailed">Could not prepare this message</string>
-    <string name="FlexyContextStickerUnconfirmed">Telegram did not confirm this sticker. Check the outgoing message before retrying.</string>
-    <string name="FlexyContextStickerSaved">Sticker saved</string>
-    <string name="FlexyContextStickerSaveFailed">Could not save the sticker</string>
-    <string name="FlexyContextConvertSticker">Convert to sticker</string>
-    <string name="FlexyContextBounce">iOS-style menu spring</string>
-    <string name="FlexyContextStickerEnabled">Convert bubbles to stickers</string>
+    <string name="FlexyContextPanel">Signature context panel</string>
+    <string name="FlexyContextBounce">iOS 27 selection animation</string>
     <string name="FlexyContextInteractions">Message interactions</string>
-    <string name="FlexyContextDescription">Use the native Matte context panel. Sticker conversion is available for fully visible, unrestricted text bubbles in compatible cloud chats. Other cases keep native menus.</string>
+    <string name="FlexyContextDescription">Highlights the message with background blur and a gentle rebound. Preserves native Telegram reactions, permissions and actions.</string>
 </resources>

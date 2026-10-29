@@ -1,4 +1,4 @@
-name: Bubble Glass rendering contracts
+name: Original bubble blur restoration contracts
 on:
   pull_request:
     paths:
@@ -19,18 +19,12 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      - name: Glass alpha/transition math checks
+      - name: Preserve Matte utility used by other surfaces
         run: |
-          mkdir -p /tmp/flexy-glass-contract
-          javac -encoding UTF-8 -d /tmp/flexy-glass-contract \
-            TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleGlassPolicy.java \
-            tools/connected_alpha/matte_bubbles/GlassPolicyContractTest.java
-          java -cp /tmp/flexy-glass-contract GlassPolicyContractTest
-          javac -encoding UTF-8 -d /tmp/flexy-glass-contract \
+          mkdir -p /tmp/flexy-blur-contract
+          javac -encoding UTF-8 -d /tmp/flexy-blur-contract \
             TMessagesProj/src/main/java/app/flexygram/bubbles/SignatureMatteFinish.java \
             tools/connected_alpha/matte_bubbles/MatteFinishContractTest.java
-          java -cp /tmp/flexy-glass-contract MatteFinishContractTest
-      - name: Settings/render/preview/source assertions
-        run: |
-          python3 tools/connected_alpha/matte_bubbles/test_matte_integration.py
-          python3 tools/connected_alpha/bubble_glass/check_glass_source.py
+          java -cp /tmp/flexy-blur-contract MatteFinishContractTest
+      - name: Current blur, conversion-removal and unchanged native-surface contracts
+        run: python3 -m unittest discover -s tools/connected_alpha -p test_reconstruction1285.py -v

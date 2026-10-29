@@ -11,7 +11,7 @@ import org.telegram.ui.Cells.TextInfoPrivacyCell;
 
 /** Chats -> Message interactions. All controls are wired to actual visible UI behavior. */
 public final class BubbleInteractionSettingsActivity extends SignatureMatteSettingsActivity {
-    private int panelRow, bounceRow, stickerRow, infoRow;
+    private int panelRow, bounceRow, infoRow;
     @Override protected String getActionBarTitle() {
         return LocaleController.getString(R.string.FlexyContextInteractions);
     }
@@ -19,7 +19,6 @@ public final class BubbleInteractionSettingsActivity extends SignatureMatteSetti
         super.updateRows();
         panelRow = addRow("flexyContextPanel");
         bounceRow = addRow("flexyContextBounce");
-        stickerRow = addRow("flexyContextStickerEnabled");
         infoRow = addRow();
     }
     @Override protected BaseListAdapter createAdapter(Context context) { return new Adapter(context); }
@@ -32,9 +31,7 @@ public final class BubbleInteractionSettingsActivity extends SignatureMatteSetti
         } else if (position == bounceRow) {
             BubbleInteractionSettings.setSpringBounce(context,
                     !BubbleInteractionSettings.springBounce(context));
-        } else if (position == stickerRow) {
-            BubbleInteractionSettings.setStickerConversion(context,
-                    !BubbleInteractionSettings.stickerConversion(context));
+
         } else return;
         listAdapter.notifyItemChanged(position);
     }
@@ -56,15 +53,13 @@ public final class BubbleInteractionSettingsActivity extends SignatureMatteSetti
                         BubbleInteractionSettings.signaturePanel(context), true);
             } else if (position == bounceRow) {
                 cell.setTextAndCheck(LocaleController.getString(R.string.FlexyContextBounce),
-                        BubbleInteractionSettings.springBounce(context), true);
-            } else if (position == stickerRow) {
-                cell.setTextAndCheck(LocaleController.getString(R.string.FlexyContextStickerEnabled),
-                        BubbleInteractionSettings.stickerConversion(context), false);
+                        BubbleInteractionSettings.springBounce(context), false);
+
             }
         }
         @Override public boolean isEnabled(RecyclerView.ViewHolder holder) {
             int position = holder.getAdapterPosition();
-            return position == panelRow || position == bounceRow || position == stickerRow;
+            return position == panelRow || position == bounceRow;
         }
     }
 }

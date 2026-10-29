@@ -34,4 +34,11 @@
     <string name="FlexyLiquidNavIndicator">Indicador Liquid</string>
     <string name="FlexyLiquidNavMotion">Movimiento</string>
     <string name="FlexyLiquidNavDesign">Diseño y tamaño</string>
+    <string name="FlexyLiquidNavReflection">Reflejos</string>
+    <string name="FlexyLiquidNavOutline">Contorno de cristal</string>
+    <string name="FlexyLiquidNavIntensity">Intensidad visual</string>
+    <string name="FlexyLiquidNavLensSize">Tamaño de la lente en reposo</string>
+    <string name="FlexyLiquidNavProfilePreset">Perfil de movimiento</string>
+    <string name="FlexyLiquidNavFluid">Fluido</string>
+    <string name="FlexyLiquidNavMinimal">Minimal</string>
 </resources>

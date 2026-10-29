@@ -15,6 +15,10 @@ public final class LiquidNavigationPreviewView extends FrameLayout implements Th
     private final MainTabsLayout bar;
     private final android.graphics.drawable.GradientDrawable surface=new android.graphics.drawable.GradientDrawable();
     private final GlassTabView[] tabs=new GlassTabView[10];
+    private org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawable nativeSurface, nativeLens;
+    private final android.graphics.Paint samplePaint=new android.graphics.Paint();
+    private final org.telegram.messenger.Utilities.Callback<Boolean> powerListener=this::onPreviewPowerChanged;
+    private void onPreviewPowerChanged(Boolean ignored){refreshNativePreviewPolicy();if(bar!=null)bar.invalidate();}
     private int selected;
     private int[] lastShown=new int[0];
     private final Runnable afterSize=()->{if(isAttachedToWindow())settingsChanged();};
@@ -30,15 +34,52 @@ public final class LiquidNavigationPreviewView extends FrameLayout implements Th
             final int chosen=id;tabs[id].setOnClickListener(v->{selected=chosen;updateSelection();});
             bar.addView(tabs[id]);bar.addTabToIgnoreClick(tabs[id]);
         }
+        setupNativePreviewSource();
         settingsChanged();
+    }
+    private void setupNativePreviewSource(){
+        if(android.os.Build.VERSION.SDK_INT<31)return;
+        var source=new org.telegram.ui.Components.blur3.source.BlurredBackgroundSourceRenderNode(null);
+        source.setupRenderer(new org.telegram.ui.Components.blur3.RenderNodeWithHash.Renderer(){
+            public void renderNodeCalculateHash(org.telegram.ui.Components.blur3.capture.IBlur3Hash hash){
+                hash.add(getWidth());hash.add(getHeight());
+                hash.add(Theme.getColor(Theme.key_windowBackgroundWhite));
+                hash.add(Theme.getColor(Theme.key_windowBackgroundGray));
+            }
+            public void renderNodeUpdateDisplayList(android.graphics.Canvas canvas){
+                canvas.drawColor(Theme.getColor(Theme.key_windowBackgroundWhite));
+                samplePaint.setColor(Theme.getColor(Theme.key_windowBackgroundGray));
+                int step=AndroidUtilities.dp(22);
+                for(int x=0;x<getWidth();x+=step*2)canvas.drawRect(x,0,x+step,getHeight(),samplePaint);
+            }
+        });
+        var factory=new org.telegram.ui.Components.blur3.BlurredBackgroundDrawableViewFactory(source);
+        factory.setSourceRootView(new org.telegram.ui.Components.chat.ViewPositionWatcher(this),this);
+        factory.setLiquidGlassEffectAllowed(org.telegram.messenger.LiteMode.isEnabled(org.telegram.messenger.LiteMode.FLAG_LIQUID_GLASS));
+        nativeSurface=factory.create(bar,org.telegram.ui.Components.blur3.drawable.color.impl.BlurredBackgroundProviderImpl.mainTabs(null));
+        nativeSurface.setPadding(0);bar.setBackground(nativeSurface);
+        nativeLens=factory.create(bar,null);nativeLens.setRadius(AndroidUtilities.dp(28));nativeLens.setPadding(0);
+        bar.setLiquidLensBackground(nativeLens);
     }
     @Override public void updateColors(){
         surface.setColor(Theme.getColor(Theme.key_windowBackgroundWhite));
+        if(nativeSurface!=null)nativeSurface.updateColors();
+        refreshNativePreviewPolicy();
         for(GlassTabView tab:tabs)if(tab!=null)tab.updateColorsLottie();
         bar.invalidate();
     }
+    private void refreshNativePreviewPolicy(){
+        boolean allowed=org.telegram.messenger.LiteMode.isEnabled(org.telegram.messenger.LiteMode.FLAG_LIQUID_GLASS);
+        applyNativePreviewPolicy(nativeSurface,allowed);applyNativePreviewPolicy(nativeLens,allowed);
+    }
+    private void applyNativePreviewPolicy(org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawable drawable,boolean allowed){
+        if(android.os.Build.VERSION.SDK_INT>=33 && drawable instanceof org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawableRenderNode){
+            ((org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawableRenderNode)drawable).setLiquidGlassEffectAllowed(allowed);
+        }
+    }
     private void updateSelection(){for(int i=0;i<tabs.length;i++)tabs[i].setSelected(i==selected,true);bar.invalidate();}
     public void settingsChanged(){
+        refreshNativePreviewPolicy();
         int available=getWidth()>0?getWidth():AndroidUtilities.displaySize.x-AndroidUtilities.dp(40);
         int[] shown=LiquidNavigationDestinations.fit(LiquidNavigationConfig.order(),Math.max(2,(available-AndroidUtilities.dp(16))/AndroidUtilities.dp(48)));
         if(!LiquidNavigationDestinations.contains(shown,selected))selected=shown[0];
@@ -54,11 +95,17 @@ public final class LiquidNavigationPreviewView extends FrameLayout implements Th
             lastShown=shown;
         }
         surface.setCornerRadius(AndroidUtilities.dp(LiquidNavigationConfig.heightDp()/2f));
+        if(nativeSurface!=null)nativeSurface.setRadius(AndroidUtilities.dp(LiquidNavigationConfig.heightDp()/2f));
         bar.refreshLiquidAppearance();
         android.view.ViewGroup.LayoutParams lp=bar.getLayoutParams();int height=AndroidUtilities.dp(LiquidNavigationConfig.heightDp()+16);if(lp.height!=height){lp.height=height;bar.setLayoutParams(lp);}
         updateSelection();requestLayout();invalidate();
     }
     @Override protected void onSizeChanged(int w,int h,int oldw,int oldh){super.onSizeChanged(w,h,oldw,oldh);if(w!=oldw){removeCallbacks(afterSize);post(afterSize);}}
-    @Override protected void onDetachedFromWindow(){removeCallbacks(afterSize);super.onDetachedFromWindow();}
+    @Override protected void onAttachedToWindow(){
+        super.onAttachedToWindow();org.telegram.messenger.LiteMode.addOnPowerSaverAppliedListener(powerListener);refreshNativePreviewPolicy();
+    }
+    @Override protected void onDetachedFromWindow(){
+        org.telegram.messenger.LiteMode.removeOnPowerSaverAppliedListener(powerListener);removeCallbacks(afterSize);super.onDetachedFromWindow();
+    }
     @Override protected void onMeasure(int w,int h){super.onMeasure(w,MeasureSpec.makeMeasureSpec(AndroidUtilities.dp(LiquidNavigationConfig.heightDp()+44),MeasureSpec.EXACTLY));}
 }

@@ -1213,6 +1213,8 @@ public class ChatActivity extends BaseFragment implements
     private final app.flexygram.bubbles.interaction.SelectedBubbleMotion selectedBubbleMotion =
             new app.flexygram.bubbles.interaction.SelectedBubbleMotion();
     private MessageObject selectedBubbleMotionMessage;
+    private float selectedBubbleOffsetY;
+    private float selectedBubblePreviewScale = 1f;
     private View scrimView;
     private float scrimViewAlpha = 1f;
     private float scrimViewProgress = 0f;
@@ -3766,8 +3768,8 @@ public class ChatActivity extends BaseFragment implements
         LiteMode.removeOnPowerSaverAppliedListener(signatureGlassPowerListener);
         selectedBubbleMotion.reset();
         selectedBubbleMotionMessage = null;
-        if(flexyBubbleStickerSession!=null){flexyBubbleStickerSession.close();flexyBubbleStickerSession=null;}
-        if(flexyBubbleStickerExport!=null){flexyBubbleStickerExport.cancel();flexyBubbleStickerExport=null;}
+        selectedBubbleOffsetY = 0f;
+        selectedBubblePreviewScale = 1f;
         app.flexygram.studio.FlexyStyleInstallHelper.cancel(this);
         app.exteraless.plugins.menus.MenuInjector.releaseMessageMenu(this);
         super.onFragmentDestroy();
@@ -11785,6 +11787,8 @@ public class ChatActivity extends BaseFragment implements
         }
         selectedBubbleMotion.reset();
         selectedBubbleMotionMessage = null;
+        selectedBubbleOffsetY = 0f;
+        selectedBubblePreviewScale = 1f;
         this.scrimView = scrimView;
         if (this.scrimView instanceof ChatActionCell) {
             ((ChatActionCell) this.scrimView).setInvalidateWithParent(fragmentView);
@@ -11847,7 +11851,10 @@ public class ChatActivity extends BaseFragment implements
         contentView.addView(instantCameraView, index, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.LEFT | Gravity.TOP));
     }
 
+    private int scrimBlurGeneration;
+
     private void dimBehindView(float value, boolean blur, boolean hidePagedownButtons) {
+        final int blurGeneration = ++scrimBlurGeneration;
         boolean enable = value > 0;
         if (scrimView instanceof ChatMessageCell) {
             ChatMessageCell cell = (ChatMessageCell) scrimView;
@@ -11877,6 +11884,13 @@ public class ChatActivity extends BaseFragment implements
 
             if (blur) {
                 ScrimOptions.makeGlobalBlurBitmaps((bitmapBg, bitmapOptions) -> {
+                    if (blurGeneration != scrimBlurGeneration || fragmentView == null
+                            || !fragmentView.isAttachedToWindow() || scrimView == null) {
+                        bitmapBg.recycle();
+                        bitmapOptions.recycle();
+                        return;
+                    }
+                    if (scrimBlurBitmap != null) scrimBlurBitmap.recycle();
                     scrimBlurBitmap = bitmapBg;
                     scrimBlurBitmapPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
                     scrimBlurBitmapPaint.setShader(scrimBlurBitmapShader = new BitmapShader(scrimBlurBitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP));
@@ -18833,8 +18847,11 @@ public class ChatActivity extends BaseFragment implements
 
         @Override
         protected void onDetachedFromWindow() {
+            ++scrimBlurGeneration;
             selectedBubbleMotion.reset();
             selectedBubbleMotionMessage = null;
+            selectedBubbleOffsetY = 0f;
+            selectedBubblePreviewScale = 1f;
             LiteMode.removeOnPowerSaverAppliedListener(signatureGlassPowerListener);
             if (signatureWallpaperBlur != null) { signatureWallpaperBlur.close(); signatureWallpaperBlur = null; }
             super.onDetachedFromWindow();
@@ -19378,6 +19395,12 @@ public class ChatActivity extends BaseFragment implements
                             viewClipBottom = Math.min(viewClipBottom, chatListView.getY() + cell.getY() + cell.getPollButtonBottom(index));
                         }
 
+                        if (cell != null && selectedBubbleMotionMessage == cell.getMessageObject()) {
+                            viewClipTop = listTop;
+                            viewClipBottom = getHeight() - windowInsetsStateHolder.getCurrentMaxBottomInset();
+                            viewClipLeft = chatListView.getLeft();
+                            viewClipRight = chatListView.getRight();
+                        }
                         if (viewClipTop < viewClipBottom) {
                             if (child.getAlpha() != 1f) {
                                 canvas.saveLayerAlpha(viewClipLeft, viewClipTop, viewClipRight, viewClipBottom, (int) (255 * child.getAlpha()), Canvas.ALL_SAVE_FLAG);
@@ -19393,20 +19416,21 @@ public class ChatActivity extends BaseFragment implements
                             }
                             canvas.clipRect(viewClipLeft, viewClipTop, viewClipRight, viewClipBottom);
                             canvas.translate(chatListView.getLeft() + child.getX(), chatListView.getY() + child.getY());
+                            // Scale the selected overlay, never a recycled cell's properties.
+                            if (cell != null && scrimGroup == null && scrimViewTask == null
+                                    && scrimViewReaction == null
+                                    && selectedBubbleMotionMessage == cell.getMessageObject()) {
+                                canvas.translate(0, selectedBubbleOffsetY * selectedBubbleMotion.progress());
+                                float scale = (1f + (selectedBubblePreviewScale-1f)*selectedBubbleMotion.progress()) * selectedBubbleMotion.scale();
+                                canvas.scale(scale, scale,
+                                        (cell.getBackgroundDrawableLeft() + cell.getBackgroundDrawableRight()) * .5f,
+                                        (cell.getBackgroundDrawableTop() + cell.getBackgroundDrawableBottom()) * .5f);
+                            }
                             if (cell != null && scrimGroup == null && cell.drawBackgroundInParent()) {
                                 canvas.save();
                                 canvas.translate(0, cell.getPaddingTop());
                                 cell.drawBackgroundInternal(canvas, true);
                                 canvas.restore();
-                            }
-                            // Scale the selected overlay, never a recycled cell's properties.
-                            if (cell != null && scrimGroup == null && scrimViewTask == null
-                                    && scrimViewReaction == null
-                                    && selectedBubbleMotionMessage == cell.getMessageObject()) {
-                                float scale = selectedBubbleMotion.scale();
-                                canvas.scale(scale, scale,
-                                        (cell.getBackgroundDrawableLeft() + cell.getBackgroundDrawableRight()) * .5f,
-                                        (cell.getBackgroundDrawableTop() + cell.getBackgroundDrawableBottom()) * .5f);
                             }
                             child.draw(canvas);
                             if (cell != null && cell.hasOutboundsContent()) {
@@ -21893,9 +21917,6 @@ public class ChatActivity extends BaseFragment implements
 
     @Override
     public void onActivityResultFragment(int requestCode, int resultCode, Intent data) {
-        if(requestCode==app.flexygram.bubbles.interaction.BubbleStickerExport.REQUEST){
-            if(flexyBubbleStickerExport!=null)flexyBubbleStickerExport.result(resultCode,data);return;
-        }
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == 0 || requestCode == 2) {
                 createChatAttachView();
@@ -32758,48 +32779,6 @@ public class ChatActivity extends BaseFragment implements
         }
     }
 
-    private app.flexygram.bubbles.interaction.BubbleStickerSession flexyBubbleStickerSession;
-    private app.flexygram.bubbles.interaction.BubbleStickerExport flexyBubbleStickerExport;
-
-    /** Revalidate native content/send permissions at preparation AND the explicit send click. */
-    private boolean canUseFlexyBubbleSticker(ChatMessageCell cell, MessageObject message) {
-        if (getParentActivity()==null || cell==null || message==null || message.currentAccount!=currentAccount
-                || selectedObject!=message || message.getDialogId()!=dialog_id
-                || cell.getPrimaryMessageObject()!=message || chatMode!=MODE_DEFAULT || !canSendMessage()
-                || chatActivityEnterView==null || chatActivityEnterView.getSlowModeTimer()!=null
-                || getMessagesController().getSendPaidMessagesStars(dialog_id)>0
-                || currentChat!=null && (!ChatObject.canSendStickers(currentChat) || !ChatObject.canWriteToChat(currentChat))) return false;
-        ArrayList<Integer> icons=new ArrayList<>(),options=new ArrayList<>();
-        ArrayList<CharSequence> items=new ArrayList<>();
-        fillMessageMenu(message,icons,items,options);
-        return lastMessageMenuStatus.allowCopy && lastMessageMenuStatus.allowForward
-                && app.flexygram.bubbles.interaction.NativeBubbleStickerPainter.eligible(cell,message);
-    }
-
-    private app.flexygram.bubbles.interaction.BubbleStickerSession createFlexyBubbleStickerSession(
-            app.flexygram.bubbles.interaction.BubbleActionPanelView panel, ChatMessageCell cell, MessageObject message) {
-        if(flexyBubbleStickerSession!=null)flexyBubbleStickerSession.close();
-        if(flexyBubbleStickerExport==null)flexyBubbleStickerExport=new app.flexygram.bubbles.interaction.BubbleStickerExport(this);
-        final int account=currentAccount;
-        final long dialog=dialog_id;
-        return flexyBubbleStickerSession=new app.flexygram.bubbles.interaction.BubbleStickerSession(panel,
-                getParentActivity().getCacheDir(),()->currentAccount==account && dialog_id==dialog && canUseFlexyBubbleSticker(cell,message),
-                ()->new app.flexygram.bubbles.interaction.NativeBubbleStickerPainter(cell,message),
-                (file,metadata,result)->{
-                    if(currentAccount!=account || dialog_id!=dialog || !canUseFlexyBubbleSticker(cell,message)) {
-                        result.complete(null,new IllegalStateException("Native send admission changed"));return;
-                    }
-                    SendMessagesHelper.SendMessageParams request=SendMessagesHelper.SendMessageParams.of(
-                            (TLRPC.TL_document)metadata,null,file.getAbsolutePath(),dialog,
-                            replyingMessageObject,getThreadMessage(),null,null,null,null,true,0,0,0,null,null,false);
-                    request.replyQuote=replyingQuote;
-                    request.sendMessageChatArguments=getMessageChatSendParams();
-                    request.monoForumPeer=getSendMonoForumPeerId();
-                    request.suggestionParams=getSendMessageSuggestionParams();
-                    app.flexygram.bubbles.interaction.NativeBubbleStickerSender.send(account,request,file,result);
-                },file->flexyBubbleStickerExport.save(file));
-    }
-
     /** Native menu policy is the authority; no independent permission rules. */
     private java.util.EnumSet<app.flexygram.bubbles.interaction.BubbleActionPanelView.Action> signatureContextActions(ArrayList<Integer> options) {
         var actions=java.util.EnumSet.noneOf(app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.class);
@@ -33291,9 +33270,7 @@ public class ChatActivity extends BaseFragment implements
             final boolean compactContext = longpress && !onDoubleTapped && v instanceof ChatMessageCell
                     && selectedObject == ((ChatMessageCell)v).getMessageObject()
                     && selectedObject != null && selectedObjectGroup == null && !selectedObject.isSponsored()
-                    && !selectedObject.isEphemeral() && !suggestEdit && AndroidUtilities.displaySize.x >= dp(320)
-                    && getParentActivity().getResources().getDisplayMetrics().scaledDensity
-                        <= getParentActivity().getResources().getDisplayMetrics().density * 1.3f
+                    && !selectedObject.isEphemeral() && !suggestEdit
                     && app.flexygram.bubbles.interaction.BubbleInteractionSettings.signaturePanel(getParentActivity());
             if(compactContext) flags |= ActionBarPopupWindow.ActionBarPopupWindowLayout.FLAG_USE_SWIPEBACK;
             ActionBarPopupWindow.ActionBarPopupWindowLayout popupLayout = new ActionBarPopupWindow.ActionBarPopupWindowLayout(getParentActivity(), R.drawable.popup_fixed_alert4, themeDelegate, flags);
@@ -33318,6 +33295,12 @@ public class ChatActivity extends BaseFragment implements
                 .setRadius(dp(compactContext ? 24 : 12))
                 .setPadding(dp(8)));
 
+            if (compactContext && !signatureContextActions(options).isEmpty()) {
+                android.graphics.drawable.GradientDrawable surface = new android.graphics.drawable.GradientDrawable();
+                surface.setColor(0xe62b3540);
+                surface.setCornerRadius(dp(20));
+                popupLayout.setBackground(surface);
+            }
             boolean addGap = false;
 
             if (optionsView == null) {
@@ -34404,34 +34387,30 @@ public class ChatActivity extends BaseFragment implements
                 final var admitted=signatureContextActions(options);
                 if (!admitted.isEmpty()) {
                     admitted.add(app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.SELECT);
-                    final boolean stickerAllowed=canUseFlexyBubbleSticker(panelCell,panelMessage);
-                    if(stickerAllowed){
-                        admitted.add(app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.BUILD_STICKER);
-                        admitted.add(app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.SEND_STICKER);
-                        admitted.add(app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.SAVE_STICKER);
-                    }
-                    panel.setBackground(null); // Shared native popup Glass, no opaque second card.
-                    panel.setMinimumWidth(dp(260));panel.setConfiguration(admitted,stickerAllowed);
-                    final app.flexygram.bubbles.interaction.BubbleStickerSession stickerSession=stickerAllowed
-                            ? createFlexyBubbleStickerSession(panel,panelCell,panelMessage):null;
+                    panel.setMinimumWidth(dp(232));
+                    panel.setAllowedActions(admitted);
                     ArrayList<View> nativeItems=new ArrayList<>();
                     for(int i=0;i<popupLayout.getItemsCount();i++)nativeItems.add(popupLayout.getItemAt(i));
                     popupLayout.removeInnerViews();
                     LinearLayout nativeMenu=new LinearLayout(getParentActivity());nativeMenu.setOrientation(LinearLayout.VERTICAL);
+                    nativeMenu.setBackgroundColor(getThemedColor(Theme.key_actionBarDefaultSubmenuBackground));
                     ActionBarMenuSubItem backToActions=new ActionBarMenuSubItem(getParentActivity(),true,false,themeDelegate);
                     backToActions.setTextAndIcon(getString(R.string.FlexyContextActions),R.drawable.ic_ab_back);
                     backToActions.setOnClickListener(view->popupLayout.getSwipeBack().closeForeground());nativeMenu.addView(backToActions);
                     for(View nativeItem:nativeItems)nativeMenu.addView(nativeItem);
                     android.widget.ScrollView nativeScroll=new android.widget.ScrollView(getParentActivity());nativeScroll.addView(nativeMenu);
                     final int nativeMenuIndex=popupLayout.addViewToSwipeBack(nativeScroll);
-                    popupLayout.addView(panel);
+                    android.widget.ScrollView signatureActionsScroll=new android.widget.ScrollView(getParentActivity()) {
+                        @Override protected void onMeasure(int widthSpec,int heightSpec) {
+                            int limit=Math.max(dp(96),Math.min(dp(336),(int)(chatListView.getHeight()*.42f)));
+                            super.onMeasure(widthSpec,View.MeasureSpec.makeMeasureSpec(limit,View.MeasureSpec.AT_MOST));
+                        }
+                    };
+                    signatureActionsScroll.setFillViewport(false);
+                    signatureActionsScroll.addView(panel);
+                    popupLayout.addView(signatureActionsScroll);
                     panel.setListener(action->{
                         if(selectedObject!=panelMessage || panelCell.getMessageObject()!=panelMessage || getParentActivity()==null)return;
-                        if(action==app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.BUILD_STICKER
-                                || action==app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.SEND_STICKER
-                                || action==app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.SAVE_STICKER){
-                            if(stickerSession!=null)stickerSession.handle(action);return;
-                        }
                         if(action==app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.MORE){
                             popupLayout.getSwipeBack().openForeground(nativeMenuIndex);return;
                         }
@@ -34502,6 +34481,7 @@ public class ChatActivity extends BaseFragment implements
                 }
             });
 
+            View signatureMessageGap = null;
             ReactionsContainerLayout reactionsLayout = null;
             if (optionsView != null) {
                 scrimPopupContainerLayout.addView(optionsView);
@@ -34560,7 +34540,7 @@ public class ChatActivity extends BaseFragment implements
                         }
                     });
 
-                    LinearLayout.LayoutParams params = LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, (int) (52 + reactionsLayout.getTopOffset() / AndroidUtilities.density + pad), Gravity.RIGHT, 0, 50, 0, -20);
+                    LinearLayout.LayoutParams params = LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, (int) (52 + reactionsLayout.getTopOffset() / AndroidUtilities.density + pad), Gravity.RIGHT, 0, compactContext ? 0 : 50, 0, -20);
                     scrimPopupContainerLayout.addView(reactionsLayout, params);
                     scrimPopupContainerLayout.setReactionsLayout(reactionsLayout);
                     scrimPopupContainerLayout.setClipChildren(false);
@@ -34598,6 +34578,11 @@ public class ChatActivity extends BaseFragment implements
                 }
 
                 boolean showNoForwards = (isPeerNoForwards() || message.messageOwner.noforwards && currentUser != null && currentUser.bot) && message.messageOwner.action == null && message.isSent() && !message.isEditing() && chatMode != MODE_SCHEDULED && chatMode != MODE_SAVED && getDialogId() != UserObject.VERIFY;
+                if (compactContext) {
+                    signatureMessageGap = new View(getParentActivity());
+                    scrimPopupContainerLayout.addView(signatureMessageGap,
+                            new LinearLayout.LayoutParams(1, 0));
+                }
                 scrimPopupContainerLayout.addView(popupLayout, LayoutHelper.createLinearRelatively(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT, isReactionsAvailable ? 16 : 0, 0, isReactionsAvailable ? 36 : 0, 0));
                 scrimPopupContainerLayout.setPopupWindowLayout(popupLayout);
                 if (showNoForwards) {
@@ -34784,11 +34769,53 @@ public class ChatActivity extends BaseFragment implements
 
             ItemOptions.setGapBackgroundColor(popupLayout, Theme.multAlpha(getThemedColor(Theme.key_actionBarDefaultSubmenuItem), 0.06f));
 
+            int signaturePopupY = Integer.MIN_VALUE;
+            float signatureOffsetY = 0f;
+            float signaturePreviewScale = 1f;
+            if (compactContext && signatureMessageGap != null) {
+                ChatMessageCell selectedCell = (ChatMessageCell) v;
+                int[] window = new int[2];
+                chatListView.getLocationInWindow(window);
+                float selectedTop = window[1] + v.getY() + selectedCell.getBackgroundDrawableTop();
+                float selectedHeight = Math.max(1, selectedCell.getBackgroundDrawableBottom()
+                        - selectedCell.getBackgroundDrawableTop());
+                int availableTop = Math.max(AndroidUtilities.statusBarHeight, window[1]) + dp(8);
+                int availableBottom = Math.min(window[1] + chatListView.getHeight(),
+                        AndroidUtilities.displaySize.y - windowInsetsStateHolder.getCurrentMaxBottomInset() - dp(8));
+                int baseHeight = scrimPopupContainerLayout.getMeasuredHeight();
+                int gapHeight = Math.max(0, Math.min((int) selectedHeight + dp(16),
+                        availableBottom - availableTop - baseHeight));
+                signatureMessageGap.getLayoutParams().height = gapHeight;
+                scrimPopupContainerLayout.setMaxHeight(availableBottom - availableTop);
+                scrimPopupContainerLayout.measure(
+                        View.MeasureSpec.makeMeasureSpec(chatListView.getWidth(), View.MeasureSpec.AT_MOST),
+                        View.MeasureSpec.makeMeasureSpec(availableBottom - availableTop, View.MeasureSpec.AT_MOST));
+                int gapTop = 0;
+                for (int i = 0; i < scrimPopupContainerLayout.getChildCount(); i++) {
+                    View child = scrimPopupContainerLayout.getChildAt(i);
+                    if (child == signatureMessageGap) break;
+                    LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) child.getLayoutParams();
+                    gapTop += child.getMeasuredHeight() + lp.topMargin + lp.bottomMargin;
+                }
+                signaturePreviewScale = Math.min(1f, Math.max(1, gapHeight - dp(16)) / selectedHeight);
+                signaturePopupY = Math.max(availableTop, Math.min((int) selectedTop - gapTop - dp(8),
+                        availableBottom - scrimPopupContainerLayout.getMeasuredHeight()));
+                // Scale around the original bubble centre, then place its upper edge in the gap.
+                float scaledTop = selectedTop + selectedHeight * (1f - signaturePreviewScale) * .5f;
+                signatureOffsetY = signaturePopupY + gapTop + dp(8) - scaledTop;
+            }
             int popupX = v.getLeft() + (int) x - scrimPopupContainerLayout.getMeasuredWidth() + backgroundPaddings.left - AndroidUtilities.dp(28);
             if (popupX < AndroidUtilities.dp(6)) {
                 popupX = AndroidUtilities.dp(6);
             } else if (popupX > chatListView.getMeasuredWidth() - AndroidUtilities.dp(6) - scrimPopupContainerLayout.getMeasuredWidth()) {
                 popupX = chatListView.getMeasuredWidth() - AndroidUtilities.dp(6) - scrimPopupContainerLayout.getMeasuredWidth();
+            }
+            if (compactContext) {
+                ChatMessageCell selectedCell=(ChatMessageCell)v;
+                int edge = selectedObject.isOutOwner() ? selectedCell.getBackgroundDrawableRight()
+                        - scrimPopupContainerLayout.getMeasuredWidth() : selectedCell.getBackgroundDrawableLeft();
+                popupX = Math.max(dp(6),Math.min((int)(v.getX()+edge),
+                        chatListView.getWidth()-dp(6)-scrimPopupContainerLayout.getMeasuredWidth()));
             }
             if (AndroidUtilities.isTablet()) {
                 int[] location = new int[2];
@@ -34821,15 +34848,32 @@ public class ChatActivity extends BaseFragment implements
             } else {
                 popupY = inBubbleMode ? 0 : AndroidUtilities.statusBarHeight;
             }
+            if (signaturePopupY != Integer.MIN_VALUE) popupY = signaturePopupY;
+            final float signatureBubbleOffset = signatureOffsetY;
+            final float signatureBubbleScale = signaturePreviewScale;
             final int finalPopupX = scrimPopupX = popupX;
             final int finalPopupY = scrimPopupY = popupY;
             scrimPopupContainerLayout.setMaxHeight(maxY + height - popupY);
             ReactionsContainerLayout finalReactionsLayout = reactionsLayout;
+            final ActionBarPopupWindow signatureMenuOwner = scrimPopupWindow;
+            final MessageObject signatureSelectedMessage = selectedObject;
             Runnable showMenu = () -> {
+                if (scrimPopupWindow != signatureMenuOwner || compactContext
+                        && (selectedObject != signatureSelectedMessage
+                            || ((ChatMessageCell)v).getMessageObject() != signatureSelectedMessage)) return;
                 if (scrimPopupWindow == null || fragmentView == null || scrimPopupWindow.isShowing() || !AndroidUtilities.isActivityRunning(getParentActivity())) {
                     return;
                 }
                 scrimPopupWindow.showAtLocation(chatListView, Gravity.LEFT | Gravity.TOP, finalPopupX, finalPopupY);
+                if (compactContext) {
+                    dimBehindView(v, true, true);
+                    selectedBubbleMotionMessage = selectedObject;
+                    selectedBubbleOffsetY = signatureBubbleOffset;
+                    selectedBubblePreviewScale = signatureBubbleScale;
+                    if (app.flexygram.bubbles.interaction.BubbleInteractionSettings.springBounce(getParentActivity())) {
+                        selectedBubbleMotion.enter(() -> { if (contentView != null) contentView.invalidate(); });
+                    }
+                }
                 if (isReactionsAvailableFinal && finalReactionsLayout != null) {
                     finalReactionsLayout.startEnterAnimation(true);
                 }
@@ -34853,13 +34897,7 @@ public class ChatActivity extends BaseFragment implements
             if (glassMenu && scrimBlur3SourceBitmap.getBitmap() == null) {
                 GlassMenuHelper.captureBlur(scrimBlur3SourceBitmap, scrimBlur3Factory, fragmentView);
             }
-            dimBehindView(v, true);
-            if (compactContext && app.flexygram.bubbles.interaction.BubbleInteractionSettings.springBounce(getParentActivity())) {
-                selectedBubbleMotionMessage = selectedObject;
-                selectedBubbleMotion.enter(() -> {
-                    if (contentView != null) contentView.invalidate();
-                });
-            }
+            if (!compactContext) dimBehindView(v, true);
             hideHints(false);
             if (topUndoView != null) {
                 topUndoView.hide(true, 1);

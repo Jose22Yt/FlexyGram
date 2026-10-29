@@ -661,7 +661,7 @@ public class MessageDrawable extends Drawable {
             // Stable theme color, independent of wallpaper/blur availability and animation phase.
             // Instance paints and the native geometry cache are reused for every draw.
             int color = signatureColor();
-            if (alpha > 0 && app.flexygram.bubbles.BubbleConfig.backgroundBlur(isOut) && flexyGlassSource != null) {
+            if (alpha > 0 && app.flexygram.bubbles.BubbleConfig.backgroundBlur() && flexyGlassSource != null) {
                 // The native bridge carries drawable alpha; message transitions sample the same cache.
                 flexyGlassSource.draw(canvas, path, alpha);
             }

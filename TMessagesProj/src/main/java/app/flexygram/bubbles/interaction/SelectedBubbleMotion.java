@@ -11,6 +11,8 @@ public final class SelectedBubbleMotion {
     private ValueAnimator animator;
     private Runnable invalidate;
     private float scale = 1f;
+    private float progress = 1f;
+    public float progress() { return progress; }
 
     public float scale() { return scale; }
     public boolean isRunning() { return animator != null; }
@@ -20,13 +22,14 @@ public final class SelectedBubbleMotion {
         if ((android.os.Build.VERSION.SDK_INT >= 26 && !ValueAnimator.areAnimatorsEnabled())) return;
         this.invalidate = invalidate;
         scale = .962f;
+        progress = 0f;
         invalidate.run();
         animate(false);
     }
 
     public void close() {
         stop();
-        if (invalidate == null || scale == 1f || (android.os.Build.VERSION.SDK_INT >= 26 && !ValueAnimator.areAnimatorsEnabled())) {
+        if (invalidate == null || (android.os.Build.VERSION.SDK_INT >= 26 && !ValueAnimator.areAnimatorsEnabled())) {
             reset();
             return;
         }
@@ -35,6 +38,7 @@ public final class SelectedBubbleMotion {
 
     private void animate(boolean closing) {
         final float from = scale;
+        final float fromProgress = progress;
         final ValueAnimator running = ValueAnimator.ofFloat(0f, 1f);
         animator = running;
         running.setInterpolator(new LinearInterpolator());
@@ -42,6 +46,8 @@ public final class SelectedBubbleMotion {
         running.addUpdateListener(frame -> {
             if (animator != running) return;
             float t = frame.getAnimatedFraction();
+            progress = closing ? fromProgress * (1f-t)*(1f-t)
+                    : Math.max(0f,Math.min(1f,DampedSpringCurve.progress(t*.330f)));
             scale = closing ? from + (1f - from) * (1f - (1f-t)*(1f-t))
                     : .962f + .038f * DampedSpringCurve.progress(t * .330f);
             if (invalidate != null) invalidate.run();
@@ -51,8 +57,9 @@ public final class SelectedBubbleMotion {
                 if (animator != running) return;
                 animator = null;
                 scale = 1f;
+                progress = closing ? 0f : 1f;
                 Runnable callback = invalidate;
-                invalidate = null;
+                if (closing) invalidate = null;
                 if (callback != null) callback.run();
             }
         });
@@ -72,6 +79,7 @@ public final class SelectedBubbleMotion {
     public void reset() {
         stop();
         scale = 1f;
+        progress = 1f;
         Runnable callback = invalidate;
         invalidate = null;
         if (callback != null) callback.run();

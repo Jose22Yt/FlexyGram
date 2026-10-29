@@ -21,11 +21,12 @@ def restore(path,data):
 
 def verify_current():
     from integration1284_contract import verify_current as verify_next, restore as next_restore
+    from reconstruction1285_contract import read_current
     verify_next()
     s=spec()
     if s['base']!=BASE:raise ValueError('Incorrect continuation base')
     for name,expected in s['reviewed'].items():
-        if hashlib.sha256(next_restore(name,(ROOT/name).read_bytes())).hexdigest()!=expected:raise ValueError('Unreviewed Alpha1283 source: '+name)
+        if hashlib.sha256(next_restore(name,read_current(name))).hexdigest()!=expected:raise ValueError('Unreviewed Alpha1283 source: '+name)
     changed=set(subprocess.check_output(['git','diff','--no-renames',BASE,'--name-only'],cwd=ROOT,text=True).splitlines())
     if changed-paths():raise ValueError('Unreviewed Alpha1283 scope: '+repr(sorted(changed-paths())))
     print('PASS exact Alpha1283 continuation; server/device acceptance remains separate')

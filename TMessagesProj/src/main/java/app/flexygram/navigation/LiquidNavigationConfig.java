@@ -11,10 +11,28 @@ public final class LiquidNavigationConfig {
     private static boolean loaded,configured,enabled,labels=true;
     private static int[] order=LiquidNavigationDestinations.defaults();
     public enum Parameter {
-        OPACITY(55), ELASTICITY(65), DEFORMATION(65), SPEED(50), DAMPING(76),
+        OPACITY(70), REFLECTION(65), OUTLINE(65), INTENSITY(80), LENS_SIZE(60), ELASTICITY(65), DEFORMATION(65), SPEED(50), DAMPING(76),
         REBOUND(30), FOLLOW(100), SETTLE(50), HEIGHT(0), COMPACT(50), SPACING(50), ICON(50), WIDTH(100);
         final int initial; int value;
         Parameter(int initial){this.initial=initial;this.value=initial;}
+    }
+    public enum Profile { FLUID, SIGNATURE, MINIMAL }
+    public static void profile(Profile profile) {
+        load();
+        int[] appearance = profile == Profile.MINIMAL ? new int[]{85,25,35,45,45}
+                : profile == Profile.FLUID ? new int[]{75,45,50,65,55} : new int[]{70,65,65,80,60};
+        Parameter[] names = {Parameter.OPACITY,Parameter.REFLECTION,Parameter.OUTLINE,Parameter.INTENSITY,Parameter.LENS_SIZE};
+        SharedPreferences.Editor editor=prefs().edit();
+        for(int i=0;i<names.length;i++){
+            names[i].value=appearance[i];editor.putInt(names[i].name().toLowerCase(java.util.Locale.ROOT),appearance[i]);
+        }
+        Parameter[] motion={Parameter.ELASTICITY,Parameter.DEFORMATION,Parameter.SPEED,Parameter.DAMPING,Parameter.REBOUND,Parameter.FOLLOW,Parameter.SETTLE};
+        int[] values=profile==Profile.MINIMAL?new int[]{25,25,85,95,0,100,15}
+                :profile==Profile.FLUID?new int[]{55,55,65,85,15,100,35}:new int[]{80,80,60,76,35,100,45};
+        for(int i=0;i<motion.length;i++){
+            motion[i].value=values[i];editor.putInt(motion[i].name().toLowerCase(java.util.Locale.ROOT),values[i]);
+        }
+        configured=true;editor.putBoolean("configured",true).apply();
     }
     private LiquidNavigationConfig(){}
     private static SharedPreferences prefs(){return ApplicationLoader.applicationContext.getSharedPreferences(NAME,Context.MODE_PRIVATE);}

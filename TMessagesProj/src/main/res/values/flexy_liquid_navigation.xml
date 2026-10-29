@@ -34,4 +34,11 @@
     <string name="FlexyLiquidNavIndicator">Liquid indicator</string>
     <string name="FlexyLiquidNavMotion">Motion</string>
     <string name="FlexyLiquidNavDesign">Layout and size</string>
+    <string name="FlexyLiquidNavReflection">Reflections</string>
+    <string name="FlexyLiquidNavOutline">Glass outline</string>
+    <string name="FlexyLiquidNavIntensity">Visual intensity</string>
+    <string name="FlexyLiquidNavLensSize">Resting lens size</string>
+    <string name="FlexyLiquidNavProfilePreset">Motion preset</string>
+    <string name="FlexyLiquidNavFluid">Fluid</string>
+    <string name="FlexyLiquidNavMinimal">Minimal</string>
 </resources>

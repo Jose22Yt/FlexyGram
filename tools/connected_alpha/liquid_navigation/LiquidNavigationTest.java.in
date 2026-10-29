@@ -91,4 +91,67 @@ public class LiquidNavigationTest {
   tabs[0].bringToFront();layout();assertSame(bar,tabs[0].getParent());assertEquals(tabs[0],bar.getChildAt(3));
   assertTrue(center(0)>center(1));
  }
+ @Test public void followingSensitivityNeverAddsPositionLagOrOvershootsTheFinger(){
+  for(int sensitivity:new int[]{0,25,50,100}){
+   LiquidNavigationConfig.value(LiquidNavigationConfig.Parameter.FOLLOW,sensitivity);
+   event(MotionEvent.ACTION_DOWN,center(0));
+   float finger=center(2)+3;
+   event(MotionEvent.ACTION_MOVE,finger);
+   assertEquals(finger,ReflectionHelpers.<Float>getField(bar,"animatedLongSelectedViewCenterX"),.01f);
+   event(MotionEvent.ACTION_CANCEL,finger);
+  }
+ }
+ @Test public void profilesKeepOrderAndGeometryAndPersistActualMotionValues(){
+  LiquidNavigationConfig.order(new int[]{0,6,8});
+  int h=LiquidNavigationConfig.heightDp();
+  LiquidNavigationConfig.profile(LiquidNavigationConfig.Profile.SIGNATURE);
+  assertEquals(80,LiquidNavigationConfig.value(LiquidNavigationConfig.Parameter.ELASTICITY));
+  LiquidNavigationConfig.profile(LiquidNavigationConfig.Profile.MINIMAL);
+  ReflectionHelpers.setStaticField(LiquidNavigationConfig.class,"loaded",false);
+  assertEquals(25,LiquidNavigationConfig.value(LiquidNavigationConfig.Parameter.ELASTICITY));
+  assertEquals(0,LiquidNavigationConfig.value(LiquidNavigationConfig.Parameter.REBOUND));
+  assertArrayEquals(new int[]{0,6,8},LiquidNavigationConfig.order());assertEquals(h,LiquidNavigationConfig.heightDp());
+ }
+ @Test @GraphicsMode(GraphicsMode.Mode.NATIVE)
+ public void fallbackLensStaysTransparentAndDoesNotInjectTheThemeAccent()throws Exception{
+  var renderer=new LiquidLensRenderer();
+  for(int opacity:new int[]{0,55,100}){
+   LiquidNavigationConfig.opacity(opacity);
+   android.graphics.Bitmap bitmap=android.graphics.Bitmap.createBitmap(320,100,android.graphics.Bitmap.Config.ARGB_8888);
+   android.graphics.Canvas canvas=new android.graphics.Canvas(bitmap);
+   renderer.prepare(160,50,100,60,.15f,1);
+   renderer.surface(canvas);renderer.rim(canvas,1);
+   int center=bitmap.getPixel(160,50);
+   assertTrue("fallback cannot become an opaque oval",android.graphics.Color.alpha(center)<40);
+   assertEquals(android.graphics.Color.red(center),android.graphics.Color.green(center));
+   assertEquals(android.graphics.Color.blue(center),android.graphics.Color.green(center));
+   assertEquals(0,android.graphics.Color.alpha(bitmap.getPixel(0,0)));
+   if(opacity==55){try(var file=new java.io.FileOutputStream("liquid-lens-fallback-synthetic.png")){bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG,100,file);}}
+   bitmap.recycle();
+  }
+ }
+
+ @Test public void geometryChangesCancelTheOldFingerSequenceWithoutNavigation(){
+  event(MotionEvent.ACTION_DOWN,center(0));event(MotionEvent.ACTION_MOVE,center(3));
+  bar.setMaxWidth(250);layout();
+  assertFalse(ReflectionHelpers.<Boolean>getField(bar,"flexyDragging"));
+  assertFalse(ReflectionHelpers.<Boolean>getField(bar,"flexyPressed"));
+  event(MotionEvent.ACTION_UP,center(3));assertEquals(0,clicks);
+  event(MotionEvent.ACTION_DOWN,center(1));event(MotionEvent.ACTION_UP,center(1));
+  Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();assertEquals(1,clicks);
+ }
+ @Test public void twoThroughSixNativeTabsKeepTargetsAndFixedOuterGeometry(){
+  java.util.ArrayList<GlassTabView> all=new java.util.ArrayList<>(java.util.Arrays.asList(tabs));
+  for(int count=2;count<=6;count++){
+   while(all.size()<count){var tab=new GlassTabView(activity);all.add(tab);bar.addView(tab);}
+   for(int i=0;i<all.size();i++)bar.setViewVisible(all.get(i),i<count,false);
+   layout();
+   for(int i=0;i<count;i++)assertTrue(all.get(i).getWidth()>=48);
+   int width=bar.getWidth(),height=bar.getHeight();
+   event(MotionEvent.ACTION_DOWN,center(0));event(MotionEvent.ACTION_MOVE,center(1));
+   assertEquals(width,bar.getWidth());assertEquals(height,bar.getHeight());
+   event(MotionEvent.ACTION_CANCEL,center(1));
+  }
+ }
+
 }
