@@ -15,6 +15,9 @@
     <string name="FlexyContextStickerUnconfirmed">Telegram не подтвердил стикер. Проверьте исходящее сообщение перед повтором.</string>
     <string name="FlexyContextStickerSaved">Стикер сохранён</string>
     <string name="FlexyContextStickerSaveFailed">Не удалось сохранить стикер</string>
+    <string name="FlexyContextConvertSticker">Преобразовать в стикер</string>
+    <string name="FlexyContextBounce">Пружинная анимация меню iOS</string>
+    <string name="FlexyContextStickerEnabled">Преобразование сообщений в стикеры</string>
     <string name="FlexyContextInteractions">Взаимодействие с сообщениями</string>
     <string name="FlexyContextDescription">Нативная панель Matte. В стикеры преобразуются полностью видимые текстовые сообщения без ограничений в совместимых облачных чатах. В остальных случаях доступны нативные меню.</string>
 </resources>
