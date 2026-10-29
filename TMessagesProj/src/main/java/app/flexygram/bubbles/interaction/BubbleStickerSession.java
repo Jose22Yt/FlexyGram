@@ -29,7 +29,8 @@ public final class BubbleStickerSession implements BubbleStickerWorkflow.Listene
     }
     public void handle(BubbleActionPanelView.Action action) {
         BubbleActionPanelView view=panel.get();
-        if (closed || view==null || admitted==null || !admitted.getAsBoolean()) return;
+        if (closed || view==null || admitted==null || !admitted.getAsBoolean()
+                || !BubbleInteractionSettings.stickerConversion(view.getContext())) return;
         if (action==BubbleActionPanelView.Action.BUILD_STICKER) {
             if(workflow.isPreparing() || workflow.exportFile()!=null)return;
             view.setStickerStatus(LocaleController.getString(R.string.FlexyContextStickerPreparing));
