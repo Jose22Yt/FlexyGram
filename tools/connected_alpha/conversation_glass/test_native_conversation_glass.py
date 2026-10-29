@@ -22,7 +22,15 @@ assert "void drawFlexyNativeGlassIslands(Canvas canvas)" in composer
 assert "LiteMode.FLAG_LIQUID_GLASS" in composer, "Bottom glass must obey same native flag"
 assert "SharedConfig.chatBlurEnabled()" in composer
 assert "sizeNotifierLayout.drawBlurRect(canvas, getTop(), flexyNativeGlassBounds" in composer
-assert "drawFlexyNativeGlassIsland(canvas, flexyNativeGlassShape)" in composer
+assert "appendFlexyNativeGlassIsland(flexyNativeGlassShape)" in composer
+# All native islands share one blur source/matrix and exactly one draw per parent frame.
+start = composer.index("private void drawFlexyNativeGlassIslands(Canvas canvas)")
+end = composer.index("@Override", start)
+compositor = composer[start:end]
+assert compositor.count("appendFlexyNativeGlassIsland(flexyNativeGlassShape)") == 4
+assert compositor.count("sizeNotifierLayout.drawBlurRect(") == 1
+assert "flexyNativeGlassBounds.union(" in composer
+assert "canvas.clipPath(flexyNativeGlassClip)" in compositor
 assert "getFlexyAttachmentBounds(flexyNativeGlassShape)" in composer
 assert "getFlexyTextPillBounds(flexyNativeGlassShape)" in composer
 assert "getFlexyVoiceBounds(flexyNativeGlassShape)" in composer
