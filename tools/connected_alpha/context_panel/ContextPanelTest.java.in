@@ -46,6 +46,26 @@ public class ContextPanelTest {
   assertNull(named(panel,"FlexyContextConvertSticker"));
   BubbleInteractionSettings.setStickerConversion(activity,true);
  }
+ @Test public void dampedSpringIsSoftBoundedAndRestoresExactIdle() {
+  assertEquals(0f,DampedSpringCurve.progress(0f),0.000001f);
+  assertTrue(DampedSpringCurve.progress(.05f)>0f);
+  assertTrue(DampedSpringCurve.progress(.05f)<1f);
+  float overshoot=DampedSpringCurve.progress(.15f);
+  assertTrue("Elastic peak should exist",overshoot>1f);
+  assertTrue("Peak must remain subtle",overshoot<1.14f);
+  assertTrue("Residual should decay",Math.abs(DampedSpringCurve.progress(.28f)-1f)<.025f);
+  assertEquals(1f,DampedSpringCurve.progress(.33f),0.000001f);
+  assertEquals(1f,DampedSpringCurve.progress(1f),0.000001f);
+ }
+ @Test public void panelReturnsToIdleAfterDetachedAnimation() {
+  BubbleInteractionSettings.setSpringBounce(activity,true);
+  var panel=new BubbleActionPanelView(activity,null);
+  root.addView(panel);
+  root.removeView(panel);
+  assertEquals(1f,panel.getScaleX(),0.000001f);
+  assertEquals(1f,panel.getScaleY(),0.000001f);
+  assertEquals(0f,panel.getTranslationY(),0.000001f);
+ }
  @Test public void localBounceAndStickerOptionsPersist() {
   var context=activity.getApplicationContext();
   BubbleInteractionSettings.setSpringBounce(context,false);
