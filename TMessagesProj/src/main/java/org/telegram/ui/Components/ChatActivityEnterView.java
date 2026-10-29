@@ -5015,6 +5015,10 @@ public class ChatActivityEnterView extends FrameLayout implements
             drawFlexyNativeGlassIsland(canvas, flexyNativeGlassShape);
         if (getFlexyTextPillBounds(flexyNativeGlassShape))
             drawFlexyNativeGlassIsland(canvas, flexyNativeGlassShape);
+        // Once the native send transition is fully settled, its independent circle
+        // receives the same shared wallpaper blur; gestures and animations stay native.
+        if (getFlexySendBounds(flexyNativeGlassShape))
+            drawFlexyNativeGlassIsland(canvas, flexyNativeGlassShape);
         final boolean voice = getFlexyVoiceBounds(flexyNativeGlassShape);
         if (voice) drawFlexyNativeGlassIsland(canvas, flexyNativeGlassShape);
         setFlexyVoiceBackdropDrawn(voice);
@@ -16795,6 +16799,21 @@ public class ChatActivityEnterView extends FrameLayout implements
         out.set(x + inset, y + inset, x + audioVideoButtonContainer.getWidth() - inset,
             y + audioVideoButtonContainer.getHeight() - inset);
         return true;
+    }
+
+    /** Native settled SendButton frame; never sample mid-transition or expanded paid UI. */
+    private boolean getFlexySendBounds(RectF out) {
+        if (!isFlexyCompactPresentation() || sendButton == null || sendButtonContainer == null
+                || sendButton.getVisibility() != VISIBLE || sendButton.getAlpha() != 1f
+                || sendButton.getScaleX() != 1f || sendButton.getScaleY() != 1f
+                || sendButtonContainer.getScaleX() != 1f || sendButtonContainer.getScaleY() != 1f
+                || sendButtonContainer.getAlpha() != 1f || sendButton.isOpen()) return false;
+        final float x = textFieldContainer.getX() + sendButtonContainer.getX()
+                + sendButton.getX() + sendButton.getWidth() - dp(44);
+        final float y = textFieldContainer.getY() + sendButtonContainer.getY() + sendButton.getY();
+        final int inset = dp(flexyInsetDp);
+        out.set(x + inset, y + inset, x + dp(44) - inset, y + dp(44) - inset);
+        return out.width() > 0 && out.height() > 0;
     }
 
     public boolean getFlexyAttachmentBounds(RectF out) {
