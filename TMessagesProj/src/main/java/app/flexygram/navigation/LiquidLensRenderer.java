@@ -67,6 +67,6 @@ public final class LiquidLensRenderer {
         paint.setStyle(Paint.Style.FILL);
     }
     public float magnification() {
-        return 1f + .13f * LiquidNavigationConfig.value(LiquidNavigationConfig.Parameter.INTENSITY) / 100f;
+        return 1f + .42f * LiquidNavigationConfig.value(LiquidNavigationConfig.Parameter.INTENSITY) / 100f;
     }
 }

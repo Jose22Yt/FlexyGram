@@ -17,6 +17,8 @@ public final class LiquidNavigationPreviewView extends FrameLayout implements Th
     private final GlassTabView[] tabs=new GlassTabView[10];
     private org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawable nativeSurface, nativeLens;
     private final android.graphics.Paint samplePaint=new android.graphics.Paint();
+    private final org.telegram.messenger.Utilities.Callback<Boolean> powerListener=this::onPreviewPowerChanged;
+    private void onPreviewPowerChanged(Boolean ignored){refreshNativePreviewPolicy();if(bar!=null)bar.invalidate();}
     private int selected;
     private int[] lastShown=new int[0];
     private final Runnable afterSize=()->{if(isAttachedToWindow())settingsChanged();};
@@ -62,17 +64,22 @@ public final class LiquidNavigationPreviewView extends FrameLayout implements Th
     @Override public void updateColors(){
         surface.setColor(Theme.getColor(Theme.key_windowBackgroundWhite));
         if(nativeSurface!=null)nativeSurface.updateColors();
-        for(var drawable:new org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawable[]{nativeSurface,nativeLens}){
-            if(android.os.Build.VERSION.SDK_INT>=33 && drawable instanceof org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawableRenderNode){
-                ((org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawableRenderNode)drawable)
-                        .setLiquidGlassEffectAllowed(org.telegram.messenger.LiteMode.isEnabled(org.telegram.messenger.LiteMode.FLAG_LIQUID_GLASS));
-            }
-        }
+        refreshNativePreviewPolicy();
         for(GlassTabView tab:tabs)if(tab!=null)tab.updateColorsLottie();
         bar.invalidate();
     }
+    private void refreshNativePreviewPolicy(){
+        boolean allowed=org.telegram.messenger.LiteMode.isEnabled(org.telegram.messenger.LiteMode.FLAG_LIQUID_GLASS);
+        applyNativePreviewPolicy(nativeSurface,allowed);applyNativePreviewPolicy(nativeLens,allowed);
+    }
+    private void applyNativePreviewPolicy(org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawable drawable,boolean allowed){
+        if(android.os.Build.VERSION.SDK_INT>=33 && drawable instanceof org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawableRenderNode){
+            ((org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawableRenderNode)drawable).setLiquidGlassEffectAllowed(allowed);
+        }
+    }
     private void updateSelection(){for(int i=0;i<tabs.length;i++)tabs[i].setSelected(i==selected,true);bar.invalidate();}
     public void settingsChanged(){
+        refreshNativePreviewPolicy();
         int available=getWidth()>0?getWidth():AndroidUtilities.displaySize.x-AndroidUtilities.dp(40);
         int[] shown=LiquidNavigationDestinations.fit(LiquidNavigationConfig.order(),Math.max(2,(available-AndroidUtilities.dp(16))/AndroidUtilities.dp(48)));
         if(!LiquidNavigationDestinations.contains(shown,selected))selected=shown[0];
@@ -94,6 +101,11 @@ public final class LiquidNavigationPreviewView extends FrameLayout implements Th
         updateSelection();requestLayout();invalidate();
     }
     @Override protected void onSizeChanged(int w,int h,int oldw,int oldh){super.onSizeChanged(w,h,oldw,oldh);if(w!=oldw){removeCallbacks(afterSize);post(afterSize);}}
-    @Override protected void onDetachedFromWindow(){removeCallbacks(afterSize);super.onDetachedFromWindow();}
+    @Override protected void onAttachedToWindow(){
+        super.onAttachedToWindow();org.telegram.messenger.LiteMode.addOnPowerSaverAppliedListener(powerListener);refreshNativePreviewPolicy();
+    }
+    @Override protected void onDetachedFromWindow(){
+        org.telegram.messenger.LiteMode.removeOnPowerSaverAppliedListener(powerListener);removeCallbacks(afterSize);super.onDetachedFromWindow();
+    }
     @Override protected void onMeasure(int w,int h){super.onMeasure(w,MeasureSpec.makeMeasureSpec(AndroidUtilities.dp(LiquidNavigationConfig.heightDp()+44),MeasureSpec.EXACTLY));}
 }
