@@ -15,6 +15,8 @@ public final class LiquidNavigationPreviewView extends FrameLayout implements Th
     private final MainTabsLayout bar;
     private final android.graphics.drawable.GradientDrawable surface=new android.graphics.drawable.GradientDrawable();
     private final GlassTabView[] tabs=new GlassTabView[10];
+    private org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawable nativeSurface, nativeLens;
+    private final android.graphics.Paint samplePaint=new android.graphics.Paint();
     private int selected;
     private int[] lastShown=new int[0];
     private final Runnable afterSize=()->{if(isAttachedToWindow())settingsChanged();};
@@ -30,10 +32,42 @@ public final class LiquidNavigationPreviewView extends FrameLayout implements Th
             final int chosen=id;tabs[id].setOnClickListener(v->{selected=chosen;updateSelection();});
             bar.addView(tabs[id]);bar.addTabToIgnoreClick(tabs[id]);
         }
+        setupNativePreviewSource();
         settingsChanged();
+    }
+    private void setupNativePreviewSource(){
+        if(android.os.Build.VERSION.SDK_INT<31)return;
+        var source=new org.telegram.ui.Components.blur3.source.BlurredBackgroundSourceRenderNode(null);
+        source.setupRenderer(new org.telegram.ui.Components.blur3.RenderNodeWithHash.Renderer(){
+            public void renderNodeCalculateHash(org.telegram.ui.Components.blur3.capture.IBlur3Hash hash){
+                hash.add(getWidth());hash.add(getHeight());
+                hash.add(Theme.getColor(Theme.key_windowBackgroundWhite));
+                hash.add(Theme.getColor(Theme.key_windowBackgroundGray));
+            }
+            public void renderNodeUpdateDisplayList(android.graphics.Canvas canvas){
+                canvas.drawColor(Theme.getColor(Theme.key_windowBackgroundWhite));
+                samplePaint.setColor(Theme.getColor(Theme.key_windowBackgroundGray));
+                int step=AndroidUtilities.dp(22);
+                for(int x=0;x<getWidth();x+=step*2)canvas.drawRect(x,0,x+step,getHeight(),samplePaint);
+            }
+        });
+        var factory=new org.telegram.ui.Components.blur3.BlurredBackgroundDrawableViewFactory(source);
+        factory.setSourceRootView(new org.telegram.ui.Components.chat.ViewPositionWatcher(this),this);
+        factory.setLiquidGlassEffectAllowed(org.telegram.messenger.LiteMode.isEnabled(org.telegram.messenger.LiteMode.FLAG_LIQUID_GLASS));
+        nativeSurface=factory.create(bar,org.telegram.ui.Components.blur3.drawable.color.impl.BlurredBackgroundProviderImpl.mainTabs(null));
+        nativeSurface.setPadding(0);bar.setBackground(nativeSurface);
+        nativeLens=factory.create(bar,null);nativeLens.setRadius(AndroidUtilities.dp(28));nativeLens.setPadding(0);
+        bar.setLiquidLensBackground(nativeLens);
     }
     @Override public void updateColors(){
         surface.setColor(Theme.getColor(Theme.key_windowBackgroundWhite));
+        if(nativeSurface!=null)nativeSurface.updateColors();
+        for(var drawable:new org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawable[]{nativeSurface,nativeLens}){
+            if(android.os.Build.VERSION.SDK_INT>=33 && drawable instanceof org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawableRenderNode){
+                ((org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawableRenderNode)drawable)
+                        .setLiquidGlassEffectAllowed(org.telegram.messenger.LiteMode.isEnabled(org.telegram.messenger.LiteMode.FLAG_LIQUID_GLASS));
+            }
+        }
         for(GlassTabView tab:tabs)if(tab!=null)tab.updateColorsLottie();
         bar.invalidate();
     }
@@ -54,6 +88,7 @@ public final class LiquidNavigationPreviewView extends FrameLayout implements Th
             lastShown=shown;
         }
         surface.setCornerRadius(AndroidUtilities.dp(LiquidNavigationConfig.heightDp()/2f));
+        if(nativeSurface!=null)nativeSurface.setRadius(AndroidUtilities.dp(LiquidNavigationConfig.heightDp()/2f));
         bar.refreshLiquidAppearance();
         android.view.ViewGroup.LayoutParams lp=bar.getLayoutParams();int height=AndroidUtilities.dp(LiquidNavigationConfig.heightDp()+16);if(lp.height!=height){lp.height=height;bar.setLayoutParams(lp);}
         updateSelection();requestLayout();invalidate();

@@ -182,12 +182,18 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
     private FrameLayout tabsViewWrapper;
     private MainTabsLayout tabsView;
     private BlurredBackgroundDrawable tabsViewBackground;
+    private BlurredBackgroundDrawable liquidLensBackground;
     private final org.telegram.messenger.Utilities.Callback<Boolean> mainGlassPowerListener = ignored -> refreshMainNativeGlassPolicy();
     private void refreshMainNativeGlassPolicy() {
         if (Build.VERSION.SDK_INT >= 33 && tabsViewBackground instanceof org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawableRenderNode) {
             ((org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawableRenderNode)tabsViewBackground)
                     .setLiquidGlassEffectAllowed(LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS));
             tabsViewBackground.updateColors();
+            if (liquidLensBackground instanceof org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawableRenderNode) {
+                ((org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawableRenderNode)liquidLensBackground)
+                        .setLiquidGlassEffectAllowed(LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS));
+                liquidLensBackground.updateColors();
+            }
             if(tabsView!=null)tabsView.invalidate();
         }
     }
@@ -485,6 +491,10 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         tabsViewBackground.setRadius(MainTabsUiHelper.getBackgroundRadius());
         tabsViewBackground.setPadding(MainTabsUiHelper.getBackgroundInset());
         tabsView.setBackground(tabsViewBackground);
+        liquidLensBackground = iBlur3FactoryGlass.create(tabsView, null);
+        liquidLensBackground.setRadius(dp(28));
+        liquidLensBackground.setPadding(0);
+        tabsView.setLiquidLensBackground(liquidLensBackground);
 
         BlurredBackgroundDrawableViewFactory iBlur3FactoryFade = new BlurredBackgroundDrawableViewFactory(iBlur3SourceColor);
         iBlur3FactoryFade.setSourceRootView(viewPositionWatcher, contentView);

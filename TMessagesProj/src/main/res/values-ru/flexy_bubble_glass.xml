@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="FlexyBubbleGlassEnabled">Glass для пузырей сообщений</string>
-    <string name="FlexyBubbleGlassStrength">Смешивание Glass</string>
-    <string name="FlexyBubbleSurface">Поверхность сообщений</string>
-    <string name="FlexyBubbleSurfaceClassic">Классическая</string>
-    <string name="FlexyBubbleGlassOutgoing">Для исходящих сообщений</string>
-    <string name="FlexyBubbleGlassIncoming">Для входящих сообщений</string>
-</resources>

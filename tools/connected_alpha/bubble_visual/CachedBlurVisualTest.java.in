@@ -16,7 +16,7 @@ public class CachedBlurVisualTest {
  private final java.util.ArrayList<View> views=new java.util.ArrayList<>();
  private View keep(View v){views.add(v);return v;}
  private final java.util.ArrayList<SignatureWallpaperBlur.Owner> owners=new java.util.ArrayList<>();
- @Before public void setup(){SignatureWallpaperBlur.trimMemory(80);ApplicationLoader.applicationContext=RuntimeEnvironment.getApplication();ApplicationLoader.applicationContext.getSharedPreferences(BubbleConfig.FILE,0).edit().clear().commit();BuildConfig.CONNECTED_ALPHA=true;AndroidUtilities.density=1;SharedConfig.bubbleRadius=20;org.telegram.ui.ActionBar.Theme.dark=false;app.exteraless.chats.ChatsConfig.removeMessageTail.value=false;BubbleConfig.load();BubbleConfig.setGlassIntensity(100);BubbleConfig.setBackgroundBlur(true);}
+ @Before public void setup(){SignatureWallpaperBlur.trimMemory(80);ApplicationLoader.applicationContext=RuntimeEnvironment.getApplication();ApplicationLoader.applicationContext.getSharedPreferences(BubbleConfig.FILE,0).edit().clear().commit();BuildConfig.CONNECTED_ALPHA=true;AndroidUtilities.density=1;SharedConfig.bubbleRadius=20;org.telegram.ui.ActionBar.Theme.dark=false;app.exteraless.chats.ChatsConfig.removeMessageTail.value=false;BubbleConfig.load();BubbleConfig.setBackgroundBlur(true);}
  @After public void close(){for(var owner:owners)owner.close();AndroidUtilities.drainMain();org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();BubbleConfig.setBackgroundBlur(false);SignatureWallpaperBlur.trimMemory(80);}
  private SignatureWallpaperBlur.Owner owner(View target){views.add(target);var owner=new SignatureWallpaperBlur.Owner(target);owners.add(owner);return owner;}
  private BitmapDrawable image(int width,int height,int seed){Bitmap b=Bitmap.createBitmap(width,height,Bitmap.Config.ARGB_8888);int[] row=new int[width];for(int y=0;y<height;y++){for(int x=0;x<width;x++)row[x]=((x+y+seed)%2==0)?Color.BLACK:Color.WHITE;b.setPixels(row,0,width,0,y,width,1);}BitmapDrawable d=new BitmapDrawable(Resources.getSystem(),b);d.setBounds(0,0,width,height);return d;}
@@ -58,24 +58,20 @@ public class CachedBlurVisualTest {
   try(var stream=new java.io.FileOutputStream(new java.io.File(System.getProperty("basedir"),"android-native-wallpaper-blur.png"))){assertTrue(evidence.compress(Bitmap.CompressFormat.PNG,100,stream));}
   evidence.recycle();
  }
- @Test public void glassBlendAndOutgoingIncomingScopesUseTheSameRealCache()throws Exception{
-  var owner=owner(keep(new View(ApplicationLoader.applicationContext)));var wallpaper=image(180,100,0);
-  owner.prepare(wallpaper,false,0xff888888);complete();Bitmap prepared=cached(owner);
-  BubbleConfig.setTransparency(100);BubbleConfig.setOutlineEnabled(false);
-  for(boolean out:new boolean[]{false,true}){
-   var bubble=new org.telegram.ui.ActionBar.MessageDrawable(org.telegram.ui.ActionBar.MessageDrawable.TYPE_TEXT,out,false);
-   bubble.setBounds(0,0,160,85);bubble.setTop(0,180,100,false,false);
-   bubble.setFlexyGlassSource(new org.telegram.ui.ActionBar.MessageDrawable.GlassSource(){public boolean draw(Canvas c,Path p){return draw(c,p,255);}public boolean draw(Canvas c,Path p,int alpha){return owner.draw(c,p,0,0,alpha);}});
-   Bitmap result=Bitmap.createBitmap(180,100,Bitmap.Config.ARGB_8888);Canvas canvas=new Canvas(result);
-   for(int blend:new int[]{0,25,50,75,100}){
-    BubbleConfig.setGlassIntensity(blend);result.eraseColor(Color.TRANSPARENT);bubble.draw(canvas);
-    assertEquals(BubbleGlassPolicy.opacity(255,blend),Color.alpha(result.getPixel(80,40)));
-    assertSame(prepared,cached(owner));assertEquals(0,Utilities.globalQueue.pending());
-   }
-   if(out)BubbleConfig.setGlassOutgoing(false);else BubbleConfig.setGlassIncoming(false);
-   result.eraseColor(Color.TRANSPARENT);bubble.draw(canvas);assertEquals(0,Color.alpha(result.getPixel(80,40)));
-   BubbleConfig.setGlassOutgoing(true);BubbleConfig.setGlassIncoming(true);result.recycle();
-  }
+ @Test public void originalBlurIgnoresRetiredGlassStrengthAndScopePreferences()throws Exception{
+  var preferences=ApplicationLoader.applicationContext.getSharedPreferences(BubbleConfig.FILE,0);
+  preferences.edit().putInt("signature_glass_intensity",0).putBoolean("signature_glass_outgoing",false).putBoolean("signature_glass_incoming",false).commit();
+  BubbleConfig.load();assertTrue(BubbleConfig.backgroundBlur());
+  View view=new View(ApplicationLoader.applicationContext);var wallpaper=owner(view);
+  Bitmap bitmap=Bitmap.createBitmap(120,80,Bitmap.Config.ARGB_8888);bitmap.eraseColor(0xff326598);
+  var drawable=new android.graphics.drawable.BitmapDrawable(ApplicationLoader.applicationContext.getResources(),bitmap);
+  drawable.setBounds(0,0,120,80);wallpaper.prepare(drawable,false,0xff000000);
+  Utilities.globalQueue.runAllOnWorker();AndroidUtilities.drainMain();
+  Path shape=new Path();shape.addRect(0,0,120,80,Path.Direction.CW);
+  Bitmap result=Bitmap.createBitmap(120,80,Bitmap.Config.ARGB_8888);
+  assertTrue(wallpaper.draw(new Canvas(result),shape,0,0,173));
+  assertEquals(173,Color.alpha(result.getPixel(60,40)));
+  result.recycle();bitmap.recycle();
  }
  @Test public void oneSharedBoundedImagePreparedOffUiAndSampledWithoutNewJobs()throws Exception{
   View target=keep(new View(ApplicationLoader.applicationContext));var a=owner(target);var b=owner(target);BitmapDrawable source=image(1600,1200,0);

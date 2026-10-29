@@ -3,7 +3,7 @@ package app.flexygram.bubbles.interaction;
 import android.content.Context;
 /** Reuses PR117's cached opt-in preference; cancelled tap motion is not read. */
 public final class BubbleInteractionSettings {
-    private static volatile Boolean panel, bounce, stickers;
+    private static volatile Boolean panel, bounce;
     private BubbleInteractionSettings() {}
     public static boolean signaturePanel(Context context) {
         Boolean value=panel;
@@ -25,17 +25,6 @@ public final class BubbleInteractionSettings {
         bounce = value;
         context.getApplicationContext().getSharedPreferences("flexy_bubble_interaction", 0)
                 .edit().putBoolean("spring_bounce", value).apply();
-    }
-    public static boolean stickerConversion(Context context) {
-        Boolean value = stickers;
-        if (value == null) stickers = value = context.getApplicationContext()
-                .getSharedPreferences("flexy_bubble_interaction", 0).getBoolean("sticker_conversion", true);
-        return value;
-    }
-    public static void setStickerConversion(Context context, boolean value) {
-        stickers = value;
-        context.getApplicationContext().getSharedPreferences("flexy_bubble_interaction", 0)
-                .edit().putBoolean("sticker_conversion", value).apply();
     }
 
 }

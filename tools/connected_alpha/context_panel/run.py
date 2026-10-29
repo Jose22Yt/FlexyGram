@@ -11,17 +11,13 @@ def write(source,root):
         dest=source/path;dest.parent.mkdir(parents=True,exist_ok=True);dest.write_text(text)
     java=root/'TMessagesProj/src/main/java'
     code=''
-    for name in ['BubbleActionPanelView','DampedSpringCurve','SelectedBubbleMotion','BubbleInteractionSettings','BubbleTouchPolicy','BubbleStickerSpec','BubbleStickerEncoder','NativeStickerMetadata','BubbleStickerWorkflow','NativeBubbleStickerPainter','NativeBubbleStickerSender','BubbleStickerSession','BubbleStickerExport']:
+    for name in ['BubbleActionPanelView','DampedSpringCurve','SelectedBubbleMotion','BubbleInteractionSettings']:
         path='app/flexygram/bubbles/interaction/'+name+'.java';text=(java/path).read_text();put(path,text);code+=text
     strings=sorted(set(re.findall(r'R.string.(\w+)',code)));icons=sorted(set(re.findall(r'R.drawable.(\w+)',code)))
     put('org/telegram/messenger/R.java','package org.telegram.messenger; public class R {public static class string {'+''.join('public static final int '+n+'='+str(i+1)+';' for i,n in enumerate(strings))+'} public static class drawable {'+''.join('public static final int '+n+'=android.R.drawable.ic_menu_edit;' for n in icons)+'}}')
     put('org/telegram/messenger/LocaleController.java','package org.telegram.messenger;public class LocaleController {public static String getString(int id){switch(id){'+''.join('case R.string.'+n+':return "'+n+'";' for n in strings)+'default:return "unknown";}}}')
     colors=['windowBackgroundWhiteBlackText','windowBackgroundWhiteGrayText2','windowBackgroundWhiteBlueText','windowBackgroundWhite','windowBackgroundGray','text_RedRegular']
     put('org/telegram/ui/ActionBar/Theme.java','package org.telegram.ui.ActionBar;public class Theme{public interface ResourcesProvider{int getColor(int key);}'+''.join('public static final int key_'+n+'='+str(i+1)+';' for i,n in enumerate(colors))+'public static int getColor(int key){return 0xff203040;}public static int getColor(int key,ResourcesProvider p){return p==null?getColor(key):p.getColor(key);}}')
-    from sticker_stubs import write as write_sticker_stubs
-    write_sticker_stubs(put)
-    for name in ['BubbleStickerNativeTest','BubbleStickerTransportTest']:
-        put(name+'.java',(HERE/(name+'.java.in')).read_text())
     native=(java/'org/telegram/ui/ChatActivity.java').read_text();start=native.index('    private java.util.EnumSet<app.flexygram.bubbles.interaction.BubbleActionPanelView.Action> signatureContextActions(');end=native.index('\n    private boolean createMenu(',start)
     method=native[start:end].replace('private java.util.EnumSet','public java.util.EnumSet')
     put('PanelHostProbe.java','import java.util.ArrayList;public class PanelHostProbe {public static final int OPTION_PIN=13;public static class Status {public boolean allowReply,allowCopy,allowForward,allowEdit,allowDelete;}public Status lastMessageMenuStatus=new Status();'+method+'}')

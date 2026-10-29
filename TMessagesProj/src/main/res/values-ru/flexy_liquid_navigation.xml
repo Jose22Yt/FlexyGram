@@ -34,4 +34,11 @@
     <string name="FlexyLiquidNavIndicator">Жидкий индикатор</string>
     <string name="FlexyLiquidNavMotion">Движение</string>
     <string name="FlexyLiquidNavDesign">Расположение и размер</string>
+    <string name="FlexyLiquidNavReflection">Отражения</string>
+    <string name="FlexyLiquidNavOutline">Контур стекла</string>
+    <string name="FlexyLiquidNavIntensity">Интенсивность эффекта</string>
+    <string name="FlexyLiquidNavLensSize">Размер линзы</string>
+    <string name="FlexyLiquidNavProfilePreset">Профиль движения</string>
+    <string name="FlexyLiquidNavFluid">Плавный</string>
+    <string name="FlexyLiquidNavMinimal">Минимальный</string>
 </resources>

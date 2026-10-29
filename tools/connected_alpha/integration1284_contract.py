@@ -6,20 +6,28 @@ ROOT = Path(__file__).resolve().parents[2]
 BASE = 'e00b33e806921017ad74ff50eb5ec88607131d9c'
 MANIFEST = ROOT/'tools/connected_alpha/integration1284_review.json'
 def spec(): return json.loads(MANIFEST.read_text())
-def paths(): return frozenset(spec()['paths'])
+def paths():
+    from reconstruction1285_contract import paths as next_paths
+    return frozenset(spec()['paths']) | next_paths()
 @lru_cache(maxsize=256)
 def original(path):
     result = subprocess.run(['git','show',BASE+':'+str(path)],cwd=ROOT,capture_output=True)
     return result.stdout if result.returncode == 0 else b''
 def restore(path, data):
+    from reconstruction1285_contract import restore as next_restore
+    data=next_restore(path,data)
     expected = spec()['reviewed'].get(str(path))
     return original(path) if expected and hashlib.sha256(data).hexdigest() == expected else data
-def historical_bytes(path): return restore(path,(ROOT/path).read_bytes())
+def historical_bytes(path):
+    from reconstruction1285_contract import read_current
+    return restore(path,read_current(path))
 def verify_current():
+    from reconstruction1285_contract import verify_current as verify_next,restore as next_restore,read_current
+    verify_next()
     s = spec()
     if s['base'] != BASE: raise ValueError('Incorrect integration base')
     for path, expected in s['reviewed'].items():
-        if hashlib.sha256((ROOT/path).read_bytes()).hexdigest() != expected:
+        if hashlib.sha256(next_restore(path,read_current(path))).hexdigest() != expected:
             raise ValueError('Unreviewed iOS27 source: '+path)
     changed = set(subprocess.check_output(['git','diff','--no-renames',BASE,'--name-only'],cwd=ROOT,text=True).splitlines())
     if changed-paths(): raise ValueError('Unreviewed iOS27 scope: '+repr(sorted(changed-paths())))

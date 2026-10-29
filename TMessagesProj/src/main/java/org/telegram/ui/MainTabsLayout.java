@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.view.ViewConfiguration;
 import app.flexygram.navigation.LiquidNavigationConfig;
 import app.flexygram.navigation.LiquidNavigationMath;
+import app.flexygram.navigation.LiquidLensRenderer;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -375,6 +376,18 @@ public class MainTabsLayout extends AnimatedLinearLayout {
     private void finishPostedNativeTap() {
         if (isAttachedToWindow() && flexyPressed && !flexyDragging) flexyFinishDrag(false);
     }
+    private final LiquidLensRenderer liquidLens = new LiquidLensRenderer();
+    private float flexyDirection;
+    public void setLiquidLensBackground(android.graphics.drawable.Drawable value) {
+        android.graphics.drawable.Drawable previous = liquidLens.backdrop();
+        if (previous != null) previous.setCallback(null);
+        liquidLens.backdrop(value);
+        if (value != null) value.setCallback(this);
+        invalidate();
+    }
+    @Override protected boolean verifyDrawable(@NonNull android.graphics.drawable.Drawable value) {
+        return value == liquidLens.backdrop() || super.verifyDrawable(value);
+    }
     private boolean liquidPreview;
     public void setLiquidPreview(boolean preview) { liquidPreview=preview; refreshLiquidAppearance(); }
     public void refreshLiquidAppearance() { setSkipDrawSelector(flexyLiquidEnabled()); requestLayout(); invalidate(); }
@@ -419,10 +432,12 @@ public class MainTabsLayout extends AnimatedLinearLayout {
             final float room=Math.max(0,Math.min(x-getPaddingLeft(),getWidth()-getPaddingRight()-x))*2f;
             final float sWidth=flexyLiquidEnabled() ? Math.min(wantedWidth,room) : wantedWidth;
             if (flexyLiquidEnabled()) {
-                final int color = Theme.getColor(Theme.key_glass_tabSelected, resourcesProvider);
-                selectorPaint.setColor(Theme.multAlpha(color, (100-LiquidNavigationConfig.opacity()) / 100f));
-            }
-            if (MainTabsUiHelper.isMaterial3NavigationBar() && !flexyLiquidEnabled()) {
+                float size=.80f+LiquidNavigationConfig.value(LiquidNavigationConfig.Parameter.LENS_SIZE)*.0015f;
+                float lensHeight=Math.max(1,getHeight()-getPaddingTop()-getPaddingBottom()-dp(4));
+                liquidLens.prepare(x,getHeight()*.5f,Math.min(sWidth*size,room),
+                        lensHeight*LiquidNavigationMath.compression(flexyStretch),flexyStretch,flexyDirection);
+                liquidLens.surface(canvas);
+            } else if (MainTabsUiHelper.isMaterial3NavigationBar()) {
                 MainTabsUiHelper.setMainTabSelectedIndicatorBounds(selectorRect, sWidth,
                         getHeight() - getPaddingTop() - getPaddingBottom());
                 selectorRect.offset(x - sWidth / 2f, getPaddingTop());
@@ -439,7 +454,21 @@ public class MainTabsLayout extends AnimatedLinearLayout {
             }
         }
 
-        super.dispatchDraw(canvas);
+        if (drawCustomSelector && flexyLiquidEnabled()) {
+            // Draw each visible pixel of the content once: unmagnified outside, refracted inside.
+            int outside=canvas.save();
+            canvas.clipPath(liquidLens.shape(),android.graphics.Region.Op.DIFFERENCE);
+            super.dispatchDraw(canvas);
+            canvas.restoreToCount(outside);
+            int inside=canvas.save();
+            canvas.clipPath(liquidLens.shape());
+            float magnification=liquidLens.magnification();
+            canvas.scale(magnification,magnification,
+                    animatedLongSelectedViewCenterX+animatedLongSelectedViewOffsetX,getHeight()*.5f);
+            super.dispatchDraw(canvas);
+            canvas.restoreToCount(inside);
+            liquidLens.rim(canvas,getResources().getDisplayMetrics().density);
+        } else super.dispatchDraw(canvas);
 
         if (drawTopDivider && MainTabsUiHelper.isMaterial3NavigationBar()) {
             dividerPaint.setColor(Theme.getDividerColor(resourcesProvider));
@@ -525,6 +554,7 @@ public class MainTabsLayout extends AnimatedLinearLayout {
         flexyPreviousEventTime=flexyEventTime;
         flexyDeformation.cancel();
         flexyStretch = 0f;
+        flexyDirection = 0f;
         AndroidUtilities.cancelRunOnUIThread(restoreDrawSelector);
         setSkipDrawSelector(true);
     }
@@ -533,6 +563,8 @@ public class MainTabsLayout extends AnimatedLinearLayout {
         final float width = Math.max(1f, getInterpolatedWidthByX(clamped, this));
         float interval=Math.max(1L,flexyEventTime-flexyPreviousEventTime);
         float normalizedDistance=(clamped-flexyPreviousX)*16f/interval;
+        if (normalizedDistance != 0f) flexyDirection=Math.signum(normalizedDistance);
+        normalizedDistance *= .65f+LiquidNavigationConfig.value(LiquidNavigationConfig.Parameter.FOLLOW)*.0035f;
         flexyPreviousEventTime=flexyEventTime;
         flexyStretch = LiquidNavigationMath.stretch(normalizedDistance, width,
                 LiquidNavigationConfig.elasticity()
@@ -842,8 +874,7 @@ public class MainTabsLayout extends AnimatedLinearLayout {
                 return true;
             } else if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
                 if (action == MotionEvent.ACTION_UP) {
-                    animatedLongSelectedViewCenterX=clampXToChildrenCenters(flexyDownX+(ev.getX()-flexyDownX)
-                            *(.85f+LiquidNavigationConfig.value(LiquidNavigationConfig.Parameter.FOLLOW)*.0015f),this);
+                    animatedLongSelectedViewCenterX=clampXToChildrenCenters(ev.getX(),this);
                 }
                 flexyFinishDrag(action == MotionEvent.ACTION_CANCEL);
                 flexyTracking = false;
@@ -882,8 +913,7 @@ public class MainTabsLayout extends AnimatedLinearLayout {
         } else if(action==MotionEvent.ACTION_MOVE && flexyPressed) {
             int pointer=ev.findPointerIndex(flexyPointerId);
             if(pointer>=0) {
-                float gain=.85f+LiquidNavigationConfig.value(LiquidNavigationConfig.Parameter.FOLLOW)*.0015f;
-                flexyMoveDrag(flexyDownX+(ev.getX(pointer)-flexyDownX)*gain);
+                flexyMoveDrag(ev.getX(pointer));
             }
         } else if(action==MotionEvent.ACTION_POINTER_DOWN || action==MotionEvent.ACTION_POINTER_UP) {
             flexyFinishDrag(true);

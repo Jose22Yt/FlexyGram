@@ -18,15 +18,15 @@ import app.flexygram.navigation.LiquidNavigationConfig.Parameter;
 
 public final class LiquidNavigationSettingsActivity extends SignatureMatteSettingsActivity {
     private static final int PREVIEW=111,SLIDER=112;
-    private int previewRow,tabsRow,enabledRow,labelsRow,resetRow;
+    private int previewRow,tabsRow,enabledRow,labelsRow,resetRow,profileRow;
     private int indicatorHeader,motionHeader,designHeader;
     private final int[] parameterRows=new int[Parameter.values().length];
     private LiquidNavigationPreviewView preview;
     @Override protected String getActionBarTitle(){return getString(R.string.FlexyLiquidNavTitle);}
     @Override protected void updateRows(){
         super.updateRows();previewRow=addRow();tabsRow=addRow("flexyLiquidTabs");
-        indicatorHeader=addRow();enabledRow=addRow("flexyLiquidEnabled");
-        for(Parameter p:new Parameter[]{Parameter.OPACITY,Parameter.ELASTICITY,Parameter.DEFORMATION})parameterRows[p.ordinal()]=addRow("flexyLiquid"+p.name());
+        profileRow=addRow("flexyLiquidProfile");indicatorHeader=addRow();enabledRow=addRow("flexyLiquidEnabled");
+        for(Parameter p:new Parameter[]{Parameter.OPACITY,Parameter.REFLECTION,Parameter.OUTLINE,Parameter.INTENSITY,Parameter.LENS_SIZE,Parameter.ELASTICITY,Parameter.DEFORMATION})parameterRows[p.ordinal()]=addRow("flexyLiquid"+p.name());
         motionHeader=addRow();
         for(Parameter p:new Parameter[]{Parameter.SPEED,Parameter.DAMPING,Parameter.REBOUND,Parameter.FOLLOW,Parameter.SETTLE})parameterRows[p.ordinal()]=addRow("flexyLiquid"+p.name());
         designHeader=addRow();
@@ -37,6 +37,15 @@ public final class LiquidNavigationSettingsActivity extends SignatureMatteSettin
     @Override protected BaseListAdapter createAdapter(Context c){return new Adapter(c);}
     @Override protected void onItemClick(View view,int pos,float x,float y){
         if(pos==tabsRow){LiquidNavigationTabsActivity editor=new LiquidNavigationTabsActivity();editor.setCurrentAccount(currentAccount);presentFragment(editor);return;}
+        if(pos==profileRow){
+            String[] profiles={getString(R.string.FlexyLiquidNavFluid),"Liquid Signature",getString(R.string.FlexyLiquidNavMinimal)};
+            showDialog(new org.telegram.ui.ActionBar.AlertDialog.Builder(getParentActivity(),getResourceProvider())
+                    .setTitle(getString(R.string.FlexyLiquidNavProfilePreset))
+                    .setItems(profiles,(dialog,which)->{
+                        LiquidNavigationConfig.profile(LiquidNavigationConfig.Profile.values()[which]);
+                        if(preview!=null)preview.settingsChanged();listAdapter.notifyDataSetChanged();
+                    }).create());return;
+        }
         if(pos==enabledRow)LiquidNavigationConfig.enabled(!LiquidNavigationConfig.enabled());
         else if(pos==labelsRow)LiquidNavigationConfig.labels(!LiquidNavigationConfig.labels());
         else if(pos==resetRow)LiquidNavigationConfig.reset();else return;
@@ -45,6 +54,10 @@ public final class LiquidNavigationSettingsActivity extends SignatureMatteSettin
     private Parameter parameter(int row){for(Parameter p:Parameter.values())if(parameterRows[p.ordinal()]==row)return p;return null;}
     private int label(Parameter p){
         switch(p){
+            case REFLECTION:return R.string.FlexyLiquidNavReflection;
+            case OUTLINE:return R.string.FlexyLiquidNavOutline;
+            case INTENSITY:return R.string.FlexyLiquidNavIntensity;
+            case LENS_SIZE:return R.string.FlexyLiquidNavLensSize;
             case OPACITY:return R.string.FlexyLiquidNavOpacity;case ELASTICITY:return R.string.FlexyLiquidNavElasticity;
             case DEFORMATION:return R.string.FlexyLiquidNavDeformation;case SPEED:return R.string.FlexyLiquidNavSpeed;
             case DAMPING:return R.string.FlexyLiquidNavDamping;case REBOUND:return R.string.FlexyLiquidNavRebound;
@@ -71,7 +84,7 @@ public final class LiquidNavigationSettingsActivity extends SignatureMatteSettin
     }
     private final class Adapter extends MatteListAdapter {
         Adapter(Context c){super(c);}
-        @Override public int getItemViewType(int p){if(p==previewRow)return PREVIEW;if(parameter(p)!=null)return SLIDER;if(p==indicatorHeader||p==motionHeader||p==designHeader)return TYPE_HEADER;if(p==tabsRow||p==resetRow)return TYPE_SETTINGS;return TYPE_CHECK;}
+        @Override public int getItemViewType(int p){if(p==previewRow)return PREVIEW;if(parameter(p)!=null)return SLIDER;if(p==indicatorHeader||p==motionHeader||p==designHeader)return TYPE_HEADER;if(p==tabsRow||p==resetRow||p==profileRow)return TYPE_SETTINGS;return TYPE_CHECK;}
         @Override public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent,int type){
             if(type==PREVIEW){preview=new LiquidNavigationPreviewView(parent.getContext());return new RecyclerListView.Holder(preview);}
             if(type==SLIDER)return new RecyclerListView.Holder(new MotionSlider(parent.getContext()));return super.onCreateViewHolder(parent,type);
@@ -79,9 +92,9 @@ public final class LiquidNavigationSettingsActivity extends SignatureMatteSettin
         @Override public void onBindViewHolder(RecyclerView.ViewHolder h,int p,boolean partial){
             if(p==previewRow){preview.settingsChanged();return;}Parameter param=parameter(p);if(param!=null){((MotionSlider)h.itemView).bind(param);return;}
             if(p==indicatorHeader||p==motionHeader||p==designHeader){((tw.nekomimi.nekogram.ui.cells.HeaderCell)h.itemView).setText(getString(p==indicatorHeader?R.string.FlexyLiquidNavIndicator:p==motionHeader?R.string.FlexyLiquidNavMotion:R.string.FlexyLiquidNavDesign));return;}
-            if(p==tabsRow||p==resetRow){((TextSettingsCell)h.itemView).setText(getString(p==tabsRow?R.string.FlexyLiquidNavTabs:R.string.Reset),true);return;}
+            if(p==tabsRow||p==resetRow||p==profileRow){((TextSettingsCell)h.itemView).setText(getString(p==tabsRow?R.string.FlexyLiquidNavTabs:p==profileRow?R.string.FlexyLiquidNavProfilePreset:R.string.Reset),true);return;}
             ((TextCheckCell)h.itemView).setTextAndCheck(getString(p==enabledRow?R.string.FlexyLiquidNavEnabled:R.string.FlexyLiquidNavLabels),p==enabledRow?LiquidNavigationConfig.enabled():LiquidNavigationConfig.labels(),true);
         }
-        @Override public boolean isEnabled(RecyclerView.ViewHolder h){int p=h.getAdapterPosition();return p==tabsRow||p==enabledRow||p==labelsRow||p==resetRow;}
+        @Override public boolean isEnabled(RecyclerView.ViewHolder h){int p=h.getAdapterPosition();return p==profileRow||p==tabsRow||p==enabledRow||p==labelsRow||p==resetRow;}
     }
 }

@@ -1,12 +1,13 @@
 """Current-source gate independent of historical snapshots and physical acceptance."""
 import hashlib, unittest
 import integration1284_contract as audit
+from reconstruction1285_contract import prior_bytes,read_current
 
 class Integration1284(unittest.TestCase):
     def test_exact_scope_and_unknown_mutations_are_rejected(self):
         audit.verify_current()
         for path in audit.spec()['reviewed']:
-            raw=(audit.ROOT/path).read_bytes()+b'\nUNREVIEWED'
+            raw=read_current(path)+b'\nUNREVIEWED'
             self.assertEqual(raw,audit.restore(path,raw),path)
 
     def test_previous_review_manifests_remain_byte_identical(self):
@@ -27,9 +28,9 @@ class Integration1284(unittest.TestCase):
         self.assertIn('running.removeAllListeners()',motion)
 
     def test_sticker_capture_suppresses_the_wallpaper_without_changing_live_bubble_settings(self):
-        cell=(audit.ROOT/'TMessagesProj/src/main/java/org/telegram/ui/Cells/ChatMessageCell.java').read_text()
+        cell=prior_bytes('TMessagesProj/src/main/java/org/telegram/ui/Cells/ChatMessageCell.java').decode()
         self.assertIn('!drawForBlur && !drawForSignatureExport && delegate.drawFlexyBubbleWallpaper',cell)
-        painter=(audit.ROOT/'TMessagesProj/src/main/java/app/flexygram/bubbles/interaction/NativeBubbleStickerPainter.java').read_text()
+        painter=prior_bytes('TMessagesProj/src/main/java/app/flexygram/bubbles/interaction/NativeBubbleStickerPainter.java').decode()
         self.assertIn('cell.drawForSignatureExport=true',painter)
         self.assertIn('cell.drawForSignatureExport=wasExport',painter)
         self.assertNotIn('BubbleConfig.setBackgroundBlur',painter)

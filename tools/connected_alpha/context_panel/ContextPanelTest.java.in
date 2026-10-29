@@ -32,20 +32,6 @@ public class ContextPanelTest {
   named(panel,"FlexyContextMore").performClick();
   assertEquals(Collections.singletonList(Action.MORE),received);
  }
- @Test public void transparentStickerOpensOnlyWhenAdmittedAndEnabled() {
-  var panel=new BubbleActionPanelView(activity,null);ArrayList<Action> received=new ArrayList<>();panel.setListener(received::add);
-  BubbleInteractionSettings.setStickerConversion(activity,true);
-  panel.setConfiguration(EnumSet.of(Action.REPLY,Action.BUILD_STICKER,Action.SEND_STICKER,Action.SAVE_STICKER),true);
-  assertNotNull(named(panel,"FlexyContextConvertSticker"));
-  named(panel,"FlexyContextConvertSticker").performClick();
-  assertEquals(Collections.singletonList(Action.BUILD_STICKER),received);
-  assertNotNull(named(panel,"FlexyContextSendHere"));
-  assertNotNull(named(panel,"FlexyContextSave"));
-  BubbleInteractionSettings.setStickerConversion(activity,false);
-  panel.setConfiguration(EnumSet.of(Action.BUILD_STICKER),true);
-  assertNull(named(panel,"FlexyContextConvertSticker"));
-  BubbleInteractionSettings.setStickerConversion(activity,true);
- }
  @Test public void dampedSpringIsSoftBoundedAndRestoresExactIdle() {
   assertEquals(0f,DampedSpringCurve.progress(0f),0.000001f);
   assertTrue(DampedSpringCurve.progress(.05f)>0f);
@@ -82,16 +68,28 @@ public class ContextPanelTest {
   org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(java.time.Duration.ofSeconds(1));
   assertEquals(before,first[0]);assertTrue(second[0]>0);assertEquals(1f,motion.scale(),0f);assertFalse(motion.isRunning());
  }
- @Test public void localBounceAndStickerOptionsPersist() {
+ @Test public void verticalRowsHaveRealActionsAndAccessibleTargets() {
+  var panel=new BubbleActionPanelView(activity,null);panel.setAllowedActions(EnumSet.allOf(Action.class));
+  panel.measure(View.MeasureSpec.makeMeasureSpec(260,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(1000,View.MeasureSpec.AT_MOST));
+  panel.layout(0,0,260,panel.getMeasuredHeight());
+  assertEquals(LinearLayout.VERTICAL,panel.getOrientation());
+  ArrayList<Action> received=new ArrayList<>();panel.setListener(received::add);
+  assertEquals(7,panel.getChildCount());
+  int bottom=0;
+  for(int i=0;i<panel.getChildCount();i++){
+   View row=panel.getChildAt(i);assertTrue(row.getTop()>=bottom);bottom=row.getBottom();
+   assertTrue(row.getHeight()>=48*activity.getResources().getDisplayMetrics().density);
+   assertTrue(row.performClick());
+  }
+  assertEquals(Arrays.asList(Action.REPLY,Action.COPY,Action.FORWARD,Action.EDIT,Action.PIN,Action.DELETE,Action.MORE),received);
+  assertEquals(1f,panel.getScaleX(),0f);
+ }
+ @Test public void localBouncePreferencePersists() {
   var context=activity.getApplicationContext();
   BubbleInteractionSettings.setSpringBounce(context,false);
-  BubbleInteractionSettings.setStickerConversion(context,false);
   org.robolectric.util.ReflectionHelpers.setStaticField(BubbleInteractionSettings.class,"bounce",null);
-  org.robolectric.util.ReflectionHelpers.setStaticField(BubbleInteractionSettings.class,"stickers",null);
   assertFalse(BubbleInteractionSettings.springBounce(context));
-  assertFalse(BubbleInteractionSettings.stickerConversion(context));
   BubbleInteractionSettings.setSpringBounce(context,true);
-  BubbleInteractionSettings.setStickerConversion(context,true);
  }
  @Test public void optInPersistsWithoutMotionPreferencesOrNoOpMenuState(){
   var context=activity.getApplicationContext();BubbleInteractionSettings.setSignaturePanel(context,true);
