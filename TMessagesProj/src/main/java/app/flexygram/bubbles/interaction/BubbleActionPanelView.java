@@ -9,8 +9,9 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import androidx.dynamicanimation.animation.SpringAnimation;
-import androidx.dynamicanimation.animation.SpringForce;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
+import android.view.animation.DecelerateInterpolator;
 import org.telegram.ui.ActionBar.Theme;
 
 /**
@@ -29,7 +30,7 @@ public final class BubbleActionPanelView extends LinearLayout {
     private final TextView sendButton;
     private final TextView saveButton, stickerStatus;
     private Runnable onDispose;
-    private SpringAnimation bounceX, bounceY, bounceDrop;
+    private AnimatorSet bounce;
     public void setOnDispose(Runnable callback) { onDispose=callback; }
     public void setStickerEnabled(boolean enabled) { stickerEnabled=enabled; if (!enabled && tab==TAB_STICKER) tab=TAB_ACTIONS; refresh(); }
     public void setStickerStatus(String status) { stickerStatus.setText(status); }
@@ -232,32 +233,28 @@ public final class BubbleActionPanelView extends LinearLayout {
             refresh();
         }
     }
+
     private void cancelBounce() {
-        if (bounceX != null) bounceX.cancel();
-        if (bounceY != null) bounceY.cancel();
-        if (bounceDrop != null) bounceDrop.cancel();
-        bounceX = bounceY = bounceDrop = null;
+        if (bounce != null) bounce.cancel();
+        bounce = null;
     }
     @Override protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         if (!BubbleInteractionSettings.springBounce(getContext())
                 || !android.animation.ValueAnimator.areAnimatorsEnabled()) return;
         cancelBounce();
-        setPivotX(getWidth() * .5f);
         setPivotY(0);
-        setScaleX(.94f);
-        setScaleY(.94f);
-        setTranslationY(dp(getContext(), 8));
-        SpringForce spring = new SpringForce(1f).setStiffness(490f).setDampingRatio(.72f);
-        bounceX = new SpringAnimation(this, SpringAnimation.SCALE_X);
-        bounceY = new SpringAnimation(this, SpringAnimation.SCALE_Y);
-        bounceDrop = new SpringAnimation(this, SpringAnimation.TRANSLATION_Y);
-        bounceX.setSpring(spring);
-        bounceY.setSpring(new SpringForce(1f).setStiffness(490f).setDampingRatio(.72f));
-        bounceDrop.setSpring(new SpringForce(0f).setStiffness(540f).setDampingRatio(.78f));
-        bounceX.animateToFinalPosition(1f);
-        bounceY.animateToFinalPosition(1f);
-        bounceDrop.animateToFinalPosition(0f);
+        bounce = new AnimatorSet();
+        // Local four-keyframe elastic motion; does not intercept cell touches or native navigation.
+        bounce.playTogether(
+            ObjectAnimator.ofFloat(this, View.SCALE_X, .94f, 1.045f, .988f, 1f),
+            ObjectAnimator.ofFloat(this, View.SCALE_Y, .94f, 1.045f, .988f, 1f),
+            ObjectAnimator.ofFloat(this, View.TRANSLATION_Y, dp(getContext(), 8),
+                    -dp(getContext(), 3), dp(getContext(), 1), 0f)
+        );
+        bounce.setDuration(270L);
+        bounce.setInterpolator(new DecelerateInterpolator(1.05f));
+        bounce.start();
     }
     @Override protected void onDetachedFromWindow() {
         cancelBounce();
