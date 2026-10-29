@@ -26,6 +26,10 @@ assert "drawFlexyNativeGlassIsland(canvas, flexyNativeGlassShape)" in composer
 assert "getFlexyAttachmentBounds(flexyNativeGlassShape)" in composer
 assert "getFlexyTextPillBounds(flexyNativeGlassShape)" in composer
 assert "getFlexyVoiceBounds(flexyNativeGlassShape)" in composer
+assert "getFlexySendBounds(flexyNativeGlassShape)" in composer
+assert "if (flexyIslands) {" in composer
+assert "drawFlexyNativeGlassIslands(canvas);\n            return;" in composer, "The opaque native full-width bar must be skipped when islands are active"
+assert "if (withComposeShadowDrawable && !flexyIslands)" in composer, "No solid shadow band behind islands"
 assert "isFlexyCompactPresentation()" in composer, "Native special states must bypass new UI"
 assert "setFlexyVoiceBackdropDrawn(false)" in composer, "Native fallback must restore voice"
 assert "flexyNativeGlassClip.rewind();" in composer
