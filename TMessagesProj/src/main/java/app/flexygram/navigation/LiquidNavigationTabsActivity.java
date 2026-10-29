@@ -34,7 +34,7 @@ public final class LiquidNavigationTabsActivity extends BaseFragment {
         adapter.reorderSectionStart();
         for(int id:order)rows.add(UItem.asButton(100+id,R.drawable.msg_actions,getString(LiquidNavigationTabs.label(id))));
         adapter.reorderSectionEnd();
-        rows.add(UItem.asShadow(getString(R.string.FlexyLiquidNavReorderHint)));
+        rows.add(UItem.asShadow(getString(R.string.FlexyLiquidNavReorderHint)+"\n"+getString(R.string.FlexyLiquidNavLimit)));
         rows.add(UItem.asHeader(getString(R.string.FlexyLiquidNavAvailable)));
         for(int id=0;id<LiquidNavigationDestinations.COUNT;id++)if(!LiquidNavigationDestinations.contains(order,id))
             rows.add(UItem.asButton(200+id,R.drawable.msg_add,getString(LiquidNavigationTabs.label(id))));
@@ -46,6 +46,7 @@ public final class LiquidNavigationTabsActivity extends BaseFragment {
             int[] next=new int[order.length-1];int n=0;for(int value:order)if(value!=id)next[n++]=value;
             LiquidNavigationConfig.order(next);
         }else if(item.id>=200 && item.id<200+LiquidNavigationDestinations.COUNT){
+            if(order.length>=LiquidNavigationDestinations.MAX_VISIBLE)return;
             int[] next=java.util.Arrays.copyOf(order,order.length+1);next[order.length]=item.id-200;LiquidNavigationConfig.order(next);
         }else return;
         preview.settingsChanged();list.adapter.update(true);

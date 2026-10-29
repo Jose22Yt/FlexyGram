@@ -5055,17 +5055,20 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             new app.flexygram.bubbles.interaction.BubbleTapMotion(this);
     private boolean signatureTapEligible;
     private float signatureTapX, signatureTapY;
-    private long signatureTapReleased;
+    private long signatureTapReleased, signatureTapStarted;
     public void signatureTapEvent(MotionEvent event) {
         int action=event.getActionMasked();
         if(action==MotionEvent.ACTION_MOVE && signatureTapEligible){
             float slop=android.view.ViewConfiguration.get(getContext()).getScaledTouchSlop();
             if(Math.abs(event.getX()-signatureTapX)>slop || Math.abs(event.getY()-signatureTapY)>slop)cancelSignatureTap();
         } else if(action==MotionEvent.ACTION_UP && signatureTapEligible){
+            if(android.os.SystemClock.uptimeMillis()-signatureTapStarted>=android.view.ViewConfiguration.getLongPressTimeout()){
+                cancelSignatureTap();return;
+            }
             signatureTapReleased=android.os.SystemClock.uptimeMillis();signatureTapMotion.release();
         } else if(action==MotionEvent.ACTION_CANCEL || action==MotionEvent.ACTION_POINTER_DOWN || action==MotionEvent.ACTION_POINTER_UP)cancelSignatureTap();
     }
-    public boolean isSignatureTap(){return signatureTapEligible && android.os.SystemClock.uptimeMillis()-signatureTapReleased<500;}
+    public boolean isSignatureTap(){return signatureTapEligible && signatureTapReleased>0 && android.os.SystemClock.uptimeMillis()-signatureTapReleased<500;}
     public void cancelSignatureTap(){signatureTapEligible=false;signatureTapReleased=0;signatureTapMotion.reset();}
     private void applySignatureTap(Canvas canvas){
         float scale=signatureTapMotion.scale();
@@ -5540,6 +5543,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                     && currentMessagesGroup==null && !currentMessageObject.shouldDrawWithoutBackground()
                     && isInsideBackground(getEventX(event),getEventY(event));
             if(signatureTapEligible){
+                signatureTapStarted=android.os.SystemClock.uptimeMillis();
                 signatureTapX=getEventX(event);signatureTapY=getEventY(event);
                 if(app.flexygram.bubbles.interaction.BubbleInteractionSettings.tapAnimation(getContext())
                         && !AndroidUtilities.isAccessibilityScreenReaderEnabled()

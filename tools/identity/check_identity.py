@@ -81,7 +81,7 @@ def main():
             if name != 'TMessagesProj/src/main/java/org/telegram/messenger/SharedConfig.java':
                 sys.path.insert(0, str(ROOT/'tools/connected_alpha'))
                 from performance_p0_contract import restore as project_performance, original as before_performance
-                data = (ROOT/name).read_bytes()
+                data = (ROOT/name).read_bytes() if (ROOT/name).is_file() else b''
                 require(project_performance(name, data) == before_performance(name), 'Source outside exact reviewed performance overlay: ' + name)
                 continue
             require(name == 'TMessagesProj/src/main/java/org/telegram/messenger/SharedConfig.java', 'Functional source modified: ' + name)
@@ -120,7 +120,7 @@ def main():
     from identity_beta_contract import verify_current, spec, restore
     verify_current()
     for name in spec()['reviewed']:
-        data = (ROOT/name).read_bytes()
+        data = (ROOT/name).read_bytes() if (ROOT/name).is_file() else b''
         mutated = data + b'\nUNREVIEWED\n'
         require(restore(name, mutated) == mutated, 'Audit accepted unknown mutation: ' + name)
     subprocess.run(['git', 'diff', '--check', BASE], cwd=ROOT, check=True)

@@ -45,15 +45,22 @@ def main():
     recycler=text('org/telegram/ui/Components/RecyclerListView.java')
     assert 'scrollFrameRateHint.setScrolling(newState != SCROLL_STATE_IDLE)' in recycler
     assert 'scrollFrameRateHint.setScrolling(false)' in block(recycler,'protected void onDetachedFromWindow()')
-    frozen=['config/signing','gradle.properties','gradle','TMessagesProj/build.gradle',
+    frozen=['config/signing','gradle.properties','gradle',
             'TMessagesProj/src/main/AndroidManifest.xml','TMessagesProj/src/connectedAlpha','TMessagesProj/src/beta',
             'TMessagesProj/jni','TMessagesProj/chaquopy','TMessagesProj/src/main/java/org/telegram/messenger/MessagesController.java',
             'TMessagesProj/src/main/java/org/telegram/messenger/MessagesStorage.java',
             'TMessagesProj/src/main/java/org/telegram/messenger/SendMessagesHelper.java',
             'TMessagesProj/src/main/java/org/telegram/messenger/NotificationsController.java',
-            'TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java','TMessagesProj/src/main/java/org/telegram/ui/Cells/ChatMessageCell.java',
+
             'TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java']
     assert not subprocess.check_output(['git','diff',BASE,'--',*frozen],cwd=ROOT)
+    assert (ROOT/'TMessagesProj/build.gradle').read_text().replace('def verCode = 1287','def verCode = 1286') == subprocess.check_output(['git','show',BASE+':TMessagesProj/build.gradle'],cwd=ROOT,text=True)
+    import sys
+    sys.path.insert(0,str(ROOT/'tools/connected_alpha'))
+    from work1_contract import restore,original
+    for name in ['org/telegram/ui/ChatActivity.java','org/telegram/ui/Cells/ChatMessageCell.java']:
+        path='TMessagesProj/src/main/java/'+name
+        assert restore(path,(ROOT/path).read_bytes())==original(path)
     print('PASS: native protocol bodies, local dialogs gate, identity/JNI and gesture ownership unchanged; lifecycle/queue wiring checked.')
 
 
