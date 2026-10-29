@@ -58,6 +58,7 @@ public final class SignatureChatHeader {
                         width, AndroidUtilities.density, LocaleController.isRTL, avatar.signatureCallAvailable());
             // Keep the approved compact sizes; large fonts/narrow windows use the existing Adaptive path.
             if (g.fits && titleLine + subtitleLine + AndroidUtilities.dp(2) <= g.height - AndroidUtilities.dp(8)) {
+                bar.prepareSignatureNativeGlass(g.mattePortrait && g.callAvailable);
                 fusionLayout = true; height = g.height; subtitleFits = true;
                 int content = Math.max(nativeHeight, Math.round(height) + AndroidUtilities.dp(12));
                 fusionTop = status + (content - height) / 2f;

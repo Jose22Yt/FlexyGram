@@ -41,6 +41,14 @@ public class LiquidNavigationTest {
   for(int i=0;i<tabs.length;i++)bar.setPriority(tabs[i],-i);
   layout();assertTrue(center(0)>center(3));for(var tab:tabs)assertSame(bar,tab.getParent());
  }
+ @Test public void nativeGlassPolicyIsIdempotentAndClearsTheOldRenderEffectOnOff(){
+  NativeGlassPolicyProbe.created=0;var policy=new NativeGlassPolicyProbe();
+  policy.setLiquidGlassEffectAllowed(true);assertTrue(policy.active());assertEquals(1,NativeGlassPolicyProbe.created);
+  policy.setLiquidGlassEffectAllowed(true);assertEquals(1,NativeGlassPolicyProbe.created);
+  policy.setLiquidGlassEffectAllowed(false);assertFalse(policy.active());assertEquals(1,policy.clears);
+  int changes=policy.invalidations;policy.setLiquidGlassEffectAllowed(false);assertEquals(changes,policy.invalidations);
+  policy.setLiquidGlassEffectAllowed(true);assertTrue(policy.active());assertEquals(2,NativeGlassPolicyProbe.created);
+ }
  @Test public void tapHighlightsImmediatelyAndDispatchesOnlyOneNativeClick(){
   event(MotionEvent.ACTION_DOWN,center(2));
   assertTrue(ReflectionHelpers.<Boolean>getField(bar,"flexyPressed"));
@@ -49,8 +57,10 @@ public class LiquidNavigationTest {
  @Test public void draggingDoesNotNavigateUntilReleaseAndSettlesWithActualAndroidXSpring(){
   event(MotionEvent.ACTION_DOWN,center(0));event(MotionEvent.ACTION_MOVE,center(3));
   assertEquals(0,clicks);assertTrue(ReflectionHelpers.<Boolean>getField(bar,"flexyDragging"));
+  assertTrue("each MOVE must retain deformation instead of being consumed twice",ReflectionHelpers.<Float>getField(bar,"flexyStretch")>0f);
   assertEquals(center(3),ReflectionHelpers.<Float>getField(bar,"animatedLongSelectedViewCenterX"),.1f);
   event(MotionEvent.ACTION_UP,center(3));assertEquals(1,clicks);assertTrue(tabs[3].isTabSelected());
+  assertTrue("release preserves deformation for the native spring",ReflectionHelpers.<Float>getField(bar,"flexyStretch")>0f);
   Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(Duration.ofSeconds(3));
   assertEquals(center(3),ReflectionHelpers.<Float>getField(bar,"animatedLongSelectedViewCenterX"),1f);
   assertEquals(0f,ReflectionHelpers.<Float>getField(bar,"flexyStretch"),.01f);

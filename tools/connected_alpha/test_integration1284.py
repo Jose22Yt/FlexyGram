@@ -26,6 +26,14 @@ class Integration1284(unittest.TestCase):
         self.assertIn('running.removeAllUpdateListeners()',motion)
         self.assertIn('running.removeAllListeners()',motion)
 
+    def test_sticker_capture_suppresses_the_wallpaper_without_changing_live_bubble_settings(self):
+        cell=(audit.ROOT/'TMessagesProj/src/main/java/org/telegram/ui/Cells/ChatMessageCell.java').read_text()
+        self.assertIn('!drawForBlur && !drawForSignatureExport && delegate.drawFlexyBubbleWallpaper',cell)
+        painter=(audit.ROOT/'TMessagesProj/src/main/java/app/flexygram/bubbles/interaction/NativeBubbleStickerPainter.java').read_text()
+        self.assertIn('cell.drawForSignatureExport=true',painter)
+        self.assertIn('cell.drawForSignatureExport=wasExport',painter)
+        self.assertNotIn('BubbleConfig.setBackgroundBlur',painter)
+
     def test_native_protocol_and_authorized_identity_are_not_changed(self):
         for path in ['TMessagesProj/src/main/java/org/telegram/messenger/SendMessagesHelper.java',
                      'TMessagesProj/src/main/java/org/telegram/tgnet/ConnectionsManager.java',

@@ -545,6 +545,19 @@ public class ChatActivity extends BaseFragment implements
     private BlurredBackgroundColorProviderThemed blurredBackgroundColorProvider;
     private BlurredBackgroundColorProviderThemed blurredBackgroundColorProviderWhite;
 
+    private boolean signatureNativeGlassAllowed;
+    private final Utilities.Callback<Boolean> signatureGlassPowerListener = ignored -> refreshSignatureNativeGlassPolicy();
+    private void refreshSignatureNativeGlassPolicy() {
+        boolean allowed=LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS);
+        if (signatureNativeGlassAllowed==allowed) return;
+        signatureNativeGlassAllowed=allowed;
+        glassBackgroundDrawableFactory.setLiquidGlassEffectAllowed(allowed);
+        glassBackgroundDrawableFactoryFrosted.setLiquidGlassEffectAllowed(allowed);
+        if (actionBar!=null) actionBar.updateSignatureNativeGlassPolicy(allowed);
+        if (chatInputViewsContainer!=null) chatInputViewsContainer.updateNativeLiquidGlassPolicy(allowed);
+        if (contentView!=null) contentView.invalidate();
+    }
+
     private final ReferenceList<View> glassAttachedViews = new ReferenceList<>();
     private final ReferenceList<BlurredBackgroundDrawable> glassAttachedDrawables = new ReferenceList<>();
     private final @Nullable DownscaleScrollableNoiseSuppressor scrollableViewNoiseSuppressor;
@@ -2995,6 +3008,7 @@ public class ChatActivity extends BaseFragment implements
 
     public ChatActivity(Bundle args) {
         super(args);
+        signatureNativeGlassAllowed=LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS);
 
         navbarContentSourceWallpaper = new BlurredBackgroundSourceWrapped();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && SharedConfig.chatBlurEnabled()) {
@@ -3749,6 +3763,7 @@ public class ChatActivity extends BaseFragment implements
 
     @Override
     public void onFragmentDestroy() {
+        LiteMode.removeOnPowerSaverAppliedListener(signatureGlassPowerListener);
         selectedBubbleMotion.reset();
         selectedBubbleMotionMessage = null;
         if(flexyBubbleStickerSession!=null){flexyBubbleStickerSession.close();flexyBubbleStickerSession=null;}
@@ -18797,6 +18812,8 @@ public class ChatActivity extends BaseFragment implements
             super.onAttachedToWindow();
             ensureSignatureWallpaperBlur();
             refreshSignatureWallpaperBlur();
+            LiteMode.addOnPowerSaverAppliedListener(signatureGlassPowerListener);
+            refreshSignatureNativeGlassPolicy();
             if (isInsideContainer) {
                 adjustPanLayoutHelper.setResizableView(contentView);
             } else if (parentLayout != null && parentLayout.isSheet()) {
@@ -18818,6 +18835,7 @@ public class ChatActivity extends BaseFragment implements
         protected void onDetachedFromWindow() {
             selectedBubbleMotion.reset();
             selectedBubbleMotionMessage = null;
+            LiteMode.removeOnPowerSaverAppliedListener(signatureGlassPowerListener);
             if (signatureWallpaperBlur != null) { signatureWallpaperBlur.close(); signatureWallpaperBlur = null; }
             super.onDetachedFromWindow();
             adjustPanLayoutHelper.onDetach();
@@ -31850,6 +31868,7 @@ public class ChatActivity extends BaseFragment implements
     @Override
     public void onResume() {
         super.onResume();
+        refreshSignatureNativeGlassPolicy();
         app.flexygram.studio.FlexyStyleInstallHelper.resume(this);
         if (BuildConfig.CONNECTED_ALPHA) app.flexygram.header.HeaderConfig.load();
         if (signatureChatHeader != null) {
@@ -39147,7 +39166,8 @@ public class ChatActivity extends BaseFragment implements
     }
 
     public BlurredBackgroundSourceRenderNode getGlassSource() {
-        return LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS) ? glassBackgroundSourceRenderNode : glassBackgroundSourceFrostedRenderNode;
+        return LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS) && glassBackgroundSourceRenderNode!=null
+                ? glassBackgroundSourceRenderNode : glassBackgroundSourceFrostedRenderNode;
     }
 
     public void setGlassSourceInvalidationCallback(Runnable callback) {

@@ -45,6 +45,19 @@ def write(source,root):
  public GlassTabView[] tabs;public int[] flexyShownDestinations,flexyConfiguredDestinations;
  int indexToPosition(int id){return id==0?0:id==1?1:id==2?2:id==4?3:-1;}
  '''+selection+'}')
+
+ renderer=(java/'org/telegram/ui/Components/blur3/drawable/BlurredBackgroundDrawableRenderNode.java').read_text()
+ start=renderer.index('    public void setLiquidGlassEffectAllowed(boolean allowed)')
+ stop=renderer.index('    @Override',start)
+ method=renderer[start:stop].strip()
+ # Only effect allocation/clearing is doubled; execute the actual production policy method.
+ put('NativeGlassPolicyProbe.java','''public class NativeGlassPolicyProbe{
+ static int created;int invalidations,clears;final Fill renderNodeFill=new Fill();LiquidGlassEffect liquidGlassEffect;
+ class Fill{void setRenderEffect(Object value){if(value!=null)throw new AssertionError();clears++;}}
+ static class LiquidGlassEffect{LiquidGlassEffect(Object node){created++;}}
+ void invalidateDisplayList(){invalidations++;}void invalidateSelf(){}
+ public boolean active(){return liquidGlassEffect!=null;}
+ '''+method+'}')
 if __name__=='__main__':
  if '--output-dir' not in sys.argv:sys.argv+=['--output-dir',str(HERE.parents[2]/'build/connected-alpha-liquid-navigation')]
  raise SystemExit(p.main(here=HERE,test_class='LiquidNavigationTest',stubs_writer=write,extra_aars=(('androidx.dynamicanimation','dynamicanimation','1.0.0'),)))

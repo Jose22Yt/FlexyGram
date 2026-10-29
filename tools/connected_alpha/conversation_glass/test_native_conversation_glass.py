@@ -46,3 +46,25 @@ assert "getThemedColor(Theme.key_chat_messagePanelBackground)" in composer
 assert "FlexyComposerConfig.glass()" in composer, "Do not remove prior independent settings"
 assert "new Bitmap(" not in composer, "Do not allocate extra bitmap in the composer"
 print("Native conversation Liquid Glass scoped source contracts passed")
+
+assert "updateSignatureNativeGlassPolicy(allowed)" in host
+assert "updateNativeLiquidGlassPolicy(allowed)" in host
+assert "LiteMode.addOnPowerSaverAppliedListener(signatureGlassPowerListener)" in host
+assert "LiteMode.removeOnPowerSaverAppliedListener(signatureGlassPowerListener)" in host
+assert "glassBackgroundSourceRenderNode!=null" in host
+renderer=(java/'org/telegram/ui/Components/blur3/drawable/BlurredBackgroundDrawableRenderNode.java').read_text()
+assert "setLiquidGlassEffectAllowed(boolean allowed)" in renderer
+assert "renderNodeFill.setRenderEffect(null)" in renderer
+assert "allowed == (liquidGlassEffect != null)" in renderer
+
+assert "signatureGlassFactory.create(this)" in header
+assert "signatureGlassCall.draw(canvas)" in header
+assert "bar.prepareSignatureNativeGlass(g.mattePortrait && g.callAvailable)" in adapter
+assert "updateSignatureNativeGlassDrawable(signatureGlassCall,allowed)" in header
+
+start=header.index("public boolean drawSignatureNativeGlass(")
+end=header.index("private int centeredTitleAvailableWidth(",start)
+assert ".setRadius(" not in header[start:end], "Do not rebuild native radius/stroke paths on every frame"
+assert "if(signatureGlassRadius==radius)return" in header
+assert "int padding=signature ? 0 : dp(6)" in header
+assert "configureSignatureGlassGeometry(signature)" in header

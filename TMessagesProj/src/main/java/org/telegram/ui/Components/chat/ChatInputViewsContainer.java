@@ -138,6 +138,15 @@ public class ChatInputViewsContainer extends FrameLayout {
         blurredBackgroundDrawable.setRadius(dp(INPUT_BUBBLE_RADIUS));
     }
 
+    public void updateNativeLiquidGlassPolicy(boolean allowed) {
+        if (Build.VERSION.SDK_INT >= 33
+                && blurredBackgroundDrawable instanceof org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawableRenderNode) {
+            ((org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawableRenderNode)blurredBackgroundDrawable).setLiquidGlassEffectAllowed(allowed);
+        }
+        if (blurredBackgroundDrawable!=null) blurredBackgroundDrawable.updateColors();
+        invalidate();
+    }
+
     public void setUnderKeyboardBackgroundDrawable(BlurredBackgroundDrawable drawable) {
         underKeyboardBackgroundDrawable = drawable;
         underKeyboardBackgroundDrawable.enableInAppKeyboardOptimization();

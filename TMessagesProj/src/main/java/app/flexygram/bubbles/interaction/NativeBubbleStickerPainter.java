@@ -46,6 +46,8 @@ public final class NativeBubbleStickerPainter implements BubbleStickerEncoder.Na
     @Override public void drawOriginalBubble(Canvas canvas) {
         if (!eligible(cell, message) || !bounds.equals(bounds(cell))) throw new IllegalStateException("Rebound or moved bubble");
         int save = canvas.save();
+        boolean wasExport=cell.drawForSignatureExport;
+        cell.drawForSignatureExport=true;
         try {
             canvas.translate(-bounds.left, -bounds.top);
             canvas.clipRect(bounds);
@@ -64,6 +66,9 @@ public final class NativeBubbleStickerPainter implements BubbleStickerEncoder.Na
                 cell.drawOutboundsContent(canvas);
                 canvas.restoreToCount(content);
             }
-        } finally { canvas.restoreToCount(save); }
+        } finally {
+            cell.drawForSignatureExport=wasExport;
+            canvas.restoreToCount(save);
+        }
     }
 }

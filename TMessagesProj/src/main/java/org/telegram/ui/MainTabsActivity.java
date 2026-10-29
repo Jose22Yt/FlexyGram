@@ -182,6 +182,15 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
     private FrameLayout tabsViewWrapper;
     private MainTabsLayout tabsView;
     private BlurredBackgroundDrawable tabsViewBackground;
+    private final org.telegram.messenger.Utilities.Callback<Boolean> mainGlassPowerListener = ignored -> refreshMainNativeGlassPolicy();
+    private void refreshMainNativeGlassPolicy() {
+        if (Build.VERSION.SDK_INT >= 33 && tabsViewBackground instanceof org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawableRenderNode) {
+            ((org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawableRenderNode)tabsViewBackground)
+                    .setLiquidGlassEffectAllowed(LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS));
+            tabsViewBackground.updateColors();
+            if(tabsView!=null)tabsView.invalidate();
+        }
+    }
     private View fadeView;
     private boolean lastHideContacts = NaConfig.INSTANCE.getMainTabsHideContacts().Bool();
     private boolean lastHideCalls = MainTabsHelper.isCallsTabHidden();
@@ -276,6 +285,15 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
     @Override
     protected FrameLayout createContentView(Context context) {
         return new FrameLayout(context) {
+            @Override protected void onAttachedToWindow() {
+                super.onAttachedToWindow();
+                LiteMode.addOnPowerSaverAppliedListener(mainGlassPowerListener);
+                refreshMainNativeGlassPolicy();
+            }
+            @Override protected void onDetachedFromWindow() {
+                LiteMode.removeOnPowerSaverAppliedListener(mainGlassPowerListener);
+                super.onDetachedFromWindow();
+            }
             @Override
             protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
                 super.onLayout(changed, left, top, right, bottom);
@@ -344,6 +362,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
             miniPlayer.update(true);
         }
         blur3_updateColors();
+        refreshMainNativeGlassPolicy();
         checkContactsTabBadge();
         checkUnreadCount(true);
 
@@ -1350,6 +1369,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
 
     @Override
     public void onFragmentDestroy() {
+        LiteMode.removeOnPowerSaverAppliedListener(mainGlassPowerListener);
         Bulletin.removeDelegate(this);
         Bulletin.removeDelegate(contentView);
 
