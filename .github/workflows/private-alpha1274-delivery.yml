@@ -1,0 +1,321 @@
+name: Alpha 1285 Signature iOS27 integration private signed delivery
+
+on:
+  push:
+    branches: [delivery/alpha1285-signature-reconstruction-private]
+    paths:
+      - '.github/workflows/private-alpha1274-delivery.yml'
+      - 'tools/private_alpha1274/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: private-alpha1285-universal-${{ github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  source-checks:
+    name: Source checks (not an APK build)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: d659b062d6a591e4a2b2f7900ab884a363aeae07
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python3 -m pip install -r tools/connected_alpha/requirements-ci.txt
+      - name: Checkout pinned media sources for plugin alias tests
+        run: git submodule update --init --depth 1 TMessagesProj_Modules/media
+      - name: Check upstream parity, build contract and all verifier/stability regressions
+        run: python3 tools/connected_alpha/run_checks.py
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: 'build-tools;36.0.0 platforms;android-37.0'
+      - name: Compile resources and link isolated provider probe against API 37
+        run: python3 tools/connected_alpha/check_resources.py --sdk-root "$ANDROID_HOME"
+      - name: Verify corrected native editor, keyboard and back regressions
+        run: python3 tools/connected_alpha/files_native/run.py --sdk-root "$ANDROID_HOME"
+      - name: Verify native iOS bubble paths, glass and saved preference policy
+        run: python3 tools/connected_alpha/bubble_visual/run.py --sdk-root "$ANDROID_HOME"
+      - name: Retain isolated native bubble graphics (not full app screenshots)
+        uses: actions/upload-artifact@v4
+        with:
+          name: FlexyGram-Alpha1285-native-bubble-probe
+          path: |
+            build/connected-alpha-bubble-visual/android-native-bubbles.png
+            build/connected-alpha-bubble-visual/android-signature-icons.png
+            build/connected-alpha-bubble-visual/target/surefire-reports/*.xml
+          retention-days: 7
+          if-no-files-found: error
+      - name: Verify native Signature Matte cell geometry and accessibility
+        run: python3 tools/connected_alpha/matte_visual/run.py --sdk-root "$ANDROID_HOME"
+      - name: Render production vectors and verify production icon sizing with Android graphics
+        run: python3 tools/connected_alpha/composer_visual/run.py --sdk-root "$ANDROID_HOME"
+      - name: Render Signature Home production surfaces and check compact geometry
+        run: python3 tools/connected_alpha/home_visual/run.py --sdk-root "$ANDROID_HOME"
+      - name: Retain isolated Signature Home Android graphics (not full app screenshots)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: signature-home-android-graphics
+          path: |
+            build/connected-alpha-home-visual/android-home-surfaces.png
+            build/connected-alpha-home-visual/target/surefire-reports/*.xml
+          retention-days: 7
+          if-no-files-found: warn
+      - name: Retain isolated Android graphic probe evidence (not app/device screenshots)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: composer-android-graphics
+          path: |
+            build/connected-alpha-composer-visual/*.png
+            build/connected-alpha-composer-visual/target/surefire-reports/*.xml
+          retention-days: 7
+          if-no-files-found: warn
+
+      - name: Verify integrated Studio, login, music, header, preview and performance Android regressions
+        run: |
+          for probe in liquid_navigation studio_native login_visual music_visual header_visual preview_visual performance/native performance/native3 native_motion_restore native_touch context_panel; do
+            python3 "tools/connected_alpha/$probe/run.py" --sdk-root "$ANDROID_HOME"
+          done
+      - name: Retain synthetic corrected music and header evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: Alpha1285-integrated-renderer-evidence
+          path: |
+            build/connected-alpha-header-visual/*.png
+            build/connected-alpha-header-visual/target/surefire-reports/*.xml
+            build/connected-alpha-music-visual/*.png
+            build/connected-alpha-music-visual/target/surefire-reports/*.xml
+          retention-days: 7
+          if-no-files-found: error
+
+  credentials-present:
+    runs-on: ubuntu-24.04
+    outputs:
+      ready: ${{ steps.check.outputs.ready }}
+    steps:
+      - id: check
+        name: Check secret presence without logging values
+        shell: bash
+        env:
+          TELEGRAM_APP_ID: ${{ secrets.TELEGRAM_APP_ID }}
+          TELEGRAM_APP_HASH: ${{ secrets.TELEGRAM_APP_HASH }}
+          ALPHA_STORE_PASSWORD: ${{ secrets.ALPHA_STORE_PASSWORD }}
+          ALPHA_KEY_ALIAS: ${{ secrets.ALPHA_KEY_ALIAS }}
+          ALPHA_KEY_PASSWORD: ${{ secrets.ALPHA_KEY_PASSWORD }}
+          ALPHA_FIREBASE_JSON_B64: ${{ secrets.ALPHA_FIREBASE_JSON_B64 }}
+          ALPHA_KEYSTORE_B64: ${{ secrets.ALPHA_KEYSTORE_B64 }}
+          ALPHA_CERTIFICATE_SHA256: ${{ secrets.ALPHA_CERTIFICATE_SHA256 }}
+        run: |
+          set -euo pipefail
+          ready=true
+          for name in TELEGRAM_APP_ID TELEGRAM_APP_HASH ALPHA_STORE_PASSWORD ALPHA_KEY_ALIAS ALPHA_KEY_PASSWORD ALPHA_FIREBASE_JSON_B64 ALPHA_KEYSTORE_B64 ALPHA_CERTIFICATE_SHA256; do
+            if [[ -z "${!name}" ]]; then
+              echo "::error::Missing private input: $name"
+              ready=false
+            fi
+          done
+          echo "ready=$ready" >> "$GITHUB_OUTPUT"
+          if [[ "$ready" != true ]]; then
+            echo 'BLOCKED: private inputs incomplete; no APK built.' >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          echo 'Private inputs present; native build still pending.' >> "$GITHUB_STEP_SUMMARY"
+
+  private-destination:
+    needs: credentials-present
+    if: needs.credentials-present.outputs.ready == 'true' && github.repository == 'Jose22Yt/FlexyGram' && github.ref == 'refs/heads/delivery/alpha1285-signature-reconstruction-private'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    outputs:
+      release_id: ${{ steps.destination.outputs.release_id }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          sparse-checkout: |
+            .github
+            tools/private_alpha1274
+            tools/connected_alpha
+          persist-credentials: false
+      - run: python3 -m pip install PyYAML==6.0.3
+      - name: Test private delivery transport and frozen source contract
+        run: PYTHONPATH=tools/connected_alpha python3 -m unittest discover -s tools/private_alpha1274 -p 'test_*.py' -v
+      - id: destination
+        name: Verify unpublished destination with a harmless probe before compiling (controlled diagnostics)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 tools/private_alpha1274/deliver.py preflight
+
+  build-arm64:
+    needs: [source-checks, credentials-present, private-destination]
+    if: needs.credentials-present.outputs.ready == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    permissions:
+      contents: write
+    defaults:
+      run:
+        working-directory: approved
+    env:
+      NATIVE_TARGET: arm64-v8a
+      COMMIT_ID: d659b062d6a591e4a2b2f7900ab884a363aeae07
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: d659b062d6a591e4a2b2f7900ab884a363aeae07
+          path: approved
+          fetch-depth: 0
+          submodules: recursive
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          path: delivery-control
+          sparse-checkout: tools/private_alpha1274
+          persist-credentials: false
+      - name: Require the exact approved application commit
+        run: test "$(git rev-parse HEAD)" = d659b062d6a591e4a2b2f7900ab884a363aeae07
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-disabled: true
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: >-
+            platform-tools
+            build-tools;36.0.0
+            platforms;android-37.0
+            ndk;27.2.12479018
+            cmake;3.31.6
+      - name: Verify SDK payload and normalize nested API 37 layout
+        run: python3 tools/connected_alpha/preflight_sdk.py --sdk-root "$ANDROID_HOME"
+      - name: Install pinned native build tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends nasm ninja-build patchelf autoconf automake libtool pkg-config
+      - name: Select installed JDK and exact CMake for Chaquopy
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Upstream daemon criteria require JetBrains even when JAVA_HOME is Temurin.
+          # Adapt only the ephemeral CI checkout, keeping the Java language target 21.
+          printf 'toolchainVersion=21\ntoolchainVendor=ADOPTIUM\n' > gradle/gradle-daemon-jvm.properties
+          printf 'sdk.dir=%s\n' "$ANDROID_HOME" > local.properties
+          echo "CHAQUOPY_BUILD_PYTHON=$(command -v python3.11)" >> "$GITHUB_ENV"
+          echo "CMAKE=$ANDROID_HOME/cmake/3.31.6/bin/cmake" >> "$GITHUB_ENV"
+          test -x "$ANDROID_HOME/cmake/3.31.6/bin/cmake"
+          "$ANDROID_HOME/cmake/3.31.6/bin/cmake" --version
+          java -version
+          python3.11 --version
+          ./gradlew --version --no-daemon
+      - name: Rebuild legacy Python dependency wheels with original 16 KB recipes
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3.11 -m venv "$RUNNER_TEMP/alpha-wheel-tools"
+          "$RUNNER_TEMP/alpha-wheel-tools/bin/python" -m pip install -r TMessagesProj/chaquopy/server/pypi/requirements.txt
+          "$RUNNER_TEMP/alpha-wheel-tools/bin/python" tools/connected_alpha/rebuild_python_wheels.py --chaquopy TMessagesProj/chaquopy --output "$RUNNER_TEMP/alpha-wheelhouse"
+          echo "ALPHA_WHEELHOUSE=$RUNNER_TEMP/alpha-wheelhouse" >> "$GITHUB_ENV"
+          # Wheel recipes use r27d; original Telegram/JNI still uses its pinned r27c.
+          # Remove only the temporary wheel-build toolchain before the large JNI build.
+          rm -rf "$ANDROID_HOME/ndk/27.3.13750724" "$RUNNER_TEMP/alpha-wheel-tools"
+      - name: Check pinned submodules and disk before JNI build
+        shell: bash
+        run: |
+          set -euo pipefail
+          git submodule status --recursive > "$RUNNER_TEMP/alpha-submodules.txt"
+          if grep -Eq '^[+-U]' "$RUNNER_TEMP/alpha-submodules.txt"; then
+            echo '::error::Missing or mismatched pinned native submodule.'
+            exit 1
+          fi
+          df -h .
+          free_kb=$(df -Pk . | awk 'NR==2 {print $4}')
+          if (( free_kb < 8 * 1024 * 1024 )); then
+            echo '::error::Less than 8 GiB free; JNI build not attempted.'
+            exit 1
+          fi
+      - name: Validate and restore private inputs (no values logged)
+        env:
+          TELEGRAM_APP_ID: ${{ secrets.TELEGRAM_APP_ID }}
+          TELEGRAM_APP_HASH: ${{ secrets.TELEGRAM_APP_HASH }}
+          ALPHA_STORE_PASSWORD: ${{ secrets.ALPHA_STORE_PASSWORD }}
+          ALPHA_KEY_ALIAS: ${{ secrets.ALPHA_KEY_ALIAS }}
+          ALPHA_KEY_PASSWORD: ${{ secrets.ALPHA_KEY_PASSWORD }}
+          ALPHA_FIREBASE_JSON_B64: ${{ secrets.ALPHA_FIREBASE_JSON_B64 }}
+          ALPHA_KEYSTORE_B64: ${{ secrets.ALPHA_KEYSTORE_B64 }}
+          ALPHA_CERTIFICATE_SHA256: ${{ secrets.ALPHA_CERTIFICATE_SHA256 }}
+        run: python3 tools/connected_alpha/ci_inputs.py
+      - name: Build Connected Alpha with original native code
+        env:
+          TELEGRAM_APP_ID: ${{ secrets.TELEGRAM_APP_ID }}
+          TELEGRAM_APP_HASH: ${{ secrets.TELEGRAM_APP_HASH }}
+          ALPHA_STORE_PASSWORD: ${{ secrets.ALPHA_STORE_PASSWORD }}
+          ALPHA_KEY_ALIAS: ${{ secrets.ALPHA_KEY_ALIAS }}
+          ALPHA_KEY_PASSWORD: ${{ secrets.ALPHA_KEY_PASSWORD }}
+        run: ./gradlew :TMessagesProj:assembleConnectedAlpha --no-daemon --console=plain --max-workers=2
+      - name: Verify APK against independently authorized certificate
+        shell: bash
+        env:
+          ALPHA_CERTIFICATE_SHA256: ${{ secrets.ALPHA_CERTIFICATE_SHA256 }}
+        run: |
+          set -euo pipefail
+          mapfile -t packages < <(find TMessagesProj/build/outputs/apk/connectedAlpha -type f -name '*.apk')
+          if [[ "${#packages[@]}" -ne 1 ]]; then
+            echo '::error::Expected exactly one Connected Alpha APK.'
+            exit 1
+          fi
+          PYTHONPATH=tools/connected_alpha python3 "$GITHUB_WORKSPACE/delivery-control/tools/private_alpha1274/signature_verifier.py" "${packages[0]}" --build-tools "$ANDROID_HOME/build-tools/36.0.0" --certificate-sha256 "$ALPHA_CERTIFICATE_SHA256" --expected-version-code 1285 > connected-alpha-verification.json
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          report = Path('connected-alpha-verification.json')
+          data = json.loads(report.read_text())
+          data['commit'] = os.environ['COMMIT_ID']
+          if data['elf_count'] != 96:
+              raise ValueError('Full Connected Alpha must contain exactly 96 ARM64 ELF payloads')
+          if data['certificate_sha256'] != 'c8f04cad685ca5757d35b25ea4b0b4613c7399909948d821e6ada61f9fb12b2c':
+              raise ValueError('APK certificate differs from the authorized installed Alpha identity')
+          report.write_text(json.dumps(data, indent=2) + '\n')
+          # Only public artifact metadata; never APK bytes or private signing inputs.
+          public = {key: data[key] for key in ('commit', 'sha256', 'application_id', 'version_code', 'elf_count', 'bytes')}
+          print('PUBLIC_APK_VERIFICATION ' + json.dumps(public, sort_keys=True))
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as f:
+              f.write('Artifact verification passed. Android launch/login: NOT TESTED.\n\n')
+              f.write('APK SHA-256: ' + data['sha256'] + '\n')
+              f.write('ELF payloads verified: ' + str(data['elf_count']) + '\n')
+          PY
+      - name: Transfer verified APK to the unpublished private draft before cleanup
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PRIVATE_RELEASE_ID: ${{ needs.private-destination.outputs.release_id }}
+        run: |
+          set -euo pipefail
+          mapfile -t packages < <(find TMessagesProj/build/outputs/apk/connectedAlpha -type f -name '*.apk')
+          test "${#packages[@]}" -eq 1
+          python3 "$GITHUB_WORKSPACE/delivery-control/tools/private_alpha1274/deliver.py" deliver --release-id "$PRIVATE_RELEASE_ID" --apk "${packages[0]}" --report connected-alpha-verification.json
+      - name: Wipe private inputs and generated plaintext, including caches
+        if: always()
+        shell: bash
+        run: |
+          rm -f local.properties TMessagesProj/src/connectedAlpha/google-services.json config/connected-alpha-test.keystore connected-alpha-verification.json
+          rm -rf TMessagesProj/build TMessagesProj/.cxx .gradle "$RUNNER_TEMP/alpha-delivery"
+
