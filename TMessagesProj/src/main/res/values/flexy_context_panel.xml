@@ -15,6 +15,9 @@
     <string name="FlexyContextStickerUnconfirmed">Telegram did not confirm this sticker. Check the outgoing message before retrying.</string>
     <string name="FlexyContextStickerSaved">Sticker saved</string>
     <string name="FlexyContextStickerSaveFailed">Could not save the sticker</string>
+    <string name="FlexyContextConvertSticker">Convert to sticker</string>
+    <string name="FlexyContextBounce">iOS-style menu spring</string>
+    <string name="FlexyContextStickerEnabled">Convert bubbles to stickers</string>
     <string name="FlexyContextInteractions">Message interactions</string>
     <string name="FlexyContextDescription">Use the native Matte context panel. Sticker conversion is available for fully visible, unrestricted text bubbles in compatible cloud chats. Other cases keep native menus.</string>
 </resources>
