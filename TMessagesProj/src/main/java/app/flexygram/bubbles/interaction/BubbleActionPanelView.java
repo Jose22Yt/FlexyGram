@@ -32,7 +32,7 @@ public final class BubbleActionPanelView extends LinearLayout {
     private Runnable onDispose;
     private AnimatorSet bounce;
     public void setOnDispose(Runnable callback) { onDispose=callback; }
-    public void setStickerEnabled(boolean enabled) { stickerEnabled=enabled; if (!enabled && tab==TAB_STICKER) tab=TAB_ACTIONS; refresh(); }
+    public void setStickerEnabled(boolean enabled) { stickerEnabled=enabled && BubbleInteractionSettings.stickerConversion(getContext()); if (!stickerEnabled && tab==TAB_STICKER) tab=TAB_ACTIONS; refresh(); }
     public void setStickerStatus(String status) { stickerStatus.setText(status); }
     public void setStickerActions(boolean send, boolean save) { sendButton.setEnabled(send); sendButton.setAlpha(send?1f:.5f); saveButton.setEnabled(save); saveButton.setAlpha(save?1f:.5f); }
     private Listener listener;
