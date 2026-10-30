@@ -76,7 +76,7 @@ public final class SignatureSmartPreviews {
         if (message.isGif()) return SignatureSmartPreviewPalette.GIF;
         if (message.isDocument()) {
             TLRPC.Document doc = message.getDocument();
-            return SignatureMiniPillClassifier.documentType(FileLoader.getDocumentFileName(doc),
+            return SignatureMiniPillClassifier.documentType(doc == null ? null : FileLoader.getDocumentFileName(doc),
                     doc == null ? null : doc.mime_type);
         }
 
@@ -107,27 +107,27 @@ public final class SignatureSmartPreviews {
             case SignatureSmartPreviewPalette.JPG: return "JPG";
             case SignatureSmartPreviewPalette.IMAGE_FILE: return "WEBP";
             case SignatureSmartPreviewPalette.GIF: return "GIF";
-            case SignatureSmartPreviewPalette.FILE: return "FILE";
+            case SignatureSmartPreviewPalette.FILE: return LocaleController.getString(R.string.FlexyPillFile);
             case SignatureSmartPreviewPalette.DOCUMENT: return "DOC";
             case SignatureSmartPreviewPalette.SPREADSHEET: return "XLS";
             case SignatureSmartPreviewPalette.PRESENTATION: return "PPT";
-            case SignatureSmartPreviewPalette.PHOTO: return "FOTO";
-            case SignatureSmartPreviewPalette.VIDEO: return "VIDEO";
-            case SignatureSmartPreviewPalette.MUSIC: return "MÚSICA";
-            case SignatureSmartPreviewPalette.VOICE: return "VOZ";
+            case SignatureSmartPreviewPalette.PHOTO: return LocaleController.getString(R.string.FlexyPillPhoto);
+            case SignatureSmartPreviewPalette.VIDEO: return LocaleController.getString(R.string.FlexyPillVideo);
+            case SignatureSmartPreviewPalette.MUSIC: return LocaleController.getString(R.string.FlexyPillMusic);
+            case SignatureSmartPreviewPalette.VOICE: return LocaleController.getString(R.string.FlexyPillVoice);
             case SignatureSmartPreviewPalette.LINK: return "WEB";
-            case SignatureSmartPreviewPalette.LOCATION: return "GPS";
-            case SignatureSmartPreviewPalette.CONTACT: return "CONTACTO";
-            case SignatureSmartPreviewPalette.STICKER: return "STICKER";
-            case SignatureSmartPreviewPalette.POLL: return "ENCUESTA";
-            case SignatureSmartPreviewPalette.JOINED: return "SE UNIÓ";
-            case SignatureSmartPreviewPalette.LEFT: return "SALIÓ";
-            case SignatureSmartPreviewPalette.PINNED: return "FIJADO";
-            case SignatureSmartPreviewPalette.EDITED: return "EDITADO";
-            case SignatureSmartPreviewPalette.CHANNEL: return "CANAL";
-            case SignatureSmartPreviewPalette.ADMIN: return "ADMIN";
-            case SignatureSmartPreviewPalette.OWNER: return "DUEÑO";
-            case SignatureSmartPreviewPalette.EVENT: return "EVENTO";
+            case SignatureSmartPreviewPalette.LOCATION: return LocaleController.getString(R.string.FlexyPillLocation);
+            case SignatureSmartPreviewPalette.CONTACT: return LocaleController.getString(R.string.FlexyPillContact);
+            case SignatureSmartPreviewPalette.STICKER: return LocaleController.getString(R.string.FlexyPillSticker);
+            case SignatureSmartPreviewPalette.POLL: return LocaleController.getString(R.string.FlexyPillPoll);
+            case SignatureSmartPreviewPalette.JOINED: return LocaleController.getString(R.string.FlexyPillJoined);
+            case SignatureSmartPreviewPalette.LEFT: return LocaleController.getString(R.string.FlexyPillLeft);
+            case SignatureSmartPreviewPalette.PINNED: return LocaleController.getString(R.string.FlexyPillPinned);
+            case SignatureSmartPreviewPalette.EDITED: return LocaleController.getString(R.string.FlexyPillEdited);
+            case SignatureSmartPreviewPalette.CHANNEL: return LocaleController.getString(R.string.FlexyPillChannel);
+            case SignatureSmartPreviewPalette.ADMIN: return LocaleController.getString(R.string.FlexyPillAdmin);
+            case SignatureSmartPreviewPalette.OWNER: return LocaleController.getString(R.string.FlexyPillOwner);
+            case SignatureSmartPreviewPalette.EVENT: return LocaleController.getString(R.string.FlexyPillEvent);
             default: return "";
         }
     }
