@@ -3,16 +3,16 @@
   "source_commit": "aeb6b5fc01f6332ab82194e311b52a19d702a81e",
   "environment": "flexygram-beta",
   "dispatch_branch": "main",
-  "environment_id": null,
+  "environment_id": 25818874267,
   "reviewer_ids": [],
   "ui_review": {
     "confirmed": false,
-    "reviewed_by": null,
-    "reviewed_at": null,
-    "admin_bypass_disabled": false,
-    "main_requires_pull_request_and_approval": false,
-    "main_blocks_force_push_and_deletion": false,
-    "main_applies_to_administrators": false,
+    "reviewed_by": "Work 2 via owner-authorized GitHub UI session Jose22Yt",
+    "reviewed_at": "2026-10-30T18:43:49Z",
+    "admin_bypass_disabled": true,
+    "main_requires_pull_request_and_approval": true,
+    "main_blocks_force_push_and_deletion": true,
+    "main_applies_to_administrators": true,
     "only_environment_scoped_beta_secrets": false,
     "delivery_age_recipient": null
   }

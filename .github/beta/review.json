@@ -15,7 +15,7 @@
   "reviewed": {
     ".github/beta/README.md": "d29d03aeb9305ed907d96e2d7319b229f36dc25e9e43310439c7ad3d59843ff8",
     ".github/beta/audit_environment.py": "d56c23ce355d8cf9d32e54b259897c77c416b7976f4bd4762e6818642413a034",
-    ".github/beta/policy.json": "5af82faf280a0b7e9c0c4ae5052c56e5f1d80c41f9647e39a02487e18a957d16",
+    ".github/beta/policy.json": "85abbee1997697cc2da5f9032dbd1ae575395324ec3fc64adbc8955ac13bb255",
     ".github/beta/private_build.py": "dd559935306248f319b2a97ae128b5b23403dd953a322030177e49547ca7b878",
     ".github/beta/source_contract.py": "3de2d144f790ca960efe73e14f12f6b17dac56fb69dfa062b8c023ab27016f54",
     ".github/beta/test_infrastructure.py": "e112ec4b27cb671eef943091f44002f74bfc3488f0669a39ff6fb226f5ea4d73",
