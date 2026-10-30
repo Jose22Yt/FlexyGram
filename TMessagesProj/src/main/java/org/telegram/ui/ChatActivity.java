@@ -44161,7 +44161,6 @@ public class ChatActivity extends BaseFragment implements
             };
             scrimPopupWindow.setPauseNotifications(true);
             scrimPopupWindow.setDismissAnimationDuration(220);
-            if (compactContext) scrimPopupWindow.setAnimationEnabled(false);
             scrimPopupWindow.setOutsideTouchable(true);
             scrimPopupWindow.setClippingEnabled(true);
             scrimPopupWindow.setAnimationStyle(R.style.PopupContextAnimation);
@@ -50032,7 +50031,6 @@ public class ChatActivity extends BaseFragment implements
             };
             scrimPopupWindow.setPauseNotifications(true);
             scrimPopupWindow.setDismissAnimationDuration(220);
-            if (compactContext) scrimPopupWindow.setAnimationEnabled(false);
             scrimPopupWindow.setOutsideTouchable(true);
             scrimPopupWindow.setClippingEnabled(true);
             scrimPopupWindow.setAnimationStyle(R.style.PopupContextAnimation);
