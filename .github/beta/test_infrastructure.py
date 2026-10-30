@@ -136,7 +136,13 @@ class WorkflowTests(unittest.TestCase):
 
     def test_base_runtime_and_verifier_untouched(self):
         # Stacked infrastructure branch only. Main activation has a different documentary baseline.
+        subprocess.run(['git','cat-file','-e',audit.SOURCE+'^{commit}'],cwd=ROOT,check=True)
         if subprocess.run(['git','merge-base','--is-ancestor',audit.SOURCE,'HEAD'],cwd=ROOT).returncode:
+            activation_base = 'db1bea24b7b705de33f8ff8c8e174011c153cac7'
+            changed = subprocess.check_output(['git','diff','--name-only',activation_base],cwd=ROOT,text=True).splitlines()
+            self.assertTrue(changed and all(p.startswith('.github/beta/') or p in [
+                '.github/workflows/beta-private.yml','.github/workflows/beta-private-tests.yml'] for p in changed), changed)
+            subprocess.run(['git','diff','--exit-code',activation_base,'--','.github/workflows/release.yml'],cwd=ROOT,check=True)
             return
         changed = subprocess.check_output(['git','diff','--name-only',audit.SOURCE],cwd=ROOT,text=True).splitlines()
         allowed = 'tools/connected_alpha/beta_release_contract.py'
