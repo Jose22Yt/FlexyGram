@@ -54,9 +54,11 @@ def main():
 
             'TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java']
     assert not subprocess.check_output(['git','diff',BASE,'--',*frozen],cwd=ROOT)
-    assert (ROOT/'TMessagesProj/build.gradle').read_text().replace('def verCode = 1287','def verCode = 1286') == subprocess.check_output(['git','show',BASE+':TMessagesProj/build.gradle'],cwd=ROOT,text=True)
     import sys
     sys.path.insert(0,str(ROOT/'tools/connected_alpha'))
+    from native_context135_contract import restore as current_overlay
+    reviewed_build = current_overlay('TMessagesProj/build.gradle', (ROOT/'TMessagesProj/build.gradle').read_bytes()).decode()
+    assert reviewed_build.replace('def verCode = 1287','def verCode = 1286') == subprocess.check_output(['git','show',BASE+':TMessagesProj/build.gradle'],cwd=ROOT,text=True)
     from work1_contract import restore,original
     signing='gradle/flexygram-beta.gradle'
     assert restore(signing,(ROOT/signing).read_bytes())==original(signing)

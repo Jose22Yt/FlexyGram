@@ -18,12 +18,13 @@
     "TMessagesProj/src/main/java/org/telegram/ui/Components/ReactionsContainerLayout.java": "f5c53b78b684f9bdf2c890baaa371cb2809c8425a1132e983b100963cd9d426a",
     "TMessagesProj/src/main/java/org/telegram/ui/MainTabsLayout.java": "fd17d6061c21bcf343374f81a617c60c619fb6681ae645dfb04d062d652f94ae",
     "TMessagesProj/src/main/res/values-es/flexy_context_panel.xml": "b5d3af2e3c667f98cf9c753e1ff2a4ccfa24dc704cd93369c2ba13ed90beefaa",
-    "TMessagesProj/src/main/res/values/flexy_context_panel.xml": "0dac7d007d6bc9486d62b49d01d6126f83b442d3c5f694f8b170283599ab4f1a",
+    "TMessagesProj/src/main/res/values/flexy_context_panel.xml": "5a478efa609b2e57f1b2ac4ec73d815521f7cf28e737492be3c9cd5f4063d37f",
     "tools/connected_alpha/context_panel/ContextPanelTest.java.in": "cc21180708bb0265093b5c88fb6ccd04f36d0178bfe1b48dd73798d0e2fb76c1",
     "tools/connected_alpha/context_panel/run.py": "a4348e208dab86d032ac6db7ae1aecaa3a471c6f5e5200de9d5d5f75e5e89c87",
     "tools/connected_alpha/interaction2/Interaction2Test.java.in": "3992f04ab1c903af1286ac060d28f7486bf6c948489141fcfb856beb31ded11c",
     "tools/connected_alpha/interaction2/run.py": "15e85eafd1df1452301359de6e9f27aab5d7b55aebd5f22ab821cdc661d0b7cd",
     "tools/connected_alpha/liquid_navigation/LiquidNavigationTest.java.in": "9321b2228fad9375964ac31e578eaca757990cea20499c5f9aa4375835ea42c5",
+    "tools/connected_alpha/liquid_navigation/check_navigation_source.py": "e794bf109a9060e830a0a742333b5e73ff1fd2472e7c8cab3d2558d2a7bb2f5b",
     "tools/connected_alpha/native_context135_contract.py": "a33f888cc41cd90cf56a3de7ea5f4e65df97d7a236ec504184ee9e29c6bfa78a",
     "tools/connected_alpha/reconstruction1285_contract.py": "e715826f3a251c8dfaa7d8d0f51c24be6ebb9ff07123873ac8cc341a58166aff",
     "tools/connected_alpha/refinement134_contract.py": "a06b11e1512ef7c239ad64980c2091b8a9a5027d7fff8d9da6c48662d2a11e12",
@@ -35,7 +36,9 @@
     "tools/connected_alpha/test_native_context135.py": "24641c16d1c18716ef5e510d7451ba460bd6fbccec94786e2ce37601e8777977",
     "tools/connected_alpha/test_work1.py": "9776f298c8064dace3b197ffc0b0e4e5dd80df4709af0d57372e48230e99e17b",
     "tools/native_context/PhysicsProbe.java": "e3ad55fed7d999c7b5ee644628566cf9dd5e8c23d7be751a105bb3b8cf904c6b",
-    "tools/native_context/README.md": "aafa07ef3791a255712dc6a60c24a83b0b4450a22dbcab95b84b175379cdbbeb"
+    "tools/native_context/README.md": "aafa07ef3791a255712dc6a60c24a83b0b4450a22dbcab95b84b175379cdbbeb",
+    "tools/performance_p0/check_wiring.py": "4615ed3e6ffb63fb1cc101a422f8725adfc3cc1c98d97583790109bbdd24a9de",
+    "tools/performance_p0/run_checks.py": "5a82b372eede0107feb4ab62b2a7a03c10590904c5db9fd4ad7e2c06f8ce1c6c"
   },
   "paths": [
     "TMessagesProj/build.gradle",
@@ -61,6 +64,7 @@
     "tools/connected_alpha/interaction2/Interaction2Test.java.in",
     "tools/connected_alpha/interaction2/run.py",
     "tools/connected_alpha/liquid_navigation/LiquidNavigationTest.java.in",
+    "tools/connected_alpha/liquid_navigation/check_navigation_source.py",
     "tools/connected_alpha/native_context135_contract.py",
     "tools/connected_alpha/reconstruction1285_contract.py",
     "tools/connected_alpha/refinement134_contract.py",
@@ -73,6 +77,8 @@
     "tools/connected_alpha/test_work1.py",
     "tools/native_context/PhysicsProbe.java",
     "tools/native_context/README.md",
-    "tools/native_context/review.json"
+    "tools/native_context/review.json",
+    "tools/performance_p0/check_wiring.py",
+    "tools/performance_p0/run_checks.py"
   ]
 }
