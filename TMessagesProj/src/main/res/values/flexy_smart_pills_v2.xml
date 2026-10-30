@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyPillFile">FILE</string>
+    <string name="FlexyPillPhoto">PHOTO</string>
+    <string name="FlexyPillVideo">VIDEO</string>
+    <string name="FlexyPillMusic">MUSIC</string>
+    <string name="FlexyPillVoice">VOICE</string>
+    <string name="FlexyPillLocation">LOCATION</string>
+    <string name="FlexyPillContact">CONTACT</string>
+    <string name="FlexyPillSticker">STICKER</string>
+    <string name="FlexyPillPoll">POLL</string>
+    <string name="FlexyPillJoined">JOINED</string>
+    <string name="FlexyPillLeft">LEFT</string>
+    <string name="FlexyPillPinned">PINNED</string>
+    <string name="FlexyPillEdited">EDITED</string>
+    <string name="FlexyPillChannel">CHANNEL</string>
+    <string name="FlexyPillOwner">OWNER</string>
+    <string name="FlexyPillEvent">EVENT</string>
+    <string name="FlexyPillAdmin">ADMIN</string>
+</resources>
