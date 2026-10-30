@@ -1,8 +1,8 @@
-name: Alpha 1288 Native context over Work2 private signed delivery
+name: Alpha 1289 Opexgram reference motion over Work2 private signed delivery
 
 on:
   push:
-    branches: [delivery/alpha1288-native-context-private]
+    branches: [delivery/alpha1289-opexgram-motion-private]
     paths:
       - '.github/workflows/private-alpha1274-delivery.yml'
       - 'tools/private_alpha1274/**'
@@ -12,7 +12,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: private-alpha1288-universal-${{ github.sha }}
+  group: private-alpha1289-universal-${{ github.sha }}
   cancel-in-progress: false
 
 jobs:
@@ -22,7 +22,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: a56b816d1e2166a72cda075d80be8b6e3b1073ca
+          ref: 6c57789a1ad335cc48d6cf70b861cad6382de7ac
           fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-java@v4
@@ -54,7 +54,7 @@ jobs:
       - name: Retain isolated native bubble graphics (not full app screenshots)
         uses: actions/upload-artifact@v4
         with:
-          name: FlexyGram-Alpha1288-native-bubble-probe
+          name: FlexyGram-Alpha1289-native-bubble-probe
           path: |
             build/connected-alpha-bubble-visual/android-native-bubbles.png
             build/connected-alpha-bubble-visual/android-signature-icons.png
@@ -96,7 +96,7 @@ jobs:
       - name: Retain synthetic corrected music and header evidence
         uses: actions/upload-artifact@v4
         with:
-          name: Alpha1288-integrated-renderer-evidence
+          name: Alpha1289-integrated-renderer-evidence
           path: |
             build/interaction2/*.png
             build/interaction2/target/surefire-reports/*.xml
@@ -143,7 +143,7 @@ jobs:
 
   private-destination:
     needs: credentials-present
-    if: needs.credentials-present.outputs.ready == 'true' && github.repository == 'Jose22Yt/FlexyGram' && github.ref == 'refs/heads/delivery/alpha1288-native-context-private'
+    if: needs.credentials-present.outputs.ready == 'true' && github.repository == 'Jose22Yt/FlexyGram' && github.ref == 'refs/heads/delivery/alpha1289-opexgram-motion-private'
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -179,11 +179,11 @@ jobs:
         working-directory: approved
     env:
       NATIVE_TARGET: arm64-v8a
-      COMMIT_ID: a56b816d1e2166a72cda075d80be8b6e3b1073ca
+      COMMIT_ID: 6c57789a1ad335cc48d6cf70b861cad6382de7ac
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: a56b816d1e2166a72cda075d80be8b6e3b1073ca
+          ref: 6c57789a1ad335cc48d6cf70b861cad6382de7ac
           path: approved
           fetch-depth: 0
           submodules: recursive
@@ -195,7 +195,7 @@ jobs:
           sparse-checkout: tools/private_alpha1274
           persist-credentials: false
       - name: Require the exact approved application commit
-        run: test "$(git rev-parse HEAD)" = a56b816d1e2166a72cda075d80be8b6e3b1073ca
+        run: test "$(git rev-parse HEAD)" = 6c57789a1ad335cc48d6cf70b861cad6382de7ac
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -305,7 +305,7 @@ jobs:
             echo '::error::Expected exactly one Connected Alpha APK.'
             exit 1
           fi
-          PYTHONPATH=tools/connected_alpha python3 "$GITHUB_WORKSPACE/delivery-control/tools/private_alpha1274/signature_verifier.py" "${packages[0]}" --build-tools "$ANDROID_HOME/build-tools/36.0.0" --certificate-sha256 "$ALPHA_CERTIFICATE_SHA256" --expected-version-code 1288 > connected-alpha-verification.json
+          PYTHONPATH=tools/connected_alpha python3 "$GITHUB_WORKSPACE/delivery-control/tools/private_alpha1274/signature_verifier.py" "${packages[0]}" --build-tools "$ANDROID_HOME/build-tools/36.0.0" --certificate-sha256 "$ALPHA_CERTIFICATE_SHA256" --expected-version-code 1289 > connected-alpha-verification.json
           python3 - <<'PY'
           import json, os
           from pathlib import Path
