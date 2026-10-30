@@ -2,6 +2,7 @@
   "base": "3db6f7a87d147b84a628af7352299173424ce4f7",
   "paths": [
     ".github/workflows/connected-alpha-arm64.yml",
+    ".github/workflows/pr.yml",
     "TMessagesProj/build.gradle",
     "TMessagesProj/src/main/java/app/exteraless/appearance/MainTabsUiHelper.java",
     "TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraAppearanceActivity.java",
@@ -27,6 +28,7 @@
     "TMessagesProj/src/main/res/values-ru/flexy_share_sheet.xml",
     "TMessagesProj/src/main/res/values/flexy_liquid_navigation.xml",
     "TMessagesProj/src/main/res/values/flexy_share_sheet.xml",
+    "gradle/flexygram-beta.gradle",
     "tools/connected_alpha/check_resources.py",
     "tools/connected_alpha/context_panel/ContextPanelTest.java.in",
     "tools/connected_alpha/home_visual/smart_probe.py",
@@ -45,16 +47,19 @@
     "tools/connected_alpha/test_stability1277.py",
     "tools/connected_alpha/test_stabilization1272.py",
     "tools/connected_alpha/test_universal3.py",
+    "tools/connected_alpha/test_variant_graphs.py",
     "tools/connected_alpha/test_work1.py",
     "tools/connected_alpha/work1_contract.py",
     "tools/identity/check_identity.py",
     "tools/performance_p0/check_wiring.py",
     "tools/performance_p0/run_checks.py",
     "tools/work1/README.md",
+    "tools/work1/check_variant_graphs.py",
     "tools/work1/review.json"
   ],
   "reviewed": {
     ".github/workflows/connected-alpha-arm64.yml": "7c411cdf8e442587d1c21be6f47e76c20d2f2786e2222cd53fb85d56c723feaa",
+    ".github/workflows/pr.yml": "37446511cd27a9264375d3e96b7d293fa1027cc8935e8b0e7359030e01a2593e",
     "TMessagesProj/build.gradle": "b2d8e386d128c00e3ced25cacd45d840fc2da4ef527987f85236f91416c5fddb",
     "TMessagesProj/src/main/java/app/exteraless/appearance/MainTabsUiHelper.java": "72fde482113351928e8c897fd46e3e299d3c712bcb32be9f5b9a7fe2e2228cdd",
     "TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraAppearanceActivity.java": "21583254e0a8d9cb9e0061c54165bb4210f28c305b661dbfbfa71972e3d537fc",
@@ -80,6 +85,7 @@
     "TMessagesProj/src/main/res/values-ru/flexy_share_sheet.xml": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "TMessagesProj/src/main/res/values/flexy_liquid_navigation.xml": "e8956a0807248f7b5016e0bd08b4e968472b8905d3f89dae3b8b9c19c77b661e",
     "TMessagesProj/src/main/res/values/flexy_share_sheet.xml": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "gradle/flexygram-beta.gradle": "02dd9c8f7a579ca483ed43d881add58372b7962f418a4326ad9d622100522500",
     "tools/connected_alpha/check_resources.py": "44757ae6324c9220b1366f5931d568a8ee88622a5c91d2386299243c1fc5d35b",
     "tools/connected_alpha/context_panel/ContextPanelTest.java.in": "f33723d7e4a85cb5c254df38fd92c91ca91ff69c41530a9ff7c0c3ed26b911e1",
     "tools/connected_alpha/home_visual/smart_probe.py": "c1ba8cd14df80eb6b2f6434380f9dc9828003b751a765e3bcf51d20f1f11794c",
@@ -98,11 +104,13 @@
     "tools/connected_alpha/test_stability1277.py": "3500f072336699e68976e10be055b0a26001c2e8c52f935be22d44b213eb0f99",
     "tools/connected_alpha/test_stabilization1272.py": "be91904715e63c4f01b089946dd5f611f609ace9ab5149b13bc8bd86ace0784a",
     "tools/connected_alpha/test_universal3.py": "82abd3bde02e0a8314b3fd26ac5cd767c8063dec832de510db1e1309f263a3d8",
-    "tools/connected_alpha/test_work1.py": "13f17ad35a3fdf3dccf6bfdde21f5e6a010c70c6730b2690a599009b63229a32",
+    "tools/connected_alpha/test_variant_graphs.py": "77d9518562bd8b18d8bffde3aebd0af88eadf9fef64e1a7532c8382157cf6d89",
+    "tools/connected_alpha/test_work1.py": "80483f3e538d625c2471511c9ba19afd4fb1f35027ca79dbe65ff76dc68e08c1",
     "tools/connected_alpha/work1_contract.py": "08ffb95a4dd9f47232c0dabe5f5adda278262bbc725a19f19d38980f14f3aff0",
-    "tools/identity/check_identity.py": "c34055cf111301ed34980a03ce7492a473b2f70f8e69360d2ae43e2a57386d91",
-    "tools/performance_p0/check_wiring.py": "680da0ec4b59b295d5d8342f49d97a1ad7f1df367c4fb639afb5e34168b7db75",
+    "tools/identity/check_identity.py": "76f5e2163192cbcd6b265948883655ff0db8719c1cfc352cdafd1bcd53bece12",
+    "tools/performance_p0/check_wiring.py": "cbba7a2c0068bc881f599bc9b65507ce71e5ad6bc2e061100e0c755a1d82fbba",
     "tools/performance_p0/run_checks.py": "ac5924c7a02987b79eea4b7ac12d6b8fe6f95c689f9486d76ba3516f832fa0d1",
-    "tools/work1/README.md": "bb9ac689f671bd142502e615196420af842ac3273025696ad633771ea0db11c3"
+    "tools/work1/README.md": "fc9bf9d3fae10e6b06b7becced02eb997d17408c7da894572de419a773d4fdf0",
+    "tools/work1/check_variant_graphs.py": "b339b555fe602808e4ad8ce2cf63a869c78b570f62e136e0bcf6506efd8692f1"
   }
 }
