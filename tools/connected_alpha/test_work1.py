@@ -24,6 +24,7 @@ class Work1(unittest.TestCase):
   for token in ['fillMessageMenu(primaryMessage, icons, items, options)','panel.setAllowedActions(admitted)','fillMessageMenu(panelCell.getPrimaryMessageObject(),freshIcons,freshItems,freshOptions)','scrimPopupWindow.showAtLocation','dimBehindView(v, true, true)','selectedBubbleMotion.enter','scrimPopupWindow != signatureMenuOwner']:
    self.assertIn(token,s)
   self.assertIn('if (bubbleTap && (scrimPopupWindow != null',s)
+  self.assertIn('if(view instanceof ChatMessageCell && ((ChatMessageCell)view).isSignatureTap() && app.flexygram.bubbles.interaction.BubbleInteractionSettings.tapPanel(view.getContext()))return false;',s)
  def test_native_controls_stay_first_and_selection_is_not_a_tap(self):
   s=(JAVA/'org/telegram/ui/Cells/ChatMessageCell.java').read_text();start=s.index('signatureTapEligible=!result')
   self.assertGreater(start,s.index('checkReactionsTouchEvent(event)'))
