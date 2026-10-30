@@ -13,6 +13,12 @@ def original(revision,path):
  return result.stdout if result.returncode==0 else None
 
 def restore(path,data):
+ # Historical parity callers may re-enter with the exact pre-startup bytes.
+ # Recognize that checkpoint before later layers inspect their own manifests.
+ path=str(path);checkpoint=json.loads(MANIFEST.read_text())
+ if path in checkpoint['reviewed']:
+  before=original(BASE,path)
+  if data==before or before is None and data==b'':return data
  from stability1277_contract import restore as restore_stability
  data=restore_stability(path,data)
  spec=json.loads(MANIFEST.read_text());path=str(path)

@@ -110,7 +110,8 @@ public class MainTabsLayout extends AnimatedLinearLayout {
         int content=Math.max(0,height-getPaddingTop()-getPaddingBottom());
         slotWidth=inner/Math.max(1,count);int rank=0;
         boolean hide=LiquidNavigationConfig.hideLabels(count,(int)(inner/getResources().getDisplayMetrics().density))
-                ||getResources().getConfiguration().fontScale>1.3f;
+                ||getResources().getConfiguration().fontScale>1.3f
+                ||content<dp(37+LiquidNavigationConfig.labelGapDp());
         for(int i=0;i<getChildCount();i++){
             View child=getChildAt(i);int w=isViewVisible(child)?slotWidth+(rank++<inner%Math.max(1,count)?1:0):0;
             if(child instanceof GlassTabView){

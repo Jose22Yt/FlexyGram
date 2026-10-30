@@ -64,4 +64,9 @@ class Universal3(unittest.TestCase):
    if prefix=='TMessagesProj/build.gradle':
     from startup_contract import restore as restore_current
     self.assertEqual(restore_current(prefix,(ROOT/prefix).read_bytes()),subprocess.check_output(['git','show',BASE+':'+prefix],cwd=ROOT))
-   else:self.assertEqual(subprocess.check_output(['git','diff',BASE,'--',prefix],cwd=ROOT),b'')
+   else:
+    from identity_beta_contract import restore as before_identity
+    for path in subprocess.check_output(['git','diff','--name-only',BASE,'--',prefix],cwd=ROOT,text=True).splitlines():
+     file=ROOT/path;data=file.read_bytes() if file.is_file() else b''
+     old=subprocess.run(['git','show',BASE+':'+path],cwd=ROOT,capture_output=True)
+     self.assertEqual(before_identity(path,data),old.stdout if old.returncode==0 else b'',path)

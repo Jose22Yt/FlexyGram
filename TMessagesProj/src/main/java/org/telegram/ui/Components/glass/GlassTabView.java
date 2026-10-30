@@ -763,7 +763,7 @@ public class GlassTabView extends FrameLayout implements MainTabsLayout.Tab, Fac
         setMainTabsCompact(compact);
         android.view.View icon=backupImageView!=null?backupImageView:imageView;
         var lp=(android.widget.FrameLayout.LayoutParams)icon.getLayoutParams();
-        int safeIcon=compact?28:Math.max(18,Math.min(28,app.flexygram.navigation.LiquidNavigationConfig.heightDp()-24-app.flexygram.navigation.LiquidNavigationConfig.labelGapDp()));
+        int safeIcon=compact?28:Math.max(18,Math.min(28,app.flexygram.navigation.LiquidNavigationConfig.heightDp()-24-app.flexygram.navigation.LiquidNavigationConfig.labelGapDp()-2*app.flexygram.navigation.LiquidNavigationConfig.contentPaddingDp()));
         int size=dp(Math.max(18,Math.min(safeIcon,iconDp)));
         int top=compact?0:dp(3);
         int gravity=compact?Gravity.CENTER:Gravity.CENTER_HORIZONTAL|Gravity.TOP;
