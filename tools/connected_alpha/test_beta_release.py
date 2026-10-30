@@ -29,12 +29,14 @@ class BetaRelease(unittest.TestCase):
         for p in (ROOT/'TMessagesProj/src/main/res').glob('values*/*.xml'):
             if {n.get('name') for n in ET.parse(p).getroot()}&{'AppName','AppNameBeta'}:
                 self.assertTrue((beta/p.parent.name/'alpha_name.xml').is_file(),str(p))
-    def test_exact_scope_runtime_and_signing_frozen(self):
+    def test_exact_scope_runtime_and_gradle_frozen(self):
         audit.verify_current()
         for p in audit.spec()['reviewed']:
             data=(ROOT/p).read_bytes()+b'UNKNOWN';self.assertEqual(data,audit.restore(p,data))
-        frozen=['TMessagesProj/src/main/java','TMessagesProj/src/connectedAlpha','TMessagesProj/jni','TMessagesProj/build.gradle','gradle.properties','gradle','config/signing']
+        frozen=['TMessagesProj/src/main/java','TMessagesProj/src/connectedAlpha','TMessagesProj/jni','TMessagesProj/build.gradle','gradle.properties','gradle']
         self.assertEqual(b'',subprocess.check_output(['git','diff',audit.BASE,'--',*frozen],cwd=ROOT))
+        config_changes=set(subprocess.check_output(['git','diff','--name-only',audit.BASE,'--','config/signing'],cwd=ROOT,text=True).splitlines())
+        self.assertLessEqual(config_changes,{'config/signing/flexygram-release.cer','config/signing/identity.properties','config/signing/public-verification.json'})
     def fixture(self,folder,count=96):
         apk=Path(folder)/'synthetic-input.zip'
         with zipfile.ZipFile(apk,'w') as z:
@@ -61,7 +63,7 @@ class BetaRelease(unittest.TestCase):
     def test_wrong_signer_missing_v3_and_multiple_signers_rejected(self):
         with tempfile.TemporaryDirectory() as folder:
             apk,t=self.fixture(folder)
-            cases=[t['signature'].replace(v.OFFICIAL,'c8f04cad685ca5757d35b25ea4b0b4613c7399909948d821e6ada61f9fb12b2c'),t['signature'].replace(v.OFFICIAL,'0'*64),t['signature'].replace('v3): true','v3): false'),t['signature']+'\nSigner #2 certificate SHA-256 digest: '+v.OFFICIAL]
+            cases=[t['signature'].replace(v.OFFICIAL,'c8f04cad685ca5757d35b25ea4b0b4613c7399909948d821e6ada61f9fb12b2c'),t['signature'].replace(v.OFFICIAL,'5a598fb5ba42949b67b7c2635106fafd5f23179397e4c098757a73cd2d2ef66c'),t['signature'].replace(v.OFFICIAL,'0'*64),t['signature'].replace('v3): true','v3): false'),t['signature']+'\nSigner #2 certificate SHA-256 digest: '+v.OFFICIAL]
             for s in cases:
                 with self.subTest(signer=s[-64:]),self.assertRaises(ValueError):self.verify(apk,{**t,'signature':s})
     def test_wrong_package_version_name_label_debug_abi_provider_rejected(self):

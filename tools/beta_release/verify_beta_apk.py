@@ -16,7 +16,7 @@ from verify_apk import (command, require, inspect_archive, require_telegram_payl
                         provider_authorities)
 
 APP = 'com.flexygram.messenger'
-OFFICIAL = '5a598fb5ba42949b67b7c2635106fafd5f23179397e4c098757a73cd2d2ef66c'
+OFFICIAL = 'e71c4d1e14dd940892009c61164df522c133029df6d1258561f6a1a4d1f3c015'
 LABEL = 'FlexyGram Beta'
 EXPECTED_ELFS = 96  # The inherited native payload; review explicitly when dependencies change.
 

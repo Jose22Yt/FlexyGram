@@ -17,7 +17,7 @@ import sys
 import tempfile
 import warnings
 
-OFFICIAL_SHA256 = '5a598fb5ba42949b67b7c2635106fafd5f23179397e4c098757a73cd2d2ef66c'
+OFFICIAL_SHA256 = 'e71c4d1e14dd940892009c61164df522c133029df6d1258561f6a1a4d1f3c015'
 ALIAS = 'flexygram-release'
 PACKAGE = 'com.flexygram.messenger'
 PASSWORD_ENV = 'FLEXYGRAM_LOCAL_STORE_PASSWORD'
