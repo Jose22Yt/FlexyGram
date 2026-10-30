@@ -2156,7 +2156,7 @@ public class ChatActivity extends BaseFragment implements
 
         @Override
         public boolean hasDoubleTap(View view, int position) {
-            if(view instanceof ChatMessageCell && app.flexygram.bubbles.interaction.BubbleInteractionSettings.tapPanel(view.getContext()))return false;
+            if(view instanceof ChatMessageCell && ((ChatMessageCell)view).isSignatureTap() && app.flexygram.bubbles.interaction.BubbleInteractionSettings.tapPanel(view.getContext()))return false;
             if (isQuickRepliesOrWelcomeMessagesMode()) return false;
             MessageObject message;
             if (view instanceof ChatMessageCell) {
