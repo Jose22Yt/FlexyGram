@@ -148,6 +148,10 @@ class Tests(unittest.TestCase):
         self.assertTrue(any(':TMessagesProj:assembleConnectedAlpha' in s.get('run','') for s in steps))
         self.assertFalse(any('upload-artifact' in s.get('uses','') for s in steps))
         self.assertNotIn('age --', workflow.read_text())
+        graph = next(i for i,s in enumerate(steps) if 'signing graphs before staging' in s.get('name',''))
+        staging = next(i for i,s in enumerate(steps) if s.get('name') == 'Validate and restore private inputs (no values logged)')
+        self.assertLess(graph, staging)
+        self.assertIn('check_variant_graphs.py',steps[graph]['run'])
         self.assertFalse(yaml.safe_load(workflow.read_text())['concurrency']['cancel-in-progress'])
 
 

@@ -100,6 +100,12 @@ def validateBeta = tasks.register('validateFlexyGramBetaConfiguration') {
         }
     }
 }
+// AGP deduplicates identical CMake configurations across variants. Its shared
+// RelWithDebInfo task can depend on preBetaBuild even for assembleConnectedAlpha.
+// Validate at Beta identity/artifact consumers, which are never shared with Alpha.
+// Every Beta APK/AAB path still requires the complete, unchanged validation above.
 tasks.configureEach { task ->
-    if (task.name == 'preBetaBuild') task.dependsOn(validateBeta)
+    if (task.name in ['generateBetaBuildConfig', 'processBetaGoogleServices',
+                     'validateSigningBeta', 'packageBeta', 'assembleBeta',
+                     'bundleBeta', 'signBetaBundle']) task.dependsOn(validateBeta)
 }

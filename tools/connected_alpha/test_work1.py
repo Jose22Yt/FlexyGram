@@ -13,8 +13,10 @@ class Work1(unittest.TestCase):
  def test_work2_identity_startup_network_scroll_and_idle_motion_are_intact(self):
   names=['app/flexygram/performance/StartupAccounts.java','app/flexygram/performance/NetworkSnapshotAge.java','app/flexygram/performance/CoalescedTask.java','app/flexygram/performance/ScrollFrameRateHint.java','app/flexygram/performance/RefreshRateMonitor.java','app/flexygram/bubbles/SignatureBorderPath.java','app/flexygram/bubbles/interaction/BubbleTapMotion.java','org/telegram/messenger/ApplicationLoader.java','org/telegram/tgnet/ConnectionsManager.java','org/telegram/ui/Cells/DialogCell.java','org/telegram/ui/Components/RecyclerListView.java','org/telegram/ui/LaunchActivity.java']
   for name in names:self.assertEqual(audit.original('TMessagesProj/src/main/java/'+name),(JAVA/name).read_bytes(),name)
-  for name in ['config/signing/identity.properties','config/signing/flexygram-release.cer','gradle/flexygram-beta.gradle','gradle.properties','TMessagesProj/src/main/AndroidManifest.xml']:
+  for name in ['config/signing/identity.properties','config/signing/flexygram-release.cer','gradle.properties','TMessagesProj/src/main/AndroidManifest.xml']:
    self.assertEqual(audit.original(name),(ROOT/name).read_bytes(),name)
+  signing='gradle/flexygram-beta.gradle'
+  self.assertEqual(audit.original(signing).decode().split('tasks.configureEach')[0],(ROOT/signing).read_text().split('// AGP deduplicates')[0])
   self.assertEqual('5a598fb5ba42949b67b7c2635106fafd5f23179397e4c098757a73cd2d2ef66c',hashlib.sha256((ROOT/'config/signing/flexygram-release.cer').read_bytes()).hexdigest())
  def test_single_tap_requests_both_real_reactions_and_native_actions(self):
   s=(JAVA/'org/telegram/ui/ChatActivity.java').read_text()

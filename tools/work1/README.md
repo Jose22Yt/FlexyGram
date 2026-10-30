@@ -41,3 +41,9 @@ For 2/3/4/5/6 tabs test real navigation, RTL, font scales1/1.3/2, label states, 
 Use `tools/performance_p0` ABBA methodology with a provenance-pinned PR132 reference and this candidate: same package/cert, account corpus, network, theme/blur/wallpaper, battery/thermal and observed refresh policy, >=20 repetitions. Cold/warm startup, chat open, scroll jank and tap latency are NOT_MEASURED here. No synthetic operation count is presented as physical FPS.
 
 Beta remains blocked until the owner's original PKCS12 is securely provisioned in an authorized environment, key/alias/certificate correspondence and custody are verified, Telegram and required Beta Firebase configuration exist, and real installation/coexistence/login/sharing/notifications/update are tested. Do not paste secrets into chat or replace the official key. A private Alpha validation build does not complete Beta acceptance.
+
+## Variant validation graph correction discovered by the full build
+
+AGP deduplicates the identical RelWithDebInfo CMake task across Alpha and Beta. The actual Alpha graph depended on preBetaBuild via that shared native task; PR131's preBetaBuild validator consequently demanded the official Beta PKCS12 during an Alpha build. No key was substituted and no APK was produced by that failed attempt; private inputs were wiped.
+
+The Beta validation body, package, certificate, alias, private/public challenge, rejection of Alpha/debug, Firebase check and custody requirements remain byte-identical. Only task binding changes: mandatory dependencies now protect Beta BuildConfig, Firebase, signing, packaging and APK/AAB entry points. They cannot enter the Alpha graph through shared CMake. Alpha's existing independent validation remains mandatory. CI obtains both real AGP task graphs without executing private tasks and rejects any cross-variant validator or missing mandatory validator. This is not a signing bypass: neither validator has onlyIf/disabled/fallback logic.

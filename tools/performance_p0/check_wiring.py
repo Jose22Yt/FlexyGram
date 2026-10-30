@@ -45,7 +45,7 @@ def main():
     recycler=text('org/telegram/ui/Components/RecyclerListView.java')
     assert 'scrollFrameRateHint.setScrolling(newState != SCROLL_STATE_IDLE)' in recycler
     assert 'scrollFrameRateHint.setScrolling(false)' in block(recycler,'protected void onDetachedFromWindow()')
-    frozen=['config/signing','gradle.properties','gradle',
+    frozen=['config/signing','gradle.properties',
             'TMessagesProj/src/main/AndroidManifest.xml','TMessagesProj/src/connectedAlpha','TMessagesProj/src/beta',
             'TMessagesProj/jni','TMessagesProj/chaquopy','TMessagesProj/src/main/java/org/telegram/messenger/MessagesController.java',
             'TMessagesProj/src/main/java/org/telegram/messenger/MessagesStorage.java',
@@ -58,6 +58,8 @@ def main():
     import sys
     sys.path.insert(0,str(ROOT/'tools/connected_alpha'))
     from work1_contract import restore,original
+    signing='gradle/flexygram-beta.gradle'
+    assert restore(signing,(ROOT/signing).read_bytes())==original(signing)
     for name in ['org/telegram/ui/ChatActivity.java','org/telegram/ui/Cells/ChatMessageCell.java']:
         path='TMessagesProj/src/main/java/'+name
         assert restore(path,(ROOT/path).read_bytes())==original(path)
