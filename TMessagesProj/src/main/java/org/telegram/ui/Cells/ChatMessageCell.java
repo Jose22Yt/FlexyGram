@@ -5087,10 +5087,33 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
-        // Media controls can return early from onTouchEvent; always finish their
-        // independent touch spring without intercepting photo/video handling.
-        if (signatureMediaPress) {
-            int action=event.getActionMasked();
+        int action=event.getActionMasked();
+        // Detect photo/video press before native handlers, several of which return
+        // early from onTouchEvent. Observe only; never consume native media taps.
+        if (action==MotionEvent.ACTION_DOWN
+                && app.flexygram.bubbles.interaction.BubbleInteractionSettings.tapAnimation(getContext())
+                && currentMessageObject!=null && delegate!=null && delegate.canPerformActions()
+                && !delegate.hasSelectedMessages() && !currentMessageObject.preview
+                && !currentMessageObject.isSponsored() && !currentMessageObject.isEphemeral()
+                && currentMessagesGroup==null && drawPhotoImage
+                && (currentMessageObject.type==MessageObject.TYPE_PHOTO || currentMessageObject.isVideo())
+                && photoImage.isInsideImage(getEventX(event),getEventY(event))) {
+            cancelSignatureTap();
+            signatureMediaPress=true;
+            signatureTapX=getEventX(event);
+            signatureTapY=getEventY(event);
+            signatureTapPivotX=photoImage.getCenterX();
+            signatureTapPivotY=photoImage.getCenterY();
+            if (!AndroidUtilities.isAccessibilityScreenReaderEnabled()
+                    && !(android.os.Build.VERSION.SDK_INT>=26 && !android.animation.ValueAnimator.areAnimatorsEnabled())) {
+                signatureTapMotion.press(.012f+.0005f*app.flexygram.bubbles.interaction.BubbleInteractionSettings.compression(getContext()),
+                        app.flexygram.bubbles.interaction.BubbleInteractionSettings.rebound(getContext())/100f,
+                        440-3L*app.flexygram.bubbles.interaction.BubbleInteractionSettings.recovery(getContext()));
+            }
+        }
+        // Media controls may return early: finish their independent touch spring
+        // regardless of the native photo/video touch handling.
+        if (signatureMediaPress && action!=MotionEvent.ACTION_DOWN) {
             if (action==MotionEvent.ACTION_UP) {
                 signatureMediaPress=false;
                 signatureTapMotion.release();
@@ -5566,7 +5589,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             }
         }
         final int signatureAction=event.getActionMasked();
-        if(signatureAction==MotionEvent.ACTION_DOWN){
+        if(signatureAction==MotionEvent.ACTION_DOWN && !signatureMediaPress){
             cancelSignatureTap();
             // Default style never claims a tap; Telegram retains its original gestures.
             // Native links, image viewers, media buttons, polls and spoilers keep precedence.
@@ -5583,8 +5606,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             // unclaimed message surface, not an image-button hit target.
             signatureTapEligible=compatible && !result && !mediaHit
                     && isInsideBackground(touchX,touchY);
-            signatureMediaPress=mediaHit;
-            if(signatureTapEligible || signatureMediaPress){
+            if(signatureTapEligible){
                 signatureTapStarted=android.os.SystemClock.uptimeMillis();
                 signatureTapX=touchX;signatureTapY=touchY;
                 signatureTapPivotX=mediaHit?photoImage.getCenterX():(getBackgroundDrawableLeft()+getBackgroundDrawableRight())*.5f;
