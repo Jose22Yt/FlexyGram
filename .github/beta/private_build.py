@@ -116,6 +116,12 @@ def run_private(args, source, child, log, output=None):
                                stderr=diagnostic, check=True)
 
 
+def require_private_scope(policy):
+    # The no-secret audit may precede provisioning. A build never may.
+    require(policy.get('ui_review', {}).get('confirmed') is True
+            and policy['ui_review'].get('only_environment_scoped_beta_secrets') is True)
+
+
 def build(env):
     os.umask(0o077)
     _, temp, source = locations(env)
@@ -126,6 +132,7 @@ def build(env):
     success = False
     try:
         policy = json.loads((HERE/'policy.json').read_text())
+        require_private_scope(policy)
         recipient = policy['ui_review']['delivery_age_recipient']
         require(re.fullmatch('age1[0-9a-z]{58}', recipient or '')
                 and env.get('BETA_AGE_RECIPIENT') == recipient)

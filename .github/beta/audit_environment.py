@@ -34,6 +34,7 @@ def validate(policy, environment, branches, main):
     require(type(policy['environment_id']) is int and policy['environment_id'] > 0
             and environment['id'] == policy['environment_id'], 'ENVIRONMENT_ID_UNREVIEWED_OR_CHANGED')
     require(environment['name'] == 'flexygram-beta', 'ENVIRONMENT_NAME')
+    require(environment.get('can_admins_bypass') is False, 'ADMIN_BYPASS_MUST_BE_DISABLED')
     rules = [r for r in environment.get('protection_rules', []) if r.get('type') == 'required_reviewers']
     require(len(rules) == 1 and rules[0].get('prevent_self_review') is True, 'REVIEW_AND_SELF_REVIEW_REQUIRED')
     require(all(r.get('type') == 'User' and r.get('reviewer', {}).get('type') == 'User'
@@ -49,8 +50,7 @@ def validate(policy, environment, branches, main):
     require(main.get('name') == 'main' and main.get('protected') is True, 'MAIN_NOT_PROTECTED')
     ui = policy['ui_review']
     for flag in ['confirmed', 'admin_bypass_disabled', 'main_requires_pull_request_and_approval',
-                 'main_blocks_force_push_and_deletion', 'main_applies_to_administrators',
-                 'only_environment_scoped_beta_secrets']:
+                 'main_blocks_force_push_and_deletion', 'main_applies_to_administrators']:
         require(ui.get(flag) is True, 'UI_PROTECTIONS_NOT_ATTESTED')
     require(isinstance(ui.get('reviewed_by'), str) and ui['reviewed_by'].strip()
             and re.fullmatch(r'\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z', ui.get('reviewed_at') or ''),
@@ -58,7 +58,9 @@ def validate(policy, environment, branches, main):
     require(re.fullmatch(r'age1[0-9a-z]{58}', ui.get('delivery_age_recipient') or ''), 'REVIEWED_AGE_RECIPIENT_REQUIRED')
     return {'status': 'PASS_API_AND_RECORDED_UI_REVIEW', 'source_commit': SOURCE,
             'environment_id': environment['id'], 'reviewer_ids': reviewers,
-            'limitation': 'Admin bypass and detailed main rules require owner UI review; API cannot prove them here.'}
+            'private_input_scope': 'VERIFIED_FOR_BUILD' if ui.get('only_environment_scoped_beta_secrets') is True
+                                   else 'PENDING_POST_AUDIT; BUILD_BLOCKED',
+            'limitation': 'Detailed main rules require owner UI review; signing inputs are checked after this no-secret audit.'}
 
 
 def get(tail):
