@@ -29,7 +29,7 @@ class Reconstruction1285(unittest.TestCase):
   self.assertIn('dimBehindView(v, true, true)',source)
   self.assertIn('blurGeneration != scrimBlurGeneration',source)
   self.assertIn('bitmapBg.recycle()',source)
-  self.assertIn('(selectedBubblePreviewScale-1f)*selectedBubbleMotion.progress()',source)
+  self.assertIn('(selectedBubblePreviewScale-1f)*selectedBubbleMotion.geometryProgress()',source)
  def test_original_blur_has_no_glass_blend_or_scope_and_matte_stays_off(self):
   config=self.text(J+'app/flexygram/bubbles/BubbleConfig.java')
   self.assertIn('getBoolean("signature_cached_blur", false)',config)

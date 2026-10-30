@@ -8,14 +8,24 @@ import app.exteraless.player.Spring;
  * Closing retargets existing springs: it never restarts a timed interpolation.
  */
 public final class SelectedBubbleMotion implements Choreographer.FrameCallback {
-    private final Spring x = new Spring(1f, 560f, .72f, .00012f);
-    private final Spring y = new Spring(1f, 560f, .72f, .00012f);
-    private final Spring phase = new Spring(1f, 640f, .80f, .0008f);
+    private final Spring x = new Spring(1f, 560f, .60f, .00012f);
+    private final Spring y = new Spring(1f, 560f, .60f, .00012f);
+    private final Spring phase = new Spring(1f, 500f, .60f, .0008f);
     private Runnable invalidate, completion;
     private boolean running, closing;
     private long lastFrame, started;
     public float progress() { return Math.max(0f, Math.min(1f, phase.value)); }
     public float panelProgress() { return phase.value; }
+    /** Preserve the spring's overshoot for spatial motion; alpha/reveal stay bounded. */
+    public float geometryProgress() { return phase.value; }
+    /** A tall preview can travel hundreds of pixels: keep its rebound in the gap. */
+    public float spatialOffset(float distance, float maxOvershoot) {
+        float p = phase.value;
+        if (p <= 1f || maxOvershoot <= 0f) return distance * p;
+        return distance + maxOvershoot * (float)Math.tanh(distance * (p - 1f) / maxOvershoot);
+    }
+    public float panelScale() { return .62f + .38f * phase.value; }
+    public float panelOffset() { return 18f * (1f - phase.value); }
     public float scale() { return (x.value + y.value) * .5f; }
     public float scaleX() { return x.value; }
     public float scaleY() { return y.value; }
@@ -49,12 +59,14 @@ public final class SelectedBubbleMotion implements Choreographer.FrameCallback {
     }
     private void schedule() {
         if (running) return;
-        running = true; lastFrame = 0; started = android.os.SystemClock.uptimeMillis();
+        running = true;
+        lastFrame = android.os.SystemClock.uptimeMillis() * 1_000_000L;
+        started = android.os.SystemClock.uptimeMillis();
         Choreographer.getInstance().postFrameCallback(this);
     }
     @Override public void doFrame(long frameTimeNanos) {
         if (!running) return;
-        float dt = lastFrame == 0 ? 1f/120f : Math.max(0f, Math.min(.064f, (frameTimeNanos-lastFrame)/1_000_000_000f));
+        float dt = Math.max(0f, Math.min(.064f, (frameTimeNanos-lastFrame)/1_000_000_000f));
         lastFrame = frameTimeNanos;
         boolean mx=x.step(dt), my=y.step(dt), mp=phase.step(dt);
         if (invalidate != null) invalidate.run();
