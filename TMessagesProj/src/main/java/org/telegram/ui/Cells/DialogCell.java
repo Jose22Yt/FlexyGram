@@ -2865,7 +2865,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                     float senderWidth=inlineSender
                             ? Layout.getDesiredWidth(messageString,0,senderEnd,currentMessagePaint)+dp(5):0;
                     int thumbnailReserve=thumbsCount>0?dp((thumbSize+2)*thumbsCount+6):0;
-                    int free=(int)(messageWidth-senderWidth-thumbnailReserve-capsuleWidth-dp(18));
+                    int free=app.flexygram.home.SignatureSmartPillLayout.remaining(messageWidth,senderWidth,thumbnailReserve,capsuleWidth,dp(18));
                     if (free >= dp(16)) {
                         String snippet=app.flexygram.home.SignatureSmartPreviews.snippet(message,candidate);
                         CharSequence clipped=TextUtils.ellipsize(snippet,currentMessagePaint,free,
