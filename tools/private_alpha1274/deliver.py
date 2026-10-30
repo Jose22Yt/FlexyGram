@@ -11,7 +11,7 @@ import urllib.parse
 import urllib.request
 
 REPO = 'Jose22Yt/FlexyGram'
-SOURCE = '6c57789a1ad335cc48d6cf70b861cad6382de7ac'
+SOURCE = '20e8ab525c93d9526356667e09f25e9c56d0eb2d'
 CERT = 'c8f04cad685ca5757d35b25ea4b0b4613c7399909948d821e6ada61f9fb12b2c'
 APP = 'io.github.jose22yt.flexygram.alpha'
 NAME = 'FlexyGram_Alpha_1289_ARM64_TEST.apk'
