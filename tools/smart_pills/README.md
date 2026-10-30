@@ -11,7 +11,7 @@ This branch **extends** SignatureSmartPreviews; it does not add a parallel chat-
 - EN/ES captions. No file reads, downloads, network requests or per-frame bitmap work.
 
 ## Deliberate limitations — Work 1 must verify before acceptance
-- The current renderer prioritizes **one pill per chat row**. Two pills (e.g. ADMIN + PDF) require verified participant roles, priority policy and real width testing, not guesses.
+- The renderer prioritizes **one pill per chat row**, with a second **CANAL** pill for verified channel posts when enough width exists. Other combinations (e.g. ADMIN + PDF) require verified participant roles, priority policy and real width testing, not guesses.
 - Never label a sender ADMIN/OWNER from a channel post alone. The role hook in SignatureMiniPillClassifier accepts only locally confirmed rights; integrate it only where a reliable cached participant record exists.
 - A filename ending in .jpg or .png does not prove WALLPAPER intent. Leave it PNG/JPG unless Telegram has explicit wallpaper media metadata.
 - Deleted-message badges require explicit AyuGram deletion metadata in the compatible Full variant. Never claim deleted based on absent messages or reveal content not stored.
