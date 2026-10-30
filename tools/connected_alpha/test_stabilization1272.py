@@ -2,6 +2,8 @@
 from pathlib import Path
 import re,subprocess,tempfile,unittest
 from stabilization_contract import ROOT,BASE,restore1271
+from identity_beta_contract import restore as before_identity
+from performance_p0_contract import restore as before_work2
 class Stabilization1272(unittest.TestCase):
  def test_entire_reviewed_production_delta_restores_exact_integrated_base(self):
   patch=(ROOT/'tools/connected_alpha/stabilization1272.patch').read_bytes()
@@ -31,7 +33,11 @@ class Stabilization1272(unittest.TestCase):
     for path in before:
      self.assertEqual(restore1271(path,(ROOT/path).read_bytes()),subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT),path)
     continue
-   self.assertEqual(subprocess.check_output(['git','diff',BASE,'--',prefix],cwd=ROOT),b'',prefix)
+   if prefix.endswith('/tgnet'):
+    # Only the exact reviewed Work2 connection scheduling delta may normalize.
+    for path in subprocess.check_output(['git','diff','--name-only',BASE,'--',prefix],cwd=ROOT,text=True).splitlines():
+     self.assertEqual(before_work2(path,(ROOT/path).read_bytes()),subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT),path)
+   else:self.assertEqual(subprocess.check_output(['git','diff',BASE,'--',prefix],cwd=ROOT),b'',prefix)
   for path in ['org/telegram/ui/LoginActivity.java','org/telegram/ui/IntroActivity.java','org/telegram/ui/ChatActivity.java','org/telegram/ui/Cells/ChatMessageCell.java','org/telegram/messenger/MediaController.java','org/telegram/messenger/MusicPlayerService.java','org/telegram/messenger/UserConfig.java','org/telegram/messenger/MessagesController.java','org/telegram/messenger/SendMessagesHelper.java']:
    path='TMessagesProj/src/main/java/'+path
    from next_alpha_contract import restore_visual
@@ -57,4 +63,4 @@ class Stabilization1272(unittest.TestCase):
   from next_alpha_contract import restore1272
   source=restore1272('TMessagesProj/build.gradle',(ROOT/'TMessagesProj/build.gradle').read_bytes()).decode();before=subprocess.check_output(['git','show',BASE+':TMessagesProj/build.gradle'],cwd=ROOT,text=True)
   new=int(re.search(r'def verCode = (\d+)',source)[1]);old=int(re.search(r'def verCode = (\d+)',before)[1]);self.assertEqual(new,1272);self.assertGreater(new,old)
-  self.assertEqual((ROOT/'gradle.properties').read_bytes(),subprocess.check_output(['git','show',BASE+':gradle.properties'],cwd=ROOT))
+  self.assertEqual(before_identity('gradle.properties',(ROOT/'gradle.properties').read_bytes()),subprocess.check_output(['git','show',BASE+':gradle.properties'],cwd=ROOT))

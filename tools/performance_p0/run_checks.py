@@ -88,7 +88,9 @@ def sources():
     names = ['app/flexygram/performance/StartupAccounts.java','app/flexygram/performance/CoalescedTask.java',
              'app/flexygram/performance/ScrollFrameRateHint.java','app/flexygram/navigation/LiquidLensRenderer.java',
              'app/flexygram/bubbles/SignatureBorderPath.java','app/flexygram/bubbles/interaction/BubbleTapMotion.java','app/flexygram/performance/NetworkSnapshotAge.java','app/flexygram/performance/RefreshRateMonitor.java']
-    result={name:(JAVA/name).read_text() for name in names}
+    # The retired Home lens is retained only as historical PR132 benchmark evidence.
+    # No lens code executes in the current Home bar.
+    result={name:((JAVA/name).read_text() if (JAVA/name).is_file() else subprocess.check_output(['git','show','3db6f7a87d147b84a628af7352299173424ce4f7:TMessagesProj/src/main/java/'+name],cwd=ROOT,text=True)) for name in names}
     for name in [names[0],names[3],names[4],names[5]]:
         old=subprocess.check_output(['git','show',BASE+':TMessagesProj/src/main/java/'+name],cwd=ROOT,text=True)
         cls=Path(name).stem
@@ -137,6 +139,7 @@ def main():
         subprocess.run(['java','-m','jdk.compiler/com.sun.tools.javac.Main','-d',str(temp/'classes'),*written],check=True)
         result=subprocess.check_output(['java','-cp',str(temp/'classes'),'PerformanceHarness'],text=True)
         report=json.loads(result)
+        report["retired_home_lens_scope"]="HISTORICAL_PR132_ONLY_NOT_CURRENT_HOME"
         startup_probes(temp)
         report["actual_startup_loop_matrix"]="PASS_10240_STATES_EACH_REVISION_ISOLATED_DOUBLES"
         cell=(JAVA/'org/telegram/ui/Cells/DialogCell.java').read_text()
@@ -167,7 +170,7 @@ public static void main(String[]a){for(float density:new float[]{.75f,1f,1.25f,1
         report['voice_bar_dp_calls_1000_full_width_draws']={'before':22000,'after':10,'density_change_rebuilds':True}
         if args.android_jar:
             api=temp/'api';api.mkdir()
-            inputs=[str(JAVA/name) for name in sources() if 'Baseline' not in name]
+            inputs=[str(JAVA/name) for name in sources() if 'Baseline' not in name and (JAVA/name).is_file()]
             # Minimal project-only dependencies, not a replacement for the Android platform API.
             inputs += [str(temp/'org/telegram/messenger/AndroidUtilities.java'),str(temp/'app/flexygram/navigation/LiquidNavigationConfig.java')]
             subprocess.run(['java','-m','jdk.compiler/com.sun.tools.javac.Main','-classpath',str(args.android_jar),'-d',str(api),*inputs],check=True)

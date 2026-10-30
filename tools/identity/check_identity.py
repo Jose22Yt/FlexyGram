@@ -81,7 +81,7 @@ def main():
             if name != 'TMessagesProj/src/main/java/org/telegram/messenger/SharedConfig.java':
                 sys.path.insert(0, str(ROOT/'tools/connected_alpha'))
                 from performance_p0_contract import restore as project_performance, original as before_performance
-                data = (ROOT/name).read_bytes()
+                data = (ROOT/name).read_bytes() if (ROOT/name).is_file() else b''
                 require(project_performance(name, data) == before_performance(name), 'Source outside exact reviewed performance overlay: ' + name)
                 continue
             require(name == 'TMessagesProj/src/main/java/org/telegram/messenger/SharedConfig.java', 'Functional source modified: ' + name)
@@ -96,7 +96,7 @@ def main():
     require("'-genkeypair'" not in read('tools/signing/owner_wizard.py'), 'New key generation must remain disabled')
     signing = read('gradle/flexygram-beta.gradle')
     require('def expected = pinned' in signing and 'An external fingerprint cannot replace' in signing, 'Environment may not replace official identity')
-    for token in ['FLEXYGRAM_RELEASE_CERT_SHA256', 'KeyStore.getInstance(keyFile, storePass)', 'java.security.PrivateKey', 'cert.checkValidity()', 'CN=Android Debug', 'preBetaBuild', 'src/beta/google-services.json', 'keyFile.toPath().startsWith']:
+    for token in ['FLEXYGRAM_RELEASE_CERT_SHA256', 'KeyStore.getInstance(keyFile, storePass)', 'java.security.PrivateKey', 'cert.checkValidity()', 'CN=Android Debug', 'generateBetaBuildConfig', 'processBetaGoogleServices', 'validateSigningBeta', 'packageBeta', 'bundleBeta', 'src/beta/google-services.json', 'keyFile.toPath().startsWith']:
         require(token in signing, 'Missing signing gate: ' + token)
     # Every new source file is text/approved icon data, never a private input or APK.
     paths = subprocess.check_output(['git', 'ls-files', '--cached', '--others', '--exclude-standard'], cwd=ROOT, text=True).splitlines()
@@ -120,7 +120,7 @@ def main():
     from identity_beta_contract import verify_current, spec, restore
     verify_current()
     for name in spec()['reviewed']:
-        data = (ROOT/name).read_bytes()
+        data = (ROOT/name).read_bytes() if (ROOT/name).is_file() else b''
         mutated = data + b'\nUNREVIEWED\n'
         require(restore(name, mutated) == mutated, 'Audit accepted unknown mutation: ' + name)
     subprocess.run(['git', 'diff', '--check', BASE], cwd=ROOT, check=True)

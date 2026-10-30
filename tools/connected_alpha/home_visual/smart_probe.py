@@ -15,7 +15,7 @@ def write_probe(source,root):
         'private void prepareSmartPreviewMetrics(', 'private void drawSmartPreviewBackground(', 'private CharSequence applyThumbs(',
         'public static class ThumbnailSpan ', 'public static class FixedWidthSpan '])
     code='''import android.graphics.*;import android.text.*;import android.text.style.*;import android.view.View;
-import org.robolectric.RuntimeEnvironment;import app.flexygram.home.*;
+import org.robolectric.RuntimeEnvironment;import app.flexygram.home.*;import org.telegram.messenger.AndroidUtilities;
 public class SmartPreviewCellProbe extends View {
  int smartPreviewKind,messageLeft=24,thumbsCount,thumbSize=20,smartPreviewPrefixEnd,smartPreviewClipLeft=6,smartPreviewClipRight=314;
  float smartPreviewStartX,smartPreviewEndX;boolean smartPreviewMetricsReady;
@@ -60,6 +60,9 @@ public class SmartPreviewCellProbe extends View {
     original=method(baseline,'private void drawSmartPreviewBackground(').replace('drawSmartPreviewBackground(','drawSmartPreviewBackgroundBaseline(',1)
     methods+='\n'+original
     methods+='\n Bitmap renderBaselineBackground(){Bitmap b=Bitmap.createBitmap(getWidth(),getHeight(),Bitmap.Config.ARGB_8888);drawSmartPreviewBackgroundBaseline(new Canvas(b),26,1);return b;}\n'
+    # Work2 caches all voice geometry. Execute its real fields/method, not a stale drawing double.
+    voice=actual[actual.index('    private static final int[] SMART_VOICE_BARS'):actual.index('    private void drawSmartPreviewBackground(')]
+    code=code.replace(' static final int[] SMART_VOICE_BARS={5,9,13,6,11,7,4};',voice)
     code=code.replace('\n}\n','\n'+methods+'\n}\n')
     (source/'SmartPreviewCellProbe.java').write_text(code)
     package=source/'app/flexygram/home';package.mkdir(parents=True,exist_ok=True)
@@ -67,7 +70,7 @@ public class SmartPreviewCellProbe extends View {
     (package/'SignaturePreviewIcon.java').write_bytes((java/'app/flexygram/home/SignaturePreviewIcon.java').read_bytes())
     (package/'SignaturePreviewContext.java').write_bytes((java/'app/flexygram/home/SignaturePreviewContext.java').read_bytes())
     messenger=source/'org/telegram/messenger';messenger.mkdir(parents=True,exist_ok=True)
-    (messenger/'AndroidUtilities.java').write_text('package org.telegram.messenger;public class AndroidUtilities {public static int dp(float value){return Math.round(value);}}')
+    (messenger/'AndroidUtilities.java').write_text('package org.telegram.messenger;public class AndroidUtilities {public static float density=1;public static int dp(float value){return Math.round(value);}}')
     (package/'SignatureSmartPreviewPalette.java').write_bytes((java/'app/flexygram/home/SignatureSmartPreviewPalette.java').read_bytes())
     (package/'SignatureSmartPreviews.java').write_text('package app.flexygram.home;public class SignatureSmartPreviews{public static int value;public static int mode(){return value;}}')
     (source/'SmartPreviewsVisualTest.java').write_bytes(Path(__file__).with_name('SmartPreviewsVisualTest.java.in').read_bytes())

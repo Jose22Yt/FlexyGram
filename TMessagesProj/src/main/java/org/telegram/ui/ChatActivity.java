@@ -2147,7 +2147,7 @@ public class ChatActivity extends BaseFragment implements
             if(view instanceof ChatMessageCell && ((ChatMessageCell)view).isSignatureTap()){
                 if(app.flexygram.bubbles.interaction.BubbleInteractionSettings.tapPanel(view.getContext())){
                     ((ChatMessageCell)view).cancelSignatureTap();
-                    createMenu(view,false,false,x,y,true);
+                    createMenu(view,true,false,x,y,true,false,false,false,true);
                 }
                 return; // animation-only single tap never opens a menu
             }
@@ -2156,7 +2156,7 @@ public class ChatActivity extends BaseFragment implements
 
         @Override
         public boolean hasDoubleTap(View view, int position) {
-            if(view instanceof ChatMessageCell && app.flexygram.bubbles.interaction.BubbleInteractionSettings.tapPanel(view.getContext()))return false;
+            if(view instanceof ChatMessageCell && ((ChatMessageCell)view).isSignatureTap() && app.flexygram.bubbles.interaction.BubbleInteractionSettings.tapPanel(view.getContext()))return false;
             if (isQuickRepliesOrWelcomeMessagesMode()) return false;
             MessageObject message;
             if (view instanceof ChatMessageCell) {
@@ -32867,6 +32867,15 @@ public class ChatActivity extends BaseFragment implements
 
     @SuppressLint("ClickableViewAccessibility")
     private boolean createMenu(View v, boolean single, boolean listView, float x, float y, boolean searchGroup, boolean longpress, boolean suggestEdit, boolean onDoubleTapped) {
+        return createMenu(v,single,listView,x,y,searchGroup,longpress,suggestEdit,onDoubleTapped,false);
+    }
+
+    /** Gesture origin is independent of menu presentation. A tap is never a long press. */
+    private boolean createMenu(View v, boolean single, boolean listView, float x, float y,
+            boolean searchGroup, boolean longpress, boolean suggestEdit, boolean onDoubleTapped,
+            boolean bubbleTap) {
+        // Repeated taps must not replace or close an existing or pending menu.
+        if (bubbleTap && (scrimPopupWindow != null || inPreviewMode || fragmentView == null || !fragmentView.isAttachedToWindow())) return false;
         if (actionBar.isActionModeShowed() || isReport()) {
             return false;
         }
@@ -33245,7 +33254,7 @@ public class ChatActivity extends BaseFragment implements
 
             List<TLRPC.TL_availableReaction> availableReacts = getMediaDataController().getEnabledReactionsList();
             final boolean isEphemeral = message != null && message.isEphemeral();
-            final boolean nekoXShowReactionsView = !disabledReactions() && (NaConfig.INSTANCE.getShowReactions().Bool() || onDoubleTapped); // Show reactions and hide them from tap; openExtera: + разбивка по типам чатов
+            final boolean nekoXShowReactionsView = !disabledReactions() && (NaConfig.INSTANCE.getShowReactions().Bool() || onDoubleTapped || bubbleTap); // Show reactions and hide them from tap; openExtera: + разбивка по типам чатов
             boolean isReactionsViewAvailable = nekoXShowReactionsView && !isEphemeral && !suggestEdit && !isSecretChat() && !isInScheduleMode() && currentUser == null && primaryMessage.hasReactions() && (!ChatObject.isChannel(currentChat) || currentChat.megagroup) && !ChatObject.isMonoForum(currentChat) && !availableReacts.isEmpty() && primaryMessage.messageOwner.reactions.can_see_list && !primaryMessage.isSecretMedia();
             final boolean isReactionsAvailable;
             if (suggestEdit || isEphemeral) {
@@ -33296,12 +33305,11 @@ public class ChatActivity extends BaseFragment implements
                 flags |= ActionBarPopupWindow.ActionBarPopupWindowLayout.FLAG_USE_SWIPEBACK;
             }
 
-            final boolean compactContext = longpress && !onDoubleTapped && v instanceof ChatMessageCell
+            final boolean compactContext = (bubbleTap || longpress) && !onDoubleTapped && v instanceof ChatMessageCell
                     && selectedObject == ((ChatMessageCell)v).getMessageObject()
                     && selectedObject != null && selectedObjectGroup == null && !selectedObject.isSponsored()
                     && !selectedObject.isEphemeral() && !suggestEdit
-                    && (app.flexygram.bubbles.interaction.BubbleInteractionSettings.signaturePanel(getParentActivity())
-                    || app.flexygram.bubbles.interaction.BubbleInteractionSettings.tapPanel(getParentActivity()));
+                    && (bubbleTap || app.flexygram.bubbles.interaction.BubbleInteractionSettings.signaturePanel(getParentActivity()));
             if(compactContext) flags |= ActionBarPopupWindow.ActionBarPopupWindowLayout.FLAG_USE_SWIPEBACK;
             ActionBarPopupWindow.ActionBarPopupWindowLayout popupLayout = new ActionBarPopupWindow.ActionBarPopupWindowLayout(getParentActivity(), R.drawable.popup_fixed_alert4, themeDelegate, flags);
             popupLayout.setMinimumWidth(AndroidUtilities.dp(200));
@@ -36012,15 +36020,6 @@ public class ChatActivity extends BaseFragment implements
                 if (messagePreviewParams != null) {
                     messagePreviewParams.setHideForwardSendersName(noForwardQuote);
                     messagePreviewParams.hideCaption = noForwardCaption;
-                }
-                if(app.flexygram.share.FlexyShareConfig.enabled(getParentActivity()) && selectedObject!=null
-                        && !isSecretChat() && !selectedObject.isPoll() && !selectedObject.isTodo()
-                        && !selectedObject.isInvoice() && !ChatObject.isMonoForum(currentChat)
-                        && selectedObject.canForwardMessage() && !getMessagesController().isPeerNoForwards(dialog_id)){
-                    ArrayList<MessageObject> sharing=new ArrayList<>();
-                    if(selectedObjectGroup!=null)sharing.addAll(selectedObjectGroup.messages);else sharing.add(selectedObject);
-                    showDialog(new ShareAlert(getParentActivity(),this,sharing,null,null,ChatObject.isChannel(currentChat),null,null,false,false,false,null,themeDelegate));
-                    break;
                 }
                 forwardingMessage = selectedObject;
                 forwardingMessageGroup = selectedObjectGroup;

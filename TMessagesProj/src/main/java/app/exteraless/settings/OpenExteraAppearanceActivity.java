@@ -119,7 +119,7 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
     // Links
     private int linksHeaderRow;
     private int appNavigationRow;
-    private int flexyLiquidNavigationRow,flexyShareRow;
+    private int flexyLiquidNavigationRow;
     private int iconPacksRow;
     private int emojiSetsRow;
     private int pillStackRow;
@@ -176,7 +176,6 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
         linksHeaderRow = addRow("linksHeader");
         appNavigationRow = addRow("appNavigation");
         flexyLiquidNavigationRow = addRow("flexyLiquidNavigation");
-        flexyShareRow=addRow("flexyShareSheet");
         pillStackRow = addRow("pillStack");
         hidingRow = addRow("hiding");
         linksDividerRow = addRow();
@@ -490,8 +489,7 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
         } else if (position == appNavigationRow) {
             presentFragment(new OpenExteraAppNavigationActivity());
             return;
-        } else if(position==flexyShareRow){
-            presentFragment(new app.flexygram.share.FlexyShareSettingsActivity());
+
         } else if (position == flexyLiquidNavigationRow) {
             presentFragment(new app.flexygram.navigation.LiquidNavigationSettingsActivity());
             return;
@@ -819,8 +817,7 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
                     TextDetailSettingsCell cell = (TextDetailSettingsCell) holder.itemView;
                     if (position == appNavigationRow) {
                         cell.setTextAndValueAndIcon(getString(R.string.OEAppearanceNavigation), getString(R.string.OEAppearanceNavigationSub), R.drawable.msg_newphone, true);
-                    } else if(position==flexyShareRow){
-                        cell.setTextAndValueAndIcon("Flexy Share Sheet",getString(R.string.FlexyShareEnabled),R.drawable.msg_share,true);
+
                     } else if (position == flexyLiquidNavigationRow) {
                         cell.setTextAndValueAndIcon(getString(R.string.FlexyLiquidNavTitle),
                             getString(R.string.FlexyLiquidNavPreview), R.drawable.msg_settings, true);
@@ -884,7 +881,7 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
                 return TYPE_INFO_PRIVACY;
             } else if (position == fabShapeRow) {
                 return TYPE_FAB_SHAPE;
-            } else if (position == appNavigationRow || position == flexyLiquidNavigationRow || position == flexyShareRow || position == iconPacksRow
+            } else if (position == appNavigationRow || position == flexyLiquidNavigationRow || position == iconPacksRow
                     || position == emojiSetsRow || position == pillStackRow || position == hidingRow) {
                 return TYPE_DETAIL_SETTINGS;
             } else if (position == dividerStyleRow || position == glassOutlineRow

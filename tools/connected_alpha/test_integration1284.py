@@ -1,6 +1,7 @@
 """Current-source gate independent of historical snapshots and physical acceptance."""
 import hashlib, unittest
 import integration1284_contract as audit
+from performance_p0_contract import restore as before_work2
 from reconstruction1285_contract import prior_bytes,read_current
 
 class Integration1284(unittest.TestCase):
@@ -13,11 +14,11 @@ class Integration1284(unittest.TestCase):
     def test_previous_review_manifests_remain_byte_identical(self):
         for name in ['stability1277','signature1278','alpha1280','alpha1281','native_motion_restore','integration1282','alpha1283']:
             path='tools/connected_alpha/'+name+'_review.json'
-            self.assertEqual(audit.original(path),(audit.ROOT/path).read_bytes(),path)
+            self.assertEqual(audit.original(path),before_work2(path,(audit.ROOT/path).read_bytes()),path)
 
     def test_message_rebound_belongs_only_to_the_selected_canvas_overlay(self):
         source=(audit.ROOT/'TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java').read_text()
-        self.assertIn('compactContext = longpress && !onDoubleTapped',source)
+        self.assertIn('compactContext = (bubbleTap || longpress) && !onDoubleTapped',source)
         self.assertIn('selectedBubbleMotionMessage == cell.getMessageObject()',source)
         self.assertIn('canvas.scale(scale, scale,',source)
         self.assertGreaterEqual(source.count('selectedBubbleMotion.reset()'),3)
@@ -40,4 +41,4 @@ class Integration1284(unittest.TestCase):
                      'TMessagesProj/src/main/java/org/telegram/tgnet/ConnectionsManager.java',
                      'TMessagesProj/src/main/java/org/telegram/ui/LoginActivity.java',
                      'TMessagesProj/src/main/AndroidManifest.xml']:
-            self.assertEqual(audit.original(path),(audit.ROOT/path).read_bytes(),path)
+            self.assertEqual(audit.original(path),before_work2(path,(audit.ROOT/path).read_bytes()),path)

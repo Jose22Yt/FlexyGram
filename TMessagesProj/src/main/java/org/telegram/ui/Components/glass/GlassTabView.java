@@ -761,19 +761,21 @@ public class GlassTabView extends FrameLayout implements MainTabsLayout.Tab, Fac
 
     public void setMainTabsAppearance(boolean compact, int iconDp) {
         setMainTabsCompact(compact);
-        android.view.View icon = backupImageView != null ? backupImageView : imageView;
-        android.view.ViewGroup.LayoutParams lp = icon.getLayoutParams();
-        int safeIcon=compact?28:Math.max(18,Math.min(28,app.flexygram.navigation.LiquidNavigationConfig.configured()?app.flexygram.navigation.LiquidNavigationConfig.heightDp()-24-app.flexygram.navigation.LiquidNavigationConfig.labelGapDp():28));
-        int size = dp(Math.max(18, Math.min(safeIcon, iconDp)));
-        if (lp.width != size || lp.height != size) {
-            lp.width = lp.height = size;
-            icon.setLayoutParams(lp);
+        android.view.View icon=backupImageView!=null?backupImageView:imageView;
+        var lp=(android.widget.FrameLayout.LayoutParams)icon.getLayoutParams();
+        int safeIcon=compact?28:Math.max(18,Math.min(28,app.flexygram.navigation.LiquidNavigationConfig.heightDp()-24-app.flexygram.navigation.LiquidNavigationConfig.labelGapDp()-2*app.flexygram.navigation.LiquidNavigationConfig.contentPaddingDp()));
+        int size=dp(Math.max(18,Math.min(safeIcon,iconDp)));
+        int top=compact?0:dp(3);
+        int gravity=compact?Gravity.CENTER:Gravity.CENTER_HORIZONTAL|Gravity.TOP;
+        if(lp.width!=size||lp.height!=size||lp.topMargin!=top||lp.gravity!=gravity){
+            lp.width=lp.height=size;lp.topMargin=top;lp.gravity=gravity;icon.setLayoutParams(lp);
         }
-        if (!compact && lp instanceof android.widget.FrameLayout.LayoutParams) {
-            android.widget.FrameLayout.LayoutParams text = (android.widget.FrameLayout.LayoutParams) textView.getLayoutParams();
-            int top = ((android.widget.FrameLayout.LayoutParams)lp).topMargin + size + dp(app.flexygram.navigation.LiquidNavigationConfig.configured()?app.flexygram.navigation.LiquidNavigationConfig.labelGapDp():1);
-            if (text.topMargin != top) { text.topMargin=top; textView.setLayoutParams(text); }
+        if(!compact){
+            var text=(android.widget.FrameLayout.LayoutParams)textView.getLayoutParams();
+            int textTop=top+size+dp(app.flexygram.navigation.LiquidNavigationConfig.labelGapDp());
+            if(text.topMargin!=textTop){text.topMargin=textTop;textView.setLayoutParams(text);}
         }
+        setContentDescription(textView.getText());
     }
 
     public void setMainTabsCompact(boolean compact) {

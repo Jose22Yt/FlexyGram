@@ -2,6 +2,10 @@
 from pathlib import Path
 import subprocess,tempfile,unittest
 from test_startup import method
+from performance_p0_contract import restore as before_work2
+def historical(name):
+ path='TMessagesProj/src/main/java/'+name
+ return before_work2(path,(ROOT/path).read_bytes()).decode()
 ROOT=Path(__file__).resolve().parents[2]
 JAVA=ROOT/'TMessagesProj/src/main/java'
 class FastConnect1277(unittest.TestCase):
@@ -10,8 +14,8 @@ class FastConnect1277(unittest.TestCase):
    p=Path(tmp)/'Probe.java';p.write_text(source)
    r=subprocess.run(['java','-m','jdk.compiler/com.sun.tools.javac.Main','-d',tmp,str(p)],capture_output=True,text=True);self.assertEqual(r.returncode,0,r.stderr)
    r=subprocess.run(['java','-cp',tmp,'Probe'],capture_output=True,text=True);self.assertEqual(r.returncode,0,r.stderr);return r.stdout
- def test_actual_service_loop_preserves_contacts_media_billing_and_all_active_accounts(self):
-  body=method((JAVA/'org/telegram/messenger/ApplicationLoader.java').read_text(),'private static void initializeAccountServices()')
+ def test_historical_service_loop_preserves_contacts_media_billing_and_all_active_accounts(self):
+  body=method(historical('org/telegram/messenger/ApplicationLoader.java'),'private static void initializeAccountServices()')
   out=self.java('''import java.util.*;class Probe{
   static List<Integer> contacts=new ArrayList<>(),downloads=new ArrayList<>();static int media,billing,sections;
   static class android{static class os{static class Trace{static void beginSection(String s){if(!s.equals("Flexy.startup.account_services"))throw new AssertionError();sections++;}static void endSection(){sections--;}}}}
@@ -38,7 +42,7 @@ class FastConnect1277(unittest.TestCase):
   self.assertEqual(method(current,'public static DownloadController getInstance(int num)'),method(old,'public static DownloadController getInstance(int num)'))
   for suffix in ('org/telegram/messenger/MessagesController.java','org/telegram/messenger/MessagesStorage.java','org/telegram/tgnet/ConnectionsManager.java'):
    p='TMessagesProj/src/main/java/'+suffix
-   data=(ROOT/p).read_bytes()
+   data=before_work2(p,(ROOT/p).read_bytes())
    if suffix.endswith('/MessagesController.java'):
     data=data.replace(b'if (getUserConfig().isClientActivated()) getDownloadController().loadAutoDownloadConfig(false);',b'getDownloadController().loadAutoDownloadConfig(false);',1)
    self.assertEqual(data,subprocess.check_output(['git','show','38e677d60847e117ede1c25731f7b6c4fd2970e2:'+p],cwd=ROOT))

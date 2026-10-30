@@ -43,11 +43,9 @@ class Reconstruction1285(unittest.TestCase):
  def test_only_bubble_glass_is_removed(self):
   for path in ['org/telegram/ui/ActionBar/ActionBar.java','org/telegram/ui/Components/ChatActivityEnterView.java','app/flexygram/header/SignatureChatHeader.java','app/flexygram/composer/ComposerStyle.java']:
    self.assertEqual(audit.original(J+path),(audit.ROOT/J/path).read_bytes(),path)
- def test_lens_never_uses_accent_fill_or_per_frame_bitmaps(self):
-  renderer=self.text(J+'app/flexygram/navigation/LiquidLensRenderer.java')
-  for bad in ['SharedPreferences','createBitmap','getColor(','key_glass_tabSelected']:self.assertNotIn(bad,renderer)
+ def test_home_lens_is_removed_and_bar_avoids_per_frame_bitmaps(self):
+  self.assertFalse((audit.ROOT/J/'app/flexygram/navigation/LiquidLensRenderer.java').exists())
   bar=self.text(J+'org/telegram/ui/MainTabsLayout.java')
-  self.assertIn('float x=ev.getX(pointer)',bar)
-  self.assertIn('flexyMoveDrag(x)',bar)
-  self.assertIn('canvas.clipPath(liquidLens.shape()',bar)
+  for bad in ['createBitmap','clipPath','LiquidLensRenderer','setRenderEffect']:self.assertNotIn(bad,bar)
+  self.assertIn('slotWidth=inner/Math.max(1,count)',bar)
 if __name__=='__main__':unittest.main()

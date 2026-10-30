@@ -124,7 +124,7 @@ public class ContextPanelTest {
   org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(java.time.Duration.ofSeconds(1));assertEquals(1f,motion.scale(),0);assertFalse(motion.pressed());
  }
  @Test public void singleTapSettingsPersistSeparatelyFromContextBounce(){
-  BubbleInteractionSettings.resetTap(activity);assertTrue(BubbleInteractionSettings.tapAnimation(activity));assertFalse(BubbleInteractionSettings.tapPanel(activity));
+  BubbleInteractionSettings.resetTap(activity);assertTrue(BubbleInteractionSettings.tapAnimation(activity));assertTrue(BubbleInteractionSettings.tapPanel(activity));
   BubbleInteractionSettings.tapPanel(activity,true);BubbleInteractionSettings.tapAnimation(activity,false);BubbleInteractionSettings.parameter(activity,0,1000);
   org.robolectric.util.ReflectionHelpers.setStaticField(BubbleInteractionSettings.class,"tap",null);
   org.robolectric.util.ReflectionHelpers.setStaticField(BubbleInteractionSettings.class,"tapPanel",null);

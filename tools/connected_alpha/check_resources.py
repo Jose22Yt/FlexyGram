@@ -87,9 +87,18 @@ def main():
     ET.register_namespace('android', A[1:-1])
     ET.ElementTree(probe_manifest()).write(manifest, encoding='utf-8', xml_declaration=True)
     run('compile-probe', aapt, 'compile', '--dir', str(probe.parent), '-o', str(output/'probe.zip'))
+    # PR131 adds native account/menu/shortcut XML that references full-app resources.
+    # Compile the complete Alpha overlay strictly above; the provider-only link probe
+    # must not pretend to contain those full-app dependencies or replace them with fakes.
+    isolated_alpha = output/'provider-alpha-res'
+    shutil.rmtree(isolated_alpha, ignore_errors=True)
+    shutil.copytree(alpha, isolated_alpha)
+    for path in (isolated_alpha/'xml').glob('*.xml'):
+        if path.name != 'provider_paths.xml': path.unlink()
+    run('compile-provider-alpha', aapt, 'compile', '--dir', str(isolated_alpha), '-o', str(output/'provider-alpha.zip'))
     container = output/'resource-probe.ap_'
     run('link-probe', aapt, 'link', '-I', str(platform/'android.jar'), '--manifest', str(manifest),
-        '--auto-add-overlay', str(output/'probe.zip'), '-R', str(output/'alpha.zip'), '-o', str(container))
+        '--auto-add-overlay', str(output/'probe.zip'), '-R', str(output/'provider-alpha.zip'), '-o', str(container))
     xml = run('provider-binary', aapt, 'dump', 'xmltree', str(container), '--file', 'res/xml/provider_paths.xml')
     if 'saved-attachments' not in xml or 'Saved Attachments/' not in xml:
         raise ValueError('Linked resource did not select the Alpha FileProvider overlay')

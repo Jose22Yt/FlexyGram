@@ -149,7 +149,11 @@ jobs:
         # The module deliberately enables only connectedAlpha. An assembleDebug
         # target cannot exist. Actual compilation/signing is gated in private delivery.
         # Dry-run is explicitly NOT APK evidence and never uploads a debug substitute.
-        run: ./gradlew :TMessagesProj:assembleConnectedAlpha --dry-run --no-daemon --console=plain
+        run: |
+          set -euo pipefail
+          ./gradlew :TMessagesProj:assembleConnectedAlpha --dry-run --no-daemon --console=plain > "$RUNNER_TEMP/alpha-variant-graph.txt"
+          ./gradlew :TMessagesProj:assembleBeta --dry-run --no-daemon --console=plain > "$RUNNER_TEMP/beta-variant-graph.txt"
+          python3 tools/work1/check_variant_graphs.py "$RUNNER_TEMP/alpha-variant-graph.txt" "$RUNNER_TEMP/beta-variant-graph.txt"
 
   official-identity-static:
     if: github.event_name == 'pull_request' && github.head_ref == 'feat/official-identity-beta-preparation'

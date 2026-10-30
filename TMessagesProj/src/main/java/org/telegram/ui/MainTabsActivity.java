@@ -181,21 +181,8 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
     private app.exteraless.player.PlayerMiniView miniPlayer;
     private FrameLayout tabsViewWrapper;
     private MainTabsLayout tabsView;
-    private BlurredBackgroundDrawable tabsViewBackground;
-    private BlurredBackgroundDrawable liquidLensBackground;
-    private final org.telegram.messenger.Utilities.Callback<Boolean> mainGlassPowerListener = ignored -> refreshMainNativeGlassPolicy();
     private void refreshMainNativeGlassPolicy() {
-        if (Build.VERSION.SDK_INT >= 33 && tabsViewBackground instanceof org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawableRenderNode) {
-            ((org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawableRenderNode)tabsViewBackground)
-                    .setLiquidGlassEffectAllowed(LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS));
-            tabsViewBackground.updateColors();
-            if (liquidLensBackground instanceof org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawableRenderNode) {
-                ((org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawableRenderNode)liquidLensBackground)
-                        .setLiquidGlassEffectAllowed(LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS));
-                liquidLensBackground.updateColors();
-            }
-            if(tabsView!=null)tabsView.invalidate();
-        }
+        if(tabsView!=null)tabsView.refreshBottomBarAppearance();
     }
     private View fadeView;
     private boolean lastHideContacts = NaConfig.INSTANCE.getMainTabsHideContacts().Bool();
@@ -204,75 +191,8 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
 
     public MainTabsActivity() {
         super();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            iBlur3SourceTabGlass = new BlurredBackgroundSourceRenderNode(null);
-            iBlur3SourceTabGlass.setupRenderer(new RenderNodeWithHash.Renderer() {
-                @Override
-                public void renderNodeCalculateHash(IBlur3Hash hash) {
-                    hash.add(getThemedColor(Theme.key_windowBackgroundWhite));
-                    hash.add(SharedConfig.chatBlurEnabled());
-
-                    for (int a = 0, N = fragmentsArr.size(); a < N; a++) {
-                        final FragmentState state = fragmentsArr.valueAt(a);
-                        final BaseFragment fragment = state.fragment;
-                        if (fragment.fragmentView == null) {
-                            continue;
-                        }
-                        if (!ViewPositionWatcher.computeRectInParent(fragment.fragmentView, contentView, fragmentPosition)) {
-                            continue;
-                        }
-                        if (fragmentPosition.right <= 0 || fragmentPosition.left >= fragmentView.getMeasuredWidth()) {
-                            continue;
-                        }
-
-                        if (fragment instanceof TabFragmentDelegate) {
-                            TabFragmentDelegate delegate = (TabFragmentDelegate) fragment;
-                            BlurredBackgroundSourceRenderNode source = delegate.getGlassSource();
-                            if (source != null) {
-                                hash.addF(fragmentPosition.left);
-                                hash.addF(fragmentPosition.top);
-                                hash.add(fragment.getClassGuid());
-                            }
-                        }
-                    }
-                }
-
-                @Override
-                public void renderNodeUpdateDisplayList(Canvas canvas) {
-                    final int width = fragmentView.getMeasuredWidth();
-                    final int height = fragmentView.getMeasuredHeight();
-
-                    canvas.drawColor(getThemedColor(Theme.key_windowBackgroundWhite));
-
-                    for (int a = 0, N = fragmentsArr.size(); a < N; a++) {
-                        final FragmentState state = fragmentsArr.valueAt(a);
-                        final BaseFragment fragment = state.fragment;
-                        if (fragment.fragmentView == null) {
-                            continue;
-                        }
-                        if (!ViewPositionWatcher.computeRectInParent(fragment.fragmentView, contentView, fragmentPosition)) {
-                            continue;
-                        }
-                        if (fragmentPosition.right <= 0 || fragmentPosition.left >= fragmentView.getMeasuredWidth()) {
-                            continue;
-                        }
-
-                        if (fragment instanceof TabFragmentDelegate) {
-                            TabFragmentDelegate delegate = (TabFragmentDelegate) fragment;
-                            BlurredBackgroundSourceRenderNode source = delegate.getGlassSource();
-                            if (source != null) {
-                                canvas.save();
-                                canvas.translate(fragmentPosition.left, fragmentPosition.top);
-                                source.draw(canvas, 0, 0, width, height);
-                                canvas.restore();
-                            }
-                        }
-                    }
-                }
-            });
-        } else {
-            iBlur3SourceTabGlass = null;
-        }
+        // Home no longer captures the conversation list for a Glass/lens backdrop.
+        iBlur3SourceTabGlass = null;
 
         iBlur3SourceColor = new BlurredBackgroundSourceColor();
 
@@ -293,11 +213,11 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         return new FrameLayout(context) {
             @Override protected void onAttachedToWindow() {
                 super.onAttachedToWindow();
-                LiteMode.addOnPowerSaverAppliedListener(mainGlassPowerListener);
+
                 refreshMainNativeGlassPolicy();
             }
             @Override protected void onDetachedFromWindow() {
-                LiteMode.removeOnPowerSaverAppliedListener(mainGlassPowerListener);
+
                 super.onDetachedFromWindow();
             }
             @Override
@@ -407,7 +327,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         final boolean compact = MainTabsHelper.isMainTabsHideTitleStyle();
 
         tabsView = new MainTabsLayout(context, resourceProvider);
-        tabsView.setClipChildren(false);
+        tabsView.setClipChildren(true);
         // В M3 панель без внутренних
         // отступов и без ограничения ширины
         MainTabsUiHelper.applyTabsLayoutStyle(tabsView, dp(328 + DialogsActivity.MAIN_TABS_MARGIN * 2));
@@ -483,18 +403,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
 
         final ViewPositionWatcher viewPositionWatcher = new ViewPositionWatcher(contentView);
 
-        BlurredBackgroundDrawableViewFactory iBlur3FactoryGlass = new BlurredBackgroundDrawableViewFactory(iBlur3SourceTabGlass != null ? iBlur3SourceTabGlass : iBlur3SourceColor);
-        iBlur3FactoryGlass.setSourceRootView(viewPositionWatcher, contentView);
-        iBlur3FactoryGlass.setLiquidGlassEffectAllowed(LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS));
-
-        tabsViewBackground = iBlur3FactoryGlass.create(tabsView, BlurredBackgroundProviderImpl.mainTabs(resourceProvider));
-        tabsViewBackground.setRadius(MainTabsUiHelper.getBackgroundRadius());
-        tabsViewBackground.setPadding(MainTabsUiHelper.getBackgroundInset());
-        tabsView.setBackground(tabsViewBackground);
-        liquidLensBackground = iBlur3FactoryGlass.create(tabsView, null);
-        liquidLensBackground.setRadius(dp(28));
-        liquidLensBackground.setPadding(0);
-        tabsView.setLiquidLensBackground(liquidLensBackground);
+        tabsView.refreshBottomBarAppearance();
 
         BlurredBackgroundDrawableViewFactory iBlur3FactoryFade = new BlurredBackgroundDrawableViewFactory(iBlur3SourceColor);
         iBlur3FactoryFade.setSourceRootView(viewPositionWatcher, contentView);
@@ -1059,7 +968,11 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         if (tabsView == null || tabs == null || !app.flexygram.navigation.LiquidNavigationConfig.configured()) return;
         int width = tabsViewWrapper != null && tabsViewWrapper.getWidth() > 0
                 ? tabsViewWrapper.getWidth() : AndroidUtilities.displaySize.x;
-        int slots = Math.max(2, (width - dp(56)) / dp(48));
+        // Use the requested insets, not the previous wrapper padding, when settings change.
+        int inner = width - insetLeft - insetRight
+                - dp(2*(app.flexygram.navigation.LiquidNavigationConfig.sideGapDp()
+                        +app.flexygram.navigation.LiquidNavigationConfig.innerMarginDp()));
+        int slots = Math.max(2, inner / dp(48));
         flexyConfiguredDestinations = app.flexygram.navigation.LiquidNavigationConfig.order();
         int[] shown = app.flexygram.navigation.LiquidNavigationConfig.shown(slots);
         boolean orderChanged = !java.util.Arrays.equals(shown, flexyShownDestinations);
@@ -1078,11 +991,10 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         }
         int oldHeight=tabsView.getLayoutParams()!=null ? tabsView.getLayoutParams().height : -1;
         MainTabsUiHelper.applyTabsLayoutStyle(tabsView,dp(328 + DialogsActivity.MAIN_TABS_MARGIN * 2));
-        if (tabsViewBackground!=null){tabsViewBackground.setRadius(MainTabsUiHelper.getBackgroundRadius());tabsViewBackground.setPadding(MainTabsUiHelper.getBackgroundInset());}
         if (tabsViewWrapper != null) MainTabsUiHelper.applyTabsBottomInset(tabsView,tabsViewWrapper,navigationBarHeight,insetLeft,insetRight);
         if (tabsView.getLayoutParams()!=null && oldHeight!=tabsView.getLayoutParams().height && fragmentView!=null)
             androidx.core.view.ViewCompat.requestApplyInsets(fragmentView);
-        tabsView.refreshLiquidAppearance();
+        tabsView.refreshBottomBarAppearance();
         int current=viewPager.getCurrentPosition();boolean represented=false;
         for (int id : flexyConfiguredDestinations) if (indexToPosition(id)==current) {represented=true;break;}
         if (!represented && current!=getPositionChats() && !viewPager.isManualScrolling() && !viewPager.isTouch()) {
@@ -1100,7 +1012,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
     private boolean openFlexyShortcut(int id, View anchor) {
         if (id == app.flexygram.navigation.LiquidNavigationDestinations.MORE) {
             ItemOptions options = ItemOptions.makeOptions(this, anchor);
-            for (int destination : app.flexygram.navigation.LiquidNavigationConfig.order()) {
+            for (int destination = 0; destination < app.flexygram.navigation.LiquidNavigationDestinations.COUNT; destination++) {
                 if (!app.flexygram.navigation.LiquidNavigationDestinations.contains(flexyShownDestinations,destination)) {
                     final int selected = destination;
                     options.add(R.drawable.msg_actions, getString(app.flexygram.navigation.LiquidNavigationTabs.label(selected)),
@@ -1114,7 +1026,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
     }
     private void openFlexyDestination(int id) {
         int position = indexToPosition(id);
-        if (position >= 0) {
+        if (position >= 0 && app.flexygram.navigation.LiquidNavigationDestinations.contains(flexyShownDestinations,id)) {
             if (!viewPager.isManualScrolling() && !viewPager.isTouch()) {
                 selectTab(position,true);viewPager.scrollToPosition(position);
             }
@@ -1380,7 +1292,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
 
     @Override
     public void onFragmentDestroy() {
-        LiteMode.removeOnPowerSaverAppliedListener(mainGlassPowerListener);
+
         Bulletin.removeDelegate(this);
         Bulletin.removeDelegate(contentView);
 
@@ -1649,9 +1561,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
 
     private void blur3_updateColors() {
         blur3_updateFadeColors();
-        if (tabsViewBackground != null) {
-            tabsViewBackground.updateColors();
-        }
+        if (tabsView != null) tabsView.refreshBottomBarAppearance();
         blur3_invalidateBlur();
         if (fadeView != null) {
             fadeView.invalidate();
@@ -1672,13 +1582,15 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
     }
 
     private boolean processLongClick(View button, int index) {
-        if (app.flexygram.navigation.LiquidNavigationConfig.configured() && index == INDEX_CHATS
-                && !app.flexygram.navigation.LiquidNavigationDestinations.contains(
-                        app.flexygram.navigation.LiquidNavigationConfig.order(), INDEX_SETTINGS)) {
-            ItemOptions.makeOptions(this, button)
-                .add(R.drawable.msg_settings, getString(R.string.Settings), () -> openFlexySettings())
-                .add(R.drawable.msg_folders, getString(R.string.MainTabsChats), () -> openFoldersSelector(button))
-                .show();
+        if (index == INDEX_CHATS) {
+            ItemOptions options=ItemOptions.makeOptions(this,button);
+            for(int id=1;id<app.flexygram.navigation.LiquidNavigationDestinations.COUNT;id++) {
+                if(!app.flexygram.navigation.LiquidNavigationDestinations.contains(flexyShownDestinations,id)) {
+                    final int destination=id;
+                    options.add(R.drawable.msg_actions,getString(app.flexygram.navigation.LiquidNavigationTabs.label(id)),()->openFlexyDestination(destination));
+                }
+            }
+            options.add(R.drawable.msg_folders,getString(R.string.MainTabsChats),()->openFoldersSelector(button)).show();
             return true;
         }
         if (index >= 6) return false;

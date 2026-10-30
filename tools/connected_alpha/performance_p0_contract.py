@@ -11,7 +11,9 @@ MANIFEST=ROOT/'tools/performance_p0/review.json'
 
 
 def spec():return json.loads(MANIFEST.read_text())
-def paths():return frozenset(spec()['paths'])
+def paths():
+    from work1_contract import paths as work1_paths
+    return frozenset(spec()['paths']) | work1_paths()
 
 
 @lru_cache(maxsize=256)
@@ -21,15 +23,20 @@ def original(path):
 
 
 def restore(path,data):
+    from work1_contract import restore as work1_restore
+    data=work1_restore(path,data)
     expected=spec()['reviewed'].get(str(path))
     return original(path) if expected and hashlib.sha256(data).hexdigest()==expected else data
 
 
 def verify_current():
+    from work1_contract import verify_current as verify_work1, restore as work1_restore
+    verify_work1()
     current=spec()
     if current['base']!=BASE:raise ValueError('Incorrect performance base')
     for path,expected in current['reviewed'].items():
-        data=(ROOT/path).read_bytes()
+        file=ROOT/path
+        data=work1_restore(path,file.read_bytes() if file.is_file() else b'')
         if hashlib.sha256(data).hexdigest()!=expected:raise ValueError('Unreviewed performance source: '+path)
         if restore(path,data+b'\nUNREVIEWED\n')!=data+b'\nUNREVIEWED\n':raise ValueError('Unknown bytes were accepted')
     changed=set(subprocess.check_output(['git','diff','--no-renames',BASE,'--name-only'],cwd=ROOT,text=True).splitlines())

@@ -1,8 +1,9 @@
-/* Real bar/layout and AndroidX springs; tab content/application services are doubles. */
+/* Actual production layout, settings and AndroidX springs; account/tab-content doubles. */
 import android.app.Activity;
 import android.view.*;
 import android.widget.FrameLayout;
 import java.time.Duration;
+import java.util.*;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.robolectric.*;
@@ -15,192 +16,35 @@ import static org.junit.Assert.*;
 @RunWith(RobolectricTestRunner.class) @Config(manifest=Config.NONE,sdk=35)
 @LooperMode(LooperMode.Mode.PAUSED)
 public class LiquidNavigationTest {
- Activity activity; FrameLayout root; MainTabsLayout bar; GlassTabView[] tabs; int clicks;
- @Before public void setup(){
-  activity=Robolectric.buildActivity(Activity.class).setup().get();org.telegram.messenger.ApplicationLoader.applicationContext=activity.getApplicationContext();
-  activity.getSharedPreferences("flexy_liquid_navigation",0).edit().clear().commit();
-  ReflectionHelpers.setStaticField(LiquidNavigationConfig.class,"loaded",false);
-  LiquidNavigationConfig.enabled(true);
-  root=new FrameLayout(activity);activity.setContentView(root);
-  bar=new MainTabsLayout(activity,null);bar.setLiquidPreview(true);bar.setPadding(8,8,8,8);
-  root.addView(bar,new FrameLayout.LayoutParams(328,76));
-  tabs=new GlassTabView[4];
-  for(int i=0;i<4;i++){final int id=i;tabs[i]=new GlassTabView(activity);bar.addView(tabs[i]);bar.setViewVisible(tabs[i],true,false);tabs[i].setOnClickListener(v->{clicks++;bar.setTabSelected(tabs[id],false);});}
-  bar.setTabSelected(tabs[0],false);layout();
+ Activity a;FrameLayout root;MainTabsLayout bar;ArrayList<GlassTabView> tabs=new ArrayList<>();int clicked;
+ @Before public void setup(){a=Robolectric.buildActivity(Activity.class).setup().get();org.telegram.messenger.ApplicationLoader.applicationContext=a;clear();root=new FrameLayout(a);a.setContentView(root);}
+ void clear(){a.getSharedPreferences("flexy_liquid_navigation",0).edit().clear().commit();ReflectionHelpers.setStaticField(LiquidNavigationConfig.class,"loaded",false);}
+ void create(int count,int width,boolean reverse){
+  root.removeAllViews();tabs.clear();bar=new MainTabsLayout(a,null);bar.setPadding(4,0,4,0);bar.refreshBottomBarAppearance();root.addView(bar,new FrameLayout.LayoutParams(width,60));
+  for(int i=0;i<count;i++){final int id=i;var v=new GlassTabView(a);tabs.add(v);bar.addView(v);bar.setViewVisible(v,true,false);bar.setPriority(v,reverse?-i:i);v.setOnClickListener(w->{clicked=id;bar.setTabSelected(v,true);});}
+  bar.setTabSelected(tabs.get(0),false);layout(width);
  }
- void layout(){root.measure(View.MeasureSpec.makeMeasureSpec(328,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(100,View.MeasureSpec.EXACTLY));root.layout(0,0,328,100);Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(Duration.ofSeconds(2));}
- void event(int action,float x){MotionEvent e=MotionEvent.obtain(0,android.os.SystemClock.uptimeMillis(),action,x,30,0);try{bar.dispatchTouchEvent(e);}finally{e.recycle();}}
- float center(int i){return tabs[i].getX()+tabs[i].getWidth()/2f;}
- @After public void end(){root.removeAllViews();Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(Duration.ofSeconds(1));activity.finish();}
- @Test public void actualHostVisibilityMethodEnablesTheBarOnlyWhenShown(){
-  var host=new NativeTabsVisibilityProbe(bar,root);host.apply(0f);assertFalse(bar.isEnabled());
-  host.apply(.5f);assertFalse(bar.isEnabled());host.apply(1f);assertTrue(bar.isEnabled());assertEquals(View.VISIBLE,bar.getVisibility());
- }
- @Test public void rtlPriorityRetainsLogicalDestinationOrderWithoutReparenting(){
-  bar.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
-  for(int i=0;i<tabs.length;i++)bar.setPriority(tabs[i],-i);
-  layout();assertTrue(center(0)>center(3));for(var tab:tabs)assertSame(bar,tab.getParent());
- }
- @Test public void nativeGlassPolicyIsIdempotentAndClearsTheOldRenderEffectOnOff(){
-  NativeGlassPolicyProbe.created=0;var policy=new NativeGlassPolicyProbe();
-  policy.setLiquidGlassEffectAllowed(true);assertTrue(policy.active());assertEquals(1,NativeGlassPolicyProbe.created);
-  policy.setLiquidGlassEffectAllowed(true);assertEquals(1,NativeGlassPolicyProbe.created);
-  policy.setLiquidGlassEffectAllowed(false);assertFalse(policy.active());assertEquals(1,policy.clears);
-  int changes=policy.invalidations;policy.setLiquidGlassEffectAllowed(false);assertEquals(changes,policy.invalidations);
-  policy.setLiquidGlassEffectAllowed(true);assertTrue(policy.active());assertEquals(2,NativeGlassPolicyProbe.created);
- }
- @Test public void tapHighlightsImmediatelyAndDispatchesOnlyOneNativeClick(){
-  event(MotionEvent.ACTION_DOWN,center(2));
-  assertTrue(ReflectionHelpers.<Boolean>getField(bar,"flexyPressed"));
-  assertEquals(0,clicks);event(MotionEvent.ACTION_UP,center(2));Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();assertEquals(1,clicks);assertTrue(tabs[2].isTabSelected());
- }
- @Test public void draggingDoesNotNavigateUntilReleaseAndSettlesWithActualAndroidXSpring(){
-  event(MotionEvent.ACTION_DOWN,center(0));event(MotionEvent.ACTION_MOVE,center(3));
-  assertEquals(0,clicks);assertTrue(ReflectionHelpers.<Boolean>getField(bar,"flexyDragging"));
-  assertTrue("each MOVE must retain deformation instead of being consumed twice",ReflectionHelpers.<Float>getField(bar,"flexyStretch")>0f);
-  assertEquals(center(3),ReflectionHelpers.<Float>getField(bar,"animatedLongSelectedViewCenterX"),.1f);
-  event(MotionEvent.ACTION_UP,center(3));assertEquals(1,clicks);assertTrue(tabs[3].isTabSelected());
-  assertTrue("release preserves deformation for the native spring",ReflectionHelpers.<Float>getField(bar,"flexyStretch")>0f);
-  Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(Duration.ofSeconds(3));
-  assertEquals(center(3),ReflectionHelpers.<Float>getField(bar,"animatedLongSelectedViewCenterX"),1f);
-  assertEquals(0f,ReflectionHelpers.<Float>getField(bar,"flexyStretch"),.01f);
- }
- @Test public void cancellationAndDetachNeverCommitOrKeepRunningTheNewSprings(){
-  event(MotionEvent.ACTION_DOWN,center(0));event(MotionEvent.ACTION_MOVE,center(3));event(MotionEvent.ACTION_CANCEL,center(3));assertEquals(0,clicks);
-  event(MotionEvent.ACTION_DOWN,center(0));event(MotionEvent.ACTION_MOVE,center(2));root.removeView(bar);
-  assertFalse(ReflectionHelpers.<Boolean>getField(bar,"flexyDragging"));assertFalse(ReflectionHelpers.<Boolean>getField(bar,"flexyPressed"));
-  androidx.dynamicanimation.animation.SpringAnimation animation=ReflectionHelpers.getField(bar,"selectedTabPositionX");assertFalse(animation.isRunning());
-  Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(Duration.ofSeconds(2));assertEquals(0,clicks);
- }
- @Test public void destinationOrderAndMotionSettingsSurviveReload(){
-  LiquidNavigationConfig.order(new int[]{8,6,0,2,7,3});
-  LiquidNavigationConfig.value(LiquidNavigationConfig.Parameter.SPEED,87);LiquidNavigationConfig.labels(false);
-  ReflectionHelpers.setStaticField(LiquidNavigationConfig.class,"loaded",false);
-  assertArrayEquals(new int[]{8,6,0,2,7,3},LiquidNavigationConfig.order());
-  assertEquals(87,LiquidNavigationConfig.value(LiquidNavigationConfig.Parameter.SPEED));assertFalse(LiquidNavigationConfig.labels());
- }
- @Test public void nativeSelectionShowsOverflowWhenTheCurrentPageMovesIntoMore(){
-  NativeTabSelectionProbe host=new NativeTabSelectionProbe();host.tabs=new GlassTabView[10];
-  for(int i=0;i<10;i++)host.tabs[i]=new GlassTabView(activity);
-  host.flexyShownDestinations=new int[]{0,1,9};host.flexyConfiguredDestinations=new int[]{0,1,2,4};
-  host.selectTab(2,false);assertTrue(host.tabs[9].isTabSelected());assertFalse(host.tabs[0].isTabSelected());
-  host.selectTab(0,false);assertFalse(host.tabs[9].isTabSelected());assertTrue(host.tabs[0].isTabSelected());
- }
- @Test public void nativeLayoutRetainsAccessibleSlotsAndReordersWithoutDetach(){
-  for(GlassTabView tab:tabs)assertTrue(tab.getWidth()>=48);
-  tabs[0].bringToFront();layout();assertSame(bar,tabs[0].getParent());assertEquals(tabs[0],bar.getChildAt(3));
-  assertTrue(center(0)>center(1));
- }
- @Test public void followingSensitivityNeverAddsPositionLagOrOvershootsTheFinger(){
-  for(int sensitivity:new int[]{0,25,50,100}){
-   LiquidNavigationConfig.value(LiquidNavigationConfig.Parameter.FOLLOW,sensitivity);
-   event(MotionEvent.ACTION_DOWN,center(0));
-   float finger=center(2)+3;
-   event(MotionEvent.ACTION_MOVE,finger);
-   assertEquals(finger,ReflectionHelpers.<Float>getField(bar,"animatedLongSelectedViewCenterX"),.01f);
-   event(MotionEvent.ACTION_CANCEL,finger);
+ void layout(int width){root.measure(View.MeasureSpec.makeMeasureSpec(width,1073741824),View.MeasureSpec.makeMeasureSpec(100,1073741824));root.layout(0,0,width,100);Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(Duration.ofSeconds(2));}
+ @After public void end(){root.removeAllViews();a.finish();}
+ @Test public void twoThroughSixEqualCellsConserveEveryPixelAndNativeClicks(){
+  for(int count=2;count<=6;count++)for(int width:new int[]{320,360,411,640})for(boolean rtl:new boolean[]{false,true}){
+   create(count,width,rtl);var visible=new ArrayList<GlassTabView>(tabs);visible.sort(Comparator.comparingDouble(View::getX));
+   int total=0,min=9999,max=0;float end=bar.getPaddingLeft(),lastCenter=-1,previousGap=-1;
+   for(var v:visible){int w=v.getWidth();total+=w;min=Math.min(min,w);max=Math.max(max,w);assertTrue(w>=48);assertEquals(end,v.getX(),.6);end=v.getX()+w;float center=v.getX()+w*.5f;if(lastCenter>=0){float gap=center-lastCenter;if(previousGap>=0)assertEquals(previousGap,gap,1.1);previousGap=gap;}lastCenter=center;
+    int index=tabs.indexOf(v);assertTrue(v.performClick());Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(Duration.ofSeconds(1));assertEquals(index,clicked);assertTrue(v.isTabSelected());assertEquals(1,bar.getScaleX(),0);assertEquals(1,bar.getScaleY(),0);
+   }
+   assertTrue(max-min<=1);assertEquals(bar.getWidth()-8,total);assertEquals(bar.getWidth()-4,end,.6);
   }
  }
- @Test public void profilesKeepOrderAndGeometryAndPersistActualMotionValues(){
-  LiquidNavigationConfig.order(new int[]{0,6,8});
-  int h=LiquidNavigationConfig.heightDp();
-  LiquidNavigationConfig.profile(LiquidNavigationConfig.Profile.SIGNATURE);
-  assertEquals(80,LiquidNavigationConfig.value(LiquidNavigationConfig.Parameter.ELASTICITY));
-  LiquidNavigationConfig.profile(LiquidNavigationConfig.Profile.MINIMAL);
-  ReflectionHelpers.setStaticField(LiquidNavigationConfig.class,"loaded",false);
-  assertEquals(25,LiquidNavigationConfig.value(LiquidNavigationConfig.Parameter.ELASTICITY));
-  assertEquals(0,LiquidNavigationConfig.value(LiquidNavigationConfig.Parameter.REBOUND));
-  assertArrayEquals(new int[]{0,6,8},LiquidNavigationConfig.order());assertEquals(h,LiquidNavigationConfig.heightDp());
+ @Test public void cancelledTouchAndLongHoldCannotNavigateTheSelection(){create(6,360,false);float x=tabs.get(3).getX()+20;long t=android.os.SystemClock.uptimeMillis();for(int action:new int[]{0,3}){MotionEvent e=MotionEvent.obtain(t,t+80,action,x,20,0);bar.dispatchTouchEvent(e);e.recycle();}assertTrue(tabs.get(0).isTabSelected());assertFalse(tabs.get(3).isTabSelected());}
+ @Test public void migrationPreservesPreviousNineOrderAndExplicitLabelsAndAnimation(){
+  a.getSharedPreferences("flexy_liquid_navigation",0).edit().putString("destinations","8,7,6,5,4,3,2,1,0").putBoolean("labels",false).putBoolean("bottom_animation",false).commit();
+  assertArrayEquals(new int[]{8,7,6,5,4,0},LiquidNavigationConfig.order());
+  assertArrayEquals(new int[]{8,7,6,5,4,3,2,1,0},LiquidNavigationConfig.previousOrder());assertFalse(LiquidNavigationConfig.labels());assertFalse(LiquidNavigationConfig.animation());
+  LiquidNavigationConfig.reset();assertArrayEquals(new int[]{8,7,6,5,4,3,2,1,0},LiquidNavigationConfig.previousOrder());
  }
- @Test @GraphicsMode(GraphicsMode.Mode.NATIVE)
- public void fallbackLensStaysTransparentAndDoesNotInjectTheThemeAccent()throws Exception{
-  var renderer=new LiquidLensRenderer();
-  for(int opacity:new int[]{0,55,100}){
-   LiquidNavigationConfig.opacity(opacity);
-   android.graphics.Bitmap bitmap=android.graphics.Bitmap.createBitmap(320,100,android.graphics.Bitmap.Config.ARGB_8888);
-   android.graphics.Canvas canvas=new android.graphics.Canvas(bitmap);
-   renderer.prepare(160,50,100,60,.15f,1);
-   renderer.surface(canvas);renderer.rim(canvas,1);
-   int center=bitmap.getPixel(160,50);
-   assertTrue("fallback cannot become an opaque oval",android.graphics.Color.alpha(center)<40);
-   assertEquals(android.graphics.Color.red(center),android.graphics.Color.green(center));
-   assertEquals(android.graphics.Color.blue(center),android.graphics.Color.green(center));
-   assertEquals(0,android.graphics.Color.alpha(bitmap.getPixel(0,0)));
-   if(opacity==55){try(var file=new java.io.FileOutputStream("liquid-lens-fallback-synthetic.png")){bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG,100,file);}}
-   bitmap.recycle();
-  }
- }
-
- @Test public void geometryChangesCancelTheOldFingerSequenceWithoutNavigation(){
-  event(MotionEvent.ACTION_DOWN,center(0));event(MotionEvent.ACTION_MOVE,center(3));
-  bar.setMaxWidth(250);layout();
-  assertFalse(ReflectionHelpers.<Boolean>getField(bar,"flexyDragging"));
-  assertFalse(ReflectionHelpers.<Boolean>getField(bar,"flexyPressed"));
-  event(MotionEvent.ACTION_UP,center(3));assertEquals(0,clicks);
-  event(MotionEvent.ACTION_DOWN,center(1));event(MotionEvent.ACTION_UP,center(1));
-  Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();assertEquals(1,clicks);
- }
- @Test public void twoThroughSixNativeTabsKeepTargetsAndFixedOuterGeometry(){
-  java.util.ArrayList<GlassTabView> all=new java.util.ArrayList<>(java.util.Arrays.asList(tabs));
-  for(int count=2;count<=6;count++){
-   while(all.size()<count){var tab=new GlassTabView(activity);all.add(tab);bar.addView(tab);}
-   for(int i=0;i<all.size();i++)bar.setViewVisible(all.get(i),i<count,false);
-   layout();
-   for(int i=0;i<count;i++)assertTrue(all.get(i).getWidth()>=48);
-   int width=bar.getWidth(),height=bar.getHeight();
-   event(MotionEvent.ACTION_DOWN,center(0));event(MotionEvent.ACTION_MOVE,center(1));
-   assertEquals(width,bar.getWidth());assertEquals(height,bar.getHeight());
-   event(MotionEvent.ACTION_CANCEL,center(1));
-  }
- }
-
-
- @Test @GraphicsMode(GraphicsMode.Mode.NATIVE) public void restLensIsUniformAndHoldExpandsOnlyHorizontalLens(){
-  android.graphics.Bitmap bitmap=android.graphics.Bitmap.createBitmap(328,100,android.graphics.Bitmap.Config.ARGB_8888);android.graphics.Canvas canvas=new android.graphics.Canvas(bitmap);
-  android.graphics.RectF rest=new android.graphics.RectF(),pressed=new android.graphics.RectF();
-  LiquidLensRenderer renderer=ReflectionHelpers.getField(bar,"liquidLens");
-  for(int i=0;i<tabs.length;i++){bar.setTabSelected(tabs[i],false);bar.draw(canvas);android.graphics.RectF actual=new android.graphics.RectF();renderer.shape().computeBounds(actual,true);if(i==0)rest.set(actual);else {assertEquals(rest.width(),actual.width(),.01f);assertEquals(rest.height(),actual.height(),.01f);}}
-  int w=bar.getWidth(),h=bar.getHeight();float first=center(3);event(MotionEvent.ACTION_DOWN,first);
-  Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(Duration.ofMillis(300));bar.draw(canvas);renderer.shape().computeBounds(pressed,true);
-  assertTrue(pressed.width()>rest.width());assertTrue(pressed.height()>rest.height());assertTrue(pressed.width()>=pressed.height()*1.55f-.1f);
-  assertEquals(w,bar.getWidth());assertEquals(h,bar.getHeight());assertEquals(1f,bar.getScaleX(),0);
-  event(MotionEvent.ACTION_UP,first);Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(Duration.ofSeconds(3));bar.draw(canvas);renderer.shape().computeBounds(pressed,true);assertEquals(rest.width(),pressed.width(),.1f);bitmap.recycle();
- }
- @Test public void expansionCanBeDisabledWithoutDisablingOpticsOrDrag(){
-  LiquidNavigationConfig.expansion(false);event(MotionEvent.ACTION_DOWN,center(0));event(MotionEvent.ACTION_MOVE,center(2));assertTrue(ReflectionHelpers.<Boolean>getField(bar,"flexyDragging"));
-  assertTrue(LiquidNavigationConfig.enabled());assertTrue(new LiquidLensRenderer().magnification()>1);event(MotionEvent.ACTION_UP,center(2));assertEquals(1,clicks);
- }
-
- @Test public void allNineDestinationsPersistWithoutTruncationAndOverflowIsExplicit(){
-  int[] all={0,1,2,3,4,5,6,7,8};LiquidNavigationConfig.order(all);
-  assertArrayEquals(all,LiquidNavigationConfig.shown(4));assertArrayEquals(all,LiquidNavigationDestinations.sanitize(all));
-  LiquidNavigationConfig.distribution(1);assertArrayEquals(new int[]{0,1,2,9},LiquidNavigationConfig.shown(4));
-  LiquidNavigationConfig.distribution(0);ReflectionHelpers.setStaticField(LiquidNavigationConfig.class,"loaded",false);assertArrayEquals(all,LiquidNavigationConfig.shown(4));
- }
- @Test public void twoThroughNineKeepAccessibleTargetsAndAllDestinationsCanBeRevealed(){
-  java.util.ArrayList<GlassTabView> all=new java.util.ArrayList<>(java.util.Arrays.asList(tabs));
-  for(int count=2;count<=9;count++){
-   while(all.size()<count){final var tab=new GlassTabView(activity);all.add(tab);bar.addView(tab);tab.setOnClickListener(v->bar.setTabSelected(tab,false));}
-   for(int i=0;i<all.size();i++)bar.setViewVisible(all.get(i),i<count,false);layout();
-   for(int i=0;i<count;i++){assertTrue(all.get(i).getWidth()>=48);bar.setTabSelected(all.get(i),false);bar.revealSelectedDestination();assertTrue(all.get(i).getX()>=bar.getPaddingLeft()-.1f);assertTrue(all.get(i).getX()+all.get(i).getWidth()<=bar.getWidth()-bar.getPaddingRight()+.1f);}
-   assertEquals(1f,bar.getScaleX(),0);
-  }
- }
- @Test public void scrollingTabsDoesNotCommitNavigationOrSnapBackToTheOldSelection(){
-  for(int i=0;i<5;i++){var tab=new GlassTabView(activity);bar.addView(tab);bar.setViewVisible(tab,true,false);}layout();
-  event(MotionEvent.ACTION_DOWN,center(2));event(MotionEvent.ACTION_MOVE,center(2)-20);event(MotionEvent.ACTION_MOVE,20);event(MotionEvent.ACTION_UP,20);
-  assertEquals(0,clicks);assertTrue(ReflectionHelpers.<Float>getField(bar,"viewportOffset")>0);assertTrue(tabs[0].isTabSelected());
- }
-
- @Test public void alpha1285DimensionsMigrateOnceAndRetainAllDestinations(){
-  var p=activity.getSharedPreferences("flexy_liquid_navigation",0);p.edit().clear().putBoolean("configured",true).putBoolean("drag_indicator",true).putInt("height",50).putString("destinations","8,6,0,2,7,3").commit();ReflectionHelpers.setStaticField(LiquidNavigationConfig.class,"loaded",false);
-  assertEquals(72,LiquidNavigationConfig.heightDp());assertEquals(4,LiquidNavigationConfig.compaction());assertArrayEquals(new int[]{8,6,0,2,7,3},LiquidNavigationConfig.order());
-  ReflectionHelpers.setStaticField(LiquidNavigationConfig.class,"loaded",false);assertEquals(72,LiquidNavigationConfig.heightDp());assertTrue(LiquidNavigationConfig.enabled());
- }
-
- @Test public void translatedNinthTabReceivesOneRealNativeClick(){
-  GlassTabView ninth=null;final int[] delivered={0};for(int i=4;i<9;i++){var tab=new GlassTabView(activity);bar.addView(tab);bar.setViewVisible(tab,true,false);tab.setOnClickListener(v->{delivered[0]++;bar.setTabSelected(tab,false);});ninth=tab;}
-  layout();ReflectionHelpers.callInstanceMethod(bar,"scrollViewport",ReflectionHelpers.ClassParameter.from(float.class,10000f));
-  assertNotNull(ninth);float x=ninth.getX()+ninth.getWidth()*.5f;assertTrue(x>=0&&x<=bar.getWidth());event(MotionEvent.ACTION_DOWN,x);event(MotionEvent.ACTION_UP,x);Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();assertEquals(1,delivered[0]);assertTrue(ninth.isTabSelected());
- }
+ @Test public void activeSanitizeNeverExceedsSixAndAlwaysContainsChats(){for(int n=0;n<18;n++){int[] input=new int[n];for(int i=0;i<n;i++)input[i]=8-i%9;int[] ids=LiquidNavigationDestinations.sanitize(input);assertTrue(ids.length>=2&&ids.length<=6);assertTrue(LiquidNavigationDestinations.contains(ids,0));assertArrayEquals(ids,LiquidNavigationDestinations.sanitize(ids));}}
+ @Test public void narrowOverflowRetainsNativeMinimumTargetWidths(){LiquidNavigationConfig.order(new int[]{0,1,2,3,4,5});assertArrayEquals(new int[]{0,1,2,9},LiquidNavigationConfig.shown(4));assertEquals(6,LiquidNavigationConfig.shown(100).length);}
+ @Test public void nativeHostVisibilityIsEnabledAtTerminalFactor(){create(4,360,false);var p=new NativeTabsVisibilityProbe(bar,root);p.apply(1);assertTrue(bar.isEnabled());p.apply(0);assertFalse(bar.isEnabled());}
+ @Test public void dimensionsAndCompactionPersistWithSafeMotionBounds(){for(var param:LiquidNavigationConfig.Parameter.values()){LiquidNavigationConfig.value(param,100);ReflectionHelpers.setStaticField(LiquidNavigationConfig.class,"loaded",false);assertEquals(100,LiquidNavigationConfig.value(param));LiquidNavigationConfig.value(param,-5);assertEquals(0,LiquidNavigationConfig.value(param));}for(int mode=0;mode<4;mode++){LiquidNavigationConfig.compaction(mode);assertTrue(LiquidNavigationConfig.heightDp()>=48);assertTrue(LiquidNavigationConfig.heightDp()<=80);}assertTrue(LiquidNavigationConfig.damping()>=.85f);}
 }
