@@ -50,6 +50,8 @@ public class PhysicsProbe {
     frame(1d/hz);samples++;
     require(Float.isFinite(menu.scaleX())&&menu.scaleX()>.96&&menu.scaleX()<1.02,"Unbounded message geometry");
     require(menu.panelProgress()>-.1&&menu.panelProgress()<1.1,"Unbounded panel spring");
+    float offset=menu.spatialOffset(-1000f,4f);
+    require(offset>=-1004.001f&&offset<=4.001f,"Interrupted return escaped spatial rebound bounds");
    }
    require(done[0]==1&&!menu.isRunning()&&!menu.hasOwner(),"Close leaked owner/callback");
    require(menu.scaleX()==1&&menu.scaleY()==1&&menu.progress()==0,"Close did not restore geometry");

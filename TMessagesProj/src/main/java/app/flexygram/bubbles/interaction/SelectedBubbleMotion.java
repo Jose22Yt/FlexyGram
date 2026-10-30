@@ -21,7 +21,9 @@ public final class SelectedBubbleMotion implements Choreographer.FrameCallback {
     /** A tall preview can travel hundreds of pixels: keep its rebound in the gap. */
     public float spatialOffset(float distance, float maxOvershoot) {
         float p = phase.value;
-        if (p <= 1f || maxOvershoot <= 0f) return distance * p;
+        if (maxOvershoot <= 0f) return distance * p;
+        if (p < 0f) return maxOvershoot * (float)Math.tanh(distance * p / maxOvershoot);
+        if (p <= 1f) return distance * p;
         return distance + maxOvershoot * (float)Math.tanh(distance * (p - 1f) / maxOvershoot);
     }
     public float panelScale() { return .62f + .38f * phase.value; }
