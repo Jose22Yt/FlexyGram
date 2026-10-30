@@ -83,6 +83,12 @@ class SignatureLoginTests(unittest.TestCase):
   allowed=combined_paths();self.assertFalse(changes-allowed,changes-allowed)
   prefixes=['TMessagesProj/build.gradle','TMessagesProj/src/main/java/app/flexygram/composer','TMessagesProj/src/main/java/app/flexygram/home','TMessagesProj/src/main/java/app/flexygram/bubbles','TMessagesProj/src/main/java/app/flexygram/settings','TMessagesProj/src/main/java/app/exteraless/appicons','TMessagesProj/src/main/java/app/exteraless/settings','TMessagesProj/src/main/java/org/telegram/ui/ActionBar/MessageDrawable.java','TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java','TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java','TMessagesProj/src/main/java/org/telegram/ui/Components/ChatActivityEnterView.java','TMessagesProj/jni','TMessagesProj/chaquopy','tools/alpha_local_installer']
   for prefix in prefixes:
+   if prefix in ('TMessagesProj/jni','TMessagesProj/chaquopy'):
+    # No presentation deltas exist in native sources. Git compares the same
+    # tracked bytes without repeatedly loading large archives through every
+    # historical Python projection. Keep the native/submodule freeze mandatory.
+    self.assertEqual(subprocess.check_output(['git','diff',WORK1,'--',prefix],cwd=ROOT),b'',prefix)
+    continue
    for path in subprocess.check_output(['git','ls-tree','-r','--name-only',WORK1,'--',prefix],cwd=ROOT,text=True).splitlines():
     if (ROOT/path).is_dir():
      self.assertEqual(subprocess.check_output(['git','diff',WORK1,'--',path],cwd=ROOT),b'',path)

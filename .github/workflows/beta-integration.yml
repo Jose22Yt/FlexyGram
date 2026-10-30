@@ -1,0 +1,59 @@
+name: Beta integration validation (no signing)
+on:
+  push:
+    branches: [integration/flexygram-beta-1]
+  pull_request:
+    branches: [feat/opexgram-context-spring]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: beta-integration-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: 'build-tools;36.0.0 platforms;android-37.0'
+      - run: python3 -m pip install -r tools/connected_alpha/requirements-ci.txt
+      - run: git submodule update --init --depth 1 TMessagesProj_Modules/media
+      - name: Exact source audit and retained host regressions
+        run: python3 tools/connected_alpha/run_checks.py
+      - name: Production placement, classification and deletion trajectories
+        run: python3 tools/beta_integration/run_host.py
+      - name: Public official certificate and identity gates
+        run: |
+          python3 tools/identity/check_identity.py
+          python3 tools/signing/check_verifier.py
+      - name: API37 resource compile (not APK)
+        run: |
+          python3 tools/connected_alpha/check_resources.py --sdk-root "$ANDROID_HOME"
+          "$ANDROID_HOME/build-tools/36.0.0/aapt2" compile --dir TMessagesProj/src/beta/res -o build/beta-resources-compile.zip
+      - name: API37 compile of production Beta views with explicit host doubles
+        run: python3 tools/beta_integration/compile_api37.py --sdk-root "$ANDROID_HOME"
+      - name: Android isolated snapshot lifecycle, scroll and pill bounds
+        run: python3 tools/beta_integration/android/run.py --sdk-root "$ANDROID_HOME"
+      - name: Preserve test reports only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: FlexyGram-Beta-integration-validation
+          path: |
+            build/beta-android/target/surefire-reports/*.xml
+            build/connected-alpha-resources/*.log
+          if-no-files-found: warn
+          retention-days: 7

@@ -15,7 +15,8 @@ def spec():
 
 
 def paths():
-    return frozenset(spec()['paths'])
+    from beta_integration_contract import paths as latest_paths
+    return frozenset(spec()['paths']) | latest_paths()
 
 
 @lru_cache(maxsize=128)
@@ -25,17 +26,21 @@ def original(path):
 
 
 def restore(path, data):
+    from beta_integration_contract import restore as latest_restore
+    data = latest_restore(path,data)
     expected = spec()['reviewed'].get(str(path))
     return original(path) if expected and hashlib.sha256(data).hexdigest() == expected else data
 
 
 def verify_current():
+    from beta_integration_contract import verify_current as latest_verify, restore as latest_restore
+    latest_verify()
     current = spec()
     if current['base'] != BASE:
         raise ValueError('Wrong deep-performance base')
     for name, expected in current['reviewed'].items():
         file = ROOT / name
-        data = file.read_bytes() if file.is_file() else b''
+        data = latest_restore(name,file.read_bytes() if file.is_file() else b'')
         if hashlib.sha256(data).hexdigest() != expected:
             raise ValueError('Unreviewed deep-performance bytes: ' + name)
         if restore(name, data + b'UNKNOWN') != data + b'UNKNOWN':

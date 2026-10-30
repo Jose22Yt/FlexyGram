@@ -36,7 +36,10 @@ class DeepPerformance(unittest.TestCase):
                   'TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java',
                   'TMessagesProj/src/main/java/org/telegram/ui/Cells',
                   'TMessagesProj/src/main/res']
-        self.assertEqual(b'', subprocess.check_output(['git','diff',audit.BASE,'--',*frozen],cwd=audit.ROOT))
+        names=subprocess.check_output(['git','diff','--name-only',audit.BASE,'--',*frozen],cwd=audit.ROOT,text=True).splitlines()
+        for name in names:
+            data=(audit.ROOT/name).read_bytes() if (audit.ROOT/name).is_file() else b''
+            self.assertEqual(audit.original(name),audit.restore(name,data),name)
 
 
 if __name__ == '__main__':

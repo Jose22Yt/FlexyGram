@@ -1546,6 +1546,27 @@ public class ChatListItemAnimator extends DefaultItemAnimator {
             FileLog.d("animate remove impl " + (thanos ? " with thanos" : ""));
         }
         final View view = holder.itemView;
+        int deleteStyle = app.flexygram.bubbles.deletion.DeleteMotionSettings.get(view.getContext());
+        if (view instanceof ChatMessageCell && deleteStyle != 0
+                && ((ChatMessageCell)view).getCurrentMessagesGroup() == null) {
+            ChatMessageCell cell = (ChatMessageCell)view;
+            android.graphics.RectF bounds = new android.graphics.RectF(
+                    cell.getBackgroundDrawableLeft(), cell.getBackgroundDrawableTop(),
+                    cell.getBackgroundDrawableRight(), cell.getBackgroundDrawableBottom());
+            int overlays = app.flexygram.bubbles.deletion.DeleteMotionOverlay.runNativeDelete(
+                    recyclerListView, java.util.Collections.singletonList(
+                        new app.flexygram.bubbles.deletion.DeleteMotionOverlay.Target(cell, bounds)),
+                    deleteStyle, () -> {});
+            if (overlays > 0) {
+                // The snapshot owns drawing; finish only this removed holder.
+                // Native move animations and other rows retain their lifecycle.
+                dispatchRemoveStarting(holder);
+                restoreTransitionParams(view);
+                dispatchRemoveFinished(holder);
+                dispatchFinishedWhenDone();
+                return;
+            }
+        }
         mRemoveAnimations.add(holder);
         if (thanos && getThanosEffectContainer != null) {
             ThanosEffect thanosEffect = getThanosEffectContainer.run();

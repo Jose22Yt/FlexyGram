@@ -20,7 +20,7 @@ class Interaction1286(unittest.TestCase):
  def test_one_tap_panel_is_independent_and_only_calls_one_native_menu(self):
   s=self.text('org/telegram/ui/ChatActivity.java');start=s.index('if(view instanceof ChatMessageCell && ((ChatMessageCell)view).isSignatureTap())');end=s.index('public boolean hasDoubleTap',start);block=s[start:end]
   self.assertIn('tapPanel(view.getContext())',block);self.assertEqual(1,block.count('createMenu(view,true,false,x,y,true,false,false,false,true)'));self.assertIn('return;',block)
-  self.assertIn('(bubbleTap || longpress) && !onDoubleTapped',s)
+  self.assertIn('(bubbleTap || longpress || single) && !onDoubleTapped',s)
  def test_six_destination_cap_and_solid_symmetric_layout(self):
   d=self.text('app/flexygram/navigation/LiquidNavigationDestinations.java');self.assertIn('MAX_VISIBLE=6',d)
   bar=self.text('org/telegram/ui/MainTabsLayout.java');self.assertIn('slotWidth=inner/Math.max(1,count)',bar)

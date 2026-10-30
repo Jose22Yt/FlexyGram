@@ -1,0 +1,33 @@
+{
+  "status": "DRAFT_NOT_RELEASED",
+  "apk": "BLOCKED_OFFICIAL_PRIVATE_INPUTS_UNAVAILABLE",
+  "physical_device": "NOT_TESTED",
+  "full_gradle_jni_dex_build": "NOT_RUN",
+  "update_installation": "NOT_TESTED",
+  "general_tests": {
+    "passed": 144,
+    "skipped_optional": 31
+  },
+  "host_production_checks": {
+    "placement_assertions": 3241,
+    "delete_math_samples": 10001,
+    "pill_assertions": 152
+  },
+  "android_isolated_api35": {
+    "passed": 4,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "api37_new_production_views_compile_with_host_doubles": "PASS",
+  "aapt2_main_and_identity_resources": "PASS",
+  "public_certificate_and_8_rejection_cases": "PASS",
+  "official_certificate_sha256": "5a598fb5ba42949b67b7c2635106fafd5f23179397e4c098757a73cd2d2ef66c",
+  "historical_source_host_suite": {
+    "passed": 373,
+    "failures": 0,
+    "errors": 0,
+    "seconds": 227.161
+  },
+  "beta_resources_compile": "PASS"
+}
