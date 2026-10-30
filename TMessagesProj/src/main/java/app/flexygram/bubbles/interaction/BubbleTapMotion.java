@@ -28,14 +28,14 @@ public final class BubbleTapMotion implements Runnable {
         this.compression = Math.max(0f, Math.min(.065f, compression));
         this.rebound = Math.max(0f, Math.min(1f, rebound));
         this.duration = Math.max(180L, Math.min(480L, duration));
-        fromX = scaleX;
-        fromY = scaleY;
         started = SystemClock.uptimeMillis();
         pressed = true;
         running = true;
-        // Immediate feedback without the old full-compression jump on ACTION_DOWN.
+        // Immediate feedback without a full-compression jump on ACTION_DOWN.
         scaleX = Math.min(scaleX, 1f - this.compression * .20f);
         scaleY = Math.min(scaleY, 1f - this.compression * .16f);
+        fromX = scaleX;
+        fromY = scaleY;
         invalidate();
         owner.postOnAnimation(this);
     }
