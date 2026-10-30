@@ -5,7 +5,7 @@ Proyecto Android con identidad y dirección de desarrollo propias, basado en [Ex
 - **Creador y responsable de FlexyGram:** [@Lukhou23](https://t.me/Lukhou23).
 - **Cuenta GitHub propietaria:** [Jose22Yt](https://github.com/Jose22Yt).
 - **Repositorio oficial:** [Jose22Yt/FlexyGram](https://github.com/Jose22Yt/FlexyGram).
-- **Estado:** PASO 1 — creación y configuración del repositorio. No hay todavía una versión 1.0 compilada ni cambios funcionales propios.
+- **Estado:** En desarrollo activo — hay builds alfa funcionales (`delivery/alpha12xx-*`). La versión 1.0 pública está pendiente.
 
 ## Identidad, autoría y licencia
 
@@ -38,14 +38,13 @@ El objetivo futuro es conservar la capacidad de respuesta de Exteraless original
 
 [Consultar el commit original](https://github.com/exteraless/exteraless/commit/1ad6a60a6834ffca722b1a22f4fba27ecb29a061).
 
-## Ramas y alcance del PASO 1
+- `main`: rama de referencia estable. Contiene la base de Exteraless con los cambios de identidad de FlexyGram.
+- `develop`: rama de integración del desarrollo activo.
+- `delivery/alpha12xx-*`: builds alfa numeradas listas para pruebas.
+- `ci/*`, `build/*`, `checkpoint/*`, `audit/*`: ramas de trabajo por área.
+- Los cambios se proponen en ramas específicas y se integran mediante pull requests hacia `develop` antes de llegar a `main`.
 
-- `main`: rama predeterminada. Código original sin modificaciones funcionales; la única modificación inicial es este README.
-- `develop`: rama destinada al futuro desarrollo, creada desde el estado documentado de `main`.
-- Los futuros cambios se propondrán en ramas específicas y se revisarán mediante pull requests antes de integrarlos.
-- No se han implementado optimizaciones, modificado la interfaz, descargado dependencias de compilación ni generado APK.
-
-**GitHub Actions está desactivado en la configuración del repositorio.** Los workflows heredados se conservan sin cambios y quedan pendientes de auditoría. Las instrucciones de compilación y CI del texto original se mantienen como referencia histórica de la base; no constituyen autorización para ejecutarlas en esta etapa.
+**GitHub Actions está desactivado en la configuración del repositorio.** Los workflows heredados quedan pendientes de auditoría antes de ser activados.
 
 ## Sincronización futura con Exteraless
 
