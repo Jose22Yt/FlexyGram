@@ -2854,25 +2854,53 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                 && (message.messageOwner.restriction_reason == null || message.messageOwner.restriction_reason.isEmpty())) {
             int candidate=app.flexygram.home.SignatureSmartPreviews.kind(message);
             if (candidate != 0 && (!inlineSender || Layout.getDesiredWidth(messageString,0,senderEnd,currentMessagePaint) < messageWidth * .35f)) {
-                String label=app.flexygram.home.SignatureSmartPreviews.lineLabel(message,candidate);
-                int iconEnd=label.indexOf("  ");
-                if (iconEnd >= 0) label=label.substring(iconEnd+2);
-                if (!TextUtils.isEmpty(label)) {
-                    SpannableStringBuilder pill=new SpannableStringBuilder("\ufffc");
-                    pill.setSpan(new app.flexygram.home.SignaturePreviewIcon(candidate),0,1,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    pill.append(label);
-                    pill.setSpan(new android.text.style.AbsoluteSizeSpan(Math.round(compactTextSize)),1,pill.length(),Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    CharSequence withThumbs=applyThumbs(pill);
-                    SpannableStringBuilder combined=new SpannableStringBuilder();
-                    if (inlineSender) { combined.append(messageString,0,senderEnd); combined.append(" "); }
-                    smartPreviewPrefixEnd=combined.length()+(thumbsCount>0?1:0);
-                    combined.append(withThumbs);
-                    smartPreviewKind=candidate;
-                    smartPreviewClipLeft=Math.max(dp(6),messageLeft);
-                    smartPreviewClipRight=Math.min(getMeasuredWidth()-dp(6),messageLeft+messageWidth);
-                    messageLeft+=dp(5);messageWidth-=dp(10);
-                    messageString=combined;
-                    checkMessage=false;
+                String badge=app.flexygram.home.SignatureSmartPreviews.badgeLabel(candidate);
+                if (!TextUtils.isEmpty(badge)) {
+                    // An inline ReplacementSpan reserves EXACT pixel width before
+                    // StaticLayout is measured. The filename is outside the capsule;
+                    // it can ellipsize without being covered by its background.
+                    app.flexygram.home.SignatureSmartPillSpan capsule =
+                            new app.flexygram.home.SignatureSmartPillSpan(candidate,badge,resourcesProvider);
+                    int capsuleWidth=capsule.getSize(currentMessagePaint,"\ufffc",0,1,null);
+                    float senderWidth=inlineSender
+                            ? Layout.getDesiredWidth(messageString,0,senderEnd,currentMessagePaint)+dp(5):0;
+                    int thumbnailReserve=thumbsCount>0?dp((thumbSize+2)*thumbsCount+6):0;
+                    int free=app.flexygram.home.SignatureSmartPillLayout.remaining(messageWidth,senderWidth,thumbnailReserve,capsuleWidth,dp(18));
+                    // A channel post can carry a second reliable category; never
+                    // infer ADMIN from the channel flag. Keep only the content
+                    // pill on narrow rows, preserving the actual filename.
+                    app.flexygram.home.SignatureSmartPillSpan channelCapsule=null;
+                    if (message.messageOwner.post && candidate!=app.flexygram.home.SignatureSmartPreviewPalette.CHANNEL) {
+                        channelCapsule=new app.flexygram.home.SignatureSmartPillSpan(
+                                app.flexygram.home.SignatureSmartPreviewPalette.CHANNEL,
+                                app.flexygram.home.SignatureSmartPreviews.badgeLabel(
+                                    app.flexygram.home.SignatureSmartPreviewPalette.CHANNEL),resourcesProvider);
+                        int secondWidth=channelCapsule.getSize(currentMessagePaint,"\ufffc",0,1,null)+dp(5);
+                        if (free-secondWidth>=dp(28))free-=secondWidth;
+                        else channelCapsule=null;
+                    }
+                    if (free >= dp(16)) {
+                        String snippet=app.flexygram.home.SignatureSmartPreviews.snippet(message,candidate);
+                        CharSequence clipped=TextUtils.ellipsize(snippet,currentMessagePaint,free,
+                                (message.isDocument()?TextUtils.TruncateAt.MIDDLE:TextUtils.TruncateAt.END));
+                        SpannableStringBuilder pill=new SpannableStringBuilder();
+                        if(channelCapsule!=null){
+                            pill.append("\ufffc");
+                            pill.setSpan(channelCapsule,0,1,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                            pill.append(" ");
+                        }
+                        int capsuleStart=pill.length();
+                        pill.append("\ufffc");
+                        pill.setSpan(capsule,capsuleStart,capsuleStart+1,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        if (!TextUtils.isEmpty(clipped))pill.append(" ").append(clipped);
+                        CharSequence withThumbs=applyThumbs(pill);
+                        SpannableStringBuilder combined=new SpannableStringBuilder();
+                        if (inlineSender) { combined.append(messageString,0,senderEnd); combined.append(" "); }
+                        combined.append(withThumbs);
+                        smartPreviewKind=candidate;
+                        messageString=combined;
+                        checkMessage=false;
+                    }
                 }
             }
         }
@@ -2981,7 +3009,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                 int reserve=smartPreviewKind==app.flexygram.home.SignatureSmartPreviewPalette.VOICE?dp(24):dp(10);
                 messageString=TextUtils.ellipsize(messageString,currentMessagePaint,
                         Math.max(dp(20),messageWidth-reserve),
-                        smartPreviewKind==app.flexygram.home.SignatureSmartPreviewPalette.FILE ? TextUtils.TruncateAt.MIDDLE : TextUtils.TruncateAt.END);
+                        TextUtils.TruncateAt.END);
             }
             // Removing links and bold spans to get rid of underlining and boldness
             if (messageString instanceof Spannable) {
@@ -2998,9 +3026,9 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                 currentMessagePaint = Theme.dialogs_messagePaint[paintIndex];
             } else if (smartPreviewKind != 0 || !useForceThreeLines && !SharedConfig.useThreeLinesLayout || hasTags() || messageNameString != null || ChatObject.isMonoForum(chat) && ChatObject.canManageMonoForum(currentAccount, chat)) {
                 if (!isForumCell() && messageString instanceof Spanned && ((Spanned) messageString).getSpans(0, messageString.length(), ThumbnailSpan.class).length <= 0) {
-                    messageStringFinal = TextUtils.ellipsize(messageString, currentMessagePaint, messageWidth - dp(12 + (thumbsCount * (thumbSize + 2) - 2) + 5), smartPreviewKind == app.flexygram.home.SignatureSmartPreviewPalette.FILE ? TextUtils.TruncateAt.MIDDLE : TextUtils.TruncateAt.END);
+                    messageStringFinal = TextUtils.ellipsize(messageString, currentMessagePaint, messageWidth - dp(12 + (thumbsCount * (thumbSize + 2) - 2) + 5), TextUtils.TruncateAt.END);
                 } else {
-                    messageStringFinal = TextUtils.ellipsize(messageString, currentMessagePaint, messageWidth - dp(12), smartPreviewKind == app.flexygram.home.SignatureSmartPreviewPalette.FILE ? TextUtils.TruncateAt.MIDDLE : TextUtils.TruncateAt.END);
+                    messageStringFinal = TextUtils.ellipsize(messageString, currentMessagePaint, messageWidth - dp(12), TextUtils.TruncateAt.END);
                 }
             } else {
                 messageStringFinal = messageString;
@@ -4564,13 +4592,9 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                     top -= dp(isForumCell() ? 10 : 11);
                 }
                 if (updateHelper.typingProgres != 1f) {
-                    drawSmartPreviewBackground(canvas,top,1f-updateHelper.typingProgres);
+                    // Badge surface is painted by the measured span, not behind the entire snippet.
                     canvas.save();
                     canvas.translate(messageLeft, top);
-                    int oldInk=messageLayout.getPaint().getColor();
-                    if (smartPreviewKind != 0) {
-                        messageLayout.getPaint().setColor(smartPreviewPalette.foreground());
-                    }
                     int oldAlpha = messageLayout.getPaint().getAlpha();
                     messageLayout.getPaint().setAlpha((int) (oldAlpha * (1f - updateHelper.typingProgres)));
                     if (!spoilers.isEmpty()) {
@@ -4594,7 +4618,6 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                         AnimatedEmojiSpan.drawAnimatedEmojis(canvas, messageLayout, animatedEmojiStack, -.075f, null, 0, 0, 0, 1f, getAdaptiveEmojiColorFilter(2, messageLayout.getPaint().getColor()));
                     }
                     messageLayout.getPaint().setAlpha(oldAlpha);
-                    if (smartPreviewKind != 0)messageLayout.getPaint().setColor(oldInk);
                     canvas.restore();
                 }
 
