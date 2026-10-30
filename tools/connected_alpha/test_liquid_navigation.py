@@ -23,13 +23,14 @@ class LiquidNavigation(unittest.TestCase):
   source=(JAVA/'org/telegram/ui/MainTabsActivity.java').read_text()
   self.assertIn('tabsView.setEnabled(factor >= .999f)',source)
   self.assertNotIn('tabsView.setEnabled(factor > 1)',source)
- def test_settings_preview_uses_the_actual_bar_and_native_reorder_list(self):
-  preview=(JAVA/'app/flexygram/navigation/LiquidNavigationPreviewView.java').read_text()
-  self.assertIn('new MainTabsLayout(',preview);self.assertIn('LiquidNavigationTabs.createPreview(',preview)
-  self.assertNotIn('onTouchEvent(',preview)
-  editor=(JAVA/'app/flexygram/navigation/LiquidNavigationTabsActivity.java').read_text()
-  for token in ['allowReorder(true)','listenReorder','LiquidNavigationConfig.order(ids)','preview.settingsChanged()']:
-   self.assertIn(token,editor)
+ def test_home_settings_preview_and_reorder_controls_are_retired(self):
+  for name in ['LiquidNavigationPreviewView','LiquidNavigationTabsActivity','LiquidNavigationSettingsActivity']:
+   self.assertFalse((JAVA/'app/flexygram/navigation'/str(name+'.java')).exists())
+  for name in ['OpenExteraAppearanceActivity','OpenExteraAppNavigationActivity']:
+   self.assertNotIn('LiquidNavigationSettingsActivity',(JAVA/'app/exteraless/settings'/str(name+'.java')).read_text())
+  fixed=(JAVA/'app/flexygram/navigation/LiquidNavigationConfig.java').read_text()
+  self.assertIn('edit.remove(key)',fixed);self.assertNotIn('.clear()',fixed)
+  self.assertIn('return 60',fixed);self.assertIn('return LiquidNavigationDestinations.defaults()',fixed)
  def test_localized_configuration_labels_match(self):
   labels=[]
   for locale in ['values','values-es','values-ru']:

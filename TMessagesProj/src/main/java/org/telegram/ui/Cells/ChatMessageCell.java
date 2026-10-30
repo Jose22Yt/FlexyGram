@@ -5062,20 +5062,25 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         int action=event.getActionMasked();
         if(action==MotionEvent.ACTION_MOVE && signatureTapEligible){
             float slop=android.view.ViewConfiguration.get(getContext()).getScaledTouchSlop();
-            if(Math.abs(event.getX()-signatureTapX)>slop || Math.abs(event.getY()-signatureTapY)>slop)cancelSignatureTap();
+            if(Math.abs(event.getX()-signatureTapX)>slop || Math.abs(event.getY()-signatureTapY)>slop)cancelSignatureGesture();
+            else signatureTapMotion.drag(event.getX()-signatureTapX,event.getY()-signatureTapY,slop);
         } else if(action==MotionEvent.ACTION_UP && signatureTapEligible){
             if(android.os.SystemClock.uptimeMillis()-signatureTapStarted>=android.view.ViewConfiguration.getLongPressTimeout()){
-                cancelSignatureTap();return;
+                finishSignatureCandidate();return;
             }
             signatureTapReleased=android.os.SystemClock.uptimeMillis();signatureTapMotion.release();
-        } else if(action==MotionEvent.ACTION_CANCEL || action==MotionEvent.ACTION_POINTER_DOWN || action==MotionEvent.ACTION_POINTER_UP)cancelSignatureTap();
+        } else if(action==MotionEvent.ACTION_CANCEL || action==MotionEvent.ACTION_POINTER_DOWN || action==MotionEvent.ACTION_POINTER_UP)cancelSignatureGesture();
     }
     public boolean isSignatureTap(){return signatureTapEligible && signatureTapReleased>0 && android.os.SystemClock.uptimeMillis()-signatureTapReleased<500;}
     public float signatureTapScaleX(){return signatureTapMotion.scaleX();}
     public float signatureTapScaleY(){return signatureTapMotion.scaleY();}
+    public float signatureTapVelocityX(){return signatureTapMotion.velocityX();}
+    public float signatureTapVelocityY(){return signatureTapMotion.velocityY();}
     /** The overlay receives the live scale first, then owns the remaining spring.
      * Resetting here is atomic with popup creation; prevents double-scaling the same cell. */
+    public void finishSignatureCandidate(){signatureTapEligible=false;signatureTapReleased=0;signatureTapMotion.release();}
     public void finishSignatureTap(){signatureTapEligible=false;signatureTapReleased=0;signatureTapMotion.reset();}
+    public void cancelSignatureGesture(){signatureTapEligible=false;signatureTapReleased=0;signatureMediaPress=false;signatureTapMotion.release();}
     public void cancelSignatureTap(){signatureTapEligible=false;signatureTapReleased=0;signatureMediaPress=false;signatureTapMotion.reset();}
     private void applySignatureTap(Canvas canvas){
         float sx=signatureTapMotion.scaleX(),sy=signatureTapMotion.scaleY();
@@ -5095,17 +5100,15 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                 && currentMessageObject!=null && delegate!=null && delegate.canPerformActions()
                 && !delegate.hasSelectedMessages() && !currentMessageObject.preview
                 && !currentMessageObject.isSponsored() && !currentMessageObject.isEphemeral()
-                && currentMessagesGroup==null && drawPhotoImage
-                && (currentMessageObject.type==MessageObject.TYPE_PHOTO || currentMessageObject.isVideo())
-                && photoImage.isInsideImage(getEventX(event),getEventY(event))) {
-            cancelSignatureTap();
+                && (isInsideBackground(getEventX(event),getEventY(event))
+                    || drawPhotoImage && photoImage.isInsideImage(getEventX(event),getEventY(event)))) {
+            cancelSignatureGesture();
             signatureMediaPress=true;
             signatureTapX=getEventX(event);
             signatureTapY=getEventY(event);
-            signatureTapPivotX=photoImage.getCenterX();
-            signatureTapPivotY=photoImage.getCenterY();
-            if (!AndroidUtilities.isAccessibilityScreenReaderEnabled()
-                    && !(android.os.Build.VERSION.SDK_INT>=26 && !android.animation.ValueAnimator.areAnimatorsEnabled())) {
+            signatureTapPivotX=(getBackgroundDrawableLeft()+getBackgroundDrawableRight())*.5f;
+            signatureTapPivotY=(getBackgroundDrawableTop()+getBackgroundDrawableBottom())*.5f;
+            if (app.flexygram.bubbles.interaction.BubbleInteractionSettings.motionEnabled()) {
                 signatureTapMotion.press(.012f+.0005f*app.flexygram.bubbles.interaction.BubbleInteractionSettings.compression(getContext()),
                         app.flexygram.bubbles.interaction.BubbleInteractionSettings.rebound(getContext())/100f,
                         440-3L*app.flexygram.bubbles.interaction.BubbleInteractionSettings.recovery(getContext()));
@@ -5120,11 +5123,12 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             } else if (action==MotionEvent.ACTION_CANCEL
                     || action==MotionEvent.ACTION_POINTER_DOWN
                     || action==MotionEvent.ACTION_POINTER_UP) {
-                cancelSignatureTap();
+                cancelSignatureGesture();
             } else if (action==MotionEvent.ACTION_MOVE) {
                 float slop=android.view.ViewConfiguration.get(getContext()).getScaledTouchSlop();
                 if (Math.abs(getEventX(event)-signatureTapX)>slop
-                        || Math.abs(getEventY(event)-signatureTapY)>slop) cancelSignatureTap();
+                        || Math.abs(getEventY(event)-signatureTapY)>slop) cancelSignatureGesture();
+                else signatureTapMotion.drag(getEventX(event)-signatureTapX,getEventY(event)-signatureTapY,slop);
             }
         }
         return super.dispatchTouchEvent(event);
@@ -5589,8 +5593,8 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             }
         }
         final int signatureAction=event.getActionMasked();
-        if(signatureAction==MotionEvent.ACTION_DOWN && !signatureMediaPress){
-            cancelSignatureTap();
+        if(signatureAction==MotionEvent.ACTION_DOWN){
+            if (!signatureMediaPress) cancelSignatureGesture();
             // Default style never claims a tap; Telegram retains its original gestures.
             // Native links, image viewers, media buttons, polls and spoilers keep precedence.
             final boolean signatureMode=app.flexygram.bubbles.interaction.BubbleInteractionSettings.tapPanel(getContext());
@@ -5610,10 +5614,10 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                 signatureTapStarted=android.os.SystemClock.uptimeMillis();
                 signatureTapX=touchX;signatureTapY=touchY;
                 signatureTapPivotX=mediaHit?photoImage.getCenterX():(getBackgroundDrawableLeft()+getBackgroundDrawableRight())*.5f;
-                signatureTapPivotY=mediaHit?photoImage.getCenterY():getHeight()*.5f;
+                signatureTapPivotY=(getBackgroundDrawableTop()+getBackgroundDrawableBottom())*.5f;
                 if(app.flexygram.bubbles.interaction.BubbleInteractionSettings.tapAnimation(getContext())
-                        && !AndroidUtilities.isAccessibilityScreenReaderEnabled()
-                        && !(android.os.Build.VERSION.SDK_INT>=26 && !android.animation.ValueAnimator.areAnimatorsEnabled())){
+                        && !signatureMediaPress
+                        && app.flexygram.bubbles.interaction.BubbleInteractionSettings.motionEnabled()){
                     signatureTapMotion.press(.012f+.0005f*app.flexygram.bubbles.interaction.BubbleInteractionSettings.compression(getContext()),
                             app.flexygram.bubbles.interaction.BubbleInteractionSettings.rebound(getContext())/100f,
                             440-3L*app.flexygram.bubbles.interaction.BubbleInteractionSettings.recovery(getContext()));
@@ -5628,7 +5632,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                     || (signatureAction==MotionEvent.ACTION_MOVE
                     && (Math.abs(getEventX(event)-signatureTapX)>android.view.ViewConfiguration.get(getContext()).getScaledTouchSlop()
                     || Math.abs(getEventY(event)-signatureTapY)>android.view.ViewConfiguration.get(getContext()).getScaledTouchSlop()))){
-                cancelSignatureTap();
+                cancelSignatureGesture();
             }
         }
         return result;

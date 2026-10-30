@@ -20,13 +20,13 @@ class Integration1284(unittest.TestCase):
         source=(audit.ROOT/'TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java').read_text()
         self.assertIn('compactContext = (bubbleTap || longpress) && !onDoubleTapped',source)
         self.assertIn('selectedBubbleMotionMessage == cell.getMessageObject()',source)
-        self.assertIn('canvas.scale(scale, scale,',source)
+        self.assertIn('canvas.scale(preview*selectedBubbleMotion.scaleX(), preview*selectedBubbleMotion.scaleY(),',source)
         self.assertGreaterEqual(source.count('selectedBubbleMotion.reset()'),3)
         motion=(audit.ROOT/'TMessagesProj/src/main/java/app/flexygram/bubbles/interaction/SelectedBubbleMotion.java').read_text()
         for forbidden in ['setScaleX','setScaleY','postDelayed','new Bitmap','ChatMessageCell']:
             self.assertNotIn(forbidden,motion)
-        self.assertIn('running.removeAllUpdateListeners()',motion)
-        self.assertIn('running.removeAllListeners()',motion)
+        self.assertIn('removeFrameCallback(this)',motion)
+        self.assertIn('completion=null; invalidate=null',motion)
 
     def test_sticker_capture_suppresses_the_wallpaper_without_changing_live_bubble_settings(self):
         cell=prior_bytes('TMessagesProj/src/main/java/org/telegram/ui/Cells/ChatMessageCell.java').decode()

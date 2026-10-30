@@ -33,7 +33,7 @@ public final class BubbleActionPanelView extends LinearLayout {
         setOrientation(VERTICAL);
         setPadding(0, dp(context, 3), 0, dp(context, 3));
         // The native popup owns the themed surface; use its foreground palette.
-        textColor = Theme.getColor(Theme.key_windowBackgroundWhiteBlackText, provider);
+        textColor = Theme.getColor(Theme.key_actionBarDefaultSubmenuItem, provider);
     }
 
     public void setListener(Listener value) { listener = value; }
@@ -54,7 +54,7 @@ public final class BubbleActionPanelView extends LinearLayout {
         if (action != Action.MORE && !allowed.contains(action)) return;
         final Context c = getContext();
         final String label = LocaleController.getString(stringId);
-        final int color = action == Action.DELETE ? 0xffdf5363 : textColor;
+        final int color = action == Action.DELETE ? Theme.getColor(Theme.key_text_RedRegular) : textColor;
         if (getChildCount() > 0) {
             View divider = new View(c);
             divider.setBackgroundColor((textColor & 0x00ffffff) | 0x18000000);
@@ -64,7 +64,7 @@ public final class BubbleActionPanelView extends LinearLayout {
             addView(divider, dividerParams);
         }
 
-        LinearLayout row = new LinearLayout(c);
+        LinearLayout row = new ActionRow(c);
         row.setOrientation(HORIZONTAL);
         row.setGravity(Gravity.CENTER_VERTICAL);
         row.setPadding(dp(c, 14), dp(c, 5), dp(c, 14), dp(c, 5));
@@ -84,7 +84,7 @@ public final class BubbleActionPanelView extends LinearLayout {
         title.setSingleLine(true);
         title.setEllipsize(TextUtils.TruncateAt.END);
         LayoutParams titleParams = new LayoutParams(0, -2, 1f);
-        titleParams.leftMargin = dp(c, 12);
+        titleParams.setMarginStart(dp(c, 12));
         row.addView(title, titleParams);
 
         int ripple = (textColor & 0x00ffffff) | 0x18000000;
@@ -96,6 +96,27 @@ public final class BubbleActionPanelView extends LinearLayout {
                 listener.onAction(action);
         });
         addView(row, new LayoutParams(-1, -2));
+    }
+
+    /** Same fixed native spring; rows observe touches and never delay action dispatch. */
+    private static final class ActionRow extends LinearLayout {
+        private final BubbleTapMotion motion=new BubbleTapMotion(this);
+        ActionRow(Context context) { super(context); }
+        @Override public boolean dispatchTouchEvent(android.view.MotionEvent event) {
+            if (BubbleInteractionSettings.motionEnabled()) {
+                int action=event.getActionMasked();
+                if (action==android.view.MotionEvent.ACTION_DOWN) motion.press(0f,0f,0L);
+                else if (action==android.view.MotionEvent.ACTION_UP || action==android.view.MotionEvent.ACTION_CANCEL
+                        || action==android.view.MotionEvent.ACTION_POINTER_DOWN) motion.release();
+            }
+            return super.dispatchTouchEvent(event);
+        }
+        @Override public void draw(android.graphics.Canvas canvas) {
+            int save=canvas.save();
+            canvas.scale(motion.scaleX(),motion.scaleY(),getWidth()*.5f,getHeight()*.5f);
+            super.draw(canvas); canvas.restoreToCount(save);
+        }
+        @Override protected void onDetachedFromWindow() { motion.reset(); super.onDetachedFromWindow(); }
     }
 
     @Override protected void onDetachedFromWindow() {

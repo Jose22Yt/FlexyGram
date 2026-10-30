@@ -60,15 +60,9 @@ public class OpenExteraAppNavigationActivity extends BaseFragment {
     // которые совпадают с id самих MainMenuItem.
     private static final int ID_TABLET_MODE = -101;
     private static final int ID_BACK_ANIMATION = -102;
-    private static final int ID_BOTTOM_NAVIGATION_BAR = -106;
     private static final int ID_PREDICTIVE_INTENSITY = -103;
     private static final int ID_DRAWER = -104;
     private static final int ID_IMMERSIVE = -105;
-    private static final int ID_HIDE_TAB_TITLES = -107;
-    private static final int ID_HIDE_CONTACTS_TAB = -108;
-    private static final int ID_HIDE_CALLS_TAB = -109;
-    private static final int ID_HIDE_PROFILE_TAB = -110;
-    private static final int ID_FLEXY_NAVIGATION = -111;
 
     /** Кнопка «добавить разделитель». */
     private static final int ID_ADD_DIVIDER = -200;
@@ -165,23 +159,6 @@ public class OpenExteraAppNavigationActivity extends BaseFragment {
             items.add(UItem.asShadow(getString(R.string.OEPredictiveBackInfo)));
         }
 
-        items.add(UItem.asHeader(getString(R.string.OEBottomNavigationBar)));
-        items.add(UItem.asButton(ID_BOTTOM_NAVIGATION_BAR, getString(R.string.OEBottomNavigationBarMode),
-                bottomNavigationModes()[MainTabsLayout.getBottomNavigationMode()]));
-        if (hasBottomTabs() && app.flexygram.navigation.LiquidNavigationConfig.configured()) {
-            items.add(UItem.asButton(ID_FLEXY_NAVIGATION, R.drawable.msg_settings, getString(R.string.FlexyLiquidNavTitle)));
-        } else if (hasBottomTabs()) {
-            items.add(UItem.asCheck(ID_HIDE_TAB_TITLES, getString(R.string.MainTabsHideTitles))
-                    .setChecked(NaConfig.INSTANCE.getMainTabsHideTitles().Bool()));
-            items.add(UItem.asCheck(ID_HIDE_CONTACTS_TAB, getString(R.string.MainTabsHideContacts))
-                    .setChecked(NaConfig.INSTANCE.getMainTabsHideContacts().Bool()));
-            items.add(UItem.asCheck(ID_HIDE_CALLS_TAB, getString(R.string.MainTabsHideCallsSettings))
-                    .setChecked(NaConfig.INSTANCE.getMainTabsHideCallsSettings().Bool()));
-            items.add(UItem.asCheck(ID_HIDE_PROFILE_TAB, getString(R.string.MainTabsHideProfile))
-                    .setChecked(NaConfig.INSTANCE.getMainTabsHideProfile().Bool()));
-        }
-        items.add(UItem.asShadow(null));
-
         items.add(UItem.asHeader(getString(R.string.OEAppNavigation)));
         items.add(UItem.asCheck(ID_DRAWER, getString(R.string.OENavigationDrawer))
                 .setChecked(AppearanceConfig.navigationDrawer()));
@@ -268,13 +245,11 @@ public class OpenExteraAppNavigationActivity extends BaseFragment {
     // ---- обработка ----
 
     private static final int[] LINK_IDS = {
-            ID_TABLET_MODE, ID_BACK_ANIMATION, ID_PREDICTIVE_INTENSITY, ID_BOTTOM_NAVIGATION_BAR,
-            ID_HIDE_TAB_TITLES, ID_HIDE_CONTACTS_TAB, ID_HIDE_CALLS_TAB, ID_HIDE_PROFILE_TAB,
+            ID_TABLET_MODE, ID_BACK_ANIMATION, ID_PREDICTIVE_INTENSITY,
             ID_DRAWER, ID_IMMERSIVE
     };
     private static final String[] LINK_KEYS = {
-            "tabletMode", "backAnimation", "predictiveBackIntensity", "bottomNavigationBar",
-            "MainTabsHideTitles", "MainTabsHideContacts", "MainTabsHideCallsSettings", "MainTabsHideProfile",
+            "tabletMode", "backAnimation", "predictiveBackIntensity",
             "navigationDrawer", "immersiveDrawerAnimation"
     };
 
@@ -332,23 +307,6 @@ public class OpenExteraAppNavigationActivity extends BaseFragment {
                     });
             return;
         }
-        if (id == ID_BOTTOM_NAVIGATION_BAR) {
-            showChoice(getString(R.string.OEBottomNavigationBarMode), bottomNavigationModes(),
-                    MainTabsLayout.getBottomNavigationMode(), which -> {
-                        MainTabsLayout.setBottomNavigationMode(which);
-                        if (which == MainTabsLayout.BOTTOM_NAVIGATION_MODE_FLOATING) {
-                            AppearanceConfig.newNavigationBarStyle.setConfigBool(false);
-                        }
-                        // Со скрытой панелью «Настройки» доступны только из меню; следить за этим
-                        // умеет сама раскладка (MainMenuLayout.ensureSettingsVisibility), поэтому
-                        // достаточно перечитать список и пересобрать вьюхи.
-                        update();
-                        if (getParentLayout() != null) {
-                            getParentLayout().rebuildAllFragmentViews(false, false);
-                        }
-                    });
-            return;
-        }
         if (id == ID_BACK_ANIMATION) {
             showChoice(getString(R.string.OEBackAnimation), backAnimations(),
                     NaConfig.INSTANCE.getBackAnimationStyle().Int(), which -> {
@@ -381,15 +339,6 @@ public class OpenExteraAppNavigationActivity extends BaseFragment {
         if (id == ID_IMMERSIVE) {
             AppearanceConfig.immersiveDrawerAnimation.setConfigBool(!AppearanceConfig.immersiveDrawerAnimation());
             update();
-            return;
-        }
-        if (id == ID_FLEXY_NAVIGATION) {
-            var settings = new app.flexygram.navigation.LiquidNavigationSettingsActivity();
-            settings.setCurrentAccount(currentAccount);presentFragment(settings);return;
-        }
-        if (id == ID_HIDE_TAB_TITLES || id == ID_HIDE_CONTACTS_TAB
-                || id == ID_HIDE_CALLS_TAB || id == ID_HIDE_PROFILE_TAB) {
-            toggleMainTab(mainTabConfig(id));
             return;
         }
         if (id == ID_ADD_DIVIDER) {
@@ -509,25 +458,6 @@ public class OpenExteraAppNavigationActivity extends BaseFragment {
         showDialog(builder.create());
     }
 
-    private static ConfigItem mainTabConfig(int id) {
-        if (id == ID_HIDE_TAB_TITLES) {
-            return NaConfig.INSTANCE.getMainTabsHideTitles();
-        } else if (id == ID_HIDE_CONTACTS_TAB) {
-            return NaConfig.INSTANCE.getMainTabsHideContacts();
-        } else if (id == ID_HIDE_CALLS_TAB) {
-            return NaConfig.INSTANCE.getMainTabsHideCallsSettings();
-        }
-        return NaConfig.INSTANCE.getMainTabsHideProfile();
-    }
-
-    private void toggleMainTab(ConfigItem item) {
-        item.setConfigBool(!item.Bool());
-        update();
-        if (getParentLayout() != null) {
-            getParentLayout().rebuildFragments(0);
-        }
-    }
-
     private boolean hasBottomTabs() {
         // Со скрытой нижней панелью «Настройки» — единственный вход в настройки,
         // и прятать их нельзя.
@@ -539,18 +469,6 @@ public class OpenExteraAppNavigationActivity extends BaseFragment {
                 getString(R.string.OETabletModeAuto),
                 getString(R.string.OETabletModeOn),
                 getString(R.string.OETabletModeOff),
-        };
-    }
-
-    /**
-     * Порядок совпадает с константами {@code MainTabsLayout.BOTTOM_NAVIGATION_MODE_*}:
-     * индекс выбранного пункта и есть режим.
-     */
-    private CharSequence[] bottomNavigationModes() {
-        return new CharSequence[]{
-                getString(R.string.OEBottomNavigationModeShow),
-                getString(R.string.OEBottomNavigationModeHide),
-                getString(R.string.OEBottomNavigationModeFloating),
         };
     }
 

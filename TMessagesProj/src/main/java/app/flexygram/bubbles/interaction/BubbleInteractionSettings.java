@@ -15,7 +15,6 @@ public final class BubbleInteractionSettings {
     private static final String PREFS = "flexy_bubble_interaction";
     private static final String STYLE_KEY = "interaction_style";
     private static volatile int cachedStyle = -1;
-    private static volatile Boolean legacyPanel, legacyBounce;
     private BubbleInteractionSettings() {}
 
     private static SharedPreferences prefs(Context context) {
@@ -40,28 +39,13 @@ public final class BubbleInteractionSettings {
         prefs(context).edit().putInt(STYLE_KEY, safe).apply();
     }
 
-    public static boolean signaturePanel(Context context) {
-        if (style(context) != STYLE_SIGNATURE) return false;
-        Boolean value = legacyPanel;
-        if (value == null) legacyPanel = value = prefs(context).getBoolean("signature_panel", false);
-        return value;
-    }
-
-    public static void setSignaturePanel(Context context, boolean value) {
-        legacyPanel = value;
-        prefs(context).edit().putBoolean("signature_panel", value).apply();
-    }
-
-    public static boolean springBounce(Context context) {
-        if (style(context) != STYLE_SIGNATURE) return false;
-        Boolean value = legacyBounce;
-        if (value == null) legacyBounce = value = prefs(context).getBoolean("spring_bounce", true);
-        return value;
-    }
-
-    public static void setSpringBounce(Context context, boolean value) {
-        legacyBounce = value;
-        prefs(context).edit().putBoolean("spring_bounce", value).apply();
+    public static boolean signaturePanel(Context context) { return style(context) == STYLE_SIGNATURE; }
+    public static boolean springBounce(Context context) { return style(context) == STYLE_SIGNATURE; }
+    public static boolean motionEnabled() {
+        // The app's explicit reduced-motion setting is authoritative; developer
+        // window/transition/animator duration scales do not alter our frame clock.
+        return org.telegram.messenger.SharedConfig.animationsEnabled()
+                && !org.telegram.messenger.AndroidUtilities.isAccessibilityScreenReaderEnabled();
     }
 
     // Used by ChatMessageCell and ChatActivity: both always follow the selected style.

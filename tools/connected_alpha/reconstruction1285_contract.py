@@ -19,6 +19,8 @@ def read_current(path):
     if spec()['reviewed'].get(str(path))==hashlib.sha256(b'').hexdigest():return b''
     from work1_contract import spec as work1_spec
     if work1_spec()['reviewed'].get(str(path))==hashlib.sha256(b'').hexdigest():return b''
+    from native_context135_contract import spec as current_spec
+    if current_spec()['reviewed'].get(str(path))==hashlib.sha256(b'').hexdigest():return b''
     raise FileNotFoundError(file)
 def restore(path,data):
     from interaction1286_contract import restore as next_restore

@@ -1592,6 +1592,16 @@ public class ReactionsContainerLayout extends FrameLayout implements Notificatio
         notificationsLocker.unlock();
     }
 
+    /** Signature's selected-message spring drives this native reaction view too. */
+    public void beginSignatureMotion() {
+        cancelSignatureTransition();
+        animatePopup = false;
+        setAlpha(1f);
+    }
+    public void setSignatureMotionProgress(float progress) {
+        setTransitionProgress(Math.max(0f, Math.min(1.04f, progress)));
+    }
+
     public void startEnterAnimation(boolean animatePopup) {
         this.animatePopup=animatePopup;
         animateSignatureTransition(true);

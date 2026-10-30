@@ -75,9 +75,9 @@ int oldRewinds=oldLens.shape().rewinds,newRewinds=lens.shape().rewinds;for(int i
 // Partial contour samples are identical; bounds normalization happens once per rebuild.
 int oldQueries=0,newQueries=0;for(int i=0;i<100;i++){Path p=new Path();float w=80+i*2,h=25+i%30;p.moveTo(0,0);p.lineTo(w,0);p.lineTo(w,h);p.lineTo(-4,h);p.lineTo(0,h-5);p.close();Rect r=new Rect(0,0,(int)w,(int)h);for(int side=1;side<=4;side++){org.telegram.messenger.AndroidUtilities.density=1+(i%4)*.5f;SignatureBorderPath b=new SignatureBorderPath();BaselineSignatureBorderPath before=new BaselineSignatureBorderPath();RectF.queries=0;Path old=before.get(p,side,r,10,0,0,2,0,0,0);oldQueries+=RectF.queries;RectF.queries=0;Path now=b.get(p,side,r,10,0,0,2,0,0,0);newQueries+=RectF.queries;check(old.commands.equals(now.commands));check(b.get(p,side,r,10,0,0,2,0,0,0)==now);}}
 check(newQueries<oldQueries);
-// Resting/recycled cells need no invalidation; active springs retain exact sampled scales.
+// Resting/recycled cells preserve Work2 idle guarantees; the approved new spring has a different response curve.
 View beforeView=new View(),nowView=new View();beforeView.parent=new View();nowView.parent=new View();BaselineBubbleTapMotion beforeMotion=new BaselineBubbleTapMotion(beforeView);BubbleTapMotion motion=new BubbleTapMotion(nowView);for(int i=0;i<1000;i++){beforeMotion.reset();motion.reset();}check(nowView.invalidations==0&&beforeView.invalidations==1000);
-for(int hz:new int[]{60,90,120,144}){SystemClock.now=0;beforeMotion.press(.04f,.7f,280);motion.press(.04f,.7f,280);check(beforeMotion.scale()==motion.scale());beforeMotion.release();motion.release();for(int n=1;n<=hz;n++){SystemClock.now=Math.round(n*1000f/hz);beforeMotion.run();motion.run();check(beforeMotion.scale()==motion.scale());}motion.reset();motion.run();check(motion.scale()==1&&!motion.pressed());}
+for(int hz:new int[]{60,90,120,144}){SystemClock.now=0;beforeMotion.press(.04f,.7f,280);motion.press(.04f,.7f,280);check(motion.scale()<1f&&motion.scale()>.99f);beforeMotion.release();motion.release();for(int n=1;n<=hz;n++){SystemClock.now=Math.round(n*1000f/hz);beforeMotion.run();motion.run();check(Float.isFinite(motion.scale())&&motion.scale()>.94f&&motion.scale()<1.04f);}check(motion.scale()==1f);motion.reset();motion.run();check(motion.scale()==1&&!motion.pressed());}
 motion.press(.02f,.3f,180);motion.release();motion.reset();int count=nowView.invalidations;motion.run();check(nowView.invalidations==count&&nowView.callbacks.isEmpty());
 System.out.println("{\\"assertions\\":"+checks+",\\"startup_loop_controller_calls_one_active\\":{\\"before\\":"+directCalls+",\\"after\\":"+eligible+"},\\"burst_1000_queued_checks\\":1,\\"stationary_lens_builds_1000_prepares\\":{\\"before\\":"+oldBuilds+",\\"after\\":"+newBuilds+"},\\"contour_bounds_queries\\":{\\"before\\":"+oldQueries+",\\"after\\":"+newQueries+"},\\"idle_cell_invalidations_1000_resets\\":{\\"before\\":1000,\\"after\\":0},\\"device_fps\\":null,\\"evidence\\":\\"ISOLATED_OPERATION_COUNTS_NOT_DEVICE_TIMING\\"}");
 }}
@@ -91,6 +91,8 @@ def sources():
     # The retired Home lens is retained only as historical PR132 benchmark evidence.
     # No lens code executes in the current Home bar.
     result={name:((JAVA/name).read_text() if (JAVA/name).is_file() else subprocess.check_output(['git','show','3db6f7a87d147b84a628af7352299173424ce4f7:TMessagesProj/src/main/java/'+name],cwd=ROOT,text=True)) for name in names}
+    for helper in ['app/exteraless/player/Spring.java','app/flexygram/bubbles/interaction/DampedSpringCurve.java']:
+        result[helper]=(JAVA/helper).read_text()
     for name in [names[0],names[3],names[4],names[5]]:
         old=subprocess.check_output(['git','show',BASE+':TMessagesProj/src/main/java/'+name],cwd=ROOT,text=True)
         cls=Path(name).stem

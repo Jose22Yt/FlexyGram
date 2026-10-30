@@ -10,7 +10,7 @@ def write(source,root):
  def put(path,text):
   dest=source/path;dest.parent.mkdir(parents=True,exist_ok=True);dest.write_text(text)
  java=root/'TMessagesProj/src/main/java'
- files=['app/flexygram/navigation/LiquidNavigationPreviewView.java','app/flexygram/navigation/LiquidNavigationSettingsActivity.java','app/flexygram/navigation/LiquidNavigationTabs.java','app/flexygram/bubbles/interaction/BubbleInteractionSettings.java','app/flexygram/bubbles/interaction/BubbleInteractionSettingsActivity.java','app/flexygram/bubbles/interaction/BubbleTapMotion.java','app/flexygram/bubbles/BubbleConfig.java','app/flexygram/bubbles/BubbleStyle.java','app/flexygram/bubbles/BubbleSettingsActivity.java']
+ files=['app/flexygram/bubbles/interaction/BubbleInteractionSettings.java','app/flexygram/bubbles/interaction/BubbleInteractionSettingsActivity.java','app/flexygram/bubbles/interaction/BubbleTapMotion.java','app/flexygram/bubbles/interaction/SelectedBubbleMotion.java','app/flexygram/bubbles/interaction/DampedSpringCurve.java','app/exteraless/player/Spring.java']
  code=''
  for name in files:
   text=(java/name).read_text();put(name,text);code+=text
@@ -24,11 +24,12 @@ def write(source,root):
     if item.tag=='string':values[item.get('name')]=''.join(item.itertext())
   except ET.ParseError:pass
  put('org/telegram/messenger/LocaleController.java','package org.telegram.messenger;public class LocaleController{public static boolean isRTL;public static String getString(int id){switch(id){'+''.join('case R.string.'+n+':return '+json.dumps(values.get(n,n),ensure_ascii=True)+';' for n in strings)+'default:return "sample";}}}')
+ put('org/telegram/messenger/SharedConfig.java','package org.telegram.messenger;public class SharedConfig{public static boolean animationsEnabled(){return true;}}')
  put('org/telegram/messenger/BuildConfig.java','package org.telegram.messenger;public class BuildConfig{public static boolean CONNECTED_ALPHA=true;}')
  put('org/telegram/messenger/UserConfig.java','package org.telegram.messenger;public class UserConfig{public static int selectedAccount=0;}')
  put('org/telegram/messenger/Utilities.java','package org.telegram.messenger;public class Utilities{public interface Callback<T>{void run(T value);}}')
  put('org/telegram/messenger/LiteMode.java','package org.telegram.messenger;public class LiteMode{public static int FLAG_LIQUID_GLASS=1;public static boolean isEnabled(int f){return true;}public static void addOnPowerSaverAppliedListener(Utilities.Callback<Boolean> c){}public static void removeOnPowerSaverAppliedListener(Utilities.Callback<Boolean> c){}}')
- p=source/'org/telegram/messenger/AndroidUtilities.java';p.write_text(p.read_text().replace('public static float density=1;','public static float density=1;public static android.graphics.Point displaySize=new android.graphics.Point(360,800);'))
+ p=source/'org/telegram/messenger/AndroidUtilities.java';p.write_text(p.read_text().replace('public static float density=1;','public static float density=1;public static boolean isAccessibilityScreenReaderEnabled(){return false;}public static android.graphics.Point displaySize=new android.graphics.Point(360,800);'))
  colors=['glass_tabSelected','windowBackgroundWhite','windowBackgroundGray','windowBackgroundWhiteBlackText','windowBackgroundWhiteGrayText2','windowBackgroundWhiteBlueText','dialogTextBlack','dialogTextGray2','dialogTextBlue']
  put('org/telegram/ui/ActionBar/Theme.java','package org.telegram.ui.ActionBar;public class Theme{public interface ResourcesProvider{}public interface Colorable{void updateColors();}'+''.join('public static int key_'+n+'='+str(i)+';' for i,n in enumerate(colors))+'''public static boolean dark;public static int getColor(int k){return k==key_windowBackgroundWhite?(dark?0xff16222e:0xfffafbfc):k==key_windowBackgroundWhiteBlackText?(dark?0xffeeeeee:0xff182533):k==key_windowBackgroundWhiteBlueText?0xff408dc2:0xff83909d;}public static int getColor(int k,ResourcesProvider p){return getColor(k);}public static int multAlpha(int c,float a){return (c&0xffffff)|(Math.round((c>>>24)*a)<<24);}public static int getDividerColor(ResourcesProvider p){return 0xffaaaaaa;}}''')
  put('org/telegram/ui/Components/glass/GlassTabView.java','''package org.telegram.ui.Components.glass;public class GlassTabView extends android.widget.FrameLayout implements org.telegram.ui.MainTabsLayout.Tab{

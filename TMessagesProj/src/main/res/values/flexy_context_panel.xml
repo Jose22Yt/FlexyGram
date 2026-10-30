@@ -7,8 +7,8 @@
     <string name="FlexyContextBounce">iOS 27 selection animation</string>
     <string name="FlexyContextInteractions">Message interactions</string>
     <string name="FlexyContextDescription">Single contact animates the bubble independently from the context menu. Enable reactions and panel with one tap separately. Native controls and long press retain their actions.</string>
-    <string name="FlexyContextStyle">Interaction style</string>
-    <string name="FlexyContextNativeStyle">Default</string>
+    <string name="FlexyContextStyle">Message menu style</string>
+    <string name="FlexyContextNativeStyle">Classic</string>
     <string name="FlexyContextSignatureStyle">Signature iOS 27</string>
-    <string name="FlexyContextStyleDescription">Default retains Telegram's original gestures and menu. Signature iOS 27 enables one-tap reactions, a compact action card and damped motion. Native physics are fixed with no speed, intensity or deformation controls.</string>
+    <string name="FlexyContextStyleDescription">Classic retains the original Telegram gestures and menu. Signature iOS 27 enables one-tap reactions, a compact action card and damped motion. Native physics are fixed with no speed, intensity or deformation controls.</string>
 </resources>

@@ -3,24 +3,35 @@ import org.junit.*;import org.junit.runner.RunWith;import static org.junit.Asser
 @RunWith(RobolectricTestRunner.class) @Config(manifest=Config.NONE,sdk=35) @LooperMode(LooperMode.Mode.PAUSED)
 public class Interaction2Test{
  Activity a;FrameLayout root;
- @Before public void start(){a=Robolectric.buildActivity(Activity.class).setup().get();org.telegram.messenger.ApplicationLoader.applicationContext=a;root=new FrameLayout(a);a.setContentView(root);a.getSharedPreferences("flexy_liquid_navigation",0).edit().clear().commit();ReflectionHelpers.setStaticField(LiquidNavigationConfig.class,"loaded",false);a.getSharedPreferences("flexy_bubble_interaction",0).edit().clear().commit();ReflectionHelpers.setStaticField(BubbleInteractionSettings.class,"tapPanel",null);}
+ @Before public void start(){a=Robolectric.buildActivity(Activity.class).setup().get();org.telegram.messenger.ApplicationLoader.applicationContext=a;root=new FrameLayout(a);a.setContentView(root);a.getSharedPreferences("flexy_liquid_navigation",0).edit().clear().commit();ReflectionHelpers.setStaticField(LiquidNavigationConfig.class,"migrated",false);a.getSharedPreferences("flexy_bubble_interaction",0).edit().clear().commit();ReflectionHelpers.setStaticField(BubbleInteractionSettings.class,"cachedStyle",-1);}
  @After public void end(){root.removeAllViews();a.finish();}
- @Test public void singleContactRoutesOnceToMenuWithTapOriginAndNeverLongPress(){var cell=new org.telegram.ui.Cells.ChatMessageCell(a);root.addView(cell);cell.arm();Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(Duration.ofMillis(80));var e=MotionEvent.obtain(0,80,1,10,10,0);cell.signatureTapEvent(e);e.recycle();assertTrue(cell.isSignatureTap());var host=new TapDispatchProbe();host.click(cell,10,10);assertEquals(1,host.calls);assertTrue(host.single);assertTrue(host.tap);assertFalse(host.longPress);assertFalse(cell.isSignatureTap());}
- @Test public void defaultCompleteInteractionAndExplicitOptOutSurviveReload(){assertTrue(BubbleInteractionSettings.tapPanel(a));BubbleInteractionSettings.tapPanel(a,false);ReflectionHelpers.setStaticField(BubbleInteractionSettings.class,"tapPanel",null);assertFalse(BubbleInteractionSettings.tapPanel(a));BubbleInteractionSettings.resetTap(a);assertTrue(BubbleInteractionSettings.tapPanel(a));}
+ @Test public void singleContactRoutesOnceToMenuWithTapOriginAndNeverLongPress(){var cell=new org.telegram.ui.Cells.ChatMessageCell(a);root.addView(cell);cell.arm();Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(Duration.ofMillis(80));var e=MotionEvent.obtain(0,80,1,10,10,0);cell.signatureTapEvent(e);e.recycle();assertTrue(cell.isSignatureTap());var host=new TapDispatchProbe();host.click(cell,10,10);assertEquals(1,host.calls);assertTrue(host.single);assertTrue(host.tap);assertFalse(host.longPress);assertTrue(cell.isSignatureTap());cell.finishSignatureTap();assertFalse(cell.isSignatureTap());}
+ @Test public void defaultCompleteInteractionAndExplicitOptOutSurviveReload(){assertTrue(BubbleInteractionSettings.tapPanel(a));BubbleInteractionSettings.tapPanel(a,false);ReflectionHelpers.setStaticField(BubbleInteractionSettings.class,"cachedStyle",-1);assertFalse(BubbleInteractionSettings.tapPanel(a));BubbleInteractionSettings.resetTap(a);assertTrue(BubbleInteractionSettings.tapPanel(a));}
  @Test public void cancelledMovedMultiPointerAndLongContactsNeverBecomeSignatureTap(){for(int action:new int[]{2,3,5,6}){var c=new org.telegram.ui.Cells.ChatMessageCell(a);c.arm();var e=MotionEvent.obtain(0,10,action,300,300,0);c.signatureTapEvent(e);e.recycle();assertFalse(c.isSignatureTap());}var c=new org.telegram.ui.Cells.ChatMessageCell(a);c.arm();Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(Duration.ofMillis(ViewConfiguration.getLongPressTimeout()+1));var e=MotionEvent.obtain(0,900,1,0,0,0);c.signatureTapEvent(e);e.recycle();assertFalse(c.isSignatureTap());}
- @Test public void optOutKeepsAnimationOnlyWithoutMenu(){BubbleInteractionSettings.tapPanel(a,false);var c=new org.telegram.ui.Cells.ChatMessageCell(a);c.arm();var e=MotionEvent.obtain(0,80,1,0,0,0);c.signatureTapEvent(e);e.recycle();var h=new TapDispatchProbe();h.click(c,0,0);assertEquals(0,h.calls);}
- @Test @GraphicsMode(GraphicsMode.Mode.NATIVE) public void previewTwoToSixLightDarkFontScaleAndNativeSelection()throws Exception{
-  for(boolean dark:new boolean[]{false,true})for(int count=2;count<=6;count++)for(float font:new float[]{1f,1.3f,2f}){
+ @Test public void classicStyleNeverClaimsNormalNativeTaps(){
+  BubbleInteractionSettings.setStyle(a,BubbleInteractionSettings.STYLE_DEFAULT);
+  var c=new org.telegram.ui.Cells.ChatMessageCell(a);var h=new TapDispatchProbe();h.click(c,0,0);
+  assertEquals(1,h.calls);assertFalse(h.tap);assertFalse(BubbleInteractionSettings.tapAnimation(a));
+ }
+ @Test @GraphicsMode(GraphicsMode.Mode.NATIVE) public void fixedHomeLightDarkAndLargeFontsRetainNativeSelection()throws Exception{
+  for(boolean dark:new boolean[]{false,true})for(float font:new float[]{1f,1.3f,2f}){
    var configuration=new android.content.res.Configuration(a.getResources().getConfiguration());configuration.fontScale=font;a.getResources().updateConfiguration(configuration,a.getResources().getDisplayMetrics());
-   org.telegram.ui.ActionBar.Theme.dark=dark;int[] order=new int[count];for(int i=0;i<count;i++)order[i]=i;LiquidNavigationConfig.order(order);
-   var preview=new LiquidNavigationPreviewView(a);root.addView(preview,new FrameLayout.LayoutParams(360,420));preview.settingsChanged();layout(360,440);
-   MainTabsLayout bar=ReflectionHelpers.getField(preview,"bar");org.telegram.ui.Components.glass.GlassTabView[] tabs=ReflectionHelpers.getField(preview,"tabs");int visible=0;int min=999,max=0;
-   for(var tab:tabs)if(tab.getVisibility()==View.VISIBLE){visible++;if(font>1.3f)assertTrue(tab.compact);min=Math.min(min,tab.getWidth());max=Math.max(max,tab.getWidth());assertTrue(tab.getWidth()>=48);assertTrue(tab.getX()>=bar.getPaddingLeft()-1);assertTrue(tab.getX()+tab.getWidth()<=bar.getWidth()-bar.getPaddingRight()+1);}
-   assertEquals(count,visible);assertTrue(max-min<=1);assertEquals(0,org.telegram.ui.Components.glass.GlassTabView.avatarBinds);
-   tabs[count-1].performClick();Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(Duration.ofSeconds(1));assertTrue(tabs[count-1].isTabSelected());
-   Bitmap b=Bitmap.createBitmap(360,420,Bitmap.Config.ARGB_8888);preview.draw(new Canvas(b));try(var out=new java.io.FileOutputStream("bottom-"+count+"-"+(dark?"dark":"light")+"-font"+font+"-isolated.png")){b.compress(Bitmap.CompressFormat.PNG,100,out);}b.recycle();root.removeView(preview);
+   org.telegram.ui.ActionBar.Theme.dark=dark;MainTabsLayout bar=new MainTabsLayout(a,null);root.addView(bar,new FrameLayout.LayoutParams(360,60));bar.refreshBottomBarAppearance();
+   java.util.ArrayList<org.telegram.ui.Components.glass.GlassTabView> tabs=new java.util.ArrayList<>();
+   for(int id:LiquidNavigationConfig.order()){
+    var tab=new org.telegram.ui.Components.glass.GlassTabView(a);tabs.add(tab);bar.addView(tab);bar.setViewVisible(tab,true,false);bar.setPriority(tab,id);
+    tab.setOnClickListener(v->bar.setTabSelected(tab,true));
+   }
+   layout(360,100);assertEquals(4,tabs.size());int min=999,max=0;
+   for(var tab:tabs){min=Math.min(min,tab.getWidth());max=Math.max(max,tab.getWidth());assertTrue(tab.getWidth()>=48);if(font>1.3f)assertTrue(tab.compact);}
+   assertTrue(max-min<=1);tabs.get(3).performClick();Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(Duration.ofSeconds(1));assertTrue(tabs.get(3).isTabSelected());
+   Bitmap b=Bitmap.createBitmap(360,100,Bitmap.Config.ARGB_8888);root.draw(new Canvas(b));try(var out=new java.io.FileOutputStream("home-default-"+(dark?"dark":"light")+"-font"+font+"-isolated.png")){b.compress(Bitmap.CompressFormat.PNG,100,out);}b.recycle();root.removeView(bar);
   }
  }
- @Test public void liveSettingsChangeDimensionsAndSurviveRecreation(){var p=new LiquidNavigationPreviewView(a);root.addView(p);p.settingsChanged();layout(360,440);MainTabsLayout b=ReflectionHelpers.getField(p,"bar");int h=b.getHeight();LiquidNavigationConfig.compaction(3);LiquidNavigationConfig.value(LiquidNavigationConfig.Parameter.HEIGHT,100);p.settingsChanged();layout(360,460);assertTrue(b.getHeight()>h);ReflectionHelpers.setStaticField(LiquidNavigationConfig.class,"loaded",false);assertEquals(80,LiquidNavigationConfig.heightDp());}
+ @Test public void messageSettingsExposeOneSelectorAndInformationOnly(){
+  var page=new BubbleInteractionSettingsActivity();ReflectionHelpers.callInstanceMethod(page,"updateRows");
+  int style=ReflectionHelpers.getField(page,"styleRow"),info=ReflectionHelpers.getField(page,"infoRow");assertEquals(0,style);assertEquals(1,info);
+  assertEquals(60,LiquidNavigationConfig.heightDp());assertEquals(23,LiquidNavigationConfig.iconDp());
+ }
  void layout(int w,int h){root.measure(View.MeasureSpec.makeMeasureSpec(w,1073741824),View.MeasureSpec.makeMeasureSpec(h,1073741824));root.layout(0,0,w,h);Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(Duration.ofSeconds(1));}
 }

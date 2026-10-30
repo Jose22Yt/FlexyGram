@@ -119,7 +119,6 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
     // Links
     private int linksHeaderRow;
     private int appNavigationRow;
-    private int flexyLiquidNavigationRow;
     private int iconPacksRow;
     private int emojiSetsRow;
     private int pillStackRow;
@@ -175,7 +174,6 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
 
         linksHeaderRow = addRow("linksHeader");
         appNavigationRow = addRow("appNavigation");
-        flexyLiquidNavigationRow = addRow("flexyLiquidNavigation");
         pillStackRow = addRow("pillStack");
         hidingRow = addRow("hiding");
         linksDividerRow = addRow();
@@ -490,9 +488,6 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
             presentFragment(new OpenExteraAppNavigationActivity());
             return;
 
-        } else if (position == flexyLiquidNavigationRow) {
-            presentFragment(new app.flexygram.navigation.LiquidNavigationSettingsActivity());
-            return;
         } else if (position == emojiSetsRow) {
             presentFragment(new NekoEmojiSettingsActivity());
             return;
@@ -818,9 +813,6 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
                     if (position == appNavigationRow) {
                         cell.setTextAndValueAndIcon(getString(R.string.OEAppearanceNavigation), getString(R.string.OEAppearanceNavigationSub), R.drawable.msg_newphone, true);
 
-                    } else if (position == flexyLiquidNavigationRow) {
-                        cell.setTextAndValueAndIcon(getString(R.string.FlexyLiquidNavTitle),
-                            getString(R.string.FlexyLiquidNavPreview), R.drawable.msg_settings, true);
                     } else if (position == iconPacksRow) {
                         cell.setTextAndValueAndIcon(getString(R.string.OEAppearanceIconPacks), getString(R.string.OEAppearanceIconPacksInfo), R.drawable.msg_sticker, true);
                     } else if (position == emojiSetsRow) {
@@ -881,7 +873,7 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
                 return TYPE_INFO_PRIVACY;
             } else if (position == fabShapeRow) {
                 return TYPE_FAB_SHAPE;
-            } else if (position == appNavigationRow || position == flexyLiquidNavigationRow || position == iconPacksRow
+            } else if (position == appNavigationRow || position == iconPacksRow
                     || position == emojiSetsRow || position == pillStackRow || position == hidingRow) {
                 return TYPE_DETAIL_SETTINGS;
             } else if (position == dividerStyleRow || position == glassOutlineRow
