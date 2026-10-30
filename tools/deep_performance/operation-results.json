@@ -1,0 +1,31 @@
+{
+  "evidence": "ISOLATED_OPERATION_COUNTS_NOT_DEVICE_TIMING",
+  "navigation_combinations": 1049080,
+  "assertions": 1108884,
+  "navigation_row_checks": {
+    "before": 1048576,
+    "after": 16
+  },
+  "navigation_keyboard_queries": {
+    "before": 131072,
+    "after": 16
+  },
+  "filters_1000_same_color": {
+    "before": 1000,
+    "after": 1
+  },
+  "tab_invalidations_1000_inactive_overrides": {
+    "before": 1000,
+    "after": 0
+  },
+  "track_invalidations_1000_same_fraction": {
+    "before": 1000,
+    "after": 0
+  },
+  "device_fps": null,
+  "baseline_sha": "cd2af16c8271e52738f0c4e726cf59862c637087",
+  "limitations": [
+    "Host doubles for Android, view hierarchy, keyboard, image targets and drawing commands.",
+    "No full-app input dispatch, pixel/GPU comparison, APK, JNI, network or physical performance measurement."
+  ]
+}

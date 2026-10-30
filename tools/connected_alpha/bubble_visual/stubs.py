@@ -11,6 +11,12 @@ def write_stubs(source, root):
         p=source/name;p.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(root/'TMessagesProj/src/main/java'/name,p)
 
     import subprocess
+    # PR136 production baseline; renaming isolates the exact old drawable in the same native-graphics process.
+    old_drawable = subprocess.check_output(['git','show','cd2af16c8271e52738f0c4e726cf59862c637087:TMessagesProj/src/main/java/org/telegram/ui/ActionBar/MessageDrawable.java'],cwd=root,text=True)
+    (source/'org/telegram/ui/ActionBar/BaselineMessageDrawable.java').write_text(old_drawable.replace('MessageDrawable','BaselineMessageDrawable'))
+    # Test-only operation instrumentation. No counter or extra branch enters the APK.
+    contour = source/'app/flexygram/bubbles/SignatureBorderPath.java'
+    contour.write_text(contour.read_text().replace('public final class SignatureBorderPath {','public final class SignatureBorderPath { public static long testRebuilds;').replace('result.rewind();','testRebuilds++; result.rewind();'))
     baseline = subprocess.check_output(['git','show','d50677f723292d0e405eae8e1529f65416ff9cbd:TMessagesProj/src/main/java/app/flexygram/bubbles/SignatureWallpaperBlur.java'],cwd=root,text=True)
     baseline = baseline.replace('SignatureWallpaperBlur','Alpha1279WallpaperBlur')
     (source/'app/flexygram/bubbles/Alpha1279WallpaperBlur.java').write_text(baseline)

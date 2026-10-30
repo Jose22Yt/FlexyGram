@@ -24,6 +24,12 @@ public final class SignatureBorderPath {
     private float centerX, centerY, normalizationWidth, normalizationHeight;
     private int mode = -1;
 
+    /** Native cell geometry was regenerated, including tail/rounding changes. */
+    public void invalidate() {
+        initialized = false;
+        fadeShader = null;
+    }
+
     public Path get(Path path, int position, Rect rect, int radius, int near, int small,
                     int padding, int type, int flags, int clippedTop) {
         if (position == 5) { mode = 5; return path; }

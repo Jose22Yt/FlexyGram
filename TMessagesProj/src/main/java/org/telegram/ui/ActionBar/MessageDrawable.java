@@ -655,6 +655,7 @@ public class MessageDrawable extends Drawable {
             invalidatePath = true;
         }
         if (invalidatePath || overrideRoundRadius != 0) {
+            if (pathDrawCacheParams != null) pathDrawCacheParams.invalidateSignatureBorder();
             generatePath(path, bounds, padding, rad, smallRad, nearRad, top, drawFullBottom, drawFullTop, paintToUse != null);
         }
 
@@ -683,13 +684,17 @@ public class MessageDrawable extends Drawable {
                 flexyBorderPaint.setColor(ColorUtils.setAlphaComponent(contour, Math.round(Color.alpha(contour) * alpha / 255f)));
                 canvas.save();
                 canvas.clipPath(path);
-                Path contourPath = signatureBorderPath.get(path, app.flexygram.bubbles.BubbleConfig.borderPosition(),
+                int borderPosition = app.flexygram.bubbles.BubbleConfig.borderPosition();
+                // MessageDrawable is shared across rows. Partial contours belong
+                // to the existing per-cell native path cache, not the last row drawn.
+                app.flexygram.bubbles.SignatureBorderPath borderCache = borderPosition == 5 ? null
+                        : pathDrawCacheParams == null ? signatureBorderPath : pathDrawCacheParams.signatureBorder();
+                Path contourPath = borderCache == null ? path : borderCache.get(path, borderPosition,
                         bounds, rad, nearRad, smallRad, padding, currentType,
                         (isTopNear ? 1 : 0) | (isBottomNear ? 2 : 0) | (botButtonsBottom ? 4 : 0)
                                 | (drawFullBubble ? 8 : 0) | (isOut ? 16 : 0)
                                 | (drawFullTop ? 32 : 0) | (drawFullBottom ? 64 : 0), top);
-                flexyBorderPaint.setShader(app.flexygram.bubbles.BubbleConfig.borderPosition() == 5
-                        ? null : signatureBorderPath.fade(contour));
+                flexyBorderPaint.setShader(borderCache == null ? null : borderCache.fade(contour));
                 flexyBorderPaint.setStrokeCap(Paint.Cap.ROUND);
                 flexyBorderPaint.setStrokeJoin(Paint.Join.ROUND);
                 float stroke = flexyBorderPaint.getStrokeWidth();
@@ -763,6 +768,7 @@ public class MessageDrawable extends Drawable {
             invalidatePath = true;
         }
         if (invalidatePath || overrideRoundRadius != 0) {
+            if (pathDrawCacheParams != null) pathDrawCacheParams.invalidateSignatureBorder();
             generatePath(path, bounds, padding, rad, smallRad, nearRad, top, drawFullBottom, drawFullTop, true);
         }
         return path;
@@ -1000,6 +1006,16 @@ public class MessageDrawable extends Drawable {
 
     public static class PathDrawParams {
         Path path = new Path();
+        // Lazily allocated only for partial Signature borders; recycled with this
+        // cell's native path. No bitmap, message reference or global size cache.
+        private app.flexygram.bubbles.SignatureBorderPath signatureBorder;
+        private app.flexygram.bubbles.SignatureBorderPath signatureBorder() {
+            if (signatureBorder == null) signatureBorder = new app.flexygram.bubbles.SignatureBorderPath();
+            return signatureBorder;
+        }
+        private void invalidateSignatureBorder() {
+            if (signatureBorder != null) signatureBorder.invalidate();
+        }
         Rect lastRect = new Rect();
         boolean lastDrawFullTop;
         boolean lastDrawFullBottom;

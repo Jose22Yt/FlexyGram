@@ -51,6 +51,7 @@ def main():
     from stubs import write_stubs
     write_stubs(source, ROOT)
     shutil.copyfile(HERE/'BubbleVisualTest.java.in', source/'BubbleVisualTest.java')
+    shutil.copyfile(ROOT/'tools/deep_performance/ScrollEffectsCacheTest.java.in', source/'ScrollEffectsCacheTest.java')
     shutil.copyfile(HERE/'SignatureControlsVisualTest.java.in', source/'SignatureControlsVisualTest.java')
     shutil.copyfile(HERE/'BubblePreviewVisualTest.java.in', source/'BubblePreviewVisualTest.java')
     shutil.copyfile(HERE/'CachedBlurVisualTest.java.in', source/'CachedBlurVisualTest.java')
