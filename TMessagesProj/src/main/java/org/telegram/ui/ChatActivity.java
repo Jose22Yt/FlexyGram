@@ -1213,6 +1213,7 @@ public class ChatActivity extends BaseFragment implements
     private final app.flexygram.bubbles.interaction.SelectedBubbleMotion selectedBubbleMotion =
             new app.flexygram.bubbles.interaction.SelectedBubbleMotion();
     private MessageObject selectedBubbleMotionMessage;
+    private float signatureHandoffScaleX = .945f, signatureHandoffScaleY = .960f;
     private float selectedBubbleOffsetY;
     private float selectedBubblePreviewScale = 1f;
     private View scrimView;
@@ -2146,10 +2147,14 @@ public class ChatActivity extends BaseFragment implements
             }
             if(view instanceof ChatMessageCell && ((ChatMessageCell)view).isSignatureTap()){
                 if(app.flexygram.bubbles.interaction.BubbleInteractionSettings.tapPanel(view.getContext())){
-                    ((ChatMessageCell)view).cancelSignatureTap();
+                    ChatMessageCell tapped=(ChatMessageCell)view;
+                    // Carry the real-cell squash/stretch into the popup's damped spring.
+                    signatureHandoffScaleX=tapped.signatureTapScaleX();
+                    signatureHandoffScaleY=tapped.signatureTapScaleY();
+                    tapped.finishSignatureTap();
                     createMenu(view,true,false,x,y,true,false,false,false,true);
                 }
-                return; // animation-only single tap never opens a menu
+                return;
             }
             createMenu(view, true, false, x, y, false);
         }
@@ -19447,8 +19452,8 @@ public class ChatActivity extends BaseFragment implements
                                     && scrimViewReaction == null
                                     && selectedBubbleMotionMessage == cell.getMessageObject()) {
                                 canvas.translate(0, selectedBubbleOffsetY * selectedBubbleMotion.progress());
-                                float scale = (1f + (selectedBubblePreviewScale-1f)*selectedBubbleMotion.progress()) * selectedBubbleMotion.scale();
-                                canvas.scale(scale, scale,
+                                float preview = 1f + (selectedBubblePreviewScale-1f)*selectedBubbleMotion.progress();
+                                canvas.scale(preview*selectedBubbleMotion.scaleX(), preview*selectedBubbleMotion.scaleY(),
                                         (cell.getBackgroundDrawableLeft() + cell.getBackgroundDrawableRight()) * .5f,
                                         (cell.getBackgroundDrawableTop() + cell.getBackgroundDrawableBottom()) * .5f);
                             }
@@ -33335,8 +33340,8 @@ public class ChatActivity extends BaseFragment implements
 
             if (compactContext && !signatureContextActions(options).isEmpty()) {
                 android.graphics.drawable.GradientDrawable surface = new android.graphics.drawable.GradientDrawable();
-                surface.setColor(0xe62b3540);
-                surface.setCornerRadius(dp(20));
+                surface.setColor(getThemedColor(Theme.key_actionBarDefaultSubmenuBackground));
+                surface.setCornerRadius(dp(22));
                 popupLayout.setBackground(surface);
             }
             boolean addGap = false;
@@ -34425,7 +34430,7 @@ public class ChatActivity extends BaseFragment implements
                 final var admitted=signatureContextActions(options);
                 if (!admitted.isEmpty()) {
                     admitted.add(app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.SELECT);
-                    panel.setMinimumWidth(dp(232));
+                    panel.setMinimumWidth(dp(220));
                     panel.setAllowedActions(admitted);
                     ArrayList<View> nativeItems=new ArrayList<>();
                     for(int i=0;i<popupLayout.getItemsCount();i++)nativeItems.add(popupLayout.getItemAt(i));
@@ -34909,7 +34914,10 @@ public class ChatActivity extends BaseFragment implements
                     selectedBubbleOffsetY = signatureBubbleOffset;
                     selectedBubblePreviewScale = signatureBubbleScale;
                     if (app.flexygram.bubbles.interaction.BubbleInteractionSettings.springBounce(getParentActivity())) {
-                        selectedBubbleMotion.enter(() -> { if (contentView != null) contentView.invalidate(); });
+                        selectedBubbleMotion.enter(
+                                () -> { if (contentView != null) contentView.invalidate(); },
+                                bubbleTap ? signatureHandoffScaleX : .945f,
+                                bubbleTap ? signatureHandoffScaleY : .960f);
                     }
                 }
                 if (isReactionsAvailableFinal && finalReactionsLayout != null) {
