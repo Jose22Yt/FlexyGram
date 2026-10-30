@@ -11,6 +11,9 @@ def write_probe(source,root):
  code='''import android.animation.*;import android.content.Context;import android.view.*;import android.view.animation.OvershootInterpolator;
 import org.telegram.ui.Components.CubicBezierInterpolator;
 public class ReactionsMotionProbe extends View {
+ public static class LocaleController {public static boolean isRTL;}
+ public boolean mirrorX;
+ private int dp(float value){return (int)Math.ceil(getResources().getDisplayMetrics().density*value);}
  public float transitionProgress=1f;boolean animatePopup;ValueAnimator pullingDownBackAnimator,cancelPressedAnimation;
  public static class Locker {public boolean held;public int locks,releases;public void lock(){held=true;locks++;}public void unlock(){if(held){held=false;releases++;}}}
  public final Locker notificationsLocker=new Locker();

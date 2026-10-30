@@ -8,8 +8,8 @@ import app.exteraless.player.Spring;
 /** Local frame-clock spring; the existing native integrator owns position AND velocity. */
 public final class BubbleTapMotion implements Runnable {
     private final View owner;
-    private final Spring x = new Spring(1f, 560f, .72f, .00012f);
-    private final Spring y = new Spring(1f, 560f, .72f, .00012f);
+    private final Spring x = new Spring(1f, 560f, .60f, .00012f);
+    private final Spring y = new Spring(1f, 560f, .60f, .00012f);
     private boolean pressed, running;
     private long last;
     public BubbleTapMotion(View owner) { this.owner = owner; }
@@ -23,8 +23,8 @@ public final class BubbleTapMotion implements Runnable {
     public void press(float compression, float rebound, long duration) {
         // Old arguments are retained for binary/source compatibility only. Physics is fixed.
         pressed = true;
-        x.target = .986f;
-        y.target = .970f;
+        x.target = .978f;
+        y.target = .965f;
         // Integrate the first sub-frame on DOWN; no abrupt scale assignment.
         x.step(1f / 240f); y.step(1f / 240f);
         invalidate();
@@ -33,8 +33,8 @@ public final class BubbleTapMotion implements Runnable {
     public void drag(float dx, float dy, float slop) {
         if (!pressed || slop <= 0f) return;
         // Small resistance inside native touch slop. Retarget, never assign position.
-        x.target=.986f+.004f*Math.min(1f,Math.abs(dx)/slop);
-        y.target=.970f+.006f*Math.min(1f,Math.abs(dy)/slop);
+        x.target=.978f+.004f*Math.min(1f,Math.abs(dx)/slop);
+        y.target=.965f+.006f*Math.min(1f,Math.abs(dy)/slop);
         schedule();
     }
     public void release() {

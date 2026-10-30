@@ -6,19 +6,25 @@ ROOT=Path(__file__).resolve().parents[2]
 BASE='6ed4d9154a032eebd22e6c236701308e388bcb17'
 MANIFEST=ROOT/'tools/native_context/review.json'
 def spec():return json.loads(MANIFEST.read_text())
-def paths():return frozenset(spec()['paths'])
+def paths():
+ from opex_motion_contract import paths as next_paths
+ return frozenset(spec()['paths'])|next_paths()
 @lru_cache(maxsize=256)
 def original(path):
  p=subprocess.run(['git','show',BASE+':'+str(path)],cwd=ROOT,capture_output=True)
  return p.stdout if p.returncode==0 else b''
 def restore(path,data):
+ from opex_motion_contract import restore as next_restore
+ data=next_restore(path,data)
  expected=spec()['reviewed'].get(str(path))
  return original(path) if expected and hashlib.sha256(data).hexdigest()==expected else data
 def verify_current():
+ from opex_motion_contract import verify_current as next_verify,restore as next_restore
+ next_verify()
  s=spec()
  if s['base']!=BASE:raise ValueError('Wrong native-context base')
  for name,expected in s['reviewed'].items():
-  p=ROOT/name;data=p.read_bytes() if p.is_file() else b''
+  p=ROOT/name;data=next_restore(name,p.read_bytes() if p.is_file() else b'')
   if hashlib.sha256(data).hexdigest()!=expected:raise ValueError('Unreviewed native-context bytes: '+name)
   if restore(name,data+b'UNKNOWN')!=data+b'UNKNOWN':raise ValueError('Unknown mutation accepted')
  changed=set(subprocess.check_output(['git','diff','--no-renames',BASE,'--name-only'],cwd=ROOT,text=True).splitlines())

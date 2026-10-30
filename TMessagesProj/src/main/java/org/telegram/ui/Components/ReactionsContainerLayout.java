@@ -1599,7 +1599,15 @@ public class ReactionsContainerLayout extends FrameLayout implements Notificatio
         setAlpha(1f);
     }
     public void setSignatureMotionProgress(float progress) {
-        setTransitionProgress(Math.max(0f, Math.min(1.04f, progress)));
+        // Native reveal geometry must stay in [0,1]. Put the damped overshoot on
+        // the whole pill instead, so its background and emojis rebound together.
+        setTransitionProgress(Math.max(0f, Math.min(1f, progress)));
+        float rebound = 1f + .25f * Math.max(0f, progress - 1f);
+        setPivotX(LocaleController.isRTL || mirrorX ? getMeasuredWidth() * .125f : getMeasuredWidth() * .875f);
+        setPivotY(getMeasuredHeight());
+        setScaleX(rebound);
+        setScaleY(rebound);
+        setTranslationY(dp(12) * (1f - progress));
     }
 
     public void startEnterAnimation(boolean animatePopup) {

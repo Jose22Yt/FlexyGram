@@ -5,6 +5,18 @@ import static org.junit.Assert.*;
 @RunWith(RobolectricTestRunner.class) @Config(manifest=Config.NONE,sdk=35) @LooperMode(LooperMode.Mode.PAUSED)
 public class ReactionsMotionTest {
  ReactionsMotionProbe open(){return new ReactionsMotionProbe(RuntimeEnvironment.getApplication());}
+ @Test public void signatureReboundsWholePillButKeepsNativeRevealBounded(){
+  for(boolean rtl:new boolean[]{false,true})for(boolean mirror:new boolean[]{false,true}){
+   var v=open();ReactionsMotionProbe.LocaleController.isRTL=rtl;v.mirrorX=mirror;
+   v.measure(android.view.View.MeasureSpec.makeMeasureSpec(240,1073741824),android.view.View.MeasureSpec.makeMeasureSpec(52,1073741824));v.layout(0,0,240,52);
+   v.beginSignatureMotion();v.setSignatureMotionProgress(1.08f);
+   assertEquals(1f,v.transitionProgress,0);assertEquals(1.02f,v.getScaleX(),.0001f);assertEquals(v.getScaleX(),v.getScaleY(),0);
+   assertEquals(rtl||mirror?30f:210f,v.getPivotX(),0);assertEquals(52f,v.getPivotY(),0);assertTrue(v.getTranslationY()<0);
+   v.setSignatureMotionProgress(-.08f);assertEquals(0f,v.transitionProgress,0);assertEquals(1f,v.getScaleX(),0);
+   v.setSignatureMotionProgress(1f);assertEquals(1f,v.getScaleX(),0);assertEquals(1f,v.getScaleY(),0);assertEquals(0f,v.getTranslationY(),0);
+  }
+  ReactionsMotionProbe.LocaleController.isRTL=false;
+ }
  @Test public void reversesWithoutRestartingFromOneOrZero(){
   var v=open();v.startEnterAnimation(true);var enter=v.current();enter.setCurrentFraction(.35f);float rendered=v.transitionProgress;
   v.startCloseAnimation();assertNotSame(enter,v.current());assertEquals(rendered,v.transitionProgress,.0001f);

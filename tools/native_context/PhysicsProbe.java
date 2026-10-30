@@ -8,6 +8,28 @@ public class PhysicsProbe {
  static void frame(double dt){SystemClock.now+=dt*1000;View.frame();Choreographer.frame((long)(SystemClock.now*1e6));}
  public static void main(String[] args){
   int samples=0;
+  for(int hz:new int[]{60,90,120,144}){
+   SelectedBubbleMotion m=new SelectedBubbleMotion();
+   m.enter(()->{},.978f,.965f,0f,0f);
+   require(m.panelScale()>.60f&&m.panelScale()<.65f,"Card must grow visibly from message anchor");
+   float peak=0f;double peakTime=0;int settledFrame=0;
+   for(int i=1;i<=hz;i++){
+    frame(1d/hz);
+    float p=m.geometryProgress();
+    if(p>peak){peak=p;peakTime=i/(double)hz;}
+    require(m.progress()>=0&&m.progress()<=1,"Opacity/reveal escaped bounds");
+    require(m.panelScale()>.60f&&m.panelScale()<1.05f,"Card rebound too large");
+    require(Math.abs(m.spatialOffset(-1000f,4f))<=1004.001f,"Tall preview crossed reaction gap");
+    require(m.spatialOffset(0f,4f)==0f,"Stationary preview moved");
+    if(!m.isRunning()&&settledFrame==0)settledFrame=i;
+   }
+   require(peak>1.04f&&peak<1.10f,"Missing or excessive damped overshoot");
+   require(peakTime>.12&&peakTime<.24,"Rebound timing outside calibrated window");
+   require(settledFrame>0&&settledFrame/(double)hz<.75,"Entry did not settle");
+   require(m.panelScale()==1&&m.panelOffset()==0,"Entry did not restore final card");
+   System.out.println("Trajectory "+hz+" Hz: peak="+peak+" at "+peakTime+"s; settled="+settledFrame/(double)hz+"s");
+   m.reset();
+  }
   for(int hz:new int[]{60,90,120,144})for(int hold:new int[]{1,2,4,12,60}){
    View owner=new View();BubbleTapMotion press=new BubbleTapMotion(owner);
    press.press(0,0,0);require(press.scaleX()<1&&press.scaleX()>.998,"Immediate response must be tiny and integrated");
@@ -28,6 +50,8 @@ public class PhysicsProbe {
     frame(1d/hz);samples++;
     require(Float.isFinite(menu.scaleX())&&menu.scaleX()>.96&&menu.scaleX()<1.02,"Unbounded message geometry");
     require(menu.panelProgress()>-.1&&menu.panelProgress()<1.1,"Unbounded panel spring");
+    float offset=menu.spatialOffset(-1000f,4f);
+    require(offset>=-1004.001f&&offset<=4.001f,"Interrupted return escaped spatial rebound bounds");
    }
    require(done[0]==1&&!menu.isRunning()&&!menu.hasOwner(),"Close leaked owner/callback");
    require(menu.scaleX()==1&&menu.scaleY()==1&&menu.progress()==0,"Close did not restore geometry");

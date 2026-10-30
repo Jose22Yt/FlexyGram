@@ -19445,8 +19445,8 @@ public class ChatActivity extends BaseFragment implements
                             if (cell != null && scrimGroup == null && scrimViewTask == null
                                     && scrimViewReaction == null
                                     && selectedBubbleMotionMessage == cell.getMessageObject()) {
-                                canvas.translate(0, selectedBubbleOffsetY * selectedBubbleMotion.progress());
-                                float preview = 1f + (selectedBubblePreviewScale-1f)*selectedBubbleMotion.progress();
+                                canvas.translate(0, selectedBubbleMotion.spatialOffset(selectedBubbleOffsetY, dp(4)));
+                                float preview = 1f + (selectedBubblePreviewScale-1f)*selectedBubbleMotion.geometryProgress();
                                 canvas.scale(preview*selectedBubbleMotion.scaleX(), preview*selectedBubbleMotion.scaleY(),
                                         (cell.getBackgroundDrawableLeft() + cell.getBackgroundDrawableRight()) * .5f,
                                         (cell.getBackgroundDrawableTop() + cell.getBackgroundDrawableBottom()) * .5f);
@@ -34936,10 +34936,10 @@ public class ChatActivity extends BaseFragment implements
                         float phase=selectedBubbleMotion.panelProgress();
                         float alpha=Math.max(0f,Math.min(1f,phase));
                         popupLayout.setPivotY(0f);
-                        popupLayout.setPivotX(popupLayout.getMeasuredWidth()*.5f);
-                        popupLayout.setScaleX(.96f+.04f*phase);
-                        popupLayout.setScaleY(.96f+.04f*phase);
-                        popupLayout.setTranslationY(dp(8)*(1f-phase));
+                        popupLayout.setPivotX(signatureSelectedMessage.isOutOwner() ? popupLayout.getMeasuredWidth() : 0f);
+                        popupLayout.setScaleX(selectedBubbleMotion.panelScale());
+                        popupLayout.setScaleY(selectedBubbleMotion.panelScale());
+                        popupLayout.setTranslationY(AndroidUtilities.dpf2(selectedBubbleMotion.panelOffset()));
                         popupLayout.setAlpha(alpha);
                         if (finalReactionsLayout != null) finalReactionsLayout.setSignatureMotionProgress(phase);
                     }, handoff?tapped.signatureTapScaleX():1f,
