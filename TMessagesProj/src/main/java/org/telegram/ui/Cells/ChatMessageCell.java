@@ -5073,8 +5073,9 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     public boolean isSignatureTap(){return signatureTapEligible && signatureTapReleased>0 && android.os.SystemClock.uptimeMillis()-signatureTapReleased<500;}
     public float signatureTapScaleX(){return signatureTapMotion.scaleX();}
     public float signatureTapScaleY(){return signatureTapMotion.scaleY();}
-    /** Preserve the active spring when handing the selected message to the popup overlay. */
-    public void finishSignatureTap(){signatureTapEligible=false;signatureTapReleased=0;signatureTapMotion.release();}
+    /** The overlay receives the live scale first, then owns the remaining spring.
+     * Resetting here is atomic with popup creation; prevents double-scaling the same cell. */
+    public void finishSignatureTap(){signatureTapEligible=false;signatureTapReleased=0;signatureTapMotion.reset();}
     public void cancelSignatureTap(){signatureTapEligible=false;signatureTapReleased=0;signatureMediaPress=false;signatureTapMotion.reset();}
     private void applySignatureTap(Canvas canvas){
         float sx=signatureTapMotion.scaleX(),sy=signatureTapMotion.scaleY();
@@ -5082,6 +5083,28 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             float cx=signatureTapPivotX,cy=signatureTapPivotY;
             canvas.scale(sx,sy,cx,cy);
         }
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        // Media controls can return early from onTouchEvent; always finish their
+        // independent touch spring without intercepting photo/video handling.
+        if (signatureMediaPress) {
+            int action=event.getActionMasked();
+            if (action==MotionEvent.ACTION_UP) {
+                signatureMediaPress=false;
+                signatureTapMotion.release();
+            } else if (action==MotionEvent.ACTION_CANCEL
+                    || action==MotionEvent.ACTION_POINTER_DOWN
+                    || action==MotionEvent.ACTION_POINTER_UP) {
+                cancelSignatureTap();
+            } else if (action==MotionEvent.ACTION_MOVE) {
+                float slop=android.view.ViewConfiguration.get(getContext()).getScaledTouchSlop();
+                if (Math.abs(getEventX(event)-signatureTapX)>slop
+                        || Math.abs(getEventY(event)-signatureTapY)>slop) cancelSignatureTap();
+            }
+        }
+        return super.dispatchTouchEvent(event);
     }
 
     @Override
@@ -5555,9 +5578,12 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             final float touchX=getEventX(event),touchY=getEventY(event);
             final boolean mediaHit=compatible && drawPhotoImage && photoImage.isInsideImage(touchX,touchY)
                     && (currentMessageObject.type==MessageObject.TYPE_PHOTO || currentMessageObject.isVideo());
-            signatureTapEligible=compatible && !result
-                    && (isInsideBackground(touchX,touchY) || mediaHit);
-            signatureMediaPress=mediaHit && !signatureTapEligible;
+            // Ordinary photo/video taps still open Telegram's media viewer.
+            // They get tactile feedback, but the one-tap context panel is for the
+            // unclaimed message surface, not an image-button hit target.
+            signatureTapEligible=compatible && !result && !mediaHit
+                    && isInsideBackground(touchX,touchY);
+            signatureMediaPress=mediaHit;
             if(signatureTapEligible || signatureMediaPress){
                 signatureTapStarted=android.os.SystemClock.uptimeMillis();
                 signatureTapX=touchX;signatureTapY=touchY;
