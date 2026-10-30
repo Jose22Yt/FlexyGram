@@ -2866,12 +2866,32 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                             ? Layout.getDesiredWidth(messageString,0,senderEnd,currentMessagePaint)+dp(5):0;
                     int thumbnailReserve=thumbsCount>0?dp((thumbSize+2)*thumbsCount+6):0;
                     int free=app.flexygram.home.SignatureSmartPillLayout.remaining(messageWidth,senderWidth,thumbnailReserve,capsuleWidth,dp(18));
+                    // A channel post can carry a second reliable category; never
+                    // infer ADMIN from the channel flag. Keep only the content
+                    // pill on narrow rows, preserving the actual filename.
+                    app.flexygram.home.SignatureSmartPillSpan channelCapsule=null;
+                    if (message.messageOwner.post && candidate!=app.flexygram.home.SignatureSmartPreviewPalette.CHANNEL) {
+                        channelCapsule=new app.flexygram.home.SignatureSmartPillSpan(
+                                app.flexygram.home.SignatureSmartPreviewPalette.CHANNEL,
+                                app.flexygram.home.SignatureSmartPreviews.badgeLabel(
+                                    app.flexygram.home.SignatureSmartPreviewPalette.CHANNEL),resourcesProvider);
+                        int secondWidth=channelCapsule.getSize(currentMessagePaint,"\ufffc",0,1,null)+dp(5);
+                        if (free-secondWidth>=dp(28))free-=secondWidth;
+                        else channelCapsule=null;
+                    }
                     if (free >= dp(16)) {
                         String snippet=app.flexygram.home.SignatureSmartPreviews.snippet(message,candidate);
                         CharSequence clipped=TextUtils.ellipsize(snippet,currentMessagePaint,free,
                                 (message.isDocument()?TextUtils.TruncateAt.MIDDLE:TextUtils.TruncateAt.END));
-                        SpannableStringBuilder pill=new SpannableStringBuilder("\ufffc");
-                        pill.setSpan(capsule,0,1,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        SpannableStringBuilder pill=new SpannableStringBuilder();
+                        if(channelCapsule!=null){
+                            pill.append("\ufffc");
+                            pill.setSpan(channelCapsule,0,1,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                            pill.append(" ");
+                        }
+                        int capsuleStart=pill.length();
+                        pill.append("\ufffc");
+                        pill.setSpan(capsule,capsuleStart,capsuleStart+1,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                         if (!TextUtils.isEmpty(clipped))pill.append(" ").append(clipped);
                         CharSequence withThumbs=applyThumbs(pill);
                         SpannableStringBuilder combined=new SpannableStringBuilder();
