@@ -14,7 +14,7 @@
     "TMessagesProj/src/main/java/app/flexygram/navigation/LiquidNavigationSettingsActivity.java": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "TMessagesProj/src/main/java/app/flexygram/navigation/LiquidNavigationTabsActivity.java": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "TMessagesProj/src/main/java/org/telegram/ui/Cells/ChatMessageCell.java": "f1dd841518005159c77fc0af1947e31276e5033fb0342295072bba5fdac827ce",
-    "TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java": "26327f7f4dbebbc642bd549dfb3f87cc106506a9bd84d7a894bb301587cecf9a",
+    "TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java": "644f9b554354e299b66c559a5424f876132aa70a25fd3ac8c03d8367208224d9",
     "TMessagesProj/src/main/java/org/telegram/ui/Components/ReactionsContainerLayout.java": "f5c53b78b684f9bdf2c890baaa371cb2809c8425a1132e983b100963cd9d426a",
     "TMessagesProj/src/main/java/org/telegram/ui/MainTabsLayout.java": "fd17d6061c21bcf343374f81a617c60c619fb6681ae645dfb04d062d652f94ae",
     "TMessagesProj/src/main/res/values-es/flexy_context_panel.xml": "b5d3af2e3c667f98cf9c753e1ff2a4ccfa24dc704cd93369c2ba13ed90beefaa",
@@ -37,7 +37,7 @@
     "tools/connected_alpha/test_native_context135.py": "24641c16d1c18716ef5e510d7451ba460bd6fbccec94786e2ce37601e8777977",
     "tools/connected_alpha/test_work1.py": "9776f298c8064dace3b197ffc0b0e4e5dd80df4709af0d57372e48230e99e17b",
     "tools/native_context/PhysicsProbe.java": "e3ad55fed7d999c7b5ee644628566cf9dd5e8c23d7be751a105bb3b8cf904c6b",
-    "tools/native_context/README.md": "aafa07ef3791a255712dc6a60c24a83b0b4450a22dbcab95b84b175379cdbbeb",
+    "tools/native_context/README.md": "9734253818c8e0b9016223e6d9d1f4ff91efeeb5c4aacc255af7fb52f8fb0244",
     "tools/performance_p0/check_wiring.py": "4615ed3e6ffb63fb1cc101a422f8725adfc3cc1c98d97583790109bbdd24a9de",
     "tools/performance_p0/run_checks.py": "5a82b372eede0107feb4ab62b2a7a03c10590904c5db9fd4ad7e2c06f8ce1c6c"
   },

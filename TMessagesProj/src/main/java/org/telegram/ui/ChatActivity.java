@@ -32152,7 +32152,8 @@ public class ChatActivity extends BaseFragment implements
         scrolling = false;
         if (scrimPopupWindow != null) {
             scrimPopupWindow.setPauseNotifications(false);
-            closeMenu();
+            // Background windows must not await another display frame to release input.
+            scrimPopupWindow.dismiss(false);
         }
         long replyId = threadMessageId;
         getMessagesController().markDialogAsReadNow(dialog_id, replyId);
