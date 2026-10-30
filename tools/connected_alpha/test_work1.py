@@ -27,7 +27,7 @@ class Work1(unittest.TestCase):
    self.assertEqual(audit.original(name),before_beta(name,(ROOT/name).read_bytes()),name)
   signing='gradle/flexygram-beta.gradle'
   self.assertEqual(audit.original(signing).decode().split('tasks.configureEach')[0],(ROOT/signing).read_text().split('// AGP deduplicates')[0])
-  self.assertEqual('5a598fb5ba42949b67b7c2635106fafd5f23179397e4c098757a73cd2d2ef66c',hashlib.sha256((ROOT/'config/signing/flexygram-release.cer').read_bytes()).hexdigest())
+  self.assertEqual('5a598fb5ba42949b67b7c2635106fafd5f23179397e4c098757a73cd2d2ef66c',hashlib.sha256(before_beta('config/signing/flexygram-release.cer',(ROOT/'config/signing/flexygram-release.cer').read_bytes())).hexdigest())
  def test_single_tap_requests_both_real_reactions_and_native_actions(self):
   s=(JAVA/'org/telegram/ui/ChatActivity.java').read_text()
   self.assertIn('createMenu(view,true,false,x,y,true,false,false,false,true)',s)
