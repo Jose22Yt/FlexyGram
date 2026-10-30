@@ -1,0 +1,25 @@
+{
+  "baseline_sha": "cd2af16c8271e52738f0c4e726cf59862c637087",
+  "scope": "TRACKED_TREE_INVENTORY_NOT_LINE_BY_LINE_OR_DEVICE_PROFILE",
+  "tracked_entries": 28642,
+  "areas": {
+    "TMessagesProj/src/main/java/org/telegram/": 1977,
+    "TMessagesProj/src/main/java/app/flexygram/": 94,
+    "TMessagesProj/src/main/java/app/exteraless/": 271,
+    "TMessagesProj/jni/": 13805,
+    "TMessagesProj/chaquopy/": 0,
+    "TMessagesProj/src/main/res/": 7372,
+    "tools/": 333
+  },
+  "source_extensions": {
+    ".c": 296,
+    ".cpp": 178,
+    ".css": 1,
+    ".h": 3223,
+    ".java": 2807,
+    ".js": 6,
+    ".kt": 60,
+    ".py": 363,
+    ".xml": 2299
+  }
+}
