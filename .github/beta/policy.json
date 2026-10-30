@@ -1,0 +1,19 @@
+{
+  "repository": "Jose22Yt/FlexyGram",
+  "source_commit": "aeb6b5fc01f6332ab82194e311b52a19d702a81e",
+  "environment": "flexygram-beta",
+  "dispatch_branch": "main",
+  "environment_id": null,
+  "reviewer_ids": [],
+  "ui_review": {
+    "confirmed": false,
+    "reviewed_by": null,
+    "reviewed_at": null,
+    "admin_bypass_disabled": false,
+    "main_requires_pull_request_and_approval": false,
+    "main_blocks_force_push_and_deletion": false,
+    "main_applies_to_administrators": false,
+    "only_environment_scoped_beta_secrets": false,
+    "delivery_age_recipient": null
+  }
+}

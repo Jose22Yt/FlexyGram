@@ -1,0 +1,121 @@
+name: Official Beta private ARM64
+run-name: Official Beta 1290 · approved PR141 · ${{ inputs.mode }}
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Audit protections first; build requires independent environment approval
+        type: choice
+        options: [audit, build]
+        default: audit
+permissions:
+  contents: read
+concurrency:
+  group: flexygram-official-beta
+  cancel-in-progress: false
+jobs:
+  audit:
+    if: github.repository == 'Jose22Yt/FlexyGram' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Check manual provenance and actual environment protections without signing inputs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_WORKFLOW_SHA: ${{ github.workflow_sha }}
+          GITHUB_WORKFLOW_REF: ${{ github.workflow_ref }}
+        run: python3 .github/beta/audit_environment.py
+  build:
+    needs: audit
+    if: inputs.mode == 'build'
+    permissions:
+      contents: read
+      actions: read
+    environment: flexygram-beta
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    env:
+      NATIVE_TARGET: arm64-v8a
+      GRADLE_USER_HOME: ${{ runner.temp }}/flexygram-beta-gradle
+      SOURCE_COMMIT: aeb6b5fc01f6332ab82194e311b52a19d702a81e
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          path: control
+          persist-credentials: false
+      - name: Recheck protections after environment approval, before private material
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_WORKFLOW_SHA: ${{ github.workflow_sha }}
+          GITHUB_WORKFLOW_REF: ${{ github.workflow_ref }}
+        run: python3 control/.github/beta/audit_environment.py
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: aeb6b5fc01f6332ab82194e311b52a19d702a81e
+          path: source
+          submodules: recursive
+          persist-credentials: false
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.11'
+      - name: Install Android and native dependencies before signing inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends age nasm ninja-build patchelf autoconf automake libtool pkg-config
+          sdkmanager 'platform-tools' 'build-tools;36.0.0' 'platforms;android-37.0' 'ndk;27.2.12479018' 'cmake;3.31.6'
+          python3 source/tools/connected_alpha/preflight_sdk.py --sdk-root "$ANDROID_HOME"
+          cd source
+          test "$(git rev-parse HEAD)" = "$SOURCE_COMMIT"
+          git submodule status --recursive > "$RUNNER_TEMP/beta-submodules.txt"
+          if grep -Eq '^[+-U]' "$RUNNER_TEMP/beta-submodules.txt"; then exit 1; fi
+          printf 'toolchainVersion=21\ntoolchainVendor=ADOPTIUM\n' > gradle/gradle-daemon-jvm.properties
+          printf 'sdk.dir=%s\n' "$ANDROID_HOME" > local.properties
+          echo "CHAQUOPY_BUILD_PYTHON=$(command -v python3.11)" >> "$GITHUB_ENV"
+          echo "CMAKE=$ANDROID_HOME/cmake/3.31.6/bin/cmake" >> "$GITHUB_ENV"
+          python3.11 -m venv "$RUNNER_TEMP/beta-wheel-tools"
+          "$RUNNER_TEMP/beta-wheel-tools/bin/python" -m pip install -r TMessagesProj/chaquopy/server/pypi/requirements.txt
+          "$RUNNER_TEMP/beta-wheel-tools/bin/python" tools/connected_alpha/rebuild_python_wheels.py --chaquopy TMessagesProj/chaquopy --output "$RUNNER_TEMP/beta-wheelhouse"
+          echo "ALPHA_WHEELHOUSE=$RUNNER_TEMP/beta-wheelhouse" >> "$GITHUB_ENV"
+          python3 ../control/.github/beta/private_build.py prepare-clean
+          df -h .
+          free_kb=$(df -Pk . | awk 'NR==2 {print $4}')
+          (( free_kb >= 8 * 1024 * 1024 ))
+      - name: Validate, assembleBeta, verify PR141 artifact and encrypt for owner
+        env:
+          FLEXYGRAM_RELEASE_KEYSTORE_B64: ${{ secrets.FLEXYGRAM_RELEASE_KEYSTORE_B64 }}
+          FLEXYGRAM_RELEASE_STORE_PASSWORD: ${{ secrets.FLEXYGRAM_RELEASE_STORE_PASSWORD }}
+          FLEXYGRAM_RELEASE_KEY_ALIAS: ${{ secrets.FLEXYGRAM_RELEASE_KEY_ALIAS }}
+          FLEXYGRAM_RELEASE_KEY_PASSWORD: ${{ secrets.FLEXYGRAM_RELEASE_KEY_PASSWORD }}
+          TELEGRAM_APP_ID: ${{ secrets.TELEGRAM_APP_ID }}
+          TELEGRAM_APP_HASH: ${{ secrets.TELEGRAM_APP_HASH }}
+          FLEXYGRAM_BETA_FIREBASE_JSON_B64: ${{ secrets.FLEXYGRAM_BETA_FIREBASE_JSON_B64 }}
+          BETA_AGE_RECIPIENT: ${{ vars.FLEXYGRAM_BETA_AGE_RECIPIENT }}
+        run: python3 control/.github/beta/private_build.py build
+      - name: Remove plaintext before any artifact action, also on failure
+        if: always()
+        run: python3 control/.github/beta/private_build.py cleanup
+      - name: Retain only owner-encrypted delivery
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: FlexyGram-Beta-1290-ARM64-owner-encrypted-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/flexygram-beta-delivery/FlexyGram-Beta-1290.tar.age
+          if-no-files-found: error
+          retention-days: 1
+          compression-level: 0
+      - name: Remove encrypted runner copy
+        if: always()
+        run: python3 control/.github/beta/private_build.py cleanup-delivery

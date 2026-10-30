@@ -1,0 +1,26 @@
+{
+  "base": "aeb6b5fc01f6332ab82194e311b52a19d702a81e",
+  "paths": [
+    ".github/beta/README.md",
+    ".github/beta/audit_environment.py",
+    ".github/beta/policy.json",
+    ".github/beta/private_build.py",
+    ".github/beta/review.json",
+    ".github/beta/source_contract.py",
+    ".github/beta/test_infrastructure.py",
+    ".github/workflows/beta-private-tests.yml",
+    ".github/workflows/beta-private.yml",
+    "tools/connected_alpha/beta_release_contract.py"
+  ],
+  "reviewed": {
+    ".github/beta/README.md": "d29d03aeb9305ed907d96e2d7319b229f36dc25e9e43310439c7ad3d59843ff8",
+    ".github/beta/audit_environment.py": "d56c23ce355d8cf9d32e54b259897c77c416b7976f4bd4762e6818642413a034",
+    ".github/beta/policy.json": "5af82faf280a0b7e9c0c4ae5052c56e5f1d80c41f9647e39a02487e18a957d16",
+    ".github/beta/private_build.py": "dd559935306248f319b2a97ae128b5b23403dd953a322030177e49547ca7b878",
+    ".github/beta/source_contract.py": "3de2d144f790ca960efe73e14f12f6b17dac56fb69dfa062b8c023ab27016f54",
+    ".github/beta/test_infrastructure.py": "6bd6cc95a534c9e19a8dbd0768dba7d73099f1003d9c48704578cbefaa5ca978",
+    ".github/workflows/beta-private-tests.yml": "8dd5d0dfa8fae01e5ffd110a5e449bdb569693d434df45c1758b43e6d9d2b221",
+    ".github/workflows/beta-private.yml": "964329a3504aea75317c73adbc482c9cefb78153b9a28732c91408d08207b6b4",
+    "tools/connected_alpha/beta_release_contract.py": "3369cdb41ca1d32a7b6da231f31dc5e758b427f757d733f762709dd8195d70a4"
+  }
+}
