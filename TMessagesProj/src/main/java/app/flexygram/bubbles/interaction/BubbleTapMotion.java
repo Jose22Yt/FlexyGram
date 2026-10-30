@@ -30,6 +30,13 @@ public final class BubbleTapMotion implements Runnable {
         invalidate();
         schedule();
     }
+    public void drag(float dx, float dy, float slop) {
+        if (!pressed || slop <= 0f) return;
+        // Small resistance inside native touch slop. Retarget, never assign position.
+        x.target=.986f+.004f*Math.min(1f,Math.abs(dx)/slop);
+        y.target=.970f+.006f*Math.min(1f,Math.abs(dy)/slop);
+        schedule();
+    }
     public void release() {
         if (!pressed) return;
         pressed = false;

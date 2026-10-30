@@ -12,6 +12,9 @@ public class PhysicsProbe {
    View owner=new View();BubbleTapMotion press=new BubbleTapMotion(owner);
    press.press(0,0,0);require(press.scaleX()<1&&press.scaleX()>.998,"Immediate response must be tiny and integrated");
    for(int i=0;i<hold;i++)frame(1d/hz);
+   float beforeDrag=press.scaleX(),speedBeforeDrag=press.velocityX();
+   press.drag(3f,4f,8f);require(press.scaleX()==beforeDrag&&press.velocityX()==speedBeforeDrag,"Drag reset state");
+   frame(1d/hz);
    float sx=press.scaleX(),sy=press.scaleY(),vx=press.velocityX(),vy=press.velocityY();
    press.release();require(press.scaleX()==sx&&press.velocityX()==vx,"UP dropped live state");
    SelectedBubbleMotion menu=new SelectedBubbleMotion();final int[] redraw={0},done={0};

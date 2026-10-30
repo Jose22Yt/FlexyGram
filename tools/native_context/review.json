@@ -7,14 +7,14 @@
     "TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraAppearanceActivity.java": "7680b700d284873ee00f5211960486df4c7aaaf70c9ea3564c00665212652672",
     "TMessagesProj/src/main/java/app/flexygram/bubbles/interaction/BubbleActionPanelView.java": "d82a6dd9598ffc687dd869783b063ce034f83f32d0867c95aefca25f60c31e69",
     "TMessagesProj/src/main/java/app/flexygram/bubbles/interaction/BubbleInteractionSettings.java": "cb5968047c861946a6a99324db62c5b6a541e2feec7b03a2f3db31ec69630495",
-    "TMessagesProj/src/main/java/app/flexygram/bubbles/interaction/BubbleTapMotion.java": "b401e1914e7b8e310769531cdcadf986a0744f4a88d7be65928c0165c93985cb",
+    "TMessagesProj/src/main/java/app/flexygram/bubbles/interaction/BubbleTapMotion.java": "5b767e0f01bd584f98b19382e2b162b37090087df4c890eec75b32a63be4ef88",
     "TMessagesProj/src/main/java/app/flexygram/bubbles/interaction/SelectedBubbleMotion.java": "9ed738d2e7363e4dffea24e7aee4cf8014c0fd6ea33a115454800e47fdccf5cd",
     "TMessagesProj/src/main/java/app/flexygram/navigation/LiquidNavigationConfig.java": "cf2e17ca9f1d8c1c7a36eae3cdede197d2346136dd919824e9ed1930bf389ee0",
     "TMessagesProj/src/main/java/app/flexygram/navigation/LiquidNavigationPreviewView.java": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "TMessagesProj/src/main/java/app/flexygram/navigation/LiquidNavigationSettingsActivity.java": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "TMessagesProj/src/main/java/app/flexygram/navigation/LiquidNavigationTabsActivity.java": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    "TMessagesProj/src/main/java/org/telegram/ui/Cells/ChatMessageCell.java": "59b60da06716746ef77912a7979c13a90fcc4c8aa17d250c867c08187cd5d532",
-    "TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java": "3c2a71078d743a360cd123f8fc79fd989cdba06455d4d36fc2d7f56dce771218",
+    "TMessagesProj/src/main/java/org/telegram/ui/Cells/ChatMessageCell.java": "f1dd841518005159c77fc0af1947e31276e5033fb0342295072bba5fdac827ce",
+    "TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java": "6d6a8c4a85a2faaa7d8bb72bd04cfc060050258ac1c2f4643a37028b974b3c8b",
     "TMessagesProj/src/main/java/org/telegram/ui/Components/ReactionsContainerLayout.java": "f5c53b78b684f9bdf2c890baaa371cb2809c8425a1132e983b100963cd9d426a",
     "TMessagesProj/src/main/java/org/telegram/ui/MainTabsLayout.java": "fd17d6061c21bcf343374f81a617c60c619fb6681ae645dfb04d062d652f94ae",
     "TMessagesProj/src/main/res/values-es/flexy_context_panel.xml": "b5d3af2e3c667f98cf9c753e1ff2a4ccfa24dc704cd93369c2ba13ed90beefaa",
@@ -30,8 +30,8 @@
     "tools/connected_alpha/test_interaction1286.py": "a50067a05e655387eb5d0648dc53a27b7084240062989fc86920b2b66aaf31a2",
     "tools/connected_alpha/test_native_context135.py": "24641c16d1c18716ef5e510d7451ba460bd6fbccec94786e2ce37601e8777977",
     "tools/connected_alpha/test_work1.py": "9776f298c8064dace3b197ffc0b0e4e5dd80df4709af0d57372e48230e99e17b",
-    "tools/native_context/PhysicsProbe.java": "2b447a88b1150f3da3041d0d436c5527c7cd8e7c6604d66f65ceb4d673651bb3",
-    "tools/native_context/README.md": "f19c77d9ecda5c8022b2ee12d16f9434fe6b23b77afe64dc7cf42a622e4f09d7"
+    "tools/native_context/PhysicsProbe.java": "e3ad55fed7d999c7b5ee644628566cf9dd5e8c23d7be751a105bb3b8cf904c6b",
+    "tools/native_context/README.md": "55fc8d433e54eacf10cce4ffbd6984f7e8068507f628e34cc08c9fc4cd81dd26"
   },
   "paths": [
     "TMessagesProj/build.gradle",

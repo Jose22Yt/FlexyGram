@@ -5382,7 +5382,7 @@ public class ChatActivity extends BaseFragment implements
                 // Observe; never intercept or consume. Native RecyclerListView still arbitrates
                 // scrolling, double taps, long press and every embedded control.
                 int action=event.getActionMasked();
-                if(action==MotionEvent.ACTION_DOWN && tapCandidate!=null){tapCandidate.cancelSignatureTap();tapCandidate=null;}
+                if(action==MotionEvent.ACTION_DOWN && tapCandidate!=null){tapCandidate.cancelSignatureGesture();tapCandidate=null;}
                 if(tapCandidate!=null) {
                     MotionEvent local=MotionEvent.obtain(event);
                     local.offsetLocation(-tapCandidate.getX(),-tapCandidate.getY());
