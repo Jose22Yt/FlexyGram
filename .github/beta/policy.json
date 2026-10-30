@@ -4,16 +4,18 @@
   "environment": "flexygram-beta",
   "dispatch_branch": "main",
   "environment_id": 25818874267,
-  "reviewer_ids": [],
+  "reviewer_ids": [
+    251905314
+  ],
   "ui_review": {
-    "confirmed": false,
+    "confirmed": true,
     "reviewed_by": "Work 2 via owner-authorized GitHub UI session Jose22Yt",
-    "reviewed_at": "2026-10-30T18:43:49Z",
+    "reviewed_at": "2026-10-30T19:31:58Z",
     "admin_bypass_disabled": true,
     "main_requires_pull_request_and_approval": true,
     "main_blocks_force_push_and_deletion": true,
     "main_applies_to_administrators": true,
     "only_environment_scoped_beta_secrets": false,
-    "delivery_age_recipient": null
+    "delivery_age_recipient": "age1dc36uuvdg4ut52crhgux297zfjc5u0p0rucgnjss8svmgdl2eylseanqqe"
   }
 }

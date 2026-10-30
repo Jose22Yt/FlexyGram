@@ -32,7 +32,7 @@ def protected():
     policy['ui_review'] = {k: True for k in policy['ui_review']}
     policy['ui_review'].update(reviewed_by='fixture-owner', reviewed_at='2026-10-30T00:00:00Z',
                                delivery_age_recipient=RECIPIENT)
-    env = {'id': 123, 'name': 'flexygram-beta', 'protection_rules': [
+    env = {'id': 123, 'name': 'flexygram-beta', 'can_admins_bypass': False, 'protection_rules': [
         {'type': 'required_reviewers', 'prevent_self_review': True,
          'reviewers': [{'type': 'User', 'reviewer': {'id': 456, 'type': 'User'}}]}],
         'deployment_branch_policy': {'protected_branches': False, 'custom_branch_policies': True}}
@@ -41,12 +41,10 @@ def protected():
 
 
 class ProtectionTests(unittest.TestCase):
-    def test_pending_policy_is_blocked(self):
+    def test_unreviewed_policy_is_blocked(self):
         policy, *api = protected()
-        policy = json.loads((audit.ROOT/'policy.json').read_text())
-        # A future reviewed policy can pass; the initial unconfigured record cannot.
-        if policy['ui_review']['confirmed'] is False:
-            with self.assertRaises(ValueError): audit.validate(policy, *api)
+        policy['ui_review']['confirmed'] = False
+        with self.assertRaises(ValueError): audit.validate(policy, *api)
 
     def test_reviewed_environment_fixture_passes(self):
         self.assertEqual(audit.validate(*protected())['status'], 'PASS_API_AND_RECORDED_UI_REVIEW')
@@ -54,6 +52,8 @@ class ProtectionTests(unittest.TestCase):
     def test_protection_drift_blocks(self):
         mutations = [
             lambda p,e,b,m: e.update(id=999),
+            lambda p,e,b,m: e.update(can_admins_bypass=True),
+            lambda p,e,b,m: e.pop('can_admins_bypass'),
             lambda p,e,b,m: e.update(protection_rules=[]),
             lambda p,e,b,m: e['protection_rules'][0].update(prevent_self_review=False),
             lambda p,e,b,m: e['protection_rules'][0]['reviewers'][0]['reviewer'].update(id=999),
@@ -72,6 +72,18 @@ class ProtectionTests(unittest.TestCase):
             with self.subTest(mutation=mutate):
                 data = protected(); mutate(*data)
                 with self.assertRaises(ValueError): audit.validate(*data)
+
+    def test_no_secret_audit_never_authorizes_private_build(self):
+        policy, *api = protected()
+        for value in [False, None, 'true', 1]:
+            with self.subTest(value=value):
+                policy['ui_review']['only_environment_scoped_beta_secrets'] = value
+                self.assertEqual(audit.validate(policy, *api)['status'], 'PASS_API_AND_RECORDED_UI_REVIEW')
+                with self.assertRaises(ValueError): build.require_private_scope(policy)
+        policy['ui_review']['only_environment_scoped_beta_secrets'] = True
+        build.require_private_scope(policy)
+        policy['ui_review']['confirmed'] = False
+        with self.assertRaises(ValueError): build.require_private_scope(policy)
 
     def test_manual_main_provenance_only(self):
         env = {'GITHUB_REPOSITORY': audit.REPO, 'GITHUB_EVENT_NAME': 'workflow_dispatch',
