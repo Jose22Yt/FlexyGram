@@ -1,0 +1,48 @@
+{
+  "base": "72f7e7f1e8600a85ab2539e04197b2fc9a6742a1",
+  "status": "AVAILABLE_CHECKS_PASS_OFFICIAL_APK_BLOCKED",
+  "full_gradle_jni_dex": "NOT_RUN_PRIVATE_INPUTS_UNAVAILABLE",
+  "apk": "NOT_BUILT_OR_SIGNED",
+  "physical_device": "NOT_TESTED",
+  "public_certificate_and_8_rejections": "PASS",
+  "beta_resources_compile_build_tools_36": "PASS_AFTER_FINAL_LABEL_CHANGE",
+  "identity_audit": "PASS_AFTER_FINAL_LABEL_CHANGE",
+  "final_targeted_tests": {
+    "passed": 14,
+    "failed": 0,
+    "scope": "Beta guards, Work1 preservation and native deletion route; includes actual manifest-label resource key"
+  },
+  "earlier_full_regressions": {
+    "host_passed": 381,
+    "host_failed": 0,
+    "general_passed": 144,
+    "general_skipped_optional": 31,
+    "scope": "Before final NagramX label adjustment; affected tests/identity/resources rerun after it"
+  },
+  "work1_math": {
+    "placement_assertions": 3241,
+    "delete_samples": 10001,
+    "pill_assertions": 152,
+    "evidence": "HOST_NOT_DEVICE"
+  },
+  "private_inputs": {
+    "status": "BLOCKED_MISSING_OR_INVALID_INPUTS",
+    "missing_input_names": [
+      "FLEXYGRAM_RELEASE_KEYSTORE",
+      "FLEXYGRAM_RELEASE_STORE_PASSWORD",
+      "FLEXYGRAM_RELEASE_KEY_ALIAS",
+      "FLEXYGRAM_RELEASE_KEY_PASSWORD",
+      "TELEGRAM_APP_ID",
+      "TELEGRAM_APP_HASH",
+      "BETA_FIREBASE_CONFIGURATION_FILE"
+    ],
+    "problems": [],
+    "expected_certificate_sha256": "5a598fb5ba42949b67b7c2635106fafd5f23179397e4c098757a73cd2d2ef66c",
+    "private_key_certificate_correspondence": "NOT_CHECKED",
+    "apk": "NOT_BUILT",
+    "scope": "ENVIRONMENT_INPUTS_ONLY; original Gradle validation remains mandatory"
+  },
+  "artifact_verifier_tests": "ANDROID_TOOLS_MOCKED_AND_SYNTHETIC_ZIP_NOT_A_REAL_APK",
+  "github_ci": "PENDING_PR_CREATION",
+  "git_diff_check": "PASS"
+}

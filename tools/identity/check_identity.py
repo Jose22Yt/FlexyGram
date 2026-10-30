@@ -69,11 +69,20 @@ def main():
         expected = original(name)
         if name.endswith('.xml'):
             expected = expected.replace(ALPHA.encode(), BETA.encode()).replace(b'FlexyGram Alpha', b'FlexyGram')
+        if beta.endswith('/alpha_name.xml'):
+            for key in ('AppName', 'AppNameBeta'):
+                expected = expected.replace(('<string name="'+key+'">FlexyGram</string>').encode(),
+                                            ('<string name="'+key+'">FlexyGram Beta</string>').encode())
+        if beta.endswith('/flexygram_identity.xml'):
+            expected = expected.replace(b'>FlexyGram</string>', b'>FlexyGram Beta</string>')
         require((ROOT/beta).read_bytes() == expected, 'Beta approved asset mismatch: ' + beta)
     for name in XML_NAMES:
         main = 'TMessagesProj/src/main/res/xml/' + name
         require(read(main) == original(main).decode().replace(ALPHA, BETA), 'Unexpected main XML delta')
         require((ROOT/'TMessagesProj/src/connectedAlpha/res/xml'/name).read_bytes() == original(main), 'Alpha XML regression')
+    beta_label = ET.parse(ROOT/'TMessagesProj/src/beta/res/values/flexygram_identity.xml').getroot()
+    require(beta_label.find("string[@name='NagramX']").text == 'FlexyGram Beta',
+            'Beta manifest label must be FlexyGram Beta')
     # Any Java/Kotlin/C++ change must be exactly the reviewed identity predicate.
     changed = subprocess.check_output(['git', 'diff', '--name-only', BASE, '--', 'TMessagesProj'], cwd=ROOT, text=True).splitlines()
     for name in changed:

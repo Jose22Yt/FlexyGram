@@ -3,7 +3,7 @@ on:
   push:
     branches: [integration/flexygram-beta-1]
   pull_request:
-    branches: [feat/opexgram-context-spring]
+    branches: [feat/opexgram-context-spring, integration/flexygram-beta-1]
   workflow_dispatch:
 permissions:
   contents: read
