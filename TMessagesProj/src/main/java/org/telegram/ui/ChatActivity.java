@@ -33338,12 +33338,9 @@ public class ChatActivity extends BaseFragment implements
                 .setRadius(dp(compactContext ? 24 : 12))
                 .setPadding(dp(8)));
 
-            if (compactContext && !signatureContextActions(options).isEmpty()) {
-                android.graphics.drawable.GradientDrawable surface = new android.graphics.drawable.GradientDrawable();
-                surface.setColor(getThemedColor(Theme.key_actionBarDefaultSubmenuBackground));
-                surface.setCornerRadius(dp(22));
-                popupLayout.setBackground(surface);
-            }
+            // The native scrimBlur3Factory surface directly above owns radius,
+            // translucency and the current theme. Do not cover it with a solid
+            // custom rectangle: the reference iOS menu keeps its backdrop visible.
             boolean addGap = false;
 
             if (optionsView == null) {
