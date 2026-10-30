@@ -6,19 +6,27 @@ ROOT=Path(__file__).resolve().parents[2]
 BASE='72f7e7f1e8600a85ab2539e04197b2fc9a6742a1'
 MANIFEST=ROOT/'tools/beta_release/review.json'
 def spec():return json.loads(MANIFEST.read_text())
-def paths():return frozenset(spec()['paths'])
+@lru_cache(maxsize=1)
+def pipeline():
+    import importlib.util
+    module_spec=importlib.util.spec_from_file_location('beta_private_source_contract',ROOT/'.github/beta/source_contract.py')
+    module=importlib.util.module_from_spec(module_spec);module_spec.loader.exec_module(module)
+    return module
+def paths():return frozenset(spec()['paths'])|pipeline().paths()
 @lru_cache(maxsize=128)
 def original(path):
     r=subprocess.run(['git','show',BASE+':'+str(path)],cwd=ROOT,capture_output=True)
     return r.stdout if r.returncode==0 else b''
 def restore(path,data):
+    data=pipeline().restore(path,data)
     expected=spec()['reviewed'].get(str(path))
     return original(path) if expected and hashlib.sha256(data).hexdigest()==expected else data
 def verify_current():
+    pipeline().verify_current()
     current=spec()
     if current['base']!=BASE:raise ValueError('Wrong Beta delivery preparation base')
     for name,expected in current['reviewed'].items():
-        file=ROOT/name;data=file.read_bytes() if file.is_file() else b''
+        file=ROOT/name;data=pipeline().restore(name,file.read_bytes() if file.is_file() else b'')
         if hashlib.sha256(data).hexdigest()!=expected:raise ValueError('Unreviewed Beta delivery bytes: '+name)
         if restore(name,data+b'UNKNOWN')!=data+b'UNKNOWN':raise ValueError('Unknown mutation accepted')
     changed=set(subprocess.check_output(['git','diff','--name-only',BASE],cwd=ROOT,text=True).splitlines())
