@@ -52,8 +52,8 @@ class Alpha1283(unittest.TestCase):
  def test_settings_has_a_real_route_and_no_duplicate_or_motion_preferences(self):
   s=(JAVA/'app/exteraless/settings/OpenExteraChatsActivity.java').read_text();start=s.index('private void updateSignatureHubRows()');end=s.index('private void updateStickerRows()',start)
   self.assertIn('flexyContextPanelRow = addRow',s[start:end]);self.assertIn('new app.flexygram.bubbles.interaction.BubbleInteractionSettingsActivity()',s)
-  prefs=(JAVA/'app/flexygram/bubbles/interaction/BubbleInteractionSettings.java').read_text();self.assertIn('"flexy_bubble_interaction"',prefs);self.assertIn('"signature_panel",false',prefs)
-  settings=(JAVA/'app/flexygram/bubbles/interaction/BubbleInteractionSettingsActivity.java').read_text();self.assertIn('SignatureMatteSettingsActivity',settings);self.assertIn('setSignaturePanel',settings)
+  prefs=(JAVA/'app/flexygram/bubbles/interaction/BubbleInteractionSettings.java').read_text();self.assertIn('"flexy_bubble_interaction"',prefs);self.assertIn('STYLE_KEY = "interaction_style"',prefs)
+  settings=(JAVA/'app/flexygram/bubbles/interaction/BubbleInteractionSettingsActivity.java').read_text();self.assertIn('SignatureMatteSettingsActivity',settings);self.assertIn('BubbleInteractionSettings.setStyle(context, which)',settings);self.assertNotIn('Slider',settings)
  def test_es_en_ru_have_matching_user_visible_labels(self):
   sets=[]
   for locale in ['values','values-es','values-ru']:

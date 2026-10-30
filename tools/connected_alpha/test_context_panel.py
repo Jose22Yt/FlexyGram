@@ -19,7 +19,7 @@ class ContextPanelWiring(unittest.TestCase):
   p=ROOT/'TMessagesProj/src/main/java/app/flexygram/bubbles/interaction'
   s=historical_bytes(str((p/'BubbleActionPanelView.java').relative_to(ROOT))).decode();settings=(p/'BubbleInteractionSettings.java').read_text()
   self.assertIn('if(stickerEnabled) headerTab',s);self.assertNotIn('stickerEnabled = true',s)
-  self.assertIn('getBoolean("signature_panel",false)',settings)
+  self.assertIn('STYLE_KEY = "interaction_style"',settings);self.assertNotIn('getBoolean("signature_panel"',settings)
   for file in p.glob('*.java'):self.assertNotIn('app.flexygram.motion',file.read_text())
   # Historical Alpha1285 omitted tap animation; current cell-owned replacement is tested separately.
   self.assertEqual(b'',__import__('interaction1286_contract').original('TMessagesProj/src/main/java/app/flexygram/bubbles/interaction/BubbleTapMotion.java'))

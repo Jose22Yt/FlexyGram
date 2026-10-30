@@ -23,6 +23,7 @@ public final class SelectedBubbleMotion implements Choreographer.FrameCallback {
     public float velocityY() { return y.velocity(); }
     public boolean isRunning() { return running; }
     public boolean hasOwner() { return invalidate != null; }
+    public boolean isClosing() { return closing && invalidate != null; }
     public void enter(Runnable redraw) { enter(redraw, 1f, 1f, 0f, 0f); }
     public void enter(Runnable redraw, float sx, float sy) { enter(redraw, sx, sy, 0f, 0f); }
     public void enter(Runnable redraw, float sx, float sy, float vx, float vy) {

@@ -32874,6 +32874,10 @@ public class ChatActivity extends BaseFragment implements
             boolean searchGroup, boolean longpress, boolean suggestEdit, boolean onDoubleTapped,
             boolean bubbleTap) {
         // Repeated taps must not replace or close an existing or pending menu.
+        // A closing popup is already visually returning and must not lock out the next contact.
+        if (bubbleTap && scrimPopupWindow != null && selectedBubbleMotion.isClosing()) {
+            scrimPopupWindow.dismiss(false);
+        }
         if (bubbleTap && (scrimPopupWindow != null || inPreviewMode || fragmentView == null || !fragmentView.isAttachedToWindow())) return false;
         if (actionBar.isActionModeShowed() || isReport()) {
             return false;
@@ -34781,10 +34785,16 @@ public class ChatActivity extends BaseFragment implements
                         if (signatureClosing) return;
                         signatureClosing = true;
                         setFocusable(false);
+                        setTouchable(false);
+                        update();
                         selectedBubbleMotion.close(() -> {
                             finishDismiss(false);
                             if (finalReactionsLayout1 != null) finalReactionsLayout1.dismissParent(false);
                         });
+                        return;
+                    }
+                    if (compactContext && signatureClosing) {
+                        selectedBubbleMotion.reset(); // Completes its one pending native-dismiss callback.
                         return;
                     }
                     if (compactContext) selectedBubbleMotion.reset();
