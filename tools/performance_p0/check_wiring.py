@@ -50,12 +50,13 @@ def main():
             'TMessagesProj/jni','TMessagesProj/chaquopy','TMessagesProj/src/main/java/org/telegram/messenger/MessagesController.java',
             'TMessagesProj/src/main/java/org/telegram/messenger/MessagesStorage.java',
             'TMessagesProj/src/main/java/org/telegram/messenger/SendMessagesHelper.java',
-            'TMessagesProj/src/main/java/org/telegram/messenger/NotificationsController.java',
-
-            'TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java']
+            'TMessagesProj/src/main/java/org/telegram/messenger/NotificationsController.java']
     assert not subprocess.check_output(['git','diff',BASE,'--',*frozen],cwd=ROOT)
     import sys
     sys.path.insert(0,str(ROOT/'tools/connected_alpha'))
+    from deep_performance_contract import restore as deep_restore
+    actionbar='TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java'
+    assert deep_restore(actionbar,(ROOT/actionbar).read_bytes()) == subprocess.check_output(['git','show',BASE+':'+actionbar],cwd=ROOT)
     from native_context135_contract import restore as current_overlay
     reviewed_build = current_overlay('TMessagesProj/build.gradle', (ROOT/'TMessagesProj/build.gradle').read_bytes()).decode()
     assert reviewed_build.replace('def verCode = 1287','def verCode = 1286') == subprocess.check_output(['git','show',BASE+':TMessagesProj/build.gradle'],cwd=ROOT,text=True)

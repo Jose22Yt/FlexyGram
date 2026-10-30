@@ -4024,6 +4024,19 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         final boolean previousIsDialogList = previous instanceof org.telegram.ui.DialogsActivity
                 || previous instanceof MainTabsActivity
                     && ((MainTabsActivity) previous).getCurrentVisibleFragment() instanceof org.telegram.ui.DialogsActivity;
+        // Reject ineligible closes before traversing visible rows or querying the
+        // window's keyboard frame. The original DOWN still follows native dispatch.
+        if (!attached || !main || isSheet || isLayersLayout || !previousIsDialogList
+                || !(outgoing instanceof ChatActivity)
+                || inPreviewMode || transitionAnimationPreviewMode
+                || previewOpenAnimationInProgress || previewMenu != null
+                || sheetFragment != null || containerView.isKeyboardVisible
+                || containerViewBack.isKeyboardVisible || startedTracking
+                || animationInProgress || predictiveBackInProgress || inActionMode
+                || ev.getY() < 0
+                || ev.getY() >= getHeight() - getBottomTabsHeight(true) - systemAndDisplayInsets.bottom) {
+            return;
+        }
         final BaseFragment dialogFragment = previous instanceof MainTabsActivity
                 ? ((MainTabsActivity) previous).getCurrentVisibleFragment()
                 : previous;

@@ -1,0 +1,52 @@
+import android.app.Activity;
+import android.graphics.*;
+import android.text.TextPaint;
+import android.view.*;
+import android.view.accessibility.AccessibilityNodeInfo;
+import android.widget.*;
+import app.flexygram.bubbles.deletion.*;
+import app.flexygram.bubbles.interaction.*;
+import app.flexygram.home.*;
+import org.junit.*;
+import org.junit.runner.RunWith;
+import org.robolectric.*;
+import org.robolectric.annotation.*;
+import java.lang.reflect.Field;
+import java.util.*;
+import static org.junit.Assert.*;
+@RunWith(RobolectricTestRunner.class) @Config(manifest=Config.NONE,sdk=35)
+@GraphicsMode(GraphicsMode.Mode.NATIVE)
+public class BetaAndroidTest {
+    static int active() throws Exception {Field f=DeleteMotionOverlay.class.getDeclaredField("active");f.setAccessible(true);return f.getInt(null);}
+    @Test public void allStylesExecuteConfirmedCallbackExactlyOnceAndReleaseOnHostDetach() throws Exception {
+        for(int style=1;style<=4;style++) {
+            var lifecycle=Robolectric.buildActivity(Activity.class).setup();Activity a=lifecycle.get();
+            FrameLayout host=new FrameLayout(a);a.setContentView(host);
+            TextView bubble=new TextView(a);bubble.setText("Native snapshot");bubble.setBackgroundColor(Color.BLUE);
+            host.addView(bubble,new FrameLayout.LayoutParams(180,60));
+            host.measure(View.MeasureSpec.makeMeasureSpec(400,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(800,View.MeasureSpec.EXACTLY));host.layout(0,0,400,800);
+            int[] calls={0};int result=DeleteMotionOverlay.runNativeDelete(host,Collections.singletonList(new DeleteMotionOverlay.Target(bubble,new RectF(0,0,180,60))),style,()->calls[0]++);
+            assertEquals(1,calls[0]);assertEquals(1,result);assertEquals(1,active());
+            lifecycle.pause().stop().destroy();assertEquals(0,active());
+        }
+    }
+    @Test public void nativeFallbackAndFailedCallbackNeverDuplicateAnOperationOrLeak() throws Exception {
+        Activity a=Robolectric.buildActivity(Activity.class).setup().get();FrameLayout host=new FrameLayout(a);
+        int[] calls={0};assertEquals(0,DeleteMotionOverlay.runNativeDelete(host,Collections.emptyList(),1,()->calls[0]++));assertEquals(1,calls[0]);
+        try{DeleteMotionOverlay.runNativeDelete(host,Collections.emptyList(),2,()->{calls[0]++;throw new IllegalStateException("native failure");});fail();}catch(IllegalStateException expected){}
+        assertEquals(2,calls[0]);assertEquals(0,active());
+    }
+    @Test public void viewportScrollClampsAndSupportsAccessibilityWithoutMovingChat() {
+        Activity a=Robolectric.buildActivity(Activity.class).setup().get();ContextPreviewViewport viewport=new ContextPreviewViewport(a);
+        viewport.layout(0,0,300,200);float[] offset={-1};viewport.configure(450,"Full message",value->offset[0]=value);
+        for(int i=0;i<10;i++)assertTrue(viewport.performAccessibilityAction(AccessibilityNodeInfo.ACTION_SCROLL_FORWARD,null));assertEquals(450,offset[0],0);
+        for(int i=0;i<10;i++)viewport.performAccessibilityAction(AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD,null);assertEquals(0,offset[0],0);
+    }
+    @Test public void capsulePaintNeverTouchesAdjacentFilenameAndDoesNotChangeFontMetrics() {
+        TextPaint paint=new TextPaint(3);paint.setTextSize(15);Paint.FontMetricsInt fm=paint.getFontMetricsInt();int before=fm.bottom;
+        SignatureSmartPillSpan span=new SignatureSmartPillSpan(SignatureSmartPreviewPalette.PDF,"PDF",null);
+        int width=span.getSize(paint,"x",0,1,fm);assertEquals(before,fm.bottom);
+        Bitmap b=Bitmap.createBitmap(width+90,40,Bitmap.Config.ARGB_8888);span.draw(new Canvas(b),"x",0,1,0,0,20,36,paint);
+        for(int x=width+1;x<b.getWidth();x++)for(int y=0;y<40;y++)assertEquals(0,b.getPixel(x,y));b.recycle();
+    }
+}

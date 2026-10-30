@@ -153,9 +153,12 @@ public class GlassTabView extends FrameLayout implements MainTabsLayout.Tab, Fac
     }
 
     public void setGestureSelectedOverride(float gestureSelectedOverride, boolean allow) {
+        final boolean hasOverride = allow && !mainTabMaterial3;
+        final boolean changed = this.hasGestureSelectedOverride != hasOverride
+                || hasOverride && this.gestureSelectedOverride != gestureSelectedOverride;
         this.gestureSelectedOverride = gestureSelectedOverride;
-        this.hasGestureSelectedOverride = allow && !mainTabMaterial3;
-        invalidate();
+        this.hasGestureSelectedOverride = hasOverride;
+        if (changed) invalidate();
     }
 
     public void setSkipDrawSelector(boolean skipDrawSelector) {
@@ -286,12 +289,18 @@ public class GlassTabView extends FrameLayout implements MainTabsLayout.Tab, Fac
     }
 
     private boolean needUpdateBackupViewColor;
+    private PorterDuffColorFilter tabColorFilter;
+    private int tabFilterColor;
 
     private void updateColors() {
         final int color = ColorUtils.blendARGB(colorDefault, colorSelected, isSelectedAnimator.getFloatValue());
         final int colorText = ColorUtils.blendARGB(colorDefault, colorSelectedText, isSelectedAnimator.getFloatValue());
 
-        final PorterDuffColorFilter filter = new PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN);
+        if (tabColorFilter == null || tabFilterColor != color) {
+            tabFilterColor = color;
+            tabColorFilter = new PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN);
+        }
+        final PorterDuffColorFilter filter = tabColorFilter;
         if (backupImageView != null && needUpdateBackupViewColor) {
             backupImageView.setColorFilter(filter);
             backupImageView.invalidate();

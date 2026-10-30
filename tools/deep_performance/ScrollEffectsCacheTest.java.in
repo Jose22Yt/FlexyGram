@@ -1,0 +1,94 @@
+/* Actual MessageDrawable/SignatureBorderPath and Android native graphics.
+ * Theme/services/blur delivery remain explicit doubles. No full-chat/GPU/device claim. */
+import android.graphics.*;
+import org.telegram.ui.ActionBar.*;
+import org.telegram.messenger.*;
+import app.flexygram.bubbles.*;
+import app.exteraless.chats.ChatsConfig;
+import org.junit.*;
+import org.junit.runner.RunWith;
+import org.robolectric.*;
+import org.robolectric.annotation.*;
+import java.lang.reflect.Field;
+import static org.junit.Assert.*;
+@RunWith(RobolectricTestRunner.class)
+@Config(manifest=Config.NONE,sdk=35)
+@GraphicsMode(GraphicsMode.Mode.NATIVE)
+public class ScrollEffectsCacheTest {
+ @Before public void setup(){
+  ApplicationLoader.applicationContext=RuntimeEnvironment.getApplication();
+  ApplicationLoader.applicationContext.getSharedPreferences(BubbleConfig.FILE,0).edit().clear().commit();
+  BuildConfig.CONNECTED_ALPHA=true;Theme.dark=false;BubbleConfig.load();BubbleConfig.setBackgroundBlur(false);
+  AndroidUtilities.density=1;SharedConfig.bubbleRadius=20;ChatsConfig.removeMessageTail.value=false;
+ }
+ private void assertPixels(Bitmap before,Bitmap after){assertTrue("native bitmap mismatch",before.sameAs(after));}
+ @Test public void alternatingRowsReuseContoursAndMatchBaselinePixels() throws Exception {
+  for(boolean out:new boolean[]{false,true})for(int position=1;position<=4;position++){
+   BubbleConfig.setBorderPosition(position);BubbleConfig.setFusionMode(2);BubbleConfig.setFusionIntensity(80);
+   MessageDrawable candidate=new MessageDrawable(MessageDrawable.TYPE_TEXT,out,false);
+   BaselineMessageDrawable baseline=new BaselineMessageDrawable(MessageDrawable.TYPE_TEXT,out,false);
+   MessageDrawable.PathDrawParams[] caches=new MessageDrawable.PathDrawParams[12];
+   BaselineMessageDrawable.PathDrawParams[] oldCaches=new BaselineMessageDrawable.PathDrawParams[12];
+   for(int i=0;i<12;i++){caches[i]=new MessageDrawable.PathDrawParams();oldCaches[i]=new BaselineMessageDrawable.PathDrawParams();}
+   Bitmap old=Bitmap.createBitmap(280,200,Bitmap.Config.ARGB_8888),now=Bitmap.createBitmap(280,200,Bitmap.Config.ARGB_8888);
+   SignatureBorderPath.testRebuilds=0;
+   for(int frame=0;frame<100;frame++)for(int row=0;row<12;row++){
+    baseline.setBounds(4,4,150+row*8,60+row*7);baseline.setTop(frame,280,1200,false,false);
+    old.eraseColor(Color.TRANSPARENT);baseline.drawCached(new Canvas(old),oldCaches[row]);
+   }
+   long oldBuilds=SignatureBorderPath.testRebuilds;SignatureBorderPath.testRebuilds=0;
+   for(int frame=0;frame<100;frame++)for(int row=0;row<12;row++){
+    candidate.setBounds(4,4,150+row*8,60+row*7);candidate.setTop(frame,280,1200,false,false);
+    now.eraseColor(Color.TRANSPARENT);candidate.drawCached(new Canvas(now),caches[row]);
+    if(frame==99){baseline.setBounds(4,4,150+row*8,60+row*7);baseline.setTop(frame,280,1200,false,false);old.eraseColor(Color.TRANSPARENT);
+     long n=SignatureBorderPath.testRebuilds;baseline.drawCached(new Canvas(old),oldCaches[row]);SignatureBorderPath.testRebuilds=n;assertPixels(old,now);}
+   }
+   assertEquals(1200,oldBuilds);assertEquals(12,SignatureBorderPath.testRebuilds);
+   old.recycle();now.recycle();
+  }
+ }
+ @Test public void directPreviewFallbackRetainsItsExistingWarmContourCache() {
+  BubbleConfig.setBorderPosition(1);MessageDrawable m=new MessageDrawable(MessageDrawable.TYPE_TEXT,true,false);
+  m.setBounds(4,4,164,84);m.setTop(0,180,200,false,false);
+  Bitmap b=Bitmap.createBitmap(180,100,Bitmap.Config.ARGB_8888);Canvas canvas=new Canvas(b);SignatureBorderPath.testRebuilds=0;
+  for(int i=0;i<100;i++)m.draw(canvas);
+  assertEquals(1,SignatureBorderPath.testRebuilds);b.recycle();
+ }
+ @Test public void fullBorderAndClassicDoNotAllocateCellContourCache() throws Exception {
+  Field field=MessageDrawable.PathDrawParams.class.getDeclaredField("signatureBorder");field.setAccessible(true);
+  MessageDrawable m=new MessageDrawable(MessageDrawable.TYPE_TEXT,true,false);m.setBounds(4,4,164,84);m.setTop(0,180,200,false,false);
+  Bitmap b=Bitmap.createBitmap(180,100,Bitmap.Config.ARGB_8888);var cache=new MessageDrawable.PathDrawParams();
+  BubbleConfig.setBorderPosition(5);m.drawCached(new Canvas(b),cache);assertNull(field.get(cache));
+  BuildConfig.CONNECTED_ALPHA=false;BubbleConfig.setBorderPosition(1);m.drawCached(new Canvas(b),cache);assertNull(field.get(cache));
+  BuildConfig.CONNECTED_ALPHA=true;m.drawCached(new Canvas(b),cache);assertNotNull(field.get(cache));b.recycle();
+ }
+ @Test public void cachedPixelsMatchBaselineAcrossStylesThemesDensityAndAlpha(){
+  for(float density:new float[]{.75f,1f,2.75f})for(boolean dark:new boolean[]{false,true})for(boolean out:new boolean[]{false,true}){
+   AndroidUtilities.density=density;Theme.dark=dark;
+   MessageDrawable m=new MessageDrawable(MessageDrawable.TYPE_TEXT,out,false);var cache=new MessageDrawable.PathDrawParams();
+   BaselineMessageDrawable old=new BaselineMessageDrawable(MessageDrawable.TYPE_TEXT,out,false);var oldCache=new BaselineMessageDrawable.PathDrawParams();
+   m.setBounds(4,4,204,104);m.setTop(0,240,400,false,false);old.setBounds(4,4,204,104);old.setTop(0,240,400,false,false);
+   Bitmap a=Bitmap.createBitmap(240,130,Bitmap.Config.ARGB_8888),b=Bitmap.createBitmap(240,130,Bitmap.Config.ARGB_8888);
+   for(int position:new int[]{5,1,2,3,4,5,1})for(int fusion=0;fusion<=2;fusion++)for(int alpha:new int[]{0,77,255}){
+    BubbleConfig.setBorderPosition(position);BubbleConfig.setFusionMode(fusion);m.setAlpha(alpha);old.setAlpha(alpha);
+    a.eraseColor(Color.TRANSPARENT);b.eraseColor(Color.TRANSPARENT);old.drawCached(new Canvas(a),oldCache);m.drawCached(new Canvas(b),cache);assertPixels(a,b);
+   }
+   a.recycle();b.recycle();
+  }
+ }
+ @Test public void regeneratedNativeGeometryInvalidatesContourIncludingMakePath() {
+  MessageDrawable m=new MessageDrawable(MessageDrawable.TYPE_TEXT,true,false);var cache=new MessageDrawable.PathDrawParams();
+  BubbleConfig.setBorderPosition(2);BubbleConfig.setFusionMode(1);
+  Bitmap actual=Bitmap.createBitmap(260,180,Bitmap.Config.ARGB_8888),expected=Bitmap.createBitmap(260,180,Bitmap.Config.ARGB_8888);
+  for(int i=0;i<80;i++){
+   boolean top=i%2==0,bottom=i%3==0;int right=170+i%4*12,height=70+i%7*5;
+   ChatsConfig.removeMessageTail.value=i%5==0;
+   m.setBounds(4,4,right,height);m.setTop(0,260,500,top,bottom);
+   if(i%2==0)m.makePath(cache);
+   actual.eraseColor(Color.TRANSPARENT);m.drawCached(new Canvas(actual),cache);
+   BaselineMessageDrawable fresh=new BaselineMessageDrawable(MessageDrawable.TYPE_TEXT,true,false);fresh.setBounds(4,4,right,height);fresh.setTop(0,260,500,top,bottom);
+   expected.eraseColor(Color.TRANSPARENT);fresh.drawCached(new Canvas(expected),new BaselineMessageDrawable.PathDrawParams());assertPixels(expected,actual);
+  }
+  actual.recycle();expected.recycle();
+ }
+}

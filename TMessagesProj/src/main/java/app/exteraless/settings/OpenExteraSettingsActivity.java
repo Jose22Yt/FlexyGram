@@ -36,6 +36,7 @@ public class OpenExteraSettingsActivity extends BaseNekoSettingsActivity {
     private int generalRow;
     private int appearanceRow;
     private int chatsRow;
+    private int animationsRow;
     private int pluginsRow;
     private int flexyStudioRow = -1;
     private int otherRow;
@@ -61,6 +62,7 @@ public class OpenExteraSettingsActivity extends BaseNekoSettingsActivity {
         generalRow = addRow("general");
         appearanceRow = addRow("appearance");
         chatsRow = addRow("chats");
+        animationsRow = addRow("flexyAnimations");
         flexyStudioRow = org.telegram.messenger.BuildConfig.CONNECTED_ALPHA ? addRow("flexystudio") : -1;
         pluginsRow = addRow("plugins");
         otherRow = addRow("other");
@@ -182,6 +184,8 @@ public class OpenExteraSettingsActivity extends BaseNekoSettingsActivity {
             presentFragment(new OpenExteraGeneralActivity());
         } else if (position == appearanceRow) {
             presentFragment(new OpenExteraAppearanceActivity());
+        } else if (position == animationsRow) {
+            presentFragment(new app.flexygram.bubbles.deletion.MessageAnimationsActivity(false));
         } else if (position == chatsRow) {
             presentFragment(new OpenExteraChatsActivity());
         } else if (position == flexyStudioRow && flexyStudioRow >= 0) {
@@ -271,6 +275,8 @@ public class OpenExteraSettingsActivity extends BaseNekoSettingsActivity {
                         cell.setTextAndIcon(getString(R.string.OpenExteraGeneral), R.drawable.msg_media, true);
                     } else if (position == appearanceRow) {
                         cell.setTextAndIcon(getString(R.string.OpenExteraAppearance), R.drawable.msg_theme, true);
+                    } else if (position == animationsRow) {
+                        cell.setTextAndIcon(getString(R.string.FlexyAnimationsTitle), R.drawable.msg_played, true);
                     } else if (position == chatsRow) {
                         cell.setTextAndIcon(getString(R.string.OpenExteraChats), R.drawable.msg_discussion, true);
                     } else if (position == flexyStudioRow && flexyStudioRow >= 0) {

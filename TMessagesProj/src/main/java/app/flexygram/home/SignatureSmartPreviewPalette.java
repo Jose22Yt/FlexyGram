@@ -4,24 +4,31 @@ package app.flexygram.home;
 /** Allocation-free media palette. Resolve only after theme/mode changes, not each frame. */
 public final class SignatureSmartPreviewPalette {
     public static final int NONE=0, FILE=1, VOICE=2, MUSIC=3, LINK=4, EVENT=5, PHOTO=6, VIDEO=7, LOCATION=8, CONTACT=9;
-    public static final int ADAPTIVE=0, THEME=1, MATTE=2, OFF=3;
+    public static final int PDF=10, TXT=11, ZIP=12, RAR=13, ARCHIVE=14, APK=15,
+            PNG=16, JPG=17, IMAGE_FILE=18, GIF=19, STICKER=20, POLL=21,
+            JOINED=22, LEFT=23, PINNED=24, EDITED=25, DOCUMENT=26,
+            SPREADSHEET=27, PRESENTATION=28, CHANNEL=29, ADMIN=30, OWNER=31, DELETED=32;
+    public static final int ADAPTIVE=0, THEME=1, OFF=3;
     private static final int[] BASE={
         0xff8892a0,0xff3488df,0xff9960cb,0xffd45a91,
-        0xff24a2ae,0xff21a36b,0xffc78d37,0xff7970ce,0xffd58a53,0xff6796c9
+        0xff24a2ae,0xff21a36b,0xffc78d37,0xff7970ce,0xffd58a53,0xff6796c9,
+        0xff3a82c2,0xff4e91a6,0xffbc823e,0xffa86b42,0xffac8942,0xff269c80,
+        0xffc09b46,0xffc18d46,0xff64a9a0,0xffba6ca8,0xffab8ad5,0xff888ad2,
+        0xff269b69,0xffbe7063,0xff6296c8,0xff8393b8,0xff4d91ca,0xff329b9d,
+        0xff8981bf,0xff548da5,0xffad8b48,0xffb38d49,0xffb56e73
     };
     private int oldKind=-1,oldMode=-1,oldAccent,oldSurface;
     private int background=0xffe6edf4,foreground=0xff26313d;
     public int background(){return background;}
     public int foreground(){return foreground;}
     public boolean update(int kind,int mode,int accent,int surface) {
-        if(kind<0||kind>=BASE.length||mode<ADAPTIVE||mode>MATTE)kind=NONE;
+        if(kind<0||kind>=BASE.length||mode<ADAPTIVE||mode>THEME)kind=NONE;
         if(oldKind==kind&&oldMode==mode&&oldAccent==accent&&oldSurface==surface)return false;
         oldKind=kind;oldMode=mode;oldAccent=accent;oldSurface=surface;
         int opaqueSurface=surface|0xff000000;
         int base=BASE[kind];
-        int main=mode==THEME?(accent|0xff000000):
-                mode==MATTE?blend(opaqueSurface,base,.16f):blend(base,accent|0xff000000,.14f);
-        float tint=mode==MATTE?.07f:.12f;
+        int main=mode==THEME?(accent|0xff000000):base;
+        float tint=.12f;
         background=blend(opaqueSurface,main,tint);
         int ink=blend(main,luminance(background)>.48?0xff172332:0xfff7f9fc,.58f);
         if(contrast(ink,background)<4.5)ink=luminance(background)>.23?0xff172332:0xfff7f9fc;

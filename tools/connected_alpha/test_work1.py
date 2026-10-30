@@ -12,9 +12,19 @@ class Work1(unittest.TestCase):
    self.assertEqual(data+b'UNKNOWN',audit.restore(name,data+b'UNKNOWN'),name)
  def test_work2_identity_startup_network_scroll_and_idle_motion_are_intact(self):
   names=['app/flexygram/performance/StartupAccounts.java','app/flexygram/performance/NetworkSnapshotAge.java','app/flexygram/performance/CoalescedTask.java','app/flexygram/performance/ScrollFrameRateHint.java','app/flexygram/performance/RefreshRateMonitor.java','app/flexygram/bubbles/SignatureBorderPath.java','org/telegram/messenger/ApplicationLoader.java','org/telegram/tgnet/ConnectionsManager.java','org/telegram/ui/Cells/DialogCell.java','org/telegram/ui/Components/RecyclerListView.java','org/telegram/ui/LaunchActivity.java']
-  for name in names:self.assertEqual(audit.original('TMessagesProj/src/main/java/'+name),(JAVA/name).read_bytes(),name)
+  for name in names:
+   path='TMessagesProj/src/main/java/'+name
+   data=(JAVA/name).read_bytes()
+   from beta_integration_contract import restore as before_beta
+   data=before_beta(path,data)
+   if name=='app/flexygram/bubbles/SignatureBorderPath.java':
+    # Only the exact new invalidation API is projected for this historical byte freeze.
+    # Candidate behavior/pixels/geometry lifetime are exercised by ScrollEffectsCacheTest.
+    from deep_performance_contract import restore as before_deep
+    data=before_deep(path,data)
+   self.assertEqual(audit.original(path),data,name)
   for name in ['config/signing/identity.properties','config/signing/flexygram-release.cer','gradle.properties','TMessagesProj/src/main/AndroidManifest.xml']:
-   self.assertEqual(audit.original(name),(ROOT/name).read_bytes(),name)
+   self.assertEqual(audit.original(name),before_beta(name,(ROOT/name).read_bytes()),name)
   signing='gradle/flexygram-beta.gradle'
   self.assertEqual(audit.original(signing).decode().split('tasks.configureEach')[0],(ROOT/signing).read_text().split('// AGP deduplicates')[0])
   self.assertEqual('5a598fb5ba42949b67b7c2635106fafd5f23179397e4c098757a73cd2d2ef66c',hashlib.sha256((ROOT/'config/signing/flexygram-release.cer').read_bytes()).hexdigest())

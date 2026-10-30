@@ -14,10 +14,13 @@ public final class ComposerSliderTrack extends Drawable {
     private float fraction;
     private int active, inactive;
     public void configure(int active, int inactive) {
+        if (this.active == active && this.inactive == inactive) return;
         this.active = active; this.inactive = inactive; invalidateSelf();
     }
     public void setFraction(int progress, int max) {
-        fraction = Math.max(0, Math.min(1, max == 0 ? 0 : progress / (float) max)); invalidateSelf();
+        float next = Math.max(0, Math.min(1, max == 0 ? 0 : progress / (float) max));
+        if (fraction == next) return;
+        fraction = next; invalidateSelf();
     }
     @Override public void draw(Canvas canvas) {
         Rect b = getBounds();

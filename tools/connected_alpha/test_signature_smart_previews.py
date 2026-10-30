@@ -103,11 +103,11 @@ class SmartPreviews(unittest.TestCase):
                         MessageObject music=m();music.music=true;music.musicTitle="Track";
                         verify(3,music);ok(SignatureSmartPreviews.label(music,3).contains("Track"),"title");
                         MessageObject file=m();file.file=true;file.document.file_name="report.pdf";
-                        verify(1,file);ok(SignatureSmartPreviews.label(file,1).contains("report.pdf"),"document name");
+                        verify(SignatureSmartPreviewPalette.PDF,file);ok(SignatureSmartPreviews.label(file,1).contains("report.pdf"),"document name");
                         MessageObject photo=m();photo.photo=true;verify(6,photo);photo.concealed=true;verify(0,photo);photo.concealed=false;
                         MessageObject video=m();video.video=true;verify(7,video);
                         MessageObject group=m();group.messageOwner.action=new TLRPC.TL_messageActionChatAddUser();
-                        group.messageText="Joined group";verify(5,group);
+                        group.messageText="Joined group";verify(SignatureSmartPreviewPalette.JOINED,group);
                         MessageObject link=m();link.messageOwner.media=new TLRPC.TL_messageMediaWebPage();
                         link.messageOwner.message="https://example.com/path?token=secret";verify(4,link);
                         String compact=SignatureSmartPreviews.label(link,4);
@@ -134,7 +134,7 @@ class SmartPreviews(unittest.TestCase):
                         verify(0,link);
                         link.messageOwner.entities.clear();verify(4,link);
                         voice.highlighted=true;verify(0,voice);voice.highlighted=false;
-                        voice.messageOwner.message="Caption";verify(0,voice);
+                        voice.messageOwner.message="Caption";verify(SignatureSmartPreviewPalette.VOICE,voice);
                         voice.messageOwner.message="";voice.messageOwner.media=new TLRPC.Media();
                         voice.messageOwner.media.ttl_seconds=15;verify(0,voice);
                         // REAL production eligibility: ordinary private chats
@@ -146,11 +146,11 @@ class SmartPreviews(unittest.TestCase):
                         ok(SignatureSmartPreviews.allowsSingleMessagePreview(latest),"normal singleton file dialog");
                         latest.add(photo);
                         ok(!SignatureSmartPreviews.allowsSingleMessagePreview(latest),"multi-item album stays native");
-                        SignatureSmartPreviews.setMode(SignatureSmartPreviewPalette.MATTE);
-                        ok(SignatureSmartPreviews.mode()==2,"mode stored");
+                        SignatureSmartPreviews.setMode(SignatureSmartPreviewPalette.THEME);
+                        ok(SignatureSmartPreviews.mode()==1,"mode stored");
                         SignatureSmartPreviews.setMode(SignatureSmartPreviewPalette.OFF);
                         ok(SignatureSmartPreviews.mode()==3,"off");
-                        for(int mode=0;mode<=2;mode++){
+                        for(int mode=0;mode<=1;mode++){
                             for(int type=1;type<=9;type++){
                                 for(int surface:new int[]{0xfff7f7f9,0xff141b25,0xff777777}){
                                     SignatureSmartPreviewPalette palette=new SignatureSmartPreviewPalette();
@@ -165,9 +165,55 @@ class SmartPreviews(unittest.TestCase):
                         System.out.println("PASS: real palette and classifier, theme modes, file/audio/link/event/caption/TTL");
                     }}'''
         }
+        import re
+        keys=sorted(set(re.findall(r"R.string.(\w+)",CLASSIFIER.read_text())))
+        doubles["org/telegram/messenger/R.java"] = "package org.telegram.messenger;public class R{public static class string{"+"".join("public static final int "+k+"="+str(i+1)+";" for i,k in enumerate(keys))+"}}"
+        doubles["org/telegram/tgnet/TLRPC.java"] = doubles["org/telegram/tgnet/TLRPC.java"].replace(
+            "public String file_name;", "public String file_name,mime_type;").replace(
+            "public MessageMedia media;", "public boolean post;public int edit_date;public Peer from_id;public MessageMedia media;")
+        doubles["org/telegram/tgnet/TLRPC.java"] = doubles["org/telegram/tgnet/TLRPC.java"].replace("public static class Document", """
+            public static class Peer {public long user_id;}
+            public static class ChannelParticipant {}
+            public static class TL_channelParticipantCreator extends ChannelParticipant {}
+            public static class TL_channelParticipantAdmin extends ChannelParticipant {}
+            public static class ChatParticipant {public long user_id;}
+            public static class TL_chatParticipantCreator extends ChatParticipant {}
+            public static class TL_chatParticipantAdmin extends ChatParticipant {}
+            public static class Participants {public java.util.ArrayList<ChatParticipant> participants=new java.util.ArrayList<>();}
+            public static class ChatFull {public Participants participants;}
+            public static class TL_messageMediaPoll extends MessageMedia {}
+            public static class TL_messageActionChatDeleteUser {public long user_id;}
+            public static class TL_messageActionPinMessage {}
+            public static class Document""")
+        doubles["org/telegram/messenger/MessageObject.java"] = doubles["org/telegram/messenger/MessageObject.java"].replace(
+            "public boolean isVoice()", "public int currentAccount;public boolean ayuDeleted;public long getDialogId(){return -10;}public boolean isAyuDeleted(){return ayuDeleted;}public boolean isSticker(){return false;}public boolean isGif(){return false;}public boolean isVoice()")
+        doubles["org/telegram/messenger/MessagesController.java"] = """package org.telegram.messenger;
+            import org.telegram.tgnet.TLRPC;
+            public class MessagesController {
+                public static TLRPC.ChannelParticipant admin;public static TLRPC.ChatFull full;
+                public static MessagesController getInstance(int account){return new MessagesController();}
+                public TLRPC.ChannelParticipant getAdminInChannel(long uid,long chat){return admin;}
+                public TLRPC.ChatFull getChatFull(long chat){return full;}
+            }"""
+        doubles["SmartPreviewProbe.java"] = doubles["SmartPreviewProbe.java"].replace(
+            'SignatureSmartPreviews.setMode(SignatureSmartPreviewPalette.THEME);', """
+            MessageObject role=m();role.messageOwner.from_id=new TLRPC.Peer();role.messageOwner.from_id.user_id=42;
+            verify(0,role);
+            org.telegram.messenger.MessagesController.admin=new TLRPC.TL_channelParticipantAdmin();
+            verify(SignatureSmartPreviewPalette.ADMIN,role);
+            org.telegram.messenger.MessagesController.admin=new TLRPC.TL_channelParticipantCreator();
+            verify(SignatureSmartPreviewPalette.OWNER,role);
+            org.telegram.messenger.MessagesController.admin=null;
+            role.ayuDeleted=true;verify(SignatureSmartPreviewPalette.DELETED,role);
+            role.ayuDeleted=false;verify(0,role);
+            file.document.file_name="verylong".repeat(30)+".pdf";
+            ok(SignatureSmartPreviews.snippet(file,10).endsWith(".pdf"),"long extension retained");
+            try { SignatureSmartPreviews.setMode(2);throw new AssertionError("retired mode"); }
+            catch(IllegalArgumentException expected) {}
+            SignatureSmartPreviews.setMode(SignatureSmartPreviewPalette.THEME);""")
         with tempfile.TemporaryDirectory() as folder:
             source=Path(folder)
-            java=[str(PALETTE),str(CLASSIFIER)]
+            java=[str(PALETTE),str(CLASSIFIER),str(JAVA/"app/flexygram/home/SignatureMiniPillClassifier.java")]
             for name,body in doubles.items():
                 path=source/name;path.parent.mkdir(parents=True,exist_ok=True)
                 path.write_text(body,encoding="utf-8");java.append(str(path))
@@ -182,16 +228,18 @@ class SmartPreviews(unittest.TestCase):
         self.assertIn("SignatureSmartPreviews.kind(message)",s)
         self.assertIn("SignatureSmartPreviews.allowsSingleMessagePreview(groupMessages)",s)
         self.assertNotIn("&& groupMessages == null",s)
-        self.assertIn("drawSmartPreviewBackground(canvas,top,1f-updateHelper.typingProgres)",s)
-        self.assertIn("smartPreviewPalette.foreground()",s)
+        self.assertIn("SignatureSmartPillSpan",s)
+        self.assertIn("SignatureSmartPillLayout.remaining",s)
+        self.assertIn("TextUtils.TruncateAt.MIDDLE",s)
+        self.assertIn("pill.setSpan(capsule,capsuleStart,capsuleStart+1",s)
         self.assertIn("smartPreviewKind=0",s)
         self.assertIn("smartModeChanged=smartPreviewModeLastBuilt!=smartModeNow",s)
         self.assertIn("!needUpdate && !smartModeChanged",s)
         self.assertIn("draftMessage == null && !draftVoice",s)
-        self.assertIn("!hasTags()",s)
-        self.assertIn("spoilers.isEmpty()",s)
-        self.assertNotIn("new Bitmap",s[s.index("drawSmartPreviewBackground"):s.index("drawSmartPreviewBackground")+1200])
-        self.assertNotIn("ValueAnimator",s[s.index("drawSmartPreviewBackground"):s.index("drawSmartPreviewBackground")+1200])
+        self.assertIn("restriction_reason.isEmpty()",s)
+        self.assertIn("SignatureSmartPreviews.secondaryKind",s)
+        self.assertNotIn("new Bitmap",s[s.index("SignatureSmartPillSpan"):s.index("SignatureSmartPillSpan")+4000])
+        self.assertNotIn("ValueAnimator",s[s.index("SignatureSmartPillSpan"):s.index("SignatureSmartPillSpan")+4000])
         self.assertIn("messageLayout = new StaticLayout(",s)
         self.assertIn("AnimatedEmojiSpan.drawAnimatedEmojis(canvas, messageLayout",s)
 

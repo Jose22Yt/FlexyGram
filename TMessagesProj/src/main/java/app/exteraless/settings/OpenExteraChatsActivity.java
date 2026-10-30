@@ -1876,9 +1876,9 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
             showOptions(view,new CharSequence[]{
                 getString(R.string.FlexySmartPreviewAdaptive),
                 getString(R.string.FlexySmartPreviewAccent),
-                getString(R.string.FlexySmartPreviewMatte),
                 getString(R.string.FlexySmartPreviewOff)
-            },selected->{
+            },index->{
+                int selected = index == 2 ? app.flexygram.home.SignatureSmartPreviewPalette.OFF : index;
                 if (selected != app.flexygram.home.SignatureSmartPreviews.mode()) {
                     app.flexygram.home.SignatureSmartPreviews.setMode(selected);
                     // Invalidate only actual Telegram dialog lists. Rebuilding

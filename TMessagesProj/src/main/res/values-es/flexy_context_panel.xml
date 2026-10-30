@@ -9,6 +9,6 @@
     <string name="FlexyContextDescription">El contacto anima la burbuja de forma independiente del menú. Activa por separado las reacciones y el panel mediante un toque. Los controles y la pulsación prolongada conservan sus acciones nativas.</string>
     <string name="FlexyContextStyle">Estilo del menú de mensajes</string>
     <string name="FlexyContextNativeStyle">Clásico</string>
-    <string name="FlexyContextSignatureStyle">Signature iOS 27</string>
-    <string name="FlexyContextStyleDescription">Clásico conserva los gestos y el menú originales de Telegram. Signature iOS 27 activa el toque único con reacciones, tarjeta compacta y movimiento amortiguado. La física es nativa y fija, sin opciones de velocidad, intensidad ni deformación.</string>
+    <string name="FlexyContextSignatureStyle">FlexyGram Signature</string>
+    <string name="FlexyContextStyleDescription">Clásico conserva los gestos y el menú originales de Telegram. FlexyGram Signature activa el toque único con reacciones, tarjeta compacta y movimiento amortiguado. La física es nativa y fija, sin opciones de velocidad, intensidad ni deformación.</string>
 </resources>

@@ -18,7 +18,7 @@ class Integration1284(unittest.TestCase):
 
     def test_message_rebound_belongs_only_to_the_selected_canvas_overlay(self):
         source=(audit.ROOT/'TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java').read_text()
-        self.assertIn('compactContext = (bubbleTap || longpress) && !onDoubleTapped',source)
+        self.assertIn('compactContext = (bubbleTap || longpress || single) && !onDoubleTapped',source)
         self.assertIn('selectedBubbleMotionMessage == cell.getMessageObject()',source)
         self.assertIn('canvas.scale(preview*selectedBubbleMotion.scaleX(), preview*selectedBubbleMotion.scaleY(),',source)
         self.assertGreaterEqual(source.count('selectedBubbleMotion.reset()'),3)
