@@ -11,7 +11,7 @@ import android.view.animation.LinearInterpolator;
  * and recovery, with initial X/Y handed off from the press on the real cell.
  */
 public final class SelectedBubbleMotion {
-    private static final long EXIT_DURATION_MS = 260L;
+    private static final long EXIT_DURATION_MS = 210L;
     private ValueAnimator animator;
     private Runnable invalidate;
     private float scaleX = 1f, scaleY = 1f, progress = 1f;
