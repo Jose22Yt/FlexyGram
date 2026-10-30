@@ -1,0 +1,30 @@
+{
+  "base": "49f91b58be48765abe02f7c3f33a5c94c93dbc52",
+  "reviewed": {
+    "TMessagesProj/src/main/java/app/flexygram/bubbles/interaction/BubbleInteractionSettings.java": "0d9a5b091abe4745a5039401a4d364a6a95d390a",
+    "TMessagesProj/src/main/java/app/flexygram/bubbles/interaction/BubbleInteractionSettingsActivity.java": "1eceb1bfa9143e5a24d199455698dde9fb38242c",
+    "TMessagesProj/src/main/java/app/flexygram/bubbles/interaction/BubbleActionPanelView.java": "6a56127dbfd85393dedaeff6838a522d52156c6c",
+    "TMessagesProj/src/main/java/app/flexygram/bubbles/interaction/BubbleTapMotion.java": "4494c4d472e2be909dbd86f41f65be6d20a92e39",
+    "TMessagesProj/src/main/java/app/flexygram/bubbles/interaction/SelectedBubbleMotion.java": "53e52613e785dbd26e7adf85e6f1ce6c73bda7cb",
+    "TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java": "f6b302e76d5a0a92c19b5e4b41fd86a7450f1969",
+    "TMessagesProj/src/main/java/org/telegram/ui/Cells/ChatMessageCell.java": "5226cef46db85bd0ec3f94f736fe00e430816ee1",
+    "TMessagesProj/src/main/res/values/flexy_context_panel.xml": "d84caeff5d69568fce39f7ddd8cc1d3c9eb5b26a",
+    "TMessagesProj/src/main/res/values-es/flexy_context_panel.xml": "116149e7a321a9962c006034c46510c357ceddb8",
+    "tools/connected_alpha/refinement134_contract.py": "5093e70ee4ab2375d85840e9c805d89d492d2545",
+    "tools/connected_alpha/work1_contract.py": "0abf2cb26ef769887568bac7e0235f2019f1ee94"
+  },
+  "paths": [
+    "TMessagesProj/src/main/java/app/flexygram/bubbles/interaction/BubbleInteractionSettings.java",
+    "TMessagesProj/src/main/java/app/flexygram/bubbles/interaction/BubbleInteractionSettingsActivity.java",
+    "TMessagesProj/src/main/java/app/flexygram/bubbles/interaction/BubbleActionPanelView.java",
+    "TMessagesProj/src/main/java/app/flexygram/bubbles/interaction/BubbleTapMotion.java",
+    "TMessagesProj/src/main/java/app/flexygram/bubbles/interaction/SelectedBubbleMotion.java",
+    "TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java",
+    "TMessagesProj/src/main/java/org/telegram/ui/Cells/ChatMessageCell.java",
+    "TMessagesProj/src/main/res/values/flexy_context_panel.xml",
+    "TMessagesProj/src/main/res/values-es/flexy_context_panel.xml",
+    "tools/connected_alpha/refinement134_contract.py",
+    "tools/connected_alpha/work1_contract.py",
+    "tools/refinement134/review.json"
+  ]
+}
