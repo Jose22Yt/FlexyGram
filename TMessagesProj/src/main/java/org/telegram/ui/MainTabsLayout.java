@@ -26,53 +26,10 @@ public class MainTabsLayout extends AnimatedLinearLayout {
     public static final int BOTTOM_NAVIGATION_MODE_HIDE = 1;
     public static final int BOTTOM_NAVIGATION_MODE_FLOATING = 2;
 
-    private static final String KEY_BOTTOM_NAVIGATION_FLOATING = "OEAppearanceBottomNavigationFloating";
-
-    private static Boolean bottomNavigationFloating;
-
-    public static int getBottomNavigationMode() {
-        if (isBottomNavigationHidden()) {
-            return BOTTOM_NAVIGATION_MODE_HIDE;
-        }
-        return isBottomNavigationFloating() ? BOTTOM_NAVIGATION_MODE_FLOATING : BOTTOM_NAVIGATION_MODE_SHOW;
-    }
-
-    public static void setBottomNavigationMode(int mode) {
-        NaConfig.INSTANCE.getHideBottomNavigationBar().setConfigBool(mode == BOTTOM_NAVIGATION_MODE_HIDE);
-        final boolean floating = mode == BOTTOM_NAVIGATION_MODE_FLOATING;
-        bottomNavigationFloating = floating;
-        final SharedPreferences preferences = getBottomNavigationPreferences();
-        if (preferences != null) {
-            preferences.edit().putBoolean(KEY_BOTTOM_NAVIGATION_FLOATING, floating).apply();
-        }
-    }
-
-    public static boolean isBottomNavigationHidden() {
-        return NaConfig.INSTANCE.getHideBottomNavigationBar().Bool();
-    }
-
-    public static boolean isBottomNavigationVisible() {
-        return !isBottomNavigationHidden();
-    }
-
-    public static boolean isBottomNavigationFloating() {
-        if (isBottomNavigationHidden()) {
-            return false;
-        }
-        if (bottomNavigationFloating == null) {
-            final SharedPreferences preferences = getBottomNavigationPreferences();
-            if (preferences == null) {
-                return false;
-            }
-            bottomNavigationFloating = preferences.getBoolean(KEY_BOTTOM_NAVIGATION_FLOATING, false);
-        }
-        return bottomNavigationFloating;
-    }
-
-    private static SharedPreferences getBottomNavigationPreferences() {
-        return ApplicationLoader.applicationContext == null ? null : NekoConfig.getPreferences();
-    }
-
+    public static int getBottomNavigationMode() { return BOTTOM_NAVIGATION_MODE_SHOW; }
+    public static boolean isBottomNavigationHidden() { return false; }
+    public static boolean isBottomNavigationVisible() { return true; }
+    public static boolean isBottomNavigationFloating() { return false; }
 
     public interface Tab {
         float measureTextWidth();

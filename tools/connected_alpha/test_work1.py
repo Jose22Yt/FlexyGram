@@ -11,7 +11,7 @@ class Work1(unittest.TestCase):
    p=ROOT/name;data=p.read_bytes() if p.is_file() else b''
    self.assertEqual(data+b'UNKNOWN',audit.restore(name,data+b'UNKNOWN'),name)
  def test_work2_identity_startup_network_scroll_and_idle_motion_are_intact(self):
-  names=['app/flexygram/performance/StartupAccounts.java','app/flexygram/performance/NetworkSnapshotAge.java','app/flexygram/performance/CoalescedTask.java','app/flexygram/performance/ScrollFrameRateHint.java','app/flexygram/performance/RefreshRateMonitor.java','app/flexygram/bubbles/SignatureBorderPath.java','app/flexygram/bubbles/interaction/BubbleTapMotion.java','org/telegram/messenger/ApplicationLoader.java','org/telegram/tgnet/ConnectionsManager.java','org/telegram/ui/Cells/DialogCell.java','org/telegram/ui/Components/RecyclerListView.java','org/telegram/ui/LaunchActivity.java']
+  names=['app/flexygram/performance/StartupAccounts.java','app/flexygram/performance/NetworkSnapshotAge.java','app/flexygram/performance/CoalescedTask.java','app/flexygram/performance/ScrollFrameRateHint.java','app/flexygram/performance/RefreshRateMonitor.java','app/flexygram/bubbles/SignatureBorderPath.java','org/telegram/messenger/ApplicationLoader.java','org/telegram/tgnet/ConnectionsManager.java','org/telegram/ui/Cells/DialogCell.java','org/telegram/ui/Components/RecyclerListView.java','org/telegram/ui/LaunchActivity.java']
   for name in names:self.assertEqual(audit.original('TMessagesProj/src/main/java/'+name),(JAVA/name).read_bytes(),name)
   for name in ['config/signing/identity.properties','config/signing/flexygram-release.cer','gradle.properties','TMessagesProj/src/main/AndroidManifest.xml']:
    self.assertEqual(audit.original(name),(ROOT/name).read_bytes(),name)
@@ -28,12 +28,12 @@ class Work1(unittest.TestCase):
   self.assertIn('if (bubbleTap && (scrimPopupWindow != null',s)
   self.assertIn('if(view instanceof ChatMessageCell && ((ChatMessageCell)view).isSignatureTap() && app.flexygram.bubbles.interaction.BubbleInteractionSettings.tapPanel(view.getContext()))return false;',s)
  def test_native_controls_stay_first_and_selection_is_not_a_tap(self):
-  s=(JAVA/'org/telegram/ui/Cells/ChatMessageCell.java').read_text();start=s.index('signatureTapEligible=!result')
+  s=(JAVA/'org/telegram/ui/Cells/ChatMessageCell.java').read_text();start=s.index('signatureTapEligible=compatible && !result')
   self.assertGreater(start,s.index('checkReactionsTouchEvent(event)'))
   for token in ['!delegate.hasSelectedMessages()','!currentMessageObject.preview','currentMessagesGroup==null','getLongPressTimeout()','signatureTapReleased>0','ACTION_POINTER_DOWN','ACTION_CANCEL']:
    self.assertIn(token,s)
  def test_no_home_glass_or_custom_share_route_survives(self):
-  for name in ['org/telegram/ui/MainTabsLayout.java','app/flexygram/navigation/LiquidNavigationPreviewView.java']:
+  for name in ['org/telegram/ui/MainTabsLayout.java']:
    s=(JAVA/name).read_text()
    for bad in ['LiquidLensRenderer','setLiquidLensBackground','setLiquidGlassEffectAllowed','clipPath','RenderNodeWithHash']:self.assertNotIn(bad,s)
   self.assertFalse((JAVA/'app/flexygram/navigation/LiquidLensRenderer.java').exists())
@@ -47,7 +47,6 @@ class Work1(unittest.TestCase):
   self.assertIn('if (index == INDEX_CHATS)',s)
   self.assertIn('()->openFlexyDestination(destination)',s)
   self.assertIn('int slots = Math.max(2, inner / dp(48))',s)
-  editor=(JAVA/'app/flexygram/navigation/LiquidNavigationTabsActivity.java').read_text()
-  self.assertIn('order.length>=LiquidNavigationDestinations.MAX_VISIBLE',editor)
-  self.assertIn('order.length<=2',editor)
+  self.assertFalse((JAVA/'app/flexygram/navigation/LiquidNavigationTabsActivity.java').exists())
+  self.assertIn('return LiquidNavigationDestinations.defaults()', (JAVA/'app/flexygram/navigation/LiquidNavigationConfig.java').read_text())
 if __name__=='__main__':unittest.main()

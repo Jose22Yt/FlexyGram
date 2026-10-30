@@ -18,7 +18,8 @@ def spec():
     return json.loads(MANIFEST.read_text())
 
 def paths():
-    return frozenset(spec()['paths'])
+    from native_context135_contract import paths as current_paths
+    return frozenset(spec()['paths']) | current_paths()
 
 def blob_sha(data):
     header = b'blob ' + str(len(data)).encode() + b'\x00'
@@ -31,18 +32,22 @@ def original(path):
     return result.stdout if result.returncode == 0 else b''
 
 def restore(path, data):
+    from native_context135_contract import restore as current_restore
+    data = current_restore(path, data)
     reviewed = spec()['reviewed'].get(str(path))
     if reviewed is not None and blob_sha(data) == reviewed:
         return original(path)
     return data
 
 def verify_current():
+    from native_context135_contract import verify_current as current_verify, restore as current_restore
+    current_verify()
     s = spec()
     if s['base'] != BASE:
         raise ValueError('Wrong Signature iOS 27 overlay base')
     for path, expected in s['reviewed'].items():
         file = ROOT / path
-        data = file.read_bytes() if file.is_file() else b''
+        data = current_restore(path, file.read_bytes() if file.is_file() else b'')
         if blob_sha(data) != expected:
             raise ValueError('Unreviewed Signature refinement delta: ' + path)
         tampered = data + b'\nUNREVIEWED\n'

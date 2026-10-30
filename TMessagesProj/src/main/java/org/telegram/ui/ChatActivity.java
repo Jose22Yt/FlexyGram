@@ -1213,7 +1213,6 @@ public class ChatActivity extends BaseFragment implements
     private final app.flexygram.bubbles.interaction.SelectedBubbleMotion selectedBubbleMotion =
             new app.flexygram.bubbles.interaction.SelectedBubbleMotion();
     private MessageObject selectedBubbleMotionMessage;
-    private float signatureHandoffScaleX = .945f, signatureHandoffScaleY = .960f;
     private float selectedBubbleOffsetY;
     private float selectedBubblePreviewScale = 1f;
     private View scrimView;
@@ -1924,7 +1923,7 @@ public class ChatActivity extends BaseFragment implements
             if((scrimPopupWindow != null && NaConfig.INSTANCE.getDoubleTapAction().Int() == DoubleTap.DOUBLE_TAP_ACTION_SHOW_REACTIONS))
                 return false;
             wasManualScroll = true;
-            if(view instanceof ChatMessageCell)((ChatMessageCell)view).cancelSignatureTap();
+            if(view instanceof ChatMessageCell)((ChatMessageCell)view).finishSignatureCandidate();
             boolean result = true;
             boolean showMenu = true;
             if (view instanceof ChatActionCell) {
@@ -2147,11 +2146,6 @@ public class ChatActivity extends BaseFragment implements
             }
             if(view instanceof ChatMessageCell && ((ChatMessageCell)view).isSignatureTap()){
                 if(app.flexygram.bubbles.interaction.BubbleInteractionSettings.tapPanel(view.getContext())){
-                    ChatMessageCell tapped=(ChatMessageCell)view;
-                    // Carry the real-cell squash/stretch into the popup's damped spring.
-                    signatureHandoffScaleX=tapped.signatureTapScaleX();
-                    signatureHandoffScaleY=tapped.signatureTapScaleY();
-                    tapped.finishSignatureTap();
                     createMenu(view,true,false,x,y,true,false,false,false,true);
                 }
                 return;
@@ -34758,9 +34752,10 @@ public class ChatActivity extends BaseFragment implements
                 GlassMenuHelper.applyToGaps(popupLayout, GlassMenuHelper.separatorColor(true, themeDelegate));
             }
             scrimPopupWindow = new ActionBarPopupWindow(scrimPopupContainerLayout, LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT) {
-                @Override
-                public void dismiss() {
-                    super.dismiss();
+                private boolean signatureClosing;
+                @Override public void dismiss() { dismiss(true); }
+                private void finishDismiss(boolean animated) {
+                    super.dismiss(animated);
                     if (scrimPopupWindow != this) {
                         return;
                     }
@@ -34781,21 +34776,30 @@ public class ChatActivity extends BaseFragment implements
                         chatActivityEnterView.getEditField().setAllowDrawCursor(true);
                     }
                 }
-
-                @Override
-                public void dismiss(boolean animated) {
-                    selectedBubbleMotion.close();
-                    super.dismiss(animated);
-                    if (finalReactionsLayout1 != null) {
-                        finalReactionsLayout1.dismissParent(animated);
+                @Override public void dismiss(boolean animated) {
+                    if (compactContext && animated && selectedBubbleMotion.hasOwner()) {
+                        if (signatureClosing) return;
+                        signatureClosing = true;
+                        setFocusable(false);
+                        selectedBubbleMotion.close(() -> {
+                            finishDismiss(false);
+                            if (finalReactionsLayout1 != null) finalReactionsLayout1.dismissParent(false);
+                        });
+                        return;
                     }
+                    if (compactContext) selectedBubbleMotion.reset();
+                    finishDismiss(animated);
+                    if (finalReactionsLayout1 != null) finalReactionsLayout1.dismissParent(animated);
                 }
             };
             scrimPopupWindow.setPauseNotifications(true);
             scrimPopupWindow.setDismissAnimationDuration(220);
+            if (compactContext) scrimPopupWindow.setAnimationEnabled(false);
             scrimPopupWindow.setOutsideTouchable(true);
             scrimPopupWindow.setClippingEnabled(true);
-            if (!isReactionsAvailable || reactionsLayout == null || !ReactionsContainerLayout.allowSmoothEnterTransition()) {
+            if (compactContext) {
+                scrimPopupWindow.setAnimationStyle(0);
+            } else if (!isReactionsAvailable || reactionsLayout == null || !ReactionsContainerLayout.allowSmoothEnterTransition()) {
                 scrimPopupWindow.setAnimationStyle(R.style.PopupContextAnimation);
             } else {
                 scrimPopupWindow.setAnimationStyle(0);
@@ -34898,9 +34902,12 @@ public class ChatActivity extends BaseFragment implements
             final ActionBarPopupWindow signatureMenuOwner = scrimPopupWindow;
             final MessageObject signatureSelectedMessage = selectedObject;
             Runnable showMenu = () -> {
-                if (scrimPopupWindow != signatureMenuOwner || compactContext
-                        && (selectedObject != signatureSelectedMessage
-                            || ((ChatMessageCell)v).getMessageObject() != signatureSelectedMessage)) return;
+                if (scrimPopupWindow != signatureMenuOwner) return;
+                if (compactContext && (selectedObject != signatureSelectedMessage
+                        || ((ChatMessageCell)v).getMessageObject() != signatureSelectedMessage)) {
+                    signatureMenuOwner.dismiss(false);
+                    return;
+                }
                 if (scrimPopupWindow == null || fragmentView == null || scrimPopupWindow.isShowing() || !AndroidUtilities.isActivityRunning(getParentActivity())) {
                     return;
                 }
@@ -34910,14 +34917,27 @@ public class ChatActivity extends BaseFragment implements
                     selectedBubbleMotionMessage = selectedObject;
                     selectedBubbleOffsetY = signatureBubbleOffset;
                     selectedBubblePreviewScale = signatureBubbleScale;
-                    if (app.flexygram.bubbles.interaction.BubbleInteractionSettings.springBounce(getParentActivity())) {
-                        selectedBubbleMotion.enter(
-                                () -> { if (contentView != null) contentView.invalidate(); },
-                                bubbleTap ? signatureHandoffScaleX : .945f,
-                                bubbleTap ? signatureHandoffScaleY : .960f);
-                    }
-                }
-                if (isReactionsAvailableFinal && finalReactionsLayout != null) {
+                    final ChatMessageCell tapped=(ChatMessageCell)v;
+                    final boolean handoff=true;
+                    if (finalReactionsLayout != null) finalReactionsLayout.beginSignatureMotion();
+                    selectedBubbleMotion.enter(() -> {
+                        if (contentView != null) contentView.invalidate();
+                        float phase=selectedBubbleMotion.panelProgress();
+                        float alpha=Math.max(0f,Math.min(1f,phase));
+                        popupLayout.setPivotY(0f);
+                        popupLayout.setPivotX(popupLayout.getMeasuredWidth()*.5f);
+                        popupLayout.setScaleX(.96f+.04f*phase);
+                        popupLayout.setScaleY(.96f+.04f*phase);
+                        popupLayout.setTranslationY(dp(8)*(1f-phase));
+                        popupLayout.setAlpha(alpha);
+                        if (finalReactionsLayout != null) finalReactionsLayout.setSignatureMotionProgress(phase);
+                    }, handoff?tapped.signatureTapScaleX():1f,
+                       handoff?tapped.signatureTapScaleY():1f,
+                       handoff?tapped.signatureTapVelocityX():0f,
+                       handoff?tapped.signatureTapVelocityY():0f);
+                    // Ownership changes at actual show time, never while language detection waits.
+                    if (handoff) tapped.finishSignatureTap();
+                } else if (isReactionsAvailableFinal && finalReactionsLayout != null) {
                     finalReactionsLayout.startEnterAnimation(true);
                 }
                 AndroidUtilities.runOnUIThread(() -> {
@@ -35215,7 +35235,6 @@ public class ChatActivity extends BaseFragment implements
     private ValueAnimator scrimViewAlphaAnimator;
 
     private void closeMenu(boolean hideDim) {
-        selectedBubbleMotion.close();
         scrimPopupWindowHideDimOnDismiss = hideDim;
         if (scrimPopupWindow != null) {
             scrimPopupWindow.dismiss();
@@ -44131,6 +44150,7 @@ public class ChatActivity extends BaseFragment implements
             };
             scrimPopupWindow.setPauseNotifications(true);
             scrimPopupWindow.setDismissAnimationDuration(220);
+            if (compactContext) scrimPopupWindow.setAnimationEnabled(false);
             scrimPopupWindow.setOutsideTouchable(true);
             scrimPopupWindow.setClippingEnabled(true);
             scrimPopupWindow.setAnimationStyle(R.style.PopupContextAnimation);
@@ -50001,6 +50021,7 @@ public class ChatActivity extends BaseFragment implements
             };
             scrimPopupWindow.setPauseNotifications(true);
             scrimPopupWindow.setDismissAnimationDuration(220);
+            if (compactContext) scrimPopupWindow.setAnimationEnabled(false);
             scrimPopupWindow.setOutsideTouchable(true);
             scrimPopupWindow.setClippingEnabled(true);
             scrimPopupWindow.setAnimationStyle(R.style.PopupContextAnimation);

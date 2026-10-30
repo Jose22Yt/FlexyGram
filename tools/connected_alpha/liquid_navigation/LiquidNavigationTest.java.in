@@ -18,7 +18,7 @@ import static org.junit.Assert.*;
 public class LiquidNavigationTest {
  Activity a;FrameLayout root;MainTabsLayout bar;ArrayList<GlassTabView> tabs=new ArrayList<>();int clicked;
  @Before public void setup(){a=Robolectric.buildActivity(Activity.class).setup().get();org.telegram.messenger.ApplicationLoader.applicationContext=a;clear();root=new FrameLayout(a);a.setContentView(root);}
- void clear(){a.getSharedPreferences("flexy_liquid_navigation",0).edit().clear().commit();ReflectionHelpers.setStaticField(LiquidNavigationConfig.class,"loaded",false);}
+ void clear(){a.getSharedPreferences("flexy_liquid_navigation",0).edit().clear().commit();ReflectionHelpers.setStaticField(LiquidNavigationConfig.class,"migrated",false);}
  void create(int count,int width,boolean reverse){
   root.removeAllViews();tabs.clear();bar=new MainTabsLayout(a,null);bar.setPadding(4,0,4,0);bar.refreshBottomBarAppearance();root.addView(bar,new FrameLayout.LayoutParams(width,60));
   for(int i=0;i<count;i++){final int id=i;var v=new GlassTabView(a);tabs.add(v);bar.addView(v);bar.setViewVisible(v,true,false);bar.setPriority(v,reverse?-i:i);v.setOnClickListener(w->{clicked=id;bar.setTabSelected(v,true);});}
@@ -37,14 +37,19 @@ public class LiquidNavigationTest {
   }
  }
  @Test public void cancelledTouchAndLongHoldCannotNavigateTheSelection(){create(6,360,false);float x=tabs.get(3).getX()+20;long t=android.os.SystemClock.uptimeMillis();for(int action:new int[]{0,3}){MotionEvent e=MotionEvent.obtain(t,t+80,action,x,20,0);bar.dispatchTouchEvent(e);e.recycle();}assertTrue(tabs.get(0).isTabSelected());assertFalse(tabs.get(3).isTabSelected());}
- @Test public void migrationPreservesPreviousNineOrderAndExplicitLabelsAndAnimation(){
-  a.getSharedPreferences("flexy_liquid_navigation",0).edit().putString("destinations","8,7,6,5,4,3,2,1,0").putBoolean("labels",false).putBoolean("bottom_animation",false).commit();
-  assertArrayEquals(new int[]{8,7,6,5,4,0},LiquidNavigationConfig.order());
-  assertArrayEquals(new int[]{8,7,6,5,4,3,2,1,0},LiquidNavigationConfig.previousOrder());assertFalse(LiquidNavigationConfig.labels());assertFalse(LiquidNavigationConfig.animation());
-  LiquidNavigationConfig.reset();assertArrayEquals(new int[]{8,7,6,5,4,3,2,1,0},LiquidNavigationConfig.previousOrder());
+ @Test public void migrationRetiresOnlyHomeVisualKeysAndAlwaysReturnsDefaults(){
+  var prefs=a.getSharedPreferences("flexy_liquid_navigation",0);
+  prefs.edit().putString("destinations","8,7,6,5,4,3,2,1,0").putBoolean("labels",false).putInt("height",100).putString("unrelated","keep").commit();
+  LiquidNavigationConfig.load();assertArrayEquals(LiquidNavigationDestinations.defaults(),LiquidNavigationConfig.order());
+  assertTrue(LiquidNavigationConfig.labels());assertTrue(LiquidNavigationConfig.animation());
+  assertEquals(60,LiquidNavigationConfig.heightDp());assertFalse(prefs.contains("height"));assertFalse(prefs.contains("destinations"));assertEquals("keep",prefs.getString("unrelated",null));
+  ReflectionHelpers.setStaticField(LiquidNavigationConfig.class,"migrated",false);LiquidNavigationConfig.load();assertEquals(60,LiquidNavigationConfig.heightDp());
  }
  @Test public void activeSanitizeNeverExceedsSixAndAlwaysContainsChats(){for(int n=0;n<18;n++){int[] input=new int[n];for(int i=0;i<n;i++)input[i]=8-i%9;int[] ids=LiquidNavigationDestinations.sanitize(input);assertTrue(ids.length>=2&&ids.length<=6);assertTrue(LiquidNavigationDestinations.contains(ids,0));assertArrayEquals(ids,LiquidNavigationDestinations.sanitize(ids));}}
- @Test public void narrowOverflowRetainsNativeMinimumTargetWidths(){LiquidNavigationConfig.order(new int[]{0,1,2,3,4,5});assertArrayEquals(new int[]{0,1,2,9},LiquidNavigationConfig.shown(4));assertEquals(6,LiquidNavigationConfig.shown(100).length);}
+ @Test public void narrowOverflowRetainsNativeMinimumTargetWidths(){assertArrayEquals(new int[]{0,1,9},LiquidNavigationConfig.shown(3));assertEquals(LiquidNavigationDestinations.defaults().length,LiquidNavigationConfig.shown(100).length);}
  @Test public void nativeHostVisibilityIsEnabledAtTerminalFactor(){create(4,360,false);var p=new NativeTabsVisibilityProbe(bar,root);p.apply(1);assertTrue(bar.isEnabled());p.apply(0);assertFalse(bar.isEnabled());}
- @Test public void dimensionsAndCompactionPersistWithSafeMotionBounds(){for(var param:LiquidNavigationConfig.Parameter.values()){LiquidNavigationConfig.value(param,100);ReflectionHelpers.setStaticField(LiquidNavigationConfig.class,"loaded",false);assertEquals(100,LiquidNavigationConfig.value(param));LiquidNavigationConfig.value(param,-5);assertEquals(0,LiquidNavigationConfig.value(param));}for(int mode=0;mode<4;mode++){LiquidNavigationConfig.compaction(mode);assertTrue(LiquidNavigationConfig.heightDp()>=48);assertTrue(LiquidNavigationConfig.heightDp()<=80);}assertTrue(LiquidNavigationConfig.damping()>=.85f);}
+ @Test public void fixedDimensionsIgnoreReintroducedStaleKeys(){
+  a.getSharedPreferences("flexy_liquid_navigation",0).edit().putInt("height",100).putInt("side_gap",100).putBoolean("bottom_animation",false).commit();
+  assertEquals(60,LiquidNavigationConfig.heightDp());assertEquals(10,LiquidNavigationConfig.sideGapDp());assertTrue(LiquidNavigationConfig.animation());
+ }
 }

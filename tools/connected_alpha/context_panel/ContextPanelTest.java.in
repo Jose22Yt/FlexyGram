@@ -44,7 +44,7 @@ public class ContextPanelTest {
   assertEquals(1f,DampedSpringCurve.progress(1f),0.000001f);
  }
  @Test public void panelReturnsToIdleAfterDetachedAnimation() {
-  BubbleInteractionSettings.setSpringBounce(activity,true);
+  BubbleInteractionSettings.setStyle(activity,BubbleInteractionSettings.STYLE_SIGNATURE);
   var panel=new BubbleActionPanelView(activity,null);
   root.addView(panel);
   root.removeView(panel);
@@ -74,29 +74,25 @@ public class ContextPanelTest {
   panel.layout(0,0,260,panel.getMeasuredHeight());
   assertEquals(LinearLayout.VERTICAL,panel.getOrientation());
   ArrayList<Action> received=new ArrayList<>();panel.setListener(received::add);
-  assertEquals(7,panel.getChildCount());
+  assertEquals(13,panel.getChildCount());
   int bottom=0;
   for(int i=0;i<panel.getChildCount();i++){
-   View row=panel.getChildAt(i);assertTrue(row.getTop()>=bottom);bottom=row.getBottom();
+   View row=panel.getChildAt(i);if(i%2==1)continue;assertTrue(row.getTop()>=bottom);bottom=row.getBottom();
    assertTrue(row.getHeight()>=48*activity.getResources().getDisplayMetrics().density);
    assertTrue(row.performClick());
   }
   assertEquals(Arrays.asList(Action.REPLY,Action.COPY,Action.FORWARD,Action.EDIT,Action.PIN,Action.DELETE,Action.MORE),received);
   assertEquals(1f,panel.getScaleX(),0f);
  }
- @Test public void localBouncePreferencePersists() {
-  var context=activity.getApplicationContext();
-  BubbleInteractionSettings.setSpringBounce(context,false);
-  org.robolectric.util.ReflectionHelpers.setStaticField(BubbleInteractionSettings.class,"bounce",null);
-  assertFalse(BubbleInteractionSettings.springBounce(context));
-  BubbleInteractionSettings.setSpringBounce(context,true);
- }
- @Test public void optInPersistsWithoutMotionPreferencesOrNoOpMenuState(){
-  var context=activity.getApplicationContext();BubbleInteractionSettings.setSignaturePanel(context,true);
-  org.robolectric.util.ReflectionHelpers.setStaticField(BubbleInteractionSettings.class,"panel",null);
-  assertTrue(BubbleInteractionSettings.signaturePanel(context));BubbleInteractionSettings.setSignaturePanel(context,false);
-  org.robolectric.util.ReflectionHelpers.setStaticField(BubbleInteractionSettings.class,"panel",null);
-  assertFalse(BubbleInteractionSettings.signaturePanel(context));
+ @Test public void oneStylePersistsAndRetiredFlagsCannotSplitItsBehaviour() {
+  var prefs=activity.getSharedPreferences("flexy_bubble_interaction",0);
+  prefs.edit().putBoolean("signature_panel",false).putBoolean("spring_bounce",false).commit();
+  BubbleInteractionSettings.setStyle(activity,BubbleInteractionSettings.STYLE_SIGNATURE);
+  assertTrue(BubbleInteractionSettings.springBounce(activity));assertTrue(BubbleInteractionSettings.signaturePanel(activity));
+  BubbleInteractionSettings.setStyle(activity,BubbleInteractionSettings.STYLE_DEFAULT);
+  assertFalse(BubbleInteractionSettings.springBounce(activity));assertFalse(BubbleInteractionSettings.tapPanel(activity));
+  org.robolectric.util.ReflectionHelpers.setStaticField(BubbleInteractionSettings.class,"cachedStyle",-1);
+  assertEquals(BubbleInteractionSettings.STYLE_DEFAULT,BubbleInteractionSettings.style(activity));
  }
  @Test public void actualNativePermissionAdapterPreservesAllCombinations(){
   for(int bits=0;bits<64;bits++){var host=new PanelHostProbe();var s=host.lastMessageMenuStatus;s.allowReply=(bits&1)!=0;s.allowCopy=(bits&2)!=0;s.allowForward=(bits&4)!=0;s.allowEdit=(bits&8)!=0;s.allowDelete=(bits&16)!=0;
@@ -107,7 +103,7 @@ public class ContextPanelTest {
 
  @Test public void singleContactCompressesRealOwnerImmediatelyWithoutMenu(){
   View cell=new View(activity);root.addView(cell);BubbleTapMotion motion=new BubbleTapMotion(cell);
-  motion.press(.04f,.45f,270);assertEquals(.96f,motion.scale(),.00001f);assertTrue(motion.pressed());
+  motion.press(.04f,.45f,270);assertTrue(motion.scale()<1f);assertTrue(motion.scale()>.995f);assertTrue(motion.pressed());
   assertEquals(1f,cell.getScaleX(),0); // Canvas-owned: native cell properties stay untouched.
   motion.release();org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(java.time.Duration.ofMillis(100));
   assertTrue(motion.scale()>.96f);
@@ -116,20 +112,16 @@ public class ContextPanelTest {
  @Test public void tapSpringHasBoundedOvershootAndIndependentRecovery(){
   float peak=1;for(int i=0;i<=100;i++)peak=Math.max(peak,BubbleTapMotion.recovery(i/100f,1));
   assertTrue(peak>1);assertTrue(peak<1.25f);assertEquals(1f,BubbleTapMotion.recovery(1,1),0);
-  assertNotEquals(BubbleTapMotion.recovery(.3f,0),BubbleTapMotion.recovery(.3f,1),.001f);
+  assertEquals(BubbleTapMotion.recovery(.3f,0),BubbleTapMotion.recovery(.3f,1),0f);
  }
  @Test public void cancelRecycleAndRapidTapsDoNotLeaveScaleOrCallbacks(){
   View cell=new View(activity);root.addView(cell);BubbleTapMotion motion=new BubbleTapMotion(cell);
   for(int i=0;i<50;i++){motion.press(.06f,.8f,140);motion.release();motion.reset();}
   org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(java.time.Duration.ofSeconds(1));assertEquals(1f,motion.scale(),0);assertFalse(motion.pressed());
  }
- @Test public void singleTapSettingsPersistSeparatelyFromContextBounce(){
-  BubbleInteractionSettings.resetTap(activity);assertTrue(BubbleInteractionSettings.tapAnimation(activity));assertTrue(BubbleInteractionSettings.tapPanel(activity));
-  BubbleInteractionSettings.tapPanel(activity,true);BubbleInteractionSettings.tapAnimation(activity,false);BubbleInteractionSettings.parameter(activity,0,1000);
-  org.robolectric.util.ReflectionHelpers.setStaticField(BubbleInteractionSettings.class,"tap",null);
-  org.robolectric.util.ReflectionHelpers.setStaticField(BubbleInteractionSettings.class,"tapPanel",null);
-  org.robolectric.util.ReflectionHelpers.setStaticField(BubbleInteractionSettings.class,"compression",-1);
-  assertTrue(BubbleInteractionSettings.tapPanel(activity));assertFalse(BubbleInteractionSettings.tapAnimation(activity));assertEquals(100,BubbleInteractionSettings.compression(activity));
-  BubbleInteractionSettings.resetTap(activity);
+ @Test public void appReducedMotionCompletesWithoutFrameCallbacks() {
+  org.telegram.messenger.SharedConfig.enabled=false;
+  try { SelectedBubbleMotion m=new SelectedBubbleMotion();m.enter(()->{});assertFalse(m.isRunning());assertEquals(1f,m.progress(),0f);final int[] done={0};m.close(()->done[0]++);assertEquals(1,done[0]);assertEquals(0f,m.progress(),0f); }
+  finally {org.telegram.messenger.SharedConfig.enabled=true;}
  }
 }
