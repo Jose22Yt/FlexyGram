@@ -968,8 +968,10 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         if (tabsView == null || tabs == null || !app.flexygram.navigation.LiquidNavigationConfig.configured()) return;
         int width = tabsViewWrapper != null && tabsViewWrapper.getWidth() > 0
                 ? tabsViewWrapper.getWidth() : AndroidUtilities.displaySize.x;
-        int inner = width - (tabsViewWrapper != null ? tabsViewWrapper.getPaddingLeft()+tabsViewWrapper.getPaddingRight() : dp(2*app.flexygram.navigation.LiquidNavigationConfig.sideGapDp()))
-                - dp(2*app.flexygram.navigation.LiquidNavigationConfig.innerMarginDp());
+        // Use the requested insets, not the previous wrapper padding, when settings change.
+        int inner = width - insetLeft - insetRight
+                - dp(2*(app.flexygram.navigation.LiquidNavigationConfig.sideGapDp()
+                        +app.flexygram.navigation.LiquidNavigationConfig.innerMarginDp()));
         int slots = Math.max(2, inner / dp(48));
         flexyConfiguredDestinations = app.flexygram.navigation.LiquidNavigationConfig.order();
         int[] shown = app.flexygram.navigation.LiquidNavigationConfig.shown(slots);
