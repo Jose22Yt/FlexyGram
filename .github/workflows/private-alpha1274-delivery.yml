@@ -22,7 +22,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: 07834a9e385c5e33b2813c16ce78b5dc3a6bd42a
+          ref: a56b816d1e2166a72cda075d80be8b6e3b1073ca
           fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-java@v4
@@ -179,11 +179,11 @@ jobs:
         working-directory: approved
     env:
       NATIVE_TARGET: arm64-v8a
-      COMMIT_ID: 07834a9e385c5e33b2813c16ce78b5dc3a6bd42a
+      COMMIT_ID: a56b816d1e2166a72cda075d80be8b6e3b1073ca
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: 07834a9e385c5e33b2813c16ce78b5dc3a6bd42a
+          ref: a56b816d1e2166a72cda075d80be8b6e3b1073ca
           path: approved
           fetch-depth: 0
           submodules: recursive
@@ -195,7 +195,7 @@ jobs:
           sparse-checkout: tools/private_alpha1274
           persist-credentials: false
       - name: Require the exact approved application commit
-        run: test "$(git rev-parse HEAD)" = 07834a9e385c5e33b2813c16ce78b5dc3a6bd42a
+        run: test "$(git rev-parse HEAD)" = a56b816d1e2166a72cda075d80be8b6e3b1073ca
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -278,6 +278,14 @@ jobs:
           ALPHA_KEYSTORE_B64: ${{ secrets.ALPHA_KEYSTORE_B64 }}
           ALPHA_CERTIFICATE_SHA256: ${{ secrets.ALPHA_CERTIFICATE_SHA256 }}
         run: python3 tools/connected_alpha/ci_inputs.py
+      - name: Compile the complete application Java before native packaging
+        env:
+          TELEGRAM_APP_ID: ${{ secrets.TELEGRAM_APP_ID }}
+          TELEGRAM_APP_HASH: ${{ secrets.TELEGRAM_APP_HASH }}
+          ALPHA_STORE_PASSWORD: ${{ secrets.ALPHA_STORE_PASSWORD }}
+          ALPHA_KEY_ALIAS: ${{ secrets.ALPHA_KEY_ALIAS }}
+          ALPHA_KEY_PASSWORD: ${{ secrets.ALPHA_KEY_PASSWORD }}
+        run: ./gradlew :TMessagesProj:compileConnectedAlphaJavaWithJavac --no-daemon --console=plain --max-workers=2
       - name: Build Connected Alpha with original native code
         env:
           TELEGRAM_APP_ID: ${{ secrets.TELEGRAM_APP_ID }}
