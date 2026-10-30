@@ -1,0 +1,30 @@
+name: FlexyGram Smart Mini Pills contract
+on:
+  pull_request:
+    paths:
+      - 'TMessagesProj/src/main/java/app/flexygram/home/SignatureSmartPreviewPalette.java'
+      - 'TMessagesProj/src/main/java/app/flexygram/home/SignatureMiniPillClassifier.java'
+      - 'TMessagesProj/src/main/java/app/flexygram/home/SignatureSmartPillLayout.java'
+      - 'tools/smart_pills/**'
+      - '.github/workflows/smart-mini-pills.yml'
+  workflow_dispatch:
+
+jobs:
+  host:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Check classifier, geometry, dark/light contrast
+        shell: bash
+        run: |
+          mkdir -p /tmp/flexy-pill-host
+          javac -d /tmp/flexy-pill-host \
+            TMessagesProj/src/main/java/app/flexygram/home/SignatureSmartPreviewPalette.java \
+            TMessagesProj/src/main/java/app/flexygram/home/SignatureMiniPillClassifier.java \
+            TMessagesProj/src/main/java/app/flexygram/home/SignatureSmartPillLayout.java \
+            tools/smart_pills/SmartPillHostTest.java
+          java -cp /tmp/flexy-pill-host SmartPillHostTest
