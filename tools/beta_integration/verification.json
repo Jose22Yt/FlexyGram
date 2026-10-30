@@ -24,10 +24,11 @@
   "public_certificate_and_8_rejection_cases": "PASS",
   "official_certificate_sha256": "5a598fb5ba42949b67b7c2635106fafd5f23179397e4c098757a73cd2d2ef66c",
   "historical_source_host_suite": {
-    "passed": 373,
+    "passed": 374,
     "failures": 0,
     "errors": 0,
-    "seconds": 227.161
+    "seconds": 229.691
   },
-  "beta_resources_compile": "PASS"
+  "beta_resources_compile": "PASS",
+  "native_delete_ownership_and_visible_identity_selection": "PASS"
 }

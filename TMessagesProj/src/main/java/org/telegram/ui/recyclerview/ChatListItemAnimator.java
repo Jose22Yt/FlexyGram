@@ -1231,6 +1231,7 @@ public class ChatListItemAnimator extends DefaultItemAnimator {
 
     @Override
     public void endAnimations() {
+        flexyPendingDeletes.clear();
         if (BuildVars.LOGS_ENABLED) {
             FileLog.d("end animations");
         }
@@ -1541,14 +1542,31 @@ public class ChatListItemAnimator extends DefaultItemAnimator {
         animatorSet.start();
     }
 
+    // Weak keys do not retain removed message/account state if a native removal is cancelled.
+    private final java.util.Set<MessageObject> flexyPendingDeletes =
+            java.util.Collections.newSetFromMap(new java.util.WeakHashMap<>());
+
+    public void prepareFlexyDelete(RecyclerView.ViewHolder holder) {
+        if (holder == null || !(holder.itemView instanceof ChatMessageCell)
+                || app.flexygram.bubbles.deletion.DeleteMotionSettings.get(recyclerListView.getContext()) == 0) return;
+        MessageObject message = ((ChatMessageCell)holder.itemView).getMessageObject();
+        if (message != null) flexyPendingDeletes.add(message);
+    }
+
+    private boolean takeFlexyDelete(ChatMessageCell cell) {
+        MessageObject message = cell.getMessageObject();
+        boolean accepted = message != null && flexyPendingDeletes.remove(message);
+        return accepted && message.deleted && !message.scheduledSent
+                && cell.getCurrentMessagesGroup() == null;
+    }
+
     protected void animateRemoveImpl(final RecyclerView.ViewHolder holder, boolean thanos) {
         if (BuildVars.LOGS_ENABLED) {
             FileLog.d("animate remove impl " + (thanos ? " with thanos" : ""));
         }
         final View view = holder.itemView;
         int deleteStyle = app.flexygram.bubbles.deletion.DeleteMotionSettings.get(view.getContext());
-        if (view instanceof ChatMessageCell && deleteStyle != 0
-                && ((ChatMessageCell)view).getCurrentMessagesGroup() == null) {
+        if (view instanceof ChatMessageCell && takeFlexyDelete((ChatMessageCell)view) && deleteStyle != 0) {
             ChatMessageCell cell = (ChatMessageCell)view;
             android.graphics.RectF bounds = new android.graphics.RectF(
                     cell.getBackgroundDrawableLeft(), cell.getBackgroundDrawableTop(),

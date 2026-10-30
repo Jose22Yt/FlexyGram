@@ -28378,6 +28378,21 @@ public class ChatActivity extends BaseFragment implements
                             messagesSearchAdapter.notifyDataSetChanged();
                         }
                         removedIndexes.add(chatAdapter.messagesStartRow + index);
+                        // Mark only accepted native deletions, never filter/list refresh removals
+                        // or send/move-to-scheduled transitions. Capture still occurs in the animator.
+                        if (thanos && !sent && !obj.scheduledSent && fragmentBeginToShow
+                                && chatListItemAnimator != null && chatListView != null
+                                && chatListView.getItemAnimator() == chatListItemAnimator) {
+                            // Earlier removals in this batch already shifted the model indices.
+                            // Match the visible cell by message identity instead of stale positions.
+                            for (int childIndex = 0; childIndex < chatListView.getChildCount(); childIndex++) {
+                                View child = chatListView.getChildAt(childIndex);
+                                if (child instanceof ChatMessageCell && ((ChatMessageCell)child).getMessageObject() == obj) {
+                                    chatListItemAnimator.prepareFlexyDelete(chatListView.getChildViewHolder(child));
+                                    break;
+                                }
+                            }
+                        }
                         if (thanos && !sent && !obj.scheduledSent && removed != null && removed.messageOwner != null && removed.messageOwner.send_state == MessageObject.MESSAGE_SEND_STATE_SENT && currentTime - removed.messageOwner.date >= (currentChat != null || currentUser != null && currentUser.bot ? 2 : 0)) {
                             thanosMessagesIndexes.add(chatAdapter.messagesStartRow + index);
                             removed.deletedByThanos = LiteMode.isEnabled(LiteMode.FLAG_CHAT_THANOS);
