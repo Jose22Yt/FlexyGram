@@ -137,7 +137,8 @@ public final class SignatureSmartPreviews {
         if (message == null || message.messageOwner == null) return "";
         TLRPC.Message owner = message.messageOwner;
         if (message.isDocument()) {
-            String filename = FileLoader.getDocumentFileName(message.getDocument());
+            TLRPC.Document document = message.getDocument();
+            String filename = document == null ? null : FileLoader.getDocumentFileName(document);
             if (!TextUtils.isEmpty(filename)) return clean(filename);
         }
         if (kind == SignatureSmartPreviewPalette.JOINED
