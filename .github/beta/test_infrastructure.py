@@ -6,6 +6,7 @@ import contextlib
 import copy
 import importlib.util
 import io
+import hashlib
 import json
 import os
 import shutil
@@ -103,6 +104,56 @@ class ProtectionTests(unittest.TestCase):
         self.assertNotIn('SENSITIVE_SENTINEL', output.getvalue())
 
 
+class SourceApprovalTests(unittest.TestCase):
+    def fixture(self):
+        policy = protected()[0]
+        manifest = json.loads((audit.ROOT/'source_identity.json').read_text())
+        pull = {'number':145, 'user':{'id':126811980}, 'head':{'sha':audit.SOURCE,'repo':{'full_name':audit.REPO}},
+                'base':{'ref':'fix/beta-official-delivery-ready','repo':{'full_name':audit.REPO}},
+                'state':'open','merged':False,'draft':False}
+        reviews = [{'id':100, 'user':{'id':audit.REVIEWER_ID,'login':'dc6764071-wq'},
+                    'state':'APPROVED','commit_id':audit.SOURCE,'submitted_at':'2026-10-30T00:00:00Z',
+                    'author_association':'COLLABORATOR'}]
+        commit = {'sha':audit.SOURCE,'tree':{'sha':manifest['source_tree']}}
+        return policy, pull, reviews, commit, manifest
+
+    def test_approval_is_bound_to_exact_source_and_independent_identity(self):
+        self.assertEqual(audit.validate_source_review(*self.fixture())['review_id'], 100)
+        mutations = [lambda p,q,r,c,m:r.clear(),
+                     lambda p,q,r,c,m:r[0].update(state='DISMISSED'),
+                     lambda p,q,r,c,m:r[0].update(state='REQUEST_CHANGES'),
+                     lambda p,q,r,c,m:r[0].update(commit_id='0'*40),
+                     lambda p,q,r,c,m:r[0]['user'].update(id=126811980),
+                     lambda p,q,r,c,m:r[0].update(author_association='NONE'),
+                     lambda p,q,r,c,m:q['head'].update(sha='0'*40),
+                     lambda p,q,r,c,m:q['head']['repo'].update(full_name='attacker/fork'),
+                     lambda p,q,r,c,m:q.update(draft=True),
+                     lambda p,q,r,c,m:q.update(state='closed'),
+                     lambda p,q,r,c,m:c['tree'].update(sha='0'*40),
+                     lambda p,q,r,c,m:m.update(certificate_sha256='0'*64),
+                     lambda p,q,r,c,m:p['source_review'].update(head_sha='0'*40),
+                     lambda p,q,r,c,m:r.extend([copy.deepcopy(r[0])]*99),
+                     lambda p,q,r,c,m:r.append(dict(r[0],id=101,state='DISMISSED'))]
+        for mutate in mutations:
+            with self.subTest(mutation=mutate), self.assertRaises(ValueError):
+                data=self.fixture(); mutate(*data); audit.validate_source_review(*data)
+
+    def test_source_tree_and_critical_file_hashes_before_private_restore(self):
+        manifest=json.loads((audit.ROOT/'source_identity.json').read_text())
+        with tempfile.TemporaryDirectory() as folder:
+            source=Path(folder)
+            for name in manifest['files']:
+                target=source/name; target.parent.mkdir(parents=True,exist_ok=True)
+                target.write_bytes(subprocess.check_output(['git','show',audit.SOURCE+':'+name],cwd=ROOT))
+            with patch.object(build.subprocess,'check_output',return_value=manifest['source_tree']+'\n'):
+                build.verify_source_files(source)
+                certificate=source/'config/signing/flexygram-release.cer'
+                certificate.write_bytes(certificate.read_bytes()+b'UNKNOWN')
+                with self.assertRaises(ValueError): build.verify_source_files(source)
+            with patch.object(build.subprocess,'check_output',return_value='0'*40+'\n'):
+                with self.assertRaises(ValueError): build.verify_source_files(source)
+
+
 class WorkflowTests(unittest.TestCase):
     def test_dispatch_and_secret_boundaries(self):
         workflow = yaml.safe_load((ROOT/'.github/workflows/beta-private.yml').read_text())
@@ -153,7 +204,8 @@ class WorkflowTests(unittest.TestCase):
             activation_base = 'db1bea24b7b705de33f8ff8c8e174011c153cac7'
             changed = subprocess.check_output(['git','diff','--name-only',activation_base],cwd=ROOT,text=True).splitlines()
             self.assertTrue(changed and all(p.startswith('.github/beta/') or p in [
-                '.github/workflows/beta-private.yml','.github/workflows/beta-private-tests.yml'] for p in changed), changed)
+                '.github/workflows/beta-private.yml','.github/workflows/beta-private-tests.yml',
+                '.github/workflows/pr.yml'] for p in changed), changed)
             subprocess.run(['git','diff','--exit-code',activation_base,'--','.github/workflows/release.yml'],cwd=ROOT,check=True)
             return
         changed = subprocess.check_output(['git','diff','--name-only',audit.SOURCE],cwd=ROOT,text=True).splitlines()
@@ -162,6 +214,21 @@ class WorkflowTests(unittest.TestCase):
         for p in ['TMessagesProj', 'gradle', 'gradle.properties', 'config/signing',
                   'tools/beta_release/verify_beta_apk.py', 'tools/beta_release/review.json']:
             subprocess.run(['git','diff','--exit-code',audit.SOURCE,'--',p],cwd=ROOT,check=True)
+
+    def test_debug_retains_full_arm64_build_with_compatible_sdk_cmake(self):
+        workflow = yaml.safe_load((ROOT/'.github/workflows/pr.yml').read_text())
+        job = workflow['jobs']['build']
+        self.assertEqual(job['env']['NATIVE_TARGET'], 'arm64-v8a')
+        sdk = next(s for s in job['steps'] if s['name'] == 'Set up Android SDK Tools')
+        self.assertIn('cmake;3.31.6', sdk['with']['packages'].split())
+        selection = next(s for s in job['steps'] if s['name'] == 'Select compatible SDK CMake for pinned Chaquopy runtime')
+        self.assertIn('$ANDROID_HOME/cmake/3.31.6/bin/cmake', selection['run'])
+        self.assertIn('CMAKE=$cmake_bin', selection['run'])
+        self.assertIn('GITHUB_ENV', selection['run'])
+        debug = next(s for s in job['steps'] if s['name'] == 'Debug Build')
+        self.assertIn('./gradlew TMessagesProj:assembleDebug', debug['run'])
+        self.assertLess(job['steps'].index(selection), job['steps'].index(debug))
+        self.assertNotIn('CMAKE_POLICY_VERSION_MINIMUM', selection['run'])
 
 
 class PrivateInputsTests(unittest.TestCase):
@@ -221,7 +288,7 @@ class PrivateInputsTests(unittest.TestCase):
         key = self.runner/'disposable-delivery-encryption-key.txt'
         subprocess.run(['age-keygen','-o',str(key)],stdout=subprocess.PIPE,stderr=subprocess.PIPE,check=True)
         recipient = subprocess.check_output(['age-keygen','-y',str(key)],text=True).strip()
-        for failure in [None, 'ASSEMBLE', 'VERIFY', 'ENCRYPT']:
+        for failure in [None, 'PROOF', 'ASSEMBLE', 'VERIFY', 'OLD_CERT', 'ENCRYPT']:
             with self.subTest(failure=failure):
                 self.source.mkdir(exist_ok=True)
                 (self.source/'TMessagesProj/src/beta').mkdir(parents=True, exist_ok=True)
@@ -233,7 +300,11 @@ class PrivateInputsTests(unittest.TestCase):
                 original = build.run_private
                 def fake(args, source, child, log, output=None):
                     if args[0] == './gradlew':
-                        self.assertEqual(args, ['./gradlew',':TMessagesProj:assembleBeta','--no-daemon','--console=plain'])
+                        self.assertIn(args[1], [':TMessagesProj:validateFlexyGramBetaConfiguration', ':TMessagesProj:assembleBeta'])
+                        self.assertEqual(args[2:], ['--no-daemon','--console=plain'])
+                        if args[1] == ':TMessagesProj:validateFlexyGramBetaConfiguration':
+                            if failure == 'PROOF': raise RuntimeError('SENSITIVE_SENTINEL')
+                            return
                         if failure == 'ASSEMBLE': raise RuntimeError('SENSITIVE_SENTINEL')
                         folder = source/'TMessagesProj/build/outputs/apk/beta'; folder.mkdir(parents=True)
                         with zipfile.ZipFile(folder/'synthetic.apk','w') as apk: apk.writestr('classes.dex',b'SYNTHETIC_NOT_INSTALLABLE')
@@ -246,10 +317,13 @@ class PrivateInputsTests(unittest.TestCase):
                         self.assertEqual(args[1], 'tools/beta_release/verify_beta_apk.py')
                         import hashlib
                         data = {'status':'PASS_OFFICIAL_BETA_ARTIFACT_ONLY','version_code':1290,'elf_count':96,
+                                'certificate_sha256': '5a598fb5ba42949b67b7c2635106fafd5f23179397e4c098757a73cd2d2ef66c' if failure == 'OLD_CERT' else build.CERTIFICATE,
+                                'application_id':'com.flexygram.messenger','version_name':'1.0.0-beta.1',
                                 'sha256':hashlib.sha256(Path(args[2]).read_bytes()).hexdigest()}
                         output.write_text(json.dumps(data))
                 stdout, stderr = io.StringIO(), io.StringIO()
                 with patch.object(build,'HERE',control), patch.object(build,'run_private',side_effect=fake), \
+                     patch.object(build,'verify_source_files'), \
                      patch.object(build.subprocess,'check_output',side_effect=[(audit.SOURCE+'\n').encode(),b'']) as git:
                     # Production check_output requests text=True.
                     git.side_effect = [audit.SOURCE+'\n', '']

@@ -47,7 +47,16 @@ jobs:
       - name: Set up Android SDK Tools
         uses: android-actions/setup-android@v4
         with:
-          packages: "build-tools;36.0.0 ndk;27.2.12479018 platforms;android-37.0"
+          packages: "build-tools;36.0.0 ndk;27.2.12479018 platforms;android-37.0 cmake;3.31.6"
+      - name: Select compatible SDK CMake for pinned Chaquopy runtime
+        run: |
+          set -euo pipefail
+          cmake_bin="$ANDROID_HOME/cmake/3.31.6/bin/cmake"
+          test -x "$cmake_bin"
+          "$cmake_bin" --version
+          "$cmake_bin" --version | head -n 1 | grep -Fx 'cmake version 3.31.6'
+          echo "CMAKE=$cmake_bin" >> "$GITHUB_ENV"
+          echo "$ANDROID_HOME/cmake/3.31.6/bin" >> "$GITHUB_PATH"
       - name: Configure Android SDK Path
         run: |
           echo "sdk.dir=${ANDROID_HOME}" >> local.properties

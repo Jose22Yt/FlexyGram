@@ -1,6 +1,6 @@
 # Primera Beta oficial: infraestructura privada
 
-Estado: controles del entorno configurados; auditoría real y revisión independiente de esta política pendientes. **Compilación firmada bloqueada** hasta cargar y comprobar los siete secretos después de una auditoría satisfactoria. Código fuente fijo: PR #141, `aeb6b5fc01f6332ab82194e311b52a19d702a81e`. No hay APK nueva ni aceptación en Poco. Paquete `com.flexygram.messenger`, nombre `FlexyGram Beta`, versión `1.0.0-beta.1`, código `1290`, alias `flexygram-release`, SHA-256 `5a598fb5ba42949b67b7c2635106fafd5f23179397e4c098757a73cd2d2ef66c`.
+Estado: controles del entorno configurados; auditoría real y revisión independiente de esta política pendientes. **Compilación firmada bloqueada** hasta cargar y comprobar los siete secretos después de una auditoría satisfactoria. Fuente candidata fijada: PR #145, `df140729c39125b65470934bccfde4db018a2f67`, derivada de PR141 sin cambiar funciones Android. No hay APK nueva ni aceptación en Poco. Paquete `com.flexygram.messenger`, nombre `FlexyGram Beta`, versión `1.0.0-beta.1`, código `1290`, alias `flexygram-release`, SHA-256 `e71c4d1e14dd940892009c61164df522c133029df6d1258561f6a1a4d1f3c015`.
 
 ## Ruta de revisión y activación
 
@@ -35,14 +35,13 @@ Observación actual (2026-10-30): entorno real ID `25818874267`; único revisor 
 
 ## Entrega cifrada: preparar antes del build
 
-Instalar `age` en el equipo privado que recibirá la APK y crear allí una identidad **de cifrado de entrega**, independiente de la firma Android:
+Conservar la identidad de cifrado de entrega existente del propietario, independiente de la firma Android. Verificar localmente su destinatario público:
 
 ```bash
-age-keygen -o flexygram-delivery-identity.txt
 age-keygen -y flexygram-delivery-identity.txt
 ```
 
-Esto NO crea otra llave de firma Android ni reemplaza el PKCS12. Guardar la identidad de entrega localmente, fuera de repositorios/chat. Copiar únicamente el destinatario público `age1...` al campo revisado `ui_review.delivery_age_recipient` y a la variable de entorno GitHub **FLEXYGRAM_BETA_AGE_RECIPIENT**. El build exige igualdad exacta; `age` valida la clave real. Su pérdida impide descifrar la entrega; conservar respaldo privado. Nunca cargar la identidad privada de entrega en GitHub.
+No se genera una identidad de entrega nueva ni se reemplaza el PKCS12. Guardar la identidad de entrega localmente, fuera de repositorios/chat. Copiar únicamente el destinatario público `age1...` al campo revisado `ui_review.delivery_age_recipient` y a la variable de entorno GitHub **FLEXYGRAM_BETA_AGE_RECIPIENT**. El build exige igualdad exacta; `age` valida la clave real. Su pérdida impide descifrar la entrega; conservar respaldo privado. Nunca cargar la identidad privada de entrega en GitHub.
 
 Los artefactos del repositorio público pueden ser accesibles a otros usuarios autenticados: por ello SOLO se sube un `.tar.age` cifrado para ese destinatario, con retención de un día. El APK, los reportes internos, las credenciales y las claves no se publican en claro. La privacidad depende de verificar el destinatario correcto antes de aprobar el build.
 
@@ -110,3 +109,19 @@ Comparar el SHA con `verification.json` y `provenance.json`, comprobar `source_c
 Ejecutar `python3 -m unittest discover -s .github/beta -p 'test_*.py' -v` con PyYAML6.0.3 y `age` instalados. El workflow separado **Beta private infrastructure tests (no secrets)** corre en PR sin entorno ni secretos. Incluye recorrido de éxito con APK sintética, build/verificador simulados, cifrado/descifrado age reales, limpieza tras fallos de build/verificación/cifrado y múltiples rechazos de políticas/entradas/procedencia. No genera ninguna llave de firma: la única clave de prueba es de cifrado de entrega desechable.
 
 Eso prueba el cableado y los controles de infraestructura. **No prueba todavía descarga/compilación completa de SDK/JNI/DEX, acceso real a secretos, aprobación real del entorno, firma oficial, instalación o rendimiento.** `mode=audit` real solo podrá pasar una vez que el propietario haya creado y revisado las protecciones. No cargar secretos basándose únicamente en pruebas con fixtures.
+
+## Activación de la identidad AntiTerm (PR145)
+
+PR145 aún necesita aprobación independiente válida de dc6764071-wq (ID251905314) sobre el commit exacto df140729c39125b65470934bccfde4db018a2f67. No se registra una aprobación inexistente. El auditor consulta PR, historial de revisiones y árbol Git en vivo; ausencia, revocación, cabeza movida, fork, historial truncado o API inaccesible bloquean audit/build sin claves privadas. Este control se repite después de la aprobación del entorno.
+
+source_identity.json fija árbol Git y hashes SHA256 de certificado, metadatos, Gradle y verificadores críticos. private_build.py los comprueba antes de reconstruir secretos. La clave privada se prueba mediante el validador Gradle original validateFlexyGramBetaConfiguration, que abre PKCS12 con contraseñas separadas y firma/verifica un desafío en memoria. Su salida va al log privado temporal. Solo después se ejecuta assembleBeta; el informe del APK también debe coincidir con certificado, paquete, versión y código exactos. El resultado real de esa prueba sigue pendiente mientras falten secretos.
+
+La auditoría #5 acredita únicamente la infraestructura anterior. Tras integrar este PR protegido debe repetirse mode=audit. only_environment_scoped_beta_secrets continúa false: la preparación del PR no habilita builds. No se modifica release.yml, no se publican Releases ni APK sin cifrar. Esta activación cambia únicamente .github y conserva la exclusión de esos paths del Release heredado.
+
+El nombre visible de la fuente fijada sigue siendo FlexyGram Beta; producto FlexyGram, versión 1.0.0-beta.1, código1290, paquete com.flexygram.messenger. No se vuelve a generar clave ni se modifica aplicación/recursos para esta activación.
+
+## Debug CI: CMake del runtime Chaquopy
+
+El submódulo exteraless/chaquopy d47b4a1e1817b4590b9c56dfd4ee5fcfdd6f0cbd declara cmake_minimum_required(VERSION 3.4.1) en product/runtime/CMakeLists.txt. exteraless/build.sh usa CMAKE si está definido y, en caso contrario, el CMake del PATH del runner. CMake4 eliminó esa compatibilidad; el Debug heredado no fijaba esa herramienta.
+
+pr.yml instala y selecciona explícitamente SDK CMake3.31.6, igual que el workflow Beta. Verifica su versión y lo exporta por GITHUB_ENV/GITHUB_PATH antes de Gradle. No cambia el submódulo, mínimos nativos, flags de16KB, ABI, fuentes ni tests. No introduce CMAKE_POLICY_VERSION_MINIMUM ni omite Chaquopy. Debug sigue ejecutando assembleDebug completo; su resultado real en Actions debe comprobarse antes de integrar.
