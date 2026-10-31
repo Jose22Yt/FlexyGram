@@ -14,7 +14,7 @@ import zipfile
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-SOURCE_COMMIT = '022849deb7f01f850a2f517d2b0602e77cad7e37'
+SOURCE_COMMIT = '237ac3f5c6bb21ffcc2539a07c532318116a24a0'
 CERTIFICATE = 'e71c4d1e14dd940892009c61164df522c133029df6d1258561f6a1a4d1f3c015'
 SECRET_NAMES = ('FLEXYGRAM_RELEASE_KEYSTORE_B64', 'FLEXYGRAM_RELEASE_STORE_PASSWORD',
                 'FLEXYGRAM_RELEASE_KEY_PASSWORD', 'FLEXYGRAM_RELEASE_KEY_ALIAS',
@@ -170,8 +170,15 @@ def build(env):
         run_private(['./gradlew', ':TMessagesProj:validateFlexyGramBetaConfiguration',
                      '--no-daemon', '--console=plain'], source, child, log)
         stage = 'ASSEMBLE_BETA'
-        run_private(['./gradlew', ':TMessagesProj:assembleBeta', '--no-daemon', '--console=plain'],
-                    source, child, log)
+        try:
+            run_private(['./gradlew', ':TMessagesProj:assembleBeta', '--no-daemon', '--console=plain'],
+                        source, child, log)
+        except Exception:
+            if log.is_file():
+                for line in log.read_text(errors='replace').splitlines()[-60:]:
+                    if not any(s in line for s in SECRET_NAMES):
+                        print('GRADLE_LOG: ' + line, file=sys.stderr)
+            raise
         stage = 'OFFICIAL_APK_VERIFICATION'
         apks = list((source/'TMessagesProj/build/outputs/apk/beta').rglob('*.apk'))
         if len(apks) != 1:
