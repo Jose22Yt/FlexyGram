@@ -14,7 +14,8 @@ import zipfile
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-SOURCE_COMMIT = 'aeb6b5fc01f6332ab82194e311b52a19d702a81e'
+SOURCE_COMMIT = 'df140729c39125b65470934bccfde4db018a2f67'
+CERTIFICATE = 'e71c4d1e14dd940892009c61164df522c133029df6d1258561f6a1a4d1f3c015'
 SECRET_NAMES = ('FLEXYGRAM_RELEASE_KEYSTORE_B64', 'FLEXYGRAM_RELEASE_STORE_PASSWORD',
                 'FLEXYGRAM_RELEASE_KEY_PASSWORD', 'FLEXYGRAM_RELEASE_KEY_ALIAS',
                 'TELEGRAM_APP_ID', 'TELEGRAM_APP_HASH', 'FLEXYGRAM_BETA_FIREBASE_JSON_B64')
@@ -122,6 +123,19 @@ def require_private_scope(policy):
             and policy['ui_review'].get('only_environment_scoped_beta_secrets') is True)
 
 
+def verify_source_files(source):
+    manifest = json.loads((HERE/'source_identity.json').read_text())
+    require(manifest['source_commit'] == SOURCE_COMMIT
+            and manifest['certificate_sha256'] == CERTIFICATE
+            and manifest['files']['config/signing/flexygram-release.cer'] == CERTIFICATE)
+    tree = subprocess.check_output(['git', 'rev-parse', 'HEAD^{tree}'], cwd=source, text=True).strip()
+    require(tree == manifest['source_tree'])
+    for name, digest in manifest['files'].items():
+        path = source/name
+        require(not path.is_symlink() and path.resolve().is_relative_to(source.resolve())
+                and hashlib.sha256(path.read_bytes()).hexdigest() == digest)
+
+
 def build(env):
     os.umask(0o077)
     _, temp, source = locations(env)
@@ -144,6 +158,7 @@ def build(env):
         if changed:
             require((source/'gradle/gradle-daemon-jvm.properties').read_text()
                     == 'toolchainVersion=21\ntoolchainVendor=ADOPTIUM\n')
+        verify_source_files(source)
         versions = (source/'gradle.properties').read_text().splitlines()
         require('BETA_VERSION_CODE=1290' in versions and 'BETA_VERSION_NAME=1.0.0-beta.1' in versions
                 and 'APP_PACKAGE=com.flexygram.messenger' in versions)
@@ -151,6 +166,9 @@ def build(env):
         log = private/'private-build.log'
         stage = 'CONFIGURATION_PREFLIGHT'
         run_private([sys.executable, 'tools/beta_release/preflight.py'], source, child, log)
+        stage = 'PRIVATE_KEY_POSSESSION_AND_BETA_CONFIGURATION'
+        run_private(['./gradlew', ':TMessagesProj:validateFlexyGramBetaConfiguration',
+                     '--no-daemon', '--console=plain'], source, child, log)
         stage = 'ASSEMBLE_BETA'
         run_private(['./gradlew', ':TMessagesProj:assembleBeta', '--no-daemon', '--console=plain'],
                     source, child, log)
@@ -167,10 +185,14 @@ def build(env):
         report = json.loads(report_path.read_text())
         require(report['status'] == 'PASS_OFFICIAL_BETA_ARTIFACT_ONLY'
                 and report['version_code'] == 1290 and report['elf_count'] == 96
+                and report['certificate_sha256'] == CERTIFICATE
+                and report['application_id'] == 'com.flexygram.messenger'
+                and report['version_name'] == '1.0.0-beta.1'
                 and report['sha256'] == hashlib.sha256(apk.read_bytes()).hexdigest())
         provenance = {'source_commit': SOURCE_COMMIT, 'dispatcher_commit': env['GITHUB_SHA'],
                       'run_id': env['GITHUB_RUN_ID'], 'run_attempt': env['GITHUB_RUN_ATTEMPT'],
-                      'apk_sha256': report['sha256'], 'android_runtime': 'NOT_TESTED'}
+                      'apk_sha256': report['sha256'], 'certificate_sha256': CERTIFICATE,
+                      'private_key_proof': 'PASS_GRADLE_CHALLENGE', 'android_runtime': 'NOT_TESTED'}
         (private/'provenance.json').write_text(json.dumps(provenance, indent=2)+'\n')
         package = private/'delivery.tar'
         with tarfile.open(package, 'w') as archive:

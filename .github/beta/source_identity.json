@@ -1,0 +1,20 @@
+{
+  "source_commit": "df140729c39125b65470934bccfde4db018a2f67",
+  "source_tree": "f497baaca58580f274bb533e50c0ee3994a55d0f",
+  "base_commit": "aeb6b5fc01f6332ab82194e311b52a19d702a81e",
+  "source_pr": 145,
+  "certificate_sha256": "e71c4d1e14dd940892009c61164df522c133029df6d1258561f6a1a4d1f3c015",
+  "files": {
+    "config/signing/flexygram-release.cer": "e71c4d1e14dd940892009c61164df522c133029df6d1258561f6a1a4d1f3c015",
+    "config/signing/identity.properties": "34b6725c547567631463bdbd4e2a821370e750804f187c87f6ad535c8a02cac1",
+    "config/signing/public-verification.json": "776a1d50ca69204129606f85bd8ef4fab9abc7177401a7c9699577a6919c53db",
+    "gradle.properties": "fcb624436da2c281ec58e0764df0bc6a49b4841d671af4130b682ab713b769b4",
+    "gradle/flexygram-beta.gradle": "02dd9c8f7a579ca483ed43d881add58372b7962f418a4326ad9d622100522500",
+    "TMessagesProj/build.gradle": "d3bb31b8025da54740c14a5c72a45f7d3eaf06fa5fb6fd2c341f4d30a2bf6105",
+    "tools/signing/VerifySigning.java": "3f0baf9db1d80751f6d6af2e0012a0159f7a1493d1d4ea5c9efb3b066fe6b3ea",
+    "tools/beta_release/verify_beta_apk.py": "0a61a634a51d4e8944f01acf836fa6efa399510ff1f23a09c38d2adeacf5b36b",
+    "tools/beta_release/preflight.py": "03c91071b798522258f0292d0ebfae1c469583e32a0a693fced4a5286040cd12",
+    "tools/beta_release/review.json": "e5fc25fa431baecef4db058f069b04a37c3eb2f271ac635fbbb8fb7fdd057027",
+    "tools/connected_alpha/verify_apk.py": "7f2bd943f232329870ad6657eee73667f380449da7f89299d47d2980ecb03465"
+  }
+}

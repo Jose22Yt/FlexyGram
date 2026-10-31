@@ -8,8 +8,11 @@ import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
-SOURCE = 'aeb6b5fc01f6332ab82194e311b52a19d702a81e'
+SOURCE = 'df140729c39125b65470934bccfde4db018a2f67'
 REPO = 'Jose22Yt/FlexyGram'
+CERTIFICATE = 'e71c4d1e14dd940892009c61164df522c133029df6d1258561f6a1a4d1f3c015'
+SOURCE_BASE = 'aeb6b5fc01f6332ab82194e311b52a19d702a81e'
+REVIEWER_ID = 251905314
 
 
 def require(condition, code):
@@ -63,6 +66,36 @@ def validate(policy, environment, branches, main):
             'limitation': 'Detailed main rules require owner UI review; signing inputs are checked after this no-secret audit.'}
 
 
+def validate_source_review(policy, pull, reviews, commit, manifest):
+    expected = {'pull_request': 145, 'head_sha': SOURCE, 'base_sha': SOURCE_BASE,
+                'reviewer_ids': [REVIEWER_ID], 'certificate_sha256': CERTIFICATE}
+    require(policy.get('source_review') == expected, 'SOURCE_REVIEW_POLICY')
+    require(manifest.get('source_commit') == SOURCE and manifest.get('source_pr') == 145
+            and manifest.get('base_commit') == SOURCE_BASE
+            and manifest.get('certificate_sha256') == CERTIFICATE, 'SOURCE_MANIFEST_IDENTITY')
+    require(pull.get('number') == 145 and pull.get('user', {}).get('id') == 126811980
+            and pull.get('head', {}).get('sha') == SOURCE
+            and pull.get('head', {}).get('repo', {}).get('full_name') == REPO
+            and pull.get('base', {}).get('repo', {}).get('full_name') == REPO
+            and pull.get('base', {}).get('ref') == 'fix/beta-official-delivery-ready'
+            and pull.get('draft') is False
+            and (pull.get('state') == 'open' or pull.get('merged') is True), 'SOURCE_PR_CHANGED_OR_CLOSED')
+    require(commit.get('sha') == SOURCE and commit.get('tree', {}).get('sha') == manifest.get('source_tree'),
+            'SOURCE_TREE_CHANGED')
+    # Never silently truncate reviews: unreadable or oversized review history blocks.
+    require(isinstance(reviews, list) and len(reviews) < 100, 'SOURCE_REVIEW_HISTORY_UNAVAILABLE')
+    decisions = [r for r in reviews if r.get('user', {}).get('id') == REVIEWER_ID
+                 and r.get('state') != 'COMMENTED']
+    require(decisions, 'SOURCE_INDEPENDENT_APPROVAL_PENDING')
+    latest = max(decisions, key=lambda r: r.get('id', 0))
+    require(latest.get('state') == 'APPROVED' and latest.get('commit_id') == SOURCE
+            and latest.get('user', {}).get('login') == 'dc6764071-wq'
+            and latest.get('author_association') == 'COLLABORATOR'
+            and latest.get('submitted_at'), 'SOURCE_INDEPENDENT_APPROVAL_PENDING_OR_STALE')
+    return {'pull_request': 145, 'commit': SOURCE, 'review_id': latest['id'],
+            'reviewer_id': REVIEWER_ID, 'certificate_sha256': CERTIFICATE}
+
+
 def get(tail):
     token = os.environ.get('GH_TOKEN')
     headers = {'Accept': 'application/vnd.github+json', 'User-Agent': 'FlexyGram-Beta-audit',
@@ -82,10 +115,14 @@ def main():
         report = validate(policy, get('environments/flexygram-beta'),
                           get('environments/flexygram-beta/deployment-branch-policies?per_page=100'),
                           get('branches/main'))
+        manifest = json.loads((ROOT/'source_identity.json').read_text())
+        report['source_review'] = validate_source_review(
+            policy, get('pulls/145'), get('pulls/145/reviews?per_page=100'),
+            get('git/commits/'+SOURCE), manifest)
         print(json.dumps(report, indent=2))
     except Exception:
         # No HTTP response body, token, traceback or external values go into logs.
-        print('BLOCKED: environment unavailable, protection drift, or pending owner UI review.', file=sys.stderr)
+        print('BLOCKED: environment, source approval/integrity, or recorded UI controls unavailable or changed.', file=sys.stderr)
         return 1
     return 0
 
