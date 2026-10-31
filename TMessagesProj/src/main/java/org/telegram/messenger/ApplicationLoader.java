@@ -384,7 +384,7 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
         UserConfig config = UserConfig.getInstance(account);
         if (!config.isClientActivated() || config.getCurrentUser() == null) return;
         MessagesController controller = MessagesController.getInstance(account);
-        if (controller.dialogsLoaded || !controller.getDialogs(0).isEmpty()) return;
+        if (controller.dialogsLoaded || !controller.allDialogs.isEmpty() || !controller.getDialogs(0).isEmpty()) return;
         android.os.Trace.beginSection("Flexy.startup.request_local_dialogs");
         try {
             controller.loadDialogs(0, 0, 100, true);
@@ -515,12 +515,12 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
         } else if (!remoteFailed && PushListenerController.getProvider().hasServices()) {
             return;
         } else {
-            enabled = MessagesController.getMainSettings(UserConfig.selectedAccount).getBoolean("keepAliveService", false);
+            enabled = MessagesController.getMainSettings(UserConfig.selectedAccount).getBoolean("keepAliveService", true);
             SharedPreferences.Editor editor = preferences.edit();
             editor.putBoolean("pushService", enabled);
-            editor.putBoolean("pushConnection", enabled);
+            editor.putBoolean("pushConnection", true);
             editor.apply();
-            ConnectionsManager.getInstance(UserConfig.selectedAccount).setPushConnectionEnabled(enabled);
+            ConnectionsManager.getInstance(UserConfig.selectedAccount).setPushConnectionEnabled(true);
         }
         if (enabled) {
             AndroidUtilities.runOnUIThread(() -> {
@@ -639,7 +639,9 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
             for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
                 if (!app.flexygram.performance.StartupAccounts.needsControllers(a, UserConfig.selectedAccount,
                         UserConfig.getInstance(a).isClientActivated())) continue;
-                ConnectionsManager.getInstance(a).scheduleConnectionCheck();
+                ConnectionsManager cm = ConnectionsManager.getInstance(a);
+                cm.resumeNetworkMaybe();
+                cm.scheduleConnectionCheck();
                 FileLoader.getInstance(a).onNetworkChanged(isSlow);
             }
         });
