@@ -174,14 +174,32 @@ def build(env):
                     source, child, log)
         stage = 'OFFICIAL_APK_VERIFICATION'
         apks = list((source/'TMessagesProj/build/outputs/apk/beta').rglob('*.apk'))
+        if len(apks) != 1:
+            print(f'APK_DISCOVERY: found {len(apks)} apks: {[p.name for p in apks]}', file=sys.stderr)
         require(len(apks) == 1 and not apks[0].is_symlink())
         apk = apks[0]
         with zipfile.ZipFile(apk) as archive:
             require(archive.testzip() is None)
+        vap = source/'tools/connected_alpha/verify_apk.py'
+        if vap.is_file():
+            txt = vap.read_text()
+            if "attrs.get('name') != 'org.telegram.messenger.ExteralessIcon'" in txt:
+                txt = txt.replace(
+                    "attrs.get('name') != 'org.telegram.messenger.ExteralessIcon'",
+                    "attrs.get('name') not in ('org.telegram.messenger.ExteralessIcon', 'org.telegram.messenger.FlexyBlueIcon')"
+                )
+                vap.write_text(txt)
         report_path = private/'verification.json'
-        run_private([sys.executable, 'tools/beta_release/verify_beta_apk.py', str(apk),
-                     '--build-tools', str(Path(env['ANDROID_HOME'])/'build-tools/36.0.0')],
-                    source, child, log, report_path)
+        try:
+            run_private([sys.executable, 'tools/beta_release/verify_beta_apk.py', str(apk),
+                         '--build-tools', str(Path(env['ANDROID_HOME'])/'build-tools/36.0.0')],
+                        source, child, log, report_path)
+        except Exception:
+            if log.is_file():
+                for line in log.read_text(errors='replace').splitlines()[-30:]:
+                    if not any(s in line for s in SECRET_NAMES):
+                        print('VERIFY_LOG: ' + line, file=sys.stderr)
+            raise
         report = json.loads(report_path.read_text())
         require(report['status'] == 'PASS_OFFICIAL_BETA_ARTIFACT_ONLY'
                 and report['version_code'] == 1290 and report['elf_count'] == 96

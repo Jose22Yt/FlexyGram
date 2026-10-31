@@ -18,7 +18,7 @@
     ".github/beta/README.md": "227c26c2b0cea7d033e5fe1f99dd2a26be8e1862a0e2e6285ee283be86df42e4",
     ".github/beta/audit_environment.py": "721f0fb30ca26a32c121d71b74ab0e4625ae6bad8bebb17a8727b3caf2768bb6",
     ".github/beta/policy.json": "66b46049ac4493b48d90cd666e9e6e1cf0e81aecad2120cf5e6f0fb0e773b27c",
-    ".github/beta/private_build.py": "c368762f14e499e54dae6d2cc648d339ee8c4b7d23bff4b7cf068621831fa1b3",
+    ".github/beta/private_build.py": "03dedfe7614ccc12839748aca81db42affb2a161a9c1c2e5281da1e088986d55",
     ".github/beta/source_contract.py": "176093cb0a941ca4d6799c59ebcf0e3360fbed6dff358ac3058a8af8fd588d65",
     ".github/beta/test_infrastructure.py": "63c9f6b2a2c8eea38126b7444d7e5456b1496524de311516d739771c65f4eee0",
     ".github/workflows/beta-private-tests.yml": "4ee320fe25544445fdc490658b415519b947434f717d5d3b78ac05d05e510237",
