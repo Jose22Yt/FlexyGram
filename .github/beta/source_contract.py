@@ -1,4 +1,4 @@
-"""Exact infrastructure-only audit overlay over pinned PR145. Never used in the APK build."""
+"""Exact infrastructure-only audit overlay over pinned PR150. Never used in the APK build."""
 from functools import lru_cache
 import hashlib
 import json
@@ -6,7 +6,7 @@ from pathlib import Path
 import subprocess
 
 ROOT = Path(__file__).resolve().parents[2]
-BASE = 'df140729c39125b65470934bccfde4db018a2f67'
+BASE = '022849deb7f01f850a2f517d2b0602e77cad7e37'
 MANIFEST = ROOT/'.github/beta/review.json'
 
 
