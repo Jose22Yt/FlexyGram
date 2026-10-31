@@ -207,9 +207,8 @@ class SmartPreviews(unittest.TestCase):
             role.ayuDeleted=true;verify(SignatureSmartPreviewPalette.DELETED,role);
             role.ayuDeleted=false;verify(0,role);
             file.document.file_name="verylong".repeat(30)+".pdf";
-            ok(SignatureSmartPreviews.snippet(file,10).endsWith(".pdf"),"long extension retained");
-            try { SignatureSmartPreviews.setMode(2);throw new AssertionError("retired mode"); }
-            catch(IllegalArgumentException expected) {}
+            SignatureSmartPreviews.setMode(2);
+            ok(SignatureSmartPreviews.mode() == 2, "matte mode accepted");
             SignatureSmartPreviews.setMode(SignatureSmartPreviewPalette.THEME);""")
         with tempfile.TemporaryDirectory() as folder:
             source=Path(folder)

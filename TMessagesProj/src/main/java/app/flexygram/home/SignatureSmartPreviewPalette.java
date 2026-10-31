@@ -8,32 +8,64 @@ public final class SignatureSmartPreviewPalette {
             PNG=16, JPG=17, IMAGE_FILE=18, GIF=19, STICKER=20, POLL=21,
             JOINED=22, LEFT=23, PINNED=24, EDITED=25, DOCUMENT=26,
             SPREADSHEET=27, PRESENTATION=28, CHANNEL=29, ADMIN=30, OWNER=31, DELETED=32;
-    public static final int ADAPTIVE=0, THEME=1, OFF=3;
+    public static final int ADAPTIVE=0, THEME=1, MATTE=2, OFF=3;
     private static final int[] BASE={
-        0xff8892a0,0xff3488df,0xff9960cb,0xffd45a91,
-        0xff24a2ae,0xff21a36b,0xffc78d37,0xff7970ce,0xffd58a53,0xff6796c9,
-        0xff3a82c2,0xff4e91a6,0xffbc823e,0xffa86b42,0xffac8942,0xff269c80,
-        0xffc09b46,0xffc18d46,0xff64a9a0,0xffba6ca8,0xffab8ad5,0xff888ad2,
-        0xff269b69,0xffbe7063,0xff6296c8,0xff8393b8,0xff4d91ca,0xff329b9d,
-        0xff8981bf,0xff548da5,0xffad8b48,0xffb38d49,0xffb56e73
+        0xff8892a0,0xff1e88e5,0xff8e24aa,0xffe91e63,
+        0xff00acc1,0xff00897b,0xff2e7d32,0xff5e35b1,0xffff8f00,0xff0288d1,
+        0xff1e88e5,0xff1976d2,0xffff9800,0xffff8f00,0xffffa000,0xff00897b,
+        0xff2e7d32,0xff388e3c,0xff43a047,0xff5e35b1,0xff7b1fa2,0xff00838f,
+        0xff00897b,0xffc2185b,0xff0097a7,0xff546e7a,0xff1e88e5,0xff2e7d32,
+        0xffe65100,0xff546e7a,0xffffb300,0xffff8f00,0xffe53935
     };
     private int oldKind=-1,oldMode=-1,oldAccent,oldSurface;
-    private int background=0xffe6edf4,foreground=0xff26313d;
+    private int background=0xffe6edf4,foreground=0xff26313d,iconColor=0xff26313d;
     public int background(){return background;}
     public int foreground(){return foreground;}
+    public int iconColor(){return iconColor;}
     public boolean update(int kind,int mode,int accent,int surface) {
-        if(kind<0||kind>=BASE.length||mode<ADAPTIVE||mode>THEME)kind=NONE;
+        if(kind<0||kind>=BASE.length||mode<ADAPTIVE||mode>OFF)kind=NONE;
         if(oldKind==kind&&oldMode==mode&&oldAccent==accent&&oldSurface==surface)return false;
         oldKind=kind;oldMode=mode;oldAccent=accent;oldSurface=surface;
         int opaqueSurface=surface|0xff000000;
         int base=BASE[kind];
-        int main=mode==THEME?(accent|0xff000000):base;
-        float tint=.12f;
-        background=blend(opaqueSurface,main,tint);
-        int ink=blend(main,luminance(background)>.48?0xff172332:0xfff7f9fc,.58f);
-        if(contrast(ink,background)<4.5)ink=luminance(background)>.23?0xff172332:0xfff7f9fc;
-        if(contrast(ink,background)<4.5)ink=luminance(background)>.18?0xff000000:0xffffffff;
-        foreground=ink;
+        boolean isDark=luminance(opaqueSurface)<0.45;
+        int main=(mode==THEME)?(accent|0xff000000):base;
+
+        if(mode==MATTE){
+            if(isDark){
+                background=blend(opaqueSurface,0xffffffff,0.16f);
+                foreground=0xffffffff;
+                iconColor=blend(base,0xffffffff,0.35f);
+            }else{
+                background=blend(opaqueSurface,0xff000000,0.08f);
+                foreground=0xff1c2024;
+                iconColor=blend(base,0xff000000,0.20f);
+            }
+        }else{
+            if(isDark){
+                background=blend(opaqueSurface,main,0.28f);
+                foreground=0xffffffff;
+                iconColor=foreground;
+            }else{
+                background=blend(0xffffffff,main,0.16f);
+                int darkInk=blend(main,0xff000000,0.40f);
+                if(contrast(darkInk,background)<4.5){
+                    darkInk=blend(main,0xff000000,0.60f);
+                }
+                foreground=darkInk;
+                iconColor=foreground;
+            }
+        }
+
+        if(contrast(foreground,background)<4.5){
+            foreground=luminance(background)>0.23?0xff172332:0xfff7f9fc;
+        }
+        if(contrast(foreground,background)<4.5){
+            foreground=luminance(background)>0.18?0xff000000:0xffffffff;
+        }
+        if(mode!=MATTE){
+            iconColor=foreground;
+        }
         return true;
     }
     private static int blend(int a,int b,float f){
