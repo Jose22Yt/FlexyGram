@@ -458,7 +458,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
             tabs[INDEX_CHATS].setCounter(null, false, animated);
         }
 
-        if (tabs[INDEX_FEED] == null || !isFeedTabEnabled()) {
+        if (tabs == null || tabs.length <= INDEX_FEED || tabs[INDEX_FEED] == null || !isFeedTabEnabled()) {
             return;
         }
         final int feedUnreadCount = FeedController.getInstance(currentAccount).getUnreadCount();
@@ -1380,19 +1380,29 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
     }
 
     private void checkUi_callTabVisible(boolean callTabsVisible, boolean animated) {
-        if (tabsView != null) {
-            tabsView.setViewVisible(tabs[INDEX_SETTINGS], !callTabsVisible, animated);
-            tabsView.setViewVisible(tabs[INDEX_CALLS], callTabsVisible, animated);
-            tabsView.setViewVisible(tabs[INDEX_PROFILE], !MainTabsHelper.isProfileTabHidden(), animated);
+        if (tabsView != null && tabs != null) {
+            if (tabs.length > INDEX_SETTINGS && tabs[INDEX_SETTINGS] != null) {
+                tabsView.setViewVisible(tabs[INDEX_SETTINGS], !callTabsVisible, animated);
+            }
+            if (tabs.length > INDEX_CALLS && tabs[INDEX_CALLS] != null) {
+                tabsView.setViewVisible(tabs[INDEX_CALLS], callTabsVisible, animated);
+            }
+            if (tabs.length > INDEX_PROFILE && tabs[INDEX_PROFILE] != null) {
+                tabsView.setViewVisible(tabs[INDEX_PROFILE], !MainTabsHelper.isProfileTabHidden(), animated);
+            }
             applyFlexyTabs();
         }
     }
 
     private void checkUi_contactsOrFeedTabVisible(boolean animated) {
-        if (tabsView != null) {
+        if (tabsView != null && tabs != null) {
             final boolean feedTabVisible = isFeedTabEnabled();
-            tabsView.setViewVisible(tabs[INDEX_FEED], feedTabVisible, animated);
-            tabsView.setViewVisible(tabs[INDEX_CONTACTS], !feedTabVisible && !MainTabsHelper.isContactsTabHidden(), animated);
+            if (tabs.length > INDEX_FEED && tabs[INDEX_FEED] != null) {
+                tabsView.setViewVisible(tabs[INDEX_FEED], feedTabVisible, animated);
+            }
+            if (tabs.length > INDEX_CONTACTS && tabs[INDEX_CONTACTS] != null) {
+                tabsView.setViewVisible(tabs[INDEX_CONTACTS], !feedTabVisible && !MainTabsHelper.isContactsTabHidden(), animated);
+            }
             applyFlexyTabs();
         }
     }

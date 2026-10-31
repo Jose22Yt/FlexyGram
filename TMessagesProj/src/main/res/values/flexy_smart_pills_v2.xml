@@ -17,4 +17,7 @@
     <string name="FlexyPillOwner">OWNER</string>
     <string name="FlexyPillEvent">EVENT</string>
     <string name="FlexyPillAdmin">ADMIN</string>
+    <string name="FlexyPillArchive">ARCHIVE</string>
+    <string name="FlexySmartArchive">Archive</string>
+    <string name="FlexySmartPhotosCount">Photo · %d photos</string>
 </resources>

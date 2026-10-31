@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="FlexySmartPreviewsTitle">Signature Smart Previews</string>
-    <string name="FlexySmartPreviewAdaptive">Multicolor</string>
-    <string name="FlexySmartPreviewAccent">Automatic</string>
+    <string name="FlexySmartPreviewAdaptive">Adaptive Semantic</string>
+    <string name="FlexySmartPreviewAccent">Theme Accent</string>
     <string name="FlexySmartPreviewMatte">Signature Matte</string>
     <string name="FlexySmartPreviewOff">Disabled</string>
     <string name="FlexySmartFile">Document</string>
