@@ -177,7 +177,7 @@ public class MessagesController extends BaseController implements NotificationCe
     public ArrayList<TLRPC.RecentMeUrl> hintDialogs = new ArrayList<>();
     public final SparseArray<ArrayList<TLRPC.Dialog>> dialogsByFolder = new SparseArray<>();
     private final LongSparseArray<ArrayList<TLRPC.Dialog>> dialogsByCommunity = new LongSparseArray<>();
-    protected final ArrayList<TLRPC.Dialog> allDialogs = new ArrayList<>();
+    public final ArrayList<TLRPC.Dialog> allDialogs = new ArrayList<>();
     public ArrayList<TLRPC.Dialog> dialogsForward = new ArrayList<>();
     public ArrayList<TLRPC.Dialog> dialogsServerOnly = new ArrayList<>();
     public ArrayList<TLRPC.Dialog> dialogsCanAddUsers = new ArrayList<>();

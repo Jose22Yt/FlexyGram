@@ -5380,6 +5380,9 @@ public class ChatActivity extends BaseFragment implements
         chatListView = new ChatListRecyclerView(context, themeDelegate) {
             private ChatMessageCell tapCandidate;
             @Override public boolean dispatchTouchEvent(MotionEvent event){
+                if (scrimAnimatorSet != null && scrimAnimatorSet.isRunning() && !scrimProgressDirection) {
+                    scrimAnimatorSet.end();
+                }
                 // Observe; never intercept or consume. Native RecyclerListView still arbitrates
                 // scrolling, double taps, long press and every embedded control.
                 int action=event.getActionMasked();
@@ -5542,14 +5545,6 @@ public class ChatActivity extends BaseFragment implements
                     return false;
                 }
                 return super.requestChildRectangleOnScreen(child, rect, immediate);
-            }
-
-            @Override
-            public boolean dispatchTouchEvent(MotionEvent ev) {
-                if (scrimAnimatorSet != null && scrimAnimatorSet.isRunning() && !scrimProgressDirection) {
-                    scrimAnimatorSet.end();
-                }
-                return super.dispatchTouchEvent(ev);
             }
 
             @Override

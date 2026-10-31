@@ -8499,7 +8499,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
             }
         } else if (currentConnectionState == ConnectionsManager.ConnectionStateUpdating) {
             MessagesController mc = MessagesController.getInstance(currentAccount);
-            if (!mc.dialogsLoaded || (mc.allDialogs.isEmpty() && mc.getDialogs(0).isEmpty())) {
+            if (!mc.dialogsLoaded || (mc.getAllDialogs().isEmpty() && mc.getDialogs(0).isEmpty())) {
                 title = "Updating";
                 titleId = R.string.Updating;
             }
@@ -8508,7 +8508,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
             titleId = R.string.ConnectingToProxyWithDots;
         } else if (currentConnectionState == ConnectionsManager.ConnectionStateConnecting) {
             MessagesController mc = MessagesController.getInstance(currentAccount);
-            if (!mc.dialogsLoaded || (mc.allDialogs.isEmpty() && mc.getDialogs(0).isEmpty()) || !ApplicationLoader.isNetworkOnline()) {
+            if (!mc.dialogsLoaded || (mc.getAllDialogs().isEmpty() && mc.getDialogs(0).isEmpty()) || !ApplicationLoader.isNetworkOnline()) {
                 title = "Connecting";
                 titleId = R.string.Connecting;
             }
