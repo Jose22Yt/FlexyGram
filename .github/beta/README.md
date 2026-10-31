@@ -119,3 +119,9 @@ source_identity.json fija árbol Git y hashes SHA256 de certificado, metadatos, 
 La auditoría #5 acredita únicamente la infraestructura anterior. Tras integrar este PR protegido debe repetirse mode=audit. only_environment_scoped_beta_secrets continúa false: la preparación del PR no habilita builds. No se modifica release.yml, no se publican Releases ni APK sin cifrar. Esta activación cambia únicamente .github y conserva la exclusión de esos paths del Release heredado.
 
 El nombre visible de la fuente fijada sigue siendo FlexyGram Beta; producto FlexyGram, versión 1.0.0-beta.1, código1290, paquete com.flexygram.messenger. No se vuelve a generar clave ni se modifica aplicación/recursos para esta activación.
+
+## Debug CI: CMake del runtime Chaquopy
+
+El submódulo exteraless/chaquopy d47b4a1e1817b4590b9c56dfd4ee5fcfdd6f0cbd declara cmake_minimum_required(VERSION 3.4.1) en product/runtime/CMakeLists.txt. exteraless/build.sh usa CMAKE si está definido y, en caso contrario, el CMake del PATH del runner. CMake4 eliminó esa compatibilidad; el Debug heredado no fijaba esa herramienta.
+
+pr.yml instala y selecciona explícitamente SDK CMake3.31.6, igual que el workflow Beta. Verifica su versión y lo exporta por GITHUB_ENV/GITHUB_PATH antes de Gradle. No cambia el submódulo, mínimos nativos, flags de16KB, ABI, fuentes ni tests. No introduce CMAKE_POLICY_VERSION_MINIMUM ni omite Chaquopy. Debug sigue ejecutando assembleDebug completo; su resultado real en Actions debe comprobarse antes de integrar.

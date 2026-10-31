@@ -204,7 +204,8 @@ class WorkflowTests(unittest.TestCase):
             activation_base = 'db1bea24b7b705de33f8ff8c8e174011c153cac7'
             changed = subprocess.check_output(['git','diff','--name-only',activation_base],cwd=ROOT,text=True).splitlines()
             self.assertTrue(changed and all(p.startswith('.github/beta/') or p in [
-                '.github/workflows/beta-private.yml','.github/workflows/beta-private-tests.yml'] for p in changed), changed)
+                '.github/workflows/beta-private.yml','.github/workflows/beta-private-tests.yml',
+                '.github/workflows/pr.yml'] for p in changed), changed)
             subprocess.run(['git','diff','--exit-code',activation_base,'--','.github/workflows/release.yml'],cwd=ROOT,check=True)
             return
         changed = subprocess.check_output(['git','diff','--name-only',audit.SOURCE],cwd=ROOT,text=True).splitlines()
@@ -213,6 +214,21 @@ class WorkflowTests(unittest.TestCase):
         for p in ['TMessagesProj', 'gradle', 'gradle.properties', 'config/signing',
                   'tools/beta_release/verify_beta_apk.py', 'tools/beta_release/review.json']:
             subprocess.run(['git','diff','--exit-code',audit.SOURCE,'--',p],cwd=ROOT,check=True)
+
+    def test_debug_retains_full_arm64_build_with_compatible_sdk_cmake(self):
+        workflow = yaml.safe_load((ROOT/'.github/workflows/pr.yml').read_text())
+        job = workflow['jobs']['build']
+        self.assertEqual(job['env']['NATIVE_TARGET'], 'arm64-v8a')
+        sdk = next(s for s in job['steps'] if s['name'] == 'Set up Android SDK Tools')
+        self.assertIn('cmake;3.31.6', sdk['with']['packages'].split())
+        selection = next(s for s in job['steps'] if s['name'] == 'Select compatible SDK CMake for pinned Chaquopy runtime')
+        self.assertIn('$ANDROID_HOME/cmake/3.31.6/bin/cmake', selection['run'])
+        self.assertIn('CMAKE=$cmake_bin', selection['run'])
+        self.assertIn('GITHUB_ENV', selection['run'])
+        debug = next(s for s in job['steps'] if s['name'] == 'Debug Build')
+        self.assertIn('./gradlew TMessagesProj:assembleDebug', debug['run'])
+        self.assertLess(job['steps'].index(selection), job['steps'].index(debug))
+        self.assertNotIn('CMAKE_POLICY_VERSION_MINIMUM', selection['run'])
 
 
 class PrivateInputsTests(unittest.TestCase):
