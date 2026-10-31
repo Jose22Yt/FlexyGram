@@ -3082,7 +3082,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             messagesController.loadGlobalNotificationsSettings();
             // ApplicationLoader may have already published the native local result during launch.
             // Do not reread it; an empty/unloaded account retains the original cache/network path.
-            if (!messagesController.dialogsLoaded || (messagesController.allDialogs.isEmpty() && messagesController.getDialogs(0).isEmpty())) {
+            if (!messagesController.dialogsLoaded || (messagesController.getAllDialogs().isEmpty() && messagesController.getDialogs(0).isEmpty())) {
                 messagesController.loadDialogs(0, 0, 100, true);
             }
             messagesController.loadHintDialogs();
@@ -4984,7 +4984,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             viewPage.dialogsAdapter.setArchivedPullDrawable(viewPage.pullForegroundDrawable);
             viewPage.listView.setAdapter(viewPage.dialogsAdapter);
 
-            boolean hasLoadedDialogs = !getMessagesController().getDialogs(folderId).isEmpty() || !getMessagesController().allDialogs.isEmpty();
+            boolean hasLoadedDialogs = !getMessagesController().getDialogs(folderId).isEmpty() || !getMessagesController().getAllDialogs().isEmpty();
             viewPage.listView.setEmptyView(folderId == 0 && communityId == 0 && !hasLoadedDialogs ? viewPage.progressView : null);
             viewPage.scrollHelper = new RecyclerAnimationScrollHelper(viewPage.listView, viewPage.layoutManager);
             viewPage.scrollHelper.forceUseStableId = true;
@@ -10934,7 +10934,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             }
         }
         try {
-            boolean hasLoadedDialogs = !getMessagesController().getDialogs(folderId).isEmpty() || !getMessagesController().allDialogs.isEmpty();
+            boolean hasLoadedDialogs = !getMessagesController().getDialogs(folderId).isEmpty() || !getMessagesController().getAllDialogs().isEmpty();
             viewPage.listView.setEmptyView(folderId == 0 && communityId == 0 && !hasLoadedDialogs ? viewPage.progressView : null);
         } catch (Exception e) {
             FileLog.e(e);
