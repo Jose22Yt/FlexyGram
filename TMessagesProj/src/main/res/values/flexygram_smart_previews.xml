@@ -13,4 +13,7 @@
     <string name="FlexySmartGroupEvent">Group event</string>
     <string name="FlexySmartLocation">Location</string>
     <string name="FlexySmartContact">Contact</string>
+    <string name="FlexySmartJoined">Joined</string>
+    <string name="FlexySmartLeft">Left</string>
+    <string name="FlexySmartPinned">Pinned</string>
 </resources>
