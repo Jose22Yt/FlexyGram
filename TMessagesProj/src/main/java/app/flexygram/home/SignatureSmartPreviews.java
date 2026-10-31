@@ -261,13 +261,16 @@ public final class SignatureSmartPreviews {
             return LocaleController.getString(R.string.FlexySmartContact);
         }
         if (kind == SignatureSmartPreviewPalette.JOINED) {
-            return LocaleController.getString(R.string.FlexySmartJoined);
+            CharSequence event = message.messageText;
+            return clean(!TextUtils.isEmpty(event) ? event.toString() : LocaleController.getString(R.string.FlexySmartJoined));
         }
         if (kind == SignatureSmartPreviewPalette.LEFT) {
-            return LocaleController.getString(R.string.FlexySmartLeft);
+            CharSequence event = message.messageText;
+            return clean(!TextUtils.isEmpty(event) ? event.toString() : LocaleController.getString(R.string.FlexySmartLeft));
         }
         if (kind == SignatureSmartPreviewPalette.PINNED) {
-            return LocaleController.getString(R.string.FlexySmartPinned);
+            CharSequence event = message.messageText;
+            return clean(!TextUtils.isEmpty(event) ? event.toString() : LocaleController.getString(R.string.FlexySmartPinned));
         }
         if (kind == SignatureSmartPreviewPalette.EVENT) {
             CharSequence event = message.messageText;
