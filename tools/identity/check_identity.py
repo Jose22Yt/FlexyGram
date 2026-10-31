@@ -97,7 +97,7 @@ def main():
             expected = original(name).decode().replace('"'+ALPHA+'".equals(ApplicationLoader.applicationContext.getPackageName())', 'BuildConfig.CONNECTED_ALPHA')
             require(read(name) == expected, 'Unreviewed SharedConfig change')
     identity = dict(re.findall(r'^(\w+)=(.*)$', read('config/signing/identity.properties'), re.M))
-    official = '5a598fb5ba42949b67b7c2635106fafd5f23179397e4c098757a73cd2d2ef66c'
+    official = 'e71c4d1e14dd940892009c61164df522c133029df6d1258561f6a1a4d1f3c015'
     require(identity['applicationId'] == BETA and identity['alias'] == 'flexygram-release', 'Registered identity/package mismatch')
     require(identity['certificateSha256'] == official, 'Official fingerprint changed')
     require(hashlib.sha256((ROOT/identity['certificateFile']).read_bytes()).hexdigest() == official, 'Registered public DER mismatch')

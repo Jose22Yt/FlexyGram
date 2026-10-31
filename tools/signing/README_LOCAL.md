@@ -63,7 +63,7 @@ Solo estos dos archivos públicos de `~/FlexyGramSigning/`:
 - `flexygram-release.cer`: certificado público DER, sin clave privada.
 - `public-verification.json`: huella y resultado público sin contraseñas ni rutas de backups.
 
-Nunca compartas el `.p12`, los backups `.age`, `custody-state.json` o las contraseñas. La SHA-256 registrada es `5a598fb5ba42949b67b7c2635106fafd5f23179397e4c098757a73cd2d2ef66c`. Las dos copias independientes siguen pendientes de confirmación al proyecto.
+Nunca compartas el `.p12`, los backups `.age`, `custody-state.json` o las contraseñas. La SHA-256 registrada es `e71c4d1e14dd940892009c61164df522c133029df6d1258561f6a1a4d1f3c015`. Las dos copias independientes siguen pendientes de confirmación al proyecto.
 
 ## Protecciones y límites
 
@@ -74,3 +74,7 @@ La contraseña se transmite a keytool y al verificador únicamente en el entorno
 Pruebas del paquete: `python -m unittest discover -s . -p 'test_owner_wizard.py' -v` (herramientas criptográficas simuladas; no genera claves) y `python check_verifier.py` (compila el verificador Java y rechaza entradas inválidas). La generación fue confirmada por el propietario. La recuperación real de dos backups sigue pendiente de confirmación; las pruebas simuladas del código no la sustituyen.
 
 Referencias oficiales: JDK keytool https://docs.oracle.com/en/java/javase/21/docs/specs/man/keytool.html; age https://github.com/FiloSottile/age; paquetes Termux https://github.com/termux/termux-packages.
+
+## Identidad AntiTerm actual
+
+El propietario conserva el original y los respaldos existentes y acepta el riesgo de exposición anterior. No se solicita regenerar claves ni repetir respaldos para registrar este certificado. Para comprobar solo posesión, usar el modo interactivo `keystore` de VerifySigning.java; el asistente completo de custodia es una operación distinta. El estado privado REVALIDATION_PENDING no se convierte automáticamente en custodia aprobada por actualizar el certificado público.

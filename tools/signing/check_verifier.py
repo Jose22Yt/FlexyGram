@@ -26,19 +26,21 @@ def main():
         official = SOURCE.with_name('flexygram-release.cer')
         if not official.exists():
             official = SOURCE.parents[2] / 'config/signing/flexygram-release.cer'
-        fingerprint = '5a598fb5ba42949b67b7c2635106fafd5f23179397e4c098757a73cd2d2ef66c'
+        fingerprint = 'e71c4d1e14dd940892009c61164df522c133029df6d1258561f6a1a4d1f3c015'
         valid = subprocess.run(['java', '-cp', str(work), 'VerifySigning', 'certificate', str(official), fingerprint], capture_output=True, text=True, check=True)
         report = json.loads(valid.stdout)
         assert report['status'] == 'PASS' and report['sha256'] == fingerprint and report['private_key'] == 'NOT_CHECKED'
         wrong = subprocess.run(['java', '-cp', str(work), 'VerifySigning', 'certificate', str(official), '0' * 64], capture_output=True, text=True)
         assert wrong.returncode == 1 and not wrong.stdout
+        previous = subprocess.run(['java', '-cp', str(work), 'VerifySigning', 'certificate', str(official), '5a598fb5ba42949b67b7c2635106fafd5f23179397e4c098757a73cd2d2ef66c'], capture_output=True, text=True)
+        assert previous.returncode == 1 and not previous.stdout
         corrupted = work / 'corrupted-public.cer'
         data = bytearray(official.read_bytes()); data[-1] ^= 1; corrupted.write_bytes(data)
         bad = subprocess.run(['java', '-cp', str(work), 'VerifySigning', 'certificate', str(corrupted)], capture_output=True, text=True)
         assert bad.returncode == 1 and not bad.stdout
         if any(work.glob('*.p12')) or any(work.glob('*.keystore')):
             raise AssertionError('Verifier tests must not create signing identities')
-    print('PASS: official public certificate verified; 8 rejection/non-disclosure cases passed; no key or Android artifact generated.')
+    print('PASS: official public certificate verified; 9 rejection/non-disclosure cases passed; no key or Android artifact generated.')
 
 
 if __name__ == '__main__':

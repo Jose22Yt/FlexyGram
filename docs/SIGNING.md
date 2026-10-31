@@ -1,6 +1,6 @@
 # Firma oficial de FlexyGram Beta
 
-El propietario confirmó haber generado la clave en su teléfono y tener acceso a ella. El asistente recibió **solo el certificado público y un informe de comprobación pública**, nunca el PKCS12 ni contraseñas. Certificado verificado el 29 de octubre de 2026 con Java y OpenSSL.
+El propietario confirmó haber generado la clave en su teléfono y tener acceso a ella. El asistente recibió **solo el certificado público y un informe de comprobación pública**, nunca el PKCS12 ni contraseñas. Certificado de AntiTerm verificado el 30 de octubre de 2026. La posesión privada actual sigue pendiente.
 
 | Campo | Identidad registrada |
 | --- | --- |
@@ -10,8 +10,8 @@ El propietario confirmó haber generado la clave en su teléfono y tener acceso 
 | Clave pública | RSA-3072 |
 | Algoritmo del certificado | SHA256withRSA |
 | Sujeto / emisor | CN=FlexyGram Release Key, OU=@Lukhou23 |
-| Vigencia UTC | 2026-10-29 22:39:21 a 2054-03-16 22:39:21 |
-| SHA-256 | 5a598fb5ba42949b67b7c2635106fafd5f23179397e4c098757a73cd2d2ef66c |
+| Vigencia UTC | 2026-10-30 23:00:20 a 2054-03-17 23:00:20 |
+| SHA-256 | e71c4d1e14dd940892009c61164df522c133029df6d1258561f6a1a4d1f3c015 |
 
 Fuentes públicas de la configuración: [identity.properties](../config/signing/identity.properties) y [flexygram-release.cer](../config/signing/flexygram-release.cer). El certificado contiene únicamente la clave pública. No demuestra por sí mismo el alias del almacén ni su custodia, y no incorpora un applicationId Android: la asociación con el paquete se fija en la configuración del proyecto. La compatibilidad aquí es de fuentes/configuración, no una APK firmada o instalada.
 
@@ -39,7 +39,7 @@ Firebase, Maps y OAuth deben registrarse por el propietario para el paquete Beta
 ## Comprobaciones sin Android
 
 ```bash
-java tools/signing/VerifySigning.java certificate config/signing/flexygram-release.cer 5a598fb5ba42949b67b7c2635106fafd5f23179397e4c098757a73cd2d2ef66c
+java tools/signing/VerifySigning.java certificate config/signing/flexygram-release.cer e71c4d1e14dd940892009c61164df522c133029df6d1258561f6a1a4d1f3c015
 python3 tools/signing/check_verifier.py
 python3 tools/identity/check_identity.py
 ```

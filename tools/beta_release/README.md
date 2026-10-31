@@ -22,3 +22,9 @@ No hay APK nueva ni correspondencia privada/pública verificada. Los tests del v
 ## Verificación realizada
 
 Suite completa anterior al último ajuste de NagramX: 381 métodos host PASS y 144 generales PASS /31 omisiones opcionales. Después del ajuste: 14 tests específicos/compatibilidad, identidad y compilación AAPT2 de recursos Beta PASS. Certificado público y ocho rechazos PASS. La validación CI del PR repetirá la suite completa sobre la fuente final. Ningún resultado equivale a una APK firmada o instalada. Detalle: verification.json.
+
+## Propuesta AntiTerm e71c4d (30 de octubre de 2026)
+
+Sobre PR141 se propone únicamente la sustitución pública autorizada por el propietario: certificado `e71c4d1e14dd940892009c61164df522c133029df6d1258561f6a1a4d1f3c015`, pines y herramientas de verificación. No cambia el código Android ni sus funciones, paquete, versión, JNI o validadores Gradle. El informe histórico verification.json acredita la base anterior, no la posesión de esta nueva identidad. Ver docs/SIGNING_CUSTODY_REVIEW.md para evidencias y pendientes actuales.
+
+La auditoría #5 no autoriza esta fuente nueva. El lanzador en main sigue fijado al PR141 original y debe permanecer así hasta una actualización revisada separada. La posesión privada, Firebase, siete secretos protegidos, build real y aceptación en Poco siguen pendientes.
