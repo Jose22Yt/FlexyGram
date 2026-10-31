@@ -20842,8 +20842,19 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     }
     @SuppressLint("WrongCall")
     public void drawInternal(Canvas canvas) {
-        int save=canvas.save();applySignatureTap(canvas);
-        try{drawSignatureContent(canvas);}finally{canvas.restoreToCount(save);}
+        float sx = signatureTapMotion.scaleX(), sy = signatureTapMotion.scaleY();
+        boolean hasScale = sx != 1f || sy != 1f;
+        int save = hasScale ? canvas.save() : -1;
+        if (hasScale) {
+            canvas.scale(sx, sy, signatureTapPivotX, signatureTapPivotY);
+        }
+        try {
+            drawSignatureContent(canvas);
+        } finally {
+            if (hasScale) {
+                canvas.restoreToCount(save);
+            }
+        }
     }
     private void drawSignatureContent(Canvas canvas) {
         if (currentMessageObject == null) {
@@ -21098,8 +21109,20 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     }
 
     public void drawBackgroundInternal(Canvas canvas, boolean fromParent) {
-        int save=canvas.save();if(fromParent)applySignatureTap(canvas);
-        try{drawBackgroundInternal(canvas, fromParent, false);}finally{canvas.restoreToCount(save);}
+        float sx = fromParent ? signatureTapMotion.scaleX() : 1f;
+        float sy = fromParent ? signatureTapMotion.scaleY() : 1f;
+        boolean hasScale = sx != 1f || sy != 1f;
+        int save = hasScale ? canvas.save() : -1;
+        if (hasScale) {
+            canvas.scale(sx, sy, signatureTapPivotX, signatureTapPivotY);
+        }
+        try {
+            drawBackgroundInternal(canvas, fromParent, false);
+        } finally {
+            if (hasScale) {
+                canvas.restoreToCount(save);
+            }
+        }
     }
 
     @SuppressLint("WrongCall")

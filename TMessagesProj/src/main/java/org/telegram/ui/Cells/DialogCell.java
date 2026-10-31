@@ -596,73 +596,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
     // Signature Smart Previews: one cached content type per updated dialog row.
     // The original message layout, row geometry and Telegram click targets remain.
     private int smartPreviewKind;
-    private int smartPreviewPrefixEnd;
-    private int smartPreviewClipLeft, smartPreviewClipRight;
     private int smartPreviewModeLastBuilt=-1;
-    private float smartPreviewStartX, smartPreviewEndX;
-    private boolean smartPreviewMetricsReady;
-    /** Layout-relative metrics: built once with the immutable native StaticLayout, not on scroll. */
-    private void prepareSmartPreviewMetrics() {
-        smartPreviewMetricsReady=false;
-        if(smartPreviewKind==0 || messageLayout==null || messageLayout.getLineCount()==0)return;
-        int end=messageLayout.getLineEnd(0);
-        smartPreviewStartX=messageLayout.getPrimaryHorizontal(Math.min(smartPreviewPrefixEnd,end));
-        smartPreviewEndX=messageLayout.getPrimaryHorizontal(end);
-        smartPreviewMetricsReady=Float.isFinite(smartPreviewStartX)&&Float.isFinite(smartPreviewEndX);
-    }
-
-    private final app.flexygram.home.SignatureSmartPreviewPalette smartPreviewPalette =
-            new app.flexygram.home.SignatureSmartPreviewPalette();
-    private final Paint smartPreviewPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private static final int[] SMART_VOICE_BARS = {5,9,13,6,11,7,4};
-    private float smartVoiceDensity = -1;
-    private final float[] smartVoiceHeights = new float[SMART_VOICE_BARS.length];
-    private float smartVoiceBarWidth, smartVoiceSpacing, smartVoiceInset;
-    private void prepareSmartVoiceGeometry() {
-        float density = AndroidUtilities.density;
-        if (smartVoiceDensity == density) return;
-        smartVoiceDensity = density;
-        smartVoiceBarWidth = dp(1f); smartVoiceSpacing = dp(2f); smartVoiceInset = dp(4f);
-        for (int i=0;i<SMART_VOICE_BARS.length;i++) smartVoiceHeights[i]=dp(SMART_VOICE_BARS[i]*.65f);
-    }
-    private void drawSmartPreviewBackground(Canvas canvas, float top, float alpha) {
-        if (smartPreviewKind == 0 || !smartPreviewMetricsReady || messageLayout == null || alpha <= 0f) return;
-        int mode=app.flexygram.home.SignatureSmartPreviews.mode();
-        if(mode==app.flexygram.home.SignatureSmartPreviewPalette.OFF)return;
-        int accent=Theme.getColor(Theme.key_actionBarTabLine,resourcesProvider);
-        int surface=Theme.getColor(Theme.key_windowBackgroundWhite,resourcesProvider);
-        smartPreviewPalette.update(smartPreviewKind,mode,accent,surface);
-        smartPreviewPaint.setColor(smartPreviewPalette.background());
-        smartPreviewPaint.setAlpha(Math.round(255f*Math.max(0f,Math.min(1f,alpha))));
-        // Message layout can be RTL; use its real visual line bounds rather
-        // than assuming the first glyph starts at messageLeft.
-        boolean rtl=LocaleController.isRTL;
-        boolean voice=smartPreviewKind==app.flexygram.home.SignatureSmartPreviewPalette.VOICE;
-        float x1=messageLeft+smartPreviewStartX;
-        float x2=messageLeft+smartPreviewEndX;
-        float lineLeft=Math.min(x1,x2), lineRight=Math.max(x1,x2);
-        float left=Math.max(smartPreviewClipLeft,lineLeft-dp(rtl&&voice?19:5));
-        float right=Math.min(smartPreviewClipRight,lineRight+dp(!rtl&&voice?19:5));
-        if (right-left < dp(16))return; // Narrow/recycled rows remain native.
-        float height=Math.min(getMeasuredHeight()-top,Math.max(dp(20),messageLayout.getLineBottom(0)+dp(2)));
-        if(height<=0f)return;
-        float bottom=top+height-dp(2);
-        canvas.drawRoundRect(left,top-dp(2),right,bottom,dp(10),dp(10),smartPreviewPaint);
-        if(voice){
-            smartPreviewPaint.setColor(smartPreviewPalette.foreground());
-            smartPreviewPaint.setAlpha(Math.round(255f*Math.max(0f,Math.min(1f,alpha))));
-            float waveX=rtl?left+dp(3):lineRight+dp(4);
-            float cy=(bottom+top-dp(2))*.5f;
-            prepareSmartVoiceGeometry();
-            float barWidth=smartVoiceBarWidth;
-            for(int i=0;i<SMART_VOICE_BARS.length;i++){
-                float h=smartVoiceHeights[i];
-                float x=waveX+smartVoiceSpacing*i;
-                if (x+barWidth>right-smartVoiceInset)break;
-                canvas.drawRoundRect(x,cy-h*.5f,x+barWidth,cy+h*.5f,barWidth*.5f,barWidth*.5f,smartPreviewPaint);
-            }
-        }
-    }
     private StaticLayout typingLayout;
 
     private int buttonTop;
@@ -2826,8 +2760,6 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
         // A real conversation/topic with a last message can appear in any
         // filter or the archive. Special rows and multi-topic summaries remain native.
         smartPreviewKind=0;
-        smartPreviewMetricsReady=false;
-        smartPreviewPrefixEnd=0;
         boolean inlineSender = messageNameString != null && (!(useForceThreeLines || SharedConfig.useThreeLinesLayout)
                 || hasTags() || currentDialogFolderId != 0 && currentDialogFolderDialogsCount > 1);
         int senderEnd=offsetName;
@@ -2853,11 +2785,11 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                 && app.flexygram.home.SignatureSmartPreviews.allowsSingleMessagePreview(groupMessages)
                 && (message.messageOwner.restriction_reason == null || message.messageOwner.restriction_reason.isEmpty())) {
             int candidate = app.flexygram.home.SignatureSmartPreviews.kind(message);
-            if (candidate != 0 && (!inlineSender || Layout.getDesiredWidth(messageString, 0, senderEnd, currentMessagePaint) < messageWidth * .35f)) {
+            float senderDesiredWidth = inlineSender ? Layout.getDesiredWidth(messageString, 0, senderEnd, currentMessagePaint) : 0;
+            if (candidate != 0 && (!inlineSender || senderDesiredWidth < messageWidth * .35f)) {
                 String snippet = app.flexygram.home.SignatureSmartPreviews.snippet(message, candidate, groupMessages);
                 if (!TextUtils.isEmpty(snippet)) {
-                    float senderWidth = inlineSender
-                            ? Layout.getDesiredWidth(messageString, 0, senderEnd, currentMessagePaint) + dp(5) : 0;
+                    float senderWidth = inlineSender ? senderDesiredWidth + dp(5) : 0;
                     int thumbnailReserve = thumbsCount > 0 ? dp((thumbSize + 2) * thumbsCount + 6) : 0;
                     int free = app.flexygram.home.SignatureSmartPillLayout.remaining(messageWidth, senderWidth, thumbnailReserve, 0, dp(8));
                     int secondaryKind = app.flexygram.home.SignatureSmartPreviews.secondaryKind(message, candidate);
@@ -3039,7 +2971,6 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
             messageLayout = null;
             FileLog.e(e);
         }
-        prepareSmartPreviewMetrics();
         animatedEmojiStack = AnimatedEmojiSpan.update(AnimatedEmojiDrawable.CACHE_TYPE_MESSAGES, this, animatedEmojiStack, messageLayout);
 
         double widthpx;

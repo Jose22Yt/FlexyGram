@@ -1928,12 +1928,9 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
                     swipeProgress = progress;
                 }
                 if (!m3PredictiveBack && !predictiveBackInProgress) {
-                    // openExtera: доводим масштаб и вертикальный сдвиг карточки после отпускания
-                    final float m3s = AndroidUtilities.lerp(1.0f, 0.85f, MathUtils.clamp(progress, 0f, 1f));
-                    containerView.setScaleX(m3s);
-                    containerView.setScaleY(m3s);
-                    containerView.setTranslationY(springRouteYRatio * Math.max(0f,
-                            (containerView.getMeasuredHeight() * (1f - m3s)) / 2f - dp(8)));
+                    containerView.setScaleX(1f);
+                    containerView.setScaleY(1f);
+                    containerView.setTranslationY(0);
                 }
 
                 if (!backAnimation) {
@@ -2263,10 +2260,6 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
                         containerView.setTranslationX((1.0f - interpolated) * widthNoPaddings);
                         containerViewBack.setTranslationX(-interpolated * 0.35f * widthNoPaddings);
                         setInnerTranslationX((1.0f - interpolated) * widthNoPaddings);
-                        // openExtera: открывающийся экран разжимается карточкой (exteraGram)
-                        final float m3s = AndroidUtilities.lerp(0.85f, 1.0f, interpolated);
-                        containerView.setScaleX(m3s);
-                        containerView.setScaleY(m3s);
                     }
                 } else {
                     float clampedReverseInterpolated = MathUtils.clamp(1f - interpolated, 0, 1);
@@ -2288,16 +2281,20 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
                         containerViewBack.setTranslationX(interpolated * widthNoPaddings);
                         containerView.setTranslationX(-(1f - interpolated) * 0.35f * widthNoPaddings);
                         setInnerTranslationX(interpolated * widthNoPaddings);
-                        // openExtera: закрывающийся экран сжимается карточкой (exteraGram)
-                        final float m3s = AndroidUtilities.lerp(1.0f, 0.85f, interpolated);
-                        containerViewBack.setScaleX(m3s);
-                        containerViewBack.setScaleY(m3s);
                     }
                 }
             });
+            if (!preview) {
+                containerView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+                containerViewBack.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+            }
             currentSpringAnimation.addEndListener((animation, canceled, value, velocity) -> {
                 if (animation != currentSpringAnimation) {
                     return;
+                }
+                if (!preview) {
+                    containerView.setLayerType(View.LAYER_TYPE_NONE, null);
+                    containerViewBack.setLayerType(View.LAYER_TYPE_NONE, null);
                 }
                 springRouteBackgroundDrawable = null;
                 containerView.setScaleX(1f);

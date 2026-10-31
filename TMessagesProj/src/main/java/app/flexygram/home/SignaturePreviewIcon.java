@@ -62,6 +62,15 @@ public final class SignaturePreviewIcon extends ReplacementSpan {
         p.moveTo(2.5f, 5f); p.lineTo(2.5f, 10.5f); p.lineTo(9.5f, 10.5f); p.lineTo(9.5f, 5f);
         p.moveTo(4.5f, 7.5f); p.lineTo(7.5f, 7.5f);
     }
+
+    private static final Paint sharedIconPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    static {
+        sharedIconPaint.setStyle(Paint.Style.STROKE);
+        sharedIconPaint.setStrokeWidth(1.2f);
+        sharedIconPaint.setStrokeCap(Paint.Cap.ROUND);
+        sharedIconPaint.setStrokeJoin(Paint.Join.ROUND);
+    }
+
     private final int kind;
     public SignaturePreviewIcon(int kind) { this.kind = kind >= 1 && kind < ICONS.length ? kind : 1; }
     @Override public int getSize(Paint paint, CharSequence text, int start, int end, Paint.FontMetricsInt fm) { return AndroidUtilities.dp(16); }
@@ -72,22 +81,12 @@ public final class SignaturePreviewIcon extends ReplacementSpan {
     public static void draw(Canvas c, int iconKind, float x, float y, float size, Paint p) {
         int index = iconKind >= 1 && iconKind < ICONS.length && ICONS[iconKind] != null ? iconKind : 1;
         float factor = size / 12f;
-        Paint.Style style = p.getStyle();
-        float stroke = p.getStrokeWidth();
-        Paint.Cap cap = p.getStrokeCap();
-        Paint.Join join = p.getStrokeJoin();
+        sharedIconPaint.setColor(p.getColor());
+        sharedIconPaint.setAlpha(p.getAlpha());
         c.save();
         c.translate(x, y);
         c.scale(factor, factor);
-        p.setStyle(Paint.Style.STROKE);
-        p.setStrokeWidth(1.2f);
-        p.setStrokeCap(Paint.Cap.ROUND);
-        p.setStrokeJoin(Paint.Join.ROUND);
-        c.drawPath(ICONS[index], p);
+        c.drawPath(ICONS[index], sharedIconPaint);
         c.restore();
-        p.setStyle(style);
-        p.setStrokeWidth(stroke);
-        p.setStrokeCap(cap);
-        p.setStrokeJoin(join);
     }
 }
