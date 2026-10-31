@@ -262,13 +262,7 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
 
                     }
 
-                    boolean isSlow = isConnectionSlow();
-                    for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
-                        if (!app.flexygram.performance.StartupAccounts.needsControllers(a, UserConfig.selectedAccount,
-                                UserConfig.getInstance(a).isClientActivated())) continue;
-                        ConnectionsManager.getInstance(a).scheduleConnectionCheck();
-                        FileLoader.getInstance(a).onNetworkChanged(isSlow);
-                    }
+                    notifyNetworkChanged();
                 }
             };
             IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
@@ -639,6 +633,18 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
         ensureCurrentNetworkGet(app.flexygram.performance.NetworkSnapshotAge.expired(now, lastNetworkCheck));
     }
 
+    public static void notifyNetworkChanged() {
+        AndroidUtilities.runOnUIThread(() -> {
+            boolean isSlow = isConnectionSlow();
+            for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
+                if (!app.flexygram.performance.StartupAccounts.needsControllers(a, UserConfig.selectedAccount,
+                        UserConfig.getInstance(a).isClientActivated())) continue;
+                ConnectionsManager.getInstance(a).scheduleConnectionCheck();
+                FileLoader.getInstance(a).onNetworkChanged(isSlow);
+            }
+        });
+    }
+
     private static void ensureCurrentNetworkGet(boolean force) {
         if (force || currentNetworkInfo == null) {
             try {
@@ -654,16 +660,19 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
                             @Override
                             public void onAvailable(@NonNull Network network) {
                                 invalidateNetworkSnapshot();
+                                notifyNetworkChanged();
                             }
 
                             @Override
                             public void onCapabilitiesChanged(@NonNull Network network, @NonNull NetworkCapabilities networkCapabilities) {
                                 invalidateNetworkSnapshot();
+                                notifyNetworkChanged();
                             }
 
                             @Override
                             public void onLost(@NonNull Network network) {
                                 invalidateNetworkSnapshot();
+                                notifyNetworkChanged();
                             }
                         };
                         connectivityManager.registerDefaultNetworkCallback(networkCallback);
@@ -797,6 +806,21 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
     public static boolean isNetworkOnlineRealtime() {
         try {
             ConnectivityManager connectivityManager = (ConnectivityManager) ApplicationLoader.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (connectivityManager == null) {
+                return true;
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                try {
+                    Network activeNetwork = connectivityManager.getActiveNetwork();
+                    if (activeNetwork != null) {
+                        NetworkCapabilities caps = connectivityManager.getNetworkCapabilities(activeNetwork);
+                        if (caps != null && caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
+                            return true;
+                        }
+                    }
+                } catch (Throwable ignore) {
+                }
+            }
             NetworkInfo netInfo = connectivityManager.getActiveNetworkInfo();
             if (netInfo != null && (netInfo.isConnectedOrConnecting() || netInfo.isAvailable())) {
                 return true;

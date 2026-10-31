@@ -20,10 +20,12 @@ public final class SignatureSmartPillSpan extends ReplacementSpan {
     private final int maxAvailableWidth;
     private final Theme.ResourcesProvider resourcesProvider;
     private final boolean isDocument;
-    private final SignatureSmartPreviewPalette colors = new SignatureSmartPreviewPalette();
-    private final TextPaint ink = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint fill = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint iconPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private static final TextPaint sharedInk = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+    private static final Paint sharedFill = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private static final Paint sharedIconPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private static final int[] colorBuf = new int[3];
+    private static android.graphics.Typeface cachedTypeface;
+
     private int measured;
     private float height;
     private float iconSize;
@@ -48,12 +50,15 @@ public final class SignatureSmartPillSpan extends ReplacementSpan {
     @Override
     public int getSize(@NonNull Paint paint, CharSequence text, int start, int end, Paint.FontMetricsInt fm) {
         // Row height / line baseline stays native.
-        try {
-            ink.setTypeface(AndroidUtilities.getTypeface("fonts/rmedium.ttf"));
-        } catch (Exception ignore) {
-            ink.setTypeface(paint.getTypeface());
+        if (cachedTypeface == null) {
+            try {
+                cachedTypeface = AndroidUtilities.getTypeface("fonts/rmedium.ttf");
+            } catch (Exception ignore) {
+                cachedTypeface = paint.getTypeface();
+            }
         }
-        ink.setTextSize(Math.max(AndroidUtilities.dp(10f), Math.min(AndroidUtilities.dp(11.5f), paint.getTextSize() * 0.74f)));
+        sharedInk.setTypeface(cachedTypeface);
+        sharedInk.setTextSize(Math.max(AndroidUtilities.dp(10f), Math.min(AndroidUtilities.dp(11.5f), paint.getTextSize() * 0.74f)));
 
         height = AndroidUtilities.dp(20f);
         iconSize = AndroidUtilities.dp(12f);
@@ -61,13 +66,13 @@ public final class SignatureSmartPillSpan extends ReplacementSpan {
         paddingH = AndroidUtilities.dp(6f);
 
         displayText = snippet;
-        float textWidth = ink.measureText(displayText);
+        float textWidth = sharedInk.measureText(displayText);
         float neededWidth = paddingH * 2 + iconSize + iconSpacing + textWidth;
         if (maxAvailableWidth > 0 && neededWidth > maxAvailableWidth) {
             float textBudget = Math.max(AndroidUtilities.dp(20f), maxAvailableWidth - (paddingH * 2 + iconSize + iconSpacing));
-            displayText = android.text.TextUtils.ellipsize(snippet, ink, textBudget,
+            displayText = android.text.TextUtils.ellipsize(snippet, sharedInk, textBudget,
                     isDocument ? android.text.TextUtils.TruncateAt.MIDDLE : android.text.TextUtils.TruncateAt.END).toString();
-            textWidth = ink.measureText(displayText);
+            textWidth = sharedInk.measureText(displayText);
             neededWidth = paddingH * 2 + iconSize + iconSpacing + textWidth;
         }
         measured = (int) Math.ceil(neededWidth);
@@ -83,29 +88,29 @@ public final class SignatureSmartPillSpan extends ReplacementSpan {
 
         int accent = Theme.getColor(Theme.key_actionBarTabLine, resourcesProvider);
         int surface = Theme.getColor(Theme.key_windowBackgroundWhite, resourcesProvider);
-        colors.update(kind, mode, accent, surface);
+        SignatureSmartPreviewPalette.resolveColors(kind, mode, accent, surface, colorBuf);
 
         int alpha = paint.getAlpha();
         float centerY = (top + bottom) * 0.5f;
 
         // 1. Draw capsule background
-        fill.setColor(colors.background());
-        fill.setAlpha(alpha);
+        sharedFill.setColor(colorBuf[0]);
+        sharedFill.setAlpha(alpha);
         float radius = height * 0.5f;
-        canvas.drawRoundRect(x, centerY - radius, x + measured, centerY + radius, radius, radius, fill);
+        canvas.drawRoundRect(x, centerY - radius, x + measured, centerY + radius, radius, radius, sharedFill);
 
         // 2. Draw icon
-        iconPaint.setColor(colors.iconColor());
-        iconPaint.setAlpha(alpha);
+        sharedIconPaint.setColor(colorBuf[2]);
+        sharedIconPaint.setAlpha(alpha);
         int iconType = SignatureSmartPreviews.iconKind(kind);
-        SignaturePreviewIcon.draw(canvas, iconType, x + paddingH, centerY - iconSize * 0.5f, iconSize, iconPaint);
+        SignaturePreviewIcon.draw(canvas, iconType, x + paddingH, centerY - iconSize * 0.5f, iconSize, sharedIconPaint);
 
         // 3. Draw text
-        ink.setColor(colors.foreground());
-        ink.setAlpha(alpha);
+        sharedInk.setColor(colorBuf[1]);
+        sharedInk.setAlpha(alpha);
         float textX = x + paddingH + iconSize + iconSpacing;
-        float textBaseline = centerY - (ink.ascent() + ink.descent()) * 0.5f;
-        canvas.drawText(displayText, textX, textBaseline, ink);
+        float textBaseline = centerY - (sharedInk.ascent() + sharedInk.descent()) * 0.5f;
+        canvas.drawText(displayText, textX, textBaseline, sharedInk);
     }
 
     public String label() {

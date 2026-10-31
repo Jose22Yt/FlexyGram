@@ -5384,7 +5384,7 @@ public class ChatActivity extends BaseFragment implements
                 // scrolling, double taps, long press and every embedded control.
                 int action=event.getActionMasked();
                 if(action==MotionEvent.ACTION_DOWN && tapCandidate!=null){tapCandidate.cancelSignatureGesture();tapCandidate=null;}
-                if(tapCandidate!=null) {
+                if(tapCandidate!=null && (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL)) {
                     MotionEvent local=MotionEvent.obtain(event);
                     local.offsetLocation(-tapCandidate.getX(),-tapCandidate.getY());
                     tapCandidate.signatureTapEvent(local);local.recycle();
@@ -5392,7 +5392,8 @@ public class ChatActivity extends BaseFragment implements
                 boolean handled=super.dispatchTouchEvent(event);
                 if(action==MotionEvent.ACTION_DOWN && getPressedChildView() instanceof ChatMessageCell)
                     tapCandidate=(ChatMessageCell)getPressedChildView();
-                if(action==MotionEvent.ACTION_UP || action==MotionEvent.ACTION_CANCEL)tapCandidate=null;
+                if(action==MotionEvent.ACTION_UP || action==MotionEvent.ACTION_CANCEL || (action == MotionEvent.ACTION_MOVE && tapCandidate != null && !tapCandidate.isPressed()))
+                    tapCandidate=null;
                 return handled;
             }
             private int lastWidth;
@@ -7523,7 +7524,15 @@ public class ChatActivity extends BaseFragment implements
                 return 1000;
             }
         });
+        chatLayoutManager.setItemPrefetchEnabled(true);
+        chatLayoutManager.setInitialPrefetchItemCount(8);
         chatListView.setLayoutManager(chatLayoutManager);
+        chatListView.setItemViewCacheSize(15);
+        chatListView.setHasFixedSize(false);
+        RecyclerView.RecycledViewPool chatPool = chatListView.getRecycledViewPool();
+        if (chatPool != null) {
+            chatPool.setMaxRecycledViews(0, 30);
+        }
         chatListView.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
             public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
