@@ -108,7 +108,7 @@ class SourceApprovalTests(unittest.TestCase):
     def fixture(self):
         policy = protected()[0]
         manifest = json.loads((audit.ROOT/'source_identity.json').read_text())
-        pull = {'number':145, 'user':{'id':126811980}, 'head':{'sha':audit.SOURCE,'repo':{'full_name':audit.REPO}},
+        pull = {'number':150, 'user':{'id':126811980}, 'head':{'sha':audit.SOURCE,'repo':{'full_name':audit.REPO}},
                 'base':{'ref':'fix/beta-official-delivery-ready','repo':{'full_name':audit.REPO}},
                 'state':'open','merged':False,'draft':False}
         reviews = [{'id':100, 'user':{'id':audit.REVIEWER_ID,'login':'dc6764071-wq'},

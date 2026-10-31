@@ -1,5 +1,5 @@
 name: Official Beta private ARM64
-run-name: Official Beta 1290 · pinned PR145 · ${{ inputs.mode }}
+run-name: Official Beta 1290 · pinned PR150 · ${{ inputs.mode }}
 on:
   workflow_dispatch:
     inputs:
@@ -45,7 +45,7 @@ jobs:
     timeout-minutes: 180
     env:
       NATIVE_TARGET: arm64-v8a
-      SOURCE_COMMIT: df140729c39125b65470934bccfde4db018a2f67
+      SOURCE_COMMIT: 022849deb7f01f850a2f517d2b0602e77cad7e37
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
@@ -60,7 +60,7 @@ jobs:
         run: python3 control/.github/beta/audit_environment.py
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          ref: df140729c39125b65470934bccfde4db018a2f67
+          ref: 022849deb7f01f850a2f517d2b0602e77cad7e37
           path: source
           submodules: recursive
           persist-credentials: false
@@ -102,7 +102,7 @@ jobs:
           df -h .
           free_kb=$(df -Pk . | awk 'NR==2 {print $4}')
           (( free_kb >= 8 * 1024 * 1024 ))
-      - name: Validate, assembleBeta, verify pinned PR145 artifact and encrypt for owner
+      - name: Validate, assembleBeta, verify pinned PR150 artifact and encrypt for owner
         env:
           FLEXYGRAM_RELEASE_KEYSTORE_B64: ${{ secrets.FLEXYGRAM_RELEASE_KEYSTORE_B64 }}
           FLEXYGRAM_RELEASE_STORE_PASSWORD: ${{ secrets.FLEXYGRAM_RELEASE_STORE_PASSWORD }}
