@@ -1068,6 +1068,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
             ItemOptions options = ItemOptions.makeOptions(this, anchor);
             for (int destination = 0; destination < app.flexygram.navigation.LiquidNavigationDestinations.COUNT; destination++) {
                 if (app.flexygram.navigation.LiquidNavigationDestinations.isSelectable(destination)
+                        && app.flexygram.navigation.LiquidNavigationDestinations.contains(flexyConfiguredDestinations,destination)
                         && !app.flexygram.navigation.LiquidNavigationDestinations.contains(flexyShownDestinations,destination)) {
                     final int selected = destination;
                     options.add(R.drawable.msg_actions, getString(app.flexygram.navigation.LiquidNavigationTabs.label(selected)),
