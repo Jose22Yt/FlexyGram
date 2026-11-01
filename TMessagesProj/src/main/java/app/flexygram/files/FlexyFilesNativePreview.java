@@ -43,6 +43,7 @@ final class FlexyFilesNativePreview extends LinearLayout {
     private final TextView edit;
     private final RecyclerListView textList;
     private final ImageView image;
+    private final int textColor;
     private final ArrayList<String> pages = new ArrayList<>();
     private final TextAdapter adapter = new TextAdapter();
 
@@ -72,6 +73,7 @@ final class FlexyFilesNativePreview extends LinearLayout {
                             Runnable onBack, Runnable onEdit) {
         super(context);
         setOrientation(VERTICAL);
+        textColor = Theme.getColor(Theme.key_windowBackgroundWhiteBlackText, provider);
         setPadding(dp(6), dp(4), dp(6), dp(8));
         setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite, provider));
 
@@ -206,7 +208,8 @@ final class FlexyFilesNativePreview extends LinearLayout {
         if (options.outWidth <= 0 || options.outHeight <= 0
                 || (long) options.outWidth * options.outHeight > MAX_IMAGE_PIXELS) return null;
         options.inJustDecodeBounds = false;
-        options.inPreferredConfig = Bitmap.Config.RGB_565;
+        // Preserve PNG/WebP alpha; sampled dimensions cap the memory cost.
+        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
         options.inSampleSize = 1;
         while (options.outWidth / options.inSampleSize > 1600
                 || options.outHeight / options.inSampleSize > 1600) {
@@ -226,7 +229,7 @@ final class FlexyFilesNativePreview extends LinearLayout {
             TextView cell = new TextView(parent.getContext());
             cell.setTextSize(14);
             cell.setTypeface(Typeface.MONOSPACE);
-            cell.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+            cell.setTextColor(textColor);
             cell.setBreakStrategy(Layout.BREAK_STRATEGY_SIMPLE);
             cell.setHyphenationFrequency(Layout.HYPHENATION_FREQUENCY_NONE);
             cell.setIncludeFontPadding(false);
