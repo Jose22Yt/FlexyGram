@@ -30,4 +30,9 @@
     <string name="FlexyFilesDiscard">Discard</string>
     <string name="FlexyFilesShare">Share file</string>
     <string name="FlexyFilesDownload">Download</string>
+    <string name="FlexyFilesNativeBack">Back to files</string>
+    <string name="FlexyFilesNativeEdit">Edit</string>
+    <string name="FlexyFilesNativeImage">Local image preview</string>
+    <string name="FlexyFilesNativeTooLarge">Preview exceeds the safe size limit. The original file is unchanged.</string>
+    <string name="FlexyFilesNativeUnsupported">No text or image preview for this format. The original file is unchanged.</string>
 </resources>
