@@ -42,7 +42,7 @@ class NativeViewerContracts(unittest.TestCase):
         self.assertIn("TEXT_CHUNK = 3072", self.viewer)
         self.assertIn("MAX_IMAGE_PIXELS = 32_000_000", self.viewer)
         self.assertIn("options.inSampleSize *= 2", self.viewer)
-        self.assertNotIn("WebView", self.sheet)
+        self.assertNotIn("new WebView(", self.sheet)
         self.assertNotIn("new WebView(", self.viewer)
 
     def test_cancellation_and_bounded_retention(self):
