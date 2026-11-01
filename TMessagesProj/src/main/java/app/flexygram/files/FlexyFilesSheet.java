@@ -79,12 +79,11 @@ final class FlexyFilesSheet extends BottomSheet {
     private final RecyclerListView list;
     private final Adapter adapter = new Adapter();
     private final int maximumListHeight;
-    private final TextView browserLabel;
-    private final LinearLayout browserPanel;
     private final FlexyFilesNativePreview previewPanel;
     private final ScrollView sheetScroll;
     private boolean previewing;
     private String previewEntry;
+    private int browserScrollY;
 
     private static final class Row {
         final String path;
@@ -166,7 +165,6 @@ final class FlexyFilesSheet extends BottomSheet {
                 Theme.key_windowBackgroundWhiteBlueText);
         sectionLabel.setTypeface(AndroidUtilities.bold());
         add(root, sectionLabel, 0, 8);
-        browserLabel = sectionLabel;
 
         LinearLayout content = vertical(c);
         content.setBackground(card());
@@ -248,13 +246,12 @@ final class FlexyFilesSheet extends BottomSheet {
         emptyLabel.setVisibility(View.GONE);
         content.addView(emptyLabel, new LinearLayout.LayoutParams(-1, -2));
         add(root, content, 0, 12);
-        browserPanel = content;
 
-        // Native bounded preview: same BottomSheet, no new fragment or sheet animation.
+        // A separate native surface shares the same BottomSheet; only one
+        // scrolling hierarchy is visible and eligible for touch at any time.
         previewPanel = new FlexyFilesNativePreview(c, owner.getResourceProvider(),
                 this::leavePreview, this::editPreview);
         previewPanel.setVisibility(View.GONE);
-        add(root, previewPanel, 0, 12);
 
         TextView reassurance = text(c,
                 getString(R.string.FlexyFilesSignatureOriginal), 12,
@@ -295,7 +292,10 @@ final class FlexyFilesSheet extends BottomSheet {
         container.setVerticalScrollBarEnabled(false);
         container.addView(root, new android.widget.FrameLayout.LayoutParams(-1, -2));
         sheetScroll = container;
-        setCustomView(container);
+        android.widget.FrameLayout surface = new android.widget.FrameLayout(c);
+        surface.addView(container, new android.widget.FrameLayout.LayoutParams(-1, -2));
+        surface.addView(previewPanel, new android.widget.FrameLayout.LayoutParams(-1, -2));
+        setCustomView(surface);
         setOnDismissListener(d -> dispose());
         refreshLocation();
         load();
@@ -445,11 +445,10 @@ final class FlexyFilesSheet extends BottomSheet {
         if (closed || document == null) return;
         previewing = true;
         previewEntry = entry;
-        browserLabel.setVisibility(View.GONE);
-        browserPanel.setVisibility(View.GONE);
+        browserScrollY = sheetScroll.getScrollY();
+        sheetScroll.setVisibility(View.GONE);
         previewPanel.setVisibility(View.VISIBLE);
         previewPanel.loading(label);
-        sheetScroll.scrollTo(0, 0);
 
         boolean imageFile = FlexyFilesNativePreview.isImage(label);
         int limit = imageFile ? FlexyFilesNativePreview.MAX_IMAGE_BYTES : SelectedDocument.MAX_TEXT;
@@ -504,9 +503,8 @@ final class FlexyFilesSheet extends BottomSheet {
         previewEntry = null;
         previewPanel.release();
         previewPanel.setVisibility(View.GONE);
-        browserLabel.setVisibility(View.VISIBLE);
-        browserPanel.setVisibility(View.VISIBLE);
-        sheetScroll.scrollTo(0, 0);
+        sheetScroll.setVisibility(View.VISIBLE);
+        sheetScroll.scrollTo(0, browserScrollY);
     }
 
     /** Keep all existing editor tools and save-a-copy protections intact. */
