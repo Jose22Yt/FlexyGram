@@ -28,6 +28,14 @@ public final class LiquidNavigationConfig {
     public static void load() {
         if (ApplicationLoader.applicationContext == null) return;
         SharedPreferences p = prefs();
+        if (!p.getBoolean("home_defaults_v2", false)) {
+            SharedPreferences.Editor edit = p.edit();
+            String[] retired = {"height", "compact", "width", "icon", "label_gap", "inner_margin",
+                    "bottom_gap", "side_gap", "radius", "speed", "damping", "labels", "bottom_animation",
+                    "bottom_compaction", "compaction", "destinations", "enabled", "opacity", "intensity"};
+            for (String key : retired) edit.remove(key);
+            edit.putBoolean("home_defaults_v2", true).apply();
+        }
         enabled = p.getBoolean("show_tabs", true);
         showTitles = p.getBoolean("show_titles", true);
         doubleTapChats = p.getBoolean("double_tap_chats", true);
@@ -35,7 +43,7 @@ public final class LiquidNavigationConfig {
         alwaysSearchChats = p.getBoolean("always_search_chats", false);
         floatingDock = p.getBoolean("floating_dock", true);
 
-        String orderStr = p.getString("tab_order", null);
+        String orderStr = prefs().getString("tab_order", null);
         if (orderStr != null && !orderStr.isEmpty()) {
             String[] parts = orderStr.split(",");
             int[] order = new int[parts.length];
@@ -130,7 +138,8 @@ public final class LiquidNavigationConfig {
 
     public static int[] order() {
         ensure();
-        return activeOrder != null ? activeOrder : LiquidNavigationDestinations.defaults();
+        if (activeOrder == null) return LiquidNavigationDestinations.defaults();
+        return activeOrder;
     }
 
     public static void setOrder(int[] order) {

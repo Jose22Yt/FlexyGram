@@ -127,10 +127,7 @@ public final class SignatureChatHeader {
         // Native Liquid Glass is a Telegram power-saving flag, not a new Flexy master switch.
         // Use the existing ActionBar blur3 sources only when they are ready.
         // Solid Signature rendering remains bit-for-bit unchanged when the flag is off.
-        if (bar.drawSignatureNativeGlass(canvas, this)) {
-            drawUnread(canvas);
-            return;
-        }
+        if (bar.drawSignatureNativeGlass(canvas, this)) return;
         if (!fusionActive()) {
             surface.draw(canvas, geometry, AndroidUtilities.density, provider);
             drawUnread(canvas);
