@@ -8,7 +8,7 @@ public final class SignatureSmartPreviewPalette {
             PNG=16, JPG=17, IMAGE_FILE=18, GIF=19, STICKER=20, POLL=21,
             JOINED=22, LEFT=23, PINNED=24, EDITED=25, DOCUMENT=26,
             SPREADSHEET=27, PRESENTATION=28, CHANNEL=29, ADMIN=30, OWNER=31, DELETED=32;
-    public static final int ADAPTIVE=0, THEME=1, MATTE=2, OFF=3;
+    public static final int ADAPTIVE=0, THEME=1, MATTE=2, OFF=3, MULTICOLOR=4;
     private static final int[] BASE={
         0xff8892a0,0xff1e88e5,0xff8e24aa,0xffe91e63,
         0xff00acc1,0xff00897b,0xff2e7d32,0xff5e35b1,0xffff8f00,0xff0288d1,
@@ -17,6 +17,28 @@ public final class SignatureSmartPreviewPalette {
         0xff00897b,0xffc2185b,0xff0097a7,0xff546e7a,0xff1e88e5,0xff2e7d32,
         0xffe65100,0xff546e7a,0xffffb300,0xffff8f00,0xffe53935
     };
+    /** Legacy THEME (1) is kept as an alias; existing stored selections migrate to ADAPTIVE. */
+    public static int normalizeMode(int mode) {
+        return mode == THEME ? ADAPTIVE : mode == MULTICOLOR || mode == MATTE || mode == OFF ? mode : ADAPTIVE;
+    }
+    private static int multicolor(int kind) {
+        switch (kind) {
+            case PHOTO: case PNG: case JPG: case IMAGE_FILE: case JOINED: return 0xff15803d;
+            case VIDEO: case GIF: return 0xff7c3aed;
+            case ZIP: case RAR: case ARCHIVE: return 0xffbe185d;
+            case VOICE: case MUSIC: return 0xffc2410c;
+            case LINK: return 0xff0369a1;
+            case LOCATION: case ADMIN: return 0xffa16207;
+            case CONTACT: case EVENT: case PINNED: return 0xff0f766e;
+            case POLL: return 0xff0e7490;
+            case STICKER: return 0xffa21caf;
+            case LEFT: case DELETED: return 0xffb91c1c;
+            case OWNER: return 0xff92400e;
+            case NONE: case EDITED: return 0xff475569;
+            default: return 0xff2563eb;
+        }
+    }
+    private final int[] resolved = new int[3];
     private int oldKind=-1,oldMode=-1,oldAccent,oldSurface;
     private int background=0xffe6edf4,foreground=0xff26313d,iconColor=0xff26313d;
     public int background(){return background;}
@@ -28,15 +50,20 @@ public final class SignatureSmartPreviewPalette {
 
     public static void resolveColors(int kind, int mode, int accent, int surface, int[] outColors) {
         if (kind < 0 || kind >= BASE.length) kind = NONE;
+        mode = normalizeMode(mode);
         if (cachedMode != mode || cachedAccent != accent || cachedSurface != surface) {
             cachedMode = mode; cachedAccent = accent; cachedSurface = surface;
             int opaqueSurface = surface | 0xff000000;
             boolean isDark = luminance(opaqueSurface) < 0.45;
             for (int k = 0; k < BASE.length; k++) {
                 int base = BASE[k];
-                int main = (mode == THEME) ? (accent | 0xff000000) : base;
+                int main = accent | 0xff000000;
                 int bg, fg, ic;
-                if (mode == MATTE) {
+                if (mode == MULTICOLOR) {
+                    bg = multicolor(k);
+                    fg = contrast(0xffffffff, bg) >= contrast(0xff000000, bg) ? 0xffffffff : 0xff000000;
+                    ic = fg;
+                } else if (mode == MATTE) {
                     if (isDark) {
                         bg = blend(opaqueSurface, 0xffffffff, 0.16f);
                         fg = 0xffffffff;
@@ -81,14 +108,13 @@ public final class SignatureSmartPreviewPalette {
     }
 
     public boolean update(int kind,int mode,int accent,int surface) {
-        if(kind<0||kind>=BASE.length||mode<ADAPTIVE||mode>OFF)kind=NONE;
+        if(kind<0||kind>=BASE.length||mode<ADAPTIVE||mode>MULTICOLOR)kind=NONE;
         if(oldKind==kind&&oldMode==mode&&oldAccent==accent&&oldSurface==surface)return false;
         oldKind=kind;oldMode=mode;oldAccent=accent;oldSurface=surface;
-        int[] c = new int[3];
-        resolveColors(kind, mode, accent, surface, c);
-        background = c[0];
-        foreground = c[1];
-        iconColor = c[2];
+        resolveColors(kind, mode, accent, surface, resolved);
+        background = resolved[0];
+        foreground = resolved[1];
+        iconColor = resolved[2];
         return true;
     }
     private static int blend(int a,int b,float f){

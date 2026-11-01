@@ -1,0 +1,53 @@
+import android.app.Activity;import android.graphics.*;import android.view.*;import androidx.recyclerview.widget.RecyclerView;import java.io.*;import java.time.Duration;import java.lang.reflect.*;import java.util.*;
+import org.junit.*;import org.junit.runner.RunWith;import org.robolectric.*;import org.robolectric.annotation.*;import static org.junit.Assert.*;
+import app.flexygram.home.*;import org.telegram.messenger.*;import org.telegram.ui.ActionBar.Theme;
+@RunWith(RobolectricTestRunner.class) @Config(manifest=Config.NONE,sdk=35) @GraphicsMode(GraphicsMode.Mode.NATIVE) @LooperMode(LooperMode.Mode.PAUSED)
+public class SmartPreviews2AndroidTest {
+ Activity activity;
+ @Before public void open()throws Exception{activity=Robolectric.buildActivity(Activity.class).setup().get();ApplicationLoader.applicationContext=activity.getApplicationContext();ApplicationLoader.applicationContext.getSharedPreferences("flexy_signature_smart_previews",0).edit().clear().commit();reset();Theme.surface=0xff101820;Theme.accent=0xff3b82f6;LocaleController.isRTL=false;}
+ @After public void close(){activity.finish();}
+ void reset()throws Exception{Field f=SignatureSmartPreviews.class.getDeclaredField("cachedMode");f.setAccessible(true);f.setInt(null,-1);}
+ void layout(View v,int width){v.measure(View.MeasureSpec.makeMeasureSpec(width,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(900,View.MeasureSpec.AT_MOST));v.layout(0,0,width,v.getMeasuredHeight());}
+ Bitmap render(View v){Bitmap b=Bitmap.createBitmap(v.getWidth(),v.getHeight(),Bitmap.Config.ARGB_8888);v.draw(new Canvas(b));return b;}
+ @Test public void existingPreferencesMigrateWithoutReusingTheirIds()throws Exception{
+  for(int stored:new int[]{0,1,2,3,4}){ApplicationLoader.applicationContext.getSharedPreferences("flexy_signature_smart_previews",0).edit().putInt("palette",stored).commit();reset();assertEquals(stored==1?0:stored,SignatureSmartPreviews.mode());reset();assertEquals(stored==1?0:stored,SignatureSmartPreviews.mode());}
+ }
+ @Test public void newDefaultAndAllSelectionsPersist()throws Exception{assertEquals(4,SignatureSmartPreviews.mode());for(int mode:new int[]{0,4,2,3}){SignatureSmartPreviews.setMode(mode);reset();assertEquals(mode,SignatureSmartPreviews.mode());}}
+ @Test public void demoUsesProductionSpanAndAllFourStylesRender()throws Exception{
+  SmartPreviewsDemoView demo=new SmartPreviewsDemoView(activity,null);activity.setContentView(demo);int previous=SignatureSmartPreviews.mode();
+  for(int mode:new int[]{0,4,2,3}){SignatureSmartPreviews.setMode(mode);demo.styleChanged(previous,mode);layout(demo,360);Bitmap b=render(demo);File out=new File(System.getProperty("basedir"),"smart-previews-style-"+mode+"-android.png");try(var stream=new FileOutputStream(out)){b.compress(Bitmap.CompressFormat.PNG,100,stream);}assertTrue(demo.getMeasuredHeight()<180);previous=mode;}
+  SignatureSmartPreviews.setMode(4);demo.styleChanged(3,4);layout(demo,360);Bitmap pixels=render(demo);assertEquals(0xff15803d,pixels.getPixel(30,14));assertTrue(demo.getContentDescription().toString().contains("0:24"));
+ }
+ @Test public void customThemeChangesInvalidateColorsAndOffPaintsNoCapsules(){
+  SmartPreviewsDemoView demo=new SmartPreviewsDemoView(activity,null);SignatureSmartPreviews.setMode(0);layout(demo,360);int old=render(demo).getPixel(30,14);Theme.accent=0xffe11d48;demo.updateColors();assertNotEquals(old,render(demo).getPixel(30,14));
+  SignatureSmartPreviews.setMode(3);demo.styleChanged(0,3);layout(demo,360);assertEquals(0,render(demo).getPixel(30,14));
+ }
+ @Test public void actualSettingsAdapterHasOneHeaderFourStylesAndOnePreview(){
+  SmartPreviewsSettingsActivity page=new SmartPreviewsSettingsActivity();RecyclerView list=page.createView(activity);activity.setContentView(list);layout(list,360);assertEquals(6,list.getAdapter().getItemCount());
+  ArrayList<Integer> changes=new ArrayList<>();list.getAdapter().registerAdapterDataObserver(new RecyclerView.AdapterDataObserver(){public void onChanged(){fail("Do not rebuild the settings list");}public void onItemRangeChanged(int s,int n,Object payload){changes.add(s);}});
+  page.click(1);assertEquals(0,SignatureSmartPreviews.mode());assertEquals(Arrays.asList(1,2),changes);page.click(4);assertEquals(3,SignatureSmartPreviews.mode());page.click(3);assertEquals(2,SignatureSmartPreviews.mode());page.click(2);assertEquals(4,SignatureSmartPreviews.mode());
+ }
+ @Test public void productionDialogPolicyOnlyRebuildsWhenEnteringOrLeavingOff(){
+  DialogStyleProbe row=new DialogStyleProbe(activity);row.message=new MessageObject();row.message.photo=true;row.smartPreviewKind=6;layout(row,360);
+  SignatureSmartPreviews.setMode(0);row.refreshSmartPreviewStyle(4,0);assertEquals(0,row.builds);
+  SignatureSmartPreviews.setMode(3);row.refreshSmartPreviewStyle(0,3);assertEquals(1,row.builds);assertEquals(0,row.smartPreviewKind);
+  SignatureSmartPreviews.setMode(4);row.refreshSmartPreviewStyle(3,4);assertEquals(2,row.builds);assertEquals(6,row.smartPreviewKind);
+  row.message.photo=false;row.smartPreviewKind=0;row.refreshSmartPreviewStyle(4,0);assertEquals(2,row.builds);
+ }
+ @Test public void listenersCanUnsubscribeDuringChangeAndReleaseReferences()throws Exception{
+  int[] calls={0};SignatureSmartPreviews.StyleListener[] owner=new SignatureSmartPreviews.StyleListener[1];owner[0]=(o,n)->{calls[0]++;SignatureSmartPreviews.removeStyleListener(owner[0]);};SignatureSmartPreviews.addStyleListener(owner[0]);SignatureSmartPreviews.addStyleListener(owner[0]);SignatureSmartPreviews.setMode(0);SignatureSmartPreviews.setMode(2);assertEquals(1,calls[0]);
+  Field f=SignatureSmartPreviews.class.getDeclaredField("listeners");f.setAccessible(true);assertTrue(((Set<?>)f.get(null)).isEmpty());
+ }
+ @Test public void longFilenameRtlAndInterleavedMeasurementsStayBounded(){
+  SignatureSmartPillSpan a=new SignatureSmartPillSpan(12,"a".repeat(1000)+".zip",95,null,true),b=new SignatureSmartPillSpan(6,"Foto",200,null,false);Paint p=new Paint(3);p.setTextSize(16);assertTrue(a.getSize(p,"x",0,1,null)<=95);p.setTextSize(10);b.getSize(p,"x",0,1,null);
+  Bitmap bitmap=Bitmap.createBitmap(360,90,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(bitmap);a.draw(c,"x",0,1,0,0,18,25,p);assertEquals(0,bitmap.getPixel(96,12));
+  LocaleController.isRTL=true;SmartPreviewsDemoView demo=new SmartPreviewsDemoView(activity,null);layout(demo,210);assertTrue(demo.getHeight()<230);render(demo);
+ }
+ @Test public void localPreviewNeverInitializesAnAccountOrTouchesMessageDetection(){
+  SmartPreviewsDemoView demo=new SmartPreviewsDemoView(activity,null);for(int mode:new int[]{0,4,2,3}){SignatureSmartPreviews.setMode(mode);demo.styleChanged(-1,mode);layout(demo,320);render(demo);}
+ }
+ @Test public void recycledStyleChangesAndWarmDrawsReuseGeometry()throws Exception{
+  SmartPreviewsDemoView demo=new SmartPreviewsDemoView(activity,null);layout(demo,360);Field f=SmartPreviewsDemoView.class.getDeclaredField("pills");f.setAccessible(true);Object[] arr=(Object[])f.get(demo);Object first=arr[0];Bitmap image=Bitmap.createBitmap(360,demo.getHeight(),Bitmap.Config.ARGB_8888);Canvas c=new Canvas(image);for(int i=0;i<1000;i++){demo.draw(c);}assertSame(first,((Object[])f.get(demo))[0]);
+  for(int i=0;i<100;i++){int old=SignatureSmartPreviews.mode();SignatureSmartPreviews.setMode(i%2==0?0:4);demo.styleChanged(old,SignatureSmartPreviews.mode());demo.draw(c);}assertSame(first,((Object[])f.get(demo))[0]);
+ }
+}

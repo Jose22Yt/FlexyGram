@@ -27,6 +27,7 @@ public final class SignatureSmartPillSpan extends ReplacementSpan {
     private static android.graphics.Typeface cachedTypeface;
 
     private int measured;
+    private float textSize;
     private float height;
     private float iconSize;
     private float iconSpacing;
@@ -35,6 +36,7 @@ public final class SignatureSmartPillSpan extends ReplacementSpan {
 
     public SignatureSmartPillSpan(int kind, String snippet, int maxAvailableWidth,
                                   Theme.ResourcesProvider resourcesProvider, boolean isDocument) {
+        SignatureSmartPreviews.mode();
         this.kind = kind;
         this.snippet = snippet == null ? "" : snippet;
         this.maxAvailableWidth = maxAvailableWidth;
@@ -58,7 +60,8 @@ public final class SignatureSmartPillSpan extends ReplacementSpan {
             }
         }
         sharedInk.setTypeface(cachedTypeface);
-        sharedInk.setTextSize(Math.max(AndroidUtilities.dp(10f), Math.min(AndroidUtilities.dp(11.5f), paint.getTextSize() * 0.74f)));
+        textSize = Math.max(AndroidUtilities.dp(10f), Math.min(AndroidUtilities.dp(11.5f), paint.getTextSize() * 0.74f));
+        sharedInk.setTextSize(textSize);
 
         height = AndroidUtilities.dp(20f);
         iconSize = AndroidUtilities.dp(12f);
@@ -69,13 +72,13 @@ public final class SignatureSmartPillSpan extends ReplacementSpan {
         float textWidth = sharedInk.measureText(displayText);
         float neededWidth = paddingH * 2 + iconSize + iconSpacing + textWidth;
         if (maxAvailableWidth > 0 && neededWidth > maxAvailableWidth) {
-            float textBudget = Math.max(AndroidUtilities.dp(20f), maxAvailableWidth - (paddingH * 2 + iconSize + iconSpacing));
+            float textBudget = Math.max(0f, maxAvailableWidth - (paddingH * 2 + iconSize + iconSpacing));
             displayText = android.text.TextUtils.ellipsize(snippet, sharedInk, textBudget,
                     isDocument ? android.text.TextUtils.TruncateAt.MIDDLE : android.text.TextUtils.TruncateAt.END).toString();
             textWidth = sharedInk.measureText(displayText);
             neededWidth = paddingH * 2 + iconSize + iconSpacing + textWidth;
         }
-        measured = (int) Math.ceil(neededWidth);
+        measured = maxAvailableWidth > 0 ? Math.min(maxAvailableWidth, (int) Math.ceil(neededWidth)) : (int) Math.ceil(neededWidth);
         return measured;
     }
 
@@ -83,13 +86,15 @@ public final class SignatureSmartPillSpan extends ReplacementSpan {
     public void draw(@NonNull Canvas canvas, CharSequence text, int start, int end,
                      float x, int top, int y, int bottom, @NonNull Paint paint) {
         if (measured <= 0) getSize(paint, text, start, end, null);
-        int mode = SignatureSmartPreviews.mode();
+        int mode = SignatureSmartPreviews.drawingMode();
         if (mode == SignatureSmartPreviewPalette.OFF) return;
 
         int accent = Theme.getColor(Theme.key_actionBarTabLine, resourcesProvider);
         int surface = Theme.getColor(Theme.key_windowBackgroundWhite, resourcesProvider);
         SignatureSmartPreviewPalette.resolveColors(kind, mode, accent, surface, colorBuf);
 
+        int save = canvas.save();
+        canvas.clipRect(x, top, x + measured, bottom);
         int alpha = paint.getAlpha();
         float centerY = (top + bottom) * 0.5f;
 
@@ -106,11 +111,14 @@ public final class SignatureSmartPillSpan extends ReplacementSpan {
         SignaturePreviewIcon.draw(canvas, iconType, x + paddingH, centerY - iconSize * 0.5f, iconSize, sharedIconPaint);
 
         // 3. Draw text
+        sharedInk.setTypeface(cachedTypeface);
+        sharedInk.setTextSize(textSize);
         sharedInk.setColor(colorBuf[1]);
         sharedInk.setAlpha(alpha);
         float textX = x + paddingH + iconSize + iconSpacing;
         float textBaseline = centerY - (sharedInk.ascent() + sharedInk.descent()) * 0.5f;
         canvas.drawText(displayText, textX, textBaseline, sharedInk);
+        canvas.restoreToCount(save);
     }
 
     public String label() {
