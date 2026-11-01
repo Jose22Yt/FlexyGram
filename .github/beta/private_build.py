@@ -193,7 +193,7 @@ def build(env):
             if "attrs.get('name') != 'org.telegram.messenger.ExteralessIcon'" in txt:
                 txt = txt.replace(
                     "attrs.get('name') != 'org.telegram.messenger.ExteralessIcon'",
-                    "attrs.get('name') not in ('org.telegram.messenger.ExteralessIcon', 'org.telegram.messenger.FlexyBlueIcon')"
+                    "attrs.get('name') not in ('org.telegram.messenger.ExteralessIcon', 'org.telegram.messenger.FlexyBlueIcon', 'org.telegram.messenger.FlexyNeonIcon')"
                 )
                 vap.write_text(txt)
         report_path = private/'verification.json'
