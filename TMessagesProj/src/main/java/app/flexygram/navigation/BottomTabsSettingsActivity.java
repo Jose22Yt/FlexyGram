@@ -16,7 +16,7 @@ import app.flexygram.settings.SignatureMatteSettingsActivity;
 import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.Theme;
-import org.telegram.ui.Cells.HeaderCell;
+import tw.nekomimi.nekogram.ui.cells.HeaderCell;
 import org.telegram.ui.Cells.TextCheckCell;
 import org.telegram.ui.Cells.TextSettingsCell;
 import org.telegram.ui.Components.RecyclerListView;
@@ -26,6 +26,7 @@ import java.util.ArrayList;
 public final class BottomTabsSettingsActivity extends SignatureMatteSettingsActivity {
 
     private int previewRow;
+    private DockPreviewCell previewCell;
     private int tabsHeaderRow, showTabsRow;
     private int appearanceHeaderRow, floatingDockRow, showTitlesRow;
     private int actionsHeaderRow, doubleTapChatsRow, doubleTapProfileRow, alwaysSearchChatsRow;
@@ -91,6 +92,9 @@ public final class BottomTabsSettingsActivity extends SignatureMatteSettingsActi
         LiquidNavigationConfig.setOrder(arr);
         updateRows();
         listAdapter.notifyDataSetChanged();
+        if (previewCell != null) {
+            previewCell.update();
+        }
     }
 
     @Override
@@ -98,15 +102,15 @@ public final class BottomTabsSettingsActivity extends SignatureMatteSettingsActi
         if (position == showTabsRow) {
             LiquidNavigationConfig.setEnabled(!LiquidNavigationConfig.isEnabled());
             listAdapter.notifyItemChanged(showTabsRow);
-            listAdapter.notifyItemChanged(previewRow);
+            if (previewCell != null) previewCell.update();
         } else if (position == floatingDockRow) {
             LiquidNavigationConfig.setFloatingDock(!LiquidNavigationConfig.isFloatingDock());
             listAdapter.notifyItemChanged(floatingDockRow);
-            listAdapter.notifyItemChanged(previewRow);
+            if (previewCell != null) previewCell.update();
         } else if (position == showTitlesRow) {
             LiquidNavigationConfig.setShowTitles(!LiquidNavigationConfig.showTitles());
             listAdapter.notifyItemChanged(showTitlesRow);
-            listAdapter.notifyItemChanged(previewRow);
+            if (previewCell != null) previewCell.update();
         } else if (position == doubleTapChatsRow) {
             LiquidNavigationConfig.setDoubleTapChats(!LiquidNavigationConfig.doubleTapChats());
             listAdapter.notifyItemChanged(doubleTapChatsRow);
@@ -185,83 +189,119 @@ public final class BottomTabsSettingsActivity extends SignatureMatteSettingsActi
     private final class DockPreviewCell extends FrameLayout {
         private final GradientDrawable dockBg = new GradientDrawable();
         private final LinearLayout dockLayout;
+        private final ArrayList<LinearLayout> tabItems = new ArrayList<>();
+        private final ArrayList<ImageView> tabIcons = new ArrayList<>();
+        private final ArrayList<TextView> tabTitles = new ArrayList<>();
+        private final TextView offView;
 
         DockPreviewCell(Context context) {
             super(context);
-            setPadding(dp(16), dp(16), dp(16), dp(16));
+            setLayoutParams(new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            setPadding(dp(16), dp(12), dp(16), dp(12));
 
             dockLayout = new LinearLayout(context);
             dockLayout.setOrientation(LinearLayout.HORIZONTAL);
             dockLayout.setGravity(Gravity.CENTER);
-            dockLayout.setPadding(dp(8), dp(6), dp(8), dp(6));
+            dockLayout.setPadding(dp(12), dp(8), dp(12), dp(8));
 
-            dockBg.setColor(Theme.getColor(Theme.key_windowBackgroundWhite, resourcesProvider));
+            dockBg.setColor((Theme.getColor(Theme.key_windowBackgroundWhite, resourcesProvider) & 0xffffff) | 0xEE000000);
             dockLayout.setBackground(dockBg);
 
             LayoutParams lp = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(64));
             lp.gravity = Gravity.CENTER;
             addView(dockLayout, lp);
+
+            offView = new TextView(context);
+            offView.setText("Barra inferior desactivada");
+            offView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText, resourcesProvider));
+            offView.setTextSize(13);
+            offView.setGravity(Gravity.CENTER);
+            offView.setVisibility(View.GONE);
+            dockLayout.addView(offView, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+            for (int i = 0; i < 5; i++) {
+                LinearLayout tabItem = new LinearLayout(context);
+                tabItem.setOrientation(LinearLayout.VERTICAL);
+                tabItem.setGravity(Gravity.CENTER);
+
+                ImageView icon = new ImageView(context);
+                icon.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+                tabItem.addView(icon, new LinearLayout.LayoutParams(dp(24), dp(24)));
+
+                TextView text = new TextView(context);
+                text.setTextSize(10);
+                text.setSingleLine(true);
+                text.setGravity(Gravity.CENTER);
+                LinearLayout.LayoutParams textLp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                textLp.topMargin = dp(2);
+                tabItem.addView(text, textLp);
+
+                LinearLayout.LayoutParams itemLp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1f);
+                dockLayout.addView(tabItem, itemLp);
+
+                tabItems.add(tabItem);
+                tabIcons.add(icon);
+                tabTitles.add(text);
+            }
+            update();
         }
 
         void update() {
-            dockLayout.removeAllViews();
             boolean floating = LiquidNavigationConfig.isFloatingDock();
             boolean titles = LiquidNavigationConfig.showTitles();
             boolean enabled = LiquidNavigationConfig.isEnabled();
 
-            dockBg.setCornerRadius(floating ? dp(28) : dp(8));
+            dockBg.setCornerRadius(floating ? dp(28) : dp(14));
             dockBg.setColor((Theme.getColor(Theme.key_windowBackgroundWhite, resourcesProvider) & 0xffffff) | 0xEE000000);
 
             if (!enabled) {
-                TextView offView = new TextView(getContext());
-                offView.setText("Barra inferior desactivada");
-                offView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText, resourcesProvider));
-                offView.setTextSize(13);
-                dockLayout.addView(offView);
+                offView.setVisibility(View.VISIBLE);
+                for (LinearLayout item : tabItems) {
+                    item.setVisibility(View.GONE);
+                }
                 return;
             }
 
+            offView.setVisibility(View.GONE);
             int[] order = LiquidNavigationConfig.order();
             int slots = Math.min(order.length, 5);
             int accent = Theme.getColor(Theme.key_windowBackgroundWhiteBlueText, resourcesProvider);
             int normal = Theme.getColor(Theme.key_windowBackgroundWhiteGrayText, resourcesProvider);
 
-            for (int i = 0; i < slots; i++) {
-                int id = order[i];
-                LinearLayout tabItem = new LinearLayout(getContext());
-                tabItem.setOrientation(LinearLayout.VERTICAL);
-                tabItem.setGravity(Gravity.CENTER);
+            for (int i = 0; i < 5; i++) {
+                LinearLayout tabItem = tabItems.get(i);
+                if (i < slots) {
+                    tabItem.setVisibility(View.VISIBLE);
+                    int id = order[i];
+                    ImageView icon = tabIcons.get(i);
+                    TextView text = tabTitles.get(i);
 
-                ImageView icon = new ImageView(getContext());
-                icon.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
-                int resId = R.drawable.tabs_chats_24;
-                switch (id) {
-                    case 0: resId = R.drawable.tabs_chats_24; break;
-                    case 1: resId = R.drawable.tabs_contacts_24; break;
-                    case 2: resId = R.drawable.outline_profile_settings; break;
-                    case 3: resId = R.drawable.tabs_calls_24; break;
-                    case 4: resId = R.drawable.msg_contact; break;
-                    case 5: resId = R.drawable.ic_feed; break;
-                    case 6: resId = R.drawable.msg_groups; break;
-                    case 7: resId = R.drawable.msg_channel; break;
-                    case 8: resId = R.drawable.msg_saved; break;
-                    default: resId = R.drawable.ic_ab_other; break;
+                    int resId = R.drawable.tabs_chats_24;
+                    switch (id) {
+                        case 0: resId = R.drawable.tabs_chats_24; break;
+                        case 1: resId = R.drawable.tabs_contacts_24; break;
+                        case 2: resId = R.drawable.outline_profile_settings; break;
+                        case 3: resId = R.drawable.tabs_calls_24; break;
+                        case 4: resId = R.drawable.msg_contact; break;
+                        case 5: resId = R.drawable.ic_feed; break;
+                        case 6: resId = R.drawable.msg_groups; break;
+                        case 7: resId = R.drawable.msg_channel; break;
+                        case 8: resId = R.drawable.msg_saved; break;
+                        default: resId = R.drawable.ic_ab_other; break;
+                    }
+                    icon.setImageResource(resId);
+                    icon.setColorFilter(i == 0 ? accent : normal);
+
+                    if (titles) {
+                        text.setVisibility(View.VISIBLE);
+                        text.setText(getString(LiquidNavigationTabs.label(id)));
+                        text.setTextColor(i == 0 ? accent : normal);
+                    } else {
+                        text.setVisibility(View.GONE);
+                    }
+                } else {
+                    tabItem.setVisibility(View.GONE);
                 }
-                icon.setImageResource(resId);
-                icon.setColorFilter(i == 0 ? accent : normal);
-                tabItem.addView(icon, new LinearLayout.LayoutParams(dp(22), dp(22)));
-
-                if (titles) {
-                    TextView text = new TextView(getContext());
-                    text.setText(getString(LiquidNavigationTabs.label(id)));
-                    text.setTextSize(10);
-                    text.setTextColor(i == 0 ? accent : normal);
-                    text.setSingleLine(true);
-                    tabItem.addView(text, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-                }
-
-                LinearLayout.LayoutParams itemLp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
-                dockLayout.addView(tabItem, itemLp);
             }
         }
     }
@@ -280,7 +320,8 @@ public final class BottomTabsSettingsActivity extends SignatureMatteSettingsActi
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup p, int type) {
             if (type == 120) {
-                return new RecyclerListView.Holder(new DockPreviewCell(p.getContext()));
+                previewCell = new DockPreviewCell(p.getContext());
+                return new RecyclerListView.Holder(previewCell);
             }
             return super.onCreateViewHolder(p, type);
         }

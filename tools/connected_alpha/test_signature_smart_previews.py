@@ -255,7 +255,7 @@ class SmartPreviews(unittest.TestCase):
             p=ROOT/"TMessagesProj/src/main/res"/locale/"flexygram_smart_previews.xml"
             tree=ET.parse(p)
             names={c.attrib["name"] for c in tree.getroot()}
-            self.assertEqual(len(names),13)
+            self.assertEqual(len(names),16)
 
     def test_exact_review(self):
         from smart_previews1278_contract import verify_current

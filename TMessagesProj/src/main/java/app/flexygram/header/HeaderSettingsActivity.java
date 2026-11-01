@@ -13,7 +13,7 @@ import app.flexygram.settings.SignatureMatteSettingsActivity;
 import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.Theme;
-import org.telegram.ui.Cells.HeaderCell;
+import tw.nekomimi.nekogram.ui.cells.HeaderCell;
 import org.telegram.ui.Cells.TextCheckCell;
 import org.telegram.ui.Cells.TextSettingsCell;
 import org.telegram.ui.Components.RecyclerListView;
@@ -30,13 +30,13 @@ public final class HeaderSettingsActivity extends SignatureMatteSettingsActivity
         HeaderConfig.load();
         previewRow = addRow();
 
-        cherryHeaderRow = addRow("FlexyHeaderCherrySection");
+        cherryHeaderRow = addHeader("FlexyHeaderCherrySection");
         centerTitleRow = addRow("signatureHeaderCenterTitle");
         adaptiveBubbleRow = addRow("signatureHeaderAdaptiveBubble");
         counterRow = addRow("signatureHeaderCounter");
         iosStyledCounterRow = HeaderConfig.counter() ? addRow("signatureHeaderIosCounter") : -1;
 
-        geometryHeaderRow = addRow("FlexyHeaderGeometrySection");
+        geometryHeaderRow = addHeader("FlexyHeaderGeometrySection");
         styleRow = addRow("signatureHeaderStyle");
         sizeRow = HeaderConfig.portrait() ? -1 : addRow("signatureHeaderSize");
         opacityRow = HeaderConfig.portrait() ? -1 : addRow("signatureHeaderOpacity");
@@ -110,6 +110,7 @@ public final class HeaderSettingsActivity extends SignatureMatteSettingsActivity
 
         OpacityCell(Context c) {
             super(c);
+            setLayoutParams(new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             setOrientation(VERTICAL);
             setPadding(dp(20), dp(12), dp(20), dp(4));
             label = new TextView(c);
@@ -162,10 +163,13 @@ public final class HeaderSettingsActivity extends SignatureMatteSettingsActivity
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup p, int type) {
             if (type == 111) {
                 preview = new HeaderPreviewView(p.getContext());
+                preview.setLayoutParams(new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
                 return new RecyclerListView.Holder(preview);
             }
             if (type == 112) {
-                return new RecyclerListView.Holder(new OpacityCell(p.getContext()));
+                OpacityCell opacityCell = new OpacityCell(p.getContext());
+                opacityCell.setLayoutParams(new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                return new RecyclerListView.Holder(opacityCell);
             }
             return super.onCreateViewHolder(p, type);
         }

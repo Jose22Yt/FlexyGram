@@ -34,7 +34,9 @@ public final class HeaderPreviewView extends View {
     private final android.text.TextPaint scratchPaint = new android.text.TextPaint();
     private String displayName = "", displayStatus = "";
     public HeaderPreviewView(Context context) {
-        super(context); text.setTextAlign(Paint.Align.CENTER);
+        super(context);
+        setLayoutParams(new androidx.recyclerview.widget.RecyclerView.LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT));
+        text.setTextAlign(Paint.Align.CENTER);
         back = context.getDrawable(R.drawable.ic_ab_back).mutate();
         name = LocaleController.getString(R.string.FlexyHeaderPreviewName); status = LocaleController.getString(R.string.Online);
         setContentDescription(name + ", " + status); setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_YES);
@@ -85,9 +87,17 @@ public final class HeaderPreviewView extends View {
     @Override protected void onSizeChanged(int w, int h, int oldw, int oldh) { super.onSizeChanged(w,h,oldw,oldh); }
     @Override protected void onDraw(Canvas canvas) {
         float d = AndroidUtilities.density, height = previewHeight;
-        canvas.drawColor(Theme.getColor(Theme.key_windowBackgroundGray));
-        if (!HeaderConfig.signature()) { text.setColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText)); canvas.drawText(name, getWidth()/2f, getHeight()/2f, text); return; }
-        if(fusionMode&&HeaderConfig.fusion()){drawFusion(canvas);return;}
+        android.graphics.drawable.Drawable wallpaper = Theme.getCachedWallpaperNonBlocking();
+        if (Theme.wallpaperLoadTask != null) {
+            invalidate();
+        }
+        if (wallpaper != null) {
+            wallpaper.setBounds(0, 0, getWidth(), getHeight());
+            wallpaper.draw(canvas);
+        } else {
+            canvas.drawColor(Theme.getColor(Theme.key_chat_wallpaper));
+        }
+        if (fusionMode && HeaderConfig.fusion()) { drawFusion(canvas); return; }
         surface.draw(canvas, geometry, d, null);
         int color = Theme.getColor(Theme.key_actionBarDefaultTitle);
         if(iconColor!=color){iconColor=color;back.setColorFilter(color, android.graphics.PorterDuff.Mode.SRC_IN);}
