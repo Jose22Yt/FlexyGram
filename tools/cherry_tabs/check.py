@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Focused source integration checks (not a substitute for Android compilation)."""
 from pathlib import Path
+import xml.etree.ElementTree as ET
 
 root = Path(__file__).resolve().parents[2] / "TMessagesProj/src/main/java"
 settings = (root / "app/flexygram/navigation/BottomTabsSettingsActivity.java").read_text()
@@ -24,3 +25,18 @@ checks = {
 for name, ok in checks.items():
     print(("PASS" if ok else "FAIL") + " " + name)
 assert all(checks.values())
+
+
+resources = Path(__file__).resolve().parents[2] / "TMessagesProj/src/main/res"
+needed = {
+    "FlexyTabsPreviewHint", "FlexyTabsAvailable", "FlexyTabsOff", "FlexyTabsLimit",
+    "FlexyTabsRestore", "FlexyTabsRestoreSub", "FlexyTabsConfigure",
+    "FlexyTabsMovePrevious", "FlexyTabsMoveNext", "FlexyTabsRemove",
+    "FlexyTabsAdd", "FlexyTabsAddTitle", "FlexyTabsAddPrefix",
+}
+for locale in ("values", "values-es", "values-ru"):
+    tree = ET.parse(resources / locale / "flexygram_navigation.xml")
+    strings = [v.attrib["name"] for v in tree.getroot() if v.tag == "string"]
+    assert len(strings) == len(set(strings)), locale + ": duplicated resource names"
+    assert needed <= set(strings), locale + ": missing translated resource keys"
+    print("PASS " + locale + " resource coverage")
