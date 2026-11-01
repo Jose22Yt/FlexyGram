@@ -34,7 +34,7 @@ public class SignatureSettingsActivity extends SignatureMatteSettingsActivity {
         rowCount=rows.size();
     }
     @Override public View createView(Context context){
-        View v=super.createView(context);actionBar.centerTitle();listView.setSections(AndroidUtilities.dp(16),AndroidUtilities.dp(20),true);listView.setItemAnimator(null);
+        View v=super.createView(context);actionBar.centerTitle();listView.setItemViewCacheSize(10);listView.setSections(AndroidUtilities.dp(16),AndroidUtilities.dp(20),true);listView.setItemAnimator(null);
         if("root".equals(page))actionBar.createMenu().addItem(7,R.drawable.ic_ab_search_solar).setIsSearchField(true).setActionBarMenuItemSearchListener(new ActionBarMenuItem.ActionBarMenuItemSearchListener(){
             @Override public void onTextChanged(EditText field){query=field.getText().toString().trim().toLowerCase(Locale.ROOT);updateRows();listAdapter.notifyDataSetChanged();}
             @Override public void onSearchCollapse(){query="";updateRows();listAdapter.notifyDataSetChanged();}

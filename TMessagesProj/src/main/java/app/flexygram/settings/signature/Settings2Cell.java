@@ -16,6 +16,9 @@ public final class Settings2Cell extends FrameLayout {
     private final Theme.ResourcesProvider provider;
     private boolean divider;
     private int bodyHeight;
+    private int lastColor = 0;
+    private GradientDrawable tileDrawable;
+    private final int[] tileColors = new int[2];
     public Settings2Cell(Context c,Theme.ResourcesProvider p){
         super(c);provider=p;setWillNotDraw(false);setFocusable(true);
         title=new TextView(c);description=new TextView(c);icon=new ImageView(c);arrow=new ImageView(c);
@@ -34,15 +37,31 @@ public final class Settings2Cell extends FrameLayout {
         description.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText2,provider));
         arrow.setColorFilter(Theme.getColor(Theme.key_windowBackgroundWhiteGrayIcon,provider));arrow.setScaleX(LocaleController.isRTL?-1:1);
         icon.setImageResource(resource);icon.setColorFilter(Color.WHITE);
-        GradientDrawable tile=new GradientDrawable(GradientDrawable.Orientation.TL_BR,new int[]{color,ColorUtils.blendARGB(color,Color.BLACK,.12f)});
-        tile.setCornerRadius(dp(10));icon.setBackground(tile);divider=divide;
-        setContentDescription(name+(detail==null||detail.isEmpty()?"":", "+detail));requestLayout();invalidate();
+        if (tileDrawable == null) {
+            tileColors[0] = color;
+            tileColors[1] = ColorUtils.blendARGB(color, Color.BLACK, 0.12f);
+            tileDrawable = new GradientDrawable(GradientDrawable.Orientation.TL_BR, tileColors);
+            tileDrawable.setCornerRadius(dp(10));
+            icon.setBackground(tileDrawable);
+            lastColor = color;
+        } else if (lastColor != color) {
+            tileColors[0] = color;
+            tileColors[1] = ColorUtils.blendARGB(color, Color.BLACK, 0.12f);
+            tileDrawable.setColors(tileColors);
+            lastColor = color;
+        }
+        divider=divide;
+        setContentDescription(name+(detail==null||detail.isEmpty()?"":", "+detail));invalidate();
     }
     @Override protected void onMeasure(int w,int h){
         int width=MeasureSpec.getSize(w),space=Math.max(0,width-dp(108));
         title.measure(MeasureSpec.makeMeasureSpec(space,MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(0,MeasureSpec.UNSPECIFIED));
-        description.measure(MeasureSpec.makeMeasureSpec(space,MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(0,MeasureSpec.UNSPECIFIED));
-        bodyHeight=title.getMeasuredHeight()+(description.getVisibility()==GONE?0:dp(3)+description.getMeasuredHeight());
+        if (description.getVisibility() != GONE) {
+            description.measure(MeasureSpec.makeMeasureSpec(space,MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(0,MeasureSpec.UNSPECIFIED));
+            bodyHeight = title.getMeasuredHeight() + dp(3) + description.getMeasuredHeight();
+        } else {
+            bodyHeight = title.getMeasuredHeight();
+        }
         icon.measure(MeasureSpec.makeMeasureSpec(dp(36),MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(dp(36),MeasureSpec.EXACTLY));
         arrow.measure(MeasureSpec.makeMeasureSpec(dp(20),MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(dp(20),MeasureSpec.EXACTLY));
         setMeasuredDimension(width,Math.max(dp(72),bodyHeight+dp(24))+(divider?1:0));
