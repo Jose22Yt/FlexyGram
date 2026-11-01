@@ -54,18 +54,7 @@ final class FlexyFilesNativePreview extends LinearLayout {
         TextData(SelectedDocument.Text text) {
             encoding = text.encoding;
             newline = text.newline;
-            String value = text.value;
-            int start = 0;
-            while (start < value.length()) {
-                int end = Math.min(start + TEXT_CHUNK, value.length());
-                if (end < value.length()) {
-                    int lastLine = value.lastIndexOf('\n', end - 1);
-                    if (lastLine >= start + TEXT_CHUNK / 2) end = lastLine + 1;
-                }
-                chunks.add(value.substring(start, end));
-                start = end;
-            }
-            if (chunks.isEmpty()) chunks.add("");
+            chunks.addAll(app.flexygram.files.core.PreviewChunks.split(text.value, TEXT_CHUNK));
         }
     }
 
