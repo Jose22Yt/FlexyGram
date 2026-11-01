@@ -72,6 +72,12 @@ final class FlexyFilesSheet extends BottomSheet {
     private final RecyclerListView list;
     private final Adapter adapter = new Adapter();
     private final int maximumListHeight;
+    private final TextView browserLabel;
+    private final LinearLayout browserPanel;
+    private final FlexyFilesNativePreview previewPanel;
+    private final ScrollView sheetScroll;
+    private boolean previewing;
+    private String previewEntry;
 
     private static final class Row {
         final String path;
@@ -153,6 +159,7 @@ final class FlexyFilesSheet extends BottomSheet {
                 Theme.key_windowBackgroundWhiteBlueText);
         sectionLabel.setTypeface(AndroidUtilities.bold());
         add(root, sectionLabel, 0, 8);
+        browserLabel = sectionLabel;
 
         LinearLayout content = vertical(c);
         content.setBackground(card());
@@ -218,8 +225,8 @@ final class FlexyFilesSheet extends BottomSheet {
                 if (query.length() == 0) filter();
                 else query.setText("");
             } else {
-                if (owner.presentFragment(new FlexyFileEditorActivity(
-                        file, name, document != null && document.isArchive() ? selected.path : null, dialog, account, owner, path).returnContext(query.getText().toString(),list.getLayoutManager().onSaveInstanceState()))) dismiss();
+                openPreview(document != null && document.isArchive() ? selected.path : null,
+                        selected.label, selected.size);
             }
         });
         // Keep the sheet compact, even on phones using enlarged font scaling.
@@ -234,6 +241,13 @@ final class FlexyFilesSheet extends BottomSheet {
         emptyLabel.setVisibility(View.GONE);
         content.addView(emptyLabel, new LinearLayout.LayoutParams(-1, -2));
         add(root, content, 0, 12);
+        browserPanel = content;
+
+        // Native bounded preview: same BottomSheet, no new fragment or sheet animation.
+        previewPanel = new FlexyFilesNativePreview(c, owner.getResourceProvider(),
+                this::leavePreview, this::editPreview);
+        previewPanel.setVisibility(View.GONE);
+        add(root, previewPanel, 0, 12);
 
         TextView reassurance = text(c,
                 getString(R.string.FlexyFilesSignatureOriginal), 12,
@@ -273,6 +287,7 @@ final class FlexyFilesSheet extends BottomSheet {
         container.setFillViewport(false);
         container.setVerticalScrollBarEnabled(false);
         container.addView(root, new android.widget.FrameLayout.LayoutParams(-1, -2));
+        sheetScroll = container;
         setCustomView(container);
         setOnDismissListener(d -> dispose());
         refreshLocation();
@@ -350,8 +365,9 @@ final class FlexyFilesSheet extends BottomSheet {
         }
     }
 
-    /** Back clears search, then climbs one ZIP directory, then dismisses at root. */
+    /** Back returns to the already-allocated explorer before touching ZIP navigation. */
     @Override public void onBackPressed() {
+        if (previewing) { leavePreview(); return; }
         if (query != null && query.length() > 0) { query.setText(""); return; }
         if (!path.isEmpty()) { goUp(); return; }
         super.onBackPressed();
@@ -393,12 +409,10 @@ final class FlexyFilesSheet extends BottomSheet {
                             AndroidUtilities.formatFileSize(ready.size()));
                     sheet.query.setEnabled(true);
                     if (!ready.isArchive()) {
-                        if (sheet.restored) {
-                            sheet.rows=Collections.singletonList(new Row(sheet.name, sheet.name, false, ready.size()));
-                            sheet.refreshLocation();sheet.adapter.notifyDataSetChanged();
-                        } else if (sheet.owner.presentFragment(new FlexyFileEditorActivity(
-                                sheet.file, sheet.name, null, sheet.dialog, sheet.account, sheet.owner, "")))
-                            sheet.dismiss();
+                        sheet.rows = Collections.singletonList(new Row(sheet.name, sheet.name, false, ready.size()));
+                        sheet.refreshLocation();
+                        sheet.adapter.notifyDataSetChanged();
+                        sheet.openPreview(null, sheet.name, ready.size());
                     } else sheet.filter();
                 });
             } catch (Exception invalid) {
@@ -414,6 +428,89 @@ final class FlexyFilesSheet extends BottomSheet {
                 });
             }
         });
+    }
+
+    /**
+     * Dispatch only one bounded read on the existing instance-owned worker.
+     * Render either recycled text chunks or a sampled image inside this sheet.
+     */
+    private void openPreview(String entry, String label, long size) {
+        if (closed || document == null) return;
+        previewing = true;
+        previewEntry = entry;
+        browserLabel.setVisibility(View.GONE);
+        browserPanel.setVisibility(View.GONE);
+        previewPanel.setVisibility(View.VISIBLE);
+        previewPanel.loading(label);
+        sheetScroll.scrollTo(0, 0);
+
+        boolean imageFile = FlexyFilesNativePreview.isImage(label);
+        int limit = imageFile ? FlexyFilesNativePreview.MAX_IMAGE_BYTES : SelectedDocument.MAX_TEXT;
+        // Never ask the worker to allocate a file larger than its preview budget.
+        work.cancel();
+        if (size > limit) {
+            previewPanel.unavailable(true);
+            return;
+        }
+        SelectedDocument selected = document;
+        FilesWork tasks = work;
+        int token = tasks.token() + 1;
+        WeakReference<FlexyFilesSheet> weak = new WeakReference<>(this);
+        tasks.submit(() -> {
+            Object parsed = null;
+            try {
+                byte[] bytes = selected.read(entry, limit);
+                if (imageFile) {
+                    parsed = FlexyFilesNativePreview.decodeImage(bytes);
+                } else {
+                    parsed = new FlexyFilesNativePreview.TextData(SelectedDocument.text(bytes));
+                }
+            } catch (Exception invalid) {
+                // Unsupported or malformed files stay in the read-only safety state.
+            }
+            Object ready = parsed;
+            AndroidUtilities.runOnUIThread(() -> {
+                FlexyFilesSheet sheet = weak.get();
+                if (sheet == null || sheet.closed || !tasks.current(token)
+                        || !sheet.previewing || !TextUtils.equals(sheet.previewEntry, entry)) {
+                    if (ready instanceof android.graphics.Bitmap) {
+                        ((android.graphics.Bitmap) ready).recycle();
+                    }
+                    return;
+                }
+                if (ready instanceof FlexyFilesNativePreview.TextData) {
+                    sheet.previewPanel.showText((FlexyFilesNativePreview.TextData) ready);
+                } else if (ready instanceof android.graphics.Bitmap) {
+                    sheet.previewPanel.showImage((android.graphics.Bitmap) ready);
+                } else {
+                    sheet.previewPanel.unavailable(false);
+                }
+            });
+        });
+    }
+
+    /** No IO, no re-indexing and no view reconstruction on returning to a folder. */
+    private void leavePreview() {
+        if (!previewing || closed) return;
+        work.cancel();
+        previewing = false;
+        previewEntry = null;
+        previewPanel.release();
+        previewPanel.setVisibility(View.GONE);
+        browserLabel.setVisibility(View.VISIBLE);
+        browserPanel.setVisibility(View.VISIBLE);
+        sheetScroll.scrollTo(0, 0);
+    }
+
+    /** Keep all existing editor tools and save-a-copy protections intact. */
+    private void editPreview() {
+        if (!previewing || closed || owner.getParentActivity() == null) return;
+        if (owner.presentFragment(new FlexyFileEditorActivity(
+                file, name, previewEntry, dialog, account, owner, path)
+                .returnContext(query.getText().toString(),
+                        list.getLayoutManager().onSaveInstanceState()))) {
+            dismiss();
+        }
     }
 
     private void filter() {
@@ -471,6 +568,7 @@ final class FlexyFilesSheet extends BottomSheet {
         if (closed) return;
         closed = true;
         work.close();
+        previewPanel.release();
         SelectedDocument old = document;
         document = null;
         if (old != null) try { old.close(); } catch (IOException ignored) {}
