@@ -331,7 +331,7 @@ public final class BottomTabsSettingsActivity extends SignatureMatteSettingsActi
                 if (currentDestinations.size() >= LiquidNavigationDestinations.MAX_VISIBLE) {
                     showDialog(new AlertDialog.Builder(getParentActivity(), resourcesProvider)
                             .setMessage(getString(R.string.FlexyTabsLimit))
-                            .setPositiveButton(R.string.OK, null).create());
+                            .setPositiveButton(getString(R.string.OK), null).create());
                     return;
                 }
                 currentDestinations.add(id);

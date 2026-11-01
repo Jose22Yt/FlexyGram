@@ -169,7 +169,8 @@ public final class LiquidNavigationConfig {
     public static boolean hideLabels(int count, int availableDp) {
         ensure();
         if (!showTitles) return true;
-        // Keep labels legible: narrow six-slot docks use icons until space is sufficient.\n        return availableDp / Math.max(1, count) < 72;
+        // Keep labels legible: narrow six-slot docks use icons until space is sufficient.
+        return availableDp / Math.max(1, count) < 72;
     }
 
     public static boolean labels() {
