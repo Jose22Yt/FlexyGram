@@ -343,7 +343,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         // отступов и без ограничения ширины
         MainTabsUiHelper.applyTabsLayoutStyle(tabsView, dp(328 + DialogsActivity.MAIN_TABS_MARGIN * 2));
 
-        tabs = new GlassTabView[10];
+        tabs = new GlassTabView[11];
         tabs[INDEX_CHATS] = GlassTabView.createMainTab(context, resourceProvider, GlassTabView.TabAnimation.CHATS, R.string.MainTabsChats);
         tabs[INDEX_CONTACTS] = GlassTabView.createMainTab(context, resourceProvider, GlassTabView.TabAnimation.CONTACTS, R.string.MainTabsContacts);
         tabs[INDEX_SETTINGS] = GlassTabView.createMainTab(context, resourceProvider, GlassTabView.TabAnimation.SETTINGS, R.string.Settings);
@@ -369,7 +369,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         tabsView.addTabToIgnoreClick(tabs[INDEX_CALLS]);
         tabsView.addTabToIgnoreClick(tabs[INDEX_FEED]);
 
-        final int[] displayOrder = {INDEX_CHATS, INDEX_FEED, INDEX_CONTACTS, INDEX_SETTINGS, INDEX_CALLS, INDEX_PROFILE,6,7,8,9};
+        final int[] displayOrder = {INDEX_CHATS, INDEX_FEED, INDEX_CONTACTS, INDEX_SETTINGS, INDEX_CALLS, INDEX_PROFILE,6,7,8,9,10};
         for (int index : displayOrder) {
             final GlassTabView view = tabs[index];
             final int tabIndex = index;
@@ -1010,6 +1010,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         }
     }
 
+    private final Runnable flexyTabConfigListener = this::applyFlexyTabs;
     public GlassTabView[] tabs;
     private int[] flexyShownDestinations = new int[0], flexyConfiguredDestinations = new int[0];
     private void applyFlexyTabs() {
@@ -1066,7 +1067,8 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         if (id == app.flexygram.navigation.LiquidNavigationDestinations.MORE) {
             ItemOptions options = ItemOptions.makeOptions(this, anchor);
             for (int destination = 0; destination < app.flexygram.navigation.LiquidNavigationDestinations.COUNT; destination++) {
-                if (!app.flexygram.navigation.LiquidNavigationDestinations.contains(flexyShownDestinations,destination)) {
+                if (app.flexygram.navigation.LiquidNavigationDestinations.isSelectable(destination)
+                        && !app.flexygram.navigation.LiquidNavigationDestinations.contains(flexyShownDestinations,destination)) {
                     final int selected = destination;
                     options.add(R.drawable.msg_actions, getString(app.flexygram.navigation.LiquidNavigationTabs.label(selected)),
                             () -> openFlexyDestination(selected));
@@ -1078,6 +1080,10 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         openFlexyDestination(id); return true;
     }
     private void openFlexyDestination(int id) {
+        if (id == app.flexygram.navigation.LiquidNavigationDestinations.SEARCH) {
+            openChatsSearch();
+            return;
+        }
         int position = indexToPosition(id);
         if (position >= 0 && app.flexygram.navigation.LiquidNavigationDestinations.contains(flexyShownDestinations,id)) {
             if (!viewPager.isManualScrolling() && !viewPager.isTouch()) {
@@ -1326,6 +1332,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
 
     @Override
     public boolean onFragmentCreate() {
+        app.flexygram.navigation.LiquidNavigationConfig.addChangeListener(flexyTabConfigListener);
         observersGroup = NotificationCenter.getInstance(currentAccount)
             .createObserversGroup(this)
             .add(NotificationCenter.fileLoaded)
@@ -1346,6 +1353,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
 
     @Override
     public void onFragmentDestroy() {
+        app.flexygram.navigation.LiquidNavigationConfig.removeChangeListener(flexyTabConfigListener);
 
         Bulletin.removeDelegate(this);
         Bulletin.removeDelegate(contentView);
