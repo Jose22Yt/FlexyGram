@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="FlexySmartPreviewsTitle">Vistas previas inteligentes</string>
-    <string name="FlexySmartPreviewAdaptive">Semántico adaptativo</string>
+    <string name="FlexySmartPreviewAdaptive">Adaptativo</string>
     <string name="FlexySmartPreviewAccent">Acento del tema</string>
-    <string name="FlexySmartPreviewMatte">Signature Matte</string>
+    <string name="FlexySmartPreviewMatte">Matte</string>
     <string name="FlexySmartPreviewOff">Desactivadas</string>
     <string name="FlexySmartFile">Documento</string>
     <string name="FlexySmartMusic">Música</string>

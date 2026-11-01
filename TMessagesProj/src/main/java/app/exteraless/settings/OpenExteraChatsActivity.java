@@ -446,7 +446,7 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
         signatureHeaderRow = addRow("signatureChatHeader");
         composerSettingsRow = addRow("flexyComposerSettings");
         signatureThemeRow = addRow("flexyThemeWallpaper");
-        smartPreviewsRow = addRow("flexySmartPreviews");
+        smartPreviewsRow = -1; // Canonical controls are embedded in Home by SmartPreviewsSettingsActivity.
         signatureInteractionHeader = addRow("settings2RetiredHeader");
         flexyContextPanelRow = addRow("flexyContextPanel");
         signatureMessagesRow = addRow("flexyMessagesGestures");
@@ -1874,24 +1874,6 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
             return;
         } else if (position == adminShortcutsRow) {
             toggleQuickAdminShortcuts(view);
-            return;
-        } else if (position == smartPreviewsRow) {
-            showOptions(view,new CharSequence[]{
-                getString(R.string.FlexySmartPreviewAdaptive),
-                getString(R.string.FlexySmartPreviewAccent),
-                getString(R.string.FlexySmartPreviewMatte),
-                getString(R.string.FlexySmartPreviewOff)
-            },selected->{
-                if (selected != app.flexygram.home.SignatureSmartPreviews.mode()) {
-                    app.flexygram.home.SignatureSmartPreviews.setMode(selected);
-                    // Invalidate only actual Telegram dialog lists. Rebuilding
-                    // the entire fragment stack for a badge-color change risks
-                    // jank and interrupted chat navigation.
-                    NotificationCenter.getInstance(org.telegram.messenger.UserConfig.selectedAccount)
-                            .postNotificationName(NotificationCenter.dialogsNeedReload);
-                }
-                reloadList();
-            });
             return;
         } else if (position == flexyContextPanelRow) {
             presentFragment(new app.flexygram.bubbles.interaction.BubbleInteractionSettingsActivity());return;

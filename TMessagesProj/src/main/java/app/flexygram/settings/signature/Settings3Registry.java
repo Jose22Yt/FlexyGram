@@ -39,6 +39,7 @@ public final class Settings3Registry {
         return "chat";
     }
     public static BaseFragment searchTarget(BaseFragment original,String key){
+        if("flexySmartPreviews".equals(key)||original instanceof app.flexygram.home.SmartPreviewsSettingsActivity)return open("home");
         if("flexyfilesEnabled".equals(key)||"flexyfilesHelp".equals(key))return open("flexyfiles");
         String route=null;
         if(original instanceof tw.nekomimi.nekogram.settings.BaseNekoSettingsActivity)route=((tw.nekomimi.nekogram.settings.BaseNekoSettingsActivity)original).getSignatureSettingsRoute();

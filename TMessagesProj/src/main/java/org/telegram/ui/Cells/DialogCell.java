@@ -976,6 +976,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
 
     @Override
     protected void onDetachedFromWindow() {
+        app.flexygram.home.SignatureSmartPreviews.removeStyleListener(smartPreviewStyleListener);
         super.onDetachedFromWindow();
         isSliding = false;
         drawRevealBackground = false;
@@ -1013,6 +1014,8 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
+        app.flexygram.home.SignatureSmartPreviews.addStyleListener(smartPreviewStyleListener);
+        refreshSmartPreviewStyle(smartPreviewModeLastBuilt, app.flexygram.home.SignatureSmartPreviews.mode());
         avatarImage.onAttachedToWindow();
         for (int i = 0; i < thumbImage.length; ++i) {
             thumbImage[i].onAttachedToWindow();
@@ -1313,6 +1316,17 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
 
     private static final float BADGE_DRAWABLE_SIZE = 16;
     private static final float BADGE_DRAWABLE_OFFSET = (BADGE_SIZE - BADGE_DRAWABLE_SIZE) / 2f;
+
+    private final app.flexygram.home.SignatureSmartPreviews.StyleListener smartPreviewStyleListener=this::refreshSmartPreviewStyle;
+    private void refreshSmartPreviewStyle(int previous, int next) {
+        if(previous==next || message==null || !(isDialogCell || isTopic)) return;
+        if(smartPreviewKind==0 && !(previous==app.flexygram.home.SignatureSmartPreviewPalette.OFF
+                && app.flexygram.home.SignatureSmartPreviews.kind(message)!=0)) return;
+        if(previous==app.flexygram.home.SignatureSmartPreviewPalette.OFF || next==app.flexygram.home.SignatureSmartPreviewPalette.OFF) {
+            if(getMeasuredWidth()>0) buildLayout(); // native text/thumbnail layout, same row height and scroll position
+        } else smartPreviewModeLastBuilt=next; // colors only: retain StaticLayout and spans
+        invalidate();
+    }
 
     public void buildLayout() {
         if (isTransitionSupport) {

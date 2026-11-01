@@ -106,7 +106,7 @@ public final class SignatureSettingsRegistry {
             case "surfaces":return scope(new OpenExteraAppearanceActivity(),"appearance","effects",id);
             case "visible":return chats(OpenExteraChatsActivity.SCREEN_HIDING,"visible",id);
             case "post_appearance":return chats(OpenExteraChatsActivity.SCREEN_SIGNATURE_MESSAGES,"post_appearance",id);
-            case "smart_previews":return chats(OpenExteraChatsActivity.SCREEN_CHATS,"chat_list",id);
+            case "smart_previews":return new app.flexygram.home.SmartPreviewsSettingsActivity();
             case "messages":case "gestures":return chats(OpenExteraChatsActivity.SCREEN_SIGNATURE_MESSAGES,id,id);
             case "menus":return chats(OpenExteraChatsActivity.SCREEN_MENUS,id,id);
             case "media":return chats(OpenExteraChatsActivity.SCREEN_MEDIA,id,id);

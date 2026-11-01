@@ -17,24 +17,35 @@ import org.telegram.tgnet.TLRPC;
 public final class SignatureSmartPreviews {
     private static final String PREFS="flexy_signature_smart_previews";
     private static volatile int cachedMode=-1;
+    public interface StyleListener { void onStyleChanged(int previous, int next); }
+    // UI-thread-only, attached views subscribe and always unsubscribe on detach.
+    private static final java.util.HashSet<StyleListener> listeners=new java.util.HashSet<>();
+    public static void addStyleListener(StyleListener listener) { listeners.add(listener); }
+    public static void removeStyleListener(StyleListener listener) { listeners.remove(listener); }
     private SignatureSmartPreviews(){}
     public static int mode(){
         int result=cachedMode;
         if(result>=0)return result;
         synchronized(SignatureSmartPreviews.class){
             if(cachedMode<0){
-                int stored=ApplicationLoader.applicationContext.getSharedPreferences(PREFS,Context.MODE_PRIVATE)
-                        .getInt("palette",SignatureSmartPreviewPalette.ADAPTIVE);
-                cachedMode=stored>=0&&stored<=3?stored:0;
+                android.content.SharedPreferences prefs=ApplicationLoader.applicationContext.getSharedPreferences(PREFS,Context.MODE_PRIVATE);
+                int stored=prefs.getInt("palette",SignatureSmartPreviewPalette.MULTICOLOR);
+                cachedMode=SignatureSmartPreviewPalette.normalizeMode(stored);
+                if(prefs.contains("palette") && cachedMode!=stored) prefs.edit().putInt("palette",cachedMode).apply();
             }
             return cachedMode;
         }
     }
+    /** Draw is never the place to load preferences. Binding/constructing a span primes mode(). */
+    public static int drawingMode() { int value=cachedMode;return value<0?SignatureSmartPreviewPalette.MULTICOLOR:value; }
     public static void setMode(int next){
-        if(next<0||next>3)throw new IllegalArgumentException("palette mode");
+        if(next<0||next>SignatureSmartPreviewPalette.MULTICOLOR)throw new IllegalArgumentException("palette mode");
+        next=SignatureSmartPreviewPalette.normalizeMode(next);
+        int previous=mode();if(previous==next)return;
         cachedMode=next;
-        ApplicationLoader.applicationContext.getSharedPreferences(PREFS,Context.MODE_PRIVATE)
-                .edit().putInt("palette",next).apply();
+        ApplicationLoader.applicationContext.getSharedPreferences(PREFS,Context.MODE_PRIVATE).edit().putInt("palette",next).apply();
+        // One allocation per user change, never per message or frame; safe if a view detaches during delivery.
+        for(StyleListener listener:listeners.toArray(new StyleListener[0])) listener.onStyleChanged(previous,next);
     }
     /**
      * Telegram stores ordinary dialog previews as singleton ArrayLists in
