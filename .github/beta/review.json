@@ -1,5 +1,5 @@
 {
-  "base": "0bfd01e748934b5eac2c6ba4215deb96119d6f5a",
+  "base": "3c7a20a229d425c8f3b5ea1740ccb6d8b3361fea",
   "paths": [
     ".github/beta/README.md",
     ".github/beta/audit_environment.py",
@@ -16,15 +16,15 @@
   ],
   "reviewed": {
     ".github/beta/README.md": "227c26c2b0cea7d033e5fe1f99dd2a26be8e1862a0e2e6285ee283be86df42e4",
-    ".github/beta/audit_environment.py": "4fb9f5b0b5f14c7b2825d7bb2b820666ebd145be7c40e06192775a15a9107372",
-    ".github/beta/policy.json": "e347e10301a58989abbed8e9eb2aa0c9d482d8bf7e23188445a3b16cb48a1e78",
-    ".github/beta/private_build.py": "f1bb663f64063210bd5678a547c90e50f656ff751b7a51b653379c5fec29a1d5",
-    ".github/beta/source_contract.py": "df6029a69226efdfbe9f1090b502bd15c74a9e3e99aa66bf98cc81ceed27fb1c",
+    ".github/beta/audit_environment.py": "dcbdfef5ba99f9297b3eb9153d596f6a76103c825971f9db44af4354967e6805",
+    ".github/beta/policy.json": "352427e57328ff75a9701a83f9887c252f61cdf907c5a74895e2158b8b180ac4",
+    ".github/beta/private_build.py": "72ba86989c7a94d04479b41be9137d1dc5f9cd5560f28e5447ca31fff5065747",
+    ".github/beta/source_contract.py": "d40ab8e902e36064f673eca572d1b0a74f848b377d5fa55684f3d10131d27a15",
     ".github/beta/test_infrastructure.py": "472e4c0cfcb7a009363fa2336950240fdc8136b1e0f9e325817347104eb28459",
     ".github/workflows/beta-private-tests.yml": "4ee320fe25544445fdc490658b415519b947434f717d5d3b78ac05d05e510237",
-    ".github/workflows/beta-private.yml": "ecc26484455d3b5324c51fe4ce543cfd32a8584fb70065a04282b5902c25ba9c",
+    ".github/workflows/beta-private.yml": "8121122d5131c2ec9aee21d3a08201ab46178a52a0d649cf834b9f34ade307c6",
     "tools/connected_alpha/beta_release_contract.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    ".github/beta/source_identity.json": "596d79ba5c3d1fd3d7623314c29f5d25425b9e7be2fe37ee2f5748790f9b5bdb",
+    ".github/beta/source_identity.json": "54529eec50ef55ebf2e6d69f1b51f415f06b027538a542dc8891ce226d4a2e51",
     ".github/workflows/pr.yml": "f004441445da84b23ca63bd0fcec2e5329552679a2463251fbe6129c34af8fcd"
   }
 }
