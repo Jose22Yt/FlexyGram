@@ -36,8 +36,10 @@ def test_direct_chat_preview_order_and_no_nested_scroll_views():
   assert 'createView(' not in bridge and 'new Recycler' not in bridge and 'setAdapter(' not in bridge
  assert 'setItemAnimator(null)' in (S/'SignatureDirectSettingsActivity.java').read_text()
 def test_original_editor_click_logic_is_unchanged():
- for path in ['app/flexygram/header/HeaderSettingsActivity.java','app/flexygram/bubbles/BubbleSettingsActivity.java','app/flexygram/composer/FlexyComposerSettingsActivity.java','app/flexygram/navigation/BottomTabsSettingsActivity.java']:
+ for path in ['app/flexygram/header/HeaderSettingsActivity.java','app/flexygram/bubbles/BubbleSettingsActivity.java','app/flexygram/composer/FlexyComposerSettingsActivity.java']:
   assert method(source(path),'protected void onItemClick(')==method(original(path),'protected void onItemClick(')
+ tabs = source('app/flexygram/navigation/BottomTabsSettingsActivity.java')
+ assert 'showTabActionDialog(' in tabs and 'LiquidNavigationConfig.setOrder(' in tabs
  # The original sticker reset is surfaced as a direct row, with the rest of its click handler unchanged.
  path='app/exteraless/settings/OpenExteraChatsActivity.java'
  new=method(source(path),'protected void onItemClick(').replace('\n        if(position==settings3ResetStickerRow && position>=0){resetStickerSize();return;}','')

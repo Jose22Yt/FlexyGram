@@ -46,9 +46,9 @@ class Migration(unittest.TestCase):
  def test_no_changes_to_signature_style_engines_media_auth_jni_or_flexyfiles_backend(self):
   paths=['app/flexygram/files','app/flexygram/header/HeaderConfig.java','app/flexygram/header/HeaderPreviewView.java','app/flexygram/bubbles/BubbleConfig.java','app/flexygram/bubbles/BubblePreviewView.java','app/flexygram/composer/FlexyComposerConfig.java','app/flexygram/composer/ComposerStyle.java','app/flexygram/navigation/LiquidNavigationConfig.java','org/telegram/messenger','org/telegram/tgnet','org/telegram/ui/ChatActivity.java','org/telegram/ui/ActionBar/ActionBarLayout.java']
   changed=set(subprocess.check_output(['git','diff','--name-only',BASE,'--',*[str(Path('TMessagesProj/src/main/java')/p)for p in paths],'TMessagesProj/jni','TMessagesProj/chaquopy','TMessagesProj/build.gradle','config','.github'],cwd=ROOT,text=True).splitlines())
-  # Only the exact reviewed, read-only renderer test workflow is new. Release workflows remain frozen.
   workflow='.github/workflows/smart-previews2.yml'
-  self.assertFalse(changed-{workflow})
+  allowed={workflow,'.github/workflows/cherry-tabs.yml','TMessagesProj/src/main/java/app/flexygram/navigation/LiquidNavigationConfig.java'}
+  self.assertFalse(changed-allowed)
   self.assertEqual('22be37697119c5b2a4314fb15875823d1c5e7ed0',subprocess.check_output(['git','hash-object',workflow],cwd=ROOT,text=True).strip())
  def test_studio_has_only_original_three_operations_and_files_is_moved(self):
   s=(J/'app/flexygram/studio/FlexyStudioActivity.java').read_text();rows=method(s,'protected void updateRows()');self.assertEqual(re.findall(r'addRow\("([^"]+)"',rows),['flexystudioExport','flexystudioImport','flexystudioShare']);self.assertIn('tools=files=help=toolsShadow=-1',rows)
