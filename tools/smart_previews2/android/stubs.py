@@ -56,3 +56,20 @@ def write(dest,root):
  s=(java/'org/telegram/ui/Cells/DialogCell.java').read_text();a=s.index('    private void refreshSmartPreviewStyle(');b=s.index('    public void buildLayout()',a);method=s[a:b].replace('private void refreshSmartPreviewStyle','public void refreshSmartPreviewStyle')
  emit('DialogStyleProbe.java',r'''import org.telegram.messenger.MessageObject;public class DialogStyleProbe extends android.view.View{public MessageObject message;public boolean isDialogCell=true,isTopic;public int smartPreviewKind,smartPreviewModeLastBuilt,builds;public DialogStyleProbe(android.content.Context c){super(c);}void buildLayout(){builds++;smartPreviewModeLastBuilt=app.flexygram.home.SignatureSmartPreviews.mode();smartPreviewKind=smartPreviewModeLastBuilt==3?0:app.flexygram.home.SignatureSmartPreviews.kind(message);}
 '''+method+'}')
+
+
+def resources(root,out):
+ # Compile the actual referenced strings, not only the host-generated Java IDs.
+ java=root/'TMessagesProj/src/main/java/app/flexygram/home'
+ names=set()
+ for name in ['SignatureSmartPreviews','SmartPreviewsSettingsActivity','SmartPreviewsDemoView']:
+  names.update(re.findall(r'R.string.(\w+)',(java/(name+'.java')).read_text()))
+ found={}
+ for directory in ['values','values-es']:
+  for p in (root/'TMessagesProj/src/main/res'/directory).glob('*.xml'):
+   for x in ET.parse(p).getroot().findall('string'):
+    if x.get('name') in names: found[x.get('name')]=x
+ values=ET.Element('resources')
+ for n in sorted(names): values.append(found[n])
+ folder=out.parent/'values';folder.mkdir(exist_ok=True)
+ ET.ElementTree(values).write(folder/'smart-previews.xml',encoding='utf-8',xml_declaration=True)

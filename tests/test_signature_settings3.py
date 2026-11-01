@@ -41,7 +41,14 @@ def test_original_editor_click_logic_is_unchanged():
  # The original sticker reset is surfaced as a direct row, with the rest of its click handler unchanged.
  path='app/exteraless/settings/OpenExteraChatsActivity.java'
  new=method(source(path),'protected void onItemClick(').replace('\n        if(position==settings3ResetStickerRow && position>=0){resetStickerSize();return;}','')
- assert new==method(original(path),'protected void onItemClick(')
+ # Smart Previews 2 replaces only the old visual picker with the canonical Home section.
+ expected=method(original(path),'protected void onItemClick(')
+ start=expected.index('        } else if (position == smartPreviewsRow) {')
+ end=expected.index('        } else if (position == flexyContextPanelRow)',start)
+ expected=expected[:start]+expected[end:]
+ assert new==expected
+ assert 'smartPreviewsRow = addRow(' not in source(path)
+ assert 'new app.flexygram.home.SmartPreviewsSettingsActivity()' in source('app/flexygram/settings/signature/SignatureDirectSettingsActivity.java')
 def test_original_extra_callbacks_are_reused_without_logic_changes():
  for cls in ['NekoGeneralSettingsActivity','NekoChatSettingsActivity','NekoExperimentalSettingsActivity']:
   path='tw/nekomimi/nekogram/settings/'+cls+'.java';new=source(path);old=original(path)

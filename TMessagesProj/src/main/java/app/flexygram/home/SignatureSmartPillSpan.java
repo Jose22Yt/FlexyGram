@@ -94,7 +94,7 @@ public final class SignatureSmartPillSpan extends ReplacementSpan {
         SignatureSmartPreviewPalette.resolveColors(kind, mode, accent, surface, colorBuf);
 
         int save = canvas.save();
-        canvas.clipRect(x, top, x + measured, bottom);
+        canvas.clipRect(x, (top + bottom - height) * .5f, x + measured, (top + bottom + height) * .5f);
         int alpha = paint.getAlpha();
         float centerY = (top + bottom) * 0.5f;
 
