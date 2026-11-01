@@ -6,7 +6,7 @@
     <string name="FlexyBottomTabsShowSub">Doble toque en la pestaña de chat para abrir "Mensajes guardados". Doble toque en el perfil (o Ajustes si está oculto) para cambiar de cuenta.</string>
     <string name="FlexyBottomTabsSectionAppearance">Apariencia</string>
     <string name="FlexyBottomTabsFloatingDock">Estilo Dock flotante</string>
-    <string name="FlexyBottomTabsFloatingDockSub">Muestra la barra como una cápsula flotante estilizada con efecto Glass.</string>
+    <string name="FlexyBottomTabsFloatingDockSub">Muestra la barra como una cápsula flotante estilizada y compacta, sin desenfoque.</string>
     <string name="FlexyBottomTabsShowTitles">Mostrar títulos de pestañas</string>
     <string name="FlexyBottomTabsSectionOrder">Orden y distribución de pestañas</string>
     <string name="FlexyBottomTabsOrderHint">Toca para activar/desactivar o mueve los elementos para personalizar tu barra.</string>
@@ -15,4 +15,17 @@
     <string name="FlexyBottomTabsDoubleTapProfile">Doble toque en perfil para cambiar de cuenta</string>
     <string name="FlexyBottomTabsAlwaysSearchChats">Buscar siempre en chats</string>
     <string name="FlexyBottomTabsAlwaysSearchChatsSub">Cuando está activo, el botón de búsqueda siempre abre la búsqueda de chats. Desactivado, busca en la pantalla actual.</string>
+    <string name="FlexyTabsPreviewHint">Arrastra los iconos para ordenarlos. Toca uno para configurarlo.</string>
+    <string name="FlexyTabsAvailable">Pestañas disponibles · Toca para agregar</string>
+    <string name="FlexyTabsOff">Barra inferior desactivada</string>
+    <string name="FlexyTabsLimit">La barra admite hasta seis pestañas. Quita una para agregar otra.</string>
+    <string name="FlexyTabsRestore">Restablecer pestañas</string>
+    <string name="FlexyTabsRestoreSub">Orden predeterminado</string>
+    <string name="FlexyTabsConfigure">Configurar ›</string>
+    <string name="FlexyTabsMovePrevious">▲ Mover a la izquierda / arriba</string>
+    <string name="FlexyTabsMoveNext">▼ Mover a la derecha / abajo</string>
+    <string name="FlexyTabsRemove">✖ Quitar pestaña</string>
+    <string name="FlexyTabsAdd">＋ Agregar otra pestaña…</string>
+    <string name="FlexyTabsAddTitle">Agregar pestaña a la barra</string>
+    <string name="FlexyTabsAddPrefix">＋</string>
 </resources>
