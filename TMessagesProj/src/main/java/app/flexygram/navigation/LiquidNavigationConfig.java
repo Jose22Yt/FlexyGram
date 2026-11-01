@@ -14,6 +14,11 @@ public final class LiquidNavigationConfig {
     private static boolean alwaysSearchChats = false;
     private static boolean floatingDock = true;
     private static int[] activeOrder = null;
+    // Main tabs remains mounted beneath the settings fragment: notify it immediately.
+    private static final java.util.concurrent.CopyOnWriteArrayList<Runnable> changeListeners = new java.util.concurrent.CopyOnWriteArrayList<>();
+    public static void addChangeListener(Runnable listener) { if (listener != null) changeListeners.addIfAbsent(listener); }
+    public static void removeChangeListener(Runnable listener) { changeListeners.remove(listener); }
+    private static void notifyChanged() { for (Runnable listener : changeListeners) listener.run(); }
 
     private LiquidNavigationConfig() {}
 
@@ -79,6 +84,7 @@ public final class LiquidNavigationConfig {
         ensure();
         enabled = value;
         prefs().edit().putBoolean("show_tabs", value).apply();
+        notifyChanged();
     }
 
     public static boolean showTitles() {
@@ -90,6 +96,7 @@ public final class LiquidNavigationConfig {
         ensure();
         showTitles = value;
         prefs().edit().putBoolean("show_titles", value).apply();
+        notifyChanged();
     }
 
     public static boolean doubleTapChats() {
@@ -134,6 +141,7 @@ public final class LiquidNavigationConfig {
         ensure();
         floatingDock = value;
         prefs().edit().putBoolean("floating_dock", value).apply();
+        notifyChanged();
     }
 
     public static int[] order() {
@@ -151,6 +159,7 @@ public final class LiquidNavigationConfig {
             sb.append(activeOrder[i]);
         }
         prefs().edit().putString("tab_order", sb.toString()).apply();
+        notifyChanged();
     }
 
     public static int[] shown(int slots) {
