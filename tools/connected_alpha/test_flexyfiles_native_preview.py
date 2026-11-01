@@ -6,6 +6,8 @@ remains the authority for ZIP validation and limits.
 """
 from pathlib import Path
 from xml.etree import ElementTree
+import subprocess
+import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -60,6 +62,46 @@ class NativeViewerContracts(unittest.TestCase):
         self.assertIn("MAX_ARCHIVE = 128L * 1024 * 1024", self.core)
         self.assertIn("new FlexyFileEditorActivity(", self.sheet)
         self.assertIn("enabled()", self.entry)
+
+    def test_real_java_chunker_preserves_unicode_and_line_endings(self):
+        """Compile and run the Android-independent production chunker on hostile text."""
+        source = JAVA / "core/PreviewChunks.java"
+        probe = r'''import app.flexygram.files.core.PreviewChunks;
+import java.util.List;
+public class ChunkProbe {
+    static void check(String input, int size) {
+        List<String> parts = PreviewChunks.split(input, size);
+        if (!String.join("", parts).equals(input)) throw new AssertionError("bytes changed");
+        for (int i = 0; i < parts.size(); i++) {
+            String value = parts.get(i);
+            if (value.length() > size) throw new AssertionError("oversized row");
+            if (value.isEmpty() && !input.isEmpty()) throw new AssertionError("empty row");
+            if (i + 1 < parts.size() && !value.isEmpty()
+                    && Character.isHighSurrogate(value.charAt(value.length() - 1)))
+                throw new AssertionError("split surrogate pair");
+        }
+    }
+    public static void main(String[] args) {
+        check("", 3072);
+        check("x".repeat(3071) + "😀" + "y".repeat(10000), 3072);
+        check(("some text\r\nline\n" + "🙂".repeat(53)).repeat(1500), 3072);
+        check("a".repeat(256 * 1024), 3072);
+        try {
+            PreviewChunks.split("bad", 1);
+            throw new AssertionError("accepted unsafe budget");
+        } catch (IllegalArgumentException expected) {}
+        System.out.println("PASS pure Java native preview chunks");
+    }
+}'''
+        with tempfile.TemporaryDirectory() as temp:
+            test = Path(temp) / "ChunkProbe.java"
+            test.write_text(probe)
+            subprocess.run(["java", "-m", "jdk.compiler/com.sun.tools.javac.Main",
+                            "-d", temp, str(source), str(test)],
+                           check=True, capture_output=True, text=True)
+            result = subprocess.check_output(["java", "-Xmx128m", "-cp", temp,
+                                              "ChunkProbe"], text=True)
+            self.assertIn("PASS pure Java native preview chunks", result)
 
     def test_translations_cover_new_actions(self):
         expected = {
