@@ -55,19 +55,19 @@ public final class BottomTabsSettingsActivity extends SignatureMatteSettingsActi
 
         previewRow = addRow();
 
-        tabsHeaderRow = addHeader("FlexyBottomTabsSectionTabs");
+        tabsHeaderRow = addRow("FlexyBottomTabsSectionTabs");
         showTabsRow = addRow("flexyBottomTabsShow");
 
-        appearanceHeaderRow = addHeader("FlexyBottomTabsSectionAppearance");
+        appearanceHeaderRow = addRow("FlexyBottomTabsSectionAppearance");
         floatingDockRow = addRow("flexyBottomTabsFloatingDock");
         showTitlesRow = addRow("flexyBottomTabsShowTitles");
 
-        actionsHeaderRow = addHeader("FlexyBottomTabsSectionActions");
+        actionsHeaderRow = addRow("FlexyBottomTabsSectionActions");
         doubleTapChatsRow = addRow("flexyBottomTabsDoubleTapChats");
         doubleTapProfileRow = addRow("flexyBottomTabsDoubleTapProfile");
         alwaysSearchChatsRow = addRow("flexyBottomTabsAlwaysSearchChats");
 
-        orderHeaderRow = addHeader("FlexyBottomTabsSectionOrder");
+        orderHeaderRow = addRow("FlexyBottomTabsSectionOrder");
         orderStartRow = rowCount;
         for (int i = 0; i < currentDestinations.size(); i++) {
             addRow("flexy_dest_" + currentDestinations.get(i));
