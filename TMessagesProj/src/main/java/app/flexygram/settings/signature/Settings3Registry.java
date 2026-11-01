@@ -42,7 +42,7 @@ public final class Settings3Registry {
         if("flexyfilesEnabled".equals(key)||"flexyfilesHelp".equals(key))return open("flexyfiles");
         String route=null;
         if(original instanceof tw.nekomimi.nekogram.settings.BaseNekoSettingsActivity)route=((tw.nekomimi.nekogram.settings.BaseNekoSettingsActivity)original).getSignatureSettingsRoute();
-        if(original instanceof tw.nekomimi.nekogram.settings.BaseNekoXSettingsActivity)route=((tw.nekomimi.nekogram.settings.BaseNekoXSettingsActivity)original).getSignatureSettingsRoute();
+        if(original instanceof tw.nekomimi.nekogram.settings.BaseNekoXSettingsActivity){route=((tw.nekomimi.nekogram.settings.BaseNekoXSettingsActivity)original).getSignatureSettingsRoute();if(route!=null)return open(SignatureLegacyExtras.categoryForKey(key));}
         if(route!=null)return open(category(route));
         if(original instanceof app.flexygram.header.HeaderSettingsActivity||original instanceof app.flexygram.bubbles.BubbleSettingsActivity||original instanceof app.flexygram.composer.FlexyComposerSettingsActivity||original instanceof app.flexygram.bubbles.interaction.BubbleInteractionSettingsActivity||original instanceof app.flexygram.bubbles.deletion.MessageAnimationsActivity)return open("chat");
         if(original instanceof app.flexygram.navigation.BottomTabsSettingsActivity)return open("navigation");

@@ -139,7 +139,7 @@ public final class SignatureSettingsRegistry {
     public static BaseFragment legacy(String screen,String key){
         if("ayumoments".equals(screen)||"exteraless_ayumoments".equals(screen)||"ayuMoments".equals(key)||"ClearMessageDatabase".equals(key))return Settings3Registry.open("ayu");
         if(key!=null){
-            BaseFragment extra=SignatureLegacyExtras.forKey(key);if(extra!=null)return Settings3Registry.open(Settings3Registry.category(SignatureLegacyExtras.routeForKey(key)));
+            BaseFragment extra=SignatureLegacyExtras.forKey(key);if(extra!=null)return Settings3Registry.open(SignatureLegacyExtras.categoryForKey(key));
             switch(key){
                 case "iconPacks":return open("icon_packs");case "emojiSets":case "EmojiSets":return open("emoji");
                 case "bottomTabs":return open("bottom_tabs");case "appNavigation":return open("app_navigation");

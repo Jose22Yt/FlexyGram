@@ -10,7 +10,7 @@ Base: PR161 `feat/beta-official-source-v2`, `3c7a20a229d425c8f3b5ea1740ccb6d8b33
 - Same VectorDrawable resources for light/dark, tinted from Telegram's foreground color. No colored tiles, gradients, Glass, shadows, animation engine or idle work is introduced.
 - Chat: original Header preview/controls, Bubble preview/controls, Composer preview/controls, original message/menu/media/sticker rows and remaining extra ConfigCells. One RecyclerListView, no nested fragment/list views. Existing context style and delete selector are direct controls; the original sticker toolbar reset is also available as a direct row.
 - Home: existing layout, avatar, folder, visibility and smart preview controls in one list.
-- Universal: existing general/network/maps/push/profile/archive, fonts/effects, residual technical preferences and the original launcher selector. No stored keys are migrated.
+- Universal: existing general/network/maps/push/profile/archive, fonts/effects, residual technical preferences and the original launcher selector. Global switch/slider/icon/title styling belongs here rather than Home. No stored keys are migrated.
 - AyuMoments: original GhostMode rows and AyuMoments controller in one page; the former ghost navigation row is hidden only for this embedded presentation.
 - Navigation: BottomTabs, the original simple tablet/back/drawer controls, gesture rows and residual navigation options directly available. The specialized reorder editor omits these simple controls to avoid duplication.
 - FlexyFiles: existing local opt-in/help only. Files and downloads: original save-path/per-chat folder handlers only. Studio retains export/import/share.
@@ -19,7 +19,7 @@ Base: PR161 `feat/beta-official-source-v2`, `3c7a20a229d425c8f3b5ea1740ccb6d8b33
 
 ## Architecture and risks
 
-`NativeSettingsSection` is a row contribution interface implemented by the existing Neko base controllers. It does **not** call child `createView`, add child fragments to navigation, or create child scrolling surfaces. It initializes the original adapter/callbacks with the current account and theme, exposes the host view for existing dialogs/bulletins and forwards pause/resume/destroy and activity/permission results. Each controller retains its own request GUID and dialog lifecycle.
+`NativeSettingsSection` is a row contribution interface implemented by the existing Neko base controllers. It does **not** call child `createView`, add child fragments to navigation, or create child scrolling surfaces. It initializes the original adapter/callbacks with the current account and theme, exposes the host view for existing dialogs/bulletins and forwards pause/resume/destroy and activity/permission results. Each controller retains its own request GUID and dialog lifecycle. The host snapshots scroll before recreating views, including rebuilds triggered by existing native callbacks.
 
 `NativeSectionsAdapter` isolates view types per section. An outer holder retains the original inner holder/type to avoid cross-section casts. Original position-dependent enabled predicates use a local position helper. Adapter notifications, click/long-click and deep-link scroll positions translate to the shared list. Disposal detaches the adapter, unregisters observers, cancels original controller resources and rejects late notifications.
 

@@ -56,6 +56,7 @@ def test_position_lifecycle_and_hidden_controls_are_preserved():
  assert text.index('listView.setAdapter(null)')<text.index('combined.close()')
  assert 'onActivityResultFragment' in text and 'onRequestPermissionsResultFragment' in text
  assert 'settings3Scroll' in text
+ assert method(text,'public View createView(').index('scrollState=layoutManager.onSaveInstanceState()')<method(text,'public View createView(').index('release()')
  for cls in ['BaseNekoSettingsActivity','BaseNekoXSettingsActivity']:
   body=method(source('tw/nekomimi/nekogram/settings/'+cls+'.java'),'void releaseSettings3()')
   assert 'onFragmentDestroy()' in body and 'listView=null' in body and 'fragmentView=null' in body
@@ -101,3 +102,12 @@ def test_navigation_simple_controls_are_direct_and_shared_with_original_editor()
  assert 'if(!menuOnly)' in method(new,'private void fillItems(')
  assert 'OpenExteraAppNavigationActivity.NativeControls()' in (S/'SignatureDirectSettingsActivity.java').read_text()
  assert 'OpenExteraAppNavigationActivity(true)' in (S/'Settings3LinksSection.java').read_text()
+
+def test_global_widgets_are_not_placed_in_home_and_search_uses_canonical_target():
+ text=(S/'SignatureLegacyExtras.java').read_text()
+ for key in ['SwitchStyle','SliderStyle','IconReplacements','CenterActionBarTitleType']:assert '"'+key+'"' in method(text,'public static String categoryForKey(String key,String source)')
+ page=(S/'SignatureDirectSettingsActivity.java').read_text()
+ assert 'category.equals(SignatureLegacyExtras.categoryForKey(' in page
+ assert '"general_extra","advanced_extra","appearance_extra"' in page
+ helper=source('tw/nekomimi/nekogram/helpers/SettingsHelper.java')
+ assert helper.count('Settings3Registry.searchTarget(fragment,key)')==2

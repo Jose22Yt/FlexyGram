@@ -255,6 +255,13 @@ public final class SignatureLegacyExtras {
         return owner[0].equals(source)&&owner[1].equals(route);
     }
     public static Set<String> sources(String route){Set<String> result=new LinkedHashSet<>();for(String[] value:owners.values())if(route.equals(value[1]))result.add(value[0]);return result;}
+    public static String categoryForKey(String key){return categoryForKey(key,"ng");}
+    public static String categoryForKey(String key,String source){
+        if("ClearMessageDatabase".equals(key))return "ayu";
+        if(java.util.Arrays.asList("SwitchStyle","SliderStyle","IconReplacements","CenterActionBarTitleType").contains(key))return "universal";
+        String[] owner=owners.get(key);
+        return Settings3Registry.category(owner!=null?owner[1]:source.equals("nc")?"messages_extra":source.equals("nx")?"advanced_extra":"general_extra");
+    }
     public static String routeForKey(String key){String[] owner=owners.get(key);return owner==null?"general_extra":owner[1];}
     public static BaseFragment forKey(String key){String[] owner=owners.get(key);return owner==null?null:screen(owner[0],owner[1]);}
     public static BaseFragment open(String route){

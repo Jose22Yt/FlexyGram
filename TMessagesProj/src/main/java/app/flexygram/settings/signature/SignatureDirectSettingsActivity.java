@@ -34,6 +34,7 @@ public final class SignatureDirectSettingsActivity extends SignatureMatteSetting
     private void extra(String source,String... routes){
         BaseNekoXSettingsActivity f=source.equals("ng")?new NekoGeneralSettingsActivity():source.equals("nc")?new NekoChatSettingsActivity():new NekoExperimentalSettingsActivity();
         f.useSignatureSettingsPage(Settings3Registry.entry(category).title,cell->{
+            if(cell instanceof tw.nekomimi.nekogram.config.cell.WithKey&&((tw.nekomimi.nekogram.config.cell.WithKey)cell).getKey()!=null&&!category.equals(SignatureLegacyExtras.categoryForKey(((tw.nekomimi.nekogram.config.cell.WithKey)cell).getKey(),source)))return false;
             if(cell instanceof tw.nekomimi.nekogram.config.cell.WithKey&&"ClearMessageDatabase".equals(((tw.nekomimi.nekogram.config.cell.WithKey)cell).getKey()))return false;
             for(String route:routes)if(SignatureLegacyExtras.accepts(cell,source,route))return true;return false;
         });add(f);
@@ -66,7 +67,7 @@ public final class SignatureDirectSettingsActivity extends SignatureMatteSetting
                 add(scope(new OpenExteraAppearanceActivity(),"appearance","fonts|effects"));
                 add(scope(new OpenExteraOtherActivity(),"other","advanced"));
                 add(new SignatureLauncherSettingsActivity());
-                extra("ng","general_extra","advanced_extra");extra("nx","advanced_extra");
+                extra("ng","general_extra","advanced_extra","appearance_extra");extra("nx","advanced_extra");
                 links(new String[]{"icon_packs","emoji","cloud","passcode"},new int[]{R.string.Settings2_icon_packs,R.string.Settings2_emoji,R.string.Settings2_cloud,R.string.Settings2_passcode},new int[]{R.drawable.settings3_stack,R.drawable.settings3_chat,R.drawable.settings3_document,R.drawable.settings3_info});break;
             case "ayu":add(new GhostModeActivity());add(new OpenExteraAyuMomentsActivity());break;
             case "navigation":
@@ -83,6 +84,7 @@ public final class SignatureDirectSettingsActivity extends SignatureMatteSetting
     }
     private void release(){if(sharedTooltip!=null)sharedTooltip.hide(false,0);if(combined!=null){if(listView!=null)listView.setAdapter(null);combined.close();}for(NativeSettingsSection section:sections)section.releaseSettings3();sections.clear();combined=null;sharedTooltip=null;}
     @Override public View createView(Context context){
+        if(layoutManager!=null)scrollState=layoutManager.onSaveInstanceState();
         release();View view=super.createView(context);listView.setItemAnimator(null);listView.setSections(org.telegram.messenger.AndroidUtilities.dp(16),org.telegram.messenger.AndroidUtilities.dp(20),true);
         combined=new NativeSectionsAdapter();build();listView.setAdapter(combined);listView.setOnItemClickListener(combined::click);
         // Dispatch native row sharing with its local key and offset.

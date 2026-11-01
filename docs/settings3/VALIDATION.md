@@ -4,9 +4,9 @@
 
 | Check | Result | Meaning |
 | --- | --- | --- |
-| General pytest suite including 11 new Settings3 tests | 155 passed, 31 optional skips | Source/ownership/callback/provenance regressions; missing optional corpus/R8 files are documented by pytest |
+| General pytest suite including 12 new Settings3 tests | 156 passed, 31 optional skips | Source/ownership/callback/provenance regressions; missing optional corpus/R8 files are documented by pytest |
 | `python3 tools/settings2/checks.py` | 12 passed | Existing ownership/security checks retained; scope updated for authorized controller presentation changes, with original click/backend preservation covered separately |
-| Settings3 Android probe | 9 passed | Real API37 resource link/Java compilation of root/cell/registry/policy/adapter; Robolectric API35 Android graphics and actual AndroidX RecyclerView 1.4 adapter. Telegram hosts, list plumbing and legacy controllers are explicit doubles |
+| Settings3 Android probe | 10 passed | Real API37 resource link/Java compilation of root/cell/registry/policy/adapter; Robolectric API35 Android graphics and actual AndroidX RecyclerView 1.4 adapter. Telegram hosts, list plumbing and legacy controllers are explicit doubles |
 | Original resource checker | PASS_RESOURCES_AND_ISOLATED_LINK_ONLY | Main AAPT2 compile (inherited formatting warnings), strict ConnectedAlpha overlay and isolated link; not the full app merged manifest |
 | Java21 syntax parser | 28 production files parsed | JavaParser 3.26.4 language level21, no semantic/type/module compilation claim |
 | Gradle wrapper | BLOCKED | Pinned Gradle 9.7.1 download fails with `java.net.SocketException: Network is unreachable`, including a proxy-configured retry |
@@ -39,3 +39,11 @@ For syntax parsing, compile `tools/settings3/JavaSyntaxProbe.java` with JavaPars
 10. Measure the same navigation/scroll workload on Poco X8 Pro (effective refresh rate, same conditions), comparing the base and candidate with the existing performance lab. Do not claim greater smoothness from source inspection.
 
 The full category controllers and modified base classes are **not yet integration-compiled** in this environment. Their lifecycle composition is the principal integration risk; maintain draft status until verified.
+
+## GitHub CI and baseline comparison
+
+[Run 41350301078](https://github.com/Jose22Yt/FlexyGram/actions/runs/41350301078) passed the real Gradle task-graph validation for **both Alpha and Beta**, using `assembleConnectedAlpha --dry-run` and `assembleBeta --dry-run`. It did not compile the application. Source checks stopped at the frozen Beta scope gate. The later artifact-upload error reports missing screenshots because rendering was never reached.
+
+[Blur run 41350301097](https://github.com/Jose22Yt/FlexyGram/actions/runs/41350301097) was reproduced on a separate, unmodified worktree at the exact base: both base and candidate have **4 passing tests, 1 failed historical ActionBar comparison and 1 scope error**. The candidate ActionBar.java is byte-identical to the base. The scope error is already present on the base and also correctly identifies the feature's new unreviewed paths. This is **not** a claim that the full CI passes, nor permission to bypass source review.
+
+See `ci-baseline-comparison.json`. Reproduce by creating a detached worktree at the base, materializing its original source/workflow/config/documentation paths, and running `python3 -m unittest discover -s tools/connected_alpha -p test_reconstruction1285.py -v` in both worktrees. Do not update historical hashes merely to make this feature green.

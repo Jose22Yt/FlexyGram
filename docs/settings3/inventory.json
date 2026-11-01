@@ -3370,7 +3370,7 @@
       "retired": false,
       "existing_retirement": false,
       "line": 185,
-      "settings3_category": "home",
+      "settings3_category": "universal",
       "verification": "original ConfigItem retained; integration/device pending",
       "settings3_excluded_from_residual": false
     },
@@ -3386,7 +3386,7 @@
       "retired": false,
       "existing_retirement": false,
       "line": 192,
-      "settings3_category": "home",
+      "settings3_category": "universal",
       "verification": "original ConfigItem retained; integration/device pending",
       "settings3_excluded_from_residual": false
     },
@@ -3402,7 +3402,7 @@
       "retired": false,
       "existing_retirement": false,
       "line": 197,
-      "settings3_category": "home",
+      "settings3_category": "universal",
       "verification": "original ConfigItem retained; integration/device pending",
       "settings3_excluded_from_residual": false
     },
@@ -3482,7 +3482,7 @@
       "retired": false,
       "existing_retirement": false,
       "line": 222,
-      "settings3_category": "home",
+      "settings3_category": "universal",
       "verification": "original ConfigItem retained; integration/device pending",
       "settings3_excluded_from_residual": false
     },
