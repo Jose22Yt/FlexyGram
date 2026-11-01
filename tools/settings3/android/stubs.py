@@ -14,6 +14,7 @@ def write(dest,root):
  def emit(path,s):
   p=dest/path;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(s)
  emit('org/telegram/messenger/BuildVars.java','package org.telegram.messenger;public class BuildVars{public static String BUILD_VERSION_STRING="ISOLATED HOST";}')
+ emit('app/flexygram/effects/GlareSettingsSection.java','package app.flexygram.effects;public class GlareSettingsSection extends app.exteraless.settings.OpenExteraGeneralActivity{}')
  (dest/'androidx/recyclerview/widget/RecyclerView.java').unlink()
  emit('app/flexygram/settings/signature/SignatureDirectSettingsActivity.java','package app.flexygram.settings.signature;public class SignatureDirectSettingsActivity extends org.telegram.ui.ActionBar.BaseFragment{public final String category;public SignatureDirectSettingsActivity(String s){category=s;}}')
  (dest/'app/flexygram/settings/signature/Settings3LinksSection.java').unlink()

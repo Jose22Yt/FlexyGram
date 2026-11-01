@@ -470,7 +470,7 @@ public abstract class BlurredBackgroundDrawable extends Drawable implements Glas
         float[] radii, float strokeWidth, boolean isTop,
         Paint paint
     ) {
-        if (GlassOutlineStyle.current() != GlassOutlineStyle.GLARE) return;
+        if (org.telegram.ui.Components.blur3.StaticOutlineStroke.drawOverride(canvas,left,top,right,bottom,radii,isTop,paint,GlassOutlineStyle.current())) return;
 
         final boolean radiiAreSame = isTop ?
             radii[0] == radii[1] && radii[1] == radii[2] && radii[2] == radii[3]:
@@ -572,7 +572,7 @@ public abstract class BlurredBackgroundDrawable extends Drawable implements Glas
 
     public static void drawStroke(Canvas canvas, float left, float top, float right, float bottom,
                                      float radii, float strokeWidth, boolean isTop, Paint paint) {
-        if (GlassOutlineStyle.current() != GlassOutlineStyle.GLARE) return;
+        if (org.telegram.ui.Components.blur3.StaticOutlineStroke.drawOverride(canvas,left,top,right,bottom,radii,isTop,paint,GlassOutlineStyle.current())) return;
         final float strokeHalf = strokeWidth / 2f;
         canvas.save();
         if (isTop) {
