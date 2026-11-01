@@ -1,0 +1,2386 @@
+[
+  {
+    "source": "appearance",
+    "owner": "avatars",
+    "row": "avatarsHeaderRow",
+    "aliases": [
+      "matteAvatarsHeader"
+    ],
+    "method": "updateRows",
+    "line": 151,
+    "class_name": "OpenExteraAppearanceActivity"
+  },
+  {
+    "source": "appearance",
+    "owner": "avatars",
+    "row": "avatarCornersPreviewRow",
+    "aliases": [
+      "avatarCorners"
+    ],
+    "method": "updateRows",
+    "line": 152,
+    "class_name": "OpenExteraAppearanceActivity"
+  },
+  {
+    "source": "appearance",
+    "owner": "avatars",
+    "row": "singleCornerRadiusRow",
+    "aliases": [
+      "singleCornerRadius"
+    ],
+    "method": "updateRows",
+    "line": 153,
+    "class_name": "OpenExteraAppearanceActivity"
+  },
+  {
+    "source": "appearance",
+    "owner": "chat_list",
+    "row": "chatListHeaderRow",
+    "aliases": [
+      "chatListHeader"
+    ],
+    "method": "updateRows",
+    "line": 156,
+    "class_name": "OpenExteraAppearanceActivity"
+  },
+  {
+    "source": "appearance",
+    "owner": "chat_list",
+    "row": "chatListPreviewRow",
+    "aliases": [
+      "chatListPreview"
+    ],
+    "method": "updateRows",
+    "line": 157,
+    "class_name": "OpenExteraAppearanceActivity"
+  },
+  {
+    "source": "appearance",
+    "owner": "chat_list",
+    "row": "forceSnowRow",
+    "aliases": [
+      "forceSnow"
+    ],
+    "method": "updateRows",
+    "line": 158,
+    "class_name": "OpenExteraAppearanceActivity"
+  },
+  {
+    "source": "appearance",
+    "owner": "chat_list",
+    "row": "centerTitleRow",
+    "aliases": [
+      "centerTitle"
+    ],
+    "method": "updateRows",
+    "line": 159,
+    "class_name": "OpenExteraAppearanceActivity"
+  },
+  {
+    "source": "appearance",
+    "owner": "chat_list",
+    "row": "senderMiniAvatarsRow",
+    "aliases": [
+      "senderMiniAvatars"
+    ],
+    "method": "updateRows",
+    "line": 160,
+    "class_name": "OpenExteraAppearanceActivity"
+  },
+  {
+    "source": "appearance",
+    "owner": "chat_list",
+    "row": "titleTextRow",
+    "aliases": [
+      "titleText"
+    ],
+    "method": "updateRows",
+    "line": 161,
+    "class_name": "OpenExteraAppearanceActivity"
+  },
+  {
+    "source": "appearance",
+    "owner": "folders",
+    "row": "foldersHeaderRow",
+    "aliases": [
+      "foldersHeader"
+    ],
+    "method": "updateRows",
+    "line": 164,
+    "class_name": "OpenExteraAppearanceActivity"
+  },
+  {
+    "source": "appearance",
+    "owner": "folders",
+    "row": "foldersPreviewRow",
+    "aliases": [
+      "foldersPreview"
+    ],
+    "method": "updateRows",
+    "line": 165,
+    "class_name": "OpenExteraAppearanceActivity"
+  },
+  {
+    "source": "appearance",
+    "owner": "folders",
+    "row": "folderThemeAccentRow",
+    "aliases": [
+      "folderThemeAccent"
+    ],
+    "method": "updateRows",
+    "line": 166,
+    "class_name": "OpenExteraAppearanceActivity"
+  },
+  {
+    "source": "appearance",
+    "owner": "folders",
+    "row": "tabTitleStyleRow",
+    "aliases": [
+      "tabTitleStyle"
+    ],
+    "method": "updateRows",
+    "line": 167,
+    "class_name": "OpenExteraAppearanceActivity"
+  },
+  {
+    "source": "appearance",
+    "owner": "folders",
+    "row": "tabCounterRow",
+    "aliases": [
+      "tabCounter"
+    ],
+    "method": "updateRows",
+    "line": 168,
+    "class_name": "OpenExteraAppearanceActivity"
+  },
+  {
+    "source": "appearance",
+    "owner": "@moved",
+    "row": "iconsHeaderRow",
+    "aliases": [
+      "matteIconsHeader"
+    ],
+    "method": "updateRows",
+    "line": 171,
+    "class_name": "OpenExteraAppearanceActivity"
+  },
+  {
+    "source": "appearance",
+    "owner": "@moved",
+    "row": "iconPacksRow",
+    "aliases": [
+      "iconPacks"
+    ],
+    "method": "updateRows",
+    "line": 172,
+    "class_name": "OpenExteraAppearanceActivity"
+  },
+  {
+    "source": "appearance",
+    "owner": "@moved",
+    "row": "emojiSetsRow",
+    "aliases": [
+      "emojiSets",
+      "EmojiSets"
+    ],
+    "method": "updateRows",
+    "line": 173,
+    "class_name": "OpenExteraAppearanceActivity"
+  },
+  {
+    "source": "appearance",
+    "owner": "@moved",
+    "row": "linksHeaderRow",
+    "aliases": [
+      "linksHeader"
+    ],
+    "method": "updateRows",
+    "line": 176,
+    "class_name": "OpenExteraAppearanceActivity"
+  },
+  {
+    "source": "appearance",
+    "owner": "@moved",
+    "row": "bottomTabsRow",
+    "aliases": [
+      "bottomTabs"
+    ],
+    "method": "updateRows",
+    "line": 177,
+    "class_name": "OpenExteraAppearanceActivity"
+  },
+  {
+    "source": "appearance",
+    "owner": "@moved",
+    "row": "appNavigationRow",
+    "aliases": [
+      "appNavigation"
+    ],
+    "method": "updateRows",
+    "line": 178,
+    "class_name": "OpenExteraAppearanceActivity"
+  },
+  {
+    "source": "appearance",
+    "owner": "@moved",
+    "row": "pillStackRow",
+    "aliases": [
+      "pillStack"
+    ],
+    "method": "updateRows",
+    "line": 179,
+    "class_name": "OpenExteraAppearanceActivity"
+  },
+  {
+    "source": "appearance",
+    "owner": "@moved",
+    "row": "hidingRow",
+    "aliases": [
+      "hiding"
+    ],
+    "method": "updateRows",
+    "line": 180,
+    "class_name": "OpenExteraAppearanceActivity"
+  },
+  {
+    "source": "appearance",
+    "owner": "fonts",
+    "row": "appearanceHeaderRow",
+    "aliases": [
+      "appearanceHeader"
+    ],
+    "method": "updateRows",
+    "line": 183,
+    "class_name": "OpenExteraAppearanceActivity"
+  },
+  {
+    "source": "appearance",
+    "owner": "chat_list",
+    "row": "fabShapeRow",
+    "aliases": [
+      "fabShape"
+    ],
+    "method": "updateRows",
+    "line": 184,
+    "class_name": "OpenExteraAppearanceActivity"
+  },
+  {
+    "source": "appearance",
+    "owner": "fonts",
+    "row": "useSystemFontsRow",
+    "aliases": [
+      "useSystemFonts"
+    ],
+    "method": "updateRows",
+    "line": 185,
+    "class_name": "OpenExteraAppearanceActivity"
+  },
+  {
+    "source": "appearance",
+    "owner": "effects",
+    "row": "customThemesRow",
+    "aliases": [
+      "customThemes"
+    ],
+    "method": "updateRows",
+    "line": 186,
+    "class_name": "OpenExteraAppearanceActivity"
+  },
+  {
+    "source": "appearance",
+    "owner": "effects",
+    "row": "sectionsHeaderRow",
+    "aliases": [
+      "sectionsHeader"
+    ],
+    "method": "updateRows",
+    "line": 189,
+    "class_name": "OpenExteraAppearanceActivity"
+  },
+  {
+    "source": "appearance",
+    "owner": "effects",
+    "row": "sectionRadiusRow",
+    "aliases": [
+      "sectionRadius"
+    ],
+    "method": "updateRows",
+    "line": 190,
+    "class_name": "OpenExteraAppearanceActivity"
+  },
+  {
+    "source": "appearance",
+    "owner": "effects",
+    "row": "separateHeadersRow",
+    "aliases": [
+      "separateHeaders"
+    ],
+    "method": "updateRows",
+    "line": 191,
+    "class_name": "OpenExteraAppearanceActivity"
+  },
+  {
+    "source": "appearance",
+    "owner": "effects",
+    "row": "dividerStyleRow",
+    "aliases": [
+      "dividerStyle"
+    ],
+    "method": "updateRows",
+    "line": 192,
+    "class_name": "OpenExteraAppearanceActivity"
+  },
+  {
+    "source": "appearance",
+    "owner": "effects",
+    "row": "blurHeaderRow",
+    "aliases": [
+      "blurHeader"
+    ],
+    "method": "updateRows",
+    "line": 195,
+    "class_name": "OpenExteraAppearanceActivity"
+  },
+  {
+    "source": "appearance",
+    "owner": "avatars",
+    "row": "gooeyAvatarRow",
+    "aliases": [
+      "gooeyAvatar"
+    ],
+    "method": "updateRows",
+    "line": 196,
+    "class_name": "OpenExteraAppearanceActivity"
+  },
+  {
+    "source": "appearance",
+    "owner": "effects",
+    "row": "glassOutlineRow",
+    "aliases": [
+      "glassOutline"
+    ],
+    "method": "updateRows",
+    "line": 197,
+    "class_name": "OpenExteraAppearanceActivity"
+  },
+  {
+    "source": "appearance",
+    "owner": "effects",
+    "row": "glassMessageMenuRow",
+    "aliases": [
+      "glassMessageMenu"
+    ],
+    "method": "updateRows",
+    "line": 198,
+    "class_name": "OpenExteraAppearanceActivity"
+  },
+  {
+    "source": "appearance",
+    "owner": "effects",
+    "row": "forceBlurRow",
+    "aliases": [
+      "forceBlur"
+    ],
+    "method": "updateRows",
+    "line": 199,
+    "class_name": "OpenExteraAppearanceActivity"
+  },
+  {
+    "source": "appearance",
+    "owner": "avatars",
+    "row": "disableAvatarBlurRow",
+    "aliases": [
+      "disableAvatarBlur"
+    ],
+    "method": "updateRows",
+    "line": 200,
+    "class_name": "OpenExteraAppearanceActivity"
+  },
+  {
+    "source": "general",
+    "owner": "translation_options",
+    "row": "translateHeaderRow",
+    "aliases": [
+      "translateHeader"
+    ],
+    "method": "updateRows",
+    "line": 174,
+    "class_name": "OpenExteraGeneralActivity"
+  },
+  {
+    "source": "general",
+    "owner": "@moved",
+    "row": "translatorRow",
+    "aliases": [
+      "translator"
+    ],
+    "method": "updateRows",
+    "line": 175,
+    "class_name": "OpenExteraGeneralActivity"
+  },
+  {
+    "source": "general",
+    "owner": "translation_options",
+    "row": "translateInSheetRow",
+    "aliases": [
+      "translateInSheet"
+    ],
+    "method": "updateRows",
+    "line": 176,
+    "class_name": "OpenExteraGeneralActivity"
+  },
+  {
+    "source": "general",
+    "owner": "general",
+    "row": "generalHeaderRow",
+    "aliases": [
+      "generalHeader"
+    ],
+    "method": "updateRows",
+    "line": 179,
+    "class_name": "OpenExteraGeneralActivity"
+  },
+  {
+    "source": "general",
+    "owner": "general",
+    "row": "disableNumberRoundingRow",
+    "aliases": [
+      "disableNumberRounding"
+    ],
+    "method": "updateRows",
+    "line": 180,
+    "class_name": "OpenExteraGeneralActivity"
+  },
+  {
+    "source": "general",
+    "owner": "general",
+    "row": "formatTimeWithSecondsRow",
+    "aliases": [
+      "formatTimeWithSeconds"
+    ],
+    "method": "updateRows",
+    "line": 181,
+    "class_name": "OpenExteraGeneralActivity"
+  },
+  {
+    "source": "general",
+    "owner": "general",
+    "row": "inAppVibrationRow",
+    "aliases": [
+      "inAppVibration"
+    ],
+    "method": "updateRows",
+    "line": 182,
+    "class_name": "OpenExteraGeneralActivity"
+  },
+  {
+    "source": "general",
+    "owner": "general",
+    "row": "filterZalgoRow",
+    "aliases": [
+      "filterZalgo"
+    ],
+    "method": "updateRows",
+    "line": 183,
+    "class_name": "OpenExteraGeneralActivity"
+  },
+  {
+    "source": "general",
+    "owner": "general",
+    "row": "speedHeaderRow",
+    "aliases": [
+      "speedHeader"
+    ],
+    "method": "updateRows",
+    "line": 186,
+    "class_name": "OpenExteraGeneralActivity"
+  },
+  {
+    "source": "general",
+    "owner": "general",
+    "row": "downloadSpeedRow",
+    "aliases": [
+      "downloadSpeed"
+    ],
+    "method": "updateRows",
+    "line": 187,
+    "class_name": "OpenExteraGeneralActivity"
+  },
+  {
+    "source": "general",
+    "owner": "general",
+    "row": "uploadBoostRow",
+    "aliases": [
+      "uploadBoost"
+    ],
+    "method": "updateRows",
+    "line": 188,
+    "class_name": "OpenExteraGeneralActivity"
+  },
+  {
+    "source": "general",
+    "owner": "general",
+    "row": "useIPv6Row",
+    "aliases": [
+      "IPv6"
+    ],
+    "method": "updateRows",
+    "line": 190,
+    "class_name": "OpenExteraGeneralActivity"
+  },
+  {
+    "source": "general",
+    "owner": "general",
+    "row": "dnsTypeRow",
+    "aliases": [
+      "dnsType",
+      "DnsType"
+    ],
+    "method": "updateRows",
+    "line": 191,
+    "class_name": "OpenExteraGeneralActivity"
+  },
+  {
+    "source": "general",
+    "owner": "general",
+    "row": "customDoHRow",
+    "aliases": [
+      "customDoH",
+      "CustomDoH"
+    ],
+    "method": "updateRows",
+    "line": 192,
+    "class_name": "OpenExteraGeneralActivity"
+  },
+  {
+    "source": "general",
+    "owner": "files",
+    "row": "storageHeaderRow",
+    "aliases": [
+      "storageHeader"
+    ],
+    "method": "updateRows",
+    "line": 196,
+    "class_name": "OpenExteraGeneralActivity"
+  },
+  {
+    "source": "general",
+    "owner": "files",
+    "row": "saveToChatSubfolderRow",
+    "aliases": [
+      "saveToChatSubfolder",
+      "SaveToChatSubfolder"
+    ],
+    "method": "updateRows",
+    "line": 197,
+    "class_name": "OpenExteraGeneralActivity"
+  },
+  {
+    "source": "general",
+    "owner": "files",
+    "row": "savePathRow",
+    "aliases": [
+      "savePath"
+    ],
+    "method": "updateRows",
+    "line": 198,
+    "class_name": "OpenExteraGeneralActivity"
+  },
+  {
+    "source": "general",
+    "owner": "profile",
+    "row": "profileHeaderRow",
+    "aliases": [
+      "profileHeader"
+    ],
+    "method": "updateRows",
+    "line": 201,
+    "class_name": "OpenExteraGeneralActivity"
+  },
+  {
+    "source": "general",
+    "owner": "profile",
+    "row": "relativeLastSeenRow",
+    "aliases": [
+      "relativeLastSeen"
+    ],
+    "method": "updateRows",
+    "line": 202,
+    "class_name": "OpenExteraGeneralActivity"
+  },
+  {
+    "source": "general",
+    "owner": "profile",
+    "row": "hidePhoneRow",
+    "aliases": [
+      "hidePhone"
+    ],
+    "method": "updateRows",
+    "line": 203,
+    "class_name": "OpenExteraGeneralActivity"
+  },
+  {
+    "source": "general",
+    "owner": "profile",
+    "row": "showIdAndDcRow",
+    "aliases": [
+      "showIdAndDc"
+    ],
+    "method": "updateRows",
+    "line": 204,
+    "class_name": "OpenExteraGeneralActivity"
+  },
+  {
+    "source": "general",
+    "owner": "profile",
+    "row": "lastfmRow",
+    "aliases": [
+      "lastfm"
+    ],
+    "method": "updateRows",
+    "line": 205,
+    "class_name": "OpenExteraGeneralActivity"
+  },
+  {
+    "source": "general",
+    "owner": "archive",
+    "row": "archiveHeaderRow",
+    "aliases": [
+      "archiveHeader"
+    ],
+    "method": "updateRows",
+    "line": 208,
+    "class_name": "OpenExteraGeneralActivity"
+  },
+  {
+    "source": "general",
+    "owner": "archive",
+    "row": "sortByUnreadRow",
+    "aliases": [
+      "sortByUnread",
+      "SortByUnread"
+    ],
+    "method": "updateRows",
+    "line": 209,
+    "class_name": "OpenExteraGeneralActivity"
+  },
+  {
+    "source": "general",
+    "owner": "archive",
+    "row": "unlimitedPinnedRow",
+    "aliases": [
+      "unlimitedPinnedDialogs",
+      "UnlimitedPinnedDialogs"
+    ],
+    "method": "updateRows",
+    "line": 210,
+    "class_name": "OpenExteraGeneralActivity"
+  },
+  {
+    "source": "general",
+    "owner": "archive",
+    "row": "hideArchiveRow",
+    "aliases": [
+      "hideArchive"
+    ],
+    "method": "updateRows",
+    "line": 211,
+    "class_name": "OpenExteraGeneralActivity"
+  },
+  {
+    "source": "general",
+    "owner": "archive",
+    "row": "archiveOnPullRow",
+    "aliases": [
+      "archiveOnPull"
+    ],
+    "method": "updateRows",
+    "line": 214,
+    "class_name": "OpenExteraGeneralActivity"
+  },
+  {
+    "source": "general",
+    "owner": "archive",
+    "row": "disableUnarchiveSwipeRow",
+    "aliases": [
+      "disableUnarchiveSwipe"
+    ],
+    "method": "updateRows",
+    "line": 215,
+    "class_name": "OpenExteraGeneralActivity"
+  },
+  {
+    "source": "general",
+    "owner": "general",
+    "row": "mapsHeaderRow",
+    "aliases": [
+      "mapsHeader"
+    ],
+    "method": "updateRows",
+    "line": 218,
+    "class_name": "OpenExteraGeneralActivity"
+  },
+  {
+    "source": "general",
+    "owner": "general",
+    "row": "mapProviderRow",
+    "aliases": [
+      "mapProvider"
+    ],
+    "method": "updateRows",
+    "line": 219,
+    "class_name": "OpenExteraGeneralActivity"
+  },
+  {
+    "source": "general",
+    "owner": "general",
+    "row": "mapDriftingFixRow",
+    "aliases": [
+      "mapDriftingFix"
+    ],
+    "method": "updateRows",
+    "line": 220,
+    "class_name": "OpenExteraGeneralActivity"
+  },
+  {
+    "source": "general",
+    "owner": "general",
+    "row": "mapPreviewRow",
+    "aliases": [
+      "mapPreview"
+    ],
+    "method": "updateRows",
+    "line": 221,
+    "class_name": "OpenExteraGeneralActivity"
+  },
+  {
+    "source": "general",
+    "owner": "general",
+    "row": "notificationsHeaderRow",
+    "aliases": [
+      "notificationsHeader"
+    ],
+    "method": "updateRows",
+    "line": 224,
+    "class_name": "OpenExteraGeneralActivity"
+  },
+  {
+    "source": "general",
+    "owner": "general",
+    "row": "pushServiceTypeRow",
+    "aliases": [
+      "pushServiceType",
+      "PushServiceType"
+    ],
+    "method": "updateRows",
+    "line": 225,
+    "class_name": "OpenExteraGeneralActivity"
+  },
+  {
+    "source": "general",
+    "owner": "general",
+    "row": "notificationBubblesRow",
+    "aliases": [
+      "disableNotificationBubbles"
+    ],
+    "method": "updateRows",
+    "line": 231,
+    "class_name": "OpenExteraGeneralActivity"
+  },
+  {
+    "source": "general",
+    "owner": "general",
+    "row": "pushStatusRow",
+    "aliases": [
+      "pushStatus"
+    ],
+    "method": "updateRows",
+    "line": 232,
+    "class_name": "OpenExteraGeneralActivity"
+  },
+  {
+    "source": "general",
+    "owner": "general",
+    "row": "batteryOptimizationRow",
+    "aliases": [
+      "batteryOptimization"
+    ],
+    "method": "updateRows",
+    "line": 233,
+    "class_name": "OpenExteraGeneralActivity"
+  },
+  {
+    "source": "general",
+    "owner": "general",
+    "row": "glyphRow",
+    "aliases": [
+      "glyph"
+    ],
+    "method": "updateRows",
+    "line": 234,
+    "class_name": "OpenExteraGeneralActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "@moved",
+    "row": "flexyBubblesRow",
+    "aliases": [
+      "flexyBubbles"
+    ],
+    "method": "updateSignatureHubRows",
+    "line": 443,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "@moved",
+    "row": "signatureHeaderRow",
+    "aliases": [
+      "signatureChatHeader"
+    ],
+    "method": "updateSignatureHubRows",
+    "line": 444,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "@moved",
+    "row": "composerSettingsRow",
+    "aliases": [
+      "flexyComposerSettings"
+    ],
+    "method": "updateSignatureHubRows",
+    "line": 445,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "@moved",
+    "row": "signatureThemeRow",
+    "aliases": [
+      "flexyThemeWallpaper"
+    ],
+    "method": "updateSignatureHubRows",
+    "line": 446,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "@moved",
+    "row": "smartPreviewsRow",
+    "aliases": [
+      "flexySmartPreviews"
+    ],
+    "method": "updateSignatureHubRows",
+    "line": 447,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "@moved",
+    "row": "flexyContextPanelRow",
+    "aliases": [
+      "flexyContextPanel"
+    ],
+    "method": "updateSignatureHubRows",
+    "line": 449,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "@moved",
+    "row": "signatureMessagesRow",
+    "aliases": [
+      "flexyMessagesGestures"
+    ],
+    "method": "updateSignatureHubRows",
+    "line": 450,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "@moved",
+    "row": "signatureStickersRow",
+    "aliases": [
+      "flexyStickersMedia"
+    ],
+    "method": "updateSignatureHubRows",
+    "line": 451,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "@moved",
+    "row": "chatSettingsRow",
+    "aliases": [
+      "chatSettings"
+    ],
+    "method": "updateSignatureHubRows",
+    "line": 453,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "stickers",
+    "row": "stickerSizeRow",
+    "aliases": [
+      "stickerSize"
+    ],
+    "method": "updateStickerRows",
+    "line": 457,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "stickers",
+    "row": "stickerTimeRow",
+    "aliases": [
+      "stickerTime",
+      "hideTimeOnStickers"
+    ],
+    "method": "updateStickerRows",
+    "line": 458,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "stickers",
+    "row": "repliesGroupRow",
+    "aliases": [
+      "replies"
+    ],
+    "method": "updateStickerRows",
+    "line": 459,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "stickers",
+    "row": "stickerShapeHeaderRow",
+    "aliases": [
+      "stickerShapeHeader"
+    ],
+    "method": "updateStickerRows",
+    "line": 469,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "stickers",
+    "row": "stickerShapeRow",
+    "aliases": [
+      "stickerShape"
+    ],
+    "method": "updateStickerRows",
+    "line": 470,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "stickers",
+    "row": "stickersHeaderRow",
+    "aliases": [
+      "stickersHeader"
+    ],
+    "method": "updateStickerRows",
+    "line": 473,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "stickers",
+    "row": "unlimitedGroupRow",
+    "aliases": [
+      "unlimited",
+      "unlimitedRecentStickers"
+    ],
+    "method": "updateStickerRows",
+    "line": 475,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "@moved",
+    "row": "mediaRow",
+    "aliases": [
+      "media"
+    ],
+    "method": "updateStickerRows",
+    "line": 484,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "@moved",
+    "row": "linksHeaderRow",
+    "aliases": [
+      "linksHeader"
+    ],
+    "method": "updateChatRows",
+    "line": 488,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "@moved",
+    "row": "menusRow",
+    "aliases": [
+      "menus"
+    ],
+    "method": "updateChatRows",
+    "line": 489,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "@moved",
+    "row": "flexyContextPanelRow",
+    "aliases": [
+      "flexyContextPanel"
+    ],
+    "method": "updateChatRows",
+    "line": 490,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "@moved",
+    "row": "mediaRow",
+    "aliases": [
+      "media"
+    ],
+    "method": "updateChatRows",
+    "line": 491,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "@moved",
+    "row": "aiChatRow",
+    "aliases": [
+      "aiChat"
+    ],
+    "method": "updateChatRows",
+    "line": 492,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "messages",
+    "row": "inputHeaderRow",
+    "aliases": [
+      "inputHeader"
+    ],
+    "method": "updateChatRows",
+    "line": 497,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "messages",
+    "row": "addCommaRow",
+    "aliases": [
+      "addCommaAfterMention"
+    ],
+    "method": "updateChatRows",
+    "line": 498,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "messages",
+    "row": "inlineMathRow",
+    "aliases": [
+      "inlineMathResult"
+    ],
+    "method": "updateChatRows",
+    "line": 499,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "messages",
+    "row": "inlineMathCurrencyRow",
+    "aliases": [
+      "inlineMathCurrency"
+    ],
+    "method": "updateChatRows",
+    "line": 500,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "messages",
+    "row": "tapToSwitchRecordRow",
+    "aliases": [
+      "tapToSwitchRecord",
+      "UseChatAttachEnterMenu"
+    ],
+    "method": "updateChatRows",
+    "line": 501,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "messages",
+    "row": "keepAttachButtonRow",
+    "aliases": [
+      "keepAttachButton"
+    ],
+    "method": "updateChatRows",
+    "line": 502,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "gestures",
+    "row": "doubleTapHeaderRow",
+    "aliases": [
+      "doubleTapHeader"
+    ],
+    "method": "updateChatRows",
+    "line": 505,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "gestures",
+    "row": "doubleTapRow",
+    "aliases": [
+      "doubleTapPreview"
+    ],
+    "method": "updateChatRows",
+    "line": 506,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "gestures",
+    "row": "doubleTapIncomingRow",
+    "aliases": [
+      "doubleTapIncoming"
+    ],
+    "method": "updateChatRows",
+    "line": 507,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "gestures",
+    "row": "doubleTapOutgoingRow",
+    "aliases": [
+      "doubleTapOutgoing"
+    ],
+    "method": "updateChatRows",
+    "line": 508,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "gestures",
+    "row": "doubleTapReactionRow",
+    "aliases": [
+      "doubleTapReaction"
+    ],
+    "method": "updateChatRows",
+    "line": 511,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "messages",
+    "row": "chatsHeaderRow",
+    "aliases": [
+      "chatsHeader"
+    ],
+    "method": "updateChatRows",
+    "line": 517,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "gestures",
+    "row": "quickTransitionGroupRow",
+    "aliases": [
+      "quickTransition"
+    ],
+    "method": "updateChatRows",
+    "line": 518,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "messages",
+    "row": "deleteChatForBothSidesRow",
+    "aliases": [
+      "deleteChatForBothSides",
+      "DeleteChatForBothSides"
+    ],
+    "method": "updateChatRows",
+    "line": 525,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "gestures",
+    "row": "hideKeyboardOnScrollRow",
+    "aliases": [
+      "hideKeyboardOnScroll"
+    ],
+    "method": "updateChatRows",
+    "line": 526,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "messages",
+    "row": "searchHeaderRow",
+    "aliases": [
+      "searchHeader"
+    ],
+    "method": "updateChatRows",
+    "line": 529,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "messages",
+    "row": "disableGlobalSearchRow",
+    "aliases": [
+      "disableGlobalSearch"
+    ],
+    "method": "updateChatRows",
+    "line": 530,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "messages",
+    "row": "searchHashtagChatRow",
+    "aliases": [
+      "searchHashtagChat",
+      "SearchHashtagDefaultPageChat"
+    ],
+    "method": "updateChatRows",
+    "line": 531,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "messages",
+    "row": "searchHashtagChannelRow",
+    "aliases": [
+      "searchHashtagChannel",
+      "SearchHashtagDefaultPageChannel"
+    ],
+    "method": "updateChatRows",
+    "line": 532,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "messages",
+    "row": "messagesHeaderRow",
+    "aliases": [
+      "messagesHeader"
+    ],
+    "method": "updateChatRows",
+    "line": 535,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "post_appearance",
+    "row": "removeMessageTailRow",
+    "aliases": [
+      "removeMessageTail"
+    ],
+    "method": "updateChatRows",
+    "line": 536,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "messages",
+    "row": "replaceEditedRow",
+    "aliases": [
+      "replaceEdited"
+    ],
+    "method": "updateChatRows",
+    "line": 537,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "messages",
+    "row": "showOnlineStatusRow",
+    "aliases": [
+      "showOnlineStatus"
+    ],
+    "method": "updateChatRows",
+    "line": 538,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "messages",
+    "row": "showResultsBeforeVotingRow",
+    "aliases": [
+      "showResultsBeforeVoting"
+    ],
+    "method": "updateChatRows",
+    "line": 539,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "messages",
+    "row": "dateOfForwardedMsgRow",
+    "aliases": [
+      "dateOfForwardedMsg",
+      "DateOfForwardedMsg"
+    ],
+    "method": "updateChatRows",
+    "line": 540,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "messages",
+    "row": "showTimeHintRow",
+    "aliases": [
+      "showTimeHint",
+      "ShowTimeHint"
+    ],
+    "method": "updateChatRows",
+    "line": 541,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "messages",
+    "row": "rememberAllRepliesRow",
+    "aliases": [
+      "rememberAllBackMessages",
+      "rememberAllBackMessages"
+    ],
+    "method": "updateChatRows",
+    "line": 542,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "messages",
+    "row": "linkConfirmationsHeaderRow",
+    "aliases": [
+      "linkConfirmationsHeader"
+    ],
+    "method": "updateChatRows",
+    "line": 545,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "messages",
+    "row": "fixLinkPreviewRow",
+    "aliases": [
+      "fixLinkPreview",
+      "FixLinkPreview"
+    ],
+    "method": "updateChatRows",
+    "line": 546,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "messages",
+    "row": "disableLinkPreviewRow",
+    "aliases": [
+      "disableLinkPreviewByDefault",
+      "DisableLinkPreviewByDefault"
+    ],
+    "method": "updateChatRows",
+    "line": 547,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "messages",
+    "row": "openLinkConfirmationRow",
+    "aliases": [
+      "openLinkConfirmation",
+      "SkipOpenLinkConfirm",
+      "ConfirmAllLinks"
+    ],
+    "method": "updateChatRows",
+    "line": 548,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "messages",
+    "row": "stripTrackingGroupRow",
+    "aliases": [
+      "stripTracking"
+    ],
+    "method": "updateChatRows",
+    "line": 559,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "messages",
+    "row": "trackingFilterRow",
+    "aliases": [
+      "trackingFilter"
+    ],
+    "method": "updateChatRows",
+    "line": 566,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "post_appearance",
+    "row": "channelPostsHeaderRow",
+    "aliases": [
+      "channelPostsHeader"
+    ],
+    "method": "updateChatRows",
+    "line": 569,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "post_appearance",
+    "row": "wideChannelPostsPreviewRow",
+    "aliases": [
+      "wideChannelPostsPreview"
+    ],
+    "method": "updateChatRows",
+    "line": 570,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "post_appearance",
+    "row": "wideChannelPostsRow",
+    "aliases": [
+      "wideChannelPosts"
+    ],
+    "method": "updateChatRows",
+    "line": 571,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "post_appearance",
+    "row": "wideFeedPostsRow",
+    "aliases": [
+      "wideFeedPosts"
+    ],
+    "method": "updateChatRows",
+    "line": 572,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "menus",
+    "row": "buttonsHeaderRow",
+    "aliases": [
+      "buttonsHeader"
+    ],
+    "method": "updateMenuRows",
+    "line": 577,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "menus",
+    "row": "bottomButtonRow",
+    "aliases": [
+      "bottomButton"
+    ],
+    "method": "updateMenuRows",
+    "line": 578,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "menus",
+    "row": "adminShortcutsRow",
+    "aliases": [
+      "adminShortcuts"
+    ],
+    "method": "updateMenuRows",
+    "line": 579,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "menus",
+    "row": "menusHeaderRow",
+    "aliases": [
+      "menusHeader"
+    ],
+    "method": "updateMenuRows",
+    "line": 582,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "menus",
+    "row": "chatMenuGroupRow",
+    "aliases": [
+      "chatMenu"
+    ],
+    "method": "updateMenuRows",
+    "line": 583,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "menus",
+    "row": "groupedMessageMenuRow",
+    "aliases": [
+      "groupedMessageMenu"
+    ],
+    "method": "updateMenuRows",
+    "line": 605,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "menus",
+    "row": "messageMenuGroupRow",
+    "aliases": [
+      "messageMenu"
+    ],
+    "method": "updateMenuRows",
+    "line": 606,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "menus",
+    "row": "textStyleRow",
+    "aliases": [
+      "textStyle",
+      "TextStyle"
+    ],
+    "method": "updateMenuRows",
+    "line": 640,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "menus",
+    "row": "mediaViewerMenuGroupRow",
+    "aliases": [
+      "mediaViewerMenu"
+    ],
+    "method": "updateMenuRows",
+    "line": 641,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "menus",
+    "row": "actionBarButtonsGroupRow",
+    "aliases": [
+      "actionBarButtons"
+    ],
+    "method": "updateMenuRows",
+    "line": 653,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "menus",
+    "row": "deleteMenuGroupRow",
+    "aliases": [
+      "defaultDeleteMenu",
+      "DefaultDeleteMenu"
+    ],
+    "method": "updateMenuRows",
+    "line": 664,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "media",
+    "row": "cameraHeaderRow",
+    "aliases": [
+      "cameraHeader"
+    ],
+    "method": "updateMediaRows",
+    "line": 677,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "media",
+    "row": "cameraTypeRow",
+    "aliases": [
+      "cameraType"
+    ],
+    "method": "updateMediaRows",
+    "line": 678,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "media",
+    "row": "extendedSettingsGroupRow",
+    "aliases": [
+      "extendedSettings"
+    ],
+    "method": "updateMediaRows",
+    "line": 684,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "media",
+    "row": "videoMessagesCameraRow",
+    "aliases": [
+      "videoMessagesCamera"
+    ],
+    "method": "updateMediaRows",
+    "line": 705,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "media",
+    "row": "rememberLastUsedCameraRow",
+    "aliases": [
+      "rememberLastUsedCamera"
+    ],
+    "method": "updateMediaRows",
+    "line": 708,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "media",
+    "row": "zoomSliderRow",
+    "aliases": [
+      "zoomSlider"
+    ],
+    "method": "updateMediaRows",
+    "line": 712,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "media",
+    "row": "staticZoomRow",
+    "aliases": [
+      "staticZoom"
+    ],
+    "method": "updateMediaRows",
+    "line": 713,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "media",
+    "row": "photoHeaderRow",
+    "aliases": [
+      "photoHeader"
+    ],
+    "method": "updateMediaRows",
+    "line": 716,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "media",
+    "row": "alwaysSendHdRow",
+    "aliases": [
+      "alwaysSendInHD"
+    ],
+    "method": "updateMediaRows",
+    "line": 717,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "media",
+    "row": "hdrPhotosRow",
+    "aliases": [
+      "hdrPhotos"
+    ],
+    "method": "updateMediaRows",
+    "line": 718,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "media",
+    "row": "disableInstantCameraRow",
+    "aliases": [
+      "disableInstantCamera",
+      "DisableInstantCamera"
+    ],
+    "method": "updateMediaRows",
+    "line": 719,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "media",
+    "row": "videosHeaderRow",
+    "aliases": [
+      "videosHeader"
+    ],
+    "method": "updateMediaRows",
+    "line": 722,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "media",
+    "row": "preferOriginalQualityRow",
+    "aliases": [
+      "preferOriginalQuality"
+    ],
+    "method": "updateMediaRows",
+    "line": 723,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "media",
+    "row": "enhancedVideoBitrateRow",
+    "aliases": [
+      "enhancedVideoBitrate",
+      "EnhancedVideoBitrate"
+    ],
+    "method": "updateMediaRows",
+    "line": 724,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "media",
+    "row": "videoPlayerDecoderRow",
+    "aliases": [
+      "videoPlayerDecoder",
+      "VideoPlayerDecoder"
+    ],
+    "method": "updateMediaRows",
+    "line": 725,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "media",
+    "row": "showSmallGifRow",
+    "aliases": [
+      "showSmallGIF",
+      "ShowSmallGIF"
+    ],
+    "method": "updateMediaRows",
+    "line": 726,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "media",
+    "row": "playbackHeaderRow",
+    "aliases": [
+      "playbackHeader"
+    ],
+    "method": "updateMediaRows",
+    "line": 729,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "media",
+    "row": "doubleTapSeekDurationRow",
+    "aliases": [
+      "doubleTapSeekDuration"
+    ],
+    "method": "updateMediaRows",
+    "line": 730,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "media",
+    "row": "swipeToPipRow",
+    "aliases": [
+      "swipeToPip"
+    ],
+    "method": "updateMediaRows",
+    "line": 731,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "media",
+    "row": "unmuteWithVolumeButtonsRow",
+    "aliases": [
+      "unmuteWithVolumeButtons"
+    ],
+    "method": "updateMediaRows",
+    "line": 732,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "media",
+    "row": "pauseGroupRow",
+    "aliases": [
+      "pauseOnMinimize"
+    ],
+    "method": "updateMediaRows",
+    "line": 733,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "media",
+    "row": "voiceHeaderRow",
+    "aliases": [
+      "voiceHeader"
+    ],
+    "method": "updateMediaRows",
+    "line": 743,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "media",
+    "row": "voiceEnhancementsRow",
+    "aliases": [
+      "noiseSuppressAndVoiceEnhance",
+      "NoiseSuppressAndVoiceEnhance"
+    ],
+    "method": "updateMediaRows",
+    "line": 744,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "media",
+    "row": "dontAutoPlayNextVoiceRow",
+    "aliases": [
+      "dontAutoPlayNextVoice",
+      "DontAutoPlayNextVoice"
+    ],
+    "method": "updateMediaRows",
+    "line": 745,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "media",
+    "row": "disableProximityEventsRow",
+    "aliases": [
+      "disableProximityEvents",
+      "DisableProximityEvents"
+    ],
+    "method": "updateMediaRows",
+    "line": 746,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "media",
+    "row": "transcribeHeaderRow",
+    "aliases": [
+      "transcribeHeader"
+    ],
+    "method": "updateMediaRows",
+    "line": 749,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "media",
+    "row": "transcribeProviderRow",
+    "aliases": [
+      "transcribeProvider",
+      "TranscribeProviderShort"
+    ],
+    "method": "updateMediaRows",
+    "line": 750,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "media",
+    "row": "cloudflareCredentialsRow",
+    "aliases": [
+      "cloudflareCredentials",
+      "CloudflareCredentials"
+    ],
+    "method": "updateMediaRows",
+    "line": 751,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "media",
+    "row": "geminiApiKeyRow",
+    "aliases": [
+      "llmProviderGeminiKey",
+      "LlmProviderGeminiKey"
+    ],
+    "method": "updateMediaRows",
+    "line": 752,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "visible",
+    "row": "hidingChatListHeaderRow",
+    "aliases": [
+      "hidingChatListHeader"
+    ],
+    "method": "updateHidingRows",
+    "line": 761,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "visible",
+    "row": "hideActionBarStatusRow",
+    "aliases": [
+      "hideActionBarStatus"
+    ],
+    "method": "updateHidingRows",
+    "line": 762,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "visible",
+    "row": "hideStoriesRow",
+    "aliases": [
+      "hideStories",
+      "HideStoriesFromHeader",
+      "DisableStories"
+    ],
+    "method": "updateHidingRows",
+    "line": 763,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "visible",
+    "row": "hideFloatingButtonRow",
+    "aliases": [
+      "hideFloatingButton"
+    ],
+    "method": "updateHidingRows",
+    "line": 764,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "visible",
+    "row": "hideSearchBarRow",
+    "aliases": [
+      "hideSearchBar"
+    ],
+    "method": "updateHidingRows",
+    "line": 765,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "visible",
+    "row": "hideAllChatsRow",
+    "aliases": [
+      "hideAllChats"
+    ],
+    "method": "updateHidingRows",
+    "line": 766,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "visible",
+    "row": "hidingChatsHeaderRow",
+    "aliases": [
+      "hidingChatsHeader"
+    ],
+    "method": "updateHidingRows",
+    "line": 769,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "visible",
+    "row": "hideSendAsPeerRow",
+    "aliases": [
+      "hideSendAsPeer"
+    ],
+    "method": "updateHidingRows",
+    "line": 770,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "visible",
+    "row": "hideShareButtonRow",
+    "aliases": [
+      "hideShareButton"
+    ],
+    "method": "updateHidingRows",
+    "line": 771,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "visible",
+    "row": "hideGiftButtonRow",
+    "aliases": [
+      "hideGiftButton"
+    ],
+    "method": "updateHidingRows",
+    "line": 772,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "visible",
+    "row": "hideSearchButtonRow",
+    "aliases": [
+      "hideSearchButton"
+    ],
+    "method": "updateHidingRows",
+    "line": 773,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "visible",
+    "row": "hideReactionsGroupRow",
+    "aliases": [
+      "hideReactions"
+    ],
+    "method": "updateHidingRows",
+    "line": 774,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "visible",
+    "row": "hideCameraTileRow",
+    "aliases": [
+      "hideCameraTile"
+    ],
+    "method": "updateHidingRows",
+    "line": 782,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "visible",
+    "row": "hidingStickersHeaderRow",
+    "aliases": [
+      "hidingStickersHeader"
+    ],
+    "method": "updateHidingRows",
+    "line": 785,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "visible",
+    "row": "disableTrendingRow",
+    "aliases": [
+      "disableTrending",
+      "DisableTrending"
+    ],
+    "method": "updateHidingRows",
+    "line": 786,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "visible",
+    "row": "hideGroupStickerRow",
+    "aliases": [
+      "hideGroupSticker"
+    ],
+    "method": "updateHidingRows",
+    "line": 787,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "visible",
+    "row": "disableGreetingRow",
+    "aliases": [
+      "disableGreeting"
+    ],
+    "method": "updateHidingRows",
+    "line": 788,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "visible",
+    "row": "hidingAiHeaderRow",
+    "aliases": [
+      "hidingAiHeader"
+    ],
+    "method": "updateHidingRows",
+    "line": 791,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "visible",
+    "row": "hideAiGroupRow",
+    "aliases": [
+      "hideAi"
+    ],
+    "method": "updateHidingRows",
+    "line": 792,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "visible",
+    "row": "hideAiEditorRow",
+    "aliases": [
+      "hideAiEditor"
+    ],
+    "method": "updateHidingRows",
+    "line": 794,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "visible",
+    "row": "hideAiSummaryRow",
+    "aliases": [
+      "hideAiSummary"
+    ],
+    "method": "updateHidingRows",
+    "line": 795,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "visible",
+    "row": "hideAiIvRow",
+    "aliases": [
+      "hideAiIv"
+    ],
+    "method": "updateHidingRows",
+    "line": 796,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "visible",
+    "row": "premiumElementsGroupRow",
+    "aliases": [
+      "premiumElements",
+      "PremiumElements"
+    ],
+    "method": "updateHidingRows",
+    "line": 800,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "visible",
+    "row": "hidingSettingsHeaderRow",
+    "aliases": [
+      "hidingSettingsHeader"
+    ],
+    "method": "updateHidingRows",
+    "line": 816,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "visible",
+    "row": "hideSettingsGroupRow",
+    "aliases": [
+      "hideSettingsSections",
+      "HidePremiumSection",
+      "HideHelpSection"
+    ],
+    "method": "updateHidingRows",
+    "line": 817,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "visible",
+    "row": "hidePremiumSectionRow",
+    "aliases": [
+      "hidePremiumSection",
+      "HidePremiumSection"
+    ],
+    "method": "updateHidingRows",
+    "line": 819,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "chats",
+    "owner": "visible",
+    "row": "hideHelpSectionRow",
+    "aliases": [
+      "hideHelpSection",
+      "HideHelpSection"
+    ],
+    "method": "updateHidingRows",
+    "line": 820,
+    "class_name": "OpenExteraChatsActivity"
+  },
+  {
+    "source": "other",
+    "owner": "advanced",
+    "row": "googleHeaderRow",
+    "aliases": [
+      "googleHeader"
+    ],
+    "method": "updateRows",
+    "line": 131,
+    "class_name": "OpenExteraOtherActivity"
+  },
+  {
+    "source": "other",
+    "owner": "advanced",
+    "row": "crashReportsRow",
+    "aliases": [
+      "crashReports"
+    ],
+    "method": "updateRows",
+    "line": 132,
+    "class_name": "OpenExteraOtherActivity"
+  },
+  {
+    "source": "other",
+    "owner": "advanced",
+    "row": "contentCaptureRow",
+    "aliases": [
+      "contentCapture"
+    ],
+    "method": "updateRows",
+    "line": 133,
+    "class_name": "OpenExteraOtherActivity"
+  },
+  {
+    "source": "other",
+    "owner": "advanced",
+    "row": "nagramHeaderRow",
+    "aliases": [
+      "nagramHeader"
+    ],
+    "method": "updateRows",
+    "line": 136,
+    "class_name": "OpenExteraOtherActivity"
+  },
+  {
+    "source": "other",
+    "owner": "advanced",
+    "row": "ayuMomentsRow",
+    "aliases": [
+      "ayuMoments"
+    ],
+    "method": "updateRows",
+    "line": 138,
+    "class_name": "OpenExteraOtherActivity"
+  },
+  {
+    "source": "other",
+    "owner": "advanced",
+    "row": "experimentalHeaderRow",
+    "aliases": [
+      "experimentalHeader"
+    ],
+    "method": "updateRows",
+    "line": 141,
+    "class_name": "OpenExteraOtherActivity"
+  },
+  {
+    "source": "other",
+    "owner": "advanced",
+    "row": "localPremiumRow",
+    "aliases": [
+      "localPremium"
+    ],
+    "method": "updateRows",
+    "line": 142,
+    "class_name": "OpenExteraOtherActivity"
+  },
+  {
+    "source": "other",
+    "owner": "advanced",
+    "row": "sensitiveContentRow",
+    "aliases": [
+      "sensitiveDisableFiltering",
+      "SensitiveDisableFiltering"
+    ],
+    "method": "updateRows",
+    "line": 146,
+    "class_name": "OpenExteraOtherActivity"
+  },
+  {
+    "source": "other",
+    "owner": "advanced",
+    "row": "backupHeaderRow",
+    "aliases": [
+      "backupHeader"
+    ],
+    "method": "updateRows",
+    "line": 149,
+    "class_name": "OpenExteraOtherActivity"
+  },
+  {
+    "source": "other",
+    "owner": "advanced",
+    "row": "exportEtgRow",
+    "aliases": [
+      "exportEtgSettings"
+    ],
+    "method": "updateRows",
+    "line": 150,
+    "class_name": "OpenExteraOtherActivity"
+  },
+  {
+    "source": "other",
+    "owner": "advanced",
+    "row": "importEtgRow",
+    "aliases": [
+      "importEtgSettings"
+    ],
+    "method": "updateRows",
+    "line": 151,
+    "class_name": "OpenExteraOtherActivity"
+  },
+  {
+    "source": "other",
+    "owner": "advanced",
+    "row": "resetSettingsRow",
+    "aliases": [
+      "resetSettings"
+    ],
+    "method": "updateRows",
+    "line": 157,
+    "class_name": "OpenExteraOtherActivity"
+  },
+  {
+    "source": "other",
+    "owner": "@native",
+    "row": "deleteAccountRow",
+    "aliases": [
+      "deleteAccount"
+    ],
+    "method": "updateRows",
+    "line": 158,
+    "class_name": "OpenExteraOtherActivity"
+  }
+]

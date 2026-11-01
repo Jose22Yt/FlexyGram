@@ -63,6 +63,20 @@ import tw.nekomimi.nekogram.config.cell.WithOnClick;
 import tw.nekomimi.nekogram.ui.cells.HeaderCell;
 
 public class BaseNekoXSettingsActivity extends BaseFragment {
+    private int signatureSettingsTitle;
+    private java.util.function.Predicate<AbstractConfigCell> signatureAllowed;
+    protected final boolean signatureSettingsAllows(AbstractConfigCell cell){return signatureAllowed==null||signatureAllowed.test(cell);}
+    public final void useSignatureSettingsPage(int title,java.util.function.Predicate<AbstractConfigCell> allowed){
+        signatureSettingsTitle=title;signatureAllowed=allowed;CellGroup group=getCellGroup();
+        if(group!=null){group.rows=new app.flexygram.settings.signature.SignatureSettingsRows(group.rows,allowed);addRowsToMap(group);}
+    }
+    private String signatureSource,signatureRoute;
+    public final void useSignatureSettingsPage(String source,String route,int title){signatureSource=source;signatureRoute=route;useSignatureSettingsPage(title,c->app.flexygram.settings.signature.SignatureLegacyExtras.accepts(c,source,route));}
+    @Override public void saveSelfArgs(android.os.Bundle args){super.saveSelfArgs(args);if(signatureSource!=null){args.putString("settings2LegacySource",signatureSource);args.putString("settings2LegacyRoute",signatureRoute);args.putInt("settings2LegacyTitle",signatureSettingsTitle);}}
+    @Override public void restoreSelfArgs(android.os.Bundle args){super.restoreSelfArgs(args);String source=args.getString("settings2LegacySource");if(source!=null)useSignatureSettingsPage(source,args.getString("settings2LegacyRoute"),args.getInt("settings2LegacyTitle"));}
+    public final int getSignatureSearchGuid(){if(signatureRoute==null)return 0;int id=app.flexygram.settings.signature.SignatureSettingsRegistry.searchGuid(signatureRoute+"_"+signatureSource);return id!=0?id:app.flexygram.settings.signature.SignatureSettingsRegistry.searchGuid(signatureRoute);}
+    public final String getSignatureSearchTitle(){return isSignatureSettingsPage()?getString(signatureSettingsTitle):getTitle();}
+    protected final boolean isSignatureSettingsPage(){return signatureSettingsTitle!=0;}
     protected BlurredRecyclerView listView;
     protected LinearLayoutManager layoutManager;
     protected UndoView tooltip;
@@ -84,7 +98,8 @@ public class BaseNekoXSettingsActivity extends BaseFragment {
     @Override
     public View createView(Context context) {
         actionBar.setBackButtonImage(R.drawable.ic_ab_back);
-        actionBar.setTitle(getTitle());
+        actionBar.setTitle(isSignatureSettingsPage()?getString(signatureSettingsTitle):getTitle());
+        if(isSignatureSettingsPage()){actionBar.centerTitle();actionBar.setDrawGlassTitle(false);actionBar.doNotDrawGlassMenu=true;}
 
         if (AndroidUtilities.isTablet()) {
             actionBar.setOccupyStatusBar(false);
@@ -115,14 +130,14 @@ public class BaseNekoXSettingsActivity extends BaseFragment {
         itemAnimator.setDelayAnimations(false);
         itemAnimator.setSupportsChangeAnimations(false);
 
-        listView.setItemAnimator(itemAnimator);
+        listView.setItemAnimator(isSignatureSettingsPage()?null:itemAnimator);
         frameLayout.addView(listView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.TOP | Gravity.LEFT));
 
         tooltip = new UndoView(context);
         frameLayout.addView(tooltip, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.BOTTOM | Gravity.LEFT, 8, 0, 8, 8));
 
         listView.setSections(true);
-        actionBar.setAdaptiveBackground(listView);
+        if(!isSignatureSettingsPage())actionBar.setAdaptiveBackground(listView);
         return fragmentView;
     }
 
@@ -498,10 +513,10 @@ public class BaseNekoXSettingsActivity extends BaseFragment {
         protected View createDefaultViewByType(int viewType) {
             return switch (viewType) {
                 case CellGroup.ITEM_TYPE_DIVIDER -> new ShadowSectionCell(mContext);
-                case CellGroup.ITEM_TYPE_TEXT_SETTINGS_CELL -> new TextSettingsCell(mContext);
-                case CellGroup.ITEM_TYPE_TEXT_CHECK -> new TextCheckCell(mContext);
+                case CellGroup.ITEM_TYPE_TEXT_SETTINGS_CELL -> isSignatureSettingsPage()?new app.flexygram.settings.MatteTextSettingsCell(mContext,getResourceProvider()):new TextSettingsCell(mContext);
+                case CellGroup.ITEM_TYPE_TEXT_CHECK -> isSignatureSettingsPage()?new app.flexygram.settings.MatteTextCheckCell(mContext,getResourceProvider()):new TextCheckCell(mContext);
                 case CellGroup.ITEM_TYPE_HEADER -> new HeaderCell(mContext);
-                case CellGroup.ITEM_TYPE_TEXT_DETAIL -> new TextDetailSettingsCell(mContext);
+                case CellGroup.ITEM_TYPE_TEXT_DETAIL -> isSignatureSettingsPage()?new app.flexygram.settings.MatteDetailSettingsCell(mContext):new TextDetailSettingsCell(mContext);
                 case CellGroup.ITEM_TYPE_TEXT -> new TextInfoPrivacyCell(mContext);
                 case CellGroup.ITEM_TYPE_TEXT_CHECK_ICON -> new TextCell(mContext);
                 default -> null;

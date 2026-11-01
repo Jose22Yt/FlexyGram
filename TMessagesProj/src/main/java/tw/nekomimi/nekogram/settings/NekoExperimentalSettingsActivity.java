@@ -414,6 +414,7 @@ public class NekoExperimentalSettingsActivity extends BaseNekoXSettingsActivity 
     }
 
     private void checkSensitive() {
+        if(isSignatureSettingsPage()&&!signatureSettingsAllows(disableFilteringRow))return; // No notifications for rows owned by another page.
         TL_account.getContentSettings req = new TL_account.getContentSettings();
         getConnectionsManager().sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
             if (error == null) {
@@ -583,6 +584,7 @@ public class NekoExperimentalSettingsActivity extends BaseNekoXSettingsActivity 
     }
 
     private void checkStoriesRows() {
+        if(isSignatureSettingsPage()&&!signatureSettingsAllows(disableStoriesRow))return; // No notifications for rows owned by another page.
         boolean disabled = NaConfig.INSTANCE.getDisableStories().Bool();
         if (listAdapter == null) {
             if (disabled) {
@@ -606,6 +608,7 @@ public class NekoExperimentalSettingsActivity extends BaseNekoXSettingsActivity 
     }
 
     private void checkSaveDeletedRows() {
+        if(isSignatureSettingsPage()&&!signatureSettingsAllows(enableSaveDeletedMessagesRow))return; // No notifications for rows owned by another page.
         final boolean isSaveEnabled = NaConfig.INSTANCE.getEnableSaveDeletedMessages().Bool();
         final List<AbstractConfigCell> allManagedRows = Arrays.asList(
                 messageSavingSaveMediaRow,
@@ -664,6 +667,7 @@ public class NekoExperimentalSettingsActivity extends BaseNekoXSettingsActivity 
     }
 
     private void checkSaveBotMsgRows() {
+        if(isSignatureSettingsPage()&&!signatureSettingsAllows(saveDeletedMessageForBotsUserRow))return; // No notifications for rows owned by another page.
         boolean enabled = NaConfig.INSTANCE.getSaveDeletedMessageForBotUser().Bool();
         if (listAdapter == null) {
             if (!enabled) {
@@ -688,6 +692,7 @@ public class NekoExperimentalSettingsActivity extends BaseNekoXSettingsActivity 
     }
 
     private void checkUseDeletedIconRows() {
+        if(isSignatureSettingsPage()&&!signatureSettingsAllows(useDeletedIconRow))return; // No notifications for rows owned by another page.
         boolean enabled = NaConfig.INSTANCE.getUseDeletedIcon().Bool();
         if (listAdapter == null) {
             if (enabled) {

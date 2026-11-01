@@ -330,6 +330,13 @@ public class SettingsHelper {
                     return;
             }
         }
+        BaseFragment canonical = app.flexygram.settings.signature.SignatureSettingsRegistry.legacy(screen==null?segments.get(1):screen,row);
+        if(canonical!=null){
+            fragment=canonical;
+            neko_fragment=canonical instanceof BaseNekoSettingsActivity?(BaseNekoSettingsActivity)canonical:null;
+            nekox_fragment=canonical instanceof BaseNekoXSettingsActivity?(BaseNekoXSettingsActivity)canonical:null;
+            navigation_fragment=canonical instanceof OpenExteraAppNavigationActivity?(OpenExteraAppNavigationActivity)canonical:null;
+        }
         callback.presentFragment(fragment);
         var value = uri.getQueryParameter("v");
         if (TextUtils.isEmpty(value)) {
@@ -422,20 +429,11 @@ public class SettingsHelper {
     public static ArrayList<SettingsSearchResult> onCreateSearchArray(Callback callback) {
         ArrayList<SettingsSearchResult> items = new ArrayList<>();
         ArrayList<BaseNekoXSettingsActivity> fragments = new ArrayList<>();
-        fragments.add(new NekoTranslatorSettingsActivity());
-
         ArrayList<BaseNekoSettingsActivity> exteralessFragments = new ArrayList<>();
-        exteralessFragments.add(new OpenExteraSettingsActivity());
-        exteralessFragments.add(new OpenExteraGeneralActivity());
-        exteralessFragments.add(new OpenExteraAppearanceActivity());
-        exteralessFragments.add(new OpenExteraChatsActivity());
-        exteralessFragments.add(new OpenExteraChatsActivity(OpenExteraChatsActivity.SCREEN_MENUS));
-        exteralessFragments.add(new OpenExteraChatsActivity(OpenExteraChatsActivity.SCREEN_MEDIA));
-        exteralessFragments.add(new OpenExteraChatsActivity(OpenExteraChatsActivity.SCREEN_HIDING));
-        exteralessFragments.add(new OpenExteraOtherActivity());
-        exteralessFragments.add(new OpenExteraAyuMomentsActivity());
-        exteralessFragments.add(new PillStackSettingsActivity());
-        exteralessFragments.add(new AiSettingsActivity());
+        for(BaseFragment candidate:app.flexygram.settings.signature.SignatureSettingsRegistry.searchScreens()){
+            if(candidate instanceof BaseNekoSettingsActivity)exteralessFragments.add((BaseNekoSettingsActivity)candidate);
+            else if(candidate instanceof BaseNekoXSettingsActivity)fragments.add((BaseNekoXSettingsActivity)candidate);
+        }
 
         String e_title = getString(R.string.OpenExtera);
         for (BaseNekoSettingsActivity fragment : exteralessFragments) {
@@ -444,7 +442,7 @@ public class SettingsHelper {
             } catch (Exception e) {
                 continue;
             }
-            int uid = fragment.getSearchGuid();
+            int uid = fragment.getSignatureSearchGuid()!=0?fragment.getSignatureSearchGuid():fragment.getSearchGuid();
             int drawable = fragment.getSearchIcon();
             String f_title = fragment.getSearchTitle();
             for (Map.Entry<Integer, String> entry : fragment.getSearchRows().entrySet()) {
@@ -474,9 +472,9 @@ public class SettingsHelper {
 
         String n_title = getString(R.string.Language);
         for (BaseNekoXSettingsActivity fragment: fragments) {
-            int uid = fragment.getBaseGuid();
+            int uid = fragment.getSignatureSearchGuid()!=0?fragment.getSignatureSearchGuid():fragment.getBaseGuid();
             int drawable = fragment.getDrawable();
-            String f_title = fragment.getTitle();
+            String f_title = fragment.getSignatureSearchTitle();
             for (Map.Entry<Integer, String> entry : fragment.getRowMapReverse().entrySet()) {
                 Integer i = entry.getKey();
                 String key = entry.getValue();

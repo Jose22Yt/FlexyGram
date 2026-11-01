@@ -439,17 +439,17 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
 
     @Override protected int matteHeaderColor() { return screen == SCREEN_CHATS ? getThemedColor(Theme.key_windowBackgroundWhiteBlueHeader) : super.matteHeaderColor(); }
     private void updateSignatureHubRows() {
-        signaturePersonalHeader = addRow();
+        signaturePersonalHeader = addRow("settings2SmartHeader");
         flexyBubblesRow = addRow("flexyBubbles");
         signatureHeaderRow = addRow("signatureChatHeader");
         composerSettingsRow = addRow("flexyComposerSettings");
         signatureThemeRow = addRow("flexyThemeWallpaper");
         smartPreviewsRow = addRow("flexySmartPreviews");
-        signatureInteractionHeader = addRow();
+        signatureInteractionHeader = addRow("settings2RetiredHeader");
         flexyContextPanelRow = addRow("flexyContextPanel");
         signatureMessagesRow = addRow("flexyMessagesGestures");
         signatureStickersRow = addRow("flexyStickersMedia");
-        signatureAdditionalHeader = addRow();
+        signatureAdditionalHeader = addRow("settings2RetiredHeader");
         chatSettingsRow = addRow("chatSettings");
         linksDividerRow = addRow();
     }

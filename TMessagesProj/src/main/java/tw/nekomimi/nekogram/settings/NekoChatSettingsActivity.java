@@ -667,6 +667,7 @@ public class NekoChatSettingsActivity extends BaseNekoXSettingsActivity implemen
     }
 
     private void checkSkipOpenLinkConfirmRows() {
+        if(isSignatureSettingsPage()&&!signatureSettingsAllows(skipOpenLinkConfirmRow))return; // Filtered rows must not issue RecyclerView notifications.
         boolean confirmAllLinks = NaConfig.INSTANCE.getConfirmAllLinks().Bool();
         if (listAdapter == null) {
             if (confirmAllLinks) {
@@ -691,6 +692,7 @@ public class NekoChatSettingsActivity extends BaseNekoXSettingsActivity implemen
     }
 
     private void checkConfirmAVRows() {
+        if(isSignatureSettingsPage()&&!signatureSettingsAllows(confirmAVRow))return; // Filtered rows must not issue RecyclerView notifications.
         boolean useChatAttachMediaMenu = NekoConfig.useChatAttachMediaMenu.Bool();
         if (listAdapter == null) {
             if (useChatAttachMediaMenu) {

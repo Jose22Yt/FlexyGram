@@ -18,6 +18,7 @@ import tw.nekomimi.nekogram.settings.BaseNekoSettingsActivity;
 
 /** Opt-in for General/Appearance only. No preference writes or changes to global Glass. */
 public abstract class SignatureMatteSettingsActivity extends BaseNekoSettingsActivity {
+    @Override public org.telegram.ui.ActionBar.ActionBar createActionBar(Context context){org.telegram.ui.ActionBar.ActionBar bar=super.createActionBar(context);bar.centerTitle();return bar;}
     protected int matteHeaderColor() { return getThemedColor(Theme.key_windowBackgroundWhiteGrayText2); }
     @Override protected boolean usesSolidSettingsSurfaces() { return true; }
     @Override protected boolean needActionBarBlur() { return false; }
