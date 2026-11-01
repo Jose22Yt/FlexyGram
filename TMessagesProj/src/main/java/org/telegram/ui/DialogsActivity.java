@@ -3068,7 +3068,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
         BirthdayController.getInstance(currentAccount).check();
         additionNavigationBarHeight = hasMainTabs && MainTabsLayout.isBottomNavigationVisible() && !MainTabsLayout.isBottomNavigationFloating() ? dp(app.exteraless.appearance.MainTabsUiHelper.getTabsViewHeightDp()) : 0;
-        additionFloatingButtonOffset = hasMainTabs && MainTabsLayout.isBottomNavigationVisible() ? dp(app.exteraless.appearance.MainTabsUiHelper.getTabsFabOffsetDp()) : 0;
+        additionFloatingButtonOffset = hasMainTabs && MainTabsLayout.isBottomNavigationVisible() ? dp(app.exteraless.appearance.MainTabsUiHelper.getTabsFabOffsetDp() + (MainTabsLayout.isBottomNavigationFloating() ? 6 : 0)) : 0;
 
         LastSeenHelper.preload();
 
@@ -3399,7 +3399,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         selectedDialogs.clear();
 
         additionNavigationBarHeight = hasMainTabs && MainTabsLayout.isBottomNavigationVisible() && !MainTabsLayout.isBottomNavigationFloating() ? dp(app.exteraless.appearance.MainTabsUiHelper.getTabsViewHeightDp()) : 0;
-        additionFloatingButtonOffset = hasMainTabs && MainTabsLayout.isBottomNavigationVisible() ? dp(app.exteraless.appearance.MainTabsUiHelper.getTabsFabOffsetDp()) : 0;
+        additionFloatingButtonOffset = hasMainTabs && MainTabsLayout.isBottomNavigationVisible() ? dp(app.exteraless.appearance.MainTabsUiHelper.getTabsFabOffsetDp() + (MainTabsLayout.isBottomNavigationFloating() ? 6 : 0)) : 0;
 
         maximumVelocity = ViewConfiguration.get(context).getScaledMaximumFlingVelocity();
 
@@ -4348,11 +4348,13 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             viewPage.addView(viewPage.progressView, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER));
 
             viewPage.listView = new DialogsRecyclerView(context, viewPage);
-            viewPage.listView.setItemViewCacheSize(15);
+            final int cacheSize = SharedConfig.getDevicePerformanceClass() >= SharedConfig.PERFORMANCE_CLASS_HIGH ? 12 : 8;
+            final int maxPool = SharedConfig.getDevicePerformanceClass() >= SharedConfig.PERFORMANCE_CLASS_HIGH ? 25 : 15;
+            viewPage.listView.setItemViewCacheSize(cacheSize);
             viewPage.listView.setHasFixedSize(true);
             RecyclerView.RecycledViewPool pool = viewPage.listView.getRecycledViewPool();
             if (pool != null) {
-                pool.setMaxRecycledViews(0, 30);
+                pool.setMaxRecycledViews(0, maxPool);
             }
             viewPage.listView.addEdgeEffectListener(() -> viewPage.listView.postOnAnimation(this::blur3_InvalidateBlur));
             viewPage.scroller = new RecyclerListViewScroller(viewPage.listView);
@@ -14915,7 +14917,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         if (commentView != null || !hasMainTabs || !MainTabsLayout.isBottomNavigationFloating()) {
             return 0;
         }
-        return dp(app.exteraless.appearance.MainTabsUiHelper.getTabsViewHeightDp());
+        return dp(app.exteraless.appearance.MainTabsUiHelper.getTabsViewHeightDp() + 16);
     }
 
     @Override
