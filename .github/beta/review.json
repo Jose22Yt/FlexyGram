@@ -22,7 +22,7 @@
     ".github/beta/source_contract.py": "d40ab8e902e36064f673eca572d1b0a74f848b377d5fa55684f3d10131d27a15",
     ".github/beta/test_infrastructure.py": "9ad7510a2d8f8a765c66c09c9e4232dbd89a61b3876c029745f3d528a744d4df",
     ".github/workflows/beta-private-tests.yml": "4ee320fe25544445fdc490658b415519b947434f717d5d3b78ac05d05e510237",
-    ".github/workflows/beta-private.yml": "8121122d5131c2ec9aee21d3a08201ab46178a52a0d649cf834b9f34ade307c6",
+    ".github/workflows/beta-private.yml": "a3c3ead044fae5393098740ffbc1b71663e0b3ecb8ba237201cfdda37934df2a",
     "tools/connected_alpha/beta_release_contract.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     ".github/beta/source_identity.json": "3c619f2caa97519bddbfee733d647a97617eb609b614fa82a390ff4325a4803e",
     ".github/workflows/pr.yml": "f004441445da84b23ca63bd0fcec2e5329552679a2463251fbe6129c34af8fcd"
