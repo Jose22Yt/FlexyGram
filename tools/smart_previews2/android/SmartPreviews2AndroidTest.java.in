@@ -24,6 +24,12 @@ public class SmartPreviews2AndroidTest {
   SmartPreviewsDemoView demo=new SmartPreviewsDemoView(activity,null);SignatureSmartPreviews.setMode(0);layout(demo,360);int old=render(demo).getPixel(30,14);Theme.accent=0xffe11d48;demo.updateColors();assertNotEquals(old,render(demo).getPixel(30,14));
   SignatureSmartPreviews.setMode(3);demo.styleChanged(0,3);layout(demo,360);assertEquals(0,render(demo).getPixel(30,14));
  }
+ @Test public void resourcesProviderOverridesGlobalThemeAndRefreshesExistingSpans()throws Exception{
+  int[] accent={0xff15803d};Theme.ResourcesProvider provider=k->k==1?accent[0]:k==2?0xfff8fafc:0xff111827;
+  SignatureSmartPreviews.setMode(0);SmartPreviewsDemoView demo=new SmartPreviewsDemoView(activity,provider);layout(demo,360);
+  Field f=SmartPreviewsDemoView.class.getDeclaredField("pills");f.setAccessible(true);Object first=((Object[])f.get(demo))[0];int old=render(demo).getPixel(30,14);
+  accent[0]=0xff7c3aed;demo.updateColors();assertNotEquals(old,render(demo).getPixel(30,14));assertSame(first,((Object[])f.get(demo))[0]);
+ }
  @Test public void actualSettingsAdapterHasOneHeaderFourStylesAndOnePreview(){
   SmartPreviewsSettingsActivity page=new SmartPreviewsSettingsActivity();RecyclerView list=page.createView(activity);activity.setContentView(list);layout(list,360);assertEquals(6,list.getAdapter().getItemCount());
   ArrayList<Integer> changes=new ArrayList<>();list.getAdapter().registerAdapterDataObserver(new RecyclerView.AdapterDataObserver(){public void onChanged(){fail("Do not rebuild the settings list");}public void onItemRangeChanged(int s,int n,Object payload){changes.add(s);}});
@@ -43,6 +49,7 @@ public class SmartPreviews2AndroidTest {
  @Test public void longFilenameRtlAndInterleavedMeasurementsStayBounded(){
   SignatureSmartPillSpan a=new SignatureSmartPillSpan(12,"a".repeat(1000)+".zip",95,null,true),b=new SignatureSmartPillSpan(6,"Foto",200,null,false);Paint p=new Paint(3);p.setTextSize(16);assertTrue(a.getSize(p,"x",0,1,null)<=95);p.setTextSize(10);b.getSize(p,"x",0,1,null);
   Bitmap bitmap=Bitmap.createBitmap(360,90,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(bitmap);a.draw(c,"x",0,1,0,0,18,25,p);assertEquals(0,bitmap.getPixel(96,12));
+  Bitmap same=bitmap.copy(Bitmap.Config.ARGB_8888,true);p.setTextSize(30);b.getSize(p,"x",0,1,null);bitmap.eraseColor(Color.TRANSPARENT);a.draw(c,"x",0,1,0,0,18,25,p);assertTrue(same.sameAs(bitmap));assertTrue(a.label().endsWith(".zip"));
   LocaleController.isRTL=true;SmartPreviewsDemoView demo=new SmartPreviewsDemoView(activity,null);layout(demo,210);assertTrue(demo.getHeight()<230);render(demo);
  }
  @Test public void localPreviewNeverInitializesAnAccountOrTouchesMessageDetection(){

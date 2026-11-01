@@ -35,7 +35,7 @@ def write(dest,root):
  emit('org/telegram/ui/ActionBar/Theme.java',r'''package org.telegram.ui.ActionBar;public class Theme{
  public interface Colorable{void updateColors();}public interface ResourcesProvider{int getColor(int key);}
  public static final int key_actionBarTabLine=1,key_windowBackgroundWhite=2,key_windowBackgroundWhiteBlackText=3;
- public static int surface=0xff101820,accent=0xff3b82f6;public static int getColor(int k,ResourcesProvider p){return p!=null?p.getColor(k):k==1?accent:k==2?surface:0xffffffff;}}
+ public static int surface=0xff101820,accent=0xff3b82f6;public static int getColor(int k,ResourcesProvider p){return p!=null?p.getColor(k):k==1?accent:k==2?surface:app.flexygram.home.SignatureSmartPreviewPalette.luminance(surface)<.45?0xffffffff:0xff111827;}}
 ''')
  emit('org/telegram/ui/ActionBar/ThemeDescription.java','package org.telegram.ui.ActionBar;public class ThemeDescription{public interface ThemeDescriptionDelegate{void didSetColor();}public ThemeDescription(android.view.View v,int f,Class[] c,String[] n,android.graphics.Paint[] p,android.graphics.drawable.Drawable[]d,ThemeDescriptionDelegate a,int k){}}')
  emit('org/telegram/ui/Components/RecyclerListView.java','package org.telegram.ui.Components;import androidx.recyclerview.widget.RecyclerView;public class RecyclerListView extends RecyclerView{public RecyclerListView(android.content.Context c){super(c);}public static class Holder extends RecyclerView.ViewHolder{public Holder(android.view.View v){super(v);}}public abstract static class SelectionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{public abstract boolean isEnabled(RecyclerView.ViewHolder h);}}')
