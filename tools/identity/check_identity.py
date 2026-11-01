@@ -69,11 +69,20 @@ def main():
         expected = original(name)
         if name.endswith('.xml'):
             expected = expected.replace(ALPHA.encode(), BETA.encode()).replace(b'FlexyGram Alpha', b'FlexyGram')
+        if beta.endswith('/alpha_name.xml'):
+            for key in ('AppName', 'AppNameBeta'):
+                expected = expected.replace(('<string name="'+key+'">FlexyGram</string>').encode(),
+                                            ('<string name="'+key+'">FlexyGram Beta</string>').encode())
+        if beta.endswith('/flexygram_identity.xml'):
+            expected = expected.replace(b'>FlexyGram</string>', b'>FlexyGram Beta</string>')
         require((ROOT/beta).read_bytes() == expected, 'Beta approved asset mismatch: ' + beta)
     for name in XML_NAMES:
         main = 'TMessagesProj/src/main/res/xml/' + name
         require(read(main) == original(main).decode().replace(ALPHA, BETA), 'Unexpected main XML delta')
         require((ROOT/'TMessagesProj/src/connectedAlpha/res/xml'/name).read_bytes() == original(main), 'Alpha XML regression')
+    beta_label = ET.parse(ROOT/'TMessagesProj/src/beta/res/values/flexygram_identity.xml').getroot()
+    require(beta_label.find("string[@name='NagramX']").text == 'FlexyGram Beta',
+            'Beta manifest label must be FlexyGram Beta')
     # Any Java/Kotlin/C++ change must be exactly the reviewed identity predicate.
     changed = subprocess.check_output(['git', 'diff', '--name-only', BASE, '--', 'TMessagesProj'], cwd=ROOT, text=True).splitlines()
     for name in changed:
@@ -88,7 +97,7 @@ def main():
             expected = original(name).decode().replace('"'+ALPHA+'".equals(ApplicationLoader.applicationContext.getPackageName())', 'BuildConfig.CONNECTED_ALPHA')
             require(read(name) == expected, 'Unreviewed SharedConfig change')
     identity = dict(re.findall(r'^(\w+)=(.*)$', read('config/signing/identity.properties'), re.M))
-    official = '5a598fb5ba42949b67b7c2635106fafd5f23179397e4c098757a73cd2d2ef66c'
+    official = 'e71c4d1e14dd940892009c61164df522c133029df6d1258561f6a1a4d1f3c015'
     require(identity['applicationId'] == BETA and identity['alias'] == 'flexygram-release', 'Registered identity/package mismatch')
     require(identity['certificateSha256'] == official, 'Official fingerprint changed')
     require(hashlib.sha256((ROOT/identity['certificateFile']).read_bytes()).hexdigest() == official, 'Registered public DER mismatch')

@@ -2,14 +2,14 @@
 
 La generación ya fue confirmada por @Lukhou23. **No generes otra clave.** El procedimiento anterior de generación se conserva en el historial Git, pero no debe repetirse para este paquete. La identidad registrada está en [SIGNING.md](SIGNING.md).
 
-El original PKCS12 y las contraseñas permanecen en el teléfono/control del propietario. El certificado público recibido por el asistente no acredita la existencia ni la restauración de dos backups; esa confirmación sigue pendiente.
+El propietario informa que conserva el PKCS12, respaldos cifrados y recuperación de la identidad AntiTerm. Se respeta su decisión de reutilizarlos, sin regenerar ni repetir el procedimiento. El informe público actual no acredita posesión privada ni restauraciones; no se marca custodia aprobada sin evidencia.
 
 ## Verificar el original
 
 Desde una terminal propia con Java, sin grabación ni registro de contraseñas:
 
 ```bash
-java tools/signing/VerifySigning.java keystore /ruta/privada/flexygram-release.p12 5a598fb5ba42949b67b7c2635106fafd5f23179397e4c098757a73cd2d2ef66c
+java tools/signing/VerifySigning.java keystore /ruta/privada/flexygram-release.p12 e71c4d1e14dd940892009c61164df522c133029df6d1258561f6a1a4d1f3c015
 ```
 
 La contraseña se pide sin eco. El alias debe ser `flexygram-release`. Un PASS con POSSESSION_VERIFIED comprueba acceso y correspondencia clave/certificado en ese momento; no confirma soportes externos ni una APK.

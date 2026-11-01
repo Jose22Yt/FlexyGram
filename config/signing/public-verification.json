@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "sha256": "e71c4d1e14dd940892009c61164df522c133029df6d1258561f6a1a4d1f3c015",
+  "public_key": "RSA-3072",
+  "signature": "SHA256withRSA",
+  "not_before": "2026-10-30T23:00:20Z",
+  "not_after": "2054-03-17T23:00:20Z",
+  "private_key": "NOT_CHECKED",
+  "custody": "OWNER_CONFIRMATION_REQUIRED",
+  "android_apk": "NOT_TESTED"
+}
