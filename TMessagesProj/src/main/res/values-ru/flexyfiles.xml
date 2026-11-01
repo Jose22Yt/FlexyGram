@@ -30,4 +30,9 @@
     <string name="FlexyFilesDiscard">Не сохранять</string>
     <string name="FlexyFilesShare">Поделиться файлом</string>
     <string name="FlexyFilesDownload">Загрузить</string>
+    <string name="FlexyFilesNativeBack">Назад к файлам</string>
+    <string name="FlexyFilesNativeEdit">Изменить</string>
+    <string name="FlexyFilesNativeImage">Предпросмотр изображения</string>
+    <string name="FlexyFilesNativeTooLarge">Размер файла превышает безопасный предел предпросмотра. Исходный файл не изменён.</string>
+    <string name="FlexyFilesNativeUnsupported">Для этого формата нет предпросмотра текста или изображений. Исходный файл не изменён.</string>
 </resources>
