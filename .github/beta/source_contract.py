@@ -6,7 +6,7 @@ from pathlib import Path
 import subprocess
 
 ROOT = Path(__file__).resolve().parents[2]
-BASE = '8ffaf2aeaa6d4526806eb4a2fd21f2b1bd2eb546'
+BASE = 'eac78ab695f7198ae7c30968b0c3571f5c1e2d83'
 MANIFEST = ROOT/'.github/beta/review.json'
 
 
