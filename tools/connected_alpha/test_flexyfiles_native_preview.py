@@ -24,11 +24,13 @@ class NativeViewerContracts(unittest.TestCase):
     def test_same_native_sheet_for_explorer_and_preview(self):
         self.assertIn("extends BottomSheet", self.sheet)
         self.assertIn("new FlexyFilesNativePreview(", self.sheet)
-        self.assertIn("browserPanel.setVisibility(View.GONE)", self.sheet)
-        self.assertIn("browserPanel.setVisibility(View.VISIBLE)", self.sheet)
+        self.assertIn("sheetScroll.setVisibility(View.GONE)", self.sheet)
+        self.assertIn("sheetScroll.setVisibility(View.VISIBLE)", self.sheet)
         self.assertIn("if (previewing) { leavePreview(); return; }", self.sheet)
         self.assertIn("openPreview(null, sheet.name, ready.size())", self.sheet)
         self.assertIn("this::leavePreview, this::editPreview", self.sheet)
+        self.assertIn("surface.addView(previewPanel", self.sheet)
+        self.assertIn("browserScrollY = sheetScroll.getScrollY()", self.sheet)
         self.assertNotIn("new FlexyFilesSheet(", self.viewer)
 
     def test_read_decode_and_chunk_outside_ui_thread(self):
