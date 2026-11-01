@@ -115,12 +115,15 @@ final class FlexyFilesNativePreview extends LinearLayout {
         textList.setNestedScrollingEnabled(true);
         textList.setOverScrollMode(OVER_SCROLL_IF_CONTENT_SCROLLS);
         textList.setVisibility(GONE);
-        addView(textList, new LayoutParams(-1, dp(440)));
+        // Match the available device viewport; no second scrolling parent.
+        int viewport = Math.max(dp(200), Math.min(dp(600),
+                (int) (org.telegram.messenger.AndroidUtilities.displaySize.y * .83f) - dp(145)));
+        addView(textList, new LayoutParams(-1, viewport));
 
         image = new ImageView(context);
         image.setAdjustViewBounds(true);
         image.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        image.setMaxHeight(dp(440));
+        image.setMaxHeight(viewport);
         image.setVisibility(GONE);
         addView(image, new LayoutParams(-1, -2));
     }
