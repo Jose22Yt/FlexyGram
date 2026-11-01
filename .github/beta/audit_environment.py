@@ -67,13 +67,13 @@ def validate(policy, environment, branches, main):
 
 
 def validate_source_review(policy, pull, reviews, commit, manifest):
-    expected = {'pull_request': 150, 'head_sha': SOURCE, 'base_sha': SOURCE_BASE,
+    expected = {'pull_request': 161, 'head_sha': SOURCE, 'base_sha': SOURCE_BASE,
                 'reviewer_ids': [REVIEWER_ID], 'certificate_sha256': CERTIFICATE}
     require(policy.get('source_review') == expected, 'SOURCE_REVIEW_POLICY')
-    require(manifest.get('source_commit') == SOURCE and manifest.get('source_pr') == 150
+    require(manifest.get('source_commit') == SOURCE and manifest.get('source_pr') == 161
             and manifest.get('base_commit') == SOURCE_BASE
             and manifest.get('certificate_sha256') == CERTIFICATE, 'SOURCE_MANIFEST_IDENTITY')
-    require(pull.get('number') == 150 and pull.get('user', {}).get('id') == 126811980
+    require(pull.get('number') == 161 and pull.get('user', {}).get('id') == 126811980
             and pull.get('head', {}).get('sha') == SOURCE
             and pull.get('head', {}).get('repo', {}).get('full_name') == REPO
             and pull.get('base', {}).get('repo', {}).get('full_name') == REPO
@@ -92,7 +92,7 @@ def validate_source_review(policy, pull, reviews, commit, manifest):
             and latest.get('user', {}).get('login') == 'dc6764071-wq'
             and latest.get('author_association') == 'COLLABORATOR'
             and latest.get('submitted_at'), 'SOURCE_INDEPENDENT_APPROVAL_PENDING_OR_STALE')
-    return {'pull_request': 150, 'commit': SOURCE, 'review_id': latest['id'],
+    return {'pull_request': 161, 'commit': SOURCE, 'review_id': latest['id'],
             'reviewer_id': REVIEWER_ID, 'certificate_sha256': CERTIFICATE}
 
 
@@ -117,7 +117,7 @@ def main():
                           get('branches/main'))
         manifest = json.loads((ROOT/'source_identity.json').read_text())
         report['source_review'] = validate_source_review(
-            policy, get('pulls/150'), get('pulls/150/reviews?per_page=100'),
+            policy, get('pulls/161'), get('pulls/161/reviews?per_page=100'),
             get('git/commits/'+SOURCE), manifest)
         print(json.dumps(report, indent=2))
     except Exception:
