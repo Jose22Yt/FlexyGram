@@ -140,7 +140,7 @@ public final class BottomTabsSettingsActivity extends SignatureMatteSettingsActi
         ArrayList<Runnable> actions = new ArrayList<>();
 
         if (index > 0) {
-            items.add("▲ Mover hacia la izquierda / arriba");
+            items.add(getString(R.string.FlexyTabsMovePrevious));
             actions.add(() -> {
                 int temp = currentDestinations.get(index - 1);
                 currentDestinations.set(index - 1, id);
@@ -149,7 +149,7 @@ public final class BottomTabsSettingsActivity extends SignatureMatteSettingsActi
             });
         }
         if (index < currentDestinations.size() - 1) {
-            items.add("▼ Mover hacia la derecha / abajo");
+            items.add(getString(R.string.FlexyTabsMoveNext));
             actions.add(() -> {
                 int temp = currentDestinations.get(index + 1);
                 currentDestinations.set(index + 1, id);
@@ -158,14 +158,14 @@ public final class BottomTabsSettingsActivity extends SignatureMatteSettingsActi
             });
         }
         if (id != LiquidNavigationDestinations.CHATS && currentDestinations.size() > 2) {
-            items.add("✖ Quitar pestaña");
+            items.add(getString(R.string.FlexyTabsRemove));
             actions.add(() -> {
                 currentDestinations.remove(index);
                 saveOrder();
             });
         }
         if (availableDestinations.size() > 0 && currentDestinations.size() < LiquidNavigationDestinations.MAX_VISIBLE) {
-            items.add("➕ Agregar otra pestaña...");
+            items.add(getString(R.string.FlexyTabsAdd));
             actions.add(this::showAddTabDialog);
         }
 
@@ -183,7 +183,7 @@ public final class BottomTabsSettingsActivity extends SignatureMatteSettingsActi
             items[i] = getString(LiquidNavigationTabs.label(availableDestinations.get(i)));
         }
         showDialog(new AlertDialog.Builder(getParentActivity(), resourcesProvider)
-                .setTitle("Agregar pestaña a la barra")
+                .setTitle(getString(R.string.FlexyTabsAddTitle))
                 .setItems(items, (d, which) -> {
                     currentDestinations.add(availableDestinations.get(which));
                     saveOrder();
@@ -210,7 +210,7 @@ public final class BottomTabsSettingsActivity extends SignatureMatteSettingsActi
             addView(content, new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
             TextView guidance = new TextView(context);
-            guidance.setText("Arrastra los iconos para ordenarlos. Toca uno para configurarlo.");
+            guidance.setText(getString(R.string.FlexyTabsPreviewHint));
             guidance.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText, resourcesProvider));
             guidance.setTextSize(12);
             guidance.setPadding(dp(5), dp(2), dp(5), dp(11));
@@ -224,13 +224,13 @@ public final class BottomTabsSettingsActivity extends SignatureMatteSettingsActi
             content.addView(dockLayout, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(48)));
 
             offView = new TextView(context);
-            offView.setText("Barra inferior desactivada");
+            offView.setText(getString(R.string.FlexyTabsOff));
             offView.setTextSize(13);
             offView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText, resourcesProvider));
             offView.setGravity(Gravity.CENTER);
 
             TextView availableLabel = new TextView(context);
-            availableLabel.setText("Pestañas disponibles · Toca para agregar");
+            availableLabel.setText(getString(R.string.FlexyTabsAvailable));
             availableLabel.setTextSize(12);
             availableLabel.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText, resourcesProvider));
             availableLabel.setPadding(dp(5), dp(14), dp(5), dp(8));
@@ -310,7 +310,7 @@ public final class BottomTabsSettingsActivity extends SignatureMatteSettingsActi
 
         private void addAvailableTab(int id, boolean capacityReached) {
             TextView chip = new TextView(getContext());
-            chip.setText("＋ " + getString(LiquidNavigationTabs.label(id)));
+            chip.setText(getString(R.string.FlexyTabsAddPrefix) + " " + getString(LiquidNavigationTabs.label(id)));
             chip.setGravity(Gravity.CENTER);
             chip.setTextSize(12);
             chip.setSingleLine(true);
@@ -330,7 +330,7 @@ public final class BottomTabsSettingsActivity extends SignatureMatteSettingsActi
             chip.setOnClickListener(v -> {
                 if (currentDestinations.size() >= LiquidNavigationDestinations.MAX_VISIBLE) {
                     showDialog(new AlertDialog.Builder(getParentActivity(), resourcesProvider)
-                            .setMessage("La barra admite hasta seis pestañas. Quita una para agregar otra.")
+                            .setMessage(getString(R.string.FlexyTabsLimit))
                             .setPositiveButton(R.string.OK, null).create());
                     return;
                 }
@@ -436,7 +436,7 @@ public final class BottomTabsSettingsActivity extends SignatureMatteSettingsActi
                 return;
             }
             if (p == restoreRow) {
-                ((TextSettingsCell) h.itemView).setTextAndValue("Restablecer pestañas", "Orden predeterminado", false);
+                ((TextSettingsCell) h.itemView).setTextAndValue(getString(R.string.FlexyTabsRestore), getString(R.string.FlexyTabsRestoreSub), false);
                 return;
             }
             if (p >= orderStartRow && p < orderEndRow) {
@@ -444,7 +444,7 @@ public final class BottomTabsSettingsActivity extends SignatureMatteSettingsActi
                 int id = currentDestinations.get(index);
                 ((TextSettingsCell) h.itemView).setTextAndValue(
                         (index + 1) + ". " + getString(LiquidNavigationTabs.label(id)),
-                        "Configurar ›",
+                        getString(R.string.FlexyTabsConfigure),
                         p != orderEndRow - 1
                 );
             }
