@@ -47,6 +47,7 @@ public final class Settings3Registry {
         if(original instanceof app.flexygram.header.HeaderSettingsActivity||original instanceof app.flexygram.bubbles.BubbleSettingsActivity||original instanceof app.flexygram.composer.FlexyComposerSettingsActivity||original instanceof app.flexygram.bubbles.interaction.BubbleInteractionSettingsActivity||original instanceof app.flexygram.bubbles.deletion.MessageAnimationsActivity)return open("chat");
         if(original instanceof app.flexygram.navigation.BottomTabsSettingsActivity)return open("navigation");
         if(original instanceof app.exteraless.settings.OpenExteraAyuMomentsActivity)return open("ayu");
+        if(original instanceof app.flexygram.effects.GlareSettingsSection)return open("chat");
         if(original instanceof SignatureLauncherSettingsActivity)return open("universal");
         return original;
     }
