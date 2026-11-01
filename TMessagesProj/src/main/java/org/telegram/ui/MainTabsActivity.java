@@ -1081,6 +1081,16 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
     }
     private void openFlexyDestination(int id) {
         if (id == app.flexygram.navigation.LiquidNavigationDestinations.SEARCH) {
+            // Follow Cherrygram's search behavior: search the current searchable page,
+            // unless the user explicitly requests that search always targets chats.
+            if (!app.flexygram.navigation.LiquidNavigationConfig.alwaysSearchChats()) {
+                BaseFragment current = getCurrentVisibleFragment();
+                if ((current instanceof SettingsActivity || current instanceof ContactsActivity)
+                        && current.getActionBar() != null) {
+                    current.getActionBar().openSearchField("", true);
+                    return;
+                }
+            }
             openChatsSearch();
             return;
         }
