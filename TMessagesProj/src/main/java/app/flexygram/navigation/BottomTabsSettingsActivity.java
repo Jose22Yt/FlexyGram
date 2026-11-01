@@ -221,7 +221,7 @@ public final class BottomTabsSettingsActivity extends SignatureMatteSettingsActi
             dockLayout.setGravity(Gravity.CENTER);
             dockLayout.setPadding(dp(4), dp(3), dp(4), dp(3));
             dockLayout.setBackground(dockBackground);
-            content.addView(dockLayout, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(56)));
+            content.addView(dockLayout, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(48)));
 
             offView = new TextView(context);
             offView.setText("Barra inferior desactivada");
@@ -255,6 +255,7 @@ public final class BottomTabsSettingsActivity extends SignatureMatteSettingsActi
             tab.setMainTabsAppearance(hideLabels, LiquidNavigationConfig.iconDp());
             tab.setMainTabsCompact(hideLabels);
             tab.setSkipDrawSelector(true);
+            tab.setContentDescription(getString(LiquidNavigationTabs.label(id)));
             dockLayout.addView(tab, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1f));
             tab.setOnClickListener(v -> showTabActionDialog(index));
             final float[] downX = {0f};
@@ -272,7 +273,11 @@ public final class BottomTabsSettingsActivity extends SignatureMatteSettingsActi
                         if (Math.abs(delta) > dp(7)) dragging[0] = true;
                         if (dragging[0]) {
                             float slot = (float) dockLayout.getWidth() / Math.max(1, currentDestinations.size());
-                            delta = Math.max(-index * slot, Math.min((currentDestinations.size() - 1 - index) * slot, delta));
+                            // LinearLayout reverses the physical direction in RTL; preserve logical order.
+                            boolean rtl = org.telegram.messenger.LocaleController.isRTL;
+                            float low = (rtl ? -(currentDestinations.size() - 1 - index) : -index) * slot;
+                            float high = (rtl ? index : (currentDestinations.size() - 1 - index)) * slot;
+                            delta = Math.max(low, Math.min(high, delta));
                             v.setTranslationX(delta);
                         }
                         return true;
@@ -285,7 +290,7 @@ public final class BottomTabsSettingsActivity extends SignatureMatteSettingsActi
                         } else {
                             float slot = (float) dockLayout.getWidth() / Math.max(1, currentDestinations.size());
                             int destination = Math.max(0, Math.min(currentDestinations.size() - 1,
-                                    index + Math.round(delta / Math.max(1f, slot))));
+                                    index + Math.round((org.telegram.messenger.LocaleController.isRTL ? -delta : delta) / Math.max(1f, slot))));
                             if (destination != index && index < currentDestinations.size()) {
                                 Integer moved = currentDestinations.remove(index);
                                 currentDestinations.add(destination, moved);
@@ -339,11 +344,12 @@ public final class BottomTabsSettingsActivity extends SignatureMatteSettingsActi
             dockLayout.removeAllViews();
             disabledLayout.removeAllViews();
             boolean enabled = LiquidNavigationConfig.isEnabled();
-            boolean floating = LiquidNavigationConfig.isFloatingDock();
-            dockBackground.setCornerRadius(dp(floating ? 31 : 12));
-            dockBackground.setColor(Theme.getColor(Theme.key_windowBackgroundWhite, resourcesProvider));
-            dockBackground.setStroke(dp(1),
-                    Theme.multAlpha(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText, resourcesProvider), .24f));
+            // Match Cherrygram's quiet translucent, round outlined preview container;
+            // the production dock still uses FlexyGram's own floating style.
+            dockBackground.setCornerRadius(dp(50));
+            int track = Theme.getColor(Theme.key_switchTrack, resourcesProvider);
+            dockBackground.setColor(Theme.multAlpha(track, 20f / 255f));
+            dockBackground.setStroke(dp(1), Theme.multAlpha(track, 63f / 255f));
             if (!enabled) {
                 dockLayout.addView(offView, new LinearLayout.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
