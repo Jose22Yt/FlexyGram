@@ -29,7 +29,7 @@ public final class BottomTabsSettingsActivity extends SignatureMatteSettingsActi
     private int tabsHeaderRow, showTabsRow;
     private int appearanceHeaderRow, floatingDockRow, showTitlesRow;
     private int actionsHeaderRow, doubleTapChatsRow, doubleTapProfileRow, alwaysSearchChatsRow;
-    private int orderHeaderRow;
+    private int orderHeaderRow, restoreRow;
     private int orderStartRow, orderEndRow;
 
     private final ArrayList<Integer> currentDestinations = new ArrayList<>();
@@ -53,26 +53,28 @@ public final class BottomTabsSettingsActivity extends SignatureMatteSettingsActi
             }
         }
 
-        previewRow = addRow();
-
         tabsHeaderRow = addRow("FlexyBottomTabsSectionTabs");
         showTabsRow = addRow("flexyBottomTabsShow");
 
         appearanceHeaderRow = addRow("FlexyBottomTabsSectionAppearance");
-        floatingDockRow = addRow("flexyBottomTabsFloatingDock");
+        previewRow = addRow();
         showTitlesRow = addRow("flexyBottomTabsShowTitles");
+        floatingDockRow = addRow("flexyBottomTabsFloatingDock");
 
         actionsHeaderRow = addRow("FlexyBottomTabsSectionActions");
         doubleTapChatsRow = addRow("flexyBottomTabsDoubleTapChats");
         doubleTapProfileRow = addRow("flexyBottomTabsDoubleTapProfile");
         alwaysSearchChatsRow = addRow("flexyBottomTabsAlwaysSearchChats");
 
+        // The preview itself is the primary organizer. Keep a compact list as an
+        // accessible alternative to dragging, plus an explicit reset action.
         orderHeaderRow = addRow("FlexyBottomTabsSectionOrder");
         orderStartRow = rowCount;
         for (int i = 0; i < currentDestinations.size(); i++) {
             addRow("flexy_dest_" + currentDestinations.get(i));
         }
         orderEndRow = rowCount;
+        restoreRow = addRow("flexy_dest_restore");
     }
 
     @Override
@@ -119,6 +121,10 @@ public final class BottomTabsSettingsActivity extends SignatureMatteSettingsActi
         } else if (position == alwaysSearchChatsRow) {
             LiquidNavigationConfig.setAlwaysSearchChats(!LiquidNavigationConfig.alwaysSearchChats());
             listAdapter.notifyItemChanged(alwaysSearchChatsRow);
+        } else if (position == restoreRow) {
+            LiquidNavigationConfig.setOrder(LiquidNavigationDestinations.defaults());
+            updateRows();
+            listAdapter.notifyDataSetChanged();
         } else if (position >= orderStartRow && position < orderEndRow) {
             int index = position - orderStartRow;
             if (index >= 0 && index < currentDestinations.size()) {
@@ -215,7 +221,7 @@ public final class BottomTabsSettingsActivity extends SignatureMatteSettingsActi
             dockLayout.setGravity(Gravity.CENTER);
             dockLayout.setPadding(dp(4), dp(3), dp(4), dp(3));
             dockLayout.setBackground(dockBackground);
-            content.addView(dockLayout, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(64)));
+            content.addView(dockLayout, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(56)));
 
             offView = new TextView(context);
             offView.setText("Barra inferior desactivada");
@@ -421,6 +427,10 @@ public final class BottomTabsSettingsActivity extends SignatureMatteSettingsActi
             }
             if (p == alwaysSearchChatsRow) {
                 ((TextCheckCell) h.itemView).setTextAndValueAndCheck(getString(R.string.FlexyBottomTabsAlwaysSearchChats), getString(R.string.FlexyBottomTabsAlwaysSearchChatsSub), LiquidNavigationConfig.alwaysSearchChats(), false, false);
+                return;
+            }
+            if (p == restoreRow) {
+                ((TextSettingsCell) h.itemView).setTextAndValue("Restablecer pestañas", "Orden predeterminado", false);
                 return;
             }
             if (p >= orderStartRow && p < orderEndRow) {
