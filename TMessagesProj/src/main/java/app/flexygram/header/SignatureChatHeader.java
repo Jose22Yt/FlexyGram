@@ -35,10 +35,24 @@ public final class SignatureChatHeader {
         this.bar = bar; this.avatar = avatar; this.provider = provider;
 
     }
+    private int unreadCount = 0;
+    private android.text.StaticLayout unreadLayout;
     public boolean enabled() { return HeaderConfig.signature(); }
     public boolean active() { return enabled() && !bar.isSearchFieldVisible() && !bar.isActionModeShowed() && avatar.getVisibility() == View.VISIBLE; }
     /** Retained bridge for older callers; unread badges belong to the native chat list. */
-    public void setCount(int value) { }
+    public void setCount(int value) {
+        if (unreadCount != value) {
+            unreadCount = value;
+            if (value > 0) {
+                String str = value > 99 ? "99+" : Integer.toString(value);
+                int countWidth = (int) Math.ceil(Theme.dialogs_countTextPaint.measureText(str));
+                unreadLayout = new android.text.StaticLayout(str, Theme.dialogs_countTextPaint, countWidth, android.text.Layout.Alignment.ALIGN_CENTER, 1.0f, 0.0f, false);
+            } else {
+                unreadLayout = null;
+            }
+            changed();
+        }
+    }
     public void changed() { avatar.requestLayout(); bar.requestLayout(); bar.invalidate(); }
     public int measure(int width, int status, int nativeHeight) {
         var metrics = bar.getResources().getDisplayMetrics();
@@ -77,8 +91,14 @@ public final class SignatureChatHeader {
         titlePx = Math.min(titlePx, height - AndroidUtilities.dp(8));
         int content = Math.max(nativeHeight, Math.round(height) + AndroidUtilities.dp(12));
         float titleWidth = avatar.signaturePreferredTitleWidth(titlePx, subtitlePx, textMetrics);
-        geometry.update(width, status + (content - height) / 2f, height, 0,
-                AndroidUtilities.density, LocaleController.isRTL, 0, titleWidth);
+        float numberWidth = 0;
+        int mode = HeaderConfig.counter() ? HeaderConfig.counterMode() : 0;
+        if (mode != 0 && unreadCount > 0 && unreadLayout != null) {
+            String str = unreadCount > 99 ? "99+" : Integer.toString(unreadCount);
+            numberWidth = Theme.dialogs_countTextPaint.measureText(str);
+        }
+        geometry.update(width, status + (content - height) / 2f, height, numberWidth,
+                AndroidUtilities.density, LocaleController.isRTL, mode, titleWidth);
         return content;
     }
     public void measureControls() {
@@ -107,14 +127,39 @@ public final class SignatureChatHeader {
         // Native Liquid Glass is a Telegram power-saving flag, not a new Flexy master switch.
         // Use the existing ActionBar blur3 sources only when they are ready.
         // Solid Signature rendering remains bit-for-bit unchanged when the flag is off.
-        if (bar.drawSignatureNativeGlass(canvas, this)) return;
-        if (!fusionActive()) { surface.draw(canvas, geometry, AndroidUtilities.density, provider); return; }
+        if (bar.drawSignatureNativeGlass(canvas, this)) {
+            drawUnread(canvas);
+            return;
+        }
+        if (!fusionActive()) {
+            surface.draw(canvas, geometry, AndroidUtilities.density, provider);
+            drawUnread(canvas);
+            return;
+        }
         int fill = Theme.getColor(Theme.key_windowBackgroundWhite, provider);
         fill = (fill & 0xffffff) | ((HeaderConfig.portrait() ? 255 : Math.round(HeaderConfig.opacity() * 2.55f)) << 24);
         int border = (Theme.getColor(Theme.key_divider, provider) & 0xffffff) | 0x66000000;
         int save = canvas.save(); canvas.translate(0, fusionTop);
         fusion.surface.drawBackdrop(canvas, fusion.layout, fill, border, border, AndroidUtilities.density);
         canvas.restoreToCount(save);
+        drawUnread(canvas);
+    }
+    private void drawUnread(Canvas canvas) {
+        if (!geometry.countVisible || unreadLayout == null || unreadCount <= 0) return;
+        canvas.save();
+        int textColor = Theme.getColor(Theme.key_actionBarDefaultTitle, provider);
+        Theme.dialogs_countTextPaint.setColor(textColor);
+        if (geometry.separateCount) {
+            canvas.translate(geometry.badge.centerX() - unreadLayout.getWidth() / 2f,
+                    geometry.badge.centerY() - unreadLayout.getHeight() / 2f);
+        } else {
+            float textX = LocaleController.isRTL
+                    ? geometry.back.left + AndroidUtilities.dp(8)
+                    : geometry.back.right - unreadLayout.getWidth() - AndroidUtilities.dp(8);
+            canvas.translate(textX, geometry.back.centerY() - unreadLayout.getHeight() / 2f);
+        }
+        unreadLayout.draw(canvas);
+        canvas.restore();
     }
     /** One final center contour, after the real avatar; no double edge under the fading image. */
     public void drawForeground(Canvas canvas) {

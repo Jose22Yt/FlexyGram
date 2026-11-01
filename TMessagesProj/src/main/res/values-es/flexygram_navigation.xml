@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyBottomTabsTitle">Organizador de barra inferior</string>
+    <string name="FlexyBottomTabsSectionTabs">Pestañas</string>
+    <string name="FlexyBottomTabsShow">Mostrar barra inferior</string>
+    <string name="FlexyBottomTabsShowSub">Doble toque en la pestaña de chat para abrir "Mensajes guardados". Doble toque en el perfil (o Ajustes si está oculto) para cambiar de cuenta.</string>
+    <string name="FlexyBottomTabsSectionAppearance">Apariencia</string>
+    <string name="FlexyBottomTabsFloatingDock">Estilo Dock flotante</string>
+    <string name="FlexyBottomTabsFloatingDockSub">Muestra la barra como una cápsula flotante estilizada con efecto Glass.</string>
+    <string name="FlexyBottomTabsShowTitles">Mostrar títulos de pestañas</string>
+    <string name="FlexyBottomTabsSectionOrder">Orden y distribución de pestañas</string>
+    <string name="FlexyBottomTabsOrderHint">Toca para activar/desactivar o mueve los elementos para personalizar tu barra.</string>
+    <string name="FlexyBottomTabsSectionActions">Acciones inteligentes</string>
+    <string name="FlexyBottomTabsDoubleTapChats">Doble toque en chats para Mensajes guardados</string>
+    <string name="FlexyBottomTabsDoubleTapProfile">Doble toque en perfil para cambiar de cuenta</string>
+    <string name="FlexyBottomTabsAlwaysSearchChats">Buscar siempre en chats</string>
+    <string name="FlexyBottomTabsAlwaysSearchChatsSub">Cuando está activo, el botón de búsqueda siempre abre la búsqueda de chats. Desactivado, busca en la pantalla actual.</string>
+</resources>

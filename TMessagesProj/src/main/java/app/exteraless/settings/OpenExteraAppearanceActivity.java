@@ -119,6 +119,7 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
     // Links
     private int linksHeaderRow;
     private int appNavigationRow;
+    private int bottomTabsRow;
     private int iconPacksRow;
     private int emojiSetsRow;
     private int pillStackRow;
@@ -173,6 +174,7 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
         iconsDividerRow = addRow();
 
         linksHeaderRow = addRow("linksHeader");
+        bottomTabsRow = addRow("bottomTabs");
         appNavigationRow = addRow("appNavigation");
         pillStackRow = addRow("pillStack");
         hidingRow = addRow("hiding");
@@ -478,7 +480,10 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
 
     @Override
     protected void onItemClick(View view, int position, float x, float y) {
-        if (position == iconPacksRow) {
+        if (position == bottomTabsRow) {
+            presentFragment(new app.flexygram.navigation.BottomTabsSettingsActivity());
+            return;
+        } else if (position == iconPacksRow) {
             presentFragment(new IconPacksActivity());
             return;
         } else if (position == pillStackRow) {
@@ -810,7 +815,9 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
                 case TYPE_DETAIL_SETTINGS: {
                     // Иконка слева, подпись под заголовком.
                     TextDetailSettingsCell cell = (TextDetailSettingsCell) holder.itemView;
-                    if (position == appNavigationRow) {
+                    if (position == bottomTabsRow) {
+                        cell.setTextAndValueAndIcon(getString(R.string.FlexyBottomTabsTitle), getString(R.string.FlexyBottomTabsOrderHint), R.drawable.msg_home, true);
+                    } else if (position == appNavigationRow) {
                         cell.setTextAndValueAndIcon(getString(R.string.OEAppearanceNavigation), getString(R.string.OEAppearanceNavigationSub), R.drawable.msg_newphone, true);
 
                     } else if (position == iconPacksRow) {
@@ -873,7 +880,7 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
                 return TYPE_INFO_PRIVACY;
             } else if (position == fabShapeRow) {
                 return TYPE_FAB_SHAPE;
-            } else if (position == appNavigationRow || position == iconPacksRow
+            } else if (position == bottomTabsRow || position == appNavigationRow || position == iconPacksRow
                     || position == emojiSetsRow || position == pillStackRow || position == hidingRow) {
                 return TYPE_DETAIL_SETTINGS;
             } else if (position == dividerStyleRow || position == glassOutlineRow

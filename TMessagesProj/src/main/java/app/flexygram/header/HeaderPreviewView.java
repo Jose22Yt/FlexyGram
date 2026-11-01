@@ -31,6 +31,7 @@ public final class HeaderPreviewView extends View {
     private float fusionTop, fusionTitleX, fusionStatusX;
     private float titlePx, subtitlePx, previewHeight, titleBaseline, subtitleBaseline;
     private final Paint.FontMetricsInt fontMetrics = new Paint.FontMetricsInt();
+    private final android.text.TextPaint scratchPaint = new android.text.TextPaint();
     private String displayName = "", displayStatus = "";
     public HeaderPreviewView(Context context) {
         super(context); text.setTextAlign(Paint.Align.CENTER);
@@ -52,10 +53,10 @@ public final class HeaderPreviewView extends View {
             if(g.fits&&titleLine+subtitleLine+AndroidUtilities.dp(2)<=g.height-AndroidUtilities.dp(8)){
                 fusionMode=true;previewHeight=g.height;
                 int h=Math.round(previewHeight)+AndroidUtilities.dp(80);setMeasuredDimension(width,h);fusionTop=(h-previewHeight)/2;
-                text.setTextSize(titlePx);displayName=android.text.TextUtils.ellipsize(name,new android.text.TextPaint(text),g.text.width(),android.text.TextUtils.TruncateAt.END).toString();
+                text.setTextSize(titlePx); scratchPaint.set(text); displayName=android.text.TextUtils.ellipsize(name,scratchPaint,g.text.width(),android.text.TextUtils.TruncateAt.END).toString();
                 fusionTitleX=app.flexygram.header.fusion.SignatureFusionGeometry.titleCenterX(
                         g, text.measureText(displayName));
-                text.setTextSize(subtitlePx);displayStatus=android.text.TextUtils.ellipsize(status,new android.text.TextPaint(text),g.text.width(),android.text.TextUtils.TruncateAt.END).toString();
+                text.setTextSize(subtitlePx); scratchPaint.set(text); displayStatus=android.text.TextUtils.ellipsize(status,scratchPaint,g.text.width(),android.text.TextUtils.TruncateAt.END).toString();
                 fusionStatusX=g.text.centerX();
                 fusion.clip.rewind();fusion.clip.addRoundRect(g.center.left,g.center.top,g.center.right,g.center.bottom,g.center.height()/2,g.center.height()/2,android.graphics.Path.Direction.CW);
                 // Preview contact has initials only: keep the initial in the small native left slot.
@@ -72,9 +73,14 @@ public final class HeaderPreviewView extends View {
         int h=Math.round(previewHeight)+AndroidUtilities.dp(80);setMeasuredDimension(width,h);
         text.setTextSize(titlePx); float preferred = text.measureText(name);
         text.setTextSize(subtitlePx); preferred = Math.max(preferred, text.measureText(status)) + AndroidUtilities.dp(24);
-        geometry.update(width,(h-previewHeight)/2,previewHeight,0,AndroidUtilities.density,LocaleController.isRTL,0,preferred);
-        text.setTextSize(titlePx);displayName=android.text.TextUtils.ellipsize(name,new android.text.TextPaint(text),Math.max(0,geometry.title.width()-AndroidUtilities.dp(24)),android.text.TextUtils.TruncateAt.END).toString();
-        text.setTextSize(subtitlePx);displayStatus=android.text.TextUtils.ellipsize(status,new android.text.TextPaint(text),Math.max(0,geometry.title.width()-AndroidUtilities.dp(24)),android.text.TextUtils.TruncateAt.END).toString();
+        float numberWidth = 0;
+        int mode = HeaderConfig.counter() ? HeaderConfig.counterMode() : 0;
+        if (mode != 0) {
+            numberWidth = Theme.dialogs_countTextPaint.measureText("10");
+        }
+        geometry.update(width,(h-previewHeight)/2,previewHeight,numberWidth,AndroidUtilities.density,LocaleController.isRTL,mode,preferred);
+        text.setTextSize(titlePx); scratchPaint.set(text); displayName=android.text.TextUtils.ellipsize(name,scratchPaint,Math.max(0,geometry.title.width()-AndroidUtilities.dp(24)),android.text.TextUtils.TruncateAt.END).toString();
+        text.setTextSize(subtitlePx); scratchPaint.set(text); displayStatus=android.text.TextUtils.ellipsize(status,scratchPaint,Math.max(0,geometry.title.width()-AndroidUtilities.dp(24)),android.text.TextUtils.TruncateAt.END).toString();
     }
     @Override protected void onSizeChanged(int w, int h, int oldw, int oldh) { super.onSizeChanged(w,h,oldw,oldh); }
     @Override protected void onDraw(Canvas canvas) {
@@ -88,6 +94,19 @@ public final class HeaderPreviewView extends View {
         float arrow = LocaleController.isRTL ? geometry.back.right-height/2 : geometry.back.left+height/2;
         int side=AndroidUtilities.dp(24), y=Math.round(geometry.back.centerY());
         back.setBounds(Math.round(arrow)-side/2,y-side/2,Math.round(arrow)+side/2,y+side/2); back.draw(canvas);
+        if (geometry.countVisible) {
+            Paint countPaint = Theme.dialogs_countTextPaint;
+            countPaint.setColor(color);
+            float countY = geometry.back.centerY() - (countPaint.descent() + countPaint.ascent()) / 2f;
+            float countX = LocaleController.isRTL
+                    ? geometry.back.left + AndroidUtilities.dp(8)
+                    : geometry.back.right - AndroidUtilities.dp(8) - countPaint.measureText("10");
+            if (geometry.separateCount) {
+                countX = geometry.badge.centerX() - countPaint.measureText("10") / 2f;
+                countY = geometry.badge.centerY() - (countPaint.descent() + countPaint.ascent()) / 2f;
+            }
+            canvas.drawText("10", countX, countY, countPaint);
+        }
         text.setColor(color);
         text.setTextSize(titlePx); float titleHeight=text.descent()-text.ascent(), titleAscent=text.ascent();
         text.setTextSize(subtitlePx); float subtitleHeight=text.descent()-text.ascent();
