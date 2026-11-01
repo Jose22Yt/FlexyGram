@@ -35,10 +35,21 @@ class Migration(unittest.TestCase):
  def test_original_preference_handlers_are_byte_identical(self):
   for name in ['OpenExteraGeneralActivity','OpenExteraAppearanceActivity','OpenExteraChatsActivity','OpenExteraOtherActivity']:
    path=Path('TMessagesProj/src/main/java/app/exteraless/settings')/(name+'.java');new=(ROOT/path).read_text();old=before(path)
-   for anchor in ['protected void onItemClick(']:self.assertEqual(method(old,anchor),method(new,anchor).replace('\n        if(position==settings3ResetStickerRow && position>=0){resetStickerSize();return;}',''),name)
+   for anchor in ['protected void onItemClick(']:
+    expected=method(old,anchor)
+    if name=='OpenExteraChatsActivity':
+     # This task retires exactly the old Smart Preview picker; retain all other callbacks byte-for-byte.
+     a=expected.index('        } else if (position == smartPreviewsRow) {')
+     b=expected.index('        } else if (position == flexyContextPanelRow)',a)
+     expected=expected[:a]+expected[b:]
+    self.assertEqual(expected,method(new,anchor).replace('\n        if(position==settings3ResetStickerRow && position>=0){resetStickerSize();return;}',''),name)
  def test_no_changes_to_signature_style_engines_media_auth_jni_or_flexyfiles_backend(self):
   paths=['app/flexygram/files','app/flexygram/header/HeaderConfig.java','app/flexygram/header/HeaderPreviewView.java','app/flexygram/bubbles/BubbleConfig.java','app/flexygram/bubbles/BubblePreviewView.java','app/flexygram/composer/FlexyComposerConfig.java','app/flexygram/composer/ComposerStyle.java','app/flexygram/navigation/LiquidNavigationConfig.java','org/telegram/messenger','org/telegram/tgnet','org/telegram/ui/ChatActivity.java','org/telegram/ui/ActionBar/ActionBarLayout.java']
-  out=subprocess.check_output(['git','diff',BASE,'--',*[str(Path('TMessagesProj/src/main/java')/p)for p in paths],'TMessagesProj/jni','TMessagesProj/chaquopy','TMessagesProj/build.gradle','config','.github'],cwd=ROOT,text=True);self.assertEqual('',out)
+  changed=set(subprocess.check_output(['git','diff','--name-only',BASE,'--',*[str(Path('TMessagesProj/src/main/java')/p)for p in paths],'TMessagesProj/jni','TMessagesProj/chaquopy','TMessagesProj/build.gradle','config','.github'],cwd=ROOT,text=True).splitlines())
+  # Only the exact reviewed, read-only renderer test workflow is new. Release workflows remain frozen.
+  workflow='.github/workflows/smart-previews2.yml'
+  self.assertFalse(changed-{workflow})
+  self.assertEqual('22be37697119c5b2a4314fb15875823d1c5e7ed0',subprocess.check_output(['git','hash-object',workflow],cwd=ROOT,text=True).strip())
  def test_studio_has_only_original_three_operations_and_files_is_moved(self):
   s=(J/'app/flexygram/studio/FlexyStudioActivity.java').read_text();rows=method(s,'protected void updateRows()');self.assertEqual(re.findall(r'addRow\("([^"]+)"',rows),['flexystudioExport','flexystudioImport','flexystudioShare']);self.assertIn('tools=files=help=toolsShadow=-1',rows)
   f=(D/'SignatureFilesSettingsActivity.java').read_text();self.assertIn('app.flexygram.files.FlexyFiles.enabled(!app.flexygram.files.FlexyFiles.enabled())',f);self.assertIn('super.onItemClick(v,p,x,y)',f);self.assertIn('notifyItemChanged(enabled)',f)

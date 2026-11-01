@@ -33,6 +33,8 @@ jobs:
           fi
       - name: Execute production preview and settings adapter under Android graphics
         run: python tools/smart_previews2/android/run.py --sdk-root "$ANDROID_HOME" --output-dir build/smart-previews2-android
+      - name: Retain Settings3 adapter and navigation regressions
+        run: python tools/settings3/android/run.py --sdk-root "$ANDROID_HOME" --output-dir build/smart-previews2-settings3
       - name: Preserve real isolated renderer evidence (not full app screenshots)
         if: always()
         uses: actions/upload-artifact@v4
@@ -41,4 +43,5 @@ jobs:
           path: |
             build/smart-previews2-android/smart-previews-style-*-android.png
             build/smart-previews2-android/target/surefire-reports/*.xml
+            build/smart-previews2-settings3/target/surefire-reports/*.xml
           if-no-files-found: warn
