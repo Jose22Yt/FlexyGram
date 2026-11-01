@@ -2,11 +2,9 @@
 package app.flexygram.settings.signature;
 import android.content.Context;
 import android.graphics.*;
-import android.graphics.drawable.GradientDrawable;
 import android.view.*;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.*;
-import androidx.core.graphics.ColorUtils;
 import org.telegram.messenger.*;
 import org.telegram.ui.ActionBar.Theme;
 /** Recycled native row. Layout adapts to font/RTL; no blur, bitmap or frame callback. */
@@ -16,16 +14,13 @@ public final class Settings2Cell extends FrameLayout {
     private final Theme.ResourcesProvider provider;
     private boolean divider;
     private int bodyHeight;
-    private int lastColor = 0;
-    private GradientDrawable tileDrawable;
-    private final int[] tileColors = new int[2];
     public Settings2Cell(Context c,Theme.ResourcesProvider p){
         super(c);provider=p;setWillNotDraw(false);setFocusable(true);
         title=new TextView(c);description=new TextView(c);icon=new ImageView(c);arrow=new ImageView(c);
-        title.setTextSize(16);title.setTypeface(AndroidUtilities.bold());description.setTextSize(13);
+        title.setTextSize(18);title.setTypeface(AndroidUtilities.bold());description.setTextSize(14);
         title.setGravity(Gravity.START);description.setGravity(Gravity.START);
         title.setSingleLine(false);description.setSingleLine(false);
-        icon.setScaleType(ImageView.ScaleType.CENTER_INSIDE);icon.setPadding(dp(6),dp(6),dp(6),dp(6));
+        icon.setScaleType(ImageView.ScaleType.CENTER_INSIDE);icon.setPadding(0,0,0,0);
         arrow.setImageResource(R.drawable.round_keyboard_arrow_right_24);
         for(View v:new View[]{icon,title,description,arrow}){addView(v);v.setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);}
         setMinimumHeight(dp(72));
@@ -36,20 +31,8 @@ public final class Settings2Cell extends FrameLayout {
         title.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText,provider));
         description.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText2,provider));
         arrow.setColorFilter(Theme.getColor(Theme.key_windowBackgroundWhiteGrayIcon,provider));arrow.setScaleX(LocaleController.isRTL?-1:1);
-        icon.setImageResource(resource);icon.setColorFilter(Color.WHITE);
-        if (tileDrawable == null) {
-            tileColors[0] = color;
-            tileColors[1] = ColorUtils.blendARGB(color, Color.BLACK, 0.12f);
-            tileDrawable = new GradientDrawable(GradientDrawable.Orientation.TL_BR, tileColors);
-            tileDrawable.setCornerRadius(dp(10));
-            icon.setBackground(tileDrawable);
-            lastColor = color;
-        } else if (lastColor != color) {
-            tileColors[0] = color;
-            tileColors[1] = ColorUtils.blendARGB(color, Color.BLACK, 0.12f);
-            tileDrawable.setColors(tileColors);
-            lastColor = color;
-        }
+        icon.setImageResource(resource);icon.setColorFilter(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText,provider));
+        icon.setBackground(null);
         divider=divide;
         setContentDescription(name+(detail==null||detail.isEmpty()?"":", "+detail));invalidate();
     }
@@ -62,13 +45,13 @@ public final class Settings2Cell extends FrameLayout {
         } else {
             bodyHeight = title.getMeasuredHeight();
         }
-        icon.measure(MeasureSpec.makeMeasureSpec(dp(36),MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(dp(36),MeasureSpec.EXACTLY));
+        icon.measure(MeasureSpec.makeMeasureSpec(dp(40),MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(dp(40),MeasureSpec.EXACTLY));
         arrow.measure(MeasureSpec.makeMeasureSpec(dp(20),MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(dp(20),MeasureSpec.EXACTLY));
         setMeasuredDimension(width,Math.max(dp(72),bodyHeight+dp(24))+(divider?1:0));
     }
     @Override protected void onLayout(boolean changed,int l,int t,int r,int b){
-        int w=getMeasuredWidth(),h=getMeasuredHeight(),ix=LocaleController.isRTL?w-dp(52):dp(16),tx=LocaleController.isRTL?dp(40):dp(68),ax=LocaleController.isRTL?dp(16):w-dp(36),y=(h-bodyHeight)/2;
-        icon.layout(ix,(h-dp(36))/2,ix+dp(36),(h+dp(36))/2);
+        int w=getMeasuredWidth(),h=getMeasuredHeight(),ix=LocaleController.isRTL?w-dp(56):dp(16),tx=LocaleController.isRTL?dp(40):dp(68),ax=LocaleController.isRTL?dp(16):w-dp(36),y=(h-bodyHeight)/2;
+        icon.layout(ix,(h-dp(40))/2,ix+dp(40),(h+dp(40))/2);
         arrow.layout(ax,(h-dp(20))/2,ax+dp(20),(h+dp(20))/2);
         title.layout(tx,y,tx+title.getMeasuredWidth(),y+title.getMeasuredHeight());y+=title.getMeasuredHeight()+dp(3);
         description.layout(tx,y,tx+description.getMeasuredWidth(),y+description.getMeasuredHeight());

@@ -1,0 +1,28 @@
+{
+  "base": "3c7a20a229d425c8f3b5ea1740ccb6d8b3361fea",
+  "general_pytest": {
+    "passed": 155,
+    "skipped": 31,
+    "includes_new_settings3_tests": 11
+  },
+  "legacy_source_checks": {
+    "passed": 12
+  },
+  "isolated_android": {
+    "passed": 9,
+    "compile_resources_api": 37,
+    "robolectric_runtime_api": 35,
+    "real_androidx_recyclerview": "1.4.0",
+    "telegram_host_and_legacy_controller_doubles": true,
+    "full_direct_category_compilation": false
+  },
+  "java21_syntax": {
+    "files_parsed": 28,
+    "semantic_compilation": false
+  },
+  "aapt2": "PASS_RESOURCES_AND_ISOLATED_LINK_ONLY",
+  "integrated_gradle": "BLOCKED: distribution download Network is unreachable",
+  "physical_device": "NOT_TESTED",
+  "performance_numbers": null,
+  "apk_generated": false
+}

@@ -58,7 +58,37 @@ import tw.nekomimi.nekogram.ui.cells.AccountCell;
 import tw.nekomimi.nekogram.ui.cells.EmojiSetCell;
 import tw.nekomimi.nekogram.ui.cells.HeaderCell;
 
-public abstract class BaseNekoSettingsActivity extends BaseFragment {
+public abstract class BaseNekoSettingsActivity extends BaseFragment implements app.flexygram.settings.signature.NativeSettingsSection {
+
+    private boolean settings3Embedded;
+    private int settings3BindingPosition=-1;
+    protected final int settingsRowPosition(RecyclerView.ViewHolder holder){return settings3Embedded?settings3BindingPosition:holder.getAdapterPosition();}
+    private java.util.function.IntUnaryOperator settings3Position = p -> p;
+    public final void setSettings3Position(java.util.function.IntUnaryOperator mapper){settings3Position=mapper;}
+    protected final int settings3GlobalPosition(int local){return local<0?local:settings3Position.applyAsInt(local);}
+    protected final boolean isSettings3Embedded(){return settings3Embedded;}
+    @Override public final BaseFragment settings3Controller(){return this;}
+    @Override public final org.telegram.ui.Components.RecyclerListView.SelectionAdapter prepareSettings3(BaseFragment host, org.telegram.ui.Components.RecyclerListView list){
+        settings3Embedded=true;
+        setCurrentAccount(host.getCurrentAccount());
+        resourcesProvider=host.getResourceProvider();
+        setParentLayout(host.getParentLayout());
+        fragmentView=host.getFragmentView();
+        listView=(org.telegram.ui.Components.BlurredRecyclerView)list;
+        layoutManager=(androidx.recyclerview.widget.LinearLayoutManager)list.getLayoutManager();
+        if(!onFragmentCreate())throw new IllegalStateException("Settings controller refused creation");
+        listAdapter=createAdapter(list.getContext());
+        return listAdapter;
+    }
+    @Override public final boolean settings3LongClick(View view,int position,float x,float y){
+        if(onItemLongClick(view,position,x,y))return true;
+        if(getKey()!=null&&rowMapReverse.containsKey(position)){
+            app.exteraless.settings.utils.SettingsRowMenu.show(this,view,String.format(java.util.Locale.ROOT,"https://%s/%s?r=%s",getMessagesController().linkPrefix,tw.nekomimi.nekogram.helpers.SettingsHelper.linkPathFor(getKey()),rowMapReverse.get(position)));return true;
+        }return false;
+    }
+    @Override public final boolean settings3Enabled(int position,RecyclerView.ViewHolder holder){settings3BindingPosition=position;try{return listAdapter!=null&&listAdapter.isEnabled(holder);}finally{settings3BindingPosition=-1;}}
+    @Override public final void settings3Click(View view,int position,float x,float y){if(position>=0&&position<rowCount)onItemClick(view,position,x,y);}
+    @Override public void releaseSettings3(){onPause();onFragmentDestroy();fragmentView=null;listView=null;listAdapter=null;layoutManager=null;setParentLayout((org.telegram.ui.ActionBar.INavigationLayout)null);}
 
     public static final Object PARTIAL = new Object();
 
@@ -161,7 +191,7 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment {
         // Карточки-секции: штатная геометрия декоратора + радиус из AppearanceConfig.
         // Тень-elevation форсируется в SectionCardRecyclerView.drawBackgroundRect.
         // При sectionRadius == 0 — стоковый плоский вид (карточки визуально отсутствуют).
-        listView.setSections(dp(isSignatureSettingsPage()?16:12), dp(isSignatureSettingsPage()?20:app.exteraless.appearance.AppearanceConfig.sectionRadius()), true);
+        listView.setSections(dp(isSignatureSettingsPage()?16:12), dp((isSettings3Embedded()||isSignatureSettingsPage())?20:app.exteraless.appearance.AppearanceConfig.sectionRadius()), true);
         if(isSignatureSettingsPage())listView.setItemAnimator(null);
         setupAdaptiveBackground();
         return fragmentView;
@@ -214,7 +244,7 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment {
      */
     /** Opt-in presentation only; existing settings screens retain their original pipeline. */
     protected boolean usesSolidSettingsSurfaces() {
-        return isSignatureSettingsPage();
+        return settings3Embedded || isSignatureSettingsPage();
     }
 
     protected app.exteraless.appearance.SectionCardRecyclerView createSettingsList(Context context) {
@@ -270,6 +300,7 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment {
         colors.add(new ThemeDescription(listView, 0, new Class[]{View.class}, Theme.dividerPaint, null, invalidate, Theme.key_divider));
         colors.add(new ThemeDescription(listView,0,new Class[]{app.flexygram.settings.signature.Settings2Cell.class},new String[]{"title"},null,null,null,Theme.key_windowBackgroundWhiteBlackText));
         colors.add(new ThemeDescription(listView,0,new Class[]{app.flexygram.settings.signature.Settings2Cell.class},new String[]{"description"},null,null,null,Theme.key_windowBackgroundWhiteGrayText2));
+        colors.add(new ThemeDescription(listView,ThemeDescription.FLAG_IMAGECOLOR,new Class[]{app.flexygram.settings.signature.Settings2Cell.class},new String[]{"icon"},null,null,null,Theme.key_windowBackgroundWhiteBlackText));
         colors.add(new ThemeDescription(listView,ThemeDescription.FLAG_IMAGECOLOR,new Class[]{app.flexygram.settings.signature.Settings2Cell.class},new String[]{"arrow"},null,null,null,Theme.key_windowBackgroundWhiteGrayIcon));
         Class[] titleCells = {TextSettingsCell.class, TextCheckCell.class, TextCheckCell2.class, TextDetailSettingsCell.class, NotificationsCheckCell.class, TextCell.class, TextRadioCell.class, CheckBoxCell.class};
         colors.add(new ThemeDescription(listView, 0, titleCells, new String[]{"textView"}, null, null, null, Theme.key_windowBackgroundWhiteBlackText));
@@ -330,8 +361,8 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment {
             listView.highlightRow(() -> {
                 // noinspection ConstantConditions
                 int position = rowMap.get(key);
-                layoutManager.scrollToPositionWithOffset(position, dp(60));
-                return position;
+                layoutManager.scrollToPositionWithOffset(settings3GlobalPosition(position), dp(60));
+                return settings3GlobalPosition(position);
             });
         } else if (unknown != null) {
             unknown.run();
@@ -401,6 +432,8 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment {
         updateRows();
     }
 
+    public final boolean settings3HasRow(String key){if(rowMap.containsKey(key))return true;if(signatureSource==null)return false;String owner=app.flexygram.settings.signature.Settings2Policy.aliasOwner(signatureSource,key);return java.util.Arrays.asList(signatureRoute.split("\\|")).contains(owner);}
+    public final String getSignatureSettingsRoute(){return signatureRoute;}
     public final int getSignatureSearchGuid(){return signatureRoute==null?0:app.flexygram.settings.signature.SignatureSettingsRegistry.searchGuid(signatureRoute);}
 
     public int getSearchGuid() {
@@ -514,7 +547,7 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment {
             if (!isSectionContent(viewType)) {
                 return;
             }
-            int radiusDp = isSignatureSettingsPage()?20:app.exteraless.appearance.AppearanceConfig.sectionRadius();
+            int radiusDp = (isSettings3Embedded()||isSignatureSettingsPage())?20:app.exteraless.appearance.AppearanceConfig.sectionRadius();
             if (radiusDp <= 0) {
                 // Дефолт-safe (0) = сток: сплошной фон, ровно как задавалось при создании ячейки.
                 holder.itemView.setBackgroundColor(getThemedColor(Theme.key_windowBackgroundWhite));
@@ -534,7 +567,7 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment {
             if (!isSectionContent(typeA) || !isSectionContent(typeB)) {
                 return false;
             }
-            if ((isSignatureSettingsPage() || app.exteraless.appearance.AppearanceConfig.separateHeaders())
+            if ((isSettings3Embedded() || isSignatureSettingsPage() || app.exteraless.appearance.AppearanceConfig.separateHeaders())
                     && (typeA == TYPE_HEADER || typeB == TYPE_HEADER)) {
                 return false;
             }
@@ -545,7 +578,7 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment {
         protected boolean isSectionContent(int viewType) {
             // exteraGram: при вынесенных заголовках заголовок лежит на фоне окна,
             // а не в своей карточке — поэтому он вообще не участвует в секциях.
-            if (viewType == TYPE_HEADER && (isSignatureSettingsPage() || app.exteraless.appearance.AppearanceConfig.separateHeaders())) {
+            if (viewType == TYPE_HEADER && (isSettings3Embedded() || isSignatureSettingsPage() || app.exteraless.appearance.AppearanceConfig.separateHeaders())) {
                 return false;
             }
             switch (viewType) {
@@ -594,7 +627,7 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment {
                     // exteraGram: вынесенный заголовок лежит на фоне окна — без белой подложки
                     // и вне карточки. Группировку карточек делает RecyclerListView.setSections
                     // по предикату вью, поэтому исключаем заголовок именно тегом.
-                    if (isSignatureSettingsPage() || app.exteraless.appearance.AppearanceConfig.separateHeaders()) {
+                    if (isSettings3Embedded() || isSignatureSettingsPage() || app.exteraless.appearance.AppearanceConfig.separateHeaders()) {
                         headerCell.setTag(RecyclerListView.TAG_NOT_SECTION);
                         // Метрики сняты с 12.9.0 на устройстве (420 dpi): контейнер 114px,
                         // сверху 16, текст 90, снизу 8 до карточки; левый отступ 63px.

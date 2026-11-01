@@ -133,6 +133,6 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
 
 
         }
-        @Override public boolean isEnabled(RecyclerView.ViewHolder holder) { int p = holder.getAdapterPosition(); if (p < 0) return false; return p == blurRow || p == styleRow || p == fuseRow || p == enabledRow || p==fusionAdaptRow; }
+        @Override public boolean isEnabled(RecyclerView.ViewHolder holder) { int p = settingsRowPosition(holder); if (p < 0) return false; return p == blurRow || p == styleRow || p == fuseRow || p == enabledRow || p==fusionAdaptRow; }
     }
 }

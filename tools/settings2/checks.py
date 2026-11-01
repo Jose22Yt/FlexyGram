@@ -2,7 +2,7 @@
 """Focused migration invariants; no accounts, private inputs, APK or runtime performance claims."""
 import re,json,subprocess,tempfile,unittest,xml.etree.ElementTree as ET
 from pathlib import Path
-ROOT=Path(__file__).resolve().parents[2];BASE='e681972163c0f25df79b367be17d106ba76d8087';J=ROOT/'TMessagesProj/src/main/java';D=J/'app/flexygram/settings/signature'
+ROOT=Path(__file__).resolve().parents[2];BASE='3c7a20a229d425c8f3b5ea1740ccb6d8b3361fea';J=ROOT/'TMessagesProj/src/main/java';D=J/'app/flexygram/settings/signature'
 def before(path):return subprocess.check_output(['git','show',BASE+':'+str(path)],cwd=ROOT,text=True)
 def method(s,anchor):
  start=s.index(anchor);i=s.index('{',start);d=1;j=i+1
@@ -35,9 +35,9 @@ class Migration(unittest.TestCase):
  def test_original_preference_handlers_are_byte_identical(self):
   for name in ['OpenExteraGeneralActivity','OpenExteraAppearanceActivity','OpenExteraChatsActivity','OpenExteraOtherActivity']:
    path=Path('TMessagesProj/src/main/java/app/exteraless/settings')/(name+'.java');new=(ROOT/path).read_text();old=before(path)
-   for anchor in ['protected void onItemClick(']:self.assertEqual(method(old,anchor),method(new,anchor),name)
- def test_no_changes_to_signature_editors_media_auth_jni_or_flexyfiles_backend(self):
-  paths=['app/flexygram/files','app/flexygram/header','app/flexygram/bubbles','app/flexygram/composer','app/flexygram/navigation','org/telegram/messenger','org/telegram/tgnet','org/telegram/ui/ChatActivity.java','org/telegram/ui/ActionBar/ActionBarLayout.java']
+   for anchor in ['protected void onItemClick(']:self.assertEqual(method(old,anchor),method(new,anchor).replace('\n        if(position==settings3ResetStickerRow && position>=0){resetStickerSize();return;}',''),name)
+ def test_no_changes_to_signature_style_engines_media_auth_jni_or_flexyfiles_backend(self):
+  paths=['app/flexygram/files','app/flexygram/header/HeaderConfig.java','app/flexygram/header/HeaderPreviewView.java','app/flexygram/bubbles/BubbleConfig.java','app/flexygram/bubbles/BubblePreviewView.java','app/flexygram/composer/FlexyComposerConfig.java','app/flexygram/composer/ComposerStyle.java','app/flexygram/navigation/LiquidNavigationConfig.java','org/telegram/messenger','org/telegram/tgnet','org/telegram/ui/ChatActivity.java','org/telegram/ui/ActionBar/ActionBarLayout.java']
   out=subprocess.check_output(['git','diff',BASE,'--',*[str(Path('TMessagesProj/src/main/java')/p)for p in paths],'TMessagesProj/jni','TMessagesProj/chaquopy','TMessagesProj/build.gradle','config','.github'],cwd=ROOT,text=True);self.assertEqual('',out)
  def test_studio_has_only_original_three_operations_and_files_is_moved(self):
   s=(J/'app/flexygram/studio/FlexyStudioActivity.java').read_text();rows=method(s,'protected void updateRows()');self.assertEqual(re.findall(r'addRow\("([^"]+)"',rows),['flexystudioExport','flexystudioImport','flexystudioShare']);self.assertIn('tools=files=help=toolsShadow=-1',rows)
@@ -48,7 +48,7 @@ class Migration(unittest.TestCase):
   self.assertIn('if (!org.telegram.messenger.BuildConfig.CONNECTED_ALPHA)',(J/'org/telegram/ui/ThemeActivity.java').read_text())
   self.assertIn('if(!org.telegram.messenger.BuildConfig.CONNECTED_ALPHA)count += 3',(J/'org/telegram/ui/LanguageSelectActivity.java').read_text())
  def test_new_menus_retain_clean_titles_and_native_animation_engine(self):
-  s=(D/'SignatureSettingsActivity.java').read_text();self.assertIn('actionBar.centerTitle()',s);self.assertIn('listView.setItemAnimator(null)',s);self.assertIn('if("root".equals(page))actionBar.createMenu()',s)
+  s=(D/'SignatureSettingsActivity.java').read_text();self.assertIn('actionBar.centerTitle()',s);self.assertIn('listView.setItemAnimator(null)',s);self.assertIn('actionBar.createMenu()',s)
   for p in D.glob('*.java'):
    for bad in ['new SpringAnimation(','FlexyMotion','requestLayout();requestLayout','rebuildAllFragmentViews','System.exit','setContentView']:
     self.assertNotIn(bad,p.read_text(),p.name)

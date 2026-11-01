@@ -106,7 +106,7 @@ public final class FlexyStudioActivity extends SignatureMatteSettingsActivity {
             if(position==header||position==tools)((tw.nekomimi.nekogram.ui.cells.HeaderCell)holder.itemView).setText(getString(position==header?R.string.FlexyStudioConfiguration:R.string.FlexyFilesTools));
             else if(position==files)((org.telegram.ui.Cells.TextCheckCell)holder.itemView).setTextAndValueAndCheck(getString(R.string.FlexyFilesEnable),getString(app.flexygram.files.FlexyFiles.enabled()?R.string.FlexyFilesDormant:R.string.FlexyFilesDisabled),app.flexygram.files.FlexyFiles.enabled(),true,true,false);
             else if(position==help)((SignatureNavigationCell)holder.itemView).bind(getString(R.string.FlexyFilesHow),R.drawable.msg_info,false);
-            else if(position!=shadow&&position!=toolsShadow)((app.flexygram.settings.signature.Settings2Cell)holder.itemView).bind(getString(position==export?R.string.FlexyStudioExport:position==importRow?R.string.FlexyStudioImport:R.string.FlexyStudioShare),"",position==export?R.drawable.flexy_studio_export:position==importRow?R.drawable.flexy_studio_import:R.drawable.flexy_studio_share,position==export?0xFF168BEA:position==importRow?0xFF8B50DE:0xFF21BC65,position!=share);
+            else if(position!=shadow&&position!=toolsShadow)((app.flexygram.settings.signature.Settings2Cell)holder.itemView).bind(getString(position==export?R.string.FlexyStudioExport:position==importRow?R.string.FlexyStudioImport:R.string.FlexyStudioShare),"",position==share?R.drawable.settings3_stack:R.drawable.settings3_document,0,position!=share);
         }
         @Override public boolean isEnabled(RecyclerView.ViewHolder holder){return holder.getItemViewType()==NAV||holder.getItemViewType()==TYPE_CHECK;}
     }

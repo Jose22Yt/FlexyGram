@@ -265,6 +265,7 @@ public final class Settings2Policy {
         ALIASES.put("appearance:tabTitleStyle","folders");
         ALIASES.put("appearance:titleText","chat_list");
         ALIASES.put("appearance:useSystemFonts","fonts");
+        ALIASES.put("chats:settings3StickerReset","stickers");
         ALIASES.put("chats:CloudflareCredentials","media");
         ALIASES.put("chats:ConfirmAllLinks","messages");
         ALIASES.put("chats:DateOfForwardedMsg","messages");
@@ -486,10 +487,10 @@ public final class Settings2Policy {
     }
     public static Map<String,String> inventory(){return Collections.unmodifiableMap(OWNERS);}
     public static final class Rows {
-        private final String source,route;private boolean previous;
-        public Rows(String source,String route){this.source=source;this.route=route;previous=false;}
+        private final String source,route;private final java.util.Set<String> routes;private boolean previous;
+        public Rows(String source,String route){this.source=source;this.route=route;this.routes=new java.util.HashSet<>(java.util.Arrays.asList(route.split("\\|")));previous=false;}
         public void reset(){previous=false;}
-        public boolean named(String... keys){previous=keys.length>0&&route.equals(owner(source,keys[0]));return previous;}
+        public boolean named(String... keys){if(keys.length>0&&source.equals("chats")&&keys[0].equals("settings3StickerReset")){previous=routes.contains("stickers");return previous;}previous=keys.length>0&&!(source.equals("other")&&keys[0].equals("ayuMoments"))&&routes.contains(owner(source,keys[0]));return previous;}
         public boolean anonymous(){return previous;}
     }
     private Settings2Policy(){}

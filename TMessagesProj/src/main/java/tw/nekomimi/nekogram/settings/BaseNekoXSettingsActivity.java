@@ -62,7 +62,30 @@ import tw.nekomimi.nekogram.config.cell.WithKey;
 import tw.nekomimi.nekogram.config.cell.WithOnClick;
 import tw.nekomimi.nekogram.ui.cells.HeaderCell;
 
-public class BaseNekoXSettingsActivity extends BaseFragment {
+public class BaseNekoXSettingsActivity extends BaseFragment implements app.flexygram.settings.signature.NativeSettingsSection {
+    private java.util.function.IntUnaryOperator settings3Position=p->p;
+    public final void setSettings3Position(java.util.function.IntUnaryOperator mapper){settings3Position=mapper;}
+    protected final int settings3GlobalPosition(int local){return local<0?local:settings3Position.applyAsInt(local);}
+    protected RecyclerListView.SelectionAdapter createSettings3Adapter(Context context){throw new UnsupportedOperationException("No embedded native adapter");}
+    @Override public final BaseFragment settings3Controller(){return this;}
+    @Override public final RecyclerListView.SelectionAdapter prepareSettings3(BaseFragment host,RecyclerListView list){
+        setCurrentAccount(host.getCurrentAccount());setResourceProvider(host.getResourceProvider());setParentLayout(host.getParentLayout());
+        fragmentView=host.getFragmentView();listView=(BlurredRecyclerView)list;layoutManager=(LinearLayoutManager)list.getLayoutManager();
+        tooltip=host instanceof app.flexygram.settings.signature.SignatureDirectSettingsActivity?((app.flexygram.settings.signature.SignatureDirectSettingsActivity)host).settings3Tooltip():new UndoView(list.getContext());
+        if(tooltip.getParent()==null)((android.view.ViewGroup)fragmentView).addView(tooltip,LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT,LayoutHelper.WRAP_CONTENT,Gravity.BOTTOM|Gravity.LEFT,8,0,8,8));
+        if(!onFragmentCreate())throw new IllegalStateException("Settings controller refused creation");
+        return createSettings3Adapter(list.getContext());
+    }
+    @Override public final boolean settings3LongClick(View view,int position,float x,float y){
+        if(onItemLongClick(view,position,x,y))return true;
+        CellGroup group=getCellGroup();if(group==null||position<0||position>=group.rows.size())return false;
+        if(group.rows.get(position) instanceof ConfigCellCheckBox)return true;
+        String prefix=getSettingsPrefix();if(prefix!=null){showDefaultLongClickOptions(view,prefix,position);return true;}return false;
+    }
+    @Override public final boolean settings3Enabled(int position,RecyclerView.ViewHolder holder){return getCellGroup()!=null&&position>=0&&position<getCellGroup().rows.size()&&getCellGroup().rows.get(position).isEnabled();}
+    @Override public final void settings3Click(View view,int position,float x,float y){if(getCellGroup()!=null&&position>=0&&position<getCellGroup().rows.size())handleCellClick(view,position,x,y);}
+    @Override public void releaseSettings3(){onPause();onFragmentDestroy();if(getCellGroup()!=null){getCellGroup().callBackSettingsChanged=null;getCellGroup().setListAdapter(null,null);}if(tooltip!=null&&tooltip.getParent() instanceof android.view.ViewGroup)((android.view.ViewGroup)tooltip.getParent()).removeView(tooltip);tooltip=null;fragmentView=null;listView=null;layoutManager=null;setParentLayout((org.telegram.ui.ActionBar.INavigationLayout)null);}
+
     private int signatureSettingsTitle;
     private java.util.function.Predicate<AbstractConfigCell> signatureAllowed;
     protected final boolean signatureSettingsAllows(AbstractConfigCell cell){return signatureAllowed==null||signatureAllowed.test(cell);}
@@ -74,6 +97,8 @@ public class BaseNekoXSettingsActivity extends BaseFragment {
     public final void useSignatureSettingsPage(String source,String route,int title){signatureSource=source;signatureRoute=route;useSignatureSettingsPage(title,c->app.flexygram.settings.signature.SignatureLegacyExtras.accepts(c,source,route));}
     @Override public void saveSelfArgs(android.os.Bundle args){super.saveSelfArgs(args);if(signatureSource!=null){args.putString("settings2LegacySource",signatureSource);args.putString("settings2LegacyRoute",signatureRoute);args.putInt("settings2LegacyTitle",signatureSettingsTitle);}}
     @Override public void restoreSelfArgs(android.os.Bundle args){super.restoreSelfArgs(args);String source=args.getString("settings2LegacySource");if(source!=null)useSignatureSettingsPage(source,args.getString("settings2LegacyRoute"),args.getInt("settings2LegacyTitle"));}
+    public final boolean settings3HasRow(String key){return rowMap.containsKey(key);}
+    public final String getSignatureSettingsRoute(){return signatureRoute;}
     public final int getSignatureSearchGuid(){if(signatureRoute==null)return 0;int id=app.flexygram.settings.signature.SignatureSettingsRegistry.searchGuid(signatureRoute+"_"+signatureSource);return id!=0?id:app.flexygram.settings.signature.SignatureSettingsRegistry.searchGuid(signatureRoute);}
     public final String getSignatureSearchTitle(){return isSignatureSettingsPage()?getString(signatureSettingsTitle):getTitle();}
     protected final boolean isSignatureSettingsPage(){return signatureSettingsTitle!=0;}
@@ -380,8 +405,8 @@ public class BaseNekoXSettingsActivity extends BaseFragment {
         if (position > -1 && listView != null && layoutManager != null) {
             int finalPosition = position;
             listView.highlightRow(() -> {
-                layoutManager.scrollToPositionWithOffset(finalPosition, dp(60));
-                return finalPosition;
+                layoutManager.scrollToPositionWithOffset(settings3GlobalPosition(finalPosition), dp(60));
+                return settings3GlobalPosition(finalPosition);
             });
         } else if (unknown != null) {
             unknown.run();

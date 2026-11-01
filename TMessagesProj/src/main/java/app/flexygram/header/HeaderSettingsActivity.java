@@ -219,7 +219,7 @@ public final class HeaderSettingsActivity extends SignatureMatteSettingsActivity
 
         @Override
         public boolean isEnabled(RecyclerView.ViewHolder h) {
-            int p = h.getAdapterPosition();
+            int p = settingsRowPosition(h);
             return p != previewRow && p != opacityRow && p != cherryHeaderRow && p != geometryHeaderRow;
         }
     }

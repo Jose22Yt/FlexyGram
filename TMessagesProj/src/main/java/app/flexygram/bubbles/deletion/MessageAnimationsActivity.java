@@ -33,6 +33,6 @@ public final class MessageAnimationsActivity extends SignatureMatteSettingsActiv
             cell.setTextAndValue(LocaleController.getString(messages?R.string.FlexyDeleteTitle:R.string.FlexyMessageAnimations),
                 messages?DeleteMotionSettings.labels()[DeleteMotionSettings.get(holder.itemView.getContext())]:"",false);
         }
-        @Override public boolean isEnabled(RecyclerView.ViewHolder holder) { return holder.getAdapterPosition()==row; }
+        @Override public boolean isEnabled(RecyclerView.ViewHolder holder) { return settingsRowPosition(holder)==row; }
     }
 }

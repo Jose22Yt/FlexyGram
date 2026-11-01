@@ -385,7 +385,7 @@ public final class BottomTabsSettingsActivity extends SignatureMatteSettingsActi
 
         @Override
         public boolean isEnabled(RecyclerView.ViewHolder h) {
-            int p = h.getAdapterPosition();
+            int p = settingsRowPosition(h);
             return p != previewRow && p != tabsHeaderRow && p != appearanceHeaderRow && p != actionsHeaderRow && p != orderHeaderRow;
         }
     }

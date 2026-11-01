@@ -302,14 +302,15 @@ public class NekoGeneralSettingsActivity extends BaseNekoXSettingsActivity {
     @SuppressLint({"NewApi", "NotifyDataSetChanged", "UseCompatLoadingForDrawables"})
     @Override
     public View createView(Context context) {
-        View superView = super.createView(context);
-
-        listAdapter = new ListAdapter(context);
-
+        View superView=super.createView(context);
+        createSettings3Adapter(context);
         listView.setAdapter(listAdapter);
-
         setupDefaultListeners();
-
+        return superView;
+    }
+    @Override protected RecyclerListView.SelectionAdapter createSettings3Adapter(Context context){
+        listAdapter=new ListAdapter(context);
+        cellGroup.setListAdapter(listView,listAdapter);
         // Cells: Set OnSettingChanged Callbacks
         cellGroup.callBackSettingsChanged = (key, newValue) -> {
             if (key.equals(NekoConfig.actionBarDecoration.getKey())) {
@@ -407,7 +408,7 @@ public class NekoGeneralSettingsActivity extends BaseNekoXSettingsActivity {
             }
         };
 
-        return superView;
+        return listAdapter;
     }
 
     private void showUnifiedPushStatistics() {

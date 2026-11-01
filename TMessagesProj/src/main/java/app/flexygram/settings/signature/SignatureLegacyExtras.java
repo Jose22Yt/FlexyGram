@@ -73,6 +73,7 @@ public final class SignatureLegacyExtras {
         owned.add("AskBeforeOpeningStory");
         owned.add("AutoPauseVideo");
         owned.add("BackAnimationStyle");
+        owned.add("ClearMessageDatabase");
         owned.add("CameraInVideoMessages");
         owned.add("ChannelAdministrators");
         owned.add("ChannelPermissions");
@@ -254,6 +255,7 @@ public final class SignatureLegacyExtras {
         return owner[0].equals(source)&&owner[1].equals(route);
     }
     public static Set<String> sources(String route){Set<String> result=new LinkedHashSet<>();for(String[] value:owners.values())if(route.equals(value[1]))result.add(value[0]);return result;}
+    public static String routeForKey(String key){String[] owner=owners.get(key);return owner==null?"general_extra":owner[1];}
     public static BaseFragment forKey(String key){String[] owner=owners.get(key);return owner==null?null:screen(owner[0],owner[1]);}
     public static BaseFragment open(String route){
         Set<String> sources=sources(route);if(sources.size()==1)return screen(sources.iterator().next(),route);

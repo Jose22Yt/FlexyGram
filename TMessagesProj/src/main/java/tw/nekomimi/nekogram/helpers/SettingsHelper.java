@@ -344,7 +344,10 @@ public class SettingsHelper {
         }
         if (!TextUtils.isEmpty(row)) {
             var rowFinal = row;
-            if (neko_fragment != null) {
+            if(neko_fragment instanceof app.flexygram.settings.signature.SignatureDirectSettingsActivity && !TextUtils.isEmpty(value)){
+                String finalValue=value;app.flexygram.settings.signature.SignatureDirectSettingsActivity direct=(app.flexygram.settings.signature.SignatureDirectSettingsActivity)neko_fragment;
+                AndroidUtilities.runOnUIThread(()->direct.importToRow(rowFinal,finalValue,unknown));
+            } else if (neko_fragment != null) {
                 BaseNekoSettingsActivity finalNeko_fragment = neko_fragment;
                 AndroidUtilities.runOnUIThread(() -> finalNeko_fragment.scrollToRow(rowFinal, unknown));
             } else if (navigation_fragment != null) {
@@ -435,7 +438,7 @@ public class SettingsHelper {
             else if(candidate instanceof BaseNekoXSettingsActivity)fragments.add((BaseNekoXSettingsActivity)candidate);
         }
 
-        String e_title = getString(R.string.OpenExtera);
+        String e_title = getString(R.string.FlexyBrandName);
         for (BaseNekoSettingsActivity fragment : exteralessFragments) {
             try {
                 fragment.buildRowsForSearch();
@@ -455,8 +458,12 @@ public class SettingsHelper {
                     continue;
                 }
                 Runnable open = () -> {
-                    callback.presentFragment(fragment);
-                    AndroidUtilities.runOnUIThread(() -> fragment.scrollToRow(key, null));
+                    BaseFragment target=app.flexygram.settings.signature.Settings3Registry.searchTarget(fragment,key);
+                    callback.presentFragment(target);
+                    AndroidUtilities.runOnUIThread(()->{
+                        if(target instanceof BaseNekoSettingsActivity)((BaseNekoSettingsActivity)target).scrollToRow(key,null);
+                        else if(target instanceof BaseNekoXSettingsActivity)((BaseNekoXSettingsActivity)target).scrollToRow(key,null);
+                    });
                 };
                 items.add(new SettingsSearchResult(
                         uid + entry.getKey(), title, e_title, f_title, drawable, open));
@@ -470,7 +477,7 @@ public class SettingsHelper {
                     AndroidUtilities.runOnUIThread(() -> emoji.scrollToRow("useSystemEmoji", null));
                 }));
 
-        String n_title = getString(R.string.Language);
+        String n_title = getString(R.string.FlexyBrandName);
         for (BaseNekoXSettingsActivity fragment: fragments) {
             int uid = fragment.getSignatureSearchGuid()!=0?fragment.getSignatureSearchGuid():fragment.getBaseGuid();
             int drawable = fragment.getDrawable();
@@ -487,8 +494,12 @@ public class SettingsHelper {
                     continue;
                 }
                 Runnable open = () -> {
-                    callback.presentFragment(fragment);
-                    AndroidUtilities.runOnUIThread(() -> fragment.scrollToRow(key, null));
+                    BaseFragment target=app.flexygram.settings.signature.Settings3Registry.searchTarget(fragment,key);
+                    callback.presentFragment(target);
+                    AndroidUtilities.runOnUIThread(()->{
+                        if(target instanceof BaseNekoSettingsActivity)((BaseNekoSettingsActivity)target).scrollToRow(key,null);
+                        else if(target instanceof BaseNekoXSettingsActivity)((BaseNekoXSettingsActivity)target).scrollToRow(key,null);
+                    });
                 };
                 SettingsSearchResult result = new SettingsSearchResult(
                         guid, title, n_title, f_title, drawable, open

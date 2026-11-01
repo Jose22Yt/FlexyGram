@@ -90,6 +90,7 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
     public static final int SCREEN_SIGNATURE_STICKERS = 5;
 
     private final int screen;
+    private int settings3ResetStickerRow=-1;
 
     private static final int TYPE_SIGNATURE_ENTRY = 107;
     private static final int TYPE_STICKER_SIZE = 100;
@@ -435,6 +436,7 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
                 updateSignatureHubRows();
                 break;
         }
+        settings3ResetStickerRow = isSettings3Embedded() && screen == SCREEN_SIGNATURE_STICKERS ? addRow("settings3StickerReset") : -1;
     }
 
     @Override protected int matteHeaderColor() { return screen == SCREEN_CHATS ? getThemedColor(Theme.key_windowBackgroundWhiteBlueHeader) : super.matteHeaderColor(); }
@@ -1738,6 +1740,7 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
 
     @Override
     protected void onItemClick(View view, int position, float x, float y) {
+        if(position==settings3ResetStickerRow && position>=0){resetStickerSize();return;}
         // Клик по телу строки-группы только сворачивает её; мастер-переключатель живёт
         // в правой зоне TextCheckCell2 за разделителем.
         if (position == repliesGroupRow) {
@@ -2497,6 +2500,7 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
 
         @Override
         public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, boolean partial) {
+            if(position==settings3ResetStickerRow && position>=0){((TextSettingsCell)holder.itemView).setText(getString(R.string.Reset),false);return;}
             switch (holder.getItemViewType()) {
                 case TYPE_SIGNATURE_ENTRY:
                     int label = position == flexyContextPanelRow ? R.string.FlexyContextInteractions
@@ -3159,6 +3163,7 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
 
         @Override
         public int getItemViewType(int position) {
+            if(position==settings3ResetStickerRow && position>=0)return TYPE_SETTINGS;
             if (screen == SCREEN_CHATS && (position == signaturePersonalHeader || position == signatureInteractionHeader || position == signatureAdditionalHeader)) return TYPE_HEADER;
             if (screen == SCREEN_CHATS && position != linksDividerRow) return TYPE_SIGNATURE_ENTRY;
             if (position == stickerSizeRow) return TYPE_STICKER_SIZE;
