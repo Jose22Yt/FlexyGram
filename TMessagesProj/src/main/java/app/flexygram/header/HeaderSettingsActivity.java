@@ -30,13 +30,13 @@ public final class HeaderSettingsActivity extends SignatureMatteSettingsActivity
         HeaderConfig.load();
         previewRow = addRow();
 
-        cherryHeaderRow = addHeader("FlexyHeaderCherrySection");
+        cherryHeaderRow = addRow("FlexyHeaderCherrySection");
         centerTitleRow = addRow("signatureHeaderCenterTitle");
         adaptiveBubbleRow = addRow("signatureHeaderAdaptiveBubble");
         counterRow = addRow("signatureHeaderCounter");
         iosStyledCounterRow = HeaderConfig.counter() ? addRow("signatureHeaderIosCounter") : -1;
 
-        geometryHeaderRow = addHeader("FlexyHeaderGeometrySection");
+        geometryHeaderRow = addRow("FlexyHeaderGeometrySection");
         styleRow = addRow("signatureHeaderStyle");
         sizeRow = HeaderConfig.portrait() ? -1 : addRow("signatureHeaderSize");
         opacityRow = HeaderConfig.portrait() ? -1 : addRow("signatureHeaderOpacity");
