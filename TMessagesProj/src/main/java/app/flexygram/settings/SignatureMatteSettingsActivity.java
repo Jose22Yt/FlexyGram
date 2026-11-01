@@ -31,6 +31,10 @@ public abstract class SignatureMatteSettingsActivity extends BaseNekoSettingsAct
         return new MatteSectionList(context);
     }
 
+    protected int addHeader(String key) {
+        return addRow(key);
+    }
+
     protected abstract class MatteListAdapter extends BaseListAdapter {
         protected MatteListAdapter(Context context) { super(context); }
 
@@ -62,9 +66,11 @@ public abstract class SignatureMatteSettingsActivity extends BaseNekoSettingsAct
             if (holder.itemView instanceof tw.nekomimi.nekogram.ui.cells.HeaderCell) {
                 tw.nekomimi.nekogram.ui.cells.HeaderCell header = (tw.nekomimi.nekogram.ui.cells.HeaderCell) holder.itemView;
                 header.setTextColor(matteHeaderColor());
-                header.getTextView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-                header.getTextView().setSingleLine(false);
-                header.getTextView().setMaxLines(Integer.MAX_VALUE);
+                if (header.getTextView() != null) {
+                    header.getTextView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+                    header.getTextView().setSingleLine(false);
+                    header.getTextView().setMaxLines(Integer.MAX_VALUE);
+                }
             }
             if (holder.itemView instanceof org.telegram.ui.Cells.CheckBoxCell) {
                 org.telegram.ui.Cells.CheckBoxCell cell = (org.telegram.ui.Cells.CheckBoxCell) holder.itemView;
