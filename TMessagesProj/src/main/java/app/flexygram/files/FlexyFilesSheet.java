@@ -57,6 +57,13 @@ final class FlexyFilesSheet extends BottomSheet {
     private volatile SelectedDocument document;
     private List<SelectedDocument.Entry> entries = Collections.emptyList();
     private List<Row> rows = Collections.emptyList();
+    // UI-thread-only, bounded folder cache: repeat ZIP navigation does no rescanning.
+    private final LinkedHashMap<String, List<Row>> folderCache =
+            new LinkedHashMap<String, List<Row>>(8, .75f, true) {
+                @Override protected boolean removeEldestEntry(java.util.Map.Entry<String, List<Row>> oldest) {
+                    return size() > 8;
+                }
+            };
     private String path = "";
     private boolean closed;
     private final boolean restored;
@@ -517,6 +524,16 @@ final class FlexyFilesSheet extends BottomSheet {
         if (document == null || closed) return;
         String prefix = path;
         String search = query.getText().toString().toLowerCase(Locale.ROOT);
+        if (search.isEmpty()) {
+            List<Row> cached = folderCache.get(prefix);
+            if (cached != null) {
+                work.cancel();
+                rows = cached;
+                refreshLocation();
+                adapter.notifyDataSetChanged();
+                return;
+            }
+        }
         List<SelectedDocument.Entry> source = entries;
         WeakReference<FlexyFilesSheet> weak = new WeakReference<>(this);
         FilesWork tasks = work;
@@ -548,6 +565,9 @@ final class FlexyFilesSheet extends BottomSheet {
                 FlexyFilesSheet sheet = weak.get();
                 if (sheet == null || !tasks.current(token)) return;
                 sheet.rows = result;
+                if (search.isEmpty() && result.size() <= 128) {
+                    sheet.folderCache.put(prefix, result);
+                }
                 sheet.refreshLocation();
                 sheet.adapter.notifyDataSetChanged();
                 if(sheet.pendingScroll!=null){sheet.list.getLayoutManager().onRestoreInstanceState(sheet.pendingScroll);sheet.pendingScroll=null;}
@@ -574,6 +594,7 @@ final class FlexyFilesSheet extends BottomSheet {
         if (old != null) try { old.close(); } catch (IOException ignored) {}
         entries = Collections.emptyList();
         rows = Collections.emptyList();
+        folderCache.clear();
         query.clearFocus();
     }
 
