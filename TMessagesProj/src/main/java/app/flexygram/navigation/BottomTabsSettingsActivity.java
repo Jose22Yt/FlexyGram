@@ -8,7 +8,6 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
@@ -49,7 +48,7 @@ public final class BottomTabsSettingsActivity extends SignatureMatteSettingsActi
         }
         availableDestinations.clear();
         for (int id = 0; id < LiquidNavigationDestinations.COUNT; id++) {
-            if (!currentDestinations.contains(id)) {
+            if (LiquidNavigationDestinations.isSelectable(id) && !currentDestinations.contains(id)) {
                 availableDestinations.add(id);
             }
         }
@@ -186,123 +185,175 @@ public final class BottomTabsSettingsActivity extends SignatureMatteSettingsActi
                 .create());
     }
 
+
+    /** Interactive editor: native tab glyphs, drag reordering and inline disabled-tab picker. */
     private final class DockPreviewCell extends FrameLayout {
-        private final GradientDrawable dockBg = new GradientDrawable();
+        private final LinearLayout content;
         private final LinearLayout dockLayout;
-        private final ArrayList<LinearLayout> tabItems = new ArrayList<>();
-        private final ArrayList<ImageView> tabIcons = new ArrayList<>();
-        private final ArrayList<TextView> tabTitles = new ArrayList<>();
+        private final LinearLayout disabledLayout;
         private final TextView offView;
+        private final GradientDrawable dockBackground = new GradientDrawable();
 
         DockPreviewCell(Context context) {
             super(context);
             setLayoutParams(new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-            setPadding(dp(16), dp(12), dp(16), dp(12));
+            setPadding(dp(16), dp(8), dp(16), dp(14));
+
+            content = new LinearLayout(context);
+            content.setOrientation(LinearLayout.VERTICAL);
+            addView(content, new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+            TextView guidance = new TextView(context);
+            guidance.setText("Arrastra los iconos para ordenarlos. Toca uno para configurarlo.");
+            guidance.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText, resourcesProvider));
+            guidance.setTextSize(12);
+            guidance.setPadding(dp(5), dp(2), dp(5), dp(11));
+            content.addView(guidance, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
             dockLayout = new LinearLayout(context);
             dockLayout.setOrientation(LinearLayout.HORIZONTAL);
             dockLayout.setGravity(Gravity.CENTER);
-            dockLayout.setPadding(dp(12), dp(8), dp(12), dp(8));
-
-            dockBg.setColor((Theme.getColor(Theme.key_windowBackgroundWhite, resourcesProvider) & 0xffffff) | 0xEE000000);
-            dockLayout.setBackground(dockBg);
-
-            LayoutParams lp = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(64));
-            lp.gravity = Gravity.CENTER;
-            addView(dockLayout, lp);
+            dockLayout.setPadding(dp(4), dp(3), dp(4), dp(3));
+            dockLayout.setBackground(dockBackground);
+            content.addView(dockLayout, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(64)));
 
             offView = new TextView(context);
             offView.setText("Barra inferior desactivada");
-            offView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText, resourcesProvider));
             offView.setTextSize(13);
+            offView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText, resourcesProvider));
             offView.setGravity(Gravity.CENTER);
-            offView.setVisibility(View.GONE);
-            dockLayout.addView(offView, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
-            for (int i = 0; i < 5; i++) {
-                LinearLayout tabItem = new LinearLayout(context);
-                tabItem.setOrientation(LinearLayout.VERTICAL);
-                tabItem.setGravity(Gravity.CENTER);
+            TextView availableLabel = new TextView(context);
+            availableLabel.setText("Pestañas disponibles · Toca para agregar");
+            availableLabel.setTextSize(12);
+            availableLabel.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText, resourcesProvider));
+            availableLabel.setPadding(dp(5), dp(14), dp(5), dp(8));
+            content.addView(availableLabel, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
-                ImageView icon = new ImageView(context);
-                icon.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
-                tabItem.addView(icon, new LinearLayout.LayoutParams(dp(24), dp(24)));
+            android.widget.HorizontalScrollView scroller = new android.widget.HorizontalScrollView(context);
+            scroller.setHorizontalScrollBarEnabled(false);
+            scroller.setFillViewport(true);
+            content.addView(scroller, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(42)));
 
-                TextView text = new TextView(context);
-                text.setTextSize(10);
-                text.setSingleLine(true);
-                text.setGravity(Gravity.CENTER);
-                LinearLayout.LayoutParams textLp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                textLp.topMargin = dp(2);
-                tabItem.addView(text, textLp);
-
-                LinearLayout.LayoutParams itemLp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1f);
-                dockLayout.addView(tabItem, itemLp);
-
-                tabItems.add(tabItem);
-                tabIcons.add(icon);
-                tabTitles.add(text);
-            }
+            disabledLayout = new LinearLayout(context);
+            disabledLayout.setGravity(Gravity.CENTER_VERTICAL);
+            disabledLayout.setOrientation(LinearLayout.HORIZONTAL);
+            scroller.addView(disabledLayout, new android.widget.HorizontalScrollView.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT));
             update();
         }
 
-        void update() {
-            boolean floating = LiquidNavigationConfig.isFloatingDock();
-            boolean titles = LiquidNavigationConfig.showTitles();
-            boolean enabled = LiquidNavigationConfig.isEnabled();
-
-            dockBg.setCornerRadius(floating ? dp(28) : dp(14));
-            dockBg.setColor((Theme.getColor(Theme.key_windowBackgroundWhite, resourcesProvider) & 0xffffff) | 0xEE000000);
-
-            if (!enabled) {
-                offView.setVisibility(View.VISIBLE);
-                for (LinearLayout item : tabItems) {
-                    item.setVisibility(View.GONE);
+        private void addEditableTab(int id, int index, boolean hideLabels) {
+            org.telegram.ui.Components.glass.GlassTabView tab =
+                    LiquidNavigationTabs.createPreview(getContext(), id);
+            tab.setMainTabsAppearance(hideLabels, LiquidNavigationConfig.iconDp());
+            tab.setMainTabsCompact(hideLabels);
+            tab.setSkipDrawSelector(true);
+            dockLayout.addView(tab, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1f));
+            tab.setOnClickListener(v -> showTabActionDialog(index));
+            final float[] downX = {0f};
+            final boolean[] dragging = {false};
+            tab.setOnTouchListener((v, event) -> {
+                switch (event.getActionMasked()) {
+                    case android.view.MotionEvent.ACTION_DOWN:
+                        downX[0] = event.getRawX();
+                        dragging[0] = false;
+                        v.setTranslationX(0f);
+                        v.getParent().requestDisallowInterceptTouchEvent(true);
+                        return true;
+                    case android.view.MotionEvent.ACTION_MOVE: {
+                        float delta = event.getRawX() - downX[0];
+                        if (Math.abs(delta) > dp(7)) dragging[0] = true;
+                        if (dragging[0]) {
+                            float slot = (float) dockLayout.getWidth() / Math.max(1, currentDestinations.size());
+                            delta = Math.max(-index * slot, Math.min((currentDestinations.size() - 1 - index) * slot, delta));
+                            v.setTranslationX(delta);
+                        }
+                        return true;
+                    }
+                    case android.view.MotionEvent.ACTION_UP: {
+                        float delta = v.getTranslationX();
+                        v.setTranslationX(0f);
+                        if (!dragging[0]) {
+                            v.performClick();
+                        } else {
+                            float slot = (float) dockLayout.getWidth() / Math.max(1, currentDestinations.size());
+                            int destination = Math.max(0, Math.min(currentDestinations.size() - 1,
+                                    index + Math.round(delta / Math.max(1f, slot))));
+                            if (destination != index && index < currentDestinations.size()) {
+                                Integer moved = currentDestinations.remove(index);
+                                currentDestinations.add(destination, moved);
+                                saveOrder();
+                            }
+                        }
+                        return true;
+                    }
+                    case android.view.MotionEvent.ACTION_CANCEL:
+                        v.setTranslationX(0f);
+                        return true;
+                    default:
+                        return true;
                 }
-                return;
-            }
+            });
+        }
 
-            offView.setVisibility(View.GONE);
-            int[] order = LiquidNavigationConfig.order();
-            int slots = Math.min(order.length, 5);
+        private void addAvailableTab(int id, boolean capacityReached) {
+            TextView chip = new TextView(getContext());
+            chip.setText("＋ " + getString(LiquidNavigationTabs.label(id)));
+            chip.setGravity(Gravity.CENTER);
+            chip.setTextSize(12);
+            chip.setSingleLine(true);
+            chip.setPadding(dp(12), 0, dp(12), 0);
             int accent = Theme.getColor(Theme.key_windowBackgroundWhiteBlueText, resourcesProvider);
-            int normal = Theme.getColor(Theme.key_windowBackgroundWhiteGrayText, resourcesProvider);
+            chip.setTextColor(capacityReached ?
+                    Theme.getColor(Theme.key_windowBackgroundWhiteGrayText, resourcesProvider) : accent);
+            GradientDrawable background = new GradientDrawable();
+            background.setCornerRadius(dp(19));
+            background.setColor(Theme.getColor(Theme.key_windowBackgroundWhite, resourcesProvider));
+            background.setStroke(dp(1), Theme.multAlpha(accent, capacityReached ? .14f : .3f));
+            chip.setBackground(background);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT, dp(34));
+            params.rightMargin = dp(7);
+            disabledLayout.addView(chip, params);
+            chip.setOnClickListener(v -> {
+                if (currentDestinations.size() >= LiquidNavigationDestinations.MAX_VISIBLE) {
+                    showDialog(new AlertDialog.Builder(getParentActivity(), resourcesProvider)
+                            .setMessage("La barra admite hasta seis pestañas. Quita una para agregar otra.")
+                            .setPositiveButton(R.string.OK, null).create());
+                    return;
+                }
+                currentDestinations.add(id);
+                saveOrder();
+            });
+        }
 
-            for (int i = 0; i < 5; i++) {
-                LinearLayout tabItem = tabItems.get(i);
-                if (i < slots) {
-                    tabItem.setVisibility(View.VISIBLE);
-                    int id = order[i];
-                    ImageView icon = tabIcons.get(i);
-                    TextView text = tabTitles.get(i);
-
-                    int resId = R.drawable.tabs_chats_24;
-                    switch (id) {
-                        case 0: resId = R.drawable.tabs_chats_24; break;
-                        case 1: resId = R.drawable.tabs_contacts_24; break;
-                        case 2: resId = R.drawable.outline_profile_settings; break;
-                        case 3: resId = R.drawable.tabs_calls_24; break;
-                        case 4: resId = R.drawable.msg_contact; break;
-                        case 5: resId = R.drawable.ic_feed; break;
-                        case 6: resId = R.drawable.msg_groups; break;
-                        case 7: resId = R.drawable.msg_channel; break;
-                        case 8: resId = R.drawable.msg_saved; break;
-                        default: resId = R.drawable.ic_ab_other; break;
-                    }
-                    icon.setImageResource(resId);
-                    icon.setColorFilter(i == 0 ? accent : normal);
-
-                    if (titles) {
-                        text.setVisibility(View.VISIBLE);
-                        text.setText(getString(LiquidNavigationTabs.label(id)));
-                        text.setTextColor(i == 0 ? accent : normal);
-                    } else {
-                        text.setVisibility(View.GONE);
-                    }
-                } else {
-                    tabItem.setVisibility(View.GONE);
+        void update() {
+            if (dockLayout == null || disabledLayout == null) return;
+            dockLayout.removeAllViews();
+            disabledLayout.removeAllViews();
+            boolean enabled = LiquidNavigationConfig.isEnabled();
+            boolean floating = LiquidNavigationConfig.isFloatingDock();
+            dockBackground.setCornerRadius(dp(floating ? 31 : 12));
+            dockBackground.setColor(Theme.getColor(Theme.key_windowBackgroundWhite, resourcesProvider));
+            dockBackground.setStroke(dp(1),
+                    Theme.multAlpha(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText, resourcesProvider), .24f));
+            if (!enabled) {
+                dockLayout.addView(offView, new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            } else {
+                // The editor displays all six configured tabs; unlike the old mock, it never drops slot six.
+                int widthPx = Math.max(1, getWidth() > 0 ? getWidth() - dp(40) :
+                        org.telegram.messenger.AndroidUtilities.displaySize.x - dp(40));
+                boolean hideLabels = LiquidNavigationConfig.hideLabels(currentDestinations.size(),
+                        (int) (widthPx / org.telegram.messenger.AndroidUtilities.density));
+                for (int i = 0; i < currentDestinations.size(); i++) {
+                    addEditableTab(currentDestinations.get(i), i, hideLabels);
                 }
             }
+
+            boolean full = currentDestinations.size() >= LiquidNavigationDestinations.MAX_VISIBLE;
+            for (int id : availableDestinations) addAvailableTab(id, full);
         }
     }
 
