@@ -11,7 +11,7 @@ glass = (root / "org/telegram/ui/Components/glass/GlassTabView.java").read_text(
 checks = {
     "real native tab views in editor": "LiquidNavigationTabs.createPreview(getContext(), id)" in settings,
     "six slots in editor": "i < currentDestinations.size(); i++) {\n                    addEditableTab" in settings,
-    "draggable editor": "MotionEvent.ACTION_MOVE" in settings and "Math.round(delta /" in settings,
+    "draggable editor": "MotionEvent.ACTION_MOVE" in settings and "Math.round(" in settings and "LocaleController.isRTL" in settings,
     "hide internal overflow": "LiquidNavigationDestinations.isSelectable(id)" in settings,
     "reset available": "setOrder(LiquidNavigationDestinations.defaults())" in settings,
     "live order change": 'putString("tab_order", sb.toString()).apply();\n        notifyChanged();' in config,
