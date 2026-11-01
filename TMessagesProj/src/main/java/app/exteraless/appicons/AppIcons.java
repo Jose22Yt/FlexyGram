@@ -96,7 +96,7 @@ public final class AppIcons {
                 return icon;
             }
         }
-        return LauncherIcon.EXTERALESS;
+        return LauncherIcon.FLEX_NEON;
     }
 
     public static void apply(LauncherIcon icon) { apply(icon, () -> { }, () -> { }); }

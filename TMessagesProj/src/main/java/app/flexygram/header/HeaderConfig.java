@@ -9,9 +9,16 @@ import java.util.Map;
 /** UI-owned snapshot. Legacy choices are read conservatively and never overwritten. */
 public final class HeaderConfig {
     private static boolean loaded, signature = true, compact, counter = true;
+    private static boolean centerTitle = true, adaptiveBubble = true;
     private static int opacity = 85, counterMode = 1, currentStyle;
     private HeaderConfig() { }
-    private static SharedPreferences prefs() { return ApplicationLoader.applicationContext.getSharedPreferences("flexygram_header", Context.MODE_PRIVATE); }
+    private static SharedPreferences preferences;
+    private static SharedPreferences prefs() {
+        if (preferences == null && ApplicationLoader.applicationContext != null) {
+            preferences = ApplicationLoader.applicationContext.getSharedPreferences("flexygram_header", Context.MODE_PRIVATE);
+        }
+        return preferences;
+    }
     public static void load() {
         Map<String, ?> p = prefs().getAll();
         Map<String, ?> old = AppearanceConfig.getPreferences().getAll();
@@ -25,6 +32,8 @@ public final class HeaderConfig {
                 : org.telegram.messenger.BuildConfig.CONNECTED_ALPHA ? 0 : legacy ? 0 : 1;
         signature = currentStyle != 1;
         compact = Boolean.TRUE.equals(p.get("compact")); counter = !Boolean.FALSE.equals(p.get("counter"));
+        centerTitle = !Boolean.FALSE.equals(p.get("center_title"));
+        adaptiveBubble = !Boolean.FALSE.equals(p.get("adaptive_bubble"));
         Object mode = p.get("counter_mode");
         counterMode = mode instanceof Integer ? Math.max(1, Math.min(2, (Integer) mode)) : 1;
         Object value = p.get("opacity"); opacity = value instanceof Integer ? Math.max(0, Math.min(100, (Integer) value)) : 85;
@@ -39,6 +48,10 @@ public final class HeaderConfig {
     public static boolean counter() { ensure(); return counter; }
     public static int counterMode() { ensure(); return counter ? counterMode : 0; }
     public static void counterMode(int value) { ensure(); counter = value != 0; if (counter) counterMode = Math.max(1, Math.min(2, value)); prefs().edit().putInt("counter_mode", counterMode).putBoolean("counter", counter).apply(); }
+    public static boolean centerTitle() { ensure(); return centerTitle; }
+    public static void centerTitle(boolean value) { ensure(); centerTitle = value; prefs().edit().putBoolean("center_title", value).apply(); }
+    public static boolean adaptiveBubble() { ensure(); return adaptiveBubble; }
+    public static void adaptiveBubble(boolean value) { ensure(); adaptiveBubble = value; prefs().edit().putBoolean("adaptive_bubble", value).apply(); }
     public static int opacity() { ensure(); return opacity; }
     public static void style(boolean value) { style(value ? 0 : 1); }
     public static void style(int value) { ensure(); currentStyle = Math.max(0, Math.min(3, value)); signature = currentStyle != 1; prefs().edit().putInt("style", currentStyle).apply(); }

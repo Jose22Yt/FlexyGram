@@ -51442,12 +51442,19 @@ public class ChatActivity extends BaseFragment implements
     private boolean usesSignatureHeader() { return signatureChatHeader != null && signatureChatHeader.enabled(); }
     private void updateSignatureHeaderCounter() {
         if (signatureChatHeader == null) return;
+        if (!app.flexygram.header.HeaderConfig.counter()) {
+            signatureChatHeader.setCount(0);
+            return;
+        }
         int count = -1;
         if (arguments != null && arguments.containsKey("dialog_folder_id") && arguments.containsKey("dialog_filter_id")) {
             if (dialogFilterId == 0) count = dialogFolderId == 0 ? getMessagesStorage().getMainUnreadCount() : dialogFolderId == 1 ? getMessagesStorage().getArchiveUnreadCount() : -1;
             else for (var filter : getMessagesController().getDialogFilters()) if (filter.id == dialogFilterId) { count = filter.unreadCount; break; }
         }
-        signatureChatHeader.setCount(count);
+        if (count < 0) {
+            count = getMessagesStorage().getMainUnreadCount();
+        }
+        signatureChatHeader.setCount(Math.max(0, count));
     }
 
     private boolean isTitleCentered() {
@@ -51455,6 +51462,9 @@ public class ChatActivity extends BaseFragment implements
     }
 
     private boolean canShowCenteredTitle(ChatActivity parentFragment) {
+        if (!app.flexygram.header.HeaderConfig.centerTitle()) {
+            return false;
+        }
         if (!(BuildConfig.CONNECTED_ALPHA ? app.flexygram.header.HeaderConfig.signature() : app.exteraless.appearance.AppearanceConfig.iosChatHeader())) {
             return false;
         }

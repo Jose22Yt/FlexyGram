@@ -57,7 +57,7 @@ public class AboutHeaderCell extends LinearLayout {
         for (LauncherIconController.LauncherIcon candidate : LauncherIconController.LauncherIcon.values()) {
             if (selected == null && LauncherIconController.isEnabled(candidate)) { selected = candidate; break; }
         }
-        if (selected == null) selected = LauncherIconController.LauncherIcon.EXTERALESS;
+        if (selected == null) selected = LauncherIconController.LauncherIcon.FLEX_NEON;
         try {
             logo.setImageDrawable(getContext().getPackageManager().getActivityIcon(selected.getComponentName(getContext())));
             logo.setBackgroundColor(android.graphics.Color.TRANSPARENT);
