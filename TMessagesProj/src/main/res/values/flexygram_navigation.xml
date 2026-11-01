@@ -6,7 +6,7 @@
     <string name="FlexyBottomTabsShowSub">Double-tap a chat tab to open "Saved Messages". Double-tap the profile tab (or Settings if profile is hidden) to switch accounts.</string>
     <string name="FlexyBottomTabsSectionAppearance">Appearance</string>
     <string name="FlexyBottomTabsFloatingDock">Floating dock style</string>
-    <string name="FlexyBottomTabsFloatingDockSub">Render as a sleek floating glass capsule detached from the screen edges.</string>
+    <string name="FlexyBottomTabsFloatingDockSub">Render as a sleek floating matte capsule detached from the screen edges.</string>
     <string name="FlexyBottomTabsShowTitles">Show tabs titles</string>
     <string name="FlexyBottomTabsSectionOrder">Tabs layout &amp; order</string>
     <string name="FlexyBottomTabsOrderHint">Tap to enable/disable or move items to customize your dock.</string>
@@ -15,4 +15,17 @@
     <string name="FlexyBottomTabsDoubleTapProfile">Double-tap profile to switch accounts</string>
     <string name="FlexyBottomTabsAlwaysSearchChats">Always search in chats</string>
     <string name="FlexyBottomTabsAlwaysSearchChatsSub">When enabled, the search button always opens chat search. When disabled, it opens context search for the current screen.</string>
+    <string name="FlexyTabsPreviewHint">Drag icons to reorder. Tap one to configure it.</string>
+    <string name="FlexyTabsAvailable">Available tabs · Tap to add</string>
+    <string name="FlexyTabsOff">Bottom tabs are hidden</string>
+    <string name="FlexyTabsLimit">The bottom bar supports up to six tabs. Remove one before adding another.</string>
+    <string name="FlexyTabsRestore">Reset tabs</string>
+    <string name="FlexyTabsRestoreSub">Default order</string>
+    <string name="FlexyTabsConfigure">Configure ›</string>
+    <string name="FlexyTabsMovePrevious">▲ Move earlier</string>
+    <string name="FlexyTabsMoveNext">▼ Move later</string>
+    <string name="FlexyTabsRemove">✖ Remove tab</string>
+    <string name="FlexyTabsAdd">＋ Add another tab…</string>
+    <string name="FlexyTabsAddTitle">Add a bottom tab</string>
+    <string name="FlexyTabsAddPrefix">＋</string>
 </resources>
