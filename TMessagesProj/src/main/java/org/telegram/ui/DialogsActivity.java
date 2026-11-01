@@ -4984,8 +4984,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             viewPage.dialogsAdapter.setArchivedPullDrawable(viewPage.pullForegroundDrawable);
             viewPage.listView.setAdapter(viewPage.dialogsAdapter);
 
-            boolean hasLoadedDialogs = !getMessagesController().getDialogs(folderId).isEmpty() || !getMessagesController().getAllDialogs().isEmpty();
-            viewPage.listView.setEmptyView(folderId == 0 && communityId == 0 && !hasLoadedDialogs ? viewPage.progressView : null);
+            viewPage.listView.setEmptyView(folderId == 0 && communityId == 0 ? viewPage.progressView : null);
             viewPage.scrollHelper = new RecyclerAnimationScrollHelper(viewPage.listView, viewPage.layoutManager);
             viewPage.scrollHelper.forceUseStableId = true;
             viewPage.scrollHelper.isDialogs = true;
@@ -10934,8 +10933,10 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             }
         }
         try {
-            boolean hasLoadedDialogs = !getMessagesController().getDialogs(folderId).isEmpty() || !getMessagesController().getAllDialogs().isEmpty();
-            viewPage.listView.setEmptyView(folderId == 0 && communityId == 0 && !hasLoadedDialogs ? viewPage.progressView : null);
+            viewPage.listView.setEmptyView(folderId == 0 && communityId == 0 ? viewPage.progressView : null);
+            if (viewPage.progressView != null && (viewPage.dialogsAdapter.getItemCount() > 0 || !getMessagesController().getDialogs(folderId).isEmpty())) {
+                viewPage.progressView.setVisibility(View.GONE);
+            }
         } catch (Exception e) {
             FileLog.e(e);
         }

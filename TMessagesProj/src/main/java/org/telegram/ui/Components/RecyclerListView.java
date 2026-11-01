@@ -2036,6 +2036,7 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
         }
         if (emptyView != null) {
             emptyView.animate().setListener(null).cancel();
+            emptyView.setVisibility(View.GONE);
         }
         emptyView = view;
         if (animateEmptyView && emptyView != null) {
