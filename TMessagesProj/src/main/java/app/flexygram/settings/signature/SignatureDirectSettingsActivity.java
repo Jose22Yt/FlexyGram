@@ -50,6 +50,7 @@ public final class SignatureDirectSettingsActivity extends SignatureMatteSetting
                 add(new app.flexygram.header.HeaderSettingsActivity());
                 add(new app.flexygram.bubbles.BubbleSettingsActivity());
                 add(new app.flexygram.composer.FlexyComposerSettingsActivity());
+                add(new app.flexygram.effects.GlareSettingsSection());
                 add(scope(new OpenExteraChatsActivity(OpenExteraChatsActivity.SCREEN_SIGNATURE_MESSAGES),"chats","messages|post_appearance"));
                 add(scope(new OpenExteraChatsActivity(OpenExteraChatsActivity.SCREEN_MENUS),"chats","menus"));
                 add(scope(new OpenExteraChatsActivity(OpenExteraChatsActivity.SCREEN_MEDIA),"chats","media"));

@@ -1,0 +1,26 @@
+{
+  "base": "4679f74ebd312acc4968dd2e044a6c6b7478445a",
+  "upstream_reference": "3050af6d948acc27db446f6cd27a8e200b205c1b",
+  "host_pytest": {
+    "passed": 162,
+    "skipped": 31
+  },
+  "migration_checks": {
+    "passed": 12
+  },
+  "glare_isolated_android": {
+    "passed": 9,
+    "failed": 0,
+    "compile_sdk": 37,
+    "runtime_api": 35
+  },
+  "settings3_isolated_android": {
+    "passed": 10,
+    "failed": 0
+  },
+  "java21_syntax_files": 8,
+  "complete_android_build": "PENDING",
+  "physical_device": "NOT_TESTED",
+  "performance_metrics": "NOT_MEASURED",
+  "apk_generated": false
+}

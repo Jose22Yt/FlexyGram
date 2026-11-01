@@ -141,6 +141,7 @@ public final class SignatureSettingsRegistry {
         if(key!=null){
             BaseFragment extra=SignatureLegacyExtras.forKey(key);if(extra!=null)return Settings3Registry.open(SignatureLegacyExtras.categoryForKey(key));
             switch(key){
+                case "glassOutline":case "glareEffects":return Settings3Registry.open("chat");
                 case "iconPacks":return open("icon_packs");case "emojiSets":case "EmojiSets":return open("emoji");
                 case "bottomTabs":return open("bottom_tabs");case "appNavigation":return open("app_navigation");
                 case "pillStack":return open("pillstack");case "hiding":return open("visible");case "translator":return open("translator");
@@ -164,6 +165,6 @@ public final class SignatureSettingsRegistry {
         switch(screen){case "general":return open("general");case "appearance":return open("appearance");case "chats":return open("conversations");case "other":return open("advanced");case "menus":return open("menus");case "media":return open("media");case "hiding":return open("visible");case "settings":return new SignatureSettingsActivity();default:return null;}
     }
     public static int searchGuid(String route){int index=0;for(Entry e:ENTRIES.values()){if(e.id.equals(route))return 10_000_000+1000*index;index++;}return 0;}
-    public static List<BaseFragment> searchScreens(){List<BaseFragment> result=new ArrayList<>();for(Entry e:all()){if(!visible(e.id))continue;BaseFragment f=openLegacyEditor(e.id);if(f instanceof BaseNekoSettingsActivity && !(f instanceof SignatureSettingsActivity)||f instanceof tw.nekomimi.nekogram.settings.BaseNekoXSettingsActivity)result.add(f);}return result;}
+    public static List<BaseFragment> searchScreens(){List<BaseFragment> result=new ArrayList<>();for(Entry e:all()){if(!visible(e.id))continue;BaseFragment f=openLegacyEditor(e.id);if(f instanceof BaseNekoSettingsActivity && !(f instanceof SignatureSettingsActivity)||f instanceof tw.nekomimi.nekogram.settings.BaseNekoXSettingsActivity)result.add(f);}result.add(new app.flexygram.effects.GlareSettingsSection());return result;}
     private SignatureSettingsRegistry(){}
 }
