@@ -85,7 +85,7 @@ public final class SignatureSmartPillSpan extends ReplacementSpan {
     @Override
     public void draw(@NonNull Canvas canvas, CharSequence text, int start, int end,
                      float x, int top, int y, int bottom, @NonNull Paint paint) {
-        if (measured <= 0) getSize(paint, text, start, end, null);
+        if (measured <= 0) return; // StaticLayout must measure first; drawing only consumes prepared geometry.
         int mode = SignatureSmartPreviews.drawingMode();
         if (mode == SignatureSmartPreviewPalette.OFF) return;
 

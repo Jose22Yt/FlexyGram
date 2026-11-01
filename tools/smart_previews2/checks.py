@@ -34,7 +34,7 @@ class SmartPreviews2(unittest.TestCase):
   span=(JAVA/'app/flexygram/home/SignatureSmartPillSpan.java').read_text()
   draw=span[span.index('    public void draw('):span.index('    public String label()')]
   self.assertIn('SignatureSmartPreviews.drawingMode()',draw)
-  for denied in ['new ','getSharedPreferences','setSpan','ellipsize']:
+  for denied in ['new ','getSharedPreferences','setSpan','ellipsize','getSize(']:
    self.assertNotIn(denied,draw)
   self.assertIn('sharedInk.setTextSize(textSize)',draw)
  def test_palette_and_preserved_matte(self):
