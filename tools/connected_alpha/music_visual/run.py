@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[3]
 HERE = Path(__file__).resolve().parent
 
 
-def main(here=HERE, test_class="MusicVisualTest", stubs_writer=None, resource_writer=None, extra_aars=()):
+def main(here=HERE, test_class="MusicVisualTest", stubs_writer=None, resource_writer=None, extra_aars=(), dependency_writer=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--sdk-root', type=Path, required=True)
     parser.add_argument('--maven', default='mvn')
@@ -83,6 +83,8 @@ def main(here=HERE, test_class="MusicVisualTest", stubs_writer=None, resource_wr
             path.write_bytes(ET.tostring(settings)); path.chmod(0o600)
             command += ['-s', str(path), '-Dprobe.proxy.host='+proxy.hostname, '-Dprobe.proxy.port='+str(proxy.port or 80)]
         subprocess.run(command + ['dependency:resolve'], check=True)
+        if dependency_writer is not None:
+            dependency_writer(output, repository, sdk)
         aar_dir = output/'target/aar'
         aar_dir.mkdir(parents=True, exist_ok=True)
         for group, artifact, version in [('androidx.core', 'core', '1.17.0'), ('androidx.test', 'monitor', '1.8.0'), ('androidx.test.espresso', 'espresso-idling-resource', '3.7.0'), *extra_aars]:

@@ -90,6 +90,7 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
     public static final int SCREEN_SIGNATURE_STICKERS = 5;
 
     private final int screen;
+    private int settings3ResetStickerRow=-1;
 
     private static final int TYPE_SIGNATURE_ENTRY = 107;
     private static final int TYPE_STICKER_SIZE = 100;
@@ -435,21 +436,22 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
                 updateSignatureHubRows();
                 break;
         }
+        settings3ResetStickerRow = isSettings3Embedded() && screen == SCREEN_SIGNATURE_STICKERS ? addRow("settings3StickerReset") : -1;
     }
 
     @Override protected int matteHeaderColor() { return screen == SCREEN_CHATS ? getThemedColor(Theme.key_windowBackgroundWhiteBlueHeader) : super.matteHeaderColor(); }
     private void updateSignatureHubRows() {
-        signaturePersonalHeader = addRow();
+        signaturePersonalHeader = addRow("settings2SmartHeader");
         flexyBubblesRow = addRow("flexyBubbles");
         signatureHeaderRow = addRow("signatureChatHeader");
         composerSettingsRow = addRow("flexyComposerSettings");
         signatureThemeRow = addRow("flexyThemeWallpaper");
-        smartPreviewsRow = addRow("flexySmartPreviews");
-        signatureInteractionHeader = addRow();
+        smartPreviewsRow = -1; // Canonical controls are embedded in Home by SmartPreviewsSettingsActivity.
+        signatureInteractionHeader = addRow("settings2RetiredHeader");
         flexyContextPanelRow = addRow("flexyContextPanel");
         signatureMessagesRow = addRow("flexyMessagesGestures");
         signatureStickersRow = addRow("flexyStickersMedia");
-        signatureAdditionalHeader = addRow();
+        signatureAdditionalHeader = addRow("settings2RetiredHeader");
         chatSettingsRow = addRow("chatSettings");
         linksDividerRow = addRow();
     }
@@ -1738,6 +1740,7 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
 
     @Override
     protected void onItemClick(View view, int position, float x, float y) {
+        if(position==settings3ResetStickerRow && position>=0){resetStickerSize();return;}
         // Клик по телу строки-группы только сворачивает её; мастер-переключатель живёт
         // в правой зоне TextCheckCell2 за разделителем.
         if (position == repliesGroupRow) {
@@ -1871,24 +1874,6 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
             return;
         } else if (position == adminShortcutsRow) {
             toggleQuickAdminShortcuts(view);
-            return;
-        } else if (position == smartPreviewsRow) {
-            showOptions(view,new CharSequence[]{
-                getString(R.string.FlexySmartPreviewAdaptive),
-                getString(R.string.FlexySmartPreviewAccent),
-                getString(R.string.FlexySmartPreviewOff)
-            },index->{
-                int selected = index == 2 ? app.flexygram.home.SignatureSmartPreviewPalette.OFF : index;
-                if (selected != app.flexygram.home.SignatureSmartPreviews.mode()) {
-                    app.flexygram.home.SignatureSmartPreviews.setMode(selected);
-                    // Invalidate only actual Telegram dialog lists. Rebuilding
-                    // the entire fragment stack for a badge-color change risks
-                    // jank and interrupted chat navigation.
-                    NotificationCenter.getInstance(org.telegram.messenger.UserConfig.selectedAccount)
-                            .postNotificationName(NotificationCenter.dialogsNeedReload);
-                }
-                reloadList();
-            });
             return;
         } else if (position == flexyContextPanelRow) {
             presentFragment(new app.flexygram.bubbles.interaction.BubbleInteractionSettingsActivity());return;
@@ -2497,6 +2482,7 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
 
         @Override
         public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, boolean partial) {
+            if(position==settings3ResetStickerRow && position>=0){((TextSettingsCell)holder.itemView).setText(getString(R.string.Reset),false);return;}
             switch (holder.getItemViewType()) {
                 case TYPE_SIGNATURE_ENTRY:
                     int label = position == flexyContextPanelRow ? R.string.FlexyContextInteractions
@@ -3026,7 +3012,12 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
             if (position == flexyContextPanelRow) {
                 cell.setTextAndIcon(getString(R.string.FlexyContextInteractions),R.drawable.msg_discussion,true);
             } else if (position == smartPreviewsRow) {
-                cell.setTextAndIcon(getString(R.string.FlexySmartPreviewsTitle), R.drawable.msg_list, false);
+                int mode = app.flexygram.home.SignatureSmartPreviews.mode();
+                String value = mode == app.flexygram.home.SignatureSmartPreviewPalette.ADAPTIVE ? getString(R.string.FlexySmartPreviewAdaptive)
+                        : mode == app.flexygram.home.SignatureSmartPreviewPalette.THEME ? getString(R.string.FlexySmartPreviewAccent)
+                        : mode == app.flexygram.home.SignatureSmartPreviewPalette.MATTE ? getString(R.string.FlexySmartPreviewMatte)
+                        : getString(R.string.FlexySmartPreviewOff);
+                cell.setTextAndValueAndIcon(getString(R.string.FlexySmartPreviewsTitle), value, R.drawable.msg_list, false);
             } else if (position == signatureMessagesRow) {
                 cell.setTextAndIcon(getString(R.string.FlexyMessagesGestures), R.drawable.msg_list, false);
             } else if (position == signatureStickersRow) {
@@ -3154,6 +3145,7 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
 
         @Override
         public int getItemViewType(int position) {
+            if(position==settings3ResetStickerRow && position>=0)return TYPE_SETTINGS;
             if (screen == SCREEN_CHATS && (position == signaturePersonalHeader || position == signatureInteractionHeader || position == signatureAdditionalHeader)) return TYPE_HEADER;
             if (screen == SCREEN_CHATS && position != linksDividerRow) return TYPE_SIGNATURE_ENTRY;
             if (position == stickerSizeRow) return TYPE_STICKER_SIZE;

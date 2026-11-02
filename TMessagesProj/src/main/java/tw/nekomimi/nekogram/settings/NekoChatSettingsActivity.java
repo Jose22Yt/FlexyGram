@@ -360,14 +360,15 @@ public class NekoChatSettingsActivity extends BaseNekoXSettingsActivity implemen
     @SuppressLint("NewApi")
     @Override
     public View createView(Context context) {
-        View superView = super.createView(context);
-
-        listAdapter = new ListAdapter(context);
-
+        View superView=super.createView(context);
+        createSettings3Adapter(context);
         listView.setAdapter(listAdapter);
-
         setupDefaultListeners();
-
+        return superView;
+    }
+    @Override protected RecyclerListView.SelectionAdapter createSettings3Adapter(Context context){
+        listAdapter=new ListAdapter(context);
+        cellGroup.setListAdapter(listView,listAdapter);
         // Cells: Set OnSettingChanged Callbacks
         cellGroup.callBackSettingsChanged = (key, newValue) -> {
             if (key.equals(NekoConfig.disableProximityEvents.getKey())) {
@@ -421,7 +422,7 @@ public class NekoChatSettingsActivity extends BaseNekoXSettingsActivity implemen
             }
         };
 
-        return superView;
+        return listAdapter;
     }
 
     @Override
@@ -667,6 +668,7 @@ public class NekoChatSettingsActivity extends BaseNekoXSettingsActivity implemen
     }
 
     private void checkSkipOpenLinkConfirmRows() {
+        if(isSignatureSettingsPage()&&!signatureSettingsAllows(skipOpenLinkConfirmRow))return; // Filtered rows must not issue RecyclerView notifications.
         boolean confirmAllLinks = NaConfig.INSTANCE.getConfirmAllLinks().Bool();
         if (listAdapter == null) {
             if (confirmAllLinks) {
@@ -691,6 +693,7 @@ public class NekoChatSettingsActivity extends BaseNekoXSettingsActivity implemen
     }
 
     private void checkConfirmAVRows() {
+        if(isSignatureSettingsPage()&&!signatureSettingsAllows(confirmAVRow))return; // Filtered rows must not issue RecyclerView notifications.
         boolean useChatAttachMediaMenu = NekoConfig.useChatAttachMediaMenu.Bool();
         if (listAdapter == null) {
             if (useChatAttachMediaMenu) {

@@ -1,0 +1,2151 @@
+[
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "customTitleRow",
+    "key": "CustomTitle",
+    "config_refs": [
+      "CustomTitle"
+    ],
+    "route": "general_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 87
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "folderNameAsTitleRow",
+    "key": "FolderNameAsTitle",
+    "config_refs": [
+      "FolderNameAsTitle"
+    ],
+    "route": "appearance_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 90
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "customTitleUserNameRow",
+    "key": "CustomTitleUserName",
+    "config_refs": [
+      "CustomTitleUserName"
+    ],
+    "route": "general_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 91
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "disableNumberRoundingRow",
+    "key": "DisableNumberRounding",
+    "config_refs": [
+      "DisableNumberRounding"
+    ],
+    "route": "general_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 92
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "preferCommonGroupsTabRow",
+    "key": "PreferCommonGroupsTab",
+    "config_refs": [
+      "PreferCommonGroupsTab"
+    ],
+    "route": "general_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 93
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "usePersianCalendarRow",
+    "key": "UsePersianCalendar",
+    "config_refs": [
+      "UsePersianCalendar"
+    ],
+    "route": "general_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 94
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "displayPersianCalendarByLatinRow",
+    "key": "DisplayPersianCalendarByLatin",
+    "config_refs": [
+      "DisplayPersianCalendarByLatin"
+    ],
+    "route": "general_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 95
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "showIdAndDcRow",
+    "key": "IdDcType",
+    "config_refs": [
+      "IdDcType"
+    ],
+    "route": "general_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 96
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "nameOrderRow",
+    "key": "NameOrder",
+    "config_refs": [
+      "NameOrder"
+    ],
+    "route": "general_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 101
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "saveToChatSubfolderRow",
+    "key": "SaveToChatSubfolder",
+    "config_refs": [
+      "SaveToChatSubfolder"
+    ],
+    "route": "general_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 109
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "customSavePathRow",
+    "key": "customSavePath",
+    "config_refs": [
+      "customSavePath"
+    ],
+    "route": "general_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 110
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "useIPv6Row",
+    "key": "IPv6",
+    "config_refs": [
+      "IPv6"
+    ],
+    "route": "general_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 122
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "defaultHlsVideoQualityRow",
+    "key": "DefaultHlsVideoQuality",
+    "config_refs": [
+      "DefaultHlsVideoQuality"
+    ],
+    "route": "media_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 123
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "dnsTypeRow",
+    "key": "DnsType",
+    "config_refs": [
+      "DnsType"
+    ],
+    "route": "general_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 131
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "customDoHRow",
+    "key": "CustomDoH",
+    "config_refs": [
+      "CustomDoH"
+    ],
+    "route": "general_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 137
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "useOSMDroidMapRow",
+    "key": "useOSMDroidMap",
+    "config_refs": [
+      "useOSMDroidMap"
+    ],
+    "route": "general_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 142
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "mapDriftingFixForGoogleMapsRow",
+    "key": "mapDriftingFixForGoogleMaps",
+    "config_refs": [
+      "mapDriftingFixForGoogleMaps"
+    ],
+    "route": "general_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 143
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "mapPreviewRow",
+    "key": "MapPreviewProvider",
+    "config_refs": [
+      "MapPreviewProvider"
+    ],
+    "route": "general_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 144
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "hideAllTabRow",
+    "key": "HideAllTab",
+    "config_refs": [
+      "HideAllTab"
+    ],
+    "route": "general_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 153
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "doNotUnarchiveBySwipeRow",
+    "key": "DoNotUnarchiveBySwipe",
+    "config_refs": [
+      "DoNotUnarchiveBySwipe"
+    ],
+    "route": "navigation_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 154
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "openArchiveOnPullRow",
+    "key": "OpenArchiveOnPull",
+    "config_refs": [
+      "OpenArchiveOnPull"
+    ],
+    "route": "advanced_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 155
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "hideArchiveRow",
+    "key": "HideArchive",
+    "config_refs": [
+      "HideArchive"
+    ],
+    "route": "advanced_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 156
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "ignoreUnreadCountRow",
+    "key": "IgnoreUnreadCount",
+    "config_refs": [
+      "IgnoreUnreadCount"
+    ],
+    "route": "general_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 157
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "tabsTitleTypeRow",
+    "key": "TabTitleType",
+    "config_refs": [
+      "TabTitleType"
+    ],
+    "route": "general_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 162
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "sortByUnreadRow",
+    "key": "SortByUnread",
+    "config_refs": [
+      "SortByUnread"
+    ],
+    "route": "general_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 171
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "hideDialogsSearchFieldRow",
+    "key": "HideDialogsSearchField",
+    "config_refs": [
+      "HideDialogsSearchField"
+    ],
+    "route": "general_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 172
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "disableDialogsFloatingButtonRow",
+    "key": "DisableDialogsFloatingButton",
+    "config_refs": [
+      "DisableDialogsFloatingButton"
+    ],
+    "route": "general_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 173
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "disableBotOpenButtonRow",
+    "key": "DisableBotOpenButton",
+    "config_refs": [
+      "DisableBotOpenButton"
+    ],
+    "route": "general_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 174
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "mediaPreviewRow",
+    "key": "MediaPreview",
+    "config_refs": [
+      "MediaPreview"
+    ],
+    "route": "media_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 175
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "typefaceRow",
+    "key": "TypefaceUseDefault",
+    "config_refs": [
+      "TypefaceUseDefault"
+    ],
+    "route": "appearance_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 180
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "alwaysShowDownloadIconRow",
+    "key": "AlwaysShowDownloadIcon",
+    "config_refs": [
+      "AlwaysShowDownloadIcon"
+    ],
+    "route": "appearance_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 181
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "showStickersInTopLevelRow",
+    "key": "ShowStickersRowToplevel",
+    "config_refs": [
+      "ShowStickersRowToplevel"
+    ],
+    "route": "stickers_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 182
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "hidePremiumSectionRow",
+    "key": "HidePremiumSection",
+    "config_refs": [
+      "HidePremiumSection"
+    ],
+    "route": "general_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 183
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "hideHelpSectionRow",
+    "key": "HideHelpSection",
+    "config_refs": [
+      "HideHelpSection"
+    ],
+    "route": "general_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 184
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "iconReplacements",
+    "key": "IconReplacements",
+    "config_refs": [
+      "IconReplacements"
+    ],
+    "route": "appearance_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 185
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "switchStyleRow",
+    "key": "SwitchStyle",
+    "config_refs": [
+      "SwitchStyle"
+    ],
+    "route": "appearance_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 192
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "sliderStyleRow",
+    "key": "SliderStyle",
+    "config_refs": [
+      "SliderStyle"
+    ],
+    "route": "appearance_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 197
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "actionBarDecorationRow",
+    "key": "ActionBarDecoration",
+    "config_refs": [
+      "ActionBarDecoration"
+    ],
+    "route": "appearance_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 202
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "chatDecorationRow",
+    "key": "ChatDecoration",
+    "config_refs": [
+      "ChatDecoration"
+    ],
+    "route": "appearance_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 208
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "notificationIconRow",
+    "key": "NotificationIcon",
+    "config_refs": [
+      "NotificationIcon"
+    ],
+    "route": "general_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 213
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "tabletModeRow",
+    "key": "TabletMode",
+    "config_refs": [
+      "TabletMode"
+    ],
+    "route": "general_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 217
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "centerActionBarTitleRow",
+    "key": "CenterActionBarTitleType",
+    "config_refs": [
+      "CenterActionBarTitleType"
+    ],
+    "route": "appearance_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 222
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "strokeOnViews",
+    "key": "StrokeOnViews",
+    "config_refs": [
+      "StrokeOnViews"
+    ],
+    "route": "general_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 232
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "disableAvatarBlurRow",
+    "key": "DisableAvatarBlur",
+    "config_refs": [
+      "DisableAvatarBlur"
+    ],
+    "route": "general_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 233
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "hideTitlesRow",
+    "key": "MainTabsHideTitles",
+    "config_refs": [
+      "MainTabsHideTitles"
+    ],
+    "route": "navigation_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 238
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "hideContactsRow",
+    "key": "MainTabsHideContacts",
+    "config_refs": [
+      "MainTabsHideContacts"
+    ],
+    "route": "navigation_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 239
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "hideCallsSettingsRow",
+    "key": "MainTabsHideCallsSettings",
+    "config_refs": [
+      "MainTabsHideCallsSettings"
+    ],
+    "route": "navigation_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 240
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "hideProfileRow",
+    "key": "MainTabsHideProfile",
+    "config_refs": [
+      "MainTabsHideProfile"
+    ],
+    "route": "navigation_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 241
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "hideBottomNavigationBarRow",
+    "key": "HideBottomNavigationBar",
+    "config_refs": [
+      "HideBottomNavigationBar"
+    ],
+    "route": "navigation_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 242
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "hidePhoneRow",
+    "key": "HidePhone",
+    "config_refs": [
+      "HidePhone"
+    ],
+    "route": "general_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 247
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "disableSystemAccountRow",
+    "key": "DisableSystemAccount",
+    "config_refs": [
+      "DisableSystemAccount"
+    ],
+    "route": "advanced_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 248
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "disableCrashlyticsCollectionRow",
+    "key": "DisableCrashlyticsCollection",
+    "config_refs": [
+      "DisableCrashlyticsCollection"
+    ],
+    "route": "advanced_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 249
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "pushServiceTypeRow",
+    "key": "PushServiceType",
+    "config_refs": [
+      "PushServiceType"
+    ],
+    "route": "general_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 254
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "pushServiceTypeUnifiedGatewayRow",
+    "key": "PushServiceTypeUnifiedGateway",
+    "config_refs": [
+      "PushServiceTypeUnifiedGateway"
+    ],
+    "route": "general_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 260
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "pushServiceTypeInAppDialogRow",
+    "key": "PushServiceTypeInAppDialog",
+    "config_refs": [
+      "PushServiceTypeInAppDialog"
+    ],
+    "route": "general_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 261
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "disableNotificationBubblesRow",
+    "key": "disableNotificationBubbles",
+    "config_refs": [
+      "disableNotificationBubbles"
+    ],
+    "route": "general_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 262
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "win32Row",
+    "key": "Win32ExecutableFiles",
+    "config_refs": [
+      "Win32ExecutableFiles"
+    ],
+    "route": "advanced_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 267
+  },
+  {
+    "source": "ng",
+    "class_name": "NekoGeneralSettingsActivity",
+    "field": "archiveRow",
+    "key": "ArchiveFiles",
+    "config_refs": [
+      "ArchiveFiles"
+    ],
+    "route": "advanced_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 268
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "stickerSizeRow",
+    "key": "StickerSize",
+    "config_refs": [
+      "StickerSize"
+    ],
+    "route": "stickers_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 86
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "showTimeHintRow",
+    "key": "ShowTimeHint",
+    "config_refs": [
+      "ShowTimeHint"
+    ],
+    "route": "messages_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 87
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "hideTimeForStickerRow",
+    "key": "HideTimeForSticker",
+    "config_refs": [
+      "HideTimeForSticker"
+    ],
+    "route": "stickers_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 88
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "disableReplyBackgroundRow",
+    "key": "MessageColoredBackground",
+    "config_refs": [
+      "MessageColoredBackground"
+    ],
+    "route": "messages_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 89
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "emojiSetsRow",
+    "key": "EmojiSets",
+    "config_refs": [
+      "EmojiSets"
+    ],
+    "route": "stickers_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 94
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "premiumElementsToggleRow",
+    "key": "PremiumItemEmojiStatus",
+    "config_refs": [
+      "PremiumItemEmojiStatus",
+      "PremiumItemEmojiInReplies",
+      "PremiumItemCustomColorInReplies",
+      "PremiumItemCustomWallpaper",
+      "PremiumItemVideoAvatar",
+      "PremiumItemStarInReactions",
+      "PremiumItemStickerEffects",
+      "PremiumItemBoosts"
+    ],
+    "route": "stickers_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 95
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "unreadBadgeOnBackButton",
+    "key": "unreadBadgeOnBackButton",
+    "config_refs": [
+      "unreadBadgeOnBackButton"
+    ],
+    "route": "messages_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 106
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "sendCommentAfterForwardRow",
+    "key": "SendCommentAfterForward",
+    "config_refs": [
+      "SendCommentAfterForward"
+    ],
+    "route": "messages_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 107
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "useChatAttachMediaMenuRow",
+    "key": "UseChatAttachEnterMenu",
+    "config_refs": [
+      "UseChatAttachEnterMenu"
+    ],
+    "route": "messages_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 108
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "fixLinkPreviewRow",
+    "key": "FixLinkPreview",
+    "config_refs": [
+      "FixLinkPreview"
+    ],
+    "route": "messages_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 109
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "disableLinkPreviewByDefaultRow",
+    "key": "DisableLinkPreviewByDefault",
+    "config_refs": [
+      "DisableLinkPreviewByDefault"
+    ],
+    "route": "messages_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 110
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "deleteChatForBothSidesRow",
+    "key": "DeleteChatForBothSides",
+    "config_refs": [
+      "DeleteChatForBothSides"
+    ],
+    "route": "messages_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 111
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "showMessageIDRow",
+    "key": "ShowMessageID",
+    "config_refs": [
+      "ShowMessageID"
+    ],
+    "route": "messages_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 112
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "showSeconds",
+    "key": "showSeconds",
+    "config_refs": [
+      "showSeconds"
+    ],
+    "route": "messages_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 113
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "useEditedIconRow",
+    "key": "UseEditedIcon",
+    "config_refs": [
+      "UseEditedIcon"
+    ],
+    "route": "messages_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 114
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "customEditedMessageRow",
+    "key": "CustomEditedMessage",
+    "config_refs": [
+      "CustomEditedMessage"
+    ],
+    "route": "messages_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 115
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "dateOfForwardMsgRow",
+    "key": "DateOfForwardedMsg",
+    "config_refs": [
+      "DateOfForwardedMsg"
+    ],
+    "route": "messages_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 116
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "showFullAboutRow",
+    "key": "ShowFullAbout",
+    "config_refs": [
+      "ShowFullAbout"
+    ],
+    "route": "messages_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 117
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "disableTrendingRow",
+    "key": "DisableTrending",
+    "config_refs": [
+      "DisableTrending"
+    ],
+    "route": "messages_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 118
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "disableZalgoSymbolsRow",
+    "key": "ZalgoFilter",
+    "config_refs": [
+      "ZalgoFilter"
+    ],
+    "route": "advanced_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 119
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "showOnlineStatusRow",
+    "key": "ShowOnlineStatus",
+    "config_refs": [
+      "ShowOnlineStatus"
+    ],
+    "route": "messages_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 120
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "leftButtonActionRow",
+    "key": "LeftBottomButtonAction",
+    "config_refs": [
+      "LeftBottomButtonAction"
+    ],
+    "route": "messages_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 121
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "markdownParserRow",
+    "key": "MarkdownParser",
+    "config_refs": [
+      "MarkdownParser"
+    ],
+    "route": "messages_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 138
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "doubleTapActionRow",
+    "key": "DoubleTapIncoming",
+    "config_refs": [
+      "DoubleTapIncoming"
+    ],
+    "route": "messages_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 146
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "doubleTapActionOutRow",
+    "key": "DoubleTapOutgoing",
+    "config_refs": [
+      "DoubleTapOutgoing"
+    ],
+    "route": "messages_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 147
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "disableInstantCameraRow",
+    "key": "DisableInstantCamera",
+    "config_refs": [
+      "DisableInstantCamera"
+    ],
+    "route": "media_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 152
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "cameraInVideoMessages",
+    "key": "CameraInVideoMessages",
+    "config_refs": [
+      "CameraInVideoMessages"
+    ],
+    "route": "media_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 153
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "showSmallGifRow",
+    "key": "ShowSmallGIF",
+    "config_refs": [
+      "ShowSmallGIF"
+    ],
+    "route": "stickers_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 162
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "takeGIFasVideoRow",
+    "key": "TakeGIFasVideo",
+    "config_refs": [
+      "TakeGIFasVideo"
+    ],
+    "route": "stickers_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 163
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "autoPauseVideoRow",
+    "key": "AutoPauseVideo",
+    "config_refs": [
+      "AutoPauseVideo"
+    ],
+    "route": "media_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 164
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "disablePreviewVideoSoundShortcutRow",
+    "key": "DisablePreviewVideoSoundShortcut",
+    "config_refs": [
+      "DisablePreviewVideoSoundShortcut"
+    ],
+    "route": "media_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 165
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "dontAutoPlayNextVoiceRow",
+    "key": "DontAutoPlayNextVoice",
+    "config_refs": [
+      "DontAutoPlayNextVoice"
+    ],
+    "route": "media_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 166
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "showSpoilersDirectlyRow",
+    "key": "showSpoilersDirectly",
+    "config_refs": [
+      "showSpoilersDirectly"
+    ],
+    "route": "media_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 167
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "dontSendGreetingStickerRow",
+    "key": "DontSendGreetingSticker",
+    "config_refs": [
+      "DontSendGreetingSticker"
+    ],
+    "route": "stickers_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 172
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "hideGroupStickerRow",
+    "key": "hideGroupSticker",
+    "config_refs": [
+      "hideGroupSticker"
+    ],
+    "route": "stickers_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 173
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "maxRecentStickerCountRow",
+    "key": "maxRecentStickerCount",
+    "config_refs": [
+      "maxRecentStickerCount"
+    ],
+    "route": "stickers_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 174
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "transcribeProviderRow",
+    "key": "TranscribeProvider",
+    "config_refs": [
+      "TranscribeProvider"
+    ],
+    "route": "messages_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 179
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "transcribeProviderCfCredentialsRow",
+    "key": "CloudflareCredentials",
+    "config_refs": [
+      "CloudflareCredentials"
+    ],
+    "route": "messages_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 187
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "transcribeProviderGeminiApiKeyRow",
+    "key": "LlmProviderGeminiKey",
+    "config_refs": [
+      "LlmProviderGeminiKey"
+    ],
+    "route": "messages_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 188
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "transcribeProviderOpenAiRow",
+    "key": "TranscribeProviderOpenAI",
+    "config_refs": [
+      "TranscribeProviderOpenAI"
+    ],
+    "route": "messages_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 189
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "chatMenuRow",
+    "key": "ChannelAdministrators",
+    "config_refs": [
+      "ChannelAdministrators",
+      "EventLog",
+      "Statistics",
+      "ChannelPermissions",
+      "GroupMembers",
+      "ChatMenuItemBoostGroup",
+      "ChatMenuItemLinkedChat",
+      "ChatMenuItemToBeginning",
+      "ChatMenuItemGoToMessage",
+      "ChatMenuItemHideTitle",
+      "ChatMenuItemViewDeleted",
+      "ChatMenuItemClearDeleted",
+      "ChatMenuItemDeleteOwnMessages"
+    ],
+    "route": "messages_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 194
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "messageMenuRow",
+    "key": "showAddToSavedMessages",
+    "config_refs": [
+      "showAddToSavedMessages",
+      "showRepeat",
+      "showDeleteDownloadedFile",
+      "showViewHistory",
+      "showTranslate",
+      "showShareMessages",
+      "showMessageHide",
+      "showReport",
+      "showAdminActions",
+      "showChangePermissions",
+      "showMessageDetails",
+      "Reactions",
+      "ReplyInPrivate",
+      "CopyLink",
+      "MessageMenuCopyFrame",
+      "CopyPhoto",
+      "CopyPhotoAsSticker",
+      "AddToStickers",
+      "AddToFavorites",
+      "NoQuoteForward",
+      "SetReminder",
+      "ShowAddToBookmark",
+      "RepeatAsCopy",
+      "TranslateMessageLLM"
+    ],
+    "route": "messages_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 211
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "mediaViewerMenuRow",
+    "key": "MediaViewerMenuItemForward",
+    "config_refs": [
+      "MediaViewerMenuItemForward",
+      "MediaViewerMenuItemNoQuoteForward",
+      "MediaViewerMenuItemCopyFrame",
+      "MediaViewerMenuItemCopyPhoto",
+      "MediaViewerMenuItemSetProfilePhoto",
+      "MediaViewerMenuItemScanQRCode"
+    ],
+    "route": "messages_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 239
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "actionBarButtonRow",
+    "key": "Reply",
+    "config_refs": [
+      "Reply",
+      "Edit",
+      "SelectBetween",
+      "Copy",
+      "Forward"
+    ],
+    "route": "messages_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 249
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "defaultDeleteMenuRow",
+    "key": "DefaultDeleteMenu",
+    "config_refs": [
+      "DefaultDeleteMenu",
+      "DeleteBanUsers",
+      "DeleteReportSpam",
+      "DeleteAll",
+      "DoActionsInCommonGroups"
+    ],
+    "route": "messages_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 258
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "textStyleRow",
+    "key": "TextStyle",
+    "config_refs": [
+      "TextStyle"
+    ],
+    "route": "messages_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 268
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "groupedMessageMenuRow",
+    "key": "GroupedMessageMenu",
+    "config_refs": [
+      "GroupedMessageMenu"
+    ],
+    "route": "messages_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 276
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "hideKeyboardOnChatScrollRow",
+    "key": "HideKeyboardOnChatScroll",
+    "config_refs": [
+      "HideKeyboardOnChatScroll"
+    ],
+    "route": "messages_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 277
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "disableVibrationRow",
+    "key": "DisableVibration",
+    "config_refs": [
+      "DisableVibration"
+    ],
+    "route": "messages_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 278
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "disableMarkdownRow",
+    "key": "DisableMarkdown",
+    "config_refs": [
+      "DisableMarkdown"
+    ],
+    "route": "messages_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 279
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "disableProximityEventsRow",
+    "key": "DisableProximityEvents",
+    "config_refs": [
+      "DisableProximityEvents"
+    ],
+    "route": "messages_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 280
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "rememberAllBackMessagesRow",
+    "key": "rememberAllBackMessages",
+    "config_refs": [
+      "rememberAllBackMessages"
+    ],
+    "route": "messages_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 281
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "typeMessageHintUseGroupNameRow",
+    "key": "TypeMessageHintUseGroupName",
+    "config_refs": [
+      "TypeMessageHintUseGroupName"
+    ],
+    "route": "messages_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 282
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "showSendAsUnderMessageHintRow",
+    "key": "ShowSendAsUnderMessageHint",
+    "config_refs": [
+      "ShowSendAsUnderMessageHint"
+    ],
+    "route": "messages_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 283
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "showQuickReplyInBotCommandsRow",
+    "key": "ShowQuickReplyInBotCommands",
+    "config_refs": [
+      "ShowQuickReplyInBotCommands"
+    ],
+    "route": "messages_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 284
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "hideBotButtonInInputFieldRow",
+    "key": "HideBotButtonInInputField",
+    "config_refs": [
+      "HideBotButtonInInputField"
+    ],
+    "route": "messages_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 285
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "hideReactionsRow",
+    "key": "HideReactions",
+    "config_refs": [
+      "HideReactions"
+    ],
+    "route": "messages_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 286
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "hideSendAsChannelRow",
+    "key": "hideSendAsChannel",
+    "config_refs": [
+      "hideSendAsChannel"
+    ],
+    "route": "messages_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 291
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "hideShareButtonInChannelRow",
+    "key": "HideShareButtonInChannel",
+    "config_refs": [
+      "HideShareButtonInChannel"
+    ],
+    "route": "messages_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 292
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "disableSwipeToNextRow",
+    "key": "disableSwipeToNextChannel",
+    "config_refs": [
+      "disableSwipeToNextChannel",
+      "disableSwipeToNextTopic"
+    ],
+    "route": "navigation_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 293
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "skipOpenLinkConfirmRow",
+    "key": "SkipOpenLinkConfirm",
+    "config_refs": [
+      "SkipOpenLinkConfirm"
+    ],
+    "route": "messages_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 302
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "askBeforeCallRow",
+    "key": "AskBeforeCalling",
+    "config_refs": [
+      "AskBeforeCalling"
+    ],
+    "route": "messages_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 303
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "repeatConfirmRow",
+    "key": "repeatConfirm",
+    "config_refs": [
+      "repeatConfirm"
+    ],
+    "route": "messages_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 304
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "disableClickCommandToSendRow",
+    "key": "DisableClickCommandToSend",
+    "config_refs": [
+      "DisableClickCommandToSend"
+    ],
+    "route": "messages_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 305
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "confirmAVRow",
+    "key": "ConfirmAVMessage",
+    "config_refs": [
+      "ConfirmAVMessage"
+    ],
+    "route": "messages_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 306
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "confirmAllLinksRow",
+    "key": "ConfirmAllLinks",
+    "config_refs": [
+      "ConfirmAllLinks"
+    ],
+    "route": "messages_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 307
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "searchHashtagDefaultPageChannelRow",
+    "key": "SearchHashtagDefaultPageChannel",
+    "config_refs": [
+      "SearchHashtagDefaultPageChannel"
+    ],
+    "route": "messages_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 317
+  },
+  {
+    "source": "nc",
+    "class_name": "NekoChatSettingsActivity",
+    "field": "searchHashtagDefaultPageChatRow",
+    "key": "SearchHashtagDefaultPageChat",
+    "config_refs": [
+      "SearchHashtagDefaultPageChat"
+    ],
+    "route": "messages_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 318
+  },
+  {
+    "source": "nx",
+    "class_name": "NekoExperimentalSettingsActivity",
+    "field": "backAnimationStyleRow",
+    "key": "BackAnimationStyle",
+    "config_refs": [
+      "BackAnimationStyle"
+    ],
+    "route": "navigation_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 104
+  },
+  {
+    "source": "nx",
+    "class_name": "NekoExperimentalSettingsActivity",
+    "field": "springAnimationCrossfadeRow",
+    "key": "SpringAnimationCrossfade",
+    "config_refs": [
+      "SpringAnimationCrossfade"
+    ],
+    "route": "navigation_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 114
+  },
+  {
+    "source": "nx",
+    "class_name": "NekoExperimentalSettingsActivity",
+    "field": "localPremiumRow",
+    "key": "localPremium",
+    "config_refs": [
+      "localPremium"
+    ],
+    "route": "advanced_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 115
+  },
+  {
+    "source": "nx",
+    "class_name": "NekoExperimentalSettingsActivity",
+    "field": "unlimitedPinnedDialogsRow",
+    "key": "UnlimitedPinnedDialogs",
+    "config_refs": [
+      "UnlimitedPinnedDialogs"
+    ],
+    "route": "advanced_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 116
+  },
+  {
+    "source": "nx",
+    "class_name": "NekoExperimentalSettingsActivity",
+    "field": "unlimitedFavedStickersRow",
+    "key": "UnlimitedFavoredStickers",
+    "config_refs": [
+      "UnlimitedFavoredStickers"
+    ],
+    "route": "stickers_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 117
+  },
+  {
+    "source": "nx",
+    "class_name": "NekoExperimentalSettingsActivity",
+    "field": "boostUploadRow",
+    "key": "uploadBoost",
+    "config_refs": [
+      "uploadBoost"
+    ],
+    "route": "advanced_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 122
+  },
+  {
+    "source": "nx",
+    "class_name": "NekoExperimentalSettingsActivity",
+    "field": "audioEnhanceRow",
+    "key": "NoiseSuppressAndVoiceEnhance",
+    "config_refs": [
+      "NoiseSuppressAndVoiceEnhance"
+    ],
+    "route": "media_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 127
+  },
+  {
+    "source": "nx",
+    "class_name": "NekoExperimentalSettingsActivity",
+    "field": "sendMp4DocumentAsVideoRow",
+    "key": "SendMp4DocumentAsVideo",
+    "config_refs": [
+      "SendMp4DocumentAsVideo"
+    ],
+    "route": "media_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 128
+  },
+  {
+    "source": "nx",
+    "class_name": "NekoExperimentalSettingsActivity",
+    "field": "enhancedVideoBitrateRow",
+    "key": "EnhancedVideoBitrate",
+    "config_refs": [
+      "EnhancedVideoBitrate"
+    ],
+    "route": "media_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 129
+  },
+  {
+    "source": "nx",
+    "class_name": "NekoExperimentalSettingsActivity",
+    "field": "customAudioBitrateRow",
+    "key": "customGroupVoipAudioBitrate",
+    "config_refs": [
+      "customGroupVoipAudioBitrate"
+    ],
+    "route": "media_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 130
+  },
+  {
+    "source": "nx",
+    "class_name": "NekoExperimentalSettingsActivity",
+    "field": "playerDecoderRow",
+    "key": "VideoPlayerDecoder",
+    "config_refs": [
+      "VideoPlayerDecoder"
+    ],
+    "route": "media_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 131
+  },
+  {
+    "source": "nx",
+    "class_name": "NekoExperimentalSettingsActivity",
+    "field": "ghostModeRow",
+    "key": "GhostMode",
+    "config_refs": [
+      "GhostMode"
+    ],
+    "route": "advanced_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 140
+  },
+  {
+    "source": "nx",
+    "class_name": "NekoExperimentalSettingsActivity",
+    "field": "regexFiltersEnabledRow",
+    "key": "RegexFilters",
+    "config_refs": [
+      "RegexFilters"
+    ],
+    "route": "advanced_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 141
+  },
+  {
+    "source": "nx",
+    "class_name": "NekoExperimentalSettingsActivity",
+    "field": "saveLastSeenRow",
+    "key": "SaveLocalLastSeen",
+    "config_refs": [
+      "SaveLocalLastSeen"
+    ],
+    "route": "advanced_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 142
+  },
+  {
+    "source": "nx",
+    "class_name": "NekoExperimentalSettingsActivity",
+    "field": "enableSaveDeletedMessagesRow",
+    "key": "EnableSaveDeletedMessages",
+    "config_refs": [
+      "EnableSaveDeletedMessages"
+    ],
+    "route": "advanced_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 143
+  },
+  {
+    "source": "nx",
+    "class_name": "NekoExperimentalSettingsActivity",
+    "field": "enableSaveEditsHistoryRow",
+    "key": "EnableSaveEditsHistory",
+    "config_refs": [
+      "EnableSaveEditsHistory"
+    ],
+    "route": "advanced_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 144
+  },
+  {
+    "source": "nx",
+    "class_name": "NekoExperimentalSettingsActivity",
+    "field": "messageSavingSaveMediaRow",
+    "key": "MessageSavingSaveMedia",
+    "config_refs": [
+      "MessageSavingSaveMedia"
+    ],
+    "route": "advanced_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 145
+  },
+  {
+    "source": "nx",
+    "class_name": "NekoExperimentalSettingsActivity",
+    "field": "saveDeletedInPrivateChatsRow",
+    "key": "SaveDeletedInPrivateChats",
+    "config_refs": [
+      "SaveDeletedInPrivateChats"
+    ],
+    "route": "advanced_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 146
+  },
+  {
+    "source": "nx",
+    "class_name": "NekoExperimentalSettingsActivity",
+    "field": "saveDeletedInGroupsRow",
+    "key": "SaveDeletedInGroups",
+    "config_refs": [
+      "SaveDeletedInGroups"
+    ],
+    "route": "advanced_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 147
+  },
+  {
+    "source": "nx",
+    "class_name": "NekoExperimentalSettingsActivity",
+    "field": "saveDeletedInChannelsRow",
+    "key": "SaveDeletedInChannels",
+    "config_refs": [
+      "SaveDeletedInChannels"
+    ],
+    "route": "advanced_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 148
+  },
+  {
+    "source": "nx",
+    "class_name": "NekoExperimentalSettingsActivity",
+    "field": "saveDeletedMessageForBotsUserRow",
+    "key": "SaveDeletedMessageForBotUser",
+    "config_refs": [
+      "SaveDeletedMessageForBotUser"
+    ],
+    "route": "advanced_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 149
+  },
+  {
+    "source": "nx",
+    "class_name": "NekoExperimentalSettingsActivity",
+    "field": "saveDeletedMessageInBotChatRow",
+    "key": "SaveDeletedMessageForBot",
+    "config_refs": [
+      "SaveDeletedMessageForBot"
+    ],
+    "route": "advanced_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 150
+  },
+  {
+    "source": "nx",
+    "class_name": "NekoExperimentalSettingsActivity",
+    "field": "replyToDeletedAsQuoteRow",
+    "key": "ReplyToDeletedAsQuote",
+    "config_refs": [
+      "ReplyToDeletedAsQuote"
+    ],
+    "route": "advanced_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 151
+  },
+  {
+    "source": "nx",
+    "class_name": "NekoExperimentalSettingsActivity",
+    "field": "translucentDeletedMessagesRow",
+    "key": "TranslucentDeletedMessages",
+    "config_refs": [
+      "TranslucentDeletedMessages"
+    ],
+    "route": "advanced_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 152
+  },
+  {
+    "source": "nx",
+    "class_name": "NekoExperimentalSettingsActivity",
+    "field": "useDeletedIconRow",
+    "key": "UseDeletedIcon",
+    "config_refs": [
+      "UseDeletedIcon"
+    ],
+    "route": "advanced_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 153
+  },
+  {
+    "source": "nx",
+    "class_name": "NekoExperimentalSettingsActivity",
+    "field": "customDeletedMarkRow",
+    "key": "CustomDeletedMark",
+    "config_refs": [
+      "CustomDeletedMark"
+    ],
+    "route": "advanced_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 154
+  },
+  {
+    "source": "nx",
+    "class_name": "NekoExperimentalSettingsActivity",
+    "field": "clearMessageDatabaseRow",
+    "key": "ClearMessageDatabase",
+    "config_refs": [
+      "ClearMessageDatabase"
+    ],
+    "route": "advanced_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 155
+  },
+  {
+    "source": "nx",
+    "class_name": "NekoExperimentalSettingsActivity",
+    "field": "showRPCErrorRow",
+    "key": "ShowRPCError",
+    "config_refs": [
+      "ShowRPCError"
+    ],
+    "route": "advanced_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 178
+  },
+  {
+    "source": "nx",
+    "class_name": "NekoExperimentalSettingsActivity",
+    "field": "forceFontWeightFallbackRow",
+    "key": "forceFontWeightFallback",
+    "config_refs": [
+      "forceFontWeightFallback"
+    ],
+    "route": "appearance_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 179
+  },
+  {
+    "source": "nx",
+    "class_name": "NekoExperimentalSettingsActivity",
+    "field": "disableChoosingStickerRow",
+    "key": "disableChoosingSticker",
+    "config_refs": [
+      "disableChoosingSticker"
+    ],
+    "route": "stickers_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 180
+  },
+  {
+    "source": "nx",
+    "class_name": "NekoExperimentalSettingsActivity",
+    "field": "disableFilteringRow",
+    "key": "SensitiveDisableFiltering",
+    "config_refs": [
+      "SensitiveDisableFiltering"
+    ],
+    "route": "advanced_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 181
+  },
+  {
+    "source": "nx",
+    "class_name": "NekoExperimentalSettingsActivity",
+    "field": "devicePerformanceClassRow",
+    "key": "PerformanceClass",
+    "config_refs": [
+      "PerformanceClass"
+    ],
+    "route": "advanced_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 182
+  },
+  {
+    "source": "nx",
+    "class_name": "NekoExperimentalSettingsActivity",
+    "field": "disableStoriesRow",
+    "key": "DisableStories",
+    "config_refs": [
+      "DisableStories"
+    ],
+    "route": "advanced_extra",
+    "retired": true,
+    "existing_retirement": false,
+    "line": 192
+  },
+  {
+    "source": "nx",
+    "class_name": "NekoExperimentalSettingsActivity",
+    "field": "hideFromHeaderRow",
+    "key": "HideStoriesFromHeader",
+    "config_refs": [
+      "HideStoriesFromHeader"
+    ],
+    "route": "advanced_extra",
+    "retired": true,
+    "existing_retirement": true,
+    "line": 193
+  },
+  {
+    "source": "nx",
+    "class_name": "NekoExperimentalSettingsActivity",
+    "field": "enablePanguOnSendingRow",
+    "key": "EnablePanguOnSending",
+    "config_refs": [
+      "EnablePanguOnSending"
+    ],
+    "route": "advanced_extra",
+    "retired": false,
+    "existing_retirement": false,
+    "line": 198
+  }
+]

@@ -1,0 +1,12 @@
+{
+  "baseline": {
+    "exit_code": 1,
+    "last_error": "ValueError: Unknown Beta delivery scope: ['TMessagesProj/src/main/AndroidManifest.xml', 'TMessagesProj/src/main/assets/licenses/remixicon-NOTICE.txt', 'TMessagesProj/src/main/assets/licenses/remixicon-apache-2.0.txt', 'TMessagesProj/src/main/java/app/exteraless/appicons/AppIcons.java', 'TMessagesProj/src/main/java/app/exteraless/crash/CrashLog.java', 'TMessagesProj/src/main/java/app/exteraless/settings/AboutHeaderCell.java', 'TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraAppNavigationActivity.java', 'TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraAppearanceActivity.java', 'TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraAyuMomentsActivity.java', 'TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraChatsActivity.java', 'TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraOtherActivity.java', 'TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraSettingsActivity.java', 'TMessagesProj/src/main/java/app/flexygram/bub"
+  },
+  "candidate": {
+    "exit_code": 1,
+    "last_error": "ValueError: Unknown Beta delivery scope: ['.github/workflows/smart-previews2.yml', 'TMessagesProj/src/main/AndroidManifest.xml', 'TMessagesProj/src/main/assets/licenses/remixicon-NOTICE.txt', 'TMessagesProj/src/main/assets/licenses/remixicon-apache-2.0.txt', 'TMessagesProj/src/main/java/app/exteraless/appicons/AppIcons.java', 'TMessagesProj/src/main/java/app/exteraless/crash/CrashLog.java', 'TMessagesProj/src/main/java/app/exteraless/settings/AboutHeaderCell.java', 'TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraAppNavigationActivity.java', 'TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraAppearanceActivity.java', 'TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraAyuMomentsActivity.java', 'TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraChatsActivity.java', 'TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraOtherActivity.java', 'TMessagesProj/src/main/java/app/exteraless/settings/OpenExteraSettingsActivity.java', 'TMes"
+  },
+  "base": "4679f74ebd312acc4968dd2e044a6c6b7478445a",
+  "release_controls_byte_identical": true
+}

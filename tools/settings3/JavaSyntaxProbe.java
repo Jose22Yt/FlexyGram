@@ -1,0 +1,2 @@
+import java.nio.file.*;import com.github.javaparser.*;
+public class JavaSyntaxProbe{public static void main(String[]args)throws Exception{var parser=new JavaParser(new ParserConfiguration().setLanguageLevel(ParserConfiguration.LanguageLevel.JAVA_21));int n=0;for(String name:args){var result=parser.parse(Path.of(name));if(!result.isSuccessful())throw new AssertionError(name+": "+result.getProblems());n++;}System.out.println("Java21 syntax parsed: "+n+" production files. This is NOT semantic compilation.");}}

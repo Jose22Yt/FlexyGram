@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="FlexySmartPreviewsTitle">Vistas previas inteligentes</string>
-    <string name="FlexySmartPreviewAdaptive">Multicolor</string>
-    <string name="FlexySmartPreviewAccent">Automático</string>
-    <string name="FlexySmartPreviewMatte">Signature Matte</string>
+    <string name="FlexySmartPreviewAdaptive">Adaptativo</string>
+    <string name="FlexySmartPreviewAccent">Acento del tema</string>
+    <string name="FlexySmartPreviewMatte">Matte</string>
     <string name="FlexySmartPreviewOff">Desactivadas</string>
     <string name="FlexySmartFile">Documento</string>
     <string name="FlexySmartMusic">Música</string>
@@ -13,4 +13,7 @@
     <string name="FlexySmartGroupEvent">Evento del grupo</string>
     <string name="FlexySmartLocation">Ubicación</string>
     <string name="FlexySmartContact">Contacto</string>
+    <string name="FlexySmartJoined">Se unió</string>
+    <string name="FlexySmartLeft">Salió</string>
+    <string name="FlexySmartPinned">Fijado</string>
 </resources>

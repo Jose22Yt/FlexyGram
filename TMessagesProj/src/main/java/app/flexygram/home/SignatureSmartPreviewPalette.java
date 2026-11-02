@@ -8,32 +8,113 @@ public final class SignatureSmartPreviewPalette {
             PNG=16, JPG=17, IMAGE_FILE=18, GIF=19, STICKER=20, POLL=21,
             JOINED=22, LEFT=23, PINNED=24, EDITED=25, DOCUMENT=26,
             SPREADSHEET=27, PRESENTATION=28, CHANNEL=29, ADMIN=30, OWNER=31, DELETED=32;
-    public static final int ADAPTIVE=0, THEME=1, OFF=3;
+    public static final int ADAPTIVE=0, THEME=1, MATTE=2, OFF=3, MULTICOLOR=4;
     private static final int[] BASE={
-        0xff8892a0,0xff3488df,0xff9960cb,0xffd45a91,
-        0xff24a2ae,0xff21a36b,0xffc78d37,0xff7970ce,0xffd58a53,0xff6796c9,
-        0xff3a82c2,0xff4e91a6,0xffbc823e,0xffa86b42,0xffac8942,0xff269c80,
-        0xffc09b46,0xffc18d46,0xff64a9a0,0xffba6ca8,0xffab8ad5,0xff888ad2,
-        0xff269b69,0xffbe7063,0xff6296c8,0xff8393b8,0xff4d91ca,0xff329b9d,
-        0xff8981bf,0xff548da5,0xffad8b48,0xffb38d49,0xffb56e73
+        0xff8892a0,0xff1e88e5,0xff8e24aa,0xffe91e63,
+        0xff00acc1,0xff00897b,0xff2e7d32,0xff5e35b1,0xffff8f00,0xff0288d1,
+        0xff1e88e5,0xff1976d2,0xffff9800,0xffff8f00,0xffffa000,0xff00897b,
+        0xff2e7d32,0xff388e3c,0xff43a047,0xff5e35b1,0xff7b1fa2,0xff00838f,
+        0xff00897b,0xffc2185b,0xff0097a7,0xff546e7a,0xff1e88e5,0xff2e7d32,
+        0xffe65100,0xff546e7a,0xffffb300,0xffff8f00,0xffe53935
     };
+    /** Legacy THEME (1) is kept as an alias; existing stored selections migrate to ADAPTIVE. */
+    public static int normalizeMode(int mode) {
+        return mode == THEME ? ADAPTIVE : mode == MULTICOLOR || mode == MATTE || mode == OFF ? mode : ADAPTIVE;
+    }
+    private static int multicolor(int kind) {
+        switch (kind) {
+            case PHOTO: case PNG: case JPG: case IMAGE_FILE: case JOINED: return 0xff15803d;
+            case VIDEO: case GIF: return 0xff7c3aed;
+            case ZIP: case RAR: case ARCHIVE: return 0xffbe185d;
+            case VOICE: case MUSIC: return 0xffc2410c;
+            case LINK: return 0xff0369a1;
+            case LOCATION: case ADMIN: return 0xffa16207;
+            case CONTACT: case EVENT: case PINNED: return 0xff0f766e;
+            case POLL: return 0xff0e7490;
+            case STICKER: return 0xffa21caf;
+            case LEFT: case DELETED: return 0xffb91c1c;
+            case OWNER: return 0xff92400e;
+            case NONE: case EDITED: return 0xff475569;
+            default: return 0xff2563eb;
+        }
+    }
+    private final int[] resolved = new int[3];
     private int oldKind=-1,oldMode=-1,oldAccent,oldSurface;
-    private int background=0xffe6edf4,foreground=0xff26313d;
+    private int background=0xffe6edf4,foreground=0xff26313d,iconColor=0xff26313d;
     public int background(){return background;}
     public int foreground(){return foreground;}
+    public int iconColor(){return iconColor;}
+
+    private static int cachedMode = -1, cachedAccent = 0, cachedSurface = 0;
+    private static final int[][] CACHED_PALETTE = new int[BASE.length][3];
+
+    public static void resolveColors(int kind, int mode, int accent, int surface, int[] outColors) {
+        if (kind < 0 || kind >= BASE.length) kind = NONE;
+        mode = normalizeMode(mode);
+        if (cachedMode != mode || cachedAccent != accent || cachedSurface != surface) {
+            cachedMode = mode; cachedAccent = accent; cachedSurface = surface;
+            int opaqueSurface = surface | 0xff000000;
+            boolean isDark = luminance(opaqueSurface) < 0.45;
+            for (int k = 0; k < BASE.length; k++) {
+                int base = BASE[k];
+                int main = accent | 0xff000000;
+                int bg, fg, ic;
+                if (mode == MULTICOLOR) {
+                    bg = multicolor(k);
+                    fg = contrast(0xffffffff, bg) >= contrast(0xff000000, bg) ? 0xffffffff : 0xff000000;
+                    ic = fg;
+                } else if (mode == MATTE) {
+                    if (isDark) {
+                        bg = blend(opaqueSurface, 0xffffffff, 0.16f);
+                        fg = 0xffffffff;
+                        ic = blend(base, 0xffffffff, 0.35f);
+                    } else {
+                        bg = blend(opaqueSurface, 0xff000000, 0.08f);
+                        fg = 0xff1c2024;
+                        ic = blend(base, 0xff000000, 0.20f);
+                    }
+                } else {
+                    if (isDark) {
+                        bg = blend(opaqueSurface, main, 0.28f);
+                        fg = 0xffffffff;
+                        ic = fg;
+                    } else {
+                        bg = blend(0xffffffff, main, 0.16f);
+                        int darkInk = blend(main, 0xff000000, 0.40f);
+                        if (contrast(darkInk, bg) < 4.5) {
+                            darkInk = blend(main, 0xff000000, 0.60f);
+                        }
+                        fg = darkInk;
+                        ic = fg;
+                    }
+                }
+                if (contrast(fg, bg) < 4.5) {
+                    fg = luminance(bg) > 0.23 ? 0xff172332 : 0xfff7f9fc;
+                }
+                if (contrast(fg, bg) < 4.5) {
+                    fg = luminance(bg) > 0.18 ? 0xff000000 : 0xffffffff;
+                }
+                if (mode != MATTE) {
+                    ic = fg;
+                }
+                CACHED_PALETTE[k][0] = bg;
+                CACHED_PALETTE[k][1] = fg;
+                CACHED_PALETTE[k][2] = ic;
+            }
+        }
+        outColors[0] = CACHED_PALETTE[kind][0];
+        outColors[1] = CACHED_PALETTE[kind][1];
+        outColors[2] = CACHED_PALETTE[kind][2];
+    }
+
     public boolean update(int kind,int mode,int accent,int surface) {
-        if(kind<0||kind>=BASE.length||mode<ADAPTIVE||mode>THEME)kind=NONE;
+        if(kind<0||kind>=BASE.length||mode<ADAPTIVE||mode>MULTICOLOR)kind=NONE;
         if(oldKind==kind&&oldMode==mode&&oldAccent==accent&&oldSurface==surface)return false;
         oldKind=kind;oldMode=mode;oldAccent=accent;oldSurface=surface;
-        int opaqueSurface=surface|0xff000000;
-        int base=BASE[kind];
-        int main=mode==THEME?(accent|0xff000000):base;
-        float tint=.12f;
-        background=blend(opaqueSurface,main,tint);
-        int ink=blend(main,luminance(background)>.48?0xff172332:0xfff7f9fc,.58f);
-        if(contrast(ink,background)<4.5)ink=luminance(background)>.23?0xff172332:0xfff7f9fc;
-        if(contrast(ink,background)<4.5)ink=luminance(background)>.18?0xff000000:0xffffffff;
-        foreground=ink;
+        resolveColors(kind, mode, accent, surface, resolved);
+        background = resolved[0];
+        foreground = resolved[1];
+        iconColor = resolved[2];
         return true;
     }
     private static int blend(int a,int b,float f){

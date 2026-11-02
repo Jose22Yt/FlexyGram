@@ -31,7 +31,8 @@ public final class FlexyStudioActivity extends SignatureMatteSettingsActivity {
     private Future<?> work;
     private int generation;
     @Override protected String getActionBarTitle(){return getString(R.string.FlexyStudioTitle);}
-    @Override protected void updateRows(){super.updateRows();header=addRow();export=addRow("flexystudioExport");importRow=addRow("flexystudioImport");share=addRow("flexystudioShare");shadow=addRow();tools=addRow();files=addRow("flexyfilesEnabled");help=addRow("flexyfilesHelp");toolsShadow=addRow();}
+    @Override protected void updateRows(){super.updateRows();header=addRow();export=addRow("flexystudioExport");importRow=addRow("flexystudioImport");share=addRow("flexystudioShare");shadow=addRow();tools=files=help=toolsShadow=-1;}
+    @Override public View createView(Context context){View v=super.createView(context);actionBar.centerTitle();listView.setSections(AndroidUtilities.dp(16),AndroidUtilities.dp(20),true);listView.setItemAnimator(null);return v;}
     @Override protected BaseListAdapter createAdapter(Context context){return new Adapter(context);}
     @Override protected void onItemClick(View view,int position,float x,float y) {
         if(position==files){app.flexygram.files.FlexyFiles.enabled(!app.flexygram.files.FlexyFiles.enabled());if(view instanceof org.telegram.ui.Cells.TextCheckCell)((org.telegram.ui.Cells.TextCheckCell)view).setTextAndValueAndCheck(getString(R.string.FlexyFilesEnable),getString(app.flexygram.files.FlexyFiles.enabled()?R.string.FlexyFilesDormant:R.string.FlexyFilesDisabled),app.flexygram.files.FlexyFiles.enabled(),true,true,false);return;}
@@ -100,12 +101,12 @@ public final class FlexyStudioActivity extends SignatureMatteSettingsActivity {
     private final class Adapter extends MatteListAdapter {
         Adapter(Context context){super(context);}
         @Override public int getItemViewType(int position){return position==header||position==tools?TYPE_HEADER:position==shadow||position==toolsShadow?TYPE_SHADOW:position==files?TYPE_CHECK:NAV;}
-        @Override public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent,int type){if(type==NAV)return new RecyclerListView.Holder(new SignatureNavigationCell(parent.getContext(),resourcesProvider));return super.onCreateViewHolder(parent,type);}
+        @Override public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent,int type){if(type==NAV)return new RecyclerListView.Holder(new app.flexygram.settings.signature.Settings2Cell(parent.getContext(),resourcesProvider));return super.onCreateViewHolder(parent,type);}
         @Override public void onBindViewHolder(RecyclerView.ViewHolder holder,int position,boolean partial){
             if(position==header||position==tools)((tw.nekomimi.nekogram.ui.cells.HeaderCell)holder.itemView).setText(getString(position==header?R.string.FlexyStudioConfiguration:R.string.FlexyFilesTools));
             else if(position==files)((org.telegram.ui.Cells.TextCheckCell)holder.itemView).setTextAndValueAndCheck(getString(R.string.FlexyFilesEnable),getString(app.flexygram.files.FlexyFiles.enabled()?R.string.FlexyFilesDormant:R.string.FlexyFilesDisabled),app.flexygram.files.FlexyFiles.enabled(),true,true,false);
             else if(position==help)((SignatureNavigationCell)holder.itemView).bind(getString(R.string.FlexyFilesHow),R.drawable.msg_info,false);
-            else if(position!=shadow&&position!=toolsShadow)((SignatureNavigationCell)holder.itemView).bind(getString(position==export?R.string.FlexyStudioExport:position==importRow?R.string.FlexyStudioImport:R.string.FlexyStudioShare),position==export?R.drawable.flexy_studio_export:position==importRow?R.drawable.flexy_studio_import:R.drawable.flexy_studio_share,position!=share);
+            else if(position!=shadow&&position!=toolsShadow)((app.flexygram.settings.signature.Settings2Cell)holder.itemView).bind(getString(position==export?R.string.FlexyStudioExport:position==importRow?R.string.FlexyStudioImport:R.string.FlexyStudioShare),"",position==share?R.drawable.settings3_stack:R.drawable.settings3_document,0,position!=share);
         }
         @Override public boolean isEnabled(RecyclerView.ViewHolder holder){return holder.getItemViewType()==NAV||holder.getItemViewType()==TYPE_CHECK;}
     }

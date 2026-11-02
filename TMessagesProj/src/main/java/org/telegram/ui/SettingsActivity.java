@@ -780,9 +780,7 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
         // Настройки NagramX по умолчанию спрятаны: у форка свои экраны, а второй
         // набор тех же настроек рядом только путает. Строку включают на экране
         // «Other» (GeneralConfig.showNagramSettings).
-        if (app.exteraless.general.GeneralConfig.showNagramSettings()) {
-            items.add(SettingCell.Factory.of(100, 0xFF3CCFFF, 0xFF007AFF, R.drawable.filled_profile_settings, getString(R.string.NekoSettings)));
-        }
+        // Signature Settings 2: one visible client entry; legacy preference is preserved.
         // Как в exteraGram 12.9.0 (SettingsActivity.java:899): знак приложения вместо
         // шестерёнки, акцент фирменного цвета на обе точки градиента.
         items.add(SettingCell.Factory.of(-1, 0xFF0753BC, 0xFF0753BC, R.drawable.flexygram_brand_tile, getString(R.string.FlexyPreferences), getString(R.string.OpenExteraInfo)));
@@ -1007,7 +1005,7 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                 break;
             }
             case 100: {
-                presentFragment(new NekoSettingsActivity());
+                presentFragment(new OpenExteraSettingsActivity());
                 break;
             }
             case -1: {

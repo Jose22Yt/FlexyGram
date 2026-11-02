@@ -6,14 +6,16 @@ import java.util.ArrayList;
 /** Stable destination IDs, deliberately independent from native pager positions. */
 public final class LiquidNavigationDestinations {
     public static final int CHATS=0, CONTACTS=1, SETTINGS=2, CALLS=3, PROFILE=4,
-            FEED=5, GROUPS=6, CHANNELS=7, SAVED=8, MORE=9;
-    public static final int COUNT=9, MAX_VISIBLE=6;
+            FEED=5, GROUPS=6, CHANNELS=7, SAVED=8, MORE=9, SEARCH=10;
+    public static final int COUNT=11, MAX_VISIBLE=6;
+    /** MORE is a layout-only overflow control, never an editable destination. */
+    public static boolean isSelectable(int id) { return id >= CHATS && id < COUNT && id != MORE; }
     private LiquidNavigationDestinations() {}
     public static int[] defaults() { return new int[]{CHATS,CONTACTS,SETTINGS,PROFILE}; }
     public static int[] sanitize(int[] input) {
         ArrayList<Integer> result=new ArrayList<>(COUNT);
         if (input != null) for (int id:input) {
-            if (id>=0 && id<COUNT && !result.contains(id)) result.add(id);
+            if (isSelectable(id) && !result.contains(id)) result.add(id);
         }
         if (!result.contains(CHATS)) {
             result.add(0,CHATS);

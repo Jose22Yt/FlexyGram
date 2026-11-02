@@ -27,7 +27,7 @@ public final class SignatureFusionSurface {
         border.setStrokeWidth(.7f * density);
         separator.setColor(separatorColor);
         separator.setStrokeWidth(.7f * density);
-        drawPill(canvas,g.backVisual);
+        drawPill(canvas,g.backVisual); if (g.separateUnread) drawPill(canvas,g.unread);
         drawCenterFill(canvas,g.center);
         drawActions(canvas,g);
         drawCenterBorder(canvas, g, borderColor, density);
@@ -45,7 +45,7 @@ public final class SignatureFusionSurface {
                      int surfaceColor, int borderColor, int separatorColor, float density) {
         fill.setColor(surfaceColor); border.setColor(borderColor); border.setStrokeWidth(.7f * density);
         separator.setColor(separatorColor); separator.setStrokeWidth(.7f * density);
-        drawPill(canvas,g.backVisual); drawCenterFill(canvas,g.center); drawActions(canvas,g);
+        drawPill(canvas,g.backVisual); if (g.separateUnread) drawPill(canvas,g.unread); drawCenterFill(canvas,g.center); drawActions(canvas,g);
         if(g.callAvailable && !g.mattePortrait){float x=g.actions.centerX();
             canvas.drawLine(x,g.actionsVisual.top+10f*density,x,g.actionsVisual.bottom-10f*density,separator);}
     }

@@ -17,24 +17,35 @@ import org.telegram.tgnet.TLRPC;
 public final class SignatureSmartPreviews {
     private static final String PREFS="flexy_signature_smart_previews";
     private static volatile int cachedMode=-1;
+    public interface StyleListener { void onStyleChanged(int previous, int next); }
+    // UI-thread-only, attached views subscribe and always unsubscribe on detach.
+    private static final java.util.HashSet<StyleListener> listeners=new java.util.HashSet<>();
+    public static void addStyleListener(StyleListener listener) { listeners.add(listener); }
+    public static void removeStyleListener(StyleListener listener) { listeners.remove(listener); }
     private SignatureSmartPreviews(){}
     public static int mode(){
         int result=cachedMode;
         if(result>=0)return result;
         synchronized(SignatureSmartPreviews.class){
             if(cachedMode<0){
-                int stored=ApplicationLoader.applicationContext.getSharedPreferences(PREFS,Context.MODE_PRIVATE)
-                        .getInt("palette",SignatureSmartPreviewPalette.ADAPTIVE);
-                cachedMode=stored==2?SignatureSmartPreviewPalette.THEME:stored>=0&&stored<=3?stored:0;
+                android.content.SharedPreferences prefs=ApplicationLoader.applicationContext.getSharedPreferences(PREFS,Context.MODE_PRIVATE);
+                int stored=prefs.getInt("palette",SignatureSmartPreviewPalette.MULTICOLOR);
+                cachedMode=SignatureSmartPreviewPalette.normalizeMode(stored);
+                if(prefs.contains("palette") && cachedMode!=stored) prefs.edit().putInt("palette",cachedMode).apply();
             }
             return cachedMode;
         }
     }
+    /** Draw is never the place to load preferences. Binding/constructing a span primes mode(). */
+    public static int drawingMode() { int value=cachedMode;return value<0?SignatureSmartPreviewPalette.MULTICOLOR:value; }
     public static void setMode(int next){
-        if(next!=0&&next!=1&&next!=3)throw new IllegalArgumentException("palette mode");
+        if(next<0||next>SignatureSmartPreviewPalette.MULTICOLOR)throw new IllegalArgumentException("palette mode");
+        next=SignatureSmartPreviewPalette.normalizeMode(next);
+        int previous=mode();if(previous==next)return;
         cachedMode=next;
-        ApplicationLoader.applicationContext.getSharedPreferences(PREFS,Context.MODE_PRIVATE)
-                .edit().putInt("palette",next).apply();
+        ApplicationLoader.applicationContext.getSharedPreferences(PREFS,Context.MODE_PRIVATE).edit().putInt("palette",next).apply();
+        // One allocation per user change, never per message or frame; safe if a view detaches during delivery.
+        for(StyleListener listener:listeners.toArray(new StyleListener[0])) listener.onStyleChanged(previous,next);
     }
     /**
      * Telegram stores ordinary dialog previews as singleton ArrayLists in
@@ -169,8 +180,45 @@ public final class SignatureSmartPreviews {
         }
     }
 
-    /** Adjacent native snippet; never put file names inside the colored capsule. */
+    public static int iconKind(int kind) {
+        switch (kind) {
+            case SignatureSmartPreviewPalette.ZIP:
+            case SignatureSmartPreviewPalette.RAR:
+            case SignatureSmartPreviewPalette.ARCHIVE:
+                return 10;
+            case SignatureSmartPreviewPalette.VOICE:
+                return 2;
+            case SignatureSmartPreviewPalette.MUSIC:
+                return 3;
+            case SignatureSmartPreviewPalette.LINK:
+                return 4;
+            case SignatureSmartPreviewPalette.EVENT:
+            case SignatureSmartPreviewPalette.JOINED:
+            case SignatureSmartPreviewPalette.LEFT:
+            case SignatureSmartPreviewPalette.PINNED:
+                return 5;
+            case SignatureSmartPreviewPalette.PHOTO:
+            case SignatureSmartPreviewPalette.PNG:
+            case SignatureSmartPreviewPalette.JPG:
+            case SignatureSmartPreviewPalette.IMAGE_FILE:
+                return 6;
+            case SignatureSmartPreviewPalette.VIDEO:
+            case SignatureSmartPreviewPalette.GIF:
+                return 7;
+            case SignatureSmartPreviewPalette.LOCATION:
+                return 8;
+            case SignatureSmartPreviewPalette.CONTACT:
+                return 9;
+            default:
+                return 1;
+        }
+    }
+
     public static String snippet(MessageObject message, int kind) {
+        return snippet(message, kind, null);
+    }
+
+    public static String snippet(MessageObject message, int kind, java.util.List<?> groupMessages) {
         if (message == null || message.messageOwner == null) return "";
         TLRPC.Message owner = message.messageOwner;
         if (message.isDocument()) {
@@ -178,23 +226,68 @@ public final class SignatureSmartPreviews {
             String filename = document == null ? null : FileLoader.getDocumentFileName(document);
             if (!TextUtils.isEmpty(filename)) {
                 String safe = filename.replace('\n', ' ').replace('\r', ' ').replace('\t', ' ');
-                if (safe.length() > 120) safe = safe.substring(0, 88) + "…" + safe.substring(safe.length()-31);
+                if (safe.length() > 120) safe = safe.substring(0, 88) + "…" + safe.substring(safe.length() - 31);
                 return clean(safe);
             }
+            boolean isArchive = (kind == SignatureSmartPreviewPalette.ZIP || kind == SignatureSmartPreviewPalette.RAR || kind == SignatureSmartPreviewPalette.ARCHIVE);
+            return LocaleController.getString(isArchive ? R.string.FlexySmartArchive : R.string.FlexySmartFile);
         }
-        if (kind == SignatureSmartPreviewPalette.JOINED
-                || kind == SignatureSmartPreviewPalette.LEFT
-                || kind == SignatureSmartPreviewPalette.PINNED) {
-            return clean(message.messageText == null ? "" : message.messageText.toString());
+        if (kind == SignatureSmartPreviewPalette.VOICE) {
+            int seconds = (int) Math.max(0, Math.min(86400, message.getDuration()));
+            String time = (seconds / 60) + ":" + (seconds % 60 < 10 ? "0" : "") + (seconds % 60);
+            return time + "  |||ı|ı||ı|";
+        }
+        if (kind == SignatureSmartPreviewPalette.MUSIC) {
+            String title = message.getMusicTitle();
+            if (!TextUtils.isEmpty(title)) return clean(title);
+            return LocaleController.getString(R.string.FlexySmartMusic);
         }
         if (kind == SignatureSmartPreviewPalette.LINK) {
             String label = label(message, SignatureSmartPreviewPalette.LINK);
             int split = label.indexOf("  ");
             return clean(split >= 0 ? label.substring(split + 2) : label);
         }
+        if (kind == SignatureSmartPreviewPalette.PHOTO) {
+            if (groupMessages != null && groupMessages.size() > 1) {
+                return String.format(LocaleController.getString(R.string.FlexySmartPhotosCount), groupMessages.size());
+            }
+            return LocaleController.getString(R.string.FlexySmartPhoto);
+        }
+        if (kind == SignatureSmartPreviewPalette.VIDEO) {
+            int seconds = (int) Math.max(0, Math.min(86400, message.getDuration()));
+            if (seconds > 0) {
+                return LocaleController.getString(R.string.FlexySmartVideo) + " · " + (seconds / 60) + ":" + (seconds % 60 < 10 ? "0" : "") + (seconds % 60);
+            }
+            return LocaleController.getString(R.string.FlexySmartVideo);
+        }
+        if (kind == SignatureSmartPreviewPalette.LOCATION) {
+            return LocaleController.getString(R.string.FlexySmartLocation);
+        }
+        if (kind == SignatureSmartPreviewPalette.CONTACT) {
+            if (owner.media instanceof TLRPC.TL_messageMediaContact) {
+                TLRPC.MessageMedia contact = owner.media;
+                String name = ((contact.first_name == null ? "" : contact.first_name) + " " + (contact.last_name == null ? "" : contact.last_name)).trim();
+                if (!TextUtils.isEmpty(name)) return clean(name);
+            }
+            return LocaleController.getString(R.string.FlexySmartContact);
+        }
+        if (kind == SignatureSmartPreviewPalette.JOINED) {
+            CharSequence event = message.messageText;
+            return clean(!TextUtils.isEmpty(event) ? event.toString() : LocaleController.getString(R.string.FlexySmartJoined));
+        }
+        if (kind == SignatureSmartPreviewPalette.LEFT) {
+            CharSequence event = message.messageText;
+            return clean(!TextUtils.isEmpty(event) ? event.toString() : LocaleController.getString(R.string.FlexySmartLeft));
+        }
+        if (kind == SignatureSmartPreviewPalette.PINNED) {
+            CharSequence event = message.messageText;
+            return clean(!TextUtils.isEmpty(event) ? event.toString() : LocaleController.getString(R.string.FlexySmartPinned));
+        }
+        if (kind == SignatureSmartPreviewPalette.EVENT) {
+            CharSequence event = message.messageText;
+            return clean(TextUtils.isEmpty(event) ? LocaleController.getString(R.string.FlexySmartGroupEvent) : event.toString());
+        }
         if (!TextUtils.isEmpty(owner.message)) return clean(owner.message);
-        if (kind == SignatureSmartPreviewPalette.MUSIC) return clean(message.getMusicTitle());
-        if (kind == SignatureSmartPreviewPalette.VOICE) return lineLabel(message, SignatureSmartPreviewPalette.VOICE).replace("🎤  ", "");
         return "";
     }
 

@@ -167,10 +167,14 @@ public class LiteMode {
     }
 
     public static void setAllFlags(int flags) {
-        // in settings it is already handled. would you handle it? 🫵
-        // onFlagsUpdate(value, flags);
+        int previous = getValue(true);
         value = flags;
         savePreference();
+        if (previous != flags) {
+            onFlagsUpdate(previous, flags);
+            // Retained native surfaces must see explicit switches as well as battery transitions.
+            dispatchPowerPolicyListeners(lastPowerSaverApplied);
+        }
     }
 
     public static void updatePresets(TLRPC.TL_jsonObject json) {
@@ -315,17 +319,18 @@ public class LiteMode {
         } else {
             onFlagsUpdate(PRESET_POWER_SAVER, getValue(true));
         }
-        if (onPowerSaverAppliedListeners != null) {
-            AndroidUtilities.runOnUIThread(() -> {
-                Iterator<Utilities.Callback<Boolean>> i = onPowerSaverAppliedListeners.iterator();
-                while (i.hasNext()) {
-                    Utilities.Callback<Boolean> callback = i.next();
-                    if (callback != null) {
-                        callback.run(powerSaverApplied);
-                    }
-                }
-            });
-        }
+        dispatchPowerPolicyListeners(powerSaverApplied);
+    }
+    private static void dispatchPowerPolicyListeners(boolean powerSaverApplied) {
+        if (onPowerSaverAppliedListeners == null) return;
+        AndroidUtilities.runOnUIThread(() -> {
+            if (onPowerSaverAppliedListeners == null) return;
+            // A callback may detach a view and remove itself; never iterate a mutating HashSet.
+            Utilities.Callback<Boolean>[] snapshot = onPowerSaverAppliedListeners.toArray(new Utilities.Callback[0]);
+            for (Utilities.Callback<Boolean> callback : snapshot) {
+                if (callback != null && onPowerSaverAppliedListeners.contains(callback)) callback.run(powerSaverApplied);
+            }
+        });
     }
 
     private static void onFlagsUpdate(int oldValue, int newValue) {

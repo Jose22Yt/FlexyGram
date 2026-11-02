@@ -17,4 +17,11 @@
     <string name="FlexyHeaderLastSeenTime">Últ.vez %1$s</string>
     <string name="FlexyHeaderFusion">Signature Fusion</string>
     <string name="FlexyHeaderPortrait">Signature Matte Portrait</string>
+    <string name="FlexyHeaderCherrySection">Opciones de cabecera</string>
+    <string name="FlexyHeaderCenterTitle">Centrar título en la barra de acción</string>
+    <string name="FlexyHeaderAdaptiveBubble">Adaptive bubble width</string>
+    <string name="FlexyHeaderShowUnread">Mostrar contador de chats no leídos</string>
+    <string name="FlexyHeaderShowUnreadSub">Activar contador de chats no leídos en el botón atrás en el chat abierto</string>
+    <string name="FlexyHeaderIosStyledCounter">iOS-styled counter</string>
+    <string name="FlexyHeaderGeometrySection">Apariencia FlexyGram</string>
 </resources>

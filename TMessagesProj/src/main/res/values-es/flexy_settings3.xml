@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="Settings3Group_personal">PERSONALIZACIÓN</string>
+  <string name="Settings3Group_functions">FUNCIONES</string>
+  <string name="Settings3Group_information">INFORMACIÓN</string>
+  <string name="Settings3Group_specialized">Herramientas especializadas</string>
+  <string name="Settings3_chat">Chat</string>
+  <string name="Settings3Desc_chat">Burbujas, mensajes y conversaciones</string>
+  <string name="Settings3_home">Pantalla principal</string>
+  <string name="Settings3Desc_home">Lista de chats, avatares y carpetas</string>
+  <string name="Settings3_universal">Universal</string>
+  <string name="Settings3Desc_universal">Idioma, red, sistema y comportamiento</string>
+  <string name="Settings3_ayu">AyuMoments</string>
+  <string name="Settings3Desc_ayu">Mensajes eliminados, historial y privacidad</string>
+  <string name="Settings3_plugins">Plugins</string>
+  <string name="Settings3Desc_plugins">Extensiones, IA y traducción</string>
+  <string name="Settings3_flexyfiles">FlexyFiles</string>
+  <string name="Settings3Desc_flexyfiles">Visor, editor y gestión de archivos</string>
+  <string name="Settings3_files">Archivos y descargas</string>
+  <string name="Settings3Desc_files">Rutas, almacenamiento y descargas</string>
+  <string name="Settings3_navigation">Navegación y gestos</string>
+  <string name="Settings3Desc_navigation">Pestañas, gestos y acciones rápidas</string>
+  <string name="Settings3_studio">FlexyStudio</string>
+  <string name="Settings3Desc_studio">Exportar, importar y compartir</string>
+  <string name="Settings3_about">FlexyGram</string>
+  <string name="Settings3Desc_about">Información, versión y licencias</string>
+  <string name="Settings3RemixCredits">Iconos de ajustes: Remix Icon 4.6.0, licencia Apache 2.0. Remix Design y colaboradores.</string>
+</resources>

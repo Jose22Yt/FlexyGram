@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyTabsPreviewHint">Перетащите значки, чтобы изменить порядок. Нажмите для настройки.</string>
+    <string name="FlexyTabsAvailable">Доступные вкладки · Нажмите, чтобы добавить</string>
+    <string name="FlexyTabsOff">Нижняя панель скрыта</string>
+    <string name="FlexyTabsLimit">На панели может быть не более шести вкладок. Удалите одну, прежде чем добавлять новую.</string>
+    <string name="FlexyTabsRestore">Сбросить вкладки</string>
+    <string name="FlexyTabsRestoreSub">Порядок по умолчанию</string>
+    <string name="FlexyTabsConfigure">Настроить ›</string>
+    <string name="FlexyTabsMovePrevious">▲ Переместить раньше</string>
+    <string name="FlexyTabsMoveNext">▼ Переместить позже</string>
+    <string name="FlexyTabsRemove">✖ Удалить вкладку</string>
+    <string name="FlexyTabsAdd">＋ Добавить вкладку…</string>
+    <string name="FlexyTabsAddTitle">Добавить вкладку</string>
+    <string name="FlexyTabsAddPrefix">＋</string>
+</resources>
