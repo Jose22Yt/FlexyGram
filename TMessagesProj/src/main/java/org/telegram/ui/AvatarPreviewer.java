@@ -188,6 +188,7 @@ public class AvatarPreviewer {
         OPEN_GROUP("OpenGroup2", R.string.OpenGroup2, R.drawable.msg_discussion),
         SEND_MESSAGE("SendMessage", R.string.SendMessage, R.drawable.msg_discussion),
         MENTION("Mention", R.string.Mention, R.drawable.msg_mention),
+        MEMBER_LENS("MemberLensAction", R.string.MemberLensAction, R.drawable.msg_search),
         SEARCH_MESSAGES("AvatarPreviewSearchMessages", R.string.AvatarPreviewSearchMessages, R.drawable.msg_search);
 
         private final String labelKey;

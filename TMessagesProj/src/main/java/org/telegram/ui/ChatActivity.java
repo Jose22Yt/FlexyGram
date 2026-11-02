@@ -12410,6 +12410,28 @@ public class ChatActivity extends BaseFragment implements
         }
     }
 
+    private boolean canOpenMemberLens(ChatMessageCell cell,TLRPC.User user) {
+        if(!app.flexygram.memberlens.MemberLensConfig.enabled() || user==null || cell==null || currentChat==null
+                || ChatObject.isChannelAndNotMegaGroup(currentChat) || ChatObject.isMonoForum(currentChat)
+                || isReport() || chatMode!=0 || searching || actionBar.isActionModeShowed() || isThreadChat()&&!isTopic) return false;
+        MessageObject message=cell.getMessageObject();
+        return message!=null && !message.isSponsored() && message.messageOwner.from_id!=null
+                && message.messageOwner.from_id.user_id==user.id && user.id>0;
+    }
+    private void openMemberLens(MessageObject message,TLRPC.User user) {
+        if(message==null||user==null||currentChat==null||!app.flexygram.memberlens.MemberLensConfig.enabled()
+                || message.getDialogId()!=dialog_id || message.getFromChatId()!=user.id)return;
+        Bundle args=new Bundle();args.putLong("lens_dialog",dialog_id);args.putLong("lens_user",user.id);
+        args.putInt("lens_topic",isTopic?(int)getTopicId():0);
+        app.flexygram.memberlens.MemberLensActivity lens=new app.flexygram.memberlens.MemberLensActivity(args,this);
+        lens.setCurrentAccount(currentAccount);presentFragment(lens);
+    }
+    public boolean openMemberLensOriginal(int messageId) {
+        if(isFinished||isFinishing())return false;
+        AndroidUtilities.runOnUIThread(()->{if(!isFinished)scrollToMessageId(messageId,0,true,0,true,0);});
+        return true;
+    }
+
     private void searchUserMessages(TLRPC.User user, TLRPC.Chat chat) {
         searchingUserMessages = user;
         searchingChatMessages = chat;
@@ -43456,15 +43478,25 @@ public class ChatActivity extends BaseFragment implements
 
         @Override
         public boolean didLongPressUserAvatar(ChatMessageCell cell, TLRPC.User user, float touchX, float touchY) {
+            final boolean memberLens = canOpenMemberLens(cell,user);
+            final MessageObject memberLensMessage=memberLens?cell.getMessageObject():null;
+            if(memberLens && !isAvatarPreviewerEnabled()) {
+                ItemOptions.makeOptions(ChatActivity.this,cell)
+                    .add(R.drawable.msg_search,getString(R.string.MemberLensAction),()->openMemberLens(memberLensMessage,user))
+                    .add(R.drawable.msg_openprofile,getString(R.string.OpenProfile),()->openProfile(user))
+                    .setDrawScrim(false).show();
+                return true;
+            }
             if (isAvatarPreviewerEnabled()) {
                 final TLRPC.User controllerUser = getMessagesController().getUser(user.id);
                 final TLRPC.User previewUser = controllerUser != null ? controllerUser : user;
                 final boolean enableMention = currentChat != null && (bottomChannelButtonsLayout == null || bottomChannelButtonsLayout.getVisibility() != View.VISIBLE) && (bottomOverlay == null || bottomOverlay.getVisibility() != View.VISIBLE);
                 final boolean enableSearchMessages = currentChat != null && (threadMessageId == 0 || isTopic) && (!ChatObject.isChannel(currentChat) || currentChat.megagroup);
-                final AvatarPreviewer.MenuItem[] menuItems = new AvatarPreviewer.MenuItem[2 + (enableMention ? 1 : 0) + (enableSearchMessages ? 1 : 0)];
+                final AvatarPreviewer.MenuItem[] menuItems = new AvatarPreviewer.MenuItem[2 + (enableMention ? 1 : 0) + (enableSearchMessages ? 1 : 0) + (memberLens ? 1 : 0)];
                 int a = 0;
                 menuItems[a++] = AvatarPreviewer.MenuItem.OPEN_PROFILE;
                 menuItems[a++] = AvatarPreviewer.MenuItem.SEND_MESSAGE;
+                if(memberLens)menuItems[a++]=AvatarPreviewer.MenuItem.MEMBER_LENS;
                 if (enableMention) {
                     menuItems[a++] = AvatarPreviewer.MenuItem.MENTION;
                 }
@@ -43493,6 +43525,9 @@ public class ChatActivity extends BaseFragment implements
                             case MENTION:
                                 appendMention(previewUser);
                                 break;
+                            case MEMBER_LENS:
+                                openMemberLens(memberLensMessage,previewUser);
+                                break;
                             case SEARCH_MESSAGES:
                                 openSearchWithUser(previewUser);
                                 break;
@@ -43510,6 +43545,7 @@ public class ChatActivity extends BaseFragment implements
                         .addIf(enableMention, R.drawable.msg_mention, getString(R.string.Mention), () -> {
                             appendMention(previewUser);
                         })
+                        .addIf(memberLens,R.drawable.msg_search,getString(R.string.MemberLensAction),()->openMemberLens(memberLensMessage,previewUser))
                         .addIf(enableSearchMessages, R.drawable.msg_search, getString(R.string.AvatarPreviewSearchMessages), () -> {
                             openSearchWithUser(previewUser);
                         })

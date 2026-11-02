@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="MemberLensInteraction">Mensajes e interacción</string>
+  <string name="MemberLensSetting">Filtro rápido por miembro</string>
+  <string name="MemberLensSettingInfo">Consulta los mensajes de un participante dentro de un grupo</string>
+  <string name="MemberLensAction">Ver mensajes de este miembro</string>
+  <string name="MemberLensSubtitle">Mensajes de este miembro</string>
+  <string name="MemberLensEmpty">No se encontraron mensajes de este miembro</string>
+  <string name="MemberLensError">No se pudieron cargar los mensajes. Toca para reintentar.</string>
+  <string name="MemberLensGoTo">Ir al mensaje original</string>
+</resources>

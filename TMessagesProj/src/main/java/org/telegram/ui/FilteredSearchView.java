@@ -101,6 +101,95 @@ import tw.nekomimi.nekogram.utils.ProxyUtil;
 
 @SuppressLint("ViewConstructor")
 public class FilteredSearchView extends FrameLayout implements NotificationCenter.NotificationCenterDelegate, FactorAnimator.Target {
+    private app.flexygram.memberlens.MemberLensScope memberLensScope;
+    private int memberLensRequestId;
+    private boolean memberLensDisposed, memberLensFailed;
+    private int memberLensOffset;
+    private Runnable memberLensState;
+    private java.util.function.Consumer<MessageObject> memberLensNavigate;
+    private RecyclerListView.SelectionAdapter memberLensAdapter;
+    public void configureMemberLens(app.flexygram.memberlens.MemberLensScope scope,
+            java.util.function.Consumer<MessageObject> navigate, Runnable stateChanged) {
+        if (memberLensScope != null) throw new IllegalStateException("Lens scope is immutable");
+        memberLensScope=scope;memberLensNavigate=navigate;memberLensState=stateChanged;
+        recyclerListView.setItemAnimator(null);
+        memberLensAdapter = new RecyclerListView.SelectionAdapter() {
+            @Override public int getItemCount(){return messages.size();}
+            @Override public boolean isEnabled(RecyclerView.ViewHolder holder){return true;}
+            @Override public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent,int type){
+                org.telegram.ui.Cells.ChatMessageCell cell=new org.telegram.ui.Cells.ChatMessageCell(parent.getContext(),scope.account,false,null,parentFragment.getResourceProvider());
+                cell.setDelegate(new org.telegram.ui.Cells.ChatMessageCell.ChatMessageCellDelegate(){
+                    @Override public void didPressImage(org.telegram.ui.Cells.ChatMessageCell c,float x,float y,boolean full){navigateMemberLens(c.getMessageObject());}
+                    @Override public void didPressReplyMessage(org.telegram.ui.Cells.ChatMessageCell c,int id,float x,float y,boolean longpress){navigateMemberLens(c.getMessageObject());}
+                    @Override public boolean needPlayMessage(org.telegram.ui.Cells.ChatMessageCell c,MessageObject message,boolean muted){navigateMemberLens(message);return false;}
+                    @Override public void didPressUrl(org.telegram.ui.Cells.ChatMessageCell c,android.text.style.CharacterStyle url,boolean longPress){navigateMemberLens(c.getMessageObject());}
+                    @Override public void didLongPress(org.telegram.ui.Cells.ChatMessageCell c,float x,float y){
+                        MessageObject selected=c.getMessageObject();
+                        org.telegram.ui.Components.ItemOptions.makeOptions(parentFragment,c).add(org.telegram.messenger.R.drawable.msg_search,LocaleController.getString(R.string.MemberLensGoTo),()->navigateMemberLens(selected)).show();
+                    }
+                });
+                android.widget.LinearLayout row=new android.widget.LinearLayout(parent.getContext());row.setOrientation(android.widget.LinearLayout.VERTICAL);
+                android.widget.TextView date=new android.widget.TextView(parent.getContext());date.setTextSize(12);date.setGravity(android.view.Gravity.CENTER);
+                date.setPadding(0,AndroidUtilities.dp(8),0,AndroidUtilities.dp(6));row.addView(date,new android.widget.LinearLayout.LayoutParams(-1,-2));
+                row.addView(cell,new android.widget.LinearLayout.LayoutParams(-1,-2));
+                return new RecyclerListView.Holder(row);
+            }
+            @Override public void onBindViewHolder(RecyclerView.ViewHolder holder,int position){
+                android.widget.LinearLayout row=(android.widget.LinearLayout)holder.itemView;
+                android.widget.TextView date=(android.widget.TextView)row.getChildAt(0);
+                MessageObject message=messages.get(position);
+                String label=LocaleController.formatDateChat(message.messageOwner.date);
+                boolean show=position==0 || !label.equals(LocaleController.formatDateChat(messages.get(position-1).messageOwner.date));
+                date.setText(label);date.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText,parentFragment.getResourceProvider()));date.setVisibility(show?View.VISIBLE:View.GONE);
+                org.telegram.ui.Cells.ChatMessageCell cell=(org.telegram.ui.Cells.ChatMessageCell)row.getChildAt(1);
+                cell.isChat=true;cell.setMessageObject(message,null,false,false,false);
+            }
+        };
+        adapter=memberLensAdapter;recyclerListView.setAdapter(adapter);
+        recyclerListView.setOnItemClickListener((view,position)->{if(position>=0&&position<messages.size())navigateMemberLens(messages.get(position));});
+        recyclerListView.setOnItemLongClickListener((view,position)->{
+            if(position>=0&&position<messages.size()){
+                MessageObject selected=messages.get(position);
+                org.telegram.ui.Components.ItemOptions.makeOptions(parentFragment,view)
+                    .add(R.drawable.msg_search,LocaleController.getString(R.string.MemberLensGoTo),()->navigateMemberLens(selected)).show();
+            }return true;
+        });
+    }
+    private void navigateMemberLens(MessageObject message){if(!memberLensDisposed&&memberLensNavigate!=null)memberLensNavigate.accept(message);}
+    public static final class MemberLensSnapshot {
+        private final String scopeKey,query;
+        private final ArrayList<MessageObject> messages;
+        private final int offset,total;
+        private final boolean end;
+        private MemberLensSnapshot(FilteredSearchView view){scopeKey=view.memberLensScope.key();query=view.currentSearchString;
+            messages=new ArrayList<>(view.messages);offset=view.memberLensOffset;total=view.totalCount;end=view.endReached;}
+    }
+    public MemberLensSnapshot saveMemberLensState(){return memberLensScope==null?null:new MemberLensSnapshot(this);}
+    public boolean restoreMemberLensState(MemberLensSnapshot saved,String query){
+        if(saved==null||!saved.scopeKey.equals(memberLensScope.key())||!java.util.Objects.equals(saved.query,query)||saved.messages.isEmpty())return false;
+        messages.addAll(saved.messages);for(MessageObject message:messages)messagesById.put(message.getId(),message);
+        memberLensOffset=saved.offset;totalCount=saved.total;endReached=saved.end;currentSearchDialogId=memberLensScope.dialogId;currentSearchString=query;lastMessagesSearchString=query;
+        lastSearchFilterQueryString=String.format(Locale.ENGLISH,"%d%d%d%d%d%s%s",memberLensScope.dialogId,0,0,0,-1,query,false)+":"+memberLensScope.key();
+        isLoading=false;firstLoading=false;adapter.notifyDataSetChanged();memberLensStateChanged();return true;
+    }
+    public void retryMemberLens(){
+        if(memberLensScope!=null && memberLensFailed){
+            boolean firstPage=messages.isEmpty();memberLensFailed=false;
+            search(memberLensScope.dialogId,0,0,0,null,false,currentSearchString,firstPage);
+        }
+    }
+    public boolean memberLensFailed(){return memberLensFailed;}
+    public boolean memberLensLoading(){return isLoading;}
+    public void disposeMemberLens(){
+        if(memberLensScope==null||memberLensDisposed)return;
+        memberLensDisposed=true;requestIndex++;
+        AndroidUtilities.cancelRunOnUIThread(searchRunnable);AndroidUtilities.cancelRunOnUIThread(clearCurrentResultsRunnable);
+        if(memberLensRequestId!=0)ConnectionsManager.getInstance(memberLensScope.account).cancelRequest(memberLensRequestId,true);
+        AndroidUtilities.cancelRunOnUIThread(hideFloatingDateRunnable);
+        memberLensRequestId=0;memberLensNavigate=null;memberLensState=null;
+        recyclerListView.setAdapter(null);messages.clear();messagesById.clear();sections.clear();sectionArrays.clear();
+    }
+    private void memberLensStateChanged(){if(memberLensScope!=null)emptyView.setVisibility(View.GONE);if(memberLensState!=null)memberLensState.run();}
     private static final int ANIMATOR_ID_FLOATING_DATE_VISIBLE = 0;
     private final BoolAnimator animatorFloatingDataVisible = new BoolAnimator(ANIMATOR_ID_FLOATING_DATE_VISIBLE, this, CubicBezierInterpolator.EASE_OUT_QUINT, 380);
 
@@ -573,9 +662,18 @@ public class FilteredSearchView extends FrameLayout implements NotificationCente
     }
 
     public void search(long dialogId, long communityId, long minDate, long maxDate, FiltersView.MediaFilterData currentSearchFilter, boolean includeFolder, String query, boolean clearOldResults) {
+        if (memberLensScope != null) {
+            if (memberLensDisposed || dialogId != memberLensScope.dialogId || communityId != 0) return;
+            if (!clearOldResults && (isLoading || endReached || memberLensFailed)) return;
+            if (clearOldResults && !memberLensFailed && isLoading && java.util.Objects.equals(currentSearchString,query==null?"":query)) return;
+            if (clearOldResults) { lastSearchFilterQueryString=null;endReached=false; }
+            if (memberLensRequestId != 0) ConnectionsManager.getInstance(memberLensScope.account).cancelRequest(memberLensRequestId,true);
+            memberLensRequestId=0;memberLensFailed=false;
+            if (clearOldResults) memberLensOffset=0;
+        }
         if (query == null) query = "";
         final String finalQuery = query;
-        String currentSearchFilterQueryString = String.format(Locale.ENGLISH, "%d%d%d%d%d%s%s", dialogId, communityId, minDate, maxDate, currentSearchFilter == null ? -1 : currentSearchFilter.filterType, query, includeFolder);
+        String currentSearchFilterQueryString = String.format(Locale.ENGLISH, "%d%d%d%d%d%s%s", dialogId, communityId, minDate, maxDate, currentSearchFilter == null ? -1 : currentSearchFilter.filterType, query, includeFolder) + (memberLensScope==null?"":":"+memberLensScope.key());
         boolean filterAndQueryIsSame = lastSearchFilterQueryString != null && lastSearchFilterQueryString.equals(currentSearchFilterQueryString);
         boolean forceClear = !filterAndQueryIsSame && clearOldResults;
         this.currentSearchFilter = currentSearchFilter;
@@ -615,7 +713,7 @@ public class FilteredSearchView extends FrameLayout implements NotificationCente
             return;
         }
         isLoading = true;
-        if (adapter != null) {
+        if (adapter != null && memberLensScope==null) {
             adapter.notifyDataSetChanged();
         }
 
@@ -633,7 +731,8 @@ public class FilteredSearchView extends FrameLayout implements NotificationCente
         }
         requestIndex++;
         final int requestId = requestIndex;
-        int currentAccount = UserConfig.selectedAccount;
+        int currentAccount = memberLensScope==null?UserConfig.selectedAccount:memberLensScope.account;
+        memberLensStateChanged();
 
         AndroidUtilities.runOnUIThread(searchRunnable = () -> {
             TLMethod<TLRPC.messages_Messages> request;
@@ -645,6 +744,10 @@ public class FilteredSearchView extends FrameLayout implements NotificationCente
                 req.limit = 20;
                 req.filter = currentSearchFilter == null ? new TLRPC.TL_inputMessagesFilterEmpty() : currentSearchFilter.filter;
                 req.peer = AccountInstance.getInstance(currentAccount).getMessagesController().getInputPeer(dialogId);
+                if(memberLensScope!=null){
+                    req.from_id=AccountInstance.getInstance(currentAccount).getMessagesController().getInputPeer(memberLensScope.userId);req.flags|=1;
+                    if(memberLensScope.topicId!=0){req.top_msg_id=memberLensScope.topicId;req.flags|=2;}
+                }
                 if (minDate > 0) {
                     req.min_date = (int) (minDate / 1000);
                 }
@@ -657,6 +760,7 @@ public class FilteredSearchView extends FrameLayout implements NotificationCente
                 } else {
                     req.offset_id = 0;
                 }
+                if(memberLensScope!=null)req.offset_id=memberLensOffset;
                 request = req;
             } else {
                 if (!TextUtils.isEmpty(finalQuery)) {
@@ -699,9 +803,9 @@ public class FilteredSearchView extends FrameLayout implements NotificationCente
             ArrayList<Object> finalResultArray = resultArray;
             final ArrayList<FiltersView.DateData> dateData = new ArrayList<>();
             FiltersView.fillTipDates(lastMessagesSearchString, dateData);
-            ConnectionsManager.getInstance(currentAccount).sendRequestTyped(request, (response, error) -> {
+            int sentRequestId = ConnectionsManager.getInstance(currentAccount).sendRequestTyped(request, (response, error) -> {
                 ArrayList<MessageObject> messageObjects = new ArrayList<>();
-                if (error == null) {
+                if (error == null && response != null) {
                     TLRPC.messages_Messages res = response;
                     int n = res.messages.size();
                     for (int i = 0; i < n; i++) {
@@ -716,6 +820,17 @@ public class FilteredSearchView extends FrameLayout implements NotificationCente
                         return;
                     }
                     isLoading = false;
+                    if(memberLensScope!=null){
+                        if(memberLensDisposed)return;
+                        memberLensRequestId=0;
+                        boolean valid=error==null && response!=null;
+                        if(valid)for(MessageObject message:messageObjects){
+                            long sender=message.messageOwner.from_id==null?0:message.messageOwner.from_id.user_id;
+                            if(!memberLensScope.accepts(message.getDialogId(),sender)
+                                    || memberLensScope.topicId!=0 && MessageObject.getTopicId(currentAccount,message.messageOwner,true)!=memberLensScope.topicId){valid=false;break;}
+                        }
+                        if(!valid){memberLensFailed=true;emptyView.showProgress(false);memberLensStateChanged();return;}
+                    }
                     if (error != null) {
                         emptyView.title.setText(LocaleController.getString(R.string.SearchEmptyViewTitle2));
                         emptyView.subtitle.setVisibility(View.VISIBLE);
@@ -739,9 +854,11 @@ public class FilteredSearchView extends FrameLayout implements NotificationCente
                     }
                     totalCount = res.count;
                     currentDataQuery = finalQuery;
+                    int oldLensSize=messages.size();
                     int n = messageObjects.size();
                     for (int i = 0; i < n; i++) {
                         MessageObject messageObject = messageObjects.get(i);
+                        if(memberLensScope!=null && messagesById.get(messageObject.getId())!=null)continue;
                         ArrayList<MessageObject> messageObjectsByDate = sectionArrays.get(messageObject.monthKey);
                         if (messageObjectsByDate == null) {
                             messageObjectsByDate = new ArrayList<>();
@@ -752,7 +869,7 @@ public class FilteredSearchView extends FrameLayout implements NotificationCente
                         messages.add(messageObject);
                         messagesById.put(messageObject.getId(), messageObject);
 
-                        if (PhotoViewer.getInstance().isVisible()) {
+                        if (memberLensScope==null && PhotoViewer.getInstance().isVisible()) {
                             PhotoViewer.getInstance().addPhoto(messageObject, photoViewerClassGuid);
                         }
                     }
@@ -760,6 +877,18 @@ public class FilteredSearchView extends FrameLayout implements NotificationCente
                         totalCount = messages.size();
                     }
                     endReached = messages.size() >= totalCount;
+                    if(memberLensScope!=null){
+                        int next=messageObjects.isEmpty()?memberLensOffset:messageObjects.get(messageObjects.size()-1).getId();
+                        endReached = endReached || messageObjects.size()<20 || next==memberLensOffset;
+                        memberLensOffset=next;firstLoading=false;
+                        adapter=memberLensAdapter;
+                        if(recyclerListView.getAdapter()!=adapter)recyclerListView.setAdapter(adapter);
+                        if(filterAndQueryIsSame && oldLensSize>0)adapter.notifyItemRangeInserted(oldLensSize,messages.size()-oldLensSize);
+                        else adapter.notifyDataSetChanged();
+                        emptyView.title.setText(LocaleController.getString(R.string.MemberLensEmpty));
+                        emptyView.subtitle.setVisibility(View.GONE);
+                        memberLensStateChanged();return; // No per-row enter animations or unrelated local search.
+                    }
 
                     if (messages.isEmpty()) {
                         if (currentSearchFilter != null) {
@@ -919,7 +1048,8 @@ public class FilteredSearchView extends FrameLayout implements NotificationCente
                     adapter.notifyDataSetChanged();
                 });
             });
-        }, (filterAndQueryIsSame && !messages.isEmpty()) ? 0 : 350);
+            if(memberLensScope!=null)memberLensRequestId=sentRequestId;
+        }, memberLensScope!=null ? (clearOldResults && !TextUtils.isEmpty(finalQuery) ? 250 : 0) : (filterAndQueryIsSame && !messages.isEmpty()) ? 0 : 350);
 
         if (currentSearchFilter == null) {
             loadingView.setViewType(FlickerLoadingView.DIALOG_TYPE);
@@ -1604,7 +1734,7 @@ public class FilteredSearchView extends FrameLayout implements NotificationCente
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        NotificationCenter.getInstance(lastAccount = UserConfig.selectedAccount).addObserver(this, NotificationCenter.emojiLoaded);
+        NotificationCenter.getInstance(lastAccount = memberLensScope==null?UserConfig.selectedAccount:memberLensScope.account).addObserver(this, NotificationCenter.emojiLoaded);
     }
 
     @Override

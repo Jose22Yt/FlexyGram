@@ -15,6 +15,7 @@ def write(dest,root):
   p=dest/path;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(s)
  emit('app/flexygram/home/SmartPreviewsSettingsActivity.java','package app.flexygram.home;public class SmartPreviewsSettingsActivity extends tw.nekomimi.nekogram.settings.BaseNekoSettingsActivity{protected String getActionBarTitle(){return "Smart Previews";}protected BaseListAdapter createAdapter(android.content.Context c){return new BaseListAdapter(c){};}protected void onItemClick(android.view.View v,int p,float x,float y){}}')
  emit('org/telegram/messenger/BuildVars.java','package org.telegram.messenger;public class BuildVars{public static String BUILD_VERSION_STRING="ISOLATED HOST";}')
+ emit('app/flexygram/memberlens/MemberLensSettingsSection.java','package app.flexygram.memberlens;public class MemberLensSettingsSection extends app.exteraless.settings.OpenExteraGeneralActivity{}')
  emit('app/flexygram/effects/GlareSettingsSection.java','package app.flexygram.effects;public class GlareSettingsSection extends app.exteraless.settings.OpenExteraGeneralActivity{}')
  (dest/'androidx/recyclerview/widget/RecyclerView.java').unlink()
  emit('app/flexygram/settings/signature/SignatureDirectSettingsActivity.java','package app.flexygram.settings.signature;public class SignatureDirectSettingsActivity extends org.telegram.ui.ActionBar.BaseFragment{public final String category;public SignatureDirectSettingsActivity(String s){category=s;}}')
