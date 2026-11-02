@@ -112,6 +112,8 @@ public class FilteredSearchView extends FrameLayout implements NotificationCente
             java.util.function.Consumer<MessageObject> navigate, Runnable stateChanged) {
         if (memberLensScope != null) throw new IllegalStateException("Lens scope is immutable");
         memberLensScope=scope;memberLensNavigate=navigate;memberLensState=stateChanged;
+        // Lens owns its single loading/error/empty row; do not re-show the generic empty panel.
+        recyclerListView.setEmptyView(null);emptyView.setVisibility(View.GONE);
         recyclerListView.setItemAnimator(null);
         memberLensAdapter = new RecyclerListView.SelectionAdapter() {
             @Override public int getItemCount(){return messages.size();}

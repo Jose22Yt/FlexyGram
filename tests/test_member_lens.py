@@ -102,6 +102,7 @@ def test_original_is_retained_and_filtered_cells_are_native():
  assert 'new org.telegram.ui.Cells.ChatMessageCell' in s and 'cell.setMessageObject(message,null,false,false,false)' in s
  assert 'LocaleController.formatDateChat' in s
  assert 'MemberLensGoTo' in s
+ assert 'recyclerListView.setEmptyView(null)' in s
 
 def test_locales_and_no_new_manifest_signing_distribution_changes():
  sets=[]
