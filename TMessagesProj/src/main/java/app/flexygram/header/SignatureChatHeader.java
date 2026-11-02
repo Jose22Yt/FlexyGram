@@ -30,11 +30,21 @@ public final class SignatureChatHeader {
     public float height, titlePx, subtitlePx;
     public boolean fusionActive() { return fusionLayout && HeaderConfig.fusion() && active(); }
     public app.flexygram.header.fusion.SignatureFusionGeometry.Layout fusionGeometry() { return fusion == null ? null : fusion.layout; }
+    private final android.graphics.RectF badgeRect = new android.graphics.RectF();
+    private final android.graphics.Paint badgePaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
     public boolean subtitleFits = true;
-    public void detach() { bar.setSignatureHeader(null); avatar.setSignatureHeader(null); }
+    public void detach() {
+        if (bar != null && bar.getBackButtonDrawable() instanceof org.telegram.ui.ActionBar.BackDrawable) {
+            ((org.telegram.ui.ActionBar.BackDrawable) bar.getBackButtonDrawable()).setIosStyle(false);
+        }
+        bar.setSignatureHeader(null);
+        avatar.setSignatureHeader(null);
+    }
     public SignatureChatHeader(ActionBar bar, ChatAvatarContainer avatar, Theme.ResourcesProvider provider) {
         this.bar = bar; this.avatar = avatar; this.provider = provider;
-
+        if (bar != null && bar.getBackButtonDrawable() instanceof org.telegram.ui.ActionBar.BackDrawable) {
+            ((org.telegram.ui.ActionBar.BackDrawable) bar.getBackButtonDrawable()).setIosStyle(enabled());
+        }
     }
     private int unreadCount = 0;
     private android.text.StaticLayout unreadLayout;
@@ -117,6 +127,9 @@ public final class SignatureChatHeader {
         if (bar.backButtonImageView == null) return;
         if (active()) {
             var back = bar.backButtonImageView;
+            if (bar.getBackButtonDrawable() instanceof org.telegram.ui.ActionBar.BackDrawable) {
+                ((org.telegram.ui.ActionBar.BackDrawable) bar.getBackButtonDrawable()).setIosStyle(true);
+            }
             back.setTranslationX(0);
             int extra = Math.round(geometry.back.width() - (fusionActive() ? geometry.back.height() : height));
             int pl = LocaleController.isRTL ? extra : 0, pr = LocaleController.isRTL ? 0 : extra;
@@ -127,7 +140,12 @@ public final class SignatureChatHeader {
             back.setUnread(0);
             back.setContentDescription(LocaleController.getString(R.string.AccDescrGoBack));
             avatar.setTranslationX(0);
-        } else { bar.backButtonImageView.setPadding(AndroidUtilities.dp(1), 0, 0, 0); }
+        } else {
+            if (bar.getBackButtonDrawable() instanceof org.telegram.ui.ActionBar.BackDrawable) {
+                ((org.telegram.ui.ActionBar.BackDrawable) bar.getBackButtonDrawable()).setIosStyle(false);
+            }
+            bar.backButtonImageView.setPadding(AndroidUtilities.dp(1), 0, 0, 0);
+        }
     }
     public void draw(Canvas canvas) {
         // Native Liquid Glass is a Telegram power-saving flag, not a new Flexy master switch.
@@ -154,18 +172,39 @@ public final class SignatureChatHeader {
     private void drawUnread(Canvas canvas) {
         if (!geometry.countVisible || unreadLayout == null || unreadCount <= 0) return;
         canvas.save();
-        int textColor = Theme.getColor(Theme.key_actionBarDefaultTitle, provider);
-        int previousColor = Theme.dialogs_countTextPaint.getColor();
-        Theme.dialogs_countTextPaint.setColor(textColor);
+        int surfaceColor = Theme.getColor(Theme.key_windowBackgroundWhite, provider);
+        boolean isDark = androidx.core.graphics.ColorUtils.calculateLuminance(surfaceColor) < 0.5f;
+        badgePaint.setColor(isDark ? 0xff2c2c2e : 0xff161618);
+
+        float badgeHeight = AndroidUtilities.dp(23);
+        float badgeRadius = badgeHeight / 2f;
+        float textWidth = unreadLayout.getWidth();
+        float badgePadH = AndroidUtilities.dp(6);
+        float badgeWidth = Math.max(badgeHeight, textWidth + badgePadH * 2);
+
         if (geometry.separateCount) {
-            canvas.translate(geometry.badge.centerX() - unreadLayout.getWidth() / 2f,
-                    geometry.badge.centerY() - unreadLayout.getHeight() / 2f);
+            badgeRect.set(geometry.badge.centerX() - badgeWidth / 2f,
+                    geometry.badge.centerY() - badgeHeight / 2f,
+                    geometry.badge.centerX() + badgeWidth / 2f,
+                    geometry.badge.centerY() + badgeHeight / 2f);
         } else {
-            float textX = LocaleController.isRTL
-                    ? geometry.back.left + AndroidUtilities.dp(8)
-                    : geometry.back.right - unreadLayout.getWidth() - AndroidUtilities.dp(8);
-            canvas.translate(textX, geometry.back.centerY() - unreadLayout.getHeight() / 2f);
+            float margin = AndroidUtilities.dp(7);
+            if (LocaleController.isRTL) {
+                float left = geometry.back.left + margin;
+                badgeRect.set(left, geometry.back.centerY() - badgeHeight / 2f,
+                        left + badgeWidth, geometry.back.centerY() + badgeHeight / 2f);
+            } else {
+                float right = geometry.back.right - margin;
+                badgeRect.set(right - badgeWidth, geometry.back.centerY() - badgeHeight / 2f,
+                        right, geometry.back.centerY() + badgeHeight / 2f);
+            }
         }
+        canvas.drawRoundRect(badgeRect, badgeRadius, badgeRadius, badgePaint);
+
+        int previousColor = Theme.dialogs_countTextPaint.getColor();
+        Theme.dialogs_countTextPaint.setColor(0xffffffff);
+        canvas.translate(badgeRect.centerX() - textWidth / 2f,
+                badgeRect.centerY() - unreadLayout.getHeight() / 2f);
         unreadLayout.draw(canvas);
         Theme.dialogs_countTextPaint.setColor(previousColor);
         canvas.restore();

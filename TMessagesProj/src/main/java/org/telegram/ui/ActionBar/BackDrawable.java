@@ -40,6 +40,20 @@ public class BackDrawable extends Drawable {
     private boolean rotated = true;
     private int arrowRotation;
 
+    private boolean iosStyle;
+    private android.graphics.Path iosPath;
+
+    public void setIosStyle(boolean value) {
+        if (iosStyle != value) {
+            iosStyle = value;
+            invalidateSelf();
+        }
+    }
+
+    public boolean isIosStyle() {
+        return iosStyle;
+    }
+
     public float getRotation() {
         return finalRotation;
     }
@@ -133,6 +147,31 @@ public class BackDrawable extends Drawable {
         } else {
             canvas.rotate(135 + currentRotation * (reverseAngle ? -180 : 180));
             rotation = 1.0f;
+        }
+        if (iosStyle) {
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeJoin(Paint.Join.ROUND);
+            paint.setStrokeCap(Paint.Cap.ROUND);
+            if (rotation == 0) {
+                paint.setStrokeWidth(AndroidUtilities.dp(2.75f));
+                if (iosPath == null) {
+                    iosPath = new android.graphics.Path();
+                }
+                iosPath.rewind();
+                float tipX = AndroidUtilities.dp(-2.5f);
+                float endX = AndroidUtilities.dp(4.2f);
+                float endY = AndroidUtilities.dp(7.2f);
+                iosPath.moveTo(endX, -endY);
+                iosPath.lineTo(tipX, 0);
+                iosPath.lineTo(endX, endY);
+                canvas.drawPath(iosPath, paint);
+                canvas.restore();
+                return;
+            } else {
+                paint.setStrokeWidth(AndroidUtilities.dp(AndroidUtilities.lerp(2.75f, 2f, rotation)));
+            }
+        } else {
+            paint.setStrokeWidth(AndroidUtilities.dp(2));
         }
         canvas.drawLine(AndroidUtilities.dp(AndroidUtilities.lerp(-6.75f, -8f, rotation)), 0, AndroidUtilities.dp(8) - (paint.getStrokeWidth() / 2f) * (1f - rotation), 0, paint);
         float startYDiff = AndroidUtilities.dp(-0.25f);

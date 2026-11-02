@@ -356,6 +356,9 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
             backDrawable.setRotation(isActionModeShowed() ? 1 : 0, false);
             backDrawable.setRotatedColor(itemsActionModeColor);
             backDrawable.setColor(itemsColor);
+            if (signatureHeader != null && signatureHeader.enabled()) {
+                backDrawable.setIosStyle(true);
+            }
         } else if (drawable instanceof MenuDrawable) {
             MenuDrawable menuDrawable = (MenuDrawable) drawable;
             menuDrawable.setBackColor(actionBarColor);
@@ -1495,7 +1498,13 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
     private BlurredBackgroundDrawableViewFactory signatureGlassFactory;
     private BlurredBackgroundColorProvider signatureGlassColorProvider;
     private app.flexygram.header.SignatureChatHeader signatureHeader;
-    public void setSignatureHeader(app.flexygram.header.SignatureChatHeader header) { signatureHeader = header; requestLayout(); }
+    public void setSignatureHeader(app.flexygram.header.SignatureChatHeader header) {
+        signatureHeader = header;
+        if (backButtonDrawable instanceof BackDrawable) {
+            ((BackDrawable) backButtonDrawable).setIosStyle(header != null && header.enabled());
+        }
+        requestLayout();
+    }
 
     /**
      * Flexy Signature reuses the host's own blur3 drawables when Telegram's
