@@ -45,7 +45,7 @@ jobs:
     timeout-minutes: 180
     env:
       NATIVE_TARGET: arm64-v8a
-      SOURCE_COMMIT: 932c9a6db84fab52ab167d4c8ee70957b3e57223
+      SOURCE_COMMIT: bdaafa009a750c262c4cbbc305839b70085b1e13
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
@@ -60,7 +60,7 @@ jobs:
         run: python3 control/.github/beta/audit_environment.py
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          ref: 932c9a6db84fab52ab167d4c8ee70957b3e57223
+          ref: bdaafa009a750c262c4cbbc305839b70085b1e13
           path: source
           submodules: recursive
           persist-credentials: false
