@@ -67,6 +67,12 @@ public class BlurredBackgroundColorProviderThemed implements BlurredBackgroundCo
     }
 
     @Override
+    public int getStrokeColorFull() {
+        // A divider may be almost transparent on custom themes. Keep the solid contour visible.
+        return Theme.multAlpha(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText, resourcesProvider), isDark() ? .28f : .20f);
+    }
+
+    @Override
     public int getStrokeColorBottom() {
         return strokeColorBottom;
     }

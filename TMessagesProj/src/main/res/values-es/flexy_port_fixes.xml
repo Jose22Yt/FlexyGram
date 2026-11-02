@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexySeparateSearch">Burbuja de búsqueda separada</string>
+    <string name="FlexySeparateSearchInfo">Muestra Buscar al lado del dock, fuera de sus pestañas.</string>
+</resources>

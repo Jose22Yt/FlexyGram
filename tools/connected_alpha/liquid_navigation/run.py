@@ -21,6 +21,11 @@ def write(source,root):
  put('me/vkryl/android/ViewUtils.java','''package me.vkryl.android;public class ViewUtils{public static void hapticVibrate(android.view.View v,boolean a,boolean b){}public static void onClick(android.view.View v){}public static void runJustBeforeBeingDrawn(android.view.View v,Runnable r){v.post(r);}}''')
  put('org/telegram/ui/Components/glass/GlassTabView.java','''package org.telegram.ui.Components.glass;public class GlassTabView extends android.widget.FrameLayout implements org.telegram.ui.MainTabsLayout.Tab{private boolean selected,skip;public GlassTabView(android.content.Context c){super(c);setClickable(true);}public boolean isTabSelected(){return selected;}public void setSelected(boolean value,boolean animated){selected=value;}public void setSkipDrawSelector(boolean v){skip=v;}public void setVisualWidth(float w){}public float measureTextWidth(){return 32;}public float measureTextWidth(float v){return 32;}public void setTextSizeDp(float v){}public void setMainTabsAppearance(boolean hidden,int size){}}''')
 
+ # Explicit native-glass host doubles: this probe exercises layout, NOT GPU blur.
+ put('org/telegram/messenger/SharedConfig.java','package org.telegram.messenger;public class SharedConfig{public static boolean chatBlurEnabled(){return false;}}')
+ put('org/telegram/messenger/LiteMode.java','package org.telegram.messenger;public class LiteMode{public static final int FLAG_LIQUID_GLASS=1;public static boolean isEnabled(int flag){return false;}}')
+ put('org/telegram/ui/Components/blur3/drawable/BlurredBackgroundDrawable.java','''package org.telegram.ui.Components.blur3.drawable;public class BlurredBackgroundDrawable extends android.graphics.drawable.Drawable{public BlurredBackgroundDrawable setRadius(float radius){return this;}public void updateColors(){}public void draw(android.graphics.Canvas canvas){}public void setAlpha(int alpha){}public void setColorFilter(android.graphics.ColorFilter filter){}public int getOpacity(){return android.graphics.PixelFormat.TRANSLUCENT;}}''')
+
  # Execute the actual MainTabsActivity visibility method, not a rewritten condition.
  native=(java/'org/telegram/ui/MainTabsActivity.java').read_text()
  anchor=native.index('    private void checkUi_tabsPosition()')

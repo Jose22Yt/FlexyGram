@@ -25,6 +25,7 @@ public final class SignatureChatHeader {
     }
     private Fusion fusion;
     private boolean fusionLayout;
+    private boolean nativeGlassDrawn;
     public float fusionTop;
     public float height, titlePx, subtitlePx;
     public boolean fusionActive() { return fusionLayout && HeaderConfig.fusion() && active(); }
@@ -63,13 +64,19 @@ public final class SignatureChatHeader {
         textMetrics.setTextSize(subtitlePx); textMetrics.getFontMetricsInt(fontMetrics);
         int subtitleLine = fontMetrics.descent - fontMetrics.ascent;
         fusionLayout = false;
+        int mode = HeaderConfig.counter() ? HeaderConfig.counterMode() : 0;
+        float numberWidth = mode != 0 && unreadCount > 0 && unreadLayout != null
+                ? unreadLayout.getWidth() : 0;
+        float countExtra = numberWidth <= 0 ? 0 : mode == 2
+                ? Math.max(AndroidUtilities.dp(28), numberWidth + AndroidUtilities.dp(8)) + AndroidUtilities.dp(3)
+                : numberWidth + AndroidUtilities.dp(16);
         if (HeaderConfig.fusion() && active()) {
             if (fusion == null) fusion = new Fusion();
             var g = HeaderConfig.portrait()
                     ? app.flexygram.header.fusion.SignatureFusionGeometry.updatePortrait(fusion.layout,
-                        width, AndroidUtilities.density, LocaleController.isRTL, avatar.signatureCallAvailable())
+                        width, AndroidUtilities.density, LocaleController.isRTL, avatar.signatureCallAvailable(), countExtra)
                     : app.flexygram.header.fusion.SignatureFusionGeometry.update(fusion.layout,
-                        width, AndroidUtilities.density, LocaleController.isRTL, avatar.signatureCallAvailable());
+                        width, AndroidUtilities.density, LocaleController.isRTL, avatar.signatureCallAvailable(), countExtra);
             // Keep the approved compact sizes; large fonts/narrow windows use the existing Adaptive path.
             if (g.fits && titleLine + subtitleLine + AndroidUtilities.dp(2) <= g.height - AndroidUtilities.dp(8)) {
                 bar.prepareSignatureNativeGlass(g.mattePortrait && g.callAvailable);
@@ -79,7 +86,11 @@ public final class SignatureChatHeader {
                 geometry.back.set(g.back.left,g.back.top+fusionTop,g.back.right,g.back.bottom+fusionTop);
                 geometry.title.set(g.text.left,g.text.top+fusionTop,g.text.right,g.text.bottom+fusionTop);
                 geometry.avatar.set(g.portrait.left,g.portrait.top+fusionTop,g.portrait.right,g.portrait.bottom+fusionTop);
-                geometry.countVisible = geometry.separateCount = false;
+                geometry.countVisible = numberWidth > 0;
+                geometry.separateCount = numberWidth > 0 && mode == 2;
+                app.flexygram.header.fusion.SignatureFusionGeometry.placeUnread(g, numberWidth, mode, AndroidUtilities.density);
+                geometry.badge.set(g.unread.left,g.unread.top+fusionTop,g.unread.right,g.unread.bottom+fusionTop);
+                bar.prepareSignatureUnreadGlass(geometry.separateCount);
                 return content;
             }
         }
@@ -91,14 +102,9 @@ public final class SignatureChatHeader {
         titlePx = Math.min(titlePx, height - AndroidUtilities.dp(8));
         int content = Math.max(nativeHeight, Math.round(height) + AndroidUtilities.dp(12));
         float titleWidth = avatar.signaturePreferredTitleWidth(titlePx, subtitlePx, textMetrics);
-        float numberWidth = 0;
-        int mode = HeaderConfig.counter() ? HeaderConfig.counterMode() : 0;
-        if (mode != 0 && unreadCount > 0 && unreadLayout != null) {
-            String str = unreadCount > 99 ? "99+" : Integer.toString(unreadCount);
-            numberWidth = Theme.dialogs_countTextPaint.measureText(str);
-        }
         geometry.update(width, status + (content - height) / 2f, height, numberWidth,
                 AndroidUtilities.density, LocaleController.isRTL, mode, titleWidth);
+        bar.prepareSignatureUnreadGlass(geometry.separateCount);
         return content;
     }
     public void measureControls() {
@@ -127,7 +133,11 @@ public final class SignatureChatHeader {
         // Native Liquid Glass is a Telegram power-saving flag, not a new Flexy master switch.
         // Use the existing ActionBar blur3 sources only when they are ready.
         // Solid Signature rendering remains bit-for-bit unchanged when the flag is off.
-        if (bar.drawSignatureNativeGlass(canvas, this)) return;
+        nativeGlassDrawn = bar.drawSignatureNativeGlass(canvas, this);
+        if (nativeGlassDrawn) {
+            drawUnread(canvas);
+            return;
+        }
         if (!fusionActive()) {
             surface.draw(canvas, geometry, AndroidUtilities.density, provider);
             drawUnread(canvas);
@@ -145,6 +155,7 @@ public final class SignatureChatHeader {
         if (!geometry.countVisible || unreadLayout == null || unreadCount <= 0) return;
         canvas.save();
         int textColor = Theme.getColor(Theme.key_actionBarDefaultTitle, provider);
+        int previousColor = Theme.dialogs_countTextPaint.getColor();
         Theme.dialogs_countTextPaint.setColor(textColor);
         if (geometry.separateCount) {
             canvas.translate(geometry.badge.centerX() - unreadLayout.getWidth() / 2f,
@@ -156,11 +167,12 @@ public final class SignatureChatHeader {
             canvas.translate(textX, geometry.back.centerY() - unreadLayout.getHeight() / 2f);
         }
         unreadLayout.draw(canvas);
+        Theme.dialogs_countTextPaint.setColor(previousColor);
         canvas.restore();
     }
     /** One final center contour, after the real avatar; no double edge under the fading image. */
     public void drawForeground(Canvas canvas) {
-        if (!fusionActive()) return;
+        if (!fusionActive() || nativeGlassDrawn) return;
         int border = (Theme.getColor(Theme.key_divider, provider) & 0xffffff) | 0x66000000;
         int save = canvas.save(); canvas.translate(0, fusionTop);
         fusion.surface.drawCenterBorder(canvas, fusion.layout, border, AndroidUtilities.density);

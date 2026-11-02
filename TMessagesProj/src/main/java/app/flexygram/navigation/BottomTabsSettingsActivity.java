@@ -27,7 +27,7 @@ public final class BottomTabsSettingsActivity extends SignatureMatteSettingsActi
     private int previewRow;
     private DockPreviewCell previewCell;
     private int tabsHeaderRow, showTabsRow;
-    private int appearanceHeaderRow, floatingDockRow, showTitlesRow;
+    private int appearanceHeaderRow, floatingDockRow, showTitlesRow, separateSearchRow;
     private int actionsHeaderRow, doubleTapChatsRow, doubleTapProfileRow, alwaysSearchChatsRow;
     private int orderHeaderRow, restoreRow;
     private int orderStartRow, orderEndRow;
@@ -60,6 +60,7 @@ public final class BottomTabsSettingsActivity extends SignatureMatteSettingsActi
         previewRow = addRow();
         showTitlesRow = addRow("flexyBottomTabsShowTitles");
         floatingDockRow = addRow("flexyBottomTabsFloatingDock");
+        separateSearchRow = addRow("flexySeparateSearch");
 
         actionsHeaderRow = addRow("FlexyBottomTabsSectionActions");
         doubleTapChatsRow = addRow("flexyBottomTabsDoubleTapChats");
@@ -108,6 +109,9 @@ public final class BottomTabsSettingsActivity extends SignatureMatteSettingsActi
             LiquidNavigationConfig.setFloatingDock(!LiquidNavigationConfig.isFloatingDock());
             listAdapter.notifyItemChanged(floatingDockRow);
             if (previewCell != null) previewCell.update();
+        } else if (position == separateSearchRow) {
+            LiquidNavigationConfig.setSeparateSearch(!LiquidNavigationConfig.separateSearch());
+            listAdapter.notifyItemChanged(separateSearchRow);
         } else if (position == showTitlesRow) {
             LiquidNavigationConfig.setShowTitles(!LiquidNavigationConfig.showTitles());
             listAdapter.notifyItemChanged(showTitlesRow);
@@ -376,7 +380,7 @@ public final class BottomTabsSettingsActivity extends SignatureMatteSettingsActi
         public int getItemViewType(int p) {
             if (p == previewRow) return 120;
             if (p == tabsHeaderRow || p == appearanceHeaderRow || p == actionsHeaderRow || p == orderHeaderRow) return TYPE_HEADER;
-            if (p == showTabsRow || p == floatingDockRow || p == showTitlesRow || p == doubleTapChatsRow || p == doubleTapProfileRow || p == alwaysSearchChatsRow) return TYPE_CHECK;
+            if (p == separateSearchRow || p == showTabsRow || p == floatingDockRow || p == showTitlesRow || p == doubleTapChatsRow || p == doubleTapProfileRow || p == alwaysSearchChatsRow) return TYPE_CHECK;
             return TYPE_SETTINGS;
         }
 
@@ -413,6 +417,10 @@ public final class BottomTabsSettingsActivity extends SignatureMatteSettingsActi
             }
             if (p == showTabsRow) {
                 ((TextCheckCell) h.itemView).setTextAndValueAndCheck(getString(R.string.FlexyBottomTabsShow), getString(R.string.FlexyBottomTabsShowSub), LiquidNavigationConfig.isEnabled(), false, true);
+                return;
+            }
+            if (p == separateSearchRow) {
+                ((TextCheckCell) h.itemView).setTextAndValueAndCheck(getString(R.string.FlexySeparateSearch), getString(R.string.FlexySeparateSearchInfo), LiquidNavigationConfig.separateSearch(), false, true);
                 return;
             }
             if (p == floatingDockRow) {

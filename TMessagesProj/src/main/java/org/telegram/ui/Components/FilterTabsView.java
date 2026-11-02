@@ -1525,7 +1525,9 @@ public class FilterTabsView extends FrameLayout {
         }
     }
 
+    private int selectorColorKey = Theme.key_listSelector;
     public void setColors(int line, int active, int unactive, int selector, int background) {
+        selectorColorKey = selector;
         tabLineColorKey = line;
         backgroundColorKey = background;
         activeTextColorKey = active;
@@ -1764,6 +1766,8 @@ public class FilterTabsView extends FrameLayout {
 
     public void updateColors() {
         if(signatureHome)refreshSignatureAccent();
+        selectorDrawable.setColor(Theme.getColor(tabLineColorKey, resourcesProvider));
+        listView.setSelectorDrawableColor(Theme.getColor(selectorColorKey, resourcesProvider));
         listView.invalidateViews();
         if (blurredBackgroundDrawable != null) {
             blurredBackgroundDrawable.updateColors();

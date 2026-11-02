@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexySeparateSearch">Separate search bubble</string>
+    <string name="FlexySeparateSearchInfo">Show Search beside the dock instead of inside it.</string>
+</resources>

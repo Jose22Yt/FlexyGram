@@ -549,6 +549,15 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     private DownloadProgressIcon downloadProgressIcon;
     private boolean downloadsItemVisible;
     public ActionBarMenuItem searchItem;
+    private boolean separateSearchHidTopItem;
+    public void updateSeparateSearchVisibility(boolean separate) {
+        if (searchItem == null || actionBar.isSearchFieldVisible()) return;
+        if (separate && searchItem.getVisibility() == View.VISIBLE) {
+            separateSearchHidTopItem = true; searchItem.setVisibility(View.GONE);
+        } else if (!separate && separateSearchHidTopItem) {
+            separateSearchHidTopItem = false; searchItem.setVisibility(View.VISIBLE);
+        }
+    }
     private ActionBarMenuItem optionsItem;
     /** Бургер вместо стрелки «назад», когда включена своя шторка. */
     private MenuDrawable menuDrawable;
@@ -7368,6 +7377,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     @Override
     public void onResume() {
         super.onResume();
+        updateSeparateSearchVisibility(mainTabsActivityController != null && app.flexygram.navigation.LiquidNavigationConfig.isEnabled()
+                && app.flexygram.navigation.LiquidNavigationConfig.separateSearch());
         if(filterTabsView!=null)filterTabsView.updateColors();
         if (dialogStoriesCell != null) {
             dialogStoriesCell.onResume();

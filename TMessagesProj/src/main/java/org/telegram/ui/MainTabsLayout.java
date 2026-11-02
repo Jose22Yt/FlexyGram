@@ -20,7 +20,7 @@ import org.telegram.ui.Components.glass.GlassTabView;
 import tw.nekomimi.nekogram.NekoConfig;
 import xyz.nextalone.nagram.NaConfig;
 
-/** Solid Home bar. Equal slots; no lens, refraction, drag deformation or idle render loop. */
+/** Native blur3 dock with solid fallback. Equal slots and no idle render loop. */
 public class MainTabsLayout extends AnimatedLinearLayout {
     public static final int BOTTOM_NAVIGATION_MODE_SHOW = 0;
     public static final int BOTTOM_NAVIGATION_MODE_HIDE = 1;
@@ -38,6 +38,21 @@ public class MainTabsLayout extends AnimatedLinearLayout {
     }
     private final Theme.ResourcesProvider resourcesProvider;
     private final GradientDrawable surface=new GradientDrawable();
+    private org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawable glassBackground;
+    public void setGlassBackground(org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawable drawable) {
+        glassBackground = drawable; if (drawable != null) drawable.setCallback(this); setBackground(null); setWillNotDraw(false); invalidate();
+    }
+    @Override protected boolean verifyDrawable(android.graphics.drawable.Drawable who) { return who == glassBackground || super.verifyDrawable(who); }
+    @Override protected void onDraw(Canvas canvas) {
+        if (glassBackground != null && canvas.isHardwareAccelerated()
+                && org.telegram.messenger.SharedConfig.chatBlurEnabled()
+                && org.telegram.messenger.LiteMode.isEnabled(org.telegram.messenger.LiteMode.FLAG_LIQUID_GLASS)) {
+            glassBackground.setRadius(dp(LiquidNavigationConfig.radiusDp()));
+            glassBackground.setBounds(0,0,getWidth(),getHeight());
+            glassBackground.draw(canvas);
+        } else { surface.setBounds(0,0,getWidth(),getHeight()); surface.draw(canvas); }
+        super.onDraw(canvas);
+    }
     private final Paint selector=new Paint(Paint.ANTI_ALIAS_FLAG);
     private float selectionX=Float.NaN;
     private int maxWidthPx,slotWidth;
@@ -47,7 +62,7 @@ public class MainTabsLayout extends AnimatedLinearLayout {
         public void setValue(MainTabsLayout v,float value){v.selectionX=value;v.invalidate();}
     }).setMinimumVisibleChange(.5f);
     public MainTabsLayout(Context context,Theme.ResourcesProvider provider){
-        super(context);resourcesProvider=provider;setClipChildren(true);setClipToPadding(true);setBackground(surface);
+        super(context);resourcesProvider=provider;setClipChildren(true);setClipToPadding(true);setWillNotDraw(false);
         selection.setSpring(new SpringForce(0).setStiffness(650).setDampingRatio(1));
     }
     public void setMaxWidth(int width){if(maxWidthPx!=width){maxWidthPx=width;requestLayout();}}
@@ -56,6 +71,7 @@ public class MainTabsLayout extends AnimatedLinearLayout {
         surface.setColor(Theme.getColor(Theme.key_windowBackgroundWhite,resourcesProvider));
         surface.setCornerRadius(dp(LiquidNavigationConfig.radiusDp()));
         for(int i=0;i<getChildCount();i++)if(getChildAt(i) instanceof GlassTabView)((GlassTabView)getChildAt(i)).setSkipDrawSelector(true);
+        if (glassBackground != null) glassBackground.updateColors();
         requestLayout();invalidate();
     }
     @Override protected void onMeasure(int ws,int hs){

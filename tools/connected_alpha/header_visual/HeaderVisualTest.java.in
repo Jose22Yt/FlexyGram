@@ -185,4 +185,19 @@ public class HeaderVisualTest {
   try(var file=new java.io.FileOutputStream(new java.io.File(System.getProperty("probe.root"),"signature-header-fusion-synthetic.png"))){assertTrue(evidence.compress(Bitmap.CompressFormat.PNG,100,file));}evidence.recycle();
  }
 
+ // Native glass is a host double here; the production counter is drawn with real Android Canvas.
+ @Test public void unreadSurvivesGlassShortCircuitBothThemesAndCounterModes()throws Exception {
+  for(boolean dark:new boolean[]{false,true})for(int mode:new int[]{1,2}) {
+   Theme.dark=dark;HeaderConfig.counterMode(mode);Context c=context(1);
+   ActionBar bar=new ActionBar(c);bar.nativeGlass=true;
+   ChatAvatarContainer avatar=new ChatAvatarContainer(c);bar.addView(avatar,0,new FrameLayout.LayoutParams(-1,-1));
+   SignatureChatHeader header=new SignatureChatHeader(bar,avatar,null);bar.setSignatureHeader(header);avatar.setSignatureHeader(header);
+   header.setCount(10);size(bar,412);assertTrue(header.geometry.countVisible);
+   Bitmap image=Bitmap.createBitmap(412,bar.getMeasuredHeight(),Bitmap.Config.ARGB_8888);
+   Canvas canvas=new Canvas(image);header.draw(canvas);int pixels=0;
+   for(int y=0;y<image.getHeight();y++)for(int x=0;x<image.getWidth();x++)if(Color.alpha(image.getPixel(x,y))>0)pixels++;
+   assertTrue("glass does not skip unread glyphs",pixels>8);image.recycle();header.detach();
+  }
+ }
+
 }

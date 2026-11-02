@@ -237,6 +237,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
         signatureGlassFactory=factory;
         signatureGlassColorProvider=colorProvider;
         signatureGlassCall=null;
+        signatureGlassUnread=null;
         signatureGlassGeometryApplied=false;
         signatureGlassRadius=-1;
 
@@ -1486,6 +1487,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
     }
 
     private BlurredBackgroundDrawable signatureGlassCall;
+    private BlurredBackgroundDrawable signatureGlassUnread;
     private boolean signatureGlassGeometryApplied;
     private float signatureGlassRadius=-1;
     private BlurredBackgroundDrawableViewFactory signatureGlassFactory;
@@ -1522,6 +1524,12 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
         if(signatureGlassCall!=null)signatureGlassCall.setRadius(radius);
     }
 
+    public void prepareSignatureUnreadGlass(boolean separate) {
+        if (separate && signatureGlassUnread == null && signatureGlassFactory != null) {
+            signatureGlassUnread = signatureGlassFactory.create(this).setColorProvider(signatureGlassColorProvider)
+                    .setPadding(0);
+        }
+    }
     public void prepareSignatureNativeGlass(boolean separateCall) {
         if (separateCall && signatureGlassCall==null && signatureGlassFactory!=null
                 && org.telegram.messenger.LiteMode.isEnabled(org.telegram.messenger.LiteMode.FLAG_LIQUID_GLASS)) {
@@ -1540,6 +1548,9 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
         updateSignatureNativeGlassDrawable(glassDrawableBack,allowed);
         updateSignatureNativeGlassDrawable(glassDrawableMenu,allowed);
         updateSignatureNativeGlassDrawable(signatureGlassCall,allowed);
+        updateSignatureNativeGlassDrawable(signatureGlassUnread,allowed);
+        requestLayout();
+        invalidate();
     }
     private static void updateSignatureNativeGlassDrawable(
             org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawable drawable, boolean allowed) {
@@ -1552,7 +1563,8 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
 
     public boolean drawSignatureNativeGlass(Canvas canvas,
             app.flexygram.header.SignatureChatHeader header) {
-        if (header == null || !header.active() || !glassMode
+        if (header == null || !header.active() || !glassMode || !canvas.isHardwareAccelerated()
+                || !org.telegram.messenger.SharedConfig.chatBlurEnabled()
                 || glassDrawable == null || glassDrawableBack == null || glassDrawableMenu == null
                 || !org.telegram.messenger.LiteMode.isEnabled(
                     org.telegram.messenger.LiteMode.FLAG_LIQUID_GLASS)) return false;
@@ -1569,6 +1581,12 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
                     Math.round(g.backVisual.top) + offset, Math.round(g.backVisual.right),
                     Math.round(g.backVisual.bottom) + offset);
             glassDrawableBack.draw(canvas);
+            if (g.separateUnread && signatureGlassUnread != null) {
+                signatureGlassUnread.setRadius(g.unread.height()*.5f);
+                signatureGlassUnread.setBounds(Math.round(g.unread.left),Math.round(g.unread.top)+offset,
+                        Math.round(g.unread.right),Math.round(g.unread.bottom)+offset);
+                signatureGlassUnread.draw(canvas);
+            }
 
             glassDrawable.setBounds(Math.round(g.center.left),
                     Math.round(g.center.top) + offset, Math.round(g.center.right),
@@ -1601,8 +1619,18 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
         setSignatureGlassRadius(g.back.height()*.5f);
         // Adaptive back pill, centered text pill and avatar island are kept independent.
 
-        glassDrawableBack.setBounds(Math.round(g.back.left), Math.round(g.back.top),
-                Math.round(g.back.right), Math.round(g.back.bottom));
+        float backLeft = g.back.left, backRight = g.back.right;
+        if (g.separateCount) {
+            if (signatureGlassUnread == null) return false;
+            if (org.telegram.messenger.LocaleController.isRTL) backLeft = backRight - g.back.height();
+            else backRight = backLeft + g.back.height();
+            signatureGlassUnread.setRadius(g.badge.height() * .5f);
+            signatureGlassUnread.setBounds(Math.round(g.badge.left), Math.round(g.badge.top),
+                    Math.round(g.badge.right), Math.round(g.badge.bottom));
+            signatureGlassUnread.draw(canvas);
+        }
+        glassDrawableBack.setBounds(Math.round(backLeft), Math.round(g.back.top),
+                Math.round(backRight), Math.round(g.back.bottom));
         glassDrawableBack.draw(canvas);
 
         glassDrawable.setBounds(Math.round(g.title.left), Math.round(g.title.top),
