@@ -18,6 +18,7 @@ public final class SignatureSmartPreviewPalette {
         0xffe65100,0xff546e7a,0xffffb300,0xffff8f00,0xffe53935
     };
     public static int normalizeMode(int mode) {
+        if (mode == THEME) return ADAPTIVE;
         return mode >= ADAPTIVE && mode <= MULTICOLOR ? mode : ADAPTIVE;
     }
     private static int multicolor(int kind) {
