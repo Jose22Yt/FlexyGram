@@ -521,6 +521,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
 
         updateLayout();
         checkUnreadCount(false);
+        applyFlexyTabs();
         return contentView;
     }
 
@@ -1096,20 +1097,24 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         if (tabsView.getLayoutParams()!=null && oldHeight!=tabsView.getLayoutParams().height && fragmentView!=null)
             androidx.core.view.ViewCompat.requestApplyInsets(fragmentView);
         FrameLayout.LayoutParams dockParams = (FrameLayout.LayoutParams) tabsView.getLayoutParams();
-        dockParams.leftMargin = LocaleController.isRTL ? reservedSearch : 0;
-        dockParams.rightMargin = LocaleController.isRTL ? 0 : reservedSearch;
-        tabsView.setLayoutParams(dockParams);
+        if (dockParams != null) {
+            dockParams.leftMargin = LocaleController.isRTL ? reservedSearch : 0;
+            dockParams.rightMargin = LocaleController.isRTL ? 0 : reservedSearch;
+            tabsView.setLayoutParams(dockParams);
+        }
         if (separateSearchButton != null) separateSearchButton.setVisibility(separate ? View.VISIBLE : View.GONE);
         updateSeparateSearchAppearance();
         tabsView.refreshBottomBarAppearance();
-        int current=viewPager.getCurrentPosition();boolean represented=false;
-        for (int id : flexyConfiguredDestinations) if (indexToPosition(id)==current) {represented=true;break;}
-        if (!represented && current!=getPositionChats() && !viewPager.isManualScrolling() && !viewPager.isTouch()) {
-            selectTab(getPositionChats(),false);
+        int current = viewPager != null ? viewPager.getCurrentPosition() : 0;
+        boolean represented = false;
+        for (int id : flexyConfiguredDestinations) if (indexToPosition(id) == current) { represented = true; break; }
+        if (!represented && current != getPositionChats() && viewPager != null && !viewPager.isManualScrolling() && !viewPager.isTouch()) {
+            selectTab(getPositionChats(), false);
             viewPager.scrollToPosition(getPositionChats());
             return;
         }
-        selectTab(current, false);tabsView.revealSelectedDestination();
+        selectTab(current, false);
+        tabsView.revealSelectedDestination();
     }
     private void updateSeparateSearchAppearance() {
         if (separateSearchButton == null) return;
