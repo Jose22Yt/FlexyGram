@@ -1,0 +1,56 @@
+[
+  {
+    "name": "chat",
+    "source": "Communication/chat-3-fill.svg",
+    "sha256": "db0c1d69dd5c1da8c82b3acc606ffde61c60c601416855a5e9f6ac6e1e9ae4cc",
+    "modified": false
+  },
+  {
+    "name": "stack",
+    "source": "Business/stack-fill.svg",
+    "sha256": "a45b291fffbf46609cf63d1cd6b9232e53fe537f9a91a79c38d7b8aeadc81c66",
+    "modified": false
+  },
+  {
+    "name": "sliders",
+    "source": "Media/equalizer-fill.svg",
+    "sha256": "dd96a45fab477f025c24bebf7f59c3a6b59fc3506844f8bfa543130afeee925a",
+    "modified": false
+  },
+  {
+    "name": "ghost",
+    "source": "User & Faces/ghost-fill.svg",
+    "sha256": "e1358eccb5a514d67b292af450233d3bac2e85e06b1d3f7f4066655d35ef9431",
+    "modified": true
+  },
+  {
+    "name": "plugins",
+    "source": "Development/puzzle-fill.svg",
+    "sha256": "c0eec3562f6b8207c2c872105ad5470f19ec6d9859ec9aeede26df5d31e1d1c8",
+    "modified": false
+  },
+  {
+    "name": "document",
+    "source": "Document/file-3-fill.svg",
+    "sha256": "a3701cfca1ec266154ee525ae26c93e3a064a1a93a4d154a4c2036353b86afc6",
+    "modified": false
+  },
+  {
+    "name": "folder",
+    "source": "Document/folder-fill.svg",
+    "sha256": "9158292adf920e8452a0f933ad36da78ce66810d51c10e647b720cea6a18678a",
+    "modified": false
+  },
+  {
+    "name": "hand",
+    "source": "Editor/hand.svg",
+    "sha256": "0acc474033e7d365b69b1f84c5c46cff365b0fee8939cb00bdc8a8861ce742c4",
+    "modified": true
+  },
+  {
+    "name": "info",
+    "source": "System/information-fill.svg",
+    "sha256": "1e8da65e4dd0527e5cc172d57d3d615b9b7435754a0043b127550b17496102b2",
+    "modified": false
+  }
+]

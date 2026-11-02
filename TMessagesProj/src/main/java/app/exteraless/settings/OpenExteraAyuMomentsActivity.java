@@ -128,7 +128,7 @@ public class OpenExteraAyuMomentsActivity extends BaseNekoSettingsActivity {
         super.updateRows();
 
         headerRow = addRow("ayuHeader");
-        ghostRow = addRow("ayuGhost");
+        ghostRow = isSettings3Embedded() ? -1 : addRow("ayuGhost");
         askStoryRow = addRow(NaConfig.INSTANCE.getAskBeforeOpeningStory().getKey());
         ghostDividerRow = addRow();
 

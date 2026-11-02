@@ -28,9 +28,19 @@ public final class HeaderGeometry {
         back.set(edge, top, edge + side, top + height);
         avatar.set(width - edge - height, top, width - edge, top + height);
         float inset = edge + Math.max(side, height) + gap;
-        title.set(Math.min(width / 2f, inset), top, Math.max(width / 2f, width - inset), top + height);
-        float preferred = Math.min(title.width(), Math.max(80 * density, desiredTitleWidth));
-        title.set(width / 2f - preferred / 2f, top, width / 2f + preferred / 2f, top + height);
+        boolean center = HeaderConfig.centerTitle();
+        boolean adaptive = HeaderConfig.adaptiveBubble();
+        float maxTitleW = Math.max(0, width - inset * 2);
+        float preferred = adaptive ? Math.min(maxTitleW, Math.max(80 * density, desiredTitleWidth)) : maxTitleW;
+        if (center) {
+            title.set(width / 2f - preferred / 2f, top, width / 2f + preferred / 2f, top + height);
+        } else {
+            if (rtl) {
+                title.set(width - inset - preferred, top, width - inset, top + height);
+            } else {
+                title.set(inset, top, inset + preferred, top + height);
+            }
+        }
         float badgeSize = separateCount ? extra - 3 * density : extra;
         float badgeLeft = rtl ? width - edge - side : back.left + height + (separateCount ? 3 * density : 0);
         badge.set(badgeLeft, top + (height - badgeSize) / 2f, badgeLeft + badgeSize, top + (height + badgeSize) / 2f);

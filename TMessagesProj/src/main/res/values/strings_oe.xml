@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Строки фич, перенесённых из exteraGram. -->
 <resources>
-    <string name="OpenExtera" translatable="false">exteraless</string>
+    <string name="OpenExtera" translatable="false">FlexyGram</string>
     <string name="OpenExteraInfo">Make the client truly yours</string>
 
 

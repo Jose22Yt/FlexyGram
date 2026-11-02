@@ -7,4 +7,12 @@
     <string name="FlexyContextBounce">Анимация выбора iOS 27</string>
     <string name="FlexyContextInteractions">Взаимодействие с сообщениями</string>
     <string name="FlexyContextDescription">Касание анимирует сообщение независимо от меню. Реакции и меню одним касанием включаются отдельно. Встроенные элементы и долгое нажатие сохраняют свои действия.</string>
+    <string name="FlexyContextConvertToSticker">Превратить в стикер</string>
+    <string name="FlexyStickerSubtitle">Превратить сообщение в статический стикер</string>
+    <string name="FlexyStickerSendDirect">Отправить в этот чат</string>
+    <string name="FlexyStickerSaveFavorite">Добавить в избранное</string>
+    <string name="FlexyStickerExportWebp">Сохранить .webp файл</string>
+    <string name="FlexyStickerSent">Стикер отправлен</string>
+    <string name="FlexyStickerSavedFavorite">Стикер добавлен в избранное</string>
+    <string name="FlexyStickerExported">Стикер сохранен в Загрузки</string>
 </resources>

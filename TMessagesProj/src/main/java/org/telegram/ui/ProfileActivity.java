@@ -4642,7 +4642,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             } else if (position == devicesRow) {
                 presentFragment(new SessionsActivity(0));
             } else if (position == nekoRow) {
-                presentFragment(new NekoSettingsActivity());
+                presentFragment(new app.exteraless.settings.OpenExteraSettingsActivity());
             } else if (position == questionRow) {
                 showDialog(AlertsCreator.createSupportAlert(ProfileActivity.this, resourcesProvider));
             } else if (position == faqRow) {
@@ -11062,7 +11062,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
 
                 // Строка настроек NagramX появляется только если её включили на
                 // экране «Other» — как и в общем списке настроек.
-                if (app.exteraless.general.GeneralConfig.showNagramSettings()) {
+                if (!org.telegram.messenger.BuildConfig.CONNECTED_ALPHA && app.exteraless.general.GeneralConfig.showNagramSettings()) {
                     nekoRow = rowCount++;
                     nekoSectionRow = rowCount++;
                 }

@@ -22,12 +22,13 @@ public final class SignatureFusionSurface {
 
     public void draw(Canvas canvas, SignatureFusionGeometry.Layout g,
                      int surfaceColor, int borderColor, int separatorColor, float density) {
-        fill.setColor(surfaceColor);
-        border.setColor(borderColor);
-        border.setStrokeWidth(.7f * density);
-        separator.setColor(separatorColor);
-        separator.setStrokeWidth(.7f * density);
-        drawPill(canvas,g.backVisual);
+        float stroke = .7f * density;
+        if (fill.getColor() != surfaceColor) fill.setColor(surfaceColor);
+        if (border.getColor() != borderColor) border.setColor(borderColor);
+        if (border.getStrokeWidth() != stroke) border.setStrokeWidth(stroke);
+        if (separator.getColor() != separatorColor) separator.setColor(separatorColor);
+        if (separator.getStrokeWidth() != stroke) separator.setStrokeWidth(stroke);
+        drawPill(canvas,g.backVisual); if (g.separateUnread) drawPill(canvas,g.unread);
         drawCenterFill(canvas,g.center);
         drawActions(canvas,g);
         drawCenterBorder(canvas, g, borderColor, density);
@@ -43,9 +44,13 @@ public final class SignatureFusionSurface {
     /** Same background, but no center stroke until the native portrait has been composited. */
     public void drawBackdrop(Canvas canvas, SignatureFusionGeometry.Layout g,
                      int surfaceColor, int borderColor, int separatorColor, float density) {
-        fill.setColor(surfaceColor); border.setColor(borderColor); border.setStrokeWidth(.7f * density);
-        separator.setColor(separatorColor); separator.setStrokeWidth(.7f * density);
-        drawPill(canvas,g.backVisual); drawCenterFill(canvas,g.center); drawActions(canvas,g);
+        float stroke = .7f * density;
+        if (fill.getColor() != surfaceColor) fill.setColor(surfaceColor);
+        if (border.getColor() != borderColor) border.setColor(borderColor);
+        if (border.getStrokeWidth() != stroke) border.setStrokeWidth(stroke);
+        if (separator.getColor() != separatorColor) separator.setColor(separatorColor);
+        if (separator.getStrokeWidth() != stroke) separator.setStrokeWidth(stroke);
+        drawPill(canvas,g.backVisual); if (g.separateUnread) drawPill(canvas,g.unread); drawCenterFill(canvas,g.center); drawActions(canvas,g);
         if(g.callAvailable && !g.mattePortrait){float x=g.actions.centerX();
             canvas.drawLine(x,g.actionsVisual.top+10f*density,x,g.actionsVisual.bottom-10f*density,separator);}
     }
@@ -59,7 +64,9 @@ public final class SignatureFusionSurface {
         work.set(r.left,r.top,r.right,r.bottom);canvas.drawRoundRect(work,r.height()*.5f,r.height()*.5f,fill);
     }
     public void drawCenterBorder(Canvas canvas, SignatureFusionGeometry.Layout g, int color, float density) {
-        border.setColor(color);border.setStrokeWidth(.7f*density);
+        float stroke = .7f * density;
+        if (border.getColor() != color) border.setColor(color);
+        if (border.getStrokeWidth() != stroke) border.setStrokeWidth(stroke);
         var r=g.center;work.set(r.left,r.top,r.right,r.bottom);work.inset(border.getStrokeWidth()*.5f,border.getStrokeWidth()*.5f);
         canvas.drawRoundRect(work,r.height()*.5f,r.height()*.5f,border);
     }

@@ -1,0 +1,47 @@
+name: Smart Previews 2 source and Android renderer
+on:
+  pull_request:
+    paths:
+      - 'TMessagesProj/src/main/java/app/flexygram/home/**'
+      - 'TMessagesProj/src/main/java/org/telegram/ui/Cells/DialogCell.java'
+      - 'tools/smart_previews2/**'
+      - '.github/workflows/smart-previews2.yml'
+permissions:
+  contents: read
+jobs:
+  behavior-and-graphics:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python tools/smart_previews2/checks.py
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: 'build-tools;36.0.0 platforms;android-37.0'
+      - name: Normalize API37 location
+        run: |
+          if [ ! -f "$ANDROID_HOME/platforms/android-37.0/android.jar" ] && [ -f "$ANDROID_HOME/platforms/android-37/android.jar" ]; then
+            ln -s android-37 "$ANDROID_HOME/platforms/android-37.0"
+          fi
+      - name: Execute production preview and settings adapter under Android graphics
+        run: python tools/smart_previews2/android/run.py --sdk-root "$ANDROID_HOME" --output-dir build/smart-previews2-android
+      - name: Retain Settings3 adapter and navigation regressions
+        run: python tools/settings3/android/run.py --sdk-root "$ANDROID_HOME" --output-dir build/smart-previews2-settings3
+      - name: Preserve real isolated renderer evidence (not full app screenshots)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smart-previews2-android-renderer
+          path: |
+            build/smart-previews2-android/smart-previews-style-*-android.png
+            build/smart-previews2-android/target/surefire-reports/*.xml
+            build/smart-previews2-settings3/target/surefire-reports/*.xml
+          if-no-files-found: warn

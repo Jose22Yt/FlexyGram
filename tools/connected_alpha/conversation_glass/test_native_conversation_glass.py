@@ -15,7 +15,11 @@ assert "LiteMode.FLAG_LIQUID_GLASS" in header, "Native top glass must obey Teleg
 assert "glassMode" in header and "glassDrawable.draw(canvas)" in header
 assert "glassDrawableBack.draw(canvas)" in header
 assert "glassDrawableMenu.draw(canvas)" in header
-assert "if (bar.drawSignatureNativeGlass(canvas, this)) return;" in adapter
+assert "nativeGlassDrawn = bar.drawSignatureNativeGlass(canvas, this)" in adapter
+start = adapter.index("if (nativeGlassDrawn)")
+end = adapter.index("if (!fusionActive())", start)
+assert adapter.index("drawUnread(canvas)", start, end) < adapter.index("return;", start, end), "Native Glass must not omit the unread count"
+assert "if (!fusionActive() || nativeGlassDrawn) return;" in adapter, "Do not overlay a second Matte border on native Glass"
 assert "surface.draw(canvas, geometry" in adapter, "OFF must retain existing header rendering"
 assert "fusion.surface.drawBackdrop" in adapter, "OFF must retain portrait/fusion rendering"
 parent = (java / "org/telegram/ui/Components/chat/ChatInputViewsContainer.java").read_text()

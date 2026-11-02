@@ -45,7 +45,7 @@ public final class SmartPillHostTest {
         eq(237, SignatureSmartPillLayout.remaining(350f, 35, 20, 40, 18), "bounds");
         eq(0, SignatureSmartPillLayout.remaining(50f, 30, 20, 40, 18), "narrow");
         eq(0, SignatureSmartPillLayout.remaining(Float.NaN, 0, 0, 0, 0), "NaN");
-        for (int mode = 0; mode < 2; mode++) {
+        for (int mode = 0; mode < 3; mode++) {
             for (int type = 1; type <= SignatureSmartPreviewPalette.DELETED; type++) {
                 SignatureSmartPreviewPalette p = new SignatureSmartPreviewPalette();
                 p.update(type, mode, 0xff438bd0, 0xfff5f6f9);

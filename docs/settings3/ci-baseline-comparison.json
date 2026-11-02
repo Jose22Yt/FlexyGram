@@ -1,0 +1,29 @@
+{
+  "tested_base": "3c7a20a229d425c8f3b5ea1740ccb6d8b3361fea",
+  "tested_candidate": "beba59a654496ad1bab205b0e1495b0ed96146dc",
+  "workflow_run": 41350301078,
+  "task_graph_job": 124978830938,
+  "task_graph_result": "PASS: assembleConnectedAlpha --dry-run and assembleBeta --dry-run; no application compilation",
+  "source_check_job": 124978830794,
+  "source_check_result": "FAIL: Unknown Beta delivery scope",
+  "blur_workflow_run": 41350301097,
+  "blur_contracts": {
+    "baseline": {
+      "passed": 4,
+      "failed": 1,
+      "errors": 1
+    },
+    "candidate": {
+      "passed": 4,
+      "failed": 1,
+      "errors": 1
+    },
+    "unchanged_actionbar_sha256": "f2d0b50e197782e0f880e9236605178b6205648be2157abcc110854dc7c99de4",
+    "failures": [
+      "Historical comparison rejects pre-existing ActionBar.java changes; this feature leaves that file byte-identical to its base.",
+      "Frozen Beta scope already rejects integrated base changes and also requires review for new Settings3 paths."
+    ]
+  },
+  "secondary_artifact_error": "No files were found: the source gate stopped rendering before artifact upload.",
+  "controls_weakened": false
+}

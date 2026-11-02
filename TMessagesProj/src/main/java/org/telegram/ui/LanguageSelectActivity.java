@@ -618,8 +618,7 @@ public class LanguageSelectActivity extends BaseFragment implements Notification
                 return searchResult.size();
             } else {
                 int count = 0;
-                count++;
-                count += 2;
+                if(!org.telegram.messenger.BuildConfig.CONNECTED_ALPHA)count += 3; // Additional translator moved to Extensions.
                 /*if (getMessagesController().isTranslationsManualEnabled() || getMessagesController().isTranslationsAutoEnabled()) {
                     count++;
                     if (getMessagesController().isTranslationsManualEnabled()) {
@@ -817,7 +816,7 @@ public class LanguageSelectActivity extends BaseFragment implements Notification
                 }
                 case VIEW_TYPE_HEADER: {
                     HeaderCell header = (HeaderCell) holder.itemView;
-                    header.setText(position == 0 ? LocaleController.getString(R.string.TranslateMessages) : LocaleController.getString(R.string.Language));
+                    header.setText(position == 0 && !org.telegram.messenger.BuildConfig.CONNECTED_ALPHA ? LocaleController.getString(R.string.TranslateMessages) : LocaleController.getString(R.string.Language));
                     break;
                 }
             }
@@ -872,9 +871,11 @@ public class LanguageSelectActivity extends BaseFragment implements Notification
                     settingsFromPosition = -1;
                     settingsToPosition = -1;
                 }*/
-                if (i-- == 0) return VIEW_TYPE_HEADER;
-                if (i-- == 0) return VIEW_TYPE_SETTINGS;
-                if (i-- == 0) return VIEW_TYPE_SHADOW;
+                if(!org.telegram.messenger.BuildConfig.CONNECTED_ALPHA){
+                    if (i-- == 0) return VIEW_TYPE_HEADER;
+                    if (i-- == 0) return VIEW_TYPE_SETTINGS;
+                    if (i-- == 0) return VIEW_TYPE_SHADOW;
+                }
                 if (i-- == 0) return VIEW_TYPE_HEADER;
                 if (!unofficialLanguages.isEmpty() && (i == unofficialLanguages.size() || i == unofficialLanguages.size() + sortedLanguages.size() + 1) || unofficialLanguages.isEmpty() && i == sortedLanguages.size()) {
                     return VIEW_TYPE_SHADOW;

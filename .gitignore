@@ -1,5 +1,6 @@
 .gradle
 .idea
+.ide
 .kotlin
 .vscode
 *.aar

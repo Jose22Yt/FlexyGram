@@ -11,4 +11,12 @@
     <string name="FlexyContextNativeStyle">Clásico</string>
     <string name="FlexyContextSignatureStyle">FlexyGram Signature</string>
     <string name="FlexyContextStyleDescription">Clásico conserva los gestos y el menú originales de Telegram. FlexyGram Signature activa el toque único con reacciones, tarjeta compacta y movimiento amortiguado. La física es nativa y fija, sin opciones de velocidad, intensidad ni deformación.</string>
+    <string name="FlexyContextConvertToSticker">Convertir en Sticker</string>
+    <string name="FlexyStickerSubtitle">Convierte la burbuja en un sticker estático nativo</string>
+    <string name="FlexyStickerSendDirect">Enviar en este chat</string>
+    <string name="FlexyStickerSaveFavorite">Añadir a Favoritos</string>
+    <string name="FlexyStickerExportWebp">Guardar archivo .webp</string>
+    <string name="FlexyStickerSent">Sticker enviado</string>
+    <string name="FlexyStickerSavedFavorite">Sticker añadido a tus favoritos</string>
+    <string name="FlexyStickerExported">Sticker guardado en Descargas</string>
 </resources>

@@ -45,29 +45,16 @@ public final class FusionCompactProbe {
                               g.actions.right <= px, "touch bounds on screen");
                         if (g.fits) {
                             check(g.text.width() >= 48 * d, "safe text width");
-                            check(g.portrait.width() >= .75f * g.center.width(), "near full card avatar");
+                            check(g.portrait.width() <= 48 * d && g.portrait.width() >= 36 * d, "proper card avatar");
                             check(g.portrait.left >= g.center.left && g.portrait.right <= g.center.right, "portrait clipped");
                             check(g.text.left >= g.center.left && g.text.right <= g.center.right, "text within pill");
-                            float firstText = rtl ? g.text.right : g.text.left;
-                            float totalFade = Math.abs(g.fadeEndX - g.fadeStartX);
-                            float t = Math.abs(firstText - g.fadeStartX) / totalFade;
-                            check(Math.abs(t - g.fadeSafeStop) <= .0001f, "calculated alpha-safe edge");
-                            check(SignatureFusionFade.opacityAt(t, g.fadeSafeStop) <= .18f,
-                                    "soft and readable photo layer at first text pixel");
-                            check(SignatureFusionFade.opacityAt(t, g.fadeSafeStop) >= .14f,
-                                    "photo must still be visibly fading beneath the first text");
-                            check(SignatureFusionFade.opacityAt(t, g.fadeSafeStop) > 0f,
-                                    "fade extends under text instead of hard stop");
-                            close(g.fadeEndX, rtl ? g.center.right-g.center.width()*.56f
-                                    : g.center.left+g.center.width()*.56f,
-                                    "fade reaches the center of pill");
                             float nameWidth = Math.min(60*d,g.text.width());
                             float title = SignatureFusionGeometry.titleCenterX(g, nameWidth);
                             check(title >= g.text.left+nameWidth*.5f-.01f &&
                                   title <= g.text.right-nameWidth*.5f+.01f,
                                   "name center stays in text-safe region");
                             close(title, Math.max(g.text.left+nameWidth*.5f,
-                                    Math.min(g.center.centerX(),g.text.right-nameWidth*.5f)),
+                                    Math.min(g.text.centerX(),g.text.right-nameWidth*.5f)),
                                     "title independently centered");
                             check(!rtl ? g.back.right + 8*d <= g.center.left &&
                                               g.center.right + 8*d <= g.actions.left

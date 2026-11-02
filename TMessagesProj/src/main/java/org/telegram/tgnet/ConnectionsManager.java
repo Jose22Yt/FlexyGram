@@ -144,6 +144,7 @@ public class ConnectionsManager extends BaseController {
     private int connectionState;
     private AtomicInteger lastRequestToken = new AtomicInteger(1);
     private int appResumeCount;
+    private Runnable pauseNetworkRunnable;
 
     private static AsyncTask currentTask;
 
@@ -322,7 +323,7 @@ public class ConnectionsManager extends BaseController {
         if (preferences.contains("pushConnection")) {
             return preferences.getBoolean("pushConnection", true);
         }
-        return MessagesController.getMainSettings(UserConfig.selectedAccount).getBoolean("backgroundConnection", false);
+        return MessagesController.getMainSettings(UserConfig.selectedAccount).getBoolean("backgroundConnection", true);
     }
 
     public long getCurrentTimeMillis() {
@@ -898,8 +899,21 @@ public class ConnectionsManager extends BaseController {
             if (lastPauseTime == 0) {
                 lastPauseTime = System.currentTimeMillis();
             }
-            native_pauseNetwork(currentAccount);
+            if (pauseNetworkRunnable != null) {
+                AndroidUtilities.cancelRunOnUIThread(pauseNetworkRunnable);
+            }
+            pauseNetworkRunnable = () -> {
+                if (appResumeCount == 0) {
+                    native_pauseNetwork(currentAccount);
+                }
+                pauseNetworkRunnable = null;
+            };
+            AndroidUtilities.runOnUIThread(pauseNetworkRunnable, 5000);
         } else {
+            if (pauseNetworkRunnable != null) {
+                AndroidUtilities.cancelRunOnUIThread(pauseNetworkRunnable);
+                pauseNetworkRunnable = null;
+            }
             if (appPaused) {
                 return;
             }

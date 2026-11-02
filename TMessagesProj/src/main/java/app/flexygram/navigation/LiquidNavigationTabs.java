@@ -14,7 +14,7 @@ public final class LiquidNavigationTabs {
             case 2:return R.string.Settings;case 3:return R.string.MainTabsCalls;
             case 4:return R.string.MainTabsProfile;case 5:return R.string.Feed;
             case 6:return R.string.FlexyLiquidNavGroups;case 7:return R.string.FlexyLiquidNavChannels;
-            case 8:return R.string.FlexyLiquidNavSaved;default:return R.string.FlexyContextMore;
+            case 8:return R.string.FlexyLiquidNavSaved;case 10:return R.string.Search;default:return R.string.FlexyContextMore;
         }
     }
     public static GlassTabView createPreview(Context context,int id){
@@ -33,6 +33,7 @@ public final class LiquidNavigationTabs {
             case 6:animation=GlassTabView.TabAnimation.NAV_GROUPS;break;
             case 7:animation=GlassTabView.TabAnimation.NAV_CHANNELS;break;
             case 8:animation=GlassTabView.TabAnimation.NAV_SAVED;break;
+            case 10:animation=GlassTabView.TabAnimation.NAV_SEARCH;break;
             default:animation=GlassTabView.TabAnimation.NAV_MORE;
         }
         return GlassTabView.createMainTab(context,provider,animation,label(id));

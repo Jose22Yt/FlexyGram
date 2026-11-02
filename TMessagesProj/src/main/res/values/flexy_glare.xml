@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="FlexyGlareEffects">Glare effects</string>
+  <string name="FlexyGlareType">Type</string>
+  <string name="FlexyGlareDisabled">Disabled</string>
+  <string name="FlexyGlareDefault">Default</string>
+  <string name="FlexyGlareSolid">Solid stroke</string>
+</resources>

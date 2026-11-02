@@ -72,7 +72,7 @@ public final class BubbleInteractionSettingsActivity extends SignatureMatteSetti
         }
 
         @Override public boolean isEnabled(RecyclerView.ViewHolder holder) {
-            return holder.getAdapterPosition() == styleRow;
+            return settingsRowPosition(holder) == styleRow;
         }
     }
 }

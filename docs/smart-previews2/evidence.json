@@ -1,0 +1,41 @@
+{
+  "base": "4679f74ebd312acc4968dd2e044a6c6b7478445a",
+  "validated_source": "9643d6b3d37e50fbe1c918b0d1126ecae099d432",
+  "workflow_run": 41356172560,
+  "android_job": 124996572595,
+  "artifact_id": 13103332301,
+  "artifact_sha256": "348da29cd0f3f63cd686062152a7cd0e44ea74b1f419e45661bd3c98b0575c3d",
+  "general_tests": {
+    "passed": 156,
+    "optional_skipped": 31
+  },
+  "focused_host_tests": 6,
+  "settings_ownership_tests": 12,
+  "android_tests": {
+    "new_production_components": 11,
+    "existing_settings3": 10
+  },
+  "physical_device": "NOT_TESTED",
+  "integrated_apk": "NOT_BUILT",
+  "captured_environment": "Android native graphics API35/Robolectric, API37 compile; explicit theme/host/service doubles",
+  "native_renderer_images": {
+    "renders/comparison-android-isolated.png": "d802e2d2840d46cf934ca18fbb82845aa1fc173d3cd6f36bd44271bfe795cb59",
+    "renders/smart-previews-style-0-dark-android.png": "63e9faa7899f9b8b83b7bcd1b624a38b6ef44f14382c3b4730961d11fd6ab1c5",
+    "renders/smart-previews-style-0-light-android.png": "e24079990b3f878af1bd6446ffef6e1aac4b40e1aece80d505d3d7603a6ded8f",
+    "renders/smart-previews-style-2-dark-android.png": "a6dd8b5767586bc265386271111554e2e9780eed2f9096aef9d3377cc67217d3",
+    "renders/smart-previews-style-2-light-android.png": "2d8ac630d2cc20b7beb0e20ddae5eb3ad1fd154b3d41c3f214c06a041222599e",
+    "renders/smart-previews-style-3-dark-android.png": "2764d840af9b20a49509f8621117b71d8fb116893c47fbb1c41ad28997dfe84c",
+    "renders/smart-previews-style-3-light-android.png": "d764da644f508f726fead432f53a551251c46119c69f672c8249048f7ba1eba0",
+    "renders/smart-previews-style-4-dark-android.png": "f53afa93a153ad698b0906713ae4dc0da1c9699424e0c9eeb03402611a1f03f2",
+    "renders/smart-previews-style-4-light-android.png": "d416e0535a5d16c4df93c1db09101a178e3f418200eecf24023ab4e8c5b00b33"
+  },
+  "production_sha256": {
+    "SignatureSmartPreviews.java": "6398ea36a0ad990142ba0d3ab216849fb700c2711fd008c19c3c0617e12de6bd",
+    "SignatureSmartPreviewPalette.java": "f398ba3f132b1f5e2e9565671a65c0f43f6c4f296b58639492ec0c687bf35a44",
+    "SignatureSmartPillSpan.java": "02763da7f1bc2475b1524c3ce7c6376e07d4e6d75f6c56677ad3c2579ec7879f",
+    "SignaturePreviewIcon.java": "37e8a96536df46d276cfc0b90b00708ffeedd02cc27566fb1444cb5e42fa2233",
+    "SmartPreviewsDemoView.java": "1d930c1ccbd109c2cbd14e0b0e8de033cba2560f7b888bc4c2fdfcebbdee9083",
+    "SmartPreviewsSettingsActivity.java": "4a681ce6cac9ce9280ccfb694a0fed7bacfa3a4cee7bfa58c59b8decab7707a8"
+  },
+  "apk_published": false
+}

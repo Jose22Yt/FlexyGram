@@ -18,6 +18,7 @@ import tw.nekomimi.nekogram.settings.BaseNekoSettingsActivity;
 
 /** Opt-in for General/Appearance only. No preference writes or changes to global Glass. */
 public abstract class SignatureMatteSettingsActivity extends BaseNekoSettingsActivity {
+    @Override public org.telegram.ui.ActionBar.ActionBar createActionBar(Context context){org.telegram.ui.ActionBar.ActionBar bar=super.createActionBar(context);bar.centerTitle();return bar;}
     protected int matteHeaderColor() { return getThemedColor(Theme.key_windowBackgroundWhiteGrayText2); }
     @Override protected boolean usesSolidSettingsSurfaces() { return true; }
     @Override protected boolean needActionBarBlur() { return false; }
@@ -29,6 +30,10 @@ public abstract class SignatureMatteSettingsActivity extends BaseNekoSettingsAct
     @Override
     protected SectionCardRecyclerView createSettingsList(Context context) {
         return new MatteSectionList(context);
+    }
+
+    protected int addHeader(String key) {
+        return addRow(key);
     }
 
     protected abstract class MatteListAdapter extends BaseListAdapter {
@@ -62,9 +67,11 @@ public abstract class SignatureMatteSettingsActivity extends BaseNekoSettingsAct
             if (holder.itemView instanceof tw.nekomimi.nekogram.ui.cells.HeaderCell) {
                 tw.nekomimi.nekogram.ui.cells.HeaderCell header = (tw.nekomimi.nekogram.ui.cells.HeaderCell) holder.itemView;
                 header.setTextColor(matteHeaderColor());
-                header.getTextView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-                header.getTextView().setSingleLine(false);
-                header.getTextView().setMaxLines(Integer.MAX_VALUE);
+                if (header.getTextView() != null) {
+                    header.getTextView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+                    header.getTextView().setSingleLine(false);
+                    header.getTextView().setMaxLines(Integer.MAX_VALUE);
+                }
             }
             if (holder.itemView instanceof org.telegram.ui.Cells.CheckBoxCell) {
                 org.telegram.ui.Cells.CheckBoxCell cell = (org.telegram.ui.Cells.CheckBoxCell) holder.itemView;

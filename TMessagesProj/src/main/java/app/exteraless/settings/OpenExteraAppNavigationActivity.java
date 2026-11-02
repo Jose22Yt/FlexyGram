@@ -73,6 +73,9 @@ public class OpenExteraAppNavigationActivity extends BaseFragment {
      */
     private static final int DIVIDER_ID_BASE = -2000;
 
+    private final boolean menuOnly;
+    public OpenExteraAppNavigationActivity(){this(false);}
+    public OpenExteraAppNavigationActivity(boolean menuOnly){this.menuOnly=menuOnly;}
     private UniversalRecyclerView listView;
     private ActionBarMenuItem resetItem;
 
@@ -145,6 +148,7 @@ public class OpenExteraAppNavigationActivity extends BaseFragment {
     // ---- содержимое ----
 
     private void fillItems(ArrayList<UItem> items, UniversalAdapter adapter) {
+        if(!menuOnly){
         items.add(UItem.asHeader(getString(R.string.OEGeneral)));
         items.add(UItem.asButton(ID_TABLET_MODE, getString(R.string.OETabletMode),
                 tabletModes()[clamp(NekoConfig.tabletMode.Int(), 3)]));
@@ -155,7 +159,7 @@ public class OpenExteraAppNavigationActivity extends BaseFragment {
         items.add(UItem.asShadow(getString(R.string.OEBackAnimationInfo)));
 
         if (android.os.Build.VERSION.SDK_INT >= 34) {
-            items.add(UItem.asCustom(ID_PREDICTIVE_INTENSITY, createIntensitySlider()));
+            items.add(UItem.asCustom(ID_PREDICTIVE_INTENSITY, createIntensitySlider(getContext())));
             items.add(UItem.asShadow(getString(R.string.OEPredictiveBackInfo)));
         }
 
@@ -167,6 +171,8 @@ public class OpenExteraAppNavigationActivity extends BaseFragment {
                     .setChecked(AppearanceConfig.immersiveDrawerAnimation()));
         }
         items.add(UItem.asShadow(getString(R.string.OENavigationDrawerInfo)));
+
+        }
 
         addMenuSection(items, adapter, getString(R.string.OEMainMenuItems), MainMenuLayout.getLayout(), true);
         items.add(UItem.asShadow(getString(R.string.OEMainMenuItemsInfo)));
@@ -230,8 +236,8 @@ public class OpenExteraAppNavigationActivity extends BaseFragment {
         return UItem.asButton(id, info.iconRes(), info.text());
     }
 
-    private View createIntensitySlider() {
-        final AvatarCornersSeekBar slider = new AvatarCornersSeekBar(getContext(),
+    private static View createIntensitySlider(Context context) {
+        final AvatarCornersSeekBar slider = new AvatarCornersSeekBar(context,
                 value -> UtilsConfig.predictiveBackIntensity.setConfigInt(value),
                 0, 200,
                 getString(R.string.OEPredictiveBackIntensity),
@@ -299,48 +305,7 @@ public class OpenExteraAppNavigationActivity extends BaseFragment {
     private void onItemClick(UItem item, View view, int position, float x, float y) {
         final int id = item.id;
 
-        if (id == ID_TABLET_MODE) {
-            showChoice(getString(R.string.OETabletMode), tabletModes(),
-                    NekoConfig.tabletMode.Int(), which -> {
-                        NekoConfig.tabletMode.setConfigInt(which);
-                        update();
-                    });
-            return;
-        }
-        if (id == ID_BACK_ANIMATION) {
-            showChoice(getString(R.string.OEBackAnimation), backAnimations(),
-                    NaConfig.INSTANCE.getBackAnimationStyle().Int(), which -> {
-                        NaConfig.INSTANCE.getBackAnimationStyle().setConfigInt(which);
-                        // Пружинные переходы не работают с выключенными анимациями
-                        // интерфейса, поэтому их взводим принудительно.
-                        if (which == BACK_ANIMATION_SPRING) {
-                            MessagesController.getGlobalMainSettings().edit()
-                                    .putBoolean("view_animations", true).apply();
-                            SharedConfig.setAnimationsEnabled(true);
-                        }
-                        update();
-                    });
-            return;
-        }
-        if (id == ID_DRAWER) {
-            AppearanceConfig.navigationDrawer.setConfigBool(!AppearanceConfig.navigationDrawer());
-            // Шторка создаётся один раз при старте активити, поэтому её надо пересобрать,
-            // иначе флаг применится только после перезапуска приложения.
-            if (getParentActivity() instanceof LaunchActivity launchActivity) {
-                launchActivity.syncDrawerContainerEnabled();
-            }
-            getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
-            update();
-            if (getParentLayout() != null) {
-                getParentLayout().rebuildFragments(0);
-            }
-            return;
-        }
-        if (id == ID_IMMERSIVE) {
-            AppearanceConfig.immersiveDrawerAnimation.setConfigBool(!AppearanceConfig.immersiveDrawerAnimation());
-            update();
-            return;
-        }
+        if(applyNativeControl(this,id,this::update))return;
         if (id == ID_ADD_DIVIDER) {
             stableDividerIds.add(nextDividerId--);
             final ArrayList<Integer> layout = MainMenuLayout.getLayoutMutable();
@@ -445,17 +410,63 @@ public class OpenExteraAppNavigationActivity extends BaseFragment {
         getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
     }
 
-    private void showChoice(String title, CharSequence[] options, int selected,
+    private static boolean applyNativeControl(BaseFragment host,int id,Runnable changed){
+        if (id == ID_TABLET_MODE) {
+            showChoice(host,getString(R.string.OETabletMode), tabletModes(),
+                    NekoConfig.tabletMode.Int(), which -> {
+                        NekoConfig.tabletMode.setConfigInt(which);
+                        changed.run();
+                    });
+            return true;
+        }
+        if (id == ID_BACK_ANIMATION) {
+            showChoice(host,getString(R.string.OEBackAnimation), backAnimations(),
+                    NaConfig.INSTANCE.getBackAnimationStyle().Int(), which -> {
+                        NaConfig.INSTANCE.getBackAnimationStyle().setConfigInt(which);
+                        // Пружинные переходы не работают с выключенными анимациями
+                        // интерфейса, поэтому их взводим принудительно.
+                        if (which == BACK_ANIMATION_SPRING) {
+                            MessagesController.getGlobalMainSettings().edit()
+                                    .putBoolean("view_animations", true).apply();
+                            SharedConfig.setAnimationsEnabled(true);
+                        }
+                        changed.run();
+                    });
+            return true;
+        }
+        if (id == ID_DRAWER) {
+            AppearanceConfig.navigationDrawer.setConfigBool(!AppearanceConfig.navigationDrawer());
+            // Шторка создаётся один раз при старте активити, поэтому её надо пересобрать,
+            // иначе флаг применится только после перезапуска приложения.
+            if (host.getParentActivity() instanceof LaunchActivity launchActivity) {
+                launchActivity.syncDrawerContainerEnabled();
+            }
+            host.getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
+            changed.run();
+            if (host.getParentLayout() != null) {
+                host.getParentLayout().rebuildFragments(0);
+            }
+            return true;
+        }
+        if (id == ID_IMMERSIVE) {
+            AppearanceConfig.immersiveDrawerAnimation.setConfigBool(!AppearanceConfig.immersiveDrawerAnimation());
+            changed.run();
+            return true;
+        }
+        return false;
+    }
+
+    private static void showChoice(BaseFragment host,String title, CharSequence[] options, int selected,
                             Utilities.Callback<Integer> onSelected) {
-        if (getParentActivity() == null) {
+        if (host.getParentActivity() == null) {
             return;
         }
         final org.telegram.ui.ActionBar.AlertDialog.Builder builder =
-                new org.telegram.ui.ActionBar.AlertDialog.Builder(getParentActivity());
+                new org.telegram.ui.ActionBar.AlertDialog.Builder(host.getParentActivity());
         builder.setTitle(title);
         builder.setItems(options, (dialog, which) -> onSelected.run(which));
         builder.setNegativeButton(getString(R.string.Cancel), null);
-        showDialog(builder.create());
+        host.showDialog(builder.create());
     }
 
     private boolean hasBottomTabs() {
@@ -464,7 +475,7 @@ public class OpenExteraAppNavigationActivity extends BaseFragment {
         return MainTabsLayout.isBottomNavigationVisible();
     }
 
-    private CharSequence[] tabletModes() {
+    private static CharSequence[] tabletModes() {
         return new CharSequence[]{
                 getString(R.string.OETabletModeAuto),
                 getString(R.string.OETabletModeOn),
@@ -475,7 +486,7 @@ public class OpenExteraAppNavigationActivity extends BaseFragment {
     /** Значение NaConfig.backAnimationStyle, соответствующее пружинным переходам. */
     private static final int BACK_ANIMATION_SPRING = 1;
 
-    private CharSequence[] backAnimations() {
+    private static CharSequence[] backAnimations() {
         if (android.os.Build.VERSION.SDK_INT < 34) {
             return new CharSequence[]{
                     getString(R.string.OEBackAnimationClassic),
@@ -493,5 +504,22 @@ public class OpenExteraAppNavigationActivity extends BaseFragment {
 
     private static int clamp(int value, int size) {
         return value < 0 || value >= size ? 0 : value;
+    }
+
+    public static final class NativeControls extends app.flexygram.settings.SignatureMatteSettingsActivity {
+        private final java.util.ArrayList<Integer> ids=new java.util.ArrayList<>();
+        @Override protected String getActionBarTitle(){return getString(R.string.OEAppNavigation);}
+        @Override protected void updateRows(){super.updateRows();ids.clear();add(ID_TABLET_MODE,"tabletMode");add(ID_BACK_ANIMATION,"backAnimation");if(android.os.Build.VERSION.SDK_INT>=34)add(ID_PREDICTIVE_INTENSITY,"predictiveBackIntensity");add(ID_DRAWER,"navigationDrawer");if(AppearanceConfig.navigationDrawer())add(ID_IMMERSIVE,"immersiveDrawerAnimation");}
+        private void add(int id,String key){ids.add(id);addRow(key);}
+        @Override protected void onItemClick(View view,int p,float x,float y){if(p>=0&&p<ids.size())applyNativeControl(this,ids.get(p),()->{updateRows();listAdapter.notifyDataSetChanged();});}
+        @Override protected BaseListAdapter createAdapter(Context context){return new MatteListAdapter(context){
+            @Override public int getItemViewType(int p){int id=ids.get(p);return id==ID_PREDICTIVE_INTENSITY?241:id==ID_DRAWER||id==ID_IMMERSIVE?TYPE_CHECK:TYPE_SETTINGS;}
+            @Override public androidx.recyclerview.widget.RecyclerView.ViewHolder onCreateViewHolder(android.view.ViewGroup parent,int type){if(type==241)return new org.telegram.ui.Components.RecyclerListView.Holder(createIntensitySlider(parent.getContext()));return super.onCreateViewHolder(parent,type);}
+            @Override public void onBindViewHolder(androidx.recyclerview.widget.RecyclerView.ViewHolder h,int p,boolean partial){int id=ids.get(p);if(id==ID_PREDICTIVE_INTENSITY){((AvatarCornersSeekBar)h.itemView).setValue(UtilsConfig.predictiveBackIntensity.Int());return;}
+                if(id==ID_DRAWER||id==ID_IMMERSIVE)((org.telegram.ui.Cells.TextCheckCell)h.itemView).setTextAndCheck(getString(id==ID_DRAWER?R.string.OENavigationDrawer:R.string.OENavigationDrawerImmersive),id==ID_DRAWER?AppearanceConfig.navigationDrawer():AppearanceConfig.immersiveDrawerAnimation(),p+1<ids.size());
+                else ((org.telegram.ui.Cells.TextSettingsCell)h.itemView).setTextAndValue(getString(id==ID_TABLET_MODE?R.string.OETabletMode:R.string.OEBackAnimation),(id==ID_TABLET_MODE?tabletModes()[clamp(NekoConfig.tabletMode.Int(),3)]:backAnimations()[clamp(NaConfig.INSTANCE.getBackAnimationStyle().Int(),backAnimations().length)]).toString(),true);
+            }
+            @Override public boolean isEnabled(androidx.recyclerview.widget.RecyclerView.ViewHolder h){return h.getItemViewType()!=241;}
+        };}
     }
 }

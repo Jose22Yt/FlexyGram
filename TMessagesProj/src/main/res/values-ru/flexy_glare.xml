@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="FlexyGlareEffects">Эффекты бликов</string>
+  <string name="FlexyGlareType">Тип</string>
+  <string name="FlexyGlareDisabled">Выключить</string>
+  <string name="FlexyGlareDefault">По умолчанию</string>
+  <string name="FlexyGlareSolid">Сплошной контур</string>
+</resources>

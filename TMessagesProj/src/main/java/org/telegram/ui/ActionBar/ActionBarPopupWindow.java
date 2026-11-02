@@ -1039,6 +1039,14 @@ public class ActionBarPopupWindow extends PopupWindow {
 
     public void dismiss(boolean animated) {
         setFocusable(false);
+        setTouchable(false);
+        try {
+            update();
+        } catch (Exception ignore) {
+        }
+        if (getContentView() != null) {
+            getContentView().setEnabled(false);
+        }
         dismissDim();
         if (windowAnimatorSet != null) {
             if (animated && isClosingAnimated) {

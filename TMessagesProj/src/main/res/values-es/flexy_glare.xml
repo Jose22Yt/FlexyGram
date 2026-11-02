@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="FlexyGlareEffects">Efectos de brillo</string>
+  <string name="FlexyGlareType">Tipo</string>
+  <string name="FlexyGlareDisabled">Desactivar</string>
+  <string name="FlexyGlareDefault">Por defecto</string>
+  <string name="FlexyGlareSolid">Contorno sólido</string>
+</resources>

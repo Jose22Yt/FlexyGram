@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="FlexySmartPreviewsTitle">Умный предпросмотр сообщений</string>
-    <string name="FlexySmartPreviewAdaptive">Адаптивные цвета по типу</string>
+    <string name="FlexySmartPreviewAdaptive">Адаптивный</string>
     <string name="FlexySmartPreviewAccent">Акцент темы</string>
-    <string name="FlexySmartPreviewMatte">Signature Matte</string>
+    <string name="FlexySmartPreviewMatte">Matte</string>
     <string name="FlexySmartPreviewOff">Выключено</string>
     <string name="FlexySmartFile">Документ</string>
     <string name="FlexySmartMusic">Музыка</string>
@@ -13,4 +13,7 @@
     <string name="FlexySmartGroupEvent">Событие в группе</string>
     <string name="FlexySmartLocation">Местоположение</string>
     <string name="FlexySmartContact">Контакт</string>
+    <string name="FlexySmartJoined">Присоединился</string>
+    <string name="FlexySmartLeft">Вышел</string>
+    <string name="FlexySmartPinned">Закреплено</string>
 </resources>

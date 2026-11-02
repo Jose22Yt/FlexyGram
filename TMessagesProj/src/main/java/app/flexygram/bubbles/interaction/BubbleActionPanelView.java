@@ -19,7 +19,7 @@ import org.telegram.ui.ActionBar.Theme;
  * checks and action dispatch; this view never bypasses Telegram restrictions.
  */
 public final class BubbleActionPanelView extends LinearLayout {
-    public enum Action { REPLY, COPY, FORWARD, EDIT, PIN, DELETE, SELECT, MORE }
+    public enum Action { REPLY, COPY, STICKER, FORWARD, EDIT, PIN, DELETE, SELECT, MORE }
     public interface Listener { void onAction(Action action); }
     private Listener listener;
     private java.util.EnumSet<Action> allowed = java.util.EnumSet.noneOf(Action.class);
@@ -43,6 +43,7 @@ public final class BubbleActionPanelView extends LinearLayout {
         removeAllViews();
         line(R.string.Reply, R.drawable.msg_reply_small, Action.REPLY);
         line(R.string.Copy, R.drawable.msg_copy, Action.COPY);
+        line(R.string.FlexyContextConvertToSticker, R.drawable.msg_sticker_remix, Action.STICKER);
         line(R.string.Forward, R.drawable.msg_forward, Action.FORWARD);
         line(R.string.Edit, R.drawable.msg_edit, Action.EDIT);
         line(R.string.PinToTop, R.drawable.msg_pin, Action.PIN);

@@ -34,8 +34,8 @@ public final class FlexyComposerSettingsActivity extends BaseNekoSettingsActivit
     public FlexyComposerSettingsActivity(Drawable contextualWallpaper) { this.contextualWallpaper = contextualWallpaper; }
     @Override protected void updateRows() {
         super.updateRows();
-        styleRow = addRow("flexyComposerStyle");
         previewRow = addRow();
+        styleRow = addRow("flexyComposerStyle");
         positionRow = addRow("flexyComposerPosition");
         positionResetRow = addRow();
         levelRow = addRow("flexyComposerLevel");

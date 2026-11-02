@@ -269,9 +269,7 @@ public class NekoGeneralSettingsActivity extends BaseNekoXSettingsActivity {
     private final AbstractConfigCell dividerAutoDownload = cellGroup.appendCell(new ConfigCellDivider());
 
     public NekoGeneralSettingsActivity() {
-        if (!NaConfig.INSTANCE.getCenterActionBarTitle().Bool()) {
-            NaConfig.INSTANCE.getCenterActionBarTitleType().setConfigInt(0);
-        }
+        // Presentation migration preserves the stored title-style value, even while disabled.
         if (!shouldShowPersian()) {
             cellGroup.rows.remove(usePersianCalendarRow);
             cellGroup.rows.remove(displayPersianCalendarByLatinRow);
@@ -304,14 +302,15 @@ public class NekoGeneralSettingsActivity extends BaseNekoXSettingsActivity {
     @SuppressLint({"NewApi", "NotifyDataSetChanged", "UseCompatLoadingForDrawables"})
     @Override
     public View createView(Context context) {
-        View superView = super.createView(context);
-
-        listAdapter = new ListAdapter(context);
-
+        View superView=super.createView(context);
+        createSettings3Adapter(context);
         listView.setAdapter(listAdapter);
-
         setupDefaultListeners();
-
+        return superView;
+    }
+    @Override protected RecyclerListView.SelectionAdapter createSettings3Adapter(Context context){
+        listAdapter=new ListAdapter(context);
+        cellGroup.setListAdapter(listView,listAdapter);
         // Cells: Set OnSettingChanged Callbacks
         cellGroup.callBackSettingsChanged = (key, newValue) -> {
             if (key.equals(NekoConfig.actionBarDecoration.getKey())) {
@@ -409,7 +408,7 @@ public class NekoGeneralSettingsActivity extends BaseNekoXSettingsActivity {
             }
         };
 
-        return superView;
+        return listAdapter;
     }
 
     private void showUnifiedPushStatistics() {
@@ -475,6 +474,7 @@ public class NekoGeneralSettingsActivity extends BaseNekoXSettingsActivity {
     }
 
     private void checkCustomDoHRows() {
+        if(isSignatureSettingsPage()&&!signatureSettingsAllows(dnsTypeRow))return; // No notifications for rows owned by another page.
         boolean useDoH = NekoConfig.dnsType.Int() == NekoConfig.DNS_TYPE_CUSTOM_DOH;
         if (listAdapter == null) {
             if (!useDoH) {
@@ -498,6 +498,7 @@ public class NekoGeneralSettingsActivity extends BaseNekoXSettingsActivity {
     }
 
     private void checkMapDriftingFixRows() {
+        if(isSignatureSettingsPage()&&!signatureSettingsAllows(useOSMDroidMapRow))return; // No notifications for rows owned by another page.
         boolean useOSMDroid = NekoConfig.useOSMDroidMap.Bool();
         if (listAdapter == null) {
             if (useOSMDroid) {
@@ -522,6 +523,7 @@ public class NekoGeneralSettingsActivity extends BaseNekoXSettingsActivity {
     }
 
     private void checkCustomTitleRows() {
+        if(isSignatureSettingsPage()&&!signatureSettingsAllows(customTitleUserNameRow))return; // No notifications for rows owned by another page.
         boolean useUserName = NaConfig.INSTANCE.getCustomTitleUserName().Bool();
         if (listAdapter == null) {
             if (useUserName) {
@@ -546,6 +548,7 @@ public class NekoGeneralSettingsActivity extends BaseNekoXSettingsActivity {
     }
 
     private void checkPushServiceTypeRows() {
+        if(isSignatureSettingsPage()&&!signatureSettingsAllows(pushServiceTypeRow))return; // No notifications for rows owned by another page.
         boolean useInApp = NaConfig.INSTANCE.getPushServiceType().Int() == 0;
         boolean useUnified = NaConfig.INSTANCE.getPushServiceType().Int() == 2;
         if (listAdapter == null) {
@@ -587,6 +590,7 @@ public class NekoGeneralSettingsActivity extends BaseNekoXSettingsActivity {
     }
 
     private void checkOpenArchiveOnPullRows() {
+        if(isSignatureSettingsPage()&&!signatureSettingsAllows(hideArchiveRow))return; // No notifications for rows owned by another page.
         boolean hideArchive = NaConfig.INSTANCE.getHideArchive().Bool();
         if (listAdapter == null) {
             if (hideArchive) {
@@ -611,6 +615,7 @@ public class NekoGeneralSettingsActivity extends BaseNekoXSettingsActivity {
     }
 
     private void checkMainTabsRows() {
+        if(isSignatureSettingsPage()&&!signatureSettingsAllows(hideBottomNavigationBarRow))return; // No notifications for rows owned by another page.
         boolean hideBottomNavigationBar = NaConfig.INSTANCE.getHideBottomNavigationBar().Bool();
         AbstractConfigCell[] tabRows = {hideTitlesRow, hideContactsRow, hideCallsSettingsRow, hideProfileRow};
         if (listAdapter == null) {

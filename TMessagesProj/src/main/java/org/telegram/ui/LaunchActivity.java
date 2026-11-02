@@ -7292,7 +7292,9 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
             ProxyUtil.registerNetworkCallback();
         }
 
-        ConnectionsManager.getInstance(currentAccount).setAppPaused(false, false);
+        ConnectionsManager cm = ConnectionsManager.getInstance(currentAccount);
+        cm.setAppPaused(false, false);
+        cm.resumeNetworkMaybe();
         updateCurrentConnectionState(currentAccount);
         if (PhotoViewer.hasInstance() && PhotoViewer.getInstance().isVisible()) {
             PhotoViewer.getInstance().onResume();
@@ -8491,17 +8493,25 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         Runnable action = null;
         currentConnectionState = ConnectionsManager.getInstance(currentAccount).getConnectionState();
         if (currentConnectionState == ConnectionsManager.ConnectionStateWaitingForNetwork) {
-            title = "WaitingForNetwork";
-            titleId = R.string.WaitingForNetwork;
+            if (!ApplicationLoader.isNetworkOnline()) {
+                title = "WaitingForNetwork";
+                titleId = R.string.WaitingForNetwork;
+            }
         } else if (currentConnectionState == ConnectionsManager.ConnectionStateUpdating) {
-            title = "Updating";
-            titleId = R.string.Updating;
+            MessagesController mc = MessagesController.getInstance(currentAccount);
+            if (!mc.dialogsLoaded || (mc.getAllDialogs().isEmpty() && mc.getDialogs(0).isEmpty())) {
+                title = "Updating";
+                titleId = R.string.Updating;
+            }
         } else if (currentConnectionState == ConnectionsManager.ConnectionStateConnectingToProxy) {
             title = "ConnectingToProxyWithDots";
             titleId = R.string.ConnectingToProxyWithDots;
         } else if (currentConnectionState == ConnectionsManager.ConnectionStateConnecting) {
-            title = "Connecting";
-            titleId = R.string.Connecting;
+            MessagesController mc = MessagesController.getInstance(currentAccount);
+            if (!mc.dialogsLoaded || (mc.getAllDialogs().isEmpty() && mc.getDialogs(0).isEmpty()) || !ApplicationLoader.isNetworkOnline()) {
+                title = "Connecting";
+                titleId = R.string.Connecting;
+            }
         }
         if (currentConnectionState == ConnectionsManager.ConnectionStateConnecting || currentConnectionState == ConnectionsManager.ConnectionStateConnectingToProxy) {
             action = () -> {

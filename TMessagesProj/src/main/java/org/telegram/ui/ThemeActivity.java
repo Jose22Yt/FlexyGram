@@ -751,9 +751,12 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
             chatListRow = rowCount++;
             chatListInfoRow = rowCount++;
 
+            // FlexyGram's custom icon selector has one canonical Appearance route.
+            if (!org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) {
             appIconHeaderRow = rowCount++;
             appIconSelectorRow = rowCount++;
             appIconShadowRow = rowCount++;
+            }
 
             swipeGestureHeaderRow = rowCount++;
             swipeGestureRow = rowCount++;
