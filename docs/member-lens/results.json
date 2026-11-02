@@ -1,0 +1,24 @@
+{
+  "base": "bf96667efac14d0cbbf6677471890a366c3ef3c0",
+  "host_pytest": {
+    "passed": 172,
+    "optional_skipped": 31
+  },
+  "new_member_lens_host_tests": 10,
+  "targeted_existing_tests": {
+    "passed": 6
+  },
+  "java21_syntax_files": 10,
+  "legacy_settings2_contract": {
+    "passed": 11,
+    "failed": 1,
+    "reason": "Existing scope rejects requested ChatActivity edit; gate not relaxed"
+  },
+  "android_full_compilation": "BLOCKED_GRADLE_DOWNLOAD_NETWORK_UNREACHABLE",
+  "android_integrated_execution": "NOT_TESTED",
+  "telegram_network_queries": "NOT_TESTED",
+  "physical_poco": "NOT_TESTED",
+  "screenshots": "NOT_AVAILABLE",
+  "fps_latency_memory": "NOT_MEASURED",
+  "apk_generated": false
+}
