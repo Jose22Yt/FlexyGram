@@ -1,7 +1,5 @@
 package org.telegram.ui.Components.blur3.drawable;
 
-import static org.telegram.messenger.AndroidUtilities.dp;
-
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Outline;
@@ -15,7 +13,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
 import org.telegram.ui.ActionBar.Theme;
-import org.telegram.ui.Components.blur3.LiquidGlassEffect;
 import org.telegram.ui.Components.blur3.source.BlurredBackgroundSource;
 
 @RequiresApi(api = Build.VERSION_CODES.Q)
@@ -55,13 +52,10 @@ public class BlurredBackgroundDrawableRenderNode extends BlurredBackgroundDrawab
         return super.setClipToOutline(clipToOutline);
     }
 
-    private LiquidGlassEffect liquidGlassEffect;
-
-    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
+    /** Compatibility entry point: the optimized material never installs a refractive shader. */
+    @Deprecated
     public void setLiquidGlassEffectAllowed() {
-        liquidGlassEffect = new LiquidGlassEffect(renderNodeFill);
     }
-
 
     @Override
     public BlurredBackgroundSource getSource() {
@@ -118,26 +112,15 @@ public class BlurredBackgroundDrawableRenderNode extends BlurredBackgroundDrawab
         final float sR = boundProps.boundsWithPadding.right + offsetX;
         final float sB = boundProps.boundsWithPadding.bottom + offsetY;
 
-        c = renderNodeFill.beginRecording();
-        c.save();
-        c.translate(-sL, -sT);
-        if (liquidGlassEffect != null && Build.VERSION.SDK_INT >= 33) {
-            final int thickness = Math.max(Math.min(
-                boundProps.liquidThickness <= 0 ? dp(11) : boundProps.liquidThickness,
-                Math.min(boundProps.boundsWithPadding.width(), boundProps.boundsWithPadding.height()) / 5), 1);
-
-            liquidGlassEffect.update(
-                0, 0, boundProps.boundsWithPadding.width(), boundProps.boundsWithPadding.height(),
-                boundProps.shaderRadii[0], boundProps.shaderRadii[2], boundProps.shaderRadii[4], boundProps.shaderRadii[6],
-                thickness,
-                boundProps.liquidIntensity,
-                boundProps.liquidIndex,
-                backgroundColor
-            );
+        // Opaque fallbacks do not need a backdrop display list at all.
+        if (Color.alpha(backgroundColor) < 255) {
+            c = renderNodeFill.beginRecording();
+            c.save();
+            c.translate(-sL, -sT);
+            source.draw(c, sL, sT, sR, sB);
+            c.restore();
+            renderNodeFill.endRecording();
         }
-        source.draw(c, sL, sT, sR, sB);
-        c.save();
-        renderNodeFill.endRecording();
 
 
         c = renderNode.beginRecording();
@@ -145,7 +128,7 @@ public class BlurredBackgroundDrawableRenderNode extends BlurredBackgroundDrawab
             c.drawColor(backgroundColor);
         } else {
             c.drawRenderNode(renderNodeFill);
-            if (liquidGlassEffect == null && Color.alpha(backgroundColor) != 0) {
+            if (Color.alpha(backgroundColor) != 0) {
                 c.drawColor(backgroundColor);
             }
         }
@@ -223,9 +206,10 @@ public class BlurredBackgroundDrawableRenderNode extends BlurredBackgroundDrawab
     public void setAlpha(int alpha) {
         final int oldAlpha = getAlpha();
 
+        if (oldAlpha == alpha) return;
         super.setAlpha(alpha);
+        // RenderNode applies opacity when replayed; fading does not change recorded content.
         renderNode.setAlpha(alpha / 255f);
-        renderNodeInvalidated = true;
 
         if (oldAlpha == 0 && alpha > 0) {
             source.dispatchOnDrawablesRelativePositionChange();

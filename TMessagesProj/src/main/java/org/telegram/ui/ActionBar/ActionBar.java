@@ -2565,6 +2565,8 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
             }
         }
 
+        private final Paint badgePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        private final TextPaint badgeTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
         private int unreadCount = 0;
         private int pluginUnreadBadgeDepth;
 
@@ -2584,9 +2586,11 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
             if (countLayout == null || unreadCount == 0 || pluginUnreadBadgeDepth > 0)
                 return;
 
-            Paint paint = Theme.dialogs_countPaint;
+            badgePaint.setColor(getThemedColor(Theme.key_chats_unreadCounter));
+            badgeTextPaint.setColor(getThemedColor(Theme.key_chats_unreadCounterText));
+            Paint paint = badgePaint;
             String unreadCountString = unreadCount > 99 ? "99+" : Integer.toString(unreadCount);
-            int countWidth = Math.max(AndroidUtilities.dp(12), (int) Math.ceil(Theme.dialogs_countTextPaint.measureText(unreadCountString)));
+            int countWidth = Math.max(AndroidUtilities.dp(12), (int) Math.ceil(badgeTextPaint.measureText(unreadCountString)));
             int countLeft = getMeasuredWidth() - countWidth - AndroidUtilities.dp(20);
             int countTop = 0;
 
@@ -2601,10 +2605,13 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
 
         public void setUnread(int count) {
             if (count != unreadCount) {
-                unreadCount = count;
+                unreadCount = Math.max(0, count);
+                count = unreadCount;
+                badgeTextPaint.setTextSize(AndroidUtilities.dp(13));
+                badgeTextPaint.setTypeface(AndroidUtilities.bold());
                 String countString = count > 99 ? "99+" : Integer.toString(count);
-                int countWidth = count == 0 ? 0 : Math.max(AndroidUtilities.dp(12), (int) Math.ceil(Theme.dialogs_countTextPaint.measureText(countString)));
-                countLayout = new StaticLayout(countString, Theme.dialogs_countTextPaint, countWidth, Layout.Alignment.ALIGN_CENTER, 1.0f, 0.0f, false);
+                int countWidth = count == 0 ? 0 : Math.max(AndroidUtilities.dp(12), (int) Math.ceil(badgeTextPaint.measureText(countString)));
+                countLayout = new StaticLayout(countString, badgeTextPaint, countWidth, Layout.Alignment.ALIGN_CENTER, 1.0f, 0.0f, false);
                 invalidate();
             }
         }
@@ -2640,6 +2647,9 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
 
     @Override
     public void updateColors() {
+        if (backButtonImageView != null) {
+            backButtonImageView.invalidate();
+        }
         adaptive_updateColor();
         if (glassDrawable != null) {
             glassDrawable.updateColors();

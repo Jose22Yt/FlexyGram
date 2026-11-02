@@ -46,6 +46,27 @@ object AppearanceConfig {
     @JvmStatic
     fun getPreferences(): SharedPreferences = NekoConfig.getPreferences()
 
+    @JvmField
+    val compactNavigation = addConfig("FlexyCompactNavigation", ConfigItem.configTypeBool, true)
+
+    @JvmField
+    val navigationDensity = addConfig("FlexyNavigationDensity", ConfigItem.configTypeInt, 1)
+
+    @JvmStatic
+    fun navigationDensity(): Int = navigationDensity.Int().coerceIn(0, 2)
+
+    @JvmField
+    val floatingSearch = addConfig("FlexyFloatingSearch", ConfigItem.configTypeBool, false)
+
+    @JvmField
+    val universalGlass = addConfig("FlexyUniversalGlass", ConfigItem.configTypeBool, false)
+    @JvmField
+    val universalGlassOpacity = addConfig("FlexyUniversalGlassOpacity", ConfigItem.configTypeInt, 42)
+    @JvmField
+    val universalGlassEdge = addConfig("FlexyUniversalGlassEdge", ConfigItem.configTypeInt, 70)
+    @JvmField
+    val universalGlassSurfaces = addConfig("FlexyUniversalGlassSurfaces", ConfigItem.configTypeInt, 63)
+
     // ---- Аватары ----
 
     /** Закругление аватарок: 0 — квадрат, [AVATAR_CORNERS_MAX] — круг. */

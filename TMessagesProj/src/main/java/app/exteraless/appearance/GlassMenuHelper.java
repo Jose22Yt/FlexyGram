@@ -54,6 +54,9 @@ public abstract class GlassMenuHelper {
     }
 
     public static BlurredBackgroundProvider scrimMenuBackground(Theme.ResourcesProvider resourcesProvider) {
+        if (UniversalGlass.canRender(UniversalGlass.MENUS, resourcesProvider)) {
+            return UniversalGlass.material(resourcesProvider, Theme.key_actionBarDefaultSubmenuBackground);
+        }
         return scrimMenuGlass(resourcesProvider)
             .setShadowColor(0x26000000, 0)
             .setShadowLayer(AndroidUtilities.dpf2(4.0f), 0.0f, 0.0f)
@@ -61,6 +64,9 @@ public abstract class GlassMenuHelper {
     }
 
     public static BlurredBackgroundProvider scrimMenuBackgroundFill(Theme.ResourcesProvider resourcesProvider) {
+        if (UniversalGlass.canRender(UniversalGlass.MENUS, resourcesProvider)) {
+            return UniversalGlass.fill(resourcesProvider, Theme.key_actionBarDefaultSubmenuBackground);
+        }
         return scrimMenuGlass(resourcesProvider)
             .setShadowColor(0, 0)
             .build();

@@ -109,10 +109,6 @@ import xyz.nextalone.nagram.NaConfig;
 public class MainTabsActivity extends ViewPagerActivity implements NotificationCenter.NotificationCenterDelegate, FactorAnimator.Target {
 
     public static final int TABS_COUNT = 4;
-    private static final int POSITION_CHATS = 0;
-    private static final int POSITION_CONTACTS = 1;
-    private static final int POSITION_CALLS_OR_SETTINGS = 2;
-    private static final int POSITION_PROFILE = 3;
 
     private static final int INDEX_CHATS = 0;
     private static final int INDEX_CONTACTS = 1;
@@ -175,9 +171,12 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
     private UpdateLayoutWrapper updateLayoutWrapper;
     private app.exteraless.player.PlayerMiniView miniPlayer;
     private FrameLayout tabsViewWrapper;
+    private android.widget.ImageView floatingSearchButton;
+    private BlurredBackgroundDrawable floatingSearchBackground;
     private MainTabsLayout tabsView;
     private BlurredBackgroundDrawable tabsViewBackground;
     private View fadeView;
+    private java.util.List<Integer> lastTabOrder = app.exteraless.appearance.MainTabsOrder.visible();
     private boolean lastHideContacts = NaConfig.INSTANCE.getMainTabsHideContacts().Bool();
     private boolean lastHideCalls = MainTabsHelper.isCallsTabHidden();
     private boolean lastHideProfile = MainTabsHelper.isProfileTabHidden();
@@ -403,7 +402,11 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         tabsView.addTabToIgnoreClick(tabs[INDEX_CALLS]);
         tabsView.addTabToIgnoreClick(tabs[INDEX_FEED]);
 
-        final int[] displayOrder = {INDEX_CHATS, INDEX_FEED, INDEX_CONTACTS, INDEX_SETTINGS, INDEX_CALLS, INDEX_PROFILE};
+        final Integer[] displayOrder = {INDEX_CHATS, INDEX_FEED, INDEX_CONTACTS, INDEX_SETTINGS, INDEX_CALLS, INDEX_PROFILE};
+        java.util.Arrays.sort(displayOrder, java.util.Comparator.comparingInt(index -> {
+            int position = indexToPosition(index);
+            return position < 0 ? Integer.MAX_VALUE : position;
+        }));
         for (int index : displayOrder) {
             final GlassTabView view = tabs[index];
             final int tabIndex = index;
@@ -473,6 +476,46 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         // В M3 панель во всю ширину,
         // высота досчитывается вместе с нижним системным отступом в applyTabsBottomInset
         tabsViewWrapper.addView(tabsView, LayoutHelper.createFrame(MainTabsUiHelper.getTabsViewWidth(), MainTabsUiHelper.getTabsViewHeightDp(), Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL));
+        floatingSearchButton = null;
+        floatingSearchBackground = null;
+        if (app.exteraless.appearance.AppearanceConfig.floatingSearch.Bool()) {
+            final FrameLayout.LayoutParams tabsParams = (FrameLayout.LayoutParams) tabsView.getLayoutParams();
+            // Reserve the button and its gap in the same layout, including RTL.
+            tabsParams.setMarginEnd(dp(Math.max(48, MainTabsHelper.getMainTabsHeight())
+                    + MainTabsHelper.getMainTabsMargin() * 2));
+            tabsView.setLayoutParams(tabsParams);
+            floatingSearchButton = new android.widget.ImageView(context) {
+                private int lastIconColor;
+                @Override
+                protected void onDraw(android.graphics.Canvas canvas) {
+                    final int color = getThemedColor(Theme.key_windowBackgroundWhiteBlackText);
+                    if (lastIconColor != color) {
+                        lastIconColor = color;
+                        setColorFilter(color);
+                    }
+                    super.onDraw(canvas);
+                }
+            };
+            floatingSearchButton.setImageResource(R.drawable.outline_header_search);
+            floatingSearchButton.setScaleType(android.widget.ImageView.ScaleType.CENTER);
+            floatingSearchButton.setContentDescription(getString(R.string.Search));
+            floatingSearchBackground = iBlur3FactoryGlass.create(floatingSearchButton,
+                    BlurredBackgroundProviderImpl.mainTabs(resourceProvider, app.exteraless.appearance.UniversalGlass.SEARCH)).setRadius(dp(28));
+            floatingSearchButton.setBackground(floatingSearchBackground);
+            final int buttonSize = MainTabsHelper.isMainTabsHideTitleStyle() ? 48 : MainTabsHelper.getMainTabsHeight();
+            final FrameLayout.LayoutParams searchParams = LayoutHelper.createFrame(buttonSize, buttonSize, Gravity.BOTTOM | Gravity.END);
+            searchParams.bottomMargin = dp(MainTabsHelper.getMainTabsMargin());
+            searchParams.setMarginEnd(dp(MainTabsHelper.getMainTabsMargin()));
+            tabsViewWrapper.addView(floatingSearchButton, searchParams);
+            floatingSearchButton.setOnClickListener(v -> {
+                final int chatsPosition = getPositionChats();
+                selectTab(chatsPosition, false);
+                viewPager.scrollToPosition(chatsPosition);
+                if (dialogsActivity != null) {
+                    dialogsActivity.search("", true);
+                }
+            });
+        }
         tabsViewWrapper.setClipToPadding(false);
         contentView.addView(tabsViewWrapper, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.BOTTOM));
 
@@ -718,15 +761,15 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
     }
 
     private void openFolder(int folderId) {
-        if (viewPager.getCurrentPosition() == POSITION_CHATS && dialogsActivity != null) {
+        if (viewPager.getCurrentPosition() == getPositionChats() && dialogsActivity != null) {
             dialogsActivity.scrollToFolder(folderId);
         } else {
             if (dialogsActivity == null) {
                 prepareDialogsActivity(null);
             }
             pendingFolderId = folderId;
-            selectTab(POSITION_CHATS, true);
-            viewPager.scrollToPosition(POSITION_CHATS);
+            selectTab(getPositionChats(), true);
+            viewPager.scrollToPosition(getPositionChats());
         }
     }
 
@@ -870,7 +913,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
             if (getPositionProfile() >= 0 && currentPosition != getPositionProfile()) {
                 dropFragmentAtPosition(getPositionProfile());
             }
-            if (pendingFolderId != null && currentPosition == POSITION_CHATS && dialogsActivity != null) {
+            if (pendingFolderId != null && currentPosition == getPositionChats() && dialogsActivity != null) {
                 dialogsActivity.scrollToFolder(pendingFolderId);
                 pendingFolderId = null;
             }
@@ -985,17 +1028,23 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         final boolean hideContacts = MainTabsHelper.isContactsTabHidden();
         final boolean hideCalls = MainTabsHelper.isCallsTabHidden();
         final boolean hideProfile = MainTabsHelper.isProfileTabHidden();
+        final java.util.List<Integer> newTabOrder = app.exteraless.appearance.MainTabsOrder.visible();
         if (hideContacts != lastHideContacts || hideCalls != lastHideCalls
-                || hideProfile != lastHideProfile) {
+                || hideProfile != lastHideProfile || !lastTabOrder.equals(newTabOrder)) {
             if (viewPager != null) {
                 // Ensure ViewPagerFixed is not left with an out-of-range position on rebuild.
                 viewPager.setPosition(getStartPosition());
             }
 
-            // Fragment positions are cached. Drop non-chats fragments to avoid mismatches after layout changes.
-            for (int pos = 1; pos <= 3; pos++) {
-                dropFragmentAtPosition(pos);
+            // Preserve the Chats state and move it to its new slot; other pages are recreated.
+            final int oldChatsPosition = lastTabOrder.indexOf(app.exteraless.appearance.MainTabsOrder.CHATS);
+            final FragmentState chatsState = fragmentsArr.get(oldChatsPosition);
+            for (int pos = 0; pos < TABS_COUNT; pos++) {
+                if (pos != oldChatsPosition) dropFragmentAtPosition(pos);
             }
+            fragmentsArr.clear();
+            if (chatsState != null) fragmentsArr.put(getPositionChats(), chatsState);
+            lastTabOrder = newTabOrder;
 
             dropCallsFragmentAfterPageScroll = false;
             lastHideContacts = hideContacts;
@@ -1301,6 +1350,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         if (tabsView == null) return;
         if (NaConfig.INSTANCE.getHideBottomNavigationBar().Bool()) {
             tabsView.setVisibility(View.GONE);
+            if (floatingSearchButton != null) floatingSearchButton.setVisibility(View.GONE);
             return;
         }
         final boolean isUpdateLayoutVisible = updateLayoutWrapper.isUpdateLayoutVisible();
@@ -1312,8 +1362,13 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         final float scale = lerp(0.85f, 1f, factor);
 
         tabsViewWrapper.setTranslationY(lerp(hiddenY, normalY, factor));
-        tabsView.setClickable(factor > 1);
-        tabsView.setEnabled(factor > 1);
+        tabsView.setClickable(factor >= 1);
+        tabsView.setEnabled(factor >= 1);
+        if (floatingSearchButton != null) {
+            floatingSearchButton.setAlpha(factor);
+            floatingSearchButton.setEnabled(factor >= 1);
+            floatingSearchButton.setVisibility(factor > 0 ? View.VISIBLE : View.GONE);
+        }
         tabsView.setAlpha(factor);
         tabsView.setVisibility(factor > 0 ? View.VISIBLE : View.GONE);
     }
@@ -1498,6 +1553,10 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
 
     private void blur3_updateColors() {
         blur3_updateFadeColors();
+        if (floatingSearchBackground != null) {
+            floatingSearchBackground.updateColors();
+            floatingSearchButton.invalidate();
+        }
         if (tabsViewBackground != null) {
             tabsViewBackground.updateColors();
         }

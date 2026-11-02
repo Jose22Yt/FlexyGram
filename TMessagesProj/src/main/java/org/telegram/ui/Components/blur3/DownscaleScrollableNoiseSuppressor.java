@@ -14,7 +14,6 @@ import android.os.Build;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 
-import org.telegram.messenger.LiteMode;
 import org.telegram.messenger.MediaDataController;
 import org.telegram.messenger.utils.RenderNodeEffects;
 import org.telegram.ui.ActionBar.Theme;
@@ -36,9 +35,9 @@ public class DownscaleScrollableNoiseSuppressor {
     }
 
     public DownscaleScrollableNoiseSuppressor(boolean simple, boolean allowNoiseSuppress) {
-        isLiquidGlassEnabled = LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS);
+        isLiquidGlassEnabled = false; // Shared backdrop blur replaces the old refractive branch.
         simpleMode = simple;
-        k = isLiquidGlassEnabled || allowNoiseSuppress ? 1 : 8; // 1
+        k = GlassRenderingPolicy.captureScale(allowNoiseSuppress);
 
         this.allowNoiseSuppress = allowNoiseSuppress;
         resultRenderNodes = new RenderNode[isLiquidGlassEnabled || !simpleMode ? 2 : 1];
@@ -162,8 +161,8 @@ public class DownscaleScrollableNoiseSuppressor {
         public void invalidateRenderNodes(RenderNode renderNode) {
             final int originalWidth = renderNode.getWidth();
             final int originalHeight = renderNode.getHeight();
-            final int downsampledWidth = Math.round((float) originalWidth * k / scaleX);
-            final int downsampledHeight = Math.round((float) originalHeight * k / scaleY);
+            final int downsampledWidth = GlassRenderingPolicy.downsampleDimension(originalWidth, k, scaleX);
+            final int downsampledHeight = GlassRenderingPolicy.downsampleDimension(originalHeight, k, scaleY);
 
             final float scaleX = (float) downsampledWidth / originalWidth;
             final float scaleY = (float) downsampledHeight / originalHeight;
@@ -199,12 +198,6 @@ public class DownscaleScrollableNoiseSuppressor {
             canvas = renderNodeOriginalWithOffset.beginRecording(originalWidth, originalHeight);
             canvas.drawRenderNode(renderNode);
             renderNodeOriginalWithOffset.endRecording();
-
-            renderNodeDownsampled[0].setPosition(0, 0, downsampledWidth, downsampledHeight);
-            canvas = renderNodeDownsampled[0].beginRecording(downsampledWidth, downsampledHeight);
-            canvas.scale(scaleX, scaleY);
-            canvas.drawRenderNode(renderNodeOriginalWithOffset);
-            renderNodeDownsampled[0].endRecording();
 
             for (int a = 0; a < renderNodeDownsampled.length; a++) {
                 renderNodeDownsampled[a].setPosition(0, 0, downsampledWidth, downsampledHeight);
@@ -501,8 +494,8 @@ public class DownscaleScrollableNoiseSuppressor {
         recordingPos = rectF;
         recordingIndex = index;
 
-        final int width = rectF.width() / k;
-        final int height = rectF.height() / k;
+        final int width = GlassRenderingPolicy.captureDimension(rectF.width(), k);
+        final int height = GlassRenderingPolicy.captureDimension(rectF.height(), k);
 
         sourcePart.renderNode.setPosition(0, 0, width, height);
         RecordingCanvas c = sourcePart.renderNode.beginRecording(width, height);

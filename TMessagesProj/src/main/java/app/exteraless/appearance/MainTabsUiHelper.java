@@ -32,7 +32,7 @@ public final class MainTabsUiHelper {
     }
 
     public static boolean isMaterial3NavigationBar() {
-        return AppearanceConfig.newNavigationBarStyle() && !MainTabsLayout.isBottomNavigationFloating();
+        return AppearanceConfig.newNavigationBarStyle() && !AppearanceConfig.compactNavigation.Bool() && !MainTabsLayout.isBottomNavigationFloating();
     }
 
     /**
@@ -66,7 +66,7 @@ public final class MainTabsUiHelper {
         if (isMaterial3NavigationBar()) {
             return 0;
         }
-        return AndroidUtilities.dp(MainTabsHelper.getMainTabsMargin() + (isIosNavigationBar() ? 6 : 4));
+        return AndroidUtilities.dp(MainTabsHelper.getMainTabsMargin() + (MainTabsHelper.isMainTabsHideTitleStyle() ? 4 : (MainTabsHelper.getMainTabsHeight() - 48) / 2));
     }
 
     public static int getTabsInnerPaddingHorizontal() {

@@ -157,6 +157,7 @@ def test_verdict_cache_reuses_classification(loader, monkeypatch):
 def test_install_reflection_gate_installs_policy(loader, monkeypatch):
     installed = []
     chaquopy = types.ModuleType('java.chaquopy')
+    chaquopy.get_reflection_policy = lambda: installed[-1] if installed else None
     chaquopy.set_reflection_policy = installed.append
     java = types.ModuleType('java')
     java.chaquopy = chaquopy
@@ -165,7 +166,7 @@ def test_install_reflection_gate_installs_policy(loader, monkeypatch):
     loader._install_reflection_gate()
     assert installed == [loader._reflection_gate]
     loader._install_reflection_gate()
-    assert installed == [loader._reflection_gate, loader._reflection_gate]
+    assert installed == [loader._reflection_gate]
 
 
 def test_install_reflection_gate_tolerates_missing_api(loader, monkeypatch, capsys):
@@ -179,6 +180,7 @@ def test_install_reflection_gate_reports_set_failure(loader, monkeypatch, capsys
     chaquopy = types.ModuleType('java.chaquopy')
     def set_reflection_policy(policy):
         raise RuntimeError("bridge rejected the policy")
+    chaquopy.get_reflection_policy = lambda: None
     chaquopy.set_reflection_policy = set_reflection_policy
     java = types.ModuleType('java')
     java.chaquopy = chaquopy

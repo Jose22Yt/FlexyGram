@@ -11654,6 +11654,20 @@ public class ChatActivityEnterView extends FrameLayout implements
         return result;
     }
 
+    public void setupUniversalGlass(BlurredBackgroundDrawableViewFactory factory) {
+        if (!app.exteraless.appearance.UniversalGlass.canRender(app.exteraless.appearance.UniversalGlass.INPUT, resourcesProvider)) return;
+        final var material = app.exteraless.appearance.UniversalGlass.material(resourcesProvider, Theme.key_chat_messagePanelBackground);
+        if (attachButton != null) {
+            final var glass = factory.create(attachButton, material).setRadius(dp(32));
+            final Drawable selector = attachButton.getBackground();
+            attachButton.setBackground(selector == null ? glass
+                    : new android.graphics.drawable.LayerDrawable(new Drawable[]{glass, selector}));
+        }
+        if (sendButton != null) {
+            sendButton.setBlurredBackgroundDrawable(factory.create(sendButton, material));
+        }
+    }
+
     public ImageView getAttachButton() {
         return attachButton;
     }
@@ -16944,12 +16958,13 @@ public class ChatActivityEnterView extends FrameLayout implements
                     blurredBackgroundDrawable.draw(canvas);
                 }
 
-                if (!isNewDesignSendButton) {
+                if (!isNewDesignSendButton && blurredBackgroundDrawable == null) {
                     canvas.drawPath(path, backgroundPaint);
                 }
                 canvas.clipPath(path);
                 if (loadingShown > 0) {
-                    loadingPaint.setColor(0xFFFFFFFF);
+                    loadingPaint.setColor(blurredBackgroundDrawable != null
+                            ? Theme.getColor(Theme.key_glass_defaultIcon, resourcesProvider) : 0xFFFFFFFF);
                     loadingPaint.setAlpha((int) (0xFF * loadingShown));
                     final float R = dp(8.66f);
                     AndroidUtilities.rectTmp.set(right - w / 2.0f - R, cy - R, right - w / 2.0f + R, cy + R);
@@ -17077,6 +17092,8 @@ public class ChatActivityEnterView extends FrameLayout implements
             this.blurredBackgroundDrawable = blurredBackgroundDrawable;
             this.blurredBackgroundDrawable.setRadius(dp(22));
             this.blurredBackgroundDrawable.setPadding(dp(4));
+            updateColors();
+            invalidate();
         }
 
         public boolean newCounterPos;
@@ -17114,7 +17131,8 @@ public class ChatActivityEnterView extends FrameLayout implements
         private int drawableColor;
 
         public void updateColors() {
-            int color = isNewDesignSendButton ? Color.WHITE : Theme.getColor(Theme.key_chat_messagePanelSend, resourcesProvider);
+            int color = blurredBackgroundDrawable != null ? Theme.getColor(Theme.key_glass_defaultIcon, resourcesProvider)
+                    : isNewDesignSendButton ? Color.WHITE : Theme.getColor(Theme.key_chat_messagePanelSend, resourcesProvider);
             if (color != drawableColor) {
                 drawableColor = color;
                 drawable.setColorFilter(new PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN));

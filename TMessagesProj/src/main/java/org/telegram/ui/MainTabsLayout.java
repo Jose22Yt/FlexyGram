@@ -123,11 +123,19 @@ public class MainTabsLayout extends AnimatedLinearLayout {
             width = maxWidthPx;
         }
 
-        final boolean fillWidth = MainTabsUiHelper.isMaterial3NavigationBar() || MainTabsUiHelper.isIosNavigationBar();
-        final int maxTotalWidthForTabs = width - getPaddingLeft() - getPaddingRight();
+        final boolean compactNavigation = app.exteraless.appearance.AppearanceConfig.compactNavigation.Bool();
+        final boolean fillWidth = !compactNavigation && (MainTabsUiHelper.isMaterial3NavigationBar() || MainTabsUiHelper.isIosNavigationBar());
+        int visibleTabs = 0;
+        for (int i = 0; i < getChildCount(); i++) {
+            if (isViewVisible(getChildAt(i))) visibleTabs++;
+        }
+        final int availableWidth = Math.max(0, width - getPaddingLeft() - getPaddingRight());
+        final int maxTotalWidthForTabs = compactNavigation
+                ? Math.min(availableWidth, dp(tw.nekomimi.nekogram.helpers.MainTabsHelper.getMainTabsPreferredTabWidth()) * visibleTabs)
+                : availableWidth;
         final int minTotalWidthForTabs = fillWidth
                 ? maxTotalWidthForTabs
-                : Math.min(dp(320), maxTotalWidthForTabs);
+                : Math.min(dp(compactNavigation ? tw.nekomimi.nekogram.helpers.MainTabsHelper.getMainTabsPreferredTabWidth() * visibleTabs : 320), maxTotalWidthForTabs);
 
         int chosenPass = PASS_TEXT_SIZES_DP.length - 1;
         float lastMeasuredTextSize = -1;
@@ -211,13 +219,19 @@ public class MainTabsLayout extends AnimatedLinearLayout {
             }
         }
 
+        int compactIndex = 0;
         int l = 0;
         for (int a = 0, N = getChildCount(); a < N; a++) {
             if (!isViewVisible(getChildAt(a))) {
                 continue;
             }
 
-            tabsWidth[a] = Math.round(tabsTextWidthWithMargin[a]);
+            if (compactNavigation && visibleTabs > 0) {
+                // Round cumulative boundaries so all pixels are shared without overflow.
+                tabsWidth[a] = Math.round((float) maxTotalWidthForTabs * (++compactIndex) / visibleTabs) - l;
+            } else {
+                tabsWidth[a] = Math.round(tabsTextWidthWithMargin[a]);
+            }
             tabsLeftPos[a] = l;
             l += tabsWidth[a];
         }

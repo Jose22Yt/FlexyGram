@@ -19,6 +19,13 @@ import org.telegram.ui.Components.blur3.drawable.color.BlurredBackgroundProvider
 
 public class BlurredBackgroundProviderImpl {
     public static BlurredBackgroundProvider mainTabs(Theme.ResourcesProvider resourcesProvider) {
+        return mainTabs(resourcesProvider, app.exteraless.appearance.UniversalGlass.NAVIGATION);
+    }
+
+    public static BlurredBackgroundProvider mainTabs(Theme.ResourcesProvider resourcesProvider, int surface) {
+        if (app.exteraless.appearance.UniversalGlass.canRender(surface, resourcesProvider)) {
+            return app.exteraless.appearance.UniversalGlass.material(resourcesProvider, Theme.key_windowBackgroundWhite);
+        }
         final BlurredBackgroundProviderBuilder builder = new BlurredBackgroundProviderBuilder(resourcesProvider)
             .setBackgroundColor((r, isDark) -> {
                 final float alpha = LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS) ? 0.85f : 0.76f;
@@ -93,6 +100,9 @@ public class BlurredBackgroundProviderImpl {
     }
 
     public static BlurredBackgroundProvider messageMenuBackground(Theme.ResourcesProvider resourcesProvider) {
+        if (app.exteraless.appearance.UniversalGlass.canRender(app.exteraless.appearance.UniversalGlass.MENUS, resourcesProvider)) {
+            return app.exteraless.appearance.UniversalGlass.material(resourcesProvider, Theme.key_actionBarDefaultSubmenuBackground);
+        }
         return new BlurredBackgroundProviderBuilder(resourcesProvider)
                 .setBackgroundColor((r, isDark) -> {
                     if (!LiteMode.isEnabled(LiteMode.FLAG_CHAT_BLUR)) {
@@ -109,6 +119,9 @@ public class BlurredBackgroundProviderImpl {
     }
 
     public static BlurredBackgroundProvider scrimMenuBackground(Theme.ResourcesProvider resourcesProvider) {
+        if (app.exteraless.appearance.UniversalGlass.canRender(app.exteraless.appearance.UniversalGlass.MENUS, resourcesProvider)) {
+            return app.exteraless.appearance.UniversalGlass.material(resourcesProvider, Theme.key_actionBarDefaultSubmenuBackground);
+        }
         return new BlurredBackgroundProviderBuilder(resourcesProvider)
             .setBackgroundColor((r, isDark) ->
                 Theme.multAlpha(Theme.getColor(Theme.key_actionBarDefaultSubmenuBackground), isDark ? 0.85f : 0.825f))
@@ -146,6 +159,9 @@ public class BlurredBackgroundProviderImpl {
     }
 
     public static BlurredBackgroundProvider bottomPanelChatActivity(Theme.ResourcesProvider resourcesProvider) {
+        if (app.exteraless.appearance.UniversalGlass.canRender(app.exteraless.appearance.UniversalGlass.INPUT, resourcesProvider)) {
+            return app.exteraless.appearance.UniversalGlass.material(resourcesProvider, Theme.key_chat_messagePanelBackground);
+        }
         return new BlurredBackgroundProviderBuilder(resourcesProvider)
                 .setBackgroundColor((r, isDark) -> {
                     if (!checkBlurEnabled(resourcesProvider)) {
@@ -165,6 +181,9 @@ public class BlurredBackgroundProviderImpl {
     }
 
     public static BlurredBackgroundProvider topPanelChatActivity(Theme.ResourcesProvider resourcesProvider) {
+        if (app.exteraless.appearance.UniversalGlass.canRender(app.exteraless.appearance.UniversalGlass.HEADER, resourcesProvider)) {
+            return app.exteraless.appearance.UniversalGlass.material(resourcesProvider, Theme.key_chat_topPanelBackground);
+        }
         return new BlurredBackgroundProviderBuilder(resourcesProvider)
                 .setBackgroundColor((r, isDark) -> {
                     if (!checkBlurEnabled(resourcesProvider)) {

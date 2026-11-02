@@ -68,6 +68,13 @@ public class OpenExteraAppNavigationActivity extends BaseFragment {
     private static final int ID_HIDE_CONTACTS_TAB = -108;
     private static final int ID_HIDE_CALLS_TAB = -109;
     private static final int ID_HIDE_PROFILE_TAB = -110;
+    private static final int ID_COMPACT_NAVIGATION = -111;
+    private static final int ID_FLOATING_SEARCH = -112;
+    private static final int ID_NAVIGATION_DENSITY = -113;
+    private static final int ID_TABS_PREVIEW = -114;
+    private static final int ID_RESET_TABS = -115;
+    private static final int ID_TAB_OPTIONS = -116;
+    private boolean tabOptionsExpanded;
 
     /** Кнопка «добавить разделитель». */
     private static final int ID_ADD_DIVIDER = -200;
@@ -160,18 +167,37 @@ public class OpenExteraAppNavigationActivity extends BaseFragment {
         }
 
         items.add(UItem.asHeader(getString(R.string.OEBottomNavigationBar)));
+        adapter.whiteSectionStart();
+        if (hasBottomTabs()) {
+            items.add(UItem.asCustom(ID_TABS_PREVIEW,
+                    new app.exteraless.appearance.MainTabsPreview(getContext(), currentAccount, getResourceProvider(), this::onTabsOrderChanged)));
+        }
         items.add(UItem.asButton(ID_BOTTOM_NAVIGATION_BAR, getString(R.string.OEBottomNavigationBarMode),
                 bottomNavigationModes()[MainTabsLayout.getBottomNavigationMode()]));
         if (hasBottomTabs()) {
+            items.add(UItem.asCheck(ID_COMPACT_NAVIGATION, getString(R.string.FlexyCompactNavigation))
+                    .setChecked(AppearanceConfig.compactNavigation.Bool()));
+            if (AppearanceConfig.compactNavigation.Bool()) {
+                items.add(UItem.asButton(ID_NAVIGATION_DENSITY, getString(R.string.FlexyNavigationDensity),
+                        navigationDensityOptions()[AppearanceConfig.navigationDensity()]));
+            }
+            items.add(UItem.asCheck(ID_FLOATING_SEARCH, getString(R.string.FlexyFloatingSearch))
+                    .setChecked(AppearanceConfig.floatingSearch.Bool()));
             items.add(UItem.asCheck(ID_HIDE_TAB_TITLES, getString(R.string.MainTabsHideTitles))
                     .setChecked(NaConfig.INSTANCE.getMainTabsHideTitles().Bool()));
+            items.add(UItem.asButton(ID_TAB_OPTIONS, getString(R.string.FlexyTabsVisibility),
+                    (tabOptionsExpanded ? "− " : "+ ") + tw.nekomimi.nekogram.helpers.MainTabsHelper.getFragmentsCount()));
+            if (tabOptionsExpanded) {
             items.add(UItem.asCheck(ID_HIDE_CONTACTS_TAB, getString(R.string.MainTabsHideContacts))
                     .setChecked(NaConfig.INSTANCE.getMainTabsHideContacts().Bool()));
             items.add(UItem.asCheck(ID_HIDE_CALLS_TAB, getString(R.string.MainTabsHideCallsSettings))
                     .setChecked(NaConfig.INSTANCE.getMainTabsHideCallsSettings().Bool()));
             items.add(UItem.asCheck(ID_HIDE_PROFILE_TAB, getString(R.string.MainTabsHideProfile))
                     .setChecked(NaConfig.INSTANCE.getMainTabsHideProfile().Bool()));
+            }
+            items.add(UItem.asButton(ID_RESET_TABS, R.drawable.msg_reset, getString(R.string.FlexyTabsReset)).accent());
         }
+        adapter.whiteSectionEnd();
         items.add(UItem.asShadow(null));
 
         items.add(UItem.asHeader(getString(R.string.OEAppNavigation)));
@@ -316,6 +342,29 @@ public class OpenExteraAppNavigationActivity extends BaseFragment {
     private void onItemClick(UItem item, View view, int position, float x, float y) {
         final int id = item.id;
 
+        if (id == ID_TAB_OPTIONS) {
+            tabOptionsExpanded = !tabOptionsExpanded;
+            update();
+            return;
+        }
+        if (id == ID_RESET_TABS) {
+            app.exteraless.appearance.MainTabsOrder.reset();
+            onTabsOrderChanged();
+            return;
+        }
+        if (id == ID_NAVIGATION_DENSITY) {
+            showChoice(getString(R.string.FlexyNavigationDensity), navigationDensityOptions(),
+                    AppearanceConfig.navigationDensity(), which -> {
+                        AppearanceConfig.navigationDensity.setConfigInt(which);
+                        update();
+                        if (getParentLayout() != null) getParentLayout().rebuildFragments(0);
+                    });
+            return;
+        }
+        if (id == ID_COMPACT_NAVIGATION || id == ID_FLOATING_SEARCH) {
+            toggleMainTab(id == ID_COMPACT_NAVIGATION ? AppearanceConfig.compactNavigation : AppearanceConfig.floatingSearch);
+            return;
+        }
         if (id == ID_TABLET_MODE) {
             showChoice(getString(R.string.OETabletMode), tabletModes(),
                     NekoConfig.tabletMode.Int(), which -> {
@@ -476,12 +525,22 @@ public class OpenExteraAppNavigationActivity extends BaseFragment {
 
     // ---- мелочи ----
 
+    private void onTabsOrderChanged() {
+        update();
+        if (getParentLayout() != null) getParentLayout().rebuildFragments(0);
+    }
+
     private void update() {
         if (listView != null && listView.adapter != null) {
             listView.adapter.update(true);
         }
         updateResetButtonVisibility(true);
         getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
+    }
+
+    private CharSequence[] navigationDensityOptions() {
+        return new CharSequence[]{getString(R.string.FlexyNavigationExtraCompact),
+                getString(R.string.FlexyNavigationCompact), getString(R.string.FlexyNavigationComfortable)};
     }
 
     private void showChoice(String title, CharSequence[] options, int selected,

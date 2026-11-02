@@ -2398,7 +2398,9 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
          */
         @Override
         protected boolean isSectionContent(int viewType) {
-            if (viewType == TYPE_EXPANDABLE_SWITCH || viewType == TYPE_ROUND_CHECK
+            if (viewType == TYPE_STICKER_SIZE || viewType == TYPE_STICKER_SHAPE
+                    || viewType == TYPE_DOUBLE_TAP || viewType == TYPE_SET_REACTION
+                    || viewType == TYPE_EXPANDABLE_SWITCH || viewType == TYPE_ROUND_CHECK
                     || viewType == TYPE_WIDE_CHANNEL_PREVIEW) {
                 return true;
             }

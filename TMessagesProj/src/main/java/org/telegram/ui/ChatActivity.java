@@ -4033,6 +4033,9 @@ public class ChatActivity extends BaseFragment implements
         blurredBackgroundColorProvider = new BlurredBackgroundColorProviderThemed(themeDelegate, Theme.key_chat_messagePanelBackground) {
             @Override
             public int getBackgroundColor() {
+                if (app.exteraless.appearance.UniversalGlass.canRender(app.exteraless.appearance.UniversalGlass.INPUT, themeDelegate)) {
+                    return app.exteraless.appearance.UniversalGlass.backgroundColor(themeDelegate, Theme.key_chat_messagePanelBackground);
+                }
                 if (!BlurredBackgroundProviderImpl.checkBlurEnabled(currentAccount, themeDelegate)) {
                     return ColorUtils.setAlphaComponent(getThemedColor(Theme.key_chat_messagePanelBackground), 255);
                 }
@@ -4042,6 +4045,26 @@ public class ChatActivity extends BaseFragment implements
                     return ColorUtils.setAlphaComponent(super.getBackgroundColor(), 216);
                 }
                 return super.getBackgroundColor();
+            }
+            @Override
+            public int getShadowColor() {
+                return app.exteraless.appearance.UniversalGlass.canRender(app.exteraless.appearance.UniversalGlass.INPUT, themeDelegate)
+                        ? 0x18000000 : super.getShadowColor();
+            }
+            @Override
+            public int getStrokeColorFull() {
+                return app.exteraless.appearance.UniversalGlass.canRender(app.exteraless.appearance.UniversalGlass.INPUT, themeDelegate)
+                        ? app.exteraless.appearance.UniversalGlass.edgeColor(true) : super.getStrokeColorFull();
+            }
+            @Override
+            public int getStrokeColorTop() {
+                return app.exteraless.appearance.UniversalGlass.canRender(app.exteraless.appearance.UniversalGlass.INPUT, themeDelegate)
+                        ? app.exteraless.appearance.UniversalGlass.edgeColor(true) : super.getStrokeColorTop();
+            }
+            @Override
+            public int getStrokeColorBottom() {
+                return app.exteraless.appearance.UniversalGlass.canRender(app.exteraless.appearance.UniversalGlass.INPUT, themeDelegate)
+                        ? app.exteraless.appearance.UniversalGlass.edgeColor(false) : super.getStrokeColorBottom();
             }
         };
         blurredBackgroundColorProviderWhite = new BlurredBackgroundColorProviderThemed(themeDelegate, Theme.key_windowBackgroundWhite) {
@@ -8765,6 +8788,7 @@ public class ChatActivity extends BaseFragment implements
         if (chatMode == MODE_SCHEDULED || isComments) {
             chatActivityEnterView.setSideButtonsForAttach(sideControlsButtonsLayout);
         }
+        chatActivityEnterView.setupUniversalGlass(glassBackgroundDrawableFactory);
         chatActivityEnterView.setInAppInsetsController(windowInsetsStateHolder);
         chatActivityEnterView.setDialogId(dialog_id, currentAccount);
         if (chatInfo != null) {

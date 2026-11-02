@@ -92,6 +92,7 @@ public class OpenExteraAppearanceActivity extends BaseNekoSettingsActivity {
 
     // Blur
     private int blurHeaderRow;
+    private int universalGlassRow;
     private int glassOutlineRow;
     private int glassMessageMenuRow;
     private int forceBlurRow;
@@ -239,6 +240,7 @@ public class OpenExteraAppearanceActivity extends BaseNekoSettingsActivity {
         sectionsDividerRow = addRow();
 
         blurHeaderRow = addRow("blurHeader");
+        universalGlassRow = addRow("universalGlass");
         glassOutlineRow = addRow("glassOutline");
         glassMessageMenuRow = addRow("glassMessageMenu");
         forceBlurRow = addRow("forceBlur");
@@ -633,6 +635,8 @@ public class OpenExteraAppearanceActivity extends BaseNekoSettingsActivity {
                     getString(R.string.OEAppearanceDividerSegments)
             }, AppearanceConfig.dividerStyle, this::onDividerStyleChanged);
             return;
+        } else if (position == universalGlassRow) {
+            presentFragment(new UniversalGlassSettingsActivity());
         } else if (position == glassOutlineRow) {
             showSelector(position, getString(R.string.OEAppearanceGlassOutline), new CharSequence[]{
                     getString(R.string.OEAppearanceGlassOutlineGlare),
@@ -1016,7 +1020,9 @@ public class OpenExteraAppearanceActivity extends BaseNekoSettingsActivity {
                 case TYPE_DETAIL_SETTINGS: {
                     // Иконка слева, подпись под заголовком.
                     TextDetailSettingsCell cell = (TextDetailSettingsCell) holder.itemView;
-                    if (position == appNavigationRow) {
+                    if (position == universalGlassRow) {
+                        cell.setTextAndValueAndIcon(getString(R.string.FlexyUniversalGlass), getString(R.string.FlexyUniversalGlassSummary), R.drawable.msg_theme, true);
+                    } else if (position == appNavigationRow) {
                         cell.setTextAndValueAndIcon(getString(R.string.OEAppearanceNavigation), getString(R.string.OEAppearanceNavigationSub), R.drawable.msg_newphone, true);
                     } else if (position == iconPacksRow) {
                         cell.setTextAndValueAndIcon(getString(R.string.OEAppearanceIconPacks), getString(R.string.OEAppearanceIconPacksInfo), R.drawable.msg_sticker, true);
@@ -1094,7 +1100,7 @@ public class OpenExteraAppearanceActivity extends BaseNekoSettingsActivity {
                 return TYPE_INFO_PRIVACY;
             } else if (position == fabShapeRow) {
                 return TYPE_FAB_SHAPE;
-            } else if (position == appNavigationRow || position == iconPacksRow
+            } else if (position == universalGlassRow || position == appNavigationRow || position == iconPacksRow
                     || position == emojiSetsRow || position == pillStackRow || position == hidingRow) {
                 return TYPE_DETAIL_SETTINGS;
             } else if (position == md3GroupRow || position == iosGroupRow) {
