@@ -224,9 +224,10 @@ public final class SignatureWallpaperBlur {
         private BitmapShader shader;
         private Runnable availabilityChanged;
         private ValueAnimator revealMotion;
-        private float reveal = 1;
+        private float reveal = 1f;
         private boolean sawFallback, firstDraw;
         private float mappedLeft = Float.NaN, mappedTop, mappedWidth, mappedHeight;
+        private float cachedScaleX = 1f, cachedScaleY = 1f;
         public Owner(View target) { this(target, null); }
         public Owner(View target, Runnable availabilityChanged) {
             this.target = new WeakReference<>(target);
@@ -354,9 +355,17 @@ public final class SignatureWallpaperBlur {
             float left = mapping.left - rootOffsetX, top = mapping.top - rootOffsetY;
             if (mappedLeft != left || mappedTop != top || mappedWidth != mapping.width() || mappedHeight != mapping.height()) {
                 matrixUpdates++;
-                mappedLeft = left; mappedTop = top; mappedWidth = mapping.width(); mappedHeight = mapping.height();
-                matrix.setScale(mappedWidth / entry.bitmap.getWidth(), mappedHeight / entry.bitmap.getHeight());
-                matrix.postTranslate(left, top); shader.setLocalMatrix(matrix);
+                if (mappedWidth != mapping.width() || mappedHeight != mapping.height()) {
+                    mappedWidth = mapping.width();
+                    mappedHeight = mapping.height();
+                    cachedScaleX = mappedWidth / entry.bitmap.getWidth();
+                    cachedScaleY = mappedHeight / entry.bitmap.getHeight();
+                }
+                mappedLeft = left;
+                mappedTop = top;
+                matrix.setScale(cachedScaleX, cachedScaleY);
+                matrix.postTranslate(left, top);
+                shader.setLocalMatrix(matrix);
             }
             // Original cached wallpaper blur: native animation alpha, independent of retired Glass settings.
             paint.setAlpha(Math.round(Math.max(0, Math.min(255, alpha)) * reveal));

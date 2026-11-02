@@ -30,4 +30,9 @@
     <string name="FlexyFilesDiscard">Descartar</string>
     <string name="FlexyFilesShare">Compartir archivo</string>
     <string name="FlexyFilesDownload">Descargar</string>
+    <string name="FlexyFilesNativeBack">Volver a archivos</string>
+    <string name="FlexyFilesNativeEdit">Editar</string>
+    <string name="FlexyFilesNativeImage">Vista previa local de imagen</string>
+    <string name="FlexyFilesNativeTooLarge">La vista previa supera el límite seguro de tamaño. El original no se ha modificado.</string>
+    <string name="FlexyFilesNativeUnsupported">No hay vista previa de texto o imagen para este formato. El original no se ha modificado.</string>
 </resources>

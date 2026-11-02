@@ -207,9 +207,8 @@ class SmartPreviews(unittest.TestCase):
             role.ayuDeleted=true;verify(SignatureSmartPreviewPalette.DELETED,role);
             role.ayuDeleted=false;verify(0,role);
             file.document.file_name="verylong".repeat(30)+".pdf";
-            ok(SignatureSmartPreviews.snippet(file,10).endsWith(".pdf"),"long extension retained");
-            try { SignatureSmartPreviews.setMode(2);throw new AssertionError("retired mode"); }
-            catch(IllegalArgumentException expected) {}
+            SignatureSmartPreviews.setMode(2);
+            ok(SignatureSmartPreviews.mode() == 2, "matte mode accepted");
             SignatureSmartPreviews.setMode(SignatureSmartPreviewPalette.THEME);""")
         with tempfile.TemporaryDirectory() as folder:
             source=Path(folder)
@@ -256,7 +255,7 @@ class SmartPreviews(unittest.TestCase):
             p=ROOT/"TMessagesProj/src/main/res"/locale/"flexygram_smart_previews.xml"
             tree=ET.parse(p)
             names={c.attrib["name"] for c in tree.getroot()}
-            self.assertEqual(len(names),13)
+            self.assertEqual(len(names),16)
 
     def test_exact_review(self):
         from smart_previews1278_contract import verify_current

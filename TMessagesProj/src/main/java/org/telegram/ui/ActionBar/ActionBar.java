@@ -2753,7 +2753,9 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
     }
 
     public void unreadBadgeSetCount(int count) {
-        if ((signatureHeader == null || !signatureHeader.enabled()) && backButtonImageView != null && NekoConfig.unreadBadgeOnBackButton.Bool()) {
+        if (signatureHeader != null && signatureHeader.enabled()) {
+            signatureHeader.setCount(app.flexygram.header.HeaderConfig.counter() ? count : 0);
+        } else if (backButtonImageView != null && (NekoConfig.unreadBadgeOnBackButton.Bool() || app.flexygram.header.HeaderConfig.counter())) {
             backButtonImageView.setUnread(count);
         }
     }

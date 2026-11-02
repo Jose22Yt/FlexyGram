@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyBottomTabsTitle">Bottom tabs organizer</string>
+    <string name="FlexyBottomTabsSectionTabs">Tabs</string>
+    <string name="FlexyBottomTabsShow">Show tabs</string>
+    <string name="FlexyBottomTabsShowSub">Double-tap a chat tab to open "Saved Messages". Double-tap the profile tab (or Settings if profile is hidden) to switch accounts.</string>
+    <string name="FlexyBottomTabsSectionAppearance">Appearance</string>
+    <string name="FlexyBottomTabsFloatingDock">Floating dock style</string>
+    <string name="FlexyBottomTabsFloatingDockSub">Render as a sleek floating glass capsule detached from the screen edges.</string>
+    <string name="FlexyBottomTabsShowTitles">Show tabs titles</string>
+    <string name="FlexyBottomTabsSectionOrder">Tabs layout &amp; order</string>
+    <string name="FlexyBottomTabsOrderHint">Tap to enable/disable or move items to customize your dock.</string>
+    <string name="FlexyBottomTabsSectionActions">Smart Actions</string>
+    <string name="FlexyBottomTabsDoubleTapChats">Double-tap chats for Saved Messages</string>
+    <string name="FlexyBottomTabsDoubleTapProfile">Double-tap profile to switch accounts</string>
+    <string name="FlexyBottomTabsAlwaysSearchChats">Always search in chats</string>
+    <string name="FlexyBottomTabsAlwaysSearchChatsSub">When enabled, the search button always opens chat search. When disabled, it opens context search for the current screen.</string>
+</resources>

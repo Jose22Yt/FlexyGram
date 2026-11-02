@@ -14,16 +14,26 @@ import org.telegram.ui.Cells.DialogCell;
 public final class NativeInstantTouchTarget {
     private NativeInstantTouchTarget() {}
 
+    private static final Search UI_SEARCH = new Search();
+    private static final Rect SCRATCH_RECT = new Rect();
+    private static final int[] SCRATCH_POINT = new int[2];
+
     /** Native ACTION_DOWN raw coordinates, on the original UI thread. */
     public static boolean isVisibleDialogRow(View root, float rawX, float rawY) {
         if (root == null || !Float.isFinite(rawX) || !Float.isFinite(rawY)) return false;
-        return find(root, rawX, rawY, 0, new Search());
+        UI_SEARCH.reset();
+        return find(root, rawX, rawY, 0, UI_SEARCH);
     }
 
     private static final class Search {
         final Rect visible = new Rect();
         final int[] screen = new int[2];
         int remaining = 128;
+
+        void reset() {
+            remaining = 128;
+            visible.setEmpty();
+        }
     }
     private static boolean find(View view, float x, float y, int depth, Search search) {
         if (view == null || --search.remaining < 0 || depth > 16 || view.getVisibility() != View.VISIBLE
@@ -43,7 +53,7 @@ public final class NativeInstantTouchTarget {
     public static boolean containsVisiblePoint(View view, float rawX, float rawY) {
         if (view == null || view.getWidth() <= 0 || view.getHeight() <= 0
                 || !view.isShown() || view.getAlpha() <= .01f) return false;
-        return containsVisiblePoint(view, rawX, rawY, new Rect(), new int[2]);
+        return containsVisiblePoint(view, rawX, rawY, SCRATCH_RECT, SCRATCH_POINT);
     }
     private static boolean containsVisiblePoint(View view, float rawX, float rawY, Rect visible, int[] screen) {
         if(view==null || view.getWidth()<=0 || view.getHeight()<=0 || !view.isShown() || view.getAlpha()<=.01f)return false;

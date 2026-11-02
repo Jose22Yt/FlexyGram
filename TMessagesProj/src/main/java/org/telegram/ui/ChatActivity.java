@@ -5380,11 +5380,14 @@ public class ChatActivity extends BaseFragment implements
         chatListView = new ChatListRecyclerView(context, themeDelegate) {
             private ChatMessageCell tapCandidate;
             @Override public boolean dispatchTouchEvent(MotionEvent event){
+                if (scrimAnimatorSet != null && scrimAnimatorSet.isRunning() && !scrimProgressDirection) {
+                    scrimAnimatorSet.end();
+                }
                 // Observe; never intercept or consume. Native RecyclerListView still arbitrates
                 // scrolling, double taps, long press and every embedded control.
                 int action=event.getActionMasked();
                 if(action==MotionEvent.ACTION_DOWN && tapCandidate!=null){tapCandidate.cancelSignatureGesture();tapCandidate=null;}
-                if(tapCandidate!=null) {
+                if(tapCandidate!=null && (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL)) {
                     MotionEvent local=MotionEvent.obtain(event);
                     local.offsetLocation(-tapCandidate.getX(),-tapCandidate.getY());
                     tapCandidate.signatureTapEvent(local);local.recycle();
@@ -5392,7 +5395,8 @@ public class ChatActivity extends BaseFragment implements
                 boolean handled=super.dispatchTouchEvent(event);
                 if(action==MotionEvent.ACTION_DOWN && getPressedChildView() instanceof ChatMessageCell)
                     tapCandidate=(ChatMessageCell)getPressedChildView();
-                if(action==MotionEvent.ACTION_UP || action==MotionEvent.ACTION_CANCEL)tapCandidate=null;
+                if(action==MotionEvent.ACTION_UP || action==MotionEvent.ACTION_CANCEL || (action == MotionEvent.ACTION_MOVE && tapCandidate != null && !tapCandidate.isPressed()))
+                    tapCandidate=null;
                 return handled;
             }
             private int lastWidth;
@@ -5545,6 +5549,9 @@ public class ChatActivity extends BaseFragment implements
 
             @Override
             public boolean onInterceptTouchEvent(MotionEvent e) {
+                if (scrimAnimatorSet != null && scrimAnimatorSet.isRunning() && !scrimProgressDirection) {
+                    scrimAnimatorSet.end();
+                }
                 textSelectionHelper.checkSelectionCancel(e);
                 if (isFastScrollAnimationRunning()) {
                     return false;
@@ -7512,7 +7519,15 @@ public class ChatActivity extends BaseFragment implements
                 return 1000;
             }
         });
+        chatLayoutManager.setItemPrefetchEnabled(true);
+        chatLayoutManager.setInitialPrefetchItemCount(8);
         chatListView.setLayoutManager(chatLayoutManager);
+        chatListView.setItemViewCacheSize(15);
+        chatListView.setHasFixedSize(false);
+        RecyclerView.RecycledViewPool chatPool = chatListView.getRecycledViewPool();
+        if (chatPool != null) {
+            chatPool.setMaxRecycledViews(0, 30);
+        }
         chatListView.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
             public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
@@ -11946,7 +11961,7 @@ public class ChatActivity extends BaseFragment implements
         scrimAnimatorSet.playTogether(animators);
         scrimAnimatorSet.setInterpolator(CubicBezierInterpolator.EASE_OUT_QUINT);
         scrimAnimatorSet.setDuration(!enable && selectedBubbleMotionMessage != null
-                && selectedBubbleMotion.progress() == 0f ? 0 : 320);
+                && selectedBubbleMotion.progress() == 0f ? 0 : (!enable ? 180 : 320));
         final ChatMessageCell cell = scrimView instanceof ChatMessageCell ? (ChatMessageCell) scrimView : null;
         scrimAnimatorSet.addListener(new AnimatorListenerAdapter() {
             @Override
@@ -19376,7 +19391,7 @@ public class ChatActivity extends BaseFragment implements
                                     - dp(9)
                                     - (mentionContainer != null ? mentionContainer.clipBottom() : 0);
 
-                            canvas.clipRect(0, listTop + (mentionContainer != null ? mentionContainer.clipTop() : 0), getMeasuredWidth(), viewClipBottom2);
+                            canvas.clipRect(0, (scrimGroup != null ? 0 : listTop) + (mentionContainer != null ? mentionContainer.clipTop() : 0), getMeasuredWidth(), viewClipBottom2);
                             canvas.translate(0, chatListView.getY());
                             scrimGroup.transitionParams.cell.drawBackground(canvas, (int) l, (int) t, (int) r, (int) b, scrimGroup.transitionParams.pinnedTop, scrimGroup.transitionParams.pinnedBotton, selected, 0);
                             canvas.restore();
@@ -19388,7 +19403,7 @@ public class ChatActivity extends BaseFragment implements
                         }
 
                         float viewClipLeft = chatListView.getLeft();
-                        float viewClipTop = listTop;
+                        float viewClipTop = (child == scrimView || scrimGroup != null) ? 0 : listTop;
                         float viewClipRight = chatListView.getRight();
                         float viewClipBottom = getMeasuredHeight()
                             - windowInsetsStateHolder.getCurrentMaxBottomInset()
@@ -34516,6 +34531,9 @@ public class ChatActivity extends BaseFragment implements
 
                 @Override
                 public boolean dispatchTouchEvent(MotionEvent ev) {
+                    if (scrimPopupWindow == null || !scrimPopupWindow.isShowing()) {
+                        return false;
+                    }
                     boolean b = super.dispatchTouchEvent(ev);
                     if (ev.getAction() == MotionEvent.ACTION_DOWN && !b) {
                         closeMenu();
@@ -34529,6 +34547,9 @@ public class ChatActivity extends BaseFragment implements
 
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
+                    if (scrimPopupWindow == null || !scrimPopupWindow.isShowing()) {
+                        return false;
+                    }
                     if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
                         if (scrimPopupWindow != null && scrimPopupWindow.isShowing()) {
                             View contentView = scrimPopupWindow.getContentView();
@@ -34807,6 +34828,15 @@ public class ChatActivity extends BaseFragment implements
                     }
                 }
                 @Override public void dismiss(boolean animated) {
+                    setTouchable(false);
+                    try {
+                        update();
+                    } catch (Exception ignore) {
+                    }
+                    if (scrimPopupContainerLayout != null) {
+                        scrimPopupContainerLayout.setOnTouchListener(null);
+                        scrimPopupContainerLayout.setEnabled(false);
+                    }
                     if (compactContext && animated && selectedBubbleMotion.hasOwner()) {
                         if (signatureClosing) return;
                         signatureClosing = true;
@@ -34848,6 +34878,12 @@ public class ChatActivity extends BaseFragment implements
             popupLayout.setFitItems(true);
 
             ItemOptions.setGapBackgroundColor(popupLayout, Theme.multAlpha(getThemedColor(Theme.key_actionBarDefaultSubmenuItem), 0.06f));
+
+            int requiredTop = (int) (chatListViewPaddingTop + AndroidUtilities.dp(8));
+            if (v instanceof ChatMessageCell && v.getTop() < requiredTop && chatListView != null && chatListView.canScrollVertically(-1)) {
+                int scrollNeeded = requiredTop - v.getTop();
+                chatListView.scrollBy(0, -scrollNeeded);
+            }
 
             int signaturePopupY = Integer.MIN_VALUE;
             int signatureMaxHeight = Integer.MAX_VALUE;
@@ -34925,7 +34961,7 @@ public class ChatActivity extends BaseFragment implements
                 totalHeight += keyboardHeight;
             }
             int popupY;
-            int minY = (int) (chatListView.getY() + dp(24));
+            int minY = (int) Math.max(chatListView.getY() + dp(24), chatListView.getY() + chatListViewPaddingTop - dp(24));
             int maxY = totalHeight - height - dp(8);
             if (height < totalHeight) {
                 popupY = (int) (chatListView.getY() + v.getTop() + y);
@@ -34935,7 +34971,7 @@ public class ChatActivity extends BaseFragment implements
                     popupY = (int) (location[1] + y);
 
                     chatListView.getLocationInWindow(location);
-                    minY = dp(24);
+                    minY = (int) Math.max(dp(24), chatListViewPaddingTop - dp(24));
                     maxY = Math.min(location[1] + chatListView.getMeasuredHeight(), AndroidUtilities.displaySize.y) - dp(8) - height;
                 } else if (height - backgroundPaddings.top - backgroundPaddings.bottom > AndroidUtilities.dp(240)) {
                     popupY += AndroidUtilities.dp(240) - height;
@@ -51406,12 +51442,19 @@ public class ChatActivity extends BaseFragment implements
     private boolean usesSignatureHeader() { return signatureChatHeader != null && signatureChatHeader.enabled(); }
     private void updateSignatureHeaderCounter() {
         if (signatureChatHeader == null) return;
+        if (!app.flexygram.header.HeaderConfig.counter()) {
+            signatureChatHeader.setCount(0);
+            return;
+        }
         int count = -1;
         if (arguments != null && arguments.containsKey("dialog_folder_id") && arguments.containsKey("dialog_filter_id")) {
             if (dialogFilterId == 0) count = dialogFolderId == 0 ? getMessagesStorage().getMainUnreadCount() : dialogFolderId == 1 ? getMessagesStorage().getArchiveUnreadCount() : -1;
             else for (var filter : getMessagesController().getDialogFilters()) if (filter.id == dialogFilterId) { count = filter.unreadCount; break; }
         }
-        signatureChatHeader.setCount(count);
+        if (count < 0) {
+            count = getMessagesStorage().getMainUnreadCount();
+        }
+        signatureChatHeader.setCount(Math.max(0, count));
     }
 
     private boolean isTitleCentered() {
@@ -51419,6 +51462,9 @@ public class ChatActivity extends BaseFragment implements
     }
 
     private boolean canShowCenteredTitle(ChatActivity parentFragment) {
+        if (!app.flexygram.header.HeaderConfig.centerTitle()) {
+            return false;
+        }
         if (!(BuildConfig.CONNECTED_ALPHA ? app.flexygram.header.HeaderConfig.signature() : app.exteraless.appearance.AppearanceConfig.iosChatHeader())) {
             return false;
         }

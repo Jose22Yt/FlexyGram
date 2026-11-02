@@ -344,9 +344,17 @@ public class ContactsActivity extends BaseFragment implements FactorAnimator.Tar
                     listViewAdapter.setSortType(sortByName ? 1 : 2, false);
                     sortItem.setIcon(sortByName ? R.drawable.msg_contacts_time : R.drawable.msg_contacts_name);
                 } else if (id == search_button) {
+                    if (app.flexygram.navigation.LiquidNavigationConfig.alwaysSearchChats()) {
+                        if (parentLayout != null) {
+                            for (BaseFragment f : parentLayout.getFragmentStack()) {
+                                if (f instanceof MainTabsActivity) {
+                                    ((MainTabsActivity) f).openChatsSearch();
+                                    return;
+                                }
+                            }
+                        }
+                    }
                     listView.smoothScrollToPosition(0);
-//                    animatorSearchFieldVisible.setValue(true, true);
-//                    animatorSearchFieldHeight.animateTo(dp(DialogsActivity.SEARCH_FIELD_HEIGHT));
                     AndroidUtilities.doOnPreDraw(searchField.editText, () -> {
                         searchField.editText.requestFocus();
                         AndroidUtilities.showKeyboard(searchField.editText);

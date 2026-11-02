@@ -57,6 +57,13 @@ final class FlexyFilesSheet extends BottomSheet {
     private volatile SelectedDocument document;
     private List<SelectedDocument.Entry> entries = Collections.emptyList();
     private List<Row> rows = Collections.emptyList();
+    // UI-thread-only, bounded folder cache: repeat ZIP navigation does no rescanning.
+    private final LinkedHashMap<String, List<Row>> folderCache =
+            new LinkedHashMap<String, List<Row>>(8, .75f, true) {
+                @Override protected boolean removeEldestEntry(java.util.Map.Entry<String, List<Row>> oldest) {
+                    return size() > 8;
+                }
+            };
     private String path = "";
     private boolean closed;
     private final boolean restored;
@@ -72,6 +79,11 @@ final class FlexyFilesSheet extends BottomSheet {
     private final RecyclerListView list;
     private final Adapter adapter = new Adapter();
     private final int maximumListHeight;
+    private final FlexyFilesNativePreview previewPanel;
+    private final ScrollView sheetScroll;
+    private boolean previewing;
+    private String previewEntry;
+    private int browserScrollY;
 
     private static final class Row {
         final String path;
@@ -218,8 +230,8 @@ final class FlexyFilesSheet extends BottomSheet {
                 if (query.length() == 0) filter();
                 else query.setText("");
             } else {
-                if (owner.presentFragment(new FlexyFileEditorActivity(
-                        file, name, document != null && document.isArchive() ? selected.path : null, dialog, account, owner, path).returnContext(query.getText().toString(),list.getLayoutManager().onSaveInstanceState()))) dismiss();
+                openPreview(document != null && document.isArchive() ? selected.path : null,
+                        selected.label, selected.size);
             }
         });
         // Keep the sheet compact, even on phones using enlarged font scaling.
@@ -234,6 +246,12 @@ final class FlexyFilesSheet extends BottomSheet {
         emptyLabel.setVisibility(View.GONE);
         content.addView(emptyLabel, new LinearLayout.LayoutParams(-1, -2));
         add(root, content, 0, 12);
+
+        // A separate native surface shares the same BottomSheet; only one
+        // scrolling hierarchy is visible and eligible for touch at any time.
+        previewPanel = new FlexyFilesNativePreview(c, owner.getResourceProvider(),
+                this::leavePreview, this::editPreview);
+        previewPanel.setVisibility(View.GONE);
 
         TextView reassurance = text(c,
                 getString(R.string.FlexyFilesSignatureOriginal), 12,
@@ -273,7 +291,11 @@ final class FlexyFilesSheet extends BottomSheet {
         container.setFillViewport(false);
         container.setVerticalScrollBarEnabled(false);
         container.addView(root, new android.widget.FrameLayout.LayoutParams(-1, -2));
-        setCustomView(container);
+        sheetScroll = container;
+        android.widget.FrameLayout surface = new android.widget.FrameLayout(c);
+        surface.addView(container, new android.widget.FrameLayout.LayoutParams(-1, -2));
+        surface.addView(previewPanel, new android.widget.FrameLayout.LayoutParams(-1, -2));
+        setCustomView(surface);
         setOnDismissListener(d -> dispose());
         refreshLocation();
         load();
@@ -350,8 +372,9 @@ final class FlexyFilesSheet extends BottomSheet {
         }
     }
 
-    /** Back clears search, then climbs one ZIP directory, then dismisses at root. */
+    /** Back returns to the already-allocated explorer before touching ZIP navigation. */
     @Override public void onBackPressed() {
+        if (previewing) { leavePreview(); return; }
         if (query != null && query.length() > 0) { query.setText(""); return; }
         if (!path.isEmpty()) { goUp(); return; }
         super.onBackPressed();
@@ -393,12 +416,10 @@ final class FlexyFilesSheet extends BottomSheet {
                             AndroidUtilities.formatFileSize(ready.size()));
                     sheet.query.setEnabled(true);
                     if (!ready.isArchive()) {
-                        if (sheet.restored) {
-                            sheet.rows=Collections.singletonList(new Row(sheet.name, sheet.name, false, ready.size()));
-                            sheet.refreshLocation();sheet.adapter.notifyDataSetChanged();
-                        } else if (sheet.owner.presentFragment(new FlexyFileEditorActivity(
-                                sheet.file, sheet.name, null, sheet.dialog, sheet.account, sheet.owner, "")))
-                            sheet.dismiss();
+                        sheet.rows = Collections.singletonList(new Row(sheet.name, sheet.name, false, ready.size()));
+                        sheet.refreshLocation();
+                        sheet.adapter.notifyDataSetChanged();
+                        sheet.openPreview(null, sheet.name, ready.size());
                     } else sheet.filter();
                 });
             } catch (Exception invalid) {
@@ -416,10 +437,101 @@ final class FlexyFilesSheet extends BottomSheet {
         });
     }
 
+    /**
+     * Dispatch only one bounded read on the existing instance-owned worker.
+     * Render either recycled text chunks or a sampled image inside this sheet.
+     */
+    private void openPreview(String entry, String label, long size) {
+        if (closed || document == null) return;
+        previewing = true;
+        previewEntry = entry;
+        browserScrollY = sheetScroll.getScrollY();
+        sheetScroll.setVisibility(View.GONE);
+        previewPanel.setVisibility(View.VISIBLE);
+        previewPanel.loading(label);
+
+        boolean imageFile = FlexyFilesNativePreview.isImage(label);
+        int limit = imageFile ? FlexyFilesNativePreview.MAX_IMAGE_BYTES : SelectedDocument.MAX_TEXT;
+        // Never ask the worker to allocate a file larger than its preview budget.
+        work.cancel();
+        if (size > limit) {
+            previewPanel.unavailable(true);
+            return;
+        }
+        SelectedDocument selected = document;
+        FilesWork tasks = work;
+        int token = tasks.token() + 1;
+        WeakReference<FlexyFilesSheet> weak = new WeakReference<>(this);
+        tasks.submit(() -> {
+            Object parsed = null;
+            try {
+                byte[] bytes = selected.read(entry, limit);
+                if (imageFile) {
+                    parsed = FlexyFilesNativePreview.decodeImage(bytes);
+                } else {
+                    parsed = new FlexyFilesNativePreview.TextData(SelectedDocument.text(bytes));
+                }
+            } catch (Exception invalid) {
+                // Unsupported or malformed files stay in the read-only safety state.
+            }
+            Object ready = parsed;
+            AndroidUtilities.runOnUIThread(() -> {
+                FlexyFilesSheet sheet = weak.get();
+                if (sheet == null || sheet.closed || !tasks.current(token)
+                        || !sheet.previewing || !TextUtils.equals(sheet.previewEntry, entry)) {
+                    if (ready instanceof android.graphics.Bitmap) {
+                        ((android.graphics.Bitmap) ready).recycle();
+                    }
+                    return;
+                }
+                if (ready instanceof FlexyFilesNativePreview.TextData) {
+                    sheet.previewPanel.showText((FlexyFilesNativePreview.TextData) ready);
+                } else if (ready instanceof android.graphics.Bitmap) {
+                    sheet.previewPanel.showImage((android.graphics.Bitmap) ready);
+                } else {
+                    sheet.previewPanel.unavailable(false);
+                }
+            });
+        });
+    }
+
+    /** No IO, no re-indexing and no view reconstruction on returning to a folder. */
+    private void leavePreview() {
+        if (!previewing || closed) return;
+        work.cancel();
+        previewing = false;
+        previewEntry = null;
+        previewPanel.release();
+        previewPanel.setVisibility(View.GONE);
+        sheetScroll.setVisibility(View.VISIBLE);
+        sheetScroll.scrollTo(0, browserScrollY);
+    }
+
+    /** Keep all existing editor tools and save-a-copy protections intact. */
+    private void editPreview() {
+        if (!previewing || closed || owner.getParentActivity() == null) return;
+        if (owner.presentFragment(new FlexyFileEditorActivity(
+                file, name, previewEntry, dialog, account, owner, path)
+                .returnContext(query.getText().toString(),
+                        list.getLayoutManager().onSaveInstanceState()))) {
+            dismiss();
+        }
+    }
+
     private void filter() {
         if (document == null || closed) return;
         String prefix = path;
         String search = query.getText().toString().toLowerCase(Locale.ROOT);
+        if (search.isEmpty()) {
+            List<Row> cached = folderCache.get(prefix);
+            if (cached != null) {
+                work.cancel();
+                rows = cached;
+                refreshLocation();
+                adapter.notifyDataSetChanged();
+                return;
+            }
+        }
         List<SelectedDocument.Entry> source = entries;
         WeakReference<FlexyFilesSheet> weak = new WeakReference<>(this);
         FilesWork tasks = work;
@@ -451,6 +563,9 @@ final class FlexyFilesSheet extends BottomSheet {
                 FlexyFilesSheet sheet = weak.get();
                 if (sheet == null || !tasks.current(token)) return;
                 sheet.rows = result;
+                if (search.isEmpty() && result.size() <= 128) {
+                    sheet.folderCache.put(prefix, result);
+                }
                 sheet.refreshLocation();
                 sheet.adapter.notifyDataSetChanged();
                 if(sheet.pendingScroll!=null){sheet.list.getLayoutManager().onRestoreInstanceState(sheet.pendingScroll);sheet.pendingScroll=null;}
@@ -471,11 +586,13 @@ final class FlexyFilesSheet extends BottomSheet {
         if (closed) return;
         closed = true;
         work.close();
+        previewPanel.release();
         SelectedDocument old = document;
         document = null;
         if (old != null) try { old.close(); } catch (IOException ignored) {}
         entries = Collections.emptyList();
         rows = Collections.emptyList();
+        folderCache.clear();
         query.clearFocus();
     }
 

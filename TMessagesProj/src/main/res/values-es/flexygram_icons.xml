@@ -1,4 +1,8 @@
 <resources>
+    <string name="FlexyIconNeon">Neón</string>
+    <string name="FlexyIconGlossy">Glossy 3D</string>
+    <string name="FlexyIconCosmic">Cósmico</string>
+    <string name="FlexyIconCyber">Cyber</string>
     <string name="FlexyIconBlue">Principal Azul</string>
     <string name="FlexyIconGreen">Verde</string>
     <string name="FlexyIconCoral">Coral</string>

@@ -23,7 +23,7 @@ public class LauncherIconController {
         if (count == 1 && !legacyEnabled && (remembered == null || active == remembered)) return;
         if (remembered != null) active = remembered;
         try {
-            applyIcon(active == null ? LauncherIcon.EXTERALESS : active, false);
+            applyIcon(active == null ? LauncherIcon.FLEX_NEON : active, false);
         } catch (IllegalArgumentException | SecurityException rejected) {
             // Atomic migration rejected: keep the existing launcher and retry next startup.
         }
@@ -34,7 +34,7 @@ public class LauncherIconController {
         int i = ctx.getPackageManager().getComponentEnabledSetting(icon.getComponentName(ctx));
         // Manifest default is effective before the process starts. Explicit overrides survive updates.
         return i == PackageManager.COMPONENT_ENABLED_STATE_ENABLED
-                || i == PackageManager.COMPONENT_ENABLED_STATE_DEFAULT && icon == LauncherIcon.EXTERALESS;
+                || i == PackageManager.COMPONENT_ENABLED_STATE_DEFAULT && icon == LauncherIcon.FLEX_NEON;
     }
 
     private static ComponentName legacyPrimary(Context ctx) {
@@ -71,6 +71,10 @@ public class LauncherIconController {
     }
 
     public enum LauncherIcon {
+        FLEX_NEON("FlexyNeonIcon", R.drawable.flexy_neon_background, R.drawable.flexy_neon_foreground, R.string.FlexyIconNeon),
+        FLEX_GLOSSY("FlexyGlossyIcon", R.drawable.flexy_glossy_background, R.drawable.flexy_glossy_foreground, R.string.FlexyIconGlossy),
+        FLEX_COSMIC("FlexyCosmicIcon", R.drawable.flexy_cosmic_background, R.drawable.flexy_cosmic_foreground, R.string.FlexyIconCosmic),
+        FLEX_CYBER("FlexyCyberIcon", R.drawable.flexy_cyber_background, R.drawable.flexy_cyber_foreground, R.string.FlexyIconCyber),
         EXTERALESS("FlexyBlueIcon", R.drawable.flexy_blue_background,
                 R.drawable.flexy_blue_foreground, R.string.FlexyIconBlue),
         FLEX_GREEN("FlexyGreenIcon", R.drawable.flexy_green_background, R.drawable.flexy_green_foreground, R.string.FlexyIconGreen),

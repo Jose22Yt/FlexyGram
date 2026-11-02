@@ -1876,9 +1876,9 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
             showOptions(view,new CharSequence[]{
                 getString(R.string.FlexySmartPreviewAdaptive),
                 getString(R.string.FlexySmartPreviewAccent),
+                getString(R.string.FlexySmartPreviewMatte),
                 getString(R.string.FlexySmartPreviewOff)
-            },index->{
-                int selected = index == 2 ? app.flexygram.home.SignatureSmartPreviewPalette.OFF : index;
+            },selected->{
                 if (selected != app.flexygram.home.SignatureSmartPreviews.mode()) {
                     app.flexygram.home.SignatureSmartPreviews.setMode(selected);
                     // Invalidate only actual Telegram dialog lists. Rebuilding
@@ -3026,7 +3026,12 @@ public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMat
             if (position == flexyContextPanelRow) {
                 cell.setTextAndIcon(getString(R.string.FlexyContextInteractions),R.drawable.msg_discussion,true);
             } else if (position == smartPreviewsRow) {
-                cell.setTextAndIcon(getString(R.string.FlexySmartPreviewsTitle), R.drawable.msg_list, false);
+                int mode = app.flexygram.home.SignatureSmartPreviews.mode();
+                String value = mode == app.flexygram.home.SignatureSmartPreviewPalette.ADAPTIVE ? getString(R.string.FlexySmartPreviewAdaptive)
+                        : mode == app.flexygram.home.SignatureSmartPreviewPalette.THEME ? getString(R.string.FlexySmartPreviewAccent)
+                        : mode == app.flexygram.home.SignatureSmartPreviewPalette.MATTE ? getString(R.string.FlexySmartPreviewMatte)
+                        : getString(R.string.FlexySmartPreviewOff);
+                cell.setTextAndValueAndIcon(getString(R.string.FlexySmartPreviewsTitle), value, R.drawable.msg_list, false);
             } else if (position == signatureMessagesRow) {
                 cell.setTextAndIcon(getString(R.string.FlexyMessagesGestures), R.drawable.msg_list, false);
             } else if (position == signatureStickersRow) {

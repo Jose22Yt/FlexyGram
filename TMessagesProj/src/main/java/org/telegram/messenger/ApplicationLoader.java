@@ -262,13 +262,7 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
 
                     }
 
-                    boolean isSlow = isConnectionSlow();
-                    for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
-                        if (!app.flexygram.performance.StartupAccounts.needsControllers(a, UserConfig.selectedAccount,
-                                UserConfig.getInstance(a).isClientActivated())) continue;
-                        ConnectionsManager.getInstance(a).scheduleConnectionCheck();
-                        FileLoader.getInstance(a).onNetworkChanged(isSlow);
-                    }
+                    notifyNetworkChanged();
                 }
             };
             IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
@@ -390,7 +384,7 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
         UserConfig config = UserConfig.getInstance(account);
         if (!config.isClientActivated() || config.getCurrentUser() == null) return;
         MessagesController controller = MessagesController.getInstance(account);
-        if (controller.dialogsLoaded || !controller.getDialogs(0).isEmpty()) return;
+        if (controller.dialogsLoaded || !controller.allDialogs.isEmpty() || !controller.getDialogs(0).isEmpty()) return;
         android.os.Trace.beginSection("Flexy.startup.request_local_dialogs");
         try {
             controller.loadDialogs(0, 0, 100, true);
@@ -521,12 +515,12 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
         } else if (!remoteFailed && PushListenerController.getProvider().hasServices()) {
             return;
         } else {
-            enabled = MessagesController.getMainSettings(UserConfig.selectedAccount).getBoolean("keepAliveService", false);
+            enabled = MessagesController.getMainSettings(UserConfig.selectedAccount).getBoolean("keepAliveService", true);
             SharedPreferences.Editor editor = preferences.edit();
             editor.putBoolean("pushService", enabled);
-            editor.putBoolean("pushConnection", enabled);
+            editor.putBoolean("pushConnection", true);
             editor.apply();
-            ConnectionsManager.getInstance(UserConfig.selectedAccount).setPushConnectionEnabled(enabled);
+            ConnectionsManager.getInstance(UserConfig.selectedAccount).setPushConnectionEnabled(true);
         }
         if (enabled) {
             AndroidUtilities.runOnUIThread(() -> {
@@ -639,6 +633,20 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
         ensureCurrentNetworkGet(app.flexygram.performance.NetworkSnapshotAge.expired(now, lastNetworkCheck));
     }
 
+    public static void notifyNetworkChanged() {
+        AndroidUtilities.runOnUIThread(() -> {
+            boolean isSlow = isConnectionSlow();
+            for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
+                if (!app.flexygram.performance.StartupAccounts.needsControllers(a, UserConfig.selectedAccount,
+                        UserConfig.getInstance(a).isClientActivated())) continue;
+                ConnectionsManager cm = ConnectionsManager.getInstance(a);
+                cm.resumeNetworkMaybe();
+                cm.scheduleConnectionCheck();
+                FileLoader.getInstance(a).onNetworkChanged(isSlow);
+            }
+        });
+    }
+
     private static void ensureCurrentNetworkGet(boolean force) {
         if (force || currentNetworkInfo == null) {
             try {
@@ -654,16 +662,19 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
                             @Override
                             public void onAvailable(@NonNull Network network) {
                                 invalidateNetworkSnapshot();
+                                notifyNetworkChanged();
                             }
 
                             @Override
                             public void onCapabilitiesChanged(@NonNull Network network, @NonNull NetworkCapabilities networkCapabilities) {
                                 invalidateNetworkSnapshot();
+                                notifyNetworkChanged();
                             }
 
                             @Override
                             public void onLost(@NonNull Network network) {
                                 invalidateNetworkSnapshot();
+                                notifyNetworkChanged();
                             }
                         };
                         connectivityManager.registerDefaultNetworkCallback(networkCallback);
@@ -797,6 +808,21 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
     public static boolean isNetworkOnlineRealtime() {
         try {
             ConnectivityManager connectivityManager = (ConnectivityManager) ApplicationLoader.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (connectivityManager == null) {
+                return true;
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                try {
+                    Network activeNetwork = connectivityManager.getActiveNetwork();
+                    if (activeNetwork != null) {
+                        NetworkCapabilities caps = connectivityManager.getNetworkCapabilities(activeNetwork);
+                        if (caps != null && caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
+                            return true;
+                        }
+                    }
+                } catch (Throwable ignore) {
+                }
+            }
             NetworkInfo netInfo = connectivityManager.getActiveNetworkInfo();
             if (netInfo != null && (netInfo.isConnectedOrConnecting() || netInfo.isAvailable())) {
                 return true;

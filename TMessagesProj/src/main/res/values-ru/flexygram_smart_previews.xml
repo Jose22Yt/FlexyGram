@@ -13,4 +13,7 @@
     <string name="FlexySmartGroupEvent">Событие в группе</string>
     <string name="FlexySmartLocation">Местоположение</string>
     <string name="FlexySmartContact">Контакт</string>
+    <string name="FlexySmartJoined">Присоединился</string>
+    <string name="FlexySmartLeft">Вышел</string>
+    <string name="FlexySmartPinned">Закреплено</string>
 </resources>
