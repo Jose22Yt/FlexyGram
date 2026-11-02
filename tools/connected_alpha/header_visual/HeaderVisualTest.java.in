@@ -140,7 +140,7 @@ public class HeaderVisualTest {
    assertTrue("placeholder remains visible",Color.blue(b.getPixel(x,Math.round(g.portrait.centerY()+header.fusionTop)))>80);
    b.recycle();
    photo.receiver.photo=true;header.changed();size(bar,401);
-   assertTrue("actual image uses full extended portrait",photo.getMeasuredWidth()>=g.center.width()*.75f);
+   assertTrue("actual image uses proper avatar size",photo.getMeasuredWidth()<=48&&photo.getMeasuredWidth()>=36);
    header.detach();
   }
  }

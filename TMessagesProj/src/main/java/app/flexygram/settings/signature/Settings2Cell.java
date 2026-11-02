@@ -22,7 +22,10 @@ public final class Settings2Cell extends FrameLayout {
         title.setSingleLine(false);description.setSingleLine(false);
         icon.setScaleType(ImageView.ScaleType.CENTER_INSIDE);icon.setPadding(0,0,0,0);
         arrow.setImageResource(R.drawable.round_keyboard_arrow_right_24);
-        for(View v:new View[]{icon,title,description,arrow}){addView(v);v.setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);}
+        addView(icon); icon.setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);
+        addView(title); title.setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);
+        addView(description); description.setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);
+        addView(arrow); arrow.setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);
         setMinimumHeight(dp(72));
     }
     private int dp(float x){return AndroidUtilities.dp(x);}

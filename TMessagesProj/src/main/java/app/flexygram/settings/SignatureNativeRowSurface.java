@@ -40,7 +40,13 @@ public final class SignatureNativeRowSurface extends Drawable {
     }
     @Override protected void onBoundsChange(Rect bounds) { geometry(); }
     @Override public void draw(Canvas canvas) { canvas.drawPath(path, paint); }
-    @Override public void getOutline(Outline outline) { if (!path.isEmpty()) outline.setConvexPath(path); }
+    @Override public void getOutline(Outline outline) {
+        if (top && bottom) {
+            outline.setRoundRect(getBounds(), AndroidUtilities.dp(18));
+        } else if (!path.isEmpty()) {
+            outline.setConvexPath(path);
+        }
+    }
     @Override public void setAlpha(int alpha) { paint.setAlpha(alpha); invalidateSelf(); }
     @Override public void setColorFilter(ColorFilter filter) { paint.setColorFilter(filter); invalidateSelf(); }
     @Override public int getOpacity() { return PixelFormat.TRANSLUCENT; }

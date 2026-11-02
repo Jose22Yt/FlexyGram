@@ -197,7 +197,7 @@ public class FilterTabsView extends FrameLayout {
 
             final int counterResultWidth;
             if (c > 0) {
-                String counterText = String.format("%d", c);
+                String counterText = Integer.toString(c);
                 int counterWidth = (int) Math.ceil(textCounterPaint.measureText(counterText));
                 int countWidth = Math.max(dp(TAB_COUNTER_HEIGHT - 10), counterWidth) + dp(10);
                 counterResultWidth = countWidth + (NekoConfig.tabsTitleType.Int() != NekoXConfig.TITLE_TYPE_ICON ? dp(6) : 0);
@@ -435,9 +435,7 @@ public class FilterTabsView extends FrameLayout {
                         app.flexygram.home.SignatureHomeStyle.selectedSurface(dark,!signatureHomeOpaquePreview && org.telegram.messenger.LiteMode.isEnabled(org.telegram.messenger.LiteMode.FLAG_LIQUID_GLASS)));
                 textPaint.setColor(signaturePalette.inkAt(signatureSelected));
             }
-            ColorFilter emojiColorFilter = signatureHome
-                    ? signatureHomeTint.get(textPaint.getColor())
-                    : new PorterDuffColorFilter(textPaint.getColor(), PorterDuff.Mode.SRC_IN);
+            ColorFilter emojiColorFilter = signatureHomeTint.get(textPaint.getColor());
 
             float counterWidth;
             int countWidth;
@@ -449,9 +447,9 @@ public class FilterTabsView extends FrameLayout {
 
             if (currentTab.counter > 0 || animateCounterRemove) {
                 if (animateCounterRemove) {
-                    counterText = String.format("%d", animateFromTabCount);
+                    counterText = Integer.toString(animateFromTabCount);
                 } else {
-                    counterText = String.format("%d", currentTab.counter);
+                    counterText = Integer.toString(currentTab.counter);
                 }
                 counterWidth = (int) Math.ceil(textCounterPaint.measureText(counterText));
                 countWidth = (int) Math.max(dp(TAB_COUNTER_HEIGHT - 10), counterWidth) + dp(10);
@@ -789,7 +787,7 @@ public class FilterTabsView extends FrameLayout {
             int countWidth;
             String counterText = null;
             if (currentTab.counter > 0) {
-                counterText = String.format("%d", currentTab.counter);
+                counterText = Integer.toString(currentTab.counter);
                 int counterWidth = (int) Math.ceil(textCounterPaint.measureText(counterText));
                 countWidth = Math.max(dp(TAB_COUNTER_HEIGHT - 10), counterWidth) + dp(10);
             } else {

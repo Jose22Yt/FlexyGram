@@ -32,6 +32,7 @@ public final class SignatureChatHeader {
     public app.flexygram.header.fusion.SignatureFusionGeometry.Layout fusionGeometry() { return fusion == null ? null : fusion.layout; }
     private final android.graphics.RectF badgeRect = new android.graphics.RectF();
     private final android.graphics.Paint badgePaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+    private int lastSurfaceColor = Integer.MIN_VALUE;
     public boolean subtitleFits = true;
     public void detach() {
         if (bar != null && bar.getBackButtonDrawable() instanceof org.telegram.ui.ActionBar.BackDrawable) {
@@ -173,8 +174,11 @@ public final class SignatureChatHeader {
         if (!geometry.countVisible || unreadLayout == null || unreadCount <= 0) return;
         canvas.save();
         int surfaceColor = Theme.getColor(Theme.key_windowBackgroundWhite, provider);
-        boolean isDark = androidx.core.graphics.ColorUtils.calculateLuminance(surfaceColor) < 0.5f;
-        badgePaint.setColor(isDark ? 0xff2c2c2e : 0xff161618);
+        if (surfaceColor != lastSurfaceColor) {
+            lastSurfaceColor = surfaceColor;
+            boolean isDark = androidx.core.graphics.ColorUtils.calculateLuminance(surfaceColor) < 0.5f;
+            badgePaint.setColor(isDark ? 0xff2c2c2e : 0xff161618);
+        }
 
         float badgeHeight = AndroidUtilities.dp(23);
         float badgeRadius = badgeHeight / 2f;

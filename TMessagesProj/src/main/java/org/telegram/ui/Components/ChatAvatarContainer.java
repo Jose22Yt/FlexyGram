@@ -528,7 +528,7 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
 
     @Override
     protected boolean drawChild(@NonNull Canvas canvas, View child, long drawingTime) {
-        final boolean fusionPhoto = child == avatarImageView && signatureFusionActive() && !app.flexygram.header.HeaderConfig.portrait();
+        final boolean fusionPhoto = false;
         int fusionSave = 0, fusionLayer = 0;
         if (fusionPhoto) {
             fusionSave = canvas.save(); canvas.clipPath(signaturePhotoClip);
@@ -950,13 +950,10 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
         }
         getSubtitleTextView().measure(MeasureSpec.makeMeasureSpec(textWidth, MeasureSpec.AT_MOST), signatureHeader.subtitleFits ? MeasureSpec.makeMeasureSpec((int)Math.ceil(signatureHeader.subtitlePx) + dp(8), MeasureSpec.AT_MOST) : MeasureSpec.makeMeasureSpec(0, MeasureSpec.EXACTLY));
         int photo = Math.max(1, Math.round(signatureHeader.height) - dp(2));
-        int photoWidth = fusion ?
-                (app.flexygram.header.HeaderConfig.portrait() || signatureFusionHasPhoto() ? Math.round(signatureHeader.geometry.avatar.width())
-                        : Math.min(Math.round(signatureHeader.geometry.avatar.width()), dp(73)))
-                : photo;
+        int photoWidth = fusion ? Math.round(signatureHeader.geometry.avatar.width()) : photo;
         int photoHeight = fusion ? Math.round(signatureHeader.geometry.avatar.height()) : photo;
         avatarImageView.measure(MeasureSpec.makeMeasureSpec(photoWidth, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(photoHeight, MeasureSpec.EXACTLY));
-        avatarImageView.setRoundRadius(fusion && !app.flexygram.header.HeaderConfig.portrait() ? 0 : photoHeight / 2);
+        avatarImageView.setRoundRadius(photoHeight / 2);
         if (fusion) {
             var g = signatureHeader.fusionGeometry();
             signatureMore.measure(MeasureSpec.makeMeasureSpec(Math.round(g.more.width()), MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(Math.round(g.more.height()), MeasureSpec.EXACTLY));

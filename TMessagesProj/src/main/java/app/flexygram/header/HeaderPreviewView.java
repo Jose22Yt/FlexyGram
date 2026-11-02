@@ -135,26 +135,10 @@ public final class HeaderPreviewView extends View {
         int outer=canvas.save();canvas.translate(0,fusionTop);
         fusion.surface.drawBackdrop(canvas,g,fill,edge,edge,d);
         int clip=canvas.save();canvas.clipPath(fusion.clip);
-        if (g.mattePortrait) {
-            avatar.setColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText));
-            canvas.drawCircle(g.portrait.centerX(),g.portrait.centerY(),g.portrait.height()*.5f,avatar);
-            text.setTextSize(AndroidUtilities.dp(20));text.setColor(0xffffffff);
-            canvas.drawText("A",g.portrait.centerX(),g.portrait.centerY()+AndroidUtilities.dp(7),text);
-        } else {
-        int layer=fusion.mask.begin(canvas,g.portrait.left,g.portrait.top,g.portrait.right,g.portrait.bottom);
-        // The synthetic preview has no real bitmap; mimic the same initials fallback as ChatAvatarContainer.
-        float placeholderW = Math.min(g.portrait.width(), AndroidUtilities.dp(73));
-        float placeholderLeft = g.rtl ? g.portrait.right-placeholderW : g.portrait.left;
         avatar.setColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText));
-        canvas.drawRect(placeholderLeft,g.portrait.top,placeholderLeft+placeholderW,g.portrait.bottom,avatar);
-        text.setTextSize(AndroidUtilities.dp(22));text.setColor(0xffffffff);
-        canvas.drawText("A",placeholderLeft+placeholderW*.5f,g.portrait.centerY()+AndroidUtilities.dp(7),text);
-        float fadeStart = g.rtl ? g.portrait.width()-placeholderW*.45f : placeholderW*.55f;
-        float fadeEnd = g.rtl ? g.portrait.width()-placeholderW : placeholderW;
-        canvas.translate(g.portrait.left,g.portrait.top);
-        fusion.mask.finish(canvas,layer,g.portrait.width(),g.portrait.height(),
-                fadeStart,fadeEnd,.9f,g.rtl);
-        }
+        canvas.drawCircle(g.portrait.centerX(),g.portrait.centerY(),g.portrait.height()*.5f,avatar);
+        text.setTextSize(AndroidUtilities.dp(20));text.setColor(0xffffffff);
+        canvas.drawText("A",g.portrait.centerX(),g.portrait.centerY()+AndroidUtilities.dp(7),text);
         canvas.restoreToCount(clip);
         text.setColor(color);text.setTextSize(titlePx);float th=text.descent()-text.ascent(),ta=text.ascent();text.setTextSize(subtitlePx);float sh=text.descent()-text.ascent();
         float top=g.text.centerY()-(th+sh+AndroidUtilities.dp(2))/2;

@@ -17,9 +17,8 @@ public final class SignatureSmartPreviewPalette {
         0xff00897b,0xffc2185b,0xff0097a7,0xff546e7a,0xff1e88e5,0xff2e7d32,
         0xffe65100,0xff546e7a,0xffffb300,0xffff8f00,0xffe53935
     };
-    /** Legacy THEME (1) is kept as an alias; existing stored selections migrate to ADAPTIVE. */
     public static int normalizeMode(int mode) {
-        return mode == THEME ? ADAPTIVE : mode == MULTICOLOR || mode == MATTE || mode == OFF ? mode : ADAPTIVE;
+        return mode >= ADAPTIVE && mode <= MULTICOLOR ? mode : ADAPTIVE;
     }
     private static int multicolor(int kind) {
         switch (kind) {

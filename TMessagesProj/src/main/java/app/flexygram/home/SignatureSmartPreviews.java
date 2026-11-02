@@ -29,9 +29,13 @@ public final class SignatureSmartPreviews {
         synchronized(SignatureSmartPreviews.class){
             if(cachedMode<0){
                 android.content.SharedPreferences prefs=ApplicationLoader.applicationContext.getSharedPreferences(PREFS,Context.MODE_PRIVATE);
-                int stored=prefs.getInt("palette",SignatureSmartPreviewPalette.MULTICOLOR);
-                cachedMode=SignatureSmartPreviewPalette.normalizeMode(stored);
-                if(prefs.contains("palette") && cachedMode!=stored) prefs.edit().putInt("palette",cachedMode).apply();
+                int stored=prefs.getInt("palette",-1);
+                if (stored >= 0) {
+                    cachedMode=SignatureSmartPreviewPalette.normalizeMode(stored);
+                    if (cachedMode!=stored) prefs.edit().putInt("palette",cachedMode).apply();
+                } else {
+                    cachedMode=SignatureSmartPreviewPalette.MULTICOLOR;
+                }
             }
             return cachedMode;
         }

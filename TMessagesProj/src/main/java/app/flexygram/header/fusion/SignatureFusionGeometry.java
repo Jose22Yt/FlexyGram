@@ -137,34 +137,25 @@ public final class SignatureFusionGeometry {
         }
 
 
-        // The native portrait extends under nearly the entire card. Its alpha now
-        // fades across the left half (right half in RTL) of the card, not abruptly
-        // before the first letter. Native title/status views are drawn ON TOP of the
-        // avatar; no text layer is faded. The subtitle keeps its previous axis.
-        // Title placement is independently centered on the whole pill.
-        float photoW = SignatureFusionFade.portraitWidth(cw, d);
-        float fadeInset = SignatureFusionFade.fadeStartInset(photoW, d);
-        // The two centered lines share one axis, closer to the actual middle
-        // of the pill than the previous avatar-width-constrained label region.
-        // Full-card alpha is already below four percent at this text boundary.
-        float textInset = Math.min(50f * d, Math.max(0f, cw * .35f));
+        // Place the portrait avatar cleanly at the edge of the central pill.
+        // It remains 1:1, perfectly circular and fully visible for contacts and channels.
+        float photo = 38f * d;
+        float inset = 4f * d;
+        float pLeft = rtl ? g.center.right - inset - photo : g.center.left + inset;
+        float pTop = g.center.centerY() - photo * .5f;
+        g.portrait.set(pLeft, pTop, pLeft + photo, pTop + photo);
         if (!rtl) {
-            g.portrait.set(g.center.left, cTop, g.center.left + photoW, cTop + centerH);
-            g.text.set(g.center.left + textInset, cTop,
+            g.text.set(g.portrait.right + 8f * d, cTop,
                     g.center.right - TEXT_RIGHT_PAD_DP * d, cTop + centerH);
-            g.fadeStartX = g.portrait.left + fadeInset;
-            g.fadeEndX = g.center.left + cw * .56f;
-            g.fadeSafeStop = SignatureFusionFade.safeStop(g.fadeStartX, g.fadeEndX, g.text.left, false);
         } else {
-            g.portrait.set(g.center.right - photoW, cTop, g.center.right, cTop + centerH);
             g.text.set(g.center.left + TEXT_RIGHT_PAD_DP * d, cTop,
-                    g.center.right - textInset, cTop + centerH);
-            g.fadeStartX = g.portrait.right - fadeInset;
-            g.fadeEndX = g.center.right - cw * .56f;
-            g.fadeSafeStop = SignatureFusionFade.safeStop(g.fadeStartX, g.fadeEndX, g.text.right, true);
+                    g.portrait.left - 8f * d, cTop + centerH);
         }
+        g.fadeStartX = g.portrait.left;
+        g.fadeEndX = g.portrait.right;
+        g.fadeSafeStop = 1.0f;
         // A fallback is preferable to clipping text or creating overlapping buttons.
-        g.fits &= g.text.width() >= 48f*d;
+        g.fits &= g.text.width() >= 48f * d;
         return g;
     }
 
@@ -218,6 +209,6 @@ public final class SignatureFusionGeometry {
         float min = g.text.left + half;
         float max = g.text.right - half;
         if (max < min) return g.text.centerX();
-        return Math.max(min, Math.min(g.center.centerX(), max));
+        return Math.max(min, Math.min(g.text.centerX(), max));
     }
 }

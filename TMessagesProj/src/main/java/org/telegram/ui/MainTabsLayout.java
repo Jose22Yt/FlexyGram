@@ -56,6 +56,7 @@ public class MainTabsLayout extends AnimatedLinearLayout {
         super.onDraw(canvas);
     }
     private final Paint selector=new Paint(Paint.ANTI_ALIAS_FLAG);
+    private int lastGlassTabColor = Integer.MIN_VALUE, lastSelectorColor;
     private float selectionX=Float.NaN;
     private int maxWidthPx,slotWidth;
     private boolean drawTopDivider=true;
@@ -124,7 +125,12 @@ public class MainTabsLayout extends AnimatedLinearLayout {
             float x=selection.isRunning()?selectionX:v.getX()+v.getWidth()*.5f;
             float w=Math.max(0,slotWidth-dp(8)),h=getHeight()-getPaddingTop()-getPaddingBottom()-dp(6);
             float y=(getPaddingTop()+getHeight()-getPaddingBottom())*.5f;
-            selector.setColor(Theme.multAlpha(Theme.getColor(Theme.key_glass_tabSelected,resourcesProvider),.12f));
+            int tabColor = Theme.getColor(Theme.key_glass_tabSelected,resourcesProvider);
+            if (tabColor != lastGlassTabColor) {
+                lastGlassTabColor = tabColor;
+                lastSelectorColor = Theme.multAlpha(tabColor, .12f);
+                selector.setColor(lastSelectorColor);
+            }
             float radius=Math.min(dp(LiquidNavigationConfig.radiusDp()),h*.5f);
             canvas.drawRoundRect(x-w*.5f,y-h*.5f,x+w*.5f,y+h*.5f,radius,radius,selector);
         }
