@@ -1525,7 +1525,6 @@ public class FilterTabsView extends FrameLayout {
         }
     }
 
-    private int selectorColorKey = Theme.key_listSelector;
     public void setColors(int line, int active, int unactive, int selector, int background) {
         selectorColorKey = selector;
         tabLineColorKey = line;
