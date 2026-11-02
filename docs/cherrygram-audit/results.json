@@ -42,5 +42,13 @@
   "screenshots_after_correction": "NOT_AVAILABLE",
   "physical_performance": "NOT_MEASURED",
   "private_reference_images_published": false,
-  "apk_generated": false
+  "apk_generated": false,
+  "native_conversation_source_contract": "PASS updated contract requires unread before return and cached radii",
+  "first_ci_head": "91caed359d436a533002523899348e67aadc69e6",
+  "first_ci_passed_jobs": [
+    "source-and-math",
+    "Interactive tabs host/source verification",
+    "contracts"
+  ],
+  "ci_full_android_compilation": "NOT_PERFORMED"
 }

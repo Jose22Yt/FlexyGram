@@ -240,6 +240,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
         signatureGlassUnread=null;
         signatureGlassGeometryApplied=false;
         signatureGlassRadius=-1;
+        signatureUnreadGlassRadius=-1;
 
         glassDrawable = factory.create(this)
             .setColorProvider(colorProvider)
@@ -1490,6 +1491,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
     private BlurredBackgroundDrawable signatureGlassUnread;
     private boolean signatureGlassGeometryApplied;
     private float signatureGlassRadius=-1;
+    private float signatureUnreadGlassRadius=-1;
     private BlurredBackgroundDrawableViewFactory signatureGlassFactory;
     private BlurredBackgroundColorProvider signatureGlassColorProvider;
     private app.flexygram.header.SignatureChatHeader signatureHeader;
@@ -1524,6 +1526,11 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
         if(signatureGlassCall!=null)signatureGlassCall.setRadius(radius);
     }
 
+    private void setSignatureUnreadGlassRadius(float radius) {
+        if (signatureUnreadGlassRadius == radius) return;
+        signatureUnreadGlassRadius = radius;
+        signatureGlassUnread.setRadius(radius);
+    }
     public void prepareSignatureUnreadGlass(boolean separate) {
         if (separate && signatureGlassUnread == null && signatureGlassFactory != null) {
             signatureGlassUnread = signatureGlassFactory.create(this).setColorProvider(signatureGlassColorProvider)
@@ -1582,7 +1589,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
                     Math.round(g.backVisual.bottom) + offset);
             glassDrawableBack.draw(canvas);
             if (g.separateUnread && signatureGlassUnread != null) {
-                signatureGlassUnread.setRadius(g.unread.height()*.5f);
+                setSignatureUnreadGlassRadius(g.unread.height()*.5f);
                 signatureGlassUnread.setBounds(Math.round(g.unread.left),Math.round(g.unread.top)+offset,
                         Math.round(g.unread.right),Math.round(g.unread.bottom)+offset);
                 signatureGlassUnread.draw(canvas);
@@ -1624,7 +1631,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
             if (signatureGlassUnread == null) return false;
             if (org.telegram.messenger.LocaleController.isRTL) backLeft = backRight - g.back.height();
             else backRight = backLeft + g.back.height();
-            signatureGlassUnread.setRadius(g.badge.height() * .5f);
+            setSignatureUnreadGlassRadius(g.badge.height() * .5f);
             signatureGlassUnread.setBounds(Math.round(g.badge.left), Math.round(g.badge.top),
                     Math.round(g.badge.right), Math.round(g.badge.bottom));
             signatureGlassUnread.draw(canvas);

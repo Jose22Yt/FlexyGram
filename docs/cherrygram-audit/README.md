@@ -51,6 +51,8 @@ PYTHONPATH=tools/connected_alpha python3 -m unittest tools.connected_alpha.test_
 ./gradlew --version
 ```
 
+El contrato de `conversation_glass` se actualiza para exigir contador antes del retorno y mantener su comprobación de radios cacheados. Se corrigieron también los radios de dock/badge para no reconstruir paths por fotograma. En el primer CI pasaron `source-and-math`, `Interactive tabs host/source verification` y `contracts`; el contrato antiguo que exigía el retorno defectuoso se sustituyó por la regresión correcta.
+
 Se amplían los probes existentes `header_visual` y `liquid_navigation`; se declaran sus dobles y NO se presentan como compilación del cliente ni GPU real. La prueba Canvas nueva del contador debe ejecutarse con SDK/Maven junto a los probes ya existentes:
 
 ```sh

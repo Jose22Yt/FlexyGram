@@ -56,6 +56,8 @@ def test_native_glass_source_can_survive_explicit_setting_changes():
     bar=src('org/telegram/ui/ActionBar/ActionBar.java')
     assert '!canvas.isHardwareAccelerated()' in bar and '!org.telegram.messenger.SharedConfig.chatBlurEnabled()' in bar
     assert 'signatureGlassUnread.draw(canvas)' in bar
+    assert 'if (signatureUnreadGlassRadius == radius) return;' in bar
+    assert 'if (glassRadius != radius)' in src('org/telegram/ui/MainTabsLayout.java')
 
 def test_launcher_nested_selector_remains_touch_enabled_and_errors_do_not_select():
     assert 'isEnabled(RecyclerView.ViewHolder h){return true;}' in src('app/flexygram/settings/signature/SignatureLauncherSettingsActivity.java')

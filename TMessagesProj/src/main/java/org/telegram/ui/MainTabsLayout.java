@@ -39,15 +39,17 @@ public class MainTabsLayout extends AnimatedLinearLayout {
     private final Theme.ResourcesProvider resourcesProvider;
     private final GradientDrawable surface=new GradientDrawable();
     private org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawable glassBackground;
+    private float glassRadius = -1;
     public void setGlassBackground(org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawable drawable) {
-        glassBackground = drawable; if (drawable != null) drawable.setCallback(this); setBackground(null); setWillNotDraw(false); invalidate();
+        glassBackground = drawable; glassRadius = -1; if (drawable != null) drawable.setCallback(this); setBackground(null); setWillNotDraw(false); invalidate();
     }
     @Override protected boolean verifyDrawable(android.graphics.drawable.Drawable who) { return who == glassBackground || super.verifyDrawable(who); }
     @Override protected void onDraw(Canvas canvas) {
         if (glassBackground != null && canvas.isHardwareAccelerated()
                 && org.telegram.messenger.SharedConfig.chatBlurEnabled()
                 && org.telegram.messenger.LiteMode.isEnabled(org.telegram.messenger.LiteMode.FLAG_LIQUID_GLASS)) {
-            glassBackground.setRadius(dp(LiquidNavigationConfig.radiusDp()));
+            float radius = dp(LiquidNavigationConfig.radiusDp());
+            if (glassRadius != radius) { glassRadius = radius; glassBackground.setRadius(radius); }
             glassBackground.setBounds(0,0,getWidth(),getHeight());
             glassBackground.draw(canvas);
         } else { surface.setBounds(0,0,getWidth(),getHeight()); surface.draw(canvas); }
