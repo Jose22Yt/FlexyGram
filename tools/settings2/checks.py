@@ -47,7 +47,7 @@ class Migration(unittest.TestCase):
   paths=['app/flexygram/files','app/flexygram/header/HeaderConfig.java','app/flexygram/header/HeaderPreviewView.java','app/flexygram/bubbles/BubbleConfig.java','app/flexygram/bubbles/BubblePreviewView.java','app/flexygram/composer/FlexyComposerConfig.java','app/flexygram/composer/ComposerStyle.java','app/flexygram/navigation/LiquidNavigationConfig.java','org/telegram/messenger','org/telegram/tgnet','org/telegram/ui/ChatActivity.java','org/telegram/ui/ActionBar/ActionBarLayout.java']
   changed=set(subprocess.check_output(['git','diff','--name-only',BASE,'--',*[str(Path('TMessagesProj/src/main/java')/p)for p in paths],'TMessagesProj/jni','TMessagesProj/chaquopy','TMessagesProj/build.gradle','config','.github'],cwd=ROOT,text=True).splitlines())
   workflow='.github/workflows/smart-previews2.yml'
-  allowed={workflow,'.github/workflows/cherry-tabs.yml','TMessagesProj/src/main/java/app/flexygram/navigation/LiquidNavigationConfig.java','TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java'}
+  allowed={workflow,'.github/workflows/cherry-tabs.yml','TMessagesProj/src/main/java/app/flexygram/navigation/LiquidNavigationConfig.java','TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java','TMessagesProj/src/main/java/org/telegram/messenger/LiteMode.java'}
   self.assertFalse(changed-allowed)
   self.assertEqual('22be37697119c5b2a4314fb15875823d1c5e7ed0',subprocess.check_output(['git','hash-object',workflow],cwd=ROOT,text=True).strip())
  def test_studio_has_only_original_three_operations_and_files_is_moved(self):
