@@ -1448,6 +1448,7 @@ public class ChatActivity extends BaseFragment implements
     private final static int OPTION_COPY_PHOTO = 150;
     private final static int OPTION_COPY_PHOTO_AS_STICKER = 151;
     private final static int OPTION_COPY_FRAME = 152;
+    private final static int OPTION_CONVERT_BUBBLE_TO_STICKER = 153;
 
     private final static int[] allowedNotificationsDuringChatListAnimations = new int[]{
             AyuConstants.MESSAGES_DELETED_NOTIFICATION,
@@ -32852,6 +32853,7 @@ public class ChatActivity extends BaseFragment implements
         var actions=java.util.EnumSet.noneOf(app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.class);
         if(lastMessageMenuStatus.allowReply)actions.add(app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.REPLY);
         if(lastMessageMenuStatus.allowCopy)actions.add(app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.COPY);
+        if(lastMessageMenuStatus.allowCopy && selectedObject!=null && selectedObject.messageOwner!=null && !selectedObject.messageOwner.noforwards && !selectedObject.isEphemeral())actions.add(app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.STICKER);
         if(lastMessageMenuStatus.allowForward)actions.add(app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.FORWARD);
         if(lastMessageMenuStatus.allowEdit)actions.add(app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.EDIT);
         if(lastMessageMenuStatus.allowDelete)actions.add(app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.DELETE);
@@ -34495,6 +34497,11 @@ public class ChatActivity extends BaseFragment implements
                         }
                         if(action==app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.SELECT){
                             createMenu(panelCell,false,false,x,y,false,true,false,false);return;
+                        }
+                        if(action==app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.STICKER){
+                            if(scrimPopupWindow!=null)scrimPopupWindow.dismiss();
+                            app.flexygram.stickers.BubbleStickerSheet.show(ChatActivity.this,panelCell,panelMessage);
+                            return;
                         }
                         ArrayList<Integer> freshIcons=new ArrayList<>(),freshOptions=new ArrayList<>();
                         ArrayList<CharSequence> freshItems=new ArrayList<>();
@@ -37132,6 +37139,15 @@ public class ChatActivity extends BaseFragment implements
                         BulletinFactory.of(this).createCopyBulletin(getString(R.string.StickerCopied)).show();
                     }
                 });
+                break;
+            }
+            case OPTION_CONVERT_BUBBLE_TO_STICKER: {
+                if (selectedObject != null) {
+                    BaseCell cell = findMessageCell(selectedObject.getId(), true);
+                    if (cell instanceof ChatMessageCell) {
+                        app.flexygram.stickers.BubbleStickerSheet.show(ChatActivity.this, (ChatMessageCell) cell, selectedObject);
+                    }
+                }
                 break;
             }
             case OPTION_COPY_FRAME: {
@@ -50651,6 +50667,11 @@ public class ChatActivity extends BaseFragment implements
                         options.add(OPTION_COPY);
                         icons.add(R.drawable.msg_copy);
                     }
+                }
+                if (!noforwardsOrPaidMedia && !isEphemeral && selectedObject != null && selectedObject.messageOwner != null && !selectedObject.isSponsored()) {
+                    items.add(LocaleController.getString(R.string.FlexyContextConvertToSticker));
+                    options.add(OPTION_CONVERT_BUBBLE_TO_STICKER);
+                    icons.add(R.drawable.msg_sticker_remix);
                 }
                 if (!isThreadChat() && chatMode != MODE_SCHEDULED && currentChat != null && primaryMessage != null && (currentChat.has_link || primaryMessage.hasReplies()) && currentChat.megagroup && primaryMessage.canViewThread()) {
                     if (primaryMessage.hasReplies()) {

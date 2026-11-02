@@ -11,4 +11,12 @@
     <string name="FlexyContextNativeStyle">Classic</string>
     <string name="FlexyContextSignatureStyle">FlexyGram Signature</string>
     <string name="FlexyContextStyleDescription">Classic retains the original Telegram gestures and menu. FlexyGram Signature enables one-tap reactions, a compact action card and damped motion. Native physics are fixed with no speed, intensity or deformation controls.</string>
+    <string name="FlexyContextConvertToSticker">Convert to Sticker</string>
+    <string name="FlexyStickerSubtitle">Convert message bubble into a native static sticker</string>
+    <string name="FlexyStickerSendDirect">Send in this chat</string>
+    <string name="FlexyStickerSaveFavorite">Add to Favorites</string>
+    <string name="FlexyStickerExportWebp">Save .webp file</string>
+    <string name="FlexyStickerSent">Sticker sent</string>
+    <string name="FlexyStickerSavedFavorite">Sticker added to Favorites</string>
+    <string name="FlexyStickerExported">Sticker saved to Downloads</string>
 </resources>
