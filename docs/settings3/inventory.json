@@ -1,0 +1,6204 @@
+{
+  "base": "3c7a20a229d425c8f3b5ea1740ccb6d8b3361fea",
+  "named_legacy_rows": [
+    {
+      "source": "appearance",
+      "owner": "avatars",
+      "row": "avatarsHeaderRow",
+      "aliases": [
+        "matteAvatarsHeader"
+      ],
+      "method": "updateRows",
+      "line": 151,
+      "class_name": "OpenExteraAppearanceActivity",
+      "settings3_category": "home",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "appearance",
+      "owner": "avatars",
+      "row": "avatarCornersPreviewRow",
+      "aliases": [
+        "avatarCorners"
+      ],
+      "method": "updateRows",
+      "line": 152,
+      "class_name": "OpenExteraAppearanceActivity",
+      "settings3_category": "home",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "appearance",
+      "owner": "avatars",
+      "row": "singleCornerRadiusRow",
+      "aliases": [
+        "singleCornerRadius"
+      ],
+      "method": "updateRows",
+      "line": 153,
+      "class_name": "OpenExteraAppearanceActivity",
+      "settings3_category": "home",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "appearance",
+      "owner": "chat_list",
+      "row": "chatListHeaderRow",
+      "aliases": [
+        "chatListHeader"
+      ],
+      "method": "updateRows",
+      "line": 156,
+      "class_name": "OpenExteraAppearanceActivity",
+      "settings3_category": "home",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "appearance",
+      "owner": "chat_list",
+      "row": "chatListPreviewRow",
+      "aliases": [
+        "chatListPreview"
+      ],
+      "method": "updateRows",
+      "line": 157,
+      "class_name": "OpenExteraAppearanceActivity",
+      "settings3_category": "home",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "appearance",
+      "owner": "chat_list",
+      "row": "forceSnowRow",
+      "aliases": [
+        "forceSnow"
+      ],
+      "method": "updateRows",
+      "line": 158,
+      "class_name": "OpenExteraAppearanceActivity",
+      "settings3_category": "home",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "appearance",
+      "owner": "chat_list",
+      "row": "centerTitleRow",
+      "aliases": [
+        "centerTitle"
+      ],
+      "method": "updateRows",
+      "line": 159,
+      "class_name": "OpenExteraAppearanceActivity",
+      "settings3_category": "home",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "appearance",
+      "owner": "chat_list",
+      "row": "senderMiniAvatarsRow",
+      "aliases": [
+        "senderMiniAvatars"
+      ],
+      "method": "updateRows",
+      "line": 160,
+      "class_name": "OpenExteraAppearanceActivity",
+      "settings3_category": "home",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "appearance",
+      "owner": "chat_list",
+      "row": "titleTextRow",
+      "aliases": [
+        "titleText"
+      ],
+      "method": "updateRows",
+      "line": 161,
+      "class_name": "OpenExteraAppearanceActivity",
+      "settings3_category": "home",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "appearance",
+      "owner": "folders",
+      "row": "foldersHeaderRow",
+      "aliases": [
+        "foldersHeader"
+      ],
+      "method": "updateRows",
+      "line": 164,
+      "class_name": "OpenExteraAppearanceActivity",
+      "settings3_category": "home",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "appearance",
+      "owner": "folders",
+      "row": "foldersPreviewRow",
+      "aliases": [
+        "foldersPreview"
+      ],
+      "method": "updateRows",
+      "line": 165,
+      "class_name": "OpenExteraAppearanceActivity",
+      "settings3_category": "home",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "appearance",
+      "owner": "folders",
+      "row": "folderThemeAccentRow",
+      "aliases": [
+        "folderThemeAccent"
+      ],
+      "method": "updateRows",
+      "line": 166,
+      "class_name": "OpenExteraAppearanceActivity",
+      "settings3_category": "home",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "appearance",
+      "owner": "folders",
+      "row": "tabTitleStyleRow",
+      "aliases": [
+        "tabTitleStyle"
+      ],
+      "method": "updateRows",
+      "line": 167,
+      "class_name": "OpenExteraAppearanceActivity",
+      "settings3_category": "home",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "appearance",
+      "owner": "folders",
+      "row": "tabCounterRow",
+      "aliases": [
+        "tabCounter"
+      ],
+      "method": "updateRows",
+      "line": 168,
+      "class_name": "OpenExteraAppearanceActivity",
+      "settings3_category": "home",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "appearance",
+      "owner": "@moved",
+      "row": "iconsHeaderRow",
+      "aliases": [
+        "matteIconsHeader"
+      ],
+      "method": "updateRows",
+      "line": 171,
+      "class_name": "OpenExteraAppearanceActivity",
+      "settings3_category": "internal_alias_or_native",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "appearance",
+      "owner": "@moved",
+      "row": "iconPacksRow",
+      "aliases": [
+        "iconPacks"
+      ],
+      "method": "updateRows",
+      "line": 172,
+      "class_name": "OpenExteraAppearanceActivity",
+      "settings3_category": "internal_alias_or_native",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "appearance",
+      "owner": "@moved",
+      "row": "emojiSetsRow",
+      "aliases": [
+        "emojiSets",
+        "EmojiSets"
+      ],
+      "method": "updateRows",
+      "line": 173,
+      "class_name": "OpenExteraAppearanceActivity",
+      "settings3_category": "internal_alias_or_native",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "appearance",
+      "owner": "@moved",
+      "row": "linksHeaderRow",
+      "aliases": [
+        "linksHeader"
+      ],
+      "method": "updateRows",
+      "line": 176,
+      "class_name": "OpenExteraAppearanceActivity",
+      "settings3_category": "internal_alias_or_native",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "appearance",
+      "owner": "@moved",
+      "row": "bottomTabsRow",
+      "aliases": [
+        "bottomTabs"
+      ],
+      "method": "updateRows",
+      "line": 177,
+      "class_name": "OpenExteraAppearanceActivity",
+      "settings3_category": "internal_alias_or_native",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "appearance",
+      "owner": "@moved",
+      "row": "appNavigationRow",
+      "aliases": [
+        "appNavigation"
+      ],
+      "method": "updateRows",
+      "line": 178,
+      "class_name": "OpenExteraAppearanceActivity",
+      "settings3_category": "internal_alias_or_native",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "appearance",
+      "owner": "@moved",
+      "row": "pillStackRow",
+      "aliases": [
+        "pillStack"
+      ],
+      "method": "updateRows",
+      "line": 179,
+      "class_name": "OpenExteraAppearanceActivity",
+      "settings3_category": "internal_alias_or_native",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "appearance",
+      "owner": "@moved",
+      "row": "hidingRow",
+      "aliases": [
+        "hiding"
+      ],
+      "method": "updateRows",
+      "line": 180,
+      "class_name": "OpenExteraAppearanceActivity",
+      "settings3_category": "internal_alias_or_native",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "appearance",
+      "owner": "fonts",
+      "row": "appearanceHeaderRow",
+      "aliases": [
+        "appearanceHeader"
+      ],
+      "method": "updateRows",
+      "line": 183,
+      "class_name": "OpenExteraAppearanceActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "appearance",
+      "owner": "chat_list",
+      "row": "fabShapeRow",
+      "aliases": [
+        "fabShape"
+      ],
+      "method": "updateRows",
+      "line": 184,
+      "class_name": "OpenExteraAppearanceActivity",
+      "settings3_category": "home",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "appearance",
+      "owner": "fonts",
+      "row": "useSystemFontsRow",
+      "aliases": [
+        "useSystemFonts"
+      ],
+      "method": "updateRows",
+      "line": 185,
+      "class_name": "OpenExteraAppearanceActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "appearance",
+      "owner": "effects",
+      "row": "customThemesRow",
+      "aliases": [
+        "customThemes"
+      ],
+      "method": "updateRows",
+      "line": 186,
+      "class_name": "OpenExteraAppearanceActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "appearance",
+      "owner": "effects",
+      "row": "sectionsHeaderRow",
+      "aliases": [
+        "sectionsHeader"
+      ],
+      "method": "updateRows",
+      "line": 189,
+      "class_name": "OpenExteraAppearanceActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "appearance",
+      "owner": "effects",
+      "row": "sectionRadiusRow",
+      "aliases": [
+        "sectionRadius"
+      ],
+      "method": "updateRows",
+      "line": 190,
+      "class_name": "OpenExteraAppearanceActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "appearance",
+      "owner": "effects",
+      "row": "separateHeadersRow",
+      "aliases": [
+        "separateHeaders"
+      ],
+      "method": "updateRows",
+      "line": 191,
+      "class_name": "OpenExteraAppearanceActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "appearance",
+      "owner": "effects",
+      "row": "dividerStyleRow",
+      "aliases": [
+        "dividerStyle"
+      ],
+      "method": "updateRows",
+      "line": 192,
+      "class_name": "OpenExteraAppearanceActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "appearance",
+      "owner": "effects",
+      "row": "blurHeaderRow",
+      "aliases": [
+        "blurHeader"
+      ],
+      "method": "updateRows",
+      "line": 195,
+      "class_name": "OpenExteraAppearanceActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "appearance",
+      "owner": "avatars",
+      "row": "gooeyAvatarRow",
+      "aliases": [
+        "gooeyAvatar"
+      ],
+      "method": "updateRows",
+      "line": 196,
+      "class_name": "OpenExteraAppearanceActivity",
+      "settings3_category": "home",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "appearance",
+      "owner": "effects",
+      "row": "glassOutlineRow",
+      "aliases": [
+        "glassOutline"
+      ],
+      "method": "updateRows",
+      "line": 197,
+      "class_name": "OpenExteraAppearanceActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "appearance",
+      "owner": "effects",
+      "row": "glassMessageMenuRow",
+      "aliases": [
+        "glassMessageMenu"
+      ],
+      "method": "updateRows",
+      "line": 198,
+      "class_name": "OpenExteraAppearanceActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "appearance",
+      "owner": "effects",
+      "row": "forceBlurRow",
+      "aliases": [
+        "forceBlur"
+      ],
+      "method": "updateRows",
+      "line": 199,
+      "class_name": "OpenExteraAppearanceActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "appearance",
+      "owner": "avatars",
+      "row": "disableAvatarBlurRow",
+      "aliases": [
+        "disableAvatarBlur"
+      ],
+      "method": "updateRows",
+      "line": 200,
+      "class_name": "OpenExteraAppearanceActivity",
+      "settings3_category": "home",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "general",
+      "owner": "translation_options",
+      "row": "translateHeaderRow",
+      "aliases": [
+        "translateHeader"
+      ],
+      "method": "updateRows",
+      "line": 174,
+      "class_name": "OpenExteraGeneralActivity",
+      "settings3_category": "plugins",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "general",
+      "owner": "@moved",
+      "row": "translatorRow",
+      "aliases": [
+        "translator"
+      ],
+      "method": "updateRows",
+      "line": 175,
+      "class_name": "OpenExteraGeneralActivity",
+      "settings3_category": "internal_alias_or_native",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "general",
+      "owner": "translation_options",
+      "row": "translateInSheetRow",
+      "aliases": [
+        "translateInSheet"
+      ],
+      "method": "updateRows",
+      "line": 176,
+      "class_name": "OpenExteraGeneralActivity",
+      "settings3_category": "plugins",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "general",
+      "owner": "general",
+      "row": "generalHeaderRow",
+      "aliases": [
+        "generalHeader"
+      ],
+      "method": "updateRows",
+      "line": 179,
+      "class_name": "OpenExteraGeneralActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "general",
+      "owner": "general",
+      "row": "disableNumberRoundingRow",
+      "aliases": [
+        "disableNumberRounding"
+      ],
+      "method": "updateRows",
+      "line": 180,
+      "class_name": "OpenExteraGeneralActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "general",
+      "owner": "general",
+      "row": "formatTimeWithSecondsRow",
+      "aliases": [
+        "formatTimeWithSeconds"
+      ],
+      "method": "updateRows",
+      "line": 181,
+      "class_name": "OpenExteraGeneralActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "general",
+      "owner": "general",
+      "row": "inAppVibrationRow",
+      "aliases": [
+        "inAppVibration"
+      ],
+      "method": "updateRows",
+      "line": 182,
+      "class_name": "OpenExteraGeneralActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "general",
+      "owner": "general",
+      "row": "filterZalgoRow",
+      "aliases": [
+        "filterZalgo"
+      ],
+      "method": "updateRows",
+      "line": 183,
+      "class_name": "OpenExteraGeneralActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "general",
+      "owner": "general",
+      "row": "speedHeaderRow",
+      "aliases": [
+        "speedHeader"
+      ],
+      "method": "updateRows",
+      "line": 186,
+      "class_name": "OpenExteraGeneralActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "general",
+      "owner": "general",
+      "row": "downloadSpeedRow",
+      "aliases": [
+        "downloadSpeed"
+      ],
+      "method": "updateRows",
+      "line": 187,
+      "class_name": "OpenExteraGeneralActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "general",
+      "owner": "general",
+      "row": "uploadBoostRow",
+      "aliases": [
+        "uploadBoost"
+      ],
+      "method": "updateRows",
+      "line": 188,
+      "class_name": "OpenExteraGeneralActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "general",
+      "owner": "general",
+      "row": "useIPv6Row",
+      "aliases": [
+        "IPv6"
+      ],
+      "method": "updateRows",
+      "line": 190,
+      "class_name": "OpenExteraGeneralActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "general",
+      "owner": "general",
+      "row": "dnsTypeRow",
+      "aliases": [
+        "dnsType",
+        "DnsType"
+      ],
+      "method": "updateRows",
+      "line": 191,
+      "class_name": "OpenExteraGeneralActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "general",
+      "owner": "general",
+      "row": "customDoHRow",
+      "aliases": [
+        "customDoH",
+        "CustomDoH"
+      ],
+      "method": "updateRows",
+      "line": 192,
+      "class_name": "OpenExteraGeneralActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "general",
+      "owner": "files",
+      "row": "storageHeaderRow",
+      "aliases": [
+        "storageHeader"
+      ],
+      "method": "updateRows",
+      "line": 196,
+      "class_name": "OpenExteraGeneralActivity",
+      "settings3_category": "files",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "general",
+      "owner": "files",
+      "row": "saveToChatSubfolderRow",
+      "aliases": [
+        "saveToChatSubfolder",
+        "SaveToChatSubfolder"
+      ],
+      "method": "updateRows",
+      "line": 197,
+      "class_name": "OpenExteraGeneralActivity",
+      "settings3_category": "files",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "general",
+      "owner": "files",
+      "row": "savePathRow",
+      "aliases": [
+        "savePath"
+      ],
+      "method": "updateRows",
+      "line": 198,
+      "class_name": "OpenExteraGeneralActivity",
+      "settings3_category": "files",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "general",
+      "owner": "profile",
+      "row": "profileHeaderRow",
+      "aliases": [
+        "profileHeader"
+      ],
+      "method": "updateRows",
+      "line": 201,
+      "class_name": "OpenExteraGeneralActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "general",
+      "owner": "profile",
+      "row": "relativeLastSeenRow",
+      "aliases": [
+        "relativeLastSeen"
+      ],
+      "method": "updateRows",
+      "line": 202,
+      "class_name": "OpenExteraGeneralActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "general",
+      "owner": "profile",
+      "row": "hidePhoneRow",
+      "aliases": [
+        "hidePhone"
+      ],
+      "method": "updateRows",
+      "line": 203,
+      "class_name": "OpenExteraGeneralActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "general",
+      "owner": "profile",
+      "row": "showIdAndDcRow",
+      "aliases": [
+        "showIdAndDc"
+      ],
+      "method": "updateRows",
+      "line": 204,
+      "class_name": "OpenExteraGeneralActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "general",
+      "owner": "profile",
+      "row": "lastfmRow",
+      "aliases": [
+        "lastfm"
+      ],
+      "method": "updateRows",
+      "line": 205,
+      "class_name": "OpenExteraGeneralActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "general",
+      "owner": "archive",
+      "row": "archiveHeaderRow",
+      "aliases": [
+        "archiveHeader"
+      ],
+      "method": "updateRows",
+      "line": 208,
+      "class_name": "OpenExteraGeneralActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "general",
+      "owner": "archive",
+      "row": "sortByUnreadRow",
+      "aliases": [
+        "sortByUnread",
+        "SortByUnread"
+      ],
+      "method": "updateRows",
+      "line": 209,
+      "class_name": "OpenExteraGeneralActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "general",
+      "owner": "archive",
+      "row": "unlimitedPinnedRow",
+      "aliases": [
+        "unlimitedPinnedDialogs",
+        "UnlimitedPinnedDialogs"
+      ],
+      "method": "updateRows",
+      "line": 210,
+      "class_name": "OpenExteraGeneralActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "general",
+      "owner": "archive",
+      "row": "hideArchiveRow",
+      "aliases": [
+        "hideArchive"
+      ],
+      "method": "updateRows",
+      "line": 211,
+      "class_name": "OpenExteraGeneralActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "general",
+      "owner": "archive",
+      "row": "archiveOnPullRow",
+      "aliases": [
+        "archiveOnPull"
+      ],
+      "method": "updateRows",
+      "line": 214,
+      "class_name": "OpenExteraGeneralActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "general",
+      "owner": "archive",
+      "row": "disableUnarchiveSwipeRow",
+      "aliases": [
+        "disableUnarchiveSwipe"
+      ],
+      "method": "updateRows",
+      "line": 215,
+      "class_name": "OpenExteraGeneralActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "general",
+      "owner": "general",
+      "row": "mapsHeaderRow",
+      "aliases": [
+        "mapsHeader"
+      ],
+      "method": "updateRows",
+      "line": 218,
+      "class_name": "OpenExteraGeneralActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "general",
+      "owner": "general",
+      "row": "mapProviderRow",
+      "aliases": [
+        "mapProvider"
+      ],
+      "method": "updateRows",
+      "line": 219,
+      "class_name": "OpenExteraGeneralActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "general",
+      "owner": "general",
+      "row": "mapDriftingFixRow",
+      "aliases": [
+        "mapDriftingFix"
+      ],
+      "method": "updateRows",
+      "line": 220,
+      "class_name": "OpenExteraGeneralActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "general",
+      "owner": "general",
+      "row": "mapPreviewRow",
+      "aliases": [
+        "mapPreview"
+      ],
+      "method": "updateRows",
+      "line": 221,
+      "class_name": "OpenExteraGeneralActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "general",
+      "owner": "general",
+      "row": "notificationsHeaderRow",
+      "aliases": [
+        "notificationsHeader"
+      ],
+      "method": "updateRows",
+      "line": 224,
+      "class_name": "OpenExteraGeneralActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "general",
+      "owner": "general",
+      "row": "pushServiceTypeRow",
+      "aliases": [
+        "pushServiceType",
+        "PushServiceType"
+      ],
+      "method": "updateRows",
+      "line": 225,
+      "class_name": "OpenExteraGeneralActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "general",
+      "owner": "general",
+      "row": "notificationBubblesRow",
+      "aliases": [
+        "disableNotificationBubbles"
+      ],
+      "method": "updateRows",
+      "line": 231,
+      "class_name": "OpenExteraGeneralActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "general",
+      "owner": "general",
+      "row": "pushStatusRow",
+      "aliases": [
+        "pushStatus"
+      ],
+      "method": "updateRows",
+      "line": 232,
+      "class_name": "OpenExteraGeneralActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "general",
+      "owner": "general",
+      "row": "batteryOptimizationRow",
+      "aliases": [
+        "batteryOptimization"
+      ],
+      "method": "updateRows",
+      "line": 233,
+      "class_name": "OpenExteraGeneralActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "general",
+      "owner": "general",
+      "row": "glyphRow",
+      "aliases": [
+        "glyph"
+      ],
+      "method": "updateRows",
+      "line": 234,
+      "class_name": "OpenExteraGeneralActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "@moved",
+      "row": "flexyBubblesRow",
+      "aliases": [
+        "flexyBubbles"
+      ],
+      "method": "updateSignatureHubRows",
+      "line": 443,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "internal_alias_or_native",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "@moved",
+      "row": "signatureHeaderRow",
+      "aliases": [
+        "signatureChatHeader"
+      ],
+      "method": "updateSignatureHubRows",
+      "line": 444,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "internal_alias_or_native",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "@moved",
+      "row": "composerSettingsRow",
+      "aliases": [
+        "flexyComposerSettings"
+      ],
+      "method": "updateSignatureHubRows",
+      "line": 445,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "internal_alias_or_native",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "@moved",
+      "row": "signatureThemeRow",
+      "aliases": [
+        "flexyThemeWallpaper"
+      ],
+      "method": "updateSignatureHubRows",
+      "line": 446,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "internal_alias_or_native",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "@moved",
+      "row": "smartPreviewsRow",
+      "aliases": [
+        "flexySmartPreviews"
+      ],
+      "method": "updateSignatureHubRows",
+      "line": 447,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "internal_alias_or_native",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "@moved",
+      "row": "flexyContextPanelRow",
+      "aliases": [
+        "flexyContextPanel"
+      ],
+      "method": "updateSignatureHubRows",
+      "line": 449,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "internal_alias_or_native",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "@moved",
+      "row": "signatureMessagesRow",
+      "aliases": [
+        "flexyMessagesGestures"
+      ],
+      "method": "updateSignatureHubRows",
+      "line": 450,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "internal_alias_or_native",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "@moved",
+      "row": "signatureStickersRow",
+      "aliases": [
+        "flexyStickersMedia"
+      ],
+      "method": "updateSignatureHubRows",
+      "line": 451,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "internal_alias_or_native",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "@moved",
+      "row": "chatSettingsRow",
+      "aliases": [
+        "chatSettings"
+      ],
+      "method": "updateSignatureHubRows",
+      "line": 453,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "internal_alias_or_native",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "stickers",
+      "row": "stickerSizeRow",
+      "aliases": [
+        "stickerSize"
+      ],
+      "method": "updateStickerRows",
+      "line": 457,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "stickers",
+      "row": "stickerTimeRow",
+      "aliases": [
+        "stickerTime",
+        "hideTimeOnStickers"
+      ],
+      "method": "updateStickerRows",
+      "line": 458,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "stickers",
+      "row": "repliesGroupRow",
+      "aliases": [
+        "replies"
+      ],
+      "method": "updateStickerRows",
+      "line": 459,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "stickers",
+      "row": "stickerShapeHeaderRow",
+      "aliases": [
+        "stickerShapeHeader"
+      ],
+      "method": "updateStickerRows",
+      "line": 469,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "stickers",
+      "row": "stickerShapeRow",
+      "aliases": [
+        "stickerShape"
+      ],
+      "method": "updateStickerRows",
+      "line": 470,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "stickers",
+      "row": "stickersHeaderRow",
+      "aliases": [
+        "stickersHeader"
+      ],
+      "method": "updateStickerRows",
+      "line": 473,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "stickers",
+      "row": "unlimitedGroupRow",
+      "aliases": [
+        "unlimited",
+        "unlimitedRecentStickers"
+      ],
+      "method": "updateStickerRows",
+      "line": 475,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "@moved",
+      "row": "mediaRow",
+      "aliases": [
+        "media"
+      ],
+      "method": "updateStickerRows",
+      "line": 484,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "internal_alias_or_native",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "@moved",
+      "row": "linksHeaderRow",
+      "aliases": [
+        "linksHeader"
+      ],
+      "method": "updateChatRows",
+      "line": 488,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "internal_alias_or_native",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "@moved",
+      "row": "menusRow",
+      "aliases": [
+        "menus"
+      ],
+      "method": "updateChatRows",
+      "line": 489,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "internal_alias_or_native",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "@moved",
+      "row": "flexyContextPanelRow",
+      "aliases": [
+        "flexyContextPanel"
+      ],
+      "method": "updateChatRows",
+      "line": 490,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "internal_alias_or_native",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "@moved",
+      "row": "mediaRow",
+      "aliases": [
+        "media"
+      ],
+      "method": "updateChatRows",
+      "line": 491,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "internal_alias_or_native",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "@moved",
+      "row": "aiChatRow",
+      "aliases": [
+        "aiChat"
+      ],
+      "method": "updateChatRows",
+      "line": 492,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "internal_alias_or_native",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "messages",
+      "row": "inputHeaderRow",
+      "aliases": [
+        "inputHeader"
+      ],
+      "method": "updateChatRows",
+      "line": 497,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "messages",
+      "row": "addCommaRow",
+      "aliases": [
+        "addCommaAfterMention"
+      ],
+      "method": "updateChatRows",
+      "line": 498,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "messages",
+      "row": "inlineMathRow",
+      "aliases": [
+        "inlineMathResult"
+      ],
+      "method": "updateChatRows",
+      "line": 499,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "messages",
+      "row": "inlineMathCurrencyRow",
+      "aliases": [
+        "inlineMathCurrency"
+      ],
+      "method": "updateChatRows",
+      "line": 500,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "messages",
+      "row": "tapToSwitchRecordRow",
+      "aliases": [
+        "tapToSwitchRecord",
+        "UseChatAttachEnterMenu"
+      ],
+      "method": "updateChatRows",
+      "line": 501,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "messages",
+      "row": "keepAttachButtonRow",
+      "aliases": [
+        "keepAttachButton"
+      ],
+      "method": "updateChatRows",
+      "line": 502,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "gestures",
+      "row": "doubleTapHeaderRow",
+      "aliases": [
+        "doubleTapHeader"
+      ],
+      "method": "updateChatRows",
+      "line": 505,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "navigation",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "gestures",
+      "row": "doubleTapRow",
+      "aliases": [
+        "doubleTapPreview"
+      ],
+      "method": "updateChatRows",
+      "line": 506,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "navigation",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "gestures",
+      "row": "doubleTapIncomingRow",
+      "aliases": [
+        "doubleTapIncoming"
+      ],
+      "method": "updateChatRows",
+      "line": 507,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "navigation",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "gestures",
+      "row": "doubleTapOutgoingRow",
+      "aliases": [
+        "doubleTapOutgoing"
+      ],
+      "method": "updateChatRows",
+      "line": 508,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "navigation",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "gestures",
+      "row": "doubleTapReactionRow",
+      "aliases": [
+        "doubleTapReaction"
+      ],
+      "method": "updateChatRows",
+      "line": 511,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "navigation",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "messages",
+      "row": "chatsHeaderRow",
+      "aliases": [
+        "chatsHeader"
+      ],
+      "method": "updateChatRows",
+      "line": 517,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "gestures",
+      "row": "quickTransitionGroupRow",
+      "aliases": [
+        "quickTransition"
+      ],
+      "method": "updateChatRows",
+      "line": 518,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "navigation",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "messages",
+      "row": "deleteChatForBothSidesRow",
+      "aliases": [
+        "deleteChatForBothSides",
+        "DeleteChatForBothSides"
+      ],
+      "method": "updateChatRows",
+      "line": 525,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "gestures",
+      "row": "hideKeyboardOnScrollRow",
+      "aliases": [
+        "hideKeyboardOnScroll"
+      ],
+      "method": "updateChatRows",
+      "line": 526,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "navigation",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "messages",
+      "row": "searchHeaderRow",
+      "aliases": [
+        "searchHeader"
+      ],
+      "method": "updateChatRows",
+      "line": 529,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "messages",
+      "row": "disableGlobalSearchRow",
+      "aliases": [
+        "disableGlobalSearch"
+      ],
+      "method": "updateChatRows",
+      "line": 530,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "messages",
+      "row": "searchHashtagChatRow",
+      "aliases": [
+        "searchHashtagChat",
+        "SearchHashtagDefaultPageChat"
+      ],
+      "method": "updateChatRows",
+      "line": 531,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "messages",
+      "row": "searchHashtagChannelRow",
+      "aliases": [
+        "searchHashtagChannel",
+        "SearchHashtagDefaultPageChannel"
+      ],
+      "method": "updateChatRows",
+      "line": 532,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "messages",
+      "row": "messagesHeaderRow",
+      "aliases": [
+        "messagesHeader"
+      ],
+      "method": "updateChatRows",
+      "line": 535,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "post_appearance",
+      "row": "removeMessageTailRow",
+      "aliases": [
+        "removeMessageTail"
+      ],
+      "method": "updateChatRows",
+      "line": 536,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "messages",
+      "row": "replaceEditedRow",
+      "aliases": [
+        "replaceEdited"
+      ],
+      "method": "updateChatRows",
+      "line": 537,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "messages",
+      "row": "showOnlineStatusRow",
+      "aliases": [
+        "showOnlineStatus"
+      ],
+      "method": "updateChatRows",
+      "line": 538,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "messages",
+      "row": "showResultsBeforeVotingRow",
+      "aliases": [
+        "showResultsBeforeVoting"
+      ],
+      "method": "updateChatRows",
+      "line": 539,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "messages",
+      "row": "dateOfForwardedMsgRow",
+      "aliases": [
+        "dateOfForwardedMsg",
+        "DateOfForwardedMsg"
+      ],
+      "method": "updateChatRows",
+      "line": 540,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "messages",
+      "row": "showTimeHintRow",
+      "aliases": [
+        "showTimeHint",
+        "ShowTimeHint"
+      ],
+      "method": "updateChatRows",
+      "line": 541,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "messages",
+      "row": "rememberAllRepliesRow",
+      "aliases": [
+        "rememberAllBackMessages",
+        "rememberAllBackMessages"
+      ],
+      "method": "updateChatRows",
+      "line": 542,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "messages",
+      "row": "linkConfirmationsHeaderRow",
+      "aliases": [
+        "linkConfirmationsHeader"
+      ],
+      "method": "updateChatRows",
+      "line": 545,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "messages",
+      "row": "fixLinkPreviewRow",
+      "aliases": [
+        "fixLinkPreview",
+        "FixLinkPreview"
+      ],
+      "method": "updateChatRows",
+      "line": 546,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "messages",
+      "row": "disableLinkPreviewRow",
+      "aliases": [
+        "disableLinkPreviewByDefault",
+        "DisableLinkPreviewByDefault"
+      ],
+      "method": "updateChatRows",
+      "line": 547,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "messages",
+      "row": "openLinkConfirmationRow",
+      "aliases": [
+        "openLinkConfirmation",
+        "SkipOpenLinkConfirm",
+        "ConfirmAllLinks"
+      ],
+      "method": "updateChatRows",
+      "line": 548,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "messages",
+      "row": "stripTrackingGroupRow",
+      "aliases": [
+        "stripTracking"
+      ],
+      "method": "updateChatRows",
+      "line": 559,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "messages",
+      "row": "trackingFilterRow",
+      "aliases": [
+        "trackingFilter"
+      ],
+      "method": "updateChatRows",
+      "line": 566,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "post_appearance",
+      "row": "channelPostsHeaderRow",
+      "aliases": [
+        "channelPostsHeader"
+      ],
+      "method": "updateChatRows",
+      "line": 569,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "post_appearance",
+      "row": "wideChannelPostsPreviewRow",
+      "aliases": [
+        "wideChannelPostsPreview"
+      ],
+      "method": "updateChatRows",
+      "line": 570,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "post_appearance",
+      "row": "wideChannelPostsRow",
+      "aliases": [
+        "wideChannelPosts"
+      ],
+      "method": "updateChatRows",
+      "line": 571,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "post_appearance",
+      "row": "wideFeedPostsRow",
+      "aliases": [
+        "wideFeedPosts"
+      ],
+      "method": "updateChatRows",
+      "line": 572,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "menus",
+      "row": "buttonsHeaderRow",
+      "aliases": [
+        "buttonsHeader"
+      ],
+      "method": "updateMenuRows",
+      "line": 577,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "menus",
+      "row": "bottomButtonRow",
+      "aliases": [
+        "bottomButton"
+      ],
+      "method": "updateMenuRows",
+      "line": 578,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "menus",
+      "row": "adminShortcutsRow",
+      "aliases": [
+        "adminShortcuts"
+      ],
+      "method": "updateMenuRows",
+      "line": 579,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "menus",
+      "row": "menusHeaderRow",
+      "aliases": [
+        "menusHeader"
+      ],
+      "method": "updateMenuRows",
+      "line": 582,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "menus",
+      "row": "chatMenuGroupRow",
+      "aliases": [
+        "chatMenu"
+      ],
+      "method": "updateMenuRows",
+      "line": 583,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "menus",
+      "row": "groupedMessageMenuRow",
+      "aliases": [
+        "groupedMessageMenu"
+      ],
+      "method": "updateMenuRows",
+      "line": 605,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "menus",
+      "row": "messageMenuGroupRow",
+      "aliases": [
+        "messageMenu"
+      ],
+      "method": "updateMenuRows",
+      "line": 606,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "menus",
+      "row": "textStyleRow",
+      "aliases": [
+        "textStyle",
+        "TextStyle"
+      ],
+      "method": "updateMenuRows",
+      "line": 640,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "menus",
+      "row": "mediaViewerMenuGroupRow",
+      "aliases": [
+        "mediaViewerMenu"
+      ],
+      "method": "updateMenuRows",
+      "line": 641,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "menus",
+      "row": "actionBarButtonsGroupRow",
+      "aliases": [
+        "actionBarButtons"
+      ],
+      "method": "updateMenuRows",
+      "line": 653,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "menus",
+      "row": "deleteMenuGroupRow",
+      "aliases": [
+        "defaultDeleteMenu",
+        "DefaultDeleteMenu"
+      ],
+      "method": "updateMenuRows",
+      "line": 664,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "media",
+      "row": "cameraHeaderRow",
+      "aliases": [
+        "cameraHeader"
+      ],
+      "method": "updateMediaRows",
+      "line": 677,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "media",
+      "row": "cameraTypeRow",
+      "aliases": [
+        "cameraType"
+      ],
+      "method": "updateMediaRows",
+      "line": 678,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "media",
+      "row": "extendedSettingsGroupRow",
+      "aliases": [
+        "extendedSettings"
+      ],
+      "method": "updateMediaRows",
+      "line": 684,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "media",
+      "row": "videoMessagesCameraRow",
+      "aliases": [
+        "videoMessagesCamera"
+      ],
+      "method": "updateMediaRows",
+      "line": 705,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "media",
+      "row": "rememberLastUsedCameraRow",
+      "aliases": [
+        "rememberLastUsedCamera"
+      ],
+      "method": "updateMediaRows",
+      "line": 708,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "media",
+      "row": "zoomSliderRow",
+      "aliases": [
+        "zoomSlider"
+      ],
+      "method": "updateMediaRows",
+      "line": 712,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "media",
+      "row": "staticZoomRow",
+      "aliases": [
+        "staticZoom"
+      ],
+      "method": "updateMediaRows",
+      "line": 713,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "media",
+      "row": "photoHeaderRow",
+      "aliases": [
+        "photoHeader"
+      ],
+      "method": "updateMediaRows",
+      "line": 716,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "media",
+      "row": "alwaysSendHdRow",
+      "aliases": [
+        "alwaysSendInHD"
+      ],
+      "method": "updateMediaRows",
+      "line": 717,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "media",
+      "row": "hdrPhotosRow",
+      "aliases": [
+        "hdrPhotos"
+      ],
+      "method": "updateMediaRows",
+      "line": 718,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "media",
+      "row": "disableInstantCameraRow",
+      "aliases": [
+        "disableInstantCamera",
+        "DisableInstantCamera"
+      ],
+      "method": "updateMediaRows",
+      "line": 719,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "media",
+      "row": "videosHeaderRow",
+      "aliases": [
+        "videosHeader"
+      ],
+      "method": "updateMediaRows",
+      "line": 722,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "media",
+      "row": "preferOriginalQualityRow",
+      "aliases": [
+        "preferOriginalQuality"
+      ],
+      "method": "updateMediaRows",
+      "line": 723,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "media",
+      "row": "enhancedVideoBitrateRow",
+      "aliases": [
+        "enhancedVideoBitrate",
+        "EnhancedVideoBitrate"
+      ],
+      "method": "updateMediaRows",
+      "line": 724,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "media",
+      "row": "videoPlayerDecoderRow",
+      "aliases": [
+        "videoPlayerDecoder",
+        "VideoPlayerDecoder"
+      ],
+      "method": "updateMediaRows",
+      "line": 725,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "media",
+      "row": "showSmallGifRow",
+      "aliases": [
+        "showSmallGIF",
+        "ShowSmallGIF"
+      ],
+      "method": "updateMediaRows",
+      "line": 726,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "media",
+      "row": "playbackHeaderRow",
+      "aliases": [
+        "playbackHeader"
+      ],
+      "method": "updateMediaRows",
+      "line": 729,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "media",
+      "row": "doubleTapSeekDurationRow",
+      "aliases": [
+        "doubleTapSeekDuration"
+      ],
+      "method": "updateMediaRows",
+      "line": 730,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "media",
+      "row": "swipeToPipRow",
+      "aliases": [
+        "swipeToPip"
+      ],
+      "method": "updateMediaRows",
+      "line": 731,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "media",
+      "row": "unmuteWithVolumeButtonsRow",
+      "aliases": [
+        "unmuteWithVolumeButtons"
+      ],
+      "method": "updateMediaRows",
+      "line": 732,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "media",
+      "row": "pauseGroupRow",
+      "aliases": [
+        "pauseOnMinimize"
+      ],
+      "method": "updateMediaRows",
+      "line": 733,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "media",
+      "row": "voiceHeaderRow",
+      "aliases": [
+        "voiceHeader"
+      ],
+      "method": "updateMediaRows",
+      "line": 743,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "media",
+      "row": "voiceEnhancementsRow",
+      "aliases": [
+        "noiseSuppressAndVoiceEnhance",
+        "NoiseSuppressAndVoiceEnhance"
+      ],
+      "method": "updateMediaRows",
+      "line": 744,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "media",
+      "row": "dontAutoPlayNextVoiceRow",
+      "aliases": [
+        "dontAutoPlayNextVoice",
+        "DontAutoPlayNextVoice"
+      ],
+      "method": "updateMediaRows",
+      "line": 745,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "media",
+      "row": "disableProximityEventsRow",
+      "aliases": [
+        "disableProximityEvents",
+        "DisableProximityEvents"
+      ],
+      "method": "updateMediaRows",
+      "line": 746,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "media",
+      "row": "transcribeHeaderRow",
+      "aliases": [
+        "transcribeHeader"
+      ],
+      "method": "updateMediaRows",
+      "line": 749,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "media",
+      "row": "transcribeProviderRow",
+      "aliases": [
+        "transcribeProvider",
+        "TranscribeProviderShort"
+      ],
+      "method": "updateMediaRows",
+      "line": 750,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "media",
+      "row": "cloudflareCredentialsRow",
+      "aliases": [
+        "cloudflareCredentials",
+        "CloudflareCredentials"
+      ],
+      "method": "updateMediaRows",
+      "line": 751,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "media",
+      "row": "geminiApiKeyRow",
+      "aliases": [
+        "llmProviderGeminiKey",
+        "LlmProviderGeminiKey"
+      ],
+      "method": "updateMediaRows",
+      "line": 752,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "chat",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "visible",
+      "row": "hidingChatListHeaderRow",
+      "aliases": [
+        "hidingChatListHeader"
+      ],
+      "method": "updateHidingRows",
+      "line": 761,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "home",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "visible",
+      "row": "hideActionBarStatusRow",
+      "aliases": [
+        "hideActionBarStatus"
+      ],
+      "method": "updateHidingRows",
+      "line": 762,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "home",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "visible",
+      "row": "hideStoriesRow",
+      "aliases": [
+        "hideStories",
+        "HideStoriesFromHeader",
+        "DisableStories"
+      ],
+      "method": "updateHidingRows",
+      "line": 763,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "home",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "visible",
+      "row": "hideFloatingButtonRow",
+      "aliases": [
+        "hideFloatingButton"
+      ],
+      "method": "updateHidingRows",
+      "line": 764,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "home",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "visible",
+      "row": "hideSearchBarRow",
+      "aliases": [
+        "hideSearchBar"
+      ],
+      "method": "updateHidingRows",
+      "line": 765,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "home",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "visible",
+      "row": "hideAllChatsRow",
+      "aliases": [
+        "hideAllChats"
+      ],
+      "method": "updateHidingRows",
+      "line": 766,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "home",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "visible",
+      "row": "hidingChatsHeaderRow",
+      "aliases": [
+        "hidingChatsHeader"
+      ],
+      "method": "updateHidingRows",
+      "line": 769,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "home",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "visible",
+      "row": "hideSendAsPeerRow",
+      "aliases": [
+        "hideSendAsPeer"
+      ],
+      "method": "updateHidingRows",
+      "line": 770,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "home",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "visible",
+      "row": "hideShareButtonRow",
+      "aliases": [
+        "hideShareButton"
+      ],
+      "method": "updateHidingRows",
+      "line": 771,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "home",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "visible",
+      "row": "hideGiftButtonRow",
+      "aliases": [
+        "hideGiftButton"
+      ],
+      "method": "updateHidingRows",
+      "line": 772,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "home",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "visible",
+      "row": "hideSearchButtonRow",
+      "aliases": [
+        "hideSearchButton"
+      ],
+      "method": "updateHidingRows",
+      "line": 773,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "home",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "visible",
+      "row": "hideReactionsGroupRow",
+      "aliases": [
+        "hideReactions"
+      ],
+      "method": "updateHidingRows",
+      "line": 774,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "home",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "visible",
+      "row": "hideCameraTileRow",
+      "aliases": [
+        "hideCameraTile"
+      ],
+      "method": "updateHidingRows",
+      "line": 782,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "home",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "visible",
+      "row": "hidingStickersHeaderRow",
+      "aliases": [
+        "hidingStickersHeader"
+      ],
+      "method": "updateHidingRows",
+      "line": 785,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "home",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "visible",
+      "row": "disableTrendingRow",
+      "aliases": [
+        "disableTrending",
+        "DisableTrending"
+      ],
+      "method": "updateHidingRows",
+      "line": 786,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "home",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "visible",
+      "row": "hideGroupStickerRow",
+      "aliases": [
+        "hideGroupSticker"
+      ],
+      "method": "updateHidingRows",
+      "line": 787,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "home",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "visible",
+      "row": "disableGreetingRow",
+      "aliases": [
+        "disableGreeting"
+      ],
+      "method": "updateHidingRows",
+      "line": 788,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "home",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "visible",
+      "row": "hidingAiHeaderRow",
+      "aliases": [
+        "hidingAiHeader"
+      ],
+      "method": "updateHidingRows",
+      "line": 791,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "home",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "visible",
+      "row": "hideAiGroupRow",
+      "aliases": [
+        "hideAi"
+      ],
+      "method": "updateHidingRows",
+      "line": 792,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "home",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "visible",
+      "row": "hideAiEditorRow",
+      "aliases": [
+        "hideAiEditor"
+      ],
+      "method": "updateHidingRows",
+      "line": 794,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "home",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "visible",
+      "row": "hideAiSummaryRow",
+      "aliases": [
+        "hideAiSummary"
+      ],
+      "method": "updateHidingRows",
+      "line": 795,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "home",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "visible",
+      "row": "hideAiIvRow",
+      "aliases": [
+        "hideAiIv"
+      ],
+      "method": "updateHidingRows",
+      "line": 796,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "home",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "visible",
+      "row": "premiumElementsGroupRow",
+      "aliases": [
+        "premiumElements",
+        "PremiumElements"
+      ],
+      "method": "updateHidingRows",
+      "line": 800,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "home",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "visible",
+      "row": "hidingSettingsHeaderRow",
+      "aliases": [
+        "hidingSettingsHeader"
+      ],
+      "method": "updateHidingRows",
+      "line": 816,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "home",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "visible",
+      "row": "hideSettingsGroupRow",
+      "aliases": [
+        "hideSettingsSections",
+        "HidePremiumSection",
+        "HideHelpSection"
+      ],
+      "method": "updateHidingRows",
+      "line": 817,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "home",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "visible",
+      "row": "hidePremiumSectionRow",
+      "aliases": [
+        "hidePremiumSection",
+        "HidePremiumSection"
+      ],
+      "method": "updateHidingRows",
+      "line": 819,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "home",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "chats",
+      "owner": "visible",
+      "row": "hideHelpSectionRow",
+      "aliases": [
+        "hideHelpSection",
+        "HideHelpSection"
+      ],
+      "method": "updateHidingRows",
+      "line": 820,
+      "class_name": "OpenExteraChatsActivity",
+      "settings3_category": "home",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "other",
+      "owner": "advanced",
+      "row": "googleHeaderRow",
+      "aliases": [
+        "googleHeader"
+      ],
+      "method": "updateRows",
+      "line": 131,
+      "class_name": "OpenExteraOtherActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "other",
+      "owner": "advanced",
+      "row": "crashReportsRow",
+      "aliases": [
+        "crashReports"
+      ],
+      "method": "updateRows",
+      "line": 132,
+      "class_name": "OpenExteraOtherActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "other",
+      "owner": "advanced",
+      "row": "contentCaptureRow",
+      "aliases": [
+        "contentCapture"
+      ],
+      "method": "updateRows",
+      "line": 133,
+      "class_name": "OpenExteraOtherActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "other",
+      "owner": "advanced",
+      "row": "nagramHeaderRow",
+      "aliases": [
+        "nagramHeader"
+      ],
+      "method": "updateRows",
+      "line": 136,
+      "class_name": "OpenExteraOtherActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "other",
+      "owner": "advanced",
+      "row": "ayuMomentsRow",
+      "aliases": [
+        "ayuMoments"
+      ],
+      "method": "updateRows",
+      "line": 138,
+      "class_name": "OpenExteraOtherActivity",
+      "settings3_category": "ayu",
+      "verification": "source ownership; device pending",
+      "settings3_role": "retired_navigation_alias_to_direct_ayu"
+    },
+    {
+      "source": "other",
+      "owner": "advanced",
+      "row": "experimentalHeaderRow",
+      "aliases": [
+        "experimentalHeader"
+      ],
+      "method": "updateRows",
+      "line": 141,
+      "class_name": "OpenExteraOtherActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "other",
+      "owner": "advanced",
+      "row": "localPremiumRow",
+      "aliases": [
+        "localPremium"
+      ],
+      "method": "updateRows",
+      "line": 142,
+      "class_name": "OpenExteraOtherActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "other",
+      "owner": "advanced",
+      "row": "sensitiveContentRow",
+      "aliases": [
+        "sensitiveDisableFiltering",
+        "SensitiveDisableFiltering"
+      ],
+      "method": "updateRows",
+      "line": 146,
+      "class_name": "OpenExteraOtherActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "other",
+      "owner": "advanced",
+      "row": "backupHeaderRow",
+      "aliases": [
+        "backupHeader"
+      ],
+      "method": "updateRows",
+      "line": 149,
+      "class_name": "OpenExteraOtherActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "other",
+      "owner": "advanced",
+      "row": "exportEtgRow",
+      "aliases": [
+        "exportEtgSettings"
+      ],
+      "method": "updateRows",
+      "line": 150,
+      "class_name": "OpenExteraOtherActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "other",
+      "owner": "advanced",
+      "row": "importEtgRow",
+      "aliases": [
+        "importEtgSettings"
+      ],
+      "method": "updateRows",
+      "line": 151,
+      "class_name": "OpenExteraOtherActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "other",
+      "owner": "advanced",
+      "row": "resetSettingsRow",
+      "aliases": [
+        "resetSettings"
+      ],
+      "method": "updateRows",
+      "line": 157,
+      "class_name": "OpenExteraOtherActivity",
+      "settings3_category": "universal",
+      "verification": "source ownership; device pending"
+    },
+    {
+      "source": "other",
+      "owner": "@native",
+      "row": "deleteAccountRow",
+      "aliases": [
+        "deleteAccount"
+      ],
+      "method": "updateRows",
+      "line": 158,
+      "class_name": "OpenExteraOtherActivity",
+      "settings3_category": "internal_alias_or_native",
+      "verification": "source ownership; device pending"
+    }
+  ],
+  "legacy_config_cells": [
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "customTitleRow",
+      "key": "CustomTitle",
+      "config_refs": [
+        "CustomTitle"
+      ],
+      "route": "general_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 87,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "folderNameAsTitleRow",
+      "key": "FolderNameAsTitle",
+      "config_refs": [
+        "FolderNameAsTitle"
+      ],
+      "route": "appearance_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 90,
+      "settings3_category": "home",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "customTitleUserNameRow",
+      "key": "CustomTitleUserName",
+      "config_refs": [
+        "CustomTitleUserName"
+      ],
+      "route": "general_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 91,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "disableNumberRoundingRow",
+      "key": "DisableNumberRounding",
+      "config_refs": [
+        "DisableNumberRounding"
+      ],
+      "route": "general_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 92,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "preferCommonGroupsTabRow",
+      "key": "PreferCommonGroupsTab",
+      "config_refs": [
+        "PreferCommonGroupsTab"
+      ],
+      "route": "general_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 93,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "usePersianCalendarRow",
+      "key": "UsePersianCalendar",
+      "config_refs": [
+        "UsePersianCalendar"
+      ],
+      "route": "general_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 94,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "displayPersianCalendarByLatinRow",
+      "key": "DisplayPersianCalendarByLatin",
+      "config_refs": [
+        "DisplayPersianCalendarByLatin"
+      ],
+      "route": "general_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 95,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "showIdAndDcRow",
+      "key": "IdDcType",
+      "config_refs": [
+        "IdDcType"
+      ],
+      "route": "general_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 96,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "nameOrderRow",
+      "key": "NameOrder",
+      "config_refs": [
+        "NameOrder"
+      ],
+      "route": "general_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 101,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "saveToChatSubfolderRow",
+      "key": "SaveToChatSubfolder",
+      "config_refs": [
+        "SaveToChatSubfolder"
+      ],
+      "route": "general_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 109,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "customSavePathRow",
+      "key": "customSavePath",
+      "config_refs": [
+        "customSavePath"
+      ],
+      "route": "general_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 110,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "useIPv6Row",
+      "key": "IPv6",
+      "config_refs": [
+        "IPv6"
+      ],
+      "route": "general_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 122,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "defaultHlsVideoQualityRow",
+      "key": "DefaultHlsVideoQuality",
+      "config_refs": [
+        "DefaultHlsVideoQuality"
+      ],
+      "route": "media_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 123,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "dnsTypeRow",
+      "key": "DnsType",
+      "config_refs": [
+        "DnsType"
+      ],
+      "route": "general_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 131,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "customDoHRow",
+      "key": "CustomDoH",
+      "config_refs": [
+        "CustomDoH"
+      ],
+      "route": "general_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 137,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "useOSMDroidMapRow",
+      "key": "useOSMDroidMap",
+      "config_refs": [
+        "useOSMDroidMap"
+      ],
+      "route": "general_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 142,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "mapDriftingFixForGoogleMapsRow",
+      "key": "mapDriftingFixForGoogleMaps",
+      "config_refs": [
+        "mapDriftingFixForGoogleMaps"
+      ],
+      "route": "general_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 143,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "mapPreviewRow",
+      "key": "MapPreviewProvider",
+      "config_refs": [
+        "MapPreviewProvider"
+      ],
+      "route": "general_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 144,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "hideAllTabRow",
+      "key": "HideAllTab",
+      "config_refs": [
+        "HideAllTab"
+      ],
+      "route": "general_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 153,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "doNotUnarchiveBySwipeRow",
+      "key": "DoNotUnarchiveBySwipe",
+      "config_refs": [
+        "DoNotUnarchiveBySwipe"
+      ],
+      "route": "navigation_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 154,
+      "settings3_category": "navigation",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "openArchiveOnPullRow",
+      "key": "OpenArchiveOnPull",
+      "config_refs": [
+        "OpenArchiveOnPull"
+      ],
+      "route": "advanced_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 155,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "hideArchiveRow",
+      "key": "HideArchive",
+      "config_refs": [
+        "HideArchive"
+      ],
+      "route": "advanced_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 156,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "ignoreUnreadCountRow",
+      "key": "IgnoreUnreadCount",
+      "config_refs": [
+        "IgnoreUnreadCount"
+      ],
+      "route": "general_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 157,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "tabsTitleTypeRow",
+      "key": "TabTitleType",
+      "config_refs": [
+        "TabTitleType"
+      ],
+      "route": "general_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 162,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "sortByUnreadRow",
+      "key": "SortByUnread",
+      "config_refs": [
+        "SortByUnread"
+      ],
+      "route": "general_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 171,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "hideDialogsSearchFieldRow",
+      "key": "HideDialogsSearchField",
+      "config_refs": [
+        "HideDialogsSearchField"
+      ],
+      "route": "general_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 172,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "disableDialogsFloatingButtonRow",
+      "key": "DisableDialogsFloatingButton",
+      "config_refs": [
+        "DisableDialogsFloatingButton"
+      ],
+      "route": "general_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 173,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "disableBotOpenButtonRow",
+      "key": "DisableBotOpenButton",
+      "config_refs": [
+        "DisableBotOpenButton"
+      ],
+      "route": "general_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 174,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "mediaPreviewRow",
+      "key": "MediaPreview",
+      "config_refs": [
+        "MediaPreview"
+      ],
+      "route": "media_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 175,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "typefaceRow",
+      "key": "TypefaceUseDefault",
+      "config_refs": [
+        "TypefaceUseDefault"
+      ],
+      "route": "appearance_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 180,
+      "settings3_category": "home",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "alwaysShowDownloadIconRow",
+      "key": "AlwaysShowDownloadIcon",
+      "config_refs": [
+        "AlwaysShowDownloadIcon"
+      ],
+      "route": "appearance_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 181,
+      "settings3_category": "home",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "showStickersInTopLevelRow",
+      "key": "ShowStickersRowToplevel",
+      "config_refs": [
+        "ShowStickersRowToplevel"
+      ],
+      "route": "stickers_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 182,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "hidePremiumSectionRow",
+      "key": "HidePremiumSection",
+      "config_refs": [
+        "HidePremiumSection"
+      ],
+      "route": "general_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 183,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "hideHelpSectionRow",
+      "key": "HideHelpSection",
+      "config_refs": [
+        "HideHelpSection"
+      ],
+      "route": "general_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 184,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "iconReplacements",
+      "key": "IconReplacements",
+      "config_refs": [
+        "IconReplacements"
+      ],
+      "route": "appearance_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 185,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "switchStyleRow",
+      "key": "SwitchStyle",
+      "config_refs": [
+        "SwitchStyle"
+      ],
+      "route": "appearance_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 192,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "sliderStyleRow",
+      "key": "SliderStyle",
+      "config_refs": [
+        "SliderStyle"
+      ],
+      "route": "appearance_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 197,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "actionBarDecorationRow",
+      "key": "ActionBarDecoration",
+      "config_refs": [
+        "ActionBarDecoration"
+      ],
+      "route": "appearance_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 202,
+      "settings3_category": "home",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "chatDecorationRow",
+      "key": "ChatDecoration",
+      "config_refs": [
+        "ChatDecoration"
+      ],
+      "route": "appearance_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 208,
+      "settings3_category": "home",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "notificationIconRow",
+      "key": "NotificationIcon",
+      "config_refs": [
+        "NotificationIcon"
+      ],
+      "route": "general_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 213,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "tabletModeRow",
+      "key": "TabletMode",
+      "config_refs": [
+        "TabletMode"
+      ],
+      "route": "general_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 217,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "centerActionBarTitleRow",
+      "key": "CenterActionBarTitleType",
+      "config_refs": [
+        "CenterActionBarTitleType"
+      ],
+      "route": "appearance_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 222,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "strokeOnViews",
+      "key": "StrokeOnViews",
+      "config_refs": [
+        "StrokeOnViews"
+      ],
+      "route": "general_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 232,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "disableAvatarBlurRow",
+      "key": "DisableAvatarBlur",
+      "config_refs": [
+        "DisableAvatarBlur"
+      ],
+      "route": "general_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 233,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "hideTitlesRow",
+      "key": "MainTabsHideTitles",
+      "config_refs": [
+        "MainTabsHideTitles"
+      ],
+      "route": "navigation_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 238,
+      "settings3_category": "navigation",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "hideContactsRow",
+      "key": "MainTabsHideContacts",
+      "config_refs": [
+        "MainTabsHideContacts"
+      ],
+      "route": "navigation_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 239,
+      "settings3_category": "navigation",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "hideCallsSettingsRow",
+      "key": "MainTabsHideCallsSettings",
+      "config_refs": [
+        "MainTabsHideCallsSettings"
+      ],
+      "route": "navigation_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 240,
+      "settings3_category": "navigation",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "hideProfileRow",
+      "key": "MainTabsHideProfile",
+      "config_refs": [
+        "MainTabsHideProfile"
+      ],
+      "route": "navigation_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 241,
+      "settings3_category": "navigation",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "hideBottomNavigationBarRow",
+      "key": "HideBottomNavigationBar",
+      "config_refs": [
+        "HideBottomNavigationBar"
+      ],
+      "route": "navigation_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 242,
+      "settings3_category": "navigation",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "hidePhoneRow",
+      "key": "HidePhone",
+      "config_refs": [
+        "HidePhone"
+      ],
+      "route": "general_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 247,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "disableSystemAccountRow",
+      "key": "DisableSystemAccount",
+      "config_refs": [
+        "DisableSystemAccount"
+      ],
+      "route": "advanced_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 248,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "disableCrashlyticsCollectionRow",
+      "key": "DisableCrashlyticsCollection",
+      "config_refs": [
+        "DisableCrashlyticsCollection"
+      ],
+      "route": "advanced_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 249,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "pushServiceTypeRow",
+      "key": "PushServiceType",
+      "config_refs": [
+        "PushServiceType"
+      ],
+      "route": "general_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 254,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "pushServiceTypeUnifiedGatewayRow",
+      "key": "PushServiceTypeUnifiedGateway",
+      "config_refs": [
+        "PushServiceTypeUnifiedGateway"
+      ],
+      "route": "general_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 260,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "pushServiceTypeInAppDialogRow",
+      "key": "PushServiceTypeInAppDialog",
+      "config_refs": [
+        "PushServiceTypeInAppDialog"
+      ],
+      "route": "general_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 261,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "disableNotificationBubblesRow",
+      "key": "disableNotificationBubbles",
+      "config_refs": [
+        "disableNotificationBubbles"
+      ],
+      "route": "general_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 262,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "win32Row",
+      "key": "Win32ExecutableFiles",
+      "config_refs": [
+        "Win32ExecutableFiles"
+      ],
+      "route": "advanced_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 267,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "ng",
+      "class_name": "NekoGeneralSettingsActivity",
+      "field": "archiveRow",
+      "key": "ArchiveFiles",
+      "config_refs": [
+        "ArchiveFiles"
+      ],
+      "route": "advanced_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 268,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "stickerSizeRow",
+      "key": "StickerSize",
+      "config_refs": [
+        "StickerSize"
+      ],
+      "route": "stickers_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 86,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "showTimeHintRow",
+      "key": "ShowTimeHint",
+      "config_refs": [
+        "ShowTimeHint"
+      ],
+      "route": "messages_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 87,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "hideTimeForStickerRow",
+      "key": "HideTimeForSticker",
+      "config_refs": [
+        "HideTimeForSticker"
+      ],
+      "route": "stickers_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 88,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "disableReplyBackgroundRow",
+      "key": "MessageColoredBackground",
+      "config_refs": [
+        "MessageColoredBackground"
+      ],
+      "route": "messages_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 89,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "emojiSetsRow",
+      "key": "EmojiSets",
+      "config_refs": [
+        "EmojiSets"
+      ],
+      "route": "stickers_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 94,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "premiumElementsToggleRow",
+      "key": "PremiumItemEmojiStatus",
+      "config_refs": [
+        "PremiumItemEmojiStatus",
+        "PremiumItemEmojiInReplies",
+        "PremiumItemCustomColorInReplies",
+        "PremiumItemCustomWallpaper",
+        "PremiumItemVideoAvatar",
+        "PremiumItemStarInReactions",
+        "PremiumItemStickerEffects",
+        "PremiumItemBoosts"
+      ],
+      "route": "stickers_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 95,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "unreadBadgeOnBackButton",
+      "key": "unreadBadgeOnBackButton",
+      "config_refs": [
+        "unreadBadgeOnBackButton"
+      ],
+      "route": "messages_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 106,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "sendCommentAfterForwardRow",
+      "key": "SendCommentAfterForward",
+      "config_refs": [
+        "SendCommentAfterForward"
+      ],
+      "route": "messages_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 107,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "useChatAttachMediaMenuRow",
+      "key": "UseChatAttachEnterMenu",
+      "config_refs": [
+        "UseChatAttachEnterMenu"
+      ],
+      "route": "messages_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 108,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "fixLinkPreviewRow",
+      "key": "FixLinkPreview",
+      "config_refs": [
+        "FixLinkPreview"
+      ],
+      "route": "messages_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 109,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "disableLinkPreviewByDefaultRow",
+      "key": "DisableLinkPreviewByDefault",
+      "config_refs": [
+        "DisableLinkPreviewByDefault"
+      ],
+      "route": "messages_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 110,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "deleteChatForBothSidesRow",
+      "key": "DeleteChatForBothSides",
+      "config_refs": [
+        "DeleteChatForBothSides"
+      ],
+      "route": "messages_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 111,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "showMessageIDRow",
+      "key": "ShowMessageID",
+      "config_refs": [
+        "ShowMessageID"
+      ],
+      "route": "messages_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 112,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "showSeconds",
+      "key": "showSeconds",
+      "config_refs": [
+        "showSeconds"
+      ],
+      "route": "messages_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 113,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "useEditedIconRow",
+      "key": "UseEditedIcon",
+      "config_refs": [
+        "UseEditedIcon"
+      ],
+      "route": "messages_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 114,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "customEditedMessageRow",
+      "key": "CustomEditedMessage",
+      "config_refs": [
+        "CustomEditedMessage"
+      ],
+      "route": "messages_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 115,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "dateOfForwardMsgRow",
+      "key": "DateOfForwardedMsg",
+      "config_refs": [
+        "DateOfForwardedMsg"
+      ],
+      "route": "messages_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 116,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "showFullAboutRow",
+      "key": "ShowFullAbout",
+      "config_refs": [
+        "ShowFullAbout"
+      ],
+      "route": "messages_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 117,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "disableTrendingRow",
+      "key": "DisableTrending",
+      "config_refs": [
+        "DisableTrending"
+      ],
+      "route": "messages_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 118,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "disableZalgoSymbolsRow",
+      "key": "ZalgoFilter",
+      "config_refs": [
+        "ZalgoFilter"
+      ],
+      "route": "advanced_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 119,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "showOnlineStatusRow",
+      "key": "ShowOnlineStatus",
+      "config_refs": [
+        "ShowOnlineStatus"
+      ],
+      "route": "messages_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 120,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "leftButtonActionRow",
+      "key": "LeftBottomButtonAction",
+      "config_refs": [
+        "LeftBottomButtonAction"
+      ],
+      "route": "messages_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 121,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "markdownParserRow",
+      "key": "MarkdownParser",
+      "config_refs": [
+        "MarkdownParser"
+      ],
+      "route": "messages_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 138,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "doubleTapActionRow",
+      "key": "DoubleTapIncoming",
+      "config_refs": [
+        "DoubleTapIncoming"
+      ],
+      "route": "messages_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 146,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "doubleTapActionOutRow",
+      "key": "DoubleTapOutgoing",
+      "config_refs": [
+        "DoubleTapOutgoing"
+      ],
+      "route": "messages_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 147,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "disableInstantCameraRow",
+      "key": "DisableInstantCamera",
+      "config_refs": [
+        "DisableInstantCamera"
+      ],
+      "route": "media_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 152,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "cameraInVideoMessages",
+      "key": "CameraInVideoMessages",
+      "config_refs": [
+        "CameraInVideoMessages"
+      ],
+      "route": "media_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 153,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "showSmallGifRow",
+      "key": "ShowSmallGIF",
+      "config_refs": [
+        "ShowSmallGIF"
+      ],
+      "route": "stickers_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 162,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "takeGIFasVideoRow",
+      "key": "TakeGIFasVideo",
+      "config_refs": [
+        "TakeGIFasVideo"
+      ],
+      "route": "stickers_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 163,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "autoPauseVideoRow",
+      "key": "AutoPauseVideo",
+      "config_refs": [
+        "AutoPauseVideo"
+      ],
+      "route": "media_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 164,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "disablePreviewVideoSoundShortcutRow",
+      "key": "DisablePreviewVideoSoundShortcut",
+      "config_refs": [
+        "DisablePreviewVideoSoundShortcut"
+      ],
+      "route": "media_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 165,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "dontAutoPlayNextVoiceRow",
+      "key": "DontAutoPlayNextVoice",
+      "config_refs": [
+        "DontAutoPlayNextVoice"
+      ],
+      "route": "media_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 166,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "showSpoilersDirectlyRow",
+      "key": "showSpoilersDirectly",
+      "config_refs": [
+        "showSpoilersDirectly"
+      ],
+      "route": "media_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 167,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "dontSendGreetingStickerRow",
+      "key": "DontSendGreetingSticker",
+      "config_refs": [
+        "DontSendGreetingSticker"
+      ],
+      "route": "stickers_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 172,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "hideGroupStickerRow",
+      "key": "hideGroupSticker",
+      "config_refs": [
+        "hideGroupSticker"
+      ],
+      "route": "stickers_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 173,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "maxRecentStickerCountRow",
+      "key": "maxRecentStickerCount",
+      "config_refs": [
+        "maxRecentStickerCount"
+      ],
+      "route": "stickers_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 174,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "transcribeProviderRow",
+      "key": "TranscribeProvider",
+      "config_refs": [
+        "TranscribeProvider"
+      ],
+      "route": "messages_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 179,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "transcribeProviderCfCredentialsRow",
+      "key": "CloudflareCredentials",
+      "config_refs": [
+        "CloudflareCredentials"
+      ],
+      "route": "messages_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 187,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "transcribeProviderGeminiApiKeyRow",
+      "key": "LlmProviderGeminiKey",
+      "config_refs": [
+        "LlmProviderGeminiKey"
+      ],
+      "route": "messages_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 188,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "transcribeProviderOpenAiRow",
+      "key": "TranscribeProviderOpenAI",
+      "config_refs": [
+        "TranscribeProviderOpenAI"
+      ],
+      "route": "messages_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 189,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "chatMenuRow",
+      "key": "ChannelAdministrators",
+      "config_refs": [
+        "ChannelAdministrators",
+        "EventLog",
+        "Statistics",
+        "ChannelPermissions",
+        "GroupMembers",
+        "ChatMenuItemBoostGroup",
+        "ChatMenuItemLinkedChat",
+        "ChatMenuItemToBeginning",
+        "ChatMenuItemGoToMessage",
+        "ChatMenuItemHideTitle",
+        "ChatMenuItemViewDeleted",
+        "ChatMenuItemClearDeleted",
+        "ChatMenuItemDeleteOwnMessages"
+      ],
+      "route": "messages_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 194,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "messageMenuRow",
+      "key": "showAddToSavedMessages",
+      "config_refs": [
+        "showAddToSavedMessages",
+        "showRepeat",
+        "showDeleteDownloadedFile",
+        "showViewHistory",
+        "showTranslate",
+        "showShareMessages",
+        "showMessageHide",
+        "showReport",
+        "showAdminActions",
+        "showChangePermissions",
+        "showMessageDetails",
+        "Reactions",
+        "ReplyInPrivate",
+        "CopyLink",
+        "MessageMenuCopyFrame",
+        "CopyPhoto",
+        "CopyPhotoAsSticker",
+        "AddToStickers",
+        "AddToFavorites",
+        "NoQuoteForward",
+        "SetReminder",
+        "ShowAddToBookmark",
+        "RepeatAsCopy",
+        "TranslateMessageLLM"
+      ],
+      "route": "messages_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 211,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "mediaViewerMenuRow",
+      "key": "MediaViewerMenuItemForward",
+      "config_refs": [
+        "MediaViewerMenuItemForward",
+        "MediaViewerMenuItemNoQuoteForward",
+        "MediaViewerMenuItemCopyFrame",
+        "MediaViewerMenuItemCopyPhoto",
+        "MediaViewerMenuItemSetProfilePhoto",
+        "MediaViewerMenuItemScanQRCode"
+      ],
+      "route": "messages_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 239,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "actionBarButtonRow",
+      "key": "Reply",
+      "config_refs": [
+        "Reply",
+        "Edit",
+        "SelectBetween",
+        "Copy",
+        "Forward"
+      ],
+      "route": "messages_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 249,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "defaultDeleteMenuRow",
+      "key": "DefaultDeleteMenu",
+      "config_refs": [
+        "DefaultDeleteMenu",
+        "DeleteBanUsers",
+        "DeleteReportSpam",
+        "DeleteAll",
+        "DoActionsInCommonGroups"
+      ],
+      "route": "messages_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 258,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "textStyleRow",
+      "key": "TextStyle",
+      "config_refs": [
+        "TextStyle"
+      ],
+      "route": "messages_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 268,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "groupedMessageMenuRow",
+      "key": "GroupedMessageMenu",
+      "config_refs": [
+        "GroupedMessageMenu"
+      ],
+      "route": "messages_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 276,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "hideKeyboardOnChatScrollRow",
+      "key": "HideKeyboardOnChatScroll",
+      "config_refs": [
+        "HideKeyboardOnChatScroll"
+      ],
+      "route": "messages_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 277,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "disableVibrationRow",
+      "key": "DisableVibration",
+      "config_refs": [
+        "DisableVibration"
+      ],
+      "route": "messages_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 278,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "disableMarkdownRow",
+      "key": "DisableMarkdown",
+      "config_refs": [
+        "DisableMarkdown"
+      ],
+      "route": "messages_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 279,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "disableProximityEventsRow",
+      "key": "DisableProximityEvents",
+      "config_refs": [
+        "DisableProximityEvents"
+      ],
+      "route": "messages_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 280,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "rememberAllBackMessagesRow",
+      "key": "rememberAllBackMessages",
+      "config_refs": [
+        "rememberAllBackMessages"
+      ],
+      "route": "messages_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 281,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "typeMessageHintUseGroupNameRow",
+      "key": "TypeMessageHintUseGroupName",
+      "config_refs": [
+        "TypeMessageHintUseGroupName"
+      ],
+      "route": "messages_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 282,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "showSendAsUnderMessageHintRow",
+      "key": "ShowSendAsUnderMessageHint",
+      "config_refs": [
+        "ShowSendAsUnderMessageHint"
+      ],
+      "route": "messages_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 283,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "showQuickReplyInBotCommandsRow",
+      "key": "ShowQuickReplyInBotCommands",
+      "config_refs": [
+        "ShowQuickReplyInBotCommands"
+      ],
+      "route": "messages_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 284,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "hideBotButtonInInputFieldRow",
+      "key": "HideBotButtonInInputField",
+      "config_refs": [
+        "HideBotButtonInInputField"
+      ],
+      "route": "messages_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 285,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "hideReactionsRow",
+      "key": "HideReactions",
+      "config_refs": [
+        "HideReactions"
+      ],
+      "route": "messages_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 286,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "hideSendAsChannelRow",
+      "key": "hideSendAsChannel",
+      "config_refs": [
+        "hideSendAsChannel"
+      ],
+      "route": "messages_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 291,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "hideShareButtonInChannelRow",
+      "key": "HideShareButtonInChannel",
+      "config_refs": [
+        "HideShareButtonInChannel"
+      ],
+      "route": "messages_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 292,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "disableSwipeToNextRow",
+      "key": "disableSwipeToNextChannel",
+      "config_refs": [
+        "disableSwipeToNextChannel",
+        "disableSwipeToNextTopic"
+      ],
+      "route": "navigation_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 293,
+      "settings3_category": "navigation",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "skipOpenLinkConfirmRow",
+      "key": "SkipOpenLinkConfirm",
+      "config_refs": [
+        "SkipOpenLinkConfirm"
+      ],
+      "route": "messages_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 302,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "askBeforeCallRow",
+      "key": "AskBeforeCalling",
+      "config_refs": [
+        "AskBeforeCalling"
+      ],
+      "route": "messages_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 303,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "repeatConfirmRow",
+      "key": "repeatConfirm",
+      "config_refs": [
+        "repeatConfirm"
+      ],
+      "route": "messages_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 304,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "disableClickCommandToSendRow",
+      "key": "DisableClickCommandToSend",
+      "config_refs": [
+        "DisableClickCommandToSend"
+      ],
+      "route": "messages_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 305,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "confirmAVRow",
+      "key": "ConfirmAVMessage",
+      "config_refs": [
+        "ConfirmAVMessage"
+      ],
+      "route": "messages_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 306,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "confirmAllLinksRow",
+      "key": "ConfirmAllLinks",
+      "config_refs": [
+        "ConfirmAllLinks"
+      ],
+      "route": "messages_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 307,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "searchHashtagDefaultPageChannelRow",
+      "key": "SearchHashtagDefaultPageChannel",
+      "config_refs": [
+        "SearchHashtagDefaultPageChannel"
+      ],
+      "route": "messages_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 317,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nc",
+      "class_name": "NekoChatSettingsActivity",
+      "field": "searchHashtagDefaultPageChatRow",
+      "key": "SearchHashtagDefaultPageChat",
+      "config_refs": [
+        "SearchHashtagDefaultPageChat"
+      ],
+      "route": "messages_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 318,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nx",
+      "class_name": "NekoExperimentalSettingsActivity",
+      "field": "backAnimationStyleRow",
+      "key": "BackAnimationStyle",
+      "config_refs": [
+        "BackAnimationStyle"
+      ],
+      "route": "navigation_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 104,
+      "settings3_category": "navigation",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nx",
+      "class_name": "NekoExperimentalSettingsActivity",
+      "field": "springAnimationCrossfadeRow",
+      "key": "SpringAnimationCrossfade",
+      "config_refs": [
+        "SpringAnimationCrossfade"
+      ],
+      "route": "navigation_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 114,
+      "settings3_category": "navigation",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "nx",
+      "class_name": "NekoExperimentalSettingsActivity",
+      "field": "localPremiumRow",
+      "key": "localPremium",
+      "config_refs": [
+        "localPremium"
+      ],
+      "route": "advanced_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 115,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nx",
+      "class_name": "NekoExperimentalSettingsActivity",
+      "field": "unlimitedPinnedDialogsRow",
+      "key": "UnlimitedPinnedDialogs",
+      "config_refs": [
+        "UnlimitedPinnedDialogs"
+      ],
+      "route": "advanced_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 116,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nx",
+      "class_name": "NekoExperimentalSettingsActivity",
+      "field": "unlimitedFavedStickersRow",
+      "key": "UnlimitedFavoredStickers",
+      "config_refs": [
+        "UnlimitedFavoredStickers"
+      ],
+      "route": "stickers_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 117,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nx",
+      "class_name": "NekoExperimentalSettingsActivity",
+      "field": "boostUploadRow",
+      "key": "uploadBoost",
+      "config_refs": [
+        "uploadBoost"
+      ],
+      "route": "advanced_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 122,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nx",
+      "class_name": "NekoExperimentalSettingsActivity",
+      "field": "audioEnhanceRow",
+      "key": "NoiseSuppressAndVoiceEnhance",
+      "config_refs": [
+        "NoiseSuppressAndVoiceEnhance"
+      ],
+      "route": "media_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 127,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nx",
+      "class_name": "NekoExperimentalSettingsActivity",
+      "field": "sendMp4DocumentAsVideoRow",
+      "key": "SendMp4DocumentAsVideo",
+      "config_refs": [
+        "SendMp4DocumentAsVideo"
+      ],
+      "route": "media_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 128,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "nx",
+      "class_name": "NekoExperimentalSettingsActivity",
+      "field": "enhancedVideoBitrateRow",
+      "key": "EnhancedVideoBitrate",
+      "config_refs": [
+        "EnhancedVideoBitrate"
+      ],
+      "route": "media_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 129,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nx",
+      "class_name": "NekoExperimentalSettingsActivity",
+      "field": "customAudioBitrateRow",
+      "key": "customGroupVoipAudioBitrate",
+      "config_refs": [
+        "customGroupVoipAudioBitrate"
+      ],
+      "route": "media_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 130,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "nx",
+      "class_name": "NekoExperimentalSettingsActivity",
+      "field": "playerDecoderRow",
+      "key": "VideoPlayerDecoder",
+      "config_refs": [
+        "VideoPlayerDecoder"
+      ],
+      "route": "media_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 131,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nx",
+      "class_name": "NekoExperimentalSettingsActivity",
+      "field": "ghostModeRow",
+      "key": "GhostMode",
+      "config_refs": [
+        "GhostMode"
+      ],
+      "route": "advanced_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 140,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nx",
+      "class_name": "NekoExperimentalSettingsActivity",
+      "field": "regexFiltersEnabledRow",
+      "key": "RegexFilters",
+      "config_refs": [
+        "RegexFilters"
+      ],
+      "route": "advanced_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 141,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nx",
+      "class_name": "NekoExperimentalSettingsActivity",
+      "field": "saveLastSeenRow",
+      "key": "SaveLocalLastSeen",
+      "config_refs": [
+        "SaveLocalLastSeen"
+      ],
+      "route": "advanced_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 142,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nx",
+      "class_name": "NekoExperimentalSettingsActivity",
+      "field": "enableSaveDeletedMessagesRow",
+      "key": "EnableSaveDeletedMessages",
+      "config_refs": [
+        "EnableSaveDeletedMessages"
+      ],
+      "route": "advanced_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 143,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nx",
+      "class_name": "NekoExperimentalSettingsActivity",
+      "field": "enableSaveEditsHistoryRow",
+      "key": "EnableSaveEditsHistory",
+      "config_refs": [
+        "EnableSaveEditsHistory"
+      ],
+      "route": "advanced_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 144,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nx",
+      "class_name": "NekoExperimentalSettingsActivity",
+      "field": "messageSavingSaveMediaRow",
+      "key": "MessageSavingSaveMedia",
+      "config_refs": [
+        "MessageSavingSaveMedia"
+      ],
+      "route": "advanced_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 145,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nx",
+      "class_name": "NekoExperimentalSettingsActivity",
+      "field": "saveDeletedInPrivateChatsRow",
+      "key": "SaveDeletedInPrivateChats",
+      "config_refs": [
+        "SaveDeletedInPrivateChats"
+      ],
+      "route": "advanced_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 146,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nx",
+      "class_name": "NekoExperimentalSettingsActivity",
+      "field": "saveDeletedInGroupsRow",
+      "key": "SaveDeletedInGroups",
+      "config_refs": [
+        "SaveDeletedInGroups"
+      ],
+      "route": "advanced_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 147,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nx",
+      "class_name": "NekoExperimentalSettingsActivity",
+      "field": "saveDeletedInChannelsRow",
+      "key": "SaveDeletedInChannels",
+      "config_refs": [
+        "SaveDeletedInChannels"
+      ],
+      "route": "advanced_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 148,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nx",
+      "class_name": "NekoExperimentalSettingsActivity",
+      "field": "saveDeletedMessageForBotsUserRow",
+      "key": "SaveDeletedMessageForBotUser",
+      "config_refs": [
+        "SaveDeletedMessageForBotUser"
+      ],
+      "route": "advanced_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 149,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nx",
+      "class_name": "NekoExperimentalSettingsActivity",
+      "field": "saveDeletedMessageInBotChatRow",
+      "key": "SaveDeletedMessageForBot",
+      "config_refs": [
+        "SaveDeletedMessageForBot"
+      ],
+      "route": "advanced_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 150,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nx",
+      "class_name": "NekoExperimentalSettingsActivity",
+      "field": "replyToDeletedAsQuoteRow",
+      "key": "ReplyToDeletedAsQuote",
+      "config_refs": [
+        "ReplyToDeletedAsQuote"
+      ],
+      "route": "advanced_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 151,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nx",
+      "class_name": "NekoExperimentalSettingsActivity",
+      "field": "translucentDeletedMessagesRow",
+      "key": "TranslucentDeletedMessages",
+      "config_refs": [
+        "TranslucentDeletedMessages"
+      ],
+      "route": "advanced_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 152,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nx",
+      "class_name": "NekoExperimentalSettingsActivity",
+      "field": "useDeletedIconRow",
+      "key": "UseDeletedIcon",
+      "config_refs": [
+        "UseDeletedIcon"
+      ],
+      "route": "advanced_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 153,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nx",
+      "class_name": "NekoExperimentalSettingsActivity",
+      "field": "customDeletedMarkRow",
+      "key": "CustomDeletedMark",
+      "config_refs": [
+        "CustomDeletedMark"
+      ],
+      "route": "advanced_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 154,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nx",
+      "class_name": "NekoExperimentalSettingsActivity",
+      "field": "clearMessageDatabaseRow",
+      "key": "ClearMessageDatabase",
+      "config_refs": [
+        "ClearMessageDatabase"
+      ],
+      "route": "advanced_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 155,
+      "settings3_category": "ayu",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nx",
+      "class_name": "NekoExperimentalSettingsActivity",
+      "field": "showRPCErrorRow",
+      "key": "ShowRPCError",
+      "config_refs": [
+        "ShowRPCError"
+      ],
+      "route": "advanced_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 178,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "nx",
+      "class_name": "NekoExperimentalSettingsActivity",
+      "field": "forceFontWeightFallbackRow",
+      "key": "forceFontWeightFallback",
+      "config_refs": [
+        "forceFontWeightFallback"
+      ],
+      "route": "appearance_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 179,
+      "settings3_category": "home",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "nx",
+      "class_name": "NekoExperimentalSettingsActivity",
+      "field": "disableChoosingStickerRow",
+      "key": "disableChoosingSticker",
+      "config_refs": [
+        "disableChoosingSticker"
+      ],
+      "route": "stickers_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 180,
+      "settings3_category": "chat",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "nx",
+      "class_name": "NekoExperimentalSettingsActivity",
+      "field": "disableFilteringRow",
+      "key": "SensitiveDisableFiltering",
+      "config_refs": [
+        "SensitiveDisableFiltering"
+      ],
+      "route": "advanced_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 181,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "nx",
+      "class_name": "NekoExperimentalSettingsActivity",
+      "field": "devicePerformanceClassRow",
+      "key": "PerformanceClass",
+      "config_refs": [
+        "PerformanceClass"
+      ],
+      "route": "advanced_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 182,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    },
+    {
+      "source": "nx",
+      "class_name": "NekoExperimentalSettingsActivity",
+      "field": "disableStoriesRow",
+      "key": "DisableStories",
+      "config_refs": [
+        "DisableStories"
+      ],
+      "route": "advanced_extra",
+      "retired": true,
+      "existing_retirement": false,
+      "line": 192,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nx",
+      "class_name": "NekoExperimentalSettingsActivity",
+      "field": "hideFromHeaderRow",
+      "key": "HideStoriesFromHeader",
+      "config_refs": [
+        "HideStoriesFromHeader"
+      ],
+      "route": "advanced_extra",
+      "retired": true,
+      "existing_retirement": true,
+      "line": 193,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": true
+    },
+    {
+      "source": "nx",
+      "class_name": "NekoExperimentalSettingsActivity",
+      "field": "enablePanguOnSendingRow",
+      "key": "EnablePanguOnSending",
+      "config_refs": [
+        "EnablePanguOnSending"
+      ],
+      "route": "advanced_extra",
+      "retired": false,
+      "existing_retirement": false,
+      "line": 198,
+      "settings3_category": "universal",
+      "verification": "original ConfigItem retained; integration/device pending",
+      "settings3_excluded_from_residual": false
+    }
+  ],
+  "native_controller_rows": [
+    {
+      "class": "app/flexygram/header/HeaderSettingsActivity",
+      "line": 31,
+      "declaration": "previewRow = addRow();",
+      "category": "chat",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/flexygram/header/HeaderSettingsActivity",
+      "line": 33,
+      "declaration": "cherryHeaderRow = addHeader(\"FlexyHeaderCherrySection\");",
+      "category": "chat",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/flexygram/header/HeaderSettingsActivity",
+      "line": 34,
+      "declaration": "centerTitleRow = addRow(\"signatureHeaderCenterTitle\");",
+      "category": "chat",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/flexygram/header/HeaderSettingsActivity",
+      "line": 35,
+      "declaration": "adaptiveBubbleRow = addRow(\"signatureHeaderAdaptiveBubble\");",
+      "category": "chat",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/flexygram/header/HeaderSettingsActivity",
+      "line": 36,
+      "declaration": "counterRow = addRow(\"signatureHeaderCounter\");",
+      "category": "chat",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/flexygram/header/HeaderSettingsActivity",
+      "line": 37,
+      "declaration": "iosStyledCounterRow = HeaderConfig.counter() ? addRow(\"signatureHeaderIosCounter\") : -1;",
+      "category": "chat",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/flexygram/header/HeaderSettingsActivity",
+      "line": 39,
+      "declaration": "geometryHeaderRow = addHeader(\"FlexyHeaderGeometrySection\");",
+      "category": "chat",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/flexygram/header/HeaderSettingsActivity",
+      "line": 40,
+      "declaration": "styleRow = addRow(\"signatureHeaderStyle\");",
+      "category": "chat",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/flexygram/header/HeaderSettingsActivity",
+      "line": 41,
+      "declaration": "sizeRow = HeaderConfig.portrait() ? -1 : addRow(\"signatureHeaderSize\");",
+      "category": "chat",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/flexygram/header/HeaderSettingsActivity",
+      "line": 42,
+      "declaration": "opacityRow = HeaderConfig.portrait() ? -1 : addRow(\"signatureHeaderOpacity\");",
+      "category": "chat",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/flexygram/bubbles/BubbleSettingsActivity",
+      "line": 32,
+      "declaration": "previewRow = addRow(); transparencyRow = addRow(\"flexyBubbleTransparency\");",
+      "category": "chat",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/flexygram/bubbles/BubbleSettingsActivity",
+      "line": 33,
+      "declaration": "blurRow = addRow(\"flexyBubbleBlur\");",
+      "category": "chat",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/flexygram/bubbles/BubbleSettingsActivity",
+      "line": 34,
+      "declaration": "enabledRow = addRow(\"flexyBubbleOutlineEnabled\");",
+      "category": "chat",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/flexygram/bubbles/BubbleSettingsActivity",
+      "line": 37,
+      "declaration": "styleRow = addRow(\"flexyBubbleOutlineStyle\"); borderRow = addRow(\"flexyBubbleBorderWidth\");",
+      "category": "chat",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/flexygram/bubbles/BubbleSettingsActivity",
+      "line": 38,
+      "declaration": "positionRow = addRow(\"flexyBubbleBorderPosition\");",
+      "category": "chat",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/flexygram/bubbles/BubbleSettingsActivity",
+      "line": 40,
+      "declaration": "pearlRow = addRow(\"flexyBubblePearlIntensity\");",
+      "category": "chat",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/flexygram/bubbles/BubbleSettingsActivity",
+      "line": 42,
+      "declaration": "fuseRow=addRow(\"flexyBubbleFusionMode\");",
+      "category": "chat",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/flexygram/bubbles/BubbleSettingsActivity",
+      "line": 43,
+      "declaration": "if(BubbleConfig.fusionMode()==2){fusionIntensityRow=addRow(\"flexyBubbleFusionIntensity\");fusionAdaptRow=addRow(\"flexyBubbleFusionAdapt\");}",
+      "category": "chat",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/flexygram/composer/FlexyComposerSettingsActivity",
+      "line": 37,
+      "declaration": "previewRow = addRow();",
+      "category": "chat",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/flexygram/composer/FlexyComposerSettingsActivity",
+      "line": 38,
+      "declaration": "styleRow = addRow(\"flexyComposerStyle\");",
+      "category": "chat",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/flexygram/composer/FlexyComposerSettingsActivity",
+      "line": 39,
+      "declaration": "positionRow = addRow(\"flexyComposerPosition\");",
+      "category": "chat",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/flexygram/composer/FlexyComposerSettingsActivity",
+      "line": 40,
+      "declaration": "positionResetRow = addRow();",
+      "category": "chat",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/flexygram/composer/FlexyComposerSettingsActivity",
+      "line": 41,
+      "declaration": "levelRow = addRow(\"flexyComposerLevel\");",
+      "category": "chat",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/flexygram/composer/FlexyComposerSettingsActivity",
+      "line": 42,
+      "declaration": "gapRow = addRow(\"flexyComposerGap\");",
+      "category": "chat",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/flexygram/composer/FlexyComposerSettingsActivity",
+      "line": 43,
+      "declaration": "iconsRow = addRow(\"flexyComposerIcons\");",
+      "category": "chat",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/flexygram/composer/FlexyComposerSettingsActivity",
+      "line": 44,
+      "declaration": "glassRow = addRow(\"flexyComposerGlass\");",
+      "category": "chat",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/flexygram/composer/FlexyComposerSettingsActivity",
+      "line": 45,
+      "declaration": "resetRow = addRow(\"flexyComposerReset\");",
+      "category": "chat",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/flexygram/composer/FlexyComposerSettingsActivity",
+      "line": 46,
+      "declaration": "infoRow = addRow();",
+      "category": "chat",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/flexygram/navigation/BottomTabsSettingsActivity",
+      "line": 57,
+      "declaration": "previewRow = addRow();",
+      "category": "navigation",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/flexygram/navigation/BottomTabsSettingsActivity",
+      "line": 59,
+      "declaration": "tabsHeaderRow = addRow(\"FlexyBottomTabsSectionTabs\");",
+      "category": "navigation",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/flexygram/navigation/BottomTabsSettingsActivity",
+      "line": 60,
+      "declaration": "showTabsRow = addRow(\"flexyBottomTabsShow\");",
+      "category": "navigation",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/flexygram/navigation/BottomTabsSettingsActivity",
+      "line": 62,
+      "declaration": "appearanceHeaderRow = addRow(\"FlexyBottomTabsSectionAppearance\");",
+      "category": "navigation",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/flexygram/navigation/BottomTabsSettingsActivity",
+      "line": 63,
+      "declaration": "floatingDockRow = addRow(\"flexyBottomTabsFloatingDock\");",
+      "category": "navigation",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/flexygram/navigation/BottomTabsSettingsActivity",
+      "line": 64,
+      "declaration": "showTitlesRow = addRow(\"flexyBottomTabsShowTitles\");",
+      "category": "navigation",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/flexygram/navigation/BottomTabsSettingsActivity",
+      "line": 66,
+      "declaration": "actionsHeaderRow = addRow(\"FlexyBottomTabsSectionActions\");",
+      "category": "navigation",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/flexygram/navigation/BottomTabsSettingsActivity",
+      "line": 67,
+      "declaration": "doubleTapChatsRow = addRow(\"flexyBottomTabsDoubleTapChats\");",
+      "category": "navigation",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/flexygram/navigation/BottomTabsSettingsActivity",
+      "line": 68,
+      "declaration": "doubleTapProfileRow = addRow(\"flexyBottomTabsDoubleTapProfile\");",
+      "category": "navigation",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/flexygram/navigation/BottomTabsSettingsActivity",
+      "line": 69,
+      "declaration": "alwaysSearchChatsRow = addRow(\"flexyBottomTabsAlwaysSearchChats\");",
+      "category": "navigation",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/flexygram/navigation/BottomTabsSettingsActivity",
+      "line": 71,
+      "declaration": "orderHeaderRow = addRow(\"FlexyBottomTabsSectionOrder\");",
+      "category": "navigation",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/flexygram/navigation/BottomTabsSettingsActivity",
+      "line": 74,
+      "declaration": "addRow(\"flexy_dest_\" + currentDestinations.get(i));",
+      "category": "navigation",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/exteraless/settings/OpenExteraAyuMomentsActivity",
+      "line": 130,
+      "declaration": "headerRow = addRow(\"ayuHeader\");",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/exteraless/settings/OpenExteraAyuMomentsActivity",
+      "line": 131,
+      "declaration": "ghostRow = isSettings3Embedded() ? -1 : addRow(\"ayuGhost\");",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/exteraless/settings/OpenExteraAyuMomentsActivity",
+      "line": 132,
+      "declaration": "askStoryRow = addRow(NaConfig.INSTANCE.getAskBeforeOpeningStory().getKey());",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/exteraless/settings/OpenExteraAyuMomentsActivity",
+      "line": 133,
+      "declaration": "ghostDividerRow = addRow();",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/exteraless/settings/OpenExteraAyuMomentsActivity",
+      "line": 143,
+      "declaration": "savingHeaderRow = addRow(\"ayuSavingHeader\");",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/exteraless/settings/OpenExteraAyuMomentsActivity",
+      "line": 144,
+      "declaration": "saveDeletedRow = addRow(NaConfig.INSTANCE.getEnableSaveDeletedMessages().getKey());",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/exteraless/settings/OpenExteraAyuMomentsActivity",
+      "line": 145,
+      "declaration": "saveEditsRow = addRow(NaConfig.INSTANCE.getEnableSaveEditsHistory().getKey());",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/exteraless/settings/OpenExteraAyuMomentsActivity",
+      "line": 146,
+      "declaration": "saveInArchivedRow = addRow(\"saveInArchived\");",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/exteraless/settings/OpenExteraAyuMomentsActivity",
+      "line": 148,
+      "declaration": "saveMediaRow = addRow(NaConfig.INSTANCE.getMessageSavingSaveMedia().getKey());",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/exteraless/settings/OpenExteraAyuMomentsActivity",
+      "line": 150,
+      "declaration": "saveMediaPrivateChatsRow = addRow();",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/exteraless/settings/OpenExteraAyuMomentsActivity",
+      "line": 151,
+      "declaration": "saveMediaPublicChannelsRow = addRow();",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/exteraless/settings/OpenExteraAyuMomentsActivity",
+      "line": 152,
+      "declaration": "saveMediaPrivateChannelsRow = addRow();",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/exteraless/settings/OpenExteraAyuMomentsActivity",
+      "line": 153,
+      "declaration": "saveMediaPublicGroupsRow = addRow();",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/exteraless/settings/OpenExteraAyuMomentsActivity",
+      "line": 154,
+      "declaration": "saveMediaPrivateGroupsRow = addRow();",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/exteraless/settings/OpenExteraAyuMomentsActivity",
+      "line": 156,
+      "declaration": "saveDeletedPrivateRow = addRow(NaConfig.INSTANCE.getSaveDeletedInPrivateChats().getKey());",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/exteraless/settings/OpenExteraAyuMomentsActivity",
+      "line": 157,
+      "declaration": "saveDeletedGroupsRow = addRow(NaConfig.INSTANCE.getSaveDeletedInGroups().getKey());",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/exteraless/settings/OpenExteraAyuMomentsActivity",
+      "line": 158,
+      "declaration": "saveDeletedChannelsRow = addRow(NaConfig.INSTANCE.getSaveDeletedInChannels().getKey());",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/exteraless/settings/OpenExteraAyuMomentsActivity",
+      "line": 159,
+      "declaration": "botUserRow = addRow(NaConfig.INSTANCE.getSaveDeletedMessageForBotUser().getKey());",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/exteraless/settings/OpenExteraAyuMomentsActivity",
+      "line": 161,
+      "declaration": "botChatRow = addRow(NaConfig.INSTANCE.getSaveDeletedMessageForBot().getKey());",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/exteraless/settings/OpenExteraAyuMomentsActivity",
+      "line": 164,
+      "declaration": "saveLastSeenRow = addRow(NaConfig.INSTANCE.getSaveLocalLastSeen().getKey());",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/exteraless/settings/OpenExteraAyuMomentsActivity",
+      "line": 165,
+      "declaration": "saveReadDateRow = addRow(NaConfig.INSTANCE.getSaveReadDate().getKey());",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/exteraless/settings/OpenExteraAyuMomentsActivity",
+      "line": 166,
+      "declaration": "savingDividerRow = addRow();",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/exteraless/settings/OpenExteraAyuMomentsActivity",
+      "line": 169,
+      "declaration": "deletedHeaderRow = addRow(\"ayuDeletedHeader\");",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/exteraless/settings/OpenExteraAyuMomentsActivity",
+      "line": 170,
+      "declaration": "replyToDeletedRow = addRow(NaConfig.INSTANCE.getReplyToDeletedAsQuote().getKey());",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/exteraless/settings/OpenExteraAyuMomentsActivity",
+      "line": 171,
+      "declaration": "translucentRow = addRow(NaConfig.INSTANCE.getTranslucentDeletedMessages().getKey());",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/exteraless/settings/OpenExteraAyuMomentsActivity",
+      "line": 172,
+      "declaration": "deletedIconRow = addRow(NaConfig.INSTANCE.getUseDeletedIcon().getKey());",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/exteraless/settings/OpenExteraAyuMomentsActivity",
+      "line": 174,
+      "declaration": "deletedMarkRow = addRow(NaConfig.INSTANCE.getCustomDeletedMark().getKey());",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/exteraless/settings/OpenExteraAyuMomentsActivity",
+      "line": 176,
+      "declaration": "deletedDividerRow = addRow();",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/exteraless/settings/OpenExteraAyuMomentsActivity",
+      "line": 179,
+      "declaration": "otherHeaderRow = addRow(\"ayuOtherHeader\");",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/exteraless/settings/OpenExteraAyuMomentsActivity",
+      "line": 180,
+      "declaration": "regexRow = addRow(NaConfig.INSTANCE.getRegexFiltersEnabled().getKey());",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/exteraless/settings/OpenExteraAyuMomentsActivity",
+      "line": 181,
+      "declaration": "forwardProtectedRow = addRow(NaConfig.INSTANCE.getForwardProtectedAsCopy().getKey());",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/exteraless/settings/OpenExteraAyuMomentsActivity",
+      "line": 182,
+      "declaration": "exportDbRow = addRow(\"databaseExport\");",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/exteraless/settings/OpenExteraAyuMomentsActivity",
+      "line": 183,
+      "declaration": "importDbRow = addRow(\"databaseImport\");",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/exteraless/settings/OpenExteraAyuMomentsActivity",
+      "line": 184,
+      "declaration": "otherDividerRow = addRow();",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/exteraless/settings/OpenExteraAyuMomentsActivity",
+      "line": 186,
+      "declaration": "dangerHeaderRow = addRow(\"ayuDangerHeader\");",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/exteraless/settings/OpenExteraAyuMomentsActivity",
+      "line": 187,
+      "declaration": "disableAllRow = addRow(\"ayuDisableAll\");",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/exteraless/settings/OpenExteraAyuMomentsActivity",
+      "line": 188,
+      "declaration": "clearDbRow = addRow(\"ayuClearDatabase\");",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "app/exteraless/settings/OpenExteraAyuMomentsActivity",
+      "line": 189,
+      "declaration": "dividerRow = addRow();",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "tw/nekomimi/nekogram/settings/GhostModeActivity",
+      "line": 58,
+      "declaration": "ghostEssentialsHeaderRow = addRow();",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "tw/nekomimi/nekogram/settings/GhostModeActivity",
+      "line": 59,
+      "declaration": "ghostModeToggleRow = addRow();",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "tw/nekomimi/nekogram/settings/GhostModeActivity",
+      "line": 61,
+      "declaration": "sendReadMessagePacketsRow = addRow();",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "tw/nekomimi/nekogram/settings/GhostModeActivity",
+      "line": 62,
+      "declaration": "sendReadStoriesPacketsRow = addRow();",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "tw/nekomimi/nekogram/settings/GhostModeActivity",
+      "line": 63,
+      "declaration": "sendOnlinePacketsRow = addRow();",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "tw/nekomimi/nekogram/settings/GhostModeActivity",
+      "line": 64,
+      "declaration": "sendUploadProgressRow = addRow();",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "tw/nekomimi/nekogram/settings/GhostModeActivity",
+      "line": 65,
+      "declaration": "sendOfflinePacketAfterOnlineRow = addRow();",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "tw/nekomimi/nekogram/settings/GhostModeActivity",
+      "line": 66,
+      "declaration": "ghostModeNoticeRow = addRow();",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "tw/nekomimi/nekogram/settings/GhostModeActivity",
+      "line": 75,
+      "declaration": "markReadAfterSendRow = addRow();",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "tw/nekomimi/nekogram/settings/GhostModeActivity",
+      "line": 76,
+      "declaration": "markReadAfterSendNoticeRow = addRow();",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "tw/nekomimi/nekogram/settings/GhostModeActivity",
+      "line": 77,
+      "declaration": "sendWithoutSoundRow = addRow();",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "tw/nekomimi/nekogram/settings/GhostModeActivity",
+      "line": 78,
+      "declaration": "sendWithoutSoundNoticeRow = addRow();",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "tw/nekomimi/nekogram/settings/GhostModeActivity",
+      "line": 79,
+      "declaration": "scheduledSendRow = addRow();",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "tw/nekomimi/nekogram/settings/GhostModeActivity",
+      "line": 80,
+      "declaration": "scheduledSendNoticeRow = addRow();",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "tw/nekomimi/nekogram/settings/GhostModeActivity",
+      "line": 81,
+      "declaration": "showGhostInDrawerRow = addRow();",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    },
+    {
+      "class": "tw/nekomimi/nekogram/settings/GhostModeActivity",
+      "line": 82,
+      "declaration": "showGhostModeStatusRow = addRow();",
+      "category": "ayu",
+      "storage": "original controller/ConfigItem, no renamed keys",
+      "verification": "integration pending"
+    }
+  ]
+}

@@ -109,6 +109,10 @@ import xyz.nextalone.nagram.NaConfig;
 public class MainTabsActivity extends ViewPagerActivity implements NotificationCenter.NotificationCenterDelegate, FactorAnimator.Target {
 
     public static final int TABS_COUNT = 4;
+    private static final int POSITION_CHATS = 0;
+    private static final int POSITION_CONTACTS = 1;
+    private static final int POSITION_CALLS_OR_SETTINGS = 2;
+    private static final int POSITION_PROFILE = 3;
 
     private static final int INDEX_CHATS = 0;
     private static final int INDEX_CONTACTS = 1;
@@ -118,6 +122,11 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
     private static final int INDEX_FEED = 5;
 
     private int indexToPosition(int index) {
+        if (app.flexygram.navigation.LiquidNavigationConfig.configured()) {
+            if (index == INDEX_SETTINGS && MainTabsHelper.isCallsTabShown(currentAccount)) return -1;
+            if (index == INDEX_CALLS && !MainTabsHelper.isCallsTabShown(currentAccount)) return -1;
+            if (index >= app.flexygram.navigation.LiquidNavigationDestinations.GROUPS) return -1;
+        }
         // return index > 2 ? index - 1 : index;
         if (index == INDEX_CHATS) {
             return getPositionChats();
@@ -171,89 +180,55 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
     private UpdateLayoutWrapper updateLayoutWrapper;
     private app.exteraless.player.PlayerMiniView miniPlayer;
     private FrameLayout tabsViewWrapper;
-    private android.widget.ImageView floatingSearchButton;
-    private BlurredBackgroundDrawable floatingSearchBackground;
     private MainTabsLayout tabsView;
-    private BlurredBackgroundDrawable tabsViewBackground;
+    private android.widget.ImageView separateSearchButton;
+    private org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawable separateSearchGlass;
+    private final Runnable refreshTabsTheme = this::blur3_updateColors;
+    private final org.telegram.messenger.Utilities.Callback<Boolean> dockPowerListener = ignored -> refreshMainNativeGlassPolicy();
+    private void refreshMainNativeGlassPolicy() {
+        invalidateTabsGlass();
+        if(tabsView!=null)tabsView.refreshBottomBarAppearance();
+        updateSeparateSearchAppearance();
+    }
     private View fadeView;
-    private java.util.List<Integer> lastTabOrder = app.exteraless.appearance.MainTabsOrder.visible();
     private boolean lastHideContacts = NaConfig.INSTANCE.getMainTabsHideContacts().Bool();
     private boolean lastHideCalls = MainTabsHelper.isCallsTabHidden();
     private boolean lastHideProfile = MainTabsHelper.isProfileTabHidden();
 
+    private long lastTabClickTime = 0;
+    private int lastTabClickIndex = -1;
+    private int currentSelectedTabPosition = -1;
+
+    private boolean isProfileTabShownInBottomBar() {
+        if (app.flexygram.navigation.LiquidNavigationConfig.configured()) {
+            return app.flexygram.navigation.LiquidNavigationDestinations.contains(flexyShownDestinations, INDEX_PROFILE);
+        }
+        return !MainTabsHelper.isProfileTabHidden();
+    }
+
     public MainTabsActivity() {
         super();
+        iBlur3SourceColor = new BlurredBackgroundSourceColor();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            iBlur3SourceTabGlass = new BlurredBackgroundSourceRenderNode(null);
-            iBlur3SourceTabGlass.setupRenderer(new RenderNodeWithHash.Renderer() {
-                @Override
-                public void renderNodeCalculateHash(IBlur3Hash hash) {
-                    hash.add(getThemedColor(Theme.key_windowBackgroundWhite));
-                    hash.add(SharedConfig.chatBlurEnabled());
-
-                    for (int a = 0, N = fragmentsArr.size(); a < N; a++) {
-                        final FragmentState state = fragmentsArr.valueAt(a);
-                        final BaseFragment fragment = state.fragment;
-                        if (fragment.fragmentView == null) {
-                            continue;
-                        }
-                        if (!ViewPositionWatcher.computeRectInParent(fragment.fragmentView, contentView, fragmentPosition)) {
-                            continue;
-                        }
-                        if (fragmentPosition.right <= 0 || fragmentPosition.left >= fragmentView.getMeasuredWidth()) {
-                            continue;
-                        }
-
-                        if (fragment instanceof TabFragmentDelegate) {
-                            TabFragmentDelegate delegate = (TabFragmentDelegate) fragment;
-                            BlurredBackgroundSourceRenderNode source = delegate.getGlassSource();
-                            if (source != null) {
-                                hash.addF(fragmentPosition.left);
-                                hash.addF(fragmentPosition.top);
-                                hash.add(fragment.getClassGuid());
-                            }
-                        }
-                    }
+            iBlur3SourceTabGlass = new BlurredBackgroundSourceRenderNode(iBlur3SourceColor);
+            iBlur3SourceTabGlass.setBlur(dp(14));
+            iBlur3SourceTabGlass.setupRenderer(new org.telegram.ui.Components.blur3.RenderNodeWithHash.Renderer() {
+                @Override public void renderNodeCalculateHash(org.telegram.ui.Components.blur3.capture.IBlur3Hash hash) {
+                    hash.add(tabsGlassRevision);
+                    if (tabsViewWrapper != null) { hash.addF(tabsViewWrapper.getX()); hash.addF(tabsViewWrapper.getY()); }
                 }
-
-                @Override
-                public void renderNodeUpdateDisplayList(Canvas canvas) {
-                    final int width = fragmentView.getMeasuredWidth();
-                    final int height = fragmentView.getMeasuredHeight();
-
-                    canvas.drawColor(getThemedColor(Theme.key_windowBackgroundWhite));
-
-                    for (int a = 0, N = fragmentsArr.size(); a < N; a++) {
-                        final FragmentState state = fragmentsArr.valueAt(a);
-                        final BaseFragment fragment = state.fragment;
-                        if (fragment.fragmentView == null) {
-                            continue;
-                        }
-                        if (!ViewPositionWatcher.computeRectInParent(fragment.fragmentView, contentView, fragmentPosition)) {
-                            continue;
-                        }
-                        if (fragmentPosition.right <= 0 || fragmentPosition.left >= fragmentView.getMeasuredWidth()) {
-                            continue;
-                        }
-
-                        if (fragment instanceof TabFragmentDelegate) {
-                            TabFragmentDelegate delegate = (TabFragmentDelegate) fragment;
-                            BlurredBackgroundSourceRenderNode source = delegate.getGlassSource();
-                            if (source != null) {
-                                canvas.save();
-                                canvas.translate(fragmentPosition.left, fragmentPosition.top);
-                                source.draw(canvas, 0, 0, width, height);
-                                canvas.restore();
-                            }
-                        }
-                    }
+                @Override public void renderNodeUpdateDisplayList(Canvas canvas) {
+                    canvas.drawColor(getEstBackgroundColor());
+                    if (viewPager == null || tabsViewWrapper == null) return;
+                    int save = canvas.save();
+                    // Record only the dock's strip, excluding dock/player/overlays to avoid feedback.
+                    canvas.clipRect(0,0,tabsViewWrapper.getWidth(),tabsViewWrapper.getHeight());
+                    canvas.translate(viewPager.getX()-tabsViewWrapper.getX(),viewPager.getY()-tabsViewWrapper.getY());
+                    viewPager.draw(canvas);
+                    canvas.restoreToCount(save);
                 }
             });
-        } else {
-            iBlur3SourceTabGlass = null;
-        }
-
-        iBlur3SourceColor = new BlurredBackgroundSourceColor();
+        } else { iBlur3SourceTabGlass = null; }
 
         Bulletin.Delegate delegate = new Bulletin.Delegate() {
             @Override
@@ -270,13 +245,32 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
     @Override
     protected FrameLayout createContentView(Context context) {
         return new FrameLayout(context) {
+            @Override protected void onAttachedToWindow() {
+                super.onAttachedToWindow();
+                org.telegram.messenger.LiteMode.addOnPowerSaverAppliedListener(dockPowerListener);
+                refreshMainNativeGlassPolicy();
+            }
+            @Override protected void onDetachedFromWindow() {
+                org.telegram.messenger.LiteMode.removeOnPowerSaverAppliedListener(dockPowerListener);
+                AndroidUtilities.cancelRunOnUIThread(refreshTabsTheme);
+                super.onDetachedFromWindow();
+            }
             @Override
             protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
                 super.onLayout(changed, left, top, right, bottom);
+                if (changed) tabsGlassRevision++;
                 checkUi_tabsPosition();
                 checkUi_fadeView();
             }
 
+            @Override public void onDescendantInvalidated(View child, View target) {
+                super.onDescendantInvalidated(child,target);
+                if (child == viewPager && SharedConfig.chatBlurEnabled() && BlurredBackgroundProviderImpl.checkBlurEnabled(resourceProvider)) {
+                    tabsGlassRevision++;
+                    if (iBlur3SourceTabGlass != null) iBlur3SourceTabGlass.invalidateDisplayListForDrawables();
+                    if (tabsView != null) tabsView.invalidate();
+                }
+            }
             @Override
             protected void dispatchDraw(@NonNull Canvas canvas) {
                 final int color = getEstBackgroundColor();
@@ -287,9 +281,8 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
                     canvas.drawRect(getWidth() - insetRight, 0, getWidth(), getHeight(), Theme.fillingPaint(color));
                 }
 
-                super.dispatchDraw(canvas);
                 blur3_invalidateBlur();
-                blur3_updateFadeColors();
+                super.dispatchDraw(canvas);
             }
         };
     }
@@ -338,10 +331,12 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
             miniPlayer.update(true);
         }
         blur3_updateColors();
+        refreshMainNativeGlassPolicy();
         checkContactsTabBadge();
         checkUnreadCount(true);
 
         showAccountChangeHint();
+        applyFlexyTabs();
     }
 
     private void checkContactsTabBadge() {
@@ -375,18 +370,22 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         final boolean compact = MainTabsHelper.isMainTabsHideTitleStyle();
 
         tabsView = new MainTabsLayout(context, resourceProvider);
-        tabsView.setClipChildren(false);
+        tabsView.setClipChildren(true);
         // В M3 панель без внутренних
         // отступов и без ограничения ширины
         MainTabsUiHelper.applyTabsLayoutStyle(tabsView, dp(328 + DialogsActivity.MAIN_TABS_MARGIN * 2));
 
-        tabs = new GlassTabView[6];
+        tabs = new GlassTabView[11];
         tabs[INDEX_CHATS] = GlassTabView.createMainTab(context, resourceProvider, GlassTabView.TabAnimation.CHATS, R.string.MainTabsChats);
         tabs[INDEX_CONTACTS] = GlassTabView.createMainTab(context, resourceProvider, GlassTabView.TabAnimation.CONTACTS, R.string.MainTabsContacts);
         tabs[INDEX_SETTINGS] = GlassTabView.createMainTab(context, resourceProvider, GlassTabView.TabAnimation.SETTINGS, R.string.Settings);
         tabs[INDEX_CALLS] = GlassTabView.createMainTab(context, resourceProvider, GlassTabView.TabAnimation.CALLS, R.string.MainTabsCalls);
         tabs[INDEX_PROFILE] = GlassTabView.createAvatar(context, resourceProvider, currentAccount, R.string.MainTabsProfile);
         tabs[INDEX_FEED] = GlassTabView.createMainTab(context, resourceProvider, GlassTabView.TabAnimation.FEED, R.string.Feed);
+        for (int id = 6; id < tabs.length; id++) {
+            tabs[id] = app.flexygram.navigation.LiquidNavigationTabs.create(context, resourceProvider, currentAccount, id);
+            tabsView.addTabToIgnoreClick(tabs[id]);
+        }
         tabs[INDEX_CHATS].setOnLongClickListener(this::openFoldersSelector);
         tabs[INDEX_CONTACTS].setOnLongClickListener(this::openContactsSelector);
         tabs[INDEX_CALLS].setOnLongClickListener(this::openCallsSelector);
@@ -402,11 +401,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         tabsView.addTabToIgnoreClick(tabs[INDEX_CALLS]);
         tabsView.addTabToIgnoreClick(tabs[INDEX_FEED]);
 
-        final Integer[] displayOrder = {INDEX_CHATS, INDEX_FEED, INDEX_CONTACTS, INDEX_SETTINGS, INDEX_CALLS, INDEX_PROFILE};
-        java.util.Arrays.sort(displayOrder, java.util.Comparator.comparingInt(index -> {
-            int position = indexToPosition(index);
-            return position < 0 ? Integer.MAX_VALUE : position;
-        }));
+        final int[] displayOrder = {INDEX_CHATS, INDEX_FEED, INDEX_CONTACTS, INDEX_SETTINGS, INDEX_CALLS, INDEX_PROFILE,6,7,8,9,10};
         for (int index : displayOrder) {
             final GlassTabView view = tabs[index];
             final int tabIndex = index;
@@ -415,6 +410,31 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
                 if (viewPager.isManualScrolling() || viewPager.isTouch()) {
                     return;
                 }
+                long now = android.os.SystemClock.elapsedRealtime();
+                boolean isDoubleTap = (now - lastTabClickTime < 350) && (lastTabClickIndex == tabIndex);
+                lastTabClickTime = now;
+                lastTabClickIndex = tabIndex;
+
+                if (isDoubleTap) {
+                    if (tabIndex == INDEX_CHATS && app.flexygram.navigation.LiquidNavigationConfig.doubleTapChats()) {
+                        Bundle args = new Bundle();
+                        args.putLong("user_id", getUserConfig().getClientUserId());
+                        presentFragment(new ChatActivity(args));
+                        lastTabClickTime = 0;
+                        lastTabClickIndex = -1;
+                        return;
+                    }
+                    if ((tabIndex == INDEX_PROFILE || (tabIndex == INDEX_SETTINGS && !isProfileTabShownInBottomBar()))
+                            && app.flexygram.navigation.LiquidNavigationConfig.doubleTapProfile()) {
+                        openAccountSelector(v);
+                        lastTabClickTime = 0;
+                        lastTabClickIndex = -1;
+                        return;
+                    }
+                }
+
+                if (app.flexygram.navigation.LiquidNavigationConfig.configured()
+                        && openFlexyShortcut(tabIndex, view)) return;
                 if (tabIndex == INDEX_FEED && isFeedTabEnabled() && AndroidUtilities.isTablet()) {
                     FeedActivity.presentFeed(this);
                     return;
@@ -437,10 +457,11 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
             });
 
             tabsView.addView(tabs[index]);
-            tabsView.setViewVisible(view, true, false);
+            tabsView.setViewVisible(view, index < 6, false);
         }
         checkUi_callTabVisible(MainTabsHelper.isCallsTabShown(currentAccount), false);
         checkUi_contactsOrFeedTabVisible(false);
+        applyFlexyTabs();
 
         selectTab(viewPager.getCurrentPosition(), false);
 
@@ -448,14 +469,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
 
         final ViewPositionWatcher viewPositionWatcher = new ViewPositionWatcher(contentView);
 
-        BlurredBackgroundDrawableViewFactory iBlur3FactoryGlass = new BlurredBackgroundDrawableViewFactory(iBlur3SourceTabGlass != null ? iBlur3SourceTabGlass : iBlur3SourceColor);
-        iBlur3FactoryGlass.setSourceRootView(viewPositionWatcher, contentView);
-        iBlur3FactoryGlass.setLiquidGlassEffectAllowed(LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS));
-
-        tabsViewBackground = iBlur3FactoryGlass.create(tabsView, BlurredBackgroundProviderImpl.mainTabs(resourceProvider));
-        tabsViewBackground.setRadius(MainTabsUiHelper.getBackgroundRadius());
-        tabsViewBackground.setPadding(MainTabsUiHelper.getBackgroundInset());
-        tabsView.setBackground(tabsViewBackground);
+        tabsView.refreshBottomBarAppearance();
 
         BlurredBackgroundDrawableViewFactory iBlur3FactoryFade = new BlurredBackgroundDrawableViewFactory(iBlur3SourceColor);
         iBlur3FactoryFade.setSourceRootView(viewPositionWatcher, contentView);
@@ -476,48 +490,26 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         // В M3 панель во всю ширину,
         // высота досчитывается вместе с нижним системным отступом в applyTabsBottomInset
         tabsViewWrapper.addView(tabsView, LayoutHelper.createFrame(MainTabsUiHelper.getTabsViewWidth(), MainTabsUiHelper.getTabsViewHeightDp(), Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL));
-        floatingSearchButton = null;
-        floatingSearchBackground = null;
-        if (app.exteraless.appearance.AppearanceConfig.floatingSearch.Bool()) {
-            final FrameLayout.LayoutParams tabsParams = (FrameLayout.LayoutParams) tabsView.getLayoutParams();
-            // Reserve the button and its gap in the same layout, including RTL.
-            tabsParams.setMarginEnd(dp(Math.max(48, MainTabsHelper.getMainTabsHeight())
-                    + MainTabsHelper.getMainTabsMargin() * 2));
-            tabsView.setLayoutParams(tabsParams);
-            floatingSearchButton = new android.widget.ImageView(context) {
-                private int lastIconColor;
-                @Override
-                protected void onDraw(android.graphics.Canvas canvas) {
-                    final int color = getThemedColor(Theme.key_windowBackgroundWhiteBlackText);
-                    if (lastIconColor != color) {
-                        lastIconColor = color;
-                        setColorFilter(color);
-                    }
-                    super.onDraw(canvas);
-                }
-            };
-            floatingSearchButton.setImageResource(R.drawable.outline_header_search);
-            floatingSearchButton.setScaleType(android.widget.ImageView.ScaleType.CENTER);
-            floatingSearchButton.setContentDescription(getString(R.string.Search));
-            floatingSearchBackground = iBlur3FactoryGlass.create(floatingSearchButton,
-                    BlurredBackgroundProviderImpl.mainTabs(resourceProvider, app.exteraless.appearance.UniversalGlass.SEARCH)).setRadius(dp(28));
-            floatingSearchButton.setBackground(floatingSearchBackground);
-            final int buttonSize = MainTabsHelper.isMainTabsHideTitleStyle() ? 48 : MainTabsHelper.getMainTabsHeight();
-            final FrameLayout.LayoutParams searchParams = LayoutHelper.createFrame(buttonSize, buttonSize, Gravity.BOTTOM | Gravity.END);
-            searchParams.bottomMargin = dp(MainTabsHelper.getMainTabsMargin());
-            searchParams.setMarginEnd(dp(MainTabsHelper.getMainTabsMargin()));
-            tabsViewWrapper.addView(floatingSearchButton, searchParams);
-            floatingSearchButton.setOnClickListener(v -> {
-                final int chatsPosition = getPositionChats();
-                selectTab(chatsPosition, false);
-                viewPager.scrollToPosition(chatsPosition);
-                if (dialogsActivity != null) {
-                    dialogsActivity.search("", true);
-                }
+        tabsViewWrapper.addOnLayoutChangeListener((v,l,t,r,b,ol,ot,or,ob) -> {
+            if (r-l != or-ol) v.post(() -> {
+                if (v.isAttachedToWindow() && tabsViewWrapper == v) applyFlexyTabs();
             });
-        }
+        });
         tabsViewWrapper.setClipToPadding(false);
         contentView.addView(tabsViewWrapper, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.BOTTOM));
+        separateSearchButton = new android.widget.ImageView(context);
+        separateSearchButton.setImageResource(R.drawable.flexy_home_search);
+        separateSearchButton.setScaleType(android.widget.ImageView.ScaleType.CENTER);
+        separateSearchButton.setContentDescription(getString(R.string.Search));
+        separateSearchButton.setOnClickListener(v -> openChatsSearch());
+        tabsViewWrapper.addView(separateSearchButton, LayoutHelper.createFrame(56,56,Gravity.BOTTOM | (LocaleController.isRTL ? Gravity.LEFT : Gravity.RIGHT)));
+        if (iBlur3SourceTabGlass != null) {
+            BlurredBackgroundDrawableViewFactory dockFactory = new BlurredBackgroundDrawableViewFactory(iBlur3SourceTabGlass);
+            dockFactory.setSourceRootView(viewPositionWatcher, tabsViewWrapper);
+            dockGlassColors = new org.telegram.ui.Components.blur3.drawable.color.BlurredBackgroundColorProviderThemed(resourceProvider, Theme.key_windowBackgroundWhite, .65f);
+            tabsView.setGlassBackground(dockFactory.create(tabsView, app.exteraless.appearance.UniversalGlass.canRender(app.exteraless.appearance.UniversalGlass.NAVIGATION, resourceProvider) ? app.exteraless.appearance.UniversalGlass.material(resourceProvider, Theme.key_windowBackgroundWhite) : dockGlassColors).setPadding(0));
+            separateSearchGlass = dockFactory.create(separateSearchButton, app.exteraless.appearance.UniversalGlass.canRender(app.exteraless.appearance.UniversalGlass.SEARCH, resourceProvider) ? app.exteraless.appearance.UniversalGlass.material(resourceProvider, Theme.key_windowBackgroundWhite) : dockGlassColors).setPadding(0).setRadius(dp(28));
+        }
 
         updateLayoutWrapper = new UpdateLayoutWrapper(context);
         contentView.addView(updateLayoutWrapper, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.BOTTOM));
@@ -529,6 +521,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
 
         updateLayout();
         checkUnreadCount(false);
+        applyFlexyTabs();
         return contentView;
     }
 
@@ -545,7 +538,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
             tabs[INDEX_CHATS].setCounter(null, false, animated);
         }
 
-        if (tabs[INDEX_FEED] == null || !isFeedTabEnabled()) {
+        if (tabs == null || tabs.length <= INDEX_FEED || tabs[INDEX_FEED] == null || !isFeedTabEnabled()) {
             return;
         }
         final int feedUnreadCount = FeedController.getInstance(currentAccount).getUnreadCount();
@@ -761,15 +754,15 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
     }
 
     private void openFolder(int folderId) {
-        if (viewPager.getCurrentPosition() == getPositionChats() && dialogsActivity != null) {
+        if (viewPager.getCurrentPosition() == POSITION_CHATS && dialogsActivity != null) {
             dialogsActivity.scrollToFolder(folderId);
         } else {
             if (dialogsActivity == null) {
                 prepareDialogsActivity(null);
             }
             pendingFolderId = folderId;
-            selectTab(getPositionChats(), true);
-            viewPager.scrollToPosition(getPositionChats());
+            selectTab(POSITION_CHATS, true);
+            viewPager.scrollToPosition(POSITION_CHATS);
         }
     }
 
@@ -913,7 +906,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
             if (getPositionProfile() >= 0 && currentPosition != getPositionProfile()) {
                 dropFragmentAtPosition(getPositionProfile());
             }
-            if (pendingFolderId != null && currentPosition == getPositionChats() && dialogsActivity != null) {
+            if (pendingFolderId != null && currentPosition == POSITION_CHATS && dialogsActivity != null) {
                 dialogsActivity.scrollToFolder(pendingFolderId);
                 pendingFolderId = null;
             }
@@ -929,7 +922,10 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
             final float position = viewPager.getPositionAnimated();
             setGestureSelectedOverride(position, isDragByGesture);
             if (isDragByGesture) {
-                selectTab(Math.round(position), true);
+                int rounded = Math.round(position);
+                if (rounded != currentSelectedTabPosition) {
+                    selectTab(rounded, true);
+                }
             }
         }
 
@@ -1028,23 +1024,17 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         final boolean hideContacts = MainTabsHelper.isContactsTabHidden();
         final boolean hideCalls = MainTabsHelper.isCallsTabHidden();
         final boolean hideProfile = MainTabsHelper.isProfileTabHidden();
-        final java.util.List<Integer> newTabOrder = app.exteraless.appearance.MainTabsOrder.visible();
         if (hideContacts != lastHideContacts || hideCalls != lastHideCalls
-                || hideProfile != lastHideProfile || !lastTabOrder.equals(newTabOrder)) {
+                || hideProfile != lastHideProfile) {
             if (viewPager != null) {
                 // Ensure ViewPagerFixed is not left with an out-of-range position on rebuild.
                 viewPager.setPosition(getStartPosition());
             }
 
-            // Preserve the Chats state and move it to its new slot; other pages are recreated.
-            final int oldChatsPosition = lastTabOrder.indexOf(app.exteraless.appearance.MainTabsOrder.CHATS);
-            final FragmentState chatsState = fragmentsArr.get(oldChatsPosition);
-            for (int pos = 0; pos < TABS_COUNT; pos++) {
-                if (pos != oldChatsPosition) dropFragmentAtPosition(pos);
+            // Fragment positions are cached. Drop non-chats fragments to avoid mismatches after layout changes.
+            for (int pos = 1; pos <= 3; pos++) {
+                dropFragmentAtPosition(pos);
             }
-            fragmentsArr.clear();
-            if (chatsState != null) fragmentsArr.put(getPositionChats(), chatsState);
-            lastTabOrder = newTabOrder;
 
             dropCallsFragmentAfterPageScroll = false;
             lastHideContacts = hideContacts;
@@ -1055,19 +1045,195 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         super.clearViews();
     }
 
+    public void openChatsSearch() {
+        int chatsPos = getPositionChats();
+        if (viewPager != null && viewPager.getCurrentPosition() != chatsPos) {
+            selectTab(chatsPos, true);
+            viewPager.scrollToPosition(chatsPos);
+        }
+        if (dialogsActivity != null) {
+            dialogsActivity.search("", true);
+        }
+    }
+
+    private final Runnable flexyTabConfigListener = this::applyFlexyTabs;
     public GlassTabView[] tabs;
+    private int[] flexyShownDestinations = new int[0], flexyConfiguredDestinations = new int[0];
+    private void applyFlexyTabs() {
+        if (tabsView == null || tabs == null) return;
+        boolean enabled = app.flexygram.navigation.LiquidNavigationConfig.isEnabled();
+        if (tabsViewWrapper != null) {
+            tabsViewWrapper.setVisibility(enabled ? View.VISIBLE : View.GONE);
+        }
+        if (!enabled) { updateSeparateSearchAppearance(); return; }
+        int width = tabsViewWrapper != null && tabsViewWrapper.getWidth() > 0
+                ? tabsViewWrapper.getWidth() : AndroidUtilities.displaySize.x;
+        // Use the requested insets, not the previous wrapper padding, when settings change.
+        boolean separate = app.flexygram.navigation.LiquidNavigationConfig.separateSearch();
+        int searchSize = app.flexygram.navigation.LiquidNavigationConfig.heightDp();
+        int reservedSearch = separate ? dp(searchSize + 8) : 0;
+        int inner = width - insetLeft - insetRight - reservedSearch
+                - dp(2*(app.flexygram.navigation.LiquidNavigationConfig.sideGapDp()
+                        +app.flexygram.navigation.LiquidNavigationConfig.innerMarginDp()));
+        int slots = Math.max(2, inner / dp(48));
+        flexyConfiguredDestinations = app.flexygram.navigation.LiquidNavigationConfig.order();
+        int[] shown = app.flexygram.navigation.LiquidNavigationConfig.shown(slots);
+        boolean orderChanged = !java.util.Arrays.equals(shown, flexyShownDestinations);
+        for (int id = 0; id < tabs.length; id++) {
+            tabsView.setViewVisible(tabs[id], app.flexygram.navigation.LiquidNavigationDestinations.contains(shown,id), false);
+            tabs[id].setMainTabsAppearance(app.flexygram.navigation.LiquidNavigationConfig.hideLabels(shown.length,(int)(width/AndroidUtilities.density)),
+                    app.flexygram.navigation.LiquidNavigationConfig.iconDp());
+        }
+        if (orderChanged) {
+            // Reorder attached native children without detach/reparent or new fragment positions.
+            for (int i=0;i<shown.length;i++) {
+                tabsView.setPriority(tabs[shown[i]],LocaleController.isRTL ? -i : i);
+                tabs[shown[i]].bringToFront();
+            }
+            flexyShownDestinations = shown;
+        }
+        int oldHeight=tabsView.getLayoutParams()!=null ? tabsView.getLayoutParams().height : -1;
+        MainTabsUiHelper.applyTabsLayoutStyle(tabsView,dp(328 + DialogsActivity.MAIN_TABS_MARGIN * 2));
+        if (tabsViewWrapper != null) MainTabsUiHelper.applyTabsBottomInset(tabsView,tabsViewWrapper,navigationBarHeight,insetLeft,insetRight);
+        if (tabsView.getLayoutParams()!=null && oldHeight!=tabsView.getLayoutParams().height && fragmentView!=null)
+            androidx.core.view.ViewCompat.requestApplyInsets(fragmentView);
+        FrameLayout.LayoutParams dockParams = (FrameLayout.LayoutParams) tabsView.getLayoutParams();
+        if (dockParams != null) {
+            dockParams.leftMargin = LocaleController.isRTL ? reservedSearch : 0;
+            dockParams.rightMargin = LocaleController.isRTL ? 0 : reservedSearch;
+            tabsView.setLayoutParams(dockParams);
+        }
+        if (separateSearchButton != null) {
+            FrameLayout.LayoutParams searchParams = (FrameLayout.LayoutParams) separateSearchButton.getLayoutParams();
+            if (searchParams.width != dp(searchSize) || searchParams.height != dp(searchSize)) {
+                searchParams.width = searchParams.height = dp(searchSize);
+                separateSearchButton.setLayoutParams(searchParams);
+            }
+            if (separateSearchGlass != null) separateSearchGlass.setRadius(dp(searchSize / 2f));
+            separateSearchButton.setVisibility(separate ? View.VISIBLE : View.GONE);
+        }
+        updateSeparateSearchAppearance();
+        tabsView.refreshBottomBarAppearance();
+        int current = viewPager != null ? viewPager.getCurrentPosition() : 0;
+        boolean represented = false;
+        for (int id : flexyConfiguredDestinations) if (indexToPosition(id) == current) { represented = true; break; }
+        if (!represented && current != getPositionChats() && viewPager != null && !viewPager.isManualScrolling() && !viewPager.isTouch()) {
+            selectTab(getPositionChats(), false);
+            viewPager.scrollToPosition(getPositionChats());
+            return;
+        }
+        selectTab(current, false);
+        tabsView.revealSelectedDestination();
+    }
+    private void updateSeparateSearchAppearance() {
+        if (separateSearchButton == null) return;
+        separateSearchButton.setColorFilter(getThemedColor(Theme.key_windowBackgroundWhiteBlackText));
+        android.graphics.drawable.GradientDrawable fallback = new android.graphics.drawable.GradientDrawable();
+        fallback.setShape(android.graphics.drawable.GradientDrawable.OVAL);
+        fallback.setColor(getThemedColor(Theme.key_windowBackgroundWhite));
+        android.graphics.drawable.Drawable background = fallback;
+        if (separateSearchGlass != null && org.telegram.messenger.SharedConfig.chatBlurEnabled()
+                && BlurredBackgroundProviderImpl.checkBlurEnabled(resourceProvider)) {
+            separateSearchGlass.updateColors(); background = separateSearchGlass;
+        }
+        separateSearchButton.setBackground(new android.graphics.drawable.RippleDrawable(
+                android.content.res.ColorStateList.valueOf(getThemedColor(Theme.key_listSelector)), background, fallback));
+        if (dialogsActivity != null) dialogsActivity.updateSeparateSearchVisibility(
+                app.flexygram.navigation.LiquidNavigationConfig.isEnabled()
+                && app.flexygram.navigation.LiquidNavigationConfig.separateSearch());
+    }
+    private void openFlexySettings() {
+        Bundle args = new Bundle();
+        BaseFragment target = new SettingsActivity(args);
+        target.setCurrentAccount(currentAccount); presentFragment(target);
+    }
+    private boolean openFlexyShortcut(int id, View anchor) {
+        if (id == app.flexygram.navigation.LiquidNavigationDestinations.MORE) {
+            ItemOptions options = ItemOptions.makeOptions(this, anchor);
+            for (int destination = 0; destination < app.flexygram.navigation.LiquidNavigationDestinations.COUNT; destination++) {
+                if (app.flexygram.navigation.LiquidNavigationDestinations.isSelectable(destination)
+                        && app.flexygram.navigation.LiquidNavigationDestinations.contains(flexyConfiguredDestinations,destination)
+                        && !app.flexygram.navigation.LiquidNavigationDestinations.contains(flexyShownDestinations,destination)) {
+                    final int selected = destination;
+                    options.add(R.drawable.msg_actions, getString(app.flexygram.navigation.LiquidNavigationTabs.label(selected)),
+                            () -> openFlexyDestination(selected));
+                }
+            }
+            options.show(); return true;
+        }
+        if (indexToPosition(id) >= 0) return false;
+        openFlexyDestination(id); return true;
+    }
+    private void openFlexyDestination(int id) {
+        if (id == app.flexygram.navigation.LiquidNavigationDestinations.SEARCH) {
+            // Follow Cherrygram's search behavior: search the current searchable page,
+            // unless the user explicitly requests that search always targets chats.
+            if (!app.flexygram.navigation.LiquidNavigationConfig.alwaysSearchChats()) {
+                BaseFragment current = getCurrentVisibleFragment();
+                if ((current instanceof SettingsActivity || current instanceof ContactsActivity)
+                        && current.getActionBar() != null) {
+                    current.getActionBar().openSearchField("", true);
+                    return;
+                }
+            }
+            openChatsSearch();
+            return;
+        }
+        int position = indexToPosition(id);
+        if (position >= 0 && app.flexygram.navigation.LiquidNavigationDestinations.contains(flexyShownDestinations,id)) {
+            if (!viewPager.isManualScrolling() && !viewPager.isTouch()) {
+                selectTab(position,true);viewPager.scrollToPosition(position);
+            }
+            return;
+        }
+        Bundle args = new Bundle(); BaseFragment target;
+        switch (id) {
+            case INDEX_SETTINGS: openFlexySettings(); return;
+            case INDEX_CALLS: target = new CallLogActivity(args); break;
+            case INDEX_CONTACTS: args.putBoolean("needPhonebook",true);target = new ContactsActivity(args);break;
+            case INDEX_PROFILE:
+                args.putLong("user_id",getUserConfig().getClientUserId());args.putBoolean("my_profile",true);
+                target = new ProfileActivity(args);break;
+            case INDEX_FEED: target = new FeedActivity(args);break;
+            case 6: args.putInt("dialogsType",DialogsActivity.DIALOGS_TYPE_GROUPS_ONLY);target=new DialogsActivity(args);break;
+            case 7: args.putInt("dialogsType",DialogsActivity.DIALOGS_TYPE_CHANNELS_ONLY);target=new DialogsActivity(args);break;
+            case 8: args.putLong("user_id",getUserConfig().getClientUserId());target=new ChatActivity(args);break;
+            default: return;
+        }
+        target.setCurrentAccount(currentAccount);presentFragment(target);
+    }
+
 
     public void selectTab(int position, boolean animated) {
+        currentSelectedTabPosition = position;
+        boolean overflowSelected = false;
+        if (app.flexygram.navigation.LiquidNavigationConfig.configured()
+                && app.flexygram.navigation.LiquidNavigationDestinations.contains(flexyShownDestinations,9)) {
+            for (int id : flexyConfiguredDestinations) {
+                if (indexToPosition(id)==position
+                        && !app.flexygram.navigation.LiquidNavigationDestinations.contains(flexyShownDestinations,id)) {
+                    overflowSelected=true;break;
+                }
+            }
+        }
         for (int a = 0; a < tabs.length; a++) {
             GlassTabView tab = tabs[a];
-            tab.setSelected(indexToPosition(a) == position, animated);
+            tab.setSelected(a==9 ? overflowSelected : indexToPosition(a)==position, animated);
         }
+        if(tabsView!=null)tabsView.revealSelectedDestination();
     }
 
     public void setGestureSelectedOverride(float animatedPosition, boolean allow) {
         for (int index = 0; index < tabs.length; index++) {
             final int position = indexToPosition(index);
-            final float visibility = Math.max(0, 1f - Math.abs(position - animatedPosition));
+            float visibility = position < 0 ? 0f : Math.max(0, 1f - Math.abs(position - animatedPosition));
+            if (index==9 && app.flexygram.navigation.LiquidNavigationConfig.configured()) {
+                for (int id : flexyConfiguredDestinations) {
+                    int nativePosition=indexToPosition(id);
+                    if (nativePosition>=0 && !app.flexygram.navigation.LiquidNavigationDestinations.contains(flexyShownDestinations,id))
+                        visibility=Math.max(visibility,Math.max(0,1f-Math.abs(nativePosition-animatedPosition)));
+                }
+            }
             tabs[index].setGestureSelectedOverride(visibility, allow);
         }
         tabsView.invalidate();
@@ -1236,6 +1402,9 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
             }
         } else if (id == NotificationCenter.needSetDayNightTheme) {
             clearAllHiddenFragments();
+            // Theme delegates apply colors after this event; refresh retained tabs on the next UI turn.
+            AndroidUtilities.cancelRunOnUIThread(refreshTabsTheme);
+            AndroidUtilities.runOnUIThread(refreshTabsTheme);
         } else if (id == NotificationCenter.callTabsVisibleToggled) {
             final boolean callTabsVisible = MainTabsHelper.isCallsTabShown(currentAccount);
             checkUi_callTabVisible(callTabsVisible, true);
@@ -1261,6 +1430,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
 
     @Override
     public boolean onFragmentCreate() {
+        app.flexygram.navigation.LiquidNavigationConfig.addChangeListener(flexyTabConfigListener);
         observersGroup = NotificationCenter.getInstance(currentAccount)
             .createObserversGroup(this)
             .add(NotificationCenter.fileLoaded)
@@ -1281,6 +1451,10 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
 
     @Override
     public void onFragmentDestroy() {
+        AndroidUtilities.cancelRunOnUIThread(refreshTabsTheme);
+        org.telegram.messenger.LiteMode.removeOnPowerSaverAppliedListener(dockPowerListener);
+        app.flexygram.navigation.LiquidNavigationConfig.removeChangeListener(flexyTabConfigListener);
+
         Bulletin.removeDelegate(this);
         Bulletin.removeDelegate(contentView);
 
@@ -1350,7 +1524,6 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         if (tabsView == null) return;
         if (NaConfig.INSTANCE.getHideBottomNavigationBar().Bool()) {
             tabsView.setVisibility(View.GONE);
-            if (floatingSearchButton != null) floatingSearchButton.setVisibility(View.GONE);
             return;
         }
         final boolean isUpdateLayoutVisible = updateLayoutWrapper.isUpdateLayoutVisible();
@@ -1362,30 +1535,37 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         final float scale = lerp(0.85f, 1f, factor);
 
         tabsViewWrapper.setTranslationY(lerp(hiddenY, normalY, factor));
-        tabsView.setClickable(factor >= 1);
-        tabsView.setEnabled(factor >= 1);
-        if (floatingSearchButton != null) {
-            floatingSearchButton.setAlpha(factor);
-            floatingSearchButton.setEnabled(factor >= 1);
-            floatingSearchButton.setVisibility(factor > 0 ? View.VISIBLE : View.GONE);
-        }
+        tabsView.setClickable(factor >= .999f);
+        tabsView.setEnabled(factor >= .999f);
         tabsView.setAlpha(factor);
         tabsView.setVisibility(factor > 0 ? View.VISIBLE : View.GONE);
     }
 
     private void checkUi_callTabVisible(boolean callTabsVisible, boolean animated) {
-        if (tabsView != null) {
-            tabsView.setViewVisible(tabs[INDEX_SETTINGS], !callTabsVisible, animated);
-            tabsView.setViewVisible(tabs[INDEX_CALLS], callTabsVisible, animated);
-            tabsView.setViewVisible(tabs[INDEX_PROFILE], !MainTabsHelper.isProfileTabHidden(), animated);
+        if (tabsView != null && tabs != null) {
+            if (tabs.length > INDEX_SETTINGS && tabs[INDEX_SETTINGS] != null) {
+                tabsView.setViewVisible(tabs[INDEX_SETTINGS], !callTabsVisible, animated);
+            }
+            if (tabs.length > INDEX_CALLS && tabs[INDEX_CALLS] != null) {
+                tabsView.setViewVisible(tabs[INDEX_CALLS], callTabsVisible, animated);
+            }
+            if (tabs.length > INDEX_PROFILE && tabs[INDEX_PROFILE] != null) {
+                tabsView.setViewVisible(tabs[INDEX_PROFILE], !MainTabsHelper.isProfileTabHidden(), animated);
+            }
+            applyFlexyTabs();
         }
     }
 
     private void checkUi_contactsOrFeedTabVisible(boolean animated) {
-        if (tabsView != null) {
+        if (tabsView != null && tabs != null) {
             final boolean feedTabVisible = isFeedTabEnabled();
-            tabsView.setViewVisible(tabs[INDEX_FEED], feedTabVisible, animated);
-            tabsView.setViewVisible(tabs[INDEX_CONTACTS], !feedTabVisible && !MainTabsHelper.isContactsTabHidden(), animated);
+            if (tabs.length > INDEX_FEED && tabs[INDEX_FEED] != null) {
+                tabsView.setViewVisible(tabs[INDEX_FEED], feedTabVisible, animated);
+            }
+            if (tabs.length > INDEX_CONTACTS && tabs[INDEX_CONTACTS] != null) {
+                tabsView.setViewVisible(tabs[INDEX_CONTACTS], !feedTabVisible && !MainTabsHelper.isContactsTabHidden(), animated);
+            }
+            applyFlexyTabs();
         }
     }
 
@@ -1515,6 +1695,8 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
 
     private final @NonNull BlurredBackgroundSourceColor iBlur3SourceColor;
     private final @Nullable BlurredBackgroundSourceRenderNode iBlur3SourceTabGlass;
+    private long tabsGlassRevision = 1;
+    private org.telegram.ui.Components.blur3.drawable.color.BlurredBackgroundColorProviderThemed dockGlassColors;
 
     private final RectF fragmentPosition = new RectF();
 
@@ -1522,6 +1704,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || iBlur3SourceTabGlass == null) {
             return;
         }
+        tabsGlassRevision++;
         iBlur3SourceTabGlass.invalidateDisplayListForDrawables();
         blur3_invalidateBlur();
         if (tabsView != null) {
@@ -1537,8 +1720,11 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
             return;
         }
 
-        final int width = fragmentView.getMeasuredWidth();
-        final int height = fragmentView.getMeasuredHeight();
+        if (tabsViewWrapper == null || tabsViewWrapper.getVisibility() != View.VISIBLE
+                || !SharedConfig.chatBlurEnabled() || !org.telegram.messenger.LiteMode.isEnabled(org.telegram.messenger.LiteMode.FLAG_LIQUID_GLASS)) return;
+        final int width = tabsViewWrapper.getMeasuredWidth();
+        final int height = tabsViewWrapper.getMeasuredHeight();
+        if (width <= 0 || height <= 0) return;
 
         iBlur3SourceTabGlass.setSize(width, height);
         iBlur3SourceTabGlass.updateDisplayListIfNeeded();
@@ -1553,13 +1739,11 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
 
     private void blur3_updateColors() {
         blur3_updateFadeColors();
-        if (floatingSearchBackground != null) {
-            floatingSearchBackground.updateColors();
-            floatingSearchButton.invalidate();
-        }
-        if (tabsViewBackground != null) {
-            tabsViewBackground.updateColors();
-        }
+        if (dockGlassColors != null) dockGlassColors.updateColors();
+        updateSeparateSearchAppearance();
+        tabsGlassRevision++;
+        if (iBlur3SourceTabGlass != null) iBlur3SourceTabGlass.invalidateDisplayListForDrawables();
+        if (tabsView != null) tabsView.refreshBottomBarAppearance();
         blur3_invalidateBlur();
         if (fadeView != null) {
             fadeView.invalidate();
@@ -1580,6 +1764,18 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
     }
 
     private boolean processLongClick(View button, int index) {
+        if (index == INDEX_CHATS) {
+            ItemOptions options=ItemOptions.makeOptions(this,button);
+            for(int id=1;id<app.flexygram.navigation.LiquidNavigationDestinations.COUNT;id++) {
+                if(!app.flexygram.navigation.LiquidNavigationDestinations.contains(flexyShownDestinations,id)) {
+                    final int destination=id;
+                    options.add(R.drawable.msg_actions,getString(app.flexygram.navigation.LiquidNavigationTabs.label(id)),()->openFlexyDestination(destination));
+                }
+            }
+            options.add(R.drawable.msg_folders,getString(R.string.MainTabsChats),()->openFoldersSelector(button)).show();
+            return true;
+        }
+        if (index >= 6) return false;
         if (index == INDEX_PROFILE) {
             openAccountSelector(button);
             return true;

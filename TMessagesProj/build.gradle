@@ -26,7 +26,7 @@ def buildTimestamp = System.getenv('BUILD_TIMESTAMP') ?: '0'
 def commitId = System.getenv('COMMIT_ID')
 def shortCommit = commitId?.take(7) ?: ''
 def verName = "${APP_VERSION_NAME}${shortCommit ? "-${shortCommit}" : ''}"
-def verCode = 1261
+def verCode = 1289
 
 def officialVer = APP_VERSION_NAME
 def officialCode = APP_VERSION_CODE
@@ -52,10 +52,15 @@ if (properties != null) {
 }
 
 def chaquopyBuildPython = properties?.getProperty('CHAQUOPY_BUILD_PYTHON') ?: System.getenv('CHAQUOPY_BUILD_PYTHON')
+def alphaWheelhouse = System.getenv('ALPHA_WHEELHOUSE')
 
 keystorePwd = keystorePwd ?: System.getenv('KEYSTORE_PASS')
 alias = alias ?: System.getenv('ALIAS_NAME')
 pwd = pwd ?: System.getenv('ALIAS_PASS')
+
+// Beta credentials are deliberately separate from Alpha and inherited signing inputs.
+def betaValue = { String name -> properties?.getProperty(name) ?: System.getenv(name) }
+def betaKeystorePath = betaValue('FLEXYGRAM_RELEASE_KEYSTORE')
 
 def nativeTarget = System.getenv('NATIVE_TARGET') ?: ''
 
@@ -143,6 +148,13 @@ android {
                 buildPython chaquopyBuildPython
             }
             pip {
+                if (alphaWheelhouse) {
+                    def verifiedWheels = fileTree(alphaWheelhouse).matching { include '*.whl' }.files.sort()
+                    if (targetAbis != ['arm64-v8a'] || verifiedWheels.size() != 4) {
+                        throw new GradleException('Alpha wheelhouse requires four verified ARM64 dependency wheels')
+                    }
+                    verifiedWheels.each { install it.absolutePath }
+                }
                 install 'beautifulsoup4'
                 install 'debugpy'
                 install 'lxml'
@@ -154,13 +166,13 @@ android {
         }
 
         // obtain your own keys at https://core.telegram.org/api/obtaining_api_id
-        def appId = '6'
-        def appHash = 'eb06d4abfb49dc3eeb1aeb98ae0f581e'
+        def appId = properties?.getProperty('TELEGRAM_APP_ID') ?: System.getenv('TELEGRAM_APP_ID') ?: '0'
+        def appHash = properties?.getProperty('TELEGRAM_APP_HASH') ?: System.getenv('TELEGRAM_APP_HASH') ?: ''
 
         // obtain your own key at https://developers.google.com/maps/documentation/android-sdk/get-api-key
         // Android keys are restricted by package name and signing certificate,
         // so a key taken from another build shows an empty map.
-        def mapsKey = 'AIzaSyDE_x6GRKJCSfCY33soBYUQ2piYsgjVpVE'
+        def mapsKey = ''
 
         // Nothing Glyph SDK. «test» — отладочный ключ из Glyph Developer Kit, боевой
         // запрашивается у Nothing под package name приложения.
@@ -178,6 +190,8 @@ android {
 
         manifestPlaceholders += [MAPS_API_KEY: mapsKey, GLYPH_API_KEY: glyphKey]
 
+        buildConfigField 'boolean', 'CONNECTED_ALPHA', 'true'
+        buildConfigField 'String', 'ALPHA_GOOGLE_AUTH_CLIENT_ID', '"' + (properties?.getProperty('ALPHA_GOOGLE_AUTH_CLIENT_ID') ?: System.getenv('ALPHA_GOOGLE_AUTH_CLIENT_ID') ?: '') + '"'
         buildConfigField 'String', 'BUILD_VERSION_STRING', '"' + APP_VERSION_NAME + '"'
         buildConfigField 'String', 'BUILD_COMMIT_ID', '"' + shortCommit + '"'
         buildConfigField 'String', 'OFFICIAL_VERSION', '"' + officialVer + '"'
@@ -221,9 +235,7 @@ android {
         }
     }
 
-    // Ключ подписи в репозиторий не кладётся. Положи свой release.keystore рядом
-    // с этим файлом и пропиши KEYSTORE_PASS / ALIAS_NAME / ALIAS_PASS в
-    // local.properties; без него сборка подписывается отладочным ключом Android.
+    // Legacy configuration remains isolated; release builds never fall back to debug.
     def releaseKeystore = project.file('release.keystore')
     def hasReleaseKeystore = releaseKeystore.exists() && keystorePwd != null && alias != null
 
@@ -238,13 +250,35 @@ android {
         }
     }
 
+    signingConfigs {
+        beta {
+            if (betaKeystorePath) storeFile rootProject.file(betaKeystorePath)
+            storeType 'PKCS12'
+            storePassword betaValue('FLEXYGRAM_RELEASE_STORE_PASSWORD')
+            keyAlias betaValue('FLEXYGRAM_RELEASE_KEY_ALIAS')
+            keyPassword betaValue('FLEXYGRAM_RELEASE_KEY_PASSWORD')
+            enableV1Signing true
+            enableV2Signing true
+            enableV3Signing true
+        }
+        connectedAlpha {
+            // Deliberately never fall back to an inherited release/debug key.
+            storeFile rootProject.file('config/connected-alpha-test.keystore')
+            storePassword properties?.getProperty('ALPHA_STORE_PASSWORD') ?: System.getenv('ALPHA_STORE_PASSWORD')
+            keyAlias properties?.getProperty('ALPHA_KEY_ALIAS') ?: System.getenv('ALPHA_KEY_ALIAS')
+            keyPassword properties?.getProperty('ALPHA_KEY_PASSWORD') ?: System.getenv('ALPHA_KEY_PASSWORD')
+            enableV1Signing true
+            enableV2Signing true
+        }
+    }
+
     buildTypes {
         debug {
             isDefault = true
             debuggable = true
             jniDebuggable = true
             multiDexEnabled = true
-            signingConfig = hasReleaseKeystore ? signingConfigs.release : signingConfigs.debug
+            signingConfig = signingConfigs.debug
         }
 
         staging {
@@ -255,7 +289,7 @@ android {
             multiDexEnabled = true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             matchingFallbacks = ['release', 'staging', 'debug']
-            signingConfig = hasReleaseKeystore ? signingConfigs.release : signingConfigs.debug
+            signingConfig = signingConfigs.release
         }
 
         release {
@@ -266,8 +300,27 @@ android {
             multiDexEnabled = true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             matchingFallbacks = ['release', 'staging', 'debug']
-            signingConfig = hasReleaseKeystore ? signingConfigs.release : signingConfigs.debug
+            signingConfig = signingConfigs.release
         }
+    }
+
+    buildTypes.create('connectedAlpha') {
+        initWith buildTypes.debug
+        // Keep native logging disabled for credentials/account traffic.
+        debuggable = false
+        jniDebuggable = false
+        signingConfig = signingConfigs.connectedAlpha
+        matchingFallbacks = ['debug']
+        versionNameSuffix = '-alpha2-signature-ui'
+    }
+
+    buildTypes.create('beta') {
+        initWith buildTypes.connectedAlpha
+        versionNameSuffix = ''
+        signingConfig = signingConfigs.beta
+        matchingFallbacks = ['release', 'debug']
+        buildConfigField 'String', 'BUILD_VERSION_STRING', '"' + BETA_VERSION_NAME + '"'
+        buildConfigField 'String', 'ALPHA_GOOGLE_AUTH_CLIENT_ID', '"' + (betaValue('FLEXYGRAM_GOOGLE_AUTH_CLIENT_ID') ?: '') + '"'
     }
 
     sourceSets.main.jniLibs.srcDirs = ['./jni/']
@@ -275,11 +328,23 @@ android {
     namespace = 'org.telegram.messenger'
 }
 
+apply from: rootProject.file('gradle/connected-alpha.gradle')
+apply from: rootProject.file('gradle/flexygram-beta.gradle')
+
 androidComponents {
+    beforeVariants(selector().all()) { builder ->
+        builder.enable = builder.buildType in ['connectedAlpha', 'beta']
+    }
     onVariants(selector().all()) { variant ->
+        variant.applicationId.set(variant.buildType == 'connectedAlpha' ? 'io.github.jose22yt.flexygram.alpha' : APP_PACKAGE)
         variant.outputs.forEach { output ->
-            String gramName = 'exteraless'
-            String first = String.format('%s-v%s(%s)', gramName, verName, verCode)
+            boolean beta = variant.buildType == 'beta'
+            if (beta) {
+                output.versionName.set(BETA_VERSION_NAME)
+                output.versionCode.set(BETA_VERSION_CODE.toInteger())
+            }
+            String gramName = beta ? 'FlexyGram-Beta' : 'FlexyGram-Alpha'
+            String first = String.format('%s-v%s(%s)', gramName, beta ? BETA_VERSION_NAME : verName, beta ? BETA_VERSION_CODE : verCode)
             output.outputFileName.set(
                 output.outputFileName.get()
                     .replace('TMessagesProj', first)

@@ -3,6 +3,7 @@ package app.exteraless.player;
 import static org.telegram.messenger.AndroidUtilities.dp;
 
 import android.content.Context;
+import org.telegram.messenger.BuildConfig;
 import android.os.SystemClock;
 import android.view.ViewGroup;
 
@@ -79,6 +80,14 @@ public class ControlsRow extends ViewGroup implements MorphButton.PressListener 
     }
 
     private void updateTargets(boolean animated) {
+        if (BuildConfig.CONNECTED_ALPHA) {
+            prev.setRadius(dp(32), false);
+            next.setRadius(dp(32), false);
+            play.setRadius(dp(44), false);
+            shuffle.setRadius(dp(24), false);
+            repeat.setRadius(dp(24), false);
+            return;
+        }
         float prevW = pressed == prev ? 76 : pressed == play ? 58 : 64;
         float nextW = pressed == next ? 76 : pressed == play ? 58 : 64;
         float playW = pressed == play ? 100 : (pressed == prev || pressed == next) ? 80 : 88;
@@ -149,16 +158,28 @@ public class ControlsRow extends ViewGroup implements MorphButton.PressListener 
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int width = MeasureSpec.getSize(widthMeasureSpec);
         scale = Math.min(1f, (width - dp(16)) / (float) dp(312));
-        int height = Math.round(dp(88) * scale);
+        int height = BuildConfig.CONNECTED_ALPHA ? Math.max(dp(64), Math.round(dp(88) * scale)) + dp(60) : Math.round(dp(88) * scale);
+        signatureInline = BuildConfig.CONNECTED_ALPHA && width >= dp(264);
+        signaturePlaySize = Math.max(dp(64), Math.min(dp(88), width - dp(224)));
+        if (signatureInline) height = signaturePlaySize + dp(16);
         measureButtons();
         setMeasuredDimension(width, height);
     }
 
+    private boolean signatureInline;
+    private int signaturePlaySize;
     private void measureButtons() {
         for (MorphButton b : buttons) {
             b.scale = scale;
-            int w = Math.max(1, Math.round(b.width.value * scale));
-            int h = Math.max(1, Math.round(b.baseHeight * scale));
+            if (signatureInline) {
+                int size = b == play ? signaturePlaySize : dp(48);
+                b.scale = b == play ? signaturePlaySize / (float) dp(88) : 1f;
+                b.measure(MeasureSpec.makeMeasureSpec(size, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(size, MeasureSpec.EXACTLY));
+                continue;
+            }
+            int minimum = BuildConfig.CONNECTED_ALPHA ? dp(b == play ? 64 : 48) : 1;
+            int w = Math.max(minimum, Math.round(b.width.value * scale));
+            int h = Math.max(minimum, Math.round(b.baseHeight * scale));
             b.measure(MeasureSpec.makeMeasureSpec(w, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(h, MeasureSpec.EXACTLY));
         }
     }
@@ -168,7 +189,22 @@ public class ControlsRow extends ViewGroup implements MorphButton.PressListener 
         layoutButtons(r - l, b - t);
     }
 
+    private void place(MorphButton button, int center, int top) {
+        int left = center - button.getMeasuredWidth() / 2;
+        button.layout(left, top, left + button.getMeasuredWidth(), top + button.getMeasuredHeight());
+    }
+
     private void layoutButtons(int width, int height) {
+        if (BuildConfig.CONNECTED_ALPHA && !signatureInline) {
+            int center = width / 2;
+            place(play, center, 0);
+            place(prev, center - Math.round(dp(100) * scale), Math.round(dp(12) * scale));
+            place(next, center + Math.round(dp(100) * scale), Math.round(dp(12) * scale));
+            int y = height - shuffle.getMeasuredHeight();
+            place(shuffle, center - Math.round(dp(52) * scale), y);
+            place(repeat, center + Math.round(dp(52) * scale), y);
+            return;
+        }
         float total = 0;
         for (MorphButton button : buttons) {
             total += button.getMeasuredWidth();

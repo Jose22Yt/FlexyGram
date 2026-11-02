@@ -1136,6 +1136,7 @@ public class ReactionsContainerLayout extends FrameLayout implements Notificatio
     }
 
     public void setMessage(MessageObject message, TLRPC.ChatFull chatFull, boolean animated) {
+        if(messageObject!=null && messageObject!=message)cancelSignatureTransition();
         this.messageObject = message;
         int chosenCount = 0;
         if (messageObject != null && messageObject.messageOwner != null && messageObject.messageOwner.reactions != null) {
@@ -1580,45 +1581,64 @@ public class ReactionsContainerLayout extends FrameLayout implements Notificatio
         }
     }
 
-    public void startEnterAnimation(boolean animatePopup) {
-        this.animatePopup = animatePopup;
-        setTransitionProgress(0);
+    private ObjectAnimator signatureTransitionAnimator;
+    private boolean signatureTransitionOpening;
+
+    /** One native progress owner, reversible from the currently rendered value. */
+    private void cancelSignatureTransition() {
+        ObjectAnimator previous=signatureTransitionAnimator;
+        signatureTransitionAnimator=null;
+        if(previous!=null){previous.removeAllListeners();previous.cancel();}
+        notificationsLocker.unlock();
+    }
+
+    /** Signature's selected-message spring drives this native reaction view too. */
+    public void beginSignatureMotion() {
+        cancelSignatureTransition();
+        animatePopup = false;
         setAlpha(1f);
-        notificationsLocker.lock();
-        ObjectAnimator animator;
-        if (allowSmoothEnterTransition()) {
-            animator = ObjectAnimator.ofFloat(this, ReactionsContainerLayout.TRANSITION_PROGRESS_VALUE, 0f, 1f).setDuration(250);
-            animator.setInterpolator(new OvershootInterpolator(0.5f));
-        } else {
-            animator = ObjectAnimator.ofFloat(this, ReactionsContainerLayout.TRANSITION_PROGRESS_VALUE, 0f, 1f).setDuration(250);
-            animator.setInterpolator(new OvershootInterpolator(0.5f));
-        }
-        animator.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                notificationsLocker.unlock();
-            }
-        });
-        animator.start();
+    }
+    public void setSignatureMotionProgress(float progress) {
+        // Native reveal geometry must stay in [0,1]. Put the damped overshoot on
+        // the whole pill instead, so its background and emojis rebound together.
+        setTransitionProgress(Math.max(0f, Math.min(1f, progress)));
+        float rebound = 1f + .25f * Math.max(0f, progress - 1f);
+        setPivotX(LocaleController.isRTL || mirrorX ? getMeasuredWidth() * .125f : getMeasuredWidth() * .875f);
+        setPivotY(getMeasuredHeight());
+        setScaleX(rebound);
+        setScaleY(rebound);
+        setTranslationY(dp(12) * (1f - progress));
+    }
+
+    public void startEnterAnimation(boolean animatePopup) {
+        this.animatePopup=animatePopup;
+        animateSignatureTransition(true);
     }
 
     public void startCloseAnimation() {
-        setTransitionProgress(0);
+        animateSignatureTransition(false);
+    }
+
+    private void animateSignatureTransition(boolean opening) {
+        if(signatureTransitionAnimator!=null && signatureTransitionOpening==opening)return;
+        boolean freshEntry=opening && signatureTransitionAnimator==null;
+        float from=freshEntry?0f:transitionProgress;
+        cancelSignatureTransition();
+        signatureTransitionOpening=opening;
+        float target=opening?1f:0f;
         setAlpha(1f);
+        setTransitionProgress(from);
+        if(Math.abs(from-target)<.001f){setTransitionProgress(target);return;}
         notificationsLocker.lock();
-        ObjectAnimator animator;
-        if (allowSmoothEnterTransition()) {
-            animator = ObjectAnimator.ofFloat(this, ReactionsContainerLayout.TRANSITION_PROGRESS_VALUE, 1f, 0f).setDuration(250);
-            animator.setInterpolator(new OvershootInterpolator(0.5f));
-        } else {
-            animator = ObjectAnimator.ofFloat(this, ReactionsContainerLayout.TRANSITION_PROGRESS_VALUE, 1f, 0f).setDuration(250);
-            animator.setInterpolator(new OvershootInterpolator(0.5f));
-        }
-        animator.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
+        final ObjectAnimator animator=ObjectAnimator.ofFloat(this,TRANSITION_PROGRESS_VALUE,from,target);
+        signatureTransitionAnimator=animator;
+        animator.setDuration(Math.max(1L,Math.round((opening?240L:180L)*Math.min(1f,Math.abs(target-from)))));
+        animator.setInterpolator(opening?new OvershootInterpolator(.5f):CubicBezierInterpolator.EASE_OUT_QUINT);
+        animator.addListener(new AnimatorListenerAdapter(){
+            @Override public void onAnimationEnd(Animator animation){
+                if(signatureTransitionAnimator!=animation)return;
+                signatureTransitionAnimator=null;
+                setTransitionProgress(target);
                 notificationsLocker.unlock();
             }
         });
@@ -1792,6 +1812,7 @@ public class ReactionsContainerLayout extends FrameLayout implements Notificatio
     }
 
     public void reset() {
+        cancelSignatureTransition();
         isHiddenNextReaction = true;
         pressedReactionPosition = 0;
         pressedProgress = 0;
@@ -2524,6 +2545,11 @@ public class ReactionsContainerLayout extends FrameLayout implements Notificatio
 
     @Override
     protected void onDetachedFromWindow() {
+        cancelSignatureTransition();
+        if(pullingDownBackAnimator!=null){pullingDownBackAnimator.removeAllListeners();pullingDownBackAnimator.cancel();pullingDownBackAnimator=null;}
+        if(cancelPressedAnimation!=null){cancelPressedAnimation.removeAllListeners();cancelPressedAnimation.cancel();cancelPressedAnimation=null;}
+        // Restore the native popup transform without modifying children during detach.
+        setTransitionProgress(1f);
         super.onDetachedFromWindow();
         NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.emojiLoaded);
         NotificationCenter.getInstance(currentAccount).removeObserver(this, NotificationCenter.chatInfoDidLoad);

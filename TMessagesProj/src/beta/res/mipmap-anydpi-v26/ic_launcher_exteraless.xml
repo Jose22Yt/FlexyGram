@@ -1,0 +1,5 @@
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@color/flexygram_launcher_blue" />
+    <foreground android:drawable="@drawable/flexygram_launcher_foreground" />
+    <monochrome android:drawable="@drawable/flexygram_launcher_monochrome" />
+</adaptive-icon>

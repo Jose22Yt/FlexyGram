@@ -1,0 +1,81 @@
+diff --git a/TMessagesProj/src/main/java/org/telegram/messenger/ImageReceiver.java b/TMessagesProj/src/main/java/org/telegram/messenger/ImageReceiver.java
+index 7a9234151..f15b96b27 100644
+--- a/TMessagesProj/src/main/java/org/telegram/messenger/ImageReceiver.java
++++ b/TMessagesProj/src/main/java/org/telegram/messenger/ImageReceiver.java
+@@ -2614,9 +2614,16 @@ public class ImageReceiver implements NotificationCenter.NotificationCenterDeleg
+     }
+ 
+     private void applyRoundRadiusInternal() {
+-        int[] value = oeRequestedRoundRadius;
+-        if (oeIsAvatar && !oeAvatarCornersApplied && !app.exteraless.appearance.AppearanceConfig.avatarCornersDefault()) {
+-            if (app.exteraless.appearance.AppearanceConfig.singleCornerRadius()) {
++        final int[] value = oeRequestedRoundRadius;
++        final boolean scaleAvatar = oeIsAvatar && !oeAvatarCornersApplied
++                && !app.exteraless.appearance.AppearanceConfig.avatarCornersDefault();
++        final boolean uniformAvatar = scaleAvatar
++                && app.exteraless.appearance.AppearanceConfig.singleCornerRadius();
++        int uniformCorner = 0;
++        int corners = 0;
++        int max = 1;
++        if (scaleAvatar) {
++            if (uniformAvatar) {
+                 // When "singleCornerRadius" is ON, all avatars must get the same corners
+                 // regardless of what radius the stock code requested (circle vs squircle).
+                 // Infer the avatar diameter from the max requested radius (= half-side for circles)
+@@ -2629,37 +2636,35 @@ public class ImageReceiver implements NotificationCenter.NotificationCenterDeleg
+                     }
+                     if (r > maxR) maxR = r;
+                 }
+-                int uniformCorner = app.exteraless.appearance.AppearanceConfig.getAvatarCorners(maxR * 2f);
+-                int[] scaled = new int[4];
+-                for (int a = 0; a < 4; a++) {
+-                    scaled[a] = uniformCorner;
+-                }
+-                value = scaled;
++                uniformCorner = app.exteraless.appearance.AppearanceConfig.getAvatarCorners(maxR * 2f);
+             } else {
+-                int corners = app.exteraless.appearance.AppearanceConfig.avatarCorners();
+-                int max = app.exteraless.appearance.AppearanceConfig.AVATAR_CORNERS_MAX;
+-                int[] scaled = new int[4];
+-                for (int a = 0; a < 4; a++) {
+-                    int r = value[a];
+-                    if (oeRadiusWidth > 0) {
+-                        r = Math.min(r, (int) Math.ceil(oeRadiusWidth / 2f));
+-                    }
+-                    scaled[a] = (int) Math.ceil(r * corners / (float) max);
+-                }
+-                value = scaled;
++                corners = app.exteraless.appearance.AppearanceConfig.avatarCorners();
++                max = app.exteraless.appearance.AppearanceConfig.AVATAR_CORNERS_MAX;
+             }
+         }
+         boolean changed = false;
+-        int firstValue = value[0];
++        int firstValue = 0;
+         isRoundRect = true;
+         for (int a = 0; a < roundRadius.length; a++) {
+-            if (roundRadius[a] != value[a]) {
++            int radius = value[a];
++            if (uniformAvatar) {
++                radius = uniformCorner;
++            } else if (scaleAvatar) {
++                if (oeRadiusWidth > 0) {
++                    radius = Math.min(radius, (int) Math.ceil(oeRadiusWidth / 2f));
++                }
++                radius = (int) Math.ceil(radius * corners / (float) max);
++            }
++            if (a == 0) {
++                firstValue = radius;
++            }
++            if (roundRadius[a] != radius) {
+                 changed = true;
+             }
+-            if (firstValue != value[a]) {
++            if (firstValue != radius) {
+                 isRoundRect = false;
+             }
+-            roundRadius[a] = value[a];
++            roundRadius[a] = radius;
+         }
+         if (changed) {
+             if (currentImageDrawable != null && imageShader == null) {

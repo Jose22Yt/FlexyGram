@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyHeaderTitle">Chat header</string>
+    <string name="FlexyHeaderStyle">Style</string>
+    <string name="FlexyHeaderSignature">Signature Adaptive</string>
+    <string name="FlexyHeaderClassic">Classic</string>
+    <string name="FlexyHeaderCounter">Show unread chat count</string>
+    <string name="FlexyHeaderSize">Size</string>
+    <string name="FlexyHeaderNormal">Normal</string>
+    <string name="FlexyHeaderCompact">Compact</string>
+    <string name="FlexyHeaderOpacity">Surface opacity</string>
+    <string name="FlexyHeaderUnread">Unread chats in the source list: %1$d</string>
+    <string name="FlexyHeaderPreviewName">Alex</string>
+    <string name="FlexyHeaderCounterOff">Off</string>
+    <string name="FlexyHeaderCounterIntegrated">Integrated</string>
+    <string name="FlexyHeaderCounterBadge">Separate badge</string>
+    <string name="FlexyHeaderLastSeenTime">Last seen %1$s</string>
+    <string name="FlexyHeaderFusion">Signature Fusion</string>
+    <string name="FlexyHeaderPortrait">Signature Matte Portrait</string>
+    <string name="FlexyHeaderCherrySection">Header Options</string>
+    <string name="FlexyHeaderCenterTitle">Center chat title in action bar</string>
+    <string name="FlexyHeaderAdaptiveBubble">Adaptive bubble width</string>
+    <string name="FlexyHeaderShowUnread">Show unread chat counter</string>
+    <string name="FlexyHeaderShowUnreadSub">Enable unread chat counter on back button in open chat</string>
+    <string name="FlexyHeaderIosStyledCounter">iOS-styled counter</string>
+    <string name="FlexyHeaderGeometrySection">FlexyGram Appearance</string>
+</resources>

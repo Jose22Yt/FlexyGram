@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyFilesTools">FLEXYGRAM TOOLS</string>
+    <string name="FlexyFilesEnable">Enable FlexyFiles</string>
+    <string name="FlexyFilesDormant">Enabled · dormant until you open a file</string>
+    <string name="FlexyFilesDisabled">Disabled</string>
+    <string name="FlexyFilesHow">How FlexyFiles works</string>
+    <string name="FlexyFilesHelp">FlexyFiles only accesses the file you choose. It does not scan your files or conversations. Even when enabled, it stays dormant until you choose Explore contents in a document menu. Processing is local. Edits are saved to a copy; the original is unchanged. Tools are released on close. ZIP and text up to 256 KiB are supported within safety limits. RAR, 7z, encrypted or oversized files are not supported in this version. A ZIP entry may need temporary extraction. Drafts are retained only when you choose to save them.</string>
+    <string name="FlexyFilesExplore">Explore contents</string>
+    <string name="FlexyFilesDownloadInfo">Download the document with Telegram, then choose Explore contents again.</string>
+    <string name="FlexyFilesError">Could not complete the operation. The file may be unsupported, damaged or over the safety limits. The original was not changed.</string>
+    <string name="FlexyFilesSave">Save a copy</string>
+    <string name="FlexyFilesSend">Send to chat with Telegram</string>
+    <string name="FlexyFilesDraft">Save draft</string>
+    <string name="FlexyFilesRecover">A saved draft is available. Restore it?</string>
+    <string name="FlexyFilesValidate">Validate XML / format JSON</string>
+    <string name="FlexyFilesHtml">Isolated HTML view</string>
+    <string name="FlexyFilesHtmlOnly">This view is only available for HTML. Scripts and network access are disabled.</string>
+    <string name="FlexyFilesZipCopy">Save ZIP with edited entry</string>
+    <string name="FlexyFilesZipOnly">This action requires editing a ZIP text entry.</string>
+    <string name="FlexyFilesReplace">Find and replace</string>
+    <string name="FlexyFilesIndent">Insert indentation</string>
+    <string name="FlexyFilesBinary">Code view unavailable. You can save or share a copy.</string>
+    <string name="FlexyFilesValid">Structure is valid</string>
+    <string name="FlexyFilesSaved">Copy or draft saved</string>
+    <string name="FlexyFilesUnsaved">You have unsaved changes</string>
+    <string name="FlexyFilesUndo">Undo</string>
+    <string name="FlexyFilesRedo">Redo</string>
+    <string name="FlexyFilesRestore">Restore</string>
+    <string name="FlexyFilesDiscard">Discard</string>
+    <string name="FlexyFilesShare">Share file</string>
+    <string name="FlexyFilesDownload">Download</string>
+</resources>

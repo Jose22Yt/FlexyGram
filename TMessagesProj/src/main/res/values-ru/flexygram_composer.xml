@@ -1,0 +1,16 @@
+<resources>
+  <string name="FlexyComposerCompact">Signature Compact</string>
+  <string name="FlexyComposerPosition">Положение панели по вертикали</string>
+  <string name="FlexyComposerLevel">Компактность</string>
+  <string name="FlexyComposerDefault">По умолчанию</string>
+  <string name="FlexyComposerSmall">Компактный</string>
+  <string name="FlexyComposerExtraSmall">Сверхкомпактный</string>
+  <string name="FlexyComposerGap">Расстояние между элементами</string>
+  <string name="FlexyComposerGlass">Перламутровое стекло</string>
+  <string name="FlexyComposerPositionReset">Сбросить положение панели</string>
+  <string name="FlexyComposerReset">Применить макет по образцу iPhone</string>
+  <string name="FlexyComposerPreview">Предпросмотр панели</string>
+  <string name="FlexyComposerIcons">Вид значков</string>
+  <string name="FlexyComposerReferenceIcons">Образец · скрепка и круг</string>
+  <string name="FlexyComposerSmileIcons">Плюс и улыбка</string>
+</resources>

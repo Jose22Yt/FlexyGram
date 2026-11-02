@@ -1,0 +1,4 @@
+<resources>
+  <string name="FlexyAlphaDeliveries">Entregas Beta</string>
+  <string name="FlexyAlphaDeliveryInfo">Beta usa una instalación independiente de Alpha y requiere iniciar sesión nuevamente. Las futuras actualizaciones deberán conservar el paquete y la firma oficial. No hay una Beta publicada por esta preparación.</string>
+</resources>

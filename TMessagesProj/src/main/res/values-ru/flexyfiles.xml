@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyFilesTools">ИНСТРУМЕНТЫ FLEXYGRAM</string>
+    <string name="FlexyFilesEnable">Включить FlexyFiles</string>
+    <string name="FlexyFilesDormant">Включено · неактивно до открытия файла</string>
+    <string name="FlexyFilesDisabled">Выключено</string>
+    <string name="FlexyFilesHow">Как работает FlexyFiles</string>
+    <string name="FlexyFilesHelp">FlexyFiles открывает только выбранный файл и не сканирует файлы или переписки. Даже после включения он неактивен, пока вы не выберете Просмотреть содержимое в меню документа. Обработка выполняется на устройстве. Изменения сохраняются в копию, оригинал остаётся неизменным. Ресурсы освобождаются при закрытии. Поддерживаются ZIP и текст до 256 КиБ с ограничениями безопасности. RAR, 7z, зашифрованные и слишком большие файлы пока не поддерживаются. Для элемента ZIP может потребоваться временное извлечение. Черновики сохраняются только по вашему выбору.</string>
+    <string name="FlexyFilesExplore">Просмотреть содержимое</string>
+    <string name="FlexyFilesDownloadInfo">Загрузите документ через Telegram, затем снова выберите Просмотреть содержимое.</string>
+    <string name="FlexyFilesError">Не удалось выполнить операцию. Формат может не поддерживаться, файл повреждён или превышает ограничения. Оригинал не изменён.</string>
+    <string name="FlexyFilesSave">Сохранить копию</string>
+    <string name="FlexyFilesSend">Отправить в чат через Telegram</string>
+    <string name="FlexyFilesDraft">Сохранить черновик</string>
+    <string name="FlexyFilesRecover">Есть сохранённый черновик. Восстановить?</string>
+    <string name="FlexyFilesValidate">Проверить XML / форматировать JSON</string>
+    <string name="FlexyFilesHtml">Изолированный просмотр HTML</string>
+    <string name="FlexyFilesHtmlOnly">Просмотр доступен только для HTML. Скрипты и доступ к сети отключены.</string>
+    <string name="FlexyFilesZipCopy">Сохранить ZIP с изменённым элементом</string>
+    <string name="FlexyFilesZipOnly">Нужно редактировать текстовый элемент ZIP.</string>
+    <string name="FlexyFilesReplace">Найти и заменить</string>
+    <string name="FlexyFilesIndent">Добавить отступ</string>
+    <string name="FlexyFilesBinary">Просмотр кода недоступен. Можно сохранить или отправить копию.</string>
+    <string name="FlexyFilesValid">Структура корректна</string>
+    <string name="FlexyFilesSaved">Копия или черновик сохранены</string>
+    <string name="FlexyFilesUnsaved">Есть несохранённые изменения</string>
+    <string name="FlexyFilesUndo">Отменить</string>
+    <string name="FlexyFilesRedo">Повторить</string>
+    <string name="FlexyFilesRestore">Восстановить</string>
+    <string name="FlexyFilesDiscard">Не сохранять</string>
+    <string name="FlexyFilesShare">Поделиться файлом</string>
+    <string name="FlexyFilesDownload">Загрузить</string>
+</resources>

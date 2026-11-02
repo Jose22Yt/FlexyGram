@@ -593,6 +593,10 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
     private int buttonLeft;
     private int typingLeft;
     private StaticLayout messageLayout;
+    // Signature Smart Previews: one cached content type per updated dialog row.
+    // The original message layout, row geometry and Telegram click targets remain.
+    private int smartPreviewKind;
+    private int smartPreviewModeLastBuilt=-1;
     private StaticLayout typingLayout;
 
     private int buttonTop;
@@ -972,6 +976,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
 
     @Override
     protected void onDetachedFromWindow() {
+        app.flexygram.home.SignatureSmartPreviews.removeStyleListener(smartPreviewStyleListener);
         super.onDetachedFromWindow();
         isSliding = false;
         drawRevealBackground = false;
@@ -1009,6 +1014,8 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
+        app.flexygram.home.SignatureSmartPreviews.addStyleListener(smartPreviewStyleListener);
+        refreshSmartPreviewStyle(smartPreviewModeLastBuilt, app.flexygram.home.SignatureSmartPreviews.mode());
         avatarImage.onAttachedToWindow();
         for (int i = 0; i < thumbImage.length; ++i) {
             thumbImage[i].onAttachedToWindow();
@@ -1310,16 +1317,33 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
     private static final float BADGE_DRAWABLE_SIZE = 16;
     private static final float BADGE_DRAWABLE_OFFSET = (BADGE_SIZE - BADGE_DRAWABLE_SIZE) / 2f;
 
+    private final app.flexygram.home.SignatureSmartPreviews.StyleListener smartPreviewStyleListener=this::refreshSmartPreviewStyle;
+    private void refreshSmartPreviewStyle(int previous, int next) {
+        if(previous==next || message==null || !(isDialogCell || isTopic)) return;
+        if(smartPreviewKind==0 && !(previous==app.flexygram.home.SignatureSmartPreviewPalette.OFF
+                && app.flexygram.home.SignatureSmartPreviews.kind(message)!=0)) return;
+        if(previous==app.flexygram.home.SignatureSmartPreviewPalette.OFF || next==app.flexygram.home.SignatureSmartPreviewPalette.OFF) {
+            if(getMeasuredWidth()>0) buildLayout(); // native text/thumbnail layout, same row height and scroll position
+        } else smartPreviewModeLastBuilt=next; // colors only: retain StaticLayout and spans
+        invalidate();
+    }
+
     public void buildLayout() {
         if (isTransitionSupport) {
             return;
         }
+        // The mode may change without a Telegram message update. An explicit
+        // dialogsNeedReload must still rebuild preview text, even if the
+        // original updateHelper reports that the message itself is unchanged.
+        int smartModeNow=app.flexygram.home.SignatureSmartPreviews.mode();
+        boolean smartModeChanged=smartPreviewModeLastBuilt!=smartModeNow;
         if (isDialogCell || isTopic) {
             boolean needUpdate = updateHelper.update();
-            if (!needUpdate && currentDialogFolderId == 0 && currentDialogCommunityId == 0 && encryptedChat == null) {
+            if (!needUpdate && !smartModeChanged && currentDialogFolderId == 0 && currentDialogCommunityId == 0 && encryptedChat == null) {
                 return;
             }
         }
+        smartPreviewModeLastBuilt=smartModeNow;
 
         if (useForceThreeLines || SharedConfig.useThreeLinesLayout || true) {
             Theme.dialogs_namePaint[0].setTextSize(dp(17));
@@ -2747,6 +2771,65 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
             }
         }
 
+        // A real conversation/topic with a last message can appear in any
+        // filter or the archive. Special rows and multi-topic summaries remain native.
+        smartPreviewKind=0;
+        boolean inlineSender = messageNameString != null && (!(useForceThreeLines || SharedConfig.useThreeLinesLayout)
+                || hasTags() || currentDialogFolderId != 0 && currentDialogFolderDialogsCount > 1);
+        int senderEnd=offsetName;
+        if (inlineSender && senderEnd <= 0 && !TextUtils.isEmpty(messageString)
+                && messageString.length() > messageNameString.length()
+                && messageString.charAt(messageNameString.length()) == ':'
+                && TextUtils.equals(messageString.subSequence(0,messageNameString.length()),messageNameString)) {
+            senderEnd=messageNameString.length()+1;
+        }
+        boolean prefixAvailable = !inlineSender || !TextUtils.isEmpty(messageString) && senderEnd > 0 && senderEnd <= messageString.length()
+                && thumbsCount == 0;
+        float compactTextSize=android.util.TypedValue.applyDimension(android.util.TypedValue.COMPLEX_UNIT_SP,12f,getResources().getDisplayMetrics());
+        if (app.flexygram.home.SignatureSmartPreviews.mode() != app.flexygram.home.SignatureSmartPreviewPalette.OFF
+                && app.flexygram.home.SignaturePreviewContext.isMessageRow(isDialogCell,isTopic,isShareToStoryCell,
+                    isDialogFolder(),isForumCell(),isFolderCell())
+                && message != null && message.messageOwner != null && draftMessage == null && !draftVoice
+                // Native status/selection/community summaries are not last-message snippets.
+                && !clearingDialog && drawTime && currentDialogCommunityId == 0 && !promoDialog
+                && TextUtils.isEmpty(printingString) && TextUtils.isEmpty(customMessage) && customDialog == null
+                && prefixAvailable && messageWidth >= dp(68)
+                // Keep the existing row height at large accessibility scales.
+                && compactTextSize <= dp(17)
+                && app.flexygram.home.SignatureSmartPreviews.allowsSingleMessagePreview(groupMessages)
+                && (message.messageOwner.restriction_reason == null || message.messageOwner.restriction_reason.isEmpty())) {
+            int candidate = app.flexygram.home.SignatureSmartPreviews.kind(message);
+            float senderDesiredWidth = inlineSender ? Layout.getDesiredWidth(messageString, 0, senderEnd, currentMessagePaint) : 0;
+            if (candidate != 0 && (!inlineSender || senderDesiredWidth < messageWidth * .35f)) {
+                String snippet = app.flexygram.home.SignatureSmartPreviews.snippet(message, candidate, groupMessages);
+                if (!TextUtils.isEmpty(snippet)) {
+                    float senderWidth = inlineSender ? senderDesiredWidth + dp(5) : 0;
+                    int thumbnailReserve = thumbsCount > 0 ? dp((thumbSize + 2) * thumbsCount + 6) : 0;
+                    int free = app.flexygram.home.SignatureSmartPillLayout.remaining(messageWidth, senderWidth, thumbnailReserve, 0, dp(8));
+                    int secondaryKind = app.flexygram.home.SignatureSmartPreviews.secondaryKind(message, candidate);
+                    if (free >= dp(24)) {
+                        boolean isMiddleEllipsize = message.isDocument();
+                        TextUtils.TruncateAt truncateAt = isMiddleEllipsize ? TextUtils.TruncateAt.MIDDLE : TextUtils.TruncateAt.END;
+                        app.flexygram.home.SignatureSmartPillSpan capsule =
+                                new app.flexygram.home.SignatureSmartPillSpan(candidate, snippet, free, resourcesProvider, isMiddleEllipsize);
+                        SpannableStringBuilder pill = new SpannableStringBuilder();
+                        int capsuleStart = pill.length();
+                        pill.append("\ufffc");
+                        pill.setSpan(capsule,capsuleStart,capsuleStart+1,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        CharSequence withThumbs = applyThumbs(pill);
+                        SpannableStringBuilder combined = new SpannableStringBuilder();
+                        if (inlineSender) {
+                            combined.append(messageString, 0, senderEnd);
+                            combined.append(" ");
+                        }
+                        combined.append(withThumbs);
+                        smartPreviewKind = candidate;
+                        messageString = combined;
+                        checkMessage = false;
+                    }
+                }
+            }
+        }
         if (checkMessage) {
             if (messageString == null) {
                 messageString = "";
@@ -2847,6 +2930,13 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
 
         try {
             CharSequence messageStringFinal;
+            if (smartPreviewKind != 0) {
+                // A one-line capsule, clipped by the same native message width.
+                int reserve=smartPreviewKind==app.flexygram.home.SignatureSmartPreviewPalette.VOICE?dp(24):dp(10);
+                messageString=TextUtils.ellipsize(messageString,currentMessagePaint,
+                        Math.max(dp(20),messageWidth-reserve),
+                        TextUtils.TruncateAt.END);
+            }
             // Removing links and bold spans to get rid of underlining and boldness
             if (messageString instanceof Spannable) {
                 Spannable messageStringSpannable = (Spannable) messageString;
@@ -2860,7 +2950,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                 messageStringFinal = messageNameString;
                 messageNameString = null;
                 currentMessagePaint = Theme.dialogs_messagePaint[paintIndex];
-            } else if (!useForceThreeLines && !SharedConfig.useThreeLinesLayout || hasTags() || messageNameString != null || ChatObject.isMonoForum(chat) && ChatObject.canManageMonoForum(currentAccount, chat)) {
+            } else if (smartPreviewKind != 0 || !useForceThreeLines && !SharedConfig.useThreeLinesLayout || hasTags() || messageNameString != null || ChatObject.isMonoForum(chat) && ChatObject.canManageMonoForum(currentAccount, chat)) {
                 if (!isForumCell() && messageString instanceof Spanned && ((Spanned) messageString).getSpans(0, messageString.length(), ThumbnailSpan.class).length <= 0) {
                     messageStringFinal = TextUtils.ellipsize(messageString, currentMessagePaint, messageWidth - dp(12 + (thumbsCount * (thumbSize + 2) - 2) + 5), TextUtils.TruncateAt.END);
                 } else {
@@ -4427,6 +4517,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                     top -= dp(isForumCell() ? 10 : 11);
                 }
                 if (updateHelper.typingProgres != 1f) {
+                    // Badge surface is painted by the measured span, not behind the entire snippet.
                     canvas.save();
                     canvas.translate(messageLeft, top);
                     int oldAlpha = messageLayout.getPaint().getAlpha();
@@ -4520,7 +4611,9 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                 }
 
                 if (lastTopicMessageUnread && topMessageTopicEndIndex != topMessageTopicStartIndex && (dialogsType == DialogsActivity.DIALOGS_TYPE_DEFAULT || dialogsType == DialogsActivity.DIALOGS_TYPE_FOLDER1 || dialogsType == DialogsActivity.DIALOGS_TYPE_FOLDER2)) {
-                    canvasButton.setColor(ColorUtils.setAlphaComponent(currentMessagePaint.getColor(), Theme.isCurrentThemeDark() ? 36 : 26));
+                    int topicSurfaceColor = org.telegram.messenger.BuildConfig.CONNECTED_ALPHA
+                            ? Theme.getColor(Theme.key_actionBarTabLine, resourcesProvider) : currentMessagePaint.getColor();
+                    canvasButton.setColor(app.flexygram.home.SignatureTopicAccent.overlay(topicSurfaceColor, Theme.isCurrentThemeDark()));
                     if (!buttonCreated) {
                         canvasButton.rewind();
                         if (topMessageTopicEndIndex != topMessageTopicStartIndex && topMessageTopicEndIndex > 0) {

@@ -23,6 +23,14 @@ public final class Spring {
         velocity = 0;
     }
 
+    /** Transfers a live interaction without dropping its momentum. */
+    public float velocity() { return velocity; }
+
+    public void setState(float position, float speed) {
+        value = position;
+        velocity = speed;
+    }
+
     public boolean settled() {
         return Math.abs(value - target) < epsilon && Math.abs(velocity) < epsilon * 10f;
     }

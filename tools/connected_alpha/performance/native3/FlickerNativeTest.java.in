@@ -1,0 +1,53 @@
+package org.telegram.ui.Components.voip;
+import android.app.*;import android.graphics.*;import android.view.*;
+import org.junit.*;import org.junit.runner.RunWith;import org.robolectric.*;import org.robolectric.annotation.*;
+import java.lang.reflect.*;import java.util.*;import java.io.*;import static org.junit.Assert.*;
+/** Full production source under real Android Canvas/Shader; GroupCall/SVG paths have dependency doubles. */
+@RunWith(RobolectricTestRunner.class) @Config(manifest=Config.NONE,sdk=35) @GraphicsMode(GraphicsMode.Mode.NATIVE)
+public class FlickerNativeTest {
+ static Object field(Object object,String name)throws Exception {Field f=object.getClass().getDeclaredField(name);f.setAccessible(true);return f.get(object);}
+ static void field(Object object,String name,Object value)throws Exception {Field f=object.getClass().getDeclaredField(name);f.setAccessible(true);f.set(object,value);}
+ @Before public void setup(){org.telegram.messenger.AndroidUtilities.density=1;}
+ @Test public void repeatedStableColorsMustKeepOnlyTwoShaderInstances()throws Exception{
+  CellFlickerDrawable current=new CellFlickerDrawable();BaselineCellFlickerDrawable old=new BaselineCellFlickerDrawable();
+  Set<Object> before=Collections.newSetFromMap(new IdentityHashMap<>()),after=Collections.newSetFromMap(new IdentityHashMap<>());
+  for(int i=0;i<1000;i++){current.setColors(0xff52789a);old.setColors(0xff52789a);before.add(field(old,"gradientShader"));before.add(field(old,"gradientShader2"));after.add(field(current,"gradientShader"));after.add(field(current,"gradientShader2"));}
+  assertEquals(2000,before.size());assertEquals(2,after.size());
+  try(FileWriter out=new FileWriter(new File(System.getProperty("probe.root"),"native3-flicker-counts.json"))){out.write("{\"evidence\":\"isolated_API35_native_shader_identity\",\"set_colors_calls\":1000,\"baseline_distinct_shaders\":"+before.size()+",\"candidate_distinct_shaders\":"+after.size()+",\"ART_bytes\":null,\"GPU_ms\":null,\"touch_latency_ms\":null}\n");}
+ }
+ @Test public void differentialPixelsAcrossColorsAlphaSizeDensityBoundsAndProgress()throws Exception{
+  Bitmap a=Bitmap.createBitmap(160,100,Bitmap.Config.ARGB_8888),b=Bitmap.createBitmap(160,100,Bitmap.Config.ARGB_8888);int[] pa=new int[16000],pb=new int[16000];int cases=0;
+  for(float density:new float[]{.75f,1,2.5f})for(int size:new int[]{40,160}){
+   org.telegram.messenger.AndroidUtilities.density=density;CellFlickerDrawable current=new CellFlickerDrawable(64,204,size);BaselineCellFlickerDrawable old=new BaselineCellFlickerDrawable(64,204,size);current.setParentWidth(160);old.setParentWidth(160);
+   for(int color:new int[]{0xff52789a,0x8052789a,0xffeeeeee,0xff10151c})for(int alpha:new int[]{0,64,255})for(float progress:new float[]{0,.3f,.9f,1.2f}){
+    for(int repeated=0;repeated<2;repeated++){
+     current.setColors(color,alpha,255-alpha);old.setColors(color,alpha,255-alpha);current.setProgress(progress);old.setProgress(progress);field(current,"lastUpdateTime",Long.MAX_VALUE);field(old,"lastUpdateTime",Long.MAX_VALUE);current.setAlpha(173);old.setAlpha(173);
+     a.eraseColor(0);b.eraseColor(0);current.draw(new Canvas(a),new RectF(8,10,150,90),12,null);old.draw(new Canvas(b),new RectF(8,10,150,90),12,null);
+     a.getPixels(pa,0,160,0,0,160,100);b.getPixels(pb,0,160,0,0,160,100);assertArrayEquals("case"+cases,pb,pa);cases++;
+     if(density==1 && size==160 && color==0xff52789a && alpha==64 && progress==.3f && repeated==0){
+      try(FileOutputStream out=new FileOutputStream(new File(System.getProperty("probe.root"),"native3-isolated-baseline.png"))){b.compress(Bitmap.CompressFormat.PNG,100,out);}
+      try(FileOutputStream out=new FileOutputStream(new File(System.getProperty("probe.root"),"native3-isolated-candidate.png"))){a.compress(Bitmap.CompressFormat.PNG,100,out);}
+     }
+    }
+   }
+  }
+  assertEquals(576,cases);
+ }
+ @Test public void stableShadersPreservePaintAlphaFrameOptionsAndPathDraw()throws Exception{
+  CellFlickerDrawable a=new CellFlickerDrawable();BaselineCellFlickerDrawable b=new BaselineCellFlickerDrawable();a.setParentWidth(100);b.setParentWidth(100);
+  Bitmap ia=Bitmap.createBitmap(100,80,Bitmap.Config.ARGB_8888),ib=Bitmap.createBitmap(100,80,Bitmap.Config.ARGB_8888);int[] pa=new int[8000],pb=new int[8000];Path path=new Path();path.addRoundRect(new RectF(5,6,95,74),9,9,Path.Direction.CW);
+  for(int alpha:new int[]{0,64,255})for(boolean frame:new boolean[]{false,true})for(boolean inside:new boolean[]{false,true})for(boolean usePath:new boolean[]{false,true}){
+   a.drawFrame=b.drawFrame=frame;a.frameInside=b.frameInside=inside;a.setColors(0xff88aacc);b.setColors(0xff88aacc);a.setAlpha(alpha);b.setAlpha(alpha);a.setProgress(.45f);b.setProgress(.45f);field(a,"lastUpdateTime",Long.MAX_VALUE);field(b,"lastUpdateTime",Long.MAX_VALUE);ia.eraseColor(0);ib.eraseColor(0);
+   if(usePath){a.draw(new Canvas(ia),path,null);b.draw(new Canvas(ib),path,null);}else{RectF ra=new RectF(5,6,95,74),rb=new RectF(ra);a.draw(new Canvas(ia),ra,9,null);b.draw(new Canvas(ib),rb,9,null);assertEquals(rb,ra);}
+   ia.getPixels(pa,0,100,0,0,100,80);ib.getPixels(pb,0,100,0,0,100,80);assertArrayEquals(pb,pa);
+  }
+ }
+ @Test public void constructorMustNotDispatchOverridableColorSetter(){
+  class Subclass extends CellFlickerDrawable {@Override public void setColors(int color,int first,int second){throw new AssertionError("virtual setter during construction");}}
+  assertNotNull(new Subclass());
+ }
+ @Test public void mutableSizeAndInvalidAlphaCannotUseStaleCache()throws Exception{
+  CellFlickerDrawable d=new CellFlickerDrawable();d.setColors(0xff123456,64,204);Object first=field(d,"gradientShader");d.size=90;d.setColors(0xff123456,64,204);assertNotSame(first,field(d,"gradientShader"));Object second=field(d,"gradientShader");d.setColors(0x00123456,64,204);assertSame(second,field(d,"gradientShader"));
+  try{d.setColors(0xff123456,-1,204);fail();}catch(IllegalArgumentException expected){}
+ }
+}

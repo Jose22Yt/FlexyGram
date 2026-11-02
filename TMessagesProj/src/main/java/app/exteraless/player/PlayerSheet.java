@@ -30,6 +30,8 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.ScrollView;
+import org.telegram.messenger.BuildConfig;
 
 import androidx.annotation.NonNull;
 import androidx.core.graphics.ColorUtils;
@@ -73,10 +75,11 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
 
     private final LaunchActivity activity;
     private final int account;
-    private final boolean dark;
+    private boolean dark;
     private final int fallbackSeed;
     private final FrameLayout root;
     private final PlayerLayout layout;
+    private ScrollView signatureScroll;
     private final FrameLayout header;
     private final ImageView collapseButton;
     private final ImageView moreButton;
@@ -183,7 +186,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         dark = PlayerColors.isDark(resourcesProvider);
         fallbackSeed = PlayerColors.noCoverSeed(resourcesProvider);
         Integer seed = PlayerArt.cachedSeed(playing);
-        colors = PlayerColors.fromSeed(seed != null ? seed : fallbackSeed, dark);
+        colors = sheetColors(seed != null ? seed : fallbackSeed);
 
         root = new FrameLayout(context) {
             @Override
@@ -252,7 +255,16 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         containerView = root;
 
         layout = new PlayerLayout(context);
-        root.addView(layout, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
+        if (BuildConfig.CONNECTED_ALPHA) {
+            ScrollView scroll = signatureScroll = new ScrollView(context);
+            scroll.setFillViewport(true);
+            scroll.setClipToPadding(false);
+            scroll.setVerticalScrollBarEnabled(false);
+            scroll.addView(layout, new ScrollView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            root.addView(scroll, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
+        } else {
+            root.addView(layout, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
+        }
 
         header = new FrameLayout(context);
         collapseButton = new ImageView(context);
@@ -271,14 +283,14 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         headerCenter.setOrientation(LinearLayout.VERTICAL);
         headerCenter.setGravity(Gravity.CENTER_HORIZONTAL);
         headerLabel = new TextView(context);
-        headerLabel.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12);
+        headerLabel.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
         headerLabel.setLetterSpacing(0.08f);
-        headerLabel.setAllCaps(true);
+        headerLabel.setAllCaps(!BuildConfig.CONNECTED_ALPHA);
         headerLabel.setSingleLine(true);
         headerLabel.setEllipsize(TextUtils.TruncateAt.END);
         headerCenter.addView(headerLabel, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL));
         headerTitle = new TextView(context);
-        headerTitle.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
+        headerTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
         headerTitle.setTypeface(AndroidUtilities.bold());
         headerTitle.setSingleLine(true);
         headerTitle.setEllipsize(TextUtils.TruncateAt.END);
@@ -287,7 +299,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         layout.addView(header);
 
         cover = new CoverImage(context, 120);
-        cover.setRadius(dp(28));
+        cover.setRadius(dp(BuildConfig.CONNECTED_ALPHA ? 22 : 28));
         cover.setListener(fallbackSeed, this::onSeed);
         cover.setOutlineProvider(new ViewOutlineProvider() {
             @Override
@@ -295,7 +307,8 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
                 outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), dp(28));
             }
         });
-        cover.setElevation(dp(14));
+        cover.setElevation(dp(BuildConfig.CONNECTED_ALPHA ? 0 : 14));
+        if (BuildConfig.CONNECTED_ALPHA) cover.setElevation(0);
         cover.setOnTouchListener(this::onCoverTouch);
         layout.addView(cover);
 
@@ -305,16 +318,20 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         LinearLayout titles = new LinearLayout(context);
         titles.setOrientation(LinearLayout.VERTICAL);
         titleView = new TextView(context);
-        titleView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 26);
+        titleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, BuildConfig.CONNECTED_ALPHA ? 24 : 26);
         titleView.setTypeface(AndroidUtilities.bold());
         titleView.setSingleLine(true);
         titleView.setEllipsize(TextUtils.TruncateAt.END);
         titles.addView(titleView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
         artistView = new TextView(context);
-        artistView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
+        artistView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
         artistView.setSingleLine(true);
         artistView.setEllipsize(TextUtils.TruncateAt.END);
         titles.addView(artistView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 4, 0, 0));
+        if (BuildConfig.CONNECTED_ALPHA) {
+            // Equal reservation opposite the48dp favorite and its12dp margin keeps text truly centered.
+            titles.setPadding(dp(60),0,0,0);titleView.setGravity(Gravity.CENTER_HORIZONTAL);artistView.setGravity(Gravity.CENTER_HORIZONTAL);
+        }
         titleRow.addView(titles, LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1f));
         likeButton = new MorphButton(context, heartIcon);
         likeButton.setRadius(dp(24), false);
@@ -334,13 +351,13 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         LinearLayout smallTitles = new LinearLayout(context);
         smallTitles.setOrientation(LinearLayout.VERTICAL);
         smallTitle = new TextView(context);
-        smallTitle.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 18);
+        smallTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
         smallTitle.setTypeface(AndroidUtilities.bold());
         smallTitle.setSingleLine(true);
         smallTitle.setEllipsize(TextUtils.TruncateAt.END);
         smallTitles.addView(smallTitle, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
         smallArtist = new TextView(context);
-        smallArtist.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
+        smallArtist.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         smallArtist.setSingleLine(true);
         smallArtist.setEllipsize(TextUtils.TruncateAt.END);
         smallTitles.addView(smallArtist, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 2, 0, 0));
@@ -366,7 +383,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         });
         lyricsPanel.addView(lyricsView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 0, 1f, 0, 16, 0, 0));
         sourceView = new TextView(context);
-        sourceView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12);
+        sourceView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
         sourceView.setSingleLine(true);
         lyricsPanel.addView(sourceView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 16, 0, 8, 0, 0));
         layout.addView(lyricsPanel);
@@ -408,11 +425,11 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         timeRow = new LinearLayout(context);
         timeRow.setOrientation(LinearLayout.HORIZONTAL);
         timeNow = new TextView(context);
-        timeNow.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 13);
+        timeNow.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         timeNow.setFontFeatureSettings("tnum");
         timeRow.addView(timeNow, LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1f));
         timeLeft = new TextView(context);
-        timeLeft.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 13);
+        timeLeft.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         timeLeft.setFontFeatureSettings("tnum");
         timeLeft.setGravity(Gravity.RIGHT);
         timeRow.addView(timeLeft, LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1f));
@@ -436,26 +453,40 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         controls.next.setContentDescription(getString(R.string.Next));
         layout.addView(controls);
 
-        group = new LinearLayout(context);
+        group = BuildConfig.CONNECTED_ALPHA ? new SignatureMusicActions(context) : new LinearLayout(context);
         group.setOrientation(LinearLayout.HORIZONTAL);
         speedButton = new MorphButton(context, PlayerIcon.stroke(PlayerIcon.SPEED, 20));
         speedButton.setRadius(dp(26), dp(8), false);
         speedButton.setOnClickListener(v -> cycleSpeed());
         group.addView(speedButton, LayoutHelper.createLinear(0, 52, 1f));
         lyricsButton = new MorphButton(context, PlayerIcon.stroke(PlayerIcon.LYRICS, 20));
-        lyricsButton.setText(getString(R.string.OEPlayerLyrics));
+        lyricsButton.setText(getString(BuildConfig.CONNECTED_ALPHA ? R.string.FlexyMusicLyrics : R.string.OEPlayerLyrics));
         lyricsButton.setRadius(dp(8), false);
         lyricsButton.setOnClickListener(v -> setLyricsMode(!lyricsMode, true));
         group.addView(lyricsButton, LayoutHelper.createLinear(0, 52, 1f, 4, 0, 4, 0));
         queueButton = new MorphButton(context, PlayerIcon.stroke(PlayerIcon.QUEUE, 20));
-        queueButton.setText(getString(R.string.OEPlayerQueue));
+        queueButton.setText(getString(BuildConfig.CONNECTED_ALPHA ? R.string.FlexyMusicQueue : R.string.OEPlayerQueue));
         queueButton.setRadius(dp(8), dp(26), false);
         queueButton.setOnClickListener(v -> openQueue());
         group.addView(queueButton, LayoutHelper.createLinear(0, 52, 1f));
+        if (BuildConfig.CONNECTED_ALPHA) {
+            for (int i = 0; i < group.getChildCount(); i++) {
+                ((MorphButton) group.getChildAt(i)).setStackedLabel(true);
+                ((MorphButton) group.getChildAt(i)).setRadius(dp(18), false);
+            }
+            MorphButton options = new MorphButton(context, PlayerIcon.fill(PlayerIcon.MORE, 20));
+            options.setText(getString(R.string.FlexyMusicMore));
+            options.setContentDescription(getString(R.string.AccDescrMoreOptions));
+            options.setStackedLabel(true);
+            options.setRadius(dp(18), false);
+            options.setColors(colors.surfaceHigh, colors.onSurface, colors.surfaceHigh, colors.onSurface);
+            options.setOnClickListener(this::showMenu);
+            group.addView(options, LayoutHelper.createLinear(0, 52, 1f, 4, 0, 0, 0));
+        }
         layout.addView(group);
 
         bubble = new TextView(context);
-        bubble.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
+        bubble.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         bubble.setTypeface(AndroidUtilities.bold());
         bubble.setFontFeatureSettings("tnum");
         bubble.setPadding(dp(12), dp(6), dp(12), dp(6));
@@ -464,6 +495,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         bubble.setVisibility(View.GONE);
         bubble.setAlpha(0f);
         layout.addView(bubble);
+        if (BuildConfig.CONNECTED_ALPHA) { collapseButton.setRotation(90); header.bringToFront(); }
 
         applyColors(colors);
         bind(playing, false);
@@ -489,7 +521,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         if (morphProgress >= 0f || closing) {
             return false;
         }
-        return !touchInLyrics || !lyricsView.canScrollUp();
+        return (signatureScroll == null || signatureScroll.getScrollY() == 0) && (!touchInLyrics || !lyricsView.canScrollUp());
     }
 
     @Override
@@ -505,6 +537,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         nc.addObserver(this, NotificationCenter.audioInfoLoaded);
         nc.addObserver(this, NotificationCenter.musicIdsLoaded);
         NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.messagePlayingSpeedChanged);
+        NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.didSetNewTheme);
         applySystemBars(true);
     }
 
@@ -916,9 +949,13 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         nc.removeObserver(this, NotificationCenter.audioInfoLoaded);
         nc.removeObserver(this, NotificationCenter.musicIdsLoaded);
         NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.messagePlayingSpeedChanged);
-        if (colorAnimator != null) {
-            colorAnimator.cancel();
-        }
+        NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.didSetNewTheme);
+        if (colorAnimator != null) colorAnimator.cancel();
+        if (lyricsAnimator != null) { lyricsAnimator.removeAllListeners(); lyricsAnimator.cancel(); }
+        cover.animate().cancel();
+        bubble.animate().cancel();
+        cover.setListener(fallbackSeed, null);
+        seekBar.setPlaying(false);
     }
 
     public static void onModesChanged() {
@@ -929,6 +966,12 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
 
     @Override
     public void didReceivedNotification(int id, int account, Object... args) {
+        if (id == NotificationCenter.didSetNewTheme && BuildConfig.CONNECTED_ALPHA) {
+            dark = PlayerColors.isDark(resourcesProvider);
+            Integer seed = PlayerArt.cachedSeed(current);
+            animateColors(sheetColors(seed != null ? seed : fallbackSeed), false);
+            return;
+        }
         if (id == NotificationCenter.messagePlayingDidStart) {
             MessageObject mo = MediaController.getInstance().getPlayingMessageObject();
             if (mo == null || !mo.isMusic()) {
@@ -992,9 +1035,9 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         if (changed) {
             Integer seed = PlayerArt.cachedSeed(mo);
             if (seed != null) {
-                animateColors(PlayerColors.fromSeed(seed, dark), animated);
+                animateColors(sheetColors(seed), animated);
             } else if (PlayerArt.fileCover(mo) == null && PlayerArt.fullLocation(mo) == null && PlayerArt.thumbLocation(mo) == null) {
-                animateColors(PlayerColors.fromSeed(fallbackSeed, dark), animated);
+                animateColors(sheetColors(fallbackSeed), animated);
             }
             lyricsKey = null;
             if (lyricsMode) {
@@ -1009,9 +1052,14 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         updateProgress();
     }
 
+    private PlayerColors sheetColors(int seed) {
+        return BuildConfig.CONNECTED_ALPHA ? PlayerColors.fromSignatureTheme(dark) : PlayerColors.fromSeed(seed, dark);
+    }
+
     private void onSeed(MessageObject mo, int seed) {
+        if (BuildConfig.CONNECTED_ALPHA) return; // Album changes never restart a theme-color transition.
         if (mo == current) {
-            animateColors(PlayerColors.fromSeed(seed, dark), true);
+            animateColors(sheetColors(seed), true);
         }
     }
 
@@ -1035,6 +1083,10 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
             } else {
                 headerTitle.setText(DialogObject.getName(account, did));
             }
+        }
+        if (BuildConfig.CONNECTED_ALPHA) {
+            headerLabel.setText(getString(R.string.FlexyMusicPlayingFrom));
+            if (mo.getDialogId() == UserConfig.getInstance(account).getClientUserId()) headerTitle.setText(getString(R.string.FlexyMusicMyMusic));
         }
     }
 
@@ -1095,7 +1147,8 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         float speed = MediaController.getInstance().getPlaybackSpeed(true);
         DecimalFormat format = new DecimalFormat("0.##", DecimalFormatSymbols.getInstance(currentLocale()));
         String label = format.format(speed) + "×";
-        speedButton.setText(label);
+        speedButton.setText(BuildConfig.CONNECTED_ALPHA ? getString(R.string.FlexyMusicSpeed) : label);
+        if (BuildConfig.CONNECTED_ALPHA) speedButton.setBadge(format.format(speed), false);
         speedButton.setContentDescription(getString(R.string.OEPlayerSpeed) + " " + label);
     }
 
@@ -1214,7 +1267,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         }
         lyricsMode = value;
         lyricsButton.setActive(value, animated);
-        lyricsButton.setRadius(dp(value ? 26 : 8), animated);
+        lyricsButton.setRadius(dp(BuildConfig.CONNECTED_ALPHA ? 18 : value ? 26 : 8), animated);
         if (value) {
             loadLyrics();
             MessageObject mo = current;
@@ -1241,7 +1294,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
                 setLyricsFraction(target);
             }
         });
-        lyricsAnimator.setDuration(360);
+        lyricsAnimator.setDuration(BuildConfig.CONNECTED_ALPHA ? 180 : 360);
         lyricsAnimator.setInterpolator(EMPHASIZED);
         lyricsAnimator.start();
     }
@@ -1309,7 +1362,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         lyricsView.showState(LyricsView.STATE_LOADING);
         sourceView.setText(null);
         OnlineLyrics.loadCached(q, (lyrics, status) -> {
-            if (!TextUtils.equals(key, currentKey)) {
+            if (detached || !TextUtils.equals(key, currentKey)) {
                 return;
             }
             if (lyrics != null) {
@@ -1340,7 +1393,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         lyricsView.showState(LyricsView.STATE_LOADING);
         sourceView.setText(null);
         OnlineLyrics.fetch(q, (lyrics, status) -> {
-            if (!TextUtils.equals(key, currentKey)) {
+            if (detached || !TextUtils.equals(key, currentKey)) {
                 return;
             }
             if (lyrics != null) {
@@ -1427,6 +1480,11 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
             PlayerActions.showInChat(activity, mo);
         });
         o.addGap();
+        if (BuildConfig.CONNECTED_ALPHA) o.add(R.drawable.msg_close, getString(R.string.AccDescrClosePlayer), () -> {
+            o.dismiss();
+            MediaController.getInstance().cleanupPlayer(true, true);
+            dismissImmediately();
+        });
         o.add(R.drawable.msg_filled_data_music, getString(R.string.OEPlayerClassic), () -> {
             o.dismiss();
             openClassic();
@@ -1516,14 +1574,16 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
     }
 
     private void animateColors(PlayerColors target, boolean animated) {
+        if (BuildConfig.CONNECTED_ALPHA && colors == target) return;
         if (colorAnimator != null) {
             colorAnimator.cancel();
             colorAnimator = null;
         }
-        if (!animated) {
+        if (BuildConfig.CONNECTED_ALPHA || !animated) {
             applyColors(target);
             return;
         }
+        if (colors == target) return;
         PlayerColors from = colors;
         colorAnimator = ValueAnimator.ofFloat(0f, 1f);
         colorAnimator.addUpdateListener(a -> applyColors(PlayerColors.lerp(from, target, (float) a.getAnimatedValue())));
@@ -1542,6 +1602,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         headerLabel.setTextColor(c.onSurfaceVariant);
         headerTitle.setTextColor(c.onSurface);
         cover.setColors(c.primaryContainer, c.onPrimaryContainer);
+        if (BuildConfig.CONNECTED_ALPHA) cover.setSignatureSurface(c.surface);
         smallCover.setColors(c.primaryContainer, c.onPrimaryContainer);
         if (Build.VERSION.SDK_INT >= 28) {
             cover.setOutlineSpotShadowColor(c.shadow());
@@ -1566,8 +1627,11 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         controls.next.setColors(c.primaryContainer, c.onPrimaryContainer, c.primaryContainer, c.onPrimaryContainer);
         controls.play.setColors(c.primary, c.onPrimary, c.primary, c.onPrimary);
         speedButton.setColors(c.surfaceHigh, c.onSurface, c.surfaceHigh, c.onSurface);
+        if (BuildConfig.CONNECTED_ALPHA) speedButton.setBadgeColors(c.primaryContainer, c.onPrimaryContainer);
         lyricsButton.setColors(c.surfaceHigh, c.onSurface, c.primary, c.onPrimary);
         queueButton.setColors(c.surfaceHigh, c.onSurface, c.surfaceHigh, c.onSurface);
+        if (BuildConfig.CONNECTED_ALPHA && group.getChildCount() > 3)
+            ((MorphButton) group.getChildAt(3)).setColors(c.surfaceHigh, c.onSurface, c.surfaceHigh, c.onSurface);
         applySystemBars(false);
     }
 
@@ -1618,18 +1682,33 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
             seekBar.measure(exactW, MeasureSpec.makeMeasureSpec(dp(40), MeasureSpec.EXACTLY));
             timeRow.measure(exactW, MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
             controls.measure(exactW, MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
-            group.measure(exactW, MeasureSpec.makeMeasureSpec(dp(52), MeasureSpec.EXACTLY));
+            group.measure(exactW, BuildConfig.CONNECTED_ALPHA ? MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED)
+                    : MeasureSpec.makeMeasureSpec(dp(52), MeasureSpec.EXACTLY));
             titleRow.measure(exactW, MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
             bubble.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
-            int fixed = dp(56) + dp(6) + dp(40) + timeRow.getMeasuredHeight() + dp(12) + controls.getMeasuredHeight() + dp(52) + dp(28) + dp(16);
+            if (BuildConfig.CONNECTED_ALPHA) {
+                coverSize = Math.max(dp(220), Math.min(contentW, dp(340)));
+                stageHeight = dp(12) + coverSize + dp(18) + titleRow.getMeasuredHeight();
+                int artMeasure = MeasureSpec.makeMeasureSpec(coverSize, MeasureSpec.EXACTLY);
+                cover.measure(artMeasure, artMeasure);
+                lyricsPanel.measure(exactW, MeasureSpec.makeMeasureSpec(stageHeight, MeasureSpec.EXACTLY));
+                int minimum = top + dp(56) + stageHeight + dp(6 + 40 + 12 + 24 + 28) + timeRow.getMeasuredHeight()
+                        + controls.getMeasuredHeight() + group.getMeasuredHeight() + bottom;
+                setMeasuredDimension(width, Math.max(height, minimum));
+                return;
+            }
+            int fixed = dp(56) + dp(6) + dp(40) + timeRow.getMeasuredHeight() + dp(12) + controls.getMeasuredHeight() + group.getMeasuredHeight() + dp(28) + dp(16);
             int available = height - top - bottom - fixed;
             int titleH = titleRow.getMeasuredHeight();
-            coverSize = Math.max(dp(96), Math.min(contentW, available - dp(16) - dp(26) - titleH));
+            coverSize = BuildConfig.CONNECTED_ALPHA
+                    ? SignatureMusicStyle.cover(contentW, available - dp(42) - titleH, dp(96))
+                    : Math.max(dp(96), Math.min(contentW, available - dp(16) - dp(26) - titleH));
             stageHeight = dp(16) + coverSize + dp(26) + titleH;
             int coverSpec = MeasureSpec.makeMeasureSpec(coverSize, MeasureSpec.EXACTLY);
             cover.measure(coverSpec, coverSpec);
             lyricsPanel.measure(exactW, MeasureSpec.makeMeasureSpec(stageHeight, MeasureSpec.EXACTLY));
-            setMeasuredDimension(width, height);
+            int minimumHeight = top + bottom + fixed + dp(42) + titleH + coverSize;
+            setMeasuredDimension(width, BuildConfig.CONNECTED_ALPHA ? Math.max(height, minimumHeight) : height);
         }
 
         @Override
@@ -1645,8 +1724,9 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
             y += dp(56);
             int stageTop = y;
             int coverLeft = (width - coverSize) / 2;
-            cover.layout(coverLeft, y + dp(16), coverLeft + coverSize, y + dp(16) + coverSize);
-            int titleTop = y + dp(16) + coverSize + dp(26);
+            if (BuildConfig.CONNECTED_ALPHA) cover.layout(coverLeft, y + dp(12), coverLeft + coverSize, y + dp(12) + coverSize);
+            else cover.layout(coverLeft, y + dp(16), coverLeft + coverSize, y + dp(16) + coverSize);
+            int titleTop = BuildConfig.CONNECTED_ALPHA ? y + dp(12) + coverSize + dp(18) : y + dp(16) + coverSize + dp(26);
             titleRow.layout(side, titleTop, side + contentW, titleTop + titleRow.getMeasuredHeight());
             lyricsPanel.layout(side, stageTop, side + contentW, stageTop + stageHeight);
             y = stageTop + stageHeight + dp(6);
@@ -1657,8 +1737,8 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
             timeRow.layout(side, y, side + contentW, y + timeRow.getMeasuredHeight());
             y += timeRow.getMeasuredHeight() + dp(12);
             controls.layout(side, y, side + contentW, y + controls.getMeasuredHeight());
-            int groupTop = height - bottom - dp(28) - dp(52);
-            group.layout(side, groupTop, side + contentW, groupTop + dp(52));
+            int groupTop = height - bottom - dp(28) - group.getMeasuredHeight();
+            group.layout(side, groupTop, side + contentW, groupTop + group.getMeasuredHeight());
             if (seeking) {
                 layoutBubble();
             }

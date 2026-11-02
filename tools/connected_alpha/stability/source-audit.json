@@ -1,0 +1,20 @@
+{
+  "status": "PASS_SOURCE_PARITY_ONLY",
+  "upstream": "1ad6a60a6834ffca722b1a22f4fba27ecb29a061",
+  "additional_components_identical": 11,
+  "sha256": {
+    "TMessagesProj/src/main/java/org/telegram/messenger/NativeLoader.java": "fb2296ec1d5e2f41f8cca48f59a78727b3d07ddeda352e76c82336da2ec1d8d9",
+    "TMessagesProj/src/main/java/org/telegram/messenger/FileLoader.java": "c86fd593fc79ed3d2e566f549d578f0edff9b90e9e960669318b6e08a8583c72",
+    "TMessagesProj/src/main/java/org/telegram/messenger/DispatchQueue.java": "f5090969254bc80dc3b30a6b5a1d78c1b79aa2a61814f8801d9e438afc2c7335",
+    "TMessagesProj/src/main/java/org/telegram/messenger/DispatchQueuePoolBackground.java": "4f20b12b0d6101820e94dee7c583ce950d5507fbb13511d202574a74c4838b91",
+    "TMessagesProj/src/main/java/org/telegram/messenger/MusicPlayerService.java": "e5860af3e27c59edb000ed9c8b984300e75bb9fc90b226fc1e0b4bbe98570507",
+    "TMessagesProj/src/main/java/org/telegram/messenger/NotificationsService.java": "b48c0d19db05b3bc9158beac68b2f371a01bf8d707a812d65cbd2e7696c171ec",
+    "TMessagesProj/src/main/java/org/telegram/messenger/PushListenerController.java": "1bcff47ba5ecb4663ae0f7ba05dad971c7ca13c4a240cff6c0e10b722d1e2fed",
+    "TMessagesProj/src/main/java/org/telegram/messenger/GooglePushListenerServiceProvider.java": "c75e58a9da5c0e4822cf1d9b03325badcb55290e6ceb0f1cd8d13d20626040e9",
+    "TMessagesProj/src/main/java/org/telegram/messenger/UserConfig.java": "dc6ab416e7cba0d9cfb4d6a784de4affbbc0a3a4663ee7f3408138c3a3e7804c",
+    "TMessagesProj/src/main/java/org/telegram/messenger/SharedConfig.java": "3f04f13b6c713732db49e298a7673e264a296754af0bba15ecfd5775a95b782a",
+    "TMessagesProj/src/main/java/org/telegram/messenger/AndroidUtilities.java": "72b9688891af95daf3ff6b55a31ff16f03eb84db730593de41dfd8b2de81acd5"
+  },
+  "committed_jni_tree": "5a436ec69d8ae7547ea3713398e39ab031d5485c",
+  "android_runtime": "NOT_TESTED"
+}

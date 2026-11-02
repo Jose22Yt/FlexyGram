@@ -1,5 +1,6 @@
 .gradle
 .idea
+.ide
 .kotlin
 .vscode
 *.aar
@@ -27,3 +28,15 @@ replay_pid*.log
 TMessagesProj/release.keystore
 TMessagesProj/release/
 tests/local/
+
+# Connected Alpha private inputs
+**/google-services.json
+config/*.keystore
+*.jks
+*.pem
+*.key
+
+# Official signing inputs (never commit private material)
+*.keystore
+*.p12
+*.pfx

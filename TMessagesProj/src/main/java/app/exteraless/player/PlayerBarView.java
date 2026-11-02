@@ -4,6 +4,8 @@ import static org.telegram.messenger.AndroidUtilities.dp;
 import static org.telegram.messenger.LocaleController.getString;
 
 import android.content.Context;
+import org.telegram.messenger.BuildConfig;
+import android.graphics.drawable.GradientDrawable;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -27,22 +29,37 @@ import org.telegram.ui.Components.LayoutHelper;
 public class PlayerBarView extends FrameLayout implements NotificationCenter.NotificationCenterDelegate {
 
     public static final int HEIGHT_DP = 52;
+    public static int heightDp(Context context) {
+        return BuildConfig.CONNECTED_ALPHA ? Math.max(HEIGHT_DP,
+                (int) Math.ceil(18 * context.getResources().getConfiguration().fontScale + 16)) : HEIGHT_DP;
+    }
 
     private final CoverImage cover;
+    private final LinearLayout texts;
     private final TextView titleView;
     private final TextView artistView;
     private final RingPlayButton playButton;
     private final ImageView nextButton;
     private final ImageView closeButton;
     private final PlayerIcon nextIcon = PlayerIcon.fill(PlayerIcon.NEXT, 22);
-    private final PlayerIcon closeIcon = PlayerIcon.stroke(PlayerIcon.CLOSE, 20);
+    private final PlayerIcon closeIcon = PlayerIcon.stroke(BuildConfig.CONNECTED_ALPHA ? PlayerIcon.CHEVRON_DOWN : PlayerIcon.CLOSE, 20);
+    private final Theme.ResourcesProvider resourcesProvider;
     private MessageObject current;
+    private Runnable onCompact;
+    public void setOnCompact(Runnable action) { onCompact = action; }
 
     public PlayerBarView(Context context, Theme.ResourcesProvider resourcesProvider, Runnable onOpen, Runnable onClose) {
         super(context);
+        this.resourcesProvider = resourcesProvider;
         PlayerColors theme = PlayerColors.fromSeed(PlayerColors.fallbackSeed(resourcesProvider), PlayerColors.isDark(resourcesProvider));
 
-        setBackground(Theme.getSelectorDrawable(false));
+        if (BuildConfig.CONNECTED_ALPHA) {
+            GradientDrawable surface = new GradientDrawable();
+            surface.setCornerRadius(dp(20));
+            surface.setColor(theme.surface);
+            surface.setStroke(dp(1), theme.outlineVariant);
+            setBackground(surface);
+        } else setBackground(Theme.getSelectorDrawable(false));
         setOnClickListener(v -> onOpen.run());
         setContentDescription(getString(R.string.OEPlayerOpen));
 
@@ -50,20 +67,20 @@ public class PlayerBarView extends FrameLayout implements NotificationCenter.Not
         cover.setRadius(dp(10));
         addView(cover, LayoutHelper.createFrame(36, 36, Gravity.LEFT | Gravity.CENTER_VERTICAL, 12, 0, 0, 0));
 
-        LinearLayout texts = new LinearLayout(context);
+        texts = new LinearLayout(context);
         texts.setOrientation(LinearLayout.VERTICAL);
         titleView = new TextView(context);
-        titleView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
+        titleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
         titleView.setTypeface(AndroidUtilities.bold());
         titleView.setSingleLine(true);
         titleView.setEllipsize(TextUtils.TruncateAt.END);
         texts.addView(titleView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
         artistView = new TextView(context);
-        artistView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 13);
+        artistView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         artistView.setSingleLine(true);
         artistView.setEllipsize(TextUtils.TruncateAt.END);
         texts.addView(artistView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 1, 0, 0));
-        addView(texts, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT | Gravity.CENTER_VERTICAL, 60, 0, 6 + 40 * 3 + 4, 0));
+        addView(texts, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT | Gravity.CENTER_VERTICAL, 60, 0, 6 + 48 * 3 + 4, 0));
 
         LinearLayout buttons = new LinearLayout(context);
         buttons.setOrientation(LinearLayout.HORIZONTAL);
@@ -80,24 +97,40 @@ public class PlayerBarView extends FrameLayout implements NotificationCenter.Not
                 mc.pauseMessage(mo);
             }
         });
-        buttons.addView(playButton, LayoutHelper.createLinear(40, 40));
+        buttons.addView(playButton, LayoutHelper.createLinear(48, 48));
         nextButton = new ImageView(context);
         nextButton.setScaleType(ImageView.ScaleType.CENTER);
         nextButton.setImageDrawable(nextIcon);
         nextButton.setContentDescription(getString(R.string.Next));
         nextButton.setOnClickListener(v -> MediaController.getInstance().playNextMessage());
-        buttons.addView(nextButton, LayoutHelper.createLinear(40, 40));
+        buttons.addView(nextButton, LayoutHelper.createLinear(48, 48));
         closeButton = new ImageView(context);
         closeButton.setScaleType(ImageView.ScaleType.CENTER);
         closeButton.setImageDrawable(closeIcon);
-        closeButton.setContentDescription(getString(R.string.AccDescrClosePlayer));
-        closeButton.setOnClickListener(v -> onClose.run());
-        buttons.addView(closeButton, LayoutHelper.createLinear(40, 40));
-        addView(buttons, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, 40, Gravity.RIGHT | Gravity.CENTER_VERTICAL, 0, 0, 6, 0));
+        closeButton.setContentDescription(getString(BuildConfig.CONNECTED_ALPHA ? R.string.FlexyMusicCompact : R.string.AccDescrClosePlayer));
+        closeButton.setOnClickListener(v -> {
+            if (BuildConfig.CONNECTED_ALPHA && onCompact != null) onCompact.run();
+            else onClose.run();
+        });
+        closeButton.setOnLongClickListener(v -> { onClose.run(); return true; });
+        buttons.addView(closeButton, LayoutHelper.createLinear(48, 48));
+        addView(buttons, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, 48, Gravity.RIGHT | Gravity.CENTER_VERTICAL, 0, 0, 6, 0));
 
-        int text = Theme.getColor(Theme.key_inappPlayerPerformer, resourcesProvider);
-        int secondary = Theme.getColor(Theme.key_inappPlayerTitle, resourcesProvider);
-        int icons = Theme.getColor(Theme.key_inappPlayerClose, resourcesProvider);
+        applyTheme();
+    }
+
+    @Override protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        boolean showNext = MeasureSpec.getSize(widthMeasureSpec) >= dp(320);
+        nextButton.setVisibility(showNext ? VISIBLE : GONE);
+        ((FrameLayout.LayoutParams) texts.getLayoutParams()).rightMargin = dp(10 + 48 * (showNext ? 3 : 2));
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+    }
+
+    private void applyTheme() {
+        PlayerColors theme = PlayerColors.fromSeed(PlayerColors.fallbackSeed(resourcesProvider), PlayerColors.isDark(resourcesProvider));
+        int text = BuildConfig.CONNECTED_ALPHA ? theme.onSurface : Theme.getColor(Theme.key_inappPlayerPerformer, resourcesProvider);
+        int secondary = BuildConfig.CONNECTED_ALPHA ? theme.onSurfaceVariant : Theme.getColor(Theme.key_inappPlayerTitle, resourcesProvider);
+        int icons = BuildConfig.CONNECTED_ALPHA ? theme.onSurface : Theme.getColor(Theme.key_inappPlayerClose, resourcesProvider);
         titleView.setTextColor(text);
         artistView.setTextColor(ColorUtils.setAlphaComponent(secondary, 0xbf));
         nextIcon.setColor(icons);
@@ -106,17 +139,23 @@ public class PlayerBarView extends FrameLayout implements NotificationCenter.Not
         nextButton.setBackground(Theme.createSelectorDrawable(ripple, Theme.RIPPLE_MASK_CIRCLE_20DP));
         closeButton.setBackground(Theme.createSelectorDrawable(ripple, Theme.RIPPLE_MASK_CIRCLE_20DP));
         playButton.setBackground(Theme.createSelectorDrawable(ripple, Theme.RIPPLE_MASK_CIRCLE_20DP));
-        int accent = Theme.getColor(Theme.key_inappPlayerPlayPause, resourcesProvider);
+        int accent = BuildConfig.CONNECTED_ALPHA ? theme.primary : Theme.getColor(Theme.key_inappPlayerPlayPause, resourcesProvider);
         playButton.setColors(accent, ColorUtils.setAlphaComponent(accent, 51), accent);
         cover.setColors(theme.primaryContainer, theme.onPrimaryContainer);
+        if (BuildConfig.CONNECTED_ALPHA && getBackground() instanceof GradientDrawable) {
+            GradientDrawable bg = (GradientDrawable) getBackground();
+            bg.setColor(theme.surface); bg.setStroke(dp(1), theme.outlineVariant);
+        }
     }
 
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
+        NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.didSetNewTheme);
         for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
             NotificationCenter nc = NotificationCenter.getInstance(a);
             nc.addObserver(this, NotificationCenter.messagePlayingDidStart);
+            nc.addObserver(this, NotificationCenter.messagePlayingDidReset);
             nc.addObserver(this, NotificationCenter.messagePlayingPlayStateChanged);
             nc.addObserver(this, NotificationCenter.messagePlayingProgressDidChanged);
             nc.addObserver(this, NotificationCenter.fileLoaded);
@@ -128,9 +167,11 @@ public class PlayerBarView extends FrameLayout implements NotificationCenter.Not
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
+        NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.didSetNewTheme);
         for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
             NotificationCenter nc = NotificationCenter.getInstance(a);
             nc.removeObserver(this, NotificationCenter.messagePlayingDidStart);
+            nc.removeObserver(this, NotificationCenter.messagePlayingDidReset);
             nc.removeObserver(this, NotificationCenter.messagePlayingPlayStateChanged);
             nc.removeObserver(this, NotificationCenter.messagePlayingProgressDidChanged);
             nc.removeObserver(this, NotificationCenter.fileLoaded);
@@ -140,6 +181,7 @@ public class PlayerBarView extends FrameLayout implements NotificationCenter.Not
 
     @Override
     public void didReceivedNotification(int id, int account, Object... args) {
+        if (id == NotificationCenter.didSetNewTheme) applyTheme();
         if (id == NotificationCenter.messagePlayingProgressDidChanged) {
             playButton.progressChanged();
         } else if (id == NotificationCenter.audioInfoLoaded) {
@@ -162,10 +204,15 @@ public class PlayerBarView extends FrameLayout implements NotificationCenter.Not
         if (mo == null || !mo.isMusic()) {
             return;
         }
+        if (current != mo || !TextUtils.equals(titleView.getText(), mo.getMusicTitle())
+                || !TextUtils.equals(artistView.getText(), mo.getMusicAuthor())) {
+            titleView.setText(mo.getMusicTitle());
+            artistView.setText(mo.getMusicAuthor());
+            cover.setMessage(mo);
+        }
         current = mo;
-        titleView.setText(mo.getMusicTitle());
-        artistView.setText(mo.getMusicAuthor());
-        cover.setMessage(mo);
+        artistView.setVisibility(getResources().getConfiguration().fontScale > 1.5f ? GONE : VISIBLE);
+        setContentDescription(mo.getMusicTitle() + ", " + mo.getMusicAuthor());
         playButton.setMessage(mo);
         boolean paused = MediaController.getInstance().isMessagePaused();
         playButton.setPlaying(!paused, isAttachedToWindow());

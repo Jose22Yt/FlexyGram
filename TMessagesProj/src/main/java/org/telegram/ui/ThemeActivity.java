@@ -354,7 +354,8 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
             textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
             textPaint.setTextSize(dp(16));
 
-            sizeBar = new SeekBarView(context);
+            sizeBar = org.telegram.messenger.BuildConfig.CONNECTED_ALPHA
+                    ? new app.flexygram.settings.FlexySignatureSeekBarView(context) : new SeekBarView(context);
             sizeBar.setReportChanges(true);
             sizeBar.setSeparatorsCount(endFontSize - startFontSize + 1);
             sizeBar.setDelegate(new SeekBarView.SeekBarViewDelegate() {
@@ -438,7 +439,8 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
             textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
             textPaint.setTextSize(dp(16));
 
-            sizeBar = new SeekBarView(context);
+            sizeBar = org.telegram.messenger.BuildConfig.CONNECTED_ALPHA
+                    ? new app.flexygram.settings.FlexySignatureSeekBarView(context) : new SeekBarView(context);
             sizeBar.setReportChanges(true);
             sizeBar.setSeparatorsCount(endRadius - startRadius + 1);
             sizeBar.setDelegate(new SeekBarView.SeekBarViewDelegate() {
@@ -495,11 +497,20 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
         }
     }
 
-    public ThemeActivity(int type) {
+    // Presentation only. All original routes, editor logic and preference keys remain native.
+    private int signatureChatSection; // 0 legacy, 1 classic options, 2 theme/wallpaper
+    public ThemeActivity(int type) { this(type, 0); }
+    protected ThemeActivity(int type, int signatureSection) {
         super();
         currentType = type;
+        signatureChatSection = org.telegram.messenger.BuildConfig.CONNECTED_ALPHA
+                && type == THEME_TYPE_BASIC ? signatureSection : 0;
         updateRows(true);
     }
+    public static ThemeActivity signatureClassicOptions() {
+        return new ThemeActivity(THEME_TYPE_BASIC, 1);
+    }
+
 
     private boolean setBubbleRadius(int size, boolean layout) {
         if (size != SharedConfig.bubbleRadius) {
@@ -702,33 +713,56 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
             createNewThemeRow = rowCount++;
             lastShadowRow = rowCount++;
         } else if (currentType == THEME_TYPE_BASIC) {
-            textSizeHeaderRow = rowCount++;
-            textSizeRow = rowCount++;
-            backgroundRow = rowCount++;
-            changeUserColor = rowCount++;
-            newThemeInfoRow = rowCount++;
-            themeHeaderRow = rowCount++;
+            if (signatureChatSection != 2) {
+                textSizeHeaderRow = rowCount++;
+                textSizeRow = rowCount++;
+            }
+            if (signatureChatSection != 1) {
+                backgroundRow = rowCount++;
+                changeUserColor = rowCount++;
+                newThemeInfoRow = rowCount++;
+                themeHeaderRow = rowCount++;
+                themeListRow2 = rowCount++;
+                themeInfoRow = rowCount++;
+            }
+            if (signatureChatSection == 2) {
+                themePreviewRow = rowCount++;
+                selectThemeHeaderRow = rowCount++;
+                themeListRow = rowCount++;
+                hasThemeAccents = Theme.getCurrentTheme().hasAccentColors();
+                if (themesHorizontalListCell != null) themesHorizontalListCell.setDrawDivider(hasThemeAccents);
+                if (hasThemeAccents) themeAccentListRow = rowCount++;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) monetStyleRow = rowCount++;
+                Theme.ThemeInfo info = Theme.getCurrentTheme();
+                Theme.ThemeAccent accent = info.getAccent(false);
+                if (info.themeAccents != null && !info.themeAccents.isEmpty() && accent != null && accent.id >= 100) editThemeRow = rowCount++;
+                createNewThemeRow = rowCount++;
+                nightThemeRow = rowCount++;
+                lastShadowRow = rowCount++;
+            } else {
 
-            themeListRow2 = rowCount++;
-            themeInfoRow = rowCount++;
-
-            bubbleRadiusHeaderRow = rowCount++;
-            bubbleRadiusRow = rowCount++;
-            bubbleRadiusInfoRow = rowCount++;
+            if (!org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) {
+                bubbleRadiusHeaderRow = rowCount++;
+                bubbleRadiusRow = rowCount++;
+                bubbleRadiusInfoRow = rowCount++;
+            }
 
             chatListHeaderRow = rowCount++;
             chatListRow = rowCount++;
             chatListInfoRow = rowCount++;
 
+            // FlexyGram's custom icon selector has one canonical Appearance route.
+            if (!org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) {
             appIconHeaderRow = rowCount++;
             appIconSelectorRow = rowCount++;
             appIconShadowRow = rowCount++;
+            }
 
             swipeGestureHeaderRow = rowCount++;
             swipeGestureRow = rowCount++;
             swipeGestureInfoRow = rowCount++;
 
-            nightThemeRow = rowCount++;
+            if (signatureChatSection == 0) nightThemeRow = rowCount++;
             browserRow = rowCount++;
             liteModeRow = rowCount++;
             stickersRow = rowCount++;
@@ -754,6 +788,7 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
             sendByEnterRow = rowCount++;
             distanceRow = rowCount++;
             otherSectionRow = rowCount++;
+            }
         } else {
             nightDisabledRow = rowCount++;  // TYPE_THEME_TYPE
             nightScheduledRow = rowCount++; // TYPE_THEME_TYPE
@@ -1004,16 +1039,24 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
             sunDrawable.setPlayInDirectionOfCustomEndFrame(true);
             menuItem = menu.addItem(day_night_switch, sunDrawable);
         } else if (currentType == THEME_TYPE_BASIC) {
-            actionBar.setTitle(getString("ChatSettings", R.string.ChatSettings));
+            actionBar.setTitle(getString(signatureChatSection == 2 ? R.string.FlexyThemeWallpaper
+                    : signatureChatSection == 1 ? R.string.FlexyClassicOptions : R.string.ChatSettings));
+            if (signatureChatSection != 0) {
+                actionBar.setDrawGlassTitle(false);
+                actionBar.doNotDrawGlassMenu = true;
+            }
             ActionBarMenu menu = actionBar.createMenu();
             menuItem = menu.addItem(0, R.drawable.ic_ab_other);
             menuItem.setContentDescription(getString("AccDescrMoreOptions", R.string.AccDescrMoreOptions));
             menuItem.addSubItem(share_theme, R.drawable.msg_share, getString("ShareTheme", R.string.ShareTheme));
-            menuItem.addSubItem(edit_theme, R.drawable.msg_edit, getString("EditThemeColors", R.string.EditThemeColors));
-            menuItem.addSubItem(create_theme, R.drawable.msg_palette, getString("CreateNewThemeMenu", R.string.CreateNewThemeMenu));
+            if (signatureChatSection != 2 || editThemeRow < 0)
+                menuItem.addSubItem(edit_theme, R.drawable.msg_edit, getString("EditThemeColors", R.string.EditThemeColors));
+            if (signatureChatSection != 2)
+                menuItem.addSubItem(create_theme, R.drawable.msg_palette, getString("CreateNewThemeMenu", R.string.CreateNewThemeMenu));
+            if (signatureChatSection == 1) menuItem.setVisibility(View.GONE);
             menuItem.addSubItem(reset_settings, R.drawable.msg_reset, getString("ThemeResetToDefaults", R.string.ThemeResetToDefaults));
 
-            if (getMessagesController().getContentSettings() == null) {
+            if (signatureChatSection != 2 && getMessagesController().getContentSettings() == null) {
                 getMessagesController().getContentSettings(settings -> {
                     if (listView != null && listView.isAttachedToWindow() && listAdapter != null) {
                         if ((sensitiveContentRow >= 0) == (settings != null && settings.sensitive_can_change)) {
@@ -1113,21 +1156,12 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
                     if (Theme.getTheme(nightThemeName) == null || !Theme.getTheme(nightThemeName).isDark()) {
                         nightThemeName = "Dark Blue";
                     }
-                    Theme.ThemeInfo themeInfo = Theme.getActiveTheme();
-                    if (dayThemeName.equals(nightThemeName)) {
-                        if (themeInfo.isDark() || dayThemeName.equals("Dark Blue") || dayThemeName.equals("Night")) {
-                            dayThemeName = "Blue";
-                        } else {
-                            nightThemeName = "Dark Blue";
-                        }
+                    final boolean toDark = !Theme.isCurrentThemeDark();
+                    Theme.ThemeInfo themeInfo = Theme.getTheme(toDark ? nightThemeName : dayThemeName);
+                    if (themeInfo == null || themeInfo.isDark() != toDark) {
+                        themeInfo = Theme.getTheme(toDark ? "Dark Blue" : "Blue");
                     }
-
-                    boolean toDark;
-                    if (toDark = dayThemeName.equals(themeInfo.getKey())) {
-                        themeInfo = Theme.getTheme(nightThemeName);
-                    } else {
-                        themeInfo = Theme.getTheme(dayThemeName);
-                    }
+                    if (themeInfo == null || themeInfo.isDark() != toDark) return;
 
                     int[] pos = new int[2];
                     menuItem.getIconView().getLocationInWindow(pos);
@@ -1574,7 +1608,8 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
 
     @Override
     public void onInsets(int left, int top, int right, int bottom) {
-        listView.setPadding(0, 0, 0, bottom);
+        if (signatureChatSection != 0) listView.setPadding(left + dp(14), 0, right + dp(14), bottom);
+        else listView.setPadding(0, 0, 0, bottom);
         listView.setClipToPadding(false);
     }
 
@@ -2778,6 +2813,33 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
                     PeerColorActivity.ChangeNameColorCell cell = (PeerColorActivity.ChangeNameColorCell) holder.itemView;
                     cell.set(getUserConfig().getCurrentUser());
                 }
+            }
+            bindSignatureSurface(holder, position);
+        }
+
+        private boolean signatureBoundary(int position) {
+            if (position < 0 || position >= rowCount) return true;
+            int type = getItemViewType(position);
+            return type == TYPE_HEADER || type == TYPE_SHADOW || type == TYPE_TEXT_INFO_PRIVACY;
+        }
+        private void bindSignatureSurface(RecyclerView.ViewHolder holder, int position) {
+            if (signatureChatSection == 0) return;
+            View view = holder.itemView;
+            if (signatureBoundary(position)) {
+                view.setClipToOutline(false);
+                view.setBackground(null);
+                if (view instanceof HeaderCell) {
+                    HeaderCell header = (HeaderCell) view;
+                    header.setTextColor(getThemedColor(Theme.key_windowBackgroundWhiteBlueHeader));
+                    if (header.getTextView() != null) {
+                        header.getTextView().setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 13);
+                        header.getTextView().setSingleLine(false);
+                    }
+                }
+            } else {
+                app.flexygram.settings.SignatureNativeRowSurface.bind(view,
+                        getThemedColor(Theme.key_windowBackgroundWhite) | 0xff000000,
+                        signatureBoundary(position - 1), signatureBoundary(position + 1));
             }
         }
 

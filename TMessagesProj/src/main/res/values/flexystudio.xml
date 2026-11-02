@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyStudioTitle">FlexyStudio</string>
+    <string name="FlexyStudioConfiguration">CONFIGURATION</string>
+    <string name="FlexyStudioExport">Export configuration</string>
+    <string name="FlexyStudioImport">Import configuration</string>
+    <string name="FlexyStudioShare">Share configuration</string>
+    <string name="FlexyStudioApplyTitle">Apply configuration</string>
+    <string name="FlexyStudioApply">Apply</string>
+    <string name="FlexyStudioApplying">Applying…</string>
+    <string name="FlexyStudioFileDescription">FlexyGram configuration</string>
+    <string name="FlexyStudioCompatible">Compatible with FlexyGram</string>
+    <string name="FlexyStudioIncludes">Includes the following configuration:</string>
+    <string name="FlexyStudioApplyInfo">The included settings will be applied in FlexyGram.</string>
+    <string name="FlexyStudioBubbles">Chat bubbles</string>
+    <string name="FlexyStudioHeader">Conversation header</string>
+    <string name="FlexyStudioComposer">Message composer</string>
+    <string name="FlexyStudioIcon">App icon</string>
+    <string name="FlexyStudioNoChanges">No exportable changes</string>
+    <string name="FlexyStudioChooseSections">Choose compatible sections to include with their current values.</string>
+    <string name="FlexyStudioNothingSelected">Select at least one section. No file was generated.</string>
+    <string name="FlexyStudioInvalid">Damaged, oversized or incompatible file. No settings were changed.</string>
+    <string name="FlexyStudioReadError">Could not read the file. Please try again.</string>
+    <string name="FlexyStudioWriteError">Could not save the file. Use the exact .flexyGram extension.</string>
+    <string name="FlexyStudioSaved">Configuration saved</string>
+    <string name="FlexyStudioApplied">Configuration applied</string>
+    <string name="FlexyStudioApplyError">Could not apply. Previous values have been restored.</string>
+    <string name="FlexyStudioRecoveryPending">Recovery could not finish. A local backup is retained for the next FlexyGram startup.</string>
+    <string name="FlexyStudioUndoQuestion">Restore the values from before this import?</string>
+    <string name="FlexyStudioUndoConflict">Cannot undo: settings were changed after importing.</string>
+    <string name="FlexyStudioBusy">Another operation is in progress. Please try again.</string>
+    <string name="FlexyStudioLoginFirst">Open FlexyGram and sign in before importing a configuration.</string>
+    <string name="FlexyStudioUnsupported">Unsupported: %1$s. No section was applied.</string>
+</resources>

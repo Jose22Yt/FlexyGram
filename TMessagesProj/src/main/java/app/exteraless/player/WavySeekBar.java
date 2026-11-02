@@ -10,6 +10,8 @@ import android.graphics.Path;
 import android.graphics.RectF;
 import android.os.Bundle;
 import android.os.SystemClock;
+import org.telegram.messenger.BuildConfig;
+import org.telegram.messenger.LiteMode;
 import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
 import android.view.View;
@@ -32,6 +34,7 @@ public class WavySeekBar extends View {
     private final Paint wavePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint trackPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint fillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint signatureInactivePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Path path = new Path();
     private final RectF rect = new RectF();
     private Delegate delegate;
@@ -42,7 +45,8 @@ public class WavySeekBar extends View {
     private float amplitude;
     private float phase;
     private long lastFrame;
-    private float maxAmplitude = dp(4);
+    private float maxAmplitude = dp(BuildConfig.CONNECTED_ALPHA ? 3 : 4);
+    private final Runnable waveFrame = this::invalidate;
 
     public WavySeekBar(Context context) {
         super(context);
@@ -64,6 +68,7 @@ public class WavySeekBar extends View {
         wavePaint.setColor(active);
         fillPaint.setColor(active);
         trackPaint.setColor(inactive);
+        signatureInactivePaint.setColor(inactive);
         invalidate();
     }
 
@@ -164,10 +169,12 @@ public class WavySeekBar extends View {
 
     @Override
     protected void onDraw(@NonNull Canvas canvas) {
+        if (BuildConfig.CONNECTED_ALPHA) { drawSignatureColumns(canvas); return; }
         long now = SystemClock.elapsedRealtime();
         float dt = lastFrame == 0 ? 0.016f : Math.min(0.05f, (now - lastFrame) / 1000f);
         lastFrame = now;
-        float targetAmp = playing ? maxAmplitude : 0f;
+        boolean visible = isShown() && getWindowVisibility() == VISIBLE;
+        float targetAmp = playing && visible && !LiteMode.isPowerSaverApplied() ? maxAmplitude : 0f;
         amplitude += (targetAmp - amplitude) * (1f - (float) Math.pow(0.85, dt / 0.04f));
         if (Math.abs(amplitude - targetAmp) < dpf2(0.05f)) {
             amplitude = targetAmp;
@@ -212,13 +219,56 @@ public class WavySeekBar extends View {
         }
         canvas.drawCircle(stopX, cy, dp(2), fillPaint);
         rect.set(x - thumbW / 2f, cy - dp(14), x + thumbW / 2f, cy + dp(14));
-        canvas.drawRoundRect(rect, dpf2(1.5f), dpf2(1.5f), fillPaint);
+        if (BuildConfig.CONNECTED_ALPHA) canvas.drawCircle(x, cy, dp(dragging ? 9 : 7), fillPaint);
+        else canvas.drawRoundRect(rect, dpf2(1.5f), dpf2(1.5f), fillPaint);
 
-        if (amplitude > 0f || targetAmp != amplitude) {
-            postInvalidateOnAnimation();
+        removeCallbacks(waveFrame);
+        if (visible && (amplitude > 0f || targetAmp != amplitude)) {
+            postDelayed(waveFrame, 33);
         } else {
             lastFrame = 0;
         }
+    }
+
+    /** Decorative deterministic columns, not measured audio. Only progress/touch invalidates this track. */
+    private void drawSignatureColumns(Canvas canvas) {
+        if (BuildConfig.CONNECTED_ALPHA) {
+            float start = left(), end = right(), center = getHeight() / 2f;
+            float at = start + Math.max(0f, Math.min(1f, getProgress())) * Math.max(0, end - start);
+            rect.set(start, center - dp(2), end, center + dp(2));
+            canvas.drawRoundRect(rect, dp(2), dp(2), signatureInactivePaint);
+            rect.right = at;
+            canvas.drawRoundRect(rect, dp(2), dp(2), fillPaint);
+            rect.set(at - dp(7), center - dp(7), at + dp(7), center + dp(7));
+            canvas.drawOval(rect, fillPaint);
+            return;
+        }
+        float center = getHeight() / 2f, start = left(), end = right();
+        float at = start + Math.max(0f, Math.min(1f, getProgress())) * Math.max(0, end - start);
+        float step = dp(6), thickness = Math.max(1, dp(3));
+        int index = 0;
+        for (float x = start + thickness / 2; x <= end - thickness / 2; x += step, index++) {
+            float height = dp(8 + ((index * 17 + index * index * 3) % 23));
+            rect.set(x - thickness / 2, center - height / 2, x + thickness / 2, center + height / 2);
+            canvas.drawRoundRect(rect, thickness / 2, thickness / 2, x <= at ? fillPaint : signatureInactivePaint);
+        }
+        rect.set(at - dp(1), center - dp(17), at + dp(1), center + dp(17));
+        canvas.drawRoundRect(rect, dp(1), dp(1), fillPaint);
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        removeCallbacks(waveFrame);
+        lastFrame = 0;
+        super.onDetachedFromWindow();
+    }
+
+    @Override
+    protected void onVisibilityChanged(View changedView, int visibility) {
+        super.onVisibilityChanged(changedView, visibility);
+        removeCallbacks(waveFrame);
+        lastFrame = 0;
+        if (isShown()) invalidate();
     }
 
     @Override
@@ -226,12 +276,20 @@ public class WavySeekBar extends View {
         super.onInitializeAccessibilityNodeInfo(info);
         info.setClassName("android.widget.SeekBar");
         info.setRangeInfo(AccessibilityNodeInfo.RangeInfo.obtain(AccessibilityNodeInfo.RangeInfo.RANGE_TYPE_PERCENT, 0, 100, getProgress() * 100f));
+        info.addAction(AccessibilityNodeInfo.AccessibilityAction.ACTION_SET_PROGRESS);
         info.addAction(AccessibilityNodeInfo.AccessibilityAction.ACTION_SCROLL_FORWARD);
         info.addAction(AccessibilityNodeInfo.AccessibilityAction.ACTION_SCROLL_BACKWARD);
     }
 
     @Override
     public boolean performAccessibilityAction(int action, Bundle arguments) {
+        if (!isEnabled()) return false;
+        if (action == android.R.id.accessibilityActionSetProgress && arguments != null) {
+            progress = Math.max(0f, Math.min(1f, arguments.getFloat(AccessibilityNodeInfo.ACTION_ARGUMENT_PROGRESS_VALUE) / 100f));
+            if (delegate != null) delegate.onSeekEnd(progress, true);
+            invalidate();
+            return true;
+        }
         if (action == AccessibilityNodeInfo.ACTION_SCROLL_FORWARD || action == AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD) {
             float value = Math.max(0f, Math.min(1f, progress + (action == AccessibilityNodeInfo.ACTION_SCROLL_FORWARD ? 0.05f : -0.05f)));
             progress = value;

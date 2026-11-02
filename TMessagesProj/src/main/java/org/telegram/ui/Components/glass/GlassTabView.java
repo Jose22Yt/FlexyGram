@@ -153,9 +153,12 @@ public class GlassTabView extends FrameLayout implements MainTabsLayout.Tab, Fac
     }
 
     public void setGestureSelectedOverride(float gestureSelectedOverride, boolean allow) {
+        final boolean hasOverride = allow && !mainTabMaterial3;
+        final boolean changed = this.hasGestureSelectedOverride != hasOverride
+                || hasOverride && this.gestureSelectedOverride != gestureSelectedOverride;
         this.gestureSelectedOverride = gestureSelectedOverride;
-        this.hasGestureSelectedOverride = allow && !mainTabMaterial3;
-        invalidate();
+        this.hasGestureSelectedOverride = hasOverride;
+        if (changed) invalidate();
     }
 
     public void setSkipDrawSelector(boolean skipDrawSelector) {
@@ -286,12 +289,18 @@ public class GlassTabView extends FrameLayout implements MainTabsLayout.Tab, Fac
     }
 
     private boolean needUpdateBackupViewColor;
+    private PorterDuffColorFilter tabColorFilter;
+    private int tabFilterColor;
 
     private void updateColors() {
         final int color = ColorUtils.blendARGB(colorDefault, colorSelected, isSelectedAnimator.getFloatValue());
         final int colorText = ColorUtils.blendARGB(colorDefault, colorSelectedText, isSelectedAnimator.getFloatValue());
 
-        final PorterDuffColorFilter filter = new PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN);
+        if (tabColorFilter == null || tabFilterColor != color) {
+            tabFilterColor = color;
+            tabColorFilter = new PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN);
+        }
+        final PorterDuffColorFilter filter = tabColorFilter;
         if (backupImageView != null && needUpdateBackupViewColor) {
             backupImageView.setColorFilter(filter);
             backupImageView.invalidate();
@@ -578,6 +587,7 @@ public class GlassTabView extends FrameLayout implements MainTabsLayout.Tab, Fac
 
     @Override
     public float measureTextWidth(float textSizeDp) {
+        if (textView.getVisibility() != VISIBLE) return 0;
         if (scaledTextPaint == null) {
             scaledTextPaint = new TextPaint(defaultTextPaint);
         }
@@ -605,6 +615,12 @@ public class GlassTabView extends FrameLayout implements MainTabsLayout.Tab, Fac
         CHATS(R.raw.tab_chats, R.drawable.tabs_chats_active_24, R.drawable.tabs_chats_24, -1, -1),
         SETTINGS(R.raw.tab_settings, R.drawable.filled_profile_settings, R.drawable.outline_profile_settings, -1, -1),
         FEED(TabAnimationType.STATIC, R.drawable.ic_feed),
+        NAV_GROUPS(TabAnimationType.STATIC, R.drawable.msg_groups),
+        NAV_CHANNELS(TabAnimationType.STATIC, R.drawable.msg_channel),
+        NAV_SAVED(TabAnimationType.STATIC, R.drawable.msg_saved),
+        NAV_PROFILE(TabAnimationType.STATIC,R.drawable.msg_contact),
+        NAV_MORE(TabAnimationType.STATIC, R.drawable.ic_ab_other),
+        NAV_SEARCH(TabAnimationType.STATIC, R.drawable.outline_header_search),
 
         CHECKLIST(R.raw.tab_checklist, R.raw.tab_checklist_reverse),
         COLORS(R.raw.tab_colors, R.raw.tab_colors_reverse),
@@ -751,6 +767,25 @@ public class GlassTabView extends FrameLayout implements MainTabsLayout.Tab, Fac
 
     public void onPreBind() {
 
+    }
+
+    public void setMainTabsAppearance(boolean compact, int iconDp) {
+        setMainTabsCompact(compact);
+        android.view.View icon=backupImageView!=null?backupImageView:imageView;
+        var lp=(android.widget.FrameLayout.LayoutParams)icon.getLayoutParams();
+        int safeIcon=compact?28:Math.max(18,Math.min(28,app.flexygram.navigation.LiquidNavigationConfig.heightDp()-24-app.flexygram.navigation.LiquidNavigationConfig.labelGapDp()-2*app.flexygram.navigation.LiquidNavigationConfig.contentPaddingDp()));
+        int size=dp(Math.max(18,Math.min(safeIcon,iconDp)));
+        int top=compact?0:dp(3);
+        int gravity=compact?Gravity.CENTER:Gravity.CENTER_HORIZONTAL|Gravity.TOP;
+        if(lp.width!=size||lp.height!=size||lp.topMargin!=top||lp.gravity!=gravity){
+            lp.width=lp.height=size;lp.topMargin=top;lp.gravity=gravity;icon.setLayoutParams(lp);
+        }
+        if(!compact){
+            var text=(android.widget.FrameLayout.LayoutParams)textView.getLayoutParams();
+            int textTop=top+size+dp(app.flexygram.navigation.LiquidNavigationConfig.labelGapDp());
+            if(text.topMargin!=textTop){text.topMargin=textTop;textView.setLayoutParams(text);}
+        }
+        setContentDescription(textView.getText());
     }
 
     public void setMainTabsCompact(boolean compact) {

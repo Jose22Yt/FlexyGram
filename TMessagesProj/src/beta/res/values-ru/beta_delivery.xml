@@ -1,0 +1,4 @@
+<resources>
+  <string name="FlexyAlphaDeliveries">Beta deliveries</string>
+  <string name="FlexyAlphaDeliveryInfo">Beta installs independently from Alpha and requires a new sign-in. Future updates must keep the official package and signing certificate. This preparation does not publish a Beta.</string>
+</resources>

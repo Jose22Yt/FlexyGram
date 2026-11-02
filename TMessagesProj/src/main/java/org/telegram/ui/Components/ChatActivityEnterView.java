@@ -684,6 +684,66 @@ public class ChatActivityEnterView extends FrameLayout implements
     @Nullable
     private ImageView reactionsButton;
     public FrameLayout messageEditTextContainer;
+    private boolean flexyCompactRequested;
+    private boolean flexyCompactLayout;
+    private boolean flexyMenuState;
+    private boolean flexyVoiceBackdropDrawn;
+    public void setFlexyVoiceBackdropDrawn(boolean drawn) {
+        if (flexyVoiceBackdropDrawn == drawn) return;
+        flexyVoiceBackdropDrawn = drawn;
+        // Refresh the child's cached display list only when surface ownership changes.
+        if (audioVideoButtonContainer != null) audioVideoButtonContainer.invalidate();
+    }
+    private int flexyInsetDp, flexyGapDp = 6, flexyTextPaddingDp = 14, flexyPositionDp;
+    private void readFlexyGeometry() {
+        final int level = app.flexygram.composer.FlexyComposerConfig.level();
+        flexyInsetDp = app.flexygram.composer.ComposerStyle.inset(level);
+        flexyGapDp = app.flexygram.composer.FlexyComposerConfig.gap();
+        flexyTextPaddingDp = app.flexygram.composer.ComposerStyle.padding(level);
+        flexyPositionDp = app.flexygram.composer.FlexyComposerConfig.position();
+    }
+    public int getFlexyVerticalOffset() {
+        // Search, message actions and channel overlays share the parent island.
+        return flexyCompactLayout && getVisibility() == VISIBLE && getAlpha() == 1f ? dp(app.flexygram.composer.ComposerStyle.offset(flexyPositionDp)) : 0;
+    }
+    private int getFlexyVerticalReservation() { return flexyCompactLayout ? dp(app.flexygram.composer.ComposerStyle.reserve(flexyPositionDp)) : 0; }
+    public int getFlexyVisualInset() { return dp(flexyInsetDp); }
+
+    private int flexyNativeFieldRight = -1;
+    private int flexyAppliedFieldRight = -1;
+    private final Runnable flexyStudioRefresh = this::refreshFlexyStudioComposer;
+    public void refreshFlexyStudioComposer() {
+        readFlexyGeometry(); checkUi_IslandTotalHeight();
+        flexyCompactRequested = app.flexygram.composer.FlexyComposerConfig.compact();
+        if (messageEditTextContainer != null) messageEditTextContainer.requestLayout(); else requestLayout();
+        if (flexyCompactLayout) { updateFlexyIconStyle(); updateFlexyIconColors(); }
+        if (audioVideoButtonContainer != null) audioVideoButtonContainer.invalidate();
+        invalidate();
+    }
+    private final SharedPreferences.OnSharedPreferenceChangeListener flexyComposerListener = (prefs, key) -> {
+        if (app.flexygram.studio.FlexyStudioStore.deferComposer(flexyStudioRefresh)) return;
+        if (app.flexygram.composer.FlexyComposerConfig.STYLE.equals(key)
+                || app.flexygram.composer.FlexyComposerConfig.POSITION.equals(key)
+                || app.flexygram.composer.FlexyComposerConfig.LEVEL.equals(key)
+                || app.flexygram.composer.FlexyComposerConfig.GAP.equals(key)) {
+            readFlexyGeometry();
+            checkUi_IslandTotalHeight();
+            if (audioVideoButtonContainer != null) audioVideoButtonContainer.invalidate();
+            flexyCompactRequested = app.flexygram.composer.FlexyComposerConfig.compact();
+            // Force the view containing the measure hook even with unchanged specs.
+            if (messageEditTextContainer != null) messageEditTextContainer.requestLayout();
+            else requestLayout();
+            invalidate();
+        } else if (app.flexygram.composer.FlexyComposerConfig.ICONS.equals(key)) {
+            if (flexyCompactLayout) {
+                updateFlexyIconStyle();
+                updateFlexyIconColors();
+            }
+        } else if (app.flexygram.composer.FlexyComposerConfig.GLASS.equals(key)
+                && audioVideoButtonContainer != null) {
+            audioVideoButtonContainer.invalidate();
+        }
+    };
     public FrameLayout textFieldContainer;
     public FrameLayout sendButtonContainer;
     private ImageView sendOutlineView;
@@ -2757,12 +2817,18 @@ public class ChatActivityEnterView extends FrameLayout implements
         FrameLayout frameLayout = messageEditTextContainer = new FrameLayout(context) {
             @Override
             protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+                applyFlexyComposerPresentation(MeasureSpec.getSize(widthMeasureSpec));
                 super.onMeasure(widthMeasureSpec, heightMeasureSpec);
                 final int height = Math.max(dp(44), getMeasuredHeight());
-                if (animatorInputFieldHeight.getFactor() > 0) {
-                    animatorInputFieldHeight.animateTo(height);
-                } else {
-                    animatorInputFieldHeight.forceFactor(height);
+                // FactorAnimator.animateTo() cancels a running animation
+                // BEFORE checking the requested target. Repeated measure passes
+                // during multiline typing must not restart that same animation.
+                if (animatorInputFieldHeight.getToFactor() != height) {
+                    if (animatorInputFieldHeight.getFactor() > 0) {
+                        animatorInputFieldHeight.animateTo(height);
+                    } else {
+                        animatorInputFieldHeight.forceFactor(height);
+                    }
                 }
                 checkUi_TopViewVisibility();
             }
@@ -3345,11 +3411,22 @@ public class ChatActivityEnterView extends FrameLayout implements
                         }
                     }
 
-                    final float r = dpf2(19);
-                    paint.setColor(getThemedColor(Theme.key_chat_messagePanelSend));
-                    final float margin = dpf2(3);
-                    final float height = dpf2(38);
-                    final float width = dpf2(38);
+                    final float r = flexyCompactLayout ? (dp(44) - 2 * dp(flexyInsetDp)) / 2f : dpf2(19);
+                    // Signature compositor: use one restrained, separate native action circle.
+                    // Preserve upstream accent and all native microphone gestures in Classic.
+                    if (flexyCompactLayout) {
+                        final int panel = getThemedColor(Theme.key_chat_messagePanelBackground);
+                        final boolean dark = ColorUtils.calculateLuminance(panel) < 0.4;
+                        paint.setColor(flexyNativeGlassIslandsAvailable()
+                            ? app.flexygram.composer.ComposerStyle.nativeGlassButton(dark)
+                            : app.flexygram.composer.ComposerStyle.surface(dark,
+                                app.flexygram.composer.FlexyComposerConfig.glass()));
+                    } else {
+                        paint.setColor(getThemedColor(Theme.key_chat_messagePanelSend));
+                    }
+                    final float margin = flexyCompactLayout ? dp(flexyInsetDp) : dpf2(3);
+                    final float height = flexyCompactLayout ? dp(44) - 2 * margin : dpf2(38);
+                    final float width = height;
                     backgroundRect.set(
                             getMeasuredWidth() - width - margin,
                             getMeasuredHeight() - height - margin,
@@ -3359,7 +3436,7 @@ public class ChatActivityEnterView extends FrameLayout implements
 
                     canvas.save();
                     canvas.scale(s, s, backgroundRect.centerX(), backgroundRect.centerY());
-                    canvas.drawRoundRect(backgroundRect, r, r, paint);
+                    if (!flexyVoiceBackdropDrawn) canvas.drawRoundRect(backgroundRect, r, r, paint);
                     canvas.restore();
                 }
                 super.dispatchDraw(canvas);
@@ -3726,6 +3803,9 @@ public class ChatActivityEnterView extends FrameLayout implements
         checkChannelRights();
 
         createMessageEditText();
+        readFlexyGeometry();
+        flexyCompactRequested = app.flexygram.composer.FlexyComposerConfig.compact();
+        app.flexygram.composer.FlexyComposerConfig.preferences().registerOnSharedPreferenceChangeListener(flexyComposerListener);
     }
 
     public void setViewParentForEmoji(ViewGroup viewParent) {
@@ -4896,6 +4976,22 @@ public class ChatActivityEnterView extends FrameLayout implements
     Paint backgroundPaint = new Paint();
     private float composeShadowAlpha = 1f;
     private Rect blurBounds = new Rect();
+    private boolean flexyNativeGlassBackdropDrawn;
+    public void setFlexyNativeGlassBackdropDrawn(boolean drawn) {
+        flexyNativeGlassBackdropDrawn = drawn;
+    }
+    /** Policy changes must refresh retained child display lists, not just the parent backdrop. */
+    public void invalidateNativeGlassColors() {
+        if (sendButton != null) sendButton.invalidate();
+        if (audioVideoButtonContainer != null) audioVideoButtonContainer.invalidate();
+        invalidate();
+    }
+
+    public boolean flexyNativeGlassIslandsAvailable() {
+        return org.telegram.messenger.LiteMode.isEnabled(org.telegram.messenger.LiteMode.FLAG_LIQUID_GLASS)
+                && isHardwareAccelerated() && SharedConfig.chatBlurEnabled()
+                && isFlexyCompactPresentation();
+    }
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -4913,10 +5009,17 @@ public class ChatActivityEnterView extends FrameLayout implements
         }
         int bottom = top + Theme.chat_composeShadowDrawable.getIntrinsicHeight();
 
-        if (withComposeShadowDrawable) {
+        final boolean flexyIslands = flexyNativeGlassBackdropDrawn && flexyNativeGlassIslandsAvailable();
+        // Do not first paint an opaque full-width native bar behind translucent islands;
+        // otherwise even a real native blur still looks solid on screen.
+        if (withComposeShadowDrawable && !flexyIslands) {
             Theme.chat_composeShadowDrawable.setAlpha((int) (composeShadowAlpha * 0xFF));
             Theme.chat_composeShadowDrawable.setBounds(0, top, getMeasuredWidth(), bottom);
             Theme.chat_composeShadowDrawable.draw(canvas);
+        }
+
+        if (flexyIslands) {
+            return; // The native parent has already drawn the shared clipped blur3 surface.
         }
 
         if (allowBlur) {
@@ -4930,6 +5033,7 @@ public class ChatActivityEnterView extends FrameLayout implements
         } else {
             canvas.drawRect(0, bottom, getWidth(), getHeight(), getThemedPaint(Theme.key_paint_chatComposeBackground));
         }
+
     }
 
     public float getVisualHeight() {
@@ -7539,6 +7643,7 @@ public class ChatActivityEnterView extends FrameLayout implements
     }
 
     public void onDestroy() {
+        app.flexygram.composer.FlexyComposerConfig.preferences().unregisterOnSharedPreferenceChangeListener(flexyComposerListener);
         if (audioTimelineView != null) {
             audioTimelineView.destroy();
         }
@@ -9236,7 +9341,7 @@ public class ChatActivityEnterView extends FrameLayout implements
                             if (sideButtons != null && (!NekoConfig.useChatAttachMediaMenu.Bool() || isStories)) {
                                 sideButtons.showButton(ChatActivitySideControlsButtonsLayout.BUTTON_ATTACH, false, true);
                             }
-                            if (attachButton != null && (!NekoConfig.useChatAttachMediaMenu.Bool() || isStories)) {
+                            if (attachButton != null && !keepFlexyAttachment() && (!NekoConfig.useChatAttachMediaMenu.Bool() || isStories)) {
                                 animators.add(ObjectAnimator.ofFloat(attachButton, View.ALPHA, attachButtonAlpha = 0.0f));
                                 animators.add(ObjectAnimator.ofFloat(attachButton, View.SCALE_X, 0.5f));
                                 animators.add(ObjectAnimator.ofFloat(attachButton, View.SCALE_Y, 0.5f));
@@ -9379,7 +9484,7 @@ public class ChatActivityEnterView extends FrameLayout implements
                                 if (sideButtons != null) {
                                     sideButtons.showButton(ChatActivitySideControlsButtonsLayout.BUTTON_ATTACH, false, false);
                                 }
-                                if (attachButton != null) {
+                                if (attachButton != null && !keepFlexyAttachment()) {
                                     attachButton.setAlpha(attachButtonAlpha = 0.0f);
                                     attachButton.setScaleX(0.5f);
                                     attachButton.setScaleY(0.5f);
@@ -9418,7 +9523,7 @@ public class ChatActivityEnterView extends FrameLayout implements
             } else {
                 color = getThemedColor(Theme.key_chat_messagePanelSend);
             }
-            boolean captionNearAttach = messageEditText != null && (!TextUtils.isEmpty(messageEditText.getCaption()) || messageEditText.isNearRightCaption(dp(DEFAULT_HEIGHT))) || LocaleController.isRTL;
+            boolean captionNearAttach = !keepFlexyAttachment() && messageEditText != null && (!TextUtils.isEmpty(messageEditText.getCaption()) || messageEditText.isNearRightCaption(dp(DEFAULT_HEIGHT))) || !keepFlexyAttachment() && LocaleController.isRTL;
 
             if (color != sendButtonBackgroundColor) {
                 sendButtonBackgroundColor = color;
@@ -9457,7 +9562,7 @@ public class ChatActivityEnterView extends FrameLayout implements
                                     animators.add(ObjectAnimator.ofFloat(attachButton, View.SCALE_X, captionNearAttach ? 0.5f : 1.0f));
                                     animators.add(ObjectAnimator.ofFloat(attachButton, View.SCALE_Y, captionNearAttach ? 0.5f : 1.0f));
                                 }
-                            } else if (attachButton != null && (!NekoConfig.useChatAttachMediaMenu.Bool() || isStories)) {
+                            } else if (attachButton != null && !keepFlexyAttachment() && (!NekoConfig.useChatAttachMediaMenu.Bool() || isStories)) {
                                 animators.add(ObjectAnimator.ofFloat(attachButton, View.ALPHA, attachButtonAlpha = 0.0f));
                                 animators.add(ObjectAnimator.ofFloat(attachButton, View.SCALE_X, 0.5f));
                                 animators.add(ObjectAnimator.ofFloat(attachButton, View.SCALE_Y, 0.5f));
@@ -9637,7 +9742,7 @@ public class ChatActivityEnterView extends FrameLayout implements
                                     attachButton.setScaleX(captionNearAttach ? 0.5f : 1.0f);
                                     attachButton.setScaleY(captionNearAttach ? 0.5f : 1.0f);
                                 }
-                            } else if (attachButton != null) {
+                            } else if (attachButton != null && !keepFlexyAttachment()) {
                                 attachButton.setAlpha(attachButtonAlpha = 0.0f);
                                 attachButton.setScaleX(0.5f);
                                 attachButton.setScaleY(0.5f);
@@ -9701,7 +9806,7 @@ public class ChatActivityEnterView extends FrameLayout implements
                     if (sideButtons != null && (!NekoConfig.useChatAttachMediaMenu.Bool() || isStories)) {
                         sideButtons.showButton(ChatActivitySideControlsButtonsLayout.BUTTON_ATTACH, false, true);
                     }
-                    if (attachButton != null && (!NekoConfig.useChatAttachMediaMenu.Bool() || isStories)) {
+                    if (attachButton != null && !keepFlexyAttachment() && (!NekoConfig.useChatAttachMediaMenu.Bool() || isStories)) {
                         if (attachButtonAnimator != null) {
                             attachButtonAnimator.cancel();
                             attachButtonAnimator = null;
@@ -9886,7 +9991,7 @@ public class ChatActivityEnterView extends FrameLayout implements
                     if (sideButtons != null && (!NekoConfig.useChatAttachMediaMenu.Bool() || isStories)) {
                         sideButtons.showButton(ChatActivitySideControlsButtonsLayout.BUTTON_ATTACH, false, true);
                     }
-                    if (attachButton != null && (!NekoConfig.useChatAttachMediaMenu.Bool() || isStories)) {
+                    if (attachButton != null && !keepFlexyAttachment() && (!NekoConfig.useChatAttachMediaMenu.Bool() || isStories)) {
                         if (attachButtonAnimator != null) {
                             attachButtonAnimator.cancel();
                             attachButtonAnimator = null;
@@ -10118,6 +10223,10 @@ public class ChatActivityEnterView extends FrameLayout implements
         if (doneButton != null && doneButton.getVisibility() == VISIBLE) {
             layoutParams.rightMargin = Math.max(layoutParams.rightMargin, Math.max(0, doneButton.width() - dp(DEFAULT_HEIGHT)));
         }
+        flexyNativeFieldRight = layoutParams.rightMargin;
+        if (flexyCompactLayout) layoutParams.rightMargin = app.flexygram.composer.ComposerGeometry.textEnd(
+            layoutParams.rightMargin, flexyCompactTextEnd(), true);
+        flexyAppliedFieldRight = layoutParams.rightMargin;
         if (oldRightMargin != layoutParams.rightMargin) {
             messageEditText.setLayoutParams(layoutParams);
         }
@@ -11789,6 +11898,7 @@ public class ChatActivityEnterView extends FrameLayout implements
         deleteRichDraftButton.setColorFilter(new PorterDuffColorFilter(getThemedColor(Theme.key_glass_defaultIcon), PorterDuff.Mode.SRC_IN));
         deleteRichDraftButton.setBackground(Theme.createInsetRoundRectDrawable(getThemedColor(Theme.key_listSelector), dp(19), dp(1), dp(3)));
         sendOutlineView.setColorFilter(getThemedColor(Theme.key_telegram_color), PorterDuff.Mode.SRC_IN);
+        if (flexyCompactLayout) updateFlexyIconColors();
     }
 
     private void updateAudioVideoSendButtonColor() {
@@ -11798,7 +11908,10 @@ public class ChatActivityEnterView extends FrameLayout implements
         boolean isMenuState = isAudioVideoSendButtonInMenuState();
         int color = audioVideoButtonContainerForbidden || isMenuState
                 ? getThemedColor(Theme.key_glass_defaultIcon)
-                : Color.WHITE;
+                : flexyCompactLayout
+                    ? app.flexygram.composer.ComposerStyle.icon(ColorUtils.calculateLuminance(
+                        getThemedColor(Theme.key_chat_messagePanelBackground)) < 0.4)
+                    : Color.WHITE;
         setIconColorFilter(audioVideoSendButton, new PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN));
         audioVideoButtonContainer.setBackground(isMenuState
                 ? Theme.createSelectorDrawable(getThemedColor(Theme.key_listSelector))
@@ -16215,7 +16328,8 @@ public class ChatActivityEnterView extends FrameLayout implements
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int wasHeight = textFieldContainer.getMeasuredHeight();
-        if (botCommandsMenuButton != null && botCommandsMenuButton.getTag() != null) {
+        updateFlexyBotRow();
+        if (!flexyBotRow && botCommandsMenuButton != null && botCommandsMenuButton.getTag() != null) {
             botCommandsMenuButton.measure(widthMeasureSpec, heightMeasureSpec);
             ((MarginLayoutParams) emojiButton.getLayoutParams()).leftMargin = dp(10) + (botCommandsMenuButton == null ? 0 : botCommandsMenuButton.getMeasuredWidth());
             if (deleteRichDraftButton != null) {
@@ -16494,15 +16608,217 @@ public class ChatActivityEnterView extends FrameLayout implements
         }
     }
 
+    /** The compact attachment occupies its own left slot, independent of Send. */
+    private boolean keepFlexyAttachment() {
+        return flexyCompactLayout && !isStories && !recordingAudioVideo && recordInterfaceState == 0
+            && editingMessageObject == null && !richDraftActive;
+    }
+
     private boolean isSendButtonEnabled() {
         return sendButtonEnabled && streamingState != BotForumHelper.SteamingSendButtonState.BLOCKING;
     }
 
     private void updateAttachButtonTranslationX() {
         if (attachButton == null) return;
-        attachButton.setTranslationX(attachLayoutPaddingTranslationX + attachLayoutTranslationX + (sendButton != null ? (
+        final float nativeTranslation = nativeAttachTranslationX();
+        attachButton.setTranslationX(flexyCompactLayout ? 0 : nativeTranslation);
+        if (flexyCompactLayout) emojiButton.setTranslationX(nativeTranslation);
+    }
+
+    private float nativeAttachTranslationX() {
+        return attachLayoutPaddingTranslationX + attachLayoutTranslationX + (sendButton != null ? (
             -Math.max(0, sendButton.width() - dp(DEFAULT_HEIGHT + 12)) * sendButton.getAlpha()
-        ) : 0));
+        ) : 0);
+    }
+
+    private int flexyCompactTextEnd() {
+        // Reserve the stable native text slot. Animated sender alpha and
+        // translation must NOT alter EditText margins on every animation frame.
+        // updateFieldRight() already accounts for wider special send actions.
+        return dp(app.flexygram.composer.ComposerGeometry.TEXT_END_SLOT);
+    }
+
+    private boolean flexyBotRow;
+    private int getFlexyBotRowHeight(){return flexyBotRow?dp(44):0;}
+    private boolean wantsFlexyBotRow() {
+        return flexyCompactRequested && isChat && parentFragment!=null && !isStories
+            && botCommandsMenuButton!=null && botMenuButtonType!=BotMenuButtonType.NO_BUTTON && dialog_id>0;
+    }
+    /** Keep the real bot menu/web-app action on a secondary row, not in the text slot. */
+    private void updateFlexyBotRow() {
+        boolean row=wantsFlexyBotRow();
+        if(row==flexyBotRow)return;
+        flexyBotRow=row;
+        if(botCommandsMenuButton!=null){
+            ViewGroup parent=(ViewGroup)botCommandsMenuButton.getParent();
+            if(parent!=null)parent.removeView(botCommandsMenuButton);
+            if(row)textFieldContainer.addView(botCommandsMenuButton,LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT,32,Gravity.TOP|Gravity.LEFT,8,6,8,6));
+            else messageEditTextContainer.addView(botCommandsMenuButton,LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT,32,Gravity.BOTTOM|Gravity.LEFT,8,6,8,6));
+        }
+        ((MarginLayoutParams)messageEditTextContainer.getLayoutParams()).topMargin=row?dp(44):0;
+    }
+
+    private boolean hasFlexySpecialControls() {
+        return !isChat || parentFragment == null || isStories
+            || senderSelectView != null && senderSelectView.getVisibility() == VISIBLE
+            || !wantsFlexyBotRow() && botCommandsMenuButton != null && (botCommandsMenuButton.getTag() != null || botCommandsMenuButton.getVisibility() == VISIBLE)
+            || botWebViewButton != null && botWebViewButton.getVisibility() == VISIBLE
+            // Use the logical state rather than the 420ms transition's
+            // temporarily VISIBLE view, which can repeatedly switch layouts.
+            || aiButton != null && shownAiButton
+            || !wantsFlexyBotRow() && ((MarginLayoutParams) emojiButton.getLayoutParams()).leftMargin > dp(3);
+    }
+
+    public int getFlexyHorizontalMargin(int width, int nativeMargin) {
+        if (!flexyCompactRequested || emojiButton == null || hasFlexySpecialControls()) return nativeMargin;
+        return app.flexygram.composer.ComposerStyle.sideMargin(width, AndroidUtilities.density, nativeMargin);
+    }
+
+    /** Mutates only existing presentation params during the native measure pass. */
+    private void applyFlexyComposerPresentation(int width) {
+        if (!flexyCompactRequested && !flexyCompactLayout) return;
+        final boolean specialControls = hasFlexySpecialControls();
+        // Layout eligibility depends on native available width and
+        // stable feature state, never per-frame send-button translation.
+        // Paid expanded send buttons stay on native layout for correct space.
+        final boolean expandedPaidSend = sendButton != null
+            && sendButton.starsPrice > 0 && sendButton.isOpen();
+        final boolean compact = flexyCompactRequested && app.flexygram.composer.ComposerGeometry.supportsCompact(
+            width / AndroidUtilities.density, specialControls || expandedPaidSend);
+        if (!compact && !flexyCompactLayout) return;
+        final boolean wasCompact = flexyCompactLayout;
+        flexyCompactLayout = compact;
+        FrameLayout.LayoutParams attach = (FrameLayout.LayoutParams) attachButton.getLayoutParams();
+        attach.gravity = Gravity.BOTTOM | (compact ? Gravity.LEFT : Gravity.RIGHT);
+        FrameLayout.LayoutParams emoji = (FrameLayout.LayoutParams) emojiButton.getLayoutParams();
+        emoji.gravity = Gravity.BOTTOM | (compact ? Gravity.RIGHT : Gravity.LEFT);
+        // The outer native onMeasure has already reserved sender/bot controls.
+        // Preserve that value when falling back, rather than restoring a constant.
+        if (compact) emoji.leftMargin = 0;
+        emoji.rightMargin = compact ? dp(7) : 0;
+        if (deleteRichDraftButton != null) {
+            FrameLayout.LayoutParams delete = (FrameLayout.LayoutParams) deleteRichDraftButton.getLayoutParams();
+            delete.gravity = emoji.gravity;
+            if (compact) delete.leftMargin = 0;
+            delete.rightMargin = emoji.rightMargin;
+        }
+        if (messageEditText != null) {
+            messageEditText.setStaticHintTypeface(compact ? android.graphics.Typeface.DEFAULT : null);
+            FrameLayout.LayoutParams text = (FrameLayout.LayoutParams) messageEditText.getLayoutParams();
+            if (compact) text.leftMargin = dp(app.flexygram.composer.ComposerGeometry.TOUCH_SLOT
+                + flexyGapDp - flexyInsetDp + flexyTextPaddingDp);
+            // Editing can directly change this margin without updateFieldRight.
+            if (flexyNativeFieldRight < 0 || text.rightMargin != flexyAppliedFieldRight) flexyNativeFieldRight = text.rightMargin;
+            text.rightMargin = app.flexygram.composer.ComposerGeometry.textEnd(flexyNativeFieldRight,
+                flexyCompactTextEnd(), compact);
+            flexyAppliedFieldRight = text.rightMargin;
+        }
+        if (sendButton != null) sendButton.setCompactVisualInset(compact ? dp(flexyInsetDp) : -1);
+        if (compact != wasCompact && messageEditText != null) {
+            messageEditText.setTextSize(compact ? TypedValue.COMPLEX_UNIT_SP : TypedValue.COMPLEX_UNIT_DIP, compact ? 16 : 18);
+        }
+        if (compact != wasCompact || compact && flexyMenuState != isInInput) {
+            flexyMenuState = isInInput;
+            // Change artwork only; reference/plus variants never change the action.
+            // Keep Exteraless' attachment click/gesture handler unchanged.
+            updateFlexyIconStyle();
+            updateFlexyIconColors();
+            updateAudioVideoSendButtonColor();
+            audioVideoButtonContainer.invalidate();
+        }
+        if (wasCompact && !compact) emojiButton.setTranslationX(0);
+        updateAttachButtonTranslationX();
+    }
+
+    private void updateFlexyIconStyle() {
+        boolean reference = app.flexygram.composer.FlexyComposerConfig.referenceIcons();
+        attachButton.setImageResource(isInInput ? R.drawable.ic_ab_other : flexyCompactLayout
+            ? (reference ? R.drawable.flexy_composer_clip : R.drawable.flexy_composer_add) : R.drawable.msg_input_attach2);
+        setFlexyIconStyle(emojiButton, flexyCompactLayout, reference);
+        setFlexyIconStyle(audioVideoSendButton, flexyCompactLayout, reference);
+    }
+
+    private static void setFlexyIconStyle(View view, boolean compact, boolean reference) {
+        if (view instanceof ChatActivityEnterViewAnimatedIconView)
+            ((ChatActivityEnterViewAnimatedIconView) view).setCompactIcons(compact, reference);
+        else if (view instanceof ChatActivityEnterViewStaticIconView)
+            ((ChatActivityEnterViewStaticIconView) view).setCompactIcons(compact, reference);
+    }
+
+    private void updateFlexyIconColors() {
+        int color = flexyCompactLayout ? app.flexygram.composer.ComposerStyle.icon(
+            ColorUtils.calculateLuminance(getThemedColor(Theme.key_chat_messagePanelBackground)) < 0.4)
+            : getThemedColor(Theme.key_glass_defaultIcon);
+        if (attachButton != null) attachButton.setColorFilter(color, flexyCompactLayout ? PorterDuff.Mode.SRC_IN : PorterDuff.Mode.MULTIPLY);
+        int innerColor = flexyCompactLayout ? app.flexygram.composer.ComposerStyle.innerIcon(
+            ColorUtils.calculateLuminance(getThemedColor(Theme.key_chat_messagePanelBackground)) < 0.4)
+            : getThemedColor(Theme.key_glass_defaultIcon);
+        if (emojiButton != null) setIconColorFilter(emojiButton, new PorterDuffColorFilter(innerColor, PorterDuff.Mode.SRC_IN));
+        if (messageEditText != null) messageEditText.setHintColor(flexyCompactLayout ? innerColor
+            : getThemedColor(Theme.key_chat_messagePanelHint));
+    }
+
+    /** Native recording/previews keep their full background; their layout is untouched. */
+    public boolean isFlexyCompactPresentation() {
+        return flexyCompactLayout && getVisibility() == VISIBLE && getAlpha() == 1f && !recordingAudioVideo
+            && recordInterfaceState == 0 && (recordedAudioPanel == null || recordedAudioPanel.getVisibility() != VISIBLE)
+            && (topView == null || topView.getVisibility() != VISIBLE)
+            && !richDraftActive;
+    }
+
+    /** Shared glass only for the settled native microphone; transitions keep native paint. */
+    public boolean getFlexyVoiceBounds(RectF out) {
+        if (!isFlexyCompactPresentation() || audioVideoButtonContainer == null
+                || audioVideoButtonContainer.getVisibility() != VISIBLE || audioVideoButtonContainer.getAlpha() != 1f
+                || audioVideoButtonContainer.getScaleX() != 1f || audioVideoButtonContainer.getScaleY() != 1f
+                || sendButtonContainer.getScaleX() != 1f || sendButtonContainer.getScaleY() != 1f
+                || sendButtonContainer.getAlpha() != 1f
+                || expandStickersButton != null && expandStickersButton.getAlpha() > 0) return false;
+        final float x = textFieldContainer.getX() + sendButtonContainer.getX() + audioVideoButtonContainer.getX();
+        final float y = textFieldContainer.getY() + sendButtonContainer.getY() + audioVideoButtonContainer.getY();
+        final int inset = dp(flexyInsetDp);
+        out.set(x + inset, y + inset, x + audioVideoButtonContainer.getWidth() - inset,
+            y + audioVideoButtonContainer.getHeight() - inset);
+        return true;
+    }
+
+    /** Native settled SendButton frame; never sample mid-transition or expanded paid UI. */
+    public boolean getFlexySendBounds(RectF out) {
+        if (!isFlexyCompactPresentation() || sendButton == null || sendButtonContainer == null
+                || sendButton.getVisibility() != VISIBLE || sendButton.getAlpha() != 1f
+                || sendButton.getScaleX() != 1f || sendButton.getScaleY() != 1f
+                || sendButtonContainer.getScaleX() != 1f || sendButtonContainer.getScaleY() != 1f
+                || sendButtonContainer.getAlpha() != 1f || sendButton.isOpen()) return false;
+        final float x = textFieldContainer.getX() + sendButtonContainer.getX()
+                + sendButton.getX() + sendButton.getWidth() - dp(44);
+        final float y = textFieldContainer.getY() + sendButtonContainer.getY() + sendButton.getY();
+        final int inset = dp(flexyInsetDp);
+        out.set(x + inset, y + inset, x + dp(44) - inset, y + dp(44) - inset);
+        return out.width() > 0 && out.height() > 0;
+    }
+
+    public boolean getFlexyAttachmentBounds(RectF out) {
+        if (attachButton == null || attachButton.getVisibility() != VISIBLE || attachButton.getAlpha() <= 0) return false;
+        final float x = textFieldContainer.getX() + messageEditTextContainer.getX() + attachButton.getX();
+        final float y = textFieldContainer.getY() + messageEditTextContainer.getY() + attachButton.getY();
+        final int inset = dp(flexyInsetDp);
+        out.set(x + inset, y + inset, x + attachButton.getWidth() - inset, y + attachButton.getHeight() - inset);
+        return true;
+    }
+
+    /** Bounds in this view's coordinates, after native layout/IME translations. */
+    public boolean getFlexyTextPillBounds(RectF out) {
+        if (messageEditTextContainer == null || messageEditTextContainer.getWidth() <= 0) return false;
+        final float x = textFieldContainer.getX() + messageEditTextContainer.getX();
+        final float y = textFieldContainer.getY() + messageEditTextContainer.getY();
+        out.set(app.flexygram.composer.ComposerGeometry.pillLeft(x,
+                dp(app.flexygram.composer.ComposerGeometry.TOUCH_SLOT) - dp(flexyInsetDp), dp(flexyGapDp)),
+            y + dp(flexyInsetDp), app.flexygram.composer.ComposerGeometry.pillRight(
+                // Draw text pill against the same stable layout bounds.
+                // The send button continues using its native animated transform.
+                x + messageEditTextContainer.getWidth(), dp(flexyGapDp) - dp(flexyInsetDp), 0),
+            y + messageEditTextContainer.getHeight() - dp(flexyInsetDp));
+        return out.width() > 0 && out.height() > 0;
     }
 
     private void updateEmojiButtonParams() {
@@ -16668,9 +16984,13 @@ public class ChatActivityEnterView extends FrameLayout implements
         public void setResourceId(int resId) {
             if (this.resId != resId) {
                 this.resId = resId;
-                drawable = getContext().getResources().getDrawable(resId).mutate();
-                inactiveDrawable = getContext().getResources().getDrawable(resId).mutate();
-                drawableInverse = getContext().getResources().getDrawable(resId).mutate();
+                if (compactVisualInset >= 0) {
+                    reloadCompactSendIcon();
+                } else {
+                    drawable = getContext().getResources().getDrawable(resId).mutate();
+                    inactiveDrawable = getContext().getResources().getDrawable(resId).mutate();
+                    drawableInverse = getContext().getResources().getDrawable(resId).mutate();
+                }
                 invalidate();
             }
         }
@@ -16867,7 +17187,7 @@ public class ChatActivityEnterView extends FrameLayout implements
             updateColors();
             checkBackgroundRect();
             if (isNewDesignSendButton) {
-                canvas.drawRoundRect(backgroundRect, dp(RADIUS), dp(RADIUS), backgroundPaint);
+                canvas.drawRoundRect(backgroundRect, compactVisualInset >= 0 ? backgroundRect.height() / 2f : dp(RADIUS), compactVisualInset >= 0 ? backgroundRect.height() / 2f : dp(RADIUS), backgroundPaint);
             }
 
             final boolean inactive = isInactive();
@@ -17141,7 +17461,11 @@ public class ChatActivityEnterView extends FrameLayout implements
                 drawableInverse.setColorFilter(new PorterDuffColorFilter(Theme.getColor(Theme.key_chat_messagePanelVoicePressed, resourcesProvider), PorterDuff.Mode.SRC_IN));
             }
             if (isNewDesignSendButton) {
-                backgroundPaint.setColor(Theme.getColor(Theme.key_chat_messagePanelSend, resourcesProvider));
+                final int sendFill = Theme.getColor(Theme.key_chat_messagePanelSend, resourcesProvider);
+                backgroundPaint.setColor(compactVisualInset >= 0
+                        && org.telegram.messenger.LiteMode.isEnabled(org.telegram.messenger.LiteMode.FLAG_LIQUID_GLASS)
+                        && SharedConfig.chatBlurEnabled() && isHardwareAccelerated()
+                        ? app.flexygram.composer.ComposerStyle.nativeGlassTint(sendFill) : sendFill);
             } else if (shouldDrawBackground()) {
                 backgroundPaint.setColor(getFillColor());
             } else {
@@ -17205,9 +17529,27 @@ public class ChatActivityEnterView extends FrameLayout implements
         private final RectF backgroundRect = new RectF();
         private static final int RADIUS = 19;
 
+        private int compactVisualInset = -1;
+        public void setCompactVisualInset(int inset) {
+            if (compactVisualInset == inset) return;
+            boolean changedStyle = (compactVisualInset >= 0) != (inset >= 0);
+            compactVisualInset = inset;
+            if (changedStyle) reloadCompactSendIcon();
+            invalidate();
+        }
+        private void reloadCompactSendIcon() {
+            int resource = compactVisualInset >= 0 && resId == R.drawable.send_plane_24
+                ? R.drawable.flexy_composer_send : resId;
+            drawable = getContext().getResources().getDrawable(resource).mutate();
+            inactiveDrawable = getContext().getResources().getDrawable(resource).mutate();
+            drawableInverse = getContext().getResources().getDrawable(resource).mutate();
+            // updateColors caches by color, so invalidate the cache after replacing artwork.
+            drawableColor = 0;
+            updateColors();
+        }
         private void checkBackgroundRect() {
-            final float margin = dpf2(3);
-            final float height = dpf2(38);
+            final float margin = compactVisualInset >= 0 ? compactVisualInset : dpf2(3);
+            final float height = compactVisualInset >= 0 ? dp(44) - 2 * margin : dpf2(38);
             final float width = lerp(
                 Math.max(height, dpf2(10 + 10) + priceText.getCurrentWidth()),
                 height, sameWidthFactor);
@@ -17363,7 +17705,10 @@ public class ChatActivityEnterView extends FrameLayout implements
             (animatorTopViewVisibility.getValue() ? 1 : 0):
             animatorTopViewVisibility.getFloatValue();
 
-        return fieldHeight + (topView != null ? topView.getMeasuredHeight() : 0) * topViewVisibility;
+        // Reserve raised islands through the existing chat-list padding callback.
+        // Negative positions retain the native reservation, leaving extra clearance.
+        return fieldHeight + (topView != null ? topView.getMeasuredHeight() : 0) * topViewVisibility
+            + getFlexyVerticalReservation() + getFlexyBotRowHeight();
     }
 
 

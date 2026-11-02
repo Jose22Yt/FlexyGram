@@ -344,6 +344,8 @@ public class SizeNotifierFrameLayout extends FrameLayout implements Theme.Colora
             if (themeAnimationValue != 1f) {
                 backgroundView.invalidate();
             }
+            // Snapshot the native wallpaper mapping before messages draw, including its crop/insets.
+            onBackgroundDrawn(backgroundDrawable, backgroundMotion || oldBackgroundDrawable != null || themeAnimationValue != 1f);
         }
 
         @Override
@@ -352,6 +354,8 @@ public class SizeNotifierFrameLayout extends FrameLayout implements Theme.Colora
             onBackgroundViewInvalidate();
         }
     }
+
+    protected void onBackgroundDrawn(Drawable drawable, boolean moving) { }
 
     protected void onBackgroundViewInvalidate() {
 

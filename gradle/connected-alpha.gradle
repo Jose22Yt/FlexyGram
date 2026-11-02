@@ -1,0 +1,38 @@
+// Private configuration is validated before any APK is assembled.
+def privateValue = { String name ->
+    def p = new Properties()
+    def local = rootProject.file('local.properties')
+    if (System.getenv('LOCAL_PROPERTIES')) {
+        p.load(new ByteArrayInputStream(Base64.decoder.decode(System.getenv('LOCAL_PROPERTIES'))))
+    } else if (local.exists()) {
+        local.withInputStream { p.load(it) }
+    }
+    p.getProperty(name) ?: System.getenv(name)
+}
+def validateAlpha = tasks.register('validateConnectedAlphaConfiguration') {
+    doLast {
+        def id = privateValue('TELEGRAM_APP_ID')
+        def hash = privateValue('TELEGRAM_APP_HASH')
+        if (!(id ==~ /[1-9][0-9]{0,9}/) || id.toLong() > Integer.MAX_VALUE || id in ['4', '6', '2040'] || !(hash ==~ /[a-fA-F0-9]{32}/)) {
+            throw new GradleException('Configure your authorized TELEGRAM_APP_ID and TELEGRAM_APP_HASH privately in local.properties or environment; inherited/sample IDs are rejected.')
+        }
+        if ((System.getenv('NATIVE_TARGET') ?: '') != 'arm64-v8a') {
+            throw new GradleException('Connected Alpha requires NATIVE_TARGET=arm64-v8a; SKIP and multi-ABI builds are not accepted.')
+        }
+        ['ALPHA_STORE_PASSWORD', 'ALPHA_KEY_ALIAS', 'ALPHA_KEY_PASSWORD'].each { name ->
+            if (!privateValue(name)) throw new GradleException('Missing private signing configuration: ' + name)
+        }
+        if (!rootProject.file('config/connected-alpha-test.keystore').isFile()) {
+            throw new GradleException('Missing authorized config/connected-alpha-test.keystore; no signing fallback is allowed.')
+        }
+        def google = file('src/connectedAlpha/google-services.json')
+        if (!google.isFile()) throw new GradleException('Supply your own Firebase Android config in src/connectedAlpha/google-services.json.')
+        def config = new groovy.json.JsonSlurper().parse(google)
+        if (!config.client.any { it.client_info?.android_client_info?.package_name == 'io.github.jose22yt.flexygram.alpha' }) {
+            throw new GradleException('Firebase config must include the independent Alpha package.')
+        }
+    }
+}
+tasks.configureEach { task ->
+    if (task.name == 'preConnectedAlphaBuild') task.dependsOn(validateAlpha)
+}

@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="MemberLensInteraction">Сообщения и взаимодействие</string>
+  <string name="MemberLensSetting">Быстрый фильтр по участнику</string>
+  <string name="MemberLensSettingInfo">Просмотр сообщений участника в группе</string>
+  <string name="MemberLensAction">Посмотреть сообщения участника</string>
+  <string name="MemberLensSubtitle">Сообщения участника</string>
+  <string name="MemberLensEmpty">Сообщения участника не найдены</string>
+  <string name="MemberLensError">Не удалось загрузить сообщения. Нажмите, чтобы повторить.</string>
+  <string name="MemberLensGoTo">Перейти к исходному сообщению</string>
+</resources>

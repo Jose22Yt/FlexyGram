@@ -5,6 +5,7 @@ import android.graphics.ColorFilter;
 import android.graphics.Path;
 import android.graphics.PixelFormat;
 import android.graphics.RectF;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 
 import androidx.annotation.NonNull;
@@ -52,6 +53,8 @@ public class ClipRoundedDrawable extends Drawable {
     }
 
     private Path path;
+    private final Rect pathBounds = new Rect();
+    private boolean pathDirty = true;
     private RectF tempBounds = new RectF();
     private RectF padding = new RectF();
     private boolean hasRadius = false;
@@ -61,6 +64,7 @@ public class ClipRoundedDrawable extends Drawable {
         radii[0] = radii[1] = radii[2] = radii[3] =
         radii[4] = radii[5] = radii[6] = radii[7] = Math.max(0, r);
         hasRadius = r > 0;
+        pathDirty = true;
         updatePath();
         return this;
     }
@@ -69,6 +73,7 @@ public class ClipRoundedDrawable extends Drawable {
         radii[0] = radii[2] = radii[4] = radii[6] = Math.max(0, rx);
         radii[1] = radii[3] = radii[5] = radii[7] = Math.max(0, ry);
         hasRadius = rx > 0 || ry > 0;
+        pathDirty = true;
         updatePath();
         return this;
     }
@@ -79,12 +84,14 @@ public class ClipRoundedDrawable extends Drawable {
         radii[4] = radii[5] = Math.max(0, bottomRight);
         radii[6] = radii[7] = Math.max(0, bottomLeft);
         hasRadius = topLeft > 0 || topRight > 0 || bottomRight > 0 || bottomLeft > 0;
+        pathDirty = true;
         updatePath();
         return this;
     }
 
     public ClipRoundedDrawable setPadding(float left, float top, float right, float bottom) {
         padding.set(left, top, right, bottom);
+        pathDirty = true;
         updatePath();
         return this;
     }
@@ -108,6 +115,7 @@ public class ClipRoundedDrawable extends Drawable {
                 break;
             }
         }
+        pathDirty = true;
         updatePath();
     }
 
@@ -115,17 +123,23 @@ public class ClipRoundedDrawable extends Drawable {
         if (!hasRadius) {
             return;
         }
+        final Rect bounds = getBounds();
+        if (path != null && !pathDirty && pathBounds.equals(bounds)) {
+            return;
+        }
         if (path == null) {
             path = new Path();
         } else {
             path.rewind();
         }
-        tempBounds.set(getBounds());
+        tempBounds.set(bounds);
         tempBounds.left += padding.left;
         tempBounds.top += padding.top;
         tempBounds.right -= padding.right;
         tempBounds.bottom -= padding.bottom;
         path.addRoundRect(tempBounds, radii, Path.Direction.CW);
+        pathBounds.set(bounds);
+        pathDirty = false;
     }
 
     @Override

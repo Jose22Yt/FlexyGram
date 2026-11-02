@@ -23,9 +23,13 @@ public class Theme {
  public static int getColor(int key, ResourcesProvider p) { return p!=null && p.isDark() ? 0xFF102030 : -1; }
  public static int multAlpha(int color, float alpha) { return (color & 0xFFFFFF) | (Math.round((color>>>24)*alpha)<<24); }
 }''',
-        "app/exteraless/appearance/AppearanceConfig.java": '''package app.exteraless.appearance;
-public class AppearanceConfig {
+        "app/exteraless/appearance/UniversalGlassConfig.java": '''package app.exteraless.appearance;
+public class UniversalGlassConfig {
  public static class Item { public int value; public Item(int v) {value=v;} public int Int(){return value;} public boolean Bool(){return value!=0;} }
+ public static boolean enabled(){return universalGlass.Bool();}
+ public static int surfaces(){return universalGlassSurfaces.Int();}
+ public static int opacity(){return universalGlassOpacity.Int();}
+ public static int edge(){return universalGlassEdge.Int();}
  public static Item universalGlass=new Item(0), universalGlassSurfaces=new Item(63), universalGlassOpacity=new Item(42), universalGlassEdge=new Item(70);
 }''',
         "org/telegram/ui/Components/blur3/drawable/color/BlurredBackgroundProvider.java": '''package org.telegram.ui.Components.blur3.drawable.color;
@@ -63,23 +67,23 @@ public class GlassTest {
   Theme.ResourcesProvider light=()->false, dark=()->true;
   BlurredBackgroundProvider fallback=()->0xFFABCDEF;
   check(UniversalGlass.surface(1,light,fallback)==fallback);
-  AppearanceConfig.universalGlass.value=1;
+  UniversalGlassConfig.universalGlass.value=1;
   for(int scope=1;scope<=32;scope*=2)check(UniversalGlass.canRender(scope,light));
-  AppearanceConfig.universalGlassSurfaces.value=UniversalGlass.HEADER;
+  UniversalGlassConfig.universalGlassSurfaces.value=UniversalGlass.HEADER;
   check(!UniversalGlass.canRender(UniversalGlass.INPUT,light));
   check(UniversalGlass.canRender(UniversalGlass.HEADER,light));
   BlurredBackgroundProviderImpl.blur=false;
   check(UniversalGlass.surface(UniversalGlass.HEADER,light,fallback)==fallback);
   BlurredBackgroundProviderImpl.blur=true;
-  AppearanceConfig.universalGlassOpacity.value=-100;
+  UniversalGlassConfig.universalGlassOpacity.value=-100;
   check((UniversalGlass.backgroundColor(light,1)>>>24)==51);
-  AppearanceConfig.universalGlassOpacity.value=1000;
+  UniversalGlassConfig.universalGlassOpacity.value=1000;
   check((UniversalGlass.backgroundColor(light,1)>>>24)==217);
   int c=UniversalGlass.backgroundColor(dark,1);
   check((c&0xFFFFFF)==0x102030 && (c>>>24)<217);
-  AppearanceConfig.universalGlassEdge.value=-10;
+  UniversalGlassConfig.universalGlassEdge.value=-10;
   check((UniversalGlass.edgeColor(true)>>>24)==0);
-  AppearanceConfig.universalGlassEdge.value=1000;
+  UniversalGlassConfig.universalGlassEdge.value=1000;
   check((UniversalGlass.edgeColor(true)>>>24)>(UniversalGlass.edgeColor(false)>>>24));
   check(UniversalGlass.material(light,1).getBackgroundColor()==UniversalGlass.fill(light,1).getBackgroundColor());
  }

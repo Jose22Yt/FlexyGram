@@ -508,7 +508,7 @@ public class NekoTranslatorSettingsActivity extends BaseNekoXSettingsActivity {
             textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
             textPaint.setTextSize(AndroidUtilities.dp(16));
 
-            sizeBar = new SeekBarView(context);
+            sizeBar = new app.flexygram.settings.FlexySignatureSeekBarView(context);
             sizeBar.setReportChanges(true);
             sizeBar.setSeparatorsCount(21);
             sizeBar.setDelegate((stop, progress) -> {

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyEditorToolsTitle">Herramientas del archivo</string>
+    <string name="FlexyEditorToolsFile">GUARDAR Y ENVIAR</string>
+    <string name="FlexyEditorToolsEdit">EDICIÓN</string>
+    <string name="FlexyEditorToolsAdvanced">MÁS HERRAMIENTAS</string>
+    <string name="FlexyFilesSendCopyToChat">Enviar copia editada a este chat</string>
+    <string name="FlexyFilesSendCopyTitle">¿Enviar copia al chat actual?</string>
+    <string name="FlexyFilesSendCopyMessage">Se enviará una copia editada al chat desde el que abriste el archivo. El original permanecerá intacto.</string>
+    <string name="FlexyFilesSendCopyConfirm">Enviar copia</string>
+    <string name="FlexyFilesSendQueued">La copia se entregó a Telegram para enviarla. Comprueba su entrega en el chat.</string>
+    <string name="FlexyFilesTopicUnavailable">El envío a foros y monoforos no está disponible hasta poder conservar su tema de forma segura. No se ha enviado ningún archivo.</string>
+</resources>

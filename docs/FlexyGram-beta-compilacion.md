@@ -44,3 +44,14 @@ El código se publicó en la rama `codex/flexygram-beta-glass`, a partir de `mai
 Se añadió `.github/workflows/ui-beta-debug.yml`, un flujo de depuración ARM64 que se activa con los pushes a esa rama y admite ejecución manual. Compila el SHA del evento, ejecuta las pruebas, conserva el registro de Gradle y verifica la firma y las bibliotecas nativas de la APK antes de guardarla como artefacto por siete días. Usa firma de depuración, no solicita secretos ni modifica el flujo protegido de beta oficial. No crea releases ni envía mensajes externos.
 
 El flujo se validó con actionlint 1.7.12. La publicación del YAML no demuestra que GitHub Actions esté habilitado ni que la ejecución haya terminado. La API `api.github.com` devuelve Forbidden desde el entorno, por lo que la comprobación del estado remoto queda pendiente hasta disponer de acceso o del resultado mostrado en Actions. La rama publicada permite revisar el código incluso mientras continúa ese bloqueo.
+
+
+## Corrección de base funcional
+
+La primera rama se creó desde `main`, tal como estaba montado el entorno. Al revisar el flujo oficial se identificó que la app usada por la beta procede de `932c9a6db84fab52ab167d4c8ee70957b3e57223`, con paquete `com.flexygram.messenger`, Signature y sus módulos de navegación/composición. Se integra ese historial en la rama de trabajo; los primeros commits quedan conservados como diagnóstico de la base anterior y no representan una nueva beta oficial.
+
+La integración conserva el sistema original de destinos de la beta y su vista previa, añade los niveles de compactación a `LiquidNavigationConfig` y cambia el gesto a mantener pulsado y arrastrar para intercambiar posiciones. Se retiran las clases de navegación duplicadas de cuatro pestañas creadas en el primer intento. La nueva sección de cristal se registra en Universal mediante `Settings2Policy`, con preferencias independientes, conservando byte por byte `AppearanceConfig` y el contrato de contorno existente.
+
+Los flujos oficiales/protegidos de `main` se conservan. Solo se modifica el flujo independiente de depuración, que compila el commit de la rama de integración, reconstruye las ruedas Python como requiere la fuente oficial y cancela intentos de depuración obsoletos de la misma rama. Esta APK de diagnóstico usa la firma debug; no reemplaza ni publica automáticamente la beta privada firmada.
+
+Validación tras la integración: 186 pruebas Python aprobadas, 31 omitidas. Los resultados de compilación anteriores corresponden a la base inicial; la compilación Android de la integración debe validarse en la nueva ejecución de Actions.

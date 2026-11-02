@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyLiquidNavTitle">Flexy Bottom Bar</string>
+    <string name="FlexyLiquidNavTabs">Доступные вкладки</string>
+    <string name="FlexyLiquidNavPreview">Предпросмотр · нажмите вкладку</string>
+    <string name="FlexyLiquidNavGroups">Группы</string>
+    <string name="FlexyLiquidNavChannels">Каналы</string>
+    <string name="FlexyLiquidNavSaved">Избранное</string>
+    <string name="FlexyLiquidNavVisible">Видимые вкладки</string>
+    <string name="FlexyLiquidNavAvailable">Добавить раздел</string>
+    <string name="FlexyLiquidNavReorderHint">Удерживайте и перетащите для изменения порядка. Нажмите для удаления. Чаты обязательны; минимум две вкладки.</string>
+    <string name="FlexyLiquidNavLimit">Можно включить до шести разделов.</string>
+    <string name="FlexyLiquidNavSpeed">Скорость</string>
+    <string name="FlexyLiquidNavHeight">Высота панели</string>
+    <string name="FlexyLiquidNavCompact">Компактность</string>
+    <string name="FlexyLiquidNavIcon">Размер значков</string>
+    <string name="FlexyLiquidNavWidth">Ширина панели</string>
+    <string name="FlexyLiquidNavLabels">Показывать подписи</string>
+    <string name="FlexyLiquidNavDimensions">Размеры и плотность</string>
+    <string name="FlexyLiquidNavCompaction">Плотность панели</string>
+    <string name="FlexyLiquidNavNormal">Обычная</string>
+    <string name="FlexyLiquidNavVeryCompact">Ультракомпактная</string>
+    <string name="FlexyLiquidNavCustom">Своя</string>
+    <string name="FlexyLiquidNavLabelGap">Отступ подписи от значка</string>
+    <string name="FlexyLiquidNavInnerMargin">Внутренние отступы</string>
+    <string name="FlexyLiquidNavBottomGap">Отступ над системными жестами</string>
+    <string name="FlexyLiquidNavSideGap">Боковые отступы</string>
+    <string name="FlexyBottomSelection">Выбор</string>
+    <string name="FlexyBottomRadius">Радиус углов</string>
+    <string name="FlexyBottomSmoothness">Плавность</string>
+    <string name="FlexyBottomAnimation">Анимация выбора</string>
+</resources>

@@ -1477,6 +1477,9 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
         return null;
     }
 
+    private final app.flexygram.performance.ScrollFrameRateHint scrollFrameRateHint =
+            new app.flexygram.performance.ScrollFrameRateHint(this);
+
     public RecyclerListView(Context context) {
         this(context, null);
     }
@@ -1511,6 +1514,7 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
 
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                scrollFrameRateHint.setScrolling(newState != SCROLL_STATE_IDLE);
                 checkStopHeavyOperations(newState);
                 if (newState != SCROLL_STATE_IDLE && currentChildView != null) {
                     if (selectChildRunnable != null) {
@@ -2032,6 +2036,7 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
         }
         if (emptyView != null) {
             emptyView.animate().setListener(null).cancel();
+            emptyView.setVisibility(View.GONE);
         }
         emptyView = view;
         if (animateEmptyView && emptyView != null) {
@@ -2790,6 +2795,7 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
 
     @Override
     protected void onDetachedFromWindow() {
+        scrollFrameRateHint.setScrolling(false);
         super.onDetachedFromWindow();
         selectorPosition = NO_POSITION;
         selectorView = null;

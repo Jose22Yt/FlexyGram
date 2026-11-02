@@ -1,0 +1,587 @@
+[
+  {
+    "id": "appearance",
+    "parent": "root",
+    "group": "Settings2Group_personal",
+    "title": "Apariencia e interfaz",
+    "description": "Inicio, chats, burbujas e iconos",
+    "icon": "msg_palette",
+    "color": "0xFF8B50DE"
+  },
+  {
+    "id": "navigation",
+    "parent": "root",
+    "group": "Settings2Group_personal",
+    "title": "Navegación y gestos",
+    "description": "Pestañas, gestos y acciones",
+    "icon": "settings2_gesture",
+    "color": "0xFF168BEA"
+  },
+  {
+    "id": "conversations",
+    "parent": "root",
+    "group": "Settings2Group_personal",
+    "title": "Mensajes y conversaciones",
+    "description": "Chats, multimedia y menús",
+    "icon": "settings2_messages",
+    "color": "0xFF21BC65"
+  },
+  {
+    "id": "studio",
+    "parent": "root",
+    "group": "Settings2Group_tools",
+    "title": "FlexyStudio",
+    "description": "Exportar, importar y compartir",
+    "icon": "settings2_studio",
+    "color": "0xFF7372DF"
+  },
+  {
+    "id": "files",
+    "parent": "root",
+    "group": "Settings2Group_tools",
+    "title": "Archivos y descargas",
+    "description": "FlexyFiles, almacenamiento y rutas",
+    "icon": "settings2_files",
+    "color": "0xFF12A8DB"
+  },
+  {
+    "id": "extensions",
+    "parent": "root",
+    "group": "Settings2Group_tools",
+    "title": "Extensiones",
+    "description": "Plugins, IA, traducción y Pill Stack",
+    "icon": "msg_plugins",
+    "color": "0xFFDF408B"
+  },
+  {
+    "id": "general",
+    "parent": "root",
+    "group": "Settings2Group_system",
+    "title": "General y conexión",
+    "description": "Red, DNS, mapas y push",
+    "icon": "msg_language",
+    "color": "0xFFF39A22"
+  },
+  {
+    "id": "advanced",
+    "parent": "root",
+    "group": "Settings2Group_system",
+    "title": "Opciones avanzadas",
+    "description": "Privacidad avanzada y diagnóstico",
+    "icon": "settings2_advanced",
+    "color": "0xFF8198BE"
+  },
+  {
+    "id": "chat_list",
+    "parent": "appearance",
+    "group": "Settings2Group_home",
+    "title": "Diseño de la lista de chats",
+    "description": "",
+    "icon": "msg_media",
+    "color": "0xFF8B50DE"
+  },
+  {
+    "id": "avatars",
+    "parent": "appearance",
+    "group": "Settings2Group_home",
+    "title": "Avatares",
+    "description": "",
+    "icon": "msg_contacts",
+    "color": "0xFF198DE4"
+  },
+  {
+    "id": "folders",
+    "parent": "appearance",
+    "group": "Settings2Group_home",
+    "title": "Carpetas de chats",
+    "description": "",
+    "icon": "msg_folders",
+    "color": "0xFFDB4092"
+  },
+  {
+    "id": "visible",
+    "parent": "appearance",
+    "group": "Settings2Group_home",
+    "title": "Elementos visibles",
+    "description": "",
+    "icon": "msg_info",
+    "color": "0xFF8B50DE"
+  },
+  {
+    "id": "bubbles",
+    "parent": "appearance",
+    "group": "Settings2Group_chat",
+    "title": "Burbujas de mensajes",
+    "description": "",
+    "icon": "msg_sticker",
+    "color": "0xFF12A8DB"
+  },
+  {
+    "id": "header",
+    "parent": "appearance",
+    "group": "Settings2Group_chat",
+    "title": "Cabecera del chat",
+    "description": "",
+    "icon": "msg_contacts",
+    "color": "0xFF21BC65"
+  },
+  {
+    "id": "composer",
+    "parent": "appearance",
+    "group": "Settings2Group_chat",
+    "title": "Barra de escritura (Composer)",
+    "description": "",
+    "icon": "msg_settings_old",
+    "color": "0xFF8B50DE"
+  },
+  {
+    "id": "post_appearance",
+    "parent": "appearance",
+    "group": "Settings2Group_chat",
+    "title": "Presentación de publicaciones",
+    "description": "",
+    "icon": "msg_media",
+    "color": "0xFF8B50DE"
+  },
+  {
+    "id": "icons",
+    "parent": "appearance",
+    "group": "Settings2Group_custom",
+    "title": "Iconos y emojis",
+    "description": "",
+    "icon": "msg_emoji_smiles",
+    "color": "0xFF198DE4"
+  },
+  {
+    "id": "fonts",
+    "parent": "appearance",
+    "group": "Settings2Group_custom",
+    "title": "Fuentes del sistema",
+    "description": "",
+    "icon": "msg_settings_old",
+    "color": "0xFF8B50DE"
+  },
+  {
+    "id": "effects",
+    "parent": "appearance",
+    "group": "Settings2Group_custom",
+    "title": "Efectos visuales",
+    "description": "",
+    "icon": "msg_palette",
+    "color": "0xFF8B50DE"
+  },
+  {
+    "id": "appearance_extra",
+    "parent": "appearance",
+    "group": "Settings2Group_custom",
+    "title": "Opciones adicionales de apariencia",
+    "description": "",
+    "icon": "msg_settings_old",
+    "color": "0xFF8B50DE"
+  },
+  {
+    "id": "bottom_tabs",
+    "parent": "navigation",
+    "group": "Settings2Group_tabs",
+    "title": "Barra de navegación inferior",
+    "description": "",
+    "icon": "msg_folders",
+    "color": "0xFF198DE4"
+  },
+  {
+    "id": "app_navigation",
+    "parent": "navigation",
+    "group": "Settings2Group_nav",
+    "title": "Menú lateral y navegación",
+    "description": "",
+    "icon": "msg_settings_old",
+    "color": "0xFF8B50DE"
+  },
+  {
+    "id": "gestures",
+    "parent": "navigation",
+    "group": "Settings2Group_gestures",
+    "title": "Acciones de mensajes y deslizamiento",
+    "description": "",
+    "icon": "msg_settings_old",
+    "color": "0xFF8B50DE"
+  },
+  {
+    "id": "navigation_extra",
+    "parent": "navigation",
+    "group": "Settings2Group_nav",
+    "title": "Navegación adicional",
+    "description": "",
+    "icon": "msg_settings_old",
+    "color": "0xFF8B50DE"
+  },
+  {
+    "id": "messages",
+    "parent": "conversations",
+    "group": "Settings2Group_messages",
+    "title": "Comportamiento de mensajes",
+    "description": "",
+    "icon": "msg_sticker",
+    "color": "0xFF21BC65"
+  },
+  {
+    "id": "context",
+    "parent": "conversations",
+    "group": "Settings2Group_interaction",
+    "title": "Interacción de mensajes",
+    "description": "",
+    "icon": "msg_media",
+    "color": "0xFF8B50DE"
+  },
+  {
+    "id": "menus",
+    "parent": "conversations",
+    "group": "Settings2Group_interaction",
+    "title": "Menús y acciones",
+    "description": "",
+    "icon": "msg_settings_old",
+    "color": "0xFF8B50DE"
+  },
+  {
+    "id": "stickers",
+    "parent": "conversations",
+    "group": "Settings2Group_interaction",
+    "title": "Stickers, GIF y respuestas",
+    "description": "",
+    "icon": "msg_emoji_smiles",
+    "color": "0xFF8B50DE"
+  },
+  {
+    "id": "media",
+    "parent": "conversations",
+    "group": "Settings2Group_media",
+    "title": "Cámara y multimedia",
+    "description": "",
+    "icon": "msg_media",
+    "color": "0xFF198DE4"
+  },
+  {
+    "id": "profile",
+    "parent": "conversations",
+    "group": "Settings2Group_chat",
+    "title": "Información de contactos",
+    "description": "",
+    "icon": "msg_contacts",
+    "color": "0xFF8B50DE"
+  },
+  {
+    "id": "archive",
+    "parent": "conversations",
+    "group": "Settings2Group_chat",
+    "title": "Archivo y organización",
+    "description": "",
+    "icon": "msg_archive",
+    "color": "0xFF8B50DE"
+  },
+  {
+    "id": "messages_extra",
+    "parent": "conversations",
+    "group": "Settings2Group_messages",
+    "title": "Opciones adicionales de conversación",
+    "description": "",
+    "icon": "msg_settings_old",
+    "color": "0xFF8B50DE"
+  },
+  {
+    "id": "stickers_extra",
+    "parent": "conversations",
+    "group": "Settings2Group_interaction",
+    "title": "Opciones adicionales de stickers",
+    "description": "",
+    "icon": "msg_sticker",
+    "color": "0xFF8B50DE"
+  },
+  {
+    "id": "media_extra",
+    "parent": "conversations",
+    "group": "Settings2Group_media",
+    "title": "Opciones adicionales de reproducción",
+    "description": "",
+    "icon": "msg_media",
+    "color": "0xFF8B50DE"
+  },
+  {
+    "id": "plugins",
+    "parent": "extensions",
+    "group": "Settings2Group_modules",
+    "title": "Plugins",
+    "description": "",
+    "icon": "msg_plugins",
+    "color": "0xFF8B50DE"
+  },
+  {
+    "id": "ai",
+    "parent": "extensions",
+    "group": "Settings2Group_modules",
+    "title": "IA de Exteraless",
+    "description": "",
+    "icon": "msg_info",
+    "color": "0xFF198DE4"
+  },
+  {
+    "id": "translation",
+    "parent": "extensions",
+    "group": "Settings2Group_modules",
+    "title": "Traducción avanzada",
+    "description": "",
+    "icon": "msg_translate",
+    "color": "0xFF21BC65"
+  },
+  {
+    "id": "pillstack",
+    "parent": "extensions",
+    "group": "Settings2Group_capsules",
+    "title": "Pill Stack",
+    "description": "",
+    "icon": "msg_info",
+    "color": "0xFFF39A22"
+  },
+  {
+    "id": "translator",
+    "parent": "translation",
+    "group": "Settings2Group_modules",
+    "title": "Proveedor e idiomas",
+    "description": "",
+    "icon": "msg_translate",
+    "color": "0xFF8B50DE"
+  },
+  {
+    "id": "translation_options",
+    "parent": "translation",
+    "group": "Settings2Group_modules",
+    "title": "Presentación de traducciones",
+    "description": "",
+    "icon": "msg_translate",
+    "color": "0xFF8B50DE"
+  },
+  {
+    "id": "layout",
+    "parent": "chat_list",
+    "group": "Settings2Group_home",
+    "title": "Disposición y títulos",
+    "description": "",
+    "icon": "msg_media",
+    "color": "0xFF8B50DE"
+  },
+  {
+    "id": "smart_previews",
+    "parent": "chat_list",
+    "group": "Settings2Group_home",
+    "title": "Smart Mini Pills",
+    "description": "",
+    "icon": "msg_media",
+    "color": "0xFF8B50DE"
+  },
+  {
+    "id": "launcher",
+    "parent": "icons",
+    "group": "Settings2Group_custom",
+    "title": "Icono de la aplicación",
+    "description": "",
+    "icon": "msg_info",
+    "color": "0xFF198DE4"
+  },
+  {
+    "id": "icon_packs",
+    "parent": "icons",
+    "group": "Settings2Group_custom",
+    "title": "Paquetes de iconos",
+    "description": "",
+    "icon": "msg_settings_old",
+    "color": "0xFF8B50DE"
+  },
+  {
+    "id": "emoji",
+    "parent": "icons",
+    "group": "Settings2Group_custom",
+    "title": "Conjuntos de emojis",
+    "description": "",
+    "icon": "msg_emoji_smiles",
+    "color": "0xFF8B50DE"
+  },
+  {
+    "id": "surfaces",
+    "parent": "effects",
+    "group": "Settings2Group_custom",
+    "title": "Superficies y efectos existentes",
+    "description": "",
+    "icon": "msg_settings_old",
+    "color": "0xFF8B50DE"
+  },
+  {
+    "id": "animations",
+    "parent": "effects",
+    "group": "Settings2Group_custom",
+    "title": "Animaciones de mensajes",
+    "description": "",
+    "icon": "msg_sticker",
+    "color": "0xFF8B50DE"
+  },
+  {
+    "id": "general_controls",
+    "parent": "general",
+    "group": "Settings2Group_general",
+    "title": "General, red, mapas y push",
+    "description": "",
+    "icon": "msg_language",
+    "color": "0xFFF39A22"
+  },
+  {
+    "id": "general_extra",
+    "parent": "general",
+    "group": "Settings2Group_general",
+    "title": "Opciones generales adicionales",
+    "description": "",
+    "icon": "msg_settings_old",
+    "color": "0xFF8B50DE"
+  },
+  {
+    "id": "advanced_controls",
+    "parent": "advanced",
+    "group": "Settings2Group_privacy",
+    "title": "Privacidad y mantenimiento",
+    "description": "",
+    "icon": "msg_settings_old",
+    "color": "0xFF8B50DE"
+  },
+  {
+    "id": "advanced_extra",
+    "parent": "advanced",
+    "group": "Settings2Group_diagnostics",
+    "title": "Diagnóstico",
+    "description": "",
+    "icon": "msg_settings_old",
+    "color": "0xFF8B50DE"
+  },
+  {
+    "id": "cloud",
+    "parent": "advanced",
+    "group": "Settings2Group_maintenance",
+    "title": "Sincronización de ajustes heredada",
+    "description": "",
+    "icon": "msg_folders",
+    "color": "0xFF8B50DE"
+  },
+  {
+    "id": "passcode",
+    "parent": "advanced",
+    "group": "Settings2Group_privacy",
+    "title": "Protección adicional de ajustes",
+    "description": "",
+    "icon": "msg_settings_old",
+    "color": "0xFF8B50DE"
+  },
+  {
+    "id": "appearance_extra_ng",
+    "parent": "appearance_extra",
+    "group": "Settings2Group_custom",
+    "title": "Estilos y elementos de interfaz",
+    "description": "Estilos y elementos de interfaz",
+    "icon": "msg_settings_old",
+    "color": "0xFF8198BE"
+  },
+  {
+    "id": "appearance_extra_nx",
+    "parent": "appearance_extra",
+    "group": "Settings2Group_custom",
+    "title": "Compatibilidad tipográfica",
+    "description": "Compatibilidad tipográfica",
+    "icon": "msg_settings_old",
+    "color": "0xFF8198BE"
+  },
+  {
+    "id": "media_extra_ng",
+    "parent": "media_extra",
+    "group": "Settings2Group_custom",
+    "title": "Red y vista previa multimedia",
+    "description": "Red y vista previa multimedia",
+    "icon": "msg_settings_old",
+    "color": "0xFF8198BE"
+  },
+  {
+    "id": "media_extra_nc",
+    "parent": "media_extra",
+    "group": "Settings2Group_custom",
+    "title": "Archivos y calidad",
+    "description": "Archivos y calidad",
+    "icon": "msg_settings_old",
+    "color": "0xFF8198BE"
+  },
+  {
+    "id": "media_extra_nx",
+    "parent": "media_extra",
+    "group": "Settings2Group_custom",
+    "title": "Vídeo y audio en llamadas",
+    "description": "Vídeo y audio en llamadas",
+    "icon": "msg_settings_old",
+    "color": "0xFF8198BE"
+  },
+  {
+    "id": "stickers_extra_ng",
+    "parent": "stickers_extra",
+    "group": "Settings2Group_custom",
+    "title": "Accesos a stickers",
+    "description": "Accesos a stickers",
+    "icon": "msg_settings_old",
+    "color": "0xFF8198BE"
+  },
+  {
+    "id": "stickers_extra_nc",
+    "parent": "stickers_extra",
+    "group": "Settings2Group_custom",
+    "title": "Panel y recientes",
+    "description": "Panel y recientes",
+    "icon": "msg_settings_old",
+    "color": "0xFF8198BE"
+  },
+  {
+    "id": "stickers_extra_nx",
+    "parent": "stickers_extra",
+    "group": "Settings2Group_custom",
+    "title": "Límites y selección",
+    "description": "Límites y selección",
+    "icon": "msg_settings_old",
+    "color": "0xFF8198BE"
+  },
+  {
+    "id": "navigation_extra_ng",
+    "parent": "navigation_extra",
+    "group": "Settings2Group_custom",
+    "title": "Visibilidad de pestañas",
+    "description": "Visibilidad de pestañas",
+    "icon": "msg_settings_old",
+    "color": "0xFF8198BE"
+  },
+  {
+    "id": "navigation_extra_nx",
+    "parent": "navigation_extra",
+    "group": "Settings2Group_custom",
+    "title": "Transiciones existentes",
+    "description": "Transiciones existentes",
+    "icon": "msg_settings_old",
+    "color": "0xFF8198BE"
+  },
+  {
+    "id": "advanced_extra_ng",
+    "parent": "advanced_extra",
+    "group": "Settings2Group_custom",
+    "title": "Privacidad y protección adicional",
+    "description": "Privacidad y protección adicional",
+    "icon": "msg_settings_old",
+    "color": "0xFF8198BE"
+  },
+  {
+    "id": "advanced_extra_nx",
+    "parent": "advanced_extra",
+    "group": "Settings2Group_custom",
+    "title": "Clase del dispositivo y errores RPC",
+    "description": "Clase del dispositivo y errores RPC",
+    "icon": "msg_settings_old",
+    "color": "0xFF8198BE"
+  }
+]

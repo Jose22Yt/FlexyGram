@@ -1,0 +1,31 @@
+{
+  "base": "a56b816d1e2166a72cda075d80be8b6e3b1073ca",
+  "reviewed": {
+    "TMessagesProj/build.gradle": "d3bb31b8025da54740c14a5c72a45f7d3eaf06fa5fb6fd2c341f4d30a2bf6105",
+    "TMessagesProj/src/main/java/app/flexygram/bubbles/interaction/BubbleTapMotion.java": "ee26ac121011f53ad9906cf4028dced937c4c94f435fb2609c635a91b7e27f9e",
+    "TMessagesProj/src/main/java/app/flexygram/bubbles/interaction/SelectedBubbleMotion.java": "698e16d3bddcbd1495183a4bcf10927138c42b393aefbf1c67f629d4264697b9",
+    "TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java": "87e584a7e6f7eb465ae6aca214a69b13c62dd49c55ac2aed1442607a9f778434",
+    "TMessagesProj/src/main/java/org/telegram/ui/Components/ReactionsContainerLayout.java": "9ad480ff5372fa55d51d49edcbab05385670cafdc217b5e86cd98bbeba4efff6",
+    "tools/connected_alpha/header_visual/ReactionsMotionTest.java.in": "e453d963d45d2a851f78aa046a5d17dda78f06303a6a2f87bcb98cccb3fd0068",
+    "tools/connected_alpha/header_visual/motion_probe.py": "dea32761fbb9364499ea1e9a7c456c6167fc060115d310f3c37492944cd30de7",
+    "tools/connected_alpha/native_context135_contract.py": "10decb760c5921f298b68ced4bd2c307f3684a508cc55451db426f7d9be531a8",
+    "tools/connected_alpha/test_reconstruction1285.py": "594e7d8dede2eae28090a2e158d1677f3d43552167bcce9cb4e1f945b861577d",
+    "tools/native_context/PhysicsProbe.java": "ad4d298779735f9d6d026d5f22f3b415afc63ccd403afcd7a12e3901c3663c5b",
+    "tools/opex_motion/README.md": "5802d48d7319530786f47dc715411943e9478452fb58b7097529613cedb6cb95"
+  },
+  "paths": [
+    "TMessagesProj/build.gradle",
+    "TMessagesProj/src/main/java/app/flexygram/bubbles/interaction/BubbleTapMotion.java",
+    "TMessagesProj/src/main/java/app/flexygram/bubbles/interaction/SelectedBubbleMotion.java",
+    "TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java",
+    "TMessagesProj/src/main/java/org/telegram/ui/Components/ReactionsContainerLayout.java",
+    "tools/connected_alpha/header_visual/ReactionsMotionTest.java.in",
+    "tools/connected_alpha/header_visual/motion_probe.py",
+    "tools/connected_alpha/native_context135_contract.py",
+    "tools/connected_alpha/opex_motion_contract.py",
+    "tools/connected_alpha/test_reconstruction1285.py",
+    "tools/native_context/PhysicsProbe.java",
+    "tools/opex_motion/README.md",
+    "tools/opex_motion/review.json"
+  ]
+}

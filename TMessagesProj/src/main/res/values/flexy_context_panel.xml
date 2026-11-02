@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyContextActions">Actions</string>
+    <string name="FlexyContextSelect">Select</string>
+    <string name="FlexyContextMore">More</string>
+    <string name="FlexyContextPanel">Signature context panel</string>
+    <string name="FlexyContextBounce">iOS 27 selection animation</string>
+    <string name="FlexyContextInteractions">Message interactions</string>
+    <string name="FlexyContextDescription">Single contact animates the bubble independently from the context menu. Enable reactions and panel with one tap separately. Native controls and long press retain their actions.</string>
+    <string name="FlexyContextStyle">Message menu style</string>
+    <string name="FlexyContextNativeStyle">Classic</string>
+    <string name="FlexyContextSignatureStyle">FlexyGram Signature</string>
+    <string name="FlexyContextStyleDescription">Classic retains the original Telegram gestures and menu. FlexyGram Signature enables one-tap reactions, a compact action card and damped motion. Native physics are fixed with no speed, intensity or deformation controls.</string>
+    <string name="FlexyContextConvertToSticker">Convert to Sticker</string>
+    <string name="FlexyStickerSubtitle">Convert message bubble into a native static sticker</string>
+    <string name="FlexyStickerSendDirect">Send in this chat</string>
+    <string name="FlexyStickerSaveFavorite">Add to Favorites</string>
+    <string name="FlexyStickerExportWebp">Save .webp file</string>
+    <string name="FlexyStickerSent">Sticker sent</string>
+    <string name="FlexyStickerSavedFavorite">Sticker added to Favorites</string>
+    <string name="FlexyStickerExported">Sticker saved to Downloads</string>
+</resources>

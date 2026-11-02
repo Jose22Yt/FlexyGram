@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyFilesSignatureContents">FILE CONTENTS</string>
+    <string name="FlexyFilesSignatureOriginal">Only this document · The original remains unchanged</string>
+    <string name="FlexyFilesSignatureFolder">Folder</string>
+    <string name="FlexyFilesSignatureDocument">Document</string>
+    <string name="FlexyFilesSignatureEmpty">No matching items</string>
+    <string name="FlexyFilesSignatureParent">Go to parent folder</string>
+    <string name="FlexyFilesSignatureCount">%1$d items</string>
+</resources>

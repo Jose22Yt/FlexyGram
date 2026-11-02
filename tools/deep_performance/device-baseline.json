@@ -1,0 +1,90 @@
+{
+  "baseline_sha": "cd2af16c8271e52738f0c4e726cf59862c637087",
+  "candidate": "independent PR based on PR136; use exact reviewed head SHA before capture",
+  "reference_device": "Owner-reported Poco X8 Pro / Android17 / HyperOS4",
+  "device_connected": false,
+  "metrics": {
+    "cold_start_ttid": {
+      "before": null,
+      "after": null,
+      "status": "NOT_MEASURED"
+    },
+    "warm_start_ttid": {
+      "before": null,
+      "after": null,
+      "status": "NOT_MEASURED"
+    },
+    "hot_start": {
+      "before": null,
+      "after": null,
+      "status": "NOT_MEASURED"
+    },
+    "useful_dialog_list": {
+      "before": null,
+      "after": null,
+      "status": "NOT_MEASURED"
+    },
+    "chat_open": {
+      "before": null,
+      "after": null,
+      "status": "NOT_MEASURED"
+    },
+    "tab_switch": {
+      "before": null,
+      "after": null,
+      "status": "NOT_MEASURED"
+    },
+    "touch_to_visible": {
+      "before": null,
+      "after": null,
+      "status": "NOT_MEASURED"
+    },
+    "frame_jank_p50_p95_p99": {
+      "before": null,
+      "after": null,
+      "status": "NOT_MEASURED"
+    },
+    "message_load": {
+      "before": null,
+      "after": null,
+      "status": "NOT_MEASURED"
+    },
+    "reconnect": {
+      "before": null,
+      "after": null,
+      "status": "NOT_MEASURED"
+    },
+    "cpu": {
+      "before": null,
+      "after": null,
+      "status": "NOT_MEASURED"
+    },
+    "gpu": {
+      "before": null,
+      "after": null,
+      "status": "NOT_MEASURED"
+    },
+    "ram_gc": {
+      "before": null,
+      "after": null,
+      "status": "NOT_MEASURED"
+    },
+    "battery": {
+      "before": null,
+      "after": null,
+      "status": "NOT_MEASURED"
+    },
+    "temperature_sustained": {
+      "before": null,
+      "after": null,
+      "status": "NOT_MEASURED"
+    }
+  },
+  "refresh_rates_hz": [
+    60,
+    90,
+    120
+  ],
+  "refresh_note": "Observe actual rates; no fixed-rate override or assumption of delivered FPS",
+  "capture_plan": "AUDIT.md; >=20 comparable repetitions, ABBA and sustained session; preserve account data"
+}

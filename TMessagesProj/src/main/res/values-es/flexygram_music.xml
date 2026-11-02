@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyMusicCompact">Comprimir reproductor</string>
+    <string name="FlexyMusicExpand">Expandir reproductor</string>
+    <string name="FlexyMusicSpeed">Velocidad</string>
+    <string name="FlexyMusicMore">Más</string>
+    <string name="FlexyMusicPlayingFrom">Reproduciendo desde</string>
+    <string name="FlexyMusicMyMusic">Mi música</string>
+    <string name="FlexyMusicLyrics">Letras</string>
+    <string name="FlexyMusicQueue">Cola</string>
+</resources>

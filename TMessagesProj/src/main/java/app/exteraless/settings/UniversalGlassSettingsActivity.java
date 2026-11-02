@@ -5,7 +5,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import java.util.ArrayList;
 
-import app.exteraless.appearance.AppearanceConfig;
+import app.exteraless.appearance.UniversalGlassConfig;
 import app.exteraless.appearance.AvatarCornersSeekBar;
 import app.exteraless.appearance.UniversalGlass;
 import org.telegram.messenger.LocaleController;
@@ -48,10 +48,10 @@ public final class UniversalGlassSettingsActivity extends BaseFragment {
 
     private void fillItems(ArrayList<UItem> items, UniversalAdapter adapter) {
         adapter.whiteSectionStart();
-        items.add(UItem.asCheck(ENABLE, text(R.string.FlexyUniversalGlassEnable)).setChecked(AppearanceConfig.universalGlass.Bool()));
+        items.add(UItem.asCheck(ENABLE, text(R.string.FlexyUniversalGlassEnable)).setChecked(UniversalGlassConfig.enabled()));
         adapter.whiteSectionEnd();
         items.add(UItem.asShadow(text(R.string.FlexyUniversalGlassInfo)));
-        if (AppearanceConfig.universalGlass.Bool()) {
+        if (UniversalGlassConfig.enabled()) {
             adapter.whiteSectionStart();
             items.add(UItem.asCustom(OPACITY, slider(true)));
             items.add(UItem.asCustom(EDGE, slider(false)));
@@ -64,7 +64,7 @@ public final class UniversalGlassSettingsActivity extends BaseFragment {
                     R.string.Search, R.string.FlexyGlassMenus, R.string.FlexyGlassFolders};
             for (int i = 0; i < scopes.length; i++) {
                 items.add(UItem.asCheck(scopes[i], text(labels[i]))
-                        .setChecked((AppearanceConfig.universalGlassSurfaces.Int() & scopes[i]) != 0));
+                        .setChecked((UniversalGlassConfig.surfaces() & scopes[i]) != 0));
             }
             adapter.whiteSectionEnd();
             items.add(UItem.asShadow(text(R.string.FlexyGlassPerformance)));
@@ -74,13 +74,13 @@ public final class UniversalGlassSettingsActivity extends BaseFragment {
 
     private View slider(boolean opacity) {
         AvatarCornersSeekBar slider = new AvatarCornersSeekBar(getContext(), value -> {
-            if (opacity) AppearanceConfig.universalGlassOpacity.setConfigInt(value);
-            else AppearanceConfig.universalGlassEdge.setConfigInt(value);
+            if (opacity) UniversalGlassConfig.setOpacity(value);
+            else UniversalGlassConfig.setEdge(value);
             dirty = true;
         }, opacity ? 20 : 0, opacity ? 85 : 100,
                 text(opacity ? R.string.FlexyGlassOpacity : R.string.FlexyGlassEdge), "", "");
         slider.setValueSuffix("%");
-        slider.setValue(opacity ? AppearanceConfig.universalGlassOpacity.Int() : AppearanceConfig.universalGlassEdge.Int());
+        slider.setValue(opacity ? UniversalGlassConfig.opacity() : UniversalGlassConfig.edge());
         return slider;
     }
 
@@ -90,9 +90,9 @@ public final class UniversalGlassSettingsActivity extends BaseFragment {
             return;
         }
         if (item.id == ENABLE) {
-            AppearanceConfig.universalGlass.setConfigBool(!AppearanceConfig.universalGlass.Bool());
+            UniversalGlassConfig.setEnabled(!UniversalGlassConfig.enabled());
         } else if (item.id > 0 && item.id <= UniversalGlass.FOLDERS) {
-            AppearanceConfig.universalGlassSurfaces.setConfigInt(AppearanceConfig.universalGlassSurfaces.Int() ^ item.id);
+            UniversalGlassConfig.setSurfaces(UniversalGlassConfig.surfaces() ^ item.id);
         } else return;
         dirty = true;
         list.adapter.update(true);

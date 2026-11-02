@@ -1,0 +1,54 @@
+{
+  "source_base": "bf96667efac14d0cbbf6677471890a366c3ef3c0",
+  "workflow_control_main": "49ccce7492b58f1d402380cc71d93391d905c205",
+  "upstream_reference": "3050af6d948acc27db446f6cd27a8e200b205c1b",
+  "installed_apk_commit": null,
+  "installed_apk_evidence": "NOT_PROVIDED",
+  "host_pytest": {
+    "passed": 172,
+    "optional_skipped": 31
+  },
+  "targeted_unittest": {
+    "passed": 16
+  },
+  "new_host_regressions": 10,
+  "fusion_counter_cases_executed": 1920,
+  "syntax_java21": {
+    "files": 15,
+    "status": "PASS_SYNTAX_ONLY"
+  },
+  "legacy_settings2_scope": {
+    "base_passed": 12,
+    "candidate_passed": 11,
+    "candidate_failed": 1,
+    "reason": "Old Settings2 scope rejects explicitly requested ChatActivity and LiteMode changes; gate remains intact"
+  },
+  "legacy_header1273": {
+    "base": {
+      "tests": 7,
+      "failures": 2,
+      "errors": 1
+    },
+    "candidate_with_fusion_and_portrait": {
+      "tests": 10,
+      "failures": 2,
+      "errors": 1
+    },
+    "state": "same pre-existing failures/errors; no gate disabled"
+  },
+  "android_full_build": "BLOCKED_GRADLE_DOWNLOAD_NETWORK_UNREACHABLE_NO_PREPARED_SDK_JDK21",
+  "android_isolated_canvas": "PREPARED_NOT_EXECUTED_IN_THIS_AUDIT",
+  "physical_poco": "NOT_TESTED",
+  "screenshots_after_correction": "NOT_AVAILABLE",
+  "physical_performance": "NOT_MEASURED",
+  "private_reference_images_published": false,
+  "apk_generated": false,
+  "native_conversation_source_contract": "PASS updated contract requires unread before return and cached radii",
+  "first_ci_head": "91caed359d436a533002523899348e67aadc69e6",
+  "first_ci_passed_jobs": [
+    "source-and-math",
+    "Interactive tabs host/source verification",
+    "contracts"
+  ],
+  "ci_full_android_compilation": "NOT_PERFORMED"
+}

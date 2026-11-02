@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexySkinClassic">Классический Flexy</string>
+    <string name="FlexySkinElevated">Объёмный 3D</string>
+    <string name="FlexySkinFine">Тонкий контур</string>
+    <string name="FlexySkinFloating">Парящий</string>
+    <string name="FlexyBubblesTitle">Пузыри сообщений</string>
+    <string name="FlexyBubblesGlass">Стеклянные пузыри</string>
+    <string name="FlexyBubblesTransparency">Прозрачность</string>
+    <string name="FlexyBubblesBorder">Выделять края</string>
+    <string name="FlexyBubblesEdges">Размытие краёв чата</string>
+    <string name="FlexyBubblesInfo">Контур Signature и изогнутый хвостик остаются чёткими. Прозрачность меняет только заливку. Текст и медиа остаются непрозрачными. Старые настройки сохранены без применения прежнего Glass.</string>
+
+    <string name="FlexyClassicOptions">Классические настройки Telegram</string>
+    <string name="FlexyClassicOptionsInfo">Настройки Telegram, темы и фон чата</string>
+    <string name="FlexyMessagesGestures">Сообщения и жесты</string>
+    <string name="FlexyStickersMedia">Стикеры и медиа</string>
+    <string name="FlexyThemeWallpaper">Тема и фон чата</string>
+    <string name="FlexyChatsPersonalization">Персонализация</string>
+    <string name="FlexyChatsInteraction">Взаимодействие и контент</string>
+    <string name="FlexyChatsAdditional">Дополнительные параметры</string>
+    <string name="FlexyConversationBar">Панель переписки</string>
+    <string name="FlexyBubbleBorderWidth">Толщина контура</string>
+    <string name="FlexyBubblePreviewIncoming">Знаешь, который час?</string>
+    <string name="FlexyBubblePreviewOutgoing">В Токио утро 😎</string>
+    <string name="FlexyBubbleBlurUnavailable">Размытие фона недоступно в этой тестовой сборке. Matte сохраняет чёткость текста и контура.</string>
+    <string name="FlexyBubblePreviewGroupIncoming">Это локальный пример переписки.</string>
+    <string name="FlexyBubblePreviewGroupOutgoing">Изменения видны сразу.</string>
+    <string name="FlexyBubbleBackgroundBlur">Размытие фона</string>
+    <string name="FlexyBubbleBlurCompatibility">Размытие доступно для совместимых статичных изображений. Анимированные и неподдерживаемые фоны сохраняют Matte.</string>
+    <string name="FlexyBubbleOutlineEnabled">Включить контур пузырьков</string>
+    <string name="FlexyBubbleOutlineStyle">Стиль контура</string>
+    <string name="FlexyBubbleIntelligentColor">Умный цвет</string>
+    <string name="FlexyBubbleGlassPearl">Glass Pearl</string>
+    <string name="FlexyBubblePearlIntensity">Интенсивность glass</string>
+    <string name="FlexyBubbleBorderPosition">Расположение контура</string>
+    <string name="FlexyBubbleBorderNone">Без контура</string>
+    <string name="FlexyBubbleBorderTop">Сверху</string>
+    <string name="FlexyBubbleBorderBottom">Снизу</string>
+    <string name="FlexyBubbleBorderLeft">Слева</string>
+    <string name="FlexyBubbleBorderRight">Справа</string>
+    <string name="FlexyBubbleBorderFull">Полный</string>
+    <string name="FlexyBubbleGlassSatin">Glass Satin</string>
+    <string name="FlexyBubbleFuseGlass">Смешивать стеклянный контур</string>
+    <string name="FlexyBubbleOriginal">Оригинальный</string>
+    <string name="FlexyBubbleGlassOriginal">Glass Original</string>
+</resources>

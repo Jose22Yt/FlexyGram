@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyLiquidNavTitle">Flexy Bottom Bar</string>
+    <string name="FlexyLiquidNavTabs">Available navigation tabs</string>
+    <string name="FlexyLiquidNavPreview">Live preview · tap a tab</string>
+    <string name="FlexyLiquidNavGroups">Groups</string>
+    <string name="FlexyLiquidNavChannels">Channels</string>
+    <string name="FlexyLiquidNavSaved">Saved Messages</string>
+    <string name="FlexyLiquidNavVisible">Visible tabs</string>
+    <string name="FlexyLiquidNavAvailable">Add a destination</string>
+    <string name="FlexyLiquidNavReorderHint">Hold and drag to reorder. Tap to remove. Keep two to six tabs. Chats stays available. Long-press Chats for hidden destinations.</string>
+    <string name="FlexyLiquidNavLimit">Maximum: six visible tabs. Remove one before adding another.</string>
+    <string name="FlexyLiquidNavSpeed">Speed</string>
+    <string name="FlexyLiquidNavHeight">Bar height</string>
+    <string name="FlexyLiquidNavCompact">Compactness</string>
+    <string name="FlexyLiquidNavIcon">Icon size</string>
+    <string name="FlexyLiquidNavWidth">Bar width</string>
+    <string name="FlexyLiquidNavLabels">Show labels</string>
+    <string name="FlexyLiquidNavDimensions">Dimensions and compactness</string>
+    <string name="FlexyLiquidNavCompaction">Compactness level</string>
+    <string name="FlexyLiquidNavNormal">Normal</string>
+    <string name="FlexyLiquidNavVeryCompact">Ultra compact</string>
+    <string name="FlexyLiquidNavCustom">Custom</string>
+    <string name="FlexyLiquidNavLabelGap">Icon to label spacing</string>
+    <string name="FlexyLiquidNavInnerMargin">Inner margins</string>
+    <string name="FlexyLiquidNavBottomGap">Distance above system gestures</string>
+    <string name="FlexyLiquidNavSideGap">Side margins</string>
+    <string name="FlexyBottomSelection">Selection</string>
+    <string name="FlexyBottomRadius">Corner radius</string>
+    <string name="FlexyBottomSmoothness">Smoothness</string>
+    <string name="FlexyBottomAnimation">Animate selection</string>
+</resources>

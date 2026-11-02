@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexySkinClassic">Classic Flexy</string>
+    <string name="FlexySkinElevated">Elevated 3D</string>
+    <string name="FlexySkinFine">Fine outline</string>
+    <string name="FlexySkinFloating">Floating</string>
+    <string name="FlexyBubblesTitle">Chat bubbles</string>
+    <string name="FlexyBubblesGlass">Glass bubbles</string>
+    <string name="FlexyBubblesTransparency">Transparency</string>
+    <string name="FlexyBubblesBorder">Highlight borders</string>
+    <string name="FlexyBubblesEdges">Blur chat edges</string>
+    <string name="FlexyBubblesInfo">Signature outline and curved tails are always defined. Transparency changes the fill only; text and media remain opaque. Previous effect preferences are kept without applying the old Glass renderer.</string>
+
+    <string name="FlexyClassicOptions">Classic Telegram options</string>
+    <string name="FlexyClassicOptionsInfo">Original Telegram settings, themes and chat wallpaper</string>
+    <string name="FlexyMessagesGestures">Messages and gestures</string>
+    <string name="FlexyStickersMedia">Stickers and media</string>
+    <string name="FlexyThemeWallpaper">Chat theme and wallpaper</string>
+    <string name="FlexyChatsPersonalization">Personalization</string>
+    <string name="FlexyChatsInteraction">Interaction and content</string>
+    <string name="FlexyChatsAdditional">Additional options</string>
+    <string name="FlexyConversationBar">Conversation bar</string>
+    <string name="FlexyBubbleBorderWidth">Border width</string>
+    <string name="FlexyBubblePreviewIncoming">Do you know what time it is?</string>
+    <string name="FlexyBubblePreviewOutgoing">It is morning in Tokyo 😎</string>
+    <string name="FlexyBubbleBlurUnavailable">Background blur is unavailable in this test build. Matte keeps text and outlines sharp.</string>
+    <string name="FlexyBubblePreviewGroupIncoming">This conversation is a local preview.</string>
+    <string name="FlexyBubblePreviewGroupOutgoing">Your changes appear immediately.</string>
+    <string name="FlexyBubbleBackgroundBlur">Background blur</string>
+    <string name="FlexyBubbleBlurCompatibility">Blur is available for compatible static image wallpapers. Animated or unsupported backgrounds keep Matte.</string>
+    <string name="FlexyBubbleOutlineEnabled">Enable bubble border</string>
+    <string name="FlexyBubbleOutlineStyle">Border style</string>
+    <string name="FlexyBubbleIntelligentColor">Intelligent color</string>
+    <string name="FlexyBubbleGlassPearl">Glass Pearl</string>
+    <string name="FlexyBubblePearlIntensity">Glass intensity</string>
+    <string name="FlexyBubbleBorderPosition">Border position</string>
+    <string name="FlexyBubbleBorderNone">None</string>
+    <string name="FlexyBubbleBorderTop">Top</string>
+    <string name="FlexyBubbleBorderBottom">Bottom</string>
+    <string name="FlexyBubbleBorderLeft">Left</string>
+    <string name="FlexyBubbleBorderRight">Right</string>
+    <string name="FlexyBubbleBorderFull">Full</string>
+    <string name="FlexyBubbleGlassSatin">Glass Satin</string>
+    <string name="FlexyBubbleFuseGlass">Blend glass border</string>
+    <string name="FlexyBubbleOriginal">Original</string>
+    <string name="FlexyBubbleGlassOriginal">Glass Original</string>
+</resources>

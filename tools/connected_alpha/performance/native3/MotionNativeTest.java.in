@@ -1,0 +1,34 @@
+package org.telegram.ui.Components;
+import android.app.*;import android.animation.*;import android.graphics.*;import android.graphics.drawable.*;import android.os.*;
+import org.junit.*;import org.junit.runner.RunWith;import org.robolectric.*;import org.robolectric.annotation.*;
+import java.lang.reflect.*;import java.time.Duration;import java.util.*;import java.io.*;import static org.junit.Assert.*;
+/** Candidate comes ONLY from an unapplied patch; shared compositor wrapper remains untouched in production. */
+@RunWith(RobolectricTestRunner.class) @Config(manifest=Config.NONE,sdk=35) @GraphicsMode(GraphicsMode.Mode.NATIVE)
+public class MotionNativeTest {
+ Activity activity;
+ static class Counter implements Drawable.Callback {int invalidations;public void invalidateDrawable(Drawable d){invalidations++;}public void scheduleDrawable(Drawable d,Runnable r,long w){}public void unscheduleDrawable(Drawable d,Runnable r){}}
+ static Object field(Object d,String name)throws Exception{Field f=d.getClass().getDeclaredField(name);f.setAccessible(true);return f.get(d);}
+ @Before public void setup(){activity=Robolectric.buildActivity(Activity.class).setup().get();}
+ @Test public void clearingIconCancelsNativeAnimatorAndFutureInvalidations()throws Exception{
+  CandidateReplaceableIconDrawable candidate=new CandidateReplaceableIconDrawable(activity);BaselineReplaceableIconDrawable old=new BaselineReplaceableIconDrawable(activity);candidate.setBounds(0,0,64,64);old.setBounds(0,0,64,64);Counter a=new Counter(),b=new Counter();candidate.setCallback(a);old.setCallback(b);
+  candidate.setIcon(new ColorDrawable(0xff112233),false);old.setIcon(new ColorDrawable(0xff112233),false);candidate.setIcon(new ColorDrawable(0xff447799),true);old.setIcon(new ColorDrawable(0xff447799),true);
+  ValueAnimator previousCandidate=(ValueAnimator)field(candidate,"animation"),previousOld=(ValueAnimator)field(old,"animation");
+  candidate.setIcon(null,false);old.setIcon(null,false);a.invalidations=b.invalidations=0;
+  // Explicit late native animator seeks test listener ownership; not real frame scheduling/latency.
+  previousCandidate.setCurrentFraction(.7f);previousOld.setCurrentFraction(.7f);
+  assertNull(candidate.getIcon());assertNull(field(candidate,"animation"));assertEquals(0,a.invalidations);assertTrue("baseline retains obsolete update listener",b.invalidations>0);
+  try(FileWriter out=new FileWriter(new File(System.getProperty("probe.root"),"native3-motion-counts.json"))){out.write("{\"evidence\":\"isolated_API35_explicit_late_ValueAnimator_seek\",\"baseline_late_seek_invalidations\":"+b.invalidations+",\"candidate_late_seek_invalidations\":"+a.invalidations+",\"production_applied\":false,\"touch_latency_ms\":null}\n");}
+ }
+ @Test public void resourceCanBeRestoredAfterClear(){
+  CandidateReplaceableIconDrawable d=new CandidateReplaceableIconDrawable(activity);d.setBounds(0,0,64,64);d.setIcon(android.R.drawable.ic_menu_add,false);assertNotNull(d.getIcon());d.setIcon(null,false);d.setIcon(android.R.drawable.ic_menu_add,false);assertNotNull(d.getIcon());d.setIcon(null,false);
+ }
+ @Test public void staleAnimationEndCannotClearNewOutgoingIcon()throws Exception{
+  CandidateReplaceableIconDrawable d=new CandidateReplaceableIconDrawable(activity);d.setBounds(0,0,64,64);d.setIcon(new ColorDrawable(0xff001122),false);d.setIcon(new ColorDrawable(0xff334455),true);Animator previous=(Animator)field(d,"animation");d.setIcon(new ColorDrawable(0xff667788),true);Object outgoing=field(d,"outDrawable");assertNotNull(outgoing);d.onAnimationEnd(previous);assertSame(outgoing,field(d,"outDrawable"));d.setIcon(null,false);
+ }
+ @Test public void normalAndInterruptedTransitionsPreservePixelsAndBounds()throws Exception{
+  CandidateReplaceableIconDrawable a=new CandidateReplaceableIconDrawable(activity);BaselineReplaceableIconDrawable b=new BaselineReplaceableIconDrawable(activity);a.setBounds(6,8,58,62);b.setBounds(6,8,58,62);a.setIcon(new ColorDrawable(0xff224466),false);b.setIcon(new ColorDrawable(0xff224466),false);
+  Bitmap ia=Bitmap.createBitmap(64,64,Bitmap.Config.ARGB_8888),ib=Bitmap.createBitmap(64,64,Bitmap.Config.ARGB_8888);int[] pa=new int[4096],pb=new int[4096];
+  for(int color:new int[]{0xff336699,0xffcc8844,0xff225533}){a.setIcon(new ColorDrawable(color),true);b.setIcon(new ColorDrawable(color),true);for(float fraction:new float[]{0,.1f,.4f,.9f}){((ValueAnimator)field(a,"animation")).setCurrentFraction(fraction);((ValueAnimator)field(b,"animation")).setCurrentFraction(fraction);ia.eraseColor(0);ib.eraseColor(0);a.draw(new Canvas(ia));b.draw(new Canvas(ib));ia.getPixels(pa,0,64,0,0,64,64);ib.getPixels(pb,0,64,0,0,64,64);assertArrayEquals(pb,pa);}}
+  a.setIcon(null,false);b.setIcon(null,false);Shadows.shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(200));
+ }
+}

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyBubbleFusionMode">Контуры и слияние</string>
+    <string name="FlexyBubbleFusionNone">Без слияния</string>
+    <string name="FlexyBubbleFusionClassic">Классическое слияние</string>
+    <string name="FlexyBubbleFusionIntensity">Сила слияния</string>
+    <string name="FlexyBubbleFusionAdapt">Адаптация слияния к теме</string>
+</resources>

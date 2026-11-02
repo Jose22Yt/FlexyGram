@@ -1,0 +1,1462 @@
+diff --git a/.github/workflows/connected-alpha-arm64.yml b/.github/workflows/connected-alpha-arm64.yml
+index 52b539464..2996e99d8 100644
+--- a/.github/workflows/connected-alpha-arm64.yml
++++ b/.github/workflows/connected-alpha-arm64.yml
+@@ -73,7 +73,7 @@ jobs:
+       - name: Retain isolated native bubble graphics (not full app screenshots)
+         uses: actions/upload-artifact@v4
+         with:
+-          name: FlexyGram-Alpha1273-native-bubble-probe
++          name: FlexyGram-Alpha1274-native-bubble-probe
+           path: |
+             build/connected-alpha-bubble-visual/android-native-bubbles.png
+             build/connected-alpha-bubble-visual/android-signature-icons.png
+@@ -249,7 +249,7 @@ jobs:
+             echo '::error::Expected exactly one Connected Alpha APK.'
+             exit 1
+           fi
+-          python3 tools/connected_alpha/verify_apk.py "${packages[0]}" --build-tools "$ANDROID_HOME/build-tools/36.0.0" --certificate-sha256 "$ALPHA_CERTIFICATE_SHA256" --expected-version-code 1273 > connected-alpha-verification.json
++          python3 tools/connected_alpha/verify_apk.py "${packages[0]}" --build-tools "$ANDROID_HOME/build-tools/36.0.0" --certificate-sha256 "$ALPHA_CERTIFICATE_SHA256" --expected-version-code 1274 > connected-alpha-verification.json
+           python3 - <<'PY'
+           import json, os
+           from pathlib import Path
+diff --git a/.github/workflows/pr.yml b/.github/workflows/pr.yml
+index ad5bcf1b2..589653240 100644
+--- a/.github/workflows/pr.yml
++++ b/.github/workflows/pr.yml
+@@ -91,7 +91,7 @@ jobs:
+           retention-days: 7
+           if-no-files-found: error
+   build:
+-    if: github.event_name == 'pull_request' && github.head_ref != 'feat/flexystudio-native-presets' && github.head_ref != 'perf/alpha1273-engineering2' && github.head_ref != 'feat/alpha1271-signature-ui' && github.head_ref != 'feat/signature-native-login' && github.head_ref != 'feat/signature-music2' && github.head_ref != 'fix/alpha-ios-bubbles-glass-home2' && github.head_ref != 'fix/signature-matte-general-appearance' && github.head_ref != 'alpha/connected-exteraless-baseline' && !startsWith(github.head_ref, 'support/connected-alpha-ci-') && !startsWith(github.head_ref, 'integration/connected-alpha-') && !startsWith(github.head_ref, 'fix/alpha2-')
++    if: github.event_name == 'pull_request' && github.head_ref != 'integration/alpha1274-signature-refinement-studio' && github.head_ref != 'feat/flexystudio-native-presets' && github.head_ref != 'perf/alpha1273-engineering2' && github.head_ref != 'feat/alpha1271-signature-ui' && github.head_ref != 'feat/signature-native-login' && github.head_ref != 'feat/signature-music2' && github.head_ref != 'fix/alpha-ios-bubbles-glass-home2' && github.head_ref != 'fix/signature-matte-general-appearance' && github.head_ref != 'alpha/connected-exteraless-baseline' && !startsWith(github.head_ref, 'support/connected-alpha-ci-') && !startsWith(github.head_ref, 'integration/connected-alpha-') && !startsWith(github.head_ref, 'fix/alpha2-')
+     name: Gradle Build
+     runs-on: ubuntu-latest
+     env:
+diff --git a/TMessagesProj/build.gradle b/TMessagesProj/build.gradle
+index 2052bf720..a43ab2704 100644
+--- a/TMessagesProj/build.gradle
++++ b/TMessagesProj/build.gradle
+@@ -26,7 +26,7 @@ def buildTimestamp = System.getenv('BUILD_TIMESTAMP') ?: '0'
+ def commitId = System.getenv('COMMIT_ID')
+ def shortCommit = commitId?.take(7) ?: ''
+ def verName = "${APP_VERSION_NAME}${shortCommit ? "-${shortCommit}" : ''}"
+-def verCode = 1273
++def verCode = 1274
+ 
+ def officialVer = APP_VERSION_NAME
+ def officialCode = APP_VERSION_CODE
+diff --git a/TMessagesProj/src/main/AndroidManifest.xml b/TMessagesProj/src/main/AndroidManifest.xml
+index ae2be629c..c8010fa41 100644
+--- a/TMessagesProj/src/main/AndroidManifest.xml
++++ b/TMessagesProj/src/main/AndroidManifest.xml
+@@ -257,11 +257,14 @@
+                 android:name="com.google.mlkit.vision.DEPENDENCIES"
+                 android:value="subject_segment" />
+         </activity>
++        <receiver android:name="app.flexygram.icons.SignatureLauncherUpdateReceiver" android:exported="false">
++            <intent-filter><action android:name="android.intent.action.MY_PACKAGE_REPLACED" /></intent-filter>
++        </receiver>
+         <!-- Единственный включённый alias: именно он даёт запись в лаунчере.
+              У NagramX эту роль играл BlueIcon, из-за чего на свежей установке
+              на рабочем столе появлялась синяя иконка апстрима. -->
+         <activity-alias
+-            android:enabled="true"
++            android:enabled="false"
+             android:name="org.telegram.messenger.ExteralessIcon"
+             android:targetActivity="org.telegram.ui.LaunchActivity"
+             android:icon="@mipmap/ic_flexy_blue"
+@@ -277,7 +280,7 @@
+         </activity-alias>
+ 
+         <activity-alias
+-            android:enabled="false"
++            android:enabled="true"
+             android:name="org.telegram.messenger.FlexyBlueIcon"
+             android:targetActivity="org.telegram.ui.LaunchActivity"
+             android:icon="@mipmap/ic_flexy_blue"
+diff --git a/TMessagesProj/src/main/java/app/exteraless/player/PlayerColors.java b/TMessagesProj/src/main/java/app/exteraless/player/PlayerColors.java
+index bd7160f46..0ab617915 100644
+--- a/TMessagesProj/src/main/java/app/exteraless/player/PlayerColors.java
++++ b/TMessagesProj/src/main/java/app/exteraless/player/PlayerColors.java
+@@ -91,7 +91,11 @@ public final class PlayerColors {
+         if (cached != null) return cached;
+         PlayerColors base = dark ? MIDNIGHT : PEARL;
+         int[] values = base.values();
+-        for (int i = 0; i < 4; i++) values[i] = ColorUtils.blendARGB(values[i], seed | 0xff000000, .08f);
++        for (int i = 0; i < 4; i++) values[i] = ColorUtils.blendARGB(values[i], seed | 0xff000000, .16f);
++        // Artwork identity belongs to the full sheet only; transport and mini players are unchanged.
++        values[7] = ColorUtils.blendARGB(seed | 0xff000000, dark ? 0xffffffff : 0xff000000, dark ? .32f : .24f);
++        values[8] = ColorUtils.calculateContrast(0xffffffff, values[7]) >= 4.5 ? 0xffffffff : 0xff101820;
++        values[9] = ColorUtils.blendARGB(values[0], seed | 0xff000000, .18f);
+         PlayerColors result = new PlayerColors(dark, values);
+         artworkPalettes.put(key, result);
+         return result;
+diff --git a/TMessagesProj/src/main/java/app/exteraless/player/PlayerSheet.java b/TMessagesProj/src/main/java/app/exteraless/player/PlayerSheet.java
+index 834ddecb0..28709f749 100644
+--- a/TMessagesProj/src/main/java/app/exteraless/player/PlayerSheet.java
++++ b/TMessagesProj/src/main/java/app/exteraless/player/PlayerSheet.java
+@@ -328,6 +328,10 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
+         artistView.setSingleLine(true);
+         artistView.setEllipsize(TextUtils.TruncateAt.END);
+         titles.addView(artistView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 4, 0, 0));
++        if (BuildConfig.CONNECTED_ALPHA) {
++            // Equal reservation opposite the48dp favorite and its12dp margin keeps text truly centered.
++            titles.setPadding(dp(60),0,0,0);titleView.setGravity(Gravity.CENTER_HORIZONTAL);artistView.setGravity(Gravity.CENTER_HORIZONTAL);
++        }
+         titleRow.addView(titles, LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1f));
+         likeButton = new MorphButton(context, heartIcon);
+         likeButton.setRadius(dp(24), false);
+@@ -449,19 +453,19 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
+         controls.next.setContentDescription(getString(R.string.Next));
+         layout.addView(controls);
+ 
+-        group = new LinearLayout(context);
++        group = BuildConfig.CONNECTED_ALPHA ? new SignatureMusicActions(context) : new LinearLayout(context);
+         group.setOrientation(LinearLayout.HORIZONTAL);
+         speedButton = new MorphButton(context, PlayerIcon.stroke(PlayerIcon.SPEED, 20));
+         speedButton.setRadius(dp(26), dp(8), false);
+         speedButton.setOnClickListener(v -> cycleSpeed());
+         group.addView(speedButton, LayoutHelper.createLinear(0, 52, 1f));
+         lyricsButton = new MorphButton(context, PlayerIcon.stroke(PlayerIcon.LYRICS, 20));
+-        lyricsButton.setText(getString(R.string.OEPlayerLyrics));
++        lyricsButton.setText(getString(BuildConfig.CONNECTED_ALPHA ? R.string.FlexyMusicLyrics : R.string.OEPlayerLyrics));
+         lyricsButton.setRadius(dp(8), false);
+         lyricsButton.setOnClickListener(v -> setLyricsMode(!lyricsMode, true));
+         group.addView(lyricsButton, LayoutHelper.createLinear(0, 52, 1f, 4, 0, 4, 0));
+         queueButton = new MorphButton(context, PlayerIcon.stroke(PlayerIcon.QUEUE, 20));
+-        queueButton.setText(getString(R.string.OEPlayerQueue));
++        queueButton.setText(getString(BuildConfig.CONNECTED_ALPHA ? R.string.FlexyMusicQueue : R.string.OEPlayerQueue));
+         queueButton.setRadius(dp(8), dp(26), false);
+         queueButton.setOnClickListener(v -> openQueue());
+         group.addView(queueButton, LayoutHelper.createLinear(0, 52, 1f));
+@@ -1677,17 +1681,15 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
+             seekBar.measure(exactW, MeasureSpec.makeMeasureSpec(dp(40), MeasureSpec.EXACTLY));
+             timeRow.measure(exactW, MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+             controls.measure(exactW, MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+-            int groupHeight = BuildConfig.CONNECTED_ALPHA ? Math.max(dp(72), (int) Math.ceil(dp(38) + 16 * getResources().getDisplayMetrics().scaledDensity)) : dp(52);
+-            if (BuildConfig.CONNECTED_ALPHA) {
+-                for (int i = 0; i < group.getChildCount(); i++) group.getChildAt(i).getLayoutParams().height = groupHeight;
+-            }
+-            group.measure(exactW, MeasureSpec.makeMeasureSpec(groupHeight, MeasureSpec.EXACTLY));
++            group.measure(exactW, BuildConfig.CONNECTED_ALPHA ? MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED)
++                    : MeasureSpec.makeMeasureSpec(dp(52), MeasureSpec.EXACTLY));
+             titleRow.measure(exactW, MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+             bubble.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+             if (BuildConfig.CONNECTED_ALPHA) {
+                 // Full-width hero; short/large-font screens scroll rather than squeezing hit targets.
+-                coverSize = Math.max(dp(220), Math.min(width, dp(440)));
+-                stageHeight = coverSize - dp(56) + dp(16) + titleRow.getMeasuredHeight();
++                coverSize = Math.max(dp(250), Math.min(Math.round(width * 1.22f), dp(560)));
++                // Title overlays the opaque end of the cached artwork fade, instead of a separate panel.
++                stageHeight = coverSize - dp(56 + 64) + titleRow.getMeasuredHeight();
+                 cover.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(top + coverSize, MeasureSpec.EXACTLY));
+                 lyricsPanel.measure(exactW, MeasureSpec.makeMeasureSpec(stageHeight, MeasureSpec.EXACTLY));
+                 int minimum = top + dp(56) + stageHeight + dp(6 + 40 + 12 + 24 + 28) + timeRow.getMeasuredHeight()
+@@ -1724,7 +1726,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
+             int coverLeft = (width - coverSize) / 2;
+             if (BuildConfig.CONNECTED_ALPHA) cover.layout(0, 0, width, top + coverSize);
+             else cover.layout(coverLeft, y + dp(16), coverLeft + coverSize, y + dp(16) + coverSize);
+-            int titleTop = BuildConfig.CONNECTED_ALPHA ? top + coverSize + dp(16) : y + dp(16) + coverSize + dp(26);
++            int titleTop = BuildConfig.CONNECTED_ALPHA ? top + coverSize - dp(64) : y + dp(16) + coverSize + dp(26);
+             titleRow.layout(side, titleTop, side + contentW, titleTop + titleRow.getMeasuredHeight());
+             lyricsPanel.layout(side, stageTop, side + contentW, stageTop + stageHeight);
+             y = stageTop + stageHeight + dp(6);
+diff --git a/TMessagesProj/src/main/java/app/exteraless/player/SignatureCoverFade.java b/TMessagesProj/src/main/java/app/exteraless/player/SignatureCoverFade.java
+index 571b5c4a8..12820ed03 100644
+--- a/TMessagesProj/src/main/java/app/exteraless/player/SignatureCoverFade.java
++++ b/TMessagesProj/src/main/java/app/exteraless/player/SignatureCoverFade.java
+@@ -14,8 +14,8 @@ final class SignatureCoverFade {
+         this.width = width; this.height = height; this.color = color;
+         int clear = color & 0x00ffffff;
+         paint.setShader(height > 0 ? new LinearGradient(0, 0, 0, height,
+-                new int[]{(color & 0x00ffffff) | 0xcc000000, clear, clear, color | 0xff000000},
+-                new float[]{0, .25f, .48f, 1}, Shader.TileMode.CLAMP) : null);
++                new int[]{(color & 0x00ffffff) | 0x55000000, clear, clear, color | 0xff000000},
++                new float[]{0, .18f, .42f, 1}, Shader.TileMode.CLAMP) : null);
+     }
+     void draw(Canvas canvas) { if (width > 0 && height > 0) canvas.drawRect(0, 0, width, height, paint); }
+ }
+diff --git a/TMessagesProj/src/main/java/app/exteraless/player/SignatureMusicActions.java b/TMessagesProj/src/main/java/app/exteraless/player/SignatureMusicActions.java
+new file mode 100644
+index 000000000..e551b87cd
+--- /dev/null
++++ b/TMessagesProj/src/main/java/app/exteraless/player/SignatureMusicActions.java
+@@ -0,0 +1,36 @@
++package app.exteraless.player;
++
++import android.content.Context;
++import android.view.View;
++import android.widget.LinearLayout;
++import static org.telegram.messenger.AndroidUtilities.dp;
++
++/** Four native actions, one row normally; narrow/large-font windows reflow without shrinking labels. */
++public final class SignatureMusicActions extends LinearLayout {
++    public SignatureMusicActions(Context context) { super(context); }
++    private int columns(int width) {
++        float scale=getResources().getConfiguration().fontScale;
++        int minimum=Math.round(dp(72)*Math.max(1f,scale));
++        return width>=minimum*4?4:width>=minimum*2?2:1;
++    }
++    @Override protected void onMeasure(int widthSpec,int heightSpec) {
++        int width=MeasureSpec.getSize(widthSpec),columns=columns(width);
++        int cellHeight=Math.max(dp(72),(int)Math.ceil(dp(38)+16*getResources().getDisplayMetrics().scaledDensity));
++        for(int i=0;i<getChildCount();i++) {
++            View child=getChildAt(i);LayoutParams lp=(LayoutParams)child.getLayoutParams();
++            int cellWidth=(i%columns+1)*width/columns-(i%columns)*width/columns;
++            child.measure(MeasureSpec.makeMeasureSpec(Math.max(0,cellWidth-lp.leftMargin-lp.rightMargin),MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(cellHeight,MeasureSpec.EXACTLY));
++        }
++        int rows=(getChildCount()+columns-1)/columns;
++        setMeasuredDimension(width,resolveSize(rows*cellHeight+Math.max(0,rows-1)*dp(8),heightSpec));
++    }
++    @Override protected void onLayout(boolean changed,int left,int top,int right,int bottom) {
++        int width=right-left,columns=columns(width);boolean rtl=getLayoutDirection()==LAYOUT_DIRECTION_RTL;
++        for(int i=0;i<getChildCount();i++) {
++            View child=getChildAt(i);LayoutParams lp=(LayoutParams)child.getLayoutParams();
++            int col=rtl?columns-1-i%columns:i%columns;
++            int x=col*width/columns+lp.leftMargin,y=(i/columns)*(child.getMeasuredHeight()+dp(8));
++            child.layout(x,y,x+child.getMeasuredWidth(),y+child.getMeasuredHeight());
++        }
++    }
++}
+diff --git a/TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleConfig.java b/TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleConfig.java
+index bb9ff88d8..20cc661fd 100644
+--- a/TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleConfig.java
++++ b/TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleConfig.java
+@@ -9,13 +9,17 @@ public final class BubbleConfig {
+     public static final String FILE = "flexygram_bubbles";
+     public static final String GLASS = "glass", TRANSPARENCY = "transparency", BORDER = "border", EDGES = "edges";
+     private static boolean loaded, glass, border, edges, cachedBlur;
+-    private static int transparency = 35, borderTenths = 11;
++    private static int transparency = 35, borderTenths = 11, outlineStyle, pearlIntensity = 55;
++    private static boolean outlineEnabled = true;
+     private BubbleConfig() { }
+     private static SharedPreferences preferences() {
+         return ApplicationLoader.applicationContext.getSharedPreferences(FILE, Context.MODE_PRIVATE);
+     }
+     public static void load() {
+         SharedPreferences p = preferences();
++        outlineEnabled = p.getBoolean("signature_outline_enabled", true);
++        outlineStyle = Math.max(0, Math.min(1, p.getInt("signature_outline_style", 0)));
++        pearlIntensity = Math.max(0, Math.min(100, p.getInt("signature_pearl_intensity", 55)));
+         cachedBlur = p.getBoolean("signature_cached_blur", false);
+         borderTenths = Math.max(5, Math.min(20, p.getInt("signature_border_tenths", 11)));
+         glass = p.getBoolean(GLASS, false); border = p.getBoolean(BORDER, false);
+@@ -31,6 +35,12 @@ public final class BubbleConfig {
+         cachedBlur = value;
+         preferences().edit().putBoolean("signature_cached_blur", value).apply();
+     }
++    public static boolean outlineEnabled() { return outlineEnabled; }
++    public static int outlineStyle() { return outlineStyle; }
++    public static int pearlIntensity() { return pearlIntensity; }
++    public static void setOutlineEnabled(boolean value) { if (!loaded) load(); outlineEnabled = value; preferences().edit().putBoolean("signature_outline_enabled", value).apply(); }
++    public static void setOutlineStyle(int value) { if (!loaded) load(); outlineStyle = Math.max(0, Math.min(1, value)); preferences().edit().putInt("signature_outline_style", outlineStyle).apply(); }
++    public static void setPearlIntensity(int value) { if (!loaded) load(); value = Math.max(0, Math.min(100, value)); if (value == pearlIntensity) return; pearlIntensity = value; preferences().edit().putInt("signature_pearl_intensity", value).apply(); }
+     public static int transparency() { return transparency; }
+     public static int borderTenths() { return borderTenths; }
+     public static float borderDp() { return borderTenths / 10f; }
+diff --git a/TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleOutline.java b/TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleOutline.java
+new file mode 100644
+index 000000000..1436c12ec
+--- /dev/null
++++ b/TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleOutline.java
+@@ -0,0 +1,29 @@
++package app.flexygram.bubbles;
++
++/** Pure color policy. Input is always the native bubble palette, never wallpaper or blur output. */
++public final class BubbleOutline {
++    private BubbleOutline() { }
++    private static int mix(int a, int b, int percent) { return a + (b - a) * percent / 100; }
++    public static int palette(int base,int first,int second,int third) {
++        int r=(base>>>16)&255,g=(base>>>8)&255,b=base&255,count=1;
++        if(first!=0){r+=(first>>>16)&255;g+=(first>>>8)&255;b+=first&255;count++;}
++        if(second!=0){r+=(second>>>16)&255;g+=(second>>>8)&255;b+=second&255;count++;}
++        if(third!=0){r+=(third>>>16)&255;g+=(third>>>8)&255;b+=third&255;count++;}
++        return 0xff000000|((r/count)<<16)|((g/count)<<8)|(b/count);
++    }
++    public static int color(int base, boolean dark, int style, int intensity) {
++        int r=(base>>>16)&255,g=(base>>>8)&255,b=base&255;
++        int luminance=(r*299+g*587+b*114)/1000;
++        if (style == 1) {
++            int strength=Math.max(0,Math.min(100,intensity));
++            int pearl=28+strength*42/100;
++            return ((160+strength*80/100)<<24)|(mix(r,255,pearl)<<16)|(mix(g,255,pearl)<<8)|mix(b,255,pearl);
++        }
++        // Increase native chroma slightly, then contrast; neutral bubbles remain neutral.
++        int contrast=dark?24:-24;
++        r=Math.max(0,Math.min(255,r+(r-luminance)*12/100+contrast));
++        g=Math.max(0,Math.min(255,g+(g-luminance)*12/100+contrast));
++        b=Math.max(0,Math.min(255,b+(b-luminance)*12/100+contrast));
++        return 0xe8000000|(r<<16)|(g<<8)|b;
++    }
++}
+diff --git a/TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleSettingsActivity.java b/TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleSettingsActivity.java
+index 74b88e690..a8580c23b 100644
+--- a/TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleSettingsActivity.java
++++ b/TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleSettingsActivity.java
+@@ -12,6 +12,8 @@ import android.graphics.drawable.GradientDrawable;
+ import androidx.recyclerview.widget.RecyclerView;
+ import org.telegram.messenger.R;
+ import org.telegram.ui.ActionBar.Theme;
++import org.telegram.ui.ActionBar.AlertDialog;
++import org.telegram.ui.Cells.TextSettingsCell;
+ import org.telegram.ui.Cells.TextCheckCell;
+ import org.telegram.ui.Cells.TextInfoPrivacyCell;
+ import org.telegram.ui.Components.RecyclerListView;
+@@ -20,23 +22,32 @@ import app.flexygram.settings.SignatureMatteSettingsActivity;
+ /** Local native preview, fill opacity, border width and optional cached wallpaper blur. */
+ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity {
+     private static final int SLIDER = 110;
+-    private int transparencyRow, borderRow, previewRow, blurRow, infoRow;
++    private int transparencyRow, borderRow, previewRow, blurRow, infoRow, enabledRow, styleRow, pearlRow;
+     private BubblePreviewView preview;
+     @Override protected void updateRows() {
+         super.updateRows(); BubbleConfig.load();
+-        previewRow = addRow(); transparencyRow = addRow("flexyBubbleTransparency"); borderRow = addRow("flexyBubbleBorderWidth"); blurRow = addRow("flexyBubbleBackgroundBlur"); infoRow = addRow();
++        previewRow = addRow(); transparencyRow = addRow("flexyBubbleTransparency"); borderRow = addRow("flexyBubbleBorderWidth"); blurRow = addRow("flexyBubbleBackgroundBlur"); enabledRow = addRow("flexyBubbleOutlineEnabled"); styleRow = addRow("flexyBubbleOutlineStyle"); pearlRow = addRow("flexyBubblePearlIntensity"); infoRow = addRow();
+     }
+     @Override protected String getActionBarTitle() { return getString(R.string.FlexyBubblesTitle); }
+     @Override protected BaseListAdapter createAdapter(Context context) { return new Adapter(context); }
+     @Override protected void onItemClick(View view, int position, float x, float y) {
+-        if (position == blurRow) {
++        if (position == enabledRow) {
++            BubbleConfig.setOutlineEnabled(!BubbleConfig.outlineEnabled());
++            listAdapter.notifyItemChanged(position); if (preview != null) preview.settingsChanged();
++        } else if (position == styleRow) {
++            showDialog(new AlertDialog.Builder(getParentActivity(), resourcesProvider).setTitle(getString(R.string.FlexyBubbleOutlineStyle))
++                .setItems(new CharSequence[]{getString(R.string.FlexyBubbleIntelligentColor),getString(R.string.FlexyBubbleGlassPearl)},(dialog,which)->{
++                    BubbleConfig.setOutlineStyle(which); listAdapter.notifyItemChanged(styleRow); listAdapter.notifyItemChanged(pearlRow);
++                    if (preview != null) preview.settingsChanged();
++                }).create());
++        } else if (position == blurRow) {
+             BubbleConfig.setBackgroundBlur(!BubbleConfig.backgroundBlur());
+             if (view instanceof TextCheckCell) ((TextCheckCell) view).setChecked(BubbleConfig.backgroundBlur());
+             if (preview != null) preview.settingsChanged();
+         }
+     }
+     private final class TransparencyCell extends LinearLayout {
+-        boolean border;
++        boolean border, pearl;
+         final TextView title;
+         final SeekBar seek;
+         boolean binding;
+@@ -51,25 +62,26 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
+                 public void onStartTrackingTouch(SeekBar bar) { bar.getParent().requestDisallowInterceptTouchEvent(true); }
+                 public void onStopTrackingTouch(SeekBar bar) { bar.getParent().requestDisallowInterceptTouchEvent(false); }
+                 public void onProgressChanged(SeekBar bar, int value, boolean user) {
+-                    if (user && !binding) { if (border) BubbleConfig.setBorderTenths(value+5); else BubbleConfig.setTransparency(value); if (preview != null) preview.settingsChanged(); }
++                    if (user && !binding) { if (border) BubbleConfig.setBorderTenths(value+5); else if (pearl) BubbleConfig.setPearlIntensity(value); else BubbleConfig.setTransparency(value); if (preview != null) preview.settingsChanged(); }
+                     label(value);
+                 }
+             });
+         }
+         void label(int value) {
+-            String text = border ? getString(R.string.FlexyBubbleBorderWidth) + " · " + String.format(java.util.Locale.US, "%.1f dp", (value+5)/10f) : getString(R.string.FlexyBubblesTransparency) + " · " + value + " %";
++            String text = border ? getString(R.string.FlexyBubbleBorderWidth) + " · " + String.format(java.util.Locale.US, "%.1f dp", (value+5)/10f) : getString(pearl ? R.string.FlexyBubblePearlIntensity : R.string.FlexyBubblesTransparency) + " · " + value + " %";
+             title.setText(text); seek.setContentDescription(text);
+         }
+-        void bind(boolean border) {
+-            this.border = border;
+-            binding = true; seek.setMax(border ? 15 : 100); int value = border ? BubbleConfig.borderTenths()-5 : BubbleConfig.transparency(); seek.setProgress(value); label(value);
+-            seek.setEnabled(true); setAlpha(1f); binding = false;
++        void bind(boolean border) { bind(border, false); }
++        void bind(boolean border, boolean pearl) {
++            this.border = border; this.pearl = pearl;
++            binding = true; seek.setMax(border ? 15 : 100); int value = border ? BubbleConfig.borderTenths()-5 : pearl ? BubbleConfig.pearlIntensity() : BubbleConfig.transparency(); seek.setProgress(value); label(value);
++            seek.setEnabled(!pearl || BubbleConfig.outlineStyle() == 1); setAlpha(!pearl || BubbleConfig.outlineStyle() == 1 ? 1f : .5f); binding = false;
+         }
+     }
+     private final class Adapter extends MatteListAdapter {
+         Adapter(Context context) { super(context); }
+         @Override public int getItemViewType(int position) {
+-            return position == previewRow ? 111 : position == blurRow ? TYPE_CHECK : position == transparencyRow || position == borderRow ? SLIDER : TYPE_INFO_PRIVACY;
++            return position == previewRow ? 111 : position == blurRow || position == enabledRow ? TYPE_CHECK : position == styleRow ? TYPE_SETTINGS : position == transparencyRow || position == borderRow || position == pearlRow ? SLIDER : TYPE_INFO_PRIVACY;
+         }
+         @Override public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int type) {
+             if (type == 111) { preview = new BubblePreviewView(parent.getContext()); return new RecyclerListView.Holder(preview); }
+@@ -79,10 +91,19 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
+         @Override public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, boolean partial) {
+             if (position == previewRow) { holder.itemView.invalidate(); return; }
+             if (position == transparencyRow || position == borderRow) { ((TransparencyCell)holder.itemView).bind(position == borderRow); return; }
+-            if (position == blurRow) { ((TextCheckCell)holder.itemView).setTextAndCheck(getString(R.string.FlexyBubbleBackgroundBlur), BubbleConfig.backgroundBlur(), false); return; }
++            if (position == enabledRow) {
++            BubbleConfig.setOutlineEnabled(!BubbleConfig.outlineEnabled());
++            listAdapter.notifyItemChanged(position); if (preview != null) preview.settingsChanged();
++        } else if (position == styleRow) {
++            showDialog(new AlertDialog.Builder(getParentActivity(), resourcesProvider).setTitle(getString(R.string.FlexyBubbleOutlineStyle))
++                .setItems(new CharSequence[]{getString(R.string.FlexyBubbleIntelligentColor),getString(R.string.FlexyBubbleGlassPearl)},(dialog,which)->{
++                    BubbleConfig.setOutlineStyle(which); listAdapter.notifyItemChanged(styleRow); listAdapter.notifyItemChanged(pearlRow);
++                    if (preview != null) preview.settingsChanged();
++                }).create());
++        } else if (position == blurRow) { ((TextCheckCell)holder.itemView).setTextAndCheck(getString(R.string.FlexyBubbleBackgroundBlur), BubbleConfig.backgroundBlur(), false); return; }
+             if (position == infoRow) { ((TextInfoPrivacyCell)holder.itemView).setText(getString(R.string.FlexyBubblesInfo) + "\n\n" + getString(R.string.FlexyBubbleBlurCompatibility)); return; }
+ 
+         }
+-        @Override public boolean isEnabled(RecyclerView.ViewHolder holder) { return holder.getAdapterPosition() == blurRow; }
++        @Override public boolean isEnabled(RecyclerView.ViewHolder holder) { int p = holder.getAdapterPosition(); return p == blurRow || p == styleRow || p == enabledRow; }
+     }
+ }
+diff --git a/TMessagesProj/src/main/java/app/flexygram/bubbles/SignatureWallpaperBlur.java b/TMessagesProj/src/main/java/app/flexygram/bubbles/SignatureWallpaperBlur.java
+index 432cf58bf..2a503fc45 100644
+--- a/TMessagesProj/src/main/java/app/flexygram/bubbles/SignatureWallpaperBlur.java
++++ b/TMessagesProj/src/main/java/app/flexygram/bubbles/SignatureWallpaperBlur.java
+@@ -221,10 +221,16 @@ public final class SignatureWallpaperBlur {
+         public boolean isReady() { return !closed && shader != null && entry != null && entry.bitmap != null && !entry.bitmap.isRecycled(); }
+         public boolean isSupported() { return supported; }
+         public boolean draw(Canvas canvas, Path shape, float rootOffsetX, float rootOffsetY) {
+-            if (!BubbleConfig.backgroundBlur() || !isReady() || bitmap(source) != sourceBitmap
+-                    || sourceBitmap.isRecycled() || sourceBitmap.getGenerationId() != generation || mapping.isEmpty()) return false;
++            return draw(canvas, shape, rootOffsetX, rootOffsetY, 255);
++        }
++        public boolean draw(Canvas canvas, Path shape, float rootOffsetX, float rootOffsetY, int alpha) {
++            // Mapping is captured once by the wallpaper owner after its native draw. A shared
++            // Drawable can be drawn by another screen; never read its mutable bounds per message.
++            if (!BubbleConfig.backgroundBlur() || !supported || !isReady()
++                    || sourceBitmap == null || sourceBitmap.isRecycled() || sourceBitmap.getGenerationId() != generation || mapping.isEmpty()) return false;
+             matrix.setScale(mapping.width() / entry.bitmap.getWidth(), mapping.height() / entry.bitmap.getHeight());
+             matrix.postTranslate(mapping.left - rootOffsetX, mapping.top - rootOffsetY); shader.setLocalMatrix(matrix);
++            paint.setAlpha(Math.max(0, Math.min(255, alpha)));
+             canvas.drawPath(shape, paint); return true;
+         }
+         private void release() {
+diff --git a/TMessagesProj/src/main/java/app/flexygram/header/HeaderConfig.java b/TMessagesProj/src/main/java/app/flexygram/header/HeaderConfig.java
+index 981def566..50c8a8ffe 100644
+--- a/TMessagesProj/src/main/java/app/flexygram/header/HeaderConfig.java
++++ b/TMessagesProj/src/main/java/app/flexygram/header/HeaderConfig.java
+@@ -9,7 +9,7 @@ import java.util.Map;
+ /** UI-owned snapshot. Legacy choices are read conservatively and never overwritten. */
+ public final class HeaderConfig {
+     private static boolean loaded, signature = true, compact, counter = true;
+-    private static int opacity = 85;
++    private static int opacity = 85, counterMode = 1;
+     private HeaderConfig() { }
+     private static SharedPreferences prefs() { return ApplicationLoader.applicationContext.getSharedPreferences("flexygram_header", Context.MODE_PRIVATE); }
+     public static void load() {
+@@ -19,6 +19,8 @@ public final class HeaderConfig {
+         boolean legacy = Boolean.TRUE.equals(old.get("OEAppearanceIosChatHeaderAuto")) || !(previous instanceof Boolean) || (Boolean) previous;
+         Object style = p.get("style"); signature = style instanceof Integer ? (Integer) style == 0 : legacy;
+         compact = Boolean.TRUE.equals(p.get("compact")); counter = !Boolean.FALSE.equals(p.get("counter"));
++        Object mode = p.get("counter_mode");
++        counterMode = mode instanceof Integer ? Math.max(1, Math.min(2, (Integer) mode)) : 1;
+         Object value = p.get("opacity"); opacity = value instanceof Integer ? Math.max(0, Math.min(100, (Integer) value)) : 85;
+         loaded = true;
+     }
+@@ -26,9 +28,11 @@ public final class HeaderConfig {
+     public static boolean signature() { ensure(); return signature; }
+     public static boolean compact() { ensure(); return compact; }
+     public static boolean counter() { ensure(); return counter; }
++    public static int counterMode() { ensure(); return counter ? counterMode : 0; }
++    public static void counterMode(int value) { ensure(); counter = value != 0; if (counter) counterMode = Math.max(1, Math.min(2, value)); prefs().edit().putInt("counter_mode", counterMode).putBoolean("counter", counter).apply(); }
+     public static int opacity() { ensure(); return opacity; }
+     public static void style(boolean value) { ensure(); signature = value; prefs().edit().putInt("style", value ? 0 : 1).apply(); }
+     public static void compact(boolean value) { ensure(); compact = value; prefs().edit().putBoolean("compact", value).apply(); }
+-    public static void counter(boolean value) { ensure(); counter = value; prefs().edit().putBoolean("counter", value).apply(); }
++    public static void counter(boolean value) { counterMode(value ? 1 : 0); }
+     public static void opacity(int value) { ensure(); opacity = Math.max(0, Math.min(100, value)); prefs().edit().putInt("opacity", opacity).apply(); }
+ }
+diff --git a/TMessagesProj/src/main/java/app/flexygram/header/HeaderGeometry.java b/TMessagesProj/src/main/java/app/flexygram/header/HeaderGeometry.java
+index 6a658a5ad..3d6a02f69 100644
+--- a/TMessagesProj/src/main/java/app/flexygram/header/HeaderGeometry.java
++++ b/TMessagesProj/src/main/java/app/flexygram/header/HeaderGeometry.java
+@@ -4,22 +4,31 @@ import android.graphics.RectF;
+ 
+ /** One layout, three equal outer heights. Title always centered in the useful window width. */
+ public final class HeaderGeometry {
+-    public final RectF back = new RectF(), title = new RectF(), avatar = new RectF();
++    public final RectF back = new RectF(), title = new RectF(), avatar = new RectF(), badge = new RectF();
++    public boolean separateCount;
+     public boolean countVisible;
+     public static float height(int width, float titlePx, float subtitlePx, float density, boolean compact) {
+-        float wanted = Math.max((compact ? 48 : 52) * density, (float) Math.ceil(titlePx + subtitlePx + 12 * density));
++        float wanted = Math.max((compact ? 40 : 44) * density, (float) Math.ceil(titlePx + subtitlePx + 8 * density));
+         float maximum = Math.max(48 * density, (width - 108 * density) / 2f);
+         return Math.min(wanted, maximum);
+     }
+     public void update(int width, float top, float height, float numberWidth, float density, boolean rtl) {
++        update(width, top, height, numberWidth, density, rtl, 1);
++    }
++    public void update(int width, float top, float height, float numberWidth, float density, boolean rtl, int counterMode) {
+         float edge = 8 * density, gap = 6 * density;
+         float maxSide = Math.max(height, Math.min(width * .28f, (width - 64 * density) / 2 - edge - gap));
+-        countVisible = numberWidth > 0 && height + numberWidth + 8 * density <= maxSide;
+-        float side = height + (countVisible ? numberWidth + 8 * density : 0);
++        float extra = counterMode == 2 ? Math.max(height * .65f, numberWidth + 8 * density) + 3 * density : numberWidth + 8 * density;
++        countVisible = counterMode != 0 && numberWidth > 0 && height + extra <= maxSide;
++        separateCount = countVisible && counterMode == 2;
++        float side = height + (countVisible ? extra : 0);
+         back.set(edge, top, edge + side, top + height);
+         avatar.set(width - edge - height, top, width - edge, top + height);
+         float inset = edge + Math.max(side, height) + gap;
+         title.set(Math.min(width / 2f, inset), top, Math.max(width / 2f, width - inset), top + height);
++        float badgeSize = separateCount ? extra - 3 * density : extra;
++        float badgeLeft = rtl ? width - edge - side : back.left + height + (separateCount ? 3 * density : 0);
++        badge.set(badgeLeft, top + (height - badgeSize) / 2f, badgeLeft + badgeSize, top + (height + badgeSize) / 2f);
+         if (rtl) { back.offset(width - edge * 2 - side, 0); avatar.offset(-(width - edge * 2 - height), 0); }
+     }
+ }
+diff --git a/TMessagesProj/src/main/java/app/flexygram/header/HeaderPreviewView.java b/TMessagesProj/src/main/java/app/flexygram/header/HeaderPreviewView.java
+index 42b30b3b2..a21cda171 100644
+--- a/TMessagesProj/src/main/java/app/flexygram/header/HeaderPreviewView.java
++++ b/TMessagesProj/src/main/java/app/flexygram/header/HeaderPreviewView.java
+@@ -17,7 +17,8 @@ public final class HeaderPreviewView extends View {
+     private final android.graphics.drawable.Drawable back, more;
+     private final String name, status;
+     private int iconColor;
+-    private float titlePx, subtitlePx, previewHeight;
++    private float titlePx, subtitlePx, previewHeight, titleBaseline, subtitleBaseline;
++    private final Paint.FontMetricsInt fontMetrics = new Paint.FontMetricsInt();
+     private String displayName = "", displayStatus = "";
+     public HeaderPreviewView(Context context) {
+         super(context); text.setTextAlign(Paint.Align.CENTER);
+@@ -28,12 +29,15 @@ public final class HeaderPreviewView extends View {
+     public void settingsChanged() { requestLayout(); invalidate(); }
+     @Override protected void onMeasure(int widthSpec, int heightSpec) {
+         int width=MeasureSpec.getSize(widthSpec); var metrics=getResources().getDisplayMetrics();
+-        titlePx=android.util.TypedValue.applyDimension(android.util.TypedValue.COMPLEX_UNIT_SP,17.5f,metrics);
+-        subtitlePx=android.util.TypedValue.applyDimension(android.util.TypedValue.COMPLEX_UNIT_SP,13.5f,metrics);
+-        previewHeight=HeaderGeometry.height(width,titlePx,subtitlePx,AndroidUtilities.density,HeaderConfig.compact());
++        titlePx=android.util.TypedValue.applyDimension(android.util.TypedValue.COMPLEX_UNIT_SP,HeaderConfig.compact()?16f:17.5f,metrics);
++        subtitlePx=android.util.TypedValue.applyDimension(android.util.TypedValue.COMPLEX_UNIT_SP,HeaderConfig.compact()?12f:13.5f,metrics);
++        text.setTextSize(titlePx); text.getFontMetricsInt(fontMetrics); int titleLine=fontMetrics.descent-fontMetrics.ascent;
++        text.setTextSize(subtitlePx); text.getFontMetricsInt(fontMetrics); int subtitleLine=fontMetrics.descent-fontMetrics.ascent;
++        previewHeight=HeaderGeometry.height(width,titleLine,subtitleLine,AndroidUtilities.density,HeaderConfig.compact());
++        float fit=Math.min(1f,(previewHeight-AndroidUtilities.dp(8))/(titleLine+subtitleLine));titlePx*=fit;subtitlePx*=fit;
+         titlePx=Math.min(titlePx,previewHeight-AndroidUtilities.dp(8));
+         int h=Math.round(previewHeight)+AndroidUtilities.dp(80);setMeasuredDimension(width,h);
+-        text.setTextSize(AndroidUtilities.dp(16));geometry.update(width,(h-previewHeight)/2,previewHeight,HeaderConfig.counter()?text.measureText("3"):0,AndroidUtilities.density,LocaleController.isRTL);
++        text.setTextSize(AndroidUtilities.dp(16));geometry.update(width,(h-previewHeight)/2,previewHeight,HeaderConfig.counter()?text.measureText("3"):0,AndroidUtilities.density,LocaleController.isRTL,HeaderConfig.counterMode());
+         text.setTextSize(titlePx);displayName=android.text.TextUtils.ellipsize(name,new android.text.TextPaint(text),Math.max(0,geometry.title.width()-AndroidUtilities.dp(64)),android.text.TextUtils.TruncateAt.END).toString();
+         text.setTextSize(subtitlePx);displayStatus=android.text.TextUtils.ellipsize(status,new android.text.TextPaint(text),Math.max(0,geometry.title.width()-AndroidUtilities.dp(64)),android.text.TextUtils.TruncateAt.END).toString();
+     }
+@@ -41,7 +45,7 @@ public final class HeaderPreviewView extends View {
+     @Override protected void onDraw(Canvas canvas) {
+         float d = AndroidUtilities.density, height = previewHeight;
+         canvas.drawColor(Theme.getColor(Theme.key_windowBackgroundGray));
+-        text.setTextSize(AndroidUtilities.dp(16)); geometry.update(getWidth(), (getHeight()-height)/2, height, HeaderConfig.counter() ? text.measureText("3") : 0, d, LocaleController.isRTL);
++        text.setTextSize(AndroidUtilities.dp(16)); geometry.update(getWidth(), (getHeight()-height)/2, height, HeaderConfig.counter() ? text.measureText("3") : 0, d, LocaleController.isRTL,HeaderConfig.counterMode());
+         if (!HeaderConfig.signature()) { text.setColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText)); canvas.drawText(name, getWidth()/2f, getHeight()/2f, text); return; }
+         surface.draw(canvas, geometry, d, null);
+         int color = Theme.getColor(Theme.key_actionBarDefaultTitle);
+@@ -50,9 +54,11 @@ public final class HeaderPreviewView extends View {
+         int side=AndroidUtilities.dp(24), y=Math.round(geometry.back.centerY());
+         back.setBounds(Math.round(arrow)-side/2,y-side/2,Math.round(arrow)+side/2,y+side/2); back.draw(canvas);
+         text.setColor(color); if (geometry.countVisible) canvas.drawText("3",LocaleController.isRTL ? geometry.back.left+(geometry.back.width()-height)/2 : geometry.back.left+height+(geometry.back.width()-height)/2, y+AndroidUtilities.dp(5),text);
+-        boolean statusFits=titlePx+subtitlePx+AndroidUtilities.dp(12)<=height;
+-        text.setTextSize(titlePx); canvas.drawText(displayName,geometry.title.centerX(),statusFits?y-AndroidUtilities.dp(1):y-(text.ascent()+text.descent())/2,text);
+-        if(statusFits){text.setTextSize(subtitlePx);canvas.drawText(displayStatus,geometry.title.centerX(),y+subtitlePx+AndroidUtilities.dp(2),text);}
++        text.setTextSize(titlePx); float titleHeight=text.descent()-text.ascent(), titleAscent=text.ascent();
++        text.setTextSize(subtitlePx); float subtitleHeight=text.descent()-text.ascent();
++        float blockTop=geometry.title.centerY()-(titleHeight+subtitleHeight+AndroidUtilities.dp(2))/2;
++        text.setTextSize(titlePx); canvas.drawText(displayName,geometry.title.centerX(),blockTop-titleAscent,text);
++        text.setTextSize(subtitlePx);canvas.drawText(displayStatus,geometry.title.centerX(),blockTop+titleHeight+AndroidUtilities.dp(2)-text.ascent(),text);
+         int mx=LocaleController.isRTL ? Math.round(geometry.title.left)+AndroidUtilities.dp(14):Math.round(geometry.title.right)-AndroidUtilities.dp(14);
+         more.setBounds(mx-side/2,y-side/2,mx+side/2,y+side/2);more.draw(canvas);
+         avatar.setColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText));canvas.drawCircle(geometry.avatar.centerX(),geometry.avatar.centerY(),height/2-AndroidUtilities.dp(1),avatar);
+diff --git a/TMessagesProj/src/main/java/app/flexygram/header/HeaderSettingsActivity.java b/TMessagesProj/src/main/java/app/flexygram/header/HeaderSettingsActivity.java
+index f4b247836..340471485 100644
+--- a/TMessagesProj/src/main/java/app/flexygram/header/HeaderSettingsActivity.java
++++ b/TMessagesProj/src/main/java/app/flexygram/header/HeaderSettingsActivity.java
+@@ -25,7 +25,9 @@ public final class HeaderSettingsActivity extends SignatureMatteSettingsActivity
+     @Override protected BaseListAdapter createAdapter(Context c) { return new Adapter(c); }
+     private void changed(int row) { listAdapter.notifyItemChanged(row); if(preview!=null)preview.settingsChanged(); }
+     @Override protected void onItemClick(View v,int position,float x,float y) {
+-        if(position==counterRow){HeaderConfig.counter(!HeaderConfig.counter());changed(position);}
++        if(position==counterRow){
++            showDialog(new AlertDialog.Builder(getParentActivity(),resourcesProvider).setTitle(getString(R.string.FlexyHeaderCounter)).setItems(new CharSequence[]{getString(R.string.FlexyHeaderCounterOff),getString(R.string.FlexyHeaderCounterIntegrated),getString(R.string.FlexyHeaderCounterBadge)},(dialog,which)->{HeaderConfig.counterMode(which);changed(position);}).create());
++        }
+         else if(position==styleRow||position==sizeRow){boolean style=position==styleRow;
+             showDialog(new AlertDialog.Builder(getParentActivity(),resourcesProvider).setTitle(getString(style?R.string.FlexyHeaderStyle:R.string.FlexyHeaderSize)).setItems(style?new CharSequence[]{getString(R.string.FlexyHeaderSignature),getString(R.string.FlexyHeaderClassic)}:new CharSequence[]{getString(R.string.FlexyHeaderNormal),getString(R.string.FlexyHeaderCompact)},(dialog,which)->{if(style)HeaderConfig.style(which==0);else HeaderConfig.compact(which==1);changed(position);}).create());
+         }
+@@ -38,9 +40,9 @@ public final class HeaderSettingsActivity extends SignatureMatteSettingsActivity
+     }
+     private final class Adapter extends MatteListAdapter {
+         Adapter(Context c){super(c);}
+-        @Override public int getItemViewType(int p){return p==previewRow?111:p==opacityRow?112:p==counterRow?TYPE_CHECK:TYPE_SETTINGS;}
++        @Override public int getItemViewType(int p){return p==previewRow?111:p==opacityRow?112:TYPE_SETTINGS;}
+         @Override public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup p,int type){if(type==111){preview=new HeaderPreviewView(p.getContext());return new RecyclerListView.Holder(preview);}if(type==112)return new RecyclerListView.Holder(new OpacityCell(p.getContext()));return super.onCreateViewHolder(p,type);}
+-        @Override public void onBindViewHolder(RecyclerView.ViewHolder h,int p,boolean partial){if(p==previewRow){h.itemView.invalidate();return;}if(p==opacityRow){((OpacityCell)h.itemView).bind();return;}if(p==counterRow){((TextCheckCell)h.itemView).setTextAndCheck(getString(R.string.FlexyHeaderCounter),HeaderConfig.counter(),true);return;}((TextSettingsCell)h.itemView).setTextAndValue(getString(p==styleRow?R.string.FlexyHeaderStyle:R.string.FlexyHeaderSize),getString(p==styleRow?(HeaderConfig.signature()?R.string.FlexyHeaderSignature:R.string.FlexyHeaderClassic):(HeaderConfig.compact()?R.string.FlexyHeaderCompact:R.string.FlexyHeaderNormal)),true);}
++        @Override public void onBindViewHolder(RecyclerView.ViewHolder h,int p,boolean partial){if(p==previewRow){h.itemView.invalidate();return;}if(p==opacityRow){((OpacityCell)h.itemView).bind();return;}if(p==counterRow){((TextSettingsCell)h.itemView).setTextAndValue(getString(R.string.FlexyHeaderCounter),getString(HeaderConfig.counterMode()==0?R.string.FlexyHeaderCounterOff:HeaderConfig.counterMode()==1?R.string.FlexyHeaderCounterIntegrated:R.string.FlexyHeaderCounterBadge),true);return;}((TextSettingsCell)h.itemView).setTextAndValue(getString(p==styleRow?R.string.FlexyHeaderStyle:R.string.FlexyHeaderSize),getString(p==styleRow?(HeaderConfig.signature()?R.string.FlexyHeaderSignature:R.string.FlexyHeaderClassic):(HeaderConfig.compact()?R.string.FlexyHeaderCompact:R.string.FlexyHeaderNormal)),true);}
+         @Override public boolean isEnabled(RecyclerView.ViewHolder h){int p=h.getAdapterPosition();return p==counterRow||p==styleRow||p==sizeRow;}
+     }
+ }
+diff --git a/TMessagesProj/src/main/java/app/flexygram/header/HeaderSurface.java b/TMessagesProj/src/main/java/app/flexygram/header/HeaderSurface.java
+index 61168f8ee..77b0ef918 100644
+--- a/TMessagesProj/src/main/java/app/flexygram/header/HeaderSurface.java
++++ b/TMessagesProj/src/main/java/app/flexygram/header/HeaderSurface.java
+@@ -7,13 +7,20 @@ import org.telegram.ui.ActionBar.Theme;
+ 
+ /** Shared by the real header and synthetic settings preview. No blur, shaders or frame allocations. */
+ public final class HeaderSurface {
++    private final RectF backSurface = new RectF();
+     private final Paint fill = new Paint(Paint.ANTI_ALIAS_FLAG), stroke = new Paint(Paint.ANTI_ALIAS_FLAG);
+     public void draw(Canvas canvas, HeaderGeometry g, float density, Theme.ResourcesProvider provider) {
+         int color = Theme.getColor(Theme.key_windowBackgroundWhite, provider);
+         fill.setColor((color & 0xffffff) | (Math.round(HeaderConfig.opacity() * 2.55f) << 24));
+         stroke.setStyle(Paint.Style.STROKE); stroke.setStrokeWidth(Math.max(1, density * .65f));
+         stroke.setColor((Theme.getColor(Theme.key_divider, provider) & 0xffffff) | 0x66000000);
+-        piece(canvas, g.back); piece(canvas, g.title); piece(canvas, g.avatar);
++        if (g.separateCount) {
++            backSurface.set(g.back);
++            if (org.telegram.messenger.LocaleController.isRTL) backSurface.left = backSurface.right - g.back.height();
++            else backSurface.right = backSurface.left + g.back.height();
++            piece(canvas, backSurface); piece(canvas, g.badge);
++        } else piece(canvas, g.back);
++        piece(canvas, g.title); piece(canvas, g.avatar);
+     }
+     private void piece(Canvas c, RectF r) { float radius = r.height() / 2; c.drawRoundRect(r, radius, radius, fill); c.drawRoundRect(r, radius, radius, stroke); }
+ }
+diff --git a/TMessagesProj/src/main/java/app/flexygram/header/SignatureChatHeader.java b/TMessagesProj/src/main/java/app/flexygram/header/SignatureChatHeader.java
+index 8a17ca400..c0594f70a 100644
+--- a/TMessagesProj/src/main/java/app/flexygram/header/SignatureChatHeader.java
++++ b/TMessagesProj/src/main/java/app/flexygram/header/SignatureChatHeader.java
+@@ -20,6 +20,8 @@ public final class SignatureChatHeader {
+     private final ChatAvatarContainer avatar;
+     private final Theme.ResourcesProvider provider;
+     private final TextView countView;
++    private final android.graphics.Paint textMetrics = new android.graphics.Paint();
++    private final android.graphics.Paint.FontMetricsInt fontMetrics = new android.graphics.Paint.FontMetricsInt();
+     private int count = -1;
+     private String number = "";
+     public float height, titlePx, subtitlePx;
+@@ -41,21 +43,28 @@ public final class SignatureChatHeader {
+     public void changed() { avatar.requestLayout(); bar.requestLayout(); bar.invalidate(); }
+     public int measure(int width, int status, int nativeHeight) {
+         var metrics = bar.getResources().getDisplayMetrics();
+-        titlePx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 17.5f, metrics);
+-        subtitlePx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 13.5f, metrics);
+-        height = HeaderGeometry.height(width, titlePx, subtitlePx, AndroidUtilities.density, HeaderConfig.compact());
+-        subtitleFits = titlePx + subtitlePx + AndroidUtilities.dp(12) <= height;
++        titlePx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, HeaderConfig.compact() ? 16f : 17.5f, metrics);
++        subtitlePx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, HeaderConfig.compact() ? 12f : 13.5f, metrics);
++        textMetrics.setTextSize(titlePx); textMetrics.getFontMetricsInt(fontMetrics);
++        int titleLine = fontMetrics.descent - fontMetrics.ascent;
++        textMetrics.setTextSize(subtitlePx); textMetrics.getFontMetricsInt(fontMetrics);
++        int subtitleLine = fontMetrics.descent - fontMetrics.ascent;
++        height = HeaderGeometry.height(width, titleLine, subtitleLine, AndroidUtilities.density, HeaderConfig.compact());
++        // Narrow windows cap side geometry; retain both lines by fitting the text block together.
++        float fit = Math.min(1f, (height - AndroidUtilities.dp(8)) / (titleLine + subtitleLine));
++        titlePx *= fit; subtitlePx *= fit;
++        subtitleFits = true;
+         titlePx = Math.min(titlePx, height - AndroidUtilities.dp(8));
+         int content = Math.max(nativeHeight, Math.round(height) + AndroidUtilities.dp(12));
+-        float digits = HeaderConfig.counter() && count >= 0 ? countView.getPaint().measureText(number) : 0;
+-        geometry.update(width, status + (content - height) / 2f, height, digits, AndroidUtilities.density, LocaleController.isRTL);
++        float digits = HeaderConfig.counter() && count > 0 ? countView.getPaint().measureText(number) : 0;
++        geometry.update(width, status + (content - height) / 2f, height, digits, AndroidUtilities.density, LocaleController.isRTL, HeaderConfig.counterMode());
+         return content;
+     }
+     public void measureControls() {
+         if (bar.backButtonImageView == null) return;
+         if (active()) {
+-            bar.backButtonImageView.measure(exact(geometry.back.width()), exact(height));
+-            countView.measure(exact(Math.max(0, geometry.back.width() - height)), exact(height));
++            bar.backButtonImageView.measure(exact(Math.max(AndroidUtilities.dp(48), geometry.back.width())), exact(Math.max(AndroidUtilities.dp(48), height)));
++            countView.measure(exact(geometry.countVisible ? geometry.badge.width() : 0), exact(geometry.separateCount ? geometry.badge.height() : height));
+         }
+         countView.setVisibility(active() && geometry.countVisible ? View.VISIBLE : View.GONE);
+     }
+@@ -67,9 +76,12 @@ public final class SignatureChatHeader {
+             int extra = Math.round(geometry.back.width() - height);
+             int pl = LocaleController.isRTL ? extra : 0, pr = LocaleController.isRTL ? 0 : extra;
+             if (back.getPaddingLeft() != pl || back.getPaddingRight() != pr) back.setPadding(pl, 0, pr, 0);
+-            back.layout(Math.round(geometry.back.left), Math.round(geometry.back.top), Math.round(geometry.back.right), Math.round(geometry.back.bottom));
+-            float x = LocaleController.isRTL ? geometry.back.left : geometry.back.left + height;
+-            countView.layout(Math.round(x), Math.round(geometry.back.top), Math.round(x + extra), Math.round(geometry.back.bottom));
++            int hitLeft = Math.round(geometry.back.centerX() - back.getMeasuredWidth() / 2f);
++            int hitTop = Math.round(geometry.back.centerY() - back.getMeasuredHeight() / 2f);
++            back.layout(hitLeft, hitTop, hitLeft + back.getMeasuredWidth(), hitTop + back.getMeasuredHeight());
++            float x = geometry.badge.left;
++            float y = geometry.separateCount ? geometry.badge.top : geometry.back.top;
++            countView.layout(Math.round(x), Math.round(y), Math.round(x + countView.getMeasuredWidth()), Math.round(y + countView.getMeasuredHeight()));
+             back.setUnread(0);
+             back.setContentDescription(LocaleController.getString(R.string.AccDescrGoBack) + (count >= 0 && HeaderConfig.counter() ? ", " + LocaleController.formatString(R.string.FlexyHeaderUnread, count) : ""));
+             avatar.setTranslationX(0);
+diff --git a/TMessagesProj/src/main/java/app/flexygram/icons/SignatureLauncherUpdateReceiver.java b/TMessagesProj/src/main/java/app/flexygram/icons/SignatureLauncherUpdateReceiver.java
+new file mode 100644
+index 000000000..1613a9705
+--- /dev/null
++++ b/TMessagesProj/src/main/java/app/flexygram/icons/SignatureLauncherUpdateReceiver.java
+@@ -0,0 +1,14 @@
++package app.flexygram.icons;
++
++import android.content.BroadcastReceiver;
++import android.content.Context;
++import android.content.Intent;
++import org.telegram.ui.LauncherIconController;
++
++/** Reconcile persisted alternative aliases immediately after this package is updated. */
++public final class SignatureLauncherUpdateReceiver extends BroadcastReceiver {
++    @Override public void onReceive(Context context, Intent intent) {
++        if (Intent.ACTION_MY_PACKAGE_REPLACED.equals(intent.getAction()))
++            LauncherIconController.tryFixLauncherIconIfNeeded();
++    }
++}
+diff --git a/TMessagesProj/src/main/java/app/flexygram/studio/core/StudioCodec.java b/TMessagesProj/src/main/java/app/flexygram/studio/core/StudioCodec.java
+index eece8a62f..d65c10b09 100644
+--- a/TMessagesProj/src/main/java/app/flexygram/studio/core/StudioCodec.java
++++ b/TMessagesProj/src/main/java/app/flexygram/studio/core/StudioCodec.java
+@@ -30,11 +30,12 @@ public final class StudioCodec {
+                 copy.put(section.getKey(),Collections.unmodifiableMap(values));
+             }
+             if(copy.isEmpty())throw new IllegalArgumentException("empty");
++            if(minApp<StudioSchema.minimumApp(copy))throw new IllegalArgumentException("version");
+             sections=Collections.unmodifiableMap(copy);
+         }
+     }
+     private StudioCodec(){}
+-    public static Preset create(String name,Map<String,Map<String,Object>> values){return new Preset(name,StudioSchema.MIN_APP,values);}
++    public static Preset create(String name,Map<String,Map<String,Object>> values){return new Preset(name,StudioSchema.minimumApp(values),values);}
+     public static Preset export(String name,Map<String,Map<String,Object>> snapshot,Set<String> explicitlyIncluded) {
+         Map<String,Map<String,Object>> result=new TreeMap<>();
+         for(String section:snapshot.keySet()) {
+diff --git a/TMessagesProj/src/main/java/app/flexygram/studio/core/StudioSchema.java b/TMessagesProj/src/main/java/app/flexygram/studio/core/StudioSchema.java
+index b92bfecf8..2ec1bea41 100644
+--- a/TMessagesProj/src/main/java/app/flexygram/studio/core/StudioSchema.java
++++ b/TMessagesProj/src/main/java/app/flexygram/studio/core/StudioSchema.java
+@@ -36,9 +36,13 @@ public final class StudioSchema {
+         i("bubbles","transparency","flexygram_bubbles","transparency",35,0,100),
+         i("bubbles","borderTenths","flexygram_bubbles","signature_border_tenths",11,5,20),
+         b("bubbles","cachedBlur","flexygram_bubbles","signature_cached_blur",false),
++        b("bubbles","outlineEnabled","flexygram_bubbles","signature_outline_enabled",true),
++        i("bubbles","outlineStyle","flexygram_bubbles","signature_outline_style",0,0,1),
++        i("bubbles","pearlIntensity","flexygram_bubbles","signature_pearl_intensity",55,0,100),
+         i("header","style","flexygram_header","style",0,0,1),
+         b("header","compact","flexygram_header","compact",false),
+         b("header","counter","flexygram_header","counter",true),
++        i("header","counterPresentation","flexygram_header","counter_mode",1,1,2),
+         i("header","opacity","flexygram_header","opacity",85,0,100),
+         i("composer","style","flexygram_composer","style",0,0,1),
+         b("composer","glass","flexygram_composer","pearlGlass",false),
+@@ -67,6 +71,12 @@ public final class StudioSchema {
+         if(key.section.equals("composer")&&key.id.equals("gap")&&result.equals(1))throw new IllegalArgumentException("value");
+         return result;
+     }
++    /** Additive schema1 keys require Alpha1274; older valid schema1 files remain accepted. */
++    public static int minimumApp(Map<String,Map<String,Object>> sections) {
++        Map<String,Object> bubbles=sections.get("bubbles"),header=sections.get("header");
++        return bubbles!=null&&(bubbles.containsKey("outlineEnabled")||bubbles.containsKey("outlineStyle")||bubbles.containsKey("pearlIntensity"))
++            ||header!=null&&header.containsKey("counterPresentation")?1274:MIN_APP;
++    }
+     public static boolean filename(String name) {
+         if(name==null||name.length()>192||!name.endsWith(EXTENSION)||name.length()<=EXTENSION.length())return false;
+         for(int j=0;j<name.length();j++) {
+diff --git a/TMessagesProj/src/main/java/org/telegram/ui/ActionBar/MessageDrawable.java b/TMessagesProj/src/main/java/org/telegram/ui/ActionBar/MessageDrawable.java
+index c25b17f40..ca4fc09bd 100644
+--- a/TMessagesProj/src/main/java/org/telegram/ui/ActionBar/MessageDrawable.java
++++ b/TMessagesProj/src/main/java/org/telegram/ui/ActionBar/MessageDrawable.java
+@@ -31,10 +31,25 @@ import java.util.Arrays;
+ 
+ public class MessageDrawable extends Drawable {
+ 
+-    public interface GlassSource { boolean draw(Canvas canvas, Path path); }
++    public interface GlassSource {
++        boolean draw(Canvas canvas, Path path);
++        // Older embedders retain their safe Matte fallback during partial-alpha transitions.
++        default boolean draw(Canvas canvas, Path path, int alpha) { return alpha == 255 && draw(canvas, path); }
++    }
+     private GlassSource flexyGlassSource;
+     private final Paint flexyFillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+     private final Paint flexyBorderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
++    private int outlineBase, outlineMode = -1, outlineIntensity = -1, outlineColor;
++    private int signatureOutline(int base) {
++        int mode = app.flexygram.bubbles.BubbleConfig.outlineStyle();
++        int intensity = app.flexygram.bubbles.BubbleConfig.pearlIntensity();
++        if (outlineBase != base || outlineMode != mode || outlineIntensity != intensity) {
++            outlineBase = base; outlineMode = mode; outlineIntensity = intensity;
++            outlineColor = app.flexygram.bubbles.BubbleOutline.color(base,
++                    (Color.red(base) * 299 + Color.green(base) * 587 + Color.blue(base) * 114) < 128000, mode, intensity);
++        }
++        return outlineColor;
++    }
+     public void setFlexyGlassSource(GlassSource source) { flexyGlassSource = source; }
+     private boolean flexySurface() {
+         return currentType != TYPE_PREVIEW && app.flexygram.bubbles.BubbleStyle.signature();
+@@ -643,11 +658,9 @@ public class MessageDrawable extends Drawable {
+             // Stable theme color, independent of wallpaper/blur availability and animation phase.
+             // Instance paints and the native geometry cache are reused for every draw.
+             int color = signatureColor();
+-            if (alpha == 255 && app.flexygram.bubbles.BubbleConfig.backgroundBlur() && flexyGlassSource != null) {
+-                // Keep native crossfades as Matte: the legacy coordinate bridge has no drawable-alpha parameter.
+-                // Reusing opaque wallpaper there would leave a visible bubble even at alpha zero.
+-                // Legacy-named coordinate callback, new bounded static cache; legacy Glass flags are ignored.
+-                flexyGlassSource.draw(canvas, path);
++            if (alpha > 0 && app.flexygram.bubbles.BubbleConfig.backgroundBlur() && flexyGlassSource != null) {
++                // The native bridge carries drawable alpha; message transitions sample the same cache.
++                flexyGlassSource.draw(canvas, path, alpha);
+             }
+             flexyFillPaint.setColor(color);
+             // Reuse Telegram's cached gradient and matrix; no new shader per frame.
+@@ -658,13 +671,16 @@ public class MessageDrawable extends Drawable {
+             flexyBorderPaint.setStyle(Paint.Style.STROKE);
+             // Keep the contour inside Telegram's unchanged message silhouette.
+             flexyBorderPaint.setStrokeWidth(2f * AndroidUtilities.density * app.flexygram.bubbles.BubbleConfig.borderDp());
+-            flexyBorderPaint.setColor(ColorUtils.setAlphaComponent(
+-                app.flexygram.bubbles.BubbleStyle.outline(color,
+-                    (Color.red(color) * 299 + Color.green(color) * 587 + Color.blue(color) * 114) < 128000), Math.round(200 * alpha / 255f)));
+-            canvas.save();
+-            canvas.clipPath(path);
+-            canvas.drawPath(path, flexyBorderPaint);
+-            canvas.restore();
++            if (app.flexygram.bubbles.BubbleConfig.outlineEnabled()) {
++                int contourBase = isOut && p.getShader() != null
++                        ? app.flexygram.bubbles.BubbleOutline.palette(color, currentGradientColor1, currentGradientColor2, currentGradientColor3) : color;
++                int contour = signatureOutline(contourBase);
++                flexyBorderPaint.setColor(ColorUtils.setAlphaComponent(contour, Math.round(Color.alpha(contour) * alpha / 255f)));
++                canvas.save();
++                canvas.clipPath(path);
++                canvas.drawPath(path, flexyBorderPaint);
++                canvas.restore();
++            }
+         } else {
+             canvas.drawPath(path, p);
+         }
+@@ -723,6 +739,16 @@ public class MessageDrawable extends Drawable {
+         return path;
+     }
+ 
++    /** Mirrored cubic contour: vertical tangent, rounded short tip and continuous return to body. */
++    private void appendSignatureTail(Path path, float edge, float bottom, float direction) {
++        float d = AndroidUtilities.density, x = direction * d;
++        path.lineTo(edge, bottom - 14 * d);
++        path.cubicTo(edge, bottom - 8 * d, edge + .6f * x, bottom - 4 * d, edge + 3 * x, bottom - 2 * d);
++        path.cubicTo(edge + 3.6f * x, bottom - 1.5f * d, edge + 3.4f * x, bottom - .5f * d, edge + 2.6f * x, bottom - .5f * d);
++        path.cubicTo(edge + 1.2f * x, bottom - .5f * d, edge - x, bottom - 3 * d, edge - 3 * x, bottom - 3 * d);
++        path.cubicTo(edge - 6 * x, bottom - 3 * d, edge - 9 * x, bottom, edge - 14 * x, bottom);
++    }
++
+     private void generatePath(Path path, Rect bounds, int padding, int rad, int smallRad, int nearRad, int top, boolean drawFullBottom, boolean drawFullTop, boolean customPaint) {
+         path.rewind();
+         int heightHalf = (bounds.height() - padding) >> 1;
+@@ -737,7 +763,7 @@ public class MessageDrawable extends Drawable {
+                 if (currentType == TYPE_MEDIA || oeNoTail) {
+                     path.moveTo(bounds.right - dp(8) - radToUse, bounds.bottom - padding);
+                 } else {
+-                    path.moveTo(bounds.right - dp(flexySurface() ? 5f : 2.6f), bounds.bottom - padding);
++                    path.moveTo(bounds.right - dp(flexySurface() ? 22f : 2.6f), bounds.bottom - padding);
+                 }
+                 path.lineTo(bounds.left + padding + radToUse, bounds.bottom - padding);
+                 rect.set(bounds.left + padding, bounds.bottom - padding - radToUse * 2, bounds.left + padding + radToUse * 2, bounds.bottom - padding);
+@@ -793,16 +819,7 @@ public class MessageDrawable extends Drawable {
+                         path.arcTo(rect, 0, 90, false);
+                     } else {
+                         if (flexySurface()) {
+-                            // Own short curved tail. Both sides share mirrored control points.
+-                            float edge = bounds.right - dp(8);
+-                            float tip = bounds.right - dp(5);
+-                            float bottom = bounds.bottom - padding;
+-                            float cap = AndroidUtilities.dpf2(.7f);
+-                            path.lineTo(edge, bottom - dp(9));
+-                            path.cubicTo(edge, bottom - dp(4), tip + cap, bottom - AndroidUtilities.dpf2(1.6f),
+-                                    tip + cap, bottom - cap);
+-                            path.cubicTo(tip + cap, bottom - AndroidUtilities.dpf2(.25f),
+-                                    tip + AndroidUtilities.dpf2(.3f), bottom, tip, bottom);
++                            appendSignatureTail(path, bounds.right - dp(8), bounds.bottom - padding, 1);
+                         } else {
+                     path.lineTo(bounds.right - dp(8), bounds.bottom - padding - smallRad - dp(3));
+                     rect.set(bounds.right - dp(8), bounds.bottom - padding - smallRad * 2 - dp(9), bounds.right - dp(7) + smallRad * 2, bounds.bottom - padding - dp(1));
+@@ -820,7 +837,7 @@ public class MessageDrawable extends Drawable {
+                 if (currentType == TYPE_MEDIA || oeNoTail) {
+                     path.moveTo(bounds.left + dp(8) + radToUse, bounds.bottom - padding);
+                 } else {
+-                    path.moveTo(bounds.left + dp(flexySurface() ? 5f : 2.6f), bounds.bottom - padding);
++                    path.moveTo(bounds.left + dp(flexySurface() ? 22f : 2.6f), bounds.bottom - padding);
+                 }
+                 path.lineTo(bounds.right - padding - radToUse, bounds.bottom - padding);
+                 rect.set(bounds.right - padding - radToUse * 2, bounds.bottom - padding - radToUse * 2, bounds.right - padding, bounds.bottom - padding);
+@@ -870,16 +887,7 @@ public class MessageDrawable extends Drawable {
+                         path.arcTo(rect, 180, -90, false);
+                     } else {
+                         if (flexySurface()) {
+-                            // Own short curved tail. Both sides share mirrored control points.
+-                            float edge = bounds.left + dp(8);
+-                            float tip = bounds.left + dp(5);
+-                            float bottom = bounds.bottom - padding;
+-                            float cap = AndroidUtilities.dpf2(.7f);
+-                            path.lineTo(edge, bottom - dp(9));
+-                            path.cubicTo(edge, bottom - dp(4), tip - cap, bottom - AndroidUtilities.dpf2(1.6f),
+-                                    tip - cap, bottom - cap);
+-                            path.cubicTo(tip - cap, bottom - AndroidUtilities.dpf2(.25f),
+-                                    tip - AndroidUtilities.dpf2(.3f), bottom, tip, bottom);
++                            appendSignatureTail(path, bounds.left + dp(8), bounds.bottom - padding, -1);
+                         } else {
+                     path.lineTo(bounds.left + dp(8), bounds.bottom - padding - smallRad - dp(3));
+                     rect.set(bounds.left + dp(7) - smallRad * 2, bounds.bottom - padding - smallRad * 2 - dp(9), bounds.left + dp(8), bounds.bottom - padding - dp(1));
+diff --git a/TMessagesProj/src/main/java/org/telegram/ui/Cells/ChatMessageCell.java b/TMessagesProj/src/main/java/org/telegram/ui/Cells/ChatMessageCell.java
+index ea22e2357..dfa3b676b 100644
+--- a/TMessagesProj/src/main/java/org/telegram/ui/Cells/ChatMessageCell.java
++++ b/TMessagesProj/src/main/java/org/telegram/ui/Cells/ChatMessageCell.java
+@@ -284,8 +284,14 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
+     private final static float EPHEMERAL_HINT_HEIGHT = 25f;
+ 
+     public boolean clipToGroupBounds;
+-    private final MessageDrawable.GlassSource flexyBubbleSource = (canvas, path) ->
+-        this.delegate != null && !this.drawForBlur && this.delegate.drawFlexyBubbleWallpaper(this, canvas, path);
++    private final MessageDrawable.GlassSource flexyBubbleSource = new MessageDrawable.GlassSource() {
++        @Override public boolean draw(Canvas canvas, android.graphics.Path path) {
++            return draw(canvas, path, 255);
++        }
++        @Override public boolean draw(Canvas canvas, android.graphics.Path path, int alpha) {
++            return delegate != null && !drawForBlur && delegate.drawFlexyBubbleWallpaper(ChatMessageCell.this, canvas, path, alpha);
++        }
++    };
+     private void drawFlexyBubble(Canvas canvas, MessageDrawable drawable, Paint customPaint) {
+         // Drawables are shared by native themes: never retain a cell/activity between draws.
+         drawable.setFlexyGlassSource(flexyBubbleSource);
+@@ -856,6 +862,9 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
+             return false;
+         }
+ 
++        default boolean drawFlexyBubbleWallpaper(ChatMessageCell cell, Canvas canvas, android.graphics.Path path, int alpha) {
++            return alpha == 255 && drawFlexyBubbleWallpaper(cell, canvas, path);
++        }
+         default boolean drawFlexyBubbleWallpaper(ChatMessageCell cell, Canvas canvas, android.graphics.Path path) {
+             return false;
+         }
+diff --git a/TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java b/TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java
+index 01e05abd8..a83909091 100644
+--- a/TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java
++++ b/TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java
+@@ -18445,9 +18445,10 @@ public class ChatActivity extends BaseFragment implements
+             if (signatureWallpaperBlur != null) signatureWallpaperBlur.prepare(getBackgroundImage(),
+                     getNewDrawableMotion(), getThemedColor(Theme.key_windowBackgroundGray));
+         }
+-        @Override protected void onBackgroundViewInvalidate() {
+-            super.onBackgroundViewInvalidate();
+-            refreshSignatureWallpaperBlur();
++        @Override protected void onBackgroundDrawn(android.graphics.drawable.Drawable drawable, boolean moving) {
++            super.onBackgroundDrawn(drawable, moving);
++            if (signatureWallpaperBlur != null) signatureWallpaperBlur.prepare(drawable, moving,
++                    getThemedColor(Theme.key_windowBackgroundGray));
+         }
+ 
+ 
+@@ -42243,11 +42244,14 @@ public class ChatActivity extends BaseFragment implements
+     private class ChatMessageCellDelegate implements ChatMessageCell.ChatMessageCellDelegate {
+         @Override
+         public boolean drawFlexyBubbleWallpaper(ChatMessageCell cell, Canvas canvas, android.graphics.Path path) {
+-            if (contentView == null || chatListView == null || contentView.signatureWallpaperBlur == null
+-                    || cell.getAlpha() < 1f || cell.getTranslationX() != 0 || Theme.isAnimatingColor()) return false;
++            return drawFlexyBubbleWallpaper(cell, canvas, path, 255);
++        }
++        @Override
++        public boolean drawFlexyBubbleWallpaper(ChatMessageCell cell, Canvas canvas, android.graphics.Path path, int alpha) {
++            if (contentView == null || chatListView == null || contentView.signatureWallpaperBlur == null) return false;
+             // Existing cell/root coordinate bridge; only the new static asynchronous cache is sampled.
+             return contentView.signatureWallpaperBlur.draw(canvas, path,
+-                    cell.getX() + chatListView.getX(), cell.getY() + chatListView.getY());
++                    cell.getX() + chatListView.getX(), cell.getY() + chatListView.getY(), alpha);
+         }
+ 
+         @Override
+diff --git a/TMessagesProj/src/main/java/org/telegram/ui/Components/ChatAvatarContainer.java b/TMessagesProj/src/main/java/org/telegram/ui/Components/ChatAvatarContainer.java
+index d8d41b3ff..2aad8a96b 100644
+--- a/TMessagesProj/src/main/java/org/telegram/ui/Components/ChatAvatarContainer.java
++++ b/TMessagesProj/src/main/java/org/telegram/ui/Components/ChatAvatarContainer.java
+@@ -166,6 +166,8 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
+ 
+         @Override
+         public void setTranslationY(float translationY) {
++            // Signature owns the measured two-line block; classic subtitle animations use a title offset.
++            if (signatureActive() && this == titleTextView) translationY = 0;
+             if (reference != null) {
+                 SimpleTextView connected = reference.get();
+                 if (connected != null) {
+@@ -866,6 +868,9 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
+         int width = MeasureSpec.getSize(widthMeasureSpec);
+         int textWidth = Math.max(0, Math.round(signatureHeader.geometry.title.width()) - dp(64));
+         titleTextView.setTextSizePx(Math.round(signatureHeader.titlePx));
++        // Classic title padding (6 + 12 dp) is outside the Signature text block.
++        titleTextView.setPadding(0, 0, 0, 0);
++        getSubtitleTextView().setPadding(0, 0, 0, 0);
+         titleTextView.setGravity(Gravity.CENTER_HORIZONTAL);
+         titleTextView.measure(MeasureSpec.makeMeasureSpec(textWidth, MeasureSpec.AT_MOST), MeasureSpec.makeMeasureSpec((int)Math.ceil(signatureHeader.titlePx) + dp(8), MeasureSpec.AT_MOST));
+         if (subtitleTextView != null) { subtitleTextView.setTextSizePx(Math.round(signatureHeader.subtitlePx)); subtitleTextView.setGravity(Gravity.CENTER_HORIZONTAL); }
+@@ -888,7 +893,7 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
+         int x = Math.round(a.centerX() - photo / 2f), y = Math.round(a.centerY() - photo / 2f);
+         avatarImageView.layout(x, y, x + photo, y + photo);
+         View subtitle = getSubtitleTextView();
+-        int th = titleTextView.getMeasuredHeight(), sh = !signatureHeader.subtitleFits || subtitle.getVisibility() == GONE ? 0 : subtitle.getMeasuredHeight();
++        int th = titleTextView.getMeasuredHeight(), sh = !signatureHeader.subtitleFits || subtitle.getVisibility() != VISIBLE ? 0 : subtitle.getMeasuredHeight();
+         int textY = Math.round(title.centerY() - (th + sh + (sh == 0 ? 0 : dp(2))) / 2f);
+         x = Math.round(title.centerX() - titleTextView.getMeasuredWidth() / 2f);
+         titleTextView.layout(x, textY, x + titleTextView.getMeasuredWidth(), textY + th);
+@@ -908,7 +913,8 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
+         if (signatureMore != null) signatureMore.setVisibility(signatureActive() ? VISIBLE : GONE);
+         if (signatureActive()) { signatureMeasured = true; measureSignature(widthMeasureSpec, heightMeasureSpec); return; }
+         if (signatureMeasured) {
+-            signatureMeasured = false; setGlassMode(); applyAvatarRadius(avatarSizeInDp, avatarRadiusForum, avatarRadiusHasStories);
++            signatureMeasured = false; titleTextView.setPadding(0, dp(6), 0, dp(12));
++            getSubtitleTextView().setPadding(0, 0, isCentered() ? 0 : dp(10), 0); setGlassMode(); applyAvatarRadius(avatarSizeInDp, avatarRadiusForum, avatarRadiusHasStories);
+             titleTextView.setGravity(isCentered() ? Gravity.CENTER_HORIZONTAL : Gravity.LEFT);
+             if (subtitleTextView != null) subtitleTextView.setGravity(isCentered() ? Gravity.CENTER_HORIZONTAL : Gravity.LEFT);
+             else if (animatedSubtitleTextView != null) animatedSubtitleTextView.setTextSize(dp(14));
+diff --git a/TMessagesProj/src/main/java/org/telegram/ui/Components/SizeNotifierFrameLayout.java b/TMessagesProj/src/main/java/org/telegram/ui/Components/SizeNotifierFrameLayout.java
+index 2530d2404..787a2f8ee 100644
+--- a/TMessagesProj/src/main/java/org/telegram/ui/Components/SizeNotifierFrameLayout.java
++++ b/TMessagesProj/src/main/java/org/telegram/ui/Components/SizeNotifierFrameLayout.java
+@@ -344,6 +344,8 @@ public class SizeNotifierFrameLayout extends FrameLayout implements Theme.Colora
+             if (themeAnimationValue != 1f) {
+                 backgroundView.invalidate();
+             }
++            // Snapshot the native wallpaper mapping before messages draw, including its crop/insets.
++            onBackgroundDrawn(backgroundDrawable, backgroundMotion || oldBackgroundDrawable != null || themeAnimationValue != 1f);
+         }
+ 
+         @Override
+@@ -353,6 +355,8 @@ public class SizeNotifierFrameLayout extends FrameLayout implements Theme.Colora
+         }
+     }
+ 
++    protected void onBackgroundDrawn(Drawable drawable, boolean moving) { }
++
+     protected void onBackgroundViewInvalidate() {
+ 
+     }
+diff --git a/TMessagesProj/src/main/java/org/telegram/ui/LauncherIconController.java b/TMessagesProj/src/main/java/org/telegram/ui/LauncherIconController.java
+index 3ee383239..387fea3fa 100644
+--- a/TMessagesProj/src/main/java/org/telegram/ui/LauncherIconController.java
++++ b/TMessagesProj/src/main/java/org/telegram/ui/LauncherIconController.java
+@@ -15,12 +15,13 @@ public class LauncherIconController {
+         for (LauncherIcon icon : LauncherIcon.values()) if (isEnabled(icon)) { active = icon; count++; }
+         Context context = ApplicationLoader.applicationContext;
+         int legacyState = context.getPackageManager().getComponentEnabledSetting(legacyPrimary(context));
+-        boolean legacyEnabled = legacyState == PackageManager.COMPONENT_ENABLED_STATE_DEFAULT
+-                || legacyState == PackageManager.COMPONENT_ENABLED_STATE_ENABLED;
+-        if (count == 1 && !legacyEnabled) return;
++        boolean legacyEnabled = legacyState == PackageManager.COMPONENT_ENABLED_STATE_ENABLED;
+         String saved = ApplicationLoader.applicationContext.getSharedPreferences("flexy_launcher", Context.MODE_PRIVATE).getString("selected", "");
+-        try { LauncherIcon remembered = LauncherIcon.valueOf(saved); if (count == 0 || isEnabled(remembered)) active = remembered; }
++        LauncherIcon remembered = null;
++        try { remembered = LauncherIcon.valueOf(saved); }
+         catch (IllegalArgumentException ignored) { }
++        if (count == 1 && !legacyEnabled && (remembered == null || active == remembered)) return;
++        if (remembered != null) active = remembered;
+         try {
+             applyIcon(active == null ? LauncherIcon.EXTERALESS : active, false);
+         } catch (IllegalArgumentException | SecurityException rejected) {
+@@ -31,11 +32,9 @@ public class LauncherIconController {
+     public static boolean isEnabled(LauncherIcon icon) {
+         Context ctx = ApplicationLoader.applicationContext;
+         int i = ctx.getPackageManager().getComponentEnabledSetting(icon.getComponentName(ctx));
+-        // Пока пользователь ничего не выбирал, включённой считается наша иконка:
+-        // именно она стоит у <application> в манифесте, и переключатель должен
+-        // показывать выбранным то, что человек видит на рабочем столе.
+-        // Modern aliases start disabled; ApplicationLoader migrates one atomically.
+-        return i == PackageManager.COMPONENT_ENABLED_STATE_ENABLED;
++        // Manifest default is effective before the process starts. Explicit overrides survive updates.
++        return i == PackageManager.COMPONENT_ENABLED_STATE_ENABLED
++                || i == PackageManager.COMPONENT_ENABLED_STATE_DEFAULT && icon == LauncherIcon.EXTERALESS;
+     }
+ 
+     private static ComponentName legacyPrimary(Context ctx) {
+diff --git a/TMessagesProj/src/main/res/values-es/flexygram_bubbles.xml b/TMessagesProj/src/main/res/values-es/flexygram_bubbles.xml
+index 4d9d62b5e..bd2d0af92 100644
+--- a/TMessagesProj/src/main/res/values-es/flexygram_bubbles.xml
++++ b/TMessagesProj/src/main/res/values-es/flexygram_bubbles.xml
+@@ -24,4 +24,9 @@
+     <string name="FlexyBubblePreviewGroupOutgoing">Tus cambios se muestran al instante.</string>
+     <string name="FlexyBubbleBackgroundBlur">Desenfoque de fondo</string>
+     <string name="FlexyBubbleBlurCompatibility">El desenfoque está disponible para fondos de imagen estáticos compatibles. Los fondos animados o no compatibles mantienen Matte.</string>
++    <string name="FlexyBubbleOutlineEnabled">Mostrar borde</string>
++    <string name="FlexyBubbleOutlineStyle">Estilo del borde</string>
++    <string name="FlexyBubbleIntelligentColor">Color inteligente</string>
++    <string name="FlexyBubbleGlassPearl">Glass Pearl</string>
++    <string name="FlexyBubblePearlIntensity">Intensidad Glass Pearl</string>
+ </resources>
+diff --git a/TMessagesProj/src/main/res/values-es/flexygram_header.xml b/TMessagesProj/src/main/res/values-es/flexygram_header.xml
+index d49ab2dc4..2565c9e57 100644
+--- a/TMessagesProj/src/main/res/values-es/flexygram_header.xml
++++ b/TMessagesProj/src/main/res/values-es/flexygram_header.xml
+@@ -11,4 +11,7 @@
+     <string name="FlexyHeaderOpacity">Opacidad de la superficie</string>
+     <string name="FlexyHeaderUnread">Chats sin leer en la lista de origen: %1$d</string>
+     <string name="FlexyHeaderPreviewName">Alex</string>
++    <string name="FlexyHeaderCounterOff">Desactivado</string>
++    <string name="FlexyHeaderCounterIntegrated">Integrado</string>
++    <string name="FlexyHeaderCounterBadge">En bolita</string>
+ </resources>
+diff --git a/TMessagesProj/src/main/res/values-es/flexygram_music.xml b/TMessagesProj/src/main/res/values-es/flexygram_music.xml
+index fe685c551..a2021f26c 100644
+--- a/TMessagesProj/src/main/res/values-es/flexygram_music.xml
++++ b/TMessagesProj/src/main/res/values-es/flexygram_music.xml
+@@ -6,4 +6,6 @@
+     <string name="FlexyMusicMore">Más</string>
+     <string name="FlexyMusicPlayingFrom">Reproduciendo desde</string>
+     <string name="FlexyMusicMyMusic">Mi música</string>
++    <string name="FlexyMusicLyrics">Letras</string>
++    <string name="FlexyMusicQueue">Cola</string>
+ </resources>
+diff --git a/TMessagesProj/src/main/res/values-ru/flexygram_bubbles.xml b/TMessagesProj/src/main/res/values-ru/flexygram_bubbles.xml
+index f89abe870..7867d3252 100644
+--- a/TMessagesProj/src/main/res/values-ru/flexygram_bubbles.xml
++++ b/TMessagesProj/src/main/res/values-ru/flexygram_bubbles.xml
+@@ -24,4 +24,9 @@
+     <string name="FlexyBubblePreviewGroupOutgoing">Изменения видны сразу.</string>
+     <string name="FlexyBubbleBackgroundBlur">Размытие фона</string>
+     <string name="FlexyBubbleBlurCompatibility">Размытие доступно для совместимых статичных изображений. Анимированные и неподдерживаемые фоны сохраняют Matte.</string>
++    <string name="FlexyBubbleOutlineEnabled">Показывать контур</string>
++    <string name="FlexyBubbleOutlineStyle">Стиль контура</string>
++    <string name="FlexyBubbleIntelligentColor">Умный цвет</string>
++    <string name="FlexyBubbleGlassPearl">Glass Pearl</string>
++    <string name="FlexyBubblePearlIntensity">Интенсивность Glass Pearl</string>
+ </resources>
+diff --git a/TMessagesProj/src/main/res/values-ru/flexygram_header.xml b/TMessagesProj/src/main/res/values-ru/flexygram_header.xml
+index f17139c1e..acbc261f0 100644
+--- a/TMessagesProj/src/main/res/values-ru/flexygram_header.xml
++++ b/TMessagesProj/src/main/res/values-ru/flexygram_header.xml
+@@ -11,4 +11,7 @@
+     <string name="FlexyHeaderOpacity">Непрозрачность поверхности</string>
+     <string name="FlexyHeaderUnread">Непрочитанные чаты в исходном списке: %1$d</string>
+     <string name="FlexyHeaderPreviewName">Алекс</string>
++    <string name="FlexyHeaderCounterOff">Выключен</string>
++    <string name="FlexyHeaderCounterIntegrated">Встроенный</string>
++    <string name="FlexyHeaderCounterBadge">Отдельный значок</string>
+ </resources>
+diff --git a/TMessagesProj/src/main/res/values-ru/flexygram_music.xml b/TMessagesProj/src/main/res/values-ru/flexygram_music.xml
+index 561e37151..42de16cbe 100644
+--- a/TMessagesProj/src/main/res/values-ru/flexygram_music.xml
++++ b/TMessagesProj/src/main/res/values-ru/flexygram_music.xml
+@@ -6,4 +6,6 @@
+     <string name="FlexyMusicMore">Ещё</string>
+     <string name="FlexyMusicPlayingFrom">Источник</string>
+     <string name="FlexyMusicMyMusic">Моя музыка</string>
++    <string name="FlexyMusicLyrics">Текст</string>
++    <string name="FlexyMusicQueue">Очередь</string>
+ </resources>
+diff --git a/TMessagesProj/src/main/res/values/flexygram_bubbles.xml b/TMessagesProj/src/main/res/values/flexygram_bubbles.xml
+index 510e7bb92..50ac94ae4 100644
+--- a/TMessagesProj/src/main/res/values/flexygram_bubbles.xml
++++ b/TMessagesProj/src/main/res/values/flexygram_bubbles.xml
+@@ -24,4 +24,9 @@
+     <string name="FlexyBubblePreviewGroupOutgoing">Your changes appear immediately.</string>
+     <string name="FlexyBubbleBackgroundBlur">Background blur</string>
+     <string name="FlexyBubbleBlurCompatibility">Blur is available for compatible static image wallpapers. Animated or unsupported backgrounds keep Matte.</string>
++    <string name="FlexyBubbleOutlineEnabled">Show border</string>
++    <string name="FlexyBubbleOutlineStyle">Border style</string>
++    <string name="FlexyBubbleIntelligentColor">Intelligent color</string>
++    <string name="FlexyBubbleGlassPearl">Glass Pearl</string>
++    <string name="FlexyBubblePearlIntensity">Glass Pearl intensity</string>
+ </resources>
+diff --git a/TMessagesProj/src/main/res/values/flexygram_header.xml b/TMessagesProj/src/main/res/values/flexygram_header.xml
+index 60f8c1fd6..4e6d568e1 100644
+--- a/TMessagesProj/src/main/res/values/flexygram_header.xml
++++ b/TMessagesProj/src/main/res/values/flexygram_header.xml
+@@ -11,4 +11,7 @@
+     <string name="FlexyHeaderOpacity">Surface opacity</string>
+     <string name="FlexyHeaderUnread">Unread chats in the source list: %1$d</string>
+     <string name="FlexyHeaderPreviewName">Alex</string>
++    <string name="FlexyHeaderCounterOff">Off</string>
++    <string name="FlexyHeaderCounterIntegrated">Integrated</string>
++    <string name="FlexyHeaderCounterBadge">Separate badge</string>
+ </resources>
+diff --git a/TMessagesProj/src/main/res/values/flexygram_music.xml b/TMessagesProj/src/main/res/values/flexygram_music.xml
+index e1552c299..804b01d08 100644
+--- a/TMessagesProj/src/main/res/values/flexygram_music.xml
++++ b/TMessagesProj/src/main/res/values/flexygram_music.xml
+@@ -6,4 +6,6 @@
+     <string name="FlexyMusicMore">More</string>
+     <string name="FlexyMusicPlayingFrom">Playing from</string>
+     <string name="FlexyMusicMyMusic">My music</string>
++    <string name="FlexyMusicLyrics">Lyrics</string>
++    <string name="FlexyMusicQueue">Queue</string>
+ </resources>
+diff --git a/tools/connected_alpha/bubble_visual/CachedBlurVisualTest.java.in b/tools/connected_alpha/bubble_visual/CachedBlurVisualTest.java.in
+index 7fb470083..91e84f36f 100644
+--- a/tools/connected_alpha/bubble_visual/CachedBlurVisualTest.java.in
++++ b/tools/connected_alpha/bubble_visual/CachedBlurVisualTest.java.in
+@@ -42,6 +42,18 @@ public class CachedBlurVisualTest {
+   for(int top:new int[]{0,21,100,160}){Bitmap sample=Bitmap.createBitmap(64,48,Bitmap.Config.ARGB_8888);assertTrue(a.draw(new Canvas(sample),local,12,top));assertEquals(expected.getPixel(32,top+24),sample.getPixel(20,24));}
+   a.prepare(source,true,0xffcccccc);assertFalse(a.isReady());assertFalse(a.isSupported());assertFalse(a.draw(new Canvas(expected),whole,0,0));assertEquals(0,Utilities.globalQueue.pending());
+  }
++ @Test public void capturedMappingSurvivesSharedDrawableBoundsAndPartialAlphaDoesNotToggleMatte()throws Exception{
++  var a=owner(new View(ApplicationLoader.applicationContext));BitmapDrawable source=image(128,256,0);
++  for(int y=0;y<256;y++)for(int x=0;x<128;x++)source.getBitmap().setPixel(x,y,Color.rgb(x*2,y,80));
++  a.prepare(source,false,0xffcccccc);complete();Bitmap prepared=cached(a);
++  Path shape=new Path();shape.addRect(0,0,64,48,Path.Direction.CW);
++  Bitmap full=Bitmap.createBitmap(64,48,Bitmap.Config.ARGB_8888);assertTrue(a.draw(new Canvas(full),shape,12,100));
++  // Another view drawing the same Drawable must not rewrite this conversation's sampling transform.
++  source.setBounds(0,0,1024,2048);
++  Bitmap sample=Bitmap.createBitmap(64,48,Bitmap.Config.ARGB_8888);assertTrue(a.draw(new Canvas(sample),shape,12,100));assertEquals(full.getPixel(20,24),sample.getPixel(20,24));
++  for(int alpha:new int[]{0,64,128,254,255}){sample.eraseColor(Color.TRANSPARENT);assertTrue(a.draw(new Canvas(sample),shape,12,100,alpha));assertEquals(alpha,Color.alpha(sample.getPixel(20,24)));assertSame(prepared,cached(a));}
++  assertEquals(0,Utilities.globalQueue.pending());
++ }
+  @Test public void cancellationLateResultsCapacityAndGenerationAreControlled()throws Exception{
+   class Counter extends View{int changes;Counter(){super(ApplicationLoader.applicationContext);}@Override public void invalidate(){super.invalidate();changes++;}}
+   Counter target=new Counter();var a=owner(target);var b=owner(target);var c=owner(target);
+diff --git a/tools/connected_alpha/bubble_visual/stubs.py b/tools/connected_alpha/bubble_visual/stubs.py
+index a308ac6c1..00fd998d5 100644
+--- a/tools/connected_alpha/bubble_visual/stubs.py
++++ b/tools/connected_alpha/bubble_visual/stubs.py
+@@ -7,7 +7,7 @@ STUBS['androidx/core/graphics/ColorUtils.java']=STUBS['androidx/core/graphics/Co
+ def write_stubs(source, root):
+     for name,text in STUBS.items():
+         p=source/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(text)
+-    for name in ('org/telegram/ui/ActionBar/MessageDrawable.java','org/telegram/ui/Components/blur3/utils/NinePatchBuilder.java','app/flexygram/bubbles/BubbleStyle.java','app/flexygram/bubbles/BubblePreviewView.java','app/flexygram/bubbles/SignatureWallpaperBlur.java','app/flexygram/bubbles/BubbleConfig.java','app/flexygram/settings/FlexySignatureSlider.java','app/flexygram/composer/ComposerSliderTrack.java'):
++    for name in ('org/telegram/ui/ActionBar/MessageDrawable.java','org/telegram/ui/Components/blur3/utils/NinePatchBuilder.java','app/flexygram/bubbles/BubbleStyle.java','app/flexygram/bubbles/BubbleOutline.java','app/flexygram/bubbles/BubblePreviewView.java','app/flexygram/bubbles/SignatureWallpaperBlur.java','app/flexygram/bubbles/BubbleConfig.java','app/flexygram/settings/FlexySignatureSlider.java','app/flexygram/composer/ComposerSliderTrack.java'):
+         p=source/name;p.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(root/'TMessagesProj/src/main/java'/name,p)
+ 
+ STUBS["org/telegram/messenger/AndroidUtilities.java"] = STUBS["org/telegram/messenger/AndroidUtilities.java"].replace("public static int dp(float v)", "public static float dpf2(float v){return v*density;}public static int dp(float v)")
+diff --git a/tools/connected_alpha/build_private_apk.py b/tools/connected_alpha/build_private_apk.py
+index 300dc2a5a..009130641 100644
+--- a/tools/connected_alpha/build_private_apk.py
++++ b/tools/connected_alpha/build_private_apk.py
+@@ -46,14 +46,14 @@ def main():
+    if proc.wait()!=0:raise RuntimeError('Full Android build failed; inspect the redacted build log')
+   apks=list((ROOT/'TMessagesProj/build/outputs/apk/connectedAlpha').rglob('*.apk'))
+   if len(apks)!=1:raise ValueError('Expected exactly one full Connected Alpha APK')
+-  name='FlexyGram_Alpha_1273_ARM64_TEST.apk';target=out/name
+-  result=subprocess.run([sys.executable,str(ROOT/'tools/connected_alpha/verify_apk.py'),str(apks[0]),'--build-tools',str(sdk/'build-tools/36.0.0'),'--certificate-sha256',CERT,'--expected-version-code','1273'],cwd=ROOT,env=env,check=True,capture_output=True,text=True)
++  name='FlexyGram_Alpha_1274_ARM64_TEST.apk';target=out/name
++  result=subprocess.run([sys.executable,str(ROOT/'tools/connected_alpha/verify_apk.py'),str(apks[0]),'--build-tools',str(sdk/'build-tools/36.0.0'),'--certificate-sha256',CERT,'--expected-version-code','1274'],cwd=ROOT,env=env,check=True,capture_output=True,text=True)
+   report=json.loads(result.stdout)
+   if report['application_id']!=APP or report['elf_count']!=96:raise ValueError('Full native APK identity/integrity mismatch')
+   shutil.copy2(apks[0],target);target.chmod(0o600)
+   if hashlib.sha256(target.read_bytes()).hexdigest()!=report['sha256']:raise ValueError('Final handoff copy mismatch')
+   report.update(commit=commit,delivery='PRIVATE_DIRECT_SIGNED_APK',filename=name,physical_install_update='NOT_TESTED',preview_physical_freeze='PENDING_OWNER_TEST',exteraless_performance_comparison='NOT_ESTABLISHED')
+-  (out/'FlexyGram_Alpha_1273_verificacion.json').write_text(json.dumps(report,indent=2)+'\n')
++  (out/'FlexyGram_Alpha_1274_verificacion.json').write_text(json.dumps(report,indent=2)+'\n')
+   print(json.dumps({k:report[k]for k in ['filename','sha256','certificate_sha256','application_id','version_code','elf_count','commit']},indent=2))
+  finally:
+   criteria.write_bytes(original)
+diff --git a/tools/connected_alpha/header_visual/HeaderVisualTest.java.in b/tools/connected_alpha/header_visual/HeaderVisualTest.java.in
+index 60741e414..b3a7ed18c 100644
+--- a/tools/connected_alpha/header_visual/HeaderVisualTest.java.in
++++ b/tools/connected_alpha/header_visual/HeaderVisualTest.java.in
+@@ -15,7 +15,12 @@ public class HeaderVisualTest {
+   for(float font:new float[]{1,1.5f,2,3})for(int width:new int[]{240,320,401,600})for(boolean rtl:new boolean[]{false,true}){
+    LocaleController.isRTL=rtl;Context c=context(font);ActionBar bar=new ActionBar(c);ChatAvatarContainer avatar=new ChatAvatarContainer(c);bar.addView(avatar,0,new FrameLayout.LayoutParams(-1,-1));SignatureChatHeader header=new SignatureChatHeader(bar,avatar,null);bar.setSignatureHeader(header);avatar.setSignatureHeader(header);header.setCount(12345);size(bar,width);
+    HeaderGeometry g=header.geometry;assertEquals(g.back.height(),g.title.height(),.001f);assertEquals(g.title.height(),g.avatar.height(),.001f);assertEquals(width/2f,g.title.centerX(),.001f);
+-   View title=(View)field(avatar,"titleTextView");assertEquals(width/2f,title.getLeft()+title.getWidth()/2f,.5f);assertEquals(Math.round(header.height),bar.backButtonImageView.getHeight());
++   View title=(View)field(avatar,"titleTextView");View status=(View)field(avatar,"subtitleTextView");
++   assertEquals(0,title.getPaddingTop());assertEquals(0,title.getPaddingBottom());
++   assertTrue("title above surface: width="+width+" font="+font+" top="+title.getTop()+" surface="+g.title,title.getTop()>=g.title.top-.5f);
++   assertTrue("status below surface: width="+width+" font="+font+" bottom="+status.getBottom()+" surface="+g.title,status.getBottom()<=g.title.bottom+.5f);
++   assertTrue("text lines overlap",title.getBottom()<=status.getTop());
++   assertEquals(width/2f,title.getLeft()+title.getWidth()/2f,.5f);assertTrue(bar.backButtonImageView.getHeight()>=48);assertEquals(g.back.centerY(),bar.backButtonImageView.getTop()+bar.backButtonImageView.getHeight()/2f,.5f);
+    assertTrue(g.back.left>=0&&g.avatar.left>=0);assertTrue(g.back.right<=width&&g.avatar.right<=width);header.detach();
+   }
+  }
+diff --git a/tools/connected_alpha/header_visual/stubs.py b/tools/connected_alpha/header_visual/stubs.py
+index 88130c020..9d119f964 100644
+--- a/tools/connected_alpha/header_visual/stubs.py
++++ b/tools/connected_alpha/header_visual/stubs.py
+@@ -40,10 +40,10 @@ import static org.telegram.messenger.AndroidUtilities.dp;import static org.teleg
+ import android.content.Context;import android.graphics.Canvas;import android.view.*;import android.widget.*;import org.telegram.messenger.*;import org.telegram.ui.ActionBar.Theme;
+ public class ChatAvatarContainer extends FrameLayout{
+  private app.flexygram.header.SignatureChatHeader signatureHeader;private ImageView signatureMore;public int profiles,menus;
+- public static class Simple extends TextView{Simple(Context c){super(c);setSingleLine(true);setEllipsize(android.text.TextUtils.TruncateAt.END);}public void setTextSizePx(int v){setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX,v);}}
++ public static class Simple extends TextView{Simple(Context c){super(c);setIncludeFontPadding(false);setSingleLine(true);setEllipsize(android.text.TextUtils.TruncateAt.END);}public void setTextSizePx(int v){setTextSize(android.util.TypedValue.COMPLEX_UNIT_PX,v);}}
+  public static class Photo extends ImageView{public int radius;Photo(Context c){super(c);}public void setRoundRadius(int r){radius=r;}@Override protected void onDraw(Canvas c){android.graphics.Paint p=new android.graphics.Paint(3);p.setColor(0xff2288cc);c.drawCircle(getWidth()/2f,getHeight()/2f,getWidth()/2f,p);}}
+  private final Simple titleTextView,subtitleTextView;private final Photo avatarImageView;private Simple animatedSubtitleTextView;private View timeItem,communityItem,starBgItem,starFgItem;
+- public ChatAvatarContainer(Context c){super(c);titleTextView=new Simple(c);titleTextView.setText("A long contact name");subtitleTextView=new Simple(c);subtitleTextView.setText("online");avatarImageView=new Photo(c);addView(titleTextView);addView(subtitleTextView);addView(avatarImageView);setOnClickListener(v->profiles++);avatarImageView.setOnClickListener(v->profiles++);}
++ public ChatAvatarContainer(Context c){super(c);titleTextView=new Simple(c);titleTextView.setText("A long contact name");titleTextView.setPadding(0,dp(6),0,dp(12));subtitleTextView=new Simple(c);subtitleTextView.setText("online");avatarImageView=new Photo(c);addView(titleTextView);addView(subtitleTextView);addView(avatarImageView);setOnClickListener(v->profiles++);avatarImageView.setOnClickListener(v->profiles++);}
+  private View getSubtitleTextView(){return subtitleTextView;}private int getThemedColor(int key){return Theme.getColor(key,null);}protected void onSignatureOptionsClick(){menus++;}
+  @Override protected void onMeasure(int w,int h){if(signatureActive()){measureSignature(w,h);return;}super.onMeasure(w,h);}
+  @Override protected void onLayout(boolean c,int l,int t,int r,int b){if(signatureActive())layoutSignature();else super.onLayout(c,l,t,r,b);}
+diff --git a/tools/connected_alpha/music_visual/LayoutFixture.java.in b/tools/connected_alpha/music_visual/LayoutFixture.java.in
+index 5905a4487..ecd55cf1f 100644
+--- a/tools/connected_alpha/music_visual/LayoutFixture.java.in
++++ b/tools/connected_alpha/music_visual/LayoutFixture.java.in
+@@ -20,7 +20,7 @@ public class LayoutFixture extends FrameLayout {
+  timeRow=new LinearLayout(c);timeRow.addView(text(c,"2:19",13,colors.onSurfaceVariant),new LinearLayout.LayoutParams(0,-2,1));timeRow.addView(text(c,"−2:29",13,colors.onSurfaceVariant));content.addView(timeRow);
+  controls=new ControlsRow(c);for(MorphButton b:new MorphButton[]{controls.shuffle,controls.prev,controls.play,controls.next,controls.repeat})b.setColors(colors.primaryContainer,colors.primary,colors.primaryContainer,colors.primary);
+  controls.play.setColors(colors.primary,colors.onPrimary,colors.primary,colors.onPrimary);content.addView(controls);
+- group=new LinearLayout(c);String[] names={"Velocidad","Letras","Cola","Más"};String[] icons={PlayerIcon.SPEED,PlayerIcon.LYRICS,PlayerIcon.QUEUE,PlayerIcon.MORE};
++ group=new SignatureMusicActions(c);String[] names={"Velocidad","Letras","Cola","Más"};String[] icons={PlayerIcon.SPEED,PlayerIcon.LYRICS,PlayerIcon.QUEUE,PlayerIcon.MORE};
+  for(int i=0;i<4;i++){MorphButton b=new MorphButton(c,PlayerIcon.stroke(icons[i],20));b.setText(names[i]);b.setStackedLabel(true);b.setRadius(dp(18),false);b.setColors(colors.surfaceHigh,colors.onSurface,colors.surfaceHigh,colors.onSurface);group.addView(b,LayoutHelper.createLinear(0,52,1f,2,0,2,0));}content.addView(group);
+  bubble=new TextView(c);bubble.setVisibility(GONE);content.addView(bubble);header.bringToFront();ordered=new View[]{header,cover,titleRow,seekBar,timeRow,controls,group};
+  }
+diff --git a/tools/connected_alpha/music_visual/MusicVisualTest.java.in b/tools/connected_alpha/music_visual/MusicVisualTest.java.in
+index 6386c4ddd..2a4ea4bdf 100644
+--- a/tools/connected_alpha/music_visual/MusicVisualTest.java.in
++++ b/tools/connected_alpha/music_visual/MusicVisualTest.java.in
+@@ -16,7 +16,9 @@ public class MusicVisualTest {
+  @Test public void oneHostCompressesWithoutStoppingAndCleansUp()throws Exception{size(root,360,760);BaseFragment fragment=new BaseFragment(root);final int[] changes={0};SignatureMusicHost[] host={null};host[0]=new SignatureMusicHost(fragment,null,()->{changes[0]++;host[0].update(true);});host[0].attach();host[0].update(true);assertEquals(1,root.getChildCount());View bubble=root.getChildAt(0);assertEquals(View.GONE,bubble.getVisibility());SignatureMusicPresentation.setCompact(true);assertEquals(View.VISIBLE,bubble.getVisibility());assertEquals(0,MediaController.getInstance().stops);size(bubble,56,56);bubble.onTouchEvent(MotionEvent.obtain(0,0,0,10,10,0));bubble.onTouchEvent(MotionEvent.obtain(0,20,2,999,999,0));bubble.onTouchEvent(MotionEvent.obtain(0,40,1,999,999,0));assertTrue(bubble.getX()<=292);assertTrue(bubble.getY()<=592);assertTrue(SignatureMusicPresentation.isCompact());bubble.performClick();assertFalse(SignatureMusicPresentation.isCompact());assertEquals(0,MediaController.getInstance().stops);MediaController.getInstance().message.music=false;SignatureMusicPresentation.setCompact(true);assertEquals(View.GONE,bubble.getVisibility());host[0].detach();assertEquals(0,root.getChildCount());int count=changes[0];host[0].update(true);host[0].onPresentationChanged();assertEquals(0,root.getChildCount());assertEquals(count,changes[0]);SignatureMusicPresentation.setCompact(false);assertEquals(count,changes[0]);}
+  @Test public void navigationCanDetachDuringBubbleDrag(){size(root,360,760);SignatureMusicHost host=new SignatureMusicHost(new BaseFragment(root),null,()->{});host.attach();SignatureMusicPresentation.setCompact(true);host.update(true);View bubble=root.getChildAt(0);size(bubble,56,56);bubble.onTouchEvent(MotionEvent.obtain(0,0,0,10,10,0));bubble.onTouchEvent(MotionEvent.obtain(0,20,2,100,100,0));host.detach();assertNull(bubble.getParent());bubble.onTouchEvent(MotionEvent.obtain(0,40,3,100,100,0));assertEquals(0,MediaController.getInstance().stops);}
+  @Test public void miniUsesOriginalPlaybackActionsAndBalancedObservers()throws Exception{BaseFragment fragment=new BaseFragment(root);PlayerMiniView mini=new PlayerMiniView(activity,fragment,null);root.addView(mini);mini.update(false);size(root,360,760);size(mini,360,80);View play=(View)field(mini,"playButton"),next=(View)field(mini,"nextButton"),close=(View)field(mini,"closeButton");play.performClick();assertEquals(1,MediaController.getInstance().pauses);play.performClick();assertEquals(1,MediaController.getInstance().plays);next.performClick();assertEquals(1,MediaController.getInstance().nexts);close.performClick();assertTrue(SignatureMusicPresentation.isCompact());assertEquals(0,MediaController.getInstance().stops);root.removeView(mini);assertEquals(1,root.getChildCount());assertEquals(View.GONE,root.getChildAt(0).getVisibility());for(int a=0;a<UserConfig.MAX_ACCOUNT_COUNT;a++)assertTrue(NotificationCenter.getInstance(a).registrations.isEmpty());assertTrue(NotificationCenter.getGlobalInstance().registrations.isEmpty());}
+- @Test public void shortScreensAndLargeFontsScrollWithoutControlOverlap(){for(float font:new float[]{1,1.5f,2,3})for(int width:new int[]{240,320,600}){Configuration config=new Configuration(activity.getResources().getConfiguration());config.fontScale=font;Context c=activity.createConfigurationContext(config);LayoutFixture f=new LayoutFixture(c,false);size(f,width,480);View[] v=f.ordered;assertEquals(0,v[1].getLeft());assertEquals(width,v[1].getRight());assertTrue(v[0].getBottom()<v[1].getBottom());for(int i=2;i<v.length;i++)assertTrue("overlap "+width+" font "+font+" index "+i,v[i].getTop()>=v[i-1].getBottom());assertTrue(f.content.getHeight()>=480);for(int i=0;i<v.length;i++){assertTrue(v[i].getLeft()>=0);assertTrue(v[i].getRight()<=width);}assertTrue(v[1].getHeight()>=220);}}
++ @Test public void shortScreensAndLargeFontsScrollWithoutControlOverlap(){for(float font:new float[]{1,1.5f,2,3})for(int width:new int[]{240,320,600}){Configuration config=new Configuration(activity.getResources().getConfiguration());config.fontScale=font;Context c=activity.createConfigurationContext(config);LayoutFixture f=new LayoutFixture(c,false);size(f,width,480);View[] v=f.ordered;assertEquals(0,v[1].getLeft());assertEquals(width,v[1].getRight());assertTrue(v[0].getBottom()<v[1].getBottom());// Artwork deliberately continues behind the title; interactive rows must remain separate.
++ assertTrue(v[2].getTop()<v[1].getBottom());assertEquals(v[1].getBottom()-AndroidUtilities.dp(64),v[2].getTop());
++ for(int i=3;i<v.length;i++)assertTrue("overlap "+width+" font "+font+" index "+i,v[i].getTop()>=v[i-1].getBottom());assertTrue(f.content.getHeight()>=480);for(int i=0;i<v.length;i++){assertTrue(v[i].getLeft()>=0);assertTrue(v[i].getRight()<=width);}assertTrue(v[1].getHeight()>=220);}}
+  @Test public void lateMetadataOnSameMessageRefreshesBothMinis()throws Exception{PlayerBarView top=new PlayerBarView(activity,null,()->{},()->{});PlayerMiniView bottom=new PlayerMiniView(activity,new BaseFragment(root),null);top.update();bottom.update(false);MessageObject same=MediaController.getInstance().message;same.title="Updated title";same.artist="Updated artist";top.update();bottom.update(false);assertEquals("Updated title",((TextView)field(top,"titleView")).getText().toString());assertEquals("Updated artist",((TextView)field(top,"artistView")).getText().toString());assertEquals("Updated title",((TextView)field(bottom,"titleView")).getText().toString());assertEquals("Updated artist",((TextView)field(bottom,"artistView")).getText().toString());}
+  @Test public void narrowMinisKeepAccessibleControlsAndText()throws Exception{for(int width:new int[]{240,320,600}){PlayerBarView top=new PlayerBarView(activity,null,()->{},()->{});top.update();size(top,width,64);View text=(View)field(top,"texts");View next=(View)field(top,"nextButton");assertTrue(text.getWidth()>40);assertEquals(width<320?View.GONE:View.VISIBLE,next.getVisibility());assertEquals(48,((View)field(top,"playButton")).getWidth());assertEquals(48,((View)field(top,"closeButton")).getWidth());PlayerMiniView bottom=new PlayerMiniView(activity,new BaseFragment(root),null);bottom.update(false);size(bottom,width,80);assertEquals(width<320?View.GONE:View.VISIBLE,((View)field(bottom,"nextButton")).getVisibility());}}
+  @Test public void renderRealComponentLayoutAndMinisLightDark()throws Exception{Bitmap image=Bitmap.createBitmap(1080,1360,Bitmap.Config.ARGB_8888);Canvas canvas=new Canvas(image);for(int panel=0;panel<2;panel++){boolean dark=panel==1;Theme.dark=dark;LayoutFixture f=new LayoutFixture(activity,dark);root.addView(f);size(f,360,780);for(int step=0;step<20;step++){org.robolectric.shadows.ShadowSystemClock.advanceBy(java.time.Duration.ofMillis(33));f.draw(new Canvas(Bitmap.createBitmap(360,780,Bitmap.Config.ARGB_8888)));}canvas.save();canvas.translate(panel*540,0);canvas.scale(1.5f,1.5f);f.draw(canvas);canvas.restore();PlayerBarView bar=new PlayerBarView(activity,null,()->{},()->{});bar.update();size(bar,344,64);canvas.save();canvas.translate(panel*540+12,1210);canvas.scale(1.5f,1.5f);bar.draw(canvas);canvas.restore();root.removeView(f);}try(FileOutputStream out=new FileOutputStream(new File(System.getProperty("probe.root"),"android-music-isolated.png"))){assertTrue(image.compress(Bitmap.CompressFormat.PNG,100,out));}}
+@@ -49,9 +51,20 @@ public class MusicVisualTest {
+   assertEquals(0f,(Float)field(bar,"phase"),0f);assertEquals(0L,field(bar,"lastFrame"));
+   for(int w:new int[]{192,240,264,272,300,320,600}){ControlsRow row=new ControlsRow(activity);size(row,w,200);View[] actions={row.shuffle,row.prev,row.play,row.next,row.repeat};for(View v:actions){assertTrue(v.getWidth()>=48);assertTrue(v.getHeight()>=48);assertTrue(v.getLeft()>=0);assertTrue(v.getRight()<=w);}if(w>=264){for(int n=1;n<5;n++)assertTrue(actions[n-1].getRight()<=actions[n].getLeft());}}
+  }
++ @Test public void actionLabelsReflowForLargeFontsWithoutTruncationOrTouchOverlap()throws Exception{
++  for(float font:new float[]{1,2,3})for(int width:new int[]{192,312,552}){
++   Configuration config=new Configuration(activity.getResources().getConfiguration());config.fontScale=font;Context context=activity.createConfigurationContext(config);
++   SignatureMusicActions grid=new SignatureMusicActions(context);
++   for(String label:new String[]{"Velocidad","Letras","Cola","Más"}){MorphButton button=new MorphButton(context,PlayerIcon.stroke(PlayerIcon.SPEED,20));button.setStackedLabel(true);button.setText(label);grid.addView(button,new LinearLayout.LayoutParams(0,72,1));}
++   grid.measure(View.MeasureSpec.makeMeasureSpec(width,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(0,View.MeasureSpec.UNSPECIFIED));grid.layout(0,0,width,grid.getMeasuredHeight());
++   for(int i=0;i<4;i++){View v=grid.getChildAt(i);assertTrue(v.getHeight()>=48);assertTrue(v.getWidth()>=48);String displayed=(String)field(v,"displayText");assertEquals(v.getContentDescription().toString(),displayed);
++    for(int j=i+1;j<4;j++){View other=grid.getChildAt(j);android.graphics.Rect r=new android.graphics.Rect(v.getLeft(),v.getTop(),v.getRight(),v.getBottom());assertFalse(r.intersect(other.getLeft(),other.getTop(),other.getRight(),other.getBottom()));}}
++   if(font==1&&width==312)assertEquals(grid.getChildAt(0).getTop(),grid.getChildAt(3).getTop());
++  }
++ }
+  @Test public void heroFadeReusesShaderAndArtworkPaletteIsBounded()throws Exception{
+   for(boolean dark:new boolean[]{false,true})for(int seed:new int[]{0xff000000,0xffffffff,0xffff0000,0xff0000ff}){
+-   PlayerColors c=PlayerColors.fromSignatureArtwork(seed,dark);for(int n=0;n<100;n++)assertSame(c,PlayerColors.fromSignatureArtwork(seed,dark));assertTrue(androidx.core.graphics.ColorUtils.calculateContrast(c.onSurface,c.surface)>=4.5);
++   PlayerColors c=PlayerColors.fromSignatureArtwork(seed,dark);for(int n=0;n<100;n++)assertSame(c,PlayerColors.fromSignatureArtwork(seed,dark));assertTrue(androidx.core.graphics.ColorUtils.calculateContrast(c.onSurface,c.surface)>=4.5);assertTrue(androidx.core.graphics.ColorUtils.calculateContrast(c.onPrimary,c.primary)>=4.5);
+    CoverImage cover=new CoverImage(activity,40);cover.setSignatureSurface(c.surface);Bitmap original=Bitmap.createBitmap(120,120,Bitmap.Config.ARGB_8888);original.eraseColor(0xff22aa88);cover.setImageBitmap(original);size(cover,240,300);
+    Object fade=field(cover,"signatureFade");android.graphics.Paint paint=(android.graphics.Paint)field(fade,"paint");Shader shader=paint.getShader();assertNotNull(shader);
+    Bitmap pixels=Bitmap.createBitmap(240,300,Bitmap.Config.ARGB_8888);for(int n=0;n<100;n++)cover.draw(new Canvas(pixels));assertSame(shader,paint.getShader());assertEquals(original.getPixel(50,50),pixels.getPixel(120,120));
+diff --git a/tools/connected_alpha/music_visual/stubs.py b/tools/connected_alpha/music_visual/stubs.py
+index 785c1c0e0..ae39dd4d0 100644
+--- a/tools/connected_alpha/music_visual/stubs.py
++++ b/tools/connected_alpha/music_visual/stubs.py
+@@ -7,7 +7,7 @@ import shutil
+ 
+ PRODUCTION = ('SignatureMusicStyle','SignatureMusicPresentation','SignatureMusicBubble',
+               'SignatureMusicHost','ControlsRow','MorphButton','PlayerIcon','Spring',
+-              'WavySeekBar','RingPlayButton','PlayerBarView','PlayerMiniView','PlayerColors','CoverImage','SignatureCoverFade')
++              'WavySeekBar','RingPlayButton','PlayerBarView','PlayerMiniView','PlayerColors','CoverImage','SignatureCoverFade','SignatureMusicActions')
+ 
+ def write_stubs(source, root):
+     def put(path, text):
+diff --git a/tools/connected_alpha/studio_native/StudioCoreTest.java b/tools/connected_alpha/studio_native/StudioCoreTest.java
+index b8e1a2942..a3eb9ddc6 100644
+--- a/tools/connected_alpha/studio_native/StudioCoreTest.java
++++ b/tools/connected_alpha/studio_native/StudioCoreTest.java
+@@ -19,13 +19,23 @@ public class StudioCoreTest {
+   }
+  }
+  public static void main(String[] args)throws Exception {
++  check(StudioSchema.keys().size()==21);
++  for(String key:new String[]{"outlineStyle","pearlIntensity","outlineEnabled"}){
++   Object valid=key.equals("outlineEnabled")?Boolean.FALSE:key.equals("outlineStyle")?1:72;
++   var preset=StudioCodec.create("Pearl.flexyGram",Map.of("bubbles",Map.of(key,valid)));check(preset.minApp==1274);
++   check(StudioCodec.decode(StudioCodec.encode(preset),1274).sections.get("bubbles").get(key).equals(valid));reject(()->StudioCodec.decode(StudioCodec.encode(preset),1273));
++  }
++  reject(()->StudioCodec.create("bad.flexyGram",Map.of("bubbles",Map.of("outlineStyle",2))));
++  reject(()->StudioCodec.create("bad.flexyGram",Map.of("bubbles",Map.of("pearlIntensity",101))));
++  reject(()->StudioCodec.create("bad.flexyGram",Map.of("header",Map.of("counterPresentation",0))));
+   var defaults=defaults();reject(()->StudioCodec.export("MiFlexyGram.flexyGram",defaults,Set.of()));
+   defaults.get("bubbles").put("transparency",74);
+   var one=StudioCodec.export("SoloBurbujas.flexyGram",defaults,Set.of());check(one.sections.keySet().equals(Set.of("bubbles")));check(one.sections.get("bubbles").size()==1);
+   defaults.get("header").put("compact",true);defaults.get("composer").put("style",1);
+   var three=StudioCodec.export("Tres.flexyGram",defaults,Set.of());check(three.sections.size()==3);
+   var full=StudioCodec.export("Completo.flexyGram",defaults,StudioSchema.sections());check(full.sections.size()==4);check(full.sections.values().stream().mapToInt(Map::size).sum()==StudioSchema.keys().size());
+-  byte[] encoded=StudioCodec.encode(full);check(Arrays.equals(encoded,StudioCodec.encode(StudioCodec.decode(encoded,1273))));
++  byte[] encoded=StudioCodec.encode(full);check(Arrays.equals(encoded,StudioCodec.encode(StudioCodec.decode(encoded,1274))));
++  check(full.minApp==1274);reject(()->StudioCodec.decode(encoded,1273));
+   Map<String,Map<String,Object>> reversed=new LinkedHashMap<>();List<String> ids=new ArrayList<>(full.sections.keySet());Collections.reverse(ids);for(String s:ids)reversed.put(s,full.sections.get(s));check(Arrays.equals(encoded,StudioCodec.encode(StudioCodec.create(full.name,reversed))));
+   check(StudioCodec.decode(StudioCodec.encode(one),1273).sections.equals(one.sections));
+   try{one.sections.put("icon",Map.of());throw new AssertionError();}catch(UnsupportedOperationException expected){checks++;}
+diff --git a/tools/connected_alpha/studio_native/stubs.py b/tools/connected_alpha/studio_native/stubs.py
+index 9bb249263..f715e9c10 100644
+--- a/tools/connected_alpha/studio_native/stubs.py
++++ b/tools/connected_alpha/studio_native/stubs.py
+@@ -29,7 +29,7 @@ if(key==key_divider)return dark?0xff354256:0xffd9e0ea;
+ return dark?(key==key_windowBackgroundGray?0xff11151c:0xff1b2533):(key==key_windowBackgroundGray?0xfff7f8fa:0xffffffff);}
+ public static Drawable createSimpleSelectorRoundRectDrawable(int radius,int fill,int pressed){GradientDrawable d=new GradientDrawable();d.setColor(fill);d.setCornerRadius(radius);return new RippleDrawable(android.content.res.ColorStateList.valueOf(pressed),d,null);}}
+ ''')
+- put('org/telegram/messenger/BuildConfig.java','package org.telegram.messenger;public class BuildConfig {public static final boolean CONNECTED_ALPHA=true;public static final int VERSION_CODE=1273;}')
++ put('org/telegram/messenger/BuildConfig.java','package org.telegram.messenger;public class BuildConfig {public static final boolean CONNECTED_ALPHA=true;public static final int VERSION_CODE=1274;}')
+  put('org/telegram/messenger/ApplicationLoader.java','''package org.telegram.messenger;public class ApplicationLoader {
+ public static android.content.Context applicationContext;public static android.os.Handler applicationHandler=new android.os.Handler(android.os.Looper.getMainLooper());public static String getApplicationId(){return applicationContext.getPackageName();}}''')
+  put('org/telegram/messenger/AndroidUtilities.java','''package org.telegram.messenger;public class AndroidUtilities {
+diff --git a/tools/connected_alpha/test_bubbles1270.py b/tools/connected_alpha/test_bubbles1270.py
+index feeeb403f..06c584e46 100644
+--- a/tools/connected_alpha/test_bubbles1270.py
++++ b/tools/connected_alpha/test_bubbles1270.py
+@@ -53,13 +53,13 @@ class BubbleReleaseTests(unittest.TestCase):
+  def test_actual_cell_glass_callback_compiles_before_late_declared_delegate(self):
+   source=(JAVA/'org/telegram/ui/Cells/ChatMessageCell.java').read_text()
+   start=source.index('    private final MessageDrawable.GlassSource flexyBubbleSource =')
+-  field=source[start:source.index(';',start)+1]
+-  runner="""class MessageDrawable {interface GlassSource {boolean draw(Object canvas,Object path);}}
++  field=source[start:source.index('    private void drawFlexyBubble(',start)].replace('android.graphics.Path','Object').replace('Canvas','Object').replace('ChatMessageCell.this','CallbackProbe.this')
++  runner="""class MessageDrawable {interface GlassSource {boolean draw(Object canvas,Object path);default boolean draw(Object canvas,Object path,int alpha){return alpha==255&&draw(canvas,path);}}}
+ class CallbackProbe {
+ _FIELD_
+- interface Delegate {boolean drawFlexyBubbleWallpaper(Object cell,Object canvas,Object path);}
+- Delegate delegate=(a,b,c)->true;boolean drawForBlur;
+- public static void main(String[] args){CallbackProbe p=new CallbackProbe();if(!p.flexyBubbleSource.draw(null,null))throw new AssertionError();p.drawForBlur=true;if(p.flexyBubbleSource.draw(null,null))throw new AssertionError();}
++ interface Delegate {boolean drawFlexyBubbleWallpaper(Object cell,Object canvas,Object path,int alpha);}
++ Delegate delegate=(a,b,c,alpha)->alpha>0;boolean drawForBlur;
++ public static void main(String[] args){CallbackProbe p=new CallbackProbe();if(!p.flexyBubbleSource.draw(null,null))throw new AssertionError();if(!p.flexyBubbleSource.draw(null,null,128)||p.flexyBubbleSource.draw(null,null,0))throw new AssertionError();p.drawForBlur=true;if(p.flexyBubbleSource.draw(null,null))throw new AssertionError();}
+ }""".replace('_FIELD_',field)
+   import tempfile
+   with tempfile.TemporaryDirectory() as temp:
+diff --git a/tools/connected_alpha/test_integration.py b/tools/connected_alpha/test_integration.py
+index e41bf62a8..d4af67379 100644
+--- a/tools/connected_alpha/test_integration.py
++++ b/tools/connected_alpha/test_integration.py
+@@ -33,7 +33,7 @@ class UnifiedIntegration(unittest.TestCase):
+                 if {'android.intent.action.MAIN'} <= actions and {'android.intent.category.LAUNCHER'} <= categories:
+                     launchers.append(alias)
+         self.assertEqual([alias.get(A+'name') for alias in launchers],
+-                         ['org.telegram.messenger.ExteralessIcon'])
++                         ['org.telegram.messenger.FlexyBlueIcon'])
+         self.assertEqual(launchers[0].get(A+'exported'), 'true')
+ 
+     def test_baseline_stray_text_rejected_and_current_values_clean(self):
+diff --git a/tools/connected_alpha/test_release1273.py b/tools/connected_alpha/test_release1273.py
+index 081558790..d36f4475d 100644
+--- a/tools/connected_alpha/test_release1273.py
++++ b/tools/connected_alpha/test_release1273.py
+@@ -1,13 +1,16 @@
+ """Current native release identity and private delivery, beyond historical audits."""
+ import re,subprocess,unittest,yaml
+ from next_alpha_contract import ROOT,restore1272,RELEASE_PATHS
++from refinement1274_contract import restore as restore_refinement
++# Preserve historical1273 checks against exact restored bytes; current1274 is checked independently.
++def historical(path):return restore_refinement(path,(ROOT/path).read_bytes()).decode()
+ class Release1273(unittest.TestCase):
+  def test_version_and_private_verifier_agree_without_identity_or_signing_changes(self):
+-  gradle=(ROOT/'TMessagesProj/build.gradle').read_text()
++  gradle=historical('TMessagesProj/build.gradle')
+   self.assertEqual(re.search(r'def verCode = (\d+)',gradle)[1],'1273')
+   old=subprocess.check_output(['git','show','8619ba40fbd8fd9d9d898ff307fb0c0716661254:TMessagesProj/build.gradle'],cwd=ROOT,text=True)
+   self.assertEqual(gradle.replace('def verCode = 1273','def verCode = 1272'),old)
+-  builder=(ROOT/'tools/connected_alpha/build_private_apk.py').read_text()
++  builder=historical('tools/connected_alpha/build_private_apk.py')
+   self.assertIn('FlexyGram_Alpha_1273_ARM64_TEST.apk',builder)
+   self.assertIn("'--expected-version-code','1273'",builder)
+   self.assertIn("CERT='c8f04cad685ca5757d35b25ea4b0b4613c7399909948d821e6ada61f9fb12b2c'",builder)
+@@ -20,7 +23,7 @@ class Release1273(unittest.TestCase):
+    self.assertEqual(restored,subprocess.check_output(['git','show','8619ba40fbd8fd9d9d898ff307fb0c0716661254:'+path],cwd=ROOT))
+    with self.assertRaises(ValueError):restore1272(path,data+b'\nUNREVIEWED\n')
+  def test_full_build_remains_guarded_and_plaintext_apk_is_never_uploaded(self):
+-  workflow=(ROOT/'.github/workflows/connected-alpha-arm64.yml').read_text()
++  workflow=historical('.github/workflows/connected-alpha-arm64.yml')
+   self.assertIn('--expected-version-code 1273',workflow)
+   jobs=yaml.safe_load(workflow)['jobs']
+   self.assertEqual(jobs['build-arm64']['needs'],['source-checks','credentials-present'])
+@@ -35,7 +38,7 @@ class Release1273(unittest.TestCase):
+  def test_real_workflow_report_enforces_payload_and_pin_without_exposing_extra_fields(self):
+   import json,os,sys,tempfile
+   from pathlib import Path
+-  workflow=yaml.safe_load((ROOT/'.github/workflows/connected-alpha-arm64.yml').read_text())
++  workflow=yaml.safe_load(historical('.github/workflows/connected-alpha-arm64.yml'))
+   step=next(s for s in workflow['jobs']['build-arm64']['steps'] if s.get('name')=='Verify APK against independently authorized certificate')
+   script=step['run'].split("python3 - <<'PY'\n",1)[1].split('\nPY',1)[0]
+   base=dict(sha256='0'*64,application_id='io.github.jose22yt.flexygram.alpha',version_code=1273,elf_count=96,bytes=1,certificate_sha256='c8f04cad685ca5757d35b25ea4b0b4613c7399909948d821e6ada61f9fb12b2c',elfs=['PRIVATE_DECOY_FIELD'])
+diff --git a/tools/connected_alpha/test_signature1271.py b/tools/connected_alpha/test_signature1271.py
+index f9944b19b..55ddc44ae 100644
+--- a/tools/connected_alpha/test_signature1271.py
++++ b/tools/connected_alpha/test_signature1271.py
+@@ -66,7 +66,7 @@ class Signature1271(unittest.TestCase):
+   aliases=app.findall('activity-alias');previous=ET.fromstring(old('TMessagesProj/src/main/AndroidManifest.xml')).find('application').findall('activity-alias')
+   self.assertTrue({x.get(A+'name') for x in previous}<={x.get(A+'name') for x in aliases})
+   launchers=[x for x in aliases if x.find("intent-filter/category[@"+A+"name='android.intent.category.LAUNCHER']") is not None]
+-  self.assertEqual([x.get(A+'name') for x in launchers if x.get(A+'enabled')=='true'],['org.telegram.messenger.ExteralessIcon'])
++  self.assertEqual([x.get(A+'name') for x in launchers if x.get(A+'enabled')=='true'],['org.telegram.messenger.FlexyBlueIcon'])
+   for name in ['blue','green','coral','mono','blueprint','nya','quack','go']:
+    for suffix in ['','_round']:
+     for density in ['mdpi','hdpi','xhdpi','xxhdpi','xxxhdpi']:self.assertTrue((ROOT/f'TMessagesProj/src/main/res/mipmap-{density}/ic_flexy_{name}{suffix}.png').is_file())
+@@ -101,7 +101,10 @@ public void setComponentEnabledSetting(ComponentName c,int s,int flags){states.p
+    'org/telegram/messenger/ApplicationLoader.java':'package org.telegram.messenger;public class ApplicationLoader {public static android.content.Context applicationContext=new android.content.Context();}',
+    'LauncherRegression.java':'''import org.telegram.ui.LauncherIconController;import org.telegram.ui.LauncherIconController.LauncherIcon;import org.telegram.messenger.ApplicationLoader;
+ public class LauncherRegression{static void check(boolean v){if(!v)throw new AssertionError();}static int count(){int n=0;for(LauncherIcon i:LauncherIcon.values())if(LauncherIconController.isEnabled(i))n++;return n;}public static void main(String[]args){
+-ApplicationLoader.applicationContext.pm.fail=true;LauncherIconController.tryFixLauncherIconIfNeeded();check(ApplicationLoader.applicationContext.pm.states.isEmpty());ApplicationLoader.applicationContext.pm.fail=false;LauncherIconController.tryFixLauncherIconIfNeeded();check(count()==1);check(LauncherIconController.isEnabled(LauncherIcon.EXTERALESS));check(ApplicationLoader.applicationContext.pm.states.get("org.telegram.messenger.ExteralessIcon")==2);
++// Fresh install resolves the blue alias without any startup mutation.
++check(count()==1);LauncherIconController.tryFixLauncherIconIfNeeded();check(ApplicationLoader.applicationContext.pm.states.isEmpty());
++// An old explicit primary override is retired atomically; a rejected migration keeps it intact.
++ApplicationLoader.applicationContext.pm.states.put("org.telegram.messenger.ExteralessIcon",1);ApplicationLoader.applicationContext.pm.fail=true;LauncherIconController.tryFixLauncherIconIfNeeded();check(ApplicationLoader.applicationContext.pm.states.get("org.telegram.messenger.ExteralessIcon")==1);ApplicationLoader.applicationContext.pm.fail=false;LauncherIconController.tryFixLauncherIconIfNeeded();check(count()==1);check(LauncherIconController.isEnabled(LauncherIcon.EXTERALESS));check(ApplicationLoader.applicationContext.pm.states.get("org.telegram.messenger.ExteralessIcon")==2);
+ for(int sdk:new int[]{32,37}){android.os.Build.VERSION.SDK_INT=sdk;for(LauncherIcon i:LauncherIcon.values()){LauncherIconController.setIcon(i);check(count()==1);check(LauncherIconController.isEnabled(i));LauncherIconController.tryFixLauncherIconIfNeeded();check(LauncherIconController.isEnabled(i));}}
+ check(ApplicationLoader.applicationContext.pm.minEnabled>=1);check(ApplicationLoader.applicationContext.pm.batches>0);
+ android.os.Build.VERSION.SDK_INT=37;LauncherIconController.setIcon(LauncherIcon.FLEX_GREEN);ApplicationLoader.applicationContext.pm.fail=true;try{LauncherIconController.setIcon(LauncherIcon.FLEX_CORAL);throw new AssertionError();}catch(SecurityException expected){}check(count()==1);check(LauncherIconController.isEnabled(LauncherIcon.FLEX_GREEN));ApplicationLoader.applicationContext.pm.fail=false;

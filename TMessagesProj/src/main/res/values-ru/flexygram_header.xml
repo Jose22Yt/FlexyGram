@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyHeaderTitle">Шапка чата</string>
+    <string name="FlexyHeaderStyle">Стиль</string>
+    <string name="FlexyHeaderSignature">Signature Adaptive</string>
+    <string name="FlexyHeaderClassic">Классический</string>
+    <string name="FlexyHeaderCounter">Показывать непрочитанные чаты</string>
+    <string name="FlexyHeaderSize">Размер</string>
+    <string name="FlexyHeaderNormal">Обычный</string>
+    <string name="FlexyHeaderCompact">Компактный</string>
+    <string name="FlexyHeaderOpacity">Непрозрачность поверхности</string>
+    <string name="FlexyHeaderUnread">Непрочитанные чаты в исходном списке: %1$d</string>
+    <string name="FlexyHeaderPreviewName">Алекс</string>
+    <string name="FlexyHeaderCounterOff">Выключен</string>
+    <string name="FlexyHeaderCounterIntegrated">Встроенный</string>
+    <string name="FlexyHeaderCounterBadge">Отдельный значок</string>
+    <string name="FlexyHeaderLastSeenTime">Был(а) %1$s</string>
+    <string name="FlexyHeaderFusion">Signature Fusion</string>
+    <string name="FlexyHeaderPortrait">Signature Matte Portrait</string>
+</resources>

@@ -1,0 +1,64 @@
+diff --git a/.github/workflows/pr.yml b/.github/workflows/pr.yml
+index ef9b61d29..e24190450 100644
+--- a/.github/workflows/pr.yml
++++ b/.github/workflows/pr.yml
+@@ -73,6 +73,7 @@ jobs:
+             python3 "tools/connected_alpha/$probe/run.py" --sdk-root "$ANDROID_HOME"
+           done
+           python3 tools/connected_alpha/music_visual/reproduce_detach.py --sdk-root "$ANDROID_HOME"
++          python3 tools/connected_alpha/preview_visual/run.py --sdk-root "$ANDROID_HOME"
+   build:
+     if: github.event_name == 'pull_request' && github.head_ref != 'feat/alpha1271-signature-ui' && github.head_ref != 'feat/signature-native-login' && github.head_ref != 'feat/signature-music2' && github.head_ref != 'fix/alpha-ios-bubbles-glass-home2' && github.head_ref != 'fix/signature-matte-general-appearance' && github.head_ref != 'alpha/connected-exteraless-baseline' && !startsWith(github.head_ref, 'support/connected-alpha-ci-') && !startsWith(github.head_ref, 'integration/connected-alpha-') && !startsWith(github.head_ref, 'fix/alpha2-')
+     name: Gradle Build
+diff --git a/TMessagesProj/src/main/java/org/telegram/ui/DialogsActivity.java b/TMessagesProj/src/main/java/org/telegram/ui/DialogsActivity.java
+index 800f50e48..03efccbef 100644
+--- a/TMessagesProj/src/main/java/org/telegram/ui/DialogsActivity.java
++++ b/TMessagesProj/src/main/java/org/telegram/ui/DialogsActivity.java
+@@ -5645,6 +5645,18 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
+ 
+         if (!onlySelect && initialDialogsType == DIALOGS_TYPE_DEFAULT) {
+             blurredView = new View(context) {
++                @Override
++                public boolean onTouchEvent(MotionEvent event) {
++                    // Opt-in Telegram logging: numeric ownership only, never chat/account data.
++                    if (BuildVars.LOGS_ENABLED && event.getActionMasked() == MotionEvent.ACTION_DOWN) {
++                        FileLog.d("SignaturePreview overlay DOWN preview="
++                                + (parentLayout != null && parentLayout.isInPreviewMode())
++                                + " transition=" + (parentLayout != null && parentLayout.isTransitionAnimationInProgress())
++                                + " alpha=" + getAlpha());
++                    }
++                    return super.onTouchEvent(event);
++                }
++
+                 @Override
+                 public void setAlpha(float alpha) {
+                     super.setAlpha(alpha);
+@@ -7687,9 +7699,28 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
+         canShowStoryHint = true;
+     }
+ 
++    /** The tab owner receives this even if an interrupted preview never advanced
++     * FragmentState visibility and therefore emitted no child transition end. */
++    @Override
++    public void onParentBecomeFullyVisible() {
++        clearClosedPreviewOverlay();
++    }
++
++    private void clearClosedPreviewOverlay() {
++        if (parentLayout != null && !parentLayout.isInPreviewMode()
++                && !parentLayout.isTransitionAnimationInProgress()
++                && blurredView != null && blurredView.getVisibility() != View.GONE) {
++            blurredView.setVisibility(View.GONE);
++            blurredView.setBackground(null);
++            blurredView.setAlpha(0f);
++            checkUi_mainTabsVisible();
++        }
++    }
++
+     @Override
+     public void onBecomeFullyVisible() {
+         super.onBecomeFullyVisible();
++        clearClosedPreviewOverlay();
+         if (isArchive()) {
+             SharedPreferences preferences = MessagesController.getGlobalMainSettings();
+             boolean showArchiveHint = preferences.getBoolean("archivehint", true);

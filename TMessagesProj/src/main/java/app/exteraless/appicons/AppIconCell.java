@@ -59,10 +59,10 @@ public class AppIconCell extends LinearLayout {
         addView(previewContainer, LayoutHelper.createLinear(68, 68, Gravity.CENTER_HORIZONTAL));
 
         title = new TextView(context);
-        title.setMaxLines(2);
+        title.setMaxLines(Integer.MAX_VALUE);
         title.setGravity(Gravity.CENTER);
-        title.setEllipsize(TextUtils.TruncateAt.END);
-        title.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 13);
+        title.setEllipsize(null);
+        title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         title.setLineSpacing(0, 0.95f);
         title.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText, resourcesProvider));
         addView(title, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL, 0, 8, 0, 0));
@@ -77,6 +77,7 @@ public class AppIconCell extends LinearLayout {
     public void set(LauncherIcon icon, boolean checked, boolean animated) {
         preview.setIcon(icon, false);
         title.setText(AppIcons.title(icon));
+        setContentDescription(AppIcons.title(icon)); setSelected(checked);
         checkBox.setChecked(checked, animated);
         float to = checked ? 1f : 0f;
         if (selectionAnimator != null) {

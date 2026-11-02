@@ -1,0 +1,104 @@
+package app.flexygram.files;
+import android.os.*;import android.widget.*;import android.webkit.*;
+import org.junit.*;import org.junit.runner.RunWith;import org.robolectric.*;import org.robolectric.annotation.*;
+import java.io.*;import java.lang.reflect.*;import java.nio.charset.*;import java.nio.file.*;import java.util.concurrent.*;import app.flexygram.files.core.*;import static org.junit.Assert.*;
+/** Real Android EditText/worker/cache/editor with explicit Telegram API doubles; no account/device execution. */
+@RunWith(RobolectricTestRunner.class) @Config(manifest=Config.NONE,sdk=35) @GraphicsMode(GraphicsMode.Mode.NATIVE)
+public class FilesNativeTest {
+ static Object get(Object o,String n)throws Exception{Field f=o.getClass().getDeclaredField(n);f.setAccessible(true);return f.get(o);}
+ static void command(FlexyFileEditorActivity o,int id)throws Exception{Method m=o.getClass().getDeclaredMethod("command",int.class);m.setAccessible(true);m.invoke(o,id);}
+ static void drain(FlexyFileEditorActivity o)throws Exception{for(int i=0;i<3;i++){FilesWork w=(FilesWork)get(o,"work");Future<?> f=(Future<?>)get(w,"future");if(f!=null)f.get(10,TimeUnit.SECONDS);Shadows.shadowOf(Looper.getMainLooper()).idle();}}
+ FlexyFileEditorActivity open(String content)throws Exception {File f=File.createTempFile("files-test-",".txt");Files.writeString(f.toPath(),content);FlexyFileEditorActivity o=new FlexyFileEditorActivity(f,"example.txt",null,1,0);o.createView(o.getParentActivity());drain(o);return o;}
+ static void drainSheet(FlexyFilesSheet sheet)throws Exception{for(int i=0;i<3;i++){FilesWork w=(FilesWork)get(sheet,"work");Future<?> f=(Future<?>)get(w,"future");if(f!=null)f.get(10,TimeUnit.SECONDS);Shadows.shadowOf(Looper.getMainLooper()).idle();}}
+ @Test public void nativeThemeCallbacksRecolorEditorWithoutReplacingTextOrCursor()throws Exception{
+  FlexyFileEditorActivity o=open("class Value { return true; }");try{
+   FilesCodeView e=(FilesCodeView)get(o,"editor");e.setSelection(3);android.text.Editable document=e.getText();
+   for(boolean dark:new boolean[]{true,false,true}){
+    org.telegram.ui.ActionBar.Theme.dark=dark;
+    java.util.ArrayList<org.telegram.ui.ActionBar.ThemeDescription> descriptions=o.getThemeDescriptions();assertEquals(7,descriptions.size());
+    for(org.telegram.ui.ActionBar.ThemeDescription d:descriptions)d.delegate.didSetColor();
+    assertSame(document,e.getText());assertEquals(3,e.getSelectionStart());assertEquals(dark?0xffeeeeee:0xff11151c,e.getCurrentTextColor());
+    assertEquals(dark?0xff11151c:0xfff7f8fa,((android.graphics.drawable.ColorDrawable)((android.widget.LinearLayout)get(o,"panel")).getBackground()).getColor());
+   }
+  }finally{org.telegram.ui.ActionBar.Theme.dark=false;o.onFragmentDestroy();}
+ }
+ @Test public void longDocumentSelectionDoesNotAccumulateOffscreenSyntaxSpans()throws Exception{
+  String document="class Value { return true; }\n".repeat(8000);FlexyFileEditorActivity o=open(document);try{
+   FilesCodeView e=(FilesCodeView)get(o,"editor");assertTrue(e.isEnabled());assertEquals(document,e.getText().toString());Method highlight=o.getClass().getDeclaredMethod("highlightParagraph");highlight.setAccessible(true);
+   for(int line=0;line<8000;line+=71){e.setSelection(Math.min(e.length(),line*29));highlight.invoke(o);assertTrue(e.getText().getSpans(0,e.length(),android.text.style.ForegroundColorSpan.class).length<=128);}
+   assertEquals(android.text.Layout.BREAK_STRATEGY_SIMPLE,e.getBreakStrategy());assertEquals(android.text.Layout.HYPHENATION_FREQUENCY_NONE,e.getHyphenationFrequency());
+   e.getText().append("changed");command(o,1);assertFalse(e.getText().toString().endsWith("changed"));command(o,2);assertTrue(e.getText().toString().endsWith("changed"));
+  }finally{o.onFragmentDestroy();}
+ }
+ @Test public void cleanBackReturnsToStandaloneOverviewAndCanReopen()throws Exception{
+  FlexyFiles.enabled(true);File f=File.createTempFile("files-return-",".txt");Files.writeString(f.toPath(),"original");org.telegram.ui.ActionBar.BaseFragment host=new org.telegram.ui.ActionBar.BaseFragment();
+  FlexyFileEditorActivity o=new FlexyFileEditorActivity(f,"document.txt",null,1,0,host,"");o.createView(o.getParentActivity());drain(o);assertTrue(o.onBackPressed(true));o.onFragmentDestroy();host.transitioning=true;host.onBecomeFullyVisible();assertNull(org.telegram.ui.ActionBar.BaseFragment.lastDialog);host.transitioning=false;Shadows.shadowOf(Looper.getMainLooper()).idle();
+  FlexyFilesSheet sheet=(FlexyFilesSheet)org.telegram.ui.ActionBar.BaseFragment.lastDialog;assertNotNull(sheet);try{drainSheet(sheet);assertEquals(1,((java.util.List<?>)get(sheet,"rows")).size());org.telegram.ui.Components.RecyclerListView.last.click(0);assertNull(get(org.telegram.ui.ActionBar.BaseFragment.presented,"entry"));org.telegram.ui.ActionBar.BaseFragment.presented.onFragmentDestroy();}finally{sheet.dismiss();}
+ }
+ @Test public void queuedExplorerReturnDoesNotResurrectAnOldChat()throws Exception{
+  FlexyFiles.enabled(true);File f=File.createTempFile("files-return-stale-",".txt");Files.writeString(f.toPath(),"original");org.telegram.ui.ActionBar.BaseFragment host=new org.telegram.ui.ActionBar.BaseFragment();
+  FlexyFileEditorActivity o=new FlexyFileEditorActivity(f,"document.txt",null,1,0,host,"");o.createView(o.getParentActivity());drain(o);assertTrue(o.onBackPressed(true));o.onFragmentDestroy();org.telegram.ui.ActionBar.BaseFragment successor=new org.telegram.ui.ActionBar.BaseFragment();host.onBecomeFullyVisible();host.top=successor;Shadows.shadowOf(Looper.getMainLooper()).idle();assertNull(org.telegram.ui.ActionBar.BaseFragment.lastDialog);
+ }
+ @Test public void searchDialogAllowsImeAndRestoresEditorFocus()throws Exception{
+  FlexyFileEditorActivity o=open("one two three");try{command(o,10);org.telegram.ui.ActionBar.AlertDialog d=org.telegram.ui.ActionBar.AlertDialog.last;Shadows.shadowOf(Looper.getMainLooper()).idle();assertTrue(d.isShowing());assertFalse((d.getWindow().getAttributes().flags & android.view.WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)!=0);d.dismiss();Shadows.shadowOf(Looper.getMainLooper()).idle();assertTrue(((FilesCodeView)get(o,"editor")).hasFocus());}finally{o.onFragmentDestroy();}
+ }
+ @Test public void actualZipSheetListsFoldersWithoutExtractingPayloadAndClosesCleanly()throws Exception{
+  File zip=File.createTempFile("files-browse-",".zip");try(java.util.zip.ZipOutputStream out=new java.util.zip.ZipOutputStream(new FileOutputStream(zip))){out.putNextEntry(new java.util.zip.ZipEntry("folder/example.txt"));out.write("hello".getBytes(StandardCharsets.UTF_8));out.closeEntry();}
+  org.telegram.ui.ActionBar.BaseFragment owner=new org.telegram.ui.ActionBar.BaseFragment();FlexyFilesSheet sheet=new FlexyFilesSheet(owner,zip,"example.zip",1,0);drainSheet(sheet);
+  SelectedDocument reader=(SelectedDocument)get(sheet,"document");assertEquals(0L,((Number)get(reader,"decoded")).longValue());assertEquals(1,((java.util.List<?>)get(sheet,"rows")).size());
+  org.telegram.ui.Components.RecyclerListView list=org.telegram.ui.Components.RecyclerListView.last;int token=((FilesWork)get(sheet,"work")).token();list.click(0);drainSheet(sheet);assertEquals(token+1,((FilesWork)get(sheet,"work")).token());assertEquals("folder/",get(sheet,"path"));assertEquals(0L,((Number)get(reader,"decoded")).longValue());
+  list.click(0);assertTrue(org.telegram.ui.ActionBar.BaseFragment.presented instanceof FlexyFileEditorActivity);assertEquals("folder/example.txt",get(org.telegram.ui.ActionBar.BaseFragment.presented,"entry"));org.telegram.ui.ActionBar.BaseFragment.presented.onFragmentDestroy();assertNull(get(sheet,"document"));assertTrue(((ThreadPoolExecutor)get(get(sheet,"work"),"pool")).isShutdown());
+ }
+ @Test public void actualHtmlPreviewHasNoScriptsNetworkOrFileAccess()throws Exception{
+  File f=File.createTempFile("files-html-",".html");Files.writeString(f.toPath(),"<h1>Local</h1><script>fetch('https://example.invalid')</script>");FlexyFileEditorActivity o=new FlexyFileEditorActivity(f,"example.html",null,1,0);o.createView(o.getParentActivity());drain(o);try{command(o,8);WebView view=(WebView)get(o,"html");assertNotNull(view);assertFalse(view.getSettings().getJavaScriptEnabled());assertFalse(view.getSettings().getAllowFileAccess());assertFalse(view.getSettings().getAllowContentAccess());assertTrue(view.getSettings().getBlockNetworkLoads());}finally{o.onFragmentDestroy();}assertNull(get(o,"html"));
+ }
+ @Test public void viewRecreationKeepsUnsavedTextCursorAndUndoHistory()throws Exception{
+  FlexyFileEditorActivity o=open("original");try{FilesCodeView editor=(FilesCodeView)get(o,"editor");editor.getText().append(" changed");editor.setSelection(3);o.clearViews();o.createView(o.getParentActivity());drain(o);editor=(FilesCodeView)get(o,"editor");assertEquals("original changed",editor.getText().toString());assertEquals(3,editor.getSelectionStart());command(o,1);assertEquals("original",editor.getText().toString());}finally{o.onFragmentDestroy();}
+ }
+ @Before public void reset(){org.telegram.ui.ActionBar.BaseFragment.lastDialog=null;org.telegram.ui.ActionBar.Theme.dark=false;FlexyFiles.enabled(false);org.telegram.messenger.FileLoader.calls=0;org.telegram.messenger.ChatObject.forum=org.telegram.messenger.ChatObject.mono=org.telegram.messenger.ChatObject.forbidden=org.telegram.messenger.ChatObject.left=false;org.telegram.messenger.UserConfig.active=true;org.telegram.ui.Components.AlertsCreator.slow=org.telegram.ui.Components.AlertsCreator.defer=org.telegram.ui.Components.AlertsCreator.duplicate=false;org.telegram.messenger.SendMessagesHelper.sends=0;org.telegram.messenger.MessagesController.chat=new org.telegram.tgnet.TLRPC.Chat();org.telegram.messenger.MessagesController.full=new Object();}
+ @Test public void enablingIsLocalAndMenuEligibilityDoesNotLoadFiles(){assertFalse(FlexyFiles.enabled());org.telegram.messenger.MessageObject m=new org.telegram.messenger.MessageObject();assertFalse(FlexyFiles.eligible(m));FlexyFiles.enabled(true);assertTrue(FlexyFiles.eligible(m));assertTrue(FlexyFiles.supports("a.plugin"));assertFalse(FlexyEditorFileTypes.mayExecuteFromEditor("a.plugin"));assertEquals(0,org.telegram.messenger.FileLoader.calls);for(String s:new String[]{"a.elyx","a.eaf","a.flexyGram","a.rar","a.7z","a.zip.exe"})assertFalse(FlexyFiles.supports(s));m.messageOwner.noforwards=true;assertFalse(FlexyFiles.eligible(m));}
+ @Test public void actualNativeEditingUndoRedoAndSourceStayIntact()throws Exception{FlexyFileEditorActivity o=open("hello\r\nworld");try{FilesCodeView e=(FilesCodeView)get(o,"editor");assertEquals("hello\r\nworld",e.getText().toString());e.getText().append("!");command(o,1);assertEquals("hello\r\nworld",e.getText().toString());command(o,2);assertTrue(e.getText().toString().endsWith("!"));assertEquals("hello\r\nworld",Files.readString(((File)get(o,"source")).toPath()));}finally{o.onFragmentDestroy();}}
+ @Test public void closingDestroysScopedWorkerAndResources()throws Exception{FlexyFileEditorActivity o=open("a");FilesWork scope=(FilesWork)get(o,"work");SelectedDocument doc=(SelectedDocument)get(o,"document");o.onFragmentDestroy();assertTrue(((ThreadPoolExecutor)get(scope,"pool")).isShutdown());try{doc.read(null,10);fail();}catch(IOException expected){}assertNull(get(o,"binary"));}
+ @Test public void historyIsBoundedAndReversible(){EditHistory h=new EditHistory();for(int i=0;i<500;i++)h.record(0,"before","after");int n=0;while(h.undo()!=null)n++;assertEquals(64,n);assertNotNull(h.redo());h.record(1,"a","b");assertNull(h.redo());h.record(0,"a".repeat(600000),"");assertTrue(h.retainedChars()<=512*1024);}
+ @Test public void formatJsonRunsOnWorkerAndRejectsTrailingData()throws Exception{FlexyFileEditorActivity o=open("{\"a\":1}");try{command(o,7);drain(o);FilesCodeView e=(FilesCodeView)get(o,"editor");assertTrue(e.getText().toString().contains("\n"));e.setText("{\"a\":1} trailing");command(o,7);drain(o);assertEquals("{\"a\":1} trailing",e.getText().toString());}finally{o.onFragmentDestroy();}}
+ @Test public void xmlExternalEntitiesAreRejectedWithoutChangingText()throws Exception{String s="<!DOCTYPE a SYSTEM 'https://example.invalid/private'><a/>";FlexyFileEditorActivity o=open(s);try{command(o,7);drain(o);assertEquals(s,((FilesCodeView)get(o,"editor")).getText().toString());}finally{o.onFragmentDestroy();}}
+ @Test public void copyDoesNotWriteSelectedFile()throws Exception{FlexyFileEditorActivity o=open("original");try{((FilesCodeView)get(o,"editor")).getText().append(" changed");command(o,3);drain(o);File out=(File)get(o,"output");assertEquals("original changed",Files.readString(out.toPath()));assertEquals("original",Files.readString(((File)get(o,"source")).toPath()));}finally{o.onFragmentDestroy();}}
+ @Test public void shareCacheAndDraftsAreBounded()throws Exception{for(int i=0;i<12;i++){File f=FilesCache.output("a.txt");Files.writeString(f.toPath(),"a");}assertTrue(FilesCache.root().listFiles(File::isDirectory).length<=8);File f=File.createTempFile("draft-source-",".txt");for(int i=0;i<8;i++)FilesCache.draftWrite(FilesCache.draft(f,"entry"+i),"draft".getBytes(StandardCharsets.UTF_8));assertTrue(FilesCache.draft(f,"entry0").getParentFile().listFiles().length<=4);}
+ @Test public void namedConfirmationQueuesOneCopyToCapturedAccountWithoutChooser()throws Exception{
+  FlexyFileEditorActivity o=open("original");try{((FilesCodeView)get(o,"editor")).getText().append(" edited");command(o,13);drain(o);
+   org.telegram.ui.ActionBar.AlertDialog confirm=org.telegram.ui.ActionBar.AlertDialog.last;assertNotNull(confirm);assertTrue(confirm.message.toString().contains("edited-example.txt"));assertTrue(confirm.message.toString().contains("Origin 0:1"));assertEquals(0,org.telegram.messenger.SendMessagesHelper.sends);
+   org.telegram.ui.Components.AlertsCreator.duplicate=true;confirm.positive.onClick(confirm,1);assertEquals(1,org.telegram.messenger.SendMessagesHelper.sends);assertEquals(0,org.telegram.messenger.SendMessagesHelper.lastAccount);assertEquals(1,org.telegram.messenger.SendMessagesHelper.lastDialog);assertEquals(7,org.telegram.messenger.SendMessagesHelper.lastPrice);
+   assertEquals("original edited",Files.readString(Path.of(org.telegram.messenger.SendMessagesHelper.sentPaths.get(0))));assertEquals("original",Files.readString(((File)get(o,"source")).toPath()));
+  }finally{o.onFragmentDestroy();}
+ }
+ @Test public void sendAdapterBlocksForeignFilesInactiveAccountsRightsAndUnsafeTopics()throws Exception{
+  File foreign=File.createTempFile("selected-original-",".txt");Files.writeString(foreign.toPath(),"original");try{FlexyFilesDirectSend.prepare(foreign);fail();}catch(IOException expected){}
+  File generated=FilesCache.output("edited.txt");Files.writeString(generated.toPath(),"copy");FlexyFilesDirectSend.Copy copy=FlexyFilesDirectSend.prepare(generated);org.telegram.ui.ActionBar.BaseFragment owner=new org.telegram.ui.ActionBar.BaseFragment();
+  org.telegram.messenger.UserConfig.active=false;try{FlexyFilesDirectSend.enqueueCopy(owner,copy,1,0,()->{});fail();}catch(IOException expected){}org.telegram.messenger.UserConfig.active=true;
+  org.telegram.messenger.ChatObject.forum=true;try{FlexyFilesDirectSend.enqueueCopy(owner,copy,-10,0,()->{});fail();}catch(IOException expected){}org.telegram.messenger.ChatObject.forum=false;
+  org.telegram.messenger.ChatObject.forbidden=true;try{FlexyFilesDirectSend.enqueueCopy(owner,copy,-10,0,()->{});fail();}catch(IOException expected){}org.telegram.messenger.ChatObject.forbidden=false;
+  org.telegram.ui.Components.AlertsCreator.slow=true;FlexyFilesDirectSend.enqueueCopy(owner,copy,-10,0,()->{});assertEquals(0,org.telegram.messenger.SendMessagesHelper.sends);
+  org.telegram.ui.Components.AlertsCreator.slow=false;org.telegram.ui.Components.AlertsCreator.defer=true;FlexyFilesDirectSend.enqueueCopy(owner,copy,-10,3,()->{});owner.isFinished=true;org.telegram.ui.Components.AlertsCreator.payment.run(7L);assertEquals(0,org.telegram.messenger.SendMessagesHelper.sends);
+ }
+ @Test public void directSendFromAnEditedZipEntryBuildsNewZipAndPreservesSource()throws Exception{
+  File source=File.createTempFile("selected-archive-",".zip");try(java.util.zip.ZipOutputStream zip=new java.util.zip.ZipOutputStream(new FileOutputStream(source))){zip.putNextEntry(new java.util.zip.ZipEntry("nested/code.plugin"));zip.write("original".getBytes(StandardCharsets.UTF_8));zip.closeEntry();}
+  byte[] original=Files.readAllBytes(source.toPath());FlexyFileEditorActivity o=new FlexyFileEditorActivity(source,"archive.zip","nested/code.plugin",44,2);o.createView(o.getParentActivity());drain(o);
+  try{((FilesCodeView)get(o,"editor")).getText().append(" edited");command(o,13);drain(o);File output=(File)get(o,"output");assertEquals("edited-archive.zip",output.getName());assertArrayEquals(original,Files.readAllBytes(source.toPath()));try(SelectedDocument zip=new SelectedDocument(output)){assertEquals("original edited",new String(zip.read("nested/code.plugin",100),StandardCharsets.UTF_8));}assertEquals(0,org.telegram.messenger.SendMessagesHelper.sends);
+  }finally{o.onFragmentDestroy();}
+ }
+
+ static android.view.View described(android.view.View view,String label){if(label.contentEquals(view.getContentDescription()==null?"":view.getContentDescription()))return view;if(view instanceof android.view.ViewGroup){android.view.ViewGroup group=(android.view.ViewGroup)view;for(int i=0;i<group.getChildCount();i++){android.view.View match=described(group.getChildAt(i),label);if(match!=null)return match;}}return null;}
+ @Test public void groupedMatteToolsAreLazyAndSendActionIsAVisibleNativeRow()throws Exception{
+  java.util.concurrent.atomic.AtomicInteger selected=new java.util.concurrent.atomic.AtomicInteger();org.telegram.ui.ActionBar.BaseFragment owner=new org.telegram.ui.ActionBar.BaseFragment();
+  FlexyEditorToolsSheet sheet=new FlexyEditorToolsSheet(owner,"example.plugin",true,true,false,selected::set);sheet.setOnDismissListener((android.content.DialogInterface.OnDismissListener)d->sheet.dispatchPendingSelection());sheet.show();
+  try{android.view.View row=described(sheet.getWindow().getDecorView(),org.telegram.messenger.LocaleController.getString(org.telegram.messenger.R.string.FlexyFilesSendCopyToChat));assertNotNull(row);assertEquals(0,selected.get());assertEquals(0,org.telegram.messenger.SendMessagesHelper.sends);row.performClick();Shadows.shadowOf(Looper.getMainLooper()).idle();assertEquals(13,selected.get());assertEquals(0,org.telegram.messenger.SendMessagesHelper.sends);}finally{sheet.dismiss();}
+ }
+
+ @Test public void confirmationUsesCapturedOriginEvenAfterSelectedAccountChanges()throws Exception{
+  File copy=FilesCache.output("edited.txt");Files.writeString(copy.toPath(),"copy");FlexyFilesDirectSend.Copy ready=FlexyFilesDirectSend.prepare(copy);
+  org.telegram.ui.ActionBar.BaseFragment owner=new org.telegram.ui.ActionBar.BaseFragment();org.telegram.ui.Components.AlertsCreator.defer=true;
+  FlexyFilesDirectSend.enqueueCopy(owner,ready,222,3,()->{});org.telegram.messenger.UserConfig.selectedAccount=9;org.telegram.ui.Components.AlertsCreator.payment.run(7L);org.telegram.ui.Components.AlertsCreator.payment.run(7L);
+  assertEquals(1,org.telegram.messenger.SendMessagesHelper.sends);assertEquals(3,org.telegram.messenger.SendMessagesHelper.lastAccount);assertEquals(222,org.telegram.messenger.SendMessagesHelper.lastDialog);
+ }
+
+}

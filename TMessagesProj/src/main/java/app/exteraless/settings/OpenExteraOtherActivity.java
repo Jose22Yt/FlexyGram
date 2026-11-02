@@ -275,7 +275,7 @@ public class OpenExteraOtherActivity extends BaseNekoSettingsActivity {
         if (listView == null || sensitiveContentRow < 0) {
             return;
         }
-        RecyclerView.ViewHolder holder = listView.findViewHolderForAdapterPosition(sensitiveContentRow);
+        RecyclerView.ViewHolder holder = listView.findViewHolderForAdapterPosition(settings3GlobalPosition(sensitiveContentRow));
         if (holder != null && holder.itemView instanceof TextCheckCell) {
             TextCheckCell cell = (TextCheckCell) holder.itemView;
             cell.setChecked(sensitiveEnabled);

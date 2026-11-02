@@ -78,6 +78,42 @@ import tw.nekomimi.nekogram.folder.FolderIconHelper;
 
 @SuppressLint("ViewConstructor")
 public class FilterTabsView extends FrameLayout {
+    private boolean signatureHome;
+    private boolean signatureHomeOpaquePreview;
+    private int signatureAccent, signatureAccentInk;
+    private final app.flexygram.home.SignatureFolderAccent signatureAccentColors=new app.flexygram.home.SignatureFolderAccent();
+    private final app.flexygram.home.SignatureFolderAccent signatureDefaultColors=new app.flexygram.home.SignatureFolderAccent();
+    /** Native theme callbacks own color/contrast resolution; draw only interpolates cached ints. */
+    private void refreshSignatureAccent() {
+        app.exteraless.appearance.AppearanceConfig.ensureLoaded();
+        boolean dark=resourcesProvider!=null?resourcesProvider.isDark():Theme.isCurrentThemeDark();
+        int neutral=app.flexygram.home.SignatureHomeStyle.surface(dark,false);
+        signatureAccentColors.update(Theme.getColor(tabLineColorKey,resourcesProvider),
+            Theme.getColor(activeTextColorKey,resourcesProvider),neutral,app.flexygram.home.SignatureHomeStyle.text(dark,false));
+        signatureAccent=signatureAccentColors.color;
+        signatureAccentInk=signatureAccentColors.ink;
+        signatureDefaultColors.update(app.flexygram.home.SignatureHomeStyle.selectedSurface(dark,false),
+            app.flexygram.home.SignatureHomeStyle.text(dark,true),neutral,
+            app.flexygram.home.SignatureHomeStyle.text(dark,false));
+    }
+
+
+    /** Settings-only solid sample; never changes the global Liquid Glass preference. */
+    public void setSignatureHomeOpaquePreview(boolean opaque) {
+        if (signatureHomeOpaquePreview == opaque) return;
+        signatureHomeOpaquePreview = opaque;
+        invalidate();
+    }
+    private final app.flexygram.home.SignatureHomePainter signatureHomePainter = new app.flexygram.home.SignatureHomePainter();
+
+    public void setSignatureHome(boolean enabled) {
+        if (signatureHome == enabled) return;
+        signatureHome = enabled;
+        if(enabled)refreshSignatureAccent();
+        requestLayout();
+        invalidate();
+    }
+
 
     private final Theme.ResourcesProvider resourcesProvider;
 
@@ -161,7 +197,7 @@ public class FilterTabsView extends FrameLayout {
 
             final int counterResultWidth;
             if (c > 0) {
-                String counterText = String.format("%d", c);
+                String counterText = Integer.toString(c);
                 int counterWidth = (int) Math.ceil(textCounterPaint.measureText(counterText));
                 int countWidth = Math.max(dp(TAB_COUNTER_HEIGHT - 10), counterWidth) + dp(10);
                 counterResultWidth = countWidth + (NekoConfig.tabsTitleType.Int() != NekoXConfig.TITLE_TYPE_ICON ? dp(6) : 0);
@@ -196,6 +232,7 @@ public class FilterTabsView extends FrameLayout {
         public ValueAnimator changeAnimator;
         private Tab currentTab;
         private int textHeight;
+        private final app.flexygram.home.SignatureHomeTint signatureHomeTint = new app.flexygram.home.SignatureHomeTint();
         private int tabWidth;
         private float tabCounterVisible;
         private int currentPosition;
@@ -315,7 +352,7 @@ public class FilterTabsView extends FrameLayout {
 
         @Override
         protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-            int w = currentTab.getWidth(false) + dp(FolderIconHelper.getTabPadding()) + additionalTabWidth;
+            int w = currentTab.getWidth(false) + dp(getTabPadding()) + additionalTabWidth;
             setMeasuredDimension(w, MeasureSpec.getSize(heightMeasureSpec));
         }
 
@@ -365,24 +402,40 @@ public class FilterTabsView extends FrameLayout {
                 unreadKey = Theme.key_chats_tabUnreadUnactiveBackground;
                 unreadOtherKey = Theme.key_chats_tabUnreadActiveBackground;
             }
-            if (animateToKey < 0) {
-                if ((animatingIndicator || manualScrollingToId != -1) && (currentTab.id == id1 || currentTab.id == id2)) {
-                    textPaint.setColor(ColorUtils.blendARGB(Theme.getColor(otherKey, resourcesProvider), Theme.getColor(key, resourcesProvider), animatingIndicatorProgress));
+            if (!signatureHome) {
+                if (animateToKey < 0) {
+                    if ((animatingIndicator || manualScrollingToId != -1) && (currentTab.id == id1 || currentTab.id == id2)) {
+                        textPaint.setColor(ColorUtils.blendARGB(Theme.getColor(otherKey, resourcesProvider), Theme.getColor(key, resourcesProvider), animatingIndicatorProgress));
+                    } else {
+                        textPaint.setColor(Theme.getColor(key, resourcesProvider));
+                    }
                 } else {
-                    textPaint.setColor(Theme.getColor(key, resourcesProvider));
-                }
-            } else {
-                int color1 = Theme.getColor(key, resourcesProvider);
-                int color2 = Theme.getColor(animateToKey, resourcesProvider);
-                if ((animatingIndicator || manualScrollingToPosition != -1) && (currentTab.id == id1 || currentTab.id == id2)) {
-                    int color3 = Theme.getColor(otherKey, resourcesProvider);
-                    int color4 = Theme.getColor(animateToOtherKey, resourcesProvider);
-                    textPaint.setColor(ColorUtils.blendARGB(ColorUtils.blendARGB(color3, color4, animationValue), ColorUtils.blendARGB(color1, color2, animationValue), animatingIndicatorProgress));
-                } else {
-                    textPaint.setColor(ColorUtils.blendARGB(color1, color2, animationValue));
+                    int color1 = Theme.getColor(key, resourcesProvider);
+                    int color2 = Theme.getColor(animateToKey, resourcesProvider);
+                    if ((animatingIndicator || manualScrollingToPosition != -1) && (currentTab.id == id1 || currentTab.id == id2)) {
+                        int color3 = Theme.getColor(otherKey, resourcesProvider);
+                        int color4 = Theme.getColor(animateToOtherKey, resourcesProvider);
+                        textPaint.setColor(ColorUtils.blendARGB(ColorUtils.blendARGB(color3, color4, animationValue), ColorUtils.blendARGB(color1, color2, animationValue), animatingIndicatorProgress));
+                    } else {
+                        textPaint.setColor(ColorUtils.blendARGB(color1, color2, animationValue));
+                    }
                 }
             }
-            emojiColorFilter = new PorterDuffColorFilter(textPaint.getColor(), PorterDuff.Mode.SRC_IN);
+            float signatureSelected=0f;
+            app.flexygram.home.SignatureFolderAccent signaturePalette=null;
+            if (signatureHome) {
+                boolean dark = resourcesProvider != null ? resourcesProvider.isDark() : Theme.isCurrentThemeDark();
+                boolean themed=app.exteraless.appearance.AppearanceConfig.folderThemeAccent.Bool();
+                signaturePalette=themed?signatureAccentColors:signatureDefaultColors;
+                signatureSelected = app.flexygram.home.SignatureHomeStyle.selection(currentTab.id, id1, id2,
+                        animatingIndicator || manualScrollingToId != -1, animatingIndicatorProgress);
+                signatureHomePainter.category(canvas, getMeasuredWidth(), getMeasuredHeight(), AndroidUtilities.density,
+                        dark, !signatureHomeOpaquePreview && org.telegram.messenger.LiteMode.isEnabled(org.telegram.messenger.LiteMode.FLAG_LIQUID_GLASS), signatureSelected,
+                        themed?signatureAccent:
+                        app.flexygram.home.SignatureHomeStyle.selectedSurface(dark,!signatureHomeOpaquePreview && org.telegram.messenger.LiteMode.isEnabled(org.telegram.messenger.LiteMode.FLAG_LIQUID_GLASS)));
+                textPaint.setColor(signaturePalette.inkAt(signatureSelected));
+            }
+            ColorFilter emojiColorFilter = signatureHomeTint.get(textPaint.getColor());
 
             float counterWidth;
             int countWidth;
@@ -394,9 +447,9 @@ public class FilterTabsView extends FrameLayout {
 
             if (currentTab.counter > 0 || animateCounterRemove) {
                 if (animateCounterRemove) {
-                    counterText = String.format("%d", animateFromTabCount);
+                    counterText = Integer.toString(animateFromTabCount);
                 } else {
-                    counterText = String.format("%d", currentTab.counter);
+                    counterText = Integer.toString(currentTab.counter);
                 }
                 counterWidth = (int) Math.ceil(textCounterPaint.measureText(counterText));
                 countWidth = (int) Math.max(dp(TAB_COUNTER_HEIGHT - 10), counterWidth) + dp(10);
@@ -537,6 +590,12 @@ public class FilterTabsView extends FrameLayout {
                     counterPaint.setColor(textPaint.getColor());
                 }
 
+                // Signature counters resolve their own legible palette. This
+                // avoids inherited black selected dots and faint inactive text.
+                if (signatureHome) {
+                    counterPaint.setColor(signaturePalette.badgeSurfaceAt(signatureSelected));
+                    textCounterPaint.setColor(signaturePalette.badgeInkAt(signatureSelected));
+                }
                 float x;
                 float titleWidth = currentTab.titleWidth;
                 if (animateTextChange) {
@@ -728,7 +787,7 @@ public class FilterTabsView extends FrameLayout {
             int countWidth;
             String counterText = null;
             if (currentTab.counter > 0) {
-                counterText = String.format("%d", currentTab.counter);
+                counterText = Integer.toString(currentTab.counter);
                 int counterWidth = (int) Math.ceil(textCounterPaint.measureText(counterText));
                 countWidth = Math.max(dp(TAB_COUNTER_HEIGHT - 10), counterWidth) + dp(10);
             } else {
@@ -895,7 +954,6 @@ public class FilterTabsView extends FrameLayout {
     private final TextPaint textCounterPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
     private final Paint deletePaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
     private final Paint counterPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private ColorFilter emojiColorFilter = new PorterDuffColorFilter(0, PorterDuff.Mode.SRC_IN);
 
     private final ArrayList<Tab> tabs = new ArrayList<>();
 
@@ -1288,6 +1346,11 @@ public class FilterTabsView extends FrameLayout {
             }
             return;
         }
+        if (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA && animatingIndicator) {
+            AndroidUtilities.cancelRunOnUIThread(animationRunnable);
+            animatingIndicator = false;
+            setAnimationIdicatorProgress(1f); // Finish the previous native page before replacing it.
+        }
         boolean scrollingForward = currentPosition < position;
         scrollingToChild = -1;
         previousPosition = currentPosition;
@@ -1302,15 +1365,19 @@ public class FilterTabsView extends FrameLayout {
 
         animationTime = 0;
         animatingIndicatorProgress = 0;
-        animatingIndicator = true;
-        setEnabled(false);
-
-        AndroidUtilities.runOnUIThread(animationRunnable, 16);
+        animatingIndicator = !org.telegram.messenger.BuildConfig.CONNECTED_ALPHA;
+        if (animatingIndicator) {
+            setEnabled(false);
+            AndroidUtilities.runOnUIThread(animationRunnable, 16);
+        }
 
         if (delegate != null) {
             delegate.onPageSelected(tab, scrollingForward);
             delegate.onTabSelected(tab, scrollingForward, true);
             oldAnimatedTab = currentPosition;
+        }
+        if (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) {
+            setAnimationIdicatorProgress(1f);
         }
         scrollToChild(position);
         if (NekoConfig.hideAllTab.Bool() && !currentTabIsDefault()) {
@@ -1412,7 +1479,7 @@ public class FilterTabsView extends FrameLayout {
         Tab tab = new Tab(id, text(text, entities), emoticon, noanimate);
         tab.isDefault = isDefault;
         tab.isLocked = isLocked;
-        allTabsWidth += tab.getWidth(true) + dp(FolderIconHelper.getTabPadding());
+        allTabsWidth += tab.getWidth(true) + dp(getTabPadding());
         tabs.add(tab);
     }
 
@@ -1431,7 +1498,7 @@ public class FilterTabsView extends FrameLayout {
         Tab tab = new Tab(id, text, emoticon, noanimate);
         tab.isDefault = isDefault;
         tab.isLocked = isLocked;
-        allTabsWidth += tab.getWidth(true) + dp(FolderIconHelper.getTabPadding());
+        allTabsWidth += tab.getWidth(true) + dp(getTabPadding());
         tabs.add(tab);
     }
 
@@ -1457,10 +1524,12 @@ public class FilterTabsView extends FrameLayout {
     }
 
     public void setColors(int line, int active, int unactive, int selector, int background) {
+        selectorColorKey = selector;
         tabLineColorKey = line;
         backgroundColorKey = background;
         activeTextColorKey = active;
         unactiveTextColorKey = unactive;
+        if(signatureHome)refreshSignatureAccent();
         selectorDrawable.setColor(Theme.getColor(tabLineColorKey, resourcesProvider));
         listView.setSelectorDrawableColor(Theme.getColor(selector, resourcesProvider));
 
@@ -1486,10 +1555,13 @@ public class FilterTabsView extends FrameLayout {
         colorChangeAnimator.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
+                if (colorChangeAnimator != animation) return;
+                colorChangeAnimator = null;
                 tabLineColorKey = aTabLineColorKey;
                 backgroundColorKey = aBackgroundColorKey;
                 activeTextColorKey = aActiveTextColorKey;
                 unactiveTextColorKey = aUnactiveTextColorKey;
+                if(signatureHome)refreshSignatureAccent();
                 aTabLineColorKey = -1;
                 aActiveTextColorKey = -1;
                 aUnactiveTextColorKey = -1;
@@ -1515,6 +1587,11 @@ public class FilterTabsView extends FrameLayout {
         return selectorColorKey;
     }
 
+    private float getTabPadding() {
+        // 12 dp inner breathing room per side plus a 6 dp visible separation.
+        return signatureHome ? Math.max(30f, FolderIconHelper.getTabPadding()) : FolderIconHelper.getTabPadding();
+    }
+
     private void updateTabsWidths() {
         positionToX.clear();
         positionToWidth.clear();
@@ -1525,7 +1602,7 @@ public class FilterTabsView extends FrameLayout {
             positionToWidth.put(a, tabWidth);
             positionToCount.put(a, tabs.get(a).counter);
             positionToX.put(a, xOffset + additionalTabWidth / 2);
-            xOffset += tabWidth + dp(FolderIconHelper.getTabPadding()) + additionalTabWidth;
+            xOffset += tabWidth + dp(getTabPadding()) + additionalTabWidth;
         }
     }
 
@@ -1589,6 +1666,7 @@ public class FilterTabsView extends FrameLayout {
     }
 
     private void drawSelector(Canvas canvas) {
+        if (signatureHome) return;
         final int height = getMeasuredHeight();
         selectorDrawable.setAlpha((int) (255 * listView.getAlpha()));
         float indicatorX = 0;
@@ -1614,7 +1692,7 @@ public class FilterTabsView extends FrameLayout {
                     int newW = positionToWidth.get(idx2);
                     float prevH = positionToCount.get(idx1) != 0 ? 1 : 0;
                     float newH = positionToCount.get(idx2) != 0 ? 1 : 0;
-                    float padding = FolderIconHelper.getTabPadding();
+                    float padding = getTabPadding();
                     if (additionalTabWidth != 0) {
                         indicatorX = lerp(prevX, newX, animatingIndicatorProgress) + dp(padding / 2f);
                     } else {
@@ -1673,6 +1751,10 @@ public class FilterTabsView extends FrameLayout {
 
     @Override
     protected void dispatchDraw(@NonNull Canvas canvas) {
+        if (signatureHome) {
+            super.dispatchDraw(canvas);
+            return;
+        }
         canvas.save();
         canvas.clipPath(clipPath);
         super.dispatchDraw(canvas);
@@ -1680,6 +1762,10 @@ public class FilterTabsView extends FrameLayout {
     }
 
     public void updateColors() {
+        if(signatureHome)refreshSignatureAccent();
+        selectorDrawable.setColor(Theme.getColor(tabLineColorKey, resourcesProvider));
+        listView.setSelectorDrawableColor(Theme.getColor(selectorColorKey, resourcesProvider));
+        listView.invalidateViews();
         if (blurredBackgroundDrawable != null) {
             blurredBackgroundDrawable.updateColors();
         }
@@ -1702,7 +1788,7 @@ public class FilterTabsView extends FrameLayout {
                 trueTabsWidth = allTabsWidth;
             }
             int prevWidth = additionalTabWidth;
-            additionalTabWidth = trueTabsWidth < width ? (width - trueTabsWidth) / tabs.size() : 0;
+            additionalTabWidth = !signatureHome && trueTabsWidth < width ? (width - trueTabsWidth) / tabs.size() : 0;
             if (prevWidth != additionalTabWidth) {
                 ignoreLayout = true;
                 RecyclerView.ItemAnimator animator = listView.getItemAnimator();
@@ -1882,7 +1968,7 @@ public class FilterTabsView extends FrameLayout {
                     defaultTab.setTitle(LocaleController.getString(R.string.FilterAllChats), null, false);
                 }
                 for (int b = 0; b < N; b++) {
-                    allTabsWidth += tabs.get(b).getWidth(true) + dp(FolderIconHelper.getTabPadding());
+                    allTabsWidth += tabs.get(b).getWidth(true) + dp(getTabPadding());
                 }
                 break;
             }
@@ -1918,7 +2004,7 @@ public class FilterTabsView extends FrameLayout {
                 defaultTab.setTitle(LocaleController.getString(R.string.FilterAllChats), null, false);
             }
             for (int b = 0, N = tabs.size(); b < N; b++) {
-                allTabsWidth += tabs.get(b).getWidth(true) + dp(FolderIconHelper.getTabPadding());
+                allTabsWidth += tabs.get(b).getWidth(true) + dp(getTabPadding());
             }
         }
     }

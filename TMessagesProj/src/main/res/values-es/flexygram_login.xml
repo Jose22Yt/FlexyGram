@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexySignatureName" translatable="false">FlexyGram</string>
+    <string name="FlexySignatureTagline">Tu Telegram, a tu manera</string>
+    <string name="FlexySignatureStart">Empezar a chatear</string>
+    <string name="FlexySignatureLanguage">Idioma</string>
+    <string name="FlexyAlphaDeliveries">Entregas Alpha verificadas</string>
+    <string name="FlexyAlphaDeliveryInfo">Las actualizaciones de prueba se entregan de forma privada como una APK Android firmada. Instala la nueva APK sobre tu FlexyGram Alpha para conservar tus datos. No necesitas descifrar archivos ni un instalador auxiliar.</string>
+</resources>

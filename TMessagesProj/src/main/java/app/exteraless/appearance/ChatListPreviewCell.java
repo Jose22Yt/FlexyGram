@@ -13,6 +13,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 
@@ -24,6 +25,10 @@ import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.UserObject;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.ActionBar;
+import org.telegram.ui.ActionBar.ActionBarMenu;
+import org.telegram.ui.ActionBar.ActionBarMenuItem;
+import app.flexygram.home.SignatureHomePainter;
+import app.flexygram.home.SignatureHomeStyle;
 import org.telegram.ui.ActionBar.SimpleTextView;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.AnimatedEmojiDrawable;
@@ -62,10 +67,55 @@ public class ChatListPreviewCell extends FrameLayout {
         statusDrawable = new AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable(null, AndroidUtilities.dp(26));
         statusDrawable.center = true;
 
-        actionBar = new ActionBar(context);
+        // Same native ActionBar + shared Signature Home painter as the actual chat list.
+        // The preview never owns a blur source or glass render layer.
+        actionBar = new ActionBar(context) {
+            private final SignatureHomePainter painter = new SignatureHomePainter();
+            private final PorterDuffColorFilter lightInk = new PorterDuffColorFilter(
+                    SignatureHomeStyle.text(false, false), PorterDuff.Mode.SRC_IN);
+            private final PorterDuffColorFilter darkInk = new PorterDuffColorFilter(
+                    SignatureHomeStyle.text(true, false), PorterDuff.Mode.SRC_IN);
+
+            @Override
+            protected void dispatchDraw(Canvas canvas) {
+                setDrawGlassTitle(false);
+                doNotDrawGlassMenu = true;
+                super.dispatchDraw(canvas);
+            }
+
+            @Override
+            protected boolean drawChild(Canvas canvas, View child, long drawingTime) {
+                if (child instanceof ActionBarMenu) {
+                    ActionBarMenu previewMenu = (ActionBarMenu) child;
+                    final boolean dark = Theme.isCurrentThemeDark();
+                    final PorterDuffColorFilter ink = dark ? darkInk : lightInk;
+                    for (int i = 0; i < previewMenu.getChildCount(); i++) {
+                        View item = previewMenu.getChildAt(i);
+                        if (!(item instanceof ActionBarMenuItem) || item.getVisibility() != View.VISIBLE) {
+                            continue;
+                        }
+                        ImageView icon = ((ActionBarMenuItem) item).getIconView();
+                        if (icon != null && icon.getColorFilter() != ink) {
+                            icon.setColorFilter(ink);
+                        }
+                        float diameter = SignatureHomeStyle.controlDiameter(
+                                item.getWidth(), item.getHeight(), AndroidUtilities.density);
+                        painter.control(canvas,
+                                previewMenu.getX() + item.getX() + item.getWidth() / 2f,
+                                previewMenu.getY() + item.getY() + item.getHeight() / 2f,
+                                diameter, AndroidUtilities.density,
+                                dark, false, item.getAlpha() * previewMenu.getAlpha());
+                    }
+                }
+                return super.drawChild(canvas, child, drawingTime);
+            }
+        };
         actionBar.setOccupyStatusBar(false);
         actionBar.setItemsColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText), false);
-        actionBar.createMenu().addItem(0, R.drawable.ic_ab_other);
+        // Preview the real Signature Home icon artwork, not the inherited
+        // exteraless three-dot asset. This is the native ActionBar component.
+        actionBar.createMenu().addItem(0, R.drawable.flexy_home_search);
+        actionBar.createMenu().addItem(1, R.drawable.flexy_home_more);
         actionBar.setBackground(new PreviewBackgroundDrawable());
         actionBar.setSupportsHolidayImage(true);
         addView(actionBar, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT,

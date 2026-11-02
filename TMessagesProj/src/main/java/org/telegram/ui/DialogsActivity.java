@@ -11,6 +11,8 @@ package org.telegram.ui;
 import app.exteraless.appearance.AppearanceConfig;
 import app.exteraless.components.TranslateBeforeSendWrapper;
 import app.exteraless.drawer.DrawerContainer;
+import app.flexygram.home.SignatureHomePainter;
+import app.flexygram.home.SignatureHomeStyle;
 import app.exteraless.drawer.MainMenuHelper;
 import app.exteraless.drawer.MainMenuItem;
 import app.exteraless.drawer.MainMenuLayout;
@@ -547,6 +549,15 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     private DownloadProgressIcon downloadProgressIcon;
     private boolean downloadsItemVisible;
     public ActionBarMenuItem searchItem;
+    private boolean separateSearchHidTopItem;
+    public void updateSeparateSearchVisibility(boolean separate) {
+        if (searchItem == null || actionBar == null || actionBar.isSearchFieldVisible()) return;
+        if (separate && searchItem.getVisibility() == View.VISIBLE) {
+            separateSearchHidTopItem = true; searchItem.setVisibility(View.GONE);
+        } else if (!separate && separateSearchHidTopItem) {
+            separateSearchHidTopItem = false; searchItem.setVisibility(View.VISIBLE);
+        }
+    }
     private ActionBarMenuItem optionsItem;
     /** Бургер вместо стрелки «назад», когда включена своя шторка. */
     private MenuDrawable menuDrawable;
@@ -1376,6 +1387,14 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         @Override
         public boolean onInterceptTouchEvent(MotionEvent ev) {
             int action = ev.getActionMasked();
+            if (BuildConfig.CONNECTED_ALPHA && action == MotionEvent.ACTION_DOWN
+                    && tabsAnimationInProgress && tabsAnimation != null && filterTabsView != null
+                    && ev.getY() >= filterTabsView.getY()
+                    && ev.getY() <= filterTabsView.getY() + filterTabsView.getHeight()) {
+                // Let a new folder tap reach the tab strip. The native end callback
+                // commits the old swipe and restores its view/adapter state once.
+                tabsAnimation.end();
+            }
             if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
                 if (actionBar.isActionModeShowed()) {
                     allowMoving = true;
@@ -3058,7 +3077,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
         BirthdayController.getInstance(currentAccount).check();
         additionNavigationBarHeight = hasMainTabs && MainTabsLayout.isBottomNavigationVisible() && !MainTabsLayout.isBottomNavigationFloating() ? dp(app.exteraless.appearance.MainTabsUiHelper.getTabsViewHeightDp()) : 0;
-        additionFloatingButtonOffset = hasMainTabs && MainTabsLayout.isBottomNavigationVisible() ? dp(app.exteraless.appearance.MainTabsUiHelper.getTabsFabOffsetDp()) : 0;
+        additionFloatingButtonOffset = hasMainTabs && MainTabsLayout.isBottomNavigationVisible() ? dp(app.exteraless.appearance.MainTabsUiHelper.getTabsFabOffsetDp() + (MainTabsLayout.isBottomNavigationFloating() ? 6 : 0)) : 0;
 
         LastSeenHelper.preload();
 
@@ -3070,15 +3089,21 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         if (!dialogsLoaded[currentAccount]) {
             MessagesController messagesController = accountInstance.getMessagesController();
             messagesController.loadGlobalNotificationsSettings();
-            messagesController.loadDialogs(0, 0, 100, true);
+            // ApplicationLoader may have already published the native local result during launch.
+            // Do not reread it; an empty/unloaded account retains the original cache/network path.
+            if (!messagesController.dialogsLoaded || (messagesController.getAllDialogs().isEmpty() && messagesController.getDialogs(0).isEmpty())) {
+                messagesController.loadDialogs(0, 0, 100, true);
+            }
             messagesController.loadHintDialogs();
             messagesController.loadUserInfo(accountInstance.getUserConfig().getCurrentUser(), false, 0);
-            accountInstance.getContactsController().checkInviteText();
-            accountInstance.getMediaDataController().checkAllMedia(false);
-            AndroidUtilities.runOnUIThread(() -> accountInstance.getDownloadController().loadDownloadingFiles(), 200);
-            for (String emoji : messagesController.diceEmojies) {
-                accountInstance.getMediaDataController().loadStickersByEmojiOrName(emoji, true, true);
-            }
+            AndroidUtilities.runOnUIThread(() -> {
+                accountInstance.getContactsController().checkInviteText();
+                accountInstance.getMediaDataController().checkAllMedia(false);
+                accountInstance.getDownloadController().loadDownloadingFiles();
+                for (String emoji : messagesController.diceEmojies) {
+                    accountInstance.getMediaDataController().loadStickersByEmojiOrName(emoji, true, true);
+                }
+            }, 300);
             dialogsLoaded[currentAccount] = true;
         }
     }
@@ -3234,6 +3259,42 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     @Override
     public ActionBar createActionBar(Context context) {
         ActionBar actionBar = new ActionBar(context, resourceProvider) {
+            private final SignatureHomePainter signatureHomePainter = new SignatureHomePainter();
+            private final PorterDuffColorFilter signatureHomeLightInk = new PorterDuffColorFilter(
+                    SignatureHomeStyle.text(false, false), PorterDuff.Mode.SRC_IN);
+            private final PorterDuffColorFilter signatureHomeDarkInk = new PorterDuffColorFilter(
+                    SignatureHomeStyle.text(true, false), PorterDuff.Mode.SRC_IN);
+
+            @Override
+            protected void dispatchDraw(Canvas canvas) {
+                // Only the main screen owns this presentation. Native search,
+                // selection and right-hand chat preview keep their original glass.
+                boolean home = isSignatureHome() && !inPreviewMode
+                        && progressToActionMode == 0 && !isActionModeShowed()
+                        && searchAnimationProgress == 0 && getRightSlidingProgress() == 0;
+                setDrawGlassTitle(!home);
+                doNotDrawGlassMenu = home;
+                super.dispatchDraw(canvas);
+            }
+
+            private void drawSignatureHomeControl(Canvas canvas, View item) {
+                if (item == null || item.getVisibility() != View.VISIBLE || menu == null) return;
+                boolean dark = resourceProvider != null ? resourceProvider.isDark() : Theme.isCurrentThemeDark();
+                // Native themes may use white action-bar icons on a light Home.
+                // Cache the two filters and reapply only when a theme update replaces one.
+                if (item instanceof ActionBarMenuItem) {
+                    android.widget.ImageView icon = ((ActionBarMenuItem) item).getIconView();
+                    PorterDuffColorFilter ink = dark ? signatureHomeDarkInk : signatureHomeLightInk;
+                    if (icon != null && icon.getColorFilter() != ink) icon.setColorFilter(ink);
+                }
+                float diameter = SignatureHomeStyle.controlDiameter(item.getWidth(), item.getHeight(), AndroidUtilities.density);
+                signatureHomePainter.control(canvas,
+                        menu.getX() + item.getX() + item.getWidth() / 2f,
+                        menu.getY() + item.getY() + item.getHeight() / 2f,
+                        diameter * Math.min(item.getScaleX(), item.getScaleY()), AndroidUtilities.density,
+                        dark, LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS), item.getAlpha() * menu.getAlpha());
+            }
+
 
             @Override
             public void setTranslationY(float translationY) {
@@ -3252,6 +3313,11 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             protected boolean drawChild(Canvas canvas, View child, long drawingTime) {
                 if (inPreviewMode && avatarContainer != null && child != avatarContainer) {
                     return false;
+                }
+                if (isSignatureHome() && child == menu && progressToActionMode == 0
+                        && !isActionModeShowed() && getRightSlidingProgress() == 0) {
+                    drawSignatureHomeControl(canvas, searchItem);
+                    drawSignatureHomeControl(canvas, optionsItem);
                 }
                 return super.drawChild(canvas, child, drawingTime);
             }
@@ -3342,7 +3408,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         selectedDialogs.clear();
 
         additionNavigationBarHeight = hasMainTabs && MainTabsLayout.isBottomNavigationVisible() && !MainTabsLayout.isBottomNavigationFloating() ? dp(app.exteraless.appearance.MainTabsUiHelper.getTabsViewHeightDp()) : 0;
-        additionFloatingButtonOffset = hasMainTabs && MainTabsLayout.isBottomNavigationVisible() ? dp(app.exteraless.appearance.MainTabsUiHelper.getTabsFabOffsetDp()) : 0;
+        additionFloatingButtonOffset = hasMainTabs && MainTabsLayout.isBottomNavigationVisible() ? dp(app.exteraless.appearance.MainTabsUiHelper.getTabsFabOffsetDp() + (MainTabsLayout.isBottomNavigationFloating() ? 6 : 0)) : 0;
 
         maximumVelocity = ViewConfiguration.get(context).getScaledMaximumFlingVelocity();
 
@@ -3356,7 +3422,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
         ActionBarMenu menu = actionBar.createMenu();
         menu.setTranslationX(-dp(5));
-        searchItem = menu.addItem(0, R.drawable.outline_header_search).setIsSearchField(true, false);
+        searchItem = menu.addItem(0, isSignatureHome() ? R.drawable.flexy_home_search : R.drawable.outline_header_search).setIsSearchField(true, false);
         searchItem.setOnClickListener(v -> {
             showSearch(true, false, true);
             fragmentSearchFieldWatcher.toggleSearch(true);
@@ -3579,7 +3645,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         fragmentSearchFieldWatcher.setDoNotCloseAfterFieldEmpty();
 
         if (initialDialogsType == DIALOGS_TYPE_DEFAULT) {
-            optionsItem = menu.addItem(4, R.drawable.ic_ab_other);
+            optionsItem = menu.addItem(4, isSignatureHome() ? R.drawable.flexy_home_more : R.drawable.ic_ab_other);
             optionsItem.setContentDescription(LocaleController.getString(R.string.AccDescrMoreOptions));
             optionsItem.setOnClickListener(v -> {
                 getContactsController().loadGlobalPrivacySetting();
@@ -3736,6 +3802,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     }
                 }
             };
+            filterTabsView.setSignatureHome(isSignatureHome());
             filterTabsView.setVisibility(View.GONE);
             canShowFilterTabsView = false;
             animatorFilterTabsVisible.setValue(false, false);
@@ -4290,6 +4357,14 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             viewPage.addView(viewPage.progressView, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER));
 
             viewPage.listView = new DialogsRecyclerView(context, viewPage);
+            final int cacheSize = SharedConfig.getDevicePerformanceClass() >= SharedConfig.PERFORMANCE_CLASS_HIGH ? 12 : 8;
+            final int maxPool = SharedConfig.getDevicePerformanceClass() >= SharedConfig.PERFORMANCE_CLASS_HIGH ? 25 : 15;
+            viewPage.listView.setItemViewCacheSize(cacheSize);
+            viewPage.listView.setHasFixedSize(true);
+            RecyclerView.RecycledViewPool pool = viewPage.listView.getRecycledViewPool();
+            if (pool != null) {
+                pool.setMaxRecycledViews(0, maxPool);
+            }
             viewPage.listView.addEdgeEffectListener(() -> viewPage.listView.postOnAnimation(this::blur3_InvalidateBlur));
             viewPage.scroller = new RecyclerListViewScroller(viewPage.listView);
             viewPage.listView.setAllowStopHeaveOperations(true);
@@ -5376,11 +5451,15 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
 
         if (filterTabsView != null) {
-            BlurredBackgroundDrawable filterTabsViewBackground = iBlur3FactoryLiquidGlass.create(filterTabsView, app.exteraless.appearance.UniversalGlass.surface(app.exteraless.appearance.UniversalGlass.FOLDERS, resourceProvider, BlurredBackgroundProviderImpl.topPanel(resourceProvider)));
-            filterTabsViewBackground.setRadius(dp(18));
-            filterTabsViewBackground.setPadding(dp(6.666f));
-            filterTabsView.setPadding(0, dp(7), 0, dp(7));
-            filterTabsView.setBlurredBackground(filterTabsViewBackground);
+            // Home paints cheap individual pills; do not even allocate/register
+            // a shared blur drawable that this row will never draw.
+            if (!isSignatureHome()) {
+                BlurredBackgroundDrawable filterTabsViewBackground = iBlur3FactoryLiquidGlass.create(filterTabsView, app.exteraless.appearance.UniversalGlass.surface(app.exteraless.appearance.UniversalGlass.FOLDERS, resourceProvider, BlurredBackgroundProviderImpl.topPanel(resourceProvider)));
+                filterTabsViewBackground.setRadius(dp(18));
+                filterTabsViewBackground.setPadding(dp(6.666f));
+                filterTabsView.setBlurredBackground(filterTabsViewBackground);
+            }
+            filterTabsView.setPadding(0, isSignatureHome() ? 0 : dp(7), 0, isSignatureHome() ? 0 : dp(7));
             contentView.addView(filterTabsView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 36 + 7 + 7, Gravity.TOP, 4, 0, 4, 0));
         }
 
@@ -5597,6 +5676,18 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
         if (!onlySelect && initialDialogsType == DIALOGS_TYPE_DEFAULT) {
             blurredView = new View(context) {
+                @Override
+                public boolean onTouchEvent(MotionEvent event) {
+                    // Opt-in Telegram logging: numeric ownership only, never chat/account data.
+                    if (BuildVars.LOGS_ENABLED && event.getActionMasked() == MotionEvent.ACTION_DOWN) {
+                        FileLog.d("SignaturePreview overlay DOWN preview="
+                                + (parentLayout != null && parentLayout.isInPreviewMode())
+                                + " transition=" + (parentLayout != null && parentLayout.isTransitionAnimationInProgress())
+                                + " alpha=" + getAlpha());
+                    }
+                    return super.onTouchEvent(event);
+                }
+
                 @Override
                 public void setAlpha(float alpha) {
                     super.setAlpha(alpha);
@@ -7286,6 +7377,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     @Override
     public void onResume() {
         super.onResume();
+        updateSeparateSearchVisibility(mainTabsActivityController != null && app.flexygram.navigation.LiquidNavigationConfig.isEnabled()
+                && app.flexygram.navigation.LiquidNavigationConfig.separateSearch());
+        if(filterTabsView!=null)filterTabsView.updateColors();
         if (dialogStoriesCell != null) {
             dialogStoriesCell.onResume();
         }
@@ -7302,8 +7396,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             for (int a = 0; a < viewPages.length; a++) {
                 if (returnedDialogId != 0 && viewPages[a].getVisibility() == View.VISIBLE) {
                     viewPages[a].updateListAfterChat(returnedDialogId);
-                } else {
-                    viewPages[a].dialogsAdapter.notifyDataSetChanged();
+                } else if (viewPages[a].getVisibility() == View.VISIBLE) {
+                    updateVisibleRows(0);
                 }
             }
         }
@@ -7639,9 +7733,28 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         canShowStoryHint = true;
     }
 
+    /** The tab owner receives this even if an interrupted preview never advanced
+     * FragmentState visibility and therefore emitted no child transition end. */
+    @Override
+    public void onParentBecomeFullyVisible() {
+        clearClosedPreviewOverlay();
+    }
+
+    private void clearClosedPreviewOverlay() {
+        if (parentLayout != null && !parentLayout.isInPreviewMode()
+                && !parentLayout.isTransitionAnimationInProgress()
+                && blurredView != null && blurredView.getVisibility() != View.GONE) {
+            blurredView.setVisibility(View.GONE);
+            blurredView.setBackground(null);
+            blurredView.setAlpha(0f);
+            checkUi_mainTabsVisible();
+        }
+    }
+
     @Override
     public void onBecomeFullyVisible() {
         super.onBecomeFullyVisible();
+        clearClosedPreviewOverlay();
         if (isArchive()) {
             SharedPreferences preferences = MessagesController.getGlobalMainSettings();
             boolean showArchiveHint = preferences.getBoolean("archivehint", true);
@@ -10834,6 +10947,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
         try {
             viewPage.listView.setEmptyView(folderId == 0 && communityId == 0 ? viewPage.progressView : null);
+            if (viewPage.progressView != null && (viewPage.dialogsAdapter.getItemCount() > 0 || !getMessagesController().getDialogs(folderId).isEmpty())) {
+                viewPage.progressView.setVisibility(View.GONE);
+            }
         } catch (Exception e) {
             FileLog.e(e);
         }
@@ -14134,20 +14250,18 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                         if (Theme.getTheme(nightThemeName) == null || !Theme.getTheme(nightThemeName).isDark()) {
                             nightThemeName = "Dark Blue";
                         }
-                        Theme.ThemeInfo themeInfo = Theme.getActiveTheme();
-                        if (dayThemeName.equals(nightThemeName)) {
-                            if (themeInfo.isDark() || dayThemeName.equals("Dark Blue") || dayThemeName.equals("Night")) {
-                                dayThemeName = "Blue";
-                            } else {
-                                nightThemeName = "Dark Blue";
-                            }
+                        // The current global theme's darkness is the source of truth.
+                        // Comparing the active theme's KEY with lastDayTheme fails for
+                        // imported/custom themes and can select another *light* theme.
+                        final boolean toDark = !Theme.isCurrentThemeDark();
+                        Theme.ThemeInfo themeInfo = Theme.getTheme(toDark ? nightThemeName : dayThemeName);
+                        if (themeInfo == null || themeInfo.isDark() != toDark) {
+                            themeInfo = Theme.getTheme(toDark ? "Dark Blue" : "Blue");
                         }
-
-                        boolean toDark;
-                        if (toDark = dayThemeName.equals(themeInfo.getKey())) {
-                            themeInfo = Theme.getTheme(nightThemeName);
-                        } else {
-                            themeInfo = Theme.getTheme(dayThemeName);
+                        // Never enqueue a null/wrong-contrast theme or latch the guard.
+                        if (themeInfo == null || themeInfo.isDark() != toDark) {
+                            switchingTheme = false;
+                            return;
                         }
                         switchTheme(themeInfo, toDark);
                         Theme.turnOffAutoNight(BulletinFactory.of(this), () -> {
@@ -14814,7 +14928,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         if (commentView != null || !hasMainTabs || !MainTabsLayout.isBottomNavigationFloating()) {
             return 0;
         }
-        return dp(app.exteraless.appearance.MainTabsUiHelper.getTabsViewHeightDp());
+        return dp(app.exteraless.appearance.MainTabsUiHelper.getTabsViewHeightDp() + 16);
     }
 
     @Override
@@ -15057,8 +15171,15 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
     }
 
+    public boolean isSignatureHome() {
+        return !onlySelect && initialDialogsType == DIALOGS_TYPE_DEFAULT
+                && folderId == 0 && communityId == 0 && searchString == null;
+    }
+
     private boolean shouldShowIdleSearchField() {
-        return !NaConfig.INSTANCE.getHideDialogsSearchField().Bool();
+        // Use the existing search button and search field transition; reserve no
+        // second, idle search row in Signature Home.
+        return !isSignatureHome() && !NaConfig.INSTANCE.getHideDialogsSearchField().Bool();
     }
 
     private int getIdleSearchFieldHeight() {

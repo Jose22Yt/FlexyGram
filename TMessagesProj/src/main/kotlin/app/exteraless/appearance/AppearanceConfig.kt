@@ -46,26 +46,9 @@ object AppearanceConfig {
     @JvmStatic
     fun getPreferences(): SharedPreferences = NekoConfig.getPreferences()
 
+    /** Signature Home active folder inherits the native theme accent; no separate palette. */
     @JvmField
-    val compactNavigation = addConfig("FlexyCompactNavigation", ConfigItem.configTypeBool, true)
-
-    @JvmField
-    val navigationDensity = addConfig("FlexyNavigationDensity", ConfigItem.configTypeInt, 1)
-
-    @JvmStatic
-    fun navigationDensity(): Int = navigationDensity.Int().coerceIn(0, 2)
-
-    @JvmField
-    val floatingSearch = addConfig("FlexyFloatingSearch", ConfigItem.configTypeBool, false)
-
-    @JvmField
-    val universalGlass = addConfig("FlexyUniversalGlass", ConfigItem.configTypeBool, false)
-    @JvmField
-    val universalGlassOpacity = addConfig("FlexyUniversalGlassOpacity", ConfigItem.configTypeInt, 42)
-    @JvmField
-    val universalGlassEdge = addConfig("FlexyUniversalGlassEdge", ConfigItem.configTypeInt, 70)
-    @JvmField
-    val universalGlassSurfaces = addConfig("FlexyUniversalGlassSurfaces", ConfigItem.configTypeInt, 63)
+    val folderThemeAccent = addConfig("FlexyFolderThemeAccent", ConfigItem.configTypeBool, true)
 
     // ---- Аватары ----
 
@@ -657,7 +640,7 @@ object AppearanceConfig {
         migrateLegacyTitleName()
         migrateCustomTitle()
         migrateCenterTitle()
-        migrateIosChatHeader()
+        retireConflictingLegacyStyles()
         migrateModernStyles()
         migrateDecorations()
     }
@@ -673,8 +656,28 @@ object AppearanceConfig {
         }
     }
 
+    /**
+     * The retired Exteraless MD3/iOS Appearance groups must not override
+     * FlexyGram's own Signature header or bottom navigation. Keep unrelated
+     * rendering defaults (loading, player, controls) intact.
+     */
+    private fun retireConflictingLegacyStyles() {
+        if (!org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) {
+            migrateIosChatHeader()
+            return
+        }
+        if (newChatHeaderStyle.Bool()) newChatHeaderStyle.setConfigBool(false)
+        if (newNavigationBarStyle.Bool()) newNavigationBarStyle.setConfigBool(false)
+        if (iosNavigationBarStyle.Bool()) iosNavigationBarStyle.setConfigBool(false)
+        if (iosChatHeader.Bool()) iosChatHeader.setConfigBool(false)
+        if (getPreferences().contains("OEAppearanceIosChatHeaderAuto")) {
+            getPreferences().edit().remove("OEAppearanceIosChatHeaderAuto").apply()
+        }
+    }
+
     private fun migrateIosChatHeader() {
         if (getPreferences().contains(iosChatHeader.key)) return
+        getPreferences().edit().putBoolean("OEAppearanceIosChatHeaderAuto", true).apply()
         iosChatHeader.setConfigBool(NaConfig.centerActionBarTitle.Bool())
     }
 
@@ -702,7 +705,8 @@ object AppearanceConfig {
     private const val LEGACY_DEFAULT_TITLE = "Nagram X"
 
     private fun migrateLegacyTitleName() {
-        if (NaConfig.customTitle.String() != LEGACY_DEFAULT_TITLE) return
+        val previous = NaConfig.customTitle.String()
+        if (previous != LEGACY_DEFAULT_TITLE && previous != "exteraless") return
         NaConfig.customTitle.setConfigString(NaConfig.customTitle.defaultValue as String)
         if (titleText.Int() == TITLE_TEXT_CUSTOM) {
             titleText.setConfigInt(0)

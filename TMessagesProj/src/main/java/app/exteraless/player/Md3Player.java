@@ -1,6 +1,7 @@
 package app.exteraless.player;
 
 import android.content.Context;
+import org.telegram.messenger.BuildConfig;
 import android.os.Bundle;
 
 import org.telegram.messenger.MediaController;
@@ -48,7 +49,7 @@ public final class Md3Player {
             return;
         }
         BottomSheet sheet = create(fragment.getParentActivity(), fragment.getResourceProvider());
-        if (sheet instanceof PlayerSheet && source != null && source.canTransition()) {
+        if (!BuildConfig.CONNECTED_ALPHA && sheet instanceof PlayerSheet && source != null && source.canTransition()) {
             ((PlayerSheet) sheet).setTransitionSource(source);
         }
         fragment.showDialog(sheet);

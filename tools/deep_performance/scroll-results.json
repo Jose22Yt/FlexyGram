@@ -1,0 +1,27 @@
+{
+  "baseline_sha": "cd2af16c8271e52738f0c4e726cf59862c637087",
+  "evidence": "ISOLATED_ANDROID_NATIVE_GRAPHICS_NOT_DEVICE_PERFORMANCE",
+  "fixture": {
+    "cells": 12,
+    "repetitions": 100,
+    "partial_sides": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "directions": [
+      "incoming",
+      "outgoing"
+    ],
+    "geometry_rebuilds_per_condition": {
+      "before": 1200,
+      "after": 12
+    }
+  },
+  "pixel_comparison": "PASS",
+  "android_probe_sdk": 35,
+  "full_apk_build": "NOT_RUN",
+  "poco_scroll_jank_input_latency_gpu_memory": "NOT_MEASURED",
+  "default_full_border_scope": "Does not invoke partial-contour measurement; no claimed reconstruction improvement in this mode."
+}

@@ -13,10 +13,6 @@ import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.FilterTabsView;
 import org.telegram.ui.Components.LayoutHelper;
-import org.telegram.ui.Components.blur3.BlurredBackgroundDrawableViewFactory;
-import org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawable;
-import org.telegram.ui.Components.blur3.drawable.color.impl.BlurredBackgroundProviderImpl;
-import org.telegram.ui.Components.blur3.source.BlurredBackgroundSourceColor;
 
 import tw.nekomimi.nekogram.NekoConfig;
 import xyz.nextalone.nagram.NaConfig;
@@ -36,7 +32,6 @@ public class FoldersPreviewCell extends FrameLayout {
 
     private final Theme.ResourcesProvider resourcesProvider;
     private final FilterTabsView tabsView;
-    private final BlurredBackgroundSourceColor backgroundSource;
 
     private int renderedTitleType = Integer.MIN_VALUE;
 
@@ -97,17 +92,14 @@ public class FoldersPreviewCell extends FrameLayout {
             }
         });
         tabsView.setHorizontalScrollingEnabled(false);
+        // Draw with the same actual tab renderer as FlexyGram Signature Home.
+        // This is a settings-only sample: no glass, background capture or blur source.
+        tabsView.setSignatureHome(true);
+        tabsView.setSignatureHomeOpaquePreview(true);
 
-        // Match the component setup in DialogsActivity. Only the obsolete preview
-        // frame is omitted: the cell itself remains transparent and blends into its row.
-        backgroundSource = new BlurredBackgroundSourceColor();
-        backgroundSource.setColor(Theme.getColor(Theme.key_windowBackgroundWhite, resourcesProvider));
-        BlurredBackgroundDrawable background = new BlurredBackgroundDrawableViewFactory(backgroundSource)
-                .create(tabsView, BlurredBackgroundProviderImpl.topPanel(resourcesProvider));
-        background.setRadius(dp(18));
-        background.setPadding(dp(6.666f));
+        // The main Home uses the same FilterTabsView with Signature mode and does not
+        // register a shared blur drawable. Match it rather than re-creating liquid glass.
         tabsView.setPadding(0, dp(7), 0, dp(7));
-        tabsView.setBlurredBackground(background);
 
         addView(tabsView, LayoutHelper.createFrame(
                 LayoutHelper.MATCH_PARENT, 50, Gravity.CENTER, 21, 0, 21, 0));
@@ -135,18 +127,18 @@ public class FoldersPreviewCell extends FrameLayout {
     }
 
     public void updateAllChatsTabName(boolean animate) {
-        rebuildTabs(animate);
+        rebuildTabs(false);
     }
 
     public void updateTabTitle(boolean animate) {
         if (renderedTitleType != NekoConfig.tabsTitleType.Int()) {
-            rebuildTabs(animate);
+            rebuildTabs(false);
         }
     }
 
     public void updateTabIcons(boolean animate) {
         if (renderedTitleType != NekoConfig.tabsTitleType.Int()) {
-            rebuildTabs(animate);
+            rebuildTabs(false);
         }
     }
 
@@ -157,9 +149,6 @@ public class FoldersPreviewCell extends FrameLayout {
     @Override
     public void invalidate() {
         super.invalidate();
-        if (backgroundSource != null) {
-            backgroundSource.setColor(Theme.getColor(Theme.key_windowBackgroundWhite, resourcesProvider));
-        }
         if (tabsView != null) {
             tabsView.updateColors();
         }

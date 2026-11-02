@@ -1,838 +1,142 @@
 package org.telegram.ui;
 
 import static org.telegram.messenger.AndroidUtilities.dp;
-import static org.telegram.messenger.AndroidUtilities.lerp;
-
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-
+import android.graphics.drawable.GradientDrawable;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.dynamicanimation.animation.DynamicAnimation;
 import androidx.dynamicanimation.animation.FloatPropertyCompat;
 import androidx.dynamicanimation.animation.SpringAnimation;
 import androidx.dynamicanimation.animation.SpringForce;
-
-import android.util.Log;
-
-import org.telegram.messenger.AndroidUtilities;
+import app.flexygram.navigation.LiquidNavigationConfig;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.AnimatedLinearLayout;
-import org.telegram.ui.Components.CubicBezierInterpolator;
 import org.telegram.ui.Components.glass.GlassTabView;
-
-import app.exteraless.appearance.MainTabsUiHelper;
-
-import java.util.HashSet;
-import java.util.Set;
-
-import me.vkryl.android.animator.BoolAnimator;
-import me.vkryl.android.animator.ListAnimator;
-import me.vkryl.android.util.ClickHelper;
-
 import tw.nekomimi.nekogram.NekoConfig;
 import xyz.nextalone.nagram.NaConfig;
 
-@SuppressLint("ViewConstructor")
+/** Native blur3 dock with solid fallback. Equal slots and no idle render loop. */
 public class MainTabsLayout extends AnimatedLinearLayout {
-
     public static final int BOTTOM_NAVIGATION_MODE_SHOW = 0;
     public static final int BOTTOM_NAVIGATION_MODE_HIDE = 1;
     public static final int BOTTOM_NAVIGATION_MODE_FLOATING = 2;
 
-    private static final String KEY_BOTTOM_NAVIGATION_FLOATING = "OEAppearanceBottomNavigationFloating";
-
-    private static Boolean bottomNavigationFloating;
-
-    public static int getBottomNavigationMode() {
-        if (isBottomNavigationHidden()) {
-            return BOTTOM_NAVIGATION_MODE_HIDE;
-        }
-        return isBottomNavigationFloating() ? BOTTOM_NAVIGATION_MODE_FLOATING : BOTTOM_NAVIGATION_MODE_SHOW;
-    }
-
-    public static void setBottomNavigationMode(int mode) {
-        NaConfig.INSTANCE.getHideBottomNavigationBar().setConfigBool(mode == BOTTOM_NAVIGATION_MODE_HIDE);
-        final boolean floating = mode == BOTTOM_NAVIGATION_MODE_FLOATING;
-        bottomNavigationFloating = floating;
-        final SharedPreferences preferences = getBottomNavigationPreferences();
-        if (preferences != null) {
-            preferences.edit().putBoolean(KEY_BOTTOM_NAVIGATION_FLOATING, floating).apply();
-        }
-    }
-
-    public static boolean isBottomNavigationHidden() {
-        return NaConfig.INSTANCE.getHideBottomNavigationBar().Bool();
-    }
-
-    public static boolean isBottomNavigationVisible() {
-        return !isBottomNavigationHidden();
-    }
-
-    public static boolean isBottomNavigationFloating() {
-        if (isBottomNavigationHidden()) {
-            return false;
-        }
-        if (bottomNavigationFloating == null) {
-            final SharedPreferences preferences = getBottomNavigationPreferences();
-            if (preferences == null) {
-                return false;
-            }
-            bottomNavigationFloating = preferences.getBoolean(KEY_BOTTOM_NAVIGATION_FLOATING, false);
-        }
-        return bottomNavigationFloating;
-    }
-
-    private static SharedPreferences getBottomNavigationPreferences() {
-        return ApplicationLoader.applicationContext == null ? null : NekoConfig.getPreferences();
-    }
-
-    private final Theme.ResourcesProvider resourcesProvider;
-
-    public MainTabsLayout(Context context, Theme.ResourcesProvider resourcesProvider) {
-        super(context);
-        this.resourcesProvider = resourcesProvider;
-    }
-
-    private static final float[] PASS_TEXT_SIZES_DP = {12f, 12f, 10f};
-    private static final int[] PASS_PADDINGS_DP = {16, 8, 4};
-
-    private int maxWidthPx;
-
-    public void setMaxWidth(int maxWidthPx) {
-        if (this.maxWidthPx != maxWidthPx) {
-            this.maxWidthPx = maxWidthPx;
-            requestLayout();
-        }
-    }
-
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        int width = MeasureSpec.getSize(widthMeasureSpec);
-        final int height = MeasureSpec.getSize(heightMeasureSpec);
-        final int tabHeight = height - getPaddingTop() - getPaddingBottom();
-
-        if (maxWidthPx > 0 && width > maxWidthPx) {
-            width = maxWidthPx;
-        }
-
-        final boolean compactNavigation = app.exteraless.appearance.AppearanceConfig.compactNavigation.Bool();
-        final boolean fillWidth = !compactNavigation && (MainTabsUiHelper.isMaterial3NavigationBar() || MainTabsUiHelper.isIosNavigationBar());
-        int visibleTabs = 0;
-        for (int i = 0; i < getChildCount(); i++) {
-            if (isViewVisible(getChildAt(i))) visibleTabs++;
-        }
-        final int availableWidth = Math.max(0, width - getPaddingLeft() - getPaddingRight());
-        final int maxTotalWidthForTabs = compactNavigation
-                ? Math.min(availableWidth, dp(tw.nekomimi.nekogram.helpers.MainTabsHelper.getMainTabsPreferredTabWidth()) * visibleTabs)
-                : availableWidth;
-        final int minTotalWidthForTabs = fillWidth
-                ? maxTotalWidthForTabs
-                : Math.min(dp(compactNavigation ? tw.nekomimi.nekogram.helpers.MainTabsHelper.getMainTabsPreferredTabWidth() * visibleTabs : 320), maxTotalWidthForTabs);
-
-        int chosenPass = PASS_TEXT_SIZES_DP.length - 1;
-        float lastMeasuredTextSize = -1;
-        for (int pass = 0; pass < PASS_TEXT_SIZES_DP.length; pass++) {
-            if (PASS_TEXT_SIZES_DP[pass] != lastMeasuredTextSize) {
-                measureTabTexts(PASS_TEXT_SIZES_DP[pass]);
-                lastMeasuredTextSize = PASS_TEXT_SIZES_DP[pass];
-            }
-            final int padding = dp(PASS_PADDINGS_DP[pass]);
-            float total = 0;
-            for (int a = 0, N = getChildCount(); a < N; a++) {
-                if (!isViewVisible(getChildAt(a))) continue;
-                final float withMargin = tabsTextWidth[a] + padding * 2;
-                total += withMargin;
-            }
-            final boolean fits = total <= maxTotalWidthForTabs;
-            if (fits || pass == PASS_TEXT_SIZES_DP.length - 1) {
-                chosenPass = pass;
-                break;
-            }
-        }
-
-        applyPassTextSize(chosenPass);
-
-        final int tabPadding = dp(PASS_PADDINGS_DP[chosenPass]);
-        final int maxTabTextWidthIfEq = (maxTotalWidthForTabs / Math.max(1, visibleChildCount)) - tabPadding * 2;
-
-        float totalWidth = 0;
-        int totalWeight = 0;
-        for (int a = 0, N = getChildCount(); a < N; a++) {
-            final View child = getChildAt(a);
-            if (!isViewVisible(child)) {
-                tabsTextWidth[a] = tabsTextWidthWithMargin[a] = 0;
-                tabsWeight[a] = 0;
-                continue;
-            }
-
-            tabsTextWidthWithMargin[a] = tabsTextWidth[a] + tabPadding * 2;
-            tabsWeight[a] = tabsTextWidthWithMargin[a] > (maxTabTextWidthIfEq + tabPadding * 2) ? 0 : 1;
-
-            totalWidth += tabsTextWidthWithMargin[a];
-            totalWeight += tabsWeight[a];
-        }
-
-        if (totalWeight == 0) {
-            for (int a = 0, N = getChildCount(); a < N; a++) {
-                tabsWeight[a] = isViewVisible(getChildAt(a)) ? 1 : 0;
-            }
-            totalWeight = visibleChildCount;
-        }
-
-        if (totalWidth > maxTotalWidthForTabs) {
-            final float m = maxTotalWidthForTabs / totalWidth;
-            for (int a = 0, N = getChildCount(); a < N; a++) {
-                tabsTextWidthWithMargin[a] *= m;
-            }
-        } else if (totalWidth < minTotalWidthForTabs) {
-            final float growW = minTotalWidthForTabs - totalWidth;
-            final float growP = growW / totalWeight;
-
-            for (int a = 0, N = getChildCount(); a < N; a++) {
-                tabsTextWidthWithMargin[a] += growP * tabsWeight[a];
-            }
-        }
-
-        if (MainTabsUiHelper.isMaterial3NavigationBar() && visibleChildCount > 0) {
-            final float share = (float) maxTotalWidthForTabs / visibleChildCount;
-            boolean fitsEqually = true;
-            for (int a = 0, N = getChildCount(); a < N; a++) {
-                if (isViewVisible(getChildAt(a)) && tabsTextWidth[a] + tabPadding * 2 > share) {
-                    fitsEqually = false;
-                    break;
-                }
-            }
-            if (fitsEqually) {
-                for (int a = 0, N = getChildCount(); a < N; a++) {
-                    if (isViewVisible(getChildAt(a))) {
-                        tabsTextWidthWithMargin[a] = share;
-                    }
-                }
-            }
-        }
-
-        int compactIndex = 0;
-        int l = 0;
-        for (int a = 0, N = getChildCount(); a < N; a++) {
-            if (!isViewVisible(getChildAt(a))) {
-                continue;
-            }
-
-            if (compactNavigation && visibleTabs > 0) {
-                // Round cumulative boundaries so all pixels are shared without overflow.
-                tabsWidth[a] = Math.round((float) maxTotalWidthForTabs * (++compactIndex) / visibleTabs) - l;
-            } else {
-                tabsWidth[a] = Math.round(tabsTextWidthWithMargin[a]);
-            }
-            tabsLeftPos[a] = l;
-            l += tabsWidth[a];
-        }
-        setMeasuredDimension(l + getPaddingLeft() + getPaddingRight(), height);
-        for (int a = 0, N = getChildCount(); a < N; a++) {
-            final View child = getChildAt(a);
-            child.measure(
-                MeasureSpec.makeMeasureSpec(tabsWidth[a], MeasureSpec.EXACTLY),
-                MeasureSpec.makeMeasureSpec(tabHeight, MeasureSpec.EXACTLY));
-        }
-
-        calculateTotalSizesAfterMeasure();
-    }
+    public static int getBottomNavigationMode() { return BOTTOM_NAVIGATION_MODE_SHOW; }
+    public static boolean isBottomNavigationHidden() { return false; }
+    public static boolean isBottomNavigationVisible() { return true; }
+    public static boolean isBottomNavigationFloating() { return false; }
 
     public interface Tab {
         float measureTextWidth();
-        default float measureTextWidth(float textSizeDp) { return measureTextWidth(); }
-        default void setTextSizeDp(float textSizeDp) {}
+        default float measureTextWidth(float size){return measureTextWidth();}
+        default void setTextSizeDp(float size){}
     }
-
-
-
-    // fills tabsTextWidth[] and return visible child count;
-
-    private float[] tabsTextWidth;
-    private float[] tabsTextWidthWithMargin;
-    private int[] tabsWeight;
-    private int[] tabsWidth;
-
-    private int[] tabsLeftPos;
-
-
-    private int visibleChildCount;
-    private int biggestTabTextWidth;
-
-    private void measureTabTexts(float textSizeDp) {
-        final int childCount = getChildCount();
-        if (tabsTextWidth == null || tabsTextWidth.length < childCount) {
-            tabsTextWidth = new float[childCount];
-            tabsTextWidthWithMargin = new float[childCount];
-            tabsWeight = new int[childCount];
-            tabsLeftPos = new int[childCount];
-            tabsWidth = new int[childCount];
-        }
-
-        float maxTabWidthF = 0;
-        int index = 0;
-
-        for (int a = 0; a < childCount; a++) {
-            final View child = getChildAt(a);
-            if (!isViewVisible(child)) {
-                tabsTextWidth[a] = -1;
-                continue;
+    private final Theme.ResourcesProvider resourcesProvider;
+    private final GradientDrawable surface=new GradientDrawable();
+    private org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawable glassBackground;
+    private float glassRadius = -1;
+    public void setGlassBackground(org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawable drawable) {
+        glassBackground = drawable; glassRadius = -1; if (drawable != null) drawable.setCallback(this); setBackground(null); setWillNotDraw(false); invalidate();
+    }
+    @Override protected boolean verifyDrawable(android.graphics.drawable.Drawable who) { return who == glassBackground || super.verifyDrawable(who); }
+    @Override protected void onDraw(Canvas canvas) {
+        if (glassBackground != null && canvas.isHardwareAccelerated()
+                && org.telegram.messenger.SharedConfig.chatBlurEnabled()
+                && org.telegram.ui.Components.blur3.drawable.color.impl.BlurredBackgroundProviderImpl.checkBlurEnabled(resourcesProvider)) {
+            float radius = dp(LiquidNavigationConfig.radiusDp());
+            if (glassRadius != radius) { glassRadius = radius; glassBackground.setRadius(radius); }
+            glassBackground.setBounds(0,0,getWidth(),getHeight());
+            glassBackground.draw(canvas);
+        } else { surface.setBounds(0,0,getWidth(),getHeight()); surface.draw(canvas); }
+        super.onDraw(canvas);
+    }
+    private final Paint selector=new Paint(Paint.ANTI_ALIAS_FLAG);
+    private int lastGlassTabColor = Integer.MIN_VALUE, lastSelectorColor;
+    private float selectionX=Float.NaN;
+    private int maxWidthPx,slotWidth;
+    private boolean drawTopDivider=true;
+    private final SpringAnimation selection=new SpringAnimation(this,new FloatPropertyCompat<MainTabsLayout>("bottomSelection"){
+        public float getValue(MainTabsLayout v){return Float.isNaN(v.selectionX)?0:v.selectionX;}
+        public void setValue(MainTabsLayout v,float value){v.selectionX=value;v.invalidate();}
+    }).setMinimumVisibleChange(.5f);
+    public MainTabsLayout(Context context,Theme.ResourcesProvider provider){
+        super(context);resourcesProvider=provider;setClipChildren(true);setClipToPadding(true);setWillNotDraw(false);
+        selection.setSpring(new SpringForce(0).setStiffness(650).setDampingRatio(1));
+    }
+    public void setMaxWidth(int width){if(maxWidthPx!=width){maxWidthPx=width;requestLayout();}}
+    public void refreshBottomBarAppearance(){
+        selection.cancel();selectionX=Float.NaN;
+        surface.setColor(Theme.getColor(Theme.key_windowBackgroundWhite,resourcesProvider));
+        surface.setCornerRadius(dp(LiquidNavigationConfig.radiusDp()));
+        for(int i=0;i<getChildCount();i++)if(getChildAt(i) instanceof GlassTabView)((GlassTabView)getChildAt(i)).setSkipDrawSelector(true);
+        if (glassBackground != null) glassBackground.updateColors();
+        requestLayout();invalidate();
+    }
+    @Override protected void onMeasure(int ws,int hs){
+        int available=MeasureSpec.getSize(ws);if(maxWidthPx>0)available=Math.min(available,maxWidthPx);
+        int count=0;for(int i=0;i<getChildCount();i++)if(isViewVisible(getChildAt(i)))count++;
+        int padding=getPaddingLeft()+getPaddingRight();
+        int width=Math.min(available,Math.max(dp(48)*count+padding,Math.round(available*LiquidNavigationConfig.widthFraction())));
+        int inner=Math.max(0,width-padding),height=MeasureSpec.getSize(hs);
+        int content=Math.max(0,height-getPaddingTop()-getPaddingBottom());
+        slotWidth=inner/Math.max(1,count);int rank=0;
+        boolean hide=LiquidNavigationConfig.hideLabels(count,(int)(inner/getResources().getDisplayMetrics().density))
+                ||getResources().getConfiguration().fontScale>1.3f
+                ||content<dp(37+LiquidNavigationConfig.labelGapDp());
+        for(int i=0;i<getChildCount();i++){
+            View child=getChildAt(i);int w=isViewVisible(child)?slotWidth+(rank++<inner%Math.max(1,count)?1:0):0;
+            if(child instanceof GlassTabView){
+                GlassTabView tab=(GlassTabView)child;tab.setSkipDrawSelector(true);tab.setTextSizeDp(11);
+                tab.setMainTabsAppearance(hide,LiquidNavigationConfig.iconDp());
             }
-
-            final float tabWidth;
-            if (child instanceof MainTabsLayout.Tab) {
-                tabWidth = ((MainTabsLayout.Tab) child).measureTextWidth(textSizeDp);
-            } else {
-                tabWidth = 0;
-            }
-
-            tabsTextWidth[a] = tabWidth;
-            maxTabWidthF = Math.max(maxTabWidthF, tabWidth);
-            index++;
+            child.measure(MeasureSpec.makeMeasureSpec(w,MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(content,MeasureSpec.EXACTLY));
         }
-
-        biggestTabTextWidth = (int) Math.ceil(maxTabWidthF);
-        visibleChildCount = index;
+        setMeasuredDimension(width,height);calculateTotalSizesAfterMeasure();
     }
-
-    private void applyPassTextSize(int pass) {
-        final float textSizeDp = PASS_TEXT_SIZES_DP[pass];
-        for (int a = 0, N = getChildCount(); a < N; a++) {
-            final View child = getChildAt(a);
-            if (child instanceof MainTabsLayout.Tab) {
-                ((MainTabsLayout.Tab) child).setTextSizeDp(textSizeDp);
-            }
-        }
-    }
-
-    @Override
-    protected void setChildVisibilityFactor(View view, float factor) {
-        final float s = lerp(0.7f, 1f, factor);
-        view.setAlpha(factor);
-        view.setScaleX(s);
-        view.setScaleY(s);
-    }
-
-    @Override
-    protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        super.onLayout(changed, l, t, r, b);
-        checkVisualWidth();
-    }
-
-    @Override
-    protected void onItemsChanged() {
+    @Override protected void setChildVisibilityFactor(View v,float factor){v.setAlpha(factor);v.setScaleX(1);v.setScaleY(1);}
+    @Override protected void onItemsChanged(){
         super.onItemsChanged();
-        checkVisualWidth();
+        for(int i=0;i<getEntriesCount();i++){var e=getEntry(i);if(e.item.view instanceof GlassTabView)((GlassTabView)e.item.view).setVisualWidth(e.getRectF().width());}
     }
-
-    private void checkVisualWidth() {
-        for (int a = 0, N = getEntriesCount(); a < N; a++) {
-            final ListAnimator.Entry<Holder> entry = getEntry(a);
-            final float width = entry.getRectF().width();
-            ((GlassTabView) entry.item.view).setVisualWidth(width);
-        }
+    @Override protected void onLayout(boolean changed,int l,int t,int r,int b){
+        super.onLayout(changed,l,t,r,b);if(changed){selection.cancel();selectionX=Float.NaN;}
+        updateSelection(false);
     }
-
-
-
-
-
-
-
-
-    public void setTabSelected(View tab, boolean animated) {
-        for (int a = 0, N = getChildCount(); a < N; a++) {
-            final View child = getChildAt(a);
-            if (child instanceof GlassTabView) {
-                ((GlassTabView) child).setSelected(child == tab, animated);
-            }
-        }
-    }
-
-    private View findSelectedTab() {
-        for (int a = 0, N = getChildCount(); a < N; a++) {
-            final View child = getChildAt(a);
-            if (child.getVisibility() != View.VISIBLE) {
-                continue;
-            }
-
-            if (child instanceof GlassTabView) {
-                if (((GlassTabView) child).isTabSelected()) {
-                    return child;
-                }
-            }
-        }
-        return null;
-    }
-
-    private final Runnable restoreDrawSelector = () -> setSkipDrawSelector(false);
-
-    private boolean drawCustomSelector;
-    private void setSkipDrawSelector(boolean skipDrawSelector) {
-        drawCustomSelector = skipDrawSelector;
-        if (drawCustomSelector) {
-            selectorPaint.setColor(Theme.multAlpha(Theme.getColor(Theme.key_glass_tabSelected, resourcesProvider), 0.09f));
-        }
-        for (int a = 0, N = getChildCount(); a < N; a++) {
-            final View child = getChildAt(a);
-            if (child.getVisibility() != View.VISIBLE) {
-                continue;
-            }
-
-            if (child instanceof GlassTabView) {
-                ((GlassTabView) child).setSkipDrawSelector(skipDrawSelector);
-            }
-        }
+    private View selected(){for(int i=0;i<getChildCount();i++){View v=getChildAt(i);if(isViewVisible(v)&&v instanceof GlassTabView&&((GlassTabView)v).isTabSelected())return v;}return null;}
+    public void setTabSelected(View tab,boolean animated){for(int i=0;i<getChildCount();i++)if(getChildAt(i) instanceof GlassTabView)((GlassTabView)getChildAt(i)).setSelected(getChildAt(i)==tab,animated);updateSelection(animated);}
+    public void revealSelectedDestination(){updateSelection(true);}
+    private void updateSelection(boolean animated){
+        View v=selected();if(v==null||v.getWidth()==0)return;float x=v.getX()+v.getWidth()*.5f;
+        if(!animated||Float.isNaN(selectionX)||!LiquidNavigationConfig.animation()
+                ||android.os.Build.VERSION.SDK_INT>=26&&!android.animation.ValueAnimator.areAnimatorsEnabled()){
+            selection.cancel();selectionX=x;
+        }else if(Math.abs(x-selectionX)>.5f){selection.getSpring().setStiffness(LiquidNavigationConfig.stiffness()).setDampingRatio(LiquidNavigationConfig.damping());selection.animateToFinalPosition(x);}
         invalidate();
     }
-
-
-
-
-
-
-
-    @Override
-    protected void dispatchDraw(@NonNull Canvas canvas) {
-        if (drawCustomSelector) {
-            final float x = animatedLongSelectedViewCenterX + animatedLongSelectedViewOffsetX;
-            final float sWidth = getInterpolatedWidthByX(x, this);
-            if (MainTabsUiHelper.isMaterial3NavigationBar()) {
-                MainTabsUiHelper.setMainTabSelectedIndicatorBounds(selectorRect, sWidth,
-                        getHeight() - getPaddingTop() - getPaddingBottom());
-                selectorRect.offset(x - sWidth / 2f, getPaddingTop());
-                final float r = selectorRect.height() / 2f;
-                canvas.drawRoundRect(selectorRect, r, r, selectorPaint);
-            } else {
-                final float sHeight = getHeight() - getPaddingTop() - getPaddingBottom();
-                canvas.drawRoundRect(
-                        x - sWidth / 2f, (getHeight() - sHeight) / 2f,
-                        x + sWidth / 2f, (getHeight() + sHeight) / 2f,
-                        sHeight / 2f, sHeight / 2f, selectorPaint);
+    public void addTabToIgnoreClick(View v){} // Native child click/long-click owns all gestures.
+    public void setDrawTopDivider(boolean value){drawTopDivider=value;invalidate();}
+    @Override protected void dispatchDraw(@NonNull Canvas canvas){
+        View v=selected();if(v!=null&&slotWidth>0){
+            float x=selection.isRunning()?selectionX:v.getX()+v.getWidth()*.5f;
+            float w=Math.max(0,slotWidth-dp(8)),h=getHeight()-getPaddingTop()-getPaddingBottom()-dp(6);
+            float y=(getPaddingTop()+getHeight()-getPaddingBottom())*.5f;
+            int tabColor = Theme.getColor(Theme.key_glass_tabSelected,resourcesProvider);
+            if (tabColor != lastGlassTabColor) {
+                lastGlassTabColor = tabColor;
+                lastSelectorColor = Theme.multAlpha(tabColor, .12f);
+                selector.setColor(lastSelectorColor);
             }
+            float radius=Math.min(dp(LiquidNavigationConfig.radiusDp()),h*.5f);
+            canvas.drawRoundRect(x-w*.5f,y-h*.5f,x+w*.5f,y+h*.5f,radius,radius,selector);
         }
-
         super.dispatchDraw(canvas);
-
-        if (drawTopDivider && MainTabsUiHelper.isMaterial3NavigationBar()) {
-            dividerPaint.setColor(Theme.getDividerColor(resourcesProvider));
-            canvas.drawLine(0, 1, getMeasuredWidth(), 1, dividerPaint);
-        }
     }
-
-    private boolean drawTopDivider = true;
-
-    public void setDrawTopDivider(boolean value) {
-        if (drawTopDivider != value) {
-            drawTopDivider = value;
-            invalidate();
-        }
-    }
-
-    final Paint dividerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    final Paint selectorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final android.graphics.RectF selectorRect = new android.graphics.RectF();
-    final SpringAnimation scaleX = new SpringAnimation(this, DynamicAnimation.SCALE_X, 1f);
-    final SpringAnimation scaleY = new SpringAnimation(this, DynamicAnimation.SCALE_Y, 1f);
-
-    final SpringAnimation selectedTabPositionOffsetX = new SpringAnimation(this, new FloatPropertyCompat<MainTabsLayout>("selectedTabPositionOffsetX") {
-        @Override
-        public float getValue(MainTabsLayout object) {
-            return object.animatedLongSelectedViewOffsetX;
-        }
-
-        @Override
-        public void setValue(MainTabsLayout object, float value) {
-            object.animatedLongSelectedViewOffsetX = value;
-            object.invalidate();
-        }
-    });
-    final SpringAnimation selectedTabPositionX = new SpringAnimation(this, new FloatPropertyCompat<MainTabsLayout>("selectedTabPositionX") {
-        @Override
-        public float getValue(MainTabsLayout object) {
-            return object.animatedLongSelectedViewCenterX;
-        }
-
-        @Override
-        public void setValue(MainTabsLayout object, float value) {
-            object.animatedLongSelectedViewCenterX = value;
-            object.invalidate();
-        }
-    });
-
-    {
-        selectedTabPositionOffsetX.setSpring(new SpringForce(1)
-            .setStiffness(SpringForce.STIFFNESS_MEDIUM)
-            .setDampingRatio(SpringForce.DAMPING_RATIO_LOW_BOUNCY));
-        scaleX.setSpring(new SpringForce(1f)
-            .setStiffness(250)
-            .setDampingRatio(0.25f));
-        scaleY.setSpring(new SpringForce(1f)
-            .setStiffness(250)
-            .setDampingRatio(0.25f));
-        selectedTabPositionX.setSpring(new SpringForce(1f)
-            .setStiffness(SpringForce.STIFFNESS_MEDIUM)
-            .setDampingRatio(SpringForce.DAMPING_RATIO_LOW_BOUNCY));
-    }
-
-    private float animatedLongSelectedViewCenterX;
-    private float animatedLongSelectedViewOffsetX;
-
-    private boolean isInLongPress;
-    private float lastLongSelectedViewCenterX;
-    private float lastLongSelectedViewWidth;
-    private View lastLongSelectedView;
-
-
-
-
-    public static View findChildUnder(ViewGroup parent, float x, float y) {
-        for (int i = parent.getChildCount() - 1; i >= 0; i--) {
-            View child = parent.getChildAt(i);
-
-            if (child.getVisibility() != View.VISIBLE) continue;
-
-            if (x >= child.getLeft() && x <= child.getRight()
-                    && y >= child.getTop() && y <= child.getBottom()) {
-                return child;
-            }
-        }
-        return null;
-    }
-
-    private void checkLongMove(float x_, float y, boolean start, boolean end) {
-        final float x = clampXToChildrenCenters(x_, this);
-        final View found = findNearestVisibleChildByX(x, this);
-        if (start) {
-            View selected = findSelectedTab();
-            if (selected != null) {
-                animatedLongSelectedViewCenterX = selected.getX() + selected.getWidth() / 2f;
-                animatedLongSelectedViewOffsetX = animatedLongSelectedViewCenterX - x;
-                selectedTabPositionOffsetX.animateToFinalPosition(0);
-                if (selected != found && found != null) {
-                    found.performClick();
-                }
-            }
-            selectedTabPositionX.cancel();
-        }
-
-        if (!end) {
-            animatedLongSelectedViewCenterX = x;
-            invalidate();
-        }
-
-        if (found != null) {
-            lastLongSelectedView = found;
-            setTabSelected(found, true);
-
-            if (end) {
-                final float vw = found.getWidth();
-                final float cx = found.getX() + vw / 2f;
-                if (lastLongSelectedViewWidth != vw || lastLongSelectedViewCenterX != cx) {
-                    selectedTabPositionX.animateToFinalPosition(cx);
-                }
-            }
-        }
-    }
-
-    private final Set<View> tabsWithIgnoreClick = new HashSet<>();
-    public void addTabToIgnoreClick(View v) {
-        tabsWithIgnoreClick.add(v);
-    }
-
-    private final BoolAnimator animatorIsScaled = new BoolAnimator(0, (a, factor, c, g) -> {
-        setScaleX(lerp(1, 1.019f, factor));
-        setScaleY(lerp(1, 1.019f, factor));
-    }, CubicBezierInterpolator.EASE_OUT_QUINT, 380);
-
-    private final ClickHelper clickHelper = new ClickHelper(new ClickHelper.Delegate() {
-        @Override
-        public boolean needClickAt(View view, float x, float y) {
-            lastLongSelectedView = null;
-            final View found = findChildUnder(MainTabsLayout.this, x, y);
-            return found != null && !tabsWithIgnoreClick.contains(found);
-        }
-
-        @Override
-        public void onClickAt(View view, float x, float y) {
-        }
-
-        @Override
-        public boolean needLongPress(float x, float y) {
-            return true;
-        }
-
-        @Override
-        public boolean needCancelTouchBySlopMove() {
-            return false;
-        }
-
-
-        @Override
-        public boolean onLongPressRequestedAt(View view, float x, float y) {
-            checkPivot(view, x, y);
-            isInLongPress = true;
-            AndroidUtilities.cancelRunOnUIThread(restoreDrawSelector);
-            setSkipDrawSelector(true);
-            checkLongMove(x, y, true, false);
-            invalidate();
-            longTouchStart();
-            return true;
-        }
-
-        @Override
-        public void onLongPressMove(View view, MotionEvent e, float x, float y, float startX, float startY) {
-            checkPivot(view, x, y);
-            checkLongMove(x, y, false, false);
-            invalidate();
-        }
-
-        @Override
-        public long getLongPressDuration() {
-            return ClickHelper.Delegate.super.getLongPressDuration() * 750 / 1000;
-        }
-
-        @Override
-        public void onLongPressFinish(View view, float x, float y) {
-            checkPivot(view, x, y);
-            checkLongMove(x, y, false, true);
-            isInLongPress = false;
-            AndroidUtilities.runOnUIThread(restoreDrawSelector, 450);
-            if (lastLongSelectedView != null) {
-                lastLongSelectedView.performClick();
-            }
-            lastLongSelectedView = null;
-            invalidate();
-            longTouchEnd();
-        }
-
-        @Override
-        public void onLongPressCancelled(View view, float x, float y) {
-            checkPivot(view, x, y);
-            checkLongMove(x, y, false, true);
-            isInLongPress = false;
-            AndroidUtilities.runOnUIThread(restoreDrawSelector, 450);
-            lastLongSelectedView = null;
-            invalidate();
-            longTouchEnd();
-        }
-
-        private void longTouchStart() {
-            animatorIsScaled.setValue(true, true);
-
-            /*
-            if (!scaleX.isRunning()) {
-                scaleX.setStartVelocity(-0.45f);
-                scaleY.setStartVelocity(-0.45f);
-            }
-            scaleX.animateToFinalPosition(1.012f);
-            scaleY.animateToFinalPosition(1.012f);
-            */
-        }
-
-        private void longTouchEnd() {
-            animatorIsScaled.setValue(false, true);
-
-            /*
-            if (!scaleX.isRunning()) {
-                scaleX.setStartVelocity(0.25f);
-                scaleY.setStartVelocity(0.25f);
-            }
-            scaleX.animateToFinalPosition(1f);
-            scaleY.animateToFinalPosition(1f);
-            */
-        }
-    });
-
-    @Override
-    public void setScaleY(float scaleY) {
-        super.setScaleY(scaleY);
-        checkLayerType();
-    }
-
-    @Override
-    public void setScaleX(float scaleX) {
-        super.setScaleX(scaleX);
-        checkLayerType();
-    }
-
-    private void checkLayerType() {
-        final int layerType = Math.abs(getScaleX() - 1f) < 0.0001f && Math.abs(getScaleY() - 1f) < 0.0001f ?
-            View.LAYER_TYPE_NONE : View.LAYER_TYPE_HARDWARE;
-
-        if (getLayerType() != layerType) {
-            setLayerType(layerType, null);
-            invalidate();
-        }
-    }
-
-
-    private void checkPivot(View view, float x, float y) {
-        float w = view.getWidth();
-        float h = view.getHeight();
-
-        if (w <= 0f || h <= 0f) {
-            return;
-        }
-
-        float cx = w * 0.5f;
-        float cy = h * 0.5f;
-
-        float dx = x - cx;
-        float dy = y - cy;
-
-        float halfW = w * 0.5f;
-        float halfH = h * 0.5f;
-
-        float nx = dx / halfW;
-        float ny = dy / halfH;
-
-        float r = (float) Math.sqrt(nx * nx + ny * ny);
-
-        float pivotX;
-        float pivotY;
-
-        if (r > 1e-4f) {
-            float mappedR = 1.5f * r / (r + 0.5f);
-
-            float scale = mappedR / r;
-            pivotX = cx + dx * scale;
-            pivotY = cy + dy * scale;
-        } else {
-            pivotX = cx;
-            pivotY = cy;
-        }
-
-        pivotX = lerp(cx, pivotX, 1f);
-        pivotY = lerp(cy, pivotY, 3f);
-
-        view.setPivotX(pivotX);
-        view.setPivotY(pivotY);
-    }
-
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-        clickHelper.onTouchEvent(this, ev);
-        return super.dispatchTouchEvent(ev);
-    }
-
-
-    private static float clampXToChildrenCenters(float x, ViewGroup parent) {
-        if (parent == null || parent.getChildCount() == 0) {
-            return x;
-        }
-
-        float min = Float.MAX_VALUE;
-        float max = -Float.MAX_VALUE;
-        boolean found = false;
-
-        for (int i = 0; i < parent.getChildCount(); i++) {
-            View view = parent.getChildAt(i);
-            if (view == null || view.getVisibility() != View.VISIBLE) {
-                continue;
-            }
-
-            float centerX = view.getX() + view.getWidth() * 0.5f;
-
-            if (centerX < min) min = centerX;
-            if (centerX > max) max = centerX;
-
-            found = true;
-        }
-
-        if (!found) {
-            return x;
-        }
-
-        if (x < min) return min;
-        if (x > max) return max;
-        return x;
-    }
-
-    @Nullable
-    private static View findNearestVisibleChildByX(float x, ViewGroup parent) {
-        if (parent == null || parent.getChildCount() == 0) {
-            return null;
-        }
-
-        View nearest = null;
-        float nearestDistance = Float.MAX_VALUE;
-
-        for (int i = 0; i < parent.getChildCount(); i++) {
-            View view = parent.getChildAt(i);
-            if (view == null || view.getVisibility() != View.VISIBLE) {
-                continue;
-            }
-
-            float centerX = view.getX() + view.getWidth() * 0.5f;
-            float distance = Math.abs(centerX - x);
-
-            if (distance < nearestDistance) {
-                nearestDistance = distance;
-                nearest = view;
-            }
-        }
-
-        return nearest;
-    }
-
-    private static float getInterpolatedWidthByX(float x, ViewGroup parent) {
-        if (parent == null || parent.getChildCount() == 0) {
-            return 0f;
-        }
-
-        View left = null;
-        View right = null;
-
-        for (int i = 0; i < parent.getChildCount(); i++) {
-            View view = parent.getChildAt(i);
-            if (view == null || view.getVisibility() != View.VISIBLE) {
-                continue;
-            }
-
-            float centerX = view.getX() + view.getWidth() * 0.5f;
-
-            if (centerX <= x && (left == null || centerX > getCenterX(left))) {
-                left = view;
-            }
-
-            if (centerX >= x && (right == null || centerX < getCenterX(right))) {
-                right = view;
-            }
-        }
-
-        if (left == null && right == null) {
-            return 0f;
-        }
-
-        if (left == null) {
-            return right.getWidth();
-        }
-
-        if (right == null) {
-            return left.getWidth();
-        }
-
-        float leftX = getCenterX(left);
-        float rightX = getCenterX(right);
-
-        if (left == right || leftX == rightX) {
-            return left.getWidth();
-        }
-
-        float ratio = (x - leftX) / (rightX - leftX);
-        return lerp(left.getWidth(), right.getWidth(), ratio);
-    }
-
-    private static float getCenterX(View v) {
-        return v.getX() + v.getWidth() * 0.5f;
-    }
+    @Override protected void onVisibilityChanged(@NonNull View changed,int visibility){super.onVisibilityChanged(changed,visibility);if(visibility!=VISIBLE&&selection!=null){selection.cancel();selectionX=Float.NaN;}}
+    @Override protected void onDetachedFromWindow(){selection.cancel();selectionX=Float.NaN;super.onDetachedFromWindow();}
+    public static View findChildUnder(ViewGroup parent,float x,float y){for(int i=parent.getChildCount()-1;i>=0;i--){View v=parent.getChildAt(i);if(v.getVisibility()==VISIBLE&&x>=v.getX()&&x<v.getX()+v.getWidth()&&y>=v.getY()&&y<v.getY()+v.getHeight())return v;}return null;}
 }

@@ -443,7 +443,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         }
 
         instance = this;
-        ApplicationLoader.postInitApplication();
+        ApplicationLoader.postInitApplication(true);
         AndroidUtilities.checkDisplaySize(this, getResources().getConfiguration());
         currentAccount = UserConfig.selectedAccount;
         registerReceiver(batteryReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
@@ -1603,6 +1603,10 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
     // before, вернувший true, глотает интент (оригинальная обработка не выполняется);
     // after зовётся всегда (finally) после оригинальной обработки.
     private boolean handleIntent(Intent intent, boolean isNew, boolean restore, boolean fromPassword, Browser.Progress progress, boolean rebuildFragments, boolean openedTelegram) {
+        // Studio data never enters plugin/Python intent handlers; native passcode gates still run below.
+        if (app.flexygram.studio.FlexyStyleInstallHelper.isStudioIntent(intent)) {
+            return handleIntentInternal(intent, isNew, restore, fromPassword, progress, rebuildFragments, openedTelegram);
+        }
         if (intent != null && app.exteraless.plugins.PluginsController.getInstance().isEngineEnabled()
                 && app.exteraless.plugins.intents.IntentsDispatcher.hasHandlers()) {
             java.util.Map<String, Object> pluginContext = app.exteraless.plugins.intents.IntentsDispatcher.buildIntentContext(
@@ -1643,7 +1647,8 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         }
         int flags = intent.getFlags();
         String action = intent.getAction();
-        final int[] intentAccount = new int[]{intent.getIntExtra("currentAccount", UserConfig.selectedAccount)};
+        final boolean flexyStudioIntent = app.flexygram.studio.FlexyStyleInstallHelper.isStudioIntent(intent);
+        final int[] intentAccount = new int[]{flexyStudioIntent ? UserConfig.selectedAccount : intent.getIntExtra("currentAccount", UserConfig.selectedAccount)};
         switchToAccount(intentAccount[0], true);
         final boolean isVoipIntent = action != null && action.equals("voip");
         final boolean isVoipAnswerIntent = action != null && action.equals("voip_answer");
@@ -1659,6 +1664,12 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                 passcodeSaveIntentIsRestore = restore;
                 return false;
             }
+        }
+        if (flexyStudioIntent) {
+            app.flexygram.studio.FlexyStyleInstallHelper.acceptExternal(this, intent.getData());
+            // Keep normal cold-start/login initialization; consume only the document routing data.
+            intent = new Intent(Intent.ACTION_MAIN);
+            action = Intent.ACTION_MAIN;
         }
         boolean pushOpened = false;
         long push_user_id = 0;
@@ -3555,6 +3566,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         }
 
         intent.setAction(null);
+        if (flexyStudioIntent) actionBarLayout.getView().post(() -> app.flexygram.studio.FlexyStyleInstallHelper.resumeExternal(this));
         return pushOpened;
     }
 
@@ -6954,8 +6966,12 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         voipLaunchedInBackground = false;
     }
 
+    private final app.flexygram.performance.RefreshRateMonitor refreshRateMonitor =
+            new app.flexygram.performance.RefreshRateMonitor(this);
+
     @Override
     protected void onPause() {
+        refreshRateMonitor.stop();
         // Пауза голосовых и кружков при сворачивании приложения.
         // exteraGram зовёт это из didReceivedNotification по stopAllHeavyOperations(4096);
         // у нас такой ветки нет, а onPause наступает ровно в тот же момент.
@@ -7088,6 +7104,8 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
 
     @Override
     protected void onDestroy() {
+        refreshRateMonitor.stop();
+        app.flexygram.studio.FlexyStyleInstallHelper.cancelExternal(this);
         app.exteraless.icons.picker.IconPickerController.onDestroy();
         app.exteraless.plugins.PluginsController.getInstance().executeOnAppEvent(app.exteraless.plugins.PluginsConstants.EVENT_APP_STOP);
         GramWalletStorageAuth.onActivityDestroyed(this);
@@ -7210,6 +7228,8 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
     @Override
     protected void onResume() {
         super.onResume();
+        refreshRateMonitor.start();
+        app.flexygram.studio.FlexyStyleInstallHelper.resumeExternal(this);
         isResumed = true;
         app.exteraless.plugins.PluginsController.getInstance().executeOnAppEvent(app.exteraless.plugins.PluginsConstants.EVENT_APP_RESUME);
         app.exteraless.plugins.PluginDenialNotice.flush();
@@ -7272,7 +7292,9 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
             ProxyUtil.registerNetworkCallback();
         }
 
-        ConnectionsManager.getInstance(currentAccount).setAppPaused(false, false);
+        ConnectionsManager cm = ConnectionsManager.getInstance(currentAccount);
+        cm.setAppPaused(false, false);
+        cm.resumeNetworkMaybe();
         updateCurrentConnectionState(currentAccount);
         if (PhotoViewer.hasInstance() && PhotoViewer.getInstance().isVisible()) {
             PhotoViewer.getInstance().onResume();
@@ -8471,17 +8493,25 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         Runnable action = null;
         currentConnectionState = ConnectionsManager.getInstance(currentAccount).getConnectionState();
         if (currentConnectionState == ConnectionsManager.ConnectionStateWaitingForNetwork) {
-            title = "WaitingForNetwork";
-            titleId = R.string.WaitingForNetwork;
+            if (!ApplicationLoader.isNetworkOnline()) {
+                title = "WaitingForNetwork";
+                titleId = R.string.WaitingForNetwork;
+            }
         } else if (currentConnectionState == ConnectionsManager.ConnectionStateUpdating) {
-            title = "Updating";
-            titleId = R.string.Updating;
+            MessagesController mc = MessagesController.getInstance(currentAccount);
+            if (!mc.dialogsLoaded || (mc.getAllDialogs().isEmpty() && mc.getDialogs(0).isEmpty())) {
+                title = "Updating";
+                titleId = R.string.Updating;
+            }
         } else if (currentConnectionState == ConnectionsManager.ConnectionStateConnectingToProxy) {
             title = "ConnectingToProxyWithDots";
             titleId = R.string.ConnectingToProxyWithDots;
         } else if (currentConnectionState == ConnectionsManager.ConnectionStateConnecting) {
-            title = "Connecting";
-            titleId = R.string.Connecting;
+            MessagesController mc = MessagesController.getInstance(currentAccount);
+            if (!mc.dialogsLoaded || (mc.getAllDialogs().isEmpty() && mc.getDialogs(0).isEmpty()) || !ApplicationLoader.isNetworkOnline()) {
+                title = "Connecting";
+                titleId = R.string.Connecting;
+            }
         }
         if (currentConnectionState == ConnectionsManager.ConnectionStateConnecting || currentConnectionState == ConnectionsManager.ConnectionStateConnectingToProxy) {
             action = () -> {

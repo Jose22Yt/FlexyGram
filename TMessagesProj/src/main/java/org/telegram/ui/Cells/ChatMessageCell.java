@@ -284,6 +284,21 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     private final static float EPHEMERAL_HINT_HEIGHT = 25f;
 
     public boolean clipToGroupBounds;
+    private final MessageDrawable.GlassSource flexyBubbleSource = new MessageDrawable.GlassSource() {
+        @Override public boolean draw(Canvas canvas, android.graphics.Path path) {
+            return draw(canvas, path, 255);
+        }
+        @Override public boolean draw(Canvas canvas, android.graphics.Path path, int alpha) {
+            return delegate != null && !drawForBlur && delegate.drawFlexyBubbleWallpaper(ChatMessageCell.this, canvas, path, alpha);
+        }
+    };
+    private void drawFlexyBubble(Canvas canvas, MessageDrawable drawable, Paint customPaint) {
+        // Drawables are shared by native themes: never retain a cell/activity between draws.
+        drawable.setFlexyGlassSource(flexyBubbleSource);
+        try { drawable.drawCached(canvas, backgroundCacheParams, customPaint); }
+        finally { drawable.setFlexyGlassSource(null); }
+    }
+
     public boolean drawForBlur;
     private boolean flipImage;
     private boolean visibleOnScreen = true;
@@ -571,6 +586,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     }
 
     public interface ChatMessageCellDelegate {
+        default boolean didPressFlexyStudioDocument(ChatMessageCell cell) { return false; }
         default boolean isReplyOrSelf() {
             return false;
         }
@@ -843,6 +859,14 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         }
 
         default boolean isLandscape() {
+            return false;
+        }
+
+        default boolean hasFlexyBubbleWallpaper() { return false; }
+        default boolean drawFlexyBubbleWallpaper(ChatMessageCell cell, Canvas canvas, android.graphics.Path path, int alpha) {
+            return alpha == 255 && drawFlexyBubbleWallpaper(cell, canvas, path);
+        }
+        default boolean drawFlexyBubbleWallpaper(ChatMessageCell cell, Canvas canvas, android.graphics.Path path) {
             return false;
         }
 
@@ -1457,6 +1481,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
      * Здесь только зависимые от хвостика геометрии в ячейке.
      */
     private static boolean oeRemoveMessageTail() {
+        if (app.flexygram.bubbles.BubbleStyle.signature()) return false;
         app.exteraless.chats.ChatsConfig.ensureLoaded();
         return app.exteraless.chats.ChatsConfig.removeMessageTail.Bool();
     }
@@ -5026,6 +5051,89 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         return replyPressed;
     }
 
+    private final app.flexygram.bubbles.interaction.BubbleTapMotion signatureTapMotion =
+            new app.flexygram.bubbles.interaction.BubbleTapMotion(this);
+    private boolean signatureTapEligible;
+    private float signatureTapX, signatureTapY;
+    private boolean signatureMediaPress;
+    private float signatureTapPivotX, signatureTapPivotY;
+    private long signatureTapReleased, signatureTapStarted;
+    public void signatureTapEvent(MotionEvent event) {
+        int action=event.getActionMasked();
+        if(action==MotionEvent.ACTION_MOVE && signatureTapEligible){
+            float slop=android.view.ViewConfiguration.get(getContext()).getScaledTouchSlop();
+            if(Math.abs(event.getX()-signatureTapX)>slop || Math.abs(event.getY()-signatureTapY)>slop)cancelSignatureGesture();
+            else signatureTapMotion.drag(event.getX()-signatureTapX,event.getY()-signatureTapY,slop);
+        } else if(action==MotionEvent.ACTION_UP && signatureTapEligible){
+            if(android.os.SystemClock.uptimeMillis()-signatureTapStarted>=android.view.ViewConfiguration.getLongPressTimeout()){
+                finishSignatureCandidate();return;
+            }
+            signatureTapReleased=android.os.SystemClock.uptimeMillis();signatureTapMotion.release();
+        } else if(action==MotionEvent.ACTION_CANCEL || action==MotionEvent.ACTION_POINTER_DOWN || action==MotionEvent.ACTION_POINTER_UP)cancelSignatureGesture();
+    }
+    public boolean isSignatureTap(){return signatureTapEligible && signatureTapReleased>0 && android.os.SystemClock.uptimeMillis()-signatureTapReleased<500;}
+    public float signatureTapScaleX(){return signatureTapMotion.scaleX();}
+    public float signatureTapScaleY(){return signatureTapMotion.scaleY();}
+    public float signatureTapVelocityX(){return signatureTapMotion.velocityX();}
+    public float signatureTapVelocityY(){return signatureTapMotion.velocityY();}
+    /** The overlay receives the live scale first, then owns the remaining spring.
+     * Resetting here is atomic with popup creation; prevents double-scaling the same cell. */
+    public void finishSignatureCandidate(){signatureTapEligible=false;signatureTapReleased=0;signatureTapMotion.release();}
+    public void finishSignatureTap(){signatureTapEligible=false;signatureTapReleased=0;signatureTapMotion.reset();}
+    public void cancelSignatureGesture(){signatureTapEligible=false;signatureTapReleased=0;signatureMediaPress=false;signatureTapMotion.release();}
+    public void cancelSignatureTap(){signatureTapEligible=false;signatureTapReleased=0;signatureMediaPress=false;signatureTapMotion.reset();}
+    private void applySignatureTap(Canvas canvas){
+        float sx=signatureTapMotion.scaleX(),sy=signatureTapMotion.scaleY();
+        if(sx!=1f || sy!=1f){
+            float cx=signatureTapPivotX,cy=signatureTapPivotY;
+            canvas.scale(sx,sy,cx,cy);
+        }
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        int action=event.getActionMasked();
+        // Detect photo/video press before native handlers, several of which return
+        // early from onTouchEvent. Observe only; never consume native media taps.
+        if (action==MotionEvent.ACTION_DOWN
+                && app.flexygram.bubbles.interaction.BubbleInteractionSettings.tapAnimation(getContext())
+                && currentMessageObject!=null && delegate!=null && delegate.canPerformActions()
+                && !delegate.hasSelectedMessages() && !currentMessageObject.preview
+                && !currentMessageObject.isSponsored() && !currentMessageObject.isEphemeral()
+                && (isInsideBackground(getEventX(event),getEventY(event))
+                    || drawPhotoImage && photoImage.isInsideImage(getEventX(event),getEventY(event)))) {
+            cancelSignatureGesture();
+            signatureMediaPress=true;
+            signatureTapX=getEventX(event);
+            signatureTapY=getEventY(event);
+            signatureTapPivotX=(getBackgroundDrawableLeft()+getBackgroundDrawableRight())*.5f;
+            signatureTapPivotY=(getBackgroundDrawableTop()+getBackgroundDrawableBottom())*.5f;
+            if (app.flexygram.bubbles.interaction.BubbleInteractionSettings.motionEnabled()) {
+                signatureTapMotion.press(.012f+.0005f*app.flexygram.bubbles.interaction.BubbleInteractionSettings.compression(getContext()),
+                        app.flexygram.bubbles.interaction.BubbleInteractionSettings.rebound(getContext())/100f,
+                        440-3L*app.flexygram.bubbles.interaction.BubbleInteractionSettings.recovery(getContext()));
+            }
+        }
+        // Media controls may return early: finish their independent touch spring
+        // regardless of the native photo/video touch handling.
+        if (signatureMediaPress && action!=MotionEvent.ACTION_DOWN) {
+            if (action==MotionEvent.ACTION_UP) {
+                signatureMediaPress=false;
+                signatureTapMotion.release();
+            } else if (action==MotionEvent.ACTION_CANCEL
+                    || action==MotionEvent.ACTION_POINTER_DOWN
+                    || action==MotionEvent.ACTION_POINTER_UP) {
+                cancelSignatureGesture();
+            } else if (action==MotionEvent.ACTION_MOVE) {
+                float slop=android.view.ViewConfiguration.get(getContext()).getScaledTouchSlop();
+                if (Math.abs(getEventX(event)-signatureTapX)>slop
+                        || Math.abs(getEventY(event)-signatureTapY)>slop) cancelSignatureGesture();
+                else signatureTapMotion.drag(getEventX(event)-signatureTapX,getEventY(event)-signatureTapY,slop);
+            }
+        }
+        return super.dispatchTouchEvent(event);
+    }
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (currentMessageObject == null || delegate != null && !delegate.canPerformActions() || animationRunning) {
@@ -5482,6 +5590,49 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                     }
                     invalidate();
                 }
+            }
+        }
+        final int signatureAction=event.getActionMasked();
+        if(signatureAction==MotionEvent.ACTION_DOWN){
+            if (!signatureMediaPress) cancelSignatureGesture();
+            // Default style never claims a tap; Telegram retains its original gestures.
+            // Native links, image viewers, media buttons, polls and spoilers keep precedence.
+            final boolean signatureMode=app.flexygram.bubbles.interaction.BubbleInteractionSettings.tapPanel(getContext());
+            final boolean compatible=signatureMode && currentMessageObject!=null && delegate!=null
+                    && !delegate.hasSelectedMessages() && !currentMessageObject.preview
+                    && !currentMessageObject.isSponsored() && !currentMessageObject.isEphemeral()
+                    && currentMessagesGroup==null;
+            final float touchX=getEventX(event),touchY=getEventY(event);
+            final boolean mediaHit=compatible && drawPhotoImage && photoImage.isInsideImage(touchX,touchY)
+                    && (currentMessageObject.type==MessageObject.TYPE_PHOTO || currentMessageObject.isVideo());
+            // Ordinary photo/video taps still open Telegram's media viewer.
+            // They get tactile feedback, but the one-tap context panel is for the
+            // unclaimed message surface, not an image-button hit target.
+            signatureTapEligible=compatible && !result && !mediaHit
+                    && isInsideBackground(touchX,touchY);
+            if(signatureTapEligible){
+                signatureTapStarted=android.os.SystemClock.uptimeMillis();
+                signatureTapX=touchX;signatureTapY=touchY;
+                signatureTapPivotX=mediaHit?photoImage.getCenterX():(getBackgroundDrawableLeft()+getBackgroundDrawableRight())*.5f;
+                signatureTapPivotY=(getBackgroundDrawableTop()+getBackgroundDrawableBottom())*.5f;
+                if(app.flexygram.bubbles.interaction.BubbleInteractionSettings.tapAnimation(getContext())
+                        && !signatureMediaPress
+                        && app.flexygram.bubbles.interaction.BubbleInteractionSettings.motionEnabled()){
+                    signatureTapMotion.press(.012f+.0005f*app.flexygram.bubbles.interaction.BubbleInteractionSettings.compression(getContext()),
+                            app.flexygram.bubbles.interaction.BubbleInteractionSettings.rebound(getContext())/100f,
+                            440-3L*app.flexygram.bubbles.interaction.BubbleInteractionSettings.recovery(getContext()));
+                }
+            }
+        } else if(signatureMediaPress){
+            if(signatureAction==MotionEvent.ACTION_UP){
+                signatureMediaPress=false;signatureTapMotion.release();
+            } else if(signatureAction==MotionEvent.ACTION_CANCEL
+                    || signatureAction==MotionEvent.ACTION_POINTER_DOWN
+                    || signatureAction==MotionEvent.ACTION_POINTER_UP
+                    || (signatureAction==MotionEvent.ACTION_MOVE
+                    && (Math.abs(getEventX(event)-signatureTapX)>android.view.ViewConfiguration.get(getContext()).getScaledTouchSlop()
+                    || Math.abs(getEventY(event)-signatureTapY)>android.view.ViewConfiguration.get(getContext()).getScaledTouchSlop()))){
+                cancelSignatureGesture();
             }
         }
         return result;
@@ -6473,6 +6624,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
 
     @Override
     protected void onDetachedFromWindow() {
+        cancelSignatureTap();
         super.onDetachedFromWindow();
 
         if (observersGroup != null) {
@@ -7000,6 +7152,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             transChanged = true;
         }
 
+        if(currentMessageObject!=messageObject)cancelSignatureTap();
         ayuDeleted = messageObject.isAyuDeleted();
         final boolean ayuDeletedChanged = ayuDeleted != lastAyuDeleted;
         lastAyuDeleted = ayuDeleted;
@@ -12406,6 +12559,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
 
     @Override
     protected boolean onLongPress() {
+        cancelSignatureTap();
         if (isRoundVideo && isPlayingRound && MediaController.getInstance().isPlayingMessage(currentMessageObject)) {
             float touchRadius = (lastTouchX - photoImage.getCenterX()) * (lastTouchX - photoImage.getCenterX()) + (lastTouchY - photoImage.getCenterY()) * (lastTouchY - photoImage.getCenterY());
             float r1 = (photoImage.getImageWidth() / 2f) * (photoImage.getImageWidth() / 2f);
@@ -18275,6 +18429,8 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             delegate.didPressRevealSensitiveContent(this);
             return;
         }
+        if (currentMessageObject != null && app.flexygram.studio.FlexyStyleInstallHelper.recognized(currentMessageObject.getDocumentName())
+                && delegate != null && delegate.didPressFlexyStudioDocument(this)) return;
         if (currentMessageObject != null && !currentMessageObject.isAnyKindOfSticker()) {
             currentMessageObject.putInDownloadsStore = true;
         }
@@ -20686,6 +20842,21 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     }
     @SuppressLint("WrongCall")
     public void drawInternal(Canvas canvas) {
+        float sx = signatureTapMotion.scaleX(), sy = signatureTapMotion.scaleY();
+        boolean hasScale = sx != 1f || sy != 1f;
+        int save = hasScale ? canvas.save() : -1;
+        if (hasScale) {
+            canvas.scale(sx, sy, signatureTapPivotX, signatureTapPivotY);
+        }
+        try {
+            drawSignatureContent(canvas);
+        } finally {
+            if (hasScale) {
+                canvas.restoreToCount(save);
+            }
+        }
+    }
+    private void drawSignatureContent(Canvas canvas) {
         if (currentMessageObject == null) {
             return;
         }
@@ -20915,7 +21086,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                 canvas.save();
                 canvas.clipRect(0, 0, getMeasuredWidth(), getMeasuredHeight());
                 if (currentBackgroundDrawable != null)
-                    currentBackgroundDrawable.drawCached(canvas, backgroundCacheParams, selectionOverlayPaint);
+                    drawFlexyBubble(canvas, currentBackgroundDrawable, selectionOverlayPaint);
                 canvas.restore();
             }
             selectionOverlayPaint.setAlpha(wasAlpha);
@@ -20938,7 +21109,20 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     }
 
     public void drawBackgroundInternal(Canvas canvas, boolean fromParent) {
-        drawBackgroundInternal(canvas, fromParent, false);
+        float sx = fromParent ? signatureTapMotion.scaleX() : 1f;
+        float sy = fromParent ? signatureTapMotion.scaleY() : 1f;
+        boolean hasScale = sx != 1f || sy != 1f;
+        int save = hasScale ? canvas.save() : -1;
+        if (hasScale) {
+            canvas.scale(sx, sy, signatureTapPivotX, signatureTapPivotY);
+        }
+        try {
+            drawBackgroundInternal(canvas, fromParent, false);
+        } finally {
+            if (hasScale) {
+                canvas.restoreToCount(save);
+            }
+        }
     }
 
     @SuppressLint("WrongCall")
@@ -21305,11 +21489,11 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
 //                if ((isPressed() && isCheckPressed || !isCheckPressed && isPressed) && !textIsSelectionMode()) {
 //                    currentSelectedBackgroundAlpha = 1f;
 //                    currentBackgroundSelectedDrawable.setAlpha((int) (255 * alphaInternal));
-//                    currentBackgroundSelectedDrawable.drawCached(canvas, backgroundCacheParams);
+//                    drawFlexyBubble(canvas, currentBackgroundSelectedDrawable, null);
 //                } else {
                 currentSelectedBackgroundAlpha = 0;
                 currentBackgroundDrawable.setAlpha((int) (255 * alphaInternal));
-                currentBackgroundDrawable.drawCached(canvas, backgroundCacheParams);
+                drawFlexyBubble(canvas, currentBackgroundDrawable, null);
 //                }
                 if (currentBackgroundShadowDrawable != null && currentPosition == null) {
                     currentBackgroundShadowDrawable.setAlpha((int) (255 * alphaInternal));
@@ -21318,18 +21502,18 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             } else {
                 if (isHighlightedAnimated) {
                     currentBackgroundDrawable.setAlpha((int) (255 * alphaInternal));
-                    currentBackgroundDrawable.drawCached(canvas, backgroundCacheParams);
+                    drawFlexyBubble(canvas, currentBackgroundDrawable, null);
                     currentSelectedBackgroundAlpha = getHighlightAlpha();
                     if (currentPosition == null) {
                         currentBackgroundSelectedDrawable.setAlpha((int) (alphaInternal * currentSelectedBackgroundAlpha * 255));
-                        currentBackgroundSelectedDrawable.drawCached(canvas, backgroundCacheParams);
+                        drawFlexyBubble(canvas, currentBackgroundSelectedDrawable, null);
                     }
                 } else if (selectedBackgroundProgress != 0 && (currentMessageObject == null || !currentMessageObject.preview) && !(currentMessagesGroup != null && currentMessagesGroup.isDocuments)) {
                     currentBackgroundDrawable.setAlpha((int) (255 * alphaInternal));
-                    currentBackgroundDrawable.drawCached(canvas, backgroundCacheParams);
+                    drawFlexyBubble(canvas, currentBackgroundDrawable, null);
                     currentSelectedBackgroundAlpha = selectedBackgroundProgress;
                     currentBackgroundSelectedDrawable.setAlpha((int) (currentSelectedBackgroundAlpha * alphaInternal * 255));
-                    currentBackgroundSelectedDrawable.drawCached(canvas, backgroundCacheParams);
+                    drawFlexyBubble(canvas, currentBackgroundSelectedDrawable, null);
                     if (currentBackgroundDrawable.getGradientShader() == null) {
                         currentBackgroundShadowDrawable = null;
                     }
@@ -21341,7 +21525,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                         }
                         currentSelectedBackgroundAlpha = 1f;
                         currentBackgroundSelectedDrawable.setAlpha((int) (255 * alphaInternal));
-                        currentBackgroundSelectedDrawable.drawCached(canvas, backgroundCacheParams);
+                        drawFlexyBubble(canvas, currentBackgroundSelectedDrawable, null);
                         if (currentPosition != null) {
                             canvas.restore();
                         }
@@ -21351,7 +21535,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                         if (NaConfig.INSTANCE.getTranslucentDeletedMessages().Bool() && ayuDeleted && currentMessageObject.isOutOwner()) {
                             currentBackgroundDrawable.setAlpha((int) (255 * 0.75f));
                         }
-                        currentBackgroundDrawable.drawCached(canvas, backgroundCacheParams);
+                        drawFlexyBubble(canvas, currentBackgroundDrawable, null);
                     }
                 }
                 if (currentBackgroundShadowDrawable != null && currentPosition == null) {
@@ -21451,6 +21635,12 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     }
 
     public boolean drawBackgroundInParent() {
+        // RecyclerView can move a cached child RenderNode without calling onDraw.
+        // A wallpaper shader must instead use the native parent pass in both directions.
+        if (canDrawBackgroundInParent && currentMessageObject != null && delegate != null
+                && delegate.hasFlexyBubbleWallpaper()) {
+            return true;
+        }
         if (canDrawBackgroundInParent && currentMessageObject != null && currentMessageObject.isOutOwner()) {
             return getThemedColor(Theme.key_chat_outBubbleGradient1) != 0;
         }
@@ -22674,7 +22864,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             }
             currentBackgroundDrawable.setAlpha((int) (getAlpha() * (shouldTranslucentDeleted() && ayuDeleted ? 255 * 0.75f : 255)));
             currentBackgroundDrawable.setBounds(left, top, right, bottom);
-            currentBackgroundDrawable.drawCached(canvas, backgroundCacheParams);
+            drawFlexyBubble(canvas, currentBackgroundDrawable, null);
             currentBackgroundDrawable.setAlpha(255);
         }
 

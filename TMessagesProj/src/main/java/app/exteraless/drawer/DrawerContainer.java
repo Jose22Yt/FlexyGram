@@ -1057,20 +1057,12 @@ public class DrawerContainer extends FrameLayout implements NotificationCenter.N
         if (Theme.getTheme(nightThemeName) == null || !Theme.getTheme(nightThemeName).isDark()) {
             nightThemeName = "Dark Blue";
         }
-        final Theme.ThemeInfo activeTheme = Theme.getActiveTheme();
-        if (dayThemeName.equals(nightThemeName)) {
-            if (activeTheme.isDark() || dayThemeName.equals("Dark Blue") || dayThemeName.equals("Night")) {
-                dayThemeName = "Blue";
-            } else {
-                nightThemeName = "Dark Blue";
-            }
+        final boolean toDark = !Theme.isCurrentThemeDark();
+        Theme.ThemeInfo themeInfo = Theme.getTheme(toDark ? nightThemeName : dayThemeName);
+        if (themeInfo == null || themeInfo.isDark() != toDark) {
+            themeInfo = Theme.getTheme(toDark ? "Dark Blue" : "Blue");
         }
-
-        final boolean toDark = dayThemeName.equals(activeTheme.getKey());
-        final Theme.ThemeInfo themeInfo = Theme.getTheme(toDark ? nightThemeName : dayThemeName);
-        if (themeInfo == null) {
-            return;
-        }
+        if (themeInfo == null || themeInfo.isDark() != toDark) return;
         DialogsActivity.switchingTheme = true;
         headerView.animateThemeToggle(toDark);
         NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.needSetDayNightTheme,

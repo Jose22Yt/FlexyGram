@@ -11,7 +11,7 @@ permissions:
 
 concurrency:
   group: flexygram-ui-debug-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -49,6 +49,10 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends nasm ninja-build patchelf autoconf automake libtool pkg-config
           python -m pip install pytest==9.2.0 PyYAML==6.0.3 tree-sitter==0.26.0 tree-sitter-java==0.23.5
+          git fetch --no-recurse-submodules --no-tags --depth=1 origin \
+            4679f74ebd312acc4968dd2e044a6c6b7478445a \
+            bf96667efac14d0cbbf6677471890a366c3ef3c0 \
+            3c7a20a229d425c8f3b5ea1740ccb6d8b3361fea
           printf 'toolchainVersion=21\ntoolchainVendor=ADOPTIUM\n' > gradle/gradle-daemon-jvm.properties
           printf 'sdk.dir=%s\n' "$ANDROID_HOME" > local.properties
           echo "CHAQUOPY_BUILD_PYTHON=$(command -v python)" >> "$GITHUB_ENV"
@@ -71,6 +75,15 @@ jobs:
           set -euo pipefail
           mkdir -p build/reports/ui-beta
           python -m pytest tests/ -q -p no:cacheprovider --junitxml=build/reports/ui-beta/tests.xml
+      - name: Rebuild the dependency wheels required by the official beta source
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m venv "$RUNNER_TEMP/beta-wheel-tools"
+          "$RUNNER_TEMP/beta-wheel-tools/bin/python" -m pip install -r TMessagesProj/chaquopy/server/pypi/requirements.txt
+          "$RUNNER_TEMP/beta-wheel-tools/bin/python" tools/connected_alpha/rebuild_python_wheels.py \
+            --chaquopy TMessagesProj/chaquopy --output "$RUNNER_TEMP/beta-wheelhouse"
+          echo "ALPHA_WHEELHOUSE=$RUNNER_TEMP/beta-wheelhouse" >> "$GITHUB_ENV"
       - name: Assemble debug APK with native libraries and Python
         shell: bash
         run: |
@@ -91,6 +104,21 @@ jobs:
             grep -Eq '^lib/arm64-v8a/libchaquopy_java\.so$' build/reports/ui-beta/apk-entries.txt
             sha256sum "$apk" >> build/reports/ui-beta/SHA256SUMS
           done
+      - name: Write build summary
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "### FlexyGram UI beta debug ARM64"
+            echo "Source: $GITHUB_SHA"
+            grep '^APP_PACKAGE=' gradle.properties
+            echo 'Functional base: official beta 932c9a6db84fab52ab167d4c8ee70957b3e57223'
+            if test -f build/reports/ui-beta/assemble.log; then
+              echo '```text'
+              grep -E -A 5 'error:|^e:|FAILED|What went wrong|Could not resolve' build/reports/ui-beta/assemble.log | tail -n 100 || true
+              echo '```'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
       - name: Save build reports
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

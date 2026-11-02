@@ -20,6 +20,12 @@ public final class ChatHeaderUiHelper {
     }
 
     public static boolean isMaterial3ChatHeaderStyle() {
+        // Connected Alpha owns its chat header in FlexyGram. A persisted
+        // Exteraless Material 3 preference must never extend the top fade
+        // or override the Signature/Fusion geometry after the old UI is retired.
+        if (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) {
+            return false;
+        }
         return AppearanceConfig.newChatHeaderStyle();
     }
 

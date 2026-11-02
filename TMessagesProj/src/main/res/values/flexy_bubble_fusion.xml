@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyBubbleFusionMode">Borders and fusion</string>
+    <string name="FlexyBubbleFusionNone">No fusion</string>
+    <string name="FlexyBubbleFusionClassic">Classic fusion</string>
+    <string name="FlexyBubbleFusionIntensity">Fusion intensity</string>
+    <string name="FlexyBubbleFusionAdapt">Adapt fusion to theme</string>
+</resources>

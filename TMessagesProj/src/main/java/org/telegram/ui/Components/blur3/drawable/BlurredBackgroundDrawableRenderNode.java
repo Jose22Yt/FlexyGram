@@ -57,6 +57,11 @@ public class BlurredBackgroundDrawableRenderNode extends BlurredBackgroundDrawab
     public void setLiquidGlassEffectAllowed() {
     }
 
+    /** Compatibility with the live material policy; refraction stays disabled. */
+    @Deprecated
+    public void setLiquidGlassEffectAllowed(boolean allowed) {
+    }
+
     @Override
     public BlurredBackgroundSource getSource() {
         return source;

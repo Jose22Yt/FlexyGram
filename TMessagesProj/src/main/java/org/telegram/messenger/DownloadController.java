@@ -355,6 +355,9 @@ public class DownloadController extends BaseController implements NotificationCe
     }
 
     public void loadAutoDownloadConfig(boolean force) {
+        // This RPC requires a session. An empty slot must not consume a request
+        // or set the daily refresh timestamp before a user has authenticated.
+        if (!getUserConfig().isClientActivated()) return;
         if (loadingAutoDownloadConfig || !force && Math.abs(System.currentTimeMillis() - getUserConfig().autoDownloadConfigLoadTime) < 24 * 60 * 60 * 1000) {
             return;
         }

@@ -1,0 +1,16 @@
+<resources>
+    <string name="FlexyIconNeon">Neón</string>
+    <string name="FlexyIconGlossy">Glossy 3D</string>
+    <string name="FlexyIconCosmic">Cósmico</string>
+    <string name="FlexyIconCyber">Cyber</string>
+    <string name="FlexyIconBlue">Principal Azul</string>
+    <string name="FlexyIconGreen">Verde</string>
+    <string name="FlexyIconCoral">Coral</string>
+    <string name="FlexyIconMono">Mono</string>
+    <string name="FlexyIconBlueprint">Blueprint</string>
+    <string name="FlexyIconNya">Nya</string>
+    <string name="FlexyIconQuack">Quack</string>
+    <string name="FlexyIconGo">Go</string>
+    <string name="FlexyIconLegacy">Exteraless clásico</string>
+    <string name="FlexyIconApplyError">No se pudo cambiar el icono. Tu acceso actual se conserva.</string>
+</resources>

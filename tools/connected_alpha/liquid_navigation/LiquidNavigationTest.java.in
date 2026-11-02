@@ -1,0 +1,55 @@
+/* Actual production layout, settings and AndroidX springs; account/tab-content doubles. */
+import android.app.Activity;
+import android.view.*;
+import android.widget.FrameLayout;
+import java.time.Duration;
+import java.util.*;
+import org.junit.*;
+import org.junit.runner.RunWith;
+import org.robolectric.*;
+import org.robolectric.annotation.*;
+import org.robolectric.util.ReflectionHelpers;
+import org.telegram.ui.MainTabsLayout;
+import org.telegram.ui.Components.glass.GlassTabView;
+import app.flexygram.navigation.*;
+import static org.junit.Assert.*;
+@RunWith(RobolectricTestRunner.class) @Config(manifest=Config.NONE,sdk=35)
+@LooperMode(LooperMode.Mode.PAUSED)
+public class LiquidNavigationTest {
+ Activity a;FrameLayout root;MainTabsLayout bar;ArrayList<GlassTabView> tabs=new ArrayList<>();int clicked;
+ @Before public void setup(){a=Robolectric.buildActivity(Activity.class).setup().get();org.telegram.messenger.ApplicationLoader.applicationContext=a;clear();root=new FrameLayout(a);a.setContentView(root);}
+ void clear(){a.getSharedPreferences("flexy_liquid_navigation",0).edit().clear().commit();ReflectionHelpers.setStaticField(LiquidNavigationConfig.class,"migrated",false);}
+ void create(int count,int width,boolean reverse){
+  root.removeAllViews();tabs.clear();bar=new MainTabsLayout(a,null);bar.setPadding(4,0,4,0);bar.refreshBottomBarAppearance();root.addView(bar,new FrameLayout.LayoutParams(width,60));
+  for(int i=0;i<count;i++){final int id=i;var v=new GlassTabView(a);tabs.add(v);bar.addView(v);bar.setViewVisible(v,true,false);bar.setPriority(v,reverse?-i:i);v.setOnClickListener(w->{clicked=id;bar.setTabSelected(v,true);});}
+  bar.setTabSelected(tabs.get(0),false);layout(width);
+ }
+ void layout(int width){root.measure(View.MeasureSpec.makeMeasureSpec(width,1073741824),View.MeasureSpec.makeMeasureSpec(100,1073741824));root.layout(0,0,width,100);Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(Duration.ofSeconds(2));}
+ @After public void end(){root.removeAllViews();a.finish();}
+ @Test public void twoThroughSixEqualCellsConserveEveryPixelAndNativeClicks(){
+  for(int count=2;count<=6;count++)for(int width:new int[]{320,360,411,640})for(boolean rtl:new boolean[]{false,true}){
+   create(count,width,rtl);var visible=new ArrayList<GlassTabView>(tabs);visible.sort(Comparator.comparingDouble(View::getX));
+   int total=0,min=9999,max=0;float end=bar.getPaddingLeft(),lastCenter=-1,previousGap=-1;
+   for(var v:visible){int w=v.getWidth();total+=w;min=Math.min(min,w);max=Math.max(max,w);assertTrue(w>=48);assertEquals(end,v.getX(),.6);end=v.getX()+w;float center=v.getX()+w*.5f;if(lastCenter>=0){float gap=center-lastCenter;if(previousGap>=0)assertEquals(previousGap,gap,1.1);previousGap=gap;}lastCenter=center;
+    int index=tabs.indexOf(v);assertTrue(v.performClick());Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(Duration.ofSeconds(1));assertEquals(index,clicked);assertTrue(v.isTabSelected());assertEquals(1,bar.getScaleX(),0);assertEquals(1,bar.getScaleY(),0);
+   }
+   assertTrue(max-min<=1);assertEquals(bar.getWidth()-8,total);assertEquals(bar.getWidth()-4,end,.6);
+  }
+ }
+ @Test public void cancelledTouchAndLongHoldCannotNavigateTheSelection(){create(6,360,false);float x=tabs.get(3).getX()+20;long t=android.os.SystemClock.uptimeMillis();for(int action:new int[]{0,3}){MotionEvent e=MotionEvent.obtain(t,t+80,action,x,20,0);bar.dispatchTouchEvent(e);e.recycle();}assertTrue(tabs.get(0).isTabSelected());assertFalse(tabs.get(3).isTabSelected());}
+ @Test public void migrationRetiresOnlyHomeVisualKeysAndAlwaysReturnsDefaults(){
+  var prefs=a.getSharedPreferences("flexy_liquid_navigation",0);
+  prefs.edit().putString("destinations","8,7,6,5,4,3,2,1,0").putBoolean("labels",false).putInt("height",100).putString("unrelated","keep").commit();
+  LiquidNavigationConfig.load();assertArrayEquals(LiquidNavigationDestinations.defaults(),LiquidNavigationConfig.order());
+  assertTrue(LiquidNavigationConfig.labels());assertTrue(LiquidNavigationConfig.animation());
+  assertEquals(60,LiquidNavigationConfig.heightDp());assertFalse(prefs.contains("height"));assertFalse(prefs.contains("destinations"));assertEquals("keep",prefs.getString("unrelated",null));
+  ReflectionHelpers.setStaticField(LiquidNavigationConfig.class,"migrated",false);LiquidNavigationConfig.load();assertEquals(60,LiquidNavigationConfig.heightDp());
+ }
+ @Test public void activeSanitizeNeverExceedsSixAndAlwaysContainsChats(){for(int n=0;n<18;n++){int[] input=new int[n];for(int i=0;i<n;i++)input[i]=8-i%9;int[] ids=LiquidNavigationDestinations.sanitize(input);assertTrue(ids.length>=2&&ids.length<=6);assertTrue(LiquidNavigationDestinations.contains(ids,0));assertArrayEquals(ids,LiquidNavigationDestinations.sanitize(ids));}}
+ @Test public void narrowOverflowRetainsNativeMinimumTargetWidths(){assertArrayEquals(new int[]{0,1,9},LiquidNavigationConfig.shown(3));assertEquals(LiquidNavigationDestinations.defaults().length,LiquidNavigationConfig.shown(100).length);}
+ @Test public void nativeHostVisibilityIsEnabledAtTerminalFactor(){create(4,360,false);var p=new NativeTabsVisibilityProbe(bar,root);p.apply(1);assertTrue(bar.isEnabled());p.apply(0);assertFalse(bar.isEnabled());}
+ @Test public void fixedDimensionsIgnoreReintroducedStaleKeys(){
+  a.getSharedPreferences("flexy_liquid_navigation",0).edit().putInt("height",100).putInt("side_gap",100).putBoolean("bottom_animation",false).commit();
+  assertEquals(60,LiquidNavigationConfig.heightDp());assertEquals(10,LiquidNavigationConfig.sideGapDp());assertTrue(LiquidNavigationConfig.animation());
+ }
+}

@@ -1,0 +1,34 @@
+diff --git a/TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java b/TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java
+index bccb9dc2e..20a62a435 100644
+--- a/TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java
++++ b/TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java
+@@ -2027,6 +2027,11 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
+ 
+     @Override
+     public void onBackPressed() {
++        if (finishClosingPreview()) return;
++        if (transitionAnimationPreviewMode) {
++            finishPreviewFragment();
++            return;
++        }
+         if (transitionAnimationPreviewMode || startedTracking || checkTransitionAnimation() || fragmentsStack.isEmpty()) {
+             return;
+         }
+@@ -3098,7 +3103,17 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
+         closeLastFragment(animated, false);
+     }
+ 
++    /** A second close consumes the same preview transition, never the fragment underneath. */
++    private boolean finishClosingPreview() {
++        if (inPreviewMode && transitionAnimationInProgress && onCloseAnimationEndRunnable != null) {
++            onAnimationEndCheck(true);
++            return true;
++        }
++        return false;
++    }
++
+     public void closeLastFragment(boolean animated, boolean forceNoAnimation) {
++        if (finishClosingPreview()) return;
+         BaseFragment fragment = getLastFragment();
+         if (fragment != null && fragment.closeLastFragment()) {
+             return;

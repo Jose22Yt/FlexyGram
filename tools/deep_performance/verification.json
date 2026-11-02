@@ -1,0 +1,63 @@
+{
+  "baseline_sha": "cd2af16c8271e52738f0c4e726cf59862c637087",
+  "status": "PASS_AVAILABLE_CHECKS_NOT_DEVICE_ACCEPTANCE",
+  "commands": [
+    {
+      "command": "python3 tools/connected_alpha/run_checks.py",
+      "status": "PASS",
+      "unittest_methods": 373,
+      "unittest_failures": 0,
+      "pytest_passed": 144,
+      "pytest_skipped": 31,
+      "skip_reasons": [
+        "External plugin corpus unavailable",
+        "No full-release R8 usage report"
+      ]
+    },
+    {
+      "command": "python3 tools/connected_alpha/bubble_visual/run.py --sdk-root <API37 SDK> --maven <Maven3.9.12>",
+      "status": "PASS",
+      "tests": 47,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "native_graphics_sdk": 35,
+      "compiled_platform": 37,
+      "doubles": [
+        "theme",
+        "services",
+        "blur source delivery"
+      ],
+      "full_app": false
+    },
+    {
+      "command": "python3 tools/performance_p0/run_checks.py --android-jar <API37 android.jar>",
+      "status": "PASS_ISOLATED_NOT_FULL_APP"
+    },
+    {
+      "command": "python3 tools/identity/check_identity.py",
+      "status": "PASS_SOURCE_ONLY"
+    },
+    {
+      "command": "python3 tools/performance_p0/check_wiring.py",
+      "status": "PASS"
+    },
+    {
+      "command": "git diff --check",
+      "status": "PASS"
+    }
+  ],
+  "production_sha256": {
+    "TMessagesProj/src/main/java/app/flexygram/bubbles/SignatureBorderPath.java": "f6487dc7861728257fcf80844b12b4feaf89d33f59e40ebbfe7191f2df24c21a",
+    "TMessagesProj/src/main/java/app/flexygram/composer/ComposerSliderTrack.java": "b50189eda58fc9cda19c2b6e4c369e3e9ea6a6ddfe0d8641dc6a0d2e77d36e1a",
+    "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java": "7313e5188ce43e2eb836d49aea7fa8b0fba6f2d8033db394dd0a5efc21a46e8b",
+    "TMessagesProj/src/main/java/org/telegram/ui/ActionBar/MessageDrawable.java": "f8d1ddce4cb04f625dfa52414768b38e12c21ec492d7ca780a85788034ee9d3d",
+    "TMessagesProj/src/main/java/org/telegram/ui/Components/glass/GlassTabView.java": "bff905e38b84d2e513d16d23c7f8bca7be4d1537dd8664b7ded9b48a21627c01"
+  },
+  "baseline_method_comparison": "PASS_REAL_BASELINE_SOURCE_WITH_HOST_DOUBLES_AND_NATIVE_GRAPHICS_ISOLATION",
+  "full_apk_arm64": "NOT_RUN",
+  "jni_16kb_new_apk": "NOT_RUN_NO_NEW_APK",
+  "device_performance": "NOT_MEASURED",
+  "github_ci": "NOT_TRIGGERED_SKIP_CI_NO_APK",
+  "physical_metrics": "device-baseline.json"
+}

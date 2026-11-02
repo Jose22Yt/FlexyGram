@@ -14,6 +14,7 @@ import android.widget.EditText;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.BuildConfig;
+import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.PushListenerController;
@@ -47,10 +48,12 @@ public class NekoXConfig {
     public static String customAppHash = preferences.getString("custom_app_hash", "");
 
     public static int currentAppId() {
+        if (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) return BuildVars.APP_ID;
         return customApi == API_TYPE_CUSTOM ? customAppId : BuildConfig.APP_ID;
     }
 
     public static String currentAppHash() {
+        if (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) return BuildVars.APP_HASH;
         return customApi == API_TYPE_CUSTOM ? customAppHash : BuildConfig.APP_HASH;
     }
 

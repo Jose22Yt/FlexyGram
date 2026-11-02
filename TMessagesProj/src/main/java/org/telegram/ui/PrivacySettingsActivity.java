@@ -827,7 +827,7 @@ public class PrivacySettingsActivity extends BaseFragment implements Notificatio
         contactsDeleteRow = rowCount++;
         contactsSyncRow = rowCount++;
         contactsSuggestRow = rowCount++;
-        disableSystemAccountRow = rowCount++;
+        disableSystemAccountRow = org.telegram.messenger.BuildConfig.CONNECTED_ALPHA ? -1 : rowCount++; // Canonical additional control: FlexyGram → Advanced.
         contactsDetailRow = rowCount++;
         secretSectionRow = rowCount++;
         secretMapRow = rowCount++;

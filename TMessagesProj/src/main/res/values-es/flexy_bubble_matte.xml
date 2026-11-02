@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyBubbleMatteEnabled">Acabado mate de las burbujas</string>
+    <string name="FlexyBubbleMatteStrength">Intensidad del efecto mate</string>
+</resources>

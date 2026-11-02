@@ -46,11 +46,11 @@ public class AppIconHeroView extends LinearLayout {
         AnimatedTextView view = new AnimatedTextView(getContext(), true, true, false);
         view.setGravity(Gravity.CENTER);
         view.setTypeface(bold ? AndroidUtilities.bold() : null);
-        view.setTextSize(AndroidUtilities.dp(sizeDp));
+        view.setTextSize(AndroidUtilities.dp(sizeDp) * getResources().getConfiguration().fontScale);
         view.setIncludeFontPadding(false);
         view.setAllowCancel(true);
         view.setAnimationProperties(0.35f, 0, 260, CubicBezierInterpolator.EASE_OUT_QUINT);
-        addView(view, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, heightDp, Gravity.CENTER_HORIZONTAL, 24, topDp, 24, 0));
+        addView(view, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, Math.round(heightDp * getResources().getConfiguration().fontScale), Gravity.CENTER_HORIZONTAL, 24, topDp, 24, 0));
         return view;
     }
 
@@ -86,7 +86,7 @@ public class AppIconHeroView extends LinearLayout {
     }
 
     public int getTextBlockHeight() {
-        return AndroidUtilities.dp(subtitle != null ? 46 + 26 : 46);
+        return Math.round(AndroidUtilities.dp(subtitle != null ? 46 + 26 : 46) * getResources().getConfiguration().fontScale);
     }
 
     public float previewCenterY() {

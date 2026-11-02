@@ -31,6 +31,44 @@ import java.util.Arrays;
 
 public class MessageDrawable extends Drawable {
 
+    public interface GlassSource {
+        boolean draw(Canvas canvas, Path path);
+        // Older embedders retain their native tint fallback during partial-alpha transitions.
+        default boolean draw(Canvas canvas, Path path, int alpha) { return alpha == 255 && draw(canvas, path); }
+    }
+    private GlassSource flexyGlassSource;
+    private final Paint flexyFillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint flexyBorderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final app.flexygram.bubbles.SignatureBorderPath signatureBorderPath = new app.flexygram.bubbles.SignatureBorderPath();
+    /** Kept for old preview callers; skins no longer alter the native geometry or finish. */
+    public void setFlexySkinPreview(int skin) { }
+    private final app.flexygram.bubbles.BubbleFusion bubbleFusion=new app.flexygram.bubbles.BubbleFusion();
+    private int outlineBase, outlineMode = -1, outlineIntensity = -1, outlineColor;
+    private int signatureOutline(int base) {
+        int mode = app.flexygram.bubbles.BubbleConfig.outlineStyle();
+        int intensity = app.flexygram.bubbles.BubbleConfig.pearlIntensity();
+        if (outlineBase != base || outlineMode != mode || outlineIntensity != intensity) {
+            outlineBase = base; outlineMode = mode; outlineIntensity = intensity;
+            outlineColor = app.flexygram.bubbles.BubbleOutline.color(base,
+                    (Color.red(base) * 299 + Color.green(base) * 587 + Color.blue(base) * 114) < 128000, mode, intensity);
+        }
+        return outlineColor;
+    }
+    public void setFlexyGlassSource(GlassSource source) { flexyGlassSource = source; }
+    private boolean flexySurface() {
+        return currentType != TYPE_PREVIEW && app.flexygram.bubbles.BubbleStyle.signature();
+    }
+    private int bubbleRadius() {
+        return app.flexygram.bubbles.BubbleStyle.signature() ? 20 : SharedConfig.bubbleRadius;
+    }
+    private int signatureColor() {
+        if (overrideColor != null) return overrideColor;
+        // Theme is the sole palette owner, including installed and per-chat themes.
+        return getColor(isOut
+                ? (isSelected ? Theme.key_chat_outBubbleSelected : Theme.key_chat_outBubble)
+                : (isSelected ? Theme.key_chat_inBubbleSelected : Theme.key_chat_inBubble));
+    }
+
     private Shader gradientShader;
     private int currentBackgroundHeight;
     public Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -332,7 +370,7 @@ public class MessageDrawable extends Drawable {
         } else if (overrideRounding > 0) {
             newRad = 0;
         } else {
-            newRad = dp(SharedConfig.bubbleRadius);
+            newRad = dp(bubbleRadius());
         }
         int idx;
         if (isTopNear && isBottomNear) {
@@ -453,7 +491,7 @@ public class MessageDrawable extends Drawable {
         if (gradientShader == null && !isSelected && crossfadeFromDrawable == null) {
             return null;
         }
-        int newRad = dp(SharedConfig.bubbleRadius);
+        int newRad = dp(bubbleRadius());
         int idx;
         if (isTopNear && isBottomNear) {
             idx = 3;
@@ -561,7 +599,7 @@ public class MessageDrawable extends Drawable {
 
     public void draw(Canvas canvas, Paint paintToUse) {
         Rect bounds = getBounds();
-        if (!oeRemoveMessageTail() && paintToUse == null && paint.getStyle() == Paint.Style.FILL && gradientShader == null && overrideRoundRadius == 0 && overrideRounding <= 0) {
+        if (!flexySurface() && !oeRemoveMessageTail() && paintToUse == null && paint.getStyle() == Paint.Style.FILL && gradientShader == null && overrideRoundRadius == 0 && overrideRounding <= 0) {
             Drawable background = getBackgroundDrawable();
             if (background != null) {
                 background.setBounds(bounds);
@@ -577,14 +615,14 @@ public class MessageDrawable extends Drawable {
             rad = overrideRoundRadius;
             nearRad = overrideRoundRadius;
         } else if (overrideRounding > 0) {
-            rad = AndroidUtilities.lerp(dp(SharedConfig.bubbleRadius), Math.min(bounds.width(), bounds.height()) / 2, overrideRounding);
-            nearRad = AndroidUtilities.lerp(dp(Math.min(6, SharedConfig.bubbleRadius)), Math.min(bounds.width(), bounds.height()) / 2, overrideRounding);
+            rad = AndroidUtilities.lerp(dp(bubbleRadius()), Math.min(bounds.width(), bounds.height()) / 2, overrideRounding);
+            nearRad = AndroidUtilities.lerp(dp(Math.min(6, bubbleRadius())), Math.min(bounds.width(), bounds.height()) / 2, overrideRounding);
         } else if (currentType == TYPE_PREVIEW) {
             rad = dp(6);
             nearRad = dp(6);
         } else {
-            rad = dp(SharedConfig.bubbleRadius);
-            nearRad = dp(Math.min(6, SharedConfig.bubbleRadius));
+            rad = dp(bubbleRadius());
+            nearRad = dp(Math.min(6, bubbleRadius()));
         }
         int smallRad = dp(6);
 
@@ -610,16 +648,76 @@ public class MessageDrawable extends Drawable {
         boolean invalidatePath;
         if (pathDrawCacheParams != null) {
             path = pathDrawCacheParams.path;
-            invalidatePath = pathDrawCacheParams.invalidatePath(bounds, drawFullBottom, drawFullTop);
+            invalidatePath = pathDrawCacheParams.invalidatePath(bounds, drawFullBottom, drawFullTop)
+                | pathDrawCacheParams.invalidateShape(rad, nearRad, smallRad, padding, currentType, isTopNear, isBottomNear, botButtonsBottom, drawFullBubble, isOut, paintToUse != null);
         } else {
             path = this.path;
             invalidatePath = true;
         }
         if (invalidatePath || overrideRoundRadius != 0) {
+            if (pathDrawCacheParams != null) pathDrawCacheParams.invalidateSignatureBorder();
             generatePath(path, bounds, padding, rad, smallRad, nearRad, top, drawFullBottom, drawFullTop, paintToUse != null);
         }
 
-        canvas.drawPath(path, p);
+        if (paintToUse == null && flexySurface()) {
+            // Stable theme color, independent of wallpaper/blur availability and animation phase.
+            // Instance paints and the native geometry cache are reused for every draw.
+            int color = signatureColor();
+            if (alpha > 0 && app.flexygram.bubbles.BubbleConfig.backgroundBlur() && flexyGlassSource != null) {
+                // The native bridge carries drawable alpha; message transitions sample the same cache.
+                flexyGlassSource.draw(canvas, path, alpha);
+            }
+            flexyFillPaint.setColor(color);
+            // Reuse Telegram's cached gradient and matrix; no new shader per frame.
+            flexyFillPaint.setShader(p.getShader());
+            flexyFillPaint.setAlpha(Math.round(alpha * app.flexygram.bubbles.BubbleStyle.tintAlpha(
+                app.flexygram.bubbles.BubbleConfig.transparency()) / 255f));
+            canvas.drawPath(path, flexyFillPaint);
+            if (app.flexygram.bubbles.BubbleConfig.outlineEnabled()) {
+                flexyBorderPaint.setStyle(Paint.Style.STROKE);
+                // Keep the contour inside Telegram's unchanged message silhouette.
+                flexyBorderPaint.setStrokeWidth(2f * AndroidUtilities.density * app.flexygram.bubbles.BubbleConfig.borderDp()
+                        );
+                int contourBase = isOut && p.getShader() != null
+                        ? app.flexygram.bubbles.BubbleOutline.palette(color, currentGradientColor1, currentGradientColor2, currentGradientColor3) : color;
+                int contour = signatureOutline(contourBase);
+                flexyBorderPaint.setColor(ColorUtils.setAlphaComponent(contour, Math.round(Color.alpha(contour) * alpha / 255f)));
+                canvas.save();
+                canvas.clipPath(path);
+                int borderPosition = app.flexygram.bubbles.BubbleConfig.borderPosition();
+                // MessageDrawable is shared across rows. Partial contours belong
+                // to the existing per-cell native path cache, not the last row drawn.
+                app.flexygram.bubbles.SignatureBorderPath borderCache = borderPosition == 5 ? null
+                        : pathDrawCacheParams == null ? signatureBorderPath : pathDrawCacheParams.signatureBorder();
+                Path contourPath = borderCache == null ? path : borderCache.get(path, borderPosition,
+                        bounds, rad, nearRad, smallRad, padding, currentType,
+                        (isTopNear ? 1 : 0) | (isBottomNear ? 2 : 0) | (botButtonsBottom ? 4 : 0)
+                                | (drawFullBubble ? 8 : 0) | (isOut ? 16 : 0)
+                                | (drawFullTop ? 32 : 0) | (drawFullBottom ? 64 : 0), top);
+                flexyBorderPaint.setShader(borderCache == null ? null : borderCache.fade(contour));
+                flexyBorderPaint.setStrokeCap(Paint.Cap.ROUND);
+                flexyBorderPaint.setStrokeJoin(Paint.Join.ROUND);
+                float stroke = flexyBorderPaint.getStrokeWidth();
+                int edgeColor = flexyBorderPaint.getColor();
+                if(app.flexygram.bubbles.BubbleConfig.fusionMode()==2){
+                    bubbleFusion.draw(canvas,contourPath,flexyBorderPaint,stroke,edgeColor,contourBase,
+                            app.flexygram.bubbles.BubbleConfig.fusionIntensity(),app.flexygram.bubbles.BubbleConfig.fusionAdapt());
+                } else if (app.flexygram.bubbles.BubbleConfig.fuseGlass() && app.flexygram.bubbles.BubbleConfig.outlineStyle() != 0) {
+                    flexyBorderPaint.setStrokeWidth(stroke * 3f);
+                    flexyBorderPaint.setColor(ColorUtils.setAlphaComponent(edgeColor, Math.round(Color.alpha(edgeColor) * .12f)));
+                    canvas.drawPath(contourPath, flexyBorderPaint);
+                    flexyBorderPaint.setStrokeWidth(stroke * 2f);
+                    flexyBorderPaint.setColor(ColorUtils.setAlphaComponent(edgeColor, Math.round(Color.alpha(edgeColor) * .26f)));
+                    canvas.drawPath(contourPath, flexyBorderPaint);
+                }
+                flexyBorderPaint.setStrokeWidth(stroke);
+                flexyBorderPaint.setColor(edgeColor);
+                canvas.drawPath(contourPath, flexyBorderPaint);
+                canvas.restore();
+            }
+        } else {
+            canvas.drawPath(path, p);
+        }
         if (gradientShader != null && isSelected && paintToUse == null) {
             int color = getColor(Theme.key_chat_outBubbleGradientSelectedOverlay);
             selectedPaint.setColor(ColorUtils.setAlphaComponent(color, (int) (Color.alpha(color) * alpha / 255f)));
@@ -640,14 +738,14 @@ public class MessageDrawable extends Drawable {
             rad = overrideRoundRadius;
             nearRad = overrideRoundRadius;
         } else if (overrideRounding > 0) {
-            rad = AndroidUtilities.lerp(dp(SharedConfig.bubbleRadius), Math.min(bounds.width(), bounds.height()) / 2, overrideRounding);
-            nearRad = AndroidUtilities.lerp(dp(Math.min(6, SharedConfig.bubbleRadius)), Math.min(bounds.width(), bounds.height()) / 2, overrideRounding);
+            rad = AndroidUtilities.lerp(dp(bubbleRadius()), Math.min(bounds.width(), bounds.height()) / 2, overrideRounding);
+            nearRad = AndroidUtilities.lerp(dp(Math.min(6, bubbleRadius())), Math.min(bounds.width(), bounds.height()) / 2, overrideRounding);
         } else if (currentType == TYPE_PREVIEW) {
             rad = dp(6);
             nearRad = dp(6);
         } else {
-            rad = dp(SharedConfig.bubbleRadius);
-            nearRad = dp(Math.min(6, SharedConfig.bubbleRadius));
+            rad = dp(bubbleRadius());
+            nearRad = dp(Math.min(6, bubbleRadius()));
         }
         int smallRad = dp(6);
         int top = Math.max(bounds.top, 0);
@@ -663,15 +761,27 @@ public class MessageDrawable extends Drawable {
         boolean invalidatePath;
         if (pathDrawCacheParams != null) {
             path = pathDrawCacheParams.path;
-            invalidatePath = pathDrawCacheParams.invalidatePath(bounds, drawFullBottom, drawFullTop);
+            invalidatePath = pathDrawCacheParams.invalidatePath(bounds, drawFullBottom, drawFullTop)
+                | pathDrawCacheParams.invalidateShape(rad, nearRad, smallRad, padding, currentType, isTopNear, isBottomNear, botButtonsBottom, drawFullBubble, isOut, true);
         } else {
             path = this.path;
             invalidatePath = true;
         }
         if (invalidatePath || overrideRoundRadius != 0) {
+            if (pathDrawCacheParams != null) pathDrawCacheParams.invalidateSignatureBorder();
             generatePath(path, bounds, padding, rad, smallRad, nearRad, top, drawFullBottom, drawFullTop, true);
         }
         return path;
+    }
+
+    /** Mirrored cubic contour: vertical tangent, rounded short tip and continuous return to body. */
+    private void appendSignatureTail(Path path, float edge, float bottom, float direction) {
+        float d = AndroidUtilities.density, x = direction * d;
+        path.lineTo(edge, bottom - 14 * d);
+        path.cubicTo(edge, bottom - 8 * d, edge + .6f * x, bottom - 4 * d, edge + 3 * x, bottom - 2 * d);
+        path.cubicTo(edge + 3.6f * x, bottom - 1.5f * d, edge + 3.4f * x, bottom - .5f * d, edge + 2.6f * x, bottom - .5f * d);
+        path.cubicTo(edge + 1.2f * x, bottom - .5f * d, edge - x, bottom - 3 * d, edge - 3 * x, bottom - 3 * d);
+        path.cubicTo(edge - 6 * x, bottom - 3 * d, edge - 9 * x, bottom, edge - 14 * x, bottom);
     }
 
     private void generatePath(Path path, Rect bounds, int padding, int rad, int smallRad, int nearRad, int top, boolean drawFullBottom, boolean drawFullTop, boolean customPaint) {
@@ -688,7 +798,7 @@ public class MessageDrawable extends Drawable {
                 if (currentType == TYPE_MEDIA || oeNoTail) {
                     path.moveTo(bounds.right - dp(8) - radToUse, bounds.bottom - padding);
                 } else {
-                    path.moveTo(bounds.right - dp(2.6f), bounds.bottom - padding);
+                    path.moveTo(bounds.right - dp(flexySurface() ? 22f : 2.6f), bounds.bottom - padding);
                 }
                 path.lineTo(bounds.left + padding + radToUse, bounds.bottom - padding);
                 rect.set(bounds.left + padding, bounds.bottom - padding - radToUse * 2, bounds.left + padding + radToUse * 2, bounds.bottom - padding);
@@ -743,9 +853,13 @@ public class MessageDrawable extends Drawable {
                         rect.set(bounds.right - dp(8) - radToUse * 2, bounds.bottom - padding - radToUse * 2, bounds.right - dp(8), bounds.bottom - padding);
                         path.arcTo(rect, 0, 90, false);
                     } else {
+                        if (flexySurface()) {
+                            appendSignatureTail(path, bounds.right - dp(8), bounds.bottom - padding, 1);
+                        } else {
                     path.lineTo(bounds.right - dp(8), bounds.bottom - padding - smallRad - dp(3));
                     rect.set(bounds.right - dp(8), bounds.bottom - padding - smallRad * 2 - dp(9), bounds.right - dp(7) + smallRad * 2, bounds.bottom - padding - dp(1));
                     path.arcTo(rect, 180, -83, false);
+                        }
                     }
                 } else {
                     path.lineTo(bounds.right - dp(8), top - topY + currentBackgroundHeight);
@@ -758,7 +872,7 @@ public class MessageDrawable extends Drawable {
                 if (currentType == TYPE_MEDIA || oeNoTail) {
                     path.moveTo(bounds.left + dp(8) + radToUse, bounds.bottom - padding);
                 } else {
-                    path.moveTo(bounds.left + dp(2.6f), bounds.bottom - padding);
+                    path.moveTo(bounds.left + dp(flexySurface() ? 22f : 2.6f), bounds.bottom - padding);
                 }
                 path.lineTo(bounds.right - padding - radToUse, bounds.bottom - padding);
                 rect.set(bounds.right - padding - radToUse * 2, bounds.bottom - padding - radToUse * 2, bounds.right - padding, bounds.bottom - padding);
@@ -807,9 +921,13 @@ public class MessageDrawable extends Drawable {
                         rect.set(bounds.left + dp(8), bounds.bottom - padding - radToUse * 2, bounds.left + dp(8) + radToUse * 2, bounds.bottom - padding);
                         path.arcTo(rect, 180, -90, false);
                     } else {
+                        if (flexySurface()) {
+                            appendSignatureTail(path, bounds.left + dp(8), bounds.bottom - padding, -1);
+                        } else {
                     path.lineTo(bounds.left + dp(8), bounds.bottom - padding - smallRad - dp(3));
                     rect.set(bounds.left + dp(7) - smallRad * 2, bounds.bottom - padding - smallRad * 2 - dp(9), bounds.left + dp(8), bounds.bottom - padding - dp(1));
                     path.arcTo(rect, 0, 83, false);
+                        }
                     }
                 } else {
                     path.lineTo(bounds.left + dp(8), top - topY + currentBackgroundHeight);
@@ -877,6 +995,7 @@ public class MessageDrawable extends Drawable {
 
     /** openExtera: убрать «хвостик» пузыря сообщения (ChatsConfig.removeMessageTail). */
     private static boolean oeRemoveMessageTail() {
+        if (app.flexygram.bubbles.BubbleStyle.signature()) return false;
         try {
             app.exteraless.chats.ChatsConfig.ensureLoaded();
             return app.exteraless.chats.ChatsConfig.removeMessageTail.Bool();
@@ -887,6 +1006,16 @@ public class MessageDrawable extends Drawable {
 
     public static class PathDrawParams {
         Path path = new Path();
+        // Lazily allocated only for partial Signature borders; recycled with this
+        // cell's native path. No bitmap, message reference or global size cache.
+        private app.flexygram.bubbles.SignatureBorderPath signatureBorder;
+        private app.flexygram.bubbles.SignatureBorderPath signatureBorder() {
+            if (signatureBorder == null) signatureBorder = new app.flexygram.bubbles.SignatureBorderPath();
+            return signatureBorder;
+        }
+        private void invalidateSignatureBorder() {
+            if (signatureBorder != null) signatureBorder.invalidate();
+        }
         Rect lastRect = new Rect();
         boolean lastDrawFullTop;
         boolean lastDrawFullBottom;
@@ -901,6 +1030,19 @@ public class MessageDrawable extends Drawable {
             lastDrawFullBottom = drawFullBottom;
             lastRect.set(bounds);
             return invalidate;
+        }
+
+        private int lastRad = -1, lastNearRad, lastSmallRad, lastPadding, lastType;
+        private boolean lastTopNear, lastBottomNear, lastBotButtons, lastFull, lastOut, lastCustom;
+        boolean invalidateShape(int rad, int nearRad, int smallRad, int padding, int type,
+                boolean topNear, boolean bottomNear, boolean botButtons, boolean full, boolean out, boolean custom) {
+            boolean changed = lastRad != rad || lastNearRad != nearRad || lastSmallRad != smallRad
+                || lastPadding != padding || lastType != type || lastTopNear != topNear
+                || lastBottomNear != bottomNear || lastBotButtons != botButtons || lastFull != full || lastOut != out || lastCustom != custom;
+            lastRad = rad; lastNearRad = nearRad; lastSmallRad = smallRad; lastPadding = padding;
+            lastType = type; lastTopNear = topNear; lastBottomNear = bottomNear;
+            lastBotButtons = botButtons; lastFull = full; lastOut = out; lastCustom = custom;
+            return changed;
         }
 
         public Path getPath() {

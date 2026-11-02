@@ -1,0 +1,105 @@
+package app.flexygram.bubbles;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+import org.telegram.messenger.ApplicationLoader;
+
+/** UI-thread snapshot: no preference reads or allocations during native bubble drawing. */
+public final class BubbleConfig {
+    public static final String FILE = "flexygram_bubbles";
+    public static final String GLASS = "glass", TRANSPARENCY = "transparency", BORDER = "border", EDGES = "edges";
+    private static boolean loaded, glass, border, edges, cachedBlur;
+    private static int transparency = 35, borderTenths = 11, outlineStyle = 1, pearlIntensity = 55, borderPosition = 5;
+    private static boolean outlineEnabled = true, fuseGlass, fusionAdapt=true;
+    private static int fusionMode,fusionIntensity=60;
+    private BubbleConfig() { }
+    private static SharedPreferences preferences() {
+        return ApplicationLoader.applicationContext.getSharedPreferences(FILE, Context.MODE_PRIVATE);
+    }
+    public static void load() {
+        SharedPreferences p = preferences();
+        outlineEnabled = p.getBoolean("signature_outline_enabled", true);
+        outlineStyle = Math.max(0, Math.min(3, p.getInt("signature_outline_style", 1)));
+        int storedPosition = p.getInt("signature_border_position", 5);
+        outlineEnabled = outlineEnabled && storedPosition != 0;
+        borderPosition = storedPosition == 0 ? 5 : Math.max(1, Math.min(5, storedPosition));
+        fuseGlass = p.getBoolean("signature_fuse_glass", false);
+        fusionMode=Math.max(0,Math.min(2,p.getInt("signature_fusion_mode",fuseGlass?1:0)));
+        fusionIntensity=Math.max(0,Math.min(100,p.getInt("signature_fusion_intensity",60)));
+        fusionAdapt=p.getBoolean("signature_fusion_adapt",true);
+        pearlIntensity = Math.max(0, Math.min(100, p.getInt("signature_pearl_intensity", 55)));
+        // Retired signature_skin preferences remain stored and have no rendering effect.
+        cachedBlur = p.getBoolean("signature_cached_blur", false);
+        // Retired Matte and Bubble Glass preferences have no rendering effect.
+        borderTenths = Math.max(5, Math.min(20, p.getInt("signature_border_tenths", 11)));
+        glass = p.getBoolean(GLASS, false); border = p.getBoolean(BORDER, false);
+        edges = p.getBoolean(EDGES, false); transparency = BubbleStyle.transparency(p.getInt(TRANSPARENCY, 35)); loaded = true;
+    }
+    public static boolean glass() { return loaded && glass; }
+    public static boolean border() { return loaded && border; }
+    public static boolean edges() { return loaded && edges; }
+    public static boolean backgroundBlur() { return cachedBlur; }
+    /** Renderer compatibility only: saved matte flags can never tint a bubble again. */
+    @Deprecated public static boolean matteEnabled() { return false; }
+    @Deprecated public static int matteStrength() { return 0; }
+    @Deprecated public static void setMatteEnabled(boolean ignored) { }
+    @Deprecated public static void setMatteStrength(int ignored) { }
+    public static void setBackgroundBlur(boolean value) {
+        if (!loaded) load();
+        if (cachedBlur == value) return;
+        cachedBlur = value;
+        preferences().edit().putBoolean("signature_cached_blur", value).apply();
+    }
+    public static boolean outlineEnabled() { return outlineEnabled; }
+    public static int outlineStyle() { return outlineStyle; }
+    public static int pearlIntensity() { return pearlIntensity; }
+    public static int skin() { return 0; }
+    public static void setSkin(int value) { }
+    public static int borderPosition() { return borderPosition; }
+    public static void setBorderPosition(int value) {
+        if (!loaded) load();
+        if (value <= 0) { setOutlineEnabled(false); return; } // Legacy "none" callers remain compatible.
+        value = Math.max(1, Math.min(5, value));
+        if (borderPosition == value && outlineEnabled) return;
+        borderPosition = value; outlineEnabled = true;
+        preferences().edit().putInt("signature_border_position", value).putBoolean("signature_outline_enabled", true).apply();
+    }
+    public static int fusionMode(){return fusionMode;}
+    public static int fusionIntensity(){return fusionIntensity;}
+    public static boolean fusionAdapt(){return fusionAdapt;}
+    public static void setFusionMode(int mode){if(!loaded)load();fusionMode=Math.max(0,Math.min(2,mode));fuseGlass=fusionMode==1;preferences().edit().putInt("signature_fusion_mode",fusionMode).putBoolean("signature_fuse_glass",fuseGlass).apply();}
+    public static void setFusionIntensity(int value){if(!loaded)load();fusionIntensity=Math.max(0,Math.min(100,value));preferences().edit().putInt("signature_fusion_intensity",fusionIntensity).apply();}
+    public static void setFusionAdapt(boolean value){if(!loaded)load();fusionAdapt=value;preferences().edit().putBoolean("signature_fusion_adapt",value).apply();}
+    public static boolean fuseGlass() { return fusionMode==1; }
+    public static void setFuseGlass(boolean value) {
+        if (!loaded) load(); if ((value?1:0) == fusionMode) return;
+        setFusionMode(value?1:0);
+    }
+    public static void setOutlineEnabled(boolean value) { if (!loaded) load(); outlineEnabled = value; preferences().edit().putBoolean("signature_outline_enabled", value).putInt("signature_border_position", borderPosition).apply(); }
+    public static void setOutlineStyle(int value) { if (!loaded) load(); outlineStyle = Math.max(0, Math.min(3, value)); preferences().edit().putInt("signature_outline_style", outlineStyle).apply(); }
+    public static void setPearlIntensity(int value) { if (!loaded) load(); value = Math.max(0, Math.min(100, value)); if (value == pearlIntensity) return; pearlIntensity = value; preferences().edit().putInt("signature_pearl_intensity", value).apply(); }
+    public static int transparency() { return transparency; }
+    public static int borderTenths() { return borderTenths; }
+    public static float borderDp() { return borderTenths / 10f; }
+    public static void setBorderTenths(int value) {
+        if (!loaded) load();
+        value = Math.max(5, Math.min(20, value));
+        if (borderTenths == value) return;
+        borderTenths = value;
+        preferences().edit().putInt("signature_border_tenths", value).apply();
+    }
+    public static void setGlass(boolean value) {
+        if (!loaded) load(); glass = value; preferences().edit().putBoolean(GLASS, value).apply();
+    }
+    public static void setBorder(boolean value) {
+        if (!loaded) load(); border = value; preferences().edit().putBoolean(BORDER, value).apply();
+    }
+    public static void setEdges(boolean value) {
+        if (!loaded) load(); edges = value; preferences().edit().putBoolean(EDGES, value).apply();
+    }
+    public static void setTransparency(int value) {
+        if (!loaded) load(); value = BubbleStyle.transparency(value);
+        if (transparency == value) return;
+        transparency = value; preferences().edit().putInt(TRANSPARENCY, value).apply();
+    }
+}

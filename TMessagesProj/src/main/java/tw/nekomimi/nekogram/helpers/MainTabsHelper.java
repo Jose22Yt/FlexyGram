@@ -25,23 +25,16 @@ public final class MainTabsHelper {
     }
 
     public static int getMainTabsHeight() {
-        if (isMainTabsHideTitleStyle()) {
-            return AppearanceConfig.compactNavigation.Bool() ? 48 : FILTER_TABS_HEIGHT;
+        if (app.flexygram.navigation.LiquidNavigationConfig.configured()) {
+            return app.flexygram.navigation.LiquidNavigationConfig.heightDp();
         }
-        if (AppearanceConfig.compactNavigation.Bool()) {
-            return 48 + AppearanceConfig.navigationDensity() * 4;
+        if (isMainTabsHideTitleStyle()) {
+            return FILTER_TABS_HEIGHT;
         }
         return MainTabsUiHelper.isIosNavigationBar() ? MAIN_TABS_HEIGHT_IOS : MAIN_TABS_HEIGHT;
     }
 
-    public static int getMainTabsPreferredTabWidth() {
-        return new int[]{56, 64, 76}[AppearanceConfig.navigationDensity()];
-    }
-
     public static int getMainTabsMargin() {
-        if (AppearanceConfig.compactNavigation.Bool()) {
-            return 4 + AppearanceConfig.navigationDensity() * 2;
-        }
         return isMainTabsHideTitleStyle() ? MAIN_TABS_MARGIN_COMPACT : MAIN_TABS_MARGIN;
     }
 
@@ -74,19 +67,22 @@ public final class MainTabsHelper {
     }
 
     public static int getChatsPosition() {
-        return app.exteraless.appearance.MainTabsOrder.position(0);
+        return 0;
     }
 
     public static int getContactsPosition() {
-        return app.exteraless.appearance.MainTabsOrder.position(1);
+        return 1;
     }
 
     public static int getCallsOrSettingsPosition() {
-        return app.exteraless.appearance.MainTabsOrder.position(2);
+        return hasContactsOrFeedTab() ? 2 : 1;
     }
 
     public static int getProfilePosition() {
-        return app.exteraless.appearance.MainTabsOrder.position(3);
+        if (isProfileTabHidden()) {
+            return -1;
+        }
+        return hasContactsOrFeedTab() ? 3 : 2;
     }
 
     public static int getFragmentsCount() {

@@ -80,15 +80,19 @@ import xyz.nextalone.nagram.helper.DoubleTap;
  * Группы-мультивыбор (Replies, Hide Reactions, Quick Swipe Transition, Message Menu,
  * Extended Settings, Auto-Pause) сделаны разворачивающимися: строка «x/y» + чекбоксы.
  */
-public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
+public class OpenExteraChatsActivity extends app.flexygram.settings.SignatureMatteSettingsActivity {
 
     public static final int SCREEN_CHATS = 0;
     public static final int SCREEN_MENUS = 1;
     public static final int SCREEN_MEDIA = 2;
     public static final int SCREEN_HIDING = 3;
+    public static final int SCREEN_SIGNATURE_MESSAGES = 4;
+    public static final int SCREEN_SIGNATURE_STICKERS = 5;
 
     private final int screen;
+    private int settings3ResetStickerRow=-1;
 
+    private static final int TYPE_SIGNATURE_ENTRY = 107;
     private static final int TYPE_STICKER_SIZE = 100;
     private static final int TYPE_STICKER_SHAPE = 101;
     private static final int TYPE_DOUBLE_TAP = 102;
@@ -191,6 +195,13 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
     private int chatsDividerRow = -1;
 
     private int inputHeaderRow = -1;
+    private int composerSettingsRow = -1;
+    private int signaturePersonalHeader = -1, signatureInteractionHeader = -1, signatureAdditionalHeader = -1;
+    private int flexyBubblesRow = -1;
+    private int flexyContextPanelRow = -1;
+    private int signatureHeaderRow = -1;
+    private int signatureMessagesRow = -1, signatureStickersRow = -1, signatureThemeRow = -1;
+    private int smartPreviewsRow = -1;
     private int inputDividerRow = -1;
     private int searchHeaderRow = -1;
     private int searchDividerRow = -1;
@@ -415,13 +426,36 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
             case SCREEN_HIDING:
                 updateHidingRows();
                 break;
-            default:
+            case SCREEN_SIGNATURE_MESSAGES:
                 updateChatRows();
                 break;
+            case SCREEN_SIGNATURE_STICKERS:
+                updateStickerRows();
+                break;
+            default:
+                updateSignatureHubRows();
+                break;
         }
+        settings3ResetStickerRow = isSettings3Embedded() && screen == SCREEN_SIGNATURE_STICKERS ? addRow("settings3StickerReset") : -1;
     }
 
-    private void updateChatRows() {
+    @Override protected int matteHeaderColor() { return screen == SCREEN_CHATS ? getThemedColor(Theme.key_windowBackgroundWhiteBlueHeader) : super.matteHeaderColor(); }
+    private void updateSignatureHubRows() {
+        signaturePersonalHeader = addRow("settings2SmartHeader");
+        flexyBubblesRow = addRow("flexyBubbles");
+        signatureHeaderRow = addRow("signatureChatHeader");
+        composerSettingsRow = addRow("flexyComposerSettings");
+        signatureThemeRow = addRow("flexyThemeWallpaper");
+        smartPreviewsRow = -1; // Canonical controls are embedded in Home by SmartPreviewsSettingsActivity.
+        signatureInteractionHeader = addRow("settings2RetiredHeader");
+        flexyContextPanelRow = addRow("flexyContextPanel");
+        signatureMessagesRow = addRow("flexyMessagesGestures");
+        signatureStickersRow = addRow("flexyStickersMedia");
+        signatureAdditionalHeader = addRow("settings2RetiredHeader");
+        chatSettingsRow = addRow("chatSettings");
+        linksDividerRow = addRow();
+    }
+    private void updateStickerRows() {
         stickerSizeRow = addRow("stickerSize");
         stickerTimeRow = addRow("stickerTime", "hideTimeOnStickers");
         repliesGroupRow = addRow("replies");
@@ -449,12 +483,26 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
         }
         stickersDividerRow = addRow();
 
+        mediaRow = addRow("media");
+        linksDividerRow = addRow();
+    }
+    private void updateChatRows() {
         linksHeaderRow = addRow("linksHeader");
         menusRow = addRow("menus");
+        flexyContextPanelRow = addRow("flexyContextPanel");
         mediaRow = addRow("media");
         aiChatRow = addRow("aiChat");
-        chatSettingsRow = addRow("chatSettings");
         linksDividerRow = addRow();
+
+        // The conversation composer lives with the existing text-input controls.
+        // Keep this near the top, immediately after the native Sections card.
+        inputHeaderRow = addRow("inputHeader");
+        addCommaRow = addRow("addCommaAfterMention");
+        inlineMathRow = addRow("inlineMathResult");
+        inlineMathCurrencyRow = ChatsConfig.inlineMathResult.Bool() ? addRow("inlineMathCurrency") : -1;
+        tapToSwitchRecordRow = addRow("tapToSwitchRecord", "UseChatAttachEnterMenu");
+        keepAttachButtonRow = addRow("keepAttachButton");
+        inputDividerRow = addRow();
 
         doubleTapHeaderRow = addRow("doubleTapHeader");
         doubleTapRow = addRow("doubleTapPreview");
@@ -480,14 +528,6 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
         hideKeyboardOnScrollRow = addRow("hideKeyboardOnScroll");
         chatsDividerRow = addRow();
 
-        inputHeaderRow = addRow("inputHeader");
-        addCommaRow = addRow("addCommaAfterMention");
-        inlineMathRow = addRow("inlineMathResult");
-        inlineMathCurrencyRow = ChatsConfig.inlineMathResult.Bool() ? addRow("inlineMathCurrency") : -1;
-        tapToSwitchRecordRow = addRow("tapToSwitchRecord", "UseChatAttachEnterMenu");
-        keepAttachButtonRow = addRow("keepAttachButton");
-        inputDividerRow = addRow();
-
         searchHeaderRow = addRow("searchHeader");
         disableGlobalSearchRow = addRow("disableGlobalSearch");
         searchHashtagChatRow = addRow("searchHashtagChat", "SearchHashtagDefaultPageChat");
@@ -495,7 +535,7 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
         searchDividerRow = addRow();
 
         messagesHeaderRow = addRow("messagesHeader");
-        removeMessageTailRow = addRow("removeMessageTail");
+        removeMessageTailRow = app.flexygram.bubbles.BubbleStyle.signature() ? -1 : addRow("removeMessageTail");
         replaceEditedRow = addRow("replaceEdited");
         showOnlineStatusRow = addRow("showOnlineStatus");
         showResultsBeforeVotingRow = addRow("showResultsBeforeVoting");
@@ -789,10 +829,14 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
     @Override
     protected String getActionBarTitle() {
         switch (screen) {
+            case SCREEN_SIGNATURE_MESSAGES:
+                return getString(R.string.FlexyMessagesGestures);
+            case SCREEN_SIGNATURE_STICKERS:
+                return getString(R.string.FlexyStickersMedia);
             case SCREEN_MENUS:
                 return getString(R.string.OEChatsMenus);
             case SCREEN_MEDIA:
-                return getString(R.string.OEChatsMedia);
+                return getString(R.string.FlexyStickersMedia);
             case SCREEN_HIDING:
                 return getString(R.string.OEAppearanceHiding);
             default:
@@ -803,6 +847,10 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
     @Override
     public int getSearchGuid() {
         switch (screen) {
+            case SCREEN_SIGNATURE_MESSAGES:
+                return 29400;
+            case SCREEN_SIGNATURE_STICKERS:
+                return 29500;
             case SCREEN_MENUS:
                 return 29100;
             case SCREEN_MEDIA:
@@ -836,6 +884,10 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
     @Override
     protected String getKey() {
         switch (screen) {
+            case SCREEN_SIGNATURE_MESSAGES:
+                return "flexy_signature_messages";
+            case SCREEN_SIGNATURE_STICKERS:
+                return "flexy_signature_stickers";
             case SCREEN_MENUS:
                 return "exteraless_menus";
             case SCREEN_MEDIA:
@@ -871,7 +923,7 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
         View view = super.createView(context);
         // Кнопка сброса размера стикеров в шапке: появляется, как только
         // размер отличается от стандартного.
-        if (actionBar != null && screen == SCREEN_CHATS) {
+        if (actionBar != null && screen == SCREEN_SIGNATURE_STICKERS) {
             resetItem = actionBar.createMenu().addItem(0, R.drawable.msg_reset);
             resetItem.setContentDescription(getString(R.string.Reset));
             // Только через updateViewVisibilityAnimated: она проставляет и видимость,
@@ -1688,6 +1740,7 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
 
     @Override
     protected void onItemClick(View view, int position, float x, float y) {
+        if(position==settings3ResetStickerRow && position>=0){resetStickerSize();return;}
         // Клик по телу строки-группы только сворачивает её; мастер-переключатель живёт
         // в правой зоне TextCheckCell2 за разделителем.
         if (position == repliesGroupRow) {
@@ -1822,6 +1875,23 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
         } else if (position == adminShortcutsRow) {
             toggleQuickAdminShortcuts(view);
             return;
+        } else if (position == flexyContextPanelRow) {
+            presentFragment(new app.flexygram.bubbles.interaction.BubbleInteractionSettingsActivity());return;
+        } else if (position == signatureMessagesRow) {
+            presentFragment(new OpenExteraChatsActivity(SCREEN_SIGNATURE_MESSAGES)); return;
+        } else if (position == signatureStickersRow) {
+            presentFragment(new OpenExteraChatsActivity(SCREEN_SIGNATURE_STICKERS)); return;
+        } else if (position == signatureThemeRow) {
+            presentFragment(new app.flexygram.settings.SignatureChatThemeActivity()); return;
+        } else if (position == signatureHeaderRow) {
+            presentFragment(new app.flexygram.header.HeaderSettingsActivity()); return;
+        } else if (position == flexyBubblesRow) {
+            presentFragment(new app.flexygram.bubbles.BubbleSettingsActivity());
+            return;
+        } else if (position == composerSettingsRow) {
+            // Navigation only: retain the original composer preferences and implementation.
+            presentFragment(new app.flexygram.composer.FlexyComposerSettingsActivity());
+            return;
         } else if (position == menusRow) {
             presentFragment(new OpenExteraChatsActivity(SCREEN_MENUS));
             return;
@@ -1832,7 +1902,7 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
             showStoriesOptions(view, position);
             return;
         } else if (position == chatSettingsRow) {
-            presentFragment(new ThemeActivity(ThemeActivity.THEME_TYPE_BASIC));
+            presentFragment(ThemeActivity.signatureClassicOptions());
             return;
         } else if (position == aiChatRow) {
             presentFragment(new app.exteraless.ai.ui.AiSettingsActivity());
@@ -2267,7 +2337,7 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
             addView(edges, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT,
                     LayoutHelper.WRAP_CONTENT, Gravity.LEFT | Gravity.TOP, 21, 52, 21, 0));
 
-            sizeBar = new SeekBarView(context);
+            sizeBar = new app.flexygram.settings.FlexySignatureSeekBarView(context);
             sizeBar.setReportChanges(true);
             sizeBar.setSeparatorsCount(endStickerSize - startStickerSize + 1);
             sizeBar.setDelegate((stop, progress) -> {
@@ -2314,7 +2384,7 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
         }
     }
 
-    private class ListAdapter extends BaseListAdapter {
+    private class ListAdapter extends MatteListAdapter {
 
         public ListAdapter(Context context) {
             super(context);
@@ -2325,6 +2395,9 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
         public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View view;
             switch (viewType) {
+                case TYPE_SIGNATURE_ENTRY:
+                    view = new app.flexygram.settings.SignatureNavigationCell(mContext, resourcesProvider);
+                    break;
                 case TYPE_STICKER_SIZE:
                     stickerSizeCell = new StickerSizeCell(mContext);
                     stickerSizeCell.setBackgroundColor(getThemedColor(Theme.key_windowBackgroundWhite));
@@ -2382,6 +2455,7 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
         @Override
         public boolean isEnabled(RecyclerView.ViewHolder holder) {
             int type = holder.getItemViewType();
+            if (type == TYPE_SIGNATURE_ENTRY) return true;
             if (type == TYPE_STICKER_SIZE || type == TYPE_STICKER_SHAPE || type == TYPE_DOUBLE_TAP
                     || type == TYPE_WIDE_CHANNEL_PREVIEW) {
                 return false;
@@ -2404,12 +2478,34 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
                     || viewType == TYPE_WIDE_CHANNEL_PREVIEW) {
                 return true;
             }
+            if (screen == SCREEN_CHATS && viewType == TYPE_HEADER) return false;
             return super.isSectionContent(viewType);
         }
 
         @Override
         public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, boolean partial) {
+            if(position==settings3ResetStickerRow && position>=0){((TextSettingsCell)holder.itemView).setText(getString(R.string.Reset),false);return;}
             switch (holder.getItemViewType()) {
+                case TYPE_SIGNATURE_ENTRY:
+                    int label = position == flexyContextPanelRow ? R.string.FlexyContextInteractions
+                        : position == flexyBubblesRow ? R.string.FlexyBubblesTitle
+                        : position == signatureHeaderRow ? R.string.FlexyHeaderTitle
+                        : position == composerSettingsRow ? R.string.FlexyConversationBar
+                        : position == smartPreviewsRow ? R.string.FlexySmartPreviewsTitle
+                        : position == signatureMessagesRow ? R.string.FlexyMessagesGestures
+                        : position == signatureThemeRow ? R.string.FlexyThemeWallpaper
+                        : position == signatureStickersRow ? R.string.FlexyStickersMedia : R.string.FlexyClassicOptions;
+                    int icon = position == flexyContextPanelRow ? R.drawable.msg_discussion
+                        : position == flexyBubblesRow ? R.drawable.msg_discussion
+                        : position == signatureHeaderRow ? R.drawable.msg_info
+                        : position == composerSettingsRow ? R.drawable.msg_message
+                        : position == signatureThemeRow ? R.drawable.msg_theme
+                        : position == smartPreviewsRow ? R.drawable.msg_list
+                        : position == signatureMessagesRow ? R.drawable.msg_list
+                        : position == signatureStickersRow ? R.drawable.msg_emoji_stickers : R.drawable.msg_settings;
+                    ((app.flexygram.settings.SignatureNavigationCell)holder.itemView).bind(getString(label), icon,
+                            position == flexyBubblesRow || position == signatureHeaderRow || position == composerSettingsRow || position == signatureMessagesRow || position == smartPreviewsRow);
+                    break;
                 case TYPE_SET_REACTION:
                     ((DoubleTapCell.SetReactionCell) holder.itemView).update(false);
                     break;
@@ -2442,7 +2538,10 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
         }
 
         private void bindHeader(HeaderCell cell, int position) {
-            if (position == stickerShapeHeaderRow) {
+            if (screen == SCREEN_CHATS && (position == signaturePersonalHeader || position == signatureInteractionHeader || position == signatureAdditionalHeader)) {
+                cell.setText(getString(position == signaturePersonalHeader ? R.string.FlexyChatsPersonalization : position == signatureInteractionHeader ? R.string.FlexyChatsInteraction : R.string.FlexyChatsAdditional));
+                cell.setTextColor(getThemedColor(Theme.key_windowBackgroundWhiteBlueHeader));
+            } else if (position == stickerShapeHeaderRow) {
                 cell.setText(getString(R.string.OEChatsStickerShape));
             } else if (position == linksHeaderRow) {
                 cell.setText(getString(R.string.OEChatsSections));
@@ -2912,18 +3011,38 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
         }
 
         private void bindText(TextCell cell, int position) {
-            if (position == menusRow) {
-                cell.setTextAndIcon(getString(R.string.OEChatsMenus), R.drawable.msg_list, true);
+            if (position == flexyContextPanelRow) {
+                cell.setTextAndIcon(getString(R.string.FlexyContextInteractions),R.drawable.msg_discussion,true);
+            } else if (position == smartPreviewsRow) {
+                int mode = app.flexygram.home.SignatureSmartPreviews.mode();
+                String value = mode == app.flexygram.home.SignatureSmartPreviewPalette.ADAPTIVE ? getString(R.string.FlexySmartPreviewAdaptive)
+                        : mode == app.flexygram.home.SignatureSmartPreviewPalette.THEME ? getString(R.string.FlexySmartPreviewAccent)
+                        : mode == app.flexygram.home.SignatureSmartPreviewPalette.MATTE ? getString(R.string.FlexySmartPreviewMatte)
+                        : getString(R.string.FlexySmartPreviewOff);
+                cell.setTextAndValueAndIcon(getString(R.string.FlexySmartPreviewsTitle), value, R.drawable.msg_list, false);
+            } else if (position == signatureMessagesRow) {
+                cell.setTextAndIcon(getString(R.string.FlexyMessagesGestures), R.drawable.msg_list, false);
+            } else if (position == signatureStickersRow) {
+                cell.setTextAndIcon(getString(R.string.FlexyStickersMedia), R.drawable.msg_camera, false);
+            } else if (position == signatureThemeRow) {
+                cell.setTextAndIcon(getString(R.string.FlexyThemeWallpaper), R.drawable.msg_discussion, false);
+            } else if (position == flexyBubblesRow) {
+                cell.setTextAndIcon(getString(R.string.FlexyBubblesTitle), R.drawable.msg_discussion, false);
+            } else if (position == composerSettingsRow) {
+                cell.setTextAndIcon(getString(R.string.FlexySettingsComposerRow), R.drawable.msg_discussion, false);
+                cell.setSubtitle(getString(R.string.FlexySettingsComposerDescription));
+            } else if (position == menusRow) {
+                cell.setTextAndIcon(getString(R.string.FlexyMessagesGestures), R.drawable.msg_list, true);
                 cell.setSubtitle(getString(R.string.OEChatsMenusInfo));
             } else if (position == mediaRow) {
-                cell.setTextAndIcon(getString(R.string.OEChatsMedia), R.drawable.msg_camera, true);
+                cell.setTextAndIcon(getString(R.string.FlexyStickersMedia), R.drawable.msg_camera, true);
                 cell.setSubtitle(getString(R.string.OEChatsMediaInfo));
             } else if (position == aiChatRow) {
                 cell.setTextAndIcon(getString(R.string.OEChatsAiChat), aiChatIcon(), true);
                 cell.setSubtitle(getString(R.string.OEChatsAiChatInfo));
             } else if (position == chatSettingsRow) {
-                cell.setTextAndIcon(getString(R.string.OEChatsChatSettings), R.drawable.msg_discussion, false);
-                cell.setSubtitle(getString(R.string.OEChatsChatSettingsInfo));
+                cell.setTextAndIcon(getString(R.string.FlexyClassicOptions), R.drawable.msg_discussion, false);
+                cell.setSubtitle(getString(R.string.FlexyClassicOptionsInfo));
             }
             // Обе строки двухстрочные: подпись под заголовком, высота 64,
             // отступ текста от иконки 60. Ставится после setTextAndIcon —
@@ -3028,6 +3147,9 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
 
         @Override
         public int getItemViewType(int position) {
+            if(position==settings3ResetStickerRow && position>=0)return TYPE_SETTINGS;
+            if (screen == SCREEN_CHATS && (position == signaturePersonalHeader || position == signatureInteractionHeader || position == signatureAdditionalHeader)) return TYPE_HEADER;
+            if (screen == SCREEN_CHATS && position != linksDividerRow) return TYPE_SIGNATURE_ENTRY;
             if (position == stickerSizeRow) return TYPE_STICKER_SIZE;
             if (position == stickerShapeRow) return TYPE_STICKER_SHAPE;
             if (position == doubleTapRow) return TYPE_DOUBLE_TAP;
@@ -3035,7 +3157,8 @@ public class OpenExteraChatsActivity extends BaseNekoSettingsActivity {
             if (position == doubleTapReactionRow) return TYPE_SET_REACTION;
             if (isHeader(position)) return TYPE_HEADER;
             if (isDivider(position)) return TYPE_INFO_PRIVACY;
-            if (position == aiChatRow || position == chatSettingsRow || position == menusRow || position == mediaRow) {
+            if (position == flexyContextPanelRow || position == smartPreviewsRow || position == signatureMessagesRow || position == signatureStickersRow || position == signatureThemeRow || position == flexyBubblesRow || position == signatureHeaderRow || position == composerSettingsRow || position == aiChatRow || position == chatSettingsRow
+                    || position == menusRow || position == mediaRow) {
                 return TYPE_TEXT;
             }
             if (isGroupHeader(position)) return TYPE_EXPANDABLE_SWITCH;

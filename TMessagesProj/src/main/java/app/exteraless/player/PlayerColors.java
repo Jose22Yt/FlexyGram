@@ -1,6 +1,7 @@
 package app.exteraless.player;
 
 import android.graphics.Bitmap;
+import org.telegram.messenger.BuildConfig;
 import android.graphics.Color;
 import android.os.Build;
 
@@ -58,7 +59,21 @@ public final class PlayerColors {
                 primary, onPrimary, primaryContainer, onPrimaryContainer, secondaryContainer, onSecondaryContainer};
     }
 
+    private static final PlayerColors PEARL = signature(false);
+    private static final PlayerColors MIDNIGHT = signature(true);
+
+    private static PlayerColors signature(boolean dark) {
+        int surface = SignatureMusicStyle.surface(dark);
+        int raised = SignatureMusicStyle.raised(dark);
+        int text = SignatureMusicStyle.text(dark);
+        return new PlayerColors(dark, new int[]{surface, surface, raised, raised,
+                text, SignatureMusicStyle.secondary(dark), SignatureMusicStyle.border(dark),
+                SignatureMusicStyle.accent(dark), dark ? 0xff072432 : 0xffffffff,
+                raised, text, raised, text});
+    }
+
     public static PlayerColors fromSeed(int seed, boolean dark) {
+        if (BuildConfig.CONNECTED_ALPHA) return dark ? MIDNIGHT : PEARL;
         DynamicScheme s = new SchemeTonalSpot(Hct.fromInt(seed), dark, 0.0);
         return new PlayerColors(dark, new int[]{
                 s.getSurface(), s.getSurfaceContainerLow(), s.getSurfaceContainer(), s.getSurfaceContainerHigh(),
@@ -66,6 +81,40 @@ public final class PlayerColors {
                 s.getPrimary(), s.getOnPrimary(), s.getPrimaryContainer(), s.getOnPrimaryContainer(),
                 s.getSecondaryContainer(), s.getOnSecondaryContainer()
         });
+    }
+
+    // Only the full Music3 sheet opts in. Mini/pills keep fromSeed's Pearl/Midnight identity.
+    private static final android.util.LruCache<Long, PlayerColors> artworkPalettes = new android.util.LruCache<>(8);
+    private static final android.util.LruCache<Long, PlayerColors> themePalettes = new android.util.LruCache<>(4);
+    public static PlayerColors fromSignatureArtwork(int seed, boolean dark) {
+        long key = ((seed & 0xffffffffL) << 1) | (dark ? 1 : 0);
+        PlayerColors cached = artworkPalettes.get(key);
+        if (cached != null) return cached;
+        PlayerColors base = dark ? MIDNIGHT : PEARL;
+        int[] values = base.values();
+        for (int i = 0; i < 4; i++) values[i] = ColorUtils.blendARGB(values[i], seed | 0xff000000, .16f);
+        // Artwork identity belongs to the full sheet only; transport and mini players are unchanged.
+        values[7] = ColorUtils.blendARGB(seed | 0xff000000, dark ? 0xffffffff : 0xff000000, dark ? .32f : .24f);
+        values[8] = ColorUtils.calculateContrast(0xffffffff, values[7]) >= 4.5 ? 0xffffffff : 0xff101820;
+        values[9] = ColorUtils.blendARGB(values[0], seed | 0xff000000, .18f);
+        PlayerColors result = new PlayerColors(dark, values);
+        artworkPalettes.put(key, result);
+        return result;
+    }
+
+    /** Compact Modern uses the active Telegram theme, independently of album art. */
+    public static PlayerColors fromSignatureTheme(boolean dark) {
+        int accent = Theme.getColor(Theme.key_windowBackgroundWhiteBlueText, (Theme.ResourcesProvider) null);
+        long key = ((accent & 0xffffffffL) << 1) | (dark ? 1 : 0);
+        PlayerColors cached = themePalettes.get(key);
+        if (cached != null) return cached;
+        int[] values = (dark ? MIDNIGHT : PEARL).values();
+        values[7] = accent;
+        values[8] = ColorUtils.calculateContrast(0xffffffff, accent) >= 4.5 ? 0xffffffff : 0xff101820;
+        values[9] = ColorUtils.blendARGB(values[0], accent, .10f);
+        PlayerColors result = new PlayerColors(dark, values);
+        themePalettes.put(key, result);
+        return result;
     }
 
     public static PlayerColors lerp(PlayerColors a, PlayerColors b, float t) {

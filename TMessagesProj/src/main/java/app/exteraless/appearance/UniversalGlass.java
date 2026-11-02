@@ -13,8 +13,8 @@ public final class UniversalGlass {
     private UniversalGlass() {}
 
     public static boolean enabled(int surface) {
-        return AppearanceConfig.universalGlass.Bool()
-                && (AppearanceConfig.universalGlassSurfaces.Int() & surface) != 0;
+        return UniversalGlassConfig.enabled()
+                && (UniversalGlassConfig.surfaces() & surface) != 0;
     }
 
     public static boolean canRender(int surface, Theme.ResourcesProvider provider) {
@@ -23,12 +23,12 @@ public final class UniversalGlass {
 
     public static int backgroundColor(Theme.ResourcesProvider provider, int colorKey) {
         boolean dark = provider != null ? provider.isDark() : Theme.isCurrentThemeDark();
-        float opacity = Math.max(20, Math.min(85, AppearanceConfig.universalGlassOpacity.Int())) / 100f;
+        float opacity = Math.max(20, Math.min(85, UniversalGlassConfig.opacity())) / 100f;
         return Theme.multAlpha(Theme.getColor(colorKey, provider), dark ? opacity * 0.85f : opacity);
     }
 
     public static int edgeColor(boolean top) {
-        float strength = Math.max(0, Math.min(100, AppearanceConfig.universalGlassEdge.Int())) / 100f;
+        float strength = Math.max(0, Math.min(100, UniversalGlassConfig.edge())) / 100f;
         return Theme.multAlpha(Color.WHITE, strength * (top ? 0.85f : 0.60f));
     }
 

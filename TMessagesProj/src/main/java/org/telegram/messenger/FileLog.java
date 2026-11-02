@@ -124,7 +124,7 @@ public class FileLog {
     }
 
     public static void dumpResponseAndRequest(int account, TLObject request, TLObject response, TLRPC.TL_error error, long requestMsgId, long startRequestTimeInMillis, int requestToken) {
-        if (!BuildVars.DEBUG_PRIVATE_VERSION || !BuildVars.LOGS_ENABLED || request == null) {
+        if (BuildConfig.CONNECTED_ALPHA || !BuildVars.DEBUG_PRIVATE_VERSION || !BuildVars.LOGS_ENABLED || request == null) {
             return;
         }
         String requestSimpleName = request.getClass().getSimpleName();
@@ -166,7 +166,7 @@ public class FileLog {
     }
 
     public static void dumpUnparsedMessage(TLObject message, long messageId, int account) {
-        if (!BuildVars.DEBUG_PRIVATE_VERSION || !BuildVars.LOGS_ENABLED || message == null) {
+        if (BuildConfig.CONNECTED_ALPHA || !BuildVars.DEBUG_PRIVATE_VERSION || !BuildVars.LOGS_ENABLED || message == null) {
             return;
         }
         long time = System.currentTimeMillis();
@@ -361,7 +361,7 @@ public class FileLog {
     }
 
     public static String getNetworkLogPath() {
-        if (!BuildVars.LOGS_ENABLED) {
+        if (BuildConfig.CONNECTED_ALPHA || !BuildVars.LOGS_ENABLED) {
             return "";
         }
         try {
@@ -378,7 +378,7 @@ public class FileLog {
     }
 
     public static String getTonlibLogPath() {
-        if (!BuildVars.LOGS_ENABLED) {
+        if (BuildConfig.CONNECTED_ALPHA || !BuildVars.LOGS_ENABLED) {
             return "";
         }
         try {
@@ -395,7 +395,7 @@ public class FileLog {
     }
 
     public static void e(final String message, final Throwable exception) {
-        if (!BuildVars.LOGS_ENABLED) {
+        if (BuildConfig.CONNECTED_ALPHA || !BuildVars.LOGS_ENABLED) {
             return;
         }
         ensureInitied();
@@ -419,7 +419,7 @@ public class FileLog {
     }
 
     public static void e(final String message) {
-        if (!BuildVars.LOGS_ENABLED) {
+        if (BuildConfig.CONNECTED_ALPHA || !BuildVars.LOGS_ENABLED) {
             return;
         }
         ensureInitied();
@@ -442,7 +442,7 @@ public class FileLog {
     }
 
     public static void e(final Throwable e, boolean logToAppCenter) {
-        if (!BuildVars.LOGS_ENABLED) {
+        if (BuildConfig.CONNECTED_ALPHA || !BuildVars.LOGS_ENABLED) {
             return;
         }
 
@@ -526,7 +526,7 @@ public class FileLog {
     }
 
     public static void fatal(final Throwable e, boolean logToAppCenter) {
-        if (!BuildVars.LOGS_ENABLED) {
+        if (BuildConfig.CONNECTED_ALPHA || !BuildVars.LOGS_ENABLED) {
             return;
         }
         if (e instanceof OutOfMemoryError) {
@@ -603,7 +603,7 @@ public class FileLog {
     }
 
     public static void d(final String message) {
-        if (!BuildVars.LOGS_ENABLED) {
+        if (BuildConfig.CONNECTED_ALPHA || !BuildVars.LOGS_ENABLED) {
             return;
         }
         ensureInitied();
@@ -633,7 +633,7 @@ public class FileLog {
     }
 
     public static void w(final String message) {
-        if (!BuildVars.LOGS_ENABLED) {
+        if (BuildConfig.CONNECTED_ALPHA || !BuildVars.LOGS_ENABLED) {
             return;
         }
         ensureInitied();

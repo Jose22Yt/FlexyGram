@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyStudioTitle">FlexyStudio</string>
+    <string name="FlexyStudioConfiguration">CONFIGURACIÓN</string>
+    <string name="FlexyStudioExport">Exportar configuración</string>
+    <string name="FlexyStudioImport">Importar configuración</string>
+    <string name="FlexyStudioShare">Compartir configuración</string>
+    <string name="FlexyStudioApplyTitle">Aplicar configuración</string>
+    <string name="FlexyStudioApply">Aplicar</string>
+    <string name="FlexyStudioApplying">Aplicando…</string>
+    <string name="FlexyStudioFileDescription">Configuración de FlexyGram</string>
+    <string name="FlexyStudioCompatible">Compatible con FlexyGram</string>
+    <string name="FlexyStudioIncludes">Incluye la siguiente configuración:</string>
+    <string name="FlexyStudioApplyInfo">Los ajustes incluidos se aplicarán en FlexyGram.</string>
+    <string name="FlexyStudioBubbles">Burbujas de chat</string>
+    <string name="FlexyStudioHeader">Cabecera de conversación</string>
+    <string name="FlexyStudioComposer">Barra de conversación</string>
+    <string name="FlexyStudioIcon">Icono de la app</string>
+    <string name="FlexyStudioNoChanges">No hay cambios exportables</string>
+    <string name="FlexyStudioChooseSections">Elige las secciones compatibles que deseas incluir con sus valores actuales.</string>
+    <string name="FlexyStudioNothingSelected">Selecciona al menos una sección. No se ha generado ningún archivo.</string>
+    <string name="FlexyStudioInvalid">Archivo dañado, demasiado grande o incompatible. No se han aplicado cambios.</string>
+    <string name="FlexyStudioReadError">No se pudo leer el archivo. Inténtalo de nuevo.</string>
+    <string name="FlexyStudioWriteError">No se pudo guardar el archivo. Utiliza la extensión exacta .flexyGram.</string>
+    <string name="FlexyStudioSaved">Configuración guardada</string>
+    <string name="FlexyStudioApplied">Configuración aplicada</string>
+    <string name="FlexyStudioApplyError">No se pudo aplicar. Los valores anteriores se han restaurado.</string>
+    <string name="FlexyStudioRecoveryPending">No se pudo completar la recuperación. Se conserva una copia local para reintentar al iniciar FlexyGram.</string>
+    <string name="FlexyStudioUndoQuestion">¿Restaurar los valores anteriores a esta importación?</string>
+    <string name="FlexyStudioUndoConflict">No se puede deshacer: los ajustes se modificaron después de importar.</string>
+    <string name="FlexyStudioBusy">Otra operación está en curso. Inténtalo de nuevo.</string>
+    <string name="FlexyStudioLoginFirst">Abre FlexyGram e inicia sesión antes de importar la configuración.</string>
+    <string name="FlexyStudioUnsupported">No compatible: %1$s. No se ha aplicado ninguna sección.</string>
+</resources>

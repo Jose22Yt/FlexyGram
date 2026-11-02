@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="Settings3Group_personal">ПЕРСОНАЛИЗАЦИЯ</string>
+  <string name="Settings3Group_functions">ФУНКЦИИ</string>
+  <string name="Settings3Group_information">ИНФОРМАЦИЯ</string>
+  <string name="Settings3Group_specialized">Специализированные инструменты</string>
+  <string name="Settings3_chat">Чат</string>
+  <string name="Settings3Desc_chat">Пузыри, сообщения и беседы</string>
+  <string name="Settings3_home">Главный экран</string>
+  <string name="Settings3Desc_home">Список чатов, аватары и папки</string>
+  <string name="Settings3_universal">Универсальные</string>
+  <string name="Settings3Desc_universal">Язык, сеть, система и поведение</string>
+  <string name="Settings3_ayu">AyuMoments</string>
+  <string name="Settings3Desc_ayu">Удалённые сообщения, история и приватность</string>
+  <string name="Settings3_plugins">Плагины</string>
+  <string name="Settings3Desc_plugins">Расширения, ИИ и перевод</string>
+  <string name="Settings3_flexyfiles">FlexyFiles</string>
+  <string name="Settings3Desc_flexyfiles">Просмотр, редактирование и управление файлами</string>
+  <string name="Settings3_files">Файлы и загрузки</string>
+  <string name="Settings3Desc_files">Пути, хранение и загрузки</string>
+  <string name="Settings3_navigation">Навигация и жесты</string>
+  <string name="Settings3Desc_navigation">Вкладки, жесты и быстрые действия</string>
+  <string name="Settings3_studio">FlexyStudio</string>
+  <string name="Settings3Desc_studio">Экспорт, импорт и отправка</string>
+  <string name="Settings3_about">FlexyGram</string>
+  <string name="Settings3Desc_about">Информация, версия и лицензии</string>
+  <string name="Settings3RemixCredits">Значки настроек: Remix Icon 4.6.0, лицензия Apache 2.0. Remix Design и участники.</string>
+</resources>

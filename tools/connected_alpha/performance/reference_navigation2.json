@@ -1,0 +1,70 @@
+{
+  "physical_device_results": [
+    {
+      "label": "exteraless",
+      "source_commit": "1ad6a60a6834ffca722b1a22f4fba27ecb29a061",
+      "evidence": "NOT_MEASURED",
+      "chat_open_ms": null,
+      "chat_close_ms": null,
+      "scroll_frame_ms": null,
+      "jank": null,
+      "input_read_to_present_ms": null,
+      "first_useful_frame_ms": null,
+      "first_interaction_possible_ms": null,
+      "pss_kib": null,
+      "gc": null,
+      "cpu_ms": null,
+      "gpu": null
+    },
+    {
+      "label": "alpha1272",
+      "source_commit": "8619ba40fbd8fd9d9d898ff307fb0c0716661254",
+      "evidence": "NOT_MEASURED",
+      "chat_open_ms": null,
+      "chat_close_ms": null,
+      "scroll_frame_ms": null,
+      "jank": null,
+      "input_read_to_present_ms": null,
+      "first_useful_frame_ms": null,
+      "first_interaction_possible_ms": null,
+      "pss_kib": null,
+      "gc": null,
+      "cpu_ms": null,
+      "gpu": null
+    },
+    {
+      "label": "pr92",
+      "source_commit": "340cd323f5f5809abc746507b2e252da71298720",
+      "evidence": "NOT_MEASURED",
+      "chat_open_ms": null,
+      "chat_close_ms": null,
+      "scroll_frame_ms": null,
+      "jank": null,
+      "input_read_to_present_ms": null,
+      "first_useful_frame_ms": null,
+      "first_interaction_possible_ms": null,
+      "pss_kib": null,
+      "gc": null,
+      "cpu_ms": null,
+      "gpu": null
+    },
+    {
+      "label": "candidate",
+      "source_commit": null,
+      "evidence": "NOT_MEASURED",
+      "chat_open_ms": null,
+      "chat_close_ms": null,
+      "scroll_frame_ms": null,
+      "jank": null,
+      "input_read_to_present_ms": null,
+      "first_useful_frame_ms": null,
+      "first_interaction_possible_ms": null,
+      "pss_kib": null,
+      "gc": null,
+      "cpu_ms": null,
+      "gpu": null
+    }
+  ],
+  "superiority": "NOT_ESTABLISHED",
+  "candidate_revision": "Use final PR HEAD; no self-referential commit SHA embedded"
+}

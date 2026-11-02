@@ -67,6 +67,46 @@ public class ChatActivityChannelButtonsLayout extends FrameLayout implements Fac
         BUTTON_RECENT_ACTIONS_INFO
     };
 
+    private static final int[] signatureLeft={BUTTON_DIRECT,BUTTON_GIFT,BUTTON_GIGA_GROUP_INFO,BUTTON_RECENT_ACTIONS_INFO};
+    private static final int[] signatureRight={BUTTON_SEARCH};
+    private boolean signatureCompact,signatureRtl,signaturePresentation;
+    private int signatureInset,signatureGap,signatureSurface,signaturePosition;
+    private int[] leftOrder(){return signatureCompact?(signatureRtl?signatureRight:signatureLeft):buttonsOrderLeft;}
+    private int[] rightOrder(){return signatureCompact?(signatureRtl?signatureLeft:signatureRight):buttonsOrderRight;}
+    private int step(){return signatureCompact?48:54;}
+    private void refreshSignature(int width){
+        boolean compact=signaturePresentation && app.flexygram.composer.FlexyComposerConfig.compact();
+        int count=0;
+        for(ButtonHolder holder:buttonHolders)if(holder!=null&&holder.visibilityAnimator.getValue())count++;
+        // Keep native fallback for narrow or unusually action-dense overlays.
+        compact &= width<=0 || width>=dp(count*48+144);
+        signatureCompact=compact;
+        signatureRtl=org.telegram.messenger.LocaleController.isRTL;
+        signatureInset=dp(app.flexygram.composer.ComposerStyle.inset(app.flexygram.composer.FlexyComposerConfig.level()));
+        signatureGap=dp(app.flexygram.composer.FlexyComposerConfig.gap());
+        signaturePosition=dp(app.flexygram.composer.ComposerStyle.offset(app.flexygram.composer.FlexyComposerConfig.position()));
+        container.setTranslationY(0);
+        signatureSurface=Theme.getColor(Theme.key_chat_messagePanelBackground,resourcesProvider);
+        for(ButtonHolder holder:buttonHolders)if(holder!=null){
+            holder.button.setDrawSurface(!compact);
+            holder.button.getLayoutParams().width=dp(compact?48:56);
+        }
+    }
+    public void setSignaturePresentation(boolean enabled){signaturePresentation=enabled;}
+    public boolean isSignatureCompactPresentation(){return signatureCompact&&getVisibility()==VISIBLE;}
+    public int getSignatureVerticalOffset(){return isSignatureCompactPresentation()?signaturePosition:0;}
+    public int getSignatureVisualInset(){return signatureInset;}
+    public int getSignatureSurfaceColor(){return signatureSurface;}
+    public float getSignatureAlpha(){return totalVisibilityFactor;}
+    /** Bounds in this layout's coordinates; actual native permission/visibility factors decide slots. */
+    public void getSignatureBounds(RectF middle,RectF left,RectF right){
+        float top=(getHeight()-dp(44))/2f+signatureInset;
+        float bottom=top+dp(44)-2*signatureInset;
+        middle.set(container.getLeft(),top,container.getRight(),bottom);
+        if(totalWidthLeft>0)left.set(dp(9)+signatureInset,top,dp(5)+totalWidthLeft-signatureInset,bottom);else left.setEmpty();
+        if(totalWidthRight>0)right.set(getWidth()-dp(5)-totalWidthRight+signatureInset,top,getWidth()-dp(9)-signatureInset,bottom);else right.setEmpty();
+    }
+
     private final Theme.ResourcesProvider resourcesProvider;
     private final BlurredBackgroundDrawableViewFactory blurredBackgroundDrawableViewFactory;
     private final BlurredBackgroundColorProvider colorProvider;
@@ -87,6 +127,7 @@ public class ChatActivityChannelButtonsLayout extends FrameLayout implements Fac
     }
 
     public void updateColors() {
+        refreshSignature(getMeasuredWidth());
         for (ButtonHolder holder : buttonHolders) {
             if (holder != null) {
                 holder.button.updateColors();
@@ -167,6 +208,11 @@ public class ChatActivityChannelButtonsLayout extends FrameLayout implements Fac
         return buttonHolders[buttonId].visibilityAnimator.getValue();
     }
 
+    public void setDiscussionButton(boolean discussion){
+        ButtonHolder holder=buttonHolders[BUTTON_DIRECT];
+        if(holder!=null)holder.button.setContentDescription(getString(discussion?R.string.ProfileActionsDiscuss:R.string.ChannelOpenDirect));
+    }
+
     public void setButtonOnClickListener(int buttonId, View.OnClickListener listener) {
         this.onClickListeners[buttonId] = listener;
     }
@@ -181,6 +227,7 @@ public class ChatActivityChannelButtonsLayout extends FrameLayout implements Fac
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        refreshSignature(MeasureSpec.getSize(widthMeasureSpec));
         checkContainerPaddings(false);
 
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
@@ -264,22 +311,23 @@ public class ChatActivityChannelButtonsLayout extends FrameLayout implements Fac
 
     private void checkContainerPaddings(boolean canRequestLayout) {
         int paddingLeft = dp(7), paddingRight = dp(7);
-        for (final int buttonId : buttonsOrderLeft) {
+        for (final int buttonId : leftOrder()) {
             final ButtonHolder holder = buttonHolders[buttonId];
             if (holder == null) {
                 continue;
             }
-            paddingLeft += holder.visibilityAnimator.getValue() ? dp(44 + 10) : 0;
+            paddingLeft += holder.visibilityAnimator.getValue() ? dp(step()) : 0;
         }
 
-        for (final int buttonId : buttonsOrderRight) {
+        for (final int buttonId : rightOrder()) {
             final ButtonHolder holder = buttonHolders[buttonId];
             if (holder == null) {
                 continue;
             }
-            paddingRight += holder.visibilityAnimator.getValue() ? dp(44 + 10) : 0;
+            paddingRight += holder.visibilityAnimator.getValue() ? dp(step()) : 0;
         }
 
+        if(signatureCompact){if(paddingLeft>dp(7))paddingLeft+=signatureGap;if(paddingRight>dp(7))paddingRight+=signatureGap;}
         final MarginLayoutParams lp = (MarginLayoutParams) container.getLayoutParams();
 
         if (lp.leftMargin != paddingLeft || lp.rightMargin != paddingRight) {
@@ -307,30 +355,32 @@ public class ChatActivityChannelButtonsLayout extends FrameLayout implements Fac
             holder.button.setScaleY(lerp(0.4f, 1f, visibility));
         }
 
-        for (final int buttonId : buttonsOrderLeft) {
+        for (final int buttonId : leftOrder()) {
             final ButtonHolder holder = buttonHolders[buttonId];
             if (holder == null) {
                 continue;
             }
 
-            final float width = holder.visibilityAnimator.getFloatValue() * dp(44 + 10);    // width + margin
-            holder.button.setTranslationX(dp(1) + totalWidthLeft);
+            final float width = holder.visibilityAnimator.getFloatValue() * dp(step());    // width + margin
+            holder.button.setTranslationX(dp(signatureCompact?7:1) + totalWidthLeft);
+            holder.button.setTranslationY(0);
             totalWidthLeft += width;
         }
 
-        for (final int buttonId : buttonsOrderRight) {
+        for (final int buttonId : rightOrder()) {
             final ButtonHolder holder = buttonHolders[buttonId];
             if (holder == null) {
                 continue;
             }
 
-            final float width = holder.visibilityAnimator.getFloatValue() * dp(44 + 10);    // width + margin
-            holder.button.setTranslationX(getMeasuredWidth() - holder.button.getMeasuredWidth() - dp(1) - totalWidthRight);
+            final float width = holder.visibilityAnimator.getFloatValue() * dp(step());    // width + margin
+            holder.button.setTranslationX(getMeasuredWidth() - holder.button.getMeasuredWidth() - dp(signatureCompact?7:1) - totalWidthRight);
+            holder.button.setTranslationY(0);
             totalWidthRight += width;
         }
 
         if (totalVisibilityFactor < 1) {
-            for (final int buttonId : buttonsOrderLeft) {
+            for (final int buttonId : leftOrder()) {
                 final ButtonHolder holder = buttonHolders[buttonId];
                 if (holder == null) {
                     continue;
@@ -339,7 +389,7 @@ public class ChatActivityChannelButtonsLayout extends FrameLayout implements Fac
                 holder.button.setTranslationX(holder.button.getTranslationX() - totalWidthLeft * (1 - totalVisibilityFactor));
             }
 
-            for (final int buttonId : buttonsOrderRight) {
+            for (final int buttonId : rightOrder()) {
                 final ButtonHolder holder = buttonHolders[buttonId];
                 if (holder == null) {
                     continue;
@@ -413,7 +463,9 @@ public class ChatActivityChannelButtonsLayout extends FrameLayout implements Fac
 
     @Override
     protected boolean drawChild(@NonNull Canvas canvas, View child, long drawingTime) {
-        if (child == container && containerDrawable != null) {
+        if(child==container&&signatureCompact){
+            // The common input parent owns the three clipped native surfaces.
+        }else if (child == container && containerDrawable != null) {
             tmpRect.set(
                 totalWidthLeft + dp(1), 0,
                 getMeasuredWidth() - dp(1) - totalWidthRight,

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyAnimationsTitle">Animaciones</string>
+    <string name="FlexyMessageAnimations">Animaciones de mensajes</string>
+    <string name="FlexyDeleteTitle">Animación al eliminar</string>
+    <string name="FlexyDeleteDescription">Elige un efecto y pruébalo sin eliminar mensajes reales.</string>
+    <string name="FlexyDeletePreview">Vista previa</string>
+    <string name="FlexyDeleteSample">Mensaje de ejemplo  ✓✓</string>
+    <string name="FlexyDeletePlay">Probar animación</string>
+    <string name="FlexyPillDeleted">ELIMINADO</string>
+    <string name="FlexyContextScrollPreview">Vista previa del mensaje. Desliza para leer el resto.</string>
+</resources>

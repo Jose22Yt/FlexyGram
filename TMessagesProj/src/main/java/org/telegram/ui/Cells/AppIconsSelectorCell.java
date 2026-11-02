@@ -133,7 +133,13 @@ public class AppIconsSelectorCell extends RecyclerListView implements Notificati
             smoothScroller.setTargetPosition(position);
             linearLayoutManager.startSmoothScroll(smoothScroller);
 
-            LauncherIconController.setIcon(icon);
+            try {
+                LauncherIconController.setIcon(icon);
+            } catch (IllegalArgumentException | SecurityException rejected) {
+                org.telegram.messenger.FileLog.e(rejected);
+                org.telegram.ui.Components.AlertsCreator.showSimpleAlert(fragment, LocaleController.getString(R.string.ErrorOccurred));
+                return; // Keep selection unchanged if PackageManager rejected the alias batch.
+            }
             holderView.setSelected(true, true);
 
             for (int i = 0; i < getChildCount(); i++) {
