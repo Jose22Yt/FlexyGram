@@ -551,7 +551,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     public ActionBarMenuItem searchItem;
     private boolean separateSearchHidTopItem;
     public void updateSeparateSearchVisibility(boolean separate) {
-        if (searchItem == null || actionBar.isSearchFieldVisible()) return;
+        if (searchItem == null || actionBar == null || actionBar.isSearchFieldVisible()) return;
         if (separate && searchItem.getVisibility() == View.VISIBLE) {
             separateSearchHidTopItem = true; searchItem.setVisibility(View.GONE);
         } else if (!separate && separateSearchHidTopItem) {
