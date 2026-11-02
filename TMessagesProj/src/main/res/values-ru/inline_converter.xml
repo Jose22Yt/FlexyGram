@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="InlineConversionTitle">Быстрые преобразования</string>
+    <string name="InlineConversionEnable">Преобразования в сообщениях</string>
+    <string name="InlineConversionCurrency">Конвертировать валюты</string>
+    <string name="InlineConversionTargetCurrency">Целевая валюта</string>
+    <string name="InlineConversionTime">Преобразовывать время</string>
+    <string name="InlineConversionTargetZone">Целевой часовой пояс</string>
+    <string name="InlineConversionUnits">Преобразовывать единицы</string>
+    <string name="InlineConversionSystem">Система единиц</string>
+    <string name="InlineConversionAuto">Автоматически (устройство)</string>
+    <string name="InlineConversionMetric">Метрическая</string>
+    <string name="InlineConversionImperial">Имперская</string>
+    <string name="InlineConversionSettingInfo">Нажмите на выражение. Ссылки и долгое нажатие работают как прежде.</string>
+    <string name="InlineConversionCurrencyUnavailable">Курсы недоступны: внешний поставщик не разрешён. Запросы не отправляются.</string>
+    <string name="InlineConversionOffline">Рассчитано локально. Округлённые результаты приблизительны.</string>
+    <string name="InlineConversionUnknownZone">Часовой пояс не распознан. Преобразование не выполнено.</string>
+    <string name="InlineConversionAmbiguousZone">Неоднозначное сокращение. Выберите исходный часовой пояс:</string>
+    <string name="InlineConversionDateAssumption">Дата расчёта (по дате сообщения):</string>
+    <string name="InlineConversionChangeDate">Выбрать дату</string>
+    <string name="InlineConversionTimeGap">Это местное время не существует в эту дату из-за перевода часов. Выберите другую дату.</string>
+    <string name="InlineConversionTimeOverlap">Это время повторяется при переводе часов. Выберите исходное смещение UTC:</string>
+    <string name="InlineConversionCopy">Копировать</string>
+    <string name="InlineConversionClose">Закрыть</string>
+    <string name="InlineConversionSelectedDate">Выбранная дата:</string>
+</resources>

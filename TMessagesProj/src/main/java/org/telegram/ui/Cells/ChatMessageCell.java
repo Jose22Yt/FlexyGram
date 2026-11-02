@@ -2523,6 +2523,71 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         return handled;
     }
 
+    private app.flexygram.inlineconverter.InlineConversionController inlineConversion;
+
+    private void prepareInlineConversions() {
+        if (currentMessageObject == null || currentMessageObject.preview || currentMessageObject.richLayout != null
+                || currentMessageObject.isSponsored() || currentMessageObject.isEphemeral()
+                || !app.flexygram.inlineconverter.InlineConversionConfig.get().enabled) {
+            if (inlineConversion != null) inlineConversion.release();
+            return;
+        }
+        CharSequence body = currentMessageObject.type == MessageObject.TYPE_TEXT || currentMessageObject.type == MessageObject.TYPE_EMOJIS
+                ? currentMessageObject.messageText : null;
+        if ((body == null || body.length() == 0) && (currentCaption == null || currentCaption.length() == 0)) {
+            if (inlineConversion != null) inlineConversion.release();
+            return;
+        }
+        if (inlineConversion == null) inlineConversion = new app.flexygram.inlineconverter.InlineConversionController(this, resourcesProvider);
+        inlineConversion.prepare(body, currentCaption, currentAccount,
+                currentMessageObject.getDialogId(), currentMessageObject.getId(), currentMessageObject.messageOwner.edit_date);
+    }
+
+    /** Same UTF-16 geometry as Telegram, but only for unclaimed plain text/caption taps. */
+    private int inlineConversionOffset(ArrayList<MessageObject.TextLayoutBlock> blocks,
+            float originX, float originY, float rtlOffset, float width, float height, MotionEvent event) {
+        float x = getEventX(event), y = getEventY(event);
+        if (blocks == null || blocks.isEmpty() || x < originX || x > originX + width || y < originY || y > originY + height) return -1;
+        y -= originY;
+        MessageObject.TextLayoutBlock block = blocks.get(0);
+        for (MessageObject.TextLayoutBlock candidate : blocks) {
+            if (candidate.textYOffset(blocks, transitionParams) > y) break;
+            block = candidate;
+        }
+        if (block.code || block.quote || !block.spoilers.isEmpty() || block.textLayout == null) return -1;
+        x -= originX - (block.isRtl() ? rtlOffset : 0);
+        y -= block.textYOffset(blocks, transitionParams);
+        if (y < 0 || y >= block.textLayout.getHeight()) return -1;
+        int line = block.textLayout.getLineForVertical((int) y);
+        float left = block.textLayout.getLineLeft(line);
+        if (x < left || x > left + block.textLayout.getLineWidth(line)) return -1;
+        return block.charactersOffset + block.textLayout.getOffsetForHorizontal(line, x);
+    }
+
+    private boolean checkInlineConversionTouch(MotionEvent event) {
+        if (inlineConversion == null && event.getActionMasked() == MotionEvent.ACTION_DOWN
+                && app.flexygram.inlineconverter.InlineConversionConfig.get().enabled) prepareInlineConversions();
+        if (inlineConversion == null || currentMessageObject == null || currentMessageObject.preview
+                || currentMessageObject.richLayout != null || touchedByExpanation
+                || delegate != null && delegate.hasSelectedMessages()
+                || AndroidUtilities.isAccessibilityScreenReaderEnabled()) return false;
+        if (inlineConversion.stale()) {
+            if (event.getActionMasked() == MotionEvent.ACTION_DOWN) prepareInlineConversions();
+            return false; // Never consume a tap while a new configuration is being prepared.
+        }
+        int offset = -1;
+        if (currentMessageObject.type == MessageObject.TYPE_TEXT || currentMessageObject.type == MessageObject.TYPE_EMOJIS)
+            offset = inlineConversionOffset(currentMessageObject.textLayoutBlocks, textX, textY,
+                    currentMessageObject.textXOffset, currentMessageObject.textWidth, currentMessageObject.textHeight(transitionParams), event);
+        boolean caption = false;
+        if (offset < 0 && captionLayout != null && currentCaption != null) {
+            caption = true;
+            offset = inlineConversionOffset(captionLayout.textLayoutBlocks, captionX, captionY,
+                    captionLayout.textXOffset, captionLayout.textWidth, captionLayout.textHeight(transitionParams), event);
+        }
+        return inlineConversion.touch(event, offset, caption, currentMessageObject.messageOwner.date);
+    }
+
     private boolean checkTextBlockMotionEvent(MotionEvent event) {
         if (!(currentMessageObject.type == MessageObject.TYPE_TEXT || currentMessageObject.type == MessageObject.TYPE_EMOJIS || currentMessageObject.type == MessageObject.TYPE_STORY_MENTION) || currentMessageObject.textLayoutBlocks == null || currentMessageObject.textLayoutBlocks.isEmpty() || !(currentMessageObject.messageText instanceof Spannable)) {
             return false;
@@ -5136,6 +5201,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if (inlineConversion != null) inlineConversion.observe(event);
         if (currentMessageObject == null || delegate != null && !delegate.canPerformActions() || animationRunning) {
             if (currentMessageObject != null && currentMessageObject.preview) {
                 return checkTextSelection(event);
@@ -5289,6 +5355,9 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         }
         if (!result) {
             result = checkAdminTouchEvent(event);
+        }
+        if (!result) {
+            result = checkInlineConversionTouch(event);
         }
 
         if (event.getAction() == MotionEvent.ACTION_CANCEL) {
@@ -6624,6 +6693,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
 
     @Override
     protected void onDetachedFromWindow() {
+        if (inlineConversion != null) inlineConversion.release();
         cancelSignatureTap();
         super.onDetachedFromWindow();
 
@@ -6864,6 +6934,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         if (stickerSetIcons != null) {
             stickerSetIcons.attach(this);
         }
+        prepareInlineConversions();
     }
 
     protected SpoilerEffect2 makeSpoilerEffect() {
@@ -11741,6 +11812,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         highlightCaptionToSetStart = highlightCaptionToSetEnd = -1;
 
         updateFlagSecure();
+        prepareInlineConversions();
     }
 
     public void checkPollFileState() {
@@ -12559,6 +12631,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
 
     @Override
     protected boolean onLongPress() {
+        if (inlineConversion != null) inlineConversion.cancelGesture();
         cancelSignatureTap();
         if (isRoundVideo && isPlayingRound && MediaController.getInstance().isPlayingMessage(currentMessageObject)) {
             float touchRadius = (lastTouchX - photoImage.getCenterX()) * (lastTouchX - photoImage.getCenterX()) + (lastTouchY - photoImage.getCenterY()) * (lastTouchY - photoImage.getCenterY());

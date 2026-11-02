@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="InlineConversionTitle">Conversiones rápidas</string>
+    <string name="InlineConversionEnable">Activar conversiones en mensajes</string>
+    <string name="InlineConversionCurrency">Convertir divisas</string>
+    <string name="InlineConversionTargetCurrency">Moneda de destino</string>
+    <string name="InlineConversionTime">Convertir horarios</string>
+    <string name="InlineConversionTargetZone">Zona horaria de destino</string>
+    <string name="InlineConversionUnits">Convertir medidas</string>
+    <string name="InlineConversionSystem">Sistema de unidades</string>
+    <string name="InlineConversionAuto">Automático (dispositivo)</string>
+    <string name="InlineConversionMetric">Métrico</string>
+    <string name="InlineConversionImperial">Imperial</string>
+    <string name="InlineConversionSettingInfo">Toca una expresión compatible. Los enlaces y la pulsación prolongada mantienen su comportamiento.</string>
+    <string name="InlineConversionCurrencyUnavailable">Tasas no disponibles: no hay proveedor externo autorizado. No se envía ninguna consulta.</string>
+    <string name="InlineConversionOffline">Calculado localmente. Los resultados redondeados son aproximados.</string>
+    <string name="InlineConversionUnknownZone">Zona horaria no reconocida. No se ha realizado una conversión.</string>
+    <string name="InlineConversionAmbiguousZone">Abreviatura ambigua. Elige la zona horaria de origen:</string>
+    <string name="InlineConversionDateAssumption">Fecha utilizada (supuesto a partir del mensaje):</string>
+    <string name="InlineConversionChangeDate">Elegir fecha</string>
+    <string name="InlineConversionTimeGap">Esta hora local no existe en esa fecha por un cambio de horario. Elige otra fecha.</string>
+    <string name="InlineConversionTimeOverlap">El reloj repite esta hora. Elige el desplazamiento UTC de origen:</string>
+    <string name="InlineConversionCopy">Copiar</string>
+    <string name="InlineConversionClose">Cerrar</string>
+    <string name="InlineConversionSelectedDate">Fecha elegida:</string>
+</resources>

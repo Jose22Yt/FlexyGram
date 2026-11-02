@@ -1,0 +1,36 @@
+name: Inline converter host regressions (not Android)
+on:
+  pull_request:
+    branches: [feat/beta-official-source-v2]
+    paths:
+      - 'TMessagesProj/src/main/java/app/flexygram/inlineconverter/**'
+      - 'TMessagesProj/src/main/java/org/telegram/ui/Cells/ChatMessageCell.java'
+      - 'TMessagesProj/src/main/java/app/flexygram/settings/signature/**'
+      - 'TMessagesProj/src/main/res/**/inline_converter.xml'
+      - 'tests/inline_converter/**'
+      - 'tests/test_inline_converter.py'
+      - '.github/workflows/inline-converter.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  host:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install pytest
+      - name: Production core and explicit host lifecycle doubles
+        run: python -m pytest tests/test_inline_converter.py -q -s
+      - name: Signing verifier remains fail closed (no key or artifact)
+        run: python tools/signing/check_verifier.py

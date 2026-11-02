@@ -1,0 +1,27 @@
+"""Explicit host doubles for scheduling/preferences/touch. Never an Android application test."""
+from pathlib import Path
+
+def write(out):
+ files={
+ 'android/content/Context.java':'package android.content;public class Context{}',
+ 'android/content/SharedPreferences.java':'''package android.content;public interface SharedPreferences {boolean getBoolean(String k,boolean v);String getString(String k,String v);int getInt(String k,int v);Editor edit();interface Editor{Editor putBoolean(String k,boolean v);Editor putString(String k,String v);Editor putInt(String k,int v);void apply();}}''',
+ 'tw/nekomimi/nekogram/NekoConfig.java':'''package tw.nekomimi.nekogram;import android.content.SharedPreferences;import java.util.*;public class NekoConfig{public static final Store store=new Store();public static SharedPreferences getPreferences(){return store;}public static class Store implements SharedPreferences,SharedPreferences.Editor{public final Map<String,Object> map=new HashMap<>();public boolean getBoolean(String k,boolean v){return (boolean)map.getOrDefault(k,v);}public String getString(String k,String v){return (String)map.getOrDefault(k,v);}public int getInt(String k,int v){return (int)map.getOrDefault(k,v);}public SharedPreferences.Editor edit(){return this;}public SharedPreferences.Editor putBoolean(String k,boolean v){map.put(k,v);return this;}public SharedPreferences.Editor putString(String k,String v){map.put(k,v);return this;}public SharedPreferences.Editor putInt(String k,int v){map.put(k,v);return this;}public void apply(){}}}''',
+ 'android/view/View.java':'''package android.view;public class View{public boolean attached=true;public boolean isAttachedToWindow(){return attached;}public android.content.Context getContext(){return new android.content.Context();}}''',
+ 'android/view/ViewConfiguration.java':'''package android.view;public class ViewConfiguration{public static ViewConfiguration get(android.content.Context c){return new ViewConfiguration();}public int getScaledTouchSlop(){return 8;}public static int getLongPressTimeout(){return 500;}}''',
+ 'android/os/Trace.java':'package android.os;public class Trace{public static void beginSection(String s){}public static void endSection(){}}',
+ 'android/os/SystemClock.java':'package android.os;public class SystemClock{public static long now;public static long uptimeMillis(){return now;}}',
+ 'android/view/MotionEvent.java':'''package android.view;public class MotionEvent{public static final int ACTION_DOWN=0,ACTION_UP=1,ACTION_MOVE=2,ACTION_CANCEL=3;public final int action;public final float x,y;public int pointers=1;public MotionEvent(int a,float x,float y){action=a;this.x=x;this.y=y;}public int getActionMasked(){return action;}public float getX(){return x;}public float getY(){return y;}public int getPointerCount(){return pointers;}}''',
+ 'android/text/Spanned.java':'package android.text;public interface Spanned extends CharSequence{<T>T[] getSpans(int start,int end,Class<T> type);int getSpanStart(Object span);int getSpanEnd(Object span);}',
+ 'android/text/style/CharacterStyle.java':'package android.text.style;public class CharacterStyle{}',
+ 'android/text/style/ClickableSpan.java':'package android.text.style;public class ClickableSpan extends CharacterStyle{}',
+ 'android/text/style/TypefaceSpan.java':'package android.text.style;public class TypefaceSpan extends CharacterStyle{}',
+ 'org/telegram/ui/Components/URLSpanMono.java':'package org.telegram.ui.Components;public class URLSpanMono extends android.text.style.CharacterStyle{}',
+ 'org/telegram/ui/Components/TextStyleSpan.java':'''package org.telegram.ui.Components;public class TextStyleSpan extends android.text.style.CharacterStyle{public static final int FLAG_STYLE_MONO=4,FLAG_STYLE_CODE=1024,FLAG_STYLE_SPOILER=256;public int flags;public int getStyleFlags(){return flags;}}''',
+ 'org/telegram/ui/ActionBar/Theme.java':'package org.telegram.ui.ActionBar;public class Theme{public interface ResourcesProvider{}}',
+ 'org/telegram/messenger/LocaleController.java':'package org.telegram.messenger;public class LocaleController{public static LocaleController getInstance(){return new LocaleController();}public java.util.Locale getCurrentLocale(){return java.util.Locale.US;}}',
+ 'org/telegram/messenger/Utilities.java':'''package org.telegram.messenger;import java.util.*;public class Utilities{public static final Queue globalQueue=new Queue();public static class Queue{public List<Runnable> tasks=new ArrayList<>();public void postRunnable(Runnable r){tasks.add(r);}public void cancelRunnable(Runnable r){tasks.remove(r);}public void flush(){var jobs=new ArrayList<>(tasks);tasks.clear();jobs.forEach(Runnable::run);}}}''',
+ 'org/telegram/messenger/AndroidUtilities.java':'''package org.telegram.messenger;public class AndroidUtilities{public static final Utilities.Queue ui=new Utilities.Queue();public static void runOnUIThread(Runnable r){ui.postRunnable(r);}}''',
+ 'app/flexygram/inlineconverter/InlineConversionPopover.java':'''package app.flexygram.inlineconverter;public class InlineConversionPopover{public static int shown;public InlineConversionPopover(android.view.View v,org.telegram.ui.ActionBar.Theme.ResourcesProvider p){}public void show(InlineConversionMatch m,int date,float x,float y){shown++;}public void dismiss(){}}'''
+ }
+ for name,source in files.items():
+  p=out/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(source)

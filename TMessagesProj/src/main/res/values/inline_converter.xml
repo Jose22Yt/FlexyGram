@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="InlineConversionTitle">Quick conversions</string>
+    <string name="InlineConversionEnable">Convert expressions in messages</string>
+    <string name="InlineConversionCurrency">Convert currencies</string>
+    <string name="InlineConversionTargetCurrency">Target currency</string>
+    <string name="InlineConversionTime">Convert times</string>
+    <string name="InlineConversionTargetZone">Target time zone</string>
+    <string name="InlineConversionUnits">Convert measurements</string>
+    <string name="InlineConversionSystem">Measurement system</string>
+    <string name="InlineConversionAuto">Automatic (device)</string>
+    <string name="InlineConversionMetric">Metric</string>
+    <string name="InlineConversionImperial">Imperial</string>
+    <string name="InlineConversionSettingInfo">Tap a supported expression. Links and long presses keep their original behavior.</string>
+    <string name="InlineConversionCurrencyUnavailable">Rates unavailable: no external provider has been authorized. No request is sent.</string>
+    <string name="InlineConversionOffline">Calculated locally. Rounded results are approximate.</string>
+    <string name="InlineConversionUnknownZone">Time zone not recognized. No conversion was applied.</string>
+    <string name="InlineConversionAmbiguousZone">Ambiguous abbreviation. Choose the source time zone:</string>
+    <string name="InlineConversionDateAssumption">Date used (assumed from message):</string>
+    <string name="InlineConversionChangeDate">Choose date</string>
+    <string name="InlineConversionTimeGap">This local time does not exist on this date because of a clock change. Choose another date.</string>
+    <string name="InlineConversionTimeOverlap">The clock repeats this time. Choose the source UTC offset:</string>
+    <string name="InlineConversionCopy">Copy</string>
+    <string name="InlineConversionClose">Close</string>
+    <string name="InlineConversionSelectedDate">Selected date:</string>
+</resources>
