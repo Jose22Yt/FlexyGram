@@ -16,6 +16,6 @@ public final class SignatureLauncherSettingsActivity extends SignatureMatteSetti
     @Override protected BaseListAdapter createAdapter(Context c){return new MatteListAdapter(c){
         @Override public int getItemViewType(int p){return 230;}
         @Override public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent,int type){return new RecyclerListView.Holder(new AppIconsSelectorCell(parent.getContext(),SignatureLauncherSettingsActivity.this,currentAccount));}
-        @Override public boolean isEnabled(RecyclerView.ViewHolder h){return false;}
+        @Override public boolean isEnabled(RecyclerView.ViewHolder h){return true;}
     };}
 }

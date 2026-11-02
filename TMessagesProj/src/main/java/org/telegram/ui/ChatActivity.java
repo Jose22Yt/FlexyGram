@@ -548,9 +548,20 @@ public class ChatActivity extends BaseFragment implements
     private boolean signatureNativeGlassAllowed;
     private final Utilities.Callback<Boolean> signatureGlassPowerListener = ignored -> refreshSignatureNativeGlassPolicy();
     private void refreshSignatureNativeGlassPolicy() {
-        boolean allowed=LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS);
+        boolean allowed=SharedConfig.chatBlurEnabled() && LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS);
         if (signatureNativeGlassAllowed==allowed) return;
         signatureNativeGlassAllowed=allowed;
+        // The native suppressor snapshots Liquid Glass in its constructor. Refresh only on a
+        // policy transition, otherwise a source created with Glass off remains frosted forever.
+        boolean liquidPolicy = LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS);
+        if (scrollableViewNoiseSuppressor != null && scrollableViewNoiseSuppressor.isLiquidGlassEnabled != liquidPolicy) {
+            scrollableViewNoiseSuppressor = new DownscaleScrollableNoiseSuppressor();
+            if (glassBackgroundSourceRenderNode != null) glassBackgroundSourceRenderNode.setScrollableNoiseSuppressor(
+                    scrollableViewNoiseSuppressor, DownscaleScrollableNoiseSuppressor.DRAW_GLASS);
+            if (glassBackgroundSourceFrostedRenderNode != null) glassBackgroundSourceFrostedRenderNode.setScrollableNoiseSuppressor(
+                    scrollableViewNoiseSuppressor, DownscaleScrollableNoiseSuppressor.DRAW_FROSTED_GLASS);
+            if (contentView != null) invalidateMergedVisibleBlurredPositionsAndSourcesPositions();
+        }
         glassBackgroundDrawableFactory.setLiquidGlassEffectAllowed(allowed);
         glassBackgroundDrawableFactoryFrosted.setLiquidGlassEffectAllowed(allowed);
         if (actionBar!=null) actionBar.updateSignatureNativeGlassPolicy(allowed);
@@ -560,7 +571,7 @@ public class ChatActivity extends BaseFragment implements
 
     private final ReferenceList<View> glassAttachedViews = new ReferenceList<>();
     private final ReferenceList<BlurredBackgroundDrawable> glassAttachedDrawables = new ReferenceList<>();
-    private final @Nullable DownscaleScrollableNoiseSuppressor scrollableViewNoiseSuppressor;
+    private @Nullable DownscaleScrollableNoiseSuppressor scrollableViewNoiseSuppressor;
     private final int recommendedAdditionalSizeY;
 
     private final @Nullable BlurredBackgroundSourceRenderNode glassBackgroundSourceRenderNode;
@@ -3020,7 +3031,7 @@ public class ChatActivity extends BaseFragment implements
 
     public ChatActivity(Bundle args) {
         super(args);
-        signatureNativeGlassAllowed=LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS);
+        signatureNativeGlassAllowed=SharedConfig.chatBlurEnabled() && LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS);
 
         navbarContentSourceWallpaper = new BlurredBackgroundSourceWrapped();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && SharedConfig.chatBlurEnabled()) {
@@ -3036,16 +3047,13 @@ public class ChatActivity extends BaseFragment implements
             glassBackgroundDrawableFactoryFrosted = new BlurredBackgroundDrawableViewFactory(glassBackgroundSourceFrostedRenderNode);
             glassBackgroundDrawableFactoryFrosted.setLiquidGlassEffectAllowed(LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS));
 
-            if (LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS)) {
+            { // Retain the native source for runtime policy changes; no recording while unused.
                 glassBackgroundSourceRenderNode = new BlurredBackgroundSourceRenderNode(navbarContentSourceWallpaper);
                 glassBackgroundSourceRenderNode.setOnDrawablesRelativePositionChangeListener(this::invalidateMergedVisibleBlurredPositionsAndSourcesPositions);
                 glassBackgroundSourceRenderNode.setScrollableNoiseSuppressor(scrollableViewNoiseSuppressor, DownscaleScrollableNoiseSuppressor.DRAW_GLASS);
                 glassBackgroundSourceRenderNode.setUnderSource(navbarContentSourceWallpaper);
                 glassBackgroundDrawableFactory = new BlurredBackgroundDrawableViewFactory(glassBackgroundSourceRenderNode);
                 glassBackgroundDrawableFactory.setLiquidGlassEffectAllowed(LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS));
-            } else {
-                glassBackgroundSourceRenderNode = null;
-                glassBackgroundDrawableFactory = glassBackgroundDrawableFactoryFrosted;
             }
         } else {
             scrollableViewNoiseSuppressor = null;
@@ -19423,7 +19431,11 @@ public class ChatActivity extends BaseFragment implements
                         viewClipTop += clipTop;
                         viewClipBottom -= clipBottom;
 
-                        if (cell == null || !cell.getTransitionParams().animateBackgroundBoundsInner) {
+                        boolean movingSelectedPreview = cell != null && scrimGroup == null && scrimViewTask == null
+                                && scrimViewReaction == null && selectedBubbleMotionMessage == cell.getMessageObject();
+                        // The selected overlay is translated/scaled below. Its SOURCE row bounds must
+                        // not clip the moved preview (especially after pinned-panel scroll correction).
+                        if (!movingSelectedPreview && (cell == null || !cell.getTransitionParams().animateBackgroundBoundsInner)) {
                             viewClipLeft = Math.max(viewClipLeft, chatListView.getLeft() + child.getX());
                             viewClipTop = Math.max(viewClipTop, chatListView.getY() + child.getY());
                             viewClipRight = Math.min(viewClipRight, chatListView.getLeft() + child.getX() + child.getMeasuredWidth());

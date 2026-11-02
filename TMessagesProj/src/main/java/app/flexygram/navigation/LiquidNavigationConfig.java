@@ -13,6 +13,7 @@ public final class LiquidNavigationConfig {
     private static boolean doubleTapProfile = true;
     private static boolean alwaysSearchChats = false;
     private static boolean floatingDock = true;
+    private static boolean separateSearch;
     private static int[] activeOrder = null;
     // Main tabs remains mounted beneath the settings fragment: notify it immediately.
     private static final java.util.concurrent.CopyOnWriteArrayList<Runnable> changeListeners = new java.util.concurrent.CopyOnWriteArrayList<>();
@@ -47,6 +48,7 @@ public final class LiquidNavigationConfig {
         doubleTapProfile = p.getBoolean("double_tap_profile", true);
         alwaysSearchChats = p.getBoolean("always_search_chats", false);
         floatingDock = p.getBoolean("floating_dock", true);
+        separateSearch = p.getBoolean("separate_search", false);
 
         String orderStr = prefs().getString("tab_order", null);
         if (orderStr != null && !orderStr.isEmpty()) {
@@ -162,8 +164,16 @@ public final class LiquidNavigationConfig {
         notifyChanged();
     }
 
+    public static boolean separateSearch() { ensure(); return separateSearch; }
+    public static void setSeparateSearch(boolean value) {
+        ensure(); separateSearch = value;
+        prefs().edit().putBoolean("separate_search",value).apply(); notifyChanged();
+    }
     public static int[] shown(int slots) {
-        return LiquidNavigationDestinations.fit(order(), slots);
+        int[] selected = order();
+        if (separateSearch()) selected = java.util.Arrays.stream(selected)
+                .filter(id -> id != LiquidNavigationDestinations.SEARCH).toArray();
+        return LiquidNavigationDestinations.fit(selected, slots);
     }
 
     public static boolean hideLabels(int count, int availableDp) {
