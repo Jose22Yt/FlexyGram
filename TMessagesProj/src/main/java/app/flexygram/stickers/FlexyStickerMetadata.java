@@ -8,16 +8,16 @@ import org.telegram.tgnet.TLRPC;
  * A WebP image sent without TL_documentAttributeSticker is treated as a generic document or photo,
  * NOT a native floating sticker.
  */
-public final class NativeStickerMetadata {
-    private NativeStickerMetadata() {}
+public final class FlexyStickerMetadata {
+    private FlexyStickerMetadata() {}
 
     public static TLRPC.TL_document create(int width, int height, int byteLength, String emoji) {
-        if (Math.max(width, height) != BubbleStickerSpec.MAX_SIDE || Math.min(width, height) < 1
-                || byteLength < 1 || byteLength > BubbleStickerSpec.MAX_BYTES) {
+        if (Math.max(width, height) != FlexyStickerSpec.MAX_SIDE || Math.min(width, height) < 1
+                || byteLength < 1 || byteLength > FlexyStickerSpec.MAX_BYTES) {
             throw new IllegalArgumentException("Not an eligible static sticker");
         }
         TLRPC.TL_document d = new TLRPC.TL_document();
-        d.mime_type = BubbleStickerSpec.MIME;
+        d.mime_type = FlexyStickerSpec.MIME;
         d.size = byteLength;
         d.file_reference = new byte[0];
 
@@ -35,8 +35,8 @@ public final class NativeStickerMetadata {
     }
 
     public static boolean isNativeStaticSticker(TLRPC.Document document) {
-        if (document == null || !BubbleStickerSpec.MIME.equals(document.mime_type)
-                || document.size < 1 || document.size > BubbleStickerSpec.MAX_BYTES) {
+        if (document == null || !FlexyStickerSpec.MIME.equals(document.mime_type)
+                || document.size < 1 || document.size > FlexyStickerSpec.MAX_BYTES) {
             return false;
         }
         boolean hasSticker = false;
@@ -47,7 +47,7 @@ public final class NativeStickerMetadata {
             }
             if (attribute instanceof TLRPC.TL_documentAttributeImageSize) {
                 TLRPC.TL_documentAttributeImageSize s = (TLRPC.TL_documentAttributeImageSize) attribute;
-                if (s.w > 0 && s.h > 0 && Math.max(s.w, s.h) == BubbleStickerSpec.MAX_SIDE) {
+                if (s.w > 0 && s.h > 0 && Math.max(s.w, s.h) == FlexyStickerSpec.MAX_SIDE) {
                     hasDimensions = true;
                 }
             }

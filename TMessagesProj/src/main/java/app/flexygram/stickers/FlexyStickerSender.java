@@ -16,7 +16,7 @@ import java.util.ArrayList;
  * Handles uploading and sending static sticker documents through Telegram's native transport.
  * Optionally adds the sticker to user's favorites upon server confirmation.
  */
-public final class BubbleStickerSender implements NotificationCenter.NotificationCenterDelegate {
+public final class FlexyStickerSender implements NotificationCenter.NotificationCenterDelegate {
 
     public interface Callback {
         void onSuccess(TLRPC.Document serverDoc);
@@ -33,7 +33,7 @@ public final class BubbleStickerSender implements NotificationCenter.Notificatio
 
     private final Runnable timeoutRunnable = () -> finish(null, new IOException("Timeout awaiting server confirmation"));
 
-    private BubbleStickerSender(int account, long dialogId, File file, boolean addToFavorites, Callback callback) {
+    private FlexyStickerSender(int account, long dialogId, File file, boolean addToFavorites, Callback callback) {
         this.account = account;
         this.dialogId = dialogId;
         this.file = file;
@@ -52,7 +52,7 @@ public final class BubbleStickerSender implements NotificationCenter.Notificatio
         }
 
         long targetDialog = addToFavorites ? UserConfig.getInstance(account).getClientUserId() : dialogId;
-        BubbleStickerSender sender = new BubbleStickerSender(account, targetDialog, file, addToFavorites, callback);
+        FlexyStickerSender sender = new FlexyStickerSender(account, targetDialog, file, addToFavorites, callback);
 
         NotificationCenter center = NotificationCenter.getInstance(account);
         center.addObserver(sender, NotificationCenter.didReceiveNewMessages);
@@ -95,7 +95,7 @@ public final class BubbleStickerSender implements NotificationCenter.Notificatio
                     && args[3] instanceof Long && (Long) args[3] == dialogId && args[2] instanceof TLRPC.Message) {
                 TLRPC.Message message = (TLRPC.Message) args[2];
                 TLRPC.Document serverDoc = message.media != null ? message.media.document : null;
-                if (serverDoc != null && NativeStickerMetadata.isNativeStaticSticker(serverDoc)) {
+                if (serverDoc != null && FlexyStickerMetadata.isNativeStaticSticker(serverDoc)) {
                     if (addToFavorites) {
                         MediaDataController.getInstance(account).addRecentSticker(
                                 MediaDataController.TYPE_FAVE, null, serverDoc, (int) (System.currentTimeMillis() / 1000), false);

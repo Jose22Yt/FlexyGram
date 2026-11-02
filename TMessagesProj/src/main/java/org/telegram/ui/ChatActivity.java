@@ -34534,7 +34534,7 @@ public class ChatActivity extends BaseFragment implements
                         }
                         if(action==app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.STICKER){
                             if(scrimPopupWindow!=null)scrimPopupWindow.dismiss();
-                            app.flexygram.stickers.BubbleStickerSheet.show(ChatActivity.this,panelCell,panelMessage);
+                            app.flexygram.stickers.FlexyStickerSheet.show(ChatActivity.this,panelCell,panelMessage);
                             return;
                         }
                         ArrayList<Integer> freshIcons=new ArrayList<>(),freshOptions=new ArrayList<>();
@@ -37179,7 +37179,7 @@ public class ChatActivity extends BaseFragment implements
                 if (selectedObject != null) {
                     BaseCell cell = findMessageCell(selectedObject.getId(), true);
                     if (cell instanceof ChatMessageCell) {
-                        app.flexygram.stickers.BubbleStickerSheet.show(ChatActivity.this, (ChatMessageCell) cell, selectedObject);
+                        app.flexygram.stickers.FlexyStickerSheet.show(ChatActivity.this, (ChatMessageCell) cell, selectedObject);
                     }
                 }
                 break;

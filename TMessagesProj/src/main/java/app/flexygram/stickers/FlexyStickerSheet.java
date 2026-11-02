@@ -35,14 +35,14 @@ import java.util.concurrent.Executors;
  * Signature FlexyGram bottom sheet for previewing, sending directly, or saving
  * converted message bubbles as native Telegram static stickers.
  */
-public final class BubbleStickerSheet extends BottomSheet {
+public final class FlexyStickerSheet extends BottomSheet {
 
     private final BaseFragment fragment;
     private final long dialogId;
     private final int currentAccount;
 
     private Bitmap capturedBitmap;
-    private BubbleStickerEncoder.StickerBytes stickerBytes;
+    private FlexyStickerEncoder.StickerBytes stickerBytes;
     private File stickerFile;
     private TLRPC.TL_document stickerDoc;
 
@@ -55,14 +55,14 @@ public final class BubbleStickerSheet extends BottomSheet {
             return;
         }
         try {
-            BubbleStickerSheet sheet = new BubbleStickerSheet(fragment, cell, message);
+            FlexyStickerSheet sheet = new FlexyStickerSheet(fragment, cell, message);
             sheet.show();
         } catch (Throwable t) {
             FileLog.e(t);
         }
     }
 
-    private BubbleStickerSheet(BaseFragment fragment, ChatMessageCell cell, MessageObject message) {
+    private FlexyStickerSheet(BaseFragment fragment, ChatMessageCell cell, MessageObject message) {
         super(fragment.getParentActivity(), false);
         this.fragment = fragment;
         this.currentAccount = fragment.getCurrentAccount();
@@ -74,7 +74,7 @@ public final class BubbleStickerSheet extends BottomSheet {
 
         // Capture bubble synchronously on UI thread before views shift
         try {
-            capturedBitmap = BubbleStickerEncoder.captureBubble(cell, message);
+            capturedBitmap = FlexyStickerEncoder.captureBubble(cell, message);
         } catch (Throwable t) {
             FileLog.e(t);
         }
@@ -185,9 +185,9 @@ public final class BubbleStickerSheet extends BottomSheet {
         final Bitmap bmpToEncode = capturedBitmap.copy(capturedBitmap.getConfig(), false);
         Executors.newSingleThreadExecutor().execute(() -> {
             try {
-                BubbleStickerEncoder.StickerBytes encoded = BubbleStickerEncoder.encodeAndRecycle(bmpToEncode);
-                File file = BubbleStickerEncoder.writeToCache(getContext().getCacheDir(), encoded);
-                TLRPC.TL_document doc = NativeStickerMetadata.create(encoded.width, encoded.height, encoded.bytes.length, "💬");
+                FlexyStickerEncoder.StickerBytes encoded = FlexyStickerEncoder.encodeAndRecycle(bmpToEncode);
+                File file = FlexyStickerEncoder.writeToCache(getContext().getCacheDir(), encoded);
+                TLRPC.TL_document doc = FlexyStickerMetadata.create(encoded.width, encoded.height, encoded.bytes.length, "💬");
 
                 new Handler(Looper.getMainLooper()).post(() -> {
                     stickerBytes = encoded;
@@ -218,7 +218,7 @@ public final class BubbleStickerSheet extends BottomSheet {
         AndroidUtilities.vibrateCursor(sendButton);
         dismiss();
 
-        BubbleStickerSender.send(currentAccount, dialogId, stickerFile, stickerDoc, toFavorites, new BubbleStickerSender.Callback() {
+        FlexyStickerSender.send(currentAccount, dialogId, stickerFile, stickerDoc, toFavorites, new FlexyStickerSender.Callback() {
             @Override
             public void onSuccess(TLRPC.Document serverDoc) {
                 int resId = toFavorites ? R.string.FlexyStickerSavedFavorite : R.string.FlexyStickerSent;

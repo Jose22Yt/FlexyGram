@@ -5,12 +5,12 @@ package app.flexygram.stickers;
  * Standard protocol specifications for Telegram native static stickers.
  * Static stickers must be WebP format with maximum side exactly 512px and max size 512KB.
  */
-public final class BubbleStickerSpec {
+public final class FlexyStickerSpec {
     public static final int MAX_SIDE = 512;
     public static final int MAX_BYTES = 512 * 1024;
     public static final String MIME = "image/webp";
 
-    private BubbleStickerSpec() {}
+    private FlexyStickerSpec() {}
 
     /**
      * Calculates scaled sticker dimensions preserving original aspect ratio.

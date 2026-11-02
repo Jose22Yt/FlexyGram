@@ -17,7 +17,7 @@ import java.io.IOException;
 /**
  * Handles capturing native ChatMessageCell bubble drawing and encoding to Telegram-compliant WebP.
  */
-public final class BubbleStickerEncoder {
+public final class FlexyStickerEncoder {
 
     public static final class StickerBytes {
         public final byte[] bytes;
@@ -31,7 +31,7 @@ public final class BubbleStickerEncoder {
         }
     }
 
-    private BubbleStickerEncoder() {}
+    private FlexyStickerEncoder() {}
 
     /**
      * Checks if a message bubble is eligible for conversion to sticker.
@@ -73,7 +73,7 @@ public final class BubbleStickerEncoder {
         int sourceW = Math.max(1, right - left);
         int sourceH = Math.max(1, bottom - top);
 
-        int[] targetDims = BubbleStickerSpec.dimensions(sourceW, sourceH);
+        int[] targetDims = FlexyStickerSpec.dimensions(sourceW, sourceH);
         Bitmap bitmap = Bitmap.createBitmap(targetDims[0], targetDims[1], Bitmap.Config.ARGB_8888);
 
         Canvas canvas = new Canvas(bitmap);
@@ -116,7 +116,7 @@ public final class BubbleStickerEncoder {
             if (Build.VERSION.SDK_INT >= 30) {
                 if (bitmap.compress(Bitmap.CompressFormat.WEBP_LOSSLESS, 100, out)) {
                     byte[] bytes = out.toByteArray();
-                    if (bytes.length <= BubbleStickerSpec.MAX_BYTES && BubbleStickerSpec.isWebp(bytes)) {
+                    if (bytes.length <= FlexyStickerSpec.MAX_BYTES && FlexyStickerSpec.isWebp(bytes)) {
                         return new StickerBytes(bytes, w, h);
                     }
                 }
@@ -128,14 +128,14 @@ public final class BubbleStickerEncoder {
                 out.reset();
                 if (bitmap.compress(fmt, quality, out)) {
                     byte[] bytes = out.toByteArray();
-                    if (bytes.length <= BubbleStickerSpec.MAX_BYTES && BubbleStickerSpec.isWebp(bytes)) {
+                    if (bytes.length <= FlexyStickerSpec.MAX_BYTES && FlexyStickerSpec.isWebp(bytes)) {
                         return new StickerBytes(bytes, w, h);
                     }
                 }
             }
 
             byte[] finalBytes = out.toByteArray();
-            if (BubbleStickerSpec.isWebp(finalBytes)) {
+            if (FlexyStickerSpec.isWebp(finalBytes)) {
                 return new StickerBytes(finalBytes, w, h);
             }
             throw new IOException("Failed to encode valid WebP sticker");
@@ -150,7 +150,7 @@ public final class BubbleStickerEncoder {
      * Writes the encoded sticker bytes to a temporary file.
      */
     public static File writeToCache(File cacheDir, StickerBytes data) throws IOException {
-        if (data == null || !BubbleStickerSpec.isWebp(data.bytes)) {
+        if (data == null || !FlexyStickerSpec.isWebp(data.bytes)) {
             throw new IOException("Invalid sticker bytes");
         }
         File file = File.createTempFile("flexy_bubble_sticker_", ".webp", cacheDir);
