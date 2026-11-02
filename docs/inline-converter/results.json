@@ -1,0 +1,87 @@
+{
+  "base": "abf93053f9f98bae95b88f070f3e964c8b3bb311",
+  "branch": "feat/inline-smart-converter",
+  "production": {
+    "native_touch_hook": true,
+    "original_message_spans_modified": false,
+    "default_enabled": false,
+    "background_existing_queue": true,
+    "cache_entries": 32,
+    "max_utf16_chars_per_text": 4096,
+    "max_matches_per_text": 12,
+    "external_rate_provider_enabled": false
+  },
+  "validation": {
+    "new_converter_tests": {
+      "passed": 19,
+      "kind": "production Java core + explicit Android host doubles + source contracts"
+    },
+    "general_pytest": {
+      "passed": 201,
+      "skipped": 31,
+      "skip_reason": "optional corpus/R8 artifacts absent; original skip behavior retained"
+    },
+    "syntax": {
+      "production_files": 14,
+      "passed": true,
+      "tool": "JavaParser 3.26.3 Java21 mode",
+      "semantic_compilation": false
+    },
+    "protected_identity_inputs": {
+      "unchanged_against_base": true
+    },
+    "signing_verifier": {
+      "passed": true,
+      "rejection_non_disclosure_cases": 9,
+      "keystore_used": false
+    },
+    "connected_alpha_checks": {
+      "candidate": "blocked",
+      "baseline": "blocked",
+      "reason": "frozen beta_release_contract Unknown Beta delivery scope; not bypassed"
+    },
+    "identity_checker": {
+      "candidate": "blocked",
+      "baseline": "blocked",
+      "reason": "frozen original manifest assertion Unexpected manifest edit; manifest identical to selected Beta base"
+    },
+    "performance1_tests": {
+      "candidate_passed": 19,
+      "candidate_failed": 1,
+      "baseline_passed": 19,
+      "baseline_failed": 1,
+      "failure": "test_only_reviewed_files_change_and_work1_production_is_exact; frozen scope"
+    },
+    "android_build": {
+      "status": "blocked before project configuration",
+      "command": "bash gradlew :TMessagesProj:compileBetaJavaWithJavac --no-daemon",
+      "reason": "Gradle 9.7.1 distribution download: Network is unreachable"
+    },
+    "android_resource_compile": "pending SDK37/build-tools36",
+    "physical_poco_x8_pro": "not connected / not executed",
+    "actual_screenshots": "pending Android execution; no mockups represented as screenshots"
+  },
+  "host_benchmark": {
+    "status": "observed host only; no Android comparison",
+    "jvm": "OpenJDK17",
+    "utf16_chars": 3800,
+    "warmup_scans": 400,
+    "samples": 600,
+    "median_ns": 554559,
+    "p95_ns": 1473108,
+    "source": "CoreProbe benchmark invocation recorded during targeted execution",
+    "android_fps": null,
+    "touch_latency_ms": null,
+    "device_jank": null,
+    "device_memory": null
+  },
+  "acceptance_pending": [
+    "full Beta Android compilation and resource validation",
+    "real touch/RTL/caption geometry and lifecycle",
+    "popup bounds with keyboard/pins/font scale/rotation",
+    "light/dark real screenshots",
+    "device framestats, GC, CPU and input-to-present comparison",
+    "specific TalkBack conversion action (native message accessibility retained)",
+    "owner authorization and provider terms before any exchange-rate network integration"
+  ]
+}
