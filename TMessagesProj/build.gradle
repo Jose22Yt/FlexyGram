@@ -333,12 +333,12 @@ apply from: rootProject.file('gradle/flexygram-beta.gradle')
 
 androidComponents {
     beforeVariants(selector().all()) { builder ->
-        builder.enable = builder.buildType in ['connectedAlpha', 'beta']
+        builder.enable = builder.buildType in ['connectedAlpha', 'beta', 'debug']
     }
     onVariants(selector().all()) { variant ->
         variant.applicationId.set(variant.buildType == 'connectedAlpha' ? 'io.github.jose22yt.flexygram.alpha' : APP_PACKAGE)
         variant.outputs.forEach { output ->
-            boolean beta = variant.buildType == 'beta'
+            boolean beta = variant.buildType in ['beta', 'debug']
             if (beta) {
                 output.versionName.set(BETA_VERSION_NAME)
                 output.versionCode.set(BETA_VERSION_CODE.toInteger())

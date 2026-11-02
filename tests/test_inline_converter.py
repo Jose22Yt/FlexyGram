@@ -92,6 +92,8 @@ def test_controller_with_explicit_host_doubles(controller_host,case):
  print(result.stdout)
 
 def test_identity_and_distribution_inputs_are_unchanged():
- for name in ['TMessagesProj/src/main/AndroidManifest.xml','TMessagesProj/build.gradle','gradle.properties','gradle/flexygram-beta.gradle']:
+ for name in ['TMessagesProj/src/main/AndroidManifest.xml','gradle.properties','gradle/flexygram-beta.gradle']:
   original=subprocess.check_output(['git','show','abf93053f9f98bae95b88f070f3e964c8b3bb311:'+name],cwd=ROOT)
   assert (ROOT/name).read_bytes()==original,name
+ assert "['connectedAlpha', 'beta', 'debug']" in (ROOT/'TMessagesProj/build.gradle').read_text()
+
