@@ -16,15 +16,15 @@
   ],
   "reviewed": {
     ".github/beta/README.md": "227c26c2b0cea7d033e5fe1f99dd2a26be8e1862a0e2e6285ee283be86df42e4",
-    ".github/beta/audit_environment.py": "0a5fe21ac2e8aa6d48c8141b1195f214cac8c2596edbd5bbdbeb8dda1189135a",
-    ".github/beta/policy.json": "71f4807fd90ff3b2822a3da40436775060b240e193af07a59dca19bebc1b276f",
-    ".github/beta/private_build.py": "f39a4e018d23a50096a55fd08d664d6091f881d48fe39ffbc77dcef5a3b2a7a5",
+    ".github/beta/audit_environment.py": "2ef00710e393e4195e78277f12e78fde8c5413a15e0474d243861094d430adc8",
+    ".github/beta/policy.json": "c79a57c88cca1fcdd4c4573a246aedc3c4468fcbe139190bfe21ea4f18bcd81f",
+    ".github/beta/private_build.py": "a6a41d92d6e0185d1f9cb787ffd23a45b0eb1cadb42beb414e0906d6aabbfb01",
     ".github/beta/source_contract.py": "d40ab8e902e36064f673eca572d1b0a74f848b377d5fa55684f3d10131d27a15",
     ".github/beta/test_infrastructure.py": "9ad7510a2d8f8a765c66c09c9e4232dbd89a61b3876c029745f3d528a744d4df",
     ".github/workflows/beta-private-tests.yml": "4ee320fe25544445fdc490658b415519b947434f717d5d3b78ac05d05e510237",
-    ".github/workflows/beta-private.yml": "27310e55a45cb5fb0305e5006d8c95e281a72ab804b03a483c1cc901c6af676f",
+    ".github/workflows/beta-private.yml": "3f398775d09a4ed8991e70f51c73bd881d84e56372b39ba1e70140406f0a04b4",
     "tools/connected_alpha/beta_release_contract.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    ".github/beta/source_identity.json": "856f57ae0a402445d32ade01ace3c1ea6bdf5b510c3adfd45f8ca0ccab59b0c6",
+    ".github/beta/source_identity.json": "c530e69bd51832fa1d4a49384727f0d899cd74a355c81ec4a3e63bb60f827df6",
     ".github/workflows/pr.yml": "f004441445da84b23ca63bd0fcec2e5329552679a2463251fbe6129c34af8fcd"
   }
 }
