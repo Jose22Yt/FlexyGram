@@ -36,3 +36,11 @@ Resultado de la suite Python completa: **148 aprobadas, 31 omitidas, cero fallos
 Se ejecutó por separado `:TMessagesProj:externalNativeBuildDebug` para validar y preparar C/C++ sin esperar a los dos dominios bloqueados. Terminó con **BUILD SUCCESSFUL** en 6 min 37 s, 29 tareas (3 ejecutadas y 26 actualizadas). Generó `TMessagesProj/build/intermediates/cxx/Debug/4p4gjk21/obj/arm64-v8a/libtmessages.49.so`, de aproximadamente 371 MiB con símbolos de depuración. Esto valida la biblioteca nativa principal ARM64, no una APK completa ni la ejecución en Android.
 
 Al finalizar se restauró el criterio Java del daemon y `git diff --check` quedó correcto. Los cambios necesarios de red y las instrucciones de inicio actualizadas están guardados en el borrador del entorno. La herramienta solicita revisión, guardado y publicación por el usuario; no se ha afirmado que esa publicación o aplicación de red se haya realizado.
+
+## Publicación del trabajo y compilación en GitHub
+
+El código se publicó en la rama `codex/flexygram-beta-glass`, a partir de `main`. El primer commit de los cambios de interfaz y cristal es `8d89304ad44c9bc15fcbff5a449328bb9d19a25c`.
+
+Se añadió `.github/workflows/ui-beta-debug.yml`, un flujo de depuración ARM64 que se activa con los pushes a esa rama y admite ejecución manual. Compila el SHA del evento, ejecuta las pruebas, conserva el registro de Gradle y verifica la firma y las bibliotecas nativas de la APK antes de guardarla como artefacto por siete días. Usa firma de depuración, no solicita secretos ni modifica el flujo protegido de beta oficial. No crea releases ni envía mensajes externos.
+
+El flujo se validó con actionlint 1.7.12. La publicación del YAML no demuestra que GitHub Actions esté habilitado ni que la ejecución haya terminado. La API `api.github.com` devuelve Forbidden desde el entorno, por lo que la comprobación del estado remoto queda pendiente hasta disponer de acceso o del resultado mostrado en Actions. La rama publicada permite revisar el código incluso mientras continúa ese bloqueo.
