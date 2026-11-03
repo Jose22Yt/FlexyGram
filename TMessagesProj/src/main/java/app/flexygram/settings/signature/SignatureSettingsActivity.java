@@ -25,13 +25,13 @@ public class SignatureSettingsActivity extends SignatureMatteSettingsActivity {
         if(!query.isEmpty()){
             for(Settings3Registry.Entry e:Settings3Registry.all())if((LocaleController.getString(e.title)+" "+LocaleController.getString(e.description)).toLowerCase(Locale.ROOT).contains(query))rows.add(e);
         }else{
-            rows.add(R.string.Settings2Title);int previous=0;
+            int previous=0;
             for(Settings3Registry.Entry e:Settings3Registry.all()){if(previous!=e.group){rows.add(e.group);previous=e.group;}rows.add(e);}
         }
         rowCount=rows.size();
     }
     @Override public View createView(Context context){
-        View v=super.createView(context);actionBar.centerTitle();listView.setItemViewCacheSize(10);listView.setSections(AndroidUtilities.dp(16),AndroidUtilities.dp(20),true);listView.setItemAnimator(null);
+        View v=super.createView(context);actionBar.centerTitle();listView.setItemViewCacheSize(10);listView.setSections(AndroidUtilities.dp(12),AndroidUtilities.dp(16),true);listView.setItemAnimator(null);
         actionBar.createMenu().addItem(7,R.drawable.ic_ab_search_solar).setIsSearchField(true).setActionBarMenuItemSearchListener(new ActionBarMenuItem.ActionBarMenuItemSearchListener(){
             @Override public void onTextChanged(EditText field){query=field.getText().toString().trim().toLowerCase(Locale.ROOT);updateRows();listAdapter.notifyDataSetChanged();}
             @Override public void onSearchCollapse(){query="";updateRows();listAdapter.notifyDataSetChanged();}
@@ -51,20 +51,24 @@ public class SignatureSettingsActivity extends SignatureMatteSettingsActivity {
     }
     @Override public void saveSelfArgs(Bundle args){super.saveSelfArgs(args);args.putString("settings2Page",page);}
     @Override public void restoreSelfArgs(Bundle args){super.restoreSelfArgs(args);page=args.getString("settings2Page","root");}
+    @Override public ArrayList<ThemeDescription> getThemeDescriptions(){
+        ArrayList<ThemeDescription> colors=super.getThemeDescriptions();
+        colors.add(new ThemeDescription(listView,ThemeDescription.FLAG_TEXTCOLOR,new Class[]{TextView.class},null,null,null,Theme.key_windowBackgroundWhiteGrayText2));
+        return colors;
+    }
     private final class Adapter extends MatteListAdapter {
         Adapter(Context c){super(c);}
         @Override public int getItemViewType(int p){return rows.get(p) instanceof Integer?TEXT:ENTRY;}
         @Override protected boolean isSectionContent(int type){return type==ENTRY;}
         @Override public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent,int type){
-            View v;if(type==ENTRY)v=new Settings2Cell(parent.getContext(),resourcesProvider);
-            else{TextView t=new TextView(parent.getContext());t.setTag(RecyclerListView.TAG_NOT_SECTION);t.setPadding(AndroidUtilities.dp(22),AndroidUtilities.dp(24),AndroidUtilities.dp(22),AndroidUtilities.dp(10));t.setTextSize(14);t.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_YES);v=t;}
+            View v;if(type==ENTRY)v=new Settings2Cell(parent.getContext(),resourcesProvider,true);
+            else{TextView t=new TextView(parent.getContext());t.setTag(RecyclerListView.TAG_NOT_SECTION);t.setPadding(AndroidUtilities.dp(20),AndroidUtilities.dp(12),AndroidUtilities.dp(20),AndroidUtilities.dp(6));t.setTextSize(12);t.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_YES);v=t;}
             v.setLayoutParams(new RecyclerView.LayoutParams(-1,-2));return new RecyclerListView.Holder(v);
         }
         @Override public void onBindViewHolder(RecyclerView.ViewHolder holder,int p,boolean partial){
             Object item=rows.get(p);
-            if(item instanceof Integer){TextView t=(TextView)holder.itemView;int id=(Integer)item;t.setTextColor(getThemedColor(Theme.key_windowBackgroundWhiteGrayText2));t.setTextSize(id==R.string.Settings2Title?32:14);t.setTypeface(AndroidUtilities.bold());
+            if(item instanceof Integer){TextView t=(TextView)holder.itemView;int id=(Integer)item;t.setTextColor(getThemedColor(Theme.key_windowBackgroundWhiteGrayText2));t.setTextSize(12);t.setTypeface(AndroidUtilities.bold());
                 t.setText(id==0?"":LocaleController.getString(id));
-                if(id==R.string.Settings2Title)t.setTextColor(getThemedColor(Theme.key_windowBackgroundWhiteBlackText));
             }else{
                 Settings2Cell c=(Settings2Cell)holder.itemView;boolean divider=p+1<rows.size()&&!(rows.get(p+1)instanceof Integer);
                 if(item instanceof Settings3Registry.Entry){var e=(Settings3Registry.Entry)item;c.bind(LocaleController.getString(e.title),LocaleController.getString(e.description),e.icon,0,divider);}

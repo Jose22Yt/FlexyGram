@@ -1,5 +1,9 @@
 # Signature Settings 3.0 — draft integration
 
+La presentación compacta posterior se documenta en
+[Inicio de ajustes compacto](../FlexyGram-ajustes-compactos.md). Las capturas de
+esta página corresponden a la presentación anterior, con descripciones visibles.
+
 Approved references: `51674.png` light and `51673.png` dark (received as `51674(1).png` and `51673(1).png`). These replace the colored Settings2 presentation. No new mockups were generated.
 
 Base: PR161 `feat/beta-official-source-v2`, `3c7a20a229d425c8f3b5ea1740ccb6d8b3361fea`. This includes the merged PR160 plus Work1's settings recycling and official Beta fixes. The older PR141 branch currently points to an earlier commit, so using it would discard integrated work. The independent feature branch preserves PR161's app behavior and does not change main, signing, version, identifiers or distribution.

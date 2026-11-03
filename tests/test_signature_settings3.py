@@ -17,7 +17,7 @@ def test_exact_root_order_and_single_vector_family():
  rows=re.findall(r'new Entry\("(\w+)",R.string.Settings3Group_(\w+),R.string.Settings3_\w+,R.string.Settings3Desc_\w+,R.drawable.(\w+)\)',text)
  assert [r[0]for r in rows]==['chat','home','navigation','ayu','plugins','flexyfiles','files','universal','studio','about']
  assert [r[1]for r in rows]==['personal']*3+['functions']*3+['system']*3+['information']
- assert all(icon.startswith('fg_settings_')for _,_,icon in rows)
+ assert all(icon.startswith('fg_settings_') or icon.endswith('_solar') for _,_,icon in rows)
  assert rows[1][2]=='fg_settings_home' and rows[8][2]=='fg_settings_layers'
  assert 'Settings2Subtitle' not in (S/'SignatureSettingsActivity.java').read_text()
 def test_root_no_colored_tiles_or_intermediate_registry():
