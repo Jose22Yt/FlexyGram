@@ -8,9 +8,10 @@ import app.exteraless.player.Spring;
  * Closing retargets existing springs: it never restarts a timed interpolation.
  */
 public final class SelectedBubbleMotion implements Choreographer.FrameCallback {
-    private final Spring x = new Spring(1f, 560f, .60f, .00012f);
-    private final Spring y = new Spring(1f, 560f, .60f, .00012f);
-    private final Spring phase = new Spring(1f, 500f, .60f, .0008f);
+    private final Spring x = new Spring(1f, 900f, .78f, .0002f);
+    private final Spring y = new Spring(1f, 900f, .78f, .0002f);
+    private final Spring phase = new Spring(1f, 1100f, .78f, .0015f);
+    private static final long ENTER_LIMIT_MS = 360, CLOSE_LIMIT_MS = 180;
     private Runnable invalidate, completion;
     private boolean running, closing;
     private long lastFrame, started;
@@ -72,11 +73,18 @@ public final class SelectedBubbleMotion implements Choreographer.FrameCallback {
         lastFrame = frameTimeNanos;
         boolean mx=x.step(dt), my=y.step(dt), mp=phase.step(dt);
         if (invalidate != null) invalidate.run();
-        if ((!mx && !my && !mp) || android.os.SystemClock.uptimeMillis()-started > 800) {
+        if ((!mx && !my && !mp) || closing && phase.value <= 0f
+                || android.os.SystemClock.uptimeMillis()-started >= (closing ? CLOSE_LIMIT_MS : ENTER_LIMIT_MS)) {
             running = false;
             x.snap(1f); y.snap(1f); phase.snap(closing ? 0f : 1f);
             if (closing) finish(); else if (invalidate != null) invalidate.run();
         } else Choreographer.getInstance().postFrameCallback(this);
+    }
+    /** A new gesture takes priority over the decorative return, with exactly one cleanup callback. */
+    public void finishImmediately() {
+        closing = true;
+        x.snap(1f); y.snap(1f); phase.snap(0f);
+        finish();
     }
     private void finish() {
         Choreographer.getInstance().removeFrameCallback(this); running = false;

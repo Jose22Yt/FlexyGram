@@ -23,9 +23,9 @@ public class PhysicsProbe {
     require(m.spatialOffset(0f,4f)==0f,"Stationary preview moved");
     if(!m.isRunning()&&settledFrame==0)settledFrame=i;
    }
-   require(peak>1.04f&&peak<1.10f,"Missing or excessive damped overshoot");
-   require(peakTime>.12&&peakTime<.24,"Rebound timing outside calibrated window");
-   require(settledFrame>0&&settledFrame/(double)hz<.75,"Entry did not settle");
+   require(peak>1f&&peak<1.04f,"Missing or excessive damped overshoot");
+   require(peakTime>.08&&peakTime<.20,"Rebound timing outside calibrated window");
+   require(settledFrame>0&&settledFrame/(double)hz<.40,"Entry did not settle");
    require(m.panelScale()==1&&m.panelOffset()==0,"Entry did not restore final card");
    System.out.println("Trajectory "+hz+" Hz: peak="+peak+" at "+peakTime+"s; settled="+settledFrame/(double)hz+"s");
    m.reset();
@@ -62,6 +62,21 @@ public class PhysicsProbe {
    m.enter(()->old[0]++,.98f,.97f,-.1f,-.2f);frame(.008);m.close(()->closed[0]++);m.reset();
    require(closed[0]==1,"Lifecycle reset stranded a closing popup");
    m.enter(()->fresh[0]++);int count=old[0];for(int j=0;j<100;j++)frame(.008);require(old[0]==count,"Stale menu invalidator");m.reset();
+  }
+  for(int hz:new int[]{60,90,120,144})for(int openedFrames:new int[]{1,4,12,60}) {
+   SelectedBubbleMotion fast=new SelectedBubbleMotion();final int[] completed={0};
+   fast.enter(()->{});
+   for(int i=0;i<openedFrames;i++)frame(1d/hz);
+   fast.close(()->completed[0]++);
+   int frames=0;
+   while(fast.hasOwner()&&frames<hz){frame(1d/hz);frames++;}
+   require(frames/(double)hz<=.21,"Close exceeded its fast deadline");
+   require(completed[0]==1&&!fast.isRunning(),"Close cleanup did not run exactly once");
+   fast.enter(()->{});frame(1d/hz);fast.close(()->completed[0]++);
+   fast.finishImmediately();
+   require(completed[0]==2&&!fast.hasOwner()&&!fast.isRunning()&&fast.progress()==0,"New input did not finish return immediately");
+   fast.finishImmediately();frame(1d/hz);
+   require(completed[0]==2,"Interrupted owner called completion twice");
   }
   System.out.println("PASS production spring/controllers: 60/90/120/144 Hz, "+samples+" simulated frames; device NOT_TESTED");
  }

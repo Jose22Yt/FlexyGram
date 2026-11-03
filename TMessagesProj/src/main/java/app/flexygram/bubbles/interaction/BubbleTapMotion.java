@@ -8,8 +8,8 @@ import app.exteraless.player.Spring;
 /** Local frame-clock spring; the existing native integrator owns position AND velocity. */
 public final class BubbleTapMotion implements Runnable {
     private final View owner;
-    private final Spring x = new Spring(1f, 560f, .60f, .00012f);
-    private final Spring y = new Spring(1f, 560f, .60f, .00012f);
+    private final Spring x = new Spring(1f, 900f, .78f, .0002f);
+    private final Spring y = new Spring(1f, 900f, .78f, .0002f);
     private boolean pressed, running;
     private long last;
     public BubbleTapMotion(View owner) { this.owner = owner; }

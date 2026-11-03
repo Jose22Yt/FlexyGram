@@ -1227,6 +1227,15 @@ public class ChatActivity extends BaseFragment implements
     private float selectedBubbleOffsetY;
     private float selectedBubblePreviewScale = 1f;
     private float selectedBubblePreviewScroll;
+    private void finishBubbleReturnForInput() {
+        if (selectedBubbleMotion.isClosing() && scrimPopupWindow != null) {
+            scrimPopupWindow.dismiss(false);
+        }
+        // Even a zero-duration dim animator may still be queued for the next frame.
+        if (scrimAnimatorSet != null && scrimAnimatorSet.isRunning() && !scrimProgressDirection) {
+            scrimAnimatorSet.end();
+        }
+    }
     private View scrimView;
     private float scrimViewAlpha = 1f;
     private float scrimViewProgress = 0f;
@@ -7606,6 +7615,7 @@ public class ChatActivity extends BaseFragment implements
 
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                if (newState != RecyclerView.SCROLL_STATE_IDLE) finishBubbleReturnForInput();
                 if (newState == RecyclerView.SCROLL_STATE_IDLE) {
                     if (pollHintCell != null) {
                         pollHintView.showForMessageCell(pollHintCell, -1, pollHintX, pollHintY, true);
@@ -7666,6 +7676,7 @@ public class ChatActivity extends BaseFragment implements
 
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                if (dx != 0 || dy != 0) finishBubbleReturnForInput();
                 final ChatActivity chatToUpdate = parentChatActivity != null ? parentChatActivity : ChatActivity.this;
 
                 chatListView.invalidate();
@@ -18972,6 +18983,7 @@ public class ChatActivity extends BaseFragment implements
 
         @Override
         public boolean dispatchTouchEvent(MotionEvent ev) {
+            if (ev.getActionMasked() == MotionEvent.ACTION_DOWN) finishBubbleReturnForInput();
             if (messageMetricsView != null) {
                 messageMetricsView.setIsUserActive();
             }
@@ -34334,12 +34346,18 @@ public class ChatActivity extends BaseFragment implements
                                 }
                             });
                         } else if (LanguageDetector.hasSupport()) {
+                            final MessageObject translationOwner = selectedObject;
                             final String[] fromLang = {null};
                             cell.setVisibility(View.GONE);
                             waitForLangDetection.set(true);
                             LanguageDetector.detectLanguage(
                                 finalMessageText.toString(),
                                 (String lang) -> {
+                                    if (selectedObject != translationOwner || fragmentView == null) {
+                                        waitForLangDetection.set(false);
+                                        onLangDetectionDone.set(null);
+                                        return;
+                                    }
                                     fromLang[0] = lang;
                                     if (fromLang[0] != null && (!fromLang[0].equals(toLang) || !fromLang[0].equals(toLangDefault) || fromLang[0].equals(TranslateController.UNKNOWN_LANGUAGE)) && (
                                         translateEnabled && !RestrictedLanguagesSelectActivity.getRestrictedLanguages().contains(fromLang[0]) ||
@@ -34920,18 +34938,24 @@ public class ChatActivity extends BaseFragment implements
                         signatureClosing = true;
                         setFocusable(false);
                         setTouchable(false);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) setTouchModal(false);
                         update();
+                        chatLayoutManager.setCanScrollVertically(true);
+                        if (chatActivityEnterView != null && chatActivityEnterView.getEditField() != null) {
+                            chatActivityEnterView.getEditField().setAllowDrawCursor(true);
+                        }
                         selectedBubbleMotion.close(() -> {
                             finishDismiss(false);
                             if (finalReactionsLayout1 != null) finalReactionsLayout1.dismissParent(false);
                         });
+                        updateMessageListAccessibilityVisibility();
                         return;
                     }
                     if (compactContext && signatureClosing) {
-                        selectedBubbleMotion.reset(); // Completes its one pending native-dismiss callback.
+                        selectedBubbleMotion.finishImmediately(); // Complete the owner before delivering the new touch.
                         return;
                     }
-                    if (compactContext) selectedBubbleMotion.reset();
+                    if (compactContext) selectedBubbleMotion.finishImmediately();
                     finishDismiss(animated);
                     if (finalReactionsLayout1 != null) finalReactionsLayout1.dismissParent(animated);
                 }
@@ -35100,6 +35124,8 @@ public class ChatActivity extends BaseFragment implements
                     return;
                 }
                 scrimPopupWindow.showAtLocation(chatListView, Gravity.LEFT | Gravity.TOP, finalPopupX, finalPopupY);
+                chatListView.stopScroll();
+                chatLayoutManager.setCanScrollVertically(false);
                 if (compactContext) {
                     dimBehindView(v, true, true);
                     if (scrimAnimatorSet != null) {
@@ -35136,23 +35162,27 @@ public class ChatActivity extends BaseFragment implements
                     finalReactionsLayout.startEnterAnimation(true);
                 }
                 AndroidUtilities.runOnUIThread(() -> {
-                    if (scrimPopupWindowItems != null && scrimPopupWindowItems.length > 0 && scrimPopupWindowItems[0] != null) {
+                    if (scrimPopupWindow == signatureMenuOwner && !selectedBubbleMotion.isClosing()
+                            && scrimPopupWindowItems != null && scrimPopupWindowItems.length > 0 && scrimPopupWindowItems[0] != null) {
                         scrimPopupWindowItems[0].requestFocus();
                         scrimPopupWindowItems[0].performAccessibilityAction(AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS, null);
                         scrimPopupWindowItems[0].sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_FOCUSED);
                     }
-                }, 420);
+                }, compactContext ? 160 : 420);
             };
-            if (waitForLangDetection.get()) {
+            if (waitForLangDetection.get() && !compactContext) {
                 onLangDetectionDone.set(showMenu);
             } else {
                 showMenu.run();
             }
-            chatListView.stopScroll();
-            chatLayoutManager.setCanScrollVertically(false);
-            // openExtera: снимок экрана как источник блюра для меню
-            // dimBehindView(v, true) идёт без блюра, поэтому scrimBlur3SourceBitmap иначе остался бы пустым.
-            if (glassMenu && scrimBlur3SourceBitmap.getBitmap() == null) {
+            if (!compactContext) {
+                // Preserve native selection ownership while the classic menu waits for language detection.
+                chatListView.stopScroll();
+                chatLayoutManager.setCanScrollVertically(false);
+            }
+            // Compact entry already schedules one guarded blur capture in dimBehindView(v, true, true).
+            // Classic dimBehindView(v, true) needs its separate background capture.
+            if (!compactContext && glassMenu && scrimBlur3SourceBitmap.getBitmap() == null) {
                 GlassMenuHelper.captureBlur(scrimBlur3SourceBitmap, scrimBlur3Factory, fragmentView);
             }
             if (!compactContext) dimBehindView(v, true);
@@ -37683,6 +37713,7 @@ public class ChatActivity extends BaseFragment implements
 
     @Override
     public boolean onBackPressed(boolean invoked) {
+        if (invoked && selectedBubbleMotion.isClosing()) finishBubbleReturnForInput();
         final Bulletin bulletin = Bulletin.getVisibleBulletin();
         if (bulletin != null && bulletin.getLayout() instanceof Bulletin.LottieLayoutWithReactions) {
             if (invoked) {
@@ -37708,7 +37739,7 @@ public class ChatActivity extends BaseFragment implements
         } else if (isMessagesSearchListVisible()) {
             if (invoked) showMessagesSearchListView(false);
             return false;
-        } else if (scrimPopupWindow != null) {
+        } else if (scrimPopupWindow != null && !selectedBubbleMotion.isClosing()) {
             if (invoked) closeMenu();
             return false;
         } else if (checkRecordLocked(invoked, false)) {
@@ -40498,7 +40529,7 @@ public class ChatActivity extends BaseFragment implements
         if (currentEncryptedChat != null) {
             return;
         }
-        chatListView.setImportantForAccessibility(mentionContainer != null && mentionContainer.isOpen() || (scrimPopupWindow != null && scrimPopupWindow.isShowing()) ? View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS : View.IMPORTANT_FOR_ACCESSIBILITY_AUTO);
+        chatListView.setImportantForAccessibility(mentionContainer != null && mentionContainer.isOpen() || (scrimPopupWindow != null && scrimPopupWindow.isShowing() && !selectedBubbleMotion.isClosing()) ? View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS : View.IMPORTANT_FOR_ACCESSIBILITY_AUTO);
     }
 
     private void markSponsoredAsRead(MessageObject object) {
