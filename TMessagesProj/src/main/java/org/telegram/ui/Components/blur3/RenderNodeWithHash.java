@@ -18,6 +18,8 @@ public class RenderNodeWithHash {
     private final Blur3HashImpl hashBuilder = new Blur3HashImpl();
 
     private long lastHash = 0;
+    private long invalidationVersion;
+    private long recordedVersion = -1;
     private int lastWidth, lastHeight;
 
     public RenderNodeWithHash(RenderNode renderNode, Renderer renderer) {
@@ -43,24 +45,32 @@ public class RenderNodeWithHash {
         renderer.renderNodeCalculateHash(hashBuilder);
 
         final long hash = hashBuilder.get();
-        boolean needUpdateDisplayList = !renderNode.hasDisplayList()
+        final long version = invalidationVersion;
+        boolean needUpdateDisplayList = recordedVersion != version || !renderNode.hasDisplayList()
             || width != lastWidth
             || height != lastHeight
             || hash != lastHash
             || hash == HASH_UNSUPPORTED;
 
-        lastWidth = width;
-        lastHeight = height;
-        lastHash = hash;
-
         if (needUpdateDisplayList) {
             RecordingCanvas canvas = renderNode.beginRecording();
-            renderer.renderNodeUpdateDisplayList(canvas);
-            renderNode.endRecording();
+            try {
+                renderer.renderNodeUpdateDisplayList(canvas);
+            } catch (RuntimeException | Error failure) {
+                invalidationVersion++;
+                throw failure;
+            } finally {
+                renderNode.endRecording();
+            }
+            lastWidth = width;
+            lastHeight = height;
+            lastHash = hash;
+            // Keep invalidations raised by the renderer pending for the next pass.
+            recordedVersion = version;
         }
     }
 
     public void invalidate() {
-        lastHash = 0;
+        invalidationVersion++;
     }
 }

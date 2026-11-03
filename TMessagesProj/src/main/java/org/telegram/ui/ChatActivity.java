@@ -3803,6 +3803,7 @@ public class ChatActivity extends BaseFragment implements
         app.flexygram.studio.FlexyStyleInstallHelper.cancel(this);
         app.exteraless.plugins.menus.MenuInjector.releaseMessageMenu(this);
         super.onFragmentDestroy();
+        AndroidUtilities.cancelRunOnUIThread(checkTranslationRunnable);
         if (contentView != null && contentView.signatureWallpaperBlur != null) {
             contentView.signatureWallpaperBlur.close(); contentView.signatureWallpaperBlur = null;
         }
@@ -26895,12 +26896,12 @@ public class ChatActivity extends BaseFragment implements
             }
 
             if (minId <= maxId) {
-                ArrayList<Long> groupsChecked = new ArrayList<>();
+                java.util.HashSet<Long> groupsChecked = new java.util.HashSet<>();
                 for (int i = 0; i < messages.size(); ++i) {
                     MessageObject messageObject = messages.get(i);
                     MessageObject.GroupedMessages group = groupedMessagesMap.get(messageObject.getGroupId());
                     if (group != null) {
-                        if (!groupsChecked.contains(group.groupId)) {
+                        if (groupsChecked.add(group.groupId)) {
                             for (int j = 0; j < group.messages.size(); ++j) {
                                 MessageObject messageObject1 = group.messages.get(j);
                                 if (messageObject1 != null) {
@@ -26910,7 +26911,6 @@ public class ChatActivity extends BaseFragment implements
                                     );
                                 }
                             }
-                            groupsChecked.add(group.groupId);
                         }
                     } else {
                         final int mid = messageObject.getId();

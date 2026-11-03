@@ -53,8 +53,10 @@ public final class SignatureChatHeader {
     public boolean active() { return enabled() && !bar.isSearchFieldVisible() && !bar.isActionModeShowed() && avatar.getVisibility() == View.VISIBLE; }
     /** Retained bridge for older callers; unread badges belong to the native chat list. */
     public void setCount(int value) {
-        if (unreadCount != value) {
-            unreadCount = value;
+        value = Math.max(0, value);
+        int previousDisplay = Math.min(100, unreadCount);
+        unreadCount = value;
+        if (previousDisplay != Math.min(100, value)) {
             if (value > 0) {
                 String str = value > 99 ? "99+" : Integer.toString(value);
                 unreadPaint.set(Theme.dialogs_countTextPaint);
@@ -171,14 +173,23 @@ public final class SignatureChatHeader {
         canvas.restoreToCount(save);
         drawUnread(canvas);
     }
+    private int lastBadgeAccent;
+    private int badgeTextColor;
+    private boolean badgeColorsReady;
+
     private void drawUnread(Canvas canvas) {
         if (!geometry.countVisible || unreadLayout == null || unreadCount <= 0) return;
         canvas.save();
         int accent = androidx.core.graphics.ColorUtils.setAlphaComponent(Theme.getColor(Theme.key_telegram_color, provider), 255);
-        badgePaint.setColor(accent);
-        unreadPaint.setColor(androidx.core.graphics.ColorUtils.calculateContrast(android.graphics.Color.WHITE, accent)
-                >= androidx.core.graphics.ColorUtils.calculateContrast(android.graphics.Color.BLACK, accent)
-                ? android.graphics.Color.WHITE : android.graphics.Color.BLACK);
+        if (!badgeColorsReady || lastBadgeAccent != accent) {
+            badgeColorsReady = true;
+            lastBadgeAccent = accent;
+            badgePaint.setColor(accent);
+            badgeTextColor = androidx.core.graphics.ColorUtils.calculateContrast(android.graphics.Color.WHITE, accent)
+                    >= androidx.core.graphics.ColorUtils.calculateContrast(android.graphics.Color.BLACK, accent)
+                    ? android.graphics.Color.WHITE : android.graphics.Color.BLACK;
+        }
+        unreadPaint.setColor(badgeTextColor);
 
         float badgeHeight = AndroidUtilities.dp(23);
         float badgeRadius = badgeHeight / 2f;

@@ -2,11 +2,31 @@ package app.exteraless.settings.utils;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.util.SparseIntArray;
 import org.telegram.messenger.R;
 
 /** Outline resources for settings navigation; unfamiliar/plugin icons retain their meaning. */
 public final class SettingsIcons {
     private SettingsIcons() {}
+    // Row binding is UI-owned. Resource identity separates app/plugin resource tables.
+    private static Resources cachedResources;
+    private static final SparseIntArray resolvedIcons = new SparseIntArray();
+
+    public static int resolve(Context context, int icon) {
+        if (icon == 0) return 0;
+        Resources resources = context.getResources();
+        if (cachedResources != resources) {
+            cachedResources = resources;
+            resolvedIcons.clear();
+        }
+        int cached = resolvedIcons.get(icon, 0);
+        if (cached != 0) return cached;
+        int resolved = resolveUncached(context, icon);
+        if (resolved == 0) return icon; // A resource loader can make a missing ID available later.
+        if (resolvedIcons.size() >= 128) resolvedIcons.clear();
+        resolvedIcons.put(icon, resolved);
+        return resolved;
+    }
 
     public static boolean appliesTo(Object fragment) {
         String name = fragment.getClass().getName();
@@ -15,13 +35,13 @@ public final class SettingsIcons {
                 || name.startsWith("app.exteraless.icons.");
     }
 
-    public static int resolve(Context context, int icon) {
+    private static int resolveUncached(Context context, int icon) {
         if (icon == 0) return 0;
         final String name;
         try {
             name = context.getResources().getResourceEntryName(icon);
         } catch (Resources.NotFoundException ignored) {
-            return icon;
+            return 0;
         }
         switch (name) {
             case "settings3_chat": return R.drawable.fg_settings_chat;

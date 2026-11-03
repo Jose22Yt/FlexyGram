@@ -101,46 +101,57 @@ public abstract class BlurredBackgroundDrawable extends Drawable implements Glas
     }
 
     public BlurredBackgroundDrawable setRadius(float radius) {
+        if (sameCorners(boundProps.radii, radius, radius, radius, radius)
+                && sameCorners(boundProps.shaderRadii, radius, radius, radius, radius)) return this;
         Arrays.fill(boundProps.radii, radius);
         Arrays.fill(boundProps.shaderRadii, radius);
         boundProps.build();
-
         onBoundPropsChanged();
         return this;
     }
 
     public BlurredBackgroundDrawable setRadius(float topLeft, float topRight, float bottomRight, float bottomLeft) {
+        if (sameCorners(boundProps.radii, topLeft, topRight, bottomRight, bottomLeft)) return this;
         boundProps.radii[0] = boundProps.radii[1] = topLeft;
         boundProps.radii[2] = boundProps.radii[3] = topRight;
         boundProps.radii[4] = boundProps.radii[5] = bottomRight;
         boundProps.radii[6] = boundProps.radii[7] = bottomLeft;
         boundProps.build();
-
         onBoundPropsChanged();
         return this;
     }
 
     public void setRadius(float topLeft, float topRight, float bottomRight, float bottomLeft, boolean forceBottomZero) {
+        final float br = forceBottomZero ? 0 : bottomRight;
+        final float bl = forceBottomZero ? 0 : bottomLeft;
+        if (sameCorners(boundProps.radii, topLeft, topRight, br, bl)
+                && sameCorners(boundProps.shaderRadii, topLeft, topRight, bottomRight, bottomLeft)) return;
         boundProps.radii[0] = boundProps.radii[1] = topLeft;
         boundProps.radii[2] = boundProps.radii[3] = topRight;
-        boundProps.radii[4] = boundProps.radii[5] = forceBottomZero ? 0 : bottomRight;
-        boundProps.radii[6] = boundProps.radii[7] = forceBottomZero ? 0 : bottomLeft;
+        boundProps.radii[4] = boundProps.radii[5] = br;
+        boundProps.radii[6] = boundProps.radii[7] = bl;
         boundProps.shaderRadii[0] = boundProps.shaderRadii[1] = topLeft;
         boundProps.shaderRadii[2] = boundProps.shaderRadii[3] = topRight;
         boundProps.shaderRadii[4] = boundProps.shaderRadii[5] = bottomRight;
         boundProps.shaderRadii[6] = boundProps.shaderRadii[7] = bottomLeft;
         boundProps.build();
-
         onBoundPropsChanged();
     }
 
+    private static boolean sameCorners(float[] r, float tl, float tr, float br, float bl) {
+        return r[0] == tl && r[1] == tl && r[2] == tr && r[3] == tr
+                && r[4] == br && r[5] == br && r[6] == bl && r[7] == bl;
+    }
+
     public BlurredBackgroundDrawable setThickness(int thickness) {
+        if (boundProps.liquidThickness == thickness) return this;
         boundProps.liquidThickness = thickness;
         onBoundPropsChanged();
         return this;
     }
 
     public void setIntensity(float intensity) {
+        if (boundProps.liquidIntensity == intensity) return;
         boundProps.liquidIntensity = intensity;
         onBoundPropsChanged();
     }

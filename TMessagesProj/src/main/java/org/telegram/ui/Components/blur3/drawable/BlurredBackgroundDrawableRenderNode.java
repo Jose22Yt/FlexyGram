@@ -30,6 +30,19 @@ public class BlurredBackgroundDrawableRenderNode extends BlurredBackgroundDrawab
     // Сплошной контур заливкой
     private final Paint paintStrokeFull = new Paint(Paint.ANTI_ALIAS_FLAG);
 
+    private int appliedShadowColor;
+    private float appliedShadowRadius = Float.NaN, appliedShadowDx, appliedShadowDy;
+
+    private void updateShadowLayer(int color) {
+        if (appliedShadowColor == color && appliedShadowRadius == shadowLayerRadius
+                && appliedShadowDx == shadowLayerDx && appliedShadowDy == shadowLayerDy) return;
+        paintShadow.setShadowLayer(shadowLayerRadius, shadowLayerDx, shadowLayerDy, color);
+        appliedShadowColor = color;
+        appliedShadowRadius = shadowLayerRadius;
+        appliedShadowDx = shadowLayerDx;
+        appliedShadowDy = shadowLayerDy;
+    }
+
     private boolean renderNodeInvalidated;
 
     public BlurredBackgroundDrawableRenderNode(BlurredBackgroundSource source) {
@@ -161,7 +174,6 @@ public class BlurredBackgroundDrawableRenderNode extends BlurredBackgroundDrawab
     public void updateColors() {
         super.updateColors();
 
-        paintShadow.setShadowLayer(shadowLayerRadius, shadowLayerDx, shadowLayerDy, shadowColor);
         if (boundProps.useFullStroke) {
             paintStrokeFull.setColor(strokeColorFull);
         } else {
@@ -193,7 +205,7 @@ public class BlurredBackgroundDrawableRenderNode extends BlurredBackgroundDrawab
 
         int color = Theme.multAlpha(shadowColor, renderNode.getAlpha() * shadowAlpha);
         if (Color.alpha(color) != 0) {
-            paintShadow.setShadowLayer(shadowLayerRadius, shadowLayerDx, shadowLayerDy, color);
+            updateShadowLayer(color);
             boundProps.drawShadows(canvas, paintShadow, inAppKeyboardOptimization);
         }
 

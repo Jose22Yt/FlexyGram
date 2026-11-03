@@ -59,17 +59,25 @@ public class BlurredBackgroundSourceRenderNode implements BlurredBackgroundSourc
         this.underSource = underSource;
     }
 
+    private float appliedBlurRadius = Float.NaN;
+    private RenderEffect appliedInputEffect;
+
     @RequiresApi(api = Build.VERSION_CODES.S)
     public void setBlur(float radius) {
-        renderNode.setRenderEffect(radius > 0 ? RenderEffect.createBlurEffect(radius, radius, Shader.TileMode.CLAMP) : null);
+        setBlur(radius, null);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.S)
     public void setBlur(float radius, RenderEffect effect) {
-        renderNode.setRenderEffect(RenderEffect.createChainEffect(RenderEffect.createBlurEffect(radius, radius, Shader.TileMode.CLAMP), effect));
+        float normalizedRadius = Math.max(0, radius);
+        if (appliedBlurRadius == normalizedRadius && appliedInputEffect == effect) return;
+        RenderEffect blur = normalizedRadius > 0
+                ? RenderEffect.createBlurEffect(normalizedRadius, normalizedRadius, Shader.TileMode.CLAMP) : null;
+        RenderEffect output = effect == null ? blur : blur == null ? effect : RenderEffect.createChainEffect(blur, effect);
+        renderNode.setRenderEffect(output);
+        appliedBlurRadius = normalizedRadius;
+        appliedInputEffect = effect;
     }
-
-
 
     public void noClip() {
         this.noClip = true;

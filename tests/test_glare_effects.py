@@ -31,6 +31,11 @@ def test_default_static_renderer_is_preserved():
  assert new.count(replacement)==2
  master_off='        if (!app.exteraless.appearance.FlexyGlassConfig.enabled()) {\n            // An opaque fill also skips replaying an already cached blurred source.\n            if (Color.alpha(backgroundColor) == 0) backgroundColor = Theme.getColor(Theme.key_windowBackgroundWhite);\n            backgroundColor = ColorUtils.setAlphaComponent(backgroundColor, 255);\n        }\n'
  assert new.count(master_off)==1
+ # Radius/thickness no-op setters are exercised by test_render_work_reuse.
+ # Preserve the byte comparison for every rendering/color/shadow path outside those setters.
+ start='    public BlurredBackgroundDrawable setRadius(float radius)'
+ end='    public Rect getPaddedBounds()'
+ new=new[:new.index(start)]+old[old.index(start):old.index(end)]+new[new.index(end):]
  assert new.replace(master_off,'').replace(replacement,'if (GlassOutlineStyle.current() != GlassOutlineStyle.GLARE) return;')==old
 
 def test_no_frame_allocations_or_background_engine():

@@ -21,6 +21,7 @@ def test_settings_icons_size_theme_and_recycling():
         assert vector.find("path").attrib[android + "strokeWidth"] == "1.8"
 
     stubs = {
+        "android.util.SparseIntArray": "public class SparseIntArray {private java.util.Map<Integer,Integer> data=new java.util.HashMap<>();public int get(int k,int d){return data.getOrDefault(k,d);}public void put(int k,int v){data.put(k,v);}public void clear(){data.clear();}public int size(){return data.size();}}",
         "android.graphics.Canvas": "public class Canvas {}",
         "android.graphics.PorterDuff": "public class PorterDuff {public enum Mode {SRC_IN}}",
         "android.graphics.PorterDuffColorFilter": "public class PorterDuffColorFilter {public int color;public PorterDuffColorFilter(int c,PorterDuff.Mode mode){color=c;}}",

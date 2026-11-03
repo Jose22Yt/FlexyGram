@@ -17,7 +17,8 @@ def test_folder_unread_badge_count_and_theme():
     count = method(chat, "private int getCurrentFolderUnreadMessageCount()")
     view = method(bar, "public class UnreadImageView extends AppCompatImageView")
     header = (root / "TMessagesProj/src/main/java/app/flexygram/header/SignatureChatHeader.java").read_text()
-    native_methods = method(header, "public void setCount(int value)") + method(header, "private void drawUnread(Canvas canvas)")
+    color_state = header[header.index("    private int lastBadgeAccent;"):header.index("    private void drawUnread(Canvas canvas)")]
+    native_methods = color_state + method(header, "public void setCount(int value)") + method(header, "private void drawUnread(Canvas canvas)")
     for full, local in (("androidx.core.graphics.ColorUtils", "ColorUtils"), ("android.graphics.Color", "Color"), ("android.text.StaticLayout", "StaticLayout"), ("android.text.Layout", "Layout")):
         native_methods = native_methods.replace(full, local)
     harness = """
@@ -125,6 +126,8 @@ public class BadgeRegression {
             require("40".equals(canvas.text),"badge count unchanged by theme");
         }
         require(Theme.dialogs_countTextPaint.color==originalSharedTextColor,"do not mutate shared dialog text paint");
+        nativeBadge.setCount(41);Canvas changedCount=new Canvas();nativeBadge.drawUnread(changedCount);
+        require(ColorUtils.calculateContrast(changedCount.foreground,c.accent)>=4.5,"new count must restore cached contrast after copying shared paint");
         badge.setUnread(120);Canvas capped=new Canvas();badge.onDraw(capped);require("99+".equals(capped.text),"retain compact display");
         badge.setUnread(-1);Canvas empty=new Canvas();badge.onDraw(empty);require(empty.draws==0,"empty count hidden");
     }
