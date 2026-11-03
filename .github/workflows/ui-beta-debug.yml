@@ -22,6 +22,9 @@ jobs:
       NATIVE_TARGET: arm64-v8a
       CMAKE_BUILD_PARALLEL_LEVEL: '2'
       GRADLE_OPTS: -Dorg.gradle.workers.max=2
+      TELEGRAM_APP_ID: ${{ secrets.TELEGRAM_APP_ID }}
+      TELEGRAM_APP_HASH: ${{ secrets.TELEGRAM_APP_HASH }}
+      ALPHA_FIREBASE_JSON_B64: ${{ secrets.ALPHA_FIREBASE_JSON_B64 || secrets.FLEXYGRAM_BETA_FIREBASE_JSON_B64 }}
     steps:
       - name: Check out this branch commit
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -56,6 +59,9 @@ jobs:
             abf93053f9f98bae95b88f070f3e964c8b3bb311
           printf 'toolchainVersion=21\ntoolchainVendor=ADOPTIUM\n' > gradle/gradle-daemon-jvm.properties
           printf 'sdk.dir=%s\n' "$ANDROID_HOME" > local.properties
+          if [ -n "${TELEGRAM_APP_ID:-}" ]; then
+            printf 'TELEGRAM_APP_ID=%s\nTELEGRAM_APP_HASH=%s\n' "$TELEGRAM_APP_ID" "$TELEGRAM_APP_HASH" >> local.properties
+          fi
           echo "CHAQUOPY_BUILD_PYTHON=$(command -v python)" >> "$GITHUB_ENV"
           echo "CMAKE=$ANDROID_HOME/cmake/3.31.6/bin/cmake" >> "$GITHUB_ENV"
           echo "$ANDROID_HOME/cmake/3.31.6/bin" >> "$GITHUB_PATH"
@@ -86,17 +92,23 @@ jobs:
             --chaquopy TMessagesProj/chaquopy --output "$RUNNER_TEMP/beta-wheelhouse"
           echo "ALPHA_WHEELHOUSE=$RUNNER_TEMP/beta-wheelhouse" >> "$GITHUB_ENV"
       - name: Assemble debug APK with native libraries and Python
+        env:
+          TELEGRAM_APP_ID: ${{ secrets.TELEGRAM_APP_ID }}
+          TELEGRAM_APP_HASH: ${{ secrets.TELEGRAM_APP_HASH }}
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p TMessagesProj/src/debug
-          cat > TMessagesProj/src/debug/google-services.json <<'JSON'
-          {
-            "project_info": {
-              "project_number": "100000000000",
-              "project_id": "flexygram-debug",
-              "storage_bucket": "flexygram-debug.appspot.com"
-            },
+          if [ -n "${ALPHA_FIREBASE_JSON_B64:-}" ]; then
+            echo "$ALPHA_FIREBASE_JSON_B64" | base64 -d > TMessagesProj/src/debug/google-services.json
+          else
+            cat > TMessagesProj/src/debug/google-services.json <<'JSON'
+            {
+              "project_info": {
+                "project_number": "100000000000",
+                "project_id": "flexygram-debug",
+                "storage_bucket": "flexygram-debug.appspot.com"
+              },
             "client": [
               {
                 "client_info": {
@@ -120,7 +132,8 @@ jobs:
             ],
             "configuration_version": "1"
           }
-          JSON
+JSON
+          fi
           ./gradlew --no-daemon --max-workers=2 --console=plain \
             --init-script "$RUNNER_TEMP/flexy-native-pools.gradle" \
             :TMessagesProj:assembleDebug 2>&1 | tee build/reports/ui-beta/assemble.log

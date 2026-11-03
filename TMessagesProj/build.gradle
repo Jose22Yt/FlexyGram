@@ -166,8 +166,9 @@ android {
         }
 
         // obtain your own keys at https://core.telegram.org/api/obtaining_api_id
-        def appId = properties?.getProperty('TELEGRAM_APP_ID') ?: System.getenv('TELEGRAM_APP_ID') ?: '0'
-        def appHash = properties?.getProperty('TELEGRAM_APP_HASH') ?: System.getenv('TELEGRAM_APP_HASH') ?: ''
+        def appId = (properties?.getProperty('TELEGRAM_APP_ID') ?: System.getenv('TELEGRAM_APP_ID') ?: '0').trim()
+        if (appId.isEmpty()) appId = '0'
+        def appHash = (properties?.getProperty('TELEGRAM_APP_HASH') ?: System.getenv('TELEGRAM_APP_HASH') ?: '').trim()
 
         // obtain your own key at https://developers.google.com/maps/documentation/android-sdk/get-api-key
         // Android keys are restricted by package name and signing certificate,
@@ -179,8 +180,9 @@ android {
         def glyphKey = 'test'
 
         if (properties != null) {
-            appId = properties.getProperty('TELEGRAM_APP_ID') ?: System.getenv('TELEGRAM_APP_ID') ?: appId
-            appHash = properties.getProperty('TELEGRAM_APP_HASH') ?: System.getenv('TELEGRAM_APP_HASH') ?: appHash
+            appId = (properties.getProperty('TELEGRAM_APP_ID') ?: System.getenv('TELEGRAM_APP_ID') ?: appId).trim()
+            if (appId.isEmpty()) appId = '0'
+            appHash = (properties.getProperty('TELEGRAM_APP_HASH') ?: System.getenv('TELEGRAM_APP_HASH') ?: appHash).trim()
             mapsKey = properties.getProperty('MAPS_API_KEY') ?: System.getenv('MAPS_API_KEY') ?: mapsKey
             glyphKey = properties.getProperty('GLYPH_API_KEY') ?: System.getenv('GLYPH_API_KEY') ?: glyphKey
         } else {

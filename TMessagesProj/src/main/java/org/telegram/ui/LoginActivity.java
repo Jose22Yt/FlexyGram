@@ -3057,7 +3057,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
                             AndroidUtilities.runOnUIThread(()-> {
                                 onNextPressed(code);
                                 floatingButton.progressView.sync(confirmView.fabButton.progressView);
-                            }, 150);
+                            }, 50);
                         });
                     }
                 });
@@ -3336,8 +3336,16 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
                         } else if (error.text.startsWith("FLOOD_WAIT")) {
                             needShowAlert(getString(R.string.RestorePasswordNoEmailTitle), getString(R.string.FloodWait) + "\n" + error.text);
                         } else if (error.code != -1000) {
-                            AlertsCreator.processError(currentAccount, error, LoginActivity.this, req, phoneInputData.phoneNumber);
+                            if (AlertsCreator.processError(currentAccount, error, LoginActivity.this, req, phoneInputData.phoneNumber) == null) {
+                                needShowAlert(getString(R.string.AppName), error.text != null ? error.text : getString(R.string.ErrorOccurred));
+                            }
+                        } else {
+                            needShowAlert(getString(R.string.AppName), getString(R.string.WaitingForNetwork));
                         }
+                    } else if (error.code != -1000) {
+                        needShowAlert(getString(R.string.AppName), getString(R.string.ErrorOccurred));
+                    } else {
+                        needShowAlert(getString(R.string.AppName), getString(R.string.WaitingForNetwork));
                     }
                 }
                 if (!isRequestingFirebaseSms) {
@@ -8986,19 +8994,24 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
                 public void onAnimationStart(Animator animation) {
                     fabContainer.setVisibility(GONE);
 
-                    // TODO: Generify this code, currently it's a clone
-                    float scaleFactor = 10;
-                    int w = (int) (fragmentView.getMeasuredWidth() / scaleFactor);
-                    int h = (int) (fragmentView.getMeasuredHeight() / scaleFactor);
-                    Bitmap bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-                    Canvas canvas = new Canvas(bitmap);
-                    canvas.scale(1.0f / scaleFactor, 1.0f / scaleFactor);
-                    canvas.drawColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhite));
-                    fragmentView.draw(canvas);
-                    Utilities.stackBlurBitmap(bitmap, Math.max(8, Math.max(w, h) / 150));
-                    blurredView.setBackground(new BitmapDrawable(getContext().getResources(), bitmap));
-                    blurredView.setAlpha(0.0f);
-                    blurredView.setVisibility(View.VISIBLE);
+                    try {
+                        float scaleFactor = 10;
+                        int w = (int) (fragmentView.getMeasuredWidth() / scaleFactor);
+                        int h = (int) (fragmentView.getMeasuredHeight() / scaleFactor);
+                        if (w > 0 && h > 0) {
+                            Bitmap bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+                            Canvas canvas = new Canvas(bitmap);
+                            canvas.scale(1.0f / scaleFactor, 1.0f / scaleFactor);
+                            canvas.drawColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhite));
+                            fragmentView.draw(canvas);
+                            Utilities.stackBlurBitmap(bitmap, Math.max(8, Math.max(w, h) / 150));
+                            blurredView.setBackground(new BitmapDrawable(getContext().getResources(), bitmap));
+                            blurredView.setAlpha(0.0f);
+                            blurredView.setVisibility(View.VISIBLE);
+                        }
+                    } catch (Throwable e) {
+                        FileLog.e(e);
+                    }
 
                     fragmentView.addView(PhoneNumberConfirmView.this);
                 }
@@ -9027,7 +9040,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
 
         private void animateProgress(Runnable callback) {
             fabButton.setProgressVisible(true, true);
-            AndroidUtilities.runOnUIThread(callback, 400);
+            AndroidUtilities.runOnUIThread(callback, 200);
         }
 
         private void dismiss() {

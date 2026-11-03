@@ -48,13 +48,15 @@ public class NekoXConfig {
     public static String customAppHash = preferences.getString("custom_app_hash", "");
 
     public static int currentAppId() {
-        if (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) return BuildVars.APP_ID;
-        return customApi == API_TYPE_CUSTOM ? customAppId : BuildConfig.APP_ID;
+        if (customApi == API_TYPE_CUSTOM && customAppId != 0) return customAppId;
+        if (BuildVars.APP_ID != 0) return BuildVars.APP_ID;
+        return BuildConfig.APP_ID;
     }
 
     public static String currentAppHash() {
-        if (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) return BuildVars.APP_HASH;
-        return customApi == API_TYPE_CUSTOM ? customAppHash : BuildConfig.APP_HASH;
+        if (customApi == API_TYPE_CUSTOM && customAppHash != null && !customAppHash.isEmpty()) return customAppHash;
+        if (BuildVars.APP_HASH != null && !BuildVars.APP_HASH.isEmpty()) return BuildVars.APP_HASH;
+        return BuildConfig.APP_HASH;
     }
 
     public static void saveCustomApi() {
