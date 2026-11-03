@@ -128,6 +128,8 @@ public class ChatActivityChannelButtonsLayout extends FrameLayout implements Fac
 
     public void updateColors() {
         refreshSignature(getMeasuredWidth());
+        if (containerDrawable != null) containerDrawable.updateColors();
+        invalidate();
         for (ButtonHolder holder : buttonHolders) {
             if (holder != null) {
                 holder.button.updateColors();

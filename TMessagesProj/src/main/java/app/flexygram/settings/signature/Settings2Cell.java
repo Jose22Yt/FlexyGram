@@ -34,8 +34,8 @@ public final class Settings2Cell extends FrameLayout {
         title.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText,provider));
         description.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText2,provider));
         arrow.setColorFilter(Theme.getColor(Theme.key_windowBackgroundWhiteGrayIcon,provider));arrow.setScaleX(LocaleController.isRTL?-1:1);
-        icon.setImageResource(resource);icon.setColorFilter(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText,provider));
-        icon.setBackground(null);
+        icon.setImageResource(app.exteraless.settings.utils.SettingsIcons.resolve(getContext(), resource));icon.setColorFilter(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText,provider));
+        icon.setBackground(null);lastIconColor=Theme.getColor(Theme.key_windowBackgroundWhiteBlackText,provider);
         divider=divide;
         setContentDescription(name+(detail==null||detail.isEmpty()?"":", "+detail));invalidate();
     }
@@ -48,17 +48,23 @@ public final class Settings2Cell extends FrameLayout {
         } else {
             bodyHeight = title.getMeasuredHeight();
         }
-        icon.measure(MeasureSpec.makeMeasureSpec(dp(40),MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(dp(40),MeasureSpec.EXACTLY));
+        icon.measure(MeasureSpec.makeMeasureSpec(dp(24),MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(dp(24),MeasureSpec.EXACTLY));
         arrow.measure(MeasureSpec.makeMeasureSpec(dp(20),MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(dp(20),MeasureSpec.EXACTLY));
         setMeasuredDimension(width,Math.max(dp(72),bodyHeight+dp(24))+(divider?1:0));
     }
     @Override protected void onLayout(boolean changed,int l,int t,int r,int b){
         int w=getMeasuredWidth(),h=getMeasuredHeight(),ix=LocaleController.isRTL?w-dp(56):dp(16),tx=LocaleController.isRTL?dp(40):dp(68),ax=LocaleController.isRTL?dp(16):w-dp(36),y=(h-bodyHeight)/2;
-        icon.layout(ix,(h-dp(40))/2,ix+dp(40),(h+dp(40))/2);
+        icon.layout(ix+dp(8),(h-dp(24))/2,ix+dp(32),(h+dp(24))/2);
         arrow.layout(ax,(h-dp(20))/2,ax+dp(20),(h+dp(20))/2);
         title.layout(tx,y,tx+title.getMeasuredWidth(),y+title.getMeasuredHeight());y+=title.getMeasuredHeight()+dp(3);
         description.layout(tx,y,tx+description.getMeasuredWidth(),y+description.getMeasuredHeight());
     }
+    @Override protected void dispatchDraw(Canvas c){
+        int foreground=Theme.getColor(Theme.key_windowBackgroundWhiteBlackText,provider);
+        if(lastIconColor!=foreground){lastIconColor=foreground;icon.setColorFilter(foreground);}
+        super.dispatchDraw(c);
+    }
+    private int lastIconColor;
     @Override protected void onDraw(Canvas c){super.onDraw(c);if(divider)c.drawRect(LocaleController.isRTL?dp(16):dp(68),getHeight()-1,LocaleController.isRTL?getWidth()-dp(68):getWidth()-dp(16),getHeight(),Theme.dividerPaint);}
     @Override public void onInitializeAccessibilityNodeInfo(AccessibilityNodeInfo info){super.onInitializeAccessibilityNodeInfo(info);info.setClassName("android.widget.Button");}
 }

@@ -32,7 +32,7 @@ public final class SignatureChatHeader {
     public app.flexygram.header.fusion.SignatureFusionGeometry.Layout fusionGeometry() { return fusion == null ? null : fusion.layout; }
     private final android.graphics.RectF badgeRect = new android.graphics.RectF();
     private final android.graphics.Paint badgePaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
-    private int lastSurfaceColor = Integer.MIN_VALUE;
+    private final android.text.TextPaint unreadPaint = new android.text.TextPaint(android.graphics.Paint.ANTI_ALIAS_FLAG);
     public boolean subtitleFits = true;
     public void detach() {
         if (bar != null && bar.getBackButtonDrawable() instanceof org.telegram.ui.ActionBar.BackDrawable) {
@@ -57,8 +57,9 @@ public final class SignatureChatHeader {
             unreadCount = value;
             if (value > 0) {
                 String str = value > 99 ? "99+" : Integer.toString(value);
-                int countWidth = (int) Math.ceil(Theme.dialogs_countTextPaint.measureText(str));
-                unreadLayout = new android.text.StaticLayout(str, Theme.dialogs_countTextPaint, countWidth, android.text.Layout.Alignment.ALIGN_CENTER, 1.0f, 0.0f, false);
+                unreadPaint.set(Theme.dialogs_countTextPaint);
+                int countWidth = (int) Math.ceil(unreadPaint.measureText(str));
+                unreadLayout = new android.text.StaticLayout(str, unreadPaint, countWidth, android.text.Layout.Alignment.ALIGN_CENTER, 1.0f, 0.0f, false);
             } else {
                 unreadLayout = null;
             }
@@ -173,12 +174,11 @@ public final class SignatureChatHeader {
     private void drawUnread(Canvas canvas) {
         if (!geometry.countVisible || unreadLayout == null || unreadCount <= 0) return;
         canvas.save();
-        int surfaceColor = Theme.getColor(Theme.key_windowBackgroundWhite, provider);
-        if (surfaceColor != lastSurfaceColor) {
-            lastSurfaceColor = surfaceColor;
-            boolean isDark = androidx.core.graphics.ColorUtils.calculateLuminance(surfaceColor) < 0.5f;
-            badgePaint.setColor(isDark ? 0xff2c2c2e : 0xff161618);
-        }
+        int accent = androidx.core.graphics.ColorUtils.setAlphaComponent(Theme.getColor(Theme.key_telegram_color, provider), 255);
+        badgePaint.setColor(accent);
+        unreadPaint.setColor(androidx.core.graphics.ColorUtils.calculateContrast(android.graphics.Color.WHITE, accent)
+                >= androidx.core.graphics.ColorUtils.calculateContrast(android.graphics.Color.BLACK, accent)
+                ? android.graphics.Color.WHITE : android.graphics.Color.BLACK);
 
         float badgeHeight = AndroidUtilities.dp(23);
         float badgeRadius = badgeHeight / 2f;
@@ -205,12 +205,9 @@ public final class SignatureChatHeader {
         }
         canvas.drawRoundRect(badgeRect, badgeRadius, badgeRadius, badgePaint);
 
-        int previousColor = Theme.dialogs_countTextPaint.getColor();
-        Theme.dialogs_countTextPaint.setColor(0xffffffff);
         canvas.translate(badgeRect.centerX() - textWidth / 2f,
                 badgeRect.centerY() - unreadLayout.getHeight() / 2f);
         unreadLayout.draw(canvas);
-        Theme.dialogs_countTextPaint.setColor(previousColor);
         canvas.restore();
     }
     /** One final center contour, after the real avatar; no double edge under the fading image. */

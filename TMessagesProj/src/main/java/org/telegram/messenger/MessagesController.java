@@ -20180,14 +20180,24 @@ public class MessagesController extends BaseController implements NotificationCe
                     }
                     for (var dialogId : dialogIds) {
                         var messagesToSave = MessageHelper.getInstance(currentAccount).getMessagesStorageMessages(dialogId, messageIds);
+                        var preservedIds = new ArrayList<Integer>();
                         if (messagesToSave != null && !messagesToSave.isEmpty()) {
                             for (var msg : messagesToSave) {
                                 var topicId = MessageObject.getTopicId(currentAccount, msg, isForum(dialogId));
                                 var prefs = new AyuSavePreferences(msg, currentAccount, dialogId, topicId, msg.id, (int)(currentTime / 1000));
-                                ayuMessagesController.onMessageDeleted(prefs);
+                                if (AyuState.isDeletePermitted(dialogId, msg.id)
+                                        || !AyuSavePreferences.saveDeletedMessageFor(currentAccount, dialogId, prefs.getFromUserId())) {
+                                    continue;
+                                }
+                                // Already on the storage queue: finish saving before the
+                                // queued Telegram deletion or a new history load can run.
+                                ayuMessagesController.onMessageDeleted(prefs, false);
+                                preservedIds.add(msg.id);
                             }
                         }
-                        notificationsToSend.put(dialogId, messageIds);
+                        if (!preservedIds.isEmpty()) {
+                            notificationsToSend.put(dialogId, preservedIds);
+                        }
                     }
                 }
                 if (!notificationsToSend.isEmpty()) {

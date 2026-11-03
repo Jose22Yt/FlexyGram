@@ -117,7 +117,12 @@ public class AyuSavePreferences {
             }
         }
 
-        var user = MessagesController.getInstance(accountId).getUser(Math.abs(dialogId));
+        // Users and channels have separate ID namespaces. A negative dialog ID
+        // must never be looked up as a user (it may collide with an unrelated bot).
+        if (dialogId <= 0) {
+            return true;
+        }
+        var user = MessagesController.getInstance(accountId).getUser(dialogId);
         if (user == null) {
             return true;
         }
