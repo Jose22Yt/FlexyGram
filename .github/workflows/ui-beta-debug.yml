@@ -103,11 +103,23 @@ jobs:
           import os, base64, json
           b64 = os.environ.get("ALPHA_FIREBASE_JSON_B64")
           out = "TMessagesProj/src/debug/google-services.json"
+          data = None
           if b64:
-              with open(out, "wb") as f:
-                  f.write(base64.b64decode(b64))
-          else:
-              mock = {
+              try:
+                  data = json.loads(base64.b64decode(b64))
+                  has_client = any(
+                      c.get("client_info", {}).get("android_client_info", {}).get("package_name") == "com.flexygram.messenger"
+                      for c in data.get("client", [])
+                  )
+                  if not has_client and data.get("client"):
+                      c = json.loads(json.dumps(data["client"][0]))
+                      c.setdefault("client_info", {}).setdefault("android_client_info", {})["package_name"] = "com.flexygram.messenger"
+                      data["client"].append(c)
+              except Exception as e:
+                  print("Could not parse ALPHA_FIREBASE_JSON_B64:", e)
+                  data = None
+          if not data:
+              data = {
                   "project_info": {
                       "project_number": "100000000000",
                       "project_id": "flexygram-debug",
@@ -126,8 +138,8 @@ jobs:
                   }],
                   "configuration_version": "1"
               }
-              with open(out, "w") as f:
-                  json.dump(mock, f, indent=2)
+          with open(out, "w") as f:
+              json.dump(data, f, indent=2)
           '
           ./gradlew --no-daemon --max-workers=2 --console=plain \
             --init-script "$RUNNER_TEMP/flexy-native-pools.gradle" \
