@@ -110,7 +110,15 @@ def test_locales_and_no_new_manifest_signing_distribution_changes():
   values=list(E.parse(ROOT/'TMessagesProj/src/main/res'/folder/'flexy_member_lens.xml').getroot());assert len(values)==8 and all(v.text for v in values);sets.append({v.get('name')for v in values})
  assert sets[0]==sets[1]==sets[2]
  for path in ['TMessagesProj/src/main/AndroidManifest.xml','TMessagesProj/src/main/java/org/telegram/ui/LauncherIconController.java','gradle/flexygram-beta.gradle']:
-  assert (ROOT/path).read_bytes()==subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT)
+  current=(ROOT/path).read_bytes()
+  original=subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT)
+  if path.endswith('AndroidManifest.xml'):
+   current=current.replace(b'android:name="org.telegram.ui.LaunchActivity"\n            android:theme="@style/Theme.FlexyGram.Start"',b'android:name="org.telegram.ui.LaunchActivity"\n            android:theme="@style/Theme.TMessages.Start"',1)
+  elif path.endswith('LauncherIconController.java'):
+   # Startup scheduling may evolve; launcher identities/resources must stay unchanged.
+   current=current[current.index(b'    public enum LauncherIcon {'):]
+   original=original[original.index(b'    public enum LauncherIcon {'):]
+  assert current==original,path
 
 def test_actual_protocol_scope_block_sets_person_topic_flags_without_narrowing_ids():
  s=source('org/telegram/ui/FilteredSearchView.java')

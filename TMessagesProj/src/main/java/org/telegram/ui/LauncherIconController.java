@@ -8,7 +8,17 @@ import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.R;
 
 public class LauncherIconController {
-    public static void tryFixLauncherIconIfNeeded() {
+    private static volatile LauncherIcon resolvedIcon;
+
+    /** Saved selection or the asynchronously reconciled alias; never scan PackageManager on first draw. */
+    public static LauncherIcon getRememberedIcon() {
+        LauncherIcon resolved = resolvedIcon;
+        if (resolved != null) return resolved;
+        String saved = ApplicationLoader.applicationContext.getSharedPreferences("flexy_launcher", Context.MODE_PRIVATE).getString("selected", "");
+        try { return LauncherIcon.valueOf(saved); }
+        catch (IllegalArgumentException ignored) { return LauncherIcon.FLEX_NEON; }
+    }
+    public static synchronized void tryFixLauncherIconIfNeeded() {
         // Preserve existing PackageManager overrides, including all legacy aliases.
         LauncherIcon active = null;
         int count = 0;
@@ -20,7 +30,11 @@ public class LauncherIconController {
         LauncherIcon remembered = null;
         try { remembered = LauncherIcon.valueOf(saved); }
         catch (IllegalArgumentException ignored) { }
-        if (count == 1 && !legacyEnabled && (remembered == null || active == remembered)) return;
+        if (count == 1 && !legacyEnabled && (remembered == null || active == remembered)) {
+            resolvedIcon = active;
+            app.flexygram.performance.StartupSplash.iconChanged();
+            return;
+        }
         if (remembered != null) active = remembered;
         try {
             applyIcon(active == null ? LauncherIcon.FLEX_NEON : active, false);
@@ -40,7 +54,7 @@ public class LauncherIconController {
     private static ComponentName legacyPrimary(Context ctx) {
         return new ComponentName(ctx.getPackageName(), "org.telegram.messenger.ExteralessIcon");
     }
-    public static void setIcon(LauncherIcon icon) { applyIcon(icon, true); }
+    public static synchronized void setIcon(LauncherIcon icon) { applyIcon(icon, true); }
     private static void applyIcon(LauncherIcon icon, boolean explicit) {
         Context ctx = ApplicationLoader.applicationContext;
         PackageManager pm = ctx.getPackageManager();
@@ -68,6 +82,8 @@ public class LauncherIconController {
         editor.putInt("signature_launcher_migration", 2);
         if (explicit) editor.putString("selected", icon.name());
         editor.apply();
+        resolvedIcon = icon;
+        app.flexygram.performance.StartupSplash.iconChanged();
     }
 
     public enum LauncherIcon {

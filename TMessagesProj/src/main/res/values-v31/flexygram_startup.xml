@@ -1,0 +1,96 @@
+<resources>
+  <style name="Theme.FlexyGram.Start" parent="Theme.TMessages.Start">
+    <item name="android:windowBackground">@color/SplashBackground</item>
+    <item name="android:windowSplashScreenBackground">@color/SplashBackground</item>
+    <item name="android:windowSplashScreenAnimatedIcon">@drawable/flexy_startup_flex_neon</item>
+    <item name="android:windowSplashScreenIconBackgroundColor">@android:color/transparent</item>
+    <item name="android:windowSplashScreenAnimationDuration">0</item>
+  </style>
+  <style name="Theme.FlexyGram.Start.FLEX_NEON" parent="Theme.FlexyGram.Start">
+    <item name="android:windowSplashScreenAnimatedIcon">@drawable/flexy_startup_flex_neon</item>
+  </style>
+  <style name="Theme.FlexyGram.Start.FLEX_GLOSSY" parent="Theme.FlexyGram.Start">
+    <item name="android:windowSplashScreenAnimatedIcon">@drawable/flexy_startup_flex_glossy</item>
+  </style>
+  <style name="Theme.FlexyGram.Start.FLEX_COSMIC" parent="Theme.FlexyGram.Start">
+    <item name="android:windowSplashScreenAnimatedIcon">@drawable/flexy_startup_flex_cosmic</item>
+  </style>
+  <style name="Theme.FlexyGram.Start.FLEX_CYBER" parent="Theme.FlexyGram.Start">
+    <item name="android:windowSplashScreenAnimatedIcon">@drawable/flexy_startup_flex_cyber</item>
+  </style>
+  <style name="Theme.FlexyGram.Start.EXTERALESS" parent="Theme.FlexyGram.Start">
+    <item name="android:windowSplashScreenAnimatedIcon">@drawable/flexy_startup_exteraless</item>
+  </style>
+  <style name="Theme.FlexyGram.Start.FLEX_GREEN" parent="Theme.FlexyGram.Start">
+    <item name="android:windowSplashScreenAnimatedIcon">@drawable/flexy_startup_flex_green</item>
+  </style>
+  <style name="Theme.FlexyGram.Start.FLEX_CORAL" parent="Theme.FlexyGram.Start">
+    <item name="android:windowSplashScreenAnimatedIcon">@drawable/flexy_startup_flex_coral</item>
+  </style>
+  <style name="Theme.FlexyGram.Start.FLEX_MONO" parent="Theme.FlexyGram.Start">
+    <item name="android:windowSplashScreenAnimatedIcon">@drawable/flexy_startup_flex_mono</item>
+  </style>
+  <style name="Theme.FlexyGram.Start.FLEX_BLUEPRINT" parent="Theme.FlexyGram.Start">
+    <item name="android:windowSplashScreenAnimatedIcon">@drawable/flexy_startup_flex_blueprint</item>
+  </style>
+  <style name="Theme.FlexyGram.Start.FLEX_NYA" parent="Theme.FlexyGram.Start">
+    <item name="android:windowSplashScreenAnimatedIcon">@drawable/flexy_startup_flex_nya</item>
+  </style>
+  <style name="Theme.FlexyGram.Start.FLEX_QUACK" parent="Theme.FlexyGram.Start">
+    <item name="android:windowSplashScreenAnimatedIcon">@drawable/flexy_startup_flex_quack</item>
+  </style>
+  <style name="Theme.FlexyGram.Start.FLEX_GO" parent="Theme.FlexyGram.Start">
+    <item name="android:windowSplashScreenAnimatedIcon">@drawable/flexy_startup_flex_go</item>
+  </style>
+  <style name="Theme.FlexyGram.Start.LEGACY_EXTERALESS" parent="Theme.FlexyGram.Start">
+    <item name="android:windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_exteraless_round</item>
+  </style>
+  <style name="Theme.FlexyGram.Start.BLUEPRINT" parent="Theme.FlexyGram.Start">
+    <item name="android:windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_blueprint_round</item>
+  </style>
+  <style name="Theme.FlexyGram.Start.RED" parent="Theme.FlexyGram.Start">
+    <item name="android:windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_red_round</item>
+  </style>
+  <style name="Theme.FlexyGram.Start.NYA" parent="Theme.FlexyGram.Start">
+    <item name="android:windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_nya_round</item>
+  </style>
+  <style name="Theme.FlexyGram.Start.AYU" parent="Theme.FlexyGram.Start">
+    <item name="android:windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_ayu_round</item>
+  </style>
+  <style name="Theme.FlexyGram.Start.QUACK" parent="Theme.FlexyGram.Start">
+    <item name="android:windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_quack_round</item>
+  </style>
+  <style name="Theme.FlexyGram.Start.GO" parent="Theme.FlexyGram.Start">
+    <item name="android:windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_go_round</item>
+  </style>
+  <style name="Theme.FlexyGram.Start.HAND" parent="Theme.FlexyGram.Start">
+    <item name="android:windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_hand_round</item>
+  </style>
+  <style name="Theme.FlexyGram.Start.MONO" parent="Theme.FlexyGram.Start">
+    <item name="android:windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_mono_round</item>
+  </style>
+  <style name="Theme.FlexyGram.Start.NOTHING" parent="Theme.FlexyGram.Start">
+    <item name="android:windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_nothing_round</item>
+  </style>
+  <style name="Theme.FlexyGram.Start.PLUS" parent="Theme.FlexyGram.Start">
+    <item name="android:windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_plus_round</item>
+  </style>
+  <style name="Theme.FlexyGram.Start.TELEGRAM" parent="Theme.FlexyGram.Start">
+    <item name="android:windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_dr_round</item>
+  </style>
+  <style name="Theme.FlexyGram.Start.VINTAGE" parent="Theme.FlexyGram.Start">
+    <item name="android:windowSplashScreenAnimatedIcon">@mipmap/icon_6_launcher_round</item>
+  </style>
+  <style name="Theme.FlexyGram.Start.AQUA" parent="Theme.FlexyGram.Start">
+    <item name="android:windowSplashScreenAnimatedIcon">@mipmap/icon_4_launcher_round</item>
+  </style>
+  <style name="Theme.FlexyGram.Start.PREMIUM" parent="Theme.FlexyGram.Start">
+    <item name="android:windowSplashScreenAnimatedIcon">@mipmap/icon_3_launcher_round</item>
+  </style>
+  <style name="Theme.FlexyGram.Start.TURBO" parent="Theme.FlexyGram.Start">
+    <item name="android:windowSplashScreenAnimatedIcon">@mipmap/icon_5_launcher_round</item>
+  </style>
+  <style name="Theme.FlexyGram.Start.NOX" parent="Theme.FlexyGram.Start">
+    <item name="android:windowSplashScreenAnimatedIcon">@mipmap/icon_2_launcher_round</item>
+  </style>
+</resources>

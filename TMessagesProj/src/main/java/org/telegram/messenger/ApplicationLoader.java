@@ -347,7 +347,14 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
         initPushServices();
         FileLog.d("app initied");
 
-        initializeAccountServices();
+        if (prepareDialogs && android.os.Looper.myLooper() == android.os.Looper.getMainLooper()) {
+            // Keep native service ownership on main, but let the first UI traversal complete first.
+            android.view.Choreographer.getInstance().postFrameCallback(frameTimeNanos ->
+                    applicationHandler.post(ApplicationLoader::initializeAccountServices));
+        } else {
+            // Push/service entry points still initialize without waiting for an Activity or frame.
+            initializeAccountServices();
+        }
         } finally {
             android.os.Trace.endSection();
         }
@@ -479,7 +486,8 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
         org.osmdroid.config.Configuration.getInstance().setOsmdroidBasePath(osmdroidBasePath);
         org.osmdroid.config.Configuration.getInstance().setOsmdroidTileCache(new File(osmdroidBasePath, "tiles"));
 
-        LauncherIconController.tryFixLauncherIconIfNeeded();
+        // Reconciliation checks every alias via binder; it is not a prerequisite for opening chats.
+        Utilities.globalQueue.postRunnable(LauncherIconController::tryFixLauncherIconIfNeeded);
         ProxyRotationController.init();
         app.exteraless.proxy.ProxyPingController.init();
         app.exteraless.links.LinkCleaner.preloadIfEnabled();

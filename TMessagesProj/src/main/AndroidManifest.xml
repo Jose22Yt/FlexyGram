@@ -134,7 +134,7 @@
 
         <activity
             android:name="org.telegram.ui.LaunchActivity"
-            android:theme="@style/Theme.TMessages.Start"
+            android:theme="@style/Theme.FlexyGram.Start"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode|smallestScreenSize|screenLayout"
             android:supportsPictureInPicture="true"
             android:hardwareAccelerated="true"

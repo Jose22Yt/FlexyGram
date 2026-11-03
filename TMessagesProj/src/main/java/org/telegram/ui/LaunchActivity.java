@@ -443,6 +443,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         }
 
         instance = this;
+        app.flexygram.performance.StartupSplash.install(this);
         ApplicationLoader.postInitApplication(true);
         AndroidUtilities.checkDisplaySize(this, getResources().getConfiguration());
         currentAccount = UserConfig.selectedAccount;
@@ -7228,6 +7229,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
     @Override
     protected void onResume() {
         super.onResume();
+        app.flexygram.performance.StartupSplash.refreshAfterFirstFrame(this);
         refreshRateMonitor.start();
         app.flexygram.studio.FlexyStyleInstallHelper.resumeExternal(this);
         isResumed = true;
