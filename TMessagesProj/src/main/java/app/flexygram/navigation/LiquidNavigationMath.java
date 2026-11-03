@@ -14,6 +14,10 @@ public final class LiquidNavigationMath {
         return Math.max(0f, slotPx * (1f + clamp(stretch, 0f, .19f)));
     }
     public static float compression(float stretch) { return 1f - clamp(stretch, 0f, .19f) * .3f; }
+    /** Center the complete dock/search pair rather than each element separately. */
+    public static int pairStart(int left, int available, int dockWidth, int searchWidth, int gap) {
+        return left + Math.max(0, (available - dockWidth - searchWidth - gap) / 2);
+    }
     public static int clampPercent(int value) { return Math.max(0, Math.min(100, value)); }
     public static int clampTabs(int value) { return Math.max(2, value); }
 }

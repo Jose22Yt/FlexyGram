@@ -45,8 +45,8 @@ public class BlurredBackgroundColorProviderThemed implements BlurredBackgroundCo
             strokeColorBottom = 0x14FFFFFF;
             shadowColor = 0;
         } else {
-            strokeColorTop = 0xFFFFFFFF;
-            strokeColorBottom = 0xFFFFFFFF;
+            strokeColorTop = 0x90FFFFFF;
+            strokeColorBottom = 0x38202A35;
             shadowColor = 0x20000000; //0x19000000;
         }
     }

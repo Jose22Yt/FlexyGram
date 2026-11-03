@@ -495,7 +495,12 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         miniPlayer.setOffsetListener(this::onMiniPlayerOffsetChanged);
         contentView.addView(miniPlayer, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, app.exteraless.player.PlayerMiniView.HEIGHT_DP + 16, Gravity.BOTTOM));
 
-        tabsViewWrapper = new FrameLayout(context);
+        tabsViewWrapper = new FrameLayout(context) {
+            @Override protected void onLayout(boolean changed, int l, int t, int r, int b) {
+                super.onLayout(changed, l, t, r, b);
+                positionCompactSearchPair();
+            }
+        };
         tabsViewWrapper.setOnClickListener(v -> {});
         // В M3 панель во всю ширину,
         // высота досчитывается вместе с нижним системным отступом в applyTabsBottomInset
@@ -1069,6 +1074,28 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
     private final Runnable flexyTabConfigListener = this::applyFlexyTabs;
     public GlassTabView[] tabs;
     private int[] flexyShownDestinations = new int[0], flexyConfiguredDestinations = new int[0];
+    private void positionCompactSearchPair() {
+        if (tabsView == null || separateSearchButton == null || tabsViewWrapper == null) return;
+        if (separateSearchButton.getVisibility() != View.VISIBLE) {
+            tabsView.setTranslationX(0);
+            separateSearchButton.setTranslationX(0);
+            separateSearchButton.setTranslationY(0);
+            return;
+        }
+        int left = tabsViewWrapper.getPaddingLeft();
+        int available = tabsViewWrapper.getWidth() - left - tabsViewWrapper.getPaddingRight();
+        int gap = dp(8);
+        int dockWidth = tabsView.getMeasuredWidth();
+        int searchWidth = separateSearchButton.getMeasuredWidth();
+        int start = app.flexygram.navigation.LiquidNavigationMath.pairStart(left, available, dockWidth, searchWidth, gap);
+        boolean rtl = LocaleController.isRTL;
+        int dockLeft = start + (rtl ? searchWidth + gap : 0);
+        int searchLeft = rtl ? start : start + dockWidth + gap;
+        tabsView.setTranslationX(dockLeft - tabsView.getLeft());
+        separateSearchButton.setTranslationX(searchLeft - separateSearchButton.getLeft());
+        separateSearchButton.setTranslationY(tabsView.getBottom() - separateSearchButton.getBottom());
+    }
+
     private void applyFlexyTabs() {
         if (tabsView == null || tabs == null) return;
         boolean enabled = app.flexygram.navigation.LiquidNavigationConfig.isEnabled();

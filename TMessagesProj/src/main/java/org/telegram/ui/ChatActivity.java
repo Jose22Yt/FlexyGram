@@ -4088,7 +4088,7 @@ public class ChatActivity extends BaseFragment implements
 
                 final boolean isThemeLight = themeDelegate != null && !themeDelegate.isDark();
                 if (isThemeLight) {
-                    return ColorUtils.setAlphaComponent(super.getBackgroundColor(), 216);
+                    return ColorUtils.setAlphaComponent(super.getBackgroundColor(), 140);
                 }
                 return super.getBackgroundColor();
             }
@@ -4100,7 +4100,7 @@ public class ChatActivity extends BaseFragment implements
             @Override
             public int getStrokeColorFull() {
                 return app.exteraless.appearance.UniversalGlass.canRender(app.exteraless.appearance.UniversalGlass.INPUT, themeDelegate)
-                        ? app.exteraless.appearance.UniversalGlass.edgeColor(true) : super.getStrokeColorFull();
+                        ? app.exteraless.appearance.UniversalGlass.contourColor(themeDelegate.isDark()) : super.getStrokeColorFull();
             }
             @Override
             public int getStrokeColorTop() {
@@ -4110,7 +4110,7 @@ public class ChatActivity extends BaseFragment implements
             @Override
             public int getStrokeColorBottom() {
                 return app.exteraless.appearance.UniversalGlass.canRender(app.exteraless.appearance.UniversalGlass.INPUT, themeDelegate)
-                        ? app.exteraless.appearance.UniversalGlass.edgeColor(false) : super.getStrokeColorBottom();
+                        ? app.exteraless.appearance.UniversalGlass.edgeColor(false, themeDelegate.isDark()) : super.getStrokeColorBottom();
             }
         };
         blurredBackgroundColorProviderWhite = new BlurredBackgroundColorProviderThemed(themeDelegate, Theme.key_windowBackgroundWhite) {
@@ -4122,7 +4122,7 @@ public class ChatActivity extends BaseFragment implements
 
                 final boolean isThemeLight = themeDelegate != null && !themeDelegate.isDark();
                 if (isThemeLight) {
-                    return ColorUtils.setAlphaComponent(super.getBackgroundColor(), 216);
+                    return ColorUtils.setAlphaComponent(super.getBackgroundColor(), 140);
                 }
                 return super.getBackgroundColor();
             }
@@ -5381,6 +5381,7 @@ public class ChatActivity extends BaseFragment implements
         chatInputViewsContainer.setWindowInsetsProvider(windowInsetsStateHolder);
         chatInputViewsContainer.setInputIslandBubbleDrawable(
             glassBackgroundDrawableFactory.create(chatInputViewsContainer, blurredBackgroundColorProvider));
+        chatInputViewsContainer.setCompactGlassFactory(glassBackgroundDrawableFactory, blurredBackgroundColorProvider);
         chatInputViewsContainer.setUnderKeyboardBackgroundDrawable(
             glassBackgroundDrawableFactoryFrosted.create(chatInputViewsContainer, blurredBackgroundColorProvider));
 

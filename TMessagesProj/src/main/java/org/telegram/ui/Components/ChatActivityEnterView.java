@@ -694,6 +694,9 @@ public class ChatActivityEnterView extends FrameLayout implements
         // Refresh the child's cached display list only when surface ownership changes.
         if (audioVideoButtonContainer != null) audioVideoButtonContainer.invalidate();
     }
+    public void setFlexySendBackdropDrawn(boolean drawn) {
+        if (sendButton != null) sendButton.setCompactBackdropDrawn(drawn);
+    }
     private int flexyInsetDp, flexyGapDp = 6, flexyTextPaddingDp = 14, flexyPositionDp;
     private void readFlexyGeometry() {
         final int level = app.flexygram.composer.FlexyComposerConfig.level();
@@ -16777,8 +16780,9 @@ public class ChatActivityEnterView extends FrameLayout implements
         final float x = textFieldContainer.getX() + sendButtonContainer.getX() + audioVideoButtonContainer.getX();
         final float y = textFieldContainer.getY() + sendButtonContainer.getY() + audioVideoButtonContainer.getY();
         final int inset = dp(flexyInsetDp);
-        out.set(x + inset, y + inset, x + audioVideoButtonContainer.getWidth() - inset,
-            y + audioVideoButtonContainer.getHeight() - inset);
+        out.set(x + audioVideoButtonContainer.getWidth() - dp(44) + inset,
+            y + audioVideoButtonContainer.getHeight() - dp(44) + inset,
+            x + audioVideoButtonContainer.getWidth() - inset, y + audioVideoButtonContainer.getHeight() - inset);
         return true;
     }
 
@@ -16791,7 +16795,8 @@ public class ChatActivityEnterView extends FrameLayout implements
                 || sendButtonContainer.getAlpha() != 1f || sendButton.isOpen()) return false;
         final float x = textFieldContainer.getX() + sendButtonContainer.getX()
                 + sendButton.getX() + sendButton.getWidth() - dp(44);
-        final float y = textFieldContainer.getY() + sendButtonContainer.getY() + sendButton.getY();
+        final float y = textFieldContainer.getY() + sendButtonContainer.getY() + sendButton.getY()
+                + sendButton.getHeight() - dp(44);
         final int inset = dp(flexyInsetDp);
         out.set(x + inset, y + inset, x + dp(44) - inset, y + dp(44) - inset);
         return out.width() > 0 && out.height() > 0;
@@ -16802,7 +16807,10 @@ public class ChatActivityEnterView extends FrameLayout implements
         final float x = textFieldContainer.getX() + messageEditTextContainer.getX() + attachButton.getX();
         final float y = textFieldContainer.getY() + messageEditTextContainer.getY() + attachButton.getY();
         final int inset = dp(flexyInsetDp);
-        out.set(x + inset, y + inset, x + attachButton.getWidth() - inset, y + attachButton.getHeight() - inset);
+        final float size = dp(44) - 2 * inset;
+        final float cx = x + attachButton.getWidth() / 2f;
+        final float cy = y + attachButton.getHeight() / 2f;
+        out.set(cx - size / 2, cy - size / 2, cx + size / 2, cy + size / 2);
         return true;
     }
 
@@ -17186,7 +17194,7 @@ public class ChatActivityEnterView extends FrameLayout implements
             }
             updateColors();
             checkBackgroundRect();
-            if (isNewDesignSendButton) {
+            if (isNewDesignSendButton && !compactBackdropDrawn) {
                 canvas.drawRoundRect(backgroundRect, compactVisualInset >= 0 ? backgroundRect.height() / 2f : dp(RADIUS), compactVisualInset >= 0 ? backgroundRect.height() / 2f : dp(RADIUS), backgroundPaint);
             }
 
@@ -17271,14 +17279,14 @@ public class ChatActivityEnterView extends FrameLayout implements
 
                 canvas.scale(eS, eS, bCX, bCY);
 
-                if (blurredBackgroundDrawable != null) {
+                if (blurredBackgroundDrawable != null && !compactBackdropDrawn) {
                     AndroidUtilities.rectTmp.round(AndroidUtilities.rectTmp2);
                     AndroidUtilities.rectTmp2.inset(-dp(7), -dp(7));
                     blurredBackgroundDrawable.setBounds(AndroidUtilities.rectTmp2);
                     blurredBackgroundDrawable.draw(canvas);
                 }
 
-                if (!isNewDesignSendButton && blurredBackgroundDrawable == null) {
+                if (!isNewDesignSendButton && blurredBackgroundDrawable == null && !compactBackdropDrawn) {
                     canvas.drawPath(path, backgroundPaint);
                 }
                 canvas.clipPath(path);
@@ -17451,7 +17459,7 @@ public class ChatActivityEnterView extends FrameLayout implements
         private int drawableColor;
 
         public void updateColors() {
-            int color = blurredBackgroundDrawable != null ? Theme.getColor(Theme.key_glass_defaultIcon, resourcesProvider)
+            int color = (compactBackdropDrawn || blurredBackgroundDrawable != null) ? Theme.getColor(Theme.key_glass_defaultIcon, resourcesProvider)
                     : isNewDesignSendButton ? Color.WHITE : Theme.getColor(Theme.key_chat_messagePanelSend, resourcesProvider);
             if (color != drawableColor) {
                 drawableColor = color;
@@ -17529,6 +17537,12 @@ public class ChatActivityEnterView extends FrameLayout implements
         private final RectF backgroundRect = new RectF();
         private static final int RADIUS = 19;
 
+        private boolean compactBackdropDrawn;
+        public void setCompactBackdropDrawn(boolean drawn) {
+            if (compactBackdropDrawn == drawn) return;
+            compactBackdropDrawn = drawn;
+            invalidate();
+        }
         private int compactVisualInset = -1;
         public void setCompactVisualInset(int inset) {
             if (compactVisualInset == inset) return;
