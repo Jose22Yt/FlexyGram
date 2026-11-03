@@ -76,7 +76,8 @@ public class GlassTest {
   check(UniversalGlass.surface(UniversalGlass.HEADER,light,fallback)==fallback);
   BlurredBackgroundProviderImpl.blur=true;
   UniversalGlassConfig.universalGlassOpacity.value=-100;
-  check((UniversalGlass.backgroundColor(light,1)>>>24)==51);
+  check((UniversalGlass.backgroundColor(light,1)>>>24)==GlassContrastPolicy.MIN_LIGHT_ALPHA);
+  check((UniversalGlass.backgroundColor(dark,1)>>>24)==43);
   UniversalGlassConfig.universalGlassOpacity.value=1000;
   check((UniversalGlass.backgroundColor(light,1)>>>24)==217);
   int c=UniversalGlass.backgroundColor(dark,1);
@@ -95,5 +96,6 @@ public class GlassTest {
         file.write_text(text)
     production = ROOT / "TMessagesProj/src/main/java/app/exteraless/appearance/UniversalGlass.java"
     subprocess.run(["java", "-m", "jdk.compiler/com.sun.tools.javac.Main", "-d", str(tmp_path),
-                    str(production), *[str(tmp_path / name) for name in sources]], check=True, capture_output=True)
+                    str(production), str(production.with_name("GlassContrastPolicy.java")),
+                    *[str(tmp_path / name) for name in sources]], check=True, capture_output=True)
     subprocess.run(["java", "-cp", str(tmp_path), "GlassTest"], check=True, capture_output=True)

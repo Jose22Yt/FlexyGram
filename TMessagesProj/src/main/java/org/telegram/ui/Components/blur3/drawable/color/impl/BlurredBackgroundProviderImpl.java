@@ -193,7 +193,8 @@ public class BlurredBackgroundProviderImpl {
 
                     final float alpha = isDark ? 0.76f : 0.52f;
                     final int colorBg = Theme.getColor(Theme.key_chat_topPanelBackground, r);
-                    return Theme.multAlpha(colorBg, alpha);
+                    return isDark ? Theme.multAlpha(colorBg, alpha)
+                            : app.exteraless.appearance.GlassContrastPolicy.lightSurface(colorBg, Math.round(alpha * 255));
                 })
                 .setStrokeColorTop(0x90FFFFFF, 0x20FFFFFF)
                 .setStrokeColorBottom(0x38202A35, 0x14FFFFFF)
@@ -214,7 +215,8 @@ public class BlurredBackgroundProviderImpl {
 
                 final float alpha = LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS) ? 0.85f : 0.76f;
                 final int colorBg = Theme.getColor(Theme.key_chat_topPanelBackground, r);
-                return Theme.multAlpha(colorBg, alpha);
+                return isDark ? Theme.multAlpha(colorBg, alpha)
+                            : app.exteraless.appearance.GlassContrastPolicy.lightSurface(colorBg, Math.round(alpha * 255));
             })
             .setStrokeColorTop(0, 0)
             .setStrokeColorBottom(0, 0)

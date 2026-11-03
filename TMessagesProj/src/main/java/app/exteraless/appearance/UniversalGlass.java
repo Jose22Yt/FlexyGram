@@ -24,7 +24,9 @@ public final class UniversalGlass {
     public static int backgroundColor(Theme.ResourcesProvider provider, int colorKey) {
         boolean dark = provider != null ? provider.isDark() : Theme.isCurrentThemeDark();
         float opacity = Math.max(20, Math.min(85, UniversalGlassConfig.opacity())) / 100f;
-        return Theme.multAlpha(Theme.getColor(colorKey, provider), dark ? opacity * 0.85f : opacity);
+        int color = Theme.getColor(colorKey, provider);
+        return dark ? Theme.multAlpha(color, opacity * 0.85f)
+                : GlassContrastPolicy.lightSurface(color, Math.round(opacity * 255));
     }
 
     public static int edgeColor(boolean top) {

@@ -47527,8 +47527,39 @@ public class ChatActivity extends BaseFragment implements
             }
         }
 
+        private final SparseIntArray glassInkSources = new SparseIntArray();
+        private final SparseIntArray glassInkColors = new SparseIntArray();
+        private int glassInkSurface = Integer.MIN_VALUE;
+        private int glassInkBaseColor = Integer.MIN_VALUE;
+        private int glassInkOpacity = -1;
+
         @Override
         public int getColor(int key) {
+            int color = getRawGlassColor(key);
+            boolean glassText = key == Theme.key_actionBarDefaultTitle || key == Theme.key_actionBarDefaultSubtitle
+                    || key == Theme.key_actionBarDefaultIcon || key == Theme.key_chat_status
+                    || key == Theme.key_chat_topPanelTitle || key == Theme.key_chat_topPanelMessage
+                    || key == Theme.key_chat_topPanelClose || key == Theme.key_chat_addContact;
+            if (!glassText || isDark() || !BlurredBackgroundProviderImpl.checkBlurEnabled(currentAccount, this)) return color;
+            int opacity = app.exteraless.appearance.UniversalGlass.enabled(app.exteraless.appearance.UniversalGlass.HEADER)
+                    ? Math.round(Math.max(20, Math.min(85, app.exteraless.appearance.UniversalGlassConfig.opacity())) * 2.55f) : 133;
+            int baseColor = getRawGlassColor(Theme.key_chat_topPanelBackground);
+            if (baseColor != glassInkBaseColor || opacity != glassInkOpacity) {
+                glassInkBaseColor = baseColor;
+                glassInkOpacity = opacity;
+                glassInkSurface = app.exteraless.appearance.GlassContrastPolicy.lightSurface(baseColor, opacity);
+                glassInkSources.clear();
+                glassInkColors.clear();
+            }
+            int index = glassInkSources.indexOfKey(key);
+            if (index < 0 || glassInkSources.valueAt(index) != color) {
+                glassInkSources.put(key, color);
+                glassInkColors.put(key, app.exteraless.appearance.GlassContrastPolicy.readableInk(color, glassInkSurface));
+            }
+            return glassInkColors.get(key);
+        }
+
+        private int getRawGlassColor(int key) {
             if (animatingColors != null) {
                 int index = animatingColors.indexOfKey(key);
                 if (index >= 0) {

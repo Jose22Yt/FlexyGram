@@ -12,7 +12,7 @@
     <string name="FlexyUniversalGlass">Universal · Optimized glass</string>
     <string name="FlexyUniversalGlassSummary">One material for chat and navigation</string>
     <string name="FlexyUniversalGlassEnable">Customize glass appearance</string>
-    <string name="FlexyUniversalGlassInfo">Optimized glass replaces Liquid Glass. Adjust its translucent tint and light edges here. The result follows your theme and wallpaper.</string>
+    <string name="FlexyUniversalGlassInfo">Optimized glass replaces Liquid Glass. Adjust its translucent tint and light edges here. The result follows your theme and wallpaper. In light mode, transparency is limited to keep text readable.</string>
     <string name="FlexyUniversalGlassSurfaces">Apply to</string>
     <string name="FlexyGlassInput">Message field, attachment and send buttons</string>
     <string name="FlexyGlassHeader">Conversation header</string>

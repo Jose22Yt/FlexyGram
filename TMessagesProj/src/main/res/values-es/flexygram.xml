@@ -12,7 +12,7 @@
     <string name="FlexyUniversalGlass">Universal · Cristal optimizado</string>
     <string name="FlexyUniversalGlassSummary">Un mismo acabado para chat y navegación</string>
     <string name="FlexyUniversalGlassEnable">Personalizar acabado del cristal</string>
-    <string name="FlexyUniversalGlassInfo">El cristal optimizado sustituye a Liquid Glass. Ajusta aquí el tinte translúcido y los bordes de luz. El resultado se adapta al tema y al fondo.</string>
+    <string name="FlexyUniversalGlassInfo">El cristal optimizado sustituye a Liquid Glass. Ajusta aquí el tinte translúcido y los bordes de luz. El resultado se adapta al tema y al fondo. En modo claro se limita la transparencia para mantener legibles los textos.</string>
     <string name="FlexyUniversalGlassSurfaces">Aplicar en</string>
     <string name="FlexyGlassInput">Campo de mensaje, adjuntos y envío</string>
     <string name="FlexyGlassHeader">Cabecera de conversación</string>
