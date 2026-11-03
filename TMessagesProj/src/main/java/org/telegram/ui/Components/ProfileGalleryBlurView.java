@@ -528,9 +528,11 @@ public class ProfileGalleryBlurView extends View {
             );
 
             float r = getBlurRadius();
-            RenderEffect mask = RenderEffect.createShaderEffect(renderNodeAlphaGradient);
-            blurNode.setRenderEffect(r <= 0 ? mask : RenderEffect.createBlendModeEffect(
-                    RenderEffect.createBlurEffect(r, r, Shader.TileMode.CLAMP), mask, BlendMode.DST_IN));
+            blurNode.setRenderEffect(RenderEffect.createBlendModeEffect(
+                    RenderEffect.createBlurEffect(r, r, Shader.TileMode.CLAMP),
+                    RenderEffect.createShaderEffect(renderNodeAlphaGradient),
+                    BlendMode.DST_IN
+            ));
         }
     }
 
@@ -740,19 +742,14 @@ public class ProfileGalleryBlurView extends View {
     }
 
     private float getBlurRadius() {
-        final float budget;
         switch (SharedConfig.getDevicePerformanceClass()) {
             case SharedConfig.PERFORMANCE_CLASS_HIGH:
-                budget = 20; break;
+                return 20;
             case SharedConfig.PERFORMANCE_CLASS_AVERAGE:
-                budget = 12; break;
+                return 12;
             default:
-                budget = 8; break;
+            case SharedConfig.PERFORMANCE_CLASS_LOW:
+                return 8;
         }
-        if (app.exteraless.appearance.UniversalGlass.enabled(app.exteraless.appearance.UniversalGlass.PROFILE)) {
-            // Reuse the avatar capture and preserve the device's existing blur budget.
-            return Math.min(budget, app.exteraless.appearance.UniversalGlassConfig.snapshot().blur * .5f);
-        }
-        return budget;
     }
 }

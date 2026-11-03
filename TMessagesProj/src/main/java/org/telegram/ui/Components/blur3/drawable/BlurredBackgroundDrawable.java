@@ -241,23 +241,19 @@ public abstract class BlurredBackgroundDrawable extends Drawable implements Glas
      * При GLARE (дефолт) — ровно прежнее поведение; SOLID гасит блик и тень и включает
      * сплошную обводку, HIDDEN гасит и обводку, и тень.
      */
-    private GlassOutlineStyle materialOutlineStyle() {
-        return colorProvider instanceof app.exteraless.appearance.CustomGlassProvider
-                ? ((app.exteraless.appearance.CustomGlassProvider) colorProvider).outline() : GlassOutlineStyle.current();
-    }
-
     @CallSuper
     public void updateColors() {
         if (colorProvider == null) return;
 
-        final GlassOutlineStyle outlineStyle = materialOutlineStyle();
-        if (colorProvider instanceof app.exteraless.appearance.CustomGlassProvider) {
+        // Keep the original outline policy; only the original custom material opts into adjustable width.
+        if (colorProvider instanceof app.exteraless.appearance.SimpleGlassProvider) {
             float width = ((BlurredBackgroundProvider) colorProvider).getStrokeWidthTop();
             if (boundProps.strokeWidthFull != width) {
                 boundProps.strokeWidthFull = width;
                 boundProps.build();
             }
         }
+        final GlassOutlineStyle outlineStyle = GlassOutlineStyle.current();
         final boolean glare = outlineStyle == GlassOutlineStyle.GLARE;
         final boolean solid = outlineStyle == GlassOutlineStyle.SOLID;
 
@@ -755,7 +751,7 @@ public abstract class BlurredBackgroundDrawable extends Drawable implements Glas
         }
 
         final boolean withStroke = boundProps.useFullStroke ||
-                materialOutlineStyle() == GlassOutlineStyle.GLARE;
+                GlassOutlineStyle.current() == GlassOutlineStyle.GLARE;
         final NinePatchDrawable ninePatchDrawable = checkNinePatchDrawable(fillColor, withStroke);
         ninePatchDrawable.setBounds(
             boundProps.boundsWithPadding.left - ninePatchDrawablePadding.left,
@@ -812,7 +808,7 @@ public abstract class BlurredBackgroundDrawable extends Drawable implements Glas
 
     private void drawStrokeInternalIfNeeded(Canvas canvas) {
         if (!boundProps.useFullStroke &&
-                materialOutlineStyle() != GlassOutlineStyle.GLARE) return;
+                GlassOutlineStyle.current() != GlassOutlineStyle.GLARE) return;
 
         if (boundProps.useFullStroke) {
             final int strokeColorFull = Theme.multAlpha(this.strokeColorFull, alpha / 255f);

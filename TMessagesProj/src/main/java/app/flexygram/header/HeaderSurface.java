@@ -18,12 +18,9 @@ public final class HeaderSurface {
         int color = Theme.getColor(Theme.key_windowBackgroundWhite, provider);
         boolean effects = app.exteraless.appearance.FlexyGlassConfig.enabled();
         fill.setColor(effects ? (color & 0xffffff) | (Math.round(HeaderConfig.opacity() * 2.55f) << 24) : color | 0xFF000000);
-        boolean custom = app.exteraless.appearance.UniversalGlass.enabled(app.exteraless.appearance.UniversalGlass.HEADER);
-        if (custom) fill.setColor(app.exteraless.appearance.UniversalGlass.backgroundColor(provider, Theme.key_windowBackgroundWhite));
-        float strokeWidth = custom ? density * app.exteraless.appearance.UniversalGlassConfig.snapshot().width / 10f : Math.max(1, density * .65f);
+        float strokeWidth = Math.max(1, density * .65f);
         if (stroke.getStrokeWidth() != strokeWidth) stroke.setStrokeWidth(strokeWidth);
         stroke.setColor(effects ? (Theme.getColor(Theme.key_divider, provider) & 0xffffff) | 0x66000000 : 0);
-        if (custom) stroke.setColor(strokeWidth > 0 ? app.exteraless.appearance.UniversalGlass.edgeColor(true) : 0);
         if (g.separateCount) {
             backSurface.set(g.back);
             if (org.telegram.messenger.LocaleController.isRTL) backSurface.left = backSurface.right - g.back.height();

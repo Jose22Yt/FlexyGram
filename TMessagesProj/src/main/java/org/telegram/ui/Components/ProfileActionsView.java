@@ -61,24 +61,6 @@ public class ProfileActionsView extends View {
     private final List<Action> actions = new ArrayList<>();
     private final Paint paint = new Paint();
     private final Paint shaderPaint = new Paint();
-    private final Paint glassBorder = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private boolean customGlass;
-    private int customGlassFill, customGlassInk;
-    public void configureGlass(org.telegram.ui.ActionBar.Theme.ResourcesProvider provider) {
-        customGlass = app.exteraless.appearance.UniversalGlass.canRender(
-                app.exteraless.appearance.UniversalGlass.PROFILE, provider);
-        int base = Theme.getColor(Theme.key_windowBackgroundWhite, provider);
-        int alpha = Math.max(184, Math.round(app.exteraless.appearance.UniversalGlassConfig.opacity() * 2.55f));
-        boolean dark = provider != null ? provider.isDark() : Theme.isCurrentThemeDark();
-        customGlassFill = dark ? (base & 0xffffff) | (alpha << 24)
-                : app.exteraless.appearance.GlassContrastPolicy.lightSurface(base, alpha);
-        customGlassInk = app.exteraless.appearance.GlassContrastPolicy.readableInk(
-                Theme.getColor(Theme.key_windowBackgroundWhiteBlackText, provider), customGlassFill);
-        glassBorder.setStyle(Paint.Style.STROKE);
-        glassBorder.setStrokeWidth(AndroidUtilities.dpf2(app.exteraless.appearance.UniversalGlassConfig.snapshot().width / 10f));
-        glassBorder.setColor(app.exteraless.appearance.UniversalGlass.edgeColor(true));
-    }
-
     private float parentExpanded;
 
     public boolean isAnimatingCallAction = false;
@@ -315,7 +297,7 @@ public class ProfileActionsView extends View {
             return;
         }
 
-        if (!ignoreRect && !customGlass) {
+        if (!ignoreRect) {
             for (int i = 0; i < c; i++) {
                 Action action = actions.get(i);
                 if (!action.isDeleted) {
@@ -349,29 +331,6 @@ public class ProfileActionsView extends View {
         }
 
         drawRenderNode(canvas);
-        if (customGlass) {
-            int oldColor = paint.getColor();
-            for (int i = 0; i < c; i++) {
-                Action action = actions.get(i);
-                if (action.isDeleted) continue;
-                AndroidUtilities.rectTmp.set(action.rect);
-                AndroidUtilities.rectTmp.inset(action.rect.width() * .5f * (1f - action.getScale()),
-                        action.rect.height() * .5f * (1f - action.getScale()));
-                float alpha = action.getAlpha() * alphaFraction1;
-                paint.setShadowLayer(0, 0, 0, 0);
-                paint.setColor(Theme.multAlpha(customGlassFill, alpha));
-                canvas.drawRoundRect(AndroidUtilities.rectTmp, r, r, paint);
-                if (glassBorder.getStrokeWidth() > 0) {
-                    int borderColor = glassBorder.getColor();
-                    glassBorder.setColor(Theme.multAlpha(borderColor, alpha));
-                    float inset = glassBorder.getStrokeWidth() * .5f;
-                    AndroidUtilities.rectTmp.inset(inset, inset);
-                    canvas.drawRoundRect(AndroidUtilities.rectTmp, Math.max(0, r - inset), Math.max(0, r - inset), glassBorder);
-                    glassBorder.setColor(borderColor);
-                }
-            }
-            paint.setColor(oldColor);
-        }
 
         float alphaFraction2 = Utilities.clamp01((fraction - 0.4f) / 0.6f);
         if (alphaFraction2 > 0f) {
@@ -458,7 +417,7 @@ public class ProfileActionsView extends View {
             useFilledWhiteIcon = 0f;
         }
 
-        final int textColor = customGlass ? customGlassInk : ColorUtils.blendARGB(Color.BLACK, Color.WHITE, useFilledWhiteIcon);
+        final int textColor = ColorUtils.blendARGB(Color.BLACK, Color.WHITE, useFilledWhiteIcon);
         if (lastColorFilter == null || lastColorFilterColor != textColor) {
             lastColorFilterColor = textColor;
             lastColorFilter = new PorterDuffColorFilter(textColor, PorterDuff.Mode.SRC_IN);

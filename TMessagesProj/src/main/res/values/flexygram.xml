@@ -10,9 +10,9 @@
     <string name="FlexyTabsVisibility">Visible tabs</string>
     <string name="FlexyTabsReset">Reset tab order</string>
     <string name="FlexyUniversalGlass">Blur and borders</string>
-    <string name="FlexyUniversalGlassSummary">One material for chat and navigation</string>
+    <string name="FlexyUniversalGlassSummary">Blur intensity and original border</string>
     <string name="FlexyUniversalGlassEnable">Customize glass appearance</string>
-    <string name="FlexyUniversalGlassInfo">Applied automatically throughout the interface. Customize the tint and light borders here. Light mode limits transparency to keep text readable.</string>
+    <string name="FlexyUniversalGlassInfo">Uses the original effect in its previous locations. Changes are saved automatically; power-saving and theme blur settings remain respected.</string>
     <string name="FlexyUniversalGlassSurfaces">Apply to</string>
     <string name="FlexyGlassInput">Message field, attachment and send buttons</string>
     <string name="FlexyGlassHeader">Conversation header</string>

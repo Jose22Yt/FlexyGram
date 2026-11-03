@@ -15,7 +15,7 @@ public final class SignatureHomePainter {
         if (diameter <= 0 || alpha <= 0) return;
         float r = diameter / 2;
         bounds.set(cx - r, cy - r, cx + r, cy + r);
-        surface(canvas, r, density, dark, SignatureHomeStyle.surface(dark, glass), alpha, app.exteraless.appearance.UniversalGlass.SEARCH);
+        surface(canvas, r, density, dark, SignatureHomeStyle.surface(dark, glass), alpha);
     }
 
     public void category(Canvas canvas, float width, float height, float density,
@@ -32,17 +32,11 @@ public final class SignatureHomePainter {
         if (bounds.width() <= 0 || h <= 0) return;
         int color = blend(SignatureHomeStyle.surface(dark, glass),
                 selectedColor, selection);
-        surface(canvas, h / 2, density, dark, color, 1, app.exteraless.appearance.UniversalGlass.FOLDERS);
+        surface(canvas, h / 2, density, dark, color, 1);
     }
 
-    private void surface(Canvas canvas, float radius, float density, boolean dark, int color, float alpha, int scope) {
+    private void surface(Canvas canvas, float radius, float density, boolean dark, int color, float alpha) {
         boolean effects = app.exteraless.appearance.FlexyGlassConfig.enabled();
-        boolean custom = app.exteraless.appearance.UniversalGlass.enabled(scope);
-        if (custom) {
-            int a = Math.round(app.exteraless.appearance.UniversalGlassConfig.opacity() * 2.55f);
-            color = dark ? (color & 0xffffff) | (Math.round(a * .85f) << 24)
-                    : app.exteraless.appearance.GlassContrastPolicy.lightSurface(color, a);
-        }
         if (!effects) color |= 0xFF000000;
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(color);
@@ -50,9 +44,8 @@ public final class SignatureHomePainter {
         canvas.drawRoundRect(bounds, radius, radius, paint);
         if (!effects) return;
         paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(custom ? density * app.exteraless.appearance.UniversalGlassConfig.snapshot().width / 10f : Math.max(1, density * .5f));
-        if (paint.getStrokeWidth() <= 0) return;
-        color = custom ? app.exteraless.appearance.UniversalGlass.edgeColor(true, dark) : SignatureHomeStyle.edge(dark);
+        paint.setStrokeWidth(Math.max(1, density * .5f));
+        color = SignatureHomeStyle.edge(dark);
         paint.setColor(color);
         paint.setAlpha(Math.round((color >>> 24) * Math.max(0, Math.min(1, alpha))));
         // Keep the stroke inside the allocated surface.

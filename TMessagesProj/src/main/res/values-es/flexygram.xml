@@ -10,9 +10,9 @@
     <string name="FlexyTabsVisibility">Pestañas visibles</string>
     <string name="FlexyTabsReset">Restablecer orden de pestañas</string>
     <string name="FlexyUniversalGlass">Blur y bordes</string>
-    <string name="FlexyUniversalGlassSummary">Un mismo acabado para chat y navegación</string>
+    <string name="FlexyUniversalGlassSummary">Intensidad del desenfoque y borde original</string>
     <string name="FlexyUniversalGlassEnable">Personalizar acabado del cristal</string>
-    <string name="FlexyUniversalGlassInfo">Se aplica automáticamente en toda la interfaz. Personaliza aquí el tinte y los bordes de luz. En modo claro se limita la transparencia para mantener legibles los textos.</string>
+    <string name="FlexyUniversalGlassInfo">Usa el efecto original en sus ubicaciones anteriores. Los cambios se guardan automáticamente y se respetan el ahorro de energía y el desenfoque del tema.</string>
     <string name="FlexyUniversalGlassSurfaces">Aplicar en</string>
     <string name="FlexyGlassInput">Campo de mensaje, adjuntos y envío</string>
     <string name="FlexyGlassHeader">Cabecera de conversación</string>
