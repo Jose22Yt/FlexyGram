@@ -711,6 +711,10 @@ public class ChatActivityEnterView extends FrameLayout implements
     }
     private int getFlexyVerticalReservation() { return flexyCompactLayout ? dp(app.flexygram.composer.ComposerStyle.reserve(flexyPositionDp)) : 0; }
     public int getFlexyVisualInset() { return dp(flexyInsetDp); }
+    public float getFlexyActionDiameter() {
+        return app.flexygram.composer.ComposerGeometry.visualHeight(
+                dp(app.flexygram.composer.ComposerGeometry.TOUCH_SLOT), getFlexyVisualInset());
+    }
 
     private int flexyNativeFieldRight = -1;
     private int flexyAppliedFieldRight = -1;
@@ -3414,7 +3418,7 @@ public class ChatActivityEnterView extends FrameLayout implements
                         }
                     }
 
-                    final float r = flexyCompactLayout ? (dp(44) - 2 * dp(flexyInsetDp)) / 2f : dpf2(19);
+                    final float r = flexyCompactLayout ? getFlexyActionDiameter() / 2f : dpf2(19);
                     // Signature compositor: use one restrained, separate native action circle.
                     // Preserve upstream accent and all native microphone gestures in Classic.
                     if (flexyCompactLayout) {
@@ -3428,7 +3432,7 @@ public class ChatActivityEnterView extends FrameLayout implements
                         paint.setColor(getThemedColor(Theme.key_chat_messagePanelSend));
                     }
                     final float margin = flexyCompactLayout ? dp(flexyInsetDp) : dpf2(3);
-                    final float height = flexyCompactLayout ? dp(44) - 2 * margin : dpf2(38);
+                    final float height = flexyCompactLayout ? getFlexyActionDiameter() : dpf2(38);
                     final float width = height;
                     backgroundRect.set(
                             getMeasuredWidth() - width - margin,
@@ -16734,6 +16738,11 @@ public class ChatActivityEnterView extends FrameLayout implements
     }
 
     private void updateFlexyIconStyle() {
+        // Match the microphone's 24dp image box without changing native touch/layout slots.
+        attachButton.setScaleType(flexyCompactLayout ? ImageView.ScaleType.CENTER_INSIDE : ImageView.ScaleType.CENTER);
+        int actionPadding = flexyCompactLayout ? dp((app.flexygram.composer.ComposerGeometry.TOUCH_SLOT
+                - app.flexygram.composer.ComposerGeometry.ACTION_ICON) / 2f) : 0;
+        attachButton.setPadding(actionPadding, actionPadding, actionPadding, actionPadding);
         boolean reference = app.flexygram.composer.FlexyComposerConfig.referenceIcons();
         attachButton.setImageResource(isInInput ? R.drawable.ic_ab_other : flexyCompactLayout
             ? (reference ? R.drawable.flexy_composer_clip : R.drawable.flexy_composer_add) : R.drawable.msg_input_attach2);
@@ -16780,9 +16789,10 @@ public class ChatActivityEnterView extends FrameLayout implements
         final float x = textFieldContainer.getX() + sendButtonContainer.getX() + audioVideoButtonContainer.getX();
         final float y = textFieldContainer.getY() + sendButtonContainer.getY() + audioVideoButtonContainer.getY();
         final int inset = dp(flexyInsetDp);
-        out.set(x + audioVideoButtonContainer.getWidth() - dp(44) + inset,
-            y + audioVideoButtonContainer.getHeight() - dp(44) + inset,
-            x + audioVideoButtonContainer.getWidth() - inset, y + audioVideoButtonContainer.getHeight() - inset);
+        final float right = x + audioVideoButtonContainer.getWidth() - inset;
+        final float bottom = y + audioVideoButtonContainer.getHeight() - inset;
+        final float diameter = getFlexyActionDiameter();
+        out.set(right - diameter, bottom - diameter, right, bottom);
         return true;
     }
 
@@ -16798,7 +16808,8 @@ public class ChatActivityEnterView extends FrameLayout implements
         final float y = textFieldContainer.getY() + sendButtonContainer.getY() + sendButton.getY()
                 + sendButton.getHeight() - dp(44);
         final int inset = dp(flexyInsetDp);
-        out.set(x + inset, y + inset, x + dp(44) - inset, y + dp(44) - inset);
+        final float diameter = getFlexyActionDiameter();
+        out.set(x + inset, y + inset, x + inset + diameter, y + inset + diameter);
         return out.width() > 0 && out.height() > 0;
     }
 
@@ -16806,8 +16817,7 @@ public class ChatActivityEnterView extends FrameLayout implements
         if (attachButton == null || attachButton.getVisibility() != VISIBLE || attachButton.getAlpha() <= 0) return false;
         final float x = textFieldContainer.getX() + messageEditTextContainer.getX() + attachButton.getX();
         final float y = textFieldContainer.getY() + messageEditTextContainer.getY() + attachButton.getY();
-        final int inset = dp(flexyInsetDp);
-        final float size = dp(44) - 2 * inset;
+        final float size = getFlexyActionDiameter();
         final float cx = x + attachButton.getWidth() / 2f;
         final float cy = y + attachButton.getHeight() / 2f;
         out.set(cx - size / 2, cy - size / 2, cx + size / 2, cy + size / 2);
@@ -17563,7 +17573,9 @@ public class ChatActivityEnterView extends FrameLayout implements
         }
         private void checkBackgroundRect() {
             final float margin = compactVisualInset >= 0 ? compactVisualInset : dpf2(3);
-            final float height = compactVisualInset >= 0 ? dp(44) - 2 * margin : dpf2(38);
+            final float height = compactVisualInset >= 0
+                    ? app.flexygram.composer.ComposerGeometry.visualHeight(dp(app.flexygram.composer.ComposerGeometry.TOUCH_SLOT), margin)
+                    : dpf2(38);
             final float width = lerp(
                 Math.max(height, dpf2(10 + 10) + priceText.getCurrentWidth()),
                 height, sameWidthFactor);

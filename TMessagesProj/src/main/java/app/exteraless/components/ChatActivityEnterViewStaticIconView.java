@@ -64,7 +64,7 @@ public class ChatActivityEnterViewStaticIconView extends FrameLayout {
         referenceIcons = reference;
         for (ImageView view : buttonViews) {
             FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) view.getLayoutParams();
-            int size = compact ? org.telegram.messenger.AndroidUtilities.dp(28) : nativeIconSize;
+            int size = compact ? Math.min(nativeIconSize, org.telegram.messenger.AndroidUtilities.dp(28)) : nativeIconSize;
             if (lp.width != size || lp.height != size) {
                 lp.width = lp.height = size;
                 view.setLayoutParams(lp);

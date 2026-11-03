@@ -28,3 +28,23 @@ comprobación de los diámetros de compactación; suite existente y sintaxis Jav
 La compilación Android se inicia al publicar los cambios mediante el workflow
 ARM64 existente. Las capturas no constituyen una medición posterior al cambio:
 la comprobación visual en dispositivo sigue pendiente.
+
+## Igualdad visual de adjuntos, micrófono y envío
+
+El clip compacto conservaba sus 28 dp intrínsecos con `CENTER`, mientras el
+micrófono animado se reducía al espacio interior de 24 dp con su padding nativo.
+El clip pasa a `CENTER_INSIDE` con el mismo espacio interior; se conservan la
+vista de 44 dp, sus gestos y el área táctil. El modo clásico recupera su centrado
+y padding originales. La variante estática del micrófono mantiene sus 24 dp
+nativos y deja de ampliar su contenedor de icono a 28 dp; los iconos de emoji
+conservan su tamaño compacto anterior.
+
+Los tres círculos y el radio del material comparten ahora el cálculo de diámetro
+visual del compositor. El botón de envío y el micrófono de reserva usan la misma
+función de geometría. Una prueba JVM ejecuta los getters reales de los tres
+controles con nueve densidades, tres niveles de inset y tres tamaños de vista
+nativa: todos producen círculos del mismo diámetro sin ampliar los controles.
+
+Validación local de esta ampliación: 211 pruebas aprobadas y 31 omitidas,
+sintaxis Java y diff correctos. Queda pendiente comparar el aspecto de los
+iconos en dispositivo con el APK nuevo.

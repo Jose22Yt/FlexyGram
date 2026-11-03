@@ -3,6 +3,7 @@ package app.flexygram.composer;
 /** Presentation constants only: never changes the native IME or measured height. */
 public final class ComposerGeometry {
     public static final int TOUCH_SLOT = 44;
+    public static final int ACTION_ICON = 24;
     public static final int VISUAL_INSET = 2;
     public static final int PILL_GAP = 6;
     public static final int TEXT_PADDING = 12;

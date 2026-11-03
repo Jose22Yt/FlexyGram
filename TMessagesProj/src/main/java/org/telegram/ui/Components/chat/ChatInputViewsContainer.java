@@ -475,7 +475,7 @@ public class ChatInputViewsContainer extends FrameLayout {
         flexyPill.offset(offsetX, offsetY);
         final boolean attach = flexyComposer.getFlexyAttachmentBounds(flexyAttach);
         if (attach) flexyAttach.offset(offsetX, offsetY);
-        final float radius = (dp(44) - 2 * flexyComposer.getFlexyVisualInset()) / 2f;
+        final float radius = flexyComposer.getFlexyActionDiameter() / 2f;
         final boolean nativeGlass = compactGlass[0] != null && canvas.isHardwareAccelerated()
                 && flexyComposer.flexyNativeGlassIslandsAvailable();
         if (nativeGlass) {
