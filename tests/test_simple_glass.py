@@ -90,7 +90,7 @@ def test_canceled_surfaces_match_previous_beta_and_editor_has_no_preview():
              'org/telegram/ui/Components/SharedMediaLayout.java']
     for path in paths:
         relative = 'TMessagesProj/src/main/java/' + path
-        assert (ROOT / relative).read_bytes() == subprocess.check_output(['git', 'show', '1c323bf54c:' + relative], cwd=ROOT)
+        assert (ROOT / relative).read_bytes() == subprocess.check_output(['git', 'show', '1c323bf54c401204b69f1a204cb5e817d7584d17:' + relative], cwd=ROOT)
     assert not (JAVA / 'app/flexygram/effects/GlassPreviewView.java').exists()
     assert not (JAVA / 'app/exteraless/appearance/CustomGlassProvider.java').exists()
     screen = (JAVA / 'app/exteraless/settings/UniversalGlassSettingsActivity.java').read_text()
