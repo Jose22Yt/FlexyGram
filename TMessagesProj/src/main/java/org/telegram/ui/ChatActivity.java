@@ -35037,9 +35037,9 @@ public class ChatActivity extends BaseFragment implements
                         (int)Math.ceil(window[1] + Math.max(0, chatListViewPaddingTop - chatListViewPaddingVisibleOffset))) + dp(8);
                 int[] contentWindow = new int[2];
                 contentView.getLocationInWindow(contentWindow);
-                int availableBottom = Math.min(window[1] + chatListView.getHeight(),
+                int availableBottom = (int) Math.floor(Math.min(window[1] + chatListView.getHeight(),
                         contentWindow[1] + contentView.getHeight() - windowInsetsStateHolder.getCurrentMaxBottomInset()
-                                - inputIslandHeightCurrent - getTopicTabsSideSize(TopicsTabsView.Position.BOTTOM) - dp(9)) - dp(8);
+                                - inputIslandHeightCurrent - getTopicTabsSideSize(TopicsTabsView.Position.BOTTOM) - dp(9))) - dp(8);
                 Rect visibleWindow = new Rect();
                 chatListView.getWindowVisibleDisplayFrame(visibleWindow);
                 availableTop = Math.max(availableTop,visibleWindow.top+dp(8));
