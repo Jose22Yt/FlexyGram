@@ -70,8 +70,11 @@ public class GlassTest {
   UniversalGlassConfig.universalGlass.value=1;
   for(int scope=1;scope<=32;scope*=2)check(UniversalGlass.canRender(scope,light));
   UniversalGlassConfig.universalGlassSurfaces.value=UniversalGlass.HEADER;
-  check(!UniversalGlass.canRender(UniversalGlass.INPUT,light));
-  check(UniversalGlass.canRender(UniversalGlass.HEADER,light));
+  // Saved per-surface exclusions no longer restrict the automatically applied material.
+  for(int scope=1;scope<=32;scope*=2)check(UniversalGlass.canRender(scope,light));
+  UniversalGlassConfig.universalGlassSurfaces.value=0;
+  for(int scope=1;scope<=32;scope*=2)check(UniversalGlass.canRender(scope,light));
+  check(!UniversalGlass.canRender(64,light));
   BlurredBackgroundProviderImpl.blur=false;
   check(UniversalGlass.surface(UniversalGlass.HEADER,light,fallback)==fallback);
   BlurredBackgroundProviderImpl.blur=true;

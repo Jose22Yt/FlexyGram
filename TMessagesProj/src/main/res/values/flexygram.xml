@@ -9,10 +9,10 @@
     <string name="FlexyTabsDragHint">Hold a tab and drag it onto another to swap their positions. Tap to preview selection.</string>
     <string name="FlexyTabsVisibility">Visible tabs</string>
     <string name="FlexyTabsReset">Reset tab order</string>
-    <string name="FlexyUniversalGlass">Universal · Optimized glass</string>
+    <string name="FlexyUniversalGlass">Blur and borders</string>
     <string name="FlexyUniversalGlassSummary">One material for chat and navigation</string>
     <string name="FlexyUniversalGlassEnable">Customize glass appearance</string>
-    <string name="FlexyUniversalGlassInfo">Optimized glass replaces Liquid Glass. Adjust its translucent tint and light edges here. The result follows your theme and wallpaper. In light mode, transparency is limited to keep text readable.</string>
+    <string name="FlexyUniversalGlassInfo">Applied automatically throughout the interface. Customize the tint and light borders here. Light mode limits transparency to keep text readable.</string>
     <string name="FlexyUniversalGlassSurfaces">Apply to</string>
     <string name="FlexyGlassInput">Message field, attachment and send buttons</string>
     <string name="FlexyGlassHeader">Conversation header</string>

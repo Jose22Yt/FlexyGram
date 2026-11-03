@@ -14,7 +14,7 @@ public final class UniversalGlass {
 
     public static boolean enabled(int surface) {
         return UniversalGlassConfig.enabled()
-                && (UniversalGlassConfig.surfaces() & surface) != 0;
+                && (surface & (INPUT | HEADER | NAVIGATION | SEARCH | MENUS | FOLDERS)) != 0;
     }
 
     public static boolean canRender(int surface, Theme.ResourcesProvider provider) {

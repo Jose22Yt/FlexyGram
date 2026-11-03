@@ -147,11 +147,7 @@ public class LiteModeSettingsActivity extends BaseFragment {
                 LiteMode.toggleFlag(item.flags, !value);
                 updateValues();
             } else if (item.viewType == VIEW_TYPE_SWITCH2) {
-                if (item.type == SWITCH_TYPE_FLEXY_GLASS) {
-                    boolean enabled = !app.exteraless.appearance.FlexyGlassConfig.enabled();
-                    app.exteraless.appearance.FlexyGlassConfig.setEnabled(enabled);
-                    ((TextCell) view).setChecked(enabled);
-                } else if (item.type == SWITCH_TYPE_SMOOTH_TRANSITIONS) {
+                if (item.type == SWITCH_TYPE_SMOOTH_TRANSITIONS) {
                     SharedPreferences preferences = MessagesController.getGlobalMainSettings();
                     boolean animations = preferences.getBoolean("view_animations", true);
                     SharedPreferences.Editor editor = preferences.edit();
@@ -304,10 +300,6 @@ public class LiteModeSettingsActivity extends BaseFragment {
             if (SharedConfig.getDevicePerformanceClass() >= SharedConfig.PERFORMANCE_CLASS_AVERAGE || BuildVars.DEBUG_PRIVATE_VERSION) {
                 items.add(Item.asCheckbox(LocaleController.getString("LiteOptionsBlur2"), LiteMode.FLAG_CHAT_BLUR));
             }
-            // Replacement for the retired Liquid Glass row in Telegram's original location.
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                items.add(Item.asSwitch(LocaleController.getString(R.string.FlexyGlassMasterSwitch), SWITCH_TYPE_FLEXY_GLASS));
-            }
             items.add(Item.asCheckbox(LocaleController.getString("LiteOptionsScale"), LiteMode.FLAG_CHAT_SCALE));
             if (ThanosEffect.supports()) {
                 items.add(Item.asCheckbox(LocaleController.getString("LiteOptionsThanos"), LiteMode.FLAG_CHAT_THANOS));
@@ -420,7 +412,6 @@ public class LiteModeSettingsActivity extends BaseFragment {
     private static final int VIEW_TYPE_VALUE = 6;
 
     public static final int SWITCH_TYPE_SMOOTH_TRANSITIONS = 1;
-    public static final int SWITCH_TYPE_FLEXY_GLASS = 2;
     public static final int TYPE_PERFORMANCE_CLASS = 2;
 
     private class Adapter extends AdapterWithDiffUtils {
@@ -493,9 +484,7 @@ public class LiteModeSettingsActivity extends BaseFragment {
                 switchCell.set(item, divider);
             } else if (viewType == VIEW_TYPE_SWITCH2) {
                 TextCell textCell = (TextCell) holder.itemView;
-                if (item.type == SWITCH_TYPE_FLEXY_GLASS) {
-                    textCell.setTextAndCheck(item.text, app.exteraless.appearance.FlexyGlassConfig.enabled(), true);
-                } else if (item.type == SWITCH_TYPE_SMOOTH_TRANSITIONS) {
+                if (item.type == SWITCH_TYPE_SMOOTH_TRANSITIONS) {
                     SharedPreferences preferences = MessagesController.getGlobalMainSettings();
                     boolean animations = preferences.getBoolean("view_animations", true);
                     textCell.setTextAndCheck(item.text, animations, false);
