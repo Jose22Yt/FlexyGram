@@ -99,41 +99,36 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p TMessagesProj/src/debug
-          if [ -n "${ALPHA_FIREBASE_JSON_B64:-}" ]; then
-            echo "$ALPHA_FIREBASE_JSON_B64" | base64 -d > TMessagesProj/src/debug/google-services.json
-          else
-            cat > TMessagesProj/src/debug/google-services.json <<'JSON'
-            {
-              "project_info": {
-                "project_number": "100000000000",
-                "project_id": "flexygram-debug",
-                "storage_bucket": "flexygram-debug.appspot.com"
-              },
-            "client": [
-              {
-                "client_info": {
-                  "mobilesdk_app_id": "1:100000000000:android:0000000000000000000000",
-                  "android_client_info": {
-                    "package_name": "com.flexygram.messenger"
-                  }
-                },
-                "oauth_client": [],
-                "api_key": [
-                  {
-                    "current_key": "AIzaSyDebugMockKeyForLocalAssembly0000"
-                  }
-                ],
-                "services": {
-                  "appinvite_service": {
-                    "other_platform_oauth_client": []
-                  }
-                }
+          python3 -c '
+          import os, base64, json
+          b64 = os.environ.get("ALPHA_FIREBASE_JSON_B64")
+          out = "TMessagesProj/src/debug/google-services.json"
+          if b64:
+              with open(out, "wb") as f:
+                  f.write(base64.b64decode(b64))
+          else:
+              mock = {
+                  "project_info": {
+                      "project_number": "100000000000",
+                      "project_id": "flexygram-debug",
+                      "storage_bucket": "flexygram-debug.appspot.com"
+                  },
+                  "client": [{
+                      "client_info": {
+                          "mobilesdk_app_id": "1:100000000000:android:0000000000000000000000",
+                          "android_client_info": {
+                              "package_name": "com.flexygram.messenger"
+                          }
+                      },
+                      "oauth_client": [],
+                      "api_key": [{"current_key": "AIzaSyDebugMockKeyForLocalAssembly0000"}],
+                      "services": {"appinvite_service": {"other_platform_oauth_client": []}}
+                  }],
+                  "configuration_version": "1"
               }
-            ],
-            "configuration_version": "1"
-          }
-JSON
-          fi
+              with open(out, "w") as f:
+                  json.dump(mock, f, indent=2)
+          '
           ./gradlew --no-daemon --max-workers=2 --console=plain \
             --init-script "$RUNNER_TEMP/flexy-native-pools.gradle" \
             :TMessagesProj:assembleDebug 2>&1 | tee build/reports/ui-beta/assemble.log
