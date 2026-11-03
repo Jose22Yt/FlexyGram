@@ -45,6 +45,7 @@ public enum GlassOutlineStyle {
 
     /** Текущий стиль из настроек; неизвестное значение трактуется как {@link #GLARE}. */
     public static GlassOutlineStyle current() {
+        if (!app.exteraless.appearance.FlexyGlassConfig.enabled()) return HIDDEN;
         final int index = AppearanceConfig.glassOutlineStyle();
         if (index < 0 || index >= VALUES.length) {
             return GLARE;

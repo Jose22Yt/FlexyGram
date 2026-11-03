@@ -36,10 +36,13 @@ public final class SignatureHomePainter {
     }
 
     private void surface(Canvas canvas, float radius, float density, boolean dark, int color, float alpha) {
+        boolean effects = app.exteraless.appearance.FlexyGlassConfig.enabled();
+        if (!effects) color |= 0xFF000000;
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(color);
         paint.setAlpha(Math.round((color >>> 24) * Math.max(0, Math.min(1, alpha))));
         canvas.drawRoundRect(bounds, radius, radius, paint);
+        if (!effects) return;
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(Math.max(1, density * .5f));
         color = SignatureHomeStyle.edge(dark);

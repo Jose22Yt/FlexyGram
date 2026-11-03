@@ -323,6 +323,14 @@ public class LiteMode {
         }
         dispatchPowerPolicyListeners(powerSaverApplied);
     }
+    /** Refresh retained blur sources and contours after the FlexyGram master switch. */
+    public static void onGlassEffectChanged() {
+        AndroidUtilities.runOnUIThread(() -> {
+            org.telegram.ui.Components.blur3.GlassOutlineStyle.dispatchChange();
+            dispatchPowerPolicyListeners(lastPowerSaverApplied);
+        });
+    }
+
     private static void dispatchPowerPolicyListeners(boolean powerSaverApplied) {
         if (onPowerSaverAppliedListeners == null) return;
         AndroidUtilities.runOnUIThread(() -> {

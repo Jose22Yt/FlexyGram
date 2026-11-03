@@ -8,7 +8,12 @@ BASE='4679f74ebd312acc4968dd2e044a6c6b7478445a'
 S=J/'app/flexygram/settings/signature'
 def test_no_preference_migration_or_backend_replacement():
  for p in ['TMessagesProj/src/main/kotlin/app/exteraless/appearance/AppearanceConfig.kt','TMessagesProj/src/main/java/org/telegram/ui/Components/blur3/GlassOutlineStyle.java']:
-  assert (ROOT/p).read_bytes()==subprocess.check_output(['git','show',BASE+':'+p],cwd=ROOT)
+  current=(ROOT/p).read_text()
+  if p.endswith('GlassOutlineStyle.java'):
+   guard='        if (!app.exteraless.appearance.FlexyGlassConfig.enabled()) return HIDDEN;\n'
+   assert current.count(guard)==1
+   current=current.replace(guard,'')
+  assert current==subprocess.check_output(['git','show',BASE+':'+p],cwd=ROOT,text=True)
  assert 'AP_GlareEffect' not in (J/'app/flexygram/effects/GlareSettingsSection.java').read_text()
 def test_one_owner_and_direct_chat_entry():
  policy=(S/'Settings2Policy.java').read_text()
@@ -24,7 +29,9 @@ def test_default_static_renderer_is_preserved():
  new=(ROOT/p).read_text()
  replacement='if (org.telegram.ui.Components.blur3.StaticOutlineStroke.drawOverride(canvas,left,top,right,bottom,radii,isTop,paint,GlassOutlineStyle.current())) return;'
  assert new.count(replacement)==2
- assert new.replace(replacement,'if (GlassOutlineStyle.current() != GlassOutlineStyle.GLARE) return;')==old
+ master_off='        if (!app.exteraless.appearance.FlexyGlassConfig.enabled()) {\n            // An opaque fill also skips replaying an already cached blurred source.\n            if (Color.alpha(backgroundColor) == 0) backgroundColor = Theme.getColor(Theme.key_windowBackgroundWhite);\n            backgroundColor = ColorUtils.setAlphaComponent(backgroundColor, 255);\n        }\n'
+ assert new.count(master_off)==1
+ assert new.replace(master_off,'').replace(replacement,'if (GlassOutlineStyle.current() != GlassOutlineStyle.GLARE) return;')==old
 
 def test_no_frame_allocations_or_background_engine():
  source=(J/'org/telegram/ui/Components/blur3/StaticOutlineStroke.java').read_text()

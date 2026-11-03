@@ -244,6 +244,11 @@ public abstract class BlurredBackgroundDrawable extends Drawable implements Glas
         }
 
         backgroundColor = colorProvider.getBackgroundColor();
+        if (!app.exteraless.appearance.FlexyGlassConfig.enabled()) {
+            // An opaque fill also skips replaying an already cached blurred source.
+            if (Color.alpha(backgroundColor) == 0) backgroundColor = Theme.getColor(Theme.key_windowBackgroundWhite);
+            backgroundColor = ColorUtils.setAlphaComponent(backgroundColor, 255);
+        }
         shadowColor = glare ? colorProvider.getShadowColor() : 0;
         strokeColorTop = glare ? colorProvider.getStrokeColorTop() : 0;
         strokeColorBottom = glare ? colorProvider.getStrokeColorBottom() : 0;

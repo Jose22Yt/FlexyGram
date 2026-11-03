@@ -16,10 +16,11 @@ public final class HeaderSurface {
 
     public void draw(Canvas canvas, HeaderGeometry g, float density, Theme.ResourcesProvider provider) {
         int color = Theme.getColor(Theme.key_windowBackgroundWhite, provider);
-        fill.setColor((color & 0xffffff) | (Math.round(HeaderConfig.opacity() * 2.55f) << 24));
+        boolean effects = app.exteraless.appearance.FlexyGlassConfig.enabled();
+        fill.setColor(effects ? (color & 0xffffff) | (Math.round(HeaderConfig.opacity() * 2.55f) << 24) : color | 0xFF000000);
         float strokeWidth = Math.max(1, density * .65f);
         if (stroke.getStrokeWidth() != strokeWidth) stroke.setStrokeWidth(strokeWidth);
-        stroke.setColor((Theme.getColor(Theme.key_divider, provider) & 0xffffff) | 0x66000000);
+        stroke.setColor(effects ? (Theme.getColor(Theme.key_divider, provider) & 0xffffff) | 0x66000000 : 0);
         if (g.separateCount) {
             backSurface.set(g.back);
             if (org.telegram.messenger.LocaleController.isRTL) backSurface.left = backSurface.right - g.back.height();
