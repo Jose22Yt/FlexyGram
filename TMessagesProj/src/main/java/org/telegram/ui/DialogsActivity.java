@@ -3256,10 +3256,18 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         return !(dialog instanceof BotWebViewSheet) && super.dismissDialogOnPause(dialog);
     }
 
+    private BlurredBackgroundDrawableViewFactory signatureHomeGlassFactory;
+
     @Override
     public ActionBar createActionBar(Context context) {
         ActionBar actionBar = new ActionBar(context, resourceProvider) {
             private final SignatureHomePainter signatureHomePainter = new SignatureHomePainter();
+            private final class HomeControlGlass {
+                BlurredBackgroundDrawable drawable;
+                float radius = -1;
+                int color;
+            }
+            private final java.util.WeakHashMap<View, HomeControlGlass> homeControlGlass = new java.util.WeakHashMap<>();
             private final PorterDuffColorFilter signatureHomeLightInk = new PorterDuffColorFilter(
                     SignatureHomeStyle.text(false, false), PorterDuff.Mode.SRC_IN);
             private final PorterDuffColorFilter signatureHomeDarkInk = new PorterDuffColorFilter(
@@ -3288,6 +3296,26 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     if (icon != null && icon.getColorFilter() != ink) icon.setColorFilter(ink);
                 }
                 float diameter = SignatureHomeStyle.controlDiameter(item.getWidth(), item.getHeight(), AndroidUtilities.density);
+                if (signatureHomeGlassFactory != null && canvas.isHardwareAccelerated()
+                        && BlurredBackgroundProviderImpl.checkBlurEnabled(currentAccount, resourceProvider)) {
+                    HomeControlGlass retained = homeControlGlass.get(item);
+                    if (retained == null) {
+                        retained = new HomeControlGlass();
+                        retained.drawable = signatureHomeGlassFactory.create(this, BlurredBackgroundProviderImpl.topPanel(resourceProvider)).setPadding(0);
+                        homeControlGlass.put(item, retained);
+                    }
+                    BlurredBackgroundDrawable glass = retained.drawable;
+                    int color = Theme.getColor(Theme.key_windowBackgroundWhite, resourceProvider);
+                    if (retained.color != color) { retained.color = color; glass.updateColors(); }
+                    float r = diameter * Math.min(item.getScaleX(), item.getScaleY()) / 2f;
+                    float cx = menu.getX() + item.getX() + item.getWidth() / 2f;
+                    float cy = menu.getY() + item.getY() + item.getHeight() / 2f;
+                    if (retained.radius != r) { retained.radius = r; glass.setRadius(r); }
+                    glass.setBounds(Math.round(cx-r), Math.round(cy-r), Math.round(cx+r), Math.round(cy+r));
+                    glass.setAlpha(Math.round(255 * item.getAlpha() * menu.getAlpha()));
+                    glass.draw(canvas);
+                    return;
+                }
                 signatureHomePainter.control(canvas,
                         menu.getX() + item.getX() + item.getWidth() / 2f,
                         menu.getY() + item.getY() + item.getHeight() / 2f,
@@ -4313,6 +4341,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         viewPositionWatcher = new ViewPositionWatcher(contentView);
         iBlur3FactoryFrostedLiquidGlass.setSourceRootView(viewPositionWatcher, contentView);
         iBlur3FactoryLiquidGlass.setSourceRootView(viewPositionWatcher, contentView);
+        signatureHomeGlassFactory = iBlur3FactoryLiquidGlass;
         iBlur3FactoryFade.setSourceRootView(viewPositionWatcher, contentView);
         iBlur3FactoryBlur.setSourceRootView(viewPositionWatcher, contentView);
 
@@ -5451,6 +5480,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
 
         if (filterTabsView != null) {
+            if (isSignatureHome()) filterTabsView.setSignatureGlassFactory(iBlur3FactoryLiquidGlass);
             // Home paints cheap individual pills; do not even allocate/register
             // a shared blur drawable that this row will never draw.
             if (!isSignatureHome()) {

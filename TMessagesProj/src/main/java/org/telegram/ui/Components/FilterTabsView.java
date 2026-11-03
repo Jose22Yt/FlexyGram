@@ -227,7 +227,24 @@ public class FilterTabsView extends FrameLayout {
     public static final float TAB_INTERNAL_PADDING = 12.5f;
     private static final float TAB_COUNTER_HEIGHT = 17.333f;
 
+    private org.telegram.ui.Components.blur3.BlurredBackgroundDrawableViewFactory signatureGlassFactory;
+    public void setSignatureGlassFactory(org.telegram.ui.Components.blur3.BlurredBackgroundDrawableViewFactory factory) {
+        signatureGlassFactory = factory;
+        for (int i=0; i<listView.getChildCount(); i++) {
+            if (listView.getChildAt(i) instanceof TabView) ((TabView)listView.getChildAt(i)).preparePillGlass();
+        }
+    }
+
     public class TabView extends View {
+
+        private BlurredBackgroundDrawable signaturePillGlass;
+        private float signaturePillRadius = -1;
+        private void preparePillGlass() {
+            if (signaturePillGlass == null && signatureGlassFactory != null) {
+                signaturePillGlass = signatureGlassFactory.create(this,
+                        org.telegram.ui.Components.blur3.drawable.color.impl.BlurredBackgroundProviderImpl.topPanel(resourcesProvider)).setPadding(0);
+            }
+        }
 
         public ValueAnimator changeAnimator;
         private Tab currentTab;
@@ -429,10 +446,23 @@ public class FilterTabsView extends FrameLayout {
                 signaturePalette=themed?signatureAccentColors:signatureDefaultColors;
                 signatureSelected = app.flexygram.home.SignatureHomeStyle.selection(currentTab.id, id1, id2,
                         animatingIndicator || manualScrollingToId != -1, animatingIndicatorProgress);
-                signatureHomePainter.category(canvas, getMeasuredWidth(), getMeasuredHeight(), AndroidUtilities.density,
-                        dark, !signatureHomeOpaquePreview && org.telegram.messenger.LiteMode.isEnabled(org.telegram.messenger.LiteMode.FLAG_LIQUID_GLASS), signatureSelected,
-                        themed?signatureAccent:
-                        app.flexygram.home.SignatureHomeStyle.selectedSurface(dark,!signatureHomeOpaquePreview && org.telegram.messenger.LiteMode.isEnabled(org.telegram.messenger.LiteMode.FLAG_LIQUID_GLASS)));
+                boolean nativePill = !signatureHomeOpaquePreview && signaturePillGlass != null && canvas.isHardwareAccelerated()
+                        && org.telegram.ui.Components.blur3.drawable.color.impl.BlurredBackgroundProviderImpl.checkBlurEnabled(resourcesProvider);
+                if (nativePill) {
+                    float h = app.flexygram.home.SignatureHomeStyle.categoryHeight(getHeight(), AndroidUtilities.density);
+                    if (signaturePillRadius != h/2) {
+                        signaturePillRadius = h/2;
+                        signaturePillGlass.setRadius(signaturePillRadius);
+                    }
+                    signaturePillGlass.setBounds(dp(3), Math.round((getHeight()-h)/2), getWidth()-dp(3), Math.round((getHeight()+h)/2));
+                    signaturePillGlass.draw(canvas);
+                }
+                if (!nativePill || signatureSelected > 0) {
+                    signatureHomePainter.category(canvas, getMeasuredWidth(), getMeasuredHeight(), AndroidUtilities.density,
+                            dark, nativePill, signatureSelected,
+                            themed?signatureAccent:
+                            app.flexygram.home.SignatureHomeStyle.selectedSurface(dark,nativePill));
+                }
                 textPaint.setColor(signaturePalette.inkAt(signatureSelected));
             }
             ColorFilter emojiColorFilter = signatureHomeTint.get(textPaint.getColor());
@@ -740,6 +770,7 @@ public class FilterTabsView extends FrameLayout {
         protected void onAttachedToWindow() {
             attached = true;
             super.onAttachedToWindow();
+            preparePillGlass();
             textLayoutEmojis = AnimatedEmojiSpan.update(currentTab.noanimate ? AnimatedEmojiDrawable.CACHE_TYPE_NOANIMATE_FOLDER : AnimatedEmojiDrawable.CACHE_TYPE_MESSAGES, this, textLayoutEmojis, textLayout);
             titleAnimateInLayoutEmojis = AnimatedEmojiSpan.update(currentTab.noanimate ? AnimatedEmojiDrawable.CACHE_TYPE_NOANIMATE_FOLDER : AnimatedEmojiDrawable.CACHE_TYPE_MESSAGES, this, titleAnimateInLayoutEmojis, titleAnimateInLayout);
             titleAnimateOutLayoutEmojis = AnimatedEmojiSpan.update(currentTab.noanimate ? AnimatedEmojiDrawable.CACHE_TYPE_NOANIMATE_FOLDER : AnimatedEmojiDrawable.CACHE_TYPE_MESSAGES, this, titleAnimateOutLayoutEmojis, titleAnimateOutLayout);
@@ -1766,6 +1797,12 @@ public class FilterTabsView extends FrameLayout {
         selectorDrawable.setColor(Theme.getColor(tabLineColorKey, resourcesProvider));
         listView.setSelectorDrawableColor(Theme.getColor(selectorColorKey, resourcesProvider));
         listView.invalidateViews();
+        for (int i=0; i<listView.getChildCount(); i++) {
+            if (listView.getChildAt(i) instanceof TabView) {
+                TabView tab = (TabView)listView.getChildAt(i);
+                if (tab.signaturePillGlass != null) tab.signaturePillGlass.updateColors();
+            }
+        }
         if (blurredBackgroundDrawable != null) {
             blurredBackgroundDrawable.updateColors();
         }

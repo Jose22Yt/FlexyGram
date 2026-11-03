@@ -9004,10 +9004,22 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
                             canvas.scale(1.0f / scaleFactor, 1.0f / scaleFactor);
                             canvas.drawColor(app.flexygram.login.SignatureLoginPalette.color(Theme.key_windowBackgroundWhite));
                             fragmentView.draw(canvas);
-                            Utilities.stackBlurBitmap(bitmap, Math.max(8, Math.max(w, h) / 150));
-                            blurredView.setBackground(new BitmapDrawable(getContext().getResources(), bitmap));
-                            blurredView.setAlpha(0.0f);
-                            blurredView.setVisibility(View.VISIBLE);
+                            Utilities.globalQueue.postRunnable(() -> {
+                                try {
+                                    Utilities.stackBlurBitmap(bitmap, Math.max(8, Math.max(w, h) / 150));
+                                    AndroidUtilities.runOnUIThread(() -> {
+                                        if (dismissed || getParent() == null) {
+                                            bitmap.recycle();
+                                            return;
+                                        }
+                                        blurredView.setBackground(new BitmapDrawable(getContext().getResources(), bitmap));
+                                        blurredView.setVisibility(View.VISIBLE);
+                                    });
+                                } catch (Throwable error) {
+                                    bitmap.recycle();
+                                    FileLog.e(error);
+                                }
+                            });
                         }
                     } catch (Throwable e) {
                         FileLog.e(e);

@@ -115,3 +115,32 @@ def test_saved_liquid_flag_cannot_reactivate_rendering(tmp_path):
     subprocess.run(["java", "-m", "jdk.compiler/com.sun.tools.javac.Main", "-d", str(tmp_path), str(harness)],
                    check=True, capture_output=True)
     subprocess.run(["java", "-cp", str(tmp_path), "FlagsTest"], check=True, capture_output=True)
+
+
+def test_signature_surfaces_do_not_require_the_retired_refractive_flag():
+    """Guard the actual render gates which previously disabled the replacement blur."""
+    import re
+    cases = {
+        'org/telegram/ui/MainTabsActivity.java': ['blur3_invalidateBlur'],
+        'org/telegram/ui/ActionBar/ActionBar.java': ['prepareSignatureNativeGlass', 'drawSignatureNativeGlass'],
+        'org/telegram/ui/Components/ChatActivityEnterView.java': ['flexyNativeGlassIslandsAvailable'],
+        'org/telegram/ui/ChatActivity.java': ['getGlassSource'],
+    }
+    parser_module = pytest.importorskip('tree_sitter')
+    language = pytest.importorskip('tree_sitter_java')
+    parser = parser_module.Parser(parser_module.Language(language.language()))
+    for file, required in cases.items():
+        source = (JAVA / file).read_bytes()
+        pending = [parser.parse(source).root_node]
+        found = {}
+        while pending:
+            node = pending.pop()
+            if node.type == 'method_declaration':
+                name = node.child_by_field_name('name').text.decode()
+                if name in required:
+                    found[name] = node.text.decode()
+            pending.extend(node.children)
+        assert set(found) == set(required)
+        for body in found.values():
+            assert 'FLAG_LIQUID_GLASS' not in body
+            assert 'FLAG_CHAT_BLUR' in body

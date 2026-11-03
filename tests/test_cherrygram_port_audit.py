@@ -80,10 +80,12 @@ def test_launcher_nested_selector_remains_touch_enabled_and_errors_do_not_select
 def test_dock_is_a_clipped_native_rendernode_not_a_translucency_simulation():
     host=src('org/telegram/ui/MainTabsActivity.java')
     assert 'new BlurredBackgroundSourceRenderNode(iBlur3SourceColor)' in host
-    assert 'iBlur3SourceTabGlass.setBlur(dp(14))' in host
+    assert 'source.draw(canvas, dockX - fragmentPosition.left' in host
+    assert 'iBlur3SourceTabGlass.setBlur(' not in host
     assert 'tabsViewWrapper.getMeasuredHeight()' in host
-    assert 'canvas.clipRect(0,0,tabsViewWrapper.getWidth(),tabsViewWrapper.getHeight())' in host
-    assert 'viewPager.draw(canvas)' in host and 'child == viewPager && SharedConfig.chatBlurEnabled()' in host
+    assert 'canvas.clipRect(0, 0, width, height)' in host
+    assert 'viewPager.draw(canvas)' not in host
+    assert 'child == viewPager && SharedConfig.chatBlurEnabled()' in host
     assert 'hash.add(tabsGlassRevision)' in host
     assert 'Bitmap.createBitmap' not in host
     assert 'postInvalidateOnAnimation' not in host

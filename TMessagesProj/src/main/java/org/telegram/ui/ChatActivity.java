@@ -548,7 +548,7 @@ public class ChatActivity extends BaseFragment implements
     private boolean signatureNativeGlassAllowed;
     private final Utilities.Callback<Boolean> signatureGlassPowerListener = ignored -> refreshSignatureNativeGlassPolicy();
     private void refreshSignatureNativeGlassPolicy() {
-        boolean allowed=SharedConfig.chatBlurEnabled() && LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS);
+        boolean allowed=SharedConfig.chatBlurEnabled() && LiteMode.isEnabled(LiteMode.FLAG_CHAT_BLUR);
         if (signatureNativeGlassAllowed==allowed) return;
         signatureNativeGlassAllowed=allowed;
         // The native suppressor snapshots Liquid Glass in its constructor. Refresh only on a
@@ -3031,7 +3031,7 @@ public class ChatActivity extends BaseFragment implements
 
     public ChatActivity(Bundle args) {
         super(args);
-        signatureNativeGlassAllowed=SharedConfig.chatBlurEnabled() && LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS);
+        signatureNativeGlassAllowed=SharedConfig.chatBlurEnabled() && LiteMode.isEnabled(LiteMode.FLAG_CHAT_BLUR);
 
         navbarContentSourceWallpaper = new BlurredBackgroundSourceWrapped();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && SharedConfig.chatBlurEnabled()) {
@@ -39435,7 +39435,7 @@ public class ChatActivity extends BaseFragment implements
     }
 
     public BlurredBackgroundSourceRenderNode getGlassSource() {
-        return LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS) && glassBackgroundSourceRenderNode!=null
+        return LiteMode.isEnabled(LiteMode.FLAG_CHAT_BLUR) && glassBackgroundSourceRenderNode!=null
                 ? glassBackgroundSourceRenderNode : glassBackgroundSourceFrostedRenderNode;
     }
 

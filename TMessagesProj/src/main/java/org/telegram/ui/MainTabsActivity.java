@@ -211,7 +211,6 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         iBlur3SourceColor = new BlurredBackgroundSourceColor();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             iBlur3SourceTabGlass = new BlurredBackgroundSourceRenderNode(iBlur3SourceColor);
-            iBlur3SourceTabGlass.setBlur(dp(14));
             iBlur3SourceTabGlass.setupRenderer(new org.telegram.ui.Components.blur3.RenderNodeWithHash.Renderer() {
                 @Override public void renderNodeCalculateHash(org.telegram.ui.Components.blur3.capture.IBlur3Hash hash) {
                     hash.add(tabsGlassRevision);
@@ -220,12 +219,23 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
                 @Override public void renderNodeUpdateDisplayList(Canvas canvas) {
                     canvas.drawColor(getEstBackgroundColor());
                     if (viewPager == null || tabsViewWrapper == null) return;
-                    int save = canvas.save();
-                    // Record only the dock's strip, excluding dock/player/overlays to avoid feedback.
-                    canvas.clipRect(0,0,tabsViewWrapper.getWidth(),tabsViewWrapper.getHeight());
-                    canvas.translate(viewPager.getX()-tabsViewWrapper.getX(),viewPager.getY()-tabsViewWrapper.getY());
-                    viewPager.draw(canvas);
-                    canvas.restoreToCount(save);
+                    final float dockX = tabsViewWrapper.getX();
+                    final float dockY = tabsViewWrapper.getY();
+                    final int width = tabsViewWrapper.getWidth();
+                    final int height = tabsViewWrapper.getHeight();
+                    for (int i = 0; i < fragmentsArr.size(); i++) {
+                        BaseFragment fragment = fragmentsArr.valueAt(i).fragment;
+                        if (!(fragment instanceof TabFragmentDelegate) || fragment.fragmentView == null
+                                || !ViewPositionWatcher.computeRectInParent(fragment.fragmentView, contentView, fragmentPosition)) continue;
+                        BlurredBackgroundSourceRenderNode source = ((TabFragmentDelegate) fragment).getGlassSource();
+                        if (source == null || fragmentPosition.right <= dockX || fragmentPosition.left >= dockX + width) continue;
+                        int save = canvas.save();
+                        canvas.clipRect(0, 0, width, height);
+                        canvas.translate(fragmentPosition.left - dockX, fragmentPosition.top - dockY);
+                        source.draw(canvas, dockX - fragmentPosition.left, dockY - fragmentPosition.top,
+                                dockX + width - fragmentPosition.left, dockY + height - fragmentPosition.top);
+                        canvas.restoreToCount(save);
+                    }
                 }
             });
         } else { iBlur3SourceTabGlass = null; }
@@ -1721,7 +1731,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         }
 
         if (tabsViewWrapper == null || tabsViewWrapper.getVisibility() != View.VISIBLE
-                || !SharedConfig.chatBlurEnabled() || !org.telegram.messenger.LiteMode.isEnabled(org.telegram.messenger.LiteMode.FLAG_LIQUID_GLASS)) return;
+                || !SharedConfig.chatBlurEnabled() || !org.telegram.messenger.LiteMode.isEnabled(org.telegram.messenger.LiteMode.FLAG_CHAT_BLUR)) return;
         final int width = tabsViewWrapper.getMeasuredWidth();
         final int height = tabsViewWrapper.getMeasuredHeight();
         if (width <= 0 || height <= 0) return;

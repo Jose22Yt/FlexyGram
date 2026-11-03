@@ -201,6 +201,7 @@ android {
         buildConfigField 'int', 'APP_ID', appId
         buildConfigField 'String', 'APP_HASH', '"' + appHash + '"'
         buildConfigField 'long', 'BUILD_TIMESTAMP', buildTimestamp + 'L'
+        buildConfigField 'boolean', 'PERFORMANCE_TEST_BUILD', String.valueOf(project.findProperty('flexyPerformanceBuild') == 'true')
         buildConfigField 'boolean', 'DEBUG_TOOLS', String.valueOf(project.findProperty('debugTools') == 'true')
 
         externalNativeBuild {
@@ -281,6 +282,12 @@ android {
             jniDebuggable = true
             multiDexEnabled = true
             signingConfig = signingConfigs.debug
+            // CI UI testing must not benchmark unoptimized C++ or package native debug symbols.
+            if (project.findProperty('flexyPerformanceBuild') == 'true') {
+                debuggable = false
+                jniDebuggable = false
+                externalNativeBuild.cmake.arguments '-DCMAKE_BUILD_TYPE=Release'
+            }
         }
 
         staging {

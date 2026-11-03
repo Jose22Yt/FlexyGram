@@ -4988,7 +4988,7 @@ public class ChatActivityEnterView extends FrameLayout implements
     }
 
     public boolean flexyNativeGlassIslandsAvailable() {
-        return org.telegram.messenger.LiteMode.isEnabled(org.telegram.messenger.LiteMode.FLAG_LIQUID_GLASS)
+        return org.telegram.messenger.LiteMode.isEnabled(org.telegram.messenger.LiteMode.FLAG_CHAT_BLUR)
                 && isHardwareAccelerated() && SharedConfig.chatBlurEnabled()
                 && isFlexyCompactPresentation();
     }
@@ -17463,7 +17463,7 @@ public class ChatActivityEnterView extends FrameLayout implements
             if (isNewDesignSendButton) {
                 final int sendFill = Theme.getColor(Theme.key_chat_messagePanelSend, resourcesProvider);
                 backgroundPaint.setColor(compactVisualInset >= 0
-                        && org.telegram.messenger.LiteMode.isEnabled(org.telegram.messenger.LiteMode.FLAG_LIQUID_GLASS)
+                        && org.telegram.messenger.LiteMode.isEnabled(org.telegram.messenger.LiteMode.FLAG_CHAT_BLUR)
                         && SharedConfig.chatBlurEnabled() && isHardwareAccelerated()
                         ? app.flexygram.composer.ComposerStyle.nativeGlassTint(sendFill) : sendFill);
             } else if (shouldDrawBackground()) {
