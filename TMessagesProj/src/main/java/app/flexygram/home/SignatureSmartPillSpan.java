@@ -64,7 +64,7 @@ public final class SignatureSmartPillSpan extends ReplacementSpan {
         sharedInk.setTextSize(textSize);
 
         height = AndroidUtilities.dp(20f);
-        iconSize = AndroidUtilities.dp(12f);
+        iconSize = AndroidUtilities.dp(14f);
         iconSpacing = AndroidUtilities.dp(3.5f);
         paddingH = AndroidUtilities.dp(6f);
 

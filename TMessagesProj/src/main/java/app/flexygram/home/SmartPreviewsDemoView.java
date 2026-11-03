@@ -16,11 +16,11 @@ public final class SmartPreviewsDemoView extends View implements Theme.Colorable
     private final Theme.ResourcesProvider provider;
     private final TextPaint ink=new TextPaint(android.graphics.Paint.ANTI_ALIAS_FLAG);
     private final int[] kinds={SignatureSmartPreviewPalette.PHOTO,SignatureSmartPreviewPalette.VIDEO,
-            SignatureSmartPreviewPalette.ZIP,SignatureSmartPreviewPalette.VOICE,SignatureSmartPreviewPalette.LINK};
-    private final SignatureSmartPillSpan[] pills=new SignatureSmartPillSpan[5];
-    private final String[] labels=new String[5];
-    private final float[] left=new float[5],top=new float[5];
-    private final int[] widths=new int[5];
+            SignatureSmartPreviewPalette.ZIP,SignatureSmartPreviewPalette.VOICE,SignatureSmartPreviewPalette.LINK,SignatureSmartPreviewPalette.PDF};
+    private final SignatureSmartPillSpan[] pills=new SignatureSmartPillSpan[kinds.length];
+    private final String[] labels=new String[kinds.length];
+    private final float[] left=new float[kinds.length],top=new float[kinds.length];
+    private final int[] widths=new int[kinds.length];
     private int measuredWidth=-1,lastMode=-1;
     public SmartPreviewsDemoView(Context context,Theme.ResourcesProvider provider){
         super(context);this.provider=provider;setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_YES);
@@ -42,16 +42,17 @@ public final class SmartPreviewsDemoView extends View implements Theme.Colorable
             labels[2]=LocaleController.getString(R.string.FlexySmartDemoArchive);
             labels[3]=LocaleController.getString(R.string.FlexyPillVoice)+" · 0:24";
             labels[4]=LocaleController.getString(R.string.FlexySmartLink);
+            labels[5]="PDF";
             int available=Math.max(1,width-padding*2),x=0,y=AndroidUtilities.dp(10);
             for(int i=0;i<kinds.length;i++){
-                pills[i]=new SignatureSmartPillSpan(kinds[i],labels[i],available,provider,i==2);
+                pills[i]=new SignatureSmartPillSpan(kinds[i],labels[i],available,provider,i==2||i==5);
                 widths[i]=mode==SignatureSmartPreviewPalette.OFF?Math.min(available,(int)Math.ceil(ink.measureText(labels[i]))):pills[i].getSize(ink,"\ufffc",0,1,null);
                 if(x>0 && x+widths[i]>available){x=0;y+=row;}
                 left[i]=LocaleController.isRTL?width-padding-x-widths[i]:padding+x;top[i]=y;x+=widths[i]+gap;
             }
             setContentDescription(android.text.TextUtils.join(", ",labels));
         }
-        setMeasuredDimension(width,(int)top[4]+row+AndroidUtilities.dp(10));
+        setMeasuredDimension(width,(int)top[kinds.length-1]+row+AndroidUtilities.dp(10));
     }
     @Override protected void onDraw(Canvas canvas){
         super.onDraw(canvas);int mode=SignatureSmartPreviews.drawingMode();

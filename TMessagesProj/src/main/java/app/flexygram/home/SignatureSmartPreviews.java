@@ -69,6 +69,7 @@ public final class SignatureSmartPreviews {
         if (owner.entities != null) for (TLRPC.MessageEntity entity : owner.entities) {
             if (entity instanceof TLRPC.TL_messageEntitySpoiler) return 0;
         }
+        if (message.isAyuDeleted()) return SignatureSmartPreviewPalette.DELETED;
         if (owner.action instanceof TLRPC.TL_messageActionChatAddUser
                 || owner.action instanceof TLRPC.TL_messageActionChatJoinedByLink)
             return SignatureSmartPreviewPalette.JOINED;
@@ -79,7 +80,7 @@ public final class SignatureSmartPreviews {
         }
         if (owner.action instanceof TLRPC.TL_messageActionPinMessage)
             return SignatureSmartPreviewPalette.PINNED;
-        if (owner.action != null) return 0; // Unknown system events stay native.
+        if (owner.action != null && !(owner.action instanceof TLRPC.TL_messageActionEmpty)) return 0; // Unknown system events stay native.
 
         if (owner.media instanceof TLRPC.TL_messageMediaContact) return SignatureSmartPreviewPalette.CONTACT;
         if (owner.media instanceof TLRPC.TL_messageMediaGeo
@@ -87,34 +88,65 @@ public final class SignatureSmartPreviews {
                 || owner.media instanceof TLRPC.TL_messageMediaVenue)
             return SignatureSmartPreviewPalette.LOCATION;
         if (owner.media instanceof TLRPC.TL_messageMediaPoll) return SignatureSmartPreviewPalette.POLL;
-        if (message.isVoice()) return SignatureSmartPreviewPalette.VOICE;
-        if (message.isMusic()) return SignatureSmartPreviewPalette.MUSIC;
-        if (message.isVideo()) return SignatureSmartPreviewPalette.VIDEO;
-        if (message.isPhoto()) return SignatureSmartPreviewPalette.PHOTO;
-        if (message.isSticker()) return SignatureSmartPreviewPalette.STICKER;
-        if (message.isGif()) return SignatureSmartPreviewPalette.GIF;
-        if (message.isDocument()) {
-            TLRPC.Document doc = message.getDocument();
-            return SignatureMiniPillClassifier.documentType(doc == null ? null : FileLoader.getDocumentFileName(doc),
-                    doc == null ? null : doc.mime_type);
+        // getDocument()/isVideo() may inspect webpage previews as well as attachments.
+        // Only direct media can become a file/photo/voice/video capsule.
+        if (owner.media instanceof TLRPC.TL_messageMediaPhoto) return SignatureSmartPreviewPalette.PHOTO;
+        if (owner.media instanceof TLRPC.TL_messageMediaDocument) {
+            TLRPC.Document doc = owner.media.document;
+            if (doc == null || doc instanceof TLRPC.TL_documentEmpty) return SignatureSmartPreviewPalette.NONE;
+            if (message.isAnyKindOfSticker()) return SignatureSmartPreviewPalette.STICKER;
+            if (message.isVoice()) return SignatureSmartPreviewPalette.VOICE;
+            if (message.isRoundVideo()) return SignatureSmartPreviewPalette.VIDEO;
+            if (message.isGif()) return SignatureSmartPreviewPalette.GIF;
+            if (message.isVideo()) return SignatureSmartPreviewPalette.VIDEO;
+            if (message.isMusic()) return SignatureSmartPreviewPalette.MUSIC;
+            return SignatureMiniPillClassifier.documentType(FileLoader.getDocumentFileName(doc), doc.mime_type);
         }
-
-        // A standalone URL does not require network access or content parsing.
-        String text = owner.message;
-        if (text != null) {
-            String url = text.trim();
-            if (!url.isEmpty() && url.indexOf(' ') < 0 && url.indexOf('\n') < 0
-                    && url.indexOf('\t') < 0 && (url.startsWith("https://")
-                    || url.startsWith("http://") || url.startsWith("www.")))
-                return SignatureSmartPreviewPalette.LINK;
-        }
-        if (message.isAyuDeleted()) return SignatureSmartPreviewPalette.DELETED;
+        if (!TextUtils.isEmpty(linkTarget(message))) return SignatureSmartPreviewPalette.LINK;
+        // Unsupported media stays native; a cached web document is never a real file.
+        if (owner.media != null && !(owner.media instanceof TLRPC.TL_messageMediaEmpty)
+                && !(owner.media instanceof TLRPC.TL_messageMediaWebPage)) return SignatureSmartPreviewPalette.NONE;
         int role = senderRole(message);
         if (role != 0) return role;
         // Actual channel-post flag, not a guess that the author is an admin.
         if (owner.post) return SignatureSmartPreviewPalette.CHANNEL;
         if (owner.edit_date > 0) return SignatureSmartPreviewPalette.EDITED;
         return 0;
+    }
+
+    /** Telegram entity offsets are UTF-16, matching Java substring indices. */
+    private static String linkTarget(MessageObject message) {
+        TLRPC.Message owner = message.messageOwner;
+        String text = owner.message;
+        if (owner.entities != null && text != null) for (TLRPC.MessageEntity entity : owner.entities) {
+            if (entity == null || entity.offset < 0 || entity.length <= 0 || entity.offset > text.length()
+                    || entity.length > text.length() - entity.offset) continue;
+            if (entity instanceof TLRPC.TL_messageEntityTextUrl) {
+                String url = confirmedLinkTarget(entity.url);
+                if (!url.isEmpty()) return url;
+            } else if (entity instanceof TLRPC.TL_messageEntityUrl) {
+                String url = confirmedLinkTarget(text.substring(entity.offset, entity.offset + entity.length));
+                if (!url.isEmpty()) return url;
+            }
+        }
+        if (text != null) {
+            String url = text.trim();
+            if (SignatureMiniPillClassifier.isWebLink(url)) return url;
+        }
+        if (owner.media instanceof TLRPC.TL_messageMediaWebPage && owner.media.webpage != null)
+            return confirmedLinkTarget(owner.media.webpage.url);
+        return "";
+    }
+
+    private static String confirmedLinkTarget(String value) {
+        if (SignatureMiniPillClassifier.isWebLink(value)) return value;
+        // Bare domains are valid only with Telegram URL entities/webpage metadata.
+        // Never infer a link from a normal message mentioning a filename.
+        if (value != null && value.indexOf('.') > 0 && value.indexOf(':') < 0 && value.length() <= 8192) {
+            String candidate = "https://" + value;
+            if (SignatureMiniPillClassifier.isWebLink(candidate)) return candidate;
+        }
+        return "";
     }
 
     /** Cached Telegram participant records only; never performs a load/request. */
@@ -152,11 +184,11 @@ public final class SignatureSmartPreviews {
             case SignatureSmartPreviewPalette.TXT: return "TXT";
             case SignatureSmartPreviewPalette.ZIP: return "ZIP";
             case SignatureSmartPreviewPalette.RAR: return "RAR";
-            case SignatureSmartPreviewPalette.ARCHIVE: return "7Z";
+            case SignatureSmartPreviewPalette.ARCHIVE: return LocaleController.getString(R.string.FlexySmartArchive);
             case SignatureSmartPreviewPalette.APK: return "APK";
             case SignatureSmartPreviewPalette.PNG: return "PNG";
             case SignatureSmartPreviewPalette.JPG: return "JPG";
-            case SignatureSmartPreviewPalette.IMAGE_FILE: return "WEBP";
+            case SignatureSmartPreviewPalette.IMAGE_FILE: return "IMG";
             case SignatureSmartPreviewPalette.GIF: return "GIF";
             case SignatureSmartPreviewPalette.FILE: return LocaleController.getString(R.string.FlexyPillFile);
             case SignatureSmartPreviewPalette.DOCUMENT: return "DOC";
@@ -196,19 +228,30 @@ public final class SignatureSmartPreviews {
                 return 3;
             case SignatureSmartPreviewPalette.LINK:
                 return 4;
-            case SignatureSmartPreviewPalette.EVENT:
-            case SignatureSmartPreviewPalette.JOINED:
-            case SignatureSmartPreviewPalette.LEFT:
-            case SignatureSmartPreviewPalette.PINNED:
-                return 5;
+            case SignatureSmartPreviewPalette.EVENT: return 5;
+            case SignatureSmartPreviewPalette.PDF: return 11;
+            case SignatureSmartPreviewPalette.TXT: return 12;
+            case SignatureSmartPreviewPalette.GIF: return 13;
+            case SignatureSmartPreviewPalette.STICKER: return 14;
+            case SignatureSmartPreviewPalette.POLL: return 15;
+            case SignatureSmartPreviewPalette.PINNED: return 16;
+            case SignatureSmartPreviewPalette.EDITED: return 17;
+            case SignatureSmartPreviewPalette.CHANNEL: return 18;
+            case SignatureSmartPreviewPalette.ADMIN: return 19;
+            case SignatureSmartPreviewPalette.OWNER: return 20;
+            case SignatureSmartPreviewPalette.DELETED: return 21;
+            case SignatureSmartPreviewPalette.JOINED: return 22;
+            case SignatureSmartPreviewPalette.LEFT: return 23;
+            case SignatureSmartPreviewPalette.APK: return 24;
+            case SignatureSmartPreviewPalette.SPREADSHEET: return 25;
+            case SignatureSmartPreviewPalette.PRESENTATION: return 26;
+            case SignatureSmartPreviewPalette.DOCUMENT: return 27;
             case SignatureSmartPreviewPalette.PHOTO:
             case SignatureSmartPreviewPalette.PNG:
             case SignatureSmartPreviewPalette.JPG:
             case SignatureSmartPreviewPalette.IMAGE_FILE:
                 return 6;
-            case SignatureSmartPreviewPalette.VIDEO:
-            case SignatureSmartPreviewPalette.GIF:
-                return 7;
+            case SignatureSmartPreviewPalette.VIDEO: return 7;
             case SignatureSmartPreviewPalette.LOCATION:
                 return 8;
             case SignatureSmartPreviewPalette.CONTACT:
@@ -225,12 +268,22 @@ public final class SignatureSmartPreviews {
     public static String snippet(MessageObject message, int kind, java.util.List<?> groupMessages) {
         if (message == null || message.messageOwner == null) return "";
         TLRPC.Message owner = message.messageOwner;
-        if (message.isDocument()) {
-            TLRPC.Document document = message.getDocument();
+        if (kind == SignatureSmartPreviewPalette.DELETED) {
+            String original = !TextUtils.isEmpty(owner.message) ? owner.message
+                    : message.messageText == null ? "" : message.messageText.toString();
+            return clean(badgeLabel(kind) + (TextUtils.isEmpty(original) ? "" : " · " + original));
+        }
+        if (SignatureMiniPillClassifier.isFileKind(kind) && owner.media instanceof TLRPC.TL_messageMediaDocument) {
+            TLRPC.Document document = owner.media.document;
             String filename = document == null ? null : FileLoader.getDocumentFileName(document);
             if (!TextUtils.isEmpty(filename)) {
                 String safe = filename.replace('\n', ' ').replace('\r', ' ').replace('\t', ' ');
-                if (safe.length() > 120) safe = safe.substring(0, 88) + "…" + safe.substring(safe.length() - 31);
+                if (safe.length() > 120) {
+                    int head = Character.isHighSurrogate(safe.charAt(87)) ? 87 : 88;
+                    int tail = safe.length() - 31;
+                    if (Character.isLowSurrogate(safe.charAt(tail))) tail++;
+                    safe = safe.substring(0, head) + "…" + safe.substring(tail);
+                }
                 return clean(safe);
             }
             boolean isArchive = (kind == SignatureSmartPreviewPalette.ZIP || kind == SignatureSmartPreviewPalette.RAR || kind == SignatureSmartPreviewPalette.ARCHIVE);
@@ -303,6 +356,7 @@ public final class SignatureSmartPreviews {
             char c = value.charAt(i);
             out.append(Character.isISOControl(c) ? ' ' : c);
         }
+        if (out.length() > 0 && Character.isHighSurrogate(out.charAt(out.length() - 1))) out.setLength(out.length() - 1);
         return out.toString().trim();
     }
 
@@ -330,7 +384,7 @@ public final class SignatureSmartPreviews {
                 return "♫  "+(TextUtils.isEmpty(title)?LocaleController.getString(R.string.FlexySmartMusic):title);
             }
             case SignatureSmartPreviewPalette.LINK:{
-                String url=message.messageOwner.message;
+                String url=linkTarget(message);
                 if(TextUtils.isEmpty(url))return "🔗  "+LocaleController.getString(R.string.FlexySmartLink);
                 // The preview is a compact host label, never a network fetch.
                 // Discard paths, queries and fragments to keep tracking codes or

@@ -2806,9 +2806,8 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
                     float senderWidth = inlineSender ? senderDesiredWidth + dp(5) : 0;
                     int thumbnailReserve = thumbsCount > 0 ? dp((thumbSize + 2) * thumbsCount + 6) : 0;
                     int free = app.flexygram.home.SignatureSmartPillLayout.remaining(messageWidth, senderWidth, thumbnailReserve, 0, dp(8));
-                    int secondaryKind = app.flexygram.home.SignatureSmartPreviews.secondaryKind(message, candidate);
-                    if (free >= dp(24)) {
-                        boolean isMiddleEllipsize = message.isDocument();
+                    if (free >= dp(36)) {
+                        boolean isMiddleEllipsize = app.flexygram.home.SignatureMiniPillClassifier.isFileKind(candidate);
                         TextUtils.TruncateAt truncateAt = isMiddleEllipsize ? TextUtils.TruncateAt.MIDDLE : TextUtils.TruncateAt.END;
                         app.flexygram.home.SignatureSmartPillSpan capsule =
                                 new app.flexygram.home.SignatureSmartPillSpan(candidate, snippet, free, resourcesProvider, isMiddleEllipsize);

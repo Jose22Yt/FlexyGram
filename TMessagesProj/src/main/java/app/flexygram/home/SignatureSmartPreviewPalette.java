@@ -94,7 +94,7 @@ public final class SignatureSmartPreviewPalette {
                 if (contrast(fg, bg) < 4.5) {
                     fg = luminance(bg) > 0.18 ? 0xff000000 : 0xffffffff;
                 }
-                if (mode != MATTE) {
+                if (mode != MATTE || contrast(ic, bg) < 3.0) {
                     ic = fg;
                 }
                 CACHED_PALETTE[k][0] = bg;
