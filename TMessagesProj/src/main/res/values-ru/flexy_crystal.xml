@@ -3,4 +3,8 @@
     <string name="FlexyCrystalBlur">Интенсивность размытия</string>
     <string name="FlexyCrystalWidth">Толщина контура</string>
     <string name="FlexyCrystalBorderStyle">Тип контура</string>
+    <string name="FlexySimpleGlassLook">Оформление контура</string>
+    <string name="FlexySimpleGlassMaterialIntensity">Интенсивность оформления</string>
+    <string name="FlexySimpleGlassIos">Glass iOS 27</string>
+    <string name="FlexySimpleGlassFusionVersion">Flexy Fusion 2.0</string>
 </resources>

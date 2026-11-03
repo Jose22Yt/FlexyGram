@@ -73,11 +73,11 @@ def test_simple_settings_ignore_experimental_keys_cache_and_save_once(tmp_path):
  var prefs=NekoConfig.prefs;prefs.values.put("FlexyGlassBlurRadius",48);prefs.values.put("FlexyGlassBorderColor",0xffff0000);prefs.values.put("FlexyUniversalGlassOpacity",80);prefs.values.put("FlexyUniversalGlassSurfaces",127);prefs.values.put("FlexyUniversalGlassEdge",100);
  var original=UniversalGlassConfig.snapshot();check(!original.enabled&&original.opacity==42&&original.blur==40&&original.width==8&&original.edge==70);
  int reads=prefs.reads;for(int i=0;i<20000;i++){check(UniversalGlassConfig.snapshot()==original);UniversalGlassConfig.opacity();UniversalGlassConfig.edge();}check(prefs.reads==reads);
- var next=original.with(0,1).with(2,999).with(3,-1).with(4,999);check(next.blur==48&&next.edge==0&&next.width==30&&original.blur==40);check(prefs.edits==0);
+ var next=original.with(0,1).with(2,999).with(3,-1).with(4,999).with(5,3).with(6,82).with(7,2).with(8,76).with(9,0).with(10,3);check(next.blur==96&&next.edge==0&&next.width==60&&original.blur==40);check(prefs.edits==0);
  UniversalGlassConfig.save(next);check(prefs.applies==1&&prefs.edits==1&&UniversalGlassConfig.snapshot()==next);
- for(int i=0;i<20000;i++)check(UniversalGlassConfig.blurRadius(40)==48);check(prefs.reads==reads);
+ for(int i=0;i<20000;i++)check(UniversalGlassConfig.blurRadius(40)==96);check(prefs.reads==reads);
  FlexyGlassConfig.value=false;check(UniversalGlassConfig.blurRadius(40)==40);FlexyGlassConfig.value=true;
- var f=UniversalGlassConfig.class.getDeclaredField("cached");f.setAccessible(true);f.set(null,null);var reloaded=UniversalGlassConfig.snapshot();check(reloaded.enabled&&reloaded.blur==48&&reloaded.edge==0&&reloaded.width==30);
+ var f=UniversalGlassConfig.class.getDeclaredField("cached");f.setAccessible(true);f.set(null,null);var reloaded=UniversalGlassConfig.snapshot();check(reloaded.enabled&&reloaded.blur==96&&reloaded.edge==0&&reloaded.width==60&&reloaded.look==3&&reloaded.materialIntensity==82&&reloaded.fusion==2&&reloaded.fusionIntensity==76&&!reloaded.fusionAdapt&&reloaded.position==3);
  UniversalGlassConfig.setEnabled(false);check(UniversalGlassConfig.blurRadius(40)==40);check(GlassSettings.defaults().opacity==42&&GlassSettings.defaults().blur==40&&GlassSettings.defaults().width==8);
  }}''',
     }, ['app/flexygram/effects/GlassSettings.java', 'app/exteraless/appearance/UniversalGlassConfig.java'])
@@ -106,4 +106,4 @@ def test_canceled_surfaces_match_previous_beta_and_editor_has_no_preview():
         items=list(ET.parse(ROOT/'TMessagesProj/src/main/res'/folder/'flexy_crystal.xml').getroot())
         assert all(item.text for item in items)
         resources.append({item.attrib['name'] for item in items})
-    assert resources[0]==resources[1]==resources[2]=={'FlexyCrystalBlur','FlexyCrystalWidth','FlexyCrystalBorderStyle'}
+    assert resources[0]==resources[1]==resources[2]=={'FlexyCrystalBlur','FlexyCrystalWidth','FlexyCrystalBorderStyle','FlexySimpleGlassLook','FlexySimpleGlassMaterialIntensity','FlexySimpleGlassIos','FlexySimpleGlassFusionVersion'}

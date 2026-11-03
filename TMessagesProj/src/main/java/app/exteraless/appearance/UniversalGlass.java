@@ -30,14 +30,14 @@ public final class UniversalGlass {
     }
 
     public static int edgeColor(boolean top) {
-        float strength = Math.max(0, Math.min(100, UniversalGlassConfig.edge())) / 100f;
-        return Theme.multAlpha(Color.WHITE, strength * (top ? 0.85f : 0.60f));
+        float strength = Math.max(0, Math.min(200, UniversalGlassConfig.edge())) / 100f;
+        return (Color.WHITE & 0xffffff) | (Math.min(255, Math.round(255 * strength * (top ? .85f : .60f))) << 24);
     }
 
     public static int edgeColor(boolean top, boolean dark) {
         if (dark || top) return edgeColor(top);
-        float strength = Math.max(0, Math.min(100, UniversalGlassConfig.edge())) / 100f;
-        return Theme.multAlpha(0xFF253040, strength * 0.40f);
+        float strength = Math.max(0, Math.min(200, UniversalGlassConfig.edge())) / 100f;
+        return 0x253040 | (Math.min(255, Math.round(255 * strength * .40f)) << 24);
     }
 
     public static int contourColor(boolean dark) {
@@ -54,7 +54,7 @@ public final class UniversalGlass {
                         AndroidUtilities.dpf2(UniversalGlassConfig.snapshot().width * .08125f))
                 .setShadowColor(0x18000000, 0x18000000)
                 .setShadowLayer(AndroidUtilities.dpf2(3), 0, AndroidUtilities.dpf2(1))
-                .build());
+                .build(), provider, colorKey);
     }
 
     public static BlurredBackgroundProvider fill(Theme.ResourcesProvider provider, int colorKey) {

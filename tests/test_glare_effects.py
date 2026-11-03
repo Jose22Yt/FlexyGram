@@ -41,6 +41,17 @@ def test_default_static_renderer_is_preserved():
  end_custom=new.index('        final GlassOutlineStyle outlineStyle',start_custom)
  assert 'SimpleGlassProvider' in new[start_custom:end_custom]
  new=new[:start_custom]+new[end_custom:]
+ # Strip the opt-in contour branch, whose behavior is executed in test_glass_contours.
+ field_start=new.index('    private app.flexygram.effects.GlassContour personalizedContour;')
+ field_end=new.index('    public BlurredBackgroundDrawable setColorProvider',field_start)
+ helper=new[field_start:field_end]
+ assert 'SimpleGlassProvider' in helper and 'GlassOutlineStyle.HIDDEN' in helper
+ new=new[:field_start]+'\n'+new[field_end:]
+ new=new.replace('final boolean withStroke = !hasPersonalizedContour() && (boundProps.useFullStroke ||\n                GlassOutlineStyle.current() == GlassOutlineStyle.GLARE);',
+                 'final boolean withStroke = boundProps.useFullStroke ||\n                GlassOutlineStyle.current() == GlassOutlineStyle.GLARE;')
+ assert new.count('        drawPersonalizedContour(canvas, alpha);')==1
+ assert new.count('        if (drawPersonalizedContour(canvas, alpha)) return;')==1
+ new=new.replace('        drawPersonalizedContour(canvas, alpha);\n','').replace('        if (drawPersonalizedContour(canvas, alpha)) return;\n','')
  assert new.replace(master_off,'').replace(replacement,'if (GlassOutlineStyle.current() != GlassOutlineStyle.GLARE) return;')==old
 
 def test_no_frame_allocations_or_background_engine():

@@ -17,19 +17,19 @@ def test_glass_scope_fallback_theme_and_bounded_controls(tmp_path):
         "org/telegram/messenger/AndroidUtilities.java": "package org.telegram.messenger; public class AndroidUtilities { public static float dpf2(float v) { return v; } }",
         "org/telegram/ui/ActionBar/Theme.java": '''package org.telegram.ui.ActionBar;
 public class Theme {
- public static final int key_windowBackgroundWhite=1;
+ public static final int key_windowBackgroundWhite=1,key_telegram_color=2;
  public interface ResourcesProvider { boolean isDark(); }
  public static boolean isCurrentThemeDark() { return false; }
- public static int getColor(int key, ResourcesProvider p) { return p!=null && p.isDark() ? 0xFF102030 : -1; }
+ public static int getColor(int key, ResourcesProvider p) { if(key==2)return 0xff34ab56;return p!=null && p.isDark() ? 0xFF102030 : -1; }
  public static int multAlpha(int color, float alpha) { return (color & 0xFFFFFF) | (Math.round((color>>>24)*alpha)<<24); }
 }''',
         "app/exteraless/appearance/UniversalGlassConfig.java": '''package app.exteraless.appearance;
 public class UniversalGlassConfig {
- public static class Item { public int value; public Item(int v) {value=v;} public int Int(){return value;} public boolean Bool(){return value!=0;} }
+ public static int look;public static class Item { public int value; public Item(int v) {value=v;} public int Int(){return value;} public boolean Bool(){return value!=0;} }
  public static boolean enabled(){return universalGlass.Bool();}
  public static int surfaces(){return universalGlassSurfaces.Int();}
  public static int opacity(){return universalGlassOpacity.Int();}
- public static int edge(){return universalGlassEdge.Int();}public static app.flexygram.effects.GlassSettings snapshot(){return new app.flexygram.effects.GlassSettings(enabled(),opacity(),40,edge(),8);}
+ public static int edge(){return universalGlassEdge.Int();}public static app.flexygram.effects.GlassSettings snapshot(){return new app.flexygram.effects.GlassSettings(enabled(),opacity(),40,edge(),8,look,55,0,60,true,5);}
  public static Item universalGlass=new Item(0), universalGlassSurfaces=new Item(63), universalGlassOpacity=new Item(42), universalGlassEdge=new Item(70);
 }''',
         "org/telegram/ui/Components/blur3/drawable/color/BlurredBackgroundProvider.java": '''package org.telegram.ui.Components.blur3.drawable.color;
@@ -90,9 +90,19 @@ public class GlassTest {
   check((c&0xFFFFFF)==0x102030 && (c>>>24)<217);
   UniversalGlassConfig.universalGlassEdge.value=-10;
   check((UniversalGlass.edgeColor(true)>>>24)==0);
-  UniversalGlassConfig.universalGlassEdge.value=1000;
+  UniversalGlassConfig.universalGlassEdge.value=100;
   check((UniversalGlass.edgeColor(true)>>>24)>(UniversalGlass.edgeColor(false)>>>24));
   check(UniversalGlass.material(light,1).getBackgroundColor()==UniversalGlass.fill(light,1).getBackgroundColor());
+  for(int look=1;look<=3;look++) {
+   UniversalGlassConfig.look=look;UniversalGlassConfig.universalGlassEdge.value=70;
+   int base=app.flexygram.bubbles.BubbleOutline.palette(-1,0xff34ab56,0,0);
+   int expected=app.flexygram.bubbles.BubbleOutline.color(base,false,look==1?3:look==2?1:2,55);
+   int actual=UniversalGlass.material(light,1).getStrokeColorTop();
+   check((actual&0xffffff)==(expected&0xffffff));check((actual>>>24)==Math.round((expected>>>24)*.7f));
+   UniversalGlassConfig.universalGlassEdge.value=200;check((UniversalGlass.material(light,1).getStrokeColorTop()>>>24)<=255);
+  }
+  UniversalGlassConfig.look=0;UniversalGlassConfig.universalGlassEdge.value=100;int lower=UniversalGlass.edgeColor(false,false)>>>24;
+  UniversalGlassConfig.universalGlassEdge.value=200;check((UniversalGlass.edgeColor(false,false)>>>24)>lower);
  }
 }''',
     }
@@ -106,5 +116,6 @@ public class GlassTest {
                     str(production), str(production.with_name("GlassContrastPolicy.java")),
                     str(production.with_name("SimpleGlassProvider.java")),
                     str(ROOT / "TMessagesProj/src/main/java/app/flexygram/effects/GlassSettings.java"),
+                    str(ROOT / "TMessagesProj/src/main/java/app/flexygram/bubbles/BubbleOutline.java"),
                     *[str(tmp_path / name) for name in sources]], check=True, capture_output=True)
     subprocess.run(["java", "-cp", str(tmp_path), "GlassTest"], check=True, capture_output=True)

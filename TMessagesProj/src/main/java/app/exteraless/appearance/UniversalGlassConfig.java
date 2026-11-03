@@ -17,7 +17,10 @@ public final class UniversalGlassConfig {
                     SharedPreferences p = prefs();
                     cached = new GlassSettings(p.getBoolean("FlexyUniversalGlass", false),
                             p.getInt("FlexySimpleGlassOpacity", 42), p.getInt("FlexySimpleGlassBlur", 40),
-                            p.getInt("FlexySimpleGlassEdge", 70), p.getInt("FlexySimpleGlassWidth", 8));
+                            p.getInt("FlexySimpleGlassEdge", 70), p.getInt("FlexySimpleGlassWidth", 8),
+                            p.getInt("FlexySimpleGlassLook", 0), p.getInt("FlexySimpleGlassMaterialIntensity", 55),
+                            p.getInt("FlexySimpleGlassFusion", 0), p.getInt("FlexySimpleGlassFusionIntensity", 60),
+                            p.getBoolean("FlexySimpleGlassFusionAdapt", true), p.getInt("FlexySimpleGlassPosition", 5));
                 }
                 value = cached;
             }
@@ -33,7 +36,10 @@ public final class UniversalGlassConfig {
     public static void save(GlassSettings value) {
         prefs().edit().putBoolean("FlexyUniversalGlass", value.enabled)
                 .putInt("FlexySimpleGlassOpacity", value.opacity).putInt("FlexySimpleGlassBlur", value.blur)
-                .putInt("FlexySimpleGlassEdge", value.edge).putInt("FlexySimpleGlassWidth", value.width).apply();
+                .putInt("FlexySimpleGlassEdge", value.edge).putInt("FlexySimpleGlassWidth", value.width)
+                .putInt("FlexySimpleGlassLook", value.look).putInt("FlexySimpleGlassMaterialIntensity", value.materialIntensity)
+                .putInt("FlexySimpleGlassFusion", value.fusion).putInt("FlexySimpleGlassFusionIntensity", value.fusionIntensity)
+                .putBoolean("FlexySimpleGlassFusionAdapt", value.fusionAdapt).putInt("FlexySimpleGlassPosition", value.position).apply();
         cached = value;
     }
     public static void setEnabled(boolean value) { save(snapshot().with(0, value ? 1 : 0)); }

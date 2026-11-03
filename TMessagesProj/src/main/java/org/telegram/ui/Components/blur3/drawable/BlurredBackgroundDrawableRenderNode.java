@@ -150,7 +150,12 @@ public class BlurredBackgroundDrawableRenderNode extends BlurredBackgroundDrawab
                 c.drawColor(backgroundColor);
             }
         }
-        if (!boundProps.useFullStroke) {
+        if (hasPersonalizedContour()) {
+            c.save();
+            c.translate(-boundProps.boundsWithPadding.left, -boundProps.boundsWithPadding.top);
+            drawPersonalizedContour(c, 255);
+            c.restore();
+        } else if (!boundProps.useFullStroke) {
             if (strokeColorTop != 0) {
                 drawStroke(c, 0, 0, boundProps.boundsWithPadding.width(),
                         boundProps.boundsWithPadding.height(), boundProps.radii,
