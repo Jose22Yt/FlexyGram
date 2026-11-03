@@ -4,7 +4,7 @@
   <string name="FlexyComposerClassic">Clásica</string>
   <string name="FlexyComposerCompact">Signature Compact</string>
   <string name="FlexyComposerGlass">Liquid Glass perlado</string>
-  <string name="FlexyComposerInfo">Los cambios se aplican sin reiniciar. Clásica conserva la barra original de Exteraless. Compacta mantiene los controles nativos, el tamaño del texto y las zonas táctiles; los controles especiales y las ventanas muy estrechas conservan su distribución original. El cristal solo cambia el acabado, nunca la altura del teclado. La grabación y las vistas previas conservan su fondo nativo.</string>
+  <string name="FlexyComposerInfo">Los cambios se aplican sin reiniciar. Clásica conserva la barra estándar del chat. Compacta mantiene los controles nativos, el tamaño del texto y las zonas táctiles; los controles especiales y las ventanas muy estrechas conservan su distribución original. El cristal solo cambia el acabado, nunca la altura del teclado. La grabación y las vistas previas conservan su fondo nativo.</string>
   <string name="FlexyComposerPosition">Posición vertical de la barra</string>
   <string name="FlexyComposerLevel">Nivel de compactación</string>
   <string name="FlexyComposerDefault">Predeterminado</string>

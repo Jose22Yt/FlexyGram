@@ -44,11 +44,11 @@ import xyz.nextalone.nagram.NaConfig;
 
 public final class GitHubUpdater {
 
-    private static final String REPO = "exteraless/exteraless";
+    private static final String REPO = "Jose22Yt/FlexyGram";
     public static final String RELEASES_URL = "https://github.com/" + REPO + "/releases";
     private static final String API = "https://api.github.com/repos/" + REPO;
     private static final long AUTO_INTERVAL = TimeUnit.HOURS.toMillis(6);
-    private static final String PREFS = "exteraless_updater";
+    private static final String PREFS = "flexygram_updater";
     private static final String KEY_LAST_CHECK = "last_check";
     private static final String KEY_SKIPPED = "skipped_tag";
     private static final Pattern VERSION = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)");
@@ -241,7 +241,10 @@ public final class GitHubUpdater {
         for (int i = 0; i < assets.length(); i++) {
             JSONObject asset = assets.optJSONObject(i);
             String name = asset == null ? "" : asset.optString("name").toLowerCase(Locale.ROOT);
-            if (!name.endsWith(".apk")) {
+            if (!name.endsWith(".apk") || !name.startsWith("flexygram")) {
+                continue;
+            }
+            if (BuildConfig.CONNECTED_ALPHA ? name.contains("beta") : name.contains("alpha")) {
                 continue;
             }
             if (!abi.isEmpty() && name.contains(abi.toLowerCase(Locale.ROOT))) {

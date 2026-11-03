@@ -354,12 +354,9 @@ androidComponents {
             }
             String gramName = beta ? 'FlexyGram-Beta' : 'FlexyGram-Alpha'
             String first = String.format('%s-v%s(%s)', gramName, beta ? BETA_VERSION_NAME : verName, beta ? BETA_VERSION_CODE : verCode)
-            output.outputFileName.set(
-                output.outputFileName.get()
-                    .replace('TMessagesProj', first)
-                    .replace('-release', '')
-                    .replace('-staging', '')
-            )
+            String filters = output.filters.collect { it.identifier }.join('-')
+            String suffix = filters.isEmpty() ? '' : "-${filters}"
+            output.outputFileName.set("${first}-${variant.name}${suffix}.apk")
         }
     }
 }

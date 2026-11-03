@@ -11,6 +11,6 @@
     <string name="FlexyIconNya">Nya</string>
     <string name="FlexyIconQuack">Quack</string>
     <string name="FlexyIconGo">Go</string>
-    <string name="FlexyIconLegacy">Exteraless clásico</string>
+    <string name="FlexyIconLegacy">FlexyGram clásico</string>
     <string name="FlexyIconApplyError">No se pudo cambiar el icono. Tu acceso actual se conserva.</string>
 </resources>

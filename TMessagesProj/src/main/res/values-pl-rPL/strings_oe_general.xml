@@ -52,13 +52,13 @@
     <string name="OEGeneralImportEtgDone">Zaimportowane ustawienia: %1$d</string>
     <string name="OEGeneralResetSettings">Zresetuj ustawienia</string>
     <string name="OEGeneralResetSettingsInfo">Wszystkie ustawienia zostaną przywrócone do wartości domyślnych, a aplikacja uruchomi się ponownie.</string>
-    <string name="OEGeneralResetSettingsDone">Ustawienia exteraless zostały zresetowane.</string>
+    <string name="OEGeneralResetSettingsDone">Ustawienia FlexyGram zostały zresetowane.</string>
     <string name="OEGeneralDeleteAccount">Usuń konto</string>
     <string name="DeepLFormalityDefault">Ton: jak w oryginale</string>
     <string name="DeepLFormalityInformal">Ton: nieformalny</string>
     <string name="DeepLFormalityFormal">Ton: formalny</string>
     <string name="OEGeneralNagramHeader">Dodatki</string>
-    <string name="OEGeneralNagramSettings">Ustawienia NagramX</string>
+    <string name="OEGeneralNagramSettings">Ustawienia FlexyGram</string>
     <string name="OEGeneralAyuMoments">AyuMoments</string>
     <string name="OEGeneralAyuMomentsInfo">Zapisywanie usuniętych i edytowanych wiadomości, tryb ducha i filtry regex. Funkcje działają dalej, nawet gdy nie otwierasz tego ekranu.</string>
     <string name="OEGeneralAyuMomentsDisableAll">Wyłącz wszystkie funkcje AyuMoments</string>
@@ -94,7 +94,7 @@
     <string name="OEGeneralMapProvider">Dostawca map</string>
     <string name="OEGeneralMapPreview">Podglądy lokalizacji</string>
     <string name="OEGeneralMapDriftingFix">Popraw przesunięcie mapy</string>
-    <string name="OECrashTitle">exteraless uległ awarii</string>
+    <string name="OECrashTitle">FlexyGram uległ awarii</string>
     <string name="OEGeneralNetworkHeader">Sieć</string>
     <string name="OEPrivacyFalseBottom">Podwójne dno</string>
     <string name="OEPrivacyFalseBottomShowIn">Pokazuj w sekcji „%1$s”</string>

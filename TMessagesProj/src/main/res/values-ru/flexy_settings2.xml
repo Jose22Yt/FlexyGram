@@ -92,8 +92,8 @@
     <string name="Settings2Desc_media_extra">Дополнительные параметры воспроизведения</string>
     <string name="Settings2_plugins">Плагины</string>
     <string name="Settings2Desc_plugins">Плагины</string>
-    <string name="Settings2_ai">ИИ Exteraless</string>
-    <string name="Settings2Desc_ai">ИИ Exteraless</string>
+    <string name="Settings2_ai">ИИ FlexyGram</string>
+    <string name="Settings2Desc_ai">ИИ FlexyGram</string>
     <string name="Settings2_translation">Расширенный перевод</string>
     <string name="Settings2Desc_translation">Расширенный перевод</string>
     <string name="Settings2_pillstack">Pill Stack</string>

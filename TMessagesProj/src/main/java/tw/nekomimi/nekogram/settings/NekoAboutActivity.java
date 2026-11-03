@@ -8,7 +8,8 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import org.telegram.messenger.MessagesController;
+import org.telegram.messenger.BuildVars;
+import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.messenger.R;
 import org.telegram.messenger.browser.Browser;
 import org.telegram.ui.Cells.TextSettingsCell;
@@ -17,42 +18,36 @@ import tw.nekomimi.nekogram.DatacenterActivity;
 
 public class NekoAboutActivity extends BaseNekoSettingsActivity {
 
-    private int xChannelRow;
-    private int channelRow;
-    private int channelTipsRow;
+    private int aboutRow;
     private int sourceCodeRow;
-    private int translationRow;
+    private int licenseRow;
     private int datacenterStatusRow;
 
     @Override
     protected void updateRows() {
         super.updateRows();
-
-        xChannelRow = addRow();
-        channelRow = addRow();
-        channelTipsRow = addRow();
+        aboutRow = addRow();
         sourceCodeRow = addRow();
-        translationRow = addRow();
+        licenseRow = addRow();
         datacenterStatusRow = addRow();
     }
 
     @Override
     protected String getActionBarTitle() {
-        return getString(R.string.About);
+        return getString(R.string.FlexySettingsAbout);
     }
 
     @Override
     protected void onItemClick(View view, int position, float x, float y) {
-        if (position == xChannelRow) {
-            MessagesController.getInstance(currentAccount).openByUserName("NagramX", NekoAboutActivity.this, 1);
-        } else if (position == channelRow) {
-            MessagesController.getInstance(currentAccount).openByUserName("nagram_channel", NekoAboutActivity.this, 1);
-        } else if (position == channelTipsRow) {
-            MessagesController.getInstance(currentAccount).openByUserName("NagramTips", NekoAboutActivity.this, 1);
-        } else if (position == translationRow) {
-            Browser.openUrl(getParentActivity(), "https://crowdin.com/project/NagramX");
+        if (position == aboutRow) {
+            showDialog(new AlertDialog.Builder(getParentActivity(), resourcesProvider)
+                    .setTitle(getString(R.string.FlexySettingsAbout))
+                    .setMessage(getString(R.string.FlexySettingsAboutBody) + "\n\n" + getString(R.string.FlexySettingsCreditsBody))
+                    .setPositiveButton(getString(R.string.OK), null).create());
         } else if (position == sourceCodeRow) {
-            Browser.openUrl(getParentActivity(), "https://github.com/risin42/NagramX");
+            Browser.openUrl(getParentActivity(), "https://github.com/Jose22Yt/FlexyGram");
+        } else if (position == licenseRow) {
+            Browser.openUrl(getParentActivity(), "https://github.com/Jose22Yt/FlexyGram/blob/main/LICENSE");
         } else if (position == datacenterStatusRow) {
             presentFragment(new DatacenterActivity(0));
         }
@@ -73,16 +68,12 @@ public class NekoAboutActivity extends BaseNekoSettingsActivity {
         public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, boolean partial) {
             if (holder.getItemViewType() == TYPE_SETTINGS) {
                 TextSettingsCell textCell = (TextSettingsCell) holder.itemView;
-                if (position == xChannelRow) {
-                    textCell.setTextAndValue(getString(R.string.XChannel), "@NagramX", true);
-                } else if (position == channelRow) {
-                    textCell.setTextAndValue(getString(R.string.OfficialChannel), "@nagram_channel", true);
-                } else if (position == channelTipsRow) {
-                    textCell.setTextAndValue(getString(R.string.TipsChannel), "@" + "NagramTips", true);
+                if (position == aboutRow) {
+                    textCell.setTextAndValue(getString(R.string.FlexySettingsAbout), BuildVars.BUILD_VERSION_STRING, true);
                 } else if (position == sourceCodeRow) {
-                    textCell.setTextAndValue(getString(R.string.SourceCode), "Github", true);
-                } else if (position == translationRow) {
-                    textCell.setTextAndValue(getString(R.string.TransSite), "Crowdin", true);
+                    textCell.setTextAndValue(getString(R.string.SourceCode), "GitHub", true);
+                } else if (position == licenseRow) {
+                    textCell.setTextAndValue(getString(R.string.FlexySettingsLicenseAction), "GPL-3.0", true);
                 } else if (position == datacenterStatusRow) {
                     textCell.setText(getString(R.string.DatacenterStatus), false);
                 }

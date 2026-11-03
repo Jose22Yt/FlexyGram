@@ -92,8 +92,8 @@
     <string name="Settings2Desc_media_extra">Additional playback options</string>
     <string name="Settings2_plugins">Plugins</string>
     <string name="Settings2Desc_plugins">Plugins</string>
-    <string name="Settings2_ai">Exteraless AI</string>
-    <string name="Settings2Desc_ai">Exteraless AI</string>
+    <string name="Settings2_ai">FlexyGram AI</string>
+    <string name="Settings2Desc_ai">FlexyGram AI</string>
     <string name="Settings2_translation">Advanced translation</string>
     <string name="Settings2Desc_translation">Advanced translation</string>
     <string name="Settings2_pillstack">Pill Stack</string>

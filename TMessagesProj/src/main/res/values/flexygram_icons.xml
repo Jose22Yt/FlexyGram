@@ -11,6 +11,6 @@
     <string name="FlexyIconNya">Nya</string>
     <string name="FlexyIconQuack">Quack</string>
     <string name="FlexyIconGo">Go</string>
-    <string name="FlexyIconLegacy">Exteraless Classic</string>
+    <string name="FlexyIconLegacy">FlexyGram Classic</string>
     <string name="FlexyIconApplyError">Could not change the icon. Your current launcher icon is preserved.</string>
 </resources>

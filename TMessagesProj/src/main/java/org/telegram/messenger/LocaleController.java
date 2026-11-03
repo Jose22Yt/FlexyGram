@@ -1473,7 +1473,7 @@ public class LocaleController {
         try {
             return ApplicationLoader.applicationContext.getString(R.string.OpenExtera);
         } catch (Exception ignore) {
-            return "exteraless";
+            return app.flexygram.branding.FlexyBranding.NAME;
         }
     }
 
@@ -1482,7 +1482,8 @@ public class LocaleController {
         // Иначе на любом облачном языке (русский — облачный) ключ AppName подтягивается
         // из языкового пакета телеграма и форк снова называется «Telegram» во всех диалогах,
         // где заголовок берут как getString(R.string.AppName).
-        if (key != null && key.contains("AppName")) {
+        if (key != null && (key.contains("AppName") || key.equals("NagramX")
+                || key.equals("Nagram") || key.equals("OpenExtera"))) {
             return getAppName();
         }
         String value = BuildVars.USE_CLOUD_STRINGS ? localeValues.get(key) : null;

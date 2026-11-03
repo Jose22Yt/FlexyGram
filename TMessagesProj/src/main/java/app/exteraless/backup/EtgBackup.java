@@ -131,7 +131,7 @@ public final class EtgBackup {
     }
 
     public static String generateBackupName() {
-        return "exteraless-" + Utilities.generateRandomString(4) + EXTENSION;
+        return "FlexyGram-" + Utilities.generateRandomString(4) + EXTENSION;
     }
 
     /** Файл похож на бэкап exteraGram: расширение на месте и внутри есть хоть один знакомый ключ. */
@@ -657,7 +657,13 @@ public final class EtgBackup {
                              Predicate<String> check) {
         list.add(new Entry(section, key, KIND_STRING, 0, 0, check,
                 () -> new JsonPrimitive(item.String()),
-                value -> item.setConfigString(value.getAsString())));
+                value -> {
+                    String restored = value.getAsString();
+                    if (item == NekoConfig.customSavePath && app.flexygram.branding.FlexyBranding.isLegacyDefaultFolder(restored)) {
+                        restored = app.flexygram.branding.FlexyBranding.NAME;
+                    }
+                    item.setConfigString(restored);
+                }));
     }
 
     private static void pluginFlag(List<Entry> list, String key, String prefsKey) {

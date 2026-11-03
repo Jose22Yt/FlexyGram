@@ -130,7 +130,7 @@ public class NekoConfig {
     public static ConfigItem cachePath = addConfig("cache_path", configTypeString, "");
     // Имя форка, а не «Nagram»: значение видно в настройках («Save Path») и в пути
     // Downloads/<папка>, куда уходят сохранённые файлы.
-    public static ConfigItem customSavePath = addConfig("customSavePath", configTypeString, "exteraless");
+    public static ConfigItem customSavePath = addConfig("customSavePath", configTypeString, app.flexygram.branding.FlexyBranding.NAME);
 
     public static ConfigItem translationProvider = addConfig("translationProvider", configTypeInt, 1);
     public static ConfigItem translateToLang = addConfig("TransToLang", configTypeString, ""); // "" -> translate to current language (MessageTrans.kt & Translator.kt)
@@ -229,6 +229,7 @@ public class NekoConfig {
                 return;
             }
             app.flexygram.settings.FreshInstallSavePath.pin(getPreferences());
+            app.flexygram.branding.FlexyBranding.migrateSaveFolder(getPreferences());
             app.exteraless.config.LegacyDefaults.pin(getPreferences());
             for (int i = 0; i < configs.size(); i++) {
                 ConfigItem o = configs.get(i);

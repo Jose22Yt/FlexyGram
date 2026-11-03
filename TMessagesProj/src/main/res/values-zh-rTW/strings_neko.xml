@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="NekoSettings">N-設定</string>
+    <string name="NekoSettings">FlexyGram</string>
     <string name="IPv6">偏好 IPv6</string>
     <string name="MessageMenu">訊息選單</string>
     <string name="HidePhone">隱藏手機號碼</string>
@@ -70,7 +70,7 @@
     <string name="CallTo">撥打給 **%1$s**？</string>
     <string name="DisableNumberRounding">停用數字四捨五入</string>
     <string name="Categories">分類</string>
-    <string name="OfficialChannel">Nagram 頻道</string>
+    <string name="OfficialChannel">FlexyGram 頻道</string>
     <string name="About">關於</string>
     <string name="IgnoreBlockedAbout">您將不會再看到被封鎖的使用者在群組中的訊息。</string>
     <string name="SourceCode">原始碼</string>
@@ -151,7 +151,7 @@
     <string name="ClearRecentChats">清除最近聊天</string>
     <string name="ClearRecentChatAlert">您確定要清除您的最近聊天嗎？</string>
     <string name="CloudConfig">雲端設定</string>
-    <string name="CloudConfigDesc">儲存 N-設定至 Telegram 雲端。</string>
+    <string name="CloudConfigDesc">將 FlexyGram 設定儲存至 Telegram 雲端。</string>
     <string name="CloudConfigSyncDate">最後同步：%s，雲端：%s</string>
     <string name="CloudConfigSyncDateNever">從未</string>
     <string name="CloudConfigSync">同步到雲端</string>

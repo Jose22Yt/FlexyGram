@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="NekoSettings">Pengaturan-N</string>
+    <string name="NekoSettings">FlexyGram</string>
     <string name="IPv6">Lebih suka IPv6</string>
     <string name="MessageMenu">Menu Pesan</string>
     <string name="HidePhone">Sembunyikan Nomor Telepon</string>
@@ -70,7 +70,7 @@
     <string name="CallTo">Panggil ke **%1$s**?</string>
     <string name="DisableNumberRounding">Nonaktifkan Pembulatan Angka</string>
     <string name="Categories">Kategori</string>
-    <string name="OfficialChannel">Saluran Nagram</string>
+    <string name="OfficialChannel">Saluran FlexyGram</string>
     <string name="About">Tentang</string>
     <string name="IgnoreBlockedAbout">Anda tidak akan lagi melihat pesan dari pengguna yang diblokir di grup.</string>
     <string name="SourceCode">Kode Sumber</string>
@@ -152,7 +152,7 @@
     <string name="ClearRecentChats">Bersihkan obrolan terbaru</string>
     <string name="ClearRecentChatAlert">Apakah Anda ingin membersihkan obrolan terbaru Anda?</string>
     <string name="CloudConfig">Pengaturan Cloud</string>
-    <string name="CloudConfigDesc">Simpan Pengaturan-N Anda ke cloud Telegram.</string>
+    <string name="CloudConfigDesc">Simpan pengaturan FlexyGram Anda ke cloud Telegram.</string>
     <string name="CloudConfigSyncDate">Terakhir disinkronkan: %s, cloud: %s</string>
     <string name="CloudConfigSyncDateNever">tidak pernah</string>
     <string name="CloudConfigSync">Sinkronkan ke cloud</string>

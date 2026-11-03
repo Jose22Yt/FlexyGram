@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="NekoSettings">Настройки N</string>
+    <string name="NekoSettings">FlexyGram</string>
     <string name="IPv6">Предпочитать IPv6</string>
     <string name="MessageMenu">Меню сообщений</string>
     <string name="HidePhone">Скрыть номер телефона</string>
@@ -70,7 +70,7 @@
     <string name="CallTo">Позвонить **%1$s**?</string>
     <string name="DisableNumberRounding">Не округлять числа</string>
     <string name="Categories">Настройки</string>
-    <string name="OfficialChannel">Канал Nagram</string>
+    <string name="OfficialChannel">Канал FlexyGram</string>
     <string name="About">О проекте</string>
     <string name="IgnoreBlockedAbout">Вы больше не будете видеть сообщения от заблокированных пользователей в группах.</string>
     <string name="SourceCode">Исходный код</string>
@@ -151,7 +151,7 @@
     <string name="ClearRecentChats">Очистить недавние чаты</string>
     <string name="ClearRecentChatAlert">Вы хотите очистить недавние чаты?</string>
     <string name="CloudConfig">Облачные настройки</string>
-    <string name="CloudConfigDesc">Сохраните ваши «Настройки N» в облаке Telegram.</string>
+    <string name="CloudConfigDesc">Сохраните настройки FlexyGram в облаке Telegram.</string>
     <string name="CloudConfigSyncDate">Последняя синхронизация: %s, облако: %s</string>
     <string name="CloudConfigSyncDateNever">никогда</string>
     <string name="CloudConfigSync">Синхронизировать с облаком</string>

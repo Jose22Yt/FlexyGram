@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="N_Config">N-Config</string>
+    <string name="N_Config">FlexyGram</string>
     <string name="CombineMessage">Unisci Messaggi</string>
     <string name="TextStyle">Stile Testo</string>
     <string name="NoiseSuppressAndVoiceEnhance">Miglioramento Voce</string>
@@ -9,7 +9,7 @@
     <string name="SendReactions">Manda Reazioni</string>
     <string name="ShowReactions">Mostra Reazioni</string>
     <string name="CustomTitle">Titolo Personalizzato</string>
-    <string name="CustomTitleHint">Lascia vuoto per usare Nagram X</string>
+    <string name="CustomTitleHint">Lascia vuoto per usare FlexyGram</string>
     <string name="CreateMono">Crea monospazio</string>
     <string name="CreateMonoLanguage">Linguaggio Codice</string>
     <string name="CopyPhoto">Copia foto</string>

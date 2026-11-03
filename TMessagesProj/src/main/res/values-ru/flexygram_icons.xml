@@ -11,6 +11,6 @@
     <string name="FlexyIconNya">Nya</string>
     <string name="FlexyIconQuack">Quack</string>
     <string name="FlexyIconGo">Go</string>
-    <string name="FlexyIconLegacy">Exteraless классический</string>
+    <string name="FlexyIconLegacy">FlexyGram классический</string>
     <string name="FlexyIconApplyError">Не удалось изменить значок. Текущий значок сохранён.</string>
 </resources>

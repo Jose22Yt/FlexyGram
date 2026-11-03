@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="NekoSettings">N-設定</string>
+    <string name="NekoSettings">FlexyGram</string>
     <string name="IPv6">IPv6 を優先</string>
     <string name="MessageMenu">メッセージメニュー</string>
     <string name="HidePhone">電話番号を非表示</string>
@@ -70,7 +70,7 @@
     <string name="CallTo">**%1$s** に電話をかけますか？</string>
     <string name="DisableNumberRounding">数値の丸めを無効化</string>
     <string name="Categories">カテゴリ</string>
-    <string name="OfficialChannel">Nagram チャンネル</string>
+    <string name="OfficialChannel">FlexyGram チャンネル</string>
     <string name="About">アプリについて</string>
     <string name="IgnoreBlockedAbout">当ユーザーからのグループメッセージは表示されなくなります。</string>
     <string name="SourceCode">ソースコード</string>
@@ -151,7 +151,7 @@
     <string name="ClearRecentChats">最近のチャットをクリア</string>
     <string name="ClearRecentChatAlert">本当に最近のチャットをクリアしますか？</string>
     <string name="CloudConfig">クラウド設定</string>
-    <string name="CloudConfigDesc">N-設定を Telegram クラウドに保存。</string>
+    <string name="CloudConfigDesc">FlexyGram の設定を Telegram クラウドに保存。</string>
     <string name="CloudConfigSyncDate">最終同期：%1$s、クラウド：%2$s</string>
     <string name="CloudConfigSyncDateNever">なし</string>
     <string name="CloudConfigSync">クラウドに同期</string>

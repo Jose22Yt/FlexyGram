@@ -5434,7 +5434,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
             if (Build.VERSION.SDK_INT >= 29) {
                 final ContentValues cv = new ContentValues();
                 final Uri uriToInsert = MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
-                final File dirDest = new File(Environment.DIRECTORY_DOWNLOADS, "Telegram");
+                final File dirDest = new File(Environment.DIRECTORY_DOWNLOADS, app.flexygram.branding.FlexyBranding.NAME);
                 cv.put(MediaStore.MediaColumns.RELATIVE_PATH, dirDest + File.separator);
                 cv.put(MediaStore.Downloads.DISPLAY_NAME, filename);
                 cv.put(MediaStore.MediaColumns.MIME_TYPE, outputMime);
@@ -5456,7 +5456,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
                     }
                 }
             } else {
-                final File destDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "Telegram");
+                final File destDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), app.flexygram.branding.FlexyBranding.NAME);
                 destDir.mkdirs();
                 File destFile = new File(destDir, filename);
                 if (!destFile.exists()) {
@@ -5808,7 +5808,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
                     final String filename = AndroidUtilities.generateFileName(0, "jpg");
                     final ContentValues cv = new ContentValues();
                     final Uri uriToInsert = MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
-                    final File dirDest = new File(Environment.DIRECTORY_PICTURES, "Telegram");
+                    final File dirDest = new File(Environment.DIRECTORY_PICTURES, app.flexygram.branding.FlexyBranding.NAME);
                     cv.put(MediaStore.MediaColumns.RELATIVE_PATH, dirDest + File.separator);
                     cv.put(MediaStore.Images.Media.DISPLAY_NAME, filename);
                     cv.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
@@ -5830,7 +5830,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
                         }
                     }
                 } else {
-                    final File destDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "Telegram");
+                    final File destDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), app.flexygram.branding.FlexyBranding.NAME);
                     destDir.mkdirs();
                     File destFile = new File(destDir, AndroidUtilities.generateFileName(0, "jpg"));
                     if (!destFile.exists()) {
