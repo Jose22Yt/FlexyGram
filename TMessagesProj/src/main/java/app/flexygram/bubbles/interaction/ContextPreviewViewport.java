@@ -14,7 +14,7 @@ public final class ContextPreviewViewport extends View {
     private Listener listener;
     public ContextPreviewViewport(Context context) { super(context); }
     public void configure(float range, CharSequence description, Listener listener) {
-        this.range=Math.max(0,range); this.listener=listener;
+        this.range=Math.max(0,range); this.listener=listener; offset=0;
         setContentDescription(description); setFocusable(range>0);
         setImportantForAccessibility(range>0?IMPORTANT_FOR_ACCESSIBILITY_YES:IMPORTANT_FOR_ACCESSIBILITY_NO);
     }

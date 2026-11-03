@@ -6111,6 +6111,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     public void setFullyDraw(boolean draw) {
         fullyDraw = draw;
     }
+    public boolean isFullyDraw() { return fullyDraw; }
 
     public void setParentViewSize(int parentW, int parentH) {
         parentWidth = parentW;
@@ -17412,11 +17413,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         }
         int firstVisibleBlockNum;
         int lastVisibleBlockNum;
-        if (origin && !drawAllBlocks) {
-            if (fullyDraw) {
-                this.firstVisibleBlockNum = 0;
-                this.lastVisibleBlockNum = textLayoutBlocks.size();
-            }
+        if (origin && !drawAllBlocks && !fullyDraw) {
             firstVisibleBlockNum = this.firstVisibleBlockNum;
             lastVisibleBlockNum = this.lastVisibleBlockNum;
         } else {
@@ -22311,11 +22308,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         }
         int firstVisibleBlockNum;
         int lastVisibleBlockNum;
-        if (origin && !drawAllBlocks) {
-            if (fullyDraw) {
-                this.firstVisibleBlockNum = 0;
-                this.lastVisibleBlockNum = textLayoutBlocks.size();
-            }
+        if (origin && !drawAllBlocks && !fullyDraw) {
             firstVisibleBlockNum = this.firstVisibleBlockNum;
             lastVisibleBlockNum = this.lastVisibleBlockNum;
         } else {
