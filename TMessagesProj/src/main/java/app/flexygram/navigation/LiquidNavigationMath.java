@@ -18,6 +18,12 @@ public final class LiquidNavigationMath {
     public static int pairStart(int left, int available, int dockWidth, int searchWidth, int gap) {
         return left + Math.max(0, (available - dockWidth - searchWidth - gap) / 2);
     }
+    public static int dockWidth(int available, int count, int padding, int slotMinimum, float fraction, boolean floating) {
+        if (count <= 0 || available <= 0) return 0;
+        if (!floating) return available;
+        int preferred=Math.round(available*clamp(fraction,0f,1f)*count/4f);
+        return Math.min(available,Math.max(padding+Math.max(0,slotMinimum)*count,preferred));
+    }
     public static int clampPercent(int value) { return Math.max(0, Math.min(100, value)); }
     public static int clampTabs(int value) { return Math.max(2, value); }
 }

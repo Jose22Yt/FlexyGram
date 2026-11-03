@@ -1090,6 +1090,7 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
     private WindowInsetsCompat onApplyWindowInsets(@NonNull View v, @NonNull WindowInsetsCompat insets) {
         final Insets systemInsets = AndroidUtilities.getDefaultWindowInsets(insets, false);
         navigationBarHeight = systemInsets.bottom;
+        additionNavigationBarHeight = hasMainTabs ? dp(app.exteraless.appearance.MainTabsUiHelper.getTabsViewHeightDp()) : 0;
         final int statusBarHeight = systemInsets.top;
         listView.setPadding(0, statusBarHeight + dp(12), 0, navigationBarHeight + additionNavigationBarHeight + miniPlayerPadding);
         return WindowInsetsCompat.CONSUMED;

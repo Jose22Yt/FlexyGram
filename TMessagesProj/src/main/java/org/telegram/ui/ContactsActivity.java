@@ -1598,6 +1598,8 @@ public class ContactsActivity extends BaseFragment implements FactorAnimator.Tar
     private WindowInsetsCompat onApplyWindowInsets(@NonNull View v, @NonNull WindowInsetsCompat insets) {
         final Insets systemInsets = AndroidUtilities.getDefaultWindowInsets(insets, false);
         navigationBarHeight = systemInsets.bottom;
+        additionNavigationBarHeight = hasMainTabs ? dp(app.exteraless.appearance.MainTabsUiHelper.getTabsViewHeightDp()) : 0;
+        additionFloatingButtonOffset = hasMainTabs ? dp(app.exteraless.appearance.MainTabsUiHelper.getTabsFabOffsetDp()) : 0;
 
         checkUi_listViewPadding();
         checkUi_floatingButtonPosition();
@@ -1609,6 +1611,8 @@ public class ContactsActivity extends BaseFragment implements FactorAnimator.Tar
     @Override
     public void onInsets(int left, int top, int right, int bottom) {
         navigationBarHeight = bottom;
+        additionNavigationBarHeight = hasMainTabs ? dp(app.exteraless.appearance.MainTabsUiHelper.getTabsViewHeightDp()) : 0;
+        additionFloatingButtonOffset = hasMainTabs ? dp(app.exteraless.appearance.MainTabsUiHelper.getTabsFabOffsetDp()) : 0;
         checkUi_listViewPadding();
         checkUi_floatingButtonPosition();
         checkUi_emptyView();

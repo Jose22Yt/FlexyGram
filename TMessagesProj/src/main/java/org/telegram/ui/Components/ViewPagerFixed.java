@@ -880,6 +880,10 @@ public class ViewPagerFixed extends FrameLayout {
     }
 
     public void setPosition(int position) {
+        if (manualScrolling != null) {
+            manualScrolling.cancel();
+            manualScrolling = null;
+        }
         if (adapter == null) {
             currentPosition = position;
             onTabAnimationUpdate(false);

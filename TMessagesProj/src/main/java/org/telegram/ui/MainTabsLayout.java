@@ -27,8 +27,8 @@ public class MainTabsLayout extends AnimatedLinearLayout {
     public static final int BOTTOM_NAVIGATION_MODE_FLOATING = 2;
 
     public static int getBottomNavigationMode() { return BOTTOM_NAVIGATION_MODE_SHOW; }
-    public static boolean isBottomNavigationHidden() { return false; }
-    public static boolean isBottomNavigationVisible() { return true; }
+    public static boolean isBottomNavigationHidden() { return !isBottomNavigationVisible(); }
+    public static boolean isBottomNavigationVisible() { return LiquidNavigationConfig.isVisible(); }
     public static boolean isBottomNavigationFloating() { return false; }
 
     public interface Tab {
@@ -81,13 +81,17 @@ public class MainTabsLayout extends AnimatedLinearLayout {
         int available=MeasureSpec.getSize(ws);if(maxWidthPx>0)available=Math.min(available,maxWidthPx);
         int count=0;for(int i=0;i<getChildCount();i++)if(isViewVisible(getChildAt(i)))count++;
         int padding=getPaddingLeft()+getPaddingRight();
-        int width=Math.min(available,Math.max(dp(48)*count+padding,Math.round(available*LiquidNavigationConfig.widthFraction())));
+        int minimum=dp(48);
+        if (LiquidNavigationConfig.showTitles()) {
+            for(int i=0;i<getChildCount();i++)if(isViewVisible(getChildAt(i))&&getChildAt(i) instanceof Tab)
+                minimum=Math.max(minimum,(int)Math.ceil(((Tab)getChildAt(i)).measureTextWidth(11))+dp(16));
+        }
+        int width=app.flexygram.navigation.LiquidNavigationMath.dockWidth(available,count,padding,minimum,
+                LiquidNavigationConfig.widthFraction(),LiquidNavigationConfig.isFloatingDock());
         int inner=Math.max(0,width-padding),height=MeasureSpec.getSize(hs);
         int content=Math.max(0,height-getPaddingTop()-getPaddingBottom());
         slotWidth=inner/Math.max(1,count);int rank=0;
-        boolean hide=LiquidNavigationConfig.hideLabels(count,(int)(inner/getResources().getDisplayMetrics().density))
-                ||getResources().getConfiguration().fontScale>1.3f
-                ||content<dp(37+LiquidNavigationConfig.labelGapDp());
+        boolean hide=LiquidNavigationConfig.hideLabels(count,(int)(inner/getResources().getDisplayMetrics().density));
         for(int i=0;i<getChildCount();i++){
             View child=getChildAt(i);int w=isViewVisible(child)?slotWidth+(rank++<inner%Math.max(1,count)?1:0):0;
             if(child instanceof GlassTabView){
@@ -131,7 +135,7 @@ public class MainTabsLayout extends AnimatedLinearLayout {
                 lastSelectorColor = Theme.multAlpha(tabColor, .12f);
                 selector.setColor(lastSelectorColor);
             }
-            float radius=Math.min(dp(LiquidNavigationConfig.radiusDp()),h*.5f);
+            float radius=Math.max(0f,h*.5f);
             canvas.drawRoundRect(x-w*.5f,y-h*.5f,x+w*.5f,y+h*.5f,radius,radius,selector);
         }
         super.dispatchDraw(canvas);

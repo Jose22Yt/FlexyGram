@@ -53,8 +53,8 @@ public final class LiquidNavigationConfig {
         separateSearch = p.getBoolean("separate_search", false);
 
         String orderStr = prefs().getString("tab_order", null);
-        if (orderStr != null && !orderStr.isEmpty()) {
-            String[] parts = orderStr.split(",");
+        if (orderStr != null) {
+            String[] parts = orderStr.isEmpty() ? new String[0] : orderStr.split(",");
             int[] order = new int[parts.length];
             for (int i = 0; i < parts.length; i++) {
                 try {
@@ -180,9 +180,12 @@ public final class LiquidNavigationConfig {
 
     public static boolean hideLabels(int count, int availableDp) {
         ensure();
-        if (!showTitles) return true;
-        // Keep labels legible: narrow six-slot docks use icons until space is sufficient.
-        return availableDp / Math.max(1, count) < 72;
+        return !showTitles;
+    }
+
+    public static boolean isVisible() {
+        ensure();
+        return enabled && order().length > 0;
     }
 
     public static boolean labels() {

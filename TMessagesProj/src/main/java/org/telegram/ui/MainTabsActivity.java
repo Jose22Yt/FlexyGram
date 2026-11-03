@@ -1062,12 +1062,12 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
 
     public void openChatsSearch() {
         int chatsPos = getPositionChats();
-        if (viewPager != null && viewPager.getCurrentPosition() != chatsPos) {
-            selectTab(chatsPos, true);
-            viewPager.scrollToPosition(chatsPos);
-        }
-        if (dialogsActivity != null) {
-            dialogsActivity.search("", true);
+        if (viewPager == null) return;
+        // Complete the page handoff before opening a search owned by DialogsActivity.
+        viewPager.setPosition(chatsPos);
+        selectTab(chatsPos, false);
+        if (dialogsActivity != null && dialogsActivity.searchItem != null) {
+            dialogsActivity.searchItem.performClick();
         }
     }
 
@@ -1084,8 +1084,8 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         }
         int left = tabsViewWrapper.getPaddingLeft();
         int available = tabsViewWrapper.getWidth() - left - tabsViewWrapper.getPaddingRight();
-        int gap = dp(8);
         int dockWidth = tabsView.getMeasuredWidth();
+        int gap = dockWidth > 0 ? dp(8) : 0;
         int searchWidth = separateSearchButton.getMeasuredWidth();
         int start = app.flexygram.navigation.LiquidNavigationMath.pairStart(left, available, dockWidth, searchWidth, gap);
         boolean rtl = LocaleController.isRTL;
@@ -1098,11 +1098,21 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
 
     private void applyFlexyTabs() {
         if (tabsView == null || tabs == null) return;
-        boolean enabled = app.flexygram.navigation.LiquidNavigationConfig.isEnabled();
+        boolean enabled = app.flexygram.navigation.LiquidNavigationConfig.isVisible();
         if (tabsViewWrapper != null) {
-            tabsViewWrapper.setVisibility(enabled ? View.VISIBLE : View.GONE);
+            int visibility = enabled ? View.VISIBLE : View.GONE;
+            if (tabsViewWrapper.getVisibility() != visibility) {
+                tabsViewWrapper.setVisibility(visibility);
+                if (fragmentView != null) androidx.core.view.ViewCompat.requestApplyInsets(fragmentView);
+            }
         }
-        if (!enabled) { updateSeparateSearchAppearance(); return; }
+        if (!enabled) {
+            if (separateSearchButton != null) separateSearchButton.setVisibility(View.GONE);
+            updateSeparateSearchAppearance();
+            checkUi_fadeView();
+            checkUi_miniPlayer();
+            return;
+        }
         int width = tabsViewWrapper != null && tabsViewWrapper.getWidth() > 0
                 ? tabsViewWrapper.getWidth() : AndroidUtilities.displaySize.x;
         // Use the requested insets, not the previous wrapper padding, when settings change.
@@ -1112,7 +1122,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         int inner = width - insetLeft - insetRight - reservedSearch
                 - dp(2*(app.flexygram.navigation.LiquidNavigationConfig.sideGapDp()
                         +app.flexygram.navigation.LiquidNavigationConfig.innerMarginDp()));
-        int slots = Math.max(2, inner / dp(48));
+        int slots = Math.max(1, inner / dp(48));
         flexyConfiguredDestinations = app.flexygram.navigation.LiquidNavigationConfig.order();
         int[] shown = app.flexygram.navigation.LiquidNavigationConfig.shown(slots);
         boolean orderChanged = !java.util.Arrays.equals(shown, flexyShownDestinations);
@@ -1176,7 +1186,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         separateSearchButton.setBackground(new android.graphics.drawable.RippleDrawable(
                 android.content.res.ColorStateList.valueOf(getThemedColor(Theme.key_listSelector)), background, fallback));
         if (dialogsActivity != null) dialogsActivity.updateSeparateSearchVisibility(
-                app.flexygram.navigation.LiquidNavigationConfig.isEnabled()
+                app.flexygram.navigation.LiquidNavigationConfig.isVisible()
                 && app.flexygram.navigation.LiquidNavigationConfig.separateSearch());
     }
     private void openFlexySettings() {
@@ -1512,6 +1522,10 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
     }
 
     private void checkUi_fadeView() {
+        if (fadeView != null && !app.flexygram.navigation.LiquidNavigationConfig.isVisible()) {
+            fadeView.setVisibility(View.GONE);
+            return;
+        }
         if (viewPager == null || fadeView == null || NaConfig.INSTANCE.getHideBottomNavigationBar().Bool()) {
             return;
         }
@@ -1533,7 +1547,8 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         if (miniPlayer == null || updateLayoutWrapper == null) {
             return;
         }
-        final boolean hidden = NaConfig.INSTANCE.getHideBottomNavigationBar().Bool();
+        final boolean hidden = NaConfig.INSTANCE.getHideBottomNavigationBar().Bool()
+                || !app.flexygram.navigation.LiquidNavigationConfig.isVisible();
         final int updateLayoutHeight = updateLayoutWrapper.isUpdateLayoutVisible() ? dp(UpdateLayoutWrapper.HEIGHT) : 0;
         final int tabsHeight = hidden ? 0 : dp(MainTabsUiHelper.getTabsViewHeightDp());
         final int gap = hidden || MainTabsUiHelper.isMaterial3NavigationBar() ? dp(12) : dp(4);

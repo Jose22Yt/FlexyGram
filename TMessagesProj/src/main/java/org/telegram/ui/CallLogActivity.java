@@ -1530,6 +1530,8 @@ public class CallLogActivity extends BaseFragment implements NotificationCenter.
 	@Override
 	public void onInsets(int left, int top, int right, int bottom) {
 		navigationBarHeight = bottom;
+        additionNavigationBarHeight = hasMainTabs ? dp(app.exteraless.appearance.MainTabsUiHelper.getTabsViewHeightDp()) : 0;
+        additionFloatingButtonOffset = hasMainTabs ? dp(app.exteraless.appearance.MainTabsUiHelper.getTabsFabOffsetDp()) : 0;
 
 		checkUi_listViewPadding();
 		checkUi_floatingButton();

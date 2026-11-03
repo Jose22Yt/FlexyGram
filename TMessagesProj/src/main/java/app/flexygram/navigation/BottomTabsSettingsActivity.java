@@ -176,7 +176,7 @@ public final class BottomTabsSettingsActivity extends SignatureMatteSettingsActi
                 saveOrder();
             });
         }
-        if (id != LiquidNavigationDestinations.CHATS && currentDestinations.size() > 2) {
+        if (!currentDestinations.isEmpty()) {
             items.add(getString(R.string.FlexyTabsRemove));
             actions.add(() -> {
                 currentDestinations.remove(index);
@@ -266,6 +266,11 @@ public final class BottomTabsSettingsActivity extends SignatureMatteSettingsActi
             scroller.addView(disabledLayout, new android.widget.HorizontalScrollView.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT));
             update();
+        }
+
+        @Override protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+            super.onSizeChanged(w, h, oldw, oldh);
+            if (w != oldw) post(this::update);
         }
 
         private void addEditableTab(int id, int index, boolean hideLabels) {
@@ -376,7 +381,17 @@ public final class BottomTabsSettingsActivity extends SignatureMatteSettingsActi
             if (dockLayout == null || disabledLayout == null) return;
             dockLayout.removeAllViews();
             disabledLayout.removeAllViews();
-            ViewGroup.LayoutParams dockParams = dockLayout.getLayoutParams();
+            LinearLayout.LayoutParams dockParams = (LinearLayout.LayoutParams) dockLayout.getLayoutParams();
+            int availableWidth = Math.max(1, getWidth() > 0 ? getWidth() - dp(40) :
+                    org.telegram.messenger.AndroidUtilities.displaySize.x - dp(40));
+            dockParams.gravity = Gravity.CENTER_HORIZONTAL;
+            int desiredWidth = currentDestinations.isEmpty() ? availableWidth : LiquidNavigationMath.dockWidth(
+                    availableWidth, currentDestinations.size(), dp(8), dp(LiquidNavigationConfig.showTitles() ? 72 : 48),
+                    LiquidNavigationConfig.widthFraction(), LiquidNavigationConfig.isFloatingDock());
+            if (dockParams.width != desiredWidth) {
+                dockParams.width = desiredWidth;
+                dockLayout.setLayoutParams(dockParams);
+            }
             int height = dp(LiquidNavigationConfig.heightDp());
             if (dockParams.height != height) {
                 dockParams.height = height;
@@ -389,7 +404,7 @@ public final class BottomTabsSettingsActivity extends SignatureMatteSettingsActi
             int track = Theme.getColor(Theme.key_switchTrack, resourcesProvider);
             dockBackground.setColor(Theme.multAlpha(track, 20f / 255f));
             dockBackground.setStroke(dp(1), Theme.multAlpha(track, 63f / 255f));
-            if (!enabled) {
+            if (!enabled || currentDestinations.isEmpty()) {
                 dockLayout.addView(offView, new LinearLayout.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
             } else {

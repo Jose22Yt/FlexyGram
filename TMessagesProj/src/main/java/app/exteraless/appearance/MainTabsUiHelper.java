@@ -51,13 +51,18 @@ public final class MainTabsUiHelper {
 
     /** M3 — 64dp, иначе высота из MainTabsHelper. */
     public static int getTabsViewHeightDp() {
+        return app.flexygram.navigation.LiquidNavigationConfig.isVisible() ? getTabsDesignHeightDp() : 0;
+    }
+
+    /** Design height is also used by independent navigation widgets, such as statistics. */
+    public static int getTabsDesignHeightDp() {
         if (app.flexygram.navigation.LiquidNavigationConfig.configured()) return app.flexygram.navigation.LiquidNavigationConfig.heightDp();
         return isMaterial3NavigationBar() ? 64 : MainTabsHelper.getMainTabsHeightWithMargins();
     }
 
     /** M3 — dp(64) плюс системный отступ снизу, иначе высота из MainTabsHelper. */
     public static int getTabsViewHeight(int bottomInset) {
-        if (app.flexygram.navigation.LiquidNavigationConfig.configured()) return AndroidUtilities.dp(getTabsViewHeightDp());
+        if (app.flexygram.navigation.LiquidNavigationConfig.configured()) return AndroidUtilities.dp(getTabsDesignHeightDp());
         return isMaterial3NavigationBar()
                 ? AndroidUtilities.dp(64) + bottomInset
                 : AndroidUtilities.dp(MainTabsHelper.getMainTabsHeightWithMargins());
@@ -96,6 +101,7 @@ public final class MainTabsUiHelper {
 
     /** Сдвиг кнопки «написать» над панелью: в M3 всегда 64. */
     public static int getTabsFabOffsetDp() {
+        if (!app.flexygram.navigation.LiquidNavigationConfig.isVisible()) return 0;
         if (app.flexygram.navigation.LiquidNavigationConfig.configured()) return getTabsViewHeightDp();
         return isMaterial3NavigationBar() ? 64 : MainTabsHelper.getMainTabsHeight() + MainTabsHelper.getMainTabsMargin();
     }

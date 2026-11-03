@@ -3455,6 +3455,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             showSearch(true, false, true);
             fragmentSearchFieldWatcher.toggleSearch(true);
             AndroidUtilities.runOnUIThread(() -> {
+                if (fragmentView == null || !fragmentView.isAttachedToWindow() || !animatorSearchVisible.getValue()) return;
                 fragmentSearchField.editText.requestFocus();
                 AndroidUtilities.showKeyboard(fragmentSearchField.editText);
             }, 100);
@@ -14460,6 +14461,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         final Insets systemInsets = AndroidUtilities.getDefaultWindowInsets(insets, false);
         statusBarHeight = systemInsets.top;
         navigationBarHeight = systemInsets.bottom;
+        additionNavigationBarHeight = hasMainTabs && MainTabsLayout.isBottomNavigationVisible() && !MainTabsLayout.isBottomNavigationFloating() ? dp(app.exteraless.appearance.MainTabsUiHelper.getTabsViewHeightDp()) : 0;
+        additionFloatingButtonOffset = hasMainTabs && MainTabsLayout.isBottomNavigationVisible() ? dp(app.exteraless.appearance.MainTabsUiHelper.getTabsFabOffsetDp() + (MainTabsLayout.isBottomNavigationFloating() ? 6 : 0)) : 0;
         final int imeInsetHeight = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom;
         if (this.imeInsetHeight != imeInsetHeight) {
             this.imeInsetHeight = imeInsetHeight;
