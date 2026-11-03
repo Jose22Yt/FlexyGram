@@ -3975,6 +3975,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             });
 
             actionsView = new ProfileActionsView(context, dp(74));
+            actionsView.configureGlass(resourcesProvider);
             setActionsMode();
             updateNotifications(false);
 
@@ -6257,6 +6258,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         bottomButton2Container.setTranslationY(dp(69));
         contentView.addView(bottomButton2Container, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.BOTTOM | Gravity.FILL_HORIZONTAL));
 
+        applyProfileGlassButtons();
         iBlur3Capture = (c, p) -> {
             listViewCapture.capture(c, p);
             if (sharedMediaLayout.iBlur3Capture != null) {
@@ -17891,6 +17893,19 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
     private final RectF iBlur3PositionMainTabs = new RectF(); {
         iBlur3Positions.add(iBlur3PositionActionBar);
         iBlur3Positions.add(iBlur3PositionMainTabs);
+    }
+
+    private void applyProfileGlassButtons() {
+        if (!app.exteraless.appearance.UniversalGlass.canRender(app.exteraless.appearance.UniversalGlass.PROFILE, resourcesProvider)) return;
+        for (View button : new View[]{actionBar.backButtonImageView, editItem, otherItem, callItem, videoCallItem, searchItem}) {
+            if (button == null) continue;
+            BlurredBackgroundDrawable glass = iBlur3FactoryLiquidGlass.create(button,
+                    app.exteraless.appearance.UniversalGlass.material(resourcesProvider, Theme.key_windowBackgroundWhite));
+            glass.setRadius(dp(24)); glass.setPadding(dp(5));
+            android.graphics.drawable.Drawable selector = button.getBackground();
+            button.setBackground(selector == null ? glass : new android.graphics.drawable.LayerDrawable(
+                    new android.graphics.drawable.Drawable[]{glass, selector}));
+        }
     }
 
     private void blur3_InvalidateBlur() {

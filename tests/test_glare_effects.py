@@ -36,6 +36,18 @@ def test_default_static_renderer_is_preserved():
  start='    public BlurredBackgroundDrawable setRadius(float radius)'
  end='    public Rect getPaddedBounds()'
  new=new[:new.index(start)]+old[old.index(start):old.index(end)]+new[new.index(end):]
+ # Only explicitly tagged custom providers opt into the new editor. Legacy render paths remain byte-identical.
+ custom_start=new.index('        final GlassOutlineStyle outlineStyle = materialOutlineStyle();')
+ custom_end=new.index('        final boolean glare',custom_start)
+ custom=new[custom_start:custom_end]
+ assert 'CustomGlassProvider' in custom and 'getStrokeWidthTop()' in custom
+ new=new[:custom_start]+'        final GlassOutlineStyle outlineStyle = GlassOutlineStyle.current();\n'+new[custom_end:]
+ from test_composer_layout import method
+ helper=method(new,'private GlassOutlineStyle materialOutlineStyle()')
+ assert 'CustomGlassProvider' in helper and ': GlassOutlineStyle.current();' in helper
+ new=new.replace('    '+helper+'\n\n','')
+ assert new.count('materialOutlineStyle()')==2
+ new=new.replace('materialOutlineStyle()', 'GlassOutlineStyle.current()')
  assert new.replace(master_off,'').replace(replacement,'if (GlassOutlineStyle.current() != GlassOutlineStyle.GLARE) return;')==old
 
 def test_no_frame_allocations_or_background_engine():

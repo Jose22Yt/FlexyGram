@@ -820,7 +820,7 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
                     // Иконка слева, подпись под заголовком.
                     TextDetailSettingsCell cell = (TextDetailSettingsCell) holder.itemView;
                     if (position == universalGlassRow) {
-                        cell.setTextAndValueAndIcon(getString(R.string.FlexyUniversalGlass), getString(R.string.FlexyUniversalGlassSummary), R.drawable.msg_theme, true);
+                        cell.setTextAndValueAndIcon(getString(R.string.FlexyCrystalTitle), getString(R.string.FlexyCrystalZonesInfo), R.drawable.msg_theme, true);
                     } else if (position == bottomTabsRow) {
                         cell.setTextAndValueAndIcon(getString(R.string.FlexyBottomTabsTitle), getString(R.string.FlexyBottomTabsOrderHint), R.drawable.msg_home, true);
                     } else if (position == appNavigationRow) {

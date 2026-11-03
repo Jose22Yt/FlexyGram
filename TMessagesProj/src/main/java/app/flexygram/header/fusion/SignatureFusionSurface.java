@@ -26,7 +26,16 @@ public final class SignatureFusionSurface {
             surfaceColor |= 0xFF000000;
             borderColor = 0;
         }
-        float stroke = .7f * density;
+        boolean custom = app.exteraless.appearance.UniversalGlass.enabled(app.exteraless.appearance.UniversalGlass.HEADER);
+        if (custom) {
+            var cfg = app.exteraless.appearance.UniversalGlassConfig.snapshot();
+            int alpha = Math.round(cfg.opacity * 2.55f);
+            surfaceColor = androidx.core.graphics.ColorUtils.calculateLuminance(surfaceColor | 0xff000000) < .3
+                    ? (surfaceColor & 0xffffff) | (alpha << 24)
+                    : app.exteraless.appearance.GlassContrastPolicy.lightSurface(surfaceColor, alpha);
+            borderColor = cfg.width > 0 ? app.exteraless.appearance.UniversalGlass.edgeColor(true) : 0;
+        }
+        float stroke = custom ? density * app.exteraless.appearance.UniversalGlassConfig.snapshot().width / 10f : .7f * density;
         if (fill.getColor() != surfaceColor) fill.setColor(surfaceColor);
         if (border.getColor() != borderColor) border.setColor(borderColor);
         if (border.getStrokeWidth() != stroke) border.setStrokeWidth(stroke);
@@ -52,7 +61,16 @@ public final class SignatureFusionSurface {
             surfaceColor |= 0xFF000000;
             borderColor = 0;
         }
-        float stroke = .7f * density;
+        boolean custom = app.exteraless.appearance.UniversalGlass.enabled(app.exteraless.appearance.UniversalGlass.HEADER);
+        if (custom) {
+            var cfg = app.exteraless.appearance.UniversalGlassConfig.snapshot();
+            int alpha = Math.round(cfg.opacity * 2.55f);
+            surfaceColor = androidx.core.graphics.ColorUtils.calculateLuminance(surfaceColor | 0xff000000) < .3
+                    ? (surfaceColor & 0xffffff) | (alpha << 24)
+                    : app.exteraless.appearance.GlassContrastPolicy.lightSurface(surfaceColor, alpha);
+            borderColor = cfg.width > 0 ? app.exteraless.appearance.UniversalGlass.edgeColor(true) : 0;
+        }
+        float stroke = custom ? density * app.exteraless.appearance.UniversalGlassConfig.snapshot().width / 10f : .7f * density;
         if (fill.getColor() != surfaceColor) fill.setColor(surfaceColor);
         if (border.getColor() != borderColor) border.setColor(borderColor);
         if (border.getStrokeWidth() != stroke) border.setStrokeWidth(stroke);
@@ -73,7 +91,10 @@ public final class SignatureFusionSurface {
     }
     public void drawCenterBorder(Canvas canvas, SignatureFusionGeometry.Layout g, int color, float density) {
         if (!app.exteraless.appearance.FlexyGlassConfig.enabled()) return;
-        float stroke = .7f * density;
+        boolean custom = app.exteraless.appearance.UniversalGlass.enabled(app.exteraless.appearance.UniversalGlass.HEADER);
+        if (custom) color = app.exteraless.appearance.UniversalGlassConfig.snapshot().width > 0
+                ? app.exteraless.appearance.UniversalGlass.edgeColor(true) : 0;
+        float stroke = custom ? density * app.exteraless.appearance.UniversalGlassConfig.snapshot().width / 10f : .7f * density;
         if (border.getColor() != color) border.setColor(color);
         if (border.getStrokeWidth() != stroke) border.setStrokeWidth(stroke);
         var r=g.center;work.set(r.left,r.top,r.right,r.bottom);work.inset(border.getStrokeWidth()*.5f,border.getStrokeWidth()*.5f);

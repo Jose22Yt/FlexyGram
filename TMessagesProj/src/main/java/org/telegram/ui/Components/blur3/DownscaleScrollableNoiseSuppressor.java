@@ -132,6 +132,7 @@ public class DownscaleScrollableNoiseSuppressor {
         }
 
         public void setPrimaryEffectBlur(float radius) {
+            if (radius <= 0) { setPrimaryEffect(null); return; }
             final float downsampledRadiusX = downscaleRadius(radius, scaleX);
             final float downsampledRadiusY = downscaleRadius(radius, scaleY);
             setPrimaryEffect(RenderEffect.createBlurEffect(
@@ -142,6 +143,7 @@ public class DownscaleScrollableNoiseSuppressor {
         }
 
         public void setPrimaryEffectBlur(float radius, RenderEffect secondEffect) {
+            if (radius <= 0) { setPrimaryEffect(secondEffect); return; }
             final float downsampledRadiusX = downscaleRadius(radius, scaleX);
             final float downsampledRadiusY = downscaleRadius(radius, scaleY);
 
@@ -296,6 +298,7 @@ public class DownscaleScrollableNoiseSuppressor {
 
         hash = MediaDataController.calcHash(hash, width);
         hash = MediaDataController.calcHash(hash, height);
+        hash = MediaDataController.calcHash(hash, (int) app.exteraless.appearance.UniversalGlassConfig.blurRadius(40));
 
         for (int a = 0; a < resultRenderNodes.length; a++) {
             RenderNode renderNode = resultRenderNodes[a];
@@ -362,6 +365,7 @@ public class DownscaleScrollableNoiseSuppressor {
         int updatedCount = 0;
         for (int a = 0; a < rectRenderNodesCount; a++) {
             final SourcePart sourcePart = rectRenderNodes.get(a);
+            if (sourcePart.refreshBlur()) updatedCount++;
             final Rect position = sourcePart.position;
             tmpRectF.set(position);
 
@@ -410,17 +414,27 @@ public class DownscaleScrollableNoiseSuppressor {
             } else if (simpleMode) {
                 renderNodesForBlur = new DownscaledRenderNode("blur", 0);
                 renderNodesForBlur.setScale(allowNoiseSuppress ? 16 : 8, allowNoiseSuppress ? 16 : 8);
-                renderNodesForBlur.setPrimaryEffectBlur(dpf2(40), RenderNodeEffects.getSaturationX3RenderEffect());
+                renderNodesForBlur.setPrimaryEffectBlur(dpf2(app.exteraless.appearance.UniversalGlassConfig.blurRadius(40)), RenderNodeEffects.getSaturationX3RenderEffect());
                 renderNodesForGlass = null;
             } else {
                 renderNodesForBlur = new DownscaledRenderNode("blur", 1);
                 renderNodesForBlur.setScale(8, 8);
-                renderNodesForBlur.setPrimaryEffectBlur(dpf2(40));
+                renderNodesForBlur.setPrimaryEffectBlur(dpf2(app.exteraless.appearance.UniversalGlassConfig.blurRadius(40)));
                 renderNodesForBlur.setSecondaryEffect(0, RenderNodeEffects.getSaturationX3RenderEffect());
                 renderNodesForGlass = null;
             }
         }
 
+
+        private float configuredRadius = app.exteraless.appearance.UniversalGlassConfig.blurRadius(40);
+        private boolean refreshBlur() {
+            float desired = app.exteraless.appearance.UniversalGlassConfig.blurRadius(40);
+            if (configuredRadius == desired || isLiquidGlassEnabled) return false;
+            configuredRadius = desired;
+            if (simpleMode) renderNodesForBlur.setPrimaryEffectBlur(dpf2(desired), RenderNodeEffects.getSaturationX3RenderEffect());
+            else renderNodesForBlur.setPrimaryEffectBlur(dpf2(desired));
+            return true;
+        }
 
         private void setPosition(RectF position) {
             this.position.left = roundDown(position.left, 16);

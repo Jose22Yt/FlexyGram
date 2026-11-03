@@ -17,23 +17,28 @@ def test_glass_scope_fallback_theme_and_bounded_controls(tmp_path):
         "org/telegram/messenger/AndroidUtilities.java": "package org.telegram.messenger; public class AndroidUtilities { public static float dpf2(float v) { return v; } }",
         "org/telegram/ui/ActionBar/Theme.java": '''package org.telegram.ui.ActionBar;
 public class Theme {
- public static final int key_windowBackgroundWhite=1;
+ public static final int key_windowBackgroundWhite=1,key_telegram_color=2;
  public interface ResourcesProvider { boolean isDark(); }
  public static boolean isCurrentThemeDark() { return false; }
- public static int getColor(int key, ResourcesProvider p) { return p!=null && p.isDark() ? 0xFF102030 : -1; }
+ public static int getColor(int key, ResourcesProvider p) { if(key==2)return 0xff449933;return p!=null && p.isDark() ? 0xFF102030 : -1; }
  public static int multAlpha(int color, float alpha) { return (color & 0xFFFFFF) | (Math.round((color>>>24)*alpha)<<24); }
 }''',
         "app/exteraless/appearance/UniversalGlassConfig.java": '''package app.exteraless.appearance;
 public class UniversalGlassConfig {
  public static class Item { public int value; public Item(int v) {value=v;} public int Int(){return value;} public boolean Bool(){return value!=0;} }
  public static boolean enabled(){return universalGlass.Bool();}
+ public static app.flexygram.effects.GlassSettings snapshot(){return new app.flexygram.effects.GlassSettings(enabled(),opacity(),24,edge(),10,1,0,surfaces());}
  public static int surfaces(){return universalGlassSurfaces.Int();}
  public static int opacity(){return universalGlassOpacity.Int();}
  public static int edge(){return universalGlassEdge.Int();}
- public static Item universalGlass=new Item(0), universalGlassSurfaces=new Item(63), universalGlassOpacity=new Item(42), universalGlassEdge=new Item(70);
+ public static Item universalGlass=new Item(0), universalGlassSurfaces=new Item(127), universalGlassOpacity=new Item(42), universalGlassEdge=new Item(70);
 }''',
         "org/telegram/ui/Components/blur3/drawable/color/BlurredBackgroundProvider.java": '''package org.telegram.ui.Components.blur3.drawable.color;
-public interface BlurredBackgroundProvider { int getBackgroundColor(); }''',
+public interface BlurredBackgroundProvider { int getBackgroundColor();
+ default int getShadowColor(){return 0;} default int getStrokeColorTop(){return 0;} default int getStrokeColorBottom(){return 0;}
+ default int getStrokeColorFull(){return 0;} default float getStrokeWidthTop(){return 1;} default float getStrokeWidthBottom(){return 1;}
+ default float getShadowRadius(){return 0;} default float getShadowDx(){return 0;} default float getShadowDy(){return 0;}
+ }''',
         "org/telegram/ui/Components/blur3/drawable/color/impl/BlurredBackgroundProviderImpl.java": '''package org.telegram.ui.Components.blur3.drawable.color.impl;
 import org.telegram.ui.ActionBar.Theme;
 public class BlurredBackgroundProviderImpl { public static boolean blur=true;
@@ -68,13 +73,14 @@ public class GlassTest {
   BlurredBackgroundProvider fallback=()->0xFFABCDEF;
   check(UniversalGlass.surface(1,light,fallback)==fallback);
   UniversalGlassConfig.universalGlass.value=1;
-  for(int scope=1;scope<=32;scope*=2)check(UniversalGlass.canRender(scope,light));
+  for(int scope=1;scope<=64;scope*=2)check(UniversalGlass.canRender(scope,light));
   UniversalGlassConfig.universalGlassSurfaces.value=UniversalGlass.HEADER;
-  // Saved per-surface exclusions no longer restrict the automatically applied material.
-  for(int scope=1;scope<=32;scope*=2)check(UniversalGlass.canRender(scope,light));
+  for(int scope=1;scope<=64;scope*=2)check(UniversalGlass.canRender(scope,light)==(scope==UniversalGlass.HEADER));
   UniversalGlassConfig.universalGlassSurfaces.value=0;
-  for(int scope=1;scope<=32;scope*=2)check(UniversalGlass.canRender(scope,light));
-  check(!UniversalGlass.canRender(64,light));
+  for(int scope=1;scope<=64;scope*=2)check(!UniversalGlass.canRender(scope,light));
+  UniversalGlassConfig.universalGlassSurfaces.value=127;
+  check(!UniversalGlass.canRender(128,light));
+  FlexyGlassConfig.value=false;check(!UniversalGlass.canRender(UniversalGlass.HEADER,light));FlexyGlassConfig.value=true;
   BlurredBackgroundProviderImpl.blur=false;
   check(UniversalGlass.surface(UniversalGlass.HEADER,light,fallback)==fallback);
   BlurredBackgroundProviderImpl.blur=true;
@@ -82,9 +88,9 @@ public class GlassTest {
   check((UniversalGlass.backgroundColor(light,1)>>>24)==GlassContrastPolicy.MIN_LIGHT_ALPHA);
   check((UniversalGlass.backgroundColor(dark,1)>>>24)==43);
   UniversalGlassConfig.universalGlassOpacity.value=1000;
-  check((UniversalGlass.backgroundColor(light,1)>>>24)==217);
+  check((UniversalGlass.backgroundColor(light,1)>>>24)==255);
   int c=UniversalGlass.backgroundColor(dark,1);
-  check((c&0xFFFFFF)==0x102030 && (c>>>24)<217);
+  check((c&0xFFFFFF)==0x102030 && (c>>>24)==217);
   UniversalGlassConfig.universalGlassEdge.value=-10;
   check((UniversalGlass.edgeColor(true)>>>24)==0);
   UniversalGlassConfig.universalGlassEdge.value=1000;
@@ -93,6 +99,8 @@ public class GlassTest {
  }
 }''',
     }
+    sources['app/exteraless/appearance/FlexyGlassConfig.java'] = 'package app.exteraless.appearance;public class FlexyGlassConfig{public static boolean value=true;public static boolean enabled(){return value;}}'
+    sources['org/telegram/ui/Components/blur3/GlassOutlineStyle.java'] = 'package org.telegram.ui.Components.blur3;public enum GlassOutlineStyle{HIDDEN,SOLID,GLARE}'
     for name, text in sources.items():
         file = tmp_path / name
         file.parent.mkdir(parents=True, exist_ok=True)
@@ -100,5 +108,7 @@ public class GlassTest {
     production = ROOT / "TMessagesProj/src/main/java/app/exteraless/appearance/UniversalGlass.java"
     subprocess.run(["java", "-m", "jdk.compiler/com.sun.tools.javac.Main", "-d", str(tmp_path),
                     str(production), str(production.with_name("GlassContrastPolicy.java")),
+                    str(production.with_name("CustomGlassProvider.java")),
+                    str(ROOT / "TMessagesProj/src/main/java/app/flexygram/effects/GlassSettings.java"),
                     *[str(tmp_path / name) for name in sources]], check=True, capture_output=True)
     subprocess.run(["java", "-cp", str(tmp_path), "GlassTest"], check=True, capture_output=True)

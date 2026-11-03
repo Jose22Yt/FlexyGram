@@ -3726,7 +3726,7 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
             topPanelLayout = new DialogsActivityTopPanelLayout(context);
             topPanelLayout.setPadding(dp(11), dp(21), dp(11), dp(21));
 
-            BlurredBackgroundDrawable topPanelLayoutBackground = iBlur3FactoryLiquidGlass.create(topPanelLayout, BlurredBackgroundProviderImpl.topPanel(resourcesProvider));
+            BlurredBackgroundDrawable topPanelLayoutBackground = iBlur3FactoryLiquidGlass.create(topPanelLayout, app.exteraless.appearance.UniversalGlass.surface(app.exteraless.appearance.UniversalGlass.PROFILE, resourcesProvider, BlurredBackgroundProviderImpl.topPanel(resourcesProvider)));
             topPanelLayoutBackground.setRadius(dp(24));
             topPanelLayoutBackground.setPadding(dp(7));
             topPanelLayout.setBlurredBackground(topPanelLayoutBackground);
@@ -3775,7 +3775,7 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
                 setVisibleHeight(lastVisibleHeight);
             });
 
-            BlurredBackgroundDrawable filterTabsViewBackground = iBlur3FactoryLiquidGlass.create(scrollSlidingTextTabStrip, BlurredBackgroundProviderImpl.topPanel(resourcesProvider));
+            BlurredBackgroundDrawable filterTabsViewBackground = iBlur3FactoryLiquidGlass.create(scrollSlidingTextTabStrip, app.exteraless.appearance.UniversalGlass.surface(app.exteraless.appearance.UniversalGlass.PROFILE, resourcesProvider, BlurredBackgroundProviderImpl.topPanel(resourcesProvider)));
             filterTabsViewBackground.setRadius(dp(18));
             filterTabsViewBackground.setPadding(dp(6.666f));
             scrollSlidingTextTabStrip.setPadding(0, dp(7), 0, dp(7));
