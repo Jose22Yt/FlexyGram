@@ -158,6 +158,34 @@ jobs:
             sha256sum "$apk" >> build/reports/ui-beta/SHA256SUMS
             python tools/apk_size_report.py "$apk" >> build/reports/ui-beta/apk-size.jsonl
           done
+      - name: Annotate compiler failures
+        if: failure()
+        shell: bash
+        run: |
+          python - <<'PY'
+          import os
+          import re
+          from pathlib import Path
+
+          report = Path('build/reports/ui-beta/assemble.log')
+          if report.is_file():
+              lines = report.read_text(errors='replace').splitlines()
+              diagnostics = []
+              for index, line in enumerate(lines):
+                  if re.search(r'error:|^e:|^> |^Execution failed for task|^Caused by:', line):
+                      context = [line]
+                      for following in lines[index + 1:index + 5]:
+                          if following.strip().startswith(('symbol:', 'location:', 'required:', 'found:', 'reason:')):
+                              context.append(following)
+                      diagnostics.append('\n'.join(context))
+              for message in list(dict.fromkeys(diagnostics))[-15:]:
+                  for name in ('TELEGRAM_APP_ID', 'TELEGRAM_APP_HASH', 'ALPHA_FIREBASE_JSON_B64'):
+                      value = os.environ.get(name)
+                      if value:
+                          message = message.replace(value, '***')
+                  message = message.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+                  print(f'::error title=FlexyGram build diagnostic::{message}')
+          PY
       - name: Write build summary
         if: always()
         shell: bash
