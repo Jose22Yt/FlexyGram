@@ -543,7 +543,8 @@ public class BaseNekoXSettingsActivity extends BaseFragment implements app.flexy
                 case CellGroup.ITEM_TYPE_HEADER -> new HeaderCell(mContext);
                 case CellGroup.ITEM_TYPE_TEXT_DETAIL -> isSignatureSettingsPage()?new app.flexygram.settings.MatteDetailSettingsCell(mContext):new TextDetailSettingsCell(mContext);
                 case CellGroup.ITEM_TYPE_TEXT -> new TextInfoPrivacyCell(mContext);
-                case CellGroup.ITEM_TYPE_TEXT_CHECK_ICON -> new TextCell(mContext);
+                case CellGroup.ITEM_TYPE_TEXT_CHECK_ICON -> isSignatureSettingsPage()
+                        ? new app.exteraless.settings.utils.CompactSettingsTextCell(mContext,getResourceProvider()) : new TextCell(mContext);
                 default -> null;
             };
         }

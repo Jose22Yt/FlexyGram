@@ -380,6 +380,10 @@ public class CustomEmojiReactionsWindow {
     public boolean transition;
 
     private void createTransition(boolean enter) {
+        // Finish the previous transition before initializing the next one's state.
+        if (valueAnimator != null) {
+            valueAnimator.cancel();
+        }
         fromRect.set(reactionsContainerLayout.rect);
         fromRadius = reactionsContainerLayout.radius;
 
@@ -442,13 +446,9 @@ public class CustomEmojiReactionsWindow {
         selectAnimatedEmojiDialog.emojiTabs.showRecentTabStub(enter && cascadeAnimation);
         account = UserConfig.selectedAccount;
         notificationsLocker.lock();
-        if (valueAnimator != null) {
-            valueAnimator.cancel();
-        }
         transition = true;
         valueAnimator = type == TYPE_STICKER_SET_EMOJI ? ValueAnimator.ofFloat(enterTransitionProgress, enter ? 1f : 0) : StableAnimator.ofFloat(enterTransitionProgress, enter ? 1f : 0);
         valueAnimator.addUpdateListener(animation -> {
-            valueAnimator = null;
             enterTransitionProgress = (float) animation.getAnimatedValue();
             updateContainersAlpha();
             updateContentPosition();
@@ -469,6 +469,9 @@ public class CustomEmojiReactionsWindow {
 
             @Override
             public void onAnimationEnd(Animator animation) {
+                if (valueAnimator == animation) {
+                    valueAnimator = null;
+                }
                 updateContainersAlpha();
                 updateContentPosition();
                 checkAnimationEnd(enter);
@@ -485,7 +488,6 @@ public class CustomEmojiReactionsWindow {
                     reactionsContainerLayout.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_AUTO);
                     reactionsContainerLayout.setSkipDraw(false);
                     removeView();
-                    Runtime.getRuntime().gc(); //to prevent garbage collection when reopening
                     reactionsContainerLayout.setCustomEmojiReactionsBackground(type != TYPE_STICKER_SET_EMOJI && type != TYPE_MESSAGE_EFFECTS);
                 }
                 transition = false;
@@ -512,7 +514,11 @@ public class CustomEmojiReactionsWindow {
         } else {
             reactionsContainerLayout.setCustomEmojiReactionsBackground(false);
             final ValueAnimator finalAnimator = valueAnimator;
-            HwEmojis.prepare(finalAnimator::start, cascadeAnimation);
+            HwEmojis.prepare(() -> {
+                if (valueAnimator == finalAnimator) {
+                    finalAnimator.start();
+                }
+            }, cascadeAnimation);
         }
         HwEmojis.enableHw();
     }

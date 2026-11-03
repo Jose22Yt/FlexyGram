@@ -70,7 +70,7 @@ public class BlurBehindDrawable {
     }
 
     public void draw(Canvas canvas) {
-        if (parentView == null || parentView.getMeasuredHeight() == 0 && parentView.getMeasuredWidth() == 0) {
+        if (parentView == null || parentView.getMeasuredHeight() <= 0 || parentView.getMeasuredWidth() <= 0) {
             return;
         }
         if (type == 1 && !wasDraw && !animateAlpha) {
@@ -142,7 +142,7 @@ public class BlurBehindDrawable {
                     toolbarH = AndroidUtilities.statusBarHeight + AndroidUtilities.dp(200);
                     try {
                         int h = i == 0 ? toolbarH : lastH;
-                        blurredBitmapTmp[i] = Bitmap.createBitmap((int) (lastW / DOWN_SCALE), (int) (h / DOWN_SCALE), Bitmap.Config.ARGB_8888);
+                        blurredBitmapTmp[i] = Bitmap.createBitmap(Math.max(1, (int) (lastW / DOWN_SCALE)), Math.max(1, (int) (h / DOWN_SCALE)), Bitmap.Config.ARGB_8888);
                         blurCanvas[i] = new Canvas(blurredBitmapTmp[i]);
                     } catch (Exception e) {
                         FileLog.e(e);
@@ -171,7 +171,7 @@ public class BlurBehindDrawable {
                 }
 
                 if (backDrawable != null && i == ADJUST_PAN_TRANSLATION_CONTENT) {
-                    Rect oldBounds = backDrawable.getBounds();
+                    Rect oldBounds = new Rect(backDrawable.getBounds());
                     backDrawable.setBounds(0, 0, behindView.getMeasuredWidth(), behindView.getMeasuredHeight());
                     backDrawable.draw(blurCanvas[i]);
                     backDrawable.setBounds(oldBounds);
@@ -283,19 +283,20 @@ public class BlurBehindDrawable {
             toolbarH = AndroidUtilities.statusBarHeight + AndroidUtilities.dp(200);
             int h = i == 0 ? toolbarH : lastH;
 
-            if (bitmap[i] == null || bitmap[i].getHeight() != h || bitmap[i].getWidth() != parentView.getMeasuredWidth()) {
+            // Compare in bitmap pixels, not view pixels: these buffers are downsampled.
+            int bitmapH = Math.max(1, (int) (h / DOWN_SCALE));
+            int bitmapW = Math.max(1, (int) (lastW / DOWN_SCALE));
+            if (bitmap[i] == null || bitmap[i].getHeight() != bitmapH || bitmap[i].getWidth() != bitmapW) {
                 if (queue != null) {
                     queue.cleanupQueue();
                 }
 
-                blurredBitmapTmp[i] = Bitmap.createBitmap((int) (lastW / DOWN_SCALE), (int) (h / DOWN_SCALE), Bitmap.Config.ARGB_8888);
+                blurredBitmapTmp[i] = Bitmap.createBitmap(bitmapW, bitmapH, Bitmap.Config.ARGB_8888);
                 if (i == 1) {
                     blurredBitmapTmp[i].eraseColor(getThemedColor(Theme.key_windowBackgroundWhite));
                 }
                 blurCanvas[i] = new Canvas(blurredBitmapTmp[i]);
 
-                int bitmapH = (int) ((i == 0 ? toolbarH : lastH) / DOWN_SCALE);
-                int bitmapW = (int) (lastW / DOWN_SCALE);
                 renderingBitmap[i] = Bitmap.createBitmap(bitmapW, bitmapH, Bitmap.Config.ARGB_8888);
                 renderingBitmapCanvas[i] = new Canvas(renderingBitmap[i]);
                 renderingBitmapCanvas[i].scale((float) renderingBitmap[i].getWidth() / (float) blurredBitmapTmp[i].getWidth(), (float) renderingBitmap[i].getHeight() / (float) blurredBitmapTmp[i].getHeight());
@@ -313,10 +314,12 @@ public class BlurBehindDrawable {
                 }
 
                 if (i == ADJUST_PAN_TRANSLATION_CONTENT) {
-                    Rect oldBounds = backDrawable.getBounds();
-                    backDrawable.setBounds(0, 0, behindView.getMeasuredWidth(), behindView.getMeasuredHeight());
-                    backDrawable.draw(blurCanvas[i]);
-                    backDrawable.setBounds(oldBounds);
+                    if (backDrawable != null) {
+                        Rect oldBounds = new Rect(backDrawable.getBounds());
+                        backDrawable.setBounds(0, 0, behindView.getMeasuredWidth(), behindView.getMeasuredHeight());
+                        backDrawable.draw(blurCanvas[i]);
+                        backDrawable.setBounds(oldBounds);
+                    }
                     behindView.draw(blurCanvas[i]);
                 }
 
@@ -358,9 +361,9 @@ public class BlurBehindDrawable {
                 backgroundBitmap = new Bitmap[2];
                 backgroundBitmapCanvas = new Canvas[2];
             }
-            int bitmapWidth = (int) (width / DOWN_SCALE);
+            int bitmapWidth = Math.max(1, (int) (width / DOWN_SCALE));
             for (int i = 0; i < 2; i++) {
-                int h = (int) ((i == 0 ? toolbarH : height) / DOWN_SCALE);
+                int h = Math.max(1, (int) ((i == 0 ? toolbarH : height) / DOWN_SCALE));
 
                 if (backgroundBitmap[i] != null && (backgroundBitmap[i].getHeight() != h || backgroundBitmap[i].getWidth() != bitmapWidth)) {
                     if (backgroundBitmap[i] != null) {

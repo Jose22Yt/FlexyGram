@@ -25,4 +25,5 @@
   <string name="Settings3_about">FlexyGram</string>
   <string name="Settings3Desc_about">Информация, версия и лицензии</string>
   <string name="Settings3RemixCredits">Значки настроек: Remix Icon 4.6.0, лицензия Apache 2.0. Remix Design и участники.</string>
+  <string name="Settings3Group_system">СИСТЕМА И ДАННЫЕ</string>
 </resources>

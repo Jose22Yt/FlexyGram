@@ -15,10 +15,11 @@ def method(text,anchor):
 def test_exact_root_order_and_single_vector_family():
  text=(S/'Settings3Registry.java').read_text()
  rows=re.findall(r'new Entry\("(\w+)",R.string.Settings3Group_(\w+),R.string.Settings3_\w+,R.string.Settings3Desc_\w+,R.drawable.(\w+)\)',text)
- assert [r[0]for r in rows]==['chat','home','universal','ayu','plugins','flexyfiles','files','navigation','studio','about']
- assert [r[1]for r in rows]==['personal']*3+['functions']*6+['information']
- assert all(icon.startswith('settings3_')for _,_,icon in rows)
- assert rows[1][2]==rows[8][2]=='settings3_stack'
+ assert [r[0]for r in rows]==['chat','home','navigation','ayu','plugins','flexyfiles','files','universal','studio','about']
+ assert [r[1]for r in rows]==['personal']*3+['functions']*3+['system']*3+['information']
+ assert all(icon.startswith('fg_settings_')for _,_,icon in rows)
+ assert rows[1][2]=='fg_settings_home' and rows[8][2]=='fg_settings_layers'
+ assert 'Settings2Subtitle' not in (S/'SignatureSettingsActivity.java').read_text()
 def test_root_no_colored_tiles_or_intermediate_registry():
  cell=(S/'Settings2Cell.java').read_text();root=(S/'SignatureSettingsActivity.java').read_text()
  assert 'GradientDrawable' not in cell and 'Color.WHITE' not in cell

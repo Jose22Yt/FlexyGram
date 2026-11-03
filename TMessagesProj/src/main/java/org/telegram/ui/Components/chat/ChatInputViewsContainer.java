@@ -416,6 +416,16 @@ public class ChatInputViewsContainer extends FrameLayout {
             if(!signatureChannelRight.isEmpty())signatureChannelMask.addRoundRect(signatureChannelRight,radius,radius,Path.Direction.CW);
             signatureChannelLastMiddle.set(signatureChannelMiddle);signatureChannelLastLeft.set(signatureChannelLeft);signatureChannelLastRight.set(signatureChannelRight);
         }
+        // Channels use the same retained native blur/border surfaces as contacts.
+        // Do not gate them on the legacy pearl preset or paint an opaque surface over them.
+        if (compactGlass[0] != null && canvas.isHardwareAccelerated()
+                && org.telegram.messenger.LiteMode.isEnabled(org.telegram.messenger.LiteMode.FLAG_CHAT_BLUR)
+                && org.telegram.messenger.SharedConfig.chatBlurEnabled()) {
+            drawCompactGlass(canvas, 0, signatureChannelMiddle, radius);
+            if (!signatureChannelLeft.isEmpty()) drawCompactGlass(canvas, 1, signatureChannelLeft, radius);
+            if (!signatureChannelRight.isEmpty()) drawCompactGlass(canvas, 2, signatureChannelRight, radius);
+            return;
+        }
         int panel=flexyChannels.getSignatureSurfaceColor();boolean dark=ColorUtils.calculateLuminance(panel)<.4;
         if(flexyPearlGlass && app.exteraless.appearance.FlexyGlassConfig.enabled()){
             tmpRectF.set(signatureChannelMiddle);if(!signatureChannelLeft.isEmpty())tmpRectF.union(signatureChannelLeft);if(!signatureChannelRight.isEmpty())tmpRectF.union(signatureChannelRight);

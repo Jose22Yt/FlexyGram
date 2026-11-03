@@ -10,7 +10,9 @@ def test_glass_counter_and_single_foreground_outline():
     glass = s[s.index('nativeGlassDrawn = bar.drawSignatureNativeGlass'):]
     assert glass.index('drawUnread(canvas);') < glass.index('return;')
     assert 'if (!fusionActive() || nativeGlassDrawn) return;' in s
-    assert 'Theme.dialogs_countTextPaint.setColor(previousColor)' in s
+    assert 'Theme.dialogs_countTextPaint.setColor(' not in s
+    assert 'new android.text.StaticLayout(str, unreadPaint' in s
+    assert 'Theme.key_telegram_color' in s
     assert 'geometry.countVisible = geometry.separateCount = false' not in s
 
 def test_fusion_counter_geometry_executes_real_java_for_both_directions():

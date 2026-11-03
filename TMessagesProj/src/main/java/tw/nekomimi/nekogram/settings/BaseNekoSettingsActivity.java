@@ -653,7 +653,9 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment implements a
                     view.setBackground(Theme.getThemedDrawable(mContext, R.drawable.greydivider, getThemedColor(Theme.key_windowBackgroundGrayShadow)));
                     break;
                 case TYPE_TEXT:
-                    view = new TextCell(mContext, resourcesProvider);
+                    view = isSettings3Embedded() || isSignatureSettingsPage()
+                            ? new app.exteraless.settings.utils.CompactSettingsTextCell(mContext, resourcesProvider)
+                            : new TextCell(mContext, resourcesProvider);
                     view.setBackgroundColor(getThemedColor(Theme.key_windowBackgroundWhite));
                     break;
                 case TYPE_CHECKBOX:

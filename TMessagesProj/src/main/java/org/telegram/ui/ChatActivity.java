@@ -3302,6 +3302,8 @@ public class ChatActivity extends BaseFragment implements
 
         // na: unread count
         getNotificationCenter().addObserver(this, NotificationCenter.dialogsUnreadCounterChanged);
+        getNotificationCenter().addObserver(this, NotificationCenter.dialogFiltersUpdated);
+        getNotificationCenter().addObserver(this, NotificationCenter.dialogsNeedReload);
 
         // exteraless plugins: реестр пунктов меняется, когда плагин включают/выключают.
         NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.pluginMenuItemsUpdated);
@@ -3841,6 +3843,8 @@ public class ChatActivity extends BaseFragment implements
 
         // na: unread count
         getNotificationCenter().removeObserver(this, NotificationCenter.dialogsUnreadCounterChanged);
+        getNotificationCenter().removeObserver(this, NotificationCenter.dialogFiltersUpdated);
+        getNotificationCenter().removeObserver(this, NotificationCenter.dialogsNeedReload);
 
         getNotificationCenter().removePostponeNotificationsCallback(postponeNotificationsWhileLoadingCallback);
         getMessagesController().setLastCreatedDialogId(dialog_id, chatMode == MODE_SCHEDULED, false);
@@ -22868,7 +22872,7 @@ public class ChatActivity extends BaseFragment implements
                             if (!messages.isEmpty() && load_type != 1) { // for loading uppermore
                                 startId = minVal;
                                 endId = AyuUtils.getMinRealId(messages);
-                            } else if (DialogObject.isUserDialog(dialogId)) { // empty(new) user dialog, so load as much as we can
+                            } else if (messages.isEmpty() || DialogObject.isUserDialog(dialogId)) { // Empty channels/groups also need their locally preserved history.
                                 startId = minVal;
                                 endId = maxVal;
                             }
@@ -26235,11 +26239,10 @@ public class ChatActivity extends BaseFragment implements
                 if (avatarContainer != null) {
                     avatarContainer.updateSubtitle();
                 }
-            } else if (id == NotificationCenter.dialogsUnreadCounterChanged) {
-                if (actionBar != null) { // NekoX
-                    actionBar.unreadBadgeSetCount(getMessagesStorage().getMainUnreadCount());
-                }
             }
+        } else if (id == NotificationCenter.dialogsUnreadCounterChanged || id == NotificationCenter.dialogFiltersUpdated
+                || id == NotificationCenter.dialogsNeedReload) {
+            updateFolderUnreadBadge();
         } else if (id == NotificationCenter.dialogTranslate) {
             final long dialogId = (long) args[0];
             if (getDialogId() != dialogId) {
@@ -26587,7 +26590,9 @@ public class ChatActivity extends BaseFragment implements
             for (int a = 0, N = messageIds.size(); a < N; a++) {
                 int mid = messageIds.get(a);
                 MessageObject currentMessage = messagesDict[0].get(mid);
-                if (currentMessage != null) {
+                if (currentMessage != null
+                        && !AyuState.isDeletePermitted(getDialogId(), mid)
+                        && AyuSavePreferences.saveDeletedMessageFor(currentAccount, getDialogId(), currentMessage)) {
                     currentMessage.messageOwner.ayuDeleted = true;
                     chatAdapter.updateRowWithMessageObject(currentMessage, false, false);
                 }
@@ -32034,6 +32039,34 @@ public class ChatActivity extends BaseFragment implements
 
     Bulletin.Delegate bulletinDelegate;
 
+    private int getCurrentFolderUnreadMessageCount() {
+        final MessagesController controller = getMessagesController();
+        final ArrayList<TLRPC.Dialog> dialogs;
+        if (dialogFilterId != 0) {
+            final MessagesController.DialogFilter filter = controller.dialogFiltersById.get(dialogFilterId);
+            // A removed filter must not fall back to the entire account.
+            dialogs = filter != null ? filter.dialogs : null;
+        } else {
+            dialogs = controller.dialogsByFolder.get(dialogFolderId);
+        }
+        if (dialogs == null) return 0;
+        long total = 0;
+        for (int i = 0, size = dialogs.size(); i < size; i++) {
+            final TLRPC.Dialog dialog = dialogs.get(i);
+            // Folder summary rows would double-count archived messages.
+            if (dialog != null && !DialogObject.isFolderDialogId(dialog.id)) {
+                total += Math.max(0, dialog.unread_count);
+            }
+        }
+        return (int) Math.min(Integer.MAX_VALUE, total);
+    }
+
+    private void updateFolderUnreadBadge() {
+        if (actionBar != null) {
+            actionBar.unreadBadgeSetCount(getCurrentFolderUnreadMessageCount());
+        }
+    }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -32052,6 +32085,7 @@ public class ChatActivity extends BaseFragment implements
             chatActivityFadeView.setFlexyEdgeBlur(false, glassBackgroundDrawableFactoryFrosted);
         }
         if (chatListView != null) chatListView.invalidateViews();
+        updateFolderUnreadBadge();
         cachedIsGestureNavigation = AndroidUtil.isGestureNavigation(getContext());
         checkShowBlur(false);
         activityResumeTime = System.currentTimeMillis();
@@ -41995,10 +42029,6 @@ public class ChatActivity extends BaseFragment implements
                         startMessageUnselect();
                     }
                 }
-                // na: unread count
-                if (actionBar != null) {
-                    actionBar.unreadBadgeSetCount(getMessagesStorage().getMainUnreadCount());
-                }
             } else if (holder.itemView instanceof ChatActionCell) {
                 final ChatActionCell actionCell = (ChatActionCell) holder.itemView;
                 actionCell.isAllChats = isAllChats();
@@ -51632,19 +51662,8 @@ public class ChatActivity extends BaseFragment implements
     private boolean usesSignatureHeader() { return signatureChatHeader != null && signatureChatHeader.enabled(); }
     private void updateSignatureHeaderCounter() {
         if (signatureChatHeader == null) return;
-        if (!app.flexygram.header.HeaderConfig.counter()) {
-            signatureChatHeader.setCount(0);
-            return;
-        }
-        int count = -1;
-        if (arguments != null && arguments.containsKey("dialog_folder_id") && arguments.containsKey("dialog_filter_id")) {
-            if (dialogFilterId == 0) count = dialogFolderId == 0 ? getMessagesStorage().getMainUnreadCount() : dialogFolderId == 1 ? getMessagesStorage().getArchiveUnreadCount() : -1;
-            else for (var filter : getMessagesController().getDialogFilters()) if (filter.id == dialogFilterId) { count = filter.unreadCount; break; }
-        }
-        if (count < 0) {
-            count = getMessagesStorage().getMainUnreadCount();
-        }
-        signatureChatHeader.setCount(Math.max(0, count));
+        signatureChatHeader.setCount(app.flexygram.header.HeaderConfig.counter()
+                ? getCurrentFolderUnreadMessageCount() : 0);
     }
 
     private boolean isTitleCentered() {
@@ -52305,6 +52324,9 @@ public class ChatActivity extends BaseFragment implements
     }
 
     private boolean onSideControlButtonOnLongClick(int buttonId, View view) {
+        if (buttonId == ChatActivitySideControlsButtonsLayout.BUTTON_ATTACH) {
+            return chatActivityEnterView != null && chatActivityEnterView.showComposerTools(view);
+        }
         final Runnable onRead;
         final int type;
         if (buttonId == ChatActivitySideControlsButtonsLayout.BUTTON_MENTION) {

@@ -2772,8 +2772,10 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
             if (countLayout == null || unreadCount == 0 || pluginUnreadBadgeDepth > 0)
                 return;
 
-            badgePaint.setColor(getThemedColor(Theme.key_chats_unreadCounter));
-            badgeTextPaint.setColor(getThemedColor(Theme.key_chats_unreadCounterText));
+            int accent = ColorUtils.setAlphaComponent(getThemedColor(Theme.key_telegram_color), 255);
+            badgePaint.setColor(accent);
+            badgeTextPaint.setColor(ColorUtils.calculateContrast(Color.WHITE, accent)
+                    >= ColorUtils.calculateContrast(Color.BLACK, accent) ? Color.WHITE : Color.BLACK);
             Paint paint = badgePaint;
             String unreadCountString = unreadCount > 99 ? "99+" : Integer.toString(unreadCount);
             int countWidth = Math.max(AndroidUtilities.dp(12), (int) Math.ceil(badgeTextPaint.measureText(unreadCountString)));
@@ -2790,6 +2792,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
         }
 
         public void setUnread(int count) {
+            count = Math.max(0, count);
             if (count != unreadCount) {
                 unreadCount = Math.max(0, count);
                 count = unreadCount;
@@ -2806,8 +2809,9 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
     public void unreadBadgeSetCount(int count) {
         if (signatureHeader != null && signatureHeader.enabled()) {
             signatureHeader.setCount(app.flexygram.header.HeaderConfig.counter() ? count : 0);
-        } else if (backButtonImageView != null && (NekoConfig.unreadBadgeOnBackButton.Bool() || app.flexygram.header.HeaderConfig.counter())) {
-            backButtonImageView.setUnread(count);
+        } else if (backButtonImageView != null) {
+            backButtonImageView.setUnread(NekoConfig.unreadBadgeOnBackButton.Bool()
+                    || app.flexygram.header.HeaderConfig.counter() ? count : 0);
         }
     }
 

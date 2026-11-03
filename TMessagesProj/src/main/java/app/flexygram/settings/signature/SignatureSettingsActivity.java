@@ -63,8 +63,8 @@ public class SignatureSettingsActivity extends SignatureMatteSettingsActivity {
         @Override public void onBindViewHolder(RecyclerView.ViewHolder holder,int p,boolean partial){
             Object item=rows.get(p);
             if(item instanceof Integer){TextView t=(TextView)holder.itemView;int id=(Integer)item;t.setTextColor(getThemedColor(Theme.key_windowBackgroundWhiteGrayText2));t.setTextSize(id==R.string.Settings2Title?32:14);t.setTypeface(AndroidUtilities.bold());
-                t.setText(id==0?"":id==R.string.Settings2Title?LocaleController.getString(id)+"\n"+LocaleController.getString(R.string.Settings2Subtitle):LocaleController.getString(id));
-                if(id==R.string.Settings2Title){SpannableString span=new SpannableString(t.getText());int n=span.toString().indexOf('\n');t.setTypeface(android.graphics.Typeface.DEFAULT);span.setSpan(new StyleSpan(android.graphics.Typeface.BOLD),0,n,0);span.setSpan(new ForegroundColorSpan(getThemedColor(Theme.key_windowBackgroundWhiteGrayText2)),n+1,span.length(),0);span.setSpan(new AbsoluteSizeSpan(16,true),n+1,span.length(),0);span.setSpan(new StyleSpan(android.graphics.Typeface.NORMAL),n+1,span.length(),0);t.setText(span);t.setTextColor(getThemedColor(Theme.key_windowBackgroundWhiteBlackText));}
+                t.setText(id==0?"":LocaleController.getString(id));
+                if(id==R.string.Settings2Title)t.setTextColor(getThemedColor(Theme.key_windowBackgroundWhiteBlackText));
             }else{
                 Settings2Cell c=(Settings2Cell)holder.itemView;boolean divider=p+1<rows.size()&&!(rows.get(p+1)instanceof Integer);
                 if(item instanceof Settings3Registry.Entry){var e=(Settings3Registry.Entry)item;c.bind(LocaleController.getString(e.title),LocaleController.getString(e.description),e.icon,0,divider);}

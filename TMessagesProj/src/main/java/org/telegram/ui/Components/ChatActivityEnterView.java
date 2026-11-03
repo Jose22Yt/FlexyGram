@@ -674,8 +674,6 @@ public class ChatActivityEnterView extends FrameLayout implements
     private LinearLayout attachLayout;
     private ViewPropertyAnimator attachButtonAnimator;
     private ImageView attachButton;
-    private AiButtonDrawable aiButtonIcon;
-    private ImageView aiButton;
     private ImageView richButton;
     private float attachButtonAlpha = 1.0f;
     private ImageView suggestButton;
@@ -2868,6 +2866,7 @@ public class ChatActivityEnterView extends FrameLayout implements
             }
         };
         frameLayout.setClipChildren(false);
+        frameLayout.setOnLongClickListener(this::showComposerTools);
         textFieldContainer.addView(frameLayout, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.BOTTOM, 0, 0, DEFAULT_HEIGHT, 0));
 
         if (ChatActivityEnterViewStaticIconView.isStaticIconsEnabled()) {
@@ -3018,87 +3017,23 @@ public class ChatActivityEnterView extends FrameLayout implements
                 }
                 delegate.didPressAttachButton();
             });
+            attachButton.setOnLongClickListener(this::showComposerTools);
             attachButton.setContentDescription(getString(R.string.AccDescrAttachButton));
             updateFieldRight(1);
         }
-
-        aiButton = new ImageView(context);
-        aiButton.setImageDrawable(aiButtonIcon = new AiButtonDrawable(context));
-        aiButton.setScaleType(ImageView.ScaleType.CENTER);
-        aiButton.setColorFilter(new PorterDuffColorFilter(getThemedColor(Theme.key_glass_defaultIcon), PorterDuff.Mode.MULTIPLY));
-        aiButton.setBackground(Theme.createSelectorDrawable(getThemedColor(Theme.key_listSelector), Theme.RIPPLE_MASK_CIRCLE_20DP, dp(16)));
-        textFieldContainer.addView(aiButton, LayoutHelper.createFrame(DEFAULT_HEIGHT, DEFAULT_HEIGHT, Gravity.TOP | Gravity.LEFT, 0, 1, 0, 0));
-        aiButton.setContentDescription(getString(R.string.AIEditor));
-        ScaleStateListAnimator.apply(aiButton);
-        aiButton.setOnClickListener(v -> {
-            MessagesController.getGlobalMainSettings().edit().putInt("aihintshown", 3).apply();
-            final long dialogId = parentFragment != null ? parentFragment.getDialogId() : dialog_id;
-            if (richDraftActive) {
-                if (richDraftMessage == null) return;
-                new AIEditorAlert(getContext(), resourcesProvider)
-                    .setText(richDraftMessage)
-                    .setOnUseRich(this::saveRichDraft)
-                    .setOnSendRich(dialogId, (rich, scheduleDate, scheduleRepeatPeriod, notify) -> {
-                        saveRichDraft(rich);
-                        if (isInScheduleMode() && scheduleDate == 0) {
-                            AlertsCreator.createScheduleDatePickerDialog(parentActivity, dialogId, new AlertsCreator.ScheduleDatePickerDelegate() {
-                                @Override
-                                public void didSelectDate(boolean notify2, int scheduleDate2, int scheduleRepeatPeriod2) {
-                                    sendMessageInternal(notify2, scheduleDate2, scheduleRepeatPeriod2, 0, true);
-                                }
-                            }, resourcesProvider);
-                        } else {
-                            sendMessageInternal(notify, scheduleDate, scheduleRepeatPeriod, 0, true);
-                        }
-                    })
-                    .show();
-                return;
-            }
-            if (messageEditText == null) return;
-            new AIEditorAlert(getContext(), resourcesProvider)
-                .setText(messageEditText.getText())
-                .setOnUse(text -> {
-                    messageEditText.setText(text);
-                    messageEditText.setSelection(text.length(), text.length());
-                })
-                .setOnSend(dialogId, editingMessageObject != null, (text, scheduleDate, scheduleRepeatPeriod, notify) -> {
-                    messageEditText.setText(text);
-                    if (editingMessageObject != null) {
-                        doneEditingMessage();
-                    } else {
-                        if (isInScheduleMode() && scheduleDate == 0) {
-                            AlertsCreator.createScheduleDatePickerDialog(parentActivity, dialogId, new AlertsCreator.ScheduleDatePickerDelegate() {
-                                @Override
-                                public void didSelectDate(boolean notify, int scheduleDate, int scheduleRepeatPeriod) {
-                                    final boolean shownDialog = sendMessageInternal(notify, scheduleDate, scheduleRepeatPeriod, 0, true);
-                                    if (messageSendPreview != null) {
-                                        messageSendPreview.dismiss(!shownDialog);
-                                        messageSendPreview = null;
-                                    }
-                                }
-                            }, resourcesProvider);
-                        } else {
-                            sendMessageInternal(notify, scheduleDate, scheduleRepeatPeriod, 0, true);
-                        }
-                    }
-                })
-                .show();
-        });
-        aiButton.setVisibility(View.GONE);
-        aiButton.setAlpha(0.0f);
-        aiButton.setScaleX(0.6f);
-        aiButton.setScaleY(0.6f);
 
         richButton = new ImageView(context);
         richButton.setImageResource(R.drawable.iv_fullscreen);
         richButton.setScaleType(ImageView.ScaleType.CENTER);
         richButton.setColorFilter(new PorterDuffColorFilter(getThemedColor(Theme.key_glass_defaultIcon), PorterDuff.Mode.MULTIPLY));
         richButton.setBackground(Theme.createSelectorDrawable(getThemedColor(Theme.key_listSelector), Theme.RIPPLE_MASK_CIRCLE_20DP, dp(16)));
-        textFieldContainer.addView(richButton, LayoutHelper.createFrame(DEFAULT_HEIGHT, DEFAULT_HEIGHT, Gravity.TOP | Gravity.RIGHT, 0, 1, 0, 0));
+        richButton.setPadding(dp(6), dp(6), dp(6), dp(6));
+        // Overlay the existing trailing gutter; never add a new row or bubble.
+        messageEditTextContainer.addView(richButton, LayoutHelper.createFrame(36, 36, Gravity.TOP | Gravity.RIGHT, 0, 2, 2, 0));
         richButton.setContentDescription(getString(R.string.ArticleEditor));
         ScaleStateListAnimator.apply(richButton);
         richButton.setOnClickListener(v -> openRichEditor());
-        richButton.setVisibility(View.GONE);
+        richButton.setVisibility(View.INVISIBLE);
         richButton.setAlpha(0.0f);
         richButton.setScaleX(0.6f);
         richButton.setScaleY(0.6f);
@@ -6169,12 +6104,26 @@ public class ChatActivityEnterView extends FrameLayout implements
         }
 
         @Override
+        public boolean performMenuAction(int itemId) {
+            if (itemId == COMPOSER_AI_MENU_ID && canUseAiEditor()) {
+                post(ChatActivityEnterView.this::openAiEditor);
+                return true;
+            }
+            if (itemId == COMPOSER_RICH_MENU_ID && canUseRichEditor()) {
+                post(ChatActivityEnterView.this::openRichEditor);
+                return true;
+            }
+            return super.performMenuAction(itemId);
+        }
+
+        @Override
         protected void extendActionMode(ActionMode actionMode, Menu menu) {
             if (parentFragment != null) {
                 parentFragment.extendActionMode(menu);
             } else {
                 ChatActivityEnterView.this.extendActionMode(menu);
             }
+            addComposerToolsToActionMode(actionMode, menu);
         }
 
         @Override
@@ -6189,8 +6138,7 @@ public class ChatActivityEnterView extends FrameLayout implements
             super.onMeasure(widthMeasureSpec, heightMeasureSpec);
             if (isInitLineCount) {
                 lineCount = getLineCount();
-                showAiButton(lineCount > 2 && !TextUtils.isEmpty(getText().toString().trim()));
-                showRichButton(lineCount > 2 && !TextUtils.isEmpty(getText().toString().trim()));
+                scheduleComposerButtonsUpdate();
             }
             isInitLineCount = false;
         }
@@ -6718,10 +6666,7 @@ public class ChatActivityEnterView extends FrameLayout implements
             @Override
             protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
                 super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-                if (lineCount != messageEditText.getLineCount()) {
-                    showAiButton(messageEditText.getLineCount() > 2 && messageEditText.getText() != null && !TextUtils.isEmpty(messageEditText.getText().toString().trim()));
-                    showRichButton(messageEditText.getLineCount() > 2 && messageEditText.getText() != null && !TextUtils.isEmpty(messageEditText.getText().toString().trim()));
-                }
+                scheduleComposerButtonsUpdate();
             }
         };
         // Вместо голого InputConnectionCompat поле получает
@@ -6912,8 +6857,7 @@ public class ChatActivityEnterView extends FrameLayout implements
                         onLineCountChanged(lineCount, messageEditText.getLineCount());
                     }
                     lineCount = messageEditText.getLineCount();
-                    showAiButton(lineCount > 2 && charSequence != null && !TextUtils.isEmpty(charSequence.toString().trim()));
-                    showRichButton(lineCount > 2 && charSequence != null && !TextUtils.isEmpty(charSequence.toString().trim()));
+                    scheduleComposerButtonsUpdate();
                 } else {
                     heightShouldBeChanged = false;
                 }
@@ -7026,9 +6970,8 @@ public class ChatActivityEnterView extends FrameLayout implements
                     }
                 }
 
-                showAiButton(lineCount > 2 && editable != null && !TextUtils.isEmpty(editable.toString().trim()));
+                scheduleComposerButtonsUpdate();
                 checkIsEphemeralMessage(true);
-                showRichButton(lineCount > 2 && editable != null && !TextUtils.isEmpty(editable.toString().trim()));
             }
         });
         messageEditText.addTextChangedListener(new EditTextSuggestionsFix());
@@ -7047,65 +6990,133 @@ public class ChatActivityEnterView extends FrameLayout implements
         updateFieldRight(lastAttachVisible);
     }
 
-    private boolean shownAiButton;
-    private void showAiButton(boolean show_) {
-        final boolean show = (show_ || richDraftActive) && parentFragment != null && !parentFragment.isSecretChat() && !app.exteraless.appearance.AiFeaturesHelper.isAiEditorHidden();
-
-        if (shownAiButton == show) return;
-        if (show) {
-            MessagesController.getInstance(currentAccount).getTonesController().load();
+    private boolean composerButtonsUpdatePending;
+    private final Runnable composerButtonsUpdate = () -> {
+        composerButtonsUpdatePending = false;
+        if (destroyed || messageEditText == null) {
+            return;
         }
-        shownAiButton = show;
-        aiButton.setVisibility(View.VISIBLE);
-        aiButton.animate()
-            .alpha(show ? 1.0f : 0.0f)
-            .scaleX(show ? 1.0f : 0.6f)
-            .scaleY(show ? 1.0f : 0.6f)
-            .setInterpolator(CubicBezierInterpolator.EASE_OUT_QUINT)
-            .setDuration(420)
-            .withEndAction(() -> {
-                if (!show) {
-                    aiButton.setVisibility(View.GONE);
+        // A text watcher can post before the next traversal. onMeasure will
+        // schedule another update once the requested text layout is available.
+        if (!richDraftActive && messageEditText.isLayoutRequested()) {
+            return;
+        }
+        // Read the final layout, not the previous layout exposed by TextWatcher.
+        final boolean show = messageEditText.getLineCount() > 3
+                && !TextUtils.isEmpty(AndroidUtilities.getTrimmedString(messageEditText.getText()));
+        showRichButton(show);
+    };
+
+    private void scheduleComposerButtonsUpdate() {
+        if (!destroyed && !composerButtonsUpdatePending) {
+            composerButtonsUpdatePending = true;
+            // Visibility changes request layout; never perform them inside onMeasure.
+            post(composerButtonsUpdate);
+        }
+    }
+
+    private boolean canUseAiEditor() {
+        return parentFragment != null && !parentFragment.isSecretChat()
+                && !isEditingBusinessLink() && !isLiveComment
+                && !app.exteraless.appearance.AiFeaturesHelper.isAiEditorHidden();
+    }
+
+    private boolean canUseRichEditor() {
+        return parentFragment != null && !parentFragment.isSecretChat()
+                && !isEditingBusinessLink() && !isLiveComment
+                && editingMessageObject == null
+                && MessagesController.getInstance(currentAccount).richEditorAvailable();
+    }
+
+    private void openAiEditor() {
+        if (destroyed || !canUseAiEditor()) return;
+        MessagesController.getInstance(currentAccount).getTonesController().load();
+        MessagesController.getGlobalMainSettings().edit().putInt("aihintshown", 3).apply();
+        final long dialogId = parentFragment != null ? parentFragment.getDialogId() : dialog_id;
+        if (richDraftActive) {
+            if (richDraftMessage == null) return;
+            new AIEditorAlert(getContext(), resourcesProvider)
+                .setText(richDraftMessage)
+                .setOnUseRich(this::saveRichDraft)
+                .setOnSendRich(dialogId, (rich, scheduleDate, scheduleRepeatPeriod, notify) -> {
+                    saveRichDraft(rich);
+                    if (isInScheduleMode() && scheduleDate == 0) {
+                        AlertsCreator.createScheduleDatePickerDialog(parentActivity, dialogId, new AlertsCreator.ScheduleDatePickerDelegate() {
+                            @Override
+                            public void didSelectDate(boolean notify2, int scheduleDate2, int scheduleRepeatPeriod2) {
+                                sendMessageInternal(notify2, scheduleDate2, scheduleRepeatPeriod2, 0, true);
+                            }
+                        }, resourcesProvider);
+                    } else {
+                        sendMessageInternal(notify, scheduleDate, scheduleRepeatPeriod, 0, true);
+                    }
+                })
+                .show();
+            return;
+        }
+        if (messageEditText == null) return;
+        new AIEditorAlert(getContext(), resourcesProvider)
+            .setText(messageEditText.getText())
+            .setOnUse(text -> {
+                messageEditText.setText(text);
+                messageEditText.setSelection(text.length(), text.length());
+            })
+            .setOnSend(dialogId, editingMessageObject != null, (text, scheduleDate, scheduleRepeatPeriod, notify) -> {
+                messageEditText.setText(text);
+                if (editingMessageObject != null) {
+                    doneEditingMessage();
+                } else {
+                    if (isInScheduleMode() && scheduleDate == 0) {
+                        AlertsCreator.createScheduleDatePickerDialog(parentActivity, dialogId, new AlertsCreator.ScheduleDatePickerDelegate() {
+                            @Override
+                            public void didSelectDate(boolean notify, int scheduleDate, int scheduleRepeatPeriod) {
+                                final boolean shownDialog = sendMessageInternal(notify, scheduleDate, scheduleRepeatPeriod, 0, true);
+                                if (messageSendPreview != null) {
+                                    messageSendPreview.dismiss(!shownDialog);
+                                    messageSendPreview = null;
+                                }
+                            }
+                        }, resourcesProvider);
+                    } else {
+                        sendMessageInternal(notify, scheduleDate, scheduleRepeatPeriod, 0, true);
+                    }
                 }
             })
-            .start();
-        if (show) {
-            aiButton.postDelayed(aiButtonIcon::animate, 220);
+            .show();
+    }
 
-            if (aiHint != null) {
-                aiHint.hide();
-                aiHint = null;
-            }
+    public boolean showComposerTools(View anchor) {
+        if (destroyed || (!canUseAiEditor() && !canUseRichEditor())) return false;
+        ItemOptions options = ItemOptions.makeOptions(parentFragment, anchor);
+        if (canUseAiEditor()) {
+            options.add(R.drawable.msg_edit, getString(R.string.AIEditor), this::openAiEditor);
+        }
+        if (canUseRichEditor()) {
+            options.add(R.drawable.iv_fullscreen, getString(R.string.ArticleEditor), this::openRichEditor);
+        }
+        options.show();
+        return true;
+    }
 
-            if (
-                MessagesController.getGlobalMainSettings().getInt("aihintshown", 0) < 3
-            ) {
-                final HintView2 thisHint = aiHint = new HintView2(getContext(), HintView2.DIRECTION_BOTTOM);
-                aiHint.setMultilineText(true);
-                aiHint.setText(getString(R.string.AIEditorHint));
-                aiHint.setJointPx(0f, aiButton.getWidth() / 2f + dp(4));
-                addView(aiHint, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 200, Gravity.TOP, 0, -200 + 4, 0, 0));
-                aiHint.setOnHiddenListener(() -> removeView(thisHint));
-                aiHint.setDuration(4000L);
-                aiHint.show();
-                MessagesController.getGlobalMainSettings().edit().putInt("aihintshown",
-                    MessagesController.getGlobalMainSettings().getInt("aihintshown", 0) + 1
-                ).apply();
-            }
-        } else {
-            if (aiHint != null) {
-                aiHint.hide();
-                aiHint = null;
-            }
+    private static final int COMPOSER_AI_MENU_ID = View.generateViewId();
+    private static final int COMPOSER_RICH_MENU_ID = View.generateViewId();
+
+    private void addComposerToolsToActionMode(ActionMode mode, Menu menu) {
+        if (canUseAiEditor() && menu.findItem(COMPOSER_AI_MENU_ID) == null) {
+            menu.add(Menu.NONE, COMPOSER_AI_MENU_ID, Menu.NONE, getString(R.string.AIEditor));
+        }
+        if (canUseRichEditor() && menu.findItem(COMPOSER_RICH_MENU_ID) == null) {
+            menu.add(Menu.NONE, COMPOSER_RICH_MENU_ID, Menu.NONE, getString(R.string.ArticleEditor));
         }
     }
 
     private boolean shownRichButton;
     private void showRichButton(boolean show_) {
-        final boolean show = (richDraftActive || show_) && parentFragment != null && !parentFragment.isSecretChat() && editingMessageObject == null && MessagesController.getInstance(currentAccount).richEditorAvailable();
+        final boolean show = show_ && !richDraftActive && canUseRichEditor();
 
         if (shownRichButton == show) return;
         shownRichButton = show;
+        richButton.animate().cancel();
         richButton.setVisibility(View.VISIBLE);
         richButton.animate()
             .alpha(show ? 1.0f : 0.0f)
@@ -7114,8 +7125,8 @@ public class ChatActivityEnterView extends FrameLayout implements
             .setInterpolator(CubicBezierInterpolator.EASE_OUT_QUINT)
             .setDuration(420)
             .withEndAction(() -> {
-                if (!show) {
-                    richButton.setVisibility(View.GONE);
+                if (!shownRichButton) {
+                    richButton.setVisibility(View.INVISIBLE);
                 }
             })
             .start();
@@ -7651,6 +7662,8 @@ public class ChatActivityEnterView extends FrameLayout implements
 
     public void onDestroy() {
         app.flexygram.composer.FlexyComposerConfig.preferences().unregisterOnSharedPreferenceChangeListener(flexyComposerListener);
+        removeCallbacks(composerButtonsUpdate);
+        composerButtonsUpdatePending = false;
         if (audioTimelineView != null) {
             audioTimelineView.destroy();
         }
@@ -10226,6 +10239,9 @@ public class ChatActivityEnterView extends FrameLayout implements
                 layoutParams.rightMargin = dp(2);
             }
         }
+        if (canUseRichEditor()) {
+            layoutParams.rightMargin = Math.max(layoutParams.rightMargin, dp(40));
+        }
         layoutParams.rightMargin = Math.max(layoutParams.rightMargin, Math.max(0, sendButton.width() - dp(DEFAULT_HEIGHT)));
         if (doneButton != null && doneButton.getVisibility() == VISIBLE) {
             layoutParams.rightMargin = Math.max(layoutParams.rightMargin, Math.max(0, doneButton.width() - dp(DEFAULT_HEIGHT)));
@@ -12134,7 +12150,7 @@ public class ChatActivityEnterView extends FrameLayout implements
     }
 
     public void openRichEditor() {
-        if (messageEditText == null || parentFragment == null) return;
+        if (destroyed || messageEditText == null || parentFragment == null) return;
         if (!MessagesController.getInstance(currentAccount).richEditorAvailable()) return;
         final RichEditor editor;
         if (richDraftMessage != null) {
@@ -12306,8 +12322,7 @@ public class ChatActivityEnterView extends FrameLayout implements
     }
 
     private void updateButtons() {
-        showAiButton(messageEditText != null && messageEditText.getLineCount() > 2 && messageEditText.getText() != null && !TextUtils.isEmpty(messageEditText.getText().toString().trim()));
-        showRichButton(messageEditText != null && messageEditText.getLineCount() > 2 && messageEditText.getText() != null && !TextUtils.isEmpty(messageEditText.getText().toString().trim()));
+        scheduleComposerButtonsUpdate();
     }
 
     private void sendRichDraftAsSimpleMessage() {
@@ -16334,7 +16349,6 @@ public class ChatActivityEnterView extends FrameLayout implements
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        int wasHeight = textFieldContainer.getMeasuredHeight();
         updateFlexyBotRow();
         if (!flexyBotRow && botCommandsMenuButton != null && botCommandsMenuButton.getTag() != null) {
             botCommandsMenuButton.measure(widthMeasureSpec, heightMeasureSpec);
@@ -16392,23 +16406,6 @@ public class ChatActivityEnterView extends FrameLayout implements
         checkUi_IslandTotalHeight();
         checkUi_TopViewVisibility();
 
-        if (wasHeight > 0 && textFieldContainer.getMeasuredHeight() != wasHeight) {
-            for (int i = 0; i < 2; ++i) {
-                final View view = i == 0 ? aiButton : richButton;
-                view.setTranslationY(view.getTranslationY() + textFieldContainer.getMeasuredHeight() - wasHeight);
-                view.animate()
-                    .translationY(0)
-                    .setInterpolator(CubicBezierInterpolator.EASE_OUT_QUINT).setDuration(420)
-                    .start();
-            }
-            if (aiHint != null) {
-                aiHint.setTranslationY(aiHint.getTranslationY() + textFieldContainer.getMeasuredHeight() - wasHeight);
-                aiHint.animate()
-                    .translationY(0)
-                    .setInterpolator(CubicBezierInterpolator.EASE_OUT_QUINT).setDuration(420)
-                    .start();
-            }
-        }
     }
 
     @Override
@@ -16670,9 +16667,6 @@ public class ChatActivityEnterView extends FrameLayout implements
             || senderSelectView != null && senderSelectView.getVisibility() == VISIBLE
             || !wantsFlexyBotRow() && botCommandsMenuButton != null && (botCommandsMenuButton.getTag() != null || botCommandsMenuButton.getVisibility() == VISIBLE)
             || botWebViewButton != null && botWebViewButton.getVisibility() == VISIBLE
-            // Use the logical state rather than the 420ms transition's
-            // temporarily VISIBLE view, which can repeatedly switch layouts.
-            || aiButton != null && shownAiButton
             || !wantsFlexyBotRow() && ((MarginLayoutParams) emojiButton.getLayoutParams()).leftMargin > dp(3);
     }
 
