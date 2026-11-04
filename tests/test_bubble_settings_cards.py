@@ -16,7 +16,7 @@ public class Probe {
  static class Context{}
  static class View{
   ViewGroup.LayoutParams params;Object tag;final Context context;View(Context c){context=c;}
-  Context getContext(){return context;}void setLayoutParams(ViewGroup.LayoutParams p){params=p;}void setTag(Object v){tag=v;}
+  Context getContext(){return context;}void setLayoutParams(ViewGroup.LayoutParams p){params=p;}void setTag(Object v){tag=v;}void setBackground(Object v){}void setPadding(int l,int t,int r,int b){}
  }
  static class ViewGroup extends View{
   ViewGroup(Context c){super(c);}static class LayoutParams{static final int MATCH_PARENT=-1,WRAP_CONTENT=-2;int width,height;LayoutParams(int w,int h){width=w;height=h;}}
@@ -24,23 +24,25 @@ public class Probe {
  static class RecyclerView{static class LayoutParams extends ViewGroup.LayoutParams{int leftMargin,topMargin,rightMargin,bottomMargin;LayoutParams(int w,int h){super(w,h);}void setMargins(int l,int t,int r,int b){leftMargin=l;topMargin=t;rightMargin=r;bottomMargin=b;}}static class ViewHolder{View itemView;ViewHolder(View v){itemView=v;}}}
  static class RecyclerListView{static final int TAG_NOT_SECTION=12;static class Holder extends RecyclerView.ViewHolder{Holder(View v){super(v);}}}
  static class BubblePreviewView extends View{BubblePreviewView(Context c,Object wallpaper){super(c);}}
+ static class HeaderCell extends View{HeaderCell(Context c){super(c);}void setHeight(int v){}}
  static class TransparencyCell extends View{TransparencyCell(Context c){super(c);}}
  static class BubbleConfig{static boolean outline;static int style,fusion;static void load(){}static boolean outlineEnabled(){return outline;}static int outlineStyle(){return style;}static int fusionMode(){return fusion;}}
- static class app{static class exteraless{static class appearance{static class AppearanceConfig{static boolean separateHeaders(){return true;}}}}}
+ static class app{static class exteraless{static class appearance{static class AppearanceConfig{static boolean separate;static boolean separateHeaders(){return separate;}}}}}
  static class NativeAdapter{
   boolean isSettings3Embedded(){return false;}boolean isSignatureSettingsPage(){return false;}
   NATIVE_CLASSIFIER
   SHARED_CLASSIFIER
   public int getItemViewType(int position){return TYPE_SETTINGS;}
-  public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent,int type){View v=new View(parent.getContext());v.setLayoutParams(new RecyclerView.LayoutParams(-1,-2));return new RecyclerListView.Holder(v);}
+  public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent,int type){View v=type==TYPE_HEADER?new HeaderCell(parent.getContext()):new View(parent.getContext());v.setLayoutParams(new RecyclerView.LayoutParams(-1,-2));return new RecyclerListView.Holder(v);}
  }
  static class MatteAdapter extends NativeAdapter{MATTE_CLASSIFIER}
  static class ListView{boolean animatorConfigured;Object animator=new Object();void setItemAnimator(Object value){animatorConfigured=true;animator=value;}}
  static class BasePage{
-  int rowCount;final ListView listView=new ListView();void updateRows(){rowCount=0;}int addRow(){return rowCount++;}int addRow(String key){return addRow();}
+  int rowCount;final ListView listView=new ListView();void updateRows(){rowCount=0;}int addRow(){return rowCount++;}int addRow(String key){return addRow();}int addHeader(String key){return addRow(key);}
   public View createView(Context c){return new View(c);}
  }
  static class Page extends BasePage{
+  int appearanceHeaderRow,borderHeaderRow,fusionHeaderRow;
   int transparencyRow,borderRow,previewRow,positionRow,blurRow,enabledRow,fuseRow,styleRow,pearlRow,fusionIntensityRow,fusionAdaptRow;
   Object contextualWallpaper;BubblePreviewView preview;
   UPDATE_ROWS
@@ -54,7 +56,8 @@ public class Probe {
  static void check(boolean value){if(!value)throw new AssertionError();}
  public static void main(String[] args){
   Context context=new Context();ViewGroup parent=new ViewGroup(context);
-  for(boolean outline:new boolean[]{false,true})for(int style=0;style<4;style++)for(int fusion=0;fusion<3;fusion++){
+  for(boolean separate:new boolean[]{false,true})for(boolean outline:new boolean[]{false,true})for(int style=0;style<4;style++)for(int fusion=0;fusion<3;fusion++){
+   app.exteraless.appearance.AppearanceConfig.separate=separate;
    BubbleConfig.outline=outline;BubbleConfig.style=style;BubbleConfig.fusion=fusion;
    Page page=new Page();page.updateRows();page.createView(context);Page.Adapter adapter=page.new Adapter();
    check(page.listView.animatorConfigured&&page.listView.animator==null);
@@ -68,12 +71,29 @@ public class Probe {
      check(view instanceof BubblePreviewView&&Objects.equals(view.tag,RecyclerListView.TAG_NOT_SECTION));
      RecyclerView.LayoutParams p=(RecyclerView.LayoutParams)view.params;
      check(p.leftMargin+8==12&&p.rightMargin+8==12&&p.topMargin>=0&&p.bottomMargin>0);
+    }else if(type==TYPE_HEADER){
+     check(!adapter.isSectionContent(type)&&!adapter.isSettingsContentType(type));
+     check(Objects.equals(view.tag,RecyclerListView.TAG_NOT_SECTION));
     }else{
      check(adapter.isSettingsContentType(type));
      if(type==SLIDER)check(view instanceof TransparencyCell);
     }
    }
-   check(page.rowCount==(outline?(style==0?8:9)+(fusion==2?2:0):4));
+   // Explicit boundaries prevent sliders/switches from becoming one unstructured card.
+   check(page.appearanceHeaderRow==page.previewRow+1);
+   check(page.transparencyRow==page.appearanceHeaderRow+1);
+   check(page.blurRow==page.transparencyRow+1);
+   check(page.borderHeaderRow==page.blurRow+1);
+   check(page.enabledRow==page.borderHeaderRow+1);
+   if(outline){
+    check(page.styleRow==page.enabledRow+1);
+    check(page.fusionHeaderRow==page.fuseRow-1);
+    check(!adapter.isSettingsContentType(adapter.getItemViewType(page.fusionHeaderRow)));
+    check(page.fusionHeaderRow==(style==0?page.positionRow:page.pearlRow)+1);
+    check((page.fusionIntensityRow>=0)==(fusion==2));
+    check((page.fusionAdaptRow>=0)==(fusion==2));
+   }else check(page.fusionHeaderRow==-1&&page.fuseRow==-1);
+   check(page.rowCount==(outline?(style==0?11:12)+(fusion==2?2:0):6));
   }
  }
 }'''

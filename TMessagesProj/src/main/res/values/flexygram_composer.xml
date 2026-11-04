@@ -17,4 +17,11 @@
   <string name="FlexyComposerIcons">Icon appearance</string>
   <string name="FlexyComposerReferenceIcons">Reference · clip and folded circle</string>
   <string name="FlexyComposerSmileIcons">Plus and smile</string>
+  <string name="FlexyComposerLayoutSection">Layout</string>
+  <string name="FlexyComposerSizeNormal">Normal</string>
+  <string name="FlexyComposerSizeVeryCompact">Very compact</string>
+  <string name="FlexyComposerPositionNeutral">Original position</string>
+  <string name="FlexyComposerPositionUp">%1$d dp higher</string>
+  <string name="FlexyComposerPositionDown">%1$d dp lower</string>
+  <string name="FlexyComposerAdjustmentsInfo">Size and position apply to the Compact style. The text field and its round buttons move together, keeping the native touch areas and space above the keyboard.</string>
 </resources>

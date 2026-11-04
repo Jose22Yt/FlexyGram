@@ -34,7 +34,9 @@ public class StudioCoreTest {
   var fusion=StudioCodec.create("Fusion.flexyGram",Map.of("header",Map.of("style",2)));
   check(fusion.minApp==1276);check(StudioCodec.decode(StudioCodec.encode(fusion),1276).sections.get("header").get("style").equals(2));
   reject(()->StudioCodec.decode(StudioCodec.encode(fusion),1275));
-  check(StudioCodec.create("new.flexyGram",Map.of("header",Map.of("style",3))).minApp==1290);reject(()->StudioCodec.create("bad.flexyGram",Map.of("header",Map.of("style",4))));
+  check(StudioCodec.create("new.flexyGram",Map.of("header",Map.of("style",3))).minApp==1290);var floating=StudioCodec.create("Floating.flexyGram",Map.of("header",Map.of("style",4)));
+  check(floating.minApp==1291);check(StudioCodec.decode(StudioCodec.encode(floating),1291).sections.get("header").get("style").equals(4));
+  reject(()->StudioCodec.decode(StudioCodec.encode(floating),1290));reject(()->StudioCodec.create("bad.flexyGram",Map.of("header",Map.of("style",5))));
   for(String key:new String[]{"borderPosition","fuseGlass"}){
    Object value=key.equals("borderPosition")?3:Boolean.TRUE;var newSetting=StudioCodec.create("Contour.flexyGram",Map.of("bubbles",Map.of(key,value)));
    check(newSetting.minApp==1276);check(StudioCodec.decode(StudioCodec.encode(newSetting),1276).sections.get("bubbles").get(key).equals(value));

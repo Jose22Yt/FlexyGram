@@ -24,4 +24,6 @@
     <string name="FlexyHeaderShowUnreadSub">Enable unread chat counter on back button in open chat</string>
     <string name="FlexyHeaderIosStyledCounter">iOS-styled counter</string>
     <string name="FlexyHeaderGeometrySection">FlexyGram Appearance</string>
+    <string name="FlexyHeaderFloating">Signature Floating</string>
+    <string name="FlexyHeaderFloatingPreviewStatus">last seen today at 09:41</string>
 </resources>

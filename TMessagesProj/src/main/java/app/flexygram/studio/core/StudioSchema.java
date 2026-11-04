@@ -44,7 +44,7 @@ public final class StudioSchema {
         i("bubbles","borderPosition","flexygram_bubbles","signature_border_position",5,0,5),
         b("bubbles","fuseGlass","flexygram_bubbles","signature_fuse_glass",false),
         i("bubbles","pearlIntensity","flexygram_bubbles","signature_pearl_intensity",55,0,100),
-        i("header","style","flexygram_header","style",0,0,3),
+        i("header","style","flexygram_header","style",0,0,4),
         b("header","compact","flexygram_header","compact",false),
         b("header","counter","flexygram_header","counter",true),
         i("header","counterPresentation","flexygram_header","counter_mode",1,1,2),
@@ -80,6 +80,7 @@ public final class StudioSchema {
     public static int minimumApp(Map<String,Map<String,Object>> sections) {
         if (sections.containsKey("client")) return 1291;
         Map<String,Object> bubbles=sections.get("bubbles"),header=sections.get("header");
+        if (header != null && Integer.valueOf(4).equals(header.get("style"))) return 1291;
         if (header != null && Integer.valueOf(3).equals(header.get("style"))) return 1290;
         if (header != null && header.get("style") instanceof Number && ((Number)header.get("style")).intValue() == 2) return 1276;
         if (bubbles != null && (bubbles.containsKey("borderPosition") || bubbles.containsKey("fuseGlass")

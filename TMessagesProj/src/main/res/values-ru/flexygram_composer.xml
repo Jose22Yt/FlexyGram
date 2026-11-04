@@ -13,4 +13,11 @@
   <string name="FlexyComposerIcons">Вид значков</string>
   <string name="FlexyComposerReferenceIcons">Образец · скрепка и круг</string>
   <string name="FlexyComposerSmileIcons">Плюс и улыбка</string>
+  <string name="FlexyComposerLayoutSection">Расположение</string>
+  <string name="FlexyComposerSizeNormal">Обычный</string>
+  <string name="FlexyComposerSizeVeryCompact">Очень компактный</string>
+  <string name="FlexyComposerPositionNeutral">Исходное положение</string>
+  <string name="FlexyComposerPositionUp">Выше на %1$d dp</string>
+  <string name="FlexyComposerPositionDown">Ниже на %1$d dp</string>
+  <string name="FlexyComposerAdjustmentsInfo">Размер и положение применяются к компактному стилю. Поле ввода и круглые кнопки перемещаются вместе, сохраняя области нажатия и отступ над клавиатурой.</string>
 </resources>

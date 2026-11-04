@@ -14,12 +14,14 @@ import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.Cells.TextSettingsCell;
 import org.telegram.ui.Cells.TextCheckCell;
+import tw.nekomimi.nekogram.ui.cells.HeaderCell;
 import org.telegram.ui.Components.RecyclerListView;
 import app.flexygram.settings.SignatureMatteSettingsActivity;
 
 /** Local native preview, fill opacity, border width and optional cached wallpaper blur. */
 public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity {
     private static final int SLIDER = 110, PREVIEW = 111;
+    private int appearanceHeaderRow, borderHeaderRow, fusionHeaderRow;
     private int transparencyRow, borderRow, previewRow, positionRow, blurRow, enabledRow, fuseRow, styleRow, pearlRow, fusionIntensityRow, fusionAdaptRow;
     private BubblePreviewView preview;
     private final android.graphics.drawable.Drawable contextualWallpaper;
@@ -27,9 +29,13 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
     public BubbleSettingsActivity(android.graphics.drawable.Drawable contextualWallpaper) { this.contextualWallpaper = contextualWallpaper; }
     @Override protected void updateRows() {
         super.updateRows(); BubbleConfig.load();
-        previewRow = addRow(); transparencyRow = addRow("flexyBubbleTransparency");
+        previewRow = addRow();
+        appearanceHeaderRow = addHeader("FlexyBubbleAppearanceSection");
+        transparencyRow = addRow("flexyBubbleTransparency");
         blurRow = addRow("flexyBubbleBlur");
+        borderHeaderRow = addHeader("FlexyBubbleBorderSection");
         enabledRow = addRow("flexyBubbleOutlineEnabled");
+        fusionHeaderRow = -1;
         borderRow = positionRow = fuseRow = styleRow = pearlRow = fusionIntensityRow = fusionAdaptRow = -1;
         if (BubbleConfig.outlineEnabled()) {
             styleRow = addRow("flexyBubbleOutlineStyle"); borderRow = addRow("flexyBubbleBorderWidth");
@@ -37,6 +43,7 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
             if (BubbleConfig.outlineStyle() != 0) {
                 pearlRow = addRow("flexyBubblePearlIntensity");
             }
+            fusionHeaderRow = addHeader("FlexyBubbleFusionSection");
             fuseRow=addRow("flexyBubbleFusionMode");
             if(BubbleConfig.fusionMode()==2){fusionIntensityRow=addRow("flexyBubbleFusionIntensity");fusionAdaptRow=addRow("flexyBubbleFusionAdapt");}
         }
@@ -113,11 +120,12 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
     private final class Adapter extends MatteListAdapter {
         Adapter(Context context) { super(context); }
         @Override public int getItemViewType(int position) {
+            if (position == appearanceHeaderRow || position == borderHeaderRow || position == fusionHeaderRow) return TYPE_HEADER;
             return position == previewRow ? PREVIEW : position == blurRow || position == fusionAdaptRow || position == enabledRow ? TYPE_CHECK : position == styleRow || position == fuseRow ? TYPE_SETTINGS : position == transparencyRow || position == borderRow || position == pearlRow || position == positionRow || position == fusionIntensityRow ? SLIDER : TYPE_INFO_PRIVACY;
         }
         @Override protected boolean isSectionContent(int type) {
-            // The preview paints its own wallpaper. Controls form a separate native card group.
-            return type != PREVIEW && super.isSectionContent(type);
+            // Wallpaper and section labels separate the three compact control groups.
+            return type != PREVIEW && type != TYPE_HEADER && super.isSectionContent(type);
         }
         @Override public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int type) {
             if (type == PREVIEW) {
@@ -136,10 +144,25 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
                         ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
                 return new RecyclerListView.Holder(cell);
             }
-            return super.onCreateViewHolder(parent, type);
+            RecyclerView.ViewHolder holder = super.onCreateViewHolder(parent, type);
+            if (type == TYPE_HEADER) {
+                // Section labels always stay on the page background, regardless of global header styling.
+                HeaderCell header = (HeaderCell) holder.itemView;
+                header.setTag(RecyclerListView.TAG_NOT_SECTION);
+                header.setBackground(null);
+                header.setPadding(dp(24), dp(6), dp(24), dp(3));
+                header.setHeight(34);
+            }
+            return holder;
         }
         @Override public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, boolean partial) {
             if (position == previewRow) { holder.itemView.invalidate(); return; }
+            if (position == appearanceHeaderRow || position == borderHeaderRow || position == fusionHeaderRow) {
+                ((HeaderCell) holder.itemView).setText(getString(position == appearanceHeaderRow
+                        ? R.string.FlexyBubbleAppearanceSection : position == borderHeaderRow
+                        ? R.string.FlexyBubbleBorderSection : R.string.FlexyBubbleFusionSection));
+                return;
+            }
             if (position == transparencyRow || position == borderRow || position == pearlRow || position == positionRow || position == fusionIntensityRow) { ((TransparencyCell)holder.itemView).bind(position == borderRow, position == pearlRow, position == positionRow,position==fusionIntensityRow); return; }
             if (position == enabledRow) { ((TextCheckCell)holder.itemView).setTextAndCheck(getString(R.string.FlexyBubbleOutlineEnabled), BubbleConfig.outlineEnabled(), false); return; }
             if (position == fuseRow) {

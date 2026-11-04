@@ -41,7 +41,8 @@ public final class SignatureFusionGeometry {
         public final Rect backVisual = new Rect(), actionsVisual = new Rect(), unread = new Rect();
         public boolean separateUnread;
         public final Rect callVisual = new Rect(), moreVisual = new Rect();
-        public boolean mattePortrait;
+        public boolean mattePortrait, floatingStatus;
+        public final Rect status = new Rect();
         /** The avatar image is cropped to this panel inside the central pill. */
         public final Rect portrait = new Rect();
         /** Logical hit targets, ordered phone then overflow for LTR; mirrored for RTL. */
@@ -78,6 +79,8 @@ public final class SignatureFusionGeometry {
         g.separateUnread = false;
         g.unread.set(0,0,0,0);
         g.mattePortrait = false;
+        g.floatingStatus = false;
+        g.status.set(0,0,0,0);
         g.callAvailable = callAvailable;
         float d = density;
         float edge = EDGE_DP * d, gap = GAP_DP * d;
@@ -159,6 +162,34 @@ public final class SignatureFusionGeometry {
         return g;
     }
 
+    /** Full-height edge photo, true full-card name axis and a separate status island. */
+    public static Layout updateFloating(Layout g, float width, float density, boolean rtl,
+                                        boolean callAvailable, float backExtraPx) {
+        update(g, width, density, rtl, callAvailable, backExtraPx);
+        g.floatingStatus = true;
+        float photoWidth = g.center.width() * .56f;
+        float left = rtl ? g.center.right - photoWidth : g.center.left;
+        g.portrait.set(left, g.center.top, left + photoWidth, g.center.bottom);
+        g.text.set(g.center.left + 10f * density, g.center.top,
+                g.center.right - 10f * density, g.center.bottom);
+        g.fadeStartX = g.portrait.left;
+        g.fadeEndX = g.portrait.right;
+        g.fadeSafeStop = .70f;
+        return g;
+    }
+
+    public static float statusHeight(float textHeight, float density) {
+        return Math.max(24f * density, textHeight + 6f * density);
+    }
+
+    /** Gap is reserved before animation; opening never changes the chat viewport. */
+    public static void placeStatus(Layout g, float textWidth, float textHeight, float density) {
+        float width = Math.min(g.center.width(), Math.max(32f * density, textWidth + 20f * density));
+        float top = g.center.bottom + 8f * density;
+        g.status.set(g.center.centerX() - width * .5f, top,
+                g.center.centerX() + width * .5f, top + statusHeight(textHeight, density));
+    }
+
     /** Split only the painted back island; the reserved native touch rectangle stays unchanged. */
     public static void placeUnread(Layout g, float numberWidth, int mode, float density) {
         g.separateUnread = numberWidth > 0 && mode == 2;
@@ -205,6 +236,7 @@ public final class SignatureFusionGeometry {
     public static float titleCenterX(Layout g, float measuredTitleWidth) {
         if (g == null || Float.isNaN(measuredTitleWidth) || measuredTitleWidth < 0f)
             throw new IllegalArgumentException("valid title geometry required");
+        if (g.floatingStatus) return g.center.centerX();
         float half = Math.min(g.text.width(), measuredTitleWidth) * .5f;
         float min = g.text.left + half;
         float max = g.text.right - half;
