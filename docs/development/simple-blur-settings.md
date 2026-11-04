@@ -1,4 +1,6 @@
-# Estado actualEl editor y el material descritos aquí fueron retirados. Véase
+# Estado actual
+
+El editor y el material descritos aquí fueron retirados. Véase
 [Restauración de Liquid Glass nativo](../FlexyGram-restauracion-liquid-glass.md).
 El resto de este documento conserva la descripción histórica.
 
