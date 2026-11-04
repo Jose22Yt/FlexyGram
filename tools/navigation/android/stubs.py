@@ -36,5 +36,5 @@ def write(dest,root):
  }
  '''.replace('METHODS',methods)
  (dest/'NavigationProbe.java').write_text(host)
- for rel in ['app/exteraless/player/Spring.java','app/flexygram/bubbles/interaction/BubbleTapMotion.java','app/flexygram/bubbles/interaction/DampedSpringCurve.java']:
+ for rel in ['app/flexygram/animation/FastMotionTiming.java','app/exteraless/player/Spring.java','app/flexygram/bubbles/interaction/BubbleTapMotion.java','app/flexygram/bubbles/interaction/DampedSpringCurve.java']:
   target=dest/rel;target.parent.mkdir(parents=True,exist_ok=True);target.write_text((root/'TMessagesProj/src/main/java'/rel).read_text())

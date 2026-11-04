@@ -23,8 +23,8 @@ public class PhysicsProbe {
     require(m.spatialOffset(0f,4f)==0f,"Stationary preview moved");
     if(!m.isRunning()&&settledFrame==0)settledFrame=i;
    }
-   require(peak>1f&&peak<1.04f,"Missing or excessive damped overshoot");
-   require(peakTime>.08&&peakTime<.20,"Rebound timing outside calibrated window");
+   require(peak==1f,"Fast motion must land at its exact target without a visible rebound tail");
+   require(settledFrame==1,"0.01 entry must finish by the first delivered frame");
    require(settledFrame>0&&settledFrame/(double)hz<.40,"Entry did not settle");
    require(m.panelScale()==1&&m.panelOffset()==0,"Entry did not restore final card");
    System.out.println("Trajectory "+hz+" Hz: peak="+peak+" at "+peakTime+"s; settled="+settledFrame/(double)hz+"s");
@@ -70,7 +70,7 @@ public class PhysicsProbe {
    fast.close(()->completed[0]++);
    int frames=0;
    while(fast.hasOwner()&&frames<hz){frame(1d/hz);frames++;}
-   require(frames/(double)hz<=.21,"Close exceeded its fast deadline");
+   require(frames<=1,"0.01 close must release the input owner by the first frame");
    require(completed[0]==1&&!fast.isRunning(),"Close cleanup did not run exactly once");
    fast.enter(()->{});frame(1d/hz);fast.close(()->completed[0]++);
    fast.finishImmediately();

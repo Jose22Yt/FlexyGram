@@ -4,6 +4,10 @@ plugins {
 
 gradlePlugin {
     plugins {
+        register("flexyFastMotion") {
+            id = "app.flexygram.fast-motion"
+            implementationClass = "app.flexygram.motionbuild.FastMotionPlugin"
+        }
         register("lottiePreParser") {
             id = "org.telegram.lottie-meta"
             implementationClass = "org.telegram.lottie.LottieMetaPlugin"

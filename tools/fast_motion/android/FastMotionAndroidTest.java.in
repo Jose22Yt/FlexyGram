@@ -1,0 +1,49 @@
+import app.flexygram.animation.*;
+import android.animation.*;import android.app.Activity;import android.os.*;import android.view.*;import android.view.animation.*;import android.widget.FrameLayout;
+import androidx.dynamicanimation.animation.*;
+import java.time.Duration;
+import org.junit.*;import static org.junit.Assert.*;import org.junit.runner.RunWith;import org.robolectric.*;import org.robolectric.annotation.*;
+import org.robolectric.util.ReflectionHelpers;import org.robolectric.util.ReflectionHelpers.ClassParameter;
+@RunWith(RobolectricTestRunner.class) @Config(sdk=35,manifest=Config.NONE)
+public class FastMotionAndroidTest {
+ Activity activity;
+ void system(float scale){ReflectionHelpers.callStaticMethod(ValueAnimator.class,"setDurationScale",ClassParameter.from(float.class,scale));}
+ void frames(){Shadows.shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(80));}
+ @Before public void setup(){activity=Robolectric.buildActivity(Activity.class).setup().get();org.telegram.messenger.ApplicationLoader.applicationContext=activity;system(1);}
+ @After public void finish(){system(1);activity.finish();}
+ @Test public void fixedTargetUsesCurrentSystemMultiplierAndCallbacksCompleteOnce(){
+  for(float scale:new float[]{.01f,.5f,1,1.5f,5,6}){
+   system(scale);int[] end={0};ValueAnimator a=ValueAnimator.ofFloat(0,1);a.setDuration(300);
+   a.addListener(new AnimatorListenerAdapter(){public void onAnimationEnd(Animator animator){end[0]++;}});
+   FastMotion.start(a);assertTrue(Math.abs(a.getDuration()*scale-3)<=Math.max(scale,1));frames();
+   assertEquals(1,end[0]);assertEquals(1f,(Float)a.getAnimatedValue(),0);assertFalse(a.isRunning());assertEquals(scale,ValueAnimator.getDurationScale(),0);
+   long adjusted=a.getDuration();FastMotion.start(a);assertEquals(adjusted,a.getDuration());frames();assertEquals(2,end[0]);
+  }
+ }
+ @Test public void nestedSetRetainsNativeSequencingAndCancellation(){
+  system(5);ValueAnimator a=ValueAnimator.ofFloat(0,1),b=ValueAnimator.ofFloat(0,1);AnimatorSet child=new AnimatorSet();child.playSequentially(a,b);
+  AnimatorSet parent=new AnimatorSet();parent.playTogether(child);parent.setDuration(300);int[] end={0},cancel={0};
+  parent.addListener(new AnimatorListenerAdapter(){public void onAnimationEnd(Animator x){end[0]++;}public void onAnimationCancel(Animator x){cancel[0]++;}});
+  FastMotion.start(parent);frames();assertEquals(1,end[0]);assertEquals(1f,(Float)b.getAnimatedValue(),0);
+  FastMotion.start(parent);parent.cancel();frames();assertEquals(2,end[0]);assertEquals(1,cancel[0]);
+ }
+ @Test public void viewPropertyAnimatorSupportsImplicitStartAndDoesNotCompoundScaling(){
+  system(5);FrameLayout root=new FrameLayout(activity);View v=new View(activity);root.addView(v,new FrameLayout.LayoutParams(100,50));activity.setContentView(root);
+  root.measure(View.MeasureSpec.makeMeasureSpec(300,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(300,View.MeasureSpec.EXACTLY));root.layout(0,0,300,300);
+  ViewPropertyAnimator a=FastMotion.viewAnimator(v.animate());FastMotion.duration(a,300);FastMotion.delay(a,100);long duration=a.getDuration();
+  for(int i=0;i<20;i++){FastMotion.viewAnimator(v.animate());assertEquals(duration,a.getDuration());}
+  int[] done={0};a.alpha(.2f).withEndAction(()->done[0]++);frames();assertEquals(.2f,v.getAlpha(),.001f);assertEquals(1,done[0]);
+  system(.5f);FastMotion.duration(a,400);assertEquals(8,a.getDuration());assertEquals(.5f,ValueAnimator.getDurationScale(),0);
+ }
+ @Test public void continuousClocksRemainNativeAndDisabledSystemSettingStaysDisabled(){
+  // Robolectric bounds infinite repeats internally; model the public getter contract explicitly.
+  ValueAnimator spinner=new ValueAnimator(){@Override public int getRepeatCount(){return INFINITE;}};spinner.setFloatValues(0,1);spinner.setDuration(700);FastMotion.start(spinner);assertEquals(700,spinner.getDuration());spinner.cancel();
+  TimeAnimator clock=new TimeAnimator();clock.setDuration(1000);FastMotion.start(clock);assertEquals(1000,clock.getDuration());clock.cancel();
+  system(0);ValueAnimator instant=ValueAnimator.ofFloat(0,1);FastMotion.start(instant);frames();assertEquals(0,ValueAnimator.getDurationScale(),0);assertFalse(instant.isRunning());
+ }
+ @Test public void legacyViewAnimationAndDecorativeSpringFinishOnNextFrame(){
+  View view=new View(activity);AlphaAnimation alpha=new AlphaAnimation(0,1);alpha.setDuration(300);FastMotion.startAnimation(view,alpha);assertEquals(3,alpha.getDuration());FastMotion.startAnimation(view,alpha);assertEquals(3,alpha.getDuration());
+  FloatValueHolder value=new FloatValueHolder(0);SpringAnimation spring=new SpringAnimation(value).setSpring(new SpringForce(1));int[] ends={0};
+  spring.addEndListener((a,c,v,s)->{assertFalse(c);ends[0]++;});FastMotion.startSpring(spring);frames();assertEquals(1,ends[0]);assertEquals(1,value.getValue(),0);
+ }
+}

@@ -12,7 +12,7 @@ class NativeContextPhysics(unittest.TestCase):
     'android/view/Choreographer.java':'''package android.view;public class Choreographer{public interface FrameCallback{void doFrame(long t);}static Choreographer instance=new Choreographer();static java.util.ArrayList<FrameCallback> queue=new java.util.ArrayList<>();public static Choreographer getInstance(){return instance;}public void postFrameCallback(FrameCallback c){queue.add(c);}public void removeFrameCallback(FrameCallback c){queue.removeIf(v->v==c);}public static void frame(long t){var pending=new java.util.ArrayList<>(queue);queue.clear();for(var c:pending)c.doFrame(t);}}''',
     'app/flexygram/bubbles/interaction/BubbleInteractionSettings.java':'package app.flexygram.bubbles.interaction;public class BubbleInteractionSettings{public static boolean motionEnabled(){return true;}}'
    }
-   for name in ['app/exteraless/player/Spring','app/flexygram/bubbles/interaction/BubbleTapMotion','app/flexygram/bubbles/interaction/SelectedBubbleMotion','app/flexygram/bubbles/interaction/DampedSpringCurve']:
+   for name in ['app/flexygram/animation/FastMotionTiming','app/exteraless/player/Spring','app/flexygram/bubbles/interaction/BubbleTapMotion','app/flexygram/bubbles/interaction/SelectedBubbleMotion','app/flexygram/bubbles/interaction/DampedSpringCurve']:
     files[name+'.java']=(ROOT/'TMessagesProj/src/main/java'/str(name+'.java')).read_text()
    files['PhysicsProbe.java']=(ROOT/'tools/native_context/PhysicsProbe.java').read_text()
    for name,text in files.items():
