@@ -19,13 +19,6 @@ import org.telegram.ui.Components.blur3.drawable.color.BlurredBackgroundProvider
 
 public class BlurredBackgroundProviderImpl {
     public static BlurredBackgroundProvider mainTabs(Theme.ResourcesProvider resourcesProvider) {
-        return mainTabs(resourcesProvider, app.exteraless.appearance.UniversalGlass.NAVIGATION);
-    }
-
-    public static BlurredBackgroundProvider mainTabs(Theme.ResourcesProvider resourcesProvider, int surface) {
-        if (app.exteraless.appearance.UniversalGlass.canRender(surface, resourcesProvider)) {
-            return app.exteraless.appearance.UniversalGlass.material(resourcesProvider, Theme.key_windowBackgroundWhite);
-        }
         final BlurredBackgroundProviderBuilder builder = new BlurredBackgroundProviderBuilder(resourcesProvider)
             .setBackgroundColor((r, isDark) -> {
                 final float alpha = LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS) ? 0.85f : 0.76f;
@@ -42,7 +35,7 @@ public class BlurredBackgroundProviderImpl {
     public static BlurredBackgroundProvider topPanel(Theme.ResourcesProvider resourcesProvider) {
         return new BlurredBackgroundProviderBuilder(resourcesProvider)
             .setBackgroundColor((r, isDark) -> {
-                final float alpha = isDark ? 0.76f : 0.52f;
+                final float alpha = LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS) ? 0.85f : 0.76f;
                 final int colorBg = Theme.getColor(Theme.key_windowBackgroundWhite, r);
                 final int colorTarget = Theme.getColor(Theme.key_glass_targetMainTopPanel, r);
                 return solveSrcColor(colorBg, colorTarget, alpha);
@@ -100,9 +93,6 @@ public class BlurredBackgroundProviderImpl {
     }
 
     public static BlurredBackgroundProvider messageMenuBackground(Theme.ResourcesProvider resourcesProvider) {
-        if (app.exteraless.appearance.UniversalGlass.canRender(app.exteraless.appearance.UniversalGlass.MENUS, resourcesProvider)) {
-            return app.exteraless.appearance.UniversalGlass.material(resourcesProvider, Theme.key_actionBarDefaultSubmenuBackground);
-        }
         return new BlurredBackgroundProviderBuilder(resourcesProvider)
                 .setBackgroundColor((r, isDark) -> {
                     if (!LiteMode.isEnabled(LiteMode.FLAG_CHAT_BLUR)) {
@@ -119,9 +109,6 @@ public class BlurredBackgroundProviderImpl {
     }
 
     public static BlurredBackgroundProvider scrimMenuBackground(Theme.ResourcesProvider resourcesProvider) {
-        if (app.exteraless.appearance.UniversalGlass.canRender(app.exteraless.appearance.UniversalGlass.MENUS, resourcesProvider)) {
-            return app.exteraless.appearance.UniversalGlass.material(resourcesProvider, Theme.key_actionBarDefaultSubmenuBackground);
-        }
         return new BlurredBackgroundProviderBuilder(resourcesProvider)
             .setBackgroundColor((r, isDark) ->
                 Theme.multAlpha(Theme.getColor(Theme.key_actionBarDefaultSubmenuBackground), isDark ? 0.85f : 0.825f))
@@ -159,9 +146,6 @@ public class BlurredBackgroundProviderImpl {
     }
 
     public static BlurredBackgroundProvider bottomPanelChatActivity(Theme.ResourcesProvider resourcesProvider) {
-        if (app.exteraless.appearance.UniversalGlass.canRender(app.exteraless.appearance.UniversalGlass.INPUT, resourcesProvider)) {
-            return app.exteraless.appearance.UniversalGlass.material(resourcesProvider, Theme.key_chat_messagePanelBackground);
-        }
         return new BlurredBackgroundProviderBuilder(resourcesProvider)
                 .setBackgroundColor((r, isDark) -> {
                     if (!checkBlurEnabled(resourcesProvider)) {
@@ -181,9 +165,6 @@ public class BlurredBackgroundProviderImpl {
     }
 
     public static BlurredBackgroundProvider topPanelChatActivity(Theme.ResourcesProvider resourcesProvider) {
-        if (app.exteraless.appearance.UniversalGlass.canRender(app.exteraless.appearance.UniversalGlass.HEADER, resourcesProvider)) {
-            return app.exteraless.appearance.UniversalGlass.material(resourcesProvider, Theme.key_chat_topPanelBackground);
-        }
         return new BlurredBackgroundProviderBuilder(resourcesProvider)
                 .setBackgroundColor((r, isDark) -> {
                     if (!checkBlurEnabled(resourcesProvider)) {
@@ -191,13 +172,12 @@ public class BlurredBackgroundProviderImpl {
                             Theme.key_actionBarDefault : Theme.key_chat_topPanelBackground, r), 255);
                     }
 
-                    final float alpha = isDark ? 0.76f : 0.52f;
+                    final float alpha = LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS) ? 0.85f : 0.76f;
                     final int colorBg = Theme.getColor(Theme.key_chat_topPanelBackground, r);
-                    return isDark ? Theme.multAlpha(colorBg, alpha)
-                            : app.exteraless.appearance.GlassContrastPolicy.lightSurface(colorBg, Math.round(alpha * 255));
+                    return Theme.multAlpha(colorBg, alpha);
                 })
-                .setStrokeColorTop(0x90FFFFFF, 0x20FFFFFF)
-                .setStrokeColorBottom(0x38202A35, 0x14FFFFFF)
+                .setStrokeColorTop(0xFFFFFFFF, 0x20FFFFFF)
+                .setStrokeColorBottom(0xFFFFFFFF, 0x14FFFFFF)
                 .setStrokeColorFull((r, isDark) -> Theme.getDividerColor(r))
                 .setShadowColor(0x20000000, 0)
                 //.setShadowLayer(dpf2(10 / 3f), 0, dpf2(2 / 3f))
@@ -215,8 +195,7 @@ public class BlurredBackgroundProviderImpl {
 
                 final float alpha = LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS) ? 0.85f : 0.76f;
                 final int colorBg = Theme.getColor(Theme.key_chat_topPanelBackground, r);
-                return isDark ? Theme.multAlpha(colorBg, alpha)
-                            : app.exteraless.appearance.GlassContrastPolicy.lightSurface(colorBg, Math.round(alpha * 255));
+                return Theme.multAlpha(colorBg, alpha);
             })
             .setStrokeColorTop(0, 0)
             .setStrokeColorBottom(0, 0)

@@ -522,8 +522,8 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
             BlurredBackgroundDrawableViewFactory dockFactory = new BlurredBackgroundDrawableViewFactory(iBlur3SourceTabGlass);
             dockFactory.setSourceRootView(viewPositionWatcher, tabsViewWrapper);
             dockGlassColors = new org.telegram.ui.Components.blur3.drawable.color.BlurredBackgroundColorProviderThemed(resourceProvider, Theme.key_windowBackgroundWhite, .65f);
-            tabsView.setGlassBackground(dockFactory.create(tabsView, app.exteraless.appearance.UniversalGlass.canRender(app.exteraless.appearance.UniversalGlass.NAVIGATION, resourceProvider) ? app.exteraless.appearance.UniversalGlass.material(resourceProvider, Theme.key_windowBackgroundWhite) : dockGlassColors).setPadding(0));
-            separateSearchGlass = dockFactory.create(separateSearchButton, app.exteraless.appearance.UniversalGlass.canRender(app.exteraless.appearance.UniversalGlass.SEARCH, resourceProvider) ? app.exteraless.appearance.UniversalGlass.material(resourceProvider, Theme.key_windowBackgroundWhite) : dockGlassColors).setPadding(0).setRadius(dp(28));
+            tabsView.setGlassBackground(dockFactory.create(tabsView, dockGlassColors).setPadding(0));
+            separateSearchGlass = dockFactory.create(separateSearchButton, dockGlassColors).setPadding(0).setRadius(dp(28));
         }
 
         updateLayoutWrapper = new UpdateLayoutWrapper(context);

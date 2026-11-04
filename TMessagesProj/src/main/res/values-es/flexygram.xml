@@ -9,17 +9,4 @@
     <string name="FlexyTabsDragHint">Mantén pulsada una pestaña y arrástrala sobre otra para intercambiarlas. Toca para probar la selección.</string>
     <string name="FlexyTabsVisibility">Pestañas visibles</string>
     <string name="FlexyTabsReset">Restablecer orden de pestañas</string>
-    <string name="FlexyUniversalGlass">Blur y bordes</string>
-    <string name="FlexyUniversalGlassSummary">Intensidad del desenfoque y borde original</string>
-    <string name="FlexyUniversalGlassEnable">Personalizar acabado del cristal</string>
-    <string name="FlexyUniversalGlassInfo">Usa el efecto original en sus ubicaciones anteriores. Los cambios se guardan automáticamente y se respetan el ahorro de energía y el desenfoque del tema.</string>
-    <string name="FlexyUniversalGlassSurfaces">Aplicar en</string>
-    <string name="FlexyGlassInput">Campo de mensaje, adjuntos y envío</string>
-    <string name="FlexyGlassHeader">Cabecera de conversación</string>
-    <string name="FlexyGlassMenus">Opciones de mensajes y reacciones</string>
-    <string name="FlexyGlassFolders">Barra de carpetas de chats</string>
-    <string name="FlexyGlassOpacity">Opacidad del tinte</string>
-    <string name="FlexyGlassEdge">Intensidad del borde de luz</string>
-    <string name="FlexyGlassPerformance">Respeta los ajustes de desenfoque, contorno y ahorro de energía. Si el desenfoque no está disponible, se conserva el fondo legible existente. Aplica para actualizar las pantallas abiertas.</string>
-    <string name="FlexyGlassApply">Aplicar apariencia</string>
 </resources>

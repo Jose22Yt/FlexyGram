@@ -11791,19 +11791,7 @@ public class ChatActivityEnterView extends FrameLayout implements
         return result;
     }
 
-    public void setupUniversalGlass(BlurredBackgroundDrawableViewFactory factory) {
-        if (!app.exteraless.appearance.UniversalGlass.canRender(app.exteraless.appearance.UniversalGlass.INPUT, resourcesProvider)) return;
-        final var material = app.exteraless.appearance.UniversalGlass.material(resourcesProvider, Theme.key_chat_messagePanelBackground);
-        if (attachButton != null) {
-            final var glass = factory.create(attachButton, material).setRadius(dp(32));
-            final Drawable selector = attachButton.getBackground();
-            attachButton.setBackground(selector == null ? glass
-                    : new android.graphics.drawable.LayerDrawable(new Drawable[]{glass, selector}));
-        }
-        if (sendButton != null) {
-            sendButton.setBlurredBackgroundDrawable(factory.create(sendButton, material));
-        }
-    }
+
 
     public ImageView getAttachButton() {
         return attachButton;

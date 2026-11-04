@@ -1,5 +1,3 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="FlexyUniversalGlassSummary">Интенсивность размытия и исходный контур</string>
-    <string name="FlexyUniversalGlassInfo">Исходный эффект в прежних областях. Изменения сохраняются автоматически. Учитываются энергосбережение и настройки размытия темы.</string>
 </resources>

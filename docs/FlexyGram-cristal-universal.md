@@ -1,3 +1,6 @@
+# Estado actualEste sistema fue retirado. Véase [Restauración de Liquid Glass nativo](FlexyGram-restauracion-liquid-glass.md).
+El resto de este documento conserva la descripción histórica.
+
 # Cristal universal
 
 Estado de compilación más reciente: [Compilación de la beta](FlexyGram-beta-compilacion.md). Las notas de validación de este documento describen las etapas anteriores.

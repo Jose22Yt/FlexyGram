@@ -16,7 +16,7 @@ public final class HeaderSurface {
 
     public void draw(Canvas canvas, HeaderGeometry g, float density, Theme.ResourcesProvider provider) {
         int color = Theme.getColor(Theme.key_windowBackgroundWhite, provider);
-        boolean effects = app.exteraless.appearance.FlexyGlassConfig.enabled();
+        boolean effects = org.telegram.messenger.SharedConfig.chatBlurEnabled();
         fill.setColor(effects ? (color & 0xffffff) | (Math.round(HeaderConfig.opacity() * 2.55f) << 24) : color | 0xFF000000);
         float strokeWidth = Math.max(1, density * .65f);
         if (stroke.getStrokeWidth() != strokeWidth) stroke.setStrokeWidth(strokeWidth);

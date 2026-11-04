@@ -36,7 +36,7 @@ public final class SignatureHomePainter {
     }
 
     private void surface(Canvas canvas, float radius, float density, boolean dark, int color, float alpha) {
-        boolean effects = app.exteraless.appearance.FlexyGlassConfig.enabled();
+        boolean effects = org.telegram.messenger.SharedConfig.chatBlurEnabled();
         if (!effects) color |= 0xFF000000;
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(color);

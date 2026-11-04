@@ -9,17 +9,4 @@
     <string name="FlexyTabsDragHint">Hold a tab and drag it onto another to swap their positions. Tap to preview selection.</string>
     <string name="FlexyTabsVisibility">Visible tabs</string>
     <string name="FlexyTabsReset">Reset tab order</string>
-    <string name="FlexyUniversalGlass">Blur and borders</string>
-    <string name="FlexyUniversalGlassSummary">Blur intensity and original border</string>
-    <string name="FlexyUniversalGlassEnable">Customize glass appearance</string>
-    <string name="FlexyUniversalGlassInfo">Uses the original effect in its previous locations. Changes are saved automatically; power-saving and theme blur settings remain respected.</string>
-    <string name="FlexyUniversalGlassSurfaces">Apply to</string>
-    <string name="FlexyGlassInput">Message field, attachment and send buttons</string>
-    <string name="FlexyGlassHeader">Conversation header</string>
-    <string name="FlexyGlassMenus">Message options and reactions</string>
-    <string name="FlexyGlassFolders">Chat folder bar</string>
-    <string name="FlexyGlassOpacity">Tint opacity</string>
-    <string name="FlexyGlassEdge">Light edge intensity</string>
-    <string name="FlexyGlassPerformance">Respects blur, outline and power-saving settings. If blur is unavailable, the app keeps its existing readable background. Apply to refresh open screens.</string>
-    <string name="FlexyGlassApply">Apply appearance</string>
 </resources>

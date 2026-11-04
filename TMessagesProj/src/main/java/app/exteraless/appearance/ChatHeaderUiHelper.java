@@ -122,9 +122,7 @@ public final class ChatHeaderUiHelper {
 
     /** M3 убирает среднюю стеклянную плашку под заголовком и её тень. */
     public static void applyChatHeaderGlassStyle(ActionBar actionBar) {
-        if (UniversalGlass.enabled(UniversalGlass.HEADER)) {
-            actionBar.setDrawGlassMiddlePill(true);
-        } else if (isMaterial3ChatHeaderStyle()) {
+        if (isMaterial3ChatHeaderStyle()) {
             actionBar.setDrawGlassMiddlePill(false);
             actionBar.setGlassShadowAlpha(0.0f);
         }

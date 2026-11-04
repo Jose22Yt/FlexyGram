@@ -1,11 +1,13 @@
 package org.telegram.ui.Components.blur3;
 
+import android.os.Build;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.Nullable;
 
 import org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawable;
+import org.telegram.ui.Components.blur3.drawable.BlurredBackgroundDrawableRenderNode;
 import org.telegram.ui.Components.blur3.drawable.color.BlurredBackgroundColorProvider;
 import org.telegram.ui.Components.blur3.source.BlurredBackgroundSource;
 import org.telegram.ui.Components.chat.ViewPositionWatcher;
@@ -77,10 +79,10 @@ public class BlurredBackgroundDrawableViewFactory {
     }
 
 
-    /** Compatibility with existing callers; FlexyGram uses backdrop blur without refraction. */
-    @Deprecated
+    private boolean isLiquidGlassEffectAllowed;
+
     public void setLiquidGlassEffectAllowed(boolean liquidGlassEffectAllowed) {
-        // Intentionally ignored. Do not instantiate a per-surface RuntimeShader.
+        isLiquidGlassEffectAllowed = liquidGlassEffectAllowed;
     }
 
     public BlurredBackgroundDrawable create() {
@@ -101,6 +103,12 @@ public class BlurredBackgroundDrawableViewFactory {
 
     public BlurredBackgroundDrawable create(View view, BlurredBackgroundColorProvider provider, boolean multiwindow) {
         final BlurredBackgroundDrawable drawable = source.createDrawable();
+        if (isLiquidGlassEffectAllowed && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (drawable instanceof BlurredBackgroundDrawableRenderNode) {
+                ((BlurredBackgroundDrawableRenderNode) drawable).setLiquidGlassEffectAllowed();
+            }
+        }
+
         drawable.setColorProvider(provider);
         drawable.setOutset(outsetX, outsetY);
 

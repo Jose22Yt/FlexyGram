@@ -427,7 +427,7 @@ public class ChatInputViewsContainer extends FrameLayout {
             return;
         }
         int panel=flexyChannels.getSignatureSurfaceColor();boolean dark=ColorUtils.calculateLuminance(panel)<.4;
-        if(flexyPearlGlass && app.exteraless.appearance.FlexyGlassConfig.enabled()){
+        if(flexyPearlGlass && org.telegram.messenger.SharedConfig.chatBlurEnabled()){
             tmpRectF.set(signatureChannelMiddle);if(!signatureChannelLeft.isEmpty())tmpRectF.union(signatureChannelLeft);if(!signatureChannelRight.isEmpty())tmpRectF.union(signatureChannelRight);
             tmpRectF.inset(-dp(7),-dp(7));tmpRectF.round(tmpRect);blurredBackgroundDrawable.setBounds(tmpRect);
             canvas.save();canvas.clipPath(signatureChannelMask);blurredBackgroundDrawable.draw(canvas);canvas.restore();
@@ -437,7 +437,7 @@ public class ChatInputViewsContainer extends FrameLayout {
         canvas.drawRoundRect(signatureChannelMiddle,radius,radius,flexySurface);
         if(!signatureChannelLeft.isEmpty())canvas.drawRoundRect(signatureChannelLeft,radius,radius,flexySurface);
         if(!signatureChannelRight.isEmpty())canvas.drawRoundRect(signatureChannelRight,radius,radius,flexySurface);
-        if(flexyPearlGlass && app.exteraless.appearance.FlexyGlassConfig.enabled()){
+        if(flexyPearlGlass && org.telegram.messenger.SharedConfig.chatBlurEnabled()){
             flexyPearl.setColor(ColorUtils.setAlphaComponent(Color.WHITE,(dark?28:76)*blurredBackgroundDrawable.getAlpha()/255));
             flexyPearl.setStyle(Paint.Style.STROKE);flexyPearl.setStrokeWidth(.65f*AndroidUtilities.density);
             canvas.drawRoundRect(signatureChannelMiddle,radius,radius,flexyPearl);
@@ -492,7 +492,7 @@ public class ChatInputViewsContainer extends FrameLayout {
             drawFlexyNativeGlassIslands(canvas, offsetX, offsetY, radius, attach);
             return;
         }
-        if (flexyPearlGlass && app.exteraless.appearance.FlexyGlassConfig.enabled()) {
+        if (flexyPearlGlass && org.telegram.messenger.SharedConfig.chatBlurEnabled()) {
             final boolean voice = flexyComposer.getFlexyVoiceBounds(flexyVoice);
             if (voice) flexyVoice.offset(offsetX, offsetY);
             // One native backdrop pass for the pill, attachment and settled microphone.

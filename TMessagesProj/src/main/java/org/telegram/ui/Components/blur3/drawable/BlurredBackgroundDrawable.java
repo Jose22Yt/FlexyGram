@@ -201,25 +201,6 @@ public abstract class BlurredBackgroundDrawable extends Drawable implements Glas
     protected BlurredBackgroundColorProvider colorProvider;
     protected int shadowColor, backgroundColor, strokeColorTop, strokeColorBottom;
     protected int strokeColorFull;
-    private app.flexygram.effects.GlassContour personalizedContour;
-    private int personalizedEdgeColor;
-
-    protected boolean hasPersonalizedContour() {
-        return colorProvider instanceof app.exteraless.appearance.SimpleGlassProvider
-                && app.exteraless.appearance.UniversalGlassConfig.snapshot().personalizedContour();
-    }
-
-    protected boolean drawPersonalizedContour(Canvas canvas, int alpha) {
-        if (!hasPersonalizedContour()) return false;
-        if (!app.exteraless.appearance.FlexyGlassConfig.enabled() || GlassOutlineStyle.current() == GlassOutlineStyle.HIDDEN) return true;
-        if (personalizedContour != null) {
-            personalizedContour.draw(canvas, boundProps.path, boundProps.boundsWithPadding,
-                    app.exteraless.appearance.UniversalGlassConfig.snapshot(), boundProps.strokeWidthTop,
-                    personalizedEdgeColor, backgroundColor, alpha);
-        }
-        return true;
-    }
-
 
     public BlurredBackgroundDrawable setColorProvider(BlurredBackgroundColorProvider colorProvider) {
         GlassOutlineStyle.addListener(this);
@@ -264,18 +245,6 @@ public abstract class BlurredBackgroundDrawable extends Drawable implements Glas
     public void updateColors() {
         if (colorProvider == null) return;
 
-        // Keep the original outline policy; only the original custom material opts into adjustable width.
-        if (colorProvider instanceof app.exteraless.appearance.SimpleGlassProvider) {
-            float width = ((BlurredBackgroundProvider) colorProvider).getStrokeWidthTop();
-            if (boundProps.strokeWidthFull != width) {
-                boundProps.strokeWidthFull = width;
-                boundProps.build();
-            }
-        }
-        if (hasPersonalizedContour()) {
-            if (personalizedContour == null) personalizedContour = new app.flexygram.effects.GlassContour();
-            personalizedEdgeColor = colorProvider.getStrokeColorFull();
-        }
         final GlassOutlineStyle outlineStyle = GlassOutlineStyle.current();
         final boolean glare = outlineStyle == GlassOutlineStyle.GLARE;
         final boolean solid = outlineStyle == GlassOutlineStyle.SOLID;
@@ -286,11 +255,6 @@ public abstract class BlurredBackgroundDrawable extends Drawable implements Glas
         }
 
         backgroundColor = colorProvider.getBackgroundColor();
-        if (!app.exteraless.appearance.FlexyGlassConfig.enabled()) {
-            // An opaque fill also skips replaying an already cached blurred source.
-            if (Color.alpha(backgroundColor) == 0) backgroundColor = Theme.getColor(Theme.key_windowBackgroundWhite);
-            backgroundColor = ColorUtils.setAlphaComponent(backgroundColor, 255);
-        }
         shadowColor = glare ? colorProvider.getShadowColor() : 0;
         strokeColorTop = glare ? colorProvider.getStrokeColorTop() : 0;
         strokeColorBottom = glare ? colorProvider.getStrokeColorBottom() : 0;
@@ -773,8 +737,8 @@ public abstract class BlurredBackgroundDrawable extends Drawable implements Glas
             return;
         }
 
-        final boolean withStroke = !hasPersonalizedContour() && (boundProps.useFullStroke ||
-                GlassOutlineStyle.current() == GlassOutlineStyle.GLARE);
+        final boolean withStroke = boundProps.useFullStroke ||
+                GlassOutlineStyle.current() == GlassOutlineStyle.GLARE;
         final NinePatchDrawable ninePatchDrawable = checkNinePatchDrawable(fillColor, withStroke);
         ninePatchDrawable.setBounds(
             boundProps.boundsWithPadding.left - ninePatchDrawablePadding.left,
@@ -784,7 +748,6 @@ public abstract class BlurredBackgroundDrawable extends Drawable implements Glas
         );
         ninePatchDrawable.setAlpha(alpha);
         ninePatchDrawable.draw(canvas);
-        drawPersonalizedContour(canvas, alpha);
     }
 
     private void drawSourceBitmap(Canvas canvas, BlurredBackgroundSourceBitmap source) {
@@ -831,7 +794,6 @@ public abstract class BlurredBackgroundDrawable extends Drawable implements Glas
     }
 
     private void drawStrokeInternalIfNeeded(Canvas canvas) {
-        if (drawPersonalizedContour(canvas, alpha)) return;
         if (!boundProps.useFullStroke &&
                 GlassOutlineStyle.current() != GlassOutlineStyle.GLARE) return;
 

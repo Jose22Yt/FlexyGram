@@ -16,7 +16,6 @@ public final class Settings2Policy {
         own("appearance:appearanceHeader", "fonts");
         own("appearance:avatarCorners", "avatars");
         own("appearance:blurHeader", "effects");
-        own("appearance:universalGlass", "effects");
         own("appearance:bottomTabs", "@moved");
         own("appearance:centerTitle", "chat_list");
         own("appearance:chatListHeader", "chat_list");

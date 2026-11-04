@@ -22,7 +22,7 @@ public final class SignatureFusionSurface {
 
     public void draw(Canvas canvas, SignatureFusionGeometry.Layout g,
                      int surfaceColor, int borderColor, int separatorColor, float density) {
-        if (!app.exteraless.appearance.FlexyGlassConfig.enabled()) {
+        if (!org.telegram.messenger.SharedConfig.chatBlurEnabled()) {
             surfaceColor |= 0xFF000000;
             borderColor = 0;
         }
@@ -48,7 +48,7 @@ public final class SignatureFusionSurface {
     /** Same background, but no center stroke until the native portrait has been composited. */
     public void drawBackdrop(Canvas canvas, SignatureFusionGeometry.Layout g,
                      int surfaceColor, int borderColor, int separatorColor, float density) {
-        if (!app.exteraless.appearance.FlexyGlassConfig.enabled()) {
+        if (!org.telegram.messenger.SharedConfig.chatBlurEnabled()) {
             surfaceColor |= 0xFF000000;
             borderColor = 0;
         }
@@ -72,7 +72,7 @@ public final class SignatureFusionSurface {
         work.set(r.left,r.top,r.right,r.bottom);canvas.drawRoundRect(work,r.height()*.5f,r.height()*.5f,fill);
     }
     public void drawCenterBorder(Canvas canvas, SignatureFusionGeometry.Layout g, int color, float density) {
-        if (!app.exteraless.appearance.FlexyGlassConfig.enabled()) return;
+        if (!org.telegram.messenger.SharedConfig.chatBlurEnabled()) return;
         float stroke = .7f * density;
         if (border.getColor() != color) border.setColor(color);
         if (border.getStrokeWidth() != stroke) border.setStrokeWidth(stroke);

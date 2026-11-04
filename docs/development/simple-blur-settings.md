@@ -1,3 +1,7 @@
+# Estado actualEl editor y el material descritos aquí fueron retirados. Véase
+[Restauración de Liquid Glass nativo](../FlexyGram-restauracion-liquid-glass.md).
+El resto de este documento conserva la descripción histórica.
+
 # Ajustes simples de blur y borde
 
 Sustituye el editor experimental `a66f36e6b9`. Se elimina la vista previa y se
