@@ -1,5 +1,7 @@
 # Tarjetas de ajustes y selección visual de interfaces
 
+Actualización: el acabado universal, los iconos de 24 dp y la retirada de flechas se documentan en [Ajustes agrupados](FlexyGram-ajustes-agrupados-universales.md). Los renderizados anteriores de este documento son históricos.
+
 Se aplica la referencia aprobada de Opexgram: filas separadas por pequeños espacios,
 esquinas exteriores más redondeadas en cada grupo, encabezados con el acento del
 tema e iconos sobre bases de color. Las diez categorías de FlexyGram conservan

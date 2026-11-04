@@ -110,7 +110,9 @@ public class BaseNekoXSettingsActivity extends BaseFragment implements app.flexy
     protected HashMap<Integer, ConfigItem> rowConfigMapReverse = new HashMap<>(20);
 
     protected BlurredRecyclerView createListView(Context context) {
-        return new BlurredRecyclerView(context);
+        var list = new app.exteraless.appearance.SectionCardRecyclerView(context);
+        list.setCardResourcesProvider(resourcesProvider);
+        return list;
     }
 
     @Override
@@ -458,7 +460,11 @@ public class BaseNekoXSettingsActivity extends BaseFragment implements app.flexy
         return themeDescriptions;
     }
 
-    protected class BaseListAdapter extends RecyclerListView.SelectionAdapter {
+    protected class BaseListAdapter extends RecyclerListView.SelectionAdapter implements app.flexygram.settings.signature.SettingsSectionTypes {
+        @Override public boolean isSettingsContentType(int type) {
+            return type != CellGroup.ITEM_TYPE_HEADER && type != CellGroup.ITEM_TYPE_DIVIDER && type != CellGroup.ITEM_TYPE_TEXT;
+        }
+
 
         protected final Context mContext;
 
@@ -540,7 +546,7 @@ public class BaseNekoXSettingsActivity extends BaseFragment implements app.flexy
                 case CellGroup.ITEM_TYPE_DIVIDER -> new ShadowSectionCell(mContext);
                 case CellGroup.ITEM_TYPE_TEXT_SETTINGS_CELL -> isSignatureSettingsPage()?new app.flexygram.settings.MatteTextSettingsCell(mContext,getResourceProvider()):new TextSettingsCell(mContext);
                 case CellGroup.ITEM_TYPE_TEXT_CHECK -> isSignatureSettingsPage()?new app.flexygram.settings.MatteTextCheckCell(mContext,getResourceProvider()):new TextCheckCell(mContext);
-                case CellGroup.ITEM_TYPE_HEADER -> new HeaderCell(mContext);
+                case CellGroup.ITEM_TYPE_HEADER -> { HeaderCell header=new HeaderCell(mContext); header.setTag(RecyclerListView.TAG_NOT_SECTION); yield header; }
                 case CellGroup.ITEM_TYPE_TEXT_DETAIL -> isSignatureSettingsPage()?new app.flexygram.settings.MatteDetailSettingsCell(mContext):new TextDetailSettingsCell(mContext);
                 case CellGroup.ITEM_TYPE_TEXT -> new TextInfoPrivacyCell(mContext);
                 case CellGroup.ITEM_TYPE_TEXT_CHECK_ICON -> isSignatureSettingsPage()

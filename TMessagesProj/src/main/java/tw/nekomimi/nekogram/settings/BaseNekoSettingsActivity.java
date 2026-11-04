@@ -248,7 +248,9 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment implements a
     }
 
     protected app.exteraless.appearance.SectionCardRecyclerView createSettingsList(Context context) {
-        return new app.exteraless.appearance.SectionCardRecyclerView(context);
+        var list = new app.exteraless.appearance.SectionCardRecyclerView(context);
+        list.setCardResourcesProvider(resourcesProvider);
+        return list;
     }
 
     protected boolean needActionBarBlur() {
@@ -301,7 +303,6 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment implements a
         colors.add(new ThemeDescription(listView,0,new Class[]{app.flexygram.settings.signature.Settings2Cell.class},new String[]{"title"},null,null,null,Theme.key_windowBackgroundWhiteBlackText));
         colors.add(new ThemeDescription(listView,0,new Class[]{app.flexygram.settings.signature.Settings2Cell.class},new String[]{"description"},null,null,null,Theme.key_windowBackgroundWhiteGrayText2));
         colors.add(new ThemeDescription(listView,ThemeDescription.FLAG_IMAGECOLOR,new Class[]{app.flexygram.settings.signature.Settings2Cell.class},new String[]{"icon"},null,null,null,Theme.key_windowBackgroundWhiteBlackText));
-        colors.add(new ThemeDescription(listView,ThemeDescription.FLAG_IMAGECOLOR,new Class[]{app.flexygram.settings.signature.Settings2Cell.class},new String[]{"arrow"},null,null,null,Theme.key_windowBackgroundWhiteGrayIcon));
         Class[] titleCells = {TextSettingsCell.class, TextCheckCell.class, TextCheckCell2.class, TextDetailSettingsCell.class, NotificationsCheckCell.class, TextCell.class, TextRadioCell.class, CheckBoxCell.class};
         colors.add(new ThemeDescription(listView, 0, titleCells, new String[]{"textView"}, null, null, null, Theme.key_windowBackgroundWhiteBlackText));
         colors.add(new ThemeDescription(listView, 0, new Class[]{TextSettingsCell.class}, new String[]{"valueTextView"}, null, null, null, Theme.key_windowBackgroundWhiteValueText));
@@ -503,7 +504,9 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment implements a
         }
     }
 
-    protected abstract class BaseListAdapter extends RecyclerListView.SelectionAdapter {
+    protected abstract class BaseListAdapter extends RecyclerListView.SelectionAdapter implements app.flexygram.settings.signature.SettingsSectionTypes {
+        @Override public boolean isSettingsContentType(int type) { return type != TYPE_HEADER && isSectionContent(type); }
+
 
         protected final Context mContext;
 
@@ -533,27 +536,18 @@ public abstract class BaseNekoSettingsActivity extends BaseFragment implements a
             applySectionBackground(holder, position);
         }
 
-        /**
-         * openExtera: готовит фон ячейки под механизм карточек-секций.
-         * Единый скруглённый фон группы с тенью-elevation рисует сам список
-         * ({@link app.exteraless.appearance.SectionCardRecyclerView}) в {@code dispatchDraw}
-         * позади контента. Здесь остаётся только выставить прозрачность ячейки:
-         * при sectionRadius > 0 фон ячейки прозрачный (просвечивает карточка), селектор
-         * нажатия рисует сам список отдельно — кликаемость не страдает. При sectionRadius == 0
-         * поведение полностью стоковое: сплошной фон, как задавалось при создании ячейки.
-         */
+        /** The list owns grouped surfaces; self-painted category cards keep their own background. */
         protected void applySectionBackground(@NonNull RecyclerView.ViewHolder holder, int position) {
+            if (holder.itemView instanceof app.flexygram.settings.signature.Settings2Cell) return;
             int viewType = holder.getItemViewType();
             if (!isSectionContent(viewType)) {
                 return;
             }
-            int radiusDp = (isSettings3Embedded()||isSignatureSettingsPage())?20:app.exteraless.appearance.AppearanceConfig.sectionRadius();
-            if (radiusDp <= 0) {
-                // Дефолт-safe (0) = сток: сплошной фон, ровно как задавалось при создании ячейки.
-                holder.itemView.setBackgroundColor(getThemedColor(Theme.key_windowBackgroundWhite));
-                return;
-            }
-            // Карточка-фон рисуется списком; ячейка должна быть прозрачной, чтобы просвечивала.
+            // A separate rounded card replaces the old in-row divider.
+            if (holder.itemView instanceof org.telegram.ui.Cells.TextSettingsCell)
+                ((org.telegram.ui.Cells.TextSettingsCell)holder.itemView).needDivider=false;
+            if (holder.itemView instanceof org.telegram.ui.Cells.TextCheckCell)
+                ((org.telegram.ui.Cells.TextCheckCell)holder.itemView).setDivider(false);
             holder.itemView.setBackground(null);
         }
 

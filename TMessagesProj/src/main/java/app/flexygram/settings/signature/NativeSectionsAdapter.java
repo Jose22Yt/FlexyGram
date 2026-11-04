@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** One RecyclerView; isolated inner holders preserve original local types for legacy casts. */
-public final class NativeSectionsAdapter extends RecyclerListView.SelectionAdapter {
+public final class NativeSectionsAdapter extends RecyclerListView.SelectionAdapter implements SettingsSectionTypes {
     private final List<Part> parts = new ArrayList<>();
     private static final int TYPE_STRIDE = 4096;
     private boolean closed;
@@ -53,6 +53,13 @@ public final class NativeSectionsAdapter extends RecyclerListView.SelectionAdapt
     private int offset(Part target){int offset=0;for(Part p:parts){if(p==target)return offset;offset+=p.count;}throw new IllegalStateException("Detached section");}
     private int index(int position){for(int i=0;i<parts.size();i++){if(position<parts.get(i).count)return i;position-=parts.get(i).count;}throw new IndexOutOfBoundsException();}
     private int local(int global,int part){for(int i=0;i<part;i++)global-=parts.get(i).count;return global;}
+    @Override public boolean isSettingsContentType(int type) {
+        if (type < 0) return false;
+        int part=type/TYPE_STRIDE, localType=type%TYPE_STRIDE;
+        if (part<0 || part>=parts.size()) return false;
+        var adapter=parts.get(part).adapter;
+        return adapter instanceof SettingsSectionTypes && ((SettingsSectionTypes)adapter).isSettingsContentType(localType);
+    }
     @Override public int getItemCount(){int count=0;for(Part p:parts)count+=p.count;return count;}
     @Override public int getItemViewType(int position){int part=index(position),type=parts.get(part).adapter.getItemViewType(local(position,part));if(type<0||type>=TYPE_STRIDE)throw new IllegalStateException("Unsupported native settings view type");return part*TYPE_STRIDE+type;}
     @Override public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent,int type){int part=type/TYPE_STRIDE;return new Wrapped(parts.get(part).adapter.createViewHolder(parent,type%TYPE_STRIDE),part);}

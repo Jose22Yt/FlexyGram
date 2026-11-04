@@ -39,7 +39,7 @@ final class Settings3LinksSection extends SignatureMatteSettingsActivity {
     @Override protected BaseListAdapter createAdapter(Context context){return new MatteListAdapter(context){
         @Override public int getItemViewType(int p){return 240;}
         @Override public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup p,int type){return new RecyclerListView.Holder(new Settings2Cell(p.getContext(),resourcesProvider,true));}
-        @Override public void onBindViewHolder(RecyclerView.ViewHolder h,int p,boolean partial){((Settings2Cell)h.itemView).setCardEdges(p==0,p+1==ids.length);((Settings2Cell)h.itemView).bind(LocaleController.getString(titles[p]),"",icons[p],0,p+1<ids.length);}
+        @Override public void onBindViewHolder(RecyclerView.ViewHolder h,int p,boolean partial){((Settings2Cell)h.itemView).bind(LocaleController.getString(titles[p]),"",icons[p],0,p+1<ids.length);}
         @Override public boolean isEnabled(RecyclerView.ViewHolder h){return true;}
     };}
 }

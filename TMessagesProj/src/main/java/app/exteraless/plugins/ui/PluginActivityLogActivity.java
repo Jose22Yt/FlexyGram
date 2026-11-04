@@ -88,7 +88,7 @@ public class PluginActivityLogActivity extends BaseFragment {
         contentView.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundGray));
 
         listView = new UniversalRecyclerView(this, this::fillItems, this::onItemClick, this::onItemLongClick);
-        listView.setSections();
+        app.flexygram.settings.signature.SettingsCardLists.apply(listView, getResourceProvider());
         listView.adapter.setApplyBackground(false);
         contentView.addView(listView,
                 LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));

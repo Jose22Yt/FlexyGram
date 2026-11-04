@@ -58,3 +58,54 @@ def write(dest,root):
 
  # Keep production per-row card backgrounds; the host supplies only list layout.
  p=dest/'tw/nekomimi/nekogram/settings/BaseNekoSettingsActivity.java';s=p.read_text().replace('if(h.itemView instanceof app.flexygram.settings.signature.Settings2Cell){','if(h.itemView instanceof app.flexygram.settings.signature.Settings2Cell && h.itemView.getBackground()==null){');p.write_text(s)
+
+ # Compile the real base adapter background hook: the previous double bypassed it and hid a root-card regression.
+ for name in ['SettingsCardStyle','SettingsSectionTypes','SettingsCardBackground']:
+  emit('app/flexygram/settings/signature/'+name+'.java',(root/'TMessagesProj/src/main/java/app/flexygram/settings/signature'/(name+'.java')).read_text())
+ text=(root/'TMessagesProj/src/main/java/tw/nekomimi/nekogram/settings/BaseNekoSettingsActivity.java').read_text()
+ start=text.index('        protected void applySectionBackground(');brace=text.index('{',start);end=brace+1;depth=1
+ while depth:
+  depth+=(text[end]=='{')-(text[end]=='}');end+=1
+ hook=text[start:end]
+ p=dest/'tw/nekomimi/nekogram/settings/BaseNekoSettingsActivity.java';s=p.read_text()
+ s=s.replace('onBindViewHolder(h,i,false);','onBindViewHolder(h,i);')
+ s=s.replace('onBindViewHolder(h,p,false);}', 'onBindViewHolder(h,p,false);applySectionBackground(h,p);}')
+ s=s.replace('protected abstract class BaseListAdapter extends RecyclerListView.SelectionAdapter{', 'protected abstract class BaseListAdapter extends RecyclerListView.SelectionAdapter{'+hook)
+ p.write_text(s)
+ p=dest/'org/telegram/ui/Cells/TextSettingsCell.java';s=p.read_text().replace('extends android.widget.TextView{','extends android.widget.TextView{public boolean needDivider;');p.write_text(s)
+ p=dest/'org/telegram/ui/Cells/TextCheckCell.java';s=p.read_text().replace('extends android.widget.TextView{','extends android.widget.TextView{public void setDivider(boolean d){}');p.write_text(s)
+ # UniversalAdapter hosts are isolated; production SettingsCardLists and painter are compiled unchanged.
+ p=dest/'tw/nekomimi/nekogram/settings/BaseNekoSettingsActivity.java';s=p.read_text().replace('@NonNull','@androidx.annotation.NonNull');p.write_text(s)
+ p=dest/'org/telegram/ui/ActionBar/Theme.java';s=p.read_text().replace('public class Theme{','public class Theme{public static int multAlpha(int c,float a){return(c&0xffffff)|((int)((c>>>24)*a)<<24);}');p.write_text(s)
+ p=dest/'org/telegram/messenger/R.java';s=p.read_text().replace('public final class R {','public final class R {public static class id{public static final int transparent_tag=0x7f0a0001;}').replace('public class R{','public class R{public static class id{public static final int transparent_tag=0x7f0a0001;}');p.write_text(s)
+ p=dest/'org/telegram/ui/Components/RecyclerListView.java';s=p.read_text().replace('public static final int TAG_NOT_SECTION=12;','public static final int TAG_NOT_SECTION=12,NO_POSITION=-1;');p.write_text(s)
+ emit('org/telegram/ui/Components/UItem.java','package org.telegram.ui.Components;public class UItem{public boolean transparent;}')
+ emit('org/telegram/ui/Components/UniversalAdapter.java','package org.telegram.ui.Components;public class UniversalAdapter{public static boolean isShadow(int t){return t==1;}public static boolean isHeader(int t){return t==4;}public boolean applyBackground=true;public UItem item;public UItem getItem(int p){return item;}public void setApplyBackground(boolean b){applyBackground=b;}}')
+ emit('org/telegram/ui/Components/UniversalRecyclerView.java','''package org.telegram.ui.Components;
+ public class UniversalRecyclerView extends RecyclerListView {
+  public UniversalAdapter adapter=new UniversalAdapter();public boolean forced;public java.util.function.Predicate<android.view.View> content;public java.util.function.IntPredicate type;public int inset;public float radius;
+  public interface Painter{void draw(android.graphics.Canvas c,android.graphics.RectF r,Float t,Float b,Float a);}
+  public UniversalRecyclerView(android.content.Context c){super(c);}
+  public void setForceSegmentedSettingsCards(boolean b){forced=b;}
+  public androidx.recyclerview.widget.RecyclerView.ViewHolder getChildViewHolder(android.view.View v){return (androidx.recyclerview.widget.RecyclerView.ViewHolder)v.getTag();}
+  public void setSections(java.util.function.Predicate<android.view.View> p,java.util.function.IntPredicate t,int pad,float r,Painter paint,boolean top){content=p;type=t;inset=pad;radius=r;}
+ }''')
+ # The real settings list subclass is compiled too; only the large native recycler host is isolated.
+ emit('app/exteraless/appearance/SectionCardRecyclerView.java',(root/'TMessagesProj/src/main/java/app/exteraless/appearance/SectionCardRecyclerView.java').read_text())
+ emit('org/telegram/ui/Components/BlurredRecyclerView.java','''package org.telegram.ui.Components;
+ public class BlurredRecyclerView extends RecyclerListView {
+  public boolean forced;public java.util.function.Predicate<android.view.View> content;public java.util.function.IntPredicate type;
+  private androidx.recyclerview.widget.RecyclerView.Adapter adapter;
+  public interface Painter{void draw(android.graphics.Canvas c,android.graphics.RectF r,Float t,Float b,Float a);}
+  public BlurredRecyclerView(android.content.Context c){super(c);}
+  public void setForceSegmentedSettingsCards(boolean b){forced=b;}
+  public androidx.recyclerview.widget.RecyclerView.Adapter getAdapter(){return adapter;}
+  public void setAdapter(androidx.recyclerview.widget.RecyclerView.Adapter a){adapter=a;}
+  public void setSections(int p,float r,boolean top){}
+  public void setSections(java.util.function.Predicate<android.view.View> p,java.util.function.IntPredicate t,int pad,float r,Painter paint,boolean top){content=p;type=t;}
+  public void drawBackgroundRect(android.graphics.Canvas c,android.graphics.RectF r,float t,float b,float a){}
+ }''')
+ for name in ['TextInfoPrivacyCell','ShadowSectionCell','GraySectionCell','HeaderCell']:
+  emit('org/telegram/ui/Cells/'+name+'.java','package org.telegram.ui.Cells;public class '+name+' extends android.widget.TextView{public '+name+'(android.content.Context c){super(c);}}')
+ # Match the real float radius overload, otherwise Java selects a nonexistent int overload in this host.
+ p=dest/'org/telegram/ui/Components/RecyclerListView.java';s=p.read_text().replace('setSections(int a,int b,boolean c)','setSections(int a,float b,boolean c)');p.write_text(s)

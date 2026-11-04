@@ -36,8 +36,8 @@ public final class SettingsCategoryIcon extends Drawable implements Drawable.Cal
     @Override public void setAlpha(int alpha){this.alpha=alpha;invalidateSelf();}
     @Override public void setColorFilter(ColorFilter filter){} // Keep the native white symbol over the colour tile.
     @Override public int getOpacity(){return PixelFormat.TRANSLUCENT;}
-    @Override public int getIntrinsicWidth(){return AndroidUtilities.dp(32);}
-    @Override public int getIntrinsicHeight(){return AndroidUtilities.dp(32);}
+    @Override public int getIntrinsicWidth(){return AndroidUtilities.dp(SettingsCardStyle.ICON);}
+    @Override public int getIntrinsicHeight(){return AndroidUtilities.dp(SettingsCardStyle.ICON);}
     @Override public void invalidateDrawable(Drawable who){invalidateSelf();}
     @Override public void scheduleDrawable(Drawable who,Runnable what,long when){scheduleSelf(what,when);}
     @Override public void unscheduleDrawable(Drawable who,Runnable what){unscheduleSelf(what);}

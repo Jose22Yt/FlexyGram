@@ -1,10 +1,6 @@
 package app.flexygram.settings;
 
 import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.RectF;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,10 +12,10 @@ import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.RecyclerListView;
 import tw.nekomimi.nekogram.settings.BaseNekoSettingsActivity;
 
-/** Opt-in for General/Appearance only. No preference writes or changes to global Glass. */
+/** Shared grouped settings surfaces. No preference writes or changes to global Glass. */
 public abstract class SignatureMatteSettingsActivity extends BaseNekoSettingsActivity {
     @Override public org.telegram.ui.ActionBar.ActionBar createActionBar(Context context){org.telegram.ui.ActionBar.ActionBar bar=super.createActionBar(context);bar.centerTitle();return bar;}
-    protected int matteHeaderColor() { return getThemedColor(Theme.key_windowBackgroundWhiteGrayText2); }
+    protected int matteHeaderColor() { return getThemedColor(Theme.key_windowBackgroundWhiteBlueHeader); }
     @Override protected boolean usesSolidSettingsSurfaces() { return true; }
     @Override protected boolean needActionBarBlur() { return false; }
     @Override protected void setupAdaptiveBackground() {
@@ -83,27 +79,8 @@ public abstract class SignatureMatteSettingsActivity extends BaseNekoSettingsAct
     }
 
     private final class MatteSectionList extends SectionCardRecyclerView {
-        private final Paint fill = new Paint(Paint.ANTI_ALIAS_FLAG);
-        private final Path shape = new Path();
-        private final float[] corners = new float[8];
-
-        MatteSectionList(Context context) { super(context); }
+        MatteSectionList(Context context) { super(context); setCardResourcesProvider(SignatureMatteSettingsActivity.this.resourcesProvider); }
         @Override protected int measureBlurTopPadding() { return 0; }
 
-        @Override
-        public void drawBackgroundRect(Canvas canvas, RectF rect, float topRadius, float bottomRadius, float alpha) {
-            // Solid theme surface; preserve only the existing native section transition alpha.
-            fill.setColor(Theme.multAlpha(Theme.getColor(Theme.key_windowBackgroundWhite,
-                    SignatureMatteSettingsActivity.this.resourcesProvider) | 0xFF000000, alpha));
-            if (topRadius == bottomRadius) {
-                canvas.drawRoundRect(rect, topRadius, topRadius, fill);
-            } else {
-                shape.rewind();
-                corners[0] = corners[1] = corners[2] = corners[3] = topRadius;
-                corners[4] = corners[5] = corners[6] = corners[7] = bottomRadius;
-                shape.addRoundRect(rect, corners, Path.Direction.CW);
-                canvas.drawPath(shape, fill);
-            }
-        }
     }
 }

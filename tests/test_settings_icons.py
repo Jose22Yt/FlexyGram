@@ -23,6 +23,8 @@ def test_settings_icons_size_theme_and_recycling():
     stubs = {
         "android.util.SparseIntArray": "public class SparseIntArray {private java.util.Map<Integer,Integer> data=new java.util.HashMap<>();public int get(int k,int d){return data.getOrDefault(k,d);}public void put(int k,int v){data.put(k,v);}public void clear(){data.clear();}public int size(){return data.size();}}",
         "app.flexygram.settings.signature.SettingsCategoryIcon": "public class SettingsCategoryIcon {public static Integer create(android.content.Context c,int r){return r;}public static Integer create(android.content.Context c,int r,int t,int b){return r;}}",
+        "org.telegram.messenger.AndroidUtilities": "public class AndroidUtilities {public static int dp(float n){return (int)Math.ceil(n);}}",
+        "android.view.View": "public class View {public static class MeasureSpec {public static final int EXACTLY=1073741824;public static int makeMeasureSpec(int s,int m){return s|m;}public static int getSize(int s){return s&0x3fffffff;}}}",
         "android.graphics.Canvas": "public class Canvas {}",
         "android.graphics.PorterDuff": "public class PorterDuff {public enum Mode {SRC_IN}}",
         "android.graphics.PorterDuffColorFilter": "public class PorterDuffColorFilter {public int color;public PorterDuffColorFilter(int c,PorterDuff.Mode mode){color=c;}}",
@@ -39,9 +41,9 @@ def test_settings_icons_size_theme_and_recycling():
             public static int foreground=0xff17191c;
             public static int getColor(int key,ResourcesProvider provider){return foreground;}
         }""",
-        "org.telegram.ui.Cells.TextCell": """public class TextCell {
+        "org.telegram.ui.Cells.TextCell": """public class TextCell extends android.view.View {
             public static class Icon {
-                public Object background=new Object(),filter;public int padding=7;public float translation=2;public int resource;
+                public Object background=new Object(),filter;public int padding=7;public float translation=2;public int resource,size;public void measure(int w,int h){size=android.view.View.MeasureSpec.getSize(w);}
                 public void setImageDrawable(Integer id){resource=id;}public void setImageResource(int id){resource=id;}public void setBackground(Object b){background=b;}
                 public void setPadding(int a,int b,int c,int d){padding=a+b+c+d;}
                 public void setTranslationX(float value){translation=value;}
@@ -78,13 +80,13 @@ public class SettingsIconsRegression extends CompactSettingsTextCell {
         SettingsIconsRegression cell=new SettingsIconsRegression();
         cell.setTextAndIcon("Conversaciones",1000,true);cell.onMeasure(360,64);cell.dispatchDraw(new Canvas());
         require(cell.imageView.resource==R.drawable.fg_settings_chat,"replace known category with outline icon");
-        require(cell.width==32&&cell.imageLeft==20&&cell.offset==64,"normalize native colour tiles after binding");
+        require(cell.imageView.size==24&&cell.imageLeft==20&&cell.offset==60,"normalize native colour tiles after binding");
         require(cell.imageView.background==null&&cell.imageView.padding==0,"avoid duplicate image backgrounds and padding");
         Theme.foreground=0xfff1f3f5;cell.dispatchDraw(new Canvas());
         require(cell.imageView.resource==R.drawable.fg_settings_chat,"theme changes preserve the assigned native tile");
         cell.setTextAndValueAndIcon("Copias","Configurado",false,1001,true);
         cell.onMeasure(360,64);cell.dispatchDraw(new Canvas());
-        require(cell.width==32&&cell.imageView.resource==R.drawable.fg_settings_cloud,"recycling restores the semantic tile");
+        require(cell.imageView.size==24&&cell.imageView.resource==R.drawable.fg_settings_cloud,"recycling restores the semantic tile");
         require("Configurado".contentEquals(cell.value),"preserve setting values");
         cell.setTextAndIcon("Plugin",1002,false);require(cell.imageView.resource==1002,"preserve unfamiliar plugin icon semantics");
         require(SettingsIcons.resolve(new Context(),0)==0,"retain absent icons");
@@ -104,7 +106,7 @@ public class SettingsIconsRegression extends CompactSettingsTextCell {
             sources.append(str(path))
         main = temp / "SettingsIconsRegression.java"
         main.write_text(harness)
-        sources += [str(main), str(root / "java/app/exteraless/settings/utils/SettingsIcons.java"), str(root / "java/app/exteraless/settings/utils/CompactSettingsTextCell.java")]
+        sources += [str(main), str(root / "java/app/exteraless/settings/utils/SettingsIcons.java"), str(root / "java/app/exteraless/settings/utils/CompactSettingsTextCell.java"), str(root / "java/app/flexygram/settings/signature/SettingsCardStyle.java")]
         result = subprocess.run(["javac", "-d", directory, *sources], capture_output=True, text=True)
         assert result.returncode == 0, result.stderr
         result = subprocess.run(["java", "-cp", directory, "SettingsIconsRegression"], capture_output=True, text=True)

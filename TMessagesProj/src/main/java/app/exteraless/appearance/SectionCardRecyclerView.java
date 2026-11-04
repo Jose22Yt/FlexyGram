@@ -2,83 +2,40 @@ package app.exteraless.appearance;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Path;
 import android.graphics.RectF;
-
+import java.util.Objects;
+import app.flexygram.settings.signature.SettingsCardStyle;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.BlurredRecyclerView;
+import org.telegram.ui.Components.RecyclerListView;
 
-/**
- * openExtera: список настроек с единой скруглённой карточкой-секцией и мягкой тенью-elevation,
- * точно как в exteraGram 12.9.0.
- *
- * <p>Геометрию (группировку смежных ячеек в секцию, горизонтальные отступы, раздельные радиусы
- * top/bottom крайних ячеек, клип к области видимости) полностью обеспечивает уже присутствующий
- * в проекте штатный механизм {@code RecyclerListView} — {@code ListSectionsDecoration} +
- * {@code drawSectionsBackgrounds()}, включаемый через {@code listView.setSections(...)}. Он
- * вызывает {@link #drawBackgroundRect(Canvas, RectF, float, float, float)} для каждой секции,
- * рисуя фон ПОД ячейками (в {@code ItemDecoration.onDraw}, до контента).</p>
- *
- * <p>Единственное отличие от стока: штатный {@code drawBackgroundRect} рисует тень только при
- * глобальном флаге {@code SharedConfig.shadowsInSections} (по умолчанию выключен). Здесь тень
- * форсируется ЛОКАЛЬНО — только для экранов настроек exteraless/Neko — без правки глобального
- * {@code RecyclerListView} и без изменения глобального конфига. Порт логики
- * {@code RecyclerListView.drawBackgroundRect} один-в-один, но с всегда включённой тенью.</p>
- *
- * <p>При {@code AppearanceConfig.sectionRadius() <= 0} метод делегирует в {@code super} —
- * поведение полностью стоковое (без карточек/тени), дефолт-safe.</p>
- */
+/** Settings-only segmented cards. Native section grouping, clipping, touch and scrolling remain owners. */
 public class SectionCardRecyclerView extends BlurredRecyclerView {
-
-    private final Paint fillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint strokePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Path path = new Path();
-    private final float[] radii = new float[8];
-
-    // Тень-elevation включена всегда — именно она даёт «экстеровский» вид карточки.
-    private boolean forceShadows = true;
+    private final app.flexygram.settings.signature.SettingsCardBackground cardBackground = new app.flexygram.settings.signature.SettingsCardBackground();
 
     public SectionCardRecyclerView(Context context) {
         super(context);
+        setForceSegmentedSettingsCards(true);
+    }
+    public void setCardResourcesProvider(Theme.ResourcesProvider provider) { cardBackground.setResourcesProvider(provider); invalidate(); }
+    /** Source-compatible legacy hook. Grouped settings now use flat opaque cards. */
+    public void setForceShadows(boolean value) {}
+
+    @Override public void setSections(int padding, float radius, boolean topPadding) {
+        setSections(view -> !(view instanceof org.telegram.ui.Cells.TextInfoPrivacyCell
+                || view instanceof org.telegram.ui.Cells.ShadowSectionCell
+                || view instanceof org.telegram.ui.Cells.GraySectionCell
+                || view instanceof org.telegram.ui.Cells.HeaderCell
+                || view instanceof tw.nekomimi.nekogram.ui.cells.HeaderCell)
+                && !Objects.equals(view.getTag(), RecyclerListView.TAG_NOT_SECTION),
+            type -> getAdapter() instanceof app.flexygram.settings.signature.SettingsSectionTypes
+                && ((app.flexygram.settings.signature.SettingsSectionTypes)getAdapter()).isSettingsContentType(type),
+            AndroidUtilities.dp(SettingsCardStyle.INSET), AndroidUtilities.dp(SettingsCardStyle.OUTER_RADIUS),
+            this::drawBackgroundRect, topPadding);
     }
 
-    public void setForceShadows(boolean value) {
-        forceShadows = value;
-    }
-
-    /**
-     * Вызывается штатным {@code drawSectionsBackgrounds} как {@code drawSectionBackground}-колбэк
-     * (см. {@code setSections(..., this::drawBackgroundRect, ...)}). Рисует скруглённый фон секции
-     * цветом {@code key_windowBackgroundWhite} с тенью-elevation.
-     *
-     * <p>Внутри — только Canvas-примитивы и {@link Theme#getColor}/{@link Theme#multAlpha}; никаких
-     * виртуальных вызовов, ведущих обратно в отрисовку (иначе рекурсия/краш).</p>
-     */
-    @Override
-    public void drawBackgroundRect(Canvas canvas, RectF rect, float topRadius, float bottomRadius, float alpha) {
-        if (!forceShadows || AppearanceConfig.sectionRadius() <= 0) {
-            // Дефолт-safe: сток (тень по глобальному флагу; при радиусе 0 карточек фактически нет).
-            super.drawBackgroundRect(canvas, rect, topRadius, bottomRadius, alpha);
-            return;
-        }
-
-        strokePaint.setColor(0);
-        strokePaint.setShadowLayer(AndroidUtilities.dpf2(0.33f), 0, 0, Theme.multAlpha(0x0C000000, alpha));
-        fillPaint.setShadowLayer(AndroidUtilities.dpf2(2f), 0, AndroidUtilities.dpf2(0.33f), Theme.multAlpha(0x0A000000, alpha));
-        fillPaint.setColor(Theme.multAlpha(Theme.getColor(Theme.key_windowBackgroundWhite, resourcesProvider), alpha));
-
-        if (topRadius == bottomRadius) {
-            canvas.drawRoundRect(rect, topRadius, topRadius, strokePaint);
-            canvas.drawRoundRect(rect, topRadius, topRadius, fillPaint);
-        } else {
-            path.rewind();
-            radii[0] = radii[1] = radii[2] = radii[3] = topRadius;
-            radii[4] = radii[5] = radii[6] = radii[7] = bottomRadius;
-            path.addRoundRect(rect, radii, Path.Direction.CW);
-            canvas.drawPath(path, strokePaint);
-            canvas.drawPath(path, fillPaint);
-        }
+    @Override public void drawBackgroundRect(Canvas canvas, RectF rect, float topRadius, float bottomRadius, float alpha) {
+        cardBackground.draw(canvas,rect,topRadius,bottomRadius,alpha);
     }
 }

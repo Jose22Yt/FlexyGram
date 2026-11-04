@@ -165,7 +165,7 @@ public class PluginSettingsActivity extends BasePreferencesActivity {
         // пережить хук плагина, а хук срабатывает на возврате из fillItems.
         listView = new UniversalRecyclerView(this, this::fillItemsWithPermissions,
                 this::onClick, this::onLongClick);
-        listView.setSections();
+        app.flexygram.settings.signature.SettingsCardLists.apply(listView, getResourceProvider());
         listView.adapter.setApplyBackground(false);
         layoutManager = (LinearLayoutManager) listView.getLayoutManager();
         contentView.addView(listView,

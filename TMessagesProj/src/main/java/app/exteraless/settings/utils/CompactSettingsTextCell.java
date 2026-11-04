@@ -5,7 +5,7 @@ import android.content.Context;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Cells.TextCell;
 
-/** Settings-only navigation rows: 32dp native colour tiles, without changing touch targets. */
+/** Settings-only navigation rows: 24dp native colour tiles, without changing touch targets. */
 public class CompactSettingsTextCell extends TextCell {
 
     public CompactSettingsTextCell(Context context, Theme.ResourcesProvider resourcesProvider) {
@@ -48,11 +48,13 @@ public class CompactSettingsTextCell extends TextCell {
         // before its measurement, so large intrinsic drawables cannot enlarge the icon.
         setIsIcon(false);
         setImageLeft(20);
-        setOffsetFromImage(64);
+        setOffsetFromImage(60);
         imageView.setBackground(null);
         imageView.setPadding(0, 0, 0, 0);
         imageView.setTranslationX(0);
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        int size=org.telegram.messenger.AndroidUtilities.dp(app.flexygram.settings.signature.SettingsCardStyle.ICON);
+        imageView.measure(MeasureSpec.makeMeasureSpec(size,MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(size,MeasureSpec.EXACTLY));
     }
 
     private void styleIcon(int resource){

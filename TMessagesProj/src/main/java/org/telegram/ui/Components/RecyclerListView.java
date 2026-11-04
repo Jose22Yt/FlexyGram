@@ -3508,7 +3508,7 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
                         if (!first && this.parent.useSegmentedSections()
                                 && this.parent.isViewTypeSection != null
                                 && this.parent.isViewTypeSection.run(adapter.getItemViewType(position - 1))) {
-                            outRect.top += dp(2);
+                            outRect.top += this.parent.segmentGap();
                         }
                     }
                 }
@@ -3532,6 +3532,18 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
     }
 
     private boolean segmentedSectionsEnabled = true;
+    private boolean forceSegmentedSettingsCards;
+
+    /** Local to settings lists; does not write AppearanceConfig or alter other screens. */
+    public void setForceSegmentedSettingsCards(boolean force) {
+        if (forceSegmentedSettingsCards == force) return;
+        forceSegmentedSettingsCards = force;
+        invalidateItemDecorations();
+        invalidate();
+    }
+
+    private int segmentGap() { return dp(forceSegmentedSettingsCards ? 4 : 2); }
+
 
     public void setSegmentedSectionsEnabled(boolean enabled) {
         if (segmentedSectionsEnabled == enabled) {
@@ -3556,14 +3568,14 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
     private boolean useSegmentedSections() {
         return segmentedSectionsEnabled
                 && sectionsItemDecoration != null
-                && (app.exteraless.appearance.AppearanceConfig.dividerStyle()
+                && (forceSegmentedSettingsCards || app.exteraless.appearance.AppearanceConfig.dividerStyle()
                         == app.exteraless.appearance.AppearanceConfig.DIVIDER_SEGMENTS
                         || app.exteraless.appearance.M3ListItems.enabled());
     }
 
     /** Внутренний угол сегмента: у exteraGram min(радиус секции, 4dp). */
     private float segmentInnerRadius() {
-        return Math.min(sectionRadius, dp(4));
+        return Math.min(sectionRadius, dp(forceSegmentedSettingsCards ? 6 : 4));
     }
 
     private void drawSectionBackground(
@@ -3748,7 +3760,7 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
             SectionsDrawer.draw(sections, sectionRadius, (from, to, topRoundRadius, bottomRoundRadius, alpha) -> {
                 AndroidUtilities.rectTmp.set(getPaddingLeft() + sectionsItemDecoration.padding, from, getWidth() - sectionsItemDecoration.padding - getPaddingRight(), to);
                 drawSectionBackground.run(canvas, AndroidUtilities.rectTmp, topRoundRadius, bottomRoundRadius, alpha);
-            }, useSegmentedSections());
+            }, useSegmentedSections(), segmentInnerRadius(), segmentGap());
             sections.clear();
         } else if (useSegmentedSections()) {
             drawSegmentedSectionsBackgrounds(canvas);
@@ -3942,13 +3954,16 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
             child.getX() + child.getWidth(),
             Math.min(getHeight() - (applyPaddingToSections ? getPaddingBottom() : 0), bottom(child))
         );
-        if (prev && next && !forceRound) {
+        if (prev && next && !forceRound && !useSegmentedSections()) {
             prev = top(child) >= rect.top;
             next = bottom(child) <= rect.bottom;
             if (prev && next) return Theme.createRoundRectDrawable(0, Theme.getColor(Theme.key_windowBackgroundWhite, resourcesProvider));
         }
         final Path clipPath = new Path();
-        if (!prev && !next || forceRound) {
+        if (useSegmentedSections() && !forceRound) {
+            float top = getSegmentedSectionTopRadius(child, rect), bottom = getSegmentedSectionBottomRadius(child, rect);
+            clipPath.addRoundRect(rect, new float[]{top,top,top,top,bottom,bottom,bottom,bottom}, Path.Direction.CW);
+        } else if (!prev && !next || forceRound) {
             clipPath.rewind();
             // Та же таблетка, что и в clipChild.
             final float radius = isRoundSectionView(child) ? getSingleSectionRadius(rect) : sectionRadius;
@@ -4021,6 +4036,14 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
             Utilities.Callback5<Float, Float, Float, Float, Float> drawRoundRect,
             boolean segmented
         ) {
+            draw(sections, roundRadius, drawRoundRect, segmented, dp(4), dp(2));
+        }
+
+        public static void draw(
+            List<Section> sections, float roundRadius,
+            Utilities.Callback5<Float, Float, Float, Float, Float> drawRoundRect,
+            boolean segmented, float innerRadius, float segmentGap
+        ) {
             if (sections == null || sections.isEmpty()) return;
 
             Collections.sort(sections, (a, b) -> Float.compare(a.from, b.from));
@@ -4028,7 +4051,7 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
             groups.clear();
 
             if (segmented) {
-                drawSegmentedSections(sections, roundRadius, drawRoundRect);
+                drawSegmentedSections(sections, roundRadius, drawRoundRect, innerRadius, segmentGap);
                 return;
             }
 
@@ -4083,10 +4106,11 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
         private static void drawSegmentedSections(
             List<Section> sections,
             float roundRadius,
-            Utilities.Callback5<Float, Float, Float, Float, Float> drawRoundRect
+            Utilities.Callback5<Float, Float, Float, Float, Float> drawRoundRect,
+            float innerRadius, float gap
         ) {
-            final float inner = Math.min(roundRadius, dp(4));
-            final float tolerance = dp(2) + CONNECT_TOLERANCE;
+            final float inner = Math.min(roundRadius, innerRadius);
+            final float tolerance = gap + CONNECT_TOLERANCE;
             for (int i = 0; i < sections.size(); ++i) {
                 final Section section = sections.get(i);
                 if (section.alpha < 0.001f || section.to <= section.from) continue;

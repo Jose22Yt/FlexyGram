@@ -137,7 +137,7 @@ public class PluginsActivity extends BaseFragment {
                         && super.canHighlightChildAt(child, x, y);
             }
         };
-        listView.setSections();
+        app.flexygram.settings.signature.SettingsCardLists.apply(listView, getResourceProvider());
         listView.adapter.setApplyBackground(false);
         contentView.addView(listView,
                 LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
