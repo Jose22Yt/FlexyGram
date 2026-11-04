@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyMenuTitle">Message menu</string>
+    <string name="FlexyMenuList">Compact list</string>
+    <string name="FlexyMenuGrid">Quick actions</string>
+    <string name="FlexyMenuGroups">Grouped cards</string>
+    <string name="FlexyMenuToolbar">Toolbar and menu</string>
+    <string name="FlexyMenuActions">Visible actions</string>
+    <string name="FlexyMenuActionsInfo">Swipe and tap a preview to choose a design. Only actions available for the message appear. Other options remain in More. Reactions stay above the message; actions stay below.</string>
+    <string name="FlexyMenuSticker">Sticker</string>
+    <string name="FlexyMenuPin">Pin</string>
+    <string name="FlexyMenuReset">Reset</string>
+    <string name="FlexyMenuSelected">Selected</string>
+</resources>

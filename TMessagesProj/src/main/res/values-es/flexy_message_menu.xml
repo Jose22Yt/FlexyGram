@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyMenuTitle">Menú de mensajes</string>
+    <string name="FlexyMenuList">Lista compacta</string>
+    <string name="FlexyMenuGrid">Acciones rápidas</string>
+    <string name="FlexyMenuGroups">Tarjetas agrupadas</string>
+    <string name="FlexyMenuToolbar">Barra y menú</string>
+    <string name="FlexyMenuActions">Acciones visibles</string>
+    <string name="FlexyMenuActionsInfo">Desliza y toca una vista previa para elegir el diseño. Solo aparecen las acciones disponibles para cada mensaje. Las demás siguen en Más. Las reacciones van arriba del mensaje y las acciones debajo.</string>
+    <string name="FlexyMenuSticker">Sticker</string>
+    <string name="FlexyMenuPin">Fijar</string>
+    <string name="FlexyMenuReset">Restablecer</string>
+    <string name="FlexyMenuSelected">Seleccionado</string>
+</resources>

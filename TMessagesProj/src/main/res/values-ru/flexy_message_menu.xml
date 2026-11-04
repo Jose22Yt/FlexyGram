@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyMenuTitle">Меню сообщений</string>
+    <string name="FlexyMenuList">Компактный список</string>
+    <string name="FlexyMenuGrid">Быстрые действия</string>
+    <string name="FlexyMenuGroups">Группы карточек</string>
+    <string name="FlexyMenuToolbar">Панель и меню</string>
+    <string name="FlexyMenuActions">Видимые действия</string>
+    <string name="FlexyMenuActionsInfo">Листайте и нажмите на миниатюру, чтобы выбрать дизайн. Доступны только разрешённые действия. Остальные остаются в «Ещё». Реакции находятся над сообщением, действия — под ним.</string>
+    <string name="FlexyMenuSticker">Стикер</string>
+    <string name="FlexyMenuPin">Закрепить</string>
+    <string name="FlexyMenuReset">Сбросить</string>
+    <string name="FlexyMenuSelected">Выбрано</string>
+</resources>

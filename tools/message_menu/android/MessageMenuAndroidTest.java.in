@@ -1,0 +1,56 @@
+import android.app.*;import android.content.*;import android.graphics.*;import android.view.*;import android.widget.*;
+import app.flexygram.bubbles.interaction.*;import app.flexygram.bubbles.interaction.BubbleActionPanelView.Action;
+import app.flexygram.settings.SignatureMatteSettingsActivity;import org.telegram.ui.ActionBar.Theme;
+import java.util.*;import java.io.*;import java.lang.reflect.*;
+import org.junit.*;import static org.junit.Assert.*;import org.junit.runner.RunWith;import org.robolectric.*;import org.robolectric.annotation.*;
+@RunWith(RobolectricTestRunner.class) @Config(sdk=35,manifest=Config.NONE) @GraphicsMode(GraphicsMode.Mode.NATIVE)
+public class MessageMenuAndroidTest {
+ Activity activity;int dp(float n){return(int)(n*activity.getResources().getDisplayMetrics().density+.5f);}
+ @Before public void setup(){activity=Robolectric.buildActivity(Activity.class).setup().get();SignatureMatteSettingsActivity.activity=activity;activity.getSharedPreferences(BubbleMenuConfig.FILE,0).edit().clear().commit();BubbleInteractionSettings.reload();Theme.dark=false;}
+ @After public void finish(){activity.finish();}
+ void layout(View view,int width){view.measure(View.MeasureSpec.makeMeasureSpec(dp(width),View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(0,View.MeasureSpec.UNSPECIFIED));view.layout(0,0,view.getMeasuredWidth(),view.getMeasuredHeight());}
+ List<View> actions(View view){List<View> result=new ArrayList<>();if(view.getTag() instanceof Action)result.add(view);if(view instanceof ViewGroup){ViewGroup g=(ViewGroup)view;for(int i=0;i<g.getChildCount();i++)result.addAll(actions(g.getChildAt(i)));}return result;}
+ BubbleActionPanelView panel(int style,EnumSet<Action> permitted,EnumSet<Action> chosen){var panel=new BubbleActionPanelView(activity,null,style,chosen);panel.setAllowedActions(permitted);layout(panel,260);return panel;}
+ @Test public void choicesPersistAndNeverGrantUnavailableActions(){
+  for(int style=0;style<4;style++){BubbleMenuConfig.layout(activity,style);assertEquals(style,BubbleMenuConfig.layout(activity));assertTrue(BubbleInteractionSettings.signaturePanel(activity));}
+  BubbleMenuConfig.actions(activity,EnumSet.of(Action.COPY,Action.SAVE));assertEquals(EnumSet.of(Action.COPY,Action.SAVE),BubbleMenuConfig.actions(activity));
+  for(int style=0;style<4;style++){
+   var panel=panel(style,EnumSet.of(Action.REPLY,Action.COPY),BubbleMenuConfig.actions(activity));List<Action> clicked=new ArrayList<>();panel.setListener(clicked::add);
+   var rows=actions(panel);assertEquals(2,rows.size());for(View row:rows)row.performClick();assertEquals(EnumSet.of(Action.COPY,Action.MORE),EnumSet.copyOf(clicked));
+  }
+  activity.getSharedPreferences(BubbleMenuConfig.FILE,0).edit().putStringSet(BubbleMenuConfig.ACTIONS,Set.of("UNKNOWN","COPY")).commit();assertEquals(EnumSet.of(Action.COPY),BubbleMenuConfig.actions(activity));
+  BubbleMenuConfig.actions(activity,EnumSet.noneOf(Action.class));for(int style=0;style<4;style++)assertEquals(Action.MORE,actions(panel(style,EnumSet.allOf(Action.class),BubbleMenuConfig.actions(activity))).get(0).getTag());
+ }
+ @Test public void layoutsMatchGridGroupsAndToolbarAndStayLegibleInBothThemes()throws Exception{
+  for(boolean dark:new boolean[]{false,true})for(int style=0;style<4;style++){
+   Theme.dark=dark;var panel=panel(style,EnumSet.allOf(Action.class),BubbleMenuConfig.defaults());assertEquals(7,actions(panel).size());
+   if(style==BubbleMenuConfig.GROUPS){assertEquals(3,panel.getChildCount());assertEquals(2,actions(panel.getChildAt(0)).size());assertEquals(3,actions(panel.getChildAt(1)).size());assertEquals(2,actions(panel.getChildAt(2)).size());}
+   if(style==BubbleMenuConfig.GRID){assertEquals(2,panel.getChildCount());assertEquals(6,actions(panel.getChildAt(0)).size());assertEquals(Action.MORE,actions(panel.getChildAt(1)).get(0).getTag());}
+   if(style==BubbleMenuConfig.TOOLBAR){assertEquals(2,panel.getChildCount());assertEquals(List.of(Action.REPLY,Action.COPY,Action.FORWARD),actions(panel.getChildAt(0)).stream().map(v->(Action)v.getTag()).toList());}
+   for(View row:actions(panel)){assertTrue(row.getMeasuredHeight()>=dp(44));assertTrue(row.getWidth()>0);assertTrue(row.isClickable());assertNotNull(row.getContentDescription());}
+   Bitmap bitmap=Bitmap.createBitmap(panel.getWidth(),panel.getHeight(),Bitmap.Config.ARGB_8888);Canvas canvas=new Canvas(bitmap);canvas.drawColor(Theme.getColor(Theme.key_windowBackgroundGray));panel.draw(canvas);
+   try(var out=new FileOutputStream(new File(System.getProperty("probe.root"),"menu-"+style+"-"+(dark?"dark":"light")+"-native.png"))){assertTrue(bitmap.compress(Bitmap.CompressFormat.PNG,100,out));}bitmap.recycle();
+   panel.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);layout(panel,244);for(View row:actions(panel))assertTrue(row.getWidth()<=panel.getWidth());
+  }
+ }
+ @Test public void miniatureTapChoosesTheRealRendererWithoutRunningAnAction(){
+  var gallery=new BubbleMenuGallery(activity,null,()->{});layout(gallery,320);LinearLayout strip=(LinearLayout)gallery.getChildAt(0);assertEquals(4,strip.getChildCount());
+  for(int style=0;style<4;style++){strip.getChildAt(style).performClick();assertEquals(style,BubbleMenuConfig.layout(activity));for(int other=0;other<4;other++)assertEquals(style==other,strip.getChildAt(other).isSelected());}
+ }
+ List<CheckBox> checks(View view){List<CheckBox> result=new ArrayList<>();if(view instanceof CheckBox)result.add((CheckBox)view);if(view instanceof ViewGroup){ViewGroup g=(ViewGroup)view;for(int i=0;i<g.getChildCount();i++)result.addAll(checks(g.getChildAt(i)));}return result;}
+ @Test public void actionsDialogCancelApplyAndResetAreAtomic()throws Exception{
+  BubbleInteractionSettingsActivity page=new BubbleInteractionSettingsActivity();page.createView(activity);Field field=BubbleInteractionSettingsActivity.class.getDeclaredField("actionsRow");field.setAccessible(true);int position=field.getInt(page);
+  page.click(position);List<CheckBox> checks=checks(page.dialog.getWindow().getDecorView());assertEquals(Action.values().length-1,checks.size());checks.get(0).toggle();page.dialog.getButton(DialogInterface.BUTTON_NEGATIVE).performClick();Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();assertEquals(BubbleMenuConfig.defaults(),BubbleMenuConfig.actions(activity));
+  page.click(position);checks(page.dialog.getWindow().getDecorView()).get(0).toggle();page.dialog.getButton(DialogInterface.BUTTON_POSITIVE).performClick();Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();assertFalse(BubbleMenuConfig.actions(activity).contains(Action.REPLY));
+  page.click(position);page.dialog.getButton(DialogInterface.BUTTON_NEUTRAL).performClick();Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();assertEquals(BubbleMenuConfig.defaults(),BubbleMenuConfig.actions(activity));
+ }
+ @Test public void reactionsStayAboveTheCompleteBubbleAndMenuBelowEvenOnShortWindows(){
+  for(int style=0;style<4;style++)for(int available:new int[]{280,440,800})for(int height:new int[]{24,200,6000}){
+   var panel=panel(style,EnumSet.allOf(Action.class),BubbleMenuConfig.defaults());int menu=Math.min(panel.getMeasuredHeight(),available-72-32);int chrome=72+menu;
+   var placement=ContextPreviewPlacement.fit(600,height,100,100+available,chrome,72,8);
+   float bubbleTop=600+height*(1-placement.scale)*.5f+placement.offsetY,bubbleBottom=bubbleTop+height*placement.scale;
+   assertTrue(bubbleTop>=placement.popupY+64+8);assertTrue(bubbleBottom<=placement.popupY+72+placement.gapHeight+.01f);
+   assertTrue(placement.popupY+chrome+placement.gapHeight<=100+available);
+  }
+ }
+}

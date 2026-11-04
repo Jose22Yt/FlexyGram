@@ -47,7 +47,7 @@ public final class SignatureDirectSettingsActivity extends SignatureMatteSetting
     private void build(){
         switch(category){
             case "chat":
-                links(new String[]{"composer_style","header_style","bubble_style"},new int[]{R.string.FlexyInterfaceLower,R.string.FlexyInterfaceUpper,R.string.FlexyBubblesTitle},new int[]{R.drawable.fg_settings_chat,R.drawable.fg_settings_home,R.drawable.msg_discussion_solar});
+                links(new String[]{"composer_style","header_style","bubble_style","context"},new int[]{R.string.FlexyInterfaceLower,R.string.FlexyInterfaceUpper,R.string.FlexyBubblesTitle,R.string.FlexyMenuTitle},new int[]{R.drawable.fg_settings_chat,R.drawable.fg_settings_home,R.drawable.msg_discussion_solar,R.drawable.fg_settings_chat});
                 add(new app.flexygram.effects.GlareSettingsSection());
                 add(new app.flexygram.memberlens.MemberLensSettingsSection());
                 add(new app.flexygram.inlineconverter.InlineConversionSettingsSection());
@@ -56,7 +56,6 @@ public final class SignatureDirectSettingsActivity extends SignatureMatteSetting
                 add(scope(new OpenExteraChatsActivity(OpenExteraChatsActivity.SCREEN_MEDIA),"chats","media"));
                 add(scope(new OpenExteraChatsActivity(OpenExteraChatsActivity.SCREEN_SIGNATURE_STICKERS),"chats","stickers"));
                 extra("nc","messages_extra","media_extra","stickers_extra");extra("ng","media_extra","stickers_extra");extra("nx","media_extra","stickers_extra");
-                add(new app.flexygram.bubbles.interaction.BubbleInteractionSettingsActivity());
                 add(new app.flexygram.bubbles.deletion.MessageAnimationsActivity(true));break;
             case "home":
                 add(new app.flexygram.home.SmartPreviewsSettingsActivity());

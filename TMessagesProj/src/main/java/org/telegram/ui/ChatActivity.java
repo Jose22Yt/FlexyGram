@@ -32954,6 +32954,9 @@ public class ChatActivity extends BaseFragment implements
         if(lastMessageMenuStatus.allowEdit)actions.add(app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.EDIT);
         if(lastMessageMenuStatus.allowDelete)actions.add(app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.DELETE);
         if(options.contains(OPTION_PIN))actions.add(app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.PIN);
+        if(options.contains(OPTION_SHARE))actions.add(app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.SHARE);
+        if(options.contains(OPTION_COPY_LINK))actions.add(app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.LINK);
+        if(options.contains(OPTION_SAVE_TO_DOWNLOADS_OR_MUSIC)||options.contains(OPTION_SAVE_TO_GALLERY)||options.contains(OPTION_SAVE_TO_GALLERY2))actions.add(app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.SAVE);
         return actions;
     }
 
@@ -34570,8 +34573,14 @@ public class ChatActivity extends BaseFragment implements
                 final var admitted=signatureContextActions(options);
                 if (!admitted.isEmpty()) {
                     admitted.add(app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.SELECT);
-                    panel.setMinimumWidth(dp(220));
+                    panel.setMinimumWidth(dp(panel.presentation()==0?220:244));
                     panel.setAllowedActions(admitted);
+                    if(panel.presentation()!=0){
+                        // Each compact group owns its surface. Retain a non-null transparent
+                        // native drawable for popup hit testing and SwipeBack bounds.
+                        popupLayout.setBackground(null);
+                        popupLayout.setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(Color.TRANSPARENT));
+                    }
                     ArrayList<View> nativeItems=new ArrayList<>();
                     for(int i=0;i<popupLayout.getItemsCount();i++)nativeItems.add(popupLayout.getItemAt(i));
                     popupLayout.removeInnerViews();
@@ -34582,6 +34591,7 @@ public class ChatActivity extends BaseFragment implements
                     backToActions.setOnClickListener(view->popupLayout.getSwipeBack().closeForeground());nativeMenu.addView(backToActions);
                     for(View nativeItem:nativeItems)nativeMenu.addView(nativeItem);
                     android.widget.ScrollView nativeScroll=new android.widget.ScrollView(getParentActivity());nativeScroll.addView(nativeMenu);
+                    if(panel.presentation()!=0){android.graphics.drawable.GradientDrawable surface=new android.graphics.drawable.GradientDrawable();surface.setColor(getThemedColor(Theme.key_actionBarDefaultSubmenuBackground));surface.setCornerRadius(dp(20));nativeScroll.setBackground(surface);nativeScroll.setClipToOutline(true);}
                     final int nativeMenuIndex=popupLayout.addViewToSwipeBack(nativeScroll);
                     android.widget.ScrollView signatureActionsScroll=new android.widget.ScrollView(getParentActivity()) {
                         @Override protected void onMeasure(int widthSpec,int heightSpec) {
@@ -34590,6 +34600,7 @@ public class ChatActivity extends BaseFragment implements
                         }
                     };
                     signatureActionsScroll.setFillViewport(false);
+                    signatureActionsScroll.setVerticalScrollBarEnabled(false);
                     signatureActionsScroll.addView(panel);
                     popupLayout.addView(signatureActionsScroll);
                     panel.setListener(action->{
@@ -34597,6 +34608,12 @@ public class ChatActivity extends BaseFragment implements
                         if(action==app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.MORE){
                             popupLayout.getSwipeBack().openForeground(nativeMenuIndex);return;
                         }
+                        ArrayList<Integer> freshIcons=new ArrayList<>(),freshOptions=new ArrayList<>();
+                        ArrayList<CharSequence> freshItems=new ArrayList<>();
+                        fillMessageMenu(panelCell.getPrimaryMessageObject(),freshIcons,freshItems,freshOptions);
+                        var freshAllowed=signatureContextActions(freshOptions);
+                        freshAllowed.add(app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.SELECT);
+                        if(!freshAllowed.contains(action))return;
                         if(action==app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.SELECT){
                             createMenu(panelCell,false,false,x,y,false,true,false,false);return;
                         }
@@ -34605,10 +34622,6 @@ public class ChatActivity extends BaseFragment implements
                             app.flexygram.stickers.FlexyStickerSheet.show(ChatActivity.this,panelCell,panelMessage);
                             return;
                         }
-                        ArrayList<Integer> freshIcons=new ArrayList<>(),freshOptions=new ArrayList<>();
-                        ArrayList<CharSequence> freshItems=new ArrayList<>();
-                        fillMessageMenu(panelCell.getPrimaryMessageObject(),freshIcons,freshItems,freshOptions);
-                        if(!signatureContextActions(freshOptions).contains(action))return;
                         switch(action){
                             case REPLY:processSelectedOption(OPTION_REPLY);break;
                             case COPY:processSelectedOption(OPTION_COPY);break;
@@ -34616,6 +34629,9 @@ public class ChatActivity extends BaseFragment implements
                             case EDIT:processSelectedOption(OPTION_EDIT);break;
                             case PIN:processSelectedOption(OPTION_PIN);break;
                             case DELETE:processSelectedOption(OPTION_DELETE);break;
+                            case SHARE:processSelectedOption(OPTION_SHARE);break;
+                            case LINK:processSelectedOption(OPTION_COPY_LINK);break;
+                            case SAVE:processSelectedOption(freshOptions.contains(OPTION_SAVE_TO_DOWNLOADS_OR_MUSIC)?OPTION_SAVE_TO_DOWNLOADS_OR_MUSIC:freshOptions.contains(OPTION_SAVE_TO_GALLERY)?OPTION_SAVE_TO_GALLERY:OPTION_SAVE_TO_GALLERY2);break;
                         }
                     });
                 }
@@ -34734,7 +34750,7 @@ public class ChatActivity extends BaseFragment implements
                         }
                     });
 
-                    LinearLayout.LayoutParams params = LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, (int) (52 + reactionsLayout.getTopOffset() / AndroidUtilities.density + pad), Gravity.RIGHT, 0, compactContext ? 0 : 50, 0, -20);
+                    LinearLayout.LayoutParams params = LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, (int) (52 + reactionsLayout.getTopOffset() / AndroidUtilities.density + pad), Gravity.RIGHT, 0, compactContext ? 0 : 50, 0, compactContext ? 8 : -20);
                     scrimPopupContainerLayout.addView(reactionsLayout, params);
                     scrimPopupContainerLayout.setReactionsLayout(reactionsLayout);
                     scrimPopupContainerLayout.setClipChildren(false);
