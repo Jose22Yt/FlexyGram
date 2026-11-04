@@ -76,7 +76,11 @@ public class BubblePreviewVisualTest {
   Bitmap snapshot=((BitmapDrawable)helper.drawable()).getBitmap();assertTrue(snapshot.getAllocationByteCount()<=512*512*4);
   original.eraseColor(Color.RED);assertEquals(Color.BLUE,snapshot.getPixel(10,10));int stable=changes[0];
   for(int n=0;n<100;n++)helper.resize(360,240);
-  assertEquals(stable,changes[0]);assertEquals(0,Utilities.globalQueue.pending());helper.close();assertTrue(snapshot.isRecycled());assertFalse(original.isRecycled());original.recycle();
+  assertEquals(stable,changes[0]);assertEquals(0,Utilities.globalQueue.pending());
+  android.graphics.drawable.Drawable recorded=helper.drawable();helper.close();assertNull(helper.drawable());
+  assertFalse(snapshot.isRecycled());assertFalse(original.isRecycled());
+  Bitmap targetFrame=Bitmap.createBitmap(100,100,Bitmap.Config.ARGB_8888);recorded.setBounds(0,0,100,100);recorded.draw(new Canvas(targetFrame));
+  assertEquals(Color.BLUE,targetFrame.getPixel(10,10));targetFrame.recycle();original.recycle();
  }
  @Test public void fontScaleRtlAndDetachReleaseOnlyPreviewOwnedReferences(){
   try(var controller=Robolectric.buildActivity(Activity.class).setup()){

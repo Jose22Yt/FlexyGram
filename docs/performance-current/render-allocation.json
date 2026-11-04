@@ -1,0 +1,38 @@
+{
+  "geometry_comparisons": 2000,
+  "samples": [
+    {
+      "rows": 16,
+      "segmented": false,
+      "baseline_bytes_per_frame": 2432.0,
+      "candidate_bytes_per_frame": 1280.0
+    },
+    {
+      "rows": 16,
+      "segmented": true,
+      "baseline_bytes_per_frame": 512.0,
+      "candidate_bytes_per_frame": 0.0
+    },
+    {
+      "rows": 64,
+      "segmented": false,
+      "baseline_bytes_per_frame": 4896.0,
+      "candidate_bytes_per_frame": 0.0
+    },
+    {
+      "rows": 64,
+      "segmented": true,
+      "baseline_bytes_per_frame": 2336.0,
+      "candidate_bytes_per_frame": 0.0
+    }
+  ],
+  "baseline": "b0fbc63a810f07d8d99427982805926fa0f93d2c",
+  "source_sha256": "a3c84cdc86855c9fa5c67bb8ff1d11de73d148c9bea14e3390aaa1060fe1adb2",
+  "java": "openjdk 21.0.11 2026-04-21",
+  "warmup_iterations": 10000,
+  "measured_iterations": 10000,
+  "flags": [
+    "-Xbatch"
+  ],
+  "scope": "HotSpot JVM geometry/allocated bytes; Android Views, HWUI, FPS, PSS and thermal behavior NOT_MEASURED"
+}
