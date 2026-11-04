@@ -533,7 +533,9 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
         if (floating && child == getSubtitleTextView() && child.getVisibility() == VISIBLE) {
             var g = signatureHeader.fusionGeometry();
             boolean animate = android.os.Build.VERSION.SDK_INT < 26 || android.animation.ValueAnimator.areAnimatorsEnabled();
-            float progress = floatingStatusMotion.progress(android.os.SystemClock.uptimeMillis(), animate);
+            float progress = floatingStatusMotion.progress(android.os.SystemClock.uptimeMillis(), animate,
+                    app.flexygram.animation.FastMotionTiming.duration(
+                            app.flexygram.header.fusion.FloatingStatusMotion.DURATION_MS));
             statusSave = canvas.save();
             // Reveal from behind the main card without resizing/moving the chat or the native subtitle View.
             canvas.clipRect(0, g.center.bottom + signatureHeader.fusionTop, getWidth(), getHeight());

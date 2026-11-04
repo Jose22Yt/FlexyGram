@@ -46,6 +46,7 @@ def test_floating_geometry_keeps_name_on_whole_card_and_status_outside(tmp_path)
     probe(tmp_path, {'Probe.java': '''
 import app.flexygram.header.fusion.SignatureFusionGeometry;
 import app.flexygram.header.fusion.FloatingStatusMotion;
+import app.flexygram.animation.FastMotionTiming;
 import app.flexygram.studio.core.StudioSchema;
 public class Probe {
  static void check(boolean ok){if(!ok)throw new AssertionError();}
@@ -84,6 +85,15 @@ public class Probe {
   equal(last,1);equal(motion.progress(999999,true),1);
   motion.reset();equal(motion.progress(1000000,true),0);
   equal(motion.progress(1000010,false),1);equal(motion.progress(1000011,true),1);
+  for(boolean fast:new boolean[]{false,true})for(double scale:new double[]{0,.5,1,2}){
+   FastMotionTiming.setEnabled(fast);FastMotionTiming.setSystemScaleProvider(()->scale);
+   long duration=FastMotionTiming.duration(FloatingStatusMotion.DURATION_MS);
+   motion.reset();equal(motion.progress(1000,true,duration),0);
+   equal(motion.progress(1000+duration,true,duration),1);
+   equal(motion.progress(1000+duration+100,true,duration),1);
+  }
+  motion.reset();equal(motion.progress(0,false,220),1);
+  motion.reset();equal(motion.progress(0,true,0),1);
   Object style=StudioSchema.key("header","style").validate(4);
   check(Integer.valueOf(4).equals(style));
   try{StudioSchema.key("header","style").validate(5);throw new AssertionError();}
@@ -91,4 +101,5 @@ public class Probe {
  }
 }'''}, [JAVA/'app/flexygram/header/fusion/SignatureFusionGeometry.java',
         JAVA/'app/flexygram/header/fusion/FloatingStatusMotion.java',
+        JAVA/'app/flexygram/animation/FastMotionTiming.java',
         JAVA/'app/flexygram/studio/core/StudioSchema.java'])

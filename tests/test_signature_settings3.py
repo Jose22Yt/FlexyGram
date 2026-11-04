@@ -45,7 +45,7 @@ def test_root_native_colored_icons_and_single_registry():
 def test_direct_chat_preview_order_and_no_nested_scroll_views():
  text=method((S/'SignatureDirectSettingsActivity.java').read_text(),'private void build()')
  chat=text[text.index('case "chat":'):text.index('case "home":')]
- assert '"composer_style","header_style","bubble_style"' in chat
+ assert '"composer_style","header_style","bubble_style","context"' in chat
  assert 'add(new app.flexygram.header.HeaderSettingsActivity())' not in chat
  links=(S/'Settings3LinksSection.java').read_text()
  assert 'new ConversationStyleSettingsActivity(false)' in links and 'new ConversationStyleSettingsActivity(true)' in links
