@@ -104,7 +104,9 @@ def test_identity_and_distribution_inputs_are_unchanged():
     current=current.replace(b'android:name="org.telegram.ui.LaunchActivity"\n            android:theme="@style/Theme.FlexyGram.Start"',b'android:name="org.telegram.ui.LaunchActivity"\n            android:theme="@style/Theme.TMessages.Start"',1)
    if name=='gradle.properties':
     # Beta version advances independently; distribution identity/configuration remains protected.
-    current=current.replace(b'BETA_VERSION_NAME=1.0.0-beta.2',b'BETA_VERSION_NAME=1.0.0-beta.1').replace(b'BETA_VERSION_CODE=1291',b'BETA_VERSION_CODE=1290')
+    for prefix in (b'BETA_VERSION_NAME=',b'BETA_VERSION_CODE='):
+     baseline=next(line for line in original.split(b'\n') if line.startswith(prefix))
+     current=b'\n'.join(baseline if line.startswith(prefix) else line for line in current.split(b'\n'))
    assert current==original,name
   except subprocess.CalledProcessError:
    pass
