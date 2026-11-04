@@ -111,7 +111,7 @@ public class BaseNekoXSettingsActivity extends BaseFragment implements app.flexy
 
     protected BlurredRecyclerView createListView(Context context) {
         var list = new app.exteraless.appearance.SectionCardRecyclerView(context);
-        list.setCardResourcesProvider(resourcesProvider);
+        list.setCardResourcesProvider(getResourceProvider());
         return list;
     }
 

@@ -12,6 +12,21 @@ def method(text,anchor):
  while level:
   level+=(text[i]=='{')-(text[i]=='}');i+=1
  return text[start:i]
+def test_legacy_settings_card_creation_uses_the_fragment_provider_api(tmp_path):
+ # Compile the actual factory against BaseFragment's getter-only contract, then
+ # verify that a changed light/dark provider reaches each newly created list.
+ from test_render_work_reuse import probe
+ factory=method(source('tw/nekomimi/nekogram/settings/BaseNekoXSettingsActivity.java'),'protected BlurredRecyclerView createListView(Context context)')
+ files={
+  'android/content/Context.java':'package android.content;public class Context{}',
+  'org/telegram/ui/Components/BlurredRecyclerView.java':'package org.telegram.ui.Components;public class BlurredRecyclerView{}',
+  'app/exteraless/appearance/SectionCardRecyclerView.java':'package app.exteraless.appearance;public class SectionCardRecyclerView extends org.telegram.ui.Components.BlurredRecyclerView{public Object provider;public SectionCardRecyclerView(android.content.Context c){}public void setCardResourcesProvider(Object p){provider=p;}}',
+  'Probe.java':'''import android.content.Context;import org.telegram.ui.Components.BlurredRecyclerView;
+class FragmentHost{private Object resourceProvider;public Object getResourceProvider(){return resourceProvider;}public void setResourceProvider(Object p){resourceProvider=p;}}
+class SettingsHost extends FragmentHost {FACTORY}
+public class Probe{public static void main(String[]args){SettingsHost host=new SettingsHost();for(Object provider:new Object[]{new Object(),new Object(),null}){host.setResourceProvider(provider);app.exteraless.appearance.SectionCardRecyclerView list=(app.exteraless.appearance.SectionCardRecyclerView)host.createListView(new Context());if(list.provider!=provider)throw new AssertionError("Fragment theme provider was not forwarded");}}}'''.replace('FACTORY',factory),
+ }
+ probe(tmp_path,files,[])
 def test_exact_root_order_and_single_vector_family():
  text=(S/'Settings3Registry.java').read_text()
  rows=re.findall(r'new Entry\("(\w+)",R.string.Settings3Group_(\w+),R.string.Settings3_\w+,R.string.Settings3Desc_\w+,R.drawable.(\w+)\)',text)
