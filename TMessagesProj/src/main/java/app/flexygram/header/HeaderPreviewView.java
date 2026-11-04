@@ -57,8 +57,8 @@ public final class HeaderPreviewView extends View implements org.telegram.messen
     @Override protected void onMeasure(int widthSpec, int heightSpec) {
         if(Theme.dialogs_countTextPaint!=null)countText.set(Theme.dialogs_countTextPaint);else{countText.setTextSize(AndroidUtilities.dp(12));countText.setTypeface(AndroidUtilities.bold());}
         int width=MeasureSpec.getSize(widthSpec); var metrics=getResources().getDisplayMetrics();
-        titlePx=android.util.TypedValue.applyDimension(android.util.TypedValue.COMPLEX_UNIT_SP,previewFusion()||HeaderConfig.compact()?16f:17.5f,metrics);
-        subtitlePx=android.util.TypedValue.applyDimension(android.util.TypedValue.COMPLEX_UNIT_SP,12f,metrics);
+        titlePx=android.util.TypedValue.applyDimension(android.util.TypedValue.COMPLEX_UNIT_SP,previewFloating()?app.flexygram.header.fusion.SignatureFusionGeometry.FLOATING_TITLE_SP:previewFusion()||HeaderConfig.compact()?16f:17.5f,metrics);
+        subtitlePx=android.util.TypedValue.applyDimension(android.util.TypedValue.COMPLEX_UNIT_SP,previewFloating()?app.flexygram.header.fusion.SignatureFusionGeometry.FLOATING_SUBTITLE_SP:12f,metrics);
         text.setTextSize(titlePx); text.getFontMetricsInt(fontMetrics); int titleLine=fontMetrics.descent-fontMetrics.ascent;
         text.setTextSize(subtitlePx); text.getFontMetricsInt(fontMetrics); int subtitleLine=fontMetrics.descent-fontMetrics.ascent;
         fusionMode=false;
@@ -66,16 +66,14 @@ public final class HeaderPreviewView extends View implements org.telegram.messen
         if(previewFusion()){
             if(fusion==null)fusion=new FusionPreview(getContext());
             var g=previewFloating() ? app.flexygram.header.fusion.SignatureFusionGeometry.updateFloating(fusion.geometry,width/previewScale,AndroidUtilities.density,LocaleController.isRTL,true,0) : previewPortrait() ? app.flexygram.header.fusion.SignatureFusionGeometry.updatePortrait(fusion.geometry,width,AndroidUtilities.density,LocaleController.isRTL,true) : app.flexygram.header.fusion.SignatureFusionGeometry.update(fusion.geometry,width,AndroidUtilities.density,LocaleController.isRTL,true);
-            if(g.fits&&(previewFloating()?titleLine:titleLine+subtitleLine+AndroidUtilities.dp(2))<=g.height-AndroidUtilities.dp(8)){
+            if(g.fits&&(titleLine+subtitleLine+AndroidUtilities.dp(2))<=g.height-AndroidUtilities.dp(8)){
                 fusionMode=true;previewHeight=g.height;
-                int extra=previewFloating()?Math.round(app.flexygram.header.fusion.SignatureFusionGeometry.statusHeight(subtitleLine,AndroidUtilities.density))+AndroidUtilities.dp(8):0;
-                int h=Math.round(previewHeight)+extra+AndroidUtilities.dp(forcedStyle<0?80:40);setMeasuredDimension(width,Math.round(h*previewScale));fusionTop=(h-previewHeight-extra)/2;
+                int h=Math.round(previewHeight)+AndroidUtilities.dp(forcedStyle<0?80:40);setMeasuredDimension(width,Math.round(h*previewScale));fusionTop=(h-previewHeight)/2;
                 text.setTextSize(titlePx); scratchPaint.set(text); displayName=android.text.TextUtils.ellipsize(name,scratchPaint,g.text.width(),android.text.TextUtils.TruncateAt.END).toString();
                 fusionTitleX=app.flexygram.header.fusion.SignatureFusionGeometry.titleCenterX(
                         g, text.measureText(displayName));
                 text.setTextSize(subtitlePx); scratchPaint.set(text); displayStatus=android.text.TextUtils.ellipsize(previewFloating()?LocaleController.getString(R.string.FlexyHeaderFloatingPreviewStatus):status,scratchPaint,g.text.width(),android.text.TextUtils.TruncateAt.END).toString();
                 fusionStatusX=g.text.centerX();
-                if(previewFloating())app.flexygram.header.fusion.SignatureFusionGeometry.placeStatus(g,text.measureText(displayStatus),subtitleLine,AndroidUtilities.density);
                 fusion.clip.rewind();fusion.clip.addRoundRect(g.center.left,g.center.top,g.center.right,g.center.bottom,g.center.height()/2,g.center.height()/2,android.graphics.Path.Direction.CW);
                 // Preview contact has initials only: keep the initial in the small native left slot.
                 float placeholderW = Math.min(g.portrait.width(), AndroidUtilities.dp(73));
@@ -166,19 +164,15 @@ public final class HeaderPreviewView extends View implements org.telegram.messen
         if(previewFloating())canvas.drawRect(g.portrait.left,g.portrait.top,g.portrait.right,g.portrait.bottom,avatar);
         else canvas.drawCircle(g.portrait.centerX(),g.portrait.centerY(),g.portrait.height()*.5f,avatar);
         text.setTextSize(AndroidUtilities.dp(20));text.setColor(0xffffffff);
-        canvas.drawText("A",g.portrait.centerX(),g.portrait.centerY()+AndroidUtilities.dp(7),text);
+        float initialX=previewFloating()?(g.rtl?g.portrait.right-g.portrait.height()/2:g.portrait.left+g.portrait.height()/2):g.portrait.centerX();
+        canvas.drawText("A",initialX,g.portrait.centerY()+AndroidUtilities.dp(7),text);
         if(previewFloating())fusion.mask.finish(canvas,photoLayer,g.portrait.right,g.portrait.bottom,g.fadeStartX,g.fadeEndX,g.fadeSafeStop,g.rtl);
         canvas.restoreToCount(clip);
         text.setColor(color);text.setTextSize(titlePx);float th=text.descent()-text.ascent(),ta=text.ascent();text.setTextSize(subtitlePx);float sh=text.descent()-text.ascent();
         float top=g.text.centerY()-(th+sh+AndroidUtilities.dp(2))/2;
-        if(previewFloating()){
-            text.setTextSize(titlePx);canvas.drawText(displayName,g.center.centerX(),g.center.centerY()-(text.descent()+text.ascent())/2,text);
-            fusion.surface.drawStatus(canvas,g,fill,edge,d);
-            text.setTextSize(subtitlePx);text.setColor(Theme.getColor(Theme.key_actionBarDefaultSubtitle));
-            canvas.drawText(displayStatus,g.status.centerX(),g.status.centerY()-(text.descent()+text.ascent())/2,text);
-        }else{
-            text.setTextSize(titlePx);canvas.drawText(displayName,fusionTitleX,top-ta,text);text.setTextSize(subtitlePx);canvas.drawText(displayStatus,fusionStatusX,top+th+AndroidUtilities.dp(2)-text.ascent(),text);
-        }
+        text.setTextSize(titlePx);canvas.drawText(displayName,fusionTitleX,top-ta,text);
+        text.setTextSize(subtitlePx);text.setColor(previewFloating()?Theme.getColor(Theme.key_actionBarDefaultSubtitle):color);
+        canvas.drawText(displayStatus,fusionStatusX,top+th+AndroidUtilities.dp(2)-text.ascent(),text);
         int icon=AndroidUtilities.dp(24),x=Math.round(g.back.centerX()),y=Math.round(g.back.centerY());back.setBounds(x-icon/2,y-icon/2,x+icon/2,y+icon/2);
         int transform=canvas.save();if(g.rtl)canvas.scale(-1,1,g.back.centerX(),g.back.centerY());back.draw(canvas);canvas.restoreToCount(transform);
         x=Math.round(g.call.centerX());y=Math.round(g.call.centerY());fusion.phone.setBounds(x-icon/2,y-icon/2,x+icon/2,y+icon/2);fusion.phone.draw(canvas);

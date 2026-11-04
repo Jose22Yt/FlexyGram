@@ -42,7 +42,7 @@ public class Probe{
     }, [JAVA/'app/flexygram/header/HeaderConfig.java'])
 
 
-def test_floating_geometry_keeps_name_on_whole_card_and_status_outside(tmp_path):
+def test_floating_geometry_keeps_both_lines_inside_whole_card(tmp_path):
     probe(tmp_path, {'Probe.java': '''
 import app.flexygram.header.fusion.SignatureFusionGeometry;
 import app.flexygram.header.fusion.FloatingStatusMotion;
@@ -61,13 +61,14 @@ public class Probe {
      if(!g.fits)continue;
      equal(g.portrait.top,g.center.top);equal(g.portrait.bottom,g.center.bottom);
      equal(rtl?g.portrait.right:g.portrait.left,rtl?g.center.right:g.center.left);
-     check(g.portrait.width()>.5f*g.center.width()&&g.portrait.width()<.6f*g.center.width());
+     equal(g.center.height(),48*d);
+     equal(g.text.centerX(),g.center.centerX());
+     equal(g.text.top,g.center.top);equal(g.text.bottom,g.center.bottom);
+     check(g.portrait.width()>.8f*g.center.width()&&g.portrait.width()<.9f*g.center.width());
+     check(g.fadeStartX<g.center.centerX()&&g.fadeEndX>g.center.centerX());
+     check(g.status.width()==0&&g.status.height()==0);
      for(float text:new float[]{0,20,100,1000}){
       equal(SignatureFusionGeometry.titleCenterX(g,text*d),g.center.centerX());
-      SignatureFusionGeometry.placeStatus(g,text*d,20*d,d);
-      equal(g.status.centerX(),g.center.centerX());
-      equal(g.status.top-g.center.bottom,8*d);
-      check(g.status.width()<=g.center.width()+.01f&&g.status.height()>=24*d);
      }
      check(g.back.width()>=48*d&&g.more.width()==48*d);
      if(call)check(g.call.width()==48*d);

@@ -250,6 +250,12 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
                     }
 
                     StoriesUtilities.drawAvatarWithStory(dialogId, canvas, imageReceiver, params);
+                } else if (signatureFusionActive() && signatureHeader.fusionGeometry().floatingStatus
+                        && signatureFusionHasPhoto() && animatedEmojiDrawable == null) {
+                    if (signatureFloatingPhoto == null)
+                        signatureFloatingPhoto = new app.flexygram.header.fusion.SignatureFloatingPhoto();
+                    imageReceiver.setImageCoords(0, 0, getWidth(), getHeight());
+                    signatureFloatingPhoto.draw(canvas, imageReceiver, getWidth(), getHeight(), LocaleController.isRTL);
                 } else {
                     super.onDraw(canvas);
                 }
@@ -529,24 +535,6 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
     @Override
     protected boolean drawChild(@NonNull Canvas canvas, View child, long drawingTime) {
         final boolean floating = signatureFusionActive() && signatureHeader.fusionGeometry().floatingStatus;
-        int statusSave = 0;
-        if (floating && child == getSubtitleTextView() && child.getVisibility() == VISIBLE) {
-            var g = signatureHeader.fusionGeometry();
-            boolean animate = android.os.Build.VERSION.SDK_INT < 26 || android.animation.ValueAnimator.areAnimatorsEnabled();
-            float progress = floatingStatusMotion.progress(android.os.SystemClock.uptimeMillis(), animate,
-                    app.flexygram.animation.FastMotionTiming.duration(
-                            app.flexygram.header.fusion.FloatingStatusMotion.DURATION_MS));
-            statusSave = canvas.save();
-            // Reveal from behind the main card without resizing/moving the chat or the native subtitle View.
-            canvas.clipRect(0, g.center.bottom + signatureHeader.fusionTop, getWidth(), getHeight());
-            if (progress < 1f) {
-                canvas.saveLayerAlpha(g.status.left, g.center.bottom + signatureHeader.fusionTop,
-                        g.status.right, g.status.bottom + signatureHeader.fusionTop, Math.round(255 * progress));
-                canvas.translate(0, -(g.status.height() + dp(8)) * (1f - progress));
-                postInvalidateOnAnimation();
-            }
-            signatureHeader.drawStatusBackground(canvas);
-        }
         final boolean fusionPhoto = floating && child == avatarImageView && signatureFusionHasPhoto();
         int fusionSave = 0, fusionLayer = 0;
         if (fusionPhoto) {
@@ -601,7 +589,6 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
                     start, end, initials ? .9f : g.fadeSafeStop, g.rtl);
             canvas.restoreToCount(fusionSave);
         }
-        if (statusSave != 0) canvas.restoreToCount(statusSave);
         return b;
     }
 
@@ -896,14 +883,13 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
     private android.widget.ImageView signatureMore, signatureCall;
     private app.flexygram.header.fusion.SignatureFusionAvatarMask signaturePhotoMask;
     private android.graphics.Path signaturePhotoClip;
-    private boolean signatureMeasured, floatingWasActive;
-    private final app.flexygram.header.fusion.FloatingStatusMotion floatingStatusMotion = new app.flexygram.header.fusion.FloatingStatusMotion();
+    private boolean signatureMeasured;
+    private app.flexygram.header.fusion.SignatureFloatingPhoto signatureFloatingPhoto;
     protected boolean isSignatureCallAvailable() { return false; }
     protected void onSignatureCallClick() { }
     public boolean signatureCallAvailable() { return isSignatureCallAvailable(); }
     private boolean signatureFusionActive() { return signatureHeader != null && signatureHeader.fusionActive(); }
-    /** Keep Telegram's native initial/placeholder at the left (right for RTL).
-     * A genuinely loaded or requested picture still fills the full Fusion card.
+    /** Keep native initials at the edge; loaded/requested photos use the fading panel.
      * This does not request images, decode frames or allocate a second receiver.
      */
     private boolean signatureFusionHasPhoto() {
@@ -955,7 +941,6 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
         int width = MeasureSpec.getSize(widthMeasureSpec);
         boolean fusion = signatureFusionActive();
         boolean floating = fusion && signatureHeader.fusionGeometry().floatingStatus;
-        if (floating != floatingWasActive) { floatingStatusMotion.reset(); floatingWasActive = floating; }
         if (fusion) prepareFusionControls();
         if (signatureCall != null) signatureCall.setVisibility(fusion && signatureHeader.fusionGeometry().callAvailable ? VISIBLE : GONE);
         if (signatureMore != null) signatureMore.setVisibility(fusion ? VISIBLE : GONE);
@@ -1001,8 +986,7 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
         avatarImageView.layout(x, y, x + photo, y + photoHeight);
         View subtitle = getSubtitleTextView();
         int th = titleTextView.getMeasuredHeight(), sh = !signatureHeader.subtitleFits || subtitle.getVisibility() != VISIBLE ? 0 : subtitle.getMeasuredHeight();
-        boolean floating = fusion && signatureHeader.fusionGeometry().floatingStatus;
-        int textY = Math.round(title.centerY() - (th + (floating ? 0 : sh + (sh == 0 ? 0 : dp(2)))) / 2f);
+        int textY = Math.round(title.centerY() - (th + sh + (sh == 0 ? 0 : dp(2))) / 2f);
         // Floating centers on the entire card; existing styles keep their established text axis.
         float nameAxis = fusion
                 ? app.flexygram.header.fusion.SignatureFusionGeometry.titleCenterX(
@@ -1011,14 +995,7 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
         x = Math.round(nameAxis - titleTextView.getMeasuredWidth() / 2f);
         titleTextView.layout(x, textY, x + titleTextView.getMeasuredWidth(), textY + th);
         x = Math.round(title.centerX() - subtitle.getMeasuredWidth() / 2f);
-        if (floating) {
-            var g = signatureHeader.fusionGeometry();
-            app.flexygram.header.fusion.SignatureFusionGeometry.placeStatus(g, subtitle.getMeasuredWidth(), subtitle.getMeasuredHeight(), AndroidUtilities.density);
-            int statusY = Math.round(g.status.centerY() + signatureHeader.fusionTop - subtitle.getMeasuredHeight() / 2f);
-            subtitle.layout(x, statusY, x + subtitle.getMeasuredWidth(), statusY + subtitle.getMeasuredHeight());
-        } else {
-            subtitle.layout(x, textY + th + dp(2), x + subtitle.getMeasuredWidth(), textY + th + dp(2) + sh);
-        }
+        subtitle.layout(x, textY + th + dp(2), x + subtitle.getMeasuredWidth(), textY + th + dp(2) + sh);
         x = LocaleController.isRTL ? Math.round(title.left) + dp(2) : Math.round(title.right) - dp(34);
         if (fusion) {
             var g = signatureHeader.fusionGeometry(); float offset = signatureHeader.fusionTop;
@@ -1047,7 +1024,7 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
         if (signatureCall != null) signatureCall.setVisibility(GONE);
         if (signatureActive()) { signatureMeasured = true; measureSignature(widthMeasureSpec, heightMeasureSpec); return; }
         if (signatureMeasured) {
-            signatureMeasured = false; floatingWasActive = false; floatingStatusMotion.reset(); titleTextView.setPadding(0, dp(6), 0, dp(12));
+            signatureMeasured = false; titleTextView.setPadding(0, dp(6), 0, dp(12));
             getSubtitleTextView().setPadding(0, 0, isCentered() ? 0 : dp(10), 0); setGlassMode(); applyAvatarRadius(avatarSizeInDp, avatarRadiusForum, avatarRadiusHasStories);
             titleTextView.setGravity(isCentered() ? Gravity.CENTER_HORIZONTAL : Gravity.LEFT);
             if (subtitleTextView != null) subtitleTextView.setGravity(isCentered() ? Gravity.CENTER_HORIZONTAL : Gravity.LEFT);
@@ -1997,7 +1974,6 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        floatingStatusMotion.reset();
         if (parentFragment != null) {
             NotificationCenter.getInstance(currentAccount).addObserver(this, NotificationCenter.didUpdateConnectionState);
             NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.emojiLoaded);
@@ -2019,7 +1995,6 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        floatingStatusMotion.reset();
         if (boundMenu != null) {
             boundMenu.removeOnLayoutChangeListener(menuLayoutListener);
             boundMenu = null;

@@ -1,0 +1,79 @@
+/* Native Android controller/views + extracted production avatar geometry methods.
+ * ActionBar/navigation/theme/image decoding are explicit doubles. Not full chat/Poco acceptance. */
+import android.app.Activity;import android.content.*;import android.content.res.*;import android.graphics.*;import android.os.*;import android.util.DisplayMetrics;import android.view.*;import android.widget.*;
+import app.flexygram.header.*;import org.telegram.messenger.*;import org.telegram.ui.ActionBar.*;import org.telegram.ui.Components.ChatAvatarContainer;
+import org.junit.*;import org.junit.runner.RunWith;import org.robolectric.*;import org.robolectric.annotation.*;import static org.junit.Assert.*;
+@RunWith(RobolectricTestRunner.class) @Config(manifest=Config.NONE,sdk=35) @GraphicsMode(GraphicsMode.Mode.NATIVE)
+public class FloatingHeaderTest {
+ private Activity activity;private FrameLayout root;
+ @Before public void setup()throws Exception{activity=Robolectric.buildActivity(Activity.class).setup().get();root=new FrameLayout(activity);activity.setContentView(root);ApplicationLoader.applicationContext=activity;activity.getSharedPreferences("flexygram_header",0).edit().clear().commit();activity.getSharedPreferences("appearance",0).edit().clear().commit();HeaderConfig.load();AndroidUtilities.density=1;LocaleController.isRTL=false;Theme.dark=false;}
+ private Context context(float font)throws Exception{AssetManager assets=AssetManager.class.getDeclaredConstructor().newInstance();assertTrue((Integer)AssetManager.class.getMethod("addAssetPath",String.class).invoke(assets,System.getProperty("probe.root")+"/resources.ap_")>0);DisplayMetrics m=new DisplayMetrics();m.density=1;m.densityDpi=160;m.scaledDensity=font;Configuration config=new Configuration();config.fontScale=font;Resources r=new Resources(assets,m,config);R.drawable.ic_ab_back=r.getIdentifier("ic_ab_back","drawable","app.flexygram.visualprobe");R.drawable.ic_ab_other=r.getIdentifier("ic_ab_other","drawable","app.flexygram.visualprobe");R.drawable.msg_callback=r.getIdentifier("msg_callback","drawable","app.flexygram.visualprobe");assertTrue(R.drawable.ic_ab_back!=0&&R.drawable.ic_ab_other!=0&&R.drawable.msg_callback!=0);return new ContextWrapper(activity){@Override public Resources getResources(){return r;}};}
+ private void size(View view,int width){view.measure(View.MeasureSpec.makeMeasureSpec(width,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(0,View.MeasureSpec.UNSPECIFIED));view.layout(0,0,width,view.getMeasuredHeight());}
+ private Object field(Object target,String name)throws Exception{var f=target.getClass().getDeclaredField(name);f.setAccessible(true);return f.get(target);}
+ private void tap(View parent,float x,float y){MotionEvent down=MotionEvent.obtain(0,0,MotionEvent.ACTION_DOWN,x,y,0),up=MotionEvent.obtain(0,1,MotionEvent.ACTION_UP,x,y,0);parent.dispatchTouchEvent(down);parent.dispatchTouchEvent(up);down.recycle();up.recycle();org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();}
+ @Test public void floatingKeepsNativeStatusInsideCardAndBothLinesOnWholeCardAxis()throws Exception{
+  HeaderConfig.style(4);
+  for(boolean rtl:new boolean[]{false,true})for(boolean dark:new boolean[]{false,true})for(int width:new int[]{240,320,401,600})for(float font:new float[]{1,1.3f,2,3}){
+   Theme.dark=dark;LocaleController.isRTL=rtl;
+   ActionBar bar=new ActionBar(context(font));ChatAvatarContainer avatar=new ChatAvatarContainer(context(font));avatar.callable=true;
+   bar.addView(avatar,0,new FrameLayout.LayoutParams(-1,-1));SignatureChatHeader header=new SignatureChatHeader(bar,avatar,null);
+   bar.setSignatureHeader(header);avatar.setSignatureHeader(header);size(bar,width);
+   View title=(View)field(avatar,"titleTextView"),status=(View)field(avatar,"subtitleTextView");
+   if(!header.fusionActive()){
+    assertTrue(title.getTop()>=header.geometry.title.top-1);
+    assertTrue(status.getBottom()<=header.geometry.title.bottom+1);
+    assertTrue(title.getBottom()<=status.getTop());continue;
+   }
+   var g=header.fusionGeometry();
+   assertEquals(g.center.centerX(),title.getLeft()+title.getWidth()/2f,1);
+   assertEquals(g.center.centerX(),status.getLeft()+status.getWidth()/2f,1);
+   assertTrue(title.getTop()>=g.center.top+header.fusionTop-1);
+   assertTrue(status.getBottom()<=g.center.bottom+header.fusionTop+1);
+   assertTrue(title.getBottom()<=status.getTop());assertEquals(0,g.status.height(),0);
+   assertEquals(15*font,header.titlePx,.01);assertEquals(10*font,header.subtitlePx,.01);
+   assertTrue(g.fadeStartX<g.center.centerX()&&g.fadeEndX>g.center.centerX());
+   assertEquals("no detached status increases chat inset",84,bar.getMeasuredHeight());
+   Bitmap output=Bitmap.createBitmap(width,bar.getHeight(),Bitmap.Config.ARGB_8888);bar.draw(new Canvas(output));output.recycle();
+  }
+ }
+ @Test public void floatingPreviewSharesCenteredInlineLayoutAndCompactHeight()throws Exception{
+  for(boolean dark:new boolean[]{false,true})for(boolean rtl:new boolean[]{false,true})for(int width:new int[]{180,360,600}){
+   Theme.dark=dark;LocaleController.isRTL=rtl;
+   HeaderPreviewView preview=new HeaderPreviewView(context(1),4);size(preview,width);
+   Object fusion=field(preview,"fusion");var g=(app.flexygram.header.fusion.SignatureFusionGeometry.Layout)field(fusion,"geometry");
+   assertTrue((Boolean)field(preview,"fusionMode"));assertEquals(0,g.status.height(),0);
+   assertEquals(g.center.centerX(),(Float)field(preview,"fusionTitleX"),.01f);
+   assertEquals(g.center.centerX(),(Float)field(preview,"fusionStatusX"),.01f);
+   assertEquals(15,(Float)field(preview,"titlePx"),.01f);assertEquals(10,(Float)field(preview,"subtitlePx"),.01f);
+   assertEquals(Math.round(88*Math.min(1f,width/360f)),preview.getMeasuredHeight());
+   Bitmap output=Bitmap.createBitmap(width,preview.getHeight(),Bitmap.Config.ARGB_8888);preview.draw(new Canvas(output));output.recycle();
+  }
+ }
+ @Test public void fadeLeavesPhotoBehindCardCenterInBothThemesAndDirections(){
+  var mask=new app.flexygram.header.fusion.SignatureFusionAvatarMask();
+  for(boolean rtl:new boolean[]{false,true})for(int surface:new int[]{Color.WHITE,Color.BLACK}){
+   Bitmap result=Bitmap.createBitmap(200,48,Bitmap.Config.ARGB_8888);Canvas canvas=new Canvas(result);canvas.drawColor(surface);
+   int layer=mask.begin(canvas,0,0,164,48);Paint photo=new Paint();photo.setColor(Color.RED);canvas.drawRect(0,0,164,48,photo);
+   mask.finish(canvas,layer,164,48,164*.15f,164*.85f,.86f,rtl);
+   int center=rtl?64:100;assertNotEquals("photo continues behind centered labels",surface,result.getPixel(center,24));
+   assertEquals("fully transparent inner edge",surface,result.getPixel(rtl?0:163,24));result.recycle();
+  }
+ }
+ @Test public void fittedPhotoPreservesTopAndBottomAndRestoresNativeReceiverState(){
+  var renderer=new app.flexygram.header.fusion.SignatureFloatingPhoto();
+  for(boolean rtl:new boolean[]{false,true})for(int iw:new int[]{60,120,240}){
+   var receiver=new ImageReceiver();receiver.bitmap=Bitmap.createBitmap(iw,120,Bitmap.Config.ARGB_8888);
+   Canvas source=new Canvas(receiver.bitmap);Paint p=new Paint();p.setColor(Color.RED);source.drawRect(0,0,iw,20,p);p.setColor(Color.GREEN);source.drawRect(0,20,iw,100,p);p.setColor(Color.BLUE);source.drawRect(0,100,iw,120,p);
+   receiver.setImageCoords(7,9,11,13);receiver.setAspectFit(true);
+   Bitmap result=Bitmap.createBitmap(180,48,Bitmap.Config.ARGB_8888);Canvas canvas=new Canvas(result);int saves=canvas.getSaveCount();
+   renderer.draw(canvas,receiver,180,48,rtl);
+   assertEquals(saves,canvas.getSaveCount());assertTrue(receiver.isAspectFit());
+   assertEquals(7,receiver.getImageX(),0);assertEquals(9,receiver.getImageY(),0);assertEquals(11,receiver.getImageWidth(),0);assertEquals(13,receiver.getImageHeight(),0);
+   assertEquals(2,receiver.draws);float fitted=app.flexygram.header.fusion.SignatureFloatingPhoto.fittedWidth(180,48,iw,120);
+   int x=(int)(rtl?180-fitted*.5f:fitted*.5f);
+   assertEquals("whole top preserved",Color.RED,result.getPixel(x,4));
+   assertEquals("whole bottom preserved",Color.BLUE,result.getPixel(x,44));
+   result.recycle();receiver.bitmap.recycle();
+  }
+ }
+}

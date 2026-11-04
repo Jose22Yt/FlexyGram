@@ -21,6 +21,9 @@ public final class SignatureFusionGeometry {
     public static final float ACTION_VISUAL_WIDTH_DP = 84f;
     public static final float ONE_ACTION_VISUAL_WIDTH_DP = 40f;
     public static final float CENTER_HEIGHT_DP = 46f;
+    public static final float FLOATING_HEIGHT_DP = 48f;
+    public static final float FLOATING_TITLE_SP = 15f;
+    public static final float FLOATING_SUBTITLE_SP = 10f;
     public static final float MAX_CENTER_WIDTH_DP = 320f;
     public static final float MIN_CENTER_WIDTH_DP = 124f;
     public static final float TEXT_RIGHT_PAD_DP = 10f;
@@ -162,32 +165,27 @@ public final class SignatureFusionGeometry {
         return g;
     }
 
-    /** Full-height edge photo, true full-card name axis and a separate status island. */
+    /** Edge photo fading behind a two-line block centered on the whole card.
+     * floatingStatus identifies persisted style 4; its status is now inline.
+     */
     public static Layout updateFloating(Layout g, float width, float density, boolean rtl,
                                         boolean callAvailable, float backExtraPx) {
         update(g, width, density, rtl, callAvailable, backExtraPx);
         g.floatingStatus = true;
-        float photoWidth = g.center.width() * .56f;
+        g.height = FLOATING_HEIGHT_DP * density;
+        g.center.set(g.center.left, 0, g.center.right, g.height);
+        float photoWidth = g.center.width() * .82f;
         float left = rtl ? g.center.right - photoWidth : g.center.left;
         g.portrait.set(left, g.center.top, left + photoWidth, g.center.bottom);
         g.text.set(g.center.left + 10f * density, g.center.top,
                 g.center.right - 10f * density, g.center.bottom);
-        g.fadeStartX = g.portrait.left;
-        g.fadeEndX = g.portrait.right;
-        g.fadeSafeStop = .70f;
+        // Fade geometry belongs to the photo, never the measured text. It crosses
+        // the card's center even for short names, long names and RTL locales.
+        g.fadeStartX = g.portrait.left + photoWidth * .15f;
+        g.fadeEndX = g.portrait.right - photoWidth * .15f;
+        g.fadeSafeStop = .86f;
+        g.fits = g.center.width() >= MIN_CENTER_WIDTH_DP * density;
         return g;
-    }
-
-    public static float statusHeight(float textHeight, float density) {
-        return Math.max(24f * density, textHeight + 6f * density);
-    }
-
-    /** Gap is reserved before animation; opening never changes the chat viewport. */
-    public static void placeStatus(Layout g, float textWidth, float textHeight, float density) {
-        float width = Math.min(g.center.width(), Math.max(32f * density, textWidth + 20f * density));
-        float top = g.center.bottom + 8f * density;
-        g.status.set(g.center.centerX() - width * .5f, top,
-                g.center.centerX() + width * .5f, top + statusHeight(textHeight, density));
     }
 
     /** Split only the painted back island; the reserved native touch rectangle stays unchanged. */

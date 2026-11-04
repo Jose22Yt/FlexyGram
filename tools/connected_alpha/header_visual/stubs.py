@@ -24,11 +24,34 @@ def write_stubs(source,root):
  t=source/'org/telegram/ui/ActionBar/Theme.java';s=t.read_text();keys=set(re.findall(r'Theme.(key_\w+)',code))-set(re.findall(r'int (key_\w+)=',s));s=s.replace('public static boolean dark;', ''.join('public static final int '+n+'='+str(2000+i)+';'for i,n in enumerate(sorted(keys)))+'public static boolean dark;');s=s.replace('public static int getColor(int k,ResourcesProvider r){','public static int getColor(int k){return getColor(k,null);}public static int getColor(int k,ResourcesProvider r){if(k==key_actionBarDefaultTitle)return dark?0xffeeeeee:0xff152c3e;if(k==key_actionBarDefaultSubtitle)return dark?0xffb0bac5:0xff5b6875;if(k==key_divider)return dark?0xff899099:0xff9babb9;');s=s.replace('public static int getColor(int k){','public static android.graphics.drawable.Drawable createSimpleSelectorRoundRectDrawable(float r,int fill,int selected){android.graphics.drawable.GradientDrawable d=new android.graphics.drawable.GradientDrawable();d.setColor(fill);d.setCornerRadius(r);return d;}public static int getColor(int k){');s=s.replace('public static boolean dark;', 'public static final android.text.TextPaint dialogs_countTextPaint=new android.text.TextPaint(3);static{dialogs_countTextPaint.setTextSize(14);}public static final android.graphics.Paint PAINT_CLEAR=new android.graphics.Paint();public static boolean dark;');t.write_text(s)
  a=source/'org/telegram/messenger/AndroidUtilities.java';s=a.read_text().replace('public class AndroidUtilities {','public class AndroidUtilities {public static final android.graphics.RectF rectTmp=new android.graphics.RectF();private static final android.os.Handler handler=new android.os.Handler(android.os.Looper.getMainLooper());public static void cancelRunOnUIThread(Runnable r){handler.removeCallbacks(r);}public static void runOnUIThread(Runnable r,long delay){handler.postDelayed(r,delay);}') ;a.write_text(s)
  l=source/'org/telegram/messenger/LocaleController.java';s=l.read_text().replace('public class LocaleController {','public class LocaleController {public static boolean isRTL;public static String formatString(int id,Object... args){return "Unread: "+args[0];}');s=s.replace('public static String getString(int id){','public static String getString(int id){if(id==R.string.FlexyHeaderPreviewName)return "Alex";if(id==R.string.Online)return "online";');l.write_text(s)
+ # Native decoder/network are a double; Android canvas and production fit/masks remain real.
+ put('org/telegram/messenger/SharedConfig.java','package org.telegram.messenger;public class SharedConfig{public static boolean chatBlurEnabled(){return true;}}')
+ put('androidx/recyclerview/widget/RecyclerView.java','package androidx.recyclerview.widget;public class RecyclerView{public static class LayoutParams extends android.view.ViewGroup.LayoutParams{public LayoutParams(int w,int h){super(w,h);}}}')
+ put('app/flexygram/preview/SignatureWallpaperPreview.java','package app.flexygram.preview;public class SignatureWallpaperPreview{public SignatureWallpaperPreview(android.view.View v,Object o,Runnable r){}public void attach(){}public void close(){}public void resize(int w,int h){}public void refresh(){}public void draw(android.graphics.Canvas c){}}')
+ put('org/telegram/ui/ActionBar/BackDrawable.java','package org.telegram.ui.ActionBar;public class BackDrawable extends android.graphics.drawable.ColorDrawable{public void setIosStyle(boolean b){}}')
+ n=source/'org/telegram/messenger/NotificationCenter.java';n.write_text(n.read_text().replace('public class NotificationCenter {','public class NotificationCenter {public static final int didApplyNewTheme=9101,didSetNewWallpapper=9102;'))
+ put('org/telegram/messenger/ImageReceiver.java','''package org.telegram.messenger;
+public class ImageReceiver {
+ public android.graphics.Bitmap bitmap;public boolean fit;public float x,y,w=1,h=1;public int draws;
+ private final android.graphics.Paint paint=new android.graphics.Paint(3);
+ private final android.graphics.RectF target=new android.graphics.RectF();
+ public boolean isAspectFit(){return fit;}public void setAspectFit(boolean b){fit=b;}
+ public float getImageX(){return x;}public float getImageY(){return y;}public float getImageWidth(){return w;}public float getImageHeight(){return h;}
+ public int getBitmapWidth(){return bitmap==null?200:bitmap.getWidth();}public int getBitmapHeight(){return bitmap==null?200:bitmap.getHeight();}
+ public void setImageCoords(float a,float b,float c,float d){x=a;y=b;w=c;h=d;}
+ public void draw(android.graphics.Canvas c){draws++;if(bitmap==null){paint.setColor(0xff2288cc);c.drawRect(x,y,x+w,y+h,paint);return;}
+  float scale=fit?Math.min(w/bitmap.getWidth(),h/bitmap.getHeight()):Math.max(w/bitmap.getWidth(),h/bitmap.getHeight());
+  float dw=bitmap.getWidth()*scale,dh=bitmap.getHeight()*scale;
+  target.set(x+(w-dw)/2,y+(h-dh)/2,x+(w+dw)/2,y+(h+dh)/2);
+  int save=c.save();c.clipRect(x,y,x+w,y+h);c.drawBitmap(bitmap,null,target,paint);c.restoreToCount(save);
+ }
+}''')
  put('org/telegram/messenger/ApplicationLoader.java','package org.telegram.messenger;public class ApplicationLoader {public static android.content.Context applicationContext;}')
  put('app/exteraless/appearance/AppearanceConfig.java','package app.exteraless.appearance;public class AppearanceConfig {public static android.content.SharedPreferences getPreferences(){return org.telegram.messenger.ApplicationLoader.applicationContext.getSharedPreferences("appearance",0);}}')
  put('org/telegram/ui/ActionBar/ActionBar.java','''package org.telegram.ui.ActionBar;
 import android.content.Context;import android.graphics.Canvas;import android.widget.*;import android.view.*;import app.flexygram.header.*;
 public class ActionBar extends FrameLayout{
+ public android.graphics.drawable.Drawable getBackButtonDrawable(){return null;}
  public void prepareSignatureNativeGlass(boolean separate){}
  public void prepareSignatureUnreadGlass(boolean separate){}
  public boolean nativeGlass;
