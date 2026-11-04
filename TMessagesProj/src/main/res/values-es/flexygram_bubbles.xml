@@ -44,4 +44,7 @@
     <string name="FlexyBubbleFuseGlass">Fusionar borde glass</string>
     <string name="FlexyBubbleOriginal">Original</string>
     <string name="FlexyBubbleGlassOriginal">Glass Original</string>
+    <string name="FlexyBubbleAppearanceSection">Apariencia</string>
+    <string name="FlexyBubbleBorderSection">Borde</string>
+    <string name="FlexyBubbleFusionSection">Fusión</string>
 </resources>

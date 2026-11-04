@@ -24,7 +24,6 @@ public final class SignatureWallpaperPreview {
     private final WeakReference<Drawable> contextual;
     private final Rect bounds = new Rect();
     private Drawable drawable;
-    private Bitmap owned;
     private Runnable task;
     private int generation;
     private boolean attached;
@@ -36,13 +35,14 @@ public final class SignatureWallpaperPreview {
     public Drawable drawable() { return drawable; }
     public void attach() { attached = true; refresh(); }
     public void refresh() {
+        if (!attached) return;
         int token = ++generation;
         if (task != null) { Utilities.globalQueue.cancelRunnable(task); task = null; }
         Drawable source = contextual.get();
         if (source == null) source = Theme.getCachedWallpaperNonBlocking();
         if (source == null) {
             Theme.loadWallpaper(true); // Native asynchronous loader also supplies the default wallpaper.
-            publish(null, null); return;
+            publish(null); return;
         }
         final int shade = source instanceof ChatBackgroundDrawable
                 ? Math.max(0, Math.min(255, Math.round(((ChatBackgroundDrawable) source).getDimAmount() * 255))) : 0;
@@ -60,12 +60,12 @@ public final class SignatureWallpaperPreview {
             int i = 0;
             for (int color : palette) if (color != 0) colors[i++] = color;
             publish(count > 1 ? new GradientDrawable(GradientDrawable.Orientation.TL_BR, colors)
-                    : count == 1 ? new ColorDrawable(colors[0]) : null, null);
+                    : count == 1 ? new ColorDrawable(colors[0]) : null);
             return;
         }
         if (source instanceof MotionBackgroundDrawable || source instanceof AnimatedFileDrawable || shade > 0) {
             // Freeze one bounded frame off the UI thread; never attach or start the source renderer.
-            publish(null, null);
+            publish(null);
             if (!attached || frame == null || frame.isRecycled()) return;
             task = () -> {
                 Bitmap snapshot = null;
@@ -84,7 +84,7 @@ public final class SignatureWallpaperPreview {
                 AndroidUtilities.runOnUIThread(() -> {
                     if (!attached || token != generation) { if (ready != null) ready.recycle(); return; }
                     task = null;
-                    publish(ready == null ? null : new BitmapDrawable(view.getResources(), ready), ready);
+                    publish(ready == null ? null : new BitmapDrawable(view.getResources(), ready));
                 });
             };
             Utilities.globalQueue.postRunnable(task);
@@ -93,14 +93,14 @@ public final class SignatureWallpaperPreview {
         Drawable still = source != null && source.getConstantState() != null
                 ? source.getConstantState().newDrawable(view.getResources()).mutate() : null;
         if (still instanceof BitmapDrawable) ((BitmapDrawable) still).setFilterBitmap(true);
-        publish(still, null);
+        publish(still);
     }
-    private void publish(Drawable next, Bitmap bitmap) {
-        Bitmap previous = owned;
-        drawable = next; owned = bitmap;
+    private void publish(Drawable next) {
+        // HWUI may still hold the previous bitmap in a recorded draw. Release our reference;
+        // unpublished canceled results above can be recycled because no renderer has seen them.
+        drawable = next;
         resize(view.getWidth(), view.getHeight());
         changed.run();
-        if (previous != null && previous != bitmap) previous.recycle();
     }
     public void resize(int width, int height) {
         if (drawable == null || width <= 0 || height <= 0) return;
@@ -120,6 +120,5 @@ public final class SignatureWallpaperPreview {
         attached = false; generation++;
         if (task != null) Utilities.globalQueue.cancelRunnable(task);
         task = null; drawable = null;
-        if (owned != null) { owned.recycle(); owned = null; }
     }
 }

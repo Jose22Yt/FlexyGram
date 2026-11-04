@@ -17,4 +17,11 @@
   <string name="FlexyComposerIcons">Apariencia de los iconos</string>
   <string name="FlexyComposerReferenceIcons">Referencia · clip y círculo plegado</string>
   <string name="FlexyComposerSmileIcons">Más y sonrisa</string>
+  <string name="FlexyComposerLayoutSection">Distribución</string>
+  <string name="FlexyComposerSizeNormal">Normal</string>
+  <string name="FlexyComposerSizeVeryCompact">Muy compacto</string>
+  <string name="FlexyComposerPositionNeutral">Posición original</string>
+  <string name="FlexyComposerPositionUp">%1$d dp más arriba</string>
+  <string name="FlexyComposerPositionDown">%1$d dp más abajo</string>
+  <string name="FlexyComposerAdjustmentsInfo">El tamaño y la posición se aplican al diseño Compacta. La entrada de texto y sus botones circulares se mueven juntos, conservando las zonas táctiles y el espacio sobre el teclado.</string>
 </resources>

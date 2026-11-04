@@ -178,12 +178,19 @@ public final class FlexyComposerSettingsActivity extends BaseNekoSettingsActivit
             icon.setBounds(Math.round(x)-half, Math.round(y)-half, Math.round(x)+half, Math.round(y)+half);
             icon.draw(canvas);
         }
-        @Override protected void onMeasure(int w, int h) { setMeasuredDimension(MeasureSpec.getSize(w), dp(96)); }
+        @Override protected void onMeasure(int w, int h) { setMeasuredDimension(MeasureSpec.getSize(w), dp(forcedStyle>=0?64:96)); }
         @Override protected void onDraw(Canvas c) {
             c.drawColor(getThemedColor(Theme.key_windowBackgroundGray));
             wallpaperPreview.draw(c);
+            int save=c.save();
+            float scale=forcedStyle>=0?.8f:1f;
+            c.scale(scale,scale);
+            drawComposer(c,getWidth()/scale,getHeight()/scale);
+            c.restoreToCount(save);
+        }
+        private void drawComposer(Canvas c,float width,float height) {
             if (forcedStyle == FlexyComposerConfig.CLASSIC || forcedStyle < 0 && !FlexyComposerConfig.compact()) {
-                float y=dp(48), radius=dp(22), end=getWidth()-dp(36);
+                float y=height/2, radius=dp(22), end=width-dp(36);
                 paint.setColor(getThemedColor(Theme.key_chat_messagePanelBackground));
                 c.drawRoundRect(dp(6),y-radius,end-dp(30),y+radius,radius,radius,paint);
                 paint.setColor(getThemedColor(Theme.key_chat_messagePanelSend));c.drawCircle(end,y,radius,paint);
@@ -195,12 +202,13 @@ public final class FlexyComposerSettingsActivity extends BaseNekoSettingsActivit
                 c.drawText(getString(R.string.TypeMessage),dp(53),y-(paint.ascent()+paint.descent())/2,paint);c.restoreToCount(save);return;
             }
             int level = FlexyComposerConfig.level(); float radius = dp(ComposerStyle.diameter(level)) / 2f;
-            float y = dp(54 - ComposerStyle.offset(FlexyComposerConfig.position())), gap = dp(FlexyComposerConfig.gap());
+            float y = forcedStyle>=0 ? height/2-dp(FlexyComposerConfig.position()) : dp(54 - ComposerStyle.offset(FlexyComposerConfig.position()));
+            float gap = dp(FlexyComposerConfig.gap());
             boolean dark = ColorUtils.calculateLuminance(getThemedColor(Theme.key_chat_messagePanelBackground)) < 0.4;
             int surface = ComposerStyle.surface(dark, FlexyComposerConfig.glass()), ink = ComposerStyle.icon(dark);
             paint.setColor(surface);
-            float side = ComposerStyle.sideMargin(getWidth(), org.telegram.messenger.AndroidUtilities.density, dp(7));
-            float left = side + dp(22), right = getWidth() - side - dp(22);
+            float side = ComposerStyle.sideMargin(Math.round(width), org.telegram.messenger.AndroidUtilities.density, dp(7));
+            float left = side + dp(22), right = width - side - dp(22);
             c.drawCircle(left,y,radius,paint); c.drawCircle(right,y,radius,paint);
             c.drawRoundRect(left+radius+gap,y-radius,right-radius-gap,y+radius,radius,radius,paint);
             icon(c, FlexyComposerConfig.referenceIcons() ? clip : plus, left, y, ink); icon(c, voice, right, y, ink);

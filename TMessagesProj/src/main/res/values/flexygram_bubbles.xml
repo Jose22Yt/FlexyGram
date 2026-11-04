@@ -44,4 +44,7 @@
     <string name="FlexyBubbleFuseGlass">Blend glass border</string>
     <string name="FlexyBubbleOriginal">Original</string>
     <string name="FlexyBubbleGlassOriginal">Glass Original</string>
+    <string name="FlexyBubbleAppearanceSection">Appearance</string>
+    <string name="FlexyBubbleBorderSection">Border</string>
+    <string name="FlexyBubbleFusionSection">Fusion</string>
 </resources>

@@ -29,7 +29,7 @@ public final class HeaderPreviewView extends View implements org.telegram.messen
     }
     private FusionPreview fusion;
     private boolean fusionMode;
-    private float fusionTop, fusionTitleX, fusionStatusX;
+    private float fusionTop, fusionTitleX, fusionStatusX, previewScale = 1f;
     private float titlePx, subtitlePx, previewHeight, titleBaseline, subtitleBaseline;
     private final Paint.FontMetricsInt fontMetrics = new Paint.FontMetricsInt();
     private final android.text.TextPaint scratchPaint = new android.text.TextPaint();
@@ -47,7 +47,8 @@ public final class HeaderPreviewView extends View implements org.telegram.messen
         setContentDescription(name + ", " + status); setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_YES);
     }
     private int previewStyle(){return forcedStyle<0?HeaderConfig.style():forcedStyle;}
-    private boolean previewFusion(){return previewStyle()==2||previewStyle()==3;}
+    private boolean previewFusion(){return previewStyle()==2||previewStyle()==3||previewStyle()==4;}
+    private boolean previewFloating(){return previewStyle()==4;}
     private boolean previewPortrait(){return previewStyle()==3;}
     @Override protected void onAttachedToWindow(){super.onAttachedToWindow();wallpaperPreview.attach();var center=org.telegram.messenger.NotificationCenter.getGlobalInstance();center.addObserver(this,org.telegram.messenger.NotificationCenter.didSetNewTheme);center.addObserver(this,org.telegram.messenger.NotificationCenter.didApplyNewTheme);center.addObserver(this,org.telegram.messenger.NotificationCenter.didSetNewWallpapper);}
     @Override protected void onDetachedFromWindow(){var center=org.telegram.messenger.NotificationCenter.getGlobalInstance();center.removeObserver(this,org.telegram.messenger.NotificationCenter.didSetNewTheme);center.removeObserver(this,org.telegram.messenger.NotificationCenter.didApplyNewTheme);center.removeObserver(this,org.telegram.messenger.NotificationCenter.didSetNewWallpapper);wallpaperPreview.close();super.onDetachedFromWindow();}
@@ -61,23 +62,27 @@ public final class HeaderPreviewView extends View implements org.telegram.messen
         text.setTextSize(titlePx); text.getFontMetricsInt(fontMetrics); int titleLine=fontMetrics.descent-fontMetrics.ascent;
         text.setTextSize(subtitlePx); text.getFontMetricsInt(fontMetrics); int subtitleLine=fontMetrics.descent-fontMetrics.ascent;
         fusionMode=false;
+        previewScale=previewFloating()&&forcedStyle>=0&&width>0?Math.min(1f,width/(360f*AndroidUtilities.density)):1f;
         if(previewFusion()){
             if(fusion==null)fusion=new FusionPreview(getContext());
-            var g=previewPortrait() ? app.flexygram.header.fusion.SignatureFusionGeometry.updatePortrait(fusion.geometry,width,AndroidUtilities.density,LocaleController.isRTL,true) : app.flexygram.header.fusion.SignatureFusionGeometry.update(fusion.geometry,width,AndroidUtilities.density,LocaleController.isRTL,true);
-            if(g.fits&&titleLine+subtitleLine+AndroidUtilities.dp(2)<=g.height-AndroidUtilities.dp(8)){
+            var g=previewFloating() ? app.flexygram.header.fusion.SignatureFusionGeometry.updateFloating(fusion.geometry,width/previewScale,AndroidUtilities.density,LocaleController.isRTL,true,0) : previewPortrait() ? app.flexygram.header.fusion.SignatureFusionGeometry.updatePortrait(fusion.geometry,width,AndroidUtilities.density,LocaleController.isRTL,true) : app.flexygram.header.fusion.SignatureFusionGeometry.update(fusion.geometry,width,AndroidUtilities.density,LocaleController.isRTL,true);
+            if(g.fits&&(previewFloating()?titleLine:titleLine+subtitleLine+AndroidUtilities.dp(2))<=g.height-AndroidUtilities.dp(8)){
                 fusionMode=true;previewHeight=g.height;
-                int h=Math.round(previewHeight)+AndroidUtilities.dp(forcedStyle<0?80:40);setMeasuredDimension(width,h);fusionTop=(h-previewHeight)/2;
+                int extra=previewFloating()?Math.round(app.flexygram.header.fusion.SignatureFusionGeometry.statusHeight(subtitleLine,AndroidUtilities.density))+AndroidUtilities.dp(8):0;
+                int h=Math.round(previewHeight)+extra+AndroidUtilities.dp(forcedStyle<0?80:40);setMeasuredDimension(width,Math.round(h*previewScale));fusionTop=(h-previewHeight-extra)/2;
                 text.setTextSize(titlePx); scratchPaint.set(text); displayName=android.text.TextUtils.ellipsize(name,scratchPaint,g.text.width(),android.text.TextUtils.TruncateAt.END).toString();
                 fusionTitleX=app.flexygram.header.fusion.SignatureFusionGeometry.titleCenterX(
                         g, text.measureText(displayName));
-                text.setTextSize(subtitlePx); scratchPaint.set(text); displayStatus=android.text.TextUtils.ellipsize(status,scratchPaint,g.text.width(),android.text.TextUtils.TruncateAt.END).toString();
+                text.setTextSize(subtitlePx); scratchPaint.set(text); displayStatus=android.text.TextUtils.ellipsize(previewFloating()?LocaleController.getString(R.string.FlexyHeaderFloatingPreviewStatus):status,scratchPaint,g.text.width(),android.text.TextUtils.TruncateAt.END).toString();
                 fusionStatusX=g.text.centerX();
+                if(previewFloating())app.flexygram.header.fusion.SignatureFusionGeometry.placeStatus(g,text.measureText(displayStatus),subtitleLine,AndroidUtilities.density);
                 fusion.clip.rewind();fusion.clip.addRoundRect(g.center.left,g.center.top,g.center.right,g.center.bottom,g.center.height()/2,g.center.height()/2,android.graphics.Path.Direction.CW);
                 // Preview contact has initials only: keep the initial in the small native left slot.
                 float placeholderW = Math.min(g.portrait.width(), AndroidUtilities.dp(73));
                 float previewStart = g.rtl ? g.portrait.width()-placeholderW*.45f : placeholderW*.55f;
                 float previewEnd = g.rtl ? g.portrait.width()-placeholderW : placeholderW;
-                if (!previewPortrait()) fusion.mask.prepare(previewStart,previewEnd,.9f,g.rtl);
+                if(previewFloating())fusion.mask.prepare(g.fadeStartX,g.fadeEndX,g.fadeSafeStop,g.rtl);
+                else if (!previewPortrait()) fusion.mask.prepare(previewStart,previewEnd,.9f,g.rtl);
                 return;
             }
         }
@@ -102,7 +107,7 @@ public final class HeaderPreviewView extends View implements org.telegram.messen
         canvas.drawColor(Theme.getColor(Theme.key_chat_wallpaper));
         wallpaperPreview.resize(getWidth(),getHeight());wallpaperPreview.draw(canvas);
         if(previewStyle()==1){drawClassic(canvas);return;}
-        if (fusionMode && previewFusion()) { drawFusion(canvas); return; }
+        if (fusionMode && previewFusion()) { int save=canvas.save();canvas.scale(previewScale,previewScale);drawFusion(canvas);canvas.restoreToCount(save);return; }
         surface.draw(canvas, geometry, d, null);
         int color = Theme.getColor(Theme.key_actionBarDefaultTitle);
         if(iconColor!=color){iconColor=color;back.setColorFilter(color, android.graphics.PorterDuff.Mode.SRC_IN);}
@@ -156,14 +161,24 @@ public final class HeaderPreviewView extends View implements org.telegram.messen
         int outer=canvas.save();canvas.translate(0,fusionTop);
         fusion.surface.drawBackdrop(canvas,g,fill,edge,edge,d);
         int clip=canvas.save();canvas.clipPath(fusion.clip);
+        int photoLayer=previewFloating()?fusion.mask.begin(canvas,g.portrait.left,g.portrait.top,g.portrait.right,g.portrait.bottom):0;
         avatar.setColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText));
-        canvas.drawCircle(g.portrait.centerX(),g.portrait.centerY(),g.portrait.height()*.5f,avatar);
+        if(previewFloating())canvas.drawRect(g.portrait.left,g.portrait.top,g.portrait.right,g.portrait.bottom,avatar);
+        else canvas.drawCircle(g.portrait.centerX(),g.portrait.centerY(),g.portrait.height()*.5f,avatar);
         text.setTextSize(AndroidUtilities.dp(20));text.setColor(0xffffffff);
         canvas.drawText("A",g.portrait.centerX(),g.portrait.centerY()+AndroidUtilities.dp(7),text);
+        if(previewFloating())fusion.mask.finish(canvas,photoLayer,g.portrait.right,g.portrait.bottom,g.fadeStartX,g.fadeEndX,g.fadeSafeStop,g.rtl);
         canvas.restoreToCount(clip);
         text.setColor(color);text.setTextSize(titlePx);float th=text.descent()-text.ascent(),ta=text.ascent();text.setTextSize(subtitlePx);float sh=text.descent()-text.ascent();
         float top=g.text.centerY()-(th+sh+AndroidUtilities.dp(2))/2;
-        text.setTextSize(titlePx);canvas.drawText(displayName,fusionTitleX,top-ta,text);text.setTextSize(subtitlePx);canvas.drawText(displayStatus,fusionStatusX,top+th+AndroidUtilities.dp(2)-text.ascent(),text);
+        if(previewFloating()){
+            text.setTextSize(titlePx);canvas.drawText(displayName,g.center.centerX(),g.center.centerY()-(text.descent()+text.ascent())/2,text);
+            fusion.surface.drawStatus(canvas,g,fill,edge,d);
+            text.setTextSize(subtitlePx);text.setColor(Theme.getColor(Theme.key_actionBarDefaultSubtitle));
+            canvas.drawText(displayStatus,g.status.centerX(),g.status.centerY()-(text.descent()+text.ascent())/2,text);
+        }else{
+            text.setTextSize(titlePx);canvas.drawText(displayName,fusionTitleX,top-ta,text);text.setTextSize(subtitlePx);canvas.drawText(displayStatus,fusionStatusX,top+th+AndroidUtilities.dp(2)-text.ascent(),text);
+        }
         int icon=AndroidUtilities.dp(24),x=Math.round(g.back.centerX()),y=Math.round(g.back.centerY());back.setBounds(x-icon/2,y-icon/2,x+icon/2,y+icon/2);
         int transform=canvas.save();if(g.rtl)canvas.scale(-1,1,g.back.centerX(),g.back.centerY());back.draw(canvas);canvas.restoreToCount(transform);
         x=Math.round(g.call.centerX());y=Math.round(g.call.centerY());fusion.phone.setBounds(x-icon/2,y-icon/2,x+icon/2,y+icon/2);fusion.phone.draw(canvas);

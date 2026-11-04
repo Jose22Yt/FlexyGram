@@ -83,6 +83,7 @@ public final class HeaderSettingsActivity extends SignatureMatteSettingsActivity
             showDialog(new AlertDialog.Builder(getParentActivity(), resourcesProvider)
                     .setTitle(getString(style ? R.string.FlexyHeaderStyle : R.string.FlexyHeaderSize))
                     .setItems(style ? new CharSequence[]{
+                            getString(R.string.FlexyHeaderFloating),
                             getString(R.string.FlexyHeaderPortrait),
                             getString(R.string.FlexyHeaderSignature),
                             getString(R.string.FlexyHeaderFusion),
@@ -91,7 +92,7 @@ public final class HeaderSettingsActivity extends SignatureMatteSettingsActivity
                             getString(R.string.FlexyHeaderNormal),
                             getString(R.string.FlexyHeaderCompact)
                     }, (dialog, which) -> {
-                        if (style) HeaderConfig.style(new int[]{3, 0, 2, 1}[which]);
+                        if (style) HeaderConfig.style(new int[]{4, 3, 0, 2, 1}[which]);
                         else HeaderConfig.compact(which == 1);
                         changed(position);
                     }).create());
@@ -211,7 +212,7 @@ public final class HeaderSettingsActivity extends SignatureMatteSettingsActivity
             ((TextSettingsCell) h.itemView).setTextAndValue(
                     getString(p == styleRow ? R.string.FlexyHeaderStyle : R.string.FlexyHeaderSize),
                     getString(p == styleRow
-                            ? (HeaderConfig.portrait() ? R.string.FlexyHeaderPortrait : HeaderConfig.fusion() ? R.string.FlexyHeaderFusion : HeaderConfig.signature() ? R.string.FlexyHeaderSignature : R.string.FlexyHeaderClassic)
+                            ? (HeaderConfig.floating() ? R.string.FlexyHeaderFloating : HeaderConfig.portrait() ? R.string.FlexyHeaderPortrait : HeaderConfig.fusion() ? R.string.FlexyHeaderFusion : HeaderConfig.signature() ? R.string.FlexyHeaderSignature : R.string.FlexyHeaderClassic)
                             : (HeaderConfig.compact() ? R.string.FlexyHeaderCompact : R.string.FlexyHeaderNormal)),
                     p != sizeRow || opacityRow != -1
             );

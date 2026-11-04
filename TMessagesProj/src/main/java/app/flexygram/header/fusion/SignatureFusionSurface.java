@@ -62,6 +62,14 @@ public final class SignatureFusionSurface {
         if(g.callAvailable && !g.mattePortrait){float x=g.actions.centerX();
             canvas.drawLine(x,g.actionsVisual.top+10f*density,x,g.actionsVisual.bottom-10f*density,separator);}
     }
+    public void drawStatus(Canvas canvas, SignatureFusionGeometry.Layout g,
+                           int color, int edge, float density) {
+        if (!org.telegram.messenger.SharedConfig.chatBlurEnabled()) color |= 0xff000000;
+        fill.setColor(color);
+        border.setColor(edge);
+        border.setStrokeWidth(.7f * density);
+        drawPill(canvas, g.status);
+    }
     private void drawActions(Canvas canvas, SignatureFusionGeometry.Layout g) {
         if (g.mattePortrait) {
             if (g.callAvailable) drawPill(canvas,g.callVisual);

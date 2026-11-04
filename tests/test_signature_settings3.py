@@ -56,7 +56,11 @@ def test_direct_chat_preview_order_and_no_nested_scroll_views():
  assert 'setItemAnimator(null)' in (S/'SignatureDirectSettingsActivity.java').read_text()
 def test_original_editor_click_logic_is_unchanged():
  for path in ['app/flexygram/header/HeaderSettingsActivity.java','app/flexygram/bubbles/BubbleSettingsActivity.java','app/flexygram/composer/FlexyComposerSettingsActivity.java']:
-  assert method(source(path),'protected void onItemClick(')==method(original(path),'protected void onItemClick(')
+  current=method(source(path),'protected void onItemClick(')
+  # Floating is an additive fifth header choice; existing choices keep their IDs/callbacks.
+  if path.endswith('/HeaderSettingsActivity.java'):
+   current=current.replace('getString(R.string.FlexyHeaderFloating),\n                            ','').replace('new int[]{4, 3, 0, 2, 1}','new int[]{3, 0, 2, 1}')
+  assert current==method(original(path),'protected void onItemClick(')
  tabs = source('app/flexygram/navigation/BottomTabsSettingsActivity.java')
  assert 'showTabActionDialog(' in tabs and 'LiquidNavigationConfig.setOrder(' in tabs
  # The original sticker reset is surfaced as a direct row, with the rest of its click handler unchanged.

@@ -86,17 +86,23 @@ public final class SignatureChatHeader {
                 : numberWidth + AndroidUtilities.dp(16);
         if (HeaderConfig.fusion() && active()) {
             if (fusion == null) fusion = new Fusion();
-            var g = HeaderConfig.portrait()
+            var g = HeaderConfig.floating()
+                    ? app.flexygram.header.fusion.SignatureFusionGeometry.updateFloating(fusion.layout,
+                        width, AndroidUtilities.density, LocaleController.isRTL, avatar.signatureCallAvailable(), countExtra)
+                    : HeaderConfig.portrait()
                     ? app.flexygram.header.fusion.SignatureFusionGeometry.updatePortrait(fusion.layout,
                         width, AndroidUtilities.density, LocaleController.isRTL, avatar.signatureCallAvailable(), countExtra)
                     : app.flexygram.header.fusion.SignatureFusionGeometry.update(fusion.layout,
                         width, AndroidUtilities.density, LocaleController.isRTL, avatar.signatureCallAvailable(), countExtra);
             // Keep the approved compact sizes; large fonts/narrow windows use the existing Adaptive path.
-            if (g.fits && titleLine + subtitleLine + AndroidUtilities.dp(2) <= g.height - AndroidUtilities.dp(8)) {
+            if (g.fits && (g.floatingStatus ? titleLine : titleLine + subtitleLine + AndroidUtilities.dp(2)) <= g.height - AndroidUtilities.dp(8)) {
                 bar.prepareSignatureNativeGlass(g.mattePortrait && g.callAvailable);
                 fusionLayout = true; height = g.height; subtitleFits = true;
-                int content = Math.max(nativeHeight, Math.round(height) + AndroidUtilities.dp(12));
-                fusionTop = status + (content - height) / 2f;
+                int extra = g.floatingStatus ? Math.round(
+                        app.flexygram.header.fusion.SignatureFusionGeometry.statusHeight(
+                                (float)Math.ceil(subtitlePx) + AndroidUtilities.dp(8), AndroidUtilities.density)) + AndroidUtilities.dp(8) : 0;
+                int content = Math.max(nativeHeight, Math.round(height) + extra + AndroidUtilities.dp(12));
+                fusionTop = status + (content - height - extra) / 2f;
                 geometry.back.set(g.back.left,g.back.top+fusionTop,g.back.right,g.back.bottom+fusionTop);
                 geometry.title.set(g.text.left,g.text.top+fusionTop,g.text.right,g.text.bottom+fusionTop);
                 geometry.avatar.set(g.portrait.left,g.portrait.top+fusionTop,g.portrait.right,g.portrait.bottom+fusionTop);
@@ -172,6 +178,16 @@ public final class SignatureChatHeader {
         fusion.surface.drawBackdrop(canvas, fusion.layout, fill, border, border, AndroidUtilities.density);
         canvas.restoreToCount(save);
         drawUnread(canvas);
+    }
+    public void drawStatusBackground(Canvas canvas) {
+        if (!fusionActive() || !fusion.layout.floatingStatus) return;
+        int fill = Theme.getColor(Theme.key_windowBackgroundWhite, provider);
+        fill = (fill & 0xffffff) | (Math.round(HeaderConfig.opacity() * 2.55f) << 24);
+        int edge = (Theme.getColor(Theme.key_actionBarDefaultSubtitle, provider) & 0xffffff) | 0x38000000;
+        int save = canvas.save();
+        canvas.translate(0, fusionTop);
+        fusion.surface.drawStatus(canvas, fusion.layout, fill, edge, AndroidUtilities.density);
+        canvas.restoreToCount(save);
     }
     private int lastBadgeAccent;
     private int badgeTextColor;

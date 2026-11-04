@@ -3700,6 +3700,15 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
         return isViewTypeSection.run(viewType);
     }
     private ArrayList<SectionsDrawer.Section> sections;
+    private ArrayList<SectionsDrawer.Section> sectionPool;
+    private SectionsDrawer.Section obtainAnimatedSection(int index, float from, float to, float alpha, boolean round) {
+        if (index >= SectionsDrawer.MAX_RETAINED_SECTIONS) return new SectionsDrawer.Section(from, to, alpha, round);
+        if (sectionPool == null) sectionPool = new ArrayList<>();
+        if (index == sectionPool.size()) sectionPool.add(new SectionsDrawer.Section(from, to, alpha, round));
+        SectionsDrawer.Section section = sectionPool.get(index);
+        section.from = from; section.to = to; section.alpha = alpha; section.round = round;
+        return section;
+    }
     public boolean isInsideForcedSection(int position) {
         if (forcedSections == null || position < 0) return false;
         for (int j = 0; j < forcedSections.size(); ++j) {
@@ -3755,13 +3764,16 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
                 } else if (isInsideForcedSection(viewHolder.getAdapterPosition())) {
                     continue;
                 }
-                sections.add(new SectionsDrawer.Section(from, to, child.getAlpha(), isRoundSectionView(child)));
+                sections.add(obtainAnimatedSection(sections.size(), from, to, child.getAlpha(), isRoundSectionView(child)));
             }
-            SectionsDrawer.draw(sections, sectionRadius, (from, to, topRoundRadius, bottomRoundRadius, alpha) -> {
-                AndroidUtilities.rectTmp.set(getPaddingLeft() + sectionsItemDecoration.padding, from, getWidth() - sectionsItemDecoration.padding - getPaddingRight(), to);
-                drawSectionBackground.run(canvas, AndroidUtilities.rectTmp, topRoundRadius, bottomRoundRadius, alpha);
-            }, useSegmentedSections(), segmentInnerRadius(), segmentGap());
-            sections.clear();
+            try {
+                SectionsDrawer.draw(sections, sectionRadius, (from, to, topRoundRadius, bottomRoundRadius, alpha) -> {
+                    AndroidUtilities.rectTmp.set(getPaddingLeft() + sectionsItemDecoration.padding, from, getWidth() - sectionsItemDecoration.padding - getPaddingRight(), to);
+                    drawSectionBackground.run(canvas, AndroidUtilities.rectTmp, topRoundRadius, bottomRoundRadius, alpha);
+                }, useSegmentedSections(), segmentInnerRadius(), segmentGap());
+            } finally {
+                sections.clear();
+            }
         } else if (useSegmentedSections()) {
             drawSegmentedSectionsBackgrounds(canvas);
         } else {
@@ -4000,6 +4012,7 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
     }
 
     public static class SectionsDrawer {
+        private static final int MAX_RETAINED_SECTIONS = 128;
 
         public static class Section {
             public float from, to;
@@ -4018,7 +4031,22 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
             }
         }
 
-        private static final ArrayList<float[]> groups = new ArrayList<>();
+        /** UI render callbacks may synchronously draw another list. Each nesting depth owns its buffers. */
+        private static final class DrawState {
+            final ArrayList<float[]> groups = new ArrayList<>();
+            final ArrayList<float[]> pool = new ArrayList<>();
+            DrawState nested;
+            boolean inUse;
+            float[] nextGroup() {
+                int index = groups.size();
+                if (index >= MAX_RETAINED_SECTIONS) return new float[5];
+                if (index == pool.size()) pool.add(new float[5]);
+                return pool.get(index);
+            }
+        }
+        private static final ThreadLocal<DrawState> drawStates = new ThreadLocal<DrawState>() {
+            @Override protected DrawState initialValue() { return new DrawState(); }
+        };
 
         private static final float CONNECT_TOLERANCE = 1.5f;
 
@@ -4046,60 +4074,77 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
         ) {
             if (sections == null || sections.isEmpty()) return;
 
-            Collections.sort(sections, (a, b) -> Float.compare(a.from, b.from));
-
-            groups.clear();
-
+            // Child order is already sorted on most frames. Avoid TimSort's scratch allocation there.
+            for (int i = 1; i < sections.size(); i++) {
+                if (Float.compare(sections.get(i - 1).from, sections.get(i).from) > 0) {
+                    Collections.sort(sections, (left, right) -> Float.compare(left.from, right.from));
+                    break;
+                }
+            }
             if (segmented) {
                 drawSegmentedSections(sections, roundRadius, drawRoundRect, innerRadius, segmentGap);
                 return;
             }
-
-            int groupStart = 0;
-            while (groupStart < sections.size()) {
-                float groupTo = sections.get(groupStart).to;
-                int groupEnd = groupStart + 1;
-
-                while (groupEnd < sections.size() && sections.get(groupEnd).from <= groupTo + CONNECT_TOLERANCE) {
-                    groupTo = Math.max(groupTo, sections.get(groupEnd).to);
-                    groupEnd++;
-                }
-
-                float[] groupData = calculateGroup(sections, groupStart, groupEnd, roundRadius);
-                if (groupData != null) {
-                    groups.add(groupData);
-                }
-
-                groupStart = groupEnd;
+            DrawState state = drawStates.get();
+            while (state.inUse) {
+                if (state.nested == null) state.nested = new DrawState();
+                state = state.nested;
             }
+            state.inUse = true;
+            ArrayList<float[]> groups = state.groups;
+            groups.clear();
+            try {
+                int groupStart = 0;
+                while (groupStart < sections.size()) {
+                    float groupTo = sections.get(groupStart).to;
+                    int groupEnd = groupStart + 1;
 
-            for (int i = 0; i < groups.size(); i++) {
-                float[] g = groups.get(i);
-                float drawFrom = g[0];
-                float drawTo = g[1];
-                float topRadius = g[2];
-                float bottomRadius = g[3];
-                float alpha = g[4];
-
-                if (i > 0) {
-                    float[] prev = groups.get(i - 1);
-                    float gap = drawFrom - prev[1];
-                    if (gap < roundRadius * 0.2f) {
-                        float t = gap / (roundRadius * 0.2f);
-                        topRadius = Math.min(topRadius, roundRadius * t);
+                    while (groupEnd < sections.size() && sections.get(groupEnd).from <= groupTo + CONNECT_TOLERANCE) {
+                        groupTo = Math.max(groupTo, sections.get(groupEnd).to);
+                        groupEnd++;
                     }
+
+                    float[] groupData = calculateGroup(sections, groupStart, groupEnd, roundRadius, state.nextGroup());
+                    if (groupData != null) {
+                        groups.add(groupData);
+                    }
+
+                    groupStart = groupEnd;
                 }
 
-                if (i < groups.size() - 1) {
-                    float[] next = groups.get(i + 1);
-                    float gap = next[0] - drawTo;
-                    if (gap < roundRadius * 0.2f) {
-                        float t = gap / (roundRadius * 0.2f);
-                        bottomRadius = Math.min(bottomRadius, roundRadius * t);
-                    }
-                }
+                for (int i = 0; i < groups.size(); i++) {
+                    float[] g = groups.get(i);
+                    float drawFrom = g[0];
+                    float drawTo = g[1];
+                    float topRadius = g[2];
+                    float bottomRadius = g[3];
+                    float alpha = g[4];
 
-                drawRoundRect.run(drawFrom, drawTo, topRadius, bottomRadius, alpha);
+                    if (i > 0) {
+                        float[] prev = groups.get(i - 1);
+                        float gap = drawFrom - prev[1];
+                        if (gap < roundRadius * 0.2f) {
+                            float t = gap / (roundRadius * 0.2f);
+                            topRadius = Math.min(topRadius, roundRadius * t);
+                        }
+                    }
+
+                    if (i < groups.size() - 1) {
+                        float[] next = groups.get(i + 1);
+                        float gap = next[0] - drawTo;
+                        if (gap < roundRadius * 0.2f) {
+                            float t = gap / (roundRadius * 0.2f);
+                            bottomRadius = Math.min(bottomRadius, roundRadius * t);
+                        }
+                    }
+
+                    drawRoundRect.run(drawFrom, drawTo, topRadius, bottomRadius, alpha);
+                }
+            } finally {
+                boolean oversized = groups.size() > MAX_RETAINED_SECTIONS;
+                groups.clear();
+                if (oversized) groups.trimToSize();
+                state.inUse = false;
             }
         }
 
@@ -4127,7 +4172,7 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
             }
         }
 
-        private static float[] calculateGroup(List<Section> sections, int start, int end, float roundRadius) {
+        private static float[] calculateGroup(List<Section> sections, int start, int end, float roundRadius, float[] result) {
             float stableFrom = Float.MAX_VALUE;
             float stableTo = Float.MIN_VALUE;
             for (int i = start; i < end; i++) {
@@ -4215,7 +4260,9 @@ public class RecyclerListView extends RecyclerView implements IBlur3Capture {
 
             if (drawTo <= drawFrom) return null;
 
-            return new float[]{drawFrom, drawTo, topRadius, bottomRadius, alpha};
+            result[0] = drawFrom; result[1] = drawTo;
+            result[2] = topRadius; result[3] = bottomRadius; result[4] = alpha;
+            return result;
         }
     }
 }
