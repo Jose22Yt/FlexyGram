@@ -9,8 +9,6 @@
 package org.telegram.ui.ActionBar;
 
 import app.exteraless.utils.AppUtils;
-import app.flexygram.navigation.NativeInstantTouchPolicy;
-import app.flexygram.navigation.NativeInstantTouchTarget;
 
 import static org.telegram.messenger.AndroidUtilities.dp;
 import static org.telegram.messenger.AndroidUtilities.dpf2;
@@ -1784,6 +1782,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
     }
 
     public boolean onBackStarted(float touchX, float touchY) {
+        finishNavigationForInput();
         if (animationInProgress) {
             if (backAnimator != null) {
                 backAnimator.end();
@@ -1885,8 +1884,11 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
     }
 
     private boolean backAnimatorIsBack;
+    private boolean settlingBackAnimation;
+    private boolean completingTransition;
     private AnimatorSet backAnimator;
     private void animateBackEndAnimation(boolean backAnimation, float velX) {
+        settlingBackAnimation = backAnimation;
         final BaseFragment currentFragment = !fragmentsStack.isEmpty() ? fragmentsStack.get(fragmentsStack.size() - 1) : null;
         if (currentFragment == null) return;
 
@@ -1946,10 +1948,9 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
                 resetPredictiveBackState();
                 onSlideAnimationEnd(canceled || backAnimation);
             });
-            currentSpringAnimation.start();
-
             animationInProgress = true;
             layoutToIgnore = containerViewBack;
+            currentSpringAnimation.start();
 
             if (velocityTracker != null) {
                 velocityTracker.recycle();
@@ -2020,13 +2021,14 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         });
         backAnimator = animatorSet;
         backAnimatorIsBack = backAnimation;
-        animatorSet.start();
         animationInProgress = true;
         layoutToIgnore = containerViewBack;
+        animatorSet.start();
     }
 
     @Override
     public void onBackPressed() {
+        finishNavigationForInput();
         if (finishClosingPreview()) return;
         if (transitionAnimationPreviewMode) {
             finishPreviewFragment();
@@ -2061,53 +2063,70 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
     }
 
     private void onAnimationEndCheck(boolean byCheck) {
-        onCloseAnimationEnd();
-        onOpenAnimationEnd();
-        if (waitingForKeyboardCloseRunnable != null) {
-            AndroidUtilities.cancelRunOnUIThread(waitingForKeyboardCloseRunnable);
-            waitingForKeyboardCloseRunnable = null;
-        }
-        if (currentAnimation != null) {
-            if (byCheck) {
-                currentAnimation.cancel();
-            }
+        if (completingTransition) return;
+        completingTransition = true;
+        try {
+            // Detach ownership before cancel: Android may synchronously call end listeners.
+            final AnimatorSet oldAnimator = currentAnimation;
+            final SpringAnimation oldSpring = currentSpringAnimation;
+            final Runnable close = onCloseAnimationEndRunnable;
+            final Runnable open = onOpenAnimationEndRunnable;
             currentAnimation = null;
-        }
-        if (currentSpringAnimation != null) {
-            SpringAnimation finishedAnimation = currentSpringAnimation;
             currentSpringAnimation = null;
-            if (byCheck) finishedAnimation.cancel();
+            if (animationRunnable != null) {
+                AndroidUtilities.cancelRunOnUIThread(animationRunnable);
+                animationRunnable = null;
+            }
+            if (waitingForKeyboardCloseRunnable != null) {
+                AndroidUtilities.cancelRunOnUIThread(waitingForKeyboardCloseRunnable);
+                waitingForKeyboardCloseRunnable = null;
+            }
+            if (delayedOpenAnimationRunnable != null) {
+                AndroidUtilities.cancelRunOnUIThread(delayedOpenAnimationRunnable);
+                delayedOpenAnimationRunnable = null;
+            }
+            if (byCheck && oldAnimator != null) oldAnimator.cancel();
+            if (byCheck && oldSpring != null) oldSpring.cancel();
+            springRouteBackgroundDrawable = null;
+            springRouteYRatio = 0f;
+            setAlpha(1f);
+            for (View container : new View[]{containerView, containerViewBack}) {
+                if (container == null) continue;
+                container.setAlpha(1f);container.setScaleX(1f);container.setScaleY(1f);
+                container.setTranslationX(0f);container.setTranslationY(0f);
+                container.setLayerType(View.LAYER_TYPE_NONE, null);
+            }
+            setInnerTranslationX(0f);
+            // Complete only the transition captured above, never one started by its callbacks.
+            if (close != null && onCloseAnimationEndRunnable == close) onCloseAnimationEnd();
+            if (open != null && onOpenAnimationEndRunnable == open) onOpenAnimationEnd();
+            if (USE_ACTIONBAR_CROSSFADE) invalidateActionBars();
+        } finally {
+            completingTransition = false;
         }
-        // openExtera: подложка и масштаб карточки живут только на время перехода
-        springRouteBackgroundDrawable = null;
-        springRouteYRatio = 0f;
-        if (containerView != null) {
-            containerView.setScaleX(1f);
-            containerView.setScaleY(1f);
-            containerView.setTranslationY(0f);
-        }
-        if (containerViewBack != null) {
-            containerViewBack.setScaleX(1f);
-            containerViewBack.setScaleY(1f);
-            containerViewBack.setTranslationY(0f);
-        }
-        if (animationRunnable != null) {
-            AndroidUtilities.cancelRunOnUIThread(animationRunnable);
-            animationRunnable = null;
-        }
-        setAlpha(1.0f);
-        containerView.setAlpha(1.0f);
-        containerView.setScaleX(1.0f);
-        containerView.setScaleY(1.0f);
-        containerView.setTranslationX(0);
-        containerView.setTranslationY(0);
-        containerViewBack.setAlpha(1.0f);
-        containerViewBack.setScaleX(1.0f);
-        containerViewBack.setScaleY(1.0f);
-        containerViewBack.setTranslationX(0);
-        containerViewBack.setTranslationY(0);
-        if (USE_ACTIONBAR_CROSSFADE) {
-            invalidateActionBars();
+    }
+
+    /** Settle decorative motion before native hit testing; retain active drags and modal owners. */
+    private void finishNavigationForInput() {
+        if ((!transitionAnimationInProgress && !animationInProgress) || completingTransition
+                || containerView == null || containerViewBack == null
+                || inPreviewMode || transitionAnimationPreviewMode || previewOpenAnimationInProgress
+                || previewMenu != null || sheetFragment != null || inActionMode || predictiveInput
+                || startedTracking && !animationInProgress) return;
+        BaseFragment current = getLastFragment();
+        if (current != null && current.getLastSheet() != null) return;
+        if (transitionAnimationInProgress) {
+            onAnimationEndCheck(true);
+        } else if (animationInProgress) {
+            if (backAnimator != null) {
+                backAnimator.end(); // Ends the committed/cancelled gesture at its native endpoint.
+            } else if (currentSpringAnimation != null) {
+                SpringAnimation spring = currentSpringAnimation;
+                currentSpringAnimation = null;
+                spring.cancel(); // Its stale end listener cannot claim the fragment stack.
+                resetPredictiveBackState();
+                onSlideAnimationEnd(settlingBackAnimation);
+            }
         }
     }
 
@@ -2440,6 +2459,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
 
     @Override
     public boolean presentFragment(NavigationParams params) {
+        finishNavigationForInput();
         BaseFragment fragment = params.fragment;
         boolean removeLast = params.removeLast;
         boolean forceWithoutAnimation = params.noAnimation;
@@ -3112,6 +3132,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
     }
 
     public void closeLastFragment(boolean animated, boolean forceNoAnimation) {
+        finishNavigationForInput();
         if (finishClosingPreview()) return;
         BaseFragment fragment = getLastFragment();
         if (fragment != null && fragment.closeLastFragment()) {
@@ -3768,7 +3789,6 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
                 endRunnable.run();
             }
             checkNeedRebuild();
-            checkNeedRebuild();
         }
     }
 
@@ -4002,74 +4022,17 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         return Math.max(0, usableViewHeight - (rect.bottom - rect.top));
     }
 
-    /**
-     * Native-first input continuation. The first genuine DOWN is still delivered
-     * unmodified to the original RecyclerListView after closing Chat A.
-     * No synthetic events, new animations, profile, preference or second tap.
-     * Only a visible native dialog cell in an exposed part of the list qualifies.
-     */
+    /** The real DOWN is delivered once, after the stable destination has been restored. */
     private void nativeInstantTouchDown(MotionEvent ev) {
-        if (ev == null || ev.getActionMasked() != MotionEvent.ACTION_DOWN
-                || ev.getPointerCount() != 1 || fragmentsStack == null
-                || fragmentsStack.size() < 2 || containerView == null
-                || containerViewBack == null || !transitionAnimationInProgress
-                || onCloseAnimationEndRunnable == null || onOpenAnimationEndRunnable != null) {
-            return;
-        }
-        final BaseFragment outgoing = fragmentsStack.get(fragmentsStack.size() - 1);
-        final BaseFragment previous = fragmentsStack.get(fragmentsStack.size() - 2);
-        final boolean previousIsDialogList = previous instanceof org.telegram.ui.DialogsActivity
-                || previous instanceof MainTabsActivity
-                    && ((MainTabsActivity) previous).getCurrentVisibleFragment() instanceof org.telegram.ui.DialogsActivity;
-        // Reject ineligible closes before traversing visible rows or querying the
-        // window's keyboard frame. The original DOWN still follows native dispatch.
-        if (!attached || !main || isSheet || isLayersLayout || !previousIsDialogList
-                || !(outgoing instanceof ChatActivity)
-                || inPreviewMode || transitionAnimationPreviewMode
-                || previewOpenAnimationInProgress || previewMenu != null
-                || sheetFragment != null || containerView.isKeyboardVisible
-                || containerViewBack.isKeyboardVisible || startedTracking
-                || animationInProgress || predictiveBackInProgress || inActionMode
-                || ev.getY() < 0
-                || ev.getY() >= getHeight() - getBottomTabsHeight(true) - systemAndDisplayInsets.bottom) {
-            return;
-        }
-        final BaseFragment dialogFragment = previous instanceof MainTabsActivity
-                ? ((MainTabsActivity) previous).getCurrentVisibleFragment()
-                : previous;
-        final View dialogRoot = dialogFragment == null ? null : dialogFragment.fragmentView;
-        final float x = ev.getRawX(), y = ev.getRawY();
-        final boolean exposedDialogRow = previousIsDialogList
-                && NativeInstantTouchTarget.isVisibleDialogRow(dialogRoot, x, y);
-        final boolean outgoingCoversTouch = containerViewBack.isShown()
-                && containerViewBack.getAlpha() > .95f
-                && NativeInstantTouchTarget.containsVisiblePoint(containerViewBack, x, y);
-        final boolean previewOrPopup = inPreviewMode || transitionAnimationPreviewMode
-                || previewOpenAnimationInProgress || previewMenu != null
-                || storyViewerAttached();
-        final boolean sheetOrKeyboard = sheetFragment != null
-                || containerView.isKeyboardVisible || containerViewBack.isKeyboardVisible
-                || measureKeyboardHeight() > dp(40);
-        final boolean nativeGesture = startedTracking || animationInProgress
-                || predictiveBackInProgress || inActionMode;
-        final boolean nativeClosing = transitionAnimationInProgress
-                && onCloseAnimationEndRunnable != null && onOpenAnimationEndRunnable == null
-                && outgoing instanceof ChatActivity;
-        final boolean outsideTabs = ev.getY() >= 0
-                && ev.getY() < getHeight() - getBottomTabsHeight(true) - systemAndDisplayInsets.bottom;
-        if (NativeInstantTouchPolicy.canFinishNativeCloseForDown(
-                outsideTabs, attached && main && !isSheet && !isLayersLayout,
-                nativeClosing, previousIsDialogList, exposedDialogRow,
-                outgoingCoversTouch, previewOrPopup, sheetOrKeyboard, nativeGesture)) {
-            // Native cleanup owns fragment detach, listener release and stack changes.
-            // This is done *before* super.dispatchTouchEvent consumes the real DOWN.
-            onAnimationEndCheck(true);
-        }
+        if (ev == null || ev.getActionMasked() != MotionEvent.ACTION_DOWN || ev.getPointerCount() != 1) return;
+        finishClosingPreview();
+        finishNavigationForInput();
     }
 
     private boolean tabsEvents;
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
+        nativeInstantTouchDown(ev);
         final boolean tabs = ev.getY() > getHeight() - getBottomTabsHeight(true) - systemAndDisplayInsets.bottom;
 
         BaseFragment.AttachedSheet lastSheet = null;
@@ -4095,7 +4058,6 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         if (ev.getAction() == MotionEvent.ACTION_UP || ev.getAction() == MotionEvent.ACTION_CANCEL) {
             tabsEvents = false;
         }
-        nativeInstantTouchDown(ev);
         return super.dispatchTouchEvent(ev);
     }
 

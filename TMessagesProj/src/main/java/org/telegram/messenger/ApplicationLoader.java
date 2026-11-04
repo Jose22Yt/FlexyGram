@@ -350,7 +350,7 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
         if (prepareDialogs && android.os.Looper.myLooper() == android.os.Looper.getMainLooper()) {
             // Keep native service ownership on main, but let the first UI traversal complete first.
             android.view.Choreographer.getInstance().postFrameCallback(frameTimeNanos ->
-                    applicationHandler.post(ApplicationLoader::initializeAccountServices));
+                    applicationHandler.post(() -> initializeAccountServices(true)));
         } else {
             // Push/service entry points still initialize without waiting for an Activity or frame.
             initializeAccountServices();
@@ -361,23 +361,41 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
     }
 
     /** All sessions/configs are loaded above; inactive slots retain native lazy getInstance(). */
-    private static void initializeAccountServices() {
+    private static void initializeAccountServices() { initializeAccountServices(false); }
+
+    private static void initializeAccountServices(boolean incremental) {
         android.os.Trace.beginSection("Flexy.startup.account_services");
         try {
             MediaController.getInstance();
-            for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
-                // Account zero still reconciles stale Android accounts against ALL loaded users.
-                if (a == 0 || UserConfig.getInstance(a).isClientActivated()) {
-                    ContactsController.getInstance(a).checkAppAccount();
-                }
-                // Do not parse presets/register a download receiver for an empty slot.
-                // Every activated session retains eager native download initialization.
-                if (UserConfig.getInstance(a).isClientActivated()) DownloadController.getInstance(a);
+            if (incremental) {
+                scheduleAccountServices(0);
+            } else {
+                for (int account = 0; account < UserConfig.MAX_ACCOUNT_COUNT; account++) initializeAccountSlot(account);
+                BillingController.getInstance().startConnection();
             }
-            BillingController.getInstance().startConnection();
         } finally {
             android.os.Trace.endSection();
         }
+    }
+
+    private static void initializeAccountSlot(int account) {
+        if (account == 0 || UserConfig.getInstance(account).isClientActivated()) ContactsController.getInstance(account).checkAppAccount();
+        if (UserConfig.getInstance(account).isClientActivated()) DownloadController.getInstance(account);
+    }
+
+    /** UI launch: leave a render opportunity between account batches, without fixed sleeps. */
+    private static void scheduleAccountServices(int start) {
+        int next = start;
+        while (next < UserConfig.MAX_ACCOUNT_COUNT && next != 0 && !UserConfig.getInstance(next).isClientActivated()) next++;
+        final int account = next;
+        android.view.Choreographer.getInstance().postFrameCallback(frameTimeNanos -> applicationHandler.post(() -> {
+            if (account >= UserConfig.MAX_ACCOUNT_COUNT) {
+                BillingController.getInstance().startConnection();
+            } else {
+                initializeAccountSlot(account);
+                scheduleAccountServices(account + 1);
+            }
+        }));
     }
 
     private static void prepareSelectedDialogs() {

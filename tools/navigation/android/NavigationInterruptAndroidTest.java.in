@@ -1,0 +1,40 @@
+import android.app.Activity;import android.animation.*;import android.os.*;import android.view.*;import android.widget.*;
+import org.junit.*;import static org.junit.Assert.*;import org.junit.runner.RunWith;import org.robolectric.*;import org.robolectric.annotation.*;
+@RunWith(RobolectricTestRunner.class) @Config(sdk=35,manifest=Config.NONE) @GraphicsMode(GraphicsMode.Mode.NATIVE)
+public class NavigationInterruptAndroidTest{
+ Activity activity;
+ @Before public void setup(){activity=Robolectric.buildActivity(Activity.class).setup().get();}
+ @After public void cleanup(){activity.finish();}
+ void layout(NavigationProbe root){if(root.getParent()==null)activity.setContentView(root);root.measure(View.MeasureSpec.makeMeasureSpec(320,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(640,View.MeasureSpec.EXACTLY));root.layout(0,0,320,640);}
+ void touch(NavigationProbe root,int action){MotionEvent event=MotionEvent.obtain(0,SystemClock.uptimeMillis(),action,80,80,0);root.dispatchTouchEvent(event);event.recycle();if(action==MotionEvent.ACTION_UP)Shadows.shadowOf(Looper.getMainLooper()).idle();}
+ @Test public void sameFingerOpensDestinationAfterOpenOrCloseWithoutWaiting(){for(boolean close:new boolean[]{false,true}){
+  NavigationProbe root=new NavigationProbe(activity);layout(root);int[] clicks={0};Button target=new Button(activity);target.setOnClickListener(v->clicks[0]++);
+  target.measure(View.MeasureSpec.makeMeasureSpec(320,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(640,View.MeasureSpec.EXACTLY));target.layout(0,0,320,640);
+  root.begin(target,close);root.containerView.setTranslationX(80);root.containerView.setLayerType(View.LAYER_TYPE_HARDWARE,null);root.innerTranslationX=80;
+  touch(root,MotionEvent.ACTION_DOWN);layout(root);touch(root,MotionEvent.ACTION_UP);
+  assertEquals(1,root.finishes);assertEquals(1,clicks[0]);assertFalse(root.transitionAnimationInProgress);assertEquals(0f,root.innerTranslationX,0f);assertEquals(View.LAYER_TYPE_NONE,root.containerView.getLayerType());
+  touch(root,MotionEvent.ACTION_DOWN);touch(root,MotionEvent.ACTION_UP);assertEquals(2,clicks[0]);assertEquals(1,root.finishes);
+ }}
+ @Test public void cancelListenersCannotCompleteTwiceOrEraseNextTransition(){
+  NavigationProbe root=new NavigationProbe(activity);layout(root);root.transitionAnimationInProgress=true;
+  Runnable next=()->{};root.onCloseAnimationEndRunnable=()->{root.finishes++;root.transitionAnimationInProgress=true;root.onOpenAnimationEndRunnable=next;};
+  AnimatorSet animator=new AnimatorSet();ValueAnimator child=ValueAnimator.ofFloat(0,1);child.setDuration(20000);animator.playTogether(child);
+  animator.addListener(new AnimatorListenerAdapter(){public void onAnimationEnd(Animator a){root.finishNow();}});root.currentAnimation=animator;animator.start();
+  root.currentSpringAnimation=new NavigationProbe.SpringAnimation();NavigationProbe.SpringAnimation spring=root.currentSpringAnimation;spring.callback=root::finishNow;
+  root.finishNow();assertEquals(1,root.finishes);assertEquals(1,spring.cancelled);assertSame(next,root.onOpenAnimationEndRunnable);assertTrue(root.transitionAnimationInProgress);
+ }
+ @Test public void activeGesturesAndModalOwnershipArePreservedButSettlingGestureCanFinish(){
+  NavigationProbe root=new NavigationProbe(activity);layout(root);root.begin(new View(activity),false);root.startedTracking=true;
+  touch(root,MotionEvent.ACTION_DOWN);assertEquals(0,root.finishes);root.startedTracking=false;root.inPreviewMode=true;touch(root,MotionEvent.ACTION_DOWN);assertEquals(0,root.finishes);
+  root.inPreviewMode=false;root.fragment.sheet=new Object();touch(root,MotionEvent.ACTION_DOWN);assertEquals(0,root.finishes);
+  root.fragment.sheet=null;root.finishNow();root.animationInProgress=true;root.startedTracking=true;root.currentSpringAnimation=new NavigationProbe.SpringAnimation();
+  touch(root,MotionEvent.ACTION_DOWN);assertEquals(1,root.slides);assertFalse(root.animationInProgress);
+ }
+ @Test public void pressingBubbleInvalidatesOnlyItsVisualBounds(){
+  class Parent extends FrameLayout{android.graphics.Rect dirty;Parent(){super(activity);}public void invalidate(int l,int t,int r,int b){dirty=new android.graphics.Rect(l,t,r,b);super.invalidate(l,t,r,b);}}
+  Parent parent=new Parent();View child=new View(activity);parent.addView(child,new FrameLayout.LayoutParams(100,48));activity.setContentView(parent);parent.measure(View.MeasureSpec.makeMeasureSpec(1000,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(1000,View.MeasureSpec.EXACTLY));parent.layout(0,0,1000,1000);parent.dirty=null;
+  var motion=new app.flexygram.bubbles.interaction.BubbleTapMotion(child);motion.press(1,1,1);
+  assertNotNull(parent.dirty);assertTrue(parent.dirty.width()<200);assertTrue(parent.dirty.height()<100);assertTrue(parent.dirty.contains(child.getLeft(),child.getTop()));motion.reset();
+ }
+
+}

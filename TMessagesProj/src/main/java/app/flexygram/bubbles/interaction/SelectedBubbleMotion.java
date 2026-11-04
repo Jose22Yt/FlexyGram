@@ -11,7 +11,7 @@ public final class SelectedBubbleMotion implements Choreographer.FrameCallback {
     private final Spring x = new Spring(1f, 900f, .78f, .0002f);
     private final Spring y = new Spring(1f, 900f, .78f, .0002f);
     private final Spring phase = new Spring(1f, 1100f, .78f, .0015f);
-    private static final long ENTER_LIMIT_MS = 360, CLOSE_LIMIT_MS = 180;
+    private static final long ENTER_LIMIT_MS = 280, CLOSE_LIMIT_MS = 180;
     private Runnable invalidate, completion;
     private boolean running, closing;
     private long lastFrame, started;
@@ -88,8 +88,8 @@ public final class SelectedBubbleMotion implements Choreographer.FrameCallback {
     }
     private void finish() {
         Choreographer.getInstance().removeFrameCallback(this); running = false;
-        if (invalidate != null) invalidate.run();
-        Runnable done=completion; completion=null; invalidate=null;
+        Runnable redraw=invalidate, done=completion; completion=null; invalidate=null;
+        if (redraw != null) redraw.run();
         if (done != null) done.run();
     }
     public void reset() {

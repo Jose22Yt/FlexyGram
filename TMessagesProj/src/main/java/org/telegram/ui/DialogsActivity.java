@@ -3088,12 +3088,13 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         int currentAccount = accountInstance.getCurrentAccount();
         if (!dialogsLoaded[currentAccount]) {
             MessagesController messagesController = accountInstance.getMessagesController();
-            messagesController.loadGlobalNotificationsSettings();
             // ApplicationLoader may have already published the native local result during launch.
             // Do not reread it; an empty/unloaded account retains the original cache/network path.
             if (!messagesController.dialogsLoaded || (messagesController.getAllDialogs().isEmpty() && messagesController.getDialogs(0).isEmpty())) {
                 messagesController.loadDialogs(0, 0, 100, true);
             }
+            // Prioritize the local list before starting independent auxiliary requests.
+            messagesController.loadGlobalNotificationsSettings();
             messagesController.loadHintDialogs();
             messagesController.loadUserInfo(accountInstance.getUserConfig().getCurrentUser(), false, 0);
             AndroidUtilities.runOnUIThread(() -> {

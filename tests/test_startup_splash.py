@@ -135,7 +135,7 @@ def test_actual_service_dispatch_keeps_background_entry_immediate_and_ui_work_af
  public void postFrameCallback(java.util.function.LongConsumer c){callback=c;}}''',
         'Probe.java': '''class ApplicationLoader {
  static int calls;static class Handler {Runnable pending;void post(Runnable r){pending=r;}}
- static Handler applicationHandler=new Handler();static void initializeAccountServices(){calls++;}
+ static Handler applicationHandler=new Handler();static void initializeAccountServices(){calls++;}static void initializeAccountServices(boolean incremental){calls++;}
  static void dispatch(boolean prepareDialogs){''' + dispatch + '''}}
 public class Probe {public static void main(String[]args){
  ApplicationLoader.dispatch(true);if(ApplicationLoader.calls!=0)throw new AssertionError();
@@ -144,4 +144,36 @@ public class Probe {public static void main(String[]args){
  ApplicationLoader.dispatch(false);if(ApplicationLoader.calls!=2)throw new AssertionError();
  android.os.Looper.ui=false;ApplicationLoader.dispatch(true);if(ApplicationLoader.calls!=3)throw new AssertionError();
  }}''',
+    })
+
+
+def test_account_services_are_spread_across_frames_and_headless_stays_immediate(tmp_path):
+    from test_composer_layout import method
+    source = (JAVA / 'org/telegram/messenger/ApplicationLoader.java').read_text()
+    bodies = '\n'.join(method(source, anchor) for anchor in [
+        'private static void initializeAccountServices(boolean incremental)',
+        'private static void initializeAccountSlot(int account)',
+        'private static void scheduleAccountServices(int start)'])
+    run_java(tmp_path, {
+        'android/os/Trace.java': 'package android.os;public class Trace{public static void beginSection(String s){}public static void endSection(){}}',
+        'android/view/Choreographer.java': '''package android.view;public class Choreographer{public static java.util.ArrayList<java.util.function.LongConsumer> frames=new java.util.ArrayList<>();public static Choreographer getInstance(){return new Choreographer();}public void postFrameCallback(java.util.function.LongConsumer r){frames.add(r);}public static void tick(){var todo=new java.util.ArrayList<>(frames);frames.clear();for(var r:todo)r.accept(1);}}''',
+        'Probe.java': '''import java.util.*;public class Probe{
+ static List<String> calls=new ArrayList<>();static class Handler{List<Runnable> queue=new ArrayList<>();void post(Runnable r){queue.add(r);}void run(){var copy=new ArrayList<>(queue);queue.clear();for(var r:copy)r.run();}}
+ static Handler applicationHandler=new Handler();
+ static class UserConfig{static final int MAX_ACCOUNT_COUNT=4;int account;static UserConfig getInstance(int a){var v=new UserConfig();v.account=a;return v;}boolean isClientActivated(){return account==1||account==3;}}
+ static class MediaController{static void getInstance(){calls.add("media");}}
+ static class ContactsController{int account;static ContactsController getInstance(int a){var v=new ContactsController();v.account=a;return v;}void checkAppAccount(){calls.add("contacts"+account);}}
+ static class DownloadController{static void getInstance(int a){calls.add("downloads"+a);}}
+ static class BillingController{static BillingController getInstance(){return new BillingController();}void startConnection(){calls.add("billing");}}
+ ''' + bodies + '''
+ static void check(boolean v){if(!v)throw new AssertionError(calls.toString());}
+ public static void main(String[] args){
+  initializeAccountServices(true);check(calls.equals(List.of("media")));
+  android.view.Choreographer.tick();check(calls.size()==1);applicationHandler.run();check(calls.equals(List.of("media","contacts0")));
+  android.view.Choreographer.tick();applicationHandler.run();check(calls.equals(List.of("media","contacts0","contacts1","downloads1")));
+  android.view.Choreographer.tick();applicationHandler.run();check(calls.get(4).equals("contacts3"));
+  android.view.Choreographer.tick();applicationHandler.run();check(calls.equals(List.of("media","contacts0","contacts1","downloads1","contacts3","downloads3","billing")));check(android.view.Choreographer.frames.isEmpty());
+  var expected=new ArrayList<>(calls);calls.clear();initializeAccountServices(false);check(calls.equals(expected));check(android.view.Choreographer.frames.isEmpty());
+ }
+}''',
     })

@@ -78,6 +78,10 @@ public class PhysicsProbe {
    fast.finishImmediately();frame(1d/hz);
    require(completed[0]==2,"Interrupted owner called completion twice");
   }
+  SelectedBubbleMotion reentrant=new SelectedBubbleMotion();int[] completions={0};
+  reentrant.enter(()->{if(reentrant.isClosing())reentrant.finishImmediately();});
+  reentrant.close(()->completions[0]++);reentrant.finishImmediately();reentrant.finishImmediately();
+  require(completions[0]==1,"Reentrant close must release the owner exactly once");
   System.out.println("PASS production spring/controllers: 60/90/120/144 Hz, "+samples+" simulated frames; device NOT_TESTED");
  }
 }
