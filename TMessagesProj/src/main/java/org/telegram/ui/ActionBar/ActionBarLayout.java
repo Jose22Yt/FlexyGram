@@ -2130,6 +2130,18 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         }
     }
 
+    /** At x0.01 a normal chat transition is shorter than one frame. Use the native
+     * immediate lifecycle path so loading/keyboard delays cannot stretch it to 200ms.
+     * Keep previews, sheets, live back gestures and chat-to-chat media transitions owned
+     * by their existing controllers. DOWN still settles older motion before hit testing.
+     */
+    private boolean useImmediateChatNavigation(BaseFragment chat, BaseFragment other, boolean preview) {
+        return chat instanceof ChatActivity && other != null && !(other instanceof ChatActivity)
+                && !preview && !inPreviewMode && !transitionAnimationPreviewMode
+                && !previewOpenAnimationInProgress && previewMenu == null && sheetFragment == null
+                && !startedTracking && !predictiveBackInProgress && !predictiveInput;
+    }
+
     public BaseFragment getLastFragment() {
         if (fragmentsStack.isEmpty()) {
             return null;
@@ -2512,7 +2524,8 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         if (parentActivity.getCurrentFocus() != null && fragment.hideKeyboardOnShow() && !preview) {
             AndroidUtilities.hideKeyboard(parentActivity.getCurrentFocus());
         }
-        boolean needAnimation = preview || !forceWithoutAnimation && MessagesController.getGlobalMainSettings().getBoolean("view_animations", true);
+        boolean needAnimation = preview || !forceWithoutAnimation && MessagesController.getGlobalMainSettings().getBoolean("view_animations", true)
+                && !useImmediateChatNavigation(fragment, lastFragment, preview);
 
         final BaseFragment currentFragment = !fragmentsStack.isEmpty() ? fragmentsStack.get(fragmentsStack.size() - 1) : null;
 
@@ -3157,6 +3170,10 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         BaseFragment previousFragment = null;
         if (fragmentsStack.size() > 1) {
             previousFragment = fragmentsStack.get(fragmentsStack.size() - 2);
+        }
+
+        if (useImmediateChatNavigation(currentFragment, previousFragment, false)) {
+            needAnimation = false;
         }
 
         if (previousFragment != null) {

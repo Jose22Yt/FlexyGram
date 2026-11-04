@@ -7,6 +7,27 @@ public class NavigationInterruptAndroidTest{
  @After public void cleanup(){activity.finish();}
  void layout(NavigationProbe root){if(root.getParent()==null)activity.setContentView(root);root.measure(View.MeasureSpec.makeMeasureSpec(320,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(640,View.MeasureSpec.EXACTLY));root.layout(0,0,320,640);}
  void touch(NavigationProbe root,int action){MotionEvent event=MotionEvent.obtain(0,SystemClock.uptimeMillis(),action,80,80,0);root.dispatchTouchEvent(event);event.recycle();if(action==MotionEvent.ACTION_UP)Shadows.shadowOf(Looper.getMainLooper()).idle();}
+ @Test public void ordinaryChatRoutesSkipVisualWaitsButOtherOwnersKeepTheirTransitions()throws Exception{
+  NavigationProbe root=new NavigationProbe(activity);var chat=new NavigationProbe.ChatActivity();var list=new NavigationProbe.BaseFragment();
+  assertTrue(root.immediate(chat,list,false));assertFalse(root.immediate(list,chat,false));
+  assertFalse(root.immediate(chat,new NavigationProbe.ChatActivity(),false));assertFalse(root.immediate(chat,null,false));
+  assertFalse(root.immediate(chat,list,true));
+  for(String flag:new String[]{"inPreviewMode","transitionAnimationPreviewMode","previewOpenAnimationInProgress","startedTracking","predictiveBackInProgress","predictiveInput"}){
+   var field=NavigationProbe.class.getDeclaredField(flag);field.setBoolean(root,true);assertFalse(flag,root.immediate(chat,list,false));field.setBoolean(root,false);
+  }
+  root.previewMenu=new Object();assertFalse(root.immediate(chat,list,false));root.previewMenu=null;
+  root.sheetFragment=new Object();assertFalse(root.immediate(chat,list,false));root.sheetFragment=null;
+  assertTrue(root.immediate(chat,list,false));
+ }
+ @Test public void touchThatCompletesCloseCanStartNextOpenWithoutStaleCleanup(){
+  NavigationProbe root=new NavigationProbe(activity);layout(root);int[] clicks={0};Button chat=new Button(activity);
+  chat.measure(View.MeasureSpec.makeMeasureSpec(320,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(640,View.MeasureSpec.EXACTLY));chat.layout(0,0,320,640);
+  chat.setOnClickListener(v->{clicks[0]++;root.begin(chat,false);});
+  root.begin(chat,true);touch(root,MotionEvent.ACTION_DOWN);layout(root);touch(root,MotionEvent.ACTION_UP);
+  assertEquals(1,clicks[0]);assertEquals(1,root.finishes);assertTrue(root.transitionAnimationInProgress);assertNotNull(root.onOpenAnimationEndRunnable);
+  touch(root,MotionEvent.ACTION_DOWN);layout(root);touch(root,MotionEvent.ACTION_UP);
+  assertEquals(2,clicks[0]);assertEquals(2,root.finishes);assertTrue(root.transitionAnimationInProgress);
+ }
  @Test public void sameFingerOpensDestinationAfterOpenOrCloseWithoutWaiting(){for(boolean close:new boolean[]{false,true}){
   NavigationProbe root=new NavigationProbe(activity);layout(root);int[] clicks={0};Button target=new Button(activity);target.setOnClickListener(v->clicks[0]++);
   target.measure(View.MeasureSpec.makeMeasureSpec(320,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(640,View.MeasureSpec.EXACTLY));target.layout(0,0,320,640);

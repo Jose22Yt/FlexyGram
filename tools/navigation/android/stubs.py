@@ -9,16 +9,17 @@ def method(text,anchor):
 def write(dest,root):
  source=(root/'TMessagesProj/src/main/java/org/telegram/ui/ActionBar/ActionBarLayout.java').read_text()
  methods='\n'.join(method(source,anchor) for anchor in [
-  'private void nativeInstantTouchDown(', 'private void finishNavigationForInput(',
+  'private void nativeInstantTouchDown(', 'private void finishNavigationForInput(', 'private boolean useImmediateChatNavigation(',
   'private void onAnimationEndCheck(', 'private void onCloseAnimationEnd()', 'private void onOpenAnimationEnd()'])
  host='''import android.content.Context;import android.view.*;import android.widget.*;import android.animation.*;
  public class NavigationProbe extends FrameLayout{
   static class BaseFragment{Object sheet;Object getLastSheet(){return sheet;}}
+  static class ChatActivity extends BaseFragment{}
   static class SpringAnimation{int cancelled;Runnable callback;void cancel(){cancelled++;if(callback!=null)callback.run();}}
   static class AndroidUtilities{static void cancelRunOnUIThread(Runnable r){}}
   boolean storyModal;boolean storyViewerAttached(){return storyModal;}
   BaseFragment fragment=new BaseFragment();FrameLayout containerView,containerViewBack;
-  boolean completingTransition,transitionAnimationInProgress,transitionAnimationPreviewMode,inPreviewMode,previewOpenAnimationInProgress,inActionMode,predictiveInput,startedTracking,animationInProgress,settlingBackAnimation;
+  boolean completingTransition,transitionAnimationInProgress,transitionAnimationPreviewMode,inPreviewMode,previewOpenAnimationInProgress,inActionMode,predictiveInput,predictiveBackInProgress,startedTracking,animationInProgress,settlingBackAnimation;
   Object previewMenu,sheetFragment,layoutToIgnore,newFragment,oldFragment,springRouteBackgroundDrawable;
   float springRouteYRatio,innerTranslationX;long transitionAnimationStartTime;
   AnimatorSet currentAnimation,backAnimator;SpringAnimation currentSpringAnimation;
@@ -32,6 +33,7 @@ def write(dest,root):
   public boolean dispatchTouchEvent(MotionEvent event){nativeInstantTouchDown(event);return super.dispatchTouchEvent(event);}
   void begin(View target,boolean close){transitionAnimationInProgress=true;Runnable done=()->{finishes++;containerView.removeAllViews();containerView.addView(target,new LayoutParams(-1,-1));};if(close)onCloseAnimationEndRunnable=done;else onOpenAnimationEndRunnable=done;}
   void finishNow(){onAnimationEndCheck(true);}
+  boolean immediate(BaseFragment chat,BaseFragment other,boolean preview){return useImmediateChatNavigation(chat,other,preview);}
   METHODS
  }
  '''.replace('METHODS',methods)
