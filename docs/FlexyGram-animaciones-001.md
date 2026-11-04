@@ -5,7 +5,7 @@ ajustes globales del teléfono ni se solicitan permisos especiales.
 
 ## Interruptor de FlexyStudio
 
-`FlexyStudio > Animaciones > Animaciones ultrarrápidas` permite activar o
+`FlexyStudio > Animaciones > Reducir animaciones` permite activar o
 desactivar este comportamiento sin reiniciar. Queda activo por defecto para
 conservar el comportamiento de la beta actual. La preferencia se guarda en
 `flexygram_motion/fast_motion_enabled` y está incluida en la copia del cliente.
