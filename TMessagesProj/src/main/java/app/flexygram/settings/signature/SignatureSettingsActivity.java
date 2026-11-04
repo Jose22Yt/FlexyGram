@@ -31,12 +31,20 @@ public class SignatureSettingsActivity extends SignatureMatteSettingsActivity {
         rowCount=rows.size();
     }
     @Override public View createView(Context context){
-        View v=super.createView(context);actionBar.centerTitle();listView.setItemViewCacheSize(10);listView.disableSections();listView.setPadding(AndroidUtilities.dp(12),0,AndroidUtilities.dp(12),AndroidUtilities.dp(8));listView.setItemAnimator(null);
+        View v=super.createView(context);actionBar.centerTitle();listView.setItemViewCacheSize(10);listView.disableSections();applyRootPadding(0);listView.setItemAnimator(null);
         actionBar.createMenu().addItem(7,R.drawable.ic_ab_search_solar).setIsSearchField(true).setActionBarMenuItemSearchListener(new ActionBarMenuItem.ActionBarMenuItemSearchListener(){
             @Override public void onTextChanged(EditText field){query=field.getText().toString().trim().toLowerCase(Locale.ROOT);updateRows();listAdapter.notifyDataSetChanged();}
             @Override public void onSearchCollapse(){query="";updateRows();listAdapter.notifyDataSetChanged();}
         }).setSearchFieldHint(LocaleController.getString(R.string.Settings2Search));
         return v;
+    }
+    @Override public void onInsets(int left,int top,int right,int bottom){
+        super.onInsets(left,top,right,bottom);
+        applyRootPadding(bottom);
+    }
+    private void applyRootPadding(int bottom){
+        int inset=AndroidUtilities.dp(SettingsCardStyle.INSET);
+        listView.setPadding(inset,0,inset,Math.max(AndroidUtilities.dp(8),bottom));
     }
     @Override protected BaseListAdapter createAdapter(Context c){return new Adapter(c);}
     @Override protected void onItemClick(View v,int p,float x,float y){

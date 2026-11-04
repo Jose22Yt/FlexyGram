@@ -67,10 +67,15 @@ def write(dest,root):
  while depth:
   depth+=(text[end]=='{')-(text[end]=='}');end+=1
  hook=text[start:end]
+ # Run the production inset callback too: omitting it hid the root margin reset.
+ start=text.index('    public void onInsets(');brace=text.index('{',start);end=brace+1;depth=1
+ while depth:
+  depth+=(text[end]=='{')-(text[end]=='}');end+=1
+ insets=text[start:end]
  p=dest/'tw/nekomimi/nekogram/settings/BaseNekoSettingsActivity.java';s=p.read_text()
  s=s.replace('onBindViewHolder(h,i,false);','onBindViewHolder(h,i);')
  s=s.replace('onBindViewHolder(h,p,false);}', 'onBindViewHolder(h,p,false);applySectionBackground(h,p);}')
- s=s.replace('protected abstract class BaseListAdapter extends RecyclerListView.SelectionAdapter{', 'protected abstract class BaseListAdapter extends RecyclerListView.SelectionAdapter{'+hook)
+ s=s.replace('protected abstract class BaseListAdapter extends RecyclerListView.SelectionAdapter{', insets+'\nprotected abstract class BaseListAdapter extends RecyclerListView.SelectionAdapter{'+hook)
  p.write_text(s)
  p=dest/'org/telegram/ui/Cells/TextSettingsCell.java';s=p.read_text().replace('extends android.widget.TextView{','extends android.widget.TextView{public boolean needDivider;');p.write_text(s)
  p=dest/'org/telegram/ui/Cells/TextCheckCell.java';s=p.read_text().replace('extends android.widget.TextView{','extends android.widget.TextView{public void setDivider(boolean d){}');p.write_text(s)

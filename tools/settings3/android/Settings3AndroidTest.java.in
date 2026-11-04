@@ -10,6 +10,21 @@ public class Settings3AndroidTest {
  @After public void finish(){activity.finish();}
  @Test public void globalWidgetOwnershipDoesNotDuplicateHomeControls(){for(String key:new String[]{"SwitchStyle","SliderStyle","IconReplacements","CenterActionBarTitleType"})assertEquals("universal",SignatureLegacyExtras.categoryForKey(key));assertEquals("home",SignatureLegacyExtras.categoryForKey("FolderNameAsTitle"));assertEquals("home",SignatureLegacyExtras.categoryForKey("AlwaysShowDownloadIcon"));assertEquals("ayu",SignatureLegacyExtras.categoryForKey("ClearMessageDatabase"));assertEquals("chat",SignatureLegacyExtras.categoryForKey("futureNcPreference","nc"));assertEquals("universal",SignatureLegacyExtras.categoryForKey("futureNgPreference","ng"));}
  @Test public void rootHasExactlyTenApprovedEntries(){assertEquals(Arrays.asList("chat","home","navigation","ayu","plugins","flexyfiles","files","universal","studio","about"),Settings3Registry.all().stream().map(e->e.id).toList());}
+ @Test public void rootKeepsSharedSideMarginsAfterSystemInsetsInBothThemesAndDirections(){
+  for(boolean dark:new boolean[]{false,true})for(boolean rtl:new boolean[]{false,true}){
+   Theme.dark=dark;LocaleController.isRTL=rtl;
+   var page=new SignatureSettingsActivity();page.onFragmentCreate();View root=page.createView(activity);
+   root.setLayoutDirection(rtl?View.LAYOUT_DIRECTION_RTL:View.LAYOUT_DIRECTION_LTR);
+   for(int bottom:new int[]{0,32,0}){
+    page.onInsets(0,0,0,bottom);
+    assertEquals(SettingsCardStyle.INSET,root.getPaddingLeft());assertEquals(SettingsCardStyle.INSET,root.getPaddingRight());
+    assertEquals(Math.max(8,bottom),root.getPaddingBottom());
+    root.measure(View.MeasureSpec.makeMeasureSpec(440,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(4000,View.MeasureSpec.AT_MOST));root.layout(0,0,440,root.getMeasuredHeight());
+    List<Settings2Cell> rows=new ArrayList<>();collectRows(root,rows);assertEquals(10,rows.size());
+    for(Settings2Cell row:rows){assertEquals(SettingsCardStyle.INSET,row.getLeft());assertEquals(440-SettingsCardStyle.INSET,row.getRight());}
+   }
+  }
+ }
  @Test public void unionScopesAdmitEachOriginalPreferenceOnce(){for(String source:new String[]{"chats","appearance","general","other"}){var union=new Settings2Policy.Rows(source,"messages|post_appearance|menus|media|stickers|chat_list|avatars|folders|general|profile|archive");for(var entry:Settings2Policy.inventory().entrySet()){if(!entry.getKey().startsWith(source+":"))continue;String key=entry.getKey().substring(source.length()+1);boolean expected=Arrays.asList("messages","post_appearance","menus","media","stickers","chat_list","avatars","folders","general","profile","archive").contains(entry.getValue());assertEquals(key,expected,union.named(key));assertEquals(expected,union.anonymous());}union.reset();assertFalse(union.anonymous());}}
  @Test public void nativeTilesKeepWhiteSymbolsAndCategoryColoursInBothThemes(){for(boolean dark:new boolean[]{false,true}){
   Theme.dark=dark;Settings2Cell row=new Settings2Cell(activity,null);row.bind("Chat","Description",R.drawable.settings3_chat,0,false);
