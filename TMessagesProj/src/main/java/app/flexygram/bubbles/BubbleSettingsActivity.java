@@ -8,20 +8,18 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.SeekBar;
-import android.graphics.drawable.GradientDrawable;
 import androidx.recyclerview.widget.RecyclerView;
 import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.Cells.TextSettingsCell;
 import org.telegram.ui.Cells.TextCheckCell;
-import org.telegram.ui.Cells.TextInfoPrivacyCell;
 import org.telegram.ui.Components.RecyclerListView;
 import app.flexygram.settings.SignatureMatteSettingsActivity;
 
 /** Local native preview, fill opacity, border width and optional cached wallpaper blur. */
 public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity {
-    private static final int SLIDER = 110;
+    private static final int SLIDER = 110, PREVIEW = 111;
     private int transparencyRow, borderRow, previewRow, positionRow, blurRow, enabledRow, fuseRow, styleRow, pearlRow, fusionIntensityRow, fusionAdaptRow;
     private BubblePreviewView preview;
     private final android.graphics.drawable.Drawable contextualWallpaper;
@@ -45,6 +43,11 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
     }
     @Override protected String getActionBarTitle() { return getString(R.string.FlexyBubblesTitle); }
     @Override protected BaseListAdapter createAdapter(Context context) { return new Adapter(context); }
+    @Override public View createView(Context context) {
+        View view = super.createView(context);
+        listView.setItemAnimator(null);
+        return view;
+    }
     @Override protected void onItemClick(View view, int position, float x, float y) {
         if (position < 0) return;
         if (position == enabledRow) {
@@ -110,11 +113,29 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
     private final class Adapter extends MatteListAdapter {
         Adapter(Context context) { super(context); }
         @Override public int getItemViewType(int position) {
-            return position == previewRow ? 111 : position == blurRow || position == fusionAdaptRow || position == enabledRow ? TYPE_CHECK : position == styleRow || position == fuseRow ? TYPE_SETTINGS : position == transparencyRow || position == borderRow || position == pearlRow || position == positionRow || position == fusionIntensityRow ? SLIDER : TYPE_INFO_PRIVACY;
+            return position == previewRow ? PREVIEW : position == blurRow || position == fusionAdaptRow || position == enabledRow ? TYPE_CHECK : position == styleRow || position == fuseRow ? TYPE_SETTINGS : position == transparencyRow || position == borderRow || position == pearlRow || position == positionRow || position == fusionIntensityRow ? SLIDER : TYPE_INFO_PRIVACY;
+        }
+        @Override protected boolean isSectionContent(int type) {
+            // The preview paints its own wallpaper. Controls form a separate native card group.
+            return type != PREVIEW && super.isSectionContent(type);
         }
         @Override public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int type) {
-            if (type == 111) { preview = new BubblePreviewView(parent.getContext(), contextualWallpaper); return new RecyclerListView.Holder(preview); }
-            if (type == SLIDER) return new RecyclerListView.Holder(new TransparencyCell(parent.getContext()));
+            if (type == PREVIEW) {
+                preview = new BubblePreviewView(parent.getContext(), contextualWallpaper);
+                preview.setTag(RecyclerListView.TAG_NOT_SECTION);
+                RecyclerView.LayoutParams params = new RecyclerView.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                // The preview has an 8dp internal inset; align it with the shared 12dp cards.
+                params.setMargins(dp(4), dp(12), dp(4), dp(8));
+                preview.setLayoutParams(params);
+                return new RecyclerListView.Holder(preview);
+            }
+            if (type == SLIDER) {
+                TransparencyCell cell = new TransparencyCell(parent.getContext());
+                cell.setLayoutParams(new RecyclerView.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                return new RecyclerListView.Holder(cell);
+            }
             return super.onCreateViewHolder(parent, type);
         }
         @Override public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, boolean partial) {
