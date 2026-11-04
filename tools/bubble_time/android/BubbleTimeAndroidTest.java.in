@@ -30,4 +30,21 @@ public class BubbleTimeAndroidTest {
   int max=0;for(int y=0;y<actual.getHeight();y++)for(int x=0;x<actual.getWidth();x++)max=Math.max(max,Color.alpha(actual.getPixel(x,y)));
   assertTrue(max>0&&max<=215);actual.recycle();expected.recycle();
  }
+ @Test public void timestampHasNoBackgroundPanelAndRestoresExistingShadow() {
+  TimeLabelProbe host=new TimeLabelProbe();host.currentMessageObject.out=true;host.gradient=0xffffee77;
+  TimeLabelProbe.Theme.chat_timePaint.setColor(0xff777777);
+  TimeLabelProbe.Theme.chat_timePaint.setShadowLayer(3,2,1,Color.CYAN);
+  StaticLayout l=label();Bitmap bitmap=Bitmap.createBitmap(220,50,Bitmap.Config.ARGB_8888);
+  Canvas c=new Canvas(bitmap);c.translate(8,8);host.draw(c,l);
+  assertEquals("The former panel's corner must remain transparent",0,bitmap.getPixel(8,8));
+  int colored=0;for(int y=8;y<8+l.getHeight();y++)for(int x=8;x<8+l.getLineWidth(0);x++)if(Color.alpha(bitmap.getPixel(x,y))>128)colored++;
+  assertTrue("Whitespace between glyphs must not become a filled rectangle",colored<l.getHeight()*l.getLineWidth(0)*.8f);
+  assertEquals(0xff777777,TimeLabelProbe.Theme.chat_timePaint.getColor());
+  assertEquals(3f,TimeLabelProbe.Theme.chat_timePaint.getShadowLayerRadius(),0f);
+  assertEquals(2f,TimeLabelProbe.Theme.chat_timePaint.getShadowLayerDx(),0f);
+  assertEquals(1f,TimeLabelProbe.Theme.chat_timePaint.getShadowLayerDy(),0f);
+  assertEquals(Color.CYAN,TimeLabelProbe.Theme.chat_timePaint.getShadowLayerColor());
+  TimeLabelProbe.Theme.chat_timePaint.clearShadowLayer();bitmap.recycle();
+ }
+
 }

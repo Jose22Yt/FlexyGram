@@ -38,7 +38,8 @@ public class TimeLabelProbe {
  int surface=0xffffffff,gradient;boolean media;
  Message currentMessageObject=new Message();
  private final app.flexygram.bubbles.BubbleTimeContrast bubbleTimeContrast=new app.flexygram.bubbles.BubbleTimeContrast();
- private Paint bubbleTimeBackingPaint;
+ private Paint bubbleTimeSavedPaint;
+ static class AndroidUtilities {static float dpf2(float n){return n;}}
  int getThemedColor(int key){return key==Theme.key_chat_outBubbleGradient1?gradient:surface;}
  boolean shouldDrawTimeOnMedia(){return media;}
  int dp(float n){return (int)Math.ceil(n);}

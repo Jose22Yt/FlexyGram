@@ -15,10 +15,10 @@ public class Probe {
    for(int alpha:new int[]{0,32,96,166,184,224,255})
     for(int ink:new int[]{0xff000000,0xffffffff,0xff757575,0xff4285f4,0x99555555}) {
      int surface=base|(alpha<<24);c.update(ink,surface);
-     int result=c.ink(),backing=c.backing();
+     int result=c.ink(),halo=c.halo();
      for(int i=0;i<20000;i++) c.update(ink,surface);
-     if(result!=c.ink()||backing!=c.backing())throw new AssertionError("unstable cache");
-     System.out.println(Integer.toUnsignedString(surface)+" "+Integer.toUnsignedString(ink|0xff000000)+" "+Integer.toUnsignedString(result)+" "+Integer.toUnsignedString(backing));
+     if(result!=c.ink()||halo!=c.halo())throw new AssertionError("unstable cache");
+     System.out.println(Integer.toUnsignedString(surface)+" "+Integer.toUnsignedString(ink|0xff000000)+" "+Integer.toUnsignedString(result)+" "+Integer.toUnsignedString(halo));
     }
  }
 }'''}
@@ -28,12 +28,16 @@ public class Probe {
     rows = subprocess.check_output(['java', '-cp', str(tmp_path), 'Probe'], text=True).splitlines()
     assert len(rows) == 210
     for row in rows:
-        surface, original, ink, backing = map(int, row.split())
+        surface, original, ink, halo = map(int, row.split())
         for background in [0xff000000, 0xffffffff, 0xff777777, 0xffff0000, 0xff00ff00, 0xff0000ff]:
-            visible = backing if backing else composite(surface, background)
-            assert contrast(ink, visible) >= 4.5, row
+            visible = composite(surface, background)
+            if halo:
+                assert halo in (0xff000000, 0xffffffff)
+                assert contrast(ink, halo) >= 4.5, row
+            else:
+                assert contrast(ink, visible) >= 4.5, row
         if surface >> 24 == 255 and contrast(original, surface) >= 4.5:
-            assert ink == original and backing == 0
+            assert ink == original and halo == 0
 
 
 def test_independent_flags_and_retained_chat_sources_switch_without_reopening(tmp_path):

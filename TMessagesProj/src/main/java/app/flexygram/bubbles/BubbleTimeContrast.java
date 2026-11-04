@@ -6,7 +6,7 @@ import app.exteraless.appearance.GlassContrastPolicy;
 public final class BubbleTimeContrast {
     private boolean initialized;
     private int original, surface;
-    private int ink, backing;
+    private int ink, halo;
 
     public void update(int original, int surface) {
         original |= 0xFF000000;
@@ -14,7 +14,7 @@ public final class BubbleTimeContrast {
         initialized = true;
         this.original = original;
         this.surface = surface;
-        backing = 0;
+        halo = 0;
         if (GlassContrastPolicy.minimumContrast(original, surface) >= 4.5) {
             ink = original;
             return;
@@ -25,11 +25,13 @@ public final class BubbleTimeContrast {
         if (Math.max(black, white) >= 4.5) {
             ink = GlassContrastPolicy.readableInk(original, surface);
         } else {
-            backing = surface | 0xFF000000;
-            ink = GlassContrastPolicy.readableInk(original, backing);
+            ink = GlassContrastPolicy.readableInk(original, surface | 0xFF000000);
+            // Protect only the glyph edges. Never draw a panel behind the timestamp.
+            halo = GlassContrastPolicy.contrast(ink, 0xFF000000)
+                    >= GlassContrastPolicy.contrast(ink, 0xFFFFFFFF) ? 0xFF000000 : 0xFFFFFFFF;
         }
     }
 
     public int ink() { return ink; }
-    public int backing() { return backing; }
+    public int halo() { return halo; }
 }

@@ -29,17 +29,19 @@ Los tintes automáticos siguen los valores nativos de cada modo; los tintes expl
 
 ## Hora de las burbujas
 
-`BubbleTimeContrast` conserva el color del tema cuando tiene contraste suficiente. Si es
-necesario lo ajusta y, cuando una superficie transparente o un gradiente impide garantizar
-contraste con un único color, dibuja un respaldo pequeño detrás de la hora. No se captura
-la pantalla ni se muestrean píxeles durante el scroll. El cálculo se conserva por celda y
-solo se repite al cambiar sus colores de entrada.
+`BubbleTimeContrast` conserva el color del tema cuando tiene contraste suficiente y lo
+ajusta cuando es necesario. Se elimina por completo la tarjeta rectangular introducida
+en la primera revisión. Si una superficie transparente o un gradiente impide resolver
+el contraste con un único color, se protege únicamente el borde de los caracteres con
+un halo fino de 1 dp, sin dibujar un fondo para la hora.
 
-La comprobación contempla también fondos intermedios: comprobar únicamente blanco y negro
-podía dar un falso resultado favorable para texto gris sobre una burbuja transparente.
-El objetivo de contraste es 4,5:1 para la hora completamente visible. Las animaciones siguen
-respetando su alfa. Las horas sobre medios conservan el dibujo nativo. Se restaura el Paint
-compartido para no afectar a otras celdas o textos.
+El objetivo de 4,5:1 se comprueba sobre el color cuando se puede conseguir con una tinta
+uniforme. En los casos ambiguos se usa la separación entre tinta y halo, sin prometer
+esa relación para cada píxel del fondo variable. No se captura la pantalla ni se muestrean
+píxeles durante el scroll; los colores se conservan por celda hasta que cambia la entrada.
+La tinta y el halo respetan el alfa de las animaciones. Se restauran el color y la sombra
+originales del Paint compartido, incluso si ya existía una sombra personalizada. Las horas
+sobre medios conservan su dibujo nativo.
 
 ## Trabajo de renderizado reducido
 
@@ -73,18 +75,23 @@ python tools/bubble_time/android/run.py \
   --output-dir /tmp/flexy-time-android-probe
 ```
 
-Dos pruebas Robolectric API 35 con gráficos nativos ejecutan el método real de dibujo de la
+Tres pruebas Robolectric API 35 con gráficos nativos ejecutan el método real de dibujo de la
 hora, StaticLayout, Canvas y los Paint de Android. Los anfitriones de Telegram son dobles;
 no se inicia la aplicación completa. La compilación Java del anfitrión usa el SDK API 37.
 En este entorno se ejecutaron sin red usando Maven y el SDK instrumentado ya en caché.
 El ejecutor compartido conserva un mensaje final histórico sobre música; el informe
-`BubbleTimeAndroidTest` es la evidencia pertinente, con 2 pruebas aprobadas.
+`BubbleTimeAndroidTest` es la evidencia pertinente, con 3 pruebas aprobadas.
 
 Límites: no se ha medido FPS, tiempo de arranque, consumo de GPU/batería ni comportamiento
 completo en un teléfono. El acabado de refracción y las transiciones de todas las superficies
 necesitan aceptación en dispositivo. Estas comprobaciones no equivalen a compilar la APK.
 
-Resultado de esta revisión: **247 pruebas generales aprobadas y 31 omitidas**;
+Resultado de la revisión inicial, antes de retirar el recuadro: **247 pruebas generales aprobadas y 31 omitidas**;
 **2 pruebas de Canvas Android aprobadas**. El parser Java 21 acepta los 15 archivos
 Java de producción modificados o añadidos; esto comprueba sintaxis, no compila la aplicación.
 `git diff --check` no presenta errores de espacios ni marcadores de conflicto.
+
+Corrección del recuadro: las regresiones de color y modos se vuelven a ejecutar, junto
+con tres pruebas de Canvas Android. La nueva prueba comprueba que las esquinas y los
+espacios del texto no se rellenan como una tarjeta, y que se restaura una sombra previa.
+No se compila una APK ni se activa GitHub Actions para esta corrección.

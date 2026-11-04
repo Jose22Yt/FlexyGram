@@ -24962,7 +24962,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     }
 
     private final app.flexygram.bubbles.BubbleTimeContrast bubbleTimeContrast = new app.flexygram.bubbles.BubbleTimeContrast();
-    private Paint bubbleTimeBackingPaint;
+    private Paint bubbleTimeSavedPaint;
 
     private void drawReadableTimeLayout(Canvas canvas, StaticLayout layout, boolean selected) {
         if (layout == null) return;
@@ -24980,19 +24980,19 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         surface = (surface & 0xFFFFFF) | ((Color.alpha(surface) * opacity / 255) << 24);
         int oldColor = Theme.chat_timePaint.getColor();
         bubbleTimeContrast.update(oldColor, surface);
-        if (bubbleTimeContrast.backing() != 0) {
-            if (bubbleTimeBackingPaint == null) bubbleTimeBackingPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-            bubbleTimeBackingPaint.setColor(bubbleTimeContrast.backing());
-            bubbleTimeBackingPaint.setAlpha(Color.alpha(oldColor));
-            float left = layout.getLineLeft(0), right = left + layout.getLineWidth(0);
-            canvas.drawRoundRect(left - dp(2), 0, right + dp(2), layout.getHeight(),
-                    dp(3), dp(3), bubbleTimeBackingPaint);
+        boolean protectEdges = bubbleTimeContrast.halo() != 0;
+        if (protectEdges) {
+            if (bubbleTimeSavedPaint == null) bubbleTimeSavedPaint = new Paint();
+            bubbleTimeSavedPaint.set(Theme.chat_timePaint);
+            Theme.chat_timePaint.setShadowLayer(AndroidUtilities.dpf2(1), 0, 0,
+                    (bubbleTimeContrast.halo() & 0xFFFFFF) | (oldColor & 0xFF000000));
         }
         Theme.chat_timePaint.setColor((bubbleTimeContrast.ink() & 0xFFFFFF) | (oldColor & 0xFF000000));
         try {
             SpoilerEffect.layoutDrawMaybe(layout, canvas);
         } finally {
-            Theme.chat_timePaint.setColor(oldColor);
+            if (protectEdges) Theme.chat_timePaint.set(bubbleTimeSavedPaint);
+            else Theme.chat_timePaint.setColor(oldColor);
         }
     }
 
