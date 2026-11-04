@@ -546,14 +546,16 @@ public class ChatActivity extends BaseFragment implements
     private BlurredBackgroundColorProviderThemed blurredBackgroundColorProviderWhite;
 
     private boolean signatureNativeGlassAllowed;
+    private boolean signatureLiquidGlassAllowed;
     private final Utilities.Callback<Boolean> signatureGlassPowerListener = ignored -> refreshSignatureNativeGlassPolicy();
     private void refreshSignatureNativeGlassPolicy() {
-        boolean allowed=SharedConfig.chatBlurEnabled() && LiteMode.isEnabled(LiteMode.FLAG_CHAT_BLUR);
-        if (signatureNativeGlassAllowed==allowed) return;
-        signatureNativeGlassAllowed=allowed;
+        boolean allowed = SharedConfig.chatBlurEnabled();
+        boolean liquidPolicy = LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS);
+        if (signatureNativeGlassAllowed == allowed && signatureLiquidGlassAllowed == liquidPolicy) return;
+        signatureNativeGlassAllowed = allowed;
+        signatureLiquidGlassAllowed = liquidPolicy;
         // The native suppressor snapshots Liquid Glass in its constructor. Refresh only on a
         // policy transition, otherwise a source created with Glass off remains frosted forever.
-        boolean liquidPolicy = LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS);
         if (scrollableViewNoiseSuppressor != null && scrollableViewNoiseSuppressor.isLiquidGlassEnabled != liquidPolicy) {
             scrollableViewNoiseSuppressor = new DownscaleScrollableNoiseSuppressor();
             if (glassBackgroundSourceRenderNode != null) glassBackgroundSourceRenderNode.setScrollableNoiseSuppressor(
@@ -562,10 +564,10 @@ public class ChatActivity extends BaseFragment implements
                     scrollableViewNoiseSuppressor, DownscaleScrollableNoiseSuppressor.DRAW_FROSTED_GLASS);
             if (contentView != null) invalidateMergedVisibleBlurredPositionsAndSourcesPositions();
         }
-        glassBackgroundDrawableFactory.setLiquidGlassEffectAllowed(allowed);
-        glassBackgroundDrawableFactoryFrosted.setLiquidGlassEffectAllowed(allowed);
-        if (actionBar!=null) actionBar.updateSignatureNativeGlassPolicy(allowed);
-        if (chatInputViewsContainer!=null) chatInputViewsContainer.updateNativeLiquidGlassPolicy(allowed);
+        glassBackgroundDrawableFactory.setLiquidGlassEffectAllowed(liquidPolicy);
+        glassBackgroundDrawableFactoryFrosted.setLiquidGlassEffectAllowed(liquidPolicy);
+        if (actionBar!=null) actionBar.updateSignatureNativeGlassPolicy(liquidPolicy);
+        if (chatInputViewsContainer!=null) chatInputViewsContainer.updateNativeLiquidGlassPolicy(liquidPolicy);
         if (contentView!=null) contentView.invalidate();
     }
 
@@ -3040,7 +3042,8 @@ public class ChatActivity extends BaseFragment implements
 
     public ChatActivity(Bundle args) {
         super(args);
-        signatureNativeGlassAllowed=SharedConfig.chatBlurEnabled() && LiteMode.isEnabled(LiteMode.FLAG_CHAT_BLUR);
+        signatureNativeGlassAllowed = SharedConfig.chatBlurEnabled();
+        signatureLiquidGlassAllowed = LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS);
 
         navbarContentSourceWallpaper = new BlurredBackgroundSourceWrapped();
         // Retain the source while the master switch is off, so enabling it does not need a new chat.
@@ -39511,7 +39514,7 @@ public class ChatActivity extends BaseFragment implements
     }
 
     public BlurredBackgroundSourceRenderNode getGlassSource() {
-        return LiteMode.isEnabled(LiteMode.FLAG_CHAT_BLUR) && glassBackgroundSourceRenderNode!=null
+        return SharedConfig.chatBlurEnabled() && glassBackgroundSourceRenderNode!=null
                 ? glassBackgroundSourceRenderNode : glassBackgroundSourceFrostedRenderNode;
     }
 

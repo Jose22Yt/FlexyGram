@@ -70,9 +70,9 @@ public class ChannelGlassRegression {
         require(canvas.draws.equals(List.of("native0","native1","native2")),"all channel capsules must use native blur/border with no opaque fill");
         c.flexyChannels.left=false;Canvas noLeft=new Canvas();c.drawSignatureChannelBackground(noLeft);
         require(noLeft.draws.equals(List.of("native0","native2")),"hidden actions must not leave a background");
-        LiteMode.enabled=false;Canvas disabled=new Canvas();c.drawSignatureChannelBackground(disabled);
+        SharedConfig.enabled=false;Canvas disabled=new Canvas();c.drawSignatureChannelBackground(disabled);
         require(!disabled.draws.contains("native0")&&disabled.draws.contains("fill"),"respect disabled blur setting");
-        LiteMode.enabled=true;Canvas software=new Canvas();software.hardware=false;c.drawSignatureChannelBackground(software);
+        SharedConfig.enabled=true;Canvas software=new Canvas();software.hardware=false;c.drawSignatureChannelBackground(software);
         require(software.draws.contains("fill")&&!software.draws.contains("native0"),"software rendering keeps readable fallback");
         c.compactGlass[0]=null;Canvas missing=new Canvas();c.drawSignatureChannelBackground(missing);
         require(missing.draws.contains("fill"),"safe fallback before native source is prepared");

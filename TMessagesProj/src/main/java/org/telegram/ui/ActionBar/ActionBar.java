@@ -1548,7 +1548,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
     }
     public void prepareSignatureNativeGlass(boolean separateCall) {
         if (separateCall && signatureGlassCall==null && signatureGlassFactory!=null
-                && org.telegram.messenger.LiteMode.isEnabled(org.telegram.messenger.LiteMode.FLAG_CHAT_BLUR)) {
+                && org.telegram.messenger.SharedConfig.chatBlurEnabled()) {
             // Each painted island needs its own retained RenderNode/transform, sharing the same native source.
             signatureGlassCall=signatureGlassFactory.create(this).setColorProvider(signatureGlassColorProvider)
                     .setRadius(dp(23)).setPadding(0);
@@ -1556,7 +1556,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
     }
 
     public void updateSignatureNativeGlassPolicy(boolean allowed) {
-        if (allowed && signatureHeader!=null && signatureHeader.fusionActive()) {
+        if (org.telegram.messenger.SharedConfig.chatBlurEnabled() && signatureHeader!=null && signatureHeader.fusionActive()) {
             var g=signatureHeader.fusionGeometry();
             prepareSignatureNativeGlass(g!=null && g.mattePortrait && g.callAvailable);
         }
@@ -1581,9 +1581,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
             app.flexygram.header.SignatureChatHeader header) {
         if (header == null || !header.active() || !glassMode || !canvas.isHardwareAccelerated()
                 || !org.telegram.messenger.SharedConfig.chatBlurEnabled()
-                || glassDrawable == null || glassDrawableBack == null || glassDrawableMenu == null
-                || !org.telegram.messenger.LiteMode.isEnabled(
-                    org.telegram.messenger.LiteMode.FLAG_CHAT_BLUR)) return false;
+                || glassDrawable == null || glassDrawableBack == null || glassDrawableMenu == null) return false;
         glassDrawable.setAlpha(255);
         glassDrawableBack.setAlpha(255);
         glassDrawableMenu.setAlpha(255);

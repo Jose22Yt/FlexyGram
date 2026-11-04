@@ -24961,6 +24961,41 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         }
     }
 
+    private final app.flexygram.bubbles.BubbleTimeContrast bubbleTimeContrast = new app.flexygram.bubbles.BubbleTimeContrast();
+    private Paint bubbleTimeBackingPaint;
+
+    private void drawReadableTimeLayout(Canvas canvas, StaticLayout layout, boolean selected) {
+        if (layout == null) return;
+        if (!app.flexygram.bubbles.BubbleStyle.signature() || shouldDrawTimeOnMedia()) {
+            SpoilerEffect.layoutDrawMaybe(layout, canvas);
+            return;
+        }
+        boolean out = currentMessageObject.isOutOwner();
+        int surface = getThemedColor(out
+                ? (selected ? Theme.key_chat_outBubbleSelected : Theme.key_chat_outBubble)
+                : (selected ? Theme.key_chat_inBubbleSelected : Theme.key_chat_inBubble));
+        int opacity = app.flexygram.bubbles.BubbleStyle.tintAlpha(app.flexygram.bubbles.BubbleConfig.transparency());
+        // The gradient is not a uniform surface; protect its time independently of moving colors.
+        if (out && getThemedColor(Theme.key_chat_outBubbleGradient1) != 0) opacity = 0;
+        surface = (surface & 0xFFFFFF) | ((Color.alpha(surface) * opacity / 255) << 24);
+        int oldColor = Theme.chat_timePaint.getColor();
+        bubbleTimeContrast.update(oldColor, surface);
+        if (bubbleTimeContrast.backing() != 0) {
+            if (bubbleTimeBackingPaint == null) bubbleTimeBackingPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            bubbleTimeBackingPaint.setColor(bubbleTimeContrast.backing());
+            bubbleTimeBackingPaint.setAlpha(Color.alpha(oldColor));
+            float left = layout.getLineLeft(0), right = left + layout.getLineWidth(0);
+            canvas.drawRoundRect(left - dp(2), 0, right + dp(2), layout.getHeight(),
+                    dp(3), dp(3), bubbleTimeBackingPaint);
+        }
+        Theme.chat_timePaint.setColor((bubbleTimeContrast.ink() & 0xFFFFFF) | (oldColor & 0xFF000000));
+        try {
+            SpoilerEffect.layoutDrawMaybe(layout, canvas);
+        } finally {
+            Theme.chat_timePaint.setColor(oldColor);
+        }
+    }
+
     private void drawTimeInternal(Canvas canvas, float alpha, boolean fromParent, float timeX, StaticLayout timeLayout, float timeWidth, boolean drawSelectionBackground) {
         if ((!drawTime || groupPhotoInvisible) && shouldDrawTimeOnMedia() || timeLayout == null || (currentMessageObject.deleted && currentPosition != null) || currentMessageObject.type == MessageObject.TYPE_PHONE_CALL) {
             return;
@@ -25177,7 +25212,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
 
             canvas.save();
             canvas.translate(drawTimeX = timeTitleTimeX + additionalX, drawTimeY = timeY - dp(7.3f) - timeLayout.getHeight());
-            SpoilerEffect.layoutDrawMaybe(timeLayout, canvas);
+            drawReadableTimeLayout(canvas, timeLayout, drawSelectionBackground);
             canvas.restore();
             Theme.chat_timePaint.setAlpha(255);
         } else {
@@ -25251,25 +25286,25 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                     canvas.translate(timeTitleTimeX + additionalX, layoutHeight - dp(pinnedBottom || pinnedTop ? 7.5f : 6.5f) - timeLayout.getHeight() + timeYOffset);
                     int oldAlpha = Theme.chat_timePaint.getAlpha();
                     Theme.chat_timePaint.setAlpha((int) (oldAlpha * transitionParams.animateChangeProgress));
-                    transitionParams.animateEditedLayout.draw(canvas);
+                    drawReadableTimeLayout(canvas, transitionParams.animateEditedLayout, drawSelectionBackground);
                     Theme.chat_timePaint.setAlpha(oldAlpha);
-                    SpoilerEffect.layoutDrawMaybe(transitionParams.animateTimeLayout, canvas);
+                    drawReadableTimeLayout(canvas, transitionParams.animateTimeLayout, drawSelectionBackground);
                 } else {
                     int oldAlpha = Theme.chat_timePaint.getAlpha();
                     canvas.save();
                     canvas.translate(transitionParams.animateFromTimeX + additionalX, layoutHeight - dp(pinnedBottom || pinnedTop ? 7.5f : 6.5f) - timeLayout.getHeight() + timeYOffset);
                     Theme.chat_timePaint.setAlpha((int) (oldAlpha * (1f - transitionParams.animateChangeProgress)));
-                    SpoilerEffect.layoutDrawMaybe(transitionParams.animateTimeLayout, canvas);
+                    drawReadableTimeLayout(canvas, transitionParams.animateTimeLayout, drawSelectionBackground);
                     canvas.restore();
 
                     canvas.translate(timeTitleTimeX + additionalX, layoutHeight - dp(pinnedBottom || pinnedTop ? 7.5f : 6.5f) - timeLayout.getHeight() + timeYOffset);
                     Theme.chat_timePaint.setAlpha((int) (oldAlpha * (transitionParams.animateChangeProgress)));
-                    SpoilerEffect.layoutDrawMaybe(timeLayout, canvas);
+                    drawReadableTimeLayout(canvas, timeLayout, drawSelectionBackground);
                     Theme.chat_timePaint.setAlpha(oldAlpha);
                 }
             } else {
                 canvas.translate(drawTimeX = timeTitleTimeX + additionalX, drawTimeY = layoutHeight - dp(pinnedBottom || pinnedTop ? 7.5f : 6.5f) - timeLayout.getHeight() + timeYOffset);
-                SpoilerEffect.layoutDrawMaybe(timeLayout, canvas);
+                drawReadableTimeLayout(canvas, timeLayout, drawSelectionBackground);
             }
             canvas.restore();
         }

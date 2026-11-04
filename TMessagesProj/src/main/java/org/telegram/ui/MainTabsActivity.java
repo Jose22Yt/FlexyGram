@@ -1773,7 +1773,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         }
 
         if (tabsViewWrapper == null || tabsViewWrapper.getVisibility() != View.VISIBLE
-                || !SharedConfig.chatBlurEnabled() || !org.telegram.messenger.LiteMode.isEnabled(org.telegram.messenger.LiteMode.FLAG_CHAT_BLUR)) return;
+                || !SharedConfig.chatBlurEnabled()) return;
         final int width = tabsViewWrapper.getMeasuredWidth();
         final int height = tabsViewWrapper.getMeasuredHeight();
         if (width <= 0 || height <= 0) return;

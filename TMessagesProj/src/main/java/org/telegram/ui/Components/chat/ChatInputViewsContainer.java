@@ -419,7 +419,6 @@ public class ChatInputViewsContainer extends FrameLayout {
         // Channels use the same retained native blur/border surfaces as contacts.
         // Do not gate them on the legacy pearl preset or paint an opaque surface over them.
         if (compactGlass[0] != null && canvas.isHardwareAccelerated()
-                && org.telegram.messenger.LiteMode.isEnabled(org.telegram.messenger.LiteMode.FLAG_CHAT_BLUR)
                 && org.telegram.messenger.SharedConfig.chatBlurEnabled()) {
             drawCompactGlass(canvas, 0, signatureChannelMiddle, radius);
             if (!signatureChannelLeft.isEmpty()) drawCompactGlass(canvas, 1, signatureChannelLeft, radius);

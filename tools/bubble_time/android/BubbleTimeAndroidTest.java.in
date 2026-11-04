@@ -1,0 +1,33 @@
+import android.graphics.*;import android.text.*;
+import org.junit.*;import static org.junit.Assert.*;import org.junit.runner.RunWith;
+import org.robolectric.*;import org.robolectric.annotation.*;
+@RunWith(RobolectricTestRunner.class) @Config(sdk=35,manifest=Config.NONE) @GraphicsMode(GraphicsMode.Mode.NATIVE)
+public class BubbleTimeAndroidTest {
+ private StaticLayout label() {
+  TimeLabelProbe.Theme.chat_timePaint.setTextSize(18);
+  return StaticLayout.Builder.obtain("12:34",0,5,TimeLabelProbe.Theme.chat_timePaint,180).setIncludePad(false).build();
+ }
+ @Test public void nativeTextRemainsVisibleOnBothExtremesAndRestoresSharedPaint() {
+  for(int bg:new int[]{Color.WHITE,Color.BLACK}) for(int surface:new int[]{Color.WHITE,Color.BLACK,0xff777777}) {
+   TimeLabelProbe host=new TimeLabelProbe();host.surface=surface;
+   TimeLabelProbe.Theme.chat_timePaint.setColor(0xff777777);StaticLayout layout=label();
+   Bitmap bitmap=Bitmap.createBitmap(220,50,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(bitmap);c.drawColor(bg);c.translate(8,8);
+   int save=c.getSaveCount();host.draw(c,layout);
+   assertEquals(0xff777777,TimeLabelProbe.Theme.chat_timePaint.getColor());assertEquals(save,c.getSaveCount());
+   int changed=0;for(int y=8;y<8+layout.getHeight();y++) for(int x=8;x<8+layout.getLineWidth(0);x++) if(bitmap.getPixel(x,y)!=bg)changed++;
+   assertTrue("Actual Canvas must paint a visible timestamp",changed>20);
+   bitmap.recycle();
+  }
+ }
+ @Test public void mediaUsesNativeRenderingAndGradientTimeRespectsAnimationAlpha() {
+  TimeLabelProbe host=new TimeLabelProbe();host.media=true;
+  TimeLabelProbe.Theme.chat_timePaint.setColor(0x99777777);StaticLayout l=label();
+  Bitmap actual=Bitmap.createBitmap(220,50,Bitmap.Config.ARGB_8888),expected=Bitmap.createBitmap(220,50,Bitmap.Config.ARGB_8888);
+  host.draw(new Canvas(actual),l);l.draw(new Canvas(expected));assertTrue(actual.sameAs(expected));
+  host.media=false;host.currentMessageObject.out=true;host.gradient=0xff0088ff;
+  actual.eraseColor(Color.TRANSPARENT);host.draw(new Canvas(actual),l);
+  assertEquals(0x99777777,TimeLabelProbe.Theme.chat_timePaint.getColor());
+  int max=0;for(int y=0;y<actual.getHeight();y++)for(int x=0;x<actual.getWidth();x++)max=Math.max(max,Color.alpha(actual.getPixel(x,y)));
+  assertTrue(max>0&&max<=215);actual.recycle();expected.recycle();
+ }
+}

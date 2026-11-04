@@ -2023,7 +2023,8 @@ public class SharedConfig {
     }
 
     public static boolean chatBlurEnabled() {
-        return canBlurChat() && LiteMode.isEnabled(LiteMode.FLAG_CHAT_BLUR);
+        // Liquid Glass includes its own blur; it does not require the separate frosted toggle.
+        return canBlurChat() && LiteMode.isEnabled(LiteMode.FLAG_CHAT_BLUR | LiteMode.FLAG_LIQUID_GLASS);
     }
 
     public static class BackgroundActivityPrefs {

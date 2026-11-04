@@ -5,6 +5,24 @@ public final class GlassContrastPolicy {
     public static final int MIN_LIGHT_ALPHA = 184;
     private GlassContrastPolicy() {}
 
+    /** Tint for the inexpensive frosted mode; resolved only when drawable colors change. */
+    public static int frostedSurface(int color) {
+        if ((color >>> 24) == 0) return color; // Shadow-only providers stay transparent.
+        int alpha = Math.max(MIN_LIGHT_ALPHA, color >>> 24);
+        if (luminance(color) >= .3) return lightSurface(color, alpha);
+        int base = color | 0xFF000000;
+        if (luminance(composite((base & 0xFFFFFF) | (alpha << 24), 0xFFFFFFFF)) <= .18)
+            return (base & 0xFFFFFF) | (alpha << 24);
+        double lo = 0, hi = 1;
+        for (int i = 0; i < 12; i++) {
+            double amount = (lo + hi) / 2;
+            int candidate = (mix(base, 0xFF000000, amount) & 0xFFFFFF) | (alpha << 24);
+            if (luminance(composite(candidate, 0xFFFFFFFF)) <= .18) hi = amount;
+            else lo = amount;
+        }
+        return (mix(base, 0xFF000000, hi) & 0xFFFFFF) | (alpha << 24);
+    }
+
     public static int lightSurface(int color, int requestedAlpha) {
         int alpha = Math.max(MIN_LIGHT_ALPHA, Math.min(255, requestedAlpha));
         int base = color | 0xFF000000;
@@ -36,6 +54,11 @@ public final class GlassContrastPolicy {
     }
 
     public static double minimumContrast(int ink, int surface) {
+        double low = luminance(composite(surface, 0xFF000000));
+        double high = luminance(composite(surface, 0xFFFFFFFF));
+        double foreground = luminance(ink);
+        // An intermediate backdrop may match the ink even if both extremes contrast well.
+        if (foreground >= low && foreground <= high) return 1;
         return Math.min(contrast(ink, composite(surface, 0xFF000000)),
                 contrast(ink, composite(surface, 0xFFFFFFFF)));
     }

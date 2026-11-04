@@ -30,7 +30,10 @@ def test_default_static_renderer_is_preserved():
  replacement='if (org.telegram.ui.Components.blur3.StaticOutlineStroke.drawOverride(canvas,left,top,right,bottom,radii,isTop,paint,GlassOutlineStyle.current())) return;'
  assert new.count(replacement)==2
  # Radius/thickness no-op setters are exercised by test_render_work_reuse.
- # Preserve all original rendering paths outside these independent cache guards.
+ # Preserve original geometry and drawing; frosted tint is a separate tested color policy.
+ tint_start=new.index("        // FlexyGram frosted mode shares")
+ tint_end=new.index("        shadowColor =",tint_start)
+ new=new[:tint_start]+new[tint_end:]
  start='    public BlurredBackgroundDrawable setRadius(float radius)'
  end='    public Rect getPaddedBounds()'
  new=new[:new.index(start)]+old[old.index(start):old.index(end)]+new[new.index(end):]

@@ -163,7 +163,7 @@ public class BlurredBackgroundDrawableRenderNode extends BlurredBackgroundDrawab
             );
         }
         source.draw(c, sL, sT, sR, sB);
-        c.save();
+        c.restore();
         renderNodeFill.endRecording();
 
 
@@ -249,10 +249,10 @@ public class BlurredBackgroundDrawableRenderNode extends BlurredBackgroundDrawab
     @Override
     public void setAlpha(int alpha) {
         final int oldAlpha = getAlpha();
-
+        if (oldAlpha == alpha) return;
         super.setAlpha(alpha);
         renderNode.setAlpha(alpha / 255f);
-        renderNodeInvalidated = true;
+        // RenderNode alpha is a composition property, not display-list content.
 
         if (oldAlpha == 0 && alpha > 0) {
             source.dispatchOnDrawablesRelativePositionChange();

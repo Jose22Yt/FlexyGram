@@ -14,6 +14,7 @@ import org.telegram.ui.Components.chat.ViewPositionWatcher;
 import org.telegram.utils.glass.GlassEngine;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 
 import me.vkryl.core.reference.ReferenceList;
 
@@ -80,9 +81,23 @@ public class BlurredBackgroundDrawableViewFactory {
 
 
     private boolean isLiquidGlassEffectAllowed;
+    // Factories outlive their views. Never retain a chat or a removed tab here.
+    private final ArrayList<WeakReference<BlurredBackgroundDrawable>> createdDrawables = new ArrayList<>();
+    private int creationsSincePrune;
 
     public void setLiquidGlassEffectAllowed(boolean liquidGlassEffectAllowed) {
         isLiquidGlassEffectAllowed = liquidGlassEffectAllowed;
+        for (int i = createdDrawables.size() - 1; i >= 0; i--) {
+            BlurredBackgroundDrawable drawable = createdDrawables.get(i).get();
+            if (drawable == null) {
+                createdDrawables.remove(i);
+                continue;
+            }
+            if (Build.VERSION.SDK_INT >= 33 && drawable instanceof BlurredBackgroundDrawableRenderNode) {
+                ((BlurredBackgroundDrawableRenderNode) drawable).setLiquidGlassEffectAllowed(liquidGlassEffectAllowed);
+            }
+            drawable.updateColors();
+        }
     }
 
     public BlurredBackgroundDrawable create() {
@@ -103,6 +118,13 @@ public class BlurredBackgroundDrawableViewFactory {
 
     public BlurredBackgroundDrawable create(View view, BlurredBackgroundColorProvider provider, boolean multiwindow) {
         final BlurredBackgroundDrawable drawable = source.createDrawable();
+        if (++creationsSincePrune >= 32) {
+            creationsSincePrune = 0;
+            for (int i = createdDrawables.size() - 1; i >= 0; i--) {
+                if (createdDrawables.get(i).get() == null) createdDrawables.remove(i);
+            }
+        }
+        createdDrawables.add(new WeakReference<>(drawable));
         if (isLiquidGlassEffectAllowed && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (drawable instanceof BlurredBackgroundDrawableRenderNode) {
                 ((BlurredBackgroundDrawableRenderNode) drawable).setLiquidGlassEffectAllowed();

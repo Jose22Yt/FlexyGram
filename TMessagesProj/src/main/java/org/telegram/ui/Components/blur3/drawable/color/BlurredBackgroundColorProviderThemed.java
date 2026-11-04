@@ -11,9 +11,11 @@ public class BlurredBackgroundColorProviderThemed implements BlurredBackgroundCo
     private final Theme.ResourcesProvider resourcesProvider;
     private final int backgroundColorId;
     private float alpha;
+    private boolean automaticAlpha;
 
     public BlurredBackgroundColorProviderThemed(Theme.ResourcesProvider resourcesProvider, int backgroundColorId) {
         this(resourcesProvider, backgroundColorId, LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS) ? 0.85f : 0.76f);
+        automaticAlpha = true;
     }
 
     public BlurredBackgroundColorProviderThemed(Theme.ResourcesProvider resourcesProvider, int backgroundColorId, float alpha) {
@@ -25,6 +27,7 @@ public class BlurredBackgroundColorProviderThemed implements BlurredBackgroundCo
     }
 
     public void setAlpha(float alpha) {
+        automaticAlpha = false;
         this.alpha = alpha;
         updateColors();
     }
@@ -58,6 +61,13 @@ public class BlurredBackgroundColorProviderThemed implements BlurredBackgroundCo
 
     @Override
     public int getBackgroundColor() {
+        if (automaticAlpha) {
+            float nextAlpha = LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS) ? 0.85f : 0.76f;
+            if (alpha != nextAlpha) {
+                alpha = nextAlpha;
+                updateColors();
+            }
+        }
         return backgroundColor;
     }
 
