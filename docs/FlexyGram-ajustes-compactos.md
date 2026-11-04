@@ -1,5 +1,8 @@
 # Inicio de ajustes compacto
 
+La presentación posterior con iconos de color y tarjetas separadas se describe en
+[Tarjetas y selección visual de interfaces](FlexyGram-ajustes-tarjetas-y-estilos.md).
+
 La pantalla de categorías de FlexyGram conserva sus diez destinos y los cuatro
 grupos. Se retira el título grande duplicado «Ajustes». Las filas del inicio usan
 16 sp, un mínimo táctil de 48 dp e iconos de 24 dp; las separaciones y los títulos

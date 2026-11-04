@@ -1,5 +1,8 @@
 # Signature Settings 3.0 — draft integration
 
+Presentación vigente: [Tarjetas y selección visual de interfaces](../FlexyGram-ajustes-tarjetas-y-estilos.md).
+El texto y las capturas que siguen describen las etapas anteriores.
+
 La presentación compacta posterior se documenta en
 [Inicio de ajustes compacto](../FlexyGram-ajustes-compactos.md). Las capturas de
 esta página corresponden a la presentación anterior, con descripciones visibles.

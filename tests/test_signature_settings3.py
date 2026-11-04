@@ -20,9 +20,9 @@ def test_exact_root_order_and_single_vector_family():
  assert all(icon.startswith('fg_settings_') or icon.endswith('_solar') for _,_,icon in rows)
  assert rows[1][2]=='fg_settings_home' and rows[8][2]=='fg_settings_layers'
  assert 'Settings2Subtitle' not in (S/'SignatureSettingsActivity.java').read_text()
-def test_root_no_colored_tiles_or_intermediate_registry():
+def test_root_native_colored_icons_and_single_registry():
  cell=(S/'Settings2Cell.java').read_text();root=(S/'SignatureSettingsActivity.java').read_text()
- assert 'GradientDrawable' not in cell and 'Color.WHITE' not in cell
+ assert 'SettingsCategoryIcon.create' in cell and 'RippleDrawable' in cell
  assert 'icon.setBackground(null)' in cell
  assert 'icon.setColorFilter(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText,provider))' in cell
  assert 'Settings3Registry.all()' in root and 'SignatureSettingsRegistry.children' not in root
@@ -30,8 +30,11 @@ def test_root_no_colored_tiles_or_intermediate_registry():
 def test_direct_chat_preview_order_and_no_nested_scroll_views():
  text=method((S/'SignatureDirectSettingsActivity.java').read_text(),'private void build()')
  chat=text[text.index('case "chat":'):text.index('case "home":')]
- assert chat.index('new app.flexygram.header.HeaderSettingsActivity')<chat.index('new app.flexygram.bubbles.BubbleSettingsActivity')<chat.index('new app.flexygram.composer.FlexyComposerSettingsActivity')
- assert 'links(' not in chat
+ assert '"composer_style","header_style","bubble_style"' in chat
+ assert 'add(new app.flexygram.header.HeaderSettingsActivity())' not in chat
+ links=(S/'Settings3LinksSection.java').read_text()
+ assert 'new ConversationStyleSettingsActivity(false)' in links and 'new ConversationStyleSettingsActivity(true)' in links
+ assert 'new app.flexygram.bubbles.BubbleSettingsActivity()' in links
  for cls in ['BaseNekoSettingsActivity','BaseNekoXSettingsActivity']:
   bridge=method(source('tw/nekomimi/nekogram/settings/'+cls+'.java'),'prepareSettings3(')
   assert 'createView(' not in bridge and 'new Recycler' not in bridge and 'setAdapter(' not in bridge

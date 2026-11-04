@@ -67,8 +67,8 @@ def main(here=HERE, test_class="MusicVisualTest", stubs_writer=None, resource_wr
                 ET.SubElement(dependency,'{'+ns['m']+'}'+key).text=value
         pom.write(output/'pom.xml',encoding='utf-8',xml_declaration=True)
 
-    repository = Path.home()/'.m2/repository'
-    command = [args.maven, '-B', '-f', str(output/'pom.xml'), '-Dandroid.sdk.jar='+str(android)]
+    repository = Path(os.environ.get('MAVEN_REPO_LOCAL', str(Path.home()/'.m2/repository')))
+    command = [args.maven, '-Dmaven.repo.local='+str(repository), '-B', '-f', str(output/'pom.xml'), '-Dandroid.sdk.jar='+str(android)]
     proxy = urlparse(os.environ.get('HTTPS_PROXY') or os.environ.get('https_proxy') or '')
     with tempfile.TemporaryDirectory(prefix='composer-maven-') as tmp:
         if proxy.hostname:

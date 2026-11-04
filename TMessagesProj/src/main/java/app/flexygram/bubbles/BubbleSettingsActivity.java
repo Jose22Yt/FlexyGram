@@ -78,8 +78,8 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
         final SeekBar seek;
         boolean binding;
         TransparencyCell(Context context) {
-            super(context); setOrientation(VERTICAL); setPadding(dp(20), dp(12), dp(20), dp(4));
-            title = new TextView(context); title.setTextSize(16);
+            super(context); setOrientation(VERTICAL); setPadding(dp(16), dp(6), dp(16), dp(2));
+            title = new TextView(context); title.setTextSize(15);
             title.setTextColor(getThemedColor(Theme.key_windowBackgroundWhiteBlackText));
             addView(title, new LinearLayout.LayoutParams(-1, -2));
             seek = new app.flexygram.settings.FlexySignatureSlider(context); seek.setMax(100);

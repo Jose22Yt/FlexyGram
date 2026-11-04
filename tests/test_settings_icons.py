@@ -1,4 +1,4 @@
-"""Host checks for settings-only sizing, semantic resources and live theme tint."""
+"""Host checks for settings-only sizing, semantic resources and native colour tiles."""
 import pathlib
 import shutil
 import subprocess
@@ -22,6 +22,7 @@ def test_settings_icons_size_theme_and_recycling():
 
     stubs = {
         "android.util.SparseIntArray": "public class SparseIntArray {private java.util.Map<Integer,Integer> data=new java.util.HashMap<>();public int get(int k,int d){return data.getOrDefault(k,d);}public void put(int k,int v){data.put(k,v);}public void clear(){data.clear();}public int size(){return data.size();}}",
+        "app.flexygram.settings.signature.SettingsCategoryIcon": "public class SettingsCategoryIcon {public static Integer create(android.content.Context c,int r){return r;}public static Integer create(android.content.Context c,int r,int t,int b){return r;}}",
         "android.graphics.Canvas": "public class Canvas {}",
         "android.graphics.PorterDuff": "public class PorterDuff {public enum Mode {SRC_IN}}",
         "android.graphics.PorterDuffColorFilter": "public class PorterDuffColorFilter {public int color;public PorterDuffColorFilter(int c,PorterDuff.Mode mode){color=c;}}",
@@ -41,7 +42,7 @@ def test_settings_icons_size_theme_and_recycling():
         "org.telegram.ui.Cells.TextCell": """public class TextCell {
             public static class Icon {
                 public Object background=new Object(),filter;public int padding=7;public float translation=2;public int resource;
-                public void setImageResource(int id){resource=id;}public void setBackground(Object b){background=b;}
+                public void setImageDrawable(Integer id){resource=id;}public void setImageResource(int id){resource=id;}public void setBackground(Object b){background=b;}
                 public void setPadding(int a,int b,int c,int d){padding=a+b+c+d;}
                 public void setTranslationX(float value){translation=value;}
                 public Object getColorFilter(){return filter;}public void setColorFilter(Object f){filter=f;}
@@ -57,7 +58,7 @@ def test_settings_icons_size_theme_and_recycling():
             public void setTextAndSpoilersValueAndIcon(String text,CharSequence v,int icon,boolean divider){setTextAndIcon(text,icon,divider);value=v;}
             public void setTextAndCheckAndIcon(CharSequence text,boolean checked,int icon,boolean divider){setTextAndIcon(text,icon,divider);}
             public void setColorfulIcon(int a,int b,int icon){}
-            protected void onMeasure(int w,int h){width=isIcon?24:96;}
+            protected void onMeasure(int w,int h){width=isIcon?24:32;}
             protected void dispatchDraw(android.graphics.Canvas c){}
         }""",
     }
@@ -77,17 +78,13 @@ public class SettingsIconsRegression extends CompactSettingsTextCell {
         SettingsIconsRegression cell=new SettingsIconsRegression();
         cell.setTextAndIcon("Conversaciones",1000,true);cell.onMeasure(360,64);cell.dispatchDraw(new Canvas());
         require(cell.imageView.resource==R.drawable.fg_settings_chat,"replace known category with outline icon");
-        require(cell.width==24&&cell.imageLeft==20&&cell.offset==60,"normalize large icons after binding");
-        require(cell.imageView.background==null&&cell.imageView.padding==0,"remove colored icon tile without changing row");
-        Object first=cell.imageView.getColorFilter();
-        require(((PorterDuffColorFilter)first).color==0xff17191c,"dark icon in light theme");
+        require(cell.width==32&&cell.imageLeft==20&&cell.offset==64,"normalize native colour tiles after binding");
+        require(cell.imageView.background==null&&cell.imageView.padding==0,"avoid duplicate image backgrounds and padding");
         Theme.foreground=0xfff1f3f5;cell.dispatchDraw(new Canvas());
-        require(((PorterDuffColorFilter)cell.imageView.getColorFilter()).color==0xfff1f3f5,"light icon after live night-mode transition");
-        Object night=cell.imageView.getColorFilter();cell.dispatchDraw(new Canvas());
-        require(night==cell.imageView.getColorFilter(),"do not allocate tint every frame");
-        cell.setTextAndValueAndIcon("Copias","Configurado",false,1001,true);cell.imageView.setColorFilter(first);
+        require(cell.imageView.resource==R.drawable.fg_settings_chat,"theme changes preserve the assigned native tile");
+        cell.setTextAndValueAndIcon("Copias","Configurado",false,1001,true);
         cell.onMeasure(360,64);cell.dispatchDraw(new Canvas());
-        require(cell.width==24&&cell.imageView.getColorFilter()==night,"recycling restores icon size and active tint");
+        require(cell.width==32&&cell.imageView.resource==R.drawable.fg_settings_cloud,"recycling restores the semantic tile");
         require("Configurado".contentEquals(cell.value),"preserve setting values");
         cell.setTextAndIcon("Plugin",1002,false);require(cell.imageView.resource==1002,"preserve unfamiliar plugin icon semantics");
         require(SettingsIcons.resolve(new Context(),0)==0,"retain absent icons");

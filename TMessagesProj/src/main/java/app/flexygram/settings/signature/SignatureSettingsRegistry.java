@@ -86,7 +86,7 @@ public final class SignatureSettingsRegistry {
     public static boolean visible(String id){if(id.endsWith("_extra")&&SignatureLegacyExtras.sources(id).isEmpty())return false;return !"passcode".equals(id)||!tw.nekomimi.nekogram.helpers.PasscodeHelper.isSettingsHidden();}
     private static BaseFragment scope(BaseNekoSettingsActivity f,String source,String route,String title){f.useSignatureSettingsPage(source,route,entry(title).title);return f;}
     private static BaseFragment chats(int screen,String route,String title){return scope(new OpenExteraChatsActivity(screen),"chats",route,title);}
-    public static BaseFragment open(String id){if(java.util.Arrays.asList("icon_packs","emoji","translator","ai","pillstack","cloud","passcode").contains(id))return openLegacyEditor(id);return Settings3Registry.open(Settings3Registry.category(id));}
+    public static BaseFragment open(String id){if(id.equals("bubbles"))return new app.flexygram.bubbles.BubbleSettingsActivity();if(id.equals("header"))return new ConversationStyleSettingsActivity(true);if(id.equals("composer"))return new ConversationStyleSettingsActivity(false);if(java.util.Arrays.asList("icon_packs","emoji","translator","ai","pillstack","cloud","passcode").contains(id))return openLegacyEditor(id);return Settings3Registry.open(Settings3Registry.category(id));}
     private static BaseFragment openLegacyEditor(String id){
         switch(id){
             case "advanced_extra_nx":return SignatureLegacyExtras.screen("nx","advanced_extra");

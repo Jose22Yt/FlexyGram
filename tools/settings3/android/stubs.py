@@ -31,3 +31,30 @@ def write(dest,root):
  p=dest/'org/telegram/ui/Components/RecyclerListView.java';s=p.read_text().replace('public void setItemAnimator(Object a){}','public void setItemAnimator(Object a){}public void setItemViewCacheSize(int size){}').replace('public static final int TAG_NOT_SECTION=12;','public static final int TAG_NOT_SECTION=12;public abstract static class SelectionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{public abstract boolean isEnabled(RecyclerView.ViewHolder h);}')
  p.write_text(s)
  emit('org/telegram/ui/Cells/TextSettingsCell.java','package org.telegram.ui.Cells;public class TextSettingsCell extends android.widget.TextView{public TextSettingsCell(android.content.Context c){super(c);}public void setText(String s,boolean d){setText(s);}}')
+ # Native icon background is copied unchanged; Telegram controller/theme plumbing remains isolated.
+ text=(root/'TMessagesProj/src/main/java/org/telegram/ui/SettingsActivity.java').read_text()
+ start=text.index('        public static class Background extends Drawable')
+ brace=text.index('{',start);end=brace+1;depth=1
+ while depth:
+  depth+=(text[end]=='{')-(text[end]=='}');end+=1
+ emit('org/telegram/ui/SettingsActivity.java','package org.telegram.ui;import android.graphics.*;import android.graphics.drawable.Drawable;import androidx.annotation.*;import org.telegram.messenger.AndroidUtilities;import org.telegram.ui.Components.blur3.GlassOutlineStyle;import static org.telegram.messenger.AndroidUtilities.dp;public class SettingsActivity{public static class SettingCell{'+text[start:end]+'}}')
+ emit('org/telegram/ui/Components/blur3/GlassOutlineStyle.java','package org.telegram.ui.Components.blur3;public enum GlassOutlineStyle{GLARE,SOLID,HIDDEN;public interface Listener{void onGlassOutlineStyleChanged();}public static void addListener(Listener l){}public static GlassOutlineStyle current(){return GLARE;}}')
+ emit('app/exteraless/settings/utils/SettingsIcons.java','package app.exteraless.settings.utils;public class SettingsIcons{public static int resolve(android.content.Context c,int i){return i;}}')
+ emit('org/telegram/ui/ActionBar/ThemeDescription.java','package org.telegram.ui.ActionBar;public class ThemeDescription{public static final int FLAG_TEXTCOLOR=4;public ThemeDescription(android.view.View v,int f,Class[] c,android.graphics.Paint p,android.graphics.drawable.Drawable[] d,Object delegate,int key){}}')
+ p=dest/'org/telegram/ui/ActionBar/BaseFragment.java';s=p.read_text().replace('public static android.app.Activity activity;','public static android.app.Activity activity;public java.util.ArrayList<ThemeDescription> getThemeDescriptions(){return new java.util.ArrayList<>();}');p.write_text(s)
+ p=dest/'org/telegram/messenger/AndroidUtilities.java';s=p.read_text().replace('public static int dp','public static android.graphics.RectF rectTmp=new android.graphics.RectF();public static int dp');p.write_text(s)
+ p=dest/'org/telegram/ui/ActionBar/Theme.java';s=p.read_text().replace('key_divider=6;','key_divider=6,key_listSelector=7,key_windowBackgroundWhiteBlueHeader=8,key_windowBackgroundWhiteBlueText=9;').replace('case 1->','case 7->0x223d9eff;case 8,9->dark?0xff79bdff:0xff1684c4;case 1->');p.write_text(s)
+ p=dest/'org/telegram/ui/Components/RecyclerListView.java';s=p.read_text().replace('public void setItemAnimator(Object a){}','public void disableSections(){}public void setItemAnimator(Object a){}');p.write_text(s)
+ # Real preference backends; preview renderers are explicit doubles in gallery interaction tests.
+ emit('org/telegram/messenger/ApplicationLoader.java','package org.telegram.messenger;public class ApplicationLoader{public static android.content.Context applicationContext=org.telegram.ui.ActionBar.BaseFragment.activity.getApplicationContext();}')
+ emit('org/telegram/messenger/BuildConfig.java','package org.telegram.messenger;public class BuildConfig{public static final boolean CONNECTED_ALPHA=false;}')
+ emit('app/exteraless/appearance/AppearanceConfig.java','package app.exteraless.appearance;public class AppearanceConfig{public static android.content.SharedPreferences getPreferences(){return org.telegram.ui.ActionBar.BaseFragment.activity.getSharedPreferences("isolated_appearance",0);}}')
+ for name in ['HeaderConfig']:
+  emit('app/flexygram/header/'+name+'.java',(root/'TMessagesProj/src/main/java/app/flexygram/header'/(name+'.java')).read_text())
+ for name in ['FlexyComposerConfig','ComposerStyle','ComposerGeometry']:
+  emit('app/flexygram/composer/'+name+'.java',(root/'TMessagesProj/src/main/java/app/flexygram/composer'/(name+'.java')).read_text())
+ emit('app/flexygram/header/HeaderPreviewView.java','package app.flexygram.header;public class HeaderPreviewView extends android.view.View{public HeaderPreviewView(android.content.Context c,int style){super(c);}protected void onMeasure(int w,int h){setMeasuredDimension(MeasureSpec.getSize(w),96);}}')
+ emit('app/flexygram/composer/FlexyComposerSettingsActivity.java','package app.flexygram.composer;public class FlexyComposerSettingsActivity extends org.telegram.ui.ActionBar.BaseFragment{public android.view.View createStylePreview(android.content.Context c,int style){return new app.flexygram.header.HeaderPreviewView(c,style);}}')
+
+ # Keep production per-row card backgrounds; the host supplies only list layout.
+ p=dest/'tw/nekomimi/nekogram/settings/BaseNekoSettingsActivity.java';s=p.read_text().replace('if(h.itemView instanceof app.flexygram.settings.signature.Settings2Cell){','if(h.itemView instanceof app.flexygram.settings.signature.Settings2Cell && h.itemView.getBackground()==null){');p.write_text(s)

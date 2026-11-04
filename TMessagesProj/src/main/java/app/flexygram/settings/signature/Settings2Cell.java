@@ -15,6 +15,16 @@ public final class Settings2Cell extends FrameLayout {
     private boolean divider;
     private int bodyHeight;
     private final boolean compact;
+    private boolean card, first, last;
+    private int cardColor, selectorColor;
+    public void setCardEdges(boolean first,boolean last){card=true;setTag(org.telegram.ui.Components.RecyclerListView.TAG_NOT_SECTION);this.first=first;this.last=last;updateCard();}
+    private void updateCard(){
+        cardColor=Theme.getColor(Theme.key_windowBackgroundWhite,provider);selectorColor=Theme.getColor(Theme.key_listSelector,provider);
+        android.graphics.drawable.GradientDrawable fill=new android.graphics.drawable.GradientDrawable();fill.setColor(cardColor);
+        float top=dp(first?24:10),bottom=dp(last?24:10);float[] corners={top,top,top,top,bottom,bottom,bottom,bottom};fill.setCornerRadii(corners);
+        android.graphics.drawable.GradientDrawable mask=new android.graphics.drawable.GradientDrawable();mask.setColor(0xffffffff);mask.setCornerRadii(corners);
+        setBackground(new android.graphics.drawable.InsetDrawable(new android.graphics.drawable.RippleDrawable(android.content.res.ColorStateList.valueOf(selectorColor),fill,mask),0,0,0,dp(4)));
+    }
     public Settings2Cell(Context c,Theme.ResourcesProvider p){
         this(c,p,false);
     }
@@ -39,13 +49,13 @@ public final class Settings2Cell extends FrameLayout {
         title.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText,provider));
         description.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText2,provider));
         arrow.setColorFilter(Theme.getColor(Theme.key_windowBackgroundWhiteGrayIcon,provider));arrow.setScaleX(LocaleController.isRTL?-1:1);
-        icon.setImageResource(app.exteraless.settings.utils.SettingsIcons.resolve(getContext(), resource));icon.setColorFilter(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText,provider));
+        icon.setImageDrawable(SettingsCategoryIcon.create(getContext(),app.exteraless.settings.utils.SettingsIcons.resolve(getContext(), resource)));icon.setColorFilter(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText,provider));
         icon.setBackground(null);lastIconColor=Theme.getColor(Theme.key_windowBackgroundWhiteBlackText,provider);
         divider=divide;
         setContentDescription(name+(detail==null||detail.isEmpty()?"":", "+detail));invalidate();
     }
     @Override protected void onMeasure(int w,int h){
-        int width=MeasureSpec.getSize(w),space=Math.max(0,width-dp(compact?96:108));
+        int width=MeasureSpec.getSize(w),space=Math.max(0,width-dp(compact?100:108));
         title.measure(MeasureSpec.makeMeasureSpec(space,MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(0,MeasureSpec.UNSPECIFIED));
         if (description.getVisibility() != GONE) {
             description.measure(MeasureSpec.makeMeasureSpec(space,MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(0,MeasureSpec.UNSPECIFIED));
@@ -53,14 +63,14 @@ public final class Settings2Cell extends FrameLayout {
         } else {
             bodyHeight = title.getMeasuredHeight();
         }
-        icon.measure(MeasureSpec.makeMeasureSpec(dp(24),MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(dp(24),MeasureSpec.EXACTLY));
+        icon.measure(MeasureSpec.makeMeasureSpec(dp(32),MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(dp(32),MeasureSpec.EXACTLY));
         arrow.measure(MeasureSpec.makeMeasureSpec(dp(20),MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(dp(20),MeasureSpec.EXACTLY));
-        setMeasuredDimension(width,Math.max(dp(compact?48:72),bodyHeight+dp(compact?20:24))+(divider?1:0));
+        setMeasuredDimension(width,Math.max(dp(compact?48:72),bodyHeight+dp(compact?20:24))+(card?dp(4):divider?1:0));
     }
     @Override protected void onLayout(boolean changed,int l,int t,int r,int b){
-        int w=getMeasuredWidth(),h=getMeasuredHeight(),iconInset=dp(compact?8:16),textInset=dp(compact?56:68);
-        int ix=LocaleController.isRTL?w-iconInset-dp(40):iconInset,tx=LocaleController.isRTL?dp(40):textInset,ax=LocaleController.isRTL?dp(compact?12:16):w-dp(compact?32:36),y=(h-bodyHeight)/2;
-        icon.layout(ix+dp(8),(h-dp(24))/2,ix+dp(32),(h+dp(24))/2);
+        int w=getMeasuredWidth(),h=getMeasuredHeight()-(card?dp(4):0),iconInset=dp(compact?8:16),textInset=dp(compact?60:68);
+        int ix=LocaleController.isRTL?w-iconInset-dp(48):iconInset,tx=LocaleController.isRTL?dp(40):textInset,ax=LocaleController.isRTL?dp(compact?12:16):w-dp(compact?32:36),y=(h-bodyHeight)/2;
+        icon.layout(ix+dp(8),(h-dp(32))/2,ix+dp(40),(h+dp(32))/2);
         arrow.layout(ax,(h-dp(20))/2,ax+dp(20),(h+dp(20))/2);
         title.layout(tx,y,tx+title.getMeasuredWidth(),y+title.getMeasuredHeight());y+=title.getMeasuredHeight()+dp(3);
         description.layout(tx,y,tx+description.getMeasuredWidth(),y+description.getMeasuredHeight());
@@ -68,9 +78,10 @@ public final class Settings2Cell extends FrameLayout {
     @Override protected void dispatchDraw(Canvas c){
         int foreground=Theme.getColor(Theme.key_windowBackgroundWhiteBlackText,provider);
         if(lastIconColor!=foreground){lastIconColor=foreground;icon.setColorFilter(foreground);}
+        if(card&&(cardColor!=Theme.getColor(Theme.key_windowBackgroundWhite,provider)||selectorColor!=Theme.getColor(Theme.key_listSelector,provider)))updateCard();
         super.dispatchDraw(c);
     }
     private int lastIconColor;
-    @Override protected void onDraw(Canvas c){super.onDraw(c);int inset=dp(compact?56:68);if(divider)c.drawRect(LocaleController.isRTL?dp(16):inset,getHeight()-1,LocaleController.isRTL?getWidth()-inset:getWidth()-dp(16),getHeight(),Theme.dividerPaint);}
+    @Override protected void onDraw(Canvas c){super.onDraw(c);int inset=dp(compact?60:68);if(divider&&!card)c.drawRect(LocaleController.isRTL?dp(16):inset,getHeight()-1,LocaleController.isRTL?getWidth()-inset:getWidth()-dp(16),getHeight(),Theme.dividerPaint);}
     @Override public void onInitializeAccessibilityNodeInfo(AccessibilityNodeInfo info){super.onInitializeAccessibilityNodeInfo(info);info.setClassName("android.widget.Button");}
 }

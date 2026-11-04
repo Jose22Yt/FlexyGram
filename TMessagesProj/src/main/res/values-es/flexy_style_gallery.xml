@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyInterfaceLower">Interfaz inferior</string>
+    <string name="FlexyInterfaceUpper">Interfaz superior</string>
+    <string name="FlexyStyleTapHint">Toca una vista previa para elegirla</string>
+    <string name="FlexyStyleSwipeHint">Desliza para ver los estilos y toca una cabecera para elegirla.</string>
+    <string name="FlexyStyleDefault">Predeterminada</string>
+    <string name="FlexyStyleCompact">Compacta</string>
+</resources>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyInterfaceLower">Lower interface</string>
+    <string name="FlexyInterfaceUpper">Upper interface</string>
+    <string name="FlexyStyleTapHint">Tap a preview to select its layout</string>
+    <string name="FlexyStyleSwipeHint">Swipe to see styles. Tap a header to select it.</string>
+    <string name="FlexyStyleDefault">Default</string>
+    <string name="FlexyStyleCompact">Compact</string>
+</resources>

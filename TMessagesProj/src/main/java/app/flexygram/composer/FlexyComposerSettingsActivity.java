@@ -137,13 +137,17 @@ public final class FlexyComposerSettingsActivity extends BaseNekoSettingsActivit
             bar.setEnabled(FlexyComposerConfig.compact()); setAlpha(bar.isEnabled() ? 1 : 0.5f); binding = false;
         }
     }
-    /** Lightweight settings preview, never substitutes the real native composer. */
+    public View createStylePreview(Context context, int style) { return new Preview(context, style); }
+
+    /** Component preview uses the same geometry and icon assets as the chat. */
     private final class Preview extends View implements org.telegram.messenger.NotificationCenter.NotificationCenterDelegate {
         private final app.flexygram.preview.SignatureWallpaperPreview wallpaperPreview;
         final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         final Drawable plus, clip, smile, folded, voice;
-        Preview(Context c) {
-            super(c); setContentDescription(getString(R.string.FlexyComposerPreview));
+        final int forcedStyle;
+        Preview(Context c) { this(c, -1); }
+        Preview(Context c, int style) {
+            super(c); forcedStyle=style; setContentDescription(getString(R.string.FlexyComposerPreview));
             wallpaperPreview = new app.flexygram.preview.SignatureWallpaperPreview(this, contextualWallpaper, this::invalidate);
             clip = c.getResources().getDrawable(R.drawable.flexy_composer_clip).mutate();
             folded = c.getResources().getDrawable(R.drawable.flexy_composer_folded).mutate();
@@ -178,10 +182,17 @@ public final class FlexyComposerSettingsActivity extends BaseNekoSettingsActivit
         @Override protected void onDraw(Canvas c) {
             c.drawColor(getThemedColor(Theme.key_windowBackgroundGray));
             wallpaperPreview.draw(c);
-            if (!FlexyComposerConfig.compact()) {
-                paint.setTextSize(dp(16)); paint.setColor(getThemedColor(Theme.key_windowBackgroundWhiteBlackText));
-                paint.setTextAlign(Paint.Align.CENTER);
-                c.drawText(getString(R.string.FlexyComposerClassic),getWidth()/2f,dp(54),paint); return;
+            if (forcedStyle == FlexyComposerConfig.CLASSIC || forcedStyle < 0 && !FlexyComposerConfig.compact()) {
+                float y=dp(48), radius=dp(22), end=getWidth()-dp(36);
+                paint.setColor(getThemedColor(Theme.key_chat_messagePanelBackground));
+                c.drawRoundRect(dp(6),y-radius,end-dp(30),y+radius,radius,radius,paint);
+                paint.setColor(getThemedColor(Theme.key_chat_messagePanelSend));c.drawCircle(end,y,radius,paint);
+                int ink=getThemedColor(Theme.key_chat_messagePanelIcons);
+                icon(c,smile,dp(28),y,ink);icon(c,clip,end-dp(52),y,ink);icon(c,voice,end,y,0xffffffff);
+                paint.setTextSize(16*getResources().getDisplayMetrics().scaledDensity);paint.setTextAlign(Paint.Align.LEFT);
+                paint.setColor(getThemedColor(Theme.key_chat_messagePanelHint));
+                int save=c.save();c.clipRect(dp(53),y-radius,Math.max(dp(53),end-dp(70)),y+radius);
+                c.drawText(getString(R.string.TypeMessage),dp(53),y-(paint.ascent()+paint.descent())/2,paint);c.restoreToCount(save);return;
             }
             int level = FlexyComposerConfig.level(); float radius = dp(ComposerStyle.diameter(level)) / 2f;
             float y = dp(54 - ComposerStyle.offset(FlexyComposerConfig.position())), gap = dp(FlexyComposerConfig.gap());
@@ -196,7 +207,9 @@ public final class FlexyComposerSettingsActivity extends BaseNekoSettingsActivit
             icon(c, FlexyComposerConfig.referenceIcons() ? folded : smile, right-radius-gap-dp(20), y, ComposerStyle.innerIcon(dark));
             paint.setColor(ComposerStyle.innerIcon(dark));
             paint.setTextAlign(Paint.Align.LEFT); paint.setTextSize(16 * getResources().getDisplayMetrics().scaledDensity);
-            c.drawText(getString(R.string.TypeMessage),left+radius+gap+dp(ComposerStyle.padding(level)),y-(paint.ascent()+paint.descent())/2,paint);
+            float start=left+radius+gap+dp(ComposerStyle.padding(level));int save=c.save();
+            c.clipRect(start,y-radius,Math.max(start,right-radius-gap-dp(38)),y+radius);
+            c.drawText(getString(R.string.TypeMessage),start,y-(paint.ascent()+paint.descent())/2,paint);c.restoreToCount(save);
         }
     }
     private final class Adapter extends BaseListAdapter {

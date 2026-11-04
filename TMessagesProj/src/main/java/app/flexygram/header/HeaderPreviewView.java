@@ -9,12 +9,13 @@ import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.Theme;
 
-/** Synthetic local preview; same geometry/surface as the live header, no accounts or observers. */
-public final class HeaderPreviewView extends View {
+/** Shared header geometry and surfaces; wallpaper observers exist only while attached. */
+public final class HeaderPreviewView extends View implements org.telegram.messenger.NotificationCenter.NotificationCenterDelegate {
     private final HeaderGeometry geometry = new HeaderGeometry();
     private final HeaderSurface surface = new HeaderSurface();
     private final Paint text = new Paint(Paint.ANTI_ALIAS_FLAG), avatar = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final android.graphics.drawable.Drawable back;
+    private final android.graphics.drawable.Drawable back, more;
+    private final Paint countText=new Paint(Paint.ANTI_ALIAS_FLAG);
     private final String name, status;
     private int iconColor;
     private static final class FusionPreview {
@@ -33,28 +34,39 @@ public final class HeaderPreviewView extends View {
     private final Paint.FontMetricsInt fontMetrics = new Paint.FontMetricsInt();
     private final android.text.TextPaint scratchPaint = new android.text.TextPaint();
     private String displayName = "", displayStatus = "";
-    public HeaderPreviewView(Context context) {
-        super(context);
+    private final int forcedStyle;
+    private final app.flexygram.preview.SignatureWallpaperPreview wallpaperPreview;
+    public HeaderPreviewView(Context context) { this(context, -1); }
+    public HeaderPreviewView(Context context, int style) {
+        super(context); forcedStyle=style;
+        wallpaperPreview=new app.flexygram.preview.SignatureWallpaperPreview(this,null,this::invalidate);
         setLayoutParams(new androidx.recyclerview.widget.RecyclerView.LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT));
         text.setTextAlign(Paint.Align.CENTER);
-        back = context.getDrawable(R.drawable.ic_ab_back).mutate();
+        back = context.getDrawable(R.drawable.ic_ab_back).mutate();more=context.getDrawable(R.drawable.ic_ab_other).mutate();
         name = LocaleController.getString(R.string.FlexyHeaderPreviewName); status = LocaleController.getString(R.string.Online);
         setContentDescription(name + ", " + status); setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_YES);
     }
+    private int previewStyle(){return forcedStyle<0?HeaderConfig.style():forcedStyle;}
+    private boolean previewFusion(){return previewStyle()==2||previewStyle()==3;}
+    private boolean previewPortrait(){return previewStyle()==3;}
+    @Override protected void onAttachedToWindow(){super.onAttachedToWindow();wallpaperPreview.attach();var center=org.telegram.messenger.NotificationCenter.getGlobalInstance();center.addObserver(this,org.telegram.messenger.NotificationCenter.didSetNewTheme);center.addObserver(this,org.telegram.messenger.NotificationCenter.didApplyNewTheme);center.addObserver(this,org.telegram.messenger.NotificationCenter.didSetNewWallpapper);}
+    @Override protected void onDetachedFromWindow(){var center=org.telegram.messenger.NotificationCenter.getGlobalInstance();center.removeObserver(this,org.telegram.messenger.NotificationCenter.didSetNewTheme);center.removeObserver(this,org.telegram.messenger.NotificationCenter.didApplyNewTheme);center.removeObserver(this,org.telegram.messenger.NotificationCenter.didSetNewWallpapper);wallpaperPreview.close();super.onDetachedFromWindow();}
+    @Override public void didReceivedNotification(int id,int account,Object... args){wallpaperPreview.refresh();settingsChanged();}
     public void settingsChanged() { requestLayout(); invalidate(); }
     @Override protected void onMeasure(int widthSpec, int heightSpec) {
+        if(Theme.dialogs_countTextPaint!=null)countText.set(Theme.dialogs_countTextPaint);else{countText.setTextSize(AndroidUtilities.dp(12));countText.setTypeface(AndroidUtilities.bold());}
         int width=MeasureSpec.getSize(widthSpec); var metrics=getResources().getDisplayMetrics();
-        titlePx=android.util.TypedValue.applyDimension(android.util.TypedValue.COMPLEX_UNIT_SP,HeaderConfig.fusion()||HeaderConfig.compact()?16f:17.5f,metrics);
+        titlePx=android.util.TypedValue.applyDimension(android.util.TypedValue.COMPLEX_UNIT_SP,previewFusion()||HeaderConfig.compact()?16f:17.5f,metrics);
         subtitlePx=android.util.TypedValue.applyDimension(android.util.TypedValue.COMPLEX_UNIT_SP,12f,metrics);
         text.setTextSize(titlePx); text.getFontMetricsInt(fontMetrics); int titleLine=fontMetrics.descent-fontMetrics.ascent;
         text.setTextSize(subtitlePx); text.getFontMetricsInt(fontMetrics); int subtitleLine=fontMetrics.descent-fontMetrics.ascent;
         fusionMode=false;
-        if(HeaderConfig.fusion()){
+        if(previewFusion()){
             if(fusion==null)fusion=new FusionPreview(getContext());
-            var g=HeaderConfig.portrait() ? app.flexygram.header.fusion.SignatureFusionGeometry.updatePortrait(fusion.geometry,width,AndroidUtilities.density,LocaleController.isRTL,true) : app.flexygram.header.fusion.SignatureFusionGeometry.update(fusion.geometry,width,AndroidUtilities.density,LocaleController.isRTL,true);
+            var g=previewPortrait() ? app.flexygram.header.fusion.SignatureFusionGeometry.updatePortrait(fusion.geometry,width,AndroidUtilities.density,LocaleController.isRTL,true) : app.flexygram.header.fusion.SignatureFusionGeometry.update(fusion.geometry,width,AndroidUtilities.density,LocaleController.isRTL,true);
             if(g.fits&&titleLine+subtitleLine+AndroidUtilities.dp(2)<=g.height-AndroidUtilities.dp(8)){
                 fusionMode=true;previewHeight=g.height;
-                int h=Math.round(previewHeight)+AndroidUtilities.dp(80);setMeasuredDimension(width,h);fusionTop=(h-previewHeight)/2;
+                int h=Math.round(previewHeight)+AndroidUtilities.dp(forcedStyle<0?80:40);setMeasuredDimension(width,h);fusionTop=(h-previewHeight)/2;
                 text.setTextSize(titlePx); scratchPaint.set(text); displayName=android.text.TextUtils.ellipsize(name,scratchPaint,g.text.width(),android.text.TextUtils.TruncateAt.END).toString();
                 fusionTitleX=app.flexygram.header.fusion.SignatureFusionGeometry.titleCenterX(
                         g, text.measureText(displayName));
@@ -65,20 +77,20 @@ public final class HeaderPreviewView extends View {
                 float placeholderW = Math.min(g.portrait.width(), AndroidUtilities.dp(73));
                 float previewStart = g.rtl ? g.portrait.width()-placeholderW*.45f : placeholderW*.55f;
                 float previewEnd = g.rtl ? g.portrait.width()-placeholderW : placeholderW;
-                if (!HeaderConfig.portrait()) fusion.mask.prepare(previewStart,previewEnd,.9f,g.rtl);
+                if (!previewPortrait()) fusion.mask.prepare(previewStart,previewEnd,.9f,g.rtl);
                 return;
             }
         }
         previewHeight=HeaderGeometry.height(width,titleLine,subtitleLine,AndroidUtilities.density,HeaderConfig.compact());
         float fit=Math.min(1f,(previewHeight-AndroidUtilities.dp(8))/(titleLine+subtitleLine));titlePx*=fit;subtitlePx*=fit;
         titlePx=Math.min(titlePx,previewHeight-AndroidUtilities.dp(8));
-        int h=Math.round(previewHeight)+AndroidUtilities.dp(80);setMeasuredDimension(width,h);
+        int h=Math.round(previewHeight)+AndroidUtilities.dp(forcedStyle<0?80:40);setMeasuredDimension(width,h);
         text.setTextSize(titlePx); float preferred = text.measureText(name);
         text.setTextSize(subtitlePx); preferred = Math.max(preferred, text.measureText(status)) + AndroidUtilities.dp(24);
         float numberWidth = 0;
         int mode = HeaderConfig.counter() ? HeaderConfig.counterMode() : 0;
         if (mode != 0) {
-            numberWidth = Theme.dialogs_countTextPaint.measureText("10");
+            numberWidth = countText.measureText("10");
         }
         geometry.update(width,(h-previewHeight)/2,previewHeight,numberWidth,AndroidUtilities.density,LocaleController.isRTL,mode,preferred);
         text.setTextSize(titlePx); scratchPaint.set(text); displayName=android.text.TextUtils.ellipsize(name,scratchPaint,Math.max(0,geometry.title.width()-AndroidUtilities.dp(24)),android.text.TextUtils.TruncateAt.END).toString();
@@ -87,17 +99,10 @@ public final class HeaderPreviewView extends View {
     @Override protected void onSizeChanged(int w, int h, int oldw, int oldh) { super.onSizeChanged(w,h,oldw,oldh); }
     @Override protected void onDraw(Canvas canvas) {
         float d = AndroidUtilities.density, height = previewHeight;
-        android.graphics.drawable.Drawable wallpaper = Theme.getCachedWallpaperNonBlocking();
-        if (Theme.wallpaperLoadTask != null) {
-            invalidate();
-        }
-        if (wallpaper != null) {
-            wallpaper.setBounds(0, 0, getWidth(), getHeight());
-            wallpaper.draw(canvas);
-        } else {
-            canvas.drawColor(Theme.getColor(Theme.key_chat_wallpaper));
-        }
-        if (fusionMode && HeaderConfig.fusion()) { drawFusion(canvas); return; }
+        canvas.drawColor(Theme.getColor(Theme.key_chat_wallpaper));
+        wallpaperPreview.resize(getWidth(),getHeight());wallpaperPreview.draw(canvas);
+        if(previewStyle()==1){drawClassic(canvas);return;}
+        if (fusionMode && previewFusion()) { drawFusion(canvas); return; }
         surface.draw(canvas, geometry, d, null);
         int color = Theme.getColor(Theme.key_actionBarDefaultTitle);
         if(iconColor!=color){iconColor=color;back.setColorFilter(color, android.graphics.PorterDuff.Mode.SRC_IN);}
@@ -105,7 +110,7 @@ public final class HeaderPreviewView extends View {
         int side=AndroidUtilities.dp(24), y=Math.round(geometry.back.centerY());
         back.setBounds(Math.round(arrow)-side/2,y-side/2,Math.round(arrow)+side/2,y+side/2); back.draw(canvas);
         if (geometry.countVisible) {
-            Paint countPaint = Theme.dialogs_countTextPaint;
+            Paint countPaint = countText;
             countPaint.setColor(color);
             float countY = geometry.back.centerY() - (countPaint.descent() + countPaint.ascent()) / 2f;
             float countX = LocaleController.isRTL
@@ -126,11 +131,27 @@ public final class HeaderPreviewView extends View {
         avatar.setColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText));canvas.drawCircle(geometry.avatar.centerX(),geometry.avatar.centerY(),height/2-AndroidUtilities.dp(1),avatar);
         text.setColor(0xffffffff);text.setTextSize(AndroidUtilities.dp(20));canvas.drawText("A",geometry.avatar.centerX(),geometry.avatar.centerY()+AndroidUtilities.dp(7),text);
     }
+    private void drawClassic(Canvas canvas){
+        float y=getHeight()/2f,d=AndroidUtilities.density;boolean rtl=LocaleController.isRTL;
+        avatar.setColor(Theme.getColor(Theme.key_actionBarDefault));canvas.drawRect(0,y-28*d,getWidth(),y+28*d,avatar);
+        int color=Theme.getColor(Theme.key_actionBarDefaultTitle);
+        back.setColorFilter(color,android.graphics.PorterDuff.Mode.SRC_IN);more.setColorFilter(color,android.graphics.PorterDuff.Mode.SRC_IN);
+        int size=AndroidUtilities.dp(24),backX=Math.round(rtl?getWidth()-20*d:20*d),menuX=Math.round(rtl?20*d:getWidth()-20*d);
+        back.setBounds(backX-size/2,(int)y-size/2,backX+size/2,(int)y+size/2);int save=canvas.save();if(rtl)canvas.rotate(180,backX,y);back.draw(canvas);canvas.restoreToCount(save);
+        more.setBounds(menuX-size/2,(int)y-size/2,menuX+size/2,(int)y+size/2);save=canvas.save();canvas.rotate(90,menuX,y);more.draw(canvas);canvas.restoreToCount(save);
+        float avatarX=rtl?getWidth()-58*d:58*d,textX=rtl?getWidth()-86*d:86*d;
+        avatar.setColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText));canvas.drawCircle(avatarX,y,20*d,avatar);
+        text.setColor(color);text.setTextAlign(rtl?Paint.Align.RIGHT:Paint.Align.LEFT);text.setTextSize(titlePx);
+        scratchPaint.set(text);String title=android.text.TextUtils.ellipsize(name,scratchPaint,Math.max(0,getWidth()-122*d),android.text.TextUtils.TruncateAt.END).toString();
+        canvas.drawText(title,textX,y-2*d,text);text.setTextSize(subtitlePx);text.setColor(Theme.getColor(Theme.key_actionBarDefaultSubtitle));
+        scratchPaint.set(text);String subtitle=android.text.TextUtils.ellipsize(status,scratchPaint,Math.max(0,getWidth()-122*d),android.text.TextUtils.TruncateAt.END).toString();
+        canvas.drawText(subtitle,textX,y+15*d,text);text.setTextAlign(Paint.Align.CENTER);
+    }
     private void drawFusion(Canvas canvas) {
         var g=fusion.geometry;float d=AndroidUtilities.density;
         int color=Theme.getColor(Theme.key_actionBarDefaultTitle);
         if(fusion.color!=color){fusion.color=color;iconColor=color;fusion.phone.setColorFilter(color,android.graphics.PorterDuff.Mode.SRC_IN);fusion.more.setColorFilter(color,android.graphics.PorterDuff.Mode.SRC_IN);back.setColorFilter(color,android.graphics.PorterDuff.Mode.SRC_IN);}
-        int fill=(Theme.getColor(Theme.key_windowBackgroundWhite)&0xffffff)|((HeaderConfig.portrait()?255:Math.round(HeaderConfig.opacity()*2.55f))<<24);
+        int fill=(Theme.getColor(Theme.key_windowBackgroundWhite)&0xffffff)|((previewPortrait()?255:Math.round(HeaderConfig.opacity()*2.55f))<<24);
         int edge=(Theme.getColor(Theme.key_divider)&0xffffff)|0x66000000;
         int outer=canvas.save();canvas.translate(0,fusionTop);
         fusion.surface.drawBackdrop(canvas,g,fill,edge,edge,d);

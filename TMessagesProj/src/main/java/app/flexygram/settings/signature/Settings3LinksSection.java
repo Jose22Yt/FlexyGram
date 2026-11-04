@@ -18,6 +18,9 @@ final class Settings3LinksSection extends SignatureMatteSettingsActivity {
     @Override protected void onItemClick(View view,int p,float x,float y){
         BaseFragment f;
         switch(ids[p]){
+            case "composer_style":f=new ConversationStyleSettingsActivity(false);break;
+            case "header_style":f=new ConversationStyleSettingsActivity(true);break;
+            case "bubble_style":f=new app.flexygram.bubbles.BubbleSettingsActivity();break;
             case "plugins":f=new app.exteraless.plugins.ui.PluginsActivity();break;
             case "ai":f=new app.exteraless.ai.ui.AiSettingsActivity();break;
             case "translator":f=new tw.nekomimi.nekogram.settings.NekoTranslatorSettingsActivity();break;
@@ -35,8 +38,8 @@ final class Settings3LinksSection extends SignatureMatteSettingsActivity {
     }
     @Override protected BaseListAdapter createAdapter(Context context){return new MatteListAdapter(context){
         @Override public int getItemViewType(int p){return 240;}
-        @Override public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup p,int type){return new RecyclerListView.Holder(new Settings2Cell(p.getContext(),resourcesProvider));}
-        @Override public void onBindViewHolder(RecyclerView.ViewHolder h,int p,boolean partial){((Settings2Cell)h.itemView).bind(LocaleController.getString(titles[p]),"",icons[p],0,p+1<ids.length);}
+        @Override public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup p,int type){return new RecyclerListView.Holder(new Settings2Cell(p.getContext(),resourcesProvider,true));}
+        @Override public void onBindViewHolder(RecyclerView.ViewHolder h,int p,boolean partial){((Settings2Cell)h.itemView).setCardEdges(p==0,p+1==ids.length);((Settings2Cell)h.itemView).bind(LocaleController.getString(titles[p]),"",icons[p],0,p+1<ids.length);}
         @Override public boolean isEnabled(RecyclerView.ViewHolder h){return true;}
     };}
 }

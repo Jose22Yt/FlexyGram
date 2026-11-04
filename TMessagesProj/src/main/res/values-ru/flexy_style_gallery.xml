@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="FlexyInterfaceLower">Нижняя панель</string>
+    <string name="FlexyInterfaceUpper">Верхняя панель</string>
+    <string name="FlexyStyleTapHint">Нажмите на превью, чтобы выбрать оформление</string>
+    <string name="FlexyStyleSwipeHint">Листайте стили и нажмите на нужную шапку.</string>
+    <string name="FlexyStyleDefault">По умолчанию</string>
+    <string name="FlexyStyleCompact">Компактная</string>
+</resources>
