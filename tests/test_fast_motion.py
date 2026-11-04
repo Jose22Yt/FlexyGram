@@ -19,6 +19,18 @@ public class Probe {public static void main(String[] args){
 }}'''},[JAVA/'app/flexygram/animation/FastMotionTiming.java'])
 
 
+def test_disabled_policy_uses_system_clock_but_does_not_double_scale_android_animators(tmp_path):
+    probe(tmp_path, {'Probe.java': '''import app.flexygram.animation.FastMotionTiming;
+public class Probe {public static void main(String[]args){
+ FastMotionTiming.setSystemScaleProvider(()->5d);FastMotionTiming.setEnabled(false);
+ if(FastMotionTiming.duration(300)!=1500||FastMotionTiming.delay(100)!=500)throw new AssertionError("native manual clock");
+ if(FastMotionTiming.animatorDuration(300,5)!=300||FastMotionTiming.animatorDelay(100,5)!=100)throw new AssertionError("native framework double scaling");
+ if(Math.abs(FastMotionTiming.frameDelta(.016f)-.0032f)>.00001f)throw new AssertionError("native spring clock");
+ FastMotionTiming.setSystemScaleProvider(()->0d);if(FastMotionTiming.duration(300)!=1||FastMotionTiming.delay(100)!=0||FastMotionTiming.frameDelta(.016f)!=0)throw new AssertionError("disabled Android animations");
+ FastMotionTiming.setEnabled(true);if(FastMotionTiming.duration(300)!=3||FastMotionTiming.frameDelta(.016f)!=.016f)throw new AssertionError("fast restored");
+}}'''},[JAVA/'app/flexygram/animation/FastMotionTiming.java'])
+
+
 def test_actual_animated_float_finishes_at_its_fixed_deadline_without_idle_redraw(tmp_path):
     files={
       'android/animation/TimeInterpolator.java':'package android.animation;public interface TimeInterpolator{float getInterpolation(float t);}',

@@ -110,6 +110,7 @@ final class StudioClientBackup {
         LocaleController.getInstance().reloadStudioLanguage();
         app.exteraless.appearance.AppearanceConfig.invalidateDividerStyle();
         LiteMode.loadPreference();
+        app.flexygram.animation.FastMotionConfig.load();
         app.flexygram.bubbles.BubbleConfig.load();
         app.flexygram.header.HeaderConfig.load();
         app.flexygram.bubbles.interaction.BubbleInteractionSettings.reload();

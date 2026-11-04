@@ -3,6 +3,30 @@
 El factor de presentación es `FastMotionTiming.SCALE = 0.01`. No se escriben
 ajustes globales del teléfono ni se solicitan permisos especiales.
 
+## Interruptor de FlexyStudio
+
+`FlexyStudio > Animaciones > Animaciones ultrarrápidas` permite activar o
+desactivar este comportamiento sin reiniciar. Queda activo por defecto para
+conservar el comportamiento de la beta actual. La preferencia se guarda en
+`flexygram_motion/fast_motion_enabled` y está incluida en la copia del cliente.
+
+Al apagarlo, los animadores recuperan sus duraciones nominales, incluso al
+reutilizarlos, y Android vuelve a aplicar su escala sin compensación. Los
+resortes AndroidX recuperan su funcionamiento nativo; los relojes manuales y
+resortes de burbujas consultan la escala Android. También se desactiva el camino
+inmediato de entrada/salida de chats.
+
+La interrupción de navegación con el mismo toque permanece activa en ambos
+modos. El interruptor nunca condiciona `finishNavigationForInput` ni la entrega
+del evento original. Se conservan las protecciones de gestos activos y modales.
+
+Verificación del interruptor: 259 pruebas generales/Studio aprobadas y 31
+omitidas por condiciones de entorno; 33 pruebas Android aisladas aprobadas
+(8 del motor, 19 de Studio, 6 de navegación). Los fixtures de Studio se ajustaron
+a la beta y su copia completa actuales: versión 1291, límite de
+`StudioSchema.MAX_BYTES` y extensión sin distinción de mayúsculas. No se
+modificaron esas políticas de importación. No se compiló una APK con este cambio.
+
 Un plugin de compilación transforma las llamadas de presentación del módulo
 principal a `Animator`, `ViewPropertyAnimator`, animaciones de vistas y resortes
 AndroidX. Usa la API de instrumentación de AGP y su ASM existente; no añade

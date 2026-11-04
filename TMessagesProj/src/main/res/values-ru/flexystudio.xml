@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="FlexyStudioTitle">FlexyStudio</string>
+    <string name="FlexyStudioMotion">АНИМАЦИИ</string>
+    <string name="FlexyStudioFastMotion">Сверхбыстрые анимации</string>
+    <string name="FlexyStudioFastMotionInfo">Переходы ×0,01 в FlexyGram. Выключите, чтобы использовать скорость анимации Android.</string>
     <string name="FlexyStudioConfiguration">КОНФИГУРАЦИЯ</string>
     <string name="FlexyStudioExport">Экспорт конфигурации</string>
     <string name="FlexyStudioImport">Импорт конфигурации</string>

@@ -52,6 +52,7 @@ public final class BubbleTapMotion implements Runnable {
         if (!running) return;
         long now = SystemClock.uptimeMillis();
         float dt = Math.max(0f, Math.min(.064f, (now-last)/1000f)); last = now;
+        dt = app.flexygram.animation.FastMotionTiming.frameDelta(dt);
         boolean movingX, movingY;
         if (now-started >= app.flexygram.animation.FastMotionTiming.duration(250)) {
             x.snap(x.target); y.snap(y.target); movingX=movingY=false;

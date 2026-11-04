@@ -2136,7 +2136,8 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
      * by their existing controllers. DOWN still settles older motion before hit testing.
      */
     private boolean useImmediateChatNavigation(BaseFragment chat, BaseFragment other, boolean preview) {
-        return chat instanceof ChatActivity && other != null && !(other instanceof ChatActivity)
+        return app.flexygram.animation.FastMotionTiming.isEnabled()
+                && chat instanceof ChatActivity && other != null && !(other instanceof ChatActivity)
                 && !preview && !inPreviewMode && !transitionAnimationPreviewMode
                 && !previewOpenAnimationInProgress && previewMenu == null && sheetFragment == null
                 && !startedTracking && !predictiveBackInProgress && !predictiveInput;

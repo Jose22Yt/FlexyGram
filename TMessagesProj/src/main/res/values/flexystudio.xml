@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="FlexyStudioTitle">FlexyStudio</string>
+    <string name="FlexyStudioMotion">ANIMATIONS</string>
+    <string name="FlexyStudioFastMotion">Ultrafast animations</string>
+    <string name="FlexyStudioFastMotionInfo">Use ×0.01 transitions in FlexyGram. Turn off to follow Android animation speed.</string>
     <string name="FlexyStudioConfiguration">CONFIGURATION</string>
     <string name="FlexyStudioExport">Export configuration</string>
     <string name="FlexyStudioImport">Import configuration</string>

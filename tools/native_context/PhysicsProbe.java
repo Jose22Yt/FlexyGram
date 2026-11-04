@@ -8,6 +8,11 @@ public class PhysicsProbe {
  static void frame(double dt){SystemClock.now+=dt*1000;View.frame();Choreographer.frame((long)(SystemClock.now*1e6));}
  public static void main(String[] args){
   int samples=0;
+  app.flexygram.animation.FastMotionTiming.setEnabled(false);
+  SelectedBubbleMotion preferenceMotion=new SelectedBubbleMotion();preferenceMotion.enter(()->{},.978f,.965f,0f,0f);frame(1d/60);
+  require(preferenceMotion.isRunning(),"Disabling fast motion must restore the normal bubble trajectory");
+  app.flexygram.animation.FastMotionTiming.setEnabled(true);frame(1d/60);
+  require(!preferenceMotion.isRunning(),"Re-enabling fast motion must update an already-created controller");preferenceMotion.reset();
   for(int hz:new int[]{60,90,120,144}){
    SelectedBubbleMotion m=new SelectedBubbleMotion();
    m.enter(()->{},.978f,.965f,0f,0f);

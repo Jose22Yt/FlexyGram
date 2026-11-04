@@ -437,6 +437,7 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
         }
 
         super.onCreate();
+        app.flexygram.animation.FastMotionConfig.load();
         installCrashReportFilter();
 
         // AndroidUtilities must be initialized before FileLog

@@ -9,8 +9,28 @@ public class FastMotionAndroidTest {
  Activity activity;
  void system(float scale){ReflectionHelpers.callStaticMethod(ValueAnimator.class,"setDurationScale",ClassParameter.from(float.class,scale));}
  void frames(){Shadows.shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(80));}
- @Before public void setup(){activity=Robolectric.buildActivity(Activity.class).setup().get();org.telegram.messenger.ApplicationLoader.applicationContext=activity;system(1);}
- @After public void finish(){system(1);activity.finish();}
+ @Before public void setup(){activity=Robolectric.buildActivity(Activity.class).setup().get();org.telegram.messenger.ApplicationLoader.applicationContext=activity;system(1);FastMotionConfig.setEnabled(true);}
+ @After public void finish(){FastMotionConfig.setEnabled(true);system(1);activity.finish();}
+ @Test public void disablingRestoresReusedAnimatorAndPropertyAnimatorToNativeDurations(){
+  system(5);ValueAnimator a=ValueAnimator.ofFloat(0,1);a.setDuration(300);a.setStartDelay(100);
+  FastMotion.start(a);assertEquals(1,a.getDuration());a.cancel();
+  FastMotionConfig.setEnabled(false);FastMotion.start(a);assertEquals(300,a.getDuration());assertEquals(100,a.getStartDelay());a.cancel();
+  View v=new View(activity);ViewPropertyAnimator property=FastMotion.viewAnimator(v.animate());FastMotion.duration(property,400);FastMotion.delay(property,200);assertEquals(400,property.getDuration());
+  FastMotionConfig.setEnabled(true);FastMotion.viewAnimator(property);assertEquals(1,property.getDuration());
+  FastMotionConfig.setEnabled(false);FastMotion.viewAnimator(property);assertEquals(400,property.getDuration());assertEquals(200,property.getStartDelay());
+  assertEquals(1500,FastMotionTiming.duration(300));assertEquals(300,FastMotionTiming.animatorDuration(300,5));assertEquals(5f,ValueAnimator.getDurationScale(),0);
+ }
+ @Test public void persistedAndImportedPreferenceUpdatesPolicyWithoutRestart(){
+  FastMotionConfig.setEnabled(false);FastMotionTiming.setEnabled(true);FastMotionConfig.load();assertFalse(FastMotionTiming.isEnabled());
+  activity.getSharedPreferences(FastMotionConfig.FILE,0).edit().putBoolean(FastMotionConfig.KEY,true).commit();Shadows.shadowOf(Looper.getMainLooper()).idle();assertTrue(FastMotionTiming.isEnabled());
+  activity.getSharedPreferences(FastMotionConfig.FILE,0).edit().putBoolean(FastMotionConfig.KEY,false).commit();Shadows.shadowOf(Looper.getMainLooper()).idle();assertFalse(FastMotionTiming.isEnabled());
+  system(0);assertEquals(1,FastMotionTiming.duration(300));assertEquals(0,FastMotionTiming.delay(300));
+ }
+ @Test public void disabledMotionLeavesDecorativeSpringRunningNaturally(){
+  FastMotionConfig.setEnabled(false);FloatValueHolder value=new FloatValueHolder(0);SpringAnimation spring=new SpringAnimation(value).setSpring(new SpringForce(1000).setStiffness(50));
+  FastMotion.startSpring(spring);spring.doAnimationFrame(1000);spring.doAnimationFrame(1016);
+  assertTrue("Normal spring must not be forced to its endpoint",spring.isRunning());assertTrue(value.getValue()<1000);spring.cancel();
+ }
  @Test public void fixedTargetUsesCurrentSystemMultiplierAndCallbacksCompleteOnce(){
   for(float scale:new float[]{.01f,.5f,1,1.5f,5,6}){
    system(scale);int[] end={0};ValueAnimator a=ValueAnimator.ofFloat(0,1);a.setDuration(300);

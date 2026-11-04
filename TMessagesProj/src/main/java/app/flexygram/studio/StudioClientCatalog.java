@@ -97,6 +97,7 @@ final class StudioClientCatalog {
         f="flexygram_composer";integer(f,"style",0);bool(f,"pearlGlass",false);integer(f,"verticalPosition",0);integer(f,"compactLevel",0);integer(f,"iconAppearance",0);integer(f,"componentGap",0);
         f="flexy_bottom_tabs";integer(f,"density_v1",1);bool(f,"show_tabs",true);bool(f,"show_titles",true);bool(f,"double_tap_chats",true);bool(f,"double_tap_profile",true);bool(f,"always_search_chats",false);bool(f,"floating_dock",true);bool(f,"separate_search",false);bool(f,"home_defaults_v2",true);add(f,"tab_order",STRING,"0,1,2,3,4");
         bool("neko","flexy_quick_member_lens",false);bool("flexy_bubble_interaction","tap_panel",true);
+        bool("flexygram_motion","fast_motion_enabled",true);
         integer("flexy_signature_smart_previews","palette",4);integer("flexy_bubble_interaction","interaction_style",1);integer("flexy_delete_motion","message_delete_style",0);bool("flexyfiles_local","enabled",false);
         f="neko";
         bool(f,"flexy_conversion_enabled",false);bool(f,"flexy_conversion_currency",true);add(f,"flexy_conversion_target_currency",STRING,"USD");bool(f,"flexy_conversion_time",true);add(f,"flexy_conversion_target_zone",STRING,"");bool(f,"flexy_conversion_units",true);integer(f,"flexy_conversion_unit_system",0);

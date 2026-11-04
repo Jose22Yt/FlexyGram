@@ -11,8 +11,7 @@ public final class SelectedBubbleMotion implements Choreographer.FrameCallback {
     private final Spring x = new Spring(1f, 900f, .78f, .0002f);
     private final Spring y = new Spring(1f, 900f, .78f, .0002f);
     private final Spring phase = new Spring(1f, 1100f, .78f, .0015f);
-    private static final long ENTER_LIMIT_MS = app.flexygram.animation.FastMotionTiming.duration(280),
-            CLOSE_LIMIT_MS = app.flexygram.animation.FastMotionTiming.duration(180);
+    private static final long ENTER_LIMIT_MS = 280, CLOSE_LIMIT_MS = 180;
     private Runnable invalidate, completion;
     private boolean running, closing;
     private long lastFrame, started;
@@ -71,11 +70,12 @@ public final class SelectedBubbleMotion implements Choreographer.FrameCallback {
     @Override public void doFrame(long frameTimeNanos) {
         if (!running) return;
         float dt = Math.max(0f, Math.min(.064f, (frameTimeNanos-lastFrame)/1_000_000_000f));
+        dt = app.flexygram.animation.FastMotionTiming.frameDelta(dt);
         lastFrame = frameTimeNanos;
         boolean mx=x.step(dt), my=y.step(dt), mp=phase.step(dt);
         if (invalidate != null) invalidate.run();
         if ((!mx && !my && !mp) || closing && phase.value <= 0f
-                || android.os.SystemClock.uptimeMillis()-started >= (closing ? CLOSE_LIMIT_MS : ENTER_LIMIT_MS)) {
+                || android.os.SystemClock.uptimeMillis()-started >= app.flexygram.animation.FastMotionTiming.duration(closing ? CLOSE_LIMIT_MS : ENTER_LIMIT_MS)) {
             running = false;
             x.snap(1f); y.snap(1f); phase.snap(closing ? 0f : 1f);
             if (closing) finish(); else if (invalidate != null) invalidate.run();

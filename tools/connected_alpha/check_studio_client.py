@@ -14,6 +14,7 @@ with tempfile.TemporaryDirectory(prefix='studio-client-') as tmp:
   if p.name not in keep:p.unlink()
  def put(path,data):
   p=src/path;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(data)
+ put('app/flexygram/animation/FastMotionConfig.java','package app.flexygram.animation;public class FastMotionConfig{public static void load(){}}')
  put('android/content/Context.java','package android.content;public class Context{public static final int MODE_PRIVATE=0;public SharedPreferences getSharedPreferences(String f,int m){return app.flexygram.studio.StudioClientTest.preferences(f);}}')
  put('android/os/Looper.java','package android.os;public class Looper{private static final Looper MAIN=new Looper();public static Looper myLooper(){return MAIN;}public static Looper getMainLooper(){return MAIN;}}')
  put('android/util/Base64.java','package android.util;public class Base64{public static final int DEFAULT=0;public static String encodeToString(byte[] b,int f){return java.util.Base64.getEncoder().encodeToString(b);}}')

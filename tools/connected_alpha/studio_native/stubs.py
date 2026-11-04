@@ -9,6 +9,9 @@ def write_stubs(source,root):
   p=source/path;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(text)
  studio=root/'TMessagesProj/src/main/java/app/flexygram/studio'
  for p in studio.rglob('*.java'):put('app/flexygram/studio/'+str(p.relative_to(studio)),p.read_text())
+ for name in ['FastMotionConfig','FastMotionTiming']:
+  put('app/flexygram/animation/'+name+'.java',(root/'TMessagesProj/src/main/java/app/flexygram/animation'/(name+'.java')).read_text())
+ put('app/flexygram/animation/FastMotion.java','package app.flexygram.animation;public class FastMotion{public static float systemScale(){return android.animation.ValueAnimator.getDurationScale();}}')
  files_entry=(root/'TMessagesProj/src/main/java/app/flexygram/files/FlexyFiles.java').read_text()
  put('app/flexygram/files/FlexyFiles.java',files_entry)
  put('app/flexygram/files/core/SelectedDocument.java',(root/'TMessagesProj/src/main/java/app/flexygram/files/core/SelectedDocument.java').read_text())
@@ -33,8 +36,8 @@ if(key==key_divider)return dark?0xff354256:0xffd9e0ea;
 return dark?(key==key_windowBackgroundGray?0xff11151c:0xff1b2533):(key==key_windowBackgroundGray?0xfff7f8fa:0xffffffff);}
 public static Drawable createSimpleSelectorRoundRectDrawable(int radius,int fill,int pressed){GradientDrawable d=new GradientDrawable();d.setColor(fill);d.setCornerRadius(radius);return new RippleDrawable(android.content.res.ColorStateList.valueOf(pressed),d,null);}}
 ''')
- version=re.search(r'def verCode = (\d+)',(root/'TMessagesProj/build.gradle').read_text())[1]
- put('org/telegram/messenger/BuildConfig.java','package org.telegram.messenger;public class BuildConfig {public static final boolean CONNECTED_ALPHA=true;public static final int VERSION_CODE='+version+';}')
+ version=re.search(r'^BETA_VERSION_CODE=(\d+)',(root/'gradle.properties').read_text(),re.M)[1]
+ put('org/telegram/messenger/BuildConfig.java','package org.telegram.messenger;public class BuildConfig {public static final boolean CONNECTED_ALPHA=false;public static final int VERSION_CODE='+version+';}')
  put('org/telegram/messenger/ApplicationLoader.java','''package org.telegram.messenger;public class ApplicationLoader {
 public static android.content.Context applicationContext;public static android.os.Handler applicationHandler=new android.os.Handler(android.os.Looper.getMainLooper());public static String getApplicationId(){return applicationContext.getPackageName();}}''')
  put('org/telegram/messenger/AndroidUtilities.java','''package org.telegram.messenger;public class AndroidUtilities {
@@ -77,8 +80,8 @@ public class AlertDialog extends android.app.AlertDialog {protected AlertDialog(
  put('org/telegram/ui/Components/RecyclerListView.java','package org.telegram.ui.Components;public class RecyclerListView {public static class Holder extends androidx.recyclerview.widget.RecyclerView.ViewHolder {public Holder(android.view.View v){super(v);}}}')
  put('app/flexygram/settings/SignatureMatteSettingsActivity.java','''package app.flexygram.settings;
 public abstract class SignatureMatteSettingsActivity extends org.telegram.ui.ActionBar.BaseFragment {
-protected org.telegram.ui.ActionBar.Theme.ResourcesProvider resourcesProvider;protected int count;protected void updateRows(){count=0;}protected int addRow(){return count++;}protected int addRow(String id){return addRow();}protected abstract String getActionBarTitle();protected abstract BaseListAdapter createAdapter(android.content.Context c);protected abstract void onItemClick(android.view.View v,int p,float x,float y);
-protected class BaseListAdapter {protected static final int TYPE_HEADER=1,TYPE_SHADOW=2,TYPE_CHECK=3;public int getItemViewType(int p){return 0;}public androidx.recyclerview.widget.RecyclerView.ViewHolder onCreateViewHolder(android.view.ViewGroup p,int t){return new org.telegram.ui.Components.RecyclerListView.Holder(new android.view.View(p.getContext()));}public void onBindViewHolder(androidx.recyclerview.widget.RecyclerView.ViewHolder h,int p,boolean b){}public boolean isEnabled(androidx.recyclerview.widget.RecyclerView.ViewHolder h){return false;}}
+protected org.telegram.ui.ActionBar.Theme.ResourcesProvider resourcesProvider;protected BaseListAdapter listAdapter=new BaseListAdapter();protected int count;protected void updateRows(){count=0;}protected int addRow(){return count++;}protected int addRow(String id){return addRow();}protected abstract String getActionBarTitle();protected abstract BaseListAdapter createAdapter(android.content.Context c);protected abstract void onItemClick(android.view.View v,int p,float x,float y);
+protected class BaseListAdapter {public void notifyItemChanged(int p){}protected static final int TYPE_HEADER=1,TYPE_SHADOW=2,TYPE_CHECK=3;public int getItemViewType(int p){return 0;}public androidx.recyclerview.widget.RecyclerView.ViewHolder onCreateViewHolder(android.view.ViewGroup p,int t){return new org.telegram.ui.Components.RecyclerListView.Holder(new android.view.View(p.getContext()));}public void onBindViewHolder(androidx.recyclerview.widget.RecyclerView.ViewHolder h,int p,boolean b){}public boolean isEnabled(androidx.recyclerview.widget.RecyclerView.ViewHolder h){return false;}}
 protected class MatteListAdapter extends BaseListAdapter {protected MatteListAdapter(android.content.Context c){}}
 }''')
  put('app/flexygram/settings/SignatureNavigationCell.java','''package app.flexygram.settings;public class SignatureNavigationCell extends android.widget.TextView {public SignatureNavigationCell(android.content.Context c,org.telegram.ui.ActionBar.Theme.ResourcesProvider p){super(c);}public void bind(String t,int icon,boolean divider){setText(t);}}''')
