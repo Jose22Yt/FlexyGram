@@ -14,6 +14,7 @@ public final class BubbleInteractionSettings {
     public static final int STYLE_SIGNATURE = 1;
     private static final String PREFS = "flexy_bubble_interaction";
     private static final String STYLE_KEY = "interaction_style";
+    public static void reload() { cachedStyle = -1; }
     private static volatile int cachedStyle = -1;
     private BubbleInteractionSettings() {}
 

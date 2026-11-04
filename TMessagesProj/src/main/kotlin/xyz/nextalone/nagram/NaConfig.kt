@@ -1758,6 +1758,9 @@ object NaConfig {
         }
     }
 
+    /** Native metadata only; account/session preferences are not part of this catalog. */
+    fun getStudioItems(): List<ConfigItem> = configs.toList()
+
     fun getConfigTypes(): Map<String, Int> {
         synchronized(sync) {
             return configs.associate { it.key to it.type }

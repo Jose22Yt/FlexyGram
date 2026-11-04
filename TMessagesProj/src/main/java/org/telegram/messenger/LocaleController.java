@@ -1316,6 +1316,18 @@ public class LocaleController {
         return new HashMap<>();
     }
 
+    /** Restore the native language selection after importing portable client preferences. */
+    public void reloadStudioLanguage() {
+        String selected=MessagesController.getGlobalMainSettings().getString("language",null);
+        LocaleInfo info=selected==null?null:getLanguageFromDict(selected);
+        if(selected!=null&&info==null)throw new IllegalArgumentException("language_unavailable");
+        if(info==null)info=getLanguageFromDict(systemDefaultLocale.getLanguage());
+        if(info==null)info=getLanguageFromDict(getLocaleString(systemDefaultLocale));
+        if(info==null)info=getLanguageFromDict("en");
+        languageOverride=selected==null?null:info.shortName;
+        if(currentLocaleInfo!=info)applyLanguage(info,selected!=null,false,UserConfig.selectedAccount);
+    }
+
     public int applyLanguage(LocaleInfo localeInfo, boolean override, boolean init, final int currentAccount) {
         return applyLanguage(localeInfo, override, init, false, false, currentAccount, null);
     }

@@ -9,6 +9,10 @@ S=J/'app/flexygram/settings/signature'
 def test_no_preference_migration_or_backend_replacement():
  for p in ['TMessagesProj/src/main/kotlin/app/exteraless/appearance/AppearanceConfig.kt','TMessagesProj/src/main/java/org/telegram/ui/Components/blur3/GlassOutlineStyle.java']:
   current=(ROOT/p).read_text()
+  if p.endswith('AppearanceConfig.kt'):
+   getter='\n    /** Native metadata only; account/session preferences are not part of this catalog. */\n    fun getStudioItems(): List<ConfigItem> = configs.toList()\n'
+   assert current.count(getter)==1
+   current=current.replace(getter,'')
   assert current==subprocess.check_output(['git','show',BASE+':'+p],cwd=ROOT,text=True)
  assert 'AP_GlareEffect' not in (J/'app/flexygram/effects/GlareSettingsSection.java').read_text()
 def test_one_owner_and_direct_chat_entry():

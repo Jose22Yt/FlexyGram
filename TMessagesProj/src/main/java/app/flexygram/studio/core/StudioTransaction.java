@@ -45,7 +45,12 @@ public final class StudioTransaction {
         Map<StudioSchema.Key,Slot> before=new LinkedHashMap<>();
         for(StudioSchema.Key key:after.keySet())before.put(key,backend.read(key));
         backend.journal(before);
-        try { write(backend,after);backend.clearJournal();return new Receipt(before,after); }
+        try {
+            write(backend,after);
+            Map<StudioSchema.Key,Slot> actual=new LinkedHashMap<>();
+            for(StudioSchema.Key key:after.keySet())actual.put(key,backend.read(key));
+            backend.clearJournal();return new Receipt(before,actual);
+        }
         catch(Exception failed) {
             boolean rollbackFailed=false;
             try{write(backend,before);backend.clearJournal();}catch(Exception restoreFailed){rollbackFailed=true;}

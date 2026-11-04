@@ -356,6 +356,11 @@ public class NekoConfig {
     );
     // --- Ghost Mode ---
 
+    /** Trusted native settings catalog for explicit local backup/import operations. */
+    public static java.util.List<ConfigItem> getStudioItems() {
+        synchronized (sync) { return new java.util.ArrayList<>(configs); }
+    }
+
     public static Map<String, Integer> getConfigTypes() {
         synchronized (sync) {
             Map<String, Integer> types = new HashMap<>();

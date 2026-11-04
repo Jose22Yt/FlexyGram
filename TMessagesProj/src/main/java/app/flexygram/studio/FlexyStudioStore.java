@@ -34,20 +34,12 @@ public final class FlexyStudioStore {
         deferred.add(new WeakReference<>(refresh));return true;
     }
     public static Map<String,Map<String,Object>> snapshot() {
-        Map<String,Map<String,Object>> result=new TreeMap<>();
-        for(StudioSchema.Key key:StudioSchema.keys()) {
-            Object value;
-            if(key.section.equals("icon"))value=activeIcon();
-            else if(key.section.equals("header")&&key.id.equals("style")&&!prefs(key.file).contains(key.preference)) {
-                SharedPreferences old=app.exteraless.appearance.AppearanceConfig.getPreferences();
-                boolean legacy=old.getBoolean("OEAppearanceIosChatHeaderAuto",false)||old.getBoolean("OEAppearanceIosChatHeader",true);
-                value=legacy?0:1;
-            } else value=readPreference(prefs(key.file),key);
-            value=StudioSchema.value(key,value);
-            result.computeIfAbsent(key.section,k->new TreeMap<>()).put(key.id,value);
-        }
-        return result;
+        return Collections.singletonMap("client", Collections.singletonMap("settings", StudioClientBackup.snapshot()));
     }
+    public static void validate(StudioCodec.Preset preset) {
+        if(preset.sections.containsKey("client"))StudioClientBackup.validate((String)preset.sections.get("client").get("settings"));
+    }
+
     private static Object readPreference(SharedPreferences p,StudioSchema.Key key) {
         if(key.defaultValue instanceof Boolean)return p.getBoolean(key.preference,(Boolean)key.defaultValue);
         if(key.defaultValue instanceof Integer)return p.getInt(key.preference,(Integer)key.defaultValue);
@@ -62,7 +54,7 @@ public final class FlexyStudioStore {
         Utilities.globalQueue.postRunnable(()->{
             StudioTransaction.Receipt receipt=null;boolean ok=false,pending=false;
             Set<String> affected=new HashSet<>(preset.sections.keySet());
-            try { affected.addAll(recoverOnWorker());receipt=StudioTransaction.apply(new Backend(),preset);last=receipt;ok=true; }
+            try { validate(preset); affected.addAll(recoverOnWorker());receipt=StudioTransaction.apply(new Backend(),preset);last=receipt;ok=true; }
             catch(Exception failure){pending=hasJournal();}
             final boolean success=ok,recovery=pending;final StudioTransaction.Receipt result=receipt;
             AndroidUtilities.runOnUIThread(()->{finish(affected);completion.done(success,recovery,result);});
@@ -80,6 +72,11 @@ public final class FlexyStudioStore {
     }
     private static void finish(Set<String> sections) {
         applying=false;
+        if(sections.contains("client")) {
+            sections.addAll(Arrays.asList("bubbles","header","composer","icon"));
+            org.telegram.ui.ActionBar.BaseFragment top=LaunchActivity.getSafeLastFragment();
+            if(top!=null && top.getParentLayout()!=null)top.getParentLayout().rebuildFragments(0);
+        }
         if(sections.contains("bubbles"))BubbleConfig.load();
         if(sections.contains("header"))HeaderConfig.load();
         List<WeakReference<Runnable>> notify=new ArrayList<>(deferred);deferred.clear();
@@ -104,25 +101,19 @@ public final class FlexyStudioStore {
     private static boolean hasJournal(){File base=journal().getBaseFile();return base.exists()||new File(base.getPath()+".bak").exists();}
     private static Map<StudioSchema.Key,StudioTransaction.Slot> readJournal()throws Exception {
         try(FileInputStream stream=journal().openRead();DataInputStream in=new DataInputStream(stream)) {
-            if(stream.getChannel().size()>16384)throw new IOException("journal");
-            if(in.readInt()!=0x46534731)throw new IOException("journal");int n=in.readInt();if(n<1||n>StudioSchema.MAX_KEYS)throw new IOException("journal");
-            Map<StudioSchema.Key,StudioTransaction.Slot> result=new LinkedHashMap<>();
-            for(int i=0;i<n;i++) {
-                StudioSchema.Key k=StudioSchema.key(in.readUTF(),in.readUTF());boolean present=in.readBoolean();
-                Object value=k.defaultValue instanceof Boolean?in.readBoolean():k.defaultValue instanceof Integer?in.readInt():in.readUTF();
-                if(result.put(k,new StudioTransaction.Slot(present,StudioSchema.value(k,value)))!=null)throw new IOException("journal");
-            }
-            if(in.read()!=-1)throw new IOException("journal");return result;
+            return StudioJournal.read(stream,stream.getChannel().size());
         }
     }
     private static final class Backend implements StudioTransaction.Backend {
         public StudioTransaction.Slot read(StudioSchema.Key key) {
+            if(key.section.equals("client"))return new StudioTransaction.Slot(true,StudioClientBackup.snapshot());
             SharedPreferences p=prefs(key.file);boolean present=p.contains(key.preference);
             Object value=key.section.equals("icon")?activeIcon():readPreference(p,key);
             if(value==null)value=key.defaultValue;
             return new StudioTransaction.Slot(present,StudioSchema.value(key,value));
         }
         public void write(String file,Map<StudioSchema.Key,StudioTransaction.Slot> values)throws Exception {
+            if(file.equals("@client")) { StudioClientBackup.apply((String)values.get(StudioSchema.key("client","settings")).value); return; }
             SharedPreferences.Editor editor=prefs(file).edit();
             for(Map.Entry<StudioSchema.Key,StudioTransaction.Slot> entry:values.entrySet()) {
                 StudioSchema.Key k=entry.getKey();StudioTransaction.Slot slot=entry.getValue();Object v=StudioSchema.value(k,slot.value);
@@ -137,13 +128,7 @@ public final class FlexyStudioStore {
         public void journal(Map<StudioSchema.Key,StudioTransaction.Slot> before)throws Exception {
             AtomicFile file=FlexyStudioStore.journal();FileOutputStream stream=file.startWrite();
             try {
-                DataOutputStream out=new DataOutputStream(stream);out.writeInt(0x46534731);out.writeInt(before.size());
-                for(Map.Entry<StudioSchema.Key,StudioTransaction.Slot> entry:before.entrySet()) {
-                    StudioSchema.Key k=entry.getKey();Object v=entry.getValue().value;
-                    out.writeUTF(k.section);out.writeUTF(k.id);out.writeBoolean(entry.getValue().present);
-                    if(v instanceof Boolean)out.writeBoolean((Boolean)v);else if(v instanceof Integer)out.writeInt((Integer)v);else out.writeUTF((String)v);
-                }
-                out.flush();file.finishWrite(stream);
+                StudioJournal.write(stream,before);file.finishWrite(stream);
             }catch(Exception failed){file.failWrite(stream);throw failed;}
         }
         public void clearJournal()throws IOException {AtomicFile file=FlexyStudioStore.journal();file.delete();if(hasJournal())throw new IOException("journal");}

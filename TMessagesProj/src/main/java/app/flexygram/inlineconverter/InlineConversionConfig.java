@@ -30,6 +30,7 @@ public final class InlineConversionConfig {
         public ZoneId zone(){return targetZone.isEmpty()?ZoneId.systemDefault():ZoneId.of(targetZone);}
         public boolean imperial(Locale locale){return system==2||system==0&&(locale.getCountry().equals("US")||locale.getCountry().equals("LR")||locale.getCountry().equals("MM"));}
     }
+    public static synchronized void reload() { int revision = current == null ? 0 : current.revision + 1; current = new Snapshot(NekoConfig.getPreferences(), revision); InlineConversionController.clearCache(); }
     private static volatile Snapshot current;
     private InlineConversionConfig(){}
     public static Snapshot get(){Snapshot value=current;if(value==null){synchronized(InlineConversionConfig.class){if(current==null)current=new Snapshot(NekoConfig.getPreferences(),0);value=current;}}return value;}

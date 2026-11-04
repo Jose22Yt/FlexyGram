@@ -31,4 +31,5 @@
     <string name="FlexyStudioBusy">Another operation is in progress. Please try again.</string>
     <string name="FlexyStudioLoginFirst">Open FlexyGram and sign in before importing a configuration.</string>
     <string name="FlexyStudioUnsupported">Unsupported: %1$s. No section was applied.</string>
+    <string name="FlexyStudioClientSettings">Complete client settings</string>
 </resources>

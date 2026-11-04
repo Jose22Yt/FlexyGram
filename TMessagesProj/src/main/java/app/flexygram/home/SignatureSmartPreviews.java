@@ -23,6 +23,7 @@ public final class SignatureSmartPreviews {
     public static void addStyleListener(StyleListener listener) { listeners.add(listener); }
     public static void removeStyleListener(StyleListener listener) { listeners.remove(listener); }
     private SignatureSmartPreviews(){}
+    public static void reload() { int previous = mode(); cachedMode = -1; int next = mode(); for (StyleListener listener : listeners.toArray(new StyleListener[0])) listener.onStyleChanged(previous, next); }
     public static int mode(){
         int result=cachedMode;
         if(result>=0)return result;

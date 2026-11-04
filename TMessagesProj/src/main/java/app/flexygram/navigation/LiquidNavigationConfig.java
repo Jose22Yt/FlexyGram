@@ -32,6 +32,7 @@ public final class LiquidNavigationConfig {
         return preferences;
     }
 
+    public static void reload() { load(); notifyChanged(); }
     public static void load() {
         if (ApplicationLoader.applicationContext == null) return;
         SharedPreferences p = prefs();

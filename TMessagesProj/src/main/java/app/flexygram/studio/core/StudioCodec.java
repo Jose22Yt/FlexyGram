@@ -20,6 +20,7 @@ public final class StudioCodec {
             Map<String,Map<String,Object>> copy=new TreeMap<>();int count=0;
             for(Map.Entry<String,Map<String,Object>> section:input.entrySet()) {
                 if(!StudioSchema.sections().contains(section.getKey()))throw new StudioSchema.Unsupported(section.getKey());
+                if (section.getKey().equals("client") && input.size() != 1) throw new IllegalArgumentException("mixed_backup");
                 if(section.getValue().isEmpty())throw new IllegalArgumentException("section");
                 Map<String,Object> values=new TreeMap<>();
                 for(Map.Entry<String,Object> entry:section.getValue().entrySet()) {
@@ -88,6 +89,47 @@ public final class StudioCodec {
         if(!digest.matches("[0-9a-f]{64}")||!MessageDigest.isEqual(digest.getBytes(StandardCharsets.US_ASCII),hash(payload(preset).getBytes(StandardCharsets.UTF_8)).getBytes(StandardCharsets.US_ASCII)))throw new IllegalArgumentException("integrity");
         return preset;
     }
+    /** Canonical data for the typed native-client bundle. No arbitrary preference names are trusted by this layer. */
+    public static String encodeValues(Object value) {
+        StringBuilder out = new StringBuilder(); appendValue(out, value, 0);
+        if (out.length() > StudioSchema.MAX_BYTES) throw new IllegalArgumentException("size");
+        return out.toString();
+    }
+    public static Object decodeValues(String value) {
+        if (value == null || value.isEmpty() || value.length() > StudioSchema.MAX_BYTES) throw new IllegalArgumentException("size");
+        return new Parser(value).parse();
+    }
+    private static void appendValue(StringBuilder out, Object value, int depth) {
+        if (depth > 6 || out.length() > StudioSchema.MAX_BYTES) throw new IllegalArgumentException("size");
+        if (value instanceof String) {
+            out.append('"');
+            String s = (String)value;
+            for (int i = 0; i < s.length(); i++) {
+                char c = s.charAt(i);
+                if (c == '"' || c == '\\') out.append('\\').append(c);
+                else if (c < 32) {
+                    out.append("\\u00"); String hex = "0123456789abcdef";
+                    out.append(hex.charAt(c >>> 4)).append(hex.charAt(c & 15));
+                } else out.append(c);
+            }
+            out.append('"');
+        } else if (value instanceof Boolean || value instanceof Integer || value instanceof Long) out.append(value);
+        else if (value instanceof Map) {
+            Map<?,?> input=(Map<?,?>)value; if(input.size()>8192)throw new IllegalArgumentException("keys");
+            TreeMap<String,Object> sorted=new TreeMap<>();
+            for (Map.Entry<?,?> e:input.entrySet()) {
+                if(!(e.getKey() instanceof String))throw new IllegalArgumentException("key");sorted.put((String)e.getKey(),e.getValue());
+            }
+            out.append('{'); boolean first=true;
+            for(Map.Entry<String,Object> e:sorted.entrySet()) {
+                if(!first)out.append(',');first=false;appendValue(out,e.getKey(),depth+1);out.append(':');appendValue(out,e.getValue(),depth+1);
+            }
+            out.append('}');
+        } else if(value instanceof List) {
+            List<?> list=(List<?>)value;if(list.size()>8192)throw new IllegalArgumentException("list");
+            out.append('[');boolean first=true;for(Object item:list){if(!first)out.append(',');first=false;appendValue(out,item,depth+1);}out.append(']');
+        } else throw new IllegalArgumentException("type");
+    }
     private static String payload(Preset p) {
         StringBuilder b=new StringBuilder("{\"format\":").append(quote(FORMAT)).append(",\"schema\":1,\"minApp\":").append(p.minApp).append(",\"name\":").append(quote(p.name)).append(",\"sections\":[");
         boolean first=true;
@@ -118,7 +160,7 @@ public final class StudioCodec {
         void ws(){while(at<s.length()&&(s.charAt(at)==' '||s.charAt(at)=='\n'||s.charAt(at)=='\r'||s.charAt(at)=='\t'))at++;}
         boolean take(char c){ws();if(at<s.length()&&s.charAt(at)==c){at++;return true;}return false;}
         Object value(int depth){
-            if(depth>6||++nodes>256)fail();ws();if(at>=s.length())fail();char c=s.charAt(at);
+            if(depth>6||++nodes>100000)fail();ws();if(at>=s.length())fail();char c=s.charAt(at);
             if(c=='{') {at++;Map<String,Object> result=new LinkedHashMap<>();if(take('}'))return result;
                 do{ws();String key=string();if(!take(':')||result.containsKey(key))fail();result.put(key,value(depth+1));}while(take(','));if(!take('}'))fail();return result;}
             if(c=='['){at++;List<Object> result=new ArrayList<>();if(take(']'))return result;do{result.add(value(depth+1));}while(take(','));if(!take(']'))fail();return result;}
@@ -126,14 +168,14 @@ public final class StudioCodec {
             for(String lit:Arrays.asList("true","false"))if(s.startsWith(lit,at)){at+=lit.length();return lit.equals("true");}
             int start=at;if(c=='-')at++;if(at>=s.length()||!Character.isDigit(s.charAt(at))||s.charAt(at)>'9')fail();
             if(s.charAt(at)=='0')at++;else while(at<s.length()&&s.charAt(at)>='0'&&s.charAt(at)<='9')at++;
-            if(at-start>12)fail();try{return Long.parseLong(s.substring(start,at));}catch(NumberFormatException invalid){fail();return null;}
+            if(at-start>20)fail();try{return Long.parseLong(s.substring(start,at));}catch(NumberFormatException invalid){fail();return null;}
         }
         String string(){
             if(at>=s.length()||s.charAt(at++)!='"')fail();StringBuilder out=new StringBuilder();boolean done=false;
             while(at<s.length()) {char c=s.charAt(at++);if(c=='"'){done=true;break;}if(c<32)fail();
                 if(c=='\\'){if(at>=s.length())fail();c=s.charAt(at++);if(c=='u'){if(at+4>s.length())fail();try{c=(char)Integer.parseInt(s.substring(at,at+4),16);}catch(NumberFormatException e){fail();}at+=4;}
                     else if(c=='n')c='\n';else if(c=='r')c='\r';else if(c=='t')c='\t';else if(c=='b')c='\b';else if(c=='f')c='\f';else if(c!='"'&&c!='\\'&&c!='/')fail();}
-                out.append(c);if(out.length()>256)fail();
+                out.append(c);if(out.length()>StudioSchema.MAX_BYTES)fail();
             }
             if(!done)fail();String value=out.toString();
             for(int i=0;i<value.length();i++){char c=value.charAt(i);if(Character.isHighSurrogate(c)){if(++i>=value.length()||!Character.isLowSurrogate(value.charAt(i)))fail();}else if(Character.isLowSurrogate(c))fail();}

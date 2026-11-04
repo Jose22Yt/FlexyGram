@@ -22,6 +22,9 @@ object UtilsConfig {
     private val sync = Any()
     private val configs = ArrayList<ConfigItem>()
 
+    /** Native metadata only; account/session preferences are not part of this catalog. */
+    fun getStudioItems(): List<ConfigItem> = configs.toList()
+
     @JvmStatic
     fun getConfigTypes(): Map<String, Int> = configs.associate { it.key to it.type }
 

@@ -6848,6 +6848,23 @@ public class Theme {
         return newTheme;
     }
 
+    public static ThemeInfo applyStudioTheme(File file) {
+        ThemeInfo previous=themesDict.get("FlexyStudio.attheme");
+        if(previous!=null&&previous.overrideWallpaper!=null) {
+            // Replacing an imported preset must not retain its old override or delete the user's image files.
+            String key=previous.overrideWallpaper.getKey();
+            if(!ApplicationLoader.applicationContext.getSharedPreferences("themeconfig",Activity.MODE_PRIVATE).edit().remove(key).commit())return null;
+            previous.overrideWallpaper=null;
+            ThemeAccent accent=previous.getAccent(false);
+            if(accent!=null)accent.overrideWallpaper=null;
+        }
+        return applyThemeFile(file,"FlexyStudio.attheme",null,false);
+    }
+
+    public static String getStudioWallpaperLink() {
+        return currentTheme.overrideWallpaper != null ? getWallpaperUrl(currentTheme.overrideWallpaper) : themedWallpaperLink;
+    }
+
     private static String getWallpaperUrl(OverrideWallpaperInfo wallpaperInfo) {
         if (wallpaperInfo == null || TextUtils.isEmpty(wallpaperInfo.slug) || wallpaperInfo.slug.equals(DEFAULT_BACKGROUND_SLUG)) {
             return null;

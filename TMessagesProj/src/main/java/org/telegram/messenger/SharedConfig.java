@@ -827,6 +827,57 @@ public class SharedConfig {
         }
     }
 
+    /** Reload portable appearance/behavior only. Never reset login, lock or account state. */
+    public static void reloadStudioSettings() {
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", Activity.MODE_PRIVATE);
+        mapPreviewType = preferences.getInt("mapPreviewType", 2);
+        searchEngineType = preferences.getInt("searchEngineType", 0);
+        raiseToListen = preferences.getBoolean("raise_to_listen", true);
+        raiseToSpeak = preferences.getBoolean("raise_to_speak", false);
+        nextMediaTap = preferences.getBoolean("next_media_on_tap", true);
+        recordViaSco = preferences.getBoolean("record_via_sco", false);
+        adaptableColorInBrowser = preferences.getBoolean("adaptableBrowser", false);
+        directShare = preferences.getBoolean("direct_share", true);
+        shuffleMusic = preferences.getBoolean("shuffleMusic", false);
+        playOrderReversed = !shuffleMusic && preferences.getBoolean("playOrderReversed", false);
+        inappCamera = preferences.getBoolean("inappCamera", true);
+        repeatMode = preferences.getInt("repeatMode", 0);
+        fontSize = preferences.getInt("fons_size", AndroidUtilities.isTablet() && !AndroidUtilities.isFold() ? 18 : 16);
+        fontSizeIsDefault = !preferences.contains("fons_size");
+        bubbleRadius = preferences.getInt("bubbleRadius",
+                app.flexygram.bubbles.BubbleStyle.defaultRadius(BuildConfig.CONNECTED_ALPHA));
+        bubbleRadius = app.flexygram.bubbles.BubbleStyle.effectiveRadius(BuildConfig.CONNECTED_ALPHA, bubbleRadius);
+        ivFontSize = preferences.getInt("iv_font_size", fontSize);
+        allowBigEmoji = preferences.getBoolean("allowBigEmoji", true);
+        useSystemEmoji = preferences.getBoolean("useSystemEmoji", false);
+        useSystemBoldFont = preferences.getBoolean("useSystemBoldFont", false);
+        forceForumTabs = preferences.getBoolean("forceForumTabs", false);
+        fastWallpaperDisabled = preferences.getBoolean("fastWallpaperDisabled", false);
+        streamMedia = preferences.getBoolean("streamMedia", true);
+        saveStreamMedia = preferences.getBoolean("saveStreamMedia", true);
+        pauseMusicOnRecord = preferences.getBoolean("pauseMusicOnRecord", true);
+        pauseMusicOnMedia = preferences.getBoolean("pauseMusicOnMedia", false);
+        streamAllVideo = preferences.getBoolean("streamAllVideo", BuildVars.DEBUG_VERSION);
+        streamMkv = preferences.getBoolean("streamMkv", false);
+        suggestStickers = preferences.getInt("suggestStickers", 0);
+        suggestAnimatedEmoji = preferences.getBoolean("suggestAnimatedEmoji", true);
+        sortContactsByName = preferences.getBoolean("sortContactsByName", false);
+        sortFilesByName = preferences.getBoolean("sortFilesByName", false);
+        useThreeLinesLayout = preferences.getBoolean("useThreeLinesLayout", false);
+        archiveHidden = preferences.getBoolean("archiveHidden", false);
+        distanceSystemType = preferences.getInt("distanceSystemType", 0);
+        chatSwipeAction = preferences.getInt("ChatSwipeAction", -1);
+        mediaColumnsCount = preferences.getInt("mediaColumnsCount", 3);
+        storiesColumnsCount = preferences.getInt("storiesColumnsCount", 3);
+        bigCameraForRound = preferences.getBoolean("bigCameraForRound", false);
+        useNewBlur = preferences.getBoolean("useNewBlur", true);
+        photoViewerBlur = preferences.getBoolean("photoViewerBlur", true);
+        shadowsInSections = preferences.getBoolean("shadowsInSections", false);
+        photoHighQualityDefault = preferences.getBoolean("photoHighQualityDefault", false);
+        photoLiveDefault = preferences.getBoolean("photoLiveDefault", false);
+        AndroidUtilities.clearTypefaceCache();
+    }
+
     public static int buildVersion() {
         try {
             return ApplicationLoader.applicationContext.getPackageManager().getPackageInfo(ApplicationLoader.applicationContext.getPackageName(), 0).versionCode;

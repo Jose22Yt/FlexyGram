@@ -7,7 +7,7 @@ import java.util.*;
 public final class StudioSchema {
     public static final String EXTENSION = ".flexyGram";
     public static final String MIME = "application/vnd.flexygram.configuration+json";
-    public static final int SCHEMA = 1, MIN_APP = 1273, MAX_BYTES = 65536, MAX_KEYS = 32;
+    public static final int SCHEMA = 1, MIN_APP = 1273, MAX_BYTES = 8 * 1024 * 1024, MAX_KEYS = 32;
     public static final class Key {
         public final String section, id, file, preference;
         public final Object defaultValue;
@@ -18,6 +18,8 @@ public final class StudioSchema {
             this.min=min;this.max=max;this.choices=Collections.unmodifiableSet(new HashSet<>(Arrays.asList(choices)));
         }
         public Object validate(Object value) {
+            if (section.equals("client") && id.equals("settings") && value instanceof String
+                    && !((String)value).isEmpty() && ((String)value).length() <= MAX_BYTES) return value;
             if (defaultValue instanceof Boolean && value instanceof Boolean) return value;
             if (defaultValue instanceof Integer && value instanceof Long) {
                 long n=(Long)value;if(n>=min&&n<=max)return (int)n;
@@ -30,6 +32,7 @@ public final class StudioSchema {
     private static Key b(String s,String id,String f,String p,boolean d){return new Key(s,id,f,p,d,0,0);}
     private static Key i(String s,String id,String f,String p,int d,int min,int max){return new Key(s,id,f,p,d,min,max);}
     private static final List<Key> KEYS=Collections.unmodifiableList(Arrays.asList(
+        new Key("client","settings","@client","settings","",0,0),
         b("bubbles","glass","flexygram_bubbles","glass",false),
         b("bubbles","border","flexygram_bubbles","border",false),
         b("bubbles","edges","flexygram_bubbles","edges",false),
@@ -41,7 +44,7 @@ public final class StudioSchema {
         i("bubbles","borderPosition","flexygram_bubbles","signature_border_position",5,0,5),
         b("bubbles","fuseGlass","flexygram_bubbles","signature_fuse_glass",false),
         i("bubbles","pearlIntensity","flexygram_bubbles","signature_pearl_intensity",55,0,100),
-        i("header","style","flexygram_header","style",0,0,2),
+        i("header","style","flexygram_header","style",0,0,3),
         b("header","compact","flexygram_header","compact",false),
         b("header","counter","flexygram_header","counter",true),
         i("header","counterPresentation","flexygram_header","counter_mode",1,1,2),
@@ -63,7 +66,7 @@ public final class StudioSchema {
     }
     private StudioSchema(){}
     public static List<Key> keys(){return KEYS;}
-    public static Set<String> sections(){return Collections.unmodifiableSet(new LinkedHashSet<>(Arrays.asList("bubbles","header","composer","icon")));}
+    public static Set<String> sections(){return Collections.unmodifiableSet(new LinkedHashSet<>(Arrays.asList("bubbles","header","composer","icon","client")));}
     public static Key key(String section,String id) {
         for(Key k:KEYS)if(k.section.equals(section)&&k.id.equals(id))return k;
         throw new Unsupported(section+"."+id);
@@ -75,7 +78,9 @@ public final class StudioSchema {
     }
     /** Additive schema1 keys require Alpha1274; older valid schema1 files remain accepted. */
     public static int minimumApp(Map<String,Map<String,Object>> sections) {
+        if (sections.containsKey("client")) return 1290;
         Map<String,Object> bubbles=sections.get("bubbles"),header=sections.get("header");
+        if (header != null && Integer.valueOf(3).equals(header.get("style"))) return 1290;
         if (header != null && header.get("style") instanceof Number && ((Number)header.get("style")).intValue() == 2) return 1276;
         if (bubbles != null && (bubbles.containsKey("borderPosition") || bubbles.containsKey("fuseGlass")
                 || bubbles.get("outlineStyle") instanceof Number && ((Number)bubbles.get("outlineStyle")).intValue() >= 2)) return 1276;
@@ -83,7 +88,7 @@ public final class StudioSchema {
             ||header!=null&&header.containsKey("counterPresentation")?1274:MIN_APP;
     }
     public static boolean filename(String name) {
-        if(name==null||name.length()>192||!name.endsWith(EXTENSION)||name.length()<=EXTENSION.length())return false;
+        if(name==null||name.length()>192||!name.toLowerCase(Locale.ROOT).endsWith(EXTENSION.toLowerCase(Locale.ROOT))||name.length()<=EXTENSION.length())return false;
         for(int j=0;j<name.length();j++) {
             char c=name.charAt(j);
             if(Character.isHighSurrogate(c)){if(j+1>=name.length()||!Character.isLowSurrogate(name.charAt(++j)))return false;}else if(Character.isLowSurrogate(c))return false;

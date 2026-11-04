@@ -5,11 +5,11 @@ import org.telegram.messenger.R;
 public final class FlexyStudioText {
     private FlexyStudioText(){}
     public static int section(String id) {
-        switch(id){case "bubbles":return R.string.FlexyStudioBubbles;case "header":return R.string.FlexyStudioHeader;
+        switch(id){case "client":return R.string.FlexyStudioClientSettings;case "bubbles":return R.string.FlexyStudioBubbles;case "header":return R.string.FlexyStudioHeader;
             case "composer":return R.string.FlexyStudioComposer;case "icon":return R.string.FlexyStudioIcon;default:throw new IllegalArgumentException("section");}
     }
     public static int icon(String id) {
-        switch(id){case "bubbles":return R.drawable.msg_discussion;case "header":return R.drawable.msg_contacts;
+        switch(id){case "client":return R.drawable.msg_theme;case "bubbles":return R.drawable.msg_discussion;case "header":return R.drawable.msg_contacts;
             case "composer":return R.drawable.msg_edit;case "icon":return R.drawable.msg_theme;default:throw new IllegalArgumentException("section");}
     }
 }

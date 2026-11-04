@@ -29,9 +29,9 @@ public final class FlexyStyleInstallHelper {
     private static Uri externalUri;
     private static WeakReference<Activity> externalOwner;
     private FlexyStyleInstallHelper(){}
-    public static boolean recognized(String name){return BuildConfig.CONNECTED_ALPHA&&StudioSchema.filename(name);}
+    public static boolean recognized(String name){return StudioSchema.filename(name);}
     public static boolean isStudioIntent(Intent intent) {
-        if(!BuildConfig.CONNECTED_ALPHA||intent==null||!Intent.ACTION_VIEW.equals(intent.getAction()))return false;
+        if(intent==null||!Intent.ACTION_VIEW.equals(intent.getAction()))return false;
         Uri uri=intent.getData();if(uri==null||uri.getAuthority()==null||!"content".equals(uri.getScheme()))return false;
         return StudioSchema.MIME.equals(intent.getType())||recognized(uri.getLastPathSegment());
     }
@@ -105,7 +105,7 @@ public final class FlexyStyleInstallHelper {
         }
         void read() {
             if(canceled)return;waiting=false;if(tag>=0)DownloadController.getInstance(account).removeLoadingFileObserver(this);
-            ApplicationLoader.applicationHandler.postDelayed(timeout,30000);
+            ApplicationLoader.applicationHandler.postDelayed(timeout,60000);
             try{work=FlexyStudioIO.execute(()->{
                 StudioCodec.Preset result=null;String realName=filename;int count=0;String unsupported=null;
                 try {
@@ -119,17 +119,16 @@ public final class FlexyStyleInstallHelper {
                                 int size=cursor.getColumnIndex(OpenableColumns.SIZE);if(size>=0&&!cursor.isNull(size)&&cursor.getLong(size)>StudioSchema.MAX_BYTES)throw new IOException("size");
                             }
                         }
-                        if(!StudioSchema.filename(realName))throw new IOException("name");
                         descriptor=resolver.openAssetFileDescriptor(uri,"r",signal);if(descriptor==null)throw new IOException("stream");input=descriptor.createInputStream();
                     } else {if(file==null)throw new IOException("file");input=new FileInputStream(file);}
-                    try(InputStream in=input){byte[] data=StudioCodec.readLimited(in);count=data.length;if(canceled)throw new IOException("canceled");result=StudioCodec.decode(data,BuildConfig.VERSION_CODE);}
+                    try(InputStream in=input){byte[] data=StudioCodec.readLimited(in);count=data.length;if(canceled)throw new IOException("canceled");result=StudioCodec.decode(data,BuildConfig.VERSION_CODE);FlexyStudioStore.validate(result);}
                 }catch(StudioSchema.Unsupported incompatible){unsupported=incompatible.identifier;}catch(Exception invalid){}finally{closeDescriptor();}
                 StudioCodec.Preset ready=result;String actual=realName;int size=count;String incompatible=unsupported;
                 AndroidUtilities.runOnUIThread(()->{
                     ApplicationLoader.applicationHandler.removeCallbacks(timeout);if(canceled)return;
                     BaseFragment fragment=owner.get();if(fragment==null){cancel();return;}
                     if(ready==null){forget(fragment);cancel();if(incompatible!=null)Toast.makeText(fragment.getParentActivity(),LocaleController.formatString("FlexyStudioUnsupported",R.string.FlexyStudioUnsupported,incompatible),Toast.LENGTH_LONG).show();else error(fragment,R.string.FlexyStudioInvalid);return;}
-                    preset=ready;filename=actual;bytes=size;show();
+                    preset=ready;filename=actual==null||actual.isEmpty()?ready.name:actual;bytes=size;show();
                 });
             });}catch(java.util.concurrent.RejectedExecutionException busy){BaseFragment f=owner.get();if(f!=null){forget(f);error(f,R.string.FlexyStudioBusy);}cancel();}
         }

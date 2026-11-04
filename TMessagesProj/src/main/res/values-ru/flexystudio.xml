@@ -31,4 +31,5 @@
     <string name="FlexyStudioBusy">Выполняется другая операция. Попробуйте ещё раз.</string>
     <string name="FlexyStudioLoginFirst">Откройте FlexyGram и войдите перед импортом конфигурации.</string>
     <string name="FlexyStudioUnsupported">Не поддерживается: %1$s. Ни один раздел не применён.</string>
+    <string name="FlexyStudioClientSettings">Все настройки клиента</string>
 </resources>

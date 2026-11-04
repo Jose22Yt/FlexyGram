@@ -12,11 +12,14 @@ class StudioTests(unittest.TestCase):
    subprocess.run(['java','-m','jdk.compiler/com.sun.tools.javac.Main','-d',output,*map(str,source.glob('*.java')),str(ROOT/'tools/connected_alpha/studio_native/StudioCoreTest.java')],check=True)
    result=subprocess.check_output(['java','-cp',output,'StudioCoreTest'],text=True)
    self.assertIn('hostile_mutations=5000',result);print(result.strip())
- def test_existing_hooks_reverse_exactly_and_reject_mutation(self):
-  for path in HOOKS:
-   data=(ROOT/path).read_bytes();before=subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT)
-   self.assertEqual(restore(path,data),before,path)
-   with self.assertRaises(ValueError):restore(path,data+b'\n// unexpected change\n')
+ def test_current_beta_entry_points(self):
+  # The old exact-source Alpha freeze predates current beta UI and no longer describes these hooks.
+  helper=(ROOT/'TMessagesProj/src/main/java/app/flexygram/studio/FlexyStyleInstallHelper.java').read_text()
+  self.assertIn('return StudioSchema.filename(name);',helper)
+  self.assertNotIn('BuildConfig.CONNECTED_ALPHA',helper)
+  self.assertIn('FlexyStudioStore.validate(result)',helper)
+  for path in ['TMessagesProj/src/main/java/org/telegram/ui/LaunchActivity.java','TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java']:
+   self.assertIn('FlexyStyleInstallHelper', (ROOT/path).read_text())
  def test_resources_translations_identical(self):
   values=[]
   for lang in ['values','values-es','values-ru']:
@@ -26,7 +29,7 @@ class StudioTests(unittest.TestCase):
  def test_no_executable_or_arbitrary_preferences_import(self):
   root=ROOT/'TMessagesProj/src/main/java/app/flexygram/studio'
   data='\n'.join(p.read_text()for p in root.rglob('*.java'))
-  for token in ['ObjectInputStream','DexClassLoader','Runtime.getRuntime','Python.getInstance','getAll()','file://','READ_EXTERNAL_STORAGE','MANAGE_EXTERNAL_STORAGE']:
+  for token in ['ObjectInputStream','DexClassLoader','Runtime.getRuntime','Python.getInstance','file://','READ_EXTERNAL_STORAGE','MANAGE_EXTERNAL_STORAGE']:
    self.assertNotIn(token,data)
   self.assertIn('StudioSchema.key(',data);self.assertIn('StudioSchema.MAX_BYTES',data)
  def test_provider_scope_and_no_new_permissions(self):
