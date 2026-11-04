@@ -78,7 +78,7 @@ public final class StudioSchema {
     }
     /** Additive schema1 keys require Alpha1274; older valid schema1 files remain accepted. */
     public static int minimumApp(Map<String,Map<String,Object>> sections) {
-        if (sections.containsKey("client")) return 1290;
+        if (sections.containsKey("client")) return 1291;
         Map<String,Object> bubbles=sections.get("bubbles"),header=sections.get("header");
         if (header != null && Integer.valueOf(3).equals(header.get("style"))) return 1290;
         if (header != null && header.get("style") instanceof Number && ((Number)header.get("style")).intValue() == 2) return 1276;

@@ -77,8 +77,8 @@ public class StudioCoreTest {
   var bundle=StudioCodec.encodeValues(Map.of("version",1,"files",Map.of("native",Map.of("flag",Map.of("present",true,"value",true))),"text","a\n\t\"☀️","long",Long.MIN_VALUE));
   check(StudioCodec.encodeValues(StudioCodec.decodeValues(bundle)).equals(bundle));
   var client=StudioCodec.create("All.flexygram",Map.of("client",Map.of("settings",bundle)));
-  check(client.minApp==1290);check(StudioCodec.decode(StudioCodec.encode(client),1290).sections.equals(client.sections));
-  reject(()->StudioCodec.decode(StudioCodec.encode(client),1289));
+  check(client.minApp==1291);check(StudioCodec.decode(StudioCodec.encode(client),1291).sections.equals(client.sections));
+  reject(()->StudioCodec.decode(StudioCodec.encode(client),1290));
   reject(()->StudioCodec.create("All.flexyGram",Map.of("client",Map.of("settings",bundle),"bubbles",Map.of("glass",true))));
   var longString="x".repeat(100000);check(StudioCodec.decodeValues(StudioCodec.encodeValues(longString)).equals(longString));
   reject(()->StudioCodec.decodeValues("{\"x\":1,\"x\":2}"));

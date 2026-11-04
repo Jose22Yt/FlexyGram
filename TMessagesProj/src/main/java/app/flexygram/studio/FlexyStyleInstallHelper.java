@@ -121,7 +121,7 @@ public final class FlexyStyleInstallHelper {
                         }
                         descriptor=resolver.openAssetFileDescriptor(uri,"r",signal);if(descriptor==null)throw new IOException("stream");input=descriptor.createInputStream();
                     } else {if(file==null)throw new IOException("file");input=new FileInputStream(file);}
-                    try(InputStream in=input){byte[] data=StudioCodec.readLimited(in);count=data.length;if(canceled)throw new IOException("canceled");result=StudioCodec.decode(data,BuildConfig.VERSION_CODE);FlexyStudioStore.validate(result);}
+                    try(InputStream in=input){byte[] data=StudioCodec.readLimited(in);count=data.length;if(canceled)throw new IOException("canceled");result=StudioCodec.decode(data,Math.max(BuildConfig.VERSION_CODE,SharedConfig.buildVersion()));FlexyStudioStore.validate(result);}
                 }catch(StudioSchema.Unsupported incompatible){unsupported=incompatible.identifier;}catch(Exception invalid){}finally{closeDescriptor();}
                 StudioCodec.Preset ready=result;String actual=realName;int size=count;String incompatible=unsupported;
                 AndroidUtilities.runOnUIThread(()->{

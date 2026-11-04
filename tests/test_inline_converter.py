@@ -102,6 +102,9 @@ def test_identity_and_distribution_inputs_are_unchanged():
    if name.endswith('AndroidManifest.xml'):
     # The native startup integration changes only LaunchActivity's theme.
     current=current.replace(b'android:name="org.telegram.ui.LaunchActivity"\n            android:theme="@style/Theme.FlexyGram.Start"',b'android:name="org.telegram.ui.LaunchActivity"\n            android:theme="@style/Theme.TMessages.Start"',1)
+   if name=='gradle.properties':
+    # Beta version advances independently; distribution identity/configuration remains protected.
+    current=current.replace(b'BETA_VERSION_NAME=1.0.0-beta.2',b'BETA_VERSION_NAME=1.0.0-beta.1').replace(b'BETA_VERSION_CODE=1291',b'BETA_VERSION_CODE=1290')
    assert current==original,name
   except subprocess.CalledProcessError:
    pass
