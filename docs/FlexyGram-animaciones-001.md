@@ -41,3 +41,11 @@ control de Android, así que no equivale a cambiar las tres opciones ADB globale
 No se ha compilado una APK con este cambio. Falta verificar la aplicación
 completa en un dispositivo, incluidas transiciones, desplazamiento y ventanas
 del sistema. Las pruebas aisladas no constituyen una medición de arranque o FPS.
+
+## Nueva beta solicitada
+
+La siguiente beta ARM64 incluye también las tarjetas agrupadas de ajustes,
+iconos compactos, eliminación de flechas y corrección de fondos de las horas.
+Se utiliza el workflow existente `ui-beta-debug.yml`, con sus credenciales de
+compilación configuradas en GitHub. El resultado del workflow y su artefacto
+deben comprobarse antes de considerar terminada la compilación.
