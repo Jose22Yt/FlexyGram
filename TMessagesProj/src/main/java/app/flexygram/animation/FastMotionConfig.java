@@ -9,7 +9,7 @@ public final class FastMotionConfig {
     public static final String FILE = "flexygram_motion", KEY = "fast_motion_enabled";
     private static SharedPreferences preferences;
     private static final SharedPreferences.OnSharedPreferenceChangeListener listener = (prefs, key) -> {
-        if (key == null || KEY.equals(key)) FastMotionTiming.setEnabled(prefs.getBoolean(KEY, true));
+        if (key == null || KEY.equals(key)) FastMotion.setEnabled(prefs.getBoolean(KEY, true));
     };
     private FastMotionConfig() {}
     public static synchronized void load() {
@@ -22,12 +22,12 @@ public final class FastMotionConfig {
             preferences.registerOnSharedPreferenceChangeListener(listener);
         }
         FastMotionTiming.setSystemScaleProvider(FastMotion::systemScale);
-        FastMotionTiming.setEnabled(preferences.getBoolean(KEY, true));
+        FastMotion.setEnabled(preferences.getBoolean(KEY, true));
     }
     public static boolean isEnabled() { load(); return FastMotionTiming.isEnabled(); }
     public static synchronized void setEnabled(boolean value) {
         load();
-        FastMotionTiming.setEnabled(value);
+        FastMotion.setEnabled(value);
         if (preferences != null) preferences.edit().putBoolean(KEY, value).apply();
     }
 }

@@ -10,9 +10,25 @@ public class PhysicsProbe {
   int samples=0;
   app.flexygram.animation.FastMotionTiming.setEnabled(false);
   SelectedBubbleMotion preferenceMotion=new SelectedBubbleMotion();preferenceMotion.enter(()->{},.978f,.965f,0f,0f);frame(1d/60);
-  require(preferenceMotion.isRunning(),"Disabling fast motion must restore the normal bubble trajectory");
+  require(preferenceMotion.isRunning(),"Bubble motion must have its own smooth trajectory");
   app.flexygram.animation.FastMotionTiming.setEnabled(true);frame(1d/60);
-  require(!preferenceMotion.isRunning(),"Re-enabling fast motion must update an already-created controller");preferenceMotion.reset();
+  require(preferenceMotion.isRunning(),"Toggling reduced animations must not cut a running bubble trajectory");preferenceMotion.reset();
+  // Byte-for-byte equivalent trajectories regardless of the global option or OS scale.
+  float[] baseline=null;
+  for(boolean reduced:new boolean[]{false,true})for(double osScale:new double[]{0,.01,.5,1,5}){
+   app.flexygram.animation.FastMotionTiming.setEnabled(reduced);
+   app.flexygram.animation.FastMotionTiming.setSystemScaleProvider(()->osScale);
+   SelectedBubbleMotion menu=new SelectedBubbleMotion();BubbleTapMotion press=new BubbleTapMotion(new View());
+   menu.enter(()->{},.978f,.965f,0f,0f);press.press(0,0,0);
+   float[] trajectory=new float[120];
+   for(int i=0;i<40;i++){
+    if(i==8){menu.close();press.release();}
+    frame(.016);trajectory[i*3]=menu.panelProgress();trajectory[i*3+1]=press.scaleX();trajectory[i*3+2]=press.scaleY();
+   }
+   if(baseline==null)baseline=trajectory;else for(int i=0;i<trajectory.length;i++)
+    require(Math.abs(trajectory[i]-baseline[i])<.00001,"Reduce animations/OS scale changed bubble physics");
+   menu.reset();press.reset();
+  }
   for(int hz:new int[]{60,90,120,144}){
    SelectedBubbleMotion m=new SelectedBubbleMotion();
    m.enter(()->{},.978f,.965f,0f,0f);
@@ -28,8 +44,8 @@ public class PhysicsProbe {
     require(m.spatialOffset(0f,4f)==0f,"Stationary preview moved");
     if(!m.isRunning()&&settledFrame==0)settledFrame=i;
    }
-   require(peak==1f,"Fast motion must land at its exact target without a visible rebound tail");
-   require(settledFrame==1,"0.01 entry must finish by the first delivered frame");
+   require(peak>1f&&peak<1.1f,"Bubble must retain its soft damped rebound");
+   require(settledFrame>1,"Bubble must interpolate across frames even with reduced animations enabled");
    require(settledFrame>0&&settledFrame/(double)hz<.40,"Entry did not settle");
    require(m.panelScale()==1&&m.panelOffset()==0,"Entry did not restore final card");
    System.out.println("Trajectory "+hz+" Hz: peak="+peak+" at "+peakTime+"s; settled="+settledFrame/(double)hz+"s");
@@ -75,7 +91,7 @@ public class PhysicsProbe {
    fast.close(()->completed[0]++);
    int frames=0;
    while(fast.hasOwner()&&frames<hz){frame(1d/hz);frames++;}
-   require(frames<=1,"0.01 close must release the input owner by the first frame");
+   require(frames<=Math.ceil(.180*hz)+1,"Bubble close exceeded its local 180ms bound");
    require(completed[0]==1&&!fast.isRunning(),"Close cleanup did not run exactly once");
    fast.enter(()->{});frame(1d/hz);fast.close(()->completed[0]++);
    fast.finishImmediately();

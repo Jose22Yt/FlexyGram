@@ -5,6 +5,7 @@ import android.view.Choreographer;
 import app.exteraless.player.Spring;
 
 /** One native frame owner for the selected message, reactions and action-card progress.
+ * Its frame clock is independent of the Reduce animations preference.
  * Closing retargets existing springs: it never restarts a timed interpolation.
  */
 public final class SelectedBubbleMotion implements Choreographer.FrameCallback {
@@ -70,12 +71,11 @@ public final class SelectedBubbleMotion implements Choreographer.FrameCallback {
     @Override public void doFrame(long frameTimeNanos) {
         if (!running) return;
         float dt = Math.max(0f, Math.min(.064f, (frameTimeNanos-lastFrame)/1_000_000_000f));
-        dt = app.flexygram.animation.FastMotionTiming.frameDelta(dt);
         lastFrame = frameTimeNanos;
         boolean mx=x.step(dt), my=y.step(dt), mp=phase.step(dt);
         if (invalidate != null) invalidate.run();
         if ((!mx && !my && !mp) || closing && phase.value <= 0f
-                || android.os.SystemClock.uptimeMillis()-started >= app.flexygram.animation.FastMotionTiming.duration(closing ? CLOSE_LIMIT_MS : ENTER_LIMIT_MS)) {
+                || android.os.SystemClock.uptimeMillis()-started >= (closing ? CLOSE_LIMIT_MS : ENTER_LIMIT_MS)) {
             running = false;
             x.snap(1f); y.snap(1f); phase.snap(closing ? 0f : 1f);
             if (closing) finish(); else if (invalidate != null) invalidate.run();

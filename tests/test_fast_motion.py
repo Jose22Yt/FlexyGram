@@ -57,15 +57,16 @@ def test_actual_bytecode_visitor_routes_only_animation_calls_and_preserves_super
     if not shutil.which('javac'):pytest.skip('JDK required')
     files={
       'android/animation/Animator.java':'package android.animation;public class Animator{public int starts;public void start(){starts++;}}',
-      'android/animation/ValueAnimator.java':'package android.animation;public class ValueAnimator extends Animator{}',
+      'android/animation/ValueAnimator.java':'package android.animation;public class ValueAnimator extends Animator{public void reverse(){starts++;}}',
       'android/view/ViewPropertyAnimator.java':'package android.view;public class ViewPropertyAnimator{public int starts;public long duration,delay;public ViewPropertyAnimator setDuration(long n){duration=n;return this;}public ViewPropertyAnimator setStartDelay(long n){delay=n;return this;}public void start(){starts++;}}',
       'android/view/animation/Animation.java':'package android.view.animation;public class Animation{}',
       'android/view/View.java':'package android.view;public class View{public final ViewPropertyAnimator a=new ViewPropertyAnimator();public long posted;public int legacy;public ViewPropertyAnimator animate(){return a;}public void postDelayed(Runnable r,long n){posted=n;}public void startAnimation(android.view.animation.Animation a){legacy++;}}',
       'androidx/dynamicanimation/animation/DynamicAnimation.java':'package androidx.dynamicanimation.animation;public class DynamicAnimation{public int starts;public void start(){starts++;}}',
       'androidx/dynamicanimation/animation/SpringAnimation.java':'package androidx.dynamicanimation.animation;public class SpringAnimation extends DynamicAnimation{}',
       'app/flexygram/animation/FastMotion.java':'''package app.flexygram.animation;public class FastMotion{
- public static int starts,properties,durations,delays,legacy,springs;
+ public static int starts,properties,durations,delays,legacy,springs,reverses;
  public static void start(android.animation.Animator a){starts++;a.start();}
+ public static void reverse(android.animation.ValueAnimator a){reverses++;a.reverse();}
  public static void start(android.view.ViewPropertyAnimator a){a.start();}
  public static android.view.ViewPropertyAnimator viewAnimator(android.view.ViewPropertyAnimator a){properties++;return a;}
  public static android.view.ViewPropertyAnimator duration(android.view.ViewPropertyAnimator a,long n){durations++;return a.setDuration(n);}
@@ -75,7 +76,7 @@ def test_actual_bytecode_visitor_routes_only_animation_calls_and_preserves_super
 }''',
       'Fixture.java':'''public class Fixture extends android.animation.ValueAnimator{
  public void start(){super.start();}
- public static void go(android.animation.ValueAnimator a,android.view.View v,androidx.dynamicanimation.animation.SpringAnimation s){a.start();v.animate().setDuration(300).setStartDelay(100).start();v.postDelayed(()->{},4000);v.startAnimation(new android.view.animation.Animation());s.start();}
+ public static void go(android.animation.ValueAnimator a,android.view.View v,androidx.dynamicanimation.animation.SpringAnimation s){a.start();a.reverse();v.animate().setDuration(300).setStartDelay(100).start();v.postDelayed(()->{},4000);v.startAnimation(new android.view.animation.Animation());s.start();}
 }''',
       'MotionAsmProbe.java':'''import java.nio.file.*;import org.objectweb.asm.*;import app.flexygram.motionbuild.FastMotionVisitor;
 public class MotionAsmProbe {
@@ -85,8 +86,8 @@ public class MotionAsmProbe {
   byte[] original=Files.readAllBytes(Path.of(args[0]));ClassWriter writer=new ClassWriter(0);new ClassReader(original).accept(new FastMotionVisitor(writer,MotionAsmProbe::inherits),0);
   Class<?> c=new Loader().define(writer.toByteArray());var a=new android.animation.ValueAnimator();var view=new android.view.View();var spring=new androidx.dynamicanimation.animation.SpringAnimation();
   c.getMethod("go",android.animation.ValueAnimator.class,android.view.View.class,androidx.dynamicanimation.animation.SpringAnimation.class).invoke(null,a,view,spring);
-  if(a.starts!=1||view.a.starts!=1||view.legacy!=1||spring.starts!=1||view.posted!=4000)throw new AssertionError("native behavior/timer changed");
-  if(app.flexygram.animation.FastMotion.starts!=1||app.flexygram.animation.FastMotion.properties!=1||app.flexygram.animation.FastMotion.durations!=1||app.flexygram.animation.FastMotion.delays!=1||app.flexygram.animation.FastMotion.legacy!=1||app.flexygram.animation.FastMotion.springs!=1)throw new AssertionError("missing hook");
+  if(a.starts!=2||view.a.starts!=1||view.legacy!=1||spring.starts!=1||view.posted!=4000)throw new AssertionError("native behavior/timer changed");
+  if(app.flexygram.animation.FastMotion.reverses!=1||app.flexygram.animation.FastMotion.starts!=1||app.flexygram.animation.FastMotion.properties!=1||app.flexygram.animation.FastMotion.durations!=1||app.flexygram.animation.FastMotion.delays!=1||app.flexygram.animation.FastMotion.legacy!=1||app.flexygram.animation.FastMotion.springs!=1)throw new AssertionError("missing hook");
   android.animation.ValueAnimator own=(android.animation.ValueAnimator)c.getConstructor().newInstance();own.start();if(own.starts!=1||app.flexygram.animation.FastMotion.starts!=1)throw new AssertionError("super call recursed");
  }
 }'''}

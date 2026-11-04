@@ -11,7 +11,7 @@ def write_stubs(source,root):
  for p in studio.rglob('*.java'):put('app/flexygram/studio/'+str(p.relative_to(studio)),p.read_text())
  for name in ['FastMotionConfig','FastMotionTiming']:
   put('app/flexygram/animation/'+name+'.java',(root/'TMessagesProj/src/main/java/app/flexygram/animation'/(name+'.java')).read_text())
- put('app/flexygram/animation/FastMotion.java','package app.flexygram.animation;public class FastMotion{public static float systemScale(){return android.animation.ValueAnimator.getDurationScale();}}')
+ put('app/flexygram/animation/FastMotion.java','package app.flexygram.animation;public class FastMotion{public static void setEnabled(boolean b){FastMotionTiming.setEnabled(b);}public static float systemScale(){return android.animation.ValueAnimator.getDurationScale();}}')
  files_entry=(root/'TMessagesProj/src/main/java/app/flexygram/files/FlexyFiles.java').read_text()
  put('app/flexygram/files/FlexyFiles.java',files_entry)
  put('app/flexygram/files/core/SelectedDocument.java',(root/'TMessagesProj/src/main/java/app/flexygram/files/core/SelectedDocument.java').read_text())

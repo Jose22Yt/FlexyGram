@@ -1,6 +1,7 @@
 package app.flexygram.animation;
 
 import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.TimeAnimator;
 import android.animation.ValueAnimator;
@@ -32,6 +33,50 @@ public final class FastMotion {
             return appliedDelay = FastMotionTiming.animatorDelay(delay, scale);
         }
     }
+    private static final AnimatorListenerAdapter restoreOnEnd = new AnimatorListenerAdapter() {
+        @Override public void onAnimationEnd(Animator animator) {
+            // An app listener may have already restarted this same animator.
+            if (!animator.isStarted()) synchronized (timings) {
+                Timing state = timings.get(animator);
+                if (state != null) restore(animator, state);
+            }
+        }
+    };
+    /** Restore cached timings immediately, including ViewPropertyAnimator's implicit starts.
+     * Never cancel an animation, replace app listeners or change Android's global settings.
+     */
+    public static void setEnabled(boolean enabled) {
+        synchronized (timings) {
+            boolean wasEnabled = FastMotionTiming.isEnabled();
+            FastMotionTiming.setEnabled(enabled);
+            if (wasEnabled && !enabled) {
+                for (var entry : timings.entrySet()) restore(entry.getKey(), entry.getValue());
+            }
+        }
+    }
+    private static void restore(Object owner, Timing state) {
+        if (owner instanceof Animator) {
+            Animator animator = (Animator) owner;
+            if (state.hasDuration && animator.getDuration() == state.appliedDuration)
+                animator.setDuration(state.duration);
+            if (state.hasDelay && animator.getStartDelay() == state.appliedDelay)
+                animator.setStartDelay(state.delay);
+        } else if (owner instanceof ViewPropertyAnimator) {
+            ViewPropertyAnimator animator = (ViewPropertyAnimator) owner;
+            if (state.hasDuration && animator.getDuration() == state.appliedDuration)
+                animator.setDuration(state.duration);
+            if (state.hasDelay && animator.getStartDelay() == state.appliedDelay)
+                animator.setStartDelay(state.delay);
+        } else if (owner instanceof Animation) {
+            Animation animation = (Animation) owner;
+            if (state.hasDuration && animation.getDuration() == state.appliedDuration)
+                animation.setDuration(state.duration);
+            if (state.hasDelay && animation.getStartOffset() == state.appliedDelay)
+                animation.setStartOffset(state.delay);
+        }
+        state.appliedDuration = state.duration;
+        state.appliedDelay = state.delay;
+    }
     private FastMotion() {}
     public static float systemScale() {
         if (Build.VERSION.SDK_INT >= 26) return ValueAnimator.getDurationScale();
@@ -50,17 +95,36 @@ public final class FastMotion {
         return false;
     }
     public static void start(Animator animator) {
-        if (!hasContinuousClock(animator)) synchronized (timings) { prepare(animator, systemScale(), false); }
+        if (!hasContinuousClock(animator)) synchronized (timings) { prepare(animator, systemScale(), -1L); }
         animator.start();
     }
-    private static void prepare(Animator animator, float scale, boolean inheritedDuration) {
+    public static void reverse(ValueAnimator animator) {
+        if (!hasContinuousClock(animator)) synchronized (timings) { prepare(animator, systemScale(), -1L); }
+        animator.reverse();
+    }
+    public static void reverse(AnimatorSet animator) {
+        if (!hasContinuousClock(animator)) synchronized (timings) { prepare(animator, systemScale(), -1L); }
+        animator.reverse();
+    }
+    private static void prepare(Animator animator, float scale, long inheritedDuration) {
         Timing state = timing(animator);
         long duration = animator.getDuration();
-        if (!inheritedDuration && duration >= 0) animator.setDuration(state.duration(duration, scale));
+        // AnimatorSet applies its duration to children on start. Record that
+        // nominal duration for each child too; otherwise cached children retain
+        // the parent's shortened value after the set finishes or the option flips.
+        if (inheritedDuration >= 0) {
+            state.duration = inheritedDuration;
+            state.hasDuration = true;
+            animator.setDuration(state.appliedDuration = FastMotionTiming.animatorDuration(inheritedDuration, scale));
+        } else if (duration >= 0) {
+            animator.setDuration(state.duration(duration, scale));
+        }
         animator.setStartDelay(state.delay(animator.getStartDelay(), scale));
+        if (animator.getListeners() == null || !animator.getListeners().contains(restoreOnEnd))
+            animator.addListener(restoreOnEnd);
         if (animator instanceof AnimatorSet) {
-            boolean inherited = inheritedDuration || duration >= 0;
-            for (Animator child : ((AnimatorSet) animator).getChildAnimations()) prepare(child, scale, inherited);
+            long nominal = state.hasDuration ? state.duration : -1L;
+            for (Animator child : ((AnimatorSet) animator).getChildAnimations()) prepare(child, scale, nominal);
         }
     }
     public static ViewPropertyAnimator viewAnimator(ViewPropertyAnimator animator) {

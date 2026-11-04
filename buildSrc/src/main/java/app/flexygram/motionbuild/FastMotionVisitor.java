@@ -28,6 +28,14 @@ public final class FastMotionVisitor extends ClassVisitor {
                             call("startSpring","(Landroidx/dynamicanimation/animation/DynamicAnimation;)V");return;
                         }
                     }
+                    if(name.equals("reverse") && desc.equals("()V")) {
+                        if(inherits.test(owner,"android.animation.ValueAnimator")) {
+                            call("reverse","(Landroid/animation/ValueAnimator;)V");return;
+                        }
+                        if(inherits.test(owner,"android.animation.AnimatorSet")) {
+                            call("reverse","(Landroid/animation/AnimatorSet;)V");return;
+                        }
+                    }
                     if(owner.equals("android/view/ViewPropertyAnimator") && desc.equals("(J)Landroid/view/ViewPropertyAnimator;")) {
                         if(name.equals("setDuration")){call("duration","(Landroid/view/ViewPropertyAnimator;J)Landroid/view/ViewPropertyAnimator;");return;}
                         if(name.equals("setStartDelay")){call("delay","(Landroid/view/ViewPropertyAnimator;J)Landroid/view/ViewPropertyAnimator;");return;}

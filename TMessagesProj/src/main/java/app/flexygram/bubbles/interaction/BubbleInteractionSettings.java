@@ -43,8 +43,8 @@ public final class BubbleInteractionSettings {
     public static boolean signaturePanel(Context context) { return style(context) == STYLE_SIGNATURE; }
     public static boolean springBounce(Context context) { return style(context) == STYLE_SIGNATURE; }
     public static boolean motionEnabled() {
-        // The app's explicit reduced-motion setting is authoritative; developer
-        // window/transition/animator duration scales do not alter our frame clock.
+        // Keep Telegram's explicit animation opt-out and screen-reader behavior.
+        // FlexyStudio Reduce animations deliberately does not own the bubble clock.
         return org.telegram.messenger.SharedConfig.animationsEnabled()
                 && !org.telegram.messenger.AndroidUtilities.isAccessibilityScreenReaderEnabled();
     }
