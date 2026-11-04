@@ -2111,7 +2111,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         if ((!transitionAnimationInProgress && !animationInProgress) || completingTransition
                 || containerView == null || containerViewBack == null
                 || inPreviewMode || transitionAnimationPreviewMode || previewOpenAnimationInProgress
-                || previewMenu != null || sheetFragment != null || inActionMode || predictiveInput
+                || previewMenu != null || sheetFragment != null || storyViewerAttached() || inActionMode || predictiveInput
                 || startedTracking && !animationInProgress) return;
         BaseFragment current = getLastFragment();
         if (current != null && current.getLastSheet() != null) return;

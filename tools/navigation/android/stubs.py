@@ -16,6 +16,7 @@ def write(dest,root):
   static class BaseFragment{Object sheet;Object getLastSheet(){return sheet;}}
   static class SpringAnimation{int cancelled;Runnable callback;void cancel(){cancelled++;if(callback!=null)callback.run();}}
   static class AndroidUtilities{static void cancelRunOnUIThread(Runnable r){}}
+  boolean storyModal;boolean storyViewerAttached(){return storyModal;}
   BaseFragment fragment=new BaseFragment();FrameLayout containerView,containerViewBack;
   boolean completingTransition,transitionAnimationInProgress,transitionAnimationPreviewMode,inPreviewMode,previewOpenAnimationInProgress,inActionMode,predictiveInput,startedTracking,animationInProgress,settlingBackAnimation;
   Object previewMenu,sheetFragment,layoutToIgnore,newFragment,oldFragment,springRouteBackgroundDrawable;

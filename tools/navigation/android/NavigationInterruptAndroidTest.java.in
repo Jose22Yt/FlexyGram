@@ -27,7 +27,7 @@ public class NavigationInterruptAndroidTest{
   NavigationProbe root=new NavigationProbe(activity);layout(root);root.begin(new View(activity),false);root.startedTracking=true;
   touch(root,MotionEvent.ACTION_DOWN);assertEquals(0,root.finishes);root.startedTracking=false;root.inPreviewMode=true;touch(root,MotionEvent.ACTION_DOWN);assertEquals(0,root.finishes);
   root.inPreviewMode=false;root.fragment.sheet=new Object();touch(root,MotionEvent.ACTION_DOWN);assertEquals(0,root.finishes);
-  root.fragment.sheet=null;root.finishNow();root.animationInProgress=true;root.startedTracking=true;root.currentSpringAnimation=new NavigationProbe.SpringAnimation();
+  root.fragment.sheet=null;root.storyModal=true;touch(root,MotionEvent.ACTION_DOWN);assertEquals(0,root.finishes);root.storyModal=false;root.finishNow();root.animationInProgress=true;root.startedTracking=true;root.currentSpringAnimation=new NavigationProbe.SpringAnimation();
   touch(root,MotionEvent.ACTION_DOWN);assertEquals(1,root.slides);assertFalse(root.animationInProgress);
  }
  @Test public void pressingBubbleInvalidatesOnlyItsVisualBounds(){
