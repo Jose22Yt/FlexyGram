@@ -71,8 +71,9 @@ jobs:
           fi
           cat gradle.properties
       - name: Debug Build
+        env:
+          LOCAL_PROPERTIES: ${{ secrets.LOCAL_PROPERTIES }}
         run: |
-          export LOCAL_PROPERTIES="${{ secrets.LOCAL_PROPERTIES }}"
           export DEBUG_BUILD=true
           sed -i 's/signingConfig = signingConfigs.release//g' TMessagesProj/build.gradle
           ./gradlew TMessagesProj:assembleDebug

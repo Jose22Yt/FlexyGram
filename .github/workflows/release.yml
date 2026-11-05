@@ -90,9 +90,9 @@ jobs:
       - name: Release Build
         id: release_build_step
         env:
+          LOCAL_PROPERTIES: ${{ secrets.LOCAL_PROPERTIES }}
           COMMIT_ID: ${{ github.event.head_commit.id || github.sha }}
         run: |
-          export LOCAL_PROPERTIES="${{ secrets.LOCAL_PROPERTIES }}"
           export BUILD_TIMESTAMP=$(date +%s)
           echo "build_timestamp=$BUILD_TIMESTAMP" >> "$GITHUB_OUTPUT"
           ./gradlew TMessagesProj:assembleRelease
