@@ -91,10 +91,12 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python -m venv "$RUNNER_TEMP/beta-wheel-tools"
-          "$RUNNER_TEMP/beta-wheel-tools/bin/python" -m pip install -r TMessagesProj/chaquopy/server/pypi/requirements.txt
-          "$RUNNER_TEMP/beta-wheel-tools/bin/python" tools/connected_alpha/rebuild_python_wheels.py \
-            --chaquopy TMessagesProj/chaquopy --output "$RUNNER_TEMP/beta-wheelhouse"
+          {
+            python -m venv "$RUNNER_TEMP/beta-wheel-tools"
+            "$RUNNER_TEMP/beta-wheel-tools/bin/python" -m pip install -r TMessagesProj/chaquopy/server/pypi/requirements.txt
+            "$RUNNER_TEMP/beta-wheel-tools/bin/python" tools/connected_alpha/rebuild_python_wheels.py \
+              --chaquopy TMessagesProj/chaquopy --output "$RUNNER_TEMP/beta-wheelhouse"
+          } 2>&1 | tee build/reports/ui-beta/wheels.log
           echo "ALPHA_WHEELHOUSE=$RUNNER_TEMP/beta-wheelhouse" >> "$GITHUB_ENV"
       - name: Assemble debug APK with native libraries and Python
         env:
@@ -163,7 +165,7 @@ jobs:
             sha256sum "$apk" >> build/reports/ui-beta/SHA256SUMS
             python tools/apk_size_report.py "$apk" >> build/reports/ui-beta/apk-size.jsonl
           done
-      - name: Annotate compiler failures
+      - name: Annotate build failures
         if: failure()
         shell: bash
         run: |
@@ -172,12 +174,14 @@ jobs:
           import re
           from pathlib import Path
 
-          report = Path('build/reports/ui-beta/assemble.log')
-          if report.is_file():
+          reports = [Path('build/reports/ui-beta/wheels.log'), Path('build/reports/ui-beta/assemble.log')]
+          for report in reports:
+              if not report.is_file():
+                  continue
               lines = report.read_text(errors='replace').splitlines()
               diagnostics = []
               for index, line in enumerate(lines):
-                  if re.search(r'error:|^e:|^> |^Execution failed for task|^Caused by:', line):
+                  if re.search(r'error:|^e:|^> |^Execution failed for task|^Caused by:|ERROR:|HTTPError:|URLError:|ValueError:|CalledProcessError:|TimeoutError:', line):
                       context = [line]
                       for following in lines[index + 1:index + 5]:
                           if following.strip().startswith(('symbol:', 'location:', 'required:', 'found:', 'reason:')):
