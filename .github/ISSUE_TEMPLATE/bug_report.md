@@ -18,7 +18,7 @@ Steps to reproduce the behavior:
 4. See error
 
 **Logcat**
-Settings - click version - "Enable Log", then click "Send Logs" to save the log file, and upload the log file here.
+Share only the smallest relevant, sanitized log excerpt. Remove tokens, credentials, account data, phone numbers and private messages. Do not upload a full log archive unless you have reviewed every file. See [SECURITY.md](https://github.com/Jose22Yt/FlexyGram/blob/main/SECURITY.md) for private security reports.
 
 **Expected behavior**
 A clear and concise description of what you expected to happen.

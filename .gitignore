@@ -27,3 +27,29 @@ replay_pid*.log
 TMessagesProj/release.keystore
 TMessagesProj/release/
 tests/local/
+
+# Local credentials and account data
+.env
+.env.*
+!.env.example
+!.env.sample
+**/google-services.json
+**/*service-account*.json
+*.jks
+*.keystore
+*.p12
+*.pfx
+*.key
+*.pem
+*.session
+*.session-journal
+*.tdata
+
+# Local analysis and editor artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+**/tdata/
+**/shared_prefs/
+/private/
+/reports/private/
