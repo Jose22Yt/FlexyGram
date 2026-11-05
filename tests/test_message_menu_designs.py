@@ -62,7 +62,7 @@ def test_menu_translation_keys_and_all_labels_are_present():
     assert sets[0]==sets[1]==sets[2]
 
 
-def test_live_cards_share_existing_blur_source_and_preserve_input_layer():
+def test_live_cards_share_existing_blur_source_and_cover_input_without_mutating_it():
     chat=(JAVA/'org/telegram/ui/ChatActivity.java').read_text()
     block=chat[chat.index('final boolean menuBlur ='):chat.index('panel.setListener(action->')]
     assert 'BlurredBackgroundProviderImpl.checkBlurEnabled(currentAccount, themeDelegate)' in block
@@ -72,6 +72,9 @@ def test_live_cards_share_existing_blur_source_and_preserve_input_layer():
     assert 'makeGlobalBlurBitmaps' not in block and 'captureBlur' not in block
     start=chat.index('final int messageScrimSave = canvas.save();')
     end=chat.index('canvas.restoreToCount(messageScrimSave);',start)
-    assert chat.index('canvas.clipRect(0, 0, getMeasuredWidth(), messageScrimBottom);',start)<chat.index('if (scrimViewReaction == null || scrimView == null)',start)<end
+    background=chat[start:chat.index('if (scrimViewReaction != null && scrimViewReactionAnimated)',start)]
+    assert 'clipRect' not in background
+    assert 'canvas.drawRect(0, 0, getMeasuredWidth(), getMeasuredHeight(), scrimBlurBitmapPaint);' in background
     assert end<chat.index('if (scrimView != null || messageEnterTransitionContainer.isRunning())',end)
-    assert 'chatInputViewsContainer.getInputBubbleTop()' in chat[start:end]
+    assert 'chatInputViewsContainer.setAlpha' not in chat[start:end]
+    assert 'chatActivityEnterView.setAlpha' not in chat[start:end]

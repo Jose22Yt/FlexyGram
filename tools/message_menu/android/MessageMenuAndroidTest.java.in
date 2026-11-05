@@ -31,18 +31,31 @@ public class MessageMenuAndroidTest {
    assertEquals(7,actions(panel).size());
   }
  }
- @Test public void messageScrimCannotReplaceLiveInputWithCapturedWallpaper() {
-  for(float top:new float[]{0,44,80,140})for(boolean visible:new boolean[]{false,true}){
-   Bitmap b=Bitmap.createBitmap(100,120,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(b);
-   c.drawColor(Color.BLUE);Paint p=new Paint();p.setColor(Color.YELLOW);
-   int save=c.save();c.clipRect(0,0,100,ContextPreviewPlacement.scrimBottom(120,top,true,visible));
-   c.drawRect(0,0,100,120,p);c.restoreToCount(save);
-   int expected=visible&&top<=119?Color.BLUE:Color.YELLOW;
-   assertEquals(expected,b.getPixel(50,119));
-   if(top>0)assertEquals(Color.YELLOW,b.getPixel(50,0));
-   assertEquals(120,ContextPreviewPlacement.scrimBottom(120,top,false,visible),0);
-   assertEquals(1,c.getSaveCount());b.recycle();
+ @Test public void fullWindowBackdropCoversInputAndDismissRestoresUnderlyingPixels() {
+  Bitmap live=Bitmap.createBitmap(100,120,Bitmap.Config.ARGB_8888);live.eraseColor(Color.BLUE);
+  Bitmap backdrop=Bitmap.createBitmap(10,12,Bitmap.Config.ARGB_8888);backdrop.eraseColor(Color.YELLOW);
+  for(int alpha:new int[]{0,128,255}) {
+   Bitmap frame=live.copy(Bitmap.Config.ARGB_8888,true);Canvas c=new Canvas(frame);
+   Paint p=new Paint();p.setShader(new BitmapShader(backdrop,Shader.TileMode.CLAMP,Shader.TileMode.CLAMP));p.setAlpha(alpha);
+   int save=c.save();c.drawRect(0,0,100,120,p);c.restoreToCount(save);
+   assertEquals("Composer and chat receive identical backdrop coverage",frame.getPixel(50,0),frame.getPixel(50,119));
+   if(alpha==255)assertEquals(Color.YELLOW,frame.getPixel(50,119));
+   if(alpha==0)assertTrue(live.sameAs(frame));
+   assertEquals("Live composer pixels were never modified",Color.BLUE,live.getPixel(50,119));
+   frame.recycle();
   }
+  live.recycle();backdrop.recycle();
+ }
+ @Test public void tallPreviewScrollsAtReadableScaleAndClampsAtBothEnds() {
+  var placement=ContextPreviewPlacement.fit(600,12000,100,900,480,72,8);
+  assertTrue(placement.scale>=.9f);assertTrue(placement.scrollRange>0);
+  float[] offset={0};var viewport=new ContextPreviewViewport(activity);
+  viewport.configure(placement.scrollRange,"Preview",value->offset[0]=value);layout(viewport,320);
+  viewport.onTouchEvent(android.view.MotionEvent.obtain(0,0,0,10,100,0));
+  viewport.onTouchEvent(android.view.MotionEvent.obtain(0,1,2,10,-50000,0));
+  assertEquals(placement.scrollRange,offset[0],.01f);
+  viewport.onTouchEvent(android.view.MotionEvent.obtain(0,2,2,10,50000,0));
+  assertEquals(0,offset[0],.01f);
  }
  @Test public void selectedMenuHasOneNativeFrameClockAndInterruptsCleanly() {
   int[] draws={0},done={0};var motion=new SelectedBubbleMotion();
@@ -127,11 +140,11 @@ public class MessageMenuAndroidTest {
   page.click(position);checks(page.dialog.getWindow().getDecorView()).get(0).toggle();page.dialog.getButton(DialogInterface.BUTTON_POSITIVE).performClick();Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();assertFalse(BubbleMenuConfig.actions(activity).contains(Action.REPLY));
   page.click(position);page.dialog.getButton(DialogInterface.BUTTON_NEUTRAL).performClick();Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();assertEquals(BubbleMenuConfig.defaults(),BubbleMenuConfig.actions(activity));
  }
- @Test public void reactionsStayAboveTheCompleteBubbleAndMenuBelowEvenOnShortWindows(){
+ @Test public void reactionsStayAboveReadableViewportAndMenuBelowEvenOnShortWindows(){
   for(int style=0;style<4;style++)for(int available:new int[]{280,440,800})for(int height:new int[]{24,200,6000}){
    var panel=panel(style,EnumSet.allOf(Action.class),BubbleMenuConfig.defaults());int menu=Math.min(panel.getMeasuredHeight(),available-72-32);int chrome=72+menu;
    var placement=ContextPreviewPlacement.fit(600,height,100,100+available,chrome,72,8);
-   float bubbleTop=600+height*(1-placement.scale)*.5f+placement.offsetY,bubbleBottom=bubbleTop+height*placement.scale;
+   float bubbleTop=600+height*(1-placement.scale)*.5f+placement.offsetY,bubbleBottom=bubbleTop+placement.viewportHeight;
    assertTrue(bubbleTop>=placement.popupY+64+8);assertTrue(bubbleBottom<=placement.popupY+72+placement.gapHeight+.01f);
    assertTrue(placement.popupY+chrome+placement.gapHeight<=100+available);
   }

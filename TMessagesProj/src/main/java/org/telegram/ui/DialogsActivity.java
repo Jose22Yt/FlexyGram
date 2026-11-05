@@ -1009,10 +1009,6 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
         @Override
         protected void dispatchDraw(Canvas canvas) {
-            if (Build.VERSION.SDK_INT >= 31 && scrollableViewNoiseSuppressor != null) {
-                blur3_InvalidateBlur();
-            }
-
             if (invalidateScrollY && (rightSlidingDialogContainer == null || !rightSlidingDialogContainer.hasFragment()) && progressToActionMode == 0) {
                 invalidateScrollY = false;
                 int firstItemPosition = hasHiddenArchive() && viewPages[0].dialogsType == DIALOGS_TYPE_DEFAULT ? 1 : 0;
@@ -1146,6 +1142,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             }
             updateContextViewPosition();
             updateStoriesViewAlpha(storiesAlpha);
+            // Capture once, after scroll/header geometry settles and before glass children draw.
+            blur3_UpdateBlur();
             super.dispatchDraw(canvas);
             drawHeaderShadow(canvas, top + actionBarHeight);
 
@@ -13554,6 +13552,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
             @Override
             public void setAlpha(float alpha) {
+                if (getAlpha() == alpha) return;
                 super.setAlpha(alpha);
                 blur3_InvalidateBlur();
             }
@@ -14935,6 +14934,15 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     }
 
     private void blur3_InvalidateBlur() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || scrollableViewNoiseSuppressor == null || fragmentView == null || actionBar == null) {
+            return;
+        }
+        // Scroll, tabs and header changes can all arrive before a single frame.
+        // Only request that frame here; the root dispatchDraw updates the shared capture once.
+        fragmentView.invalidate();
+    }
+
+    private void blur3_UpdateBlur() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || scrollableViewNoiseSuppressor == null || fragmentView == null || actionBar == null) {
             return;
         }

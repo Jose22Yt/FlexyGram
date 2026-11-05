@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 JAVA = ROOT / 'TMessagesProj/src/main/java'
 
 
-def test_whole_message_fits_and_spring_never_flips_preview(tmp_path):
+def test_readable_message_viewport_fits_and_spring_never_flips_preview(tmp_path):
     if not shutil.which('java'):
         pytest.skip('JDK required')
     probe = tmp_path / 'FullPreviewProbe.java'
@@ -26,10 +26,12 @@ public class FullPreviewProbe {
      check(p.popupY>=top);
      check(p.popupY+chrome+p.gapHeight<=bottom);
      float actualTop=sourceTop+height*(1-p.scale)*.5f+p.offsetY;
-     float actualBottom=actualTop+height*p.scale;
+     float actualBottom=actualTop+p.viewportHeight;
      check(Math.abs(actualTop-(p.popupY+64+8))<.02f);
      check(actualBottom<=p.popupY+64+p.gapHeight-8+.02f);
-     check(p.scrollRange<.02f);
+     check(p.scale>=.9f);
+     check(Math.abs(p.scrollRange+p.viewportHeight-height*p.scale)<.02f);
+     if(height>1200)check(p.scrollRange>0);
      float finalScale=ContextPreviewPlacement.animatedScale(p.scale,1.2f,1.25f);
      if(p.scale<1f)check(Math.abs(finalScale-p.scale)<.00001f);
      for(float phase:new float[]{-.2f,0,.25f,.5f,1,1.2f})
