@@ -25,6 +25,7 @@ public class StrokeDrawable extends Drawable implements GlassOutlineStyle.Listen
     protected int strokeColorFull;
 
     private float alpha = 1.0f;
+    private GlassContourRenderer extraContour;
     private final RectF rect = new RectF();
     private int padding;
 
@@ -64,6 +65,7 @@ public class StrokeDrawable extends Drawable implements GlassOutlineStyle.Listen
         if (colorProvider == null) return;
 
         final GlassOutlineStyle outlineStyle = GlassOutlineStyle.current();
+        if(GlassContourRenderer.supports(outlineStyle) && extraContour==null) extraContour=new GlassContourRenderer();
         if (outlineStyle == GlassOutlineStyle.GLARE) {
             strokeColorTop = Theme.multAlpha(colorProvider.getStrokeColorTop(), alpha);
             strokeColorBottom = Theme.multAlpha(colorProvider.getStrokeColorBottom(), alpha);
@@ -99,6 +101,13 @@ public class StrokeDrawable extends Drawable implements GlassOutlineStyle.Listen
 
         if (Color.alpha(paintFill.getColor()) > 0) {
             canvas.drawCircle(cx, cy, radius, paintFill);
+        }
+        if(extraContour!=null && GlassContourRenderer.supports(GlassOutlineStyle.current())) {
+            int surface=androidx.core.graphics.ColorUtils.compositeColors(colorProvider.getBackgroundColor(),
+                    Theme.getColor(Theme.key_windowBackgroundWhite));
+            extraContour.draw(canvas,rect.left,rect.top,rect.right,rect.bottom,radius,
+                    GlassOutlineStyle.current(),surface,Math.round(alpha*255));
+            return;
         }
         if (strokeColorFull != 0) {
             final float half = paintStrokeFull.getStrokeWidth() / 2f;

@@ -13,6 +13,8 @@ def test_no_preference_migration_or_backend_replacement():
    getter='\n    /** Native metadata only; account/session preferences are not part of this catalog. */\n    fun getStudioItems(): List<ConfigItem> = configs.toList()\n'
    assert current.count(getter)==1
    current=current.replace(getter,'')
+  if p.endswith('GlassOutlineStyle.java'):
+   current=current.replace('    HIDDEN,\n    DOUBLE,\n    ADAPTIVE;', '    HIDDEN;')
   assert current==subprocess.check_output(['git','show',BASE+':'+p],cwd=ROOT,text=True)
  assert 'AP_GlareEffect' not in (J/'app/flexygram/effects/GlareSettingsSection.java').read_text()
 def test_one_owner_and_direct_chat_entry():
@@ -29,15 +31,14 @@ def test_default_static_renderer_is_preserved():
  new=(ROOT/p).read_text()
  replacement='if (org.telegram.ui.Components.blur3.StaticOutlineStroke.drawOverride(canvas,left,top,right,bottom,radii,isTop,paint,GlassOutlineStyle.current())) return;'
  assert new.count(replacement)==2
- # Radius/thickness no-op setters are exercised by test_render_work_reuse.
- # Preserve original geometry and drawing; frosted tint is a separate tested color policy.
- tint_start=new.index("        // FlexyGram frosted mode shares")
- tint_end=new.index("        shadowColor =",tint_start)
- new=new[:tint_start]+new[tint_end:]
- start='    public BlurredBackgroundDrawable setRadius(float radius)'
- end='    public Rect getPaddedBounds()'
- new=new[:new.index(start)]+old[old.index(start):old.index(end)]+new[new.index(end):]
- assert new.replace(replacement,'if (GlassOutlineStyle.current() != GlassOutlineStyle.GLARE) return;')==old
+ # Existing static glare algorithms remain unchanged; the new modes use separate paths.
+ from test_composer_layout import method
+ for anchor in ['public static void drawStroke(\n','public static void drawStroke(Canvas canvas, RectF rect,','public static void drawStroke(Canvas canvas, float left, float top, float right, float bottom,']:
+  before=method(old,anchor);after=method(new,anchor)
+  after=after.replace(replacement,'if (GlassOutlineStyle.current() != GlassOutlineStyle.GLARE) return;')
+  assert before==after
+ assert 'private void drawSourceContents(' in new
+ assert 'drawSourceContents(canvas,source);\n        drawAdditionalOutline(canvas,source);' in new
 
 def test_no_frame_allocations_or_background_engine():
  source=(J/'org/telegram/ui/Components/blur3/StaticOutlineStroke.java').read_text()
@@ -60,6 +61,23 @@ def test_three_locales_have_exact_same_keys():
  values=[]
  for folder in ['values','values-es','values-ru']:
   items=list(E.parse(ROOT/'TMessagesProj/src/main/res'/folder/'flexy_glare.xml').getroot())
-  assert len(items)==5 and all(x.text and x.text.strip() for x in items)
+  assert len(items)==7 and all(x.text and x.text.strip() for x in items)
   values.append({x.get('name') for x in items})
  assert values[0]==values[1]==values[2]
+
+def test_extended_modes_preserve_ordinals_and_backup_range():
+ for path in ['org/telegram/ui/Components/blur3/GlassOutlineStyle.java', 'com/exteragram/messenger/GlassOutlineStyle.java']:
+  text=(J/path).read_text()
+  assert text.index('GLARE,') < text.index('SOLID,') < text.index('HIDDEN,') < text.index('DOUBLE,') < text.index('ADAPTIVE;')
+ backup=(J/'app/exteraless/backup/EtgBackup.java').read_text()
+ assert '"glassOutlineStyle", AppearanceConfig.glassOutlineStyle, 0, 4' in backup
+
+def test_extended_contours_use_existing_surface_routes():
+ base=(J/'org/telegram/ui/Components/blur3/drawable/BlurredBackgroundDrawable.java').read_text()
+ hardware=(J/'org/telegram/ui/Components/blur3/drawable/BlurredBackgroundDrawableRenderNode.java').read_text()
+ assert 'drawSourceContents(canvas, ((BlurredBackgroundSourceWrapped) source).getSource());' in base
+ assert 'canvas.restore();\n        drawAdditionalOutline(canvas, source);' in hardware
+ sampler=(J/'org/telegram/ui/Components/blur3/GlassBackdropColor.java').read_text()
+ assert 'now-sampledAt<180' in sampler
+ for forbidden in ['PixelCopy', 'scheduleSelf', 'postDelayed', 'createBitmap', 'RenderEffect']:
+  assert forbidden not in sampler

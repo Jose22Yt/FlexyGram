@@ -17,7 +17,9 @@ public enum GlassOutlineStyle {
     /** Сплошной контур цветом разделителя, тень выключена. */
     SOLID,
     /** Контура и тени нет. */
-    HIDDEN;
+    HIDDEN,
+    DOUBLE,
+    ADAPTIVE;
 
     private static final GlassOutlineStyle[] VALUES = values();
     private static final Set<Listener> listeners = Collections.newSetFromMap(new WeakHashMap<>());

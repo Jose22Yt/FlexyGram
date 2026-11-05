@@ -510,7 +510,9 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
             showSelector(position, getString(R.string.OEAppearanceGlassOutline), new CharSequence[]{
                     getString(R.string.OEAppearanceGlassOutlineGlare),
                     getString(R.string.OEAppearanceGlassOutlineSolid),
-                    getString(R.string.OEAppearanceGlassOutlineHidden)
+                    getString(R.string.OEAppearanceGlassOutlineHidden),
+                    getString(R.string.FlexyGlareDouble),
+                    getString(R.string.FlexyGlareAdaptive)
             }, AppearanceConfig.glassOutlineStyle, null);
             return;
         } else if (position == folderThemeAccentRow) {
@@ -794,7 +796,7 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
                         String[] v = {getString(R.string.OEAppearanceDividerHidden), getString(R.string.OEAppearanceDividerLine), getString(R.string.OEAppearanceDividerSegments)};
                         cell.setTextAndValue(getString(R.string.OEAppearanceDividerStyle), v[clamp(AppearanceConfig.dividerStyle.Int(), v.length)], false);
                     } else if (position == glassOutlineRow) {
-                        String[] v = {getString(R.string.OEAppearanceGlassOutlineGlare), getString(R.string.OEAppearanceGlassOutlineSolid), getString(R.string.OEAppearanceGlassOutlineHidden)};
+                        String[] v = {getString(R.string.OEAppearanceGlassOutlineGlare), getString(R.string.OEAppearanceGlassOutlineSolid), getString(R.string.OEAppearanceGlassOutlineHidden), getString(R.string.FlexyGlareDouble), getString(R.string.FlexyGlareAdaptive)};
                         cell.setTextAndValue(getString(R.string.OEAppearanceGlassOutline), v[clamp(AppearanceConfig.glassOutlineStyle.Int(), v.length)], true);
                     } else if (position == tabTitleStyleRow) {
                         CharSequence[] v = tabTitleOptions();
