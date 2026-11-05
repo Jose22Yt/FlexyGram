@@ -88,6 +88,7 @@ public final class HeaderPreviewView extends View implements org.telegram.messen
         float fit=Math.min(1f,(previewHeight-AndroidUtilities.dp(8))/(titleLine+subtitleLine));titlePx*=fit;subtitlePx*=fit;
         titlePx=Math.min(titlePx,previewHeight-AndroidUtilities.dp(8));
         int h=Math.round(previewHeight)+AndroidUtilities.dp(forcedStyle<0?80:40);setMeasuredDimension(width,h);
+        if(previewStyle()==1){prepareClassicText(width);return;}
         text.setTextSize(titlePx); float preferred = text.measureText(name);
         text.setTextSize(subtitlePx); preferred = Math.max(preferred, text.measureText(status)) + AndroidUtilities.dp(24);
         float numberWidth = 0;
@@ -134,6 +135,13 @@ public final class HeaderPreviewView extends View implements org.telegram.messen
         avatar.setColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText));canvas.drawCircle(geometry.avatar.centerX(),geometry.avatar.centerY(),height/2-AndroidUtilities.dp(1),avatar);
         text.setColor(0xffffffff);text.setTextSize(AndroidUtilities.dp(20));canvas.drawText("A",geometry.avatar.centerX(),geometry.avatar.centerY()+AndroidUtilities.dp(7),text);
     }
+    private void prepareClassicText(float width) {
+        float available = Math.max(0, width - 122 * AndroidUtilities.density);
+        text.setTextSize(titlePx); scratchPaint.set(text);
+        displayName = android.text.TextUtils.ellipsize(name, scratchPaint, available, android.text.TextUtils.TruncateAt.END).toString();
+        text.setTextSize(subtitlePx); scratchPaint.set(text);
+        displayStatus = android.text.TextUtils.ellipsize(status, scratchPaint, available, android.text.TextUtils.TruncateAt.END).toString();
+    }
     private void drawClassic(Canvas canvas){
         float y=getHeight()/2f,d=AndroidUtilities.density;boolean rtl=LocaleController.isRTL;
         avatar.setColor(Theme.getColor(Theme.key_actionBarDefault));canvas.drawRect(0,y-28*d,getWidth(),y+28*d,avatar);
@@ -145,10 +153,8 @@ public final class HeaderPreviewView extends View implements org.telegram.messen
         float avatarX=rtl?getWidth()-58*d:58*d,textX=rtl?getWidth()-86*d:86*d;
         avatar.setColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlueText));canvas.drawCircle(avatarX,y,20*d,avatar);
         text.setColor(color);text.setTextAlign(rtl?Paint.Align.RIGHT:Paint.Align.LEFT);text.setTextSize(titlePx);
-        scratchPaint.set(text);String title=android.text.TextUtils.ellipsize(name,scratchPaint,Math.max(0,getWidth()-122*d),android.text.TextUtils.TruncateAt.END).toString();
-        canvas.drawText(title,textX,y-2*d,text);text.setTextSize(subtitlePx);text.setColor(Theme.getColor(Theme.key_actionBarDefaultSubtitle));
-        scratchPaint.set(text);String subtitle=android.text.TextUtils.ellipsize(status,scratchPaint,Math.max(0,getWidth()-122*d),android.text.TextUtils.TruncateAt.END).toString();
-        canvas.drawText(subtitle,textX,y+15*d,text);text.setTextAlign(Paint.Align.CENTER);
+        canvas.drawText(displayName,textX,y-2*d,text);text.setTextSize(subtitlePx);text.setColor(Theme.getColor(Theme.key_actionBarDefaultSubtitle));
+        canvas.drawText(displayStatus,textX,y+15*d,text);text.setTextAlign(Paint.Align.CENTER);
     }
     private void drawFusion(Canvas canvas) {
         var g=fusion.geometry;float d=AndroidUtilities.density;

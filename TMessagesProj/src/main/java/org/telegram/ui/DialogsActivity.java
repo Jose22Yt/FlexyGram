@@ -3438,6 +3438,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         wasDrawn = false;
         pacmanAnimation = null;
         filterTabsView = null;
+        lastFilterTabsLayoutFactor = Float.NaN;
         selectedDialogs.clear();
 
         additionNavigationBarHeight = hasMainTabs && MainTabsLayout.isBottomNavigationVisible() && !MainTabsLayout.isBottomNavigationFloating() ? dp(app.exteraless.appearance.MainTabsUiHelper.getTabsViewHeightDp()) : 0;
@@ -14663,18 +14664,22 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         return factor1 * factor2 * factor3;
     }
 
+    private float lastFilterTabsLayoutFactor = Float.NaN;
+
     private void checkUi_filterTabsVisible() {
         final float factor = getFilterTabsVisibilityFactor(true);
         if (filterTabsView != null) {
-            final boolean alphaChanged = filterTabsView.getAlpha() != factor;
-
             final float s = lerp(0.98f, 1f, factor);
             filterTabsView.setAlpha(factor);
             filterTabsView.setScaleX(s);
             filterTabsView.setScaleY(s);
             filterTabsView.setVisibility(factor > 0 ? View.VISIBLE : View.GONE);
 
-            if (alphaChanged && viewPages[0] != null) {
+            // List padding uses the factor WITHOUT search (see the list's measurement).
+            // Search only fades/scales the tabs; it must not remeasure every dialog row.
+            final float layoutFactor = getFilterTabsVisibilityFactor(false);
+            if (lastFilterTabsLayoutFactor != layoutFactor && viewPages[0] != null) {
+                lastFilterTabsLayoutFactor = layoutFactor;
                 viewPages[0].listView.requestLayout();
             }
         }

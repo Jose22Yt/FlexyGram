@@ -28,6 +28,8 @@ public final class SignatureSmartPillSpan extends ReplacementSpan {
 
     private int measured;
     private float textSize;
+    private float measuredDensity = -1;
+    private android.graphics.Typeface measuredTypeface;
     private float height;
     private float iconSize;
     private float iconSpacing;
@@ -59,8 +61,13 @@ public final class SignatureSmartPillSpan extends ReplacementSpan {
                 cachedTypeface = paint.getTypeface();
             }
         }
+        float requestedSize = Math.max(AndroidUtilities.dp(10f), Math.min(AndroidUtilities.dp(11.5f), paint.getTextSize() * 0.74f));
+        // Content, width budget and document truncation mode are immutable per span.
+        if (measured > 0 && textSize == requestedSize && measuredDensity == AndroidUtilities.density && measuredTypeface == cachedTypeface) return measured;
+        measuredDensity = AndroidUtilities.density;
+        measuredTypeface = cachedTypeface;
+        textSize = requestedSize;
         sharedInk.setTypeface(cachedTypeface);
-        textSize = Math.max(AndroidUtilities.dp(10f), Math.min(AndroidUtilities.dp(11.5f), paint.getTextSize() * 0.74f));
         sharedInk.setTextSize(textSize);
 
         height = AndroidUtilities.dp(20f);

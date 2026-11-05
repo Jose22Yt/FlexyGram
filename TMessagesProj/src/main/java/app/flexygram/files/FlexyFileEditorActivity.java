@@ -104,10 +104,41 @@ public final class FlexyFileEditorActivity extends BaseFragment {
         tasks.submit(()->{Object value=null;boolean ok=true;try{value=job.run();}catch(Exception failure){ok=false;}Object done=value;boolean success=ok;
             AndroidUtilities.runOnUIThread(()->{FlexyFileEditorActivity owner=weak.get();if(owner==null||!tasks.current(token)||owner.getParentActivity()==null||owner.status==null)return;if(success)result.ready(owner,done);else{owner.status.setText(getString(R.string.FlexyFilesError));owner.ready=owner.text!=null||owner.binary!=null;}});});
     }
-    private void load(){File selected=source;String path=entry;job(()->{SelectedDocument previous=document;document=null;if(previous!=null)previous.close();SelectedDocument reader=new SelectedDocument(selected);document=reader;if(Thread.currentThread().isInterrupted()){reader.close();throw new InterruptedIOException();}return reader.read(path,SelectedDocument.MAX_ENTRY);},(owner,value)->{
-        owner.binary=(byte[])value;owner.ready=true;try{owner.text=SelectedDocument.text(owner.binary);owner.internal=true;owner.editor.setText(owner.text.value);owner.editor.setEnabled(true);owner.internal=false;owner.status.setText(owner.filename()+" · "+owner.text.encoding+" · "+owner.text.newline);owner.highlightParagraph();owner.recoverDraft();}
-        catch(IOException binary){owner.editor.setVisibility(View.GONE);owner.status.setText(owner.filename()+" · "+AndroidUtilities.formatFileSize(owner.binary.length)+"\n"+getString(R.string.FlexyFilesBinary));owner.image();}
-    });}
+    /** Immutable result prepared by the existing cancellable document worker. */
+    private static final class LoadedContent {
+        final byte[] bytes;
+        final SelectedDocument.Text text;
+        LoadedContent(byte[] bytes) {
+            this.bytes = bytes;
+            SelectedDocument.Text decoded;
+            try { decoded = SelectedDocument.text(bytes); }
+            catch (IOException binary) { decoded = null; }
+            text = decoded;
+        }
+    }
+    private void load() {
+        File selected = source; String path = entry;
+        job(() -> {
+            SelectedDocument previous = document; document = null;
+            if (previous != null) previous.close();
+            SelectedDocument reader = new SelectedDocument(selected); document = reader;
+            if (Thread.currentThread().isInterrupted()) { reader.close(); throw new InterruptedIOException(); }
+            return new LoadedContent(reader.read(path, SelectedDocument.MAX_ENTRY));
+        }, (owner, value) -> {
+            LoadedContent loaded = (LoadedContent) value;
+            owner.binary = loaded.bytes; owner.text = loaded.text; owner.ready = true;
+            if (owner.text != null) {
+                owner.internal = true; owner.editor.setText(owner.text.value);
+                owner.editor.setEnabled(true); owner.internal = false;
+                owner.status.setText(owner.filename() + " · " + owner.text.encoding + " · " + owner.text.newline);
+                owner.highlightParagraph(); owner.recoverDraft();
+            } else {
+                owner.editor.setVisibility(View.GONE);
+                owner.status.setText(owner.filename() + " · " + AndroidUtilities.formatFileSize(owner.binary.length) + "\n" + getString(R.string.FlexyFilesBinary));
+                owner.image();
+            }
+        });
+    }
     private void recoverDraft(){File f=source;String path=entry;job(()->{File draft=FilesCache.draft(f,path);if(!draft.isFile()||draft.length()>SelectedDocument.MAX_TEXT)return null;try(InputStream in=new FileInputStream(draft)){ByteArrayOutputStream data=new ByteArrayOutputStream();byte[] buffer=new byte[4096];int count;while((count=in.read(buffer))!=-1){if(Thread.currentThread().isInterrupted()||data.size()+count>SelectedDocument.MAX_TEXT)throw new IOException();data.write(buffer,0,count);}return SelectedDocument.text(data.toByteArray()).value;}},(owner,value)->{if(value==null)return;owner.showDialog(new AlertDialog.Builder(owner.getParentActivity(),owner.getResourceProvider()).setTitle(getString(R.string.FlexyFilesRecover)).setPositiveButton(getString(R.string.FlexyFilesRestore),(d,w)->{owner.replaceText((String)value);}).setNegativeButton(getString(R.string.FlexyFilesDiscard),(d,w)->owner.deleteDraft()).create());});}
     private void deleteDraft(){File f=source;String path=entry;job(()->{FilesCache.draft(f,path).delete();return null;},(o,v)->{});}
     private void image(){String lower=filename().toLowerCase(Locale.ROOT);if(!(lower.endsWith(".png")||lower.endsWith(".jpg")||lower.endsWith(".jpeg")||lower.endsWith(".webp")))return;byte[] data=binary;
