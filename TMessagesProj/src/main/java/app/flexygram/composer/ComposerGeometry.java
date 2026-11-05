@@ -26,6 +26,12 @@ public final class ComposerGeometry {
         return widthDp >= 280 && !nativeSpecialControls;
     }
 
+    public static int senderSize(int inset) { return Math.max(24, TOUCH_SLOT - 2 * inset - 8); }
+    public static int senderLeft(int inset, int gap) { return TOUCH_SLOT - inset + gap + 4; }
+    public static int senderTextStart(int inset, int gap) {
+        return senderLeft(inset, gap) + senderSize(inset) + 8;
+    }
+
     public static int textEnd(int nativeEnd, int slotPx, boolean compact) {
         return compact ? Math.max(nativeEnd, slotPx) : nativeEnd;
     }

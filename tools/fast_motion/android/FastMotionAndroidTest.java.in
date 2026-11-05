@@ -35,9 +35,9 @@ public class FastMotionAndroidTest {
   for(float scale:new float[]{.01f,.5f,1,1.5f,5,6}){
    system(scale);int[] end={0};ValueAnimator a=ValueAnimator.ofFloat(0,1);a.setDuration(300);
    a.addListener(new AnimatorListenerAdapter(){public void onAnimationEnd(Animator animator){end[0]++;}});
-   FastMotion.start(a);assertTrue(Math.abs(a.getDuration()*scale-3)<=Math.max(scale,1));frames();
+   FastMotion.start(a);assertTrue(Math.abs(a.getDuration()*scale-3)<=Math.max(scale,1));long adjusted=a.getDuration();frames();
    assertEquals(1,end[0]);assertEquals(1f,(Float)a.getAnimatedValue(),0);assertFalse(a.isRunning());assertEquals(scale,ValueAnimator.getDurationScale(),0);
-   long adjusted=a.getDuration();FastMotion.start(a);assertEquals(adjusted,a.getDuration());frames();assertEquals(2,end[0]);
+   assertEquals("completed animators restore nominal timing",300,a.getDuration());FastMotion.start(a);assertEquals(adjusted,a.getDuration());frames();assertEquals(2,end[0]);assertEquals(300,a.getDuration());
   }
  }
  @Test public void nestedSetRetainsNativeSequencingAndCancellation(){

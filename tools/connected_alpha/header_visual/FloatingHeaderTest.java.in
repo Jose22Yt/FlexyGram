@@ -45,7 +45,7 @@ public class FloatingHeaderTest {
    assertEquals(g.center.centerX(),(Float)field(preview,"fusionTitleX"),.01f);
    assertEquals(g.center.centerX(),(Float)field(preview,"fusionStatusX"),.01f);
    assertEquals(15,(Float)field(preview,"titlePx"),.01f);assertEquals(10,(Float)field(preview,"subtitlePx"),.01f);
-   assertEquals(Math.round(88*Math.min(1f,width/360f)),preview.getMeasuredHeight());
+   assertEquals(Math.round(60*Math.min(1f,width/360f)),preview.getMeasuredHeight());
    Bitmap output=Bitmap.createBitmap(width,preview.getHeight(),Bitmap.Config.ARGB_8888);preview.draw(new Canvas(output));output.recycle();
   }
  }

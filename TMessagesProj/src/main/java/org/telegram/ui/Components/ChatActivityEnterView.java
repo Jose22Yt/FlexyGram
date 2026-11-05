@@ -12724,6 +12724,25 @@ public class ChatActivityEnterView extends FrameLayout implements
             senderSelectView.setTag(null);
         }
 
+        if (flexyCompactRequested && isChat && !isStories) {
+            // The compact identity slot reserves space once. Animate only alpha,
+            // never shift the emoji/text or change margins on animation frames.
+            senderSelectView.animate().cancel();
+            senderSelectView.setTranslationX(0);
+            senderSelectView.setVisibility(isVisible ? VISIBLE : GONE);
+            senderSelectView.setAlpha(isVisible ? 1f : 0f);
+            senderSelectView.setTag(null);
+            emojiButton.setTranslationX(0);
+            messageTextTranslationX = 0;
+            updateMessageTextParams();
+            if (isVisible && animated) {
+                senderSelectView.setAlpha(0f);
+                senderSelectView.animate().alpha(1f).setDuration(150).start();
+            }
+            requestLayout();
+            return;
+        }
+
         if ((isLiveComment || parentFragment != null && parentFragment.getOtherSameChatsDiff() == 0 && parentFragment.fragmentOpened) && animated) {
             ValueAnimator anim = ValueAnimator.ofFloat(0, 1).setDuration(150);
             if (senderSelectView != null) {
@@ -16658,10 +16677,10 @@ public class ChatActivityEnterView extends FrameLayout implements
 
     private boolean hasFlexySpecialControls() {
         return !isChat || parentFragment == null || isStories
-            || senderSelectView != null && senderSelectView.getVisibility() == VISIBLE
             || !wantsFlexyBotRow() && botCommandsMenuButton != null && (botCommandsMenuButton.getTag() != null || botCommandsMenuButton.getVisibility() == VISIBLE)
             || botWebViewButton != null && botWebViewButton.getVisibility() == VISIBLE
-            || !wantsFlexyBotRow() && ((MarginLayoutParams) emojiButton.getLayoutParams()).leftMargin > dp(3);
+            || !wantsFlexyBotRow() && (senderSelectView == null || senderSelectView.getVisibility() != VISIBLE)
+                && ((MarginLayoutParams) emojiButton.getLayoutParams()).leftMargin > dp(3);
     }
 
     public int getFlexyHorizontalMargin(int width, int nativeMargin) {
@@ -16683,6 +16702,16 @@ public class ChatActivityEnterView extends FrameLayout implements
         if (!compact && !flexyCompactLayout) return;
         final boolean wasCompact = flexyCompactLayout;
         flexyCompactLayout = compact;
+        if (compact && !wasCompact && senderSelectView != null) {
+            if (senderSelectView.getTag() instanceof ValueAnimator) {
+                ((ValueAnimator) senderSelectView.getTag()).cancel();
+                senderSelectView.setTag(null);
+            }
+            senderSelectView.setTranslationX(0);
+            messageTextTranslationX = 0;
+            updateMessageTextParams();
+        }
+        final boolean senderVisible = applyFlexySenderPresentation(compact);
         FrameLayout.LayoutParams attach = (FrameLayout.LayoutParams) attachButton.getLayoutParams();
         attach.gravity = Gravity.BOTTOM | (compact ? Gravity.LEFT : Gravity.RIGHT);
         FrameLayout.LayoutParams emoji = (FrameLayout.LayoutParams) emojiButton.getLayoutParams();
@@ -16700,8 +16729,12 @@ public class ChatActivityEnterView extends FrameLayout implements
         if (messageEditText != null) {
             messageEditText.setStaticHintTypeface(compact ? android.graphics.Typeface.DEFAULT : null);
             FrameLayout.LayoutParams text = (FrameLayout.LayoutParams) messageEditText.getLayoutParams();
-            if (compact) text.leftMargin = dp(app.flexygram.composer.ComposerGeometry.TOUCH_SLOT
-                + flexyGapDp - flexyInsetDp + flexyTextPaddingDp);
+            if (compact) text.leftMargin = senderVisible
+                ? dp(app.flexygram.composer.ComposerGeometry.senderTextStart(flexyInsetDp, flexyGapDp))
+                : dp(app.flexygram.composer.ComposerGeometry.TOUCH_SLOT + flexyGapDp - flexyInsetDp + flexyTextPaddingDp);
+            if (compact && richDraftPreview != null) {
+                ((MarginLayoutParams) richDraftPreview.getLayoutParams()).leftMargin = text.leftMargin;
+            }
             // Editing can directly change this margin without updateFieldRight.
             if (flexyNativeFieldRight < 0 || text.rightMargin != flexyAppliedFieldRight) flexyNativeFieldRight = text.rightMargin;
             text.rightMargin = app.flexygram.composer.ComposerGeometry.textEnd(flexyNativeFieldRight,
@@ -16723,6 +16756,17 @@ public class ChatActivityEnterView extends FrameLayout implements
         }
         if (wasCompact && !compact) emojiButton.setTranslationX(0);
         updateAttachButtonTranslationX();
+    }
+
+    private boolean applyFlexySenderPresentation(boolean compact) {
+        final boolean senderVisible = senderSelectView != null && senderSelectView.getVisibility() == VISIBLE;
+        if (senderSelectView != null) {
+            FrameLayout.LayoutParams sender = (FrameLayout.LayoutParams) senderSelectView.getLayoutParams();
+            sender.width = sender.height = compact ? dp(app.flexygram.composer.ComposerGeometry.senderSize(flexyInsetDp)) : dp(36);
+            sender.leftMargin = compact ? dp(app.flexygram.composer.ComposerGeometry.senderLeft(flexyInsetDp, flexyGapDp)) : dp(4.66f);
+            sender.bottomMargin = compact ? dp(flexyInsetDp + 4) : dp(4);
+        }
+        return senderVisible;
     }
 
     private void updateFlexyIconStyle() {
@@ -17719,7 +17763,7 @@ public class ChatActivityEnterView extends FrameLayout implements
             animatorTopViewVisibility.getFloatValue();
 
         // Reserve raised islands through the existing chat-list padding callback.
-        // Negative positions retain the native reservation, leaving extra clearance.
+        // Below-screen positions add no negative reservation to the native field height.
         return fieldHeight + (topView != null ? topView.getMeasuredHeight() : 0) * topViewVisibility
             + getFlexyVerticalReservation() + getFlexyBotRowHeight();
     }

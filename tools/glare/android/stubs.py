@@ -27,9 +27,11 @@ def write(dest,root):
 public class RecyclerView extends android.view.ViewGroup {
  public RecyclerView(android.content.Context c){super(c);}public void setAdapter(Adapter a){}
  protected void onLayout(boolean changed,int l,int t,int r,int b){}
- public abstract static class ViewHolder{public final android.view.View itemView;public ViewHolder(android.view.View v){itemView=v;}}
+ public abstract static class ViewHolder{public final android.view.View itemView;public ViewHolder(android.view.View v){itemView=v;}public int getItemViewType(){return 1;}}
  public abstract static class Adapter<T extends ViewHolder>{public abstract int getItemCount();public abstract T onCreateViewHolder(android.view.ViewGroup p,int t);public abstract void onBindViewHolder(T h,int p);public int getItemViewType(int p){return 0;}public void notifyDataSetChanged(){}public void notifyItemChanged(int p){}}
 }''')
+ emit('org/telegram/ui/Components/RecyclerListView.java','package org.telegram.ui.Components;public class RecyclerListView{public static class Holder extends androidx.recyclerview.widget.RecyclerView.ViewHolder{public Holder(android.view.View v){super(v);}}}')
+ emit('app/flexygram/effects/GlarePreviewView.java','package app.flexygram.effects;public class GlarePreviewView extends android.view.View{public GlarePreviewView(android.content.Context c,Object p){super(c);}}')
  emit('org/telegram/messenger/R.java','package org.telegram.messenger;public class R{public static class string{}public static class drawable{public static final int settings3_sliders=android.R.drawable.ic_menu_preferences;}}')
  emit('org/telegram/messenger/ApplicationLoader.java','package org.telegram.messenger;public class ApplicationLoader{public static android.content.Context applicationContext;}')
  emit('org/telegram/messenger/FileLog.java','package org.telegram.messenger;public class FileLog{public static void e(Throwable e){}}')
@@ -43,16 +45,16 @@ public class RecyclerView extends android.view.ViewGroup {
  emit('app/flexygram/settings/SignatureMatteSettingsActivity.java','''package app.flexygram.settings;
 import android.content.*;import android.view.*;import androidx.recyclerview.widget.*;
 public abstract class SignatureMatteSettingsActivity extends org.telegram.ui.ActionBar.BaseFragment{
- protected static final int TYPE_HEADER=0,TYPE_SETTINGS=1;protected BaseListAdapter listAdapter;protected RecyclerView listView;
+ protected static final int TYPE_HEADER=0,TYPE_SETTINGS=1;protected BaseListAdapter listAdapter;protected RecyclerView listView;protected Object resourcesProvider;
  private final java.util.Map<String,Integer> rows=new java.util.LinkedHashMap<>();
  protected abstract String getActionBarTitle();protected abstract String getKey();public abstract int getSearchGuid();public abstract int getSearchIcon();public abstract String getSearchPrefix();
- protected void updateRows(){rows.clear();}protected int addRow(String k){int n=rows.size();rows.put(k,n);return n;}
+ protected void updateRows(){rows.clear();}protected int addRow(){return addRow("preview");}protected int addRow(String k){int n=rows.size();rows.put(k,n);return n;}
  public java.util.Map<String,Integer> rowKeys(){return rows;}public boolean onFragmentCreate(){updateRows();return true;}
  public View createView(Context c){listView=new RecyclerView(c);listAdapter=createAdapter(c);listView.setAdapter(listAdapter);return listView;}
  public void click(int p){onItemClick(null,p,0,0);}protected abstract void onItemClick(View v,int p,float x,float y);
  protected abstract BaseListAdapter createAdapter(Context c);
  protected abstract class BaseListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
-  final Context context;BaseListAdapter(Context c){context=c;}public int getItemCount(){return rows.size();}
+  final Context context;BaseListAdapter(Context c){context=c;}protected boolean isSectionContent(int t){return true;}public boolean isEnabled(RecyclerView.ViewHolder h){return true;}public int getItemCount(){return rows.size();}
   public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup p,int type){return new RecyclerView.ViewHolder(type==0?new tw.nekomimi.nekogram.ui.cells.HeaderCell(context):new org.telegram.ui.Cells.TextSettingsCell(context)){};}
   public void onBindViewHolder(RecyclerView.ViewHolder h,int p){onBindViewHolder(h,p,false);}
   public abstract void onBindViewHolder(RecyclerView.ViewHolder h,int p,boolean partial);

@@ -2,7 +2,7 @@ package app.flexygram.composer;
 
 /** Bounded presentation policy. Native 44dp touch slots and text size never shrink. */
 public final class ComposerStyle {
-    public static final int MIN_POSITION = -4, MAX_POSITION = 16;
+    public static final int MIN_POSITION = -160, MAX_POSITION = 16;
     public static final int MIN_GAP = 2, MAX_GAP = 8;
     private ComposerStyle() { }
     public static int clamp(int value, int min, int max) { return Math.max(min, Math.min(max, value)); }
@@ -29,7 +29,7 @@ public final class ComposerStyle {
     // User adjustment is relative to the reference lift, never to Android system insets.
     public static int position(int value) { return clamp(value, MIN_POSITION, MAX_POSITION); }
     public static int offset(int position) { return 10 + position(position); }
-    public static int reserve(int position) { return offset(position); }
+    public static int reserve(int position) { return Math.max(0, offset(position)); }
     /** Screenshot proportions; keep enough native field width on narrow windows. */
     public static int sideMargin(int widthPx, float density, int nativeMargin) {
         int reference = Math.min(Math.round(widthPx * 0.065f), Math.round(32 * density));

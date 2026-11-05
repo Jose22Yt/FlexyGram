@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.SeekBar;
@@ -77,13 +76,11 @@ public final class ConversationStyleSettingsActivity extends SignatureMatteSetti
             setTag(RecyclerListView.TAG_NOT_SECTION);
             setLayoutParams(new RecyclerView.LayoutParams(-1,-2));
             hint=new TextView(context);hint.setTextSize(14);hint.setTextColor(getThemedColor(Theme.key_windowBackgroundWhiteGrayText2));hint.setPadding(dp(8),dp(8),dp(8),dp(header?16:8));
-            hint.setText(LocaleController.getString(header?R.string.FlexyStyleSwipeHint:R.string.FlexyStyleTapHint));addView(hint,new LayoutParams(-1,-2));
+            hint.setText(LocaleController.getString(R.string.FlexyStyleTapHint));addView(hint,new LayoutParams(-1,-2));
             styles=header?new int[]{1,0,2,3,4}:new int[]{0,1};choices=new StylePreviewCard[styles.length];
             int[] labels=header?new int[]{R.string.FlexyStyleDefault,R.string.FlexyHeaderSignature,R.string.FlexyHeaderFusion,R.string.FlexyHeaderPortrait,R.string.FlexyHeaderFloating}:new int[]{R.string.FlexyStyleDefault,R.string.FlexyStyleCompact};
-            LinearLayout strip=new LinearLayout(context);strip.setOrientation(header?HORIZONTAL:VERTICAL);
-            HorizontalScrollView scroll=header?new HorizontalScrollView(context):null;
-            if(header){scroll.setHorizontalScrollBarEnabled(false);scroll.setClipToPadding(false);scroll.addView(strip,new ViewGroup.LayoutParams(-2,-2));addView(scroll,new LayoutParams(-1,-2));}
-            else addView(strip,new LayoutParams(-1,-2));
+            LinearLayout strip=new LinearLayout(context);strip.setOrientation(VERTICAL);
+            addView(strip,new LayoutParams(-1,-2));
             for(int i=0;i<styles.length;i++){
                 final int index=i;
                 View preview=header?new HeaderPreviewView(context,styles[i]):new FlexyComposerSettingsActivity().createStylePreview(context,styles[i]);
@@ -91,11 +88,12 @@ public final class ConversationStyleSettingsActivity extends SignatureMatteSetti
                     if(header){HeaderConfig.style(styles[index]);bind();}
                     else{FlexyComposerConfig.setStyle(styles[index]);refreshComposerChoices();}
                 },!header);
-                int width=header?Math.max(dp(220),Math.min(context.getResources().getDisplayMetrics().widthPixels-dp(56),dp(420))):-1;
-                LayoutParams params=new LayoutParams(width,-2);if(header)params.setMarginEnd(dp(12));else params.bottomMargin=dp(8);strip.addView(choices[i],params);
+                choices[i].setSegmentEdges(i==0,i==styles.length-1);
+                LayoutParams params=new LayoutParams(-1,-2);
+                params.bottomMargin=i==styles.length-1?0:dp(4);
+                strip.addView(choices[i],params);
             }
             bind();
-            if(header){final HorizontalScrollView viewport=scroll;post(()->{for(int i=0;i<styles.length;i++)if(styles[i]==HeaderConfig.style())viewport.scrollTo(choices[i].getLeft(),0);});}
         }
         @Override protected void dispatchDraw(android.graphics.Canvas canvas){int color=getThemedColor(Theme.key_windowBackgroundWhiteGrayText2);if(hint.getCurrentTextColor()!=color)hint.setTextColor(color);super.dispatchDraw(canvas);}
         void bind(){int selected=header?HeaderConfig.style():FlexyComposerConfig.compact()?1:0;for(int i=0;i<styles.length;i++)choices[i].bind(styles[i]==selected);}
