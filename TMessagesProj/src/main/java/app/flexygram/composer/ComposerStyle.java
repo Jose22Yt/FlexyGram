@@ -13,11 +13,11 @@ public final class ComposerStyle {
     public static int surface(boolean dark, boolean glass) { return dark ? (glass ? 0xE8303236 : 0xFF303236) : (glass ? 0xF5FAFAFC : 0xFFFAFAFC); }
     /**
      * Visual tint over Telegram's existing blur surface; it does NOT generate or
-     * emulate blur and is only used while native Liquid Glass is active.
-     * High enough alpha for text/button contrast in light and dark themes.
+     * emulate blur and is used over the native blur/Liquid Glass surface.
+     * The native provider already supplies the contrast tint; keep this wash light.
      */
     public static int nativeGlassTint(int themedColor) {
-        return (themedColor & 0x00ffffff) | 0x9a000000;
+        return (themedColor & 0x00ffffff) | 0x28000000;
     }
     public static int nativeGlassButton(boolean dark) {
         return dark ? 0xa6383b42 : 0xa6f8f9fc;

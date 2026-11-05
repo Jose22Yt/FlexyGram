@@ -11,6 +11,15 @@ import app.exteraless.player.Spring;
 public final class SelectedBubbleMotion implements Choreographer.FrameCallback {
     private final Spring x = new Spring(1f, 900f, .78f, .0002f);
     private final Spring y = new Spring(1f, 900f, .78f, .0002f);
+    private final Spring backdrop = new Spring(0f, 900f, 1f, .003f);
+    private boolean backdropAvailable;
+    public float backdropProgress() { return Math.max(0f, Math.min(1f, backdrop.value)); }
+    public void backdropReady() {
+        if (invalidate == null || closing) return;
+        backdropAvailable = true;backdrop.target = 1f;
+        if (!BubbleInteractionSettings.motionEnabled()) { backdrop.snap(1f);invalidate.run();return; }
+        schedule();
+    }
     private final Spring phase = new Spring(1f, 1100f, .78f, .0015f);
     private static final long ENTER_LIMIT_MS = 280, CLOSE_LIMIT_MS = 180;
     private Runnable invalidate, completion;
@@ -55,7 +64,7 @@ public final class SelectedBubbleMotion implements Choreographer.FrameCallback {
         if (closing) return;
         closing = true; completion = done;
         started = android.os.SystemClock.uptimeMillis();
-        x.target = y.target = 1f; phase.target = 0f;
+        x.target = y.target = 1f; phase.target = 0f;backdrop.target = 0f;
         if (invalidate == null || !BubbleInteractionSettings.motionEnabled()) {
             phase.snap(0f); x.snap(1f); y.snap(1f); finish(); return;
         }
@@ -64,19 +73,19 @@ public final class SelectedBubbleMotion implements Choreographer.FrameCallback {
     private void schedule() {
         if (running) return;
         running = true;
-        lastFrame = android.os.SystemClock.uptimeMillis() * 1_000_000L;
+        lastFrame = 0; // Establish the time base from Choreographer itself.
         started = android.os.SystemClock.uptimeMillis();
         Choreographer.getInstance().postFrameCallback(this);
     }
     @Override public void doFrame(long frameTimeNanos) {
         if (!running) return;
-        float dt = Math.max(0f, Math.min(.064f, (frameTimeNanos-lastFrame)/1_000_000_000f));
+        float dt = lastFrame == 0 ? 1f/120f : Math.max(0f, Math.min(.064f, (frameTimeNanos-lastFrame)/1_000_000_000f));
         lastFrame = frameTimeNanos;
-        boolean mx=x.step(dt), my=y.step(dt), mp=phase.step(dt);
-        if ((!mx && !my && !mp) || closing && phase.value <= 0f
-                || android.os.SystemClock.uptimeMillis()-started >= (closing ? CLOSE_LIMIT_MS : ENTER_LIMIT_MS)) {
+        boolean mx=x.step(dt), my=y.step(dt), mp=phase.step(dt), mb=backdrop.step(dt);
+        if ((!mx && !my && !mp && !mb) || closing && phase.value <= 0f
+                || android.os.SystemClock.uptimeMillis()-started >= (closing ? CLOSE_LIMIT_MS : ENTER_LIMIT_MS) && (closing || !mb)) {
             running = false;
-            x.snap(1f); y.snap(1f); phase.snap(closing ? 0f : 1f);
+            x.snap(1f); y.snap(1f); phase.snap(closing ? 0f : 1f);backdrop.snap(!closing && backdropAvailable ? 1f : 0f);
             if (closing) finish(); else if (invalidate != null) invalidate.run();
         } else {
             if (invalidate != null) invalidate.run();
@@ -91,13 +100,14 @@ public final class SelectedBubbleMotion implements Choreographer.FrameCallback {
     }
     private void finish() {
         Choreographer.getInstance().removeFrameCallback(this); running = false;
+        backdrop.snap(0f);backdropAvailable=false;
         Runnable redraw=invalidate, done=completion; completion=null; invalidate=null;
         if (redraw != null) redraw.run();
         if (done != null) done.run();
     }
     public void reset() {
         Choreographer.getInstance().removeFrameCallback(this); running=false;
-        x.snap(1f); y.snap(1f); phase.snap(1f);
+        x.snap(1f); y.snap(1f); phase.snap(1f);backdrop.snap(0f);backdropAvailable=false;
         Runnable done=completion; completion=null; invalidate=null; closing=false;
         if (done != null) done.run();
     }

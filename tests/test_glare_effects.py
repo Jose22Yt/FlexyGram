@@ -6,13 +6,18 @@ ROOT=Path(__file__).resolve().parents[1]
 J=ROOT/'TMessagesProj/src/main/java'
 BASE='4679f74ebd312acc4968dd2e044a6c6b7478445a'
 S=J/'app/flexygram/settings/signature'
+def without_width_extension(text):
+ start=text.index('    /** Relative contour width, in tenths:')
+ end=text.index('    /** Стеклянное меню сообщения.',start)
+ return text[:start]+text[end:]
+
 def test_no_preference_migration_or_backend_replacement():
  for p in ['TMessagesProj/src/main/kotlin/app/exteraless/appearance/AppearanceConfig.kt','TMessagesProj/src/main/java/org/telegram/ui/Components/blur3/GlassOutlineStyle.java']:
   current=(ROOT/p).read_text()
   if p.endswith('AppearanceConfig.kt'):
    getter='\n    /** Native metadata only; account/session preferences are not part of this catalog. */\n    fun getStudioItems(): List<ConfigItem> = configs.toList()\n'
    assert current.count(getter)==1
-   current=current.replace(getter,'')
+   current=without_width_extension(current.replace(getter,''))
   assert current==subprocess.check_output(['git','show',BASE+':'+p],cwd=ROOT,text=True)
  assert 'AP_GlareEffect' not in (J/'app/flexygram/effects/GlareSettingsSection.java').read_text()
 def test_one_owner_and_direct_chat_entry():
@@ -29,15 +34,13 @@ def test_default_static_renderer_is_preserved():
  new=(ROOT/p).read_text()
  replacement='if (org.telegram.ui.Components.blur3.StaticOutlineStroke.drawOverride(canvas,left,top,right,bottom,radii,isTop,paint,GlassOutlineStyle.current())) return;'
  assert new.count(replacement)==2
- # Radius/thickness no-op setters are exercised by test_render_work_reuse.
- # Preserve original geometry and drawing; frosted tint is a separate tested color policy.
- tint_start=new.index("        // FlexyGram frosted mode shares")
- tint_end=new.index("        shadowColor =",tint_start)
- new=new[:tint_start]+new[tint_end:]
- start='    public BlurredBackgroundDrawable setRadius(float radius)'
- end='    public Rect getPaddedBounds()'
- new=new[:new.index(start)]+old[old.index(start):old.index(end)]+new[new.index(end):]
- assert new.replace(replacement,'if (GlassOutlineStyle.current() != GlassOutlineStyle.GLARE) return;')==old
+ from test_composer_layout import method
+ for anchor, historical in [('protected static void drawStrokeRaw(\n','public static void drawStroke(\n'),('protected static void drawStrokeRaw(Canvas canvas, float left, float top, float right, float bottom,','public static void drawStroke(Canvas canvas, float left, float top, float right, float bottom,')]:
+  actual=method(new,anchor).replace('protected static void drawStrokeRaw','public static void drawStroke')
+  actual=actual.replace(replacement,'if (GlassOutlineStyle.current() != GlassOutlineStyle.GLARE) return;')
+  assert actual==method(old,historical)
+ assert 'finally { paint.setStrokeWidth(previousWidth); }' in new
+ assert 'applyOutlineWidth();' in new
 
 def test_no_frame_allocations_or_background_engine():
  source=(J/'org/telegram/ui/Components/blur3/StaticOutlineStroke.java').read_text()
@@ -60,6 +63,38 @@ def test_three_locales_have_exact_same_keys():
  values=[]
  for folder in ['values','values-es','values-ru']:
   items=list(E.parse(ROOT/'TMessagesProj/src/main/res'/folder/'flexy_glare.xml').getroot())
-  assert len(items)==5 and all(x.text and x.text.strip() for x in items)
+  assert len(items)==7 and all(x.text and x.text.strip() for x in items)
   values.append({x.get('name') for x in items})
  assert values[0]==values[1]==values[2]
+
+
+def test_width_metadata_and_retained_renderer_route_are_bounded_and_single_scaled():
+ source=(J/'app/exteraless/backup/EtgBackup.java').read_text()
+ assert '"glassOutlineWidth", AppearanceConfig.glassOutlineWidth, 5, 30' in source
+ render=(J/'org/telegram/ui/Components/blur3/drawable/BlurredBackgroundDrawableRenderNode.java').read_text()
+ assert 'drawStrokeRaw(c,' in render and 'drawStroke(c,' not in render
+ assert 'own("appearance:glassOutlineWidth", "chat_glare")' in (S/'Settings2Policy.java').read_text()
+
+
+def test_native_width_updates_do_not_compound_or_rebuild_unchanged_geometry(tmp_path):
+ from test_composer_layout import method
+ from test_render_work_reuse import probe
+ source=(J/'org/telegram/ui/Components/blur3/drawable/BlurredBackgroundDrawable.java').read_text()
+ methods=method(source,'public void setStrokeWidth(')+method(source,'private void applyOutlineWidth(')
+ probe(tmp_path,{
+ 'app/exteraless/appearance/AppearanceConfig.java':'package app.exteraless.appearance;public class AppearanceConfig{public static int width=10;public static int glassOutlineWidth(){return width;}}',
+ 'Probe.java':'''public class Probe{
+ static class Props{float strokeWidthTop=3,strokeWidthBottom=2,strokeWidthFull=1;int builds;void build(){builds++;}}
+ Props boundProps=new Props();float baseStrokeWidthTop,baseStrokeWidthBottom;int notifications;
+ void onBoundPropsChanged(){notifications++;}
+ METHODS
+ static void check(boolean v){if(!v)throw new AssertionError();}
+ public static void main(String[]args){var p=new Probe();p.setStrokeWidth(3,2);check(p.boundProps.builds==0);
+ app.exteraless.appearance.AppearanceConfig.width=30;
+ for(int i=0;i<1000;i++)p.setStrokeWidth(3,2);
+ check(p.boundProps.strokeWidthTop==9&&p.boundProps.strokeWidthBottom==6&&p.boundProps.builds==1&&p.notifications==1);
+ app.exteraless.appearance.AppearanceConfig.width=5;p.applyOutlineWidth();check(p.boundProps.strokeWidthTop==1.5f&&p.boundProps.strokeWidthBottom==1&&p.notifications==2);
+ app.exteraless.appearance.AppearanceConfig.width=10;p.applyOutlineWidth();check(p.boundProps.strokeWidthTop==3&&p.boundProps.strokeWidthBottom==2&&p.boundProps.strokeWidthFull==1&&p.notifications==3);
+ }
+}'''.replace('METHODS',methods)
+ },[J/'org/telegram/ui/Components/blur3/GlareStrokeWidth.java'])

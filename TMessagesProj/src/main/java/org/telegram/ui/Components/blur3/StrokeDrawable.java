@@ -79,7 +79,7 @@ public class StrokeDrawable extends Drawable implements GlassOutlineStyle.Listen
         paintStrokeBottom.setColor(strokeColorBottom);
         paintStrokeBottom.setStrokeWidth(dpf2(2 / 3f));
         paintStrokeFull.setColor(strokeColorFull);
-        paintStrokeFull.setStrokeWidth(dpf2(1));
+        paintStrokeFull.setStrokeWidth(dpf2(1)*GlareStrokeWidth.factor());
     }
 
     public boolean nonRound;

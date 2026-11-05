@@ -60,3 +60,43 @@ def write(dest,root):
  public void onBindViewHolder(RecyclerView.ViewHolder h,int p,boolean partial){}public boolean isEnabled(RecyclerView.ViewHolder h){return true;}}
  protected class MatteListAdapter extends BaseListAdapter{public MatteListAdapter(Context c){}}}
  ''')
+
+ # Compile actual async scrim processing with explicit transport/worker hosts.
+ text=(java/'org/telegram/ui/Components/ScrimOptions.java').read_text()
+ def extract(anchor):
+  a=text.index(anchor);b=text.index('{',a)+1;depth=1
+  while depth:depth+=(text[b]=='{')-(text[b]=='}');b+=1
+  return text[a:b]
+ methods=extract('public static void makeGlobalBlurBitmaps(Utilities.Callback2<Bitmap, Bitmap> bitmaps, boolean async)')
+ put('org/telegram/messenger/FileLog.java','package org.telegram.messenger;public class FileLog{public static void e(Throwable t){}}')
+ code='''import android.graphics.*;public class AsyncScrimProbe {
+ public static class Queue{public java.util.ArrayDeque<Runnable> tasks=new java.util.ArrayDeque<>();public void postRunnable(Runnable r){tasks.add(r);}public void drain(){while(!tasks.isEmpty())tasks.remove().run();}}
+ public static class Utilities{public interface Callback2<A,B>{void run(A a,B b);}public static final Queue themeQueue=new Queue();}
+ public static class Theme{public static boolean isCurrentThemeDark(){return false;}}
+ public static class AndroidUtilities{
+  public interface Callback{void run(Bitmap b);}public static Queue ui=new Queue();public static Bitmap original;public static boolean requestedAsync;
+  public static void makeGlobalBlurBitmap(Callback cb,float downscale,int amount,Object v,Object exclude,boolean async){requestedAsync=async;original=Bitmap.createBitmap(16,16,Bitmap.Config.ARGB_8888);original.eraseColor(Color.RED);if(async)Utilities.themeQueue.postRunnable(()->cb.run(original));else cb.run(original);}
+  public static void runOnUIThread(Runnable r){ui.postRunnable(r);}public static void adjustSaturationColorMatrix(ColorMatrix m,float d){m.setSaturation(1+d);}
+  public static void adjustBrightnessColorMatrix(ColorMatrix m,float d){}
+  public static Bitmap applyColorMatrix(Bitmap bitmap,ColorMatrix matrix){Bitmap out=Bitmap.createBitmap(16,16,Bitmap.Config.ARGB_8888);Paint p=new Paint();p.setColorFilter(new ColorMatrixColorFilter(matrix));new Canvas(out).drawBitmap(bitmap,0,0,p);return out;}
+ }
+ METHODS
+}'''.replace('METHODS',methods)
+ put('AsyncScrimProbe.java',code)
+
+ text=(java/'org/telegram/messenger/AndroidUtilities.java').read_text()
+ start=text.index('public static void makeGlobalBlurBitmap(Utilities.Callback<Bitmap> onBitmapDone, float downscale, int amount, View forView, List<View> exclude, boolean asyncBlur)')
+ pos=text.index('{',start)+1;depth=1
+ while depth:depth+=(text[pos]=='{')-(text[pos]=='}');pos+=1
+ capture=text[start:pos]
+ put('NativeCaptureProbe.java','''import android.graphics.*;import android.view.*;import java.util.*;import androidx.core.graphics.ColorUtils;
+public class NativeCaptureProbe{
+ public static boolean makingGlobalBlurBitmap;public static List<View> views;
+ public static List<View> allGlobalViews(){return views;}
+ public static class FileLog{public static void e(Throwable t){throw new AssertionError(t);}}
+ public static class Utilities{public interface Callback<T>{void run(T t);}public static AsyncScrimProbe.Queue themeQueue=new AsyncScrimProbe.Queue();public static int blurs;public static void stackBlurBitmap(Bitmap b,int r){blurs++;}}
+ public static class Theme{public static int key_windowBackgroundWhite;public static int getColor(int k){return Color.WHITE;}}
+ public static class AndroidUtilities{public static Point displaySize=new Point(120,240);public static int statusBarHeight,navigationBarHeight;public static AsyncScrimProbe.Queue ui=new AsyncScrimProbe.Queue();public static void runOnUIThread(Runnable r){ui.postRunnable(r);}}
+ public static class PipRoundVideoView{public static class PipFrameLayout extends android.widget.FrameLayout{public PipFrameLayout(android.content.Context c){super(c);}}}
+ CAPTURE
+}'''.replace('CAPTURE',capture))

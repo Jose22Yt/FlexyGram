@@ -61,6 +61,39 @@ public class MessageMenuAndroidTest {
   assertEquals(old,first[0]);assertTrue(next[0]>1);assertEquals(1f,motion.panelScale(),0);
   motion.reset();assertFalse(motion.hasOwner());
  }
+ @Test public void lateBackdropFadesOnTheExistingClockWithoutRestartingTheCard() {
+  var motion=new SelectedBubbleMotion();java.util.List<Float> samples=new java.util.ArrayList<>();motion.enter(()->samples.add(motion.backdropProgress()));
+  org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(java.time.Duration.ofMillis(350));
+  assertFalse(motion.isRunning());assertEquals(1f,motion.panelScale(),0);
+  samples.clear();motion.backdropReady();assertTrue(motion.isRunning());assertEquals(0f,motion.backdropProgress(),0);
+  org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(java.time.Duration.ofMillis(64));
+  assertEquals(1f,motion.panelScale(),0);
+  int intermediate=0;float previous=0;
+  for(float sample:samples){assertTrue(sample>=previous);assertTrue(sample-previous<.25f);if(sample>0&&sample<1)intermediate++;previous=sample;}
+  assertTrue("native frames must crossfade, not jump",intermediate>=4);
+  org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(java.time.Duration.ofMillis(350));
+  assertEquals(1f,motion.backdropProgress(),0);assertFalse(motion.isRunning());
+  motion.close();motion.finishImmediately();assertEquals(0f,motion.backdropProgress(),0);motion.backdropReady();assertFalse(motion.isRunning());
+ }
+ @Test public void actualScrimProcessingDefersPixelsAndPublishesOwnedBitmapsOnUiQueue() {
+  Bitmap[] result={null,null};int[] calls={0};
+  AsyncScrimProbe.makeGlobalBlurBitmaps((bg,options)->{result[0]=bg;result[1]=options;calls[0]++;},true);
+  assertTrue(AsyncScrimProbe.AndroidUtilities.requestedAsync);assertEquals(0,calls[0]);
+  AsyncScrimProbe.Utilities.themeQueue.drain();assertEquals(0,calls[0]);assertTrue(AsyncScrimProbe.AndroidUtilities.original.isRecycled());
+  AsyncScrimProbe.AndroidUtilities.ui.drain();assertEquals(1,calls[0]);assertNotNull(result[0]);assertNotSame(result[0],result[1]);
+  assertFalse(result[0].isRecycled());assertFalse(result[1].isRecycled());result[0].recycle();result[1].recycle();
+ }
+ @Test public void actualCaptureReturnsBeforePixelBlurAndRestoresTheCaptureFlag() {
+  var view=new View(activity){public void draw(Canvas canvas){assertTrue(NativeCaptureProbe.makingGlobalBlurBitmap);canvas.drawColor(Color.RED);}};
+  view.layout(0,0,120,240);NativeCaptureProbe.views=java.util.List.of(view);NativeCaptureProbe.Utilities.blurs=0;
+  Bitmap[] result={null};NativeCaptureProbe.makeGlobalBlurBitmap(b->result[0]=b,15,15,null,null,true);
+  assertFalse(NativeCaptureProbe.makingGlobalBlurBitmap);assertNull(result[0]);assertEquals(0,NativeCaptureProbe.Utilities.blurs);
+  NativeCaptureProbe.Utilities.themeQueue.drain();assertNotNull(result[0]);assertEquals(1,NativeCaptureProbe.Utilities.blurs);
+  assertTrue(NativeCaptureProbe.AndroidUtilities.ui.tasks.isEmpty());assertEquals(Color.RED,result[0].getPixel(1,1));result[0].recycle();
+  result[0]=null;NativeCaptureProbe.Utilities.blurs=0;
+  NativeCaptureProbe.makeGlobalBlurBitmap(b->result[0]=b,15,15,null,null,false);
+  assertNotNull(result[0]);assertEquals(1,NativeCaptureProbe.Utilities.blurs);assertFalse(NativeCaptureProbe.makingGlobalBlurBitmap);result[0].recycle();
+ }
  @Test public void choicesPersistAndNeverGrantUnavailableActions(){
   for(int style=0;style<4;style++){BubbleMenuConfig.layout(activity,style);assertEquals(style,BubbleMenuConfig.layout(activity));assertTrue(BubbleInteractionSettings.signaturePanel(activity));}
   BubbleMenuConfig.actions(activity,EnumSet.of(Action.COPY,Action.SAVE));assertEquals(EnumSet.of(Action.COPY,Action.SAVE),BubbleMenuConfig.actions(activity));

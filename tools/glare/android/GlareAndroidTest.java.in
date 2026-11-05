@@ -5,13 +5,13 @@ import app.flexygram.effects.*;import app.exteraless.appearance.AppearanceConfig
 @RunWith(RobolectricTestRunner.class) @Config(manifest=Config.NONE,sdk=35) @GraphicsMode(GraphicsMode.Mode.NATIVE)
 public class GlareAndroidTest {
  Activity activity;
- @Before public void setup()throws Exception{activity=Robolectric.buildActivity(Activity.class).setup().get();BaseFragment.activity=activity;org.telegram.messenger.ApplicationLoader.applicationContext=activity;AppearanceConfig.glassOutlineStyle.setConfigInt(0);var method=activity.getAssets().getClass().getMethod("addAssetPath",String.class);assertTrue((Integer)method.invoke(activity.getAssets(),System.getProperty("probe.root")+"/resources.ap_")>0);}
+ @Before public void setup()throws Exception{activity=Robolectric.buildActivity(Activity.class).setup().get();BaseFragment.activity=activity;org.telegram.messenger.ApplicationLoader.applicationContext=activity;AppearanceConfig.glassOutlineStyle.setConfigInt(0);AppearanceConfig.glassOutlineWidth.setConfigInt(10);var method=activity.getAssets().getClass().getMethod("addAssetPath",String.class);assertTrue((Integer)method.invoke(activity.getAssets(),System.getProperty("probe.root")+"/resources.ap_")>0);}
  @After public void cleanup(){activity.finish();}
  @Test public void allSavedModesRoundTripAndUnknownIsDefault(){for(int stored=0;stored<3;stored++)assertEquals(stored,GlareMode.toStored(GlareMode.fromStored(stored)));assertEquals(GlareMode.DEFAULT,GlareMode.fromStored(-99));assertEquals(GlareMode.DEFAULT,GlareMode.fromStored(88));assertEquals(2,GlareMode.toStored(0));assertEquals(0,GlareMode.toStored(1));assertEquals(1,GlareMode.toStored(2));try{GlareMode.toStored(3);fail();}catch(IllegalArgumentException expected){}}
  @Test public void selectorUsesActualSavedValueAndOnlyWritesOnSelection(){var prefs=tw.nekomimi.nekogram.NekoConfig.getPreferences();prefs.edit().putString("untouched","keep").apply();AppearanceConfig.glassOutlineStyle.setConfigInt(1);var page=new GlareSettingsSection();page.onFragmentCreate();page.createView(activity);assertEquals(1,AppearanceConfig.glassOutlineStyle());page.click(page.rowKeys().get("glareEffects"));assertEquals(GlareMode.SOLID,AlertsCreator.selected);assertArrayEquals(new String[]{"Desactivar","Por defecto","Contorno sólido"},AlertsCreator.options);assertEquals(1,AppearanceConfig.glassOutlineStyle());AlertsCreator.listener.onClick(null,0);assertEquals(2,AppearanceConfig.glassOutlineStyle());assertEquals(2,prefs.getInt("OEAppearanceGlassOutlineStyle",-1));assertEquals("keep",prefs.getString("untouched",null));}
  @Test public void removedModesFallBackToOriginalDefaultWithoutPreview(){
   var page=new GlareSettingsSection();page.onFragmentCreate();page.createView(activity);
-  assertEquals(2,page.rowKeys().size());
+  assertEquals(3,page.rowKeys().size());
   for(int removed:new int[]{3,4}){
    AppearanceConfig.glassOutlineStyle.setConfigInt(removed);
    assertEquals(GlassOutlineStyle.GLARE,GlassOutlineStyle.current());
@@ -19,6 +19,40 @@ public class GlareAndroidTest {
    assertEquals(GlareMode.DEFAULT,AlertsCreator.selected);assertEquals(3,AlertsCreator.options.length);
    AlertsCreator.listener.onClick(null,GlareMode.DEFAULT);assertEquals(0,AppearanceConfig.glassOutlineStyle());
   }
+ }
+ android.widget.SeekBar slider(android.view.View view){
+  if(view instanceof android.widget.SeekBar)return (android.widget.SeekBar)view;
+  if(view instanceof android.view.ViewGroup){var group=(android.view.ViewGroup)view;for(int i=0;i<group.getChildCount();i++){var found=slider(group.getChildAt(i));if(found!=null)return found;}}
+  return null;
+ }
+ @Test public void widthDialogCancelsAppliesPersistsAndResets(){
+  var page=new GlareSettingsSection();page.onFragmentCreate();page.createView(activity);
+  page.click(page.rowKeys().get("glareOutlineWidth"));
+  var dialog=org.robolectric.shadows.ShadowAlertDialog.getLatestAlertDialog();var bar=slider(dialog.getWindow().getDecorView());assertNotNull(bar);
+  assertEquals(5,bar.getProgress());bar.setProgress(25);assertEquals(10,AppearanceConfig.glassOutlineWidth());
+  dialog.getButton(android.content.DialogInterface.BUTTON_NEGATIVE).performClick();org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();assertEquals(10,AppearanceConfig.glassOutlineWidth());
+  page.click(page.rowKeys().get("glareOutlineWidth"));dialog=org.robolectric.shadows.ShadowAlertDialog.getLatestAlertDialog();slider(dialog.getWindow().getDecorView()).setProgress(25);
+  dialog.getButton(android.content.DialogInterface.BUTTON_POSITIVE).performClick();org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();assertEquals(30,AppearanceConfig.glassOutlineWidth());
+  assertEquals(30,tw.nekomimi.nekogram.NekoConfig.getPreferences().getInt("OEAppearanceGlassOutlineWidth",-1));
+  page.click(page.rowKeys().get("glareOutlineWidth"));dialog=org.robolectric.shadows.ShadowAlertDialog.getLatestAlertDialog();assertEquals(25,slider(dialog.getWindow().getDecorView()).getProgress());
+  dialog.getButton(android.content.DialogInterface.BUTTON_NEUTRAL).performClick();org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();assertEquals(10,AppearanceConfig.glassOutlineWidth());
+  assertEquals(0,AppearanceConfig.glassOutlineStyle());
+ }
+ @Test public void thicknessChangesBothExistingVisibleEffectsAndHiddenStillDrawsNothing(){
+  for(int effect:new int[]{GlareMode.DEFAULT,GlareMode.SOLID})for(boolean array:new boolean[]{false,true}){
+   AppearanceConfig.glassOutlineWidth.setConfigInt(5);var thin=stroke(effect,array,false);
+   AppearanceConfig.glassOutlineWidth.setConfigInt(30);var thick=stroke(effect,array,false);
+   assertTrue("thicker perimeter",pixels(thick)>pixels(thin));assertEquals(0,Color.alpha(thick.getPixel(50,30)));
+   thin.recycle();thick.recycle();
+  }
+  assertEquals(0,pixels(stroke(GlareMode.DISABLED,false,false)));
+ }
+ @Test public void adjustedDefaultRestoresBorrowedPaintAndShader(){
+  AppearanceConfig.glassOutlineStyle.setConfigInt(0);AppearanceConfig.glassOutlineWidth.setConfigInt(30);
+  Paint p=new Paint(3);p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(1);Shader shader=new LinearGradient(0,0,100,0,Color.RED,Color.BLUE,Shader.TileMode.CLAMP);p.setShader(shader);
+  Bitmap b=Bitmap.createBitmap(100,60,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(b);
+  for(int i=0;i<100;i++)BlurredBackgroundDrawable.drawStroke(c,10,10,90,50,15,1,true,p);
+  assertEquals(1,p.getStrokeWidth(),0);assertSame(shader,p.getShader());assertEquals(Paint.Style.STROKE,p.getStyle());b.recycle();
  }
  @Test public void originalWeakListenerDispatchesOnlyOnChange(){int[] calls={0};GlassOutlineStyle.Listener listener=()->calls[0]++;GlassOutlineStyle.addListener(listener);GlassOutlineStyle.addListener(listener);AppearanceConfig.glassOutlineStyle.setConfigInt(0);assertEquals(0,calls[0]);AppearanceConfig.glassOutlineStyle.setConfigInt(1);assertEquals(1,calls[0]);AppearanceConfig.glassOutlineStyle.setConfigInt(1);assertEquals(1,calls[0]);AppearanceConfig.glassOutlineStyle.setConfigInt(2);assertEquals(2,calls[0]);}
  Bitmap stroke(int mode,boolean array,boolean baseline){AppearanceConfig.glassOutlineStyle.setConfigInt(GlareMode.toStored(mode));Bitmap image=Bitmap.createBitmap(100,60,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(image);Paint p=new Paint(Paint.ANTI_ALIAS_FLAG);p.setColor(0xff8196ae);p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(1);float[]r={18,18,9,9,15,15,3,3};for(boolean top:new boolean[]{true,false}){if(baseline){if(array)BaselineStroke.drawStroke(c,10,10,90,50,r,1,top,p);else BaselineStroke.drawStroke(c,10,10,90,50,18,1,top,p);}else{if(array)BlurredBackgroundDrawable.drawStroke(c,10,10,90,50,r,1,top,p);else BlurredBackgroundDrawable.drawStroke(c,10,10,90,50,18,1,top,p);}}return image;}

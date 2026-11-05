@@ -43,7 +43,7 @@ def test_compact_popup_captures_once_before_show_and_does_not_create_a_second_cl
     chat=(JAVA/'org/telegram/ui/ChatActivity.java').read_text()
     assert 'if (!compactContext) updateScrimSourceBitmap();' in chat
     prep=method(chat,'private void prepareSignatureMenuScrim(')
-    assert prep.count('captureMessageMenuBlur(generation)')==1
+    assert prep.count('captureMessageMenuBlur(generation, true)')==1
     assert 'if (SharedConfig.chatBlurEnabled())' in prep
     assert 'new Animator' not in prep and 'ValueAnimator.of' not in prep
     show=chat[chat.index('Runnable showMenu = () -> {',chat.index('final MessageObject signatureSelectedMessage')):]

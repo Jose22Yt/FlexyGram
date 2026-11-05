@@ -21,7 +21,7 @@ def write(dest,root):
  J=root/'TMessagesProj/src/main/java'
  def emit(path,text):
   p=dest/path;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(text)
- for path in ['app/flexygram/effects/GlareMode.java','app/flexygram/effects/GlareSettingsSection.java','org/telegram/ui/Components/blur3/StaticOutlineStroke.java','org/telegram/ui/Components/blur3/GlassOutlineStyle.java','org/telegram/ui/Components/blur3/StrokeDrawable.java','tw/nekomimi/nekogram/config/ConfigItem.java']:
+ for path in ['app/flexygram/effects/GlareMode.java','app/flexygram/effects/GlareSettingsSection.java','org/telegram/ui/Components/blur3/StaticOutlineStroke.java','org/telegram/ui/Components/blur3/GlareStrokeWidth.java','org/telegram/ui/Components/blur3/GlassOutlineStyle.java','org/telegram/ui/Components/blur3/StrokeDrawable.java','tw/nekomimi/nekogram/config/ConfigItem.java']:
   emit(path,(J/path).read_text())
  emit('androidx/recyclerview/widget/RecyclerView.java','''package androidx.recyclerview.widget;
 public class RecyclerView extends android.view.ViewGroup {
@@ -30,14 +30,22 @@ public class RecyclerView extends android.view.ViewGroup {
  public abstract static class ViewHolder{public final android.view.View itemView;public ViewHolder(android.view.View v){itemView=v;}public int getItemViewType(){return 1;}}
  public abstract static class Adapter<T extends ViewHolder>{public abstract int getItemCount();public abstract T onCreateViewHolder(android.view.ViewGroup p,int t);public abstract void onBindViewHolder(T h,int p);public int getItemViewType(int p){return 0;}public void notifyDataSetChanged(){}public void notifyItemChanged(int p){}}
 }''')
- emit('org/telegram/messenger/R.java','package org.telegram.messenger;public class R{public static class string{}public static class drawable{public static final int settings3_sliders=android.R.drawable.ic_menu_preferences;}}')
+ emit('org/telegram/messenger/R.java','package org.telegram.messenger;public class R{public static class string{public static final int Done=android.R.string.ok,Cancel=android.R.string.cancel;}public static class drawable{public static final int settings3_sliders=android.R.drawable.ic_menu_preferences;}}')
  emit('org/telegram/messenger/ApplicationLoader.java','package org.telegram.messenger;public class ApplicationLoader{public static android.content.Context applicationContext;}')
  emit('org/telegram/messenger/FileLog.java','package org.telegram.messenger;public class FileLog{public static void e(Throwable e){}}')
  emit('org/telegram/messenger/AndroidUtilities.java','package org.telegram.messenger;public class AndroidUtilities{public static float dpf2(float v){return v;}public static int dp(float v){return (int)Math.ceil(v);}}')
  emit('tw/nekomimi/nekogram/NekoConfig.java','package tw.nekomimi.nekogram;public class NekoConfig{public static final Object sync=new Object();public static android.content.SharedPreferences getPreferences(){return org.telegram.messenger.ApplicationLoader.applicationContext.getSharedPreferences("glare-test",0);}}')
- emit('org/telegram/messenger/LocaleController.java','package org.telegram.messenger;public class LocaleController{public static String getString(int id){return switch(id){default->"";};}}')
- emit('org/telegram/ui/ActionBar/Theme.java','package org.telegram.ui.ActionBar;public class Theme{public static final int key_windowBackgroundWhite=1;public static int getColor(int key){return 0xffffffff;}public static int multAlpha(int c,float a){return(c&0xffffff)|((int)((c>>>24)*a)<<24);}}')
- emit('org/telegram/ui/ActionBar/BaseFragment.java','package org.telegram.ui.ActionBar;public class BaseFragment{public static android.app.Activity activity;public android.app.Activity getParentActivity(){return activity;}public void showDialog(android.app.Dialog d){}}')
+ emit('org/telegram/messenger/LocaleController.java','package org.telegram.messenger;public class LocaleController{public static String getString(int id){return switch(id){default->org.telegram.messenger.ApplicationLoader.applicationContext.getString(id);};}}')
+ emit('org/telegram/ui/ActionBar/Theme.java','package org.telegram.ui.ActionBar;public class Theme{public static final int key_windowBackgroundWhite=1,key_windowBackgroundWhiteBlackText=2,key_windowBackgroundWhiteBlueText=3;public static int getColor(int k,Object p){return getColor(k);}public static int getColor(int key){return 0xffffffff;}public static int multAlpha(int c,float a){return(c&0xffffff)|((int)((c>>>24)*a)<<24);}}')
+ emit('org/telegram/ui/ActionBar/BaseFragment.java','package org.telegram.ui.ActionBar;public class BaseFragment{public static android.app.Activity activity;public android.app.Activity getParentActivity(){return activity;}public void showDialog(android.app.Dialog d){d.show();}}')
+ emit('org/telegram/ui/ActionBar/AlertDialog.java','''package org.telegram.ui.ActionBar;public class AlertDialog{public static class Builder{
+ final android.app.AlertDialog.Builder b;public Builder(android.content.Context c,Object p){b=new android.app.AlertDialog.Builder(c);}
+ public Builder setTitle(String s){b.setTitle(s);return this;}public Builder setView(android.view.View v){b.setView(v);return this;}
+ public Builder setPositiveButton(String s,android.content.DialogInterface.OnClickListener l){b.setPositiveButton(s,l);return this;}
+ public Builder setNegativeButton(String s,android.content.DialogInterface.OnClickListener l){b.setNegativeButton(s,l);return this;}
+ public Builder setNeutralButton(String s,android.content.DialogInterface.OnClickListener l){b.setNeutralButton(s,l);return this;}
+ public android.app.AlertDialog create(){return b.create();}
+}}''')
  emit('tw/nekomimi/nekogram/ui/cells/HeaderCell.java','package tw.nekomimi.nekogram.ui.cells;public class HeaderCell extends android.widget.TextView{public HeaderCell(android.content.Context c){super(c);}}')
  emit('org/telegram/ui/Cells/TextSettingsCell.java','package org.telegram.ui.Cells;public class TextSettingsCell extends android.widget.TextView{public TextSettingsCell(android.content.Context c){super(c);}public void setTextAndValue(String s,String v,boolean d){setText(s+" · "+v);}}')
  emit('app/flexygram/settings/SignatureMatteSettingsActivity.java','''package app.flexygram.settings;
@@ -61,21 +69,21 @@ public abstract class SignatureMatteSettingsActivity extends org.telegram.ui.Act
 }''')
  emit('org/telegram/ui/Components/blur3/drawable/color/BlurredBackgroundColorProvider.java',(J/'org/telegram/ui/Components/blur3/drawable/color/BlurredBackgroundColorProvider.java').read_text())
  # Default provider divider is a native-theme host double.
- p=dest/'org/telegram/ui/ActionBar/Theme.java';p.write_text(p.read_text().replace('public static int getColor(', 'public static int getDividerColor(Object p){return 0xff888888;}public static int getColor('))
+ p=dest/'org/telegram/ui/ActionBar/Theme.java';p.write_text(p.read_text().replace('public static int getColor(', 'public static int getDividerColor(Object p){return 0xff888888;}public static int getColor(',1))
  # Link new production string IDs into the same real resource APK.
  dump=subprocess.check_output([str(Path(os.environ['SETTINGS2_SDK_ROOT'])/'build-tools/36.0.0/aapt2'),'dump','resources',str(dest.parents[2]/'resources.ap_')],text=True)
  ids={m[2]:int(m[1],16)for m in re.finditer(r'resource (0x[0-9a-f]+) (?:[^: ]+:)?string/(FlexyGlare\w+)',dump)}
  p=dest/'org/telegram/messenger/R.java';s=p.read_text().replace('public static class string{','public static class string{'+''.join('public static final int '+n+'='+str(v)+';'for n,v in ids.items()));p.write_text(s)
  p=dest/'org/telegram/messenger/LocaleController.java';s=p.read_text();texts={x.get('name'):x.text for x in E.parse(root/'TMessagesProj/src/main/res/values-es/flexy_glare.xml').getroot()};s=s.replace('return switch(id){','return switch(id){'+''.join('case '+str(v)+'->'+json.dumps(texts[n])+';'for n,v in ids.items()));p.write_text(s)
  # Same original key and changed-only dispatch shape, backed by the original Java ConfigItem.
- emit('app/exteraless/appearance/AppearanceConfig.java','''package app.exteraless.appearance;import tw.nekomimi.nekogram.config.ConfigItem;public class AppearanceConfig{public static final ConfigItem glassOutlineStyle=new ConfigItem("OEAppearanceGlassOutlineStyle",ConfigItem.configTypeInt,0){public void setConfigInt(int v){boolean change=Int()!=v;super.setConfigInt(v);if(change)org.telegram.ui.Components.blur3.GlassOutlineStyle.dispatchChange();}};public static int glassOutlineStyle(){return glassOutlineStyle.Int();}}''')
+ emit('app/exteraless/appearance/AppearanceConfig.java','''package app.exteraless.appearance;import tw.nekomimi.nekogram.config.ConfigItem;public class AppearanceConfig{public static final ConfigItem glassOutlineStyle=new ConfigItem("OEAppearanceGlassOutlineStyle",ConfigItem.configTypeInt,0){public void setConfigInt(int v){boolean change=Int()!=v;super.setConfigInt(v);if(change)org.telegram.ui.Components.blur3.GlassOutlineStyle.dispatchChange();}};public static int glassOutlineStyle(){return glassOutlineStyle.Int();}public static final ConfigItem glassOutlineWidth=new ConfigItem("OEAppearanceGlassOutlineWidth",ConfigItem.configTypeInt,10){public void setConfigInt(int v){v=Math.max(5,Math.min(30,v));boolean c=Int()!=v;super.setConfigInt(v);if(c)org.telegram.ui.Components.blur3.GlassOutlineStyle.dispatchChange();}};public static int glassOutlineWidth(){return Math.max(5,Math.min(30,glassOutlineWidth.Int()));}}''')
  emit('org/telegram/ui/Components/AlertsCreator.java','''package org.telegram.ui.Components;public class AlertsCreator{public static int selected;public static String[] options;public static android.content.DialogInterface.OnClickListener listener;public static android.app.Dialog createSingleChoiceDialog(android.app.Activity c,String[] values,String title,int checked,android.content.DialogInterface.OnClickListener l){selected=checked;options=values;listener=l;return new android.app.Dialog(c);}}''')
  # Extract all three EXISTING public static draw overloads verbatim from production.
  body=(J/'org/telegram/ui/Components/blur3/drawable/BlurredBackgroundDrawable.java').read_text()
- anchors=['public static void drawStroke(\n','public static void drawStroke(Canvas canvas, RectF rect,','public static void drawStroke(Canvas canvas, float left, float top, float right, float bottom,']
+ anchors=['public static void drawStroke(Canvas canvas, float left, float top, float right, float bottom, float radii,','public static void drawStroke(Canvas canvas, float left, float top, float right, float bottom, float[] radii,','public static void drawStroke(Canvas canvas, RectF rect,','protected static void drawStrokeRaw(\n','protected static void drawStrokeRaw(Canvas canvas, float left, float top, float right, float bottom,']
  methods='\n'.join(method(body,a)for a in anchors)
  emit('org/telegram/ui/Components/blur3/drawable/BlurredBackgroundDrawable.java','package org.telegram.ui.Components.blur3.drawable;import android.graphics.*;import androidx.core.math.MathUtils;import org.telegram.ui.Components.blur3.GlassOutlineStyle;public class BlurredBackgroundDrawable{'+methods+'}')
 
  # Historical static implementation for pixel-identical default-mode regression.
  baseline=subprocess.check_output(['git','show','4679f74ebd312acc4968dd2e044a6c6b7478445a:TMessagesProj/src/main/java/org/telegram/ui/Components/blur3/drawable/BlurredBackgroundDrawable.java'],cwd=root,text=True)
- emit('org/telegram/ui/Components/blur3/drawable/BaselineStroke.java','package org.telegram.ui.Components.blur3.drawable;import android.graphics.*;import androidx.core.math.MathUtils;import org.telegram.ui.Components.blur3.GlassOutlineStyle;public class BaselineStroke{'+ '\n'.join(method(baseline,a)for a in anchors)+'}')
+ emit('org/telegram/ui/Components/blur3/drawable/BaselineStroke.java','package org.telegram.ui.Components.blur3.drawable;import android.graphics.*;import androidx.core.math.MathUtils;import org.telegram.ui.Components.blur3.GlassOutlineStyle;public class BaselineStroke{'+ '\n'.join(method(baseline,a)for a in ['public static void drawStroke(\n','public static void drawStroke(Canvas canvas, RectF rect,','public static void drawStroke(Canvas canvas, float left, float top, float right, float bottom,'])+'}')

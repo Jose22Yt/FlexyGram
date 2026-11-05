@@ -141,7 +141,7 @@ public final class SignatureSettingsRegistry {
         if(key!=null){
             BaseFragment extra=SignatureLegacyExtras.forKey(key);if(extra!=null)return Settings3Registry.open(SignatureLegacyExtras.categoryForKey(key));
             switch(key){
-                case "flexy_quick_member_lens":case "glassOutline":case "glareEffects":return Settings3Registry.open("chat");
+                case "flexy_quick_member_lens":case "glareOutlineWidth":case "glassOutline":case "glareEffects":return Settings3Registry.open("chat");
                 case "iconPacks":return open("icon_packs");case "emojiSets":case "EmojiSets":return open("emoji");
                 case "bottomTabs":return open("bottom_tabs");case "appNavigation":return open("app_navigation");
                 case "pillStack":return open("pillstack");case "hiding":return open("visible");case "translator":return open("translator");

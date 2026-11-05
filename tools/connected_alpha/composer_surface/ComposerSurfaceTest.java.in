@@ -39,6 +39,17 @@ public class ComposerSurfaceTest {
             assertTrue("resolved ink contrast",androidx.core.graphics.ColorUtils.calculateContrast(colors.ink,pixel)>=4.5);
         }
     }
+    @Test public void inputWashDoesNotHideTheNativeBackdrop() {
+        for(int theme:new int[]{Color.WHITE,0xff303236}){
+            int[] values=new int[2];int i=0;
+            for(int backdrop:new int[]{Color.BLACK,Color.WHITE}){
+                SurfaceProbe p=new SurfaceProbe();p.flexyComposer.color=theme;p.emptySource=true;
+                Bitmap b=Bitmap.createBitmap(284,44,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(b);c.drawColor(backdrop);p.draw(c);
+                values[i++]=Color.red(b.getPixel(140,22));b.recycle();
+            }
+            assertTrue("light native overlay preserves backdrop variation",Math.abs(values[0]-values[1])>=180);
+        }
+    }
     @Test public void sourceChangesCannotLeavePillOrButtonsTransparent() {
         for(int theme:new int[]{Color.WHITE,0xff303236})
             for(int wallpaper:new int[]{0xffffb43b,Color.WHITE,Color.BLACK}) {

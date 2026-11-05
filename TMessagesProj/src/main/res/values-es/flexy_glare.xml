@@ -5,4 +5,6 @@
   <string name="FlexyGlareDisabled">Desactivar</string>
   <string name="FlexyGlareDefault">Por defecto</string>
   <string name="FlexyGlareSolid">Contorno sólido</string>
+  <string name="FlexyGlareWidth">Grosor del borde</string>
+  <string name="FlexyGlareReset">Restablecer</string>
 </resources>

@@ -5,4 +5,6 @@
   <string name="FlexyGlareDisabled">Выключить</string>
   <string name="FlexyGlareDefault">По умолчанию</string>
   <string name="FlexyGlareSolid">Сплошной контур</string>
+  <string name="FlexyGlareWidth">Толщина контура</string>
+  <string name="FlexyGlareReset">Сбросить</string>
 </resources>

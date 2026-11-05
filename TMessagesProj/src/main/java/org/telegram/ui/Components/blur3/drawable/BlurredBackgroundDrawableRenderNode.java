@@ -178,12 +178,12 @@ public class BlurredBackgroundDrawableRenderNode extends BlurredBackgroundDrawab
         }
         if (!boundProps.useFullStroke) {
             if (strokeColorTop != 0) {
-                drawStroke(c, 0, 0, boundProps.boundsWithPadding.width(),
+                drawStrokeRaw(c, 0, 0, boundProps.boundsWithPadding.width(),
                         boundProps.boundsWithPadding.height(), boundProps.radii,
                         boundProps.strokeWidthTop, true, paintStrokeTop);
             }
             if (strokeColorBottom != 0) {
-                drawStroke(c, 0, 0, boundProps.boundsWithPadding.width(),
+                drawStrokeRaw(c, 0, 0, boundProps.boundsWithPadding.width(),
                         boundProps.boundsWithPadding.height(), boundProps.radii,
                         boundProps.strokeWidthBottom, false, paintStrokeBottom);
             }

@@ -6109,6 +6109,12 @@ public class AndroidUtilities {
     }
 
     public static void makeGlobalBlurBitmap(Utilities.Callback<Bitmap> onBitmapDone, float downscale, int amount, View forView, List<View> exclude) {
+        makeGlobalBlurBitmap(onBitmapDone, downscale, amount, forView, exclude, false);
+    }
+
+    /** View drawing stays on UI. With asyncBlur, pixel blur and its callback run on
+     * the existing theme worker; the caller must publish view changes on UI. */
+    public static void makeGlobalBlurBitmap(Utilities.Callback<Bitmap> onBitmapDone, float downscale, int amount, View forView, List<View> exclude, boolean asyncBlur) {
         if (onBitmapDone == null) {
             return;
         }
@@ -6166,10 +6172,21 @@ public class AndroidUtilities {
                 }
                 canvas.restore();
             }
-            Utilities.stackBlurBitmap(bitmap, Math.max(amount, Math.max(w, h) / 180));
-//            AndroidUtilities.runOnUIThread(() -> {
+            final int radius = Math.max(amount, Math.max(w, h) / 180);
+            if (asyncBlur) {
+                Utilities.themeQueue.postRunnable(() -> {
+                    try {
+                        Utilities.stackBlurBitmap(bitmap, radius);
+                        onBitmapDone.run(bitmap);
+                    } catch (Exception error) {
+                        FileLog.e(error);bitmap.recycle();
+                        onBitmapDone.run(null);
+                    }
+                });
+            } else {
+                Utilities.stackBlurBitmap(bitmap, radius);
                 onBitmapDone.run(bitmap);
-//            });
+            }
         } catch (Exception e) {
             FileLog.e(e);
 //            AndroidUtilities.runOnUIThread(() -> {

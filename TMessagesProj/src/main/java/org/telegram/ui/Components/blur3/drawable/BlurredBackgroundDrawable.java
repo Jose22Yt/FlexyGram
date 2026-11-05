@@ -46,8 +46,8 @@ import java.util.Arrays;
 
 public abstract class BlurredBackgroundDrawable extends Drawable implements GlassOutlineStyle.Listener {
     public BlurredBackgroundDrawable() {
-        boundProps.strokeWidthTop = dpf2(1);
-        boundProps.strokeWidthBottom = dpf2(2 / 3f);
+        baseStrokeWidthTop = boundProps.strokeWidthTop = dpf2(1);
+        baseStrokeWidthBottom = boundProps.strokeWidthBottom = dpf2(2 / 3f);
         // Сплошной контур в пикселях, не в dp
         boundProps.strokeWidthFull = 1.0f;
 
@@ -248,10 +248,11 @@ public abstract class BlurredBackgroundDrawable extends Drawable implements Glas
         final GlassOutlineStyle outlineStyle = GlassOutlineStyle.current();
         final boolean glare = outlineStyle == GlassOutlineStyle.GLARE;
         final boolean solid = outlineStyle == GlassOutlineStyle.SOLID;
+        applyOutlineWidth();
 
         if (boundProps.useFullStroke != solid) {
             boundProps.useFullStroke = solid;
-            boundProps.build();
+            boundProps.build();onBoundPropsChanged();
         }
 
         backgroundColor = colorProvider.getBackgroundColor();
@@ -481,7 +482,31 @@ public abstract class BlurredBackgroundDrawable extends Drawable implements Glas
 
 
 
-    public static void drawStroke(
+    public static void drawStroke(Canvas canvas, float left, float top, float right, float bottom, float radii, float strokeWidth, boolean isTop, Paint paint) {
+        float factor = org.telegram.ui.Components.blur3.GlareStrokeWidth.factor();
+        if (factor == 1f || GlassOutlineStyle.current() != GlassOutlineStyle.GLARE) {
+            drawStrokeRaw(canvas,left,top,right,bottom,radii,strokeWidth,isTop,paint);return;
+        }
+        float previousWidth = paint.getStrokeWidth();
+        try {
+            paint.setStrokeWidth(previousWidth * factor);
+            drawStrokeRaw(canvas,left,top,right,bottom,radii,strokeWidth*factor,isTop,paint);
+        } finally { paint.setStrokeWidth(previousWidth); }
+    }
+
+    public static void drawStroke(Canvas canvas, float left, float top, float right, float bottom, float[] radii, float strokeWidth, boolean isTop, Paint paint) {
+        float factor = org.telegram.ui.Components.blur3.GlareStrokeWidth.factor();
+        if (factor == 1f || GlassOutlineStyle.current() != GlassOutlineStyle.GLARE) {
+            drawStrokeRaw(canvas,left,top,right,bottom,radii,strokeWidth,isTop,paint);return;
+        }
+        float previousWidth = paint.getStrokeWidth();
+        try {
+            paint.setStrokeWidth(previousWidth * factor);
+            drawStrokeRaw(canvas,left,top,right,bottom,radii,strokeWidth*factor,isTop,paint);
+        } finally { paint.setStrokeWidth(previousWidth); }
+    }
+
+    protected static void drawStrokeRaw(
         Canvas canvas,
         float left, float top, float right, float bottom,
         float[] radii, float strokeWidth, boolean isTop,
@@ -587,7 +612,7 @@ public abstract class BlurredBackgroundDrawable extends Drawable implements Glas
         drawStroke(canvas, rect.left, rect.top, rect.right, rect.bottom, radii, strokeWidth, isTop, paint);
     }
 
-    public static void drawStroke(Canvas canvas, float left, float top, float right, float bottom,
+    protected static void drawStrokeRaw(Canvas canvas, float left, float top, float right, float bottom,
                                      float radii, float strokeWidth, boolean isTop, Paint paint) {
         if (org.telegram.ui.Components.blur3.StaticOutlineStroke.drawOverride(canvas,left,top,right,bottom,radii,isTop,paint,GlassOutlineStyle.current())) return;
         final float strokeHalf = strokeWidth / 2f;
@@ -639,9 +664,18 @@ public abstract class BlurredBackgroundDrawable extends Drawable implements Glas
         shadowAlpha = alpha;
     }
 
+    private float baseStrokeWidthTop, baseStrokeWidthBottom;
     public void setStrokeWidth(float strokeWidthTop, float strokeWidthBottom) {
-        boundProps.strokeWidthTop = strokeWidthTop;
-        boundProps.strokeWidthBottom = strokeWidthBottom;
+        baseStrokeWidthTop = strokeWidthTop;
+        baseStrokeWidthBottom = strokeWidthBottom;
+        applyOutlineWidth();
+    }
+    private void applyOutlineWidth() {
+        float factor = org.telegram.ui.Components.blur3.GlareStrokeWidth.factor();
+        float top = baseStrokeWidthTop * factor, bottom = baseStrokeWidthBottom * factor;
+        if (boundProps.strokeWidthTop == top && boundProps.strokeWidthBottom == bottom && boundProps.strokeWidthFull == factor) return;
+        boundProps.strokeWidthTop = top;boundProps.strokeWidthBottom = bottom;boundProps.strokeWidthFull = factor;
+        boundProps.build();onBoundPropsChanged();
     }
 
 

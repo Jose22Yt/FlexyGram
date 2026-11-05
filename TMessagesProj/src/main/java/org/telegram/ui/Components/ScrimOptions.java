@@ -347,24 +347,46 @@ public class ScrimOptions extends Dialog {
     }
 
     public static void makeGlobalBlurBitmaps(Utilities.Callback2<Bitmap, Bitmap> bitmaps) {
+        makeGlobalBlurBitmaps(bitmaps, false);
+    }
+
+    /** One capture; optional blur and color transforms off UI, publication always on UI. */
+    public static void makeGlobalBlurBitmaps(Utilities.Callback2<Bitmap, Bitmap> bitmaps, boolean async) {
+        final boolean dark = Theme.isCurrentThemeDark();
         AndroidUtilities.makeGlobalBlurBitmap(bitmap -> {
-            final ColorMatrix colorMatrixBg = new ColorMatrix();
-            AndroidUtilities.adjustSaturationColorMatrix(colorMatrixBg, Theme.isCurrentThemeDark() ? .04f : +.25f);
-            AndroidUtilities.adjustBrightnessColorMatrix(colorMatrixBg, Theme.isCurrentThemeDark() ? -.04f : -.07f);
-            final Bitmap bitmapBg = AndroidUtilities.applyColorMatrix(bitmap, colorMatrixBg);
-            bitmapBg.setHasAlpha(false);
-
-            final ColorMatrix colorMatrixOptions = new ColorMatrix();
-            colorMatrixOptions.setSaturation(Theme.isCurrentThemeDark() ? 2 : 3);
-            if (!Theme.isCurrentThemeDark()) {
-                AndroidUtilities.adjustBrightnessColorMatrix(colorMatrixOptions, Theme.isCurrentThemeDark() ? -.2f : -.07f);
+            if (bitmap == null) {
+                if (async) AndroidUtilities.runOnUIThread(() -> bitmaps.run(null, null));
+                else bitmaps.run(null, null);
+                return;
             }
-            final Bitmap bitmapOptions = AndroidUtilities.applyColorMatrix(bitmap, colorMatrixOptions);
-            bitmapOptions.setHasAlpha(false);
-
-            bitmap.recycle();
-            bitmaps.run(bitmapBg, bitmapOptions);
-        }, 15);
+            Runnable process = () -> {
+                Bitmap background = null, options = null;
+                try {
+                    ColorMatrix backgroundMatrix = new ColorMatrix();
+                    AndroidUtilities.adjustSaturationColorMatrix(backgroundMatrix, dark ? .04f : .25f);
+                    AndroidUtilities.adjustBrightnessColorMatrix(backgroundMatrix, dark ? -.04f : -.07f);
+                    background = AndroidUtilities.applyColorMatrix(bitmap, backgroundMatrix);
+                    background.setHasAlpha(false);
+                    ColorMatrix optionsMatrix = new ColorMatrix();
+                    optionsMatrix.setSaturation(dark ? 2 : 3);
+                    if (!dark) AndroidUtilities.adjustBrightnessColorMatrix(optionsMatrix, -.07f);
+                    options = AndroidUtilities.applyColorMatrix(bitmap, optionsMatrix);
+                    options.setHasAlpha(false);
+                } catch (Exception error) {
+                    org.telegram.messenger.FileLog.e(error);
+                    if (background != null) background.recycle();
+                    if (options != null) options.recycle();
+                    if (async) AndroidUtilities.runOnUIThread(() -> bitmaps.run(null, null));
+                    else bitmaps.run(null, null);
+                    return;
+                } finally { bitmap.recycle(); }
+                final Bitmap readyBackground = background, readyOptions = options;
+                if (async) AndroidUtilities.runOnUIThread(() -> bitmaps.run(readyBackground, readyOptions));
+                else bitmaps.run(readyBackground, readyOptions);
+            };
+            // Async blur invokes this callback on the pixel worker already.
+            process.run();
+        }, 15, 15, null, null, async);
     }
 
     public static void makeGlobalBlurBitmaps(View cutToContainer, Utilities.Callback2<Bitmap, Bitmap> bitmaps) {

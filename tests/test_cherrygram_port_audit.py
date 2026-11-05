@@ -117,12 +117,13 @@ def test_theme_refreshes_retained_tabs_and_original_glare_key_is_preserved():
     filters=src('org/telegram/ui/Components/FilterTabsView.java')
     update=filters[filters.index('    public void updateColors()'):filters.index('    protected void onMeasure',filters.index('    public void updateColors()'))]
     assert 'selectorDrawable.setColor' in update and 'Theme.getColor(selectorColorKey, resourcesProvider)' in update
-    for path in ['TMessagesProj/src/main/kotlin/app/exteraless/appearance/AppearanceConfig.kt','TMessagesProj/src/main/java/app/flexygram/effects/GlareMode.java','TMessagesProj/src/main/java/org/telegram/ui/Components/blur3/StaticOutlineStroke.java']:
+    for path in ['TMessagesProj/src/main/kotlin/app/exteraless/appearance/AppearanceConfig.kt','TMessagesProj/src/main/java/app/flexygram/effects/GlareMode.java']:
         current=(ROOT/path).read_bytes()
         if path.endswith('AppearanceConfig.kt'):
             getter=b'\n    /** Native metadata only; account/session preferences are not part of this catalog. */\n    fun getStudioItems(): List<ConfigItem> = configs.toList()\n'
             assert current.count(getter)==1
-            current=current.replace(getter,b'')
+            from test_glare_effects import without_width_extension
+            current=without_width_extension(current.replace(getter,b'').decode()).encode()
         assert current==subprocess.check_output(['git','show','bf96667efac14d0cbbf6677471890a366c3ef3c0:'+path],cwd=ROOT)
 
 def test_transformed_reaction_preview_does_not_use_source_row_clip():

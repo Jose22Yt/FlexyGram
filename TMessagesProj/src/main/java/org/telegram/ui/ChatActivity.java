@@ -11926,12 +11926,13 @@ public class ChatActivity extends BaseFragment implements
     private int scrimBlurGeneration;
 
     /** One shared capture, before the popup is visible; discard stale owners. */
-    private void captureMessageMenuBlur(int blurGeneration) {
+    private void captureMessageMenuBlur(int blurGeneration, boolean async) {
         ScrimOptions.makeGlobalBlurBitmaps((bitmapBg, bitmapOptions) -> {
-            if (blurGeneration != scrimBlurGeneration || fragmentView == null
+            if (bitmapBg == null || bitmapOptions == null || blurGeneration != scrimBlurGeneration
+                    || async && (!selectedBubbleMotion.hasOwner() || selectedBubbleMotion.isClosing()) || fragmentView == null
                     || !fragmentView.isAttachedToWindow() || scrimView == null) {
-                bitmapBg.recycle();
-                bitmapOptions.recycle();
+                if (bitmapBg != null) bitmapBg.recycle();
+                if (bitmapOptions != null) bitmapOptions.recycle();
                 return;
             }
             if (scrimBlurBitmap != null) scrimBlurBitmap.recycle();
@@ -11942,7 +11943,9 @@ public class ChatActivity extends BaseFragment implements
             scrimBlur3SourceBitmap.setBitmap(bitmapOptions);
             Blur3Utils.checkBitmapSourceMatrixScale(scrimBlur3SourceBitmap, fragmentView);
             scrimBlur3Factory.invalidateAllLinkedViews();
-        });
+            if (async) selectedBubbleMotion.backdropReady();
+            if (contentView != null) contentView.invalidate();
+        }, async);
     }
 
     /** Compact menus use SelectedBubbleMotion as their sole animation clock. */
@@ -11966,7 +11969,7 @@ public class ChatActivity extends BaseFragment implements
             scrimBlurBitmapShader = null;scrimBlurBitmapPaint = null;
             scrimBlurBitmap.recycle();scrimBlurBitmap = null;
         }
-        if (SharedConfig.chatBlurEnabled()) captureMessageMenuBlur(generation);
+        if (SharedConfig.chatBlurEnabled()) captureMessageMenuBlur(generation, true);
     }
 
     private void dimBehindView(float value, boolean blur, boolean hidePagedownButtons) {
@@ -11999,7 +12002,7 @@ public class ChatActivity extends BaseFragment implements
             animators.add(scrimPaintAlphaAnimator = ValueAnimator.ofFloat(0, value));
 
             if (blur) {
-                captureMessageMenuBlur(blurGeneration);
+                captureMessageMenuBlur(blurGeneration, false);
             }
         } else {
             scrimViewProgress = scrimPaintAlpha / max;
@@ -19370,6 +19373,10 @@ public class ChatActivity extends BaseFragment implements
                             && chatInputViewsContainer.getInputBubbleHeight() > 0);
             canvas.clipRect(0, 0, getMeasuredWidth(), messageScrimBottom);
             if (scrimViewReaction == null || scrimView == null) {
+                if (selectedBubbleMotionMessage != null) {
+                    scrimPaint.setAlpha((int) (255 * scrimPaintAlpha));
+                    canvas.drawRect(0, 0, getMeasuredWidth(), getMeasuredHeight(), scrimPaint);
+                }
                 if (scrimBlurBitmapPaint != null) {
                     scrimBlurMatrix.reset();
                     final float s = (float) getMeasuredWidth() / scrimBlurBitmap.getWidth();
@@ -19379,7 +19386,7 @@ public class ChatActivity extends BaseFragment implements
                     if (scrimBlurBitmapPaint.getAlpha() > 0) {
                         canvas.drawRect(0, 0, getMeasuredWidth(), getMeasuredHeight(), scrimBlurBitmapPaint);
                     }
-                } else {
+                } else if (selectedBubbleMotionMessage == null) {
                     scrimPaint.setAlpha((int) (0xFF * scrimPaintAlpha * (scrimView != null ? scrimViewAlpha : 1f)));
                     if (scrimPaint.getAlpha() > 0) {
                         canvas.drawRect(0, 0, getMeasuredWidth(), getMeasuredHeight(), scrimPaint);
@@ -35229,7 +35236,7 @@ public class ChatActivity extends BaseFragment implements
                         float phase=selectedBubbleMotion.panelProgress();
                         float alpha=Math.max(0f,Math.min(1f,phase));
                         scrimPaintAlpha = .2f * alpha;
-                        scrimViewProgress = alpha;
+                        scrimViewProgress = alpha * selectedBubbleMotion.backdropProgress();
                         if (sideControlsButtonsLayout != null) sideControlsButtonsLayout.setAlpha(1f-alpha);
                         popupLayout.setPivotY(0f);
                         popupLayout.setPivotX(signatureSelectedMessage.isOutOwner() ? popupLayout.getMeasuredWidth() : 0f);
