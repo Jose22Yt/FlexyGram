@@ -21,6 +21,10 @@ import org.telegram.ui.ActionBar.Theme;
 public final class BubbleActionPanelView extends LinearLayout {
     public enum Action { REPLY, COPY, STICKER, FORWARD, EDIT, PIN, DELETE, SELECT, SAVE, SHARE, LINK, MORE }
     public interface Listener { void onAction(Action action); }
+    public interface SurfaceFactory { android.graphics.drawable.Drawable create(View view, float radius); }
+    private SurfaceFactory surfaceFactory;
+    /** Set before actions are built. All cards share the chat popup capture. */
+    public void setSurfaceFactory(SurfaceFactory factory) { surfaceFactory = factory; }
     private Listener listener;
     private EnumSet<Action> allowed = EnumSet.noneOf(Action.class);
     private final EnumSet<Action> chosen;
@@ -55,6 +59,7 @@ public final class BubbleActionPanelView extends LinearLayout {
     public void setAllowedActions(EnumSet<Action> actions) {
         allowed=BubbleMenuConfig.visible(actions==null?EnumSet.noneOf(Action.class):actions,chosen);
         allowed.add(Action.MORE);removeAllViews();
+        if (style == BubbleMenuConfig.LIST) setBackground(surface(this, false));
         if(style==BubbleMenuConfig.GRID){
             LinearLayout grid=card(false);ArrayList<Action> items=new ArrayList<>(allowed);items.remove(Action.MORE);
             for(int i=0;i<items.size();i+=3){
@@ -87,9 +92,13 @@ public final class BubbleActionPanelView extends LinearLayout {
     }
     private LinearLayout card(boolean translucent){
         LinearLayout card=new LinearLayout(getContext());card.setOrientation(VERTICAL);
+        card.setBackground(surface(card, translucent));card.setClipToOutline(true);return card;
+    }
+    private android.graphics.drawable.Drawable surface(View view, boolean translucent) {
+        if (surfaceFactory != null) return surfaceFactory.create(view, dp(getContext(), 20));
         GradientDrawable fill=new GradientDrawable();fill.setColor(translucent?(surface&0xffffff)|0xe6000000:surface);fill.setCornerRadius(dp(getContext(),20));
         if(translucent)fill.setStroke(dp(getContext(),1),(textColor&0xffffff)|0x18000000);
-        card.setBackground(fill);card.setClipToOutline(true);return card;
+        return fill;
     }
     private void addCard(LinearLayout card,boolean gap){LayoutParams lp=new LayoutParams(-1,-2);if(gap)lp.topMargin=dp(getContext(),8);addView(card,lp);}
     private void group(EnumSet<Action> members){

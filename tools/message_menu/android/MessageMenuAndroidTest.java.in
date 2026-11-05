@@ -11,6 +11,39 @@ public class MessageMenuAndroidTest {
  void layout(View view,int width){view.measure(View.MeasureSpec.makeMeasureSpec(dp(width),View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(0,View.MeasureSpec.UNSPECIFIED));view.layout(0,0,view.getMeasuredWidth(),view.getMeasuredHeight());}
  List<View> actions(View view){List<View> result=new ArrayList<>();if(view.getTag() instanceof Action)result.add(view);if(view instanceof ViewGroup){ViewGroup g=(ViewGroup)view;for(int i=0;i<g.getChildCount();i++)result.addAll(actions(g.getChildAt(i)));}return result;}
  BubbleActionPanelView panel(int style,EnumSet<Action> permitted,EnumSet<Action> chosen){var panel=new BubbleActionPanelView(activity,null,style,chosen);panel.setAllowedActions(permitted);layout(panel,260);return panel;}
+ @Test public void everyMenuStyleUsesSharedBackdropAndCanReturnToSolid() {
+  for(int style=0;style<4;style++){
+   var panel=new BubbleActionPanelView(activity,null,style,BubbleMenuConfig.defaults());
+   List<View> surfaces=new ArrayList<>();
+   panel.setSurfaceFactory((view,radius)->{surfaces.add(view);return new android.graphics.drawable.ColorDrawable(0x80304050);});
+   panel.setAllowedActions(EnumSet.allOf(Action.class));layout(panel,260);
+   assertEquals(new int[]{1,2,3,2}[style],surfaces.size());
+   for(View view:surfaces)assertEquals(0x80304050,((android.graphics.drawable.ColorDrawable)view.getBackground()).getColor());
+   int[] samples=new int[2];int i=0;
+   for(int under:new int[]{Color.RED,Color.BLUE}){
+    Bitmap b=Bitmap.createBitmap(panel.getWidth(),panel.getHeight(),Bitmap.Config.ARGB_8888);
+    Canvas c=new Canvas(b);c.drawColor(under);panel.draw(c);samples[i++]=b.getPixel(dp(1),dp(20));b.recycle();
+   }
+   assertNotEquals("no opaque card hides the backdrop",samples[0],samples[1]);
+   panel.setSurfaceFactory(null);panel.setAllowedActions(EnumSet.allOf(Action.class));layout(panel,260);
+   View first=style==0?panel:((ViewGroup)panel).getChildAt(0);
+   assertTrue(first.getBackground() instanceof android.graphics.drawable.GradientDrawable);
+   assertEquals(7,actions(panel).size());
+  }
+ }
+ @Test public void messageScrimCannotReplaceLiveInputWithCapturedWallpaper() {
+  for(float top:new float[]{0,44,80,140})for(boolean visible:new boolean[]{false,true}){
+   Bitmap b=Bitmap.createBitmap(100,120,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(b);
+   c.drawColor(Color.BLUE);Paint p=new Paint();p.setColor(Color.YELLOW);
+   int save=c.save();c.clipRect(0,0,100,ContextPreviewPlacement.scrimBottom(120,top,true,visible));
+   c.drawRect(0,0,100,120,p);c.restoreToCount(save);
+   int expected=visible&&top<=119?Color.BLUE:Color.YELLOW;
+   assertEquals(expected,b.getPixel(50,119));
+   if(top>0)assertEquals(Color.YELLOW,b.getPixel(50,0));
+   assertEquals(120,ContextPreviewPlacement.scrimBottom(120,top,false,visible),0);
+   assertEquals(1,c.getSaveCount());b.recycle();
+  }
+ }
  @Test public void choicesPersistAndNeverGrantUnavailableActions(){
   for(int style=0;style<4;style++){BubbleMenuConfig.layout(activity,style);assertEquals(style,BubbleMenuConfig.layout(activity));assertTrue(BubbleInteractionSettings.signaturePanel(activity));}
   BubbleMenuConfig.actions(activity,EnumSet.of(Action.COPY,Action.SAVE));assertEquals(EnumSet.of(Action.COPY,Action.SAVE),BubbleMenuConfig.actions(activity));

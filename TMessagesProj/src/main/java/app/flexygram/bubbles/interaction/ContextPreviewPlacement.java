@@ -3,6 +3,11 @@ package app.flexygram.bubbles.interaction;
 
 /** Window-coordinate placement, independent of density, keyboard and message type. */
 public final class ContextPreviewPlacement {
+    /** Keep a message scrim above the live input, including keyboard/position changes. */
+    public static float scrimBottom(float height, float inputTop, boolean messageSelected, boolean inputVisible) {
+        return messageSelected && inputVisible ? Math.max(0, Math.min(height, inputTop)) : height;
+    }
+
     public final float scale, offsetY, scrollRange;
     public final int popupY, gapHeight;
     private ContextPreviewPlacement(float scale, float offsetY, float range, int y, int gap) {

@@ -19331,6 +19331,15 @@ public class ChatActivity extends BaseFragment implements
                     canvas.restore();
                 }
             }
+            // A captured scrim can omit native glass input surfaces. Never paint that
+            // snapshot over the live composer while a message menu opens/closes.
+            final int messageScrimSave = canvas.save();
+            final float messageScrimBottom = app.flexygram.bubbles.interaction.ContextPreviewPlacement.scrimBottom(
+                    getMeasuredHeight(), chatInputViewsContainer.getY() + chatInputViewsContainer.getInputBubbleTop(),
+                    scrimView instanceof ChatMessageCell,
+                    chatInputViewsContainer.getVisibility() == VISIBLE && chatActivityEnterView.getVisibility() == VISIBLE
+                            && chatInputViewsContainer.getInputBubbleHeight() > 0);
+            canvas.clipRect(0, 0, getMeasuredWidth(), messageScrimBottom);
             if (scrimViewReaction == null || scrimView == null) {
                 if (scrimBlurBitmapPaint != null) {
                     scrimBlurMatrix.reset();
@@ -19729,6 +19738,8 @@ public class ChatActivity extends BaseFragment implements
                     }
                 }
             }
+
+            canvas.restoreToCount(messageScrimSave);
 
             if (scrimView != null || messageEnterTransitionContainer.isRunning()) {
                 if (mentionContainer == null || mentionContainer.getVisibility() != View.VISIBLE) {
@@ -34570,12 +34581,17 @@ public class ChatActivity extends BaseFragment implements
                 final MessageObject panelMessage=selectedObject;
                 final ChatMessageCell panelCell=(ChatMessageCell)v;
                 final var panel=new app.flexygram.bubbles.interaction.BubbleActionPanelView(getParentActivity(),themeDelegate);
+                final boolean menuBlur = BlurredBackgroundProviderImpl.checkBlurEnabled(currentAccount, themeDelegate);
+                if (menuBlur) panel.setSurfaceFactory((target, radius) -> scrimBlur3Factory.create(target, true)
+                        .setColorProvider(BlurredBackgroundProviderImpl.messageMenuBackground(themeDelegate))
+                        .setRadius(radius));
                 final var admitted=signatureContextActions(options);
                 if (!admitted.isEmpty()) {
                     admitted.add(app.flexygram.bubbles.interaction.BubbleActionPanelView.Action.SELECT);
                     panel.setMinimumWidth(dp(panel.presentation()==0?220:244));
                     panel.setAllowedActions(admitted);
-                    if(panel.presentation()!=0){
+                    {
+                        // Every presentation owns its surface, including the list.
                         // Each compact group owns its surface. Retain a non-null transparent
                         // native drawable for popup hit testing and SwipeBack bounds.
                         popupLayout.setBackground(null);
@@ -34585,13 +34601,22 @@ public class ChatActivity extends BaseFragment implements
                     for(int i=0;i<popupLayout.getItemsCount();i++)nativeItems.add(popupLayout.getItemAt(i));
                     popupLayout.removeInnerViews();
                     LinearLayout nativeMenu=new LinearLayout(getParentActivity());nativeMenu.setOrientation(LinearLayout.VERTICAL);
-                    nativeMenu.setBackgroundColor(getThemedColor(Theme.key_actionBarDefaultSubmenuBackground));
+                    nativeMenu.setBackgroundColor(Color.TRANSPARENT);
                     ActionBarMenuSubItem backToActions=new ActionBarMenuSubItem(getParentActivity(),true,false,themeDelegate);
                     backToActions.setTextAndIcon(getString(R.string.FlexyContextActions),R.drawable.ic_ab_back);
                     backToActions.setOnClickListener(view->popupLayout.getSwipeBack().closeForeground());nativeMenu.addView(backToActions);
                     for(View nativeItem:nativeItems)nativeMenu.addView(nativeItem);
                     android.widget.ScrollView nativeScroll=new android.widget.ScrollView(getParentActivity());nativeScroll.addView(nativeMenu);
-                    if(panel.presentation()!=0){android.graphics.drawable.GradientDrawable surface=new android.graphics.drawable.GradientDrawable();surface.setColor(getThemedColor(Theme.key_actionBarDefaultSubmenuBackground));surface.setCornerRadius(dp(20));nativeScroll.setBackground(surface);nativeScroll.setClipToOutline(true);}
+                    if (menuBlur) {
+                        nativeScroll.setBackground(scrimBlur3Factory.create(nativeScroll, true)
+                                .setColorProvider(BlurredBackgroundProviderImpl.messageMenuBackground(themeDelegate))
+                                .setRadius(dp(20)));
+                    } else {
+                        android.graphics.drawable.GradientDrawable surface = new android.graphics.drawable.GradientDrawable();
+                        surface.setColor(getThemedColor(Theme.key_actionBarDefaultSubmenuBackground));
+                        surface.setCornerRadius(dp(20));nativeScroll.setBackground(surface);
+                    }
+                    nativeScroll.setClipToOutline(true);
                     final int nativeMenuIndex=popupLayout.addViewToSwipeBack(nativeScroll);
                     android.widget.ScrollView signatureActionsScroll=new android.widget.ScrollView(getParentActivity()) {
                         @Override protected void onMeasure(int widthSpec,int heightSpec) {

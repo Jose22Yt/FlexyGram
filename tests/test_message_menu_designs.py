@@ -60,3 +60,18 @@ def test_menu_translation_keys_and_all_labels_are_present():
         sets.append({item.attrib['name']for item in tree.getroot()})
         assert all(item.text for item in tree.getroot())
     assert sets[0]==sets[1]==sets[2]
+
+
+def test_live_cards_share_existing_blur_source_and_preserve_input_layer():
+    chat=(JAVA/'org/telegram/ui/ChatActivity.java').read_text()
+    block=chat[chat.index('final boolean menuBlur ='):chat.index('panel.setListener(action->')]
+    assert 'BlurredBackgroundProviderImpl.checkBlurEnabled(currentAccount, themeDelegate)' in block
+    assert 'panel.setSurfaceFactory' in block and 'scrimBlur3Factory.create(target, true)' in block
+    assert 'nativeMenu.setBackgroundColor(Color.TRANSPARENT)' in block
+    assert 'scrimBlur3Factory.create(nativeScroll, true)' in block
+    assert 'makeGlobalBlurBitmaps' not in block and 'captureBlur' not in block
+    start=chat.index('final int messageScrimSave = canvas.save();')
+    end=chat.index('canvas.restoreToCount(messageScrimSave);',start)
+    assert chat.index('canvas.clipRect(0, 0, getMeasuredWidth(), messageScrimBottom);',start)<chat.index('if (scrimViewReaction == null || scrimView == null)',start)<end
+    assert end<chat.index('if (scrimView != null || messageEnterTransitionContainer.isRunning())',end)
+    assert 'chatInputViewsContainer.getInputBubbleTop()' in chat[start:end]
