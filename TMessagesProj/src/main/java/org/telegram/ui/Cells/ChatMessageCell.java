@@ -5116,6 +5116,8 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         return replyPressed;
     }
 
+    // Never start this compatibility spring on DOWN/MOVE: scrolling must not animate cells.
+    // SelectedBubbleMotion starts only after ChatActivity confirms and opens the menu.
     private final app.flexygram.bubbles.interaction.BubbleTapMotion signatureTapMotion =
             new app.flexygram.bubbles.interaction.BubbleTapMotion(this);
     private boolean signatureTapEligible;
@@ -5145,7 +5147,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
      * Resetting here is atomic with popup creation; prevents double-scaling the same cell. */
     public void finishSignatureCandidate(){signatureTapEligible=false;signatureTapReleased=0;signatureTapMotion.release();}
     public void finishSignatureTap(){signatureTapEligible=false;signatureTapReleased=0;signatureTapMotion.reset();}
-    public void cancelSignatureGesture(){signatureTapEligible=false;signatureTapReleased=0;signatureMediaPress=false;signatureTapMotion.release();}
+    public void cancelSignatureGesture(){signatureTapEligible=false;signatureTapReleased=0;signatureMediaPress=false;signatureTapMotion.reset();}
     public void cancelSignatureTap(){signatureTapEligible=false;signatureTapReleased=0;signatureMediaPress=false;signatureTapMotion.reset();}
     private void applySignatureTap(Canvas canvas){
         float sx=signatureTapMotion.scaleX(),sy=signatureTapMotion.scaleY();
@@ -5173,14 +5175,9 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             signatureTapY=getEventY(event);
             signatureTapPivotX=(getBackgroundDrawableLeft()+getBackgroundDrawableRight())*.5f;
             signatureTapPivotY=(getBackgroundDrawableTop()+getBackgroundDrawableBottom())*.5f;
-            if (app.flexygram.bubbles.interaction.BubbleInteractionSettings.motionEnabled()) {
-                signatureTapMotion.press(.012f+.0005f*app.flexygram.bubbles.interaction.BubbleInteractionSettings.compression(getContext()),
-                        app.flexygram.bubbles.interaction.BubbleInteractionSettings.rebound(getContext())/100f,
-                        440-3L*app.flexygram.bubbles.interaction.BubbleInteractionSettings.recovery(getContext()));
-            }
         }
-        // Media controls may return early: finish their independent touch spring
-        // regardless of the native photo/video touch handling.
+        // Media controls may return early: finish gesture bookkeeping
+        // without animating DOWN/MOVE or changing native photo/video taps.
         if (signatureMediaPress && action!=MotionEvent.ACTION_DOWN) {
             if (action==MotionEvent.ACTION_UP) {
                 signatureMediaPress=false;
@@ -5675,7 +5672,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             final boolean mediaHit=compatible && drawPhotoImage && photoImage.isInsideImage(touchX,touchY)
                     && (currentMessageObject.type==MessageObject.TYPE_PHOTO || currentMessageObject.isVideo());
             // Ordinary photo/video taps still open Telegram's media viewer.
-            // They get tactile feedback, but the one-tap context panel is for the
+            // The one-tap context panel is for the
             // unclaimed message surface, not an image-button hit target.
             signatureTapEligible=compatible && !result && !mediaHit
                     && isInsideBackground(touchX,touchY);
@@ -5684,13 +5681,6 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                 signatureTapX=touchX;signatureTapY=touchY;
                 signatureTapPivotX=mediaHit?photoImage.getCenterX():(getBackgroundDrawableLeft()+getBackgroundDrawableRight())*.5f;
                 signatureTapPivotY=(getBackgroundDrawableTop()+getBackgroundDrawableBottom())*.5f;
-                if(app.flexygram.bubbles.interaction.BubbleInteractionSettings.tapAnimation(getContext())
-                        && !signatureMediaPress
-                        && app.flexygram.bubbles.interaction.BubbleInteractionSettings.motionEnabled()){
-                    signatureTapMotion.press(.012f+.0005f*app.flexygram.bubbles.interaction.BubbleInteractionSettings.compression(getContext()),
-                            app.flexygram.bubbles.interaction.BubbleInteractionSettings.rebound(getContext())/100f,
-                            440-3L*app.flexygram.bubbles.interaction.BubbleInteractionSettings.recovery(getContext()));
-                }
             }
         } else if(signatureMediaPress){
             if(signatureAction==MotionEvent.ACTION_UP){

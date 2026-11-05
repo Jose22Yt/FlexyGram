@@ -1,0 +1,43 @@
+import android.graphics.*;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.*;
+import static org.junit.Assert.*;
+
+@RunWith(RobolectricTestRunner.class) @Config(manifest=Config.NONE,sdk=35)
+@GraphicsMode(GraphicsMode.Mode.NATIVE)
+public class ComposerSurfaceTest {
+    @Test public void sourceChangesCannotLeavePillOrButtonsTransparent() {
+        for(int theme:new int[]{Color.WHITE,0xff303236})
+            for(int wallpaper:new int[]{0xffffb43b,Color.WHITE,Color.BLACK}) {
+                SurfaceProbe p=new SurfaceProbe();p.flexyComposer.color=theme;
+                for(int i=0;i<20;i++) {
+                    p.emptySource=i%2==0;
+                    Bitmap image=Bitmap.createBitmap(284,44,Bitmap.Config.ARGB_8888);
+                    Canvas canvas=new Canvas(image);canvas.drawColor(wallpaper);p.draw(canvas);
+                    int expected=(theme&0xffffff)|0xff000000;
+                    int middle=image.getPixel(140,22),attachment=image.getPixel(22,22),voice=image.getPixel(260,22);
+                    if(wallpaper!=expected) {
+                        assertNotEquals("pill has a stable surface even with empty capture",wallpaper,middle);
+                        assertNotEquals("attachment has a stable surface",wallpaper,attachment);
+                        assertNotEquals("microphone has a stable surface",wallpaper,voice);
+                    }
+                    assertEquals(255,Color.alpha(middle));assertTrue(p.flexyComposer.backdrop);
+                    assertEquals("outer background remains untouched",wallpaper,image.getPixel(46,22));
+                    image.recycle();
+                }
+            }
+    }
+    @Test public void hideAnimationAndHiddenButtonsLeaveNoPaintedGhosts() {
+        SurfaceProbe p=new SurfaceProbe();p.blurredBackgroundDrawable.alpha=0;
+        Bitmap image=Bitmap.createBitmap(284,44,Bitmap.Config.ARGB_8888);Canvas canvas=new Canvas(image);canvas.drawColor(Color.RED);
+        p.draw(canvas);assertEquals(Color.RED,image.getPixel(140,22));assertEquals(Color.RED,image.getPixel(260,22));
+        p.blurredBackgroundDrawable.alpha=255;p.flexyComposer.voice=false;p.flexyComposer.send=false;
+        image.eraseColor(Color.RED);p.draw(canvas);
+        assertNotEquals(Color.RED,image.getPixel(140,22));assertEquals(Color.RED,image.getPixel(260,22));
+        p.flexyComposer.send=true;image.eraseColor(Color.RED);p.draw(canvas);
+        assertNotEquals(Color.RED,image.getPixel(260,22));assertTrue(p.flexySendDrawn);assertFalse(p.flexyVoiceDrawn);
+        image.recycle();
+    }
+}
