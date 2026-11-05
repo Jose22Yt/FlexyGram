@@ -24,6 +24,11 @@ public final class SignatureHomeStyle {
                 : (glass ? 0xE6F1F2F5 : 0xFFF1F2F5);
     }
 
+    /** Accent overlay over an already tinted native blur, never a second opaque surface. */
+    public static int glassSelectionTint(int color) {
+        return (color & 0x00ffffff) | (Math.min(color >>> 24, 102) << 24);
+    }
+
     public static int selectedSurface(boolean dark, boolean glass) {
         return dark ? (glass ? 0xF0444D5A : 0xFF444D5A)
                 : (glass ? 0xF0DFE8F2 : 0xFFDFE8F2);

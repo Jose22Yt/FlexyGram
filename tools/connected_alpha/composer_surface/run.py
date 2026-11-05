@@ -15,6 +15,9 @@ def write(source,root):
         p=source/path;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(text)
     for name in ['ComposerStyle','ComposerGeometry']:
         path='app/flexygram/composer/'+name+'.java';put(path,(java/path).read_text())
+    for name in ['SignatureHomeStyle', 'SignatureHomePainter', 'SignatureFolderAccent']:
+        path='app/flexygram/home/'+name+'.java';put(path,(java/path).read_text())
+    put('org/telegram/messenger/SharedConfig.java','package org.telegram.messenger;public class SharedConfig{public static boolean blur=true;public static boolean chatBlurEnabled(){return blur;}}')
     s=(java/'org/telegram/ui/Components/chat/ChatInputViewsContainer.java').read_text()
     methods='\n'.join(method(s,a) for a in ['private void drawFlexyComposerTint(', 'private void drawFlexyNativeGlassIslands('])
     put('SurfaceProbe.java','''import android.graphics.*;

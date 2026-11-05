@@ -14919,6 +14919,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         iBlur3FactoryLiquidGlass.setLiquidGlassEffectAllowed(liquid);
         iBlur3FactoryFrostedLiquidGlass.setLiquidGlassEffectAllowed(liquid);
         iBlur3FactoryBlur.setLiquidGlassEffectAllowed(false);
+        // Invalidate retained tab display lists as well as their backdrop source.
+        if (filterTabsView != null) filterTabsView.updateColors();
         if (fragmentView != null) fragmentView.invalidate();
     }
 

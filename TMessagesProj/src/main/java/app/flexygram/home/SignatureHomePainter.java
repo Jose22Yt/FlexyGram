@@ -30,8 +30,14 @@ public final class SignatureHomePainter {
         // No item decoration changes positions or filter hit testing.
         bounds.set(3 * density, (height - h) / 2, width - 3 * density, (height + h) / 2);
         if (bounds.width() <= 0 || h <= 0) return;
-        int color = blend(SignatureHomeStyle.surface(dark, glass),
-                selectedColor, selection);
+        int color;
+        if (glass) {
+            int tint = SignatureHomeStyle.glassSelectionTint(selectedColor);
+            int alpha = Math.round((tint >>> 24) * Math.max(0f, Math.min(1f, selection)));
+            color = (tint & 0x00ffffff) | (alpha << 24);
+        } else {
+            color = blend(SignatureHomeStyle.surface(dark, false), selectedColor, selection);
+        }
         surface(canvas, h / 2, density, dark, color, 1);
     }
 

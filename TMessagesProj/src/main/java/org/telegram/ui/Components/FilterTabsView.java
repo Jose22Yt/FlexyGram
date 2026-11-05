@@ -83,6 +83,8 @@ public class FilterTabsView extends FrameLayout {
     private int signatureAccent, signatureAccentInk;
     private final app.flexygram.home.SignatureFolderAccent signatureAccentColors=new app.flexygram.home.SignatureFolderAccent();
     private final app.flexygram.home.SignatureFolderAccent signatureDefaultColors=new app.flexygram.home.SignatureFolderAccent();
+    private final app.flexygram.home.SignatureFolderAccent signatureGlassAccentColors=new app.flexygram.home.SignatureFolderAccent();
+    private final app.flexygram.home.SignatureFolderAccent signatureGlassDefaultColors=new app.flexygram.home.SignatureFolderAccent();
     /** Native theme callbacks own color/contrast resolution; draw only interpolates cached ints. */
     private void refreshSignatureAccent() {
         app.exteraless.appearance.AppearanceConfig.ensureLoaded();
@@ -95,6 +97,12 @@ public class FilterTabsView extends FrameLayout {
         signatureDefaultColors.update(app.flexygram.home.SignatureHomeStyle.selectedSurface(dark,false),
             app.flexygram.home.SignatureHomeStyle.text(dark,true),neutral,
             app.flexygram.home.SignatureHomeStyle.text(dark,false));
+        int glassBase=Theme.getColor(Theme.key_windowBackgroundWhite,resourcesProvider);
+        signatureGlassAccentColors.update(app.flexygram.home.SignatureHomeStyle.glassSelectionTint(signatureAccent),
+            Theme.getColor(activeTextColorKey,resourcesProvider),glassBase,app.flexygram.home.SignatureHomeStyle.text(dark,false));
+        signatureGlassDefaultColors.update(app.flexygram.home.SignatureHomeStyle.glassSelectionTint(
+            app.flexygram.home.SignatureHomeStyle.selectedSurface(dark,false)),
+            app.flexygram.home.SignatureHomeStyle.text(dark,true),glassBase,app.flexygram.home.SignatureHomeStyle.text(dark,false));
     }
 
 
@@ -449,6 +457,7 @@ public class FilterTabsView extends FrameLayout {
                 boolean nativePill = !signatureHomeOpaquePreview && signaturePillGlass != null && canvas.isHardwareAccelerated()
                         && org.telegram.ui.Components.blur3.drawable.color.impl.BlurredBackgroundProviderImpl.checkBlurEnabled(resourcesProvider);
                 if (nativePill) {
+                    signaturePalette=themed?signatureGlassAccentColors:signatureGlassDefaultColors;
                     float h = app.flexygram.home.SignatureHomeStyle.categoryHeight(getHeight(), AndroidUtilities.density);
                     if (signaturePillRadius != h/2) {
                         signaturePillRadius = h/2;
