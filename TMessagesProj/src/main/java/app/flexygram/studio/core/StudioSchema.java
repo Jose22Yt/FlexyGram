@@ -51,7 +51,7 @@ public final class StudioSchema {
         i("header","opacity","flexygram_header","opacity",85,0,100),
         i("composer","style","flexygram_composer","style",0,0,1),
         b("composer","glass","flexygram_composer","pearlGlass",false),
-        i("composer","position","flexygram_composer","verticalPosition",0,-4,16),
+        i("composer","position","flexygram_composer","verticalPosition",0,-160,16),
         i("composer","density","flexygram_composer","compactLevel",0,0,2),
         i("composer","icons","flexygram_composer","iconAppearance",0,0,1),
         // Zero means the native density-dependent gap; values1 is not supported.

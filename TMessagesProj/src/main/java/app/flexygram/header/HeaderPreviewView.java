@@ -69,7 +69,7 @@ public final class HeaderPreviewView extends View implements org.telegram.messen
             if(g.fits&&(previewFloating()?titleLine:titleLine+subtitleLine+AndroidUtilities.dp(2))<=g.height-AndroidUtilities.dp(8)){
                 fusionMode=true;previewHeight=g.height;
                 int extra=previewFloating()?Math.round(app.flexygram.header.fusion.SignatureFusionGeometry.statusHeight(subtitleLine,AndroidUtilities.density))+AndroidUtilities.dp(8):0;
-                int h=Math.round(previewHeight)+extra+AndroidUtilities.dp(forcedStyle<0?80:40);setMeasuredDimension(width,Math.round(h*previewScale));fusionTop=(h-previewHeight-extra)/2;
+                int h=Math.round(previewHeight)+extra+AndroidUtilities.dp(forcedStyle<0?80:12);setMeasuredDimension(width,Math.round(h*previewScale));fusionTop=(h-previewHeight-extra)/2;
                 text.setTextSize(titlePx); scratchPaint.set(text); displayName=android.text.TextUtils.ellipsize(name,scratchPaint,g.text.width(),android.text.TextUtils.TruncateAt.END).toString();
                 fusionTitleX=app.flexygram.header.fusion.SignatureFusionGeometry.titleCenterX(
                         g, text.measureText(displayName));
@@ -89,7 +89,7 @@ public final class HeaderPreviewView extends View implements org.telegram.messen
         previewHeight=HeaderGeometry.height(width,titleLine,subtitleLine,AndroidUtilities.density,HeaderConfig.compact());
         float fit=Math.min(1f,(previewHeight-AndroidUtilities.dp(8))/(titleLine+subtitleLine));titlePx*=fit;subtitlePx*=fit;
         titlePx=Math.min(titlePx,previewHeight-AndroidUtilities.dp(8));
-        int h=Math.round(previewHeight)+AndroidUtilities.dp(forcedStyle<0?80:40);setMeasuredDimension(width,h);
+        int h=Math.round(previewHeight)+AndroidUtilities.dp(forcedStyle<0?80:12);setMeasuredDimension(width,h);
         if(previewStyle()==1){prepareClassicText(width);return;}
         text.setTextSize(titlePx); float preferred = text.measureText(name);
         text.setTextSize(subtitlePx); preferred = Math.max(preferred, text.measureText(status)) + AndroidUtilities.dp(24);
