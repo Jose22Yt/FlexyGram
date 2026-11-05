@@ -1,32 +1,41 @@
-# Créditos y licencias
+# Créditos y avisos
 
-**FlexyGram:** creación y dirección del proyecto por @Lukhou23. **Repositorio:** Jose22Yt/FlexyGram, administrado por Jose22Yt. Estos roles no atribuyen a sus responsables la autoría del código heredado.
+FlexyGram es un proyecto creado y dirigido por [@Lukhou23](https://t.me/Lukhou23), con el repositorio mantenido por [Jose22Yt](https://github.com/Jose22Yt). Estos roles corresponden al proyecto FlexyGram y no sustituyen la autoría de sus componentes.
 
-## Procedencia
+## Código y proyectos de origen
 
-- Telegram para Android: código base, protocolo, mensajería y componentes nativos. Se conservan los avisos de cada archivo, incluidos los de Nikolai Kudashov. Fuente: https://github.com/DrKLO/Telegram.
-- Exteraless: base directa de FlexyGram; referencia de procedencia `1ad6a60a6834ffca722b1a22f4fba27ecb29a061`. Fuente: https://github.com/exteraless/exteraless.
-- NagramX: base declarada por Exteraless; https://github.com/risin42/NagramX.
-- exteraGram: funciones, diseños y recursos reconocidos por la documentación heredada; https://github.com/exteraSquad/exteraGram.
+| Proyecto | Aportación / procedencia |
+| --- | --- |
+| [Telegram para Android](https://github.com/DrKLO/Telegram) | Base de mensajería y numerosos componentes Android y nativos. Se conservan los avisos de sus autores, incluidos los de Nikolai Kudashov. |
+| [Exteraless](https://github.com/exteraless/exteraless) | Base directa del repositorio; origen registrado en `1ad6a60a6834ffca722b1a22f4fba27ecb29a061`. |
+| [NagramX](https://github.com/risin42/NagramX) | Base declarada por el proyecto de origen y componentes reconocidos en sus fuentes. |
+| [exteraGram](https://github.com/exteraSquad/exteraGram) | Funciones, diseños y recursos acreditados por el proyecto de origen. |
+| [Nagram](https://github.com/NextAlone/Nagram) y [Nekogram](https://github.com/Nekogram/Nekogram) | Componentes, opciones y utilidades que mantienen sus namespaces y avisos de origen. |
 
-El README heredado reconoce a **@the8055u** (iconos y diseño) y **@BlueprintDsgn** (estudio de diseño). Se conserva esa atribución para los recursos reutilizados. Los recursos existentes de FlexyGram se mantienen sin atribuirles un autor nuevo ni alterar los diseños aprobados.
+También se conservan los reconocimientos heredados a [AyuGram](https://github.com/AyuGram/AyuGram4A), [Cherrygram](https://github.com/arsLan4k1390/Cherrygram), [Dr4iv3rNope](https://github.com/Dr4iv3rNope/NotSoAndroidAyuGram), [Inugram](https://github.com/teidesu/inugram) y [OctoGram](https://github.com/OctoGramApp/OctoGram). Un reconocimiento no implica incorporar todo el código de un proyecto.
 
-## Reconocimientos heredados
+## Diseño y recursos visuales
 
-Se mantienen los reconocimientos de la documentación de origen; no implican que todo el código de cada proyecto esté incorporado:
+- **Diseño e iconos heredados de exteraGram:** [@the8055u](https://t.me/the8055u) y el estudio [@BlueprintDsgn](https://t.me/BlueprintDsgn). Sus derechos y avisos se conservan.
+- **Solar Icons:** [480 Design / @Design480](https://github.com/480-Design/Solar-Icon-Set). Las cadenas de atribución y conversiones se encuentran en `strings_nax.xml`, `SolarIcons.kt` y los recursos con sufijo `_solar`.
+- **Remix Icon:** [Remix Design / @Remixicon](https://github.com/Remix-Design/RemixIcon). Acreditados en `strings_nax.xml` y las conversiones de iconos; los recursos con sufijo `_remix` conservan su procedencia. Debe respetarse la licencia de la versión concreta incorporada, que puede diferir de la versión actual del proyecto.
+- **Icono de FlexyGram en esta portada:** el mismo recurso de identidad que utiliza la línea beta del proyecto. No se presenta como un recurso nuevo ni se atribuye su autoría a otra persona. Las marcas y elementos de terceros mantienen los derechos que les correspondan.
 
-- AyuGram: https://github.com/AyuGram/AyuGram4A
-- Cherrygram: https://github.com/arsLan4k1390/Cherrygram
-- Dr4iv3rNope: https://github.com/Dr4iv3rNope/NotSoAndroidAyuGram
-- Inugram: https://github.com/teidesu/inugram
-- Nagram: https://github.com/NextAlone/Nagram
-- Nekogram: https://github.com/Nekogram/Nekogram
-- OctoGram: https://github.com/OctoGramApp/OctoGram
+No se deben sustituir licencias ausentes por una licencia supuesta. Antes de distribuir un conjunto de recursos heredados, hay que comprobar su revisión de origen y conservar los avisos exigidos. El crédito de una imagen no equivale por sí solo a un permiso de uso.
 
-## Dependencias y avisos
+## Bibliotecas y componentes
 
-FlexyGram mantiene GNU GPL-3.0 en [LICENSE](LICENSE). Los encabezados y licencias de terceros siguen vigentes; algunos archivos de Telegram indican GPL v2 o posterior. No se sustituyen esos avisos por una atribución exclusiva a FlexyGram.
+Los manifiestos técnicos son la referencia de las dependencias y revisiones de cada rama:
 
-[.gitmodules](.gitmodules) identifica las fuentes de libvpx, dav1d, FFmpeg, Ogg, Opus, opusfile, jlatexmath, tlottie, módulos multimedia, Abseil, WAMR, tgcalls, wallet-engine, Boost.Regex, libprisma y Chaquopy. Las dependencias Java/Kotlin/Python están declaradas en [TMessagesProj/build.gradle](TMessagesProj/build.gradle). BoringSSL, WebRTC, SQLite y el resto de componentes conservan sus avisos en sus directorios y archivos originales. Este índice no reemplaza sus licencias ni pretende ser un inventario jurídico exhaustivo de todos los recursos.
+- [`.gitmodules`](.gitmodules): libvpx, dav1d, FFmpeg, Ogg, Opus, opusfile, jlatexmath, tlottie, módulos multimedia, Abseil, WAMR, tgcalls, wallet-engine, Boost.Regex, libprisma y Chaquopy.
+- [`TMessagesProj/build.gradle`](TMessagesProj/build.gradle): AndroidX, Material Components, ZXing, AndroidSVG, nv-websocket-client, Vosk, Firebase, Google Play services/ML Kit, Gson, Guava, mp4parser, Markwon, Stripe, Billing, coroutines, osmdroid, OkHttp, dnsjava, TrueTypeParser, UnifiedPush, Room, Commons Text, el traductor de Nekogram, Aliuhook, MVEL, DexMaker y HiddenApiBypass, entre otros.
+- [`TMessagesProj/jni`](TMessagesProj/jni): componentes nativos y sus avisos, incluidos BoringSSL, WebRTC, SQLite y FFmpeg.
+- `TMessagesProj/libs/glyph-matrix-sdk-2.0.aar`: SDK de terceros; su licencia y condiciones de redistribución deben comprobarse con su proveedor antes de distribuir una entrega que lo incluya.
 
-Las contribuciones se acreditan mediante el historial Git y los avisos aplicables. No se reescribe el historial ni se inventan autores o fechas. Antes de distribuir una Beta debe comprobarse también la conservación de avisos en la distribución final.
+Este índice no sustituye los archivos `LICENSE`, `COPYING`, `NOTICE` ni los encabezados de cada componente; tampoco es un inventario jurídico exhaustivo de las dependencias transitivas. Las versiones y componentes pueden variar entre ramas.
+
+## Licencia y contribuciones
+
+El repositorio mantiene [GNU GPL versión 3](LICENSE). Los avisos específicos de los archivos y componentes de terceros siguen siendo aplicables, incluidos los encabezados GPL v2 o posterior que existan en el código de origen.
+
+La autoría de las contribuciones permanece en el historial Git. Los nuevos componentes deben registrar fuente, revisión y licencia, además de incluir los avisos que correspondan en la distribución.

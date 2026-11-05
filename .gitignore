@@ -40,3 +40,21 @@ config/*.keystore
 *.keystore
 *.p12
 *.pfx
+# Local credentials and account data
+.env
+.env.*
+!.env.example
+!.env.sample
+**/*service-account*.json
+*.session
+*.session-journal
+*.tdata
+
+# Local analysis and editor artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+**/tdata/
+**/shared_prefs/
+/private/
+/reports/private/

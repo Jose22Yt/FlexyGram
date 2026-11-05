@@ -1,50 +1,40 @@
-# Compilar FlexyGram
+# Desarrollo y compilación
 
-Esta guía prepara una compilación futura. **La misión de identidad no autoriza ejecutar los comandos de compilación que aparecen aquí.** No se ha compilado ni firmado la nueva Beta.
+## Elegir la base
 
-## Fuentes y herramientas
+Este repositorio contiene distintas líneas de desarrollo. Consulta la rama y el commit de la entrega que quieras reproducir; no asumas que la portada o `main` contienen la beta más reciente.
 
-```bash
-git clone https://github.com/Jose22Yt/FlexyGram.git
+```sh
+git clone --recurse-submodules https://github.com/Jose22Yt/FlexyGram.git
 cd FlexyGram
-git switch feat/official-identity-beta-preparation
+git switch <rama-elegida>
 git submodule update --init --recursive
 ```
 
-Fija el commit aprobado antes de compilar. Esta rama deriva de `feat/signature-interaction-navigation-2`, SHA `258dd3590f40ca0083a4b7bad6b413433c4e2c14`. Su PR debe revisarse sobre esa base; no incorpora otros candidatos ni reemplaza Exteraless desde cero.
+## Entorno
 
-| Herramienta | Configuración del repositorio |
-| --- | --- |
-| JDK | 21 |
-| Gradle / AGP | wrapper 9.7.1 / 9.3.1 |
-| Android SDK | compile 37, target 36, mínimo 24 |
-| Build Tools | 36.0.0 |
-| NDK | 27.2.12479018 |
-| CMake | 3.31.6 o compatible con la restricción del proyecto |
-| Python / Chaquopy | 3.11 / 17.0.0 |
-| ABI de entrega | arm64-v8a |
+Usa las versiones de JDK, SDK, NDK, CMake y Gradle declaradas por la rama y sus workflows. Los requisitos pueden cambiar entre variantes. Revisa `TMessagesProj/build.gradle`, `gradle/wrapper/gradle-wrapper.properties` y `.gitmodules` antes de descargar o ejecutar herramientas.
 
-Instala también las dependencias exigidas por los submódulos y scripts nativos. Consulta sus instrucciones originales. No uses `NATIVE_TARGET=SKIP`: omitiría JNI y pruebas. x86_64 no sirve como validación del payload ARM64.
+Configura tus propios identificadores de API y servicios, y las credenciales de firma cuando correspondan. Mantén los valores privados en `local.properties`, variables de entorno o secretos de CI; no los añadas al repositorio ni a los comandos de incidencias. Un archivo Firebase de otra aplicación no sustituye el registro de tu propia variante. La configuración heredada `TMessagesProj/google-services.json` se retira del control de versiones: debes proporcionar la tuya en la ubicación que requiera tu variante. La entrega beta privada utiliza un secreto de CI y no necesita publicar ese archivo. Una compilación local que use el plugin de Google Services requerirá esta configuración antes de ejecutarse.
 
-## Entradas privadas
+## Verificar y construir
 
-Configura `sdk.dir`, `TELEGRAM_APP_ID` y `TELEGRAM_APP_HASH` propios en `local.properties` (ignorado), o las variables admitidas. Obtén las credenciales en https://my.telegram.org; no reutilices muestras ni claves ajenas.
+Consulta las tareas y variantes de Gradle de la rama seleccionada. Las variantes de prueba y distribución pueden usar aplicaciones, firmas y servicios distintos. No distribuyas una compilación como oficial sin comprobar identidad, procedencia y firma.
 
-Para Beta proporciona `TMessagesProj/src/beta/google-services.json` de una aplicación Firebase registrada como `com.flexygram.messenger` y todas las entradas de [SIGNING.md](SIGNING.md). No se crea ni activa un servicio externo durante esta misión. Si se desea autenticación Google, configura `FLEXYGRAM_GOOGLE_AUTH_CLIENT_ID` para Beta; nunca se hereda automáticamente el cliente OAuth de Alpha. Maps y Glyph requieren claves propias y restricciones de paquete/certificado cuando correspondan. La ausencia de estas credenciales limita sus funciones.
+Las comprobaciones de documentación y fuentes pueden ejecutarse sin generar APK. Las pruebas Android, la compilación completa y las pruebas de rendimiento en dispositivo son etapas diferentes: registra exactamente qué comprobaste.
 
-Para Alpha se conservan el JSON de `src/connectedAlpha`, la clave `config/connected-alpha-test.keystore` y las entradas `ALPHA_*`. El constructor privado y los verificadores de `tools/connected_alpha` siguen siendo **exclusivos de Alpha**, no sirven para entregar ni certificar una Beta.
+## Dependencias
 
-## Solo después de autorizar la compilación
+Los componentes nativos pueden requerir submódulos y herramientas adicionales. Conserva las licencias incluidas y consulta [CREDITS.md](../CREDITS.md). Nunca sustituyas dependencias faltantes por archivos descargados de una procedencia no verificada.
 
-```bash
-NATIVE_TARGET=arm64-v8a ./gradlew :TMessagesProj:validateFlexyGramBetaConfiguration
-NATIVE_TARGET=arm64-v8a ./gradlew :TMessagesProj:assembleBeta
-```
+## Beta de pruebas de interfaz ARM64
 
-La primera orden inspecciona configuración y certificado; no prueba una APK. La segunda compila JNI/Chaquopy y la aplicación completa. El artefacto futuro estará bajo `TMessagesProj/build/outputs/apk/beta/`, con prefijo `FlexyGram-Beta`. `connectedAlpha` mantiene su identidad y prefijo `FlexyGram-Alpha`. `debug`, `staging` y `release` no están habilitadas como variantes de entrega en esta base.
+En `codex/flexygram-beta-glass`, `.github/workflows/ui-beta-debug.yml` compila la
+variante `debug` para ARM64 con bibliotecas nativas optimizadas y firma de pruebas.
+Esta variante no acredita la firma de distribución de `assembleBeta`. El workflow
+proporciona su configuración Firebase en `src/debug` y verifica firma y ABI antes
+de guardar el APK como artefacto. La instalación y las mediciones en dispositivo
+son verificaciones posteriores.
 
-Antes de distribuir: verificar manifiesto combinado, DEX, recursos, firma y certificado con herramientas Android; comprobar los ELF ARM64 y alineación de 16 KB; instalar en dispositivo físico y probar login, contactos, compartir, notificaciones, enlaces y actualizaciones. No basta con cambiar el paquete esperado en el verificador Alpha: hace falta revisar el contrato completo de entrega Beta.
-
-## Actions
-
-El PR de identidad usa únicamente `tools/identity/check_identity.py`, sin Gradle ni Android SDK. Se omiten en esta rama los dos jobs generales de PR que incluyen herramientas Android. Los workflows de entrega Alpha conservan sus restricciones de ramas y no se disparan por esta rama. Los workflows heredados `release`, `canary` y `staging` no son una ruta de publicación Beta y no deben usarse para ella. No se ha añadido ni despachado un pipeline de empaquetado o publicación Beta.
+Herramientas de esta rama: JDK 21, Gradle 9.7.1, AGP 9.3.1, Build Tools 36.0.0,
+SDK de compilación 37, NDK 27.2.12479018, CMake 3.31.6 y Python 3.11.
