@@ -17,13 +17,70 @@ public final class Settings2Cell extends FrameLayout {
     private final boolean compact;
     private boolean card, first, last;
     private int cardColor, selectorColor, pageColor;
-    public void setCardEdges(boolean first,boolean last){card=true;setTag(org.telegram.ui.Components.RecyclerListView.TAG_NOT_SECTION);this.first=first;this.last=last;updateCard();}
-    private void updateCard(){
-        pageColor=Theme.getColor(Theme.key_windowBackgroundGray,provider);cardColor=SettingsCardStyle.surface(Theme.getColor(Theme.key_windowBackgroundWhite,provider),pageColor);selectorColor=Theme.getColor(Theme.key_listSelector,provider);
-        android.graphics.drawable.GradientDrawable fill=new android.graphics.drawable.GradientDrawable();fill.setColor(cardColor);
-        float top=dp(first?SettingsCardStyle.OUTER_RADIUS:SettingsCardStyle.INNER_RADIUS),bottom=dp(last?SettingsCardStyle.OUTER_RADIUS:SettingsCardStyle.INNER_RADIUS);float[] corners={top,top,top,top,bottom,bottom,bottom,bottom};fill.setCornerRadii(corners);
-        android.graphics.drawable.GradientDrawable mask=new android.graphics.drawable.GradientDrawable();mask.setColor(0xffffffff);mask.setCornerRadii(corners);
-        setBackground(new android.graphics.drawable.InsetDrawable(new android.graphics.drawable.RippleDrawable(android.content.res.ColorStateList.valueOf(selectorColor),fill,mask),0,0,0,dp(4)));
+    private android.graphics.drawable.GradientDrawable cardFill, cardMask;
+    private android.graphics.drawable.RippleDrawable cardRipple;
+    private android.graphics.drawable.InsetDrawable cardBackground;
+    private final float[] cardCorners = new float[8];
+    private float appliedTop = -1, appliedBottom = -1;
+    private int appliedGap = -1;
+    private int iconResource = Integer.MIN_VALUE;
+    private android.content.res.Resources iconResources;
+    private android.content.res.Configuration iconConfiguration;
+
+    public void setCardEdges(boolean first, boolean last) {
+        if (!card) { card = true; requestLayout(); }
+        setTag(org.telegram.ui.Components.RecyclerListView.TAG_NOT_SECTION);
+        this.first = first;
+        this.last = last;
+        updateCard();
+    }
+
+    private void updateCard() {
+        pageColor = Theme.getColor(Theme.key_windowBackgroundGray, provider);
+        int surface = SettingsCardStyle.surface(Theme.getColor(Theme.key_windowBackgroundWhite, provider), pageColor);
+        int selector = Theme.getColor(Theme.key_listSelector, provider);
+        boolean created = cardFill == null;
+        if (created) {
+            cardFill = new android.graphics.drawable.GradientDrawable();
+            cardMask = new android.graphics.drawable.GradientDrawable();
+            cardMask.setColor(0xffffffff);
+            cardRipple = new android.graphics.drawable.RippleDrawable(
+                    android.content.res.ColorStateList.valueOf(selector), cardFill, cardMask);
+        }
+        if (created || cardColor != surface) {
+            cardColor = surface;
+            cardFill.setColor(surface);
+        }
+        if (created || selectorColor != selector) {
+            selectorColor = selector;
+            cardRipple.setColor(android.content.res.ColorStateList.valueOf(selector));
+        }
+        float top = dp(first ? SettingsCardStyle.OUTER_RADIUS : SettingsCardStyle.INNER_RADIUS);
+        float bottom = dp(last ? SettingsCardStyle.OUTER_RADIUS : SettingsCardStyle.INNER_RADIUS);
+        if (top != appliedTop || bottom != appliedBottom) {
+            appliedTop = top; appliedBottom = bottom;
+            for (int i = 0; i < 4; i++) cardCorners[i] = top;
+            for (int i = 4; i < 8; i++) cardCorners[i] = bottom;
+            cardFill.setCornerRadii(cardCorners);
+            cardMask.setCornerRadii(cardCorners);
+        }
+        int gap = dp(4);
+        if (cardBackground == null || appliedGap != gap) {
+            appliedGap = gap;
+            cardBackground = new android.graphics.drawable.InsetDrawable(cardRipple, 0, 0, 0, gap);
+        }
+        if (getBackground() != cardBackground) setBackground(cardBackground);
+    }
+
+    private void bindIcon(int resource) {
+        android.content.res.Resources resources = getResources();
+        android.content.res.Configuration configuration = resources.getConfiguration();
+        if (iconResource == resource && iconResources == resources
+                && configuration.equals(iconConfiguration)) return;
+        icon.setImageDrawable(SettingsCategoryIcon.create(getContext(), resource));
+        iconResource = resource;
+        iconResources = resources;
+        iconConfiguration = new android.content.res.Configuration(configuration);
     }
     public Settings2Cell(Context c,Theme.ResourcesProvider p){
         this(c,p,true);
@@ -44,10 +101,8 @@ public final class Settings2Cell extends FrameLayout {
     private int dp(float x){return AndroidUtilities.dp(x);}
     public void bind(String name,String detail,int resource,int color,boolean divide){
         title.setText(name);description.setText(detail);description.setVisibility(compact||detail==null||detail.isEmpty()?GONE:VISIBLE);
-        title.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText,provider));
-        description.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText2,provider));
-        icon.setImageDrawable(SettingsCategoryIcon.create(getContext(),app.exteraless.settings.utils.SettingsIcons.resolve(getContext(), resource)));icon.setColorFilter(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText,provider));
-        icon.setBackground(null);lastIconColor=Theme.getColor(Theme.key_windowBackgroundWhiteBlackText,provider);
+        bindIcon(app.exteraless.settings.utils.SettingsIcons.resolve(getContext(), resource));
+        icon.setBackground(null);foregroundInitialized=false;updateForeground();
         divider=divide;
         setContentDescription(name+(detail==null||detail.isEmpty()?"":", "+detail));invalidate();
     }
@@ -71,12 +126,26 @@ public final class Settings2Cell extends FrameLayout {
         description.layout(tx,y,tx+description.getMeasuredWidth(),y+description.getMeasuredHeight());
     }
     @Override protected void dispatchDraw(Canvas c){
-        int foreground=Theme.getColor(Theme.key_windowBackgroundWhiteBlackText,provider);
-        if(lastIconColor!=foreground){lastIconColor=foreground;icon.setColorFilter(foreground);}
+        updateForeground();
         if(card&&(cardColor!=SettingsCardStyle.surface(Theme.getColor(Theme.key_windowBackgroundWhite,provider),Theme.getColor(Theme.key_windowBackgroundGray,provider))||selectorColor!=Theme.getColor(Theme.key_listSelector,provider)))updateCard();
         super.dispatchDraw(c);
     }
-    private int lastIconColor;
+    private int lastIconColor, lastDescriptionColor;
+    private boolean foregroundInitialized;
+    private void updateForeground() {
+        int foreground = Theme.getColor(Theme.key_windowBackgroundWhiteBlackText, provider);
+        int secondary = Theme.getColor(Theme.key_windowBackgroundWhiteGrayText2, provider);
+        if (!foregroundInitialized || lastIconColor != foreground) {
+            title.setTextColor(foreground);
+            icon.setColorFilter(foreground);
+            lastIconColor = foreground;
+        }
+        if (!foregroundInitialized || lastDescriptionColor != secondary) {
+            description.setTextColor(secondary);
+            lastDescriptionColor = secondary;
+        }
+        foregroundInitialized = true;
+    }
     @Override protected void onDraw(Canvas c){super.onDraw(c);}
     @Override public void onInitializeAccessibilityNodeInfo(AccessibilityNodeInfo info){super.onInitializeAccessibilityNodeInfo(info);info.setClassName("android.widget.Button");}
 }

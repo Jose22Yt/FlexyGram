@@ -36,3 +36,16 @@ Detalles de los cambios:
 - [Galería y controles inferiores](settings3/COMPOSER_GALLERY_CONTROLS.md)
 - [Revisión de rendimiento](performance-current/REVIEW.md)
 - [Menú de mensajes de la base compartida](FlexyGram-menu-mensajes.md)
+
+## Actualización para la siguiente beta
+
+Sobre `41ec915549ddeea4bbe53eb6ade6d20114b1dc4b` se añaden las mejoras de filas de ajustes, layout de búsqueda de la lista, medidas de etiquetas, preparación de texto de cabeceras y layouts de la vista previa de burbujas, opacidad compartida de fragmentos de borrado y decodificación de documentos en el worker existente. Se retira el halo añadido a la hora y se incorporan ticks vectoriales de estilo iOS 27 como recursos nativos predeterminados de FlexyGram, conservando tamaño y coordenadas.
+
+Validación registrada por grupos: suite de rendimiento con **280 aprobadas, 33 omitidas y 9 subtests aprobados**; tras la corrección de hora/ticks, **9 pruebas específicas aprobadas**, recursos comprobados con aapt2 y sintaxis Java validada. No son 289 pruebas distintas ni una nueva ejecución completa de la suite después de los ticks. No se dispone de dispositivo conectado ni de medidas físicas de FPS/GPU/temperatura. No se genera APK en esta entrega.
+
+- [Diagnóstico inicial y plan de jank](performance-current/JANK_PASS.md)
+- [Reutilización de filas de ajustes](performance-current/SETTINGS_ROW_REUSE.md)
+- [Revisión ampliada y mediciones de trabajo](performance-current/WIDE_PASS.md)
+- [Hora limpia y ticks predeterminados](performance-current/TIME_IOS27.md)
+
+Los parches exportados en el entorno son snapshots auxiliares; esta rama contiene directamente los cambios. La otra cuenta debe actualizar la rama y no reaplicar esos parches encima.

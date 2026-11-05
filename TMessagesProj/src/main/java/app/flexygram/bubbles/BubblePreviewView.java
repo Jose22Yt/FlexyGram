@@ -49,6 +49,8 @@ public final class BubblePreviewView extends View implements NotificationCenter.
         invalidate();
     }
     private int checkColor;
+    private int measuredWidth = -1, measuredHeight;
+    private float measuredDensity = -1;
     private static final String TIME = "09:41";
 
     public BubblePreviewView(Context context) { this(context, null); }
@@ -61,13 +63,14 @@ public final class BubblePreviewView extends View implements NotificationCenter.
             bubbles[i] = new MessageDrawable(MessageDrawable.TYPE_TEXT, i == 1, false);
             caches[i] = new MessageDrawable.PathDrawParams();
         }
-        check = context.getResources().getDrawable(R.drawable.msg_check_s).mutate();
-        halfCheck = context.getResources().getDrawable(R.drawable.msg_halfcheck).mutate();
+        check = context.getResources().getDrawable(BubbleStyle.signature() ? R.drawable.flexy_check_ios27 : R.drawable.msg_check_s).mutate();
+        halfCheck = context.getResources().getDrawable(BubbleStyle.signature() ? R.drawable.flexy_halfcheck_ios27 : R.drawable.msg_halfcheck).mutate();
         setContentDescription(String.join("\n", samples));
         refreshTheme();
     }
 
     private void refreshTheme() {
+        measuredWidth = -1;
         Theme.createChatResources(getContext(), false);
         if (Theme.chat_msgTextPaint != null) text.set(Theme.chat_msgTextPaint);
         else text.setTextSize(14 * getResources().getDisplayMetrics().scaledDensity);
@@ -119,7 +122,12 @@ public final class BubblePreviewView extends View implements NotificationCenter.
                 .build();
     }
     @Override protected void onMeasure(int widthSpec, int heightSpec) {
-        int width = MeasureSpec.getSize(widthSpec), side = AndroidUtilities.dp(16);
+        int width = MeasureSpec.getSize(widthSpec);
+        if (measuredWidth == width && measuredDensity == AndroidUtilities.density) {
+            setMeasuredDimension(width, measuredHeight);
+            return;
+        }
+        int side = AndroidUtilities.dp(16);
         int maximum = Math.max(1, Math.min(width - side * 2, Math.round(width * .78f)));
         int y = AndroidUtilities.dp(12), inset = AndroidUtilities.dp(14);
         int metadata = Math.round(time.getFontSpacing()) + AndroidUtilities.dp(10);
@@ -137,7 +145,12 @@ public final class BubblePreviewView extends View implements NotificationCenter.
         }
         int height = y + AndroidUtilities.dp(12);
         for (int i = 0; i < bubbles.length; i++) bubbles[i].setTop(tops[i], width, height, false, false);
+        measuredWidth = width; measuredHeight = height; measuredDensity = AndroidUtilities.density;
         setMeasuredDimension(width, height);
+    }
+    @Override protected void onConfigurationChanged(android.content.res.Configuration configuration) {
+        super.onConfigurationChanged(configuration);
+        refreshTheme();
     }
     private void updateWallpaperBounds(int width, int height) {
         frameBounds.set(AndroidUtilities.dp(8), 0, Math.max(AndroidUtilities.dp(8), width - AndroidUtilities.dp(8)), height);

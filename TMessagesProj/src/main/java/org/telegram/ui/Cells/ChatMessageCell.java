@@ -24961,39 +24961,9 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         }
     }
 
-    private final app.flexygram.bubbles.BubbleTimeContrast bubbleTimeContrast = new app.flexygram.bubbles.BubbleTimeContrast();
-    private Paint bubbleTimeSavedPaint;
-
+    /** Use the theme's normal timestamp ink, with no added halo or contrast pass. */
     private void drawReadableTimeLayout(Canvas canvas, StaticLayout layout, boolean selected) {
-        if (layout == null) return;
-        if (!app.flexygram.bubbles.BubbleStyle.signature() || shouldDrawTimeOnMedia()) {
-            SpoilerEffect.layoutDrawMaybe(layout, canvas);
-            return;
-        }
-        boolean out = currentMessageObject.isOutOwner();
-        int surface = getThemedColor(out
-                ? (selected ? Theme.key_chat_outBubbleSelected : Theme.key_chat_outBubble)
-                : (selected ? Theme.key_chat_inBubbleSelected : Theme.key_chat_inBubble));
-        int opacity = app.flexygram.bubbles.BubbleStyle.tintAlpha(app.flexygram.bubbles.BubbleConfig.transparency());
-        // The gradient is not a uniform surface; protect its time independently of moving colors.
-        if (out && getThemedColor(Theme.key_chat_outBubbleGradient1) != 0) opacity = 0;
-        surface = (surface & 0xFFFFFF) | ((Color.alpha(surface) * opacity / 255) << 24);
-        int oldColor = Theme.chat_timePaint.getColor();
-        bubbleTimeContrast.update(oldColor, surface);
-        boolean protectEdges = bubbleTimeContrast.halo() != 0;
-        if (protectEdges) {
-            if (bubbleTimeSavedPaint == null) bubbleTimeSavedPaint = new Paint();
-            bubbleTimeSavedPaint.set(Theme.chat_timePaint);
-            Theme.chat_timePaint.setShadowLayer(AndroidUtilities.dpf2(1), 0, 0,
-                    (bubbleTimeContrast.halo() & 0xFFFFFF) | (oldColor & 0xFF000000));
-        }
-        Theme.chat_timePaint.setColor((bubbleTimeContrast.ink() & 0xFFFFFF) | (oldColor & 0xFF000000));
-        try {
-            SpoilerEffect.layoutDrawMaybe(layout, canvas);
-        } finally {
-            if (protectEdges) Theme.chat_timePaint.set(bubbleTimeSavedPaint);
-            else Theme.chat_timePaint.setColor(oldColor);
-        }
+        if (layout != null) SpoilerEffect.layoutDrawMaybe(layout, canvas);
     }
 
     private void drawTimeInternal(Canvas canvas, float alpha, boolean fromParent, float timeX, StaticLayout timeLayout, float timeWidth, boolean drawSelectionBackground) {

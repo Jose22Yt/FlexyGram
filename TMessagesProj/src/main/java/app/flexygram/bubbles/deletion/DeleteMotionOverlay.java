@@ -270,12 +270,12 @@ public final class DeleteMotionOverlay extends View implements Choreographer.Fra
         float t=progress;
         if(t<.13f) { drawWhole(c,DeleteMotionMath.preCompression(t),1f,0f,0f,255);return; }
         float scatter=DeleteMotionMath.scatter(t);
+        bitmapPaint.setAlpha(Math.round(255f*DeleteMotionMath.fade(t,.60f)));
         for(Piece p:pieces) {
             int checkpoint=c.save();
             c.translate(p.dx*scatter*p.weight,p.dy*scatter*p.weight + image.getHeight()*.18f*scatter*scatter);
             c.rotate(p.spin*scatter,p.x,p.y);
             c.clipPath(p.clip);
-            bitmapPaint.setAlpha(Math.round(255f*DeleteMotionMath.fade(t,.60f)));
             c.drawBitmap(image,0,0,bitmapPaint);
             c.restoreToCount(checkpoint);
         }
@@ -301,11 +301,11 @@ public final class DeleteMotionOverlay extends View implements Choreographer.Fra
         int saved=c.save();
         c.translate(cx,cy);c.rotate(250f*orbit);c.scale(1f-.94f*orbit,1f-.94f*orbit);
         c.translate(-cx,-cy);
+        bitmapPaint.setAlpha(Math.round(255f*DeleteMotionMath.fade(t,.74f)));
         for(Piece p:pieces) {
             int save=c.save();
             c.rotate(12f*orbit*p.weight,cx,cy);
             c.clipPath(p.clip);
-            bitmapPaint.setAlpha(Math.round(255f*DeleteMotionMath.fade(t,.74f)));
             c.drawBitmap(image,0,0,bitmapPaint);
             c.restoreToCount(save);
         }
@@ -322,13 +322,13 @@ public final class DeleteMotionOverlay extends View implements Choreographer.Fra
             c.drawRoundRect(0,0,image.getWidth(),image.getHeight(),image.getWidth()*.025f,
                     image.getWidth()*.025f,flashPaint);
         }
+        bitmapPaint.setAlpha(Math.round(255f*DeleteMotionMath.fade(t,.63f)));
         for(Piece p:pieces) {
             int save=c.save();
             c.translate(p.dx*s*p.weight,p.dy*s*p.weight+image.getHeight()*.36f*s*s);
             c.rotate(p.spin*s,p.x,p.y);
             c.scale(1f-.32f*s,1f-.32f*s,p.x,p.y);
             c.clipPath(p.clip);
-            bitmapPaint.setAlpha(Math.round(255f*DeleteMotionMath.fade(t,.63f)));
             c.drawBitmap(image,0,0,bitmapPaint);
             c.restoreToCount(save);
         }

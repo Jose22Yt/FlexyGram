@@ -8362,16 +8362,21 @@ public class Theme {
             playPauseAnimator.addSvgKeyFrame("M 47.641 17.125 C 50.641 18.207 51.09 19.935 51.078 22.653 C 51.07 24.191 51.062 21.23 51.088 23.063 C 51.109 24.886 49.587 27 47.377 27 L 5 27.009 C 2.79 27.009 1 25.219 1 23.009 L 0.983 11.459 C 0.983 8.908 3.414 7.522 5.476 7.838 C 7.138 8.486 47.641 17.125 47.641 17.125 Z", 300);
             playPauseAnimator.addSvgKeyFrame("M 48 7 C 50.21 7 52 8.79 52 11 C 52 19 52 19 52 19 C 52 21.21 50.21 23 48 23 L 4 23 C 1.79 23 0 21.21 0 19 L 0 11 C 0 8.79 1.79 7 4 7 C 48 7 48 7 48 7 Z", 383);
 
-            chat_msgOutCheckDrawable = resources.getDrawable(R.drawable.msg_check_s).mutate();
-            chat_msgOutCheckSelectedDrawable = resources.getDrawable(R.drawable.msg_check_s).mutate();
-            chat_msgOutCheckReadDrawable = resources.getDrawable(R.drawable.msg_check_s).mutate();
-            chat_msgOutCheckReadSelectedDrawable = resources.getDrawable(R.drawable.msg_check_s).mutate();
-            chat_msgMediaCheckDrawable = resources.getDrawable(R.drawable.msg_check_s).mutate();
-            chat_msgStickerCheckDrawable = resources.getDrawable(R.drawable.msg_check_s).mutate();
-            chat_msgOutHalfCheckDrawable = resources.getDrawable(R.drawable.msg_halfcheck).mutate();
-            chat_msgOutHalfCheckSelectedDrawable = resources.getDrawable(R.drawable.msg_halfcheck).mutate();
-            chat_msgMediaHalfCheckDrawable = resources.getDrawable(R.drawable.msg_halfcheck_s).mutate();
-            chat_msgStickerHalfCheckDrawable = resources.getDrawable(R.drawable.msg_halfcheck_s).mutate();
+            // Native FlexyGram defaults: identical 12dp bounds preserve all status offsets.
+            final int bubbleCheck = app.flexygram.bubbles.BubbleStyle.signature()
+                    ? R.drawable.flexy_check_ios27 : R.drawable.msg_check_s;
+            final int bubbleHalfCheck = app.flexygram.bubbles.BubbleStyle.signature()
+                    ? R.drawable.flexy_halfcheck_ios27 : R.drawable.msg_halfcheck;
+            chat_msgOutCheckDrawable = resources.getDrawable(bubbleCheck).mutate();
+            chat_msgOutCheckSelectedDrawable = resources.getDrawable(bubbleCheck).mutate();
+            chat_msgOutCheckReadDrawable = resources.getDrawable(bubbleCheck).mutate();
+            chat_msgOutCheckReadSelectedDrawable = resources.getDrawable(bubbleCheck).mutate();
+            chat_msgMediaCheckDrawable = resources.getDrawable(bubbleCheck).mutate();
+            chat_msgStickerCheckDrawable = resources.getDrawable(bubbleCheck).mutate();
+            chat_msgOutHalfCheckDrawable = resources.getDrawable(bubbleHalfCheck).mutate();
+            chat_msgOutHalfCheckSelectedDrawable = resources.getDrawable(bubbleHalfCheck).mutate();
+            chat_msgMediaHalfCheckDrawable = resources.getDrawable(app.flexygram.bubbles.BubbleStyle.signature() ? R.drawable.flexy_halfcheck_ios27 : R.drawable.msg_halfcheck_s).mutate();
+            chat_msgStickerHalfCheckDrawable = resources.getDrawable(app.flexygram.bubbles.BubbleStyle.signature() ? R.drawable.flexy_halfcheck_ios27 : R.drawable.msg_halfcheck_s).mutate();
             chat_msgClockDrawable = new MsgClockDrawable();
             chat_msgUnlockDrawable = resources.getDrawable(R.drawable.ic_lock_header).mutate();
             chat_msgInViewsDrawable = resources.getDrawable(R.drawable.msg_views).mutate();

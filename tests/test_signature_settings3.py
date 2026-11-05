@@ -39,7 +39,9 @@ def test_root_native_colored_icons_and_single_registry():
  cell=(S/'Settings2Cell.java').read_text();root=(S/'SignatureSettingsActivity.java').read_text()
  assert 'SettingsCategoryIcon.create' in cell and 'RippleDrawable' in cell
  assert 'icon.setBackground(null)' in cell
- assert 'icon.setColorFilter(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText,provider))' in cell
+ assert 'icon.setColorFilter(foreground)' in cell
+ assert 'int foreground = Theme.getColor(Theme.key_windowBackgroundWhiteBlackText, provider)' in cell
+ assert 'updateForeground();' in cell
  assert 'Settings3Registry.all()' in root and 'SignatureSettingsRegistry.children' not in root
  assert 'Theme.key_windowBackgroundWhiteBlackText' in source('tw/nekomimi/nekogram/settings/BaseNekoSettingsActivity.java')
 def test_direct_chat_preview_order_and_no_nested_scroll_views():
