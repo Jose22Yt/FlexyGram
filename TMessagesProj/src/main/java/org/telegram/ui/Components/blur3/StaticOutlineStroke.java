@@ -16,7 +16,6 @@ public final class StaticOutlineStroke {
         final RectF rect=new RectF();
         final Path path=new Path();
         final float[] radii=new float[8];
-        final GlassContourRenderer contour=new GlassContourRenderer();
     }
     private static final ThreadLocal<Scratch> SCRATCH=ThreadLocal.withInitial(Scratch::new);
     private StaticOutlineStroke(){}
@@ -24,11 +23,6 @@ public final class StaticOutlineStroke {
     public static boolean drawOverride(Canvas c,float l,float t,float r,float b,float radius,boolean top,Paint p,GlassOutlineStyle mode){
         if(mode==GlassOutlineStyle.GLARE)return false;
         if(skip(mode,top)||r<=l||b<=t)return true;
-        if(GlassContourRenderer.supports(mode)) {
-            SCRATCH.get().contour.draw(c,l,t,r,b,radius,mode,
-                    org.telegram.ui.ActionBar.Theme.getColor(org.telegram.ui.ActionBar.Theme.key_windowBackgroundWhite),p.getAlpha());
-            return true;
-        }
         float width=Math.min(AndroidUtilities.dpf2(1),Math.min(r-l,b-t)),half=width*.5f;
         Paint.Style style=p.getStyle();float oldWidth=p.getStrokeWidth();Shader shader=p.getShader();
         try{p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(width);p.setShader(null);
@@ -40,11 +34,6 @@ public final class StaticOutlineStroke {
     public static boolean drawOverride(Canvas c,float l,float t,float r,float b,float[] radii,boolean top,Paint p,GlassOutlineStyle mode){
         if(mode==GlassOutlineStyle.GLARE)return false;
         if(skip(mode,top)||r<=l||b<=t)return true;
-        if(GlassContourRenderer.supports(mode)) {
-            SCRATCH.get().contour.draw(c,l,t,r,b,radii,mode,
-                    org.telegram.ui.ActionBar.Theme.getColor(org.telegram.ui.ActionBar.Theme.key_windowBackgroundWhite),p.getAlpha());
-            return true;
-        }
         Scratch s=SCRATCH.get();float width=Math.min(AndroidUtilities.dpf2(1),Math.min(r-l,b-t)),half=width*.5f;
         s.rect.set(l+half,t+half,r-half,b-half);
         for(int i=0;i<8;i++)s.radii[i]=Math.max(0,radii[i]-half);

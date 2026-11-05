@@ -21,7 +21,7 @@ def write(dest,root):
  J=root/'TMessagesProj/src/main/java'
  def emit(path,text):
   p=dest/path;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(text)
- for path in ['app/flexygram/effects/GlareMode.java','app/flexygram/effects/GlareSettingsSection.java','org/telegram/ui/Components/blur3/StaticOutlineStroke.java','org/telegram/ui/Components/blur3/GlassContourRenderer.java','org/telegram/ui/Components/blur3/GlassBackdropColor.java','org/telegram/ui/Components/blur3/GlassOutlineStyle.java','org/telegram/ui/Components/blur3/StrokeDrawable.java','tw/nekomimi/nekogram/config/ConfigItem.java']:
+ for path in ['app/flexygram/effects/GlareMode.java','app/flexygram/effects/GlareSettingsSection.java','org/telegram/ui/Components/blur3/StaticOutlineStroke.java','org/telegram/ui/Components/blur3/GlassOutlineStyle.java','org/telegram/ui/Components/blur3/StrokeDrawable.java','tw/nekomimi/nekogram/config/ConfigItem.java']:
   emit(path,(J/path).read_text())
  emit('androidx/recyclerview/widget/RecyclerView.java','''package androidx.recyclerview.widget;
 public class RecyclerView extends android.view.ViewGroup {
@@ -30,8 +30,6 @@ public class RecyclerView extends android.view.ViewGroup {
  public abstract static class ViewHolder{public final android.view.View itemView;public ViewHolder(android.view.View v){itemView=v;}public int getItemViewType(){return 1;}}
  public abstract static class Adapter<T extends ViewHolder>{public abstract int getItemCount();public abstract T onCreateViewHolder(android.view.ViewGroup p,int t);public abstract void onBindViewHolder(T h,int p);public int getItemViewType(int p){return 0;}public void notifyDataSetChanged(){}public void notifyItemChanged(int p){}}
 }''')
- emit('org/telegram/ui/Components/RecyclerListView.java','package org.telegram.ui.Components;public class RecyclerListView{public static class Holder extends androidx.recyclerview.widget.RecyclerView.ViewHolder{public Holder(android.view.View v){super(v);}}}')
- emit('app/flexygram/effects/GlarePreviewView.java','package app.flexygram.effects;public class GlarePreviewView extends android.view.View{public GlarePreviewView(android.content.Context c,Object p){super(c);}}')
  emit('org/telegram/messenger/R.java','package org.telegram.messenger;public class R{public static class string{}public static class drawable{public static final int settings3_sliders=android.R.drawable.ic_menu_preferences;}}')
  emit('org/telegram/messenger/ApplicationLoader.java','package org.telegram.messenger;public class ApplicationLoader{public static android.content.Context applicationContext;}')
  emit('org/telegram/messenger/FileLog.java','package org.telegram.messenger;public class FileLog{public static void e(Throwable e){}}')
@@ -61,11 +59,6 @@ public abstract class SignatureMatteSettingsActivity extends org.telegram.ui.Act
  }
  protected abstract class MatteListAdapter extends BaseListAdapter{protected MatteListAdapter(Context c){super(c);}}
 }''')
- emit('org/telegram/ui/Components/blur3/source/BlurredBackgroundSource.java','package org.telegram.ui.Components.blur3.source;public interface BlurredBackgroundSource{}')
- emit('org/telegram/ui/Components/blur3/source/BlurredBackgroundSourceColor.java','package org.telegram.ui.Components.blur3.source;public class BlurredBackgroundSourceColor implements BlurredBackgroundSource{public int color;public int getColor(){return color;}}')
- emit('org/telegram/ui/Components/blur3/source/BlurredBackgroundSourceBitmap.java','package org.telegram.ui.Components.blur3.source;public class BlurredBackgroundSourceBitmap implements BlurredBackgroundSource{public android.graphics.Bitmap bitmap;public final android.graphics.Matrix matrix=new android.graphics.Matrix();public android.graphics.Bitmap getBitmap(){return bitmap;}public android.graphics.Matrix getMatrix(){return matrix;}}')
- emit('org/telegram/ui/Components/blur3/source/BlurredBackgroundSourceWrapped.java','package org.telegram.ui.Components.blur3.source;public class BlurredBackgroundSourceWrapped implements BlurredBackgroundSource{public BlurredBackgroundSource source;public BlurredBackgroundSource getSource(){return source;}}')
- emit('org/telegram/ui/Components/blur3/source/BlurredBackgroundSourceRenderNode.java','package org.telegram.ui.Components.blur3.source;public class BlurredBackgroundSourceRenderNode implements BlurredBackgroundSource{public BlurredBackgroundSource underSource;}')
  emit('org/telegram/ui/Components/blur3/drawable/color/BlurredBackgroundColorProvider.java',(J/'org/telegram/ui/Components/blur3/drawable/color/BlurredBackgroundColorProvider.java').read_text())
  # Default provider divider is a native-theme host double.
  p=dest/'org/telegram/ui/ActionBar/Theme.java';p.write_text(p.read_text().replace('public static int getColor(', 'public static int getDividerColor(Object p){return 0xff888888;}public static int getColor('))

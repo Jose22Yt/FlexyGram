@@ -240,7 +240,6 @@ public class BlurredBackgroundDrawableRenderNode extends BlurredBackgroundDrawab
         canvas.translate(boundProps.boundsWithPadding.left, boundProps.boundsWithPadding.top);
         canvas.drawRenderNode(renderNode);
         canvas.restore();
-        drawAdditionalOutline(canvas, source);
     }
 
     public void invalidateDisplayList() {

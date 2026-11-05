@@ -5,6 +5,4 @@
   <string name="FlexyGlareDisabled">Выключить</string>
   <string name="FlexyGlareDefault">По умолчанию</string>
   <string name="FlexyGlareSolid">Сплошной контур</string>
-  <string name="FlexyGlareDouble">Двойной контур</string>
-  <string name="FlexyGlareAdaptive">Адаптивный</string>
 </resources>

@@ -117,9 +117,7 @@ def test_theme_refreshes_retained_tabs_and_original_glare_key_is_preserved():
     filters=src('org/telegram/ui/Components/FilterTabsView.java')
     update=filters[filters.index('    public void updateColors()'):filters.index('    protected void onMeasure',filters.index('    public void updateColors()'))]
     assert 'selectorDrawable.setColor' in update and 'Theme.getColor(selectorColorKey, resourcesProvider)' in update
-    # Extended glare modes have dedicated compatibility/pixel tests in test_glare_effects
-    # and tools/glare/android; the existing preference backend must remain unchanged.
-    for path in ['TMessagesProj/src/main/kotlin/app/exteraless/appearance/AppearanceConfig.kt']:
+    for path in ['TMessagesProj/src/main/kotlin/app/exteraless/appearance/AppearanceConfig.kt','TMessagesProj/src/main/java/app/flexygram/effects/GlareMode.java','TMessagesProj/src/main/java/org/telegram/ui/Components/blur3/StaticOutlineStroke.java']:
         current=(ROOT/path).read_bytes()
         if path.endswith('AppearanceConfig.kt'):
             getter=b'\n    /** Native metadata only; account/session preferences are not part of this catalog. */\n    fun getStudioItems(): List<ConfigItem> = configs.toList()\n'

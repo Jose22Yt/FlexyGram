@@ -5,6 +5,4 @@
   <string name="FlexyGlareDisabled">Desactivar</string>
   <string name="FlexyGlareDefault">Por defecto</string>
   <string name="FlexyGlareSolid">Contorno sólido</string>
-  <string name="FlexyGlareDouble">Doble contorno</string>
-  <string name="FlexyGlareAdaptive">Adaptativo</string>
 </resources>

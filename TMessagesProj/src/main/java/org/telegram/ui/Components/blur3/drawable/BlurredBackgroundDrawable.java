@@ -232,23 +232,6 @@ public abstract class BlurredBackgroundDrawable extends Drawable implements Glas
         return outsetY;
     }
 
-    private org.telegram.ui.Components.blur3.GlassContourRenderer extraContour;
-    private org.telegram.ui.Components.blur3.GlassBackdropColor backdropColor;
-
-    /** Extra modes paint after the existing surface, without changing legacy strokes. */
-    protected void drawAdditionalOutline(Canvas canvas, BlurredBackgroundSource source) {
-        GlassOutlineStyle mode=GlassOutlineStyle.current();
-        if(extraContour==null || !org.telegram.ui.Components.blur3.GlassContourRenderer.supports(mode) || alpha<=0 || boundProps.boundsWithPadding.isEmpty()) return;
-        int under=Theme.getColor(Theme.key_windowBackgroundWhite);
-        if(mode==GlassOutlineStyle.ADAPTIVE) under=backdropColor.resolve(source,
-                boundProps.boundsWithPadding.centerX()+sourceOffsetX,
-                boundProps.boundsWithPadding.centerY()+sourceOffsetY,under);
-        int surface=ColorUtils.compositeColors(backgroundColor,under);
-        extraContour.draw(canvas,boundProps.boundsWithPadding.left,boundProps.boundsWithPadding.top,
-                boundProps.boundsWithPadding.right,boundProps.boundsWithPadding.bottom,
-                boundProps.radii,mode,surface,alpha);
-    }
-
     @Override
     public void onGlassOutlineStyleChanged() {
         updateColors();
@@ -265,11 +248,6 @@ public abstract class BlurredBackgroundDrawable extends Drawable implements Glas
         final GlassOutlineStyle outlineStyle = GlassOutlineStyle.current();
         final boolean glare = outlineStyle == GlassOutlineStyle.GLARE;
         final boolean solid = outlineStyle == GlassOutlineStyle.SOLID;
-        if (org.telegram.ui.Components.blur3.GlassContourRenderer.supports(outlineStyle) && extraContour==null) {
-            extraContour=new org.telegram.ui.Components.blur3.GlassContourRenderer();
-            backdropColor=new org.telegram.ui.Components.blur3.GlassBackdropColor();
-        }
-        if(backdropColor!=null) backdropColor.reset();
 
         if (boundProps.useFullStroke != solid) {
             boundProps.useFullStroke = solid;
@@ -671,11 +649,6 @@ public abstract class BlurredBackgroundDrawable extends Drawable implements Glas
     /* Universal */
 
     protected void drawSource(Canvas canvas, BlurredBackgroundSource source) {
-        drawSourceContents(canvas,source);
-        drawAdditionalOutline(canvas,source);
-    }
-
-    private void drawSourceContents(Canvas canvas, BlurredBackgroundSource source) {
         if (boundProps.boundsWithPadding.isEmpty()) {
             return;
         }
@@ -692,7 +665,7 @@ public abstract class BlurredBackgroundDrawable extends Drawable implements Glas
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && source instanceof BlurredBackgroundSourceRenderNode) {
             drawSourceRenderNode(canvas, (BlurredBackgroundSourceRenderNode) source);
         } else if (source instanceof BlurredBackgroundSourceWrapped) {
-            drawSourceContents(canvas, ((BlurredBackgroundSourceWrapped) source).getSource());
+            drawSource(canvas, ((BlurredBackgroundSourceWrapped) source).getSource());
         } else if (source != null) {
             drawSourceAny(canvas, source);
         }
