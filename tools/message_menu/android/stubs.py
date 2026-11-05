@@ -7,7 +7,7 @@ def write(dest,root):
  def put(name,source):
   path=dest/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_text(source)
  java=root/'TMessagesProj/src/main/java'
- names=['BubbleActionPanelView','BubbleMenuConfig','BubbleMenuIcon','BubbleMenuGallery','BubbleInteractionSettings','BubbleInteractionSettingsActivity','BubbleTapMotion','DampedSpringCurve','ContextPreviewPlacement']
+ names=['BubbleActionPanelView','BubbleMenuConfig','BubbleMenuIcon','BubbleMenuGallery','BubbleInteractionSettings','BubbleInteractionSettingsActivity','BubbleTapMotion','SelectedBubbleMotion','DampedSpringCurve','ContextPreviewPlacement']
  sources=[]
  for name in names:
   source=(java/'app/flexygram/bubbles/interaction'/(name+'.java')).read_text();sources.append(source);put('app/flexygram/bubbles/interaction/'+name+'.java',source)

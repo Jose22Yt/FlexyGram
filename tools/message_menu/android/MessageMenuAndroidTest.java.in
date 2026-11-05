@@ -44,6 +44,23 @@ public class MessageMenuAndroidTest {
    assertEquals(1,c.getSaveCount());b.recycle();
   }
  }
+ @Test public void selectedMenuHasOneNativeFrameClockAndInterruptsCleanly() {
+  int[] draws={0},done={0};var motion=new SelectedBubbleMotion();
+  motion.enter(()->draws[0]++);assertEquals(.94f,motion.panelScale(),.0001f);assertEquals(8f,motion.panelOffset(),.001f);
+  org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(java.time.Duration.ofMillis(350));
+  assertFalse(motion.isRunning());assertEquals(1f,motion.panelScale(),0f);assertTrue(draws[0]>2);
+  motion.close(()->done[0]++);motion.finishImmediately();motion.finishImmediately();assertEquals(1,done[0]);
+  int stopped=draws[0];org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(java.time.Duration.ofMillis(350));
+  assertEquals(stopped,draws[0]);assertFalse(motion.hasOwner());
+ }
+ @Test public void selectedMenuReentryReleasesOnlyThePreviousOwner() {
+  int[] first={0},next={0},cleanup={0};var motion=new SelectedBubbleMotion();
+  motion.enter(()->first[0]++);motion.close(()->cleanup[0]++);
+  motion.enter(()->next[0]++);int old=first[0];assertEquals(1,cleanup[0]);
+  org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(java.time.Duration.ofMillis(350));
+  assertEquals(old,first[0]);assertTrue(next[0]>1);assertEquals(1f,motion.panelScale(),0);
+  motion.reset();assertFalse(motion.hasOwner());
+ }
  @Test public void choicesPersistAndNeverGrantUnavailableActions(){
   for(int style=0;style<4;style++){BubbleMenuConfig.layout(activity,style);assertEquals(style,BubbleMenuConfig.layout(activity));assertTrue(BubbleInteractionSettings.signaturePanel(activity));}
   BubbleMenuConfig.actions(activity,EnumSet.of(Action.COPY,Action.SAVE));assertEquals(EnumSet.of(Action.COPY,Action.SAVE),BubbleMenuConfig.actions(activity));

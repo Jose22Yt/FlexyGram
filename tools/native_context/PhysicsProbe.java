@@ -32,7 +32,7 @@ public class PhysicsProbe {
   for(int hz:new int[]{60,90,120,144}){
    SelectedBubbleMotion m=new SelectedBubbleMotion();
    m.enter(()->{},.978f,.965f,0f,0f);
-   require(m.panelScale()>.60f&&m.panelScale()<.65f,"Card must grow visibly from message anchor");
+   require(m.panelScale()>=.94f&&m.panelScale()<.95f,"Card must use a subtle anchored reveal");
    float peak=0f;double peakTime=0;int settledFrame=0;
    for(int i=1;i<=hz;i++){
     frame(1d/hz);

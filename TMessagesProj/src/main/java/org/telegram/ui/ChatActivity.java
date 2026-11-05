@@ -11925,6 +11925,50 @@ public class ChatActivity extends BaseFragment implements
 
     private int scrimBlurGeneration;
 
+    /** One shared capture, before the popup is visible; discard stale owners. */
+    private void captureMessageMenuBlur(int blurGeneration) {
+        ScrimOptions.makeGlobalBlurBitmaps((bitmapBg, bitmapOptions) -> {
+            if (blurGeneration != scrimBlurGeneration || fragmentView == null
+                    || !fragmentView.isAttachedToWindow() || scrimView == null) {
+                bitmapBg.recycle();
+                bitmapOptions.recycle();
+                return;
+            }
+            if (scrimBlurBitmap != null) scrimBlurBitmap.recycle();
+            scrimBlurBitmap = bitmapBg;
+            scrimBlurBitmapPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            scrimBlurBitmapPaint.setShader(scrimBlurBitmapShader = new BitmapShader(scrimBlurBitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP));
+            scrimBlurMatrix = new Matrix();
+            scrimBlur3SourceBitmap.setBitmap(bitmapOptions);
+            Blur3Utils.checkBitmapSourceMatrixScale(scrimBlur3SourceBitmap, fragmentView);
+            scrimBlur3Factory.invalidateAllLinkedViews();
+        });
+    }
+
+    /** Compact menus use SelectedBubbleMotion as their sole animation clock. */
+    private void prepareSignatureMenuScrim(View view) {
+        setScrimView(view);
+        int generation = ++scrimBlurGeneration;
+        if (scrimAnimatorSet != null) {
+            scrimAnimatorSet.removeAllListeners();scrimAnimatorSet.cancel();
+        }
+        if (scrimViewAlphaAnimator != null) {
+            scrimViewAlphaAnimator.removeAllListeners();scrimViewAlphaAnimator.cancel();
+        }
+        scrimViewAlpha = 1f;scrimViewProgress = 0f;scrimPaintAlpha = 0f;
+        scrimProgressDirection = true;
+        if (view instanceof ChatMessageCell) {
+            ChatMessageCell cell = (ChatMessageCell) view;
+            cell.setInvalidatesParent(true);restartSticker(cell);
+        }
+        // Do not capture a previous selection overlay into the next backdrop.
+        if (scrimBlurBitmap != null) {
+            scrimBlurBitmapShader = null;scrimBlurBitmapPaint = null;
+            scrimBlurBitmap.recycle();scrimBlurBitmap = null;
+        }
+        if (SharedConfig.chatBlurEnabled()) captureMessageMenuBlur(generation);
+    }
+
     private void dimBehindView(float value, boolean blur, boolean hidePagedownButtons) {
         final int blurGeneration = ++scrimBlurGeneration;
         boolean enable = value > 0;
@@ -11955,22 +11999,7 @@ public class ChatActivity extends BaseFragment implements
             animators.add(scrimPaintAlphaAnimator = ValueAnimator.ofFloat(0, value));
 
             if (blur) {
-                ScrimOptions.makeGlobalBlurBitmaps((bitmapBg, bitmapOptions) -> {
-                    if (blurGeneration != scrimBlurGeneration || fragmentView == null
-                            || !fragmentView.isAttachedToWindow() || scrimView == null) {
-                        bitmapBg.recycle();
-                        bitmapOptions.recycle();
-                        return;
-                    }
-                    if (scrimBlurBitmap != null) scrimBlurBitmap.recycle();
-                    scrimBlurBitmap = bitmapBg;
-                    scrimBlurBitmapPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-                    scrimBlurBitmapPaint.setShader(scrimBlurBitmapShader = new BitmapShader(scrimBlurBitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP));
-                    scrimBlurMatrix = new Matrix();
-                    scrimBlur3SourceBitmap.setBitmap(bitmapOptions);
-                    Blur3Utils.checkBitmapSourceMatrixScale(scrimBlur3SourceBitmap, fragmentView);
-                    scrimBlur3Factory.invalidateAllLinkedViews();
-                });
+                captureMessageMenuBlur(blurGeneration);
             }
         } else {
             scrimViewProgress = scrimPaintAlpha / max;
@@ -33482,7 +33511,7 @@ public class ChatActivity extends BaseFragment implements
             }
             MessageSeenView messageSeenView = null;
 
-            updateScrimSourceBitmap();
+            if (!compactContext) updateScrimSourceBitmap();
 
             popupLayout.setBackground(scrimBlur3Factory.create(popupLayout, true)
                 .setColorProvider(BlurredBackgroundProviderImpl.messageMenuBackground(resourceProvider))
@@ -35177,21 +35206,24 @@ public class ChatActivity extends BaseFragment implements
                 if (scrimPopupWindow == null || fragmentView == null || scrimPopupWindow.isShowing() || !AndroidUtilities.isActivityRunning(getParentActivity())) {
                     return;
                 }
+                if (compactContext) {
+                    prepareSignatureMenuScrim(v);
+                    popupLayout.setAlpha(0f);
+                    popupLayout.setScaleX(.94f);popupLayout.setScaleY(.94f);
+                    popupLayout.setTranslationY(dp(8));
+                    if (finalReactionsLayout != null) {
+                        finalReactionsLayout.beginSignatureMotion();finalReactionsLayout.setSignatureMotionProgress(0f);
+                    }
+                }
                 scrimPopupWindow.showAtLocation(chatListView, Gravity.LEFT | Gravity.TOP, finalPopupX, finalPopupY);
                 chatListView.stopScroll();
                 chatLayoutManager.setCanScrollVertically(false);
                 if (compactContext) {
-                    dimBehindView(v, true, true);
-                    if (scrimAnimatorSet != null) {
-                        scrimAnimatorSet.removeAllListeners();
-                        scrimAnimatorSet.cancel();
-                    }
                     selectedBubbleMotionMessage = selectedObject;
                     selectedBubbleOffsetY = signatureBubbleOffset;
                     selectedBubblePreviewScale = signatureBubbleScale;
                     final ChatMessageCell tapped=(ChatMessageCell)v;
                     final boolean handoff=true;
-                    if (finalReactionsLayout != null) finalReactionsLayout.beginSignatureMotion();
                     selectedBubbleMotion.enter(() -> {
                         if (contentView != null) contentView.invalidate();
                         float phase=selectedBubbleMotion.panelProgress();
@@ -35234,7 +35266,7 @@ public class ChatActivity extends BaseFragment implements
                 chatListView.stopScroll();
                 chatLayoutManager.setCanScrollVertically(false);
             }
-            // Compact entry already schedules one guarded blur capture in dimBehindView(v, true, true).
+            // Compact entry prepares exactly one guarded capture before showing the popup.
             // Classic dimBehindView(v, true) needs its separate background capture.
             if (!compactContext && glassMenu && scrimBlur3SourceBitmap.getBitmap() == null) {
                 GlassMenuHelper.captureBlur(scrimBlur3SourceBitmap, scrimBlur3Factory, fragmentView);

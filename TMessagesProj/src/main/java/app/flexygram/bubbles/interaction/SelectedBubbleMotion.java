@@ -28,8 +28,8 @@ public final class SelectedBubbleMotion implements Choreographer.FrameCallback {
         if (p <= 1f) return distance * p;
         return distance + maxOvershoot * (float)Math.tanh(distance * (p - 1f) / maxOvershoot);
     }
-    public float panelScale() { return .62f + .38f * phase.value; }
-    public float panelOffset() { return 18f * (1f - phase.value); }
+    public float panelScale() { return .94f + .06f * phase.value; }
+    public float panelOffset() { return 8f * (1f - phase.value); }
     public float scale() { return (x.value + y.value) * .5f; }
     public float scaleX() { return x.value; }
     public float scaleY() { return y.value; }
@@ -73,13 +73,15 @@ public final class SelectedBubbleMotion implements Choreographer.FrameCallback {
         float dt = Math.max(0f, Math.min(.064f, (frameTimeNanos-lastFrame)/1_000_000_000f));
         lastFrame = frameTimeNanos;
         boolean mx=x.step(dt), my=y.step(dt), mp=phase.step(dt);
-        if (invalidate != null) invalidate.run();
         if ((!mx && !my && !mp) || closing && phase.value <= 0f
                 || android.os.SystemClock.uptimeMillis()-started >= (closing ? CLOSE_LIMIT_MS : ENTER_LIMIT_MS)) {
             running = false;
             x.snap(1f); y.snap(1f); phase.snap(closing ? 0f : 1f);
             if (closing) finish(); else if (invalidate != null) invalidate.run();
-        } else Choreographer.getInstance().postFrameCallback(this);
+        } else {
+            if (invalidate != null) invalidate.run();
+            Choreographer.getInstance().postFrameCallback(this);
+        }
     }
     /** A new gesture takes priority over the decorative return, with exactly one cleanup callback. */
     public void finishImmediately() {
