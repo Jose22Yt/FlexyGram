@@ -197,24 +197,6 @@ object AppearanceConfig {
             }
         })
 
-    /** Relative contour width, in tenths: 5..30, default 10 (1x). */
-    @JvmField
-    val glassOutlineWidth =
-        addConfig(object : ConfigItem("OEAppearanceGlassOutlineWidth", ConfigItem.configTypeInt, 10) {
-            override fun setConfigInt(v: Int) {
-                val safe = v.coerceIn(5, 30)
-                val changed = Int() != safe
-                super.setConfigInt(safe)
-                if (changed) GlassOutlineStyle.dispatchChange()
-            }
-        })
-
-    @JvmStatic
-    fun glassOutlineWidth(): Int {
-        ensureLoaded()
-        return glassOutlineWidth.Int().coerceIn(5, 30)
-    }
-
     /** Стеклянное меню сообщения. Дефолт true, как в exteraGram (BooleanPref(1)). */
     @JvmField
     val glassMessageMenu =

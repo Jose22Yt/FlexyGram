@@ -1,5 +1,7 @@
 # Input backdrop, contour width and asynchronous message-menu blur
 
+Update: the width slider/preference described below was cancelled before packaging. See [beta 8 fixed contour](BETA8_FIXED_GLARE.md). The input and async-menu corrections remain.
+
 The compact composer had an extra 154/255 tint over the native blur provider's
 own contrast surface. That compounded opacity hid much of the sampled backdrop.
 Keep the existing provider/capture/island geometry and reduce only the additional

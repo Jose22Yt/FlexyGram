@@ -32,7 +32,6 @@ public final class Settings2Policy {
         own("appearance:forceSnow", "chat_list");
         own("appearance:glassMessageMenu", "effects");
         own("appearance:glassOutline", "chat_glare");
-        own("appearance:glassOutlineWidth", "chat_glare");
         own("appearance:gooeyAvatar", "avatars");
         own("appearance:hiding", "@moved");
         own("appearance:iconPacks", "@moved");
@@ -250,7 +249,6 @@ public final class Settings2Policy {
         ALIASES.put("appearance:forceSnow","chat_list");
         ALIASES.put("appearance:glassMessageMenu","effects");
         ALIASES.put("appearance:glassOutline","chat_glare");
-        ALIASES.put("appearance:glassOutlineWidth","chat_glare");
         ALIASES.put("appearance:gooeyAvatar","avatars");
         ALIASES.put("appearance:hiding","@moved");
         ALIASES.put("appearance:iconPacks","@moved");

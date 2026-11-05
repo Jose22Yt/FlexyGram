@@ -5,6 +5,4 @@
   <string name="FlexyGlareDisabled">Disabled</string>
   <string name="FlexyGlareDefault">Default</string>
   <string name="FlexyGlareSolid">Solid stroke</string>
-  <string name="FlexyGlareWidth">Outline thickness</string>
-  <string name="FlexyGlareReset">Reset</string>
 </resources>
