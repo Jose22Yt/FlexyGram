@@ -38,6 +38,7 @@ public final class StudioSchema {
         b("bubbles","edges","flexygram_bubbles","edges",false),
         i("bubbles","transparency","flexygram_bubbles","transparency",35,0,100),
         i("bubbles","borderTenths","flexygram_bubbles","signature_border_tenths",11,5,20),
+        i("bubbles","surfaceEffect","flexygram_bubbles","surface_effect",0,0,1),
         b("bubbles","cachedBlur","flexygram_bubbles","signature_cached_blur",false),
         b("bubbles","outlineEnabled","flexygram_bubbles","signature_outline_enabled",true),
         i("bubbles","outlineStyle","flexygram_bubbles","signature_outline_style",1,0,3),

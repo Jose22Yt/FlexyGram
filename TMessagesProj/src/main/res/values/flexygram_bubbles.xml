@@ -47,4 +47,7 @@
     <string name="FlexyBubbleAppearanceSection">Appearance</string>
     <string name="FlexyBubbleBorderSection">Border</string>
     <string name="FlexyBubbleFusionSection">Fusion</string>
+    <string name="FlexyBubbleSurfaceEffect">Bubble effect</string>
+    <string name="FlexyBubbleAdaptiveSurface">Adaptive wallpaper</string>
+    <string name="FlexyBubbleLegacySurface">Previous effect</string>
 </resources>

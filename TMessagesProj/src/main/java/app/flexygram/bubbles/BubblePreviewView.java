@@ -42,9 +42,20 @@ public final class BubblePreviewView extends View implements NotificationCenter.
     private final app.flexygram.preview.SignatureWallpaperPreview wallpaperPreview;
     private boolean wallpaperMotion;
     private SignatureWallpaperBlur.Owner blurOwner;
-    private final MessageDrawable.GlassSource cachedWallpaper = (canvas, shape) ->
-            blurOwner != null && blurOwner.draw(canvas, shape, 0, 0);
+    private final ServiceBubbleSurface serviceBubbleSurface = new ServiceBubbleSurface();
+    private final MessageDrawable.GlassSource cachedWallpaper = new MessageDrawable.GlassSource() {
+        @Override public boolean draw(Canvas canvas, Path shape) { return draw(canvas, shape, 255, false); }
+        @Override public boolean draw(Canvas canvas, Path shape, int alpha) { return draw(canvas, shape, alpha, false); }
+        @Override public boolean draw(Canvas canvas, Path shape, int alpha, boolean selected) {
+            if (BubbleConfig.adaptive()) {
+                return serviceBubbleSurface.draw(canvas, shape, null, getWidth(), getHeight(), 0, 0, alpha, selected);
+            }
+            return blurOwner != null && blurOwner.draw(canvas, shape, 0, 0, alpha);
+        }
+    };
     public void settingsChanged() {
+        checkColor = BubbleConfig.adaptive() ? ServiceBubbleSurface.textColor(null) : Theme.getColor(Theme.key_chat_outSentCheckRead);
+        check.setTint(checkColor); halfCheck.setTint(checkColor);
         if (blurOwner != null) blurOwner.prepare(wallpaper, wallpaperMotion, Theme.getColor(Theme.key_windowBackgroundGray));
         invalidate();
     }
@@ -170,10 +181,10 @@ public final class BubblePreviewView extends View implements NotificationCenter.
             boolean out = i == 1;
             bubbles[i].drawCached(canvas, caches[i]);
             Rect bounds = bubbles[i].getBounds();
-            text.setColor(Theme.getColor(out ? Theme.key_chat_messageTextOut : Theme.key_chat_messageTextIn));
+            text.setColor(BubbleConfig.adaptive() ? ServiceBubbleSurface.textColor(null) : Theme.getColor(out ? Theme.key_chat_messageTextOut : Theme.key_chat_messageTextIn));
             int labelSave = canvas.save();canvas.translate(bounds.left + AndroidUtilities.dp(14), bounds.top + AndroidUtilities.dp(10));
             labels[i].draw(canvas);canvas.restoreToCount(labelSave);
-            time.setColor(Theme.getColor(out ? Theme.key_chat_outTimeText : Theme.key_chat_inTimeText));
+            time.setColor(BubbleConfig.adaptive() ? ServiceBubbleSurface.textColor(null) : Theme.getColor(out ? Theme.key_chat_outTimeText : Theme.key_chat_inTimeText));
             float baseline = bounds.bottom - AndroidUtilities.dp(8) - time.descent();
             float x = bounds.right - AndroidUtilities.dp(out ? 34 : 14) - time.measureText(TIME);
             canvas.drawText(TIME, x, baseline, time);

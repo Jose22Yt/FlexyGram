@@ -42904,9 +42904,20 @@ public class ChatActivity extends BaseFragment implements
     }
 
     private class ChatMessageCellDelegate implements ChatMessageCell.ChatMessageCellDelegate {
+        private final app.flexygram.bubbles.ServiceBubbleSurface serviceBubbleSurface = new app.flexygram.bubbles.ServiceBubbleSurface();
+        @Override public boolean drawFlexyBubbleWallpaper(ChatMessageCell cell, Canvas canvas, android.graphics.Path path, int alpha, boolean selected) {
+            if (app.flexygram.bubbles.BubbleConfig.adaptive()) {
+                if (contentView == null || chatListView == null) return false;
+                // Reuse the cell's native service coordinates, including keyboard/pan/topic offsets.
+                cell.applyServiceShaderMatrix();
+                return serviceBubbleSurface.drawMapped(canvas, path, themeDelegate, alpha, selected);
+            }
+            return drawFlexyBubbleWallpaper(cell, canvas, path, alpha);
+        }
         @Override public boolean hasFlexyBubbleWallpaper() {
-            return app.flexygram.bubbles.BubbleConfig.backgroundBlur() && contentView != null
-                    && contentView.signatureWallpaperBlur != null && contentView.signatureWallpaperBlur.isReady();
+            return (app.flexygram.bubbles.BubbleConfig.adaptive() && contentView != null)
+                    || (app.flexygram.bubbles.BubbleConfig.backgroundBlur() && contentView != null
+                    && contentView.signatureWallpaperBlur != null && contentView.signatureWallpaperBlur.isReady());
         }
         @Override
         public boolean drawFlexyBubbleWallpaper(ChatMessageCell cell, Canvas canvas, android.graphics.Path path) {

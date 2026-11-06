@@ -26,7 +26,7 @@ public class Probe {
  static class BubblePreviewView extends View{BubblePreviewView(Context c,Object wallpaper){super(c);}}
  static class HeaderCell extends View{HeaderCell(Context c){super(c);}void setHeight(int v){}}
  static class TransparencyCell extends View{TransparencyCell(Context c){super(c);}}
- static class BubbleConfig{static boolean outline;static int style,fusion;static void load(){}static boolean outlineEnabled(){return outline;}static int outlineStyle(){return style;}static int fusionMode(){return fusion;}}
+ static class BubbleConfig{static boolean outline,adaptive;static boolean adaptive(){return adaptive;}static int style,fusion;static void load(){}static boolean outlineEnabled(){return outline;}static int outlineStyle(){return style;}static int fusionMode(){return fusion;}}
  static class app{static class exteraless{static class appearance{static class AppearanceConfig{static boolean separate;static boolean separateHeaders(){return separate;}}}}}
  static class NativeAdapter{
   boolean isSettings3Embedded(){return false;}boolean isSignatureSettingsPage(){return false;}
@@ -42,7 +42,7 @@ public class Probe {
   public View createView(Context c){return new View(c);}
  }
  static class Page extends BasePage{
-  int appearanceHeaderRow,borderHeaderRow,fusionHeaderRow;
+  int effectRow,appearanceHeaderRow,borderHeaderRow,fusionHeaderRow;
   int transparencyRow,borderRow,previewRow,positionRow,blurRow,enabledRow,fuseRow,styleRow,pearlRow,fusionIntensityRow,fusionAdaptRow;
   Object contextualWallpaper;BubblePreviewView preview;
   UPDATE_ROWS
@@ -63,7 +63,7 @@ public class Probe {
    check(page.listView.animatorConfigured&&page.listView.animator==null);
    check(!adapter.isSettingsContentType(PREVIEW)&&adapter.isSettingsContentType(SLIDER));
    // The first control gets the group's large top corners rather than connecting to the wallpaper.
-   check(!adapter.isSettingsContentType(adapter.getItemViewType(page.transparencyRow-1)));
+   check(!adapter.isSettingsContentType(adapter.getItemViewType(page.effectRow-1)));
    for(int position=0;position<page.rowCount;position++){
     int type=adapter.getItemViewType(position);View view=adapter.onCreateViewHolder(parent,type).itemView;
     check(view.params!=null&&view.params.width==-1&&view.params.height==-2);
@@ -81,7 +81,8 @@ public class Probe {
    }
    // Explicit boundaries prevent sliders/switches from becoming one unstructured card.
    check(page.appearanceHeaderRow==page.previewRow+1);
-   check(page.transparencyRow==page.appearanceHeaderRow+1);
+   check(page.effectRow==page.appearanceHeaderRow+1);
+   check(page.transparencyRow==page.effectRow+1);
    check(page.blurRow==page.transparencyRow+1);
    check(page.borderHeaderRow==page.blurRow+1);
    check(page.enabledRow==page.borderHeaderRow+1);
@@ -93,7 +94,13 @@ public class Probe {
     check((page.fusionIntensityRow>=0)==(fusion==2));
     check((page.fusionAdaptRow>=0)==(fusion==2));
    }else check(page.fusionHeaderRow==-1&&page.fuseRow==-1);
-   check(page.rowCount==(outline?(style==0?11:12)+(fusion==2?2:0):6));
+   BubbleConfig.adaptive=true;page.updateRows();
+   check(page.rowCount==3&&page.effectRow==2&&adapter.getItemViewType(page.effectRow)==TYPE_SETTINGS);
+   check(page.transparencyRow==-1&&page.blurRow==-1&&page.borderHeaderRow==-1&&page.enabledRow==-1);
+   check(page.fusionHeaderRow==-1&&page.borderRow==-1&&page.positionRow==-1&&page.fuseRow==-1);
+   check(page.styleRow==-1&&page.pearlRow==-1&&page.fusionIntensityRow==-1&&page.fusionAdaptRow==-1);
+   BubbleConfig.adaptive=false;page.updateRows();
+   check(page.rowCount==(outline?(style==0?12:13)+(fusion==2?2:0):7));
   }
  }
 }'''

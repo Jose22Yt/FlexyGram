@@ -21,6 +21,7 @@ import app.flexygram.settings.SignatureMatteSettingsActivity;
 /** Local native preview, fill opacity, border width and optional cached wallpaper blur. */
 public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity {
     private static final int SLIDER = 110, PREVIEW = 111;
+    private int effectRow;
     private int appearanceHeaderRow, borderHeaderRow, fusionHeaderRow;
     private int transparencyRow, borderRow, previewRow, positionRow, blurRow, enabledRow, fuseRow, styleRow, pearlRow, fusionIntensityRow, fusionAdaptRow;
     private BubblePreviewView preview;
@@ -31,6 +32,10 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
         super.updateRows(); BubbleConfig.load();
         previewRow = addRow();
         appearanceHeaderRow = addHeader("FlexyBubbleAppearanceSection");
+        effectRow = addRow("flexyBubbleSurfaceEffect");
+        transparencyRow = blurRow = borderHeaderRow = enabledRow = fusionHeaderRow = -1;
+        borderRow = positionRow = fuseRow = styleRow = pearlRow = fusionIntensityRow = fusionAdaptRow = -1;
+        if (BubbleConfig.adaptive()) return;
         transparencyRow = addRow("flexyBubbleTransparency");
         blurRow = addRow("flexyBubbleBlur");
         borderHeaderRow = addHeader("FlexyBubbleBorderSection");
@@ -57,7 +62,15 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
     }
     @Override protected void onItemClick(View view, int position, float x, float y) {
         if (position < 0) return;
-        if (position == enabledRow) {
+        if (position == effectRow) {
+            showDialog(new AlertDialog.Builder(getParentActivity(), resourcesProvider)
+                    .setTitle(getString(R.string.FlexyBubbleSurfaceEffect))
+                    .setItems(new CharSequence[]{getString(R.string.FlexyBubbleAdaptiveSurface), getString(R.string.FlexyBubbleLegacySurface)}, (dialog, which) -> {
+                        BubbleConfig.setSurfaceEffect(which);
+                        updateRows(); listAdapter.notifyDataSetChanged();
+                        if (preview != null) preview.settingsChanged();
+                    }).create());
+        } else if (position == enabledRow) {
             BubbleConfig.setOutlineEnabled(!BubbleConfig.outlineEnabled());
             updateRows(); listAdapter.notifyDataSetChanged(); if (preview != null) preview.settingsChanged();
         } else if (position == fuseRow) {
@@ -121,7 +134,7 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
         Adapter(Context context) { super(context); }
         @Override public int getItemViewType(int position) {
             if (position == appearanceHeaderRow || position == borderHeaderRow || position == fusionHeaderRow) return TYPE_HEADER;
-            return position == previewRow ? PREVIEW : position == blurRow || position == fusionAdaptRow || position == enabledRow ? TYPE_CHECK : position == styleRow || position == fuseRow ? TYPE_SETTINGS : position == transparencyRow || position == borderRow || position == pearlRow || position == positionRow || position == fusionIntensityRow ? SLIDER : TYPE_INFO_PRIVACY;
+            return position == previewRow ? PREVIEW : position == blurRow || position == fusionAdaptRow || position == enabledRow ? TYPE_CHECK : position == effectRow || position == styleRow || position == fuseRow ? TYPE_SETTINGS : position == transparencyRow || position == borderRow || position == pearlRow || position == positionRow || position == fusionIntensityRow ? SLIDER : TYPE_INFO_PRIVACY;
         }
         @Override protected boolean isSectionContent(int type) {
             // Wallpaper and section labels separate the three compact control groups.
@@ -157,6 +170,11 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
         }
         @Override public void onBindViewHolder(RecyclerView.ViewHolder holder, int position, boolean partial) {
             if (position == previewRow) { holder.itemView.invalidate(); return; }
+            if (position == effectRow) {
+                ((TextSettingsCell) holder.itemView).setTextAndValue(getString(R.string.FlexyBubbleSurfaceEffect),
+                        getString(BubbleConfig.adaptive() ? R.string.FlexyBubbleAdaptiveSurface : R.string.FlexyBubbleLegacySurface), false);
+                return;
+            }
             if (position == appearanceHeaderRow || position == borderHeaderRow || position == fusionHeaderRow) {
                 ((HeaderCell) holder.itemView).setText(getString(position == appearanceHeaderRow
                         ? R.string.FlexyBubbleAppearanceSection : position == borderHeaderRow
@@ -177,6 +195,6 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
 
 
         }
-        @Override public boolean isEnabled(RecyclerView.ViewHolder holder) { int p = settingsRowPosition(holder); if (p < 0) return false; return p == blurRow || p == styleRow || p == fuseRow || p == enabledRow || p==fusionAdaptRow; }
+        @Override public boolean isEnabled(RecyclerView.ViewHolder holder) { int p = settingsRowPosition(holder); if (p < 0) return false; return p == effectRow || p == blurRow || p == styleRow || p == fuseRow || p == enabledRow || p==fusionAdaptRow; }
     }
 }
