@@ -39,6 +39,7 @@ public final class StudioSchema {
         i("bubbles","transparency","flexygram_bubbles","transparency",35,0,100),
         i("bubbles","borderTenths","flexygram_bubbles","signature_border_tenths",11,5,20),
         i("bubbles","surfaceEffect","flexygram_bubbles","surface_effect",0,0,1),
+        b("bubbles","smallTimestamp","flexygram_bubbles","small_timestamp",true),
         b("bubbles","cachedBlur","flexygram_bubbles","signature_cached_blur",false),
         b("bubbles","outlineEnabled","flexygram_bubbles","signature_outline_enabled",true),
         i("bubbles","outlineStyle","flexygram_bubbles","signature_outline_style",1,0,3),
@@ -80,6 +81,7 @@ public final class StudioSchema {
     /** Additive schema1 keys require Alpha1274; older valid schema1 files remain accepted. */
     public static int minimumApp(Map<String,Map<String,Object>> sections) {
         Map<String,Object> bubbles=sections.get("bubbles"),header=sections.get("header");
+        if (bubbles != null && bubbles.containsKey("smallTimestamp")) return 1301;
         if (bubbles != null && bubbles.containsKey("surfaceEffect")) return 1299;
         if (sections.containsKey("client")) return 1291;
         if (header != null && Integer.valueOf(4).equals(header.get("style"))) return 1291;

@@ -50,4 +50,5 @@
     <string name="FlexyBubbleSurfaceEffect">Bubble effect</string>
     <string name="FlexyBubbleAdaptiveSurface">Adaptive wallpaper</string>
     <string name="FlexyBubbleLegacySurface">Previous effect</string>
+    <string name="FlexyBubbleSmallTimestamp">Small time in message color</string>
 </resources>

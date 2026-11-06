@@ -11,6 +11,7 @@ public final class BubbleConfig {
     public static final String SURFACE_EFFECT = "surface_effect";
     public static final int ADAPTIVE = 0, LEGACY = 1;
     private static int surfaceEffect = ADAPTIVE;
+    private static boolean smallTimestamps = true;
     private static boolean loaded, glass, border, edges, cachedBlur;
     private static int transparency = 35, borderTenths = 11, outlineStyle = 1, pearlIntensity = 55, borderPosition = 5;
     private static boolean outlineEnabled = true, fuseGlass, fusionAdapt=true;
@@ -22,6 +23,7 @@ public final class BubbleConfig {
     public static void load() {
         SharedPreferences p = preferences();
         surfaceEffect = normalizeSurfaceEffect(p.getInt(SURFACE_EFFECT, ADAPTIVE));
+        smallTimestamps = p.getBoolean("small_timestamp", true);
         outlineEnabled = p.getBoolean("signature_outline_enabled", true);
         outlineStyle = Math.max(0, Math.min(3, p.getInt("signature_outline_style", 1)));
         int storedPosition = p.getInt("signature_border_position", 5);
@@ -51,6 +53,13 @@ public final class BubbleConfig {
         if (surfaceEffect == value) return;
         surfaceEffect = value;
         preferences().edit().putInt(SURFACE_EFFECT, value).apply();
+    }
+    public static boolean smallTimestamps() { return smallTimestamps; }
+    public static void setSmallTimestamps(boolean value) {
+        if (!loaded) load();
+        if (smallTimestamps == value) return;
+        smallTimestamps = value;
+        preferences().edit().putBoolean("small_timestamp", value).apply();
     }
     // Preserve the old preference, but don't prepare a second blur cache in native mode.
     public static boolean backgroundBlur() { return !adaptive() && cachedBlur; }

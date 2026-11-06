@@ -91,7 +91,7 @@ final class StudioClientCatalog {
         for(ConfigItem item:app.exteraless.glyph.GlyphConfig.INSTANCE.getStudioItems())item(item);
         String f="flexygram_bubbles";
         bool(f,"glass",false);bool(f,"border",false);bool(f,"edges",false);integer(f,"transparency",35);integer(f,"signature_border_tenths",11);
-        integer(f,"surface_effect",0);
+        integer(f,"surface_effect",0);bool(f,"small_timestamp",true);
         bool(f,"signature_cached_blur",false);bool(f,"signature_outline_enabled",true);integer(f,"signature_outline_style",1);integer(f,"signature_border_position",5);
         bool(f,"signature_fuse_glass",false);integer(f,"signature_fusion_mode",0);integer(f,"signature_fusion_intensity",60);bool(f,"signature_fusion_adapt",true);integer(f,"signature_pearl_intensity",55);
         f="flexygram_header";integer(f,"style",0);bool(f,"compact",false);bool(f,"counter",true);integer(f,"counter_mode",1);integer(f,"opacity",85);bool(f,"center_title",true);bool(f,"adaptive_bubble",true);

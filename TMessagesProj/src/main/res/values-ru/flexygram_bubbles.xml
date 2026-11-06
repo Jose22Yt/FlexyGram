@@ -47,4 +47,5 @@
     <string name="FlexyBubbleSurfaceEffect">Эффект пузырей</string>
     <string name="FlexyBubbleAdaptiveSurface">Адаптивный фон</string>
     <string name="FlexyBubbleLegacySurface">Прежний эффект</string>
+    <string name="FlexyBubbleSmallTimestamp">Маленькое время в цвет текста</string>
 </resources>

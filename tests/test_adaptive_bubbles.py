@@ -67,6 +67,9 @@ def test_mode_default_validation_and_legacy_preferences_survive_switches(tmp_pat
  BubbleConfig.setSurfaceEffect(BubbleConfig.LEGACY);check(BubbleConfig.backgroundBlur()&&BubbleConfig.transparency()==29);
  for(int value:new int[]{-1,2,Integer.MAX_VALUE}){p.putInt(BubbleConfig.SURFACE_EFFECT,value);BubbleConfig.load();check(BubbleConfig.adaptive());}
  BubbleConfig.setSurfaceEffect(900);check(BubbleConfig.adaptive());
+ check(BubbleConfig.smallTimestamps());BubbleConfig.setSmallTimestamps(false);BubbleConfig.load();check(!BubbleConfig.smallTimestamps());
+ BubbleConfig.setSurfaceEffect(BubbleConfig.LEGACY);check(!BubbleConfig.smallTimestamps());
+ BubbleConfig.setSmallTimestamps(true);BubbleConfig.load();check(BubbleConfig.smallTimestamps());
  }}''',
     }, [JAVA/'app/flexygram/bubbles/BubbleConfig.java', JAVA/'app/flexygram/bubbles/BubbleStyle.java'])
 
@@ -109,7 +112,7 @@ def test_service_ink_and_ticks_are_local_cached_and_leave_media_keys_unchanged(t
     declarations=''.join(f'static final {"String" if k.startswith("key_drawable") else "int"} {k}={chr(34)+k+chr(34) if k.startswith("key_drawable") else str(i+1)};' for i,k in enumerate(keys))
     probe(tmp_path,{'Probe.java': '''import java.util.*;public class Probe{
  static class app{static class flexygram{static class bubbles{
- static class BubbleConfig{static boolean mode=true;static boolean adaptive(){return mode;}}
+ static class BubbleConfig{static boolean mode=true,tiny=true;static boolean adaptive(){return mode;}static boolean smallTimestamps(){return tiny;}}
  static class BubbleStyle{static boolean signature(){return true;}}
  static class ServiceBubbleSurface{static int ink=0xffffffff;static int textColor(Object p){return ink;}}
  }}}
@@ -118,7 +121,7 @@ def test_service_ink_and_ticks_are_local_cached_and_leave_media_keys_unchanged(t
  ConstantState getConstantState(){return new ConstantState();}Drawable mutate(){return this;}void setTint(int c){tint=c;}}
  static class Provider{Drawable drawable=new Drawable();Drawable getDrawable(String key){return drawable;}}
  static class Theme{KEYS static int getColor(int key,Provider p){return key;}static Drawable getThemeDrawable(String k){return new Drawable();}}
- static class Message{boolean noBackground;boolean shouldDrawWithoutBackground(){return noBackground;}}
+ static class Message{boolean noBackground;boolean out;boolean isOutOwner(){return out;}boolean shouldDrawWithoutBackground(){return noBackground;}}
  static class ArrayMap<K,V>{List<K>keys=new ArrayList<>();List<V>values=new ArrayList<>();int size(){return keys.size();}V valueAt(int i){return values.get(i);}V get(K k){int i=keys.indexOf(k);return i<0?null:values.get(i);}void put(K k,V v){int i=keys.indexOf(k);if(i<0){keys.add(k);values.add(v);}else values.set(i,v);}}
  final ArrayMap<String,Drawable> adaptiveStatusDrawables=new ArrayMap<>(),adaptiveStatusSources=new ArrayMap<>();int adaptiveStatusColor;
  Provider resourcesProvider=new Provider();Message currentMessageObject=new Message();Object getResources(){return null;}
@@ -129,8 +132,15 @@ def test_service_ink_and_ticks_are_local_cached_and_leave_media_keys_unchanged(t
  check(p.getThemedColor(-99)==-99);
  for(boolean mode:new boolean[]{true,false}){
   app.flexygram.bubbles.BubbleConfig.mode=mode;
-  check(p.getTimestampColor(false)==Theme.key_chat_inTimeText);
-  check(p.getTimestampColor(true)==Theme.key_chat_inTimeSelectedText);
+  for(boolean out:new boolean[]{false,true}){
+   p.currentMessageObject.out=out;
+   int expected=mode?0xffffffff:out?Theme.key_chat_messageTextOut:Theme.key_chat_messageTextIn;
+   check(p.getTimestampColor(false)==expected);check(p.getTimestampColor(true)==expected);
+   app.flexygram.bubbles.BubbleConfig.tiny=false;
+   check(p.getTimestampColor(false)==(out?Theme.key_chat_outTimeText:Theme.key_chat_inTimeText));
+   check(p.getTimestampColor(true)==(out?Theme.key_chat_outTimeSelectedText:Theme.key_chat_inTimeSelectedText));
+   app.flexygram.bubbles.BubbleConfig.tiny=true;
+  }
  }
  app.flexygram.bubbles.BubbleConfig.mode=true;
  String[] keys={Theme.key_drawable_msgOutCheck,Theme.key_drawable_msgOutCheckRead,Theme.key_drawable_msgOutHalfCheck,Theme.key_drawable_msgOutCheckSelected,Theme.key_drawable_msgOutCheckReadSelected,Theme.key_drawable_msgOutHalfCheckSelected};

@@ -42,7 +42,7 @@ public class Probe {
   public View createView(Context c){return new View(c);}
  }
  static class Page extends BasePage{
-  int effectRow,appearanceHeaderRow,borderHeaderRow,fusionHeaderRow;
+  int effectRow,timestampRow,appearanceHeaderRow,borderHeaderRow,fusionHeaderRow;
   int transparencyRow,borderRow,previewRow,positionRow,blurRow,enabledRow,fuseRow,styleRow,pearlRow,fusionIntensityRow,fusionAdaptRow;
   Object contextualWallpaper;BubblePreviewView preview;
   UPDATE_ROWS
@@ -82,7 +82,8 @@ public class Probe {
    // Explicit boundaries prevent sliders/switches from becoming one unstructured card.
    check(page.appearanceHeaderRow==page.previewRow+1);
    check(page.effectRow==page.appearanceHeaderRow+1);
-   check(page.transparencyRow==page.effectRow+1);
+   check(page.timestampRow==page.effectRow+1&&adapter.getItemViewType(page.timestampRow)==TYPE_CHECK);
+   check(page.transparencyRow==page.timestampRow+1);
    check(page.blurRow==page.transparencyRow+1);
    check(page.borderHeaderRow==page.blurRow+1);
    check(page.enabledRow==page.borderHeaderRow+1);
@@ -97,15 +98,16 @@ public class Probe {
    BubbleConfig.adaptive=true;page.updateRows();
    check(page.effectRow==2&&adapter.getItemViewType(page.effectRow)==TYPE_SETTINGS);
    check(page.transparencyRow==-1&&page.blurRow==-1);
-   check(page.borderHeaderRow==page.effectRow+1&&page.enabledRow==page.borderHeaderRow+1);
+   check(page.timestampRow==page.effectRow+1&&adapter.getItemViewType(page.timestampRow)==TYPE_CHECK);
+   check(page.borderHeaderRow==page.timestampRow+1&&page.enabledRow==page.borderHeaderRow+1);
    check((page.styleRow>=0)==outline&&(page.borderRow>=0)==outline&&(page.positionRow>=0)==outline);
    check((page.fusionHeaderRow>=0)==outline&&(page.fuseRow>=0)==outline);
    check((page.pearlRow>=0)==(outline&&style!=0));
    check((page.fusionIntensityRow>=0)==(outline&&fusion==2));
    check((page.fusionAdaptRow>=0)==(outline&&fusion==2));
-   check(page.rowCount==(outline?(style==0?10:11)+(fusion==2?2:0):5));
+   check(page.rowCount==(outline?(style==0?11:12)+(fusion==2?2:0):6));
    BubbleConfig.adaptive=false;page.updateRows();
-   check(page.rowCount==(outline?(style==0?12:13)+(fusion==2?2:0):7));
+   check(page.rowCount==(outline?(style==0?13:14)+(fusion==2?2:0):8));
   }
  }
 }'''

@@ -47,4 +47,20 @@ public class BubbleTimeAndroidTest {
   TimeLabelProbe.Theme.chat_timePaint.clearShadowLayer();bitmap.recycle();
  }
 
+ @Test public void tinyTimestampLayoutUsesNineDpAndKeepsSharedMetadataSizeUntouched() {
+  TimeLabelProbe host=new TimeLabelProbe();TimeLabelProbe.Theme.chat_timePaint.setTextSize(12);
+  TimeLabelProbe.Theme.chat_timePaint.setColor(0x99ffffff);host.prepare();
+  assertEquals(9f,host.timestampPaint.getTextSize(),0f);
+  StaticLayout tiny=StaticLayout.Builder.obtain("12:34 PM",0,8,host.timestampPaint,180).setIncludePad(false).build();
+  StaticLayout original=StaticLayout.Builder.obtain("12:34 PM",0,8,TimeLabelProbe.Theme.chat_timePaint,180).setIncludePad(false).build();
+  assertTrue(tiny.getLineWidth(0)<original.getLineWidth(0));assertTrue(tiny.getHeight()<=original.getHeight());
+  Bitmap bitmap=Bitmap.createBitmap(220,50,Bitmap.Config.ARGB_8888);host.draw(new Canvas(bitmap),tiny);
+  assertEquals(12f,TimeLabelProbe.Theme.chat_timePaint.getTextSize(),0f);
+  assertEquals(9f,host.timestampPaint.getTextSize(),0f);
+  int maxAlpha=0;for(int y=0;y<50;y++)for(int x=0;x<220;x++)maxAlpha=Math.max(maxAlpha,Color.alpha(bitmap.getPixel(x,y)));
+  assertTrue(maxAlpha>0&&maxAlpha<=153);bitmap.recycle();
+  app.flexygram.bubbles.BubbleConfig.tiny=false;host.prepare();assertEquals(12f,host.timestampPaint.getTextSize(),0f);
+  app.flexygram.bubbles.BubbleConfig.tiny=true;host.prepare();assertEquals(9f,host.timestampPaint.getTextSize(),0f);
+ }
+
 }

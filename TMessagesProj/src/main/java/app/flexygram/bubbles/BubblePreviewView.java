@@ -54,6 +54,10 @@ public final class BubblePreviewView extends View implements NotificationCenter.
         }
     };
     public void settingsChanged() {
+        if (Theme.chat_timePaint != null) time.set(Theme.chat_timePaint);
+        if (BubbleConfig.smallTimestamps()) time.setTextSize(AndroidUtilities.dpf2(9));
+        measuredWidth = -1;
+        requestLayout();
         checkColor = BubbleConfig.adaptive() ? ServiceBubbleSurface.textColor(null) : Theme.getColor(Theme.key_chat_outSentCheckRead);
         check.setTint(checkColor); halfCheck.setTint(checkColor);
         if (blurOwner != null) blurOwner.prepare(wallpaper, wallpaperMotion, Theme.getColor(Theme.key_windowBackgroundGray));
@@ -86,7 +90,7 @@ public final class BubblePreviewView extends View implements NotificationCenter.
         if (Theme.chat_msgTextPaint != null) text.set(Theme.chat_msgTextPaint);
         else text.setTextSize(14 * getResources().getDisplayMetrics().scaledDensity);
         if (Theme.chat_timePaint != null) time.set(Theme.chat_timePaint);
-        else time.setTextSize(11 * getResources().getDisplayMetrics().scaledDensity);
+        if (BubbleConfig.smallTimestamps()) time.setTextSize(AndroidUtilities.dpf2(9));
         checkColor = Theme.getColor(Theme.key_chat_outSentCheckRead);
         check.setTint(checkColor); halfCheck.setTint(checkColor);
         wallpaperPreview.refresh();
@@ -184,7 +188,7 @@ public final class BubblePreviewView extends View implements NotificationCenter.
             text.setColor(BubbleConfig.adaptive() ? ServiceBubbleSurface.textColor(null) : Theme.getColor(out ? Theme.key_chat_messageTextOut : Theme.key_chat_messageTextIn));
             int labelSave = canvas.save();canvas.translate(bounds.left + AndroidUtilities.dp(14), bounds.top + AndroidUtilities.dp(10));
             labels[i].draw(canvas);canvas.restoreToCount(labelSave);
-            time.setColor(Theme.getColor(Theme.key_chat_inTimeText));
+            time.setColor(BubbleConfig.smallTimestamps() ? text.getColor() : Theme.getColor(out ? Theme.key_chat_outTimeText : Theme.key_chat_inTimeText));
             float baseline = bounds.bottom - AndroidUtilities.dp(8) - time.descent();
             float x = bounds.right - AndroidUtilities.dp(out ? 34 : 14) - time.measureText(TIME);
             canvas.drawText(TIME, x, baseline, time);

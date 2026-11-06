@@ -1821,6 +1821,8 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     private float drawTimeX;
     private float drawTimeY;
     public StaticLayout timeLayout;
+    private final TextPaint timestampPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+    private boolean measuredSmallTimestamp;
     public int timeWidth;
     public int timeTextWidth;
     public int timeX;
@@ -7120,7 +7122,8 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         mediaSpoilerRevealProgress = 0f;
         TLRPC.Message newReply = messageObject.hasValidReplyMessageObject() ? messageObject.replyMessageObject.messageOwner : null;
         boolean messageIdChanged = currentMessageObject == null || currentMessageObject.getId() != messageObject.getId();
-        boolean messageChanged = currentMessageObject != messageObject || messageObject.forceUpdate || (isRoundVideo && isPlayingRound != (MediaController.getInstance().isPlayingMessage(currentMessageObject) && delegate != null && !delegate.keyboardIsOpened()));
+        boolean messageChanged = measuredSmallTimestamp != app.flexygram.bubbles.BubbleConfig.smallTimestamps()
+                || currentMessageObject != messageObject || messageObject.forceUpdate || (isRoundVideo && isPlayingRound != (MediaController.getInstance().isPlayingMessage(currentMessageObject) && delegate != null && !delegate.keyboardIsOpened()));
         boolean dataChanged = currentMessageObject != null && currentMessageObject.getId() == messageObject.getId() && lastSendState == MessageObject.MESSAGE_SEND_STATE_EDITING && messageObject.isSent() ||
                 currentMessageObject == messageObject && (isUserDataChanged() || photoNotSet) ||
                 lastPostAuthor != messageObject.messageOwner.post_author ||
@@ -14383,7 +14386,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                 timeTextWidth = dp(10);
             }
             if (currentTimeString != null) {
-                timeLayout = new StaticLayout(currentTimeString, Theme.chat_timePaint, timeTextWidth + dp(100), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
+                timeLayout = new StaticLayout(currentTimeString, timestampPaint, timeTextWidth + dp(100), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
             } else {
                 timeLayout = null;
             }
@@ -19035,7 +19038,14 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         allowAssistant = value;
     }
 
+    private void prepareTimestampPaint() {
+        timestampPaint.set(Theme.chat_timePaint);
+        measuredSmallTimestamp = app.flexygram.bubbles.BubbleConfig.smallTimestamps();
+        if (measuredSmallTimestamp) timestampPaint.setTextSize(AndroidUtilities.dpf2(9));
+    }
+
     private void measureTime(MessageObject messageObject) {
+        prepareTimestampPaint();
         CharSequence signString;
         MessageObject primaryMessageObject = getPrimaryMessageObject();
         long fromId = messageObject.getFromChatId();
@@ -19221,7 +19231,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                 currentTimeString.insert(0, prefix);
             }
         }
-        timeTextWidth = timeWidth = (int) Math.ceil(Theme.chat_timePaint.measureText(currentTimeString, 0, currentTimeString == null ? 0 : currentTimeString.length()));
+        timeTextWidth = timeWidth = (int) Math.ceil(timestampPaint.measureText(currentTimeString, 0, currentTimeString == null ? 0 : currentTimeString.length()));
         if (timeString instanceof SpannableStringBuilder) {
             if (edited && TimeStringHelper.useEditedIcon() && TimeStringHelper.editedDrawable != null) { // openExtera: + NaConfig.UseEditedIcon
                 timeTextWidth = timeWidth += TimeStringHelper.editedDrawable.getIntrinsicWidth();
@@ -19319,15 +19329,15 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                     widthForSign -= dp(96);
                 }
             }
-            signString = Emoji.replaceEmoji(signString, Theme.chat_timePaint.getFontMetricsInt(), false);
-            int width = (int) Math.ceil(Theme.chat_timePaint.measureText(signString, 0, signString.length()));
+            signString = Emoji.replaceEmoji(signString, timestampPaint.getFontMetricsInt(), false);
+            int width = (int) Math.ceil(timestampPaint.measureText(signString, 0, signString.length()));
             signWidth = Math.min(width, widthForSign);
             if (width > widthForSign) {
                 if (widthForSign <= 0) {
                     signString = "";
                     width = 0;
                 } else {
-                    signString = TextUtils.ellipsize(signString, Theme.chat_timePaint, widthForSign, TextUtils.TruncateAt.END);
+                    signString = TextUtils.ellipsize(signString, timestampPaint, widthForSign, TextUtils.TruncateAt.END);
                     width = widthForSign;
                 }
             }
@@ -24948,15 +24958,28 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         }
     }
 
-    /** Use the theme's normal timestamp ink, with no added halo or contrast pass. */
-    /** Match native incoming timestamp ink, resolved through the active chat theme/provider. */
+    /** Optional compact ink; disabled uses the original native direction/selection palette. */
     private int getTimestampColor(boolean selected) {
-        // Adaptive service text may use white ink; timestamp metadata must keep native theme ink.
-        return Theme.getColor(selected ? Theme.key_chat_inTimeSelectedText : Theme.key_chat_inTimeText, resourcesProvider);
+        if (app.flexygram.bubbles.BubbleConfig.smallTimestamps()) {
+            return getThemedColor(currentMessageObject.isOutOwner() ? Theme.key_chat_messageTextOut : Theme.key_chat_messageTextIn);
+        }
+        // Bypass the adaptive material's service-ink override for native timestamp colors.
+        return Theme.getColor(currentMessageObject.isOutOwner()
+                ? (selected ? Theme.key_chat_outTimeSelectedText : Theme.key_chat_outTimeText)
+                : (selected ? Theme.key_chat_inTimeSelectedText : Theme.key_chat_inTimeText), resourcesProvider);
     }
 
     private void drawReadableTimeLayout(Canvas canvas, StaticLayout layout, boolean selected) {
-        if (layout != null) SpoilerEffect.layoutDrawMaybe(layout, canvas);
+        if (layout == null) return;
+        // Keep the small layout paint separate from the shared metadata/audio paint.
+        TextPaint paint = layout.getPaint();
+        int previousColor = paint.getColor();
+        paint.setColor(Theme.chat_timePaint.getColor());
+        try {
+            SpoilerEffect.layoutDrawMaybe(layout, canvas);
+        } finally {
+            paint.setColor(previousColor);
+        }
     }
 
     private void drawTimeInternal(Canvas canvas, float alpha, boolean fromParent, float timeX, StaticLayout timeLayout, float timeWidth, boolean drawSelectionBackground) {
@@ -29717,12 +29740,12 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                 int i = text.toString().indexOf(editedStr);
                 if (i >= 0) {
                     if (i == 0) {
-                        animateEditedLayout = new StaticLayout(editedStr, Theme.chat_timePaint, timeTextWidth + dp(100), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
+                        animateEditedLayout = new StaticLayout(editedStr, timestampPaint, timeTextWidth + dp(100), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
                         SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
                         spannableStringBuilder.append(editedStr);
                         spannableStringBuilder.append(text.subSequence(editedStr.length(), text.length()));
                         spannableStringBuilder.setSpan(new EmptyStubSpan(), 0, editedStr.length(), 0);
-                        animateTimeLayout = new StaticLayout(spannableStringBuilder, Theme.chat_timePaint, timeTextWidth + dp(100), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
+                        animateTimeLayout = new StaticLayout(spannableStringBuilder, timestampPaint, timeTextWidth + dp(100), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
                         animateEditedWidthDiff = timeWidth - lastTimeWidth;
                     } else {
                         animateEditedWidthDiff = 0;

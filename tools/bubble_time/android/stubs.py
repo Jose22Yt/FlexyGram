@@ -19,13 +19,13 @@ def write(dest, root):
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text((java/rel).read_text())
     config = dest/'app/flexygram/bubbles/BubbleConfig.java'
-    config.write_text('package app.flexygram.bubbles;public class BubbleConfig {public static int opacity=35;public static int transparency(){return opacity;}}')
+    config.write_text('package app.flexygram.bubbles;public class BubbleConfig {public static int opacity=35;public static boolean tiny=true;public static boolean smallTimestamps(){return tiny;}public static int transparency(){return opacity;}}')
     target = dest/'org/telegram/messenger/BuildConfig.java'
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text('package org.telegram.messenger;public class BuildConfig{public static final boolean CONNECTED_ALPHA=true;}')
     (dest/'app/flexygram/bubbles/BubbleStyle.java').write_text((java/'app/flexygram/bubbles/BubbleStyle.java').read_text())
     source = (java/'org/telegram/ui/Cells/ChatMessageCell.java').read_text()
-    body = method(source, 'private void drawReadableTimeLayout(')
+    body = method(source, 'private void drawReadableTimeLayout(') + '\n' + method(source, 'private void prepareTimestampPaint()')
     (dest/'TimeLabelProbe.java').write_text('''
 import android.graphics.*;import android.text.*;
 public class TimeLabelProbe {
@@ -39,6 +39,9 @@ public class TimeLabelProbe {
  Message currentMessageObject=new Message();
  private final app.flexygram.bubbles.BubbleTimeContrast bubbleTimeContrast=new app.flexygram.bubbles.BubbleTimeContrast();
  private Paint bubbleTimeSavedPaint;
+ boolean measuredSmallTimestamp;
+ final TextPaint timestampPaint=new TextPaint(Paint.ANTI_ALIAS_FLAG);
+ void prepare(){prepareTimestampPaint();}
  static class AndroidUtilities {static float dpf2(float n){return n;}}
  int getThemedColor(int key){return key==Theme.key_chat_outBubbleGradient1?gradient:surface;}
  boolean shouldDrawTimeOnMedia(){return media;}

@@ -19,7 +19,12 @@ public class StudioCoreTest {
   }
  }
  public static void main(String[] args)throws Exception {
-  check(StudioSchema.keys().size()==25);
+  check(StudioSchema.keys().size()==26);
+  for(boolean enabled:new boolean[]{false,true}){
+   var tiny=StudioCodec.create("Time.flexyGram",Map.of("bubbles",Map.of("smallTimestamp",enabled)));
+   check(tiny.minApp==1301);check(StudioCodec.decode(StudioCodec.encode(tiny),1301).sections.get("bubbles").get("smallTimestamp").equals(enabled));
+   reject(()->StudioCodec.decode(StudioCodec.encode(tiny),1300));
+  }
   for(int effect:new int[]{0,1}) {
    var adaptive=StudioCodec.create("Adaptive.flexyGram",Map.of("bubbles",Map.of("surfaceEffect",effect)));
    check(adaptive.minApp==1299);
@@ -58,9 +63,9 @@ public class StudioCoreTest {
   defaults.get("header").put("compact",true);defaults.get("composer").put("style",1);
   var three=StudioCodec.export("Tres.flexyGram",defaults,Set.of());check(three.sections.size()==3);
   var full=StudioCodec.export("Completo.flexyGram",defaults,StudioSchema.sections());check(full.sections.size()==4);check(full.sections.values().stream().mapToInt(Map::size).sum()==StudioSchema.keys().size()-1);
-  byte[] encoded=StudioCodec.encode(full);check(Arrays.equals(encoded,StudioCodec.encode(StudioCodec.decode(encoded,1299))));
-  check(full.minApp==1299);reject(()->StudioCodec.decode(encoded,1298));
-  var legacy=defaults();legacy.get("bubbles").remove("surfaceEffect");legacy.get("bubbles").remove("borderPosition");legacy.get("bubbles").remove("fuseGlass");
+  byte[] encoded=StudioCodec.encode(full);check(Arrays.equals(encoded,StudioCodec.encode(StudioCodec.decode(encoded,1301))));
+  check(full.minApp==1301);reject(()->StudioCodec.decode(encoded,1300));
+  var legacy=defaults();legacy.get("bubbles").remove("smallTimestamp");legacy.get("bubbles").remove("surfaceEffect");legacy.get("bubbles").remove("borderPosition");legacy.get("bubbles").remove("fuseGlass");
   var legacyPreset=StudioCodec.export("Legacy.flexyGram",legacy,StudioSchema.sections());check(legacyPreset.minApp==1274);check(StudioCodec.decode(StudioCodec.encode(legacyPreset),1276).sections.equals(legacyPreset.sections));
   Map<String,Map<String,Object>> reversed=new LinkedHashMap<>();List<String> ids=new ArrayList<>(full.sections.keySet());Collections.reverse(ids);for(String s:ids)reversed.put(s,full.sections.get(s));check(Arrays.equals(encoded,StudioCodec.encode(StudioCodec.create(full.name,reversed))));
   check(StudioCodec.decode(StudioCodec.encode(one),1273).sections.equals(one.sections));

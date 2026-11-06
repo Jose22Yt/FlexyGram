@@ -10,13 +10,15 @@ def test_time_is_one_theme_draw_without_paint_mutation(tmp_path):
     draw=method(source,'private void drawReadableTimeLayout(')
     probe(tmp_path, {'Probe.java': '''public class Probe {
  static class Canvas{}
- static class StaticLayout{int ink,draws;StaticLayout(int ink){this.ink=ink;}}
- static class SpoilerEffect {static void layoutDrawMaybe(StaticLayout l,Canvas c){l.draws++;}}
+ static class TextPaint{int ink;TextPaint(int c){ink=c;}int getColor(){return ink;}void setColor(int c){ink=c;}}
+ static class Theme{static TextPaint chat_timePaint=new TextPaint(0x7fffffff);}
+ static class StaticLayout{TextPaint paint;int draws,drawn;StaticLayout(int ink){paint=new TextPaint(ink);}TextPaint getPaint(){return paint;}}
+ static class SpoilerEffect {static void layoutDrawMaybe(StaticLayout l,Canvas c){l.draws++;l.drawn=l.paint.ink;}}
  DRAW
  public static void main(String[] args){Probe p=new Probe();Canvas canvas=new Canvas();
  for(int color:new int[]{0xff888888,0xffffffff,0xff000000,0x55444444})for(boolean selected:new boolean[]{false,true}){
  StaticLayout layout=new StaticLayout(color);for(int i=0;i<1000;i++)p.drawReadableTimeLayout(canvas,layout,selected);
- if(layout.ink!=color||layout.draws!=1000)throw new AssertionError();
+ if(layout.paint.ink!=color||layout.draws!=1000||layout.drawn!=Theme.chat_timePaint.ink)throw new AssertionError();
  }
  p.drawReadableTimeLayout(canvas,null,false);
  }

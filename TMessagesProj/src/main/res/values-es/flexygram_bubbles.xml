@@ -50,4 +50,5 @@
     <string name="FlexyBubbleSurfaceEffect">Efecto de burbuja</string>
     <string name="FlexyBubbleAdaptiveSurface">Adaptativo del fondo</string>
     <string name="FlexyBubbleLegacySurface">Efecto anterior</string>
+    <string name="FlexyBubbleSmallTimestamp">Hora pequeña del color del mensaje</string>
 </resources>
