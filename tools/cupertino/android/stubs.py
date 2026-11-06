@@ -5,7 +5,7 @@ def write(dest,root):
   p=dest/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(s)
  mapping=json.loads((root/'tools/cupertino/mapping.json').read_text())
  put('org/telegram/messenger/R.java','package org.telegram.messenger;public class R{public static class drawable{'+''.join(f'public static int {name}={i+1};' for i,name in enumerate(sorted(mapping)))+'}}')
- put('app/exteraless/icons/BaseIconPacks.java','package app.exteraless.icons;public class BaseIconPacks{public static final int BASE_DEFAULT=0;public static int selected;public static int getSelected(){return selected;}}')
+ put('app/exteraless/icons/BaseIconPacks.java','package app.exteraless.icons;public class BaseIconPacks{public static final int BASE_DEFAULT=0,BASE_CUPERTINO=3;public static int selected=3;public static int getSelected(){return selected;}}')
  put('app/flexygram/animation/FastMotionTiming.java','package app.flexygram.animation;public class FastMotionTiming{public static boolean enabled;public static boolean isEnabled(){return enabled;}}')
  java=root/'TMessagesProj/src/main/java'
  allowed=['CupertinoGlyphDrawable.java','CupertinoIconMap.java','CupertinoIcons.java','CupertinoResources.java','CupertinoSupplement.java','IconPressCurve.java','IconPressFeedback.java']

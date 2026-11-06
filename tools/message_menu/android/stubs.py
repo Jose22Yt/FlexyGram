@@ -23,9 +23,9 @@ def write(dest,root):
  iconmap=json.loads((root/'tools/cupertino/mapping.json').read_text())
  put('org/telegram/messenger/R.java','package org.telegram.messenger;public class R{public static class string{'+''.join('public static final int '+k+'='+str(i+1)+';'for i,k in enumerate(keys))+'}public static class drawable{'+''.join('public static final int '+k+'='+str(i+1)+';'for i,k in enumerate(sorted(iconmap)))+'}}')
  import shutil
- for name in ['CupertinoIcons','CupertinoGlyphDrawable','CupertinoIconMap','CupertinoSupplement']:
+ for name in ['CupertinoIcons','CupertinoGlyphDrawable','CupertinoIconMap','CupertinoSupplement','IconPressFeedback','IconPressCurve']:
   put('app/flexygram/icons/'+name+'.java',(java/'app/flexygram/icons'/(name+'.java')).read_text())
- put('app/exteraless/icons/BaseIconPacks.java','package app.exteraless.icons;public class BaseIconPacks{public static final int BASE_DEFAULT=0;public static int getSelected(){return 0;}}')
+ put('app/exteraless/icons/BaseIconPacks.java','package app.exteraless.icons;public class BaseIconPacks{public static final int BASE_DEFAULT=0,BASE_CUPERTINO=3;public static int getSelected(){return 0;}}')
  shutil.copyfile(root/'TMessagesProj/src/main/assets/cupertino/CupertinoIcons.ttf',dest.parents[2]/'CupertinoIcons.ttf')
  put('org/telegram/messenger/LocaleController.java','package org.telegram.messenger;public class LocaleController{public static boolean isRTL;public static String getString(int id){switch(id){'+''.join('case '+str(i+1)+':return '+json.dumps(values[k],ensure_ascii=True)+';'for i,k in enumerate(keys))+'default:throw new IllegalArgumentException();}}}')
  theme_keys=sorted(set(re.findall(r'Theme.(key_\w+)','\n'.join(sources))))

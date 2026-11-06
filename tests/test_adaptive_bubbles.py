@@ -68,20 +68,26 @@ def test_mode_default_validation_and_legacy_preferences_survive_switches(tmp_pat
  public Editor edit(){return this;}public Editor putBoolean(String k,boolean v){values.put(k,v);return this;}public Editor putInt(String k,int v){values.put(k,v);return this;}public void apply(){}
  }
  public static void main(String[]args){Prefs p=new Prefs();ApplicationLoader.applicationContext.p=p;
- BubbleConfig.load();check(BubbleConfig.adaptive()&&BubbleConfig.surfaceEffect()==0&&!BubbleConfig.backgroundBlur());
+ BubbleConfig.load();check(!BubbleConfig.adaptive()&&BubbleConfig.surfaceEffect()==BubbleConfig.DEFAULT&&!BubbleConfig.backgroundBlur());
+ check(!BubbleStyle.signature()&&!BubbleConfig.smallTimestamps()&&!BubbleConfig.outlineEnabled()&&BubbleConfig.transparency()==0);
+ check(p.values.isEmpty());BubbleConfig.setSurfaceEffect(BubbleConfig.ADAPTIVE);
  BubbleConfig.setBackgroundBlur(true);BubbleConfig.setTransparency(29);BubbleConfig.setBorderTenths(17);BubbleConfig.setOutlineStyle(2);
  check(BubbleConfig.backgroundBlur());BubbleConfig.setSurfaceEffect(BubbleConfig.LEGACY);BubbleConfig.load();check(!BubbleConfig.adaptive()&&BubbleConfig.backgroundBlur());
  check(BubbleConfig.transparency()==29&&BubbleConfig.borderTenths()==17&&BubbleConfig.outlineStyle()==2);
  BubbleConfig.setSurfaceEffect(BubbleConfig.ADAPTIVE);BubbleConfig.load();check(BubbleConfig.adaptive()&&BubbleConfig.backgroundBlur());
  BubbleConfig.setSurfaceEffect(BubbleConfig.LEGACY);check(BubbleConfig.backgroundBlur()&&BubbleConfig.transparency()==29);
- for(int value:new int[]{-1,2,Integer.MAX_VALUE}){p.putInt(BubbleConfig.SURFACE_EFFECT,value);BubbleConfig.load();check(BubbleConfig.adaptive());}
- BubbleConfig.setSurfaceEffect(900);check(BubbleConfig.adaptive());
+ for(int value:new int[]{-1,3,Integer.MAX_VALUE}){p.putInt(BubbleConfig.SURFACE_EFFECT,value);BubbleConfig.load();check(BubbleConfig.surfaceEffect()==BubbleConfig.DEFAULT);}
+ BubbleConfig.setSurfaceEffect(900);check(BubbleConfig.surfaceEffect()==BubbleConfig.DEFAULT);BubbleConfig.setSurfaceEffect(BubbleConfig.ADAPTIVE);
  for(int n=0;n<=20;n++){BubbleConfig.setBorderTenths(n);BubbleConfig.load();check(BubbleConfig.borderTenths()==n&&BubbleConfig.borderDp()==n/10f);}
  BubbleConfig.setBorderTenths(-1);BubbleConfig.load();check(BubbleConfig.borderTenths()==0);
  BubbleConfig.setBorderTenths(21);BubbleConfig.load();check(BubbleConfig.borderTenths()==20);
- check(BubbleConfig.smallTimestamps());BubbleConfig.setSmallTimestamps(false);BubbleConfig.load();check(!BubbleConfig.smallTimestamps());
+ check(!BubbleConfig.smallTimestamps());BubbleConfig.setSmallTimestamps(false);BubbleConfig.load();check(!BubbleConfig.smallTimestamps());
  BubbleConfig.setSurfaceEffect(BubbleConfig.LEGACY);check(!BubbleConfig.smallTimestamps());
  BubbleConfig.setSmallTimestamps(true);BubbleConfig.load();check(BubbleConfig.smallTimestamps());
+ BubbleConfig.setOutlineEnabled(true);BubbleConfig.setSurfaceEffect(BubbleConfig.DEFAULT);BubbleConfig.load();
+ check(!BubbleStyle.signature()&&!BubbleConfig.backgroundBlur()&&!BubbleConfig.outlineEnabled());
+ BubbleConfig.setSurfaceEffect(BubbleConfig.LEGACY);BubbleConfig.load();
+ check(BubbleStyle.signature()&&BubbleConfig.backgroundBlur()&&BubbleConfig.outlineEnabled()&&BubbleConfig.transparency()==29);
  }}''',
     }, [JAVA/'app/flexygram/bubbles/BubbleConfig.java', JAVA/'app/flexygram/bubbles/BubbleStyle.java'])
 
@@ -116,8 +122,8 @@ def test_localized_selector_and_backup_cover_native_mode():
     for locale in ['values','values-es','values-ru']:
         names={e.attrib['name'] for e in ET.parse(ROOT/f'TMessagesProj/src/main/res/{locale}/flexygram_bubbles.xml').getroot()}
         assert {'FlexyBubbleSurfaceEffect','FlexyBubbleAdaptiveSurface','FlexyBubbleLegacySurface'} <= names
-    assert '"surface_effect",0' in (JAVA/'app/flexygram/studio/StudioClientCatalog.java').read_text()
-    assert '"surfaceEffect","flexygram_bubbles","surface_effect",0,0,1' in (JAVA/'app/flexygram/studio/core/StudioSchema.java').read_text()
+    assert '"surface_effect",2' in (JAVA/'app/flexygram/studio/StudioClientCatalog.java').read_text()
+    assert '"surfaceEffect","flexygram_bubbles","surface_effect",2,0,2' in (JAVA/'app/flexygram/studio/core/StudioSchema.java').read_text()
 
 
 def test_service_ink_and_ticks_are_local_cached_and_leave_media_keys_unchanged(tmp_path):

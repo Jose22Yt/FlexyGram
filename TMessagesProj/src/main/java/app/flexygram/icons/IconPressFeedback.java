@@ -27,6 +27,7 @@ public final class IconPressFeedback {
     private static int lastAction;
     private IconPressFeedback() {}
     public static void observe(View root, MotionEvent event) {
+        if (app.exteraless.icons.BaseIconPacks.getSelected() != app.exteraless.icons.BaseIconPacks.BASE_CUPERTINO) return;
         int action = event.getActionMasked();
         // Popup content and its dialog may observe the same native event.
         if (lastEvent == event && lastTime == event.getEventTime() && lastAction == action) return;

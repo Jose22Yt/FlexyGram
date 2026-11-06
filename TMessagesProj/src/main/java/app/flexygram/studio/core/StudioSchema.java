@@ -36,26 +36,26 @@ public final class StudioSchema {
         b("bubbles","glass","flexygram_bubbles","glass",false),
         b("bubbles","border","flexygram_bubbles","border",false),
         b("bubbles","edges","flexygram_bubbles","edges",false),
-        i("bubbles","transparency","flexygram_bubbles","transparency",35,0,100),
+        i("bubbles","transparency","flexygram_bubbles","transparency",0,0,100),
         i("bubbles","borderTenths","flexygram_bubbles","signature_border_tenths",11,0,20),
-        i("bubbles","surfaceEffect","flexygram_bubbles","surface_effect",0,0,1),
-        b("bubbles","smallTimestamp","flexygram_bubbles","small_timestamp",true),
+        i("bubbles","surfaceEffect","flexygram_bubbles","surface_effect",2,0,2),
+        b("bubbles","smallTimestamp","flexygram_bubbles","small_timestamp",false),
         b("bubbles","cachedBlur","flexygram_bubbles","signature_cached_blur",false),
-        b("bubbles","outlineEnabled","flexygram_bubbles","signature_outline_enabled",true),
+        b("bubbles","outlineEnabled","flexygram_bubbles","signature_outline_enabled",false),
         i("bubbles","outlineStyle","flexygram_bubbles","signature_outline_style",1,0,3),
         i("bubbles","borderPosition","flexygram_bubbles","signature_border_position",5,0,5),
         b("bubbles","fuseGlass","flexygram_bubbles","signature_fuse_glass",false),
         i("bubbles","pearlIntensity","flexygram_bubbles","signature_pearl_intensity",55,0,100),
-        i("header","style","flexygram_header","style",0,0,4),
+        i("header","style","flexygram_header","style",1,0,4),
         b("header","compact","flexygram_header","compact",false),
-        b("header","counter","flexygram_header","counter",true),
+        b("header","counter","flexygram_header","counter",false),
         i("header","counterPresentation","flexygram_header","counter_mode",1,1,2),
         i("header","opacity","flexygram_header","opacity",85,0,100),
         i("composer","style","flexygram_composer","style",0,0,1),
         b("composer","glass","flexygram_composer","pearlGlass",false),
         i("composer","position","flexygram_composer","verticalPosition",0,-160,16),
         i("composer","density","flexygram_composer","compactLevel",0,0,2),
-        i("composer","icons","flexygram_composer","iconAppearance",0,0,1),
+        i("composer","icons","flexygram_composer","iconAppearance",1,0,1),
         // Zero means the native density-dependent gap; values1 is not supported.
         new Key("composer","gap","flexygram_composer","componentGap",0,0,8),
         new Key("icon","selected","flexy_launcher","selected","EXTERALESS",0,0,
@@ -81,6 +81,7 @@ public final class StudioSchema {
     /** Additive schema1 keys require Alpha1274; older valid schema1 files remain accepted. */
     public static int minimumApp(Map<String,Map<String,Object>> sections) {
         Map<String,Object> bubbles=sections.get("bubbles"),header=sections.get("header");
+        if (bubbles != null && Integer.valueOf(2).equals(bubbles.get("surfaceEffect"))) return 1303;
         if (bubbles != null && bubbles.containsKey("smallTimestamp")) return 1301;
         if (bubbles != null && bubbles.containsKey("surfaceEffect")) return 1299;
         if (sections.containsKey("client")) return 1291;

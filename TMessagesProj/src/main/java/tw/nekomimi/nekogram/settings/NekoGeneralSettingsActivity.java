@@ -188,6 +188,7 @@ public class NekoGeneralSettingsActivity extends BaseNekoXSettingsActivity {
             // Третий набор появился вместе с портом BaseIconPacks; без него выбор Remix
             // давал индекс за границей массива.
             getString(R.string.IconReplacementRemix),
+            app.exteraless.icons.BaseIconPacks.getName(app.exteraless.icons.BaseIconPacks.BASE_CUPERTINO),
     }, null));
     private final AbstractConfigCell switchStyleRow = cellGroup.appendCell(new ConfigCellSelectBox("SwitchStyle", NaConfig.INSTANCE.getSwitchStyle(), new String[]{
             getString(R.string.Default),

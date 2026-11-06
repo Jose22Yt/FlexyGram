@@ -7,7 +7,7 @@ import android.graphics.drawable.Drawable;
 import android.view.View;
 
 /** One native, cached font glyph. No Flutter runtime, bitmap conversion or per-frame allocation. */
-public final class CupertinoGlyphDrawable extends Drawable {
+public final class CupertinoGlyphDrawable extends Drawable implements IconPressFeedback.Target {
     private static Typeface typeface;
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.SUBPIXEL_TEXT_FLAG);
     private final Rect unitBounds = new Rect();
@@ -22,6 +22,7 @@ public final class CupertinoGlyphDrawable extends Drawable {
     private float pressScale=1;
     public void setPressScale(float scale){if(pressScale!=scale){pressScale=scale;invalidateSelf();}}
     public float getPressScale(){return pressScale;}
+    @Override public void setIconPressScale(float scale){setPressScale(scale);}
     private static synchronized Typeface font(Resources resources) {
         if (typeface == null) typeface = Typeface.createFromAsset(resources.getAssets(), "cupertino/CupertinoIcons.ttf");
         return typeface;

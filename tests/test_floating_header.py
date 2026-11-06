@@ -29,7 +29,9 @@ public class AppearanceConfig{static final android.content.SharedPreferences p=n
 public class Probe{
  static void check(boolean b){if(!b)throw new AssertionError();}
  public static void main(String[]args){
-  HeaderConfig.load();check(HeaderConfig.style()==0&&!HeaderConfig.floating());
+  HeaderConfig.load();check(HeaderConfig.style()==1&&!HeaderConfig.signature()&&!HeaderConfig.floating());
+  check(!HeaderConfig.counter()&&!HeaderConfig.centerTitle()&&!HeaderConfig.adaptiveBubble());
+  check(org.telegram.messenger.ApplicationLoader.applicationContext.prefs.data.isEmpty());
   for(int style=0;style<=4;style++){
    HeaderConfig.style(style);HeaderConfig.load();check(HeaderConfig.style()==style);
    check(HeaderConfig.floating()==(style==4));check(HeaderConfig.signature()==(style!=1));

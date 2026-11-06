@@ -39,7 +39,7 @@ public final class FlexyStudioText {
         if(!(value instanceof Number))return null;int n=((Number)value).intValue();int label=0;
         if(key.equals("style")&&file.equals("flexygram_header")&&n>=0&&n<=4)label=new int[]{R.string.FlexyHeaderSignature,R.string.FlexyHeaderClassic,R.string.FlexyHeaderFusion,R.string.FlexyHeaderPortrait,R.string.FlexyHeaderFloating}[n];
         else if(key.equals("style")&&file.equals("flexygram_composer")&&n>=0&&n<=1)label=n==0?R.string.FlexyComposerClassic:R.string.FlexyComposerCompact;
-        else if((key.equals("surface_effect")||key.equals("surfaceEffect"))&&n>=0&&n<=1)label=n==0?R.string.FlexyBubbleAdaptiveSurface:R.string.FlexyBubbleLegacySurface;
+        else if((key.equals("surface_effect")||key.equals("surfaceEffect"))&&n>=0&&n<=2)label=n==2?R.string.Default:n==0?R.string.FlexyBubbleAdaptiveSurface:R.string.FlexyBubbleLegacySurface;
         else if((key.equals("compactLevel")||key.equals("density"))&&file.equals("flexygram_composer")&&n>=0&&n<=2)label=new int[]{R.string.FlexyComposerDefault,R.string.FlexyComposerSmall,R.string.FlexyComposerExtraSmall}[n];
         return label==0?null:org.telegram.messenger.LocaleController.getString(label);
     }

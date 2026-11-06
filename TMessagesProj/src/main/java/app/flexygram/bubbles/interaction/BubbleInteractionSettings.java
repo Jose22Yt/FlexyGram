@@ -26,10 +26,10 @@ public final class BubbleInteractionSettings {
         int value = cachedStyle;
         if (value >= 0) return value;
         SharedPreferences p = prefs(context);
-        // Honor the user's previous opt-out. Existing enabled users stay Signature.
+        // Preserve explicit and legacy choices; new installs use Telegram interaction.
         value = p.contains(STYLE_KEY)
-                ? p.getInt(STYLE_KEY, STYLE_SIGNATURE)
-                : (p.getBoolean("tap_panel", true) ? STYLE_SIGNATURE : STYLE_DEFAULT);
+                ? p.getInt(STYLE_KEY, STYLE_DEFAULT)
+                : (p.getBoolean("tap_panel", false) ? STYLE_SIGNATURE : STYLE_DEFAULT);
         cachedStyle = value == STYLE_DEFAULT ? STYLE_DEFAULT : STYLE_SIGNATURE;
         return cachedStyle;
     }
@@ -71,6 +71,6 @@ public final class BubbleInteractionSettings {
     }
 
     public static void resetTap(Context context) {
-        setStyle(context, STYLE_SIGNATURE);
+        setStyle(context, STYLE_DEFAULT);
     }
 }

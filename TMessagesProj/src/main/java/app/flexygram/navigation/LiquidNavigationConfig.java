@@ -8,12 +8,12 @@ import org.telegram.messenger.ApplicationLoader;
 public final class LiquidNavigationConfig {
     private static int density = 1;
     private static boolean loaded = false;
-    private static boolean enabled = true;
+    private static boolean enabled = false;
     private static boolean showTitles = true;
-    private static boolean doubleTapChats = true;
-    private static boolean doubleTapProfile = true;
+    private static boolean doubleTapChats = false;
+    private static boolean doubleTapProfile = false;
     private static boolean alwaysSearchChats = false;
-    private static boolean floatingDock = true;
+    private static boolean floatingDock = false;
     private static boolean separateSearch;
     private static int[] activeOrder = null;
     // Main tabs remains mounted beneath the settings fragment: notify it immediately.
@@ -45,12 +45,12 @@ public final class LiquidNavigationConfig {
             edit.putBoolean("home_defaults_v2", true).apply();
         }
         density = Math.max(0, Math.min(2, p.getInt("density_v1", 1)));
-        enabled = p.getBoolean("show_tabs", true);
+        enabled = p.getBoolean("show_tabs", false);
         showTitles = p.getBoolean("show_titles", true);
-        doubleTapChats = p.getBoolean("double_tap_chats", true);
-        doubleTapProfile = p.getBoolean("double_tap_profile", true);
+        doubleTapChats = p.getBoolean("double_tap_chats", false);
+        doubleTapProfile = p.getBoolean("double_tap_profile", false);
         alwaysSearchChats = p.getBoolean("always_search_chats", false);
-        floatingDock = p.getBoolean("floating_dock", true);
+        floatingDock = p.getBoolean("floating_dock", false);
         separateSearch = p.getBoolean("separate_search", false);
 
         String orderStr = prefs().getString("tab_order", null);

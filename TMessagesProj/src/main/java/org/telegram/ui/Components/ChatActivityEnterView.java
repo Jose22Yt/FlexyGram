@@ -4919,7 +4919,9 @@ public class ChatActivityEnterView extends FrameLayout implements
     private Rect blurBounds = new Rect();
     private boolean flexyNativeGlassBackdropDrawn;
     public void setFlexyNativeGlassBackdropDrawn(boolean drawn) {
+        if (flexyNativeGlassBackdropDrawn == drawn) return;
         flexyNativeGlassBackdropDrawn = drawn;
+        invalidate();
     }
     /** Policy changes must refresh retained child display lists, not just the parent backdrop. */
     public void invalidateNativeGlassColors() {

@@ -18,9 +18,10 @@ public class ScaleStateListAnimator {
         }
 
         // Icon feedback owns only the glyph; do not also spring the button/background.
-        if(view instanceof android.widget.ImageView
+        if(app.exteraless.icons.BaseIconPacks.getSelected() == app.exteraless.icons.BaseIconPacks.BASE_CUPERTINO
+                && (view instanceof android.widget.ImageView
                 || view instanceof app.flexygram.icons.IconPressFeedback.Target
-                || view instanceof org.telegram.ui.ActionBar.ActionBarMenuItem){
+                || view instanceof org.telegram.ui.ActionBar.ActionBarMenuItem)){
             view.setStateListAnimator(null);
             return;
         }

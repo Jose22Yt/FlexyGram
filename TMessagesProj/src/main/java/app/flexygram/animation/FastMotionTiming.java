@@ -3,7 +3,7 @@ package app.flexygram.animation;
 /** Presentation timing only. Never apply to network, playback, recording or gesture distances. */
 public final class FastMotionTiming {
     public static final double SCALE = 0.01d;
-    private static volatile boolean enabled = true;
+    private static volatile boolean enabled = false;
     private static volatile java.util.function.DoubleSupplier systemScale = () -> 1d;
     private FastMotionTiming() {}
     public static boolean isEnabled() { return enabled; }

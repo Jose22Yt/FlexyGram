@@ -26,7 +26,7 @@ public class Probe {
  static class BubblePreviewView extends View{BubblePreviewView(Context c,Object wallpaper){super(c);}}
  static class HeaderCell extends View{HeaderCell(Context c){super(c);}void setHeight(int v){}}
  static class TransparencyCell extends View{TransparencyCell(Context c){super(c);}}
- static class BubbleConfig{static boolean outline,adaptive;static boolean adaptive(){return adaptive;}static int style,fusion;static void load(){}static boolean outlineEnabled(){return outline;}static int outlineStyle(){return style;}static int fusionMode(){return fusion;}}
+ static class BubbleConfig{static final int DEFAULT=2;static int surfaceEffect(){return adaptive?0:1;}static boolean outline,adaptive;static boolean adaptive(){return adaptive;}static int style,fusion;static void load(){}static boolean outlineEnabled(){return outline;}static int outlineStyle(){return style;}static int fusionMode(){return fusion;}}
  static class app{static class exteraless{static class appearance{static class AppearanceConfig{static boolean separate;static boolean separateHeaders(){return separate;}}}}}
  static class NativeAdapter{
   boolean isSettings3Embedded(){return false;}boolean isSignatureSettingsPage(){return false;}

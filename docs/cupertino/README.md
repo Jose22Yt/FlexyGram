@@ -1,9 +1,10 @@
-# Cupertino default icons and touch feedback
+# Optional Cupertino icons and touch feedback
 
-The built-in Default icon pack now loads the bundled Cupertino Icons glyphs through
-both LaunchActivity's existing IconsResources and ApplicationLoader's resources.
-Explicit Solar/Remix selections and installed user packs keep their precedence.
-The default pack is labelled Cupertino Icons in both existing pack selectors.
+The built-in Default pack keeps Telegram's native resources. Cupertino Icons is
+a separate optional pack (ID 3), selectable in both existing pack selectors. It
+loads the bundled glyphs through LaunchActivity's IconsResources and
+ApplicationLoader's resources. Solar/Remix and installed user packs retain their
+precedence. No icon customization is enabled on a fresh installation.
 
 `tools/cupertino/mapping.json` maps 2,011 static resources (including pack variants)
 to 150 Cupertino/project symbols. It is the explicit resource-to-glyph/dimensions/color
@@ -26,14 +27,16 @@ which are absent from the upstream catalog. They reuse cached immutable Paths.
 Font and catalog provenance/hashes are recorded in `tools/cupertino/UPSTREAM.json`;
 the upstream MIT and Flutter BSD notices ship in assets/licenses.
 
-Touch feedback observes native events in activities, action-bar popups, alerts and
-bottom sheets. On a confirmed single tap, the icon shrinks to 94% and returns over
+When the Cupertino pack is selected, touch feedback observes native events in
+activities, action-bar popups, alerts and bottom sheets. On a confirmed single tap, the icon shrinks to 94% and returns over
 160 ms. Reduce Animations uses a smaller 98%, 80 ms gesture. On API26+, Android's disabled
 animators suppress the feedback. Native click dispatch never waits for the effect.
 Dragging past touch slop, cancellation, multiple pointers and long presses do not
 start it. One finite Choreographer callback owns the current pulse; a new touch,
 replacement icon, detachment or completion restores the original image matrix.
-No view scale, row geometry or text scale is changed.
+Cupertino glyphs animate in their own draw pass without changing ImageView scale
+type or requesting layout. Native custom ImageView drawables retain the bounded
+matrix fallback. No view scale, row geometry or text scale is changed.
 
 Settings category tiles scale only their white symbol. SendButton scales only its
 send glyph, keeping its background, price and counters steady. Compound Cupertino
@@ -41,7 +44,7 @@ icons in TextViews retain their reserved bounds and use a floating-point draw
 transform, avoiding rounded-pixel jumps or text-layout changes. Message-menu options use
 Cupertino glyphs and no longer apply the old row-wide spring. Telegram's functional
 media/morph animations, status layers, logos and multicolor artwork are retained;
-the existing iOS chevron mode is now BackDrawable's default.
+BackDrawable keeps the native arrow by default; explicit iOS chevron callers remain supported.
 
 Validation uses the actual production Java against Android API37 and Android API35
 native Canvas/Typeface with explicit application/theme hosts. It covers every

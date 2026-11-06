@@ -38,7 +38,7 @@ object ChatsConfig {
 
     /** Форма стикеров: 0 — как есть, 1 — скруглённая, 2 — как сообщение. */
     @JvmField
-    val stickerShape = addConfig("OEChatsStickerShape", ConfigItem.configTypeInt, 1)
+    val stickerShape = addConfig("OEChatsStickerShape", ConfigItem.configTypeInt, 0)
 
     @JvmField
     val stickerTimeSide = addConfig("OEChatsStickerTimeSide", ConfigItem.configTypeBool, false)

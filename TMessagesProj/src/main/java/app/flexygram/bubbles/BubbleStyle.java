@@ -2,7 +2,7 @@ package app.flexygram.bubbles;
 
 /** Pure bounded presentation policy. Native message layout/selection/media are unchanged. */
 public final class BubbleStyle {
-    public static boolean signature() { return org.telegram.messenger.BuildConfig.CONNECTED_ALPHA; }
+    public static boolean signature() { return org.telegram.messenger.BuildConfig.CONNECTED_ALPHA && BubbleConfig.surfaceEffect() != BubbleConfig.DEFAULT; }
     private BubbleStyle() { }
     public static int transparency(int percent) { return Math.max(0, Math.min(100, percent)); }
     // Only fill alpha changes. Text, media, selection and contour keep their own alpha.
@@ -14,5 +14,5 @@ public final class BubbleStyle {
         return 0xff000000 | (r << 16) | (g << 8) | b;
     }
     public static int effectiveRadius(boolean signature, int stored) { return signature ? 20 : stored; }
-    public static int defaultRadius(boolean alpha) { return alpha ? 20 : 17; }
+    public static int defaultRadius(boolean alpha) { return 17; }
 }

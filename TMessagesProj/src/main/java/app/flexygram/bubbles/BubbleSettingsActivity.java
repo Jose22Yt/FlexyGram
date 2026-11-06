@@ -36,6 +36,7 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
         timestampRow = addRow("flexyBubbleSmallTimestamp");
         transparencyRow = blurRow = borderHeaderRow = enabledRow = fusionHeaderRow = -1;
         borderRow = positionRow = fuseRow = styleRow = pearlRow = fusionIntensityRow = fusionAdaptRow = -1;
+        if (BubbleConfig.surfaceEffect() == BubbleConfig.DEFAULT) return;
         transparencyRow = addRow("flexyBubbleTransparency");
         blurRow = addRow("flexyBubbleBlur");
         borderHeaderRow = addHeader("FlexyBubbleBorderSection");
@@ -65,8 +66,8 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
         if (position == effectRow) {
             showDialog(new AlertDialog.Builder(getParentActivity(), resourcesProvider)
                     .setTitle(getString(R.string.FlexyBubbleSurfaceEffect))
-                    .setItems(new CharSequence[]{getString(R.string.FlexyBubbleAdaptiveSurface), getString(R.string.FlexyBubbleLegacySurface)}, (dialog, which) -> {
-                        BubbleConfig.setSurfaceEffect(which);
+                    .setItems(new CharSequence[]{getString(R.string.Default), getString(R.string.FlexyBubbleAdaptiveSurface), getString(R.string.FlexyBubbleLegacySurface)}, (dialog, which) -> {
+                        BubbleConfig.setSurfaceEffect(new int[]{BubbleConfig.DEFAULT, BubbleConfig.ADAPTIVE, BubbleConfig.LEGACY}[which]);
                         updateRows(); listAdapter.notifyDataSetChanged();
                         if (preview != null) preview.settingsChanged();
                     }).create());
@@ -180,7 +181,7 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
             }
             if (position == effectRow) {
                 ((TextSettingsCell) holder.itemView).setTextAndValue(getString(R.string.FlexyBubbleSurfaceEffect),
-                        getString(BubbleConfig.adaptive() ? R.string.FlexyBubbleAdaptiveSurface : R.string.FlexyBubbleLegacySurface), false);
+                        getString(BubbleConfig.surfaceEffect() == BubbleConfig.DEFAULT ? R.string.Default : BubbleConfig.adaptive() ? R.string.FlexyBubbleAdaptiveSurface : R.string.FlexyBubbleLegacySurface), false);
                 return;
             }
             if (position == appearanceHeaderRow || position == borderHeaderRow || position == fusionHeaderRow) {
