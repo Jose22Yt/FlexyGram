@@ -410,6 +410,7 @@ public final class SignatureWallpaperBlur {
         private void clear() {
             boolean wasReady = isReady();
             release(); source = null; supported = false;
+            snapshotSource = null; staticSnapshot = null;
             if (wasReady) invalidateVisual();
         }
         public void close() { if (closed) return; closed = true; clear(); snapshotSource = null; staticSnapshot = null; availabilityChanged = null; target.clear(); }

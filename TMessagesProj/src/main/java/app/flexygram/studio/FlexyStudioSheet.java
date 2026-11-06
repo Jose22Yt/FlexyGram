@@ -40,37 +40,59 @@ public final class FlexyStudioSheet extends BottomSheet {
         info.addView(detail,new LinearLayout.LayoutParams(0,-2,1));add(all,info,0,14);
         add(all,text(getString(R.string.FlexyStudioIncludes),14,Theme.key_windowBackgroundWhiteBlueText),0,8);
         LinearLayout sections=panel(c);sections.setPadding(0,0,0,0);sections.setOrientation(LinearLayout.VERTICAL);
-        selected.addAll(plan.changedGroups());
+        selected.addAll(plan.defaultSelection());
         for(StudioImportPlan.Group group:plan.groups) {
             String id=group.id;
             LinearLayout block=new LinearLayout(c);block.setOrientation(LinearLayout.VERTICAL);
             LinearLayout row=new LinearLayout(c);row.setGravity(Gravity.CENTER_VERTICAL);row.setPadding(dp(16),dp(10),dp(12),dp(10));row.setMinimumHeight(dp(56));
             LinearLayout labels=new LinearLayout(c);labels.setOrientation(LinearLayout.VERTICAL);
             labels.addView(text(getString(FlexyStudioText.section(id)),16,Theme.key_windowBackgroundWhiteBlackText));
-            labels.addView(text(group.changes.isEmpty()?getString(R.string.FlexyStudioAlreadyMatches):org.telegram.messenger.LocaleController.formatString("FlexyStudioChangeCount",R.string.FlexyStudioChangeCount,group.changes.size()),13,Theme.key_windowBackgroundWhiteGrayText2));
+            TextView count=text("",13,Theme.key_windowBackgroundWhiteGrayText2);labels.addView(count);
             row.addView(labels,new LinearLayout.LayoutParams(0,-2,1));
-            CheckBox check=new CheckBox(c);check.setButtonTintList(android.content.res.ColorStateList.valueOf(color(Theme.key_windowBackgroundWhiteBlueText)));check.setChecked(selected.contains(id));check.setEnabled(!group.changes.isEmpty());
+            CheckBox check=new CheckBox(c);check.setButtonTintList(android.content.res.ColorStateList.valueOf(color(Theme.key_windowBackgroundWhiteBlueText)));check.setEnabled(!group.changes.isEmpty());
             check.setContentDescription(getString(FlexyStudioText.section(id)));row.addView(check,new LinearLayout.LayoutParams(dp(48),dp(48)));
-            check.setOnCheckedChangeListener((button,checked)->{if(busy){check.setChecked(selected.contains(id));return;}if(checked)selected.add(id);else selected.remove(id);refreshApply();});
-            row.setOnClickListener(v->{if(check.isEnabled())check.performClick();});
-            block.addView(row,new LinearLayout.LayoutParams(-1,-2));
+            boolean[] binding={false};
+            Runnable refreshGroup=()->{
+                int included=0;for(StudioImportPlan.Change change:group.changes)if(selected.contains(StudioImportPlan.selectionKey(group,change)))included++;
+                binding[0]=true;check.setChecked(included>0&&included==group.changes.size());binding[0]=false;
+                count.setText(group.changes.isEmpty()?getString(R.string.FlexyStudioAlreadyMatches):org.telegram.messenger.LocaleController.formatString("FlexyStudioSelectedCount",R.string.FlexyStudioSelectedCount,included,group.changes.size()));
+                refreshApply();
+            };
+            LinearLayout details=new LinearLayout(c);details.setOrientation(LinearLayout.VERTICAL);details.setVisibility(View.GONE);
+            int[] page={0};Runnable[] showPage={()->{}};
+            check.setOnCheckedChangeListener((button,checked)->{
+                if(binding[0])return;
+                if(!busy)for(StudioImportPlan.Change change:group.changes){String key=StudioImportPlan.selectionKey(group,change);if(checked)selected.add(key);else selected.remove(key);}
+                refreshGroup.run();if(details.getVisibility()==View.VISIBLE)showPage[0].run();
+            });
+            row.setOnClickListener(v->{if(check.isEnabled()&&!busy)check.performClick();});
+            block.addView(row,new LinearLayout.LayoutParams(-1,-2));refreshGroup.run();
             if(!group.changes.isEmpty()) {
-                TextView details=text("",13,Theme.key_windowBackgroundWhiteGrayText2);details.setPadding(dp(16),0,dp(16),dp(12));details.setVisibility(View.GONE);
                 TextView expand=text(getString(R.string.FlexyStudioViewChanges),14,Theme.key_windowBackgroundWhiteBlueText);expand.setPadding(dp(16),dp(8),dp(16),dp(12));expand.setMinHeight(dp(44));expand.setFocusable(true);
-                int[] page={0};
                 LinearLayout paging=new LinearLayout(c);paging.setGravity(Gravity.CENTER_VERTICAL);paging.setVisibility(View.GONE);
                 TextView previous=button(getString(R.string.FlexyStudioPreviousChanges),false),next=button(getString(R.string.FlexyStudioNextChanges),false);
                 paging.addView(previous,new LinearLayout.LayoutParams(0,-2,1));paging.addView(next,new LinearLayout.LayoutParams(0,-2,1));
-                Runnable showPage=()->{details.setText(describe(group,page[0]));previous.setEnabled(page[0]>0);next.setEnabled(page[0]+20<group.changes.size());};
-                previous.setOnClickListener(v->{if(page[0]>0){page[0]-=20;showPage.run();}});
-                next.setOnClickListener(v->{if(page[0]+20<group.changes.size()){page[0]+=20;showPage.run();}});
-                expand.setOnClickListener(v->{boolean show=details.getVisibility()!=View.VISIBLE;if(show)showPage.run();details.setVisibility(show?View.VISIBLE:View.GONE);paging.setVisibility(show&&group.changes.size()>20?View.VISIBLE:View.GONE);expand.setText(getString(show?R.string.FlexyStudioHideChanges:R.string.FlexyStudioViewChanges));});
+                showPage[0]=()->{
+                    details.removeAllViews();int end=Math.min(page[0]+20,group.changes.size());
+                    for(int i=page[0];i<end;i++){
+                        StudioImportPlan.Change change=group.changes.get(i);String key=StudioImportPlan.selectionKey(group,change);
+                        LinearLayout item=new LinearLayout(c);item.setGravity(Gravity.CENTER_VERTICAL);item.setPadding(dp(16),dp(6),dp(12),dp(6));item.setMinimumHeight(dp(48));
+                        item.addView(text(describe(change),13,Theme.key_windowBackgroundWhiteGrayText2),new LinearLayout.LayoutParams(0,-2,1));
+                        CheckBox option=new CheckBox(c);option.setButtonTintList(android.content.res.ColorStateList.valueOf(color(Theme.key_windowBackgroundWhiteBlueText)));option.setChecked(selected.contains(key));option.setContentDescription(describe(change));
+                        option.setOnCheckedChangeListener((button,checked)->{if(busy){option.setChecked(selected.contains(key));return;}if(checked)selected.add(key);else selected.remove(key);refreshGroup.run();});
+                        item.addView(option,new LinearLayout.LayoutParams(dp(48),dp(48)));item.setOnClickListener(v->{if(!busy)option.performClick();});details.addView(item,new LinearLayout.LayoutParams(-1,-2));
+                    }
+                    previous.setEnabled(page[0]>0);next.setEnabled(end<group.changes.size());
+                };
+                previous.setOnClickListener(v->{if(page[0]>0){page[0]-=20;showPage[0].run();}});
+                next.setOnClickListener(v->{if(page[0]+20<group.changes.size()){page[0]+=20;showPage[0].run();}});
+                expand.setOnClickListener(v->{boolean show=details.getVisibility()!=View.VISIBLE;if(show)showPage[0].run();details.setVisibility(show?View.VISIBLE:View.GONE);paging.setVisibility(show&&group.changes.size()>20?View.VISIBLE:View.GONE);expand.setText(getString(show?R.string.FlexyStudioHideChanges:R.string.FlexyStudioViewChanges));});
                 block.addView(expand,new LinearLayout.LayoutParams(-1,-2));block.addView(details,new LinearLayout.LayoutParams(-1,-2));block.addView(paging,new LinearLayout.LayoutParams(-1,-2));
             }
             sections.addView(block,new LinearLayout.LayoutParams(-1,-2));
             if(sections.getChildCount()<plan.groups.size()*2-1){View separator=new View(c);separator.setBackgroundColor(color(Theme.key_divider));sections.addView(separator,new LinearLayout.LayoutParams(-1,1));}
         }
-        add(all,sections,0,14);add(all,text(getString(R.string.FlexyStudioApplyInfo),14,Theme.key_windowBackgroundWhiteGrayText2),0,14);
+        add(all,sections,0,14);add(all,text(getString(R.string.FlexyStudioSelectiveInfo),14,Theme.key_windowBackgroundWhiteGrayText2),0,14);
         LinearLayout buttons=new LinearLayout(c);buttons.setGravity(Gravity.CENTER_VERTICAL);
         TextView cancel=button(getString(R.string.Cancel),false);apply=button(getString(R.string.FlexyStudioApply),true);refreshApply();
         LinearLayout.LayoutParams half=new LinearLayout.LayoutParams(0,-2,1);half.setMarginEnd(dp(10));buttons.addView(cancel,half);buttons.addView(apply,new LinearLayout.LayoutParams(0,-2,1));
@@ -79,7 +101,7 @@ public final class FlexyStudioSheet extends BottomSheet {
             if(busy||selected.isEmpty())return;BaseFragment f=owner.get();if(f==null||f.getParentActivity()==null){dismiss();return;}
             busy=true;apply.setEnabled(false);apply.setText(getString(R.string.FlexyStudioApplying));
             WeakReference<FlexyStudioSheet> weakSheet=new WeakReference<>(this);
-            boolean accepted=FlexyStudioStore.applySelection(plan,selected,(ok,recovery,receipt)->{
+            boolean accepted=FlexyStudioStore.applyChanges(plan,selected,(ok,recovery,receipt)->{
                 FlexyStudioSheet sheet=weakSheet.get();if(sheet==null)return;
                 sheet.busy=false;BaseFragment current=sheet.owner.get();
                 if(ok){sheet.dismiss();if(current!=null&&current.getParentActivity()!=null)BulletinFactory.of(current).createSimpleBulletin(0,getString(R.string.FlexyStudioApplied),getString(R.string.UndoNoCaps),()->confirmUndo(current,receipt)).show();}
@@ -92,17 +114,9 @@ public final class FlexyStudioSheet extends BottomSheet {
         scroll.setFillViewport(false);scroll.addView(all,new ScrollView.LayoutParams(-1,-2));setCustomView(scroll);
     }
     private void refreshApply(){if(apply!=null)apply.setEnabled(!busy&&!selected.isEmpty());}
-    private String describe(StudioImportPlan.Group group,int start){
-        StringBuilder result=new StringBuilder();int end=Math.min(start+20,group.changes.size());
-        if(group.changes.size()>20)result.append(start+1).append("–").append(end).append(" / ").append(group.changes.size()).append("\n\n");
-        for(int i=start;i<end;i++){
-            StudioImportPlan.Change change=group.changes.get(i);
-            if(i>start)result.append("\n\n");
-            if(change.key.equals("theme")){result.append(getString(R.string.FlexyStudioThemeChange));continue;}
-            result.append(FlexyStudioText.setting(change.file,change.key)).append(": ")
-                    .append(value(change.file,change.key,change.before)).append(" → ").append(value(change.file,change.key,change.after));
-        }
-        return result.toString();
+    private String describe(StudioImportPlan.Change change){
+        if(change.key.equals("theme"))return getString(R.string.FlexyStudioThemeChange);
+        return FlexyStudioText.setting(change.file,change.key)+": "+value(change.file,change.key,change.before)+" → "+value(change.file,change.key,change.after);
     }
     private String value(String file,String key,Object raw){
         if(raw instanceof java.util.Map){java.util.Map<?,?> map=(java.util.Map<?,?>)raw;

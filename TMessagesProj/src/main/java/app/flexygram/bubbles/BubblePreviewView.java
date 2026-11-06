@@ -56,10 +56,14 @@ public final class BubblePreviewView extends View implements NotificationCenter.
         }
     };
     public void settingsChanged() {
+        float previousFontSpacing = time.getFontSpacing();
         if (Theme.chat_timePaint != null) time.set(Theme.chat_timePaint);
         if (BubbleConfig.smallTimestamps()) time.setTextSize(AndroidUtilities.dpf2(9));
-        measuredWidth = -1;
-        requestLayout();
+        // Material, blur and border sliders only repaint. Rebuild text layouts only for geometry changes.
+        if (measuredWidth < 0 || previousFontSpacing != time.getFontSpacing()) {
+            measuredWidth = -1;
+            requestLayout();
+        }
         checkColor = BubbleConfig.adaptive() ? ServiceBubbleSurface.textColor(null) : Theme.getColor(Theme.key_chat_outSentCheckRead);
         check.setTint(checkColor); halfCheck.setTint(checkColor);
         if (blurOwner != null) blurOwner.prepare(wallpaper, wallpaperMotion, Theme.getColor(Theme.key_windowBackgroundGray));

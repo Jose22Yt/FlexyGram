@@ -7,7 +7,7 @@ import shutil
 
 PRODUCTION = ('SignatureMusicStyle','SignatureMusicPresentation','SignatureMusicBubble',
               'SignatureMusicHost','ControlsRow','MorphButton','PlayerIcon','Spring',
-              'WavySeekBar','RingPlayButton','PlayerBarView','PlayerMiniView','PlayerColors','CoverImage','SignatureCoverFade','SignatureMusicActions')
+              'WavySeekBar','RingPlayButton','PlayerBarView','PlayerMiniView','PlayerColors','CoverImage','SignatureCoverFade','SignatureMusicActions','CompactPlayerQueue')
 
 def write_stubs(source, root):
     def put(path, text):
@@ -23,10 +23,10 @@ def write_stubs(source, root):
     keys=sorted(set(re.findall(r'Theme.(key_\w+)',code)))
     put('org/telegram/ui/ActionBar/Theme.java','''package org.telegram.ui.ActionBar;
 import android.graphics.drawable.*; public class Theme {
-public static boolean dark; public static final int RIPPLE_MASK_CIRCLE_20DP=1,RIPPLE_MASK_ALL=2;
+public static boolean dark;public static int accent=0xff008acb; public static final int RIPPLE_MASK_CIRCLE_20DP=1,RIPPLE_MASK_ALL=2;
 '''+''.join(f'public static final int {n}={i+1};' for i,n in enumerate(keys))+'''
 public interface ResourcesProvider {default int getColor(int k){return Theme.getColor(k,null);} default boolean isDark(){return dark;}}
-public static int getColor(int k,ResourcesProvider r){return dark?0xff11151c:0xfff7f8fa;}
+public static int getColor(int k,ResourcesProvider r){if(r!=null)return r.getColor(k);return k==key_windowBackgroundWhiteBlueText?accent:dark?0xff11151c:0xfff7f8fa;}
 public static Drawable getSelectorDrawable(boolean v){return new ColorDrawable(0);}
 public static Drawable createSelectorDrawable(int c,int mask){android.graphics.drawable.GradientDrawable shape=new android.graphics.drawable.GradientDrawable();shape.setColor(0xffffffff);if(mask==RIPPLE_MASK_CIRCLE_20DP)shape.setShape(1);return new android.graphics.drawable.RippleDrawable(android.content.res.ColorStateList.valueOf(c),null,shape);}
 }''')
@@ -36,13 +36,13 @@ public static int dp2(float v){return dp(v);}public static float density=1;publi
 public static android.graphics.Typeface bold(){return android.graphics.Typeface.create("sans-serif",1);}
 }''')
     put('org/telegram/messenger/LiteMode.java','package org.telegram.messenger; public class LiteMode {public static boolean isPowerSaverApplied(){return false;}}')
-    put('org/telegram/messenger/LocaleController.java','''package org.telegram.messenger; public class LocaleController {public static String getString(int id){
+    put('org/telegram/messenger/LocaleController.java','''package org.telegram.messenger; public class LocaleController {public static boolean isRTL;public static String getString(int id){
 if(id==R.string.FlexyMusicCompact)return "Comprimir reproductor";
 if(id==R.string.FlexyMusicExpand)return "Expandir reproductor";
 return "Music action";}}''')
     put('org/telegram/messenger/MessageObject.java','''package org.telegram.messenger; public class MessageObject {
 public int currentAccount,audioProgressSec;public float audioProgress; public boolean music=true;public String title="Alone",artist="Marshmello";
-public boolean isMusic(){return music;} public int getId(){return 10;} public String getMusicTitle(){return title;} public String getMusicAuthor(){return artist;}
+public boolean isMusic(){return music;}public long getDialogId(){return 123L;} public int getId(){return 10;} public String getMusicTitle(){return title;} public String getMusicAuthor(){return artist;}
 public Object getDocument(){return null;}
 }''')
     put('org/telegram/messenger/MediaController.java','''package org.telegram.messenger; public class MediaController {
@@ -50,8 +50,11 @@ private static final MediaController I=new MediaController(); public static Medi
 public MessageObject message; public boolean paused; public int pauses,plays,nexts,stops;
 public MessageObject getPlayingMessageObject(){return message;} public boolean isDownloadingCurrentMessage(){return false;} public boolean isMessagePaused(){return paused;}
 public void playMessage(MessageObject m){plays++;paused=false;} public void pauseMessage(MessageObject m){pauses++;paused=true;}
+public java.util.ArrayList<MessageObject> playlist=new java.util.ArrayList<>();public Object currentSavedMusicList;
+public java.util.ArrayList<MessageObject> getPlaylist(){return playlist;}public boolean isPlayingMessage(MessageObject m){return m==message;}public void findMessageInPlaylistAndPlay(MessageObject m){message=m;plays++;}
 public void playNextMessage(){nexts++;}public void cleanupPlayer(boolean a,boolean b){stops++;message=null;}
 }''')
+    put('org/telegram/messenger/SharedConfig.java','package org.telegram.messenger;public class SharedConfig{public static boolean playOrderReversed;}')
     put('org/telegram/messenger/FileLoader.java','package org.telegram.messenger; public class FileLoader {public static String getAttachFileName(Object o){return "fixture";}}')
     events=sorted(set(re.findall(r'NotificationCenter.(\w+)',code)) - {'getGlobalInstance','getInstance','NotificationCenterDelegate'})
     put('org/telegram/messenger/NotificationCenter.java','''package org.telegram.messenger; import java.util.*;
@@ -65,7 +68,7 @@ public void removeObserver(NotificationCenterDelegate d,int e){registrations.rem
 }''')
     put('org/telegram/messenger/UserConfig.java','package org.telegram.messenger; public class UserConfig {public static final int MAX_ACCOUNT_COUNT=3;}')
     put('org/telegram/ui/ActionBar/BaseFragment.java','''package org.telegram.ui.ActionBar; public class BaseFragment {
-private android.view.View root;public BaseFragment(android.view.View v){root=v;}public android.view.View getFragmentView(){return root;}}
+private android.view.View root;public BaseFragment(android.view.View v){root=v;}public android.view.View getFragmentView(){return root;}public Theme.ResourcesProvider getResourceProvider(){return null;}}
 ''')
     put('org/telegram/ui/Components/CubicBezierInterpolator.java','''package org.telegram.ui.Components; public class CubicBezierInterpolator implements android.animation.TimeInterpolator {
 public CubicBezierInterpolator(double a,double b,double c,double d){}public float getInterpolation(float t){return t;}}

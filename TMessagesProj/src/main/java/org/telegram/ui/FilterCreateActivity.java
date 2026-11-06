@@ -127,6 +127,7 @@ public class FilterCreateActivity extends BaseFragment {
     private boolean nameChangedManually;
 
     private MessagesController.DialogFilter filter;
+    private java.util.function.Consumer<MessagesController.DialogFilter> onFilterSaved;
     private boolean creatingNew;
     private boolean doNotCloseWhenSave;
     private CharSequence newFilterName;
@@ -194,7 +195,18 @@ public class FilterCreateActivity extends BaseFragment {
     }
 
     public FilterCreateActivity(MessagesController.DialogFilter dialogFilter, ArrayList<Long> alwaysShow) {
-        super();
+        this(dialogFilter,alwaysShow,org.telegram.messenger.UserConfig.selectedAccount);
+    }
+
+    /** Native editor scoped before resolving ids/controllers; saving remains explicit and cancellable. */
+    public static FilterCreateActivity forAccount(int account,MessagesController.DialogFilter existing,CharSequence initialName,java.util.function.Consumer<MessagesController.DialogFilter> saved){
+        FilterCreateActivity editor=new FilterCreateActivity(existing,null,account);
+        if(existing==null){editor.newFilterName=initialName;editor.newFilterEmoticon="⭐";}
+        editor.onFilterSaved=saved;return editor;
+    }
+
+    private FilterCreateActivity(MessagesController.DialogFilter dialogFilter, ArrayList<Long> alwaysShow,int account) {
+        super();setCurrentAccount(account);
         filter = dialogFilter;
         if (filter == null) {
             filter = new MessagesController.DialogFilter();
@@ -1049,6 +1061,7 @@ public class FilterCreateActivity extends BaseFragment {
             filter.flags = newFilterFlags;
             checkDoneButton(true);
 
+            if(onFilterSaved!=null){java.util.function.Consumer<MessagesController.DialogFilter> saved=onFilterSaved;onFilterSaved=null;saved.accept(filter);}
             getNotificationCenter().postNotificationName(NotificationCenter.dialogFiltersUpdated);
 
             if (after != null) {

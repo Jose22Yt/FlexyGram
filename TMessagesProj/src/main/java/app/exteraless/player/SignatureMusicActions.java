@@ -15,7 +15,7 @@ public final class SignatureMusicActions extends LinearLayout {
     }
     @Override protected void onMeasure(int widthSpec,int heightSpec) {
         int width=MeasureSpec.getSize(widthSpec),columns=columns(width);
-        int cellHeight=Math.max(dp(72),(int)Math.ceil(dp(38)+16*getResources().getDisplayMetrics().scaledDensity));
+        int cellHeight=Math.max(dp(56),(int)Math.ceil(dp(26)+16*getResources().getDisplayMetrics().scaledDensity));
         for(int i=0;i<getChildCount();i++) {
             View child=getChildAt(i);LayoutParams lp=(LayoutParams)child.getLayoutParams();
             int cellWidth=(i%columns+1)*width/columns-(i%columns)*width/columns;

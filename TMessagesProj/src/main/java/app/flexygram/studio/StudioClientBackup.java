@@ -103,6 +103,7 @@ final class StudioClientBackup {
         if(root.containsKey("theme"))StudioClientTheme.apply(root.get("theme"));
     }
     static void reload() {
+        app.flexygram.home.HomeStyleConfig.load();
         tw.nekomimi.nekogram.NekoConfig.loadConfig(true);
         xyz.nextalone.nagram.NaConfig.INSTANCE.loadConfig(true);
         app.exteraless.OpenExteraConfig.INSTANCE.loadConfig(true);

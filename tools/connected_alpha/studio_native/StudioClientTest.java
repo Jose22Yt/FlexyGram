@@ -94,6 +94,41 @@ public class StudioClientTest {
   check(disk.get("flexy_bubble_interaction").get("menu_actions").equals(Set.of("REPLY","COPY","MORE")));
   var badSet=root(saved);file(badSet,"flexy_bubble_interaction").put("menu_actions",Map.of("present",true,"value",List.of(4L)));
   reject(()->StudioClientBackup.validate(StudioCodec.encodeValues(badSet)));
+  // Fine-grained selection: unchecked keys in the same section and the active theme stay intact.
+  {
+   StudioClientBackup.apply(defaults);
+   Map<String,Object> candidateRoot=root(saved);candidateRoot.put("theme",Map.of("colors",Map.of("test",2L)));
+   var candidate=StudioCodec.create("Granular.flexygram",Map.of("client",Map.of("settings",StudioCodec.encodeValues(candidateRoot))));
+   var granular=StudioImportPlan.prepare(candidate);
+   check(granular.changedGroups().contains("theme"));
+   var noTheme=root((String)granular.selectChanges(granular.defaultSelection()).sections.get("client").get("settings"));
+   check(!noTheme.containsKey("theme"));
+   String token=null,themeToken=null;
+   for(var group:granular.groups)for(var change:group.changes){
+    if(change.file.equals("flexygram_header")&&change.key.equals("style"))token=StudioImportPlan.selectionKey(group,change);
+    if(group.id.equals("theme"))themeToken=StudioImportPlan.selectionKey(group,change);
+   }
+   check(token!=null&&themeToken!=null);var onlyStyle=granular.selectChanges(Set.of(token));
+   var selectedRoot=root((String)onlyStyle.sections.get("client").get("settings"));
+   check(StudioClientBackup.object(selectedRoot.get("files")).keySet().equals(Set.of("flexygram_header")));
+   check(file(selectedRoot,"flexygram_header").keySet().equals(Set.of("style")));
+   int themeCalls=StudioClientTheme.applies;put("flexygram_header","compact",true);
+   var selectiveReceipt=StudioTransaction.apply(backend,onlyStyle);
+   check(StudioClientTheme.applies==themeCalls);
+   check(disk.get("flexygram_header").get("style").equals(3));
+   check(disk.get("flexygram_header").get("compact").equals(true));
+   check(!disk.get("flexygram_composer").containsKey("componentGap"));
+   StudioTransaction.undo(backend,selectiveReceipt);
+   check(StudioClientTheme.applies==themeCalls&&disk.get("flexygram_header").get("compact").equals(true));
+   var onlyTheme=root((String)granular.selectChanges(Set.of(themeToken)).sections.get("client").get("settings"));
+   check(onlyTheme.containsKey("theme")&&StudioClientBackup.object(onlyTheme.get("files")).isEmpty());
+   reject(()->granular.selectChanges(Set.of()));reject(()->granular.selectChanges(Set.of("unknown")));
+   StudioClientBackup.apply(defaults);
+   var legacy=StudioImportPlan.prepare(StudioCodec.create("Legacy.flexyGram",Map.of("header",Map.of("style",1,"compact",true))));
+   String compactToken=null;for(var group:legacy.groups)for(var change:group.changes)if(change.key.equals("compact"))compactToken=StudioImportPlan.selectionKey(group,change);
+   check(compactToken!=null&&legacy.selectChanges(Set.of(compactToken)).sections.equals(Map.of("header",Map.of("compact",true))));
+   StudioClientBackup.apply(saved);
+  }
   System.out.println("Studio client checks="+checks+"; complete/default round trips, typed values, secrets excluded, undo conflicts and mid-import disk rollback passed; persistence/theme are doubles.");
  }
 }

@@ -19,11 +19,11 @@ public final class Md3Player {
     }
 
     public static boolean enabled() {
-        return AppearanceConfig.md3Player();
+        return BuildConfig.CONNECTED_ALPHA || AppearanceConfig.md3Player();
     }
 
     public static boolean miniEnabled() {
-        return AppearanceConfig.md3MiniPlayer();
+        return BuildConfig.CONNECTED_ALPHA || AppearanceConfig.md3MiniPlayer();
     }
 
     private static boolean handles(MessageObject messageObject) {

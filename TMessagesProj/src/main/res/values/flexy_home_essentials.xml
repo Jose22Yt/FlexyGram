@@ -1,0 +1,7 @@
+<resources>
+    <string name="FlexyHomeStyle">Home screen style</string>
+    <string name="FlexyHomeEssentials">Essential cards</string>
+    <string name="FlexyHomeFavorites">Favorites</string>
+    <string name="FlexyHomeFavoritesEmpty">Favorites is empty</string>
+    <string name="FlexyHomeFavoritesHint">Long-press Favorites to choose chats, groups, channels or bots.</string>
+</resources>

@@ -73,7 +73,7 @@ public final class PlayerColors {
     }
 
     public static PlayerColors fromSeed(int seed, boolean dark) {
-        if (BuildConfig.CONNECTED_ALPHA) return dark ? MIDNIGHT : PEARL;
+        if (BuildConfig.CONNECTED_ALPHA) return fromSignatureTheme(dark);
         DynamicScheme s = new SchemeTonalSpot(Hct.fromInt(seed), dark, 0.0);
         return new PlayerColors(dark, new int[]{
                 s.getSurface(), s.getSurfaceContainerLow(), s.getSurfaceContainer(), s.getSurfaceContainerHigh(),
@@ -103,14 +103,15 @@ public final class PlayerColors {
     }
 
     /** Compact Modern uses the active Telegram theme, independently of album art. */
-    public static PlayerColors fromSignatureTheme(boolean dark) {
-        int accent = Theme.getColor(Theme.key_windowBackgroundWhiteBlueText, (Theme.ResourcesProvider) null);
+    public static PlayerColors fromSignatureTheme(boolean dark) {return fromSignatureTheme(dark,null);}
+    public static PlayerColors fromSignatureTheme(boolean dark,Theme.ResourcesProvider provider) {
+        int accent = Theme.getColor(Theme.key_windowBackgroundWhiteBlueText, provider) | 0xff000000;
         long key = ((accent & 0xffffffffL) << 1) | (dark ? 1 : 0);
         PlayerColors cached = themePalettes.get(key);
         if (cached != null) return cached;
         int[] values = (dark ? MIDNIGHT : PEARL).values();
         values[7] = accent;
-        values[8] = ColorUtils.calculateContrast(0xffffffff, accent) >= 4.5 ? 0xffffffff : 0xff101820;
+        values[8] = ColorUtils.calculateContrast(0xffffffff, accent) >= 4.5 ? Color.WHITE : Color.BLACK;
         values[9] = ColorUtils.blendARGB(values[0], accent, .10f);
         PlayerColors result = new PlayerColors(dark, values);
         themePalettes.put(key, result);

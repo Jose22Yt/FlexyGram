@@ -54,4 +54,6 @@
     <string name="FlexyStudioExportError">Could not prepare the configuration. No file was generated.</string>
     <string name="FlexyStudioPreviousChanges">Previous</string>
     <string name="FlexyStudioNextChanges">Next</string>
+    <string name="FlexyStudioSelectedCount">Selected: %1$d / %2$d</string>
+    <string name="FlexyStudioSelectiveInfo">Only selected settings will be applied. Your current theme and wallpaper stay unchanged unless you select Theme and wallpaper.</string>
 </resources>

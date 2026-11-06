@@ -951,6 +951,10 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             if (SizeNotifierFrameLayout.drawingBlur) {
                 return super.drawChild(canvas, child, drawingTime);
             }
+            if(isEssentialsHome()&&(child==essentialsBrand||child==essentialsShortcuts)){
+                canvas.save();canvas.clipRect(0,actionBar.getHeight(),getWidth(),getHeight());
+                boolean drawn=super.drawChild(canvas,child,drawingTime);canvas.restore();return drawn;
+            }
             boolean result;
             if (child == viewPages[0] || (viewPages.length > 1 && child == viewPages[1]) || child == topPanelLayout || child == filterTabsView) {
                 canvas.save();
@@ -1144,6 +1148,14 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             updateStoriesViewAlpha(storiesAlpha);
             // Capture once, after scroll/header geometry settles and before glass children draw.
             blur3_UpdateBlur();
+            if(essentialsSearchHeader!=null){
+                float visible=(1f-searchAnimationProgress)*(1f-progressToActionMode)*(1f-getRightSlidingProgress());
+                essentialsSearchHeader.setAlpha(visible);essentialsSearchHeader.setVisibility(visible>0?VISIBLE:INVISIBLE);
+                essentialsShortcuts.setAlpha(visible);essentialsShortcuts.setVisibility(visible>0?VISIBLE:INVISIBLE);
+                essentialsShortcuts.setTranslationY(scrollYOffset+storiesYOffset+storiesOverscroll);
+                essentialsBrand.setTranslationY(scrollYOffset+storiesYOffset+storiesOverscroll);essentialsBrand.setAlpha(visible);
+                actionBar.setAlpha(1f-visible);actionBar.setImportantForAccessibility(visible>.99f?View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS:View.IMPORTANT_FOR_ACCESSIBILITY_AUTO);
+            }
             super.dispatchDraw(canvas);
             drawHeaderShadow(canvas, top + actionBarHeight);
 
@@ -1370,6 +1382,12 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     childTop += getIdleSearchFieldHeight();
                 } else if (dialogStoriesCell != null && dialogStoriesCell.getPremiumHint() == child) {
                     continue;
+                }
+                if(isEssentialsHome()) {
+                    if(child==essentialsBrand)childTop=actionBar.getMeasuredHeight();
+                    else if(child==dialogStoriesCell)childTop+=dp(64);
+                    else if(child==essentialsSearchHeader)childTop=actionBar.getOccupyStatusBar()?AndroidUtilities.statusBarHeight:0;
+                    else if(child==essentialsShortcuts)childTop=actionBar.getMeasuredHeight()+dp(64)+(hasStories?dp(DialogStoriesCell.HEIGHT_IN_DP):0);
                 }
                 child.layout(childLeft, childTop, childLeft + width, childTop + height);
             }
@@ -3259,6 +3277,10 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         return !(dialog instanceof BotWebViewSheet) && super.dismissDialogOnPause(dialog);
     }
 
+    private boolean essentialsHome;
+    private app.flexygram.home.EssentialsSearchHeader essentialsSearchHeader;
+    private app.flexygram.home.EssentialsShortcuts essentialsShortcuts;
+    private android.widget.TextView essentialsBrand;
     private BlurredBackgroundDrawableViewFactory signatureHomeGlassFactory;
 
     @Override
@@ -3431,6 +3453,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
     @Override
     public View createView(final Context context) {
+        app.flexygram.home.HomeStyleConfig.load();
+        essentialsHome=app.flexygram.home.HomeStyleConfig.style()==app.flexygram.home.HomeStyleConfig.ESSENTIALS && isSignatureHome();
+        essentialsSearchHeader=null;essentialsShortcuts=null;essentialsBrand=null;
         searching = false;
         searchWas = false;
         wasDrawn = false;
@@ -3835,7 +3860,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     }
                 }
             };
-            filterTabsView.setSignatureHome(isSignatureHome());
+            filterTabsView.setSignatureHome(isSignatureHome() && !isEssentialsHome());
             filterTabsView.setVisibility(View.GONE);
             canShowFilterTabsView = false;
             animatorFilterTabsVisible.setValue(false, false);
@@ -4124,6 +4149,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
                 @Override
                 public void onTabSelected(FilterTabsView.Tab tab, boolean forward, boolean animated) {
+                    refreshEssentialsHome();
                     if (actionBar == null) return;
                     if (AppearanceConfig.folderNameAsTitle()) {
                         CharSequence title = tab.isDefault ? actionBarTitleNax : EmojiHelper.removeEmojiSpans(tab.realTitle);
@@ -5995,6 +6021,17 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
 
 
+        if(isEssentialsHome()) {
+            essentialsBrand=new android.widget.TextView(context);essentialsBrand.setTextSize(22);essentialsBrand.setTypeface(AndroidUtilities.bold());essentialsBrand.setGravity(Gravity.CENTER_VERTICAL);essentialsBrand.setPadding(dp(20),0,dp(20),0);essentialsBrand.setText(TypefaceHelper.getTitleText(currentAccount));
+            essentialsShortcuts=new app.flexygram.home.EssentialsShortcuts(context,resourceProvider,this::openEssentialsSaved,this::openEssentialsFavorites,this::editEssentialsFavorites);
+            essentialsSearchHeader=new app.flexygram.home.EssentialsSearchHeader(context,currentAccount,resourceProvider,signatureHomeGlassFactory,getUserConfig().getCurrentUser(),()->{
+                Bundle args=new Bundle();args.putLong("user_id",getUserConfig().getClientUserId());presentFragment(new ProfileActivity(args));
+            },()->{if(searchItem!=null)searchItem.performClick();},()->{getContactsController().loadGlobalPrivacySetting();showItemOptions(essentialsSearchHeader.getMenuAnchor());},()->openAccountSelector(essentialsSearchHeader.getProfileAnchor()));
+            contentView.addView(essentialsBrand,LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT,64,Gravity.TOP));
+            contentView.addView(essentialsShortcuts,LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT,64,Gravity.TOP));
+            contentView.addView(essentialsSearchHeader,LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT,64,Gravity.TOP));
+            refreshEssentialsHome();
+        }
         updateStoriesVisibility(false);
 
         updateFloatingButtonVisibility(false);
@@ -7176,6 +7213,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     }
 
     public void switchToCurrentSelectedMode(boolean animated) {
+        refreshEssentialsHome();
         for (int a = 0; a < viewPages.length; a++) {
             viewPages[a].listView.stopScroll();
         }
@@ -7412,6 +7450,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     @Override
     public void onResume() {
         super.onResume();
+        refreshEssentialsHome();
         refreshNativeGlassPolicy();
         updateSeparateSearchVisibility(mainTabsActivityController != null && app.flexygram.navigation.LiquidNavigationConfig.isEnabled()
                 && app.flexygram.navigation.LiquidNavigationConfig.separateSearch());
@@ -9304,10 +9343,10 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         final boolean isVisible = !(onlySelect && initialDialogsType != 10 || folderId != 0 || communityId != 0 || inPreviewMode || (searching && !onlySelect) || floatingButtonHidden);
 
         if (floatingButton3 != null) {
-            floatingButton3.setButtonVisible(isVisible, animated);
+            floatingButton3.setButtonVisible(isVisible && !isEssentialsHome(), animated);
         }
         if (floatingButtonStories != null) {
-            floatingButtonStories.setButtonVisible(isVisible && !NaConfig.INSTANCE.getDisableStories().Bool(), animated);
+            floatingButtonStories.setButtonVisible(isVisible && !isEssentialsHome() && !NaConfig.INSTANCE.getDisableStories().Bool(), animated);
         }
     }
 
@@ -11000,6 +11039,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     @SuppressWarnings("unchecked")
     @Override
     public void didReceivedNotification(int id, int account, Object... args) {
+        if(account==currentAccount&&essentialsSearchHeader!=null&&id==NotificationCenter.mainUserInfoChanged)essentialsSearchHeader.setUser(getUserConfig().getCurrentUser());
+        if(account==currentAccount&&(id==NotificationCenter.dialogsNeedReload||id==NotificationCenter.updateInterfaces))refreshEssentialsHome();
+
         if (id == NotificationCenter.dialogsNeedReload) {
             if (viewPages == null || dialogsListFrozen) {
                 return;
@@ -11226,6 +11268,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             }
         } else if (id == NotificationCenter.dialogFiltersUpdated) {
             updateFilterTabs(true, true);
+            refreshEssentialsHome();
         } else if (id == NotificationCenter.filterSettingsUpdated) {
             showFiltersHint();
         } else if (id == NotificationCenter.newSuggestionsAvailable) {
@@ -13091,6 +13134,10 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             searchViewPager.getThemeDescriptions(arrayList);
         }
 
+        if (isEssentialsHome()) {
+            SimpleThemeDescription.add(arrayList, this::refreshEssentialsHome, Theme.key_windowBackgroundWhite, Theme.key_windowBackgroundGray, Theme.key_windowBackgroundWhiteBlackText, Theme.key_windowBackgroundWhiteBlueText);
+        }
+
         if (dialogsHintCell != null) {
             SimpleThemeDescription.add(arrayList, dialogsHintCell::updateColors, Theme.key_windowBackgroundWhite, Theme.key_windowBackgroundWhiteBlackText, Theme.key_windowBackgroundWhiteGrayText);
         }
@@ -14208,9 +14255,23 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
     }
 
-    private void showItemOptions() {
-        ItemOptions io = ItemOptions.makeOptions(this, optionsItem, true);
-        io.setColors(getThemedColor(Theme.key_actionBarDefaultTitle), getThemedColor(Theme.key_actionBarDefaultTitle));
+    private void showItemOptions(){showItemOptions(optionsItem);}
+    private void showItemOptions(View anchor) {
+        ItemOptions io = ItemOptions.makeOptions(this, anchor, true);
+        if (isEssentialsHome()) {
+            io.add(R.drawable.msg_message, getString(R.string.NewMessageTitle), () -> { io.dismiss(); openWriteContacts(); });
+            if (passcodeItem != null && passcodeItem.getVisibility() == View.VISIBLE) {
+                io.add(R.drawable.outline_header_lock_24, getString(R.string.AccDescrPasscodeLock), () -> { io.dismiss(); passcodeItem.performClick(); });
+            }
+            if (downloadsItem != null && downloadsItemVisible) {
+                io.add(R.drawable.msg_download, getString(R.string.DownloadsTabs), () -> { io.dismiss(); downloadsItem.performClick(); });
+            }
+        }
+        if (isEssentialsHome()) {
+            io.setColors(getThemedColor(Theme.key_actionBarDefaultSubmenuItem), getThemedColor(Theme.key_actionBarDefaultSubmenuItemIcon));
+        } else {
+            io.setColors(getThemedColor(Theme.key_actionBarDefaultTitle), getThemedColor(Theme.key_actionBarDefaultTitle));
+        }
         if (Theme.getActiveTheme().isMonet()) {
             io.setSelectorColor(getThemedColor(Theme.key_dialogButtonSelector));
         }
@@ -14348,7 +14409,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             if (hideBottomNavigationBar) {
                 io.add(R.drawable.menu_recent, getString(R.string.RecentChats), () -> {
                     io.dismiss();
-                    BackButtonMenuRecent.show(currentAccount, this, optionsItem);
+                    BackButtonMenuRecent.show(currentAccount, this, anchor);
                 });
             }
             if (hideBottomNavigationBar && NaConfig.INSTANCE.getHideArchive().Bool()) {
@@ -14728,6 +14789,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     }
 
     private void checkUi_menuItems() {
+        refreshEssentialsHome();
         checkUi_itemBackButtonVisibility();
         checkUi_itemOptionsVisibility();
         checkUi_itemDownloadsVisibility();
@@ -14833,7 +14895,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         final float factor2 = 1f - getRightSlidingProgress();
         final float factor3 = 1f - animatorDoneButtonVisible.getFloatValue();
         // Со своей шторкой пункты уезжают в неё, «⋮» не нужен.
-        final float factor4 = AppearanceConfig.navigationDrawer() ? 0f : 1f;
+        final float factor4 = AppearanceConfig.navigationDrawer() || isEssentialsHome() ? 0f : 1f;
         final float factor = factor1 * factor2 * factor3 * factor4;
         FragmentFloatingButton.setAnimatedVisibility(optionsItem, factor);
     }
@@ -14871,7 +14933,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         final float factor2 = 1f - getRightSlidingProgress();
         final float factor3 = 1f - animatorDoneButtonVisible.getFloatValue();
         final float factor = factor0 * factor1 * factor2 * factor3;
-        FragmentFloatingButton.setAnimatedVisibility(searchItem, factor);
+        FragmentFloatingButton.setAnimatedVisibility(searchItem, isEssentialsHome()?0f:factor);
         if (dialogStoriesCell != null) {
             dialogStoriesCell.invalidate();
         }
@@ -15247,6 +15309,37 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
     }
 
+    public boolean isEssentialsHome(){return essentialsHome&&isSignatureHome();}
+
+    private MessagesController.DialogFilter essentialsFavoriteFilter(){
+        int id=app.flexygram.home.HomeStyleConfig.favoriteFolder(currentAccount);
+        return id>1?getMessagesController().dialogFiltersById.get(id):null;
+    }
+    private void refreshEssentialsHome(){
+        if(essentialsShortcuts==null)return;
+        MessagesController.DialogFilter favorite=essentialsFavoriteFilter();
+        int selectedId=filterTabsView!=null?filterTabsView.getCurrentTabId():viewPages!=null&&viewPages[0]!=null?viewPages[0].selectedType:-1;
+        boolean selected=favorite!=null&&selectedId==favorite.id;
+        essentialsShortcuts.refresh(selected,favorite==null?0:favorite.unreadCount);
+        if(essentialsSearchHeader!=null)essentialsSearchHeader.updateColors();
+        if(essentialsBrand!=null)essentialsBrand.setTextColor(getThemedColor(Theme.key_windowBackgroundWhiteBlueText));
+    }
+    private void openEssentialsSaved(){Bundle args=new Bundle();args.putLong("user_id",getUserConfig().getClientUserId());presentFragment(new ChatActivity(args));}
+    private void openEssentialsFavorites(){
+        MessagesController.DialogFilter favorite=essentialsFavoriteFilter();
+        if(favorite==null){showDialog(new AlertDialog.Builder(getParentActivity(),resourceProvider).setTitle(getString(R.string.FlexyHomeFavoritesEmpty)).setMessage(getString(R.string.FlexyHomeFavoritesHint)).setPositiveButton(getString(R.string.OK),null).create());return;}
+        if(favorite.locked){showDialog(new org.telegram.ui.Components.Premium.LimitReachedBottomSheet(this,getParentActivity(),org.telegram.ui.Components.Premium.LimitReachedBottomSheet.TYPE_FOLDERS,currentAccount,null));return;}
+        scrollToFolder(favorite.id);refreshEssentialsHome();
+    }
+    private void editEssentialsFavorites(){
+        MessagesController.DialogFilter favorite=essentialsFavoriteFilter();int count=getMessagesController().getDialogFilters().size();
+        if((favorite!=null&&favorite.locked)||(favorite==null&&((count-1>=getMessagesController().dialogFiltersLimitDefault&&!getUserConfig().isPremium())||count>=getMessagesController().dialogFiltersLimitPremium))){
+            showDialog(new org.telegram.ui.Components.Premium.LimitReachedBottomSheet(this,getParentActivity(),org.telegram.ui.Components.Premium.LimitReachedBottomSheet.TYPE_FOLDERS,currentAccount,null));return;
+        }
+        final int account=currentAccount;
+        presentFragment(FilterCreateActivity.forAccount(account,favorite,getString(R.string.FlexyHomeFavorites),filter->app.flexygram.home.HomeStyleConfig.favoriteFolder(account,filter.id)));
+    }
+
     public boolean isSignatureHome() {
         return !onlySelect && initialDialogsType == DIALOGS_TYPE_DEFAULT
                 && folderId == 0 && communityId == 0 && searchString == null;
@@ -15259,7 +15352,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     }
 
     private int getIdleSearchFieldHeight() {
-        return shouldShowIdleSearchField() ? dp(SEARCH_FIELD_HEIGHT) : 0;
+        return isEssentialsHome()?dp(app.flexygram.home.HomeStyleConfig.extraHeaderDp(true)):(shouldShowIdleSearchField() ? dp(SEARCH_FIELD_HEIGHT) : 0);
     }
 
 }

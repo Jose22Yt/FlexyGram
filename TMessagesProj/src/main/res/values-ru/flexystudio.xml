@@ -54,4 +54,6 @@
     <string name="FlexyStudioExportError">Не удалось подготовить конфигурацию. Файл не создан.</string>
     <string name="FlexyStudioPreviousChanges">Назад</string>
     <string name="FlexyStudioNextChanges">Далее</string>
+    <string name="FlexyStudioSelectedCount">Выбрано: %1$d / %2$d</string>
+    <string name="FlexyStudioSelectiveInfo">Будут применены только выбранные настройки. Текущая тема и фон сохранятся, если не выбрать «Тема и фон».</string>
 </resources>

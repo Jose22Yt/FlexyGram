@@ -686,6 +686,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
     private int statusDrawableLeft;
 
     private DialogsActivity parentFragment;
+    private app.flexygram.home.EssentialDialogPainter essentialCardPainter;
 
     private StaticLayout swipeMessageTextLayout;
     private int swipeMessageTextId;
@@ -720,6 +721,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
         storyParams.allowLongress = true;
         this.resourcesProvider = resourcesProvider;
         parentFragment = fragment;
+        if(fragment!=null&&fragment.isEssentialsHome())essentialCardPainter=new app.flexygram.home.EssentialDialogPainter();
         Theme.createDialogsResources(context);
         drawMonoforumAvatar = false;
         drawCommunityAvatar = false;
@@ -4070,6 +4072,9 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
             return;
         }
 
+        final boolean essentialsCard=parentFragment!=null&&parentFragment.isEssentialsHome()&&isDialogCell&&!isTopic&&!isShareToStoryCell;
+        if(essentialsCard&&essentialCardPainter!=null)essentialCardPainter.draw(canvas,getMeasuredWidth(),getMeasuredHeight(),AndroidUtilities.density,
+                Theme.getColor(Theme.key_windowBackgroundGray,resourcesProvider),Theme.getColor(Theme.key_windowBackgroundWhite,resourcesProvider));
         boolean needInvalidate = false;
 
         if (drawArchive && (currentDialogFolderId != 0 || isTopic && forumTopic != null && forumTopic.id == 1) && archivedChatsDrawable != null && archivedChatsDrawable.outProgress == 0.0f && translationX == 0.0f) {
@@ -5095,7 +5100,7 @@ public class DialogCell extends BaseCell implements StoriesListPlaceProvider.Ava
             canvas.restore();
         }
 
-        if (useSeparator) {
+        if (useSeparator && !essentialsCard) {
             int left;
             if (fullSeparator || currentDialogFolderId != 0 && archiveHidden && !fullSeparator2 || fullSeparator2 && !archiveHidden) {
                 left = 0;

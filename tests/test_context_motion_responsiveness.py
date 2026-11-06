@@ -16,9 +16,11 @@ def test_real_springs_close_quickly_and_new_input_finishes_owner_once():
 
 def test_return_releases_scroll_and_does_not_block_next_touch():
     source = CHAT.read_text()
-    start = source.index('if (compactContext && animated && selectedBubbleMotion.hasOwner())')
-    end = source.index('if (compactContext && signatureClosing)', start)
-    close = source[start:end]
+    from test_composer_layout import method
+    close = method(source, 'public void dismiss(boolean animated)')
+    assert 'boolean springClose = compactContext && animated && selectedBubbleMotion.hasOwner()' in close
+    assert close.index('setFocusable(false)') < close.index('update();') < close.index('selectedBubbleMotion.close(')
+    assert close.count('update();') == 1
     assert close.index('setCanScrollVertically(true)') < close.index('selectedBubbleMotion.close(')
     assert 'setFocusable(false)' in close and 'setTouchable(false)' in close
     assert 'updateMessageListAccessibilityVisibility()' in close

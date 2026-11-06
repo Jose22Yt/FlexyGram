@@ -25,6 +25,7 @@ public final class FlexyStudioText {
             case "signature_outline_style":case "outlineStyle":label=R.string.FlexyBubbleOutlineStyle;break;
             case "signature_border_tenths":case "borderTenths":label=R.string.FlexyBubbleBorderWidth;break;
             case "surface_effect":case "surfaceEffect":label=R.string.FlexyBubbleSurfaceEffect;break;
+            case "small_timestamp":case "smallTimestamp":label=R.string.FlexyBubbleSmallTimestamp;break;
             case "compactLevel":case "density":label=R.string.FlexyComposerLevel;break;
             case "verticalPosition":case "position":label=R.string.FlexyComposerPosition;break;
             case "pearlGlass":label=R.string.FlexyComposerGlass;break;

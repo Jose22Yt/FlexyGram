@@ -183,7 +183,7 @@ public class NekoGeneralSettingsActivity extends BaseNekoXSettingsActivity {
     private final AbstractConfigCell hidePremiumSectionRow = cellGroup.appendCell(new ConfigCellTextCheck(NaConfig.INSTANCE.getHidePremiumSection()));
     private final AbstractConfigCell hideHelpSectionRow = cellGroup.appendCell(new ConfigCellTextCheck(NaConfig.INSTANCE.getHideHelpSection()));
     private final AbstractConfigCell iconReplacements = cellGroup.appendCell(new ConfigCellSelectBox("IconReplacements", NaConfig.INSTANCE.getIconReplacements(), new String[]{
-            app.exteraless.icons.BaseIconPacks.getName(app.exteraless.icons.BaseIconPacks.BASE_DEFAULT),
+            getString(R.string.Default),
             getString(R.string.IconReplacementSolar),
             // Третий набор появился вместе с портом BaseIconPacks; без него выбор Remix
             // давал индекс за границей массива.

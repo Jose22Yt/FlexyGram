@@ -60,15 +60,35 @@ public final class StudioImportPlan {
         return new StudioImportPlan(preset,groups);
     }
     Set<String> changedGroups(){Set<String> result=new LinkedHashSet<>();for(Group group:groups)if(!group.changes.isEmpty())result.add(group.id);return result;}
+    static String selectionKey(Group group,Change change) {
+        return group.id.length()+":"+group.id+change.file.length()+":"+change.file+change.key;
+    }
+    Set<String> changedSettings() {
+        Set<String> result=new LinkedHashSet<>();
+        for(Group group:groups)for(Change change:group.changes)result.add(selectionKey(group,change));
+        return result;
+    }
+    Set<String> defaultSelection() {
+        Set<String> result=new LinkedHashSet<>();
+        for(Group group:groups)if(!group.id.equals("theme"))for(Change change:group.changes)result.add(selectionKey(group,change));
+        return result;
+    }
     StudioCodec.Preset select(Set<String> selected) {
         if(selected.isEmpty()||!changedGroups().containsAll(selected))throw new IllegalArgumentException("selection");
+        Set<String> settings=new LinkedHashSet<>();
+        for(Group group:groups)if(selected.contains(group.id))for(Change change:group.changes)settings.add(selectionKey(group,change));
+        return selectChanges(settings);
+    }
+    StudioCodec.Preset selectChanges(Set<String> selected) {
+        if(selected.isEmpty()||!changedSettings().containsAll(selected))throw new IllegalArgumentException("selection");
         if(!client) {
             Map<String,Map<String,Object>> result=new TreeMap<>();
-            for(Group group:groups)if(selected.contains(group.id))for(Change change:group.changes)result.computeIfAbsent(group.id,k->new TreeMap<>()).put(change.key,change.after);
+            for(Group group:groups)for(Change change:group.changes)if(selected.contains(selectionKey(group,change)))
+                result.computeIfAbsent(group.id,k->new TreeMap<>()).put(change.key,change.after);
             return StudioCodec.create(preset.name,result);
         }
         Map<String,Object> root=new TreeMap<>(),files=new TreeMap<>();root.put("version",1);root.put("files",files);
-        for(Group group:groups)if(selected.contains(group.id))for(Change change:group.changes) {
+        for(Group group:groups)for(Change change:group.changes)if(selected.contains(selectionKey(group,change))) {
             if(change.file.equals("@client"))root.put(change.key,change.after);
             else {
                 Map<String,Object> settings=(Map<String,Object>)files.computeIfAbsent(change.file,k->new TreeMap<>());
