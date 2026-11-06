@@ -107,6 +107,8 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
     private final TextView timeLeft;
     private final ControlsRow controls;
     private final LinearLayout group;
+    private final View compactDeck;
+    private final CompactPlayerQueue compactQueue;
     private final MorphButton speedButton;
     private final MorphButton lyricsButton;
     private final MorphButton queueButton;
@@ -300,7 +302,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
 
         cover = new CoverImage(context, 120);
         cover.setRadius(dp(BuildConfig.CONNECTED_ALPHA ? 22 : 28));
-        cover.setListener(fallbackSeed, this::onSeed);
+        if (!BuildConfig.CONNECTED_ALPHA) cover.setListener(fallbackSeed, this::onSeed);
         cover.setOutlineProvider(new ViewOutlineProvider() {
             @Override
             public void getOutline(View view, Outline outline) {
@@ -328,10 +330,6 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         artistView.setSingleLine(true);
         artistView.setEllipsize(TextUtils.TruncateAt.END);
         titles.addView(artistView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 4, 0, 0));
-        if (BuildConfig.CONNECTED_ALPHA) {
-            // Equal reservation opposite the48dp favorite and its12dp margin keeps text truly centered.
-            titles.setPadding(dp(60),0,0,0);titleView.setGravity(Gravity.CENTER_HORIZONTAL);artistView.setGravity(Gravity.CENTER_HORIZONTAL);
-        }
         titleRow.addView(titles, LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1f));
         likeButton = new MorphButton(context, heartIcon);
         likeButton.setRadius(dp(24), false);
@@ -484,6 +482,10 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
             group.addView(options, LayoutHelper.createLinear(0, 52, 1f, 4, 0, 0, 0));
         }
         layout.addView(group);
+        compactDeck = BuildConfig.CONNECTED_ALPHA ? new View(context) : null;
+        compactQueue = BuildConfig.CONNECTED_ALPHA ? new CompactPlayerQueue(context,this::openQueue) : null;
+        if(compactDeck!=null){layout.addView(compactDeck,0);layout.addView(compactQueue);}
+
 
         bubble = new TextView(context);
         bubble.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
@@ -536,6 +538,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         nc.addObserver(this, NotificationCenter.fileLoaded);
         nc.addObserver(this, NotificationCenter.audioInfoLoaded);
         nc.addObserver(this, NotificationCenter.musicIdsLoaded);
+        if (compactQueue != null) {nc.addObserver(this, NotificationCenter.musicDidLoad);nc.addObserver(this, NotificationCenter.moreMusicDidLoad);}
         NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.messagePlayingSpeedChanged);
         NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.didSetNewTheme);
         applySystemBars(true);
@@ -948,6 +951,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         nc.removeObserver(this, NotificationCenter.fileLoaded);
         nc.removeObserver(this, NotificationCenter.audioInfoLoaded);
         nc.removeObserver(this, NotificationCenter.musicIdsLoaded);
+        if (compactQueue != null) {nc.removeObserver(this, NotificationCenter.musicDidLoad);nc.removeObserver(this, NotificationCenter.moreMusicDidLoad);}
         NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.messagePlayingSpeedChanged);
         NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.didSetNewTheme);
         if (colorAnimator != null) colorAnimator.cancel();
@@ -966,6 +970,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
 
     @Override
     public void didReceivedNotification(int id, int account, Object... args) {
+        if(compactQueue!=null && (id==NotificationCenter.musicDidLoad || id==NotificationCenter.moreMusicDidLoad || id==NotificationCenter.audioInfoLoaded || id==NotificationCenter.fileLoaded || id==NotificationCenter.messagePlayingPlayStateChanged)) compactQueue.refresh(colors);
         if (id == NotificationCenter.didSetNewTheme && BuildConfig.CONNECTED_ALPHA) {
             dark = PlayerColors.isDark(resourcesProvider);
             Integer seed = PlayerArt.cachedSeed(current);
@@ -1050,10 +1055,11 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         updateSpeed();
         updatePlayState(animated);
         updateProgress();
+        if(compactQueue!=null)compactQueue.refresh(colors);
     }
 
     private PlayerColors sheetColors(int seed) {
-        return BuildConfig.CONNECTED_ALPHA ? PlayerColors.fromSignatureTheme(dark) : PlayerColors.fromSeed(seed, dark);
+        return BuildConfig.CONNECTED_ALPHA ? PlayerColors.fromSignatureTheme(dark, resourcesProvider) : PlayerColors.fromSeed(seed, dark);
     }
 
     private void onSeed(MessageObject mo, int seed) {
@@ -1266,6 +1272,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
             return;
         }
         lyricsMode = value;
+        if(BuildConfig.CONNECTED_ALPHA)layout.requestLayout();
         lyricsButton.setActive(value, animated);
         lyricsButton.setRadius(dp(BuildConfig.CONNECTED_ALPHA ? 18 : value ? 26 : 8), animated);
         if (value) {
@@ -1485,7 +1492,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
             MediaController.getInstance().cleanupPlayer(true, true);
             dismissImmediately();
         });
-        o.add(R.drawable.msg_filled_data_music, getString(R.string.OEPlayerClassic), () -> {
+        if (!BuildConfig.CONNECTED_ALPHA) o.add(R.drawable.msg_filled_data_music, getString(R.string.OEPlayerClassic), () -> {
             o.dismiss();
             openClassic();
         });
@@ -1602,7 +1609,10 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         headerLabel.setTextColor(c.onSurfaceVariant);
         headerTitle.setTextColor(c.onSurface);
         cover.setColors(c.primaryContainer, c.onPrimaryContainer);
-        if (BuildConfig.CONNECTED_ALPHA) cover.setSignatureSurface(c.surface);
+        if (compactDeck!=null) {
+            GradientDrawable deck=new GradientDrawable();deck.setColor(c.surfaceContainer);deck.setCornerRadius(dp(16));compactDeck.setBackground(deck);
+            compactQueue.refresh(c);
+        }
         smallCover.setColors(c.primaryContainer, c.onPrimaryContainer);
         if (Build.VERSION.SDK_INT >= 28) {
             cover.setOutlineSpotShadowColor(c.shadow());
@@ -1623,15 +1633,15 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         controls.shuffle.setColors(0, c.onSurfaceVariant, c.secondaryContainer, c.onSecondaryContainer);
         controls.repeat.setColors(0, c.onSurfaceVariant, c.secondaryContainer, c.onSecondaryContainer);
         controls.repeat.setBadgeColors(c.primary, c.onPrimary);
-        controls.prev.setColors(c.primaryContainer, c.onPrimaryContainer, c.primaryContainer, c.onPrimaryContainer);
-        controls.next.setColors(c.primaryContainer, c.onPrimaryContainer, c.primaryContainer, c.onPrimaryContainer);
+        controls.prev.setColors(BuildConfig.CONNECTED_ALPHA?0:c.primaryContainer, c.onSurface, c.primaryContainer, c.onPrimaryContainer);
+        controls.next.setColors(BuildConfig.CONNECTED_ALPHA?0:c.primaryContainer, c.onSurface, c.primaryContainer, c.onPrimaryContainer);
         controls.play.setColors(c.primary, c.onPrimary, c.primary, c.onPrimary);
-        speedButton.setColors(c.surfaceHigh, c.onSurface, c.surfaceHigh, c.onSurface);
+        speedButton.setColors(BuildConfig.CONNECTED_ALPHA?0:c.surfaceHigh, c.onSurface, 0, c.onSurface);
         if (BuildConfig.CONNECTED_ALPHA) speedButton.setBadgeColors(c.primaryContainer, c.onPrimaryContainer);
-        lyricsButton.setColors(c.surfaceHigh, c.onSurface, c.primary, c.onPrimary);
-        queueButton.setColors(c.surfaceHigh, c.onSurface, c.surfaceHigh, c.onSurface);
+        lyricsButton.setColors(BuildConfig.CONNECTED_ALPHA?0:c.surfaceHigh, c.onSurface, c.primary, c.onPrimary);
+        queueButton.setColors(BuildConfig.CONNECTED_ALPHA?0:c.surfaceHigh, c.onSurface, 0, c.onSurface);
         if (BuildConfig.CONNECTED_ALPHA && group.getChildCount() > 3)
-            ((MorphButton) group.getChildAt(3)).setColors(c.surfaceHigh, c.onSurface, c.surfaceHigh, c.onSurface);
+            ((MorphButton) group.getChildAt(3)).setColors(0, c.onSurface, 0, c.onSurface);
         applySystemBars(false);
     }
 
@@ -1662,6 +1672,8 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
 
         private int coverSize;
         private int stageHeight;
+        private boolean compactInline;
+        private int compactInset;
 
         PlayerLayout(Context context) {
             super(context);
@@ -1687,15 +1699,20 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
             titleRow.measure(exactW, MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
             bubble.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
             if (BuildConfig.CONNECTED_ALPHA) {
-                coverSize = Math.max(dp(220), Math.min(contentW, dp(340)));
-                stageHeight = dp(12) + coverSize + dp(18) + titleRow.getMeasuredHeight();
-                int artMeasure = MeasureSpec.makeMeasureSpec(coverSize, MeasureSpec.EXACTLY);
-                cover.measure(artMeasure, artMeasure);
-                lyricsPanel.measure(exactW, MeasureSpec.makeMeasureSpec(stageHeight, MeasureSpec.EXACTLY));
-                int minimum = top + dp(56) + stageHeight + dp(6 + 40 + 12 + 24 + 28) + timeRow.getMeasuredHeight()
-                        + controls.getMeasuredHeight() + group.getMeasuredHeight() + bottom;
-                setMeasuredDimension(width, Math.max(height, minimum));
-                return;
+                compactInline=contentW>=dp(264)&&getResources().getConfiguration().fontScale<=1.5f;
+                coverSize=Math.min(dp(96),Math.max(dp(48),contentW/3));
+                int titlesW=compactInline?Math.max(0,contentW-coverSize-dp(16)):contentW;
+                titleRow.measure(MeasureSpec.makeMeasureSpec(titlesW,MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(0,MeasureSpec.UNSPECIFIED));
+                stageHeight=dp(24)+(compactInline?Math.max(coverSize,titleRow.getMeasuredHeight()):coverSize+dp(12)+titleRow.getMeasuredHeight());
+                int artMeasure=MeasureSpec.makeMeasureSpec(coverSize,MeasureSpec.EXACTLY);cover.measure(artMeasure,artMeasure);
+                lyricsPanel.measure(exactW,MeasureSpec.makeMeasureSpec(Math.max(dp(200),stageHeight),MeasureSpec.EXACTLY));
+                if(lyricsMode)stageHeight=Math.max(dp(200),stageHeight);
+                compactInset=contentW<dp(216)?0:dp(12);
+                int deckW=MeasureSpec.makeMeasureSpec(Math.max(0,contentW-compactInset*2),MeasureSpec.EXACTLY);
+                seekBar.measure(deckW,MeasureSpec.makeMeasureSpec(dp(40),MeasureSpec.EXACTLY));timeRow.measure(deckW,MeasureSpec.makeMeasureSpec(0,MeasureSpec.UNSPECIFIED));controls.measure(deckW,MeasureSpec.makeMeasureSpec(0,MeasureSpec.UNSPECIFIED));
+                compactQueue.measure(exactW,MeasureSpec.makeMeasureSpec(0,compactQueue.getVisibility()==View.GONE?MeasureSpec.EXACTLY:MeasureSpec.UNSPECIFIED));
+                int minimum=top+dp(56)+stageHeight+dp(24)+dp(40)+timeRow.getMeasuredHeight()+controls.getMeasuredHeight()+dp(20)+compactQueue.getMeasuredHeight()+dp(16)+group.getMeasuredHeight()+dp(20)+bottom;
+                setMeasuredDimension(width,Math.max(height,minimum));return;
             }
             int fixed = dp(56) + dp(6) + dp(40) + timeRow.getMeasuredHeight() + dp(12) + controls.getMeasuredHeight() + group.getMeasuredHeight() + dp(28) + dp(16);
             int available = height - top - bottom - fixed;
@@ -1723,6 +1740,22 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
             header.layout(side - dp(12), y, side - dp(12) + header.getMeasuredWidth(), y + dp(56));
             y += dp(56);
             int stageTop = y;
+            if (BuildConfig.CONNECTED_ALPHA) {
+                int artTop=y+dp(12),artLeft=LocaleController.isRTL?width-side-coverSize:side;
+                int textLeft=compactInline&&!LocaleController.isRTL?side+coverSize+dp(16):side;
+                cover.layout(artLeft,artTop,artLeft+coverSize,artTop+coverSize);
+                int titleTop=compactInline?artTop:artTop+coverSize+dp(12);
+                titleRow.layout(textLeft,titleTop,textLeft+titleRow.getMeasuredWidth(),titleTop+titleRow.getMeasuredHeight());
+                lyricsPanel.layout(side,stageTop,side+contentW,stageTop+stageHeight);
+                int deckTop=stageTop+stageHeight,innerLeft=side+compactInset;y=deckTop+dp(12);
+                seekBar.layout(innerLeft,y,innerLeft+seekBar.getMeasuredWidth(),y+dp(40));bubble.layout(side,y-dp(36),side+bubble.getMeasuredWidth(),y-dp(36)+bubble.getMeasuredHeight());y+=dp(40);
+                timeRow.layout(innerLeft,y,innerLeft+timeRow.getMeasuredWidth(),y+timeRow.getMeasuredHeight());y+=timeRow.getMeasuredHeight();
+                controls.layout(innerLeft,y,innerLeft+controls.getMeasuredWidth(),y+controls.getMeasuredHeight());y+=controls.getMeasuredHeight()+dp(12);
+                compactDeck.layout(side,deckTop,side+contentW,y);y+=dp(20);
+                compactQueue.layout(side,y,side+contentW,y+compactQueue.getMeasuredHeight());y+=compactQueue.getMeasuredHeight()+dp(16);
+                int groupY=Math.max(y,height-bottom-dp(20)-group.getMeasuredHeight());group.layout(side,groupY,side+contentW,groupY+group.getMeasuredHeight());
+                if(seeking)layoutBubble();return;
+            }
             int coverLeft = (width - coverSize) / 2;
             if (BuildConfig.CONNECTED_ALPHA) cover.layout(coverLeft, y + dp(12), coverLeft + coverSize, y + dp(12) + coverSize);
             else cover.layout(coverLeft, y + dp(16), coverLeft + coverSize, y + dp(16) + coverSize);

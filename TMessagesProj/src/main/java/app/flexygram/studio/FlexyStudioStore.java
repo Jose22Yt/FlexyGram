@@ -56,6 +56,10 @@ public final class FlexyStudioStore {
         Set<String> included=new HashSet<>(selected);
         return applyPrepared(()->plan.select(included),completion);
     }
+    static boolean applyChanges(StudioImportPlan plan,Set<String> selected,Completion completion) {
+        Set<String> included=new HashSet<>(selected);
+        return applyPrepared(()->plan.selectChanges(included),completion);
+    }
     private static boolean applyPrepared(java.util.concurrent.Callable<StudioCodec.Preset> source,Completion completion) {
         if(applying)return false;applying=true;
         try{FlexyStudioIO.execute(()->{

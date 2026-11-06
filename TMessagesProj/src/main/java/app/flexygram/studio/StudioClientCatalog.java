@@ -86,7 +86,7 @@ final class StudioClientCatalog {
             case "flexygram_bubbles":return "bubbles";
             case "flexygram_header":return "header";
             case "flexygram_composer":return "composer";
-            case "flexy_bottom_tabs":case "flexy_signature_smart_previews":return "home";
+            case "flexygram_home":case "flexy_bottom_tabs":case "flexy_signature_smart_previews":return "home";
             case "flexy_bubble_interaction":case "flexy_delete_motion":return "chat";
             case "aiConfig":return "ai";
             case "exteraless_plugins":return "plugins";
@@ -107,6 +107,7 @@ final class StudioClientCatalog {
         for(ConfigItem item:PillStackConfig.INSTANCE.getStudioItems())item(item,"navigation");
         for(ConfigItem item:UtilsConfig.INSTANCE.getStudioItems())item(item);
         for(ConfigItem item:app.exteraless.glyph.GlyphConfig.INSTANCE.getStudioItems())item(item,"appearance");
+        integer("flexygram_home","style",0);range("flexygram_home","style",0,1);
         String f="flexygram_bubbles";
         bool(f,"glass",false);bool(f,"border",false);bool(f,"edges",false);integer(f,"transparency",35);integer(f,"signature_border_tenths",11);
         integer(f,"surface_effect",0);bool(f,"small_timestamp",true);

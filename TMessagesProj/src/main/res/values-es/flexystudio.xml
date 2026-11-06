@@ -54,4 +54,6 @@
     <string name="FlexyStudioExportError">No se pudo preparar la configuración. No se ha generado ningún archivo.</string>
     <string name="FlexyStudioPreviousChanges">Anterior</string>
     <string name="FlexyStudioNextChanges">Siguiente</string>
+    <string name="FlexyStudioSelectedCount">Seleccionados: %1$d / %2$d</string>
+    <string name="FlexyStudioSelectiveInfo">Solo se aplicarán los ajustes seleccionados. Se conservarán tu tema y fondo actuales, salvo que selecciones Tema y fondo.</string>
 </resources>

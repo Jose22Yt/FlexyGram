@@ -1,0 +1,7 @@
+<resources>
+    <string name="FlexyHomeStyle">Estilo de pantalla principal</string>
+    <string name="FlexyHomeEssentials">Tarjetas esenciales</string>
+    <string name="FlexyHomeFavorites">Favoritos</string>
+    <string name="FlexyHomeFavoritesEmpty">Favoritos está vacío</string>
+    <string name="FlexyHomeFavoritesHint">Mantén pulsado Favoritos para elegir chats, grupos, canales o bots.</string>
+</resources>

@@ -41,8 +41,8 @@ public class PlayerBarView extends FrameLayout implements NotificationCenter.Not
     private final RingPlayButton playButton;
     private final ImageView nextButton;
     private final ImageView closeButton;
-    private final PlayerIcon nextIcon = PlayerIcon.fill(PlayerIcon.NEXT, 22);
-    private final PlayerIcon closeIcon = PlayerIcon.stroke(BuildConfig.CONNECTED_ALPHA ? PlayerIcon.CHEVRON_DOWN : PlayerIcon.CLOSE, 20);
+    private final PlayerIcon nextIcon = BuildConfig.CONNECTED_ALPHA ? PlayerIcon.stroke(PlayerIcon.CHEVRON_DOWN,22) : PlayerIcon.fill(PlayerIcon.NEXT,22);
+    private final PlayerIcon closeIcon = PlayerIcon.stroke(PlayerIcon.CLOSE, 20);
     private final Theme.ResourcesProvider resourcesProvider;
     private MessageObject current;
     private Runnable onCompact;
@@ -51,7 +51,7 @@ public class PlayerBarView extends FrameLayout implements NotificationCenter.Not
     public PlayerBarView(Context context, Theme.ResourcesProvider resourcesProvider, Runnable onOpen, Runnable onClose) {
         super(context);
         this.resourcesProvider = resourcesProvider;
-        PlayerColors theme = PlayerColors.fromSeed(PlayerColors.fallbackSeed(resourcesProvider), PlayerColors.isDark(resourcesProvider));
+        PlayerColors theme = BuildConfig.CONNECTED_ALPHA?PlayerColors.fromSignatureTheme(PlayerColors.isDark(resourcesProvider),resourcesProvider):PlayerColors.fromSeed(PlayerColors.fallbackSeed(resourcesProvider), PlayerColors.isDark(resourcesProvider));
 
         if (BuildConfig.CONNECTED_ALPHA) {
             GradientDrawable surface = new GradientDrawable();
@@ -101,16 +101,16 @@ public class PlayerBarView extends FrameLayout implements NotificationCenter.Not
         nextButton = new ImageView(context);
         nextButton.setScaleType(ImageView.ScaleType.CENTER);
         nextButton.setImageDrawable(nextIcon);
-        nextButton.setContentDescription(getString(R.string.Next));
-        nextButton.setOnClickListener(v -> MediaController.getInstance().playNextMessage());
+        nextButton.setContentDescription(getString(BuildConfig.CONNECTED_ALPHA ? R.string.FlexyMusicCompact : R.string.Next));
+        nextButton.setOnClickListener(v -> {if(BuildConfig.CONNECTED_ALPHA){if(onCompact!=null)onCompact.run();}else MediaController.getInstance().playNextMessage();});
         buttons.addView(nextButton, LayoutHelper.createLinear(48, 48));
         closeButton = new ImageView(context);
         closeButton.setScaleType(ImageView.ScaleType.CENTER);
         closeButton.setImageDrawable(closeIcon);
-        closeButton.setContentDescription(getString(BuildConfig.CONNECTED_ALPHA ? R.string.FlexyMusicCompact : R.string.AccDescrClosePlayer));
+        closeButton.setContentDescription(getString(R.string.AccDescrClosePlayer));
         closeButton.setOnClickListener(v -> {
-            if (BuildConfig.CONNECTED_ALPHA && onCompact != null) onCompact.run();
-            else onClose.run();
+            SignatureMusicPresentation.setCompact(false);
+            onClose.run();
         });
         closeButton.setOnLongClickListener(v -> { onClose.run(); return true; });
         buttons.addView(closeButton, LayoutHelper.createLinear(48, 48));
@@ -127,7 +127,7 @@ public class PlayerBarView extends FrameLayout implements NotificationCenter.Not
     }
 
     private void applyTheme() {
-        PlayerColors theme = PlayerColors.fromSeed(PlayerColors.fallbackSeed(resourcesProvider), PlayerColors.isDark(resourcesProvider));
+        PlayerColors theme = BuildConfig.CONNECTED_ALPHA?PlayerColors.fromSignatureTheme(PlayerColors.isDark(resourcesProvider),resourcesProvider):PlayerColors.fromSeed(PlayerColors.fallbackSeed(resourcesProvider), PlayerColors.isDark(resourcesProvider));
         int text = BuildConfig.CONNECTED_ALPHA ? theme.onSurface : Theme.getColor(Theme.key_inappPlayerPerformer, resourcesProvider);
         int secondary = BuildConfig.CONNECTED_ALPHA ? theme.onSurfaceVariant : Theme.getColor(Theme.key_inappPlayerTitle, resourcesProvider);
         int icons = BuildConfig.CONNECTED_ALPHA ? theme.onSurface : Theme.getColor(Theme.key_inappPlayerClose, resourcesProvider);
@@ -202,6 +202,8 @@ public class PlayerBarView extends FrameLayout implements NotificationCenter.Not
     public void update() {
         MessageObject mo = MediaController.getInstance().getPlayingMessageObject();
         if (mo == null || !mo.isMusic()) {
+            if(current!=null){current=null;cover.setMessage(null);playButton.setMessage(null);}
+            playButton.setPlaying(false,false);
             return;
         }
         if (current != mo || !TextUtils.equals(titleView.getText(), mo.getMusicTitle())

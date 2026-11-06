@@ -1,11 +1,11 @@
 package app.exteraless.player;
 import static org.telegram.messenger.AndroidUtilities.dp;
 import android.content.*;import android.view.*;import android.widget.*;import android.graphics.*;
-import org.telegram.messenger.BuildConfig;import org.telegram.ui.Components.LayoutHelper;
+import org.telegram.messenger.BuildConfig;import org.telegram.messenger.LocaleController;import org.telegram.ui.Components.LayoutHelper;
 /** Production inner layout in an isolated UI fixture; NOT the complete PlayerSheet. */
 public class LayoutFixture extends FrameLayout {
  private final FrameLayout header; private final View cover;private final LinearLayout titleRow,lyricsPanel,timeRow,group;
- private final WavySeekBar seekBar;private final TextView bubble;private final ControlsRow controls;private boolean seeking;
+ private final WavySeekBar seekBar;private final TextView bubble;private final ControlsRow controls;private boolean seeking,lyricsMode;private View compactDeck;private CompactPlayerQueue compactQueue;
  private int getStatusBarHeight(){return dp(24);}private int getBottomInset(){return dp(24);}private void layoutBubble(){}
  public ViewGroup content;public View[] ordered;
  private TextView text(Context c,String value,int size,int color){TextView t=new TextView(c);t.setText(value);t.setTextSize(size);t.setTextColor(color);t.setSingleLine();t.setEllipsize(android.text.TextUtils.TruncateAt.END);return t;}
@@ -22,6 +22,7 @@ public class LayoutFixture extends FrameLayout {
  controls.play.setColors(colors.primary,colors.onPrimary,colors.primary,colors.onPrimary);content.addView(controls);
  group=new SignatureMusicActions(c);String[] names={"Velocidad","Letras","Cola","Más"};String[] icons={PlayerIcon.SPEED,PlayerIcon.LYRICS,PlayerIcon.QUEUE,PlayerIcon.MORE};
  for(int i=0;i<4;i++){MorphButton b=new MorphButton(c,PlayerIcon.stroke(icons[i],20));b.setText(names[i]);b.setStackedLabel(true);b.setRadius(dp(18),false);b.setColors(colors.surfaceHigh,colors.onSurface,colors.surfaceHigh,colors.onSurface);group.addView(b,LayoutHelper.createLinear(0,52,1f,2,0,2,0));}content.addView(group);
+ compactDeck=new View(c);content.addView(compactDeck,0);compactQueue=new CompactPlayerQueue(c,()->{});compactQueue.refresh(colors);content.addView(compactQueue);
  bubble=new TextView(c);bubble.setVisibility(GONE);content.addView(bubble);header.bringToFront();ordered=new View[]{header,cover,titleRow,seekBar,timeRow,controls,group};
  }
 _LAYOUT_

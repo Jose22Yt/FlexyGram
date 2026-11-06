@@ -26,6 +26,7 @@ import org.telegram.ui.ActionBar.Theme;
 /** One ordinary child view in its fragment, never an overlay window or a playback owner. */
 public final class SignatureMusicBubble extends FrameLayout {
     private final FrameLayout host;
+    private java.lang.ref.WeakReference<BaseFragment> owner=new java.lang.ref.WeakReference<>(null);
     private final CoverImage art;
     private final RingPlayButton play;
     private final TextView title;
@@ -62,7 +63,7 @@ public final class SignatureMusicBubble extends FrameLayout {
         titleParams.leftMargin = AndroidUtilities.dp(64);
         titleParams.topMargin = AndroidUtilities.dp(7);
         addView(title, titleParams);
-        title.setOnClickListener(v -> SignatureMusicPresentation.setCompact(false));
+        title.setOnClickListener(v -> openPlayer());
         title.setVisibility(GONE);
         artist = new TextView(getContext());
         artist.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
@@ -72,11 +73,11 @@ public final class SignatureMusicBubble extends FrameLayout {
         artistParams.leftMargin = AndroidUtilities.dp(64);
         artistParams.topMargin = AndroidUtilities.dp(29);
         addView(artist, artistParams);
-        artist.setOnClickListener(v -> SignatureMusicPresentation.setCompact(false));
+        artist.setOnClickListener(v -> openPlayer());
         artist.setVisibility(GONE);
         play = new RingPlayButton(getContext(), 10, 2, 11, 0, 8);
-        FrameLayout.LayoutParams badge = new FrameLayout.LayoutParams(AndroidUtilities.dp(32), AndroidUtilities.dp(56), Gravity.RIGHT | Gravity.TOP);
-        badge.rightMargin = AndroidUtilities.dp(36);
+        FrameLayout.LayoutParams badge = new FrameLayout.LayoutParams(AndroidUtilities.dp(24), AndroidUtilities.dp(24), Gravity.RIGHT | Gravity.BOTTOM);
+        badge.rightMargin = 0;
         addView(play, badge);
         play.setOnClickListener(v -> {
             MessageObject mo = MediaController.getInstance().getPlayingMessageObject();
@@ -99,8 +100,8 @@ public final class SignatureMusicBubble extends FrameLayout {
         setClickable(true);
         setFocusable(true);
         setContentDescription(LocaleController.getString(R.string.FlexyMusicExpand));
-        setOnClickListener(v -> { if (expanded) SignatureMusicPresentation.setCompact(false); else setExpanded(true); });
-        art.setOnClickListener(v -> { if (expanded) setExpanded(false); else setExpanded(true); });
+        setOnClickListener(v -> openPlayer());
+        art.setOnClickListener(v -> openPlayer());
         setOnLongClickListener(v -> {
             PopupMenu menu = new PopupMenu(getContext(), this);
             menu.getMenu().add(LocaleController.getString(R.string.FlexyMusicExpand)).setOnMenuItemClickListener(item -> {
@@ -126,14 +127,18 @@ public final class SignatureMusicBubble extends FrameLayout {
             if (child instanceof SignatureMusicBubble && ((SignatureMusicBubble) child).released) {
                 SignatureMusicBubble bubble = (SignatureMusicBubble) child;
                 bubble.released = false;
+                bubble.owner=new java.lang.ref.WeakReference<>(fragment);
                 host.addOnLayoutChangeListener(bubble.boundsListener);
                 return bubble;
             }
         }
         SignatureMusicBubble bubble = new SignatureMusicBubble(host);
+        bubble.owner=new java.lang.ref.WeakReference<>(fragment);
         host.addView(bubble, new FrameLayout.LayoutParams(AndroidUtilities.dp(56), AndroidUtilities.dp(56), Gravity.TOP | Gravity.LEFT));
         return bubble;
     }
+
+    private void openPlayer(){BaseFragment fragment=owner.get();if(!released&&fragment!=null)Md3Player.open(fragment,null);}
 
     public void release() {
         release(false);
@@ -142,6 +147,7 @@ public final class SignatureMusicBubble extends FrameLayout {
     private void release(boolean windowDetaching) {
         if (released) return;
         released = true;
+        owner.clear();
         host.removeOnLayoutChangeListener(boundsListener);
         cancelLongPress(); dragging = false; setPressed(false); setVisibility(GONE);
         host.requestDisallowInterceptTouchEvent(false);
@@ -158,12 +164,18 @@ public final class SignatureMusicBubble extends FrameLayout {
         MessageObject message = MediaController.getInstance().getPlayingMessageObject();
         boolean show = allowed && SignatureMusicPresentation.isCompact() && message != null && message.isMusic();
         setVisibility(show ? VISIBLE : GONE);
-        if (!show) { play.setPlaying(false, false); return; }
-        int accent = Theme.getColor(Theme.key_windowBackgroundWhiteBlueText, (Theme.ResourcesProvider) null);
+        if (!show) {
+            play.setPlaying(false,false);
+            if((message==null||!message.isMusic())&&bound!=null){bound=null;art.setMessage(null);play.setMessage(null);}
+            return;
+        }
+        BaseFragment fragment=owner.get();
+        Theme.ResourcesProvider provider=fragment!=null?fragment.getResourceProvider():null;
+        int accent = Theme.getColor(Theme.key_windowBackgroundWhiteBlueText, provider);
         if (darkTheme == null || darkTheme != dark || themeAccent != accent) {
             darkTheme = dark;
             themeAccent = accent;
-            PlayerColors colors = PlayerColors.fromSignatureTheme(dark);
+            PlayerColors colors = PlayerColors.fromSignatureTheme(dark,provider);
             art.setColors(colors.primaryContainer, colors.onSurface);
             play.setColors(colors.primary, colors.surface, colors.onSurface);
             pill.setColor(colors.surfaceContainer);
@@ -181,6 +193,7 @@ public final class SignatureMusicBubble extends FrameLayout {
             play.setPlaying(!MediaController.getInstance().isMessagePaused(), false);
         }
         boolean nowPaused = MediaController.getInstance().isMessagePaused();
+        play.setContentDescription(LocaleController.getString(nowPaused?R.string.AccActionPlay:R.string.AccActionPause));
         if (paused != nowPaused) { paused = nowPaused; play.setPlaying(!paused, false); }
         if (host.indexOfChild(this) != host.getChildCount() - 1) bringToFront();
         confine();

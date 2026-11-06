@@ -23,3 +23,15 @@ Las copias completas mantienen su formato. Los subconjuntos usados al aplicar y 
 `tests/test_studio_import.py` ejecuta el catálogo, codec, copia completa, conjuntos de texto, selección y transacciones de producción con dobles explícitos de persistencia y tema. Incluye una comprobación de tipos de las clases de Studio contra Android API 37 y pruebas del fallback de escritura SAF y del filtro de extensión. `tools/connected_alpha/test_flexystudio.py` cubre el codec, archivos alterados, recursos y permisos.
 
 Pendiente en dispositivo: guardar mediante distintos proveedores de documentos, compartir con otra aplicación, abrir el archivo recibido, seleccionar secciones, comprobar el antes/después y deshacer tras modificar una sección excluida. Revisar ambos temas, fuentes grandes y la navegación entre páginas de cambios. No se generó ninguna APK durante este trabajo.
+
+## Selección por ajuste desde un archivo en el chat
+
+El toque sobre un `.flexygram` sigue la ruta nativa `handleMessageTap` → lectura/validación en StudioIO → comparación sin escrituras → hoja de importación. La hoja muestra las secciones presentes y permite desplegar «Ver cambios» para marcar cada ajuste, con su valor actual y el que viene en el archivo. Las casillas de sección seleccionan o deseleccionan su contenido completo; un contador muestra cuántos ajustes están incluidos incluso cuando la selección es parcial. Se crean como máximo veinte filas de detalle por página y por sección abierta.
+
+Cada cambio tiene una identidad que distingue sección, archivo de preferencias y clave. Solo los cambios seleccionados se incluyen en el preset transaccional; desmarcar una clave conserva su valor actual aunque se importen otras claves de la misma sección. La selección se copia antes de enviarse al trabajador. Una selección vacía o desconocida se rechaza antes de aplicar.
+
+«Tema y fondo» queda desmarcado inicialmente. No se llama a la aplicación del tema si no se incluye ese cambio. La hoja obtiene sus colores del proveedor del tema activo; los ajustes importados conservan sus rutas nativas de renderizado. Marcar el tema permite sustituirlo de forma explícita. No se promete convertir valores incompatibles: la validación existente de formato, claves, tipos y versión sigue siendo obligatoria.
+
+Pruebas añadidas al harness de cliente: selección de una sola clave en una sección, conservación de otra clave de esa misma sección, conservación de ajustes de otras secciones, ausencia de llamadas de aplicación del tema al excluirlo, tema como selección independiente, entradas vacías/desconocidas rechazadas y selección individual en formato antiguo. Se comprueba también undo limitado a las claves aplicadas. Persistencia de Android y aplicación del tema están duplicadas explícitamente en ese harness.
+
+Verificación ejecutada: las nueve pruebas de `tests/test_studio_import.py` y `tools/connected_alpha/test_flexystudio.py` pasan, incluida la comprobación de tipos de Studio contra Android API37. Se añadió una prueba de interacción de casillas en el harness nativo aislado, pendiente de ejecución. No se construyó una APK ni se ejecutó en dispositivo.
