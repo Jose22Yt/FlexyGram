@@ -8,6 +8,9 @@ import org.telegram.messenger.ApplicationLoader;
 public final class BubbleConfig {
     public static final String FILE = "flexygram_bubbles";
     public static final String GLASS = "glass", TRANSPARENCY = "transparency", BORDER = "border", EDGES = "edges";
+    public static final String SURFACE_EFFECT = "surface_effect";
+    public static final int ADAPTIVE = 0, LEGACY = 1;
+    private static int surfaceEffect = ADAPTIVE;
     private static boolean loaded, glass, border, edges, cachedBlur;
     private static int transparency = 35, borderTenths = 11, outlineStyle = 1, pearlIntensity = 55, borderPosition = 5;
     private static boolean outlineEnabled = true, fuseGlass, fusionAdapt=true;
@@ -18,6 +21,7 @@ public final class BubbleConfig {
     }
     public static void load() {
         SharedPreferences p = preferences();
+        surfaceEffect = normalizeSurfaceEffect(p.getInt(SURFACE_EFFECT, ADAPTIVE));
         outlineEnabled = p.getBoolean("signature_outline_enabled", true);
         outlineStyle = Math.max(0, Math.min(3, p.getInt("signature_outline_style", 1)));
         int storedPosition = p.getInt("signature_border_position", 5);
@@ -38,7 +42,18 @@ public final class BubbleConfig {
     public static boolean glass() { return loaded && glass; }
     public static boolean border() { return loaded && border; }
     public static boolean edges() { return loaded && edges; }
-    public static boolean backgroundBlur() { return cachedBlur; }
+    private static int normalizeSurfaceEffect(int value) { return value == LEGACY ? LEGACY : ADAPTIVE; }
+    public static int surfaceEffect() { return surfaceEffect; }
+    public static boolean adaptive() { return surfaceEffect == ADAPTIVE; }
+    public static void setSurfaceEffect(int value) {
+        if (!loaded) load();
+        value = normalizeSurfaceEffect(value);
+        if (surfaceEffect == value) return;
+        surfaceEffect = value;
+        preferences().edit().putInt(SURFACE_EFFECT, value).apply();
+    }
+    // Preserve the old preference, but don't prepare a second blur cache in native mode.
+    public static boolean backgroundBlur() { return !adaptive() && cachedBlur; }
     /** Renderer compatibility only: saved matte flags can never tint a bubble again. */
     @Deprecated public static boolean matteEnabled() { return false; }
     @Deprecated public static int matteStrength() { return 0; }

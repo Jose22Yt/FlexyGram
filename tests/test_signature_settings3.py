@@ -62,6 +62,10 @@ def test_original_editor_click_logic_is_unchanged():
   # Floating is an additive fifth header choice; existing choices keep their IDs/callbacks.
   if path.endswith('/HeaderSettingsActivity.java'):
    current=current.replace('getString(R.string.FlexyHeaderFloating),\n                            ','').replace('new int[]{4, 3, 0, 2, 1}','new int[]{3, 0, 2, 1}')
+  if path.endswith('/BubbleSettingsActivity.java'):
+   # The material selector is additive; all previous control callbacks stay intact.
+   added=method(current,'if (position == effectRow)')
+   current=current.replace(added+' else ','',1)
   assert current==method(original(path),'protected void onItemClick(')
  tabs = source('app/flexygram/navigation/BottomTabsSettingsActivity.java')
  assert 'showTabActionDialog(' in tabs and 'LiquidNavigationConfig.setOrder(' in tabs

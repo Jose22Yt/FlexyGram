@@ -8,14 +8,14 @@ def test_timestamp_uses_incoming_theme_colors_in_light_dark_and_custom_chats(tmp
     resolve=method(source,'private int getTimestampColor(boolean selected)')
     probe(tmp_path, {'Probe.java': '''
 public class Probe {
- static class Theme{static final int key_chat_inTimeText=1,key_chat_inTimeSelectedText=2;}
- int normal,selected;
- int getThemedColor(int key){if(key==1)return normal;if(key==2)return selected;throw new AssertionError("unexpected accent/text color");}
+ static class Theme{static final int key_chat_inTimeText=1,key_chat_inTimeSelectedText=2;
+ static int normal,selected;static int getColor(int key,Object provider){if(provider==null)throw new AssertionError("missing chat theme");if(key==1)return normal;if(key==2)return selected;throw new AssertionError("unexpected accent/text color");}}
+ Object resourcesProvider=new Object();
  RESOLVE
  public static void main(String[] args){Probe p=new Probe();
   // The chat's provider can override both colors independently of the global mode/accent.
   for(int[] theme:new int[][]{{0xff888888,0xff777777},{0xffaaaaaa,0xffbbbbbb},{0xff91999f,0xff8a9399}}){
-   p.normal=theme[0];p.selected=theme[1];
+   Theme.normal=theme[0];Theme.selected=theme[1];
    for(int i=0;i<10000;i++){
     if(p.getTimestampColor(false)!=theme[0]||p.getTimestampColor(true)!=theme[1])throw new AssertionError();
    }

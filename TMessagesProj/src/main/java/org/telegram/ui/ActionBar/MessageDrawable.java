@@ -35,6 +35,9 @@ public class MessageDrawable extends Drawable {
         boolean draw(Canvas canvas, Path path);
         // Older embedders retain their native tint fallback during partial-alpha transitions.
         default boolean draw(Canvas canvas, Path path, int alpha) { return alpha == 255 && draw(canvas, path); }
+        default boolean draw(Canvas canvas, Path path, int alpha, boolean selected) {
+            return draw(canvas, path, alpha);
+        }
     }
     private GlassSource flexyGlassSource;
     private final Paint flexyFillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -660,6 +663,18 @@ public class MessageDrawable extends Drawable {
         }
 
         if (paintToUse == null && flexySurface()) {
+            if (app.flexygram.bubbles.BubbleConfig.adaptive()) {
+                if (flexyGlassSource == null || !flexyGlassSource.draw(canvas, path, alpha, isSelected)) {
+                    // Offscreen renderers without a chat root use the native solid service color.
+                    flexyFillPaint.reset();
+                    flexyFillPaint.setAntiAlias(true);
+                    int service = getColor(isSelected ? Theme.key_chat_serviceBackgroundSelected : Theme.key_chat_serviceBackground);
+                    flexyFillPaint.setColor(service);
+                    flexyFillPaint.setAlpha(Math.round(Color.alpha(service) * alpha / 255f));
+                    canvas.drawPath(path, flexyFillPaint);
+                }
+                return; // No outgoing gradient, legacy tint, border or fusion over the native material.
+            }
             // Stable theme color, independent of wallpaper/blur availability and animation phase.
             // Instance paints and the native geometry cache are reused for every draw.
             int color = signatureColor();

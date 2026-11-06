@@ -291,6 +291,10 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         @Override public boolean draw(Canvas canvas, android.graphics.Path path, int alpha) {
             return delegate != null && !drawForBlur && delegate.drawFlexyBubbleWallpaper(ChatMessageCell.this, canvas, path, alpha);
         }
+        @Override public boolean draw(Canvas canvas, android.graphics.Path path, int alpha, boolean selected) {
+            return delegate != null && !drawForBlur
+                    && delegate.drawFlexyBubbleWallpaper(ChatMessageCell.this, canvas, path, alpha, selected);
+        }
     };
     private void drawFlexyBubble(Canvas canvas, MessageDrawable drawable, Paint customPaint) {
         // Drawables are shared by native themes: never retain a cell/activity between draws.
@@ -863,6 +867,9 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         }
 
         default boolean hasFlexyBubbleWallpaper() { return false; }
+        default boolean drawFlexyBubbleWallpaper(ChatMessageCell cell, Canvas canvas, android.graphics.Path path, int alpha, boolean selected) {
+            return drawFlexyBubbleWallpaper(cell, canvas, path, alpha);
+        }
         default boolean drawFlexyBubbleWallpaper(ChatMessageCell cell, Canvas canvas, android.graphics.Path path, int alpha) {
             return alpha == 255 && drawFlexyBubbleWallpaper(cell, canvas, path);
         }
@@ -24944,7 +24951,8 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     /** Use the theme's normal timestamp ink, with no added halo or contrast pass. */
     /** Match native incoming timestamp ink, resolved through the active chat theme/provider. */
     private int getTimestampColor(boolean selected) {
-        return getThemedColor(selected ? Theme.key_chat_inTimeSelectedText : Theme.key_chat_inTimeText);
+        // Adaptive service text may use white ink; timestamp metadata must keep native theme ink.
+        return Theme.getColor(selected ? Theme.key_chat_inTimeSelectedText : Theme.key_chat_inTimeText, resourcesProvider);
     }
 
     private void drawReadableTimeLayout(Canvas canvas, StaticLayout layout, boolean selected) {
@@ -30220,13 +30228,71 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         }
     }
 
+    private boolean hasAdaptiveBubbleSurface() {
+        return app.flexygram.bubbles.BubbleStyle.signature() && app.flexygram.bubbles.BubbleConfig.adaptive()
+                && currentMessageObject != null && !currentMessageObject.shouldDrawWithoutBackground();
+    }
+
     public int getThemedColor(int key) {
+        if (hasAdaptiveBubbleSurface()) {
+            if (key == Theme.key_chat_messageTextIn || key == Theme.key_chat_messageTextOut
+                    || key == Theme.key_chat_inTimeText || key == Theme.key_chat_outTimeText
+                    || key == Theme.key_chat_inTimeSelectedText || key == Theme.key_chat_outTimeSelectedText
+                    || key == Theme.key_chat_outSentClock
+                    || key == Theme.key_chat_inAudioTitleText
+                    || key == Theme.key_chat_outAudioTitleText
+                    || key == Theme.key_chat_inAudioPerformerText
+                    || key == Theme.key_chat_outAudioPerformerText
+                    || key == Theme.key_chat_inAudioPerformerSelectedText
+                    || key == Theme.key_chat_outAudioPerformerSelectedText
+                    || key == Theme.key_chat_inAudioDurationText
+                    || key == Theme.key_chat_outAudioDurationText
+                    || key == Theme.key_chat_inAudioDurationSelectedText
+                    || key == Theme.key_chat_outAudioDurationSelectedText
+                    || key == Theme.key_chat_inFileNameText
+                    || key == Theme.key_chat_outFileNameText
+                    || key == Theme.key_chat_inContactPhoneText
+                    || key == Theme.key_chat_outContactPhoneText
+                    || key == Theme.key_chat_inContactPhoneSelectedText
+                    || key == Theme.key_chat_outContactPhoneSelectedText) {
+                return app.flexygram.bubbles.ServiceBubbleSurface.textColor(resourcesProvider);
+            } else if (key == Theme.key_chat_messageLinkIn || key == Theme.key_chat_messageLinkOut) {
+                return app.flexygram.bubbles.ServiceBubbleSurface.textColor(resourcesProvider);
+            }
+        }
         return Theme.getColor(key, resourcesProvider);
     }
 
+    private final android.util.ArrayMap<String, Drawable> adaptiveStatusDrawables = new android.util.ArrayMap<>();
+    private final android.util.ArrayMap<String, Drawable> adaptiveStatusSources = new android.util.ArrayMap<>();
+    private int adaptiveStatusColor;
+
     private Drawable getThemedDrawable(String key) {
         Drawable drawable = resourcesProvider != null ? resourcesProvider.getDrawable(key) : null;
-        return drawable != null ? drawable : Theme.getThemeDrawable(key);
+        drawable = drawable != null ? drawable : Theme.getThemeDrawable(key);
+        if (hasAdaptiveBubbleSurface() && (Theme.key_drawable_msgOutCheck.equals(key)
+                || Theme.key_drawable_msgOutCheckRead.equals(key) || Theme.key_drawable_msgOutHalfCheck.equals(key)
+                || Theme.key_drawable_msgOutCheckSelected.equals(key) || Theme.key_drawable_msgOutCheckReadSelected.equals(key)
+                || Theme.key_drawable_msgOutHalfCheckSelected.equals(key))) {
+            int color = app.flexygram.bubbles.ServiceBubbleSurface.textColor(resourcesProvider);
+            if (adaptiveStatusColor != color) {
+                adaptiveStatusColor = color;
+                for (int i = 0; i < adaptiveStatusDrawables.size(); i++) {
+                    adaptiveStatusDrawables.valueAt(i).setTint(color);
+                }
+            }
+            Drawable copy = adaptiveStatusDrawables.get(key);
+            if (copy == null || adaptiveStatusSources.get(key) != drawable) {
+                Drawable.ConstantState state = drawable == null ? null : drawable.getConstantState();
+                if (state == null) return drawable;
+                copy = state.newDrawable(getResources()).mutate();
+                copy.setTint(color);
+                adaptiveStatusSources.put(key, drawable);
+                adaptiveStatusDrawables.put(key, copy);
+            }
+            return copy;
+        }
+        return drawable;
     }
 
     public Paint getThemedPaint(String paintKey) {

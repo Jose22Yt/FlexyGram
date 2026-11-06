@@ -44,4 +44,7 @@
     <string name="FlexyBubbleFuseGlass">Смешивать стеклянный контур</string>
     <string name="FlexyBubbleOriginal">Оригинальный</string>
     <string name="FlexyBubbleGlassOriginal">Glass Original</string>
+    <string name="FlexyBubbleSurfaceEffect">Эффект пузырей</string>
+    <string name="FlexyBubbleAdaptiveSurface">Адаптивный фон</string>
+    <string name="FlexyBubbleLegacySurface">Прежний эффект</string>
 </resources>
