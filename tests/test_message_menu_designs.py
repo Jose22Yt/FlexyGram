@@ -75,7 +75,22 @@ def test_live_cards_share_existing_blur_source_and_cover_input_without_mutating_
     background=chat[start:chat.index('if (scrimViewReaction != null && scrimViewReactionAnimated)',start)]
     assert 'clipRect' not in background
     assert 'canvas.drawRect(0, 0, getMeasuredWidth(), getMeasuredHeight(), scrimBlurBitmapPaint);' in background
-    assert end<chat.index('if (scrimView != null || messageEnterTransitionContainer.isRunning())',end)
+    assert end<chat.index('if (!focusedMessageBackdrop && (scrimView != null || messageEnterTransitionContainer.isRunning()))',end)
     assert 'chatInputViewsContainer.setAlpha' not in chat[start:end]
-    assert 'super.drawChild(canvas, chatInputViewsContainer, getDrawingTime());' in chat[end:chat.index('if (scrimView != null || messageEnterTransitionContainer.isRunning())',end)]
+    assert 'super.drawChild(canvas, chatInputViewsContainer, getDrawingTime());' not in chat[end:chat.index('if (!focusedMessageBackdrop && (scrimView != null || messageEnterTransitionContainer.isRunning()))',end)]
     assert 'chatActivityEnterView.setAlpha' not in chat[start:end]
+
+
+def test_album_menu_transforms_tiles_background_caption_and_time_together():
+    chat=(JAVA/'org/telegram/ui/ChatActivity.java').read_text()
+    start=chat.index('final boolean compactContext =')
+    gate=chat[start:chat.index(';',start)]
+    assert 'selectedObjectGroup == null' not in gate
+    start=chat.index('final int selectionTransformSave = canvas.save();')
+    end=chat.index('canvas.restoreToCount(selectionTransformSave);',start)
+    draw=chat[start:end]
+    assert draw.index('transformSelectedMessagePreview(canvas)') < draw.index('scrimGroup.transitionParams.cell.drawBackground')
+    assert 'drawChildElement(canvas, listTop, cell, 2)' in draw
+    assert 'drawChildElement(canvas, listTop, drawTimeAfter.get(a), 0)' in draw
+    assert '&& (scrimGroup != null || selectedBubbleMotionMessage == cell.getMessageObject())' in draw
+    assert 'if (!movingSelectedPreview) canvas.clipRect' in draw

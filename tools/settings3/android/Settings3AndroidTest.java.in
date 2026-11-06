@@ -89,9 +89,9 @@ public class Settings3AndroidTest {
   for(boolean header:new boolean[]{false,true}){
    if(header)app.flexygram.header.HeaderConfig.style(1);else app.flexygram.composer.FlexyComposerConfig.setStyle(0);
    var page=new ConversationStyleSettingsActivity(header);page.onFragmentCreate();View root=page.createView(activity);
-   List<StylePreviewCard> cards=new ArrayList<>();cards(root,cards);assertEquals(header?4:2,cards.size());assertTrue(cards.get(0).isSelected());
+   List<StylePreviewCard> cards=new ArrayList<>();cards(root,cards);assertEquals(header?5:2,cards.size());assertTrue(cards.get(0).isSelected());
    cards.get(cards.size()-1).performClick();assertTrue(cards.get(cards.size()-1).isSelected());assertFalse(cards.get(0).isSelected());
-   assertEquals(header?3:1,header?app.flexygram.header.HeaderConfig.style():app.flexygram.composer.FlexyComposerConfig.compact()?1:0);
+   assertEquals(header?4:1,header?app.flexygram.header.HeaderConfig.style():app.flexygram.composer.FlexyComposerConfig.compact()?1:0);
    var saved=new android.os.Bundle();page.saveSelfArgs(saved);var next=new ConversationStyleSettingsActivity();next.restoreSelfArgs(saved);next.onFragmentCreate();
    List<StylePreviewCard> restored=new ArrayList<>();cards(next.createView(activity),restored);assertEquals(cards.size(),restored.size());assertTrue(restored.get(restored.size()-1).isSelected());
   }

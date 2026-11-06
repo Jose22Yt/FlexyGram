@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 JAVA = ROOT / 'TMessagesProj/src/main/java'
 
 
-def test_whole_popup_scrolls_without_cropping_or_shrinking_message(tmp_path):
+def test_whole_message_fits_without_cropping_or_scrolling(tmp_path):
     if not shutil.which('java'):
         pytest.skip('JDK required')
     probe = tmp_path / 'FullPreviewProbe.java'
@@ -29,9 +29,9 @@ public class FullPreviewProbe {
      float actualBottom=actualTop+p.viewportHeight;
      check(Math.abs(actualTop-(p.popupY+64+8))<.02f);
      check(actualBottom<=p.popupY+64+p.gapHeight-8+.02f);
-     check(p.scale==1f);
-     check(Math.abs(p.scrollRange-Math.max(0,chrome+p.gapHeight-(bottom-top)))<.02f);
-     if(height>1200)check(p.scrollRange>0);
+     check(p.scale>0f&&p.scale<=1f);
+     check(p.scrollRange==0);
+     if(height>1200)check(p.scale<1);
      float finalScale=ContextPreviewPlacement.animatedScale(p.scale,1.2f,1.25f);
      if(p.scale<1f)check(Math.abs(finalScale-p.scale)<.00001f);
      for(float phase:new float[]{-.2f,0,.25f,.5f,1,1.2f})
@@ -60,7 +60,7 @@ def test_full_preview_does_not_overwrite_normal_row_text_block_cache():
     assert chat.index('cell.setFullyDraw(true)',start)<chat.index('cell.drawBackgroundInternal(canvas, true)',start)<end
     assert cell.count('if (!fullyDraw && getY() < 0)')==2
     assert cell.count('if (!fullyDraw && getY() + getMeasuredHeight() > parentHeight)')==2
-    assert 'signaturePreviewScroll.getLocationOnScreen(popupScreen);' in chat
+    assert 'signaturePreviewViewport.getLocationOnScreen(popupScreen);' in chat
     assert 'contentView.getLocationOnScreen(contentScreen);' in chat
     assert 'addOnPreDrawListener' in chat[chat.index('final Runnable syncSelectionWindow'):chat.index('if (waitForLangDetection.get() && !compactContext)')]
 
@@ -87,7 +87,7 @@ def test_popup_bottom_compiles_with_fractional_animated_input_height(tmp_path):
    for(float tab:new float[]{0,32,32.5f}) {
     chatListView.height=listHeight;contentView.height=900;inputIslandHeightCurrent=input;tabs=tab;
     int actual=bottom(new int[]{0,50},new int[]{0,10});
-    double bound=Math.min(50+listHeight,10+900-20-input-tab-9)-8;
+    double bound=10+900-20-8;
     if(actual>bound||bound-actual>=1)throw new AssertionError("unsafe bottom "+actual+" / "+bound);
    }
  }

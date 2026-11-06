@@ -97,15 +97,15 @@ public class Probe {
    }else check(page.fusionHeaderRow==-1&&page.fuseRow==-1);
    BubbleConfig.adaptive=true;page.updateRows();
    check(page.effectRow==2&&adapter.getItemViewType(page.effectRow)==TYPE_SETTINGS);
-   check(page.transparencyRow==-1&&page.blurRow==-1);
+   check(page.transparencyRow==page.timestampRow+1&&page.blurRow==page.transparencyRow+1);
    check(page.timestampRow==page.effectRow+1&&adapter.getItemViewType(page.timestampRow)==TYPE_CHECK);
-   check(page.borderHeaderRow==page.timestampRow+1&&page.enabledRow==page.borderHeaderRow+1);
+   check(page.borderHeaderRow==page.blurRow+1&&page.enabledRow==page.borderHeaderRow+1);
    check((page.styleRow>=0)==outline&&(page.borderRow>=0)==outline&&(page.positionRow>=0)==outline);
    check((page.fusionHeaderRow>=0)==outline&&(page.fuseRow>=0)==outline);
    check((page.pearlRow>=0)==(outline&&style!=0));
    check((page.fusionIntensityRow>=0)==(outline&&fusion==2));
    check((page.fusionAdaptRow>=0)==(outline&&fusion==2));
-   check(page.rowCount==(outline?(style==0?11:12)+(fusion==2?2:0):6));
+   check(page.rowCount==(outline?(style==0?13:14)+(fusion==2?2:0):8));
    BubbleConfig.adaptive=false;page.updateRows();
    check(page.rowCount==(outline?(style==0?13:14)+(fusion==2?2:0):8));
   }

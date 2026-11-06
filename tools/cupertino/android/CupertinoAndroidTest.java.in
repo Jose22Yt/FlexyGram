@@ -1,0 +1,132 @@
+import android.app.Activity;
+import android.graphics.*;
+import android.graphics.drawable.*;
+import android.view.*;
+import android.widget.*;
+import java.time.Duration;
+import java.io.File;
+import org.junit.*;import static org.junit.Assert.*;
+import org.junit.runner.RunWith;
+import org.robolectric.*;import org.robolectric.annotation.*;
+import app.flexygram.icons.*;
+@RunWith(RobolectricTestRunner.class) @Config(sdk=35,manifest=Config.NONE) @GraphicsMode(GraphicsMode.Mode.NATIVE)
+public class CupertinoAndroidTest {
+ Activity activity;
+ @Before public void setup()throws Exception{
+  activity=Robolectric.buildActivity(Activity.class).setup().get();
+  var font=CupertinoGlyphDrawable.class.getDeclaredField("typeface");font.setAccessible(true);
+  font.set(null,Typeface.createFromFile(new File(System.getProperty("basedir"),"CupertinoIcons.ttf")));
+  app.exteraless.icons.BaseIconPacks.selected=0;app.flexygram.animation.FastMotionTiming.enabled=false;
+ }
+ @Test public void everyMappedGlyphRendersAtItsNativeSizeWithIndependentTintAndAlpha()throws Exception{
+  var resources=activity.getResources();int count=0;
+  for(var field:org.telegram.messenger.R.drawable.class.getDeclaredFields()){
+   int id=field.getInt(null),spec=CupertinoIconMap.spec(id);assertTrue(spec!=0);
+   Drawable icon=CupertinoIcons.create(resources,id);assertNotNull(icon);
+   assertEquals(Math.round(((spec>>>16)&255)*resources.getDisplayMetrics().density),icon.getIntrinsicWidth());
+   assertEquals(Math.round(((spec>>>24)&127)*resources.getDisplayMetrics().density),icon.getIntrinsicHeight());
+   assertEquals((spec&0x80000000)!=0,icon.isAutoMirrored());
+   icon.setBounds(0,0,64,64);icon.setTint(Color.MAGENTA);icon.setAlpha(127);
+   Bitmap b=Bitmap.createBitmap(64,64,Bitmap.Config.ARGB_8888);icon.draw(new Canvas(b));int visible=0;
+   for(int y=0;y<64;y++)for(int x=0;x<64;x++){int p=b.getPixel(x,y);if(Color.alpha(p)>0){visible++;assertTrue(Color.alpha(p)<=127);}}
+   assertTrue("empty icon: "+field.getName(),visible>0);b.recycle();
+   Drawable clone=icon.getConstantState().newDrawable();assertNotSame(icon,clone);assertEquals(255,clone.getAlpha());count++;
+  }
+  assertTrue(count>1000);
+ }
+ @Test public void explicitOtherPacksAndUnmappedGraphicsRetainTheirNativeLoader(){
+  assertNull(CupertinoIcons.create(activity.getResources(),-1));
+  app.exteraless.icons.BaseIconPacks.selected=1;
+  assertNull(CupertinoIcons.create(activity.getResources(),org.telegram.messenger.R.drawable.msg_settings));
+ }
+ @Test public void drawableAlphaSurvivesTintStateAndCloning(){
+  Drawable icon=CupertinoIcons.create(activity.getResources(),org.telegram.messenger.R.drawable.msg_settings);
+  icon.setBounds(0,0,64,64);icon.setAlpha(80);icon.setTint(Color.RED);assertEquals(80,icon.getAlpha());
+  icon.setColorFilter(new PorterDuffColorFilter(Color.GREEN,PorterDuff.Mode.SRC_IN));
+  Bitmap b=Bitmap.createBitmap(64,64,Bitmap.Config.ARGB_8888);icon.draw(new Canvas(b));
+  boolean green=false;for(int y=0;y<64;y++)for(int x=0;x<64;x++){int p=b.getPixel(x,y);if(Color.alpha(p)>0){assertEquals(0,Color.red(p));green|=Color.green(p)>200;}}
+  assertTrue(green);b.recycle();
+ }
+ @Test public void pulseCurveIsBoundedAndReturnsExactlyToRestForBothPolicies(){
+  for(boolean reduced:new boolean[]{false,true}){
+   for(int i=0;i<=1000;i++){float s=IconPressCurve.scale(i/1000f,reduced);assertTrue(s>=.9399f&&s<=1);}
+   assertEquals(1,IconPressCurve.scale(0,reduced),0);assertEquals(1,IconPressCurve.scale(1,reduced),0);
+   assertEquals(reduced?.98f:.94f,IconPressCurve.scale(.4f,reduced),.0001f);
+  }
+ }
+ FrameLayout root;ImageView image;TextView label;int clicks;long down;
+ void layout(){root=new FrameLayout(activity);root.setBackgroundColor(Color.BLUE);root.setClickable(true);root.setOnClickListener(v->clicks++);
+  image=new ImageView(activity);image.setImageDrawable(CupertinoIcons.create(activity.getResources(),org.telegram.messenger.R.drawable.msg_settings));
+  image.setScaleType(ImageView.ScaleType.CENTER_INSIDE);FrameLayout.LayoutParams lp=new FrameLayout.LayoutParams(64,64);lp.leftMargin=20;lp.topMargin=20;root.addView(image,lp);
+  label=new TextView(activity);label.setText("Settings");FrameLayout.LayoutParams text=new FrameLayout.LayoutParams(140,64);text.leftMargin=100;text.topMargin=20;root.addView(label,text);
+  activity.setContentView(root);root.measure(View.MeasureSpec.makeMeasureSpec(320,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(200,View.MeasureSpec.EXACTLY));root.layout(0,0,320,200);Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();
+ }
+ void touch(int action,float x,float y,long elapsed){int[] pos=new int[2];root.getLocationOnScreen(pos);
+  if(action==0)down=android.os.SystemClock.uptimeMillis();
+  MotionEvent event=MotionEvent.obtain(down,down+elapsed,action,x+pos[0],y+pos[1],0);
+  IconPressFeedback.observe(root,event);
+  // Native dispatch uses local coordinates, preserving its real click/scroll handling.
+  event.offsetLocation(-pos[0],-pos[1]);root.dispatchTouchEvent(event);event.recycle();
+ }
+ @Test public void confirmedTapAnimatesOnlyIconAndNeverDelaysNativeClick(){
+  layout();Matrix before=new Matrix(image.getImageMatrix());touch(0,150,40,0);touch(1,150,40,40);
+  assertEquals(ImageView.ScaleType.MATRIX,image.getScaleType());
+  Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();assertEquals(1,clicks);
+  Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(Duration.ofMillis(220));
+  assertEquals(ImageView.ScaleType.CENTER_INSIDE,image.getScaleType());assertEquals(before,image.getImageMatrix());
+ }
+ @Test public void scrollingCancelledAndLongTouchesDoNotCreateIconFeedback(){
+  layout();touch(0,40,40,0);touch(2,40,140,20);touch(1,40,140,40);
+  assertEquals(ImageView.ScaleType.CENTER_INSIDE,image.getScaleType());
+  touch(0,40,40,0);touch(3,40,40,20);assertEquals(ImageView.ScaleType.CENTER_INSIDE,image.getScaleType());
+  touch(0,40,40,0);touch(1,40,40,ViewConfiguration.getLongPressTimeout()+1);assertEquals(ImageView.ScaleType.CENTER_INSIDE,image.getScaleType());
+ }
+ @Test public void replacingIconDuringPulseRestoresLayoutPolicyForTheNewDrawable(){
+  layout();touch(0,150,40,0);touch(1,150,40,30);
+  Drawable next=CupertinoIcons.create(activity.getResources(),org.telegram.messenger.R.drawable.msg_add);image.setImageDrawable(next);
+  Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(Duration.ofMillis(220));
+  assertSame(next,image.getDrawable());assertEquals(ImageView.ScaleType.CENTER_INSIDE,image.getScaleType());
+ }
+ @Test public void actualNativeMatrixChangesOnlyTheIconAndEndsWithoutAFrameCallback()throws Exception{
+  layout();Matrix before=new Matrix(image.getImageMatrix());touch(0,150,40,0);touch(1,150,40,40);
+  var field=IconPressFeedback.class.getDeclaredField("active");field.setAccessible(true);Object pulse=field.get(null);assertNotNull(pulse);
+  var frame=pulse.getClass().getDeclaredMethod("doFrame",long.class);frame.setAccessible(true);
+  frame.invoke(pulse,1000000000L);frame.invoke(pulse,1070000000L);
+  assertFalse(before.equals(image.getImageMatrix()));
+  assertEquals(1,image.getScaleX(),0);assertEquals(1,label.getScaleX(),0);assertEquals(1,root.getScaleX(),0);
+  frame.invoke(pulse,1200000000L);assertNull(field.get(null));
+  assertEquals(ImageView.ScaleType.CENTER_INSIDE,image.getScaleType());assertEquals(before,image.getImageMatrix());
+ }
+
+ @Test public void backUsesIosChevronByDefaultAndKeepsNativeCloseMorph(){
+  org.telegram.ui.ActionBar.BackDrawable back=new org.telegram.ui.ActionBar.BackDrawable(false);assertTrue(back.isIosStyle());
+  back.setColor(Color.MAGENTA);back.setRotatedColor(Color.MAGENTA);back.setBounds(0,0,24,24);
+  for(float rotation:new float[]{0,.25f,.5f,.75f,1}){
+   back.setRotation(rotation,false);Bitmap b=Bitmap.createBitmap(24,24,Bitmap.Config.ARGB_8888);back.draw(new Canvas(b));
+   int visible=0;for(int y=0;y<24;y++)for(int x=0;x<24;x++)if(Color.alpha(b.getPixel(x,y))>0)visible++;
+   assertTrue(visible>0);assertEquals(rotation,back.getRotation(),0);b.recycle();
+  }
+ }
+
+ @Test public void removingTintRestoresOriginalMonochromeColorAndOpacity(){
+  int spec=CupertinoIconMap.spec(org.telegram.messenger.R.drawable.msg_settings);
+  Drawable icon=new CupertinoGlyphDrawable(activity.getResources(),spec,0x80336699);icon.setBounds(0,0,64,64);
+  icon.setTint(Color.RED);icon.setAlpha(127);Bitmap tinted=Bitmap.createBitmap(64,64,Bitmap.Config.ARGB_8888);icon.draw(new Canvas(tinted));
+  int visible=0;for(int y=0;y<64;y++)for(int x=0;x<64;x++){int p=tinted.getPixel(x,y);if(Color.alpha(p)>0){visible++;assertTrue(Color.alpha(p)<=64);}}
+  assertTrue(visible>0);icon.setTintList(null);assertEquals(127,icon.getAlpha());
+  Drawable clone=icon.getConstantState().newDrawable();assertEquals(255,clone.getAlpha());
+  tinted.recycle();
+ }
+
+ @Test public void textCompoundIconUsesSmoothFloatScaleWithoutChangingItsReservedBounds()throws Exception{
+  layout();CupertinoGlyphDrawable glyph=(CupertinoGlyphDrawable)CupertinoIcons.create(activity.getResources(),org.telegram.messenger.R.drawable.msg_settings);
+  glyph.setBounds(0,0,22,22);label.setCompoundDrawablesRelative(glyph,null,null,null);label.setClickable(true);
+  Rect bounds=new Rect(glyph.getBounds());touch(0,150,40,0);touch(1,150,40,40);
+  var field=IconPressFeedback.class.getDeclaredField("active");field.setAccessible(true);Object pulse=field.get(null);assertNotNull(pulse);
+  var frame=pulse.getClass().getDeclaredMethod("doFrame",long.class);frame.setAccessible(true);
+  frame.invoke(pulse,1000000000L);frame.invoke(pulse,1070000000L);
+  assertTrue(glyph.getPressScale()<1);assertEquals(bounds,glyph.getBounds());assertEquals(1,label.getScaleX(),0);
+  frame.invoke(pulse,1200000000L);assertEquals(1,glyph.getPressScale(),0);assertEquals(bounds,glyph.getBounds());
+ }
+
+}

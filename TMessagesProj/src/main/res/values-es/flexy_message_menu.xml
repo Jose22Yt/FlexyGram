@@ -11,4 +11,5 @@
     <string name="FlexyMenuPin">Fijar</string>
     <string name="FlexyMenuReset">Restablecer</string>
     <string name="FlexyMenuSelected">Seleccionado</string>
+    <string name="FlexyContextFullPreview">Vista previa del mensaje seleccionado</string>
 </resources>

@@ -343,6 +343,10 @@ public final class SignatureWallpaperBlur {
             return draw(canvas, shape, rootOffsetX, rootOffsetY, 255);
         }
         public boolean draw(Canvas canvas, Path shape, float rootOffsetX, float rootOffsetY, int alpha) {
+            return draw(canvas, shape, rootOffsetX, rootOffsetY, alpha, null);
+        }
+        /** Replaces only the image shader, preserving a material's native tint/filter/selection. */
+        public boolean draw(Canvas canvas, Path shape, float rootOffsetX, float rootOffsetY, int alpha, Paint material) {
             // Mapping is captured once by the wallpaper owner after its native draw. A shared
             // Drawable can be drawn by another screen; never read its mutable bounds per message.
             if (!BubbleConfig.backgroundBlur() || !supported) return false;
@@ -368,7 +372,21 @@ public final class SignatureWallpaperBlur {
                 shader.setLocalMatrix(matrix);
             }
             // Original cached wallpaper blur: native animation alpha, independent of retired Glass settings.
-            paint.setAlpha(Math.round(Math.max(0, Math.min(255, alpha)) * reveal));
+            if (material != null) {
+                paint.set(material);
+                // Theme paints may not have synchronized their native filter yet.
+                // Rebind it after copying, without changing the theme-owned paint.
+                paint.setColorFilter(null);
+                paint.setColorFilter(material.getColorFilter());
+                paint.setShader(shader);
+            } else {
+                paint.reset();
+                paint.setAntiAlias(true);
+                paint.setFilterBitmap(true);
+                paint.setShader(shader);
+            }
+            paint.setAlpha(Math.round((material == null ? 255 : material.getAlpha())
+                    * Math.max(0, Math.min(255, alpha)) / 255f * reveal));
             canvas.drawPath(shape, paint); return true;
         }
         private void release() {

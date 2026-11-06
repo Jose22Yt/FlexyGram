@@ -1,23 +1,17 @@
 package app.flexygram.bubbles.interaction;
 
 import android.content.Context;
-import android.widget.ScrollView;
+import android.widget.FrameLayout;
 
-/** Scroll the complete selection (reactions, original-sized message, actions) together. */
-public final class MessageMenuScrollView extends ScrollView {
-    public interface Listener { void onScroll(int offset); }
+/** Bounded, non-scrolling host. The complete selected message is fitted above the actions.
+ */
+public final class MessageMenuViewport extends FrameLayout {
     private int viewportHeight;
-    private final Listener listener;
 
-    public MessageMenuScrollView(Context context, Listener listener) {
+    public MessageMenuViewport(Context context) {
         super(context);
-        this.listener = listener;
-        // Do not let opening focus jump to actions below a long message.
         setDescendantFocusability(FOCUS_BEFORE_DESCENDANTS);
         setFocusableInTouchMode(true);
-        setFillViewport(false);
-        setVerticalScrollBarEnabled(true);
-        setOverScrollMode(OVER_SCROLL_NEVER);
     }
 
     public void setViewportHeight(int height) {
@@ -27,6 +21,8 @@ public final class MessageMenuScrollView extends ScrollView {
         requestLayout();
     }
 
+    @Override public void scrollTo(int x, int y) { super.scrollTo(0, 0); }
+
     @Override protected void onMeasure(int widthSpec, int heightSpec) {
         if (viewportHeight > 0) {
             int limit = viewportHeight;
@@ -35,10 +31,5 @@ public final class MessageMenuScrollView extends ScrollView {
             heightSpec = MeasureSpec.makeMeasureSpec(limit, MeasureSpec.AT_MOST);
         }
         super.onMeasure(widthSpec, heightSpec);
-    }
-
-    @Override protected void onScrollChanged(int x, int y, int oldX, int oldY) {
-        super.onScrollChanged(x, y, oldX, oldY);
-        if (listener != null) listener.onScroll(y);
     }
 }

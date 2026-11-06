@@ -6,11 +6,12 @@ import xml.etree.ElementTree as ET
 
 def test_native_material_keeps_shader_filter_alpha_and_provider_ownership(tmp_path):
     probe(tmp_path, {
+        'app/flexygram/bubbles/SignatureWallpaperBlur.java': '''package app.flexygram.bubbles;import android.graphics.*;public class SignatureWallpaperBlur {public static class Owner {public boolean ready;public int calls,alpha;public Paint material;public float x,y;public boolean draw(Canvas c,Path p,float x,float y,int a,Paint m){calls++;this.x=x;this.y=y;alpha=a;material=m;return ready;}}}''',
         'android/graphics/Path.java': 'package android.graphics;public class Path{}',
         'android/graphics/Paint.java': '''package android.graphics;public class Paint{
  public static final int ANTI_ALIAS_FLAG=1;public static int allocations;public Object shader,filter;public int alpha=255,color;
  public Paint(int flags){allocations++;}public void set(Paint p){shader=p.shader;filter=p.filter;alpha=p.alpha;color=p.color;}
- public int getAlpha(){return alpha;}public void setAlpha(int a){alpha=a;}public int getColor(){return color;}}''',
+ public Object getColorFilter(){return filter;}public void setColorFilter(Object f){filter=f;}public int getAlpha(){return alpha;}public void setAlpha(int a){alpha=a;}public int getColor(){return color;}}''',
         'android/graphics/Canvas.java': '''package android.graphics;public class Canvas{
  public int draws,alpha,color;public Object shader,filter;public void drawPath(Path p,Paint paint){draws++;alpha=paint.alpha;color=paint.color;shader=paint.shader;filter=paint.filter;}}''',
         'org/telegram/ui/ActionBar/Theme.java': '''package org.telegram.ui.ActionBar;import android.graphics.Paint;public class Theme{
@@ -40,6 +41,14 @@ def test_native_material_keeps_shader_filter_alpha_and_provider_ownership(tmp_pa
  surface.draw(c,path,provider,123,456,-10,65,127,true);check(c.draws==draws+2&&Theme.maps==maps&&c.alpha==Math.round(133*127/255f)&&c.shader==chatPaint.shader&&chatPaint.alpha==133);
  check(ServiceBubbleSurface.textColor(provider)==0xffffffff);
  allocations=Paint.allocations;for(int i=0;i<20000;i++)surface.drawMapped(c,path,provider,255,false);check(Paint.allocations==allocations);
+ app.flexygram.bubbles.SignatureWallpaperBlur.Owner owner=new app.flexygram.bubbles.SignatureWallpaperBlur.Owner();
+ draws=c.draws;check(!surface.drawCached(c,path,null,owner,12,34,127,false)&&c.draws==draws);
+ owner.ready=true;
+ for(boolean selected:new boolean[]{false,true})for(int alpha:new int[]{0,1,127,255}){
+ draws=c.draws;check(surface.drawCached(c,path,null,owner,12,34,alpha,selected));
+ check(owner.material==(selected?Theme.selected:Theme.normal)&&owner.alpha==alpha&&owner.x==12&&owner.y==34&&c.draws==draws);
+ }
+ Theme.gradient=true;draws=c.draws;check(surface.drawCached(c,path,null,owner,12,34,127,false));check(c.draws==draws+1);
  Theme.gradient=false;Theme.normal.shader=null;Theme.normal.filter=null;surface.drawMapped(c,path,null,255,false);check(c.shader==null&&c.filter==null);
  }}''',
     }, [JAVA/'app/flexygram/bubbles/ServiceBubbleSurface.java'])
@@ -61,12 +70,15 @@ def test_mode_default_validation_and_legacy_preferences_survive_switches(tmp_pat
  public static void main(String[]args){Prefs p=new Prefs();ApplicationLoader.applicationContext.p=p;
  BubbleConfig.load();check(BubbleConfig.adaptive()&&BubbleConfig.surfaceEffect()==0&&!BubbleConfig.backgroundBlur());
  BubbleConfig.setBackgroundBlur(true);BubbleConfig.setTransparency(29);BubbleConfig.setBorderTenths(17);BubbleConfig.setOutlineStyle(2);
- check(!BubbleConfig.backgroundBlur());BubbleConfig.setSurfaceEffect(BubbleConfig.LEGACY);BubbleConfig.load();check(!BubbleConfig.adaptive()&&BubbleConfig.backgroundBlur());
+ check(BubbleConfig.backgroundBlur());BubbleConfig.setSurfaceEffect(BubbleConfig.LEGACY);BubbleConfig.load();check(!BubbleConfig.adaptive()&&BubbleConfig.backgroundBlur());
  check(BubbleConfig.transparency()==29&&BubbleConfig.borderTenths()==17&&BubbleConfig.outlineStyle()==2);
- BubbleConfig.setSurfaceEffect(BubbleConfig.ADAPTIVE);BubbleConfig.load();check(BubbleConfig.adaptive()&&!BubbleConfig.backgroundBlur());
+ BubbleConfig.setSurfaceEffect(BubbleConfig.ADAPTIVE);BubbleConfig.load();check(BubbleConfig.adaptive()&&BubbleConfig.backgroundBlur());
  BubbleConfig.setSurfaceEffect(BubbleConfig.LEGACY);check(BubbleConfig.backgroundBlur()&&BubbleConfig.transparency()==29);
  for(int value:new int[]{-1,2,Integer.MAX_VALUE}){p.putInt(BubbleConfig.SURFACE_EFFECT,value);BubbleConfig.load();check(BubbleConfig.adaptive());}
  BubbleConfig.setSurfaceEffect(900);check(BubbleConfig.adaptive());
+ for(int n=0;n<=20;n++){BubbleConfig.setBorderTenths(n);BubbleConfig.load();check(BubbleConfig.borderTenths()==n&&BubbleConfig.borderDp()==n/10f);}
+ BubbleConfig.setBorderTenths(-1);BubbleConfig.load();check(BubbleConfig.borderTenths()==0);
+ BubbleConfig.setBorderTenths(21);BubbleConfig.load();check(BubbleConfig.borderTenths()==20);
  check(BubbleConfig.smallTimestamps());BubbleConfig.setSmallTimestamps(false);BubbleConfig.load();check(!BubbleConfig.smallTimestamps());
  BubbleConfig.setSurfaceEffect(BubbleConfig.LEGACY);check(!BubbleConfig.smallTimestamps());
  BubbleConfig.setSmallTimestamps(true);BubbleConfig.load();check(BubbleConfig.smallTimestamps());
@@ -84,13 +96,17 @@ def test_adaptive_fill_preserves_native_alpha_and_continues_to_shared_border(tmp
  static class Theme{static final int key_chat_serviceBackgroundSelected=2,key_chat_serviceBackground=1;}
  static class Color{static int alpha(int c){return c>>>24;}}
  INTERFACE
+ static class app{static class flexygram{static class bubbles{
+ static class BubbleConfig{static int transparency;static int transparency(){return transparency;}}
+ static class BubbleStyle{static int tintAlpha(int t){return Math.round(255*(1-t/100f));}}
+ }}}
  boolean adaptive=true,isSelected;int alpha=255,legacy,color;GlassSource flexyGlassSource;Path path=new Path();Paint flexyFillPaint=new Paint();
  int getColor(int key){return key==2?0xcc123456:0xaa654321;}
  void draw(Canvas canvas){BRANCH legacy++;}
  static void check(boolean v){if(!v)throw new AssertionError();}
  public static void main(String[]args){Probe p=new Probe();Canvas c=new Canvas();
- for(boolean selected:new boolean[]{false,true})for(int a:new int[]{0,1,127,255}){p.isSelected=selected;p.alpha=a;p.draw(c);check(p.legacy>0&&p.flexyFillPaint.shader==null&&p.flexyFillPaint.aa&&p.flexyFillPaint.alpha==Math.round((selected?204:170)*a/255f));}
- p.flexyGlassSource=new GlassSource(){public boolean draw(Canvas c,Path path){throw new AssertionError();}public boolean draw(Canvas c,Path path,int alpha,boolean selected){check(alpha==p.alpha&&selected==p.isSelected);return true;}};
+ for(int t:new int[]{0,35,100})for(boolean selected:new boolean[]{false,true})for(int a:new int[]{0,1,127,255}){app.flexygram.bubbles.BubbleConfig.transparency=t;p.isSelected=selected;p.alpha=a;p.draw(c);check(p.legacy>0&&p.flexyFillPaint.shader==null&&p.flexyFillPaint.aa&&p.flexyFillPaint.alpha==Math.round((selected?204:170)*Math.round(a*app.flexygram.bubbles.BubbleStyle.tintAlpha(t)/255f)/255f));}
+ p.flexyGlassSource=new GlassSource(){public boolean draw(Canvas c,Path path){throw new AssertionError();}public boolean draw(Canvas c,Path path,int alpha,boolean selected){check(alpha==Math.round(p.alpha*app.flexygram.bubbles.BubbleStyle.tintAlpha(app.flexygram.bubbles.BubbleConfig.transparency)/255f)&&selected==p.isSelected);return true;}};
  int draws=c.draws,common=p.legacy;p.draw(c);check(c.draws==draws&&p.legacy==common+1);
  p.adaptive=false;p.draw(c);check(p.legacy==common+2);
  }}'''.replace('INTERFACE',interface).replace('BRANCH',branch)})

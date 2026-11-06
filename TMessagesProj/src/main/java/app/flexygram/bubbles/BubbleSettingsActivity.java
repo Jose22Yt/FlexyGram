@@ -36,10 +36,8 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
         timestampRow = addRow("flexyBubbleSmallTimestamp");
         transparencyRow = blurRow = borderHeaderRow = enabledRow = fusionHeaderRow = -1;
         borderRow = positionRow = fuseRow = styleRow = pearlRow = fusionIntensityRow = fusionAdaptRow = -1;
-        if (!BubbleConfig.adaptive()) {
-            transparencyRow = addRow("flexyBubbleTransparency");
-            blurRow = addRow("flexyBubbleBlur");
-        }
+        transparencyRow = addRow("flexyBubbleTransparency");
+        blurRow = addRow("flexyBubbleBlur");
         borderHeaderRow = addHeader("FlexyBubbleBorderSection");
         enabledRow = addRow("flexyBubbleOutlineEnabled");
         fusionHeaderRow = -1;
@@ -117,13 +115,13 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
                 public void onStartTrackingTouch(SeekBar bar) { bar.getParent().requestDisallowInterceptTouchEvent(true); }
                 public void onStopTrackingTouch(SeekBar bar) { bar.getParent().requestDisallowInterceptTouchEvent(false); }
                 public void onProgressChanged(SeekBar bar, int value, boolean user) {
-                    if (user && !binding) { if(fusion)BubbleConfig.setFusionIntensity(value);else if (position) BubbleConfig.setBorderPosition(value + 1); else if (border) BubbleConfig.setBorderTenths(value+5); else if (pearl) BubbleConfig.setPearlIntensity(value); else BubbleConfig.setTransparency(value); if (preview != null) preview.settingsChanged(); }
+                    if (user && !binding) { if(fusion)BubbleConfig.setFusionIntensity(value);else if (position) BubbleConfig.setBorderPosition(value + 1); else if (border) BubbleConfig.setBorderTenths(value); else if (pearl) BubbleConfig.setPearlIntensity(value); else BubbleConfig.setTransparency(value); if (preview != null) preview.settingsChanged(); }
                     label(value);
                 }
             });
         }
         void label(int value) {
-            String text = fusion?getString(R.string.FlexyBubbleFusionIntensity)+" · "+value+" %":position ? getString(R.string.FlexyBubbleBorderPosition) + " · " + borderPositions()[value] : border ? getString(R.string.FlexyBubbleBorderWidth) + " · " + String.format(java.util.Locale.US, "%.1f dp", (value+5)/10f) : getString(pearl ? R.string.FlexyBubblePearlIntensity : R.string.FlexyBubblesTransparency) + " · " + value + " %";
+            String text = fusion?getString(R.string.FlexyBubbleFusionIntensity)+" · "+value+" %":position ? getString(R.string.FlexyBubbleBorderPosition) + " · " + borderPositions()[value] : border ? getString(R.string.FlexyBubbleBorderWidth) + " · " + String.format(java.util.Locale.US, "%.1f dp", value/10f) : getString(pearl ? R.string.FlexyBubblePearlIntensity : R.string.FlexyBubblesTransparency) + " · " + value + " %";
             title.setText(text); seek.setContentDescription(text);
         }
         void bind(boolean border) { bind(border, false, false); }
@@ -132,7 +130,7 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
             this.fusion=fusion;
             this.position = position;
             this.border = border; this.pearl = pearl;
-            binding = true; seek.setMax(position ? 4 : border ? 15 : 100); int value = fusion?BubbleConfig.fusionIntensity():position ? BubbleConfig.borderPosition() - 1 : border ? BubbleConfig.borderTenths()-5 : pearl ? BubbleConfig.pearlIntensity() : BubbleConfig.transparency(); seek.setProgress(value); label(value);
+            binding = true; seek.setMax(position ? 4 : border ? 20 : 100); int value = fusion?BubbleConfig.fusionIntensity():position ? BubbleConfig.borderPosition() - 1 : border ? BubbleConfig.borderTenths() : pearl ? BubbleConfig.pearlIntensity() : BubbleConfig.transparency(); seek.setProgress(value); label(value);
             seek.setEnabled(!pearl || BubbleConfig.outlineStyle() >= 1); setAlpha(!pearl || BubbleConfig.outlineStyle() >= 1 ? 1f : .5f); binding = false;
         }
     }

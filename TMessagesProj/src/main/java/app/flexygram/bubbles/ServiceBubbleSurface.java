@@ -31,8 +31,24 @@ public final class ServiceBubbleSurface {
         return true;
     }
 
+    /** Use the shared blurred wallpaper once, retaining the adaptive material's native color filter. */
+    public boolean drawCached(Canvas canvas, Path shape, Theme.ResourcesProvider provider,
+                              SignatureWallpaperBlur.Owner owner, float x, float y, int alpha, boolean selected) {
+        if (owner == null || !owner.draw(canvas, shape, x, y, alpha, Theme.getThemePaint(selected
+                ? Theme.key_paint_chatActionBackgroundSelected : Theme.key_paint_chatActionBackground, provider))) {
+            return false;
+        }
+        if (provider != null ? provider.hasGradientService() : Theme.hasGradientService()) {
+            drawLayer(canvas, shape, Theme.getThemePaint(Theme.key_paint_chatActionBackgroundDarken, provider), alpha);
+        }
+        return true;
+    }
+
     private void drawLayer(Canvas canvas, Path shape, Paint source, int alpha) {
         scratch.set(source);
+        // Rebind lazy native filters after copying an undrawn theme paint.
+        scratch.setColorFilter(null);
+        scratch.setColorFilter(source.getColorFilter());
         scratch.setAlpha(Math.round(source.getAlpha() * Math.max(0, Math.min(255, alpha)) / 255f));
         canvas.drawPath(shape, scratch);
     }

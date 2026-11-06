@@ -667,12 +667,14 @@ public class MessageDrawable extends Drawable {
             int color;
             if (adaptiveSurface) {
                 color = getColor(isSelected ? Theme.key_chat_serviceBackgroundSelected : Theme.key_chat_serviceBackground);
-                if (flexyGlassSource == null || !flexyGlassSource.draw(canvas, path, alpha, isSelected)) {
+                final int fillAlpha = Math.round(alpha * app.flexygram.bubbles.BubbleStyle.tintAlpha(
+                        app.flexygram.bubbles.BubbleConfig.transparency()) / 255f);
+                if (flexyGlassSource == null || !flexyGlassSource.draw(canvas, path, fillAlpha, isSelected)) {
                     // Offscreen renderers without a chat root use the native solid service color.
                     flexyFillPaint.reset();
                     flexyFillPaint.setAntiAlias(true);
                     flexyFillPaint.setColor(color);
-                    flexyFillPaint.setAlpha(Math.round(Color.alpha(color) * alpha / 255f));
+                    flexyFillPaint.setAlpha(Math.round(Color.alpha(color) * fillAlpha / 255f));
                     canvas.drawPath(path, flexyFillPaint);
                 }
             } else {
@@ -691,7 +693,8 @@ public class MessageDrawable extends Drawable {
                 canvas.drawPath(path, flexyFillPaint);
             }
             // The same cached contour and fusion controls apply to either surface material.
-            if (app.flexygram.bubbles.BubbleConfig.outlineEnabled()) {
+            if (app.flexygram.bubbles.BubbleConfig.outlineEnabled()
+                    && app.flexygram.bubbles.BubbleConfig.borderTenths() > 0) {
                 flexyBorderPaint.setStyle(Paint.Style.STROKE);
                 // Keep the contour inside Telegram's unchanged message silhouette.
                 flexyBorderPaint.setStrokeWidth(2f * AndroidUtilities.density * app.flexygram.bubbles.BubbleConfig.borderDp()

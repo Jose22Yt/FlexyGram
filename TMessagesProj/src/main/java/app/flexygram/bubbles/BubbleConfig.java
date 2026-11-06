@@ -37,7 +37,7 @@ public final class BubbleConfig {
         // Retired signature_skin preferences remain stored and have no rendering effect.
         cachedBlur = p.getBoolean("signature_cached_blur", false);
         // Retired Matte and Bubble Glass preferences have no rendering effect.
-        borderTenths = Math.max(5, Math.min(20, p.getInt("signature_border_tenths", 11)));
+        borderTenths = Math.max(0, Math.min(20, p.getInt("signature_border_tenths", 11)));
         glass = p.getBoolean(GLASS, false); border = p.getBoolean(BORDER, false);
         edges = p.getBoolean(EDGES, false); transparency = BubbleStyle.transparency(p.getInt(TRANSPARENCY, 35)); loaded = true;
     }
@@ -61,8 +61,8 @@ public final class BubbleConfig {
         smallTimestamps = value;
         preferences().edit().putBoolean("small_timestamp", value).apply();
     }
-    // Preserve the old preference, but don't prepare a second blur cache in native mode.
-    public static boolean backgroundBlur() { return !adaptive() && cachedBlur; }
+    // Both surface materials share the same optional wallpaper blur cache.
+    public static boolean backgroundBlur() { return cachedBlur; }
     /** Renderer compatibility only: saved matte flags can never tint a bubble again. */
     @Deprecated public static boolean matteEnabled() { return false; }
     @Deprecated public static int matteStrength() { return 0; }
@@ -107,7 +107,7 @@ public final class BubbleConfig {
     public static float borderDp() { return borderTenths / 10f; }
     public static void setBorderTenths(int value) {
         if (!loaded) load();
-        value = Math.max(5, Math.min(20, value));
+        value = Math.max(0, Math.min(20, value));
         if (borderTenths == value) return;
         borderTenths = value;
         preferences().edit().putInt("signature_border_tenths", value).apply();

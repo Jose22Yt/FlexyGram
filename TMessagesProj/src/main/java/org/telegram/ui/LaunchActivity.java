@@ -7402,6 +7402,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         AndroidUtilities.checkDisplaySize(this, newConfig);
         AndroidUtilities.setPreferredMaxRefreshRate(getWindow());
         super.onConfigurationChanged(newConfig);
+        if(customResources!=null)customResources.updateConfiguration(newConfig,super.getResources().getDisplayMetrics());
         pipActivityHandler.onConfigurationChanged(newConfig);
         AndroidUtilities.resetTabletFlag();
         invalidateTabletMode();

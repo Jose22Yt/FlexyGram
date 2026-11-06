@@ -7,7 +7,7 @@ def write(dest,root):
  def put(name,source):
   path=dest/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_text(source)
  java=root/'TMessagesProj/src/main/java'
- names=['BubbleActionPanelView','BubbleMenuConfig','BubbleMenuIcon','BubbleMenuGallery','BubbleInteractionSettings','BubbleInteractionSettingsActivity','BubbleTapMotion','SelectedBubbleMotion','DampedSpringCurve','ContextPreviewPlacement','ContextPreviewViewport','MessageMenuScrollView']
+ names=['BubbleActionPanelView','BubbleMenuConfig','BubbleMenuIcon','BubbleMenuGallery','BubbleInteractionSettings','BubbleInteractionSettingsActivity','BubbleTapMotion','SelectedBubbleMotion','DampedSpringCurve','ContextPreviewPlacement','ContextPreviewViewport','MessageMenuViewport']
  sources=[]
  for name in names:
   source=(java/'app/flexygram/bubbles/interaction'/(name+'.java')).read_text();sources.append(source);put('app/flexygram/bubbles/interaction/'+name+'.java',source)
@@ -20,7 +20,13 @@ def write(dest,root):
    if item.tag=='string':values[item.attrib['name']]=''.join(item.itertext())
  missing=set(keys)-values.keys()
  if missing:raise AssertionError('Missing production string resources: '+str(missing))
- put('org/telegram/messenger/R.java','package org.telegram.messenger;public class R{public static class string{'+''.join('public static final int '+k+'='+str(i+1)+';'for i,k in enumerate(keys))+'}}')
+ iconmap=json.loads((root/'tools/cupertino/mapping.json').read_text())
+ put('org/telegram/messenger/R.java','package org.telegram.messenger;public class R{public static class string{'+''.join('public static final int '+k+'='+str(i+1)+';'for i,k in enumerate(keys))+'}public static class drawable{'+''.join('public static final int '+k+'='+str(i+1)+';'for i,k in enumerate(sorted(iconmap)))+'}}')
+ import shutil
+ for name in ['CupertinoIcons','CupertinoGlyphDrawable','CupertinoIconMap','CupertinoSupplement']:
+  put('app/flexygram/icons/'+name+'.java',(java/'app/flexygram/icons'/(name+'.java')).read_text())
+ put('app/exteraless/icons/BaseIconPacks.java','package app.exteraless.icons;public class BaseIconPacks{public static final int BASE_DEFAULT=0;public static int getSelected(){return 0;}}')
+ shutil.copyfile(root/'TMessagesProj/src/main/assets/cupertino/CupertinoIcons.ttf',dest.parents[2]/'CupertinoIcons.ttf')
  put('org/telegram/messenger/LocaleController.java','package org.telegram.messenger;public class LocaleController{public static boolean isRTL;public static String getString(int id){switch(id){'+''.join('case '+str(i+1)+':return '+json.dumps(values[k],ensure_ascii=True)+';'for i,k in enumerate(keys))+'default:throw new IllegalArgumentException();}}}')
  theme_keys=sorted(set(re.findall(r'Theme.(key_\w+)','\n'.join(sources))))
  put('org/telegram/ui/ActionBar/Theme.java','''package org.telegram.ui.ActionBar;public class Theme{public interface ResourcesProvider{}public static boolean dark;
@@ -101,19 +107,48 @@ public class NativeCaptureProbe{
  CAPTURE
 }'''.replace('CAPTURE',capture))
 
- # Execute the production composer redraw condition with native View/Canvas composition.
+ # Execute the full production backdrop pass with native View/Canvas composition.
  chat=(java/'org/telegram/ui/ChatActivity.java').read_text()
- a=chat.index('            if (selectedBubbleMotionMessage != null && scrimBlurBitmapPaint != null && scrimViewProgress > 0f')
- b=chat.index('{',a)+1;depth=1
- while depth:depth+=(chat[b]=='{')-(chat[b]=='}');b+=1
- block=chat[a:b]
+ a=chat.index('            final int messageScrimSave = canvas.save();')
+ b=chat.index('            if (scrimViewReaction != null && scrimViewReactionAnimated)',a)
+ block=chat[a:b]+'canvas.restoreToCount(messageScrimSave);'
  put('ComposerOverlayProbe.java', '''import android.content.*;import android.graphics.*;import android.view.*;import android.widget.*;
  public class ComposerOverlayProbe extends FrameLayout {
- Object selectedBubbleMotionMessage=new Object();Paint scrimBlurBitmapPaint=new Paint();float scrimViewProgress=1;
- View chatInputViewsContainer;
- public ComposerOverlayProbe(Context c){super(c);chatInputViewsContainer=new View(c);chatInputViewsContainer.setBackgroundColor(Color.CYAN);addView(chatInputViewsContainer,new FrameLayout.LayoutParams(100,24,Gravity.BOTTOM));}
- public void redraw(Canvas canvas){BLOCK}
+ Object selectedBubbleMotionMessage=new Object(),scrimViewReaction,scrimView;Paint scrimBlurBitmapPaint=new Paint(),scrimPaint=new Paint();float scrimViewProgress=1,scrimPaintAlpha=.2f,scrimViewAlpha=1;
+ Bitmap scrimBlurBitmap=Bitmap.createBitmap(100,120,Bitmap.Config.ARGB_8888);Matrix scrimBlurMatrix=new Matrix();BitmapShader scrimBlurBitmapShader;
+ View chatInputViewsContainer,header;
+ public ComposerOverlayProbe(Context c){super(c);chatInputViewsContainer=new View(c);chatInputViewsContainer.setBackgroundColor(Color.CYAN);addView(chatInputViewsContainer,new FrameLayout.LayoutParams(100,24,Gravity.BOTTOM));
+ header=new View(c);header.setBackgroundColor(Color.CYAN);addView(header,new FrameLayout.LayoutParams(100,24,Gravity.TOP));
+ scrimBlurBitmap.eraseColor(Color.YELLOW);scrimBlurBitmapShader=new BitmapShader(scrimBlurBitmap,Shader.TileMode.CLAMP,Shader.TileMode.CLAMP);scrimBlurBitmapPaint.setShader(scrimBlurBitmapShader);}
+ public void redraw(Canvas canvas){super.dispatchDraw(canvas);BLOCK}
  }'''.replace('BLOCK',block))
+
+ # Actual common preview transform: tiles, group background, caption and time share one matrix.
+ a=chat.index('    private void transformSelectedMessagePreview(Canvas canvas)')
+ b=chat.index('{',a)+1;depth=1
+ while depth:depth+=(chat[b]=='{')-(chat[b]=='}');b+=1
+ transform=chat[a:b].replace('private void','public void')
+ a=chat.index('    private void selectedMessageBounds(ChatMessageCell anchor, RectF bounds)')
+ b=chat.index('{',a)+1;depth=1
+ while depth:depth+=(chat[b]=='{')-(chat[b]=='}');b+=1
+ bounds=chat[a:b].replace('private void','public void')
+ put('AlbumTransformProbe.java','''import android.graphics.*;import android.view.*;import android.content.*;
+ public class AlbumTransformProbe {
+ public final RectF selectedBubblePreviewBounds=new RectF();public float selectedBubblePreviewWindowTop,selectedBubblePreviewWindowBottom,selectedBubbleOffsetY,selectedBubblePreviewScale=1;
+ public View contentView;public android.widget.FrameLayout chatListView;
+ public static class MessageObject{public static class GroupedMessages{}}
+ public static class ChatMessageCell extends View{
+ public final RectF background=new RectF();public MessageObject.GroupedMessages album;
+ public ChatMessageCell(Context c){super(c);}public MessageObject.GroupedMessages getCurrentMessagesGroup(){return album;}
+ public int getBackgroundDrawableLeft(){return (int)background.left;}public int getBackgroundDrawableTop(){return (int)background.top;}
+ public int getBackgroundDrawableRight(){return (int)background.right;}public int getBackgroundDrawableBottom(){return (int)background.bottom;}}
+ public final Motion selectedBubbleMotion=new Motion();
+ public static class Motion{public float phase=1;public float progress(){return phase;}public float spatialOffset(float value,int extra){return value*phase;}public float scaleX(){return 1;}public float scaleY(){return 1;}}
+ public static float lerp(float a,float b,float t){return a+(b-a)*t;}public static int dp(int v){return v;}
+ public AlbumTransformProbe(Context c){contentView=new View(c);contentView.layout(0,0,320,700);chatListView=new android.widget.FrameLayout(c);chatListView.layout(0,20,320,700);}
+ TRANSFORM
+ BOUNDS
+ }'''.replace('TRANSFORM',transform).replace('BOUNDS',bounds))
 
  # Actual cell alpha-layer clipping, with native Canvas and explicit row bounds.
  cell=(java/'org/telegram/ui/Cells/ChatMessageCell.java').read_text()

@@ -82,7 +82,7 @@ public final class BaseIconPacks {
         if (type == BASE_REMIX) {
             return "Remix Icon";
         }
-        return org.telegram.messenger.LocaleController.getString(R.string.Default);
+        return "Cupertino Icons";
     }
 
     /** Автор набора ({@code BaseIconPacks.java:1192}). */
@@ -93,7 +93,7 @@ public final class BaseIconPacks {
         if (type == BASE_REMIX) {
             return "Remix-Design";
         }
-        return "Telegram";
+        return "Vladimir Kharlampidi · MIT";
     }
 
     /** Карта выбранного набора или null, если подмены нет. */

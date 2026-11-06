@@ -1,0 +1,15 @@
+{
+  "font_source": "https://github.com/flutter/packages/tree/main/third_party/packages/cupertino_icons",
+  "catalog_source": "https://github.com/flutter/flutter/blob/master/packages/flutter/lib/src/cupertino/icons.dart",
+  "catalog_source_sha256": "903e47d2459d68350a5298a57c35a122c43bf07f116e5faba562e1a384cb90a2",
+  "font_sha256": "67c44fe9183b002e79dde7f6977e2988661c9a3e4a3c5fce968787efdbed823c",
+  "license": "MIT (font); Flutter BSD-3-Clause (catalog declarations)",
+  "note": "Static icon names/codepoints only; no Flutter engine or Dart runtime is included.",
+  "supplemental_symbols": {
+    "flexy_baseball": "0xe001",
+    "flexy_crown": "0xe002",
+    "flexy_fingerprint": "0xe003",
+    "flexy_crown_off": "0xe004"
+  },
+  "supplemental_note": "Project-drawn immutable paths in CupertinoSupplement.java; the upstream font is unchanged."
+}

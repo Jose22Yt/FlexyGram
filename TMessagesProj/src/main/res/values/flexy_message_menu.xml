@@ -11,4 +11,5 @@
     <string name="FlexyMenuPin">Pin</string>
     <string name="FlexyMenuReset">Reset</string>
     <string name="FlexyMenuSelected">Selected</string>
+    <string name="FlexyContextFullPreview">Selected message preview</string>
 </resources>

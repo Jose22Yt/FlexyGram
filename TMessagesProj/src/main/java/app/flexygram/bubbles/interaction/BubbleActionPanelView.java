@@ -115,11 +115,14 @@ public final class BubbleActionPanelView extends LinearLayout {
     }
     private View button(Action action,boolean tile,boolean trailingIcon){
         Context context=getContext();int color=action==Action.DELETE?deleteColor:textColor;
-        LinearLayout row=new ActionRow(context);row.setOrientation(tile?VERTICAL:HORIZONTAL);
+        LinearLayout row=new LinearLayout(context);row.setOrientation(tile?VERTICAL:HORIZONTAL);
         boolean centeredFooter=style==BubbleMenuConfig.GRID&&action==Action.MORE;
         row.setGravity(tile||centeredFooter?Gravity.CENTER:Gravity.CENTER_VERTICAL);row.setMinimumHeight(dp(context,tile?80:44));
         row.setPadding(dp(context,tile?4:14),dp(context,8),dp(context,tile?4:14),dp(context,8));
-        ImageView icon=new ImageView(context);icon.setScaleType(ImageView.ScaleType.FIT_CENTER);icon.setImageDrawable(new BubbleMenuIcon(action,color));
+        ImageView icon=new ImageView(context);icon.setScaleType(ImageView.ScaleType.FIT_CENTER);android.graphics.drawable.Drawable symbol=app.flexygram.icons.CupertinoIcons.create(context.getResources(),iconResource(action));
+        if(symbol==null)symbol=new BubbleMenuIcon(action,color);
+        else symbol.setColorFilter(new android.graphics.PorterDuffColorFilter(color,android.graphics.PorterDuff.Mode.SRC_IN));
+        icon.setImageDrawable(symbol);
         TextView title=new TextView(context);title.setText(label(action));title.setTextSize(tile?12:14.5f);title.setTextColor(color);
         title.setTypeface(org.telegram.messenger.AndroidUtilities.bold());
         title.setGravity(tile?Gravity.CENTER:Gravity.START|Gravity.CENTER_VERTICAL);title.setMaxLines(2);title.setEllipsize(TextUtils.TruncateAt.END);
@@ -136,18 +139,21 @@ public final class BubbleActionPanelView extends LinearLayout {
         row.setContentDescription(label(action));row.setTag(action);row.setFocusable(true);
         row.setOnClickListener(view->{if(listener!=null&&allowed.contains(action))listener.onAction(action);});return row;
     }
-    private static final class ActionRow extends LinearLayout {
-        private final BubbleTapMotion motion=new BubbleTapMotion(this);
-        ActionRow(Context context){super(context);}
-        @Override public boolean dispatchTouchEvent(android.view.MotionEvent event){
-            if(BubbleInteractionSettings.motionEnabled()){
-                int action=event.getActionMasked();if(action==android.view.MotionEvent.ACTION_DOWN)motion.press(0,0,0);
-                else if(action==android.view.MotionEvent.ACTION_UP||action==android.view.MotionEvent.ACTION_CANCEL||action==android.view.MotionEvent.ACTION_POINTER_DOWN)motion.release();
-            }
-            return super.dispatchTouchEvent(event);
+    private static int iconResource(Action action){
+        switch(action){
+            case REPLY:return R.drawable.menu_reply;
+            case COPY:return R.drawable.msg_copy;
+            case STICKER:return R.drawable.msg_sticker;
+            case FORWARD:return R.drawable.msg_forward;
+            case EDIT:return R.drawable.msg_edit;
+            case PIN:return R.drawable.msg_pin;
+            case DELETE:return R.drawable.msg_delete;
+            case SELECT:return R.drawable.msg_select;
+            case SAVE:return R.drawable.msg_download;
+            case SHARE:return R.drawable.msg_share;
+            case LINK:return R.drawable.msg_link;
+            default:return R.drawable.ic_ab_other;
         }
-        @Override public void draw(android.graphics.Canvas canvas){int save=canvas.save();canvas.scale(motion.scaleX(),motion.scaleY(),getWidth()*.5f,getHeight()*.5f);super.draw(canvas);canvas.restoreToCount(save);}
-        @Override protected void onDetachedFromWindow(){motion.reset();super.onDetachedFromWindow();}
     }
     @Override protected void onDetachedFromWindow(){listener=null;super.onDetachedFromWindow();}
 }

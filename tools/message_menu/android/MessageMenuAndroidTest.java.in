@@ -6,7 +6,7 @@ import org.junit.*;import static org.junit.Assert.*;import org.junit.runner.RunW
 @RunWith(RobolectricTestRunner.class) @Config(sdk=35,manifest=Config.NONE) @GraphicsMode(GraphicsMode.Mode.NATIVE)
 public class MessageMenuAndroidTest {
  Activity activity;int dp(float n){return(int)(n*activity.getResources().getDisplayMetrics().density+.5f);}
- @Before public void setup(){activity=Robolectric.buildActivity(Activity.class).setup().get();SignatureMatteSettingsActivity.activity=activity;activity.getSharedPreferences(BubbleMenuConfig.FILE,0).edit().clear().commit();BubbleInteractionSettings.reload();Theme.dark=false;}
+ @Before public void setup()throws Exception{var font=app.flexygram.icons.CupertinoGlyphDrawable.class.getDeclaredField("typeface");font.setAccessible(true);font.set(null,Typeface.createFromFile(new File(System.getProperty("basedir"),"CupertinoIcons.ttf")));activity=Robolectric.buildActivity(Activity.class).setup().get();SignatureMatteSettingsActivity.activity=activity;activity.getSharedPreferences(BubbleMenuConfig.FILE,0).edit().clear().commit();BubbleInteractionSettings.reload();Theme.dark=false;}
  @After public void finish(){activity.finish();}
  void layout(View view,int width){view.measure(View.MeasureSpec.makeMeasureSpec(dp(width),View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(0,View.MeasureSpec.UNSPECIFIED));view.layout(0,0,view.getMeasuredWidth(),view.getMeasuredHeight());}
  List<View> actions(View view){List<View> result=new ArrayList<>();if(view.getTag() instanceof Action)result.add(view);if(view instanceof ViewGroup){ViewGroup g=(ViewGroup)view;for(int i=0;i<g.getChildCount();i++)result.addAll(actions(g.getChildAt(i)));}return result;}
@@ -46,31 +46,48 @@ public class MessageMenuAndroidTest {
   }
   live.recycle();backdrop.recycle();
  }
- @Test public void wholeSelectionScrollsWithOriginalMessageSizeAndCompleteBackground() {
+ @Test public void wholeSelectionFitsWithoutMessageScrolling() {
   for(int messageHeight:new int[]{120,450,6000}) {
-   int[] offset={0};var scroll=new MessageMenuScrollView(activity,y->offset[0]=y);
+   var viewport=new MessageMenuViewport(activity);
+   var placement=ContextPreviewPlacement.fit(100,messageHeight,0,700,304,64,8);
    LinearLayout content=new LinearLayout(activity);content.setOrientation(1);
    View reactions=new View(activity),bubble=new View(activity),actions=new View(activity);
    content.addView(reactions,new LinearLayout.LayoutParams(320,64));
-   bubble.setBackgroundColor(Color.GREEN);content.addView(bubble,new LinearLayout.LayoutParams(320,messageHeight));
-   content.addView(actions,new LinearLayout.LayoutParams(320,240));scroll.addView(content);
-   scroll.setViewportHeight(700);layout(scroll,320);
-   assertEquals(messageHeight,bubble.getHeight());assertEquals(1f,bubble.getScaleX(),0f);
-   assertEquals(64+messageHeight+240,content.getHeight());assertTrue(scroll.getHeight()<=700);
-   int range=Math.max(0,content.getHeight()-scroll.getHeight());scroll.scrollTo(0,range);
-   assertEquals(range,scroll.getScrollY());assertEquals(range,offset[0]);
-   assertEquals(content.getHeight(),actions.getBottom());scroll.scrollTo(0,0);assertEquals(0,offset[0]);
+   content.addView(bubble,new LinearLayout.LayoutParams(320,placement.gapHeight));
+   content.addView(actions,new LinearLayout.LayoutParams(320,240));viewport.addView(content);
+   viewport.setViewportHeight(700);layout(viewport,320);
+   assertTrue(content.getHeight()<=700);assertTrue(actions.getBottom()<=viewport.getHeight());
+   viewport.scrollTo(0,5000);assertEquals(0,viewport.getScrollY());
+   assertFalse(viewport.canScrollVertically(1));assertFalse(viewport.canScrollVertically(-1));
   }
  }
- @Test public void productionOverlayRedrawPreservesComposerAboveBlurWithoutChangingAlpha() {
+ @Test public void fullBackdropCoversHeaderAndComposerWithoutChangingTheirState() {
   ComposerOverlayProbe host=new ComposerOverlayProbe(activity);
   host.measure(View.MeasureSpec.makeMeasureSpec(100,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(120,View.MeasureSpec.EXACTLY));host.layout(0,0,100,120);
-  Bitmap frame=Bitmap.createBitmap(100,120,Bitmap.Config.ARGB_8888);frame.eraseColor(Color.YELLOW);
-  Canvas canvas=new Canvas(frame);int save=canvas.getSaveCount();host.redraw(canvas);
-  assertEquals(Color.CYAN,frame.getPixel(50,110));assertEquals(Color.YELLOW,frame.getPixel(50,80));
+  Bitmap frame=Bitmap.createBitmap(100,120,Bitmap.Config.ARGB_8888);Canvas canvas=new Canvas(frame);int save=canvas.getSaveCount();host.redraw(canvas);
+  assertEquals(Color.YELLOW,frame.getPixel(50,10));assertEquals(Color.YELLOW,frame.getPixel(50,110));
   assertEquals(1f,host.chatInputViewsContainer.getAlpha(),0f);assertEquals(View.VISIBLE,host.chatInputViewsContainer.getVisibility());assertEquals(save,canvas.getSaveCount());
-  frame.eraseColor(Color.YELLOW);host.scrimViewProgress=0;host.redraw(canvas);assertEquals(Color.YELLOW,frame.getPixel(50,110));
-  host.scrimViewProgress=1;host.selectedBubbleMotionMessage=null;host.redraw(canvas);assertEquals(Color.YELLOW,frame.getPixel(50,110));frame.recycle();
+  host.scrimViewProgress=0;host.scrimPaintAlpha=0;host.redraw(canvas);
+  assertEquals(Color.CYAN,frame.getPixel(50,10));assertEquals(Color.CYAN,frame.getPixel(50,110));frame.recycle();
+ }
+ @Test public void nativeAlbumTilesCaptionAndTimeUseOneFitTransform(){
+  for(float top:new float[]{-1200,100,900}){
+   AlbumTransformProbe host=new AlbumTransformProbe(activity);host.selectedBubblePreviewBounds.set(20,top,300,top+1200);
+   var placement=ContextPreviewPlacement.fit(top,1200,20,680,304,64,8);
+   host.selectedBubblePreviewScale=placement.scale;host.selectedBubbleOffsetY=placement.offsetY;
+   host.selectedBubblePreviewWindowTop=20;host.selectedBubblePreviewWindowBottom=680;
+   Bitmap b=Bitmap.createBitmap(320,700,Bitmap.Config.ARGB_8888);Canvas canvas=new Canvas(b);Paint paint=new Paint();
+   host.transformSelectedMessagePreview(canvas);
+   paint.setColor(Color.RED);canvas.drawRect(20,top,160,top+500,paint);
+   paint.setColor(Color.BLUE);canvas.drawRect(160,top,300,top+500,paint);
+   paint.setColor(Color.GREEN);canvas.drawRect(20,top+500,300,top+1100,paint);
+   paint.setColor(Color.YELLOW);canvas.drawRect(20,top+1100,300,top+1200,paint);
+   float fittedTop=top+1200*(1-placement.scale)/2+placement.offsetY;
+   assertEquals(Color.RED,b.getPixel(150,(int)(fittedTop+100*placement.scale)));
+   assertEquals(Color.BLUE,b.getPixel(170,(int)(fittedTop+100*placement.scale)));
+   assertEquals(Color.GREEN,b.getPixel(160,(int)(fittedTop+800*placement.scale)));
+   assertEquals(Color.YELLOW,b.getPixel(160,(int)(fittedTop+1150*placement.scale)));b.recycle();
+  }
  }
  @Test public void selectedMenuHasOneNativeFrameClockAndInterruptsCleanly() {
   int[] draws={0},done={0};var motion=new SelectedBubbleMotion();
@@ -175,20 +192,34 @@ public class MessageMenuAndroidTest {
    b.recycle();
   }
  }
- @Test public void realPopupOffsetAndScrollStayAlignedAcrossWindowInsets(){
-  for(int screenInset:new int[]{0,24,80,300})for(int sourceTop:new int[]{-1200,0,150,800})for(int scroll:new int[]{0,120,3000}){
-   int gapTop=screenInset+100-scroll,sourceScreen=screenInset+sourceTop;
-   float offset=ContextPreviewPlacement.screenOffset(gapTop,sourceScreen,7,scroll,8);
-   float renderedTop=sourceScreen+7+offset-scroll;
-   assertEquals(gapTop+8,renderedTop,.001f);
+ @Test public void fittedPopupOffsetStaysAlignedAcrossWindowInsets(){
+  for(int inset:new int[]{0,24,80,300})for(int sourceTop:new int[]{-1200,0,150,800})for(float scale:new float[]{.02f,.5f,1}){
+   int gapTop=inset+100,sourceScreen=inset+sourceTop;
+   float offset=ContextPreviewPlacement.fittedOffset(gapTop,sourceScreen,6000,scale,8);
+   assertEquals(gapTop+8,sourceScreen+6000*(1-scale)/2+offset,.001f);
   }
  }
  @Test public void openingFocusDoesNotJumpPastLongMessage(){
-  var scroll=new MessageMenuScrollView(activity,offset->{});LinearLayout body=new LinearLayout(activity);body.setOrientation(1);
+  var scroll=new MessageMenuViewport(activity);LinearLayout body=new LinearLayout(activity);body.setOrientation(1);
   View message=new View(activity);message.setClickable(true);message.setFocusable(true);
-  Button action=new Button(activity);action.setText("Reply");body.addView(message,new LinearLayout.LayoutParams(320,6000));body.addView(action,new LinearLayout.LayoutParams(320,60));
+  Button action=new Button(activity);action.setText("Reply");body.addView(message,new LinearLayout.LayoutParams(320,500));body.addView(action,new LinearLayout.LayoutParams(320,60));
   scroll.addView(body);scroll.setViewportHeight(700);activity.setContentView(scroll);layout(scroll,320);scroll.requestFocus();
   assertTrue(scroll.isFocused());assertEquals(0,scroll.getScrollY());
+ }
+
+ @Test public void nativeAlbumBoundsIncludeEveryAttachedTileAndExcludeOtherMessages(){
+  AlbumTransformProbe host=new AlbumTransformProbe(activity);
+  var album=new AlbumTransformProbe.MessageObject.GroupedMessages();
+  var first=new AlbumTransformProbe.ChatMessageCell(activity);first.album=album;first.background.set(20,0,160,500);
+  var second=new AlbumTransformProbe.ChatMessageCell(activity);second.album=album;second.background.set(160,0,300,500);
+  var caption=new AlbumTransformProbe.ChatMessageCell(activity);caption.album=album;caption.background.set(20,0,300,200);
+  var other=new AlbumTransformProbe.ChatMessageCell(activity);other.background.set(0,0,320,3000);
+  host.chatListView.addView(first);host.chatListView.addView(second);host.chatListView.addView(caption);host.chatListView.addView(other);
+  first.layout(0,-200,320,300);second.layout(0,-200,320,300);caption.layout(0,300,320,500);other.layout(0,500,320,3500);
+  RectF bounds=new RectF();host.selectedMessageBounds(first,bounds);
+  assertEquals(new RectF(20,-180,300,520),bounds);
+  host.selectedMessageBounds(second,bounds);assertEquals(new RectF(20,-180,300,520),bounds);
+  host.selectedMessageBounds(other,bounds);assertEquals(new RectF(0,520,320,3520),bounds);
  }
 
 }

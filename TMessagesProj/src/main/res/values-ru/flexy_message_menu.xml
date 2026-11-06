@@ -11,4 +11,5 @@
     <string name="FlexyMenuPin">Закрепить</string>
     <string name="FlexyMenuReset">Сбросить</string>
     <string name="FlexyMenuSelected">Выбрано</string>
+    <string name="FlexyContextFullPreview">Предпросмотр выбранного сообщения</string>
 </resources>

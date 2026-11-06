@@ -1226,10 +1226,10 @@ public class ChatActivity extends BaseFragment implements
     private final app.flexygram.bubbles.interaction.SelectedBubbleMotion selectedBubbleMotion =
             new app.flexygram.bubbles.interaction.SelectedBubbleMotion();
     private MessageObject selectedBubbleMotionMessage;
+    private final RectF selectedBubblePreviewBounds = new RectF();
     private float selectedBubbleOffsetY;
     private float selectedBubblePreviewScale = 1f;
     private float selectedBubblePreviewWindowTop, selectedBubblePreviewWindowBottom;
-    private float selectedBubblePreviewScroll;
     private void finishBubbleReturnForInput() {
         if (selectedBubbleMotion.isClosing() && scrimPopupWindow != null) {
             scrimPopupWindow.dismiss(false);
@@ -3804,7 +3804,8 @@ public class ChatActivity extends BaseFragment implements
         selectedBubbleMotionMessage = null;
         selectedBubbleOffsetY = 0f;
         selectedBubblePreviewScale = 1f;
-        selectedBubblePreviewWindowTop = selectedBubblePreviewWindowBottom = selectedBubblePreviewScroll = 0f;
+        selectedBubblePreviewWindowTop = selectedBubblePreviewWindowBottom = 0f;
+        selectedBubblePreviewBounds.setEmpty();
         app.flexygram.studio.FlexyStyleInstallHelper.cancel(this);
         app.exteraless.plugins.menus.MenuInjector.releaseMessageMenu(this);
         super.onFragmentDestroy();
@@ -11864,7 +11865,8 @@ public class ChatActivity extends BaseFragment implements
         selectedBubbleMotionMessage = null;
         selectedBubbleOffsetY = 0f;
         selectedBubblePreviewScale = 1f;
-        selectedBubblePreviewWindowTop = selectedBubblePreviewWindowBottom = selectedBubblePreviewScroll = 0f;
+        selectedBubblePreviewWindowTop = selectedBubblePreviewWindowBottom = 0f;
+        selectedBubblePreviewBounds.setEmpty();
         this.scrimView = scrimView;
         if (this.scrimView instanceof ChatActionCell) {
             ((ChatActionCell) this.scrimView).setInvalidateWithParent(fragmentView);
@@ -11950,6 +11952,34 @@ public class ChatActivity extends BaseFragment implements
             if (async) selectedBubbleMotion.backdropReady();
             if (contentView != null) contentView.invalidate();
         }, async);
+    }
+
+    /** Native group coordinates keep every attached album tile, caption and background together. */
+    private void selectedMessageBounds(ChatMessageCell anchor, RectF bounds) {
+        bounds.setEmpty();
+        MessageObject.GroupedMessages album = anchor.getCurrentMessagesGroup();
+        for (int i = 0; i < chatListView.getChildCount(); i++) {
+            View child = chatListView.getChildAt(i);
+            if (!(child instanceof ChatMessageCell)) continue;
+            ChatMessageCell cell = (ChatMessageCell) child;
+            if (cell != anchor && (album == null || cell.getCurrentMessagesGroup() != album)) continue;
+            float x = chatListView.getX() + cell.getX();
+            float y = chatListView.getY() + cell.getY();
+            bounds.union(x + cell.getBackgroundDrawableLeft(), y + cell.getBackgroundDrawableTop(),
+                    x + cell.getBackgroundDrawableRight(), y + cell.getBackgroundDrawableBottom());
+        }
+    }
+
+    private void transformSelectedMessagePreview(Canvas canvas) {
+        float phase = selectedBubbleMotion.progress();
+        canvas.clipRect(0, lerp(0, selectedBubblePreviewWindowTop, phase), contentView.getWidth(),
+                lerp(contentView.getHeight(), selectedBubblePreviewWindowBottom, phase));
+        canvas.translate(0, selectedBubbleMotion.spatialOffset(selectedBubbleOffsetY, dp(4)));
+        canvas.scale(app.flexygram.bubbles.interaction.ContextPreviewPlacement.animatedScale(
+                        selectedBubblePreviewScale, phase, selectedBubbleMotion.scaleX()),
+                app.flexygram.bubbles.interaction.ContextPreviewPlacement.animatedScale(
+                        selectedBubblePreviewScale, phase, selectedBubbleMotion.scaleY()),
+                selectedBubblePreviewBounds.centerX(), selectedBubblePreviewBounds.centerY());
     }
 
     /** Compact menus use SelectedBubbleMotion as their sole animation clock. */
@@ -18983,7 +19013,8 @@ public class ChatActivity extends BaseFragment implements
             selectedBubbleMotionMessage = null;
             selectedBubbleOffsetY = 0f;
             selectedBubblePreviewScale = 1f;
-            selectedBubblePreviewWindowTop = selectedBubblePreviewWindowBottom = selectedBubblePreviewScroll = 0f;
+            selectedBubblePreviewWindowTop = selectedBubblePreviewWindowBottom = 0f;
+        selectedBubblePreviewBounds.setEmpty();
             LiteMode.removeOnPowerSaverAppliedListener(signatureGlassPowerListener);
             if (signatureWallpaperBlur != null) { signatureWallpaperBlur.close(); signatureWallpaperBlur = null; }
             super.onDetachedFromWindow();
@@ -19253,10 +19284,14 @@ public class ChatActivity extends BaseFragment implements
 
         private void drawChildElement(Canvas canvas, float listTop, ChatMessageCell cell, int type) {
             int restoreCount = canvas.save();
+            boolean oldFullyDraw = cell.isFullyDraw();
+            if (selectedBubbleMotionMessage != null) cell.setFullyDraw(true);
+            try {
             float canvasOffsetX = chatListView.getLeft() + cell.getX();
             float canvasOffsetY = chatListView.getY() + cell.getY() + cell.getPaddingTop();
             float alpha = cell.shouldDrawAlphaLayer() ? cell.getAlpha() : 1f;
-            canvas.clipRect(chatListView.getLeft(), listTop, chatListView.getRight(), chatListView.getY() + chatListView.getMeasuredHeight() - blurredViewBottomOffset - windowInsetsStateHolder.getCurrentMaxBottomInset() - inputIslandHeightCurrent - dp(9));
+            if (selectedBubbleMotionMessage == null)
+                canvas.clipRect(chatListView.getLeft(), listTop, chatListView.getRight(), chatListView.getY() + chatListView.getMeasuredHeight() - blurredViewBottomOffset - windowInsetsStateHolder.getCurrentMaxBottomInset() - inputIslandHeightCurrent - dp(9));
             canvas.translate(canvasOffsetX, canvasOffsetY);
             cell.setInvalidatesParent(true);
             if (type == 0) {
@@ -19289,8 +19324,11 @@ public class ChatActivity extends BaseFragment implements
                     }
                 }
             }
-            cell.setInvalidatesParent(false);
-            canvas.restoreToCount(restoreCount);
+            } finally {
+                cell.setFullyDraw(oldFullyDraw);
+                cell.setInvalidatesParent(false);
+                canvas.restoreToCount(restoreCount);
+            }
         }
 
         @Override
@@ -19305,6 +19343,7 @@ public class ChatActivity extends BaseFragment implements
 
         @Override
         protected void dispatchDraw(Canvas canvas) {
+            final boolean focusedMessageBackdrop = selectedBubbleMotionMessage != null && SharedConfig.chatBlurEnabled();
             chatActivityEnterView.checkAnimation();
             updateChatListViewTopPadding();
             if (invalidateMessagesVisiblePart || (chatListItemAnimator != null && chatListItemAnimator.isRunning())) {
@@ -19320,7 +19359,7 @@ public class ChatActivity extends BaseFragment implements
                 scheduledHint.updatePosition();
             }
             int restoreToCount = -1;
-            if (switchingFromTopics) {
+            if (!focusedMessageBackdrop && switchingFromTopics) {
                 restoreToCount = canvas.saveLayerAlpha(0, actionBar.getBottom(), getMeasuredWidth(), getMeasuredHeight(), (int) (255 * switchingFromTopicsProgress), Canvas.ALL_SAVE_FLAG);
                 float s = 0.8f + 0.2f * switchingFromTopicsProgress;
                 canvas.scale(s, s, getMeasuredWidth() / 2f, getMeasuredHeight() / 2f);
@@ -19432,6 +19471,10 @@ public class ChatActivity extends BaseFragment implements
                     } else {
                         scrimGroup = null;
                     }
+                    final boolean movingSelection = selectedBubbleMotionMessage != null
+                            && scrimViewTask == null && scrimViewReaction == null;
+                    final int selectionTransformSave = canvas.save();
+                    if (movingSelection) transformSelectedMessagePreview(canvas);
                     boolean groupedBackgroundWasDraw = false;
                     int count = chatListView.getChildCount();
                     for (int num = 0; num < count; num++) {
@@ -19523,8 +19566,8 @@ public class ChatActivity extends BaseFragment implements
                         viewClipTop += clipTop;
                         viewClipBottom -= clipBottom;
 
-                        boolean movingSelectedPreview = cell != null && scrimGroup == null && scrimViewTask == null
-                                && scrimViewReaction == null && selectedBubbleMotionMessage == cell.getMessageObject();
+                        boolean movingSelectedPreview = movingSelection && cell != null
+                                && (scrimGroup != null || selectedBubbleMotionMessage == cell.getMessageObject());
                         // The selected overlay is translated/scaled below. Its SOURCE row bounds must
                         // not clip the moved preview (especially after pinned-panel scroll correction).
                         if (!movingSelectedPreview && (cell == null || !cell.getTransitionParams().animateBackgroundBoundsInner)) {
@@ -19543,9 +19586,11 @@ public class ChatActivity extends BaseFragment implements
                         }
 
                         if (movingSelectedPreview) {
-                            float phase = selectedBubbleMotion.progress();
-                            viewClipTop = Math.max(viewClipTop, lerp(listTop, selectedBubblePreviewWindowTop, phase));
-                            viewClipBottom = Math.min(viewClipBottom, lerp(viewClipBottom, selectedBubblePreviewWindowBottom, phase));
+                            // Alpha layers also need the complete source bounds before the shared fit transform.
+                            viewClipLeft = selectedBubblePreviewBounds.left - dp(16);
+                            viewClipTop = selectedBubblePreviewBounds.top - dp(16);
+                            viewClipRight = selectedBubblePreviewBounds.right + dp(16);
+                            viewClipBottom = selectedBubblePreviewBounds.bottom + dp(16);
                         }
                         if (viewClipTop < viewClipBottom) {
                             if (child.getAlpha() != 1f) {
@@ -19560,24 +19605,8 @@ public class ChatActivity extends BaseFragment implements
                                 actionCell.setInvalidatesParent(true);
                                 actionCell.setScrimReaction(scrimViewReaction);
                             }
-                            canvas.clipRect(viewClipLeft, viewClipTop, viewClipRight, viewClipBottom);
+                            if (!movingSelectedPreview) canvas.clipRect(viewClipLeft, viewClipTop, viewClipRight, viewClipBottom);
                             canvas.translate(chatListView.getLeft() + child.getX(), chatListView.getY() + child.getY());
-                            // Scale the selected overlay, never a recycled cell's properties.
-                            if (cell != null && scrimGroup == null && scrimViewTask == null
-                                    && scrimViewReaction == null
-                                    && selectedBubbleMotionMessage == cell.getMessageObject()) {
-                                float fitPhase = selectedBubbleMotion.progress();
-                                float shift = selectedBubbleMotion.spatialOffset(selectedBubbleOffsetY, dp(4));
-                                // Fitting must stay bounded even while the decorative spring overshoots.
-                                float sx = app.flexygram.bubbles.interaction.ContextPreviewPlacement.animatedScale(
-                                        selectedBubblePreviewScale, fitPhase, selectedBubbleMotion.scaleX());
-                                float sy = app.flexygram.bubbles.interaction.ContextPreviewPlacement.animatedScale(
-                                        selectedBubblePreviewScale, fitPhase, selectedBubbleMotion.scaleY());
-                                canvas.translate(0, shift - selectedBubblePreviewScroll * fitPhase);
-                                canvas.scale(sx, sy,
-                                        (cell.getBackgroundDrawableLeft() + cell.getBackgroundDrawableRight()) * .5f,
-                                        (cell.getBackgroundDrawableTop() + cell.getBackgroundDrawableBottom()) * .5f);
-                            }
                             boolean oldFullyDraw = cell != null && cell.isFullyDraw();
                             if (movingSelectedPreview) cell.setFullyDraw(true);
                             try {
@@ -19650,7 +19679,7 @@ public class ChatActivity extends BaseFragment implements
                                 } else {
                                     canvas.save();
                                 }
-                                canvas.clipRect(viewClipLeft, viewClipTop, viewClipRight, viewClipBottom);
+                                if (!movingSelectedPreview) canvas.clipRect(viewClipLeft, viewClipTop, viewClipRight, viewClipBottom);
                                 canvas.translate(chatListView.getLeft() + child.getX(), chatListView.getY() + child.getY() + child.getPaddingTop());
                                 cell.drawScrimReaction(canvas, scrimViewReaction, scrimProgress, scrimProgressDirection);
                                 canvas.restore();
@@ -19682,7 +19711,7 @@ public class ChatActivity extends BaseFragment implements
                                 } else {
                                     canvas.save();
                                 }
-                                canvas.clipRect(viewClipLeft, viewClipTop, viewClipRight, viewClipBottom);
+                                if (!movingSelectedPreview) canvas.clipRect(viewClipLeft, viewClipTop, viewClipRight, viewClipBottom);
                                 canvas.translate(chatListView.getLeft() + child.getX(), chatListView.getY() + child.getY() + child.getPaddingTop());
                                 actionCell.drawScrimReaction(canvas, scrimViewReaction, scrimProgress, scrimProgressDirection);
                                 canvas.restore();
@@ -19754,6 +19783,7 @@ public class ChatActivity extends BaseFragment implements
                         }
                         drawReactionsAfter.clear();
                     }
+                    canvas.restoreToCount(selectionTransformSave);
                 }
 
                 if (scrimViewReaction == null && scrimViewAlpha < 1f) {
@@ -19773,14 +19803,7 @@ public class ChatActivity extends BaseFragment implements
 
             canvas.restoreToCount(messageScrimSave);
 
-            if (selectedBubbleMotionMessage != null && scrimBlurBitmapPaint != null && scrimViewProgress > 0f
-                    && chatInputViewsContainer.getVisibility() == VISIBLE) {
-                // Keep the real composer and its native glass surfaces visible above the snapshot.
-                // Never alter its alpha, visibility or background during selection.
-                super.drawChild(canvas, chatInputViewsContainer, getDrawingTime());
-            }
-
-            if (scrimView != null || messageEnterTransitionContainer.isRunning()) {
+            if (!focusedMessageBackdrop && (scrimView != null || messageEnterTransitionContainer.isRunning())) {
                 if (mentionContainer == null || mentionContainer.getVisibility() != View.VISIBLE) {
                     super.drawChild(canvas, sideControlsButtonsLayout, SystemClock.uptimeMillis());
                 }
@@ -19825,7 +19848,7 @@ public class ChatActivity extends BaseFragment implements
                 }
             }
 
-            if (fixedKeyboardHeight > 0 && keyboardHeight < AndroidUtilities.dp(20)) {
+            if (!focusedMessageBackdrop && fixedKeyboardHeight > 0 && keyboardHeight < AndroidUtilities.dp(20)) {
                 int color = getThemedColor(Theme.key_windowBackgroundWhite);
                 if (backgroundPaint == null) {
                     backgroundPaint = new Paint();
@@ -19835,7 +19858,7 @@ public class ChatActivity extends BaseFragment implements
                 }
                 canvas.drawRect(0,getMeasuredHeight() - fixedKeyboardHeight, getMeasuredWidth(), getMeasuredHeight(), backgroundPaint);
             }
-            if (pullingDownDrawable != null && pullingDownDrawable.needDrawBottomPanel()) {
+            if (!focusedMessageBackdrop && pullingDownDrawable != null && pullingDownDrawable.needDrawBottomPanel()) {
                 int top, bottom;
                 top = (int) chatInputViewsContainer.getInputBubbleTop();
                 bottom = (int) chatInputViewsContainer.getInputBubbleBottom();
@@ -19851,12 +19874,12 @@ public class ChatActivity extends BaseFragment implements
                 canvas.restore();
             }
 
-            emojiAnimationsOverlay.draw(canvas);
+            if (!focusedMessageBackdrop) emojiAnimationsOverlay.draw(canvas);
 
             if (restoreToCount >= 0) {
                 canvas.restore();
             }
-            if (switchingFromTopics) {
+            if (!focusedMessageBackdrop && switchingFromTopics) {
                 canvas.save();
                 canvas.translate(actionBar.getX(), actionBar.getY());
                 canvas.saveLayerAlpha(0, 0, actionBar.getWidth(), actionBar.getHeight(), (int) (255 * switchingFromTopicsProgress), Canvas.ALL_SAVE_FLAG);
@@ -33514,7 +33537,7 @@ public class ChatActivity extends BaseFragment implements
 
             final boolean compactContext = (bubbleTap || longpress || single) && !onDoubleTapped && v instanceof ChatMessageCell
                     && selectedObject == ((ChatMessageCell)v).getMessageObject()
-                    && selectedObject != null && selectedObjectGroup == null && !selectedObject.isSponsored()
+                    && selectedObject != null && !selectedObject.isSponsored()
                     && !selectedObject.isEphemeral() && !suggestEdit
                     && (bubbleTap || app.flexygram.bubbles.interaction.BubbleInteractionSettings.signaturePanel(getParentActivity()));
             if(compactContext) flags |= ActionBarPopupWindow.ActionBarPopupWindowLayout.FLAG_USE_SWIPEBACK;
@@ -34767,14 +34790,11 @@ public class ChatActivity extends BaseFragment implements
                 }
             });
 
-            final app.flexygram.bubbles.interaction.MessageMenuScrollView signaturePreviewScroll = compactContext
-                    ? new app.flexygram.bubbles.interaction.MessageMenuScrollView(getParentActivity(), offset -> {
-                        selectedBubblePreviewScroll = offset;
-                        if (contentView != null) contentView.invalidate();
-                    }) : null;
-            if (signaturePreviewScroll != null) {
-                signaturePreviewScroll.addView(scrimPopupContainerLayout,
-                        new android.widget.ScrollView.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            final app.flexygram.bubbles.interaction.MessageMenuViewport signaturePreviewViewport = compactContext
+                    ? new app.flexygram.bubbles.interaction.MessageMenuViewport(getParentActivity()) : null;
+            if (signaturePreviewViewport != null) {
+                signaturePreviewViewport.addView(scrimPopupContainerLayout,
+                        new android.widget.FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             }
             View signatureMessageGap = null;
             ReactionsContainerLayout reactionsLayout = null;
@@ -34876,7 +34896,7 @@ public class ChatActivity extends BaseFragment implements
                 if (compactContext) {
                     signatureMessageGap = new View(getParentActivity());
                     signatureMessageGap.setClickable(true);
-                    signatureMessageGap.setContentDescription(getString(R.string.FlexyContextScrollPreview) + " " + selectedObject.messageText);
+                    signatureMessageGap.setContentDescription(getString(R.string.FlexyContextFullPreview) + " " + selectedObject.messageText);
                     scrimPopupContainerLayout.addView(signatureMessageGap,
                             new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0));
                 }
@@ -35014,7 +35034,7 @@ public class ChatActivity extends BaseFragment implements
             if (glassMenu) {
                 GlassMenuHelper.applyToGaps(popupLayout, GlassMenuHelper.separatorColor(true, themeDelegate));
             }
-            scrimPopupWindow = new ActionBarPopupWindow(compactContext ? signaturePreviewScroll : scrimPopupContainerLayout, LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT) {
+            scrimPopupWindow = new ActionBarPopupWindow(compactContext ? signaturePreviewViewport : scrimPopupContainerLayout, LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT) {
                 private boolean signatureClosing;
                 @Override public void dismiss() { dismiss(true); }
                 private void finishDismiss(boolean animated) {
@@ -35107,28 +35127,27 @@ public class ChatActivity extends BaseFragment implements
             float signatureOffsetY = 0f;
             float signaturePreviewScale = 1f;
             float signaturePreviewWindowTop = 0f, signaturePreviewWindowBottom = 0f;
+            final RectF signatureSelectionBounds = new RectF();
             if (compactContext && signatureMessageGap != null) {
                 ChatMessageCell selectedCell = (ChatMessageCell) v;
-                int[] window = new int[2];
-                chatListView.getLocationInWindow(window);
-                float selectedTop = window[1] + v.getY() + selectedCell.getBackgroundDrawableTop();
-                float selectedHeight = Math.max(1, selectedCell.getBackgroundDrawableBottom()
-                        - selectedCell.getBackgroundDrawableTop());
-                // Match the area actually drawable below the header, pinned message and translation row.
-                int availableTop = Math.max(AndroidUtilities.statusBarHeight,
-                        (int)Math.ceil(window[1] + Math.max(0, chatListViewPaddingTop - chatListViewPaddingVisibleOffset))) + dp(8);
+                selectedMessageBounds(selectedCell, signatureSelectionBounds);
                 int[] contentWindow = new int[2];
                 contentView.getLocationInWindow(contentWindow);
-                int availableBottom = (int) Math.floor(Math.min(window[1] + chatListView.getHeight(),
-                        contentWindow[1] + contentView.getHeight() - windowInsetsStateHolder.getCurrentMaxBottomInset()
-                                - inputIslandHeightCurrent - getTopicTabsSideSize(TopicsTabsView.Position.BOTTOM) - dp(9))) - dp(8);
+                float selectedTop = contentWindow[1] + signatureSelectionBounds.top;
+                float selectedHeight = Math.max(1, signatureSelectionBounds.height());
+                // Header and composer are part of the blurred backdrop, so their area is usable.
+                int availableTop = Math.max(AndroidUtilities.statusBarHeight, contentWindow[1]) + dp(8);
+                int availableBottom = contentWindow[1] + contentView.getHeight()
+                        - windowInsetsStateHolder.getCurrentMaxBottomInset() - dp(8);
                 Rect visibleWindow = new Rect();
                 chatListView.getWindowVisibleDisplayFrame(visibleWindow);
                 availableTop = Math.max(availableTop,visibleWindow.top+dp(8));
                 availableBottom = Math.min(availableBottom,visibleWindow.bottom-dp(8));
                 availableBottom = Math.max(availableTop + 1, availableBottom);
                 int availableHeight = availableBottom - availableTop;
-                // The message keeps its complete native size. Scroll all popup content together.
+                // Bound only the action list on short windows; the selected message never scrolls.
+                popupLayout.getLayoutParams().height = Math.min(popupLayout.getMeasuredHeight(),
+                        Math.max(dp(48), availableHeight / 2));
                 scrimPopupContainerLayout.setMaxHeight(0);
                 scrimPopupContainerLayout.forceLayout();
                 scrimPopupContainerLayout.measure(
@@ -35159,13 +35178,12 @@ public class ChatActivity extends BaseFragment implements
                 signaturePreviewScale = placement.scale;
                 signaturePopupY = placement.popupY;
                 signatureOffsetY = placement.offsetY;
-                selectedBubblePreviewScroll = 0f;
-                signaturePreviewScroll.setViewportHeight(availableHeight);
-                signaturePreviewScroll.measure(
+                signaturePreviewViewport.setViewportHeight(availableHeight);
+                signaturePreviewViewport.measure(
                         View.MeasureSpec.makeMeasureSpec(chatListView.getWidth(), View.MeasureSpec.AT_MOST),
                         View.MeasureSpec.makeMeasureSpec(availableHeight, View.MeasureSpec.AT_MOST));
                 signaturePreviewWindowTop = placement.popupY - contentWindow[1];
-                signaturePreviewWindowBottom = signaturePreviewWindowTop + signaturePreviewScroll.getMeasuredHeight();
+                signaturePreviewWindowBottom = signaturePreviewWindowTop + signaturePreviewViewport.getMeasuredHeight();
             }
             int popupX = v.getLeft() + (int) x - scrimPopupContainerLayout.getMeasuredWidth() + backgroundPaddings.left - AndroidUtilities.dp(28);
             if (popupX < AndroidUtilities.dp(6)) {
@@ -35222,28 +35240,26 @@ public class ChatActivity extends BaseFragment implements
             final ActionBarPopupWindow signatureMenuOwner = scrimPopupWindow;
             final MessageObject signatureSelectedMessage = selectedObject;
             final View signaturePreviewGap = signatureMessageGap;
-            final int[] popupScreen = new int[2], sourceScreen = new int[2], contentScreen = new int[2], gapScreen = new int[2];
+            final int[] popupScreen = new int[2], contentScreen = new int[2], gapScreen = new int[2];
             final Runnable syncSelectionWindow = () -> {
                 if (!compactContext || signaturePreviewGap == null || fragmentView == null
                         || scrimPopupWindow != signatureMenuOwner || selectedBubbleMotion.isClosing()
                         || selectedBubbleMotionMessage != signatureSelectedMessage
-                        || signaturePreviewScroll.getWidth() == 0) return;
+                        || signaturePreviewViewport.getWidth() == 0) return;
                 // PopupWindow may adjust the requested position. Map both windows through screen
                 // coordinates only after layout, instead of retaining a guessed status-bar offset.
-                signaturePreviewScroll.getLocationOnScreen(popupScreen);
+                signaturePreviewViewport.getLocationOnScreen(popupScreen);
                 signaturePreviewGap.getLocationOnScreen(gapScreen);
-                v.getLocationOnScreen(sourceScreen);
                 contentView.getLocationOnScreen(contentScreen);
-                selectedBubbleOffsetY = app.flexygram.bubbles.interaction.ContextPreviewPlacement.screenOffset(
-                        gapScreen[1], sourceScreen[1], ((ChatMessageCell)v).getBackgroundDrawableTop(),
-                        signaturePreviewScroll.getScrollY(), dp(8));
-                selectedBubblePreviewScroll = signaturePreviewScroll.getScrollY();
+                selectedBubbleOffsetY = app.flexygram.bubbles.interaction.ContextPreviewPlacement.fittedOffset(
+                        gapScreen[1], contentScreen[1] + selectedBubblePreviewBounds.top,
+                        selectedBubblePreviewBounds.height(), selectedBubblePreviewScale, dp(8));
                 selectedBubblePreviewWindowTop = popupScreen[1] - contentScreen[1];
-                selectedBubblePreviewWindowBottom = selectedBubblePreviewWindowTop + signaturePreviewScroll.getHeight();
+                selectedBubblePreviewWindowBottom = selectedBubblePreviewWindowTop + signaturePreviewViewport.getHeight();
                 contentView.invalidate();
             };
-            if (signaturePreviewScroll != null) {
-                signaturePreviewScroll.addOnLayoutChangeListener((previewView,newLeft,newTop,newRight,newBottom,previousLeft,previousTop,previousRight,previousBottom) -> syncSelectionWindow.run());
+            if (signaturePreviewViewport != null) {
+                signaturePreviewViewport.addOnLayoutChangeListener((previewView,newLeft,newTop,newRight,newBottom,previousLeft,previousTop,previousRight,previousBottom) -> syncSelectionWindow.run());
             }
             Runnable showMenu = () -> {
                 if (scrimPopupWindow != signatureMenuOwner) return;
@@ -35271,6 +35287,7 @@ public class ChatActivity extends BaseFragment implements
                     selectedBubbleMotionMessage = selectedObject;
                     selectedBubbleOffsetY = signatureBubbleOffset;
                     selectedBubblePreviewScale = signatureBubbleScale;
+                    selectedBubblePreviewBounds.set(signatureSelectionBounds);
                     selectedBubblePreviewWindowTop = signatureBubbleWindowTop;
                     selectedBubblePreviewWindowBottom = signatureBubbleWindowBottom;
                     final ChatMessageCell tapped=(ChatMessageCell)v;
@@ -35295,10 +35312,10 @@ public class ChatActivity extends BaseFragment implements
                        handoff?tapped.signatureTapVelocityY():0f);
                     // Ownership changes at actual show time, never while language detection waits.
                     if (handoff) tapped.finishSignatureTap();
-                    signaturePreviewScroll.getViewTreeObserver().addOnPreDrawListener(new android.view.ViewTreeObserver.OnPreDrawListener() {
+                    signaturePreviewViewport.getViewTreeObserver().addOnPreDrawListener(new android.view.ViewTreeObserver.OnPreDrawListener() {
                         @Override public boolean onPreDraw() {
-                            if (signaturePreviewScroll.getViewTreeObserver().isAlive())
-                                signaturePreviewScroll.getViewTreeObserver().removeOnPreDrawListener(this);
+                            if (signaturePreviewViewport.getViewTreeObserver().isAlive())
+                                signaturePreviewViewport.getViewTreeObserver().removeOnPreDrawListener(this);
                             syncSelectionWindow.run();
                             return true;
                         }
@@ -35309,7 +35326,7 @@ public class ChatActivity extends BaseFragment implements
                 AndroidUtilities.runOnUIThread(() -> {
                     if (scrimPopupWindow == signatureMenuOwner && !selectedBubbleMotion.isClosing()
                             && scrimPopupWindowItems != null && scrimPopupWindowItems.length > 0 && scrimPopupWindowItems[0] != null) {
-                        View focusTarget = compactContext ? signaturePreviewScroll : scrimPopupWindowItems[0];
+                        View focusTarget = compactContext ? signaturePreviewViewport : scrimPopupWindowItems[0];
                         // Focusing the first action would auto-scroll a tall message out of view.
                         focusTarget.requestFocus();
                         focusTarget.performAccessibilityAction(AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS, null);
@@ -42946,6 +42963,10 @@ public class ChatActivity extends BaseFragment implements
         @Override public boolean drawFlexyBubbleWallpaper(ChatMessageCell cell, Canvas canvas, android.graphics.Path path, int alpha, boolean selected) {
             if (app.flexygram.bubbles.BubbleConfig.adaptive()) {
                 if (contentView == null || chatListView == null) return false;
+                if (app.flexygram.bubbles.BubbleConfig.backgroundBlur() && serviceBubbleSurface.drawCached(
+                        canvas, path, themeDelegate, contentView.signatureWallpaperBlur,
+                        cell.getX() + chatListView.getX(),
+                        cell.getY() + cell.getPaddingTop() + chatListView.getY(), alpha, selected)) return true;
                 // Reuse the cell's native service coordinates, including keyboard/pan/topic offsets.
                 cell.applyServiceShaderMatrix();
                 return serviceBubbleSurface.drawMapped(canvas, path, themeDelegate, alpha, selected);

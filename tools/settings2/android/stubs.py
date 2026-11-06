@@ -25,6 +25,8 @@ def write(dest,root):
      if x.get('name')in ids:titles[x.get('name')]=''.join(x.itertext()).replace("\\'","'")
    except E.ParseError:pass
  def q(s):return json.dumps(s,ensure_ascii=True)
+ emit('app/flexygram/icons/IconPressFeedback.java','package app.flexygram.icons;public class IconPressFeedback{public interface Target{void setIconPressScale(float scale);}}')
+ emit('app/exteraless/icons/BaseIconPacks.java','package app.exteraless.icons;public class BaseIconPacks{public static final int BASE_DEFAULT=0;public static int getSelected(){return 0;}}')
  emit('org/telegram/messenger/R.java','package org.telegram.messenger;public class R{public static class string{'+''.join('public static final int '+n+'='+str(i)+';'for n,i in ids.items())+'}public static class drawable{'+''.join('public static final int '+n+'='+str(symbols[('drawable',n)])+';'for n in sorted(set(re.findall(r'R.drawable.(\w+)',source))))+'}}')
  emit('org/telegram/messenger/LocaleController.java','package org.telegram.messenger;public class LocaleController{public static boolean isRTL;public static String getString(int id){return switch(id){'+''.join('case '+str(i)+'->'+q(titles.get(n,n))+';'for n,i in ids.items())+'default->"";};}}')
  emit('org/telegram/messenger/AndroidUtilities.java','package org.telegram.messenger;public class AndroidUtilities{public static int dp(float v){return Math.round(v);}public static android.graphics.Typeface bold(){return android.graphics.Typeface.DEFAULT_BOLD;}}')

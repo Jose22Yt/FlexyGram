@@ -48,6 +48,8 @@ public final class BubblePreviewView extends View implements NotificationCenter.
         @Override public boolean draw(Canvas canvas, Path shape, int alpha) { return draw(canvas, shape, alpha, false); }
         @Override public boolean draw(Canvas canvas, Path shape, int alpha, boolean selected) {
             if (BubbleConfig.adaptive()) {
+                if (BubbleConfig.backgroundBlur() && serviceBubbleSurface.drawCached(
+                        canvas, shape, null, blurOwner, 0, 0, alpha, selected)) return true;
                 return serviceBubbleSurface.draw(canvas, shape, null, getWidth(), getHeight(), 0, 0, alpha, selected);
             }
             return blurOwner != null && blurOwner.draw(canvas, shape, 0, 0, alpha);
