@@ -14472,11 +14472,10 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     }
                 }
             }
-            if (MainTabsHelper.isCallsTabShown(currentAccount) || hideBottomNavigationBar) {
+            // Always reachable, including when the configurable bottom bar has no visible tabs.
             io.add(R.drawable.msg_settings_old, getString(R.string.Settings), () -> {
                 presentFragment(new SettingsActivity());
             });
-        }
 
         if (proxyMenuSubItem != null) {
             proxyMenuSubItem.subtextView.setTextColor(getThemedColor(Theme.key_groupcreate_sectionText));

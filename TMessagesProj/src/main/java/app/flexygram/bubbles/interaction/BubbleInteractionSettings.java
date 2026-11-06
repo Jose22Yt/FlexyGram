@@ -26,10 +26,10 @@ public final class BubbleInteractionSettings {
         int value = cachedStyle;
         if (value >= 0) return value;
         SharedPreferences p = prefs(context);
-        // Preserve explicit and legacy choices; new installs use Telegram interaction.
+        // Preserve explicit and legacy choices; new installs use the animated message panel.
         value = p.contains(STYLE_KEY)
-                ? p.getInt(STYLE_KEY, STYLE_DEFAULT)
-                : (p.getBoolean("tap_panel", false) ? STYLE_SIGNATURE : STYLE_DEFAULT);
+                ? p.getInt(STYLE_KEY, STYLE_SIGNATURE)
+                : (p.getBoolean("tap_panel", true) ? STYLE_SIGNATURE : STYLE_DEFAULT);
         cachedStyle = value == STYLE_DEFAULT ? STYLE_DEFAULT : STYLE_SIGNATURE;
         return cachedStyle;
     }
@@ -40,6 +40,11 @@ public final class BubbleInteractionSettings {
         prefs(context).edit().putInt(STYLE_KEY, safe).apply();
     }
 
+    /** Selection backdrop is independent of the optional persistent surface blur/glass. */
+    public static boolean backdropBlur(Context context) {
+        return context != null && signaturePanel(context)
+                && org.telegram.messenger.SharedConfig.canBlurChat();
+    }
     public static boolean signaturePanel(Context context) { return style(context) == STYLE_SIGNATURE; }
     public static boolean springBounce(Context context) { return style(context) == STYLE_SIGNATURE; }
     public static boolean motionEnabled() {
@@ -71,6 +76,6 @@ public final class BubbleInteractionSettings {
     }
 
     public static void resetTap(Context context) {
-        setStyle(context, STYLE_DEFAULT);
+        setStyle(context, STYLE_SIGNATURE);
     }
 }

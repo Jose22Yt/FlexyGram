@@ -23,11 +23,11 @@ public class SharedPreferences {
 }'''
 
 
-def test_composer_interaction_and_motion_are_opt_in_and_reset_to_native(tmp_path):
+def test_native_composer_and_enabled_message_motion_preserve_explicit_choices(tmp_path):
     probe(tmp_path, {
         'android/content/SharedPreferences.java': PREFS,
         'app/flexygram/composer/ComposerGeometry.java': 'package app.flexygram.composer;public class ComposerGeometry{public static final int TOUCH_SLOT=44;}',
-        'org/telegram/messenger/SharedConfig.java': 'package org.telegram.messenger;public class SharedConfig{public static boolean animationsEnabled(){return true;}}',
+        'org/telegram/messenger/SharedConfig.java': 'package org.telegram.messenger;public class SharedConfig{public static boolean capable=true;public static boolean canBlurChat(){return capable;}public static boolean chatBlurEnabled(){throw new AssertionError("surface blur must stay independent");}public static boolean animationsEnabled(){return true;}}',
         'org/telegram/messenger/AndroidUtilities.java': 'package org.telegram.messenger;public class AndroidUtilities{public static boolean isAccessibilityScreenReaderEnabled(){return false;}}',
         'android/content/Context.java': '''package android.content;import java.util.*;
 public class Context {public static final int MODE_PRIVATE=0;final Map<String,SharedPreferences> files=new HashMap<>();
@@ -47,12 +47,14 @@ public class Probe {
  FlexyComposerConfig.setStyle(1);FlexyComposerConfig.setGlass(true);FlexyComposerConfig.setReferenceIcons(true);
  check(FlexyComposerConfig.compact()&&FlexyComposerConfig.glass()&&FlexyComposerConfig.referenceIcons());
  FlexyComposerConfig.reset();check(!FlexyComposerConfig.compact()&&!FlexyComposerConfig.glass()&&!FlexyComposerConfig.referenceIcons());
- check(BubbleInteractionSettings.style(c)==BubbleInteractionSettings.STYLE_DEFAULT);
+ check(BubbleInteractionSettings.style(c)==BubbleInteractionSettings.STYLE_SIGNATURE&&BubbleInteractionSettings.backdropBlur(c));
+ BubbleInteractionSettings.setStyle(c,0);BubbleInteractionSettings.reload();check(BubbleInteractionSettings.style(c)==0&&!BubbleInteractionSettings.backdropBlur(c));
  BubbleInteractionSettings.setStyle(c,1);BubbleInteractionSettings.reload();check(BubbleInteractionSettings.style(c)==1);
- BubbleInteractionSettings.resetTap(c);BubbleInteractionSettings.reload();check(BubbleInteractionSettings.style(c)==0);
- var p=c.getSharedPreferences("flexy_bubble_interaction",0);p.data.clear();p.data.put("tap_panel",true);
- BubbleInteractionSettings.reload();check(BubbleInteractionSettings.style(c)==1);
- check(!FastMotionTiming.isEnabled());FastMotionConfig.load();check(!FastMotionConfig.isEnabled());
+ BubbleInteractionSettings.resetTap(c);BubbleInteractionSettings.reload();check(BubbleInteractionSettings.style(c)==1);
+ org.telegram.messenger.SharedConfig.capable=false;check(!BubbleInteractionSettings.backdropBlur(c));org.telegram.messenger.SharedConfig.capable=true;
+ var p=c.getSharedPreferences("flexy_bubble_interaction",0);p.data.clear();p.data.put("tap_panel",false);
+ BubbleInteractionSettings.reload();check(BubbleInteractionSettings.style(c)==0&&!BubbleInteractionSettings.backdropBlur(c));
+ check(FastMotionTiming.isEnabled());FastMotionConfig.load();check(FastMotionConfig.isEnabled());
  FastMotionConfig.setEnabled(true);FastMotionConfig.load();check(FastMotionConfig.isEnabled());
  FastMotionConfig.setEnabled(false);FastMotionConfig.load();check(!FastMotionConfig.isEnabled());
  }}''',

@@ -8,7 +8,7 @@ from test_render_work_reuse import JAVA, ROOT, probe
 def test_fixed_point_zero_one_and_system_compensation(tmp_path):
     probe(tmp_path, {'Probe.java': '''import app.flexygram.animation.FastMotionTiming;
 public class Probe {public static void main(String[] args){
- if(FastMotionTiming.isEnabled()||FastMotionTiming.duration(300)!=300)throw new AssertionError("native default");
+ if(!FastMotionTiming.isEnabled()||FastMotionTiming.duration(300)!=3)throw new AssertionError("fast default");
  FastMotionTiming.setEnabled(true);
  if(FastMotionTiming.SCALE!=.01d||FastMotionTiming.duration(300)!=3||FastMotionTiming.delay(200)!=2)throw new AssertionError();
  for(float s:new float[]{.01f,.5f,1,1.5f,5,6})for(long nominal:new long[]{100,150,200,300,500,1000}){

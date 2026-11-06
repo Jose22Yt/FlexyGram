@@ -51,7 +51,7 @@ object AppearanceConfig {
 
     /** Signature Home active folder inherits the native theme accent; no separate palette. */
     @JvmField
-    val folderThemeAccent = addConfig("FlexyFolderThemeAccent", ConfigItem.configTypeBool, false)
+    val folderThemeAccent = addConfig("FlexyFolderThemeAccent", ConfigItem.configTypeBool, true)
 
     // ---- Аватары ----
 
@@ -70,7 +70,7 @@ object AppearanceConfig {
     /** Мини-аватарки отправителей в списке чатов. */
     @JvmField
     val senderMiniAvatars =
-        addConfig("OEAppearanceSenderMiniAvatars", ConfigItem.configTypeBool, false)
+        addConfig("OEAppearanceSenderMiniAvatars", ConfigItem.configTypeBool, true)
 
     /** Прятать эмодзи-статус рядом с заголовком шапки. Дефолт false, как в exteraGram. */
     @JvmField
@@ -111,7 +111,7 @@ object AppearanceConfig {
      * Радиус считается как ceil(size * 16 / 56) dp, то есть 16 dp при кнопке 56 dp.
      */
     @JvmField
-    val squareFab = addConfig("OEAppearanceSquareFab", ConfigItem.configTypeBool, false)
+    val squareFab = addConfig("OEAppearanceSquareFab", ConfigItem.configTypeBool, true)
 
     @JvmStatic
     fun squareFab(): Boolean {
@@ -142,7 +142,7 @@ object AppearanceConfig {
     /** «Gooey»-анимация аватарки при оттягивании шапки профиля. Дефолт true, как в exteraGram. */
     @JvmField
     val gooeyAvatarAnimation =
-        addConfig("OEAppearanceGooeyAvatarAnimation", ConfigItem.configTypeBool, false)
+        addConfig("OEAppearanceGooeyAvatarAnimation", ConfigItem.configTypeBool, true)
 
     @JvmStatic
     fun gooeyAvatarAnimation(): Boolean {
@@ -179,7 +179,7 @@ object AppearanceConfig {
     /** Отдельные заголовки секций. Только UI. */
     @JvmField
     val separateHeaders =
-        addConfig("OEAppearanceSeparateHeaders", ConfigItem.configTypeBool, false)
+        addConfig("OEAppearanceSeparateHeaders", ConfigItem.configTypeBool, true)
 
     /** Стиль разделителя: 0 — скрыт, 1 — линия, 2 — сегменты. 0/1 привязаны к NaConfig.hideDividers, 2 — только UI. */
     @JvmField
@@ -220,7 +220,7 @@ object AppearanceConfig {
     /** M3-индикаторы загрузки. Дефолт true, как в exteraGram. */
     @JvmField
     val newLoadingStyle =
-        addConfig("OEAppearanceNewLoadingStyle", ConfigItem.configTypeBool, false)
+        addConfig("OEAppearanceNewLoadingStyle", ConfigItem.configTypeBool, true)
 
     /** M3-шапка чата. Дефолт false, как в exteraGram. */
     @JvmField
@@ -262,7 +262,7 @@ object AppearanceConfig {
 
     @JvmField
     val md3Player =
-        addConfig("OEAppearanceMd3Player", ConfigItem.configTypeBool, false)
+        addConfig("OEAppearanceMd3Player", ConfigItem.configTypeBool, true)
 
     @JvmStatic
     fun md3Player(): Boolean {
@@ -272,7 +272,7 @@ object AppearanceConfig {
 
     @JvmField
     val md3MiniPlayer =
-        addConfig("OEAppearanceMd3MiniPlayer", ConfigItem.configTypeBool, false)
+        addConfig("OEAppearanceMd3MiniPlayer", ConfigItem.configTypeBool, true)
 
     @JvmStatic
     fun md3MiniPlayer(): Boolean {
@@ -297,7 +297,7 @@ object AppearanceConfig {
 
     @JvmField
     val profileMusicCard =
-        addConfig("OEAppearanceProfileMusicCard", ConfigItem.configTypeBool, false)
+        addConfig("OEAppearanceProfileMusicCard", ConfigItem.configTypeBool, true)
 
     @JvmStatic
     fun profileMusicCard(): Boolean {

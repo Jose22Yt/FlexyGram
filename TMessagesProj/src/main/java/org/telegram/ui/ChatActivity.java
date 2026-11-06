@@ -11985,7 +11985,7 @@ public class ChatActivity extends BaseFragment implements
             scrimBlurBitmapShader = null;scrimBlurBitmapPaint = null;
             scrimBlurBitmap.recycle();scrimBlurBitmap = null;
         }
-        if (SharedConfig.chatBlurEnabled()) captureMessageMenuBlur(generation, true);
+        if (app.flexygram.bubbles.interaction.BubbleInteractionSettings.backdropBlur(getParentActivity())) captureMessageMenuBlur(generation, true);
     }
 
     private void dimBehindView(float value, boolean blur, boolean hidePagedownButtons) {
@@ -19325,7 +19325,7 @@ public class ChatActivity extends BaseFragment implements
 
         @Override
         protected void dispatchDraw(Canvas canvas) {
-            final boolean focusedMessageBackdrop = selectedBubbleMotionMessage != null && SharedConfig.chatBlurEnabled();
+            final boolean focusedMessageBackdrop = selectedBubbleMotionMessage != null && app.flexygram.bubbles.interaction.BubbleInteractionSettings.backdropBlur(getParentActivity());
             chatActivityEnterView.checkAnimation();
             updateChatListViewTopPadding();
             if (invalidateMessagesVisiblePart || (chatListItemAnimator != null && chatListItemAnimator.isRunning())) {

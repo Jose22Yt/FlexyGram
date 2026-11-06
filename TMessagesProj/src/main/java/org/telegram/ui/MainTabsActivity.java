@@ -1884,6 +1884,8 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
     }
 
     private void addChatsMenuItems(ItemOptions o, View button) {
+        // Independent of bar visibility and destination selection; never strand Settings.
+        o.add(R.drawable.msg_settings_old, getString(R.string.Settings), this::openFlexySettings);
         o.add(R.drawable.menu_recent, getString(R.string.RecentChats), () -> {
             o.dismiss();
             BackButtonMenuRecent.show(currentAccount, this, button);
