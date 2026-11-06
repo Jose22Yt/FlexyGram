@@ -544,7 +544,9 @@ public class ChatActivity extends BaseFragment implements
 
     private BlurredBackgroundColorProviderThemed blurredBackgroundColorProvider;
     private BlurredBackgroundColorProviderThemed blurredBackgroundColorProviderWhite;
+    private BlurredBackgroundColorProviderThemed blurredBackgroundColorProviderTop;
 
+    private int performanceOpenTransitionCookie, performanceCloseTransitionCookie;
     private boolean signatureNativeGlassAllowed;
     private boolean signatureLiquidGlassAllowed;
     private final Utilities.Callback<Boolean> signatureGlassPowerListener = ignored -> refreshSignatureNativeGlassPolicy();
@@ -4096,34 +4098,13 @@ public class ChatActivity extends BaseFragment implements
         Timer t = Timer.create("ChatActivity.createView");
         ChatsHelper chatsHelper = ChatsHelper.getInstance(currentAccount);
 
-        blurredBackgroundColorProvider = new BlurredBackgroundColorProviderThemed(themeDelegate, Theme.key_chat_messagePanelBackground) {
-            @Override
-            public int getBackgroundColor() {
-                if (!BlurredBackgroundProviderImpl.checkBlurEnabled(currentAccount, themeDelegate)) {
-                    return ColorUtils.setAlphaComponent(getThemedColor(Theme.key_chat_messagePanelBackground), 255);
-                }
-
-                final boolean isThemeLight = themeDelegate != null && !themeDelegate.isDark();
-                if (isThemeLight) {
-                    return ColorUtils.setAlphaComponent(super.getBackgroundColor(), 140);
-                }
-                return super.getBackgroundColor();
-            }
-        };
-        blurredBackgroundColorProviderWhite = new BlurredBackgroundColorProviderThemed(themeDelegate, Theme.key_windowBackgroundWhite) {
-            @Override
-            public int getBackgroundColor() {
-                if (!BlurredBackgroundProviderImpl.checkBlurEnabled(currentAccount, themeDelegate)) {
-                    return ColorUtils.setAlphaComponent(getThemedColor(Theme.key_windowBackgroundWhite), 255);
-                }
-
-                final boolean isThemeLight = themeDelegate != null && !themeDelegate.isDark();
-                if (isThemeLight) {
-                    return ColorUtils.setAlphaComponent(super.getBackgroundColor(), 140);
-                }
-                return super.getBackgroundColor();
-            }
-        };
+        // All chat islands use the input's material policy; keep each theme color distinct.
+        blurredBackgroundColorProvider = new app.flexygram.effects.ChatGlassColorProvider(
+                currentAccount, themeDelegate, Theme.key_chat_messagePanelBackground);
+        blurredBackgroundColorProviderWhite = new app.flexygram.effects.ChatGlassColorProvider(
+                currentAccount, themeDelegate, Theme.key_windowBackgroundWhite);
+        blurredBackgroundColorProviderTop = new app.flexygram.effects.ChatGlassColorProvider(
+                currentAccount, themeDelegate, Theme.key_chat_topPanelBackground);
 
         if (textSelectionHelper == null) {
             Timer.Task t1 = Timer.start(t, "new ChatActivityTextSelectionHelper");
@@ -5353,7 +5334,7 @@ public class ChatActivity extends BaseFragment implements
 
         actionBar.setupGlass(
             glassBackgroundDrawableFactory,
-            BlurredBackgroundProviderImpl.topPanelChatActivity(themeDelegate),
+            blurredBackgroundColorProviderTop,
             ChatObject.isForum(currentChat));
         app.exteraless.appearance.ChatHeaderUiHelper.applyChatHeaderGlassStyle(actionBar);
         //actionBar.setChatAvatarContainer(avatarContainer);
@@ -7602,6 +7583,7 @@ public class ChatActivity extends BaseFragment implements
 
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                if (BuildConfig.FLEXY_FRAME_DIAGNOSTICS) app.flexygram.performance.FrameDiagnostics.scrolling(getParentActivity(), newState != RecyclerView.SCROLL_STATE_IDLE);
                 if (newState != RecyclerView.SCROLL_STATE_IDLE) finishBubbleReturnForInput();
                 checkTranslation(false);
                 if (newState == RecyclerView.SCROLL_STATE_IDLE) {
@@ -9833,7 +9815,7 @@ public class ChatActivity extends BaseFragment implements
 
         checkUi_topPanelLayoutWidth();
         topPanelLayout.setBlurredBackground(glassBackgroundDrawableFactory.create(topPanelLayout)
-            .setColorProvider(BlurredBackgroundProviderImpl.topPanelChatActivity(themeDelegate))
+            .setColorProvider(blurredBackgroundColorProviderTop)
             .setRadius(dp(18))
             .setPadding(dp(7)));
 
@@ -29371,6 +29353,10 @@ public class ChatActivity extends BaseFragment implements
     @Override
     public void onTransitionAnimationStart(boolean isOpen, boolean backward) {
         super.onTransitionAnimationStart(isOpen, backward);
+        if (BuildConfig.FLEXY_FRAME_DIAGNOSTICS) {
+            int cookie = app.flexygram.performance.FrameDiagnostics.transitionStart(getParentActivity(), isOpen);
+            if (isOpen) performanceOpenTransitionCookie = cookie; else performanceCloseTransitionCookie = cookie;
+        }
         startMs = System.currentTimeMillis();
         int[] alowedNotifications = null;
         if (isOpen) {
@@ -29412,6 +29398,8 @@ public class ChatActivity extends BaseFragment implements
     @Override
     public void onTransitionAnimationEnd(boolean isOpen, boolean backward) {
         super.onTransitionAnimationEnd(isOpen, backward);
+        if (BuildConfig.FLEXY_FRAME_DIAGNOSTICS) app.flexygram.performance.FrameDiagnostics.transitionEnd(
+                getParentActivity(), isOpen ? performanceOpenTransitionCookie : performanceCloseTransitionCookie);
         app.flexygram.studio.FlexyStyleInstallHelper.resume(this);
         if (isOpen) {
             if (backward) {
@@ -46698,6 +46686,9 @@ public class ChatActivity extends BaseFragment implements
             }
             if (blurredBackgroundColorProviderWhite != null) {
                 blurredBackgroundColorProviderWhite.updateColors();
+            }
+            if (blurredBackgroundColorProviderTop != null) {
+                blurredBackgroundColorProviderTop.updateColors();
             }
 
             if (chatActivityEnterView != null) {

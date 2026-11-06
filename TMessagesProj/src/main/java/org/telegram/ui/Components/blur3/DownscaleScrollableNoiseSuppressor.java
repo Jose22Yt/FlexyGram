@@ -162,8 +162,9 @@ public class DownscaleScrollableNoiseSuppressor {
         public void invalidateRenderNodes(RenderNode renderNode) {
             final int originalWidth = renderNode.getWidth();
             final int originalHeight = renderNode.getHeight();
-            final int downsampledWidth = Math.round((float) originalWidth * k / scaleX);
-            final int downsampledHeight = Math.round((float) originalHeight * k / scaleY);
+            if (originalWidth <= 0 || originalHeight <= 0) return;
+            final int downsampledWidth = Math.max(1, Math.round((float) originalWidth * k / scaleX));
+            final int downsampledHeight = Math.max(1, Math.round((float) originalHeight * k / scaleY));
 
             final float scaleX = (float) downsampledWidth / originalWidth;
             final float scaleY = (float) downsampledHeight / originalHeight;
@@ -200,12 +201,7 @@ public class DownscaleScrollableNoiseSuppressor {
             canvas.drawRenderNode(renderNode);
             renderNodeOriginalWithOffset.endRecording();
 
-            renderNodeDownsampled[0].setPosition(0, 0, downsampledWidth, downsampledHeight);
-            canvas = renderNodeDownsampled[0].beginRecording(downsampledWidth, downsampledHeight);
-            canvas.scale(scaleX, scaleY);
-            canvas.drawRenderNode(renderNodeOriginalWithOffset);
-            renderNodeDownsampled[0].endRecording();
-
+            // The loop records index 0 once, before dependent effects.
             for (int a = 0; a < renderNodeDownsampled.length; a++) {
                 renderNodeDownsampled[a].setPosition(0, 0, downsampledWidth, downsampledHeight);
                 canvas = renderNodeDownsampled[a].beginRecording(downsampledWidth, downsampledHeight);

@@ -42,12 +42,13 @@ public final class FlexyStudioFiles {
         for(int i=0;i<dirs.length;i++)if(i>=keep||now-dirs[i].lastModified()>=TTL){File[] files=dirs[i].listFiles();if(files!=null)for(File file:files)file.delete();dirs[i].delete();}
     }
     static OutputStream openForExport(ContentResolver resolver,Uri uri)throws IOException {
-        try{return resolver.openOutputStream(uri,"wt");}
-        catch(FileNotFoundException | IllegalArgumentException unsupportedMode){return resolver.openOutputStream(uri,"w");}
+        try{OutputStream out=resolver.openOutputStream(uri,"wt");if(out!=null)return out;}
+        catch(FileNotFoundException | IllegalArgumentException unsupportedMode){ /* Retry providers without truncate mode. */ }
+        return resolver.openOutputStream(uri,"w");
     }
     public static Intent shareIntent(Context context,File file) {
         Uri uri=FileProvider.getUriForFile(context,context.getPackageName()+".flexystudio",file);
-        Intent intent=new Intent(Intent.ACTION_SEND).setType("application/octet-stream").putExtra(Intent.EXTRA_STREAM,uri);
+        Intent intent=new Intent(Intent.ACTION_SEND).setType(StudioSchema.MIME).putExtra(Intent.EXTRA_STREAM,uri);
         intent.setClipData(ClipData.newRawUri("FlexyStudio",uri));
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         return intent;

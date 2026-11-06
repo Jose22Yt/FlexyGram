@@ -31,3 +31,8 @@ include ':TMessagesProj'
 gradle.ext.androidxMediaModulePrefix = 'TMessagesProj_Modules:media3:media-'
 apply from: file("TMessagesProj_Modules/media/core_settings.gradle")
 project(':TMessagesProj_Modules:media3:media-lib-common-ktx').projectDir = file("TMessagesProj_Modules/media3/common-ktx")
+
+// Enable the standalone device test module explicitly; regular builds do not configure it.
+if (providers.gradleProperty('flexyPerformanceTools').orNull == 'true') {
+    include ':performance'
+}

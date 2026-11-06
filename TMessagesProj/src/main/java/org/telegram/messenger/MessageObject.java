@@ -8900,8 +8900,7 @@ public class MessageObject {
     public static StaticLayout makeStaticLayout(CharSequence text_, TextPaint paint, int width, float lineSpacingMult, float lineSpacingAdd, boolean dontIncludePad, Layout.Alignment alignment) {
         if (width <= 0) width = 1;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            final CharSequence text = /* Build.VERSION.SDK_INT >= Build.VERSION_CODES.P ?
-                PrecomputedText.create(text_, new PrecomputedText.Params.Builder(paint).build()) :*/ text_;
+            final CharSequence text = app.flexygram.performance.TextLayoutPrecompute.getOrSchedule(text_, paint);
 
             StaticLayout.Builder builder =
                     StaticLayout.Builder.obtain(text, 0, text.length(), paint, width)
@@ -8925,7 +8924,7 @@ public class MessageObject {
                 }
             }
             if (realWidthLarger) {
-                builder = StaticLayout.Builder.obtain(text, 0, text.length(), paint, width)
+                builder = StaticLayout.Builder.obtain(text_, 0, text_.length(), paint, width)
                                 .setLineSpacing(lineSpacingAdd, lineSpacingMult)
                                 .setBreakStrategy(StaticLayout.BREAK_STRATEGY_SIMPLE)
                                 .setHyphenationFrequency(StaticLayout.HYPHENATION_FREQUENCY_NONE)

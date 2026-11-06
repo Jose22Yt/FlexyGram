@@ -47,6 +47,7 @@ public class BlurredBackgroundSourceRenderNode implements BlurredBackgroundSourc
     }
 
     public void setSize(int width, int height) {
+        if (renderNode.getWidth() == width && renderNode.getHeight() == height) return;
         renderNode.setPosition(0, 0, width, height);
     }
 

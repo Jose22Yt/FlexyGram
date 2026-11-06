@@ -14,7 +14,7 @@
     <string name="FlexyStudioFileDescription">Конфигурация FlexyGram</string>
     <string name="FlexyStudioCompatible">Совместимо с FlexyGram</string>
     <string name="FlexyStudioIncludes">Включает следующие настройки:</string>
-    <string name="FlexyStudioApplyInfo">Включённые настройки будут применены во FlexyGram.</string>
+    <string name="FlexyStudioApplyInfo">Будут применены только отмеченные разделы. Откройте раздел для просмотра изменений.</string>
     <string name="FlexyStudioBubbles">Облачка сообщений</string>
     <string name="FlexyStudioHeader">Заголовок чата</string>
     <string name="FlexyStudioComposer">Панель ввода сообщения</string>
@@ -35,4 +35,23 @@
     <string name="FlexyStudioLoginFirst">Откройте FlexyGram и войдите перед импортом конфигурации.</string>
     <string name="FlexyStudioUnsupported">Не поддерживается: %1$s. Ни один раздел не применён.</string>
     <string name="FlexyStudioClientSettings">Все настройки клиента</string>
+    <string name="FlexyStudioAppearance">Внешний вид и эффекты</string>
+    <string name="FlexyStudioTheme">Тема и фон</string>
+    <string name="FlexyStudioChat">Чаты и меню сообщений</string>
+    <string name="FlexyStudioHome">Главный экран</string>
+    <string name="FlexyStudioNavigation">Навигация</string>
+    <string name="FlexyStudioGeneral">Общие настройки</string>
+    <string name="FlexyStudioAi">Настройки ИИ</string>
+    <string name="FlexyStudioPlugins">Настройки плагинов</string>
+    <string name="FlexyStudioChangeCount">Изменений: %1$d</string>
+    <string name="FlexyStudioAlreadyMatches">Совпадает с текущими настройками</string>
+    <string name="FlexyStudioViewChanges">Показать изменения</string>
+    <string name="FlexyStudioHideChanges">Скрыть изменения</string>
+    <string name="FlexyStudioDefaultValue">По умолчанию</string>
+    <string name="FlexyStudioEnabledValue">Включено</string>
+    <string name="FlexyStudioDisabledValue">Выключено</string>
+    <string name="FlexyStudioThemeChange">Заменить цвета темы и фон данными из файла.</string>
+    <string name="FlexyStudioExportError">Не удалось подготовить конфигурацию. Файл не создан.</string>
+    <string name="FlexyStudioPreviousChanges">Назад</string>
+    <string name="FlexyStudioNextChanges">Далее</string>
 </resources>

@@ -775,6 +775,7 @@ public abstract class BaseFragment {
 
     public void onBecomeFullyVisible() {
         isFullyVisible = true;
+        if (org.telegram.messenger.BuildConfig.FLEXY_FRAME_DIAGNOSTICS) app.flexygram.performance.FrameDiagnostics.screen(getParentActivity(), getClass().getSimpleName());
         AccessibilityManager mgr = (AccessibilityManager) ApplicationLoader.applicationContext.getSystemService(Context.ACCESSIBILITY_SERVICE);
         if (mgr.isEnabled()) {
             ActionBar actionBar = getActionBar();
