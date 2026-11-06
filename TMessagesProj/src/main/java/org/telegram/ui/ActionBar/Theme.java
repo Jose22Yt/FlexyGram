@@ -687,13 +687,13 @@ public class Theme {
                     int subTextColor;
                     int seekbarColor;
                     boolean useBlackText;
-                    int timeSurface = AndroidUtilities.getAverageColor(myMessagesAccentColor, myMessagesGradientAccentColor1);
                     if (myMessagesGradientAccentColor2 != 0) {
-                        timeSurface = AndroidUtilities.getAverageColor(timeSurface, myMessagesGradientAccentColor2);
+                        int color = AndroidUtilities.getAverageColor(myMessagesAccentColor, myMessagesGradientAccentColor1);
+                        color = AndroidUtilities.getAverageColor(color, myMessagesGradientAccentColor2);
                         if (myMessagesGradientAccentColor3 != 0) {
-                            timeSurface = AndroidUtilities.getAverageColor(timeSurface, myMessagesGradientAccentColor3);
+                            color = AndroidUtilities.getAverageColor(color, myMessagesGradientAccentColor3);
                         }
-                        useBlackText = AndroidUtilities.computePerceivedBrightness(timeSurface) > 0.705f;
+                        useBlackText = AndroidUtilities.computePerceivedBrightness(color) > 0.705f;
                     } else {
                         useBlackText = useBlackText(myMessagesAccentColor, myMessagesGradientAccentColor1);
                     }
@@ -754,17 +754,8 @@ public class Theme {
                         currentColors.put(key_chat_outMenu, textColor);
                         currentColors.put(key_chat_outMenuSelected, textColor);
 
-                        // Generated gradients need secondary metadata, not the message's white ink.
-                        // Keep distinct theme timestamp colors (including the selected variant).
-                        int timeColor = app.flexygram.bubbles.BubbleTimeColors.gradientSecondary(textColor, timeSurface);
-                        if (currentColorsNoAccent.indexOfKey(key_chat_outTimeText) < 0
-                                || currentColors.get(key_chat_outTimeText, currentColorsNoAccent.get(key_chat_outTimeText)) == textColor) {
-                            currentColors.put(key_chat_outTimeText, timeColor);
-                        }
-                        if (currentColorsNoAccent.indexOfKey(key_chat_outTimeSelectedText) < 0
-                                || currentColors.get(key_chat_outTimeSelectedText, currentColorsNoAccent.get(key_chat_outTimeSelectedText)) == textColor) {
-                            currentColors.put(key_chat_outTimeSelectedText, timeColor);
-                        }
+                        currentColors.put(key_chat_outTimeText, textColor);
+                        currentColors.put(key_chat_outTimeSelectedText, textColor);
 
                         currentColors.put(key_chat_outAudioDurationText, subTextColor);
                         currentColors.put(key_chat_outAudioDurationSelectedText, subTextColor);

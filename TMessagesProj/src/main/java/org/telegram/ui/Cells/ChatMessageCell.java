@@ -20808,10 +20808,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             Theme.chat_timePaint.setColor(
                 ColorUtils.blendARGB(
                     getThemedColor(Theme.key_chat_serviceText),
-                    getThemedColor(isDrawSelectionBackground() ?
-                        (currentMessageObject.isOutOwner() ? Theme.key_chat_outTimeSelectedText : Theme.key_chat_inTimeSelectedText) :
-                        (currentMessageObject.isOutOwner() ? Theme.key_chat_outTimeText : Theme.key_chat_inTimeText)
-                    ),
+                    getTimestampColor(isDrawSelectionBackground()),
                     getVideoTranscriptionProgress()
                 )
             );
@@ -20823,11 +20820,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                     Theme.chat_timePaint.setColor(getThemedColor(Theme.key_chat_mediaTimeText));
                 }
             } else {
-                if (currentMessageObject.isOutOwner()) {
-                    Theme.chat_timePaint.setColor(getThemedColor(isDrawSelectionBackground() ? Theme.key_chat_outTimeSelectedText : Theme.key_chat_outTimeText));
-                } else {
-                    Theme.chat_timePaint.setColor(getThemedColor(isDrawSelectionBackground() ? Theme.key_chat_inTimeSelectedText : Theme.key_chat_inTimeText));
-                }
+                Theme.chat_timePaint.setColor(getTimestampColor(isDrawSelectionBackground()));
             }
         }
     }
@@ -24706,10 +24699,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             Theme.chat_timePaint.setColor(
                 ColorUtils.blendARGB(
                     getThemedColor(Theme.key_chat_serviceText),
-                    getThemedColor(isDrawSelectionBackground() ?
-                        (currentMessageObject.isOutOwner() ? Theme.key_chat_outTimeSelectedText : Theme.key_chat_inTimeSelectedText) :
-                        (currentMessageObject.isOutOwner() ? Theme.key_chat_outTimeText : Theme.key_chat_inTimeText)
-                    ),
+                    getTimestampColor(isDrawSelectionBackground()),
                     getVideoTranscriptionProgress()
                 )
             );
@@ -24952,6 +24942,11 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     }
 
     /** Use the theme's normal timestamp ink, with no added halo or contrast pass. */
+    /** Match native incoming timestamp ink, resolved through the active chat theme/provider. */
+    private int getTimestampColor(boolean selected) {
+        return getThemedColor(selected ? Theme.key_chat_inTimeSelectedText : Theme.key_chat_inTimeText);
+    }
+
     private void drawReadableTimeLayout(Canvas canvas, StaticLayout layout, boolean selected) {
         if (layout != null) SpoilerEffect.layoutDrawMaybe(layout, canvas);
     }
@@ -24964,10 +24959,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             Theme.chat_timePaint.setColor(
                 ColorUtils.blendARGB(
                     getThemedColor(Theme.key_chat_serviceText),
-                    getThemedColor(isDrawSelectionBackground() ?
-                            (currentMessageObject.isOutOwner() ? Theme.key_chat_outTimeSelectedText : Theme.key_chat_inTimeSelectedText) :
-                            (currentMessageObject.isOutOwner() ? Theme.key_chat_outTimeText : Theme.key_chat_inTimeText)
-                    ),
+                    getTimestampColor(isDrawSelectionBackground()),
                     getVideoTranscriptionProgress()
                 )
             );
@@ -24979,11 +24971,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                     Theme.chat_timePaint.setColor(getThemedColor(Theme.key_chat_mediaTimeText));
                 }
             } else {
-                if (currentMessageObject.isOutOwner()) {
-                    Theme.chat_timePaint.setColor(getThemedColor(drawSelectionBackground ? Theme.key_chat_outTimeSelectedText : Theme.key_chat_outTimeText));
-                } else {
-                    Theme.chat_timePaint.setColor(getThemedColor(drawSelectionBackground ? Theme.key_chat_inTimeSelectedText : Theme.key_chat_inTimeText));
-                }
+                Theme.chat_timePaint.setColor(getTimestampColor(drawSelectionBackground));
             }
         }
         if (getTransitionParams().animateDrawingTimeAlpha) {

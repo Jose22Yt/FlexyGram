@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 JAVA = ROOT / 'TMessagesProj/src/main/java'
 
 
-def test_readable_message_viewport_fits_and_spring_never_flips_preview(tmp_path):
+def test_whole_popup_scrolls_without_cropping_or_shrinking_message(tmp_path):
     if not shutil.which('java'):
         pytest.skip('JDK required')
     probe = tmp_path / 'FullPreviewProbe.java'
@@ -24,13 +24,13 @@ public class FullPreviewProbe {
      if(chrome<64)continue;
      var p=ContextPreviewPlacement.fit(sourceTop,height,top,bottom,chrome,64,8);
      check(p.popupY>=top);
-     check(p.popupY+chrome+p.gapHeight<=bottom);
+     check(p.popupY+Math.min(bottom-top,chrome+p.gapHeight)<=bottom);
      float actualTop=sourceTop+height*(1-p.scale)*.5f+p.offsetY;
      float actualBottom=actualTop+p.viewportHeight;
      check(Math.abs(actualTop-(p.popupY+64+8))<.02f);
      check(actualBottom<=p.popupY+64+p.gapHeight-8+.02f);
-     check(p.scale>=.9f);
-     check(Math.abs(p.scrollRange+p.viewportHeight-height*p.scale)<.02f);
+     check(p.scale==1f);
+     check(Math.abs(p.scrollRange-Math.max(0,chrome+p.gapHeight-(bottom-top)))<.02f);
      if(height>1200)check(p.scrollRange>0);
      float finalScale=ContextPreviewPlacement.animatedScale(p.scale,1.2f,1.25f);
      if(p.scale<1f)check(Math.abs(finalScale-p.scale)<.00001f);

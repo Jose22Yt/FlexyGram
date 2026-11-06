@@ -7,7 +7,7 @@ def write(dest,root):
  def put(name,source):
   path=dest/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_text(source)
  java=root/'TMessagesProj/src/main/java'
- names=['BubbleActionPanelView','BubbleMenuConfig','BubbleMenuIcon','BubbleMenuGallery','BubbleInteractionSettings','BubbleInteractionSettingsActivity','BubbleTapMotion','SelectedBubbleMotion','DampedSpringCurve','ContextPreviewPlacement','ContextPreviewViewport']
+ names=['BubbleActionPanelView','BubbleMenuConfig','BubbleMenuIcon','BubbleMenuGallery','BubbleInteractionSettings','BubbleInteractionSettingsActivity','BubbleTapMotion','SelectedBubbleMotion','DampedSpringCurve','ContextPreviewPlacement','ContextPreviewViewport','MessageMenuScrollView']
  sources=[]
  for name in names:
   source=(java/'app/flexygram/bubbles/interaction'/(name+'.java')).read_text();sources.append(source);put('app/flexygram/bubbles/interaction/'+name+'.java',source)
@@ -100,3 +100,17 @@ public class NativeCaptureProbe{
  public static class PipRoundVideoView{public static class PipFrameLayout extends android.widget.FrameLayout{public PipFrameLayout(android.content.Context c){super(c);}}}
  CAPTURE
 }'''.replace('CAPTURE',capture))
+
+ # Execute the production composer redraw condition with native View/Canvas composition.
+ chat=(java/'org/telegram/ui/ChatActivity.java').read_text()
+ a=chat.index('            if (selectedBubbleMotionMessage != null && scrimBlurBitmapPaint != null && scrimViewProgress > 0f')
+ b=chat.index('{',a)+1;depth=1
+ while depth:depth+=(chat[b]=='{')-(chat[b]=='}');b+=1
+ block=chat[a:b]
+ put('ComposerOverlayProbe.java', '''import android.content.*;import android.graphics.*;import android.view.*;import android.widget.*;
+ public class ComposerOverlayProbe extends FrameLayout {
+ Object selectedBubbleMotionMessage=new Object();Paint scrimBlurBitmapPaint=new Paint();float scrimViewProgress=1;
+ View chatInputViewsContainer;
+ public ComposerOverlayProbe(Context c){super(c);chatInputViewsContainer=new View(c);chatInputViewsContainer.setBackgroundColor(Color.CYAN);addView(chatInputViewsContainer,new FrameLayout.LayoutParams(100,24,Gravity.BOTTOM));}
+ public void redraw(Canvas canvas){BLOCK}
+ }'''.replace('BLOCK',block))

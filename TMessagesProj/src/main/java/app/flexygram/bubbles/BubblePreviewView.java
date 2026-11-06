@@ -173,7 +173,7 @@ public final class BubblePreviewView extends View implements NotificationCenter.
             text.setColor(Theme.getColor(out ? Theme.key_chat_messageTextOut : Theme.key_chat_messageTextIn));
             int labelSave = canvas.save();canvas.translate(bounds.left + AndroidUtilities.dp(14), bounds.top + AndroidUtilities.dp(10));
             labels[i].draw(canvas);canvas.restoreToCount(labelSave);
-            time.setColor(Theme.getColor(out ? Theme.key_chat_outTimeText : Theme.key_chat_inTimeText));
+            time.setColor(Theme.getColor(Theme.key_chat_inTimeText));
             float baseline = bounds.bottom - AndroidUtilities.dp(8) - time.descent();
             float x = bounds.right - AndroidUtilities.dp(out ? 34 : 14) - time.measureText(TIME);
             canvas.drawText(TIME, x, baseline, time);

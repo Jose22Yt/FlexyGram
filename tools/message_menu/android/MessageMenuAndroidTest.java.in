@@ -46,16 +46,31 @@ public class MessageMenuAndroidTest {
   }
   live.recycle();backdrop.recycle();
  }
- @Test public void tallPreviewScrollsAtReadableScaleAndClampsAtBothEnds() {
-  var placement=ContextPreviewPlacement.fit(600,12000,100,900,480,72,8);
-  assertTrue(placement.scale>=.9f);assertTrue(placement.scrollRange>0);
-  float[] offset={0};var viewport=new ContextPreviewViewport(activity);
-  viewport.configure(placement.scrollRange,"Preview",value->offset[0]=value);layout(viewport,320);
-  viewport.onTouchEvent(android.view.MotionEvent.obtain(0,0,0,10,100,0));
-  viewport.onTouchEvent(android.view.MotionEvent.obtain(0,1,2,10,-50000,0));
-  assertEquals(placement.scrollRange,offset[0],.01f);
-  viewport.onTouchEvent(android.view.MotionEvent.obtain(0,2,2,10,50000,0));
-  assertEquals(0,offset[0],.01f);
+ @Test public void wholeSelectionScrollsWithOriginalMessageSizeAndCompleteBackground() {
+  for(int messageHeight:new int[]{120,450,6000}) {
+   int[] offset={0};var scroll=new MessageMenuScrollView(activity,y->offset[0]=y);
+   LinearLayout content=new LinearLayout(activity);content.setOrientation(1);
+   View reactions=new View(activity),bubble=new View(activity),actions=new View(activity);
+   content.addView(reactions,new LinearLayout.LayoutParams(320,64));
+   bubble.setBackgroundColor(Color.GREEN);content.addView(bubble,new LinearLayout.LayoutParams(320,messageHeight));
+   content.addView(actions,new LinearLayout.LayoutParams(320,240));scroll.addView(content);
+   scroll.setViewportHeight(700);layout(scroll,320);
+   assertEquals(messageHeight,bubble.getHeight());assertEquals(1f,bubble.getScaleX(),0f);
+   assertEquals(64+messageHeight+240,content.getHeight());assertTrue(scroll.getHeight()<=700);
+   int range=Math.max(0,content.getHeight()-scroll.getHeight());scroll.scrollTo(0,range);
+   assertEquals(range,scroll.getScrollY());assertEquals(range,offset[0]);
+   assertEquals(content.getHeight(),actions.getBottom());scroll.scrollTo(0,0);assertEquals(0,offset[0]);
+  }
+ }
+ @Test public void productionOverlayRedrawPreservesComposerAboveBlurWithoutChangingAlpha() {
+  ComposerOverlayProbe host=new ComposerOverlayProbe(activity);
+  host.measure(View.MeasureSpec.makeMeasureSpec(100,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(120,View.MeasureSpec.EXACTLY));host.layout(0,0,100,120);
+  Bitmap frame=Bitmap.createBitmap(100,120,Bitmap.Config.ARGB_8888);frame.eraseColor(Color.YELLOW);
+  Canvas canvas=new Canvas(frame);int save=canvas.getSaveCount();host.redraw(canvas);
+  assertEquals(Color.CYAN,frame.getPixel(50,110));assertEquals(Color.YELLOW,frame.getPixel(50,80));
+  assertEquals(1f,host.chatInputViewsContainer.getAlpha(),0f);assertEquals(View.VISIBLE,host.chatInputViewsContainer.getVisibility());assertEquals(save,canvas.getSaveCount());
+  frame.eraseColor(Color.YELLOW);host.scrimViewProgress=0;host.redraw(canvas);assertEquals(Color.YELLOW,frame.getPixel(50,110));
+  host.scrimViewProgress=1;host.selectedBubbleMotionMessage=null;host.redraw(canvas);assertEquals(Color.YELLOW,frame.getPixel(50,110));frame.recycle();
  }
  @Test public void selectedMenuHasOneNativeFrameClockAndInterruptsCleanly() {
   int[] draws={0},done={0};var motion=new SelectedBubbleMotion();
@@ -146,7 +161,7 @@ public class MessageMenuAndroidTest {
    var placement=ContextPreviewPlacement.fit(600,height,100,100+available,chrome,72,8);
    float bubbleTop=600+height*(1-placement.scale)*.5f+placement.offsetY,bubbleBottom=bubbleTop+placement.viewportHeight;
    assertTrue(bubbleTop>=placement.popupY+64+8);assertTrue(bubbleBottom<=placement.popupY+72+placement.gapHeight+.01f);
-   assertTrue(placement.popupY+chrome+placement.gapHeight<=100+available);
+   assertTrue(placement.popupY+Math.min(available,chrome+placement.gapHeight)<=100+available);
   }
  }
 }

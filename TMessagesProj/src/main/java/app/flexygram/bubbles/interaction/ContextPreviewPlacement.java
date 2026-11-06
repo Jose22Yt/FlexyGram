@@ -18,15 +18,15 @@ public final class ContextPreviewPlacement {
             int safeBottom, int chromeHeight, int gapTop, int padding) {
         float height=Math.max(1f,sourceHeight);
         int available=Math.max(1,safeBottom-safeTop);
-        int gap=Math.max(1,Math.min((int)Math.ceil(height)+2*padding,available-chromeHeight));
+        int gap=Math.max(1,(int)Math.ceil(height)+2*padding);
         int inset=Math.min(Math.max(0,padding),Math.max(0,(gap-1)/2));
-        // Large messages remain legible; the existing preview viewport scrolls the overflow.
-        float viewport=Math.max(1,gap-2*inset);
-        float scale=Math.min(1f,Math.max(.9f,viewport/height));
-        viewport=Math.min(viewport,height*scale);
+        // Never crop or squeeze the message to reserve space for the action cards.
+        // The entire popup scrolls when reactions + message + actions exceed the window.
+        float scale=1f;
+        float viewport=height;
         int total=Math.min(available,chromeHeight+gap);
         int y=Math.max(safeTop,Math.min(Math.round(sourceTop)-gapTop-inset,safeBottom-total));
         float offset=y+gapTop+inset-(sourceTop+height*(1f-scale)*.5f);
-        return new ContextPreviewPlacement(scale,offset,Math.max(0,height*scale-viewport),viewport,y,gap);
+        return new ContextPreviewPlacement(scale,offset,Math.max(0,chromeHeight+gap-available),viewport,y,gap);
     }
 }

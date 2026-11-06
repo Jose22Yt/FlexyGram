@@ -77,4 +77,5 @@ def test_live_cards_share_existing_blur_source_and_cover_input_without_mutating_
     assert 'canvas.drawRect(0, 0, getMeasuredWidth(), getMeasuredHeight(), scrimBlurBitmapPaint);' in background
     assert end<chat.index('if (scrimView != null || messageEnterTransitionContainer.isRunning())',end)
     assert 'chatInputViewsContainer.setAlpha' not in chat[start:end]
+    assert 'super.drawChild(canvas, chatInputViewsContainer, getDrawingTime());' in chat[end:chat.index('if (scrimView != null || messageEnterTransitionContainer.isRunning())',end)]
     assert 'chatActivityEnterView.setAlpha' not in chat[start:end]
