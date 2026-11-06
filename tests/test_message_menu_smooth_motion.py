@@ -8,7 +8,7 @@ def test_actual_menu_motion_has_small_steps_single_frame_owner_and_interruptible
         'android/os/SystemClock.java': 'package android.os;public class SystemClock{public static long now=1000;public static long uptimeMillis(){return now;}}',
         'android/view/Choreographer.java': '''package android.view;public class Choreographer{
  public interface FrameCallback{void doFrame(long t);}static final Choreographer instance=new Choreographer();public FrameCallback pending;
- public static Choreographer getInstance(){return instance;}public void postFrameCallback(FrameCallback c){if(pending!=null&&pending!=c)throw new AssertionError("multiple owners");pending=c;}
+ public static Choreographer getInstance(){return instance;}public void postFrameCallback(FrameCallback c){if(pending!=null)throw new AssertionError("duplicate frame callback");pending=c;}
  public void removeFrameCallback(FrameCallback c){if(pending==c)pending=null;}
  public void frame(long nanos){android.os.SystemClock.now=nanos/1000000;FrameCallback c=pending;pending=null;if(c!=null)c.doFrame(nanos);}
 }''',
@@ -26,11 +26,22 @@ public class Probe{
     check(motion.progress()>=0&&motion.progress()<=1);previous=motion.panelScale();
    }
    check(!motion.isRunning()&&motion.panelScale()==1f&&frames<=hz/2);
-   motion.close(()->done[0]++);t+=1000000000L/hz;Choreographer.getInstance().frame(t);
+   motion.close(()->done[0]++);float previousClose=motion.progress();int closeFrames=0;
+   while(motion.hasOwner()&&closeFrames++<hz){t+=1000000000L/hz;Choreographer.getInstance().frame(t);
+    check(motion.progress()<=previousClose+.0001f);previousClose=motion.progress();}
+   check(!motion.hasOwner()&&motion.progress()==0&&done[0]==1&&closeFrames<=hz/3+2);
    motion.finishImmediately();motion.finishImmediately();check(done[0]==1&&!motion.hasOwner());
    check(Choreographer.getInstance().pending==null);
    motion.enter(()->draws[0]++);motion.close(()->done[0]++);motion.reset();check(done[0]==2);
    check(!motion.isRunning()&&Choreographer.getInstance().pending==null);
+  }
+  // A redraw can synchronously cancel or replace its owner: no stale/duplicate frame survives.
+  for(boolean replace:new boolean[]{false,true}){
+   var current=new SelectedBubbleMotion();int[] calls={0};
+   current.enter(()->{if(++calls[0]==2){current.reset();if(replace)current.enter(()->{});}});
+   Choreographer.getInstance().frame(9_000_000_000L);
+   check(current.isRunning()==replace);
+   check((Choreographer.getInstance().pending!=null)==replace);current.reset();
   }
   BubbleInteractionSettings.enabled=false;var motion=new SelectedBubbleMotion();motion.enter(()->{});
   check(!motion.isRunning()&&motion.progress()==1);motion.close();check(!motion.hasOwner());
@@ -52,3 +63,14 @@ def test_compact_popup_captures_once_before_show_and_does_not_create_a_second_cl
     assert 'dimBehindView(v, true, true)' not in compact
     capture=method(chat,'private void captureMessageMenuBlur(')
     assert 'blurGeneration != scrimBlurGeneration' in capture
+
+
+def test_popup_close_updates_window_once_and_keeps_pivots_outside_frame_callback():
+    chat=(JAVA/'org/telegram/ui/ChatActivity.java').read_text()
+    dismiss=method(chat,'public void dismiss(boolean animated)')
+    assert dismiss.count('update();')==1
+    assert dismiss.index('setFocusable(false)')<dismiss.index('update();')
+    show=chat[chat.index('Runnable showMenu = () -> {',chat.index('final MessageObject signatureSelectedMessage')):]
+    frame=show[show.index('selectedBubbleMotion.enter(() -> {'):show.index('}, handoff?')]
+    assert 'setPivot' not in frame and 'requestLayout(' not in frame and '.measure(' not in frame
+    assert show.index('popupLayout.setPivotX')<show.index('selectedBubbleMotion.enter(')

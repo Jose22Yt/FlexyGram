@@ -119,10 +119,8 @@ public final class BubbleActionPanelView extends LinearLayout {
         boolean centeredFooter=style==BubbleMenuConfig.GRID&&action==Action.MORE;
         row.setGravity(tile||centeredFooter?Gravity.CENTER:Gravity.CENTER_VERTICAL);row.setMinimumHeight(dp(context,tile?80:44));
         row.setPadding(dp(context,tile?4:14),dp(context,8),dp(context,tile?4:14),dp(context,8));
-        ImageView icon=new ImageView(context);icon.setScaleType(ImageView.ScaleType.FIT_CENTER);android.graphics.drawable.Drawable symbol=app.flexygram.icons.CupertinoIcons.create(context.getResources(),iconResource(action));
-        if(symbol==null)symbol=new BubbleMenuIcon(action,color);
-        else symbol.setColorFilter(new android.graphics.PorterDuffColorFilter(color,android.graphics.PorterDuff.Mode.SRC_IN));
-        icon.setImageDrawable(symbol);
+        ImageView icon=new ImageView(context);icon.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        icon.setImageDrawable(new BubbleMenuIcon(action,color));
         TextView title=new TextView(context);title.setText(label(action));title.setTextSize(tile?12:14.5f);title.setTextColor(color);
         title.setTypeface(org.telegram.messenger.AndroidUtilities.bold());
         title.setGravity(tile?Gravity.CENTER:Gravity.START|Gravity.CENTER_VERTICAL);title.setMaxLines(2);title.setEllipsize(TextUtils.TruncateAt.END);

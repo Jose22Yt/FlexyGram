@@ -2001,7 +2001,6 @@ public class BottomSheet extends Dialog implements BaseFragment.AttachedSheet {
 
     @Override
     public boolean dispatchTouchEvent(@NonNull MotionEvent ev) {
-        app.flexygram.icons.IconPressFeedback.observe(getWindow().getDecorView(), ev);
         if (dismissed) {
             return false;
         }

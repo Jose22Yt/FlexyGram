@@ -25,6 +25,7 @@ public final class SelectedBubbleMotion implements Choreographer.FrameCallback {
     private Runnable invalidate, completion;
     private boolean running, closing;
     private long lastFrame, started;
+    private long generation;
     public float progress() { return Math.max(0f, Math.min(1f, phase.value)); }
     public float panelProgress() { return phase.value; }
     /** Preserve the spring's overshoot for spatial motion; alpha/reveal stay bounded. */
@@ -79,6 +80,7 @@ public final class SelectedBubbleMotion implements Choreographer.FrameCallback {
     }
     @Override public void doFrame(long frameTimeNanos) {
         if (!running) return;
+        long frameGeneration = generation;
         float dt = lastFrame == 0 ? 1f/120f : Math.max(0f, Math.min(.064f, (frameTimeNanos-lastFrame)/1_000_000_000f));
         lastFrame = frameTimeNanos;
         boolean mx=x.step(dt), my=y.step(dt), mp=phase.step(dt), mb=backdrop.step(dt);
@@ -89,7 +91,9 @@ public final class SelectedBubbleMotion implements Choreographer.FrameCallback {
             if (closing) finish(); else if (invalidate != null) invalidate.run();
         } else {
             if (invalidate != null) invalidate.run();
-            Choreographer.getInstance().postFrameCallback(this);
+            // A redraw may synchronously close/reset this owner or hand off to a new gesture.
+            if (running && generation == frameGeneration)
+                Choreographer.getInstance().postFrameCallback(this);
         }
     }
     /** A new gesture takes priority over the decorative return, with exactly one cleanup callback. */
@@ -99,6 +103,7 @@ public final class SelectedBubbleMotion implements Choreographer.FrameCallback {
         finish();
     }
     private void finish() {
+        generation++;
         Choreographer.getInstance().removeFrameCallback(this); running = false;
         backdrop.snap(0f);backdropAvailable=false;
         Runnable redraw=invalidate, done=completion; completion=null; invalidate=null;
@@ -106,6 +111,7 @@ public final class SelectedBubbleMotion implements Choreographer.FrameCallback {
         if (done != null) done.run();
     }
     public void reset() {
+        generation++;
         Choreographer.getInstance().removeFrameCallback(this); running=false;
         x.snap(1f); y.snap(1f); phase.snap(1f);backdrop.snap(0f);backdropAvailable=false;
         Runnable done=completion; completion=null; invalidate=null; closing=false;

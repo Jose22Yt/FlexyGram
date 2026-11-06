@@ -40,7 +40,7 @@ public class BackDrawable extends Drawable {
     private boolean rotated = true;
     private int arrowRotation;
 
-    private boolean iosStyle = true;
+    private boolean iosStyle;
     private android.graphics.Path iosPath;
     private float lastDensity = -1;
 

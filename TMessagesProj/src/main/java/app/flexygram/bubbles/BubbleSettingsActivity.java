@@ -36,21 +36,22 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
         timestampRow = addRow("flexyBubbleSmallTimestamp");
         transparencyRow = blurRow = borderHeaderRow = enabledRow = fusionHeaderRow = -1;
         borderRow = positionRow = fuseRow = styleRow = pearlRow = fusionIntensityRow = fusionAdaptRow = -1;
-        transparencyRow = addRow("flexyBubbleTransparency");
-        blurRow = addRow("flexyBubbleBlur");
-        borderHeaderRow = addHeader("FlexyBubbleBorderSection");
-        enabledRow = addRow("flexyBubbleOutlineEnabled");
-        fusionHeaderRow = -1;
-        borderRow = positionRow = fuseRow = styleRow = pearlRow = fusionIntensityRow = fusionAdaptRow = -1;
-        if (BubbleConfig.outlineEnabled()) {
-            styleRow = addRow("flexyBubbleOutlineStyle"); borderRow = addRow("flexyBubbleBorderWidth");
-            positionRow = addRow("flexyBubbleBorderPosition");
-            if (BubbleConfig.outlineStyle() != 0) {
-                pearlRow = addRow("flexyBubblePearlIntensity");
+        if (!BubbleConfig.adaptive()) {
+            transparencyRow = addRow("flexyBubbleTransparency");
+            blurRow = addRow("flexyBubbleBlur");
+        } else {
+            borderHeaderRow = addHeader("FlexyBubbleBorderSection");
+            enabledRow = addRow("flexyBubbleOutlineEnabled");
+            if (BubbleConfig.outlineEnabled()) {
+                styleRow = addRow("flexyBubbleOutlineStyle"); borderRow = addRow("flexyBubbleBorderWidth");
+                positionRow = addRow("flexyBubbleBorderPosition");
+                if (BubbleConfig.outlineStyle() != 0) {
+                    pearlRow = addRow("flexyBubblePearlIntensity");
+                }
+                fusionHeaderRow = addHeader("FlexyBubbleFusionSection");
+                fuseRow=addRow("flexyBubbleFusionMode");
+                if(BubbleConfig.fusionMode()==2){fusionIntensityRow=addRow("flexyBubbleFusionIntensity");fusionAdaptRow=addRow("flexyBubbleFusionAdapt");}
             }
-            fusionHeaderRow = addHeader("FlexyBubbleFusionSection");
-            fuseRow=addRow("flexyBubbleFusionMode");
-            if(BubbleConfig.fusionMode()==2){fusionIntensityRow=addRow("flexyBubbleFusionIntensity");fusionAdaptRow=addRow("flexyBubbleFusionAdapt");}
         }
     }
     @Override protected String getActionBarTitle() { return getString(R.string.FlexyBubblesTitle); }

@@ -35048,7 +35048,17 @@ public class ChatActivity extends BaseFragment implements
                     }
                 }
                 @Override public void dismiss(boolean animated) {
+                    if (compactContext && signatureClosing) {
+                        if (!animated) selectedBubbleMotion.finishImmediately();
+                        return;
+                    }
+                    boolean springClose = compactContext && animated && selectedBubbleMotion.hasOwner();
                     setTouchable(false);
+                    if (springClose) {
+                        setFocusable(false);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) setTouchModal(false);
+                    }
+                    // Apply all window flags in a single WindowManager update.
                     try {
                         update();
                     } catch (Exception ignore) {
@@ -35057,13 +35067,8 @@ public class ChatActivity extends BaseFragment implements
                         scrimPopupContainerLayout.setOnTouchListener(null);
                         scrimPopupContainerLayout.setEnabled(false);
                     }
-                    if (compactContext && animated && selectedBubbleMotion.hasOwner()) {
-                        if (signatureClosing) return;
+                    if (springClose) {
                         signatureClosing = true;
-                        setFocusable(false);
-                        setTouchable(false);
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) setTouchModal(false);
-                        update();
                         chatLayoutManager.setCanScrollVertically(true);
                         if (chatActivityEnterView != null && chatActivityEnterView.getEditField() != null) {
                             chatActivityEnterView.getEditField().setAllowDrawCursor(true);
@@ -35073,10 +35078,6 @@ public class ChatActivity extends BaseFragment implements
                             if (finalReactionsLayout1 != null) finalReactionsLayout1.dismissParent(false);
                         });
                         updateMessageListAccessibilityVisibility();
-                        return;
-                    }
-                    if (compactContext && signatureClosing) {
-                        selectedBubbleMotion.finishImmediately(); // Complete the owner before delivering the new touch.
                         return;
                     }
                     if (compactContext) selectedBubbleMotion.finishImmediately();
@@ -35264,6 +35265,8 @@ public class ChatActivity extends BaseFragment implements
                     popupLayout.setAlpha(0f);
                     popupLayout.setScaleX(.94f);popupLayout.setScaleY(.94f);
                     popupLayout.setTranslationY(dp(8));
+                    popupLayout.setPivotY(0f);
+                    popupLayout.setPivotX(signatureSelectedMessage.isOutOwner() ? popupLayout.getMeasuredWidth() : 0f);
                     if (finalReactionsLayout != null) {
                         finalReactionsLayout.beginSignatureMotion();finalReactionsLayout.setSignatureMotionProgress(0f);
                     }
@@ -35287,8 +35290,6 @@ public class ChatActivity extends BaseFragment implements
                         scrimPaintAlpha = .2f * alpha;
                         scrimViewProgress = alpha * selectedBubbleMotion.backdropProgress();
                         if (sideControlsButtonsLayout != null) sideControlsButtonsLayout.setAlpha(1f-alpha);
-                        popupLayout.setPivotY(0f);
-                        popupLayout.setPivotX(signatureSelectedMessage.isOutOwner() ? popupLayout.getMeasuredWidth() : 0f);
                         popupLayout.setScaleX(selectedBubbleMotion.panelScale());
                         popupLayout.setScaleY(selectedBubbleMotion.panelScale());
                         popupLayout.setTranslationY(AndroidUtilities.dpf2(selectedBubbleMotion.panelOffset()));
@@ -42951,10 +42952,6 @@ public class ChatActivity extends BaseFragment implements
         @Override public boolean drawFlexyBubbleWallpaper(ChatMessageCell cell, Canvas canvas, android.graphics.Path path, int alpha, boolean selected) {
             if (app.flexygram.bubbles.BubbleConfig.adaptive()) {
                 if (contentView == null || chatListView == null) return false;
-                if (app.flexygram.bubbles.BubbleConfig.backgroundBlur() && serviceBubbleSurface.drawCached(
-                        canvas, path, themeDelegate, contentView.signatureWallpaperBlur,
-                        cell.getX() + chatListView.getX(),
-                        cell.getY() + cell.getPaddingTop() + chatListView.getY(), alpha, selected)) return true;
                 // Reuse the cell's native service coordinates, including keyboard/pan/topic offsets.
                 cell.applyServiceShaderMatrix();
                 return serviceBubbleSurface.drawMapped(canvas, path, themeDelegate, alpha, selected);

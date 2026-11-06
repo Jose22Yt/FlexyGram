@@ -98,8 +98,8 @@ public class CupertinoAndroidTest {
   assertEquals(ImageView.ScaleType.CENTER_INSIDE,image.getScaleType());assertEquals(before,image.getImageMatrix());
  }
 
- @Test public void backUsesIosChevronByDefaultAndKeepsNativeCloseMorph(){
-  org.telegram.ui.ActionBar.BackDrawable back=new org.telegram.ui.ActionBar.BackDrawable(false);assertTrue(back.isIosStyle());
+ @Test public void backDefaultsToNativeAndKeepsOptionalIosCloseMorph(){
+  org.telegram.ui.ActionBar.BackDrawable back=new org.telegram.ui.ActionBar.BackDrawable(false);assertFalse(back.isIosStyle());back.setIosStyle(true);
   back.setColor(Color.MAGENTA);back.setRotatedColor(Color.MAGENTA);back.setBounds(0,0,24,24);
   for(float rotation:new float[]{0,.25f,.5f,.75f,1}){
    back.setRotation(rotation,false);Bitmap b=Bitmap.createBitmap(24,24,Bitmap.Config.ARGB_8888);back.draw(new Canvas(b));

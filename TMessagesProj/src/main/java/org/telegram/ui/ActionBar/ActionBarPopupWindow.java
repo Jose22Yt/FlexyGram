@@ -138,11 +138,6 @@ public class ActionBarPopupWindow extends PopupWindow {
         private View topView;
         protected ActionBarPopupWindow window;
 
-        @Override public boolean dispatchTouchEvent(android.view.MotionEvent event) {
-            app.flexygram.icons.IconPressFeedback.observe(this, event);
-            return super.dispatchTouchEvent(event);
-        }
-
         public int subtractBackgroundHeight;
         Rect rect;
 

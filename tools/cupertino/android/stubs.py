@@ -12,7 +12,7 @@ def write(dest,root):
  for p in (dest/'app/flexygram/icons').glob('*.java'):
   if p.name not in allowed:p.unlink()
  for name in allowed:
-  p=java/'app/flexygram/icons'/name
+  p=root/'tools/cupertino/reference/src/app/flexygram/icons'/name
   target=dest/'app/flexygram/icons'/p.name;target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(p,target)
  put('androidx/annotation/NonNull.java','package androidx.annotation;public @interface NonNull{}')
  put('org/telegram/messenger/AndroidUtilities.java','package org.telegram.messenger;public class AndroidUtilities{public static float density=1;public static int dp(float v){return Math.round(v*density);}public static float lerp(float a,float b,float t){return a+(b-a)*t;}}')
@@ -20,4 +20,4 @@ def write(dest,root):
  put('androidx/core/graphics/ColorUtils.java','package androidx.core.graphics;public class ColorUtils{public static int blendARGB(int a,int b,float t){return android.graphics.Color.argb(Math.round(android.graphics.Color.alpha(a)*(1-t)+android.graphics.Color.alpha(b)*t),Math.round(android.graphics.Color.red(a)*(1-t)+android.graphics.Color.red(b)*t),Math.round(android.graphics.Color.green(a)*(1-t)+android.graphics.Color.green(b)*t),Math.round(android.graphics.Color.blue(a)*(1-t)+android.graphics.Color.blue(b)*t));}}')
  put('org/telegram/ui/ActionBar/BackDrawable.java',(java/'org/telegram/ui/ActionBar/BackDrawable.java').read_text())
  # Font is the exact shipped upstream asset; rendering uses Android's native Typeface/Canvas.
- shutil.copyfile(root/'TMessagesProj/src/main/assets/cupertino/CupertinoIcons.ttf',dest.parents[2]/'CupertinoIcons.ttf')
+ shutil.copyfile(root/'tools/cupertino/reference/assets/cupertino/CupertinoIcons.ttf',dest.parents[2]/'CupertinoIcons.ttf')

@@ -8,12 +8,10 @@ import org.telegram.messenger.R;
 import org.telegram.ui.SettingsActivity;
 
 /** Reuses Telegram's own coloured Settings icon background and filled native glyphs. */
-public final class SettingsCategoryIcon extends Drawable implements Drawable.Callback, app.flexygram.icons.IconPressFeedback.Target {
+public final class SettingsCategoryIcon extends Drawable implements Drawable.Callback {
     private final Drawable glyph;
     private final SettingsActivity.SettingCell.Background background=new SettingsActivity.SettingCell.Background();
     private int alpha=255;
-    private float iconPressScale=1;
-    @Override public void setIconPressScale(float scale){iconPressScale=scale;invalidateSelf();}
     public static Drawable create(Context context,int resource){return resource<=0?null:new SettingsCategoryIcon(context,resource);}
     public static Drawable create(Context context,int resource,int top,int bottom){if(resource<=0)return null;SettingsCategoryIcon icon=new SettingsCategoryIcon(context,resource);icon.background.setColor(top,bottom);return icon;}
     private SettingsCategoryIcon(Context context,int resource){
@@ -28,13 +26,13 @@ public final class SettingsCategoryIcon extends Drawable implements Drawable.Cal
         else if(name.contains("history")||name.contains("recent")){color=0xffdd6150;}
         else if(name.contains("layers")){color=0xff6961da;}
         else if(name.contains("info")){filled=R.drawable.msg_info_filled_solar;}
-        glyph=context.getDrawable(app.exteraless.icons.BaseIconPacks.getSelected()==app.exteraless.icons.BaseIconPacks.BASE_DEFAULT?resource:filled).mutate();glyph.setColorFilter(Color.WHITE,PorterDuff.Mode.SRC_IN);
+        glyph=context.getDrawable(filled).mutate();glyph.setColorFilter(Color.WHITE,PorterDuff.Mode.SRC_IN);
         int top=androidx.core.graphics.ColorUtils.blendARGB(color,Color.WHITE,.16f);
         background.setColor(top,color);background.setCircle(false);background.setDrawBorder(true);
         background.setCallback(this);glyph.setCallback(this);
     }
     @Override protected void onBoundsChange(Rect bounds){background.setBounds(bounds);int inset=Math.round(bounds.width()*.125f);glyph.setBounds(bounds.left+inset,bounds.top+inset,bounds.right-inset,bounds.bottom-inset);}
-    @Override public void draw(Canvas canvas){int save=alpha<255?canvas.saveLayerAlpha(getBounds().left,getBounds().top,getBounds().right,getBounds().bottom,alpha):-1;background.draw(canvas);int iconSave=canvas.save();canvas.scale(iconPressScale,iconPressScale,getBounds().exactCenterX(),getBounds().exactCenterY());glyph.draw(canvas);canvas.restoreToCount(iconSave);if(save>=0)canvas.restoreToCount(save);}
+    @Override public void draw(Canvas canvas){int save=alpha<255?canvas.saveLayerAlpha(getBounds().left,getBounds().top,getBounds().right,getBounds().bottom,alpha):-1;background.draw(canvas);glyph.draw(canvas);if(save>=0)canvas.restoreToCount(save);}
     @Override public void setAlpha(int alpha){this.alpha=alpha;invalidateSelf();}
     @Override public void setColorFilter(ColorFilter filter){} // Keep the native white symbol over the colour tile.
     @Override public int getOpacity(){return PixelFormat.TRANSLUCENT;}

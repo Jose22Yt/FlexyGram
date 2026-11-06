@@ -27,7 +27,7 @@ public class AdaptiveBorderAndroidTest {
      BubbleConfig.setFusionMode(fusion);BubbleConfig.setPearlIntensity(70);BubbleConfig.setFusionIntensity(70);
      Bitmap edge=render(d,cache);int changed=0;
      for(int y=0;y<100;y++)for(int x=0;x<180;x++)if(edge.getPixel(x,y)!=plain.getPixel(x,y))changed++;
-     assertTrue("border missing mode="+effect+" style="+style+" position="+position+" fusion="+fusion,changed>0);
+     assertEquals("border belongs only to the adaptive material",effect==BubbleConfig.ADAPTIVE,changed>0);
      assertEquals("border cannot repaint native fill",plain.getPixel(80,44),edge.getPixel(80,44));
      assertEquals(0,edge.getPixel(0,0));assertEquals(0,edge.getPixel(179,99));edge.recycle();
     }
@@ -40,7 +40,7 @@ public class AdaptiveBorderAndroidTest {
   Bitmap first=render(d,cache);long builds=SignatureBorderPath.testRebuilds;
   for(int i=0;i<100;i++){Bitmap b=render(d,cache);assertTrue(first.sameAs(b));b.recycle();}
   assertEquals(builds,SignatureBorderPath.testRebuilds);first.recycle();
-  for(int mode:new int[]{1,0,1,0}){BubbleConfig.setSurfaceEffect(mode);BubbleConfig.load();assertEquals(17,BubbleConfig.borderTenths());assertEquals(3,BubbleConfig.borderPosition());assertEquals(2,BubbleConfig.outlineStyle());assertTrue(BubbleConfig.outlineEnabled());}
+  for(int mode:new int[]{1,0,1,0}){BubbleConfig.setSurfaceEffect(mode);BubbleConfig.load();assertEquals(17,BubbleConfig.borderTenths());assertEquals(3,BubbleConfig.borderPosition());assertEquals(2,BubbleConfig.outlineStyle());assertEquals(mode==BubbleConfig.ADAPTIVE,BubbleConfig.outlineEnabled());}
  }
  @Test public void zeroDrawableAlphaHidesFillAndBorderInBothModes(){
   BubbleConfig.setOutlineEnabled(true);BubbleConfig.setFusionMode(2);
@@ -80,60 +80,35 @@ public class AdaptiveBorderAndroidTest {
    BubbleConfig.setBorderTenths(0);Bitmap zero=render(d,cache);assertTrue("zero cannot become an Android hairline",plain.sameAs(zero));zero.recycle();
    for(int width=1;width<=4;width++){
     BubbleConfig.setBorderTenths(width);BubbleConfig.load();assertEquals(width/10f,BubbleConfig.borderDp(),0f);
-    Bitmap edge=render(d,cache);assertFalse("fractional border missing: "+width,plain.sameAs(edge));edge.recycle();
+    Bitmap edge=render(d,cache);assertEquals("fractional border follows active material",effect==BubbleConfig.LEGACY,plain.sameAs(edge));edge.recycle();
    }
    plain.recycle();
   }
  }
- @Test public void adaptiveTransparencyChangesOnlyFillAndLeavesContourIndependent(){
-  BubbleConfig.setSurfaceEffect(0);MessageDrawable d=drawable(true,false);
-  BubbleConfig.setOutlineEnabled(false);
-  int lastAlpha=256;
-  for(int transparency:new int[]{0,35,75,100}){
-   BubbleConfig.setTransparency(transparency);Bitmap b=render(d,new MessageDrawable.PathDrawParams());
-   int alpha=Color.alpha(b.getPixel(80,44));assertTrue(alpha<lastAlpha);lastAlpha=alpha;b.recycle();
+ @Test public void adaptiveIgnoresLegacyTransparencyWhileLegacyRemainsCustomizable(){
+  for(int effect:new int[]{0,1}){
+   BubbleConfig.setSurfaceEffect(effect);BubbleConfig.setOutlineEnabled(false);
+   MessageDrawable d=drawable(true,false);int previous=256;
+   for(int transparency:new int[]{0,35,75,100}){
+    BubbleConfig.setTransparency(transparency);Bitmap b=render(d,new MessageDrawable.PathDrawParams());
+    int alpha=Color.alpha(b.getPixel(80,44));
+    if(effect==0)assertEquals(Color.alpha(Theme.getColor(Theme.key_chat_serviceBackground)),alpha);
+    else {assertTrue(alpha<previous);previous=alpha;}
+    b.recycle();
+   }
+   if(effect==1)assertEquals(0,previous);
   }
-  assertEquals(0,lastAlpha);BubbleConfig.setOutlineEnabled(true);BubbleConfig.setBorderTenths(11);
-  Bitmap outlined=render(d,new MessageDrawable.PathDrawParams());assertEquals(0,Color.alpha(outlined.getPixel(80,44)));
-  boolean edge=false;for(int y=0;y<100;y++)for(int x=0;x<180;x++)edge|=Color.alpha(outlined.getPixel(x,y))>0;
-  assertTrue(edge);outlined.recycle();
  }
-
- @Test public void cachedBlurRetainsAdaptiveTintAlphaAndSelectionWithoutLeakingIntoLegacy()throws Exception{
-  BubbleConfig.setBackgroundBlur(true);BubbleConfig.setSurfaceEffect(0);
+ @Test public void disablingLegacyBlurReleasesAuxiliarySnapshotWithoutRecyclingIt()throws Exception{
+  BubbleConfig.setSurfaceEffect(1);BubbleConfig.setBackgroundBlur(true);
   android.view.View target=new android.view.View(RuntimeEnvironment.getApplication());
   SignatureWallpaperBlur.Owner owner=new SignatureWallpaperBlur.Owner(target);
-  Bitmap image=Bitmap.createBitmap(120,80,Bitmap.Config.ARGB_8888);image.eraseColor(0xff326598);
-  android.graphics.drawable.BitmapDrawable wallpaper=new android.graphics.drawable.BitmapDrawable(target.getResources(),image);
+  android.graphics.drawable.ColorDrawable wallpaper=new android.graphics.drawable.ColorDrawable(Color.BLUE);
   wallpaper.setBounds(0,0,120,80);owner.prepare(wallpaper,false,Color.BLACK);
-  org.telegram.messenger.Utilities.globalQueue.runAllOnWorker();org.telegram.messenger.AndroidUtilities.drainMain();
-  org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();assertTrue(owner.isReady());
-  Path shape=new Path();shape.addRect(0,0,120,80,Path.Direction.CW);
-  Bitmap b=Bitmap.createBitmap(120,80,Bitmap.Config.ARGB_8888);Canvas canvas=new Canvas(b);
-  Paint material=Theme.normal;material.setAlpha(173);
-  Shader themeShader=new LinearGradient(0,0,120,80,Color.RED,Color.BLUE,Shader.TileMode.CLAMP);material.setShader(themeShader);
-  ColorFilter tint=new PorterDuffColorFilter(0xff102030,PorterDuff.Mode.SRC_IN);material.setColorFilter(tint);
-  Theme.selected.set(material);Theme.selected.setColorFilter(new PorterDuffColorFilter(0xff506070,PorterDuff.Mode.SRC_IN));
-  ServiceBubbleSurface surface=new ServiceBubbleSurface();long renders=SignatureWallpaperBlur.diagnostics()[2];
-  for(boolean selected:new boolean[]{false,true})for(int alpha:new int[]{0,1,127,255}){
-   b.eraseColor(Color.TRANSPARENT);assertTrue(surface.drawCached(canvas,shape,null,owner,0,0,alpha,selected));
-   assertEquals(Math.round(173*alpha/255f),Color.alpha(b.getPixel(60,40)));
-   if(alpha==255){int expected=selected?0x506070:0x102030,actual=b.getPixel(60,40);
-    for(int shift:new int[]{0,8,16})assertTrue(Math.abs(((expected>>>shift)&255)-((actual>>>shift)&255))<=1);
-   }
-   if(alpha==255){
-    Bitmap nativeMaterial=Bitmap.createBitmap(120,80,Bitmap.Config.ARGB_8888);
-    surface.drawMapped(new Canvas(nativeMaterial),shape,null,alpha,selected);
-    assertEquals(b.getPixel(60,40),nativeMaterial.getPixel(60,40));nativeMaterial.recycle();
-   }
-   assertSame(themeShader,material.getShader());assertSame(tint,material.getColorFilter());assertEquals(173,material.getAlpha());
-  }
-  for(int frame=0;frame<100;frame++)surface.drawCached(canvas,shape,null,owner,0,0,127,false);
-  assertEquals(renders,SignatureWallpaperBlur.diagnostics()[2]);assertEquals(0,org.telegram.messenger.Utilities.globalQueue.pending());
-  BubbleConfig.setSurfaceEffect(1);b.eraseColor(Color.TRANSPARENT);assertTrue(owner.draw(canvas,shape,0,0,255));
-  assertEquals(0xff326598,b.getPixel(60,40));
-  BubbleConfig.setBackgroundBlur(false);assertFalse(surface.drawCached(canvas,shape,null,owner,0,0,255,false));
-  owner.close();image.recycle();b.recycle();
+  var field=SignatureWallpaperBlur.Owner.class.getDeclaredField("staticSnapshot");field.setAccessible(true);
+  Bitmap snapshot=(Bitmap)field.get(owner);assertNotNull(snapshot);
+  BubbleConfig.setBackgroundBlur(false);owner.prepare(wallpaper,false,Color.BLACK);
+  assertNull(field.get(owner));assertFalse(snapshot.isRecycled());assertFalse(owner.isReady());
+  owner.close();
  }
-
 }

@@ -55,8 +55,6 @@ public class IconsResources extends Resources {
      */
     @Nullable
     public Drawable getOriginalDrawableForDensity(int id, int density, @Nullable Theme theme) {
-        Drawable cupertino = app.flexygram.icons.CupertinoIcons.create(this, id);
-        if (cupertino != null) return cupertino;
         int converted = getConversion(id);
         long key = ((long) converted << 32) | (density & 0xffffffffL);
         Drawable.ConstantState state = constantStates.get(key);

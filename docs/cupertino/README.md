@@ -1,3 +1,5 @@
+> Restauración: Cupertino ya no sustituye los iconos generales. Los archivos y la fuente se archivaron en `tools/cupertino/reference`, fuera del código y assets de la app; se conservan sus licencias como referencia; los recursos nativos y los conjuntos elegidos por el usuario vuelven a tener su comportamiento anterior. La documentación siguiente describe la implementación anterior.
+
 # Cupertino default icons and touch feedback
 
 The built-in Default icon pack now loads the bundled Cupertino Icons glyphs through

@@ -61,8 +61,8 @@ public final class BubbleConfig {
         smallTimestamps = value;
         preferences().edit().putBoolean("small_timestamp", value).apply();
     }
-    // Both surface materials share the same optional wallpaper blur cache.
-    public static boolean backgroundBlur() { return cachedBlur; }
+    // Preserve the legacy preference without applying it to the native adaptive material.
+    public static boolean backgroundBlur() { return !adaptive() && cachedBlur; }
     /** Renderer compatibility only: saved matte flags can never tint a bubble again. */
     @Deprecated public static boolean matteEnabled() { return false; }
     @Deprecated public static int matteStrength() { return 0; }
@@ -74,7 +74,8 @@ public final class BubbleConfig {
         cachedBlur = value;
         preferences().edit().putBoolean("signature_cached_blur", value).apply();
     }
-    public static boolean outlineEnabled() { return outlineEnabled; }
+    // Keep saved border settings when switching styles; only the adaptive surface draws them.
+    public static boolean outlineEnabled() { return adaptive() && outlineEnabled; }
     public static int outlineStyle() { return outlineStyle; }
     public static int pearlIntensity() { return pearlIntensity; }
     public static int skin() { return 0; }

@@ -24,11 +24,6 @@ import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.AlertsCreator;
 
 public class BasePermissionsActivity extends FragmentActivity {
-    @Override public boolean dispatchTouchEvent(android.view.MotionEvent event) {
-        app.flexygram.icons.IconPressFeedback.observe(getWindow().getDecorView(), event);
-        return super.dispatchTouchEvent(event);
-    }
-
     public final static int REQUEST_CODE_GEOLOCATION = 2,
             REQUEST_CODE_EXTERNAL_STORAGE = 4,
             REQUEST_CODE_ATTACH_CONTACT = 5,

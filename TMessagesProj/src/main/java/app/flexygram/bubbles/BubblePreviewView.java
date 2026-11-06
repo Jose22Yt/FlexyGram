@@ -48,18 +48,20 @@ public final class BubblePreviewView extends View implements NotificationCenter.
         @Override public boolean draw(Canvas canvas, Path shape, int alpha) { return draw(canvas, shape, alpha, false); }
         @Override public boolean draw(Canvas canvas, Path shape, int alpha, boolean selected) {
             if (BubbleConfig.adaptive()) {
-                if (BubbleConfig.backgroundBlur() && serviceBubbleSurface.drawCached(
-                        canvas, shape, null, blurOwner, 0, 0, alpha, selected)) return true;
                 return serviceBubbleSurface.draw(canvas, shape, null, getWidth(), getHeight(), 0, 0, alpha, selected);
             }
             return blurOwner != null && blurOwner.draw(canvas, shape, 0, 0, alpha);
         }
     };
     public void settingsChanged() {
+        float previousFontSpacing = time.getFontSpacing();
         if (Theme.chat_timePaint != null) time.set(Theme.chat_timePaint);
         if (BubbleConfig.smallTimestamps()) time.setTextSize(AndroidUtilities.dpf2(9));
-        measuredWidth = -1;
-        requestLayout();
+        // Material, blur and border sliders only repaint. Rebuild text layouts only for geometry changes.
+        if (measuredWidth < 0 || previousFontSpacing != time.getFontSpacing()) {
+            measuredWidth = -1;
+            requestLayout();
+        }
         checkColor = BubbleConfig.adaptive() ? ServiceBubbleSurface.textColor(null) : Theme.getColor(Theme.key_chat_outSentCheckRead);
         check.setTint(checkColor); halfCheck.setTint(checkColor);
         if (blurOwner != null) blurOwner.prepare(wallpaper, wallpaperMotion, Theme.getColor(Theme.key_windowBackgroundGray));
