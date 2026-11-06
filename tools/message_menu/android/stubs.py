@@ -114,3 +114,18 @@ public class NativeCaptureProbe{
  public ComposerOverlayProbe(Context c){super(c);chatInputViewsContainer=new View(c);chatInputViewsContainer.setBackgroundColor(Color.CYAN);addView(chatInputViewsContainer,new FrameLayout.LayoutParams(100,24,Gravity.BOTTOM));}
  public void redraw(Canvas canvas){BLOCK}
  }'''.replace('BLOCK',block))
+
+ # Actual cell alpha-layer clipping, with native Canvas and explicit row bounds.
+ cell=(java/'org/telegram/ui/Cells/ChatMessageCell.java').read_text()
+ a=cell.index('        if (alphaInternal != 1.0f) {');b=cell.index('{',a)+1;depth=1
+ while depth:depth+=(cell[b]=='{')-(cell[b]=='}');b+=1
+ put('SelectedAlphaProbe.java', '''import android.graphics.*;import android.graphics.drawable.*;
+ public class SelectedAlphaProbe {
+ boolean fullyDraw;float alphaInternal=.5f;int parentHeight=400,drawSideButton;float y=-200;
+ static class Message {boolean isOutOwner(){return false;}}Message currentMessageObject=new Message();int dp(int n){return n;}
+ RectF rect=new RectF();Drawable currentBackgroundDrawable=new ColorDrawable(Color.GREEN);
+ public SelectedAlphaProbe(){currentBackgroundDrawable.setBounds(0,0,120,800);}
+ int getMeasuredWidth(){return 120;}int getMeasuredHeight(){return 800;}float getY(){return y;}
+ void render(Canvas canvas){int save=canvas.getSaveCount();BLOCK
+ Paint paint=new Paint();paint.setColor(Color.GREEN);canvas.drawRect(0,0,120,800,paint);canvas.restoreToCount(save);}
+ }'''.replace('BLOCK',cell[a:b]))

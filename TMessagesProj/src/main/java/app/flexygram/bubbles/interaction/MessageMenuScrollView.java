@@ -12,6 +12,9 @@ public final class MessageMenuScrollView extends ScrollView {
     public MessageMenuScrollView(Context context, Listener listener) {
         super(context);
         this.listener = listener;
+        // Do not let opening focus jump to actions below a long message.
+        setDescendantFocusability(FOCUS_BEFORE_DESCENDANTS);
+        setFocusableInTouchMode(true);
         setFillViewport(false);
         setVerticalScrollBarEnabled(true);
         setOverScrollMode(OVER_SCROLL_NEVER);

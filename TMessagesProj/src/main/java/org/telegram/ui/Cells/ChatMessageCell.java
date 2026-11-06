@@ -17539,10 +17539,10 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                         if (caption) {
                             rect.set(getCurrentBackgroundLeft() - dp(10), top, currentBackgroundDrawable.getBounds().right + dp(10), bottom);
                         } else {
-                            if (getY() < 0) {
+                            if (!fullyDraw && getY() < 0) {
                                 top = (int) -getY();
                             }
-                            if (getY() + getMeasuredHeight() > parentHeight) {
+                            if (!fullyDraw && getY() + getMeasuredHeight() > parentHeight) {
                                 bottom = (int) (parentHeight - getY());
                             }
                             rect.set(getCurrentBackgroundLeft(), top, currentBackgroundDrawable.getBounds().right, bottom);
@@ -21014,10 +21014,10 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                     right += dp(8 + 32);
                 }
             }
-            if (getY() < 0) {
+            if (!fullyDraw && getY() < 0) {
                 top = (int) -getY();
             }
-            if (getY() + getMeasuredHeight() > parentHeight) {
+            if (!fullyDraw && getY() + getMeasuredHeight() > parentHeight) {
                 bottom = (int) (parentHeight - getY());
             }
             rect.set(left, top, right, bottom);

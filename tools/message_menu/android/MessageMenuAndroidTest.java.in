@@ -164,4 +164,31 @@ public class MessageMenuAndroidTest {
    assertTrue(placement.popupY+Math.min(available,chrome+placement.gapHeight)<=100+available);
   }
  }
+ @Test public void selectedAlphaLayerDoesNotKeepSourceViewportCropping(){
+  SelectedAlphaProbe host=new SelectedAlphaProbe();
+  for(float sourceY:new float[]{-200,200})for(boolean full:new boolean[]{false,true}){
+   host.y=sourceY;host.fullyDraw=full;
+   Bitmap b=Bitmap.createBitmap(120,800,Bitmap.Config.ARGB_8888);host.render(new Canvas(b));
+   if(full){assertTrue(Color.alpha(b.getPixel(60,10))>0);assertTrue(Color.alpha(b.getPixel(60,790))>0);}
+   else if(sourceY<0)assertEquals(0,Color.alpha(b.getPixel(60,10)));
+   else assertEquals(0,Color.alpha(b.getPixel(60,790)));
+   b.recycle();
+  }
+ }
+ @Test public void realPopupOffsetAndScrollStayAlignedAcrossWindowInsets(){
+  for(int screenInset:new int[]{0,24,80,300})for(int sourceTop:new int[]{-1200,0,150,800})for(int scroll:new int[]{0,120,3000}){
+   int gapTop=screenInset+100-scroll,sourceScreen=screenInset+sourceTop;
+   float offset=ContextPreviewPlacement.screenOffset(gapTop,sourceScreen,7,scroll,8);
+   float renderedTop=sourceScreen+7+offset-scroll;
+   assertEquals(gapTop+8,renderedTop,.001f);
+  }
+ }
+ @Test public void openingFocusDoesNotJumpPastLongMessage(){
+  var scroll=new MessageMenuScrollView(activity,offset->{});LinearLayout body=new LinearLayout(activity);body.setOrientation(1);
+  View message=new View(activity);message.setClickable(true);message.setFocusable(true);
+  Button action=new Button(activity);action.setText("Reply");body.addView(message,new LinearLayout.LayoutParams(320,6000));body.addView(action,new LinearLayout.LayoutParams(320,60));
+  scroll.addView(body);scroll.setViewportHeight(700);activity.setContentView(scroll);layout(scroll,320);scroll.requestFocus();
+  assertTrue(scroll.isFocused());assertEquals(0,scroll.getScrollY());
+ }
+
 }

@@ -57,6 +57,12 @@ def test_full_preview_does_not_overwrite_normal_row_text_block_cache():
     end = chat.index('cell.setFullyDraw(oldFullyDraw)', start)
     assert 'cell.drawOutboundsContent(canvas)' in chat[start:end]
     assert '} finally {' in chat[start:end]
+    assert chat.index('cell.setFullyDraw(true)',start)<chat.index('cell.drawBackgroundInternal(canvas, true)',start)<end
+    assert cell.count('if (!fullyDraw && getY() < 0)')==2
+    assert cell.count('if (!fullyDraw && getY() + getMeasuredHeight() > parentHeight)')==2
+    assert 'signaturePreviewScroll.getLocationOnScreen(popupScreen);' in chat
+    assert 'contentView.getLocationOnScreen(contentScreen);' in chat
+    assert 'addOnPreDrawListener' in chat[chat.index('final Runnable syncSelectionWindow'):chat.index('if (waitForLangDetection.get() && !compactContext)')]
 
 
 def test_popup_bottom_compiles_with_fractional_animated_input_height(tmp_path):

@@ -8,6 +8,11 @@ public final class ContextPreviewPlacement {
     private ContextPreviewPlacement(float scale, float offsetY, float range, float viewportHeight, int y, int gap) {
         this.scale=scale; this.offsetY=offsetY; scrollRange=range; this.viewportHeight=viewportHeight; popupY=y; gapHeight=gap;
     }
+    /** Shared screen coordinates account for actual popup insets and its current scroll. */
+    public static float screenOffset(float gapScreenTop, float sourceScreenTop, float sourceBackgroundTop,
+            float scroll, float padding) {
+        return gapScreenTop + scroll + padding - sourceScreenTop - sourceBackgroundTop;
+    }
     public static float animatedScale(float target, float progress, float spring) {
         float phase=Math.max(0f,Math.min(1f,progress));
         float motion=Math.max(.01f,spring);

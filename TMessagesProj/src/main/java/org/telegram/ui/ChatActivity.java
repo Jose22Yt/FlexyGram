@@ -19578,15 +19578,15 @@ public class ChatActivity extends BaseFragment implements
                                         (cell.getBackgroundDrawableLeft() + cell.getBackgroundDrawableRight()) * .5f,
                                         (cell.getBackgroundDrawableTop() + cell.getBackgroundDrawableBottom()) * .5f);
                             }
-                            if (cell != null && scrimGroup == null && cell.drawBackgroundInParent()) {
-                                canvas.save();
-                                canvas.translate(0, cell.getPaddingTop());
-                                cell.drawBackgroundInternal(canvas, true);
-                                canvas.restore();
-                            }
                             boolean oldFullyDraw = cell != null && cell.isFullyDraw();
                             if (movingSelectedPreview) cell.setFullyDraw(true);
                             try {
+                                if (cell != null && scrimGroup == null && cell.drawBackgroundInParent()) {
+                                    canvas.save();
+                                    canvas.translate(0, cell.getPaddingTop());
+                                    cell.drawBackgroundInternal(canvas, true);
+                                    canvas.restore();
+                                }
                                 child.draw(canvas);
                                 if (cell != null && cell.hasOutboundsContent()) {
                                     canvas.save();
@@ -35221,6 +35221,30 @@ public class ChatActivity extends BaseFragment implements
             ReactionsContainerLayout finalReactionsLayout = reactionsLayout;
             final ActionBarPopupWindow signatureMenuOwner = scrimPopupWindow;
             final MessageObject signatureSelectedMessage = selectedObject;
+            final View signaturePreviewGap = signatureMessageGap;
+            final int[] popupScreen = new int[2], sourceScreen = new int[2], contentScreen = new int[2], gapScreen = new int[2];
+            final Runnable syncSelectionWindow = () -> {
+                if (!compactContext || signaturePreviewGap == null || fragmentView == null
+                        || scrimPopupWindow != signatureMenuOwner || selectedBubbleMotion.isClosing()
+                        || selectedBubbleMotionMessage != signatureSelectedMessage
+                        || signaturePreviewScroll.getWidth() == 0) return;
+                // PopupWindow may adjust the requested position. Map both windows through screen
+                // coordinates only after layout, instead of retaining a guessed status-bar offset.
+                signaturePreviewScroll.getLocationOnScreen(popupScreen);
+                signaturePreviewGap.getLocationOnScreen(gapScreen);
+                v.getLocationOnScreen(sourceScreen);
+                contentView.getLocationOnScreen(contentScreen);
+                selectedBubbleOffsetY = app.flexygram.bubbles.interaction.ContextPreviewPlacement.screenOffset(
+                        gapScreen[1], sourceScreen[1], ((ChatMessageCell)v).getBackgroundDrawableTop(),
+                        signaturePreviewScroll.getScrollY(), dp(8));
+                selectedBubblePreviewScroll = signaturePreviewScroll.getScrollY();
+                selectedBubblePreviewWindowTop = popupScreen[1] - contentScreen[1];
+                selectedBubblePreviewWindowBottom = selectedBubblePreviewWindowTop + signaturePreviewScroll.getHeight();
+                contentView.invalidate();
+            };
+            if (signaturePreviewScroll != null) {
+                signaturePreviewScroll.addOnLayoutChangeListener((previewView,newLeft,newTop,newRight,newBottom,previousLeft,previousTop,previousRight,previousBottom) -> syncSelectionWindow.run());
+            }
             Runnable showMenu = () -> {
                 if (scrimPopupWindow != signatureMenuOwner) return;
                 if (compactContext && (selectedObject != signatureSelectedMessage
@@ -35271,6 +35295,14 @@ public class ChatActivity extends BaseFragment implements
                        handoff?tapped.signatureTapVelocityY():0f);
                     // Ownership changes at actual show time, never while language detection waits.
                     if (handoff) tapped.finishSignatureTap();
+                    signaturePreviewScroll.getViewTreeObserver().addOnPreDrawListener(new android.view.ViewTreeObserver.OnPreDrawListener() {
+                        @Override public boolean onPreDraw() {
+                            if (signaturePreviewScroll.getViewTreeObserver().isAlive())
+                                signaturePreviewScroll.getViewTreeObserver().removeOnPreDrawListener(this);
+                            syncSelectionWindow.run();
+                            return true;
+                        }
+                    });
                 } else if (isReactionsAvailableFinal && finalReactionsLayout != null) {
                     finalReactionsLayout.startEnterAnimation(true);
                 }
