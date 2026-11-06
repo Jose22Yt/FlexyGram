@@ -28,6 +28,8 @@ public class StudioNativeTest {
   for(int count=1;count<=4;count++){FlexyStudioSheet sheet=new FlexyStudioSheet(fragment,preset(count),"SoloBurbujas.flexyGram",834,StudioImportPlan.prepare(preset(count)));sheet.show();List<TextView> all=texts(sheet.content);for(String id:StudioSchema.sections()){String label=LocaleController.getString(FlexyStudioText.section(id));long found=all.stream().filter(t->label.contentEquals(t.getText())).count();assertEquals(preset(count).sections.containsKey(id)?1:0,found);}assertFalse(activity.getSharedPreferences("flexygram_bubbles",0).contains("transparency"));sheet.dismiss();}
  }
  @Test public void perSettingCheckboxLeavesUncheckedChangesInSameSectionUntouched()throws Exception{
+  // Create two real changes independently of the fresh-install defaults.
+  activity.getSharedPreferences("flexygram_bubbles",0).edit().putBoolean("small_timestamp",true).commit();
   var candidate=StudioCodec.create("Individual.flexygram",Map.of("bubbles",Map.of("transparency",72,"smallTimestamp",false)));
   FlexyStudioSheet sheet=new FlexyStudioSheet(fragment,candidate,"Individual.flexygram",400,StudioImportPlan.prepare(candidate));sheet.show();
   TextView expand=texts(sheet.content).stream().filter(t->LocaleController.getString(R.string.FlexyStudioViewChanges).contentEquals(t.getText())).findFirst().orElseThrow();expand.performClick();
