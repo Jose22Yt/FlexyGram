@@ -2,12 +2,12 @@
 
 El selector **Ajustes → Chat → Burbujas de chat → Efecto de burbuja** ofrece:
 
-- **Adaptativo del fondo**, predeterminado: reutiliza el material nativo de los avisos de servicio. No tiene controles adicionales.
+- **Adaptativo del fondo**, predeterminado: reutiliza el material nativo de los avisos de servicio. Conserva los controles de borde y fusión, que se dibujan sobre el material nativo.
 - **Efecto anterior**: conserva transparencia, desenfoque, contorno y fusión con los valores guardados anteriormente.
 
 `ServiceBubbleSurface` dibuja el shader y los filtros existentes del proveedor de tema de cada chat, sobre la geometría original de `MessageDrawable`. También usa la capa de oscurecimiento y el estado seleccionado nativos. No extrae colores ni crea otro bitmap de desenfoque. El proveedor conserva la propiedad de sus pinturas; un `Paint` reutilizable compone el alfa sin modificarlas.
 
-`ChatMessageCell.applyServiceShaderMatrix()` aporta las coordenadas nativas, incluidos los desplazamientos de teclado y separadores. Los fondos con shader usan el pase del padre para evitar fijar el muestreo al RenderNode de una fila durante el scroll. El modo adaptativo omite el tinte, el gradiente saliente y los bordes anteriores. Cuando el material nativo no dispone de shader, conserva su alternativa sólida.
+`ChatMessageCell.applyServiceShaderMatrix()` aporta las coordenadas nativas, incluidos los desplazamientos de teclado y separadores. Los fondos con shader usan el pase del padre para evitar fijar el muestreo al RenderNode de una fila durante el scroll. El modo adaptativo omite el tinte y el gradiente saliente. Comparte con el efecto anterior los controles y el trazado de borde (activación, estilo, ancho, posición, intensidad y fusión), sin cambiar el material del fondo. Cuando el material nativo no dispone de shader, conserva su alternativa sólida.
 
 El texto usa la tinta de servicio. La hora conserva el color nativo de los mensajes recibidos del tema del chat, tanto en modo claro como oscuro y al seleccionar la burbuja; no adopta el blanco de servicio ni el acento saliente. La vista previa sigue la misma política. Los ticks conservan forma y posición; sus copias locales se reutilizan y cambian de color sin modificar los drawables compartidos. Las imágenes, los stickers sin fondo, los indicadores de error y los controles de selección mantienen sus rutas de dibujo.
 

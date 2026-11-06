@@ -1,0 +1,75 @@
+import android.graphics.*;
+import org.junit.*;import static org.junit.Assert.*;import org.junit.runner.RunWith;
+import org.robolectric.*;import org.robolectric.annotation.*;
+import app.flexygram.bubbles.*;import org.telegram.ui.ActionBar.*;
+@RunWith(RobolectricTestRunner.class) @Config(sdk=35,manifest=Config.NONE) @GraphicsMode(GraphicsMode.Mode.NATIVE)
+public class AdaptiveBorderAndroidTest {
+ @Before public void setup(){
+  org.telegram.messenger.ApplicationLoader.applicationContext=RuntimeEnvironment.getApplication();
+  RuntimeEnvironment.getApplication().getSharedPreferences(BubbleConfig.FILE,0).edit().clear().commit();
+  BubbleConfig.load();BubbleConfig.setTransparency(0);
+ }
+ MessageDrawable drawable(boolean out,boolean selected){
+  MessageDrawable d=new MessageDrawable(MessageDrawable.TYPE_TEXT,out,selected);
+  d.setBounds(4,4,164,84);d.setTop(0,180,100,false,false);return d;
+ }
+ Bitmap render(MessageDrawable d,MessageDrawable.PathDrawParams cache){
+  Bitmap b=Bitmap.createBitmap(180,100,Bitmap.Config.ARGB_8888);d.drawCached(new Canvas(b),cache);return b;
+ }
+ @Test public void everyBorderStylePositionAndFusionWorksOnEitherFillWithoutChangingItsCenter(){
+  for(int effect:new int[]{BubbleConfig.ADAPTIVE,BubbleConfig.LEGACY})for(boolean dark:new boolean[]{false,true})
+   for(boolean out:new boolean[]{false,true})for(boolean selected:new boolean[]{false,true}){
+    Theme.dark=dark;BubbleConfig.setSurfaceEffect(effect);
+    MessageDrawable d=drawable(out,selected);MessageDrawable.PathDrawParams cache=new MessageDrawable.PathDrawParams();
+    BubbleConfig.setOutlineEnabled(false);Bitmap plain=render(d,cache);
+    for(int style=0;style<4;style++)for(int position=1;position<=5;position++)for(int fusion=0;fusion<=2;fusion++){
+     BubbleConfig.setOutlineEnabled(true);BubbleConfig.setOutlineStyle(style);BubbleConfig.setBorderPosition(position);
+     BubbleConfig.setFusionMode(fusion);BubbleConfig.setPearlIntensity(70);BubbleConfig.setFusionIntensity(70);
+     Bitmap edge=render(d,cache);int changed=0;
+     for(int y=0;y<100;y++)for(int x=0;x<180;x++)if(edge.getPixel(x,y)!=plain.getPixel(x,y))changed++;
+     assertTrue("border missing mode="+effect+" style="+style+" position="+position+" fusion="+fusion,changed>0);
+     assertEquals("border cannot repaint native fill",plain.getPixel(80,44),edge.getPixel(80,44));
+     assertEquals(0,edge.getPixel(0,0));assertEquals(0,edge.getPixel(179,99));edge.recycle();
+    }
+    BubbleConfig.setOutlineEnabled(false);Bitmap disabled=render(d,cache);assertTrue(plain.sameAs(disabled));disabled.recycle();plain.recycle();
+   }
+ }
+ @Test public void cachedPartialBorderReusesGeometryAndPreferencesSurviveSurfaceSwitch(){
+  BubbleConfig.setBorderPosition(3);BubbleConfig.setBorderTenths(17);BubbleConfig.setOutlineStyle(2);BubbleConfig.setOutlineEnabled(true);
+  MessageDrawable d=drawable(true,false);MessageDrawable.PathDrawParams cache=new MessageDrawable.PathDrawParams();
+  Bitmap first=render(d,cache);long builds=SignatureBorderPath.testRebuilds;
+  for(int i=0;i<100;i++){Bitmap b=render(d,cache);assertTrue(first.sameAs(b));b.recycle();}
+  assertEquals(builds,SignatureBorderPath.testRebuilds);first.recycle();
+  for(int mode:new int[]{1,0,1,0}){BubbleConfig.setSurfaceEffect(mode);BubbleConfig.load();assertEquals(17,BubbleConfig.borderTenths());assertEquals(3,BubbleConfig.borderPosition());assertEquals(2,BubbleConfig.outlineStyle());assertTrue(BubbleConfig.outlineEnabled());}
+ }
+ @Test public void zeroDrawableAlphaHidesFillAndBorderInBothModes(){
+  BubbleConfig.setOutlineEnabled(true);BubbleConfig.setFusionMode(2);
+  for(int effect:new int[]{0,1}){BubbleConfig.setSurfaceEffect(effect);MessageDrawable d=drawable(true,true);d.setAlpha(0);
+   Bitmap b=render(d,new MessageDrawable.PathDrawParams());for(int y=0;y<100;y++)for(int x=0;x<180;x++)assertEquals(0,Color.alpha(b.getPixel(x,y)));b.recycle();}
+ }
+ @Test public void adaptiveSourceStillDrawsWithBorderAndRetainsItsSelectedAlpha(){
+  BubbleConfig.setSurfaceEffect(0);BubbleConfig.setOutlineEnabled(true);BubbleConfig.setBorderPosition(5);
+  for(boolean selected:new boolean[]{false,true}){
+   MessageDrawable d=drawable(true,selected);int[] calls={0};d.setFlexyGlassSource(new MessageDrawable.GlassSource(){
+    public boolean draw(Canvas c,Path p){throw new AssertionError("alpha-aware source required");}
+    public boolean draw(Canvas c,Path p,int alpha,boolean sel){assertEquals(selected,sel);calls[0]++;Paint paint=new Paint();paint.setColor(Color.MAGENTA);paint.setAlpha(alpha);c.drawPath(p,paint);return true;}
+   });
+   Bitmap b=render(d,new MessageDrawable.PathDrawParams());assertEquals(Color.MAGENTA,b.getPixel(80,44));assertEquals(1,calls[0]);b.recycle();
+  }
+ }
+ @Test public void selectedAdaptiveFillIgnoresLegacyOutgoingGradientOverlay(){
+  BubbleConfig.setSurfaceEffect(0);Theme.dark=false;
+  Theme.ResourcesProvider provider=key->{
+   if(key==Theme.key_chat_outBubbleGradient1)return 0xff0011aa;
+   if(key==Theme.key_chat_outBubbleGradientSelectedOverlay)return Color.RED;
+   return Theme.getColor(key);
+  };
+  for(boolean outline:new boolean[]{false,true}){
+   BubbleConfig.setOutlineEnabled(outline);MessageDrawable d=new MessageDrawable(MessageDrawable.TYPE_TEXT,true,true,provider);
+   d.setBounds(4,4,164,84);d.setTop(0,180,100,false,false);
+   Bitmap b=render(d,new MessageDrawable.PathDrawParams());
+   assertEquals(Theme.getColor(Theme.key_chat_serviceBackgroundSelected),b.getPixel(80,44));b.recycle();
+  }
+ }
+
+}

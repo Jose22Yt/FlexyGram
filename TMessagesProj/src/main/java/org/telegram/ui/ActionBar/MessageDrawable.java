@@ -663,37 +663,40 @@ public class MessageDrawable extends Drawable {
         }
 
         if (paintToUse == null && flexySurface()) {
-            if (app.flexygram.bubbles.BubbleConfig.adaptive()) {
+            final boolean adaptiveSurface = app.flexygram.bubbles.BubbleConfig.adaptive();
+            int color;
+            if (adaptiveSurface) {
+                color = getColor(isSelected ? Theme.key_chat_serviceBackgroundSelected : Theme.key_chat_serviceBackground);
                 if (flexyGlassSource == null || !flexyGlassSource.draw(canvas, path, alpha, isSelected)) {
                     // Offscreen renderers without a chat root use the native solid service color.
                     flexyFillPaint.reset();
                     flexyFillPaint.setAntiAlias(true);
-                    int service = getColor(isSelected ? Theme.key_chat_serviceBackgroundSelected : Theme.key_chat_serviceBackground);
-                    flexyFillPaint.setColor(service);
-                    flexyFillPaint.setAlpha(Math.round(Color.alpha(service) * alpha / 255f));
+                    flexyFillPaint.setColor(color);
+                    flexyFillPaint.setAlpha(Math.round(Color.alpha(color) * alpha / 255f));
                     canvas.drawPath(path, flexyFillPaint);
                 }
-                return; // No outgoing gradient, legacy tint, border or fusion over the native material.
+            } else {
+                // Stable theme color, independent of wallpaper/blur availability and animation phase.
+                // Instance paints and the native geometry cache are reused for every draw.
+                color = signatureColor();
+                if (alpha > 0 && app.flexygram.bubbles.BubbleConfig.backgroundBlur() && flexyGlassSource != null) {
+                    // The native bridge carries drawable alpha; message transitions sample the same cache.
+                    flexyGlassSource.draw(canvas, path, alpha);
+                }
+                flexyFillPaint.setColor(color);
+                // Reuse Telegram's cached gradient and matrix; no new shader per frame.
+                flexyFillPaint.setShader(p.getShader());
+                flexyFillPaint.setAlpha(Math.round(alpha * app.flexygram.bubbles.BubbleStyle.tintAlpha(
+                    app.flexygram.bubbles.BubbleConfig.transparency()) / 255f));
+                canvas.drawPath(path, flexyFillPaint);
             }
-            // Stable theme color, independent of wallpaper/blur availability and animation phase.
-            // Instance paints and the native geometry cache are reused for every draw.
-            int color = signatureColor();
-            if (alpha > 0 && app.flexygram.bubbles.BubbleConfig.backgroundBlur() && flexyGlassSource != null) {
-                // The native bridge carries drawable alpha; message transitions sample the same cache.
-                flexyGlassSource.draw(canvas, path, alpha);
-            }
-            flexyFillPaint.setColor(color);
-            // Reuse Telegram's cached gradient and matrix; no new shader per frame.
-            flexyFillPaint.setShader(p.getShader());
-            flexyFillPaint.setAlpha(Math.round(alpha * app.flexygram.bubbles.BubbleStyle.tintAlpha(
-                app.flexygram.bubbles.BubbleConfig.transparency()) / 255f));
-            canvas.drawPath(path, flexyFillPaint);
+            // The same cached contour and fusion controls apply to either surface material.
             if (app.flexygram.bubbles.BubbleConfig.outlineEnabled()) {
                 flexyBorderPaint.setStyle(Paint.Style.STROKE);
                 // Keep the contour inside Telegram's unchanged message silhouette.
                 flexyBorderPaint.setStrokeWidth(2f * AndroidUtilities.density * app.flexygram.bubbles.BubbleConfig.borderDp()
                         );
-                int contourBase = isOut && p.getShader() != null
+                int contourBase = !adaptiveSurface && isOut && p.getShader() != null
                         ? app.flexygram.bubbles.BubbleOutline.palette(color, currentGradientColor1, currentGradientColor2, currentGradientColor3) : color;
                 int contour = signatureOutline(contourBase);
                 flexyBorderPaint.setColor(ColorUtils.setAlphaComponent(contour, Math.round(Color.alpha(contour) * alpha / 255f)));
@@ -733,7 +736,8 @@ public class MessageDrawable extends Drawable {
         } else {
             canvas.drawPath(path, p);
         }
-        if (gradientShader != null && isSelected && paintToUse == null) {
+        if (gradientShader != null && isSelected && paintToUse == null
+                && !(flexySurface() && app.flexygram.bubbles.BubbleConfig.adaptive())) {
             int color = getColor(Theme.key_chat_outBubbleGradientSelectedOverlay);
             selectedPaint.setColor(ColorUtils.setAlphaComponent(color, (int) (Color.alpha(color) * alpha / 255f)));
             canvas.drawPath(path, selectedPaint);

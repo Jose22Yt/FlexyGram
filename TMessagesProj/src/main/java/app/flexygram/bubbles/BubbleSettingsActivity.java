@@ -35,9 +35,10 @@ public final class BubbleSettingsActivity extends SignatureMatteSettingsActivity
         effectRow = addRow("flexyBubbleSurfaceEffect");
         transparencyRow = blurRow = borderHeaderRow = enabledRow = fusionHeaderRow = -1;
         borderRow = positionRow = fuseRow = styleRow = pearlRow = fusionIntensityRow = fusionAdaptRow = -1;
-        if (BubbleConfig.adaptive()) return;
-        transparencyRow = addRow("flexyBubbleTransparency");
-        blurRow = addRow("flexyBubbleBlur");
+        if (!BubbleConfig.adaptive()) {
+            transparencyRow = addRow("flexyBubbleTransparency");
+            blurRow = addRow("flexyBubbleBlur");
+        }
         borderHeaderRow = addHeader("FlexyBubbleBorderSection");
         enabledRow = addRow("flexyBubbleOutlineEnabled");
         fusionHeaderRow = -1;

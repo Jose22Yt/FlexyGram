@@ -95,10 +95,15 @@ public class Probe {
     check((page.fusionAdaptRow>=0)==(fusion==2));
    }else check(page.fusionHeaderRow==-1&&page.fuseRow==-1);
    BubbleConfig.adaptive=true;page.updateRows();
-   check(page.rowCount==3&&page.effectRow==2&&adapter.getItemViewType(page.effectRow)==TYPE_SETTINGS);
-   check(page.transparencyRow==-1&&page.blurRow==-1&&page.borderHeaderRow==-1&&page.enabledRow==-1);
-   check(page.fusionHeaderRow==-1&&page.borderRow==-1&&page.positionRow==-1&&page.fuseRow==-1);
-   check(page.styleRow==-1&&page.pearlRow==-1&&page.fusionIntensityRow==-1&&page.fusionAdaptRow==-1);
+   check(page.effectRow==2&&adapter.getItemViewType(page.effectRow)==TYPE_SETTINGS);
+   check(page.transparencyRow==-1&&page.blurRow==-1);
+   check(page.borderHeaderRow==page.effectRow+1&&page.enabledRow==page.borderHeaderRow+1);
+   check((page.styleRow>=0)==outline&&(page.borderRow>=0)==outline&&(page.positionRow>=0)==outline);
+   check((page.fusionHeaderRow>=0)==outline&&(page.fuseRow>=0)==outline);
+   check((page.pearlRow>=0)==(outline&&style!=0));
+   check((page.fusionIntensityRow>=0)==(outline&&fusion==2));
+   check((page.fusionAdaptRow>=0)==(outline&&fusion==2));
+   check(page.rowCount==(outline?(style==0?10:11)+(fusion==2?2:0):5));
    BubbleConfig.adaptive=false;page.updateRows();
    check(page.rowCount==(outline?(style==0?12:13)+(fusion==2?2:0):7));
   }

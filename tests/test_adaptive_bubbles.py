@@ -71,9 +71,9 @@ def test_mode_default_validation_and_legacy_preferences_survive_switches(tmp_pat
     }, [JAVA/'app/flexygram/bubbles/BubbleConfig.java', JAVA/'app/flexygram/bubbles/BubbleStyle.java'])
 
 
-def test_adaptive_renderer_does_not_layer_legacy_tint_or_gradient(tmp_path):
+def test_adaptive_fill_preserves_native_alpha_and_continues_to_shared_border(tmp_path):
     source=(JAVA/'org/telegram/ui/ActionBar/MessageDrawable.java').read_text()
-    branch=method(source,'if (app.flexygram.bubbles.BubbleConfig.adaptive())').replace('app.flexygram.bubbles.BubbleConfig.adaptive()', 'adaptive')
+    branch=method(source,'if (adaptiveSurface)').replace('adaptiveSurface', 'adaptive')
     interface=method(source,'public interface GlassSource')
     probe(tmp_path,{'Probe.java': '''public class Probe{
  static class Canvas{int draws;void drawPath(Path p,Paint paint){draws++;}}
@@ -81,15 +81,15 @@ def test_adaptive_renderer_does_not_layer_legacy_tint_or_gradient(tmp_path):
  static class Theme{static final int key_chat_serviceBackgroundSelected=2,key_chat_serviceBackground=1;}
  static class Color{static int alpha(int c){return c>>>24;}}
  INTERFACE
- boolean adaptive=true,isSelected;int alpha=255,legacy;GlassSource flexyGlassSource;Path path=new Path();Paint flexyFillPaint=new Paint();
+ boolean adaptive=true,isSelected;int alpha=255,legacy,color;GlassSource flexyGlassSource;Path path=new Path();Paint flexyFillPaint=new Paint();
  int getColor(int key){return key==2?0xcc123456:0xaa654321;}
  void draw(Canvas canvas){BRANCH legacy++;}
  static void check(boolean v){if(!v)throw new AssertionError();}
  public static void main(String[]args){Probe p=new Probe();Canvas c=new Canvas();
- for(boolean selected:new boolean[]{false,true})for(int a:new int[]{0,1,127,255}){p.isSelected=selected;p.alpha=a;p.draw(c);check(p.legacy==0&&p.flexyFillPaint.shader==null&&p.flexyFillPaint.aa&&p.flexyFillPaint.alpha==Math.round((selected?204:170)*a/255f));}
+ for(boolean selected:new boolean[]{false,true})for(int a:new int[]{0,1,127,255}){p.isSelected=selected;p.alpha=a;p.draw(c);check(p.legacy>0&&p.flexyFillPaint.shader==null&&p.flexyFillPaint.aa&&p.flexyFillPaint.alpha==Math.round((selected?204:170)*a/255f));}
  p.flexyGlassSource=new GlassSource(){public boolean draw(Canvas c,Path path){throw new AssertionError();}public boolean draw(Canvas c,Path path,int alpha,boolean selected){check(alpha==p.alpha&&selected==p.isSelected);return true;}};
- int draws=c.draws;p.draw(c);check(c.draws==draws&&p.legacy==0);
- p.adaptive=false;p.draw(c);check(p.legacy==1);
+ int draws=c.draws,common=p.legacy;p.draw(c);check(c.draws==draws&&p.legacy==common+1);
+ p.adaptive=false;p.draw(c);check(p.legacy==common+2);
  }}'''.replace('INTERFACE',interface).replace('BRANCH',branch)})
 
 
