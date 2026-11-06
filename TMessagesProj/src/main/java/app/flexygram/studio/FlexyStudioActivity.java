@@ -41,14 +41,14 @@ public final class FlexyStudioActivity extends SignatureMatteSettingsActivity {
         busy=true;int token=++generation;WeakReference<FlexyStudioActivity> weak=new WeakReference<>(this);
         try{work=FlexyStudioIO.execute(()->{
             byte[] encoded=null;File staged=null;
-            try{encoded=StudioCodec.encode(StudioCodec.create("MiFlexyGram.flexyGram",FlexyStudioStore.snapshot()));if(!sharing)staged=FlexyStudioFiles.stage(ApplicationLoader.applicationContext,encoded);}
-            catch(Exception ignored){}
+            try{StudioCodec.Preset preset=StudioCodec.create("MiFlexyGram.flexyGram",FlexyStudioStore.snapshot());FlexyStudioStore.validate(preset);encoded=StudioCodec.encode(preset);if(!sharing)staged=FlexyStudioFiles.stage(ApplicationLoader.applicationContext,encoded);}
+            catch(Exception failed){encoded=null;org.telegram.messenger.FileLog.e("FlexyStudio export: "+failed.getClass().getSimpleName());}
             byte[] data=encoded;File pending=staged;
             AndroidUtilities.runOnUIThread(()->{
                 FlexyStudioActivity owner=weak.get();if(owner==null||owner.generation!=token||owner.getParentActivity()==null)return;
                 owner.busy=false;
 
-                if(data==null||!sharing&&pending==null){FlexyStyleInstallHelper.error(owner,R.string.FlexyStudioReadError);return;}
+                if(data==null||!sharing&&pending==null){FlexyStyleInstallHelper.error(owner,R.string.FlexyStudioExportError);return;}
                 if(sharing)owner.share(data);else {owner.pendingExport=pending;Intent intent=new Intent(Intent.ACTION_CREATE_DOCUMENT).addCategory(Intent.CATEGORY_OPENABLE).setType(StudioSchema.MIME).putExtra(Intent.EXTRA_TITLE,"MiFlexyGram.flexyGram");try { owner.busy=true; owner.startActivityForResult(intent,SAVE); } catch(Exception unavailable) { owner.busy=false; pending.delete(); owner.pendingExport=null; FlexyStyleInstallHelper.error(owner,R.string.FlexyStudioWriteError); }}
             });
         });}catch(java.util.concurrent.RejectedExecutionException rejected){busy=false;FlexyStyleInstallHelper.error(this,R.string.FlexyStudioBusy);}

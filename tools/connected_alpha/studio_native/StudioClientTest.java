@@ -42,6 +42,7 @@ public class StudioClientTest {
  static void put(String file,String key,Object value){disk.computeIfAbsent(file,k->new HashMap<>()).put(key,value);}
  static class Backend implements StudioTransaction.Backend {
   Map<StudioSchema.Key,StudioTransaction.Slot> journal;
+  public StudioTransaction.Slot readForChange(StudioSchema.Key k,StudioTransaction.Slot scope){return new StudioTransaction.Slot(true,StudioClientBackup.snapshotLike((String)scope.value));}
   public StudioTransaction.Slot read(StudioSchema.Key k){return new StudioTransaction.Slot(true,StudioClientBackup.snapshot());}
   public void write(String f,Map<StudioSchema.Key,StudioTransaction.Slot> values)throws Exception{StudioClientBackup.apply((String)values.values().iterator().next().value);}
   public void journal(Map<StudioSchema.Key,StudioTransaction.Slot> before){journal=before;}
@@ -57,6 +58,7 @@ public class StudioClientTest {
   put("nkmrcfg","LlmApiKey","private");put("nkmrcfg","PushServiceTypeUnifiedWebPushAuthSecret","private");put("nkmrcfg","TranscribeProviderCfApiToken","private");
   put("userconfing","authKey","private session");put("mainconfig","passcodeHash1","private lock");
   put("flexygram_header","style",3);put("flexygram_composer","componentGap",8);put("flexygram_bubbles","signature_fusion_mode",2);put("flexy_bottom_tabs","show_titles",false);put("mainconfig","lite_mode6",4095);
+  put("flexy_bubble_interaction","menu_actions",Set.of("REPLY","COPY","MORE"));
   String saved=StudioClientBackup.snapshot();check(!saved.contains("private"));check(!saved.contains("ApiKey"));check(!saved.contains("ApiToken"));check(!saved.contains("AuthSecret"));check(!saved.contains("userconfing"));
   var preset=StudioCodec.create("Complete.flexygram",Map.of("client",Map.of("settings",saved)));
   var decoded=StudioCodec.decode(StudioCodec.encode(preset),1291);StudioClientBackup.validate((String)decoded.sections.get("client").get("settings"));
@@ -70,6 +72,28 @@ public class StudioClientTest {
   StudioClientBackup.apply(defaults);Backend backend=new Backend();var receipt=StudioTransaction.apply(backend,preset);check(saved.equals(StudioClientBackup.snapshot()));StudioTransaction.undo(backend,receipt);check(defaults.equals(StudioClientBackup.snapshot()));
   receipt=StudioTransaction.apply(backend,preset);put("flexygram_header","compact",true);try{StudioTransaction.undo(backend,receipt);throw new AssertionError("lost edit");}catch(IllegalStateException conflict){checks++;}
   StudioClientBackup.apply(defaults);failFile="flexygram_header";try{StudioTransaction.apply(backend,preset);throw new AssertionError("ignored disk fault");}catch(StudioTransaction.Failure failure){check(!failure.rollbackFailed);}check(defaults.equals(StudioClientBackup.snapshot()));check(backend.journal==null);
+  // Preview is read-only. Apply/undo only selected changed keys; unrelated later edits survive.
+  StudioClientBackup.apply(defaults);
+  var plan=StudioImportPlan.prepare(preset);
+  check(defaults.equals(StudioClientBackup.snapshot()));
+  check(plan.changedGroups().containsAll(Set.of("header","composer","chat")));
+  var headerOnly=plan.select(Set.of("header"));
+  var partialRoot=root((String)headerOnly.sections.get("client").get("settings"));
+  check(StudioClientBackup.object(partialRoot.get("files")).keySet().equals(Set.of("flexygram_header")));
+  check(!partialRoot.containsKey("theme")&&!partialRoot.containsKey("icon"));
+  receipt=StudioTransaction.apply(backend,headerOnly);
+  check(disk.get("flexygram_header").get("style").equals(3));
+  check(!disk.get("flexygram_composer").containsKey("componentGap"));
+  put("flexygram_composer","componentGap",4);StudioTransaction.undo(backend,receipt);
+  check(disk.get("flexygram_composer").get("componentGap").equals(4));
+  check(!disk.get("flexygram_header").containsKey("style"));
+  receipt=StudioTransaction.apply(backend,headerOnly);put("flexygram_header","style",2);
+  try{StudioTransaction.undo(backend,receipt);throw new AssertionError("selected conflict ignored");}catch(IllegalStateException expected){checks++;}
+  reject(()->plan.select(Set.of()));reject(()->plan.select(Set.of("unknown")));
+  StudioClientBackup.apply(saved);check(StudioImportPlan.prepare(preset).changedGroups().isEmpty());
+  check(disk.get("flexy_bubble_interaction").get("menu_actions").equals(Set.of("REPLY","COPY","MORE")));
+  var badSet=root(saved);file(badSet,"flexy_bubble_interaction").put("menu_actions",Map.of("present",true,"value",List.of(4L)));
+  reject(()->StudioClientBackup.validate(StudioCodec.encodeValues(badSet)));
   System.out.println("Studio client checks="+checks+"; complete/default round trips, typed values, secrets excluded, undo conflicts and mid-import disk rollback passed; persistence/theme are doubles.");
  }
 }

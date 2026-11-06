@@ -18,7 +18,7 @@ import java.io.*;
 import java.lang.ref.WeakReference;
 import java.util.*;
 
-/** Only explicit Studio operations use globalQueue. No dedicated thread or idle observer. */
+/** All transfer, comparison and transaction I/O shares the bounded Studio worker. */
 public final class FlexyStudioStore {
     public interface Completion {void done(boolean ok,boolean recoveryPending,StudioTransaction.Receipt receipt);}
     private static volatile boolean applying;
@@ -40,7 +40,7 @@ public final class FlexyStudioStore {
         if(preset.sections.containsKey("client"))StudioClientBackup.validate((String)preset.sections.get("client").get("settings"));
     }
 
-    private static Object readPreference(SharedPreferences p,StudioSchema.Key key) {
+    static Object readPreference(SharedPreferences p,StudioSchema.Key key) {
         if(key.defaultValue instanceof Boolean)return p.getBoolean(key.preference,(Boolean)key.defaultValue);
         if(key.defaultValue instanceof Integer)return p.getInt(key.preference,(Integer)key.defaultValue);
         return p.getString(key.preference,(String)key.defaultValue);
@@ -50,25 +50,32 @@ public final class FlexyStudioStore {
         return "EXTERALESS";
     }
     public static boolean apply(StudioCodec.Preset preset,Completion completion) {
+        return applyPrepared(()->preset,completion);
+    }
+    static boolean applySelection(StudioImportPlan plan,Set<String> selected,Completion completion) {
+        Set<String> included=new HashSet<>(selected);
+        return applyPrepared(()->plan.select(included),completion);
+    }
+    private static boolean applyPrepared(java.util.concurrent.Callable<StudioCodec.Preset> source,Completion completion) {
         if(applying)return false;applying=true;
-        Utilities.globalQueue.postRunnable(()->{
+        try{FlexyStudioIO.execute(()->{
             StudioTransaction.Receipt receipt=null;boolean ok=false,pending=false;
-            Set<String> affected=new HashSet<>(preset.sections.keySet());
-            try { validate(preset); affected.addAll(recoverOnWorker());receipt=StudioTransaction.apply(new Backend(),preset);last=receipt;ok=true; }
+            Set<String> affected=new HashSet<>();
+            try { StudioCodec.Preset preset=source.call();validate(preset);affected.addAll(preset.sections.keySet());affected.addAll(recoverOnWorker());receipt=StudioTransaction.apply(new Backend(),preset);last=receipt;ok=true; }
             catch(Exception failure){pending=hasJournal();}
             final boolean success=ok,recovery=pending;final StudioTransaction.Receipt result=receipt;
             AndroidUtilities.runOnUIThread(()->{finish(affected);completion.done(success,recovery,result);});
-        });return true;
+        });return true;}catch(java.util.concurrent.RejectedExecutionException busy){applying=false;return false;}
     }
     public static boolean undo(StudioTransaction.Receipt receipt,Completion completion) {
         if(applying||receipt==null||last!=receipt)return false;applying=true;
-        Utilities.globalQueue.postRunnable(()->{
+        try{FlexyStudioIO.execute(()->{
             Set<String> sections=new HashSet<>();for(StudioSchema.Key k:receipt.before.keySet())sections.add(k.section);
             boolean ok=false;
             try{sections.addAll(recoverOnWorker());StudioTransaction.undo(new Backend(),receipt);last=null;ok=true;}catch(Exception ignored){}
             final boolean success=ok,pending=hasJournal();
             AndroidUtilities.runOnUIThread(()->{finish(sections);completion.done(success,pending,null);});
-        });return true;
+        });return true;}catch(java.util.concurrent.RejectedExecutionException busy){applying=false;return false;}
     }
     private static void finish(Set<String> sections) {
         applying=false;
@@ -87,11 +94,11 @@ public final class FlexyStudioStore {
     /** One cheap startup existence check; disk recovery is scheduled only after an interrupted import. */
     public static void recoverIfNeeded() {
         if(recovering||applying||!hasJournal())return;recovering=true;applying=true;
-        Utilities.globalQueue.postRunnable(()->{
+        try{FlexyStudioIO.execute(()->{
             Set<String> affected=new HashSet<>();
             try{Map<StudioSchema.Key,StudioTransaction.Slot> saved=readJournal();for(StudioSchema.Key k:saved.keySet())affected.add(k.section);StudioTransaction.recover(new Backend(),saved);}catch(Exception ignored){}
             AndroidUtilities.runOnUIThread(()->{recovering=false;finish(affected);});
-        });
+        });}catch(java.util.concurrent.RejectedExecutionException busy){recovering=false;applying=false;}
     }
     private static Set<String> recoverOnWorker()throws Exception {
         Set<String> affected=new HashSet<>();
@@ -105,6 +112,10 @@ public final class FlexyStudioStore {
         }
     }
     private static final class Backend implements StudioTransaction.Backend {
+        public StudioTransaction.Slot readForChange(StudioSchema.Key key,StudioTransaction.Slot scope) {
+            if(key.section.equals("client"))return new StudioTransaction.Slot(true,StudioClientBackup.snapshotLike((String)scope.value));
+            return read(key);
+        }
         public StudioTransaction.Slot read(StudioSchema.Key key) {
             if(key.section.equals("client"))return new StudioTransaction.Slot(true,StudioClientBackup.snapshot());
             SharedPreferences p=prefs(key.file);boolean present=p.contains(key.preference);

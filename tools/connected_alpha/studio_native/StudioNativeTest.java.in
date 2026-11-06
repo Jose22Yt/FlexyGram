@@ -25,7 +25,7 @@ public class StudioNativeTest {
   click.invoke(settings,cell,positions[3],0f,0f);bind.invoke(adapter,holder,positions[3],false);assertTrue(app.flexygram.animation.FastMotionConfig.isEnabled());assertTrue(cell.isChecked());settings.onFragmentDestroy();
  }
  @Test public void cardListsExactlyPresentSectionsBeforeAnyPreferencesChange(){
-  for(int count=1;count<=4;count++){FlexyStudioSheet sheet=new FlexyStudioSheet(fragment,preset(count),"SoloBurbujas.flexyGram",834);sheet.show();List<TextView> all=texts(sheet.content);for(String id:StudioSchema.sections()){String label=LocaleController.getString(FlexyStudioText.section(id));long found=all.stream().filter(t->label.contentEquals(t.getText())).count();assertEquals(preset(count).sections.containsKey(id)?1:0,found);}assertFalse(activity.getSharedPreferences("flexygram_bubbles",0).contains("transparency"));sheet.dismiss();}
+  for(int count=1;count<=4;count++){FlexyStudioSheet sheet=new FlexyStudioSheet(fragment,preset(count),"SoloBurbujas.flexyGram",834,StudioImportPlan.prepare(preset(count)));sheet.show();List<TextView> all=texts(sheet.content);for(String id:StudioSchema.sections()){String label=LocaleController.getString(FlexyStudioText.section(id));long found=all.stream().filter(t->label.contentEquals(t.getText())).count();assertEquals(preset(count).sections.containsKey(id)?1:0,found);}assertFalse(activity.getSharedPreferences("flexygram_bubbles",0).contains("transparency"));sheet.dismiss();}
  }
  @Test public void actualApplyAndUndoUseRealPreferencesAndRefreshOnlyIncludedSections()throws Exception{
   AtomicBoolean applied=new AtomicBoolean();AtomicReference<StudioTransaction.Receipt> receipt=new AtomicReference<>();
@@ -120,7 +120,7 @@ public class StudioNativeTest {
  }
  @Test public void renderIsolatedPearlMidnightSingleAndMultipleWithLargeFonts()throws Exception{
   for(boolean dark:new boolean[]{false,true})for(int count:new int[]{1,4}){
-   Theme.dark=dark;FlexyStudioSheet sheet=new FlexyStudioSheet(fragment,preset(count),"SoloBurbujas.flexyGram",834);
+   Theme.dark=dark;FlexyStudioSheet sheet=new FlexyStudioSheet(fragment,preset(count),"SoloBurbujas.flexyGram",834,StudioImportPlan.prepare(preset(count)));
    for(TextView t:texts(sheet.content))t.setTextSize(t.getTextSize()/activity.getResources().getDisplayMetrics().scaledDensity*1.25f);
    View content=sheet.content;content.measure(View.MeasureSpec.makeMeasureSpec(400,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(840,View.MeasureSpec.AT_MOST));content.layout(0,0,400,content.getMeasuredHeight());assertTrue(content.getMeasuredHeight()<=840);assertTrue(content.getMeasuredHeight()>200);
    Bitmap image=Bitmap.createBitmap(400,content.getMeasuredHeight(),Bitmap.Config.ARGB_8888);content.draw(new Canvas(image));try(FileOutputStream out=new FileOutputStream(new File(System.getProperty("probe.root"),"studio-"+(dark?"midnight":"pearl")+"-"+count+"-isolated.png"))){image.compress(Bitmap.CompressFormat.PNG,100,out);}sheet.dismiss();

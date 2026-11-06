@@ -96,7 +96,7 @@ public final class FlexyStyleInstallHelper {
         volatile AssetFileDescriptor descriptor;
         Future<?> work;
         File file;Uri uri;String filename;int account,tag=-1,bytes,messageId;long dialogId;boolean waiting,showing;
-        StudioCodec.Preset preset;Animator pulse;Runnable cancelDownload;
+        StudioCodec.Preset preset;StudioImportPlan plan;Animator pulse;Runnable cancelDownload;
         final Runnable timeout;
         Request(BaseFragment fragment,View view){owner=new WeakReference<>(fragment);source=new WeakReference<>(view);timeout=()->{BaseFragment current=owner.get();if(current!=null&&!canceled){cancel();forget(current);error(current,R.string.FlexyStudioReadError);}};if(view!=null)view.addOnAttachStateChangeListener(this);}
         void pulse() {
@@ -107,7 +107,7 @@ public final class FlexyStyleInstallHelper {
             if(canceled)return;waiting=false;if(tag>=0)DownloadController.getInstance(account).removeLoadingFileObserver(this);
             ApplicationLoader.applicationHandler.postDelayed(timeout,60000);
             try{work=FlexyStudioIO.execute(()->{
-                StudioCodec.Preset result=null;String realName=filename;int count=0;String unsupported=null;
+                StudioCodec.Preset result=null;StudioImportPlan comparison=null;String realName=filename;int count=0;String unsupported=null;
                 try {
                     InputStream input;
                     if(uri!=null) {
@@ -121,26 +121,26 @@ public final class FlexyStyleInstallHelper {
                         }
                         descriptor=resolver.openAssetFileDescriptor(uri,"r",signal);if(descriptor==null)throw new IOException("stream");input=descriptor.createInputStream();
                     } else {if(file==null)throw new IOException("file");input=new FileInputStream(file);}
-                    try(InputStream in=input){byte[] data=StudioCodec.readLimited(in);count=data.length;if(canceled)throw new IOException("canceled");result=StudioCodec.decode(data,Math.max(BuildConfig.VERSION_CODE,SharedConfig.buildVersion()));FlexyStudioStore.validate(result);}
+                    try(InputStream in=input){byte[] data=StudioCodec.readLimited(in);count=data.length;if(canceled)throw new IOException("canceled");StudioCodec.Preset candidate=StudioCodec.decode(data,Math.max(BuildConfig.VERSION_CODE,SharedConfig.buildVersion()));StudioImportPlan compared=StudioImportPlan.prepare(candidate);result=candidate;comparison=compared;}
                 }catch(StudioSchema.Unsupported incompatible){unsupported=incompatible.identifier;}catch(Exception invalid){}finally{closeDescriptor();}
-                StudioCodec.Preset ready=result;String actual=realName;int size=count;String incompatible=unsupported;
+                StudioCodec.Preset ready=result;StudioImportPlan compared=comparison;String actual=realName;int size=count;String incompatible=unsupported;
                 AndroidUtilities.runOnUIThread(()->{
                     ApplicationLoader.applicationHandler.removeCallbacks(timeout);if(canceled)return;
                     BaseFragment fragment=owner.get();if(fragment==null){cancel();return;}
                     if(ready==null){forget(fragment);cancel();if(incompatible!=null)Toast.makeText(fragment.getParentActivity(),LocaleController.formatString("FlexyStudioUnsupported",R.string.FlexyStudioUnsupported,incompatible),Toast.LENGTH_LONG).show();else error(fragment,R.string.FlexyStudioInvalid);return;}
-                    preset=ready;filename=actual==null||actual.isEmpty()?ready.name:actual;bytes=size;show();
+                    preset=ready;plan=compared;filename=actual==null||actual.isEmpty()?ready.name:actual;bytes=size;show();
                 });
             });}catch(java.util.concurrent.RejectedExecutionException busy){BaseFragment f=owner.get();if(f!=null){forget(f);error(f,R.string.FlexyStudioBusy);}cancel();}
         }
         void show() {
             BaseFragment fragment=owner.get();
             if(canceled||preset==null||showing||fragment==null||fragment.getParentActivity()==null||fragment.isPaused()||fragment.getFragmentView()==null||!fragment.getFragmentView().isAttachedToWindow())return;
-            FlexyStudioSheet sheet=new FlexyStudioSheet(fragment,preset,filename,bytes);
+            FlexyStudioSheet sheet=new FlexyStudioSheet(fragment,preset,filename,bytes,plan);
             if(fragment.showDialog(sheet,false,d->{forget(fragment);cancel();})!=null){showing=true;if(pulse!=null){pulse.cancel();View v=source.get();if(v!=null){v.setScaleX(1f);v.setScaleY(1f);}}}
         }
         private void closeDescriptor(){AssetFileDescriptor fd=descriptor;descriptor=null;if(fd!=null)try{fd.close();}catch(IOException ignored){}}
         void forget(BaseFragment fragment){if(pending.get(fragment)==this)pending.remove(fragment);}
-        void cancel(){if(canceled)return;canceled=true;try{signal.cancel();}catch(RuntimeException ignored){}closeDescriptor();FlexyStudioIO.cancel(work);ApplicationLoader.applicationHandler.removeCallbacks(timeout);if(tag>=0)DownloadController.getInstance(account).removeLoadingFileObserver(this);View view=source.get();if(view!=null){view.removeOnAttachStateChangeListener(this);if(pulse!=null){pulse.cancel();view.setScaleX(1f);view.setScaleY(1f);}}preset=null;}
+        void cancel(){if(canceled)return;canceled=true;try{signal.cancel();}catch(RuntimeException ignored){}closeDescriptor();FlexyStudioIO.cancel(work);ApplicationLoader.applicationHandler.removeCallbacks(timeout);if(tag>=0)DownloadController.getInstance(account).removeLoadingFileObserver(this);View view=source.get();if(view!=null){view.removeOnAttachStateChangeListener(this);if(pulse!=null){pulse.cancel();view.setScaleX(1f);view.setScaleY(1f);}}preset=null;plan=null;}
         public void onViewAttachedToWindow(View v){}
         public void onViewDetachedFromWindow(View v){BaseFragment fragment=owner.get();if(fragment!=null)forget(fragment);cancel();}
         public void onFailedDownload(String name,boolean userCanceled){if(canceled)return;BaseFragment fragment=owner.get();if(fragment!=null)forget(fragment);cancel();if(!userCanceled&&fragment!=null)error(fragment,R.string.FlexyStudioReadError);}

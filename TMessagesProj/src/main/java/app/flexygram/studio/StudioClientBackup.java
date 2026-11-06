@@ -13,13 +13,19 @@ import java.util.concurrent.atomic.AtomicReference;
 /** Complete portable client settings. File names and keys always come from native metadata. */
 final class StudioClientBackup {
     private StudioClientBackup() {}
-    static String snapshot() {
+    static String snapshot() { return snapshotLike(null); }
+    static String snapshotLike(String encodedScope) {
+        Map<String,Object> scope=encodedScope==null?null:object(StudioCodec.decodeValues(encodedScope));
+        Map<String,Object> scopeFiles=scope==null?null:object(scope.get("files"));
         StudioClientCatalog catalog = new StudioClientCatalog();
         Map<String,Object> files = new TreeMap<>();
         for (Map.Entry<String,Map<String,StudioClientCatalog.Spec>> file : catalog.files().entrySet()) {
+            if(scopeFiles!=null&&!scopeFiles.containsKey(file.getKey()))continue;
+            Map<String,Object> scoped=scopeFiles==null?null:object(scopeFiles.get(file.getKey()));
             Map<String,?> values = catalog.preferences(file.getKey()).getAll();
             Map<String,Object> settings = new TreeMap<>();
             for (Map.Entry<String,StudioClientCatalog.Spec> item : file.getValue().entrySet()) {
+                if(scoped!=null&&!scoped.containsKey(item.getKey()))continue;
                 Map<String,Object> slot = new TreeMap<>();
                 boolean present = values.containsKey(item.getKey());
                 slot.put("present", present);
@@ -30,8 +36,8 @@ final class StudioClientBackup {
         }
         Map<String,Object> result = new TreeMap<>();
         result.put("version", 1); result.put("files", files);
-        result.put("icon", activeIcon());
-        result.put("theme", StudioClientTheme.snapshot());
+        if(scope==null||scope.containsKey("icon"))result.put("icon", activeIcon());
+        if(scope==null||scope.containsKey("theme"))result.put("theme", StudioClientTheme.snapshot());
         return StudioCodec.encodeValues(result);
     }
     private static String activeIcon() {
@@ -45,11 +51,12 @@ final class StudioClientBackup {
     }
     static Map<String,Object> validate(String encoded) {
         Map<String,Object> root = object(StudioCodec.decodeValues(encoded));
-        if (!root.keySet().equals(new HashSet<>(Arrays.asList("version","files","icon","theme")))
+        if (!root.keySet().containsAll(Arrays.asList("version","files"))
+                || !new HashSet<>(Arrays.asList("version","files","icon","theme")).containsAll(root.keySet())
                 || !Long.valueOf(1).equals(root.get("version"))) throw new IllegalArgumentException("client_version");
         StudioClientCatalog catalog = new StudioClientCatalog();
         Map<String,Object> files = object(root.get("files"));
-        if (files.isEmpty()) throw new IllegalArgumentException("client_empty");
+        if (files.isEmpty()&&!root.containsKey("icon")&&!root.containsKey("theme")) throw new IllegalArgumentException("client_empty");
         for (Map.Entry<String,Object> file : files.entrySet()) {
             Map<String,StudioClientCatalog.Spec> specs = catalog.files().get(file.getKey());
             if (specs == null) throw new StudioSchema.Unsupported("client."+file.getKey());
@@ -63,7 +70,7 @@ final class StudioClientBackup {
                 if (present) spec.validate(slot.get("value"));
             }
         }
-        LauncherIconController.LauncherIcon.valueOf((String)root.get("icon"));
+        if(root.containsKey("icon"))LauncherIconController.LauncherIcon.valueOf((String)root.get("icon"));
         Object main=files.get("mainconfig");
         if(main!=null && object(main).containsKey("language")) {
             Map<String,Object> language=object(object(main).get("language"));
@@ -72,7 +79,7 @@ final class StudioClientBackup {
                 if(!onUi(() -> LocaleController.getInstance().getLanguageFromDict(code)!=null))throw new StudioSchema.Unsupported("client.language");
             }
         }
-        StudioClientTheme.validate(root.get("theme"));
+        if(root.containsKey("theme"))StudioClientTheme.validate(root.get("theme"));
         return root;
     }
     static void apply(String encoded) throws Exception {
@@ -89,11 +96,11 @@ final class StudioClientBackup {
             if (!editor.commit()) throw new IOException("client_preferences");
         }
         onUi(() -> {
-            LauncherIconController.setIcon(LauncherIconController.LauncherIcon.valueOf((String)root.get("icon")));
+            if(root.containsKey("icon"))LauncherIconController.setIcon(LauncherIconController.LauncherIcon.valueOf((String)root.get("icon")));
             reload(); return null;
         });
         app.exteraless.icons.IconPackManager.getInstance().reloadInternal();
-        StudioClientTheme.apply(root.get("theme"));
+        if(root.containsKey("theme"))StudioClientTheme.apply(root.get("theme"));
     }
     static void reload() {
         tw.nekomimi.nekogram.NekoConfig.loadConfig(true);

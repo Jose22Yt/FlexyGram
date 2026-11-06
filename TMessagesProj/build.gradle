@@ -340,6 +340,7 @@ android {
 
 apply from: rootProject.file('gradle/connected-alpha.gradle')
 apply from: rootProject.file('gradle/flexygram-beta.gradle')
+apply from: rootProject.file('gradle/flexygram-performance.gradle')
 
 androidComponents {
     beforeVariants(selector().all()) { builder ->

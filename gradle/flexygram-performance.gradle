@@ -1,0 +1,45 @@
+// Device-only diagnostics and an isolated optimizer experiment. No build runs automatically.
+def performanceBuild = project.findProperty('flexyPerformanceBuild') == 'true'
+def optimizeExperiment = project.findProperty('flexyR8Optimization') == 'true'
+if (optimizeExperiment && !performanceBuild) {
+    throw new GradleException('flexyR8Optimization requires flexyPerformanceBuild on the isolated connectedAlpha test variant.')
+}
+android.defaultConfig {
+    buildConfigField 'boolean', 'FLEXY_FRAME_DIAGNOSTICS', String.valueOf(performanceBuild && (project.findProperty('flexyFrameDiagnostics') == 'true' || project.findProperty('flexySystemTrace') == 'true'))
+    buildConfigField 'boolean', 'FLEXY_SYSTEM_TRACE', String.valueOf(performanceBuild && project.findProperty('flexySystemTrace') == 'true')
+}
+if (performanceBuild) {
+    android.sourceSets.debug.manifest.srcFile('src/performance/AndroidManifest.xml')
+    android.sourceSets.connectedAlpha.manifest.srcFile('src/performance/AndroidManifest.xml')
+}
+if (optimizeExperiment) {
+    def rules = layout.buildDirectory.file('generated/performance/optimized-rules.pro')
+    def generateRules = tasks.register('prepareFlexyOptimizedRules') {
+        inputs.file('proguard-rules.pro')
+        outputs.file(rules)
+        doLast {
+            def source = file('proguard-rules.pro').readLines('UTF-8')
+            if (source.count { it.trim() == '-dontoptimize' } != 1) {
+                throw new GradleException('Review the optimizer rules: expected exactly one global optimization switch.')
+            }
+            def target = rules.get().asFile
+            target.parentFile.mkdirs()
+            // Names, reflection, JNI and plugin keep rules remain untouched.
+            target.setText(source.findAll { it.trim() != '-dontoptimize' }.join('\n') + '\n', 'UTF-8')
+        }
+    }
+    tasks.matching { it.name == 'minifyConnectedAlphaWithR8' }.configureEach { dependsOn(generateRules) }
+    android.buildTypes.connectedAlpha {
+        minifyEnabled = true
+        shrinkResources = true
+        proguardFiles android.getDefaultProguardFile('proguard-android-optimize.txt'), rules.get().asFile
+    }
+}
+dependencies {
+    // Profiles are generated on-device; don't ship invented method lists.
+    if (performanceBuild || file('src/main/generated/baselineProfiles/baseline-prof.txt').isFile()) {
+        implementation 'androidx.profileinstaller:profileinstaller:1.4.1'
+    }
+    // Tracking is created only when PERFORMANCE_TEST_BUILD is explicitly true.
+    implementation 'androidx.metrics:metrics-performance:1.0.0'
+}

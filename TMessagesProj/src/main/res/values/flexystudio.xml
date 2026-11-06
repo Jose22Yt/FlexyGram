@@ -14,7 +14,7 @@
     <string name="FlexyStudioFileDescription">FlexyGram configuration</string>
     <string name="FlexyStudioCompatible">Compatible with FlexyGram</string>
     <string name="FlexyStudioIncludes">Includes the following configuration:</string>
-    <string name="FlexyStudioApplyInfo">The included settings will be applied in FlexyGram.</string>
+    <string name="FlexyStudioApplyInfo">Only checked sections will be applied. Open each section to compare its changes.</string>
     <string name="FlexyStudioBubbles">Chat bubbles</string>
     <string name="FlexyStudioHeader">Conversation header</string>
     <string name="FlexyStudioComposer">Message composer</string>
@@ -35,4 +35,23 @@
     <string name="FlexyStudioLoginFirst">Open FlexyGram and sign in before importing a configuration.</string>
     <string name="FlexyStudioUnsupported">Unsupported: %1$s. No section was applied.</string>
     <string name="FlexyStudioClientSettings">Complete client settings</string>
+    <string name="FlexyStudioAppearance">Appearance and effects</string>
+    <string name="FlexyStudioTheme">Theme and wallpaper</string>
+    <string name="FlexyStudioChat">Chat and message menus</string>
+    <string name="FlexyStudioHome">Home screen</string>
+    <string name="FlexyStudioNavigation">Navigation</string>
+    <string name="FlexyStudioGeneral">General settings</string>
+    <string name="FlexyStudioAi">AI preferences</string>
+    <string name="FlexyStudioPlugins">Plugin preferences</string>
+    <string name="FlexyStudioChangeCount">Changes: %1$d</string>
+    <string name="FlexyStudioAlreadyMatches">Matches your current settings</string>
+    <string name="FlexyStudioViewChanges">View changes</string>
+    <string name="FlexyStudioHideChanges">Hide changes</string>
+    <string name="FlexyStudioDefaultValue">Default</string>
+    <string name="FlexyStudioEnabledValue">Enabled</string>
+    <string name="FlexyStudioDisabledValue">Disabled</string>
+    <string name="FlexyStudioThemeChange">Replace theme colors and wallpaper with those in this file.</string>
+    <string name="FlexyStudioExportError">Could not prepare the configuration. No file was generated.</string>
+    <string name="FlexyStudioPreviousChanges">Previous</string>
+    <string name="FlexyStudioNextChanges">Next</string>
 </resources>

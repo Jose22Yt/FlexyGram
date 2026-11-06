@@ -14,6 +14,7 @@ public final class StudioTransaction {
     }
     public interface Backend {
         Slot read(StudioSchema.Key key)throws Exception;
+        default Slot readForChange(StudioSchema.Key key,Slot scope)throws Exception{return read(key);}
         void write(String file,Map<StudioSchema.Key,Slot> values)throws Exception;
         void journal(Map<StudioSchema.Key,Slot> before)throws Exception;
         void clearJournal()throws Exception;
@@ -38,17 +39,17 @@ public final class StudioTransaction {
     }
     public static void undo(Backend backend,Receipt receipt)throws Exception {
         // Do not silently overwrite settings the owner changed after the import.
-        for(StudioSchema.Key key:receipt.after.keySet())if(!receipt.after.get(key).equals(backend.read(key)))throw new IllegalStateException("undo_conflict");
+        for(StudioSchema.Key key:receipt.after.keySet())if(!receipt.after.get(key).equals(backend.readForChange(key,receipt.after.get(key))))throw new IllegalStateException("undo_conflict");
         change(backend,receipt.before);
     }
     private static Receipt change(Backend backend,Map<StudioSchema.Key,Slot> after)throws Exception {
         Map<StudioSchema.Key,Slot> before=new LinkedHashMap<>();
-        for(StudioSchema.Key key:after.keySet())before.put(key,backend.read(key));
+        for(StudioSchema.Key key:after.keySet())before.put(key,backend.readForChange(key,after.get(key)));
         backend.journal(before);
         try {
             write(backend,after);
             Map<StudioSchema.Key,Slot> actual=new LinkedHashMap<>();
-            for(StudioSchema.Key key:after.keySet())actual.put(key,backend.read(key));
+            for(StudioSchema.Key key:after.keySet())actual.put(key,backend.readForChange(key,after.get(key)));
             backend.clearJournal();return new Receipt(before,actual);
         }
         catch(Exception failed) {

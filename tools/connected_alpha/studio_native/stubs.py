@@ -110,3 +110,7 @@ protected class MatteListAdapter extends BaseListAdapter {protected MatteListAda
 
  amend('org/telegram/messenger/LocaleController.java','public static boolean isRTL;', 'public static boolean isRTL;public static final LocaleController INSTANCE=new LocaleController();public static LocaleController getInstance(){return INSTANCE;}public Object getLanguageFromDict(String key){return new Object();}public void reloadStudioLanguage(){}')
  put('app/exteraless/icons/IconPackManager.java','package app.exteraless.icons;public class IconPackManager{public static IconPackManager getInstance(){return new IconPackManager();}public void reloadInternal(){}}')
+
+ # Comparison labels use the native string-key fallback; diagnostics never print configuration values.
+ amend('org/telegram/messenger/LocaleController.java','public static boolean isRTL;', 'public static boolean isRTL;public static String getString(String key,int id){return "LOC_ERR:"+key;}')
+ put('org/telegram/messenger/FileLog.java','package org.telegram.messenger;public class FileLog{public static void e(String message){}}')

@@ -6967,12 +6967,15 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         voipLaunchedInBackground = false;
     }
 
+    private app.flexygram.performance.FrameDiagnostics frameDiagnostics;
+
     private final app.flexygram.performance.RefreshRateMonitor refreshRateMonitor =
             new app.flexygram.performance.RefreshRateMonitor(this);
 
     @Override
     protected void onPause() {
         refreshRateMonitor.stop();
+        if (BuildConfig.FLEXY_FRAME_DIAGNOSTICS) app.flexygram.performance.FrameDiagnostics.pause(frameDiagnostics);
         // Пауза голосовых и кружков при сворачивании приложения.
         // exteraGram зовёт это из didReceivedNotification по stopAllHeavyOperations(4096);
         // у нас такой ветки нет, а onPause наступает ровно в тот же момент.
@@ -7106,6 +7109,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
     @Override
     protected void onDestroy() {
         refreshRateMonitor.stop();
+        if (BuildConfig.FLEXY_FRAME_DIAGNOSTICS) app.flexygram.performance.FrameDiagnostics.pause(frameDiagnostics);
         app.flexygram.studio.FlexyStyleInstallHelper.cancelExternal(this);
         app.exteraless.icons.picker.IconPickerController.onDestroy();
         app.exteraless.plugins.PluginsController.getInstance().executeOnAppEvent(app.exteraless.plugins.PluginsConstants.EVENT_APP_STOP);
@@ -7231,6 +7235,11 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         super.onResume();
         app.flexygram.performance.StartupSplash.refreshAfterFirstFrame(this);
         refreshRateMonitor.start();
+        if (BuildConfig.FLEXY_FRAME_DIAGNOSTICS) {
+            frameDiagnostics = app.flexygram.performance.FrameDiagnostics.resume(this, frameDiagnostics);
+            BaseFragment performanceFragment = getSafeLastFragment();
+            if (performanceFragment != null) app.flexygram.performance.FrameDiagnostics.screen(this, performanceFragment.getClass().getSimpleName());
+        }
         app.flexygram.studio.FlexyStyleInstallHelper.resumeExternal(this);
         isResumed = true;
         app.exteraless.plugins.PluginsController.getInstance().executeOnAppEvent(app.exteraless.plugins.PluginsConstants.EVENT_APP_RESUME);

@@ -595,12 +595,14 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
     public void onTrimMemory(int level) {
         super.onTrimMemory(level);
         app.flexygram.bubbles.SignatureWallpaperBlur.trimMemory(level);
+        app.flexygram.performance.TextLayoutPrecompute.trimMemory(level);
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
         app.flexygram.bubbles.SignatureWallpaperBlur.trimMemory(android.content.ComponentCallbacks2.TRIM_MEMORY_COMPLETE);
+        app.flexygram.performance.TextLayoutPrecompute.trimMemory(android.content.ComponentCallbacks2.TRIM_MEMORY_COMPLETE);
     }
 
     @Override

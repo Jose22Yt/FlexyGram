@@ -17,7 +17,7 @@ class StudioTests(unittest.TestCase):
   helper=(ROOT/'TMessagesProj/src/main/java/app/flexygram/studio/FlexyStyleInstallHelper.java').read_text()
   self.assertIn('return StudioSchema.filename(name);',helper)
   self.assertNotIn('BuildConfig.CONNECTED_ALPHA',helper)
-  self.assertIn('FlexyStudioStore.validate(result)',helper)
+  self.assertIn('StudioImportPlan.prepare(candidate)',helper)
   for path in ['TMessagesProj/src/main/java/org/telegram/ui/LaunchActivity.java','TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java']:
    self.assertIn('FlexyStyleInstallHelper', (ROOT/path).read_text())
  def test_resources_translations_identical(self):

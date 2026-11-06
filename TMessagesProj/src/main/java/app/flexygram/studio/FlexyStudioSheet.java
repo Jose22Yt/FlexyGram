@@ -20,7 +20,8 @@ public final class FlexyStudioSheet extends BottomSheet {
     private boolean busy;
     private final TextView apply;
     private final Theme.ResourcesProvider provider;
-    public FlexyStudioSheet(BaseFragment fragment,StudioCodec.Preset preset,String filename,int bytes) {
+    private final java.util.Set<String> selected=new java.util.LinkedHashSet<>();
+    public FlexyStudioSheet(BaseFragment fragment,StudioCodec.Preset preset,String filename,int bytes,StudioImportPlan plan) {
         super(fragment.getParentActivity(),false,fragment.getResourceProvider());
         owner=new WeakReference<>(fragment);provider=fragment.getResourceProvider();Context c=getContext();
         setBackgroundColor(color(Theme.key_windowBackgroundGray));setApplyTopPadding(false);
@@ -39,34 +40,87 @@ public final class FlexyStudioSheet extends BottomSheet {
         info.addView(detail,new LinearLayout.LayoutParams(0,-2,1));add(all,info,0,14);
         add(all,text(getString(R.string.FlexyStudioIncludes),14,Theme.key_windowBackgroundWhiteBlueText),0,8);
         LinearLayout sections=panel(c);sections.setPadding(0,0,0,0);sections.setOrientation(LinearLayout.VERTICAL);
-        for(String id:preset.sections.keySet()) {
-            LinearLayout row=new LinearLayout(c);row.setGravity(Gravity.CENTER_VERTICAL);row.setPadding(dp(16),dp(12),dp(16),dp(12));row.setMinimumHeight(dp(52));
-            ImageView line=new ImageView(c);line.setImageResource(FlexyStudioText.icon(id));line.setColorFilter(color(Theme.key_windowBackgroundWhiteBlackText));line.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
-            row.addView(line,new LinearLayout.LayoutParams(dp(24),dp(24)));
-            TextView label=text(getString(FlexyStudioText.section(id)),16,Theme.key_windowBackgroundWhiteBlackText);label.setPaddingRelative(dp(16),0,0,0);row.addView(label,new LinearLayout.LayoutParams(0,-2,1));
-            sections.addView(row,new LinearLayout.LayoutParams(-1,-2));
-            if(sections.getChildCount()<preset.sections.size()*2-1){View separator=new View(c);separator.setBackgroundColor(color(Theme.key_divider));sections.addView(separator,new LinearLayout.LayoutParams(-1,1));}
+        selected.addAll(plan.changedGroups());
+        for(StudioImportPlan.Group group:plan.groups) {
+            String id=group.id;
+            LinearLayout block=new LinearLayout(c);block.setOrientation(LinearLayout.VERTICAL);
+            LinearLayout row=new LinearLayout(c);row.setGravity(Gravity.CENTER_VERTICAL);row.setPadding(dp(16),dp(10),dp(12),dp(10));row.setMinimumHeight(dp(56));
+            LinearLayout labels=new LinearLayout(c);labels.setOrientation(LinearLayout.VERTICAL);
+            labels.addView(text(getString(FlexyStudioText.section(id)),16,Theme.key_windowBackgroundWhiteBlackText));
+            labels.addView(text(group.changes.isEmpty()?getString(R.string.FlexyStudioAlreadyMatches):org.telegram.messenger.LocaleController.formatString("FlexyStudioChangeCount",R.string.FlexyStudioChangeCount,group.changes.size()),13,Theme.key_windowBackgroundWhiteGrayText2));
+            row.addView(labels,new LinearLayout.LayoutParams(0,-2,1));
+            CheckBox check=new CheckBox(c);check.setButtonTintList(android.content.res.ColorStateList.valueOf(color(Theme.key_windowBackgroundWhiteBlueText)));check.setChecked(selected.contains(id));check.setEnabled(!group.changes.isEmpty());
+            check.setContentDescription(getString(FlexyStudioText.section(id)));row.addView(check,new LinearLayout.LayoutParams(dp(48),dp(48)));
+            check.setOnCheckedChangeListener((button,checked)->{if(busy){check.setChecked(selected.contains(id));return;}if(checked)selected.add(id);else selected.remove(id);refreshApply();});
+            row.setOnClickListener(v->{if(check.isEnabled())check.performClick();});
+            block.addView(row,new LinearLayout.LayoutParams(-1,-2));
+            if(!group.changes.isEmpty()) {
+                TextView details=text("",13,Theme.key_windowBackgroundWhiteGrayText2);details.setPadding(dp(16),0,dp(16),dp(12));details.setVisibility(View.GONE);
+                TextView expand=text(getString(R.string.FlexyStudioViewChanges),14,Theme.key_windowBackgroundWhiteBlueText);expand.setPadding(dp(16),dp(8),dp(16),dp(12));expand.setMinHeight(dp(44));expand.setFocusable(true);
+                int[] page={0};
+                LinearLayout paging=new LinearLayout(c);paging.setGravity(Gravity.CENTER_VERTICAL);paging.setVisibility(View.GONE);
+                TextView previous=button(getString(R.string.FlexyStudioPreviousChanges),false),next=button(getString(R.string.FlexyStudioNextChanges),false);
+                paging.addView(previous,new LinearLayout.LayoutParams(0,-2,1));paging.addView(next,new LinearLayout.LayoutParams(0,-2,1));
+                Runnable showPage=()->{details.setText(describe(group,page[0]));previous.setEnabled(page[0]>0);next.setEnabled(page[0]+20<group.changes.size());};
+                previous.setOnClickListener(v->{if(page[0]>0){page[0]-=20;showPage.run();}});
+                next.setOnClickListener(v->{if(page[0]+20<group.changes.size()){page[0]+=20;showPage.run();}});
+                expand.setOnClickListener(v->{boolean show=details.getVisibility()!=View.VISIBLE;if(show)showPage.run();details.setVisibility(show?View.VISIBLE:View.GONE);paging.setVisibility(show&&group.changes.size()>20?View.VISIBLE:View.GONE);expand.setText(getString(show?R.string.FlexyStudioHideChanges:R.string.FlexyStudioViewChanges));});
+                block.addView(expand,new LinearLayout.LayoutParams(-1,-2));block.addView(details,new LinearLayout.LayoutParams(-1,-2));block.addView(paging,new LinearLayout.LayoutParams(-1,-2));
+            }
+            sections.addView(block,new LinearLayout.LayoutParams(-1,-2));
+            if(sections.getChildCount()<plan.groups.size()*2-1){View separator=new View(c);separator.setBackgroundColor(color(Theme.key_divider));sections.addView(separator,new LinearLayout.LayoutParams(-1,1));}
         }
         add(all,sections,0,14);add(all,text(getString(R.string.FlexyStudioApplyInfo),14,Theme.key_windowBackgroundWhiteGrayText2),0,14);
         LinearLayout buttons=new LinearLayout(c);buttons.setGravity(Gravity.CENTER_VERTICAL);
-        TextView cancel=button(getString(R.string.Cancel),false);apply=button(getString(R.string.FlexyStudioApply),true);
+        TextView cancel=button(getString(R.string.Cancel),false);apply=button(getString(R.string.FlexyStudioApply),true);refreshApply();
         LinearLayout.LayoutParams half=new LinearLayout.LayoutParams(0,-2,1);half.setMarginEnd(dp(10));buttons.addView(cancel,half);buttons.addView(apply,new LinearLayout.LayoutParams(0,-2,1));
         cancel.setOnClickListener(v->{if(!busy)dismiss();});
         apply.setOnClickListener(v->{
-            if(busy)return;BaseFragment f=owner.get();if(f==null||f.getParentActivity()==null){dismiss();return;}
+            if(busy||selected.isEmpty())return;BaseFragment f=owner.get();if(f==null||f.getParentActivity()==null){dismiss();return;}
             busy=true;apply.setEnabled(false);apply.setText(getString(R.string.FlexyStudioApplying));
             WeakReference<FlexyStudioSheet> weakSheet=new WeakReference<>(this);
-            boolean accepted=FlexyStudioStore.apply(preset,(ok,recovery,receipt)->{
+            boolean accepted=FlexyStudioStore.applySelection(plan,selected,(ok,recovery,receipt)->{
                 FlexyStudioSheet sheet=weakSheet.get();if(sheet==null)return;
                 sheet.busy=false;BaseFragment current=sheet.owner.get();
                 if(ok){sheet.dismiss();if(current!=null&&current.getParentActivity()!=null)BulletinFactory.of(current).createSimpleBulletin(0,getString(R.string.FlexyStudioApplied),getString(R.string.UndoNoCaps),()->confirmUndo(current,receipt)).show();}
-                else {sheet.apply.setEnabled(true);sheet.apply.setText(getString(R.string.FlexyStudioApply));FlexyStyleInstallHelper.error(current,recovery?R.string.FlexyStudioRecoveryPending:R.string.FlexyStudioApplyError);}
+                else {sheet.refreshApply();sheet.apply.setText(getString(R.string.FlexyStudioApply));FlexyStyleInstallHelper.error(current,recovery?R.string.FlexyStudioRecoveryPending:R.string.FlexyStudioApplyError);}
             });
-            if(!accepted){busy=false;apply.setEnabled(true);apply.setText(getString(R.string.FlexyStudioApply));FlexyStyleInstallHelper.error(f,R.string.FlexyStudioBusy);}
+            if(!accepted){busy=false;refreshApply();apply.setText(getString(R.string.FlexyStudioApply));FlexyStyleInstallHelper.error(f,R.string.FlexyStudioBusy);}
         });
         all.addView(buttons,new LinearLayout.LayoutParams(-1,-2));
         ScrollView scroll=new ScrollView(c){@Override protected void onMeasure(int w,int h){super.onMeasure(w,MeasureSpec.makeMeasureSpec(Math.min(MeasureSpec.getSize(h),Math.max(dp(160),(int)(AndroidUtilities.displaySize.y*.86f))),MeasureSpec.AT_MOST));}};
         scroll.setFillViewport(false);scroll.addView(all,new ScrollView.LayoutParams(-1,-2));setCustomView(scroll);
+    }
+    private void refreshApply(){if(apply!=null)apply.setEnabled(!busy&&!selected.isEmpty());}
+    private String describe(StudioImportPlan.Group group,int start){
+        StringBuilder result=new StringBuilder();int end=Math.min(start+20,group.changes.size());
+        if(group.changes.size()>20)result.append(start+1).append("–").append(end).append(" / ").append(group.changes.size()).append("\n\n");
+        for(int i=start;i<end;i++){
+            StudioImportPlan.Change change=group.changes.get(i);
+            if(i>start)result.append("\n\n");
+            if(change.key.equals("theme")){result.append(getString(R.string.FlexyStudioThemeChange));continue;}
+            result.append(FlexyStudioText.setting(change.file,change.key)).append(": ")
+                    .append(value(change.file,change.key,change.before)).append(" → ").append(value(change.file,change.key,change.after));
+        }
+        return result.toString();
+    }
+    private String value(String file,String key,Object raw){
+        if(raw instanceof java.util.Map){java.util.Map<?,?> map=(java.util.Map<?,?>)raw;
+            if(Boolean.FALSE.equals(map.get("present")))return getString(R.string.FlexyStudioDefaultValue);
+            if(Boolean.TRUE.equals(map.get("present")))return value(file,key,map.get("value"));
+            StringBuilder text=new StringBuilder();int count=0;
+            for(java.util.Map.Entry<?,?> item:map.entrySet()){
+                if(count++==10){text.append("…");break;}
+                if(text.length()>0)text.append(", ");
+                text.append(item.getKey()).append("=").append(item.getValue());
+            }
+            return text.toString();
+        }
+        if(raw instanceof java.util.List){java.util.List<?> list=(java.util.List<?>)raw;StringBuilder text=new StringBuilder();for(int i=0;i<Math.min(10,list.size());i++){if(i>0)text.append(", ");String item=String.valueOf(list.get(i));text.append(item.substring(0,Math.min(30,item.length())));}if(list.size()>10)text.append("…");return text.toString();}
+        if(raw instanceof Boolean)return getString((Boolean)raw?R.string.FlexyStudioEnabledValue:R.string.FlexyStudioDisabledValue);
+        String choice=FlexyStudioText.choice(file,key,raw);if(choice!=null)return choice;
+        String text=String.valueOf(raw).replace('\n',' ').replace('\r',' ');
+        return text.length()>100?text.substring(0,100)+"…":text;
     }
     private static void confirmUndo(BaseFragment owner,app.flexygram.studio.core.StudioTransaction.Receipt receipt) {
         owner.showDialog(new AlertDialog.Builder(owner.getParentActivity(),owner.getResourceProvider()).setTitle(getString(R.string.UndoNoCaps)).setMessage(getString(R.string.FlexyStudioUndoQuestion))
