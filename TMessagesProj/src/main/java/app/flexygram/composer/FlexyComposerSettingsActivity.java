@@ -204,7 +204,7 @@ public final class FlexyComposerSettingsActivity extends BaseNekoSettingsActivit
             int level = FlexyComposerConfig.level(); float radius = dp(ComposerStyle.diameter(level)) / 2f;
             float y = forcedStyle>=0 ? height/2-dp(FlexyComposerConfig.position()) : dp(54 - ComposerStyle.offset(FlexyComposerConfig.position()));
             float gap = dp(FlexyComposerConfig.gap());
-            boolean dark = Theme.isCurrentThemeDark();
+            boolean dark = ColorUtils.calculateLuminance(getThemedColor(Theme.key_chat_messagePanelBackground)) < 0.4;
             int surface = ComposerStyle.surface(dark, FlexyComposerConfig.glass()), ink = ComposerStyle.icon(dark);
             paint.setColor(surface);
             float side = ComposerStyle.sideMargin(Math.round(width), org.telegram.messenger.AndroidUtilities.density, dp(7));

@@ -9,9 +9,9 @@ import app.exteraless.player.Spring;
  * Closing retargets existing springs: it never restarts a timed interpolation.
  */
 public final class SelectedBubbleMotion implements Choreographer.FrameCallback {
-    private final Spring x = new Spring(1f, 750f, .88f, .0002f);
-    private final Spring y = new Spring(1f, 750f, .88f, .0002f);
-    private final Spring backdrop = new Spring(0f, 750f, 1f, .003f);
+    private final Spring x = new Spring(1f, 900f, .78f, .0002f);
+    private final Spring y = new Spring(1f, 900f, .78f, .0002f);
+    private final Spring backdrop = new Spring(0f, 900f, 1f, .003f);
     private boolean backdropAvailable;
     public float backdropProgress() { return Math.max(0f, Math.min(1f, backdropAvailable ? backdrop.value : Math.max(backdrop.value, phase.value * 0.85f))); }
     public void backdropReady() {
@@ -20,8 +20,8 @@ public final class SelectedBubbleMotion implements Choreographer.FrameCallback {
         if (!BubbleInteractionSettings.motionEnabled()) { backdrop.snap(1f);invalidate.run();return; }
         schedule();
     }
-    private final Spring phase = new Spring(1f, 850f, .88f, .0015f);
-    private static final long ENTER_LIMIT_MS = 340, CLOSE_LIMIT_MS = 180;
+    private final Spring phase = new Spring(1f, 1100f, .78f, .0015f);
+    private static final long ENTER_LIMIT_MS = 280, CLOSE_LIMIT_MS = 180;
     private Runnable invalidate, completion;
     private boolean running, closing;
     private long lastFrame, started;
