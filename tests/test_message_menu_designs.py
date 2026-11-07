@@ -65,7 +65,8 @@ def test_menu_translation_keys_and_all_labels_are_present():
 def test_live_cards_share_existing_blur_source_and_cover_input_without_mutating_it():
     chat=(JAVA/'org/telegram/ui/ChatActivity.java').read_text()
     block=chat[chat.index('final boolean menuBlur ='):chat.index('panel.setListener(action->')]
-    assert 'BlurredBackgroundProviderImpl.checkBlurEnabled(currentAccount, themeDelegate)' in block
+    assert 'BubbleInteractionSettings.backdropBlur(getParentActivity())' in block
+    assert 'BlurredBackgroundProviderImpl.scrimMenuBackground(themeDelegate)' in block
     assert 'panel.setSurfaceFactory' in block and 'scrimBlur3Factory.create(target, true)' in block
     assert 'nativeMenu.setBackgroundColor(Color.TRANSPARENT)' in block
     assert 'scrimBlur3Factory.create(nativeScroll, true)' in block

@@ -113,8 +113,8 @@ final class StudioClientCatalog {
         integer(f,"surface_effect",2);bool(f,"small_timestamp",false);
         bool(f,"signature_cached_blur",false);bool(f,"signature_outline_enabled",false);integer(f,"signature_outline_style",1);integer(f,"signature_border_position",5);
         bool(f,"signature_fuse_glass",false);integer(f,"signature_fusion_mode",0);integer(f,"signature_fusion_intensity",60);bool(f,"signature_fusion_adapt",true);integer(f,"signature_pearl_intensity",55);
-        f="flexygram_header";integer(f,"style",1);bool(f,"compact",false);bool(f,"counter",false);integer(f,"counter_mode",1);integer(f,"opacity",85);bool(f,"center_title",false);bool(f,"adaptive_bubble",false);
-        f="flexygram_composer";integer(f,"style",0);bool(f,"pearlGlass",false);integer(f,"verticalPosition",0);integer(f,"compactLevel",0);integer(f,"iconAppearance",1);integer(f,"componentGap",0);
+        f="flexygram_header";integer(f,"style",1);bool(f,"compact",false);bool(f,"counter",true);integer(f,"counter_mode",1);integer(f,"opacity",85);bool(f,"center_title",false);bool(f,"adaptive_bubble",false);
+        f="flexygram_composer";integer(f,"style",0);bool(f,"pearlGlass",false);integer(f,"verticalPosition",0);integer(f,"compactLevel",0);integer(f,"iconAppearance",0);integer(f,"componentGap",0);
         f="flexy_bottom_tabs";integer(f,"density_v1",1);bool(f,"show_tabs",true);bool(f,"show_titles",true);bool(f,"double_tap_chats",true);bool(f,"double_tap_profile",true);bool(f,"always_search_chats",false);bool(f,"floating_dock",true);bool(f,"separate_search",false);bool(f,"home_defaults_v2",true);add(f,"tab_order",STRING,"0,1,2,4");
         bool("neko","flexy_quick_member_lens",false);bool("flexy_bubble_interaction","tap_panel",true);
         bool("flexygram_motion","fast_motion_enabled",true);

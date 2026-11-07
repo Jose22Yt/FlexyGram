@@ -42,11 +42,11 @@ import app.flexygram.bubbles.interaction.*;import org.telegram.messenger.Applica
 public class Probe {
  static void check(boolean b){if(!b)throw new AssertionError();}
  public static void main(String[]args){var c=ApplicationLoader.applicationContext;
- check(!FlexyComposerConfig.compact()&&!FlexyComposerConfig.glass()&&!FlexyComposerConfig.referenceIcons());
- check(FlexyComposerConfig.preferences().getAll().isEmpty());
+ check(!FlexyComposerConfig.compact()&&!FlexyComposerConfig.glass()&&FlexyComposerConfig.referenceIcons());
+ check(FlexyComposerConfig.preferences().getBoolean("reference_icons_restored_v1",false));
  FlexyComposerConfig.setStyle(1);FlexyComposerConfig.setGlass(true);FlexyComposerConfig.setReferenceIcons(true);
  check(FlexyComposerConfig.compact()&&FlexyComposerConfig.glass()&&FlexyComposerConfig.referenceIcons());
- FlexyComposerConfig.reset();check(!FlexyComposerConfig.compact()&&!FlexyComposerConfig.glass()&&!FlexyComposerConfig.referenceIcons());
+ FlexyComposerConfig.reset();check(!FlexyComposerConfig.compact()&&!FlexyComposerConfig.glass()&&FlexyComposerConfig.referenceIcons());
  check(BubbleInteractionSettings.style(c)==BubbleInteractionSettings.STYLE_SIGNATURE&&BubbleInteractionSettings.backdropBlur(c));
  BubbleInteractionSettings.setStyle(c,0);BubbleInteractionSettings.reload();check(BubbleInteractionSettings.style(c)==0&&!BubbleInteractionSettings.backdropBlur(c));
  BubbleInteractionSettings.setStyle(c,1);BubbleInteractionSettings.reload();check(BubbleInteractionSettings.style(c)==1);

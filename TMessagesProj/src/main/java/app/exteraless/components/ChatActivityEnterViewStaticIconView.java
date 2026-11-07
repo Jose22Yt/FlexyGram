@@ -77,6 +77,12 @@ public class ChatActivityEnterViewStaticIconView extends FrameLayout {
     }
 
 
+    private void setControlIcon(ImageView view,State state){
+        int glyph=iconResource(state);
+        if(compactIcons&&glyph!=state.resource)view.setImageDrawable(app.flexygram.icons.ConversationControlIcons.load(getContext(),glyph));
+        else view.setImageResource(glyph);
+    }
+
     public ChatActivityEnterViewStaticIconView(Context context, ChatActivityEnterView enterView) {
         this(context, enterView, 32);
     }
@@ -160,7 +166,7 @@ public class ChatActivityEnterViewStaticIconView extends FrameLayout {
                 buttonsAnimation.cancel();
                 buttonsAnimation = null;
             }
-            buttonViews[0].setImageResource(iconResource(currentState));
+            setControlIcon(buttonViews[0],currentState);
             buttonViews[0].setAlpha(1f);
             buttonViews[0].setScaleX(1f);
             buttonViews[0].setScaleY(1f);
@@ -171,7 +177,7 @@ public class ChatActivityEnterViewStaticIconView extends FrameLayout {
                 buttonsAnimation.cancel();
             }
             buttonViews[1].setVisibility(VISIBLE);
-            buttonViews[1].setImageResource(iconResource(currentState));
+            setControlIcon(buttonViews[1],currentState);
             buttonViews[0].setAlpha(1f);
             buttonViews[0].setScaleX(1f);
             buttonViews[0].setScaleY(1f);

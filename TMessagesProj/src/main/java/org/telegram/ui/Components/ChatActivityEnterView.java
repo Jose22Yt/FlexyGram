@@ -16771,6 +16771,9 @@ public class ChatActivityEnterView extends FrameLayout implements
         return senderVisible;
     }
 
+    private int flexyAttachGlyphResource;
+    private Drawable flexyAttachGlyph;
+
     private void updateFlexyIconStyle() {
         // Match the microphone's 24dp image box without changing native touch/layout slots.
         attachButton.setScaleType(flexyCompactLayout ? ImageView.ScaleType.CENTER_INSIDE : ImageView.ScaleType.CENTER);
@@ -16778,8 +16781,16 @@ public class ChatActivityEnterView extends FrameLayout implements
                 - app.flexygram.composer.ComposerGeometry.ACTION_ICON) / 2f) : 0;
         attachButton.setPadding(actionPadding, actionPadding, actionPadding, actionPadding);
         boolean reference = app.flexygram.composer.FlexyComposerConfig.referenceIcons();
-        attachButton.setImageResource(isInInput ? R.drawable.ic_ab_other : flexyCompactLayout
-            ? (reference ? R.drawable.flexy_composer_clip : R.drawable.flexy_composer_add) : R.drawable.msg_input_attach2);
+        int attachIcon=isInInput?R.drawable.ic_ab_other:flexyCompactLayout
+                ?(reference?R.drawable.flexy_composer_clip:R.drawable.flexy_composer_add):R.drawable.msg_input_attach2;
+        if(flexyCompactLayout&&!isInInput){
+            if(flexyAttachGlyph==null||flexyAttachGlyphResource!=attachIcon){
+                flexyAttachGlyphResource=attachIcon;
+                flexyAttachGlyph=app.flexygram.icons.ConversationControlIcons.load(getContext(),attachIcon);
+            }
+            attachButton.setImageDrawable(flexyAttachGlyph);
+        }
+        else attachButton.setImageResource(attachIcon);
         setFlexyIconStyle(emojiButton, flexyCompactLayout, reference);
         setFlexyIconStyle(audioVideoSendButton, flexyCompactLayout, reference);
     }

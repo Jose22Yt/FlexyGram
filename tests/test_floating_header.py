@@ -30,8 +30,8 @@ public class Probe{
  static void check(boolean b){if(!b)throw new AssertionError();}
  public static void main(String[]args){
   HeaderConfig.load();check(HeaderConfig.style()==1&&!HeaderConfig.signature()&&!HeaderConfig.floating());
-  check(!HeaderConfig.counter()&&!HeaderConfig.centerTitle()&&!HeaderConfig.adaptiveBubble());
-  check(org.telegram.messenger.ApplicationLoader.applicationContext.prefs.data.isEmpty());
+  check(HeaderConfig.counter()&&HeaderConfig.counterMode()==1&&!HeaderConfig.centerTitle()&&!HeaderConfig.adaptiveBubble());
+  check(Boolean.TRUE.equals(org.telegram.messenger.ApplicationLoader.applicationContext.prefs.data.get("back_counter_restored_v1")));
   for(int style=0;style<=4;style++){
    HeaderConfig.style(style);HeaderConfig.load();check(HeaderConfig.style()==style);
    check(HeaderConfig.floating()==(style==4));check(HeaderConfig.signature()==(style!=1));

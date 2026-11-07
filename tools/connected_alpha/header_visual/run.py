@@ -17,6 +17,7 @@ def write_all_stubs(source,root):
 
 def resources(root,res):
  for name in ['ic_ab_back.webp','ic_ab_other.webp','msg_callback.webp']:shutil.copyfile(root/'TMessagesProj/src/main/res/drawable-mdpi'/name,res/name)
+ for name in ['flexy_ios_back.xml','flexy_ios_call.xml','flexy_ios_more.xml']:shutil.copyfile(root/'TMessagesProj/src/main/res/drawable'/name,res/name)
 if __name__=='__main__':
  if '--output-dir'not in sys.argv:sys.argv+=['--output-dir',str(TOOLS.parents[1]/'build/connected-alpha-header-visual')]
  raise SystemExit(pipeline.main(here=HERE,test_class='HeaderVisualTest',stubs_writer=write_all_stubs,resource_writer=resources))

@@ -138,9 +138,9 @@ def test_unread_99_plus_does_not_relayout_but_keeps_real_count(tmp_path):
  int unreadCount,changes;android.text.TextPaint unreadPaint=new android.text.TextPaint();android.text.StaticLayout unreadLayout;
  void changed(){changes++;}SETTER
  static void check(boolean b){if(!b)throw new AssertionError();}
- public static void main(String[]args){Probe p=new Probe();p.setCount(-3);check(p.changes==0&&p.unreadCount==0);
- for(int i=100;i<20000;i++)p.setCount(i);check(p.unreadCount==19999&&p.changes==1&&android.text.StaticLayout.builds==1&&p.unreadLayout.text.equals("99+"));
- p.setCount(99);check(p.changes==2&&p.unreadLayout.text.equals("99"));p.setCount(0);check(p.changes==3&&p.unreadLayout==null);p.setCount(0);check(p.changes==3);
+ public static void main(String[]args){Probe p=new Probe();p.setCount(-3);check(p.changes==1&&p.unreadCount==0&&p.unreadLayout.text.equals("0"));
+ for(int i=100;i<20000;i++)p.setCount(i);check(p.unreadCount==19999&&p.changes==2&&android.text.StaticLayout.builds==2&&p.unreadLayout.text.equals("99+"));
+ p.setCount(99);check(p.changes==3&&p.unreadLayout.text.equals("99"));p.setCount(0);check(p.changes==4&&p.unreadLayout.text.equals("0"));p.setCount(0);check(p.changes==4);
  }}'''.replace('SETTER',setter),
     })
 

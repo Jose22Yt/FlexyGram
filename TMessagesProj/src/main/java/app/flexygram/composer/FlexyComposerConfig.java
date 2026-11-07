@@ -21,8 +21,15 @@ public final class FlexyComposerConfig {
         return ApplicationLoader.applicationContext.getSharedPreferences("flexygram_composer", Context.MODE_PRIVATE);
     }
     public static boolean compact() { return preferences().getInt(STYLE, CLASSIC) == COMPACT_IOS; }
-    public static boolean referenceIcons() { return preferences().getInt(ICONS, 1) != 1; }
-    public static void setReferenceIcons(boolean reference) { preferences().edit().putInt(ICONS, reference ? 0 : 1).apply(); }
+    public static boolean referenceIcons() {
+        SharedPreferences p=preferences();
+        if (!p.getBoolean("reference_icons_restored_v1",false)) {
+            p.edit().putInt(ICONS,0).putBoolean("reference_icons_restored_v1",true).apply();
+            return true;
+        }
+        return p.getInt(ICONS,0)!=1;
+    }
+    public static void setReferenceIcons(boolean reference) { preferences().edit().putInt(ICONS, reference ? 0 : 1).putBoolean("reference_icons_restored_v1",true).apply(); }
     public static boolean glass() { return preferences().getBoolean(GLASS, false); }
     public static int position() { return ComposerStyle.position(preferences().getInt(POSITION, 0)); }
     public static int level() { return ComposerStyle.level(preferences().getInt(LEVEL, 0)); }

@@ -149,11 +149,11 @@ public final class FlexyComposerSettingsActivity extends BaseNekoSettingsActivit
         Preview(Context c, int style) {
             super(c); forcedStyle=style; setContentDescription(getString(R.string.FlexyComposerPreview));
             wallpaperPreview = new app.flexygram.preview.SignatureWallpaperPreview(this, contextualWallpaper, this::invalidate);
-            clip = c.getResources().getDrawable(R.drawable.flexy_composer_clip).mutate();
-            folded = c.getResources().getDrawable(R.drawable.flexy_composer_folded).mutate();
-            plus = c.getResources().getDrawable(R.drawable.flexy_composer_add).mutate();
-            smile = c.getResources().getDrawable(R.drawable.flexy_composer_smile).mutate();
-            voice = c.getResources().getDrawable(R.drawable.flexy_composer_voice).mutate();
+            clip = app.flexygram.icons.ConversationControlIcons.load(c,R.drawable.flexy_composer_clip);
+            folded = app.flexygram.icons.ConversationControlIcons.load(c,R.drawable.flexy_composer_folded);
+            plus = app.flexygram.icons.ConversationControlIcons.load(c,R.drawable.flexy_composer_add);
+            smile = app.flexygram.icons.ConversationControlIcons.load(c,R.drawable.flexy_composer_smile);
+            voice = app.flexygram.icons.ConversationControlIcons.load(c,R.drawable.flexy_composer_voice);
         }
         @Override protected void onAttachedToWindow() {
             super.onAttachedToWindow();
