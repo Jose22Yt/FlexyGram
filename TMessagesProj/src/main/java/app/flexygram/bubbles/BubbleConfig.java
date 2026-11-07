@@ -9,12 +9,12 @@ public final class BubbleConfig {
     public static final String FILE = "flexygram_bubbles";
     public static final String GLASS = "glass", TRANSPARENCY = "transparency", BORDER = "border", EDGES = "edges";
     public static final String SURFACE_EFFECT = "surface_effect";
-    public static final int ADAPTIVE = 0, LEGACY = 1;
-    private static int surfaceEffect = ADAPTIVE;
-    private static boolean smallTimestamps = true;
+    public static final int ADAPTIVE = 0, LEGACY = 1, DEFAULT = 2;
+    private static int surfaceEffect = DEFAULT;
+    private static boolean smallTimestamps = false;
     private static boolean loaded, glass, border, edges, cachedBlur;
-    private static int transparency = 35, borderTenths = 11, outlineStyle = 1, pearlIntensity = 55, borderPosition = 5;
-    private static boolean outlineEnabled = true, fuseGlass, fusionAdapt=true;
+    private static int transparency = 0, borderTenths = 11, outlineStyle = 1, pearlIntensity = 55, borderPosition = 5;
+    private static boolean outlineEnabled = false, fuseGlass, fusionAdapt=true;
     private static int fusionMode,fusionIntensity=60;
     private BubbleConfig() { }
     private static SharedPreferences preferences() {
@@ -22,9 +22,9 @@ public final class BubbleConfig {
     }
     public static void load() {
         SharedPreferences p = preferences();
-        surfaceEffect = normalizeSurfaceEffect(p.getInt(SURFACE_EFFECT, ADAPTIVE));
-        smallTimestamps = p.getBoolean("small_timestamp", true);
-        outlineEnabled = p.getBoolean("signature_outline_enabled", true);
+        surfaceEffect = normalizeSurfaceEffect(p.getInt(SURFACE_EFFECT, DEFAULT));
+        smallTimestamps = p.getBoolean("small_timestamp", false);
+        outlineEnabled = p.getBoolean("signature_outline_enabled", false);
         outlineStyle = Math.max(0, Math.min(3, p.getInt("signature_outline_style", 1)));
         int storedPosition = p.getInt("signature_border_position", 5);
         outlineEnabled = outlineEnabled && storedPosition != 0;
@@ -39,12 +39,12 @@ public final class BubbleConfig {
         // Retired Matte and Bubble Glass preferences have no rendering effect.
         borderTenths = Math.max(0, Math.min(20, p.getInt("signature_border_tenths", 11)));
         glass = p.getBoolean(GLASS, false); border = p.getBoolean(BORDER, false);
-        edges = p.getBoolean(EDGES, false); transparency = BubbleStyle.transparency(p.getInt(TRANSPARENCY, 35)); loaded = true;
+        edges = p.getBoolean(EDGES, false); transparency = BubbleStyle.transparency(p.getInt(TRANSPARENCY, 0)); loaded = true;
     }
     public static boolean glass() { return loaded && glass; }
     public static boolean border() { return loaded && border; }
     public static boolean edges() { return loaded && edges; }
-    private static int normalizeSurfaceEffect(int value) { return value == LEGACY ? LEGACY : ADAPTIVE; }
+    private static int normalizeSurfaceEffect(int value) { return value == LEGACY || value == ADAPTIVE ? value : DEFAULT; }
     public static int surfaceEffect() { return surfaceEffect; }
     public static boolean adaptive() { return surfaceEffect == ADAPTIVE; }
     public static void setSurfaceEffect(int value) {
@@ -61,8 +61,8 @@ public final class BubbleConfig {
         smallTimestamps = value;
         preferences().edit().putBoolean("small_timestamp", value).apply();
     }
-    // Preserve the legacy preference without applying it to the native adaptive material.
-    public static boolean backgroundBlur() { return !adaptive() && cachedBlur; }
+    // Both surface materials share the same optional wallpaper blur cache.
+    public static boolean backgroundBlur() { return surfaceEffect != DEFAULT && cachedBlur; }
     /** Renderer compatibility only: saved matte flags can never tint a bubble again. */
     @Deprecated public static boolean matteEnabled() { return false; }
     @Deprecated public static int matteStrength() { return 0; }
@@ -74,8 +74,7 @@ public final class BubbleConfig {
         cachedBlur = value;
         preferences().edit().putBoolean("signature_cached_blur", value).apply();
     }
-    // Keep saved border settings when switching styles; only the adaptive surface draws them.
-    public static boolean outlineEnabled() { return adaptive() && outlineEnabled; }
+    public static boolean outlineEnabled() { return surfaceEffect != DEFAULT && outlineEnabled; }
     public static int outlineStyle() { return outlineStyle; }
     public static int pearlIntensity() { return pearlIntensity; }
     public static int skin() { return 0; }

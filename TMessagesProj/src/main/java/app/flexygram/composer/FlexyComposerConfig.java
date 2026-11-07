@@ -21,7 +21,7 @@ public final class FlexyComposerConfig {
         return ApplicationLoader.applicationContext.getSharedPreferences("flexygram_composer", Context.MODE_PRIVATE);
     }
     public static boolean compact() { return preferences().getInt(STYLE, CLASSIC) == COMPACT_IOS; }
-    public static boolean referenceIcons() { return preferences().getInt(ICONS, 0) != 1; }
+    public static boolean referenceIcons() { return preferences().getInt(ICONS, 1) != 1; }
     public static void setReferenceIcons(boolean reference) { preferences().edit().putInt(ICONS, reference ? 0 : 1).apply(); }
     public static boolean glass() { return preferences().getBoolean(GLASS, false); }
     public static int position() { return ComposerStyle.position(preferences().getInt(POSITION, 0)); }
@@ -31,7 +31,7 @@ public final class FlexyComposerConfig {
     public static void setLevel(int value) { preferences().edit().putInt(LEVEL, ComposerStyle.level(value)).apply(); }
     public static void setGap(int value) { preferences().edit().putInt(GAP, ComposerStyle.clamp(value, ComposerStyle.MIN_GAP, ComposerStyle.MAX_GAP)).apply(); }
     public static void reset() {
-        preferences().edit().putInt(STYLE, COMPACT_IOS).putBoolean(GLASS, true)
+        preferences().edit().putInt(STYLE, CLASSIC).putBoolean(GLASS, false)
             .remove(ICONS).remove(POSITION).remove(LEVEL).remove(GAP).apply();
     }
     public static void setStyle(int value) {

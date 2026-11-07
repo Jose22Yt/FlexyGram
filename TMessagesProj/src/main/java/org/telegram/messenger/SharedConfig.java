@@ -284,7 +284,7 @@ public class SharedConfig {
     public static Boolean useCamera2Force;
     public static boolean useNewBlur;
     public static boolean useSurfaceInStories;
-    public static boolean photoViewerBlur = true;
+    public static boolean photoViewerBlur = false;
     public static boolean payByInvoice;
     public static int stealthModeSendMessageConfirm = 2;
     private static int lastLocalId = -210000;
@@ -744,7 +744,7 @@ public class SharedConfig {
             bubbleRadius = preferences.getInt("bubbleRadius",
                     app.flexygram.bubbles.BubbleStyle.defaultRadius(BuildConfig.CONNECTED_ALPHA));
             // Match native media clipping/layout to Signature without rewriting the saved radius.
-            bubbleRadius = app.flexygram.bubbles.BubbleStyle.effectiveRadius(BuildConfig.CONNECTED_ALPHA, bubbleRadius);
+            bubbleRadius = app.flexygram.bubbles.BubbleStyle.effectiveRadius(app.flexygram.bubbles.BubbleStyle.signature(), bubbleRadius);
             ivFontSize = preferences.getInt("iv_font_size", fontSize);
             allowBigEmoji = preferences.getBoolean("allowBigEmoji", true);
             useSystemEmoji = preferences.getBoolean("useSystemEmoji", false);
@@ -809,7 +809,7 @@ public class SharedConfig {
             useCamera2Force = !preferences.contains("useCamera2Force_2") ? null : preferences.getBoolean("useCamera2Force_2", false);
             useSurfaceInStories = preferences.getBoolean("useSurfaceInStories", Build.VERSION.SDK_INT >= 30);
             payByInvoice = preferences.getBoolean("payByInvoice", false);
-            photoViewerBlur = preferences.getBoolean("photoViewerBlur", true);
+            photoViewerBlur = preferences.getBoolean("photoViewerBlur", false);
             multipleReactionsPromoShowed = preferences.getBoolean("multipleReactionsPromoShowed", false);
             callEncryptionHintDisplayedCount = preferences.getInt("callEncryptionHintDisplayedCount", 0);
             debugVideoQualities = preferences.getBoolean("debugVideoQualities", false);
@@ -846,7 +846,7 @@ public class SharedConfig {
         fontSizeIsDefault = !preferences.contains("fons_size");
         bubbleRadius = preferences.getInt("bubbleRadius",
                 app.flexygram.bubbles.BubbleStyle.defaultRadius(BuildConfig.CONNECTED_ALPHA));
-        bubbleRadius = app.flexygram.bubbles.BubbleStyle.effectiveRadius(BuildConfig.CONNECTED_ALPHA, bubbleRadius);
+        bubbleRadius = app.flexygram.bubbles.BubbleStyle.effectiveRadius(app.flexygram.bubbles.BubbleStyle.signature(), bubbleRadius);
         ivFontSize = preferences.getInt("iv_font_size", fontSize);
         allowBigEmoji = preferences.getBoolean("allowBigEmoji", true);
         useSystemEmoji = preferences.getBoolean("useSystemEmoji", false);
@@ -871,7 +871,7 @@ public class SharedConfig {
         storiesColumnsCount = preferences.getInt("storiesColumnsCount", 3);
         bigCameraForRound = preferences.getBoolean("bigCameraForRound", false);
         useNewBlur = preferences.getBoolean("useNewBlur", true);
-        photoViewerBlur = preferences.getBoolean("photoViewerBlur", true);
+        photoViewerBlur = preferences.getBoolean("photoViewerBlur", false);
         shadowsInSections = preferences.getBoolean("shadowsInSections", false);
         photoHighQualityDefault = preferences.getBoolean("photoHighQualityDefault", false);
         photoLiveDefault = preferences.getBoolean("photoLiveDefault", false);

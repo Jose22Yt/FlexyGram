@@ -40,6 +40,10 @@ public class DockProbe {
  static void check(boolean b){if(!b)throw new AssertionError();}
  public static void main(String[] args) {
   LiquidNavigationConfig.load();check(LiquidNavigationConfig.order().length==4);
+  check(LiquidNavigationConfig.isEnabled()&&LiquidNavigationConfig.isVisible()&&LiquidNavigationConfig.isFloatingDock());
+  check(LiquidNavigationConfig.doubleTapChats()&&LiquidNavigationConfig.doubleTapProfile());
+  LiquidNavigationConfig.setEnabled(false);LiquidNavigationConfig.load();check(!LiquidNavigationConfig.isEnabled()&&!LiquidNavigationConfig.isVisible());
+  LiquidNavigationConfig.setEnabled(true);
   LiquidNavigationConfig.setOrder(new int[0]);check(!LiquidNavigationConfig.isVisible());
   LiquidNavigationConfig.load();check(LiquidNavigationConfig.order().length==0);
   check(LiquidNavigationConfig.shown(4).length==0);

@@ -26,7 +26,7 @@ public class Probe {
  static class BubblePreviewView extends View{BubblePreviewView(Context c,Object wallpaper){super(c);}}
  static class HeaderCell extends View{HeaderCell(Context c){super(c);}void setHeight(int v){}}
  static class TransparencyCell extends View{TransparencyCell(Context c){super(c);}}
- static class BubbleConfig{static boolean outline,adaptive;static boolean adaptive(){return adaptive;}static int style,fusion;static void load(){}static boolean outlineEnabled(){return outline;}static int outlineStyle(){return style;}static int fusionMode(){return fusion;}}
+ static class BubbleConfig{static final int DEFAULT=2;static int surfaceEffect(){return adaptive?0:1;}static boolean outline,adaptive;static boolean adaptive(){return adaptive;}static int style,fusion;static void load(){}static boolean outlineEnabled(){return outline;}static int outlineStyle(){return style;}static int fusionMode(){return fusion;}}
  static class app{static class exteraless{static class appearance{static class AppearanceConfig{static boolean separate;static boolean separateHeaders(){return separate;}}}}}
  static class NativeAdapter{
   boolean isSettings3Embedded(){return false;}boolean isSignatureSettingsPage(){return false;}
@@ -85,23 +85,29 @@ public class Probe {
    check(page.timestampRow==page.effectRow+1&&adapter.getItemViewType(page.timestampRow)==TYPE_CHECK);
    check(page.transparencyRow==page.timestampRow+1);
    check(page.blurRow==page.transparencyRow+1);
-   check(page.borderHeaderRow==-1&&page.enabledRow==-1);
-   check(page.styleRow==-1&&page.borderRow==-1&&page.positionRow==-1&&page.pearlRow==-1);
-   check(page.fusionHeaderRow==-1&&page.fuseRow==-1&&page.fusionIntensityRow==-1&&page.fusionAdaptRow==-1);
-   check(page.rowCount==6);
+   check(page.borderHeaderRow==page.blurRow+1);
+   check(page.enabledRow==page.borderHeaderRow+1);
+   if(outline){
+    check(page.styleRow==page.enabledRow+1);
+    check(page.fusionHeaderRow==page.fuseRow-1);
+    check(!adapter.isSettingsContentType(adapter.getItemViewType(page.fusionHeaderRow)));
+    check(page.fusionHeaderRow==(style==0?page.positionRow:page.pearlRow)+1);
+    check((page.fusionIntensityRow>=0)==(fusion==2));
+    check((page.fusionAdaptRow>=0)==(fusion==2));
+   }else check(page.fusionHeaderRow==-1&&page.fuseRow==-1);
    BubbleConfig.adaptive=true;page.updateRows();
    check(page.effectRow==2&&adapter.getItemViewType(page.effectRow)==TYPE_SETTINGS);
-   check(page.transparencyRow==-1&&page.blurRow==-1);
+   check(page.transparencyRow==page.timestampRow+1&&page.blurRow==page.transparencyRow+1);
    check(page.timestampRow==page.effectRow+1&&adapter.getItemViewType(page.timestampRow)==TYPE_CHECK);
-   check(page.borderHeaderRow==page.timestampRow+1&&page.enabledRow==page.borderHeaderRow+1);
+   check(page.borderHeaderRow==page.blurRow+1&&page.enabledRow==page.borderHeaderRow+1);
    check((page.styleRow>=0)==outline&&(page.borderRow>=0)==outline&&(page.positionRow>=0)==outline);
    check((page.fusionHeaderRow>=0)==outline&&(page.fuseRow>=0)==outline);
    check((page.pearlRow>=0)==(outline&&style!=0));
    check((page.fusionIntensityRow>=0)==(outline&&fusion==2));
    check((page.fusionAdaptRow>=0)==(outline&&fusion==2));
-   check(page.rowCount==(outline?(style==0?11:12)+(fusion==2?2:0):6));
+   check(page.rowCount==(outline?(style==0?13:14)+(fusion==2?2:0):8));
    BubbleConfig.adaptive=false;page.updateRows();
-   check(page.rowCount==6);
+   check(page.rowCount==(outline?(style==0?13:14)+(fusion==2?2:0):8));
   }
  }
 }'''

@@ -141,6 +141,7 @@ public class ChatInputViewsContainer extends FrameLayout {
     private final BlurredBackgroundDrawable[] compactGlass = new BlurredBackgroundDrawable[4];
     private final boolean[] compactGlassDrawn = new boolean[4];
     private boolean flexySendDrawn;
+    private boolean flexyNativeGlassDrawn;
     private final float[] compactGlassRadius = {-1, -1, -1, -1};
     public void setCompactGlassFactory(org.telegram.ui.Components.blur3.BlurredBackgroundDrawableViewFactory factory,
             org.telegram.ui.Components.blur3.drawable.color.BlurredBackgroundColorProvider colors) {
@@ -349,53 +350,80 @@ public class ChatInputViewsContainer extends FrameLayout {
 
     @Override
     protected void dispatchDraw(@NonNull Canvas canvas) {
-        underKeyboardBackgroundDrawable.setBounds(
-            0,
-            getMeasuredHeight() - (int) imeBottomInset,
-            getMeasuredWidth(),
-            Math.max(getMeasuredHeight(), getMeasuredHeight() - (int) imeBottomInset + dp(INPUT_KEYBOARD_RADIUS * 2))
-        );
-
-        flexyVoiceDrawn = false;
-        if (flexyComposer != null) {
-            flexyComposer.setFlexyNativeGlassBackdropDrawn(false);
-        }
-        flexySendDrawn = false;
-        java.util.Arrays.fill(compactGlassDrawn, false);
-        final int blurTop = getMeasuredHeight() - currentBlurredHeight;
-
-        tmpRect.set(
-            Math.round(inputBubbleOffsetLeft),
-            0,
-            getMeasuredWidth() - Math.round(inputBubbleOffsetRight),
-            inputBubbleHeightRound
-        );
-        tmpRect.inset(0, -dp(7));
-        tmpRect.offset(0, blurTop + (int) bubbleInputTranlationY);
-
-        blurredBackgroundDrawable.setBounds(tmpRect);
-        if (drawInputBackground) {
-            if (flexyComposer != null && flexyComposer.isFlexyCompactPresentation()) {
-                drawFlexyCompactBackground(canvas);
-            } else if(flexyChannels!=null&&flexyChannels.isSignatureCompactPresentation()){
-                drawSignatureChannelBackground(canvas);
-            } else {
-                blurredBackgroundDrawable.draw(canvas);
+        // Menu/blur snapshots use a software Canvas even while the live view uses HWUI.
+        // Never hide retained RenderNodes or leave child background ownership in snapshot mode.
+        final boolean snapshotPass = !canvas.isHardwareAccelerated();
+        final boolean previousNative = flexyNativeGlassDrawn;
+        final boolean previousVoice = flexyVoiceDrawn;
+        final boolean previousSend = flexySendDrawn;
+        int previousGlassMask = 0;
+        if (snapshotPass) {
+            for (int i = 0; i < compactGlassDrawn.length; i++) {
+                if (compactGlassDrawn[i]) previousGlassMask |= 1 << i;
             }
         }
+        try {
+            underKeyboardBackgroundDrawable.setBounds(
+                0,
+                getMeasuredHeight() - (int) imeBottomInset,
+                getMeasuredWidth(),
+                Math.max(getMeasuredHeight(), getMeasuredHeight() - (int) imeBottomInset + dp(INPUT_KEYBOARD_RADIUS * 2))
+            );
 
-        for (int i = 0; i < compactGlass.length; i++) {
-            if (!compactGlassDrawn[i] && compactGlass[i] != null) compactGlass[i].setAlpha(0);
-        }
-        if (flexyComposer != null) {
-            flexyComposer.setFlexyVoiceBackdropDrawn(flexyVoiceDrawn);
-            flexyComposer.setFlexySendBackdropDrawn(flexySendDrawn);
-        }
-        if (needDrawInAppKeyboard) {
-            underKeyboardBackgroundDrawable.draw(canvas);
-        }
+            flexyNativeGlassDrawn = false;
+            flexyVoiceDrawn = false;
+            flexySendDrawn = false;
+            java.util.Arrays.fill(compactGlassDrawn, false);
+            final int blurTop = getMeasuredHeight() - currentBlurredHeight;
 
-        super.dispatchDraw(canvas);
+            tmpRect.set(
+                Math.round(inputBubbleOffsetLeft),
+                0,
+                getMeasuredWidth() - Math.round(inputBubbleOffsetRight),
+                inputBubbleHeightRound
+            );
+            tmpRect.inset(0, -dp(7));
+            tmpRect.offset(0, blurTop + (int) bubbleInputTranlationY);
+
+            blurredBackgroundDrawable.setBounds(tmpRect);
+            if (drawInputBackground) {
+                if (flexyComposer != null && flexyComposer.isFlexyCompactPresentation()) {
+                    drawFlexyCompactBackground(canvas);
+                } else if(flexyChannels!=null&&flexyChannels.isSignatureCompactPresentation()){
+                    drawSignatureChannelBackground(canvas);
+                } else {
+                    blurredBackgroundDrawable.draw(canvas);
+                }
+            }
+
+            for (int i = 0; i < compactGlass.length; i++) {
+                if (!snapshotPass && !compactGlassDrawn[i] && compactGlass[i] != null) compactGlass[i].setAlpha(0);
+            }
+            if (flexyComposer != null) {
+                flexyComposer.setFlexyNativeGlassBackdropDrawn(flexyNativeGlassDrawn);
+                flexyComposer.setFlexyVoiceBackdropDrawn(flexyVoiceDrawn);
+                flexyComposer.setFlexySendBackdropDrawn(flexySendDrawn);
+            }
+            if (needDrawInAppKeyboard) {
+                underKeyboardBackgroundDrawable.draw(canvas);
+            }
+
+            super.dispatchDraw(canvas);
+        } finally {
+            if (snapshotPass) {
+                for (int i = 0; i < compactGlassDrawn.length; i++) {
+                    compactGlassDrawn[i] = (previousGlassMask & (1 << i)) != 0;
+                }
+                flexyNativeGlassDrawn = previousNative;
+                flexyVoiceDrawn = previousVoice;
+                flexySendDrawn = previousSend;
+                if (flexyComposer != null) {
+                    flexyComposer.setFlexyNativeGlassBackdropDrawn(previousNative);
+                    flexyComposer.setFlexyVoiceBackdropDrawn(previousVoice);
+                    flexyComposer.setFlexySendBackdropDrawn(previousSend);
+                }
+            }
+        }
     }
 
     private final RectF signatureChannelMiddle=new RectF(),signatureChannelLeft=new RectF(),signatureChannelRight=new RectF();
@@ -482,7 +510,7 @@ public class ChatInputViewsContainer extends FrameLayout {
         }
         flexySendDrawn = send;
         flexyVoiceDrawn = voice;
-        flexyComposer.setFlexyNativeGlassBackdropDrawn(true);
+        flexyNativeGlassDrawn = true;
         // Invalidate the legacy mask cache after a native ON/OFF switch.
         flexyLastPill.setEmpty();
     }

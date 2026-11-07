@@ -26,7 +26,7 @@ public final class BubbleInteractionSettings {
         int value = cachedStyle;
         if (value >= 0) return value;
         SharedPreferences p = prefs(context);
-        // Honor the user's previous opt-out. Existing enabled users stay Signature.
+        // Preserve explicit and legacy choices; new installs use the animated message panel.
         value = p.contains(STYLE_KEY)
                 ? p.getInt(STYLE_KEY, STYLE_SIGNATURE)
                 : (p.getBoolean("tap_panel", true) ? STYLE_SIGNATURE : STYLE_DEFAULT);
@@ -40,6 +40,11 @@ public final class BubbleInteractionSettings {
         prefs(context).edit().putInt(STYLE_KEY, safe).apply();
     }
 
+    /** Selection backdrop is independent of the optional persistent surface blur/glass. */
+    public static boolean backdropBlur(Context context) {
+        return context != null && signaturePanel(context)
+                && org.telegram.messenger.SharedConfig.canBlurChat();
+    }
     public static boolean signaturePanel(Context context) { return style(context) == STYLE_SIGNATURE; }
     public static boolean springBounce(Context context) { return style(context) == STYLE_SIGNATURE; }
     public static boolean motionEnabled() {

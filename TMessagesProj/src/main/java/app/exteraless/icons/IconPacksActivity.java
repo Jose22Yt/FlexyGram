@@ -44,6 +44,7 @@ public class IconPacksActivity extends BaseNekoSettingsActivity {
     private int baseDefaultRow;
     private int baseSolarRow;
     private int baseRemixRow;
+    private int baseCupertinoRow;
     private int basePacksDividerRow;
 
     private int enableHeaderRow;
@@ -87,6 +88,7 @@ public class IconPacksActivity extends BaseNekoSettingsActivity {
         baseDefaultRow = addRow("iconPackBaseDefault");
         baseSolarRow = addRow("iconPackBaseSolar");
         baseRemixRow = addRow("iconPackBaseRemix");
+        baseCupertinoRow = addRow("iconPackBaseCupertino");
         basePacksDividerRow = addRow();
 
         enableHeaderRow = addRow("iconPacksHeader");
@@ -159,8 +161,9 @@ public class IconPacksActivity extends BaseNekoSettingsActivity {
     @SuppressWarnings("deprecation")
     @Override
     protected void onItemClick(View view, int position, float x, float y) {
-        if (position == baseDefaultRow || position == baseSolarRow || position == baseRemixRow) {
+        if (position == baseDefaultRow || position == baseSolarRow || position == baseRemixRow || position == baseCupertinoRow) {
             int type = position == baseSolarRow ? BaseIconPacks.BASE_SOLAR
+                    : position == baseCupertinoRow ? BaseIconPacks.BASE_CUPERTINO
                     : position == baseRemixRow ? BaseIconPacks.BASE_REMIX
                     : BaseIconPacks.BASE_DEFAULT;
             if (type == BaseIconPacks.getSelected()) {
@@ -168,7 +171,7 @@ public class IconPacksActivity extends BaseNekoSettingsActivity {
             }
             BaseIconPacks.setSelected(type);
             if (listAdapter != null) {
-                listAdapter.notifyItemRangeChanged(baseDefaultRow, 3);
+                listAdapter.notifyItemRangeChanged(baseDefaultRow, 4);
             }
             IconPackManager.getInstance().reload();
             // IconsResources кэширует выбранный набор до перезапуска процесса
@@ -514,10 +517,11 @@ public class IconPacksActivity extends BaseNekoSettingsActivity {
                 case TYPE_RADIO: {
                     org.telegram.ui.Cells.TextRadioCell cell = (org.telegram.ui.Cells.TextRadioCell) holder.itemView;
                     int type = position == baseSolarRow ? BaseIconPacks.BASE_SOLAR
+                            : position == baseCupertinoRow ? BaseIconPacks.BASE_CUPERTINO
                             : position == baseRemixRow ? BaseIconPacks.BASE_REMIX
                             : BaseIconPacks.BASE_DEFAULT;
                     cell.setTextAndValueAndCheck(BaseIconPacks.getName(type), BaseIconPacks.getAuthor(type),
-                            BaseIconPacks.getSelected() == type, false, position != baseRemixRow);
+                            BaseIconPacks.getSelected() == type, false, position != baseCupertinoRow);
                     break;
                 }
                 case TYPE_TEXT: {
@@ -554,7 +558,7 @@ public class IconPacksActivity extends BaseNekoSettingsActivity {
         public int getItemViewType(int position) {
             if (position == basePacksHeaderRow || position == enableHeaderRow || position == packsHeaderRow) {
                 return TYPE_HEADER;
-            } else if (position == baseDefaultRow || position == baseSolarRow || position == baseRemixRow) {
+            } else if (position == baseDefaultRow || position == baseSolarRow || position == baseRemixRow || position == baseCupertinoRow) {
                 return TYPE_RADIO;
             } else if (position == basePacksDividerRow) {
                 return TYPE_SHADOW;

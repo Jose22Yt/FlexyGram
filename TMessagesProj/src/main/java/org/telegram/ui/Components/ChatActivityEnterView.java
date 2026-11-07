@@ -4919,7 +4919,9 @@ public class ChatActivityEnterView extends FrameLayout implements
     private Rect blurBounds = new Rect();
     private boolean flexyNativeGlassBackdropDrawn;
     public void setFlexyNativeGlassBackdropDrawn(boolean drawn) {
+        if (flexyNativeGlassBackdropDrawn == drawn) return;
         flexyNativeGlassBackdropDrawn = drawn;
+        invalidate();
     }
     /** Policy changes must refresh retained child display lists, not just the parent backdrop. */
     public void invalidateNativeGlassColors() {
@@ -16946,7 +16948,9 @@ public class ChatActivityEnterView extends FrameLayout implements
     }
 
     @SuppressLint("ViewConstructor")
-    public static class SendButton extends View implements ItemOptions.ScrimView {
+    public static class SendButton extends View implements ItemOptions.ScrimView, app.flexygram.icons.IconPressFeedback.Target {
+        private float iconPressScale=1;
+        @Override public void setIconPressScale(float scale){iconPressScale=scale;invalidate();}
         public static final float INFINITE_LOADING = -3f;
 
         public final Theme.ResourcesProvider resourcesProvider;
@@ -17272,6 +17276,7 @@ public class ChatActivityEnterView extends FrameLayout implements
                 canvas.rotate(60 * (1f - appear), x + drawable.getIntrinsicWidth() / 2f, y + drawable.getIntrinsicHeight() / 2f);
                 drawable.setBounds(x, y, x + drawable.getIntrinsicWidth(), y + drawable.getIntrinsicHeight());
                 drawable.setAlpha((int) (0xFF * (1.0f - priceProgress)));
+                canvas.scale(iconPressScale,iconPressScale,x+drawable.getIntrinsicWidth()/2f,y+drawable.getIntrinsicHeight()/2f);
                 drawable.draw(canvas);
                 canvas.restore();
             }

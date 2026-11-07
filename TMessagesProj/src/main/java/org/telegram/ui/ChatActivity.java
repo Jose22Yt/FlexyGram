@@ -11985,7 +11985,7 @@ public class ChatActivity extends BaseFragment implements
             scrimBlurBitmapShader = null;scrimBlurBitmapPaint = null;
             scrimBlurBitmap.recycle();scrimBlurBitmap = null;
         }
-        if (SharedConfig.chatBlurEnabled()) captureMessageMenuBlur(generation, true);
+        if (app.flexygram.bubbles.interaction.BubbleInteractionSettings.backdropBlur(getParentActivity())) captureMessageMenuBlur(generation, true);
     }
 
     private void dimBehindView(float value, boolean blur, boolean hidePagedownButtons) {
@@ -19325,7 +19325,7 @@ public class ChatActivity extends BaseFragment implements
 
         @Override
         protected void dispatchDraw(Canvas canvas) {
-            final boolean focusedMessageBackdrop = selectedBubbleMotionMessage != null && SharedConfig.chatBlurEnabled();
+            final boolean focusedMessageBackdrop = selectedBubbleMotionMessage != null && app.flexygram.bubbles.interaction.BubbleInteractionSettings.backdropBlur(getParentActivity());
             chatActivityEnterView.checkAnimation();
             updateChatListViewTopPadding();
             if (invalidateMessagesVisiblePart || (chatListItemAnimator != null && chatListItemAnimator.isRunning())) {
@@ -42952,6 +42952,10 @@ public class ChatActivity extends BaseFragment implements
         @Override public boolean drawFlexyBubbleWallpaper(ChatMessageCell cell, Canvas canvas, android.graphics.Path path, int alpha, boolean selected) {
             if (app.flexygram.bubbles.BubbleConfig.adaptive()) {
                 if (contentView == null || chatListView == null) return false;
+                if (app.flexygram.bubbles.BubbleConfig.backgroundBlur() && serviceBubbleSurface.drawCached(
+                        canvas, path, themeDelegate, contentView.signatureWallpaperBlur,
+                        cell.getX() + chatListView.getX(),
+                        cell.getY() + cell.getPaddingTop() + chatListView.getY(), alpha, selected)) return true;
                 // Reuse the cell's native service coordinates, including keyboard/pan/topic offsets.
                 cell.applyServiceShaderMatrix();
                 return serviceBubbleSurface.drawMapped(canvas, path, themeDelegate, alpha, selected);

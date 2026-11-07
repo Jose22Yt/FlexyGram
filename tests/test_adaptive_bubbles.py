@@ -41,6 +41,14 @@ def test_native_material_keeps_shader_filter_alpha_and_provider_ownership(tmp_pa
  surface.draw(c,path,provider,123,456,-10,65,127,true);check(c.draws==draws+2&&Theme.maps==maps&&c.alpha==Math.round(133*127/255f)&&c.shader==chatPaint.shader&&chatPaint.alpha==133);
  check(ServiceBubbleSurface.textColor(provider)==0xffffffff);
  allocations=Paint.allocations;for(int i=0;i<20000;i++)surface.drawMapped(c,path,provider,255,false);check(Paint.allocations==allocations);
+ app.flexygram.bubbles.SignatureWallpaperBlur.Owner owner=new app.flexygram.bubbles.SignatureWallpaperBlur.Owner();
+ draws=c.draws;check(!surface.drawCached(c,path,null,owner,12,34,127,false)&&c.draws==draws);
+ owner.ready=true;
+ for(boolean selected:new boolean[]{false,true})for(int alpha:new int[]{0,1,127,255}){
+ draws=c.draws;check(surface.drawCached(c,path,null,owner,12,34,alpha,selected));
+ check(owner.material==(selected?Theme.selected:Theme.normal)&&owner.alpha==alpha&&owner.x==12&&owner.y==34&&c.draws==draws);
+ }
+ Theme.gradient=true;draws=c.draws;check(surface.drawCached(c,path,null,owner,12,34,127,false));check(c.draws==draws+1);
  Theme.gradient=false;Theme.normal.shader=null;Theme.normal.filter=null;surface.drawMapped(c,path,null,255,false);check(c.shader==null&&c.filter==null);
  }}''',
     }, [JAVA/'app/flexygram/bubbles/ServiceBubbleSurface.java'])
@@ -60,20 +68,26 @@ def test_mode_default_validation_and_legacy_preferences_survive_switches(tmp_pat
  public Editor edit(){return this;}public Editor putBoolean(String k,boolean v){values.put(k,v);return this;}public Editor putInt(String k,int v){values.put(k,v);return this;}public void apply(){}
  }
  public static void main(String[]args){Prefs p=new Prefs();ApplicationLoader.applicationContext.p=p;
- BubbleConfig.load();check(BubbleConfig.adaptive()&&BubbleConfig.surfaceEffect()==0&&!BubbleConfig.backgroundBlur());
+ BubbleConfig.load();check(!BubbleConfig.adaptive()&&BubbleConfig.surfaceEffect()==BubbleConfig.DEFAULT&&!BubbleConfig.backgroundBlur());
+ check(!BubbleStyle.signature()&&!BubbleConfig.smallTimestamps()&&!BubbleConfig.outlineEnabled()&&BubbleConfig.transparency()==0);
+ check(p.values.isEmpty());BubbleConfig.setSurfaceEffect(BubbleConfig.ADAPTIVE);
  BubbleConfig.setBackgroundBlur(true);BubbleConfig.setTransparency(29);BubbleConfig.setBorderTenths(17);BubbleConfig.setOutlineStyle(2);
- check(!BubbleConfig.backgroundBlur());BubbleConfig.setSurfaceEffect(BubbleConfig.LEGACY);BubbleConfig.load();check(!BubbleConfig.adaptive()&&BubbleConfig.backgroundBlur());
- check(BubbleConfig.transparency()==29&&BubbleConfig.borderTenths()==17&&BubbleConfig.outlineStyle()==2&&!BubbleConfig.outlineEnabled());
- BubbleConfig.setSurfaceEffect(BubbleConfig.ADAPTIVE);BubbleConfig.load();check(BubbleConfig.adaptive()&&!BubbleConfig.backgroundBlur()&&BubbleConfig.outlineEnabled());
+ check(BubbleConfig.backgroundBlur());BubbleConfig.setSurfaceEffect(BubbleConfig.LEGACY);BubbleConfig.load();check(!BubbleConfig.adaptive()&&BubbleConfig.backgroundBlur());
+ check(BubbleConfig.transparency()==29&&BubbleConfig.borderTenths()==17&&BubbleConfig.outlineStyle()==2);
+ BubbleConfig.setSurfaceEffect(BubbleConfig.ADAPTIVE);BubbleConfig.load();check(BubbleConfig.adaptive()&&BubbleConfig.backgroundBlur());
  BubbleConfig.setSurfaceEffect(BubbleConfig.LEGACY);check(BubbleConfig.backgroundBlur()&&BubbleConfig.transparency()==29);
- for(int value:new int[]{-1,2,Integer.MAX_VALUE}){p.putInt(BubbleConfig.SURFACE_EFFECT,value);BubbleConfig.load();check(BubbleConfig.adaptive());}
- BubbleConfig.setSurfaceEffect(900);check(BubbleConfig.adaptive());
+ for(int value:new int[]{-1,3,Integer.MAX_VALUE}){p.putInt(BubbleConfig.SURFACE_EFFECT,value);BubbleConfig.load();check(BubbleConfig.surfaceEffect()==BubbleConfig.DEFAULT);}
+ BubbleConfig.setSurfaceEffect(900);check(BubbleConfig.surfaceEffect()==BubbleConfig.DEFAULT);BubbleConfig.setSurfaceEffect(BubbleConfig.ADAPTIVE);
  for(int n=0;n<=20;n++){BubbleConfig.setBorderTenths(n);BubbleConfig.load();check(BubbleConfig.borderTenths()==n&&BubbleConfig.borderDp()==n/10f);}
  BubbleConfig.setBorderTenths(-1);BubbleConfig.load();check(BubbleConfig.borderTenths()==0);
  BubbleConfig.setBorderTenths(21);BubbleConfig.load();check(BubbleConfig.borderTenths()==20);
- check(BubbleConfig.smallTimestamps());BubbleConfig.setSmallTimestamps(false);BubbleConfig.load();check(!BubbleConfig.smallTimestamps());
+ check(!BubbleConfig.smallTimestamps());BubbleConfig.setSmallTimestamps(false);BubbleConfig.load();check(!BubbleConfig.smallTimestamps());
  BubbleConfig.setSurfaceEffect(BubbleConfig.LEGACY);check(!BubbleConfig.smallTimestamps());
  BubbleConfig.setSmallTimestamps(true);BubbleConfig.load();check(BubbleConfig.smallTimestamps());
+ BubbleConfig.setOutlineEnabled(true);BubbleConfig.setSurfaceEffect(BubbleConfig.DEFAULT);BubbleConfig.load();
+ check(!BubbleStyle.signature()&&!BubbleConfig.backgroundBlur()&&!BubbleConfig.outlineEnabled());
+ BubbleConfig.setSurfaceEffect(BubbleConfig.LEGACY);BubbleConfig.load();
+ check(BubbleStyle.signature()&&BubbleConfig.backgroundBlur()&&BubbleConfig.outlineEnabled()&&BubbleConfig.transparency()==29);
  }}''',
     }, [JAVA/'app/flexygram/bubbles/BubbleConfig.java', JAVA/'app/flexygram/bubbles/BubbleStyle.java'])
 
@@ -97,8 +111,8 @@ def test_adaptive_fill_preserves_native_alpha_and_continues_to_shared_border(tmp
  void draw(Canvas canvas){BRANCH legacy++;}
  static void check(boolean v){if(!v)throw new AssertionError();}
  public static void main(String[]args){Probe p=new Probe();Canvas c=new Canvas();
- for(int t:new int[]{0,35,100})for(boolean selected:new boolean[]{false,true})for(int a:new int[]{0,1,127,255}){app.flexygram.bubbles.BubbleConfig.transparency=t;p.isSelected=selected;p.alpha=a;p.draw(c);check(p.legacy>0&&p.flexyFillPaint.shader==null&&p.flexyFillPaint.aa&&p.flexyFillPaint.alpha==Math.round((selected?204:170)*a/255f));}
- p.flexyGlassSource=new GlassSource(){public boolean draw(Canvas c,Path path){throw new AssertionError();}public boolean draw(Canvas c,Path path,int alpha,boolean selected){check(alpha==p.alpha&&selected==p.isSelected);return true;}};
+ for(int t:new int[]{0,35,100})for(boolean selected:new boolean[]{false,true})for(int a:new int[]{0,1,127,255}){app.flexygram.bubbles.BubbleConfig.transparency=t;p.isSelected=selected;p.alpha=a;p.draw(c);check(p.legacy>0&&p.flexyFillPaint.shader==null&&p.flexyFillPaint.aa&&p.flexyFillPaint.alpha==Math.round((selected?204:170)*Math.round(a*app.flexygram.bubbles.BubbleStyle.tintAlpha(t)/255f)/255f));}
+ p.flexyGlassSource=new GlassSource(){public boolean draw(Canvas c,Path path){throw new AssertionError();}public boolean draw(Canvas c,Path path,int alpha,boolean selected){check(alpha==Math.round(p.alpha*app.flexygram.bubbles.BubbleStyle.tintAlpha(app.flexygram.bubbles.BubbleConfig.transparency)/255f)&&selected==p.isSelected);return true;}};
  int draws=c.draws,common=p.legacy;p.draw(c);check(c.draws==draws&&p.legacy==common+1);
  p.adaptive=false;p.draw(c);check(p.legacy==common+2);
  }}'''.replace('INTERFACE',interface).replace('BRANCH',branch)})
@@ -108,8 +122,8 @@ def test_localized_selector_and_backup_cover_native_mode():
     for locale in ['values','values-es','values-ru']:
         names={e.attrib['name'] for e in ET.parse(ROOT/f'TMessagesProj/src/main/res/{locale}/flexygram_bubbles.xml').getroot()}
         assert {'FlexyBubbleSurfaceEffect','FlexyBubbleAdaptiveSurface','FlexyBubbleLegacySurface'} <= names
-    assert '"surface_effect",0' in (JAVA/'app/flexygram/studio/StudioClientCatalog.java').read_text()
-    assert '"surfaceEffect","flexygram_bubbles","surface_effect",0,0,1' in (JAVA/'app/flexygram/studio/core/StudioSchema.java').read_text()
+    assert '"surface_effect",2' in (JAVA/'app/flexygram/studio/StudioClientCatalog.java').read_text()
+    assert '"surfaceEffect","flexygram_bubbles","surface_effect",2,0,2' in (JAVA/'app/flexygram/studio/core/StudioSchema.java').read_text()
 
 
 def test_service_ink_and_ticks_are_local_cached_and_leave_media_keys_unchanged(tmp_path):

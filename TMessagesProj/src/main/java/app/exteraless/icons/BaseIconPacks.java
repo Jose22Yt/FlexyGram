@@ -37,6 +37,7 @@ public final class BaseIconPacks {
     public static final int BASE_SOLAR = 1;
     /** Remix Icon (Remix-Design). */
     public static final int BASE_REMIX = 2;
+    public static final int BASE_CUPERTINO = 3;
 
     /**
      * Сколько put-ов exteraGram пропущено: их базовых drawable нет в нашем дереве, и
@@ -61,14 +62,14 @@ public final class BaseIconPacks {
     public static int getSelected() {
         try {
             int value = NaConfig.INSTANCE.getIconReplacements().Int();
-            return value == BASE_SOLAR || value == BASE_REMIX ? value : BASE_DEFAULT;
+            return value == BASE_SOLAR || value == BASE_REMIX || value == BASE_CUPERTINO ? value : BASE_DEFAULT;
         } catch (Throwable t) {
             return BASE_DEFAULT;
         }
     }
 
     public static void setSelected(int type) {
-        if (type != BASE_DEFAULT && type != BASE_SOLAR && type != BASE_REMIX) {
+        if (type != BASE_DEFAULT && type != BASE_SOLAR && type != BASE_REMIX && type != BASE_CUPERTINO) {
             type = BASE_DEFAULT;
         }
         NaConfig.INSTANCE.getIconReplacements().setConfigInt(type);
@@ -82,7 +83,7 @@ public final class BaseIconPacks {
         if (type == BASE_REMIX) {
             return "Remix Icon";
         }
-        return org.telegram.messenger.LocaleController.getString(R.string.Default);
+        return type == BASE_CUPERTINO ? "Cupertino Icons" : org.telegram.messenger.LocaleController.getString(R.string.Default);
     }
 
     /** Автор набора ({@code BaseIconPacks.java:1192}). */
@@ -93,7 +94,7 @@ public final class BaseIconPacks {
         if (type == BASE_REMIX) {
             return "Remix-Design";
         }
-        return "Telegram";
+        return type == BASE_CUPERTINO ? "Vladimir Kharlampidi · MIT" : "Telegram";
     }
 
     /** Карта выбранного набора или null, если подмены нет. */
@@ -106,7 +107,7 @@ public final class BaseIconPacks {
         }
         // Набор def применяется и при «Default»: popup_fixed_alert/2/3
         // схлопываются в popup_fixed_alert4.
-        return getDef();
+        return type == BASE_DEFAULT ? null : getDef();
     }
 
     /**

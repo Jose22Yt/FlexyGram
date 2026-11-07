@@ -8,9 +8,9 @@ import java.util.Map;
 
 /** UI-owned snapshot. Legacy choices are read conservatively and never overwritten. */
 public final class HeaderConfig {
-    private static boolean loaded, signature = true, compact, counter = true;
-    private static boolean centerTitle = true, adaptiveBubble = true;
-    private static int opacity = 85, counterMode = 1, currentStyle;
+    private static boolean loaded, signature = false, compact, counter = false;
+    private static boolean centerTitle = false, adaptiveBubble = false;
+    private static int opacity = 85, counterMode = 1, currentStyle = 1;
     private HeaderConfig() { }
     private static SharedPreferences preferences;
     private static SharedPreferences prefs() {
@@ -23,17 +23,17 @@ public final class HeaderConfig {
         Map<String, ?> p = prefs().getAll();
         Map<String, ?> old = AppearanceConfig.getPreferences().getAll();
         Object previous = old.get("OEAppearanceIosChatHeader");
-        boolean legacy = Boolean.TRUE.equals(old.get("OEAppearanceIosChatHeaderAuto")) || !(previous instanceof Boolean) || (Boolean) previous;
+        boolean legacy = Boolean.TRUE.equals(old.get("OEAppearanceIosChatHeaderAuto")) || Boolean.TRUE.equals(previous);
         Object style = p.get("style");
         // Once the deprecated iOS Design master switch is retired, its stale
         // preferences cannot choose the conversation header implicitly.
         // Explicit choices remain respected; new styles are always opt-in.
         currentStyle = style instanceof Integer ? ((Integer) style >= 0 && (Integer) style <= 4 ? (Integer) style : 1)
-                : org.telegram.messenger.BuildConfig.CONNECTED_ALPHA ? 0 : legacy ? 0 : 1;
+                : legacy ? 0 : 1;
         signature = currentStyle != 1;
-        compact = Boolean.TRUE.equals(p.get("compact")); counter = !Boolean.FALSE.equals(p.get("counter"));
-        centerTitle = !Boolean.FALSE.equals(p.get("center_title"));
-        adaptiveBubble = !Boolean.FALSE.equals(p.get("adaptive_bubble"));
+        compact = Boolean.TRUE.equals(p.get("compact")); counter = Boolean.TRUE.equals(p.get("counter"));
+        centerTitle = Boolean.TRUE.equals(p.get("center_title"));
+        adaptiveBubble = Boolean.TRUE.equals(p.get("adaptive_bubble"));
         Object mode = p.get("counter_mode");
         counterMode = mode instanceof Integer ? Math.max(1, Math.min(2, (Integer) mode)) : 1;
         Object value = p.get("opacity"); opacity = value instanceof Integer ? Math.max(0, Math.min(100, (Integer) value)) : 85;

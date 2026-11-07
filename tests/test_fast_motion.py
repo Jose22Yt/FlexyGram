@@ -8,6 +8,8 @@ from test_render_work_reuse import JAVA, ROOT, probe
 def test_fixed_point_zero_one_and_system_compensation(tmp_path):
     probe(tmp_path, {'Probe.java': '''import app.flexygram.animation.FastMotionTiming;
 public class Probe {public static void main(String[] args){
+ if(!FastMotionTiming.isEnabled()||FastMotionTiming.duration(300)!=3)throw new AssertionError("fast default");
+ FastMotionTiming.setEnabled(true);
  if(FastMotionTiming.SCALE!=.01d||FastMotionTiming.duration(300)!=3||FastMotionTiming.delay(200)!=2)throw new AssertionError();
  for(float s:new float[]{.01f,.5f,1,1.5f,5,6})for(long nominal:new long[]{100,150,200,300,500,1000}){
   long value=FastMotionTiming.animatorDuration(nominal,s);
@@ -40,7 +42,7 @@ def test_actual_animated_float_finishes_at_its_fixed_deadline_without_idle_redra
       'org/telegram/messenger/AndroidUtilities.java':'package org.telegram.messenger;public class AndroidUtilities{public static float lerp(float a,float b,float t){return a+(b-a)*t;}}',
       'org/telegram/ui/Components/CubicBezierInterpolator.java':'package org.telegram.ui.Components;public class CubicBezierInterpolator{public static final android.animation.TimeInterpolator DEFAULT=t->t;}',
       'Probe.java':'''import org.telegram.ui.Components.AnimatedFloat;import android.os.SystemClock;
-public class Probe {public static void main(String[]args){int[] invalid={0};AnimatedFloat a=new AnimatedFloat((Runnable)()->invalid[0]++);a.setDuration(300);a.set(0);a.set(1);
+public class Probe {public static void main(String[]args){app.flexygram.animation.FastMotionTiming.setEnabled(true);int[] invalid={0};AnimatedFloat a=new AnimatedFloat((Runnable)()->invalid[0]++);a.setDuration(300);a.set(0);a.set(1);
  if(!a.isInProgress()||a.getDuration()!=300)throw new AssertionError("public nominal duration");
  SystemClock.now=3;if(a.getValue()!=1||a.isInProgress())throw new AssertionError("3ms target");int idle=invalid[0];
  for(int i=0;i<1000;i++)a.getValue();if(invalid[0]!=idle)throw new AssertionError("idle redraws");

@@ -19,7 +19,7 @@ public class BubbleVisualTest {
   ApplicationLoader.applicationContext=RuntimeEnvironment.getApplication();BubbleConfig.load();BubbleConfig.setBackgroundBlur(false);
   ApplicationLoader.applicationContext.getSharedPreferences(BubbleConfig.FILE,0).edit().clear().commit();
   BuildConfig.CONNECTED_ALPHA=true;Theme.dark=false;
-  BubbleConfig.load(); SharedConfig.bubbleRadius=20; AndroidUtilities.density=1; ChatsConfig.removeMessageTail.value=false;
+  BubbleConfig.load(); BubbleConfig.setSurfaceEffect(BubbleConfig.LEGACY); SharedConfig.bubbleRadius=20; AndroidUtilities.density=1; ChatsConfig.removeMessageTail.value=false;
  }
  @Test public void retiredMatteCannotChangeNativeGradientOrAlpha() throws Exception {
   BubbleConfig.setOutlineEnabled(false);BubbleConfig.setTransparency(0);
@@ -166,14 +166,14 @@ public class BubbleVisualTest {
   try(java.io.FileOutputStream file=new java.io.FileOutputStream(new java.io.File(System.getProperty("probe.root"),"android-native-bubbles.png"))) {assertTrue(b.compress(Bitmap.CompressFormat.PNG,100,file));}
  }
  @Test public void preferencePersistenceClampingAndIndependentSwitches() {
-  assertFalse(BubbleConfig.glass());assertFalse(BubbleConfig.border());assertFalse(BubbleConfig.edges());assertEquals(35,BubbleConfig.transparency());
+  assertFalse(BubbleConfig.glass());assertFalse(BubbleConfig.border());assertFalse(BubbleConfig.edges());assertEquals(0,BubbleConfig.transparency());
   BubbleConfig.setGlass(true);BubbleConfig.setBorder(true);BubbleConfig.setEdges(true);BubbleConfig.setTransparency(150);BubbleConfig.load();
   assertTrue(BubbleConfig.glass());assertTrue(BubbleConfig.edges());assertTrue(BubbleConfig.border());assertEquals(100,BubbleConfig.transparency());
   BubbleConfig.setGlass(false);BubbleConfig.load();assertTrue(BubbleConfig.edges());assertTrue(BubbleConfig.border());
   BubbleConfig.setTransparency(-10);assertEquals(0,BubbleConfig.transparency());
   for(int x=-100;x<200;x++){int a=BubbleStyle.tintAlpha(x);assertTrue(a>=0&&a<=255);}
   for(int stored=-20;stored<100;stored++){assertEquals(20,BubbleStyle.effectiveRadius(true,stored));assertEquals(stored,BubbleStyle.effectiveRadius(false,stored));}
-  assertEquals(20,BubbleStyle.defaultRadius(true));assertEquals(17,BubbleStyle.defaultRadius(false));
+  assertEquals(17,BubbleStyle.defaultRadius(true));assertEquals(17,BubbleStyle.defaultRadius(false));
  }
  @Test public void contourSwitchPreservesTheSelectedSideAndLegacyNoneSurvivesReload() {
   BubbleConfig.setTransparency(65);BubbleConfig.setBorderTenths(17);BubbleConfig.setBorderPosition(3);

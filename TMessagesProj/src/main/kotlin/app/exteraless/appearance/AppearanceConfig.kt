@@ -200,7 +200,7 @@ object AppearanceConfig {
     /** Стеклянное меню сообщения. Дефолт true, как в exteraGram (BooleanPref(1)). */
     @JvmField
     val glassMessageMenu =
-        addConfig("OEAppearanceGlassMessageMenu", ConfigItem.configTypeBool, true)
+        addConfig("OEAppearanceGlassMessageMenu", ConfigItem.configTypeBool, false)
 
     @JvmStatic
     fun glassMessageMenu(): Boolean {

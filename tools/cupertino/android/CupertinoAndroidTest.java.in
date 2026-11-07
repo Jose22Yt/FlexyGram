@@ -16,7 +16,7 @@ public class CupertinoAndroidTest {
   activity=Robolectric.buildActivity(Activity.class).setup().get();
   var font=CupertinoGlyphDrawable.class.getDeclaredField("typeface");font.setAccessible(true);
   font.set(null,Typeface.createFromFile(new File(System.getProperty("basedir"),"CupertinoIcons.ttf")));
-  app.exteraless.icons.BaseIconPacks.selected=0;app.flexygram.animation.FastMotionTiming.enabled=false;
+  app.exteraless.icons.BaseIconPacks.selected=3;app.flexygram.animation.FastMotionTiming.enabled=false;
  }
  @Test public void everyMappedGlyphRendersAtItsNativeSizeWithIndependentTintAndAlpha()throws Exception{
   var resources=activity.getResources();int count=0;
@@ -36,8 +36,8 @@ public class CupertinoAndroidTest {
  }
  @Test public void explicitOtherPacksAndUnmappedGraphicsRetainTheirNativeLoader(){
   assertNull(CupertinoIcons.create(activity.getResources(),-1));
-  app.exteraless.icons.BaseIconPacks.selected=1;
-  assertNull(CupertinoIcons.create(activity.getResources(),org.telegram.messenger.R.drawable.msg_settings));
+  for(int pack:new int[]{0,1,2}){app.exteraless.icons.BaseIconPacks.selected=pack;
+  assertNull(CupertinoIcons.create(activity.getResources(),org.telegram.messenger.R.drawable.msg_settings));}
  }
  @Test public void drawableAlphaSurvivesTintStateAndCloning(){
   Drawable icon=CupertinoIcons.create(activity.getResources(),org.telegram.messenger.R.drawable.msg_settings);
@@ -56,7 +56,7 @@ public class CupertinoAndroidTest {
  }
  FrameLayout root;ImageView image;TextView label;int clicks;long down;
  void layout(){root=new FrameLayout(activity);root.setBackgroundColor(Color.BLUE);root.setClickable(true);root.setOnClickListener(v->clicks++);
-  image=new ImageView(activity);image.setImageDrawable(CupertinoIcons.create(activity.getResources(),org.telegram.messenger.R.drawable.msg_settings));
+  image=new ImageView(activity);android.graphics.drawable.ShapeDrawable nativeIcon=new android.graphics.drawable.ShapeDrawable(new android.graphics.drawable.shapes.OvalShape());nativeIcon.setIntrinsicWidth(24);nativeIcon.setIntrinsicHeight(24);image.setImageDrawable(nativeIcon);
   image.setScaleType(ImageView.ScaleType.CENTER_INSIDE);FrameLayout.LayoutParams lp=new FrameLayout.LayoutParams(64,64);lp.leftMargin=20;lp.topMargin=20;root.addView(image,lp);
   label=new TextView(activity);label.setText("Settings");FrameLayout.LayoutParams text=new FrameLayout.LayoutParams(140,64);text.leftMargin=100;text.topMargin=20;root.addView(label,text);
   activity.setContentView(root);root.measure(View.MeasureSpec.makeMeasureSpec(320,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(200,View.MeasureSpec.EXACTLY));root.layout(0,0,320,200);Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();
@@ -98,8 +98,8 @@ public class CupertinoAndroidTest {
   assertEquals(ImageView.ScaleType.CENTER_INSIDE,image.getScaleType());assertEquals(before,image.getImageMatrix());
  }
 
- @Test public void backDefaultsToNativeAndKeepsOptionalIosCloseMorph(){
-  org.telegram.ui.ActionBar.BackDrawable back=new org.telegram.ui.ActionBar.BackDrawable(false);assertFalse(back.isIosStyle());back.setIosStyle(true);
+ @Test public void backDefaultsToNativeAndOptionalIosChevronKeepsCloseMorph(){
+  org.telegram.ui.ActionBar.BackDrawable back=new org.telegram.ui.ActionBar.BackDrawable(false);assertFalse(back.isIosStyle());back.setIosStyle(true);assertTrue(back.isIosStyle());
   back.setColor(Color.MAGENTA);back.setRotatedColor(Color.MAGENTA);back.setBounds(0,0,24,24);
   for(float rotation:new float[]{0,.25f,.5f,.75f,1}){
    back.setRotation(rotation,false);Bitmap b=Bitmap.createBitmap(24,24,Bitmap.Config.ARGB_8888);back.draw(new Canvas(b));
@@ -127,6 +127,19 @@ public class CupertinoAndroidTest {
   frame.invoke(pulse,1000000000L);frame.invoke(pulse,1070000000L);
   assertTrue(glyph.getPressScale()<1);assertEquals(bounds,glyph.getBounds());assertEquals(1,label.getScaleX(),0);
   frame.invoke(pulse,1200000000L);assertEquals(1,glyph.getPressScale(),0);assertEquals(bounds,glyph.getBounds());
+ }
+
+ @Test public void defaultCupertinoPulseNeverRequestsLayoutOrChangesImageScaleType()throws Exception{
+  layout();CupertinoGlyphDrawable glyph=(CupertinoGlyphDrawable)CupertinoIcons.create(activity.getResources(),org.telegram.messenger.R.drawable.msg_settings);
+  image.setImageDrawable(glyph);Shadows.shadowOf(android.os.Looper.getMainLooper()).idle();
+  assertFalse(image.isLayoutRequested());Matrix before=new Matrix(image.getImageMatrix());
+  touch(0,150,40,0);touch(1,150,40,40);
+  assertFalse(image.isLayoutRequested());assertEquals(ImageView.ScaleType.CENTER_INSIDE,image.getScaleType());
+  var field=IconPressFeedback.class.getDeclaredField("active");field.setAccessible(true);Object pulse=field.get(null);assertNotNull(pulse);
+  var frame=pulse.getClass().getDeclaredMethod("doFrame",long.class);frame.setAccessible(true);
+  frame.invoke(pulse,1000000000L);frame.invoke(pulse,1070000000L);
+  assertTrue(glyph.getPressScale()<1);assertFalse(image.isLayoutRequested());assertEquals(before,image.getImageMatrix());
+  frame.invoke(pulse,1200000000L);assertEquals(1,glyph.getPressScale(),0);assertFalse(image.isLayoutRequested());
  }
 
 }

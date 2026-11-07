@@ -59,7 +59,7 @@ def application_nodes(xmltree):
         if manifest['tag'] == 'manifest':
             yield from (child for child in manifest['children'] if child['tag'] == 'application')
 
-def has_launcher_alias(xmltree):
+def has_launcher_alias(xmltree, expected_aliases=('org.telegram.messenger.ExteralessIcon',)):
     """Inspect the packaged manifest: AAPT2 badging omits launcher aliases."""
 
     def enabled(node):
@@ -75,7 +75,7 @@ def has_launcher_alias(xmltree):
             if component['tag'] != 'activity-alias' or not enabled(component):
                 continue
             attrs = component['attrs']
-            if attrs.get('targetActivity') not in activities or attrs.get('name') != 'org.telegram.messenger.ExteralessIcon':
+            if attrs.get('targetActivity') not in activities or attrs.get('name') not in expected_aliases:
                 continue
             if attrs.get('exported') not in ('true', '(type 0x12)0xffffffff'):
                 continue

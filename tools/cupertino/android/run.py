@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Native Android graphics/touch tests for the archived Cupertino reference."""
+"""Native Android graphics/touch tests for the production Cupertino integration."""
 import importlib.util
 from pathlib import Path
 HERE=Path(__file__).resolve().parent

@@ -221,7 +221,7 @@ source+='  };\n  java.util.Arrays.sort(data);return data;\n }\n private static l
 for name,spec in sorted(mapped.items()):
  if spec['color']!=0xff000000:source+=f'   ((long) R.drawable.{name} << 32) | 0x{spec["color"]:08x}L,\n'
 source+='  };\n  java.util.Arrays.sort(data);return data;\n }\n}\n'
-(ROOT/'tools/cupertino/reference/src/app/flexygram/icons/CupertinoIconMap.java').write_text(source)
+(ROOT/'TMessagesProj/src/main/java/app/flexygram/icons/CupertinoIconMap.java').write_text(source)
 (Path(__file__).parent/'mapping.json').write_text(json.dumps(mapped,indent=2)+'\n')
 (Path(__file__).parent/'unmapped.json').write_text(json.dumps(skipped,indent=2)+'\n')
 print(f'Mapped {len(mapped)} static icon resources; {len(skipped)} retained for review/state/geometry.')

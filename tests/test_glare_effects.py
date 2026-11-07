@@ -7,7 +7,9 @@ J=ROOT/'TMessagesProj/src/main/java'
 BASE='4679f74ebd312acc4968dd2e044a6c6b7478445a'
 S=J/'app/flexygram/settings/signature'
 def without_width_extension(text):
- return text  # No width preference remains; historical backend must match exactly.
+ for key in ['FlexyFolderThemeAccent','OEAppearanceSenderMiniAvatars','OEAppearanceSquareFab','OEAppearanceGooeyAvatarAnimation','OEAppearanceSeparateHeaders','OEAppearanceGlassMessageMenu','OEAppearanceNewLoadingStyle','OEAppearanceMd3Player','OEAppearanceMd3MiniPlayer','OEAppearanceProfileMusicCard']:
+  text=text.replace('"'+key+'", ConfigItem.configTypeBool, false','"'+key+'", ConfigItem.configTypeBool, true')
+ return text  # Normalize only the approved fresh-install defaults; the glare backend is unchanged.
 
 def test_no_preference_migration_or_backend_replacement():
  for p in ['TMessagesProj/src/main/kotlin/app/exteraless/appearance/AppearanceConfig.kt','TMessagesProj/src/main/java/org/telegram/ui/Components/blur3/GlassOutlineStyle.java']:

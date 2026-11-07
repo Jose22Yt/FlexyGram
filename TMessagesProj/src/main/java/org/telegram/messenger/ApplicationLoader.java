@@ -427,6 +427,17 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
         return Camera2Config.defaultConfig();
     }
 
+    private android.content.res.Resources cupertinoResources;
+    private android.content.res.AssetManager cupertinoAssets;
+    @Override public android.content.res.Resources getResources() {
+        android.content.res.Resources original=super.getResources();
+        if(cupertinoResources==null || cupertinoAssets!=original.getAssets()){
+            cupertinoAssets=original.getAssets();
+            cupertinoResources=new app.flexygram.icons.CupertinoResources(original);
+        }
+        return cupertinoResources;
+    }
+
     @Override
     public void onCreate() {
         applicationLoaderInstance = this;
@@ -597,6 +608,7 @@ public class ApplicationLoader extends Application implements CameraXConfig.Prov
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+        if(cupertinoResources!=null)cupertinoResources.updateConfiguration(newConfig,super.getResources().getDisplayMetrics());
         try {
             LocaleController.getInstance().onDeviceConfigurationChange(newConfig);
             AndroidUtilities.checkDisplaySize(applicationContext, newConfig);

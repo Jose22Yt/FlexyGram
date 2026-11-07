@@ -9,9 +9,9 @@ def test_cupertino_catalog_matches_shipped_assets_and_generated_resource_map():
     mapping=json.loads((TOOLS/'mapping.json').read_text())
     catalog=json.loads((TOOLS/'catalog.json').read_text())
     upstream=json.loads((TOOLS/'UPSTREAM.json').read_text())
-    asset=TOOLS/'reference/assets/cupertino/CupertinoIcons.ttf'
+    asset=ROOT/'TMessagesProj/src/main/assets/cupertino/CupertinoIcons.ttf'
     assert hashlib.sha256(asset.read_bytes()).hexdigest()==upstream['font_sha256']
-    source=(TOOLS/'reference/src/app/flexygram/icons/CupertinoIconMap.java').read_text()
+    source=(JAVA/'app/flexygram/icons/CupertinoIconMap.java').read_text()
     specs=source[source.index('private static long[] buildSpecs()'):source.index('private static long[] buildColors()')]
     ids=set(re.findall(r'R.drawable.(\w+) << 32',specs))
     assert ids==mapping.keys()
@@ -27,24 +27,6 @@ def test_cupertino_catalog_matches_shipped_assets_and_generated_resource_map():
 
 def test_cupertino_notices_ship_without_a_flutter_runtime():
     assets=ROOT/'TMessagesProj/src/main/assets'
-    assert (assets/'licenses/cupertino-icons-MIT.txt').read_bytes()==(TOOLS/'reference/assets/cupertino/LICENSE').read_bytes()
+    assert (assets/'licenses/cupertino-icons-MIT.txt').read_bytes()==(assets/'cupertino/LICENSE').read_bytes()
     assert (assets/'licenses/flutter-cupertino-catalog-BSD.txt').read_bytes()==(TOOLS/'FLUTTER-LICENSE').read_bytes()
-    assert not (assets/'cupertino/CupertinoIcons.ttf').exists()
-    assert {p.name for p in (JAVA/'app/flexygram/icons').glob('*.java')} == {'SignatureLauncherUpdateReceiver.java'}
-
-
-def test_native_icon_resources_are_restored_without_overriding_user_packs():
-    # There must be no active Cupertino resource wrapper, menu substitution or touch observer.
-    for path in JAVA.rglob('*.java'):
-        if path.is_relative_to(JAVA/'app/flexygram/icons'):
-            continue
-        source=path.read_text()
-        assert 'CupertinoIcons.create(' not in source, str(path)
-        assert 'new app.flexygram.icons.CupertinoResources(' not in source, str(path)
-        assert 'IconPressFeedback.observe(' not in source, str(path)
-    packs=(JAVA/'app/exteraless/icons/BaseIconPacks.java').read_text()
-    assert 'return "Cupertino Icons";' not in packs
-    assert 'return org.telegram.messenger.LocaleController.getString(R.string.Default);' in packs
-    loader=(JAVA/'tw/nekomimi/nekogram/ui/icons/IconsResources.java').read_text()
-    assert 'IconPackManager.getInstance().getDrawable(this, id, density, theme)' in loader
-    assert 'getConversion(id)' in loader
+    assert not list((assets/'cupertino').glob('*.dart'))

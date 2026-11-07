@@ -31,7 +31,10 @@ public class StudioCoreTest {
    check(StudioCodec.decode(StudioCodec.encode(adaptive),1299).sections.get("bubbles").get("surfaceEffect").equals(effect));
    reject(()->StudioCodec.decode(StudioCodec.encode(adaptive),1298));
   }
-  reject(()->StudioCodec.create("bad.flexyGram",Map.of("bubbles",Map.of("surfaceEffect",2))));
+  var nativeSurface=StudioCodec.create("Native.flexyGram",Map.of("bubbles",Map.of("surfaceEffect",2)));
+  check(nativeSurface.minApp==1303);check(StudioCodec.decode(StudioCodec.encode(nativeSurface),1303).sections.get("bubbles").get("surfaceEffect").equals(2));
+  reject(()->StudioCodec.decode(StudioCodec.encode(nativeSurface),1302));
+  reject(()->StudioCodec.create("bad.flexyGram",Map.of("bubbles",Map.of("surfaceEffect",3))));
   reject(()->StudioCodec.create("bad.flexyGram",Map.of("bubbles",Map.of("surfaceEffect",-1))));
   for(String key:new String[]{"outlineStyle","pearlIntensity","outlineEnabled"}){
    Object valid=key.equals("outlineEnabled")?Boolean.FALSE:key.equals("outlineStyle")?1:72;
@@ -63,8 +66,8 @@ public class StudioCoreTest {
   defaults.get("header").put("compact",true);defaults.get("composer").put("style",1);
   var three=StudioCodec.export("Tres.flexyGram",defaults,Set.of());check(three.sections.size()==3);
   var full=StudioCodec.export("Completo.flexyGram",defaults,StudioSchema.sections());check(full.sections.size()==4);check(full.sections.values().stream().mapToInt(Map::size).sum()==StudioSchema.keys().size()-1);
-  byte[] encoded=StudioCodec.encode(full);check(Arrays.equals(encoded,StudioCodec.encode(StudioCodec.decode(encoded,1301))));
-  check(full.minApp==1301);reject(()->StudioCodec.decode(encoded,1300));
+  byte[] encoded=StudioCodec.encode(full);check(Arrays.equals(encoded,StudioCodec.encode(StudioCodec.decode(encoded,1303))));
+  check(full.minApp==1303);reject(()->StudioCodec.decode(encoded,1302));
   var legacy=defaults();legacy.get("bubbles").remove("smallTimestamp");legacy.get("bubbles").remove("surfaceEffect");legacy.get("bubbles").remove("borderPosition");legacy.get("bubbles").remove("fuseGlass");
   var legacyPreset=StudioCodec.export("Legacy.flexyGram",legacy,StudioSchema.sections());check(legacyPreset.minApp==1274);check(StudioCodec.decode(StudioCodec.encode(legacyPreset),1276).sections.equals(legacyPreset.sections));
   Map<String,Map<String,Object>> reversed=new LinkedHashMap<>();List<String> ids=new ArrayList<>(full.sections.keySet());Collections.reverse(ids);for(String s:ids)reversed.put(s,full.sections.get(s));check(Arrays.equals(encoded,StudioCodec.encode(StudioCodec.create(full.name,reversed))));

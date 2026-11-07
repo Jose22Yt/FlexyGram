@@ -280,6 +280,14 @@ public class LiteMode {
             }
         }
 
+        // Preserve saved/legacy policy. New installs start without optional glass effects,
+        // even when a server-provided performance preset includes them.
+        if (!preferences.contains("lite_mode6") && !preferences.contains("lite_mode5")
+                && !preferences.contains("lite_mode4") && !preferences.contains("lite_mode3")
+                && !preferences.contains("lite_mode2") && !preferences.contains("lite_mode")
+                && !preferences.contains("light_mode") && !preferences.contains("chatBlur")) {
+            defaultValue &= ~(FLAG_CHAT_BLUR | FLAG_LIQUID_GLASS);
+        }
         int prevValue = value;
         value = preferences.getInt("lite_mode6", defaultValue);
         if (loaded) {

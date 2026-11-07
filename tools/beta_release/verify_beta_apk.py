@@ -59,7 +59,7 @@ def verify(apk, build_tools):
     abi = re.findall(r'^native-code: (.+)$', badging, re.M)
     require(len(abi) == 1 and re.findall(r"'([^']+)'", abi[0]) == ['arm64-v8a'], 'Wrong native ABI')
     manifest = command(str(build_tools/'aapt2'), 'dump', 'xmltree', str(apk), '--file', 'AndroidManifest.xml')
-    require(has_launcher_alias(manifest), 'Invalid packaged launcher alias')
+    require(has_launcher_alias(manifest, ('org.telegram.messenger.FlexyGlossyIcon',)), 'Invalid packaged launcher alias')
     require('sharedUserId' not in manifest and 'backupAgent' not in manifest, 'Shared UID/backup agent present')
     require(binary_boolean_is_false(manifest, 'allowBackup')
             and binary_boolean_is_false(manifest, 'restoreAnyVersion'), 'Backup/restore must be disabled')
