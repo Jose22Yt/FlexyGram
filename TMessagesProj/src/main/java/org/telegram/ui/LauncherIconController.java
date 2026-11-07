@@ -16,7 +16,7 @@ public class LauncherIconController {
         if (resolved != null) return resolved;
         String saved = ApplicationLoader.applicationContext.getSharedPreferences("flexy_launcher", Context.MODE_PRIVATE).getString("selected", "");
         try { return LauncherIcon.valueOf(saved); }
-        catch (IllegalArgumentException ignored) { return LauncherIcon.FLEX_NEON; }
+        catch (IllegalArgumentException ignored) { return LauncherIcon.FLEX_GLOSSY; }
     }
     public static synchronized void tryFixLauncherIconIfNeeded() {
         // Preserve existing PackageManager overrides, including all legacy aliases.
@@ -37,7 +37,7 @@ public class LauncherIconController {
         }
         if (remembered != null) active = remembered;
         try {
-            applyIcon(active == null ? LauncherIcon.FLEX_NEON : active, false);
+            applyIcon(active == null ? LauncherIcon.FLEX_GLOSSY : active, false);
         } catch (IllegalArgumentException | SecurityException rejected) {
             // Atomic migration rejected: keep the existing launcher and retry next startup.
         }
@@ -48,7 +48,7 @@ public class LauncherIconController {
         int i = ctx.getPackageManager().getComponentEnabledSetting(icon.getComponentName(ctx));
         // Manifest default is effective before the process starts. Explicit overrides survive updates.
         return i == PackageManager.COMPONENT_ENABLED_STATE_ENABLED
-                || i == PackageManager.COMPONENT_ENABLED_STATE_DEFAULT && icon == LauncherIcon.FLEX_NEON;
+                || i == PackageManager.COMPONENT_ENABLED_STATE_DEFAULT && icon == LauncherIcon.FLEX_GLOSSY;
     }
 
     private static ComponentName legacyPrimary(Context ctx) {

@@ -77,7 +77,7 @@ def test_launcher_nested_selector_remains_touch_enabled_and_errors_do_not_select
         assert alias.get(ns+'exported')=='true'
         assert alias.get(ns+'targetActivity')=='org.telegram.ui.LaunchActivity'
     enabled=[k for k,a in aliases.items() if a.get(ns+'enabled')=='true']
-    assert enabled==['org.telegram.messenger.FlexyNeonIcon']
+    assert enabled==['org.telegram.messenger.FlexyGlossyIcon']
 
 def test_dock_is_a_clipped_native_rendernode_not_a_translucency_simulation():
     host=src('org/telegram/ui/MainTabsActivity.java')

@@ -14,7 +14,7 @@ def test_style_default_normalization_and_account_local_folder_pointers(tmp_path)
  java.util.Map<String,Integer> values=new java.util.HashMap<>();public int getInt(String k,int d){return values.getOrDefault(k,d);}public Editor edit(){return this;}public Editor putInt(String k,int v){values.put(k,v);return this;}public void apply(){}}
  public static void main(String[]args){Prefs p=new Prefs();org.telegram.messenger.ApplicationLoader.preferences=p;
  HomeStyleConfig.load();if(HomeStyleConfig.style()!=0||HomeStyleConfig.extraHeaderDp(false)!=0)throw new AssertionError();
- HomeStyleConfig.setStyle(1);HomeStyleConfig.load();if(HomeStyleConfig.style()!=1||HomeStyleConfig.extraHeaderDp(true)!=128)throw new AssertionError();
+ HomeStyleConfig.setStyle(1);HomeStyleConfig.load();if(HomeStyleConfig.style()!=1||HomeStyleConfig.extraHeaderDp(true)!=64)throw new AssertionError();
  HomeStyleConfig.favoriteFolder(0,4);HomeStyleConfig.favoriteFolder(1,9);HomeStyleConfig.setStyle(0);
  if(HomeStyleConfig.favoriteFolder(0)!=4||HomeStyleConfig.favoriteFolder(1)!=9||HomeStyleConfig.favoriteFolder(2)!=0)throw new AssertionError();
  HomeStyleConfig.favoriteFolder(0,1);if(HomeStyleConfig.favoriteFolder(0)!=4)throw new AssertionError();
@@ -23,16 +23,21 @@ def test_style_default_normalization_and_account_local_folder_pointers(tmp_path)
     },[JAVA/'app/flexygram/home/HomeStyleConfig.java'])
 
 
-def test_cards_reuse_paint_and_rectangles_on_repeated_scroll_draws(tmp_path):
-    probe(tmp_path,{
-      'android/graphics/Paint.java':'package android.graphics;public class Paint{public static int ANTI_ALIAS_FLAG=1,allocations;public int color;public Paint(int f){allocations++;}public void setColor(int c){color=c;}}',
-      'android/graphics/RectF.java':'package android.graphics;public class RectF{public static int allocations;public RectF(){allocations++;}public float l,t,r,b;public void set(float a,float c,float d,float e){l=a;t=c;r=d;b=e;}}',
-      'android/graphics/Canvas.java':'package android.graphics;public class Canvas{public int rects,rounds;public void drawRect(float l,float t,float r,float b,Paint p){rects++;}public void drawRoundRect(RectF r,float x,float y,Paint p){if(r.r<r.l||r.b<r.t)throw new AssertionError();rounds++;}}',
-      'Probe.java':'''import app.flexygram.home.EssentialDialogPainter;import android.graphics.*;public class Probe{public static void main(String[]args){EssentialDialogPainter painter=new EssentialDialogPainter();Canvas canvas=new Canvas();int paints=Paint.allocations,rects=RectF.allocations;
- for(int i=0;i<20000;i++)painter.draw(canvas,360,72,1,0xff101010,0xff202020);
- if(Paint.allocations!=paints||RectF.allocations!=rects||canvas.rects!=20000||canvas.rounds!=20000)throw new AssertionError();
- }}'''
-    },[JAVA/'app/flexygram/home/EssentialDialogPainter.java'])
+def test_saved_projection_preserves_controller_order_and_reuses_snapshots(tmp_path):
+    probe(tmp_path,{'Probe.java':'''import java.util.*;import app.flexygram.home.HomeDialogProjection;public class Probe{
+ public static void main(String[]args){
+ HomeDialogProjection<Long> filter=new HomeDialogProjection<>(id->id);
+ ArrayList<Long> original=new ArrayList<>(Arrays.asList(9L,1L,8L));
+ ArrayList<Long> projected=filter.without(original,1);
+ if(!projected.equals(Arrays.asList(9L,8L))||!original.equals(Arrays.asList(9L,1L,8L)))throw new AssertionError();
+ for(int i=0;i<20000;i++)if(filter.without(original,1)!=projected)throw new AssertionError();
+ original.add(0,7L);filter.invalidate();
+ if(!filter.without(original,1).equals(Arrays.asList(7L,9L,8L)))throw new AssertionError();
+ if(!filter.without(original,9).equals(Arrays.asList(7L,1L,8L)))throw new AssertionError();
+ ArrayList<Long> second=new ArrayList<>(Arrays.asList(1L,2L));
+ if(!filter.without(second,9).equals(second))throw new AssertionError();
+ if(filter.without(second,9)==second)throw new AssertionError("controller list must not be exposed for mutation");
+ }}'''},[JAVA/'app/flexygram/home/HomeDialogProjection.java'])
 
 
 def test_first_settings_row_has_no_preview_and_favorite_ids_are_not_portable():

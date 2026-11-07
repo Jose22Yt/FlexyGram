@@ -1,0 +1,83 @@
+{
+  "TMessagesProj/src/main/res/values-es-rES/strings_neko.xml": {
+    "CloudConfigSyncDate": "Última sincronización: %s, nube: %s"
+  },
+  "TMessagesProj/src/main/res/values-fa-rIR/strings_neko.xml": {
+    "CloudConfigSyncDate": "آخرین همگام‌سازی: %s، ابر: %s"
+  },
+  "TMessagesProj/src/main/res/values-in-rID/strings_neko.xml": {
+    "CloudConfigSyncDate": "Terakhir disinkronkan: %s, cloud: %s"
+  },
+  "TMessagesProj/src/main/res/values-it-rIT/strings_neko.xml": {
+    "CloudConfigSyncDate": "Ultima sincronizzazione: %s, cloud: %s"
+  },
+  "TMessagesProj/src/main/res/values-ko/strings_neko.xml": {
+    "CloudConfigSyncDate": "마지막 동기화: %s, 클라우드: %s"
+  },
+  "TMessagesProj/src/main/res/values-pl-rPL/strings_neko.xml": {
+    "CloudConfigSyncDate": "Ostatnia synchronizacja: %s, chmura: %s"
+  },
+  "TMessagesProj/src/main/res/values-pt-rBR/strings_neko.xml": {
+    "CloudConfigSyncDate": "Última sincronização: %s, nuvem: %s"
+  },
+  "TMessagesProj/src/main/res/values-ru-rRU/strings_neko.xml": {
+    "CloudConfigSyncDate": "Последняя синхронизация: %s, облако: %s"
+  },
+  "TMessagesProj/src/main/res/values-tr-rTR/strings_neko.xml": {
+    "CloudConfigSyncDate": "Son senkronizasyon: %s, bulut: %s"
+  },
+  "TMessagesProj/src/main/res/values-uk-rUA/strings_neko.xml": {
+    "CloudConfigSyncDate": "Остання синхронізація: %s, хмара: %s"
+  },
+  "TMessagesProj/src/main/res/values-vi-rVN/strings_neko.xml": {
+    "CloudConfigSyncDate": "Lần đồng bộ cuối: %s, đám mây: %s"
+  },
+  "TMessagesProj/src/main/res/values-zh-rCN/strings_neko.xml": {
+    "CloudConfigSyncDate": "最后同步：%s，云端：%s"
+  },
+  "TMessagesProj/src/main/res/values-zh-rTW/strings_neko.xml": {
+    "CloudConfigSyncDate": "最後同步：%s，雲端：%s"
+  },
+  "TMessagesProj/src/main/res/values/strings.xml": {
+    "NotificationTopicExceptionsDesctription_one": "%s, %d exception",
+    "NotificationTopicExceptionsDesctription_other": "%s, %d exceptions",
+    "StoryAddedToAlbumTitle_one": "%d story saved to **%s**",
+    "StoryAddedToAlbumTitle_other": "%d stories saved to **%s**",
+    "StoryRemovedFromAlbumTitle_one": "%d story removed from **%s**",
+    "StoryRemovedFromAlbumTitle_other": "%d stories removed from**%s**",
+    "UnconfirmedAuthMultipleFrom_one": "We detected new %d login to your account from %s. Is it you?",
+    "UnconfirmedAuthMultipleFrom_other": "We detected new %d logins to your account from %s. Is it you?",
+    "Gift2AuctionInfo_one": "%d gift is dropped at varying intervals to the top %d bidder by bid amount.",
+    "Gift2AuctionInfo_other": "%d gifts are dropped at varying intervals to the top %d bidders by bid amount.",
+    "Gift2AuctionInfoLearnMore2_one": "%d gift is dropped at varying intervals to the top %d bidder by bid amount. **Learn More >**",
+    "Gift2AuctionInfoLearnMore2_other": "%d gifts are dropped at varying intervals to the top %d bidders by bid amount. **Learn More >**",
+    "Gift2AuctionInfo2_one": "Top **%d** bidder will get an **%s**\\nthis round.",
+    "Gift2AuctionInfo2_other": "Top **%d** bidders will get an **%s**\\nthis round.",
+    "Gift2AveragePriceHint": "**%d Stars** is the average sale price for **%s** gifts.",
+    "Gift2InfoOutConverted_one": "%2$s converted this gift to **%d** Star.",
+    "Gift2InfoOutConverted_other": "%2$s converted this gift to **%d** Stars.",
+    "SuggestAPostBelowSubtitleStarsAndTime": "⭐️ %s %s",
+    "SuggestionAgreementReachedUser1": "📆 Your post will be automatically published on **%s** **%s**",
+    "SuggestionAgreementReachedUser1PastSimple": "📆 Your post was automatically published on **%s** **%s**",
+    "SuggestionAgreementReachedAdmin1": "📆 This post will be automatically published **%s** **%s**",
+    "SuggestionAgreementReachedAdmin1PastSimple": "📆 This post was automatically published on **%s** **%s**",
+    "SuggestionAgreementReachedAdmin2": "💰 **%s** has been charged ⭐️ **%s**.",
+    "SuggestionAgreementReachedUser3Stars": "⏳ **%s** will receive your **Stars** once the post has been live for **%d** hours.",
+    "SuggestionAgreementReachedAdmin3Stars": "⏳ **%s** will receive the **Stars** once the post has been live for **%d** hours.",
+    "SuggestionAgreementReachedUser4Stars": "🔁 If **%s** removes the post before it has been live for **%d** hours, your **Stars** will be refunded.",
+    "SuggestionAgreementReachedAdmin4Stars": "🔁 If **%s** removes the post before it has been live for **%d** hours, **Stars** will be refunded to user.",
+    "SuggestionAgreementReachedUser3TON": "⏳ **%s** will receive your **TON** once the post has been live for **%d** hours.",
+    "SuggestionAgreementReachedAdmin3TON": "⏳ **%s** will receive the **TON** once the post has been live for **%d** hours.",
+    "SuggestionAgreementReachedUser4TON": "🔁 If **%s** removes the post before it has been live for **%d** hours, your **TON** will be refunded.",
+    "SuggestionAgreementReachedAdmin4TON": "🔁 If **%s** removes the post before it has been live for **%d** hours, **TON** will be refunded to user.",
+    "GiftAuctionInfo1Text_one": "%d gift is dropped at varying intervals to the top %d bidder by bid amount.",
+    "GiftAuctionInfo1Text_other": "%d gifts are dropped at varying intervals to the top %d bidders by bid amount.",
+    "Gift2ActiveAuctionsActiveRound": "Round %s of %s",
+    "Gift2ActiveAuctionsActiveBidActive": "Your bid **%s** is ranked **#%d**",
+    "Gift2AuctionsChangeRecipient2": "You’ve already placed a bid on this gift for **%s.** Do you want to raise your bid and change the recipient to **%s?**",
+    "GiftOfferPayMulti": "Pay %s and %s"
+  },
+  "TMessagesProj/src/main/res/values/strings_neko.xml": {
+    "CloudConfigSyncDate": "Last synced: %s, cloud: %s"
+  }
+}

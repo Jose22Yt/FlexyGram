@@ -113,6 +113,8 @@ def test_locales_and_no_new_manifest_signing_distribution_changes():
   current=(ROOT/path).read_bytes()
   original=subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT)
   if path.endswith('AndroidManifest.xml'):
+   from launcher_manifest_contract import before_glossy_default
+   current=before_glossy_default(current)
    # The existing Studio intent filter also accepts the lowercase extension.
    current=current.replace(b'                <data android:scheme="content" android:host="*" android:pathPattern=".*\\\\.flexygram" />\n',b'',1)
    current=current.replace(b'android:name="org.telegram.ui.LaunchActivity"\n            android:theme="@style/Theme.FlexyGram.Start"',b'android:name="org.telegram.ui.LaunchActivity"\n            android:theme="@style/Theme.TMessages.Start"',1)

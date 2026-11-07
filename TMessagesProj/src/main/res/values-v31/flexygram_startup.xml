@@ -2,7 +2,7 @@
   <style name="Theme.FlexyGram.Start" parent="Theme.TMessages.Start">
     <item name="android:windowBackground">@color/SplashBackground</item>
     <item name="android:windowSplashScreenBackground">@color/SplashBackground</item>
-    <item name="android:windowSplashScreenAnimatedIcon">@drawable/flexy_startup_flex_neon</item>
+    <item name="android:windowSplashScreenAnimatedIcon">@drawable/flexy_startup_flex_glossy</item>
     <item name="android:windowSplashScreenIconBackgroundColor">@android:color/transparent</item>
     <item name="android:windowSplashScreenAnimationDuration">0</item>
   </style>

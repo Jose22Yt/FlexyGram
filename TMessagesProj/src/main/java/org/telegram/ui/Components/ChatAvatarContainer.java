@@ -902,11 +902,11 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
         if (signatureMore != null) return;
         signaturePhotoMask = new app.flexygram.header.fusion.SignatureFusionAvatarMask();
         signaturePhotoClip = new android.graphics.Path();
-        signatureMore = new android.widget.ImageView(getContext()); signatureMore.setImageResource(R.drawable.ic_ab_other);
-        signatureMore.setRotation(90); signatureMore.setScaleType(android.widget.ImageView.ScaleType.CENTER);
+        signatureMore = new android.widget.ImageView(getContext()); signatureMore.setImageResource(R.drawable.flexy_ios_more);
+        signatureMore.setRotation(0); signatureMore.setScaleType(android.widget.ImageView.ScaleType.CENTER);
         signatureMore.setContentDescription(getString(R.string.AccDescrMoreOptions));
         signatureMore.setOnClickListener(v -> onSignatureOptionsClick());
-        signatureCall = new android.widget.ImageView(getContext()); signatureCall.setImageResource(R.drawable.msg_callback);
+        signatureCall = new android.widget.ImageView(getContext()); signatureCall.setImageResource(R.drawable.flexy_ios_call);
         signatureCall.setScaleType(android.widget.ImageView.ScaleType.CENTER);
         signatureCall.setContentDescription(getString(R.string.Call));
         signatureCall.setOnClickListener(v -> { if (isSignatureCallAvailable()) onSignatureCallClick(); });
@@ -914,6 +914,7 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
         signatureCall.setBackground(Theme.createSimpleSelectorRoundRectDrawable(dp(23),0,getThemedColor(Theme.key_listSelector)));
         addView(signatureMore); addView(signatureCall);
     }
+    public View getSignatureMenuAnchor() { return signatureMore != null && signatureMore.getVisibility() == VISIBLE ? signatureMore : this; }
     protected void onSignatureOptionsClick() { }
     public void setSignatureHeader(app.flexygram.header.SignatureChatHeader header) {
         signatureHeader = header;

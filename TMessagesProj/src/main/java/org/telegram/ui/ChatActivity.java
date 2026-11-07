@@ -4740,7 +4740,7 @@ public class ChatActivity extends BaseFragment implements
                 return openNativeHeaderOptions();
             }
             @Override protected void onSignatureOptionsClick() {
-                if (usesSignatureHeader() && headerItem != null && headerItem.hasSubMenu()) headerItem.toggleSubMenu();
+                if (usesSignatureHeader() && headerItem != null && headerItem.hasSubMenu()) headerItem.toggleSubMenu(null, avatarContainer.getSignatureMenuAnchor());
                 else openNativeHeaderOptions();
             }
             @Override protected boolean isSignatureCallAvailable() {

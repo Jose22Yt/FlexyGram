@@ -154,7 +154,7 @@ public class BackDrawable extends Drawable {
             paint.setStrokeJoin(Paint.Join.ROUND);
             paint.setStrokeCap(Paint.Cap.ROUND);
             if (rotation == 0) {
-                paint.setStrokeWidth(AndroidUtilities.dp(2.75f));
+                paint.setStrokeWidth(AndroidUtilities.dp(2.0f));
                 if (iosPath == null || lastDensity != AndroidUtilities.density) {
                     if (iosPath == null) {
                         iosPath = new android.graphics.Path();

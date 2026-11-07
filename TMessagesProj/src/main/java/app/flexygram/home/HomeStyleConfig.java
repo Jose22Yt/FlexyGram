@@ -18,5 +18,5 @@ public final class HomeStyleConfig {
     public static void setStyle(int value){style=normalize(value);prefs().edit().putInt(STYLE,style).apply();}
     public static int favoriteFolder(int account){return prefs().getInt("favorite_folder_"+account,0);}
     public static void favoriteFolder(int account,int id){if(id>1)prefs().edit().putInt("favorite_folder_"+account,id).apply();}
-    public static int extraHeaderDp(boolean enabled){return enabled?128:0;}
+    public static int extraHeaderDp(boolean enabled){return enabled?64:0;}
 }

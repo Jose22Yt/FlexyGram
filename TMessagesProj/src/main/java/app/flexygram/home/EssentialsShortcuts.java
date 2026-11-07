@@ -34,7 +34,7 @@ public final class EssentialsShortcuts extends LinearLayout {
             setBackgroundColor(page);saved.setBackground(background(card,0));favorites.setBackground(background(selected?androidx.core.graphics.ColorUtils.blendARGB(card,accent,.12f):card,selected?accent:0));
             saved.setTextColor(ink);favorites.setTextColor(selected?accent:ink);
             saved.setCompoundDrawablePadding(AndroidUtilities.dp(4));favorites.setCompoundDrawablePadding(AndroidUtilities.dp(4));
-            saved.setText(LocaleController.getString(R.string.SavedMessages));
+            saved.setText(LocaleController.getString(R.string.FlexyHomeSaved));saved.setContentDescription(LocaleController.getString(R.string.SavedMessages));
             android.graphics.drawable.Drawable bookmark=getContext().getDrawable(R.drawable.chats_saved).mutate(),star=getContext().getDrawable(R.drawable.msg_fave).mutate();
             bookmark.setTint(ink);star.setTint(selected?accent:ink);int size=AndroidUtilities.dp(20);bookmark.setBounds(0,0,size,size);star.setBounds(0,0,size,size);
             saved.setCompoundDrawablesRelative(bookmark,null,null,null);favorites.setCompoundDrawablesRelative(star,null,null,null);

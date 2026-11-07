@@ -24,7 +24,7 @@ EXPECTED_ELFS = 96  # The inherited native payload; review explicitly when depen
 def expected_version():
     properties = dict(re.findall(r'^(\w+)=(.*)$', (ROOT/'gradle.properties').read_text(), re.M))
     require(properties.get('APP_PACKAGE') == APP, 'Wrong source Beta package')
-    require(properties.get('BETA_VERSION_NAME') == '1.0.0-beta.1', 'Unexpected source Beta version')
+    require(re.fullmatch(r'1\.0\.0-beta\.[1-9][0-9]*', properties.get('BETA_VERSION_NAME', '')) is not None, 'Unexpected source Beta version')
     code = int(properties['BETA_VERSION_CODE'])
     require(code >= 1290, 'Beta version must not roll back')
     return code, properties['BETA_VERSION_NAME']

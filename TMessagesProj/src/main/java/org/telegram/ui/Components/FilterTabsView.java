@@ -177,6 +177,7 @@ public class FilterTabsView extends FrameLayout {
         public boolean isDefault;
         public boolean isLocked;
         public boolean noanimate;
+        public boolean shortcutOnly;
 
         public Tab(int i, CharSequence title, String emoticon, boolean noanimate) {
             this.id = i;
@@ -187,6 +188,7 @@ public class FilterTabsView extends FrameLayout {
         }
 
         public int getWidth(boolean store) {
+            if (shortcutOnly) return 0;
             iconWidth = FolderIconHelper.getTotalIconWidth();
             int width = titleWidth = (int) Math.ceil(HintView2.measureCorrectly(title, textPaint));
             width += iconWidth;
@@ -377,13 +379,14 @@ public class FilterTabsView extends FrameLayout {
 
         @Override
         protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-            int w = currentTab.getWidth(false) + dp(getTabPadding()) + additionalTabWidth;
+            int w = currentTab.shortcutOnly ? 0 : currentTab.getWidth(false) + dp(getTabPadding()) + additionalTabWidth;
             setMeasuredDimension(w, MeasureSpec.getSize(heightMeasureSpec));
         }
 
         @SuppressLint("DrawAllocation")
         @Override
         protected void onDraw(@NonNull Canvas canvas) {
+            if (currentTab != null && currentTab.shortcutOnly) return;
             boolean reorderEnabled = !currentTab.isDefault || UserConfig.getInstance(UserConfig.selectedAccount).isPremiumOrLocal();
             boolean showRemove = !currentTab.isDefault && reorderEnabled;
             if (reorderEnabled && editingAnimationProgress != 0) {
@@ -1542,6 +1545,19 @@ public class FilterTabsView extends FrameLayout {
         tabs.add(tab);
     }
 
+    private int tabTotalWidth(Tab tab,boolean store){
+        return tab.shortcutOnly?0:tab.getWidth(store)+dp(getTabPadding());
+    }
+
+    /** Keep the native filter index and page navigation, but expose this folder only through its Home shortcut. */
+    public void setShortcutOnly(int id){
+        int position=idToPosition.get(id,-1);
+        Tab tab=getTab(position);
+        if(tab==null||tab.shortcutOnly)return;
+        allTabsWidth-=tabTotalWidth(tab,false);
+        tab.shortcutOnly=true;
+    }
+
     public int getTabsCount() {
         return tabs.size();
     }
@@ -1642,7 +1658,7 @@ public class FilterTabsView extends FrameLayout {
             positionToWidth.put(a, tabWidth);
             positionToCount.put(a, tabs.get(a).counter);
             positionToX.put(a, xOffset + additionalTabWidth / 2);
-            xOffset += tabWidth + dp(getTabPadding()) + additionalTabWidth;
+            if(!tabs.get(a).shortcutOnly)xOffset += tabWidth + dp(getTabPadding()) + additionalTabWidth;
         }
     }
 
@@ -1706,6 +1722,8 @@ public class FilterTabsView extends FrameLayout {
     }
 
     private void drawSelector(Canvas canvas) {
+        Tab selected=getTab(currentPosition);
+        if(selected!=null&&selected.shortcutOnly)return;
         if (signatureHome) return;
         final int height = getMeasuredHeight();
         selectorDrawable.setAlpha((int) (255 * listView.getAlpha()));
@@ -1834,7 +1852,9 @@ public class FilterTabsView extends FrameLayout {
                 trueTabsWidth = allTabsWidth;
             }
             int prevWidth = additionalTabWidth;
-            additionalTabWidth = !signatureHome && trueTabsWidth < width ? (width - trueTabsWidth) / tabs.size() : 0;
+            int visibleCount=0;
+            for(Tab tab:tabs)if(!tab.shortcutOnly)visibleCount++;
+            additionalTabWidth = !signatureHome && trueTabsWidth < width && visibleCount>0 ? (width - trueTabsWidth) / visibleCount : 0;
             if (prevWidth != additionalTabWidth) {
                 ignoreLayout = true;
                 RecyclerView.ItemAnimator animator = listView.getItemAnimator();
@@ -1999,6 +2019,7 @@ public class FilterTabsView extends FrameLayout {
         boolean changed = false;
         for (int a = 0, N = tabs.size(); a < N; a++) {
             Tab tab = tabs.get(a);
+            if(tab.shortcutOnly)continue;
             if (tab.counter == delegate.getTabCounter(tab.id) || delegate.getTabCounter(tab.id) < 0) {
                 continue;
             }
@@ -2014,7 +2035,7 @@ public class FilterTabsView extends FrameLayout {
                     defaultTab.setTitle(LocaleController.getString(R.string.FilterAllChats), null, false);
                 }
                 for (int b = 0; b < N; b++) {
-                    allTabsWidth += tabs.get(b).getWidth(true) + dp(getTabPadding());
+                    allTabsWidth += tabTotalWidth(tabs.get(b),true);
                 }
                 break;
             }
@@ -2031,6 +2052,7 @@ public class FilterTabsView extends FrameLayout {
             return;
         }
         Tab tab = tabs.get(position);
+        if(tab.shortcutOnly)return;
         if (tab.counter == delegate.getTabCounter(tab.id) || delegate.getTabCounter(tab.id) < 0) {
             return;
         }
@@ -2050,7 +2072,7 @@ public class FilterTabsView extends FrameLayout {
                 defaultTab.setTitle(LocaleController.getString(R.string.FilterAllChats), null, false);
             }
             for (int b = 0, N = tabs.size(); b < N; b++) {
-                allTabsWidth += tabs.get(b).getWidth(true) + dp(getTabPadding());
+                allTabsWidth += tabTotalWidth(tabs.get(b),true);
             }
         }
     }
@@ -2075,7 +2097,8 @@ public class FilterTabsView extends FrameLayout {
 
         @Override
         public boolean isEnabled(RecyclerView.ViewHolder holder) {
-            return true;
+            Tab tab=getTab(holder.getAdapterPosition());
+            return tab!=null&&!tab.shortcutOnly;
         }
 
         @NonNull
@@ -2089,6 +2112,7 @@ public class FilterTabsView extends FrameLayout {
             TabView tabView = (TabView) holder.itemView;
             int oldId = tabView.currentTab != null ? tabView.getId() : -1;
             tabView.setTab(tabs.get(position), position);
+            tabView.setImportantForAccessibility(tabs.get(position).shortcutOnly?View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS:View.IMPORTANT_FOR_ACCESSIBILITY_AUTO);
             if (oldId != tabView.getId()) {
                 tabView.progressToLocked = tabView.currentTab.isLocked ? 1f : 0;
             }

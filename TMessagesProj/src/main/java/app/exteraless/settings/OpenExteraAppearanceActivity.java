@@ -189,7 +189,7 @@ public class OpenExteraAppearanceActivity extends app.flexygram.settings.Signatu
         sectionsHeaderRow = addRow("sectionsHeader");
         sectionRadiusRow = addRow("sectionRadius");
         separateHeadersRow = addRow("separateHeaders");
-        dividerStyleRow = addRow("dividerStyle");
+        dividerStyleRow = isSignatureSettingsPage() ? -1 : addRow("dividerStyle");
         sectionsDividerRow = addRow();
 
         blurHeaderRow = addRow("blurHeader");

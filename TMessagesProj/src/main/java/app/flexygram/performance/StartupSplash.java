@@ -92,7 +92,7 @@ public final class StartupSplash {
             case PREMIUM: return R.style.Theme_FlexyGram_Start_PREMIUM;
             case TURBO: return R.style.Theme_FlexyGram_Start_TURBO;
             case NOX: return R.style.Theme_FlexyGram_Start_NOX;
-            default: return R.style.Theme_FlexyGram_Start_FLEX_NEON;
+            default: return R.style.Theme_FlexyGram_Start_FLEX_GLOSSY;
         }
     }
 }

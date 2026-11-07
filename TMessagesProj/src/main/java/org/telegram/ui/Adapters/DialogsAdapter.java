@@ -1223,6 +1223,11 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
             fromDialog.pinnedNum = toDialog.pinnedNum;
             toDialog.pinnedNum = oldNum;
         }
+        ArrayList<TLRPC.Dialog> controllerDialogs = parentFragment.getControllerDialogsArray(currentAccount, dialogsType, folderId, false);
+        if (controllerDialogs != dialogs) {
+            int controllerFrom = controllerDialogs.indexOf(fromDialog), controllerTo = controllerDialogs.indexOf(toDialog);
+            if (controllerFrom >= 0 && controllerTo >= 0) Collections.swap(controllerDialogs, controllerFrom, controllerTo);
+        }
         Collections.swap(dialogs, fromIndex, toIndex);
         updateList(null);
     }
@@ -1605,6 +1610,7 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
     }
 
     private void updateItemList() {
+        if(parentFragment!=null&&parentFragment.isEssentialsHome())parentFragment.invalidateHomeDialogs();
         if (communityId != 0) {
             updateItemListForCommunity();
             return;

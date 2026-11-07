@@ -951,7 +951,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             if (SizeNotifierFrameLayout.drawingBlur) {
                 return super.drawChild(canvas, child, drawingTime);
             }
-            if(isEssentialsHome()&&(child==essentialsBrand||child==essentialsShortcuts)){
+            if(isEssentialsHome()&&child==essentialsShortcuts){
                 canvas.save();canvas.clipRect(0,actionBar.getHeight(),getWidth(),getHeight());
                 boolean drawn=super.drawChild(canvas,child,drawingTime);canvas.restore();return drawn;
             }
@@ -1153,7 +1153,6 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 essentialsSearchHeader.setAlpha(visible);essentialsSearchHeader.setVisibility(visible>0?VISIBLE:INVISIBLE);
                 essentialsShortcuts.setAlpha(visible);essentialsShortcuts.setVisibility(visible>0?VISIBLE:INVISIBLE);
                 essentialsShortcuts.setTranslationY(scrollYOffset+storiesYOffset+storiesOverscroll);
-                essentialsBrand.setTranslationY(scrollYOffset+storiesYOffset+storiesOverscroll);essentialsBrand.setAlpha(visible);
                 actionBar.setAlpha(1f-visible);actionBar.setImportantForAccessibility(visible>.99f?View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS:View.IMPORTANT_FOR_ACCESSIBILITY_AUTO);
             }
             super.dispatchDraw(canvas);
@@ -1384,10 +1383,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     continue;
                 }
                 if(isEssentialsHome()) {
-                    if(child==essentialsBrand)childTop=actionBar.getMeasuredHeight();
-                    else if(child==dialogStoriesCell)childTop+=dp(64);
-                    else if(child==essentialsSearchHeader)childTop=actionBar.getOccupyStatusBar()?AndroidUtilities.statusBarHeight:0;
-                    else if(child==essentialsShortcuts)childTop=actionBar.getMeasuredHeight()+dp(64)+(hasStories?dp(DialogStoriesCell.HEIGHT_IN_DP):0);
+                    if(child==essentialsSearchHeader)childTop=actionBar.getOccupyStatusBar()?AndroidUtilities.statusBarHeight:0;
+                    else if(child==essentialsShortcuts)childTop=actionBar.getMeasuredHeight()+(hasStories?dp(DialogStoriesCell.HEIGHT_IN_DP):0);
                 }
                 child.layout(childLeft, childTop, childLeft + width, childTop + height);
             }
@@ -3277,10 +3274,13 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         return !(dialog instanceof BotWebViewSheet) && super.dismissDialogOnPause(dialog);
     }
 
+    private final app.flexygram.home.HomeDialogProjection<TLRPC.Dialog> homeDialogProjection =
+            new app.flexygram.home.HomeDialogProjection<>(dialog -> dialog.id);
+    public void invalidateHomeDialogs() { homeDialogProjection.invalidate(); }
+
     private boolean essentialsHome;
     private app.flexygram.home.EssentialsSearchHeader essentialsSearchHeader;
     private app.flexygram.home.EssentialsShortcuts essentialsShortcuts;
-    private android.widget.TextView essentialsBrand;
     private BlurredBackgroundDrawableViewFactory signatureHomeGlassFactory;
 
     @Override
@@ -3455,7 +3455,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     public View createView(final Context context) {
         app.flexygram.home.HomeStyleConfig.load();
         essentialsHome=app.flexygram.home.HomeStyleConfig.style()==app.flexygram.home.HomeStyleConfig.ESSENTIALS && isSignatureHome();
-        essentialsSearchHeader=null;essentialsShortcuts=null;essentialsBrand=null;
+        essentialsSearchHeader=null;essentialsShortcuts=null;invalidateHomeDialogs();
         searching = false;
         searchWas = false;
         wasDrawn = false;
@@ -6022,12 +6022,10 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
 
         if(isEssentialsHome()) {
-            essentialsBrand=new android.widget.TextView(context);essentialsBrand.setTextSize(22);essentialsBrand.setTypeface(AndroidUtilities.bold());essentialsBrand.setGravity(Gravity.CENTER_VERTICAL);essentialsBrand.setPadding(dp(20),0,dp(20),0);essentialsBrand.setText(TypefaceHelper.getTitleText(currentAccount));
             essentialsShortcuts=new app.flexygram.home.EssentialsShortcuts(context,resourceProvider,this::openEssentialsSaved,this::openEssentialsFavorites,this::editEssentialsFavorites);
             essentialsSearchHeader=new app.flexygram.home.EssentialsSearchHeader(context,currentAccount,resourceProvider,signatureHomeGlassFactory,getUserConfig().getCurrentUser(),()->{
                 Bundle args=new Bundle();args.putLong("user_id",getUserConfig().getClientUserId());presentFragment(new ProfileActivity(args));
             },()->{if(searchItem!=null)searchItem.performClick();},()->{getContactsController().loadGlobalPrivacySetting();showItemOptions(essentialsSearchHeader.getMenuAnchor());},()->openAccountSelector(essentialsSearchHeader.getProfileAnchor()));
-            contentView.addView(essentialsBrand,LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT,64,Gravity.TOP));
             contentView.addView(essentialsShortcuts,LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT,64,Gravity.TOP));
             contentView.addView(essentialsSearchHeader,LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT,64,Gravity.TOP));
             refreshEssentialsHome();
@@ -7003,7 +7001,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         float fadeViewT = totalOffset;
 
         if (filterTabsView != null) {
-            filterTabsView.setTranslationY(totalOffset - searchOffset);
+            filterTabsView.setTranslationY(isEssentialsHome()?Math.max(-getIdleSearchFieldHeight(), totalOffset - searchOffset):totalOffset - searchOffset);
             filtersTabVisibility = filterTabsView.getAlpha();
             filtersTabHeight = dp(36 + 7) * filtersTabVisibility;
             totalOffset += filtersTabHeight;
@@ -7294,6 +7292,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     } else {
                         final MessagesController.DialogFilter filter = filters.get(a);
                         filterTabsView.addTab(a, filter.localId, filter.name, filter.emoticon, filter.entities, filter.title_noanimate, false, filters.get(a).locked);
+                        if(isEssentialsHome()&&filter.id==app.flexygram.home.HomeStyleConfig.favoriteFolder(currentAccount))filterTabsView.setShortcutOnly(a);
                     }
                 }
                 if (NekoConfig.hideAllTab.Bool() && stableId <= 0) {
@@ -9621,7 +9620,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         ArrayList<TLRPC.Dialog> dialogs;
         boolean containsFilter = (viewPages[0].dialogsType == 7 || viewPages[0].dialogsType == 8) && (!actionBar.isActionModeShowed() || actionBar.isActionModeShowed(null));
         if (containsFilter) {
-            dialogs = getDialogsArray(currentAccount, viewPages[0].dialogsType, folderId, dialogsListFrozen);
+            dialogs = getControllerDialogsArray(currentAccount, viewPages[0].dialogsType, folderId, false);
         } else {
             dialogs = getMessagesController().getDialogs(folderId);
         }
@@ -11040,7 +11039,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     @Override
     public void didReceivedNotification(int id, int account, Object... args) {
         if(account==currentAccount&&essentialsSearchHeader!=null&&id==NotificationCenter.mainUserInfoChanged)essentialsSearchHeader.setUser(getUserConfig().getCurrentUser());
-        if(account==currentAccount&&(id==NotificationCenter.dialogsNeedReload||id==NotificationCenter.updateInterfaces))refreshEssentialsHome();
+        if(account==currentAccount&&(id==NotificationCenter.dialogsNeedReload||id==NotificationCenter.updateInterfaces||id==NotificationCenter.dialogFiltersUpdated)){invalidateHomeDialogs();refreshEssentialsHome();}
 
         if (id == NotificationCenter.dialogsNeedReload) {
             if (viewPages == null || dialogsListFrozen) {
@@ -11527,6 +11526,13 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
     @NonNull
     public ArrayList<TLRPC.Dialog> getDialogsArray(int currentAccount, int dialogsType, int folderId, boolean frozen) {
+        ArrayList<TLRPC.Dialog> dialogs = getControllerDialogsArray(currentAccount, dialogsType, folderId, frozen);
+        if (!isEssentialsHome() || frozen || folderId != 0 || currentAccount != this.currentAccount
+                || (dialogsType != DIALOGS_TYPE_DEFAULT && dialogsType != DIALOGS_TYPE_FOLDER1 && dialogsType != DIALOGS_TYPE_FOLDER2)) return dialogs;
+        return homeDialogProjection.without(dialogs, getUserConfig().getClientUserId());
+    }
+
+    public ArrayList<TLRPC.Dialog> getControllerDialogsArray(int currentAccount, int dialogsType, int folderId, boolean frozen) {
         if (frozen && frozenDialogsList != null) {
             return frozenDialogsList;
         }
@@ -15319,10 +15325,10 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         if(essentialsShortcuts==null)return;
         MessagesController.DialogFilter favorite=essentialsFavoriteFilter();
         int selectedId=filterTabsView!=null?filterTabsView.getCurrentTabId():viewPages!=null&&viewPages[0]!=null?viewPages[0].selectedType:-1;
-        boolean selected=favorite!=null&&selectedId==favorite.id;
+        int favoriteIndex=favorite==null?-1:getMessagesController().getDialogFilters().indexOf(favorite);
+        boolean selected=favorite!=null&&selectedId==favoriteIndex;
         essentialsShortcuts.refresh(selected,favorite==null?0:favorite.unreadCount);
         if(essentialsSearchHeader!=null)essentialsSearchHeader.updateColors();
-        if(essentialsBrand!=null)essentialsBrand.setTextColor(getThemedColor(Theme.key_windowBackgroundWhiteBlueText));
     }
     private void openEssentialsSaved(){Bundle args=new Bundle();args.putLong("user_id",getUserConfig().getClientUserId());presentFragment(new ChatActivity(args));}
     private void openEssentialsFavorites(){

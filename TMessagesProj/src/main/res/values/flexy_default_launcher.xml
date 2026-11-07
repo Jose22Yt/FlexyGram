@@ -1,0 +1,5 @@
+<resources>
+    <!-- API 24/25 fallback: reuse the existing Glossy artwork before adaptive icons are available. -->
+    <item type="mipmap" name="ic_flexy_glossy">@drawable/flexy_startup_flex_glossy</item>
+    <item type="mipmap" name="ic_flexy_glossy_round">@drawable/flexy_startup_flex_glossy</item>
+</resources>
