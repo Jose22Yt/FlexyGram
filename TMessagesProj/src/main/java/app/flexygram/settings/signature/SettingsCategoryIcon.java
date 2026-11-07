@@ -13,7 +13,7 @@ public final class SettingsCategoryIcon extends Drawable implements Drawable.Cal
     private final SettingsActivity.SettingCell.Background background=new SettingsActivity.SettingCell.Background();
     private int alpha=255;
     private float iconPressScale=1;
-    @Override public void setIconPressScale(float scale){iconPressScale=scale;invalidateSelf();}
+    @Override public void setIconPressScale(float scale){}
     public static Drawable create(Context context,int resource){return resource<=0?null:new SettingsCategoryIcon(context,resource);}
     public static Drawable create(Context context,int resource,int top,int bottom){if(resource<=0)return null;SettingsCategoryIcon icon=new SettingsCategoryIcon(context,resource);icon.background.setColor(top,bottom);return icon;}
     private SettingsCategoryIcon(Context context,int resource){

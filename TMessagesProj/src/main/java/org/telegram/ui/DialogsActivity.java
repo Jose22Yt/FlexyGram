@@ -916,7 +916,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
 
         public int getActionBarFullHeight() {
-            float h = actionBar.getHeight();
+            float h = isEssentialsHome()
+                ? ((actionBar.getOccupyStatusBar() ? AndroidUtilities.statusBarHeight : 0) + (essentialsSearchHeader != null && essentialsSearchHeader.getMeasuredHeight() > 0 ? essentialsSearchHeader.getMeasuredHeight() : dp(64)))
+                : actionBar.getHeight();
             float rightSlidingProgress = 0f;
             if (rightSlidingDialogContainer != null && rightSlidingDialogContainer.hasFragment()) {
                 rightSlidingProgress = rightSlidingDialogContainer.openedProgress;
@@ -952,8 +954,12 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 return super.drawChild(canvas, child, drawingTime);
             }
             if(isEssentialsHome()&&child==essentialsShortcuts){
-                canvas.save();canvas.clipRect(0,actionBar.getHeight(),getWidth(),getHeight());
-                boolean drawn=super.drawChild(canvas,child,drawingTime);canvas.restore();return drawn;
+                canvas.save();
+                int clipTop = essentialsSearchHeader != null ? essentialsSearchHeader.getBottom() : actionBar.getHeight();
+                canvas.clipRect(0, clipTop, getWidth(), getHeight());
+                boolean drawn=super.drawChild(canvas,child,drawingTime);
+                canvas.restore();
+                return drawn;
             }
             boolean result;
             if (child == viewPages[0] || (viewPages.length > 1 && child == viewPages[1]) || child == topPanelLayout || child == filterTabsView) {
@@ -1150,10 +1156,17 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             blur3_UpdateBlur();
             if(essentialsSearchHeader!=null){
                 float visible=(1f-searchAnimationProgress)*(1f-progressToActionMode)*(1f-getRightSlidingProgress());
-                essentialsSearchHeader.setAlpha(visible);essentialsSearchHeader.setVisibility(visible>0?VISIBLE:INVISIBLE);
-                essentialsShortcuts.setAlpha(visible);essentialsShortcuts.setVisibility(visible>0?VISIBLE:INVISIBLE);
-                essentialsShortcuts.setTranslationY(scrollYOffset+storiesYOffset+storiesOverscroll);
-                actionBar.setAlpha(1f-visible);actionBar.setImportantForAccessibility(visible>.99f?View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS:View.IMPORTANT_FOR_ACCESSIBILITY_AUTO);
+                float scrollY = scrollYOffset + storiesYOffset + storiesOverscroll;
+                float scrollProgress = scrollY < 0 ? Math.min(1f, -scrollY / (float) AndroidUtilities.dp(40)) : 0f;
+                essentialsSearchHeader.setAlpha(visible);
+                essentialsSearchHeader.setVisibility(visible > 0 ? VISIBLE : INVISIBLE);
+                essentialsSearchHeader.setScrollProgress(scrollProgress);
+                float shortcutsAlpha = visible * (1f - scrollProgress);
+                essentialsShortcuts.setAlpha(shortcutsAlpha);
+                essentialsShortcuts.setVisibility(shortcutsAlpha > 0 ? VISIBLE : INVISIBLE);
+                essentialsShortcuts.setTranslationY(scrollY);
+                actionBar.setAlpha(1f-visible);
+                actionBar.setImportantForAccessibility(visible>.99f?View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS:View.IMPORTANT_FOR_ACCESSIBILITY_AUTO);
             }
             super.dispatchDraw(canvas);
             drawHeaderShadow(canvas, top + actionBarHeight);

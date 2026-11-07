@@ -6,8 +6,25 @@ from pathlib import Path
 from verify_beta_apk import ROOT, APP, OFFICIAL, expected_version
 
 
+def _read_local_properties(root):
+    props = {}
+    path = root / 'local.properties'
+    if path.is_file():
+        for line in path.read_text().splitlines():
+            line = line.strip()
+            if line and not line.startswith('#') and '=' in line:
+                k, v = line.split('=', 1)
+                props[k.strip()] = v.strip()
+    return props
+
+
 def inspect(environ=None, root=ROOT):
-    environ = os.environ if environ is None else environ
+    props = _read_local_properties(root)
+    if environ is None:
+        merged = {**props, **os.environ}
+    else:
+        merged = {**props, **environ}
+    environ = merged
     required = ['FLEXYGRAM_RELEASE_KEYSTORE','FLEXYGRAM_RELEASE_STORE_PASSWORD',
                 'FLEXYGRAM_RELEASE_KEY_ALIAS','FLEXYGRAM_RELEASE_KEY_PASSWORD',
                 'TELEGRAM_APP_ID','TELEGRAM_APP_HASH']

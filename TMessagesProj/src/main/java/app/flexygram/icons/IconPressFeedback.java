@@ -27,37 +27,8 @@ public final class IconPressFeedback {
     private static int lastAction;
     private IconPressFeedback() {}
     public static void observe(View root, MotionEvent event) {
-        if (app.exteraless.icons.BaseIconPacks.getSelected() != app.exteraless.icons.BaseIconPacks.BASE_CUPERTINO) return;
-        int action = event.getActionMasked();
-        // Popup content and its dialog may observe the same native event.
-        if (lastEvent == event && lastTime == event.getEventTime() && lastAction == action) return;
-        lastEvent = event;lastTime = event.getEventTime();lastAction = action;
-        if (action == MotionEvent.ACTION_DOWN) {
-            if (active != null) active.finish();
-            candidate = event.getPointerCount() == 1;
-            downX = event.getRawX();downY = event.getRawY();
-            slop = ViewConfiguration.get(root.getContext()).getScaledTouchSlop();
-        } else if (action == MotionEvent.ACTION_MOVE) {
-            if (Math.abs(event.getRawX()-downX)>slop || Math.abs(event.getRawY()-downY)>slop) candidate=false;
-        } else if (action == MotionEvent.ACTION_CANCEL || action == MotionEvent.ACTION_POINTER_DOWN) {
-            candidate=false;
-            if (active != null) active.finish();
-        } else if (action == MotionEvent.ACTION_UP) {
-            boolean tap=candidate && Math.abs(event.getRawX()-downX)<=slop && Math.abs(event.getRawY()-downY)<=slop
-                    && event.getEventTime()-event.getDownTime()<ViewConfiguration.getLongPressTimeout();
-            candidate=false;
-            if (!tap || Build.VERSION.SDK_INT>=26 && !ValueAnimator.areAnimatorsEnabled()) return;
-            View host=find(root,event.getRawX(),event.getRawY());
-            while(host!=null && !host.isClickable() && !(host instanceof Target)) {
-                View parent=host.getParent() instanceof View?(View)host.getParent():null;
-                // Recycler/List rows dispatch through their parent rather than their own listener.
-                if(isList(parent))break;
-                host=parent;
-            }
-            if(host==null)return;
-            ArrayList<Item> items=new ArrayList<>(3);collect(host,items,true);
-            if(!items.isEmpty()){active=new Pulse(items,FastMotionTiming.isEnabled());active.start();}
-        }
+        // Disabled: icon touch pulse animation causes errors and visual glitches. Icons remain static and fluid.
+        return;
     }
     private static View find(View view,float x,float y) {
         if(view.getVisibility()!=View.VISIBLE || !view.isEnabled() || view.getAlpha()==0

@@ -33,9 +33,15 @@ public final class EssentialsSearchHeader extends FrameLayout {
     private final BackupImageView avatar;
     private final ImageView menu;
     private final Theme.ResourcesProvider provider;
+    private final BlurredBackgroundDrawableViewFactory factory;
+    private final int account;
+    private final Paint barPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private BlurredBackgroundDrawable glass;
+    private float scrollProgress;
+    private int lastColor;
     private int lastInk,lastSurface;private boolean colored;
     public EssentialsSearchHeader(Context context,int account,Theme.ResourcesProvider provider,BlurredBackgroundDrawableViewFactory factory,TLRPC.User user,Runnable openProfile,Runnable openSearch,Runnable openMenu,Runnable switchAccount){
-        super(context);this.provider=provider;
+        super(context);this.provider=provider;this.factory=factory;this.account=account;setWillNotDraw(false);
         profile=new Surface(context,account,provider,factory);
         actions=new Surface(context,account,provider,factory);
         boolean rtl=LocaleController.isRTL;
@@ -49,7 +55,8 @@ public final class EssentialsSearchHeader extends FrameLayout {
         profile.setContentDescription(LocaleController.getString(R.string.MyProfile));
         hint=new TextView(context);hint.setTextSize(21);hint.setTypeface(AndroidUtilities.bold());
         hint.setGravity(Gravity.CENTER_VERTICAL|(rtl?Gravity.RIGHT:Gravity.LEFT));
-        hint.setSingleLine(true);hint.setEllipsize(TextUtils.TruncateAt.END);hint.setText("FlexyGram");
+        hint.setSingleLine(true);hint.setEllipsize(TextUtils.TruncateAt.END);
+        hint.setText(LocaleController.getString(R.string.NagramX));
         addView(hint,LayoutHelper.createFrame(-1,48,Gravity.CENTER_VERTICAL,rtl?112:68,0,rtl?68:112,0));
         search=new ImageView(context);search.setImageResource(R.drawable.flexy_ios_search);search.setScaleType(ImageView.ScaleType.CENTER);
         actions.addView(search,LayoutHelper.createFrame(48,48,(rtl?Gravity.RIGHT:Gravity.LEFT)|Gravity.CENTER_VERTICAL));
@@ -59,6 +66,10 @@ public final class EssentialsSearchHeader extends FrameLayout {
         menu.setOnClickListener(v->openMenu.run());menu.setContentDescription(LocaleController.getString(R.string.AccDescrMoreOptions));
         updateColors();
     }
+    public void setScrollProgress(float progress){
+        progress=Math.max(0f,Math.min(1f,progress));
+        if(scrollProgress!=progress){scrollProgress=progress;invalidate();}
+    }
     public void setUser(TLRPC.User user){if(user!=null)avatar.setImage(ImageLocation.getForUser(user,ImageLocation.TYPE_SMALL),"50_50",new AvatarDrawable(user),user);}
     public android.view.View getProfileAnchor(){return profile;}
     public android.view.View getMenuAnchor(){return more;}
@@ -66,8 +77,27 @@ public final class EssentialsSearchHeader extends FrameLayout {
         int ink=Theme.getColor(Theme.key_windowBackgroundWhiteBlackText,provider),surface=Theme.getColor(Theme.key_windowBackgroundWhite,provider);
         if(colored&&lastInk==ink&&lastSurface==surface)return;colored=true;lastInk=ink;lastSurface=surface;
         hint.setTextColor(ink);menu.setColorFilter(ink);search.setColorFilter(ink);
-        profile.invalidate();actions.invalidate();
+        if(glass!=null){glass.updateColors();lastColor=surface;}
+        profile.invalidate();actions.invalidate();invalidate();
     }
+    @Override protected void onDraw(Canvas canvas){
+        if(scrollProgress>0f){
+            int color=Theme.getColor(Theme.key_windowBackgroundWhite,provider);
+            if(factory!=null&&canvas.isHardwareAccelerated()&&SharedConfig.chatBlurEnabled()&&BlurredBackgroundProviderImpl.checkBlurEnabled(account,provider)){
+                if(glass==null){glass=factory.create(this,BlurredBackgroundProviderImpl.topPanel(provider)).setPadding(0);lastColor=color;}
+                if(lastColor!=color){lastColor=color;glass.updateColors();}
+                glass.setAlpha((int)(255*scrollProgress));
+                glass.setBounds(0,0,getWidth(),getHeight());
+                glass.draw(canvas);
+            }else{
+                barPaint.setColor(color|0xff000000);
+                barPaint.setAlpha((int)(255*scrollProgress));
+                canvas.drawRect(0,0,getWidth(),getHeight(),barPaint);
+            }
+        }
+        super.onDraw(canvas);
+    }
+    @Override protected void onDetachedFromWindow(){glass=null;super.onDetachedFromWindow();}
     private static final class Surface extends FrameLayout {
         private final Theme.ResourcesProvider provider;
         private final BlurredBackgroundDrawableViewFactory factory;

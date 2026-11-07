@@ -20,9 +20,9 @@ public final class CupertinoGlyphDrawable extends Drawable implements IconPressF
     private float x, baseline;
     private boolean mirrored;
     private float pressScale=1;
-    public void setPressScale(float scale){if(pressScale!=scale){pressScale=scale;invalidateSelf();}}
-    public float getPressScale(){return pressScale;}
-    @Override public void setIconPressScale(float scale){setPressScale(scale);}
+    public void setPressScale(float scale){}
+    public float getPressScale(){return 1f;}
+    @Override public void setIconPressScale(float scale){}
     private static synchronized Typeface font(Resources resources) {
         if (typeface == null) typeface = Typeface.createFromAsset(resources.getAssets(), "cupertino/CupertinoIcons.ttf");
         return typeface;
