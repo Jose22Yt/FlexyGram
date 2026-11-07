@@ -13,6 +13,8 @@ import java.util.Map;
 
 public class ChatActivityEnterViewAnimatedIconView extends RLottieImageView {
     private State currentState;
+    private int fixedGlyphResource;
+    private android.graphics.drawable.Drawable fixedGlyph;
     private boolean compactIcons, referenceIcons;
     private ScaleType nativeScaleType;
     public void setCompactIcons(boolean compact, boolean reference) {
@@ -97,7 +99,16 @@ public class ChatActivityEnterViewAnimatedIconView extends RLottieImageView {
             currentState = state;
             animatingState = null;
             stopAnimation();
-            setImageResource(compactIcons ? app.flexygram.composer.ComposerIcons.resource(state.name(), staticResourceFor(state), referenceIcons) : staticResourceFor(state));
+            int fallback=staticResourceFor(state);
+            int glyph=compactIcons?app.flexygram.composer.ComposerIcons.resource(state.name(),fallback,referenceIcons):fallback;
+            if(compactIcons&&glyph!=fallback){
+                if(fixedGlyph==null||fixedGlyphResource!=glyph){
+                    fixedGlyphResource=glyph;
+                    fixedGlyph=app.flexygram.icons.ConversationControlIcons.load(getContext(),glyph);
+                }
+                setImageDrawable(fixedGlyph);
+            }
+            else setImageResource(glyph);
             if (state == State.VOICE) setContentDescription(LocaleController.getString(R.string.AccDescrVoiceMessage));
             else if (state == State.VIDEO) setContentDescription(LocaleController.getString(R.string.AccDescrVideoMessage));
             return;

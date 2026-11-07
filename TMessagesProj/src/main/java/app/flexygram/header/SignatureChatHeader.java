@@ -56,15 +56,11 @@ public final class SignatureChatHeader {
         value = Math.max(0, value);
         int previousDisplay = Math.min(100, unreadCount);
         unreadCount = value;
-        if (previousDisplay != Math.min(100, value)) {
-            if (value > 0) {
-                String str = value > 99 ? "99+" : Integer.toString(value);
-                unreadPaint.set(Theme.dialogs_countTextPaint);
-                int countWidth = (int) Math.ceil(unreadPaint.measureText(str));
-                unreadLayout = new android.text.StaticLayout(str, unreadPaint, countWidth, android.text.Layout.Alignment.ALIGN_CENTER, 1.0f, 0.0f, false);
-            } else {
-                unreadLayout = null;
-            }
+        if (unreadLayout == null || previousDisplay != Math.min(100, value)) {
+            String str = value > 99 ? "99+" : Integer.toString(value);
+            unreadPaint.set(Theme.dialogs_countTextPaint);
+            int countWidth = (int) Math.ceil(unreadPaint.measureText(str));
+            unreadLayout = new android.text.StaticLayout(str, unreadPaint, countWidth, android.text.Layout.Alignment.ALIGN_CENTER, 1.0f, 0.0f, false);
             changed();
         }
     }
@@ -79,7 +75,7 @@ public final class SignatureChatHeader {
         int subtitleLine = fontMetrics.descent - fontMetrics.ascent;
         fusionLayout = false;
         int mode = HeaderConfig.counter() ? HeaderConfig.counterMode() : 0;
-        float numberWidth = mode != 0 && unreadCount > 0 && unreadLayout != null
+        float numberWidth = mode != 0 && unreadLayout != null
                 ? unreadLayout.getWidth() : 0;
         float countExtra = numberWidth <= 0 ? 0 : mode == 2
                 ? Math.max(AndroidUtilities.dp(28), numberWidth + AndroidUtilities.dp(8)) + AndroidUtilities.dp(3)
@@ -181,7 +177,7 @@ public final class SignatureChatHeader {
     private boolean badgeColorsReady;
 
     private void drawUnread(Canvas canvas) {
-        if (!geometry.countVisible || unreadLayout == null || unreadCount <= 0) return;
+        if (!geometry.countVisible || unreadLayout == null) return;
         canvas.save();
         int accent = androidx.core.graphics.ColorUtils.setAlphaComponent(Theme.getColor(Theme.key_telegram_color, provider), 255);
         if (!badgeColorsReady || lastBadgeAccent != accent) {

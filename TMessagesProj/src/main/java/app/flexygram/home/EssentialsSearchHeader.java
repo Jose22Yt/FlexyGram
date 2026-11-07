@@ -56,7 +56,7 @@ public final class EssentialsSearchHeader extends FrameLayout {
         hint=new TextView(context);hint.setTextSize(21);hint.setTypeface(AndroidUtilities.bold());
         hint.setGravity(Gravity.CENTER_VERTICAL|(rtl?Gravity.RIGHT:Gravity.LEFT));
         hint.setSingleLine(true);hint.setEllipsize(TextUtils.TruncateAt.END);
-        hint.setText(LocaleController.getString(R.string.NagramX));
+        hint.setText("FlexyGram");
         addView(hint,LayoutHelper.createFrame(-1,48,Gravity.CENTER_VERTICAL,rtl?112:68,0,rtl?68:112,0));
         search=new ImageView(context);search.setImageResource(R.drawable.flexy_ios_search);search.setScaleType(ImageView.ScaleType.CENTER);
         actions.addView(search,LayoutHelper.createFrame(48,48,(rtl?Gravity.RIGHT:Gravity.LEFT)|Gravity.CENTER_VERTICAL));

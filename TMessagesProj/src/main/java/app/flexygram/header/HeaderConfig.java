@@ -6,9 +6,9 @@ import app.exteraless.appearance.AppearanceConfig;
 import org.telegram.messenger.ApplicationLoader;
 import java.util.Map;
 
-/** UI-owned snapshot. Legacy choices are read conservatively and never overwritten. */
+/** UI-owned snapshot with a one-time repair of the integrated back counter. */
 public final class HeaderConfig {
-    private static boolean loaded, signature = false, compact, counter = false;
+    private static boolean loaded, signature = false, compact, counter = true;
     private static boolean centerTitle = false, adaptiveBubble = false;
     private static int opacity = 85, counterMode = 1, currentStyle = 1;
     private HeaderConfig() { }
@@ -31,11 +31,15 @@ public final class HeaderConfig {
         currentStyle = style instanceof Integer ? ((Integer) style >= 0 && (Integer) style <= 4 ? (Integer) style : 1)
                 : legacy ? 0 : 1;
         signature = currentStyle != 1;
-        compact = Boolean.TRUE.equals(p.get("compact")); counter = Boolean.TRUE.equals(p.get("counter"));
+        compact = Boolean.TRUE.equals(p.get("compact"));
+        boolean restored = Boolean.TRUE.equals(p.get("back_counter_restored_v1"));
+        counter = !restored || !Boolean.FALSE.equals(p.get("counter"));
+        if (!restored) prefs().edit().putBoolean("counter",true).putInt("counter_mode",1)
+                .putBoolean("back_counter_restored_v1",true).apply();
         centerTitle = Boolean.TRUE.equals(p.get("center_title"));
         adaptiveBubble = Boolean.TRUE.equals(p.get("adaptive_bubble"));
         Object mode = p.get("counter_mode");
-        counterMode = mode instanceof Integer ? Math.max(1, Math.min(2, (Integer) mode)) : 1;
+        counterMode = !restored ? 1 : mode instanceof Integer ? Math.max(1, Math.min(2, (Integer) mode)) : 1;
         Object value = p.get("opacity"); opacity = value instanceof Integer ? Math.max(0, Math.min(100, (Integer) value)) : 85;
         loaded = true;
     }
@@ -48,7 +52,7 @@ public final class HeaderConfig {
     public static boolean compact() { ensure(); return compact; }
     public static boolean counter() { ensure(); return counter; }
     public static int counterMode() { ensure(); return counter ? counterMode : 0; }
-    public static void counterMode(int value) { ensure(); counter = value != 0; if (counter) counterMode = Math.max(1, Math.min(2, value)); prefs().edit().putInt("counter_mode", counterMode).putBoolean("counter", counter).apply(); }
+    public static void counterMode(int value) { ensure(); counter = value != 0; if (counter) counterMode = Math.max(1, Math.min(2, value)); prefs().edit().putInt("counter_mode", counterMode).putBoolean("counter", counter).putBoolean("back_counter_restored_v1",true).apply(); }
     public static boolean centerTitle() { ensure(); return centerTitle; }
     public static void centerTitle(boolean value) { ensure(); centerTitle = value; prefs().edit().putBoolean("center_title", value).apply(); }
     public static boolean adaptiveBubble() { ensure(); return adaptiveBubble; }

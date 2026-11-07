@@ -32006,7 +32006,7 @@ public class ChatActivity extends BaseFragment implements
         }
         if (avatarContainer != null) {
             avatarContainer.setOccupyStatusBar(!value);
-            avatarContainer.setLayoutParams(LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.MATCH_PARENT, Gravity.TOP | Gravity.LEFT, usesSignatureHeader() ? 0 : !inPreviewMode ? 52 : 0, 0, isTitleCentered() ? 0 : 52, 0));
+            avatarContainer.setLayoutParams(LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.MATCH_PARENT, Gravity.TOP | Gravity.LEFT, usesSignatureHeader() ? 0 : !inPreviewMode ? 52 : 0, 0, usesSignatureHeader() || isTitleCentered() ? 0 : 52, 0));
         }
         if (chatActivityEnterView != null) {
             chatActivityEnterView.setVisibility(!value ? View.VISIBLE : View.INVISIBLE);
@@ -32083,7 +32083,7 @@ public class ChatActivity extends BaseFragment implements
         if (sections.contains("header") && signatureChatHeader != null) {
             var params = (android.widget.FrameLayout.LayoutParams) avatarContainer.getLayoutParams();
             params.leftMargin = usesSignatureHeader() ? 0 : AndroidUtilities.dp(!inPreviewMode ? 52 : 0);
-            params.rightMargin = isTitleCentered() ? 0 : AndroidUtilities.dp(52);
+            params.rightMargin = usesSignatureHeader() || isTitleCentered() ? 0 : AndroidUtilities.dp(52);
             avatarContainer.setLayoutParams(params);
             updateSignatureHeaderCounter(); signatureChatHeader.changed();
         }
@@ -32128,7 +32128,7 @@ public class ChatActivity extends BaseFragment implements
         if (signatureChatHeader != null) {
             var params = (android.widget.FrameLayout.LayoutParams) avatarContainer.getLayoutParams();
             params.leftMargin = usesSignatureHeader() ? 0 : AndroidUtilities.dp(!inPreviewMode ? 52 : 0);
-            params.rightMargin = isTitleCentered() ? 0 : AndroidUtilities.dp(52);
+            params.rightMargin = usesSignatureHeader() || isTitleCentered() ? 0 : AndroidUtilities.dp(52);
             avatarContainer.setLayoutParams(params);
             updateSignatureHeaderCounter(); signatureChatHeader.changed();
         }
@@ -34643,9 +34643,9 @@ public class ChatActivity extends BaseFragment implements
                 final MessageObject panelMessage=selectedObject;
                 final ChatMessageCell panelCell=(ChatMessageCell)v;
                 final var panel=new app.flexygram.bubbles.interaction.BubbleActionPanelView(getParentActivity(),themeDelegate);
-                final boolean menuBlur = BlurredBackgroundProviderImpl.checkBlurEnabled(currentAccount, themeDelegate);
+                final boolean menuBlur = app.flexygram.bubbles.interaction.BubbleInteractionSettings.backdropBlur(getParentActivity());
                 if (menuBlur) panel.setSurfaceFactory((target, radius) -> scrimBlur3Factory.create(target, true)
-                        .setColorProvider(BlurredBackgroundProviderImpl.messageMenuBackground(themeDelegate))
+                        .setColorProvider(BlurredBackgroundProviderImpl.scrimMenuBackground(themeDelegate))
                         .setRadius(radius));
                 final var admitted=signatureContextActions(options);
                 if (!admitted.isEmpty()) {

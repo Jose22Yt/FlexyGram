@@ -93,6 +93,11 @@ final class StudioClientBackup {
                 if (!(Boolean)slot.get("present")) editor.remove(setting.getKey());
                 else catalog.files().get(file.getKey()).get(setting.getKey()).write(editor, setting.getKey(), slot.get("value"));
             }
+            // An explicit import wins over the one-time conversation-control repair.
+            if(file.getKey().equals("flexygram_header") && (object(file.getValue()).containsKey("counter") || object(file.getValue()).containsKey("counter_mode")))
+                editor.putBoolean("back_counter_restored_v1",true);
+            if(file.getKey().equals("flexygram_composer") && object(file.getValue()).containsKey("iconAppearance"))
+                editor.putBoolean("reference_icons_restored_v1",true);
             if (!editor.commit()) throw new IOException("client_preferences");
         }
         onUi(() -> {
