@@ -16803,16 +16803,19 @@ public class ChatActivityEnterView extends FrameLayout implements
     }
 
     private void updateFlexyIconColors() {
-        int color = flexyCompactLayout ? app.flexygram.composer.ComposerStyle.icon(
-            ColorUtils.calculateLuminance(getThemedColor(Theme.key_chat_messagePanelBackground)) < 0.4)
+        boolean dark = Theme.isCurrentThemeDark();
+        int color = flexyCompactLayout ? app.flexygram.composer.ComposerStyle.icon(dark)
             : getThemedColor(Theme.key_glass_defaultIcon);
         if (attachButton != null) attachButton.setColorFilter(color, flexyCompactLayout ? PorterDuff.Mode.SRC_IN : PorterDuff.Mode.MULTIPLY);
-        int innerColor = flexyCompactLayout ? app.flexygram.composer.ComposerStyle.innerIcon(
-            ColorUtils.calculateLuminance(getThemedColor(Theme.key_chat_messagePanelBackground)) < 0.4)
+        int innerColor = flexyCompactLayout ? app.flexygram.composer.ComposerStyle.innerIcon(dark)
             : getThemedColor(Theme.key_glass_defaultIcon);
         if (emojiButton != null) setIconColorFilter(emojiButton, new PorterDuffColorFilter(innerColor, PorterDuff.Mode.SRC_IN));
-        if (messageEditText != null) messageEditText.setHintColor(flexyCompactLayout ? innerColor
-            : getThemedColor(Theme.key_chat_messagePanelHint));
+        int hintColor = flexyCompactLayout ? (dark ? 0x80FFFFFF : 0x8A000000)
+            : getThemedColor(Theme.key_chat_messagePanelHint);
+        if (messageEditText != null) {
+            messageEditText.setHintColor(hintColor);
+            messageEditText.setHintTextColor(hintColor);
+        }
     }
 
     /** Native recording/previews keep their full background; their layout is untouched. */

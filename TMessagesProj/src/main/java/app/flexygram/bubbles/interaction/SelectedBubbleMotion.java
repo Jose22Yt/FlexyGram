@@ -9,19 +9,19 @@ import app.exteraless.player.Spring;
  * Closing retargets existing springs: it never restarts a timed interpolation.
  */
 public final class SelectedBubbleMotion implements Choreographer.FrameCallback {
-    private final Spring x = new Spring(1f, 900f, .78f, .0002f);
-    private final Spring y = new Spring(1f, 900f, .78f, .0002f);
-    private final Spring backdrop = new Spring(0f, 900f, 1f, .003f);
+    private final Spring x = new Spring(1f, 750f, .88f, .0002f);
+    private final Spring y = new Spring(1f, 750f, .88f, .0002f);
+    private final Spring backdrop = new Spring(0f, 750f, 1f, .003f);
     private boolean backdropAvailable;
-    public float backdropProgress() { return Math.max(0f, Math.min(1f, backdrop.value)); }
+    public float backdropProgress() { return Math.max(0f, Math.min(1f, backdropAvailable ? backdrop.value : Math.max(backdrop.value, phase.value * 0.85f))); }
     public void backdropReady() {
         if (invalidate == null || closing) return;
         backdropAvailable = true;backdrop.target = 1f;
         if (!BubbleInteractionSettings.motionEnabled()) { backdrop.snap(1f);invalidate.run();return; }
         schedule();
     }
-    private final Spring phase = new Spring(1f, 1100f, .78f, .0015f);
-    private static final long ENTER_LIMIT_MS = 280, CLOSE_LIMIT_MS = 180;
+    private final Spring phase = new Spring(1f, 850f, .88f, .0015f);
+    private static final long ENTER_LIMIT_MS = 340, CLOSE_LIMIT_MS = 180;
     private Runnable invalidate, completion;
     private boolean running, closing;
     private long lastFrame, started;
@@ -38,8 +38,8 @@ public final class SelectedBubbleMotion implements Choreographer.FrameCallback {
         if (p <= 1f) return distance * p;
         return distance + maxOvershoot * (float)Math.tanh(distance * (p - 1f) / maxOvershoot);
     }
-    public float panelScale() { return .94f + .06f * phase.value; }
-    public float panelOffset() { return 8f * (1f - phase.value); }
+    public float panelScale() { return Math.max(.85f, Math.min(1.04f, .94f + .06f * phase.value)); }
+    public float panelOffset() { return 8f * Math.max(-0.2f, 1f - phase.value); }
     public float scale() { return (x.value + y.value) * .5f; }
     public float scaleX() { return x.value; }
     public float scaleY() { return y.value; }
@@ -55,8 +55,9 @@ public final class SelectedBubbleMotion implements Choreographer.FrameCallback {
         invalidate = redraw; closing = false;
         x.setState(sx, vx); y.setState(sy, vy); x.target = y.target = 1f;
         phase.snap(0f); phase.target = 1f;
+        backdrop.snap(0f); backdrop.target = 1f;
         if (!BubbleInteractionSettings.motionEnabled()) {
-            x.snap(1f); y.snap(1f); phase.snap(1f); redraw.run(); return;
+            x.snap(1f); y.snap(1f); phase.snap(1f); backdrop.snap(1f); redraw.run(); return;
         }
         redraw.run(); schedule();
     }

@@ -204,7 +204,7 @@ public final class FlexyComposerSettingsActivity extends BaseNekoSettingsActivit
             int level = FlexyComposerConfig.level(); float radius = dp(ComposerStyle.diameter(level)) / 2f;
             float y = forcedStyle>=0 ? height/2-dp(FlexyComposerConfig.position()) : dp(54 - ComposerStyle.offset(FlexyComposerConfig.position()));
             float gap = dp(FlexyComposerConfig.gap());
-            boolean dark = ColorUtils.calculateLuminance(getThemedColor(Theme.key_chat_messagePanelBackground)) < 0.4;
+            boolean dark = Theme.isCurrentThemeDark();
             int surface = ComposerStyle.surface(dark, FlexyComposerConfig.glass()), ink = ComposerStyle.icon(dark);
             paint.setColor(surface);
             float side = ComposerStyle.sideMargin(Math.round(width), org.telegram.messenger.AndroidUtilities.density, dp(7));
@@ -213,7 +213,7 @@ public final class FlexyComposerSettingsActivity extends BaseNekoSettingsActivit
             c.drawRoundRect(left+radius+gap,y-radius,right-radius-gap,y+radius,radius,radius,paint);
             icon(c, FlexyComposerConfig.referenceIcons() ? clip : plus, left, y, ink); icon(c, voice, right, y, ink);
             icon(c, FlexyComposerConfig.referenceIcons() ? folded : smile, right-radius-gap-dp(20), y, ComposerStyle.innerIcon(dark));
-            paint.setColor(ComposerStyle.innerIcon(dark));
+            paint.setColor(dark ? 0x80FFFFFF : 0x8A000000);
             paint.setTextAlign(Paint.Align.LEFT); paint.setTextSize(16 * getResources().getDisplayMetrics().scaledDensity);
             float start=left+radius+gap+dp(ComposerStyle.padding(level));int save=c.save();
             c.clipRect(start,y-radius,Math.max(start,right-radius-gap-dp(38)),y+radius);

@@ -4744,12 +4744,13 @@ public class ChatActivity extends BaseFragment implements
                 else openNativeHeaderOptions();
             }
             @Override protected boolean isSignatureCallAvailable() {
+                TLRPC.UserFull full = userInfo != null ? userInfo : (currentUser != null ? getMessagesController().getUserFull(currentUser.id) : null);
                 return currentUser != null && !currentUser.bot && !UserObject.isDeleted(currentUser)
                         && !UserObject.isUserSelf(currentUser) && chatMode != MODE_SAVED
-                        && userInfo != null && userInfo.phone_calls_available;
+                        && (full == null || full.phone_calls_available);
             }
             @Override protected void onSignatureCallClick() {
-                if (isSignatureCallAvailable() && actionBar.getActionBarMenuOnItemClick() != null)
+                if (currentUser != null && actionBar.getActionBarMenuOnItemClick() != null)
                     actionBar.getActionBarMenuOnItemClick().onItemClick(call);
             }
 
@@ -4903,7 +4904,7 @@ public class ChatActivity extends BaseFragment implements
                 audioCallIconItem = menu.lazilyAddItem(call, R.drawable.call, themeDelegate);
                 audioCallIconItem.setContentDescription(LocaleController.getString(R.string.Call));
                 userFull = getMessagesController().getUserFull(currentUser.id);
-                if (userFull != null && userFull.phone_calls_available) {
+                if (userFull != null && userFull.phone_calls_available && !usesSignatureHeader()) {
                     showAudioCallAsIcon = !inPreviewMode;
                     audioCallIconItem.setVisibility(View.VISIBLE);
                 } else {
@@ -19941,7 +19942,7 @@ public class ChatActivity extends BaseFragment implements
                     }
                 }
                 if (!actionBar.isSearchFieldVisible() && audioCallIconItem != null) {
-                    audioCallIconItem.setVisibility((showAudioCallAsIcon && !showSearchAsIcon) ? View.VISIBLE : View.GONE);
+                    audioCallIconItem.setVisibility((showAudioCallAsIcon && !showSearchAsIcon && !usesSignatureHeader()) ? View.VISIBLE : View.GONE);
                 }
                 if (headerItem != null) {
                     TLRPC.UserFull userInfo = getCurrentUserInfo();
@@ -25974,7 +25975,7 @@ public class ChatActivity extends BaseFragment implements
                     }
                 }
                 if (headerItem != null) {
-                    showAudioCallAsIcon = userInfo.phone_calls_available && !inPreviewMode && !isTitleCentered();
+                    showAudioCallAsIcon = userInfo.phone_calls_available && !inPreviewMode && !isTitleCentered() && !usesSignatureHeader();
                     if (userInfo.phone_calls_available) {
                         if (showAudioCallAsIcon) {
                             if (audioCallIconItem != null) {
@@ -31996,7 +31997,7 @@ public class ChatActivity extends BaseFragment implements
         super.setInPreviewMode(value);
         if (currentUser != null && audioCallIconItem != null) {
             TLRPC.UserFull userFull = getMessagesController().getUserFull(currentUser.id);
-            if (userFull != null && userFull.phone_calls_available) {
+            if (userFull != null && userFull.phone_calls_available && !usesSignatureHeader()) {
                 showAudioCallAsIcon = !inPreviewMode;
                 audioCallIconItem.setVisibility(View.VISIBLE);
             } else {
@@ -32086,6 +32087,7 @@ public class ChatActivity extends BaseFragment implements
             params.rightMargin = usesSignatureHeader() || isTitleCentered() ? 0 : AndroidUtilities.dp(52);
             avatarContainer.setLayoutParams(params);
             updateSignatureHeaderCounter(); signatureChatHeader.changed();
+            if (audioCallIconItem != null && usesSignatureHeader()) audioCallIconItem.setVisibility(View.GONE);
         }
     }
 
@@ -32131,6 +32133,7 @@ public class ChatActivity extends BaseFragment implements
             params.rightMargin = usesSignatureHeader() || isTitleCentered() ? 0 : AndroidUtilities.dp(52);
             avatarContainer.setLayoutParams(params);
             updateSignatureHeaderCounter(); signatureChatHeader.changed();
+            if (audioCallIconItem != null && usesSignatureHeader()) audioCallIconItem.setVisibility(View.GONE);
         }
         app.flexygram.bubbles.BubbleConfig.load();
         if (chatActivityFadeView != null) {
@@ -42600,7 +42603,7 @@ public class ChatActivity extends BaseFragment implements
                 if (headerItem != null) {
                     headerItem.setVisibility(View.VISIBLE);
                 }
-                if (audioCallIconItem != null && showAudioCallAsIcon) {
+                if (audioCallIconItem != null && showAudioCallAsIcon && !usesSignatureHeader()) {
                     audioCallIconItem.setVisibility(View.VISIBLE);
                 }
                 if (topicCreateItem != null) {
