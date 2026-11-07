@@ -5,6 +5,7 @@ from test_composer_layout import method
 
 def test_native_menu_cannot_steal_custom_header_taps(tmp_path):
     source = (JAVA / 'org/telegram/ui/ActionBar/ActionBarMenu.java').read_text()
+    assert source.count('public boolean dispatchTouchEvent(MotionEvent ') == 1, 'Duplicate native touch override'
     dispatch = method(source, 'public boolean dispatchTouchEvent(MotionEvent event)')
     probe(tmp_path, {'Probe.java': '''
 class MotionEvent {}
