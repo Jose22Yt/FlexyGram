@@ -451,6 +451,7 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
 
     @Override
     protected boolean drawChild(Canvas canvas, View child, long drawingTime) {
+        if (child == menu && hasSignatureActionControls()) return false;
         if (parentFragment != null && parentFragment.getParentLayout() != null && parentFragment.getParentLayout().isActionBarInCrossfade()) {
             return false;
         }
@@ -1498,6 +1499,10 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
     private BlurredBackgroundDrawableViewFactory signatureGlassFactory;
     private BlurredBackgroundColorProvider signatureGlassColorProvider;
     private app.flexygram.header.SignatureChatHeader signatureHeader;
+    /** The custom header owns these touch targets; the native menu remains the action model. */
+    public boolean hasSignatureActionControls() {
+        return signatureHeader != null && signatureHeader.fusionActive();
+    }
     public void setSignatureHeader(app.flexygram.header.SignatureChatHeader header) {
         signatureHeader = header;
         if (backButtonDrawable instanceof BackDrawable) {
@@ -1707,6 +1712,9 @@ public class ActionBar extends FrameLayout implements FactorAnimator.Target, The
         // textLeft += additionalTextLeft;
 
         if (menu != null && menu.getVisibility() != GONE) {
+            int accessibility = hasSignatureActionControls()
+                    ? View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS : View.IMPORTANT_FOR_ACCESSIBILITY_AUTO;
+            if (menu.getImportantForAccessibility() != accessibility) menu.setImportantForAccessibility(accessibility);
             int menuWidth;
             boolean searchFieldIsVisible = menu.searchFieldVisible();
             if (searchFieldIsVisible && !this.isSearchFieldVisible) {

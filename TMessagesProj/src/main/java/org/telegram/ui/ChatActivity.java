@@ -34784,6 +34784,7 @@ public class ChatActivity extends BaseFragment implements
             final app.flexygram.bubbles.interaction.MessageMenuViewport signaturePreviewViewport = compactContext
                     ? new app.flexygram.bubbles.interaction.MessageMenuViewport(getParentActivity()) : null;
             if (signaturePreviewViewport != null) {
+                signaturePreviewViewport.setDismissRequest(() -> closeMenu());
                 signaturePreviewViewport.addView(scrimPopupContainerLayout,
                         new android.widget.FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             }
@@ -34887,6 +34888,7 @@ public class ChatActivity extends BaseFragment implements
                 if (compactContext) {
                     signatureMessageGap = new View(getParentActivity());
                     signatureMessageGap.setClickable(true);
+                    signatureMessageGap.setOnClickListener(preview -> closeMenu());
                     signatureMessageGap.setContentDescription(getString(R.string.FlexyContextFullPreview) + " " + selectedObject.messageText);
                     scrimPopupContainerLayout.addView(signatureMessageGap,
                             new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0));

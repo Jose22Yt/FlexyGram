@@ -2045,6 +2045,21 @@ public class ActionBarMenuItem extends FrameLayout {
     }
 
     private void updateOrShowPopup(boolean show, boolean update) {
+        if (anchor == null && showSubMenuFrom != null && parentMenu != null
+                && showSubMenuFrom.getParent() != parentMenu) {
+            // A custom header control is not a child of the native menu. Its
+            // coordinates must not be added to the hidden menu item's coordinates.
+            View source = showSubMenuFrom;
+            int popupX = (LocaleController.isRTL ? 0 : source.getWidth() - popupWindow.getContentView().getMeasuredWidth())
+                    + additionalXOffset + xOffset;
+            int popupY = additionalYOffset + yOffset;
+            if (show) {
+                popupLayout.scrollToTop();
+                popupWindow.showAsDropDown(source, popupX, popupY);
+            }
+            if (update) popupWindow.update(source, popupX, popupY, -1, -1);
+            return;
+        }
         int offsetY;
 
         if (anchor != null) {

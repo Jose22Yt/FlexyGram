@@ -53,6 +53,14 @@ public class ActionBarMenu extends LinearLayout {
         super(context);
     }
 
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        // Native call/search slots may overlap the custom controls even when their
+        // overflow item is hidden. Let the parent's normal dispatch reach the header.
+        if (parentActionBar != null && parentActionBar.hasSignatureActionControls()) return false;
+        return super.dispatchTouchEvent(event);
+    }
+
     protected void updateItemsBackgroundColor() {
         int count = getChildCount();
         for (int a = 0; a < count; a++) {

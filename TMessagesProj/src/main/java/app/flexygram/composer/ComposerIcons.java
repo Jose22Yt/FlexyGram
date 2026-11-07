@@ -11,7 +11,7 @@ public final class ComposerIcons {
             case "VIDEO": return R.drawable.flexy_composer_video;
             case "SMILE": return reference ? R.drawable.flexy_composer_folded : R.drawable.flexy_composer_smile;
             case "KEYBOARD": return R.drawable.flexy_composer_keyboard;
-            case "STICKER": return R.drawable.flexy_composer_sticker;
+            case "STICKER": return reference ? R.drawable.flexy_composer_folded : R.drawable.flexy_composer_sticker;
             default: return fallback; // GIF/menu retain their native, labelled meaning.
         }
     }
