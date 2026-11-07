@@ -14,7 +14,7 @@ import zipfile
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-SOURCE_COMMIT = '932c9a6db84fab52ab167d4c8ee70957b3e57223'
+SOURCE_COMMIT = '6ea76c7082fd51d51fa51ebf03a572a192eda86a'
 CERTIFICATE = 'e71c4d1e14dd940892009c61164df522c133029df6d1258561f6a1a4d1f3c015'
 SECRET_NAMES = ('FLEXYGRAM_RELEASE_KEYSTORE_B64', 'FLEXYGRAM_RELEASE_STORE_PASSWORD',
                 'FLEXYGRAM_RELEASE_KEY_PASSWORD', 'FLEXYGRAM_RELEASE_KEY_ALIAS',
@@ -160,7 +160,7 @@ def build(env):
                     == 'toolchainVersion=21\ntoolchainVendor=ADOPTIUM\n')
         verify_source_files(source)
         versions = (source/'gradle.properties').read_text().splitlines()
-        require('BETA_VERSION_CODE=1290' in versions and 'BETA_VERSION_NAME=1.0.0-beta.1' in versions
+        require('BETA_VERSION_CODE=1305' in versions and 'BETA_VERSION_NAME=1.0.0-beta.16' in versions
                 and 'APP_PACKAGE=com.flexygram.messenger' in versions)
         child = restore(env, source, private)
         log = private/'private-build.log'
@@ -187,15 +187,6 @@ def build(env):
         apk = apks[0]
         with zipfile.ZipFile(apk) as archive:
             require(archive.testzip() is None)
-        vap = source/'tools/connected_alpha/verify_apk.py'
-        if vap.is_file():
-            txt = vap.read_text()
-            if "attrs.get('name') != 'org.telegram.messenger.ExteralessIcon'" in txt:
-                txt = txt.replace(
-                    "attrs.get('name') != 'org.telegram.messenger.ExteralessIcon'",
-                    "attrs.get('name') not in ('org.telegram.messenger.ExteralessIcon', 'org.telegram.messenger.FlexyBlueIcon', 'org.telegram.messenger.FlexyNeonIcon')"
-                )
-                vap.write_text(txt)
         report_path = private/'verification.json'
         try:
             run_private([sys.executable, 'tools/beta_release/verify_beta_apk.py', str(apk),
@@ -209,10 +200,10 @@ def build(env):
             raise
         report = json.loads(report_path.read_text())
         require(report['status'] == 'PASS_OFFICIAL_BETA_ARTIFACT_ONLY'
-                and report['version_code'] == 1290 and report['elf_count'] == 96
+                and report['version_code'] == 1305 and report['elf_count'] == 96
                 and report['certificate_sha256'] == CERTIFICATE
                 and report['application_id'] == 'com.flexygram.messenger'
-                and report['version_name'] == '1.0.0-beta.1'
+                and report['version_name'] == '1.0.0-beta.16'
                 and report['sha256'] == hashlib.sha256(apk.read_bytes()).hexdigest())
         provenance = {'source_commit': SOURCE_COMMIT, 'dispatcher_commit': env['GITHUB_SHA'],
                       'run_id': env['GITHUB_RUN_ID'], 'run_attempt': env['GITHUB_RUN_ATTEMPT'],
@@ -221,14 +212,14 @@ def build(env):
         (private/'provenance.json').write_text(json.dumps(provenance, indent=2)+'\n')
         package = private/'delivery.tar'
         with tarfile.open(package, 'w') as archive:
-            for path, name in [(apk, 'FlexyGram-Beta-1290-ARM64.apk'),
+            for path, name in [(apk, 'FlexyGram-Beta-1305-ARM64.apk'),
                                (report_path, 'verification.json'),
                                (private/'provenance.json', 'provenance.json')]:
                 archive.add(path, arcname=name, recursive=False)
         stage = 'OWNER_ENCRYPTION'
         require(not delivery.exists())
         delivery.mkdir(mode=0o700)
-        target = delivery/'FlexyGram-Beta-1290.tar.age'
+        target = delivery/'FlexyGram-Beta-1305.tar.age'
         # Encryption tool receives no signing credentials.
         encrypt_env = {k: v for k, v in env.items() if k not in SECRET_NAMES and k != 'BETA_AGE_RECIPIENT'}
         run_private(['age', '--recipient', recipient, '--output', str(target), str(package)],

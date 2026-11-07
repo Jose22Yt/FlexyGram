@@ -1,6 +1,6 @@
 {
   "repository": "Jose22Yt/FlexyGram",
-  "source_commit": "932c9a6db84fab52ab167d4c8ee70957b3e57223",
+  "source_commit": "6ea76c7082fd51d51fa51ebf03a572a192eda86a",
   "environment": "flexygram-beta",
   "dispatch_branch": "main",
   "environment_id": 25818874267,
@@ -16,15 +16,19 @@
     "main_blocks_force_push_and_deletion": true,
     "main_applies_to_administrators": true,
     "only_environment_scoped_beta_secrets": true,
-    "delivery_age_recipient": "age1dc36uuvdg4ut52crhgux297zfjc5u0p0rucgnjss8svmgdl2eylseanqqe"
+    "delivery_age_recipient": "age18xyex96lpp6wl8n46684g4tt06h5ze08vxa0wau5ffdwejfxjensr2f6zv"
   },
   "source_review": {
-    "pull_request": 161,
-    "head_sha": "932c9a6db84fab52ab167d4c8ee70957b3e57223",
-    "base_sha": "2b4bcd1d0dc095ee92176ed4b318430ec5f2ddf7",
+    "pull_request": 180,
+    "head_sha": "6ea76c7082fd51d51fa51ebf03a572a192eda86a",
+    "base_sha": "6e8e7a3ae715a9f2104b7b107e47fd93b59d35f3",
     "reviewer_ids": [
       251905314
     ],
     "certificate_sha256": "e71c4d1e14dd940892009c61164df522c133029df6d1258561f6a1a4d1f3c015"
+  },
+  "delivery_request": {
+    "recipient": "age18xyex96lpp6wl8n46684g4tt06h5ze08vxa0wau5ffdwejfxjensr2f6zv",
+    "purpose": "Owner-authorized beta.16 APK delivery; private receiving identity remains outside the repository."
   }
 }

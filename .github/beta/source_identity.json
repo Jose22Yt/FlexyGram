@@ -1,20 +1,20 @@
 {
-  "source_commit": "932c9a6db84fab52ab167d4c8ee70957b3e57223",
-  "source_tree": "ec0fe7a5abe4954c415709781d78192f8743321a",
-  "base_commit": "2b4bcd1d0dc095ee92176ed4b318430ec5f2ddf7",
-  "source_pr": 161,
+  "source_commit": "6ea76c7082fd51d51fa51ebf03a572a192eda86a",
+  "source_tree": "19d20293865081ae2d5274d479a6ac3963f0b8f1",
+  "base_commit": "6e8e7a3ae715a9f2104b7b107e47fd93b59d35f3",
+  "source_pr": 180,
   "certificate_sha256": "e71c4d1e14dd940892009c61164df522c133029df6d1258561f6a1a4d1f3c015",
   "files": {
     "config/signing/flexygram-release.cer": "e71c4d1e14dd940892009c61164df522c133029df6d1258561f6a1a4d1f3c015",
     "config/signing/identity.properties": "34b6725c547567631463bdbd4e2a821370e750804f187c87f6ad535c8a02cac1",
     "config/signing/public-verification.json": "776a1d50ca69204129606f85bd8ef4fab9abc7177401a7c9699577a6919c53db",
-    "gradle.properties": "fcb624436da2c281ec58e0764df0bc6a49b4841d671af4130b682ab713b769b4",
+    "gradle.properties": "dd1e30c04c05531c512b2e6c6f252f907ca137b54819da40265707e0d26bb987",
     "gradle/flexygram-beta.gradle": "02dd9c8f7a579ca483ed43d881add58372b7962f418a4326ad9d622100522500",
-    "TMessagesProj/build.gradle": "d3bb31b8025da54740c14a5c72a45f7d3eaf06fa5fb6fd2c341f4d30a2bf6105",
+    "TMessagesProj/build.gradle": "61b5b5e45fccbf283643723ab04d769992e976a8582e27b367ad9fab02cd96df",
     "tools/signing/VerifySigning.java": "3f0baf9db1d80751f6d6af2e0012a0159f7a1493d1d4ea5c9efb3b066fe6b3ea",
-    "tools/beta_release/verify_beta_apk.py": "0a61a634a51d4e8944f01acf836fa6efa399510ff1f23a09c38d2adeacf5b36b",
+    "tools/beta_release/verify_beta_apk.py": "f5fb45b32f120015f29657f9c32db406b5d66e6e4447f155207df90a325198ad",
     "tools/beta_release/preflight.py": "03c91071b798522258f0292d0ebfae1c469583e32a0a693fced4a5286040cd12",
     "tools/beta_release/review.json": "e5fc25fa431baecef4db058f069b04a37c3eb2f271ac635fbbb8fb7fdd057027",
-    "tools/connected_alpha/verify_apk.py": "7f2bd943f232329870ad6657eee73667f380449da7f89299d47d2980ecb03465"
+    "tools/connected_alpha/verify_apk.py": "61df8f2c1d78b6d7304f6b0cc45aaba9f1683e9526e7a56aece58fd56ce45a6a"
   }
 }

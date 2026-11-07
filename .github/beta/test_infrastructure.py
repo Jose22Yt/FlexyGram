@@ -108,8 +108,8 @@ class SourceApprovalTests(unittest.TestCase):
     def fixture(self):
         policy = protected()[0]
         manifest = json.loads((audit.ROOT/'source_identity.json').read_text())
-        pull = {'number':161, 'user':{'id':126811980}, 'head':{'sha':audit.SOURCE,'repo':{'full_name':audit.REPO}},
-                'base':{'ref':'fix/beta-official-delivery-ready','repo':{'full_name':audit.REPO}},
+        pull = {'number':audit.SOURCE_PR, 'user':{'id':audit.SOURCE_AUTHOR_ID}, 'head':{'sha':audit.SOURCE,'repo':{'full_name':audit.REPO}},
+                'base':{'ref':audit.SOURCE_BASE_REF,'repo':{'full_name':audit.REPO}},
                 'state':'open','merged':False,'draft':False}
         reviews = [{'id':100, 'user':{'id':audit.REVIEWER_ID,'login':'dc6764071-wq'},
                     'state':'APPROVED','commit_id':audit.SOURCE,'submitted_at':'2026-10-30T00:00:00Z',
@@ -177,7 +177,7 @@ class WorkflowTests(unittest.TestCase):
                         self.assertFalse(step['with']['persist-credentials'])
         uploads = [s for s in job['steps'] if s.get('uses','').startswith('actions/upload-artifact@')]
         self.assertEqual(len(uploads), 1)
-        self.assertTrue(uploads[0]['with']['path'].endswith('/FlexyGram-Beta-1290.tar.age'))
+        self.assertTrue(uploads[0]['with']['path'].endswith('/FlexyGram-Beta-1305.tar.age'))
         index = job['steps'].index(uploads[0])
         self.assertEqual(job['steps'][index-1]['if'], 'always()')
         self.assertTrue(job['steps'][index-1]['run'].endswith(' cleanup'))
@@ -292,7 +292,7 @@ class PrivateInputsTests(unittest.TestCase):
             with self.subTest(failure=failure):
                 self.source.mkdir(exist_ok=True)
                 (self.source/'TMessagesProj/src/beta').mkdir(parents=True, exist_ok=True)
-                (self.source/'gradle.properties').write_text('APP_PACKAGE=com.flexygram.messenger\nBETA_VERSION_CODE=1290\nBETA_VERSION_NAME=1.0.0-beta.1\n')
+                (self.source/'gradle.properties').write_text('APP_PACKAGE=com.flexygram.messenger\nBETA_VERSION_CODE=1305\nBETA_VERSION_NAME=1.0.0-beta.16\n')
                 control = self.runner/'control'; control.mkdir(exist_ok=True)
                 policy = protected()[0]; policy['ui_review']['delivery_age_recipient'] = recipient
                 (control/'policy.json').write_text(json.dumps(policy))
@@ -316,9 +316,9 @@ class PrivateInputsTests(unittest.TestCase):
                         if failure == 'VERIFY': raise RuntimeError('SENSITIVE_SENTINEL')
                         self.assertEqual(args[1], 'tools/beta_release/verify_beta_apk.py')
                         import hashlib
-                        data = {'status':'PASS_OFFICIAL_BETA_ARTIFACT_ONLY','version_code':1290,'elf_count':96,
+                        data = {'status':'PASS_OFFICIAL_BETA_ARTIFACT_ONLY','version_code':1305,'elf_count':96,
                                 'certificate_sha256': '5a598fb5ba42949b67b7c2635106fafd5f23179397e4c098757a73cd2d2ef66c' if failure == 'OLD_CERT' else build.CERTIFICATE,
-                                'application_id':'com.flexygram.messenger','version_name':'1.0.0-beta.1',
+                                'application_id':'com.flexygram.messenger','version_name':'1.0.0-beta.16',
                                 'sha256':hashlib.sha256(Path(args[2]).read_bytes()).hexdigest()}
                         output.write_text(json.dumps(data))
                 stdout, stderr = io.StringIO(), io.StringIO()
@@ -335,13 +335,13 @@ class PrivateInputsTests(unittest.TestCase):
                 self.assertNotIn('SENSITIVE_SENTINEL',stdout.getvalue()+stderr.getvalue())
                 self.assertFalse(self.source.exists())
                 self.assertEqual(list(self.runner.glob('flexygram-beta-private-*')), [])
-                delivery = self.runner/'flexygram-beta-delivery/FlexyGram-Beta-1290.tar.age'
+                delivery = self.runner/'flexygram-beta-delivery/FlexyGram-Beta-1305.tar.age'
                 if failure:
                     self.assertFalse(delivery.exists())
                 else:
                     decoded = self.runner/'roundtrip.tar'
                     subprocess.run(['age','--decrypt','--identity',str(key),'--output',str(decoded),str(delivery)],check=True)
                     with tarfile.open(decoded) as archive:
-                        self.assertEqual(sorted(archive.getnames()),['FlexyGram-Beta-1290-ARM64.apk','provenance.json','verification.json'])
+                        self.assertEqual(sorted(archive.getnames()),['FlexyGram-Beta-1305-ARM64.apk','provenance.json','verification.json'])
                         self.assertEqual(json.load(archive.extractfile('provenance.json'))['source_commit'],audit.SOURCE)
                     build.cleanup(env,delivery=True)

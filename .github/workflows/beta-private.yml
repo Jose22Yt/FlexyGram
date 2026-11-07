@@ -1,5 +1,5 @@
 name: Official Beta private ARM64
-run-name: Official Beta 1290 · pinned PR150 · ${{ inputs.mode }}
+run-name: Official Beta 1305 · pinned reviewed beta.16 source · ${{ inputs.mode }}
 on:
   workflow_dispatch:
     inputs:
@@ -45,7 +45,7 @@ jobs:
     timeout-minutes: 180
     env:
       NATIVE_TARGET: arm64-v8a
-      SOURCE_COMMIT: 932c9a6db84fab52ab167d4c8ee70957b3e57223
+      SOURCE_COMMIT: 6ea76c7082fd51d51fa51ebf03a572a192eda86a
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
@@ -60,7 +60,7 @@ jobs:
         run: python3 control/.github/beta/audit_environment.py
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          ref: 932c9a6db84fab52ab167d4c8ee70957b3e57223
+          ref: 6ea76c7082fd51d51fa51ebf03a572a192eda86a
           path: source
           submodules: recursive
           persist-credentials: false
@@ -102,7 +102,7 @@ jobs:
           df -h .
           free_kb=$(df -Pk . | awk 'NR==2 {print $4}')
           (( free_kb >= 8 * 1024 * 1024 ))
-      - name: Validate, assembleBeta, verify pinned PR150 artifact and encrypt for owner
+      - name: Validate, assembleBeta, verify pinned reviewed beta.16 source artifact and encrypt for owner
         env:
           FLEXYGRAM_RELEASE_KEYSTORE_B64: ${{ secrets.FLEXYGRAM_RELEASE_KEYSTORE_B64 }}
           FLEXYGRAM_RELEASE_STORE_PASSWORD: ${{ secrets.FLEXYGRAM_RELEASE_STORE_PASSWORD }}
@@ -119,8 +119,8 @@ jobs:
       - name: Retain only owner-encrypted delivery
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: FlexyGram-Beta-1290-ARM64-owner-encrypted-${{ github.run_id }}-${{ github.run_attempt }}
-          path: ${{ runner.temp }}/flexygram-beta-delivery/FlexyGram-Beta-1290.tar.age
+          name: FlexyGram-Beta-1305-ARM64-owner-encrypted-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/flexygram-beta-delivery/FlexyGram-Beta-1305.tar.age
           if-no-files-found: error
           retention-days: 1
           compression-level: 0
