@@ -16,13 +16,26 @@
 - Message action panels: use the shared selection blur and its translucent scrim
   tint, independently of the persistent chat-surface blur preference. Device blur
   capability restrictions remain in effect.
+- While the custom header owns the action buttons, exclude the overlapping native
+  menu from drawing, touch dispatch and accessibility. Native search/action modes
+  retain their controls, and custom buttons still invoke the original actions.
+- Anchor overflow popups to the actual custom button, without adding coordinates
+  from the hidden native menu. Mirror popup alignment for right-to-left layouts.
+- Dismiss message selection from its preview placeholder, unhandled viewport
+  touches and outside events. Consume the dismissal gesture; retain normal menu
+  button and scrolling gestures and the existing single-owner return animation.
+- Both smile/sticker entry states use the selected circular curved-fold glyph
+  with reference icons enabled; keyboard and recording states keep their meaning.
 
 ## Verification
 
-- Maintained Python/JVM suite: 349 passed, 33 skipped.
+- Maintained Python/JVM suite: 353 passed, 33 skipped.
 - Regression coverage includes resumed/imported header touch bounds at several
   widths, densities and layout directions, one-time setting repairs, imported
   choices, vector decoding and stable counter layout reuse.
+- Touch regression tests execute native-menu exclusion, external anchor alignment
+  in both layout directions and preview dismissal without consuming menu gestures.
+- `MessageMenuViewport` also compiles against the real Android SDK 37.
 - Decoder compiled against Android SDK 37; main resources compiled with AAPT2.
 - Java syntax parsing and `git diff --check` passed.
 - No APK was assembled or signed for this change. Device interaction, contrast
@@ -38,3 +51,6 @@
    optional global icon pack, light/dark themes and an imported configuration.
 4. Open and dismiss message action panels with supported blur enabled, then with
    reduced-capability settings. Confirm text contrast and selection cleanup.
+5. Tap beside the selected bubble and in empty preview areas. The menu must close
+   without activating a message or control underneath. Repeat during entry and
+   return animations; action buttons and scrolling inside the menu must still work.
