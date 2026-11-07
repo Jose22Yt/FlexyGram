@@ -13,6 +13,7 @@ import subprocess
 import sys
 import tarfile
 import tempfile
+import time
 import urllib.request
 import zipfile
 from pathlib import Path
@@ -125,7 +126,20 @@ def main():
             metadata = yaml.safe_load((recipe/'meta.yaml').read_text())
             if metadata['package'] != {'name': name, 'version': version}:
                 raise ValueError('Unexpected upstream package identity')
-            data = checked_bytes(urllib.request.urlopen(url, timeout=60).read(), digest)
+            data = None
+            last_err = None
+            for attempt in range(1, 6):
+                try:
+                    req = urllib.request.Request(url, headers={'User-Agent': 'FlexyGram-Build/1.0'})
+                    with urllib.request.urlopen(req, timeout=60) as resp:
+                        data = checked_bytes(resp.read(), digest)
+                    break
+                except Exception as exc:
+                    last_err = exc
+                    if attempt < 5:
+                        time.sleep(3 * attempt)
+                    else:
+                        raise last_err
             source = work/(name+'-source')
             source.mkdir()
             with tarfile.open(fileobj=io.BytesIO(data), mode='r:*') as archive:
