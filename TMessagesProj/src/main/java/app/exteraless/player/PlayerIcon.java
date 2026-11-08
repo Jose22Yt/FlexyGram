@@ -27,6 +27,7 @@ public class PlayerIcon extends Drawable {
     public static final String NEXT = roundRect(16.4f, 5.5f, 2.6f, 13, 1.2f) + "M5 6.6v10.8a1 1 0 0 0 1.55.84l8.1-5.4a1 1 0 0 0 0-1.68l-8.1-5.4A1 1 0 0 0 5 6.6z";
     public static final String PLAY = "M8 5.8v12.4a1 1 0 0 0 1.54.84l9.6-6.2a1 1 0 0 0 0-1.68l-9.6-6.2A1 1 0 0 0 8 5.8z";
     public static final String PAUSE = roundRect(6, 5, 4.6f, 14, 1.6f) + roundRect(13.4f, 5, 4.6f, 14, 1.6f);
+    public static final String TIMER = "M9 2h6M12 7v5l3 2M18 5l2 2" + circle(12,14,8);
     public static final String SPEED = "M12 14l3.5-3.5M4.6 18a8.5 8.5 0 1 1 14.8 0";
     public static final String LYRICS = "M4 6h12M4 11h16M4 16h9";
     public static final String QUEUE = "M4 6h12M4 11h12M4 16h7M15 14v6l5-3z";

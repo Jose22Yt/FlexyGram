@@ -8,4 +8,7 @@
     <string name="FlexyMusicMyMusic">My music</string>
     <string name="FlexyMusicLyrics">Lyrics</string>
     <string name="FlexyMusicQueue">Queue</string>
+    <string name="FlexyMusicTimer">Timer</string>
+    <string name="FlexyMusicTimerMinutes">%1$d minutes</string>
+    <string name="FlexyMusicTimerCancel">Cancel timer</string>
 </resources>

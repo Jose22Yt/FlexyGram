@@ -4559,6 +4559,11 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
         return currentAspectRatioFrameLayout != null && currentAspectRatioFrameLayout.isDrawingReady();
     }
 
+    /** Read-only order for the music UI; selecting an item still goes through native playback actions. */
+    public java.util.List<MessageObject> getMusicPlaybackOrder() {
+        return java.util.Collections.unmodifiableList(SharedConfig.shuffleMusic ? shuffledPlaylist : playlist);
+    }
+
     public ArrayList<MessageObject> getPlaylist() {
         return playlist;
     }

@@ -38,14 +38,16 @@ import org.telegram.ui.Components.LayoutHelper;
 
 public class PlayerMiniView extends FrameLayout implements NotificationCenter.NotificationCenterDelegate {
 
-    public static final int HEIGHT_DP = 64;
+    public static final int HEIGHT_DP = 72;
 
     private SignatureMusicHost signatureHost;
     private final BaseFragment fragment;
     private final Theme.ResourcesProvider resourcesProvider;
     private boolean dark;
     private int seed;
-    private final LinearLayout card;
+    private final FrameLayout card;
+    private MusicBlurSurface blurSurface;
+    private MusicProgressView progress;
     private final GradientDrawable cardBg = new GradientDrawable();
     private final CoverImage cover;
     private final TextView titleView;
@@ -53,7 +55,7 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
     private final RingPlayButton playButton;
     private final ImageView nextButton;
     private final ImageView closeButton;
-    private final PlayerIcon nextIcon = BuildConfig.CONNECTED_ALPHA ? PlayerIcon.stroke(PlayerIcon.CHEVRON_DOWN,24) : PlayerIcon.fill(PlayerIcon.NEXT,24);
+    private final PlayerIcon nextIcon = PlayerIcon.fill(PlayerIcon.NEXT,24);
     private final PlayerIcon closeIcon = PlayerIcon.stroke(PlayerIcon.CLOSE, 22);
     private PlayerColors colors;
     private ValueAnimator showAnimator;
@@ -74,12 +76,16 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
         setClipChildren(false);
         setClipToPadding(false);
 
-        card = new LinearLayout(context);
-        card.setOrientation(LinearLayout.HORIZONTAL);
-        card.setGravity(Gravity.CENTER_VERTICAL);
-        card.setPadding(dp(10), 0, dp(6), 0);
+        card = new FrameLayout(context);
+        LinearLayout row = new LinearLayout(context);
+        row.setOrientation(LinearLayout.HORIZONTAL); row.setGravity(Gravity.CENTER_VERTICAL);
+        row.setPadding(dp(10),0,dp(6),0);
+        card.addView(row, LayoutHelper.createFrame(-1,-1));
         cardBg.setCornerRadius(dp(20));
         card.setBackground(cardBg);
+        if (BuildConfig.CONNECTED_ALPHA) { blurSurface = new MusicBlurSurface(card, dp(22)); card.setBackground(blurSurface); }
+        progress = new MusicProgressView(context, false);
+        card.addView(progress, LayoutHelper.createFrame(-1,2,Gravity.BOTTOM,dp(0),0,0,0));
         card.setOutlineProvider(new ViewOutlineProvider() {
             @Override
             public void getOutline(View view, Outline outline) {
@@ -95,7 +101,7 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
 
         cover = new CoverImage(context, 22);
         cover.setRadius(dp(12));
-        card.addView(cover, LayoutHelper.createLinear(44, 44));
+        row.addView(cover, LayoutHelper.createLinear(44, 44));
 
         LinearLayout texts = new LinearLayout(context);
         texts.setOrientation(LinearLayout.VERTICAL);
@@ -111,9 +117,10 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
         artistView.setEllipsize(TextUtils.TruncateAt.END);
         artistView.setAlpha(0.8f);
         texts.addView(artistView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 2, 0, 0));
-        card.addView(texts, LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1f, 12, 0, 4, 0));
+        row.addView(texts, LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1f, 12, 0, 4, 0));
 
         playButton = new RingPlayButton(context, 20, 3, 22, 1.3f, 12);
+        playButton.setShowRing(!org.telegram.messenger.BuildConfig.CONNECTED_ALPHA);
         playButton.setOnClickListener(v -> {
             MediaController mc = MediaController.getInstance();
             MessageObject mo = mc.getPlayingMessageObject();
@@ -126,17 +133,16 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
                 mc.pauseMessage(mo);
             }
         });
-        card.addView(playButton, LayoutHelper.createLinear(48, 48));
+        row.addView(playButton, LayoutHelper.createLinear(48, 48));
 
         nextButton = new ImageView(context);
         nextButton.setScaleType(ImageView.ScaleType.CENTER);
         nextButton.setImageDrawable(nextIcon);
-        nextButton.setContentDescription(getString(BuildConfig.CONNECTED_ALPHA ? R.string.FlexyMusicCompact : R.string.Next));
+        nextButton.setContentDescription(getString(R.string.Next));
         nextButton.setOnClickListener(v -> {
-            if(BuildConfig.CONNECTED_ALPHA){if(signatureHost!=null&&signatureHost.canCompact())SignatureMusicPresentation.setCompact(true);}
-            else MediaController.getInstance().playNextMessage();
+            MediaController.getInstance().playNextMessage();
         });
-        card.addView(nextButton, LayoutHelper.createLinear(48, 48));
+        row.addView(nextButton, LayoutHelper.createLinear(48, 48));
 
         closeButton = new ImageView(context);
         closeButton.setScaleType(ImageView.ScaleType.CENTER);
@@ -147,7 +153,7 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
             MediaController.getInstance().cleanupPlayer(true, true);
         });
         closeButton.setOnLongClickListener(v -> { MediaController.getInstance().cleanupPlayer(true, true); return true; });
-        card.addView(closeButton, LayoutHelper.createLinear(48, 48));
+        row.addView(closeButton, LayoutHelper.createLinear(48, 48));
 
         applyColors(colors);
         setVisibility(GONE);
@@ -157,6 +163,8 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
         nextButton.setVisibility(MeasureSpec.getSize(widthMeasureSpec) >= dp(320) ? VISIBLE : GONE);
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
+
+    @Override public void draw(Canvas canvas) { if (!MusicBlurSurface.isCapturing()) super.draw(canvas); }
 
     public boolean canTransition() {
         return isAttachedToWindow() && getVisibility() == VISIBLE && shown && showProgress >= 1f && hostFactor >= 0.99f && card.getWidth() > 0;
@@ -256,6 +264,7 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
+        if (blurSurface != null) blurSurface.attach();
         NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.didSetNewTheme);
         for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
             NotificationCenter nc = NotificationCenter.getInstance(a);
@@ -275,6 +284,7 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
 
     @Override
     protected void onDetachedFromWindow() {
+        if (blurSurface != null) blurSurface.detach();
         if (signatureHost != null) { signatureHost.detachFromWindow(); signatureHost = null; }
         super.onDetachedFromWindow();
         NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.didSetNewTheme);
@@ -295,6 +305,7 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
         if (signatureHost != null) signatureHost.update(Md3Player.miniEnabled());
         if (id == NotificationCenter.messagePlayingProgressDidChanged) {
             playButton.progressChanged();
+            progress.invalidate();
         } else if (id == NotificationCenter.audioInfoLoaded) {
             MessageObject mo = current;
             if (mo != null && PlayerArt.isPlaying(mo)) {
@@ -313,6 +324,7 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
     private void checkThemeColors() {
         boolean themeDark = PlayerColors.isDark(resourcesProvider);
         int themeSeed = PlayerColors.fallbackSeed(resourcesProvider);
+        if (BuildConfig.CONNECTED_ALPHA) { PlayerColors next = PlayerColors.fromSignatureTheme(themeDark, resourcesProvider); if (next != colors) applyColors(next); }
         if (themeDark != dark || themeSeed != seed) {
             dark = themeDark;
             seed = themeSeed;
@@ -326,10 +338,10 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
         boolean want = Md3Player.miniEnabled() && mo != null && mo.isMusic() && mo.getId() != 0;
         if (signatureHost != null) {
             signatureHost.update(want);
-            nextButton.setEnabled(signatureHost.canCompact());
+
             if (signatureHost.canCompact() && SignatureMusicPresentation.isCompact()) want = false;
         }
-        if(!want&&(mo==null||!mo.isMusic())&&current!=null){current=null;cover.setMessage(null);playButton.setMessage(null);}
+        if(!want&&(mo==null||!mo.isMusic())&&current!=null){current=null;cover.setMessage(null);playButton.setMessage(null);progress.setMessage(null);}
         if (want) {
             bind(mo);
         }
@@ -345,6 +357,7 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
             cover.setMessage(mo);
         }
         current = mo;
+        progress.setMessage(mo);
         artistView.setVisibility(getResources().getConfiguration().fontScale > 1.5f ? GONE : VISIBLE);
         card.setContentDescription(mo.getMusicTitle() + ", " + mo.getMusicAuthor());
         playButton.setMessage(mo);
@@ -380,6 +393,8 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
 
     private void applyColors(PlayerColors c) {
         colors = c;
+        if (blurSurface != null) blurSurface.setColors(c);
+        progress.setColors(c);
         cardBg.setColor(c.primaryContainer);
         cardBg.setStroke(dp(1), c.outlineVariant);
         if (Build.VERSION.SDK_INT >= 28) {

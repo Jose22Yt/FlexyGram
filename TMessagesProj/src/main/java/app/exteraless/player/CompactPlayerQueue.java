@@ -13,34 +13,34 @@ import org.telegram.messenger.LocaleController;
 import org.telegram.ui.Components.LayoutHelper;
 import java.util.ArrayList;
 
-/** Three recycled queue rows, refreshed by the sheet's existing notifications, never by progress frames. */
+/** Two recycled upcoming rows, refreshed by the sheet's existing notifications, never by progress frames. */
 final class CompactPlayerQueue extends LinearLayout {
     private final TextView heading;
-    private final Row[] rows=new Row[3];
+    private final Row[] rows=new Row[2];
     CompactPlayerQueue(Context context,Runnable openQueue) {
         super(context);setOrientation(VERTICAL);
         heading=new TextView(context);heading.setTextSize(16);heading.setTypeface(org.telegram.messenger.AndroidUtilities.bold());
         heading.setText(LocaleController.getString(R.string.FlexyMusicQueueTitle));heading.setGravity(Gravity.CENTER_VERTICAL);
         heading.setOnClickListener(v->openQueue.run());heading.setFocusable(true);
-        addView(heading,LayoutHelper.createLinear(-1,44));
-        for(int i=0;i<rows.length;i++){rows[i]=new Row(context);addView(rows[i],LayoutHelper.createLinear(-1,60));}
+        addView(heading,LayoutHelper.createLinear(-1,36));
+        for(int i=0;i<rows.length;i++){rows[i]=new Row(context);addView(rows[i],LayoutHelper.createLinear(-1,52));}
     }
     void refresh(PlayerColors colors) {
-        MediaController mc=MediaController.getInstance();ArrayList<MessageObject> list=mc.getPlaylist();
-        boolean direct=mc.currentSavedMusicList!=null?!SharedConfig.playOrderReversed:SharedConfig.playOrderReversed;
+        MediaController mc=MediaController.getInstance();java.util.List<MessageObject> list=mc.getMusicPlaybackOrder();
+        boolean direct=SharedConfig.playOrderReversed;
         MessageObject playing=mc.getPlayingMessageObject();int current=-1;
         for(int i=0;i<list.size();i++)if(sameMessage(list.get(i),playing)){current=direct?i:list.size()-1-i;break;}
-        int start=windowStart(list.size(),current,rows.length);
+        int start=nextWindowStart(list.size(),current);
         heading.setTextColor(colors.onSurface);
         for(int i=0;i<rows.length;i++){
             int position=start+i;
             MessageObject message=position<list.size()?list.get(direct?position:list.size()-1-position):null;
             rows[i].bind(message,playing,colors);
         }
-        setVisibility(list.isEmpty()?GONE:VISIBLE);
+        setVisibility(start>=list.size()?GONE:VISIBLE);
     }
     static boolean sameMessage(MessageObject a,MessageObject b){return a!=null&&b!=null&&(a==b||a.getId()!=0&&a.currentAccount==b.currentAccount&&a.getId()==b.getId()&&a.getDialogId()==b.getDialogId());}
-    static int windowStart(int size,int current,int count){return Math.max(0,Math.min(current,Math.max(0,size-count)));}
+    static int nextWindowStart(int size,int current){return Math.max(0,Math.min(size,current+1));}
     private static final class Row extends LinearLayout {
         final CoverImage cover;final TextView title,artist;MessageObject message;PlayerColors lastColors;
         Row(Context context){

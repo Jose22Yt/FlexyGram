@@ -34,6 +34,8 @@ public class PlayerBarView extends FrameLayout implements NotificationCenter.Not
                 (int) Math.ceil(18 * context.getResources().getConfiguration().fontScale + 16)) : HEIGHT_DP;
     }
 
+    private MusicBlurSurface blurSurface;
+    private final MusicProgressView progress;
     private final CoverImage cover;
     private final LinearLayout texts;
     private final TextView titleView;
@@ -41,7 +43,7 @@ public class PlayerBarView extends FrameLayout implements NotificationCenter.Not
     private final RingPlayButton playButton;
     private final ImageView nextButton;
     private final ImageView closeButton;
-    private final PlayerIcon nextIcon = BuildConfig.CONNECTED_ALPHA ? PlayerIcon.stroke(PlayerIcon.CHEVRON_DOWN,22) : PlayerIcon.fill(PlayerIcon.NEXT,22);
+    private final PlayerIcon nextIcon = PlayerIcon.fill(PlayerIcon.NEXT,22);
     private final PlayerIcon closeIcon = PlayerIcon.stroke(PlayerIcon.CLOSE, 20);
     private final Theme.ResourcesProvider resourcesProvider;
     private MessageObject current;
@@ -85,6 +87,7 @@ public class PlayerBarView extends FrameLayout implements NotificationCenter.Not
         LinearLayout buttons = new LinearLayout(context);
         buttons.setOrientation(LinearLayout.HORIZONTAL);
         playButton = new RingPlayButton(context, 15, 2.5f, 16, 1.1f, 10);
+        playButton.setShowRing(!org.telegram.messenger.BuildConfig.CONNECTED_ALPHA);
         playButton.setOnClickListener(v -> {
             MediaController mc = MediaController.getInstance();
             MessageObject mo = mc.getPlayingMessageObject();
@@ -101,8 +104,8 @@ public class PlayerBarView extends FrameLayout implements NotificationCenter.Not
         nextButton = new ImageView(context);
         nextButton.setScaleType(ImageView.ScaleType.CENTER);
         nextButton.setImageDrawable(nextIcon);
-        nextButton.setContentDescription(getString(BuildConfig.CONNECTED_ALPHA ? R.string.FlexyMusicCompact : R.string.Next));
-        nextButton.setOnClickListener(v -> {if(BuildConfig.CONNECTED_ALPHA){if(onCompact!=null)onCompact.run();}else MediaController.getInstance().playNextMessage();});
+        nextButton.setContentDescription(getString(R.string.Next));
+        nextButton.setOnClickListener(v -> MediaController.getInstance().playNextMessage());
         buttons.addView(nextButton, LayoutHelper.createLinear(48, 48));
         closeButton = new ImageView(context);
         closeButton.setScaleType(ImageView.ScaleType.CENTER);
@@ -116,6 +119,10 @@ public class PlayerBarView extends FrameLayout implements NotificationCenter.Not
         buttons.addView(closeButton, LayoutHelper.createLinear(48, 48));
         addView(buttons, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, 48, Gravity.RIGHT | Gravity.CENTER_VERTICAL, 0, 0, 6, 0));
 
+        progress = new MusicProgressView(context,false);
+        addView(progress,LayoutHelper.createFrame(-1,2,Gravity.BOTTOM));
+        if (BuildConfig.CONNECTED_ALPHA) { blurSurface=new MusicBlurSurface(this,dp(20));setBackground(blurSurface); }
+        setOnLongClickListener(v->{if(onCompact==null)return false;onCompact.run();return true;});
         applyTheme();
     }
 
@@ -128,6 +135,8 @@ public class PlayerBarView extends FrameLayout implements NotificationCenter.Not
 
     private void applyTheme() {
         PlayerColors theme = BuildConfig.CONNECTED_ALPHA?PlayerColors.fromSignatureTheme(PlayerColors.isDark(resourcesProvider),resourcesProvider):PlayerColors.fromSeed(PlayerColors.fallbackSeed(resourcesProvider), PlayerColors.isDark(resourcesProvider));
+        if (blurSurface != null) blurSurface.setColors(theme);
+        progress.setColors(theme);
         int text = BuildConfig.CONNECTED_ALPHA ? theme.onSurface : Theme.getColor(Theme.key_inappPlayerPerformer, resourcesProvider);
         int secondary = BuildConfig.CONNECTED_ALPHA ? theme.onSurfaceVariant : Theme.getColor(Theme.key_inappPlayerTitle, resourcesProvider);
         int icons = BuildConfig.CONNECTED_ALPHA ? theme.onSurface : Theme.getColor(Theme.key_inappPlayerClose, resourcesProvider);
@@ -151,6 +160,7 @@ public class PlayerBarView extends FrameLayout implements NotificationCenter.Not
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
+        if (blurSurface != null) blurSurface.attach();
         NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.didSetNewTheme);
         for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
             NotificationCenter nc = NotificationCenter.getInstance(a);
@@ -166,6 +176,7 @@ public class PlayerBarView extends FrameLayout implements NotificationCenter.Not
 
     @Override
     protected void onDetachedFromWindow() {
+        if (blurSurface != null) blurSurface.detach();
         super.onDetachedFromWindow();
         NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.didSetNewTheme);
         for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
@@ -184,6 +195,7 @@ public class PlayerBarView extends FrameLayout implements NotificationCenter.Not
         if (id == NotificationCenter.didSetNewTheme) applyTheme();
         if (id == NotificationCenter.messagePlayingProgressDidChanged) {
             playButton.progressChanged();
+            progress.invalidate();
         } else if (id == NotificationCenter.audioInfoLoaded) {
             MessageObject mo = current;
             if (mo != null && PlayerArt.isPlaying(mo)) {
@@ -199,10 +211,12 @@ public class PlayerBarView extends FrameLayout implements NotificationCenter.Not
         }
     }
 
+    @Override public void draw(android.graphics.Canvas canvas) { if (!MusicBlurSurface.isCapturing()) super.draw(canvas); }
+
     public void update() {
         MessageObject mo = MediaController.getInstance().getPlayingMessageObject();
         if (mo == null || !mo.isMusic()) {
-            if(current!=null){current=null;cover.setMessage(null);playButton.setMessage(null);}
+            if(current!=null){current=null;cover.setMessage(null);playButton.setMessage(null);progress.setMessage(null);}
             playButton.setPlaying(false,false);
             return;
         }
@@ -213,6 +227,7 @@ public class PlayerBarView extends FrameLayout implements NotificationCenter.Not
             cover.setMessage(mo);
         }
         current = mo;
+        progress.setMessage(mo);
         artistView.setVisibility(getResources().getConfiguration().fontScale > 1.5f ? GONE : VISIBLE);
         setContentDescription(mo.getMusicTitle() + ", " + mo.getMusicAuthor());
         playButton.setMessage(mo);

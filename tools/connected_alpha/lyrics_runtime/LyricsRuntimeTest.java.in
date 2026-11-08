@@ -1,0 +1,77 @@
+package app.exteraless.player;
+import android.os.Looper;import org.junit.*;import org.junit.runner.RunWith;import org.robolectric.*;import org.robolectric.annotation.*;
+import org.telegram.messenger.*;import org.json.*;import java.io.*;import java.net.*;import java.nio.charset.StandardCharsets;
+import java.util.function.Function;import static org.junit.Assert.*;
+@RunWith(RobolectricTestRunner.class) @Config(manifest=Config.NONE,sdk=35)
+public class LyricsRuntimeTest {
+ static Function<String,String> response;static int calls;static int code=200;static int readTimeout,connectTimeout;
+ @BeforeClass public static void transport(){URL.setURLStreamHandlerFactory(protocol->"https".equals(protocol)?new URLStreamHandler(){
+  protected URLConnection openConnection(URL url){return new HttpURLConnection(url){
+   public void connect(){}public boolean usingProxy(){return false;}public void disconnect(){}
+   public int getResponseCode(){calls++;return code;}
+   public InputStream getInputStream()throws IOException{
+    connectTimeout=getConnectTimeout();readTimeout=getReadTimeout();String text=response.apply(url.toString());
+    if(text==null)throw new java.net.SocketTimeoutException("fixture timeout");return new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8));}
+  };}
+ }:null);}
+ @Before public void setup(){ApplicationLoader.applicationContext=RuntimeEnvironment.getApplication();calls=0;code=200;}
+ OnlineLyrics.Query query(String name){return new OnlineLyrics.Query("Luna Norte",name,"Album",252);}
+ String track(String name,String lyric,boolean sync){try{return new JSONObject().put("trackName",name).put("artistName","Luna Norte").put("duration",252).put(sync?"syncedLyrics":"plainLyrics",lyric).toString();}catch(Exception e){throw new AssertionError(e);}}
+ void drain(){DispatchQueue.drain();Shadows.shadowOf(Looper.getMainLooper()).idle();}
+ @Test public void refusesDifferentSongArtistAndVersion()throws Exception{
+  JSONObject candidate=new JSONObject(track("Canción","[00:01]Hola",true));
+  assertTrue(OnlineLyrics.matches("Cancion","LUNA NORTE",252,candidate,"trackName","artistName"));
+  assertFalse(OnlineLyrics.matches("Otra","Luna Norte",252,candidate,"trackName","artistName"));
+  assertFalse(OnlineLyrics.matches("Canción","Otro artista",252,candidate,"trackName","artistName"));
+  assertFalse(OnlineLyrics.matches("Canción (Live)","Luna Norte",252,candidate,"trackName","artistName"));
+  candidate.put("duration",300);assertFalse(OnlineLyrics.matches("Canción","Luna Norte",252,candidate,"trackName","artistName"));
+ }
+ @Test public void mergesRepeatedRequestsAndCachesResult(){
+  String name="Coalesced";response=url->track(name,"[00:01]Hola",true);int[] delivered={0};
+  OnlineLyrics.fetch(query(name),(lyrics,status)->{assertEquals(OnlineLyrics.OK,status);assertEquals("Hola",lyrics.lines.get(0).text);delivered[0]++;});
+  OnlineLyrics.fetch(query(name),(lyrics,status)->delivered[0]++);drain();assertEquals(1,calls);assertEquals(2,delivered[0]);
+  OnlineLyrics.fetch(query(name),(lyrics,status)->delivered[0]++);drain();assertEquals(1,calls);assertEquals(3,delivered[0]);
+ }
+ @Test public void cancelSkipsQueuedNetworkAndNeverDeliversOldTrack(){
+  response=url->track("Current","[00:02]Correcta",true);int[] old={0},current={0};
+  OnlineLyrics.Request request=OnlineLyrics.fetch(query("Old"),(lyrics,status)->old[0]++);request.cancel();
+  OnlineLyrics.fetch(query("Current"),(lyrics,status)->{assertEquals(OnlineLyrics.OK,status);current[0]++;});drain();
+  assertEquals(0,old[0]);assertEquals(1,current[0]);assertEquals(1,calls);
+ }
+ @Test public void networkErrorDoesNotBecomePermanentMissing(){
+  String name="Retry network";response=url->null;int[] status={-1};
+  OnlineLyrics.fetch(query(name),(lyrics,value)->status[0]=value);drain();assertEquals(OnlineLyrics.ERROR,status[0]);assertFalse(OnlineLyrics.knownMissing(query(name)));
+  response=url->track(name,"[00:01]Recuperada",true);OnlineLyrics.fetch(query(name),(lyrics,value)->status[0]=value);drain();assertEquals(OnlineLyrics.OK,status[0]);assertEquals(5000,connectTimeout);assertEquals(6000,readTimeout);
+ }
+ @Test public void malformedAndOversizedResponsesAreRecoverableErrors(){
+  for(String name:new String[]{"Malformed","Oversized"}){
+   response=url->name.equals("Malformed")?"not JSON":"x".repeat(1024*1024+1);int[] status={-1};
+   OnlineLyrics.fetch(query(name),(lyrics,value)->status[0]=value);drain();assertEquals(OnlineLyrics.ERROR,status[0]);assertFalse(OnlineLyrics.knownMissing(query(name)));
+  }
+ }
+ @Test public void missingHasExpiryAndIsDistinctFromTransportFailure(){
+  code=404;int[] status={-1};OnlineLyrics.Query query=query("Missing TTL");OnlineLyrics.fetch(query,(lyrics,value)->status[0]=value);drain();
+  assertEquals(OnlineLyrics.NOT_FOUND,status[0]);assertTrue(OnlineLyrics.knownMissing(query));
+  org.robolectric.shadows.ShadowSystemClock.advanceBy(java.time.Duration.ofMinutes(16));assertFalse(OnlineLyrics.knownMissing(query));
+ }
+ @Test public void rejectsWrongSearchHitEvenWhenItsDurationMatches(){
+  String name="Exact requested song";response=url->url.contains("search?")?"["+track("Another song","[00:01]Wrong",true)+"]":url.contains("api.lrcmux")?"{}":"{}";
+  int[] status={-1};OnlineLyrics.fetch(query(name),(lyrics,value)->{assertNull(lyrics);status[0]=value;});drain();assertEquals(OnlineLyrics.NOT_FOUND,status[0]);
+ }
+ @Test public void keepsPlainLyricsWhenSecondProviderFails(){
+  String name="Plain fallback";response=url->url.contains("api.lrcmux")?null:track(name,"Una letra sin tiempos",false);
+  Lyrics[] result={null};OnlineLyrics.fetch(query(name),(lyrics,status)->{assertEquals(OnlineLyrics.OK,status);result[0]=lyrics;});drain();assertNotNull(result[0]);assertFalse(result[0].synced);
+  assertNotNull(OnlineLyrics.cached(query(name)));
+ }
+ @Test public void albumsUseSeparateCacheKeysAndParseDoesNotExposeMetadata(){
+  assertNotEquals(query("Song").key(),new OnlineLyrics.Query("Luna Norte","Song","Other album",252).key());
+  Lyrics lyrics=Lyrics.parse("[ar:Someone]\n[00:02.30]Dos\n[00:01.10]Uno",Lyrics.SOURCE_FILE);assertTrue(lyrics.synced);assertEquals("Uno",lyrics.lines.get(0).text);assertEquals(0,lyrics.indexAt(1200));
+  assertNull(Lyrics.parse("x".repeat(1024*1024+1),Lyrics.SOURCE_FILE));
+ }
+
+ @Test public void cancellingActiveRequestSkipsOtherProviders(){
+  OnlineLyrics.Request[] request={null};String name="Cancel active";int[] delivered={0};
+  response=url->{request[0].cancel();return track(name,"[00:01]Old",true);};
+  request[0]=OnlineLyrics.fetch(query(name),(lyrics,status)->delivered[0]++);drain();assertEquals(1,calls);assertEquals(0,delivered[0]);
+ }
+}
