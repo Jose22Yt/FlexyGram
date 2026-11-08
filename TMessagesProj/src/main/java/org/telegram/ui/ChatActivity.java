@@ -9844,7 +9844,7 @@ public class ChatActivity extends BaseFragment implements
         Timer.finish(t);
 
         AndroidUtilities.runOnUIThread(() -> {
-            if (fragmentView != null && isAttachedToWindow()) {
+            if (fragmentView != null && fragmentView.isAttachedToWindow()) {
                 if (chatAttachAlert == null) {
                     createChatAttachView();
                 }
