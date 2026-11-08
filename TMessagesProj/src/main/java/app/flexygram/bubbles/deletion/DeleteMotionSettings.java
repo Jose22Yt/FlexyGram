@@ -32,9 +32,10 @@ public final class DeleteMotionSettings {
     }
 
     public static boolean effectsAllowed() {
-        // The native preference and accessibility remain authoritative.
+        // The native preference, accessibility and battery saver remain authoritative.
         return org.telegram.messenger.SharedConfig.animationsEnabled()
-                && !org.telegram.messenger.AndroidUtilities.isAccessibilityScreenReaderEnabled();
+                && !org.telegram.messenger.AndroidUtilities.isAccessibilityScreenReaderEnabled()
+                && !org.telegram.messenger.LiteMode.isPowerSaverApplied();
     }
 
     public static String[] labels() {

@@ -27,6 +27,7 @@ def write_stubs(source,root):
  return "Elige un estilo";}}''')
  put('org/telegram/messenger/AndroidUtilities.java','''package org.telegram.messenger;public class AndroidUtilities{public static boolean screenReader;public static int dp(float v){return(int)Math.ceil(v);}public static android.graphics.Typeface bold(){return android.graphics.Typeface.create("sans-serif",1);}public static boolean isAccessibilityScreenReaderEnabled(){return screenReader;}public static void runOnUIThread(Runnable r){new android.os.Handler(android.os.Looper.getMainLooper()).post(r);}}''')
  put('org/telegram/messenger/SharedConfig.java','package org.telegram.messenger;public class SharedConfig{public static boolean enabled=true;public static boolean animationsEnabled(){return enabled;}}')
+ put('org/telegram/messenger/LiteMode.java','package org.telegram.messenger;public class LiteMode{public static boolean powerSaver;public static boolean isPowerSaverApplied(){return powerSaver;}}')
  put('org/telegram/messenger/NotificationCenter.java','''package org.telegram.messenger;public class NotificationCenter{
  public static final int didSetNewTheme=1,didApplyNewTheme=2,didSetNewWallpapper=3;static final NotificationCenter n=new NotificationCenter();public static NotificationCenter getGlobalInstance(){return n;}
  public interface NotificationCenterDelegate{void didReceivedNotification(int id,int account,Object...args);}public void addObserver(Object o,int id){}public void removeObserver(Object o,int id){}}''')

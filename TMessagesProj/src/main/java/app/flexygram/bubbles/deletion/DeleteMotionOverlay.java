@@ -22,7 +22,8 @@ public final class DeleteMotionOverlay extends View implements Choreographer.Fra
     private final ViewGroup host;
     private final WeakReference<View> source;
     private final float left,top,contentWidth,contentHeight;
-    private final long durationMs = 2000L;
+    private final float boundsLeft,boundsTop;
+    private final long durationMs = 850L;
     private final int imagePixels;
     private Bitmap image;
     private BubbleFractureRenderer renderer;
@@ -103,28 +104,40 @@ public final class DeleteMotionOverlay extends View implements Choreographer.Fra
                 }
             }
             target.cell.draw(canvas);
-            DeleteMotionOverlay overlay=new DeleteMotionOverlay(host,target.cell,image,x,y,bounds.width(),bounds.height(),style);
+            DeleteMotionOverlay overlay=new DeleteMotionOverlay(host,target.cell,image,x,y,bounds.left,bounds.top,bounds.width(),bounds.height(),style);
             pixels+=width*height;overlay.budgeted=true;return overlay;
         }catch(OutOfMemoryError|RuntimeException error){if(image!=null && !image.isRecycled())image.recycle();return null;}
         finally{if(cell!=null)cell.drawingToBitmap=drawing;}
     }
-    private DeleteMotionOverlay(ViewGroup host,View source,Bitmap image,float left,float top,float width,float height,int style){
+    private DeleteMotionOverlay(ViewGroup host,View source,Bitmap image,float left,float top,float boundsLeft,float boundsTop,float width,float height,int style){
         super(host.getContext());this.host=host;this.source=new WeakReference<>(source);this.image=image;
-        this.left=left;this.top=top;contentWidth=width;contentHeight=height;imagePixels=image.getWidth()*image.getHeight();
+        this.left=left;this.top=top;this.boundsLeft=boundsLeft;this.boundsTop=boundsTop;contentWidth=width;contentHeight=height;imagePixels=image.getWidth()*image.getHeight();
         renderer=new BubbleFractureRenderer(image,width,height,getResources().getDisplayMetrics().density,style,(int)durationMs,System.nanoTime());
         setWillNotDraw(false);setClickable(false);setFocusable(false);setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);
     }
     private void start(){host.addOnAttachStateChangeListener(hostListener);Choreographer.getInstance().postFrameCallback(this);invalidate();}
     @Override public void doFrame(long nanos){
         if(stopped)return;
+        View src=source.get();
+        if(src!=null && !src.isAttachedToWindow()){stop();return;}
         if(firstFrame<0)firstFrame=nanos;
         progress=DeleteMotionMath.clamp((nanos-firstFrame)/(durationMs*1_000_000f));invalidate();
         if(progress>=1)stop();else Choreographer.getInstance().postFrameCallback(this);
     }
     @Override protected void onDraw(Canvas canvas){
         if(stopped || image==null || image.isRecycled())return;
-        int save=canvas.save();canvas.clipRect(0,0,host.getWidth(),host.getHeight());canvas.translate(left,top);
-        renderer.draw(canvas,progress,FractureMotionMath.exitDistance(top,host.getHeight(),contentWidth,contentHeight));
+        float currentLeft=left,currentTop=top;
+        View src=source.get();
+        if(src!=null){
+            if(!src.isAttachedToWindow()){post(this::stop);return;}
+            if(host.isAttachedToWindow()){
+                int[] at=new int[2],origin=new int[2];src.getLocationInWindow(at);host.getLocationInWindow(origin);
+                currentLeft=at[0]-origin[0]+boundsLeft;currentTop=at[1]-origin[1]+boundsTop;
+                if(currentTop+contentHeight<-150 || currentTop>host.getHeight()+150){post(this::stop);return;}
+            }
+        }
+        int save=canvas.save();canvas.clipRect(0,0,host.getWidth(),host.getHeight());canvas.translate(currentLeft,currentTop);
+        renderer.draw(canvas,progress,FractureMotionMath.exitDistance(currentTop,host.getHeight(),contentWidth,contentHeight));
         canvas.restoreToCount(save);
     }
     private void stop(){

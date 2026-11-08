@@ -6,7 +6,7 @@ import java.lang.reflect.*;import java.nio.file.Files;import java.nio.file.Paths
 @RunWith(RobolectricTestRunner.class) @Config(manifest=Config.NONE,sdk=35) @GraphicsMode(GraphicsMode.Mode.NATIVE)
 public class DeleteMotionTest{
  Activity activity;FrameLayout root;
- @Before public void setup(){activity=Robolectric.buildActivity(Activity.class).setup().get();root=new FrameLayout(activity);activity.setContentView(root);size(root,640,840);DeleteMotionSettings.set(activity,0);SharedConfig.enabled=true;AndroidUtilities.screenReader=false;Theme.dark=false;Theme.wallpaper=new ColorDrawable(0xff43674b);}
+ @Before public void setup(){activity=Robolectric.buildActivity(Activity.class).setup().get();root=new FrameLayout(activity);activity.setContentView(root);size(root,640,840);DeleteMotionSettings.set(activity,0);SharedConfig.enabled=true;AndroidUtilities.screenReader=false;LiteMode.powerSaver=false;Theme.dark=false;Theme.wallpaper=new ColorDrawable(0xff43674b);}
  void size(View v,int w,int h){v.measure(View.MeasureSpec.makeMeasureSpec(w,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(h,View.MeasureSpec.EXACTLY));v.layout(0,0,w,h);}
  static Object field(Object object,String name)throws Exception{Field f=object.getClass().getDeclaredField(name);f.setAccessible(true);return f.get(object);}
  static void set(Object object,String name,Object value)throws Exception{Field f=object.getClass().getDeclaredField(name);f.setAccessible(true);f.set(object,value);}
@@ -28,9 +28,9 @@ public class DeleteMotionTest{
  }
  @Test public void effectsRespectAccessibilityAndNativeFallback()throws Exception{
   TextView v=sample();int[] calls={0};
-  for(int mode=0;mode<3;mode++){SharedConfig.enabled=mode!=1;AndroidUtilities.screenReader=mode==2;
+  for(int mode=0;mode<4;mode++){SharedConfig.enabled=mode!=1;AndroidUtilities.screenReader=mode==2;LiteMode.powerSaver=mode==3;
    assertEquals(0,DeleteMotionOverlay.runNativeDelete(root,Collections.singletonList(target(v)),mode==0?0:1,()->calls[0]++));}
-  assertEquals(3,calls[0]);assertTrue(overlays().isEmpty());
+  assertEquals(4,calls[0]);assertTrue(overlays().isEmpty());
  }
  @Test public void captureFailureDoesNotPreventDeletion()throws Exception{
   View v=new View(activity){@Override public void draw(Canvas c){throw new IllegalStateException("fixture capture failure");}};root.addView(v);size(v,100,50);int[] nativeCalls={0};
