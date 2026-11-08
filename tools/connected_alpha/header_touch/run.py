@@ -35,6 +35,34 @@ public class ControlOwner extends FrameLayout {
 }'''.replace('PREFIX',prefix))
 
 
+    chat = (root/'TMessagesProj/src/main/java/org/telegram/ui/ChatActivity.java').read_text()
+    start = chat.index('                if (showSearchAsIcon || showAudioCallAsIcon || UserObject.isBotForumWithEditableTopics(currentUser))')
+    end = chat.index('                if (showSearchAsIcon) {', start)
+    margins = chat[start:end]
+    (source/'HeaderHost.java').write_text('''
+import android.content.Context;import android.view.*;import android.widget.*;
+public class HeaderHost extends FrameLayout {
+ final FrameLayout avatarContainer;final ImageView more,call;
+ boolean signature=true,centered=false,showSearchAsIcon,showAudioCallAsIcon;
+ Object currentUser;int chatMode;static final int MODE_SAVED=1;
+ static class UserObject{static boolean isBotForumWithEditableTopics(Object u){return false;}}
+ static class AndroidUtilities{static int dp(int value){return value;}}
+ boolean isTitleCentered(){return centered;}boolean usesSignatureHeader(){return signature;}
+ public HeaderHost(Context c){super(c);
+  avatarContainer=new FrameLayout(c);avatarContainer.setClipChildren(false);
+  more=new ImageView(c);call=new ImageView(c);
+  avatarContainer.addView(call,new FrameLayout.LayoutParams(48,48));avatarContainer.addView(more,new FrameLayout.LayoutParams(48,48));
+  addView(avatarContainer,new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT,60));
+ }
+ @Override protected void onMeasure(int w,int h){MARGINS super.onMeasure(w,h);}
+ @Override protected void onLayout(boolean changed,int l,int t,int r,int b){
+  super.onLayout(changed,l,t,r,b);
+  // Signature geometry is calculated from the full ActionBar width, not the title width.
+  more.layout(getWidth()-52,6,getWidth()-4,54);call.layout(getWidth()-104,6,getWidth()-56,54);
+ }
+}'''.replace('MARGINS',margins))
+
+
 if __name__ == '__main__':
     result = pipeline.main(here=HERE,test_class='HeaderTouchTest',stubs_writer=write_stubs)
     print('PASS: native Android header touch/popup regression; production measure entry; app navigation/device not exercised.')

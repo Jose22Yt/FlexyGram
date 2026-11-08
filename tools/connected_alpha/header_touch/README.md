@@ -17,3 +17,12 @@ Before the fix, the menu and call tests failed: temporarily setting the controls
 to `GONE` during measurement cancelled their pending clicks. With the active
 header branch evaluated first, all three tests pass. The UI beta workflow runs
 this probe before assembling the APK.
+
+The host-width regression also extracts the chat root's production margin block.
+Signature geometry uses the full ActionBar width. An old native-menu right margin
+of 52/92 dp reduced the avatar container's touch area while its overflow remained
+drawn outside it. With title centering off, the unpatched code loses the overflow
+click. The fixed code opens a real PopupWindow and dispatches the call click at
+320, 400 and 800 px widths, with and without native action flags. A separate test
+checks that native headers retain their original reserved menu space. Header
+geometry and account services remain fixtures; no logged-in device is exercised.

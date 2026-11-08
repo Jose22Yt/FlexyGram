@@ -19917,13 +19917,15 @@ public class ChatActivity extends BaseFragment implements
                     showSearchAsIcon = false;
                 }
                 showSearchAsIcon = showSearchAsIcon && !isTitleCentered();
+                // Signature action buttons occupy the full bar, including when title centering is off.
+                // Reserving native menu space here leaves the visible overflow outside its touch parent.
                 if (showSearchAsIcon || showAudioCallAsIcon || UserObject.isBotForumWithEditableTopics(currentUser)) {
                     if (avatarContainer != null && avatarContainer.getLayoutParams() != null) {
-                        ((ViewGroup.MarginLayoutParams) avatarContainer.getLayoutParams()).rightMargin = isTitleCentered() ? 0 : AndroidUtilities.dp(chatMode == MODE_SAVED ? 52 : 92);
+                        ((ViewGroup.MarginLayoutParams) avatarContainer.getLayoutParams()).rightMargin = usesSignatureHeader() || isTitleCentered() ? 0 : AndroidUtilities.dp(chatMode == MODE_SAVED ? 52 : 92);
                     }
                 } else {
                     if (avatarContainer != null && avatarContainer.getLayoutParams() != null) {
-                        ((ViewGroup.MarginLayoutParams) avatarContainer.getLayoutParams()).rightMargin = isTitleCentered() ? 0 : AndroidUtilities.dp(52);
+                        ((ViewGroup.MarginLayoutParams) avatarContainer.getLayoutParams()).rightMargin = usesSignatureHeader() || isTitleCentered() ? 0 : AndroidUtilities.dp(52);
                     }
                 }
                 if (showSearchAsIcon) {
