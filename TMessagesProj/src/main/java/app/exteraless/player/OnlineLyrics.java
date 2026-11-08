@@ -98,12 +98,12 @@ public final class OnlineLyrics {
     private static final int MAX_RESPONSE_BYTES = 1024 * 1024;
     private static final long MISSING_TTL_MS = 15 * 60_000L;
     private static final int MAX_DURATION_DIFF = 3;
-    private static final int MAX_FALLBACK_DURATION_DIFF = 15;
+    private static final int MAX_FALLBACK_DURATION_DIFF = 5;
     private static final int ALIGN_WINDOW = 4;
     private static final float MIN_ALIGNED = 0.9f;
     private static final Pattern NOT_WORD = Pattern.compile("[^\\p{L}\\p{N}]+");
     private static final Pattern AUDIO_EXT = Pattern.compile("\\.(mp3|m4a|flac|ogg|oga|opus|wav|aac|alac|wma)$", Pattern.CASE_INSENSITIVE);
-    private static final Pattern DECORATION = Pattern.compile("\\s*[(\\[][^)\\]]*(official|lyric|video|audio|visualizer|remaster|hq|hd|mix|edit|version|radio|club|extended|bonus|single|feat|ft\\.)[^)\\]]*[)\\]]", Pattern.CASE_INSENSITIVE);
+    private static final Pattern DECORATION = Pattern.compile("\\s*[(\\[][^)\\]]*(official|lyric|video|audio|visualizer|remaster|hq|hd)[^)\\]]*[)\\]]", Pattern.CASE_INSENSITIVE);
     private static final DispatchQueue queue = new DispatchQueue("lyrics");
     private static final LruCache<String, Lyrics> memory = new LruCache<>(24);
     private static final LruCache<String, Long> missing = new LruCache<>(64);
@@ -306,24 +306,10 @@ public final class OnlineLyrics {
         if (candTitle == null && "trackName".equals(titleKey)) {
             candTitle = optString(candidate, "name");
         }
-        if (candTitle == null) return false;
-        String idTitle = identity(title);
-        String idCandTitle = identity(candTitle);
-        boolean titleMatch = idTitle.equals(idCandTitle)
-                || (idTitle.length() >= 3 && idCandTitle.contains(idTitle))
-                || (idCandTitle.length() >= 3 && idTitle.contains(idCandTitle));
-        if (!titleMatch) return false;
-
+        if (candTitle == null || !identity(title).equals(identity(candTitle))) return false;
         if (!TextUtils.isEmpty(artist)) {
             String candArtist = optString(candidate, artistKey);
-            if (candArtist != null) {
-                String idArtist = identity(artist);
-                String idCandArtist = identity(candArtist);
-                boolean artistMatch = idArtist.equals(idCandArtist)
-                        || (idArtist.length() >= 3 && idCandArtist.contains(idArtist))
-                        || (idCandArtist.length() >= 3 && idArtist.contains(idCandArtist));
-                if (!artistMatch) return false;
-            }
+            if (candArtist == null || !identity(artist).equals(identity(candArtist))) return false;
         }
         double actual = candidate.optDouble("duration", 0);
         return Double.isFinite(actual) && (duration <= 0 || actual <= 0 || Math.abs(actual - duration) <= MAX_FALLBACK_DURATION_DIFF);
