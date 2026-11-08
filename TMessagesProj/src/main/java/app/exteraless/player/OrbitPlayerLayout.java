@@ -77,7 +77,22 @@ public final class OrbitPlayerLayout extends FrameLayout {
     public void setInsets(int top,int bottom){if(topInset!=top||bottomInset!=bottom){topInset=top;bottomInset=bottom;requestLayout();}}
     public void bindSong(String title,String artist){song=title;compactSong.setText(title+" · "+artist);artwork.setContentDescription(title+", "+artist);header.requestLayout();}
     public void setPlaying(boolean playing){playIcon=PlayerIcon.fill(playing?PlayerIcon.PAUSE:PlayerIcon.PLAY,20);if(colors!=null)playIcon.setColor(colors.primary);compactPlay.setImageDrawable(playIcon);compactPlay.setContentDescription(LocaleController.getString(playing?R.string.AccActionPause:R.string.AccActionPlay));ImageView play=(ImageView)lyricsControls.getChildAt(0);play.setImageDrawable(PlayerIcon.fill(playing?PlayerIcon.PAUSE:PlayerIcon.PLAY,24));play.setContentDescription(compactPlay.getContentDescription());if(colors!=null)((PlayerIcon)play.getDrawable()).setColor(colors.primary);}
-    public void setLyricsMode(boolean value){lyrics=value;scroll.setVisibility(value?INVISIBLE:VISIBLE);artwork.setVisibility(value?INVISIBLE:VISIBLE);lyricsPanel.setVisibility(value?VISIBLE:GONE);lyricsControls.setVisibility(value?VISIBLE:GONE);requestLayout();}
+    public void setLyricsMode(boolean value){
+        lyrics=value;
+        scroll.setVisibility(value?INVISIBLE:VISIBLE);
+        artwork.setVisibility(value?INVISIBLE:VISIBLE);
+        lyricsPanel.setVisibility(value?VISIBLE:GONE);
+        lyricsControls.setVisibility(value?VISIBLE:GONE);
+        if(lyrics){
+            lyricsPanel.bringToFront();
+            lyricsControls.bringToFront();
+            header.bringToFront();
+        }else{
+            header.bringToFront();
+            artwork.bringToFront();
+        }
+        requestLayout();
+    }
     public void setColors(PlayerColors value){colors=value;setBackgroundColor(value.surface);artwork.setColors(value);for(MusicBlurSurface s:surfaces)s.setColors(value);compactSong.setTextColor(value.onSurfaceVariant);playIcon.setColor(value.primary);nextIcon.setColor(value.onSurface);for(int i=0;i<lyricsControls.getChildCount();i++)((PlayerIcon)((ImageView)lyricsControls.getChildAt(i)).getDrawable()).setColor(value.primary);header.invalidate();}
     @Override protected void onAttachedToWindow(){super.onAttachedToWindow();for(MusicBlurSurface s:surfaces)s.attach();}
     @Override protected void onDetachedFromWindow(){for(MusicBlurSurface s:surfaces)s.detach();super.onDetachedFromWindow();}
@@ -109,15 +124,19 @@ public final class OrbitPlayerLayout extends FrameLayout {
         collapse=lyrics?1:OrbitMotion.fraction(scroll.getScrollY(),distance);
         header.place(collapse);
         float size=OrbitMotion.mix(diameter,dp(36),collapse),scale=size/diameter;
-        float startX=(getWidth()-diameter)*.5f,startY=artworkSlot.getTop()-scroll.getScrollY();
+        float startX=(getWidth()-diameter)*.5f,startY=artworkSlot.getTop();
         float endX=header.pill.getLeft()+dp(8),endY=header.getTop()+header.pill.getTop()+(header.pill.getHeight()-dp(36))*.5f;
         if(getLayoutDirection()==LAYOUT_DIRECTION_RTL)endX=header.pill.getRight()-dp(44);
-        artwork.setTranslationX(OrbitMotion.mix(startX,endX,collapse));artwork.setTranslationY(OrbitMotion.mix(startY,endY,collapse));artwork.setScaleX(scale);artwork.setScaleY(scale);artwork.setRingAlpha(1-collapse);
+        artwork.setTranslationX(OrbitMotion.mix(startX,endX,collapse));
+        artwork.setTranslationY(Math.max(endY,OrbitMotion.mix(startY,endY,collapse)));
+        artwork.setScaleX(scale);artwork.setScaleY(scale);artwork.setRingAlpha(1-collapse);
         artwork.setEnabled(!lyrics&&collapse<.1f);artwork.setImportantForAccessibility(collapse>.1f?IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS:IMPORTANT_FOR_ACCESSIBILITY_YES);
-        titleRow.setAlpha(1-collapse);controls.setAlpha(1-collapse);titleRow.setImportantForAccessibility(collapse>.5f?IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS:IMPORTANT_FOR_ACCESSIBILITY_AUTO);
-        controls.setVisibility(collapse>=1?INVISIBLE:VISIBLE);
-        // Header always wins hit testing, except for the exposed large seek ring.
-        if(lyrics)header.bringToFront();
+        titleRow.setAlpha(1-collapse);controls.setAlpha(1-collapse);
+        titleRow.setImportantForAccessibility(collapse>.5f?IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS:IMPORTANT_FOR_ACCESSIBILITY_AUTO);
+        controls.setImportantForAccessibility(collapse>.5f?IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS:IMPORTANT_FOR_ACCESSIBILITY_AUTO);
+        boolean docked=collapse>=.85f;
+        controls.setEnabled(!docked);
+        controls.setVisibility(docked?INVISIBLE:VISIBLE);
     }
     private final class Header extends ViewGroup {
         private final View back,more;
@@ -126,7 +145,7 @@ public final class OrbitPlayerLayout extends FrameLayout {
         private final FrameLayout pill;
         private final LinearLayout labels;
         Header(Context c,View back,View more){super(c);this.back=back;this.more=more;remove(back);remove(more);addView(back);addView(more);
-            pill=new FrameLayout(c);pill.setClipChildren(true);addView(pill);labels=new LinearLayout(c);labels.setOrientation(LinearLayout.VERTICAL);labels.setGravity(Gravity.CENTER);remove(sourceLabel);remove(sourceTitle);labels.addView(sourceLabel);labels.addView(sourceTitle);labels.addView(compactSong);pill.addView(labels);pill.addView(compactPlay);pill.addView(compactNext);}
+            pill=new FrameLayout(c);pill.setClipChildren(true);pill.setClickable(true);addView(pill);labels=new LinearLayout(c);labels.setOrientation(LinearLayout.VERTICAL);labels.setGravity(Gravity.CENTER);remove(sourceLabel);remove(sourceTitle);labels.addView(sourceLabel);labels.addView(sourceTitle);labels.addView(compactSong);pill.addView(labels);pill.addView(compactPlay);pill.addView(compactNext);}
         @Override public void draw(Canvas canvas){if(!MusicBlurSurface.isCapturing())super.draw(canvas);}
         @Override protected void onMeasure(int ws,int hs){int w=MeasureSpec.getSize(ws),h=MeasureSpec.getSize(hs);stacked=w<dp(320)||getResources().getConfiguration().fontScale>1.6f;desiredWidth=Math.max(dp(100),Math.round(Math.max(sourceTitle.getPaint().measureText(sourceTitle.getText().toString()),sourceLabel.getPaint().measureText(sourceLabel.getText().toString()))+dp(28)));for(View v:new View[]{back,more})v.measure(MeasureSpec.makeMeasureSpec(dp(48),MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(dp(48),MeasureSpec.EXACTLY));pill.measure(MeasureSpec.makeMeasureSpec(Math.max(1,w-dp(120)),MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec((stacked?h-dp(52):h)-dp(4),MeasureSpec.EXACTLY));compactPlay.measure(MeasureSpec.makeMeasureSpec(dp(48),MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(dp(48),MeasureSpec.EXACTLY));compactNext.measure(MeasureSpec.makeMeasureSpec(dp(48),MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(dp(48),MeasureSpec.EXACTLY));setMeasuredDimension(w,h);}
         @Override protected void onLayout(boolean changed,int l,int t,int r,int b){place(collapse);}
@@ -139,6 +158,7 @@ public final class OrbitPlayerLayout extends FrameLayout {
             sourceLabel.setVisibility(docked||getResources().getConfiguration().fontScale>1.6f?GONE:VISIBLE);compactSong.setVisibility(docked&&getResources().getConfiguration().fontScale<=1.6f?VISIBLE:GONE);
             int textWidth=Math.max(dp(12),pw-start-end);labels.measure(MeasureSpec.makeMeasureSpec(textWidth,MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(pill.getHeight(),MeasureSpec.AT_MOST));int tx=rtl?end:start,ty=(pill.getHeight()-labels.getMeasuredHeight())/2;labels.layout(tx,ty,tx+textWidth,ty+labels.getMeasuredHeight());
             compactPlay.setVisibility(docked?VISIBLE:INVISIBLE);compactNext.setVisibility(docked&&actionCount==2?VISIBLE:INVISIBLE);
+            compactPlay.setEnabled(docked);compactNext.setEnabled(docked&&actionCount==2);
             int px=rtl?dp(2):pw-dp(48)*actionCount;compactPlay.layout(px,(pill.getHeight()-dp(48))/2,px+dp(48),(pill.getHeight()+dp(48))/2);int nx=rtl?dp(50):pw-dp(48);compactNext.layout(nx,(pill.getHeight()-dp(48))/2,nx+dp(48),(pill.getHeight()+dp(48))/2);
             compactPlay.setAlpha(fraction);compactNext.setAlpha(fraction);
         }

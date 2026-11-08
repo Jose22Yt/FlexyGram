@@ -20,7 +20,19 @@ public class ControlsRow extends ViewGroup implements MorphButton.PressListener 
     private final Paint dockPaint=new Paint(Paint.ANTI_ALIAS_FLAG);
     private int dockColor;
     public void setOrbitColors(PlayerColors colors){dockColor=colors.outlineVariant;setWillNotDraw(false);invalidate();}
-    @Override protected void onDraw(Canvas canvas){if(BuildConfig.CONNECTED_ALPHA&&signatureInline&&dockColor!=0){dockPaint.setColor(dockColor);dockPaint.setStyle(Paint.Style.STROKE);dockPaint.setStrokeWidth(dp(1));canvas.drawRoundRect(prev.getLeft()-dp(2),getHeight()/2f-dp(24),next.getRight()+dp(2),getHeight()/2f+dp(24),dp(24),dp(24),dockPaint);}}
+    @Override protected void onDraw(Canvas canvas){
+        if(BuildConfig.CONNECTED_ALPHA&&signatureInline&&dockColor!=0){
+            dockPaint.setColor(dockColor);
+            dockPaint.setStyle(Paint.Style.STROKE);
+            dockPaint.setStrokeWidth(dp(1));
+            float capsuleTop = Math.max(dp(1), (getHeight() - signaturePlaySize) / 2f - dp(2));
+            float capsuleBottom = Math.min(getHeight() - dp(1), (getHeight() + signaturePlaySize) / 2f + dp(2));
+            float capsuleRadius = (capsuleBottom - capsuleTop) * 0.5f;
+            float capsuleLeft = Math.max(shuffle.getRight() + dp(4), prev.getLeft() - dp(12));
+            float capsuleRight = Math.min(repeat.getLeft() - dp(4), next.getRight() + dp(12));
+            canvas.drawRoundRect(capsuleLeft, capsuleTop, capsuleRight, capsuleBottom, capsuleRadius, capsuleRadius, dockPaint);
+        }
+    }
     private MorphButton pressed;
     private boolean playing;
     private boolean shuffleOn;

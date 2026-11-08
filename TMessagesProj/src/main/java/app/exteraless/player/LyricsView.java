@@ -59,7 +59,7 @@ public class LyricsView extends FrameLayout {
     public interface PositionProvider { long positionMs(); }
     private PositionProvider positionProvider;
     private TextView followButton;
-    private int colorText;
+    private int colorText = 0xffffffff;
     private boolean clockScheduled;
     private final Runnable positionTick=new Runnable(){public void run(){
         clockScheduled=false;
@@ -94,7 +94,7 @@ public class LyricsView extends FrameLayout {
     private int active = -1;
     private long userScrollAt;
     private boolean userDragging;
-    private int colorActive;
+    private int colorActive = 0xff2688eb;
     private long positionMs;
     private long positionAt;
     private final Runnable resumeFollow = () -> {

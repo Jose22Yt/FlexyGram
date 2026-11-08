@@ -86,14 +86,16 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
         if (BuildConfig.CONNECTED_ALPHA) { blurSurface = new MusicBlurSurface(card, dp(22)); card.setBackground(blurSurface); }
         progress = new MusicProgressView(context, false);
         card.addView(progress, LayoutHelper.createFrame(-1,2,Gravity.BOTTOM,dp(0),0,0,0));
-        card.setOutlineProvider(new ViewOutlineProvider() {
-            @Override
-            public void getOutline(View view, Outline outline) {
-                outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), dp(20));
-            }
-        });
-        card.setClipToOutline(true);
-        card.setElevation(dp(1));
+        if (!BuildConfig.CONNECTED_ALPHA) {
+            card.setOutlineProvider(new ViewOutlineProvider() {
+                @Override
+                public void getOutline(View view, Outline outline) {
+                    outline.setRoundRect(0, 0, view.getWidth(), view.getHeight(), dp(20));
+                }
+            });
+            card.setClipToOutline(true);
+            card.setElevation(dp(1));
+        }
         card.setOnClickListener(v -> Md3Player.open(fragment, this));
         card.setOnLongClickListener(v->{if(signatureHost!=null&&signatureHost.canCompact()){SignatureMusicPresentation.setCompact(true);return true;}return false;});
         card.setContentDescription(getString(R.string.OEPlayerOpen));
@@ -398,7 +400,7 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
         progress.setColors(c);
         cardBg.setColor(c.primaryContainer);
         cardBg.setStroke(dp(1), c.outlineVariant);
-        if (Build.VERSION.SDK_INT >= 28) {
+        if (Build.VERSION.SDK_INT >= 28 && !BuildConfig.CONNECTED_ALPHA) {
             card.setOutlineSpotShadowColor(c.shadow());
             card.setOutlineAmbientShadowColor(c.shadow());
         }

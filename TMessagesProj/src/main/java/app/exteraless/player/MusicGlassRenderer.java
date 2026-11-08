@@ -38,5 +38,5 @@ final class MusicGlassRenderer {
         if(surface!=color||outline!=stroke){surface=color;outline=stroke;drawable.updateColors();}
         drawable.setBounds(bounds);drawable.draw(canvas);
     }
-    void clear(){recorded=null;source.beginRecording(1,1);source.endRecording();}
+    void clear(){recorded=null;width=0;height=0;source.beginRecording(1,1);source.endRecording();}
 }
