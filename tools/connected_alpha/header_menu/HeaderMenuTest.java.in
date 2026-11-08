@@ -1,0 +1,38 @@
+import android.app.Activity;import android.content.*;import android.content.res.*;import android.graphics.*;import android.os.Looper;import android.util.DisplayMetrics;import android.view.*;import android.widget.*;
+import org.telegram.messenger.R;import org.telegram.ui.ActionBar.*;
+import org.junit.*;import org.junit.runner.RunWith;import org.robolectric.*;import org.robolectric.annotation.*;import static org.junit.Assert.*;
+
+@RunWith(RobolectricTestRunner.class) @Config(manifest=Config.NONE,sdk=35) @GraphicsMode(GraphicsMode.Mode.NATIVE)
+public class HeaderMenuTest{
+ private Activity activity;private Context context;private FrameLayout root;
+ @Before public void setup()throws Exception{
+  activity=Robolectric.buildActivity(Activity.class).setup().get();root=new FrameLayout(activity);activity.setContentView(root);
+  AssetManager assets=AssetManager.class.getDeclaredConstructor().newInstance();AssetManager.class.getMethod("addAssetPath",String.class).invoke(assets,System.getProperty("probe.root")+"/resources.ap_");
+  DisplayMetrics metrics=new DisplayMetrics();metrics.density=1;metrics.densityDpi=160;metrics.scaledDensity=1;
+  Resources r=new Resources(assets,metrics,new Configuration());
+  R.drawable.popup_fixed_alert2=r.getIdentifier("popup_fixed_alert2","drawable","app.flexygram.visualprobe");R.drawable.popup_fixed_alert4=r.getIdentifier("popup_fixed_alert4","drawable","app.flexygram.visualprobe");R.drawable.greydivider=r.getIdentifier("greydivider","drawable","app.flexygram.visualprobe");
+  context=new ContextWrapper(activity){@Override public Resources getResources(){return r;}};
+ }
+ @Test public void nativeMenuHasVisibleRowsOnEveryHeaderPresentation(){
+  for(boolean external:new boolean[]{false,true})for(boolean blur:new boolean[]{false,true}){
+   ActionBar bar=new ActionBar(context);root.addView(bar,new FrameLayout.LayoutParams(400,80));
+   ActionBarMenu menu=new ActionBarMenu(context,bar);bar.addView(menu,new FrameLayout.LayoutParams(400,56));
+   ActionBarMenuItem item=new ActionBarMenuItem(context,menu);menu.addView(item,new LinearLayout.LayoutParams(48,56));
+   ImageView source=new ImageView(context);FrameLayout.LayoutParams lp=new FrameLayout.LayoutParams(48,48);lp.leftMargin=344;lp.topMargin=24;bar.addView(source,lp);
+   if(external)item.setVisibility(View.GONE);if(blur)item.useBlur();
+   bar.measure(View.MeasureSpec.makeMeasureSpec(400,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(80,View.MeasureSpec.EXACTLY));bar.layout(0,0,400,80);
+   item.toggleSubMenu(null,external?source:null,false);Shadows.shadowOf(Looper.getMainLooper()).idleFor(java.time.Duration.ofSeconds(1));
+   assertTrue("popup not showing",item.showing());View content=item.contents();
+   if(content.getWidth()==0){content.measure(View.MeasureSpec.makeMeasureSpec(360,View.MeasureSpec.AT_MOST),View.MeasureSpec.makeMeasureSpec(700,View.MeasureSpec.AT_MOST));content.layout(0,0,content.getMeasuredWidth(),content.getMeasuredHeight());}
+   assertTrue("empty menu width",content.getWidth()>0);assertTrue("empty menu height",content.getHeight()>0);
+   Bitmap image=Bitmap.createBitmap(content.getWidth(),content.getHeight(),Bitmap.Config.ARGB_8888);content.draw(new Canvas(image));int dark=0;
+   for(int y=0;y<image.getHeight();y++)for(int x=0;x<image.getWidth();x++){int c=image.getPixel(x,y);if(Color.alpha(c)>150&&Color.red(c)<100)dark++;}
+   assertTrue("menu rows invisible, external="+external+", blur="+blur+", pixels="+dark,dark>10);
+   image.recycle();item.dismiss();root.removeView(bar);
+  }
+ }
+ @Test public void nativeMenuWithSystemAnimationsDisabled()throws Exception{
+  var scale=android.animation.ValueAnimator.class.getDeclaredMethod("setDurationScale",float.class);scale.setAccessible(true);scale.invoke(null,0f);
+  try{nativeMenuHasVisibleRowsOnEveryHeaderPresentation();}finally{scale.invoke(null,1f);}
+ }
+}
