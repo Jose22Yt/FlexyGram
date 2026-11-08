@@ -282,7 +282,7 @@ object AppearanceConfig {
 
     @JvmField
     val lrclibAllowed =
-        addConfig("OEPlayerLrclibAllowed", ConfigItem.configTypeBool, true)
+        addConfig("OEPlayerLrclibAllowed", ConfigItem.configTypeBool, false)
 
     /** Широкая нижняя панель как в Telegram iOS. Уступает M3-панели, если включены обе. */
     @JvmField
