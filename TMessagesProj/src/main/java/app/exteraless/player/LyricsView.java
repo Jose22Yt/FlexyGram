@@ -56,6 +56,23 @@ public class LyricsView extends FrameLayout {
         void onSeek(long ms);
     }
 
+    public interface PositionProvider { long positionMs(); }
+    private PositionProvider positionProvider;
+    private TextView followButton;
+    private int colorText = 0xffffffff;
+    private boolean clockScheduled;
+    private final Runnable positionTick=new Runnable(){public void run(){
+        clockScheduled=false;
+        if(!isAttachedToWindow()||!isShown()||state!=STATE_LYRICS||lyrics==null||!lyrics.synced||positionProvider==null)return;
+        setPosition(positionProvider.positionMs());
+    }};
+    public void setPositionProvider(PositionProvider provider){positionProvider=provider;restartClock();}
+    private void restartClock(){removeCallbacks(positionTick);clockScheduled=false;ensureClock();}
+    private void ensureClock(){
+        boolean active=positionProvider!=null&&isAttachedToWindow()&&isShown()&&state==STATE_LYRICS&&lyrics!=null&&lyrics.synced&&!MediaController.getInstance().isMessagePaused();
+        if(!active){removeCallbacks(positionTick);clockScheduled=false;}
+        else if(!clockScheduled){clockScheduled=true;postDelayed(positionTick,150);}
+    }
     private final RecyclerListView list;
     private final LinearLayoutManager layoutManager;
     private final Adapter adapter = new Adapter();
@@ -77,18 +94,19 @@ public class LyricsView extends FrameLayout {
     private int active = -1;
     private long userScrollAt;
     private boolean userDragging;
-    private int colorActive;
+    private int colorActive = 0xff2688eb;
     private long positionMs;
     private long positionAt;
     private final Runnable resumeFollow = () -> {
         userScrollAt = 0;
+        userDragging=false;followButton.setVisibility(GONE);
         updateBlur();
         scrollToActive(true);
     };
 
     private final Runnable scrollToCurrent = () -> scrollToActive(false);
 
-    private static final long FOLLOW_RESUME_MS = 750;
+    private static final long FOLLOW_RESUME_MS = 6000;
     private static final int MAX_BLUR_DISTANCE = 4;
     private static final float BLUR_PER_LINE_DP = 1.25f;
 
@@ -115,13 +133,14 @@ public class LyricsView extends FrameLayout {
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 userDragging = newState == RecyclerView.SCROLL_STATE_DRAGGING;
                 if (newState != RecyclerView.SCROLL_STATE_IDLE && userDragging) {
-                    userScrollAt = SystemClock.elapsedRealtime();
+                    userScrollAt = Math.max(1,SystemClock.elapsedRealtime());
                     removeCallbacks(resumeFollow);
+                    followButton.setVisibility(lyrics!=null&&lyrics.synced?VISIBLE:GONE);
                     updateBlur();
                 } else if (newState == RecyclerView.SCROLL_STATE_IDLE && userScrollAt != 0) {
-                    userScrollAt = SystemClock.elapsedRealtime();
+                    userScrollAt = Math.max(1,SystemClock.elapsedRealtime());
                     removeCallbacks(resumeFollow);
-                    postDelayed(resumeFollow, FOLLOW_RESUME_MS);
+                    // Resume only on the explicit follow action; never fight manual reading.
                 }
             }
         });
@@ -140,7 +159,7 @@ public class LyricsView extends FrameLayout {
         };
         tile.setWillNotDraw(false);
         fadePaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_OUT));
-        tileBg.setCornerRadius(dp(22));
+        tileBg.setCornerRadius(dp(32));
         tile.setBackground(tileBg);
         empty.addView(tile, LayoutHelper.createLinear(64, 64, Gravity.CENTER_HORIZONTAL));
         progress = new RadialProgressView(context);
@@ -171,6 +190,8 @@ public class LyricsView extends FrameLayout {
         });
         empty.addView(actionButton, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, 44, Gravity.CENTER_HORIZONTAL, 0, 16, 0, 0));
         addView(empty, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER, 16, 0, 16, 0));
+        followButton=new TextView(context);followButton.setText(LocaleController.getString(R.string.FlexyMusicFollowLyrics));followButton.setTextSize(13);followButton.setGravity(Gravity.CENTER);followButton.setPadding(dp(16),0,dp(16),0);followButton.setVisibility(GONE);followButton.setOnClickListener(v->resumeFollow.run());
+        addView(followButton,LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT,44,Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL,8,0,8,8));
     }
 
     public void setDelegate(Delegate delegate) {
@@ -178,7 +199,8 @@ public class LyricsView extends FrameLayout {
     }
 
     public void setColors(PlayerColors c) {
-        colorActive = c.onSurface;
+        colorActive = ColorUtils.blendARGB(c.primary,c.onSurface,.2f);colorText=c.onSurface;
+        GradientDrawable follow=new GradientDrawable();follow.setCornerRadius(dp(22));follow.setColor(c.surfaceHigh);follow.setStroke(dp(1),c.outlineVariant);followButton.setBackground(follow);followButton.setTextColor(c.primary);
         tileBg.setColor(c.secondaryContainer);
         tileIcon.setColor(c.onSecondaryContainer);
         tile.invalidate();
@@ -207,6 +229,7 @@ public class LyricsView extends FrameLayout {
 
     public void showState(int newState) {
         state = newState;
+        followButton.setVisibility(GONE);removeCallbacks(positionTick);
         if (newState == STATE_LYRICS) {
             list.setVisibility(VISIBLE);
             empty.setVisibility(GONE);
@@ -256,7 +279,8 @@ public class LyricsView extends FrameLayout {
         active = value != null ? value.indexAt(positionMs) : -1;
         this.positionMs = positionMs;
         positionAt = SystemClock.elapsedRealtime();
-        userScrollAt = 0;
+        userScrollAt = 0;userDragging=false;followButton.setVisibility(GONE);
+        restartClock();
         applyPadding();
         adapter.notifyDataSetChanged();
         removeCallbacks(scrollToCurrent);
@@ -264,6 +288,7 @@ public class LyricsView extends FrameLayout {
     }
 
     public void setPosition(long ms) {
+        ensureClock();
         if (lyrics == null || !lyrics.synced) {
             return;
         }
@@ -282,7 +307,7 @@ public class LyricsView extends FrameLayout {
                 ((LineView) child).setRole(roleFor(pos), true);
             }
         }
-        boolean following = !userDragging && (userScrollAt == 0 || SystemClock.elapsedRealtime() - userScrollAt > FOLLOW_RESUME_MS);
+        boolean following = !userDragging && userScrollAt == 0;
         if (following) {
             userScrollAt = 0;
             scrollToActive(old >= 0 && Math.abs(index - old) <= 3);
@@ -291,6 +316,7 @@ public class LyricsView extends FrameLayout {
     }
 
     private long currentMs() {
+        if(positionProvider!=null)return positionProvider.positionMs();
         if (MediaController.getInstance().isMessagePaused()) {
             return positionMs;
         }
@@ -301,13 +327,7 @@ public class LyricsView extends FrameLayout {
         return !MediaController.getInstance().isMessagePaused();
     }
 
-    private float blurFor(int position) {
-        if (lyrics == null || !lyrics.synced || active < 0 || userDragging || userScrollAt != 0) {
-            return 0f;
-        }
-        int distance = Math.min(Math.abs(position - active), MAX_BLUR_DISTANCE);
-        return dp(BLUR_PER_LINE_DP) * distance;
-    }
+    private float blurFor(int position) { return 0f; } // Surrounding verses remain readable.
 
     private void updateBlur() {
         for (int i = 0; i < list.getChildCount(); i++) {
@@ -383,12 +403,13 @@ public class LyricsView extends FrameLayout {
         int w = getWidth();
         int h = getHeight();
         int save = canvas.saveLayer(0, 0, w, h, null);
-        super.dispatchDraw(canvas);
+        drawChild(canvas,list,getDrawingTime());
         fadePaint.setShader(topFade);
         canvas.drawRect(0, 0, w, dp(32), fadePaint);
         fadePaint.setShader(bottomFade);
         canvas.drawRect(0, h - dp(40), w, h, fadePaint);
         canvas.restoreToCount(save);
+        if(followButton.getVisibility()==VISIBLE)drawChild(canvas,followButton,getDrawingTime());
     }
 
     @Override
@@ -403,9 +424,11 @@ public class LyricsView extends FrameLayout {
         }
     }
 
+    @Override protected void onAttachedToWindow(){super.onAttachedToWindow();restartClock();}
+    @Override protected void onVisibilityChanged(View changedView,int visibility){super.onVisibilityChanged(changedView,visibility);if(list!=null)restartClock();}
     @Override
     protected void onDetachedFromWindow() {
-        list.stopScroll();
+        removeCallbacks(positionTick);clockScheduled=false;list.stopScroll();
         removeCallbacks(resumeFollow);
         removeCallbacks(scrollToCurrent);
         super.onDetachedFromWindow();
@@ -579,7 +602,7 @@ public class LyricsView extends FrameLayout {
             if (isInterlude()) {
                 drawInterlude(canvas, live, progress, alpha, now);
             } else if (live) {
-                int filled = ColorUtils.setAlphaComponent(colorActive, (int) (alpha * baseAlpha));
+                int filled = ColorUtils.setAlphaComponent(live?colorActive:colorText, (int) (alpha * baseAlpha));
                 int unfilled = ColorUtils.setAlphaComponent(colorActive, (int) (alpha * baseAlpha * UNFILLED_ALPHA));
                 float height = layout.getHeight();
                 LinearGradient fill = fillShader.get(filled, unfilled);
@@ -600,7 +623,7 @@ public class LyricsView extends FrameLayout {
             } else {
                 paint.setShader(null);
                 paint.clearShadowLayer();
-                paint.setColor(ColorUtils.setAlphaComponent(colorActive, (int) (alpha * baseAlpha)));
+                paint.setColor(ColorUtils.setAlphaComponent(live?colorActive:colorText, (int) (alpha * baseAlpha)));
                 layout.draw(canvas);
             }
             canvas.restore();

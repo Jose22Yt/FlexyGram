@@ -31,12 +31,18 @@ final class MusicBlurSurface extends Drawable implements ViewTreeObserver.OnPreD
     private long lastCapture = -160;
     private int surface, outline;
     private float radius;
+    private float segmentWidth, segmentGap;
+    private final boolean allowGlass;
+    private MusicGlassRenderer glass;
 
-    MusicBlurSurface(View target, float radius) { this.target = target; this.radius = radius; }
+    MusicBlurSurface(View target, float radius) { this(target,radius,false); }
+    MusicBlurSurface(View target,float radius,boolean allowGlass) { this.target=target;this.radius=radius;this.allowGlass=allowGlass; }
+    void setSegments(float controlsWidth,float gap){if(segmentWidth!=controlsWidth||segmentGap!=gap){segmentWidth=controlsWidth;segmentGap=gap;invalidateSelf();}}
     static boolean isCapturing() { return capturing; }
     void setColors(PlayerColors colors) {
-        if (surface == colors.surface && outline == colors.outlineVariant) return;
-        surface = colors.surface; outline = colors.outlineVariant; dirty = true;
+        int fill=allowGlass?colors.surfaceHigh:colors.surface;
+        if (surface == fill && outline == colors.outlineVariant) return;
+        surface = fill; outline = colors.outlineVariant; dirty = true;
         invalidateSelf();
     }
     void attach() {
@@ -54,7 +60,7 @@ final class MusicBlurSurface extends Drawable implements ViewTreeObserver.OnPreD
         }
         observer = null;
         // A published bitmap may still be referenced by RenderThread. Let GC retire it safely.
-        bitmap = null;
+        bitmap = null;if(glass!=null){glass.clear();glass=null;}
     }
     @Override public void onScrollChanged() { dirty = true; target.invalidate(); }
     @Override public void onGlobalLayout() { dirty = true; target.invalidate(); }
@@ -63,7 +69,7 @@ final class MusicBlurSurface extends Drawable implements ViewTreeObserver.OnPreD
                 || target.getWidth() < 8 || target.getHeight() < 8) return true;
         if (!LiteMode.isEnabled(LiteMode.FLAG_CHAT_BLUR)) {
             dirty = true;
-            if (bitmap != null) { bitmap = null; invalidateSelf(); }
+            if (bitmap != null) { bitmap = null;if(glass!=null){glass.clear();glass=null;} invalidateSelf(); }
             return true;
         }
         target.getLocationOnScreen(position);
@@ -90,15 +96,25 @@ final class MusicBlurSurface extends Drawable implements ViewTreeObserver.OnPreD
     }
     @Override public void draw(Canvas canvas) {
         rect.set(getBounds()); if (rect.isEmpty()) return;
-        clip.rewind(); clip.addRoundRect(rect, radius, radius, Path.Direction.CW);
+        clip.rewind();
+        float split=rect.right-segmentWidth;
+        if(segmentWidth>0&&split>rect.left){
+            clip.addRoundRect(rect.left,rect.top,split-segmentGap,rect.bottom,radius,radius,Path.Direction.CW);
+            clip.addRoundRect(split,rect.top,rect.right,rect.bottom,radius,radius,Path.Direction.CW);
+        }else clip.addRoundRect(rect, radius, radius, Path.Direction.CW);
+        if(allowGlass&&android.os.Build.VERSION.SDK_INT>=33&&canvas.isHardwareAccelerated()&&bitmap!=null&&!bitmap.isRecycled()
+                &&LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS)){
+            if(glass==null)glass=new MusicGlassRenderer(target,radius);
+            glass.draw(canvas,bitmap,getBounds(),surface,outline);return;
+        }
         int save = canvas.save(); canvas.clipPath(clip);
         if (bitmap != null && !bitmap.isRecycled()) {
             paint.setColor(0xffffffff); canvas.drawBitmap(bitmap, null, rect, paint);
-            paint.setColor((surface & 0xffffff) | 0xc9000000);
+            paint.setColor((surface & 0xffffff) | (allowGlass?0x99000000:0xc9000000));
         } else paint.setColor(surface);
         canvas.drawRect(rect, paint); canvas.restoreToCount(save);
         paint.setStyle(Paint.Style.STROKE); paint.setStrokeWidth(AndroidUtilities.dpf2(.7f));
-        paint.setColor(outline); rect.inset(.5f,.5f); canvas.drawRoundRect(rect,radius,radius,paint);
+        paint.setColor(outline); rect.inset(.5f,.5f); canvas.drawPath(clip,paint);
         paint.setStyle(Paint.Style.FILL);
     }
     @Override public void setAlpha(int alpha) { }

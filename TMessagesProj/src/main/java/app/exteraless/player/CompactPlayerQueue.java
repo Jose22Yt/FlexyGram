@@ -16,9 +16,12 @@ import java.util.ArrayList;
 /** Two recycled upcoming rows, refreshed by the sheet's existing notifications, never by progress frames. */
 final class CompactPlayerQueue extends LinearLayout {
     private final TextView heading;
-    private final Row[] rows=new Row[2];
+    private final Row[] rows;
     CompactPlayerQueue(Context context,Runnable openQueue) {
-        super(context);setOrientation(VERTICAL);
+        this(context,openQueue,2);
+    }
+    CompactPlayerQueue(Context context,Runnable openQueue,int visibleRows) {
+        super(context);rows=new Row[Math.max(2,Math.min(12,visibleRows))];setOrientation(VERTICAL);
         heading=new TextView(context);heading.setTextSize(16);heading.setTypeface(org.telegram.messenger.AndroidUtilities.bold());
         heading.setText(LocaleController.getString(R.string.FlexyMusicQueueTitle));heading.setGravity(Gravity.CENTER_VERTICAL);
         heading.setOnClickListener(v->openQueue.run());heading.setFocusable(true);

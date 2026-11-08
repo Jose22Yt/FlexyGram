@@ -121,7 +121,7 @@ public class PlayerBarView extends FrameLayout implements NotificationCenter.Not
 
         progress = new MusicProgressView(context,false);
         addView(progress,LayoutHelper.createFrame(-1,2,Gravity.BOTTOM));
-        if (BuildConfig.CONNECTED_ALPHA) { blurSurface=new MusicBlurSurface(this,dp(20));setBackground(blurSurface); }
+        if (BuildConfig.CONNECTED_ALPHA) { blurSurface=new MusicBlurSurface(this,dp(22));setBackground(blurSurface); }
         setOnLongClickListener(v->{if(onCompact==null)return false;onCompact.run();return true;});
         applyTheme();
     }
@@ -129,7 +129,11 @@ public class PlayerBarView extends FrameLayout implements NotificationCenter.Not
     @Override protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         boolean showNext = MeasureSpec.getSize(widthMeasureSpec) >= dp(320);
         nextButton.setVisibility(showNext ? VISIBLE : GONE);
-        ((FrameLayout.LayoutParams) texts.getLayoutParams()).rightMargin = dp(10 + 48 * (showNext ? 3 : 2));
+        ((FrameLayout.LayoutParams) texts.getLayoutParams()).rightMargin = dp(16 + 48 * (showNext ? 3 : 2));
+        if(blurSurface!=null){
+            int controlsWidth=dp(6+48*(showNext?3:2));blurSurface.setSegments(controlsWidth,dp(6));
+            FrameLayout.LayoutParams line=(FrameLayout.LayoutParams)progress.getLayoutParams();line.width=Math.max(0,MeasureSpec.getSize(widthMeasureSpec)-controlsWidth-dp(24));line.leftMargin=dp(12);line.bottomMargin=dp(6);
+        }
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 

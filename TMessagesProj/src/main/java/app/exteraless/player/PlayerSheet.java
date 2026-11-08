@@ -80,6 +80,8 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
     private final FrameLayout root;
     private final PlayerLayout layout;
     private ScrollView signatureScroll;
+    private OrbitPlayerLayout orbit;
+    private WavySeekBar.Delegate seekDelegate;
     private int playerViewportHeight;
     private final FrameLayout header;
     private final ImageView collapseButton;
@@ -197,6 +199,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
             @Override
             protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
                 playerViewportHeight = MeasureSpec.getSize(heightMeasureSpec);
+                if(orbit!=null)orbit.setInsets(getStatusBarHeight(),getBottomInset());
                 super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(playerViewportHeight, MeasureSpec.EXACTLY));
             }
 
@@ -277,7 +280,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         collapseButton.setScaleType(ImageView.ScaleType.CENTER);
         collapseButton.setImageDrawable(collapseIcon);
         collapseButton.setContentDescription(getString(R.string.Close));
-        collapseButton.setOnClickListener(v -> dismiss());
+        collapseButton.setOnClickListener(v -> {if(orbit!=null&&lyricsMode)setLyricsMode(false,true);else dismiss();});
         header.addView(collapseButton, LayoutHelper.createFrame(48, 48, Gravity.LEFT | Gravity.CENTER_VERTICAL));
         moreButton = new ImageView(context);
         moreButton.setScaleType(ImageView.ScaleType.CENTER);
@@ -392,10 +395,11 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
 
         seekBar = new WavySeekBar(context);
         seekBar.setContentDescription(getString(R.string.OEPlayerSeek));
-        seekBar.setDelegate(new WavySeekBar.Delegate() {
+        seekBar.setDelegate(seekDelegate = new WavySeekBar.Delegate() {
             @Override
             public void onSeekStart() {
                 seeking = true;
+                if(orbit!=null)return;
                 bubble.animate().cancel();
                 bubble.setVisibility(View.VISIBLE);
                 bubble.animate().alpha(1f).scaleX(1f).scaleY(1f).setDuration(150).start();
@@ -487,7 +491,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
             group.addView(options, 2, LayoutHelper.createLinear(0, 52, 1f));
         }
         layout.addView(group);
-        compactQueue = BuildConfig.CONNECTED_ALPHA ? new CompactPlayerQueue(context,this::openQueue) : null;
+        compactQueue = BuildConfig.CONNECTED_ALPHA ? new CompactPlayerQueue(context,this::openQueue,12) : null;
         if(compactQueue!=null)layout.addView(compactQueue);
 
 
@@ -503,6 +507,17 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         layout.addView(bubble);
         if (BuildConfig.CONNECTED_ALPHA) { collapseButton.setRotation(90); header.bringToFront(); }
 
+        if(BuildConfig.CONNECTED_ALPHA){
+            titleRow.setOrientation(LinearLayout.VERTICAL);titleRow.setGravity(Gravity.CENTER_HORIZONTAL);
+            LinearLayout.LayoutParams titlesParams=(LinearLayout.LayoutParams)titles.getLayoutParams();titlesParams.width=-1;titlesParams.weight=0;
+            titleView.setGravity(Gravity.CENTER);artistView.setGravity(Gravity.CENTER);
+            LinearLayout.LayoutParams likeParams=(LinearLayout.LayoutParams)likeButton.getLayoutParams();likeParams.leftMargin=0;likeParams.topMargin=dp(4);
+            root.removeView(signatureScroll);signatureScroll=null;
+            orbit=new OrbitPlayerLayout(context,cover,headerLabel,headerTitle,collapseButton,moreButton,titleRow,timeRow,controls,group,compactQueue,lyricsPanel,this::togglePlay,()->MediaController.getInstance().playNextMessage());
+            orbit.setInsets(getStatusBarHeight(),getBottomInset());root.addView(orbit,new FrameLayout.LayoutParams(-1,-1));
+            orbit.getArtwork().setDelegate(seekDelegate);cover.setOnTouchListener(null);
+            lyricsView.setPositionProvider(this::positionMs);
+        }
         applyColors(colors);
         bind(playing, false);
     }
@@ -527,7 +542,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         if (morphProgress >= 0f || closing) {
             return false;
         }
-        return (signatureScroll == null || signatureScroll.getScrollY() == 0) && (!touchInLyrics || !lyricsView.canScrollUp());
+        return (orbit==null?signatureScroll == null || signatureScroll.getScrollY() == 0:orbit.getScrollYPosition()==0) && (!touchInLyrics || !lyricsView.canScrollUp());
     }
 
     @Override
@@ -735,7 +750,8 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
     }
 
     private void restoreMorphCover() {
-        if (morphCoverView == cover) {
+        if(orbit!=null&&morphCoverView==orbit.getArtwork()){orbit.getArtwork().setVisibility(lyricsMode?View.INVISIBLE:View.VISIBLE);
+        } else if (morphCoverView == cover) {
             cover.setVisibility(lyricsFraction >= 1f ? View.INVISIBLE : View.VISIBLE);
         } else if (morphCoverView != null) {
             morphCoverView.setVisibility(View.VISIBLE);
@@ -749,6 +765,8 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
     private static void lerpRect(RectF a, RectF b, float t, RectF out) {
         out.set(a.left + (b.left - a.left) * t, a.top + (b.top - a.top) * t, a.right + (b.right - a.right) * t, a.bottom + (b.bottom - a.bottom) * t);
     }
+
+    private View visualContent(){return orbit!=null?orbit:layout;}
 
     private void rectInRoot(View view, RectF out) {
         float x = 0;
@@ -774,7 +792,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         if (lyricsAnimator != null && lyricsAnimator.isRunning()) {
             lyricsAnimator.end();
         }
-        View coverView = lyricsFraction >= 0.5f ? smallCover : cover;
+        View coverView = lyricsFraction >= 0.5f ? smallCover : orbit!=null?orbit.getArtwork():cover;
         morphCoverView = coverView;
         int[] loc = new int[2];
         root.getLocationOnScreen(loc);
@@ -787,10 +805,10 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         morphFromColor = mini.getCardColor();
         recycleSnapshot();
         morphSnapshot = mini.captureCard();
-        Bitmap bitmap = coverView instanceof CoverImage ? ((CoverImage) coverView).getImageReceiver().getBitmap() : null;
+        Bitmap bitmap = coverView instanceof OrbitArtwork ? cover.getImageReceiver().getBitmap() : coverView instanceof CoverImage ? ((CoverImage) coverView).getImageReceiver().getBitmap() : null;
         morphCoverBitmap = bitmap != null ? bitmap : mini.getCoverBitmap();
         rectInRoot(coverView, morphCoverTo);
-        morphCoverToRadius = coverView == cover ? dp(28) * cover.getScaleX() : dp(16);
+        morphCoverToRadius = coverView instanceof OrbitArtwork ? morphCoverTo.width()*.5f : coverView == cover ? dp(28) * cover.getScaleX() : dp(16);
         if (activity != null && activity.getWindow() != null) {
             int flags = activity.getWindow().getDecorView().getSystemUiVisibility();
             underLightStatus = (flags & View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR) != 0;
@@ -801,7 +819,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         if (hideCover) {
             coverView.setVisibility(View.INVISIBLE);
         }
-        layout.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+        visualContent().setLayerType(View.LAYER_TYPE_HARDWARE, null);
         return true;
     }
 
@@ -833,13 +851,13 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         float p = morphProgress;
         lerpRect(morphFrom, morphTo, p, morphRect);
         float s = morphRect.width() / Math.max(1, root.getWidth());
-        layout.setPivotX(0);
-        layout.setPivotY(0);
-        layout.setScaleX(s);
-        layout.setScaleY(s);
-        layout.setTranslationX(morphRect.left);
-        layout.setTranslationY(morphRect.top);
-        layout.setAlpha(clamp01((p - 0.35f) / 0.65f));
+        visualContent().setPivotX(0);
+        visualContent().setPivotY(0);
+        visualContent().setScaleX(s);
+        visualContent().setScaleY(s);
+        visualContent().setTranslationX(morphRect.left);
+        visualContent().setTranslationY(morphRect.top);
+        visualContent().setAlpha(clamp01((p - 0.35f) / 0.65f));
         backDrawable.setAlpha(dimBehind ? (int) (dimBehindAlpha * clamp01(p)) : 0);
         updateMorphBars();
         root.invalidate();
@@ -847,12 +865,12 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
 
     private void clearMorph() {
         morphProgress = -1f;
-        layout.setScaleX(1f);
-        layout.setScaleY(1f);
-        layout.setTranslationX(0);
-        layout.setTranslationY(0);
-        layout.setAlpha(1f);
-        layout.setLayerType(View.LAYER_TYPE_NONE, null);
+        visualContent().setScaleX(1f);
+        visualContent().setScaleY(1f);
+        visualContent().setTranslationX(0);
+        visualContent().setTranslationY(0);
+        visualContent().setAlpha(1f);
+        visualContent().setLayerType(View.LAYER_TYPE_NONE, null);
         recycleSnapshot();
         morphCoverBitmap = null;
         root.invalidate();
@@ -1056,6 +1074,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
             }
         }
         updateHeader();
+        if(orbit!=null)orbit.bindSong(mo.getMusicTitle(),mo.getMusicAuthor());
         updateLike(animated);
         updateModes(animated);
         updateSpeed();
@@ -1111,7 +1130,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         }
         boolean saved = PlayerActions.isSavedToProfile(mo);
         likeButton.setActive(saved, animated);
-        likeButton.setRadius(dp(saved ? 14 : 24), animated);
+        likeButton.setRadius(dp(BuildConfig.CONNECTED_ALPHA?24:saved?14:24), BuildConfig.CONNECTED_ALPHA?false:animated);
         heartIcon.setFillStroke(saved);
         likeButton.setContentDescription(getString(saved ? R.string.ProfilePlaylistRemoveFromProfile : R.string.AudioSaveToMyProfile));
     }
@@ -1123,7 +1142,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         }
         boolean save = !PlayerActions.isSavedToProfile(mo);
         likeButton.setActive(save, true);
-        likeButton.setRadius(dp(save ? 14 : 24), true);
+        likeButton.setRadius(dp(BuildConfig.CONNECTED_ALPHA?24:save?14:24), !BuildConfig.CONNECTED_ALPHA);
         heartIcon.setFillStroke(save);
         PlayerActions.saveToProfile(mo, save, error -> {
             Theme.ResourcesProvider rp = colors.provider(resourcesProvider);
@@ -1202,6 +1221,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         controls.setPlaying(playing, animated);
         controls.play.setContentDescription(getString(playing ? R.string.AccActionPause : R.string.AccActionPlay));
         seekBar.setPlaying(playing);
+        if(orbit!=null){orbit.setPlaying(playing);cover.setScaleX(1);cover.setScaleY(1);return;}
         float scale = playing ? 1f : 0.92f;
         if (cover.getScaleX() != scale) {
             if (animated) {
@@ -1230,9 +1250,10 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         if (!seeking) {
             seekBar.setProgress(mo.audioProgress);
         }
+        if(orbit!=null)orbit.getArtwork().setProgress(displayProgress());
         updateTimes();
         if (lyricsMode) {
-            lyricsView.setPosition((long) (mo.audioProgress * mo.getDuration() * 1000));
+            lyricsView.setPosition(positionMs());
         }
     }
 
@@ -1242,9 +1263,9 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
             return;
         }
         int duration = (int) Math.round(mo.getDuration());
-        int now = seeking ? (int) (duration * seekProgress) : Math.min(duration, mo.audioProgressSec);
+        int now = seeking ? (int) (duration * seekProgress) : Math.min(duration, (int)(positionMs()/1000));
         String a = formatTime(now);
-        String b = "−" + formatTime(Math.max(0, duration - now));
+        String b = orbit!=null?formatTime(duration):"−" + formatTime(Math.max(0, duration - now));
         if (!TextUtils.equals(timeNow.getText(), a)) {
             timeNow.setText(a);
             bubble.setText(a);
@@ -1262,6 +1283,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
     }
 
     private void layoutBubble() {
+        if(orbit!=null){orbit.getArtwork().setProgress(seekProgress);return;}
         if (bubble.getWidth() == 0) {
             bubble.post(this::layoutBubble);
             return;
@@ -1281,14 +1303,19 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         }
         if (!value) { cancelLyricsRequest(); lyricsKey = null; }
         lyricsMode = value;
+        if(orbit!=null){
+            if(lyricsAnimator!=null){lyricsAnimator.removeAllListeners();lyricsAnimator.cancel();lyricsAnimator=null;}
+            lyricsFraction=value?1:0;orbit.setLyricsMode(value);lyricsPanel.setAlpha(1);lyricsPanel.setTranslationY(0);
+            lyricsButton.setActive(value,false);if(value){loadLyrics();lyricsView.setPosition(positionMs());}return;
+        }
         if(BuildConfig.CONNECTED_ALPHA)layout.requestLayout();
         lyricsButton.setActive(value, animated);
-        lyricsButton.setRadius(dp(BuildConfig.CONNECTED_ALPHA ? 18 : value ? 26 : 8), animated);
+        lyricsButton.setRadius(dp(BuildConfig.CONNECTED_ALPHA ? 28 : value ? 26 : 8), animated);
         if (value) {
             loadLyrics();
             MessageObject mo = current;
             if (mo != null) {
-                lyricsView.setPosition((long) (mo.audioProgress * mo.getDuration() * 1000));
+                lyricsView.setPosition(positionMs());
             }
         }
         if (lyricsAnimator != null) {
@@ -1343,7 +1370,10 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
 
     private long positionMs() {
         MessageObject mo = current;
-        return mo == null ? 0 : (long) (mo.audioProgress * mo.getDuration() * 1000);
+        if(mo==null)return 0;
+        if(seeking)return (long)(seekProgress*mo.getDuration()*1000);
+        long actual=MediaController.getInstance().getProgressMs(mo);
+        return actual>=0?actual:(long)(mo.audioProgress*mo.getDuration()*1000);
     }
 
     private void loadLyrics() {
@@ -1639,10 +1669,10 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
     private void applyColors(PlayerColors c) {
         colors = c;
         root.invalidate();
+        if(orbit!=null)orbit.setColors(c);
         collapseIcon.setColor(c.onSurface);
         moreIcon.setColor(c.onSurface);
-        collapseButton.setBackground(Theme.createSelectorDrawable(c.ripple(), Theme.RIPPLE_MASK_CIRCLE_20DP));
-        moreButton.setBackground(Theme.createSelectorDrawable(c.ripple(), Theme.RIPPLE_MASK_CIRCLE_20DP));
+        if(orbit==null){collapseButton.setBackground(Theme.createSelectorDrawable(c.ripple(), Theme.RIPPLE_MASK_CIRCLE_20DP));moreButton.setBackground(Theme.createSelectorDrawable(c.ripple(), Theme.RIPPLE_MASK_CIRCLE_20DP));}
         headerLabel.setTextColor(c.onSurfaceVariant);
         headerTitle.setTextColor(c.onSurface);
         cover.setColors(c.primaryContainer, c.onPrimaryContainer);
@@ -1670,6 +1700,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         controls.prev.setColors(BuildConfig.CONNECTED_ALPHA?0:c.primaryContainer, c.onSurface, c.primaryContainer, c.onPrimaryContainer);
         controls.next.setColors(BuildConfig.CONNECTED_ALPHA?0:c.primaryContainer, c.onSurface, c.primaryContainer, c.onPrimaryContainer);
         controls.play.setColors(c.primary, c.onPrimary, c.primary, c.onPrimary);
+        if(orbit!=null)controls.setOrbitColors(c);
         speedButton.setColors(BuildConfig.CONNECTED_ALPHA?0:c.surfaceHigh, c.onSurface, 0, c.onSurface);
         if (BuildConfig.CONNECTED_ALPHA) speedButton.setBadgeColors(c.primaryContainer, c.onPrimaryContainer);
         lyricsButton.setColors(BuildConfig.CONNECTED_ALPHA?0:c.surfaceHigh, c.onSurface, c.primary, c.onPrimary);

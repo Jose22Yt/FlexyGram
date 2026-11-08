@@ -7,7 +7,7 @@ import shutil
 
 PRODUCTION = ('MusicBlurSurface','MusicProgressView','MusicSleepTimer','SignatureMusicStyle','SignatureMusicPresentation','SignatureMusicBubble',
               'SignatureMusicHost','ControlsRow','MorphButton','PlayerIcon','Spring',
-              'WavySeekBar','RingPlayButton','PlayerBarView','PlayerMiniView','PlayerColors','CoverImage','SignatureCoverFade','SignatureMusicActions','CompactPlayerQueue')
+              'WavySeekBar','RingPlayButton','PlayerBarView','PlayerMiniView','PlayerColors','CoverImage','SignatureCoverFade','SignatureMusicActions','CompactPlayerQueue','OrbitMotion','OrbitArtwork','OrbitPlayerLayout')
 
 def write_stubs(source, root):
     def put(path, text):
@@ -17,6 +17,7 @@ def write_stubs(source, root):
     player=root/'TMessagesProj/src/main/java/app/exteraless/player'
     for name in PRODUCTION:
         put('app/exteraless/player/'+name+'.java',(player/(name+'.java')).read_text())
+    put('app/exteraless/player/MusicGlassRenderer.java','package app.exteraless.player;class MusicGlassRenderer{MusicGlassRenderer(android.view.View v,float r){throw new AssertionError("GPU glass bridge is not software rendering");}void draw(android.graphics.Canvas c,android.graphics.Bitmap b,android.graphics.Rect r,int x,int y){throw new AssertionError();}void clear(){}}')
     code='\n'.join((player/(n+'.java')).read_text() for n in PRODUCTION)
     names=sorted(set(re.findall(r'R.string.(\w+)',code)))
     put('org/telegram/messenger/R.java','package org.telegram.messenger; public class R {public static class string {'+''.join(f'public static final int {n}={i+1};' for i,n in enumerate(names))+'}}')
@@ -40,7 +41,7 @@ public static void makeGlobalBlurBitmap(org.telegram.messenger.Utilities.Callbac
 public static android.graphics.Typeface bold(){return android.graphics.Typeface.create("sans-serif",1);}
 }''')
     put('org/telegram/messenger/Utilities.java','package org.telegram.messenger;public class Utilities{public interface Callback<T>{void run(T value);}}')
-    put('org/telegram/messenger/LiteMode.java','package org.telegram.messenger; public class LiteMode {public static final int FLAG_CHAT_BLUR=256;public static boolean blurEnabled;public static boolean isEnabled(int flag){return blurEnabled;}public static boolean isPowerSaverApplied(){return false;}}')
+    put('org/telegram/messenger/LiteMode.java','package org.telegram.messenger; public class LiteMode {public static final int FLAG_CHAT_BLUR=256,FLAG_LIQUID_GLASS=262144;public static boolean blurEnabled;public static boolean isEnabled(int flag){return blurEnabled;}public static boolean isPowerSaverApplied(){return false;}}')
     put('org/telegram/messenger/LocaleController.java','''package org.telegram.messenger; public class LocaleController {public static boolean isRTL;public static String getString(int id){
 if(id==R.string.FlexyMusicQueueTitle)return "A continuación";
 if(id==R.string.FlexyMusicCompact)return "Comprimir reproductor";
