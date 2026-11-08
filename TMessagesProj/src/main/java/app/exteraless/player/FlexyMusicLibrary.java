@@ -36,8 +36,9 @@ public final class FlexyMusicLibrary {
         storage.getStorageQueue().postRunnable(() -> {
             ArrayList<MessageObject> downloadedList = new ArrayList<>();
             HashSet<String> seenPaths = new HashSet<>();
+            SQLiteCursor cursor = null;
             try {
-                SQLiteCursor cursor = storage.getDatabase().queryFinalized(String.format(Locale.US,
+                cursor = storage.getDatabase().queryFinalized(String.format(Locale.US,
                         "SELECT data, mid, uid FROM media_v4 WHERE mid > 0 AND type = %d ORDER BY date DESC LIMIT 500",
                         MediaDataController.MEDIA_MUSIC));
                 while (cursor.next()) {
@@ -63,9 +64,12 @@ public final class FlexyMusicLibrary {
                         }
                     }
                 }
-                cursor.dispose();
             } catch (Throwable e) {
                 FileLog.e(e);
+            } finally {
+                if (cursor != null) {
+                    cursor.dispose();
+                }
             }
 
             try {
@@ -85,20 +89,21 @@ public final class FlexyMusicLibrary {
 
     private static void scanDirectoryForAudio(int account, File dir, ArrayList<MessageObject> list, HashSet<String> seenPaths) {
         if (dir == null || !dir.exists() || !dir.isDirectory()) return;
-        File[] files = dir.listFiles();
+        File[] files = dir.listFiles((d, name) -> {
+            String lower = name.toLowerCase(Locale.ROOT);
+            return lower.endsWith(".mp3") || lower.endsWith(".m4a") || lower.endsWith(".flac")
+                    || lower.endsWith(".ogg") || lower.endsWith(".opus") || lower.endsWith(".wav");
+        });
         if (files == null) return;
         for (File f : files) {
+            if (list.size() >= 1000) break;
             if (f.isFile() && f.length() > 1024) {
                 String path = f.getAbsolutePath();
                 if (seenPaths.contains(path)) continue;
-                String name = f.getName().toLowerCase(Locale.ROOT);
-                if (name.endsWith(".mp3") || name.endsWith(".m4a") || name.endsWith(".flac")
-                        || name.endsWith(".ogg") || name.endsWith(".opus") || name.endsWith(".wav")) {
-                    MessageObject mo = createMessageObjectForFile(account, f, list.size() + 1);
-                    if (mo != null && mo.isMusic()) {
-                        list.add(mo);
-                        seenPaths.add(path);
-                    }
+                MessageObject mo = createMessageObjectForFile(account, f, list.size() + 1);
+                if (mo != null && mo.isMusic()) {
+                    list.add(mo);
+                    seenPaths.add(path);
                 }
             }
         }
@@ -167,18 +172,25 @@ public final class FlexyMusicLibrary {
             }
 
             if (playing != null && playing.isMusic()) {
-                MessageObject match = null;
-                for (MessageObject mo : list) {
-                    if (mo.getId() != 0 && mo.getId() == playing.getId() && mo.getDialogId() == playing.getDialogId()) {
-                        match = mo;
-                        break;
+                ArrayList<MessageObject> currentPlaylist = mc.getPlaylist();
+                if (currentPlaylist != null) {
+                    HashSet<String> existingKeys = new HashSet<>();
+                    for (MessageObject mo : currentPlaylist) {
+                        existingKeys.add(mo.getDialogId() + "_" + mo.getId());
+                    }
+                    int added = 0;
+                    for (MessageObject mo : list) {
+                        String key = mo.getDialogId() + "_" + mo.getId();
+                        if (!existingKeys.contains(key)) {
+                            currentPlaylist.add(mo);
+                            existingKeys.add(key);
+                            added++;
+                        }
+                    }
+                    if (added > 0) {
+                        NotificationCenter.getInstance(fragment.getCurrentAccount()).postNotificationName(NotificationCenter.moreMusicDidLoad, added);
                     }
                 }
-                if (match == null) {
-                    list.add(0, playing);
-                    match = playing;
-                }
-                mc.setPlaylist(list, match, 0, false, null);
                 Md3Player.open(fragment, miniView);
             } else {
                 MessageObject first = list.get(0);
