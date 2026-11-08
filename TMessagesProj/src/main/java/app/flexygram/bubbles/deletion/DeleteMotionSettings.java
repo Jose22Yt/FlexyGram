@@ -39,6 +39,7 @@ public final class DeleteMotionSettings {
 
     public static String[] labels() {
         return new String[]{org.telegram.messenger.LocaleController.getString(org.telegram.messenger.R.string.FlexyContextNativeStyle),
-                "Crystal Fracture", "Liquid Fall", "Liquid Vortex", "TNT Dispersion"};
+                org.telegram.messenger.LocaleController.getString(org.telegram.messenger.R.string.FlexyDeleteCrystal), org.telegram.messenger.LocaleController.getString(org.telegram.messenger.R.string.FlexyDeleteFall),
+                org.telegram.messenger.LocaleController.getString(org.telegram.messenger.R.string.FlexyDeleteVortex), org.telegram.messenger.LocaleController.getString(org.telegram.messenger.R.string.FlexyDeleteTnt)};
     }
 }

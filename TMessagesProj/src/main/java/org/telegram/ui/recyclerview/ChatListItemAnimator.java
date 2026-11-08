@@ -1182,6 +1182,7 @@ public class ChatListItemAnimator extends DefaultItemAnimator {
 
     @Override
     public void endAnimation(RecyclerView.ViewHolder item) {
+        app.flexygram.bubbles.deletion.DeleteMotionOverlay.cancel(item.itemView);
         Animator animator = animators.remove(item);
         if (animator != null) {
             animator.cancel();
@@ -1231,6 +1232,7 @@ public class ChatListItemAnimator extends DefaultItemAnimator {
 
     @Override
     public void endAnimations() {
+        app.flexygram.bubbles.deletion.DeleteMotionOverlay.cancelAll(recyclerListView);
         flexyPendingDeletes.clear();
         if (BuildVars.LOGS_ENABLED) {
             FileLog.d("end animations");
@@ -1574,14 +1576,17 @@ public class ChatListItemAnimator extends DefaultItemAnimator {
             int overlays = app.flexygram.bubbles.deletion.DeleteMotionOverlay.runNativeDelete(
                     recyclerListView, java.util.Collections.singletonList(
                         new app.flexygram.bubbles.deletion.DeleteMotionOverlay.Target(cell, bounds)),
-                    deleteStyle, () -> {});
+                    deleteStyle, () -> {}, () -> {
+                        if (mRemoveAnimations.remove(holder)) {
+                            restoreTransitionParams(view);
+                            dispatchRemoveFinished(holder);
+                            dispatchFinishedWhenDone();
+                        }
+                    });
             if (overlays > 0) {
-                // The snapshot owns drawing; finish only this removed holder.
-                // Native move animations and other rows retain their lifecycle.
+                mRemoveAnimations.add(holder);
                 dispatchRemoveStarting(holder);
-                restoreTransitionParams(view);
-                dispatchRemoveFinished(holder);
-                dispatchFinishedWhenDone();
+                view.setAlpha(0f);
                 return;
             }
         }

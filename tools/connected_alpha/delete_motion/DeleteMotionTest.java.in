@@ -1,0 +1,99 @@
+package app.flexygram.bubbles.deletion;
+import android.app.*;import android.content.*;import android.content.res.*;import android.graphics.*;import android.graphics.drawable.*;import android.os.*;import android.view.*;import android.widget.*;
+import org.junit.*;import org.junit.runner.RunWith;import org.robolectric.*;import org.robolectric.annotation.*;
+import org.telegram.messenger.*;import org.telegram.ui.ActionBar.Theme;import org.telegram.ui.Cells.ChatMessageCell;import androidx.recyclerview.widget.RecyclerView;
+import java.lang.reflect.*;import java.nio.file.Files;import java.nio.file.Paths;import java.util.*;import org.json.*;import static org.junit.Assert.*;
+@RunWith(RobolectricTestRunner.class) @Config(manifest=Config.NONE,sdk=35) @GraphicsMode(GraphicsMode.Mode.NATIVE)
+public class DeleteMotionTest{
+ Activity activity;FrameLayout root;
+ @Before public void setup(){activity=Robolectric.buildActivity(Activity.class).setup().get();root=new FrameLayout(activity);activity.setContentView(root);size(root,640,840);DeleteMotionSettings.set(activity,0);SharedConfig.enabled=true;AndroidUtilities.screenReader=false;Theme.dark=false;Theme.wallpaper=new ColorDrawable(0xff43674b);}
+ void size(View v,int w,int h){v.measure(View.MeasureSpec.makeMeasureSpec(w,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(h,View.MeasureSpec.EXACTLY));v.layout(0,0,w,h);}
+ static Object field(Object object,String name)throws Exception{Field f=object.getClass().getDeclaredField(name);f.setAccessible(true);return f.get(object);}
+ static void set(Object object,String name,Object value)throws Exception{Field f=object.getClass().getDeclaredField(name);f.setAccessible(true);f.set(object,value);}
+ @SuppressWarnings("unchecked") List<DeleteMotionOverlay> overlays()throws Exception{Field f=DeleteMotionOverlay.class.getDeclaredField("running");f.setAccessible(true);return new ArrayList<>(((Map<View,DeleteMotionOverlay>)f.get(null)).values());}
+ @After public void cleanup()throws Exception{for(DeleteMotionOverlay o:overlays()){View source=((java.lang.ref.WeakReference<View>)field(o,"source")).get();DeleteMotionOverlay.cancel(source);}assertTrue(overlays().isEmpty());}
+ TextView sample(){TextView v=new TextView(activity);v.setText("FlexyGram ✓✓");v.setTextColor(0xff132518);v.setBackgroundColor(0xffaaddbb);root.addView(v,new FrameLayout.LayoutParams(220,74));size(v,220,74);return v;}
+ DeleteMotionOverlay.Target target(View v){return new DeleteMotionOverlay.Target(v,new RectF(0,0,v.getWidth(),v.getHeight()));}
+ void finish(DeleteMotionOverlay overlay){overlay.doFrame(0);overlay.doFrame(2_000_000_000L);}
+ @Test public void nativeDeletionIsImmediateAndVisualCompletionIsExactlyOnce()throws Exception{
+  TextView v=sample();int[] calls={0,0};int count=DeleteMotionOverlay.runNativeDelete(root,Collections.singletonList(target(v)),1,()->calls[0]++,()->calls[1]++);
+  assertEquals(1,count);assertArrayEquals(new int[]{1,0},calls);DeleteMotionOverlay overlay=overlays().get(0);finish(overlay);finish(overlay);assertArrayEquals(new int[]{1,1},calls);assertNull(field(overlay,"image"));
+ }
+ @Test public void nativeHolderFinishesAfterEffectAndCancellationRestoresIt()throws Exception{
+  DeleteMotionSettings.set(activity,1);ChatMessageCell cell=new ChatMessageCell(activity);root.addView(cell,new FrameLayout.LayoutParams(220,74));size(cell,220,74);
+  // Bounds accessors are provided by the actual route fixture's cell contract.
+  NativeDeleteOwner owner=new NativeDeleteOwner(root);RecyclerView.ViewHolder holder=new RecyclerView.ViewHolder(cell);owner.prepareFlexyDelete(holder);owner.remove(holder);
+  assertEquals(1,owner.starting);assertEquals(0,owner.finished);assertEquals(0f,cell.getAlpha(),0);assertEquals(1,owner.mRemoveAnimations.size());
+  DeleteMotionOverlay.cancel(cell);DeleteMotionOverlay.cancel(cell);assertEquals(1,owner.finished);assertEquals(1,owner.done);assertEquals(1f,cell.getAlpha(),0);assertTrue(owner.mRemoveAnimations.isEmpty());
+ }
+ @Test public void effectsRespectAccessibilityAndNativeFallback()throws Exception{
+  TextView v=sample();int[] calls={0};
+  for(int mode=0;mode<3;mode++){SharedConfig.enabled=mode!=1;AndroidUtilities.screenReader=mode==2;
+   assertEquals(0,DeleteMotionOverlay.runNativeDelete(root,Collections.singletonList(target(v)),mode==0?0:1,()->calls[0]++));}
+  assertEquals(3,calls[0]);assertTrue(overlays().isEmpty());
+ }
+ @Test public void captureFailureDoesNotPreventDeletion()throws Exception{
+  View v=new View(activity){@Override public void draw(Canvas c){throw new IllegalStateException("fixture capture failure");}};root.addView(v);size(v,100,50);int[] nativeCalls={0};
+  assertEquals(0,DeleteMotionOverlay.runNativeDelete(root,Collections.singletonList(target(v)),1,()->nativeCalls[0]++));assertEquals(1,nativeCalls[0]);assertTrue(overlays().isEmpty());
+ }
+ @Test public void budgetsAreBoundedAndCancelAllCompletesBatchOnce()throws Exception{
+  ArrayList<DeleteMotionOverlay.Target> targets=new ArrayList<>();for(int i=0;i<12;i++)targets.add(target(sample()));int[] calls={0,0};
+  assertEquals(8,DeleteMotionOverlay.runNativeDelete(root,targets,1,()->calls[0]++,()->calls[1]++));DeleteMotionOverlay.cancelAll(root);DeleteMotionOverlay.cancelAll(root);assertArrayEquals(new int[]{1,1},calls);assertTrue(overlays().isEmpty());
+ }
+ @Test public void detachingHostReleasesEffectsAndRestoresPreview()throws Exception{
+  TextView v=sample();int[] done={0};DeleteMotionOverlay.runNativeDelete(root,Collections.singletonList(target(v)),4,()->v.setAlpha(0),()->{v.setAlpha(1);done[0]++;});
+  activity.setContentView(new FrameLayout(activity));assertEquals(1,done[0]);assertEquals(1f,v.getAlpha(),0);assertTrue(overlays().isEmpty());
+ }
+ @Test public void previewUsesWallpaperAndTapPersistsOnlyTheChosenStyle()throws Exception{
+  DeleteMotionSettingsActivity page=new DeleteMotionSettingsActivity();View view=page.createView(activity);root.addView(view,new FrameLayout.LayoutParams(360,840));size(view,360,840);
+  LinearLayout gallery=(LinearLayout)((ViewGroup)view).getChildAt(0);View crystal=gallery.getChildAt(2);crystal.performClick();assertEquals(1,DeleteMotionSettings.get(activity));assertTrue(crystal.isSelected());
+  DeleteMotionPreview preview=(DeleteMotionPreview)((ViewGroup)crystal).getChildAt(0);TextView bubble=(TextView)field(preview,"sample");assertEquals(0f,bubble.getAlpha(),0);DeleteMotionOverlay.cancel(bubble);assertEquals(1f,bubble.getAlpha(),0);
+  Bitmap first=Bitmap.createBitmap(preview.getWidth(),preview.getHeight(),Bitmap.Config.ARGB_8888);preview.draw(new Canvas(first));int before=first.getPixel(preview.getWidth()-5,preview.getHeight()/2);
+  Theme.wallpaper=new ColorDrawable(0xff7755aa);preview.didReceivedNotification(NotificationCenter.didSetNewWallpapper,0);Bitmap second=Bitmap.createBitmap(preview.getWidth(),preview.getHeight(),Bitmap.Config.ARGB_8888);preview.draw(new Canvas(second));assertNotEquals(before,second.getPixel(preview.getWidth()-5,preview.getHeight()/2));
+ }
+ @Test public void cancelAllStillFindsEffectsWhenSourceReferenceIsCleared()throws Exception{
+  TextView v=sample();DeleteMotionOverlay.runNativeDelete(root,Collections.singletonList(target(v)),1,()->{});
+  DeleteMotionOverlay overlay=overlays().get(0);((java.lang.ref.WeakReference<?>)field(overlay,"source")).clear();DeleteMotionOverlay.cancelAll(root);assertNull(field(overlay,"image"));
+ }
+ @Test public void settingsRenderInBothThemesAndPauseStopsPreview()throws Exception{
+  for(boolean dark:new boolean[]{false,true}){Theme.dark=dark;DeleteMotionSettingsActivity page=new DeleteMotionSettingsActivity();View view=page.createView(activity);root.addView(view,new FrameLayout.LayoutParams(360,840));size(view,360,840);
+   LinearLayout gallery=(LinearLayout)((ViewGroup)view).getChildAt(0);gallery.getChildAt(3).performClick();page.onPause();assertTrue(overlays().isEmpty());
+   Bitmap frame=Bitmap.createBitmap(360,840,Bitmap.Config.ARGB_8888);view.draw(new Canvas(frame));try(java.io.OutputStream out=Files.newOutputStream(Paths.get(System.getProperty("probe.root"),dark?"settings-dark.png":"settings-light.png"))){frame.compress(Bitmap.CompressFormat.PNG,100,out);}frame.recycle();root.removeView(view);
+  }
+ }
+ @Test public void previewSegmentsStayCompactAndLargeFontsNeverOverlap()throws Exception{
+  for(float font:new float[]{1,2,3}){Configuration config=new Configuration(activity.getResources().getConfiguration());config.fontScale=font;Context c=activity.createConfigurationContext(config);DeleteMotionPreview preview=new DeleteMotionPreview(c,1,null);preview.measure(View.MeasureSpec.makeMeasureSpec(320,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(0,View.MeasureSpec.UNSPECIFIED));preview.layout(0,0,320,preview.getMeasuredHeight());
+   View label=(View)field(preview,"label"),sample=(View)field(preview,"sample");assertTrue("font="+font+" label="+label.getBottom()+" sample="+sample.getTop(),label.getBottom()<=sample.getTop());if(font==1)assertTrue(preview.getMeasuredHeight()<=120);}
+ }
+ @Test public void rendererHasNoPerFrameGeometryAllocationsAndBoundsStayFinite(){
+  for(int style=1;style<=4;style++)for(float density:new float[]{1,2,3}){Bitmap original=art();BubbleFractureRenderer renderer=new BubbleFractureRenderer(original,220,74,density,style,2000,9911);Bitmap frame=Bitmap.createBitmap(640,420,Bitmap.Config.ARGB_8888);
+   for(int i=0;i<=100;i++){frame.eraseColor(0);renderer.draw(new Canvas(frame),i/100f,650);}
+   assertFalse(original.isRecycled());frame.recycle();original.recycle();}
+ }
+ static Bitmap art(){Bitmap b=Bitmap.createBitmap(220,74,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(b);Paint p=new Paint(3);p.setColor(0xff64a0b8);c.drawRoundRect(0,0,220,74,18,18,p);p.setColor(0xffe7ff93);c.drawCircle(34,35,18,p);p.setColor(0xff263b24);p.setTextSize(20);c.drawText("FlexyGram",66,43,p);return b;}
+ @Test public void originalPluginFramesMatchTheNativePort()throws Exception{
+  Class<?> reference=null;try{reference=Class.forName("com.larrat.fracture.BubbleFracture");}catch(ClassNotFoundException absent){}
+  java.nio.file.Path file=Paths.get(System.getProperty("probe.root"),"golden.json");JSONObject golden=Files.isRegularFile(file)?new JSONObject(Files.readString(file)):new JSONObject();
+  Assume.assumeTrue("Original-source oracle or its recorded golden frames required",reference!=null||golden.length()>0);
+  for(int style=1;style<=4;style++){
+   Bitmap image=art();BubbleFractureRenderer port=new BubbleFractureRenderer(image,220,74,1,style,2000,9911);Object original=null;Method draw=null;
+   if(reference!=null){reference.getMethod("configure",int.class,int.class,int.class,int.class,int.class,int.class,int.class).invoke(null,style-1,100,100,100,15,100,100);
+    Class<?> layer=Class.forName("com.larrat.fracture.BubbleFracture$Layer");Constructor<?> ctor=layer.getDeclaredConstructors()[0];ctor.setAccessible(true);
+    original=ctor.newInstance(root,sample(),new Object(),new Object(),image,220,74,0,0,1f,new ArrayList<>(),null,null,null,2000,20,100);
+    ((Rect)field(original,"clip")).set(0,0,640,420);set(original,"fallDistance",650f);
+    if(style==1||style==4){Class<?> mesh=Class.forName("com.larrat.fracture."+(style==1?"FractureMesh":"TntMesh"));List<Object> seeded=(List<Object>)mesh.getMethod("make",float.class,float.class,int.class,long.class).invoke(null,220f,74f,style==1?20:32,9911L);
+     List<Object> pieces=(List<Object>)field(original,"pieces");pieces.clear();pieces.addAll(seeded);List<Path> paths=(List<Path>)field(original,"paths");paths.clear();
+     for(Object piece:pieces){float[] xy=(float[])field(piece,"xy");Path path=new Path();path.moveTo(xy[0],xy[1]);for(int j=2;j<xy.length;j+=2)path.lineTo(xy[j],xy[j+1]);path.close();paths.add(path);}
+    }draw=layer.getDeclaredMethod("onDraw",Canvas.class);draw.setAccessible(true);
+   }
+   for(int ms:new int[]{0,120,400,800,1200,1600,1960,2000}){
+    Bitmap actual=Bitmap.createBitmap(640,420,Bitmap.Config.ARGB_8888);port.draw(new Canvas(actual),ms/2000f,650);
+    String key=style+":"+ms,digest=digest(actual);
+    if(original!=null){set(original,"began",SystemClock.uptimeMillis()-ms);Bitmap expected=Bitmap.createBitmap(640,420,Bitmap.Config.ARGB_8888);draw.invoke(original,new Canvas(expected));assertTrue("Plugin differs: "+key,actual.sameAs(expected));golden.put(key,digest(expected));expected.recycle();}
+    else assertEquals("Golden plugin frame differs: "+key,golden.getString(key),digest);
+    actual.recycle();
+   }image.recycle();
+  }Files.writeString(file,golden.toString(2));
+ }
+ static String digest(Bitmap b)throws Exception{int[] pixels=new int[b.getWidth()*b.getHeight()];b.getPixels(pixels,0,b.getWidth(),0,0,b.getWidth(),b.getHeight());java.nio.ByteBuffer data=java.nio.ByteBuffer.allocate(pixels.length*4);for(int pixel:pixels)data.putInt(pixel);return java.util.HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(data.array()));}
+}

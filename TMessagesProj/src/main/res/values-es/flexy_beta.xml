@@ -9,4 +9,10 @@
     <string name="FlexyDeletePlay">Probar animación</string>
     <string name="FlexyPillDeleted">ELIMINADO</string>
     <string name="FlexyContextScrollPreview">Vista previa del mensaje. Desliza para leer el resto.</string>
+    <string name="FlexyDeleteCrystal">Fractura de cristal</string>
+    <string name="FlexyDeleteFall">Caída fluida</string>
+    <string name="FlexyDeleteVortex">Vórtice</string>
+    <string name="FlexyDeleteTnt">Explosión TNT</string>
+    <string name="FlexyDeleteTapHint">Toca un estilo para aplicarlo y ver su animación. Vuelve a tocarlo para repetirla.</string>
+    <string name="FlexyDeleteAttribution">Efectos adaptados de Bubble Fracture v1.0, de @larrat23.</string>
 </resources>
