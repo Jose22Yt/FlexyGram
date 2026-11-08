@@ -98,12 +98,12 @@ public final class OnlineLyrics {
     private static final int MAX_RESPONSE_BYTES = 1024 * 1024;
     private static final long MISSING_TTL_MS = 15 * 60_000L;
     private static final int MAX_DURATION_DIFF = 3;
-    private static final int MAX_FALLBACK_DURATION_DIFF = 5;
+    private static final int MAX_FALLBACK_DURATION_DIFF = 15;
     private static final int ALIGN_WINDOW = 4;
     private static final float MIN_ALIGNED = 0.9f;
     private static final Pattern NOT_WORD = Pattern.compile("[^\\p{L}\\p{N}]+");
     private static final Pattern AUDIO_EXT = Pattern.compile("\\.(mp3|m4a|flac|ogg|oga|opus|wav|aac|alac|wma)$", Pattern.CASE_INSENSITIVE);
-    private static final Pattern DECORATION = Pattern.compile("\\s*[(\\[][^)\\]]*(official|lyric|video|audio|visualizer|remaster|hq|hd)[^)\\]]*[)\\]]", Pattern.CASE_INSENSITIVE);
+    private static final Pattern DECORATION = Pattern.compile("\\s*[(\\[][^)\\]]*(official|lyric|video|audio|visualizer|remaster|hq|hd|mix|edit|version|radio|club|extended|bonus|single|feat|ft\\.)[^)\\]]*[)\\]]", Pattern.CASE_INSENSITIVE);
     private static final DispatchQueue queue = new DispatchQueue("lyrics");
     private static final LruCache<String, Lyrics> memory = new LruCache<>(24);
     private static final LruCache<String, Long> missing = new LruCache<>(64);
@@ -237,21 +237,24 @@ public final class OnlineLyrics {
 
     private static Found requestLrclib(Query q) throws Exception {
         if (!TextUtils.isEmpty(q.artist)) {
-            StringBuilder url = new StringBuilder(LRCLIB).append("get?artist_name=").append(enc(q.artist))
-                    .append("&track_name=").append(enc(q.title));
-            if (!TextUtils.isEmpty(q.album)) {
-                url.append("&album_name=").append(enc(q.album));
-            }
-            if (q.duration > 0) {
-                url.append("&duration=").append(q.duration);
-            }
-            String body = get(url.toString());
-            if (body != null) {
-                JSONObject candidate = new JSONObject(body);
-                Found found = matches(q.title, q.artist, q.duration, candidate, "trackName", "artistName") ? fromLrclib(candidate) : null;
-                if (found != null) {
-                    return found;
+            try {
+                StringBuilder url = new StringBuilder(LRCLIB).append("get?artist_name=").append(enc(q.artist))
+                        .append("&track_name=").append(enc(q.title));
+                if (!TextUtils.isEmpty(q.album)) {
+                    url.append("&album_name=").append(enc(q.album));
                 }
+                if (q.duration > 0) {
+                    url.append("&duration=").append(q.duration);
+                }
+                String body = get(url.toString());
+                if (body != null) {
+                    JSONObject candidate = new JSONObject(body);
+                    Found found = matches(q.title, q.artist, q.duration, candidate, "trackName", "artistName") ? fromLrclib(candidate) : null;
+                    if (found != null) {
+                        return found;
+                    }
+                }
+            } catch (Throwable ignore) {
             }
         }
         StringBuilder url = new StringBuilder(LRCLIB).append("search?track_name=").append(enc(q.title));
@@ -259,6 +262,14 @@ public final class OnlineLyrics {
             url.append("&artist_name=").append(enc(q.artist));
         }
         String body = get(url.toString());
+        if (body == null && !TextUtils.isEmpty(q.artist)) {
+            url = new StringBuilder(LRCLIB).append("search?q=").append(enc(q.artist + " " + q.title));
+            body = get(url.toString());
+        }
+        if (body == null) {
+            url = new StringBuilder(LRCLIB).append("search?q=").append(enc(q.title));
+            body = get(url.toString());
+        }
         if (body == null) {
             return null;
         }
@@ -290,10 +301,32 @@ public final class OnlineLyrics {
     }
 
     static boolean matches(String title, String artist, int duration, JSONObject candidate, String titleKey, String artistKey) {
-        if (candidate == null || !identity(title).equals(identity(optString(candidate,titleKey)))) return false;
-        if (!TextUtils.isEmpty(artist) && !identity(artist).equals(identity(optString(candidate,artistKey)))) return false;
-        double actual = candidate.optDouble("duration",0);
-        return Double.isFinite(actual) && (duration <= 0 || actual <= 0 || Math.abs(actual-duration) <= MAX_FALLBACK_DURATION_DIFF);
+        if (candidate == null) return false;
+        String candTitle = optString(candidate, titleKey);
+        if (candTitle == null && "trackName".equals(titleKey)) {
+            candTitle = optString(candidate, "name");
+        }
+        if (candTitle == null) return false;
+        String idTitle = identity(title);
+        String idCandTitle = identity(candTitle);
+        boolean titleMatch = idTitle.equals(idCandTitle)
+                || (idTitle.length() >= 3 && idCandTitle.contains(idTitle))
+                || (idCandTitle.length() >= 3 && idTitle.contains(idCandTitle));
+        if (!titleMatch) return false;
+
+        if (!TextUtils.isEmpty(artist)) {
+            String candArtist = optString(candidate, artistKey);
+            if (candArtist != null) {
+                String idArtist = identity(artist);
+                String idCandArtist = identity(candArtist);
+                boolean artistMatch = idArtist.equals(idCandArtist)
+                        || (idArtist.length() >= 3 && idCandArtist.contains(idArtist))
+                        || (idCandArtist.length() >= 3 && idArtist.contains(idCandArtist));
+                if (!artistMatch) return false;
+            }
+        }
+        double actual = candidate.optDouble("duration", 0);
+        return Double.isFinite(actual) && (duration <= 0 || actual <= 0 || Math.abs(actual - duration) <= MAX_FALLBACK_DURATION_DIFF);
     }
 
     private static String optString(JSONObject o, String name) {
@@ -478,7 +511,7 @@ public final class OnlineLyrics {
         try {
             connection.setConnectTimeout(5_000);
             connection.setReadTimeout(6_000);
-            connection.setRequestProperty("User-Agent", "FlexyGram/" + BuildVars.BUILD_VERSION_STRING + " (https://github.com/Jose22Yt/FlexyGram)");
+            connection.setRequestProperty("User-Agent", "FlexyGram/" + BuildVars.BUILD_VERSION_STRING + " (Android; +https://github.com/Jose22Yt/FlexyGram)");
             connection.setRequestProperty("Accept", "application/json");
             int code = connection.getResponseCode();
             if (code == 404) {

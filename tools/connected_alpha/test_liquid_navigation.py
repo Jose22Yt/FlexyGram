@@ -5,7 +5,7 @@ ROOT=Path(__file__).resolve().parents[2]
 JAVA=ROOT/'TMessagesProj/src/main/java'
 class LiquidNavigation(unittest.TestCase):
  def test_order_sanitization_and_narrow_window_overflow_keep_safe_destinations(self):
-  code='''import app.flexygram.navigation.*;import java.util.*;public class DestinationProbe{static void ok(boolean x){if(!x)throw new AssertionError();}public static void main(String[]a){Random r=new Random(17);for(int n=0;n<20000;n++){int[] raw=new int[r.nextInt(18)];for(int i=0;i<raw.length;i++)raw[i]=r.nextInt(15)-3;int[] ids=LiquidNavigationDestinations.sanitize(raw);ok(ids.length>=2&&ids.length<=LiquidNavigationDestinations.COUNT);ok(LiquidNavigationDestinations.contains(ids,0));Set<Integer>s=new HashSet<>();for(int id:ids)ok(id>=0&&id<9&&s.add(id));ok(Arrays.equals(ids,LiquidNavigationDestinations.sanitize(ids)));for(int slots=2;slots<=LiquidNavigationDestinations.COUNT;slots++){int[] fit=LiquidNavigationDestinations.fit(ids,slots);ok(fit.length<=slots&&LiquidNavigationDestinations.contains(fit,0));for(int id:fit)ok(id==9||LiquidNavigationDestinations.contains(ids,id));if(ids.length>slots)ok(fit[fit.length-1]==9);}}}}'''
+  code='''import app.flexygram.navigation.*;import java.util.*;public class DestinationProbe{static void ok(boolean x){if(!x)throw new AssertionError();}public static void main(String[]a){Random r=new Random(17);for(int n=0;n<20000;n++){int[] raw=new int[r.nextInt(18)];for(int i=0;i<raw.length;i++)raw[i]=r.nextInt(15)-3;int[] ids=LiquidNavigationDestinations.sanitize(raw);ok(ids.length>=0&&ids.length<=LiquidNavigationDestinations.MAX_VISIBLE);Set<Integer>s=new HashSet<>();for(int id:ids)ok(id>=0&&id<LiquidNavigationDestinations.COUNT&&id!=LiquidNavigationDestinations.MORE&&s.add(id));ok(Arrays.equals(ids,LiquidNavigationDestinations.sanitize(ids)));for(int slots=2;slots<=LiquidNavigationDestinations.MAX_VISIBLE;slots++){int[] fit=LiquidNavigationDestinations.fit(ids,slots);ok(fit.length<=slots);for(int id:fit)ok(id==9||LiquidNavigationDestinations.contains(ids,id));if(ids.length>slots)ok(fit[fit.length-1]==9);}}}}'''
   with tempfile.TemporaryDirectory() as d:
    p=Path(d)/'DestinationProbe.java';p.write_text(code)
    subprocess.run(['java','-m','jdk.compiler/com.sun.tools.javac.Main','-d',d,str(JAVA/'app/flexygram/navigation/LiquidNavigationDestinations.java'),str(p)],check=True,capture_output=True)
@@ -30,7 +30,7 @@ class LiquidNavigation(unittest.TestCase):
    self.assertNotIn('LiquidNavigationSettingsActivity',(JAVA/'app/exteraless/settings'/str(name+'.java')).read_text())
   fixed=(JAVA/'app/flexygram/navigation/LiquidNavigationConfig.java').read_text()
   self.assertIn('edit.remove(key)',fixed);self.assertNotIn('.clear()',fixed)
-  self.assertIn('return 60',fixed);self.assertIn('return LiquidNavigationDestinations.defaults()',fixed)
+  self.assertIn('60',fixed);self.assertIn('return LiquidNavigationDestinations.defaults()',fixed)
  def test_localized_configuration_labels_match(self):
   labels=[]
   for locale in ['values','values-es','values-ru']:

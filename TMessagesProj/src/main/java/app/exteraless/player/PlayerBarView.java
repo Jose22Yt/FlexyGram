@@ -87,7 +87,12 @@ public class PlayerBarView extends FrameLayout implements NotificationCenter.Not
         LinearLayout buttons = new LinearLayout(context);
         buttons.setOrientation(LinearLayout.HORIZONTAL);
         playButton = new RingPlayButton(context, 15, 2.5f, 16, 1.1f, 10);
-        playButton.setShowRing(!org.telegram.messenger.BuildConfig.CONNECTED_ALPHA);
+        if (BuildConfig.CONNECTED_ALPHA) {
+            playButton.setFillCircle(true);
+            playButton.setShowRing(false);
+        } else {
+            playButton.setShowRing(true);
+        }
         playButton.setOnClickListener(v -> {
             MediaController mc = MediaController.getInstance();
             MessageObject mo = mc.getPlayingMessageObject();
@@ -129,10 +134,15 @@ public class PlayerBarView extends FrameLayout implements NotificationCenter.Not
     @Override protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         boolean showNext = MeasureSpec.getSize(widthMeasureSpec) >= dp(320);
         nextButton.setVisibility(showNext ? VISIBLE : GONE);
-        ((FrameLayout.LayoutParams) texts.getLayoutParams()).rightMargin = dp(16 + 48 * (showNext ? 3 : 2));
-        if(blurSurface!=null){
-            int controlsWidth=dp(6+48*(showNext?3:2));blurSurface.setSegments(controlsWidth,dp(6));
-            FrameLayout.LayoutParams line=(FrameLayout.LayoutParams)progress.getLayoutParams();line.width=Math.max(0,MeasureSpec.getSize(widthMeasureSpec)-controlsWidth-dp(24));line.leftMargin=dp(12);line.bottomMargin=dp(6);
+        int controlsWidth = dp(6 + 48 * (showNext ? 3 : 2));
+        int segmentGap = dp(12);
+        ((FrameLayout.LayoutParams) texts.getLayoutParams()).rightMargin = controlsWidth + segmentGap + dp(12);
+        if (blurSurface != null) {
+            blurSurface.setSegments(controlsWidth, segmentGap);
+            FrameLayout.LayoutParams line = (FrameLayout.LayoutParams) progress.getLayoutParams();
+            line.width = Math.max(0, MeasureSpec.getSize(widthMeasureSpec) - controlsWidth - segmentGap - dp(24));
+            line.leftMargin = dp(12);
+            line.bottomMargin = dp(6);
         }
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
@@ -153,6 +163,9 @@ public class PlayerBarView extends FrameLayout implements NotificationCenter.Not
         closeButton.setBackground(Theme.createSelectorDrawable(ripple, Theme.RIPPLE_MASK_CIRCLE_20DP));
         playButton.setBackground(Theme.createSelectorDrawable(ripple, Theme.RIPPLE_MASK_CIRCLE_20DP));
         int accent = BuildConfig.CONNECTED_ALPHA ? theme.primary : Theme.getColor(Theme.key_inappPlayerPlayPause, resourcesProvider);
+        if (BuildConfig.CONNECTED_ALPHA) {
+            playButton.setFillIconColor(theme.onPrimary);
+        }
         playButton.setColors(accent, ColorUtils.setAlphaComponent(accent, 51), accent);
         cover.setColors(theme.primaryContainer, theme.onPrimaryContainer);
         if (BuildConfig.CONNECTED_ALPHA && getBackground() instanceof GradientDrawable) {

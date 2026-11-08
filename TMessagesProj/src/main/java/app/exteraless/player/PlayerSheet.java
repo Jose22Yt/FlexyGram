@@ -577,6 +577,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         if (closing) {
             return;
         }
+        MusicBlurSurface.setFrozen(true);
         if (!skipMorph && miniSource != null && !isDismissed()) {
             if (morphProgress >= 0f) {
                 boolean preview = backPreview;
@@ -587,7 +588,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
                     backPreview = false;
                     morphCoverView.setVisibility(View.INVISIBLE);
                 }
-                startMorph(morphProgress, 0f, preview ? 380 : 300, this::finishMorphClose);
+                startMorph(morphProgress, 0f, preview ? 260 : 220, this::finishMorphClose);
                 return;
             }
             float ty = root.getTranslationY();
@@ -599,7 +600,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
                 morphTo.set(0, ty, root.getWidth(), root.getHeight() + ty);
                 morphToRadius = dp(28) * clamp01(ty / dp(56));
                 morphCoverTo.offset(0, ty);
-                startMorph(1f, 0f, 380, this::finishMorphClose);
+                startMorph(1f, 0f, 240, this::finishMorphClose);
                 return;
             }
             root.setTranslationY(ty);
@@ -619,6 +620,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         if (miniSource != null) {
             miniSource.setTransitionHidden(false);
         }
+        MusicBlurSurface.setFrozen(false);
         super.dismiss();
     }
 
@@ -629,11 +631,14 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         root.setVisibility(View.INVISIBLE);
         backDrawable.setAlpha(0);
         skipDismissAnimation();
+        clearMorph();
+        MusicBlurSurface.setFrozen(false);
         super.dismiss();
     }
 
     @Override
     public void dismissInternal() {
+        MusicBlurSurface.setFrozen(false);
         if (miniSource != null) {
             miniSource.setTransitionHidden(false);
         }
@@ -804,7 +809,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         morphCoverFromRadius = mini.getCoverRadius();
         morphFromColor = mini.getCardColor();
         recycleSnapshot();
-        morphSnapshot = mini.captureCard();
+        morphSnapshot = closing ? null : mini.captureCard();
         Bitmap bitmap = coverView instanceof OrbitArtwork ? cover.getImageReceiver().getBitmap() : coverView instanceof CoverImage ? ((CoverImage) coverView).getImageReceiver().getBitmap() : null;
         morphCoverBitmap = bitmap != null ? bitmap : mini.getCoverBitmap();
         rectInRoot(coverView, morphCoverTo);
@@ -819,7 +824,9 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         if (hideCover) {
             coverView.setVisibility(View.INVISIBLE);
         }
-        visualContent().setLayerType(View.LAYER_TYPE_HARDWARE, null);
+        if (!closing) {
+            visualContent().setLayerType(View.LAYER_TYPE_HARDWARE, null);
+        }
         return true;
     }
 
@@ -1415,10 +1422,8 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
             }
             if (lyrics != null) {
                 showLyrics(lyrics);
-            } else if (AppearanceConfig.lrclibAllowed.Bool()) {
-                fetchLyrics();
             } else {
-                lyricsView.showState(LyricsView.STATE_OFFER);
+                fetchLyrics();
             }
         });
     }

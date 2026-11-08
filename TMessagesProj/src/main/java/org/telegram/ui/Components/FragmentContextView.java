@@ -1657,6 +1657,7 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
     private app.exteraless.player.SignatureMusicHost signatureMusicHost;
     private app.exteraless.player.PlayerBarView md3Bar;
     private boolean md3Music;
+    public boolean isMd3Music() { return md3Music; }
 
     private boolean computeMd3Music() {
         MessageObject messageObject = MediaController.getInstance().getPlayingMessageObject();

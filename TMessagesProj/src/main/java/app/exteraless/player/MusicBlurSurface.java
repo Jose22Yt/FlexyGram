@@ -38,6 +38,8 @@ final class MusicBlurSurface extends Drawable implements ViewTreeObserver.OnPreD
     MusicBlurSurface(View target, float radius) { this(target,radius,false); }
     MusicBlurSurface(View target,float radius,boolean allowGlass) { this.target=target;this.radius=radius;this.allowGlass=allowGlass; }
     void setSegments(float controlsWidth,float gap){if(segmentWidth!=controlsWidth||segmentGap!=gap){segmentWidth=controlsWidth;segmentGap=gap;invalidateSelf();}}
+    private static volatile boolean frozen;
+    public static void setFrozen(boolean value) { frozen = value; }
     static boolean isCapturing() { return capturing; }
     void setColors(PlayerColors colors) {
         int fill=allowGlass?colors.surfaceHigh:colors.surface;
@@ -65,7 +67,7 @@ final class MusicBlurSurface extends Drawable implements ViewTreeObserver.OnPreD
     @Override public void onScrollChanged() { dirty = true; target.invalidate(); }
     @Override public void onGlobalLayout() { dirty = true; target.invalidate(); }
     @Override public boolean onPreDraw() {
-        if (!attached || pending || capturing || !target.isShown() || target.getAlpha() == 0
+        if (frozen || !attached || pending || capturing || !target.isShown() || target.getAlpha() == 0
                 || target.getWidth() < 8 || target.getHeight() < 8) return true;
         if (!LiteMode.isEnabled(LiteMode.FLAG_CHAT_BLUR)) {
             dirty = true;
@@ -99,13 +101,21 @@ final class MusicBlurSurface extends Drawable implements ViewTreeObserver.OnPreD
         clip.rewind();
         float split=rect.right-segmentWidth;
         if(segmentWidth>0&&split>rect.left){
-            clip.addRoundRect(rect.left,rect.top,split-segmentGap,rect.bottom,radius,radius,Path.Direction.CW);
+            float cardRadius = Math.min(radius, AndroidUtilities.dp(16));
+            clip.addRoundRect(rect.left,rect.top,split-segmentGap,rect.bottom,cardRadius,cardRadius,Path.Direction.CW);
             clip.addRoundRect(split,rect.top,rect.right,rect.bottom,radius,radius,Path.Direction.CW);
         }else clip.addRoundRect(rect, radius, radius, Path.Direction.CW);
         if(allowGlass&&android.os.Build.VERSION.SDK_INT>=33&&canvas.isHardwareAccelerated()&&bitmap!=null&&!bitmap.isRecycled()
                 &&LiteMode.isEnabled(LiteMode.FLAG_LIQUID_GLASS)){
+            int save = canvas.save();
+            canvas.clipPath(clip);
             if(glass==null)glass=new MusicGlassRenderer(target,radius);
-            glass.draw(canvas,bitmap,getBounds(),surface,outline);return;
+            glass.draw(canvas,bitmap,getBounds(),surface,outline);
+            canvas.restoreToCount(save);
+            paint.setStyle(Paint.Style.STROKE); paint.setStrokeWidth(AndroidUtilities.dpf2(.7f));
+            paint.setColor(outline); rect.inset(.5f,.5f); canvas.drawPath(clip,paint);
+            paint.setStyle(Paint.Style.FILL);
+            return;
         }
         int save = canvas.save(); canvas.clipPath(clip);
         if (bitmap != null && !bitmap.isRecycled()) {

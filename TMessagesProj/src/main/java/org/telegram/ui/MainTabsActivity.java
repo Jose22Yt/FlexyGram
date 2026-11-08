@@ -385,7 +385,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         // отступов и без ограничения ширины
         MainTabsUiHelper.applyTabsLayoutStyle(tabsView, dp(328 + DialogsActivity.MAIN_TABS_MARGIN * 2));
 
-        tabs = new GlassTabView[11];
+        tabs = new GlassTabView[12];
         tabs[INDEX_CHATS] = GlassTabView.createMainTab(context, resourceProvider, GlassTabView.TabAnimation.CHATS, R.string.MainTabsChats);
         tabs[INDEX_CONTACTS] = GlassTabView.createMainTab(context, resourceProvider, GlassTabView.TabAnimation.CONTACTS, R.string.MainTabsContacts);
         tabs[INDEX_SETTINGS] = GlassTabView.createMainTab(context, resourceProvider, GlassTabView.TabAnimation.SETTINGS, R.string.Settings);
@@ -411,7 +411,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         tabsView.addTabToIgnoreClick(tabs[INDEX_CALLS]);
         tabsView.addTabToIgnoreClick(tabs[INDEX_FEED]);
 
-        final int[] displayOrder = {INDEX_CHATS, INDEX_FEED, INDEX_CONTACTS, INDEX_SETTINGS, INDEX_CALLS, INDEX_PROFILE,6,7,8,9,10};
+        final int[] displayOrder = {INDEX_CHATS, INDEX_FEED, INDEX_CONTACTS, INDEX_SETTINGS, INDEX_CALLS, INDEX_PROFILE, 6, 7, 8, 9, 10, 11};
         for (int index : displayOrder) {
             final GlassTabView view = tabs[index];
             final int tabIndex = index;
@@ -1245,6 +1245,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
             case 6: args.putInt("dialogsType",DialogsActivity.DIALOGS_TYPE_GROUPS_ONLY);target=new DialogsActivity(args);break;
             case 7: args.putInt("dialogsType",DialogsActivity.DIALOGS_TYPE_CHANNELS_ONLY);target=new DialogsActivity(args);break;
             case 8: args.putLong("user_id",getUserConfig().getClientUserId());target=new ChatActivity(args);break;
+            case 11: app.exteraless.player.FlexyMusicLibrary.openMusicTab(this, miniPlayer); return;
             default: return;
         }
         target.setCurrentAccount(currentAccount);presentFragment(target);
@@ -1551,9 +1552,10 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
                 || !app.flexygram.navigation.LiquidNavigationConfig.isVisible();
         final int updateLayoutHeight = updateLayoutWrapper.isUpdateLayoutVisible() ? dp(UpdateLayoutWrapper.HEIGHT) : 0;
         final int tabsHeight = hidden ? 0 : dp(MainTabsUiHelper.getTabsViewHeightDp());
-        final int gap = hidden || MainTabsUiHelper.isMaterial3NavigationBar() ? dp(12) : dp(4);
+        final int bottomGap = app.flexygram.navigation.LiquidNavigationConfig.configured() ? dp(app.flexygram.navigation.LiquidNavigationConfig.bottomGapDp()) : 0;
+        final int tabsTotalTop = navigationBarHeight + updateLayoutHeight + tabsHeight + bottomGap;
         final float factor = hidden ? 1f : animatorTabsVisible.getFloatValue();
-        miniPlayer.setHostPosition(-(navigationBarHeight + updateLayoutHeight + tabsHeight + gap - dp(12)), factor);
+        miniPlayer.setHostPosition(-(tabsTotalTop + dp(10)), factor);
         onMiniPlayerOffsetChanged();
     }
 

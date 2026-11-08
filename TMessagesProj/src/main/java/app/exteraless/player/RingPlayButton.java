@@ -36,6 +36,10 @@ public class RingPlayButton extends View {
     private boolean playing;
     private boolean showRing = true;
     public void setShowRing(boolean value) { showRing = value; invalidate(); }
+    private boolean fillCircle;
+    private int fillIconColor = 0xffffffff;
+    public void setFillCircle(boolean value) { fillCircle = value; invalidate(); }
+    public void setFillIconColor(int color) { fillIconColor = color; invalidate(); }
     private float amplitude;
     private float phase;
     private long lastFrame;
@@ -116,7 +120,13 @@ public class RingPlayButton extends View {
         }
         float cx = getWidth() / 2f;
         float cy = getHeight() / 2f;
-        if (showRing) canvas.drawCircle(cx, cy, radius, trackPaint);
+        if (fillCircle) {
+            Paint fillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            fillPaint.setColor(ringColor);
+            canvas.drawCircle(cx, cy, radius + dpf2(2), fillPaint);
+        } else if (showRing) {
+            canvas.drawCircle(cx, cy, radius, trackPaint);
+        }
         MessageObject mo = message;
         float progress = mo != null ? Math.max(0f, Math.min(1f, mo.audioProgress)) : 0f;
         drawnProgress = progress;
@@ -164,7 +174,7 @@ public class RingPlayButton extends View {
         int size = icon.getIntrinsicWidth();
         int cx = getWidth() / 2;
         int cy = getHeight() / 2;
-        icon.setColor(iconColor);
+        icon.setColor(fillCircle ? fillIconColor : iconColor);
         icon.setAlpha((int) (255 * Math.min(1f, alpha)));
         icon.setBounds(cx - size / 2, cy - size / 2, cx + size / 2, cy + size / 2);
         canvas.save();

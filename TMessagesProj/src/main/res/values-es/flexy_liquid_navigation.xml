@@ -6,6 +6,7 @@
     <string name="FlexyLiquidNavGroups">Grupos</string>
     <string name="FlexyLiquidNavChannels">Canales</string>
     <string name="FlexyLiquidNavSaved">Mensajes guardados</string>
+    <string name="FlexyLiquidNavMusic">Música</string>
     <string name="FlexyLiquidNavVisible">Pestañas visibles</string>
     <string name="FlexyLiquidNavAvailable">Agregar un destino</string>
     <string name="FlexyLiquidNavReorderHint">Mantén y arrastra para reordenar. Toca para quitar. Conserva de dos a seis pestañas. Mantén Chats pulsado para abrir destinos ocultos.</string>

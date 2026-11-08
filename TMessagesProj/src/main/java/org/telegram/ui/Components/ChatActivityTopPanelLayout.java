@@ -106,7 +106,18 @@ public class ChatActivityTopPanelLayout extends AnimatedLinearLayout {
     protected void dispatchDraw(@NonNull Canvas canvas) {
         if (getMetadata().getTotalVisibility() == 0) return;
 
-        if (backgroundDrawable != null) {
+        boolean isMd3Only = false;
+        if (callFragmentContextView != null && callFragmentContextView.isMd3Music()) {
+            int visibleCount = 0;
+            for (int a = 0, N = getEntriesCount(); a < N; a++) {
+                if (getEntry(a).getVisibility() > 0) visibleCount++;
+            }
+            if (visibleCount <= 1) {
+                isMd3Only = true;
+            }
+        }
+
+        if (backgroundDrawable != null && !isMd3Only) {
             backgroundDrawable.draw(canvas);
         }
 

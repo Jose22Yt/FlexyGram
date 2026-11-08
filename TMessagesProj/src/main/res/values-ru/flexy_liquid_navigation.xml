@@ -6,6 +6,7 @@
     <string name="FlexyLiquidNavGroups">Группы</string>
     <string name="FlexyLiquidNavChannels">Каналы</string>
     <string name="FlexyLiquidNavSaved">Избранное</string>
+    <string name="FlexyLiquidNavMusic">Музыка</string>
     <string name="FlexyLiquidNavVisible">Видимые вкладки</string>
     <string name="FlexyLiquidNavAvailable">Добавить раздел</string>
     <string name="FlexyLiquidNavReorderHint">Удерживайте и перетащите для изменения порядка. Нажмите для удаления. Чаты обязательны; минимум две вкладки.</string>

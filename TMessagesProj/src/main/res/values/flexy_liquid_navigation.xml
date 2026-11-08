@@ -6,6 +6,7 @@
     <string name="FlexyLiquidNavGroups">Groups</string>
     <string name="FlexyLiquidNavChannels">Channels</string>
     <string name="FlexyLiquidNavSaved">Saved Messages</string>
+    <string name="FlexyLiquidNavMusic">Music</string>
     <string name="FlexyLiquidNavVisible">Visible tabs</string>
     <string name="FlexyLiquidNavAvailable">Add a destination</string>
     <string name="FlexyLiquidNavReorderHint">Hold and drag to reorder. Tap to remove. Keep two to six tabs. Chats stays available. Long-press Chats for hidden destinations.</string>
