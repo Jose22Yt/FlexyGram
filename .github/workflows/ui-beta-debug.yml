@@ -151,6 +151,7 @@ jobs:
           with open(out, "w") as f:
               json.dump(data, f, indent=2)
           '
+          export GRADLE_OPTS="-Dorg.gradle.internal.http.socketTimeout=120000 -Dorg.gradle.internal.http.connectionTimeout=120000 -Dorg.gradle.wrapper.networkTimeout=120000"
           ./gradlew --no-daemon --max-workers=2 --console=plain \
             --init-script "$RUNNER_TEMP/flexy-native-pools.gradle" \
             -PflexyPerformanceBuild=true :TMessagesProj:assembleDebug 2>&1 | tee build/reports/ui-beta/assemble.log
