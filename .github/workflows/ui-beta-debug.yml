@@ -90,6 +90,7 @@ jobs:
           python tools/connected_alpha/header_touch/run.py --sdk-root "$ANDROID_HOME" --output-dir build/reports/ui-beta/header-touch
           python tools/connected_alpha/music_visual/run.py --sdk-root "$ANDROID_HOME" --output-dir build/reports/ui-beta/music-visual
           python tools/connected_alpha/lyrics_runtime/run.py --sdk-root "$ANDROID_HOME" --output-dir build/reports/ui-beta/lyrics-runtime
+          python tools/connected_alpha/lyrics_ui/run.py --sdk-root "$ANDROID_HOME" --output-dir build/reports/ui-beta/lyrics-ui
           python tools/connected_alpha/delete_motion/run.py --sdk-root "$ANDROID_HOME" --output-dir build/reports/ui-beta/delete-motion
       - name: Rebuild the dependency wheels required by the official beta source
         shell: bash
