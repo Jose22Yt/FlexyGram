@@ -44,6 +44,11 @@ Todas las correcciones se implementaron sin introducir dependencias externas, pr
 | **SEC-01** | Ciclo de Vida / Crash | **Media** | **Corregido** | `FlexyFileEditorActivity.java` | `destroyHtml()` invocaba `html.destroy()` mientras el `WebView` seguía anclado a la jerarquía de vistas de `AlertDialog`, pudiendo arrojar excepciones en Android 10+. |
 | **STOR-01** | Disco / Caché | **Media** | **Corregido** | `OnlineLyrics.java` | El directorio `cache/lrclib/` acumulaba archivos JSON indefinidamente sin cuota máxima ni política de desalojo LRU. |
 | **A11Y-01** | Accesibilidad / UX | **Media** | **Corregido** | `GlassTabView.java` | `setMainTabsCompact()` asignaba `setContentDescription(null)` al expandir pestañas, e ignoraba la cantidad de mensajes sin leer para servicios de lectura de pantalla (TalkBack). |
+| **PERF-06** | Gráficos / Animación | **Media** | **Corregido** | `DeleteMotionOverlay.java` | Creación de dos arrays `new int[2]` en cada cuadro de `onDraw()` durante animaciones de fractura/borrado de burbujas, provocando GC churn a 60/120 Hz. |
+| **PERF-07** | Gráficos / RenderNode | **Alta** | **Corregido** | `PlayerSheet.java` | `useHardwareLayer = true` provocaba asignación de textura FBO de pantalla completa en GPU durante transiciones, causando micro-pausas y retrasos perceptibles al abrir/cerrar. |
+| **UX-02** | Interfaz / Dock | **Alta** | **Corregido** | `MainTabsActivity.java`, `FragmentContextView.java` | Eliminación de tarjetas flotantes sobre la barra inferior (`PlayerMiniView`) y restauración de la barra nativa compacta de 36dp de Telegram (`FragmentContextView`), eliminando conflictos de posición y lag al salir. |
+| **UX-03** | Animación / Fluidez | **Alta** | **Corregido** | `PlayerSheet.java`, `Md3Player.java` | Apertura y cierre "súper smooth" mediante animación de traslación por hardware de `BottomSheet`, eliminando capturas de bitmap pesadas, morphing y congelamientos de superficies de desenfoque (`MusicBlurSurface`). |
+| **ARCH-02** | Navegación / Reproducción | **Media** | **Corregido** | `LiquidNavigationDestinations.java`, `LiquidNavigationTabs.java`, `FlexyMusicLibrary.java` | Eliminación del destino `MUSIC` del dock (`COUNT = 11`) y preservación estricta de la reproducción acotada al chat activo (comportamiento Telegram nativo sin escaneo global de almacenamiento). |
 
 ---
 
@@ -75,6 +80,27 @@ Todas las correcciones se implementaron sin introducir dependencias externas, pr
 - **`GlassTabView.java`**:
   1. Se implementó el método `updateContentDescription()`, el cual sincroniza el título de la pestaña y, si existe un contador de elementos no leídos (`counter.getText()`), formatea la descripción accesible (ej. `"Chats, 5"`).
   2. Se garantiza que la descripción accesible persista tanto en modo compacto como expandido, mejorando sustancialmente la experiencia para usuarios con discapacidades visuales.
+
+### 4.6. Eliminación de Tarjetas Flotantes y Retorno al Mini Reproductor Nativo de Telegram
+- **`Md3Player.java` y `FragmentContextView.java`**:
+  1. Se desactivó el subcomponente `md3MiniPlayer` en `Md3Player.miniEnabled()` (`return false;`), forzando que `FragmentContextView` utilice el strip nativo de Telegram (altura 36dp, controles vectoriales directos, texto marquesina).
+  2. Se eliminó la inyección y el consumo de recursos de `PlayerBarView` en la cabecera de conversaciones.
+  3. Al tocar la barra de contexto superior, se abre el reproductor completo con carátula circular Órbita, anillo de progreso y visor de letras, manteniendo la estética aprobada.
+- **`MainTabsActivity.java` y `LiquidNavigationDestinations.java`**:
+  1. Se removió la vista `miniPlayer` (`PlayerMiniView`) del layout de la pantalla principal, suprimiendo cualquier colisión de coordenadas y desfase con el dock de navegación inferior y el botón flotante (FAB).
+  2. Se retiró la opción `MUSIC = 11` del dock de navegación inferior (`LiquidNavigationDestinations.COUNT = 11`), manteniendo intacta la disposición aprobada de pestañas (0 a 10).
+  3. Se desvinculó el escaneo global de almacenamiento en `FlexyMusicLibrary`, devolviendo la reproducción al comportamiento original de Telegram acotado estrictamente a los audios del chat activo.
+
+### 4.7. Optimización de Animación y Fluidez al Abrir/Cerrar el Reproductor ("Super Smooth")
+- **`PlayerSheet.java`**:
+  1. Se configuró `useHardwareLayer = false;` en el constructor, previniendo que Android asigne y destruya una textura FBO del tamaño completo de la pantalla en la GPU durante las animaciones de entrada y salida, eliminando el micro-stuttering ("jank").
+  2. Se optimizó el flujo de `dismiss()` para que ejecute inmediatamente la transición nativa por hardware (`super.dismiss()`), eliminando capturas de pantalla morfológicas (`captureCard`), conversiones de bitmaps y bloqueos de desenfoque (`MusicBlurSurface.setFrozen(true)`).
+  3. `onCustomOpenAnimation()` retorna `false` cuando no hay tarjeta flotante previa, permitiendo que la física nativa de `BottomSheet` anime el deslizamiento vertical con interpolador cúbico a 60/120 FPS sin latencia táctil.
+
+### 4.8. Optimización de Ciclos de Renderizado en Animaciones de Borrado
+- **`DeleteMotionOverlay.java`**:
+  1. Se eliminó la creación repetitiva de arrays primitivos `new int[2]` dentro del método `onDraw()`.
+  2. Se implementaron buffers de coordenadas reutilizables `tmpAt` y `tmpOrigin`, evitando sobrecargar el recolector de basura (GC) durante animaciones continuas a 60/120 Hz.
 
 ---
 

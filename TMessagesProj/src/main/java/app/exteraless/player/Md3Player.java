@@ -23,7 +23,7 @@ public final class Md3Player {
     }
 
     public static boolean miniEnabled() {
-        return BuildConfig.CONNECTED_ALPHA || AppearanceConfig.md3MiniPlayer();
+        return false;
     }
 
     private static boolean handles(MessageObject messageObject) {
@@ -49,17 +49,10 @@ public final class Md3Player {
             return;
         }
         BottomSheet sheet = create(fragment.getParentActivity(), fragment.getResourceProvider());
-        if (!BuildConfig.CONNECTED_ALPHA && sheet instanceof PlayerSheet && source != null && source.canTransition()) {
-            ((PlayerSheet) sheet).setTransitionSource(source);
-        }
         fragment.showDialog(sheet);
     }
 
     public static boolean hidesContextPlayer(BaseFragment fragment, MessageObject messageObject) {
-        if (!miniEnabled() || fragment == null || messageObject == null || !messageObject.isMusic()) {
-            return false;
-        }
-        Bundle args = fragment.getArguments();
-        return args != null && args.getBoolean("hasMainTabs", false);
+        return false;
     }
 }

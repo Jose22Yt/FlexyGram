@@ -31,6 +31,7 @@ public final class DeleteMotionOverlay extends View implements Choreographer.Fra
     private long firstFrame = -1;
     private float progress;
     private boolean stopped,counted,budgeted;
+    private final int[] tmpAt = new int[2], tmpOrigin = new int[2];
     private final View.OnAttachStateChangeListener hostListener = new View.OnAttachStateChangeListener() {
         public void onViewAttachedToWindow(View view) {}
         public void onViewDetachedFromWindow(View view) { stop(); }
@@ -131,8 +132,8 @@ public final class DeleteMotionOverlay extends View implements Choreographer.Fra
         if(src!=null){
             if(!src.isAttachedToWindow()){post(this::stop);return;}
             if(host.isAttachedToWindow()){
-                int[] at=new int[2],origin=new int[2];src.getLocationInWindow(at);host.getLocationInWindow(origin);
-                currentLeft=at[0]-origin[0]+boundsLeft;currentTop=at[1]-origin[1]+boundsTop;
+                src.getLocationInWindow(tmpAt);host.getLocationInWindow(tmpOrigin);
+                currentLeft=tmpAt[0]-tmpOrigin[0]+boundsLeft;currentTop=tmpAt[1]-tmpOrigin[1]+boundsTop;
                 if(currentTop+contentHeight<-150 || currentTop>host.getHeight()+150){post(this::stop);return;}
             }
         }

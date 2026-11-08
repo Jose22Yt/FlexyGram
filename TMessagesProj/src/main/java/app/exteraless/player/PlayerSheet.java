@@ -185,6 +185,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         touchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
         occupyNavigationBar = true;
         drawNavigationBar = false;
+        useHardwareLayer = false;
         setApplyTopPadding(false);
         setApplyBottomPadding(false);
 
@@ -578,8 +579,8 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         if (closing) {
             return;
         }
-        MusicBlurSurface.setFrozen(true);
         if (!skipMorph && miniSource != null && !isDismissed()) {
+            MusicBlurSurface.setFrozen(true);
             if (morphProgress >= 0f) {
                 boolean preview = backPreview;
                 closing = true;
@@ -606,6 +607,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
             }
             root.setTranslationY(ty);
         }
+        closing = true;
         detach();
         if (morphAnimator != null) {
             morphAnimator.removeAllListeners();
@@ -621,7 +623,6 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         if (miniSource != null) {
             miniSource.setTransitionHidden(false);
         }
-        MusicBlurSurface.setFrozen(false);
         super.dismiss();
     }
 
@@ -648,6 +649,9 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
 
     @Override
     protected boolean onCustomOpenAnimation() {
+        if (miniSource == null || skipMorph) {
+            return false;
+        }
         root.setTranslationY(0);
         if (!prepareMorph(true)) {
             return false;

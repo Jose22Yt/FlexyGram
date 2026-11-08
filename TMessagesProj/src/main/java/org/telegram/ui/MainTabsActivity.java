@@ -385,7 +385,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         // отступов и без ограничения ширины
         MainTabsUiHelper.applyTabsLayoutStyle(tabsView, dp(328 + DialogsActivity.MAIN_TABS_MARGIN * 2));
 
-        tabs = new GlassTabView[12];
+        tabs = new GlassTabView[11];
         tabs[INDEX_CHATS] = GlassTabView.createMainTab(context, resourceProvider, GlassTabView.TabAnimation.CHATS, R.string.MainTabsChats);
         tabs[INDEX_CONTACTS] = GlassTabView.createMainTab(context, resourceProvider, GlassTabView.TabAnimation.CONTACTS, R.string.MainTabsContacts);
         tabs[INDEX_SETTINGS] = GlassTabView.createMainTab(context, resourceProvider, GlassTabView.TabAnimation.SETTINGS, R.string.Settings);
@@ -411,7 +411,7 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         tabsView.addTabToIgnoreClick(tabs[INDEX_CALLS]);
         tabsView.addTabToIgnoreClick(tabs[INDEX_FEED]);
 
-        final int[] displayOrder = {INDEX_CHATS, INDEX_FEED, INDEX_CONTACTS, INDEX_SETTINGS, INDEX_CALLS, INDEX_PROFILE, 6, 7, 8, 9, 10, 11};
+        final int[] displayOrder = {INDEX_CHATS, INDEX_FEED, INDEX_CONTACTS, INDEX_SETTINGS, INDEX_CALLS, INDEX_PROFILE, 6, 7, 8, 9, 10};
         for (int index : displayOrder) {
             final GlassTabView view = tabs[index];
             final int tabIndex = index;
@@ -490,10 +490,6 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
         fadeView.setBackground(fadeDrawable);
 
         contentView.addView(fadeView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 0, Gravity.BOTTOM));
-
-        miniPlayer = new app.exteraless.player.PlayerMiniView(context, this, resourceProvider);
-        miniPlayer.setOffsetListener(this::onMiniPlayerOffsetChanged);
-        contentView.addView(miniPlayer, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, app.exteraless.player.PlayerMiniView.HEIGHT_DP + 16, Gravity.BOTTOM));
 
         tabsViewWrapper = new FrameLayout(context) {
             @Override protected void onLayout(boolean changed, int l, int t, int r, int b) {
@@ -1245,7 +1241,6 @@ public class MainTabsActivity extends ViewPagerActivity implements NotificationC
             case 6: args.putInt("dialogsType",DialogsActivity.DIALOGS_TYPE_GROUPS_ONLY);target=new DialogsActivity(args);break;
             case 7: args.putInt("dialogsType",DialogsActivity.DIALOGS_TYPE_CHANNELS_ONLY);target=new DialogsActivity(args);break;
             case 8: args.putLong("user_id",getUserConfig().getClientUserId());target=new ChatActivity(args);break;
-            case 11: app.exteraless.player.FlexyMusicLibrary.openMusicTab(this, miniPlayer); return;
             default: return;
         }
         target.setCurrentAccount(currentAccount);presentFragment(target);
