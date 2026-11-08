@@ -76,6 +76,63 @@ public final class R {
 }''')
  put('androidx/customview/poolingcontainer/R.java','package androidx.customview.poolingcontainer;public final class R{public static final class id{public static final int is_pooling_container_tag=0x7f090010;public static final int pooling_container_listener_holder_tag=0x7f090011;}}')
  put('androidx/customview/R.java','package androidx.customview;public final class R{public static final class id{public static final int tag_unhandled_key_event_manager=0x7f090020;public static final int tag_unhandled_key_listeners=0x7f090021;}}')
+ put('androidx/core/R.java','''package androidx.core;
+public final class R {
+ public static final class attr {}
+ public static final class styleable {}
+ public static final class id {
+  public static final int accessibility_action_clickable_span = 0x7f090001;
+  public static final int accessibility_custom_action_0 = 0x7f090002;
+  public static final int accessibility_custom_action_1 = 0x7f090003;
+  public static final int accessibility_custom_action_2 = 0x7f090004;
+  public static final int accessibility_custom_action_3 = 0x7f090005;
+  public static final int accessibility_custom_action_4 = 0x7f090006;
+  public static final int accessibility_custom_action_5 = 0x7f090007;
+  public static final int accessibility_custom_action_6 = 0x7f090008;
+  public static final int accessibility_custom_action_7 = 0x7f090009;
+  public static final int accessibility_custom_action_8 = 0x7f09000a;
+  public static final int accessibility_custom_action_9 = 0x7f09000b;
+  public static final int accessibility_custom_action_10 = 0x7f09000c;
+  public static final int accessibility_custom_action_11 = 0x7f09000d;
+  public static final int accessibility_custom_action_12 = 0x7f09000e;
+  public static final int accessibility_custom_action_13 = 0x7f09000f;
+  public static final int accessibility_custom_action_14 = 0x7f090010;
+  public static final int accessibility_custom_action_15 = 0x7f090011;
+  public static final int accessibility_custom_action_16 = 0x7f090012;
+  public static final int accessibility_custom_action_17 = 0x7f090013;
+  public static final int accessibility_custom_action_18 = 0x7f090014;
+  public static final int accessibility_custom_action_19 = 0x7f090015;
+  public static final int accessibility_custom_action_20 = 0x7f090016;
+  public static final int accessibility_custom_action_21 = 0x7f090017;
+  public static final int accessibility_custom_action_22 = 0x7f090018;
+  public static final int accessibility_custom_action_23 = 0x7f090019;
+  public static final int accessibility_custom_action_24 = 0x7f09001a;
+  public static final int accessibility_custom_action_25 = 0x7f09001b;
+  public static final int accessibility_custom_action_26 = 0x7f09001c;
+  public static final int accessibility_custom_action_27 = 0x7f09001d;
+  public static final int accessibility_custom_action_28 = 0x7f09001e;
+  public static final int accessibility_custom_action_29 = 0x7f09001f;
+  public static final int accessibility_custom_action_30 = 0x7f090020;
+  public static final int accessibility_custom_action_31 = 0x7f090021;
+  public static final int tag_accessibility_actions = 0x7f090022;
+  public static final int tag_accessibility_clickable_spans = 0x7f090023;
+  public static final int tag_accessibility_heading = 0x7f090024;
+  public static final int tag_accessibility_pane_title = 0x7f090025;
+  public static final int tag_screen_reader_focusable = 0x7f090026;
+  public static final int tag_state_description = 0x7f090027;
+  public static final int tag_unhandled_key_event_ids = 0x7f090028;
+  public static final int tag_unhandled_key_event_manager = 0x7f090029;
+  public static final int tag_unhandled_key_listeners = 0x7f09002a;
+  public static final int tag_window_insets_animation_callback = 0x7f09002b;
+  public static final int tag_on_apply_window_listener = 0x7f09002c;
+  public static final int tag_on_receive_content_listener = 0x7f09002d;
+  public static final int tag_on_receive_content_mime_types = 0x7f09002e;
+  public static final int view_tree_lifecycle_owner = 0x7f09002f;
+  public static final int view_tree_view_model_store_owner = 0x7f090030;
+  public static final int view_tree_saved_state_registry_owner = 0x7f090031;
+  public static final int item_touch_helper_previous_elevation = 0x7f090032;
+ }
+}''')
  # Music layout fixtures are not needed in the lyrics suite.
  (source/'app/exteraless/player/LayoutFixture.java').unlink()
 if __name__=='__main__':raise SystemExit(pipeline.main(here=HERE,test_class='LyricsUiTest',stubs_writer=write_stubs,extra_aars=[('androidx.recyclerview','recyclerview','1.4.0'),('androidx.customview','customview','1.2.0'),('androidx.customview','customview-poolingcontainer','1.0.0')]))
