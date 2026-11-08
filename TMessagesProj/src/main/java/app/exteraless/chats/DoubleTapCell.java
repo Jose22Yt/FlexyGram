@@ -53,8 +53,12 @@ import xyz.nextalone.nagram.NaConfig;
 public class DoubleTapCell extends LinearLayout {
 
     private final RectF rect = new RectF();
+    private final Rect rect1 = new Rect();
     private final Paint outlinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint[] circleOutlinePaint = new Paint[2];
+    private final Paint[] circleOutlinePaint = new Paint[]{
+            new Paint(Paint.ANTI_ALIAS_FLAG),
+            new Paint(Paint.ANTI_ALIAS_FLAG)
+    };
 
     private final MessageDrawable[] messages = new MessageDrawable[]{
             new MessageDrawable(MessageDrawable.TYPE_TEXT, false, false),
@@ -119,8 +123,6 @@ public class DoubleTapCell extends LinearLayout {
                 int g = Color.green(color);
                 int b = Color.blue(color);
 
-                @SuppressLint("DrawAllocation") Rect rect1 = new Rect();
-
                 float stroke = outlinePaint.getStrokeWidth() / 2;
                 Theme.dialogs_onlineCirclePaint.setColor(Color.argb(20, r, g, b));
 
@@ -137,7 +139,6 @@ public class DoubleTapCell extends LinearLayout {
                     messages[i].draw(canvas, outlinePaint);
 
                     for (int j = 0; j < 2; j++) {
-                        circleOutlinePaint[j] = new Paint(Paint.ANTI_ALIAS_FLAG);
                         circleOutlinePaint[j].setStyle(Paint.Style.STROKE);
                         circleOutlinePaint[j].setColor(ColorUtils.blendARGB(0x00, Color.argb(76, r, g, b), circleProgress[i + 2 * j]));
                         circleOutlinePaint[j].setStrokeWidth(AndroidUtilities.dp(1.5f) * circleProgress[i + 2 * j] * circleProgress[i + 2 * j]);

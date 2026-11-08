@@ -195,10 +195,11 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
         locate(cover, out);
     }
 
-    private static void locate(View view, RectF out) {
-        int[] loc = new int[2];
-        view.getLocationOnScreen(loc);
-        out.set(loc[0], loc[1], loc[0] + view.getWidth(), loc[1] + view.getHeight());
+    private final int[] tmpLoc = new int[2];
+
+    private void locate(View view, RectF out) {
+        view.getLocationOnScreen(tmpLoc);
+        out.set(tmpLoc[0], tmpLoc[1], tmpLoc[0] + view.getWidth(), tmpLoc[1] + view.getHeight());
     }
 
     public float getCardRadius() {

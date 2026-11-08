@@ -155,6 +155,7 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
     private boolean underLightStatus;
     private boolean underLightNav;
     private final RectF backgroundRect = new RectF();
+    private final int[] tmpLoc = new int[2];
     private PlayerColors colors;
     private ValueAnimator colorAnimator;
     private MessageObject current;
@@ -799,12 +800,11 @@ public class PlayerSheet extends BottomSheet implements NotificationCenter.Notif
         }
         View coverView = lyricsFraction >= 0.5f ? smallCover : orbit!=null?orbit.getArtwork():cover;
         morphCoverView = coverView;
-        int[] loc = new int[2];
-        root.getLocationOnScreen(loc);
+        root.getLocationOnScreen(tmpLoc);
         mini.getCardRect(morphFrom);
-        morphFrom.offset(-loc[0], -loc[1]);
+        morphFrom.offset(-tmpLoc[0], -tmpLoc[1]);
         mini.getCoverRect(morphCoverFrom);
-        morphCoverFrom.offset(-loc[0], -loc[1]);
+        morphCoverFrom.offset(-tmpLoc[0], -tmpLoc[1]);
         morphFromRadius = mini.getCardRadius();
         morphCoverFromRadius = mini.getCoverRadius();
         morphFromColor = mini.getCardColor();

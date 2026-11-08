@@ -22,6 +22,7 @@ public class RingPlayButton extends View {
 
     private final Paint trackPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint ringPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint fillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Path path = new Path();
     private final Runnable waveFrame = this::invalidate;
     private final PlayerIcon playIcon;
@@ -121,7 +122,6 @@ public class RingPlayButton extends View {
         float cx = getWidth() / 2f;
         float cy = getHeight() / 2f;
         if (fillCircle) {
-            Paint fillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
             fillPaint.setColor(ringColor);
             canvas.drawCircle(cx, cy, radius + dpf2(2), fillPaint);
         } else if (showRing) {
