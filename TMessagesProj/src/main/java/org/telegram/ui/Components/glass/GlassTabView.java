@@ -257,6 +257,7 @@ public class GlassTabView extends FrameLayout implements MainTabsLayout.Tab, Fac
         counter.setText(text, animated);
         isHasCounterAnimator.setValue(!TextUtils.isEmpty(text), animated);
         isHasCounterErrorAnimator.setValue(isError, animated);
+        updateContentDescription();
     }
 
     public void setPremiumBadge(boolean usePremiumBadge) {
@@ -719,6 +720,7 @@ public class GlassTabView extends FrameLayout implements MainTabsLayout.Tab, Fac
 
     public void setText(CharSequence text) {
         textView.setText(text);
+        updateContentDescription();
     }
 
 
@@ -795,12 +797,7 @@ public class GlassTabView extends FrameLayout implements MainTabsLayout.Tab, Fac
         }
 
         textView.setVisibility(compact ? GONE : VISIBLE);
-
-        if (compact) {
-            setContentDescription(textView.getText());
-        } else {
-            setContentDescription(null);
-        }
+        updateContentDescription();
 
         if (backupImageView != null) {
             backupImageView.setLayoutParams(compact ?
@@ -816,5 +813,16 @@ public class GlassTabView extends FrameLayout implements MainTabsLayout.Tab, Fac
 
         requestLayout();
         invalidate();
+    }
+
+    public void updateContentDescription() {
+        CharSequence title = textView != null ? textView.getText() : null;
+        if (TextUtils.isEmpty(title)) return;
+        CharSequence count = counter != null ? counter.getText() : null;
+        if (!TextUtils.isEmpty(count)) {
+            setContentDescription(title + ", " + count);
+        } else {
+            setContentDescription(title);
+        }
     }
 }
