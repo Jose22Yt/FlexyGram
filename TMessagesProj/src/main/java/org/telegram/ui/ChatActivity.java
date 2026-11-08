@@ -9843,6 +9843,21 @@ public class ChatActivity extends BaseFragment implements
         ViewCompat.setOnApplyWindowInsetsListener(fragmentView, this::onApplyWindowInsets);
         Timer.finish(t);
 
+        AndroidUtilities.runOnUIThread(() -> {
+            if (fragmentView != null && isAttachedToWindow()) {
+                if (chatAttachAlert == null) {
+                    createChatAttachView();
+                }
+                if (chatActivityEnterView != null) {
+                    chatActivityEnterView.post(() -> {
+                        if (chatActivityEnterView != null && chatActivityEnterView.isAttachedToWindow()) {
+                            chatActivityEnterView.prewarmEmojiView();
+                        }
+                    });
+                }
+            }
+        }, 600);
+
         return fragmentView;
     }
 
@@ -12019,7 +12034,7 @@ public class ChatActivity extends BaseFragment implements
             animators.add(scrimPaintAlphaAnimator = ValueAnimator.ofFloat(0, value));
 
             if (blur) {
-                captureMessageMenuBlur(blurGeneration, false);
+                captureMessageMenuBlur(blurGeneration, true);
             }
         } else {
             scrimViewProgress = scrimPaintAlpha / max;
@@ -29173,13 +29188,7 @@ public class ChatActivity extends BaseFragment implements
 
     @Override
     public boolean needDelayOpenAnimation() {
-        if (chatMode != MODE_SCHEDULED && getParentLayout() != null && getParentLayout().getFragmentStack().size() > 1) {
-            BaseFragment previousFragment = getParentLayout().getFragmentStack().get(getParentLayout().getFragmentStack().size() - 2);
-            if (previousFragment instanceof ChatActivity && ((ChatActivity) previousFragment).isKeyboardVisible()) {
-                return false;
-            }
-        }
-        return firstLoading;
+        return false;
     }
 
     @Override

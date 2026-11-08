@@ -2101,6 +2101,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
             if (close != null && onCloseAnimationEndRunnable == close) onCloseAnimationEnd();
             if (open != null && onOpenAnimationEndRunnable == open) onOpenAnimationEnd();
             if (USE_ACTIONBAR_CROSSFADE) invalidateActionBars();
+            NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.startAllHeavyOperations, 512);
         } finally {
             completingTransition = false;
         }
@@ -2227,6 +2228,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         if (first) {
             animationProgress = 0.0f;
             lastFrameTime = System.nanoTime() / 1000000;
+            NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.stopAllHeavyOperations, 512);
         }
         if (USE_SPRING_ANIMATION) {
             if (USE_ACTIONBAR_CROSSFADE) {

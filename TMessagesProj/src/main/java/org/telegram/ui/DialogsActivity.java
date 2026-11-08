@@ -4860,7 +4860,17 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     } else {
                         scrollingManually = false;
                     }
+                    if (newState == RecyclerView.SCROLL_STATE_DRAGGING || newState == RecyclerView.SCROLL_STATE_SETTLING) {
+                        if (!stoppedAllHeavyOperations) {
+                            stoppedAllHeavyOperations = true;
+                            NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.stopAllHeavyOperations, 512);
+                        }
+                    }
                     if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                        if (stoppedAllHeavyOperations) {
+                            stoppedAllHeavyOperations = false;
+                            NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.startAllHeavyOperations, 512);
+                        }
                         wasManualScroll = false;
                         disableActionBarScrolling = false;
                         if (waitingForScrollFinished) {
@@ -4877,7 +4887,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
                 @Override
                 public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                    if (contentView != null) {
+                    if (contentView != null && (dx != 0 || dy != 0)) {
                         contentView.updateBlurContent();
                     }
                     viewPage.dialogsItemAnimator.onListScroll(-dy);

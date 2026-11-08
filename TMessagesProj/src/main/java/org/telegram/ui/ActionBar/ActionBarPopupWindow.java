@@ -893,6 +893,7 @@ public class ActionBarPopupWindow extends PopupWindow {
         });
         content.updateAnimation = false;
         content.clipChildren = true;
+        content.setLayerType(View.LAYER_TYPE_HARDWARE, null);
         windowAnimatorSet.playTogether(
                 ObjectAnimator.ofFloat(content, "backScaleY", 0.0f, finalScaleY),
                 ObjectAnimator.ofInt(content, "backAlpha", 0, 255),
@@ -902,6 +903,7 @@ public class ActionBarPopupWindow extends PopupWindow {
         windowAnimatorSet.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
+                content.setLayerType(View.LAYER_TYPE_NONE, null);
                 content.startAnimationPending = false;
                 int count = content.getItemsCount();
                 for (int a = 0; a < count; a++) {
@@ -979,6 +981,10 @@ public class ActionBarPopupWindow extends PopupWindow {
                     finalScaleY = content.backScaleY;
                 }
             }
+            final ActionBarPopupWindowLayout finalContent = content;
+            if (finalContent != null) {
+                finalContent.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+            }
             windowAnimatorSet = new AnimatorSet();
             windowAnimatorSet.playTogether(
                     ObjectAnimator.ofFloat(content, "backScaleY", 0.0f, finalScaleY),
@@ -987,6 +993,9 @@ public class ActionBarPopupWindow extends PopupWindow {
             windowAnimatorSet.addListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
+                    if (finalContent != null) {
+                        finalContent.setLayerType(View.LAYER_TYPE_NONE, null);
+                    }
                     windowAnimatorSet = null;
                     ViewGroup viewGroup = (ViewGroup) getContentView();
                     ActionBarPopupWindowLayout content = null;

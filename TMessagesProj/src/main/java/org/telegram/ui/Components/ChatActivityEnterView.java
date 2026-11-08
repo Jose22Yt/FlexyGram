@@ -13396,7 +13396,11 @@ public class ChatActivityEnterView extends FrameLayout implements
         mOverrideEditTextView = editText;
     }
 
-    protected void createEmojiView() {
+    public void prewarmEmojiView() {
+        createEmojiView();
+    }
+
+    public void createEmojiView() {
         if (emojiView != null && emojiView.currentAccount != UserConfig.selectedAccount) {
             viewParentForEmojiView.removeView(emojiView);
             emojiView = null;
@@ -14531,6 +14535,10 @@ public class ChatActivityEnterView extends FrameLayout implements
                         this.animationEndRunnable = onAnimationEndRunnuble;
                     } else {
                         panelAnimation = new AnimatorSet();
+                        final View animatedPanel = currentView;
+                        if (animatedPanel != null) {
+                            animatedPanel.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+                        }
                         if (windowInsetsInAppController != null) {
                             panelAnimation.playTogether(ObjectAnimator.ofFloat(currentHeight - previousHeight, 0));
                         } else {
@@ -14542,6 +14550,9 @@ public class ChatActivityEnterView extends FrameLayout implements
                         panelAnimation.addListener(new AnimatorListenerAdapter() {
                             @Override
                             public void onAnimationEnd(Animator animation) {
+                                if (animatedPanel != null) {
+                                    animatedPanel.setLayerType(View.LAYER_TYPE_NONE, null);
+                                }
                                 panelAnimation = null;
                                 notificationsLocker.unlock();
                                 onAnimationEndRunnuble.run();

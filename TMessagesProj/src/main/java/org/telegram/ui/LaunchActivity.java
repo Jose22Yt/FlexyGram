@@ -3546,10 +3546,15 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                 }
             }
             if (rebuildFragments) {
-                actionBarLayout.rebuildFragments(INavigationLayout.REBUILD_FLAG_REBUILD_LAST);
-                if (AndroidUtilities.isTablet()) {
-                    layersActionBarLayout.rebuildFragments(INavigationLayout.REBUILD_FLAG_REBUILD_LAST);
-                    rightActionBarLayout.rebuildFragments(INavigationLayout.REBUILD_FLAG_REBUILD_LAST);
+                boolean isLauncherIntent = intent != null && Intent.ACTION_MAIN.equals(intent.getAction())
+                        && (intent.hasCategory(Intent.CATEGORY_LAUNCHER) || intent.getCategories() == null || intent.getCategories().isEmpty())
+                        && (intent.getExtras() == null || intent.getExtras().isEmpty());
+                if (!isLauncherIntent) {
+                    actionBarLayout.rebuildFragments(INavigationLayout.REBUILD_FLAG_REBUILD_LAST);
+                    if (AndroidUtilities.isTablet()) {
+                        layersActionBarLayout.rebuildFragments(INavigationLayout.REBUILD_FLAG_REBUILD_LAST);
+                        rightActionBarLayout.rebuildFragments(INavigationLayout.REBUILD_FLAG_REBUILD_LAST);
+                    }
                 }
             }
         }
@@ -6350,6 +6355,16 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
     @Override
     public void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
+        boolean isLauncherIntent = intent != null && Intent.ACTION_MAIN.equals(intent.getAction())
+                && (intent.hasCategory(Intent.CATEGORY_LAUNCHER) || intent.getCategories() == null || intent.getCategories().isEmpty())
+                && (intent.getExtras() == null || intent.getExtras().isEmpty());
+        boolean hasExistingStack = actionBarLayout != null && !actionBarLayout.getFragmentStack().isEmpty();
+        if (isLauncherIntent && hasExistingStack) {
+            if (AndroidUtilities.needShowPasscode(true) || SharedConfig.isWaitingForPasscodeEnter) {
+                showPasscodeActivity(true, false, -1, -1, null, null);
+            }
+            return;
+        }
         handleIntent(intent, true, false, false, null, true, true);
     }
 

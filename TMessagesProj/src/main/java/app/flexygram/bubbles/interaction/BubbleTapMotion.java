@@ -71,12 +71,5 @@ public final class BubbleTapMotion implements Runnable {
     }
     private void invalidate() {
         owner.invalidate();
-        if (owner.getParent() instanceof View) {
-            View parent=(View)owner.getParent();
-            float extra=Math.max(Math.abs(x.value-1f),Math.abs(y.value-1f));
-            int pad=(int)Math.ceil(Math.max(owner.getWidth(),owner.getHeight())*extra)+2;
-            int left=(int)Math.floor(owner.getX())-parent.getScrollX(), top=(int)Math.floor(owner.getY())-parent.getScrollY();
-            parent.invalidate(left-pad,top-pad,left+owner.getWidth()+pad,top+owner.getHeight()+pad);
-        }
     }
 }

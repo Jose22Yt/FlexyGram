@@ -1629,6 +1629,7 @@ public class ReactionsContainerLayout extends FrameLayout implements Notificatio
         setAlpha(1f);
         setTransitionProgress(from);
         if(Math.abs(from-target)<.001f){setTransitionProgress(target);return;}
+        setLayerType(View.LAYER_TYPE_HARDWARE, null);
         notificationsLocker.lock();
         final ObjectAnimator animator=ObjectAnimator.ofFloat(this,TRANSITION_PROGRESS_VALUE,from,target);
         signatureTransitionAnimator=animator;
@@ -1640,6 +1641,7 @@ public class ReactionsContainerLayout extends FrameLayout implements Notificatio
                 signatureTransitionAnimator=null;
                 setTransitionProgress(target);
                 notificationsLocker.unlock();
+                setLayerType(View.LAYER_TYPE_NONE, null);
             }
         });
         animator.start();

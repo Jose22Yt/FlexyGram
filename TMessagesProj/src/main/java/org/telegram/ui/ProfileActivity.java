@@ -9913,11 +9913,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
 
     @Override
     public boolean needDelayOpenAnimation() {
-        if (NaConfig.INSTANCE.getBackAnimationStyle().Int() == ActionBarLayout.BACK_ANIMATION_SPRING || NaConfig.INSTANCE.getCenterActionBarTitle().Bool() && NaConfig.INSTANCE.getCenterActionBarTitleType().Int() != 2) {
-            return false;
-        } else {
-            return playProfileAnimation == 0;
-        }
+        return false;
     }
 
     @Override
@@ -11801,7 +11797,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         } else if (currentConnectionState == ConnectionsManager.ConnectionStateConnecting) {
             onlineTextOverride = LocaleController.getString(R.string.Connecting);
         } else if (currentConnectionState == ConnectionsManager.ConnectionStateUpdating) {
-            onlineTextOverride = LocaleController.getString(R.string.Updating);
+            onlineTextOverride = null;
         } else if (currentConnectionState == ConnectionsManager.ConnectionStateConnectingToProxy) {
             onlineTextOverride = LocaleController.getString(R.string.ConnectingToProxy);
         } else {

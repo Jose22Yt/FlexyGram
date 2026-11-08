@@ -21,7 +21,7 @@ public final class SelectedBubbleMotion implements Choreographer.FrameCallback {
         schedule();
     }
     private final Spring phase = new Spring(1f, 1100f, .78f, .0015f);
-    private static final long ENTER_LIMIT_MS = 280, CLOSE_LIMIT_MS = 180;
+    private static final long ENTER_LIMIT_MS = 360, CLOSE_LIMIT_MS = 220;
     private Runnable invalidate, completion;
     private boolean running, closing;
     private long lastFrame, started;

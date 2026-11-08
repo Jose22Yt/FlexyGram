@@ -2001,6 +2001,10 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
             boundMenu = null;
         }
         removeNotificationObservers();
+        if (pendingUpdatingConnectionRunnable != null) {
+            AndroidUtilities.cancelRunOnUIThread(pendingUpdatingConnectionRunnable);
+            pendingUpdatingConnectionRunnable = null;
+        }
         if (emojiStatusDrawable != null) {
             emojiStatusDrawable.detach();
         }
@@ -2040,6 +2044,8 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
         }
     }
 
+    private Runnable pendingUpdatingConnectionRunnable;
+
     private void updateCurrentConnectionState() {
         String title = null;
         if (currentConnectionState == ConnectionsManager.ConnectionStateWaitingForNetwork) {
@@ -2051,6 +2057,27 @@ public class ChatAvatarContainer extends FrameLayout implements FactorAnimator.T
         } else if (currentConnectionState == ConnectionsManager.ConnectionStateConnectingToProxy) {
             title = getString(R.string.ConnectingToProxy);
         }
+
+        if (pendingUpdatingConnectionRunnable != null) {
+            AndroidUtilities.cancelRunOnUIThread(pendingUpdatingConnectionRunnable);
+            pendingUpdatingConnectionRunnable = null;
+        }
+
+        if (title == null) {
+            applyConnectionStateTitle(null);
+        } else if (currentConnectionState == ConnectionsManager.ConnectionStateUpdating) {
+            final String finalTitle = title;
+            pendingUpdatingConnectionRunnable = () -> {
+                pendingUpdatingConnectionRunnable = null;
+                applyConnectionStateTitle(finalTitle);
+            };
+            AndroidUtilities.runOnUIThread(pendingUpdatingConnectionRunnable, 1200);
+        } else {
+            applyConnectionStateTitle(title);
+        }
+    }
+
+    private void applyConnectionStateTitle(String title) {
         if (title == null) {
             if (lastSubtitle != null) {
                 if (subtitleTextView != null) {
