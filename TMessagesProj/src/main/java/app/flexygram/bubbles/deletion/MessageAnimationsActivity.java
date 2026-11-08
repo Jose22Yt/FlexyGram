@@ -21,7 +21,7 @@ public final class MessageAnimationsActivity extends SignatureMatteSettingsActiv
     @Override protected BaseListAdapter createAdapter(Context context) { return new Adapter(context); }
     @Override protected void onItemClick(View view,int position,float x,float y) {
         if (position != row || getParentActivity() == null) return;
-        if (messages) DeleteMotionSettingsDialog.show(getParentActivity());
+        if (messages) presentFragment(new DeleteMotionSettingsActivity());
         else presentFragment(new MessageAnimationsActivity(true));
     }
     @Override public void onResume() { super.onResume(); if (listAdapter != null) listAdapter.notifyDataSetChanged(); }

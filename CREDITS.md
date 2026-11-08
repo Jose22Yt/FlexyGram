@@ -23,6 +23,16 @@ También se conservan los reconocimientos heredados a [AyuGram](https://github.c
 
 No se deben sustituir licencias ausentes por una licencia supuesta. Antes de distribuir un conjunto de recursos heredados, hay que comprobar su revisión de origen y conservar los avisos exigidos. El crédito de una imagen no equivale por sí solo a un permiso de uso.
 
+## Efectos de borrado
+
+Las mallas, curvas y fórmulas de renderizado de fractura, caída, vórtice y TNT se
+adaptan de **Bubble Fracture v1.0**, de [@larrat23](https://t.me/larrat23), a partir
+del archivo proporcionado para esta integración. Se conservan los valores
+predeterminados del efecto. La integración nativa, el ciclo de vida y el selector
+son propios de FlexyGram; no se incorpora el cargador DEX ni los hooks del plugin.
+El archivo recibido no declara una licencia específica: esta atribución no
+sustituye los derechos ni supone una licencia nueva para sus fuentes originales.
+
 ## Bibliotecas y componentes
 
 Los manifiestos técnicos son la referencia de las dependencias y revisiones de cada rama:

@@ -59,39 +59,34 @@ def test_bubble_measure_reuses_layouts_and_invalidates_width_density_theme(tmp_p
 }'''.replace('MEASURE',measure)})
 
 
-def test_fragment_effects_share_one_fade_calculation_and_paint_update_per_frame(tmp_path):
-    source=(JAVA/'app/flexygram/bubbles/deletion/DeleteMotionOverlay.java').read_text()
-    methods='\n'.join(method(source,s) for s in [
-        'private void drawCrystal(', 'private void drawVortex(', 'private void drawTnt(', 'private void drawWhole('])
-    probe(tmp_path,{'Probe.java':'''public class Probe {
- static class DeleteMotionMath {
- static int fades;static float fade(float t,float b){fades++;return app.flexygram.bubbles.deletion.DeleteMotionMath.fade(t,b);}
- static float smooth(float t){return app.flexygram.bubbles.deletion.DeleteMotionMath.smooth(t);}
- static float scatter(float t){return app.flexygram.bubbles.deletion.DeleteMotionMath.scatter(t);}
- static float preCompression(float t){return app.flexygram.bubbles.deletion.DeleteMotionMath.preCompression(t);}
+def test_fracture_geometry_is_deterministic_and_preserves_bubble_area(tmp_path):
+    base=JAVA/'app/flexygram/bubbles/deletion'
+    probe(tmp_path, {'Probe.java': '''import app.flexygram.bubbles.deletion.*;
+public class Probe {
+ static void check(boolean value){if(!value)throw new AssertionError();}
+ public static void main(String[] args){
+ for(long seed=0;seed<20;seed++){
+ var pieces=FractureMesh.make(220,74,20,seed);var repeated=FractureMesh.make(220,74,20,seed);
+ check(pieces.size()==20);double area=0;
+ for(int i=0;i<pieces.size();i++){
+ var piece=pieces.get(i);float[] xy=piece.xy;check(java.util.Arrays.equals(xy,repeated.get(i).xy));
+ double signed=0;for(int j=0;j<xy.length;j+=2){int next=(j+2)%xy.length;
+ check(Float.isFinite(xy[j])&&Float.isFinite(xy[j+1]));
+ check(xy[j]>=-.001&&xy[j]<=220.001&&xy[j+1]>=-.001&&xy[j+1]<=74.001);
+ signed+=xy[j]*xy[next+1]-xy[next]*xy[j+1];}area+=Math.abs(signed)*.5;
+ }check(Math.abs(area-220*74)<.1);
  }
- static class Color {static int WHITE;}
- static class Paint {int alpha=255,sets;void setColor(int c){}void setAlpha(int a){alpha=a;sets++;}}
- static class Image {int getWidth(){return 100;}int getHeight(){return 160;}}
- static class Piece {float dx,dy,weight=1,spin,x,y;Object clip=new Object();}
- static class Canvas {int expected,draws;int save(){return 0;}void translate(float a,float b){}void rotate(float a,float b,float c){}void rotate(float a){}void scale(float a,float b){}void scale(float a,float b,float c,float d){}void clipPath(Object p){}void restoreToCount(int n){}
- void drawRoundRect(float a,float b,float c,float d,float e,float f,Paint p){}
- void drawBitmap(Image i,float x,float y,Paint p){check(p.alpha==expected);draws++;}}
- Image image=new Image();Paint bitmapPaint=new Paint(),flashPaint=new Paint();float progress;
- java.util.List<Piece> pieces=new java.util.ArrayList<>();
- METHODS
- static void check(boolean b){if(!b)throw new AssertionError();}
- public static void main(String[] args){Probe p=new Probe();for(int i=0;i<32;i++)p.pieces.add(new Piece());
- for(int style=0;style<3;style++)for(int step=0;step<=100;step++){
- p.progress=step/100f;float begin=style==0?.60f:style==1?.74f:.63f;
- boolean whole=(style==0&&p.progress<.13f)||(style==2&&p.progress<.085f);
- Canvas c=new Canvas();c.expected=whole?255:Math.round(255f*app.flexygram.bubbles.deletion.DeleteMotionMath.fade(p.progress,begin));
- p.bitmapPaint.sets=0;DeleteMotionMath.fades=0;
- if(style==0)p.drawCrystal(c);else if(style==1)p.drawVortex(c);else p.drawTnt(c);
- check(c.draws==(whole?1:32)&&p.bitmapPaint.alpha==255&&p.bitmapPaint.sets==2&&DeleteMotionMath.fades==(whole?0:1));
+ for(int step=0;step<=100;step++){float t=step/100f;
+ check(Math.abs(FractureMotionMath.falling(t,100)-t*t)<.00001);
+ check(FractureMesh.fade(t)>=0&&FractureMesh.fade(t)<=1);
+ check(TntMotion.fade(t)>=0&&TntMotion.fade(t)<=1);
+ check(TntMotion.travel(t)>=0&&TntMotion.travel(t)<=1);
  }
+ check(FractureMesh.phase(.1f,.2f)==0&&FractureMesh.phase(1,.2f)==1);
+ check(TntMotion.flash(0)==0&&TntMotion.flash(1)==0);
+ check(TntMotion.fuseDuration(650,2000)==650);
  }
-}'''.replace('METHODS',methods)},[JAVA/'app/flexygram/bubbles/deletion/DeleteMotionMath.java'])
+}'''},[base/(name+'.java') for name in ['FractureMesh','FractureMotionMath','TntMotion']])
 
 
 def test_list_pill_measurement_cache_keeps_content_and_size_invalidation(tmp_path):

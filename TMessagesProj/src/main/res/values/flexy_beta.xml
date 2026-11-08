@@ -9,4 +9,10 @@
     <string name="FlexyDeletePlay">Preview animation</string>
     <string name="FlexyPillDeleted">DELETED</string>
     <string name="FlexyContextScrollPreview">Message preview. Swipe to read the rest.</string>
+    <string name="FlexyDeleteCrystal">Crystal fracture</string>
+    <string name="FlexyDeleteFall">Liquid fall</string>
+    <string name="FlexyDeleteVortex">Liquid vortex</string>
+    <string name="FlexyDeleteTnt">TNT dispersion</string>
+    <string name="FlexyDeleteTapHint">Tap a style to apply it and preview its animation. Tap it again to replay.</string>
+    <string name="FlexyDeleteAttribution">Effects adapted from Bubble Fracture v1.0 by @larrat23.</string>
 </resources>
