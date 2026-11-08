@@ -21583,8 +21583,10 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                         drawFlexyBubble(canvas, currentBackgroundSelectedDrawable, null);
                     }
                 } else if (selectedBackgroundProgress != 0 && (currentMessageObject == null || !currentMessageObject.preview) && !(currentMessagesGroup != null && currentMessagesGroup.isDocuments)) {
-                    currentBackgroundDrawable.setAlpha((int) (255 * alphaInternal));
-                    drawFlexyBubble(canvas, currentBackgroundDrawable, null);
+                    if (selectedBackgroundProgress < 1f) {
+                        currentBackgroundDrawable.setAlpha((int) (255 * alphaInternal));
+                        drawFlexyBubble(canvas, currentBackgroundDrawable, null);
+                    }
                     currentSelectedBackgroundAlpha = selectedBackgroundProgress;
                     currentBackgroundSelectedDrawable.setAlpha((int) (currentSelectedBackgroundAlpha * alphaInternal * 255));
                     drawFlexyBubble(canvas, currentBackgroundSelectedDrawable, null);

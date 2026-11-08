@@ -47,7 +47,6 @@ public final class ServiceBubbleSurface {
     private void drawLayer(Canvas canvas, Path shape, Paint source, int alpha) {
         scratch.set(source);
         // Rebind lazy native filters after copying an undrawn theme paint.
-        scratch.setColorFilter(null);
         scratch.setColorFilter(source.getColorFilter());
         scratch.setAlpha(Math.round(source.getAlpha() * Math.max(0, Math.min(255, alpha)) / 255f));
         canvas.drawPath(shape, scratch);

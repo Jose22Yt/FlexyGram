@@ -685,26 +685,28 @@ public class MessageDrawable extends Drawable {
                     // The native bridge carries drawable alpha; message transitions sample the same cache.
                     flexyGlassSource.draw(canvas, path, alpha);
                 }
-                flexyFillPaint.setColor(color);
-                // Reuse Telegram's cached gradient and matrix; no new shader per frame.
-                flexyFillPaint.setShader(p.getShader());
-                flexyFillPaint.setAlpha(Math.round(alpha * app.flexygram.bubbles.BubbleStyle.tintAlpha(
-                    app.flexygram.bubbles.BubbleConfig.transparency()) / 255f));
-                canvas.drawPath(path, flexyFillPaint);
+                final int fillAlpha = Math.round(alpha * app.flexygram.bubbles.BubbleStyle.tintAlpha(
+                    app.flexygram.bubbles.BubbleConfig.transparency()) / 255f);
+                if (fillAlpha > 0) {
+                    flexyFillPaint.setColor(color);
+                    // Reuse Telegram's cached gradient and matrix; no new shader per frame.
+                    flexyFillPaint.setShader(p.getShader());
+                    flexyFillPaint.setAlpha(fillAlpha);
+                    canvas.drawPath(path, flexyFillPaint);
+                }
             }
             // The same cached contour and fusion controls apply to either surface material.
             if (app.flexygram.bubbles.BubbleConfig.outlineEnabled()
-                    && app.flexygram.bubbles.BubbleConfig.borderTenths() > 0) {
+                    && app.flexygram.bubbles.BubbleConfig.borderTenths() > 0 && alpha > 0) {
                 flexyBorderPaint.setStyle(Paint.Style.STROKE);
-                // Keep the contour inside Telegram's unchanged message silhouette.
-                flexyBorderPaint.setStrokeWidth(2f * AndroidUtilities.density * app.flexygram.bubbles.BubbleConfig.borderDp()
-                        );
+                // Hardware-accelerated direct vector stroke without stencil clipPath.
+                float stroke = AndroidUtilities.density * app.flexygram.bubbles.BubbleConfig.borderDp();
+                flexyBorderPaint.setStrokeWidth(stroke);
                 int contourBase = !adaptiveSurface && isOut && p.getShader() != null
                         ? app.flexygram.bubbles.BubbleOutline.palette(color, currentGradientColor1, currentGradientColor2, currentGradientColor3) : color;
                 int contour = signatureOutline(contourBase);
-                flexyBorderPaint.setColor(ColorUtils.setAlphaComponent(contour, Math.round(Color.alpha(contour) * alpha / 255f)));
-                canvas.save();
-                canvas.clipPath(path);
+                int edgeColor = ColorUtils.setAlphaComponent(contour, Math.round(Color.alpha(contour) * alpha / 255f));
+                flexyBorderPaint.setColor(edgeColor);
                 int borderPosition = app.flexygram.bubbles.BubbleConfig.borderPosition();
                 // MessageDrawable is shared across rows. Partial contours belong
                 // to the existing per-cell native path cache, not the last row drawn.
@@ -718,23 +720,27 @@ public class MessageDrawable extends Drawable {
                 flexyBorderPaint.setShader(borderCache == null ? null : borderCache.fade(contour));
                 flexyBorderPaint.setStrokeCap(Paint.Cap.ROUND);
                 flexyBorderPaint.setStrokeJoin(Paint.Join.ROUND);
-                float stroke = flexyBorderPaint.getStrokeWidth();
-                int edgeColor = flexyBorderPaint.getColor();
-                if(app.flexygram.bubbles.BubbleConfig.fusionMode()==2){
-                    bubbleFusion.draw(canvas,contourPath,flexyBorderPaint,stroke,edgeColor,contourBase,
-                            app.flexygram.bubbles.BubbleConfig.fusionIntensity(),app.flexygram.bubbles.BubbleConfig.fusionAdapt());
+                if (app.flexygram.bubbles.BubbleConfig.fusionMode() == 2) {
+                    bubbleFusion.draw(canvas, contourPath, flexyBorderPaint, stroke, edgeColor, contourBase,
+                            app.flexygram.bubbles.BubbleConfig.fusionIntensity(), app.flexygram.bubbles.BubbleConfig.fusionAdapt());
                 } else if (app.flexygram.bubbles.BubbleConfig.fuseGlass() && app.flexygram.bubbles.BubbleConfig.outlineStyle() != 0) {
-                    flexyBorderPaint.setStrokeWidth(stroke * 3f);
-                    flexyBorderPaint.setColor(ColorUtils.setAlphaComponent(edgeColor, Math.round(Color.alpha(edgeColor) * .12f)));
-                    canvas.drawPath(contourPath, flexyBorderPaint);
-                    flexyBorderPaint.setStrokeWidth(stroke * 2f);
-                    flexyBorderPaint.setColor(ColorUtils.setAlphaComponent(edgeColor, Math.round(Color.alpha(edgeColor) * .26f)));
-                    canvas.drawPath(contourPath, flexyBorderPaint);
+                    int edgeAlpha = Color.alpha(edgeColor);
+                    int outerAlpha = Math.round(edgeAlpha * .12f);
+                    if (outerAlpha > 0) {
+                        flexyBorderPaint.setStrokeWidth(stroke * 2.5f);
+                        flexyBorderPaint.setColor(ColorUtils.setAlphaComponent(edgeColor, outerAlpha));
+                        canvas.drawPath(contourPath, flexyBorderPaint);
+                    }
+                    int midAlpha = Math.round(edgeAlpha * .26f);
+                    if (midAlpha > 0) {
+                        flexyBorderPaint.setStrokeWidth(stroke * 1.6f);
+                        flexyBorderPaint.setColor(ColorUtils.setAlphaComponent(edgeColor, midAlpha));
+                        canvas.drawPath(contourPath, flexyBorderPaint);
+                    }
                 }
                 flexyBorderPaint.setStrokeWidth(stroke);
                 flexyBorderPaint.setColor(edgeColor);
                 canvas.drawPath(contourPath, flexyBorderPaint);
-                canvas.restore();
             }
         } else {
             canvas.drawPath(path, p);

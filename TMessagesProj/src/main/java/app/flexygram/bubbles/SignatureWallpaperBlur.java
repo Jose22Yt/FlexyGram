@@ -211,6 +211,7 @@ public final class SignatureWallpaperBlur {
     public static final class Owner {
         private final WeakReference<View> target;
         private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
+        private Paint lastMaterial;
         private final Matrix matrix = new Matrix();
         private final RectF mapping = new RectF();
         private Drawable source;
@@ -314,7 +315,12 @@ public final class SignatureWallpaperBlur {
             if (closed || entry == null || entry.bitmap == null || entry.bitmap.isRecycled() || shader != null) return;
             Trace.beginSection("Flexy.blur.available"); Trace.endSection();
             shader = new BitmapShader(entry.bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP);
-            paint.setShader(shader); mappedLeft = Float.NaN;
+            paint.reset();
+            paint.setAntiAlias(true);
+            paint.setFilterBitmap(true);
+            paint.setShader(shader);
+            lastMaterial = null;
+            mappedLeft = Float.NaN;
             View view = target.get();
             if (sawFallback && view != null && view.isAttachedToWindow() && view.isShown()) {
                 // One native, finite owner-level fade for cold publication only. Warm
@@ -373,17 +379,21 @@ public final class SignatureWallpaperBlur {
             }
             // Original cached wallpaper blur: native animation alpha, independent of retired Glass settings.
             if (material != null) {
-                paint.set(material);
-                // Theme paints may not have synchronized their native filter yet.
-                // Rebind it after copying, without changing the theme-owned paint.
-                paint.setColorFilter(null);
-                paint.setColorFilter(material.getColorFilter());
-                paint.setShader(shader);
+                if (lastMaterial != material) {
+                    lastMaterial = material;
+                    paint.set(material);
+                    // Theme paints may not have synchronized their native filter yet.
+                    // Rebind it after copying, without changing the theme-owned paint.
+                    paint.setColorFilter(null);
+                    paint.setColorFilter(material.getColorFilter());
+                    paint.setShader(shader);
+                }
             } else {
-                paint.reset();
-                paint.setAntiAlias(true);
-                paint.setFilterBitmap(true);
-                paint.setShader(shader);
+                if (lastMaterial != null) {
+                    lastMaterial = null;
+                    paint.setColorFilter(null);
+                    paint.setShader(shader);
+                }
             }
             paint.setAlpha(Math.round((material == null ? 255 : material.getAlpha())
                     * Math.max(0, Math.min(255, alpha)) / 255f * reveal));
@@ -395,6 +405,7 @@ public final class SignatureWallpaperBlur {
             sawFallback = false; firstDraw = false; reveal = 1;
             if (waitingForSlot) { waiting.removeIf(reference -> reference.get() == null || reference.get() == this); waitingForSlot = false; }
             if (shader != null) { paint.setShader(null); shader = null; }
+            lastMaterial = null;
             if (entry != null) {
                 Entry previous = entry; entry = null;
                 previous.owners.removeIf(reference -> reference.get() == null || reference.get() == this);

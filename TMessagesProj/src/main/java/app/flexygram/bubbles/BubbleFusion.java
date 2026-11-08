@@ -14,15 +14,24 @@ public final class BubbleFusion {
     public void draw(Canvas canvas,Path path,Paint paint,float stroke,int edge,int fill,int strength,boolean adapt){
         strength=Math.max(0,Math.min(100,strength));
         if(strength==0)return;
+        int alpha=edge>>>24;
+        if(alpha==0)return;
         if(fill!=previousFill||edge!=previousEdge||strength!=previousStrength||adapt!=previousAdapt){
             previousFill=fill;previousEdge=edge;previousStrength=strength;previousAdapt=adapt;
             outerColor=adapt?mix(fill,edge,25):edge;middleColor=adapt?mix(fill,edge,55):edge;
         }
-        int alpha=edge>>>24;
-        paint.setStrokeWidth(stroke*(1.6f+strength*.020f));
-        paint.setColor((outerColor&0xffffff)|(Math.round(alpha*strength*.0016f)<<24));canvas.drawPath(path,paint);
-        paint.setStrokeWidth(stroke*(1.2f+strength*.010f));
-        paint.setColor((middleColor&0xffffff)|(Math.round(alpha*strength*.0032f)<<24));canvas.drawPath(path,paint);
+        int outerA=Math.round(alpha*strength*.0016f);
+        if(outerA>0){
+            paint.setStrokeWidth(stroke*(1.6f+strength*.020f));
+            paint.setColor((outerColor&0xffffff)|(outerA<<24));
+            canvas.drawPath(path,paint);
+        }
+        int midA=Math.round(alpha*strength*.0032f);
+        if(midA>0){
+            paint.setStrokeWidth(stroke*(1.2f+strength*.010f));
+            paint.setColor((middleColor&0xffffff)|(midA<<24));
+            canvas.drawPath(path,paint);
+        }
         paint.setStrokeWidth(stroke);paint.setColor(edge);
     }
     public static int mix(int a,int b,int percent){
