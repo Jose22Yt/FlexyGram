@@ -26925,16 +26925,12 @@ public class ChatActivity extends BaseFragment implements
     private void checkTranslation(boolean force) {
         // Do not scan the loaded history during a drag/fling, even after the old 1s timeout.
         // Explicit language/translation changes still run immediately.
-        if (!force && isTranslationScrollActive()) {
-            translationCheckDeferred = true;
-            return;
-        }
-        translationCheckDeferred = false;
-        if (System.currentTimeMillis() - lastTranslationCheck > 1000) {
+        translationCheckDeferred = !force && isTranslationScrollActive();
+        if (!translationCheckDeferred && System.currentTimeMillis() - lastTranslationCheck > 1000) {
             force = true;
         }
         AndroidUtilities.cancelRunOnUIThread(checkTranslationRunnable);
-        AndroidUtilities.runOnUIThread(checkTranslationRunnable, force ? 0 : 150);
+        AndroidUtilities.runOnUIThread(checkTranslationRunnable, force && !translationCheckDeferred ? 0 : 150);
     }
     private Runnable checkTranslationRunnable = () -> {
         if (translationCheckDeferred && isTranslationScrollActive()) {
