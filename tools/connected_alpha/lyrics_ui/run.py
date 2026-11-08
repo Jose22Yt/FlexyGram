@@ -135,4 +135,4 @@ public final class R {
 }''')
  # Music layout fixtures are not needed in the lyrics suite.
  (source/'app/exteraless/player/LayoutFixture.java').unlink()
-if __name__=='__main__':raise SystemExit(pipeline.main(here=HERE,test_class='LyricsUiTest',stubs_writer=write_stubs,extra_aars=[('androidx.recyclerview','recyclerview','1.4.0'),('androidx.customview','customview','1.2.0'),('androidx.customview','customview-poolingcontainer','1.0.0')]))
+if __name__=='__main__':raise SystemExit(pipeline.main(here=HERE,test_class='LyricsUiTest',stubs_writer=write_stubs,extra_aars=[('androidx.recyclerview','recyclerview','1.4.0'),('androidx.customview','customview','1.2.0'),('androidx.customview','customview-poolingcontainer','1.0.0'),('androidx.core','core-ktx','1.17.0')]))
