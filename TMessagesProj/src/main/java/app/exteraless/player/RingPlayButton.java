@@ -34,6 +34,8 @@ public class RingPlayButton extends View {
     private int iconColor;
     private MessageObject message;
     private boolean playing;
+    private boolean showRing = true;
+    public void setShowRing(boolean value) { showRing = value; invalidate(); }
     private float amplitude;
     private float phase;
     private long lastFrame;
@@ -67,6 +69,7 @@ public class RingPlayButton extends View {
     }
 
     public void setPlaying(boolean value, boolean animated) {
+        if (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) animated = false;
         if (playing == value && alt.target == (value ? 1f : 0f)) {
             return;
         }
@@ -103,7 +106,7 @@ public class RingPlayButton extends View {
         float dt = lastFrame == 0 ? 0.016f : Math.min(0.05f, (now - lastFrame) / 1000f);
         lastFrame = now;
         boolean animating = alt.step(dt);
-        float targetAmp = playing && !LiteMode.isPowerSaverApplied() ? maxAmplitude : 0f;
+        float targetAmp = playing && showRing && !org.telegram.messenger.BuildConfig.CONNECTED_ALPHA && !LiteMode.isPowerSaverApplied() ? maxAmplitude : 0f;
         amplitude += (targetAmp - amplitude) * (1f - (float) Math.pow(0.85, dt / 0.04f));
         if (Math.abs(amplitude - targetAmp) < dpf2(0.03f)) {
             amplitude = targetAmp;
@@ -113,12 +116,12 @@ public class RingPlayButton extends View {
         }
         float cx = getWidth() / 2f;
         float cy = getHeight() / 2f;
-        canvas.drawCircle(cx, cy, radius, trackPaint);
+        if (showRing) canvas.drawCircle(cx, cy, radius, trackPaint);
         MessageObject mo = message;
         float progress = mo != null ? Math.max(0f, Math.min(1f, mo.audioProgress)) : 0f;
         drawnProgress = progress;
         float sweep = 360f * progress;
-        if (sweep > 0.5f) {
+        if (showRing && sweep > 0.5f) {
             path.rewind();
             boolean first = true;
             for (float deg = 0; ; deg += 3f) {

@@ -106,16 +106,31 @@ public final class PlayerColors {
     public static PlayerColors fromSignatureTheme(boolean dark) {return fromSignatureTheme(dark,null);}
     public static PlayerColors fromSignatureTheme(boolean dark,Theme.ResourcesProvider provider) {
         int accent = Theme.getColor(Theme.key_windowBackgroundWhiteBlueText, provider) | 0xff000000;
-        long key = ((accent & 0xffffffffL) << 1) | (dark ? 1 : 0);
+        int surface = Theme.getColor(Theme.key_windowBackgroundWhite, provider) | 0xff000000;
+        int text = Theme.getColor(Theme.key_windowBackgroundWhiteBlackText, provider) | 0xff000000;
+        int secondary = Theme.getColor(Theme.key_windowBackgroundWhiteGrayText, provider) | 0xff000000;
+        // Include every input: changing a custom theme without changing its accent must refresh surfaces too.
+        int[] values = {surface, surface,
+                ColorUtils.blendARGB(surface, text, dark ? .07f : .035f),
+                ColorUtils.blendARGB(surface, text, dark ? .11f : .06f),
+                legible(text, surface, 4.5), legible(secondary, surface, 4.5),
+                ColorUtils.blendARGB(surface, text, .18f), accent,
+                ColorUtils.calculateContrast(Color.WHITE, accent) >= 4.5 ? Color.WHITE : Color.BLACK,
+                ColorUtils.blendARGB(surface, accent, dark ? .18f : .12f), 0,
+                ColorUtils.blendARGB(surface, text, .10f), 0};
+        values[10] = legible(text, values[9], 4.5);
+        values[12] = legible(text, values[11], 4.5);
+        long key = ((long) java.util.Arrays.hashCode(values) << 1) | (dark ? 1 : 0);
         PlayerColors cached = themePalettes.get(key);
-        if (cached != null) return cached;
-        int[] values = (dark ? MIDNIGHT : PEARL).values();
-        values[7] = accent;
-        values[8] = ColorUtils.calculateContrast(0xffffffff, accent) >= 4.5 ? Color.WHITE : Color.BLACK;
-        values[9] = ColorUtils.blendARGB(values[0], accent, .10f);
+        if (cached != null && cached.dark == dark && java.util.Arrays.equals(cached.values(), values)) return cached;
         PlayerColors result = new PlayerColors(dark, values);
         themePalettes.put(key, result);
         return result;
+    }
+
+    private static int legible(int foreground, int background, double minimum) {
+        if (ColorUtils.calculateContrast(foreground, background) >= minimum) return foreground;
+        return ColorUtils.calculateContrast(Color.WHITE, background) >= minimum ? Color.WHITE : Color.BLACK;
     }
 
     public static PlayerColors lerp(PlayerColors a, PlayerColors b, float t) {

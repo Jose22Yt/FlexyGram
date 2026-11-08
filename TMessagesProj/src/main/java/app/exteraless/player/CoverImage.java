@@ -20,6 +20,8 @@ public class CoverImage extends BackupImageView {
     private final RectF rect = new RectF();
     private final PlayerIcon note;
     private int radius;
+    private boolean showPlaceholderNote = true;
+    public void setShowPlaceholderNote(boolean value) { showPlaceholderNote = value; invalidate(); }
     private SignatureCoverFade signatureFade;
     private int signatureSurface;
     private String currentKey;
@@ -117,8 +119,11 @@ public class CoverImage extends BackupImageView {
         if (!getImageReceiver().hasBitmapImage()) {
             rect.set(0, 0, getWidth(), getHeight());
             canvas.drawRoundRect(rect, radius, radius, placeholderPaint);
-            note.setBounds(0, 0, getWidth(), getHeight());
-            note.draw(canvas);
+            if (showPlaceholderNote) {
+                int size=Math.min(Math.min(getWidth(),getHeight())/2,note.getIntrinsicWidth());
+                int x=(getWidth()-size)/2,y=(getHeight()-size)/2;
+                note.setBounds(x,y,x+size,y+size);note.draw(canvas);
+            }
         }
         super.onDraw(canvas);
         if (signatureFade != null) signatureFade.draw(canvas);

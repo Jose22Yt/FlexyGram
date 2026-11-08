@@ -46,7 +46,7 @@ public class ControlsRow extends ViewGroup implements MorphButton.PressListener 
         repeat.setRadius(dp(24), false);
         prev.setRadius(dp(32), false);
         next.setRadius(dp(32), false);
-        play.setRadius(dp(44), false);
+        play.setRadius(dp(BuildConfig.CONNECTED_ALPHA ? 18 : 44), false);
     }
 
     @Override
@@ -83,7 +83,7 @@ public class ControlsRow extends ViewGroup implements MorphButton.PressListener 
         if (BuildConfig.CONNECTED_ALPHA) {
             prev.setRadius(dp(32), false);
             next.setRadius(dp(32), false);
-            play.setRadius(dp(44), false);
+            play.setRadius(dp(BuildConfig.CONNECTED_ALPHA ? 18 : 44), false);
             shuffle.setRadius(dp(24), false);
             repeat.setRadius(dp(24), false);
             return;
@@ -160,8 +160,8 @@ public class ControlsRow extends ViewGroup implements MorphButton.PressListener 
         scale = Math.min(1f, (width - dp(16)) / (float) dp(312));
         int height = BuildConfig.CONNECTED_ALPHA ? Math.max(dp(64), Math.round(dp(88) * scale)) + dp(60) : Math.round(dp(88) * scale);
         signatureInline = BuildConfig.CONNECTED_ALPHA && width >= dp(264);
-        signaturePlaySize = Math.max(dp(64), Math.min(dp(88), width - dp(224)));
-        if (signatureInline) height = signaturePlaySize + dp(16);
+        signaturePlaySize = dp(60);
+        if (signatureInline) height = signaturePlaySize + dp(8);
         measureButtons();
         setMeasuredDimension(width, height);
     }

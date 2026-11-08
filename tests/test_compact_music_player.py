@@ -6,14 +6,14 @@ from test_render_work_reuse import JAVA,ROOT,probe
 from test_composer_layout import method
 
 
-def test_queue_window_is_bounded_and_contains_current_track_when_available(tmp_path):
+def test_upcoming_window_is_bounded_and_excludes_current_track(tmp_path):
     source=(JAVA/'app/exteraless/player/CompactPlayerQueue.java').read_text()
-    body=method(source,'static int windowStart(')
+    body=method(source,'static int nextWindowStart(')
     probe(tmp_path,{'Probe.java':'''public class Probe{
  BODY
  public static void main(String[]args){for(int size=0;size<500;size++)for(int current=-1;current<size;current++){
- int start=windowStart(size,current,3);if(start<0||start>Math.max(0,size-3))throw new AssertionError();
- if(current>=0&&(current<start||current>=start+3))throw new AssertionError();
+ int start=nextWindowStart(size,current);if(start<0||start>size)throw new AssertionError();
+ if(current>=0&&start<=current)throw new AssertionError();
  }}}'''.replace('BODY',body)})
 
 
@@ -77,3 +77,18 @@ def test_queue_identity_never_confuses_accounts_dialogs_or_local_zero_ids(tmp_pa
  b.currentAccount=0;b.dialog=13;if(sameMessage(a,b))throw new AssertionError();b.dialog=12;a.id=b.id=0;
  if(sameMessage(a,b)||!sameMessage(a,a))throw new AssertionError();}
  }'''.replace('BODY',body)})
+
+
+def test_music_preview_order_is_read_only_and_follows_native_shuffle(tmp_path):
+    source=(JAVA/'org/telegram/messenger/MediaController.java').read_text()
+    body=method(source,'public java.util.List<MessageObject> getMusicPlaybackOrder(')
+    probe(tmp_path,{'Probe.java':'''public class Probe{
+    static class MessageObject{}static class SharedConfig{static boolean shuffleMusic;}
+    java.util.ArrayList<MessageObject> playlist=new java.util.ArrayList<>(),shuffledPlaylist=new java.util.ArrayList<>();
+    BODY
+    public static void main(String[]args){Probe p=new Probe();MessageObject normal=new MessageObject(),mixed=new MessageObject();p.playlist.add(normal);p.shuffledPlaylist.add(mixed);
+    if(p.getMusicPlaybackOrder().get(0)!=normal)throw new AssertionError();SharedConfig.shuffleMusic=true;
+    if(p.getMusicPlaybackOrder().get(0)!=mixed)throw new AssertionError();
+    try{p.getMusicPlaybackOrder().clear();throw new AssertionError();}catch(UnsupportedOperationException expected){}
+    if(p.playlist.size()!=1||p.shuffledPlaylist.size()!=1)throw new AssertionError();}}
+    '''.replace('BODY',body)})

@@ -108,6 +108,7 @@ public class MorphButton extends android.view.View {
     }
 
     public void setRadius(float left, float right, boolean animated) {
+        if (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) animated = false;
         if (animated) {
             radiusLeft.target = left;
             radiusRight.target = right;
@@ -123,6 +124,7 @@ public class MorphButton extends android.view.View {
     }
 
     public void setAlt(boolean value, boolean animated) {
+        if (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) animated = false;
         if (animated) {
             alt.target = value ? 1f : 0f;
         } else {
@@ -132,6 +134,7 @@ public class MorphButton extends android.view.View {
     }
 
     public void setActive(boolean value, boolean animated) {
+        if (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) animated = false;
         if (animated) {
             active.target = value ? 1f : 0f;
         } else {
@@ -141,6 +144,7 @@ public class MorphButton extends android.view.View {
     }
 
     public void setBadge(String value, boolean animated) {
+        if (org.telegram.messenger.BuildConfig.CONNECTED_ALPHA) animated = false;
         if (value != null) {
             badgeText = value;
         }
@@ -156,7 +160,7 @@ public class MorphButton extends android.view.View {
         textPaint.setTextSize(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,
                 stackedLabel ? 12 : 15, getResources().getDisplayMetrics()));
         displayText = text == null ? null : TextUtils.ellipsize(text, textPaint,
-                Math.max(0, getWidth() - dp(stackedLabel ? 12 : 40)), TextUtils.TruncateAt.END).toString();
+                Math.max(0, getWidth() - dp(stackedLabel ? 4 : 40)), TextUtils.TruncateAt.END).toString();
     }
 
     @Override

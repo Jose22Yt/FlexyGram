@@ -5,7 +5,7 @@ import re
 from pathlib import Path
 import shutil
 
-PRODUCTION = ('SignatureMusicStyle','SignatureMusicPresentation','SignatureMusicBubble',
+PRODUCTION = ('MusicBlurSurface','MusicProgressView','MusicSleepTimer','SignatureMusicStyle','SignatureMusicPresentation','SignatureMusicBubble',
               'SignatureMusicHost','ControlsRow','MorphButton','PlayerIcon','Spring',
               'WavySeekBar','RingPlayButton','PlayerBarView','PlayerMiniView','PlayerColors','CoverImage','SignatureCoverFade','SignatureMusicActions','CompactPlayerQueue')
 
@@ -33,16 +33,22 @@ public static Drawable createSelectorDrawable(int c,int mask){android.graphics.d
     put('org/telegram/messenger/BuildConfig.java','package org.telegram.messenger; public class BuildConfig {public static boolean CONNECTED_ALPHA=true;}')
     put('org/telegram/messenger/AndroidUtilities.java','''package org.telegram.messenger; public class AndroidUtilities {
 public static int dp2(float v){return dp(v);}public static float density=1;public static int dp(float v){return (int)Math.ceil(density*v);} public static float dpf2(float v){return density*v;}
+public static android.graphics.Point displaySize=new android.graphics.Point(400,800);
+public static void runOnUIThread(Runnable r){new android.os.Handler(android.os.Looper.getMainLooper()).post(r);}
+public static int blurRequests;public static java.util.function.Function<android.view.View,android.graphics.Bitmap> blurCapture;
+public static void makeGlobalBlurBitmap(org.telegram.messenger.Utilities.Callback<android.graphics.Bitmap> c,float s,int amount,android.view.View v,java.util.List<android.view.View> e,boolean async){blurRequests++;c.run(blurCapture==null?null:blurCapture.apply(v));}
 public static android.graphics.Typeface bold(){return android.graphics.Typeface.create("sans-serif",1);}
 }''')
-    put('org/telegram/messenger/LiteMode.java','package org.telegram.messenger; public class LiteMode {public static boolean isPowerSaverApplied(){return false;}}')
+    put('org/telegram/messenger/Utilities.java','package org.telegram.messenger;public class Utilities{public interface Callback<T>{void run(T value);}}')
+    put('org/telegram/messenger/LiteMode.java','package org.telegram.messenger; public class LiteMode {public static final int FLAG_CHAT_BLUR=256;public static boolean blurEnabled;public static boolean isEnabled(int flag){return blurEnabled;}public static boolean isPowerSaverApplied(){return false;}}')
     put('org/telegram/messenger/LocaleController.java','''package org.telegram.messenger; public class LocaleController {public static boolean isRTL;public static String getString(int id){
+if(id==R.string.FlexyMusicQueueTitle)return "A continuación";
 if(id==R.string.FlexyMusicCompact)return "Comprimir reproductor";
 if(id==R.string.FlexyMusicExpand)return "Expandir reproductor";
 return "Music action";}}''')
     put('org/telegram/messenger/MessageObject.java','''package org.telegram.messenger; public class MessageObject {
-public int currentAccount,audioProgressSec;public float audioProgress; public boolean music=true;public String title="Alone",artist="Marshmello";
-public boolean isMusic(){return music;}public long getDialogId(){return 123L;} public int getId(){return 10;} public String getMusicTitle(){return title;} public String getMusicAuthor(){return artist;}
+public int currentAccount,audioProgressSec,id=10;public float audioProgress; public boolean music=true;public String title="Alone",artist="Marshmello";
+public boolean isMusic(){return music;}public long getDialogId(){return 123L;} public int getId(){return id;} public String getMusicTitle(){return title;} public String getMusicAuthor(){return artist;}
 public Object getDocument(){return null;}
 }''')
     put('org/telegram/messenger/MediaController.java','''package org.telegram.messenger; public class MediaController {
@@ -51,10 +57,11 @@ public MessageObject message; public boolean paused; public int pauses,plays,nex
 public MessageObject getPlayingMessageObject(){return message;} public boolean isDownloadingCurrentMessage(){return false;} public boolean isMessagePaused(){return paused;}
 public void playMessage(MessageObject m){plays++;paused=false;} public void pauseMessage(MessageObject m){pauses++;paused=true;}
 public java.util.ArrayList<MessageObject> playlist=new java.util.ArrayList<>();public Object currentSavedMusicList;
+public java.util.ArrayList<MessageObject> shuffledPlaylist=new java.util.ArrayList<>();public java.util.List<MessageObject> getMusicPlaybackOrder(){return SharedConfig.shuffleMusic?shuffledPlaylist:playlist;}
 public java.util.ArrayList<MessageObject> getPlaylist(){return playlist;}public boolean isPlayingMessage(MessageObject m){return m==message;}public void findMessageInPlaylistAndPlay(MessageObject m){message=m;plays++;}
 public void playNextMessage(){nexts++;}public void cleanupPlayer(boolean a,boolean b){stops++;message=null;}
 }''')
-    put('org/telegram/messenger/SharedConfig.java','package org.telegram.messenger;public class SharedConfig{public static boolean playOrderReversed;}')
+    put('org/telegram/messenger/SharedConfig.java','package org.telegram.messenger;public class SharedConfig{public static boolean playOrderReversed,shuffleMusic;}')
     put('org/telegram/messenger/FileLoader.java','package org.telegram.messenger; public class FileLoader {public static String getAttachFileName(Object o){return "fixture";}}')
     events=sorted(set(re.findall(r'NotificationCenter.(\w+)',code)) - {'getGlobalInstance','getInstance','NotificationCenterDelegate'})
     put('org/telegram/messenger/NotificationCenter.java','''package org.telegram.messenger; import java.util.*;
@@ -81,6 +88,7 @@ public static FrameLayout.LayoutParams createFrame(float w,float h,int g){return
 public static FrameLayout.LayoutParams createFrame(float w,float h,int g,float l,float t,float r,float b){FrameLayout.LayoutParams p=new FrameLayout.LayoutParams(d(w),d(h),g);p.setMargins(d(l),d(t),d(r),d(b));return p;}
 public static LinearLayout.LayoutParams createLinear(float w,float h,float l,float t,float r,float b){return createLinear(w,h,0,0,l,t,r,b);}
 public static LinearLayout.LayoutParams createLinear(float w,float h){return createLinear(w,h,0,0,0,0,0,0);}
+public static LinearLayout.LayoutParams createLinear(float w,float h,float weight){return createLinear(w,h,weight,0,0,0,0,0);}
 public static LinearLayout.LayoutParams createLinear(float w,float h,int g){return createLinear(w,h,0,g,0,0,0,0);}
 public static LinearLayout.LayoutParams createLinear(float w,float h,float weight,float l,float t,float r,float b){return createLinear(w,h,weight,0,l,t,r,b);}
 public static LinearLayout.LayoutParams createLinear(float w,float h,int g,float l,float t,float r,float b){return createLinear(w,h,0,g,l,t,r,b);}

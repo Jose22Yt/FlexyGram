@@ -71,11 +71,12 @@ public final class Lyrics {
     }
 
     public static Lyrics parse(String text, int source, String provider) {
-        if (TextUtils.isEmpty(text)) {
+        if (TextUtils.isEmpty(text) || text.length() > 1024 * 1024) {
             return null;
         }
         String normalized = text.replace("\r\n", "\n").replace('\r', '\n');
         String[] raw = normalized.split("\n");
+        if (raw.length > 10_000) return null;
         long offset = 0;
         ArrayList<Line> timed = new ArrayList<>();
         for (String row : raw) {
@@ -84,6 +85,7 @@ public final class Lyrics {
             if (off.find()) {
                 try {
                     offset = Long.parseLong(off.group(1));
+                    if (offset > 86_400_000 || offset < -86_400_000) offset = 0;
                 } catch (NumberFormatException ignore) {
                 }
                 continue;
