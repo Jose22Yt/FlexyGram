@@ -15,4 +15,5 @@
     <string name="FlexyDeleteTnt">TNT dispersion</string>
     <string name="FlexyDeleteTapHint">Tap a style to apply it and preview its animation. Tap it again to replay.</string>
     <string name="FlexyDeleteAttribution">Effects adapted from Bubble Fracture v1.0 by @larrat23.</string>
+    <string name="FlexyMusicFollowLyrics">Follow current verse</string>
 </resources>

@@ -136,4 +136,38 @@ public class MusicVisualTest {
   grid.measure(View.MeasureSpec.makeMeasureSpec(312,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(0,View.MeasureSpec.UNSPECIFIED));grid.layout(0,0,312,grid.getMeasuredHeight());
   assertEquals("Temporizador",field(grid.getChildAt(2),"displayText"));
  }
+
+ private OrbitPlayerLayout orbit(Context c){
+  CoverImage cover=new CoverImage(c,60);cover.setImageBitmap(art());
+  TextView from=new TextView(c);from.setText("Desde");from.setTextSize(11);TextView chat=new TextView(c);chat.setText("Mi Movistar");chat.setTextSize(15);chat.setSingleLine();chat.setEllipsize(android.text.TextUtils.TruncateAt.END);
+  ImageView back=new ImageView(c),more=new ImageView(c);back.setImageDrawable(PlayerIcon.stroke(PlayerIcon.CHEVRON_DOWN,24));more.setImageDrawable(PlayerIcon.fill(PlayerIcon.MORE,24));
+  LinearLayout title=new LinearLayout(c);title.setOrientation(1);title.setGravity(Gravity.CENTER);TextView song=new TextView(c);song.setText("Alone");song.setTextSize(24);title.addView(song);TextView artist=new TextView(c);artist.setText("Marshmello");artist.setTextSize(16);title.addView(artist);
+  LinearLayout times=new LinearLayout(c);TextView elapsed=new TextView(c);elapsed.setText("0:42");times.addView(elapsed,new LinearLayout.LayoutParams(0,-2,1));TextView total=new TextView(c);total.setText("4:48");times.addView(total);
+  PlayerColors colors=PlayerColors.fromSeed(0,Theme.dark);ControlsRow controls=new ControlsRow(c);for(MorphButton b:new MorphButton[]{controls.shuffle,controls.prev,controls.play,controls.next,controls.repeat})b.setColors(0,colors.onSurface,colors.primary,colors.onPrimary);controls.play.setColors(colors.primary,colors.onPrimary,colors.primary,colors.onPrimary);controls.setPlaying(true,false);
+  SignatureMusicActions actions=new SignatureMusicActions(c);String[] names={"Velocidad","Letras","Temporizador","Cola"};String[] icons={PlayerIcon.SPEED,PlayerIcon.LYRICS,PlayerIcon.TIMER,PlayerIcon.QUEUE};for(int n=0;n<4;n++){MorphButton b=new MorphButton(c,PlayerIcon.stroke(icons[n],20));b.setText(names[n]);b.setStackedLabel(true);b.setColors(0,colors.onSurface,colors.primary,colors.onPrimary);actions.addView(b,new LinearLayout.LayoutParams(0,56,1));}
+  LinearLayout queue=new LinearLayout(c);queue.setOrientation(1);for(int n=0;n<12;n++){TextView row=new TextView(c);row.setText(n==0?"A continuación":n+".  Silence · Marshmello");row.setTextSize(16);row.setTextColor(colors.onSurface);row.setGravity(Gravity.CENTER_VERTICAL);queue.addView(row,new LinearLayout.LayoutParams(-1,56));}
+  LinearLayout lyrics=new LinearLayout(c);lyrics.setOrientation(1);TextView words=new TextView(c);words.setText("I am so alone\nNothing feels like home");words.setTextSize(28);lyrics.addView(words);
+  OrbitPlayerLayout scene=new OrbitPlayerLayout(c,cover,from,chat,back,more,title,times,controls,actions,queue,lyrics,()->MediaController.getInstance().pauseMessage(MediaController.getInstance().message),()->MediaController.getInstance().playNextMessage());scene.bindSong("Alone","Marshmello");scene.setColors(colors);scene.setInsets(24,24);scene.getArtwork().setProgress(.4f);return scene;
+ }
+ private Bitmap art(){Bitmap b=Bitmap.createBitmap(160,160,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(b);Paint p=new Paint();p.setShader(new LinearGradient(0,0,160,160,0xff7333aa,0xff1683ba,Shader.TileMode.CLAMP));c.drawRect(0,0,160,160,p);p.setShader(null);p.setColor(0xffeeeeee);c.drawRoundRect(42,42,118,118,18,18,p);return b;}
+ @Test public void orbitDockFollowsScrollAndReturnsToTheExactExpandedGeometry()throws Exception{
+  OrbitPlayerLayout scene=orbit(activity);root.addView(scene);size(scene,400,840);OrbitArtwork art=scene.getArtwork();Object parent=art.getParent();float x=art.getX(),y=art.getY();ScrollView list=(ScrollView)field(scene,"scroll");float last=0;
+  for(int pos=0;pos<=560;pos+=8){list.scrollTo(0,pos);assertTrue(scene.getCollapseFraction()>=last);last=scene.getCollapseFraction();assertSame(parent,art.getParent());}
+  assertEquals(1,scene.getCollapseFraction(),0);assertEquals(36,art.getWidth()*art.getScaleX(),.1);assertTrue(art.getY()>=24);assertTrue(art.getY()+36<=24+((View)field(scene,"header")).getHeight());
+  ((View)field(scene,"compactPlay")).performClick();((View)field(scene,"compactNext")).performClick();assertEquals(1,MediaController.getInstance().pauses);assertEquals(1,MediaController.getInstance().nexts);
+  list.scrollTo(0,0);assertEquals(0,scene.getCollapseFraction(),0);assertEquals(x,art.getX(),0);assertEquals(y,art.getY(),0);assertEquals(1,art.getScaleX(),0);root.removeView(scene);
+ }
+ @Test public void orbitAdaptsHeaderAndLyricsToNarrowAndLargeFontWindows()throws Exception{
+  for(float font:new float[]{1,2,3})for(int width:new int[]{240,320,400,600}){Configuration cfg=new Configuration(activity.getResources().getConfiguration());cfg.fontScale=font;Context c=activity.createConfigurationContext(cfg);OrbitPlayerLayout scene=orbit(c);root.addView(scene);size(scene,width,640);((ScrollView)field(scene,"scroll")).scrollTo(0,1000);View header=(View)field(scene,"header");View pill=(View)field(header,"pill"),labels=(View)field(header,"labels");assertTrue(pill.getLeft()>=0&&pill.getRight()<=width);assertTrue(labels.getWidth()>=48);assertTrue(labels.getBottom()<=pill.getHeight());scene.setLyricsMode(true);size(scene,width,640);View lyrics=(View)field(scene,"lyricsPanel");assertTrue(lyrics.getTop()>=header.getBottom());assertTrue(lyrics.getHeight()>=180);assertTrue(lyrics.getBottom()<=((View)field(scene,"lyricsControls")).getTop());scene.setLyricsMode(false);size(scene,width,640);assertEquals(View.VISIBLE,scene.getArtwork().getVisibility());root.removeView(scene);}
+ }
+ @Test public void orbitRingSeekCommitsAndCancellationAndAccessibilityWork()throws Exception{
+  CoverImage cover=new CoverImage(activity,40);OrbitArtwork ring=new OrbitArtwork(activity,cover);root.addView(ring);size(ring,240,240);int[] calls={0,0,0};float[] progress={0};ring.setDelegate(new WavySeekBar.Delegate(){public void onSeekStart(){calls[0]++;}public void onSeekMove(float p){progress[0]=p;}public void onSeekEnd(float p,boolean commit){calls[commit?1:2]++;}});
+  ring.onTouchEvent(MotionEvent.obtain(0,0,0,238,120,0));ring.onTouchEvent(MotionEvent.obtain(0,20,1,120,238,0));assertEquals(.5f,progress[0],.01f);assertEquals(1,calls[1]);
+  ring.onTouchEvent(MotionEvent.obtain(0,30,0,238,120,0));ring.onTouchEvent(MotionEvent.obtain(0,40,3,238,120,0));assertEquals(1,calls[2]);ring.performAccessibilityAction(android.view.accessibility.AccessibilityNodeInfo.ACTION_SCROLL_FORWARD,null);assertEquals(2,calls[1]);root.removeView(ring);
+ }
+ @Test public void orbitAndSplitCardHaveRealLightDarkSnapshots()throws Exception{
+  for(boolean dark:new boolean[]{false,true}){Theme.dark=dark;OrbitPlayerLayout scene=orbit(activity);root.addView(scene);size(scene,400,840);
+   Bitmap image=Bitmap.createBitmap(800,840,Bitmap.Config.ARGB_8888);Canvas c=new Canvas(image);scene.draw(c);((ScrollView)field(scene,"scroll")).scrollTo(0,520);c.save();c.translate(400,0);scene.draw(c);c.restore();try(FileOutputStream out=new FileOutputStream(new File(System.getProperty("probe.root"),dark?"orbit-dark.png":"orbit-light.png"))){image.compress(Bitmap.CompressFormat.PNG,100,out);}root.removeView(scene);
+  }
+ }
 }

@@ -3,6 +3,8 @@ package app.exteraless.player;
 import static org.telegram.messenger.AndroidUtilities.dp;
 
 import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import org.telegram.messenger.BuildConfig;
 import android.os.SystemClock;
 import android.view.ViewGroup;
@@ -15,6 +17,10 @@ public class ControlsRow extends ViewGroup implements MorphButton.PressListener 
     public final MorphButton next;
     public final MorphButton repeat;
     private final MorphButton[] buttons;
+    private final Paint dockPaint=new Paint(Paint.ANTI_ALIAS_FLAG);
+    private int dockColor;
+    public void setOrbitColors(PlayerColors colors){dockColor=colors.outlineVariant;setWillNotDraw(false);invalidate();}
+    @Override protected void onDraw(Canvas canvas){if(BuildConfig.CONNECTED_ALPHA&&signatureInline&&dockColor!=0){dockPaint.setColor(dockColor);dockPaint.setStyle(Paint.Style.STROKE);dockPaint.setStrokeWidth(dp(1));canvas.drawRoundRect(prev.getLeft()-dp(2),getHeight()/2f-dp(24),next.getRight()+dp(2),getHeight()/2f+dp(24),dp(24),dp(24),dockPaint);}}
     private MorphButton pressed;
     private boolean playing;
     private boolean shuffleOn;
@@ -46,7 +52,7 @@ public class ControlsRow extends ViewGroup implements MorphButton.PressListener 
         repeat.setRadius(dp(24), false);
         prev.setRadius(dp(32), false);
         next.setRadius(dp(32), false);
-        play.setRadius(dp(BuildConfig.CONNECTED_ALPHA ? 18 : 44), false);
+        play.setRadius(dp(44), false);
     }
 
     @Override
@@ -83,7 +89,7 @@ public class ControlsRow extends ViewGroup implements MorphButton.PressListener 
         if (BuildConfig.CONNECTED_ALPHA) {
             prev.setRadius(dp(32), false);
             next.setRadius(dp(32), false);
-            play.setRadius(dp(BuildConfig.CONNECTED_ALPHA ? 18 : 44), false);
+            play.setRadius(dp(44), false);
             shuffle.setRadius(dp(24), false);
             repeat.setRadius(dp(24), false);
             return;
@@ -160,7 +166,7 @@ public class ControlsRow extends ViewGroup implements MorphButton.PressListener 
         scale = Math.min(1f, (width - dp(16)) / (float) dp(312));
         int height = BuildConfig.CONNECTED_ALPHA ? Math.max(dp(64), Math.round(dp(88) * scale)) + dp(60) : Math.round(dp(88) * scale);
         signatureInline = BuildConfig.CONNECTED_ALPHA && width >= dp(264);
-        signaturePlaySize = dp(60);
+        signaturePlaySize = dp(72);
         if (signatureInline) height = signaturePlaySize + dp(8);
         measureButtons();
         setMeasuredDimension(width, height);

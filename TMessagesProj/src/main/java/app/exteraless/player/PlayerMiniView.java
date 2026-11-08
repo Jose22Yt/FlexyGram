@@ -38,7 +38,7 @@ import org.telegram.ui.Components.LayoutHelper;
 
 public class PlayerMiniView extends FrameLayout implements NotificationCenter.NotificationCenterDelegate {
 
-    public static final int HEIGHT_DP = 72;
+    public static final int HEIGHT_DP = 60;
 
     private SignatureMusicHost signatureHost;
     private final BaseFragment fragment;
@@ -117,7 +117,7 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
         artistView.setEllipsize(TextUtils.TruncateAt.END);
         artistView.setAlpha(0.8f);
         texts.addView(artistView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 2, 0, 0));
-        row.addView(texts, LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1f, 12, 0, 4, 0));
+        row.addView(texts, LayoutHelper.createLinear(0, LayoutHelper.WRAP_CONTENT, 1f, 12, 0, 12, 0));
 
         playButton = new RingPlayButton(context, 20, 3, 22, 1.3f, 12);
         playButton.setShowRing(!org.telegram.messenger.BuildConfig.CONNECTED_ALPHA);
@@ -160,7 +160,8 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
     }
 
     @Override protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        nextButton.setVisibility(MeasureSpec.getSize(widthMeasureSpec) >= dp(320) ? VISIBLE : GONE);
+        boolean showNext=MeasureSpec.getSize(widthMeasureSpec)>=dp(320);nextButton.setVisibility(showNext?VISIBLE:GONE);
+        if(blurSurface!=null){int controlsWidth=dp(6+48*(showNext?3:2));blurSurface.setSegments(controlsWidth,dp(6));FrameLayout.LayoutParams line=(FrameLayout.LayoutParams)progress.getLayoutParams();line.width=Math.max(0,MeasureSpec.getSize(widthMeasureSpec)-dp(24)-controlsWidth-dp(24));line.leftMargin=dp(12);line.bottomMargin=dp(6);}
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
@@ -402,8 +403,8 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
             card.setOutlineAmbientShadowColor(c.shadow());
         }
         cover.setColors(c.secondaryContainer, c.onSecondaryContainer);
-        titleView.setTextColor(c.onPrimaryContainer);
-        artistView.setTextColor(c.onPrimaryContainer);
+        titleView.setTextColor(BuildConfig.CONNECTED_ALPHA?c.onSurface:c.onPrimaryContainer);
+        artistView.setTextColor(BuildConfig.CONNECTED_ALPHA?c.onSurfaceVariant:c.onPrimaryContainer);
         nextIcon.setColor(c.onPrimaryContainer);
         closeIcon.setColor(c.onPrimaryContainer);
         int ripple = ColorUtils.setAlphaComponent(c.onPrimaryContainer, 0x1f);
@@ -411,6 +412,6 @@ public class PlayerMiniView extends FrameLayout implements NotificationCenter.No
         closeButton.setBackground(Theme.createSelectorDrawable(ripple, Theme.RIPPLE_MASK_CIRCLE_20DP));
         playButton.setBackground(Theme.createSelectorDrawable(ripple, Theme.RIPPLE_MASK_CIRCLE_20DP));
         playButton.setColors(c.onPrimaryContainer, ColorUtils.setAlphaComponent(c.onPrimaryContainer, 46), c.onPrimaryContainer);
-        card.setForeground(Theme.createSelectorDrawable(ripple, Theme.RIPPLE_MASK_ALL));
+        if(!BuildConfig.CONNECTED_ALPHA)card.setForeground(Theme.createSelectorDrawable(ripple, Theme.RIPPLE_MASK_ALL));
     }
 }
