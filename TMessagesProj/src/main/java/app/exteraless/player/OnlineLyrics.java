@@ -540,6 +540,7 @@ public final class OnlineLyrics {
             if (f == null || !f.exists()) {
                 return null;
             }
+            f.setLastModified(System.currentTimeMillis());
             JSONObject o;
             try (FileInputStream in = new FileInputStream(f)) {
                 o = new JSONObject(readAll(in));
@@ -574,8 +575,20 @@ public final class OnlineLyrics {
             try {
                 out = atomic.startWrite();out.write(o.toString().getBytes(StandardCharsets.UTF_8));atomic.finishWrite(out);
             } catch (Exception error) { atomic.failWrite(out); throw error; }
+            pruneDiskCacheIfNeeded(f.getParentFile());
         } catch (Throwable e) {
             FileLog.e(e);
+        }
+    }
+
+    private static void pruneDiskCacheIfNeeded(File dir) {
+        if (dir == null || !dir.exists()) return;
+        File[] files = dir.listFiles((d, name) -> name != null && name.endsWith(".json"));
+        if (files == null || files.length <= 250) return;
+        java.util.Arrays.sort(files, (a, b) -> Long.compare(a.lastModified(), b.lastModified()));
+        int toDelete = files.length - 200;
+        for (int i = 0; i < toDelete && i < files.length; i++) {
+            files[i].delete();
         }
     }
 }
