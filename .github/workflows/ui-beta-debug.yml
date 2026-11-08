@@ -50,7 +50,7 @@ jobs:
         run: |
           set -euo pipefail
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends nasm ninja-build patchelf autoconf automake libtool pkg-config
+          sudo apt-get install -y --no-install-recommends nasm ninja-build patchelf autoconf automake libtool pkg-config maven
           python -m pip install pytest==9.2.0 PyYAML==6.0.3 tree-sitter==0.26.0 tree-sitter-java==0.23.5
           git fetch --no-recurse-submodules --no-tags --depth=1 origin \
             4679f74ebd312acc4968dd2e044a6c6b7478445a \
@@ -87,6 +87,7 @@ jobs:
           python -m pytest tools/connected_alpha/test_flexystudio.py -q -p no:cacheprovider
           python tools/connected_alpha/check_studio_types.py
           python tools/connected_alpha/check_studio_client.py
+          python tools/connected_alpha/header_touch/run.py --sdk-root "$ANDROID_HOME" --output-dir build/reports/ui-beta/header-touch
       - name: Rebuild the dependency wheels required by the official beta source
         shell: bash
         run: |

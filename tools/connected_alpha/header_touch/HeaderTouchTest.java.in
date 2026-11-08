@@ -1,0 +1,20 @@
+import android.app.Activity;import android.os.Looper;import android.view.*;import android.widget.*;
+import org.junit.*;import org.junit.runner.RunWith;import org.robolectric.*;import org.robolectric.annotation.*;
+import static org.junit.Assert.*;
+
+@RunWith(RobolectricTestRunner.class) @Config(manifest=Config.NONE,sdk=35)
+public class HeaderTouchTest {
+ private Activity activity;private FrameLayout root;private ControlOwner owner;
+ private void layout(){owner.forceLayout();owner.measure(View.MeasureSpec.makeMeasureSpec(200,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(60,View.MeasureSpec.EXACTLY));owner.layout(0,0,200,60);}
+ @Before public void setup(){activity=Robolectric.buildActivity(Activity.class).setup().get();root=new FrameLayout(activity);activity.setContentView(root);owner=new ControlOwner(activity);root.addView(owner,new FrameLayout.LayoutParams(200,60));layout();}
+ private void send(int action,float x,float y,long time){MotionEvent e=MotionEvent.obtain(0,time,action,x,y,0);assertTrue(owner.dispatchTouchEvent(e));e.recycle();}
+ private void clickThroughMeasure(View button){float x=button.getX()+button.getWidth()/2f,y=button.getY()+button.getHeight()/2f;send(MotionEvent.ACTION_DOWN,x,y,0);Shadows.shadowOf(Looper.getMainLooper()).idleFor(java.time.Duration.ofMillis(130));layout();send(MotionEvent.ACTION_UP,x,y,150);Shadows.shadowOf(Looper.getMainLooper()).idle();}
+ @Test public void nativePopupOpensAfterIntermediateMeasure(){
+  TextView item=new TextView(activity);item.setText("Buscar");PopupWindow popup=new PopupWindow(item,180,100,true);
+  owner.signatureMore.setOnClickListener(v->popup.showAsDropDown(v));
+  clickThroughMeasure(owner.signatureMore);
+  assertTrue("menu popup lost its click during measure",popup.isShowing());assertEquals("Buscar",((TextView)popup.getContentView()).getText());popup.dismiss();
+ }
+ @Test public void callClickSurvivesIntermediateMeasure(){int[]calls={0};owner.signatureCall.setOnClickListener(v->calls[0]++);clickThroughMeasure(owner.signatureCall);assertEquals("call click lost during measure",1,calls[0]);}
+ @Test public void inactiveHeaderHidesCustomControls(){owner.active=false;layout();assertEquals(View.GONE,owner.signatureMore.getVisibility());assertEquals(View.GONE,owner.signatureCall.getVisibility());}
+}

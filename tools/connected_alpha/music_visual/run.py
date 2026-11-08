@@ -92,7 +92,7 @@ def main(here=HERE, test_class="MusicVisualTest", stubs_writer=None, resource_wr
             with zipfile.ZipFile(path) as archive:
                 (aar_dir/(artifact+'.jar')).write_bytes(archive.read('classes.jar'))
         subprocess.run(command + ['-Pmusic-compile', 'test'], check=True)
-    print('PASS: Android API35 isolated production music components; playback services are test doubles; full app/device NOT_TESTED.')
+    print(f'PASS: Android API35 isolated {test_class}; complete application/device NOT_TESTED.')
     return 0
 
 
